@@ -203,7 +203,7 @@ $menu-tokens: defaults(
     &.active,
     &:active {
       color: var(--#{$prefix}theme-contrast, var(--#{$prefix}menu-item-active-color));
-      background-color: var(--#{$prefix}theme-base, var(--#{$prefix}menu-item-active-bg));
+      background-color: var(--#{$prefix}theme-bg, var(--#{$prefix}menu-item-active-bg));
 
       .menu-item-icon {
         color: inherit !important; // stylelint-disable-line declaration-no-important

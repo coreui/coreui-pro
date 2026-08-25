@@ -6,13 +6,12 @@
 
 // scss-docs-start theme-color-variables
 $primary:       #5856d6 !default;
-$secondary:     #6b7785 !default;
+$secondary:     light-dark(var(--#{$prefix}gray-100), var(--#{$prefix}gray-600)) !default;
 $success:       #1b9e3e !default;
 $info:          #39f !default;
 $warning:       #f9b115 !default;
 $danger:        #e55353 !default;
-$light:         $gray-100 !default;
-$dark:          $gray-900 !default;
+$inverse:       light-dark(var(--#{$prefix}gray-900), var(--#{$prefix}gray-100)) !default;
 // scss-docs-end theme-color-variables
 
 $link-color:    $primary !default;
@@ -32,13 +31,13 @@ $theme-colors: (
   ),
   "secondary": (
     "base":          $secondary,
-    "contrast":      $white,
-    "fg":            light-dark(var(--#{$prefix}secondary-600), var(--#{$prefix}secondary-400)),
-    "text-emphasis": light-dark(var(--#{$prefix}secondary-800), var(--#{$prefix}secondary-200)),
-    "bg-subtle":     light-dark(var(--#{$prefix}secondary-100), var(--#{$prefix}secondary-900)),
-    "bg-muted":      light-dark(var(--#{$prefix}secondary-200), var(--#{$prefix}secondary-800)),
-    "border-subtle": light-dark(var(--#{$prefix}secondary-300), var(--#{$prefix}secondary-600)),
-    "focus-ring":    color-mix(in srgb, var(--#{$prefix}secondary) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
+    "contrast":      light-dark(var(--#{$prefix}gray-900), var(--#{$prefix}white)),
+    "fg":            light-dark(var(--#{$prefix}gray-600), var(--#{$prefix}gray-400)),
+    "text-emphasis": light-dark(var(--#{$prefix}gray-800), var(--#{$prefix}gray-200)),
+    "bg-subtle":     light-dark(var(--#{$prefix}gray-100), var(--#{$prefix}gray-800)),
+    "bg-muted":      light-dark(var(--#{$prefix}gray-200), var(--#{$prefix}gray-700)),
+    "border-subtle": light-dark(var(--#{$prefix}gray-300), var(--#{$prefix}gray-600)),
+    "focus-ring":    color-mix(in srgb, light-dark(var(--#{$prefix}gray-500), var(--#{$prefix}gray-300)) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
   ),
   "success": (
     "base":          $success,
@@ -80,25 +79,15 @@ $theme-colors: (
     "border-subtle": light-dark(var(--#{$prefix}danger-300), var(--#{$prefix}danger-600)),
     "focus-ring":    color-mix(in srgb, var(--#{$prefix}danger) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
   ),
-  "light": (
-    "base":          $light,
-    "contrast":      $black,
-    "fg":            light-dark(var(--#{$prefix}light-800), var(--#{$prefix}light-300)),
-    "text-emphasis": light-dark(var(--#{$prefix}gray-700), var(--#{$prefix}gray-100)),
-    "bg-subtle":     light-dark(var(--#{$prefix}light-100), var(--#{$prefix}gray-800)),
-    "bg-muted":      light-dark(var(--#{$prefix}light-200), var(--#{$prefix}light-800)),
-    "border-subtle": light-dark(var(--#{$prefix}gray-200), var(--#{$prefix}gray-700)),
-    "focus-ring":    color-mix(in srgb, var(--#{$prefix}light) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
-  ),
-  "dark": (
-    "base":          $dark,
-    "contrast":      $white,
-    "fg":            light-dark(var(--#{$prefix}dark-600), var(--#{$prefix}dark-300)),
-    "text-emphasis": light-dark(var(--#{$prefix}gray-800), var(--#{$prefix}gray-300)),
-    "bg-subtle":     light-dark(var(--#{$prefix}gray-400), var(--#{$prefix}dark-600)),
-    "bg-muted":      light-dark(var(--#{$prefix}dark-200), var(--#{$prefix}dark-800)),
-    "border-subtle": light-dark(var(--#{$prefix}gray-500), var(--#{$prefix}gray-800)),
-    "focus-ring":    color-mix(in srgb, var(--#{$prefix}dark) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
+  "inverse": (
+    "base":          $inverse,
+    "contrast":      light-dark(var(--#{$prefix}white), var(--#{$prefix}gray-900)),
+    "fg":            light-dark(var(--#{$prefix}gray-900), var(--#{$prefix}gray-200)),
+    "text-emphasis": light-dark(var(--#{$prefix}black), var(--#{$prefix}white)),
+    "bg-subtle":     light-dark(var(--#{$prefix}gray-100), var(--#{$prefix}gray-900)),
+    "bg-muted":      light-dark(var(--#{$prefix}gray-200), var(--#{$prefix}gray-700)),
+    "border-subtle": light-dark(var(--#{$prefix}gray-400), var(--#{$prefix}gray-600)),
+    "focus-ring":    color-mix(in srgb, light-dark(var(--#{$prefix}gray-900), var(--#{$prefix}gray-100)) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
   ),
 ) !default;
 // scss-docs-end theme-colors-map
@@ -131,10 +120,11 @@ $color-shades: (
 ) !default;
 // scss-docs-end color-scale-variables
 
-// The three families below read the scales through `light-dark()`, so a theme
-// color reads correctly in both schemes without a second set of variables.
-// `light` and `dark` point at the gray scale instead: their own scales would
-// be a scale of a gray, which is what `$grays` already is.
+// The families below read the scales through `light-dark()`, so a theme color
+// reads correctly in both schemes without a second set of variables. `secondary`
+// and `inverse` read `$grays` instead: they are grays already, and their fill
+// swaps ends of the scale between schemes, which a scale mixed from one base
+// cannot do.
 
 // scss-docs-start theme-text-map
 $theme-colors-text: map-slot($theme-colors, "text-emphasis") !default;
@@ -172,7 +162,7 @@ $theme-colors-focus-ring: map-slot($theme-colors, "focus-ring") !default;
 
 // scss-docs-start theme-token-refs
 $theme-token-refs: (
-  "base": "",
+  "bg": "",
   "contrast": "-contrast",
   "fg": "-fg",
   "fg-emphasis": "-text-emphasis",
@@ -183,14 +173,35 @@ $theme-token-refs: (
 ) !default;
 // scss-docs-end theme-token-refs
 
+// The :root tokens behind one slot, keyed by color name, for utility maps that
+// need to point a whole family at the same slot.
+@function theme-color-refs($slot, $key-suffix: "") {
+  $result: ();
+
+  @each $color in map.keys($theme-colors) {
+    $result: map.set($result, "#{$color}#{$key-suffix}", var(--#{$prefix}#{$color}#{map.get($theme-token-refs, $slot)}));
+  }
+
+  @return $result;
+}
+
 // scss-docs-start theme-interaction-variables
 // Tuned to land near the shade-color() amounts compiled before the states moved into CSS.
 $theme-hover-lightness:   .85 !default;
 $theme-active-lightness:  .8 !default;
 
-// Dark theme colors sit too low to darken any further, so they brighten instead.
-$theme-lightness-overrides: (
-  "dark": ("hover": 1.48, "active": 1.62)
+// The neutral pair steps along the gray scale instead of shifting lightness: its
+// fill swaps ends between schemes, so one multiplier would darken a dark fill in
+// one scheme and wash out a light one in the other.
+$theme-state-colors: (
+  "secondary": (
+    "hover":  light-dark(var(--#{$prefix}gray-200), var(--#{$prefix}gray-700)),
+    "active": light-dark(var(--#{$prefix}gray-300), var(--#{$prefix}gray-800))
+  ),
+  "inverse": (
+    "hover":  light-dark(var(--#{$prefix}gray-800), var(--#{$prefix}gray-200)),
+    "active": light-dark(var(--#{$prefix}gray-700), var(--#{$prefix}gray-300))
+  )
 ) !default;
 // scss-docs-end theme-interaction-variables
 
@@ -199,11 +210,16 @@ $theme-lightness-overrides: (
     --#{$prefix}theme-#{$token}: var(--#{$prefix}#{$state}#{$suffix});
   }
 
-  $overrides: map.get($theme-lightness-overrides, $state) or ();
+  $overrides: map.get($theme-state-colors, $state) or ();
 
   @each $token, $lightness in ("hover": $theme-hover-lightness, "active": $theme-active-lightness) {
-    $shift: map.get($overrides, $token) or $lightness;
-    --#{$prefix}theme-#{$token}: oklch(from var(--#{$prefix}#{$state}) calc(l * #{$shift}) c h);
+    $override: map.get($overrides, $token);
+
+    @if $override {
+      --#{$prefix}theme-#{$token}: #{$override};
+    } @else {
+      --#{$prefix}theme-#{$token}: oklch(from var(--#{$prefix}#{$state}) calc(l * #{$lightness}) c h);
+    }
   }
 }
 

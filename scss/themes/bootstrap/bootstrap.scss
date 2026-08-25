@@ -37,8 +37,7 @@ $success:       $green !default;
 $info:          $cyan !default;
 $warning:       $yellow !default;
 $danger:        $red !default;
-$light:         $gray-100 !default;
-$dark:          $gray-900 !default;
+$inverse:       light-dark($gray-900, $gray-100) !default;
 // scss-docs-end theme-color-variables
 
 @forward "../../coreui" with (
@@ -61,8 +60,7 @@ $dark:          $gray-900 !default;
   $info:                          $info !default,
   $warning:                       $warning !default,
   $danger:                        $danger !default,
-  $light:                         $light !default,
-  $dark:                          $dark !default,
+  $inverse:                       $inverse !default,
   $body-color:                    light-dark($gray-900, $gray-300) !default,
   $body-secondary-color:          light-dark(rgba($gray-900, .75), rgba($gray-300, .75)) !default,
   $body-tertiary-color:           light-dark(rgba($gray-900, .5), rgba($gray-300, .5)) !default,

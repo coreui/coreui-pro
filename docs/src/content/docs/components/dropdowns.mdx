@@ -174,7 +174,7 @@ Opt into darker dropdowns to match a dark navbar or custom style by adding `.dro
 
 And putting it to use in a navbar:
 
-<Example code={`<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<Example code={`<nav class="navbar navbar-expand-lg bg-body-tertiary" data-coreui-theme="dark">
     <div class="container-fluid">
       <a class="navbar-brand" href="#">Navbar</a>
       <button class="navbar-toggler" type="button" data-coreui-toggle="collapse" data-coreui-target="#navbarNavDarkDropdown" aria-controls="navbarNavDarkDropdown" aria-expanded="false" aria-label="Toggle navigation">
@@ -183,7 +183,7 @@ And putting it to use in a navbar:
       <div class="collapse navbar-collapse" id="navbarNavDarkDropdown">
         <ul class="navbar-nav">
           <li class="nav-item dropdown">
-            <button class="btn btn-dark dropdown-toggle" data-coreui-toggle="dropdown" aria-expanded="false">
+            <button class="btn btn-inverse dropdown-toggle" data-coreui-toggle="dropdown" aria-expanded="false">
               Dropdown
             </button>
             <ul class="dropdown-menu dropdown-menu-dark">

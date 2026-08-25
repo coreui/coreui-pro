@@ -102,7 +102,7 @@ $badge-variants: (
     vertical-align: baseline;
     border: var(--#{$prefix}badge-border-width) solid var(--#{$prefix}badge-border-color);
     border-radius: var(--#{$prefix}badge-border-radius, 0); // stylelint-disable-line property-disallowed-list
-    @include gradient-bg(var(--#{$prefix}theme-base, var(--#{$prefix}badge-bg)));
+    @include gradient-bg(var(--#{$prefix}theme-bg, var(--#{$prefix}badge-bg)));
 
     // Empty badges collapse automatically
     &:empty {

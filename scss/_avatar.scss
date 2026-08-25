@@ -85,7 +85,7 @@ $avatar-variants: (
     font-size: var(--#{$prefix}avatar-font-size, calc(var(--#{$prefix}avatar-size) * #{$avatar-font-size-ratio}));
     color: var(--#{$prefix}theme-contrast, var(--#{$prefix}avatar-color));
     vertical-align: middle;
-    background-color: var(--#{$prefix}theme-base, var(--#{$prefix}avatar-bg));
+    background-color: var(--#{$prefix}theme-bg, var(--#{$prefix}avatar-bg));
     @include border-radius(var(--#{$prefix}avatar-border-radius));
     @include transition($avatar-transition);
   }
