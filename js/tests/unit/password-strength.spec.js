@@ -1,3 +1,4 @@
+import PasswordInput from '../../src/password-input.js'
 import PasswordStrength from '../../src/password-strength.js'
 import { getFixture, clearFixture } from '../helpers/fixture.js'
 
@@ -326,6 +327,67 @@ describe('PasswordStrength', () => {
       const instance = new PasswordStrength(fixtureEl.querySelector('#meter'), { input: '#pw' })
 
       expect(instance.getScore()).toBeGreaterThan(0)
+    })
+
+    it('should ignore a plain text input', () => {
+      fixtureEl.innerHTML = [
+        '<div>',
+        '  <input type="text" class="form-control" value="Str0ng!&Passphrase99">',
+        '  <div id="meter"></div>',
+        '</div>'
+      ].join('')
+
+      const instance = new PasswordStrength(fixtureEl.querySelector('#meter'))
+
+      expect(instance.getScore()).toBeNull()
+    })
+  })
+
+  describe('paired with Password Input', () => {
+    const pair = () => {
+      fixtureEl.innerHTML = [
+        '<div>',
+        '  <input type="password" class="form-control" id="pw" data-coreui-toggle="password-input" value="Str0ng!&Passphrase99">',
+        '  <div id="meter"></div>',
+        '</div>'
+      ].join('')
+
+      return {
+        input: fixtureEl.querySelector('#pw'),
+        meterEl: fixtureEl.querySelector('#meter')
+      }
+    }
+
+    it('should find the field while the password is revealed', () => {
+      const { input, meterEl } = pair()
+      const passwordInput = new PasswordInput(input)
+
+      passwordInput.toggle()
+      expect(input.type).toBe('text')
+
+      // The meter is created only now, so the fallback runs against a field
+      // that is no longer type="password".
+      const instance = new PasswordStrength(meterEl, { debounce: 0 })
+
+      expect(instance.getScore()).toBeGreaterThan(0)
+    })
+
+    it('should keep scoring across a visibility round-trip', () => {
+      const { input, meterEl } = pair()
+      const passwordInput = new PasswordInput(input)
+      const instance = new PasswordStrength(meterEl, { debounce: 0 })
+
+      const initial = instance.getScore()
+
+      passwordInput.toggle()
+      passwordInput.toggle()
+
+      expect(input.type).toBe('password')
+      expect(instance.getScore()).toBe(initial)
+
+      type(input, 'abc')
+
+      expect(instance.getScore()).toBeLessThan(initial)
     })
   })
 })
