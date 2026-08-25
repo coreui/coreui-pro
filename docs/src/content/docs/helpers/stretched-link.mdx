@@ -30,7 +30,7 @@ Most custom components do not have `position: relative` by default, so we need t
     </div>
   </div>`} />
 
-<Example code={`<div class="row g-0 bg-body-secondary position-relative">
+<Example code={`<div class="row g-0 bg-4 position-relative">
     <div class="col-md-6 mb-md-0 p-md-4">
       <svg class="docs-placeholder-img w-100" width="100%" height="200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Generic placeholder image" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Generic placeholder image</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em">false</text></svg>
     </div>
@@ -58,7 +58,7 @@ If the stretched link doesn't seem to work, the [containing block](https://devel
       <p class="card-text">
         <a href="#" class="stretched-link text-danger" style="position: relative;">Stretched link will not work here, because <code>position: relative</code> is added to the link</a>
       </p>
-      <p class="card-text bg-body-secondary" style="transform: rotate(0);">
+      <p class="card-text bg-4" style="transform: rotate(0);">
         This <a href="#" class="text-warning stretched-link">stretched link</a> will only be spread over the <code>p</code>-tag, because a transform is applied to it.
       </p>
     </div>

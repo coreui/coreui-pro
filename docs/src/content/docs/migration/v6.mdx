@@ -2477,7 +2477,7 @@ now, and the two neutrals swap ends of the gray scale between schemes.
   colour-scheme opt-ins keep their names: `.navbar-dark`, `.dropdown-menu-dark`,
   `.carousel-dark` and `.sidebar-dark` are unaffected, as is `.fw-light`.
 - **A surface is not a theme colour.** Where `.bg-light` was a neutral panel,
-  reach for `.bg-body-secondary` or `.bg-body-tertiary`; where `.bg-dark` was a
+  reach for `.bg-4` or `.bg-3`; where `.bg-dark` was a
   fixed dark backdrop, set `data-coreui-theme="dark"` on the container and let
   the surface classes follow.
 - **`--cui-theme-base` is now `--cui-theme-bg`.** The contextual token that
@@ -3143,8 +3143,8 @@ no output at all.
 
 | Removed | Use instead |
 | --- | --- |
-| `.text-high-emphasis`, `.text-medium-emphasis` | `.text-body`, `.text-body-secondary` |
-| `.text-disabled` | `.text-body-tertiary` |
+| `.text-high-emphasis`, `.text-medium-emphasis` | `.text-body`, `.fg-2` |
+| `.text-disabled` | `.fg-3` |
 | `.text-high-emphasis-inverse`, `.text-medium-emphasis-inverse`, `.text-disabled-inverse` | `.text-white` with an opacity utility |
 
 (The `.dark:` variants of the emphasis utilities go with them.)

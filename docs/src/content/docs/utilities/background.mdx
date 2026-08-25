@@ -16,10 +16,7 @@ Each theme color comes in three weights: the solid color, `.bg-*-muted` and `.bg
   ...getData('theme-colors').map((c) => `<div class="p-3 mb-2 bg-${c.name} ${c.contrast_color ? `text-${c.contrast_color}` : `text-white`}">.bg-${c.name}</div>
 <div class="p-3 mb-2 bg-${c.name}-muted text-${c.name}-emphasis">.bg-${c.name}-muted</div>
 <div class="p-3 mb-2 bg-${c.name}-subtle text-${c.name}-emphasis">.bg-${c.name}-subtle</div>`),
-  `<p class="p-3 mb-2 bg-body-secondary">.bg-body-secondary</p>
-<p class="p-3 mb-2 bg-body-tertiary">.bg-body-tertiary</p>
-
-<div class="p-3 mb-2 bg-body text-body">.bg-body</div>
+  `<div class="p-3 mb-2 bg-body text-body">.bg-body</div>
 <div class="p-3 mb-2 bg-black text-white">.bg-black</div>
 <div class="p-3 mb-2 bg-white text-black">.bg-white</div>
 <div class="p-3 mb-2 bg-transparent text-body">.bg-transparent</div>`
