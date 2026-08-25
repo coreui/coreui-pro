@@ -14,6 +14,8 @@ We're building a Parcel project with CoreUI from scratch, so there are some prer
    npm init -y
    ```
 
+   Delete the `"main": "index.js"` line from that fresh `package.json`. Parcel reads `main` as a library build target, and with it present the build stops before it starts (*Target "main" declares an output file path of "index.js" which does not match the compiled bundle type "html"*).
+
 2. **Install Parcel.** Unlike our Webpack guide, there's only a single build tool dependency here. Parcel will automatically install language transformers (like Sass) as it detects them. We use `--save-dev` to signal that this dependency is only for development use and not for production.
 
    ```sh
@@ -40,7 +42,7 @@ We've already created the `my-project` folder and initialized npm. Now we'll als
 
 ```sh
 mkdir {src,src/js,src/scss}
-touch src/index.html src/js/main.js src/scss/styles.scss
+touch .sassrc src/index.html src/js/main.js src/scss/styles.scss
 ```
 
 When you're done, your complete project should look like this:
@@ -53,6 +55,7 @@ my-project/
 │   ├── scss/
 │   │   └── styles.scss
 │   └── index.html
+├── .sassrc
 ├── package-lock.json
 └── package.json
 ```
@@ -78,13 +81,13 @@ With dependencies installed and our project folder ready for us to start coding,
      <body>
        <div class="container py-4 px-3 mx-auto">
          <h1>Hello, CoreUI and Parcel!</h1>
-         <button class="btn btn-primary">Primary button</button>
+         <button class="btn-solid theme-primary">Primary button</button>
        </div>
      </body>
    </html>
    ```
 
-   We're including a little bit of CoreUI styling here with the `div class="container"` and `<button>` so that we see when CoreUI's CSS is loaded by Webpack.
+   We're including a little bit of CoreUI styling here with the `div class="container"` and `<button>` so that we see when CoreUI's CSS is loaded by Parcel.
 
    Parcel will automatically detect we're using Sass and install the [Sass Parcel plugin](https://parceljs.org/languages/sass/) to support it. However, if you wish, you can also manually run `npm i --save-dev @parcel/transformer-sass`.
 
@@ -111,28 +114,41 @@ In the next and final section to this guide, we'll import all of CoreUI's CSS an
 
 ## Import CoreUI
 
-Importing CoreUI into Parcel requires two imports, one into our `styles.scss` and one into our `main.js`.
+Importing CoreUI into Parcel takes one line of Sass config and two imports, one into our `styles.scss` and one into our `main.js`.
 
-1. **Import CoreUI's CSS.** Add the following to `src/scss/styles.scss` to import all of CoreUI's source Sass.
+1. **Point the Sass transformer at `node_modules`.** Unlike Vite and Webpack, Parcel's Sass transformer resolves imports relative to the file only — a package path finds nothing on its own, whether or not you prefix it with `~`. Create a `.sassrc` next to `package.json` so package paths resolve:
+
+   ```json
+   {
+     "includePaths": ["node_modules"]
+   }
+   ```
+
+2. **Import CoreUI's CSS.** Add the following to `src/scss/styles.scss` to import all of CoreUI's source Sass.
 
    ```scss
    // Use all of CoreUI's CSS
-   @use "~@coreui/coreui/scss/coreui";
-
-   // Or use all of CoreUI PRO's CSS
-   @use "~@coreui/coreui-pro/scss/coreui";
+   @use "@coreui/coreui/scss/coreui";
    ```
 
+   PRO users import the PRO package instead. Import **one** of the two — importing both emits the whole stylesheet twice.
+
+   ```scss
+   @use "@coreui/coreui-pro/scss/coreui";
+   ```
 
    *You can also import our stylesheets individually if you want. [Read our Sass import docs](/customize/sass/#importing) for details.*
 
-2. **Import CoreUI's JS.** Add the following to `src/js/main.js` to import all of CoreUI's JS. Floating UI will be imported automatically through CoreUI.
+3. **Import CoreUI's JS.** Add the following to `src/js/main.js` to import all of CoreUI's JS. Floating UI will be imported automatically through CoreUI.
 
    ```js
    // Import all of CoreUI's JS
    import * as coreui from '@coreui/coreui'
+   ```
 
-   // Or import all of CoreUI PRO's JS
+   PRO users import the PRO package instead. Again, pick one — two `import * as coreui` statements in the same file bind the same name twice and the file will not parse.
+
+   ```js
    import * as coreui from '@coreui/coreui-pro'
    ```
 
@@ -147,6 +163,6 @@ Importing CoreUI into Parcel requires two imports, one into our `styles.scss` an
 
    *[Read our JavaScript docs](/getting-started/javascript/) for more information on how to use CoreUI's plugins.*
 
-3. **And you're done! 🎉** With CoreUI's source Sass and JS fully loaded, your local development server should now look like this.
+4. **And you're done! 🎉** With CoreUI's source Sass and JS fully loaded, your local development server should now look like this.
 
    Now you can start adding any CoreUI components you want to use.
