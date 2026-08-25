@@ -33,15 +33,15 @@ Toggle a dialog by clicking the button below.
     <p>This is a native dialog element. It uses the browser's built-in modal behavior for accessibility and focus management.</p>
   </div>
   <div class="dialog-footer">
-    <button type="button" class="btn btn-secondary" data-coreui-dismiss="dialog">Close</button>
-    <button type="button" class="btn btn-primary">Save changes</button>
+    <button type="button" class="btn-solid theme-secondary" data-coreui-dismiss="dialog">Close</button>
+    <button type="button" class="btn-solid theme-primary">Save changes</button>
   </div>
 </dialog>
 
-<Example html={[`<button type="button" class="btn btn-primary" data-coreui-toggle="dialog" data-coreui-target="#exampleDialog">`, `  Open dialog`, `</button>`]} />
+<Example html={[`<button type="button" class="btn-solid theme-primary" data-coreui-toggle="dialog" data-coreui-target="#exampleDialog">`, `  Open dialog`, `</button>`]} />
 
 ```html
-<button type="button" class="btn btn-primary" data-coreui-toggle="dialog" data-coreui-target="#exampleDialog">
+<button type="button" class="btn-solid theme-primary" data-coreui-toggle="dialog" data-coreui-target="#exampleDialog">
   Open dialog
 </button>
 
@@ -54,8 +54,8 @@ Toggle a dialog by clicking the button below.
     <p>This is a native dialog element.</p>
   </div>
   <div class="dialog-footer">
-    <button type="button" class="btn btn-secondary" data-coreui-dismiss="dialog">Close</button>
-    <button type="button" class="btn btn-primary">Save changes</button>
+    <button type="button" class="btn-solid theme-secondary" data-coreui-dismiss="dialog">Close</button>
+    <button type="button" class="btn-solid theme-primary">Save changes</button>
   </div>
 </dialog>
 ```
@@ -84,7 +84,7 @@ Dialogs fade in and out by default. Add `.dialog-slide-down` to slide in from ab
   </div>
 </dialog>
 
-<Example html={[`<button type="button" class="btn btn-primary" data-coreui-toggle="dialog" data-coreui-target="#exampleDialogSlideDown">Slide down</button>`, `<button type="button" class="btn btn-primary" data-coreui-toggle="dialog" data-coreui-target="#exampleDialogSlideUp">Slide up</button>`]} />
+<Example html={[`<button type="button" class="btn-solid theme-primary" data-coreui-toggle="dialog" data-coreui-target="#exampleDialogSlideDown">Slide down</button>`, `<button type="button" class="btn-solid theme-primary" data-coreui-toggle="dialog" data-coreui-target="#exampleDialogSlideUp">Slide up</button>`]} />
 
 ```html
 <dialog class="dialog dialog-slide-down">...</dialog>
@@ -106,12 +106,12 @@ When backdrop is set to `static`, the dialog will not close when clicking outsid
     <p>I will not close if you click outside of me. Don't even try to press escape key.</p>
   </div>
   <div class="dialog-footer">
-    <button type="button" class="btn btn-secondary" data-coreui-dismiss="dialog">Close</button>
-    <button type="button" class="btn btn-primary">Understood</button>
+    <button type="button" class="btn-solid theme-secondary" data-coreui-dismiss="dialog">Close</button>
+    <button type="button" class="btn-solid theme-primary">Understood</button>
   </div>
 </dialog>
 
-<Example html={[`<button type="button" class="btn btn-primary" data-coreui-toggle="dialog" data-coreui-target="#exampleDialogStatic">`, `  Launch static backdrop dialog`, `</button>`]} />
+<Example html={[`<button type="button" class="btn-solid theme-primary" data-coreui-toggle="dialog" data-coreui-target="#exampleDialogStatic">`, `  Launch static backdrop dialog`, `</button>`]} />
 
 ## Scrolling long content
 
@@ -128,12 +128,12 @@ Add `.dialog-scrollable` — the header and footer stay fixed while the dialog b
     <p>This content should appear at the bottom after you scroll.</p>
   </div>
   <div class="dialog-footer">
-    <button type="button" class="btn btn-secondary" data-coreui-dismiss="dialog">Close</button>
-    <button type="button" class="btn btn-primary">Save changes</button>
+    <button type="button" class="btn-solid theme-secondary" data-coreui-dismiss="dialog">Close</button>
+    <button type="button" class="btn-solid theme-primary">Save changes</button>
   </div>
 </dialog>
 
-<Example html={[`<button type="button" class="btn btn-primary" data-coreui-toggle="dialog" data-coreui-target="#exampleDialogScrollable">`, `  Launch scrollable dialog`, `</button>`]} />
+<Example html={[`<button type="button" class="btn-solid theme-primary" data-coreui-toggle="dialog" data-coreui-target="#exampleDialogScrollable">`, `  Launch scrollable dialog`, `</button>`]} />
 
 ```html
 <dialog class="dialog dialog-scrollable">
@@ -154,7 +154,7 @@ When a trigger sits inside an open dialog, the component swaps to the target dia
       Show a second dialog and hide this one with the button below.
     </div>
     <div class="dialog-footer">
-      <button class="btn btn-primary" data-coreui-target="#exampleDialogToggle2" data-coreui-toggle="dialog">Open second dialog</button>
+      <button class="btn-solid theme-primary" data-coreui-target="#exampleDialogToggle2" data-coreui-toggle="dialog">Open second dialog</button>
     </div>
   </dialog>
   <dialog class="dialog" id="exampleDialogToggle2" aria-labelledby="exampleDialogToggleLabel2">
@@ -166,10 +166,10 @@ When a trigger sits inside an open dialog, the component swaps to the target dia
       Hide this dialog and show the first with the button below.
     </div>
     <div class="dialog-footer">
-      <button class="btn btn-primary" data-coreui-target="#exampleDialogToggle" data-coreui-toggle="dialog">Back to first</button>
+      <button class="btn-solid theme-primary" data-coreui-target="#exampleDialogToggle" data-coreui-toggle="dialog">Back to first</button>
     </div>
   </dialog>
-  <button class="btn btn-primary" data-coreui-target="#exampleDialogToggle" data-coreui-toggle="dialog">Open first dialog</button>`} />
+  <button class="btn-solid theme-primary" data-coreui-target="#exampleDialogToggle" data-coreui-toggle="dialog">Open first dialog</button>`} />
 
 ## Non-modal dialogs
 
@@ -185,7 +185,7 @@ Set the `modal` option to `false` to show the dialog without the top layer — n
   </div>
 </dialog>
 
-<Example html={[`<button type="button" class="btn btn-primary" data-coreui-toggle="dialog" data-coreui-target="#exampleDialogNonModal">`, `  Open non-modal dialog`, `</button>`]} />
+<Example html={[`<button type="button" class="btn-solid theme-primary" data-coreui-toggle="dialog" data-coreui-target="#exampleDialogNonModal">`, `  Open non-modal dialog`, `</button>`]} />
 
 ```html
 <dialog class="dialog" id="myDialog" data-coreui-modal="false">
@@ -273,9 +273,9 @@ Options can be passed using data attributes or JavaScript. To do this, append an
 | `getInstance` | *Static* method which allows you to get the dialog instance associated with a DOM element. |
 | `getOrCreateInstance` | *Static* method which allows you to get the dialog instance associated with a DOM element, or create a new one in case it wasn't initialized. |
 | `handleUpdate` | Provided for API consistency with Modal — the native `<dialog>` needs no manual adjustments. |
-| `hide` | Manually hides a dialog. **Returns to the caller before the dialog has actually been hidden** (i.e. before the `hidden.coreui.dialog` event occurs). |
-| `show` | Manually opens a dialog. **Returns to the caller before the dialog has actually been shown** (i.e. before the `shown.coreui.dialog` event occurs). Also, you can pass a DOM element as an argument that can be received in the dialog events (as the `relatedTarget` property). |
-| `toggle` | Manually toggles a dialog. **Returns to the caller before the dialog has actually been shown or hidden** (i.e. before the `shown.coreui.dialog` or `hidden.coreui.dialog` event occurs). |
+| `hide` | Manually hides a dialog. **Returns a promise that resolves after the dialog is hidden** (i.e. after the `hidden.coreui.dialog` event occurs). |
+| `show` | Manually opens a dialog. **Returns a promise that resolves after the dialog is shown** (i.e. after the `shown.coreui.dialog` event occurs). Also, you can pass a DOM element as an argument that can be received in the dialog events (as the `relatedTarget` property). |
+| `toggle` | Manually toggles a dialog. **Returns a promise that resolves after the dialog is shown or hidden** (i.e. after the `shown.coreui.dialog` or `hidden.coreui.dialog` event occurs). |
 
 ### Events
 

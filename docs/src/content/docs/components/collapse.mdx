@@ -1,5 +1,5 @@
 ---
-title: "Bootstrap 5 Collapse"
+title: "Bootstrap 6 Collapse"
 name: "Collapse"
 description: "Bootstrap collapse component toggles the visibility of content across your project with a few classes and some scripts. Useful for a large amount of content."
 otherFrameworks:
@@ -24,11 +24,11 @@ Click the buttons below to show and hide another element via class changes:
 
 You can use a link with the `href` attribute, or a button with the `data-coreui-target` attribute. In both samples, the `data-coreui-toggle="collapse""` is required.
 
-<Example code={`<p class="d-inline-flex gap-1">
-    <a class="btn btn-primary" data-coreui-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+<Example code={`<p class="d-inline-flex flex-wrap gap-1">
+    <a class="btn-solid theme-primary" data-coreui-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
       Link with href
     </a>
-    <button class="btn btn-primary" type="button" data-coreui-toggle="collapse" data-coreui-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+    <button class="btn-solid theme-primary" type="button" data-coreui-toggle="collapse" data-coreui-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
       Button with data-coreui-target
     </button>
   </p>
@@ -47,7 +47,7 @@ Please note that while the example below has a `min-height` set to avoid excessi
 </Callout>
 
 <Example code={`<p>
-    <button class="btn btn-primary" type="button" data-coreui-toggle="collapse" data-coreui-target="#collapseWidthExample" aria-expanded="false" aria-controls="collapseWidthExample">
+    <button class="btn-solid theme-primary" type="button" data-coreui-toggle="collapse" data-coreui-target="#collapseWidthExample" aria-expanded="false" aria-controls="collapseWidthExample">
       Toggle width collapse
     </button>
   </p>
@@ -64,10 +64,10 @@ Please note that while the example below has a `min-height` set to avoid excessi
 A `<button>` or `<a>` can show and hide multiple elements by referencing them with a selector in its `href` or `data-coreui-target` attribute.
 Multiple `<button>` or `<a>` can show and hide an element if they each reference it with their `href` or `data-coreui-target` attribute
 
-<Example code={`<p class="d-inline-flex gap-1">
-    <a class="btn btn-primary" data-coreui-toggle="collapse" href="#multiCollapseExample1" role="button" aria-expanded="false" aria-controls="multiCollapseExample1">Toggle first element</a>
-    <button class="btn btn-primary" type="button" data-coreui-toggle="collapse" data-coreui-target="#multiCollapseExample2" aria-expanded="false" aria-controls="multiCollapseExample2">Toggle second element</button>
-    <button class="btn btn-primary" type="button" data-coreui-toggle="collapse" data-coreui-target=".multi-collapse" aria-expanded="false" aria-controls="multiCollapseExample1 multiCollapseExample2">Toggle both elements</button>
+<Example code={`<p class="d-inline-flex flex-wrap gap-1">
+    <a class="btn-solid theme-primary" data-coreui-toggle="collapse" href="#multiCollapseExample1" role="button" aria-expanded="false" aria-controls="multiCollapseExample1">Toggle first element</a>
+    <button class="btn-solid theme-primary" type="button" data-coreui-toggle="collapse" data-coreui-target="#multiCollapseExample2" aria-expanded="false" aria-controls="multiCollapseExample2">Toggle second element</button>
+    <button class="btn-solid theme-primary" type="button" data-coreui-toggle="collapse" data-coreui-target=".multi-collapse" aria-expanded="false" aria-controls="multiCollapseExample1 multiCollapseExample2">Toggle both elements</button>
   </p>
   <div class="row">
     <div class="col">
@@ -91,7 +91,7 @@ Multiple `<button>` or `<a>` can show and hide an element if they each reference
 By default a collapsed area is removed from the layout, which also removes it from what the browser's find-in-page can search. Set `data-coreui-hidden-until-found="true"` on the collapsible element to hide it with [`hidden="until-found"`](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/hidden) instead: the content stays laid out but invisible, so searching the page finds it, and the browser expands the area to show the match.
 
 <Example code={`<p>
-    <button class="btn btn-primary" type="button" data-coreui-toggle="collapse" data-coreui-target="#collapseFindable" aria-expanded="false" aria-controls="collapseFindable">
+    <button class="btn-solid theme-primary" type="button" data-coreui-toggle="collapse" data-coreui-target="#collapseFindable" aria-expanded="false" aria-controls="collapseFindable">
       Toggle findable content
     </button>
   </p>
@@ -172,9 +172,9 @@ bsCollapse.show()
 | `dispose` | Destroys an element's collapse. (Removes stored data on the DOM element) |
 | `getInstance` | Static method which allows you to get the collapse instance associated to a DOM element, you can use it like this: `coreui.Collapse.getInstance(element)` |
 | `getOrCreateInstance` | Static method which returns a collapse instance associated to a DOM element or create a new one in case it wasn't initialized. You can use it like this: `coreui.Collapse.getOrCreateInstance(element)` |
-| `hide` | Hides a collapsible element. **Returns to the caller before the collapsible element has actually been hidden** (e.g., before the `hidden.coreui.collapse` event occurs). |
-| `show` | Shows a collapsible element. **Returns to the caller before the collapsible element has actually been shown** (e.g., before the `shown.coreui.collapse` event occurs). |
-| `toggle` | Toggles a collapsible element to shown or hidden. **Returns to the caller before the collapsible element has actually been shown or hidden** (i.e. before the `shown.coreui.collapse` or `hidden.coreui.collapse` event occurs). |
+| `hide` | Hides a collapsible element. **Returns a promise that resolves after the collapsible element is hidden** (e.g., after the `hidden.coreui.collapse` event occurs). |
+| `show` | Shows a collapsible element. **Returns a promise that resolves after the collapsible element is shown** (e.g., after the `shown.coreui.collapse` event occurs). |
+| `toggle` | Toggles a collapsible element to shown or hidden. **Returns a promise that resolves after the collapsible element is shown or hidden** (i.e. after the `shown.coreui.collapse` or `hidden.coreui.collapse` event occurs). |
 
 ### Events
 

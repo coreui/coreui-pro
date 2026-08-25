@@ -1,5 +1,5 @@
 ---
-title: "Bootstrap 5 Colors"
+title: "Bootstrap 6 Colors"
 name: "Colors"
 description: "Convey meaning through `color` with a handful of color utility classes. Includes support for styling links with hover states, too."
 utility: [{prefix: "text", property: "color"}, "text-opacity"]
@@ -24,7 +24,7 @@ Colorize text with color utilities. To colorize a link, give it a [theme class](
 ]} />
 
 <Callout color="warning">
-**Deprecation:** With the addition of `.text-opacity-*` utilities and CSS variables for text utilities, `.text-black-50` and `.text-white-50` are deprecated as of v4.1.0. They'll be removed in v6.0.0.
+**Deprecation:** `.text-black-50` and `.text-white-50` still ship, but `.text-opacity-*` composes with any text color and is the spelling to reach for. Write `.text-black.text-opacity-50` instead.
 </Callout>
 
 ## Foreground ladder
