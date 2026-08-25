@@ -32,6 +32,7 @@ import OffCanvas from './src/offcanvas.js'
 import OTPInput from './src/otp-input.js'
 import NumberInput from './src/number-input.js'
 import PasswordInput from './src/password-input.js'
+import PasswordStrength from './src/password-strength.js'
 import Popover from './src/popover.js'
 import RangeSlider from './src/range-slider.js'
 import Rating from './src/rating.js'
@@ -73,6 +74,7 @@ export default {
   OTPInput,
   NumberInput,
   PasswordInput,
+  PasswordStrength,
   Popover,
   RangeSlider,
   Rating,

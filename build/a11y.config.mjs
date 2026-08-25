@@ -253,6 +253,26 @@ export const a11yComponents = [
     ]
   },
   {
+    component: 'forms/password-strength',
+    criteria: [
+      {
+        criterion: '4.1.3',
+        status: 'built-in',
+        note: 'The label, warning and suggestions share one role=status/aria-live=polite region, so the verdict is announced as a single polite message. Debouncing keeps the region from updating on every keystroke.'
+      },
+      {
+        criterion: '1.4.1',
+        status: 'built-in',
+        note: 'Strength is carried by the text label, not by the bar colour alone; the segmented bar is aria-hidden because it only restates that label.'
+      },
+      {
+        criterion: '3.3.2',
+        status: 'author',
+        note: 'Pair the password field with a <label for> (shown in the docs examples).'
+      }
+    ]
+  },
+  {
     component: 'forms/range-slider',
     criteria: [
       {
