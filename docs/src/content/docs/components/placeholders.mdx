@@ -101,7 +101,7 @@ Animate Bootstrap placeholders using `.placeholder-glow` or `.placeholder-wave` 
 
 ### CSS variables
 
-Placeholders use local CSS variables on `.placeholder` and `.placeholder-wave` for real-time customization. Values for the CSS variables are set via Sass, so Sass customization is still supported, too.
+Placeholders use local CSS variables on `.placeholder` and `.placeholder-wave` for real-time customization.
 
 <ScssDocs file="scss/_placeholder.scss" capture="placeholder-css-vars" />
 
@@ -114,5 +114,9 @@ Both animations read them, so lowering the minimum deepens the pulse of `.placeh
 ```
 
 ### SASS variables
+
+<DeprecatedIn version="6.0.0" />
+
+Sass variables set these defaults at build time and are removed in v7. The CSS variables above reach the same values without recompiling, and can be set on a single element.
 
 <ScssDocs file="scss/_placeholder.scss" capture="placeholders" />

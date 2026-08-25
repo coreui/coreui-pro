@@ -290,6 +290,10 @@ Input groups include support for custom selects and custom file inputs. Browser 
 ## Customizing
 
 ### SASS variables
+
+<DeprecatedIn version="6.0.0" />
+
+Sass variables set these defaults at build time and are removed in v7. The CSS variables above reach the same values without recompiling, and can be set on a single element.
 <ScssDocs file="scss/forms/_input-group.scss" capture="input-group-variables" />
 
 The sizes are a map, so `@use ... with()` can add one or drop one — set a key to `null` to remove it:

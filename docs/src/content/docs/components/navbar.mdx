@@ -696,7 +696,7 @@ The [drawer component](/components/drawer/) works the same way, with the v6 look
 
 ### CSS variables
 
-Navbars use local CSS variables on `.navbar` for enhanced real-time customization. Values for the CSS variables are set via Sass, so Sass customization is still supported, too.
+Navbars use local CSS variables on `.navbar` for enhanced real-time customization.
 
 <ScssDocs file="scss/_navbar.scss" capture="navbar-css-vars" />
 
@@ -705,6 +705,10 @@ Some additional CSS variables are also present on `.navbar-nav`:
 <ScssDocs file="scss/_navbar.scss" capture="navbar-nav-css-vars" />
 
 ### SASS variables
+
+<DeprecatedIn version="6.0.0" />
+
+Sass variables set these defaults at build time and are removed in v7. The CSS variables above reach the same values without recompiling, and can be set on a single element.
 
 Variables for all navbars:
 

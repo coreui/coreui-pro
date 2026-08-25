@@ -301,11 +301,15 @@ myDialogEl.addEventListener('hidden.coreui.dialog', event => {
 
 ### CSS variables
 
-Dialogs use local CSS variables on `.dialog` for enhanced real-time customization. Values for the CSS variables are set via Sass, so Sass customization is still supported, too.
+Dialogs use local CSS variables on `.dialog` for enhanced real-time customization.
 
 <ScssDocs file="scss/_dialog.scss" capture="dialog-css-vars" />
 
 ### SASS variables
+
+<DeprecatedIn version="6.0.0" />
+
+Sass variables set these defaults at build time and are removed in v7. The CSS variables above reach the same values without recompiling, and can be set on a single element.
 
 <ScssDocs file="scss/_dialog.scss" capture="dialog-variables" />
 

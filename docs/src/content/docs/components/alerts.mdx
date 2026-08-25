@@ -252,6 +252,10 @@ Our Bootstrap alerts utilize local CSS variables on `.alert` for improved real-t
 
 ### SASS variables
 
+<DeprecatedIn version="6.0.0" />
+
+Sass variables set these defaults at build time and are removed in v7. The CSS variables above reach the same values without recompiling, and can be set on a single element.
+
 <ScssDocs file="scss/_alert.scss" capture="alert-variables" />
 
 Each entry in the variants map names the theme role every token reads, so adding a variant takes a map entry rather than a new rule.

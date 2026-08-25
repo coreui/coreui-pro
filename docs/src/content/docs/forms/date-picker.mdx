@@ -440,6 +440,10 @@ customization. Values are set via Sass, so Sass customization is supported too.
 
 ### SASS variables
 
+<DeprecatedIn version="6.0.0" />
+
+Sass variables set these defaults at build time and are removed in v7. The CSS variables above reach the same values without recompiling, and can be set on a single element.
+
 The shell reuses the existing `$date-picker-*` shell-layer variables — it adds
 no new configuration surface. The input-layer variables (`$date-picker-input-*`,
 `$date-picker-cleaner-*`, `$date-picker-separator-icon-*`) belong to the v1

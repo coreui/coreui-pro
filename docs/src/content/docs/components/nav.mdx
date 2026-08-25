@@ -380,7 +380,7 @@ A [theme class](/customize/components/#theme-variants) recolors a nav. Every lin
 
 ### CSS variables
 
-Navs use local CSS variables on `.nav`, `.nav-tabs`, `.nav-pills`, `.nav-underline` and `.nav-underline-border` for enhanced real-time customization. Values for the CSS variables are set via Sass, so Sass customization is still supported, too.
+Navs use local CSS variables on `.nav`, `.nav-tabs`, `.nav-pills`, `.nav-underline` and `.nav-underline-border` for enhanced real-time customization.
 
 On the `.nav` base class:
 
@@ -411,5 +411,9 @@ Tab pane variables:
 <ScssDocs file="scss/_nav.scss" capture="tab-pane-css-vars" />
 
 ### SASS variables
+
+<DeprecatedIn version="6.0.0" />
+
+Sass variables set these defaults at build time and are removed in v7. The CSS variables above reach the same values without recompiling, and can be set on a single element.
 
 <ScssDocs file="scss/_nav.scss" capture="nav-variables" />

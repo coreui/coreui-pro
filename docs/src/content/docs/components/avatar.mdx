@@ -144,11 +144,15 @@ The ring around the indicator follows the page background through `--cui-avatar-
 
 ### CSS variables
 
-Avatars use local CSS variables on `.avatar` for enhanced real-time customization. Values for the CSS variables are set via Sass, so Sass customization is still supported, too.
+Avatars use local CSS variables on `.avatar` for enhanced real-time customization.
 
 <ScssDocs file="scss/_avatar.scss" capture="avatar-css-vars" />
 
 ### SASS variables
+
+<DeprecatedIn version="6.0.0" />
+
+Sass variables set these defaults at build time and are removed in v7. The CSS variables above reach the same values without recompiling, and can be set on a single element.
 
 <ScssDocs file="scss/_avatar.scss" capture="avatar-variables" />
 
