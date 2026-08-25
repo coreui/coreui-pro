@@ -41,7 +41,7 @@ Here's an example of all the sub-components included in a responsive header.
     <button class="header-toggler" type="button">
       <span class="header-toggler-icon"></span>
     </button>
-    <ul class="header-nav mr-auto">
+    <ul class="header-nav me-auto">
       <li class="nav-item active">
         <a class="nav-link" href="#">Home <span class="visually-hidden">(current)</span></a>
       </li>
@@ -191,9 +191,7 @@ Input groups work, too:
 <Example code={`<header class="header">
     <form class="d-flex">
       <div class="input-group">
-        <div class="input-group-prepend">
-          <span class="input-group-text" id="basic-addon1">@</span>
-        </div>
+        <span class="input-group-text" id="basic-addon1">@</span>
         <input type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1">
       </div>
     </form>
