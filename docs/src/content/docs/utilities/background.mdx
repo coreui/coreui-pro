@@ -11,8 +11,11 @@ import { getData } from '@coreui/astro-docs/data'
 
 Similar to the contextual text color classes, set the background of an element to any contextual class. Background utilities **do not set `color`**, so in some cases you'll want to use `.text-*` [color utilities](/utilities/colors/).
 
+Each theme color comes in three weights: the solid color, `.bg-*-muted` and `.bg-*-subtle`. The two lighter ones are surfaces to read text on, and `.text-*-emphasis` is the color that reads on them — `.bg-*-muted` is the step you want when a subtle surface has to separate from a subtle surface behind it, which is what a hovered row or a selected item needs.
+
 <Example code={[
   ...getData('theme-colors').map((c) => `<div class="p-3 mb-2 bg-${c.name} ${c.contrast_color ? `text-${c.contrast_color}` : `text-white`}">.bg-${c.name}</div>
+<div class="p-3 mb-2 bg-${c.name}-muted text-${c.name}-emphasis">.bg-${c.name}-muted</div>
 <div class="p-3 mb-2 bg-${c.name}-subtle text-${c.name}-emphasis">.bg-${c.name}-subtle</div>`),
   `<p class="p-3 mb-2 bg-body-secondary">.bg-body-secondary</p>
 <p class="p-3 mb-2 bg-body-tertiary">.bg-body-tertiary</p>
@@ -95,6 +98,10 @@ Grayscale colors are also available, but only a subset are used to generate any 
 Variables for setting `background-color` in `.bg-*-subtle` utilities in light and dark mode:
 
 <ScssDocs file="scss/_theme.scss" capture="theme-bg-subtle-map" />
+
+And the same for `.bg-*-muted`:
+
+<ScssDocs file="scss/_theme.scss" capture="theme-bg-muted-map" />
 
 ### Map
 
