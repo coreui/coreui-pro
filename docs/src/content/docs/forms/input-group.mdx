@@ -289,6 +289,16 @@ Input groups include support for custom selects and custom file inputs. Browser 
 
 ## Customizing
 
+### CSS variables
+
+The addon declares its own tokens on `.input-group-text`, so a single addon can be repainted or resized without a modifier class. `.input-group` itself declares none — it is a layout wrapper.
+
+<ScssDocs file="scss/forms/_input-group.scss" capture="input-group-tokens" />
+
+```html
+<span class="input-group-text" style="--cui-input-group-addon-bg: var(--cui-bg-1);">@</span>
+```
+
 ### SASS variables
 
 <DeprecatedIn version="6.0.0" />
