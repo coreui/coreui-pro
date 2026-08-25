@@ -614,9 +614,9 @@ const myModal = new coreui.Modal('#myModal', {
 | `getInstance` | *Static* method which allows you to get the modal instance associated with a DOM element. |
 | `getOrCreateInstance` | *Static* method which allows you to get the modal instance associated with a DOM element, or create a new one in case it wasn't initialized. |
 | `handleUpdate` | Kept for API compatibility with v5 — the native `<dialog>` needs no manual position adjustments. |
-| `hide` | Manually hides a modal. **Returns to the caller before the modal has actually been hidden** (i.e. before the `hidden.coreui.modal` event occurs). |
-| `show` | Manually opens a modal. **Returns to the caller before the modal has actually been shown** (i.e. before the `shown.coreui.modal` event occurs). Also, you can pass a DOM element as an argument that can be received in the modal events (as the `relatedTarget` property). (i.e. `const modalToggle = document.getElementById('toggleMyModal'); myModal.show(modalToggle)` |
-| `toggle` | Manually toggles a modal. **Returns to the caller before the modal has actually been shown or hidden** (i.e. before the `shown.coreui.modal` or `hidden.coreui.modal` event occurs). |
+| `hide` | Manually hides a modal. **Returns a promise that resolves after the modal is hidden** (i.e. after the `hidden.coreui.modal` event occurs). |
+| `show` | Manually opens a modal. **Returns a promise that resolves after the modal is shown** (i.e. after the `shown.coreui.modal` event occurs). Also, you can pass a DOM element as an argument that can be received in the modal events (as the `relatedTarget` property). (i.e. `const modalToggle = document.getElementById('toggleMyModal'); myModal.show(modalToggle)` |
+| `toggle` | Manually toggles a modal. **Returns a promise that resolves after the modal is shown or hidden** (i.e. after the `shown.coreui.modal` or `hidden.coreui.modal` event occurs). |
 
 ### Events
 

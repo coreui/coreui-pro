@@ -143,7 +143,7 @@ const alert = coreui.Alert.getOrCreateInstance('#myAlert')
 
 ### Promises and transitions
 
-All programmatic API methods are **asynchronous** and return to the caller once the transition is started, but **before it ends**.
+All programmatic API methods are **asynchronous**: they start the transition and hand control straight back, so the line after the call runs while the component is still moving.
 
 Methods that show or hide a component return a **promise**. The promise resolves when the transition ends, so you can `await` the method instead of listening for an event.
 
@@ -158,7 +158,7 @@ These methods return a promise:
 
 | Method | Components |
 | --- | --- |
-| `show`, `hide`, `toggle` | Collapse, Menu, Modal, Offcanvas, Popover, Sidebar, Tooltip |
+| `show`, `hide`, `toggle` | Collapse, Dialog, Drawer, Menu, Modal, Offcanvas, Popover, Sidebar, Tooltip |
 | `show`, `hide` | Toast |
 | `show` | Tab |
 | `close` | Alert |

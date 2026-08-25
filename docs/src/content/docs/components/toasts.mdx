@@ -333,9 +333,9 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `dispose` | Hides an element's toast. Your Bootstrap toast will stay in the DOM but won't be visible anymore. |
 | `getInstance` | *Static* method that allows you to get the toast instance associated with a DOM element. For example: `const myToastEl = document.getElementById('myToastEl')` and `const myToast = coreui.Toast.getInstance(myToastEl)`. Returns a Bootstrap toast instance.
 | `getOrCreateInstance` | *Static* method that gets the toast instance associated with a DOM element or creates a new one if it wasn't initialized. For example: `const myToastEl = document.getElementById('myToastEl')` and `const myToast = coreui.Toast.getOrCreateInstance(myToastEl)`. Returns a Bootstrap toast instance.
-| `hide` | Hides an element's toast. **Returns to the caller before the toast is actually hidden** (i.e., before the `hidden.coreui.toast` event occurs). You need to manually call this method if you set `autohide` to `false`. |
+| `hide` | Hides an element's toast. **Returns a promise that resolves after the toast is hidden** (i.e., after the `hidden.coreui.toast` event occurs). You need to manually call this method if you set `autohide` to `false`. |
 | `isShown` | Returns a boolean indicating the toast's visibility state. |
-| `show` | Reveals an element's toast. **Returns to the caller before the toast is actually shown** (i.e., before the `shown.coreui.toast` event occurs). You need to call this method manually; otherwise, your toast won't appear. |
+| `show` | Reveals an element's toast. **Returns a promise that resolves after the toast is shown** (i.e., after the `shown.coreui.toast` event occurs). You need to call this method manually; otherwise, your toast won't appear. |
 
 ### Events
 

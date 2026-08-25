@@ -273,9 +273,9 @@ Options can be passed using data attributes or JavaScript. To do this, append an
 | `getInstance` | *Static* method which allows you to get the dialog instance associated with a DOM element. |
 | `getOrCreateInstance` | *Static* method which allows you to get the dialog instance associated with a DOM element, or create a new one in case it wasn't initialized. |
 | `handleUpdate` | Provided for API consistency with Modal — the native `<dialog>` needs no manual adjustments. |
-| `hide` | Manually hides a dialog. **Returns to the caller before the dialog has actually been hidden** (i.e. before the `hidden.coreui.dialog` event occurs). |
-| `show` | Manually opens a dialog. **Returns to the caller before the dialog has actually been shown** (i.e. before the `shown.coreui.dialog` event occurs). Also, you can pass a DOM element as an argument that can be received in the dialog events (as the `relatedTarget` property). |
-| `toggle` | Manually toggles a dialog. **Returns to the caller before the dialog has actually been shown or hidden** (i.e. before the `shown.coreui.dialog` or `hidden.coreui.dialog` event occurs). |
+| `hide` | Manually hides a dialog. **Returns a promise that resolves after the dialog is hidden** (i.e. after the `hidden.coreui.dialog` event occurs). |
+| `show` | Manually opens a dialog. **Returns a promise that resolves after the dialog is shown** (i.e. after the `shown.coreui.dialog` event occurs). Also, you can pass a DOM element as an argument that can be received in the dialog events (as the `relatedTarget` property). |
+| `toggle` | Manually toggles a dialog. **Returns a promise that resolves after the dialog is shown or hidden** (i.e. after the `shown.coreui.dialog` or `hidden.coreui.dialog` event occurs). |
 
 ### Events
 
