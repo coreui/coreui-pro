@@ -40,12 +40,12 @@ By adding a `.bg-gradient` class, a linear gradient is added as background image
 
 Do you need a gradient in your custom CSS? Just add `background-image: var(gradient);`.
 
-<div class="p-3 mb-2 bg-primary bg-gradient text-white">.bg-primary.bg-gradient</div>
-<div class="p-3 mb-2 bg-secondary bg-gradient text-white">.bg-secondary.bg-gradient</div>
-<div class="p-3 mb-2 bg-success bg-gradient text-white">.bg-success.bg-gradient</div>
-<div class="p-3 mb-2 bg-danger bg-gradient text-white">.bg-danger.bg-gradient</div>
-<div class="p-3 mb-2 bg-warning bg-gradient text-black">.bg-warning.bg-gradient</div>
-<div class="p-3 mb-2 bg-info bg-gradient text-black">.bg-info.bg-gradient</div>
+<div class="p-3 mb-2 text-bg-primary bg-gradient">.bg-primary.bg-gradient</div>
+<div class="p-3 mb-2 text-bg-secondary bg-gradient">.bg-secondary.bg-gradient</div>
+<div class="p-3 mb-2 text-bg-success bg-gradient">.bg-success.bg-gradient</div>
+<div class="p-3 mb-2 text-bg-danger bg-gradient">.bg-danger.bg-gradient</div>
+<div class="p-3 mb-2 text-bg-warning bg-gradient">.bg-warning.bg-gradient</div>
+<div class="p-3 mb-2 text-bg-info bg-gradient">.bg-info.bg-gradient</div>
 <div class="p-3 mb-2 bg-black bg-gradient text-white">.bg-black.bg-gradient</div>
 
 ## Opacity
@@ -79,11 +79,11 @@ To change that opacity, override `--cui-bg-opacity` via custom styles or inline 
 
 Or, choose from any of the `.bg-opacity` utilities:
 
-<Example code={`<div class="bg-success p-2 text-white">This is default success background</div>
-  <div class="bg-success p-2 text-white bg-opacity-75">This is 75% opacity success background</div>
-  <div class="bg-success p-2 text-black bg-opacity-50">This is 50% opacity success background</div>
-  <div class="bg-success p-2 text-black bg-opacity-25">This is 25% opacity success background</div>
-  <div class="bg-success p-2 text-black bg-opacity-10">This is 10% opacity success background</div>`} />
+<Example code={`<div class="text-bg-success p-2">This is default success background</div>
+  <div class="bg-success p-2 bg-opacity-75">This is 75% opacity success background</div>
+  <div class="bg-success p-2 bg-opacity-50">This is 50% opacity success background</div>
+  <div class="bg-success p-2 bg-opacity-25">This is 25% opacity success background</div>
+  <div class="bg-success p-2 bg-opacity-10">This is 10% opacity success background</div>`} />
 
 ## Sass
 
