@@ -17,14 +17,21 @@ Change the border color using utilities built on our theme colors.
 
 ## Neutral
 
-Four weights sit between the page and a themed border, for lines that separate content without naming a color. `.border-emphasized` is the strongest, the default `--cui-border-color` sits in the middle, and `.border-subtle` is the faintest.
+Four weights sit between the page and a themed border, for lines that separate content without naming a color. `.border-emphasized` is the strongest, `.border-body` is the default weight a plain `.border` already draws, and `.border-subtle` is the faintest.
 
 <Example class="docs-example-border-utils" code={`<span class="border border-emphasized"></span>
-  <span class="border"></span>
+  <span class="border border-body"></span>
   <span class="border border-muted"></span>
   <span class="border border-subtle"></span>`} />
 
 Each is a `light-dark()` pair, so the ladder keeps its order in both color schemes rather than fading out in one of them.
+
+Naming the default is what lets you return to it. Dropping `.border-primary` gets you there when the class is yours to remove, but not when the color arrives from a component's own rule, a breakpoint or a `.theme-*` block — there, `.border-body` is the way back.
+
+`.border-bg` is the odd one out: it paints the line in the page background color, so the border holds its space without being seen. Reach for it when a visible border appears on hover or on a state, and the element would otherwise shift by the width of the line.
+
+<Example class="docs-example-border-utils" code={`<span class="border border-bg"></span>
+  <span class="border border-body"></span>`} />
 
 ## Sides
 

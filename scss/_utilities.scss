@@ -45,8 +45,10 @@ $utilities-border-colors: map.merge(
   (
     "black": var(--#{$prefix}black),
     "white": var(--#{$prefix}white),
+    "bg": var(--#{$prefix}bg-body),
     "subtle": var(--#{$prefix}border-subtle),
     "muted": var(--#{$prefix}border-muted),
+    "body": var(--#{$prefix}border-color),
     "emphasized": var(--#{$prefix}border-emphasized)
   )
 ) !default;
