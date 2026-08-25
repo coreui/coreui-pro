@@ -171,10 +171,10 @@ Add the `data-coreui-disabled="true"` attribute to disable the component:
 
 ## Sizing
 
-You may also choose from small and large auto completes to match our similarly sized text inputs.
+The frame carries the size. Add `.form-control-sm` or `.form-control-lg` to the element you initialize — it becomes the `.form-control-group`, so the field matches our similarly sized text inputs.
 
 <Example pro class="d-flex flex-column gap-3" code={`<div 
-    class="autocomplete-lg"
+    class="form-control-lg"
     data-coreui-cleaner="true"
     data-coreui-highlight-options-on-search="true"
     data-coreui-indicator="true"
@@ -195,7 +195,7 @@ You may also choose from small and large auto completes to match our similarly s
     data-coreui-toggle="autocomplete"
   ></div>
   <div 
-    class="autocomplete-sm"
+    class="form-control-sm"
     data-coreui-cleaner="true"
     data-coreui-highlight-options-on-search="true"
     data-coreui-indicator="true"
