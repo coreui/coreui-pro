@@ -642,11 +642,15 @@ myModalEl.addEventListener('hidden.coreui.modal', event => {
 
 ### CSS variables
 
-Modals use local CSS variables on `.modal` for enhanced real-time customization. Values for the CSS variables are set via Sass, so Sass customization is still supported, too.
+Modals use local CSS variables on `.modal` for enhanced real-time customization.
 
 <ScssDocs file="scss/_modal.scss" capture="modal-css-vars" />
 
 ### SASS variables
+
+<DeprecatedIn version="6.0.0" />
+
+Sass variables set these defaults at build time and are removed in v7. The CSS variables above reach the same values without recompiling, and can be set on a single element.
 
 <ScssDocs file="scss/_modal.scss" capture="modal-variables" />
 

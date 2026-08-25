@@ -163,7 +163,7 @@ Use spinners within buttons to indicate an action is currently processing or tak
 
 ### CSS variables
 
-Spinners use local CSS variables on `.spinner-border` and `.spinner-grow` for enhanced real-time customization. Values for the CSS variables are set via Sass, so Sass customization is still supported, too.
+Spinners use local CSS variables on `.spinner-border` and `.spinner-grow` for enhanced real-time customization.
 
 Border spinner variables:
 
@@ -178,6 +178,10 @@ The `.spinner-sm` modifier updates the values of these CSS variables, so it appl
 <ScssDocs file="scss/_spinner.scss" capture="spinner-sm-css-vars" />
 
 ### SASS variables
+
+<DeprecatedIn version="6.0.0" />
+
+Sass variables set these defaults at build time and are removed in v7. The CSS variables above reach the same values without recompiling, and can be set on a single element.
 
 <ScssDocs file="scss/_spinner.scss" capture="spinner-variables" />
 

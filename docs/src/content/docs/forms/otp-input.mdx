@@ -392,6 +392,10 @@ Each cell is an input, so it carries the shared `--cui-control-*` tokens on `.fo
 
 ### SASS variables
 
+<DeprecatedIn version="6.0.0" />
+
+Sass variables set these defaults at build time and are removed in v7. The CSS variables above reach the same values without recompiling, and can be set on a single element.
+
 Everything except the cell width and the gap defaults to the shared `--cui-btn-input-*` frame, so restyling the text controls reaches the OTP input without touching these. Override one when the cell should differ from the rest of the family:
 
 <ScssDocs file="scss/forms/_otp-input.scss" capture="form-otp-variables" />

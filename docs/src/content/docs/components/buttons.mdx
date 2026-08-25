@@ -311,7 +311,7 @@ See the [v6 migration guide](/migration/v6/) for the full picture.
 
 ### CSS variables
 
-Buttons use local CSS variables on `.btn` for enhanced real-time customization. Values for the CSS variables are set via Sass, so Sass customization is still supported, too.
+Buttons use local CSS variables on `.btn` for enhanced real-time customization.
 
 <ScssDocs file="scss/buttons/_button.scss" capture="btn-tokens" />
 
@@ -341,6 +341,10 @@ In your own stylesheet that is a class, and the buttons carry it the way they ca
 ```
 
 ### SASS variables
+
+<DeprecatedIn version="6.0.0" />
+
+Sass variables set these defaults at build time and are removed in v7. The CSS variables above reach the same values without recompiling, and can be set on a single element.
 
 The variables below are the neutral fallbacks — what a variant renders as when no theme colour reaches it.
 
