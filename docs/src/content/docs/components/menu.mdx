@@ -27,7 +27,7 @@ Menus are built on a third party library, [Floating UI](https://floating-ui.com/
 
 While `<button>` is the recommended control for a menu toggle, there might be situations where you have to use an `<a>` element. If you do, we recommend adding a `role="button"` attribute to appropriately convey control’s purpose to assistive technologies such as screen readers.
 
-Use [button groups](/components/button-group/) to create split button menus where the menu is displayed when a secondary button is clicked.
+Use [button groups](/components/button-group/) to create split button menus where the menu is displayed when a secondary button is clicked. Give that second button `.menu-toggle-split`, which narrows its padding so the pair reads as one control.
 
 <Example code={`<a class="btn btn-primary" href="#" role="button" data-coreui-toggle="menu" aria-expanded="false">
     Toggle menu
