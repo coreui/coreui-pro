@@ -38,6 +38,7 @@ result reads as a single field rather than a row of parts.
 | `.form-control-group` | The frame. |
 | `.form-control` | The editable inside it. |
 | `.form-control-icon` | Decoration — an icon and nothing more. It ignores pointer events, and can sit in the group on its own or inside an action. |
+| `.form-control-text` | Static text in the frame — a prefix or suffix like `https://`, `@` or `.00`. Inert and unselectable, so a click lands in the input and a drag over the field does not pick it up. |
 | `.form-control-action` | An interactive adornment: a real `<button>`. Give it an `aria-label`; it may hold a `.form-control-icon`. |
 | `.form-control-cleaner` | The action that clears the value. Styled like an action; showing and hiding it is the component's job, since only it knows whether the control holds a value. |
 
@@ -52,6 +53,44 @@ button's colour, which is how a validation state reaches it.
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor"><path d="M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z"/></svg>
       </span>
     </button>
+  </div>`} />
+
+## Static text
+
+<AddedIn version="6.0.0" />
+
+Use `.form-control-text` for a fixed prefix or suffix that labels the value
+rather than changing it — a scheme, a unit, a currency. It is inert: pointer
+events pass through to the input, and the text cannot be selected, so
+double-clicking to select the value never catches the adornment instead.
+
+Which side it lands on is decided by where you put it, because the group is a
+flex row and follows DOM order. Write it before the input for a prefix, after
+for a suffix — there is no separate class for the end.
+
+<Example code={`<div class="form-control-group mb-3">
+    <span class="form-control-text">https://</span>
+    <input type="text" class="form-control" placeholder="example.com" aria-label="Website address">
+  </div>
+  <div class="form-control-group mb-3">
+    <span class="form-control-text">@</span>
+    <input type="text" class="form-control" placeholder="username" aria-label="Username">
+  </div>
+  <div class="form-control-group">
+    <span class="form-control-text">$</span>
+    <input type="text" class="form-control" placeholder="0" aria-label="Amount">
+    <span class="form-control-text">.00</span>
+  </div>`} />
+
+It combines with the other parts, and dims with the group when the field is
+disabled:
+
+<Example code={`<div class="form-control-group">
+    <span class="form-control-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0a8 8 0 100 16A8 8 0 008 0zM1.5 8a6.5 6.5 0 1113 0 6.5 6.5 0 01-13 0z"/></svg>
+    </span>
+    <span class="form-control-text">USD</span>
+    <input type="text" class="form-control" value="1250" disabled aria-label="Amount">
   </div>`} />
 
 ## Sizing
