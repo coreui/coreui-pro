@@ -19,15 +19,14 @@ From this one map the library generates:
 | Theme color | Default value | Description |
 | --- | --- | --- |
 | `primary` | `#5856d6` | Main brand color for primary actions |
-| `secondary` | `#6b7785` | Less prominent actions and states |
+| `secondary` | `light-dark(var(--cui-gray-100), var(--cui-gray-600))` | Less prominent actions and states |
 | `success` | `#1b9e3e` | Positive actions and successful states |
 | `info` | `#39f` | Informational messages and neutral states |
 | `warning` | `#f9b115` | Cautionary messages and states |
 | `danger` | `#e55353` | Destructive actions and error states |
-| `light` | `$gray-100` | Light surfaces and low-emphasis elements |
-| `dark` | `$gray-900` | Dark surfaces and high-contrast elements |
+| `inverse` | `light-dark(var(--cui-gray-900), var(--cui-gray-100))` | Surfaces that flip against the page, e.g. a dark bar on a light page |
 
-Each base value is a standalone Sass variable (`$primary`, `$danger`, …) feeding the `base` slot of its entry, so overriding the one variable retints the whole family.
+Each base value is a standalone Sass variable (`$primary`, `$danger`, …) feeding the `base` slot of its entry, so overriding the one variable retints the whole family. `secondary` and `inverse` are `light-dark()` pairs rather than fixed hexes, so they follow the color mode on their own.
 
 ## Color slots
 
