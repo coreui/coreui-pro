@@ -134,6 +134,20 @@ Combine `.drawer-bottom` with `.drawer-sheet` for a flush-to-edge bottom sheet w
 
 Add `.drawer-fit-content` to a `.drawer-start`/`.drawer-end` drawer to keep the panel only as tall as its content.
 
+### Footer
+
+Add a `.drawer-footer` below the `.drawer-body` for the panel's actions. It is a flex row that wraps and keeps its children spaced and vertically centered, so a row of buttons needs no utilities.
+
+<Example html={[`<div class="drawer-footer">`, `  <button type="button" class="btn-outline theme-secondary" data-coreui-dismiss="drawer">Close</button>`, `  <button type="button" class="btn-solid theme-primary">Save changes</button>`, `</div>`]} />
+
+### No backdrop
+
+Add `.drawer-no-backdrop` to hide the backdrop while keeping the drawer modal — the panel still takes the top layer and traps focus, but nothing dims the page behind it.
+
+### Instant
+
+Add `.drawer-instant` to a drawer that should appear and disappear at once, with no slide and no backdrop fade. It is the same opt-out that [`.alert-instant`](/components/alerts/#dismissing) provides, and it applies to both directions.
+
 ## Body scrolling
 
 The page scroll is blocked while a drawer is open. Set `scroll: true` to open the drawer non-modally instead — the page stays interactive and scrollable. A visible backdrop requires the top layer, so `backdrop: true` (the default) takes precedence over `scroll: true` for the page-interactivity part.
