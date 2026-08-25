@@ -239,9 +239,9 @@ Options can be passed using data attributes or JavaScript. To do this, append an
 | `dispose` | Destroys an element's drawer. (Removes stored data on the DOM element) |
 | `getInstance` | *Static* method that allows you to obtain the drawer instance associated with a DOM element |
 | `getOrCreateInstance` | *Static* method that enables you to retrieve the drawer instance linked to a DOM element, or create a new one if it hasn't been initialized |
-| `hide` | Hides a drawer. **Returns to the caller before the drawer is actually hidden** (i.e. before the `hidden.coreui.drawer` event occurs).|
-| `show` | Displays a drawer. **Returns to the caller before the drawer is actually shown** (i.e. before the `shown.coreui.drawer` event occurs).|
-| `toggle` | Switches a drawer between shown and hidden. **Returns to the caller before the drawer is actually shown or hidden** (i.e. before the `shown.coreui.drawer` or `hidden.coreui.drawer` event occurs).
+| `hide` | Hides a drawer. **Returns a promise that resolves after the drawer is hidden** (i.e. after the `hidden.coreui.drawer` event occurs).|
+| `show` | Displays a drawer. **Returns a promise that resolves after the drawer is shown** (i.e. after the `shown.coreui.drawer` event occurs).|
+| `toggle` | Switches a drawer between shown and hidden. **Returns a promise that resolves after the drawer is shown or hidden** (i.e. after the `shown.coreui.drawer` or `hidden.coreui.drawer` event occurs).
 
 ### Events
 

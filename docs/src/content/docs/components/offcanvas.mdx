@@ -302,9 +302,9 @@ const cuiOffcanvas = new coreui.Offcanvas('#myOffcanvas')
 | --- | --- |
 | `getInstance` | *Static* method that allows you to obtain the offcanvas instance associated with a DOM element |
 | `getOrCreateInstance` | *Static* method that enables you to retrieve the offcanvas instance linked to a DOM element, or create a new one if it hasn't been initialized |
-| `hide` | Hides an offcanvas element. **Returns to the caller before the offcanvas element is actually hidden** (i.e. before the `hidden.coreui.offcanvas` event occurs).|
-| `show` | Displays an offcanvas element. **Returns to the caller before the offcanvas element is actually shown** (i.e. before the `shown.coreui.offcanvas` event occurs).|
-| `toggle` | Switches an offcanvas element between shown and hidden. **Returns to the caller before the offcanvas element is actually shown or hidden** (i.e. before the `shown.coreui.offcanvas` or `hidden.coreui.offcanvas` event occurs).
+| `hide` | Hides an offcanvas element. **Returns a promise that resolves after the offcanvas element is hidden** (i.e. after the `hidden.coreui.offcanvas` event occurs).|
+| `show` | Displays an offcanvas element. **Returns a promise that resolves after the offcanvas element is shown** (i.e. after the `shown.coreui.offcanvas` event occurs).|
+| `toggle` | Switches an offcanvas element between shown and hidden. **Returns a promise that resolves after the offcanvas element is shown or hidden** (i.e. after the `shown.coreui.offcanvas` or `hidden.coreui.offcanvas` event occurs).
 
 ### Events
 
