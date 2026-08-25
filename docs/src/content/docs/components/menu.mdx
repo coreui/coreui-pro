@@ -27,7 +27,7 @@ Menus are built on a third party library, [Floating UI](https://floating-ui.com/
 
 While `<button>` is the recommended control for a menu toggle, there might be situations where you have to use an `<a>` element. If you do, we recommend adding a `role="button"` attribute to appropriately convey control’s purpose to assistive technologies such as screen readers.
 
-Use [button groups](/components/button-group/) to create split button menus where the menu is displayed when a secondary button is clicked.
+Use [button groups](/components/button-group/) to create split button menus where the menu is displayed when a secondary button is clicked. Give that second button `.menu-toggle-split`, which narrows its padding so the pair reads as one control.
 
 <Example code={`<a class="btn btn-primary" href="#" role="button" data-coreui-toggle="menu" aria-expanded="false">
     Toggle menu
@@ -41,6 +41,7 @@ Use [button groups](/components/button-group/) to create split button menus wher
   <div class="btn-group">
     <button type="button" class="btn btn-secondary">Split</button>
     <button type="button" class="btn btn-secondary menu-toggle-split" data-coreui-toggle="menu" aria-expanded="false">
+      <svg class="icon" viewBox="0 0 512 512" aria-hidden="true"><path d="M256 144a64 64 0 1 0-64-64 64.07 64.07 0 0 0 64 64m0-96a32 32 0 1 1-32 32 32.036 32.036 0 0 1 32-32m0 320a64 64 0 1 0 64 64 64.07 64.07 0 0 0-64-64m0 96a32 32 0 1 1 32-32 32.036 32.036 0 0 1-32 32m0-272a64 64 0 1 0 64 64 64.07 64.07 0 0 0-64-64m0 96a32 32 0 1 1 32-32 32.036 32.036 0 0 1-32 32"></path></svg>
       <span class="visually-hidden">Toggle menu</span>
     </button>
     <div class="menu">
@@ -144,7 +145,7 @@ For example, `data-coreui-placement="bottom-start md:bottom-end lg:end-start"` w
 - Switch to `bottom-end` at the `md` breakpoint
 - Switch to `right-start` at the `lg` breakpoint
 
-<Example class="d-flex flex-column lg:flex-row gap-2" code={`<button class="btn btn-secondary" type="button" data-coreui-toggle="menu" data-coreui-placement="bottom-start md:bottom-end" aria-expanded="false">
+<Example class="d-flex flex-column flex-lg-row gap-2" code={`<button class="btn btn-secondary" type="button" data-coreui-toggle="menu" data-coreui-placement="bottom-start md:bottom-end" aria-expanded="false">
     Bottom start → md:bottom-end
   </button>
   <div class="menu">
@@ -477,6 +478,7 @@ Use `data-coreui-offset` or `data-coreui-reference` to change the location of th
     <div class="btn-group">
       <button type="button" class="btn btn-secondary">Reference</button>
       <button type="button" class="btn btn-secondary menu-toggle-split" data-coreui-toggle="menu" aria-expanded="false" data-coreui-reference="parent">
+        <svg class="icon" viewBox="0 0 512 512" aria-hidden="true"><path d="M256 144a64 64 0 1 0-64-64 64.07 64.07 0 0 0 64 64m0-96a32 32 0 1 1-32 32 32.036 32.036 0 0 1 32-32m0 320a64 64 0 1 0 64 64 64.07 64.07 0 0 0-64-64m0 96a32 32 0 1 1 32-32 32.036 32.036 0 0 1-32 32m0-272a64 64 0 1 0 64 64 64.07 64.07 0 0 0-64-64m0 96a32 32 0 1 1 32-32 32.036 32.036 0 0 1-32 32"></path></svg>
         <span class="visually-hidden">Toggle Menu</span>
       </button>
       <div class="menu">
