@@ -162,14 +162,8 @@
         text: PRO
     - title: OTP Input
       to: /forms/otp-input/
-      badge:
-        color: danger
-        text: PRO
     - title: Password Input
       to: /forms/password-input/
-      badge:
-        color: danger
-        text: PRO
     - title: Radio
       to: /forms/radio/
     - title: Range
