@@ -104,6 +104,33 @@ Floating labels also support `.form-control-plaintext`, which can be helpful for
     <input type="email" readonly class="form-control-plaintext" id="floatingPlaintextInput" placeholder="name@example.com" value="name@example.com">
   </div>`} />
 
+## Input groups
+
+Floating labels also support `.input-group` — put the `.form-floating` next to the other addons:
+
+<Example code={`<div class="input-group mb-3">
+    <span class="input-group-text">@</span>
+    <div class="form-floating">
+      <label for="floatingInputGroup1">Username</label>
+      <input type="text" class="form-control" id="floatingInputGroup1" placeholder="Username">
+    </div>
+  </div>`} />
+
+When using `.input-group` and `.form-floating` along with form validation, wrap the group in a [`.form-field`](/forms/field/) and place the feedback outside the `.input-group`, so it renders under the whole group rather than inside the frame:
+
+<Example code={`<div class="form-field">
+    <div class="input-group">
+      <span class="input-group-text">@</span>
+      <div class="form-floating is-invalid">
+        <label for="floatingInputGroup2">Username</label>
+        <input type="text" class="form-control is-invalid" id="floatingInputGroup2" placeholder="Username" required>
+      </div>
+    </div>
+    <div class="invalid-feedback">
+      Please choose a username.
+    </div>
+  </div>`} />
+
 ## Layout
 
 When working with the CoreUI for Bootstrap grid system, be sure to place form elements within column classes.

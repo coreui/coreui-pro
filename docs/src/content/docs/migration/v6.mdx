@@ -759,6 +759,32 @@ declaration.
   is finally the same height as a sized input; it only shows if you have cut the
   padding below that floor.
 
+#### Input group: `.has-validation` removed
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+`.has-validation` is gone. It existed so a group could keep its corner logic
+with a `-feedback` element sitting inside it as the last child — in v6 the
+feedback lives **outside** the group: wrap the group in a
+[`.form-field`](/forms/field/) and put the `-feedback` after it, and the
+message renders under the whole frame. A group still carrying the class simply
+gets the default corner handling; a group still carrying the feedback *inside*
+should move it out.
+
+```diff
+- <div class="input-group has-validation">
+-   <span class="input-group-text">@</span>
+-   <input type="text" class="form-control is-invalid" required>
+-   <div class="invalid-feedback">Please choose a username.</div>
+- </div>
++ <div class="form-field">
++   <div class="input-group">
++     <span class="input-group-text">@</span>
++     <input type="text" class="form-control is-invalid" required>
++   </div>
++   <div class="invalid-feedback">Please choose a username.</div>
++ </div>
+```
+
 #### Input group: one frame class instead of five
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
