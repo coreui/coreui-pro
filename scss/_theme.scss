@@ -216,6 +216,16 @@ $theme-state-colors: (
 }
 // scss-docs-end theme-classes
 
+// scss-docs-start theme-reset
+@mixin generate-theme-reset() {
+  .theme-reset {
+    @each $token, $suffix in map.merge($theme-token-refs, ("hover": null, "active": null)) {
+      --#{$prefix}theme-#{$token}: initial;
+    }
+  }
+}
+// scss-docs-end theme-reset
+
 @function theme-color-tokens() {
   $tokens: ();
 
