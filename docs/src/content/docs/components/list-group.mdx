@@ -136,13 +136,13 @@ The responsive variants measure the nearest [query container](/utilities/contain
     <li class="list-group-item">A third item</li>
   </ul>`)} />
 
-## Contextual classes
+## Variants
 
 Colour a list item with a [`.theme-*` class](/customize/components/#theme-variants). It works on the item, on the `.list-group` above it, or on both — an item's own theme wins over the one it inherits.
 
 <Example code={[`<ul class="list-group">`, `<li class="list-group-item">A simple default list group item</li>`, ...getData('theme-colors').map((c) => `<li class="list-group-item theme-${c.name}">A simple ${c.name} list group item</li>`), ``, `</ul>`]} />
 
-Contextual classes also work with `.list-group-item-action`. Note the addition of the hover styles here not present in the previous example. Also supported is the `.active` state; apply it to indicate an active selection on a contextual list group item.
+Theme classes also work with `.list-group-item-action`. Note the addition of the hover styles here not present in the previous example. Also supported is the `.active` state; apply it to indicate an active selection on a themed list group item.
 
 <Example code={[`<div class="list-group">`, `<a href="#" class="list-group-item list-group-item-action">A simple default list group item</a>`, ...getData('theme-colors').map((c) => `<a href="#" class="list-group-item list-group-item-action theme-${c.name}">A simple ${c.name} list group item</a>`), ``, `</div>`]} />
 
