@@ -6,6 +6,8 @@ otherFrameworks:
   - pagination
 ---
 
+import { getData } from '@coreui/astro-docs/data'
+
 ## Overview
 
 We use a large block of connected links for our pagination, making links hard to miss and easily scalable—all while providing large hit areas. Pagination is built with list HTML elements so screen readers can announce the number of available links. Use a wrapping `<nav>` element to identify it as a navigation section to screen readers and other assistive technologies.
@@ -88,15 +90,15 @@ You can optionally swap out active or disabled anchors for `<span>`, or omit the
 
 A [theme class](/customize/components/#theme-variants) recolors the whole pagination: links read the theme's foreground, the hover state its subtle surface, and the active page its solid color.
 
-<Example code={`<nav aria-label="Themed pagination">
-    <ul class="pagination theme-success">
+<Example code={getData('theme-colors').map((c) => `<nav aria-label="Pagination ${c.title}">
+    <ul class="pagination theme-${c.name}">
       <li class="page-item"><a class="page-link" href="#">Previous</a></li>
       <li class="page-item"><a class="page-link" href="#">1</a></li>
       <li class="page-item active" aria-current="page"><a class="page-link" href="#">2</a></li>
       <li class="page-item"><a class="page-link" href="#">3</a></li>
       <li class="page-item"><a class="page-link" href="#">Next</a></li>
     </ul>
-  </nav>`} />
+  </nav>`)} />
 
 ## Sizing
 
