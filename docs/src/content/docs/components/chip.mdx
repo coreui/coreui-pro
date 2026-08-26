@@ -108,11 +108,11 @@ Add `.chip-img` for an image like an avatar or use our avatar component.
 
 Colour a chip with a [`.theme-*` class](/customize/components/#theme-variants), on the chip itself or on any element above it. Chips are subtle by default as this allows for a clear, themed active state.
 
-<Example code={[`<div class="d-flex flex-wrap gap-1">`, ...getData('theme-colors').map((c) => `<span class="chip theme-${c.name} chip-clickable" tabindex="0">${c.title} chip</span>
-    <span class="chip theme-${c.name} active" tabindex="0">${c.title} chip</span>`), ``, `</div>`]} />
+<Example code={[`<div class="d-flex flex-wrap gap-1">`, ...getData('theme-colors').map((c) => `    <span class="chip theme-${c.name} chip-clickable" tabindex="0">${c.title} chip</span>
+    <span class="chip theme-${c.name} active" tabindex="0">${c.title} chip</span>`), `  </div>`]} />
 
-<Example code={[`<div class="d-flex flex-wrap gap-1">`, ...getData('theme-colors').map((c) => `<span class="chip chip-outline chip-clickable theme-${c.name}" tabindex="0">${c.title} chip</span>
-    <span class="chip chip-outline theme-${c.name} active" tabindex="0">${c.title} chip</span>`), ``, `</div>`]} />
+<Example code={[`<div class="d-flex flex-wrap gap-1">`, ...getData('theme-colors').map((c) => `    <span class="chip chip-outline chip-clickable theme-${c.name}" tabindex="0">${c.title} chip</span>
+    <span class="chip chip-outline theme-${c.name} active" tabindex="0">${c.title} chip</span>`), `  </div>`]} />
 
 ### Active state
 
@@ -358,7 +358,7 @@ The Bootstrap Chip component follows WAI-ARIA patterns for interactive widgets, 
 
 The v5 spelling — `.chip` with a colour modifier — still works and renders identically. Each colour class is generated from the same theme map as the class it replaces, so `.chip-primary` *is* `.chip.theme-primary`. They are removed in v7.
 
-<Example code={[`<div class="d-flex flex-wrap gap-1">`, ...getData('theme-colors').map((c) => `<span class="chip chip-${c.name}">${c.title} chip</span>`), ``, `</div>`]} />
+<Example code={[`<div class="d-flex flex-wrap gap-1">`, ...getData('theme-colors').map((c) => `    <span class="chip chip-${c.name}">${c.title} chip</span>`), `  </div>`]} />
 
 ```diff
 - <span class="chip chip-success">Done</span>
