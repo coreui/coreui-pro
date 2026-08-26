@@ -1,0 +1,72 @@
+---
+title: "Bootstrap 6 Theme"
+name: "Theme"
+description: "Style utilities that pair a themed surface with the text color that reads on it, so any element can be colored the way component variants are."
+utility: ["theme-contrast", "theme-subtle", "theme-muted", "theme-border"]
+---
+
+import { getData } from '@coreui/astro-docs/data'
+
+## How it works
+
+A [`.theme-{color}` class](/customize/components/#theme-variants) sets the theme slot tokens — `--cui-theme-bg`, `--cui-theme-fg`, `--cui-theme-bg-subtle` and friends — without painting anything itself. Components read those slots on their own; for arbitrary markup, add one of the style utilities below to pair a themed surface with the text color that reads on it. `.theme-border` additionally draws a border in the theme's border color and composes with any of the three surfaces.
+
+See [Theme](/customize/theme/) for how the slots resolve and how to add a color of your own.
+
+### Contrast
+
+`.theme-contrast` fills with the solid theme color and sets the text to the color that reads on it — the pairing behind solid component variants:
+
+<Example class="d-grid gap-2" code={getData('theme-colors').map((c) => `<div class="p-2 theme-${c.name} theme-contrast">.theme-${c.name} .theme-contrast</div>`)} />
+
+### Subtle
+
+`.theme-subtle` uses the theme's subtle surface with its readable foreground. The pairing adjusts to the color mode on its own:
+
+<Example class="d-grid gap-2" code={getData('theme-colors').map((c) => `<div class="p-2 theme-${c.name} theme-subtle">.theme-${c.name} .theme-subtle</div>`)} />
+
+And with `.theme-border`:
+
+<Example class="d-grid gap-2" code={getData('theme-colors').map((c) => `<div class="p-2 theme-${c.name} theme-subtle theme-border">.theme-${c.name} .theme-subtle .theme-border</div>`)} />
+
+### Muted
+
+`.theme-muted` uses the theme's muted surface with its emphasis foreground, for the quietest of the three pairings:
+
+<Example class="d-grid gap-2" code={getData('theme-colors').map((c) => `<div class="p-2 theme-${c.name} theme-muted">.theme-${c.name} .theme-muted</div>`)} />
+
+## Comparison
+
+All three pairings side by side, per theme color:
+
+<Example code={getData('theme-colors').map((c) => `<div class="d-flex gap-2 mb-2">
+    <div class="theme-${c.name} theme-contrast p-3 flex-fill text-center rounded">${c.title}</div>
+    <div class="theme-${c.name} theme-subtle p-3 flex-fill text-center rounded">${c.title}</div>
+    <div class="theme-${c.name} theme-muted p-3 flex-fill text-center rounded">${c.title}</div>
+  </div>`)} />
+
+## Mixing colors
+
+Each element carries its own `.theme-{color}`, so siblings can differ — the utility reads whichever theme is in scope:
+
+<Example code={`<div class="d-flex gap-2">
+    <div class="theme-success theme-contrast p-3 rounded">Success</div>
+    <div class="theme-warning theme-contrast p-3 rounded">Warning</div>
+    <div class="theme-danger theme-contrast p-3 rounded">Danger</div>
+  </div>`} />
+
+The theme can also come from any element above, so one wrapper themes every pairing inside it:
+
+<Example code={`<div class="theme-primary d-flex gap-2">
+    <div class="theme-contrast p-3 rounded">Contrast</div>
+    <div class="theme-subtle p-3 rounded">Subtle</div>
+    <div class="theme-muted p-3 rounded">Muted</div>
+  </div>`} />
+
+## Customizing
+
+### Utilities API
+
+Theme utilities are declared in our utilities API in `scss/_utilities.scss`. [Learn how to use the utilities API.](/utilities/api/#using-the-api)
+
+<ScssDocs file="scss/_utilities.scss" capture="utils-theme" />
