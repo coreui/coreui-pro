@@ -285,6 +285,7 @@ attributes work on the picker element too.
 | --- | --- | --- | --- |
 | `allowList` | object | `SVGAllowlist` | Allowlist used when sanitizing icon markup. |
 | `ariaCleanerLabel` | string | `'Clear the value'` | Accessible label of the cleaner button. |
+| `ariaLabel` | string | `'Date input'` | Accessible name of the fields. It lands on the `role="group"` container the sections sit in. **Both the start and the end field receive it**, so give each range its own name and expect the two halves to announce alike. |
 | `ariaToggleLabel` | string | `'Toggle the calendar'` | Accessible label of the indicator button. |
 | `cleaner` | boolean | `true` | Renders a button that clears the value. It appears only once the field holds one. |
 | `cleanerIcon` | string | cross SVG | Inline SVG rendered by the component (sanitized). |
