@@ -2554,6 +2554,24 @@ Two consequences for the tokens:
   surface) carry a higher alpha for the same rendered color over the darker
   page. Override the `$bg-*` knobs or the `--cui-bg-*` tokens to keep the
   previous palette.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The text ladder is solid grays, and components use all of its rungs.**
+  `--cui-fg-body` through `--cui-fg-4` were alpha blends of one color
+  (`rgba(…, .95)` down to `.25`), which made the two deepest rungs
+  illegible and left every component crowded onto `fg-body`/`fg-2`. Each
+  rung is a palette stop now — `fg-body` on `gray-900/050`, `fg-1` on
+  `800/200`, `fg-2` on `700/300`, `fg-3` on `600/500`, `fg-4` on `500/600`
+  — so contrast is the same on any surface and can be audited once.
+  Components spread across the rungs: secondary text (breadcrumb links,
+  toast headers, captions, blockquote footers) reads `fg-3` instead of
+  `fg-2`, disabled states read `fg-3`/`fg-4` and stay legible, dividers
+  read `fg-4`, and the strongest text (tables, active nav links, the
+  tooltip surface) reads `fg-body` instead of `--cui-emphasis-color`.
+  Nav links are neutral (`fg-2`, darkening through `fg-1` to `fg-body`
+  when active) instead of link-colored — a `.theme-*` class still
+  recolors them. `$gray-base` fed the alpha blends and is removed.
+  Override the `$fg-*` knobs or the `--cui-fg-*` tokens to keep the
+  previous rendering.
 - **`.text-body` and `.text-body-emphasis` are unaffected** — they are not
   ordinal, any more than `.text-primary` is.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>

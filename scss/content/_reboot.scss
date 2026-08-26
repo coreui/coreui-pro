@@ -32,7 +32,7 @@ $kbd-padding-y:               .1875rem !default;
 $kbd-padding-x:               .375rem !default;
 $kbd-font-size:               $code-font-size !default;
 $kbd-color:                   var(--#{$prefix}bg-body) !default;
-$kbd-bg:                      var(--#{$prefix}fg-body) !default;
+$kbd-bg:                      var(--#{$prefix}fg-2) !default;
 $kbd-border-radius:           var(--#{$prefix}radius-3) !default;
 // scss-docs-end kbd-variables
 

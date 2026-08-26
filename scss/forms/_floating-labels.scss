@@ -15,7 +15,7 @@ $form-floating-input-padding-b:         .625rem !default;
 $form-floating-label-height:            1.5em !default;
 $form-floating-label-opacity:           .65 !default;
 $form-floating-label-transform:         scale(.85) translateY(-.5rem) translateX(.15rem) !default;
-$form-floating-label-disabled-color:    var(--#{$prefix}gray-600) !default;
+$form-floating-label-disabled-color:    var(--#{$prefix}fg-3) !default;
 // The label is a sibling of the control, so it cannot inherit the control's own
 // background — the textarea mask has to be told the same colour a second time.
 $form-floating-label-bg:                var(--#{$prefix}btn-input-bg) !default;
