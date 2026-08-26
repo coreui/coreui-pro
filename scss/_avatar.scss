@@ -48,8 +48,8 @@ $avatar-tokens: () !default;
 $avatar-tokens: defaults(
   (
     --#{$prefix}avatar-size: #{$avatar-size},
-    --#{$prefix}avatar-color: #{$avatar-color},
-    --#{$prefix}avatar-bg: #{$avatar-bg},
+    --#{$prefix}avatar-color: var(--#{$prefix}theme-contrast, #{$avatar-color}),
+    --#{$prefix}avatar-bg: var(--#{$prefix}theme-bg, #{$avatar-bg}),
     --#{$prefix}avatar-border-radius: #{$avatar-border-radius},
     --#{$prefix}avatar-status-size: #{$avatar-status-size},
     --#{$prefix}avatar-status-border-radius: #{$avatar-status-border-radius},
@@ -83,9 +83,9 @@ $avatar-variants: (
     // Declared as a fallback rather than a token, so the derived size is the
     // default and an explicit one still wins.
     font-size: var(--#{$prefix}avatar-font-size, calc(var(--#{$prefix}avatar-size) * #{$avatar-font-size-ratio}));
-    color: var(--#{$prefix}theme-contrast, var(--#{$prefix}avatar-color));
+    color: var(--#{$prefix}avatar-color);
     vertical-align: middle;
-    background-color: var(--#{$prefix}theme-bg, var(--#{$prefix}avatar-bg));
+    background-color: var(--#{$prefix}avatar-bg);
     @include border-radius(var(--#{$prefix}avatar-border-radius));
     @include transition($avatar-transition);
   }
