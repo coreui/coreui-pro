@@ -91,7 +91,7 @@ $reboot-kbd-tokens: defaults(
 // from the .table component's variables — that coupling is what kept the table
 // block pinned in _variables.scss.
 $caption-padding-y:    .5rem !default;
-$caption-color:        var(--#{$prefix}fg-2) !default;
+$caption-color:        var(--#{$prefix}fg-3) !default;
 $th-font-weight:       null !default;
 // scss-docs-end reboot-table-variables
 
