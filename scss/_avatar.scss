@@ -62,14 +62,24 @@ $avatar-tokens: defaults(
 
 // stylelint-enable scss/dollar-variable-default
 
+$avatar-variants: () !default;
+
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start avatar-variants
-$avatar-variants: (
-  "subtle": (
-    "color": "fg",
-    "bg": "bg-subtle"
-  )
-) !default;
+$avatar-variants: defaults(
+  (
+    "subtle": (
+      "color": "fg",
+      "bg": "bg-subtle"
+    )
+  ),
+  $avatar-variants
+);
 // scss-docs-end avatar-variants
+
+// stylelint-enable scss/dollar-variable-default
+
 @layer components {
   .avatar {
     @include tokens($avatar-tokens);

@@ -1,6 +1,7 @@
 @use "sass:map";
 @use "sass:meta";
 
+// scss-docs-start defaults-function
 // Merge overrides on top of defaults, stripping null entries.
 // Null values let users remove map keys via @use ... with().
 // Accepts a list as $defaults (converted to a map with `true` values).
@@ -20,3 +21,4 @@
   }
   @return $merged;
 }
+// scss-docs-end defaults-function
