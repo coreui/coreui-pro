@@ -27,7 +27,7 @@ $alert-tokens: () !default;
 // scss-docs-start alert-css-vars
 $alert-tokens: defaults(
   (
-    --#{$prefix}alert-bg: var(--#{$prefix}theme-bg-subtle, transparent),
+    --#{$prefix}alert-bg: var(--#{$prefix}theme-bg-subtle, var(--#{$prefix}bg-1)),
     --#{$prefix}alert-padding-x: #{$alert-padding-x},
     --#{$prefix}alert-padding-y: #{$alert-padding-y},
     --#{$prefix}alert-gap: #{$alert-gap},
