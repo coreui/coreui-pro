@@ -43,6 +43,19 @@ Place one add-on or button on either side of an input. You may also place one on
     <textarea class="form-control" aria-label="With textarea"></textarea>
   </div>`} />
 
+## With form field
+
+Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label and description, and to get validation feedback in the right place.
+
+<Example code={`<div class="form-field">
+    <label for="inputGroupField" class="form-label">Your vanity URL</label>
+    <div class="input-group">
+      <span class="input-group-text">https://example.com/users/</span>
+      <input type="text" class="form-control" id="inputGroupField">
+    </div>
+    <div class="form-text">Choose a unique name for your profile.</div>
+  </div>`} />
+
 ## Wrapping
 
 Input groups wrap by default via `flex-wrap: wrap` in order to accommodate custom form field validation within an input group. You may disable this with `.flex-nowrap`.

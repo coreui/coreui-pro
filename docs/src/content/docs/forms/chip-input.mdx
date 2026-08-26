@@ -98,13 +98,13 @@ Start with just the input and let users add chips as they type.
 
 <Example code={`<div class="chip-input" data-coreui-chip-input data-coreui-name="tags" data-coreui-placeholder="Start typing tags..."></div>`} />
 
-## With label
+## With form field
 
-Use a standard form label for accessibility.
+Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label and description, and to get validation feedback in the right place. The label goes inside the container as `.chip-input-label` — that is the one the component points at the text input it builds.
 
-<Example code={`<div class="mb-3">
-    <label class="form-label" for="techStackInput">Tech stack</label>
+<Example code={`<div class="form-field">
     <div class="chip-input" data-coreui-chip-input data-coreui-name="techStack" data-coreui-placeholder="Add package...">
+      <label class="chip-input-label" for="techStackInput">Tech stack</label>
       <span class="chip">Vue</span>
       <span class="chip">Vite</span>
     </div>

@@ -22,6 +22,16 @@ adds the buttons — you write neither the frame, the buttons nor their icons.
 
 <Example pro code={`<input type="number" class="form-control" value="3" aria-label="Quantity" data-coreui-toggle="number-input">`} />
 
+## With form field
+
+Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label and description, and to get validation feedback in the right place.
+
+<Example pro code={`<div class="form-field">
+    <label for="numberInputField" class="form-label">Quantity</label>
+    <input type="number" class="form-control" id="numberInputField" value="3" data-coreui-toggle="number-input">
+    <div class="form-text">Up to ten items per order.</div>
+  </div>`} />
+
 ## Min, max and step
 
 `min`, `max` and `step` are the native attributes — the component does not

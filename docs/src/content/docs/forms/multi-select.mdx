@@ -41,6 +41,21 @@ A straightforward demonstration of how to implement a basic Bootstrap Multi Sele
     </optgroup>
   </select>`} />
 
+## With form field
+
+Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label and description, and to get validation feedback in the right place.
+
+<Example pro code={`<div class="form-field">
+    <label for="multiSelectField" class="form-label">Technologies</label>
+    <select id="multiSelectField" data-coreui-multi-select multiple>
+      <option value="0">Angular</option>
+      <option value="1">Bootstrap</option>
+      <option value="2">React.js</option>
+      <option value="3">Vue.js</option>
+    </select>
+    <div class="form-text">Pick every technology you work with.</div>
+  </div>`} />
+
 ## Data source
 
 Learn how to populate the multi-select component with data from various sources, including arrays and objects, for dynamic content integration.

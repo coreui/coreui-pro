@@ -22,6 +22,16 @@ Use an empty container with `data-coreui-date-time-input` to create a masked dat
 <Example pro code={`<label class="form-label">Appointment</label>
   <div class="form-control form-date-time" data-coreui-date-time-input data-coreui-name="appointment"></div>`} />
 
+## With form field
+
+Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label and description, and to get validation feedback in the right place.
+
+<Example pro code={`<div class="form-field">
+    <span class="form-label">Appointment</span>
+    <div class="form-control form-date-time" data-coreui-date-time-input data-coreui-name="appointment"></div>
+    <div class="form-text">Local time, in your own time zone.</div>
+  </div>`} />
+
 ## Formats
 
 Combine [date tokens](/forms/date-input/#formats) and [time tokens](/forms/time-input/#formats) in one format string — including text month tokens (`MMM`, `MMMM`) with [letter matching](/forms/date-input/#month-names) and the AM/PM section.

@@ -34,6 +34,21 @@ A straightforward demonstration of how to implement a basic Bootstrap Autocomple
     data-coreui-value="React.js"
   ></div>`} />
 
+## With form field
+
+Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label and description, and to get validation feedback in the right place.
+
+<Example pro code={`<div class="form-field">
+    <label for="autocompleteField" class="form-label">Framework</label>
+    <div
+      data-coreui-toggle="autocomplete"
+      data-coreui-id="autocompleteField"
+      data-coreui-options="Angular, Bootstrap, React.js, Vue.js"
+      data-coreui-placeholder="Search frameworks..."
+    ></div>
+    <div class="form-text">Start typing to filter the list.</div>
+  </div>`} />
+
 ## Data source
 
 Learn how to populate the autocomplete component with data from various sources, including arrays and objects, for dynamic content integration.

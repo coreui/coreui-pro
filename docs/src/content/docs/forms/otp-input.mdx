@@ -20,6 +20,23 @@ Use the `form-otp` wrapper with `data-coreui-toggle="otp"` to create an one-time
     <input class="form-otp-control">
   </div>`} />
 
+## With form field
+
+Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label and description, and to get validation feedback in the right place.
+
+<Example pro code={`<div class="form-field">
+    <span class="form-label">Verification code</span>
+    <div class="form-otp" data-coreui-toggle="otp" data-coreui-name="otpField">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+    </div>
+    <div class="form-text">We sent it to your phone a moment ago.</div>
+  </div>`} />
+
 ## One-time password types
 
 The one-time password input supports different input types for various use cases.

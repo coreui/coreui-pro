@@ -36,6 +36,16 @@ Create a simple range slider with default settings.
 
 <Example pro code={`<div data-coreui-toggle="range-slider" data-coreui-value="50"></div>`} />
 
+## With form field
+
+Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label and description, and to get validation feedback in the right place.
+
+<Example pro code={`<div class="form-field">
+    <span class="form-label">Budget</span>
+    <div data-coreui-toggle="range-slider" data-coreui-value="25, 75" data-coreui-aria-labels='["Minimum budget", "Maximum budget"]'></div>
+    <div class="form-text">Monthly spend, in thousands.</div>
+  </div>`} />
+
 ## Multiple handles
 
 Enable multiple handles to allow the selection of a range or/and multiple values.
