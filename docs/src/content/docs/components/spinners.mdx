@@ -26,18 +26,6 @@ Use the border spinners for a lightweight loading indicator.
     <span class="visually-hidden">Loading...</span>
   </div>`} />
 
-### Colors
-
-The border spinner uses `currentColor` for its `border-color`, meaning you can customize the color with [text color utilities][color]. You can use any of our text color utilities on the standard spinner.
-
-<Example code={getData('theme-colors').map((c) => `<div class="spinner-border text-${c.name}" role="status">
-    <span class="visually-hidden">Loading...</span>
-  </div>`)} />
-
-<Callout color="info">
-**Why not use `border-color` utilities?** Each border spinner specifies a `transparent` border for at least one side, so `.border-{color}` utilities would override that.
-</Callout>
-
 ## Growing spinner
 
 If you don't fancy a border spinner, switch to the grow spinner. While it doesn't technically spin, it does repeatedly grow!
@@ -46,11 +34,21 @@ If you don't fancy a border spinner, switch to the grow spinner. While it doesn'
     <span class="visually-hidden">Loading...</span>
   </div>`} />
 
-Once again, this spinner is built with `currentColor`, so you can easily change its appearance with [text color utilities][color]. Here it is in blue, along with the supported variants.
+## Variants
+
+Both spinners use `currentColor` for their appearance, so any [text color utility][color] recolors them.
+
+<Example code={getData('theme-colors').map((c) => `<div class="spinner-border text-${c.name}" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>`)} />
 
 <Example code={getData('theme-colors').map((c) => `<div class="spinner-grow text-${c.name}" role="status">
     <span class="visually-hidden">Loading...</span>
   </div>`)} />
+
+<Callout color="info">
+**Why not use `border-color` utilities?** Each border spinner specifies a `transparent` border for at least one side, so `.border-{color}` utilities would override that.
+</Callout>
 
 ## Alignment
 

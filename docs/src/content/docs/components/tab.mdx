@@ -13,6 +13,8 @@ Dynamic tabbed interfaces, as described in the [<abbr title="Web Accessibility I
 
 Note that dynamic tabbed interfaces should <em>not</em> contain dropdown menus, as this causes both usability and accessibility issues. From a usability perspective, the fact that the currently displayed tab's trigger element is not immediately visible (as it's inside the closed dropdown menu) can cause confusion. From an accessibility point of view, there is currently no sensible way to map this sort of construct to a standard WAI ARIA pattern, meaning that it cannot be easily made understandable to users of assistive technologies.
 
+## Nav tabs
+
 <Example html={[`<ul class="nav nav-tabs mb-3" id="myTab" role="tablist">`, `  <li class="nav-item" role="presentation">`, `    <button class="nav-link active" id="home-tab" data-coreui-toggle="tab" data-coreui-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">Home</button>`, `  </li>`, `  <li class="nav-item" role="presentation">`, `    <button class="nav-link" id="profile-tab" data-coreui-toggle="tab" data-coreui-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Profile</button>`, `  </li>`, `  <li class="nav-item" role="presentation">`, `    <button class="nav-link" id="contact-tab" data-coreui-toggle="tab" data-coreui-target="#contact-tab-pane" type="button" role="tab" aria-controls="contact-tab-pane" aria-selected="false">Contact</button>`, `  </li>`, `  <li class="nav-item" role="presentation">`, `    <button class="nav-link" id="disabled-tab" data-coreui-toggle="tab" data-coreui-target="#disabled-tab-pane" type="button" role="tab" aria-controls="disabled-tab-pane" aria-selected="false" disabled>Disabled</button>`, `  </li>`, `</ul>`, `<div class="tab-content" id="myTabContent">`, `  <div class="tab-pane show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">`, `    <p>This is some placeholder content the <strong>Home tab's</strong> associated content. Clicking another tab will toggle the visibility of this one for the next. The tab JavaScript swaps classes to control the content visibility and styling. You can use it with tabs, pills, and any other <code>.nav</code>-powered navigation.</p>`, `</div>`, `  <div class="tab-pane" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">`, `    <p>This is some placeholder content the <strong>Profile tab's</strong> associated content. Clicking another tab will toggle the visibility of this one for the next. The tab JavaScript swaps classes to control the content visibility and styling. You can use it with tabs, pills, and any other <code>.nav</code>-powered navigation.</p>`, `  </div>`, `  <div class="tab-pane" id="contact-tab-pane" role="tabpanel" aria-labelledby="contact-tab" tabindex="0">`, `    <p>This is some placeholder content the <strong>Contact tab's</strong> associated content. Clicking another tab will toggle the visibility of this one for the next. The tab JavaScript swaps classes to control the content visibility and styling. You can use it with tabs, pills, and any other <code>.nav</code>-powered navigation.</p>`, `  </div>`, `  <div class="tab-pane" id="disabled-tab-pane" role="tabpanel" aria-labelledby="disabled-tab" tabindex="0">`, `    <p>This is some placeholder content the <strong>Disabled tab's</strong> associated content.</p>`, `  </div>`, `  </div>`]} />
 
 ```html
@@ -38,6 +40,8 @@ Note that dynamic tabbed interfaces should <em>not</em> contain dropdown menus, 
 </div>
 ```
 
+## With arbitrary markup
+
 To help fit your needs, this works with `<ul>`-based markup, as shown above, or with any arbitrary "roll your own" markup. Note that if you're using `<nav>`, you shouldn't add `role="tablist"` directly to it, as this would override the element's native role as a navigation landmark. Instead, switch to an alternative element (in the example below, a simple `<div>`) and wrap the `<nav>` around it.
 
 <Example html={[`<nav>`, `  <div class="nav nav-tabs mb-3" id="nav-tab" role="tablist">`, `    <button class="nav-link active" id="nav-home-tab" data-coreui-toggle="tab" data-coreui-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Home</button>`, `    <button class="nav-link" id="nav-profile-tab" data-coreui-toggle="tab" data-coreui-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">Profile</button>`, `    <button class="nav-link" id="nav-contact-tab" data-coreui-toggle="tab" data-coreui-target="#nav-contact" type="button" role="tab" aria-controls="nav-contact" aria-selected="false">Contact</button>`, `    <button class="nav-link" id="nav-disabled-tab" data-coreui-toggle="tab" data-coreui-target="#nav-disabled" type="button" role="tab" aria-controls="nav-disabled" aria-selected="false" disabled>Disabled</button>`, `</div>`, `</nav>`, `<div class="tab-content" id="nav-tabContent">`, `  <div class="tab-pane show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab" tabindex="0">`, `    <p>This is some placeholder content the <strong>Home tab's</strong> associated content. Clicking another tab will toggle the visibility of this one for the next. The tab JavaScript swaps classes to control the content visibility and styling. You can use it with tabs, pills, and any other <code>.nav</code>-powered navigation.</p>`, `  </div>`, `  <div class="tab-pane" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab" tabindex="0">`, `    <p>This is some placeholder content the <strong>Profile tab's</strong> associated content. Clicking another tab will toggle the visibility of this one for the next. The tab JavaScript swaps classes to control the content visibility and styling. You can use it with tabs, pills, and any other <code>.nav</code>-powered navigation.</p>`, `  </div>`, `  <div class="tab-pane" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab" tabindex="0">`, `    <p>This is some placeholder content the <strong>Contact tab's</strong> associated content. Clicking another tab will toggle the visibility of this one for the next. The tab JavaScript swaps classes to control the content visibility and styling. You can use it with tabs, pills, and any other <code>.nav</code>-powered navigation.</p>`, `  </div>`, `  <div class="tab-pane" id="nav-disabled" role="tabpanel" aria-labelledby="nav-disabled-tab" tabindex="0">`, `    <p>This is some placeholder content the <strong>Disabled tab's</strong> associated content.</p>`, `  </div>`, `  </div>`]} />
@@ -58,6 +62,8 @@ To help fit your needs, this works with `<ul>`-based markup, as shown above, or 
   <div class="tab-pane" id="nav-disabled" role="tabpanel" aria-labelledby="nav-disabled-tab" tabindex="0">...</div>
 </div>
 ```
+
+## Pills
 
 The tabs plugin also works with pills.
 
@@ -123,7 +129,9 @@ In general, to facilitate keyboard navigation, it's recommended to make the tab 
 The tab JavaScript plugin **does not** support tabbed interfaces that contain dropdown menus, as these cause both usability and accessibility issues. From a usability perspective, the fact that the currently displayed tab's trigger element is not immediately visible (as it's inside the closed dropdown menu) can cause confusion. From an accessibility point of view, there is currently no sensible way to map this sort of construct to a standard WAI ARIA pattern, meaning that it cannot be easily made understandable to users of assistive technologies.
 </Callout>
 
-## Using data attributes
+## Usage
+
+### Via data attributes
 
 You can activate a tab or pill navigation without writing any JavaScript by simply specifying `data-coreui-toggle="tab"` or `data-coreui-toggle="pill"` on an element. Use these data attributes on `.nav-tabs` or `.nav-pills`.
 
@@ -153,7 +161,7 @@ You can activate a tab or pill navigation without writing any JavaScript by simp
 </div>
 ```
 
-## Via JavaScript
+### Via JavaScript
 
 Enable tabbable tabs via JavaScript (each tab needs to be activated individually):
 
@@ -179,7 +187,7 @@ const triggerFirstTabEl = document.querySelector('#myTab li:first-child button')
 coreui.Tab.getInstance(triggerFirstTabEl).show() // Select first tab
 ```
 
-## Fade effect
+### Fade effect
 
 Every `.tab-pane` fades in as it becomes active — no class to add. The pane you leave goes at once, because two in-flow panes cannot cross-fade without one stacking under the other.
 
@@ -192,7 +200,7 @@ Add `.tab-pane-instant` to a pane to switch its fade off, or retime it with `--c
 </div>
 ```
 
-## Methods
+### Methods
 
 <Callout color="info">
 #### Promises and transitions
@@ -217,7 +225,7 @@ const cuiTab = new coreui.Tab('#myTab')
 | `getOrCreateInstance` | *Static* method which allows you to get the tab instance associated with a DOM element, or create a new one in case it wasn't initialized You can use it like this: `coreui.Tab.getOrCreateInstance(element)`. |
 | `show` | Selects the given tab and shows its associated pane. Any other tab that was previously selected becomes unselected and its associated pane is hidden. **Returns a promise that resolves after the tab pane is shown** (i.e. after the `shown.coreui.tab` event occurs). |
 
-## Events
+### Events
 
 When showing a new tab, the events fire in the following order:
 

@@ -449,6 +449,51 @@ You are able to adjust the borders on the card elements as needed, and even excl
     <div class="card-footer bg-transparent border-success">Footer</div>
   </div>`} />
 
+## Theme variants
+
+A [theme class](/customize/components/#theme-variants) paints the card's frame and caps with the theme color, with contrast text in the header and footer:
+
+<Example class="d-flex flex-wrap gap-3" code={getData('theme-colors').map((c) => `<div class="card theme-${c.name}" style="width: 15rem;">
+    <div class="card-header">Header</div>
+    <div class="card-body">
+      <p class="card-text">Some quick example text to build on the card title.</p>
+    </div>
+    <div class="card-footer">Footer</div>
+  </div>`)} />
+
+Put the theme class on a single section instead and only that section follows it:
+
+<Example code={`<div class="card" style="max-width: 18rem;">
+    <div class="card-header">Header</div>
+    <div class="card-body">
+      <p class="card-text">Some quick example text to build on the card title.</p>
+    </div>
+    <div class="card-footer theme-danger">Something went wrong</div>
+  </div>`} />
+
+Add `.card-subtle` to swap the solid fill for the theme's subtle background and border, with emphasis text in the caps.
+
+<Example class="d-flex flex-wrap gap-3" code={getData('theme-colors').map((c) => `<div class="card card-subtle theme-${c.name}" style="width: 15rem;">
+    <div class="card-header">Header</div>
+    <div class="card-body">
+      <p class="card-text">Some quick example text to build on the card title.</p>
+    </div>
+    <div class="card-footer">Footer</div>
+  </div>`)} />
+
+## Translucent
+
+Add `.card-translucent` to let the background through the card and blur it. The caps thin out with it, so the whole card reads as one surface.
+
+<Example class="bg-black p-4" code={`<div class="card card-translucent" style="width: 18rem;">
+    <div class="card-header">Header</div>
+    <div class="card-body">
+      <h5 class="card-title">Card title</h5>
+      <p class="card-text">Some quick example text to build on the card title.</p>
+    </div>
+    <div class="card-footer">Footer</div>
+  </div>`} />
+
 ## Card layout
 
 In addition to styling the content within cards, Bootstrap includes a few options for laying out series of cards. For the time being, **these layout options are not yet responsive**.
@@ -687,50 +732,6 @@ Just like with card groups, card footers will automatically line up.
     </div>
   </div>`} />
 
-## Theming
-
-A [theme class](/customize/components/#theme-variants) paints the card's frame and caps with the theme color, with contrast text in the header and footer:
-
-<Example class="d-flex flex-wrap gap-3" code={getData('theme-colors').map((c) => `<div class="card theme-${c.name}" style="width: 15rem;">
-    <div class="card-header">Header</div>
-    <div class="card-body">
-      <p class="card-text">Some quick example text to build on the card title.</p>
-    </div>
-    <div class="card-footer">Footer</div>
-  </div>`)} />
-
-Put the theme class on a single section instead and only that section follows it:
-
-<Example code={`<div class="card" style="max-width: 18rem;">
-    <div class="card-header">Header</div>
-    <div class="card-body">
-      <p class="card-text">Some quick example text to build on the card title.</p>
-    </div>
-    <div class="card-footer theme-danger">Something went wrong</div>
-  </div>`} />
-
-Add `.card-subtle` to swap the solid fill for the theme's subtle background and border, with emphasis text in the caps.
-
-<Example class="d-flex flex-wrap gap-3" code={getData('theme-colors').map((c) => `<div class="card card-subtle theme-${c.name}" style="width: 15rem;">
-    <div class="card-header">Header</div>
-    <div class="card-body">
-      <p class="card-text">Some quick example text to build on the card title.</p>
-    </div>
-    <div class="card-footer">Footer</div>
-  </div>`)} />
-
-## Translucent
-
-Add `.card-translucent` to let the background through the card and blur it. The caps thin out with it, so the whole card reads as one surface.
-
-<Example class="bg-black p-4" code={`<div class="card card-translucent" style="width: 18rem;">
-    <div class="card-header">Header</div>
-    <div class="card-body">
-      <h5 class="card-title">Card title</h5>
-      <p class="card-text">Some quick example text to build on the card title.</p>
-    </div>
-    <div class="card-footer">Footer</div>
-  </div>`} />
 
 ## Customizing
 
