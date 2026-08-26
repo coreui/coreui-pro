@@ -379,11 +379,45 @@ To nest your content with the default grid, add a new `.row` and set of `.col-sm
     </div>
   </div>`} />
 
-## Sass
+## Customizing the grid
+
+Using our built-in grid Sass variables and maps, it's possible to completely customize the predefined grid classes. Change the number of tiers, the media query dimensions, and the container widths—then recompile.
+
+### Columns and gutters
+
+The number of grid columns can be modified via Sass variables. `$grid-columns` is used to generate the widths (in percent) of each individual column while `$grid-gutter-width` sets the width for the column gutters.
+
+```scss
+$grid-columns: 12 !default;
+$grid-gutter-width: 1.5rem !default;
+```
+
+### Grid tiers
+
+Moving beyond the columns themselves, you may also customize the number of grid tiers. If you wanted just four grid tiers, you'd update the `$grid-breakpoints` and `$container-max-widths` to something like this:
+
+```scss
+$grid-breakpoints: (
+  xs: 0,
+  sm: 480px,
+  md: 768px,
+  lg: 1024px
+);
+
+$container-max-widths: (
+  sm: 420px,
+  md: 720px,
+  lg: 960px
+);
+```
+
+When making any changes to the Sass variables or maps, you'll need to save your changes and recompile. Doing so will output a brand new set of predefined grid classes for column widths, offsets, and ordering. Responsive visibility utilities will also be updated to use the custom breakpoints. Make sure to set grid values in `px` (not `rem`, `em`, or `%`).
+
+## Customizing
 
 When using CoreUI for Bootstrap's source Sass files, you have the option of using Sass variables and mixins to create custom, semantic, and responsive page layouts. Our predefined grid classes use these same variables and mixins to provide a whole suite of ready-to-use classes for fast responsive layouts.
 
-### Variables
+### Sass variables
 
 Variables and maps determine the number of columns, the gutter width, and the media query point at which to begin floating columns. We use these to generate the predefined grid classes documented above, as well as for the custom mixins listed below.
 
@@ -396,7 +430,7 @@ $grid-gutter-width: 1.5rem;
 
 <ScssDocs file="scss/_config.scss" capture="container-max-widths" />
 
-### Mixins
+### Sass mixins
 
 Mixins are used in conjunction with the grid variables to generate semantic CSS for individual grid columns.
 
@@ -460,37 +494,3 @@ You can modify the variables to your own custom values, or just use the mixins w
       <div class="example-content-secondary">Secondary content</div>
     </div>
   </div>`} />
-
-## Customizing the grid
-
-Using our built-in grid Sass variables and maps, it's possible to completely customize the predefined grid classes. Change the number of tiers, the media query dimensions, and the container widths—then recompile.
-
-### Columns and gutters
-
-The number of grid columns can be modified via Sass variables. `$grid-columns` is used to generate the widths (in percent) of each individual column while `$grid-gutter-width` sets the width for the column gutters.
-
-```scss
-$grid-columns: 12 !default;
-$grid-gutter-width: 1.5rem !default;
-```
-
-### Grid tiers
-
-Moving beyond the columns themselves, you may also customize the number of grid tiers. If you wanted just four grid tiers, you'd update the `$grid-breakpoints` and `$container-max-widths` to something like this:
-
-```scss
-$grid-breakpoints: (
-  xs: 0,
-  sm: 480px,
-  md: 768px,
-  lg: 1024px
-);
-
-$container-max-widths: (
-  sm: 420px,
-  md: 720px,
-  lg: 960px
-);
-```
-
-When making any changes to the Sass variables or maps, you'll need to save your changes and recompile. Doing so will output a brand new set of predefined grid classes for column widths, offsets, and ordering. Responsive visibility utilities will also be updated to use the custom breakpoints. Make sure to set grid values in `px` (not `rem`, `em`, or `%`).

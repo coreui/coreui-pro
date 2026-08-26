@@ -60,26 +60,23 @@ Use `.container-fluid` for a full width container, spanning the entire width of 
 
 ## Customizing
 
+### Sass maps
+
 As shown above, CoreUI for Bootstrap generates a series of predefined container classes to help you build the layouts you desire. You may customize these predefined container classes by modifying the Sass map (found in `_config.scss`) that powers them:
 
 <ScssDocs file="scss/_config.scss" capture="container-max-widths" />
 
-In addition to customizing the Sass, you can also create your own containers with our Sass mixin.
+### Sass mixins
+
+In addition to customizing the Sass, you can also create your own containers with our Sass mixin. The mixin declares the container's own `--cui-gutter-*` properties, so the padding follows a gutter override the same way the built-in containers do:
+
+<ScssDocs file="scss/mixins/_container.scss" capture="make-container" />
 
 ```scss
-// Source mixin
-@mixin make-container($padding-x: $container-padding-x) {
-  width: 100%;
-  padding-right: $padding-x;
-  padding-left: $padding-x;
-  margin-right: auto;
-  margin-left: auto;
-}
-
 // Usage
 .custom-container {
   @include make-container();
 }
 ```
 
-For more information and examples on how to modify our Sass maps and variables, please refer to [the Sass section of the Grid documentation](/layout/grid/#sass).
+For more information and examples on how to modify our Sass maps and variables, please refer to [the Sass section of the Grid documentation](/layout/grid/#customizing).

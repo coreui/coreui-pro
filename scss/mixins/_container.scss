@@ -2,6 +2,7 @@
 
 // Container mixins
 
+// scss-docs-start make-container
 @mixin make-container($gutter: $container-padding-x) {
   --#{$prefix}gutter-x: #{$gutter};
   --#{$prefix}gutter-y: 0;
@@ -9,3 +10,4 @@
   padding-inline: calc(var(--#{$prefix}gutter-x) * .5);
   margin-inline: auto;
 }
+// scss-docs-end make-container
