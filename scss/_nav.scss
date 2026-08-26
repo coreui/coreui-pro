@@ -208,6 +208,10 @@ $tab-pane-tokens: defaults(
     list-style-type: "";
   }
 
+  .nav-item {
+    display: flex;
+  }
+
   .nav-link {
     display: flex;
     gap: var(--#{$prefix}nav-link-gap);

@@ -136,6 +136,8 @@ $pagination-sizes: defaults(
   }
 
   .page-item {
+    display: flex;
+
     &:not(:first-child) .page-link {
       margin-inline-start: calc(-1 * var(--#{$prefix}pagination-border-width));
     }

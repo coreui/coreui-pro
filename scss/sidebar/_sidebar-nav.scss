@@ -153,6 +153,10 @@ $sidebar-nav-tree-link-active-icon-bullet-bg:  var(--#{$prefix}border-color) !de
     overflow-y: auto;
     list-style-type: "";
 
+    .nav-item {
+      flex-direction: column;
+    }
+
     .nav-item + .nav-item,
     .nav-item + .nav-group,
     .nav-group + .nav-item,
