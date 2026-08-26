@@ -31,7 +31,7 @@ $menu-item-color:               var(--#{$prefix}menu-color, var(--#{$prefix}fg-b
 $menu-item-hover-color:         var(--#{$prefix}menu-color, var(--#{$prefix}fg-body)) !default;
 $menu-item-hover-bg:            var(--#{$prefix}bg-3) !default;
 $menu-item-active-color:        var(--#{$prefix}primary-contrast) !default;
-$menu-item-active-bg:           var(--#{$prefix}primary) !default;
+$menu-item-active-bg:           var(--#{$prefix}primary-bg) !default;
 $menu-item-disabled-color:      var(--#{$prefix}fg-3) !default;
 $menu-item-gap:                 .5rem !default;
 $menu-item-padding-x:           .75rem !default;

@@ -13,7 +13,7 @@ $progress-bg:                          var(--#{$prefix}bg-4) !default;
 $progress-border-radius:               var(--#{$prefix}radius-5) !default;
 $progress-box-shadow:                  var(--#{$prefix}box-shadow-inset) !default;
 $progress-bar-color:                   var(--#{$prefix}primary-contrast) !default;
-$progress-bar-bg:                      var(--#{$prefix}primary) !default;
+$progress-bar-bg:                      var(--#{$prefix}primary-bg) !default;
 $progress-bar-transition:              width .6s ease !default;
 $progress-bar-animation:               progress-bar-stripes 1s linear infinite !default;
 

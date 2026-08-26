@@ -223,6 +223,12 @@ $theme-state-colors: (
     $tokens: map.set($tokens, --#{$prefix}#{$color}, map.get($slots, "base"));
   }
 
+  // The action-background slot: what checked, active and filled states read.
+  // Points at the base color, so overriding either retunes every action state.
+  @each $color in map.keys($theme-colors) {
+    $tokens: map.set($tokens, --#{$prefix}#{$color}-bg, var(--#{$prefix}#{$color}));
+  }
+
   // A 100-900 scale per theme color, on the same generator the palette uses. The
   // subtle backgrounds, borders and emphasis text below are `light-dark()` pairs
   // of these stops.
