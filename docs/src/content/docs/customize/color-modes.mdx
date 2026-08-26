@@ -268,7 +268,7 @@ Global colors are declared once as `light-dark()` pairs, so the color mode selec
 
 Do the same in your own color modes: declare `color-scheme` and override only the tokens whose value is genuinely mode-specific.
 
-### SASS variables
+### Sass variables
 
 <DeprecatedIn version="6.0.0" />
 
@@ -282,13 +282,13 @@ The one value that cannot be a `light-dark()` pair — the color baked into the 
 
 <ScssDocs file="scss/forms/_form-control.scss" capture="form-control-select-dark-variables" />
 
-### SASS maps
+### Sass maps
 
 The two maps are the stops of that scale: each entry is one step number and how far it mixes towards the tint or the shade color. Add an entry and every theme color gains that stop; set one to `null` to drop it everywhere at once.
 
 <ScssDocs file="scss/_colors.scss" capture="color-scale-maps" />
 
-### SASS mixins
+### Sass mixins
 
 Styles for dark mode, and any custom color modes you create, can be scoped appropriately to the `data-coreui-theme` attribute selector or media query with the customizable `color-mode()` mixin. See the [Sass usage section](#building-with-sass) for more details.
 

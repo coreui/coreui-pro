@@ -166,7 +166,7 @@ Two tokens are declared by the class that uses them rather than on every control
 
 <ScssDocs file="scss/forms/_form-text.scss" capture="form-text-css-vars" />
 
-### SASS variables
+### Sass variables
 
 The frame every field draws is configured once, in `_root.scss`. `$input-btn-*` sets it for buttons and controls together, and each value is emitted as a `--cui-btn-input-*` token that the components read:
 
@@ -186,7 +186,7 @@ The colour picker keeps a width of its own, since it is not as wide as it is tal
 
 <ScssDocs file="scss/forms/_form-control.scss" capture="form-file-variables" />
 
-### SASS maps
+### Sass maps
 
 Each entry generates one `.form-control-{size}` and `.form-select-{size}` class, pointing the control at the matching `--cui-btn-input-{size}-*` values. Add a key to define a size, or set one to `null` to drop it:
 
