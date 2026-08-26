@@ -334,6 +334,12 @@ finished, not whether the state changed.
 #### Alert
 
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **An alert without a theme class carries its own surface.** `--cui-alert-bg`
+  falls back to `var(--cui-bg-1)` instead of `transparent`, so a plain
+  `.alert` no longer takes the color of whatever it sits on. Set
+  `--cui-alert-bg: transparent` on the alert to restore the old rendering.
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **The alert lays its children out in a row.** It is `display: flex` with
   `align-items: start` and `--cui-alert-gap` between children, so an icon next
   to a label needs no `d-flex` and no spacing utility. Text mixed with inline
