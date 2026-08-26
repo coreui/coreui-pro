@@ -344,6 +344,18 @@ All these colors are available as a Sass map, `$theme-colors`.
 
 Check out [our Sass maps and loops docs](/customize/sass/#maps-and-loops) for how to modify these colors.
 
+## From colors to theme
+
+The `--cui-{color}-{stop}` tokens are the raw palette. On their own they style nothing — a chosen subset feeds the **theme layer**, where each color picks up semantic roles and every theme-aware component follows. The pipeline, end to end:
+
+1. **`$colors`** (`scss/_colors.scss`) defines the base hues, and each one gets a 100–900 scale of `color-mix()` tokens on `:root` — `--cui-blue-300` and friends, mixed in the browser from the color's own token.
+2. **Theme colors** (`$primary`, `$success`, … in `scss/_theme.scss`) get the same runtime scale from their own tokens — `--cui-primary-300`.
+3. **`$theme-colors`** maps each semantic name to a family of slots (`base`, `contrast`, `fg`, `text-emphasis`, `bg-subtle`, `bg-muted`, `border-subtle`, `focus-ring`), mostly reading that scale through `light-dark()` so every slot adapts to the color mode.
+4. The slots are emitted as **`--cui-{name}-{slot}`** tokens — `--cui-primary-bg-subtle` — the ones the table at the top of this page shows.
+5. **`.theme-{name}`** classes (and component variants like `.alert-danger`) remap them onto generic **`--cui-theme-{slot}`** tokens that components read — so one class restyles any theme-aware component, and overriding `--cui-primary` alone retints the whole family.
+
+The theme layer — the slots, the runtime scale, the classes — is documented in full on [Theme](/customize/theme/), and the mechanics of the slot indirection on [Architecture](/customize/architecture/#theme-slots). The rest of this page stays on the base color layer.
+
 ## All colors
 
 All CoreUI for Bootstrap colors are available as Sass variables and a Sass map in `scss/_colors.scss` file. To avoid increased file sizes, we don't create text or background color classes for each of these variables. Instead, we choose a subset of these colors for a [theme palette](#theme-colors).
