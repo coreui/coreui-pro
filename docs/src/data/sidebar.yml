@@ -50,6 +50,8 @@
       to: /customize/options/
     - title: Color
       to: /customize/color/
+    - title: Theme
+      to: /customize/theme/
     - title: Color modes
       to: /customize/color-modes/
     - title: Components
