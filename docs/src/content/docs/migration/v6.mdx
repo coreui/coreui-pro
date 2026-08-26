@@ -2542,6 +2542,18 @@ Two consequences for the tokens:
   instead. This name is exactly why the ladder moved out of the theme-color
   namespace: a page surface sat next to `--cui-secondary-bg-subtle` (a
   theme-color slot) with no way to tell which system a token belonged to.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The dark side of the ladder is palette stops, and the page got darker.**
+  The grays gain `--cui-gray-950` (`#15181f`) and `--cui-gray-975` (`#0e1115`),
+  and every dark rung is a stop instead of a `color-mix()` between `gray-800`
+  and `gray-900`: the body sits on `gray-975` (was `gray-900`), `bg-1` on
+  `gray-950`, `bg-2` on `gray-900`, `bg-3` on `gray-800` and `bg-4` on
+  `gray-700`. Dark mode reads darker overall and surfaces have more room to
+  step away from the page; the light side is unchanged. Translucent values
+  un-blended against the body (`$border-color-translucent`, the tertiary
+  surface) carry a higher alpha for the same rendered color over the darker
+  page. Override the `$bg-*` knobs or the `--cui-bg-*` tokens to keep the
+  previous palette.
 - **`.text-body` and `.text-body-emphasis` are unaffected** — they are not
   ordinal, any more than `.text-primary` is.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
