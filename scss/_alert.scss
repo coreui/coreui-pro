@@ -33,8 +33,9 @@ $alert-tokens: defaults(
     --#{$prefix}alert-gap: #{$alert-gap},
     --#{$prefix}alert-margin-bottom: #{$alert-margin-bottom},
     --#{$prefix}alert-color: var(--#{$prefix}theme-fg-emphasis, inherit),
-    --#{$prefix}alert-border-color: var(--#{$prefix}theme-border, transparent),
+    --#{$prefix}alert-border-color: var(--#{$prefix}theme-border, var(--#{$prefix}border-color)),
     --#{$prefix}alert-border-width: #{$alert-border-width},
+    --#{$prefix}alert-border: var(--#{$prefix}alert-border-width) solid var(--#{$prefix}alert-border-color),
     --#{$prefix}alert-border-radius: #{$alert-border-radius},
     --#{$prefix}alert-link-color: inherit,
     --#{$prefix}alert-transition-property: #{$alert-transition-property},
@@ -69,7 +70,7 @@ $alert-variants: (
     margin-bottom: var(--#{$prefix}alert-margin-bottom);
     color: var(--#{$prefix}alert-color);
     background-color: var(--#{$prefix}alert-bg);
-    border: var(--#{$prefix}alert-border-width) solid var(--#{$prefix}alert-border-color);
+    border: var(--#{$prefix}alert-border);
     @include border-radius(var(--#{$prefix}alert-border-radius));
 
     // scss-docs-start alert-transition
