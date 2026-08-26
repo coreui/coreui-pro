@@ -27,13 +27,13 @@ $alert-tokens: () !default;
 // scss-docs-start alert-css-vars
 $alert-tokens: defaults(
   (
-    --#{$prefix}alert-bg: transparent,
+    --#{$prefix}alert-bg: var(--#{$prefix}theme-bg-subtle, transparent),
     --#{$prefix}alert-padding-x: #{$alert-padding-x},
     --#{$prefix}alert-padding-y: #{$alert-padding-y},
     --#{$prefix}alert-gap: #{$alert-gap},
     --#{$prefix}alert-margin-bottom: #{$alert-margin-bottom},
-    --#{$prefix}alert-color: inherit,
-    --#{$prefix}alert-border-color: transparent,
+    --#{$prefix}alert-color: var(--#{$prefix}theme-fg-emphasis, inherit),
+    --#{$prefix}alert-border-color: var(--#{$prefix}theme-border, transparent),
     --#{$prefix}alert-border-width: #{$alert-border-width},
     --#{$prefix}alert-border-radius: #{$alert-border-radius},
     --#{$prefix}alert-link-color: inherit,
@@ -67,9 +67,9 @@ $alert-variants: (
     align-items: start;
     padding: var(--#{$prefix}alert-padding-y) var(--#{$prefix}alert-padding-x);
     margin-bottom: var(--#{$prefix}alert-margin-bottom);
-    color: var(--#{$prefix}theme-fg-emphasis, var(--#{$prefix}alert-color));
-    background-color: var(--#{$prefix}theme-bg-subtle, var(--#{$prefix}alert-bg));
-    border: var(--#{$prefix}alert-border-width) solid var(--#{$prefix}theme-border, var(--#{$prefix}alert-border-color));
+    color: var(--#{$prefix}alert-color);
+    background-color: var(--#{$prefix}alert-bg);
+    border: var(--#{$prefix}alert-border-width) solid var(--#{$prefix}alert-border-color);
     @include border-radius(var(--#{$prefix}alert-border-radius));
 
     // scss-docs-start alert-transition
@@ -130,10 +130,6 @@ $alert-variants: (
           --#{$prefix}alert-#{$property}: var(--#{$prefix}theme-#{$value});
         }
       }
-
-      color: var(--#{$prefix}alert-color);
-      background-color: var(--#{$prefix}alert-bg);
-      border-color: var(--#{$prefix}alert-border-color);
     }
   }
   // scss-docs-end alert-modifiers
