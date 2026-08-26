@@ -43,6 +43,15 @@ export default defineConfig({
     '/helpers/ratio/': `${base}/utilities/aspect-ratio/`,
     // `.link-{color}` gave way to the theme classes in v6.
     '/helpers/colored-links/': `${base}/utilities/link/`,
+    // Download and Contents merged into one Install page.
+    '/getting-started/download/': `${base}/getting-started/install/`,
+    '/getting-started/contents/': `${base}/getting-started/install/`,
+    // The build-tool pages and Laravel moved into a single Guides section.
+    '/getting-started/webpack/': `${base}/guides/webpack/`,
+    '/getting-started/parcel/': `${base}/guides/parcel/`,
+    '/getting-started/vite/': `${base}/guides/vite/`,
+    '/getting-started/build-tools/': `${base}/guides/build-tools/`,
+    '/integration-guides/laravel/': `${base}/guides/laravel/`,
   },
   outDir: '../_site',
   cacheDir: '../.cache/astro',
