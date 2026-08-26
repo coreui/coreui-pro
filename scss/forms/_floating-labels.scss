@@ -19,7 +19,7 @@ $form-floating-label-disabled-color:    var(--#{$prefix}gray-600) !default;
 // The label is a sibling of the control, so it cannot inherit the control's own
 // background — the textarea mask has to be told the same colour a second time.
 $form-floating-label-bg:                var(--#{$prefix}btn-input-bg) !default;
-$form-floating-label-disabled-bg:       var(--#{$prefix}bg-4) !default;
+$form-floating-label-disabled-bg:       var(--#{$prefix}bg-2) !default;
 $form-floating-label-border-radius:     var(--#{$prefix}btn-input-border-radius) !default;
 $form-floating-transition-property:     "opacity, transform" !default;
 $form-floating-transition-duration:     .1s !default;

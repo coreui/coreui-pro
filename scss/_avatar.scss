@@ -13,7 +13,7 @@ $avatar-size:                  2rem !default;
 // The label scales with the frame, so a size only has to be given once.
 $avatar-font-size-ratio:       .4 !default;
 $avatar-color:                 inherit !default;
-$avatar-bg:                    var(--#{$prefix}bg-4) !default;
+$avatar-bg:                    var(--#{$prefix}bg-2) !default;
 $avatar-border-radius:         50em !default;
 $avatar-status-size:           .5rem !default;
 $avatar-status-border-radius:  50em !default;

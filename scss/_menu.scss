@@ -29,7 +29,7 @@ $menu-divider-margin-y:         .125rem !default;
 $menu-divider-margin-x:         .25rem !default;
 $menu-item-color:               var(--#{$prefix}menu-color, var(--#{$prefix}fg-body)) !default;
 $menu-item-hover-color:         var(--#{$prefix}menu-color, var(--#{$prefix}fg-body)) !default;
-$menu-item-hover-bg:            var(--#{$prefix}bg-3) !default;
+$menu-item-hover-bg:            var(--#{$prefix}bg-1) !default;
 $menu-item-active-color:        var(--#{$prefix}primary-contrast) !default;
 $menu-item-active-bg:           var(--#{$prefix}primary-bg) !default;
 $menu-item-disabled-color:      var(--#{$prefix}fg-3) !default;
@@ -162,7 +162,7 @@ $menu-tokens: defaults(
   }
 
   .menu-translucent {
-    --#{$prefix}menu-item-hover-bg: color-mix(in oklch, var(--#{$prefix}bg-3) 85%, transparent);
+    --#{$prefix}menu-item-hover-bg: color-mix(in oklch, var(--#{$prefix}bg-1) 85%, transparent);
     --#{$prefix}menu-item-active-bg: color-mix(in oklch, var(--#{$prefix}primary) 75%, transparent);
 
     background-color: color-mix(in oklch, var(--#{$prefix}menu-bg) 80%, transparent);

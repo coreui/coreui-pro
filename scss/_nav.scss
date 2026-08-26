@@ -20,7 +20,7 @@ $nav-link-border-radius:            var(--#{$prefix}border-radius) !default;
 $nav-link-font-weight:              null !default;
 $nav-link-color:                    var(--#{$prefix}link-color) !default;
 $nav-link-hover-color:              var(--#{$prefix}link-hover-color) !default;
-$nav-link-hover-bg:                 var(--#{$prefix}bg-3) !default;
+$nav-link-hover-bg:                 var(--#{$prefix}bg-1) !default;
 $nav-link-active-color:             var(--#{$prefix}emphasis-color) !default;
 $nav-link-active-bg:                var(--#{$prefix}bg-4) !default;
 $nav-link-transition-property:      color, background-color, border-color !default;
