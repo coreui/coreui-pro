@@ -31,6 +31,8 @@
       to: /guides/vite/
     - title: Laravel
       to: /guides/laravel/
+    - title: Django
+      to: /guides/django/
     - title: Build tools
       to: /guides/build-tools/
 - title: Customize
