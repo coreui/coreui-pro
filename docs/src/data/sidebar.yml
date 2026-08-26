@@ -38,6 +38,8 @@
   pages:
     - title: Overview
       to: /customize/overview/
+    - title: Architecture
+      to: /customize/architecture/
     - title: Sass
       to: /customize/sass/
     - title: Options
