@@ -17,6 +17,21 @@ A `<select>` takes `.form-control`, the same class as every other form control â
     <option value="3">Three</option>
   </select>`} />
 
+## With form field
+
+Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label and description, and to get validation feedback in the right place.
+
+<Example code={`<div class="form-field">
+    <label for="selectField" class="form-label">Country</label>
+    <select class="form-control" id="selectField">
+      <option selected>Choose oneâ€¦</option>
+      <option value="1">United States</option>
+      <option value="2">Canada</option>
+      <option value="3">United Kingdom</option>
+    </select>
+    <div class="form-text">We ship to these three for now.</div>
+  </div>`} />
+
 ## Sizing
 
 `.form-control-sm` and `.form-control-lg` size a select exactly as they size a text input.

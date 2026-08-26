@@ -18,6 +18,16 @@ Embed the Rating component in your HTML by using a `div` with `data-coreui-toggl
 
 <Example pro code={`<div data-coreui-toggle="rating" data-coreui-value="3"></div>`} />
 
+## With form field
+
+Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label and description, and to get validation feedback in the right place.
+
+<Example pro code={`<div class="form-field">
+    <span class="form-label" id="ratingFieldLabel">Overall rating</span>
+    <div data-coreui-toggle="rating" data-coreui-value="3" aria-labelledby="ratingFieldLabel"></div>
+    <div class="form-text">Tell us how the delivery went.</div>
+  </div>`} />
+
 ## Allow clear
 
 Enable users to clear their selected rating by clicking on the current rating again. This functionality is activated by setting `data-coreui-allow-clear="true"`.

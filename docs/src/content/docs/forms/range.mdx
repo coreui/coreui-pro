@@ -15,6 +15,16 @@ Create custom `<input type="range" />` controls with `.form-range`. The track (t
 <Example code={`<label for="customRange1" class="form-label">Example range</label>
   <input type="range" class="form-range" id="customRange1">`} />
 
+## With form field
+
+Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label and description, and to get validation feedback in the right place.
+
+<Example code={`<div class="form-field">
+    <label for="rangeField" class="form-label">Volume</label>
+    <input type="range" class="form-range" id="rangeField">
+    <div class="form-text">Applies to notification sounds only.</div>
+  </div>`} />
+
 ## Disabled
 
 Add the `disabled` boolean attribute on an input to give it a grayed out appearance and remove pointer events.

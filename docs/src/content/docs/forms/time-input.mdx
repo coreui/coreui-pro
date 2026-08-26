@@ -22,6 +22,16 @@ Use an empty container with `data-coreui-time-input` to create a masked time fie
 <Example pro code={`<label class="form-label">Meeting time</label>
   <div class="form-control form-date-time" data-coreui-time-input data-coreui-name="meeting-time"></div>`} />
 
+## With form field
+
+Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label and description, and to get validation feedback in the right place.
+
+<Example pro code={`<div class="form-field">
+    <span class="form-label">Meeting time</span>
+    <div class="form-control form-date-time" data-coreui-time-input data-coreui-name="meeting-time"></div>
+    <div class="form-text">Local time, in your own time zone.</div>
+  </div>`} />
+
 ## Formats
 
 Set an explicit format with the `data-coreui-format` attribute: `HH`/`H` for the 23-hour cycle, `hh`/`h` for the 12-hour cycle, `mm` for minutes, `ss` for seconds, and `A`/`a` for the day period. Type `a` or `p` in the AM/PM section to switch it, or use the arrow keys.

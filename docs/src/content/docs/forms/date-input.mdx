@@ -28,6 +28,16 @@ By default, the section order and separators are derived from the user's locale,
 <Example pro code={`<label class="form-label" id="basicDateInputLabel">Delivery date</label>
   <div class="form-control form-date-time" data-coreui-date-input data-coreui-name="delivery-date"></div>`} />
 
+## With form field
+
+Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label and description, and to get validation feedback in the right place.
+
+<Example pro code={`<div class="form-field">
+    <span class="form-label">Delivery date</span>
+    <div class="form-control form-date-time" data-coreui-date-input data-coreui-name="delivery-date"></div>
+    <div class="form-text">We deliver on working days only.</div>
+  </div>`} />
+
 ## Formats
 
 Set an explicit format with the `data-coreui-format` attribute. The parser accepts both dayjs/moment-style tokens (`DD`, `MM`, `YYYY`, `YY`) and date-fns/Unicode-style tokens (`dd`, `MM`, `yyyy`, `yy`), plus `ww` for ISO week numbers and `q` (numeric) or `QQQ` (`Q1`–`Q4`) for quarters, so you can reuse the format strings from the date library you already use. Any other character becomes a literal separator — a fixed, non-editable part of the mask — and text wrapped in single quotes is always a literal, even when it contains token letters (`'Week' ww` renders `Week 29`; escape a quote by doubling it, `''`).
