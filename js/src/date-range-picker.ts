@@ -71,6 +71,7 @@ const DEFAULT_SEPARATOR_ICON_RTL: string = '<svg xmlns="http://www.w3.org/2000/s
 type DateRangePickerConfig = {
   allowList: SanitizerAllowList
   ariaCleanerLabel: string
+  ariaLabels: string[]
   ariaToggleLabel: string
   cleaner: boolean
   cleanerIcon: string
@@ -97,6 +98,7 @@ type DateRangePickerConfig = {
 const Default: DateRangePickerConfig = {
   allowList: SVGAllowlist,
   ariaCleanerLabel: 'Clear the value',
+  ariaLabels: ['Start date', 'End date'],
   ariaToggleLabel: 'Toggle the calendar',
   cleaner: true,
   cleanerIcon: CLEANER_ICON,
@@ -123,6 +125,7 @@ const Default: DateRangePickerConfig = {
 const DefaultType: Record<string, string> = {
   allowList: 'object',
   ariaCleanerLabel: 'string',
+  ariaLabels: 'array',
   ariaToggleLabel: 'string',
   cleaner: 'boolean',
   cleanerIcon: 'string',
@@ -326,10 +329,18 @@ class DateRangePicker extends BaseComponent {
     return isRtl ? this._config.separatorIconRtl : this._config.separatorIcon
   }
 
-  _createInput(date: Date | null, name: string): any {
+  // Both halves are the same primitive, so without a name of its own each would
+  // announce identically and give no clue which end of the range it is.
+  _ariaLabel(index: number): string {
+    const labels = this._config.ariaLabels
+    return (Array.isArray(labels) && labels[index]) || (Default.ariaLabels as string[])[index]
+  }
+
+  _createInput(date: Date | null, name: string, ariaLabel: string): any {
     const inputEl = document.createElement('div')
 
     const input = new DateInput(inputEl, this._forwardConfig(DateInput, {
+      ariaLabel,
       date,
       disabled: this._config.disabled,
       locale: this._config.locale,
@@ -354,7 +365,7 @@ class DateRangePicker extends BaseComponent {
       inputGroup.classList.add(`${CLASS_NAME_FORM_CONTROL}-${this._config.size}`)
     }
 
-    const start = this._createInput(this._config.startDate, this._config.startName)
+    const start = this._createInput(this._config.startDate, this._config.startName, this._ariaLabel(0))
     this._startInput = start.input
     this._startInputElement = start.inputEl
     inputGroup.append(start.inputEl)
@@ -365,7 +376,7 @@ class DateRangePicker extends BaseComponent {
     separator.innerHTML = this._sanitizeIcon(this._resolveSeparatorIcon())
     inputGroup.append(separator)
 
-    const end = this._createInput(this._config.endDate, this._config.endName)
+    const end = this._createInput(this._config.endDate, this._config.endName, this._ariaLabel(1))
     this._endInput = end.input
     this._endInputElement = end.inputEl
     inputGroup.append(end.inputEl)
