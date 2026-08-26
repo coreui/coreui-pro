@@ -49,8 +49,11 @@ $mobile-breakpoint:           lg !default;
 
 // You can add more entries to the $spacers map, should you need more variation.
 
-// scss-docs-start spacer-variables-maps
+// scss-docs-start spacer-variables
 $spacer: 1rem !default;
+// scss-docs-end spacer-variables
+
+// scss-docs-start spacers-map
 $spacers: (
   0: 0,
   1: $spacer * .25,
@@ -59,7 +62,7 @@ $spacers: (
   4: $spacer * 1.5,
   5: $spacer * 3,
 ) !default;
-// scss-docs-end spacer-variables-maps
+// scss-docs-end spacers-map
 
 // Define the edge positioning anchors of the position utilities.
 

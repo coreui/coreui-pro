@@ -53,6 +53,8 @@ Every theme color gets a 100–900 scale of `color-mix()` tokens, mixed at runti
 
 <ScssDocs file="scss/_colors.scss" capture="color-scale-variables" />
 
+<ScssDocs file="scss/_colors.scss" capture="color-scale-maps" />
+
 ```css
 :root {
   --cui-primary: #6f42c1; /* the scale, the slots and every component follow */
@@ -105,7 +107,7 @@ Four style utilities pair a themed surface with its matching text color — comp
 
 ## Customizing
 
-### SASS variables
+### Sass variables
 
 <DeprecatedIn version="6.0.0" />
 
@@ -113,8 +115,16 @@ Sass variables set these defaults at build time and are removed in v7. The CSS v
 
 <ScssDocs file="scss/_theme.scss" capture="theme-color-variables" />
 
-<ScssDocs file="scss/_theme.scss" capture="theme-token-refs" />
-
-Each theme class also carries its own interaction shades, computed from the color in the browser, so a component asking for "this color, one step darker" reads a token instead of recomputing it. A color that is already dark brightens instead — that is what the overrides map is for.
+Each theme class also carries its own interaction shades, computed from the color in the browser, so a component asking for "this color, one step darker" reads a token instead of recomputing it. These two multipliers set how far a shade travels:
 
 <ScssDocs file="scss/_theme.scss" capture="theme-interaction-variables" />
+
+### Sass maps
+
+`$theme-token-refs` is the contract between a theme class and the components reading it: each entry names a `--cui-theme-*` token and the suffix it takes from the theme color. Add an entry and every theme class gains that token.
+
+<ScssDocs file="scss/_theme.scss" capture="theme-token-refs" />
+
+A color that is already dark brightens instead of darkening, which no single multiplier handles. `$theme-state-colors` is the escape hatch: name a theme color and give its `hover` and `active` values outright, and the multipliers above are skipped for it.
+
+<ScssDocs file="scss/_theme.scss" capture="theme-state-colors" />

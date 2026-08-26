@@ -201,7 +201,7 @@ Checkboxes read their own custom properties, so restyling one control does not t
 
 <ScssDocs file="scss/forms/_check.scss" capture="check-css-vars" />
 
-### SASS variables
+### Sass variables
 
 <DeprecatedIn version="6.0.0" />
 
@@ -214,3 +214,9 @@ Sass variables set these defaults at build time and are removed in v7. The CSS v
 The checkbox, the radio and the switch share their size and their focus, active and disabled states. Those live on `:root` as `--cui-control-*`, so one declaration retunes all three at runtime; the Sass variables behind them set the defaults:
 
 <ScssDocs file="scss/_root.scss" capture="control-state-variables" />
+
+### Sass maps
+
+Each entry is one size class, and the same map drives both `.check-{size}` and `.radio-{size}` — add a key to define a size, or set one to `null` to drop it:
+
+<ScssDocs file="scss/forms/_check.scss" capture="check-sizes" />

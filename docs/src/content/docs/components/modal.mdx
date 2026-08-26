@@ -646,7 +646,7 @@ Modals use local CSS variables on `.modal` for enhanced real-time customization.
 
 <ScssDocs file="scss/_modal.scss" capture="modal-css-vars" />
 
-### SASS variables
+### Sass variables
 
 <DeprecatedIn version="6.0.0" />
 
@@ -654,11 +654,13 @@ Sass variables set these defaults at build time and are removed in v7. The CSS v
 
 <ScssDocs file="scss/_modal.scss" capture="modal-variables" />
 
-Each size is one entry, and the map merges with your overrides — add a key to define a size, or set one to `null` to drop it:
+### Sass maps
+
+Each entry is one `.modal-{size}` class and the width it sets, and the map merges with your overrides — add a key to define a size, or set one to `null` to drop it:
 
 <ScssDocs file="scss/_modal.scss" capture="modal-sizes" />
 
-### SASS Loop
+### Sass loops
 
 [Responsive fullscreen modals](#fullscreen-modal) are generated via the `$breakpoints` map and a loop in `scss/_modal.scss`.
 

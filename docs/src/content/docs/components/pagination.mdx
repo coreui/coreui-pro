@@ -164,7 +164,7 @@ Pagination now uses local CSS variables on `.pagination` for enhanced real-time 
 
 <ScssDocs file="scss/_pagination.scss" capture="pagination-css-vars" />
 
-### SASS variables
+### Sass variables
 
 <DeprecatedIn version="6.0.0" />
 
@@ -172,11 +172,13 @@ Sass variables set these defaults at build time and are removed in v7. The CSS v
 
 <ScssDocs file="scss/_pagination.scss" capture="pagination-variables" />
 
-The sizes are a map, so `@use ... with()` can add one or drop one — set a key to `null` to remove it:
+### Sass maps
+
+Each entry is one `.pagination-{size}` class, and the map merges with your overrides — add a key to define a size, or set one to `null` to drop it:
 
 <ScssDocs file="scss/_pagination.scss" capture="pagination-sizes" />
 
-### SASS loop
+### Sass loops
 
 Each size remaps the pagination's tokens onto the shared `--cui-btn-input-*` scale, so a new entry in `$pagination-sizes` picks up whatever that scale defines for it.
 
