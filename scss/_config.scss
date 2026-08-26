@@ -131,6 +131,25 @@ $border-radius-lg:            .5rem !default;
 $border-radius-pill:          50rem !default;
 // scss-docs-end border-radius-variables
 
+// scss-docs-start radius-variables
+$radius:                      .5rem !default;
+// scss-docs-end radius-variables
+
+// scss-docs-start radii-map
+$radii: (
+  0: 0,
+  1: $radius * .25,
+  2: $radius * .375,
+  3: $radius * .5,
+  4: $radius * .75,
+  5: $radius,
+  6: $radius * 1.25,
+  7: $radius * 1.5,
+  8: $radius * 2,
+  9: $radius * 3,
+) !default;
+// scss-docs-end radii-map
+
 // Every layer's alpha is base * strength * opacity, so the tint, the depth and
 // the per-element dimming are three separate knobs at runtime.
 // `--#{$prefix}shadow-tint` and `--#{$prefix}shadow-opacity` are written by the

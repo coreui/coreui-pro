@@ -1872,6 +1872,23 @@ primary customization API — every component knob still works through
 `@use ... with()` — but several things below are breaking and are called out
 as such.
 
+#### A numeric radius scale replaces the one global radius
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **Components read stops of a radius scale, and most got rounder.** `:root`
+  emits `--cui-radius-0` through `--cui-radius-9` (multiples of `$radius`,
+  `.5rem` by default) plus `--cui-radius-pill`, and component tokens read
+  stops instead of the one global `--cui-border-radius`: buttons, inputs,
+  alerts, list groups, tabs, progress, tooltips and thumbnails sit on
+  `--cui-radius-5` (`.5rem`), badges, cards, popovers, dialogs, drawers and
+  menus on `--cui-radius-7` (`.75rem`), pills on `--cui-radius-9` (`1.5rem`).
+  Everything that used the `.375rem` default is visibly rounder. To keep a
+  component on its old radius, set its own token
+  (`--cui-card-border-radius: .375rem`); to retune the whole page, override
+  the stops or `$radius`. The `$border-radius(-sm/-lg/-xl/-xxl/-pill)`
+  variables and their tokens are unchanged and keep driving the `rounded-*`
+  utilities.
+
 #### Colour decisions are written, not computed
 
 v6 stops evaluating colours at build time, the way upstream v6 does — Sass

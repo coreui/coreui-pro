@@ -16,7 +16,7 @@ $badge-color:                       inherit !default;
 $badge-bg:                          var(--#{$prefix}bg-4) !default;
 $badge-border-width:                var(--#{$prefix}border-width) !default;
 $badge-border-color:                transparent !default;
-$badge-border-radius:               var(--#{$prefix}border-radius) !default;
+$badge-border-radius:               var(--#{$prefix}radius-7) !default;
 
 $badge-min-height-sm:               1.125rem !default;
 $badge-padding-y-sm:                .2em !default;

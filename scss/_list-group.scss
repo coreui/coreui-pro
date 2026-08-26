@@ -12,7 +12,7 @@ $list-group-color:                  var(--#{$prefix}fg-body) !default;
 $list-group-bg:                     var(--#{$prefix}bg-body) !default;
 $list-group-border-color:           var(--#{$prefix}border-color) !default;
 $list-group-border-width:           var(--#{$prefix}border-width) !default;
-$list-group-border-radius:          var(--#{$prefix}border-radius) !default;
+$list-group-border-radius:          var(--#{$prefix}radius-5) !default;
 
 $list-group-item-padding-y:         var(--#{$prefix}spacer-2) !default;
 $list-group-item-padding-x:         var(--#{$prefix}spacer-3) !default;

@@ -12,7 +12,7 @@ $popover-bg:                        var(--#{$prefix}bg-body) !default;
 $popover-max-width:                 276px !default;
 $popover-border-width:              var(--#{$prefix}border-width) !default;
 $popover-border-color:              var(--#{$prefix}border-color-translucent) !default;
-$popover-border-radius:             var(--#{$prefix}border-radius-lg) !default;
+$popover-border-radius:             var(--#{$prefix}radius-7) !default;
 $popover-inner-border-radius:       calc(#{$popover-border-radius} - #{$popover-border-width}) !default;
 $popover-box-shadow:                var(--#{$prefix}box-shadow) !default;
 
