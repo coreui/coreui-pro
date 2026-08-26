@@ -21,7 +21,7 @@ $toast-spacing:                     $container-padding-x !default;
 $toast-transition-duration:         .15s !default;
 $toast-transition-timing:           linear !default;
 
-$toast-header-color:                var(--#{$prefix}fg-2) !default;
+$toast-header-color:                var(--#{$prefix}fg-3) !default;
 $toast-header-background-color:     $toast-background-color !default;
 $toast-header-border-color:         $toast-border-color !default;
 // scss-docs-end toast-variables
