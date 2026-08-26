@@ -19,8 +19,8 @@ $form-color-width:                3rem !default;
 
 // scss-docs-start form-file-variables
 $form-file-button-color:          var(--#{$prefix}btn-input-color) !default;
-$form-file-button-bg:             var(--#{$prefix}bg-3) !default;
-$form-file-button-hover-bg:       var(--#{$prefix}bg-4) !default;
+$form-file-button-bg:             var(--#{$prefix}bg-1) !default;
+$form-file-button-hover-bg:       var(--#{$prefix}bg-2) !default;
 // scss-docs-end form-file-variables
 
 // stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
@@ -60,7 +60,7 @@ $form-control-tokens: defaults(
     --#{$prefix}control-focus-border-color: var(--#{$prefix}btn-input-focus-border-color),
     --#{$prefix}control-focus-ring: var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring-color)),
     --#{$prefix}control-disabled-color: var(--#{$prefix}fg-body),
-    --#{$prefix}control-disabled-bg: var(--#{$prefix}bg-4),
+    --#{$prefix}control-disabled-bg: var(--#{$prefix}bg-2),
     --#{$prefix}control-disabled-border-color: var(--#{$prefix}border-color),
     --#{$prefix}control-action-color: #{$form-file-button-color},
     --#{$prefix}control-action-bg: #{$form-file-button-bg},

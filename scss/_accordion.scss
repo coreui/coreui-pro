@@ -24,7 +24,7 @@ $accordion-button-bg:                     var(--#{$prefix}accordion-bg) !default
 $accordion-transition-property:           #{var(--#{$prefix}btn-input-action-transition-property), border-radius} !default;
 $accordion-transition-duration:           var(--#{$prefix}btn-input-transition-duration) !default;
 $accordion-transition-timing:             var(--#{$prefix}btn-input-transition-timing) !default;
-$accordion-button-active-bg:              var(--#{$prefix}bg-4) !default;
+$accordion-button-active-bg:              var(--#{$prefix}bg-2) !default;
 $accordion-button-active-color:           var(--#{$prefix}fg-body) !default;
 $accordion-active-border-color:           $accordion-border-color !default;
 

@@ -17,7 +17,7 @@ $popover-inner-border-radius:       calc(#{$popover-border-radius} - #{$popover-
 $popover-box-shadow:                var(--#{$prefix}box-shadow) !default;
 
 $popover-header-font-size:          var(--#{$prefix}body-font-size) !default;
-$popover-header-bg:                 var(--#{$prefix}bg-4) !default;
+$popover-header-bg:                 var(--#{$prefix}bg-1) !default;
 $popover-header-color:              var(--#{$prefix}heading-color) !default;
 $popover-header-padding-y:          .5rem !default;
 $popover-header-padding-x:          var(--#{$prefix}spacer-3) !default;

@@ -19,7 +19,7 @@ $breadcrumb-link-padding-y:         .25rem !default;
 $breadcrumb-link-padding-x:         .5rem !default;
 $breadcrumb-link-color:             var(--#{$prefix}fg-2) !default;
 $breadcrumb-link-hover-color:       var(--#{$prefix}fg-body) !default;
-$breadcrumb-link-hover-bg:          var(--#{$prefix}bg-3) !default;
+$breadcrumb-link-hover-bg:          var(--#{$prefix}bg-1) !default;
 $breadcrumb-link-border-radius:     var(--#{$prefix}radius-7) !default;
 $breadcrumb-divider:                string.quote("/") !default;
 $breadcrumb-divider-flipped:        $breadcrumb-divider !default;

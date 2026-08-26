@@ -17,7 +17,7 @@ $list-group-border-radius:          var(--#{$prefix}radius-5) !default;
 $list-group-item-padding-y:         var(--#{$prefix}spacer-2) !default;
 $list-group-item-padding-x:         var(--#{$prefix}spacer-3) !default;
 
-$list-group-hover-bg:               var(--#{$prefix}bg-3) !default;
+$list-group-hover-bg:               var(--#{$prefix}bg-1) !default;
 $list-group-active-color:           var(--#{$prefix}primary-contrast) !default;
 $list-group-active-bg:              var(--#{$prefix}primary-bg) !default;
 $list-group-active-border-color:    $list-group-active-bg !default;
@@ -29,7 +29,7 @@ $list-group-action-color:           var(--#{$prefix}fg-2) !default;
 $list-group-action-hover-color:     var(--#{$prefix}emphasis-color) !default;
 
 $list-group-action-active-color:    var(--#{$prefix}fg-body) !default;
-$list-group-action-active-bg:       var(--#{$prefix}bg-4) !default;
+$list-group-action-active-bg:       var(--#{$prefix}bg-2) !default;
 // scss-docs-end list-group-variables
 
 $list-group-tokens: () !default;
