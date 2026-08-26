@@ -177,6 +177,10 @@ $menu-tokens: defaults(
     opacity: 1;
   }
 
+  .menu > li {
+    display: flex;
+  }
+
   .menu-item {
     display: flex;
     gap: var(--#{$prefix}menu-item-gap);
