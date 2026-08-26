@@ -498,6 +498,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | --- | --- | --- | --- |
 | `allowList` | object | `DefaultAllowlist` | Object containing allowed tags and attributes for HTML sanitization when using custom templates. |
 | `ariaCleanerLabel`| string | `Clear all selections` | A string that provides an accessible label for the cleaner button. This label is read by screen readers to describe the action associated with the button. |
+| `ariaIndicatorLabel` | string | `'Toggle visibility of options menu'` | Accessible label of the indicator button. |
 | `ariaSearchLabel`| string | `Search` | Accessible label for the search input (when `search` is enabled). |
 | `ariaTagDeleteLabel`| string | `Remove` | Accessible label prefix for a tag's delete button (selection type `tags`). The selected option's text is appended, so screen readers announce e.g. "Remove Angular". |
 | `cleaner`| boolean | `true` | Enables selection cleaner element. |
@@ -528,8 +529,8 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `selectAllLabel` | string | `'Select all'` | Sets the select all button label shown until everything is selected. The button is a toggle: it shows `selectAllLabel` (and selects all) until everything is selected, then shows `deselectAllLabel` (and deselects all). |
 | `selectAllMode` | string | `'all'` | Scope of the built-in select all button: `'all'` toggles every option (ignoring the search filter), `'filtered'` toggles only the search-filtered options. With no active filter both behave the same. |
 | `selectAllStyle` | string | `'checkbox'` | Sets the select all button style: `'checkbox'` or `'text'`. With `'checkbox'` (and `multiple`), the built-in select all button shows a tri-state checkbox indicator (`none` / `all` / `indeterminate`) reflecting the overall selection, and clicking it toggles between selecting and deselecting all. |
-| `selectionLimit` | number, null | `null` | Sets the maximum number of selectable options. The select all button stays enabled and selects up to the limit (firing the `selectionLimit` event), then toggles to deselect all once the limit is reached. |
 | `selectFilteredLabel` | string | `'Select filtered'` | Label shown instead of `selectAllLabel` when `selectAllMode: 'filtered'` and a search filter narrows the list, so the button reads as acting on the filtered options rather than the whole list. |
+| `selectionLimit` | number, null | `null` | Sets the maximum number of selectable options. The select all button stays enabled and selects up to the limit (firing the `selectionLimit` event), then toggles to deselect all once the limit is reached. |
 | `selectionType` | string | `'tags'` | Sets the selection style: `'chips'`, `'counter'`, `'tags'` or `'text'`. Selections render as [Chip](/components/chip/) components — `'tags'` and `'chips'` are the same thing, kept as synonyms. |
 | `selectionTypeCounterText` | string | `'item(s) selected'` | Sets the counter selection label.	|
 | `valid` | boolean | `false` | Toggle the valid state for the component. |
