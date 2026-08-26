@@ -83,6 +83,7 @@ The floor table above names what *sets* each floor; this is the fuller inventory
 | Native `<dialog>` | Dialog and Drawer — the top layer, `::backdrop` and focus containment come from the browser |
 | `<details name="…">` | exclusive accordions |
 | Container queries (`@container`) | stacked tables, horizontal list groups, card groups and stacks respond to their container, not the viewport |
+| Relative color syntax (`oklch(from …)`) | theme hover and active states derive from the base color at runtime |
 | Logical properties | spacing, borders and RTL support throughout — there is no separate RTL stylesheet |
 | Range syntax in media queries | every breakpoint compiles to `@media (width >= …)` |
 
@@ -107,7 +108,7 @@ These sit above at least one of our floors, so v6 cannot rely on them without a 
 | --- | --- |
 | Unprefixed `backdrop-filter` | Safari 18 — keep the `-webkit-` prefix; our build emits both |
 | `content-visibility` | Chrome 85, Firefox 125, Safari 18 |
-| Relative color syntax, `rgb(from …)` | Chrome 122, Firefox 128, Safari 18 |
+| Relative color syntax with number channel values | Chrome 122, Firefox 128, Safari 18 — the slice v6 uses, `calc()` on channel keywords, works on Safari 17.5; passing plain numbers as replacement channels is what Safari below 18 gets wrong |
 | `interpolate-size` / `calc-size()` | Chrome 129, no Firefox or Safari yet |
 | View transitions | Chrome 111, Firefox 144, Safari 18 |
 | Anchor positioning | Chrome 125, Firefox 147, Safari 26 |
