@@ -3,11 +3,48 @@ title: "JavaScript"
 description: "Bring CoreUI for Bootstrap to life with our optional JavaScript plugins. Learn about each plugin, our data and programmatic API options, and more."
 ---
 
+## JS components
+
+Curious which components explicitly require our JavaScript and [Floating UI](https://floating-ui.com/)?
+
+- Accordion for animating panels and closing the rest of an exclusive group
+- Alerts for dismissing
+- Autocomplete, Combobox and Multi Select for the whole selection behavior (Combobox also requires [Floating UI](https://floating-ui.com/))
+- Buttons for toggling states and checkbox/radio functionality; Loading Button for its busy state
+- Calendar, Date Picker, Date Range Picker and Time Picker for date and time selection — the calendar is our own, with no third-party dependency
+- Carousel for all slide behaviors, controls, and indicators
+- Chips for dismissing, and Chip Input for typing chips into a field
+- Collapse for toggling visibility of content
+- Dialog and Drawer for displaying, positioning, and scroll behavior
+- Menu and Dropdown for displaying and positioning (also requires [Floating UI](https://floating-ui.com/))
+- Modal and Offcanvas for displaying, positioning, and focus behavior
+- Number Input, OTP Input, Password Input, Password Strength, Range Slider, Rating and Stepper for their form behaviors
+- Scrollspy for scroll behavior and navigation updates
+- Sidebar and Navigation for the app shell's responsive behaviors
+- Tab for toggling tab panes
+- Toasts for displaying and dismissing
+- Tooltips and popovers for displaying and positioning (also requires [Floating UI](https://floating-ui.com/))
+
+[Floating UI](https://floating-ui.com/) is a `peerDependency` and the only third-party runtime we rely on — install it only if you use the components listed with it.
+
 ## Individual or compiled
 
 Plugins can be included individually (using CoreUI's individual `js/dist/*.js`), or all at once using `coreui.js` or the minified `coreui.min.js` (don't include both).
 
 If you use a bundler (Webpack, Rollup...), you can use `/js/dist/*.js` files which are UMD ready.
+
+## TypeScript
+
+Our plugins are authored in TypeScript and ship with type declarations — no `@types/…` package is needed. The main entry point and every individual plugin under `js/dist/*.js` come with their own `.d.ts`:
+
+```ts
+import { Tooltip } from '@coreui/coreui-pro'
+
+const tooltip = Tooltip.getOrCreateInstance('#example')
+tooltip.show()
+```
+
+Some plugin modules also export their configuration object type (for example `TooltipConfig`) if you need to type your own wrappers.
 
 ## Usage with JavaScript frameworks
 
