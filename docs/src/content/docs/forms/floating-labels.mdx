@@ -116,10 +116,10 @@ Floating labels also support `.input-group` — put the `.form-floating` next to
     </div>
   </div>`} />
 
-When using `.input-group` and `.form-floating` along with form validation, wrap the group in a [`.form-field`](/forms/field/) and place the feedback outside the `.input-group`, so it renders under the whole group rather than inside the frame:
+When using `.input-group` and `.form-floating` along with form validation, wrap the group in a [`.form-field`](/forms/field/) and place the feedback outside the `.input-group`, so it renders under the whole group rather than inside the frame. Don't add `.has-validation` here — that class exists for feedback sitting *inside* the group as its last child, and with the feedback outside it would leave the addons fully rounded:
 
 <Example code={`<div class="form-field">
-    <div class="input-group has-validation">
+    <div class="input-group">
       <span class="input-group-text">@</span>
       <div class="form-floating is-invalid">
         <label for="floatingInputGroup2">Username</label>
