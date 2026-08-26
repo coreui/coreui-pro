@@ -10,7 +10,7 @@
 $progress-height:                      1rem !default;
 $progress-font-size:                   var(--#{$prefix}font-size-sm) !default;
 $progress-bg:                          var(--#{$prefix}bg-4) !default;
-$progress-border-radius:               var(--#{$prefix}border-radius) !default;
+$progress-border-radius:               var(--#{$prefix}radius-5) !default;
 $progress-box-shadow:                  var(--#{$prefix}box-shadow-inset) !default;
 $progress-bar-color:                   var(--#{$prefix}primary-contrast) !default;
 $progress-bar-bg:                      var(--#{$prefix}primary) !default;

@@ -17,7 +17,7 @@ $dialog-color:                      var(--#{$prefix}fg-body) !default;
 $dialog-bg:                         var(--#{$prefix}bg-body) !default;
 $dialog-border-color:               var(--#{$prefix}border-color-translucent) !default;
 $dialog-border-width:               var(--#{$prefix}border-width) !default;
-$dialog-border-radius:              .75rem !default;
+$dialog-border-radius:              var(--#{$prefix}radius-7) !default;
 $dialog-box-shadow:                 var(--#{$prefix}box-shadow-lg) !default;
 $dialog-transition-duration:        .3s !default;
 $dialog-transition-timing:          var(--#{$prefix}transition-timing-overlay) !default;

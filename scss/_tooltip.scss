@@ -11,7 +11,7 @@ $tooltip-font-size:                 var(--#{$prefix}font-size-sm) !default;
 $tooltip-max-width:                 200px !default;
 $tooltip-color:                     var(--#{$prefix}bg-body) !default;
 $tooltip-bg:                        var(--#{$prefix}emphasis-color) !default;
-$tooltip-border-radius:             var(--#{$prefix}border-radius) !default;
+$tooltip-border-radius:             var(--#{$prefix}radius-5) !default;
 $tooltip-opacity:                   .9 !default;
 $tooltip-padding-y:                 var(--#{$prefix}spacer-1) !default;
 $tooltip-padding-x:                 var(--#{$prefix}spacer-2) !default;

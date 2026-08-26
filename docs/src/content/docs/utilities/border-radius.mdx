@@ -35,10 +35,27 @@ Use the scaling classes for larger or smaller rounded corners. Sizes range from 
 
 ## Customizing
 
+### CSS variables
+
+The radius scale is emitted on `:root` as `--cui-radius-0` through `--cui-radius-9`, plus `--cui-radius-pill`. Components read stops of the scale (`--cui-radius-5`, `--cui-radius-7`), so overriding a stop re-rounds everything that uses it without recompiling.
+
+<ScssDocs file="scss/_root.scss" capture="root-radius-loop" />
+
 ### Sass variables
+
+`$radius` is the base of the scale — every stop is a multiple of it.
+
+<ScssDocs file="scss/_config.scss" capture="radius-variables" />
+
 
 <ScssDocs file="scss/_config.scss" capture="border-radius-variables" />
 <ScssDocs file="scss/_root.scss" capture="border-radius-variables" />
+
+### Sass maps
+
+Each entry is one `--cui-radius-{step}` token as a multiple of `$radius` — override the map to add or retune a step:
+
+<ScssDocs file="scss/_config.scss" capture="radii-map" />
 
 ### Sass mixins
 

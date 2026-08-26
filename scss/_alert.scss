@@ -11,7 +11,7 @@ $alert-padding-y:               var(--#{$prefix}spacer-3) !default;
 $alert-padding-x:               var(--#{$prefix}spacer-3) !default;
 $alert-gap:                     var(--#{$prefix}spacer-2) !default;
 $alert-margin-bottom:           1rem !default;
-$alert-border-radius:           var(--#{$prefix}border-radius) !default;
+$alert-border-radius:           var(--#{$prefix}radius-5) !default;
 $alert-link-font-weight:        var(--#{$prefix}font-weight-bold) !default;
 $alert-border-width:            var(--#{$prefix}border-width) !default;
 

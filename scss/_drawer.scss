@@ -20,7 +20,7 @@ $drawer-color:                      var(--#{$prefix}fg-body) !default;
 $drawer-bg:                         var(--#{$prefix}bg-body) !default;
 $drawer-border-color:               var(--#{$prefix}border-color-translucent) !default;
 $drawer-border-width:               var(--#{$prefix}border-width) !default;
-$drawer-border-radius:              .75rem !default;
+$drawer-border-radius:              var(--#{$prefix}radius-7) !default;
 $drawer-box-shadow:                 var(--#{$prefix}box-shadow-lg) !default;
 $drawer-transition-duration:        .3s !default;
 $drawer-transition-timing:          var(--#{$prefix}transition-timing-overlay) !default;
