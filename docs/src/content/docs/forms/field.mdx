@@ -79,6 +79,17 @@ Nest one `.form-field` per control inside an outer one, and give the group its o
     <div class="form-text">Turn this off and we will only contact you about your account.</div>
   </div>`} />
 
+## Overhead label
+
+When a check, radio, or switch needs a field title above it, add a `.form-label`. It spans both grid columns automatically, so it sits on its own row above the control while the control's own label and description keep their places:
+
+<Example code={`<div class="form-field">
+    <label class="form-label">Terms and conditions</label>
+    <input class="check" type="checkbox" id="fieldOverheadCheck">
+    <label for="fieldOverheadCheck">I agree to the terms</label>
+    <div class="form-text">Please read them before agreeing.</div>
+  </div>`} />
+
 ## Validation
 
 Feedback elements are children of the field like any other, so they inherit its gap and land under the control.
