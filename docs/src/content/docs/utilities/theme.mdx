@@ -63,6 +63,19 @@ The theme can also come from any element above, so one wrapper themes every pair
     <div class="theme-muted p-3 rounded">Muted</div>
   </div>`} />
 
+## Reset
+
+<AddedIn version="6.0.0" />
+
+`.theme-reset` drops the theme a subtree inherits: it sets every `--cui-theme-*` slot back to `initial`, so components and utilities below it fall back to their defaults.
+
+<Example code={`<div class="theme-primary p-3 rounded">
+    <span class="badge">Primary badge</span>
+    <span class="badge theme-reset">Default badge</span>
+  </div>`} />
+
+<ScssDocs file="scss/_theme.scss" capture="theme-reset" />
+
 ## Customizing
 
 ### Utilities API
