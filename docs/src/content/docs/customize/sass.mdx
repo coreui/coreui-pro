@@ -132,6 +132,25 @@ Here's an example that changes the `background-color` and `color` for the `<body
 
 Repeat as necessary for any variable in CoreUI, including the global options below.
 
+## Token defaults
+
+Every CSS custom property the library emits is built from a Sass map you can override the same way: `$root-tokens` holds everything declared on `:root`, and each component keeps its surface in `$<component>-tokens`. Hand the map your overrides through `with ()` — you only include the keys you want to change, and a `null` value removes the token from the output entirely:
+
+```scss
+@use "@coreui/coreui/scss/coreui" with (
+  $root-tokens: (
+    --cui-border-radius: .25rem,
+    --cui-spacer: 1.5rem,
+  ),
+  $alert-tokens: (
+    --cui-alert-padding-x: 2rem,
+    --cui-alert-margin-bottom: null,
+  )
+);
+```
+
+The two levels coexist: classic variable overrides like `$alert-padding-y: 2rem` keep working, because the token map's defaults are built from those same variables — the map override just wins when both target one token. And because the output is a CSS custom property, the third level needs no compiler at all: set `--cui-alert-padding-x` on any selector at run time. [Architecture](/customize/architecture/#component-tokens) walks through when each level is the right one.
+
 ## Maps and loops
 
 CoreUI for Bootstrap includes a handful of Sass maps, key value pairs that make it easier to generate families of related CSS. We use Sass maps for our colors, grid breakpoints, and more. Just like Sass variables, all Sass maps include the `!default` flag and can be overridden and extended.
@@ -204,6 +223,52 @@ $theme-colors-border-subtle: map.remove($theme-colors-border-subtle, "info", "li
 
 The `$theme-colors-*` families are derived from `$theme-colors` when the theme module first loads, so a later reassignment of the main map doesn't reach them — remove the keys from each derived map you use, as above.
 
+### Size maps
+
+Components with size modifiers declare them in a `$<component>-sizes` map, written as a plain list — `defaults()` turns it into a map where every key is `true`:
+
+<ScssDocs file="scss/_pagination.scss" capture="pagination-sizes" />
+
+A loop then emits one modifier class per key:
+
+<ScssDocs file="scss/_pagination.scss" capture="pagination-sizes-loop" />
+
+Removing a size you don't ship is one `null`:
+
+```scss
+@use "@coreui/coreui/scss/coreui" with (
+  $pagination-sizes: ("sm": null)
+);
+```
+
+Adding a key generates the class, but the class is only as good as the tokens it reads — here `--cui-btn-input-<size>-*` — so a new size also needs those tokens declared. Removing is the everyday operation; adding is a design-system extension.
+
+### Variant maps
+
+Style variants follow the same pattern in `$<component>-variants`: each entry names a variant and maps CSS properties to [theme slots](/customize/theme/):
+
+<ScssDocs file="scss/_alert.scss" capture="alert-variants" />
+
+The loop turns every entry into a `.{component}-{variant}` class that re-points the component's tokens at the slots:
+
+<ScssDocs file="scss/_alert.scss" capture="alert-modifiers" />
+
+Add your own variant by merging an entry — the value side names a `--cui-theme-*` slot, so the variant follows every theme color automatically:
+
+```scss
+@use "@coreui/coreui/scss/coreui" with (
+  $alert-variants: (
+    "outline": (
+      "color": "fg",
+      "bg": "transparent",
+      "border-color": "border"
+    )
+  )
+);
+```
+
+Button variants use a richer, nested shape (`base` / `hover` / `active` states per variant) — see the `btn-variants` block in `scss/buttons/_button.scss` for the reference.
+
 ## Required keys
 
 CoreUI for Bootstrap assumes the presence of some specific keys within Sass maps as we used and extend these ourselves. As you customize the included maps, you may encounter errors where a specific Sass map's key is being used.
@@ -211,6 +276,14 @@ CoreUI for Bootstrap assumes the presence of some specific keys within Sass maps
 For example, we use the `primary`, `success`, and `danger` keys from `$theme-colors` for links, buttons, and form states. Replacing the values of these keys should present no issues, but removing them may cause Sass compilation issues. In these instances, you'll need to modify the Sass code that makes use of those values.
 
 ## Functions
+
+### Defaults
+
+`defaults()` is the merge behind every overridable map on this page — token maps, size maps, variant maps. It layers your overrides on top of the library's defaults, drops every key whose value is `null`, and accepts a plain list as the defaults (each item becomes a key set to `true`, which is how the size maps are written):
+
+<ScssDocs file="scss/functions/_defaults.scss" capture="defaults-function" />
+
+That one function is why `with ()` overrides are always partial — you pass only what changes — and why `null` is the removal syntax everywhere.
 
 ### Colors
 
@@ -289,6 +362,22 @@ You can also specify a base color with our color map functions:
 ### Escape SVG
 
 We use the `escape-svg` function to escape the `<`, `>` and `#` characters for SVG background images. When using the `escape-svg` function, data URIs must be quoted.
+
+### Map helpers
+
+The theme system keeps its definitions nested — one entry per color, holding every slot. `map-slot()` flattens that for consumers that want a single family across all colors:
+
+<ScssDocs file="scss/functions/_maps.scss" capture="map-slot-function" />
+
+```scss
+@use "@coreui/coreui/scss/functions/maps" as *;
+@use "@coreui/coreui/scss/theme" as *;
+
+$subtle-backgrounds: map-slot($theme-colors, "bg-subtle");
+// => ("primary": …, "secondary": …, "success": …, …)
+```
+
+`scss/functions/maps` also carries the general-purpose helpers the library uses internally: `map-get-multiple()` (pick several keys), `map-merge-multiple()` (merge several maps), and `map-get-nested()` (pull one sub-key out of every entry).
 
 ### Add and Subtract functions
 

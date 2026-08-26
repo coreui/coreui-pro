@@ -49,15 +49,24 @@ $alert-tokens: defaults(
 
 // stylelint-enable scss/dollar-variable-default
 
+$alert-variants: () !default;
+
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start alert-variants
-$alert-variants: (
-  "solid": (
-    "color": "contrast",
-    "bg": "bg",
-    "border-color": "bg"
-  )
-) !default;
+$alert-variants: defaults(
+  (
+    "solid": (
+      "color": "contrast",
+      "bg": "bg",
+      "border-color": "bg"
+    )
+  ),
+  $alert-variants
+);
 // scss-docs-end alert-variants
+
+// stylelint-enable scss/dollar-variable-default
 
 @layer components {
   .alert {
