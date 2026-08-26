@@ -9,9 +9,17 @@ otherFrameworks:
 import { getData } from '@coreui/astro-docs/data'
 import alertLive from './snippets/alert-live.js?raw'
 
-## Examples
+## Default alert
 
-Bootstrap alerts can accommodate text of any length and feature an optional close button. `.alert` on its own is a neutral alert; the colour comes from a [`.theme-*` class](/customize/components/#theme-variants), which may sit on the alert or on any element above it. For inline dismissal, utilize the [alerts JavaScript plugin](#dismissing).
+Bootstrap alerts can accommodate text of any length and feature an optional close button. `.alert` on its own is a neutral alert — a bordered surface that inherits the text color of its surroundings. For inline dismissal, utilize the [alerts JavaScript plugin](#dismissing).
+
+<Example code={`<div class="alert" role="alert">
+    A simple alert—check it out!
+  </div>`} />
+
+## Variants
+
+The color comes from a [`.theme-*` class](/customize/components/#theme-variants), which may sit on the alert or on any element above it.
 
 <Example code={`<div class="alert theme-primary" role="alert">
     Here's a straightforward example of a primary alert—take a look!
@@ -38,7 +46,18 @@ Bootstrap alerts can accommodate text of any length and feature an optional clos
 Relying on color to convey meaning creates a visual cue that assistive technologies, like screen readers, cannot perceive. It's essential that any information represented by color is either apparent from the content itself (e.g., the visible text) or supplemented by alternative methods, such as extra text using the `.visually-hidden` class.
 </Callout>
 
-### Live example
+## Solid
+
+<AddedIn version="6.0.0" />
+
+Add `.alert-solid` for a high-contrast alert. The background takes the theme color and the text takes the color that reads on it, so a yellow alert gets dark text and a dark one gets light text without you picking either.
+
+<Example code={getData('theme-colors').map((c) => `<div class="alert alert-solid theme-${c.name}" role="alert">
+    Here's a straightforward example of solid ${c.name} alert—take a look!
+  </div>`)} />
+
+
+## Live example
 
 Click the button below to show an alert (initially hidden with inline styles), then dismiss (and destroy) it using the built-in close button.
 
@@ -49,7 +68,7 @@ The JavaScript below initiates our live alert demo:
 
 <Code code={alertLive} lang="js" />
 
-### Link color
+## Link color
 
 Utilize the `.alert-link` utility class to instantly create matching colored links within any alert.
 <Example code={`<div class="alert theme-primary" role="alert">
@@ -71,7 +90,7 @@ Utilize the `.alert-link` utility class to instantly create matching colored lin
     Here's a straightforward example of an info alert with <a href="#" class="alert-link">an example link</a>. Take a look!
   </div>`} />
 
-### Additional content
+## Additional content
 
 Bootstrap alerts can also include additional HTML elements such as headings, paragraphs, and dividers. The alert lays its children out in a row, so wrap them in a [`.vstack`](/helpers/stacks/) to keep them stacked.
 
@@ -84,7 +103,7 @@ Bootstrap alerts can also include additional HTML elements such as headings, par
     </div>
   </div>`} />
 
-### Icons
+## Icons
 
 Put an icon straight into the alert — it lays its children out in a row and spaces them with `--cui-alert-gap`, so no flexbox utilities are needed. Use [CoreUI Icons](https://coreui.io/icons/) or any inline SVG.
 
@@ -141,17 +160,7 @@ Different kinds of alert usually call for different icons. Put the matching SVG 
     </div>
   </div>`} />
 
-### Solid
-
-<AddedIn version="6.0.0" />
-
-Add `.alert-solid` for a high-contrast alert. The background takes the theme color and the text takes the color that reads on it, so a yellow alert gets dark text and a dark one gets light text without you picking either.
-
-<Example code={getData('theme-colors').map((c) => `<div class="alert alert-solid theme-${c.name}" role="alert">
-    Here's a straightforward example of solid ${c.name} alert—take a look!
-  </div>`)} />
-
-### Dismissing
+## Dismissing
 
 Using the JavaScript plugin, you can remove any alert.
 

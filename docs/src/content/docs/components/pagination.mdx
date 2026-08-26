@@ -84,6 +84,20 @@ You can optionally swap out active or disabled anchors for `<span>`, or omit the
     </ul>
   </nav>`} />
 
+## Variants
+
+A [theme class](/customize/components/#theme-variants) recolors the whole pagination: links read the theme's foreground, the hover state its subtle surface, and the active page its solid color.
+
+<Example code={`<nav aria-label="Themed pagination">
+    <ul class="pagination theme-success">
+      <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+      <li class="page-item"><a class="page-link" href="#">1</a></li>
+      <li class="page-item active" aria-current="page"><a class="page-link" href="#">2</a></li>
+      <li class="page-item"><a class="page-link" href="#">3</a></li>
+      <li class="page-item"><a class="page-link" href="#">Next</a></li>
+    </ul>
+  </nav>`} />
+
 ## Sizing
 
 Fancy larger or smaller pagination? Add `.pagination-lg` or `.pagination-sm` for additional sizes. Each one maps the pagination's tokens onto the shared control scale, so a page link lines up with a button or an input of the same size.
@@ -142,19 +156,6 @@ Or with `.justify-content-end`:
     </ul>
   </nav>`} />
 
-## Theming
-
-A [theme class](/customize/components/#theme-variants) recolors the whole pagination: links read the theme's foreground, the hover state its subtle surface, and the active page its solid color.
-
-<Example code={`<nav aria-label="Themed pagination">
-    <ul class="pagination theme-success">
-      <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-      <li class="page-item"><a class="page-link" href="#">1</a></li>
-      <li class="page-item active" aria-current="page"><a class="page-link" href="#">2</a></li>
-      <li class="page-item"><a class="page-link" href="#">3</a></li>
-      <li class="page-item"><a class="page-link" href="#">Next</a></li>
-    </ul>
-  </nav>`} />
 
 ## Customizing
 

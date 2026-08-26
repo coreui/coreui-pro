@@ -111,6 +111,54 @@ Wrap toasts in a toast container to stack them, which adds vertical spacing.
     </div>
   </div>`} />
 
+### Dark toasts
+
+Set `data-coreui-theme="dark"` on a toast to render it dark whatever [color mode](/customize/color-modes/) the page is in:
+
+<Example code={`<div class="toast show" data-coreui-theme="dark" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header">
+      <strong class="me-auto">Deployment</strong>
+      <small>11 mins ago</small>
+      <button type="button" class="btn-close" data-coreui-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body">Build finished and deployed to production.</div>
+  </div>`} />
+
+### Variants
+
+A [theme class](/customize/components/#theme-variants) tints the toast's border and header. Add it to the toast to recolor the whole notification:
+
+<Example class="d-flex flex-column gap-3" code={`<div class="toast theme-success show" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header">
+      <strong class="me-auto">Deployment</strong>
+      <small>11 mins ago</small>
+      <button type="button" class="btn-close" data-coreui-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body">Build finished and deployed to production.</div>
+  </div>
+
+  <div class="toast theme-danger show" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header">
+      <strong class="me-auto">Deployment</strong>
+      <small>2 seconds ago</small>
+      <button type="button" class="btn-close" data-coreui-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body">Build failed on step 4 of 9.</div>
+  </div>`} />
+
+The same classes work on a single part of a toast, so the body can stay neutral while the header carries the theme:
+
+<Example code={`<div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header theme-warning">
+      <strong class="me-auto">Certificate</strong>
+      <small>11 mins ago</small>
+      <button type="button" class="btn-close" data-coreui-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body">The TLS certificate expires in 7 days.</div>
+  </div>`} />
+
+Theme classes also apply from an ancestor, so a themed container passes its colors to every toast inside it.
+
 ### Custom content
 
 Customize your toasts by removing sub-components, adjusting them with [utilities](/utilities/api/), or adding your own markup. In this example, we've made a simpler toast by removing the default `.toast-header`, incorporating a custom hide icon from [CoreUI Icons](https://coreui.io/icons/), and using [flexbox utilities](/utilities/flex/) to modify the layout.
@@ -137,8 +185,6 @@ Alternatively, you can also add additional controls and components to toasts.
   </div>`} />
 
 ### Color schemes
-
-Building on the previous example, you can design various toast color schemes using our color and background utilities. In this case, we've added .text-bg-primary to the .toast. To achieve a clean edge, we remove the default border with .border-0.
 
 Building on the previous example, you can design various toast color schemes using our [color](/utilities/colors/) and [background](/utilities/background/) utilities. We added `.text-bg-primary` to the `.toast`; the close button takes the colour it inherits, so it stays legible on its own. To achieve a clean edge, we remove the default border with `.border-0`.
 
@@ -353,53 +399,6 @@ myToastEl.addEventListener('hidden.coreui.toast', () => {
 })
 ```
 
-## Theming
-
-A [theme class](/customize/components/#theme-variants) tints the toast's border and header. Add it to the toast to recolor the whole notification:
-
-<Example class="d-flex flex-column gap-3" code={`<div class="toast theme-success show" role="alert" aria-live="assertive" aria-atomic="true">
-    <div class="toast-header">
-      <strong class="me-auto">Deployment</strong>
-      <small>11 mins ago</small>
-      <button type="button" class="btn-close" data-coreui-dismiss="toast" aria-label="Close"></button>
-    </div>
-    <div class="toast-body">Build finished and deployed to production.</div>
-  </div>
-
-  <div class="toast theme-danger show" role="alert" aria-live="assertive" aria-atomic="true">
-    <div class="toast-header">
-      <strong class="me-auto">Deployment</strong>
-      <small>2 seconds ago</small>
-      <button type="button" class="btn-close" data-coreui-dismiss="toast" aria-label="Close"></button>
-    </div>
-    <div class="toast-body">Build failed on step 4 of 9.</div>
-  </div>`} />
-
-The same classes work on a single part of a toast, so the body can stay neutral while the header carries the theme:
-
-<Example code={`<div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
-    <div class="toast-header theme-warning">
-      <strong class="me-auto">Certificate</strong>
-      <small>11 mins ago</small>
-      <button type="button" class="btn-close" data-coreui-dismiss="toast" aria-label="Close"></button>
-    </div>
-    <div class="toast-body">The TLS certificate expires in 7 days.</div>
-  </div>`} />
-
-Theme classes also apply from an ancestor, so a themed container passes its colors to every toast inside it.
-
-### Dark toasts
-
-Set `data-coreui-theme="dark"` on a toast to render it dark whatever [color mode](/customize/color-modes/) the page is in:
-
-<Example code={`<div class="toast show" data-coreui-theme="dark" role="alert" aria-live="assertive" aria-atomic="true">
-    <div class="toast-header">
-      <strong class="me-auto">Deployment</strong>
-      <small>11 mins ago</small>
-      <button type="button" class="btn-close" data-coreui-dismiss="toast" aria-label="Close"></button>
-    </div>
-    <div class="toast-body">Build finished and deployed to production.</div>
-  </div>`} />
 
 ## Customizing
 ### CSS variables
