@@ -237,7 +237,7 @@ finished, not whether the state changed.
   `--cui-accordion-active-bg` and `--cui-accordion-active-color` were fixed to
   `--cui-primary-bg-subtle` / `--cui-primary-text-emphasis`, so every accordion
   turned the brand colour on open whether or not that suited the page. They are
-  `--cui-secondary-bg` and `--cui-body-color` now, and the active tokens resolve
+  `--cui-bg-4` and `--cui-fg-body` now, and the active tokens resolve
   through `--cui-theme-fg` / `-bg-subtle` / `-border` first — so the colour is a
   decision you make per accordion instead of one baked into the component. To
   keep the old look, put `.theme-primary` on the `.accordion`.
@@ -450,7 +450,7 @@ check, radio, carousel and toggler icons already work:
   `.badge` used to be white text with no background of its own, so it was
   invisible until a `.text-bg-*` utility supplied both. It renders neutral on
   its own now — `--cui-badge-color` is `inherit` and `--cui-badge-bg` is
-  `--cui-secondary-bg` — and a `.theme-*` class colours it:
+  `--cui-bg-4` — and a `.theme-*` class colours it:
   `<span class="badge theme-danger">`. The `.badge-*` namespace carries the
   three variants instead: solid (default), `.badge-subtle` and
   `.badge-outline`, each mapping the same theme roles.
@@ -1224,7 +1224,7 @@ adornment in the library — so the button needs no icon markup at all:
   colour of your own gets the whole set for free.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **A bare `.btn` is a neutral button, not an invisible one.** It renders in the
-  surface colours (`--cui-secondary-bg`, one step darker on hover) instead of
+  surface colours (`--cui-bg-4`, one step darker on hover) instead of
   being transparent and unstyled. Buttons that carry a variant or a colour class
   are unaffected. For the old behaviour use `.btn-ghost`, which is transparent
   by design.
@@ -1889,6 +1889,19 @@ as such.
   variables and their tokens are unchanged and keep driving the `rounded-*`
   utilities.
 
+#### Every theme colour gets an action-background slot
+
+`:root` emits `--cui-{color}-bg` for every theme colour, pointing at the
+colour's base token. Active and checked states read the slot instead of the
+base directly — `--cui-list-group-active-bg`, `--cui-menu-item-active-bg`,
+`--cui-pagination-active-bg`, `--cui-nav-pills-link-active-bg`,
+`--cui-progress-bar-bg` and `--cui-range-thumb-bg` are all
+`var(--cui-primary-bg)` now. The resolved values are unchanged; the slot is a
+single place to retune what "filled with the theme colour" means without
+touching the base colour that text and borders derive from. (The `secondary`
+colour's slot takes over the name of the former surface alias — see the
+ladder entry above.)
+
 #### Colour decisions are written, not computed
 
 v6 stops evaluating colours at build time, the way upstream v6 does — Sass
@@ -2505,13 +2518,17 @@ Two consequences for the tokens:
   **The surface tokens move out of the theme-color namespace.**
   `--cui-bg-body`, `--cui-bg-1` … `--cui-bg-4` and `--cui-fg-body`,
   `--cui-fg-1` … `--cui-fg-4` are canonical; `--cui-body-bg`, `--cui-body-color`,
-  `--cui-secondary-bg`, `--cui-secondary-color`, `--cui-tertiary-bg` and
-  `--cui-tertiary-color` remain as aliases with identical values, and go away in
-  v7 — at which point `--cui-secondary-*` belongs to the `secondary` theme color
-  alone. Until then the two systems share the prefix, which is exactly why the
-  ladder moved out: `--cui-secondary-bg` (a page surface) sat next to
-  `--cui-secondary-bg-subtle` (a theme-color slot) with no way to tell which
-  system a token belonged to.
+  `--cui-secondary-color`, `--cui-tertiary-bg` and `--cui-tertiary-color`
+  remain as aliases with identical values, and go away in v7 — at which point
+  the `--cui-secondary-*` prefix belongs to the `secondary` theme color alone.
+  One alias is already gone:
+  <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`--cui-secondary-bg` is the `secondary` theme color's action-background
+  slot now** (see the entry below), not a surface alias. Markup that read it
+  for the surface gets a similar but lighter gray — read `--cui-bg-4`
+  instead. This name is exactly why the ladder moved out of the theme-color
+  namespace: a page surface sat next to `--cui-secondary-bg-subtle` (a
+  theme-color slot) with no way to tell which system a token belonged to.
 - **`.text-body` and `.text-body-emphasis` are unaffected** — they are not
   ordinal, any more than `.text-primary` is.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>

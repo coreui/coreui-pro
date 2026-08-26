@@ -13,7 +13,7 @@ The palette below covers two different jobs. `secondary` and `tertiary` text and
 
 All of them are declared globally on `:root` and are available through Sass and CSS variables (but not through our color maps or utility classes).
 
-To fade any of these colors, mix it toward `transparent` rather than reaching for a channel triplet — `color-mix(in srgb, var(--cui-secondary-bg) 50%, transparent)`.
+To fade any of these colors, mix it toward `transparent` rather than reaching for a channel triplet — `color-mix(in srgb, var(--cui-bg-4) 50%, transparent)`.
 
 **Heads up!** The surface colors and the theme colors overlap in name without overlapping in purpose: `--cui-secondary-color` is body text at a lighter weight, while `--cui-secondary` is the theme color that `.btn-secondary` and friends are built from. The same split applies to `light` and `dark`.
 
@@ -58,10 +58,10 @@ To fade any of these colors, mix it toward `transparent` rather than reaching fo
     </tr>
     <tr>
       <td>
-        <div class="p-3 rounded-2 border" style="background-color: var(--cui-secondary-bg);">&nbsp;</div>
+        <div class="p-3 rounded-2 border" style="background-color: var(--cui-bg-4);">&nbsp;</div>
       </td>
       <td>
-        `--cui-secondary-bg`
+        `--cui-bg-4`
       </td>
     </tr>
     <tr>

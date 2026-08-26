@@ -38,7 +38,7 @@ $nav-tabs-link-active-border-color: var(--#{$prefix}border-color) var(--#{$prefi
 
 $nav-pills-border-radius:           var(--#{$prefix}radius-9) !default;
 $nav-pills-link-active-color:       var(--#{$prefix}primary-contrast) !default;
-$nav-pills-link-active-bg:          var(--#{$prefix}primary) !default;
+$nav-pills-link-active-bg:          var(--#{$prefix}primary-bg) !default;
 
 $nav-underline-gap:                 1rem !default;
 $nav-underline-border-width:        .125rem !default;
