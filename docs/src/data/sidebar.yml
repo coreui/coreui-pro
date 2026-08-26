@@ -443,6 +443,8 @@
       to: /utilities/text-transform/
     - title: Text wrapping
       to: /utilities/text-wrapping/
+    - title: Theme
+      to: /utilities/theme/
     - title: User select
       to: /utilities/user-select/
     - title: Vertical alignment
