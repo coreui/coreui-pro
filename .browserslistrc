@@ -8,6 +8,10 @@
 #
 #   Feature                    Sets the floor for   Used by
 #   -------------------------  -------------------  ------------------------------
+#   <details name="…">         Firefox 130          exclusive accordions: the
+#                                                   grouping is driven off
+#                                                   `details.name`, which reads
+#                                                   back undefined below it
 #   light-dark()               Chrome 123           every theme decision resolves
 #                              Safari/iOS 17.5      through it, with no fallback
 #   @starting-style            Firefox 129          Menu's entry animation
@@ -21,10 +25,12 @@
 #                                                   sidebar indicators, calendar
 #                                                   ranges, rating icons
 #
-# :has() no longer sets the Firefox floor — @property and @starting-style
-# arrived after this file was first written and both sit above it. @property is
-# the one that matters: an unsupported @starting-style only drops an animation,
-# but an ignored `inherits: false` is a live bug.
+# Only the topmost entry per browser binds; the rest are kept because they say
+# what actually breaks below each version. On Firefox that is now
+# `<details name>`: an unsupported @starting-style merely drops an animation and
+# an ignored `inherits: false` leaks a utility into its descendants, but a
+# `details.name` that reads back undefined leaves an exclusive accordion with
+# every panel open at once.
 #
 # Declaring anything lower would be fiction; raising it further is a product
 # choice we have not made. Upstream Bootstrap v6 sits at Chrome 130 / Firefox 132
@@ -39,7 +45,7 @@ unreleased versions
 
 Chrome >= 123
 Edge >= 123
-Firefox >= 129
+Firefox >= 130
 iOS >= 17.5
 Safari >= 17.5
 

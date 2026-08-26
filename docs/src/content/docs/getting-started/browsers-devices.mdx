@@ -10,8 +10,8 @@ CoreUI for Bootstrap supports the **latest, stable releases** of all major brows
 Alternative browsers which use the latest version of WebKit, Blink, or Gecko, whether directly or via the platform's web view API, are not explicitly supported. However, CoreUI for Bootstrap should (in most cases) display and function correctly in these browsers as well. More specific support information is provided below.
 
 The floor is set by the platform features v6 depends on, with no fallbacks
-shipped: **Chrome 123, Edge 123, Firefox 129, Safari 17.5 and iOS 17.5**.
-Together with the evergreen lines below, this covers about 86% of global usage
+shipped: **Chrome 123, Edge 123, Firefox 130, Safari 17.5 and iOS 17.5**.
+Together with the evergreen lines below, this covers about 89% of global usage
 as measured with `npx browserslist --coverage`.
 
 Each floor is set by the newest feature v6 already requires, because the floor
@@ -20,16 +20,18 @@ has to hold for the whole 6.x line:
 | Feature | Sets the floor for |
 | --- | --- |
 | `light-dark()` | Chrome and Edge 123, Safari and iOS 17.5 — every theme decision resolves through it, and `color-mix()`, with no fallback |
+| `<details name="…">` | Firefox 130 — exclusive accordions, which group their panels by `details.name` |
 | `@starting-style`, `transition-behavior: allow-discrete` | Firefox 129 — the Menu's entry animation |
 | `@property` | Firefox 128 — `inherits: false` on the colour and opacity utilities' custom properties |
 | `:has()` | Firefox 121 — validation and focus states on Multi Select and Autocomplete, the sidebar navigation indicators, calendar ranges and the rating icons are all selected with it |
 
 A browser below the floor does not merely lose polish. An unsupported `:has()`
 invalidates the whole rule it appears in, and unresolved `light-dark()` leaves
-colors unset. `@property` is the quietest of the three and the one worth
-knowing about: without it the registrations are ignored, custom properties
-inherit again, and a colour or opacity utility on a container tints everything
-nested inside it.
+colors unset. Where `details.name` reads back undefined, an exclusive accordion
+stops closing its siblings and every panel can stand open at once. `@property`
+is the quietest of them and the one worth knowing about: without it the
+registrations are ignored, custom properties inherit again, and a colour or
+opacity utility on a container tints everything nested inside it.
 
 Versions come from MDN's browser compatibility data. Note that caniuse does not
 track `@property`, `@starting-style` or `transition-behavior` at all, so
@@ -44,7 +46,7 @@ unreleased versions
 
 Chrome >= 123
 Edge >= 123
-Firefox >= 129
+Firefox >= 130
 iOS >= 17.5
 Safari >= 17.5
 
