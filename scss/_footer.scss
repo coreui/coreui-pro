@@ -45,7 +45,7 @@ $footer-tokens: defaults(
     padding: var(--#{$prefix}footer-padding-y) var(--#{$prefix}footer-padding-x);
     color: var(--#{$prefix}footer-color);
     background: var(--#{$prefix}footer-bg);
-    border-top: var(--#{$prefix}footer-border);
+    border-block-start: var(--#{$prefix}footer-border);
   }
 
   .footer-sticky {

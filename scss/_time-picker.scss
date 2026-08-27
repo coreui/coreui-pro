@@ -117,7 +117,7 @@ $time-picker-tokens: defaults(
     display: flex;
     justify-content: flex-end;
     padding: var(--#{$prefix}time-picker-footer-padding);
-    border-top: var(--#{$prefix}time-picker-footer-border-width) solid var(--#{$prefix}time-picker-footer-border-color);
+    border-block-start: var(--#{$prefix}time-picker-footer-border-width) solid var(--#{$prefix}time-picker-footer-border-color);
 
     .btn + .btn {
       margin-inline-start: .5rem;

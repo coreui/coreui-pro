@@ -349,8 +349,7 @@ $navbar-dark-tokens: defaults(
             }
 
             .nav-link {
-              padding-right: var(--#{$prefix}navbar-nav-link-padding-x);
-              padding-left: var(--#{$prefix}navbar-nav-link-padding-x);
+              padding-inline: var(--#{$prefix}navbar-nav-link-padding-x);
             }
           }
 

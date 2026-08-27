@@ -96,7 +96,7 @@ $date-picker-tokens: defaults(
     gap: .5rem;
     justify-content: flex-end;
     padding: var(--#{$prefix}date-picker-footer-padding);
-    border-top: var(--#{$prefix}date-picker-footer-border-width) solid var(--#{$prefix}date-picker-footer-border-color);
+    border-block-start: var(--#{$prefix}date-picker-footer-border-width) solid var(--#{$prefix}date-picker-footer-border-color);
   }
 
 }

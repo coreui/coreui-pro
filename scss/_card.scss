@@ -87,8 +87,8 @@ $card-tokens: defaults(
     }
 
     > .list-group {
-      border-top: inherit;
-      border-bottom: inherit;
+      border-block-start: inherit;
+      border-block-end: inherit;
 
       &:first-child {
         border-top-width: 0;
@@ -105,7 +105,7 @@ $card-tokens: defaults(
     // use a child selector here to prevent double borders.
     > .card-header + .list-group,
     > .list-group + .card-footer {
-      border-top: 0;
+      border-block-start: 0;
     }
   }
 
@@ -147,7 +147,7 @@ $card-tokens: defaults(
     margin-bottom: 0; // Removes the default margin-bottom of <hN>
     color: var(--#{$prefix}theme-contrast, var(--#{$prefix}card-cap-color));
     background-color: var(--#{$prefix}theme-bg, var(--#{$prefix}card-cap-bg));
-    border-bottom: var(--#{$prefix}card-border-width) solid var(--#{$prefix}theme-bg, var(--#{$prefix}card-border-color));
+    border-block-end: var(--#{$prefix}card-border-width) solid var(--#{$prefix}theme-bg, var(--#{$prefix}card-border-color));
 
     &:first-child {
       @include border-radius(var(--#{$prefix}card-inner-border-radius) var(--#{$prefix}card-inner-border-radius) 0 0);
@@ -158,7 +158,7 @@ $card-tokens: defaults(
     padding: var(--#{$prefix}card-cap-padding-y) var(--#{$prefix}card-cap-padding-x);
     color: var(--#{$prefix}theme-contrast, var(--#{$prefix}card-cap-color));
     background-color: var(--#{$prefix}theme-bg, var(--#{$prefix}card-cap-bg));
-    border-top: var(--#{$prefix}card-border-width) solid var(--#{$prefix}theme-bg, var(--#{$prefix}card-border-color));
+    border-block-start: var(--#{$prefix}card-border-width) solid var(--#{$prefix}theme-bg, var(--#{$prefix}card-border-color));
 
     &:last-child {
       @include border-radius(0 0 var(--#{$prefix}card-inner-border-radius) var(--#{$prefix}card-inner-border-radius));
@@ -199,7 +199,7 @@ $card-tokens: defaults(
   .card-header-tabs {
     margin-inline: calc(-.5 * var(--#{$prefix}card-cap-padding-x));
     margin-bottom: calc(-1 * var(--#{$prefix}card-cap-padding-y));
-    border-bottom: 0;
+    border-block-end: 0;
 
     .nav-link.active {
       background-color: var(--#{$prefix}card-bg);
@@ -210,10 +210,7 @@ $card-tokens: defaults(
   // Card image
   .card-img-overlay {
     position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
+    inset: 0;
     padding: var(--#{$prefix}card-img-overlay-padding);
     @include border-radius(var(--#{$prefix}card-inner-border-radius));
   }

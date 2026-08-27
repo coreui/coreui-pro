@@ -259,8 +259,7 @@ $form-control-select-tokens: defaults(
 
     &.form-control-sm,
     &.form-control-lg {
-      padding-right: 0;
-      padding-left: 0;
+      padding-inline: 0;
     }
   }
 

@@ -99,7 +99,7 @@ $header-tokens: defaults(
     justify-content: space-between; // space out brand from logo
     padding: var(--#{$prefix}header-padding-y) var(--#{$prefix}header-padding-x);
     background: var(--#{$prefix}header-bg);
-    border-bottom: var(--#{$prefix}header-border);
+    border-block-end: var(--#{$prefix}header-border);
     @include transition(var(--#{$prefix}header-transition));
 
     // Because flex properties aren't inherited, we need to redeclare these first
@@ -134,7 +134,7 @@ $header-tokens: defaults(
     flex-basis: calc(100% + (2 * var(--#{$prefix}header-padding-x)));
     height: 0;
     margin: var(--#{$prefix}header-padding-y) calc(-1 * var(--#{$prefix}header-padding-x));
-    border-top: var(--#{$prefix}header-divider-border);
+    border-block-start: var(--#{$prefix}header-divider-border);
   }
 
   // Header brand

@@ -112,13 +112,13 @@ $offcanvas-tokens: defaults(
         &.offcanvas-top {
           inset: 0 0 auto;
           height: var(--#{$prefix}offcanvas-height);
-          border-bottom: var(--#{$prefix}offcanvas-border-width) solid var(--#{$prefix}offcanvas-border-color);
+          border-block-end: var(--#{$prefix}offcanvas-border-width) solid var(--#{$prefix}offcanvas-border-color);
         }
 
         &.offcanvas-bottom {
           inset: auto 0 0;
           height: var(--#{$prefix}offcanvas-height);
-          border-top: var(--#{$prefix}offcanvas-border-width) solid var(--#{$prefix}offcanvas-border-color);
+          border-block-start: var(--#{$prefix}offcanvas-border-width) solid var(--#{$prefix}offcanvas-border-color);
         }
 
         &:not(.offcanvas-instant) {
