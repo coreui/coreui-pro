@@ -7,7 +7,7 @@ utility: "m"
 
 ## Overview
 
-Assign responsive-friendly `margin` values to an element or a subset of its sides with shorthand classes. Includes support for individual properties, all properties, and vertical and horizontal properties. Classes are built from a default Sass map ranging from `.25rem` to `3rem`.
+Assign responsive-friendly `margin` values to an element or a subset of its sides with shorthand classes. Includes support for individual properties, all properties, and vertical and horizontal properties. Classes are built from a default Sass map ranging from `.25rem` to `8rem`.
 
 **Laying out with CSS Grid or flexbox?** Consider using [the gap utility](/utilities/gap/) instead — it spaces the children from the container, so you do not have to strip the margin off the last one.
 
@@ -35,6 +35,10 @@ Where *size* is one of:
 - `3` - (by default) for classes that set the `margin` to `$spacer`
 - `4` - (by default) for classes that set the `margin` to `$spacer * 1.5`
 - `5` - (by default) for classes that set the `margin` to `$spacer * 3`
+- `6` - (by default) for classes that set the `margin` to `$spacer * 4`
+- `7` - (by default) for classes that set the `margin` to `$spacer * 5`
+- `8` - (by default) for classes that set the `margin` to `$spacer * 6`
+- `9` - (by default) for classes that set the `margin` to `$spacer * 8`
 - `auto` - for classes that set the `margin` to auto
 
 (You can add more sizes by adding entries to the `$spacers` Sass map variable.)

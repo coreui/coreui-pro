@@ -7,7 +7,7 @@ utility: ["p", "pt", "pb", "ps", "pe", "px", "py"]
 
 ## Overview
 
-Assign responsive-friendly `padding` values to an element or a subset of its sides with shorthand classes. Includes support for individual properties, all properties, and vertical and horizontal properties. Classes are built from a default Sass map ranging from `.25rem` to `3rem`.
+Assign responsive-friendly `padding` values to an element or a subset of its sides with shorthand classes. Includes support for individual properties, all properties, and vertical and horizontal properties. Classes are built from a default Sass map ranging from `.25rem` to `8rem`.
 
 Unlike [margin](/utilities/margin/), `padding` takes no negative values and no `auto`, so there is no `.p-n1` and no `.px-auto`.
 
@@ -35,6 +35,10 @@ Where *size* is one of:
 - `3` - (by default) for classes that set the `padding` to `$spacer`
 - `4` - (by default) for classes that set the `padding` to `$spacer * 1.5`
 - `5` - (by default) for classes that set the `padding` to `$spacer * 3`
+- `6` - (by default) for classes that set the `padding` to `$spacer * 4`
+- `7` - (by default) for classes that set the `padding` to `$spacer * 5`
+- `8` - (by default) for classes that set the `padding` to `$spacer * 6`
+- `9` - (by default) for classes that set the `padding` to `$spacer * 8`
 
 (You can add more sizes by adding entries to the `$spacers` Sass map variable.)
 
