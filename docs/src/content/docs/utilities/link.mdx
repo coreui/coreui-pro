@@ -35,7 +35,7 @@ Change the underline's color independent of the link text color.
 
 ### Underline offset
 
-Change the underline's distance from your text. Offset is set in `em` units to automatically scale with the element's current `font-size`.
+Change the underline's distance from your text. Offset is set in `em` units to automatically scale with the element's current `font-size`. Every link already sits on a `.2em` offset from the global `--cui-link-underline-offset` token; these utilities override it per link.
 
 <Example code={`<p><a href="#">Default link</a></p>
   <p><a class="link-offset-1" href="#">Offset 1 link</a></p>
