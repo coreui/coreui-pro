@@ -53,7 +53,7 @@ The `<html>` and `<body>` elements are updated to provide better page-wide defau
 
 ## Links
 
-Links take `--cui-link-color` and switch to `--cui-link-hover-color` on hover. Inside anything that sets a theme, both follow it: the link reads `--cui-theme-fg` and hovers to `--cui-theme-fg-emphasis`, so a link on a colored surface stays part of that surface.
+Links take `--cui-link-color` and switch to `--cui-link-hover-color` on hover. Inside anything that sets a theme, both follow it: the link reads `--cui-theme-fg` and hovers to `--cui-theme-fg-emphasis`, so a link on a colored surface stays part of that surface. The underline sits `.2em` below the text through `--cui-link-underline-offset` (Sass knob: `$link-underline-offset`), clearing descenders; the [`.link-offset-*` utilities](/utilities/link/#underline-offset) adjust it per link, and setting the token to `auto` restores the browser default.
 
 Placeholder links — an `<a>` with neither `href` nor a class — keep the surrounding text color and get no underline, so an anchor waiting for its URL doesn't read as a working link.
 
