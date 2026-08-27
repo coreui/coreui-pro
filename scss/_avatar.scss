@@ -16,9 +16,13 @@ $avatar-color:                 inherit !default;
 $avatar-bg:                    var(--#{$prefix}bg-2) !default;
 $avatar-border-radius:         50em !default;
 $avatar-status-size:           .5rem !default;
+$avatar-status-bg:             var(--#{$prefix}secondary) !default;
 $avatar-status-border-radius:  50em !default;
 $avatar-status-border-width:   1px !default;
 $avatar-status-border-color:   var(--#{$prefix}bg-body) !default;
+$avatar-stack-spacing:         -.4 !default;
+$avatar-stack-ring-width:      2px !default;
+$avatar-stack-ring-color:      var(--#{$prefix}bg-body) !default;
 $avatar-stack-hover-transform: translateY(-2px) !default;
 $avatar-transition:            transform .15s ease-in-out !default;
 
@@ -52,6 +56,7 @@ $avatar-tokens: defaults(
     --#{$prefix}avatar-bg: var(--#{$prefix}theme-bg, #{$avatar-bg}),
     --#{$prefix}avatar-border-radius: #{$avatar-border-radius},
     --#{$prefix}avatar-status-size: #{$avatar-status-size},
+    --#{$prefix}avatar-status-bg: #{$avatar-status-bg},
     --#{$prefix}avatar-status-border-radius: #{$avatar-status-border-radius},
     --#{$prefix}avatar-status-border-width: #{$avatar-status-border-width},
     --#{$prefix}avatar-status-border-color: #{$avatar-status-border-color},
@@ -59,6 +64,19 @@ $avatar-tokens: defaults(
   $avatar-tokens
 );
 // scss-docs-end avatar-css-vars
+
+$avatar-stack-tokens: () !default;
+
+// scss-docs-start avatar-stack-css-vars
+$avatar-stack-tokens: defaults(
+  (
+    --#{$prefix}avatar-stack-spacing: #{$avatar-stack-spacing},
+    --#{$prefix}avatar-stack-ring-width: #{$avatar-stack-ring-width},
+    --#{$prefix}avatar-stack-ring-color: #{$avatar-stack-ring-color},
+  ),
+  $avatar-stack-tokens
+);
+// scss-docs-end avatar-stack-css-vars
 
 // stylelint-enable scss/dollar-variable-default
 
@@ -127,12 +145,14 @@ $avatar-variants: defaults(
     display: block;
     width: var(--#{$prefix}avatar-status-size);
     height: var(--#{$prefix}avatar-status-size);
+    background-color: var(--#{$prefix}theme-bg, var(--#{$prefix}avatar-status-bg));
     border: var(--#{$prefix}avatar-status-border-width) solid var(--#{$prefix}avatar-status-border-color);
     @include border-radius(var(--#{$prefix}avatar-status-border-radius));
   }
 
   @each $size, $map in $avatar-sizes {
-    .avatar-#{$size} {
+    .avatar-#{$size},
+    .avatars-stack-#{$size} .avatar {
       --#{$prefix}avatar-size: #{map.get($map, "size")};
 
       @if map.has-key($map, "status-size") {
@@ -142,10 +162,17 @@ $avatar-variants: defaults(
   }
 
   .avatars-stack {
+    @include tokens($avatar-stack-tokens);
+
     display: flex;
 
     .avatar {
-      margin-inline-end: calc(-.4 * var(--#{$prefix}avatar-size));
+      margin-inline-end: calc(var(--#{$prefix}avatar-stack-spacing) * var(--#{$prefix}avatar-size));
+      border: var(--#{$prefix}avatar-stack-ring-width) solid var(--#{$prefix}avatar-stack-ring-color);
+
+      &:last-child {
+        margin-inline-end: 0;
+      }
 
       // Lifted rather than pulled apart: changing the margin here moves every
       // avatar after this one.

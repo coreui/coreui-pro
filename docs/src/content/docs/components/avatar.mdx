@@ -89,7 +89,7 @@ Adjust the size of avatars using the `.avatar-sm`, `.avatar-md`, `.avatar-lg`, a
 
 ## Stacked avatars
 
-Display multiple avatars in a stack to represent a group of users or items, with additional count if there are more avatars than can be displayed.
+Display multiple avatars in a stack to represent a group of users or items, with additional count if there are more avatars than can be displayed. Each avatar in a stack wears a ring in the page background colour, so overlapping photos stay separated in both colour schemes.
 
 <Example code={`<div class="avatars-stack">
     <div class="avatar">
@@ -106,33 +106,47 @@ Display multiple avatars in a stack to represent a group of users or items, with
     </div>
   </div>`} />
 
+Size the whole stack at once with `.avatars-stack-sm` through `.avatars-stack-xl`, and tune the overlap with `--cui-avatar-stack-spacing` — the fraction of the avatar size each one is pulled over its neighbour:
+
+<Example code={`<div class="avatars-stack avatars-stack-lg" style="--cui-avatar-stack-spacing: -.25">
+    <div class="avatar">
+      <img class="avatar-img" src="/assets/img/avatars/1.jpg" alt="user@email.com">
+    </div>
+    <div class="avatar">
+      <img class="avatar-img" src="/assets/img/avatars/2.jpg" alt="user@email.com">
+    </div>
+    <div class="avatar">
+      <img class="avatar-img" src="/assets/img/avatars/3.jpg" alt="user@email.com">
+    </div>
+  </div>`} />
+
 ## Avatars with status
 
-Add `.avatar-status` to show presence. The indicator takes its colour from a background utility, so a state needs no class of its own:
+Add `.avatar-status` to show presence. The indicator takes its colour from a `theme-*` class and defaults to a neutral grey, so "offline" needs no class at all:
 
 <Example code={`<div class="d-flex gap-3">
     <div class="avatar">
       <img class="avatar-img" src="/assets/img/avatars/1.jpg" alt="user@email.com">
-      <span class="avatar-status bg-success" role="img" aria-label="Online"></span>
+      <span class="avatar-status theme-success" role="img" aria-label="Online"></span>
     </div>
     <div class="avatar">
       CUI
-      <span class="avatar-status bg-warning" role="img" aria-label="Away"></span>
+      <span class="avatar-status theme-warning" role="img" aria-label="Away"></span>
     </div>
     <div class="avatar">
       CUI
-      <span class="avatar-status bg-danger" role="img" aria-label="Busy"></span>
+      <span class="avatar-status theme-danger" role="img" aria-label="Busy"></span>
     </div>
     <div class="avatar">
       CUI
-      <span class="avatar-status bg-secondary" role="img" aria-label="Offline"></span>
+      <span class="avatar-status" role="img" aria-label="Offline"></span>
     </div>
   </div>`} />
 
 The indicator is a few pixels of colour and nothing else, so colour is the only thing separating one state from another — not enough on its own, and at this size a different shape would not help either. Where the state means something rather than decorates, name it on the indicator:
 
 ```html
-<span class="avatar-status bg-danger" role="img" aria-label="Busy"></span>
+<span class="avatar-status theme-danger" role="img" aria-label="Busy"></span>
 ```
 
 `role="img"` is what makes the name stick: `aria-label` on a bare `<span>` has no role to attach to, and assistive technology is free to ignore it.
@@ -146,6 +160,10 @@ The ring around the indicator follows the page background through `--cui-avatar-
 Avatars use local CSS variables on `.avatar` for enhanced real-time customization.
 
 <ScssDocs file="scss/_avatar.scss" capture="avatar-css-vars" />
+
+Stacks carry their own variables on `.avatars-stack`:
+
+<ScssDocs file="scss/_avatar.scss" capture="avatar-stack-css-vars" />
 
 ### Sass variables
 
