@@ -39,10 +39,6 @@ $btn-ghost-hover-color:       var(--#{$prefix}fg-body) !default;
 $btn-ghost-hover-bg:          var(--#{$prefix}bg-1) !default;
 // scss-docs-end btn-variables
 
-// The v6 spelling puts `.btn-check` on the `<label>` next to `.btn`, so the
-// deprecated one — the class on the input — is the `.btn-check` that is not a `.btn`.
-$btn-check-deprecated: ".btn-check:not(.btn)" !default;
-
 // stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
 $button-tokens: () !default;
@@ -226,6 +222,11 @@ $btn-variant-selectors: (string.unquote(".btn"), string.unquote(".btn-link"), st
   $btn-variant-selectors: list.append($btn-variant-selectors, string.unquote(".btn-#{$variant}"), comma);
 }
 // scss-docs-end btn-variant-selectors
+
+// The v6 spelling puts `.btn-check` on the `<label>` styled as a button, so the
+// deprecated one — the class on the input — is the `.btn-check` that carries
+// no button spelling at all.
+$btn-check-deprecated: ".btn-check:not(#{$btn-variant-selectors})" !default;
 
 // The solid variant is the one a colour class spells without its variant name:
 // `.btn-primary`, not `.btn-solid-primary`.
