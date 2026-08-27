@@ -45,6 +45,7 @@ $accordion-button-active-icon:            var(--#{$prefix}accordion-btn-icon) !d
 $accordion-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
+// stylelint-disable custom-property-no-missing-var-function
 
 // scss-docs-start accordion-css-vars
 $accordion-tokens: defaults(
@@ -80,6 +81,7 @@ $accordion-tokens: defaults(
 // scss-docs-end accordion-css-vars
 
 // stylelint-enable scss/dollar-variable-default
+// stylelint-enable custom-property-no-missing-var-function
 
 @layer components {
   .accordion {
@@ -262,6 +264,15 @@ $accordion-tokens: defaults(
     font-size: var(--#{$prefix}accordion-font-size);
   }
 
+
+  .accordion-sm {
+    // scss-docs-start accordion-sm-css-vars
+    --#{$prefix}accordion-padding-x: .875rem;
+    --#{$prefix}accordion-padding-y: .625rem;
+    --#{$prefix}accordion-border-radius: var(--#{$prefix}radius-5);
+    --#{$prefix}accordion-font-size: var(--#{$prefix}font-size-sm);
+    // scss-docs-end accordion-sm-css-vars
+  }
 
   .accordion-flush {
     > .accordion-item {
