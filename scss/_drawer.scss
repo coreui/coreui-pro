@@ -22,6 +22,7 @@ $drawer-border-color:               var(--#{$prefix}border-color-translucent) !d
 $drawer-border-width:               var(--#{$prefix}border-width) !default;
 $drawer-border-radius:              var(--#{$prefix}radius-7) !default;
 $drawer-box-shadow:                 var(--#{$prefix}box-shadow-lg) !default;
+$drawer-transition-property:        "transform, visibility" !default;
 $drawer-transition-duration:        .3s !default;
 $drawer-transition-timing:          var(--#{$prefix}transition-timing-overlay) !default;
 $drawer-scale-transform:            scale(1.02) !default;
@@ -50,6 +51,7 @@ $drawer-tokens: defaults(
     --#{$prefix}drawer-border-color: #{$drawer-border-color},
     --#{$prefix}drawer-border-radius: #{$drawer-border-radius},
     --#{$prefix}drawer-box-shadow: #{$drawer-box-shadow},
+    --#{$prefix}drawer-transition-property: #{$drawer-transition-property},
     --#{$prefix}drawer-transition-duration: #{$drawer-transition-duration},
     --#{$prefix}drawer-transition-timing: #{$drawer-transition-timing},
     --#{$prefix}drawer-title-line-height: #{$drawer-title-line-height},
@@ -133,9 +135,12 @@ $drawer-tokens: defaults(
         }
 
         &:not(.drawer-instant) {
-          @include transition(
-            transform var(--#{$prefix}drawer-transition-duration) var(--#{$prefix}drawer-transition-timing),
-            visibility 0s var(--#{$prefix}drawer-transition-duration)
+          // One transition covers both directions — see the note in _dialog.scss
+          // on `visibility` in the property list.
+          @include transition-props(
+            var(--#{$prefix}drawer-transition-property),
+            var(--#{$prefix}drawer-transition-duration),
+            var(--#{$prefix}drawer-transition-timing)
           );
 
           &:where(.drawer-start) {
@@ -168,10 +173,6 @@ $drawer-tokens: defaults(
 
           &[open]:not(.hiding) {
             visibility: visible;
-            @include transition(
-              transform var(--#{$prefix}drawer-transition-duration) var(--#{$prefix}drawer-transition-timing),
-              visibility 0s
-            );
             transform: none;
           }
 
