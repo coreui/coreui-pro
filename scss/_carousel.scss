@@ -2,6 +2,7 @@
 @use "functions/escape-svg" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/color-mode" as *;
+@use "mixins/focus-ring" as *;
 @use "mixins/ltr-rtl" as *;
 @use "mixins/mask-icon" as *;
 @use "mixins/tokens" as *;
@@ -31,6 +32,10 @@ $carousel-caption-padding-y:         1.25rem !default;
 $carousel-caption-spacer:            1.25rem !default;
 
 $carousel-control-icon-width:        2rem !default;
+
+$carousel-play-pause-size:           2.5rem !default;
+$carousel-play-pause-icon-width:     1rem !default;
+$carousel-play-pause-bg:             color-mix(in srgb, var(--#{$prefix}black) 25%, transparent) !default;
 
 $carousel-control-prev-icon-bg:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0'/></svg>") !default;
 $carousel-control-next-icon-bg:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708'/></svg>") !default;
@@ -100,6 +105,10 @@ $carousel-tokens: defaults(
   }
 
   .carousel-item {
+    // The containing block for the slide's own caption; without it every
+    // absolute .carousel-caption resolves against the carousel root and the
+    // captions of all slides stack in one spot.
+    position: relative;
     // `100%` here is `.carousel-inner`'s content box, which `padding-inline`
     // has already inset by the peek on each side, so the peek must NOT be
     // subtracted again — doing so makes every slide `2 * peek` too narrow and
@@ -230,21 +239,55 @@ $carousel-tokens: defaults(
   // Optional play/pause control
   //
   // A discoverable toggle so users can stop an autoplaying carousel, as required
-  // by WCAG 2.2.2 (Pause, Stop, Hide). `.carousel-control-play-pause` is only a
-  // behavior hook — the JS toggles `.paused` on it and its appearance comes from
-  // the wrapping button. The button holds both glyphs and we show whichever
-  // icon matches the current state.
-  .carousel-control-play-pause .carousel-control-play-icon {
-    display: none;
-  }
+  // by WCAG 2.2.2 (Pause, Stop, Hide). Sits in the end corner next to the
+  // indicators row; the JS toggles `.paused` on it and the button holds both
+  // glyphs — we show whichever icon matches the current state.
+  .carousel-control-play-pause {
+    position: absolute;
+    inset-block-end: .625rem;
+    inset-inline-end: .75rem;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: $carousel-play-pause-size;
+    height: $carousel-play-pause-size;
+    padding: 0;
+    color: var(--#{$prefix}carousel-control-color);
+    cursor: pointer;
+    background-color: $carousel-play-pause-bg;
+    border: 0;
+    @include border-radius(50%);
+    opacity: $carousel-control-opacity;
+    @include transition($carousel-control-transition);
 
-  .carousel-control-play-pause.paused {
-    .carousel-control-pause-icon {
-      display: none;
+    &:hover,
+    &:focus-visible {
+      opacity: $carousel-control-hover-opacity;
+    }
+
+    &:focus-visible {
+      @include focus-ring();
+    }
+
+    .carousel-control-pause-icon,
+    .carousel-control-play-icon {
+      width: $carousel-play-pause-icon-width;
+      height: $carousel-play-pause-icon-width;
     }
 
     .carousel-control-play-icon {
-      display: inline-block;
+      display: none;
+    }
+
+    &.paused {
+      .carousel-control-pause-icon {
+        display: none;
+      }
+
+      .carousel-control-play-icon {
+        display: inline-block;
+      }
     }
   }
 
