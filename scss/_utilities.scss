@@ -196,7 +196,7 @@ $utilities: map.merge(
       print: true,
       property: display,
       class: d,
-      values: inline inline-block block grid inline-grid table table-row table-cell flex inline-flex none
+      values: inline inline-block block grid inline-grid table table-row table-cell flex inline-flex contents flow-root none
     ),
     // scss-docs-end utils-display
     // scss-docs-start utils-shadow
@@ -403,7 +403,10 @@ $utilities: map.merge(
         50: 50%,
         75: 75%,
         100: 100%,
-        auto: auto
+        auto: auto,
+        min: min-content,
+        max: max-content,
+        fit: fit-content
       )
     ),
     "max-width": (
@@ -441,7 +444,10 @@ $utilities: map.merge(
         50: 50%,
         75: 75%,
         100: 100%,
-        auto: auto
+        auto: auto,
+        min: min-content,
+        max: max-content,
+        fit: fit-content
       )
     ),
     "max-height": (
@@ -846,7 +852,10 @@ $utilities: map.merge(
     "font-family": (
       property: font-family,
       class: font,
-      values: (monospace: var(--#{$prefix}font-monospace))
+      values: (
+        monospace: var(--#{$prefix}font-monospace),
+        body: var(--#{$prefix}body-font-family)
+      )
     ),
     // scss-docs-end utils-font-family
     // scss-docs-start utils-font-size
@@ -927,6 +936,11 @@ $utilities: map.merge(
       class: text,
       values: (break: break-word),
     ),
+    "text-wrap": (
+      property: text-wrap,
+      class: text,
+      values: balance pretty,
+    ),
     // scss-docs-end utils-text-wrap
     // scss-docs-end utils-text
     // scss-docs-start utils-color
@@ -1002,6 +1016,18 @@ $utilities: map.merge(
         1: .125em,
         2: .25em,
         3: .375em,
+      )
+    ),
+    "underline-thickness": (
+      property: text-decoration-thickness,
+      class: underline-thickness,
+      state: hover,
+      values: (
+        1: 1px,
+        2: 2px,
+        3: 3px,
+        4: 4px,
+        5: 5px,
       )
     ),
     "link-underline": (
@@ -1120,7 +1146,7 @@ $utilities: map.merge(
     // scss-docs-start utils-user-select
     "user-select": (
       property: user-select,
-      values: all auto none
+      values: all auto text none
     ),
     // scss-docs-end utils-user-select
     // scss-docs-start utils-pointer-events

@@ -2,7 +2,7 @@
 title: "Bootstrap 6 Link"
 name: "Link"
 description: "Link utilities are used to stylize your anchors to adjust their color, opacity, underline offset, underline color, and more."
-utility: ["link-opacity", "link-offset", "link-underline"]
+utility: ["link-opacity", "link-offset", "link-underline", "underline-thickness"]
 ---
 
 import { getData } from '@coreui/astro-docs/data'
@@ -41,6 +41,15 @@ Change the underline's distance from your text. Offset is set in `em` units to a
   <p><a class="link-offset-1" href="#">Offset 1 link</a></p>
   <p><a class="link-offset-2" href="#">Offset 2 link</a></p>
   <p><a class="link-offset-3" href="#">Offset 3 link</a></p>`} />
+
+### Underline thickness
+
+Change how heavy the underline is drawn, on links or any underlined text. Hover variants are included.
+
+<Example code={`<p><a class="underline-thickness-1" href="#">Thickness 1 link</a></p>
+  <p><a class="underline-thickness-2" href="#">Thickness 2 link</a></p>
+  <p><a class="underline-thickness-3" href="#">Thickness 3 link</a></p>
+  <p><a class="underline-thickness-1 underline-thickness-3-hover" href="#">Thicker on hover</a></p>`} />
 
 ### Underline opacity
 

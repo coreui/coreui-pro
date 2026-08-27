@@ -39,6 +39,14 @@ A mobile browser resizes the viewport as it shows or hides its URL bar, so `vw` 
 <div class="dvw-100">Width 100dvw</div>
 ```
 
+## Intrinsic widths
+
+Size an element from its content instead of its container: `.w-min` (the widest unbreakable word), `.w-max` (the full unwrapped content), `.w-fit` (the content, capped at the container).
+
+<Example code={`<div class="w-min p-2 mb-2 bg-4 border">Min width</div>
+  <div class="w-max p-2 mb-2 bg-4 border">Max width</div>
+  <div class="w-fit p-2 bg-4 border">Fit width</div>`} />
+
 ## Customizing
 
 ### Utilities API
