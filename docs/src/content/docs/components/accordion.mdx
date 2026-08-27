@@ -93,6 +93,23 @@ Put a whole `.accordion` inside an `.accordion-body` to nest one. Give each leve
     </details>
   </div>`} />
 
+## Small
+
+Add `.accordion-sm` for a compact accordion — tighter padding, a smaller radius and the small font size, all through the component's own tokens:
+
+<ScssDocs file="scss/_accordion.scss" capture="accordion-sm-css-vars" />
+
+<Example code={`<div class="accordion accordion-sm">
+    <details class="accordion-item" name="accordion-sm-example" open>
+      <summary class="accordion-header">Accordion Item #1</summary>
+      <div class="accordion-body">A compact accordion body for denser layouts.</div>
+    </details>
+    <details class="accordion-item" name="accordion-sm-example">
+      <summary class="accordion-header">Accordion Item #2</summary>
+      <div class="accordion-body">The same markup, just the small variant's tokens.</div>
+    </details>
+  </div>`} />
+
 ## Flush
 
 Add `.accordion-flush` to remove the default `background-color`, some borders, and some rounded corners to render accordions edge-to-edge with their parent container.
