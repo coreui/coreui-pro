@@ -15,13 +15,13 @@ $thumbnail-box-shadow:              var(--#{$prefix}box-shadow-sm) !default;
 // scss-docs-end thumbnail-variables
 
 // scss-docs-start figure-variables
-$figure-img-margin-bottom:          var(--#{$prefix}spacer-2) !default;
+$figure-gap:                        var(--#{$prefix}spacer-2) !default;
 $figure-caption-font-size:          var(--#{$prefix}small-font-size) !default;
 $figure-caption-color:              var(--#{$prefix}fg-3) !default;
 // scss-docs-end figure-variables
 
 $thumbnail-tokens: () !default;
-$figure-img-tokens: () !default;
+$figure-tokens: () !default;
 $figure-caption-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
@@ -41,11 +41,11 @@ $thumbnail-tokens: defaults(
 // scss-docs-end thumbnail-css-vars
 
 // scss-docs-start figure-css-vars
-$figure-img-tokens: defaults(
+$figure-tokens: defaults(
   (
-    --#{$prefix}figure-img-margin-bottom: #{$figure-img-margin-bottom},
+    --#{$prefix}figure-gap: #{$figure-gap},
   ),
-  $figure-img-tokens
+  $figure-tokens
 );
 
 $figure-caption-tokens: defaults(
@@ -87,15 +87,13 @@ $figure-caption-tokens: defaults(
   }
 
   .figure {
-    // Ensures the caption's text aligns with the image.
-    display: inline-block;
-  }
+    @include tokens($figure-tokens);
 
-  .figure-img {
-    @include tokens($figure-img-tokens);
-
-    margin-bottom: var(--#{$prefix}figure-img-margin-bottom);
-    line-height: 1;
+    // inline-flex, not flex: the figure keeps shrinking to its image, so the
+    // caption still aligns with it.
+    display: inline-flex;
+    flex-direction: column;
+    gap: var(--#{$prefix}figure-gap);
   }
 
   .figure-caption {

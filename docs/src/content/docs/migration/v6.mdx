@@ -1477,6 +1477,19 @@ Multi Select's option indicators moved with it — they render as a decorative
   rebuild from Sass. `.figure-img` declares it now, and it is the one figure
   measurement you can retune in the browser.
 
+#### Figures
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`.figure` is an inline flex column and spaces its parts with
+  `--cui-figure-gap`.** `$figure-img-margin-bottom` and
+  `--cui-figure-img-margin-bottom` are gone — the gap (knob: `$figure-gap`,
+  same `.5rem`) replaces the image's bottom margin, and `.figure-img`
+  carries no styles at all any more — keep it in your markup or drop it,
+  both render the same. Documented markup renders pixel-identically;
+  an `<img>` without width/height attributes can now stretch to a wider
+  caption (flex `stretch`), so give figure images explicit dimensions —
+  which they need anyway to avoid layout shift.
+
 #### Reboot
 
 - **Links change color on hover.** `--cui-link-hover-color` was declared and
