@@ -101,6 +101,18 @@ $tooltip-tokens: defaults(
     }
   }
 
+  .bs-tooltip-top {
+    // Invisible strip over the offset gap, so the pointer can cross from the
+    // trigger to the tip anywhere along its edge, not only over the arrow.
+    &::after {
+      position: absolute;
+      inset-inline: 0;
+      bottom: calc(-1 * var(--#{$prefix}tooltip-arrow-height));
+      height: var(--#{$prefix}tooltip-arrow-height);
+      content: "";
+    }
+  }
+
   .bs-tooltip-top .tooltip-arrow {
     bottom: calc(-1 * var(--#{$prefix}tooltip-arrow-height));
 
@@ -108,6 +120,16 @@ $tooltip-tokens: defaults(
       top: -1px;
       border-width: var(--#{$prefix}tooltip-arrow-height) calc(var(--#{$prefix}tooltip-arrow-width) * .5) 0;
       border-top-color: var(--#{$prefix}tooltip-surface-bg);
+    }
+  }
+
+  .bs-tooltip-end {
+    &::after {
+      position: absolute;
+      inset-block: 0;
+      left: calc(-1 * var(--#{$prefix}tooltip-arrow-height));
+      width: var(--#{$prefix}tooltip-arrow-height);
+      content: "";
     }
   }
 
@@ -123,6 +145,16 @@ $tooltip-tokens: defaults(
     }
   }
 
+  .bs-tooltip-bottom {
+    &::after {
+      position: absolute;
+      inset-inline: 0;
+      top: calc(-1 * var(--#{$prefix}tooltip-arrow-height));
+      height: var(--#{$prefix}tooltip-arrow-height);
+      content: "";
+    }
+  }
+
   .bs-tooltip-bottom .tooltip-arrow {
     top: calc(-1 * var(--#{$prefix}tooltip-arrow-height));
 
@@ -130,6 +162,16 @@ $tooltip-tokens: defaults(
       bottom: -1px;
       border-width: 0 calc(var(--#{$prefix}tooltip-arrow-width) * .5) var(--#{$prefix}tooltip-arrow-height);
       border-bottom-color: var(--#{$prefix}tooltip-surface-bg);
+    }
+  }
+
+  .bs-tooltip-start {
+    &::after {
+      position: absolute;
+      inset-block: 0;
+      right: calc(-1 * var(--#{$prefix}tooltip-arrow-height));
+      width: var(--#{$prefix}tooltip-arrow-height);
+      content: "";
     }
   }
 

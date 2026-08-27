@@ -128,6 +128,14 @@ $popover-tokens: defaults(
   }
 
   .bs-popover-top {
+    &::after {
+      position: absolute;
+      inset-inline: 0;
+      bottom: calc(-1 * var(--#{$prefix}popover-arrow-height) - var(--#{$prefix}popover-border-width));
+      height: calc(var(--#{$prefix}popover-arrow-height) + var(--#{$prefix}popover-border-width));
+      content: "";
+    }
+
     > .popover-arrow {
       bottom: calc(-1 * (var(--#{$prefix}popover-arrow-height)) - var(--#{$prefix}popover-border-width));
 
@@ -149,6 +157,14 @@ $popover-tokens: defaults(
   }
 
   .bs-popover-end {
+    &::after {
+      position: absolute;
+      inset-block: 0;
+      left: calc(-1 * var(--#{$prefix}popover-arrow-height) - var(--#{$prefix}popover-border-width));
+      width: calc(var(--#{$prefix}popover-arrow-height) + var(--#{$prefix}popover-border-width));
+      content: "";
+    }
+
     > .popover-arrow {
       left: calc(-1 * (var(--#{$prefix}popover-arrow-height)) - var(--#{$prefix}popover-border-width));
       width: var(--#{$prefix}popover-arrow-height);
@@ -172,6 +188,14 @@ $popover-tokens: defaults(
   }
 
   .bs-popover-bottom {
+    &::after {
+      position: absolute;
+      inset-inline: 0;
+      top: calc(-1 * var(--#{$prefix}popover-arrow-height) - var(--#{$prefix}popover-border-width));
+      height: calc(var(--#{$prefix}popover-arrow-height) + var(--#{$prefix}popover-border-width));
+      content: "";
+    }
+
     > .popover-arrow {
       top: calc(-1 * (var(--#{$prefix}popover-arrow-height)) - var(--#{$prefix}popover-border-width));
 
@@ -209,6 +233,14 @@ $popover-tokens: defaults(
   }
 
   .bs-popover-start {
+    &::after {
+      position: absolute;
+      inset-block: 0;
+      right: calc(-1 * var(--#{$prefix}popover-arrow-height) - var(--#{$prefix}popover-border-width));
+      width: calc(var(--#{$prefix}popover-arrow-height) + var(--#{$prefix}popover-border-width));
+      content: "";
+    }
+
     > .popover-arrow {
       right: calc(-1 * (var(--#{$prefix}popover-arrow-height)) - var(--#{$prefix}popover-border-width));
       width: var(--#{$prefix}popover-arrow-height);
