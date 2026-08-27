@@ -34,6 +34,29 @@ $group-button: ":is(#{$btn-variant-selectors})" !default;
     }
   }
 
+  // Optional: a line between grouped buttons, for styles whose borders
+  // don't separate them (solid, subtle)
+  .btn-group-divider > #{$group-button} + #{$group-button}::before {
+    position: absolute;
+    z-index: 3;
+    content: "";
+    background-color: var(--#{$prefix}btn-color);
+    opacity: .25;
+  }
+
+  .btn-group:where(.btn-group-divider) > #{$group-button} + #{$group-button}::before {
+    inset-inline-start: calc(-1 * var(--#{$prefix}btn-border-width));
+    top: 25%;
+    bottom: 25%;
+    width: var(--#{$prefix}btn-border-width);
+  }
+
+  .btn-group-vertical:where(.btn-group-divider) > #{$group-button} + #{$group-button}::before {
+    inset-inline: var(--#{$prefix}btn-padding-x);
+    top: calc(-1 * var(--#{$prefix}btn-border-width));
+    height: var(--#{$prefix}btn-border-width);
+  }
+
   // Optional: Group multiple button groups together for a toolbar
   .btn-toolbar {
     display: flex;
