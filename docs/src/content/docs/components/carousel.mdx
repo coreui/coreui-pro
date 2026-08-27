@@ -8,7 +8,7 @@ otherFrameworks:
 
 ## How it works
 
-The bootstrap carousel is a slideshow for cycling within a group of content, built with CSS 3D transforms and JavaScript. It runs with a group of images, text, or html elements. It also incorporates support for previous/next buttons.
+The carousel is a slideshow built on native CSS scroll snapping: the track is a scroll container, so dragging, swiping, momentum and trackpad scrolling all come from the browser. JavaScript layers on the previous/next controls, indicators, autoplay and active-slide tracking — it steps the scroll position itself for programmatic jumps, so every jump takes the same time in every browser.
 
 In browsers where the [Page Visibility API](https://www.w3.org/TR/page-visibility/) is supported, the carousel will avoid sliding when the webpage is not visible to the user (such as when the browser tab is inactive, the browser window is minimized, etc.).
 
@@ -26,9 +26,9 @@ Carousels don't automatically normalize slide dimensions. As such, you may want 
 
 ### Slides only
 
-Here's a carousel with slides. Note the appearance of the `.d-block` also, `.w-100` on carousel images to override browser default image alignment.
+Here's a carousel with slides. Note the appearance of the `.d-block` also, `.w-100` on carousel images to override browser default image alignment. Swipe, drag or scroll the track — the browser handles it natively.
 
-<Example code={`<div id="carouselExampleSlidesOnly" class="carousel slide" data-coreui-ride="carousel">
+<Example code={`<div id="carouselExampleSlidesOnly" class="carousel">
     <div class="carousel-inner">
       <div class="carousel-item active">
         <svg class="docs-placeholder-img docs-placeholder-img-lg d-block w-100" width="800" height="400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="First slide" preserveAspectRatio="xMidYMid slice" focusable="false"><title>First slide</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em">First slide</text></svg>
@@ -46,7 +46,7 @@ Here's a carousel with slides. Note the appearance of the `.d-block` also, `.w-1
 
 Adding in the previous and next controls. We recommend using `<button>` elements, but you can also use `<a>` elements with `role="button"`.
 
-<Example code={`<div id="carouselExampleControls" class="carousel slide" data-coreui-ride="carousel">
+<Example code={`<div id="carouselExampleControls" class="carousel">
     <div class="carousel-inner">
       <div class="carousel-item active">
         <svg class="docs-placeholder-img docs-placeholder-img-lg d-block w-100" width="800" height="400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="First slide" preserveAspectRatio="xMidYMid slice" focusable="false"><title>First slide</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em">First slide</text></svg>
@@ -72,7 +72,7 @@ Adding in the previous and next controls. We recommend using `<button>` elements
 
 You can attach the indicators to the carousel, lengthwise the controls, too.
 
-<Example code={`<div id="carouselExampleIndicators" class="carousel slide" data-coreui-ride="true">
+<Example code={`<div id="carouselExampleIndicators" class="carousel">
     <div class="carousel-indicators">
       <button type="button" data-coreui-target="#carouselExampleIndicators" data-coreui-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
       <button type="button" data-coreui-target="#carouselExampleIndicators" data-coreui-slide-to="1" aria-label="Slide 2"></button>
@@ -103,7 +103,7 @@ You can attach the indicators to the carousel, lengthwise the controls, too.
 
 You can add captions to slides with the `.carousel-caption` element within any `.carousel-item`. They can be immediately hidden on smaller viewports, as shown below, with optional [display utilities](/utilities/display/). We hide them with `.d-none` and draw them back on medium-sized devices with `.d-md-block`.
 
-<Example code={`<div id="carouselExampleCaptions" class="carousel slide" data-coreui-ride="false">
+<Example code={`<div id="carouselExampleCaptions" class="carousel">
     <div class="carousel-indicators">
       <button type="button" data-coreui-target="#carouselExampleCaptions" data-coreui-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
       <button type="button" data-coreui-target="#carouselExampleCaptions" data-coreui-slide-to="1" aria-label="Slide 2"></button>
@@ -144,9 +144,9 @@ You can add captions to slides with the `.carousel-caption` element within any `
 
 ### Crossfade
 
-Add `.carousel-fade` to your carousel to animate slides with a fade transition instead of a slide. Depending on your carousel content (e.g., text only slides), you may want to add `.bg-body` or some custom CSS to the `.carousel-item`s for proper crossfading.
+Add `.carousel-fade` to your carousel to animate slides with a fade transition instead of a slide. The slides stack on a grid and the active one fades in over `--cui-carousel-fade-duration`. Depending on your carousel content (e.g., text only slides), you may want to add `.bg-body` or some custom CSS to the `.carousel-item`s for proper crossfading.
 
-<Example code={`<div id="carouselExampleFade" class="carousel slide carousel-fade" data-coreui-ride="carousel">
+<Example code={`<div id="carouselExampleFade" class="carousel carousel-fade">
     <div class="carousel-inner">
       <div class="carousel-item active">
         <svg class="docs-placeholder-img docs-placeholder-img-lg d-block w-100" width="800" height="400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="First slide" preserveAspectRatio="xMidYMid slice" focusable="false"><title>First slide</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em">First slide</text></svg>
@@ -168,11 +168,112 @@ Add `.carousel-fade` to your carousel to animate slides with a fade transition i
     </button>
   </div>`} />
 
+## Items
+
+The track lays slides out with three custom properties: `--cui-carousel-items` (how many slides share the viewport), `--cui-carousel-items-gap` (the space between them — keep a unit, even for zero) and `--cui-carousel-items-peek` (how much of the neighbouring slides shows at the edges).
+
+### Multiple items
+
+<Example code={`<div id="carouselExampleItems" class="carousel" style="--cui-carousel-items: 3; --cui-carousel-items-gap: .5rem">
+    <div class="carousel-inner">
+      <div class="carousel-item active">
+        <svg class="docs-placeholder-img d-block w-100" width="800" height="400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Slide 1" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Slide 1</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em">1</text></svg>
+      </div>
+      <div class="carousel-item">
+        <svg class="docs-placeholder-img d-block w-100" width="800" height="400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Slide 2" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Slide 2</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em">2</text></svg>
+      </div>
+      <div class="carousel-item">
+        <svg class="docs-placeholder-img d-block w-100" width="800" height="400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Slide 3" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Slide 3</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em">3</text></svg>
+      </div>
+      <div class="carousel-item">
+        <svg class="docs-placeholder-img d-block w-100" width="800" height="400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Slide 4" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Slide 4</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em">4</text></svg>
+      </div>
+      <div class="carousel-item">
+        <svg class="docs-placeholder-img d-block w-100" width="800" height="400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Slide 5" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Slide 5</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em">5</text></svg>
+      </div>
+    </div>
+    <button class="carousel-control-prev" type="button" data-coreui-target="#carouselExampleItems" data-coreui-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-coreui-target="#carouselExampleItems" data-coreui-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+  </div>`} />
+
+### Peeking
+
+`--cui-carousel-items-peek` insets the track so the neighbouring slides show at the edges; add `.carousel-center` to snap the active slide to the middle of the viewport instead of the start.
+
+<Example code={`<div id="carouselExamplePeek" class="carousel carousel-center" style="--cui-carousel-items-peek: 3rem; --cui-carousel-items-gap: .5rem">
+    <div class="carousel-inner">
+      <div class="carousel-item active">
+        <svg class="docs-placeholder-img docs-placeholder-img-lg d-block w-100" width="800" height="400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="First slide" preserveAspectRatio="xMidYMid slice" focusable="false"><title>First slide</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em">First slide</text></svg>
+      </div>
+      <div class="carousel-item">
+        <svg class="docs-placeholder-img docs-placeholder-img-lg d-block w-100" width="800" height="400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Second slide" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Second slide</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em">Second slide</text></svg>
+      </div>
+      <div class="carousel-item">
+        <svg class="docs-placeholder-img docs-placeholder-img-lg d-block w-100" width="800" height="400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Third slide" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Third slide</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em">Third slide</text></svg>
+      </div>
+    </div>
+    <button class="carousel-control-prev" type="button" data-coreui-target="#carouselExamplePeek" data-coreui-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-coreui-target="#carouselExamplePeek" data-coreui-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+  </div>`} />
+
+### Variable width
+
+Add `.carousel-auto` and each slide keeps its own width; snap points still land on every item.
+
+## Autoplay
+
+Set `data-coreui-autoplay="true"` (or the `autoplay` option) to cycle automatically. Autoplay pauses on hover (the `pause` option) and turns off for good once the user takes control — a click on a control, an arrow key, a drag, or the pause button — so content never moves out from under them ([WCAG 2.2.2](https://www.w3.org/WAI/WCAG22/Understanding/pause-stop-hide.html)). While autoplay runs, the active indicator fills like a progress bar over the current slide's interval.
+
+Give an autoplaying carousel a visible pause control: a button with `.carousel-control-play-pause` holds both glyphs and the component shows the one matching the current state, swapping its `aria-label` between `data-coreui-pause-label` and `data-coreui-play-label`.
+
+<Example code={`<div id="carouselExampleAutoplay" class="carousel" data-coreui-autoplay="true">
+    <div class="carousel-indicators">
+      <button type="button" data-coreui-target="#carouselExampleAutoplay" data-coreui-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+      <button type="button" data-coreui-target="#carouselExampleAutoplay" data-coreui-slide-to="1" aria-label="Slide 2"></button>
+      <button type="button" data-coreui-target="#carouselExampleAutoplay" data-coreui-slide-to="2" aria-label="Slide 3"></button>
+    </div>
+    <div class="carousel-inner">
+      <div class="carousel-item active">
+        <svg class="docs-placeholder-img docs-placeholder-img-lg d-block w-100" width="800" height="400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="First slide" preserveAspectRatio="xMidYMid slice" focusable="false"><title>First slide</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em">First slide</text></svg>
+      </div>
+      <div class="carousel-item">
+        <svg class="docs-placeholder-img docs-placeholder-img-lg d-block w-100" width="800" height="400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Second slide" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Second slide</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em">Second slide</text></svg>
+      </div>
+      <div class="carousel-item">
+        <svg class="docs-placeholder-img docs-placeholder-img-lg d-block w-100" width="800" height="400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Third slide" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Third slide</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em">Third slide</text></svg>
+      </div>
+    </div>
+    <button class="carousel-control-play-pause position-absolute top-0 end-0 z-2 m-3" type="button" data-coreui-target="#carouselExampleAutoplay" data-coreui-pause-label="Pause carousel" data-coreui-play-label="Play carousel" aria-label="Pause carousel">
+      <span class="carousel-control-pause-icon" aria-hidden="true"></span>
+      <span class="carousel-control-play-icon" aria-hidden="true"></span>
+    </button>
+    <button class="carousel-control-prev" type="button" data-coreui-target="#carouselExampleAutoplay" data-coreui-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-coreui-target="#carouselExampleAutoplay" data-coreui-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+  </div>`} />
+
 ### Individual `.carousel-item` interval
 
 Add `data-coreui-interval=""` to a `.carousel-item` to change the amount of time to delay between automatically cycling to the next item.
 
-<Example code={`<div id="carouselExampleInterval" class="carousel slide" data-coreui-ride="carousel">
+<Example code={`<div id="carouselExampleInterval" class="carousel" data-coreui-autoplay="true">
     <div class="carousel-inner">
       <div class="carousel-item active" data-coreui-interval="10000">
         <svg class="docs-placeholder-img docs-placeholder-img-lg d-block w-100" width="800" height="400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="First slide" preserveAspectRatio="xMidYMid slice" focusable="false"><title>First slide</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em">First slide</text></svg>
@@ -194,11 +295,15 @@ Add `data-coreui-interval=""` to a `.carousel-item` to change the amount of time
     </button>
   </div>`} />
 
-### Disable touch swiping
+## End behavior
 
-Carousels support swiping left/right on touchscreen devices to move between slides. This can be disabled using the `data-coreui-touch` attribute. The example below also does not include the `data-coreui-ride` attribute so it doesn't autoplay.
+The `ends` option decides what happens past the last (or before the first) slide:
 
-<Example code={`<div id="carouselExampleControlsNoTouching" class="carousel slide" data-coreui-touch="false">
+- `loop` (default) — continues seamlessly in the same direction where the layout allows it (single slide, no peek, no centering), and falls back to `wrap` elsewhere.
+- `wrap` — jumps back to the other end.
+- `stop` — hard stops: the matching control is disabled at each end, so there are no dead buttons.
+
+<Example code={`<div id="carouselExampleEnds" class="carousel" data-coreui-ends="stop">
     <div class="carousel-inner">
       <div class="carousel-item active">
         <svg class="docs-placeholder-img docs-placeholder-img-lg d-block w-100" width="800" height="400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="First slide" preserveAspectRatio="xMidYMid slice" focusable="false"><title>First slide</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em">First slide</text></svg>
@@ -210,11 +315,11 @@ Carousels support swiping left/right on touchscreen devices to move between slid
         <svg class="docs-placeholder-img docs-placeholder-img-lg d-block w-100" width="800" height="400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Third slide" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Third slide</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em">Third slide</text></svg>
       </div>
     </div>
-    <button class="carousel-control-prev" type="button" data-coreui-target="#carouselExampleControlsNoTouching" data-coreui-slide="prev">
+    <button class="carousel-control-prev" type="button" data-coreui-target="#carouselExampleEnds" data-coreui-slide="prev">
       <span class="carousel-control-prev-icon" aria-hidden="true"></span>
       <span class="visually-hidden">Previous</span>
     </button>
-    <button class="carousel-control-next" type="button" data-coreui-target="#carouselExampleControlsNoTouching" data-coreui-slide="next">
+    <button class="carousel-control-next" type="button" data-coreui-target="#carouselExampleEnds" data-coreui-slide="next">
       <span class="carousel-control-next-icon" aria-hidden="true"></span>
       <span class="visually-hidden">Next</span>
     </button>
@@ -222,23 +327,23 @@ Carousels support swiping left/right on touchscreen devices to move between slid
 
 ## Dark variant
 
-Add `.carousel-dark` to the `.carousel` for darker controls, indicators, and captions. Controls have been inverted from their default white fill with the `filter` CSS property. Captions and controls have additional Sass variables that customize the `color` and `background-color`.
+Add `.carousel-dark` to the `.carousel` for darker controls, indicators, and captions. Captions and controls have additional Sass variables that customize the `color` and `background-color`.
 
-<Example code={`<div id="carouselExampleDark" class="carousel carousel-dark slide">
+<Example code={`<div id="carouselExampleDark" class="carousel carousel-dark">
     <div class="carousel-indicators">
       <button type="button" data-coreui-target="#carouselExampleDark" data-coreui-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
       <button type="button" data-coreui-target="#carouselExampleDark" data-coreui-slide-to="1" aria-label="Slide 2"></button>
       <button type="button" data-coreui-target="#carouselExampleDark" data-coreui-slide-to="2" aria-label="Slide 3"></button>
     </div>
     <div class="carousel-inner">
-      <div class="carousel-item active" data-coreui-interval="10000">
+      <div class="carousel-item active">
         <svg class="docs-placeholder-img docs-placeholder-img-lg d-block w-100" width="800" height="400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="First slide" preserveAspectRatio="xMidYMid slice" focusable="false"><title>First slide</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em">First slide</text></svg>
         <div class="carousel-caption d-none d-md-block">
           <h5>First slide label</h5>
           <p>Some representative placeholder content for the first slide.</p>
         </div>
       </div>
-      <div class="carousel-item" data-coreui-interval="2000">
+      <div class="carousel-item">
         <svg class="docs-placeholder-img docs-placeholder-img-lg d-block w-100" width="800" height="400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Second slide" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Second slide</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em">Second slide</text></svg>
         <div class="carousel-caption d-none d-md-block">
           <h5>Second slide label</h5>
@@ -265,7 +370,7 @@ Add `.carousel-dark` to the `.carousel` for darker controls, indicators, and cap
 
 ## Custom transition
 
-The transition duration of `.carousel-item` can be changed with the `$carousel-transition-duration` Sass variable before compiling or custom styles if you're using the compiled CSS. If multiple transitions are applied, make sure the transform transition is defined first (eg. `transition: transform 2s ease, opacity .5s ease-out`).
+Programmatic jumps (controls, indicators, autoplay) animate the scroll position over a fixed 300ms with an ease-in-out curve, in every browser. The crossfade's timing lives in `--cui-carousel-fade-duration` and `--cui-carousel-fade-timing`. Native scrolling — dragging, swiping, momentum — is the browser's own and has no duration to configure.
 
 ## Usage
 
@@ -273,7 +378,8 @@ The transition duration of `.carousel-item` can be changed with the `$carousel-t
 
 Utilize data attributes to control the position of the carousel. `data-coreui-slide` allows the keywords `prev` or `next`, which changes the slide position corresponding to its current position. Alternatively, use `data-coreui-slide-to` to pass a raw slide index to the carousel `data-coreui-slide-to="2"`, which moves the slide position to a particular index beginning with `0`.
 
-The `data-coreui-ride="carousel"` attribute is applied to mark a carousel as animating starting at page load. **It cannot be done in combination with (redundant and unnecessary) explicit JavaScript initialization of the same carousel.**
+The `data-coreui-autoplay="true"` attribute marks a carousel as cycling from page load. **It cannot be done in combination with (redundant and unnecessary) explicit JavaScript initialization of the same carousel.**
+
 ### Via JavaScript
 
 Call carousel manually with:
@@ -290,22 +396,13 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
+| `autoplay` | boolean | `false` | Whether the carousel cycles automatically from page load. Autoplay turns off for good once the user interacts with the carousel. |
+| `ends` | string | `"loop"` | What happens past the ends: `"loop"` continues seamlessly where the layout allows, `"wrap"` jumps to the other end, `"stop"` disables the matching control at each end. |
 | `interval` | number | `5000` | The amount of time to delay between automatically cycling an item. |
 | `keyboard` | boolean | `true` | Whether the carousel should react to keyboard events. |
-| `pause` | string, boolean | `"hover"` | If set to `"hover"`, pauses the cycling of the carousel on `mouseenter` and resumes the cycling of the carousel on `mouseleave`. If set to `false`, hovering over the carousel won't pause it. On touch-enabled devices, when set to `"hover"`, cycling will pause on `touchend` (once the user finished interacting with the carousel) for two intervals, before automatically resuming. This is in addition to the mouse behavior. |
-| `ride` | string, boolean | `false` | If set to `true`, autoplays the carousel after the user manually cycles the first item. If set to `"carousel"`, autoplays the carousel on load. |
-| `touch` | boolean | `true` | Whether the carousel should support left/right swipe interactions on touchscreen devices. |
-| `wrap` | boolean | `true` | Whether the carousel should cycle continuously or have hard stops. |
+| `pause` | string, boolean | `"hover"` | If set to `"hover"`, pauses the cycling of the carousel on `mouseenter` and resumes the cycling of the carousel on `mouseleave`. If set to `false`, hovering over the carousel won't pause it. |
 
 ### Methods
-
-<Callout color="danger">
-#### Asynchronous methods and transitions
-
-All our API methods are **asynchronous** and initiate a **transition**. They return to the caller as soon as the transition begins but **before it concludes**. Furthermore, a method call on a **transitioning component will be ignored**.
-
-[Refer to our JavaScript documentation for further details](/getting-started/javascript/#promises-and-transitions).
-</Callout>
 
 You can create a carousel instance with the carousel constructor, for example, to initialize with additional options and start cycling through items:
 
@@ -313,13 +410,13 @@ You can create a carousel instance with the carousel constructor, for example, t
 const myCarouselElement = document.querySelector('#myCarousel')
 const carousel = new coreui.Carousel(myCarouselElement, {
   interval: 2000,
-  wrap: false
+  ends: 'stop'
 })
 ```
 
 | Method | Description |
 | --- | --- |
-| `cycle` | Cycles through the carousel items from left to right. |
+| `cycle` | Starts cycling through the carousel items and restarts the autoplay timer. |
 | `dispose` | Destroys an element's carousel. (Removes stored data on the DOM element) |
 | `getInstance` | Static method which allows you to get the carousel instance associated to a DOM element, you can use it like this: `coreui.Carousel.getInstance(element)` |
 | `getOrCreateInstance` | Static method which returns a carousel instance associated to a DOM element or create a new one in case it wasn't initialized. You can use it like this: `coreui.Carousel.getOrCreateInstance(element)` |
@@ -352,7 +449,14 @@ myCarousel.addEventListener('slide.coreui.carousel', event => {
   // do something...
 })
 ```
+
 ## Customizing
+
+### CSS variables
+
+The carousel declares the scroll-engine tokens on `.carousel`; set them on a single carousel (as in the [Items examples](#items)) or on an ancestor. While autoplay runs, the component also sets `--cui-carousel-interval` on the root element, which the indicator progress fill reads for its duration.
+
+<ScssDocs file="scss/_carousel.scss" capture="carousel-css-vars" />
 
 ### Sass variables
 
