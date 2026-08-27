@@ -1,6 +1,5 @@
 @use "functions/defaults" as *;
 @use "mixins/border-radius" as *;
-@use "mixins/deprecate" as *;
 @use "mixins/reset-text" as *;
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
@@ -15,7 +14,6 @@ $tooltip-border-radius:             var(--#{$prefix}radius-5) !default;
 $tooltip-opacity:                   .9 !default;
 $tooltip-padding-y:                 var(--#{$prefix}spacer-1) !default;
 $tooltip-padding-x:                 var(--#{$prefix}spacer-2) !default;
-$tooltip-margin:                    null !default; // TODO: remove this in v6
 
 $tooltip-arrow-width:               .8rem !default;
 $tooltip-arrow-height:              .4rem !default;
@@ -36,7 +34,6 @@ $tooltip-tokens: defaults(
     --#{$prefix}tooltip-max-width: #{$tooltip-max-width},
     --#{$prefix}tooltip-padding-x: #{$tooltip-padding-x},
     --#{$prefix}tooltip-padding-y: #{$tooltip-padding-y},
-    --#{$prefix}tooltip-margin: #{$tooltip-margin},
     --#{$prefix}tooltip-font-size: #{$tooltip-font-size},
     --#{$prefix}tooltip-color: #{$tooltip-color},
     --#{$prefix}tooltip-bg: #{$tooltip-bg},
@@ -64,8 +61,6 @@ $tooltip-tokens: defaults(
 
     z-index: var(--#{$prefix}tooltip-zindex);
     display: block;
-    margin: var(--#{$prefix}tooltip-margin);
-    @include deprecate("`$tooltip-margin`", "v4", "v4.x", true);
     // Our parent element can be arbitrary since tooltips are by default inserted as a sibling of their target element.
     // So reset our font and text properties to avoid inheriting weird values.
     @include reset-text();

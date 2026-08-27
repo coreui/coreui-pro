@@ -1024,6 +1024,11 @@ adornment in the library — so the button needs no icon markup at all:
   3.5&#8758;1). The surface and arrow keep the same translucent look; the text
   renders at full opacity. The token still works — override it and only the
   background alpha changes.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`$tooltip-margin` and `--cui-tooltip-margin` are removed.** The variable
+  had been `null` and deprecated since v4; the token compiled to an empty
+  value and the `margin` declaration reading it never took effect. Position
+  a tooltip with the JS `offset` option instead.
 
 #### OTP input
 
