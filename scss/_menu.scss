@@ -43,6 +43,7 @@ $menu-check-color:              currentcolor !default;
 $menu-header-color:             var(--#{$prefix}fg-3) !default;
 $menu-header-padding-x:         .75rem !default;
 $menu-header-padding-y:         .25rem !default;
+$menu-transition-property:      "opacity, transform, display" !default;
 $menu-transition-duration:      .15s !default;
 $menu-transition-timing:        var(--#{$prefix}transition-timing-overlay) !default;
 // scss-docs-end menu-variables
@@ -83,6 +84,7 @@ $menu-tokens: defaults(
     --#{$prefix}menu-header-color: #{$menu-header-color},
     --#{$prefix}menu-header-padding-x: #{$menu-header-padding-x},
     --#{$prefix}menu-header-padding-y: #{$menu-header-padding-y},
+    --#{$prefix}menu-transition-property: #{$menu-transition-property},
     --#{$prefix}menu-transition-duration: #{$menu-transition-duration},
     --#{$prefix}menu-transition-timing: #{$menu-transition-timing},
   ),
@@ -136,10 +138,11 @@ $menu-tokens: defaults(
       transform-origin: top right;
     }
 
-    @include transition(
-      opacity var(--#{$prefix}menu-transition-duration) var(--#{$prefix}menu-transition-timing),
-      transform var(--#{$prefix}menu-transition-duration) var(--#{$prefix}menu-transition-timing),
-      display var(--#{$prefix}menu-transition-duration) allow-discrete
+    @include transition-props(
+      var(--#{$prefix}menu-transition-property),
+      var(--#{$prefix}menu-transition-duration),
+      var(--#{$prefix}menu-transition-timing),
+      allow-discrete
     );
 
     &.show {
