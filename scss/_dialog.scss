@@ -19,6 +19,7 @@ $dialog-border-color:               var(--#{$prefix}border-color-translucent) !d
 $dialog-border-width:               var(--#{$prefix}border-width) !default;
 $dialog-border-radius:              var(--#{$prefix}radius-7) !default;
 $dialog-box-shadow:                 var(--#{$prefix}box-shadow-lg) !default;
+$dialog-transition-property:        "opacity, transform, visibility" !default;
 $dialog-transition-duration:        .3s !default;
 $dialog-transition-timing:          var(--#{$prefix}transition-timing-overlay) !default;
 $dialog-slide-distance:             3rem !default;
@@ -68,6 +69,7 @@ $dialog-tokens: defaults(
     --#{$prefix}dialog-border-width: #{$dialog-border-width},
     --#{$prefix}dialog-border-radius: #{$dialog-border-radius},
     --#{$prefix}dialog-box-shadow: #{$dialog-box-shadow},
+    --#{$prefix}dialog-transition-property: #{$dialog-transition-property},
     --#{$prefix}dialog-transition-duration: #{$dialog-transition-duration},
     --#{$prefix}dialog-transition-timing: #{$dialog-transition-timing},
     --#{$prefix}dialog-backdrop-bg: #{$dialog-backdrop-bg},
@@ -112,10 +114,15 @@ $dialog-tokens: defaults(
 
     &:not(.dialog-instant) {
       opacity: 0;
-      @include transition(
-        opacity var(--#{$prefix}dialog-transition-duration) var(--#{$prefix}dialog-transition-timing),
-        transform var(--#{$prefix}dialog-transition-duration) var(--#{$prefix}dialog-transition-timing),
-        visibility 0s var(--#{$prefix}dialog-transition-duration)
+      // One transition covers both directions. `visibility` animates with the
+      // rest because it interpolates as a step that stays `visible` while
+      // either end is visible: it flips visible at once on entry, and only
+      // after the animation on exit. Keep it in the property list when you
+      // override the token, or the exit becomes invisible.
+      @include transition-props(
+        var(--#{$prefix}dialog-transition-property),
+        var(--#{$prefix}dialog-transition-duration),
+        var(--#{$prefix}dialog-transition-timing)
       );
 
       &.dialog-slide-down {
@@ -129,11 +136,6 @@ $dialog-tokens: defaults(
       &[open]:not(.hiding) {
         visibility: visible;
         opacity: 1;
-        @include transition(
-          opacity var(--#{$prefix}dialog-transition-duration) var(--#{$prefix}dialog-transition-timing),
-          transform var(--#{$prefix}dialog-transition-duration) var(--#{$prefix}dialog-transition-timing),
-          visibility 0s
-        );
         transform: none;
       }
 
