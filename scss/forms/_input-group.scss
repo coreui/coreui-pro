@@ -1,5 +1,6 @@
 @use "sass:map";
 @use "sass:string";
+@use "../buttons/variables" as *;
 @use "../functions/defaults" as *;
 @use "../mixins/border-radius" as *;
 @use "../mixins/forms" as *;
@@ -78,7 +79,7 @@ $input-group-tokens: defaults(
     // Ensure buttons are always above inputs for more visually pleasing borders.
     // This isn't needed for `.input-group-text` since it shares the same border-color
     // as our inputs.
-    .btn {
+    :is(#{$btn-variant-selectors}) {
       position: relative;
       z-index: 2;
 
