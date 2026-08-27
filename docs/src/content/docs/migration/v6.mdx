@@ -1472,6 +1472,11 @@ Multi Select's option indicators moved with it — they render as a decorative
   read by navs and pagination, but a plain `<a>` only ever changed its underline.
   It now switches color as well, and inside a themed surface it hovers to
   `--cui-theme-fg-emphasis`.
+- **The underline sits `.2em` below the text.** `<a>` reads the new
+  `--cui-link-underline-offset` token (knob: `$link-underline-offset`), so
+  underlines clear descenders instead of cutting through them. The
+  `.link-offset-*` utilities and `.icon-link` still override it per element;
+  set the token to `auto` for the old browser default.
 - **`accent-color: var(--cui-primary)` on `:root`.** Native controls we don't
   restyle — a bare checkbox, radio, range or `<progress>` — follow the brand
   color instead of the browser's blue.

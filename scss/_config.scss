@@ -71,6 +71,7 @@ $spacers: (
 // Style anchor elements.
 
 $link-decoration:                         underline !default;
+$link-underline-offset:                   .2em !default;
 $link-hover-decoration:                   null !default;
 
 // Define the minimum dimensions at which your layout will change,

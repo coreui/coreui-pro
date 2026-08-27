@@ -236,6 +236,7 @@ $root-token-defaults: map.merge(
     --#{$prefix}heading-color: $headings-color,
     --#{$prefix}link-color: $link-color,
     --#{$prefix}link-decoration: $link-decoration,
+    --#{$prefix}link-underline-offset: $link-underline-offset,
     --#{$prefix}link-hover-color: $link-hover-color,
     --#{$prefix}link-hover-decoration: $link-hover-decoration,
     --#{$prefix}code-color: $code-color,
