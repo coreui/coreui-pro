@@ -1198,6 +1198,9 @@ adornment in the library — so the button needs no icon markup at all:
   it — while the variable's own comment told you to set `nowrap`, which is to say
   the default was the one nobody wanted. A long label now keeps the button one
   line tall and makes it wider instead.
+- **`.btn-toolbar` spaces its groups on its own** with a `.5rem` `gap`
+  (`--cui-spacer-2`). Drop the `me-*` utilities that carried the spacing in
+  v5, or they now add to the gap.
 
   It is still a token, so the old behaviour is one declaration away — on a single
   button, on a theme, or globally:

@@ -34,6 +34,7 @@
   .btn-toolbar {
     display: flex;
     flex-wrap: wrap;
+    gap: var(--#{$prefix}spacer-2);
     justify-content: flex-start;
 
     .input-group {
