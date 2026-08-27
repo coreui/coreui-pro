@@ -768,6 +768,17 @@ declaration.
   is finally the same height as a sized input; it only shows if you have cut the
   padding below that floor.
 
+#### Form labels carry their own weight
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`.form-label` and `.col-form-label` render medium and full-contrast by
+  default.** `$form-label-font-weight` is `var(--cui-font-weight-medium)`
+  (was `null` — labels inherited the surrounding weight) and
+  `$form-label-color` is `var(--cui-fg-body)` (was `null`), so a label inside
+  a muted or tinted context keeps the page's text colour instead of fading
+  with it. Set the knobs back to `null`, or `--cui-label-font-weight` /
+  `--cui-label-color` to `inherit`, for the old behaviour.
+
 #### Input group: `.has-validation` removed
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>

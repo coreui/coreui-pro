@@ -6,8 +6,8 @@
 $form-label-margin-bottom:              .5rem !default;
 $form-label-font-size:                  null !default;
 $form-label-font-style:                 null !default;
-$form-label-font-weight:                null !default;
-$form-label-color:                      null !default;
+$form-label-font-weight:                var(--#{$prefix}font-weight-medium) !default;
+$form-label-color:                      var(--#{$prefix}fg-body) !default;
 // scss-docs-end form-label-variables
 
 $form-label-tokens: () !default;
@@ -50,8 +50,7 @@ $form-label-tokens: defaults(
     --#{$prefix}label-padding-y: calc(var(--#{$prefix}btn-input-padding-y) + var(--#{$prefix}btn-input-border-width));
     --#{$prefix}label-line-height: var(--#{$prefix}btn-input-line-height);
 
-    padding-top: var(--#{$prefix}label-padding-y);
-    padding-bottom: var(--#{$prefix}label-padding-y);
+    padding-block: var(--#{$prefix}label-padding-y);
     margin-bottom: 0; // Override the `<legend>` default
     line-height: var(--#{$prefix}label-line-height);
   }
