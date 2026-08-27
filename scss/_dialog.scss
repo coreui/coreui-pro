@@ -245,7 +245,7 @@ $dialog-tokens: defaults(
     flex-shrink: 0;
     align-items: center;
     padding: var(--#{$prefix}dialog-header-padding);
-    border-bottom: var(--#{$prefix}dialog-header-border-width) solid var(--#{$prefix}dialog-header-border-color);
+    border-block-end: var(--#{$prefix}dialog-header-border-width) solid var(--#{$prefix}dialog-header-border-color);
 
     .btn-close {
       margin-inline-start: auto;
@@ -274,6 +274,6 @@ $dialog-tokens: defaults(
     align-items: center;
     justify-content: flex-end;
     padding: var(--#{$prefix}dialog-footer-padding);
-    border-top: var(--#{$prefix}dialog-footer-border-width) solid var(--#{$prefix}dialog-footer-border-color);
+    border-block-start: var(--#{$prefix}dialog-footer-border-width) solid var(--#{$prefix}dialog-footer-border-color);
   }
 }

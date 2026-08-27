@@ -271,9 +271,8 @@ $drawer-tokens: defaults(
   }
 
   .drawer-sheet {
-    right: 0;
-    bottom: 0;
-    left: 0;
+    inset-block-end: 0;
+    inset-inline: 0;
     width: 100vw;
     margin-inline: auto;
     margin-bottom: calc(-1 * var(--#{$prefix}drawer-border-width));
@@ -327,6 +326,6 @@ $drawer-tokens: defaults(
     align-items: center;
     justify-content: flex-end;
     padding: var(--#{$prefix}drawer-padding-y) var(--#{$prefix}drawer-padding-x);
-    border-top: var(--#{$prefix}drawer-border-width) solid var(--#{$prefix}drawer-border-color);
+    border-block-start: var(--#{$prefix}drawer-border-width) solid var(--#{$prefix}drawer-border-color);
   }
 }

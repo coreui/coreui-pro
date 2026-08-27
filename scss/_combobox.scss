@@ -127,7 +127,7 @@ $combobox-tokens: defaults(
 
   .combobox-header {
     padding: var(--#{$prefix}combobox-header-padding-y) var(--#{$prefix}combobox-header-padding-x);
-    border-bottom: var(--#{$prefix}combobox-header-border-width) solid var(--#{$prefix}combobox-header-border-color);
+    border-block-end: var(--#{$prefix}combobox-header-border-width) solid var(--#{$prefix}combobox-header-border-color);
   }
 
   .combobox-all {

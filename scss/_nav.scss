@@ -267,7 +267,7 @@ $tab-pane-tokens: defaults(
 
     --#{$prefix}nav-link-border-radius: 0;
 
-    border-bottom: var(--#{$prefix}nav-tabs-border-width) solid var(--#{$prefix}nav-tabs-border-color);
+    border-block-end: var(--#{$prefix}nav-tabs-border-width) solid var(--#{$prefix}nav-tabs-border-color);
 
     .nav-link {
       margin-bottom: calc(-1 * var(--#{$prefix}nav-tabs-border-width));
@@ -331,9 +331,8 @@ $tab-pane-tokens: defaults(
     gap: var(--#{$prefix}nav-underline-gap);
 
     .nav-link {
-      padding-right: 0;
-      padding-left: 0;
-      border-bottom: var(--#{$prefix}nav-underline-border-width) solid transparent;
+      padding-inline: 0;
+      border-block-end: var(--#{$prefix}nav-underline-border-width) solid transparent;
 
       &:hover,
       &:focus {
@@ -362,12 +361,12 @@ $tab-pane-tokens: defaults(
     --#{$prefix}nav-link-disabled-color: var(--#{$prefix}nav-underline-border-link-disabled-color);
 
     gap: var(--#{$prefix}nav-underline-border-gap);
-    border-bottom: var(--#{$prefix}nav-underline-border-border-width) solid var(--#{$prefix}nav-underline-border-border-color);
+    border-block-end: var(--#{$prefix}nav-underline-border-border-width) solid var(--#{$prefix}nav-underline-border-border-color);
 
     .nav-link {
       padding: var(--#{$prefix}nav-underline-border-link-padding-y) var(--#{$prefix}nav-underline-border-link-padding-x);
       margin-bottom: calc(-1 * var(--#{$prefix}nav-underline-border-border-width));
-      border-bottom: var(--#{$prefix}nav-underline-border-border-width) solid transparent;
+      border-block-end: var(--#{$prefix}nav-underline-border-border-width) solid transparent;
 
       &:hover,
       &:focus {

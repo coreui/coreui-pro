@@ -204,7 +204,7 @@ $popover-tokens: defaults(
       width: var(--#{$prefix}popover-arrow-width);
       margin-left: calc(-.5 * var(--#{$prefix}popover-arrow-width));
       content: "";
-      border-bottom: var(--#{$prefix}popover-border-width) solid var(--#{$prefix}popover-header-bg);
+      border-block-end: var(--#{$prefix}popover-border-width) solid var(--#{$prefix}popover-header-bg);
     }
   }
 
@@ -253,7 +253,7 @@ $popover-tokens: defaults(
     font-size: var(--#{$prefix}popover-header-font-size);
     color: var(--#{$prefix}popover-header-color);
     background-color: var(--#{$prefix}popover-header-bg);
-    border-bottom: var(--#{$prefix}popover-border-width) solid var(--#{$prefix}popover-border-color);
+    border-block-end: var(--#{$prefix}popover-border-width) solid var(--#{$prefix}popover-border-color);
     @include border-top-radius(var(--#{$prefix}popover-inner-border-radius));
 
     &:empty {
