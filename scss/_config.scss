@@ -209,6 +209,8 @@ $h3-font-size:                clamp(1.3rem, 1.3rem + .6vw, 1.75rem) !default;
 $h4-font-size:                clamp(1.275rem, 1.275rem + .3vw, 1.5rem) !default;
 $h5-font-size:                $font-size-lg !default;
 $h6-font-size:                var(--#{$prefix}body-font-size) !default;
+$font-size-5xl:               clamp(1.425rem, 1.425rem + 2.1vw, 3rem) !default;
+$font-size-6xl:               clamp(1.475rem, 1.475rem + 2.7vw, 3.5rem) !default;
 // scss-docs-end font-variables
 
 // scss-docs-start headings-variables
@@ -235,7 +237,9 @@ $font-sizes: (
   "xl":  ("font-size": $h4-font-size,         "line-height": $headings-line-height),
   "2xl": ("font-size": $h3-font-size,         "line-height": $headings-line-height),
   "3xl": ("font-size": $h2-font-size,         "line-height": $headings-line-height),
-  "4xl": ("font-size": $h1-font-size,         "line-height": $headings-line-height)
+  "4xl": ("font-size": $h1-font-size,         "line-height": $headings-line-height),
+  "5xl": ("font-size": $font-size-5xl,        "line-height": $headings-line-height),
+  "6xl": ("font-size": $font-size-6xl,        "line-height": $headings-line-height)
 ) !default;
 // scss-docs-end font-sizes
 
