@@ -1901,6 +1901,17 @@ as such.
   step down the same way. Interaction feedback is a tint rather than a
   block of gray — the same relationships, two rungs closer to the page.
   Set the component's own token to keep a darker surface.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The neutral button steps down the ladder with everything else.** A `.btn`
+  without a theme colour rests on `--cui-bg-2` (was `--cui-bg-4`) and hovers
+  on `--cui-bg-3` (was a hard-coded `gray-300`/`gray-700` pair outside the
+  ladder); the neutral subtle variant rests on `--cui-bg-2` and the ghost
+  variant's hover wash is `--cui-bg-1`. The default button is visibly
+  lighter. Its corners also now read `--cui-btn-input-border-radius`
+  (`--cui-radius-5`, `.5rem`) instead of the global `--cui-border-radius`,
+  so buttons match the fields they sit next to in input groups; `.btn-group`
+  clips to the same stop. Set `$btn-bg`/`$btn-hover-bg` or the `--cui-btn-*`
+  tokens to keep the old look.
 
 #### Every theme colour gets an action-background slot
 
