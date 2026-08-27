@@ -3,6 +3,10 @@
 @use "button" as *;
 @use "../config" as *;
 
+// A v6 button may carry only its variant class (`.btn-solid`), so the group
+// plumbing cannot key on `.btn` alone.
+$group-button: ":is(#{$btn-variant-selectors})" !default;
+
 @layer components {
   // Make the div behave like a button
   .btn-group,
@@ -11,23 +15,46 @@
     display: inline-flex;
     vertical-align: middle; // match .btn alignment given font-size hack above
 
-    > .btn {
+    > #{$group-button} {
       position: relative;
       flex: 1 1 auto;
     }
 
     // Bring the hover, focused, and "active" buttons to the front to overlay
     // the borders properly
-    > #{$btn-check-deprecated}:checked + .btn,
-    > #{$btn-check-deprecated}:focus + .btn,
+    > #{$btn-check-deprecated}:checked + #{$group-button},
+    > #{$btn-check-deprecated}:focus + #{$group-button},
     > .btn-check:has(input:checked),
     > .btn-check:has(input:focus),
-    > .btn:hover,
-    > .btn:focus,
-    > .btn:active,
-    > .btn.active {
+    > #{$group-button}:hover,
+    > #{$group-button}:focus,
+    > #{$group-button}:active,
+    > #{$group-button}.active {
       z-index: 1;
     }
+  }
+
+  // Optional: a line between grouped buttons, for styles whose borders
+  // don't separate them (solid, subtle)
+  .btn-group-divider > #{$group-button} + #{$group-button}::before {
+    position: absolute;
+    z-index: 3;
+    content: "";
+    background-color: var(--#{$prefix}btn-color);
+    opacity: .25;
+  }
+
+  .btn-group:where(.btn-group-divider) > #{$group-button} + #{$group-button}::before {
+    inset-inline-start: calc(-1 * var(--#{$prefix}btn-border-width));
+    top: 25%;
+    bottom: 25%;
+    width: var(--#{$prefix}btn-border-width);
+  }
+
+  .btn-group-vertical:where(.btn-group-divider) > #{$group-button} + #{$group-button}::before {
+    inset-inline: var(--#{$prefix}btn-padding-x);
+    top: calc(-1 * var(--#{$prefix}btn-border-width));
+    height: var(--#{$prefix}btn-border-width);
   }
 
   // Optional: Group multiple button groups together for a toolbar
@@ -46,7 +73,7 @@
     @include border-radius(var(--#{$prefix}btn-input-border-radius));
 
     // Prevent double borders when buttons are next to each other
-    > :not(#{$btn-check-deprecated}:first-child) + .btn,
+    > :not(#{$btn-check-deprecated}:first-child) + #{$group-button},
     > .btn-group:not(:first-child) {
       margin-inline-start: calc(-1 * var(--#{$prefix}btn-border-width));
     }
@@ -54,10 +81,10 @@
     // Reset rounded corners
     // A menu trigger carries no class of its own, so it is recognised by the
     // `.menu` that follows it.
-    > .btn:not(:last-child, .dropdown-toggle, :has(+ .menu)),
-    > .btn.dropdown-toggle-split:first-child,
-    > .btn.menu-toggle-split:first-child,
-    > .btn-group:not(:last-child) > .btn {
+    > #{$group-button}:not(:last-child, .dropdown-toggle, :has(+ .menu)),
+    > #{$group-button}.dropdown-toggle-split:first-child,
+    > #{$group-button}.menu-toggle-split:first-child,
+    > .btn-group:not(:last-child) > #{$group-button} {
       @include border-end-radius(0);
     }
 
@@ -66,9 +93,9 @@
     // - the second child and the previous element isn't a deprecated `.btn-check`
     //   input (making it the first child visually)
     // - part of a btn-group which isn't the first child
-    > .btn:nth-child(n + 3),
-    > :not(#{$btn-check-deprecated}) + .btn,
-    > .btn-group:not(:first-child) > .btn {
+    > #{$group-button}:nth-child(n + 3),
+    > :not(#{$btn-check-deprecated}) + #{$group-button},
+    > .btn-group:not(:first-child) > #{$group-button} {
       @include border-start-radius(0);
     }
   }
@@ -100,19 +127,19 @@
     align-items: flex-start;
     justify-content: center;
 
-    > .btn,
+    > #{$group-button},
     > .btn-group {
       width: 100%;
     }
 
-    > .btn:not(:first-child),
+    > #{$group-button}:not(:first-child),
     > .btn-group:not(:first-child) {
       margin-top: calc(-1 * var(--#{$prefix}btn-border-width));
     }
 
     // Reset rounded corners
-    > .btn:not(:last-child, .dropdown-toggle, :has(+ .menu)),
-    > .btn-group:not(:last-child) > .btn {
+    > #{$group-button}:not(:last-child, .dropdown-toggle, :has(+ .menu)),
+    > .btn-group:not(:last-child) > #{$group-button} {
       @include border-bottom-radius(0);
     }
 
@@ -121,9 +148,9 @@
     // - the second child and the previous element isn't a deprecated `.btn-check`
     //   input (making it the first child visually)
     // - part of a btn-group which isn't the first child
-    > .btn:nth-child(n + 3),
-    > :not(#{$btn-check-deprecated}) + .btn,
-    > .btn-group:not(:first-child) > .btn {
+    > #{$group-button}:nth-child(n + 3),
+    > :not(#{$btn-check-deprecated}) + #{$group-button},
+    > .btn-group:not(:first-child) > #{$group-button} {
       @include border-top-radius(0);
     }
   }
