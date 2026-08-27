@@ -3194,8 +3194,10 @@ $font-sizes: (
 ```
 
 - **`$font-sizes` changed shape** — it was `(1: $h1-font-size, … 6: $h6-font-size)`
-  and is now keyed `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl`, `4xl`, with a nested
-  map per stop.
+  and is now keyed `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl`, `4xl`, `5xl`, `6xl`,
+  with a nested map per stop. The two top stops sit above the headings — display
+  sizes (`$font-size-5xl`/`-6xl`, up to `3rem` and `3.5rem`) continuing the same
+  fluid progression, numerically level with `.display-5` and `.display-4`.
   <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   If you overrode `$font-sizes`, move your values into the new shape. The numeric
   keys live on in `$font-sizes-legacy`, which is derived from the named scale.
