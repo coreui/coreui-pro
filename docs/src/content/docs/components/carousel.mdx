@@ -327,9 +327,9 @@ The `ends` option decides what happens past the last (or before the first) slide
 
 ## Dark variant
 
-Add `.carousel-dark` to the `.carousel` for darker controls, indicators, and captions. Captions and controls have additional Sass variables that customize the `color` and `background-color`.
+Set `data-coreui-theme="dark"` on the `.carousel` for darker controls, indicators, and captions. The chrome colours are `light-dark()` pairs resolved on the carousel itself, so the standard theme attribute flips them all — and `data-coreui-theme="light"` pins the white chrome on a dark page the same way.
 
-<Example code={`<div id="carouselExampleDark" class="carousel carousel-dark">
+<Example code={`<div id="carouselExampleDark" class="carousel" data-coreui-theme="dark">
     <div class="carousel-indicators">
       <button type="button" data-coreui-target="#carouselExampleDark" data-coreui-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
       <button type="button" data-coreui-target="#carouselExampleDark" data-coreui-slide-to="1" aria-label="Slide 2"></button>
@@ -454,7 +454,7 @@ myCarousel.addEventListener('slide.coreui.carousel', event => {
 
 ### CSS variables
 
-The carousel declares the scroll-engine tokens on `.carousel`; set them on a single carousel (as in the [Items examples](#items)) or on an ancestor. While autoplay runs, the component also sets `--cui-carousel-interval` on the root element, which the indicator progress fill reads for its duration.
+The carousel declares its tokens — the scroll engine and the whole chrome: controls, icons, indicators, captions and the play/pause button — on `.carousel`; set them on a single carousel (as in the [Items examples](#items)) or on an ancestor. While autoplay runs, the component also sets `--cui-carousel-interval` on the root element, which the indicator progress fill reads for its duration.
 
 <ScssDocs file="scss/_carousel.scss" capture="carousel-css-vars" />
 
@@ -468,6 +468,3 @@ Variables for all carousels:
 
 <ScssDocs file="scss/_carousel.scss" capture="carousel-variables" />
 
-Variables for the [dark carousel](#dark-variant):
-
-<ScssDocs file="scss/_carousel.scss" capture="carousel-dark-variables" />

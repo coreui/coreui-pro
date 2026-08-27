@@ -509,6 +509,16 @@ check, radio, carousel and toggler icons already work:
   and `.carousel-control-play-icon`) toggles autoplay and swaps its
   `aria-label` between `data-coreui-pause-label` and
   `data-coreui-play-label`.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`.carousel-dark`, the `carousel-dark()` mixin and `$carousel-dark-*` are
+  gone.** The chrome colours are `light-dark()` pairs resolved on the
+  carousel itself, so the standard `data-coreui-theme="dark"` attribute is
+  the dark variant — and `data-coreui-theme="light"` pins the white chrome
+  on a dark page the same way.
+- **Every chrome measurement is a `--cui-carousel-*` token** declared on
+  `.carousel` — control width and opacities, icon images and sizes,
+  indicator geometry and transitions, caption metrics, the play/pause
+  button — so the whole carousel restyles at runtime without recompiling.
 - **Crossfade timing moved to tokens.** `$carousel-transition-duration` and
   `$carousel-transition` are gone; the fade reads
   `--cui-carousel-fade-duration` and `--cui-carousel-fade-timing`, and the
