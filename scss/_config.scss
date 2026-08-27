@@ -163,6 +163,7 @@ $shadows: (
   null:  0 .5rem 1rem color-mix(in oklch, var(--#{$prefix}shadow-tint, var(--#{$prefix}shadow-color)) calc(15% * var(--#{$prefix}shadow-strength) * var(--#{$prefix}shadow-opacity, 1)), transparent),
   sm:    0 .125rem .25rem color-mix(in oklch, var(--#{$prefix}shadow-tint, var(--#{$prefix}shadow-color)) calc(7.5% * var(--#{$prefix}shadow-strength) * var(--#{$prefix}shadow-opacity, 1)), transparent),
   lg:    0 1rem 3rem color-mix(in oklch, var(--#{$prefix}shadow-tint, var(--#{$prefix}shadow-color)) calc(17.5% * var(--#{$prefix}shadow-strength) * var(--#{$prefix}shadow-opacity, 1)), transparent),
+  xl:    0 1.5rem 4rem color-mix(in oklch, var(--#{$prefix}shadow-tint, var(--#{$prefix}shadow-color)) calc(20% * var(--#{$prefix}shadow-strength) * var(--#{$prefix}shadow-opacity, 1)), transparent),
   inset: inset 0 1px 2px color-mix(in oklch, var(--#{$prefix}shadow-tint, var(--#{$prefix}shadow-color)) calc(7.5% * var(--#{$prefix}shadow-strength) * var(--#{$prefix}shadow-opacity, 1)), transparent),
 ) !default;
 // scss-docs-end box-shadow-variables
