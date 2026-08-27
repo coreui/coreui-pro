@@ -196,7 +196,9 @@ $card-tokens: defaults(
   // Header navs
   //
 
-  .card-header-tabs {
+  // Combined selector: `.nav` alone matches the base class's `margin-bottom: 0`
+  // at equal specificity, and _nav.scss is emitted after this file.
+  .nav.card-header-tabs {
     margin-inline: calc(-.5 * var(--#{$prefix}card-cap-padding-x));
     margin-bottom: calc(-1 * var(--#{$prefix}card-cap-padding-y) - var(--#{$prefix}nav-tabs-border-width));
 
