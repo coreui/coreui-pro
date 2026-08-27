@@ -249,6 +249,8 @@ $accordion-tokens: defaults(
     }
 
     &:focus-visible {
+      --#{$prefix}focus-ring-offset: -1px;
+
       position: relative;
       z-index: 3;
       @include focus-ring(true);
