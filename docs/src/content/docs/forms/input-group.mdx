@@ -300,6 +300,16 @@ Input groups include support for custom selects and custom file inputs. Browser 
     <button class="btn btn-outline-secondary" type="button" id="inputGroupFileAddon04">Button</button>
   </div>`} />
 
+## Skipping an element
+
+CSS selectors can only account for so much. When a group carries an element that should not take part in the border-radius and negative-margin logic — a hidden input, a tooltip anchor — add `.input-group-ignore` to it and the corners flow to its visible neighbours:
+
+<Example code={`<div class="input-group">
+    <span class="input-group-text" id="visible-addon">@</span>
+    <input type="text" class="form-control input-group-ignore d-none" placeholder="Hidden input" aria-label="Hidden input" aria-describedby="visible-addon">
+    <input type="text" class="form-control" placeholder="Visible input" aria-label="Visible input" aria-describedby="visible-addon">
+  </div>`} />
+
 ## Customizing
 
 ### CSS variables

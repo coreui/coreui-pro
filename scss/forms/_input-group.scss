@@ -153,16 +153,20 @@ $input-group-tokens: defaults(
       $validation-messages: $validation-messages + ":not(." + string.unquote($state) + "-tooltip)" + ":not(." + string.unquote($state) + "-feedback)";
     }
 
-    > :not(:last-child, .dropdown-toggle, .dropdown-menu, .form-floating),
+    > :not(:last-child, .dropdown-toggle, .dropdown-menu, .input-group-ignore, .form-floating, :has(+ :is(.dropdown-menu, .input-group-ignore):last-child)),
     > .dropdown-toggle:nth-last-child(n + 3),
     > .form-floating:not(:last-child) > .form-control,
     > .form-floating:not(:last-child) > .form-select {
       @include border-end-radius(0);
     }
 
-    > :not(:first-child):not(.dropdown-menu)#{$validation-messages} {
+    > :not(:first-child):not(.dropdown-menu):not(.input-group-ignore)#{$validation-messages} {
       margin-inline-start: calc(-1 * var(--#{$prefix}btn-input-border-width));
       @include border-start-radius(0);
+    }
+
+    > :first-child:is(.input-group-ignore) + :not(.dropdown-menu, .input-group-ignore) {
+      @include border-start-radius(var(--#{$prefix}control-border-radius));
     }
 
     > .form-floating:not(:first-child) > .form-control,
