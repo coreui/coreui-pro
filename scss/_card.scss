@@ -198,12 +198,11 @@ $card-tokens: defaults(
 
   .card-header-tabs {
     margin-inline: calc(-.5 * var(--#{$prefix}card-cap-padding-x));
-    margin-bottom: calc(-1 * var(--#{$prefix}card-cap-padding-y));
-    border-block-end: 0;
+    margin-bottom: calc(-1 * var(--#{$prefix}card-cap-padding-y) - var(--#{$prefix}nav-tabs-border-width));
 
     .nav-link.active {
       background-color: var(--#{$prefix}card-bg);
-      border-bottom-color: var(--#{$prefix}card-bg);
+      border-block-end-color: var(--#{$prefix}card-bg);
     }
   }
 

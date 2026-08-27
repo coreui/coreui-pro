@@ -267,11 +267,11 @@ $tab-pane-tokens: defaults(
 
     --#{$prefix}nav-link-border-radius: 0;
 
-    border-block-end: var(--#{$prefix}nav-tabs-border-width) solid var(--#{$prefix}nav-tabs-border-color);
+    box-shadow: inset 0 calc(-1 * var(--#{$prefix}nav-tabs-border-width)) 0 var(--#{$prefix}nav-tabs-border-color);
 
     .nav-link {
-      margin-bottom: calc(-1 * var(--#{$prefix}nav-tabs-border-width));
       border: var(--#{$prefix}nav-tabs-border-width) solid transparent;
+      border-block-end-color: var(--#{$prefix}nav-tabs-border-color);
       @include border-top-radius(var(--#{$prefix}nav-tabs-border-radius));
 
       &:hover,
@@ -337,7 +337,7 @@ $tab-pane-tokens: defaults(
       &:hover,
       &:focus {
         background-color: var(--#{$prefix}nav-link-hover-bg);
-        border-bottom-color: currentcolor;
+        border-block-end-color: currentcolor;
       }
     }
 
@@ -346,7 +346,7 @@ $tab-pane-tokens: defaults(
       font-weight: var(--#{$prefix}font-weight-bold);
       color: var(--#{$prefix}theme-fg, var(--#{$prefix}nav-underline-link-active-color));
       background-color: var(--#{$prefix}nav-link-active-bg);
-      border-bottom-color: currentcolor;
+      border-block-end-color: currentcolor;
     }
   }
 
@@ -371,7 +371,7 @@ $tab-pane-tokens: defaults(
       &:hover,
       &:focus {
         background-color: var(--#{$prefix}nav-link-hover-bg);
-        border-bottom-color: currentcolor;
+        border-block-end-color: currentcolor;
       }
     }
 
@@ -380,7 +380,7 @@ $tab-pane-tokens: defaults(
       font-weight: var(--#{$prefix}font-weight-bold);
       color: var(--#{$prefix}theme-fg, var(--#{$prefix}nav-underline-border-link-active-color));
       background-color: var(--#{$prefix}nav-link-active-bg);
-      border-bottom-color: currentcolor;
+      border-block-end-color: currentcolor;
     }
   }
 

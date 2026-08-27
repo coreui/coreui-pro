@@ -1014,6 +1014,17 @@ adornment in the library — so the button needs no icon markup at all:
   and the two underline variants take neither fill, hover or active: they mark
   their state with a line, and a radius curves that line's ends while a fill says
   the same thing twice.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`.nav-tabs` draws its line with an inset `box-shadow`, not a border.** The
+  links no longer pull themselves over the container's border with a negative
+  `margin-bottom`; each link carries its own bottom border (the line colour at
+  rest, the panel colour when active) and the container paints the line as
+  `box-shadow: inset 0 calc(-1 * var(--cui-nav-tabs-border-width)) 0
+  var(--cui-nav-tabs-border-color)`. The rendered result is pixel-identical,
+  but custom CSS targeting `.nav-tabs`' `border-bottom` or the links' negative
+  margin needs a second look; recolour the line through
+  `--cui-nav-tabs-border-color`. `.card-header-tabs` compensates with a deeper
+  negative margin instead of zeroing the border.
 - **`--cui-nav-gap` is new**, declared on `.nav` and defaulting to `0`, so the
   base nav renders exactly as it did. It gives the token a home on the component
   whose name it carries: `.navbar-nav` already overrode it, and `.nav-underline`
