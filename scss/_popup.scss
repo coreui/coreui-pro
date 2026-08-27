@@ -10,7 +10,7 @@ $popup-zindex:          1000 !default;
 $popup-bg:              var(--#{$prefix}bg-body) !default;
 $popup-border-width:    var(--#{$prefix}border-width) !default;
 $popup-border-color:    var(--#{$prefix}border-color) !default;
-$popup-border-radius:   var(--#{$prefix}border-radius) !default;
+$popup-border-radius:   var(--#{$prefix}radius-7) !default;
 $popup-box-shadow:      var(--#{$prefix}box-shadow) !default;
 $popup-transition-duration: .15s !default;
 $popup-transition-timing:   var(--#{$prefix}transition-timing-overlay) !default;

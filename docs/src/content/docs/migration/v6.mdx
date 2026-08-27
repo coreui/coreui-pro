@@ -1890,9 +1890,11 @@ as such.
   emits `--cui-radius-0` through `--cui-radius-9` (multiples of `$radius`,
   `.5rem` by default) plus `--cui-radius-pill`, and component tokens read
   stops instead of the one global `--cui-border-radius`: buttons, inputs,
-  alerts, list groups, tabs, progress, tooltips and thumbnails sit on
-  `--cui-radius-5` (`.5rem`), badges, cards, popovers, dialogs, drawers and
-  menus on `--cui-radius-7` (`.75rem`), pills on `--cui-radius-9` (`1.5rem`).
+  alerts, list groups, tabs, nav links, progress, tooltips, thumbnails,
+  callouts, combobox options and the range slider's tooltip sit on
+  `--cui-radius-5` (`.5rem`), badges, cards, popovers, dialogs, drawers,
+  menus, accordions, toasts, dropdowns and popups on `--cui-radius-7`
+  (`.75rem`), pills on `--cui-radius-9` (`1.5rem`).
   Everything that used the `.375rem` default is visibly rounder. To keep a
   component on its old radius, set its own token
   (`--cui-card-border-radius: .375rem`); to retune the whole page, override

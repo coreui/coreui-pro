@@ -10,7 +10,7 @@ $callout-padding-y:                 var(--#{$prefix}spacer-3) !default;
 $callout-padding-x:                 var(--#{$prefix}spacer-3) !default;
 $callout-margin-y:                  var(--#{$prefix}spacer-3) !default;
 $callout-margin-x:                  0 !default;
-$callout-border-radius:             var(--#{$prefix}border-radius) !default;
+$callout-border-radius:             var(--#{$prefix}radius-5) !default;
 $callout-border-width:              var(--#{$prefix}border-width) !default;
 $callout-border-color:              var(--#{$prefix}border-color) !default;
 $callout-border-left-width:         calc(#{$callout-border-width} * 4) !default;
