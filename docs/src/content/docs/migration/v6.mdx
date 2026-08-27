@@ -478,6 +478,42 @@ check, radio, carousel and toggler icons already work:
   switches, `.badge-lg` joins `.badge-sm` on the size scale, and `a.badge` no
   longer inherits the underline from the reboot.
 
+#### Carousel slides by scrolling
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The engine is native CSS scroll snapping, not transforms.** The track
+  (`.carousel-inner`) is a scroll container: dragging, swiping and momentum
+  come from the browser, and programmatic jumps animate the scroll position
+  over a fixed 300ms. The transform choreography is gone with its state
+  classes — `.carousel-item-next`, `.carousel-item-prev`,
+  `.carousel-item-start`, `.carousel-item-end` and `.pointer-event` no longer
+  exist; react to the `slide`/`slid` events instead of styling them. The
+  `.slide` class is inert — leave it in old markup or drop it, nothing reads
+  it any more. The markup skeleton (indicators + inner with items +
+  controls) is unchanged, and the controls, indicators and captions keep
+  their overlaid layout.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`ride` is `autoplay`, `wrap` is `ends`, and `touch` is gone.**
+  `data-coreui-autoplay="true"` (boolean — the `"carousel"` spelling is gone)
+  cycles from page load; `ends` takes `"loop"` (default — continues
+  seamlessly where the layout allows), `"wrap"` (the old jump) or `"stop"`
+  (hard ends with the matching control disabled). Touch needs no option:
+  the browser owns it. Autoplay now turns off for good once the user
+  interacts (WCAG 2.2.2), and while it runs the active indicator fills like
+  a progress bar over the slide's interval.
+- **New layout knobs and a pause control.** `--cui-carousel-items`,
+  `--cui-carousel-items-gap` and `--cui-carousel-items-peek` put several
+  slides in the viewport; `.carousel-center` snaps the active slide to the
+  middle and `.carousel-auto` lets slides keep their own width. A button
+  with `.carousel-control-play-pause` (holding `.carousel-control-pause-icon`
+  and `.carousel-control-play-icon`) toggles autoplay and swaps its
+  `aria-label` between `data-coreui-pause-label` and
+  `data-coreui-play-label`.
+- **Crossfade timing moved to tokens.** `$carousel-transition-duration` and
+  `$carousel-transition` are gone; the fade reads
+  `--cui-carousel-fade-duration` and `--cui-carousel-fade-timing`, and the
+  slides stack on a grid instead of floating.
+
 #### Autocomplete and Multi Select share one options menu
 
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
