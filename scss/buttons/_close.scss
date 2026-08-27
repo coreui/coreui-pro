@@ -59,7 +59,7 @@ $close-tokens: defaults(
     background-color: currentcolor;
     @include mask-icon(var(--#{$prefix}btn-close-icon), var(--#{$prefix}btn-close-icon-size));
     border: 0; // for button elements
-    @include border-radius();
+    @include border-radius(var(--#{$prefix}radius-4));
     opacity: var(--#{$prefix}btn-close-opacity);
 
     // Override <a>'s hover style
