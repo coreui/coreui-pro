@@ -47,7 +47,7 @@ $range-slider-tooltip-margin-bottom:       .25rem !default;
 $range-slider-tooltip-font-size:           var(--#{$prefix}font-size-sm) !default;
 $range-slider-tooltip-color:               var(--#{$prefix}fg-body) !default;
 $range-slider-tooltip-bg:                  var(--#{$prefix}bg-4) !default;
-$range-slider-tooltip-border-radius:       var(--#{$prefix}border-radius) !default;
+$range-slider-tooltip-border-radius:       var(--#{$prefix}radius-5) !default;
 $range-slider-tooltip-box-shadow:          var(--#{$prefix}box-shadow) !default;
 $range-slider-tooltip-transition:          visibility .15s, opacity .15s ease !default;
 
