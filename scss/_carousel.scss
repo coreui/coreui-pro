@@ -1,7 +1,6 @@
 @use "functions/defaults" as *;
 @use "functions/escape-svg" as *;
 @use "mixins/border-radius" as *;
-@use "mixins/color-mode" as *;
 @use "mixins/focus-ring" as *;
 @use "mixins/ltr-rtl" as *;
 @use "mixins/mask-icon" as *;
@@ -25,6 +24,8 @@ $carousel-indicator-active-bg:       light-dark(var(--#{$prefix}white), var(--#{
 $carousel-indicator-active-opacity:  1 !default;
 $carousel-indicator-transition:      opacity .6s ease !default;
 $carousel-indicator-progress-bg:     var(--#{$prefix}carousel-indicator-active-bg) !default;
+
+$carousel-indicators-margin-bottom:  1rem !default;
 
 $carousel-caption-width:             70% !default;
 $carousel-caption-color:             light-dark(var(--#{$prefix}white), var(--#{$prefix}black)) !default;
@@ -51,12 +52,6 @@ $carousel-tokens: () !default;
 // stylelint-disable scss/dollar-variable-default
 
 // scss-docs-start carousel-css-vars
-// Scroll-snap engine. `items-gap` must carry a length unit: it feeds the
-// `.carousel-item` flex-basis `calc()`, and subtracting a unitless `0` from a
-// percentage is invalid CSS (it would drop the whole declaration and collapse
-// every slide to its content width). `items-peek` only feeds `padding-inline`/
-// `scroll-padding-inline`, so a bare `0` would be valid there, but we keep it
-// unit-bearing for consistency.
 $carousel-tokens: defaults(
   (
     --#{$prefix}carousel-items: 1,
@@ -64,6 +59,33 @@ $carousel-tokens: defaults(
     --#{$prefix}carousel-items-peek: 0px,
     --#{$prefix}carousel-fade-duration: #{$carousel-fade-duration},
     --#{$prefix}carousel-fade-timing: #{$carousel-fade-timing},
+    --#{$prefix}carousel-control-color: #{$carousel-control-color},
+    --#{$prefix}carousel-control-width: #{$carousel-control-width},
+    --#{$prefix}carousel-control-opacity: #{$carousel-control-opacity},
+    --#{$prefix}carousel-control-hover-opacity: #{$carousel-control-hover-opacity},
+    --#{$prefix}carousel-control-transition: #{$carousel-control-transition},
+    --#{$prefix}carousel-control-icon-width: #{$carousel-control-icon-width},
+    --#{$prefix}carousel-control-prev-icon: #{escape-svg($carousel-control-prev-icon-bg)},
+    --#{$prefix}carousel-control-next-icon: #{escape-svg($carousel-control-next-icon-bg)},
+    --#{$prefix}carousel-control-pause-icon: #{escape-svg($carousel-control-pause-icon-bg)},
+    --#{$prefix}carousel-control-play-icon: #{escape-svg($carousel-control-play-icon-bg)},
+    --#{$prefix}carousel-play-pause-size: #{$carousel-play-pause-size},
+    --#{$prefix}carousel-play-pause-icon-width: #{$carousel-play-pause-icon-width},
+    --#{$prefix}carousel-play-pause-bg: #{$carousel-play-pause-bg},
+    --#{$prefix}carousel-indicator-active-bg: #{$carousel-indicator-active-bg},
+    --#{$prefix}carousel-indicator-progress-bg: #{$carousel-indicator-progress-bg},
+    --#{$prefix}carousel-indicator-width: #{$carousel-indicator-width},
+    --#{$prefix}carousel-indicator-height: #{$carousel-indicator-height},
+    --#{$prefix}carousel-indicator-hit-area-height: #{$carousel-indicator-hit-area-height},
+    --#{$prefix}carousel-indicator-spacer: #{$carousel-indicator-spacer},
+    --#{$prefix}carousel-indicator-opacity: #{$carousel-indicator-opacity},
+    --#{$prefix}carousel-indicator-active-opacity: #{$carousel-indicator-active-opacity},
+    --#{$prefix}carousel-indicator-transition: #{$carousel-indicator-transition},
+    --#{$prefix}carousel-indicators-margin-bottom: #{$carousel-indicators-margin-bottom},
+    --#{$prefix}carousel-caption-color: #{$carousel-caption-color},
+    --#{$prefix}carousel-caption-width: #{$carousel-caption-width},
+    --#{$prefix}carousel-caption-padding-y: #{$carousel-caption-padding-y},
+    --#{$prefix}carousel-caption-spacer: #{$carousel-caption-spacer},
   ),
   $carousel-tokens
 );
@@ -78,9 +100,6 @@ $carousel-tokens: defaults(
     position: relative;
   }
 
-  // The scroll viewport. The browser owns sliding, dragging, momentum, and
-  // keyboard scrolling; the JS only layers on autoplay, the controls, and
-  // active-slide syncing.
   .carousel-inner {
     display: flex;
     gap: var(--#{$prefix}carousel-items-gap);
@@ -105,14 +124,9 @@ $carousel-tokens: defaults(
   }
 
   .carousel-item {
-    // The containing block for the slide's own caption; without it every
-    // absolute .carousel-caption resolves against the carousel root and the
-    // captions of all slides stack in one spot.
+    // Anchors the slide's absolute caption.
     position: relative;
-    // `100%` here is `.carousel-inner`'s content box, which `padding-inline`
-    // has already inset by the peek on each side, so the peek must NOT be
-    // subtracted again — doing so makes every slide `2 * peek` too narrow and
-    // the peek lopsided. Only the inter-slide gaps need removing.
+    // 100% is the content box, already inset by the peek — subtract only the gaps.
     flex: 0 0 calc((100% - (var(--#{$prefix}carousel-items) - 1) * var(--#{$prefix}carousel-items-gap)) / var(--#{$prefix}carousel-items));
     min-width: 0;
     scroll-snap-align: start;
@@ -141,9 +155,7 @@ $carousel-tokens: defaults(
   // Alternate transitions
   //
 
-  // Fade can't ride scroll-snap (it stacks slides instead of scrolling), so it
-  // becomes a JavaScript-driven mode: every slide is stacked and the active one
-  // is faded in via a CSS opacity transition.
+  // Fade can't ride scroll-snap: the slides stack and the active one fades in.
   .carousel-fade {
     .carousel-inner {
       display: grid;
@@ -167,8 +179,7 @@ $carousel-tokens: defaults(
   }
 
   //
-  // The overlaid chrome: prev/next controls on the sides, indicators at the
-  // bottom, captions over the slide.
+  // The overlaid chrome
   //
 
   .carousel-control-prev,
@@ -181,21 +192,21 @@ $carousel-tokens: defaults(
     display: flex; // 1. allow flex styles
     align-items: center; // 2. vertically center contents
     justify-content: center; // 3. horizontally center contents
-    width: $carousel-control-width;
+    width: var(--#{$prefix}carousel-control-width);
     padding: 0;
     color: var(--#{$prefix}carousel-control-color);
     text-align: center;
     background: none;
     border: 0;
-    opacity: $carousel-control-opacity;
-    @include transition($carousel-control-transition);
+    opacity: var(--#{$prefix}carousel-control-opacity);
+    @include transition(var(--#{$prefix}carousel-control-transition));
 
     // Hover/focus state
     &:hover,
     &:focus {
       color: var(--#{$prefix}carousel-control-color);
       text-decoration: none;
-      opacity: $carousel-control-hover-opacity;
+      opacity: var(--#{$prefix}carousel-control-hover-opacity);
     }
   }
   .carousel-control-prev {
@@ -215,8 +226,8 @@ $carousel-tokens: defaults(
   .carousel-control-pause-icon,
   .carousel-control-play-icon {
     display: inline-block;
-    width: $carousel-control-icon-width;
-    height: $carousel-control-icon-width;
+    width: var(--#{$prefix}carousel-control-icon-width);
+    height: var(--#{$prefix}carousel-control-icon-width);
     // Painted through the mask, so the arrow follows the control's colour
     // instead of carrying it inside the SVG and being inverted by a filter.
     background-color: var(--#{$prefix}carousel-control-color);
@@ -224,24 +235,19 @@ $carousel-tokens: defaults(
   }
 
   .carousel-control-prev-icon {
-    @include ltr-rtl-value-only("mask-image", escape-svg($carousel-control-prev-icon-bg), escape-svg($carousel-control-next-icon-bg));
+    @include ltr-rtl-value-only("mask-image", var(--#{$prefix}carousel-control-prev-icon), var(--#{$prefix}carousel-control-next-icon));
   }
   .carousel-control-next-icon {
-    @include ltr-rtl-value-only("mask-image", escape-svg($carousel-control-next-icon-bg), escape-svg($carousel-control-prev-icon-bg));
+    @include ltr-rtl-value-only("mask-image", var(--#{$prefix}carousel-control-next-icon), var(--#{$prefix}carousel-control-prev-icon));
   }
   .carousel-control-pause-icon {
-    mask-image: escape-svg($carousel-control-pause-icon-bg);
+    mask-image: var(--#{$prefix}carousel-control-pause-icon);
   }
   .carousel-control-play-icon {
-    mask-image: escape-svg($carousel-control-play-icon-bg);
+    mask-image: var(--#{$prefix}carousel-control-play-icon);
   }
 
-  // Optional play/pause control
-  //
-  // A discoverable toggle so users can stop an autoplaying carousel, as required
-  // by WCAG 2.2.2 (Pause, Stop, Hide). Sits in the end corner next to the
-  // indicators row; the JS toggles `.paused` on it and the button holds both
-  // glyphs — we show whichever icon matches the current state.
+  // Optional stop for autoplay (WCAG 2.2.2); the JS toggles `.paused` on it.
   .carousel-control-play-pause {
     position: absolute;
     inset-block-end: .625rem;
@@ -250,20 +256,20 @@ $carousel-tokens: defaults(
     display: flex;
     align-items: center;
     justify-content: center;
-    width: $carousel-play-pause-size;
-    height: $carousel-play-pause-size;
+    width: var(--#{$prefix}carousel-play-pause-size);
+    height: var(--#{$prefix}carousel-play-pause-size);
     padding: 0;
     color: var(--#{$prefix}carousel-control-color);
     cursor: pointer;
-    background-color: $carousel-play-pause-bg;
+    background-color: var(--#{$prefix}carousel-play-pause-bg);
     border: 0;
     @include border-radius(50%);
-    opacity: $carousel-control-opacity;
-    @include transition($carousel-control-transition);
+    opacity: var(--#{$prefix}carousel-control-opacity);
+    @include transition(var(--#{$prefix}carousel-control-transition));
 
     &:hover,
     &:focus-visible {
-      opacity: $carousel-control-hover-opacity;
+      opacity: var(--#{$prefix}carousel-control-hover-opacity);
     }
 
     &:focus-visible {
@@ -272,8 +278,8 @@ $carousel-tokens: defaults(
 
     .carousel-control-pause-icon,
     .carousel-control-play-icon {
-      width: $carousel-play-pause-icon-width;
-      height: $carousel-play-pause-icon-width;
+      width: var(--#{$prefix}carousel-play-pause-icon-width);
+      height: var(--#{$prefix}carousel-play-pause-icon-width);
     }
 
     .carousel-control-play-icon {
@@ -306,40 +312,37 @@ $carousel-tokens: defaults(
     justify-content: center;
     padding: 0;
     // Use the .carousel-control's width as margin so we don't overlay those
-    margin-right: $carousel-control-width;
-    margin-bottom: 1rem;
-    margin-left: $carousel-control-width;
+    margin-right: var(--#{$prefix}carousel-control-width);
+    margin-bottom: var(--#{$prefix}carousel-indicators-margin-bottom);
+    margin-left: var(--#{$prefix}carousel-control-width);
 
     [data#{$data-infix}target] {
       box-sizing: content-box;
       flex: 0 1 auto;
-      width: $carousel-indicator-width;
-      height: $carousel-indicator-height;
+      width: var(--#{$prefix}carousel-indicator-width);
+      height: var(--#{$prefix}carousel-indicator-height);
       padding: 0;
-      margin-right: $carousel-indicator-spacer;
-      margin-left: $carousel-indicator-spacer;
+      margin-right: var(--#{$prefix}carousel-indicator-spacer);
+      margin-left: var(--#{$prefix}carousel-indicator-spacer);
       text-indent: -999px;
       cursor: pointer;
-      background-color: $carousel-indicator-active-bg;
+      background-color: var(--#{$prefix}carousel-indicator-active-bg);
       background-clip: padding-box;
       border: 0;
       // Use transparent borders to increase the hit area by 10px on top and bottom.
-      border-top: $carousel-indicator-hit-area-height solid transparent;
-      border-bottom: $carousel-indicator-hit-area-height solid transparent;
-      opacity: $carousel-indicator-opacity;
-      @include transition($carousel-indicator-transition);
+      border-top: var(--#{$prefix}carousel-indicator-hit-area-height) solid transparent;
+      border-bottom: var(--#{$prefix}carousel-indicator-hit-area-height) solid transparent;
+      opacity: var(--#{$prefix}carousel-indicator-opacity);
+      @include transition(var(--#{$prefix}carousel-indicator-transition));
     }
 
     .active {
-      opacity: $carousel-indicator-active-opacity;
+      opacity: var(--#{$prefix}carousel-indicator-active-opacity);
     }
   }
 
-  // Autoplay progress: fill the active indicator like a progress bar over the
-  // current slide's interval. The JS adds `.carousel-playing` and sets
-  // `--cui-carousel-interval` while autoplay is running. The fill restarts on
-  // its own each slide because `.active` moves to a fresh indicator, so its
-  // `::after` animation begins from scratch.
+  // The JS adds `.carousel-playing` and sets `--cui-carousel-interval` while
+  // autoplay runs.
   @if $enable-transitions {
     @keyframes carousel-indicator-progress {
       from { inline-size: 0; }
@@ -350,8 +353,7 @@ $carousel-tokens: defaults(
       @media (prefers-reduced-motion: no-preference) {
         position: relative;
         overflow: hidden;
-        // Dim the bar to a track that the full-strength fill grows across.
-        background-color: color-mix(in srgb, #{$carousel-indicator-active-bg} 35%, transparent);
+        background-color: color-mix(in srgb, var(--#{$prefix}carousel-indicator-active-bg) 35%, transparent);
 
         &::after {
           position: absolute;
@@ -372,41 +374,12 @@ $carousel-tokens: defaults(
 
   .carousel-caption {
     position: absolute;
-    right: (100% - $carousel-caption-width) * .5;
-    bottom: $carousel-caption-spacer;
-    left: (100% - $carousel-caption-width) * .5;
-    padding-top: $carousel-caption-padding-y;
-    padding-bottom: $carousel-caption-padding-y;
+    right: calc((100% - var(--#{$prefix}carousel-caption-width)) / 2);
+    bottom: var(--#{$prefix}carousel-caption-spacer);
+    left: calc((100% - var(--#{$prefix}carousel-caption-width)) / 2);
+    padding-block: var(--#{$prefix}carousel-caption-padding-y);
     color: var(--#{$prefix}carousel-caption-color);
     text-align: center;
   }
 }
 
-// Dark mode carousel
-
-// The .carousel-dark opt-in is deliberately independent of the colour scheme,
-// so it pins the dark side of each pair rather than reading the token.
-// scss-docs-start carousel-dark-variables
-$carousel-dark-indicator-active-bg: var(--#{$prefix}black) !default;
-$carousel-dark-caption-color:       var(--#{$prefix}black) !default;
-$carousel-dark-control-color:       var(--#{$prefix}black) !default;
-// scss-docs-end carousel-dark-variables
-
-@mixin carousel-dark() {
-  --#{$prefix}carousel-indicator-active-bg: #{$carousel-dark-indicator-active-bg};
-  --#{$prefix}carousel-caption-color: #{$carousel-dark-caption-color};
-  --#{$prefix}carousel-control-color: #{$carousel-dark-control-color};
-}
-
-@layer components {
-  .carousel-dark {
-    @include carousel-dark();
-  }
-
-  :root {
-    --#{$prefix}carousel-indicator-active-bg: #{$carousel-indicator-active-bg};
-    --#{$prefix}carousel-caption-color: #{$carousel-caption-color};
-    --#{$prefix}carousel-control-color: #{$carousel-control-color};
-    --#{$prefix}carousel-indicator-progress-bg: #{$carousel-indicator-progress-bg};
-  }
-}
