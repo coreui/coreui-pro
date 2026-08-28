@@ -132,14 +132,19 @@ describe('floating labels', () => {
     expect(getComputedStyle(rest.querySelector('.form-control-icon')).color).toBe('rgba(0, 0, 0, 0)')
   })
 
-  // With only the start set, the empty end would stand bare under no label if
-  // its mask showed — each control reveals its own, the arrow says "a second
-  // date belongs here".
-  it('keeps the empty end mask hidden while only the start date is set', () => {
+  // With only the start set and no focus, the empty half shows nothing at all:
+  // the end would stand bare under no label if its mask showed, and the arrow —
+  // mid-field, since the pair flexes 50/50 — would hang over nothing.
+  it('shows only the start date while the rest of the range is empty and blurred', () => {
     const root = build(HOST_DIV, DateRangePicker, { locale: 'en-US', startDate: DATE })
     const [start, end] = root.querySelectorAll('.form-date-time')
     expect(getComputedStyle(start.querySelector('.form-date-time-section')).color).not.toBe('rgba(0, 0, 0, 0)')
     expect(getComputedStyle(end.querySelector('.form-date-time-section')).color).toBe('rgba(0, 0, 0, 0)')
+    expect(getComputedStyle(root.querySelector('.form-control-icon')).color).toBe('rgba(0, 0, 0, 0)')
+  })
+
+  it('shows the arrow once the end date is set', () => {
+    const root = build(HOST_DIV, DateRangePicker, { locale: 'en-US', startDate: DATE, endDate: new Date(2026, 6, 20) })
     expect(getComputedStyle(root.querySelector('.form-control-icon')).color).not.toBe('rgba(0, 0, 0, 0)')
   })
 

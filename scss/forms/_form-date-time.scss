@@ -158,17 +158,16 @@ $form-date-time-tokens: defaults(
       }
     }
 
-    // The arrow follows the group: at rest it would sit alone under the label,
-    // active it separates the pair — "12/31/2026 →" is what says a second date
-    // belongs here while the end keeps its mask hidden.
-    &:not(:focus-within, :has(.form-date-time-filled)) {
-      > .form-control-icon {
-        color: transparent;
-      }
+    // The arrow shows only when there is something on both of its sides: while
+    // the group has focus, or once the end date is set. Blurred with only the
+    // start filled, the fields flex 50/50 and the arrow would hang mid-field
+    // over nothing — an orphan, not a hint.
+    &:not(:focus-within) > .form-control-icon:has(+ .form-date-time:not(.form-date-time-filled)) {
+      color: transparent;
+    }
 
-      ~ label {
-        transform: none;
-      }
+    &:not(:focus-within, :has(.form-date-time-filled)) ~ label {
+      transform: none;
     }
 
     &:focus-within ~ label,

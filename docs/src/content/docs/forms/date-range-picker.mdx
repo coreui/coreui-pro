@@ -122,7 +122,7 @@ Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label 
 
 ## Floating labels
 
-The date range picker supports [floating labels](https://coreui.io/bootstrap/docs/forms/floating-labels/): wrap the component in `.form-floating` and put a `<label>` beside it. One label covers the pair — it floats as soon as either date is set or any part of the field has focus. Each field reveals its own mask: with only the start date set, the empty end keeps its mask hidden and the arrow is what says a second date belongs there.
+The date range picker supports [floating labels](https://coreui.io/bootstrap/docs/forms/floating-labels/): wrap the component in `.form-floating` and put a `<label>` beside it. One label covers the pair — it floats as soon as either date is set or any part of the field has focus. Each field reveals its own mask, and the arrow shows only while you are in the field or once both dates are set — so a half-filled range at rest reads as just the start date.
 
 <Example pro code={`<div class="form-floating">
     <div id="floatingExample" data-coreui-locale="en-US" data-coreui-toggle="date-range-picker"></div>
