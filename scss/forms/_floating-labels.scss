@@ -169,16 +169,19 @@ $form-floating-tokens: defaults(
       }
 
       &:focus-within > .form-control,
-      > .form-control:not(:placeholder-shown) {
+      > .form-control:not(.form-date-time, :placeholder-shown) {
         padding-top: var(--#{$prefix}form-floating-input-padding-t);
         padding-bottom: var(--#{$prefix}form-floating-input-padding-b);
       }
     }
 
+    // `:not(:placeholder-shown)` is vacuously true on the div-based
+    // `.form-date-time`, so it is excluded here; its filled state lives in
+    // forms/_form-date-time.scss, keyed to the JS-managed class instead.
     > label:has(~ .form-control-group:focus-within),
-    > label:has(~ .form-control-group > .form-control:not(:placeholder-shown)),
+    > label:has(~ .form-control-group > .form-control:not(.form-date-time, :placeholder-shown)),
     > .form-control-group:focus-within ~ label,
-    > .form-control-group:has(> .form-control:not(:placeholder-shown)) ~ label {
+    > .form-control-group:has(> .form-control:not(.form-date-time, :placeholder-shown)) ~ label {
       transform: var(--#{$prefix}form-floating-label-transform);
     }
 

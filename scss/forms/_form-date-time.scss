@@ -132,4 +132,38 @@ $form-date-time-tokens: defaults(
       transform: var(--#{$prefix}form-floating-label-transform);
     }
   }
+
+  // The pickers wrap this control in `.form-control-group` — one of them for
+  // Date/Time/DateTime Picker, two side by side for the range picker — so the
+  // direct-child block above never matches there. The group's shared rules in
+  // forms/_floating-labels.scss give it the height; this block re-binds the
+  // states the same way: focus is `:focus-within` on the group, so opening the
+  // calendar from the action button floats the label too, and filled is "any
+  // control inside carries the JS-managed class". At rest the range arrow
+  // (`.form-control-icon`) hides with the masks — without that it would sit
+  // alone under the label.
+  .form-floating > .form-control-group:has(> .form-date-time) {
+    &:focus-within > .form-date-time,
+    &:has(.form-date-time-filled) > .form-date-time {
+      padding-top: var(--#{$prefix}form-floating-input-padding-t);
+      padding-bottom: var(--#{$prefix}form-floating-input-padding-b);
+    }
+
+    &:not(:focus-within, :has(.form-date-time-filled)) {
+      .form-date-time-section,
+      .form-date-time-separator,
+      > .form-control-icon {
+        color: transparent;
+      }
+
+      ~ label {
+        transform: none;
+      }
+    }
+
+    &:focus-within ~ label,
+    &:has(.form-date-time-filled) ~ label {
+      transform: var(--#{$prefix}form-floating-label-transform);
+    }
+  }
 }

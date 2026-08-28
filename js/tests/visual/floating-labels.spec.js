@@ -12,9 +12,13 @@
 import '../../../scss/coreui.scss'
 import Autocomplete from '../../src/autocomplete.js'
 import DateInput from '../../src/date-input.js'
+import DatePicker from '../../src/date-picker.js'
+import DateRangePicker from '../../src/date-range-picker.js'
+import DateTimePicker from '../../src/date-time-picker.js'
 import MultiSelect from '../../src/multi-select.js'
 import NumberInput from '../../src/number-input.js'
 import PasswordInput from '../../src/password-input.js'
+import TimePicker from '../../src/time-picker.js'
 
 const OPTIONS = [{ value: 1, label: 'Angular' }, { value: 2, label: 'Bootstrap' }]
 const DATE = new Date(2026, 6, 14)
@@ -94,8 +98,44 @@ describe('floating labels', () => {
     // has to reach the same structure.
     ['Multi Select over a select',
       () => build(HOST_SELECT, MultiSelect, {}),
-      () => build(HOST_SELECT_SELECTED, MultiSelect, {})]
+      () => build(HOST_SELECT_SELECTED, MultiSelect, {})],
+    // The pickers wrap one date-time control (two for the range) in the same
+    // group; their empty state is the JS-managed class, not :placeholder-shown.
+    ['Date Picker',
+      () => build(HOST_DIV, DatePicker, { locale: 'en-US' }),
+      () => build(HOST_DIV, DatePicker, { locale: 'en-US', date: DATE })],
+    ['Time Picker',
+      () => build(HOST_DIV, TimePicker, { locale: 'en-US' }),
+      () => build(HOST_DIV, TimePicker, { locale: 'en-US', time: new Date(2026, 0, 1, 14, 30) })],
+    ['Date Time Picker',
+      () => build(HOST_DIV, DateTimePicker, { locale: 'en-US' }),
+      () => build(HOST_DIV, DateTimePicker, { locale: 'en-US', date: DATE })],
+    ['Date Range Picker',
+      () => build(HOST_DIV, DateRangePicker, { locale: 'en-US' }),
+      () => build(HOST_DIV, DateRangePicker, { locale: 'en-US', startDate: DATE, endDate: new Date(2026, 6, 20) })]
   ]
+
+  // The masks (and the range picker's arrow) hide at rest so the label has the
+  // field to itself, and come back once it floats.
+  it('hides the picker mask while at rest and reveals it when filled', () => {
+    const rest = build(HOST_DIV, DatePicker, { locale: 'en-US' })
+    const restSection = rest.querySelector('.form-date-time-section')
+    expect(getComputedStyle(restSection).color).toBe('rgba(0, 0, 0, 0)')
+
+    const filled = build(HOST_DIV, DatePicker, { locale: 'en-US', date: DATE })
+    const filledSection = filled.querySelector('.form-date-time-section')
+    expect(getComputedStyle(filledSection).color).not.toBe('rgba(0, 0, 0, 0)')
+  })
+
+  it('hides the range arrow while at rest', () => {
+    const rest = build(HOST_DIV, DateRangePicker, { locale: 'en-US' })
+    expect(getComputedStyle(rest.querySelector('.form-control-icon')).color).toBe('rgba(0, 0, 0, 0)')
+  })
+
+  it('floats the range label once only the start date is set', () => {
+    const root = build(HOST_DIV, DateRangePicker, { locale: 'en-US', startDate: DATE })
+    expect(labelFloats(root)).toBeTrue()
+  })
 
   // The toggle is created by the component, so a wrong data attribute in an
   // example kills it silently while the label keeps floating via the plain-input
