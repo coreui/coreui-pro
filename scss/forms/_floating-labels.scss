@@ -146,6 +146,42 @@ $form-floating-tokens: defaults(
       transform: var(--#{$prefix}form-floating-label-transform);
     }
 
+    // The field components — Password Input, Number Input, Autocomplete, Multi
+    // Select — wrap their control in `.form-control-group`, so every `> .form-control`
+    // rule above misses it and the label never moves. The group takes the height,
+    // and the control inside it takes the padding shift.
+    > .form-control-group {
+      height: var(--#{$prefix}form-floating-height);
+      min-height: var(--#{$prefix}form-floating-height);
+      line-height: var(--#{$prefix}form-floating-line-height);
+
+      // Only the block axis: the group's frame already carries the inline
+      // padding, and restating it on the control indents the text twice.
+      > .form-control {
+        padding-top: var(--#{$prefix}form-floating-padding-y);
+        padding-bottom: var(--#{$prefix}form-floating-padding-y);
+
+        // Hidden until the label is out of the way, exactly as the direct-child
+        // rule above does it — otherwise the two overlap while the field is empty.
+        &::placeholder {
+          color: transparent;
+        }
+      }
+
+      &:focus-within > .form-control,
+      > .form-control:not(:placeholder-shown) {
+        padding-top: var(--#{$prefix}form-floating-input-padding-t);
+        padding-bottom: var(--#{$prefix}form-floating-input-padding-b);
+      }
+    }
+
+    > label:has(~ .form-control-group:focus-within),
+    > label:has(~ .form-control-group > .form-control:not(:placeholder-shown)),
+    > .form-control-group:focus-within ~ label,
+    > .form-control-group:has(> .form-control:not(:placeholder-shown)) ~ label {
+      transform: var(--#{$prefix}form-floating-label-transform);
+    }
+
     > label:has(~ textarea:focus)::after,
     > label:has(~ textarea:not(:placeholder-shown))::after,
     > textarea:focus ~ label::after,

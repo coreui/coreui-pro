@@ -77,6 +77,15 @@ a number field can share a frame with anything else the group holds:
     <input type="number" class="form-control" value="3" aria-label="Quantity" data-coreui-toggle="number-input">
   </div>`} />
 
+## Floating labels
+
+The number input supports [floating labels](https://coreui.io/bootstrap/docs/forms/floating-labels/). Wrap the control in `.form-floating` and put a `<label>` beside it — the stepper buttons ride along with the field.
+
+<Example pro code={`<div class="form-floating">
+    <input class="form-control" type="number" placeholder=" " id="floatingNumberInput" value="42" data-coreui-toggle="number-input">
+    <label for="floatingNumberInput">Quantity</label>
+  </div>`} />
+
 ## Accessibility
 
 The buttons carry labels (`Increase` / `Decrease` by default, both

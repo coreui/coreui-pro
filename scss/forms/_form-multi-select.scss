@@ -109,4 +109,34 @@ $form-multi-select-tokens: defaults(
     }
   }
 
+  // Multi Select has no input to ask, so the float is re-bound to the placeholder
+  // element the component renders only while nothing is selected — the same shape
+  // the date input uses with `.form-date-time-filled`. The shared
+  // `.form-control-group` rules in forms/_floating-labels.scss cover the height;
+  // what is left is the empty state, which they read from `:placeholder-shown`.
+  .form-floating > .form-multi-select {
+    &:not(:focus-within, :has(.form-multi-select-placeholder)),
+    &:focus-within {
+      .form-multi-select-selection {
+        padding-top: var(--#{$prefix}form-floating-input-padding-t);
+        padding-bottom: var(--#{$prefix}form-floating-input-padding-b);
+      }
+    }
+
+    &:not(:focus-within):has(.form-multi-select-placeholder) {
+      .form-multi-select-placeholder {
+        color: transparent;
+      }
+
+      ~ label {
+        transform: none;
+      }
+    }
+
+    &:focus-within ~ label,
+    &:not(:has(.form-multi-select-placeholder)) ~ label {
+      transform: var(--#{$prefix}form-floating-label-transform);
+    }
+  }
+
 }
