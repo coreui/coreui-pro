@@ -139,9 +139,7 @@ $form-date-time-tokens: defaults(
   // forms/_floating-labels.scss give it the height; this block re-binds the
   // states the same way: focus is `:focus-within` on the group, so opening the
   // calendar from the action button floats the label too, and filled is "any
-  // control inside carries the JS-managed class". At rest the range arrow
-  // (`.form-control-icon`) hides with the masks — without that it would sit
-  // alone under the label.
+  // control inside carries the JS-managed class".
   .form-floating > .form-control-group:has(> .form-date-time) {
     &:focus-within > .form-date-time,
     &:has(.form-date-time-filled) > .form-date-time {
@@ -149,9 +147,21 @@ $form-date-time-tokens: defaults(
       padding-bottom: var(--#{$prefix}form-floating-input-padding-b);
     }
 
-    &:not(:focus-within, :has(.form-date-time-filled)) {
+    // Each control reveals its own mask — a control neither focused nor filled
+    // keeps it hidden even while its sibling floats the label. With one control
+    // that is exactly the old group-at-rest state; with two, the range's empty
+    // end no longer stands bare under no label once the start is set.
+    > .form-date-time:not(:focus-within, .form-date-time-filled) {
       .form-date-time-section,
-      .form-date-time-separator,
+      .form-date-time-separator {
+        color: transparent;
+      }
+    }
+
+    // The arrow follows the group: at rest it would sit alone under the label,
+    // active it separates the pair — "12/31/2026 →" is what says a second date
+    // belongs here while the end keeps its mask hidden.
+    &:not(:focus-within, :has(.form-date-time-filled)) {
       > .form-control-icon {
         color: transparent;
       }
