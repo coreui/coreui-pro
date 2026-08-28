@@ -139,4 +139,20 @@ $form-multi-select-tokens: defaults(
     }
   }
 
+  // Label-first. "Has a selection" cannot be asked from the label's side in one
+  // selector — `:has()` does not nest — so the cascade does the logic: float by
+  // default, rest while the placeholder element is present, float again on
+  // focus regardless.
+  .form-floating > label:has(~ .form-multi-select) {
+    transform: var(--#{$prefix}form-floating-label-transform);
+  }
+
+  .form-floating > label:has(~ .form-multi-select .form-multi-select-placeholder) {
+    transform: none;
+  }
+
+  .form-floating > label:has(~ .form-multi-select:focus-within) {
+    transform: var(--#{$prefix}form-floating-label-transform);
+  }
+
 }

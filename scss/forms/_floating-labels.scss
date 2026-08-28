@@ -131,11 +131,11 @@ $form-floating-tokens: defaults(
     }
 
     > label:has(~ .form-control:focus),
-    > label:has(~ .form-control:not(:placeholder-shown)),
+    > label:has(~ .form-control:not(.form-date-time, :placeholder-shown)),
     > label:has(~ .form-control-plaintext),
     > label:has(~ .form-select),
     > .form-control:focus ~ label,
-    > .form-control:not(:placeholder-shown) ~ label,
+    > .form-control:not(.form-date-time, :placeholder-shown) ~ label,
     > .form-control-plaintext ~ label,
     > .form-select ~ label {
       transform: var(--#{$prefix}form-floating-label-transform);

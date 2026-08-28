@@ -133,6 +133,14 @@ $form-date-time-tokens: defaults(
     }
   }
 
+  // The label may sit either side of the control (see forms/_floating-labels.scss)
+  // — the block above catches the label written after it, this one the label
+  // written first, the order the docs use.
+  .form-floating > label:has(~ .form-date-time:focus-within),
+  .form-floating > label:has(~ .form-date-time.form-date-time-filled) {
+    transform: var(--#{$prefix}form-floating-label-transform);
+  }
+
   // Per-field labels: with `startLabel` / `endLabel` set, the range picker
   // wraps each of its controls in its own `.form-floating` inside the group,
   // and the direct-child block above runs the states per field. What is left
@@ -200,5 +208,12 @@ $form-date-time-tokens: defaults(
     &:has(.form-date-time-filled) ~ label {
       transform: var(--#{$prefix}form-floating-label-transform);
     }
+  }
+
+  // Label-first over a picker group. Focus-forward comes from the shared block;
+  // what is missing there is "a following group holds a filled control" — as a
+  // descendant match, because `:has()` cannot nest inside `:has()`.
+  .form-floating > label:has(~ .form-control-group .form-date-time-filled) {
+    transform: var(--#{$prefix}form-floating-label-transform);
   }
 }

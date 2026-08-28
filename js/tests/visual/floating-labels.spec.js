@@ -25,16 +25,19 @@ const DATE = new Date(2026, 6, 14)
 
 let container
 
+let labelFirst = false
+
 const mount = html => {
   container = document.createElement('div')
   container.style.cssText = 'padding: 1rem; width: 420px;'
-  container.innerHTML = `<div class="form-floating">${html}<label for="host">Label</label></div>`
+  const label = '<label for="host">Label</label>'
+  container.innerHTML = `<div class="form-floating">${labelFirst ? label + html : html + label}</div>`
   document.body.append(container)
   return container.querySelector('.form-floating')
 }
 
 const labelFloats = root => getComputedStyle(root.querySelector('label')).transform !== 'none'
-const wrapperHeight = root => Math.round(root.firstElementChild.getBoundingClientRect().height)
+const wrapperHeight = root => Math.round((root.querySelector(':scope > :not(label)')).getBoundingClientRect().height)
 
 // A plain `.form-control` is the reference: whatever height it gets under
 // `.form-floating`, every field component has to match, or the row it sits in
@@ -141,7 +144,7 @@ describe('floating labels', () => {
     document.body.append(container)
 
     new DateRangePicker(container.querySelector('#host'), {
-      locale: 'en-US', startLabel: 'Check-in', endLabel: 'Check-out', ...config
+      locale: 'en-US', floatingLabels: ['Check-in', 'Check-out'], ...config
     })
     return container.querySelector('.form-control-group')
   }
@@ -181,6 +184,22 @@ describe('floating labels', () => {
     expect(inset).toBeLessThanOrEqual(14)
   })
 
+  // The single pickers take the same shape through `floatingLabel` — the
+  // component renders wrapper and label itself, no markup needed.
+  it('renders and floats the single picker label from the floatingLabel option', () => {
+    container = document.createElement('div')
+    container.style.cssText = 'padding: 1rem; width: 420px;'
+    container.innerHTML = '<div id="host"></div>'
+    document.body.append(container)
+
+    new DatePicker(container.querySelector('#host'), { locale: 'en-US', floatingLabel: 'Delivery date', date: DATE })
+    const group = container.querySelector('.form-control-group')
+    const label = group.querySelector('label')
+    expect(label.textContent).toBe('Delivery date')
+    expect(getComputedStyle(label).transform).not.toBe('none')
+    expect(Math.round(group.getBoundingClientRect().height)).toBe(plainHeight)
+  })
+
   // With only the start set and no focus, the empty half shows nothing at all:
   // the end would stand bare under no label if its mask showed, and the arrow —
   // mid-field, since the pair flexes 50/50 — would hang over nothing.
@@ -215,17 +234,31 @@ describe('floating labels', () => {
     expect(Math.abs((b.top + (b.height / 2)) - (g.top + (g.height / 2)))).toBeLessThanOrEqual(1)
   })
 
-  for (const [name, empty, filled] of cases) {
-    it(`leaves the label in place while ${name} is empty`, () => {
-      expect(labelFloats(empty())).toBeFalse()
-    })
+  // The label may sit either side of the control — the docs write it first, the
+  // v5 order still works — so every case runs in both directions.
+  for (const order of ['label after', 'label first']) {
+    describe(order, () => {
+      beforeEach(() => {
+        labelFirst = order === 'label first'
+      })
 
-    it(`floats the label once ${name} has a value`, () => {
-      expect(labelFloats(filled())).toBeTrue()
-    })
+      afterEach(() => {
+        labelFirst = false
+      })
 
-    it(`gives ${name} the same height as a plain control`, () => {
-      expect(wrapperHeight(empty())).toBe(plainHeight)
+      for (const [name, empty, filled] of cases) {
+        it(`leaves the label in place while ${name} is empty`, () => {
+          expect(labelFloats(empty())).toBeFalse()
+        })
+
+        it(`floats the label once ${name} has a value`, () => {
+          expect(labelFloats(filled())).toBeTrue()
+        })
+
+        it(`gives ${name} the same height as a plain control`, () => {
+          expect(wrapperHeight(empty())).toBe(plainHeight)
+        })
+      }
     })
   }
 })

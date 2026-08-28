@@ -122,9 +122,9 @@ Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label 
 
 ## Floating labels
 
-Each field carries its own [floating label](https://coreui.io/bootstrap/docs/forms/floating-labels/): set `startLabel` and `endLabel` and the picker renders a label over each date, floating independently — fill in the check-in date and only its label rises. The label text also becomes the field's accessible name, so the visible and spoken labels stay one thing. No wrapper markup is needed.
+Each field carries its own [floating label](https://coreui.io/bootstrap/docs/forms/floating-labels/): set `floatingLabels` and the picker renders a label over each date, floating independently — fill in the check-in date and only its label rises. The label text also becomes the field's accessible name, so the visible and spoken labels stay one thing. No wrapper markup is needed.
 
-<Example pro code={`<div data-coreui-locale="en-US" data-coreui-start-label="Check-in" data-coreui-end-label="Check-out" data-coreui-toggle="date-range-picker"></div>`} />
+<Example pro code={`<div data-coreui-locale="en-US" data-coreui-floating-labels='["Check-in", "Check-out"]' data-coreui-toggle="date-range-picker"></div>`} />
 
 ## Sizing
 
@@ -300,8 +300,8 @@ attributes work on the picker element too.
 | `container` | string, element, false | `false` | Teleport target for the dropdown. |
 | `disabled` | boolean | `false` | Disables the fields and the popup. |
 | `endDate` | date, string, null | `null` | Initial end of the range. |
-| `endLabel` | string, null | `null` | Renders a floating label over the end field, and becomes its accessible name. |
 | `endName` | string, null | `null` | Name of the end hidden input. |
+| `floatingLabels` | array, null | `null` | Renders a floating label over each field — `['Check-in', 'Check-out']` — which also becomes that field's accessible name. |
 | `indicatorIcon` | string | calendar SVG | Inline SVG rendered by the component (sanitized). |
 | `inputOptions` | object | `{}` | Programmatic escape hatch for date input options. |
 | `locale` | string | browser locale | Drives section order, separators, and calendar labels. |
@@ -313,7 +313,6 @@ attributes work on the picker element too.
 | `separatorIconRtl` | string | mirrored arrow SVG | Inline SVG used when the picker renders in an RTL context. |
 | `size` | string, null | `null` | `'sm'` or `'lg'`. |
 | `startDate` | date, string, null | `null` | Initial start of the range. |
-| `startLabel` | string, null | `null` | Renders a floating label over the start field, and becomes its accessible name. |
 | `startName` | string, null | `null` | Name of the start hidden input. |
 
 ### Methods
