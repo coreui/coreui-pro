@@ -132,6 +132,55 @@ describe('floating labels', () => {
     expect(getComputedStyle(rest.querySelector('.form-control-icon')).color).toBe('rgba(0, 0, 0, 0)')
   })
 
+  // The per-field mode: startLabel / endLabel render a label inside the group
+  // over each date, no wrapper markup. Each floats on its own field's state.
+  const buildTwoLabel = config => {
+    container = document.createElement('div')
+    container.style.cssText = 'padding: 1rem; width: 640px;'
+    container.innerHTML = '<div id="host"></div>'
+    document.body.append(container)
+
+    new DateRangePicker(container.querySelector('#host'), {
+      locale: 'en-US', startLabel: 'Check-in', endLabel: 'Check-out', ...config
+    })
+    return container.querySelector('.form-control-group')
+  }
+
+  const floatsByText = (group, text) =>
+    getComputedStyle([...group.querySelectorAll('label')].find(l => l.textContent === text)).transform !== 'none'
+
+  it('renders a label per range field and floats only the filled one', () => {
+    const group = buildTwoLabel({ startDate: DATE })
+    expect(floatsByText(group, 'Check-in')).toBeTrue()
+    expect(floatsByText(group, 'Check-out')).toBeFalse()
+  })
+
+  it('rests both range labels while the range is empty', () => {
+    const group = buildTwoLabel({})
+    expect(floatsByText(group, 'Check-in')).toBeFalse()
+    expect(floatsByText(group, 'Check-out')).toBeFalse()
+  })
+
+  it('floats both range labels once both dates are set', () => {
+    const group = buildTwoLabel({ startDate: DATE, endDate: new Date(2026, 6, 20) })
+    expect(floatsByText(group, 'Check-in')).toBeTrue()
+    expect(floatsByText(group, 'Check-out')).toBeTrue()
+  })
+
+  it('keeps the per-field-labelled group at a plain control height', () => {
+    const group = buildTwoLabel({ startDate: DATE })
+    expect(Math.round(group.getBoundingClientRect().height)).toBe(plainHeight)
+  })
+
+  // The field keeps its own inline padding, so the group's start padding would
+  // stack under it and indent label and value twice.
+  it('starts the range value at a plain control text offset', () => {
+    const group = buildTwoLabel({ startDate: DATE })
+    const section = group.querySelector('.form-date-time-section')
+    const inset = Math.round(section.getBoundingClientRect().left - group.getBoundingClientRect().left)
+    expect(inset).toBeLessThanOrEqual(14)
+  })
+
   // With only the start set and no focus, the empty half shows nothing at all:
   // the end would stand bare under no label if its mask showed, and the arrow —
   // mid-field, since the pair flexes 50/50 — would hang over nothing.

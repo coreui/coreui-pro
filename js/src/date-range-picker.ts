@@ -19,7 +19,7 @@ import type { ComponentConfig } from './util/config.js'
 import { getWeekSectionsFromLocale } from './util/date-sections.js'
 import { createControlGroupAction } from './util/form-control-group.js'
 import { CLEANER_ICON } from './util/icons.js'
-import { defineJQueryPlugin } from './util/index.js'
+import { defineJQueryPlugin, getUID } from './util/index.js'
 import { sanitizeHtml, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 
 /**
@@ -55,6 +55,7 @@ const CLASS_NAME_INPUT_GROUP = 'form-control-group'
 const CLASS_NAME_PICKER = 'picker'
 const CLASS_NAME_POPUP = 'popup'
 const CLASS_NAME_RANGES = 'date-picker-ranges'
+const CLASS_NAME_FORM_FLOATING = 'form-floating'
 const CLASS_NAME_SEPARATOR = 'form-control-icon'
 const CLASS_NAME_SHOW = 'show'
 
@@ -88,10 +89,12 @@ type DateRangePickerConfig = {
   size: string | null
   calendars: number
   endDate: Date | string | null
+  endLabel: string | null
   endName: string | null
   separatorIcon: string
   separatorIconRtl: string
   startDate: Date | string | null
+  startLabel: string | null
   startName: string | null
 }
 
@@ -107,6 +110,7 @@ const Default: DateRangePickerConfig = {
   container: false,
   disabled: false,
   endDate: null,
+  endLabel: null,
   endName: null,
   indicatorIcon: DEFAULT_INDICATOR_ICON,
   inputOptions: {},
@@ -119,6 +123,7 @@ const Default: DateRangePickerConfig = {
   separatorIconRtl: DEFAULT_SEPARATOR_ICON_RTL,
   size: null,
   startDate: null,
+  startLabel: null,
   startName: null
 }
 
@@ -134,6 +139,7 @@ const DefaultType: Record<string, string> = {
   container: '(string|element|boolean)',
   disabled: 'boolean',
   endDate: '(date|string|null)',
+  endLabel: '(string|null)',
   endName: '(string|null)',
   indicatorIcon: 'string',
   inputOptions: 'object',
@@ -146,6 +152,7 @@ const DefaultType: Record<string, string> = {
   separatorIconRtl: 'string',
   size: '(string|null)',
   startDate: '(date|string|null)',
+  startLabel: '(string|null)',
   startName: '(string|null)'
 }
 
@@ -365,10 +372,29 @@ class DateRangePicker extends BaseComponent {
       inputGroup.classList.add(`${CLASS_NAME_FORM_CONTROL}-${this._config.size}`)
     }
 
-    const start = this._createInput(this._config.startDate, this._config.startName, this._ariaLabel(0))
+    // With a label the field gets its own `.form-floating` inside the group, so
+    // the two labels float independently — the label text also becomes the
+    // field's accessible name, keeping the visible and spoken labels one thing.
+    const appendField = (inputEl: HTMLElement, labelText: string | null) => {
+      if (!labelText) {
+        inputGroup.append(inputEl)
+        return
+      }
+
+      const wrapper = document.createElement('div')
+      wrapper.classList.add(CLASS_NAME_FORM_FLOATING)
+      inputEl.id ||= getUID(`${this.constructor.NAME}-`)
+      const label = document.createElement('label')
+      label.htmlFor = inputEl.id
+      label.textContent = labelText
+      wrapper.append(inputEl, label)
+      inputGroup.append(wrapper)
+    }
+
+    const start = this._createInput(this._config.startDate, this._config.startName, this._config.startLabel ?? this._ariaLabel(0))
     this._startInput = start.input
     this._startInputElement = start.inputEl
-    inputGroup.append(start.inputEl)
+    appendField(start.inputEl, this._config.startLabel)
 
     const separator = document.createElement('span')
     separator.classList.add(CLASS_NAME_SEPARATOR)
@@ -376,10 +402,10 @@ class DateRangePicker extends BaseComponent {
     separator.innerHTML = this._sanitizeIcon(this._resolveSeparatorIcon())
     inputGroup.append(separator)
 
-    const end = this._createInput(this._config.endDate, this._config.endName, this._ariaLabel(1))
+    const end = this._createInput(this._config.endDate, this._config.endName, this._config.endLabel ?? this._ariaLabel(1))
     this._endInput = end.input
     this._endInputElement = end.inputEl
-    inputGroup.append(end.inputEl)
+    appendField(end.inputEl, this._config.endLabel)
 
     // See DatePicker — the bridge from typed values back to the calendar
     EventHandler.on(start.inputEl, DateInput.eventName(DateInput.CHANGE_EVENT_NAME), (event: any) => {
