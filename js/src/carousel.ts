@@ -264,7 +264,7 @@ class Carousel extends BaseComponent {
       to: targetIndex
     })
 
-    if (slideEvent!.defaultPrevented) {
+    if (slideEvent.defaultPrevented) {
       return
     }
 
@@ -577,7 +577,7 @@ class Carousel extends BaseComponent {
       to: toIndex
     })
 
-    if (slideEvent!.defaultPrevented) {
+    if (slideEvent.defaultPrevented) {
       return
     }
 

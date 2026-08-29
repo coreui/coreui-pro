@@ -88,7 +88,7 @@ class Toast extends BaseComponent {
   async show(): Promise<void> {
     const showEvent = EventHandler.trigger(this._element, EVENT_SHOW)
 
-    if (showEvent!.defaultPrevented) {
+    if (showEvent.defaultPrevented) {
       return
     }
 
@@ -112,7 +112,7 @@ class Toast extends BaseComponent {
 
     const hideEvent = EventHandler.trigger(this._element, EVENT_HIDE)
 
-    if (hideEvent!.defaultPrevented) {
+    if (hideEvent.defaultPrevented) {
       return
     }
 

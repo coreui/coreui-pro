@@ -131,7 +131,7 @@ EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, function (
   }
 
   EventHandler.one(target, EVENT_SHOW, showEvent => {
-    if (showEvent!.defaultPrevented) {
+    if (showEvent.defaultPrevented) {
       // only register focus restorer if dialog will actually get shown
       return
     }

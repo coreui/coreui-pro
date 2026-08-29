@@ -40,7 +40,7 @@ class Alert extends BaseComponent {
   async close(): Promise<void> {
     const closeEvent = EventHandler.trigger(this._element, EVENT_CLOSE)
 
-    if (closeEvent!.defaultPrevented) {
+    if (closeEvent.defaultPrevented) {
       return
     }
 

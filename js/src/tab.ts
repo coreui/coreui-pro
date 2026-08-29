@@ -99,7 +99,7 @@ class Tab extends BaseComponent {
 
     const showEvent = EventHandler.trigger(innerElem, EVENT_SHOW, { relatedTarget: active })
 
-    if (showEvent!.defaultPrevented || (hideEvent && hideEvent!.defaultPrevented)) {
+    if (showEvent.defaultPrevented || (hideEvent && hideEvent.defaultPrevented)) {
       return
     }
 
