@@ -18,7 +18,7 @@ import SelectorEngine from './dom/selector-engine.js'
 import Popup from './util/popup.js'
 import type { ComponentConfig } from './util/config.js'
 import { getWeekSectionsFromLocale } from './util/date-sections.js'
-import { createControlGroupAction } from './util/form-control-group.js'
+import { appendControlGroupField, createControlGroupAction } from './util/form-control-group.js'
 import { CLEANER_ICON } from './util/icons.js'
 import { defineJQueryPlugin } from './util/index.js'
 import { sanitizeHtml, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
@@ -73,6 +73,7 @@ type DatePickerConfig = {
   calendarOptions: Record<string, any>
   container: Element | boolean | string
   disabled: boolean
+  floatingLabel: string | null
   indicatorIcon: string
   inputOptions: Record<string, any>
   locale: string
@@ -95,6 +96,7 @@ const Default: DatePickerConfig = {
   container: false,
   date: null,
   disabled: false,
+  floatingLabel: null,
   indicatorIcon: DEFAULT_INDICATOR_ICON,
   inputOptions: {},
   locale: navigator.language,
@@ -116,6 +118,7 @@ const DefaultType: Record<string, string> = {
   container: '(string|element|boolean)',
   date: '(date|string|null)',
   disabled: 'boolean',
+  floatingLabel: '(string|null)',
   indicatorIcon: 'string',
   inputOptions: 'object',
   locale: 'string',
@@ -292,7 +295,7 @@ class DatePicker extends BaseComponent {
     }
 
     const inputEl = document.createElement('div')
-    inputGroup.append(inputEl)
+    appendControlGroupField(inputGroup, inputEl, this._config.floatingLabel, `${this.constructor.NAME}-`)
 
     const action = (className: string, icon: string, label: string) => createControlGroupAction({
       className, disabled: this._config.disabled, icon, label, sanitizeIcon: (value: string) => this._sanitizeIcon(value)
@@ -313,7 +316,7 @@ class DatePicker extends BaseComponent {
       locale: this._config.locale,
       name: this._config.name,
       ...(this._resolveFormat() ? { format: this._resolveFormat() } : {})
-    }, this._config.inputOptions))
+    }, { ...(this._config.floatingLabel ? { ariaLabel: this._config.floatingLabel } : {}), ...this._config.inputOptions }))
 
     // Selection flows panel → field; this is the only bridge back, so a date
     // typed into the field reaches the calendar too. The guard stops the echo

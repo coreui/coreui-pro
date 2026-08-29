@@ -908,6 +908,37 @@ describe('Tooltip', () => {
       })
     })
 
+    it('should hide a delegated tooltip when the cursor leaves the tip element', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = '<div><a href="#" rel="tooltip" title="Another tooltip">trigger</a></div>'
+
+        const containerEl = fixtureEl.querySelector('div')
+        const tooltipContainer = new Tooltip(containerEl, {
+          selector: 'a[rel="tooltip"]',
+          trigger: 'hover'
+        })
+
+        const tooltipEl = containerEl.querySelector('a')
+
+        tooltipEl.addEventListener('shown.coreui.tooltip', () => {
+          const delegated = Tooltip.getInstance(tooltipEl)
+          const leaveTipEvent = createEvent('mouseout')
+          Object.defineProperty(leaveTipEvent, 'relatedTarget', {
+            value: document.body
+          })
+
+          delegated._getTipElement().dispatchEvent(leaveTipEvent)
+        })
+
+        tooltipEl.addEventListener('hidden.coreui.tooltip', () => {
+          tooltipContainer.dispose()
+          resolve()
+        })
+
+        tooltipEl.dispatchEvent(createEvent('mouseover', { bubbles: true }))
+      })
+    })
+
     it('should hide a tooltip when the cursor leaves the tip element', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = '<a href="#" rel="tooltip" title="Another tooltip">trigger</a>'

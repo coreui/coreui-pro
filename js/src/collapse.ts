@@ -158,7 +158,7 @@ class Collapse extends BaseComponent {
     }
 
     const startEvent = EventHandler.trigger(this._element, EVENT_SHOW)
-    if (startEvent!.defaultPrevented) {
+    if (startEvent.defaultPrevented) {
       return
     }
 
@@ -206,7 +206,7 @@ class Collapse extends BaseComponent {
     }
 
     const startEvent = EventHandler.trigger(this._element, EVENT_HIDE)
-    if (startEvent!.defaultPrevented) {
+    if (startEvent.defaultPrevented) {
       return
     }
 

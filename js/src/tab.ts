@@ -12,7 +12,7 @@ import BaseComponent from './base-component.js'
 import EventHandler, { type CoreUIEvent } from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import {
-  defineJQueryPlugin, getNextActiveElement, getTransitionDurationFromElement, isDisabled
+  defineJQueryPlugin, getNextActiveElement, getTransitionDurationFromElement, isDisabled, setAriaAttribute
 } from './util/index.js'
 
 /**
@@ -40,7 +40,6 @@ const END_KEY = 'End'
 
 const CLASS_NAME_ACTIVE = 'active'
 const CLASS_NAME_SHOW = 'show'
-const CLASS_DROPDOWN = 'dropdown'
 
 const SELECTOR_DROPDOWN_TOGGLE = '.dropdown-toggle'
 const SELECTOR_DROPDOWN_MENU = '.dropdown-menu'
@@ -99,7 +98,7 @@ class Tab extends BaseComponent {
 
     const showEvent = EventHandler.trigger(innerElem, EVENT_SHOW, { relatedTarget: active })
 
-    if (showEvent!.defaultPrevented || (hideEvent && hideEvent!.defaultPrevented)) {
+    if (showEvent.defaultPrevented || (hideEvent && hideEvent.defaultPrevented)) {
       return
     }
 
@@ -127,7 +126,7 @@ class Tab extends BaseComponent {
 
     const complete = () => {
       element.removeAttribute('tabindex')
-      element.setAttribute('aria-selected', true as unknown as string)
+      setAriaAttribute(element, 'aria-selected', true)
       this._toggleDropDown(element, true)
       EventHandler.trigger(element, EVENT_SHOWN, {
         relatedTarget: relatedElem
@@ -157,7 +156,7 @@ class Tab extends BaseComponent {
     this._deactivate(SelectorEngine.getElementFromSelector(element)) // Search and deactivate the shown section too
 
     const complete = () => {
-      element.setAttribute('aria-selected', false as unknown as string)
+      setAriaAttribute(element, 'aria-selected', false)
       element.setAttribute('tabindex', '-1')
       this._toggleDropDown(element, false)
       EventHandler.trigger(element, EVENT_HIDDEN, { relatedTarget: relatedElem })
@@ -168,6 +167,12 @@ class Tab extends BaseComponent {
 
   _keydown(event: CoreUIEvent): void {
     if (!([ARROW_LEFT_KEY, ARROW_RIGHT_KEY, ARROW_UP_KEY, ARROW_DOWN_KEY, HOME_KEY, END_KEY].includes(event.key))) {
+      return
+    }
+
+    // Don't hijack modifier+arrow shortcuts (e.g. Alt+Left/Right for browser
+    // history navigation); only the bare keys drive tablist navigation.
+    if (event.altKey || event.ctrlKey || event.metaKey) {
       return
     }
 
@@ -210,7 +215,7 @@ class Tab extends BaseComponent {
     child = this._getInnerElement(child)!
     const isActive = this._elemIsActive(child)
     const outerElem = this._getOuterElement(child)
-    child.setAttribute('aria-selected', isActive as unknown as string)
+    setAriaAttribute(child, 'aria-selected', isActive)
 
     if (outerElem !== child) {
       this._setAttributeIfNotExists(outerElem, 'role', 'presentation')
@@ -242,20 +247,19 @@ class Tab extends BaseComponent {
 
   _toggleDropDown(element: HTMLElement, open: boolean): void {
     const outerElem = this._getOuterElement(element)
-    if (!outerElem.classList.contains(CLASS_DROPDOWN)) {
+    const dropdownToggle = SelectorEngine.findOne(SELECTOR_DROPDOWN_TOGGLE, outerElem)
+    if (!dropdownToggle) {
       return
     }
 
-    const toggle = (selector: string, className: string) => {
-      const element = SelectorEngine.findOne(selector, outerElem)
-      if (element) {
-        element.classList.toggle(className, open)
-      }
+    const dropdownMenu = SelectorEngine.findOne(SELECTOR_DROPDOWN_MENU, outerElem)
+
+    dropdownToggle.classList.toggle(CLASS_NAME_ACTIVE, open)
+    if (dropdownMenu) {
+      dropdownMenu.classList.toggle(CLASS_NAME_SHOW, open)
     }
 
-    toggle(SELECTOR_DROPDOWN_TOGGLE, CLASS_NAME_ACTIVE)
-    toggle(SELECTOR_DROPDOWN_MENU, CLASS_NAME_SHOW)
-    outerElem.setAttribute('aria-expanded', open as unknown as string)
+    setAriaAttribute(dropdownToggle, 'aria-expanded', open)
   }
 
   _setAttributeIfNotExists(element: Element, attribute: string, value: string): void {

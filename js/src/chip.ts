@@ -128,7 +128,7 @@ class Chip extends BaseComponent {
   remove(): void {
     const removeEvent = EventHandler.trigger(this._element, EVENT_REMOVE)
 
-    if (removeEvent!.defaultPrevented) {
+    if (removeEvent.defaultPrevented) {
       return
     }
 
@@ -158,7 +158,7 @@ class Chip extends BaseComponent {
     }
 
     const selectEvent = EventHandler.trigger(this._element, EVENT_SELECT)
-    if (selectEvent!.defaultPrevented) {
+    if (selectEvent.defaultPrevented) {
       return
     }
 
@@ -178,7 +178,7 @@ class Chip extends BaseComponent {
     }
 
     const deselectEvent = EventHandler.trigger(this._element, EVENT_DESELECT)
-    if (deselectEvent!.defaultPrevented) {
+    if (deselectEvent.defaultPrevented) {
       return
     }
 

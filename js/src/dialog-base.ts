@@ -69,7 +69,7 @@ class DialogBase extends BaseComponent {
 
     const showEvent = EventHandler.trigger(this._element, this.constructor.eventName('show'), { relatedTarget })
 
-    if (showEvent!.defaultPrevented) {
+    if (showEvent.defaultPrevented) {
       return
     }
 
@@ -92,7 +92,7 @@ class DialogBase extends BaseComponent {
 
     const hideEvent = EventHandler.trigger(this._element, this.constructor.eventName('hide'))
 
-    if (hideEvent!.defaultPrevented) {
+    if (hideEvent.defaultPrevented) {
       return
     }
 
@@ -200,7 +200,7 @@ class DialogBase extends BaseComponent {
   protected _triggerBackdropTransition(): void {
     const hidePreventedEvent = EventHandler.trigger(this._element, this.constructor.eventName('hidePrevented'))
 
-    if (hidePreventedEvent!.defaultPrevented) {
+    if (hidePreventedEvent.defaultPrevented) {
       return
     }
 

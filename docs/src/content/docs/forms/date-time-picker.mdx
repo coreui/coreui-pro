@@ -68,6 +68,12 @@ Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label 
     <div class="form-text">Local time, in your own time zone.</div>
   </div>`} />
 
+## Floating labels
+
+The date time picker supports [floating labels](https://coreui.io/bootstrap/docs/forms/floating-labels/): set `floatingLabel` and the component renders the label itself — no wrapper markup needed — and the text also becomes the field's accessible name. The mask placeholders stay hidden while the label rests inside the field; focusing any part of the field — the sections or the picker button — floats the label and reveals the mask.
+
+<Example pro code={`<div data-coreui-locale="en-US" data-coreui-floating-label="Appointment" data-coreui-toggle="date-time-picker"></div>`} />
+
 ## Sizing
 
 <Example pro code={`<div class="row mb-3">

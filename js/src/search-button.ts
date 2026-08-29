@@ -118,7 +118,7 @@ class SearchButton extends BaseComponent {
   }
 
   _handleShortcut(event: any): boolean | null {
-    if (this._isDisabled() || event!.defaultPrevented || event.repeat || this._shouldIgnoreShortcut(event)) {
+    if (this._isDisabled() || event.defaultPrevented || event.repeat || this._shouldIgnoreShortcut(event)) {
       return false
     }
 
