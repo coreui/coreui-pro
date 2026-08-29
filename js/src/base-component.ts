@@ -39,6 +39,13 @@ class BaseComponent extends Config {
     this._element = element as HTMLElement
     this._config = this._getConfig(config)
 
+    // Dispose any existing instance bound to this element before registering the new one,
+    // so its event listeners and timers are cleaned up instead of leaking
+    const existingInstance = Data.get(this._element, this.constructor.DATA_KEY)
+    if (existingInstance) {
+      existingInstance.dispose()
+    }
+
     Data.set(this._element, this.constructor.DATA_KEY, this)
   }
 
