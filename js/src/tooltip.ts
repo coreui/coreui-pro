@@ -103,6 +103,10 @@ type TooltipConfig = {
   trigger: string
 }
 
+// Delegated tooltips are created on the fly with their `trigger` forced to
+// `manual`, so the real trigger is stored here for later reference.
+type TooltipInternalConfig = TooltipConfig & { _trigger: string }
+
 const Default: TooltipConfig = {
   allowList: DefaultAllowlist,
   animation: true,
@@ -659,12 +663,7 @@ class Tooltip extends BaseComponent {
           context.toggle()
         })
       } else if (trigger !== TRIGGER_MANUAL) {
-        const eventIn = trigger === TRIGGER_HOVER ?
-          this.constructor.eventName(EVENT_MOUSEENTER) :
-          this.constructor.eventName(EVENT_FOCUSIN)
-        const eventOut = trigger === TRIGGER_HOVER ?
-          this.constructor.eventName(EVENT_MOUSELEAVE) :
-          this.constructor.eventName(EVENT_FOCUSOUT)
+        const [eventIn, eventOut] = this._getTriggerEvents(trigger)
 
         EventHandler.on(this._element, eventIn, this._config.selector as string, event => {
           const context = this._initializeOnDelegatedTarget(event)
@@ -694,9 +693,9 @@ class Tooltip extends BaseComponent {
   // itself, so users can reach interactive content inside it (WCAG 1.4.13).
   // Hover/focus tips get matching leave listeners on the tip element.
   protected _setTipListeners(tip: HTMLElement): void {
-    const { trigger } = this._config
+    const trigger = this._getTrigger()
 
-    if (trigger === TRIGGER_MANUAL || trigger.includes('click')) {
+    if (trigger === TRIGGER_MANUAL || trigger.includes(TRIGGER_CLICK)) {
       return
     }
 
@@ -707,9 +706,7 @@ class Tooltip extends BaseComponent {
 
     for (const name of trigger.split(' ')) {
       if (name === TRIGGER_HOVER || name === TRIGGER_FOCUS) {
-        const eventOut = name === TRIGGER_HOVER ?
-          this.constructor.eventName(EVENT_MOUSELEAVE) :
-          this.constructor.eventName(EVENT_FOCUSOUT)
+        const [, eventOut] = this._getTriggerEvents(name)
         EventHandler.on(tip, eventOut, this._tipEventOut)
       }
     }
@@ -720,13 +717,11 @@ class Tooltip extends BaseComponent {
       return
     }
 
-    const { trigger } = this._config
+    const trigger = this._getTrigger()
 
     for (const name of trigger.split(' ')) {
       if (name === TRIGGER_HOVER || name === TRIGGER_FOCUS) {
-        const eventOut = name === TRIGGER_HOVER ?
-          this.constructor.eventName(EVENT_MOUSELEAVE) :
-          this.constructor.eventName(EVENT_FOCUSOUT)
+        const [, eventOut] = this._getTriggerEvents(name)
         EventHandler.off(tip, eventOut, this._tipEventOut)
       }
     }
@@ -736,6 +731,25 @@ class Tooltip extends BaseComponent {
 
   protected _isInside(element: Node | null): boolean {
     return this._element.contains(element) || Boolean(this.tip?.contains(element))
+  }
+
+  protected _getTrigger(): string {
+    return (this._config as TooltipInternalConfig)._trigger
+  }
+
+  protected _getTriggerEvents(trigger: string): [string, string] {
+    const events: Record<string, [string, string]> = {
+      [TRIGGER_HOVER]: [
+        this.constructor.eventName(EVENT_MOUSEENTER),
+        this.constructor.eventName(EVENT_MOUSELEAVE)
+      ],
+      [TRIGGER_FOCUS]: [
+        this.constructor.eventName(EVENT_FOCUSIN),
+        this.constructor.eventName(EVENT_FOCUSOUT)
+      ]
+    }
+
+    return events[trigger]
   }
 
   protected _setEscapeListener(): void {
@@ -863,6 +877,11 @@ class Tooltip extends BaseComponent {
 
   override _configAfterMerge(config: ComponentConfig): ComponentConfig {
     config.container = config.container === false ? document.body : getElement(config.container)
+
+    // Delegated tooltips are created on the fly with `trigger` set to `manual`,
+    // which makes the real trigger hard to check later. Preserve it here so the
+    // tip listeners know whether the tooltip is hover- or focus-driven.
+    config._trigger = config._trigger || config.trigger
 
     if (typeof config.delay === 'number') {
       config.delay = {
