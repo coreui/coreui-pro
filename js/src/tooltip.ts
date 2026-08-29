@@ -170,7 +170,7 @@ class Tooltip extends BaseComponent {
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     if (typeof computePosition === 'undefined') {
-      throw new TypeError('Bootstrap\'s tooltips require Floating UI (https://floating-ui.com)')
+      throw new TypeError('CoreUI\'s tooltips require Floating UI (https://floating-ui.com)')
     }
 
     super(element, config)
@@ -871,8 +871,8 @@ class Tooltip extends BaseComponent {
       }
     }
 
-    // Coerce number/boolean title and content to strings. `data-bs-title="true"`
-    // / `data-bs-content="false"` are auto-converted to booleans by the data-API,
+    // Coerce number/boolean title and content to strings. `data-coreui-title="true"`
+    // / `data-coreui-content="false"` are auto-converted to booleans by the data-API,
     // which would otherwise fail the (null|string|element|function) type check.
     if (typeof config.title === 'number' || typeof config.title === 'boolean') {
       config.title = config.title.toString()
