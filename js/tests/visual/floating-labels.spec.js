@@ -135,6 +135,22 @@ describe('floating labels', () => {
     expect(getComputedStyle(rest.querySelector('.form-control-icon')).color).toBe('rgba(0, 0, 0, 0)')
   })
 
+  // Search mode renders no placeholder element — a single selection lives in
+  // the search input's placeholder attribute — so the states must come from the
+  // JS-managed filled class, and the resting label must also silence the search
+  // input's own placeholder text.
+  it('rests the label over an empty searchable Multi Select and hides its placeholder', () => {
+    const root = build(HOST_DIV, MultiSelect, { options: OPTIONS, search: 'global' })
+    expect(labelFloats(root)).toBeFalse()
+    const search = root.querySelector('.form-multi-select-search')
+    expect(getComputedStyle(search, '::placeholder').color).toBe('rgba(0, 0, 0, 0)')
+  })
+
+  it('floats the label once a searchable single Multi Select has a selection', () => {
+    const root = build(HOST_DIV, MultiSelect, { multiple: false, options: SELECTED, search: 'global' })
+    expect(labelFloats(root)).toBeTrue()
+  })
+
   // The per-field mode: startLabel / endLabel render a label inside the group
   // over each date, no wrapper markup. Each floats on its own field's state.
   const buildTwoLabel = config => {

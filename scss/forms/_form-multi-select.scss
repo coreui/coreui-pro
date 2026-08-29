@@ -109,22 +109,27 @@ $form-multi-select-tokens: defaults(
     }
   }
 
-  // Multi Select has no input to ask, so the float is re-bound to the placeholder
-  // element the component renders only while nothing is selected — the same shape
-  // the date input uses with `.form-date-time-filled`. The shared
-  // `.form-control-group` rules in forms/_floating-labels.scss cover the height;
-  // what is left is the empty state, which they read from `:placeholder-shown`.
+  // Multi Select has no input to ask, so the float is re-bound to the JS-managed
+  // `.form-multi-select-filled` on the component itself — the same shape the
+  // date input uses with `.form-date-time-filled`, and the only signal that
+  // covers search mode, where a single selection lives in the search input's
+  // placeholder attribute and the placeholder element never renders. The shared
+  // `.form-control-group` rules in forms/_floating-labels.scss cover the height.
   .form-floating > .form-multi-select {
-    &:not(:focus-within, :has(.form-multi-select-placeholder)),
-    &:focus-within {
+    &:focus-within,
+    &.form-multi-select-filled {
       .form-multi-select-selection {
         padding-top: var(--#{$prefix}form-floating-input-padding-t);
         padding-bottom: var(--#{$prefix}form-floating-input-padding-b);
       }
     }
 
-    &:not(:focus-within):has(.form-multi-select-placeholder) {
+    &:not(:focus-within, .form-multi-select-filled) {
       .form-multi-select-placeholder {
+        color: transparent;
+      }
+
+      .form-multi-select-search::placeholder {
         color: transparent;
       }
 
@@ -134,24 +139,15 @@ $form-multi-select-tokens: defaults(
     }
 
     &:focus-within ~ label,
-    &:not(:has(.form-multi-select-placeholder)) ~ label {
+    &.form-multi-select-filled ~ label {
       transform: var(--#{$prefix}form-floating-label-transform);
     }
   }
 
-  // Label-first. "Has a selection" cannot be asked from the label's side in one
-  // selector — `:has()` does not nest — so the cascade does the logic: float by
-  // default, rest while the placeholder element is present, float again on
-  // focus regardless.
-  .form-floating > label:has(~ .form-multi-select) {
-    transform: var(--#{$prefix}form-floating-label-transform);
-  }
-
-  .form-floating > label:has(~ .form-multi-select .form-multi-select-placeholder) {
-    transform: none;
-  }
-
-  .form-floating > label:has(~ .form-multi-select:focus-within) {
+  // Label-first — the filled state is a class on the element itself, so both
+  // directions read it plainly.
+  .form-floating > label:has(~ .form-multi-select:focus-within),
+  .form-floating > label:has(~ .form-multi-select.form-multi-select-filled) {
     transform: var(--#{$prefix}form-floating-label-transform);
   }
 
