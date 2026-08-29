@@ -1921,6 +1921,28 @@ Multi Select's option indicators moved with it — they render as a decorative
   longer adds a `-sm` class to the spinner it injects; the spinner follows the
   button's font size, so it now scales with `.btn-sm` and `.btn-lg`.
 
+#### Callout
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`.callout` and its `.callout-{color}` modifiers are gone.** The base class
+  was padding, margin, a border and a radius, and the modifier only set the
+  colour of the left edge, so the whole family is utilities:
+  `<div class="p-3 my-3 border rounded border-start-4 border-start-info">`.
+  The `--cui-callout-*` tokens and the `$callout-*` Sass variables go with it.
+
+- **The base class never stood on its own.** `.callout` read
+  `--cui-callout-border-left-color`, which nothing declared — only the modifiers
+  set it — so a callout without a colour class drew its left edge in
+  `currentColor`. The docs called the modifier "required" to work around it.
+
+- **A tinted callout pairs `.theme-{color}` with `.theme-subtle`.** Those
+  utilities colour the background and the text from the theme slots, which the
+  component never read — `.callout` predates the theme system and was the last
+  component still generating its own `-{color}` family from a Sass map.
+  `.theme-border` cannot carry the accent edge, though: it emits the `border`
+  shorthand after the width utilities, so it resets `border-inline-start-width`.
+
+
 ### Helpers
 
 - **`.link-{color}` is gone; a theme class colours a link.** Reboot resolves a
@@ -3077,6 +3099,15 @@ Five names are now registered with
   must opt out the same way, with `at-property: false` in its `$utilities` entry.
 - Compiled output is otherwise byte-identical — the five `@property` blocks are
   the whole diff.
+
+#### Per-side border colour utilities read tokens
+
+`.border-top-{color}`, `.border-end-{color}`, `.border-bottom-{color}` and
+`.border-start-{color}` compiled the colour to a literal hex, while the
+all-sides `.border-{color}` emitted `var(--cui-{color})`. Overriding a theme
+colour at runtime moved one and not the other. All five read the token now, so
+`.border-start-info` follows `--cui-info` the way `.border-info` already did.
+The class names and the set of colours are unchanged.
 
 #### The CSS Grid ships, and its responsive classes are container queries
 
