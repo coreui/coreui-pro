@@ -52,9 +52,11 @@ $callout-tokens: defaults(
   }
 
   // scss-docs-start callout-modifiers
-  @each $state in map.keys($theme-colors) {
-    .callout-#{$state} {
-      @include theme-tokens($state);
+  @if $enable-deprecated-classes {
+    @each $state in map.keys($theme-colors) {
+      .callout-#{$state} {
+        @include theme-tokens($state);
+      }
     }
   }
   // scss-docs-end callout-modifiers

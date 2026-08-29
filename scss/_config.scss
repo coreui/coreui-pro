@@ -34,6 +34,12 @@ $enable-rtl:                  true !default;
 // `.form-switch` and friends. Deprecated in v6, removed in v7; set to `false` to
 // leave it out of the build once your markup uses `.check` / `.radio` / `.switch`.
 $enable-deprecated-form-check: true !default;
+// The v5 colour modifiers — `.alert-{color}`, `.btn-{color}`, `.btn-outline-{color}`,
+// `.btn-ghost-{color}`, `.callout-{color}`, `.chip-{color}` and
+// `.list-group-item-{color}`. Each is an alias of the `.theme-{color}` class that
+// replaces it. Deprecated in v6, removed in v7; set to `false` to leave them out of
+// the build once your markup uses the theme classes.
+$enable-deprecated-classes:   true !default;
 $enable-dark-mode:            true !default;
 $color-mode-type:             data !default; // `data` or `media-query`
 

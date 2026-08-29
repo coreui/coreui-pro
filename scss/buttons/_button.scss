@@ -235,8 +235,10 @@ $btn-check-deprecated: ".btn-check:not(#{$btn-variant-selectors})" !default;
   $infix: if(sass($variant == "solid"): ""; else: "#{$variant}-");
   $selectors: (string.unquote(".btn-#{$variant}"));
 
-  @each $color in map.keys($theme-colors) {
-    $selectors: list.append($selectors, string.unquote(".btn-#{$infix}#{$color}"), comma);
+  @if $enable-deprecated-classes {
+    @each $color in map.keys($theme-colors) {
+      $selectors: list.append($selectors, string.unquote(".btn-#{$infix}#{$color}"), comma);
+    }
   }
 
   @return $selectors;
@@ -405,21 +407,25 @@ $btn-check-deprecated: ".btn-check:not(#{$btn-variant-selectors})" !default;
       @include button-variant($variant);
     }
   }
+  // scss-docs-end btn-variant-loops
 
-  @each $color in map.keys($theme-colors) {
-    $selectors: (string.unquote(".btn-#{$color}"));
+  // scss-docs-start btn-deprecated-modifiers
+  @if $enable-deprecated-classes {
+    @each $color in map.keys($theme-colors) {
+      $selectors: (string.unquote(".btn-#{$color}"));
 
-    @each $variant, $_ in $button-variants {
-      @if $variant != "solid" {
-        $selectors: list.append($selectors, string.unquote(".btn-#{$variant}-#{$color}"), comma);
+      @each $variant, $_ in $button-variants {
+        @if $variant != "solid" {
+          $selectors: list.append($selectors, string.unquote(".btn-#{$variant}-#{$color}"), comma);
+        }
+      }
+
+      #{$selectors} {
+        @include theme-tokens($color);
       }
     }
-
-    #{$selectors} {
-      @include theme-tokens($color);
-    }
   }
-  // scss-docs-end btn-variant-loops
+  // scss-docs-end btn-deprecated-modifiers
 
   .btn-transparent {
     --#{$prefix}btn-active-border-color: transparent;

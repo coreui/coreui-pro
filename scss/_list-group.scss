@@ -227,9 +227,11 @@ $list-group-tokens: defaults(
   // Add modifier classes to change text and background color on individual items.
   // Organizationally, this must come after the `:hover` states.
 
-  @each $state in map.keys($theme-colors) {
-    .list-group-item-#{$state} {
-      @include theme-tokens($state);
+  @if $enable-deprecated-classes {
+    @each $state in map.keys($theme-colors) {
+      .list-group-item-#{$state} {
+        @include theme-tokens($state);
+      }
     }
   }
   // scss-docs-end list-group-modifiers

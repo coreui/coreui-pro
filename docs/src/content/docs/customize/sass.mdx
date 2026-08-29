@@ -251,7 +251,7 @@ Style variants follow the same pattern in `$<component>-variants`: each entry na
 
 The loop turns every entry into a `.{component}-{variant}` class that re-points the component's tokens at the slots:
 
-<ScssDocs file="scss/_alert.scss" capture="alert-modifiers" />
+<ScssDocs file="scss/_alert.scss" capture="alert-variant-loop" />
 
 Add your own variant by merging an entry — the value side names a `--cui-theme-*` slot, so the variant follows every theme color automatically:
 

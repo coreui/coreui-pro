@@ -434,9 +434,12 @@ Sass variables set these defaults at build time and are removed in v7. The CSS v
 
 ### Sass loops
 
+<DeprecatedIn version="6.0.0" />
+
 Loop that generates the [deprecated colour classes](#deprecated-markup) for
 `.list-group-item`s. Each class sets the same generic `--cui-theme-*` tokens that
 `.theme-{color}` sets, which is why the two spellings render identically — the item,
-its `.active` state and `.list-group-item-action` all read those tokens directly.
+its `.active` state and `.list-group-item-action` all read those tokens directly. Set
+`$enable-deprecated-classes` to `false` to leave them out of the build.
 
 <ScssDocs file="scss/_list-group.scss" capture="list-group-modifiers" />

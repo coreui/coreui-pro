@@ -285,9 +285,11 @@ $chip-outline-tokens: defaults(
   // scss-docs-start chip-modifiers
   // The variant sets the theme tokens and lets the base .chip tokens read
   // them, the way the alert and table variants do.
-  @each $state in map.keys($theme-colors) {
-    .chip-#{$state} {
-      @include theme-tokens($state);
+  @if $enable-deprecated-classes {
+    @each $state in map.keys($theme-colors) {
+      .chip-#{$state} {
+        @include theme-tokens($state);
+      }
     }
   }
   // scss-docs-end chip-modifiers

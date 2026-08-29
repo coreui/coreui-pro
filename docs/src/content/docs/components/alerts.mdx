@@ -294,6 +294,14 @@ Each entry in the variants map names the theme role every token reads, so adding
 
 ### Sass loops
 
-Loops that create the modifier classes: one points each alert's tokens at the matching theme color, the other at the roles a variant reads.
+The loop that turns every entry of the variants map into a `.alert-{variant}` class, re-pointing the alert's tokens at the roles that variant names.
+
+<ScssDocs file="scss/_alert.scss" capture="alert-variant-loop" />
+
+#### Deprecated color classes
+
+<DeprecatedIn version="6.0.0" />
+
+The loop that generates the [deprecated color classes](#deprecated-markup), pointing each one at the matching theme color. Set `$enable-deprecated-classes` to `false` to leave them out of the build.
 
 <ScssDocs file="scss/_alert.scss" capture="alert-modifiers" />
