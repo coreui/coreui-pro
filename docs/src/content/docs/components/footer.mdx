@@ -6,18 +6,14 @@ otherFrameworks:
   - footer
 ---
 
-## How it works
+## Basic example
 
-Here's what you need to know before getting started with the aside menu:
+The footer component is dropped in version v6 as it can be replicated with utilities. Please check examples of how to build a page footer out of layout, spacing, background, and border utilities.
 
-- Bootstrap footer requires a wrapping `.footer`.
-
-## Examples
-
-<Example code={`<footer class="footer">
+<Example code={`<footer class="d-flex flex-wrap align-items-center justify-content-between bg-3 border-top px-3 py-2">
     <div>
       <a href="https://coreui.io">CoreUI</a>
-      <span>&copy; 2022 creativeLabs.</span>
+      <span>&copy; 2026 creativeLabs.</span>
     </div>
     <div>
       <span>Powered by</span>
@@ -25,18 +21,22 @@ Here's what you need to know before getting started with the aside menu:
     </div>
   </footer>`} />
 
-## Customizing
+## Pinning the footer
 
-### CSS variables
+`.sticky-bottom` keeps the footer at the bottom of the viewport while the rest of the page scrolls, and `.fixed-bottom` takes it out of the flow entirely. Both replace what `.footer-sticky` and `.footer-fixed` used to do.
 
-Footers use local CSS variables on `.footer` for enhanced real-time customization.
+## Custom Bootstrap footers
 
-<ScssDocs file="scss/_footer.scss" capture="footer-css-vars" />
+Swap the background and border utilities to change the look, or drop them entirely for a footer that sits flush with the page.
 
-### Sass variables
-
-<DeprecatedIn version="6.0.0" />
-
-Sass variables set these defaults at build time and are removed in v7. The CSS variables above reach the same values without recompiling, and can be set on a single element.
-
-<ScssDocs file="scss/_footer.scss" capture="footer-variables" />
+<Example code={`<footer class="d-flex flex-wrap align-items-center justify-content-between gap-3 bg-black text-white px-3 py-4" data-coreui-theme="dark">
+    <div>
+      <a href="https://coreui.io">CoreUI</a>
+      <span>&copy; 2026 creativeLabs.</span>
+    </div>
+    <ul class="list-unstyled d-flex gap-3 mb-0">
+      <li><a href="#">Docs</a></li>
+      <li><a href="#">Pricing</a></li>
+      <li><a href="#">Support</a></li>
+    </ul>
+  </footer>`} />
