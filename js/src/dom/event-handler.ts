@@ -102,6 +102,7 @@ const nativeEvents = new Set([
   'error',
   'abort',
   'scroll',
+  'scrollend',
   'toggle',
   'beforematch'
 ])
@@ -258,6 +259,48 @@ function getTypeEvent(event: string): string {
   return customEvents[event] || event
 }
 
+function trigger(element: EventTarget, event: string, args?: Record<string, unknown>): CoreUIEvent
+function trigger(element: EventTarget | null, event: string, args?: Record<string, unknown>): CoreUIEvent | null
+function trigger(element: EventTarget | null, event: string, args?: Record<string, unknown>): CoreUIEvent | null {
+  if (typeof event !== 'string' || !element) {
+    return null
+  }
+
+  const $ = getjQuery()
+  const typeEvent = getTypeEvent(event)
+  const inNamespace = event !== typeEvent
+
+  let jQueryEvent = null
+  let bubbles = true
+  let nativeDispatch = true
+  let defaultPrevented = false
+
+  if (inNamespace && $) {
+    jQueryEvent = $.Event(event, args)
+
+    $(element).trigger(jQueryEvent)
+    bubbles = !jQueryEvent.isPropagationStopped()
+    nativeDispatch = !jQueryEvent.isImmediatePropagationStopped()
+    defaultPrevented = jQueryEvent.isDefaultPrevented()
+  }
+
+  const evt = hydrateObj(new Event(event, { bubbles, cancelable: true }), args)
+
+  if (defaultPrevented) {
+    evt.preventDefault()
+  }
+
+  if (nativeDispatch) {
+    element.dispatchEvent(evt)
+  }
+
+  if (evt.defaultPrevented && jQueryEvent) {
+    jQueryEvent.preventDefault()
+  }
+
+  return evt
+}
+
 const EventHandler = {
   on(element: EventTarget | null, event: string, handler?: string | EventCallable, delegationFunction?: EventCallable): void {
     addHandler(element as Element, event, handler, delegationFunction, false)
@@ -310,45 +353,8 @@ const EventHandler = {
     }
   },
 
-  trigger(element: EventTarget | null, event: string, args?: Record<string, unknown>): CoreUIEvent | null {
-    if (typeof event !== 'string' || !element) {
-      return null
-    }
-
-    const $ = getjQuery()
-    const typeEvent = getTypeEvent(event)
-    const inNamespace = event !== typeEvent
-
-    let jQueryEvent = null
-    let bubbles = true
-    let nativeDispatch = true
-    let defaultPrevented = false
-
-    if (inNamespace && $) {
-      jQueryEvent = $.Event(event, args)
-
-      $(element).trigger(jQueryEvent)
-      bubbles = !jQueryEvent.isPropagationStopped()
-      nativeDispatch = !jQueryEvent.isImmediatePropagationStopped()
-      defaultPrevented = jQueryEvent.isDefaultPrevented()
-    }
-
-    const evt = hydrateObj(new Event(event, { bubbles, cancelable: true }), args)
-
-    if (defaultPrevented) {
-      evt.preventDefault()
-    }
-
-    if (nativeDispatch) {
-      element.dispatchEvent(evt)
-    }
-
-    if (evt.defaultPrevented && jQueryEvent) {
-      jQueryEvent.preventDefault()
-    }
-
-    return evt
-  }
+  // `isolatedDeclarations` can't infer a shorthand property — the assertion carries the declared type
+  trigger: trigger as typeof trigger
 }
 
 function hydrateObj<T extends object>(obj: T, meta: Record<string, unknown> = {}): T & Record<string, any> {

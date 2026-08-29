@@ -159,7 +159,7 @@ class ChipSet extends BaseComponent {
       relatedTarget: this._input ?? null
     })
 
-    if (addEvent!.defaultPrevented) {
+    if (addEvent.defaultPrevented) {
       return null
     }
 
@@ -202,7 +202,7 @@ class ChipSet extends BaseComponent {
       relatedTarget: this._input ?? null
     })
 
-    if (removeEvent!.defaultPrevented) {
+    if (removeEvent.defaultPrevented) {
       return false
     }
 

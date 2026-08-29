@@ -249,7 +249,7 @@ class Menu extends BaseComponent {
 
     const showEvent = EventHandler.trigger(this._element, this.constructor.eventName('show'), relatedTarget)
 
-    if (showEvent!.defaultPrevented) {
+    if (showEvent.defaultPrevented) {
       return
     }
 
@@ -325,7 +325,7 @@ class Menu extends BaseComponent {
 
   protected _completeHide(relatedTarget: Record<string, unknown>): void {
     const hideEvent = EventHandler.trigger(this._element, this.constructor.eventName('hide'), relatedTarget)
-    if (hideEvent!.defaultPrevented) {
+    if (hideEvent.defaultPrevented) {
       return
     }
 
