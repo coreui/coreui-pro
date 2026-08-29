@@ -72,6 +72,7 @@ const CLASS_NAME_DISABLED = 'disabled'
 const CLASS_NAME_HEADER = 'combobox-header'
 const CLASS_NAME_INPUT_GROUP = 'form-control-group'
 const CLASS_NAME_SELECT = 'form-multi-select'
+const CLASS_NAME_SELECT_FILLED = 'form-multi-select-filled'
 const CLASS_NAME_SELECT_ALL = 'combobox-all'
 const CLASS_NAME_SELECT_ALL_WITH_CHECKBOX = 'combobox-all-with-checkbox'
 const CLASS_NAME_OPTGROUP_LABEL_WITH_CHECKBOX = 'combobox-optgroup-label-with-checkbox'
@@ -1191,6 +1192,12 @@ class MultiSelect extends Combobox {
   _updateSelection(): void {
     const selection = SelectorEngine.findOne(SELECTOR_SELECTION, this._wrapperElement)!
     const search = SelectorEngine.findOne(SELECTOR_SEARCH, this._wrapperElement)
+
+    // The DOM does not otherwise encode "something is selected" once search is
+    // on — a single selection lives in the search input's placeholder attribute
+    // — and the floating label needs the state, the way the date-time field
+    // carries `.form-date-time-filled`.
+    this._wrapperElement.classList.toggle(CLASS_NAME_SELECT_FILLED, this._selected.length > 0)
 
     if (this._selected.length === 0 && !this._config.search) {
       this._renderEmptySelection(selection)

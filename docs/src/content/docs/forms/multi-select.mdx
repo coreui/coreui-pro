@@ -396,6 +396,20 @@ We use the following JavaScript to set up our multi-select:
 
 <Code code={multiSelectIndeterminate} lang="js" />
 
+## Floating labels
+
+Multi Select supports [floating labels](https://coreui.io/bootstrap/docs/forms/floating-labels/). Wrap the component in `.form-floating` and put a `<label>` beside it. It has no input to report emptiness, so the label floats on focus and on the first selection, and the component's `placeholder` is hidden while the label rests inside the field.
+
+<Example pro code={`<div class="form-floating">
+    <label for="floatingMultiSelect">Frameworks</label>
+    <select id="floatingMultiSelect" data-coreui-multi-select multiple>
+      <option value="0">Angular</option>
+      <option value="1">Bootstrap</option>
+      <option value="2">React.js</option>
+      <option value="3">Vue.js</option>
+    </select>
+  </div>`} />
+
 ## Sizing
 
 The frame carries the size. Add `.form-control-sm` or `.form-control-lg` to the `<select>` — the component copies the element's classes onto the `.form-control-group` it builds, so the field matches our similarly sized text inputs.

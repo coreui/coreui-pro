@@ -120,6 +120,12 @@ Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label 
     <div class="form-text">Both dates are included in the report.</div>
   </div>`} />
 
+## Floating labels
+
+Each field carries its own [floating label](https://coreui.io/bootstrap/docs/forms/floating-labels/): set `floatingLabels` and the picker renders a label over each date, floating independently — fill in the check-in date and only its label rises. The label text also becomes the field's accessible name, so the visible and spoken labels stay one thing. No wrapper markup is needed.
+
+<Example pro code={`<div data-coreui-locale="en-US" data-coreui-floating-labels='["Check-in", "Check-out"]' data-coreui-toggle="date-range-picker"></div>`} />
+
 ## Sizing
 
 <Example pro code={`<div class="row mb-3">
@@ -295,6 +301,7 @@ attributes work on the picker element too.
 | `disabled` | boolean | `false` | Disables the fields and the popup. |
 | `endDate` | date, string, null | `null` | Initial end of the range. |
 | `endName` | string, null | `null` | Name of the end hidden input. |
+| `floatingLabels` | array, null | `null` | Renders a floating label over each field — `['Check-in', 'Check-out']` — which also becomes that field's accessible name. |
 | `indicatorIcon` | string | calendar SVG | Inline SVG rendered by the component (sanitized). |
 | `inputOptions` | object | `{}` | Programmatic escape hatch for date input options. |
 | `locale` | string | browser locale | Drives section order, separators, and calendar labels. |

@@ -9,6 +9,9 @@
  * --------------------------------------------------------------------------
  */
 
+import { getUID } from './index.js'
+
+const CLASS_NAME_FORM_FLOATING = 'form-floating'
 const CLASS_NAME_GROUP = 'form-control-group'
 const CLASS_NAME_FORM_CONTROL = 'form-control'
 
@@ -80,6 +83,34 @@ type ActionOptions = {
  * @param {object} options The button's class, icon, accessible label, disabled state and the icon sanitizer.
  * @returns {HTMLButtonElement} The button.
  */
+/**
+ * Appends a field to the group — wrapped in its own `.form-floating` with a
+ * rendered `<label>` when `floatingLabel` is set, so a generated frame can
+ * carry a floating label without any wrapper markup from the author. The
+ * label text is the visible half; passing it on as the field's accessible
+ * name is the caller's job, so the two stay one thing.
+ * @param {HTMLElement} group The `.form-control-group` frame.
+ * @param {HTMLElement} field The control to append.
+ * @param {string | null} floatingLabel The label text, or null to append bare.
+ * @param {string} uidPrefix Prefix for the generated id the label points at.
+ */
+export const appendControlGroupField = (group: HTMLElement, field: HTMLElement, floatingLabel: string | null, uidPrefix: string): void => {
+  if (!floatingLabel) {
+    group.append(field)
+    return
+  }
+
+  const wrapper = document.createElement('div')
+  wrapper.classList.add(CLASS_NAME_FORM_FLOATING)
+  field.id ||= getUID(uidPrefix)
+  const label = document.createElement('label')
+  label.htmlFor = field.id
+  label.textContent = floatingLabel
+  // Label first — a screen reader announces it before the field's value.
+  wrapper.append(label, field)
+  group.append(wrapper)
+}
+
 export const createControlGroupAction = (options: ActionOptions): HTMLButtonElement => {
   const button = document.createElement('button')
   button.classList.add(options.className)

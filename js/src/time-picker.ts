@@ -16,7 +16,7 @@ import Popup from './util/popup.js'
 import TimeSelection from './util/time-selection.js'
 import { sanitizeHtml, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 import type { ComponentConfig } from './util/config.js'
-import { createControlGroupAction } from './util/form-control-group.js'
+import { appendControlGroupField, createControlGroupAction } from './util/form-control-group.js'
 import { CLEANER_ICON } from './util/icons.js'
 import { defineJQueryPlugin } from './util/index.js'
 
@@ -65,6 +65,7 @@ type TimePickerConfig = {
   cleanerIcon: string
   container: Element | boolean | string
   disabled: boolean
+  floatingLabel: string | null
   indicatorIcon: string
   inputOptions: Record<string, any>
   locale: string
@@ -85,6 +86,7 @@ const Default: TimePickerConfig = {
   cleanerIcon: CLEANER_ICON,
   container: false,
   disabled: false,
+  floatingLabel: null,
   indicatorIcon: DEFAULT_INDICATOR_ICON,
   inputOptions: {},
   locale: navigator.language,
@@ -105,6 +107,7 @@ const DefaultType: Record<string, string> = {
   cleanerIcon: 'string',
   container: '(string|element|boolean)',
   disabled: 'boolean',
+  floatingLabel: '(string|null)',
   indicatorIcon: 'string',
   inputOptions: 'object',
   locale: 'string',
@@ -262,7 +265,7 @@ class TimePicker extends BaseComponent {
     }
 
     const inputEl = document.createElement('div')
-    inputGroup.append(inputEl)
+    appendControlGroupField(inputGroup, inputEl, this._config.floatingLabel, `${this.constructor.NAME}-`)
 
     const action = (className: string, icon: string, label: string) => createControlGroupAction({
       className, disabled: this._config.disabled, icon, label, sanitizeIcon: (value: string) => this._sanitizeIcon(value)
@@ -282,7 +285,7 @@ class TimePicker extends BaseComponent {
       disabled: this._config.disabled,
       locale: this._config.locale,
       name: this._config.name
-    }, this._config.inputOptions))
+    }, { ...(this._config.floatingLabel ? { ariaLabel: this._config.floatingLabel } : {}), ...this._config.inputOptions }))
 
     // See DatePicker — the bridge from a typed value back to the panel
     EventHandler.on(inputEl, TimeInput.eventName(TimeInput.CHANGE_EVENT_NAME), (event: any) => {

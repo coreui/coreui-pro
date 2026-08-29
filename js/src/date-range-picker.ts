@@ -15,9 +15,9 @@ import DateInput from './date-input.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import Popup from './util/popup.js'
+import { appendControlGroupField, createControlGroupAction } from './util/form-control-group.js'
 import type { ComponentConfig } from './util/config.js'
 import { getWeekSectionsFromLocale } from './util/date-sections.js'
-import { createControlGroupAction } from './util/form-control-group.js'
 import { CLEANER_ICON } from './util/icons.js'
 import { defineJQueryPlugin } from './util/index.js'
 import { sanitizeHtml, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
@@ -89,6 +89,7 @@ type DateRangePickerConfig = {
   calendars: number
   endDate: Date | string | null
   endName: string | null
+  floatingLabels: string[] | null
   separatorIcon: string
   separatorIconRtl: string
   startDate: Date | string | null
@@ -108,6 +109,7 @@ const Default: DateRangePickerConfig = {
   disabled: false,
   endDate: null,
   endName: null,
+  floatingLabels: null,
   indicatorIcon: DEFAULT_INDICATOR_ICON,
   inputOptions: {},
   locale: navigator.language,
@@ -135,6 +137,7 @@ const DefaultType: Record<string, string> = {
   disabled: 'boolean',
   endDate: '(date|string|null)',
   endName: '(string|null)',
+  floatingLabels: '(array|null)',
   indicatorIcon: 'string',
   inputOptions: 'object',
   locale: 'string',
@@ -331,6 +334,11 @@ class DateRangePicker extends BaseComponent {
 
   // Both halves are the same primitive, so without a name of its own each would
   // announce identically and give no clue which end of the range it is.
+  _floatingLabel(index: number): string | null {
+    const labels = this._config.floatingLabels
+    return (Array.isArray(labels) && labels[index]) || null
+  }
+
   _ariaLabel(index: number): string {
     const labels = this._config.ariaLabels
     return (Array.isArray(labels) && labels[index]) || (Default.ariaLabels as string[])[index]
@@ -365,10 +373,13 @@ class DateRangePicker extends BaseComponent {
       inputGroup.classList.add(`${CLASS_NAME_FORM_CONTROL}-${this._config.size}`)
     }
 
-    const start = this._createInput(this._config.startDate, this._config.startName, this._ariaLabel(0))
+    // With floating labels each field gets its own `.form-floating` inside the
+    // group, so the two labels float independently — the label text is also the
+    // field's accessible name, keeping the visible and spoken labels one thing.
+    const start = this._createInput(this._config.startDate, this._config.startName, this._floatingLabel(0) ?? this._ariaLabel(0))
     this._startInput = start.input
     this._startInputElement = start.inputEl
-    inputGroup.append(start.inputEl)
+    appendControlGroupField(inputGroup, start.inputEl, this._floatingLabel(0), `${this.constructor.NAME}-`)
 
     const separator = document.createElement('span')
     separator.classList.add(CLASS_NAME_SEPARATOR)
@@ -376,10 +387,10 @@ class DateRangePicker extends BaseComponent {
     separator.innerHTML = this._sanitizeIcon(this._resolveSeparatorIcon())
     inputGroup.append(separator)
 
-    const end = this._createInput(this._config.endDate, this._config.endName, this._ariaLabel(1))
+    const end = this._createInput(this._config.endDate, this._config.endName, this._floatingLabel(1) ?? this._ariaLabel(1))
     this._endInput = end.input
     this._endInputElement = end.inputEl
-    inputGroup.append(end.inputEl)
+    appendControlGroupField(inputGroup, end.inputEl, this._floatingLabel(1), `${this.constructor.NAME}-`)
 
     // See DatePicker — the bridge from typed values back to the calendar
     EventHandler.on(start.inputEl, DateInput.eventName(DateInput.CHANGE_EVENT_NAME), (event: any) => {

@@ -158,6 +158,12 @@ Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label 
     <div class="form-text">We deliver on working days only.</div>
   </div>`} />
 
+## Floating labels
+
+The date picker supports [floating labels](https://coreui.io/bootstrap/docs/forms/floating-labels/): set `floatingLabel` and the component renders the label itself — no wrapper markup needed — and the text also becomes the field's accessible name. The mask placeholders stay hidden while the label rests inside the field; focusing any part of the field — the sections or the picker button — floats the label and reveals the mask.
+
+<Example pro code={`<div data-coreui-locale="en-US" data-coreui-floating-label="Delivery date" data-coreui-toggle="date-picker"></div>`} />
+
 ## Sizing
 
 Set heights using the `data-coreui-size` attribute like `data-coreui-size="lg"`
