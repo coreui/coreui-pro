@@ -1941,6 +1941,30 @@ Multi Select's option indicators moved with it — they render as a decorative
   the viewport the same way and, unlike the footer class, is available in both
   editions.
 
+#### Callout
+
+- **The callout takes its colour from a `.theme-*` class**, on the callout or on
+  any element above it, like the alert does. The class colours the leading edge
+  and tints the border, and because it exposes every slot, `.theme-subtle` next
+  to it fills the callout without naming the colour twice.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Deprecated</span>
+  **`.callout-{color}` still works and is removed in v7.** Each modifier is
+  generated from `$theme-colors` through the same `theme-tokens()` mixin as the
+  theme class, so `.callout-primary` *is* `.callout.theme-primary`.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`$callout-variants` is gone.** The modifier classes are generated from
+  `$theme-colors`, so adding a theme colour adds its callout class — there is no
+  separate map to keep in step.
+- **A callout without a colour no longer draws its leading edge in
+  `currentColor`.** `--cui-callout-border-left-color` was read but never
+  declared: only the modifiers set it, so the declaration was invalid on a bare
+  `.callout` and the property fell back to its initial value. It now defaults to
+  the callout's own border colour.
+- **The 1px border of a coloured callout is tinted.** It reads
+  `--cui-theme-border` where it used to stay neutral, so a coloured callout is a
+  coherent block rather than a grey box with a coloured tick. The leading edge
+  is unchanged.
+
 
 ### Helpers
 
