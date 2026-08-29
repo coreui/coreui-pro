@@ -1,3 +1,4 @@
+@use "sass:map";
 @use "functions/defaults" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/tokens" as *;
@@ -14,8 +15,6 @@ $callout-border-radius:             var(--#{$prefix}radius-5) !default;
 $callout-border-width:              var(--#{$prefix}border-width) !default;
 $callout-border-color:              var(--#{$prefix}border-color) !default;
 $callout-border-left-width:         calc(#{$callout-border-width} * 4) !default;
-
-$callout-variants: theme-color-refs("bg") !default;
 // scss-docs-end callout-variables
 
 $callout-tokens: () !default;
@@ -30,8 +29,9 @@ $callout-tokens: defaults(
     --#{$prefix}callout-margin-x: #{$callout-margin-x},
     --#{$prefix}callout-margin-y: #{$callout-margin-y},
     --#{$prefix}callout-border-width: #{$callout-border-width},
-    --#{$prefix}callout-border-color: #{$callout-border-color},
+    --#{$prefix}callout-border-color: var(--#{$prefix}theme-border, #{$callout-border-color}),
     --#{$prefix}callout-border-left-width: #{$callout-border-left-width},
+    --#{$prefix}callout-border-left-color: var(--#{$prefix}theme-bg, var(--#{$prefix}callout-border-color)),
     --#{$prefix}callout-border-radius: #{$callout-border-radius},
   ),
   $callout-tokens
@@ -52,10 +52,9 @@ $callout-tokens: defaults(
   }
 
   // scss-docs-start callout-modifiers
-  // Generate contextual modifier classes for colorizing the collor.
-  @each $state, $value in $callout-variants {
+  @each $state in map.keys($theme-colors) {
     .callout-#{$state} {
-      --#{$prefix}callout-border-left-color: #{$value};
+      @include theme-tokens($state);
     }
   }
   // scss-docs-end callout-modifiers

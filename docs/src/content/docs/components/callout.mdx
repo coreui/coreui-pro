@@ -8,10 +8,19 @@ otherFrameworks:
 
 import { getData } from '@coreui/astro-docs/data'
 
-## Examples
+## Default callout
 
-Callout component is prepared for any length of text, as well as an optional elements like icons, headings, etc. For a styling, use one of the **required** contextual classes (e.g., `.callout-success`).
-<Example code={getData('theme-colors').map((c) => `<div class="callout callout-${c.name}">
+Callouts accommodate text of any length, along with optional elements like icons and headings. `.callout` on its own is a neutral callout — a bordered surface with a thicker leading edge, inheriting the text color of its surroundings.
+
+<Example code={`<div class="callout">
+    New to or unfamiliar with flexbox? Read this CSS Tricks flexbox guide for background, terminology, guidelines, and code snippets.
+  </div>`} />
+
+## Variants
+
+The color comes from a [`.theme-*` class](/customize/components/#theme-variants), which may sit on the callout or on any element above it. It colors the leading edge and tints the border.
+
+<Example code={getData('theme-colors').map((c) => `<div class="callout theme-${c.name}">
     New to or unfamiliar with flexbox? Read this CSS Tricks flexbox guide for background, terminology, guidelines, and code snippets.
   </div>`)} />
 
@@ -20,6 +29,29 @@ Callout component is prepared for any length of text, as well as an optional ele
 
 Relying on color to convey meaning creates a visual cue that assistive technologies, like screen readers, cannot perceive. It's essential that any information represented by color is either apparent from the content itself (e.g., the visible text) or supplemented by alternative methods, such as extra text using the `.visually-hidden` class.
 </Callout>
+
+## Tinted callout
+
+Because the theme class exposes every slot, the background utilities read from it too. Add `.theme-subtle` for a filled callout without naming a color twice.
+
+<Example code={getData('theme-colors').map((c) => `<div class="callout theme-subtle theme-${c.name}">
+    New to or unfamiliar with flexbox? Read this CSS Tricks flexbox guide for background, terminology, guidelines, and code snippets.
+  </div>`)} />
+
+## Deprecated markup
+
+<DeprecatedIn version="6.0.0" />
+
+The v5 spelling — `.callout` with a colour modifier — still works. Each colour class is generated from the same theme map as the class it replaces, so `.callout-primary` *is* `.callout.theme-primary`. They are removed in v7.
+
+<Example code={getData('theme-colors').map((c) => `<div class="callout callout-${c.name}">
+    New to or unfamiliar with flexbox? Read this CSS Tricks flexbox guide for background, terminology, guidelines, and code snippets.
+  </div>`)} />
+
+```diff
+- <div class="callout callout-success">Saved</div>
++ <div class="callout theme-success">Saved</div>
+```
 
 ## Customizing
 
@@ -37,12 +69,10 @@ Sass variables set these defaults at build time and are removed in v7. The CSS v
 
 <ScssDocs file="scss/_callout.scss" capture="callout-variables" />
 
-#### Variants
+### Sass loops
 
-Check out [our Sass maps and loops docs](/customize/sass/#maps-and-loops) for how to customize these loops and extend CoreUI's base-modifier approach to your own code.
+<DeprecatedIn version="6.0.0" />
 
-#### Modifiers
-
-CoreUI's callout component is built with a base-modifier class approach. This means the bulk of the styling is contained to a base class `.callout` while style variations are confined to modifier classes (e.g., `.callout-danger`). These modifier classes are built from the `$callout-variants` map to make customizing the number and name of our modifier classes.
+The loop that creates the modifier classes, pointing each one at the matching theme color. It goes with them in v7.
 
 <ScssDocs file="scss/_callout.scss" capture="callout-modifiers" />
