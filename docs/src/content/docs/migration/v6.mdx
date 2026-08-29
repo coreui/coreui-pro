@@ -1921,6 +1921,27 @@ Multi Select's option indicators moved with it — they render as a decorative
   longer adds a `-sm` class to the spinner it injects; the spinner follows the
   button's font size, so it now scales with `.btn-sm` and `.btn-lg`.
 
+#### Footer
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`.footer` is gone.** Every declaration it carried is reachable with
+  utilities, so `<footer class="footer">` becomes `<footer class="d-flex
+  flex-wrap align-items-center justify-content-between bg-3 border-top px-3
+  py-2">`. The only property without a utility is `min-height: 3rem`; where a
+  floor matters, set it yourself or pad with `py-3`. The
+  `--cui-footer-*` variables and the `$footer-*` Sass variables go with it.
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`.footer-sticky` is replaced by `.sticky-bottom`.** It pins to the bottom
+  the same way but sits on `--cui-z-sticky` rather than `--cui-z-fixed`, so a
+  footer that has to stack above fixed chrome needs its own `z-index`.
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`.footer-fixed` is replaced by `.fixed-bottom`.** It pins to the bottom of
+  the viewport the same way and, unlike the footer class, is available in both
+  editions.
+
+
 ### Helpers
 
 - **`.link-{color}` is gone; a theme class colours a link.** Reboot resolves a
