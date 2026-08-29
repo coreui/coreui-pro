@@ -1966,6 +1966,27 @@ Multi Select's option indicators moved with it — they render as a decorative
   is unchanged.
 
 
+#### The deprecated colour classes are behind a flag
+
+- **`$enable-deprecated-classes` drops the v5 colour modifiers from the build.**
+  It defaults to `true`, so nothing changes unless you set it: with the flag on,
+  the compiled CSS is byte-identical to a build without it. Set it to `false`
+  once your markup uses the theme classes and `.alert-{color}`,
+  `.btn-{color}`, `.btn-outline-{color}`, `.btn-ghost-{color}`,
+  `.callout-{color}`, `.chip-{color}` and `.list-group-item-{color}` leave the
+  stylesheet. They are removed outright in v7.
+- **The buttons lose the colour spelling in two places, not one.** Besides the
+  loop that points each class at a theme colour, `btn-variant-selectors()`
+  appends the colour classes to the selector list that carries a variant's base
+  declarations — the flag gates both, so `.btn-primary` disappears whole rather
+  than surviving as a rule with no colour.
+- **`alert-modifiers` and `btn-variant-loops` each covered two loops, one
+  deprecated and one not.** They are split, so the docs can mark the deprecated
+  half without mislabelling the other: the alert variants loop is
+  `alert-variant-loop`, and the deprecated button classes are
+  `btn-deprecated-modifiers`.
+
+
 ### Helpers
 
 - **`.link-{color}` is gone; a theme class colours a link.** Reboot resolves a

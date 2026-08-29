@@ -125,12 +125,16 @@ $alert-variants: defaults(
 
 
   // scss-docs-start alert-modifiers
-  @each $state in map.keys($theme-colors) {
-    .alert-#{$state} {
-      @include theme-tokens($state);
+  @if $enable-deprecated-classes {
+    @each $state in map.keys($theme-colors) {
+      .alert-#{$state} {
+        @include theme-tokens($state);
+      }
     }
   }
+  // scss-docs-end alert-modifiers
 
+  // scss-docs-start alert-variant-loop
   @each $variant, $properties in $alert-variants {
     .alert-#{$variant} {
       @each $property, $value in $properties {
@@ -142,5 +146,5 @@ $alert-variants: defaults(
       }
     }
   }
-  // scss-docs-end alert-modifiers
+  // scss-docs-end alert-variant-loop
 }

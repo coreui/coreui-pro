@@ -384,3 +384,11 @@ Chips use local CSS variables on `.chip` for enhanced real-time customization.
 Sass variables set these defaults at build time and are removed in v7. The CSS variables above reach the same values without recompiling, and can be set on a single element.
 
 <ScssDocs file="scss/_chip.scss" capture="chip-variables" />
+
+### Sass loops
+
+<DeprecatedIn version="6.0.0" />
+
+The loop that generates the [deprecated color classes](#deprecated-markup), pointing each one at the matching theme color. Set `$enable-deprecated-classes` to `false` to leave them out of the build.
+
+<ScssDocs file="scss/_chip.scss" capture="chip-modifiers" />
