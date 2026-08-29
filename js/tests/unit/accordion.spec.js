@@ -54,9 +54,9 @@ describe('Accordion', () => {
 
       const accordionEl = fixtureEl.querySelector('.accordion')
       const accordionBySelector = new Accordion('.accordion')
-      const accordionByElement = new Accordion(accordionEl)
-
       expect(accordionBySelector._element).toEqual(accordionEl)
+
+      const accordionByElement = new Accordion(accordionEl)
       expect(accordionByElement._element).toEqual(accordionEl)
     })
   })

@@ -166,7 +166,7 @@ class Menu extends BaseComponent {
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     if (typeof computePosition === 'undefined') {
-      throw new TypeError('Bootstrap\'s menus require Floating UI (https://floating-ui.com)')
+      throw new TypeError('CoreUI\'s menus require Floating UI (https://floating-ui.com)')
     }
 
     super(element, config)
