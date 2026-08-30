@@ -145,7 +145,8 @@
     "js/dist/**/*.{js,map,d.ts}",
     "js/src/**/*.ts",
     "scss/**/*.scss",
-    "!scss/tests/**"
+    "!scss/tests/**",
+    ".browserslistrc"
   ],
   "jspm": {
     "registry": "npm",
