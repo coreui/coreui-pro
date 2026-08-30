@@ -188,7 +188,7 @@ The field participates in the standard form validation styling. Three mechanisms
 
 - **Range validation (automatic)** — a completed date outside `minDate`/`maxDate`/`disabledDates` gets `.is-invalid` until corrected.
 - **The `valid`/`invalid` options** — force the state, e.g. after server-side validation.
-- **Form submit** — the date input renders a hidden input, which is excluded from native constraint validation, so the component applies `.is-valid`/`.is-invalid` itself when a form with the `.was-validated` class is submitted: a `required` empty field becomes invalid, a filled one valid.
+- **Form submit** — the date input renders a hidden input, which is excluded from native constraint validation, so the component applies the state itself when a form with the `data-coreui-validate` attribute is submitted: a `required` empty field becomes `.is-invalid`, and a filled one becomes `.is-valid` when the form opts into success styling with `data-coreui-validate="valid"`.
 
 Sibling `.valid-feedback`/`.invalid-feedback` elements work as with any other form control.
 
@@ -202,7 +202,7 @@ Sibling `.valid-feedback`/`.invalid-feedback` elements work as with any other fo
   </div>`} />
 
 ```html
-<form class="needs-validation" novalidate>
+<form data-coreui-validate novalidate>
   <div class="form-control form-date-time" data-coreui-date-input data-coreui-required="true"></div>
   <div class="invalid-feedback">Please provide a delivery date.</div>
   <button type="submit">Submit</button>
@@ -210,15 +210,13 @@ Sibling `.valid-feedback`/`.invalid-feedback` elements work as with any other fo
 ```
 
 ```javascript
-const form = document.querySelector('.needs-validation')
+const form = document.querySelector('form[data-coreui-validate]')
 
 form.addEventListener('submit', event => {
   if (!form.checkValidity()) {
     event.preventDefault()
     event.stopPropagation()
   }
-
-  form.classList.add('was-validated')
 })
 ```
 

@@ -429,12 +429,20 @@ describe('password input', () => {
   })
 
   // Native constraint validation reaches the frame through the control inside
-  // it — the state never lands on the group itself here.
-  it('invalid under was-validated', async () => {
-    mountPassword(`<div class="was-validated">
+  // it — the state never lands on the group itself here. `:user-invalid`
+  // needs real user interaction committed by a blur, so the test types,
+  // erases the character and leaves the field.
+  it('invalid under data-coreui-validate', async () => {
+    mountPassword(`<div data-coreui-validate>
         <input type="password" class="form-control" required aria-label="Password">
       </div>`)
-    await shoot(frame(), 'password-was-validated')
+    const input = container.querySelector('input')
+    input.focus()
+    await userEvent.keyboard('x')
+    await userEvent.keyboard('{Backspace}')
+    input.blur()
+    expect(input.matches(':user-invalid')).toBe(true)
+    await shoot(frame(), 'password-user-invalid')
   })
 })
 

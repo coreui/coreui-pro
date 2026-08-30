@@ -77,8 +77,13 @@ $form-feedback-tokens: defaults(
 
 // scss-docs-start form-validation-mixins
 @mixin form-validation-state-selector($state) {
-  @if ($state == "valid" or $state == "invalid") {
-    .was-validated #{if(sass(&): "&"; else: "")}:#{$state},
+  @if $state == "invalid" {
+    [data-coreui-validate] #{if(sass(&): "&"; else: "")}:user-invalid,
+    #{if(sass(&): "&"; else: "")}.is-#{$state} {
+      @content;
+    }
+  } @else if $state == "valid" {
+    [data-coreui-validate~="valid"] #{if(sass(&): "&"; else: "")}:user-valid,
     #{if(sass(&): "&"; else: "")}.is-#{$state} {
       @content;
     }
@@ -184,9 +189,14 @@ $validated-controls: if(sass($enable-deprecated-form-check): ".check, .radio, .s
     @include form-control-group-validation-state($color, $border-color, $focus-ring-color);
   }
 
-  @if $state == "valid" or $state == "invalid" {
-    .was-validated .form-control-group:has(> .form-control:#{$state}),
-    .was-validated .form-multi-select:has(> select:#{$state}) .form-control-group {
+  @if $state == "invalid" {
+    [data-coreui-validate] .form-control-group:has(> .form-control:user-invalid),
+    [data-coreui-validate] .form-multi-select:has(> select:user-invalid) .form-control-group {
+      @include form-control-group-validation-state($color, $border-color, $focus-ring-color);
+    }
+  } @else if $state == "valid" {
+    [data-coreui-validate~="valid"] .form-control-group:has(> .form-control:user-valid),
+    [data-coreui-validate~="valid"] .form-multi-select:has(> select:user-valid) .form-control-group {
       @include form-control-group-validation-state($color, $border-color, $focus-ring-color);
     }
   }
