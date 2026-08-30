@@ -2261,9 +2261,18 @@ them. A state names a theme colour now, and every value is a slot of it.
   `--cui-focus-ring-opacity` at runtime moved the default ring. It is
   `var(--cui-primary-focus-ring)` now — the slot every `.theme-*` ring
   already mixed from. `$focus-ring` itself only restated
-  `--cui-focus-ring`, which `_root.scss` composes, so the two variables
-  that read it (`$btn-close-focus-shadow`, `$sidebar-toggler-focus-shadow`)
-  take the token instead.
+  `--cui-focus-ring`, which `_root.scss` composes, so the two variables that
+  read it — `$btn-close-focus-shadow` and `$sidebar-toggler-focus-shadow` —
+  are gone with it; the close button and the sidebar toggler draw their ring
+  with the shared `focus-ring()` mixin.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`--cui-sidebar-toggler-focus-shadow` is removed.** It fed a `box-shadow`
+  on `.sidebar-toggler:focus-visible` next to an `outline: 0`, and its value
+  was the `--cui-focus-ring` shorthand — `<width> solid <color>`, which
+  `box-shadow` does not accept. The declaration was dropped as invalid and
+  the toggler had no focus indicator at all. The ring is an `outline` now,
+  like everywhere else; restyle it through `--cui-focus-ring-width`,
+  `--cui-focus-ring-color` and `--cui-focus-ring-offset`.
 - **`form-validation-state()` takes `$theme` where it took `$color`**, and the
   variables moved from `scss/_config.scss` into the partials that use them
   alongside `$form-text-*` and `$form-feedback-*`.
