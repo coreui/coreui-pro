@@ -9,7 +9,9 @@ CoreUI for Bootstrap declares several hundred [CSS custom properties (variables)
 
 ## Root variables
 
-Here are the variables we include (note that the `:root` is required) that can be accessed anywhere CoreUI for Bootstrap's CSS is loaded. They're located in our `_root.scss` file and included in our compiled dist files. Most of them pick their light and dark value in a single declaration through the CSS [`light-dark()`](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/light-dark) function, so one `:root` declaration covers both [color modes](/customize/color-modes/).
+Here are the variables we include (note that the `:root, :host` selector is required) that can be accessed anywhere CoreUI for Bootstrap's CSS is loaded. They're located in our `_root.scss` file and included in our compiled dist files. Most of them pick their light and dark value in a single declaration through the CSS [`light-dark()`](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/light-dark) function, so one declaration covers both [color modes](/customize/color-modes/).
+
+`:host` is there so the tokens also land when our CSS is loaded inside a shadow root — `:root` matches the document, never a shadow tree, so without it every global token would be unset in a web component.
 
 <ScssDocs file="scss/_root.scss" capture="root-body-variables" />
 
@@ -21,11 +23,21 @@ Because `light-dark()` resolves both modes above, only one value still needs a d
 
 ## Component variables
 
-CoreUI is increasingly making use of custom properties as local variables for various components. This way we reduce our compiled CSS, ensure styles aren't inherited in places like nested tables, and allow some basic restyling and extending of CoreUI components after Sass compilation.
+We use custom properties as local variables for components. This way we reduce our compiled CSS, ensure styles aren't inherited in places like nested tables, and allow restyling and extending of CoreUI components after Sass compilation.
 
-Have a look at our table documentation for some [insight into how we're using CSS variables](/content/tables/#how-do-the-variants-and-accented-tables-work). Our [navbars also use CSS variables](/components/navbar/#css-variables) as of v4.2.6. We're also using CSS variables across our grids—primarily for gutters the [new opt-in CSS grid](/layout/css-grid/)—with more component usage coming in the future.
+Every component declares its complete styling surface as custom properties on its base class, so you can override any of them in your own CSS without recompiling Sass:
 
-Whenever possible, we'll assign CSS variables at the base component level (e.g., `.navbar` for navbar and its sub-components). This reduces guessing on where and how to customize, and allows for easy modifications by our team in future updates.
+```css
+.alert {
+  --cui-alert-padding-x: 1.5rem;
+  --cui-alert-padding-y: 1rem;
+  --cui-alert-border-radius: var(--cui-border-radius-lg);
+}
+```
+
+Have a look at our table documentation for some [insight into how we're using CSS variables](/content/tables/#how-do-the-variants-and-accented-tables-work). Our [navbars also use CSS variables](/components/navbar/#css-variables), and we use them across our grids — primarily for gutters and the [opt-in CSS grid](/layout/css-grid/).
+
+We assign CSS variables at the base component level (e.g., `.navbar` for navbar and its sub-components). This reduces guessing on where and how to customize, and allows for easy modifications by our team in future updates.
 
 A variable resolves where it is **declared**, so override it on the element that carries the base class — setting `--cui-navbar-padding-y` on a wrapper around the navbar will not reach it.
 
@@ -80,4 +92,4 @@ Each component still exposes its own `--cui-{component}-transition-timing`, so a
 
 ## Grid breakpoints
 
-While we include our grid breakpoints as CSS variables (except for `xs`), be aware that **CSS variables do not work in media queries**. This is by design in the CSS spec for variables, but may change in coming years with support for `env()` variables. Check out [this Stack Overflow answer](https://stackoverflow.com/a/47212942) for some helpful links. In the mean time, you can use these variables in other CSS situations, as well as in your JavaScript.
+While we include our grid breakpoints as CSS variables (except for `xs`), be aware that **CSS variables do not work in media queries**. This is by design in the CSS spec for variables, but may change in coming years with support for `env()` variables. Check out [this Stack Overflow answer](https://stackoverflow.com/a/47212942) for some helpful links. In the meantime, you can use these variables in other CSS situations, as well as in your JavaScript.
