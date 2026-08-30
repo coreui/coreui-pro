@@ -18,19 +18,25 @@ $group-button: ":is(#{$btn-variant-selectors})" !default;
     > #{$group-button} {
       position: relative;
       flex: 1 1 auto;
+
+      &:hover {
+        z-index: 1;
+      }
     }
 
     // Bring the hover, focused, and "active" buttons to the front to overlay
     // the borders properly
     > #{$btn-check-deprecated}:checked + #{$group-button},
-    > #{$btn-check-deprecated}:focus + #{$group-button},
     > .btn-check:has(input:checked),
-    > .btn-check:has(input:focus),
-    > #{$group-button}:hover,
-    > #{$group-button}:focus,
     > #{$group-button}:active,
     > #{$group-button}.active {
-      z-index: 1;
+      z-index: 2;
+    }
+
+    > #{$btn-check-deprecated}:focus + #{$group-button},
+    > .btn-check:has(input:focus),
+    > #{$group-button}:focus {
+      z-index: 3;
     }
   }
 
