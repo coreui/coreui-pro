@@ -408,7 +408,7 @@ This example shows a stepper with native browser validation enabled:
 
 ### Custom styles
 
-To disable native browser styles validation and turn on custom styles, add the `novalidate` attribute to your forms:
+To disable native browser styles validation and turn on custom styles, add the `novalidate` attribute to your forms. The stepper then marks the invalid controls with `.is-invalid` when a step fails, and keeps the state updated as the user corrects them; add `data-coreui-validate="valid"` to a form to also mark the valid controls with `.is-valid`:
 
 <Example pro code={`<div class="stepper" data-coreui-toggle="stepper" id="novalidateStepper">
     <ol class="stepper-steps">

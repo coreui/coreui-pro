@@ -6,19 +6,14 @@ description: "Provide valuable, actionable feedback to your users with HTML5 for
 
 import validateForms from './snippets/validate-forms.js?raw'
 
-<Callout color="warning">
-We are aware that currently the client-side custom validation styles and tooltips are not accessible, since they are not exposed to assistive technologies. While we work on a solution, we'd recommend either using the server-side option or the default browser validation method.
-</Callout>
-
 ## How it works
 
 Here's how form validation works with Bootstrap:
 
-- HTML form validation is applied via CSS's two pseudo-classes, `:invalid` and `:valid`. It applies to `<input />`, `<select>`, and `<textarea>` elements.
-- CoreUI for Bootstrap scopes the `:invalid` and `:valid` styles to parent `.was-validated` class, usually applied to the `<form>`. Otherwise, any required field without a value shows up as invalid on page load. This way, you may choose when to activate them (typically after form submission is attempted).
-- To reset the appearance of the form (for instance, in the case of dynamic form submissions using AJAX), remove the `.was-validated` class from the `<form>` again after submission.
-- As a fallback, `.is-invalid` and `.is-valid` classes may be used instead of the pseudo-classes for [server-side validation](#server-side). They do not require a `.was-validated` parent class.
-- Due to constraints in how CSS works, we cannot (at present) apply styles to a `<label>` that comes before a form control in the DOM without the help of custom JavaScript.
+- **Client-side validation** uses CSS pseudo-classes scoped behind the `data-coreui-validate` attribute. Add `data-coreui-validate` to your `<form>` to opt in to `:user-invalid` styling—validation styles only appear **after the user interacts** with a control (e.g., typing and blurring, or attempting to submit), so required fields don't show up as invalid on page load.
+- By default, **client-side validation only shows invalid styling.** To also show success styling for valid fields, set `data-coreui-validate="valid"`.
+- **Server-side validation** uses the `.is-invalid` and `.is-valid` classes to indicate field state without requiring user interaction. These work globally—no `data-coreui-validate` attribute needed.
+- Custom validation states beyond `valid`/`invalid` (e.g., `warning`) are supported via the `.is-*` class pattern and the `$form-validation-states` Sass map. There are no generated pseudo-classes for custom states.
 - All modern browsers support the [constraint validation API](https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#the-constraint-validation-api), a series of JavaScript methods for validating form controls.
 - Feedback messages may utilize the [browser defaults](#browser-defaults) (different for each browser, and unstylable via CSS) or our custom feedback styles with additional HTML and CSS.
 - You may provide custom validity messages with `setCustomValidity` in JavaScript.
@@ -27,11 +22,11 @@ With that in mind, consider the following demos for our custom form validation s
 
 ## Custom styles
 
-For custom CoreUI for Bootstrap form validation messages, you'll need to add the `novalidate` boolean attribute to your `<form>`. This disables the browser default feedback tooltips, but still provides access to the form validation APIs in JavaScript. Try to submit the form below; our JavaScript will intercept the submit button and relay feedback to you. When attempting to submit, you'll see the `:invalid` and `:valid` styles applied to your form controls.
+For custom CoreUI for Bootstrap form validation messages, add `data-coreui-validate` and the `novalidate` boolean attribute to your `<form>`. The `data-coreui-validate` attribute opts in to the `:user-invalid` styling, while `novalidate` disables the browser default feedback tooltips but still provides access to the form validation APIs in JavaScript. Try to submit the form below; our JavaScript will intercept the submit button and relay feedback to you.
 
-Custom feedback styles apply custom colors, borders, focus styles, and background icons to better communicate feedback. Background icons for `<select>`s are only available with `.form-control`, and not `.form-control`.
+Custom feedback styles apply custom colors, borders, focus styles, and background icons to better communicate feedback.
 
-<Example code={`<form class="row g-3 needs-validation" novalidate>
+<Example code={`<form class="row g-3" data-coreui-validate novalidate>
     <div class="col-md-4">
       <label for="validationCustom01" class="form-label">First name</label>
       <input type="text" class="form-control" id="validationCustom01" value="Mark" required>
@@ -233,44 +228,44 @@ Validation styles are available for the following form controls and components:
 - `<select>`s with `.form-control`
 - `.form-check`s
 
-<Example code={`<form class="was-validated">
+<Example code={`<form>
     <div class="mb-3">
       <label for="validationTextarea" class="form-label">Textarea</label>
-      <textarea class="form-control" id="validationTextarea" placeholder="Required example textarea" required></textarea>
-      <div class="invalid-feedback">
+      <textarea class="form-control is-invalid" id="validationTextarea" placeholder="Required example textarea" required aria-describedby="validationTextareaFeedback"></textarea>
+      <div id="validationTextareaFeedback" class="invalid-feedback">
         Please enter a message in the textarea.
       </div>
     </div>
 
     <div class="form-check mb-3">
-      <input type="checkbox" class="form-check-input" id="validationFormCheck1" required>
+      <input type="checkbox" class="form-check-input is-invalid" id="validationFormCheck1" required aria-describedby="validationFormCheck1Feedback">
       <label class="form-check-label" for="validationFormCheck1">Check this checkbox</label>
-      <div class="invalid-feedback">Example invalid feedback text</div>
+      <div id="validationFormCheck1Feedback" class="invalid-feedback">Example invalid feedback text</div>
     </div>
 
     <div class="form-check">
-      <input type="radio" class="form-check-input" id="validationFormCheck2" name="radio-stacked" required>
+      <input type="radio" class="form-check-input is-invalid" id="validationFormCheck2" name="radio-stacked" required>
       <label class="form-check-label" for="validationFormCheck2">Toggle this radio</label>
     </div>
     <div class="form-check mb-3">
-      <input type="radio" class="form-check-input" id="validationFormCheck3" name="radio-stacked" required>
+      <input type="radio" class="form-check-input is-invalid" id="validationFormCheck3" name="radio-stacked" required aria-describedby="validationFormCheck3Feedback">
       <label class="form-check-label" for="validationFormCheck3">Or toggle this other radio</label>
-      <div class="invalid-feedback">More example invalid feedback text</div>
+      <div id="validationFormCheck3Feedback" class="invalid-feedback">More example invalid feedback text</div>
     </div>
 
     <div class="mb-3">
-      <select class="form-control" required aria-label="select example">
+      <select class="form-control is-invalid" required aria-label="select example" aria-describedby="validationSelectFeedback">
         <option value="">Open this select menu</option>
         <option value="1">One</option>
         <option value="2">Two</option>
         <option value="3">Three</option>
       </select>
-      <div class="invalid-feedback">Example invalid select feedback</div>
+      <div id="validationSelectFeedback" class="invalid-feedback">Example invalid select feedback</div>
     </div>
 
     <div class="mb-3">
-      <input type="file" class="form-control" aria-label="file example" required>
-      <div class="invalid-feedback">Example invalid form file feedback</div>
+      <input type="file" class="form-control is-invalid" aria-label="file example" required aria-describedby="validationFileFeedback">
+      <div id="validationFileFeedback" class="invalid-feedback">Example invalid form file feedback</div>
     </div>
 
     <div class="mb-3">
@@ -282,7 +277,7 @@ Validation styles are available for the following form controls and components:
 
 If your form layout allows it, you can swap the `.{valid|invalid}-feedback` classes for `.{valid|invalid}-tooltip` classes to display validation feedback in a styled tooltip. Be sure to have a parent with `position: relative` on it for tooltip positioning. In the example below, our column classes have this already, but your project may require an alternative setup.
 
-<Example code={`<form class="row g-3 needs-validation" novalidate>
+<Example code={`<form class="row g-3" data-coreui-validate novalidate>
     <div class="col-md-4 position-relative">
       <label for="validationTooltip01" class="form-label">First name</label>
       <input type="text" class="form-control" id="validationTooltip01" value="Mark" required>

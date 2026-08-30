@@ -837,6 +837,35 @@ declaration.
   with it. Set the knobs back to `null`, or `--cui-label-font-weight` /
   `--cui-label-color` to `inherit`, for the old behaviour.
 
+#### Validation: `data-coreui-validate` replaces `.was-validated`
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+Client-side validation no longer uses `.was-validated` or the bare `:valid` /
+`:invalid` pseudo-classes. Add `data-coreui-validate` to the `<form>` instead:
+the styles ride the `:user-invalid` pseudo-class, so feedback appears only
+after the user interacts with a control or attempts to submit — no JavaScript
+toggles a class anymore, and after an AJAX submission there is nothing to
+remove to reset the form's appearance.
+
+- **Success styling is opt-in.** `data-coreui-validate` alone shows only
+  invalid styling; set `data-coreui-validate="valid"` to also colour the
+  valid fields.
+- **Server-side validation is unchanged** — `.is-invalid` / `.is-valid` keep
+  working globally, without the attribute.
+
+```diff
+- <form class="needs-validation" novalidate>
++ <form data-coreui-validate novalidate>
+```
+
+In the starter JavaScript, select the forms with
+`document.querySelectorAll('form[data-coreui-validate]')` and remove the
+`form.classList.add('was-validated')` line. Components follow the attribute:
+the stepper marks the controls of a failing `novalidate` step form with
+`.is-invalid` itself (and `.is-valid` under `data-coreui-validate="valid"`),
+and the date / time / date-time inputs key their submit-time state off the
+attribute instead of the class.
+
 #### Input group: `.has-validation` removed
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>

@@ -27,17 +27,21 @@ const EVENT_RESET = `reset${EVENT_KEY}`
 const EVENT_STEP_CHANGE = `stepChange${EVENT_KEY}`
 const EVENT_STEP_VALIDATION_COMPLETE = `stepValidationComplete${EVENT_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}`
+const EVENT_INPUT = `input${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}`
 
 const CLASS_NAME_ACTIVE = 'active'
 const CLASS_NAME_COMPLETE = 'complete'
+const CLASS_NAME_IS_INVALID = 'is-invalid'
+const CLASS_NAME_IS_VALID = 'is-valid'
 const CLASS_NAME_SHOW = 'show'
 const CLASS_NAME_STEPPER_STEP_CONNECTOR = 'stepper-step-connector'
 const CLASS_NAME_STEPPER_STEP_INDICATOR_ICON = 'stepper-step-indicator-icon'
 const CLASS_NAME_STEPPER_STEP_INDICATOR_TEXT = 'stepper-step-indicator-text'
 
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="stepper"]'
+const SELECTOR_FORM_VALIDATE_VALID = '[data-coreui-validate~="valid"]'
 const SELECTOR_STEPPER = '.stepper'
 const SELECTOR_STEPPER_ACTION = '[data-coreui-stepper-action]'
 const SELECTOR_STEPPER_STEP = '.stepper-step'
@@ -74,6 +78,7 @@ class Stepper extends BaseComponent {
   protected declare _activeStepButton: HTMLButtonElement
   protected declare _initialStepButton: HTMLButtonElement
   protected declare _isFinished: boolean
+  protected declare _validatedForms: Set<HTMLFormElement>
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
@@ -82,6 +87,7 @@ class Stepper extends BaseComponent {
     this._activeStepButton = this._getActiveElem()
     this._initialStepButton = this._activeStepButton
     this._isFinished = false
+    this._validatedForms = new Set()
 
     this._addStepperConnector()
     this._resetPanes(this._getTargetPane(this._activeStepButton))
@@ -251,6 +257,12 @@ class Stepper extends BaseComponent {
       (form as HTMLFormElement).reset()
     }
 
+    for (const form of this._validatedForms) {
+      for (const control of form.elements) {
+        control.classList.remove(CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID)
+      }
+    }
+
     const firstStep = this._initialStepButton || steps[0]
     firstStep.classList.add(CLASS_NAME_ACTIVE)
 
@@ -272,6 +284,14 @@ class Stepper extends BaseComponent {
     this._isFinished = false
     this._updateStepButtonsDisabledState()
     EventHandler.trigger(this._element, EVENT_RESET)
+  }
+
+  override dispose(): void {
+    for (const form of this._validatedForms) {
+      EventHandler.off(form, EVENT_INPUT)
+    }
+
+    super.dispose()
   }
 
   // Private
@@ -321,7 +341,7 @@ class Stepper extends BaseComponent {
 
     if (!isValid) {
       if (form.noValidate) {
-        form.classList.add('was-validated')
+        this._showValidationState(form)
       } else {
         form.reportValidity()
       }
@@ -330,6 +350,26 @@ class Stepper extends BaseComponent {
     }
 
     return true
+  }
+
+  _showValidationState(form: HTMLFormElement): void {
+    for (const control of form.elements) {
+      this._updateControlValidationState(control, form)
+    }
+
+    if (!this._validatedForms.has(form)) {
+      this._validatedForms.add(form)
+      EventHandler.on(form, EVENT_INPUT, (event: any) => this._updateControlValidationState(event.target, form))
+    }
+  }
+
+  _updateControlValidationState(control: any, form: HTMLFormElement): void {
+    if (!control.willValidate || ['button', 'reset', 'submit'].includes(control.type)) {
+      return
+    }
+
+    control.classList.toggle(CLASS_NAME_IS_INVALID, !control.validity.valid)
+    control.classList.toggle(CLASS_NAME_IS_VALID, control.validity.valid && form.matches(SELECTOR_FORM_VALIDATE_VALID))
   }
 
   _activate(element: any): void {
