@@ -260,7 +260,7 @@ Learn more on the [`z-index` layout page](/layout/z-index/).
 
 Where a behavior can be expressed in HTML and CSS, we prefer that over JavaScript — it is more accessible to people of all experience levels and faster in the browser. It is also why our first-class JavaScript API is `data-coreui-*` attributes: they let you write HTML instead of wiring up JavaScript. Read more in [our JavaScript overview](/getting-started/javascript/#data-attributes).
 
-Our styles build on fundamental browser behavior. You can put `.btn` on nearly any element, but we use `<button>` and `<a>` for the semantics and keyboard handling the browser already gives them.
+Our styles build on fundamental browser behavior. You can put `.btn` on nearly any element, but we use `<button>` and `<a>` for the semantics and keyboard handling the browser already gives them. Form validation works the same way: styles ride the `:user-invalid` pseudo-class behind a `data-coreui-validate` attribute, so the browser decides when feedback appears — after the user works a control or tries to submit — instead of a script toggling a class.
 
 ### Utilities
 
