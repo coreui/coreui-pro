@@ -1,6 +1,7 @@
 @use "../functions/escape-svg" as *;
 @use "../mixins/backdrop" as *;
 @use "../mixins/border-radius" as *;
+@use "../mixins/focus-ring" as *;
 @use "../layout/breakpoints" as *;
 @use "../mixins/ltr-rtl" as *;
 @use "../mixins/transition" as *;
@@ -14,7 +15,6 @@ $sidebar-toggler-padding-y:         .25rem !default;
 $sidebar-toggler-bg:                transparent !default;
 $sidebar-toggler-color:             var(--#{$prefix}fg-3) !default;
 $sidebar-toggler-icon:              url("data:image/svg+xml,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cg xmlns='http://www.w3.org/2000/svg' transform='matrix(-1 0 0 -1 512 512)'%3E%3Cpath fill='%23000' d='M472,16H40A24.028,24.028,0,0,0,16,40V200H48V48H464V464H48V304H16V472a24.028,24.028,0,0,0,24,24H472a24.028,24.028,0,0,0,24-24V40A24.028,24.028,0,0,0,472,16Z'/%3E%3Cpolygon fill='%23000' points='209.377 363.306 232.004 385.933 366.627 251.31 232.004 116.687 209.377 139.313 305.374 235.311 16 235.311 16 267.311 305.372 267.311 209.377 363.306'/%3E%3C/g%3E%3C/svg%3E") !default;
-$sidebar-toggler-focus-shadow:      var(--#{$prefix}focus-ring) !default;
 $sidebar-toggler-hover-color:       var(--#{$prefix}fg-2) !default;
 $sidebar-toggler-focus-color:       var(--#{$prefix}fg-2) !default;
 $sidebar-toggler-transition:        transform .15s !default;
@@ -228,7 +228,6 @@ $sidebar-widths: (
     --#{$prefix}sidebar-toggler-color: #{$sidebar-toggler-color};
     --#{$prefix}sidebar-toggler-icon: #{escape-svg($sidebar-toggler-icon)};
     --#{$prefix}sidebar-toggler-hover-color: #{$sidebar-toggler-hover-color};
-    --#{$prefix}sidebar-toggler-focus-shadow: #{$sidebar-toggler-focus-shadow};
     --#{$prefix}sidebar-toggler-focus-color: #{$sidebar-toggler-focus-color};
     --#{$prefix}sidebar-toggler-transition: #{$sidebar-toggler-transition};
     // scss-docs-end sidebar-toggler-css-vars
@@ -266,8 +265,7 @@ $sidebar-widths: (
     }
 
     &:focus-visible {
-      outline: 0;
-      box-shadow: var(--#{$prefix}sidebar-toggler-focus-shadow);
+      @include focus-ring(true);
 
       &::before {
         background-color: var(--#{$prefix}sidebar-toggler-focus-color);
