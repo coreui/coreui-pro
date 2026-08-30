@@ -1941,6 +1941,19 @@ Multi Select's option indicators moved with it — they render as a decorative
   the viewport the same way and, unlike the footer class, is available in both
   editions.
 
+#### Header
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`.header-sticky` is replaced by `.sticky-top`.** The two rules were
+  identical — `position: sticky`, `top: 0`, `--cui-z-sticky` — so the utility
+  pins the header exactly as the component class did, and it composes with the
+  responsive variants (`.sticky-md-top`) the component class never had.
+
+- **`.header-fixed` never existed.** The `position` property on the framework
+  components accepted `fixed` and rendered a class the stylesheet did not
+  define, so it did nothing. Use `.fixed-top` or `.fixed-bottom`; on the
+  framework components, `position` renders those utilities now.
+
 #### Callout
 
 - **The callout takes its colour from a `.theme-*` class**, on the callout or on
