@@ -550,8 +550,8 @@ describe('DateInput', () => {
   })
 
   describe('validation', () => {
-    const createInForm = (config = {}) => {
-      fixtureEl.innerHTML = '<form class="was-validated"><div id="mydateinput"></div></form>'
+    const createInForm = (config = {}, formAttributes = 'data-coreui-validate') => {
+      fixtureEl.innerHTML = `<form ${formAttributes}><div id="mydateinput"></div></form>`
       return new DateInput(fixtureEl.querySelector('div'), { format: 'dd.MM.yyyy', ...config })
     }
 
@@ -572,8 +572,8 @@ describe('DateInput', () => {
       expect(dateInput._element.classList.contains('is-invalid')).toBeTrue()
     })
 
-    it('should mark a filled field as valid on submit of a validated form', async () => {
-      const dateInput = createInForm({ required: true, date: new Date(2026, 6, 14) })
+    it('should mark a filled field as valid on submit of a form opted into valid styling', async () => {
+      const dateInput = createInForm({ required: true, date: new Date(2026, 6, 14) }, 'data-coreui-validate="valid"')
 
       fixtureEl.querySelector('form').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
       await Promise.resolve()
@@ -582,11 +582,21 @@ describe('DateInput', () => {
       expect(dateInput._element.classList.contains('is-invalid')).toBeFalse()
     })
 
-    it('should apply the state even when was-validated is added during the same submit', async () => {
+    it('should not mark a filled field as valid when the form does not opt into valid styling', async () => {
+      const dateInput = createInForm({ required: true, date: new Date(2026, 6, 14) })
+
+      fixtureEl.querySelector('form').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
+      await Promise.resolve()
+
+      expect(dateInput._element.classList.contains('is-valid')).toBeFalse()
+      expect(dateInput._element.classList.contains('is-invalid')).toBeFalse()
+    })
+
+    it('should apply the state even when data-coreui-validate is added during the same submit', async () => {
       fixtureEl.innerHTML = '<form><div id="mydateinput"></div></form>'
       const form = fixtureEl.querySelector('form')
       const dateInput = new DateInput(fixtureEl.querySelector('div'), { format: 'dd.MM.yyyy', required: true })
-      form.addEventListener('submit', () => form.classList.add('was-validated'))
+      form.addEventListener('submit', () => form.setAttribute('data-coreui-validate', ''))
 
       form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
       await Promise.resolve()

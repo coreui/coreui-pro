@@ -105,7 +105,7 @@ The built-in token parser covers dayjs, moment, date-fns, and luxon format strin
 
 ## Validation
 
-The field participates in the standard form validation styling, [the same way as the date input](/forms/date-input/#validation): a completed value outside `minDate`/`maxDate`/`disabledDates` gets `.is-invalid` automatically, the `valid`/`invalid` options force a state, and submitting a form with the `.was-validated` class marks a `required` empty field invalid and a filled one valid. Sibling `.valid-feedback`/`.invalid-feedback` elements work as with any other form control.
+The field participates in the standard form validation styling, [the same way as the date input](/forms/date-input/#validation): a completed value outside `minDate`/`maxDate`/`disabledDates` gets `.is-invalid` automatically, the `valid`/`invalid` options force a state, and submitting a form with the `data-coreui-validate` attribute marks a `required` empty field invalid — and a filled one valid when the form carries `data-coreui-validate="valid"`. Sibling `.valid-feedback`/`.invalid-feedback` elements work as with any other form control.
 
 <Example pro code={`<div class="mb-3">
     <div class="form-control form-date-time" data-coreui-date-time-input data-coreui-format="dd.MM.yyyy HH:mm" data-coreui-date="2026-07-14 14:30" data-coreui-valid="true"></div>

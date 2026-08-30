@@ -1182,8 +1182,7 @@ describe('Stepper', () => {
       expect(buttons[0]).toHaveClass('active')
     })
 
-    it('should add was-validated class to noValidate forms on failure', () => {
-      fixtureEl.innerHTML = `
+    const validationFixture = formAttributes => `
         <div class="stepper" data-coreui-toggle="stepper">
           <ol class="stepper-steps">
             <li class="stepper-step">
@@ -1198,21 +1197,68 @@ describe('Stepper', () => {
             </li>
           </ol>
           <div id="step1" class="stepper-pane active show">
-            <form novalidate>
-              <input type="text" required value="">
+            <form ${formAttributes}>
+              <input id="empty" type="text" required value="">
+              <input id="filled" type="text" required value="filled">
             </form>
           </div>
           <div id="step2" class="stepper-pane"></div>
         </div>
       `
 
+    it('should mark invalid controls on noValidate forms on failure', () => {
+      fixtureEl.innerHTML = validationFixture('novalidate')
+
       const stepperElement = fixtureEl.querySelector('.stepper')
       const stepper = new Stepper(stepperElement)
 
       stepper.next()
 
-      const form = fixtureEl.querySelector('form')
-      expect(form).toHaveClass('was-validated')
+      expect(fixtureEl.querySelector('#empty')).toHaveClass('is-invalid')
+      expect(fixtureEl.querySelector('#filled')).not.toHaveClass('is-valid')
+    })
+
+    it('should mark valid controls only when the form opts in with data-coreui-validate="valid"', () => {
+      fixtureEl.innerHTML = validationFixture('novalidate data-coreui-validate="valid"')
+
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+
+      stepper.next()
+
+      expect(fixtureEl.querySelector('#empty')).toHaveClass('is-invalid')
+      expect(fixtureEl.querySelector('#filled')).toHaveClass('is-valid')
+    })
+
+    it('should clear the invalid state as the user corrects the control', () => {
+      fixtureEl.innerHTML = validationFixture('novalidate')
+
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+
+      stepper.next()
+
+      const input = fixtureEl.querySelector('#empty')
+      expect(input).toHaveClass('is-invalid')
+
+      input.value = 'corrected'
+      input.dispatchEvent(new Event('input', { bubbles: true }))
+
+      expect(input).not.toHaveClass('is-invalid')
+    })
+
+    it('should clear the validation state on reset', () => {
+      fixtureEl.innerHTML = validationFixture('novalidate')
+
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+
+      stepper.next()
+      expect(fixtureEl.querySelector('#empty')).toHaveClass('is-invalid')
+
+      stepper.reset()
+
+      expect(fixtureEl.querySelector('#empty')).not.toHaveClass('is-invalid')
     })
 
     it('should call reportValidity on non-noValidate forms on failure', () => {

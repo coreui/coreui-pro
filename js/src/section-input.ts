@@ -48,11 +48,12 @@ const CLASS_NAME_FORM_CONTROL = 'form-control'
 const CLASS_NAME_FILLED = 'form-date-time-filled'
 const CLASS_NAME_IS_INVALID = 'is-invalid'
 const CLASS_NAME_IS_VALID = 'is-valid'
-const CLASS_NAME_WAS_VALIDATED = 'was-validated'
 const CLASS_NAME_SECTION = 'form-date-time-section'
 const CLASS_NAME_SECTION_EMPTY = 'form-date-time-section-empty'
 const CLASS_NAME_SEPARATOR = 'form-date-time-separator'
 
+const SELECTOR_FORM_VALIDATE = '[data-coreui-validate]'
+const SELECTOR_FORM_VALIDATE_VALID = '[data-coreui-validate~="valid"]'
 const SELECTOR_SECTION = '.form-date-time-section'
 
 export type SectionInputConfig = {
@@ -360,11 +361,11 @@ class SectionInput extends BaseComponent {
 
     if (form) {
       EventHandler.on(form, eventName('submit'), () => {
-        // Defer to a microtask so a page handler adding `.was-validated`
+        // Defer to a microtask so a page handler adding `data-coreui-validate`
         // during the same submit is taken into account regardless of
         // listener order.
         queueMicrotask(() => {
-          if (!form.classList.contains(CLASS_NAME_WAS_VALIDATED)) {
+          if (!form.matches(SELECTOR_FORM_VALIDATE)) {
             return
           }
 
@@ -374,7 +375,7 @@ class SectionInput extends BaseComponent {
             (this._config.required && this._date === null)
 
           this._element.classList.toggle(CLASS_NAME_IS_INVALID, isInvalid)
-          this._element.classList.toggle(CLASS_NAME_IS_VALID, !isInvalid)
+          this._element.classList.toggle(CLASS_NAME_IS_VALID, !isInvalid && form.matches(SELECTOR_FORM_VALIDATE_VALID))
         })
       })
     }
