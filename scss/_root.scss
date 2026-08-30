@@ -347,6 +347,7 @@ $root-tokens: defaults($root-token-defaults, $root-tokens);
 
 @layer root {
   :root,
+  :host,
   [data#{$data-infix}theme="light"] {
     @include tokens($root-tokens);
 
