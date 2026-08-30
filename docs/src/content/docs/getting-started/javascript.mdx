@@ -77,7 +77,7 @@ If you try this as-is, you'll see an error in the console like the following:
 Uncaught TypeError: Failed to resolve module specifier "@floating-ui/dom". Relative references must start with either "/", "./", or "../".
 ```
 
-To fix this, you can use an `importmap` to resolve the arbitrary module names to complete paths. If your [targeted browsers](https://caniuse.com/?search=importmap) do not support `importmap`, you'll need to use the [es-module-shims](https://github.com/guybedford/es-module-shims) project. Here's how it works for CoreUI and Floating UI:
+To fix this, use an [import map](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap) to resolve the bare module names to complete paths. Here's how it works for CoreUI and Floating UI:
 
 ```html
 <!doctype html>
@@ -92,7 +92,6 @@ To fix this, you can use an `importmap` to resolve the arbitrary module names to
     <h1>Hello, modularity!</h1>
     <button id="popoverButton" type="button" class="btn-solid theme-primary btn-lg" data-coreui-toggle="popover" title="ESM in Browser" data-coreui-content="Bang!">Custom popover</button>
 
-    <script async src="https://cdn.jsdelivr.net/npm/es-module-shims@1/dist/es-module-shims.min.js" crossorigin="anonymous"></script>
     <script type="importmap">
     {
       "imports": {
@@ -109,6 +108,8 @@ To fix this, you can use an `importmap` to resolve the arbitrary module names to
   </body>
 </html>
 ```
+
+The map is needed whatever you import. `coreui.esm.js` is the only build we ship as an ES module and it imports Floating UI at the top, so the specifier has to resolve even for a component that never positions anything. The per-component files under `js/dist/` are UMD — load them with a plain `<script>`, not `<script type="module">`.
 
 ## Dependencies
 
@@ -281,9 +282,9 @@ Every CoreUI for Bootstrap plugin exposes the following methods and static prope
 
 | Method | Description |
 | --- | --- |
-| `dispose` | Destroys an element's modal. (Removes stored data on the DOM element) |
-| `getInstance` | *Static* method which allows you to get the modal instance associated with a DOM element. |
-| `getOrCreateInstance` | *Static* method which allows you to get the modal instance associated with a DOM element, or create a new one in case it wasn't initialized. |
+| `dispose` | Destroys an element's plugin instance. (Removes stored data on the DOM element) |
+| `getInstance` | *Static* method which allows you to get the plugin instance associated with a DOM element. |
+| `getOrCreateInstance` | *Static* method which allows you to get the plugin instance associated with a DOM element, or create a new one in case it wasn't initialized. |
 
 | Static property | Description |
 | --- | --- |
@@ -292,7 +293,7 @@ Every CoreUI for Bootstrap plugin exposes the following methods and static prope
 
 ## Sanitizer
 
-Tooltips, Popovers, and Ratings use our built-in sanitizer to sanitize options which accept HTML.
+Some plugins render or accept arbitrary HTML in their configuration. To prevent cross-site scripting (XSS) attacks, those options pass through our built-in sanitizer before they reach the page. Sanitization is on by default and covers every plugin that takes HTML — Tooltip and Popover, Rating, the Autocomplete, Combobox and Multi Select option renderers, Chip and Chip Input, Calendar and the Date, Date Range, Date Time and Time pickers, Number Input, Password Input and Range Slider.
 
 The default `allowList` value is the following:
 
