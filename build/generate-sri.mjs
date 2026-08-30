@@ -46,6 +46,10 @@ const files = [
     configPropertyName: 'js_pro_bundle_hash'
   },
   {
+    file: 'dist/js/coreui.esm.min.js',
+    configPropertyName: 'js_pro_esm_hash'
+  },
+  {
     file: 'dist/js/bootstrap.min.js',
     configPropertyName: 'js_bs_pro_hash'
   },

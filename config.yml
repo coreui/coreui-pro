@@ -14,6 +14,8 @@ cdn:
   js_hash: "sha384-gf1tanjsJUdqpGpiHABhWprM/7/k8itp69MQWhJGblqf0/0EhOcPA5GPZZE83Br9"
   js_bundle: "https://cdn.jsdelivr.net/npm/@coreui/coreui@5.9.0/dist/js/coreui.bundle.min.js"
   js_bundle_hash: "sha384-FTek6QoTuxz6Bb078pS0kYQ0qH2LZVB5LWwZl8944mluH+TCk0q3OP4PqA+dHJRl"
+  js_esm: "https://cdn.jsdelivr.net/npm/@coreui/coreui@5.9.0/dist/js/coreui.esm.min.js"
+  js_esm_hash: "sha384-cCVKOjLm5MUL2D56ALmwdmVzR6wAAlGaMrM/6B5LVTJOKeylVmfGdUCHzO5r0uEF"
   floating_ui_core: "https://cdn.jsdelivr.net/npm/@floating-ui/core@1.8.0/dist/floating-ui.core.umd.min.js"
   floating_ui_core_hash: "sha384-HNCdK6HYLs4EKIDg2Ml3NdfNMVD/LcFbGXnagRABpWmpJjiEuhrtSIckScRnqDOD"
   floating_ui_dom: "https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.8.0/dist/floating-ui.dom.umd.min.js"
@@ -35,6 +37,8 @@ cdn_pro:
   js_pro_hash: "sha384-kUpSKa20uGjMrb8XIUCECbcTGyZ7WO4FUM9/Dad7olwxxV6JFZqNSNCwAb7OzSYc"
   js_pro_bundle: "https://cdn.jsdelivr.net/npm/@coreui/coreui-pro@5.27.0/dist/js/coreui.bundle.min.js"
   js_pro_bundle_hash: "sha384-5EIITWrYmdJ/lLrIJ/CAkKMbEDQmQ2tbtKex02fTpIPGDke4Gk/2ypdWo43vOvfj"
+  js_pro_esm: "https://cdn.jsdelivr.net/npm/@coreui/coreui-pro@5.27.0/dist/js/coreui.esm.min.js"
+  js_pro_esm_hash: "sha384-PsF+4u61iMi60YqmimN6qPBfr/4L1S96Yvb21YpB/JVqn6r7LboSAsIyANHzxmOi"
 
 cdn_pro_themes:
   css_bs_pro: "https://cdn.jsdelivr.net/npm/@coreui/coreui-pro@5.27.0/dist/css/themes/bootstrap/bootstrap.min.css"
