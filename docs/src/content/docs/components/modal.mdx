@@ -16,7 +16,7 @@ Bootstrap modals are lightweight and multi-purpose popups built on the native `<
 - Focus trapping, background inertness, and the dialog ARIA semantics come from the browser — no `role`, `aria-modal`, `aria-hidden`, or `tabindex` attributes are needed in the markup.
 - The backdrop is the native `::backdrop` pseudo-element. Clicking it closes the modal, and page scroll is blocked while a modal is open.
 - Modals are vertically and horizontally centered by the browser.
-- Due to how HTML5 defines its semantics, [the `autofocus` HTML attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#attr-autofocus) has no effect in Bootstrap modals. To achieve the same effect, use some custom JavaScript:
+- Due to how HTML5 defines its semantics, [the `autofocus` HTML attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#attr-autofocus) has no effect in CoreUI modals. To achieve the same effect, use some custom JavaScript:
 
 ```js
 const myModal = document.getElementById('myModal')
@@ -387,7 +387,7 @@ Be sure to add `aria-labelledby="..."`, referencing the modal title, to the `<di
 
 ### Embedding YouTube videos
 
-Embedding YouTube videos in modals requires additional JavaScript not in Bootstrap to automatically stop playback and more. [See this helpful Stack Overflow post](https://stackoverflow.com/questions/18622508/bootstrap-3-and-youtube-in-modal) for more information.
+Embedding YouTube videos in modals requires additional JavaScript not in CoreUI to automatically stop playback and more. [See this helpful Stack Overflow post](https://stackoverflow.com/questions/18622508/bootstrap-3-and-youtube-in-modal) for more information.
 
 ## Optional sizes
 

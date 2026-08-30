@@ -21,7 +21,7 @@ Because `light-dark()` resolves both modes above, only one value still needs a d
 
 ## Component variables
 
-CoreUI is increasingly making use of custom properties as local variables for various components. This way we reduce our compiled CSS, ensure styles aren't inherited in places like nested tables, and allow some basic restyling and extending of Bootstrap components after Sass compilation.
+CoreUI is increasingly making use of custom properties as local variables for various components. This way we reduce our compiled CSS, ensure styles aren't inherited in places like nested tables, and allow some basic restyling and extending of CoreUI components after Sass compilation.
 
 Have a look at our table documentation for some [insight into how we're using CSS variables](/content/tables/#how-do-the-variants-and-accented-tables-work). Our [navbars also use CSS variables](/components/navbar/#css) as of v4.2.6. We're also using CSS variables across our grids—primarily for gutters the [new opt-in CSS grid](/layout/css-grid/)—with more component usage coming in the future.
 
@@ -52,7 +52,7 @@ a {
 
 <AddedIn version="4.3.0" />
 
-Bootstrap provides custom `:focus` styles using a combination of Sass and CSS variables that can be optionally added to specific components and elements. We do not yet globally override all `:focus` styles.
+CoreUI provides custom `:focus` styles using a combination of Sass and CSS variables that can be optionally added to specific components and elements. We do not yet globally override all `:focus` styles.
 
 In our Sass, we set default values that can be customized before compiling.
 
