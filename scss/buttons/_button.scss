@@ -427,12 +427,6 @@ $btn-check-deprecated: ".btn-check:not(#{$btn-variant-selectors})" !default;
   }
   // scss-docs-end btn-deprecated-modifiers
 
-  .btn-transparent {
-    --#{$prefix}btn-active-border-color: transparent;
-    --#{$prefix}btn-disabled-border-color: transparent;
-    --#{$prefix}btn-hover-border-color: transparent;
-  }
-
 
   //
   // Link buttons
