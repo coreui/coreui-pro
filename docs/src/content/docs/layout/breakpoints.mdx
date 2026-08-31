@@ -187,4 +187,13 @@ Which results in:
 @container (width >= 768px) { ... }
 ```
 
-Our [CSS Grid](/layout/css-grid/) is built this way: every `.grid` is a query container, so `.g-col-md-*` follows the width of the grid rather than the browser window.
+Several parts of the library are built this way, which is worth knowing when a component responds to something other than the window:
+
+| Query container | What follows its width |
+| --- | --- |
+| `.grid` | `.g-col-md-*` and the rest of the [CSS Grid](/layout/css-grid/) column classes |
+| `.navbar` | `.navbar-expand-*` — a navbar in a sidebar collapses there while a full-width one on the same page stays expanded |
+| `.table-responsive`, `.table-responsive-*` | the scroll threshold of a [responsive table](/content/tables/#responsive-tables) |
+| `.stack-container` | the [stack helpers](/helpers/stacks/) inside it |
+
+You can make anything else one with `set-container()` in Sass, or the `.contains-inline` utility in markup.
