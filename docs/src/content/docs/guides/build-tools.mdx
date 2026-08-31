@@ -34,9 +34,17 @@ Dart Sass uses a rounding precision of 10 and for efficiency reasons does not al
 
 ## Autoprefixer
 
-CoreUI for Bootstrap uses [Autoprefixer](https://github.com/postcss/autoprefixer) (included in our build process) to automatically add vendor prefixes to some CSS properties at build time. Doing so saves us time and code by allowing us to write key parts of our CSS a single time while eliminating the need for vendor mixins like those found in v3.
+CoreUI for Bootstrap uses [Autoprefixer](https://github.com/postcss/autoprefixer) (included in our build process) to automatically add vendor prefixes to some CSS properties at build time, so we write each declaration once instead of maintaining prefixed copies of it.
 
 We maintain the list of browsers supported through Autoprefixer in a separate file within our GitHub repository. See [.browserslistrc](https://github.com/coreui/coreui/blob/v[[config:current_version]]/.browserslistrc) for details.
+
+## JavaScript
+
+Our JavaScript source is TypeScript and lives in `js/src/`. We bundle it with [Rolldown](https://rolldown.rs/), then minify the output with [terser](https://github.com/terser/terser). Rolldown strips the types and lowers the syntax itself, so there is no Babel step.
+
+Rolldown does not read `.browserslistrc`, so [build/browser-targets.mjs](https://github.com/coreui/coreui/blob/v[[config:current_version]]/build/browser-targets.mjs) resolves that file at build time and converts it into the target list the bundler expects. Both pipelines therefore honor one browser list — change `.browserslistrc` and the CSS prefixes and the JS syntax level move together.
+
+We ship our own type declarations, emitted by `npm run js-emit-types`, so no `@types/` package is needed. The bundler configuration is in [build/rolldown.config.mjs](https://github.com/coreui/coreui/blob/v[[config:current_version]]/build/rolldown.config.mjs).
 
 ## Local documentation
 
