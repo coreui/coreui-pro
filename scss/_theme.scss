@@ -23,70 +23,70 @@ $theme-colors: (
     "base":          $primary,
     "contrast":      $white,
     "fg":            light-dark(var(--#{$prefix}primary-600), var(--#{$prefix}primary-400)),
-    "text-emphasis": light-dark(var(--#{$prefix}primary-800), var(--#{$prefix}primary-200)),
+    "fg-emphasis":   light-dark(var(--#{$prefix}primary-800), var(--#{$prefix}primary-200)),
     "bg-subtle":     light-dark(var(--#{$prefix}primary-100), var(--#{$prefix}primary-900)),
     "bg-muted":      light-dark(var(--#{$prefix}primary-200), var(--#{$prefix}primary-800)),
-    "border-subtle": light-dark(var(--#{$prefix}primary-300), var(--#{$prefix}primary-600)),
+    "border":        light-dark(var(--#{$prefix}primary-300), var(--#{$prefix}primary-600)),
     "focus-ring":    color-mix(in srgb, var(--#{$prefix}primary) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
   ),
   "secondary": (
     "base":          $secondary,
     "contrast":      light-dark(var(--#{$prefix}gray-900), var(--#{$prefix}white)),
     "fg":            light-dark(var(--#{$prefix}gray-600), var(--#{$prefix}gray-400)),
-    "text-emphasis": light-dark(var(--#{$prefix}gray-800), var(--#{$prefix}gray-200)),
+    "fg-emphasis":   light-dark(var(--#{$prefix}gray-800), var(--#{$prefix}gray-200)),
     "bg-subtle":     light-dark(var(--#{$prefix}gray-025), var(--#{$prefix}gray-800)),
     "bg-muted":      light-dark(var(--#{$prefix}gray-050), var(--#{$prefix}gray-700)),
-    "border-subtle": light-dark(var(--#{$prefix}gray-300), var(--#{$prefix}gray-600)),
+    "border":        light-dark(var(--#{$prefix}gray-300), var(--#{$prefix}gray-600)),
     "focus-ring":    color-mix(in srgb, light-dark(var(--#{$prefix}gray-500), var(--#{$prefix}gray-300)) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
   ),
   "success": (
     "base":          $success,
     "contrast":      $black,
     "fg":            light-dark(var(--#{$prefix}success-600), var(--#{$prefix}success-400)),
-    "text-emphasis": light-dark(var(--#{$prefix}success-800), var(--#{$prefix}success-200)),
+    "fg-emphasis":   light-dark(var(--#{$prefix}success-800), var(--#{$prefix}success-200)),
     "bg-subtle":     light-dark(var(--#{$prefix}success-100), var(--#{$prefix}success-900)),
     "bg-muted":      light-dark(var(--#{$prefix}success-200), var(--#{$prefix}success-800)),
-    "border-subtle": light-dark(var(--#{$prefix}success-300), var(--#{$prefix}success-600)),
+    "border":        light-dark(var(--#{$prefix}success-300), var(--#{$prefix}success-600)),
     "focus-ring":    color-mix(in srgb, var(--#{$prefix}success) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
   ),
   "info": (
     "base":          $info,
     "contrast":      $black,
     "fg":            light-dark(var(--#{$prefix}info-700), var(--#{$prefix}info-300)),
-    "text-emphasis": light-dark(var(--#{$prefix}info-800), var(--#{$prefix}info-200)),
+    "fg-emphasis":   light-dark(var(--#{$prefix}info-800), var(--#{$prefix}info-200)),
     "bg-subtle":     light-dark(var(--#{$prefix}info-100), var(--#{$prefix}info-900)),
     "bg-muted":      light-dark(var(--#{$prefix}info-200), var(--#{$prefix}info-800)),
-    "border-subtle": light-dark(var(--#{$prefix}info-300), var(--#{$prefix}info-600)),
+    "border":        light-dark(var(--#{$prefix}info-300), var(--#{$prefix}info-600)),
     "focus-ring":    color-mix(in srgb, var(--#{$prefix}info) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
   ),
   "warning": (
     "base":          $warning,
     "contrast":      $black,
     "fg":            light-dark(var(--#{$prefix}warning-700), var(--#{$prefix}warning-300)),
-    "text-emphasis": light-dark(var(--#{$prefix}warning-800), var(--#{$prefix}warning-200)),
+    "fg-emphasis":   light-dark(var(--#{$prefix}warning-800), var(--#{$prefix}warning-200)),
     "bg-subtle":     light-dark(var(--#{$prefix}warning-100), var(--#{$prefix}warning-900)),
     "bg-muted":      light-dark(var(--#{$prefix}warning-200), var(--#{$prefix}warning-800)),
-    "border-subtle": light-dark(var(--#{$prefix}warning-300), var(--#{$prefix}warning-600)),
+    "border":        light-dark(var(--#{$prefix}warning-300), var(--#{$prefix}warning-600)),
     "focus-ring":    color-mix(in srgb, var(--#{$prefix}warning) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
   ),
   "danger": (
     "base":          $danger,
     "contrast":      $black,
     "fg":            light-dark(var(--#{$prefix}danger-600), var(--#{$prefix}danger-400)),
-    "text-emphasis": light-dark(var(--#{$prefix}danger-800), var(--#{$prefix}danger-200)),
+    "fg-emphasis":   light-dark(var(--#{$prefix}danger-800), var(--#{$prefix}danger-200)),
     "bg-subtle":     light-dark(var(--#{$prefix}danger-100), var(--#{$prefix}danger-900)),
     "bg-muted":      light-dark(var(--#{$prefix}danger-200), var(--#{$prefix}danger-800)),
-    "border-subtle": light-dark(var(--#{$prefix}danger-300), var(--#{$prefix}danger-600)),
+    "border":        light-dark(var(--#{$prefix}danger-300), var(--#{$prefix}danger-600)),
     "focus-ring":    color-mix(in srgb, var(--#{$prefix}danger) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
   ),
   "inverse": (
     "base":          $inverse,
     "contrast":      light-dark(var(--#{$prefix}white), var(--#{$prefix}gray-900)),
     "fg":            light-dark(var(--#{$prefix}gray-900), var(--#{$prefix}gray-200)),
-    "text-emphasis": light-dark(var(--#{$prefix}black), var(--#{$prefix}white)),
+    "fg-emphasis":   light-dark(var(--#{$prefix}black), var(--#{$prefix}white)),
     "bg-subtle":     light-dark(var(--#{$prefix}gray-100), var(--#{$prefix}gray-900)),
     "bg-muted":      light-dark(var(--#{$prefix}gray-200), var(--#{$prefix}gray-700)),
-    "border-subtle": light-dark(var(--#{$prefix}gray-400), var(--#{$prefix}gray-600)),
+    "border":        light-dark(var(--#{$prefix}gray-400), var(--#{$prefix}gray-600)),
     "focus-ring":    color-mix(in srgb, light-dark(var(--#{$prefix}gray-900), var(--#{$prefix}gray-100)) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
   ),
 ) !default;
@@ -107,17 +107,17 @@ $theme-colors: (
 // swaps ends of the scale between schemes, which a scale mixed from one base
 // cannot do.
 
-// scss-docs-start theme-text-map
-$theme-colors-text: map-slot($theme-colors, "text-emphasis") !default;
-// scss-docs-end theme-text-map
+// scss-docs-start theme-fg-emphasis-map
+$theme-colors-fg-emphasis: map-slot($theme-colors, "fg-emphasis") !default;
+// scss-docs-end theme-fg-emphasis-map
 
 // scss-docs-start theme-bg-subtle-map
 $theme-colors-bg-subtle: map-slot($theme-colors, "bg-subtle") !default;
 // scss-docs-end theme-bg-subtle-map
 
-// scss-docs-start theme-border-subtle-map
-$theme-colors-border-subtle: map-slot($theme-colors, "border-subtle") !default;
-// scss-docs-end theme-border-subtle-map
+// scss-docs-start theme-border-map
+$theme-colors-border: map-slot($theme-colors, "border") !default;
+// scss-docs-end theme-border-map
 
 // scss-docs-start theme-contrast-map
 $theme-colors-contrast: map-slot($theme-colors, "contrast") !default;
@@ -146,10 +146,10 @@ $theme-token-refs: (
   "bg": "",
   "contrast": "-contrast",
   "fg": "-fg",
-  "fg-emphasis": "-text-emphasis",
+  "fg-emphasis": "-fg-emphasis",
   "bg-subtle": "-bg-subtle",
   "bg-muted": "-bg-muted",
-  "border": "-border-subtle",
+  "border": "-border",
   "focus-ring": "-focus-ring"
 ) !default;
 // scss-docs-end theme-token-refs
@@ -231,6 +231,7 @@ $theme-state-colors: (
 
   @each $color, $slots in $theme-colors {
     $tokens: map.set($tokens, --#{$prefix}#{$color}, map.get($slots, "base"));
+    $tokens: map.set($tokens, --#{$prefix}#{$color}-base, var(--#{$prefix}#{$color}));
   }
 
   // The action-background slot: what checked, active and filled states read.
@@ -246,16 +247,16 @@ $theme-state-colors: (
     $tokens: map.merge($tokens, color-scale-tokens($color));
   }
 
-  @each $color, $value in $theme-colors-text {
-    $tokens: map.set($tokens, --#{$prefix}#{$color}-text-emphasis, $value);
+  @each $color, $value in $theme-colors-fg-emphasis {
+    $tokens: map.set($tokens, --#{$prefix}#{$color}-fg-emphasis, $value);
   }
 
   @each $color, $value in $theme-colors-bg-subtle {
     $tokens: map.set($tokens, --#{$prefix}#{$color}-bg-subtle, $value);
   }
 
-  @each $color, $value in $theme-colors-border-subtle {
-    $tokens: map.set($tokens, --#{$prefix}#{$color}-border-subtle, $value);
+  @each $color, $value in $theme-colors-border {
+    $tokens: map.set($tokens, --#{$prefix}#{$color}-border, $value);
   }
 
   @each $color, $value in $theme-colors-contrast {

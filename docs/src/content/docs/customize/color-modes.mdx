@@ -97,7 +97,7 @@ $color-mode-type: data;
 
 @include color-mode(dark) {
   .element {
-    color: var(--cui-primary-text-emphasis);
+    color: var(--cui-primary-fg-emphasis);
     background-color: var(--cui-primary-bg-subtle);
   }
 }
@@ -107,7 +107,7 @@ Outputs to:
 
 ```css
 [data-coreui-theme=dark] .element {
-  color: var(--cui-primary-text-emphasis);
+  color: var(--cui-primary-fg-emphasis);
   background-color: var(--cui-primary-bg-subtle);
 }
 ```
@@ -119,7 +119,7 @@ $color-mode-type: media-query;
 
 @include color-mode(dark) {
   .element {
-    color: var(--cui-primary-text-emphasis);
+    color: var(--cui-primary-fg-emphasis);
     background-color: var(--cui-primary-bg-subtle);
   }
 }
@@ -130,7 +130,7 @@ Outputs to:
 ```css
 @media (prefers-color-scheme: dark) {
   .element {
-    color: var(--cui-primary-text-emphasis);
+    color: var(--cui-primary-fg-emphasis);
     background-color: var(--cui-primary-bg-subtle);
   }
 }
@@ -245,7 +245,7 @@ $theme-colors: map.merge($theme-colors, (
     "base":          #712cf9,
     "contrast":      #fff,
     "fg":            light-dark(var(--cui-custom-color-600), var(--cui-custom-color-400)),
-    "text-emphasis": light-dark(var(--cui-custom-color-800), var(--cui-custom-color-200)),
+    "fg-emphasis": light-dark(var(--cui-custom-color-800), var(--cui-custom-color-200)),
     "bg-subtle":     light-dark(var(--cui-custom-color-100), var(--cui-custom-color-900)),
     "bg-muted":      light-dark(var(--cui-custom-color-200), var(--cui-custom-color-800)),
     "border-subtle": light-dark(var(--cui-custom-color-300), var(--cui-custom-color-600)),

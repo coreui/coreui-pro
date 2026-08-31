@@ -238,7 +238,7 @@ finished, not whether the state changed.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **The open item is neutral, and `.theme-{color}` is what tints it.**
   `--cui-accordion-active-bg` and `--cui-accordion-active-color` were fixed to
-  `--cui-primary-bg-subtle` / `--cui-primary-text-emphasis`, so every accordion
+  `--cui-primary-bg-subtle` / `--cui-primary-fg-emphasis`, so every accordion
   turned the brand colour on open whether or not that suited the page. They are
   `--cui-bg-4` and `--cui-fg-body` now, and the active tokens resolve
   through `--cui-theme-fg` / `-bg-subtle` / `-border` first — so the colour is a
@@ -2280,6 +2280,19 @@ them. A state names a theme colour now, and every value is a slot of it.
   and not once for these two. Write the `calc()` yourself; guard a possible
   `0` with `if($value == 0, …)` where it can actually occur. `divide()` stays,
   the grid still uses it.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The theme colour tokens finish the rename to the slot names.**
+  `--cui-{color}-text-emphasis` is `--cui-{color}-fg-emphasis` and
+  `--cui-{color}-border-subtle` is `--cui-{color}-border`. The theme slots
+  (`--cui-theme-fg-emphasis`, `--cui-theme-border`) already carried these
+  names; the colour tokens they read did not, so the two halves of the same
+  system spelled the same idea differently. `--cui-{color}-base` is added
+  alongside the bare `--cui-{color}`, which stays. The Sass keys move with
+  them: `"text-emphasis"` → `"fg-emphasis"` and `"border-subtle"` → `"border"`
+  in `$theme-colors`, `$theme-colors-text` → `$theme-colors-fg-emphasis`,
+  `$theme-colors-border-subtle` → `$theme-colors-border`. **No class names
+  change** — `.text-primary-emphasis` and `.border-primary-subtle` take their
+  suffix from the utility definition, not from the token.
 - **`form-validation-state()` takes `$theme` where it took `$color`**, and the
   variables moved from `scss/_config.scss` into the partials that use them
   alongside `$form-text-*` and `$form-feedback-*`.
@@ -2732,8 +2745,8 @@ pair, and `[data#{$data-infix}theme="dark"]` only declares `color-scheme: dark`.
   `$grays-dark` map. Every one of them was defined as exactly its light
   counterpart, so they generated nothing — read `$gray-*` directly. The bundled
   Bootstrap theme no longer passes `$grays-dark: ()` through its `with()` block.
-- **`$theme-colors-dark` is gone**, along with `$theme-colors-text-dark`,
-  `$theme-colors-bg-subtle-dark`, `$theme-colors-border-subtle-dark` and
+- **`$theme-colors-dark` is gone**, along with `$theme-colors-fg-emphasis-dark`,
+  `$theme-colors-bg-subtle-dark`, `$theme-colors-border-dark` and
   `$theme-colors-contrast-dark`, and the eight `$primary-dark` … `$dark-dark`
   variables behind them. Theme colours themselves no longer change
   between colour modes — the old dark variants were a 10% desaturation, which

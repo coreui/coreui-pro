@@ -38,10 +38,10 @@ Every entry defines the same slots, emitted as `--cui-{color}-{slot}` on `:root`
 | — | `--cui-primary-bg` | The action-background slot: what checked, active and filled states read; points at the base |
 | `contrast` | `--cui-primary-contrast` | Text and icons sitting on the solid base |
 | `fg` | `--cui-primary-fg` | The color readable as text, one step lighter than the emphasis |
-| `text-emphasis` | `--cui-primary-text-emphasis` | High-contrast foreground text |
+| `text-emphasis` | `--cui-primary-fg-emphasis` | High-contrast foreground text |
 | `bg-subtle` | `--cui-primary-bg-subtle` | Subtle background tint for low-emphasis surfaces |
 | `bg-muted` | `--cui-primary-bg-muted` | Muted background, between subtle and solid |
-| `border-subtle` | `--cui-primary-border-subtle` | Border color |
+| `border-subtle` | `--cui-primary-border` | Border color |
 | `focus-ring` | `--cui-primary-focus-ring` | The hue the color's focus ring mixes from |
 
 The slot values are `light-dark()` pairs of stops from the runtime scale, so a theme color reads correctly in both color modes without a second set of definitions:
@@ -85,7 +85,7 @@ $theme-colors: map.merge($theme-colors, (
     "base":          #6f42c1,
     "contrast":      #fff,
     "fg":            light-dark(var(--cui-brand-600), var(--cui-brand-400)),
-    "text-emphasis": light-dark(var(--cui-brand-800), var(--cui-brand-200)),
+    "fg-emphasis": light-dark(var(--cui-brand-800), var(--cui-brand-200)),
     "bg-subtle":     light-dark(var(--cui-brand-100), var(--cui-brand-900)),
     "bg-muted":      light-dark(var(--cui-brand-200), var(--cui-brand-800)),
     "border-subtle": light-dark(var(--cui-brand-300), var(--cui-brand-600)),

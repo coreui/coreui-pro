@@ -194,7 +194,7 @@ $custom-colors: (
     "base":          #900,
     "contrast":      #fff,
     "fg":            light-dark(var(--cui-custom-color-600), var(--cui-custom-color-400)),
-    "text-emphasis": light-dark(var(--cui-custom-color-800), var(--cui-custom-color-200)),
+    "fg-emphasis": light-dark(var(--cui-custom-color-800), var(--cui-custom-color-200)),
     "bg-subtle":     light-dark(var(--cui-custom-color-100), var(--cui-custom-color-900)),
     "bg-muted":      light-dark(var(--cui-custom-color-200), var(--cui-custom-color-800)),
     "border-subtle": light-dark(var(--cui-custom-color-300), var(--cui-custom-color-600)),
@@ -216,7 +216,7 @@ To remove colors from `$theme-colors`, or any other map, use `map-remove`. Be aw
 @use "@coreui/coreui/scss/theme" as *;
 
 $theme-colors: map-remove($theme-colors, "info", "light", "dark");
-$theme-colors-border-subtle: map.remove($theme-colors-border-subtle, "info", "light", "dark");
+$theme-colors-border: map.remove($theme-colors-border, "info", "light", "dark");
 
 @use "@coreui/coreui/scss/coreui";
 ```

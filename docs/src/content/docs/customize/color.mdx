@@ -126,18 +126,18 @@ To fade any of these colors, mix it toward `transparent` rather than reaching fo
     </tr>
     <tr>
       <td>
-        <div class="p-3 rounded-2" style="border: 5px var(--cui-primary-border-subtle) solid">&nbsp;</div>
+        <div class="p-3 rounded-2" style="border: 5px var(--cui-primary-border) solid">&nbsp;</div>
       </td>
       <td>
-        `--cui-primary-border-subtle`
+        `--cui-primary-border`
       </td>
     </tr>
     <tr>
       <td>
-        <div class="py-3 fw-bold h5" style="color: var(--cui-primary-text-emphasis)">Text</div>
+        <div class="py-3 fw-bold h5" style="color: var(--cui-primary-fg-emphasis)">Text</div>
       </td>
       <td>
-        `--cui-primary-text-emphasis`
+        `--cui-primary-fg-emphasis`
       </td>
     </tr>
     <tr>
@@ -161,18 +161,18 @@ To fade any of these colors, mix it toward `transparent` rather than reaching fo
     </tr>
     <tr>
       <td>
-        <div class="p-3 rounded-2" style="border: 5px var(--cui-success-border-subtle) solid">&nbsp;</div>
+        <div class="p-3 rounded-2" style="border: 5px var(--cui-success-border) solid">&nbsp;</div>
       </td>
       <td>
-        `--cui-success-border-subtle`
+        `--cui-success-border`
       </td>
     </tr>
     <tr>
       <td>
-        <div class="py-3 fw-bold h5" style="color: var(--cui-success-text-emphasis)">Text</div>
+        <div class="py-3 fw-bold h5" style="color: var(--cui-success-fg-emphasis)">Text</div>
       </td>
       <td>
-        `--cui-success-text-emphasis`
+        `--cui-success-fg-emphasis`
       </td>
     </tr>
     <tr>
@@ -196,18 +196,18 @@ To fade any of these colors, mix it toward `transparent` rather than reaching fo
     </tr>
     <tr>
       <td>
-        <div class="p-3 rounded-2" style="border: 5px var(--cui-danger-border-subtle) solid">&nbsp;</div>
+        <div class="p-3 rounded-2" style="border: 5px var(--cui-danger-border) solid">&nbsp;</div>
       </td>
       <td>
-        `--cui-danger-border-subtle`
+        `--cui-danger-border`
       </td>
     </tr>
     <tr>
       <td>
-        <div class="py-3 fw-bold h5" style="color: var(--cui-danger-text-emphasis)">Text</div>
+        <div class="py-3 fw-bold h5" style="color: var(--cui-danger-fg-emphasis)">Text</div>
       </td>
       <td>
-        `--cui-danger-text-emphasis`
+        `--cui-danger-fg-emphasis`
       </td>
     </tr>
     <tr>
@@ -231,18 +231,18 @@ To fade any of these colors, mix it toward `transparent` rather than reaching fo
     </tr>
     <tr>
       <td>
-        <div class="p-3 rounded-2" style="border: 5px var(--cui-warning-border-subtle) solid">&nbsp;</div>
+        <div class="p-3 rounded-2" style="border: 5px var(--cui-warning-border) solid">&nbsp;</div>
       </td>
       <td>
-        `--cui-warning-border-subtle`
+        `--cui-warning-border`
       </td>
     </tr>
     <tr>
       <td>
-        <div class="py-3 fw-bold h5" style="color: var(--cui-warning-text-emphasis)">Text</div>
+        <div class="py-3 fw-bold h5" style="color: var(--cui-warning-fg-emphasis)">Text</div>
       </td>
       <td>
-        `--cui-warning-text-emphasis`
+        `--cui-warning-fg-emphasis`
       </td>
     </tr>
     <tr>
@@ -266,18 +266,18 @@ To fade any of these colors, mix it toward `transparent` rather than reaching fo
     </tr>
     <tr>
       <td>
-        <div class="p-3 rounded-2" style="border: 5px var(--cui-info-border-subtle) solid">&nbsp;</div>
+        <div class="p-3 rounded-2" style="border: 5px var(--cui-info-border) solid">&nbsp;</div>
       </td>
       <td>
-        `--cui-info-border-subtle`
+        `--cui-info-border`
       </td>
     </tr>
     <tr>
       <td>
-        <div class="py-3 fw-bold h5" style="color: var(--cui-info-text-emphasis)">Text</div>
+        <div class="py-3 fw-bold h5" style="color: var(--cui-info-fg-emphasis)">Text</div>
       </td>
       <td>
-        `--cui-info-text-emphasis`
+        `--cui-info-fg-emphasis`
       </td>
     </tr>
     <tr>
@@ -301,18 +301,18 @@ To fade any of these colors, mix it toward `transparent` rather than reaching fo
     </tr>
     <tr>
       <td>
-        <div class="p-3 rounded-2" style="border: 5px var(--cui-inverse-border-subtle) solid">&nbsp;</div>
+        <div class="p-3 rounded-2" style="border: 5px var(--cui-inverse-border) solid">&nbsp;</div>
       </td>
       <td>
-        `--cui-inverse-border-subtle`
+        `--cui-inverse-border`
       </td>
     </tr>
     <tr>
       <td>
-        <div class="py-3 fw-bold h5" style="color: var(--cui-inverse-text-emphasis)">Text</div>
+        <div class="py-3 fw-bold h5" style="color: var(--cui-inverse-fg-emphasis)">Text</div>
       </td>
       <td>
-        `--cui-inverse-text-emphasis`
+        `--cui-inverse-fg-emphasis`
       </td>
     </tr>
   </tbody>
@@ -477,7 +477,7 @@ every theme color's emphasis tone (e.g., `.text-purple`, `.text-success`).
 @use "@coreui/coreui/scss/theme" as *;
 @use "@coreui/coreui/scss/utilities" as *;
 
-$all-colors: map-merge-multiple($colors, map-slot($theme-colors, "text-emphasis"));
+$all-colors: map-merge-multiple($colors, map-slot($theme-colors, "fg-emphasis"));
 
 $utilities: map.merge(
   $utilities,
