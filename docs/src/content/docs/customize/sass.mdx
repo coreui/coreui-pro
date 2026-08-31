@@ -383,6 +383,8 @@ $subtle-backgrounds: map-slot($theme-colors, "bg-subtle");
 
 Our `scss/mixins/` directory has a ton of mixins that power parts of CoreUI for Bootstrap and can also be used across your own project.
 
+Two of the mixins you are most likely to reach for are documented elsewhere, next to the systems they belong to: `tokens()`, which turns a token map into custom properties on a class, in [Architecture](/customize/architecture/#component-tokens), and the theme class generator in [Theme](/customize/theme/#theme-classes).
+
 ### Color schemes
 
 A shorthand mixin for the `prefers-color-scheme` media query is available with support for `light`, `dark`, and custom color schemes.
@@ -402,3 +404,20 @@ A shorthand mixin for the `prefers-color-scheme` media query is available with s
   }
 }
 ```
+
+### Mask icons
+
+An icon carried as a `background-image` paints the colour baked into the SVG, so it cannot follow a theme. `mask-icon()` renders the shape through a CSS mask instead, which paints it with the element's `background-color` — so the icon takes whatever token that property reads.
+
+<ScssDocs file="scss/mixins/_mask-icon.scss" capture="mask-icon-mixin" />
+
+```scss
+@use "@coreui/coreui/scss/mixins/mask-icon" as *;
+
+.my-toggle {
+  @include mask-icon(url("data:image/svg+xml,…"));
+  background-color: var(--cui-theme-fg, var(--cui-fg-2));
+}
+```
+
+Pass `null` for the icon when the shape is applied conditionally — per state, or per direction — and set `mask-image` in the branch that needs it.
