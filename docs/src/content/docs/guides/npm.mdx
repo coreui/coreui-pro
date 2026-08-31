@@ -36,21 +36,21 @@ We're building a npm project with CoreUI from scratch, so there are some prerequ
    npm i --save-dev autoprefixer postcss postcss-cli sass
    ```
 
-4. **Install local development tools.** Lastly, to make life a little easier, we recommend some dev tools for running a local server with automatic rebuilds. We use `nodemon` to watch files for changes, `npm-run-all` to run multiple npm scripts at a time, and `sirv-cli` to run a local server.
+4. **Install local development tools.** Lastly, to make life a little easier, we recommend some dev tools for running a local server with automatic rebuilds. We use `nodemon` to watch files for changes, `npm-run-all` to run multiple npm scripts at a time, `sirv-cli` to run a local server, and `stylelint` to keep your Sass consistent with the style CoreUI is written in.
 
    ```sh
-   npm i --save-dev nodemon npm-run-all sirv-cli
+   npm i --save-dev nodemon npm-run-all sirv-cli stylelint stylelint-config-twbs-bootstrap
    ```
 
 Now that we have all the necessary dependencies installed, we can get to work creating the project files and importing CoreUI.
 
 ## Project structure
 
-We've already created the `my-project` folder and initialized npm. Now we'll also create our `scss` folder, stylesheet, and configuration file to round out the project structure. Run the following from `my-project`, or manually create the folder and file structure shown below.
+We've already created the `my-project` folder and initialized npm. Now we'll also create our `scss` folder, stylesheet, and configuration files to round out the project structure. Run the following from `my-project`, or manually create the folder and file structure shown below.
 
 ```sh
 mkdir {css,scss}
-touch index.html scss/styles.scss postcss.config.js
+touch index.html scss/styles.scss postcss.config.js stylelint.config.mjs
 ```
 
 When you're done, your project should look like this:
@@ -63,7 +63,8 @@ my-project/
 ├── index.html
 ├── package-lock.json
 ├── package.json
-└── postcss.config.js
+├── postcss.config.js
+└── stylelint.config.mjs
 ```
 
 At this point, everything is in the right place, but we'll need to configure our files and add some npm scripts to compile the CSS.
@@ -125,7 +126,7 @@ With dependencies installed and our project folder ready for us to start coding,
 
    *[Read our JavaScript docs](/getting-started/javascript/) for more information on how to use CoreUI's plugins.*
 
-4. **Add npm scripts to `package.json`.** Open `package.json` and add the following scripts. We use `sass` to compile our Sass (with `--load-path=node_modules` so it can resolve CoreUI), `postcss-cli` to apply Autoprefixer, `nodemon` to watch for changes, `npm-run-all` to run scripts in sequence or in parallel, and `sirv-cli` to serve our project.
+4. **Add npm scripts to `package.json`.** Open `package.json` and add the following scripts. We use `sass` to compile our Sass (with `--load-path=node_modules` so it can resolve CoreUI), `postcss-cli` to apply Autoprefixer, `nodemon` to watch for changes, `npm-run-all` to run scripts in sequence or in parallel, `sirv-cli` to serve our project, and `stylelint` to lint our Sass.
 
    ```json
    {
@@ -136,13 +137,23 @@ With dependencies installed and our project folder ready for us to start coding,
        "build": "npm-run-all --sequential css-compile css-prefix",
        "watch": "nodemon --watch scss/ --ext scss --exec \"npm run build\"",
        "serve": "sirv --port 8080 --dev .",
-       "start": "npm-run-all build --parallel watch serve"
+       "start": "npm-run-all build --parallel watch serve",
+       "lint": "stylelint \"scss/**/*.scss\""
      },
      // ...
    }
    ```
 
-5. **And finally, we can start the npm scripts.** From the `my-project` folder in your terminal, run that newly added npm script:
+5. **Configure `stylelint.config.mjs`.** `stylelint-config-twbs-bootstrap` is the shared config CoreUI's own stylesheets are linted with, so your Sass follows the same rules as the source you are extending.
+
+   ```js
+   /** @type {import('stylelint').Config} */
+   export default {
+     extends: 'stylelint-config-twbs-bootstrap',
+   }
+   ```
+
+6. **And finally, we can start the npm scripts.** From the `my-project` folder in your terminal, run that newly added npm script:
 
    ```sh
    npm start
