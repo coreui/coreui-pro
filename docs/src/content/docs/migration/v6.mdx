@@ -2273,6 +2273,13 @@ them. A state names a theme colour now, and every value is a slot of it.
   the toggler had no focus indicator at all. The ring is an `outline` now,
   like everywhere else; restyle it through `--cui-focus-ring-width`,
   `--cui-focus-ring-color` and `--cui-focus-ring-offset`.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`add()` and `subtract()` are removed.** They wrapped `calc()` to keep a
+  unitless `0` from making the expression invalid. v6 computes derived values
+  in the browser, so the stylesheet reaches for `calc()` directly — 243 times,
+  and not once for these two. Write the `calc()` yourself; guard a possible
+  `0` with `if($value == 0, …)` where it can actually occur. `divide()` stays,
+  the grid still uses it.
 - **`form-validation-state()` takes `$theme` where it took `$color`**, and the
   variables moved from `scss/_config.scss` into the partials that use them
   alongside `$form-text-*` and `$form-feedback-*`.
