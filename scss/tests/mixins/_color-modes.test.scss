@@ -10,7 +10,7 @@
       @include output() {
         @include color-mode(dark) {
           .element {
-            color: var(--cui-primary-text-emphasis);
+            color: var(--cui-primary-fg-emphasis);
             background-color: var(--cui-primary-bg-subtle);
           }
         }
@@ -20,7 +20,7 @@
       }
       @include expect() {
         [data-coreui-theme=dark] .element {
-          color: var(--cui-primary-text-emphasis);
+          color: var(--cui-primary-fg-emphasis);
           background-color: var(--cui-primary-bg-subtle);
         }
         [data-coreui-theme=dark] {
@@ -39,7 +39,7 @@
       @include output() {
         @include color-mode(dark) {
           .element {
-            color: var(--cui-primary-text-emphasis);
+            color: var(--cui-primary-fg-emphasis);
             background-color: var(--cui-primary-bg-subtle);
           }
         }
@@ -50,7 +50,7 @@
       @include expect() {
         @media (prefers-color-scheme: dark) {
           .element {
-            color: var(--cui-primary-text-emphasis);
+            color: var(--cui-primary-fg-emphasis);
             background-color: var(--cui-primary-bg-subtle);
           }
         }
