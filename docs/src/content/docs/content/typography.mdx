@@ -12,9 +12,36 @@ CoreUI for Bootstrap sets basic global display, typography, and link styles. Whe
 - For a more inclusive and accessible type scale, we use the browser's default root `font-size` (typically 16px) so visitors can customize their browser defaults as needed.
 - Use the `$font-family-base`, `$font-size-base`, and `$line-height-base` attributes as our typographic base applied to the `<body>`.
 - Set the global link color via `$link-color` and the underline's distance from the text via `$link-underline-offset`.
-- Use `$body-bg` to set a `background-color` on the `<body>` (`#fff` by default).
+- Use `$bg-body` to set a `background-color` on the `<body>` — `light-dark()` picks white or `--cui-gray-975`, so one value covers both color modes.
 
 These styles can be found within `content/_reboot.scss`, and the global variables are defined in `_config.scss`. Make sure to set `$font-size-base` in `rem`.
+
+### Using a custom font
+
+The default is a [native font stack](/content/reboot/#native-font-stack), which needs no download and matches the host OS. To use a web font instead, load it and point the two font tokens at it — no Sass compilation involved.
+
+Add the font to your `<head>`, before CoreUI's CSS:
+
+```html
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+```
+
+Then override the tokens, in a `<style>` tag or your own stylesheet:
+
+```css
+:root {
+  --cui-font-sans-serif: "Inter", system-ui, sans-serif;
+  --cui-font-monospace: "JetBrains Mono", ui-monospace, monospace;
+}
+```
+
+Keep the generic families at the end of each stack: they are what renders while the web font loads, and what renders if it fails.
+
+`--cui-body-font-family` reads `--cui-font-sans-serif`, so setting the stack covers the body and everything inheriting from it. Set `--cui-body-font-family` directly only when you want the body to differ from the rest.
+
+The same works from Sass if you compile your own build — set `$font-family-sans-serif` and `$font-family-monospace` before importing CoreUI.
 
 ## Headings
 
