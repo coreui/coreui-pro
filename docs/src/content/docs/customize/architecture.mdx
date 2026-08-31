@@ -7,6 +7,17 @@ description: "How the v6 styling system is put together: cascade layers, design 
 
 Four mechanisms carry the whole v6 styling system. Each one has a page of its own for the details; this page shows how they fit together, and where your overrides plug in.
 
+Where each piece lives, from the raw hue up to the component:
+
+| Layer | File | What it defines |
+| --- | --- | --- |
+| Color scales | `scss/_colors.scss` | One base token per color, expanded into the `100`–`900` steps with `color-mix()` against `$tint-color` / `$shade-color`. The mix names the base token, not its value, so overriding `--cui-primary` retints the whole scale in the browser. The grays are hand-picked stops rather than a mix, because a neutral ramp has to stay neutral. |
+| Theme colors | `scss/_theme.scss` | `$theme-colors`, one nested map per role (`primary`, `danger`, …), each holding `base`, `fg`, `text-emphasis`, `bg`, `bg-subtle`, `bg-muted`, `border-subtle`, `focus-ring` and `contrast` |
+| Global tokens | `scss/_root.scss` | `$root-tokens`, everything emitted on `:root, :host` — spacing, radii, typography, z-index and the surface ladders |
+| Component tokens | the component's own partial | `$alert-tokens`, `$card-tokens` and the rest, emitted on the component's base class |
+
+Each layer reads the one below it, so a change low down travels upward: retint `--cui-blue-500` and every theme role built on blue follows, along with every component reading those roles.
+
 ## Cascade layers
 
 Every rule the library ships lives in a [cascade layer](https://developer.mozilla.org/en-US/docs/Web/CSS/@layer). The order is declared once, at the top of the bundle:
