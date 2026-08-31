@@ -104,6 +104,47 @@ Feedback elements are children of the field like any other, so they inherit its 
 
 See [validation](/forms/validation/) for the full picture, including the server-side and browser-native flavours.
 
+## Descriptions
+
+Add a `<small class="form-text">` after the label and wrap both in a `.form-field-content` so the description sits under the label rather than beside the control.
+
+<Example class="d-flex flex-column gap-3" code={`<div class="form-field">
+    <input type="checkbox" id="fieldCheckDesc" class="check" />
+    <div class="form-field-content">
+      <label for="fieldCheckDesc">Subscribe to updates</label>
+      <small class="form-text">We'll send you a weekly digest of what's new.</small>
+    </div>
+  </div>
+  <div class="form-field">
+    <input type="radio" id="fieldRadioDesc" class="radio" name="fieldRadioDesc" checked />
+    <div class="form-field-content">
+      <label for="fieldRadioDesc">Standard shipping</label>
+      <small class="form-text">Arrives in three to five working days.</small>
+    </div>
+  </div>`} />
+
+### Cards
+
+Add `.form-field-card` to each field for a card treatment that highlights the selected option. The label's hit area covers the whole card, so the option is selected by clicking anywhere on it.
+
+<Example code={`<label class="form-label">Select a plan</label>
+  <div class="vstack gap-1">
+    <div class="form-field form-field-card">
+      <input type="radio" id="fieldRadioCard1" class="radio" name="fieldRadioCard" checked />
+      <div class="form-field-content">
+        <label for="fieldRadioCard1">Basic</label>
+        <small class="form-text">$9/month — for individuals.</small>
+      </div>
+    </div>
+    <div class="form-field form-field-card">
+      <input type="radio" id="fieldRadioCard2" class="radio" name="fieldRadioCard" />
+      <div class="form-field-content">
+        <label for="fieldRadioCard2">Pro</label>
+        <small class="form-text">$29/month — for teams.</small>
+      </div>
+    </div>
+  </div>`} />
+
 ## Customizing
 
 ### CSS variables

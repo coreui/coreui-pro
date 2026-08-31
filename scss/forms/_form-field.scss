@@ -1,10 +1,16 @@
 @use "../functions/defaults" as *;
 @use "../mixins/tokens" as *;
 @use "../config" as *;
+@use "../mixins/border-radius" as *;
 
 // scss-docs-start form-field-variables
 $form-field-gap:            .5rem !default;
 $form-field-column-gap:     .5rem !default;
+$form-field-card-padding:   calc(var(--#{$prefix}spacer) * .75) !default;
+$form-field-card-radius:    var(--#{$prefix}radius-7) !default;
+$form-field-card-hover-bg:  var(--#{$prefix}bg-1) !default;
+$form-field-card-checked-bg: var(--#{$prefix}bg-1) !default;
+$form-field-card-checked-border-color: var(--#{$prefix}border-color) !default;
 // scss-docs-end form-field-variables
 
 $form-field-tokens: () !default;
@@ -20,6 +26,21 @@ $form-field-tokens: defaults(
   $form-field-tokens
 );
 // scss-docs-end form-field-css-vars
+
+$form-field-card-tokens: () !default;
+
+// scss-docs-start form-field-card-css-vars
+$form-field-card-tokens: defaults(
+  (
+    --#{$prefix}form-field-card-padding: #{$form-field-card-padding},
+    --#{$prefix}form-field-card-radius: #{$form-field-card-radius},
+    --#{$prefix}form-field-card-hover-bg: #{$form-field-card-hover-bg},
+    --#{$prefix}form-field-card-checked-bg: #{$form-field-card-checked-bg},
+    --#{$prefix}form-field-card-checked-border-color: #{$form-field-card-checked-border-color},
+  ),
+  $form-field-card-tokens
+);
+// scss-docs-end form-field-card-css-vars
 
 // stylelint-enable scss/dollar-variable-default
 
@@ -60,6 +81,38 @@ $form-field-control-children: if(sass($enable-deprecated-form-check): "> .check,
       > .form-label {
         grid-column: 1 / -1;
       }
+    }
+  }
+
+  .form-field-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .form-field-card {
+    @include tokens($form-field-card-tokens);
+
+    position: relative;
+    padding: var(--#{$prefix}form-field-card-padding);
+    cursor: pointer;
+    border: var(--#{$prefix}border-width) solid transparent;
+    @include border-radius(var(--#{$prefix}form-field-card-radius));
+
+    &:hover {
+      background-color: var(--#{$prefix}form-field-card-hover-bg);
+    }
+
+    &:has(:checked) {
+      background-color: var(--#{$prefix}form-field-card-checked-bg);
+      border-color: var(--#{$prefix}form-field-card-checked-border-color);
+    }
+
+    // the pseudo-element makes the whole card the label's hit area
+    label::before {
+      position: absolute;
+      inset: 0;
+      content: "";
     }
   }
 }

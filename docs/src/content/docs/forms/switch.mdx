@@ -65,6 +65,16 @@ Any other size is that one property:
 ```
 
 The proportion is a Sass variable, `$switch-aspect-ratio`, so a squarer or longer track is set once for every size.
+## Custom width
+
+The switch reads its size from two tokens, so a wider switch with a larger thumb is two declarations — no new class.
+
+<Example class="d-flex flex-column gap-3" code={`<div class="form-field">
+    <div class="switch" style="--cui-switch-width: 2.75rem; --cui-switch-thumb-size: 1.5rem;">
+      <input type="checkbox" id="switchCustomWidth" role="switch" switch checked>
+    </div>
+    <label for="switchCustomWidth">Custom width switch</label>
+  </div>`} />
 
 ## With form field
 
