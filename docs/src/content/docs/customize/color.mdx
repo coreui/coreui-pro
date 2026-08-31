@@ -9,9 +9,11 @@ import { getData, getSequence } from '@coreui/astro-docs/data'
 
 <AddedIn version="5.0.0" />
 
-The palette below covers two different jobs. `secondary` and `tertiary` text and background colors describe **surfaces** — the page, its dividers, its disabled states. The `{color}-bg-subtle`, `{color}-border-subtle`, and `{color}-text-emphasis` sets are **tinted variants of the theme colors**, so that a single theme color can carry a background, a border, and a readable text tone that all shift together between color modes.
+The palette below covers two different jobs. `secondary` and `tertiary` text and background colors describe **surfaces** — the page, its dividers, its disabled states. The `{color}-bg-subtle`, `{color}-border`, and `{color}-fg-emphasis` sets are **tinted variants of the theme colors**, so that a single theme color can carry a background, a border, and a readable text tone that all shift together between color modes.
 
 All of them are declared globally on `:root` and are available through Sass and CSS variables (but not through our color maps or utility classes).
+
+Each family is generated, not hand-listed: one base token per color, and the `100`–`900` steps mixed from it with `color-mix()`. The mix names the base token rather than its value, so **overriding `--cui-primary` retints its whole scale in the browser** — no rebuild, both color schemes at once. [Notes on Sass](#notes-on-sass) covers the stops and the mixing space, and [Architecture](/customize/architecture/) shows where this sits relative to the theme and component tokens.
 
 To fade any of these colors, mix it toward `transparent` rather than reaching for a channel triplet — `color-mix(in srgb, var(--cui-bg-4) 50%, transparent)`.
 
