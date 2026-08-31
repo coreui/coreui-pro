@@ -133,13 +133,6 @@ $min-contrast-ratio:   4.5 !default;
 $color-contrast-dark:      $black !default;
 $color-contrast-light:     $white !default;
 
-// fusv-disable
-
-$yellow-100: tint-color($yellow, 80%) !default;
-$yellow-800: shade-color($yellow, 60%) !default;
-
-// fusv-enable
-
 // The palette: the base colours, the grays, and their maps. The theme colour
 // system built on top of them lives in _theme.scss.
 //
