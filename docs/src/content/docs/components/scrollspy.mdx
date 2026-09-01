@@ -171,13 +171,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `rootMargin` | string | `0px 0px -25%` | Intersection Observer [rootMargin](https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserver/rootMargin) valid units, when calculating scroll position. |
 | `smoothScroll` | boolean | `false` | Enables smooth scrolling when a user clicks on a link that refers to ScrollSpy observables. |
 | `target` | string, DOM element | `null`  | Specifies element to apply Scrollspy plugin. |
-
-<Callout color="warning">
-**Deprecated Options**
-
-Up until v5.1.3 we were using `offset` & `method` options, which are now deprecated and replaced by `rootMargin`.
-To keep backwards compatibility, we will continue to parse a given `offset` to `rootMargin`, but this feature will be removed in **v6**.
-</Callout>
+| `threshold` | array | `[0.1, 0.5, 1]` | Intersection Observer [threshold](https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserver/thresholds) values, at which fractions of a section's visibility the observer reports back. |
 
 ### Methods
 
