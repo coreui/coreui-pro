@@ -123,6 +123,17 @@ Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label 
       <div class="form-text">Next working day, where available.</div>
     </div>
   </div>`} />
+## Description
+
+Add a description after the label and wrap both in a `.form-field-content`, so the description sits under the label rather than beside the radio.
+
+<Example code={`<div class="form-field">
+    <input type="radio" id="radioDescription" class="radio" name="radioDescription" checked />
+    <div class="form-field-content">
+      <label for="radioDescription">Example radio</label>
+      <small class="form-text">Supporting description for the label above.</small>
+    </div>
+  </div>`} />
 
 ## Toggle buttons
 

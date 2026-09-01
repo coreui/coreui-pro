@@ -120,6 +120,17 @@ Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label 
     <label for="fieldCheck">Subscribe to the newsletter</label>
     <div class="form-text">We send one email a month, and never share your address.</div>
   </div>`} />
+## Description
+
+Add a description after the label and wrap both in a `.form-field-content`, so the description sits under the label rather than beside the checkbox.
+
+<Example code={`<div class="form-field">
+    <input type="checkbox" id="checkDescription" class="check" checked />
+    <div class="form-field-content">
+      <label for="checkDescription">Example checkbox</label>
+      <small class="form-text">Supporting description for the label above.</small>
+    </div>
+  </div>`} />
 
 ## Toggle buttons
 
