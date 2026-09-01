@@ -57,7 +57,7 @@
     "js-test-jquery": "cross-env JQUERY=true vitest run --config js/tests/vitest.config.mts",
     "lint": "npm-run-all --aggregate-output --continue-on-error --parallel js-lint js-typecheck js-test-default-type css-lint lockfile-lint",
     "docs": "npm-run-all docs-build docs-lint",
-    "docs-build": "astro build --root docs",
+    "docs-build": "npm run css-compile && astro build --root docs",
     "docs-compile": "npm run docs-build",
     "docs-vnu": "node build/vnu-jar.mjs",
     "docs-lint": "npm run docs-vnu",
