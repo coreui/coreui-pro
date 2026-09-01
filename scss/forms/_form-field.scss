@@ -11,6 +11,7 @@ $form-field-card-radius:    var(--#{$prefix}radius-7) !default;
 $form-field-card-hover-bg:  var(--#{$prefix}bg-1) !default;
 $form-field-card-checked-bg: var(--#{$prefix}bg-1) !default;
 $form-field-card-checked-border-color: var(--#{$prefix}border-color) !default;
+$form-group-gap:            .5rem !default;
 // scss-docs-end form-field-variables
 
 $form-field-tokens: () !default;
@@ -41,6 +42,17 @@ $form-field-card-tokens: defaults(
   $form-field-card-tokens
 );
 // scss-docs-end form-field-card-css-vars
+
+$form-group-tokens: () !default;
+
+// scss-docs-start form-group-css-vars
+$form-group-tokens: defaults(
+  (
+    --#{$prefix}form-group-gap: #{$form-group-gap},
+  ),
+  $form-group-tokens
+);
+// scss-docs-end form-group-css-vars
 
 // stylelint-enable scss/dollar-variable-default
 
@@ -113,6 +125,20 @@ $form-field-control-children: if(sass($enable-deprecated-form-check): "> .check,
       position: absolute;
       inset: 0;
       content: "";
+    }
+  }
+
+  .form-group {
+    @include tokens($form-group-tokens);
+
+    display: grid;
+    gap: var(--#{$prefix}form-group-gap);
+
+    > label,
+    > .form-label,
+    > legend {
+      justify-self: start;
+      margin-bottom: 0;
     }
   }
 }

@@ -125,25 +125,43 @@ Add a `<small class="form-text">` after the label and wrap both in a `.form-fiel
 
 ### Cards
 
-Add `.form-field-card` to each field for a card treatment that highlights the selected option. The label's hit area covers the whole card, so the option is selected by clicking anywhere on it.
+Add `.form-field-card` to each field for a card treatment that highlights the selected option. The label's hit area covers the whole card, so the option is selected by clicking anywhere on it. Wrap the set in a `.form-group` to carry its own label and keep the spacing tight.
 
-<Example code={`<label class="form-label">Select a plan</label>
-  <div class="vstack gap-1">
-    <div class="form-field form-field-card">
-      <input type="radio" id="fieldRadioCard1" class="radio" name="fieldRadioCard" checked />
-      <div class="form-field-content">
-        <label for="fieldRadioCard1">Basic</label>
-        <small class="form-text">$9/month — for individuals.</small>
+<Example code={`<div class="form-group">
+    <label class="form-label">Select a plan</label>
+    <div class="vstack gap-1">
+      <div class="form-field form-field-card">
+        <input type="radio" id="fieldRadioCard1" class="radio" name="fieldRadioCard" checked />
+        <div class="form-field-content">
+          <label for="fieldRadioCard1">Basic</label>
+          <small class="form-text">$9/month — for individuals.</small>
+        </div>
       </div>
-    </div>
-    <div class="form-field form-field-card">
-      <input type="radio" id="fieldRadioCard2" class="radio" name="fieldRadioCard" />
-      <div class="form-field-content">
-        <label for="fieldRadioCard2">Pro</label>
-        <small class="form-text">$29/month — for teams.</small>
+      <div class="form-field form-field-card">
+        <input type="radio" id="fieldRadioCard2" class="radio" name="fieldRadioCard" />
+        <div class="form-field-content">
+          <label for="fieldRadioCard2">Pro</label>
+          <small class="form-text">$29/month — for teams.</small>
+        </div>
       </div>
     </div>
   </div>`} />
+
+### Groups
+
+`.form-group` lays out a set of related fields the way `.form-field` lays out one: a grid with the same gap, and a label or `<legend>` pinned to the start. Reach for it when several fields share a heading — the card example above uses it.
+
+<Example code={`<fieldset class="form-group">
+    <legend class="form-label">Notifications</legend>
+    <div class="form-field">
+      <input type="checkbox" id="groupCheck1" class="check" checked />
+      <label for="groupCheck1">Email</label>
+    </div>
+    <div class="form-field">
+      <input type="checkbox" id="groupCheck2" class="check" />
+      <label for="groupCheck2">Push</label>
+    </div>
+  </fieldset>`} />
 
 ## Customizing
 
