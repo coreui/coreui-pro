@@ -2050,19 +2050,19 @@ Multi Select's option indicators moved with it — they render as a decorative
 
   ```html
   <!-- v5 -->
-  <a href="#" class="link-primary link-underline-opacity-25">Primary link</a>
+  <a href="#" class="link-primary underline-opacity-25">Primary link</a>
 
   <!-- v6 -->
-  <a href="#" class="theme-primary link-underline link-underline-opacity-25">Primary link</a>
+  <a href="#" class="theme-primary underline underline-opacity-25">Primary link</a>
   ```
 
   Two things change beyond the class name. The theme slot is a **tone picked for
   text** rather than the raw brand colour — it darkens on a light background and
   lightens on a dark one, where `.link-*` gave the same colour in both, so the
   link is more readable in dark mode and slightly different in light. And the
-  underline needs `.link-underline` to carry it; its colour now defaults to
+  underline needs `.underline` to carry it; its colour now defaults to
   `currentColor`, so it follows the theme unless you name one with
-  `.link-underline-{color}`.
+  `.underline-{color}`.
 
   `.link-body-emphasis` becomes `.text-body-emphasis`.
 
@@ -2875,7 +2875,7 @@ now, and the two neutrals swap ends of the gray scale between schemes.
 - **Every `-light` and `-dark` class is gone.** Rename `-dark` to `-inverse` and
   `-light` to `-secondary` across `alert`, `bg`, `border` (and its per-side
   variants), `btn`, `btn-ghost`, `btn-outline`, `btn-subtle`, `callout`, `chip`,
-  `focus-ring`, `link-underline`, `list-group-item`, `shadow`, `table`, `text`,
+  `focus-ring`, `underline`, `list-group-item`, `shadow`, `table`, `text`,
   `text-bg` and `theme`, plus the `-subtle` and `-emphasis` families. The
   colour-scheme opt-ins keep their names: `.navbar-dark`, `.dropdown-menu-dark`,
   `.carousel-dark` and `.sidebar-dark` are unaffected, as is `.fw-light`.
@@ -3075,7 +3075,7 @@ and still compose. What changes is where the translucency expression lives:
   ignored the opacity knob every other colour utility honoured.
 - Every custom property a utility assigns is registered
   `@property { inherits: false }`, which now covers `--cui-bg`, `--cui-text`,
-  `--cui-border` and `--cui-link-underline` as well — so a colour set on a
+  `--cui-border` and `--cui-underline` as well — so a colour set on a
   container cannot leak into a descendant that only carries an opacity class.
 
 `at-property: false` still opts a utility out of that registration, for the one
@@ -3215,7 +3215,7 @@ Five names are now registered with
 `inherits: false`, so each utility is scoped to the element it is applied to:
 `--cui-text-opacity`, `--cui-bg-opacity`,
 `--cui-border-opacity`, `--cui-link-opacity`,
-`--cui-link-underline-opacity`. Upstream v6 does the same.
+`--cui-underline-opacity`. Upstream v6 does the same.
 
 - **If you relied on the leak** — one `.link-opacity-*` on a wrapper fading a
   whole block of links — put the utility on each element, or set the custom
@@ -3685,3 +3685,26 @@ Prefer the `.d-sidebar-narrow*` names in new markup.
   `prefers-reduced-motion: reduce`; `.color-scheme-{light|dark}` sets CSS
   `color-scheme`, which is what the browser reads to paint form controls and
   scrollbars — it changes no colours of its own.
+- **`.link-underline-*` is `.underline-*`.** `.link-underline-danger` becomes
+  `.underline-danger`, and the opacity steps become `.underline-opacity-*`
+  (`.link-underline-opacity-50-hover` → `.underline-opacity-50-hover`). Like
+  `.underline-offset-*`, the class sets a `text-decoration-*` property on any
+  element rather than only on a link, and it now sits beside
+  `.underline-thickness-*`, which already carried that name. **We keep the
+  `-opacity-` segment** where upstream folds opacity into the colour class as
+  `.underline-50` — every other opacity family here reads
+  `.bg-opacity-*` / `.text-opacity-*` / `.link-opacity-*`, and one family
+  spelling it differently is what this pass is removing.
+- **New `.rounded-size-*`.** It writes the radius into `--cui-rounded-size`
+  without setting `border-radius` itself, and the unprefixed corner classes
+  (`.rounded`, `.rounded-top`, `.rounded-end`, `.rounded-bottom`,
+  `.rounded-start`) now read that token, so one size class drives whichever
+  corners you round. With no `.rounded-size-*` in scope they fall back to
+  `--cui-border-radius`, so existing markup renders unchanged; the numbered
+  classes (`.rounded-3`, `.rounded-top-3`) set their own value and ignore it.
+- **The derived colour utilities compose with their opacity classes.**
+  `.bg-*-subtle`, `.bg-*-muted`, `.border-*-subtle` and `.text-*-emphasis` each
+  wrote the property directly, so `.bg-opacity-50` on a `.bg-primary-subtle`
+  did nothing while the same class on `.bg-primary` worked. They now declare
+  `--cui-bg` / `--cui-border` / `--cui-text` and resolve through the same
+  `color-mix()` as the base families. Nothing changes at full opacity.
