@@ -200,6 +200,8 @@
       badge:
         color: danger
         text: PRO
+    - title: Textarea
+      to: /forms/textarea/
     - title: Time Input
       to: /forms/time-input/
       badge:
