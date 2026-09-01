@@ -1599,7 +1599,7 @@ Multi Select's option indicators moved with it — they render as a decorative
 - **The underline sits `.2em` below the text.** `<a>` reads the new
   `--cui-link-underline-offset` token (knob: `$link-underline-offset`), so
   underlines clear descenders instead of cutting through them. The
-  `.link-offset-*` utilities and `.icon-link` still override it per element;
+  `.underline-offset-*` utilities and `.icon-link` still override it per element;
   set the token to `auto` for the old browser default.
 - **`accent-color: var(--cui-primary)` on `:root`.** Native controls we don't
   restyle — a bare checkbox, radio, range or `<progress>` — follow the brand
@@ -3665,3 +3665,23 @@ Prefer the `.d-sidebar-narrow*` names in new markup.
   support the media feature gets no transition at all. Rules that force
   `transition: none` stay outside the query — they disable motion on purpose,
   so they have to reach every reader.
+- **The sizing utilities spell the property out: `.mw-100` → `.max-w-100`,
+  `.mh-100` → `.max-h-100`.** The abbreviations were the only ones on that axis:
+  the floor classes are `.min-vw-100`, `.min-vh-100`, `.min-dvw-100`, and the
+  new `.min-w-*` / `.min-h-*` join them, so `.mw` sitting next to `.min-w` read
+  as two conventions for one property. Both ends are now written the same way.
+- **`.link-offset-*` is `.underline-offset-*`.** Same three steps, same
+  `-hover` variants — `.link-offset-2-hover` becomes
+  `.underline-offset-2-hover`. The class sets `text-underline-offset` on any
+  element, not just a link, and `.underline-thickness-*` next to it already
+  carried the property-based name.
+- **New utilities:** `.border-x` / `.border-y` (and their `-0` forms) set the
+  `border-inline` / `border-block` shorthands, so a facing pair of borders takes
+  one class instead of two; `.min-w-{0|100}` and `.min-h-{0|100}` set a floor —
+  `.min-w-0` is what releases the `min-width: auto` on a flex child so a
+  `.text-truncate` sibling can actually truncate; `.animation-{shake|pop}` ship
+  their keyframes with them, prefixed so they cannot be redefined by a bare
+  `shake` or `pop` of your own, and stand down under
+  `prefers-reduced-motion: reduce`; `.color-scheme-{light|dark}` sets CSS
+  `color-scheme`, which is what the browser reads to paint form controls and
+  scrollbars — it changes no colours of its own.

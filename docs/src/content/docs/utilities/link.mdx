@@ -2,7 +2,7 @@
 title: "Bootstrap 6 Link"
 name: "Link"
 description: "Link utilities are used to stylize your anchors to adjust their color, opacity, underline offset, underline color, and more."
-utility: ["link-opacity", "link-offset", "link-underline", "underline-thickness"]
+utility: ["link-opacity", "underline-offset", "link-underline", "underline-thickness"]
 ---
 
 import { getData } from '@coreui/astro-docs/data'
@@ -38,9 +38,9 @@ Change the underline's color independent of the link text color.
 Change the underline's distance from your text. Offset is set in `em` units to automatically scale with the element's current `font-size`. Every link already sits on a `.2em` offset from the global `--cui-link-underline-offset` token; these utilities override it per link.
 
 <Example code={`<p><a href="#">Default link</a></p>
-  <p><a class="link-offset-1" href="#">Offset 1 link</a></p>
-  <p><a class="link-offset-2" href="#">Offset 2 link</a></p>
-  <p><a class="link-offset-3" href="#">Offset 3 link</a></p>`} />
+  <p><a class="underline-offset-1" href="#">Offset 1 link</a></p>
+  <p><a class="underline-offset-2" href="#">Offset 2 link</a></p>
+  <p><a class="underline-offset-3" href="#">Offset 3 link</a></p>`} />
 
 ### Underline thickness
 
@@ -55,18 +55,18 @@ Change how heavy the underline is drawn, on links or any underlined text. Hover 
 
 Change the underline's opacity. Requires adding `.link-underline` to first set an `rgba()` color we use to then modify the alpha opacity.
 
-<Example code={`<p><a class="link-offset-2 link-underline link-underline-opacity-0" href="#">Underline opacity 0</a></p>
-  <p><a class="link-offset-2 link-underline link-underline-opacity-10" href="#">Underline opacity 10</a></p>
-  <p><a class="link-offset-2 link-underline link-underline-opacity-25" href="#">Underline opacity 25</a></p>
-  <p><a class="link-offset-2 link-underline link-underline-opacity-50" href="#">Underline opacity 50</a></p>
-  <p><a class="link-offset-2 link-underline link-underline-opacity-75" href="#">Underline opacity 75</a></p>
-  <p><a class="link-offset-2 link-underline link-underline-opacity-100" href="#">Underline opacity 100</a></p>`} />
+<Example code={`<p><a class="underline-offset-2 link-underline link-underline-opacity-0" href="#">Underline opacity 0</a></p>
+  <p><a class="underline-offset-2 link-underline link-underline-opacity-10" href="#">Underline opacity 10</a></p>
+  <p><a class="underline-offset-2 link-underline link-underline-opacity-25" href="#">Underline opacity 25</a></p>
+  <p><a class="underline-offset-2 link-underline link-underline-opacity-50" href="#">Underline opacity 50</a></p>
+  <p><a class="underline-offset-2 link-underline link-underline-opacity-75" href="#">Underline opacity 75</a></p>
+  <p><a class="underline-offset-2 link-underline link-underline-opacity-100" href="#">Underline opacity 100</a></p>`} />
 
 ### Hover variants
 
-Just like the `.link-opacity-*-hover` utilities, `.link-offset` and `.link-underline-opacity` utilities include `:hover` variants by default. Mix and match to create unique link styles.
+Just like the `.link-opacity-*-hover` utilities, `.underline-offset` and `.link-underline-opacity` utilities include `:hover` variants by default. Mix and match to create unique link styles.
 
-<Example code={`<a class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" href="#">
+<Example code={`<a class="underline-offset-2 underline-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" href="#">
     Underline opacity 0
   </a>`} />
 
@@ -74,7 +74,7 @@ Just like the `.link-opacity-*-hover` utilities, `.link-offset` and `.link-under
 
 Give a link a theme colour with a [`.theme-*`](/customize/theme/) class. Reboot resolves a link's colour from `--cui-theme-fg`, which every theme class sets, so the link follows the theme rather than needing a class of its own.
 
-<Example code={[...getData('theme-colors').map((c) => `<p><a href="#" class="theme-${c.name} link-offset-2 link-underline link-underline-opacity-25 link-underline-opacity-100-hover">${c.title} link</a></p>`), ``, `<p><a href="#" class="text-body-emphasis link-offset-2 link-underline link-underline-opacity-25 link-underline-opacity-75-hover">Emphasis link</a></p>`]} />
+<Example code={[...getData('theme-colors').map((c) => `<p><a href="#" class="theme-${c.name} underline-offset-2 link-underline link-underline-opacity-25 link-underline-opacity-100-hover">${c.title} link</a></p>`), ``, `<p><a href="#" class="text-body-emphasis underline-offset-2 link-underline link-underline-opacity-25 link-underline-opacity-75-hover">Emphasis link</a></p>`]} />
 
 `.link-underline` here carries the underline colour, which defaults to `currentColor` — so it follows the theme too, and the opacity utilities have something to fade. Name a colour with `.link-underline-{color}` to break that pairing deliberately.
 

@@ -381,6 +381,8 @@
       to: /utilities/border-color/
     - title: Border radius
       to: /utilities/border-radius/
+    - title: Color scheme
+      to: /utilities/color-scheme/
     - title: Colors
       to: /utilities/colors/
     - title: Container queries

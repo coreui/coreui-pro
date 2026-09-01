@@ -314,6 +314,22 @@ $utilities: map.merge(
         0: 0,
       ),
     ),
+    "border-x": (
+      property: border-inline,
+      class: border-x,
+      values: (
+        null: var(--#{$prefix}border-width) var(--#{$prefix}border-style) var(--#{$prefix}border-color),
+        0: 0,
+      ),
+    ),
+    "border-y": (
+      property: border-block,
+      class: border-y,
+      values: (
+        null: var(--#{$prefix}border-width) var(--#{$prefix}border-style) var(--#{$prefix}border-color),
+        0: 0,
+      ),
+    ),
     // scss-docs-end utils-border-sides
     // scss-docs-start utils-border-color
     "border-color": (
@@ -411,8 +427,16 @@ $utilities: map.merge(
     ),
     "max-width": (
       property: max-width,
-      class: mw,
+      class: max-w,
       values: (100: 100%)
+    ),
+    "min-width": (
+      property: min-width,
+      class: min-w,
+      values: (
+        0: 0,
+        100: 100%,
+      )
     ),
     "viewport-width": (
       property: width,
@@ -450,9 +474,17 @@ $utilities: map.merge(
         fit: fit-content
       )
     ),
+    "min-height": (
+      property: min-height,
+      class: min-h,
+      values: (
+        0: 0,
+        100: 100%,
+      )
+    ),
     "max-height": (
       property: max-height,
-      class: mh,
+      class: max-h,
       values: (100: 100%)
     ),
     "viewport-height": (
@@ -1008,9 +1040,9 @@ $utilities: map.merge(
         100: 1
       )
     ),
-    "link-offset": (
+    "underline-offset": (
       property: text-underline-offset,
-      class: link-offset,
+      class: underline-offset,
       state: hover,
       values: (
         1: .125em,
@@ -1258,8 +1290,29 @@ $utilities: map.merge(
       values: (
         none: none,
       )
-    )
+    ),
     // scss-docs-end utils-transition
+    // scss-docs-start utils-animation
+    "animation": (
+      property: animation,
+      class: animation,
+      values: (
+        none: none,
+        shake: animation-shake .82s cubic-bezier(.36, .07, .19, .97) both,
+        pop: animation-pop .3s cubic-bezier(.34, 1.56, .64, 1) both,
+      )
+    ),
+    // scss-docs-end utils-animation
+    // scss-docs-start utils-color-scheme
+    "color-scheme": (
+      property: color-scheme,
+      class: color-scheme,
+      values: (
+        light: light,
+        dark: dark,
+      )
+    )
+    // scss-docs-end utils-color-scheme
   ),
   $utilities
 );

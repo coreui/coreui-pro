@@ -2,7 +2,7 @@
 title: "Bootstrap 6 Width"
 name: "Width"
 description: "Set an element's width relative to its parent or to the viewport with our width utilities."
-utility: ["w", "mw", "vw", "min-vw", "dvw", "min-dvw"]
+utility: ["w", "max-w", "min-w", "vw", "min-vw", "dvw", "min-dvw"]
 ---
 
 ## Relative to the parent
@@ -17,9 +17,24 @@ Width utilities are generated from the utility API in `_utilities.scss`. Include
 
 ## Max width
 
-Use `.mw-100` to cap an element at the width of its parent — the usual reason to reach for it is an image or an SVG that would otherwise overflow.
+Use `.max-w-100` to cap an element at the width of its parent — the usual reason to reach for it is an image or an SVG that would otherwise overflow.
 
-<Example code={`<svg class="docs-placeholder-img mw-100" width="100%" height="100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Max-width 100%" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Max-width 100%</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em">Max-width 100%</text></svg>`} />
+<Example code={`<svg class="docs-placeholder-img max-w-100" width="100%" height="100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Max-width 100%" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Max-width 100%</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em">Max-width 100%</text></svg>`} />
+
+## Min width
+
+`.min-w-0` and `.min-w-100` set a floor rather than a cap.
+
+`.min-w-0` is the one you reach for most. A flex or grid child starts at `min-width: auto`, which refuses to shrink below its own content — and a `.text-truncate` child never breaks its line, so its content width is the whole string. The item pushes past its track instead of ellipsizing. Dropping the floor to `0` lets it shrink so the truncation can happen.
+
+<Example code={`<div class="d-flex gap-2 border p-2 mb-2" style="max-width: 320px;">
+    <div class="text-truncate">Without a floor this line pushes the button out of the box</div>
+    <button class="btn btn-primary flex-shrink-0" type="button">Action</button>
+  </div>
+  <div class="d-flex gap-2 border p-2" style="max-width: 320px;">
+    <div class="min-w-0 text-truncate">With .min-w-0 the same line truncates instead</div>
+    <button class="btn btn-primary flex-shrink-0" type="button">Action</button>
+  </div>`} />
 
 ## Relative to the viewport
 
