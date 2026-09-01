@@ -554,9 +554,43 @@ Sometimes you want to use the collapse plugin to trigger a container element for
 
 When you do this, we recommend including additional JavaScript to move the focus programmatically to the container when it is opened. Otherwise, keyboard users and users of assistive technologies will likely have a hard time finding the newly revealed content - particularly if the container that was opened comes *before* the toggler in the document's structure. We also recommend making sure that the toggler has the `aria-controls` attribute, pointing to the `id` of the content container. In theory, this allows assistive technology users to jump directly from the toggler to the container it controls–but support for this is currently quite patchy.
 
+### Drawer
+
+Turn an expanding navbar into a side panel with the [drawer component](/components/drawer/) — a floating, inset, rounded panel. The `.navbar-expand-*` class flattens it into an inline nav at the breakpoint; omit the class entirely for a navbar that stays collapsed at every width.
+
+The example below slides in from the end; `.drawer-start`, `.drawer-top` and `.drawer-bottom` pick another edge, and `start`/`end` follow the reading direction.
+
+<Example code={`<nav class="navbar navbar-expand-lg bg-3">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">Drawer navbar</a>
+      <button class="navbar-toggler" type="button" data-coreui-toggle="drawer" data-coreui-target="#drawerNavbar" aria-controls="drawerNavbar">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <dialog class="drawer drawer-end" id="drawerNavbar" aria-labelledby="drawerNavbarLabel">
+        <div class="drawer-header">
+          <h5 class="drawer-title" id="drawerNavbarLabel">Drawer</h5>
+          <button type="button" class="btn-close" data-coreui-dismiss="drawer" aria-label="Close"></button>
+        </div>
+        <div class="drawer-body">
+          <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="#">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Link</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Pricing</a>
+            </li>
+          </ul>
+        </div>
+      </dialog>
+    </div>
+  </nav>`} />
+
 ### Offcanvas
 
-Transform your expanding and collapsing navbar into an offcanvas drawer with the [offcanvas component](/components/offcanvas/). We extend both the offcanvas default styles and use our `.navbar-expand-*` classes to create a dynamic and flexible navigation sidebar.
+The [offcanvas component](/components/offcanvas/) does the same with the classic edge-to-edge look, and works identically under `.navbar-expand-*`. It is a compatibility layer that may be removed in v7, so prefer the drawer above for new work.
 
 In the example below, to create an offcanvas navbar that is always collapsed across all breakpoints, omit the `.navbar-expand-*` class entirely.
 
@@ -655,38 +689,6 @@ When using offcanvas in a dark navbar, be aware that you may need to have a dark
             <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
             <button class="btn-solid theme-success" type="submit">Search</button>
           </form>
-        </div>
-      </dialog>
-    </div>
-  </nav>`} />
-
-### Drawer
-
-The [drawer component](/components/drawer/) works the same way, with the v6 look — a floating, inset, rounded panel instead of an edge-to-edge one. Swap the `offcanvas` vocabulary for `drawer` and the `.navbar-expand-*` class flattens it into an inline nav at the breakpoint, exactly as it does for an offcanvas.
-
-<Example code={`<nav class="navbar navbar-expand-lg bg-3">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="#">Drawer navbar</a>
-      <button class="navbar-toggler" type="button" data-coreui-toggle="drawer" data-coreui-target="#drawerNavbar" aria-controls="drawerNavbar">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <dialog class="drawer drawer-end" id="drawerNavbar" aria-labelledby="drawerNavbarLabel">
-        <div class="drawer-header">
-          <h5 class="drawer-title" id="drawerNavbarLabel">Drawer</h5>
-          <button type="button" class="btn-close" data-coreui-dismiss="drawer" aria-label="Close"></button>
-        </div>
-        <div class="drawer-body">
-          <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="#">Home</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Link</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Pricing</a>
-            </li>
-          </ul>
         </div>
       </dialog>
     </div>
