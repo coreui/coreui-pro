@@ -80,18 +80,19 @@ Make avatars square by using the `.rounded-0` class, removing any rounded edges 
   <div class="avatar rounded-0 theme-warning">CUI</div>`} />
 
 ## Sizing
-Adjust the size of avatars using the `.avatar-sm`, `.avatar-md`, `.avatar-lg`, and `.avatar-xl` classes for larger or smaller versions.
+Adjust the size of avatars using the `.avatar-xs`, `.avatar-sm`, `.avatar-md`, `.avatar-lg`, and `.avatar-xl` classes for larger or smaller versions. The status indicator scales with the avatar, so it stays proportional at every size.
 <Example code={`<div class="avatar avatar-xl">CUI</div>
   <div class="avatar avatar-lg">CUI</div>
   <div class="avatar avatar-md">CUI</div>
   <div class="avatar">CUI</div>
-  <div class="avatar avatar-sm">CUI</div>`} />
+  <div class="avatar avatar-sm">CUI</div>
+  <div class="avatar avatar-xs">CUI</div>`} />
 
 ## Stacked avatars
 
 Display multiple avatars in a stack to represent a group of users or items, with additional count if there are more avatars than can be displayed. Each avatar in a stack wears a ring in the page background colour, so overlapping photos stay separated in both colour schemes.
 
-<Example code={`<div class="avatars-stack">
+<Example code={`<div class="avatar-stack">
     <div class="avatar">
       <img class="avatar-img" src="/assets/img/avatars/1.jpg" alt="user@email.com">
     </div>
@@ -106,9 +107,9 @@ Display multiple avatars in a stack to represent a group of users or items, with
     </div>
   </div>`} />
 
-Size the whole stack at once with `.avatars-stack-sm` through `.avatars-stack-xl`, and tune the overlap with `--cui-avatar-stack-spacing` — the fraction of the avatar size each one is pulled over its neighbour:
+Size the whole stack at once with `.avatar-stack-sm` through `.avatar-stack-xl`, and tune the overlap with `--cui-avatar-stack-spacing` — the fraction of the avatar size each one is pulled over its neighbour:
 
-<Example code={`<div class="avatars-stack avatars-stack-lg" style="--cui-avatar-stack-spacing: -.25">
+<Example code={`<div class="avatar-stack avatar-stack-lg" style="--cui-avatar-stack-spacing: -.25">
     <div class="avatar">
       <img class="avatar-img" src="/assets/img/avatars/1.jpg" alt="user@email.com">
     </div>
@@ -161,7 +162,7 @@ Avatars use local CSS variables on `.avatar` for enhanced real-time customizatio
 
 <ScssDocs file="scss/_avatar.scss" capture="avatar-css-vars" />
 
-Stacks carry their own variables on `.avatars-stack`:
+Stacks carry their own variables on `.avatar-stack`:
 
 <ScssDocs file="scss/_avatar.scss" capture="avatar-stack-css-vars" />
 
