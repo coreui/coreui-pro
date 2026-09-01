@@ -95,10 +95,10 @@ Put an inline SVG inside the element. Nothing has to be URL escaped, and `curren
 
 ### Changing every divider
 
-The separators a breadcrumb writes for itself come from [`::before`](https://developer.mozilla.org/en-US/docs/Web/CSS/::before) and [`content`](https://developer.mozilla.org/en-US/docs/Web/CSS/content). Change them all at once with the `--cui-breadcrumb-divider` custom property, or with the `$breadcrumb-divider` Sass variable — and `$breadcrumb-divider-flipped` for its RTL counterpart. The Sass variable is the fallback of the custom property, so a global divider can be overridden per breadcrumb without recompiling.
+The separators a breadcrumb writes for itself come from [`::before`](https://developer.mozilla.org/en-US/docs/Web/CSS/::before) and [`content`](https://developer.mozilla.org/en-US/docs/Web/CSS/content). Change them all at once with the `--cui-breadcrumb-divider` custom property, or with the `$breadcrumb-divider` Sass variable — and `$breadcrumb-divider-flipped` for its RTL counterpart. The Sass variable sets the token's default, so a global divider can still be overridden on a single breadcrumb without recompiling. Set the property on the `<ol class="breadcrumb">` itself — the token is declared there, so a value put on a wrapping element is overridden rather than inherited.
 
-<Example code={`<nav style="--cui-breadcrumb-divider: '>';" aria-label="breadcrumb">
-    <ol class="breadcrumb">
+<Example code={`<nav aria-label="breadcrumb">
+    <ol class="breadcrumb" style="--cui-breadcrumb-divider: '>';">
       <li class="breadcrumb-item"><a href="#">Home</a></li>
       <li class="breadcrumb-item active" aria-current="page">Library</li>
     </ol>
@@ -120,8 +120,8 @@ It's also possible to use an **embedded SVG icon**. Apply it via our CSS custom 
 Inlining SVG as data URI requires to URL escape a few characters, most notably `<`, `>` and `#`. That's why the `$breadcrumb-divider` variable is passed through our [`escape-svg()` Sass function](/customize/sass/#escape-svg). When using the CSS custom property, you need to URL escape your SVG on your own. Read [Kevin Weber's explanations on CodePen](https://codepen.io/kevinweber/pen/dXWoRw ) for detailed information on what to escape.
 </Callout>
 
-<Example code={`<nav style="--cui-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='%236c757d'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
-    <ol class="breadcrumb">
+<Example code={`<nav aria-label="breadcrumb">
+    <ol class="breadcrumb" style="--cui-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='%236c757d'/%3E%3C/svg%3E&#34;);">
       <li class="breadcrumb-item"><a href="#">Home</a></li>
       <li class="breadcrumb-item active" aria-current="page">Library</li>
     </ol>
@@ -133,8 +133,8 @@ $breadcrumb-divider: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/
 
 You can also remove the divider setting `--cui-breadcrumb-divider: '';` (empty strings in CSS custom properties counts as a value), or setting the Sass variable to `$breadcrumb-divider: none;`.
 
-<Example code={`<nav style="--cui-breadcrumb-divider: '';" aria-label="breadcrumb">
-    <ol class="breadcrumb">
+<Example code={`<nav aria-label="breadcrumb">
+    <ol class="breadcrumb" style="--cui-breadcrumb-divider: '';">
       <li class="breadcrumb-item"><a href="#">Home</a></li>
       <li class="breadcrumb-item active" aria-current="page">Library</li>
     </ol>
