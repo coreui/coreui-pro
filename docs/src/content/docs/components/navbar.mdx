@@ -664,6 +664,8 @@ When using offcanvas in a dark navbar, be aware that you may need to have a dark
 
 The [drawer component](/components/drawer/) works the same way, with the v6 look — a floating, inset, rounded panel instead of an edge-to-edge one. Swap the `offcanvas` vocabulary for `drawer` and the `.navbar-expand-*` class flattens it into an inline nav at the breakpoint, exactly as it does for an offcanvas.
 
+The example below slides in from the end; `.drawer-start`, `.drawer-top` and `.drawer-bottom` pick another edge, and `start`/`end` follow the reading direction.
+
 <Example code={`<nav class="navbar navbar-expand-lg bg-3">
     <div class="container-fluid">
       <a class="navbar-brand" href="#">Drawer navbar</a>
