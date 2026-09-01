@@ -221,7 +221,7 @@ This sets up an alert to listen for click events on descendant elements that hav
 
 | Method | Description |
 | --- | --- |
-| `close` | Closes an alert by removing it from the DOM. If the `.fade` and `.show` classes are present on the element, the alert will fade out before being removed. |
+| `close` | Closes an alert by removing it from the DOM. It fades out first unless the alert carries [`.alert-instant`](#dismissing). Returns a promise that resolves once the element is gone, so work that depends on the alert being removed can await it. |
 | `dispose` | Destroys an element's alert and removes any stored data associated with the DOM element. |
 | `getInstance` | A static method that allows you to retrieve the alert instance linked to a DOM element. For example: `coreui.Alert.getInstance(alert)`. |
 | `getOrCreateInstance` | A static method that returns the alert instance associated with a DOM element or creates a new one if it hasn't been initialized. You can use it as follows: `coreui.Alert.getOrCreateInstance(element)`. |
