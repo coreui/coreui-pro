@@ -94,6 +94,26 @@ When a check, radio, or switch needs a field title above it, add a `.form-label`
 
 Feedback elements are children of the field like any other, so they inherit its gap and land under the control.
 
+### Client-side
+
+Add `data-coreui-validate` to the `<form>` to style fields from `:user-invalid`, which only matches after the user has interacted with a control — so a field is not marked wrong before it has been filled in. `novalidate` suppresses the browser's own tooltips while keeping the constraint validation API available.
+
+<Example code={`<form class="vstack gap-3" data-coreui-validate novalidate>
+    <div class="form-field">
+      <label for="fieldValidateEmail" class="form-label">Email address</label>
+      <input type="email" class="form-control" id="fieldValidateEmail" required>
+      <div class="invalid-feedback">Please enter a valid email address.</div>
+    </div>
+    <div class="form-field">
+      <input type="checkbox" id="fieldValidateTerms" class="check" required>
+      <label for="fieldValidateTerms">Accept the terms</label>
+      <div class="invalid-feedback">You must accept before submitting.</div>
+    </div>
+    <button class="btn-solid theme-primary" type="submit">Submit</button>
+  </form>`} />
+
+### Server-side
+
 <Example code={`<div class="form-field">
     <label for="fieldValidation" class="form-label">Username</label>
     <input type="text" class="form-control is-invalid" id="fieldValidation" value="jan kowalski" aria-describedby="fieldValidationFeedback">
