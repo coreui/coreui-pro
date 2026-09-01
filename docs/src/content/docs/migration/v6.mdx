@@ -279,8 +279,12 @@ finished, not whether the state changed.
   set anywhere above the list reached the separators by inheritance. It is a
   real token now — and a token declared on `.breadcrumb` beats one inherited
   from an ancestor, so `<nav style="--cui-breadcrumb-divider: '>'">` stops
-  working. Move it onto the `<ol class="breadcrumb">`. Same for
-  `--cui-breadcrumb-divider-flipped`, its RTL counterpart.
+  working. Move it onto the `<ol class="breadcrumb">`.
+- **A custom divider now survives in RTL.** `--cui-breadcrumb-divider-flipped`
+  defaults to the main divider instead of to a second copy of the Sass default,
+  so setting only `--cui-breadcrumb-divider` no longer leaves right-to-left
+  pages on the built-in `/`. Set the flipped one only for a separator that
+  points somewhere — `>` becomes `<` — as before.
 - **New: `.breadcrumb-link`, an opt-in class that gives a step a padded,
   hoverable target.** Bare links keep rendering as they always did. On a
   `<button>` it looks identical to a link, which is what lets one step toggle a

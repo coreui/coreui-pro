@@ -95,7 +95,9 @@ Put an inline SVG inside the element. Nothing has to be URL escaped, and `curren
 
 ### Changing every divider
 
-The separators a breadcrumb writes for itself come from [`::before`](https://developer.mozilla.org/en-US/docs/Web/CSS/::before) and [`content`](https://developer.mozilla.org/en-US/docs/Web/CSS/content). Change them all at once with the `--cui-breadcrumb-divider` custom property, or with the `$breadcrumb-divider` Sass variable — and `$breadcrumb-divider-flipped` for its RTL counterpart. The Sass variable sets the token's default, so a global divider can still be overridden on a single breadcrumb without recompiling. Set the property on the `<ol class="breadcrumb">` itself — the token is declared there, so a value put on a wrapping element is overridden rather than inherited.
+The separators a breadcrumb writes for itself come from [`::before`](https://developer.mozilla.org/en-US/docs/Web/CSS/::before) and [`content`](https://developer.mozilla.org/en-US/docs/Web/CSS/content). Change them all at once with the `--cui-breadcrumb-divider` custom property, or with the `$breadcrumb-divider` Sass variable. The Sass variable sets the token's default, so a global divider can still be overridden on a single breadcrumb without recompiling. Set the property on the `<ol class="breadcrumb">` itself — the token is declared there, so a value put on a wrapping element is overridden rather than inherited.
+
+A right-to-left breadcrumb follows the same divider unless you give it its own. Reach for `--cui-breadcrumb-divider-flipped` (or `$breadcrumb-divider-flipped`) when the separator points somewhere — `>` should become `<`, `→` should become `←` — and leave it alone for a symmetric one like `/`.
 
 <Example code={`<nav aria-label="breadcrumb">
     <ol class="breadcrumb" style="--cui-breadcrumb-divider: '>';">
