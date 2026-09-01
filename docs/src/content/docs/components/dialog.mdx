@@ -229,6 +229,31 @@ Pop up a dialog that covers the user viewport, via modifier classes placed on th
 </dialog>
 ```
 
+## Dark variant
+
+Put `data-coreui-theme="dark"` on the `<dialog>` and it flips the tokens its own surface reads, so the dialog and everything in it — including the close button — turns dark on a light page.
+
+<dialog class="dialog" id="darkDialog" data-coreui-theme="dark" aria-labelledby="darkDialogLabel">
+  <div class="dialog-header">
+    <h5 class="dialog-title" id="darkDialogLabel">Dark dialog</h5>
+    <button type="button" class="btn-close" data-coreui-dismiss="dialog" aria-label="Close"></button>
+  </div>
+  <div class="dialog-body">
+    <p>The surface, the text and the dividers all read the flipped tokens.</p>
+  </div>
+  <div class="dialog-footer">
+    <button type="button" class="btn-solid theme-secondary" data-coreui-dismiss="dialog">Close</button>
+  </div>
+</dialog>
+
+<Example html={[`<button type="button" class="btn-solid theme-primary" data-coreui-toggle="dialog" data-coreui-target="#darkDialog">`, `  Open dark dialog`, `</button>`]} />
+
+```html
+<dialog class="dialog" data-coreui-theme="dark">
+  ...
+</dialog>
+```
+
 ## Accessibility
 
 Be sure to add `aria-labelledby="..."`, referencing the dialog title, to the `<dialog>`. Additionally, you may give a description of your dialog with `aria-describedby`. The native `<dialog>` element already provides the dialog role, `aria-modal` semantics, focus trapping, and background inertness — don't add `role`, `aria-modal`, `aria-hidden`, or `tabindex` yourself.
