@@ -344,7 +344,7 @@ Separate groups of related menu items with a divider.
 Place any freeform text within a menu with text and use [spacing utilities](/utilities/margin/). Note that you’ll likely need additional sizing styles to constrain the menu width.
 
 <Example code={`<div class="menu show position-static p-3 fg-2"
-       style="--bs-menu-min-width: 240px;">
+       style="--cui-menu-min-width: 240px;">
     <p>
       Some example text that’s free-flowing within the menu.
     </p>
@@ -358,7 +358,7 @@ Place any freeform text within a menu with text and use [spacing utilities](/uti
 Put a form within a menu, or make it into a menu, and use [spacing utilities](/utilities/margin/) to give it the negative space you require.
 
 <Example code={`<div class="menu show position-static"
-       style="--bs-menu-min-width: 300px;">
+       style="--cui-menu-min-width: 300px;">
     <form class="d-flex flex-column gap-3 p-3">
       <div>
         <label for="exampleMenuFormEmail1" class="form-label">Email address</label>
@@ -382,9 +382,9 @@ Put a form within a menu, or make it into a menu, and use [spacing utilities](/u
 
 ## Scrollable menus
 
-Assign `--bs-menu-max-height` and `--bs-menu-overflow-y` custom properties to constrain the menu height and enable scrolling.
+Assign `--cui-menu-max-height` and `--cui-menu-overflow-y` custom properties to constrain the menu height and enable scrolling.
 
-<Example code={`<div class="menu show position-static" style="--bs-menu-max-height: 145px; --bs-menu-overflow-y: auto;">
+<Example code={`<div class="menu show position-static" style="--cui-menu-max-height: 145px; --cui-menu-overflow-y: auto;">
     <button class="menu-item" type="button">Item 1</button>
     <button class="menu-item" type="button">Item 2</button>
     <button class="menu-item" type="button">Item 3</button>
