@@ -1001,7 +1001,9 @@ class MultiSelect extends Combobox {
     if (!this._config.multiple) {
       this.hide()
       this.search('')
-      this._searchElement.value = null
+      if (this._config.search) {
+        this._searchElement.value = null
+      }
     }
 
     if (this._config.clearSearchOnSelect && this._config.search) {

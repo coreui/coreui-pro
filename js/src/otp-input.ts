@@ -199,25 +199,23 @@ class OTPInput extends BaseComponent {
         return
       }
 
+      const inputs = this._getInputs()
+
+      if (!inputs.length) {
+        return
+      }
+
+      this._setHiddenInputValue(inputs.map((input: HTMLInputElement) => input.value).join(''))
+
       if (target!.value.length === 1) {
-        const inputs = this._getInputs()
-
-        if (!inputs.length) {
-          return
-        }
-
-        const currentValue = inputs.map((input: HTMLInputElement) => input.value).join('')
-
-        this._setHiddenInputValue(currentValue)
-
         const nextInput = getNextActiveElement(inputs, target as HTMLInputElement, true)
         if (nextInput) {
           nextInput.focus()
         }
-
-        this._setInputsTabIndexes()
-        this._checkAutoSubmit(inputs)
       }
+
+      this._setInputsTabIndexes()
+      this._checkAutoSubmit(inputs)
     })
 
     EventHandler.on(this._element, EVENT_KEYDOWN, SELECTOR_FORM_OTP_CONTROL, event => {
@@ -425,9 +423,7 @@ class OTPInput extends BaseComponent {
         input.placeholder = placeholder.length > 1 ? placeholder[index] || '' : placeholder
       }
 
-      if (this._config.required !== null) {
-        input.setAttribute('required', true as unknown as string)
-      }
+      input.required = this._config.required
 
       switch (this._config.type) {
         case 'number': {

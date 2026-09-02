@@ -2816,6 +2816,28 @@ describe('Autocomplete', () => {
       expect(optionEl.classList.contains('disabled')).toBe(true)
       expect(optionEl.getAttribute('aria-disabled')).toBe('true')
     })
+
+    it('should keep disabled options out of the tab order and not activate them', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        options: [
+          { label: 'Option 1', value: '1', disabled: true },
+          { label: 'Option 2', value: '2' }
+        ]
+      })
+
+      autocomplete.show()
+      const optionEl = autocomplete._optionsElement.querySelector('[data-value="1"]')
+
+      expect(optionEl.tabIndex).toBe(-1)
+      expect(autocomplete._optionsElement.querySelector('[data-value="2"]').tabIndex).toBe(0)
+
+      optionEl.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
+      optionEl.click()
+
+      expect(autocomplete._selected).toEqual([])
+    })
   })
 
   describe('container mode', () => {

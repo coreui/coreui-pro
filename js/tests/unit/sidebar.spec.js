@@ -376,6 +376,46 @@ describe('Sidebar', () => {
     })
   })
 
+  describe('data-coreui-toggle', () => {
+    it('should toggle narrow and prevent the default on a narrow toggler', () => {
+      fixtureEl.innerHTML = '<div class="sidebar"><button type="button" data-coreui-toggle="narrow"></button></div>'
+      const sidebar = new Sidebar('.sidebar')
+      const spyToggleNarrow = spyOn(sidebar, 'toggleNarrow')
+      const event = new MouseEvent('click', { bubbles: true, cancelable: true })
+
+      fixtureEl.querySelector('button').dispatchEvent(event)
+
+      expect(spyToggleNarrow).toHaveBeenCalled()
+      expect(event.defaultPrevented).toBe(true)
+    })
+
+    it('should toggle unfoldable and prevent the default on an unfoldable toggler', () => {
+      fixtureEl.innerHTML = '<div class="sidebar"><button type="button" data-coreui-toggle="unfoldable"></button></div>'
+      const sidebar = new Sidebar('.sidebar')
+      const spyToggleUnfoldable = spyOn(sidebar, 'toggleUnfoldable')
+      const event = new MouseEvent('click', { bubbles: true, cancelable: true })
+
+      fixtureEl.querySelector('button').dispatchEvent(event)
+
+      expect(spyToggleUnfoldable).toHaveBeenCalled()
+      expect(event.defaultPrevented).toBe(true)
+    })
+
+    it('should leave the default of other togglers inside the sidebar alone', () => {
+      fixtureEl.innerHTML = '<div class="sidebar"><a href="#" data-coreui-toggle="tooltip">Link</a></div>'
+      const sidebar = new Sidebar('.sidebar')
+      const spyToggleNarrow = spyOn(sidebar, 'toggleNarrow')
+      const spyToggleUnfoldable = spyOn(sidebar, 'toggleUnfoldable')
+      const event = new MouseEvent('click', { bubbles: true, cancelable: true })
+
+      fixtureEl.querySelector('a').dispatchEvent(event)
+
+      expect(event.defaultPrevented).toBe(false)
+      expect(spyToggleNarrow).not.toHaveBeenCalled()
+      expect(spyToggleUnfoldable).not.toHaveBeenCalled()
+    })
+  })
+
   describe('Private Methods', () => {
     describe('_initializeBackDrop', () => {
       it('should create backdrop with correct configuration', () => {
