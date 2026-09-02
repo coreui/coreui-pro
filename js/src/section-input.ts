@@ -158,6 +158,8 @@ class SectionInput extends BaseComponent {
   protected declare _error: any
   protected declare _inputElement: any
   protected declare _monthFormatter: any
+  protected declare _form: HTMLFormElement | null
+  protected declare _submitHandler: () => void
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
@@ -173,6 +175,8 @@ class SectionInput extends BaseComponent {
     this._error = null
     this._inputElement = null
     this._monthFormatter = new Intl.DateTimeFormat(this._config.locale, { month: 'long' })
+    this._form = null
+    this._submitHandler = () => this._onFormSubmit()
 
     this._createSectionInput()
     this._date = this._applyValidationState()
@@ -254,6 +258,11 @@ class SectionInput extends BaseComponent {
     // min/max must end up in the same state as a typed one
     this._date = previousDate
     this._updateDate()
+  }
+
+  override dispose(): void {
+    EventHandler.off(this._form, this.constructor.eventName('submit'), this._submitHandler)
+    super.dispose()
   }
 
   // Private
@@ -357,27 +366,10 @@ class SectionInput extends BaseComponent {
       }
     })
 
-    const form = this._element.closest('form')
+    this._form = this._element.closest('form')
 
-    if (form) {
-      EventHandler.on(form, eventName('submit'), () => {
-        // Defer to a microtask so a page handler adding `data-coreui-validate`
-        // during the same submit is taken into account regardless of
-        // listener order.
-        queueMicrotask(() => {
-          if (!form.matches(SELECTOR_FORM_VALIDATE)) {
-            return
-          }
-
-          // Keep a live out-of-range invalid state; otherwise the field is
-          // invalid only when required and empty.
-          const isInvalid = this._element.classList.contains(CLASS_NAME_IS_INVALID) ||
-            (this._config.required && this._date === null)
-
-          this._element.classList.toggle(CLASS_NAME_IS_INVALID, isInvalid)
-          this._element.classList.toggle(CLASS_NAME_IS_VALID, !isInvalid && form.matches(SELECTOR_FORM_VALIDATE_VALID))
-        })
-      })
+    if (this._form) {
+      EventHandler.on(this._form, eventName('submit'), this._submitHandler)
     }
 
     EventHandler.on(this._element, eventName('click'), (event: any) => {
@@ -392,6 +384,27 @@ class SectionInput extends BaseComponent {
       if (target) {
         target.focus()
       }
+    })
+  }
+
+  _onFormSubmit(): void {
+    const form = this._form!
+
+    // Defer to a microtask so a page handler adding `data-coreui-validate`
+    // during the same submit is taken into account regardless of
+    // listener order.
+    queueMicrotask(() => {
+      if (!form.matches(SELECTOR_FORM_VALIDATE)) {
+        return
+      }
+
+      // Keep a live out-of-range invalid state; otherwise the field is
+      // invalid only when required and empty.
+      const isInvalid = this._element.classList.contains(CLASS_NAME_IS_INVALID) ||
+        (this._config.required && this._date === null)
+
+      this._element.classList.toggle(CLASS_NAME_IS_INVALID, isInvalid)
+      this._element.classList.toggle(CLASS_NAME_IS_VALID, !isInvalid && form.matches(SELECTOR_FORM_VALIDATE_VALID))
     })
   }
 

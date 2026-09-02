@@ -615,6 +615,41 @@ describe('DateInput', () => {
       expect(dateInput._element.classList.contains('is-valid')).toBeFalse()
     })
 
+    it('should stop listening to the form on dispose', async () => {
+      const dateInput = createInForm({ required: true })
+      const element = dateInput._element
+
+      dateInput.dispose()
+      fixtureEl.querySelector('form').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
+      await Promise.resolve()
+
+      expect(element.classList.contains('is-invalid')).toBeFalse()
+    })
+
+    it('should run the submit handler once after re-initialization', async () => {
+      const element = createInForm({ required: true })._element
+      new DateInput(element, { format: 'dd.MM.yyyy', required: true }) // eslint-disable-line no-new
+      const toggle = spyOn(element.classList, 'toggle').and.callThrough()
+
+      fixtureEl.querySelector('form').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
+      await Promise.resolve()
+
+      expect(toggle).toHaveBeenCalledTimes(2)
+      expect(element.classList.contains('is-invalid')).toBeTrue()
+    })
+
+    it('should keep the submit handler of another field in the same form', async () => {
+      fixtureEl.innerHTML = '<form data-coreui-validate><div id="first"></div><div id="second"></div></form>'
+      const first = new DateInput(fixtureEl.querySelector('#first'), { format: 'dd.MM.yyyy', required: true })
+      const second = new DateInput(fixtureEl.querySelector('#second'), { format: 'dd.MM.yyyy', required: true })
+
+      first.dispose()
+      fixtureEl.querySelector('form').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
+      await Promise.resolve()
+
+      expect(second._element.classList.contains('is-invalid')).toBeTrue()
+    })
+
     it('should emit errorChange with a reason when validation state changes', () => {
       const dateInput = createDateInput({
         date: new Date(2026, 6, 14),

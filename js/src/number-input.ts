@@ -26,6 +26,10 @@ const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
 const EVENT_CHANGE = `change${EVENT_KEY}`
+const EVENT_CLICK = `click${EVENT_KEY}`
+const EVENT_INPUT = `input${EVENT_KEY}`
+const EVENT_POINTERDOWN = `pointerdown${EVENT_KEY}`
+const EVENTS_STOP_REPEAT = ['pointerup', 'pointercancel', 'pointerleave'].map(event => `${event}${EVENT_KEY}`)
 
 const CLASS_NAME_ACTION = 'form-control-action'
 const CLASS_NAME_NUMBER_INPUT = 'number-input'
@@ -85,6 +89,7 @@ class NumberInput extends BaseComponent {
   private _group: ControlGroup | null = null
   private _repeatTimeout: ReturnType<typeof setTimeout> | null = null
   private _repeatInterval: ReturnType<typeof setInterval> | null = null
+  private _stopRepeatingHandler = (): void => this._stopRepeating()
 
   constructor(element: string | Element, config?: Partial<NumberInputConfig>) {
     super(element, config)
@@ -118,8 +123,15 @@ class NumberInput extends BaseComponent {
 
   override dispose(): void {
     this._stopRepeating()
-    this._decrementElement?.remove()
-    this._incrementElement?.remove()
+
+    for (const event of EVENTS_STOP_REPEAT) {
+      EventHandler.off(document, event, this._stopRepeatingHandler)
+    }
+
+    for (const button of [this._decrementElement, this._incrementElement]) {
+      EventHandler.off(button, EVENT_KEY)
+      button?.remove()
+    }
 
     if (this._group) {
       this._group.element.classList.remove(CLASS_NAME_NUMBER_INPUT)
@@ -191,10 +203,10 @@ class NumberInput extends BaseComponent {
         continue
       }
 
-      EventHandler.on(button, 'click', () => this._step(direction))
+      EventHandler.on(button, EVENT_CLICK, () => this._step(direction))
 
       if (this._config.repeat) {
-        EventHandler.on(button, 'pointerdown', (event: any) => {
+        EventHandler.on(button, EVENT_POINTERDOWN, (event: any) => {
           if (event.button !== 0) {
             return
           }
@@ -206,10 +218,10 @@ class NumberInput extends BaseComponent {
 
     // The value can change without the buttons — typing, a form reset, a script
     // — and the bounds have to follow it.
-    EventHandler.on(this._element, 'input', () => this._updateButtonState())
+    EventHandler.on(this._element, EVENT_INPUT, () => this._updateButtonState())
 
-    for (const event of ['pointerup', 'pointercancel', 'pointerleave', 'blur']) {
-      EventHandler.on(document, event, () => this._stopRepeating())
+    for (const event of EVENTS_STOP_REPEAT) {
+      EventHandler.on(document, event, this._stopRepeatingHandler)
     }
   }
 
