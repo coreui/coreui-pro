@@ -76,6 +76,26 @@
     "watch-js-main": "nodemon --watch js/src/ --ext ts --exec \"npm-run-all js-lint js-compile\""
   },
   "types": "./js/dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./js/dist/index.d.ts",
+      "import": "./dist/js/coreui.esm.js",
+      "require": "./dist/js/coreui.js"
+    },
+    "./js/src/*.js": "./js/dist/*.js",
+    "./js/src/*": "./js/src/*",
+    "./js/dist/*.js": "./js/dist/*.js",
+    "./js/dist/*": "./js/dist/*.js",
+    "./dist/js/*": "./dist/js/*",
+    "./dist/css/*": "./dist/css/*",
+    "./scss/*": "./scss/*",
+    "./package.json": "./package.json"
+  },
+  "sideEffects": [
+    "./js/src/*.ts",
+    "./js/dist/*.js",
+    "./dist/js/*.js"
+  ],
   "style": "dist/css/coreui.css",
   "sass": "scss/coreui.scss",
   "main": "dist/js/coreui.js",

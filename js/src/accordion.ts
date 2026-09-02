@@ -1,7 +1,7 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI accordion.ts
- * Licensed under MIT (https://coreui.io/pro/license/)
+ * CoreUI accordion.js
+ * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
  * --------------------------------------------------------------------------
  */
 

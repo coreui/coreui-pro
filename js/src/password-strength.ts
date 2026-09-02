@@ -1,7 +1,10 @@
 /**
  * --------------------------------------------------------------------------
  * CoreUI password-strength.js
- * License (https://coreui.io/license/)
+ * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
+ *
+ * This component is a modified version of the Bootstrap's strength.ts
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  * --------------------------------------------------------------------------
  */
 
