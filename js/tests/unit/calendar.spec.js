@@ -308,6 +308,22 @@ describe('Calendar', () => {
       expect(div.classList).not.toContain('show-week-numbers')
       expect(div.querySelector('.calendar-cell-week-number')).toBeNull()
     })
+
+    it('should select the week when the week number cell is clicked', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, {
+        calendarDate: new Date(2023, 5, 1),
+        selectionType: 'week',
+        showWeekNumber: true
+      })
+
+      const row = div.querySelectorAll('.calendar-row[tabindex="0"]')[1]
+      row.querySelector('.calendar-cell-week-number').click()
+
+      expect(calendar._startDate).toEqual(new Date(row.querySelector('.calendar-cell').dataset.coreuiDate))
+    })
   })
 
   describe('accessibility', () => {
@@ -1420,21 +1436,31 @@ describe('Calendar', () => {
         calendarDate: new Date(2023, 5, 1)
       })
 
-      // In week mode, rows should be clickable/focusable
       const rows = div.querySelectorAll('.calendar-row[tabindex="0"]')
       expect(rows.length).toBeGreaterThan(0)
 
-      // Simulate keyboard Enter on a cell within a row to select a week
       const secondRow = rows[1]
-      const cell = secondRow.querySelector('.calendar-cell')
-      expect(cell).not.toBeNull()
-
       const event = {
-        target: cell, key: 'Enter', code: 'Space', preventDefault() {}
+        target: secondRow, key: 'Enter', code: 'Enter', preventDefault() {}
       }
       calendar._handleCalendarKeydown(event)
-      // After Enter on a week cell, the start date should be set
-      expect(calendar._startDate).toBeDefined()
+      expect(calendar._startDate).toEqual(new Date(secondRow.querySelector('.calendar-cell').dataset.coreuiDate))
+    })
+
+    it('should select the week on Enter keydown dispatched on the row', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, {
+        selectionType: 'week',
+        calendarDate: new Date(2023, 5, 1)
+      })
+
+      const row = div.querySelectorAll('.calendar-row[tabindex="0"]')[1]
+      const keydownEvent = createEvent('keydown')
+      keydownEvent.key = 'Enter'
+      row.dispatchEvent(keydownEvent)
+
+      expect(calendar._startDate).toEqual(new Date(row.querySelector('.calendar-cell').dataset.coreuiDate))
     })
   })
 
@@ -1960,6 +1986,30 @@ describe('Calendar', () => {
       calendar._updateClassNamesAndAriaLabels()
       const rangeHoverCells = div.querySelectorAll('.calendar-cell.range-hover')
       expect(rangeHoverCells.length).toBeGreaterThan(0)
+    })
+
+    it('should apply range-hover class only to rows inside the hovered range in week selection mode', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, {
+        calendarDate: new Date(2023, 5, 1),
+        range: true,
+        selectionType: 'week',
+        selectEndDate: true
+      })
+
+      const rows = div.querySelectorAll('.calendar-row')
+      const rowDate = row => new Date(row.querySelector('.calendar-cell').dataset.coreuiDate)
+      calendar._startDate = rowDate(rows[1])
+      calendar._hoverDate = rowDate(rows[2])
+      calendar._updateClassNamesAndAriaLabels()
+
+      const rangeHoverRows = div.querySelectorAll('.calendar-row.range-hover')
+      expect(rangeHoverRows.length).toBe(2)
+      expect(rows[1].classList).toContain('range-hover')
+      expect(rows[2].classList).toContain('range-hover')
+      expect(rows[3].classList).not.toContain('range-hover')
     })
 
     it('should apply range-hover class with endDate hover (selectEndDate false)', () => {

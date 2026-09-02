@@ -307,6 +307,13 @@ class Calendar extends BaseComponent {
     closest?.focus()
   }
 
+  _getEventTarget(event: any): HTMLElement | null {
+    // When weeks are the unit, the row is the focusable thing — a focus event
+    // then arrives with no cell above it, and the row stands in for one.
+    return event.target.closest(SELECTOR_CALENDAR_CELL) ??
+      event.target.closest(SELECTOR_CALENDAR_ROW)
+  }
+
   _getDate(target: HTMLElement): Date {
     if (this._config.selectionType === 'week') {
       const firstCell = SelectorEngine.findOne(SELECTOR_CALENDAR_CELL, target.closest(SELECTOR_CALENDAR_ROW) as ParentNode)
@@ -317,10 +324,15 @@ class Calendar extends BaseComponent {
   }
 
   _handleCalendarClick(event: any): void {
-    const target = event.target.closest(SELECTOR_CALENDAR_CELL)
+    const target = this._getEventTarget(event)
+
+    if (!target) {
+      return
+    }
+
     const date = this._getDate(target)
     const cloneDate = new Date(date)
-    const index = Manipulator.getDataAttribute(target.closest(SELECTOR_CALENDAR), 'calendar-index') as number
+    const index = Manipulator.getDataAttribute(target.closest(SELECTOR_CALENDAR) as HTMLElement, 'calendar-index') as number
 
     if (this._view === 'days') {
       this._setCalendarDate(index ? new Date(cloneDate.setMonth(cloneDate.getMonth() - index)) : date)
@@ -514,10 +526,7 @@ class Calendar extends BaseComponent {
   }
 
   _handleCalendarMouseEnter(event: any): void {
-    // When weeks are the unit, the row is the focusable thing — a focus event
-    // then arrives with no cell above it, and the row stands in for one.
-    const target = event.target.closest(SELECTOR_CALENDAR_CELL) ??
-      event.target.closest(SELECTOR_CALENDAR_ROW)
+    const target = this._getEventTarget(event)
 
     if (!target) {
       return
@@ -1193,8 +1202,8 @@ class Calendar extends BaseComponent {
 
     const isRangeHover = this._hoverDate && (
       this._selectEndDate ?
-        isYearInRange(date, this._startDate, this._hoverDate) :
-        isYearInRange(date, this._hoverDate, this._endDate)
+        isDateInRange(date, this._startDate, this._hoverDate) :
+        isDateInRange(date, this._hoverDate, this._endDate)
     )
 
     const classNames = this._classNames({
