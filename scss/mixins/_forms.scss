@@ -275,6 +275,31 @@ $validated-controls: if(sass($enable-deprecated-form-check): ".check, .radio, .s
     }
   }
 
+  // Input group — feedback lives outside the input-group in the parent
+  // .form-field, so we use :has() to toggle display.
+  .form-field:has(.input-group .is-#{$state}) {
+    .#{$state}-feedback,
+    .#{$state}-tooltip {
+      display: block;
+    }
+  }
+
+  @if $state == "invalid" {
+    [data-coreui-validate] .form-field:has(.input-group :user-invalid) {
+      .invalid-feedback,
+      .invalid-tooltip {
+        display: block;
+      }
+    }
+  } @else if $state == "valid" {
+    [data-coreui-validate~="valid"] .form-field:has(.input-group :user-valid) {
+      .valid-feedback,
+      .valid-tooltip {
+        display: block;
+      }
+    }
+  }
+
   .input-group {
     > .autocomplete:focus-within,
     > .date-picker:focus-within,
