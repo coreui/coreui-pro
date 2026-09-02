@@ -2539,6 +2539,27 @@ describe('MultiSelect', () => {
       expect(multiSelect._selected[0].value).toBe('1')
     })
 
+    it('should not activate a disabled option on click or Enter', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [
+          { value: '1', text: 'Opt 1' },
+          { value: '2', text: 'Opt 2', disabled: true }
+        ]
+      })
+
+      multiSelect.show()
+      const option = multiSelect._optionsElement.querySelector('[data-value="2"]')
+
+      expect(option.tabIndex).toBe(-1)
+
+      option.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
+      option.click()
+
+      expect(multiSelect._selected.length).toBe(0)
+    })
+
     it('should deselect option when clicking selected option in multiple mode', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
@@ -2600,6 +2621,26 @@ describe('MultiSelect', () => {
       const option = multiSelect._optionsElement.querySelector('[data-value="1"]')
       multiSelect._onOptionsClick(option)
 
+      expect(multiSelect._wrapperElement.classList.contains('show')).toBe(false)
+    })
+
+    it('should select an option and hide dropdown in single mode without search', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [
+          { value: '1', text: 'Opt 1' },
+          { value: '2', text: 'Opt 2' }
+        ],
+        multiple: false
+      })
+
+      multiSelect.show()
+      const option = multiSelect._optionsElement.querySelector('[data-value="1"]')
+
+      expect(() => option.click()).not.toThrow()
+      expect(multiSelect._selected.length).toBe(1)
+      expect(multiSelect._selected[0].value).toBe('1')
       expect(multiSelect._wrapperElement.classList.contains('show')).toBe(false)
     })
 
