@@ -165,9 +165,6 @@
         text: PRO
     - title: Number Input
       to: /forms/number-input/
-      badge:
-        color: danger
-        text: PRO
     - title: OTP Input
       to: /forms/otp-input/
     - title: Password Input
