@@ -189,6 +189,19 @@ class Autocomplete extends Combobox {
 
   override dispose(): void {
     this._disposeFloating()
+
+    for (const element of [
+      this._menu,
+      this._inputElement,
+      this._cleanerElement,
+      this._indicatorElement,
+      this._optionsElement
+    ]) {
+      if (element) {
+        EventHandler.off(element, EVENT_KEY)
+      }
+    }
+
     this._menu?.remove()
 
     super.dispose()

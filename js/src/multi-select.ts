@@ -294,33 +294,7 @@ class MultiSelect extends Combobox {
   }
 
   override dispose(): void {
-    this._disposeFloating()
-
-    for (const element of [
-      this._wrapperElement,
-      this._menu,
-      this._selectionElement,
-      this._togglerElement,
-      this._searchElement,
-      this._indicatorElement,
-      this._selectAllElement,
-      this._headerElement,
-      this._optionsElement
-    ]) {
-      if (element) {
-        EventHandler.off(element, EVENT_KEY)
-      }
-    }
-
-    if (this._menu) {
-      this._menu.remove()
-    }
-
-    if (this._wrapperElement) {
-      this._wrapperElement.before(this._element)
-      this._wrapperElement.remove()
-    }
-
+    this._destroySelect()
     this._element.removeAttribute('tabindex')
 
     super.dispose()
@@ -340,9 +314,7 @@ class MultiSelect extends Combobox {
     this._config = { ...this._config, ...this._configAfterMerge(config) }
     this._selected = []
     this._options = this._getOptions()
-    this._menu.remove()
-    this._wrapperElement.before(this._element)
-    this._wrapperElement.remove()
+    this._destroySelect()
     this._element.innerHTML = ''
     this._configureNativeSelect()
     this._createNativeOptions(this._element, this._options)
@@ -406,6 +378,36 @@ class MultiSelect extends Combobox {
   }
 
   // Private
+
+  _destroySelect(): void {
+    this._disposeFloating()
+    this._disposeSelection()
+
+    for (const element of [
+      this._wrapperElement,
+      this._menu,
+      this._selectionElement,
+      this._togglerElement,
+      this._searchElement,
+      this._indicatorElement,
+      this._selectAllElement,
+      this._headerElement,
+      this._optionsElement
+    ]) {
+      if (element) {
+        EventHandler.off(element, EVENT_KEY)
+      }
+    }
+
+    if (this._menu) {
+      this._menu.remove()
+    }
+
+    if (this._wrapperElement) {
+      this._wrapperElement.before(this._element)
+      this._wrapperElement.remove()
+    }
+  }
 
   _addEventListeners(): void {
     // Selections are real Chip instances: cancel the chip's own
@@ -1250,6 +1252,20 @@ class MultiSelect extends Combobox {
 
     selection.innerHTML = ''
     selection.append(placeholder)
+  }
+
+  _disposeSelection(): void {
+    if (!this._selectionElement) {
+      return
+    }
+
+    for (const chip of SelectorEngine.find(SELECTOR_CHIP, this._selectionElement)) {
+      Chip.getInstance(chip)?.dispose()
+    }
+
+    this._selectionChipSet?.dispose()
+    this._selectionChipSet = null
+    EventHandler.off(this._selectionElement, Chip.EVENT_KEY)
   }
 
   _updateSelectionCleaner(): void {
