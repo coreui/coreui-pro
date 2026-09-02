@@ -223,6 +223,35 @@ describe('NumberInput', () => {
       expect(buttons().length).toBe(0)
       expect(group.classList.contains('number-input')).toBe(false)
     })
+
+    it('should ignore input typed after dispose', () => {
+      const input = markup('value="1"')
+      const numberInput = new NumberInput(input)
+
+      numberInput.dispose()
+      input.value = '2'
+      input.dispatchEvent(new Event('input'))
+
+      expect(input.value).toBe('2')
+    })
+
+    it('should drop its document listeners', () => {
+      const stopRepeating = spyOn(NumberInput.prototype, '_stopRepeating').and.callThrough()
+      const release = () => {
+        stopRepeating.calls.reset()
+        document.dispatchEvent(new Event('pointerup'))
+        return stopRepeating.calls.count()
+      }
+
+      const idle = release()
+      const numberInput = new NumberInput(markup('value="1"'))
+
+      expect(release()).toBe(idle + 1)
+
+      numberInput.dispose()
+
+      expect(release()).toBe(idle)
+    })
   })
 
   describe('data-api', () => {

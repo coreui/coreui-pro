@@ -28,7 +28,7 @@ const EVENT_COMPLETE = `complete${EVENT_KEY}`
 const EVENT_FOCUS = `focus${EVENT_KEY}`
 const EVENT_INPUT = `input${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
-const EVENT_PASTE = `paste`
+const EVENT_PASTE = `paste${EVENT_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
 const SELECTOR_FORM_OTP_CONTROL = '.form-otp-control'
@@ -474,11 +474,16 @@ class OTPInput extends BaseComponent {
   }
 
   _setInputsTabIndexes(): void {
+    const inputs = this._getInputs()
+
     if (!this._config.linear) {
+      for (const input of inputs) {
+        input.removeAttribute('tabindex')
+      }
+
       return
     }
 
-    const inputs = this._getInputs()
     let foundEmpty = false
 
     for (const input of inputs) {
