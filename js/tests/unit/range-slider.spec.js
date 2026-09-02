@@ -851,31 +851,93 @@ describe('RangeSlider', () => {
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, { value: 0, step: 5 })
 
-      // Access _roundToStep via input event
-      const input = element.querySelector('.range-slider-input')
-      input.value = 23
-      input.dispatchEvent(new Event('input', { bubbles: true }))
+      expect(element.querySelector('.range-slider-input').step).toBe('5')
+      expect(rangeSlider._roundToStep(23, 5)).toBe(25)
+      expect(rangeSlider._roundToStep(22, 5)).toBe(20)
+    })
 
-      // With step=5 and input value=23, value should stay as is because
-      // input events pass through directly. The rounding happens on click/move.
-      // Let's test with a step=10 slider
-      const element2 = document.createElement('div')
-      fixtureEl.append(element2)
-      const rangeSlider2 = new RangeSlider(element2, { value: 0, step: 10 })
+    it('should anchor the step grid at min and stay within max', () => {
+      fixtureEl.innerHTML = '<div id="slider"></div>'
+      const element = fixtureEl.querySelector('#slider')
+      const rangeSlider = new RangeSlider(element, {
+        min: 1, max: 10, step: 2, value: 1
+      })
 
-      const input2 = element2.querySelector('.range-slider-input')
-      expect(input2.step).toBe('10')
+      expect(rangeSlider._roundToStep(4, 2)).toBe(5)
+      expect(rangeSlider._roundToStep(5.9, 2)).toBe(5)
+      expect(rangeSlider._roundToStep(10, 2)).toBe(9)
+      expect(rangeSlider._roundToStep(50, 2)).toBe(9)
+      expect(rangeSlider._roundToStep(-5, 2)).toBe(1)
+    })
+
+    it('should round to the precision of the step', () => {
+      fixtureEl.innerHTML = '<div id="slider"></div>'
+      const element = fixtureEl.querySelector('#slider')
+      const rangeSlider = new RangeSlider(element, {
+        min: 0, max: 1, step: 0.1, value: 0
+      })
+
+      expect(rangeSlider._roundToStep(0.3, 0.1)).toBe(0.3)
+      expect(rangeSlider._roundToStep(0.26, 0.1)).toBe(0.3)
+      expect(rangeSlider._roundToStep(0.7, 0.1)).toBe(0.7)
+      expect(rangeSlider._roundToStep(1, 0.1)).toBe(1)
+    })
+
+    it('should only clamp when step is "any"', () => {
+      fixtureEl.innerHTML = '<div id="slider"></div>'
+      const element = fixtureEl.querySelector('#slider')
+      const rangeSlider = new RangeSlider(element, { step: 'any', value: 0 })
+
+      expect(element.querySelector('.range-slider-input').step).toBe('any')
+      expect(rangeSlider._roundToStep(33.3, 'any')).toBe(33.3)
+      expect(rangeSlider._roundToStep(120, 'any')).toBe(100)
+      expect(rangeSlider._roundToStep(-1, 'any')).toBe(0)
     })
 
     it('should treat step 0 as step 1', () => {
       fixtureEl.innerHTML = '<div id="slider"></div>'
       const element = fixtureEl.querySelector('#slider')
-      // step=0 should be treated as step=1 internally in _roundToStep
       const rangeSlider = new RangeSlider(element, { value: 0, step: 0 })
 
+      expect(element.querySelector('.range-slider-input').step).toBe('0')
+      expect(rangeSlider._roundToStep(2.4, 0)).toBe(2)
+      expect(rangeSlider._roundToStep(2.6, 0)).toBe(3)
+    })
+
+    it('should write a float-clean value to the tooltip and aria-valuenow while dragging', () => {
+      fixtureEl.innerHTML = '<div id="slider"></div>'
+      const element = fixtureEl.querySelector('#slider')
+      const rangeSlider = new RangeSlider(element, {
+        min: 0, max: 1, step: 0.1, value: 0
+      })
+
+      const track = element.querySelector('.range-slider-track')
+      spyOn(track, 'getBoundingClientRect').and.returnValue({
+        top: 0, bottom: 50, left: 0, right: 200, height: 50, width: 200
+      })
+
+      const container = element.querySelector('.range-slider-inputs-container')
+      const mousedownEvent = new MouseEvent('mousedown', {
+        bubbles: true,
+        button: 0,
+        clientX: 0,
+        clientY: 25
+      })
+      Object.defineProperty(mousedownEvent, 'target', { value: track })
+      container.dispatchEvent(mousedownEvent)
+
+      document.documentElement.dispatchEvent(new MouseEvent('mousemove', {
+        bubbles: true,
+        clientX: 60,
+        clientY: 25
+      }))
+      document.documentElement.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }))
+
       const input = element.querySelector('.range-slider-input')
-      // step=0 should work (treated as 1)
-      expect(input.step).toBe('0')
+      expect(rangeSlider._currentValue).toEqual([0.3])
+      expect(input.value).toBe('0.3')
+      expect(input.getAttribute('aria-valuenow')).toBe('0.3')
+      expect(element.querySelector('.range-slider-tooltip-inner').textContent).toBe('0.3')
     })
   })
 
@@ -1961,6 +2023,25 @@ describe('RangeSlider', () => {
       }
 
       expect(calledOnDisposedInstance).toBeFalse()
+    })
+
+    it('should leave the listeners of other instances in place', () => {
+      fixtureEl.innerHTML = '<div id="first"></div><div id="second"></div>'
+
+      const first = new RangeSlider(fixtureEl.querySelector('#first'), { value: [10, 40] })
+      const second = new RangeSlider(fixtureEl.querySelector('#second'), { value: [10, 40] })
+      const resizeSpy = spyOn(second, '_updateLabelsContainerSize')
+
+      first.dispose()
+
+      second._isDragging = true
+      document.documentElement.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }))
+      window.dispatchEvent(new Event('resize'))
+
+      expect(second._isDragging).toBeFalse()
+      expect(resizeSpy).toHaveBeenCalledTimes(1)
+
+      second.dispose()
     })
   })
 })

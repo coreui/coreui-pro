@@ -121,6 +121,9 @@ class RangeSlider extends BaseComponent {
   protected declare _dragIndex: number
   protected declare _inputs: HTMLInputElement[]
   protected declare _isDragging: boolean
+  protected declare _onDocumentMouseMove: (event: any) => void
+  protected declare _onDocumentMouseUp: () => void
+  protected declare _onWindowResize: () => void
   protected declare _sliderTrack: any
   protected declare _tooltips: HTMLElement[]
 
@@ -135,6 +138,22 @@ class RangeSlider extends BaseComponent {
     this._isDragging = false
     this._sliderTrack = null
     this._tooltips = []
+
+    this._onDocumentMouseMove = event => {
+      if (!this._isDragging) {
+        return
+      }
+
+      this._updateValue(this._calculateMoveValue(event), this._dragIndex)
+    }
+
+    this._onDocumentMouseUp = () => {
+      this._isDragging = false
+    }
+
+    this._onWindowResize = () => {
+      this._updateLabelsContainerSize()
+    }
 
     this._initializeRangeSlider()
   }
@@ -161,8 +180,9 @@ class RangeSlider extends BaseComponent {
   }
 
   override dispose(): void {
-    EventHandler.off(window, EVENT_KEY)
-    EventHandler.off(document.documentElement, EVENT_KEY)
+    EventHandler.off(window, EVENT_RESIZE, this._onWindowResize)
+    EventHandler.off(document.documentElement, EVENT_MOUSEMOVE, this._onDocumentMouseMove)
+    EventHandler.off(document.documentElement, EVENT_MOUSEUP, this._onDocumentMouseUp)
 
     super.dispose()
   }
@@ -213,23 +233,9 @@ class RangeSlider extends BaseComponent {
       EventHandler.trigger(this._element, EVENT_INPUT, { value: this._currentValue })
     })
 
-    EventHandler.on(document.documentElement, EVENT_MOUSEUP, () => {
-      this._isDragging = false
-    })
-
-    EventHandler.on(document.documentElement, EVENT_MOUSEMOVE, (event: any) => {
-      if (!this._isDragging) {
-        return
-      }
-
-      const moveValue = this._calculateMoveValue(event)
-
-      this._updateValue(moveValue, this._dragIndex)
-    })
-
-    EventHandler.on(window, EVENT_RESIZE, () => {
-      this._updateLabelsContainerSize()
-    })
+    EventHandler.on(document.documentElement, EVENT_MOUSEUP, this._onDocumentMouseUp)
+    EventHandler.on(document.documentElement, EVENT_MOUSEMOVE, this._onDocumentMouseMove)
+    EventHandler.on(window, EVENT_RESIZE, this._onWindowResize)
   }
 
   _initializeRangeSlider(): void {
@@ -460,7 +466,7 @@ class RangeSlider extends BaseComponent {
       this._calculateHorizontalPosition(event.clientX, trackRect)
 
     if (typeof position === 'string') {
-      return position === 'max' ? this._config.max : this._config.min
+      return this._roundToStep(position === 'max' ? this._config.max : this._config.min, this._config.step)
     }
 
     const value = this._config.min + (position * (this._config.max - this._config.min))
@@ -599,9 +605,26 @@ class RangeSlider extends BaseComponent {
     return value
   }
 
-  _roundToStep(number: number, step: number): number {
-    const _step = step === 0 ? 1 : step
-    return Math.round(number / _step) * _step
+  _getDecimals(number: number): number {
+    const [mantissa, exponent = '0'] = `${number}`.split('e')
+
+    return Math.max(0, (mantissa.split('.')[1] || '').length - Number(exponent))
+  }
+
+  _roundToStep(number: number, step: number | string): number {
+    const { max, min } = this._config
+    const value = Math.min(Math.max(number, min), max)
+    const _step = Number(step)
+
+    if (Number.isNaN(_step)) {
+      return value
+    }
+
+    const size = _step === 0 ? 1 : _step
+    const decimals = Math.max(this._getDecimals(size), this._getDecimals(min))
+    const rounded = Number((min + (Math.round((value - min) / size) * size)).toFixed(decimals))
+
+    return rounded > max ? Math.max(min, Number((rounded - size).toFixed(decimals))) : rounded
   }
 
   override _configAfterMerge(config: any): any {
