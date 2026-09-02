@@ -108,6 +108,32 @@ const isOutsideRange = (value: number, min: number | null, max: number | null) :
 }
 
 /**
+ * Helper function to check if every day of a period is disabled.
+ * @param start - First day of the period.
+ * @param end - Last day of the period.
+ * @param min - Minimum allowed date.
+ * @param max - Maximum allowed date.
+ * @param disabledDates - Criteria for disabled dates.
+ * @returns True if no day between start and end (clamped to min/max) is selectable.
+ */
+const isPeriodDisabled = (start: Date, end: Date, min: Date | null | undefined, max: Date | null | undefined, disabledDates: DisabledDate | DisabledDate[]) : boolean => {
+  const startTime = min ? Math.max(start.getTime(), min.getTime()) : start.getTime()
+  const endTime = max ? Math.min(end.getTime(), max.getTime()) : end.getTime()
+
+  for (
+    const currentDate = new Date(startTime);
+    currentDate.getTime() <= endTime;
+    currentDate.setDate(currentDate.getDate() + 1)
+  ) {
+    if (!isDateDisabled(currentDate, min, max, disabledDates)) {
+      return false
+    }
+  }
+
+  return true
+}
+
+/**
  * Converts an ISO week string to a Date object representing the Monday of that week.
  * @param isoWeek - The ISO week string (e.g., "2023W05" or "2023w05").
  * @returns The Date object for the Monday of the specified week.
@@ -323,7 +349,7 @@ const generateDatePatterns = (locale: string, includeTime: boolean) : string[] =
 const buildDateRegexPattern = (formatString: string, includeTime: boolean) : string => {
   // First escape special regex characters
 
-  let regexPattern = formatString.replaceAll(/[.*+?^${}()|[\\]\\]/g, "\\$&")
+  let regexPattern = formatString.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&")
 
   // Then replace the date/time components with regex groups
   regexPattern = regexPattern
@@ -1031,24 +1057,10 @@ export const isMonthDisabled = (date: Date, min?: Date | null, max?: Date | null
     return false
   }
 
-  const startTime = min ?
-    Math.max(date.getTime(), min.getTime()) :
-    date.getTime()
-  const endTime = max ?
-    Math.min(date.getTime(), max.getTime()) :
-    new Date(new Date().getFullYear(), 11, 31).getTime()
+  const year = date.getFullYear()
+  const month = date.getMonth()
 
-  for (
-    const currentDate = new Date(startTime);
-    currentDate.getTime() <= endTime;
-    currentDate.setDate(currentDate.getDate() + 1)
-  ) {
-    if (!isDateDisabled(currentDate, min, max, disabledDates)) {
-      return false
-    }
-  }
-
-  return false
+  return isPeriodDisabled(new Date(year, month, 1), new Date(year, month + 1, 0), min, max, disabledDates)
 }
 
 /**
@@ -1113,33 +1125,10 @@ export const isQuarterDisabled = (date: Date, min?: Date | null, max?: Date | nu
     return false
   }
 
-  // Get the start and end of the quarter
-  const quarter = Math.floor(date.getMonth() / 3)
-  const quarterStartMonth = quarter * 3
-  const quarterEndMonth = quarterStartMonth + 2
   const year = date.getFullYear()
+  const quarterStartMonth = Math.floor(date.getMonth() / 3) * 3
 
-  const quarterStart = new Date(year, quarterStartMonth, 1)
-  const quarterEnd = new Date(year, quarterEndMonth + 1, 0) // Last day of the quarter
-
-  const startTime = min ?
-    Math.max(quarterStart.getTime(), min.getTime()) :
-    quarterStart.getTime()
-  const endTime = max ?
-    Math.min(quarterEnd.getTime(), max.getTime()) :
-    quarterEnd.getTime()
-
-  for (
-    const currentDate = new Date(startTime);
-    currentDate.getTime() <= endTime;
-    currentDate.setDate(currentDate.getDate() + 1)
-  ) {
-    if (!isDateDisabled(currentDate, min, max, disabledDates)) {
-      return false
-    }
-  }
-
-  return false
+  return isPeriodDisabled(new Date(year, quarterStartMonth, 1), new Date(year, quarterStartMonth + 3, 0), min, max, disabledDates)
 }
 
 /**
@@ -1240,24 +1229,7 @@ export const isYearDisabled = (date: Date, min?: Date | null, max?: Date | null,
     return false
   }
 
-  const startTime = min ?
-    Math.max(date.getTime(), min.getTime()) :
-    date.getTime()
-  const endTime = max ?
-    Math.min(date.getTime(), max.getTime()) :
-    new Date(new Date().getFullYear(), 11, 31).getTime()
-
-  for (
-    const currentDate = new Date(startTime);
-    currentDate.getTime() <= endTime;
-    currentDate.setDate(currentDate.getDate() + 1)
-  ) {
-    if (!isDateDisabled(currentDate, min, max, disabledDates)) {
-      return false
-    }
-  }
-
-  return false
+  return isPeriodDisabled(new Date(year, 0, 1), new Date(year, 11, 31), min, max, disabledDates)
 }
 
 /**
