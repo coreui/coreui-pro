@@ -283,6 +283,40 @@ describe('LoadingButton', () => {
         loadingButton.start()
       })
     })
+
+    it('should clear the timeout so it cannot cut a later loading cycle short', () => {
+      jasmine.clock().install()
+
+      try {
+        fixtureEl.innerHTML = '<button>Click me</button>'
+        const button = fixtureEl.querySelector('button')
+        const loadingButton = new LoadingButton(button, { timeout: 100 })
+        let stopCount = 0
+        button.addEventListener('stop.coreui.loading-button', () => {
+          stopCount++
+        })
+
+        loadingButton.start()
+        jasmine.clock().tick(10)
+        loadingButton.stop()
+        expect(loadingButton._timeout).toBeNull()
+
+        jasmine.clock().tick(10)
+        expect(stopCount).toBe(1)
+        expect(loadingButton._state).toBe('idle')
+
+        loadingButton.start()
+        jasmine.clock().tick(95)
+        expect(loadingButton._state).toBe('loading')
+        expect(stopCount).toBe(1)
+
+        expect(() => jasmine.clock().tick(100)).not.toThrow()
+        expect(loadingButton._state).toBe('idle')
+        expect(stopCount).toBe(2)
+      } finally {
+        jasmine.clock().uninstall()
+      }
+    })
   })
 
   describe('dispose', () => {
@@ -296,6 +330,27 @@ describe('LoadingButton', () => {
       loadingButton.dispose()
 
       expect(Data.get(button, 'coreui.loading-button')).toBeNull()
+    })
+
+    it('should not let the timers fire after dispose', () => {
+      jasmine.clock().install()
+
+      try {
+        fixtureEl.innerHTML = '<button>Click me</button>'
+        const button = fixtureEl.querySelector('button')
+        const loadingButton = new LoadingButton(button, { timeout: 100 })
+        const startSpy = jasmine.createSpy('start')
+        button.addEventListener('start.coreui.loading-button', startSpy)
+
+        loadingButton.start()
+        loadingButton.dispose()
+
+        expect(() => jasmine.clock().tick(200)).not.toThrow()
+        expect(startSpy).not.toHaveBeenCalled()
+        expect(button.classList.contains('is-loading')).toBeFalse()
+      } finally {
+        jasmine.clock().uninstall()
+      }
     })
   })
 
@@ -518,17 +573,18 @@ describe('LoadingButton', () => {
       })
     })
 
-    it('should handle stop call without start', () => {
+    it('should ignore stop when not loading', () => {
       fixtureEl.innerHTML = '<button>Click me</button>'
       const button = fixtureEl.querySelector('button')
       const loadingButton = new LoadingButton(button)
+      const stopSpy = jasmine.createSpy('stop')
+      button.addEventListener('stop.coreui.loading-button', stopSpy)
 
-      // The stop method will throw when trying to call remove() on null spinner
       expect(() => {
         loadingButton.stop()
-      }).toThrow()
+      }).not.toThrow()
 
-      // Even after the error, the state should remain idle
+      expect(stopSpy).not.toHaveBeenCalled()
       expect(loadingButton._state).toBe('idle')
     })
 
