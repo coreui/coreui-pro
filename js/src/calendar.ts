@@ -275,6 +275,13 @@ class Calendar extends BaseComponent {
     this._createCalendar()
   }
 
+  override dispose(): void {
+    this._element.innerHTML = ''
+    this._element.classList.remove(CLASS_NAME_CALENDARS, CLASS_NAME_SHOW_WEEK_NUMBERS, `select-${this._config.selectionType}`)
+
+    super.dispose()
+  }
+
   // Private
   _focusOnFirstAvailableCell(): void {
     const cell = SelectorEngine.findOne(SELECTOR_CALENDAR_CELL_CLICKABLE, this._element as ParentNode)
@@ -962,7 +969,7 @@ class Calendar extends BaseComponent {
     this._createCalendar()
 
     if (callback) {
-      setTimeout(callback, 1)
+      callback()
     }
   }
 

@@ -223,4 +223,48 @@ describe('DateTimePicker', () => {
       expect(picker.getDate()).toBeNull()
     })
   })
+
+  describe('dispose', () => {
+    it('should drop the listeners on the controls it built', () => {
+      fixtureEl.innerHTML = '<div id="picker"></div>'
+      const picker = new DateTimePicker(fixtureEl.querySelector('#picker'))
+      const indicator = fixtureEl.querySelector('.form-control-action')
+      const cleaner = fixtureEl.querySelector('.form-control-cleaner')
+      const errors = []
+      const onError = event => {
+        event.preventDefault()
+        errors.push(event.error)
+      }
+
+      window.addEventListener('error', onError)
+      picker.dispose()
+      indicator.click()
+      cleaner.click()
+      window.removeEventListener('error', onError)
+
+      expect(errors).toEqual([])
+    })
+
+    it('should remove the controls it built', () => {
+      fixtureEl.innerHTML = '<div id="picker"></div>'
+      const el = fixtureEl.querySelector('#picker')
+      const picker = new DateTimePicker(el)
+
+      picker.dispose()
+
+      expect(el.children).toHaveLength(0)
+      expect(el.classList.contains('form-control-group')).toBe(false)
+    })
+
+    it('should build one set of controls when re-initialised on the same element', () => {
+      fixtureEl.innerHTML = '<div id="picker"></div>'
+      const el = fixtureEl.querySelector('#picker')
+      new DateTimePicker(el) // eslint-disable-line no-new
+      pickers.push(new DateTimePicker(el))
+
+      expect(el.querySelectorAll('.form-date-time')).toHaveLength(1)
+      expect(el.querySelectorAll('.form-control-cleaner')).toHaveLength(1)
+      expect(el.querySelectorAll('.form-control-action')).toHaveLength(1)
+    })
+  })
 })

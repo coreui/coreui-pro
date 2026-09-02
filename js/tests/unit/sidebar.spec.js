@@ -691,6 +691,7 @@ describe('Sidebar', () => {
 
       const el = fixtureEl.querySelector('.sidebar')
       const sidebar = new Sidebar(el)
+      sidebar.dispose()
 
       // Watch the prototype and match on the receiver: `dispose()` nulls the
       // instance's own properties (an instance spy would be wiped), and other
@@ -706,7 +707,6 @@ describe('Sidebar', () => {
       }
 
       try {
-        sidebar.dispose()
         window.dispatchEvent(new Event('resize'))
       } finally {
         Sidebar.prototype._isMobile = original
@@ -739,6 +739,21 @@ describe('Sidebar', () => {
       window.dispatchEvent(new Event('load'))
 
       expect(spySidebarInterface).toHaveBeenCalledWith(sidebarEl)
+    })
+
+    it('should drop the backdrop and restore body scroll when disposed while shown on mobile', () => {
+      fixtureEl.innerHTML = '<div class="sidebar" style="--cui-is-mobile: true; position: fixed; top: 0; left: 0; width: 10px; height: 10px"></div>'
+      const sidebar = new Sidebar(fixtureEl.querySelector('.sidebar'))
+
+      sidebar.show()
+
+      expect(document.querySelector('.sidebar-backdrop')).not.toBeNull()
+      expect(document.body.style.overflow).toBe('hidden')
+
+      sidebar.dispose()
+
+      expect(document.querySelector('.sidebar-backdrop')).toBeNull()
+      expect(document.body.style.overflow).toBe('')
     })
   })
 })

@@ -7,7 +7,6 @@
 
 import BaseComponent from './base-component.js'
 import type { ComponentConfig } from './util/config.js'
-import Data from './dom/data.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { defineJQueryPlugin } from './util/index.js'
@@ -60,17 +59,11 @@ class Navigation extends BaseComponent {
     this._config = this._getConfig(config)
     this._setActiveLink()
     this._addEventListeners()
-
-    Data.set(element as Element, DATA_KEY, this)
   }
   // Getters
 
   static override get Default(): typeof Default {
     return Default
-  }
-
-  static override get DATA_KEY(): string {
-    return DATA_KEY
   }
 
   static override get DefaultType(): typeof DefaultType {
