@@ -1,7 +1,7 @@
 /**
  * --------------------------------------------------------------------------
  * CoreUI PRO index.ts
- * Licensed under MIT (https://coreui.io/pro/license/)
+ * License (https://coreui.io/pro/license/)
  * --------------------------------------------------------------------------
  */
 
@@ -18,8 +18,8 @@ export { default as Collapse } from './collapse.js'
 export { default as DateInput } from './date-input.js'
 export { default as DatePicker } from './date-picker.js'
 export { default as DateRangePicker } from './date-range-picker.js'
-export { default as DateTimePicker } from './date-time-picker.js'
 export { default as DateTimeInput } from './date-time-input.js'
+export { default as DateTimePicker } from './date-time-picker.js'
 export { default as Dialog } from './dialog.js'
 export { default as Drawer } from './drawer.js'
 export { default as Dropdown } from './dropdown.js'
@@ -29,8 +29,8 @@ export { default as Modal } from './modal.js'
 export { default as MultiSelect } from './multi-select.js'
 export { default as Navigation } from './navigation.js'
 export { default as Offcanvas } from './offcanvas.js'
-export { default as OTPInput } from './otp-input.js'
 export { default as NumberInput } from './number-input.js'
+export { default as OTPInput } from './otp-input.js'
 export { default as PasswordInput } from './password-input.js'
 export { default as PasswordStrength } from './password-strength.js'
 export { default as Popover } from './popover.js'

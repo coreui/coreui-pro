@@ -1,10 +1,7 @@
 /**
  * --------------------------------------------------------------------------
  * CoreUI chip-input.js
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
- *
- * This component is a highly modified version of the Bootstrap's chip-input.js
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+ * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
  * --------------------------------------------------------------------------
  */
 

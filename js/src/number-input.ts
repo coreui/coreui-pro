@@ -1,7 +1,7 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI PRO number-input.js
- * License (https://coreui.io/pro/license/)
+ * CoreUI number-input.js
+ * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
  * --------------------------------------------------------------------------
  */
 
