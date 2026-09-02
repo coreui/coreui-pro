@@ -2699,6 +2699,40 @@ describe('Calendar', () => {
       // Should remove all event handlers
       expect(spy.calls.count()).toBeGreaterThan(0)
     })
+
+    it('should remove the panels it built', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, { calendars: 2, showWeekNumber: true })
+
+      calendar.dispose()
+
+      expect(div.children).toHaveLength(0)
+      expect(div.className).toBe('')
+    })
+
+    it('should build one set of panels when re-initialised on the same element', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div) // eslint-disable-line no-new
+      new Calendar(div) // eslint-disable-line no-new
+
+      expect(div.querySelectorAll('.calendar')).toHaveLength(1)
+    })
+  })
+
+  describe('_updateCalendar', () => {
+    it('should run the callback once the panels are rebuilt, before returning', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, { calendarDate: new Date(2023, 5, 1) })
+
+      div.querySelector('.btn-month').click()
+      div.querySelector('.calendar-cell[tabindex="0"]').click()
+
+      expect(calendar._view).toEqual('days')
+      expect(document.activeElement).toEqual(div.querySelector('.calendar-cell[tabindex="0"]'))
+    })
   })
 
   describe('calendarInterface', () => {

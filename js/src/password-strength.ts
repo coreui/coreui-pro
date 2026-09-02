@@ -23,6 +23,7 @@ const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
 const EVENT_CHANGE = `change${EVENT_KEY}`
+const EVENT_INPUT = `input${EVENT_KEY}`
 
 const CLASS_NAME_BUSY = 'password-strength-busy'
 const CLASS_NAME_FEEDBACK = 'password-strength-feedback'
@@ -114,8 +115,8 @@ class PasswordStrength extends BaseComponent {
     this._createMeter()
 
     if (this._input) {
-      EventHandler.on(this._input, 'input', () => this._schedule())
-      EventHandler.on(this._input, 'change', () => this._schedule())
+      EventHandler.on(this._input, EVENT_INPUT, () => this._schedule())
+      EventHandler.on(this._input, EVENT_CHANGE, () => this._schedule())
       this._evaluate()
     }
   }
@@ -148,8 +149,7 @@ class PasswordStrength extends BaseComponent {
     }
 
     if (this._input) {
-      EventHandler.off(this._input, 'input')
-      EventHandler.off(this._input, 'change')
+      EventHandler.off(this._input, EVENT_KEY)
     }
 
     this._meterElement?.remove()
