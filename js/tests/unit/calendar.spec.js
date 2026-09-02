@@ -339,8 +339,8 @@ describe('Calendar', () => {
     })
   })
 
-  describe('showAdjacementDays', () => {
-    it('should show adjacement days by default', () => {
+  describe('showAdjacentDays', () => {
+    it('should show adjacent days by default', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
@@ -349,15 +349,15 @@ describe('Calendar', () => {
       const prevMonthCells = div.querySelectorAll('.calendar-cell.previous')
       const nextMonthCells = div.querySelectorAll('.calendar-cell.next')
 
-      // There should be adjacement day cells rendered
+      // There should be adjacent day cells rendered
       expect(prevMonthCells.length + nextMonthCells.length).toBeGreaterThan(0)
     })
 
-    it('should not show adjacement days when showAdjacementDays is false', () => {
+    it('should not show adjacent days when showAdjacentDays is false', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
-      new Calendar(div, { showAdjacementDays: false, calendarDate: new Date(2023, 5, 1) }) // eslint-disable-line no-new
+      new Calendar(div, { showAdjacentDays: false, calendarDate: new Date(2023, 5, 1) }) // eslint-disable-line no-new
 
       const prevMonthCells = div.querySelectorAll('.calendar-cell.previous')
       const nextMonthCells = div.querySelectorAll('.calendar-cell.next')
@@ -367,13 +367,13 @@ describe('Calendar', () => {
     })
   })
 
-  describe('selectAdjacementDays', () => {
-    it('should make adjacement day cells clickable when selectAdjacementDays is true', () => {
+  describe('selectAdjacentDays', () => {
+    it('should make adjacent day cells clickable when selectAdjacentDays is true', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
       new Calendar(div, { // eslint-disable-line no-new
-        selectAdjacementDays: true,
+        selectAdjacentDays: true,
         calendarDate: new Date(2023, 5, 1)
       })
 
@@ -2083,14 +2083,14 @@ describe('Calendar', () => {
       expect(attrs.className).toContain('disabled')
     })
 
-    it('should return tabIndex 0 for adjacement days when selectAdjacementDays is true', () => {
+    it('should return tabIndex 0 for adjacent days when selectAdjacentDays is true', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
       const calendar = new Calendar(div, {
         selectionType: 'day',
         calendarDate: new Date(2023, 5, 1),
-        selectAdjacementDays: true
+        selectAdjacentDays: true
       })
       const date = new Date(2023, 4, 31) // previous month
       const attrs = calendar._cellDayAttributes(date, 'previous')
@@ -2098,14 +2098,14 @@ describe('Calendar', () => {
       expect(attrs.tabIndex).toEqual(0)
     })
 
-    it('should return tabIndex -1 for adjacement days when selectAdjacementDays is false', () => {
+    it('should return tabIndex -1 for adjacent days when selectAdjacentDays is false', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
       const calendar = new Calendar(div, {
         selectionType: 'day',
         calendarDate: new Date(2023, 5, 1),
-        selectAdjacementDays: false
+        selectAdjacentDays: false
       })
       const date = new Date(2023, 4, 31) // previous month
       const attrs = calendar._cellDayAttributes(date, 'previous')

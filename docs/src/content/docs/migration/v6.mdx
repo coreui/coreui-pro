@@ -646,6 +646,11 @@ check, radio, carousel and toggler icons already work:
 
 #### Calendar
 
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`selectAdjacementDays` and `showAdjacementDays` are spelled `selectAdjacentDays`
+  and `showAdjacentDays`** — the option keys, the `data-coreui-select-adjacent-days`
+  / `data-coreui-show-adjacent-days` attributes and the picker passthrough alike. The
+  typo is fixed in the React and Vue libraries in the same release.
 - **Behavior change:** `update()` now **merges** the given options over the
   current configuration instead of resolving them against the defaults. A
   partial call like `calendar.update({ selectEndDate: true })` no longer resets

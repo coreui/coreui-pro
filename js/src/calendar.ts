@@ -131,10 +131,10 @@ type CalendarConfig = {
   renderYearCell: ((date: Date) => string) | null
   sanitize: boolean
   sanitizeFn: ((unsafeHtml: string) => string) | null
-  selectAdjacementDays: boolean
+  selectAdjacentDays: boolean
   selectEndDate: boolean
   selectionType: string
-  showAdjacementDays: boolean
+  showAdjacentDays: boolean
   showWeekNumber: boolean
   startDate: Date | number | string | null
   weekdayFormat: number | string
@@ -169,10 +169,10 @@ const Default: CalendarConfig = {
   renderYearCell: null,
   sanitize: true,
   sanitizeFn: null,
-  selectAdjacementDays: false,
+  selectAdjacentDays: false,
   selectEndDate: false,
   selectionType: 'day',
-  showAdjacementDays: true,
+  showAdjacentDays: true,
   showWeekNumber: false,
   startDate: null,
   weekdayFormat: 2,
@@ -207,10 +207,10 @@ const DefaultType: Record<string, string> = {
   renderYearCell: '(function|null)',
   sanitize: 'boolean',
   sanitizeFn: '(null|function)',
-  selectAdjacementDays: 'boolean',
+  selectAdjacentDays: 'boolean',
   selectEndDate: 'boolean',
   selectionType: 'string',
-  showAdjacementDays: 'boolean',
+  showAdjacentDays: 'boolean',
   showWeekNumber: 'boolean',
   startDate: '(date|number|string|null)',
   weekdayFormat: '(number|string)',
@@ -848,7 +848,7 @@ class Calendar extends BaseComponent {
               }
               ${days.map(({ date, month }) => {
                 const cellAttributes = this._cellDayAttributes(date, month)
-                return month === 'current' || this._config.showAdjacementDays ?
+                return month === 'current' || this._config.showAdjacentDays ?
                   `<td
                     class="${cellAttributes.className}"
                     tabindex="${cellAttributes.tabIndex}"
@@ -1079,7 +1079,7 @@ class Calendar extends BaseComponent {
 
     const classNames = this._classNames({
       [CLASS_NAME_CALENDAR_CELL]: true,
-      clickable: !isCurrentMonth && this._config.selectAdjacementDays,
+      clickable: !isCurrentMonth && this._config.selectAdjacentDays,
       disabled: isDisabled,
       range: isInRange,
       'range-hover': isRangeHover,
@@ -1090,7 +1090,7 @@ class Calendar extends BaseComponent {
 
     return {
       className: classNames,
-      tabIndex: (isCurrentMonth || this._config.selectAdjacementDays) && !isDisabled ? 0 : -1,
+      tabIndex: (isCurrentMonth || this._config.selectAdjacentDays) && !isDisabled ? 0 : -1,
       ariaSelected: isSelected,
       ariaLabel: date.toLocaleDateString(this._config.locale),
       ariaCurrent: isTodayDate,
