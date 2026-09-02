@@ -439,7 +439,6 @@ class Popup extends Config {
     EventHandler.off(document, EVENT_KEYDOWN, this._keydownListener)
     this._clickListener = null
     this._keydownListener = null
-    this._anchorKeydownListener = null
   }
 }
 

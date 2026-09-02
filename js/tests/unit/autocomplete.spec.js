@@ -2253,6 +2253,45 @@ describe('Autocomplete', () => {
 
       expect(autocomplete._element).toBeNull()
     })
+
+    it('should remove the listeners of the generated elements on dispose', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        cleaner: true,
+        indicator: true,
+        options: [{ label: 'Option 1', value: '1' }]
+      })
+
+      const input = autocomplete._inputElement
+      const cleaner = autocomplete._cleanerElement
+      const indicator = autocomplete._indicatorElement
+      const menu = autocomplete._menu
+      const options = autocomplete._optionsElement
+
+      autocomplete.dispose()
+
+      const showSpy = spyOn(autocomplete, 'show')
+      const toggleSpy = spyOn(autocomplete, 'toggle')
+      const searchSpy = spyOn(autocomplete, 'search')
+      const clearSpy = spyOn(autocomplete, 'clear')
+      const optionsClickSpy = spyOn(autocomplete, '_onOptionsClick')
+
+      input.value = 'O'
+      input.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'ArrowDown' }))
+      input.dispatchEvent(new KeyboardEvent('keyup', { bubbles: true, key: 'O' }))
+      input.dispatchEvent(new Event('blur'))
+      menu.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'O' }))
+      indicator.click()
+      cleaner.click()
+      options.click()
+
+      expect(showSpy).not.toHaveBeenCalled()
+      expect(toggleSpy).not.toHaveBeenCalled()
+      expect(searchSpy).not.toHaveBeenCalled()
+      expect(clearSpy).not.toHaveBeenCalled()
+      expect(optionsClickSpy).not.toHaveBeenCalled()
+    })
   })
 
   describe('input blur', () => {
