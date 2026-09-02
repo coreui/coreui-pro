@@ -1092,9 +1092,32 @@ adornment in the library — so the button needs no icon markup at all:
 #### ScrollSpy
 
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The active link is chosen by an activation line, not by scroll
+  direction.** The plugin used to compare each section's offset with the
+  previous scroll position, so the same scroll offset could highlight a
+  different link depending on which way you arrived. It now activates the
+  lowest section whose top edge has crossed a line drawn `topMargin` below
+  the top of the scroll container — a pure function of the scroll position.
+  Two visible consequences: **the last active link stays highlighted while a
+  gap between sections crosses the line** (the navigation no longer goes
+  blank), and **a short last section is activated when the container is
+  scrolled to the bottom**, even though its top never reaches the line.
+- **New option `topMargin`** (default `12%`) places the activation line; it
+  takes a percentage of the container's height or a pixel value (`96px`).
+  A pixel line is recomputed on resize.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`rootMargin` defaults to `null` and is now the raw override.** Set it and
+  it is handed to the `IntersectionObserver` unchanged, taking precedence over
+  `topMargin`; a v5 configuration such as `rootMargin: '0px 0px -25%'` keeps
+  working as written. `threshold` defaults to `[0]` instead of
+  `[0.1, 0.5, 1]` — with an activation line a section only needs to report
+  whether it crosses it.
+- **`smoothScroll` finishes the navigation.** Once the scroll settles, the
+  URL hash is replaced with the link's target and focus moves to the section.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **The deprecated `offset` option is removed** — it has been a thin alias
-  since the IntersectionObserver rewrite. Use `rootMargin` instead; the exact
-  equivalence is `offset: 100` &rarr; `rootMargin: '100px 0px -30%'`.
+  since the IntersectionObserver rewrite. Use `topMargin` instead:
+  `offset: 100` &rarr; `topMargin: '100px'`.
 
 #### Tab
 
