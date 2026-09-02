@@ -2545,7 +2545,8 @@ emitted as:
 ```
 
 `$input-height-inner`, `-half` and `-quarter` are geometry rather than aliases,
-so they follow the validation mixin they serve into `scss/mixins/_forms.scss`;
+so they follow the validation mixin they serve into
+`scss/mixins/_form-validation.scss`;
 `$input-height-border` had one reader and is written where it is used.
 
 #### The control variables moved out of the shared config
@@ -3212,7 +3213,8 @@ Nothing existing changes; these are additions. See
   default to `$tooltip-*`, so overriding `$tooltip-padding-y` alone no longer
   moves feedback tooltips at compile time — use the runtime link (add the
   class) or set `$form-feedback-tooltip-*` explicitly. The tooltip variables
-  moved to `scss/_tooltip.scss`, the feedback set to `scss/mixins/_forms.scss`.
+  moved to `scss/_tooltip.scss`, the feedback set to
+  `scss/mixins/_form-validation.scss`.
 - **Validation composes through the tokens**: `.is-invalid` / `.is-valid` set
   `--cui-control-border-color`, `-focus-border-color` and `-focus-ring`
   instead of restating declarations, so state styling follows any control

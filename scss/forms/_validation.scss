@@ -1,4 +1,9 @@
-@use "../mixins/forms" as *;
+@use "../functions/escape-svg" as *;
+@use "../mixins/border-radius" as *;
+@use "../mixins/focus-ring" as *;
+@use "../mixins/form-validation" as *;
+@use "../mixins/ltr-rtl" as *;
+@use "../mixins/tokens" as *;
 @use "../config" as *;
 
 // Form validation
@@ -8,6 +13,238 @@
 // Client-side: `:user-invalid` pseudo-class is scoped behind `[data-coreui-validate]`.
 // `:user-valid` is scoped behind `[data-coreui-validate~="valid"]` so success styling is opt-in.
 // Custom states (e.g., "warning") use only `.is-*` classes.
+
+// stylelint-disable scss/at-function-named-arguments
+
+@mixin form-control-group-validation-state($color, $border-color, $focus-ring-color) {
+  --#{$prefix}control-border-color: #{$border-color};
+  --#{$prefix}control-focus-border-color: #{$border-color};
+  --#{$prefix}control-focus-ring: #{$focus-ring-color};
+  --#{$prefix}control-group-icon-color: #{$color};
+  --#{$prefix}control-group-action-color: #{$color};
+}
+
+$validated-controls: if(sass($enable-deprecated-form-check): ".check, .radio, .switch, .form-check-input"; else: ".check, .radio, .switch") !default;
+
+// scss-docs-start form-validation-state-mixin
+@mixin form-validation-state(
+  $state,
+  $theme,
+  $icon,
+  $color: var(--#{$prefix}#{$theme}-fg),
+  $tooltip-color: var(--#{$prefix}#{$theme}-contrast),
+  $tooltip-bg-color: color-mix(in srgb, var(--#{$prefix}#{$theme}) #{$form-feedback-tooltip-opacity * 100%}, transparent),
+  $focus-ring-color: var(--#{$prefix}#{$theme}-focus-ring),
+  $border-color: var(--#{$prefix}#{$theme}-fg)
+) {
+  .#{$state}-feedback {
+    @include tokens($form-feedback-tokens);
+
+    display: none;
+    width: 100%;
+    margin-top: var(--#{$prefix}form-feedback-margin-top);
+    font-size: var(--#{$prefix}form-feedback-font-size);
+    font-style: var(--#{$prefix}form-feedback-font-style);
+    color: $color;
+  }
+
+  // The compound variant outweighs .tooltip's own opacity: 0 (0,2,0 vs 0,1,0).
+  .tooltip.#{$state}-tooltip,
+  .#{$state}-tooltip {
+    @include tokens($form-feedback-tokens);
+
+    position: absolute;
+    top: 100%;
+    z-index: 5;
+    display: none;
+    max-width: 100%; // Contain to parent when possible
+    padding: var(--#{$prefix}tooltip-padding-y, var(--#{$prefix}form-feedback-tooltip-padding-y)) var(--#{$prefix}tooltip-padding-x, var(--#{$prefix}form-feedback-tooltip-padding-x));
+    margin-top: .1rem;
+    font-size: var(--#{$prefix}tooltip-font-size, var(--#{$prefix}form-feedback-tooltip-font-size));
+    line-height: var(--#{$prefix}form-feedback-tooltip-line-height);
+    color: $tooltip-color;
+    background-color: $tooltip-bg-color;
+    opacity: 1;
+    @include border-radius(var(--#{$prefix}tooltip-border-radius, var(--#{$prefix}form-feedback-tooltip-border-radius)));
+  }
+
+  @include form-validation-state-selector($state) {
+    ~ .#{$state}-feedback,
+    ~ .#{$state}-tooltip {
+      display: block;
+    }
+  }
+
+  .form-control {
+    @include form-validation-state-selector($state) {
+      --#{$prefix}control-border-color: #{$border-color};
+      --#{$prefix}control-focus-border-color: #{$border-color};
+      --#{$prefix}control-focus-ring: #{$focus-ring-color};
+
+      @if $enable-validation-icons {
+        padding-inline-end: $input-height-inner;
+        background-image: escape-svg($icon);
+        background-repeat: no-repeat;
+        @include ltr-rtl-value-only("background-position", right $input-height-inner-quarter center, left $input-height-inner-quarter center);
+        background-size: $input-height-inner-half $input-height-inner-half;
+      }
+
+    }
+  }
+
+  .form-otp-control {
+    @include form-validation-state-selector($state) {
+      border-color: $border-color;
+
+      &:focus {
+        border-color: $border-color;
+        @include focus-ring(true, $color: $focus-ring-color);
+      }
+    }
+  }
+
+  // The state has to reach the group: a custom property set on the control
+  // inside it only inherits downwards, never back up to the frame.
+  .form-control-group.is-#{$state},
+  .form-control-group:has(> .form-control.is-#{$state}),
+  .autocomplete.is-#{$state} .form-control-group,
+  .form-multi-select.is-#{$state} .form-control-group {
+    @include form-control-group-validation-state($color, $border-color, $focus-ring-color);
+  }
+
+  @if $state == "invalid" {
+    [data-coreui-validate] .form-control-group:has(> .form-control:user-invalid),
+    [data-coreui-validate] .form-multi-select:has(> select:user-invalid) .form-control-group {
+      @include form-control-group-validation-state($color, $border-color, $focus-ring-color);
+    }
+  } @else if $state == "valid" {
+    [data-coreui-validate~="valid"] .form-control-group:has(> .form-control:user-valid),
+    [data-coreui-validate~="valid"] .form-multi-select:has(> select:user-valid) .form-control-group {
+      @include form-control-group-validation-state($color, $border-color, $focus-ring-color);
+    }
+  }
+
+  @if $enable-validation-icons {
+    .form-control-group > .form-control {
+      @include form-validation-state-selector($state) {
+        background-image: none;
+      }
+    }
+  }
+
+  // stylelint-disable-next-line selector-no-qualifying-type
+  textarea.form-control {
+    @include form-validation-state-selector($state) {
+      @if $enable-validation-icons {
+        padding-inline-end: $input-height-inner;
+        @include ltr-rtl-value-only("background-position", top $input-height-inner-quarter right $input-height-inner-quarter, top $input-height-inner-quarter left $input-height-inner-quarter);
+      }
+    }
+  }
+
+  // stylelint-disable selector-no-qualifying-type
+  select.form-control,
+  .form-control-caret,
+  .form-select {
+    @include form-validation-state-selector($state) {
+      --#{$prefix}control-border-color: #{$border-color};
+      --#{$prefix}control-focus-border-color: #{$border-color};
+      --#{$prefix}control-focus-ring: #{$focus-ring-color};
+
+      @if $enable-validation-icons {
+        &:not([multiple], [size]),
+        &:not([multiple])[size="1"] {
+          --#{$prefix}control-select-bg-icon: #{escape-svg($icon)};
+          padding-inline-end: var(--#{$prefix}control-select-feedback-icon-padding-end);
+          background-position: var(--#{$prefix}control-select-validation-bg-position);
+          background-size: var(--#{$prefix}control-select-feedback-icon-size);
+        }
+      }
+    }
+  }
+  // stylelint-enable selector-no-qualifying-type
+
+  .form-control-color {
+    @include form-validation-state-selector($state) {
+      @if $enable-validation-icons {
+        width: calc(var(--#{$prefix}control-color-width) + #{$input-height-inner});
+      }
+    }
+  }
+
+  #{$validated-controls} {
+    @include form-validation-state-selector($state) {
+      border-color: $border-color;
+
+      &:checked {
+        background-color: $color;
+      }
+
+      &:focus-visible {
+        @include focus-ring(true, $color: $focus-ring-color);
+      }
+
+      ~ label {
+        color: $color;
+      }
+    }
+  }
+
+  @if $enable-deprecated-form-check {
+    .form-check-inline .form-check-input {
+      ~ .#{$state}-feedback {
+        margin-inline-start: .5em;
+      }
+    }
+  }
+
+  // Input group — feedback lives outside the input-group in the parent
+  // .form-field, so we use :has() to toggle display.
+  .form-field:has(.input-group .is-#{$state}) {
+    .#{$state}-feedback,
+    .#{$state}-tooltip {
+      display: block;
+    }
+  }
+
+  @if $state == "invalid" {
+    [data-coreui-validate] .form-field:has(.input-group :user-invalid) {
+      .invalid-feedback,
+      .invalid-tooltip {
+        display: block;
+      }
+    }
+  } @else if $state == "valid" {
+    [data-coreui-validate~="valid"] .form-field:has(.input-group :user-valid) {
+      .valid-feedback,
+      .valid-tooltip {
+        display: block;
+      }
+    }
+  }
+
+  .input-group {
+    > .autocomplete:focus-within,
+    > .date-picker:focus-within,
+    > .time-picker:focus-within,
+    > .form-control-group:focus-within,
+    > .form-multi-select:focus-within,
+    > .form-control:focus,
+    > .form-select:focus,
+    > .form-floating:focus-within {
+      @include form-validation-state-selector($state) {
+        @if $state == "valid" {
+          z-index: 3;
+        } @else if $state == "invalid" {
+          z-index: 4;
+        }
+      }
+    }
+  }
+}
+// scss-docs-end form-validation-state-mixin
+
+// stylelint-enable scss/at-function-named-arguments
 
 @layer forms {
   // scss-docs-start form-validation-states-loop
