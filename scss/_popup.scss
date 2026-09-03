@@ -6,7 +6,7 @@
 @use "config" as *;
 
 // scss-docs-start popup-variables
-$popup-zindex:              1000 !default;
+$popup-zindex:              var(--#{$prefix}z-dropdown) !default;
 $popup-bg:                  var(--#{$prefix}bg-body) !default;
 $popup-border-width:        var(--#{$prefix}border-width) !default;
 $popup-border-color:        var(--#{$prefix}border-color) !default;
