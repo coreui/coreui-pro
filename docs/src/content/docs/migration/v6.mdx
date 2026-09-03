@@ -1972,13 +1972,12 @@ Multi Select's option indicators moved with it — they render as a decorative
   `--cui-progress-height` if you want the stripe geometry to follow the height
   too.
 
-- **`.progress-white` sets tokens, and paints with `currentcolor` instead of
-  literal white.** It was painting `background-color` past
-  `--cui-progress-bg`, so nothing could adjust it and a theme class on the same
-  bar overrode the white. On the coloured cards it is made for, the surrounding
-  text colour is the readable one, so the bar renders exactly as before — and on
-  a surface whose text is dark, the bar now follows instead of disappearing into
-  the background.
+- **`.progress-white` sets tokens.** It was painting `background-color` past
+  `--cui-progress-bg`, so nothing could adjust it. It now sets
+  `--cui-progress-bg` (translucent white) and `--cui-progress-bar-bg`
+  (`--cui-white`) and lets the base rules paint; the bar stays white under a
+  `.theme-*` class, as the variant is meant for dark and brand-coloured
+  surfaces.
 
 #### Spinner
 

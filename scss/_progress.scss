@@ -104,8 +104,8 @@ $progress-tokens: defaults(
   }
 
   .progress-white {
-    --#{$prefix}progress-bg: #{color-mix(in oklch, currentcolor $progress-contrast-track-opacity, transparent)};
-    --#{$prefix}progress-bar-bg: currentcolor;
+    --#{$prefix}progress-bg: #{color-mix(in oklch, var(--#{$prefix}white) $progress-contrast-track-opacity, transparent)};
+    --#{$prefix}progress-bar-bg: var(--#{$prefix}white);
 
     .progress-bar {
       background-color: var(--#{$prefix}progress-bar-bg);
