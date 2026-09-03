@@ -18,6 +18,7 @@ $accordion-bg:                            var(--#{$prefix}bg-body) !default;
 $accordion-border-width:                  var(--#{$prefix}border-width) !default;
 $accordion-border-color:                  var(--#{$prefix}border-color) !default;
 $accordion-border-radius:                 var(--#{$prefix}radius-7) !default;
+$accordion-gap:                           var(--#{$prefix}spacer-2) !default;
 
 $accordion-button-color:                  var(--#{$prefix}fg-2) !default;
 $accordion-button-bg:                     var(--#{$prefix}accordion-bg) !default;
@@ -61,6 +62,7 @@ $accordion-tokens: defaults(
     --#{$prefix}accordion-border-color: #{$accordion-border-color},
     --#{$prefix}accordion-border-width: #{$accordion-border-width},
     --#{$prefix}accordion-border-radius: #{$accordion-border-radius},
+    --#{$prefix}accordion-gap: #{$accordion-gap},
     --#{$prefix}accordion-btn-color: #{$accordion-button-color},
     --#{$prefix}accordion-btn-bg: #{$accordion-button-bg},
     --#{$prefix}accordion-btn-icon: #{escape-svg($accordion-button-icon)},
@@ -272,6 +274,32 @@ $accordion-tokens: defaults(
     --#{$prefix}accordion-border-radius: var(--#{$prefix}radius-5);
     --#{$prefix}accordion-font-size: var(--#{$prefix}font-size-sm);
     // scss-docs-end accordion-sm-css-vars
+  }
+
+  .accordion-gap {
+    display: flex;
+    flex-direction: column;
+    gap: var(--#{$prefix}accordion-gap);
+
+    > .accordion-item {
+      @include border-radius(var(--#{$prefix}accordion-border-radius));
+
+      &:not(:first-of-type) {
+        margin-block-start: 0;
+      }
+
+      > .accordion-header {
+        @include border-radius(calc(var(--#{$prefix}accordion-border-radius) - var(--#{$prefix}accordion-border-width)));
+      }
+
+      > .accordion-body {
+        @include border-bottom-radius(var(--#{$prefix}accordion-border-radius));
+      }
+
+      &[open] > .accordion-header {
+        @include border-bottom-radius(0);
+      }
+    }
   }
 
   .accordion-flush {

@@ -1,5 +1,6 @@
 import PasswordInput from '../../src/password-input.js'
 import PasswordStrength from '../../src/password-strength.js'
+import EventHandler from '../../src/dom/event-handler.js'
 import { getFixture, clearFixture } from '../helpers/fixture.js'
 
 describe('PasswordStrength', () => {
@@ -301,6 +302,18 @@ describe('PasswordStrength', () => {
       type(input, 'Str0ng!&Passphrase99')
 
       expect(element.querySelector('.password-strength-text')).toBeNull()
+    })
+
+    it('should leave other input listeners on the field alone', () => {
+      const { input, instance } = setup()
+      const spy = jasmine.createSpy('input')
+      EventHandler.on(input, 'input', spy)
+
+      instance.dispose()
+      type(input, 'Str0ng!&Passphrase99')
+
+      expect(spy).toHaveBeenCalledTimes(1)
+      EventHandler.off(input, 'input', spy)
     })
   })
 

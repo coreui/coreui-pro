@@ -94,6 +94,26 @@ When a check, radio, or switch needs a field title above it, add a `.form-label`
 
 Feedback elements are children of the field like any other, so they inherit its gap and land under the control.
 
+### Client-side
+
+Add `data-coreui-validate` to the `<form>` to style fields from `:user-invalid`, which only matches after the user has interacted with a control — so a field is not marked wrong before it has been filled in. `novalidate` suppresses the browser's own tooltips while keeping the constraint validation API available.
+
+<Example code={`<form class="vstack gap-3" data-coreui-validate novalidate>
+    <div class="form-field">
+      <label for="fieldValidateEmail" class="form-label">Email address</label>
+      <input type="email" class="form-control" id="fieldValidateEmail" required>
+      <div class="invalid-feedback">Please enter a valid email address.</div>
+    </div>
+    <div class="form-field">
+      <input type="checkbox" id="fieldValidateTerms" class="check" required>
+      <label for="fieldValidateTerms">Accept the terms</label>
+      <div class="invalid-feedback">You must accept before submitting.</div>
+    </div>
+    <button class="btn-solid theme-primary" type="submit">Submit</button>
+  </form>`} />
+
+### Server-side
+
 <Example code={`<div class="form-field">
     <label for="fieldValidation" class="form-label">Username</label>
     <input type="text" class="form-control is-invalid" id="fieldValidation" value="jan kowalski" aria-describedby="fieldValidationFeedback">
@@ -103,6 +123,65 @@ Feedback elements are children of the field like any other, so they inherit its 
   </div>`} />
 
 See [validation](/forms/validation/) for the full picture, including the server-side and browser-native flavours.
+
+## Descriptions
+
+Add a `<small class="form-text">` after the label and wrap both in a `.form-field-content` so the description sits under the label rather than beside the control.
+
+<Example class="d-flex flex-column gap-3" code={`<div class="form-field">
+    <input type="checkbox" id="fieldCheckDesc" class="check" />
+    <div class="form-field-content">
+      <label for="fieldCheckDesc">Subscribe to updates</label>
+      <small class="form-text">We'll send you a weekly digest of what's new.</small>
+    </div>
+  </div>
+  <div class="form-field">
+    <input type="radio" id="fieldRadioDesc" class="radio" name="fieldRadioDesc" checked />
+    <div class="form-field-content">
+      <label for="fieldRadioDesc">Standard shipping</label>
+      <small class="form-text">Arrives in three to five working days.</small>
+    </div>
+  </div>`} />
+
+### Cards
+
+Add `.form-field-card` to each field for a card treatment that highlights the selected option. The label's hit area covers the whole card, so the option is selected by clicking anywhere on it. Wrap the set in a `.form-group` to carry its own label and keep the spacing tight.
+
+<Example code={`<div class="form-group">
+    <label class="form-label">Select a plan</label>
+    <div class="vstack gap-1">
+      <div class="form-field form-field-card">
+        <input type="radio" id="fieldRadioCard1" class="radio" name="fieldRadioCard" checked />
+        <div class="form-field-content">
+          <label for="fieldRadioCard1">Basic</label>
+          <small class="form-text">$9/month — for individuals.</small>
+        </div>
+      </div>
+      <div class="form-field form-field-card">
+        <input type="radio" id="fieldRadioCard2" class="radio" name="fieldRadioCard" />
+        <div class="form-field-content">
+          <label for="fieldRadioCard2">Pro</label>
+          <small class="form-text">$29/month — for teams.</small>
+        </div>
+      </div>
+    </div>
+  </div>`} />
+
+### Groups
+
+`.form-group` lays out a set of related fields the way `.form-field` lays out one: a grid with the same gap, and a label or `<legend>` pinned to the start. Reach for it when several fields share a heading — the card example above uses it.
+
+<Example code={`<fieldset class="form-group">
+    <legend class="form-label">Notifications</legend>
+    <div class="form-field">
+      <input type="checkbox" id="groupCheck1" class="check" checked />
+      <label for="groupCheck1">Email</label>
+    </div>
+    <div class="form-field">
+      <input type="checkbox" id="groupCheck2" class="check" />
+      <label for="groupCheck2">Push</label>
+    </div>
+  </fieldset>`} />
 
 ## Customizing
 

@@ -309,9 +309,48 @@ describe('Stepper', () => {
 
       const event = new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true })
       const spy = spyOn(event, 'preventDefault')
-      stepperElement.dispatchEvent(event)
+      fixtureEl.querySelector('.stepper-step-button').dispatchEvent(event)
 
       expect(spy).toHaveBeenCalled()
+    })
+
+    it('should leave keydown alone outside the step buttons', () => {
+      fixtureEl.innerHTML = `
+        <div class="stepper" data-coreui-toggle="stepper">
+          <ol class="stepper-steps">
+            <li class="stepper-step">
+              <button type="button" class="stepper-step-button active" data-coreui-target="#step1">
+                <span class="stepper-step-indicator">1</span>
+              </button>
+            </li>
+            <li class="stepper-step">
+              <button type="button" class="stepper-step-button" data-coreui-target="#step2">
+                <span class="stepper-step-indicator">2</span>
+              </button>
+            </li>
+          </ol>
+          <div id="step1" class="stepper-pane active show">
+            <input type="text" value="abc">
+          </div>
+          <div id="step2" class="stepper-pane"></div>
+        </div>
+      `
+      const stepperElement = fixtureEl.querySelector('.stepper')
+
+      // eslint-disable-next-line no-new
+      new Stepper(stepperElement)
+
+      const input = fixtureEl.querySelector('input')
+      input.focus()
+
+      for (const key of ['ArrowLeft', 'ArrowRight', 'Home', 'End']) {
+        const event = new KeyboardEvent('keydown', { key, bubbles: true })
+        const spy = spyOn(event, 'preventDefault')
+        input.dispatchEvent(event)
+
+        expect(spy).not.toHaveBeenCalled()
+        expect(document.activeElement).toBe(input)
+      }
     })
   })
 
@@ -846,21 +885,42 @@ describe('Stepper', () => {
       expect(buttons[1].disabled).toBeFalse()
     })
 
-    it('should reset isFinished flag', () => {
+    it('should reset after finish', () => {
       fixtureEl.innerHTML = getThreeStepFixture({ activeStep: 3 })
       const stepperElement = fixtureEl.querySelector('.stepper')
       const stepper = new Stepper(stepperElement, { linear: false })
+      const buttons = [...fixtureEl.querySelectorAll('.stepper-step-button')]
 
       stepper.finish()
-      // After finish, _isFinished is true and all buttons are disabled
       expect(stepper._isFinished).toBeTrue()
-
-      // Manually re-enable a button so reset() can find enabled steps
-      const buttons = fixtureEl.querySelectorAll('.stepper-step-button')
-      buttons[0].disabled = false
+      expect(buttons.every(button => button.disabled)).toBeTrue()
 
       stepper.reset()
+
       expect(stepper._isFinished).toBeFalse()
+      expect(buttons.every(button => !button.disabled)).toBeTrue()
+      expect(buttons[2]).toHaveClass('active')
+      expect(buttons[2]).not.toHaveClass('complete')
+      expect(fixtureEl.querySelector('#step3')).toHaveClass('show')
+    })
+
+    it('should reapply the linear disabled state after finish', () => {
+      fixtureEl.innerHTML = getThreeStepFixture()
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement, { skipValidation: true })
+      const buttons = [...fixtureEl.querySelectorAll('.stepper-step-button')]
+
+      stepper.next()
+      stepper.next()
+      stepper.finish()
+      expect(buttons.every(button => button.disabled)).toBeTrue()
+
+      stepper.reset()
+
+      expect(buttons[0]).toHaveClass('active')
+      expect(buttons[0].disabled).toBeFalse()
+      expect(buttons[1].disabled).toBeFalse()
+      expect(buttons[2].disabled).toBeTrue()
     })
 
     it('should reset panes to show only initial step pane', () => {
@@ -1537,7 +1597,7 @@ describe('Stepper', () => {
       })
 
       const spy = spyOn(event, 'preventDefault')
-      stepperElement.dispatchEvent(event)
+      fixtureEl.querySelector('.stepper-step-button').dispatchEvent(event)
 
       expect(spy).not.toHaveBeenCalled()
     })
@@ -1555,7 +1615,7 @@ describe('Stepper', () => {
       })
 
       const spy = spyOn(event, 'stopPropagation')
-      stepperElement.dispatchEvent(event)
+      fixtureEl.querySelector('.stepper-step-button').dispatchEvent(event)
 
       expect(spy).toHaveBeenCalled()
     })

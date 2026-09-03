@@ -1,7 +1,7 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI PRO password-input.js
- * License (https://coreui.io/pro/license/)
+ * CoreUI otp-input.js
+ * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
  * --------------------------------------------------------------------------
  */
 
@@ -28,7 +28,7 @@ const EVENT_COMPLETE = `complete${EVENT_KEY}`
 const EVENT_FOCUS = `focus${EVENT_KEY}`
 const EVENT_INPUT = `input${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
-const EVENT_PASTE = `paste`
+const EVENT_PASTE = `paste${EVENT_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
 const SELECTOR_FORM_OTP_CONTROL = '.form-otp-control'
@@ -199,25 +199,23 @@ class OTPInput extends BaseComponent {
         return
       }
 
+      const inputs = this._getInputs()
+
+      if (!inputs.length) {
+        return
+      }
+
+      this._setHiddenInputValue(inputs.map((input: HTMLInputElement) => input.value).join(''))
+
       if (target!.value.length === 1) {
-        const inputs = this._getInputs()
-
-        if (!inputs.length) {
-          return
-        }
-
-        const currentValue = inputs.map((input: HTMLInputElement) => input.value).join('')
-
-        this._setHiddenInputValue(currentValue)
-
         const nextInput = getNextActiveElement(inputs, target as HTMLInputElement, true)
         if (nextInput) {
           nextInput.focus()
         }
-
-        this._setInputsTabIndexes()
-        this._checkAutoSubmit(inputs)
       }
+
+      this._setInputsTabIndexes()
+      this._checkAutoSubmit(inputs)
     })
 
     EventHandler.on(this._element, EVENT_KEYDOWN, SELECTOR_FORM_OTP_CONTROL, event => {
@@ -425,9 +423,7 @@ class OTPInput extends BaseComponent {
         input.placeholder = placeholder.length > 1 ? placeholder[index] || '' : placeholder
       }
 
-      if (this._config.required !== null) {
-        input.setAttribute('required', true as unknown as string)
-      }
+      input.required = this._config.required
 
       switch (this._config.type) {
         case 'number': {
@@ -474,11 +470,16 @@ class OTPInput extends BaseComponent {
   }
 
   _setInputsTabIndexes(): void {
+    const inputs = this._getInputs()
+
     if (!this._config.linear) {
+      for (const input of inputs) {
+        input.removeAttribute('tabindex')
+      }
+
       return
     }
 
-    const inputs = this._getInputs()
     let foundEmpty = false
 
     for (const input of inputs) {

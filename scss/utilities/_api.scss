@@ -51,6 +51,17 @@
     }
   }
 
+  // The keyframe animation utilities are decorative, so they stand down when the
+  // user asks for reduced motion.
+  @if map.has-key($utilities, "animation") and $enable-reduced-motion {
+    @media (prefers-reduced-motion: reduce) {
+      .animation-shake,
+      .animation-pop {
+        animation: none;
+      }
+    }
+  }
+
   // Print utilities
   @media print {
     @each $key, $utility in $utilities {
@@ -60,5 +71,35 @@
         @include generate-utility($utility, "-print");
       }
     }
+  }
+}
+
+// Keyframes powering the animation utilities. Declared outside the cascade layer
+// since `@keyframes` registration is global and unaffected by layers — which is
+// also why they carry the utility prefix, so they cannot collide with a `shake`
+// or `pop` animation of your own. Bundles that narrow `$utilities` before
+// importing this file skip them along with the utility.
+@if map.has-key($utilities, "animation") {
+  @keyframes animation-shake {
+    10%,
+    90% { transform: translate3d(-1px, 0, 0); }
+
+    20%,
+    80% { transform: translate3d(2px, 0, 0); }
+
+    30%,
+    50%,
+    70% { transform: translate3d(-4px, 0, 0); }
+
+    40%,
+    60% { transform: translate3d(4px, 0, 0); }
+  }
+
+  // Scales from 0 to 1; the back-easing curve on the utility supplies the slight
+  // overshoot, so the keyframes stay a simple two-stop scale.
+  @keyframes animation-pop {
+    from { transform: scale(0); }
+
+    to { transform: scale(1); }
   }
 }

@@ -117,21 +117,16 @@
       to: /forms/checkbox/
     - title: Chip input
       to: /forms/chip-input/
-      badge:
-        color: success
-        text: NEW
     - title: Date Input
       to: /forms/date-input/
       badge:
-        color: danger
-        text: PRO
+        - color: success
+          text: NEW
+        - color: danger
+          text: PRO
+          className: ms-1
     - title: Date Picker
       to: /forms/date-picker/
-      badge:
-        color: danger
-        text: PRO
-    - title: Date Time Picker
-      to: /forms/date-time-picker/
       badge:
         color: danger
         text: PRO
@@ -143,10 +138,24 @@
     - title: Date Time Input
       to: /forms/date-time-input/
       badge:
-        color: danger
-        text: PRO
+        - color: success
+          text: NEW
+        - color: danger
+          text: PRO
+          className: ms-1
+    - title: Date Time Picker
+      to: /forms/date-time-picker/
+      badge:
+        - color: success
+          text: NEW
+        - color: danger
+          text: PRO
+          className: ms-1
     - title: Field
       to: /forms/field/
+      badge:
+        color: success
+        text: NEW
     - title: Floating labels
       to: /forms/floating-labels/
     - title: Form control
@@ -166,8 +175,8 @@
     - title: Number Input
       to: /forms/number-input/
       badge:
-        color: danger
-        text: PRO
+        color: success
+        text: NEW
     - title: OTP Input
       to: /forms/otp-input/
     - title: Password Input
@@ -193,18 +202,23 @@
         text: PRO
     - title: Select
       to: /forms/select/
-    - title: Switch
-      to: /forms/switch/
     - title: Stepper
       to: /forms/stepper/
       badge:
         color: danger
         text: PRO
+    - title: Switch
+      to: /forms/switch/
+    - title: Textarea
+      to: /forms/textarea/
     - title: Time Input
       to: /forms/time-input/
       badge:
-        color: danger
-        text: PRO
+        - color: success
+          text: NEW
+        - color: danger
+          text: PRO
+          className: ms-1
     - title: Time Picker
       to: /forms/time-picker/
       badge:
@@ -219,7 +233,7 @@
   pages:
     - title: Accordion
       to: /components/accordion/
-    - title: Alerts
+    - title: Alert
       to: /components/alerts/
     - title: Avatar
       to: /components/avatar/
@@ -227,7 +241,7 @@
       to: /components/badge/
     - title: Breadcrumb
       to: /components/breadcrumb/
-    - title: Buttons
+    - title: Button
       to: /components/buttons/
     - title: Button group
       to: /components/button-group/
@@ -244,14 +258,8 @@
       to: /components/carousel/
     - title: Chip
       to: /components/chip/
-      badge:
-        color: success
-        text: NEW
     - title: Chip set
       to: /components/chip-set/
-      badge:
-        color: success
-        text: NEW
     - title: Close button
       to: /components/close-button/
     - title: Collapse
@@ -266,7 +274,7 @@
       badge:
         color: success
         text: NEW
-    - title: Dropdowns
+    - title: Dropdown
       to: /components/dropdowns/
     - title: Footer
       to: /components/footer/
@@ -276,26 +284,29 @@
       to: /components/jumbotron/
     - title: List group
       to: /components/list-group/
-    - title: Loading buttons
+    - title: Loading button
       to: /components/loading-buttons/
       badge:
         color: danger
         text: PRO
     - title: Menu
       to: /components/menu/
+      badge:
+        color: success
+        text: NEW
     - title: Modal
       to: /components/modal/
-    - title: Navbar
-      to: /components/navbar/
     - title: Nav
       to: /components/nav/
+    - title: Navbar
+      to: /components/navbar/
     - title: Offcanvas
       to: /components/offcanvas/
     - title: Pagination
       to: /components/pagination/
-    - title: Placeholders
+    - title: Placeholder
       to: /components/placeholders/
-    - title: Popovers
+    - title: Popover
       to: /components/popovers/
     - title: Progress
       to: /components/progress/
@@ -303,21 +314,15 @@
       to: /components/scrollspy/
     - title: Search Button
       to: /components/search-button/
-      badge:
-        color: success
-        text: NEW
     - title: Sidebar
       to: /components/sidebar/
-      badge:
-        color: success
-        text: NEW
-    - title: Spinners
+    - title: Spinner
       to: /components/spinners/
-    - title: Tabs
+    - title: Tab
       to: /components/tab/
-    - title: Toasts
+    - title: Toast
       to: /components/toasts/
-    - title: Tooltips
+    - title: Tooltip
       to: /components/tooltips/
 - title: Icons
   icon: <path fill="var(--ci-primary-color, currentColor)" d="M487.97,155.853a24.035,24.035,0,0,0-7-18.166L376.126,32.842a24,24,0,0,0-35.546,1.772L250.644,144.536,120.507,171.05a27.1,27.1,0,0,0-20.025,17.026L17.883,405.84a27.268,27.268,0,0,0,6.205,28.917l53.271,53.271a27.263,27.263,0,0,0,28.915,6.207L324.134,411.6a27.144,27.144,0,0,0,16.95-19.655l28.1-128.7L479.2,173.232A24.041,24.041,0,0,0,487.97,155.853Zm-177.6,226.741L97.807,463.222,84.665,450.079l99.36-99.36a56.061,56.061,0,1,0-22.268-22.986l-99.72,99.72L48.894,414.31,129.47,201.881l124.717-25.41,83.052,83.051ZM187.42,301.9a24,24,0,1,1,24,24A24,24,0,0,1,187.42,301.9Zm168.391-69.065L280.973,158,359.749,61.72l92.343,92.343Z" class="ci-primary"/>
@@ -379,6 +384,8 @@
       to: /utilities/border-color/
     - title: Border radius
       to: /utilities/border-radius/
+    - title: Color scheme
+      to: /utilities/color-scheme/
     - title: Colors
       to: /utilities/colors/
     - title: Container queries

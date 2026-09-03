@@ -1,0 +1,88 @@
+@use "../theme" as *;
+@use "../functions/defaults" as *;
+@use "../config" as *;
+
+// This mixin uses an `if()` technique to be compatible with Dart Sass
+// See https://github.com/sass/sass/issues/1873#issuecomment-152293725 for more details
+
+// scss-docs-start form-feedback-variables
+$form-feedback-margin-top:          .25rem !default;
+$form-feedback-font-size:           var(--#{$prefix}small-font-size) !default;
+$form-feedback-font-style:          null !default;
+
+$form-feedback-icon-valid-color:    $success !default;
+$form-feedback-icon-valid:          url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'><path fill='#{$form-feedback-icon-valid-color}' d='M2.3 6.73.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1'/></svg>") !default;
+$form-feedback-icon-invalid-color:  $danger !default;
+$form-feedback-icon-invalid:        url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='#{$form-feedback-icon-invalid-color}'><circle cx='6' cy='6' r='4.5'/><path stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/><circle cx='6' cy='8.2' r='.6' fill='#{$form-feedback-icon-invalid-color}' stroke='none'/></svg>") !default;
+// scss-docs-end form-feedback-variables
+
+// `icon` stays a Sass value because the SVG bakes its fill in at build time.
+// scss-docs-start form-validation-states
+// `icon` stays a Sass value because the SVG bakes its fill in at build time.
+$form-validation-states: (
+  "valid": (
+    "theme": "success",
+    "icon": $form-feedback-icon-valid,
+  ),
+  "invalid": (
+    "theme": "danger",
+    "icon": $form-feedback-icon-invalid,
+  )
+) !default;
+// scss-docs-end form-validation-states
+
+// Geometry of the validation icon painted into the field: the room it needs and
+// where it sits. Derived from the frame, so it follows a retuned control.
+$input-height-inner:                    calc(var(--#{$prefix}btn-input-line-height) * 1em + var(--#{$prefix}btn-input-padding-y) * 2) !default;
+$input-height-inner-half:               calc(var(--#{$prefix}btn-input-line-height) * .5em + var(--#{$prefix}btn-input-padding-y)) !default;
+$input-height-inner-quarter:            calc(var(--#{$prefix}btn-input-line-height) * .25em + var(--#{$prefix}btn-input-padding-y) * .5) !default;
+
+// scss-docs-start tooltip-feedback-variables
+$form-feedback-tooltip-padding-y:     var(--#{$prefix}spacer-1) !default;
+$form-feedback-tooltip-padding-x:     var(--#{$prefix}spacer-2) !default;
+$form-feedback-tooltip-font-size:     var(--#{$prefix}font-size-sm) !default;
+$form-feedback-tooltip-line-height:   null !default;
+$form-feedback-tooltip-opacity:       .9 !default;
+$form-feedback-tooltip-border-radius: var(--#{$prefix}border-radius) !default;
+// scss-docs-end tooltip-feedback-variables
+
+// stylelint-disable scss/dollar-variable-default
+
+// scss-docs-start form-feedback-tokens
+$form-feedback-tokens: () !default;
+$form-feedback-tokens: defaults(
+  (
+    --#{$prefix}form-feedback-margin-top: #{$form-feedback-margin-top},
+    --#{$prefix}form-feedback-font-size: #{$form-feedback-font-size},
+    --#{$prefix}form-feedback-font-style: #{$form-feedback-font-style},
+    --#{$prefix}form-feedback-tooltip-padding-y: #{$form-feedback-tooltip-padding-y},
+    --#{$prefix}form-feedback-tooltip-padding-x: #{$form-feedback-tooltip-padding-x},
+    --#{$prefix}form-feedback-tooltip-font-size: #{$form-feedback-tooltip-font-size},
+    --#{$prefix}form-feedback-tooltip-line-height: #{$form-feedback-tooltip-line-height},
+    --#{$prefix}form-feedback-tooltip-border-radius: #{$form-feedback-tooltip-border-radius},
+  ),
+  $form-feedback-tokens
+);
+// scss-docs-end form-feedback-tokens
+
+// stylelint-enable scss/dollar-variable-default
+
+// scss-docs-start form-validation-state-selector
+@mixin form-validation-state-selector($state) {
+  @if $state == "invalid" {
+    [data-coreui-validate] #{if(sass(&): "&"; else: "")}:user-invalid,
+    #{if(sass(&): "&"; else: "")}.is-#{$state} {
+      @content;
+    }
+  } @else if $state == "valid" {
+    [data-coreui-validate~="valid"] #{if(sass(&): "&"; else: "")}:user-valid,
+    #{if(sass(&): "&"; else: "")}.is-#{$state} {
+      @content;
+    }
+  } @else {
+    #{if(sass(&): "&"; else: "")}.is-#{$state} {
+      @content;
+    }
+  }
+}
+// scss-docs-end form-validation-state-selector

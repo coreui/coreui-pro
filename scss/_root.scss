@@ -81,7 +81,7 @@ $font-family-monospace:  SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mo
 
 // scss-docs-start type-variables
 $mark-color: var(--#{$prefix}fg-body) !default;
-$mark-bg:    light-dark($yellow-100, $yellow-800) !default;
+$mark-bg:    light-dark(var(--#{$prefix}yellow-100), var(--#{$prefix}yellow-800)) !default;
 // scss-docs-end type-variables
 
 $icon-size-base: 1rem !default;

@@ -1,10 +1,7 @@
 /**
  * --------------------------------------------------------------------------
  * CoreUI chip-input.js
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
- *
- * This component is a highly modified version of the Bootstrap's chip-input.js
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+ * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
  * --------------------------------------------------------------------------
  */
 
@@ -23,7 +20,12 @@ const DATA_KEY = 'coreui.chip-input'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
+const EVENT_BLUR = `blur${EVENT_KEY}`
+const EVENT_CLICK = `click${EVENT_KEY}`
+const EVENT_FOCUS = `focus${EVENT_KEY}`
 const EVENT_INPUT = `input${EVENT_KEY}`
+const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
+const EVENT_PASTE = `paste${EVENT_KEY}`
 
 const SELECTOR_DATA_CHIP_INPUT = '[data-coreui-chip-input]'
 const SELECTOR_CHIP = '.chip'
@@ -147,6 +149,8 @@ class ChipInput extends ChipSet {
       this._element.classList.remove(CLASS_NAME_GROUP)
     }
 
+    EventHandler.off(this._input, EVENT_KEY)
+
     super.dispose()
   }
 
@@ -202,7 +206,7 @@ class ChipInput extends ChipSet {
   }
 
   _addInputEventListeners(): void {
-    EventHandler.on(this._element, 'keydown', (event: any) => {
+    EventHandler.on(this._element, EVENT_KEYDOWN, (event: any) => {
       if (event.target === this._input) {
         return
       }
@@ -223,13 +227,13 @@ class ChipInput extends ChipSet {
         this._input.focus()
       }
     })
-    EventHandler.on(this._input, 'keydown', event => this._handleInputKeydown(event))
-    EventHandler.on(this._input, 'input', event => this._handleInput(event))
-    EventHandler.on(this._input, 'paste', event => this._handlePaste(event))
-    EventHandler.on(this._input, 'focus', () => this.clearSelection())
+    EventHandler.on(this._input, EVENT_KEYDOWN, event => this._handleInputKeydown(event))
+    EventHandler.on(this._input, EVENT_INPUT, event => this._handleInput(event))
+    EventHandler.on(this._input, EVENT_PASTE, event => this._handlePaste(event))
+    EventHandler.on(this._input, EVENT_FOCUS, () => this.clearSelection())
 
     if (this._config.createOnBlur) {
-      EventHandler.on(this._input, 'blur', (event: any) => {
+      EventHandler.on(this._input, EVENT_BLUR, (event: any) => {
         // Don't create chip if clicking on a chip
         if (!event.relatedTarget?.closest(SELECTOR_CHIP)) {
           this._createChipFromInput()
@@ -238,7 +242,7 @@ class ChipInput extends ChipSet {
     }
 
     // Focus input when clicking container background
-    EventHandler.on(this._element, 'click', (event: any) => {
+    EventHandler.on(this._element, EVENT_CLICK, (event: any) => {
       if (event.target === this._element) {
         this._input?.focus()
       }

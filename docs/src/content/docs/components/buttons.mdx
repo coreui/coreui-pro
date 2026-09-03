@@ -1,6 +1,6 @@
 ---
-title: "Bootstrap 6 Buttons"
-name: "Buttons"
+title: "Bootstrap 6 Button"
+name: "Button"
 description: "Bootstrap button component for actions in tables, forms, cards, and more. CoreUI for Bootstrap provides various styles, states, and size. Ready to use and easy to customize."
 otherFrameworks:
   - button
@@ -130,6 +130,7 @@ With a theme colour the text takes it, and the fill that appears on hover takes 
 <Example code={getData('theme-colors').map((c) => `<button type="button" class="btn-subtle theme-${c.name}">${c.title}</button>`)} />
 
 ## Sizing
+
 Larger or smaller buttons? Add `.btn-xs`, `.btn-sm` or `.btn-lg` for additional sizes.
 
 <Example code={`<button type="button" class="btn-solid theme-primary btn-lg">Large button</button>
@@ -163,6 +164,7 @@ You can even roll your own custom sizing with CSS variables:
 <Example code={getData('theme-colors').map((c) => `<button type="button" class="btn-solid theme-${c.name} rounded-0">${c.title}</button>`)} />
 
 ## Disabled
+
 Add the `disabled` boolean attribute to any `<button>` element to make buttons look inactive. Disabled button has `pointer-events: none` applied to, disabling hover and active states from triggering.
 
 <Example code={`<button type="button" class="btn-solid theme-primary btn-lg" disabled>Primary button</button>

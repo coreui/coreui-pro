@@ -1,3 +1,4 @@
+@use "sass:meta";
 @use "sass:string";
 @use "functions/defaults" as *;
 @use "functions/escape-svg" as *;
@@ -22,7 +23,7 @@ $breadcrumb-link-hover-color:       var(--#{$prefix}fg-2) !default;
 $breadcrumb-link-hover-bg:          var(--#{$prefix}bg-1) !default;
 $breadcrumb-link-border-radius:     var(--#{$prefix}radius-7) !default;
 $breadcrumb-divider:                string.quote("/") !default;
-$breadcrumb-divider-flipped:        $breadcrumb-divider !default;
+$breadcrumb-divider-flipped:        var(--#{$prefix}breadcrumb-divider) !default;
 $breadcrumb-border-radius:          var(--#{$prefix}radius-5) !default;
 // scss-docs-end breadcrumb-variables
 
@@ -38,7 +39,9 @@ $breadcrumb-tokens: defaults(
     --#{$prefix}breadcrumb-margin-bottom: #{$breadcrumb-margin-bottom},
     --#{$prefix}breadcrumb-bg: #{$breadcrumb-bg},
     --#{$prefix}breadcrumb-border-radius: #{$breadcrumb-border-radius},
+    --#{$prefix}breadcrumb-divider: #{meta.inspect(escape-svg($breadcrumb-divider))},
     --#{$prefix}breadcrumb-divider-color: #{$breadcrumb-divider-color},
+    --#{$prefix}breadcrumb-divider-flipped: #{meta.inspect(escape-svg($breadcrumb-divider-flipped))},
     --#{$prefix}breadcrumb-item-padding-x: #{$breadcrumb-item-padding-x},
     --#{$prefix}breadcrumb-item-active-color: #{$breadcrumb-active-color},
     --#{$prefix}breadcrumb-link-padding-x: #{$breadcrumb-link-padding-x},
@@ -81,9 +84,9 @@ $breadcrumb-tokens: defaults(
         color: var(--#{$prefix}breadcrumb-divider-color);
         @include ltr-rtl(
           "content",
-          var(--#{$prefix}breadcrumb-divider, escape-svg($breadcrumb-divider)),
+          var(--#{$prefix}breadcrumb-divider),
           null,
-          var(--#{$prefix}breadcrumb-divider-flipped, escape-svg($breadcrumb-divider-flipped))
+          var(--#{$prefix}breadcrumb-divider-flipped)
         );
       }
     }
@@ -119,9 +122,9 @@ $breadcrumb-tokens: defaults(
     &:empty::before {
       @include ltr-rtl(
         "content",
-        var(--#{$prefix}breadcrumb-divider, escape-svg($breadcrumb-divider)),
+        var(--#{$prefix}breadcrumb-divider),
         null,
-        var(--#{$prefix}breadcrumb-divider-flipped, escape-svg($breadcrumb-divider-flipped))
+        var(--#{$prefix}breadcrumb-divider-flipped)
       );
     }
   }

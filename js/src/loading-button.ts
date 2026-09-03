@@ -7,7 +7,6 @@
 
 import BaseComponent from './base-component.js'
 import type { ComponentConfig } from './util/config.js'
-import Data from './dom/data.js'
 import EventHandler from './dom/event-handler.js'
 import { defineJQueryPlugin } from './util/index.js'
 
@@ -49,6 +48,7 @@ const DefaultType = {
  */
 
 class LoadingButton extends BaseComponent {
+  protected declare _startTimeout: ReturnType<typeof setTimeout> | null
   protected declare _timeout: ReturnType<typeof setTimeout> | null
   protected declare _spinner: HTMLElement | null
   protected declare _state: string
@@ -57,13 +57,10 @@ class LoadingButton extends BaseComponent {
     super(element)
 
     this._config = this._getConfig(config)
-    this._timeout = this._config.timeout
+    this._startTimeout = null
+    this._timeout = null
     this._spinner = null
     this._state = 'idle'
-
-    if (this._element) {
-      Data.set(element as Element, DATA_KEY, this)
-    }
 
     this._createButton()
   }
@@ -85,28 +82,35 @@ class LoadingButton extends BaseComponent {
   // Public
 
   start(): void {
-    if (this._state !== 'loading') {
-      this._createSpinner()
-      this._state = 'loading'
+    if (this._state === 'loading') {
+      return
+    }
 
-      setTimeout(() => {
-        this._element.classList.add(CLASS_NAME_IS_LOADING)
-        EventHandler.trigger(this._element, EVENT_START)
+    this._createSpinner()
+    this._state = 'loading'
 
-        if (this._config.disabledOnLoading) {
-          this._element.setAttribute('disabled', true as unknown as string)
-        }
-      }, 1)
+    this._startTimeout = setTimeout(() => {
+      this._element.classList.add(CLASS_NAME_IS_LOADING)
+      EventHandler.trigger(this._element, EVENT_START)
 
-      if (this._config.timeout) {
-        setTimeout(() => {
-          this.stop()
-        }, this._config.timeout)
+      if (this._config.disabledOnLoading) {
+        this._element.setAttribute('disabled', true as unknown as string)
       }
+    }, 1)
+
+    if (this._config.timeout) {
+      this._timeout = setTimeout(() => {
+        this.stop()
+      }, this._config.timeout)
     }
   }
 
   stop(): void {
+    if (this._state !== 'loading') {
+      return
+    }
+
+    this._clearTimeouts()
     this._element.classList.remove(CLASS_NAME_IS_LOADING)
     const stoped = () => {
       this._removeSpinner()
@@ -125,6 +129,26 @@ class LoadingButton extends BaseComponent {
     }
 
     stoped()
+  }
+
+  override dispose(): void {
+    this._clearTimeouts()
+
+    super.dispose()
+  }
+
+  // Private
+
+  _clearTimeouts(): void {
+    if (this._startTimeout) {
+      clearTimeout(this._startTimeout)
+      this._startTimeout = null
+    }
+
+    if (this._timeout) {
+      clearTimeout(this._timeout)
+      this._timeout = null
+    }
   }
 
   _createButton(): void {

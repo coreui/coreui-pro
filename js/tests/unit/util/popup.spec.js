@@ -478,6 +478,22 @@ describe('Popup', () => {
       expect(popup._anchor).toBeNull()
       expect(popup._content).toBeNull()
     })
+
+    it('should stop opening from the anchor after a show, hide and dispose', () => {
+      const popup = buildPopup()
+      const anchor = fixtureEl.querySelector('#anchor')
+
+      popup.show()
+      popup.hide()
+      popup.dispose()
+
+      const showSpy = spyOn(popup, 'show')
+
+      anchor.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'F4' }))
+
+      expect(showSpy).not.toHaveBeenCalled()
+      expect(popup.isShown).toBeFalse()
+    })
   })
 
   describe('positioning', () => {

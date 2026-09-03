@@ -321,7 +321,7 @@ class Combobox extends BaseComponent {
       }
 
       optionDiv.dataset.value = String(option.value)
-      optionDiv.tabIndex = 0
+      optionDiv.tabIndex = option.disabled ? -1 : 0
 
       this._decorateOption(optionDiv, option)
       this._renderOptionContent(optionDiv, option)
@@ -357,6 +357,10 @@ class Combobox extends BaseComponent {
       if (!element) {
         return
       }
+    }
+
+    if (element.classList.contains(CLASS_NAME_DISABLED)) {
+      return
     }
 
     this._onOptionActivate(String(element.dataset.value), element)

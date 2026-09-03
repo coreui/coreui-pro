@@ -2,18 +2,22 @@
 title: "Bootstrap 6 Border"
 name: "Border"
 description: "Use border utilities to add or remove an element's borders, and to set how thick they are."
-utility: [{prefix: "border", property: "border"}, {prefix: "border", property: "border-width"}, {prefix: "border", property: "border-top-width"}, {prefix: "border", property: "border-inline-end-width"}, {prefix: "border", property: "border-bottom-width"}, {prefix: "border", property: "border-inline-start-width"}]
+utility: [{prefix: "border", property: "border"}, {prefix: "border", property: "border-inline"}, {prefix: "border", property: "border-block"}, {prefix: "border", property: "border-width"}, {prefix: "border", property: "border-top-width"}, {prefix: "border", property: "border-inline-end-width"}, {prefix: "border", property: "border-bottom-width"}, {prefix: "border", property: "border-inline-start-width"}]
 ---
 
 ## Additive
 
-Use border utilities to add or remove an element's borders. Choose from all borders or one at a time.
+Use border utilities to add or remove an element's borders. Choose from all borders, one at a time, or a facing pair — `.border-x` draws the two inline sides, `.border-y` the two block sides.
 
 <Example class="docs-example-border-utils" code={`<span class="border"></span>
   <span class="border-top"></span>
   <span class="border-end"></span>
   <span class="border-bottom"></span>
-  <span class="border-start"></span>`} />
+  <span class="border-start"></span>
+  <span class="border-x"></span>
+  <span class="border-y"></span>`} />
+
+<AddedIn version="6.0.0" /> `.border-x` and `.border-y` set the `border-inline` and `border-block` shorthands, so they follow the writing direction the way the single-side classes do.
 
 ## Subtractive
 
@@ -23,7 +27,9 @@ Or remove borders:
   <span class="border border-top-0"></span>
   <span class="border border-end-0"></span>
   <span class="border border-bottom-0"></span>
-  <span class="border border-start-0"></span>`} />
+  <span class="border border-start-0"></span>
+  <span class="border border-x-0"></span>
+  <span class="border border-y-0"></span>`} />
 
 ## Width
 

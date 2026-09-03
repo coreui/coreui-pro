@@ -148,6 +148,28 @@ Add `.drawer-no-backdrop` to hide the backdrop while keeping the drawer modal �
 
 Add `.drawer-instant` to a drawer that should appear and disappear at once, with no slide and no backdrop fade. It is the same opt-out that [`.alert-instant`](/components/alerts/#dismissing) provides, and it applies to both directions.
 
+### Dark
+
+Put `data-coreui-theme="dark"` on the drawer and it flips the tokens its own surface reads, so the panel and everything in it — including the close button — turns dark on a light page.
+
+<Example html={[`<button class="btn-solid theme-primary" type="button" data-coreui-toggle="drawer" data-coreui-target="#drawerDark">Dark drawer</button>`]} />
+
+<dialog class="drawer drawer-start" data-coreui-theme="dark" id="drawerDark" aria-labelledby="drawerDarkLabel">
+  <div class="drawer-header">
+    <h5 class="drawer-title" id="drawerDarkLabel">Dark drawer</h5>
+    <button type="button" class="btn-close" data-coreui-dismiss="drawer" aria-label="Close"></button>
+  </div>
+  <div class="drawer-body">
+    <p>The surface, the text and the dividers all read the flipped tokens.</p>
+  </div>
+</dialog>
+
+```html
+<dialog class="drawer drawer-start" data-coreui-theme="dark">
+  ...
+</dialog>
+```
+
 ## Body scrolling
 
 The page scroll is blocked while a drawer is open. Set `scroll: true` to open the drawer non-modally instead — the page stays interactive and scrollable. A visible backdrop requires the top layer, so `backdrop: true` (the default) takes precedence over `scroll: true` for the page-interactivity part.
@@ -190,7 +212,7 @@ Responsive drawer classes hide content in a drawer below a specified breakpoint 
 
 <Example code={`<button class="btn-solid theme-primary d-lg-none" type="button" data-coreui-toggle="drawer" data-coreui-target="#drawerResponsive" aria-controls="drawerResponsive">Toggle drawer</button>
 
-  <div class="alert alert-info d-none d-lg-block">Resize your browser to show the responsive drawer toggle.</div>
+  <div class="alert theme-info d-none d-lg-block">Resize your browser to show the responsive drawer toggle.</div>
 
   <dialog class="drawer-lg drawer-end" id="drawerResponsive" aria-labelledby="drawerResponsiveLabel">
     <div class="drawer-header">

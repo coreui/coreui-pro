@@ -37,6 +37,7 @@ Add `role="switch"` to convey the nature of the control to assistive technologie
   </div>`} />
 
 ## Sizing
+
 `.switch-sm`, `.switch-lg` and `.switch-xl` size the whole row — the track, its thumb, and the label beside it — the way [`.check-sm`](/forms/checkbox/#sizing) and [`.radio-lg`](/forms/radio/#sizing) do.
 
 Each sets **one** custom property. The track's width follows its height through the aspect ratio, the thumb follows the height minus the padding, and the alignment margin is computed from the line — so nothing needs re-tuning per size.
@@ -65,6 +66,16 @@ Any other size is that one property:
 ```
 
 The proportion is a Sass variable, `$switch-aspect-ratio`, so a squarer or longer track is set once for every size.
+## Custom width
+
+The switch reads its size from two tokens, so a wider switch with a larger thumb is two declarations — no new class.
+
+<Example class="d-flex flex-column gap-3" code={`<div class="form-field">
+    <div class="switch" style="--cui-switch-width: 2.75rem; --cui-switch-thumb-size: 1.5rem;">
+      <input type="checkbox" id="switchCustomWidth" role="switch" switch checked>
+    </div>
+    <label for="switchCustomWidth">Custom width switch</label>
+  </div>`} />
 
 ## With form field
 
@@ -95,7 +106,7 @@ The v5 spelling — `.form-check.form-switch` wrapping a `.form-check-input`, wi
 
 See the [v6 migration guide](/migration/v6/) for the full picture.
 
-## Theme colors
+## Theme variants
 
 Modify the appearance of checked switches by adding a [`.theme-{color}` class](/customize/components/#theme-variants) to the `.form-check` element. This sets the checked background and border color to the theme color.
 

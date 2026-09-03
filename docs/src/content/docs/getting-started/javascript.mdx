@@ -126,6 +126,29 @@ Nearly all CoreUI for Bootstrap plugins can be enabled and configured through HT
 Currently to query DOM elements we use the native methods `querySelector` and `querySelectorAll` for performance reasons, so you have to use [valid selectors](https://www.w3.org/TR/CSS21/syndata.html#value-def-identifier).
 If you use special selectors, for example: `collapse:Example` be sure to escape them.
 
+## Shadow DOM
+
+Components work inside a shadow root, with two differences from normal use.
+
+**Initialize with JavaScript, not data attributes.** Our plugins listen on the document and match the event target against a selector. An event that crosses a shadow boundary is retargeted to the host element, so the listener sees the host rather than the button inside — `data-coreui-toggle` never resolves. Construct the component instead:
+
+```js
+const root = host.shadowRoot
+const dropdown = new coreui.Dropdown(root.querySelector('.dropdown-toggle'))
+```
+
+**Adopt the stylesheet into the root.** Document styles do not cross the boundary either, so a component renders unstyled without it:
+
+```js
+const sheet = new CSSStyleSheet()
+sheet.replaceSync(await (await fetch('/path/to/coreui.min.css')).text())
+
+const root = host.attachShadow({ mode: 'open' })
+root.adoptedStyleSheets = [sheet]
+```
+
+Design tokens need no extra work: the stylesheet declares them on `:host` alongside `:root`, so every `--cui-*` variable resolves inside the shadow root once the sheet is adopted.
+
 ## Events
 
 CoreUI for Bootstrap provides custom events for most plugins' unique actions. Generally, these come in an infinitive and past participle form - where the infinitive (ex. `show`) is triggered at the start of an event, and its past participle form (ex. `shown`) is triggered on the completion of an action.

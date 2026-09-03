@@ -53,14 +53,50 @@ CoreUI for Bootstrap depends on Autoprefixer to automatically add browser prefix
 
 ## Unused CSS
 
-_Help wanted with this section, please consider opening a PR. Thanks!_
+[PurgeCSS](https://github.com/FullHuman/purgecss) reads your markup, finds the class names actually in use, and strips the rest. On a project that uses a handful of components that removes most of the stylesheet.
 
-While we don't have a prebuilt example for using [PurgeCSS](https://github.com/FullHuman/purgecss) with Bootstrap, there are some helpful articles and walkthroughs that the community has written. Here are some options:
+Install it as a dev dependency:
 
-- [https://medium.com/dwarves-foundation/remove-unused-css-styles-from-bootstrap-using-purgecss-88395a2c5772](https://medium.com/dwarves-foundation/remove-unused-css-styles-from-bootstrap-using-purgecss-88395a2c5772)
-- [https://lukelowrey.com/automatically-removeunused-css-from-bootstrap-or-other-frameworks/](https://lukelowrey.com/automatically-removeunused-css-from-bootstrap-or-other-frameworks/)
+```sh
+npm install --save-dev purgecss
+```
 
-Lastly, this [CSS Tricks article on unused CSS](https://css-tricks.com/how-do-you-remove-unused-css-from-a-site/) shows how to use PurgeCSS and other similar tools.
+Add a `purgecss.config.js` at the project root:
+
+```js
+// purgecss.config.js
+export default {
+  // Where your class names appear
+  content: ['./**/*.html', './**/*.js'],
+  // The compiled CSS to shrink, plus any of your own
+  css: ['./css/coreui.css'],
+  output: './css/coreui.purged.css',
+  safelist: {
+    // States our JavaScript toggles, which never appear in your markup
+    standard: ['show', 'hide', 'hiding', 'fade', 'active', 'selected', 'collapsing', 'disabled', 'readonly', 'indeterminate', 'complete', 'paused'],
+    // Families whose markup the components build themselves
+    greedy: [/^combobox/, /^date-/, /^time-/, /^password-/, /^rating/, /^dialog/, /^modal/, /^carousel/, /^stepper/, /^form-/, /^is-/]
+  }
+}
+```
+
+Run it as a build step and serve the purged file:
+
+```sh
+npx purgecss --config purgecss.config.js
+```
+
+<Callout type="warning">
+**Test every interactive component after purging.** Our JavaScript toggles **115** class names at run time and builds whole subtrees — the options list of a Combobox, a Date Picker's calendar, a Stepper's panes — none of which exist in your HTML for PurgeCSS to find. The `safelist` above covers the families we ship; extend it with any classes your own scripts add.
+</Callout>
+
+Unlike upstream's setup, no custom `defaultExtractor` is needed here: our responsive classes are infixed (`.d-md-none`), so no class name contains a `:` or `/` that the default extractor would split on.
+
+The community has written deeper walkthroughs:
+
+- [Remove unused CSS styles from Bootstrap using PurgeCSS](https://medium.com/dwarves-foundation/remove-unused-css-styles-from-bootstrap-using-purgecss-88395a2c5772)
+- [Automatically remove unused CSS from Bootstrap or other frameworks](https://lukelowrey.com/automatically-removeunused-css-from-bootstrap-or-other-frameworks/)
+- [CSS-Tricks: How do you remove unused CSS from a site?](https://css-tricks.com/how-do-you-remove-unused-css-from-a-site/)
 
 ## Minify and gzip
 

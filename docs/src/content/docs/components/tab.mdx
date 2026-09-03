@@ -1,6 +1,6 @@
 ---
-title: "Bootstrap 6 Tabs"
-name: "Tabs"
+title: "Bootstrap 6 Tab"
+name: "Tab"
 description: "Turn a nav into a tabbable interface with the tab plugin: panes of local content that swap without leaving the page."
 otherFrameworks:
   - navs-tabs
@@ -114,6 +114,27 @@ And with vertical pills. Ideally, for vertical tabs, you should also add `aria-o
   </div>
 </div>
 ```
+
+## List groups
+
+The tab plugin also works with [list groups](/components/list-group/). Put `data-coreui-toggle="list"` on each `.list-group-item` and pair them with `.tab-pane` elements — the toggle value only names the pattern, the behavior is the same as for tabs and pills.
+
+<Example code={`<div class="row">
+    <div class="col-4">
+      <div class="list-group" id="list-tab" role="tablist">
+        <a class="list-group-item list-group-item-action active" id="list-home-list" data-coreui-toggle="list" href="#list-home" role="tab" aria-controls="list-home">Home</a>
+        <a class="list-group-item list-group-item-action" id="list-profile-list" data-coreui-toggle="list" href="#list-profile" role="tab" aria-controls="list-profile">Profile</a>
+        <a class="list-group-item list-group-item-action" id="list-messages-list" data-coreui-toggle="list" href="#list-messages" role="tab" aria-controls="list-messages">Messages</a>
+      </div>
+    </div>
+    <div class="col-8">
+      <div class="tab-content" id="list-tabContent">
+        <div class="tab-pane fade show active" id="list-home" role="tabpanel" aria-labelledby="list-home-list">Home panel.</div>
+        <div class="tab-pane fade" id="list-profile" role="tabpanel" aria-labelledby="list-profile-list">Profile panel.</div>
+        <div class="tab-pane fade" id="list-messages" role="tabpanel" aria-labelledby="list-messages-list">Messages panel.</div>
+      </div>
+    </div>
+  </div>`} />
 
 ## Accessibility
 

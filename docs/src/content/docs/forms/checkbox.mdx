@@ -82,6 +82,7 @@ There is no inline modifier: the control is an inline element, so a row is a fle
   </div>`} />
 
 ## Sizing
+
 `.check-sm` and `.check-lg` size the whole row — the box, its label, and the space they sit in. Each sets one font size: the box is `1em`, so it follows, and so does the alignment margin, which is computed from the line. Nothing needs re-tuning per size, and a size of your own is one custom property.
 
 <Example code={`<div class="d-flex align-items-start gap-3">
@@ -119,6 +120,17 @@ Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label 
     <input class="check" type="checkbox" value="" id="fieldCheck">
     <label for="fieldCheck">Subscribe to the newsletter</label>
     <div class="form-text">We send one email a month, and never share your address.</div>
+  </div>`} />
+## Description
+
+Add a description after the label and wrap both in a `.form-field-content`, so the description sits under the label rather than beside the checkbox.
+
+<Example code={`<div class="form-field">
+    <input type="checkbox" id="checkDescription" class="check" checked />
+    <div class="form-field-content">
+      <label for="checkDescription">Example checkbox</label>
+      <small class="form-text">Supporting description for the label above.</small>
+    </div>
   </div>`} />
 
 ## Toggle buttons
@@ -184,7 +196,7 @@ The v5 toggle button — `.btn-check` on the input, with a sibling `.btn` label 
 
 See the [v6 migration guide](/migration/v6/) for the full picture.
 
-## Theme colors
+## Theme variants
 
 Modify the appearance of checked checkboxes by adding a [`.theme-{color}` class](/customize/components/#theme-variants) to the `.form-check` element. This sets the checked background and border color to the theme color.
 

@@ -314,6 +314,22 @@ $utilities: map.merge(
         0: 0,
       ),
     ),
+    "border-x": (
+      property: border-inline,
+      class: border-x,
+      values: (
+        null: var(--#{$prefix}border-width) var(--#{$prefix}border-style) var(--#{$prefix}border-color),
+        0: 0,
+      ),
+    ),
+    "border-y": (
+      property: border-block,
+      class: border-y,
+      values: (
+        null: var(--#{$prefix}border-width) var(--#{$prefix}border-style) var(--#{$prefix}border-color),
+        0: 0,
+      ),
+    ),
     // scss-docs-end utils-border-sides
     // scss-docs-start utils-border-color
     "border-color": (
@@ -375,7 +391,11 @@ $utilities: map.merge(
     // scss-docs-end utils-border-width
     // scss-docs-start utils-border-color-subtle
     "subtle-border-color": (
-      property: border-color,
+      property: (
+        --#{$prefix}border: null,
+        --#{$prefix}border-opacity: 1,
+        border-color: color-mix(in srgb, var(--#{$prefix}border) calc(var(--#{$prefix}border-opacity) * 100%), transparent),
+      ),
       class: border,
       values: $utilities-border-subtle
     ),
@@ -411,8 +431,16 @@ $utilities: map.merge(
     ),
     "max-width": (
       property: max-width,
-      class: mw,
+      class: max-w,
       values: (100: 100%)
+    ),
+    "min-width": (
+      property: min-width,
+      class: min-w,
+      values: (
+        0: 0,
+        100: 100%,
+      )
     ),
     "viewport-width": (
       property: width,
@@ -450,9 +478,17 @@ $utilities: map.merge(
         fit: fit-content
       )
     ),
+    "min-height": (
+      property: min-height,
+      class: min-h,
+      values: (
+        0: 0,
+        100: 100%,
+      )
+    ),
     "max-height": (
       property: max-height,
-      class: mh,
+      class: max-h,
       values: (100: 100%)
     ),
     "viewport-height": (
@@ -990,7 +1026,11 @@ $utilities: map.merge(
       )
     ),
     "text-color": (
-      property: color,
+      property: (
+        --#{$prefix}text: null,
+        --#{$prefix}text-opacity: 1,
+        color: color-mix(in srgb, var(--#{$prefix}text) calc(var(--#{$prefix}text-opacity) * 100%), transparent),
+      ),
       class: text,
       values: $utilities-text-emphasis-colors
     ),
@@ -1008,9 +1048,9 @@ $utilities: map.merge(
         100: 1
       )
     ),
-    "link-offset": (
+    "underline-offset": (
       property: text-underline-offset,
-      class: link-offset,
+      class: underline-offset,
       state: hover,
       values: (
         1: .125em,
@@ -1030,13 +1070,13 @@ $utilities: map.merge(
         5: 5px,
       )
     ),
-    "link-underline": (
+    "underline-color": (
       property: (
-        --#{$prefix}link-underline: null,
-        --#{$prefix}link-underline-opacity: 1,
-        text-decoration-color: color-mix(in srgb, var(--#{$prefix}link-underline) calc(var(--#{$prefix}link-underline-opacity) * 100%), transparent),
+        --#{$prefix}underline: null,
+        --#{$prefix}underline-opacity: 1,
+        text-decoration-color: color-mix(in srgb, var(--#{$prefix}underline) calc(var(--#{$prefix}underline-opacity) * 100%), transparent),
       ),
-      class: link-underline,
+      class: underline,
       values: map.merge(
         $utilities-links-underline,
         (
@@ -1046,9 +1086,9 @@ $utilities: map.merge(
         )
       )
     ),
-    "link-underline-opacity": (
-      property: (--#{$prefix}link-underline-opacity: null),
-      class: link-underline-opacity,
+    "underline-opacity": (
+      property: (--#{$prefix}underline-opacity: null),
+      class: underline-opacity,
       state: hover,
       values: (
         0: 0,
@@ -1094,12 +1134,20 @@ $utilities: map.merge(
       )
     ),
     "subtle-background-color": (
-      property: background-color,
+      property: (
+        --#{$prefix}bg: null,
+        --#{$prefix}bg-opacity: 1,
+        background-color: color-mix(in srgb, var(--#{$prefix}bg) calc(var(--#{$prefix}bg-opacity) * 100%), transparent),
+      ),
       class: bg,
       values: $utilities-bg-subtle
     ),
     "muted-background-color": (
-      property: background-color,
+      property: (
+        --#{$prefix}bg: null,
+        --#{$prefix}bg-opacity: 1,
+        background-color: color-mix(in srgb, var(--#{$prefix}bg) calc(var(--#{$prefix}bg-opacity) * 100%), transparent),
+      ),
       class: bg,
       values: $utilities-bg-muted
     ),
@@ -1162,7 +1210,21 @@ $utilities: map.merge(
       property: border-radius,
       class: rounded,
       values: (
-        null: var(--#{$prefix}border-radius),
+        null: var(--#{$prefix}rounded-size, var(--#{$prefix}border-radius)),
+        0: 0,
+        1: var(--#{$prefix}border-radius-sm),
+        2: var(--#{$prefix}border-radius),
+        3: var(--#{$prefix}border-radius-lg),
+        4: var(--#{$prefix}border-radius-xl),
+        5: var(--#{$prefix}border-radius-xxl),
+        circle: 50%,
+        pill: var(--#{$prefix}border-radius-pill)
+      )
+    ),
+    "rounded-size": (
+      property: --#{$prefix}rounded-size,
+      class: rounded-size,
+      values: (
         0: 0,
         1: var(--#{$prefix}border-radius-sm),
         2: var(--#{$prefix}border-radius),
@@ -1177,7 +1239,7 @@ $utilities: map.merge(
       property: border-top-left-radius border-top-right-radius,
       class: rounded-top,
       values: (
-        null: var(--#{$prefix}border-radius),
+        null: var(--#{$prefix}rounded-size, var(--#{$prefix}border-radius)),
         0: 0,
         1: var(--#{$prefix}border-radius-sm),
         2: var(--#{$prefix}border-radius),
@@ -1192,7 +1254,7 @@ $utilities: map.merge(
       property: border-start-end-radius border-end-end-radius,
       class: rounded-end,
       values: (
-        null: var(--#{$prefix}border-radius),
+        null: var(--#{$prefix}rounded-size, var(--#{$prefix}border-radius)),
         0: 0,
         1: var(--#{$prefix}border-radius-sm),
         2: var(--#{$prefix}border-radius),
@@ -1207,7 +1269,7 @@ $utilities: map.merge(
       property: border-bottom-right-radius border-bottom-left-radius,
       class: rounded-bottom,
       values: (
-        null: var(--#{$prefix}border-radius),
+        null: var(--#{$prefix}rounded-size, var(--#{$prefix}border-radius)),
         0: 0,
         1: var(--#{$prefix}border-radius-sm),
         2: var(--#{$prefix}border-radius),
@@ -1222,7 +1284,7 @@ $utilities: map.merge(
       property: border-end-start-radius border-start-start-radius,
       class: rounded-start,
       values: (
-        null: var(--#{$prefix}border-radius),
+        null: var(--#{$prefix}rounded-size, var(--#{$prefix}border-radius)),
         0: 0,
         1: var(--#{$prefix}border-radius-sm),
         2: var(--#{$prefix}border-radius),
@@ -1258,8 +1320,29 @@ $utilities: map.merge(
       values: (
         none: none,
       )
-    )
+    ),
     // scss-docs-end utils-transition
+    // scss-docs-start utils-animation
+    "animation": (
+      property: animation,
+      class: animation,
+      values: (
+        none: none,
+        shake: animation-shake .82s cubic-bezier(.36, .07, .19, .97) both,
+        pop: animation-pop .3s cubic-bezier(.34, 1.56, .64, 1) both,
+      )
+    ),
+    // scss-docs-end utils-animation
+    // scss-docs-start utils-color-scheme
+    "color-scheme": (
+      property: color-scheme,
+      class: color-scheme,
+      values: (
+        light: light,
+        dark: dark,
+      )
+    )
+    // scss-docs-end utils-color-scheme
   ),
   $utilities
 );

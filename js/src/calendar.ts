@@ -131,10 +131,10 @@ type CalendarConfig = {
   renderYearCell: ((date: Date) => string) | null
   sanitize: boolean
   sanitizeFn: ((unsafeHtml: string) => string) | null
-  selectAdjacementDays: boolean
+  selectAdjacentDays: boolean
   selectEndDate: boolean
   selectionType: string
-  showAdjacementDays: boolean
+  showAdjacentDays: boolean
   showWeekNumber: boolean
   startDate: Date | number | string | null
   weekdayFormat: number | string
@@ -169,10 +169,10 @@ const Default: CalendarConfig = {
   renderYearCell: null,
   sanitize: true,
   sanitizeFn: null,
-  selectAdjacementDays: false,
+  selectAdjacentDays: false,
   selectEndDate: false,
   selectionType: 'day',
-  showAdjacementDays: true,
+  showAdjacentDays: true,
   showWeekNumber: false,
   startDate: null,
   weekdayFormat: 2,
@@ -207,10 +207,10 @@ const DefaultType: Record<string, string> = {
   renderYearCell: '(function|null)',
   sanitize: 'boolean',
   sanitizeFn: '(null|function)',
-  selectAdjacementDays: 'boolean',
+  selectAdjacentDays: 'boolean',
   selectEndDate: 'boolean',
   selectionType: 'string',
-  showAdjacementDays: 'boolean',
+  showAdjacentDays: 'boolean',
   showWeekNumber: 'boolean',
   startDate: '(date|number|string|null)',
   weekdayFormat: '(number|string)',
@@ -275,6 +275,13 @@ class Calendar extends BaseComponent {
     this._createCalendar()
   }
 
+  override dispose(): void {
+    this._element.innerHTML = ''
+    this._element.classList.remove(CLASS_NAME_CALENDARS, CLASS_NAME_SHOW_WEEK_NUMBERS, `select-${this._config.selectionType}`)
+
+    super.dispose()
+  }
+
   // Private
   _focusOnFirstAvailableCell(): void {
     const cell = SelectorEngine.findOne(SELECTOR_CALENDAR_CELL_CLICKABLE, this._element as ParentNode)
@@ -307,6 +314,13 @@ class Calendar extends BaseComponent {
     closest?.focus()
   }
 
+  _getEventTarget(event: any): HTMLElement | null {
+    // When weeks are the unit, the row is the focusable thing — a focus event
+    // then arrives with no cell above it, and the row stands in for one.
+    return event.target.closest(SELECTOR_CALENDAR_CELL) ??
+      event.target.closest(SELECTOR_CALENDAR_ROW)
+  }
+
   _getDate(target: HTMLElement): Date {
     if (this._config.selectionType === 'week') {
       const firstCell = SelectorEngine.findOne(SELECTOR_CALENDAR_CELL, target.closest(SELECTOR_CALENDAR_ROW) as ParentNode)
@@ -317,10 +331,15 @@ class Calendar extends BaseComponent {
   }
 
   _handleCalendarClick(event: any): void {
-    const target = event.target.closest(SELECTOR_CALENDAR_CELL)
+    const target = this._getEventTarget(event)
+
+    if (!target) {
+      return
+    }
+
     const date = this._getDate(target)
     const cloneDate = new Date(date)
-    const index = Manipulator.getDataAttribute(target.closest(SELECTOR_CALENDAR), 'calendar-index') as number
+    const index = Manipulator.getDataAttribute(target.closest(SELECTOR_CALENDAR) as HTMLElement, 'calendar-index') as number
 
     if (this._view === 'days') {
       this._setCalendarDate(index ? new Date(cloneDate.setMonth(cloneDate.getMonth() - index)) : date)
@@ -514,10 +533,7 @@ class Calendar extends BaseComponent {
   }
 
   _handleCalendarMouseEnter(event: any): void {
-    // When weeks are the unit, the row is the focusable thing — a focus event
-    // then arrives with no cell above it, and the row stands in for one.
-    const target = event.target.closest(SELECTOR_CALENDAR_CELL) ??
-      event.target.closest(SELECTOR_CALENDAR_ROW)
+    const target = this._getEventTarget(event)
 
     if (!target) {
       return
@@ -832,7 +848,7 @@ class Calendar extends BaseComponent {
               }
               ${days.map(({ date, month }) => {
                 const cellAttributes = this._cellDayAttributes(date, month)
-                return month === 'current' || this._config.showAdjacementDays ?
+                return month === 'current' || this._config.showAdjacentDays ?
                   `<td
                     class="${cellAttributes.className}"
                     tabindex="${cellAttributes.tabIndex}"
@@ -962,7 +978,7 @@ class Calendar extends BaseComponent {
     this._createCalendar()
 
     if (callback) {
-      setTimeout(callback, 1)
+      callback()
     }
   }
 
@@ -1063,7 +1079,7 @@ class Calendar extends BaseComponent {
 
     const classNames = this._classNames({
       [CLASS_NAME_CALENDAR_CELL]: true,
-      clickable: !isCurrentMonth && this._config.selectAdjacementDays,
+      clickable: !isCurrentMonth && this._config.selectAdjacentDays,
       disabled: isDisabled,
       range: isInRange,
       'range-hover': isRangeHover,
@@ -1074,7 +1090,7 @@ class Calendar extends BaseComponent {
 
     return {
       className: classNames,
-      tabIndex: (isCurrentMonth || this._config.selectAdjacementDays) && !isDisabled ? 0 : -1,
+      tabIndex: (isCurrentMonth || this._config.selectAdjacentDays) && !isDisabled ? 0 : -1,
       ariaSelected: isSelected,
       ariaLabel: date.toLocaleDateString(this._config.locale),
       ariaCurrent: isTodayDate,
@@ -1193,8 +1209,8 @@ class Calendar extends BaseComponent {
 
     const isRangeHover = this._hoverDate && (
       this._selectEndDate ?
-        isYearInRange(date, this._startDate, this._hoverDate) :
-        isYearInRange(date, this._hoverDate, this._endDate)
+        isDateInRange(date, this._startDate, this._hoverDate) :
+        isDateInRange(date, this._hoverDate, this._endDate)
     )
 
     const classNames = this._classNames({

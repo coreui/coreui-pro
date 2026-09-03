@@ -22,6 +22,7 @@ import {
   isMonthDisabled,
   isMonthSelected,
   isMonthInRange,
+  isQuarterDisabled,
   isSameDateAs,
   isToday,
   isYearDisabled,
@@ -437,6 +438,26 @@ describe('Calendar Utilities', () => {
       const max = new Date(2023, 5, 1)
       expect(isMonthDisabled(date, min, max, undefined)).toBeFalse()
     })
+
+    it('should return true if disabledDates disables every day of the month', () => {
+      expect(isMonthDisabled(new Date(2023, 2, 1), null, null, () => true)).toBeTrue()
+    })
+
+    it('should return false if disabledDates leaves any day of the month enabled', () => {
+      const weekends = date => date.getDay() === 0 || date.getDay() === 6
+      expect(isMonthDisabled(new Date(2023, 2, 1), null, null, weekends)).toBeFalse()
+    })
+
+    it('should return true if the month lies entirely outside min/max', () => {
+      expect(isMonthDisabled(new Date(2023, 2, 1), new Date(2023, 3, 1), null, () => false)).toBeTrue()
+      expect(isMonthDisabled(new Date(2023, 2, 1), null, new Date(2023, 1, 1), () => false)).toBeTrue()
+    })
+
+    it('should return false if any day inside min/max is enabled', () => {
+      const onlyMarch20 = date => date.getDate() !== 20
+      expect(isMonthDisabled(new Date(2023, 2, 1), new Date(2023, 2, 15), null, onlyMarch20)).toBeFalse()
+      expect(isMonthDisabled(new Date(2023, 2, 1), null, new Date(2023, 2, 10), onlyMarch20)).toBeTrue()
+    })
   })
 
   describe('isMonthSelected', () => {
@@ -473,6 +494,36 @@ describe('Calendar Utilities', () => {
       const start = new Date(2023, 1, 1)
       const end = new Date(2023, 3, 1)
       expect(isMonthInRange(date, start, end)).toBeFalse()
+    })
+  })
+
+  describe('isQuarterDisabled', () => {
+    it('should return true if quarter is outside min/max', () => {
+      expect(isQuarterDisabled(new Date(2023, 0, 1), new Date(2023, 3, 1), null, undefined)).toBeTrue()
+      expect(isQuarterDisabled(new Date(2023, 6, 1), null, new Date(2023, 5, 30), undefined)).toBeTrue()
+    })
+
+    it('should return false if no disabledDates and within min/max', () => {
+      expect(isQuarterDisabled(new Date(2023, 3, 1), new Date(2023, 0, 1), new Date(2023, 11, 31), undefined)).toBeFalse()
+    })
+
+    it('should return true if disabledDates disables every day of the quarter', () => {
+      expect(isQuarterDisabled(new Date(2023, 3, 1), null, null, () => true)).toBeTrue()
+    })
+
+    it('should return false if disabledDates leaves any day of the quarter enabled', () => {
+      const weekends = date => date.getDay() === 0 || date.getDay() === 6
+      expect(isQuarterDisabled(new Date(2023, 3, 1), null, null, weekends)).toBeFalse()
+    })
+
+    it('should return true if the quarter lies entirely outside min/max', () => {
+      expect(isQuarterDisabled(new Date(2023, 3, 1), new Date(2023, 6, 1), null, () => false)).toBeTrue()
+    })
+
+    it('should return false if any day inside min/max is enabled', () => {
+      const onlyJune15 = date => !(date.getMonth() === 5 && date.getDate() === 15)
+      expect(isQuarterDisabled(new Date(2023, 3, 1), new Date(2023, 5, 1), null, onlyJune15)).toBeFalse()
+      expect(isQuarterDisabled(new Date(2023, 3, 1), null, new Date(2023, 4, 31), onlyJune15)).toBeTrue()
     })
   })
 
@@ -524,6 +575,25 @@ describe('Calendar Utilities', () => {
       const min = new Date(2023, 0, 1)
       const max = new Date(2023, 11, 31)
       expect(isYearDisabled(date, min, max, undefined)).toBeFalse()
+    })
+
+    it('should return true if disabledDates disables every day of the year', () => {
+      expect(isYearDisabled(new Date(2023, 0, 1), null, null, () => true)).toBeTrue()
+    })
+
+    it('should return false if disabledDates leaves any day of the year enabled', () => {
+      const weekends = date => date.getDay() === 0 || date.getDay() === 6
+      expect(isYearDisabled(new Date(2023, 0, 1), null, null, weekends)).toBeFalse()
+    })
+
+    it('should return true if the year lies entirely outside min/max', () => {
+      expect(isYearDisabled(new Date(2023, 0, 1), new Date(2024, 0, 1), null, () => false)).toBeTrue()
+    })
+
+    it('should return false if any day inside min/max is enabled', () => {
+      const onlyDecember24 = date => !(date.getMonth() === 11 && date.getDate() === 24)
+      expect(isYearDisabled(new Date(2023, 0, 1), new Date(2023, 11, 1), null, onlyDecember24)).toBeFalse()
+      expect(isYearDisabled(new Date(2023, 0, 1), null, new Date(2023, 10, 30), onlyDecember24)).toBeTrue()
     })
   })
 
@@ -690,6 +760,11 @@ describe('Calendar Utilities', () => {
       expect(result.getFullYear()).toBe(2023)
       expect(result.getMonth()).toBe(1) // February
       expect(result.getDate()).toBe(15)
+    })
+
+    it('should not treat the separator as a wildcard', () => {
+      expect(getLocalDateFromString('2x15x2023', 'en-US')).toBeNull()
+      expect(getLocalDateFromString('15x2x2023', 'de-DE')).toBeNull()
     })
 
     it('should parse date string with time when includeTime is true', () => {

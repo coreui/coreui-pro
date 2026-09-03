@@ -2,7 +2,7 @@
 title: "Bootstrap 6 Height"
 name: "Height"
 description: "Set an element's height relative to its parent or to the viewport with our height utilities."
-utility: ["h", "mh", "vh", "min-vh", "dvh", "min-dvh"]
+utility: ["h", "max-h", "min-h", "vh", "min-vh", "dvh", "min-dvh"]
 ---
 
 ## Relative to the parent
@@ -21,11 +21,27 @@ A percentage height resolves against the parent, so the parent needs a height of
 
 ## Max height
 
-`.mh-100` caps an element at the height of its parent, clipping whatever would otherwise overflow it.
+`.max-h-100` caps an element at the height of its parent, clipping whatever would otherwise overflow it.
 
 <Example code={`<div style="height: 100px; background-color: rgba(255,0,0,.1);">
-    <div class="mh-100" style="width: 100px; height: 200px; background-color: rgba(0,0,255,.1);">Max-height 100%</div>
+    <div class="max-h-100" style="width: 100px; height: 200px; background-color: rgba(0,0,255,.1);">Max-height 100%</div>
   </div>`} />
+
+## Min height
+
+`.min-h-100` sets a floor at the parent's height instead of a cap: the element fills the parent when its content is short, and still grows past it when the content is tall. That is what separates it from `.h-100`, which pins the height and lets the overflow escape.
+
+<Example code={`<div style="height: 100px; background-color: rgba(255,0,0,.1);">
+    <div class="min-h-100 d-inline-block" style="width: 120px; background-color: rgba(0,0,255,.1);">Min-height 100%</div>
+  </div>`} />
+
+`.min-h-0` releases the same `min-height: auto` floor that `.min-w-0` releases on the other axis. A scrolling child of a flex column needs it — without it the child grows to its content instead of scrolling inside the column.
+
+```html
+<div class="d-flex flex-column" style="height: 200px;">
+  <div class="min-h-0 overflow-auto">Scrolls inside the column</div>
+</div>
+```
 
 ## Relative to the viewport
 

@@ -34,19 +34,42 @@ Every entry defines the same slots, emitted as `--cui-{color}-{slot}` on `:root`
 
 | Slot | Emitted token | Description |
 | --- | --- | --- |
-| `base` | `--cui-primary` | The color itself, e.g. a solid button background |
+| `base` | `--cui-primary`, `--cui-primary-base` | The color itself, e.g. a solid button background. Both spellings are emitted; `-base` matches the slot name, the bare form is the one every utility and component reads |
 | — | `--cui-primary-bg` | The action-background slot: what checked, active and filled states read; points at the base |
 | `contrast` | `--cui-primary-contrast` | Text and icons sitting on the solid base |
 | `fg` | `--cui-primary-fg` | The color readable as text, one step lighter than the emphasis |
-| `text-emphasis` | `--cui-primary-text-emphasis` | High-contrast foreground text |
+| `fg-emphasis` | `--cui-primary-fg-emphasis` | High-contrast foreground text |
 | `bg-subtle` | `--cui-primary-bg-subtle` | Subtle background tint for low-emphasis surfaces |
 | `bg-muted` | `--cui-primary-bg-muted` | Muted background, between subtle and solid |
-| `border-subtle` | `--cui-primary-border-subtle` | Border color |
+| `border` | `--cui-primary-border` | Border color |
 | `focus-ring` | `--cui-primary-focus-ring` | The hue the color's focus ring mixes from |
 
 The slot values are `light-dark()` pairs of stops from the runtime scale, so a theme color reads correctly in both color modes without a second set of definitions:
 
 <ScssDocs file="scss/_theme.scss" capture="theme-colors-map" />
+
+### Pairings
+
+The slots are not interchangeable — each foreground is tuned against a particular background, so a legible combination is one of these:
+
+- `contrast` on `bg` — text and icons on the solid color
+- `fg` on `bg-subtle` — the everyday tinted panel
+- `fg-emphasis` on `bg-muted` — the heavier panel, where the foreground has to work harder
+- `border` with either `bg-subtle` or `bg-muted`
+
+<Example code={`<div class="theme-primary vstack gap-3">
+  <div class="p-3 rounded-3" style="color: var(--cui-theme-contrast); background: var(--cui-theme-bg);">
+    contrast on bg
+  </div>
+  <div class="p-3 rounded-3" style="color: var(--cui-theme-fg); background: var(--cui-theme-bg-subtle); border: 1px solid var(--cui-theme-border);">
+    fg on bg-subtle
+  </div>
+  <div class="p-3 rounded-3" style="color: var(--cui-theme-fg-emphasis); background: var(--cui-theme-bg-muted); border: 1px solid var(--cui-theme-border);">
+    fg-emphasis on bg-muted
+  </div>
+</div>`} />
+
+Reading a foreground against a background it was not paired with is where contrast falls apart: `fg` sits close to `bg-muted`, and `contrast` is built for the solid `bg` alone — on any tinted surface it disappears.
 
 ## The runtime scale
 
@@ -82,14 +105,14 @@ A new theme color is one entry in the map. Point the slots at the runtime scale 
 
 $theme-colors: map.merge($theme-colors, (
   "brand": (
-    "base":          #6f42c1,
-    "contrast":      #fff,
-    "fg":            light-dark(var(--cui-brand-600), var(--cui-brand-400)),
-    "text-emphasis": light-dark(var(--cui-brand-800), var(--cui-brand-200)),
-    "bg-subtle":     light-dark(var(--cui-brand-100), var(--cui-brand-900)),
-    "bg-muted":      light-dark(var(--cui-brand-200), var(--cui-brand-800)),
-    "border-subtle": light-dark(var(--cui-brand-300), var(--cui-brand-600)),
-    "focus-ring":    color-mix(in srgb, var(--cui-brand) calc(var(--cui-focus-ring-opacity) * 100%), transparent),
+    "base":        #6f42c1,
+    "contrast":    #fff,
+    "fg":          light-dark(var(--cui-brand-600), var(--cui-brand-400)),
+    "fg-emphasis": light-dark(var(--cui-brand-800), var(--cui-brand-200)),
+    "bg-subtle":   light-dark(var(--cui-brand-100), var(--cui-brand-900)),
+    "bg-muted":    light-dark(var(--cui-brand-200), var(--cui-brand-800)),
+    "border":      light-dark(var(--cui-brand-300), var(--cui-brand-600)),
+    "focus-ring":  color-mix(in srgb, var(--cui-brand) calc(var(--cui-focus-ring-opacity) * 100%), transparent),
   ),
 ));
 

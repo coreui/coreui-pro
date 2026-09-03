@@ -8,6 +8,10 @@ otherFrameworks:
 
 import varyingModalContent from './snippets/varying-modal-content.js?raw'
 
+<Callout color="warning">
+**Built on the same engine as Dialog — and heading for retirement.** Since v6 the Modal plugin is a compatibility layer over the dialog behavior [Dialog](/components/dialog/) is built on — same engine and dismissal, with the v5 markup, classes and `*.coreui.modal` events preserved, and the classic look. Existing modal markup keeps working unchanged throughout v6, but **Modal may be removed in v7** — we recommend using Dialog for new work and migrating when convenient.
+</Callout>
+
 ## How it works
 
 Bootstrap modals are lightweight and multi-purpose popups built on the native `<dialog>` element. Modals are split into three primary sections: header, body, and footer. Each has its role and so should be used accordingly. Before getting started with CoreUI for Bootstrap's modal component, be sure to read the following as our menu options have recently changed.
@@ -32,7 +36,7 @@ This component's animation effect relies on the `prefers-reduced-motion` media q
 </Callout>
 
 <Callout color="warning">
-#### Migrating from v5
+### Migrating from v5
 
 The v5 `<div class="modal">` markup (with its `.modal-dialog` and `.modal-content` wrappers) is upgraded to the native `<dialog>` structure automatically at runtime, with a console warning. This transitional layer will be removed in v7 — update your markup to the structure documented below.
 </Callout>
@@ -381,10 +385,6 @@ Modals animate by default. For modals that simply appear rather than fade in to 
 </dialog>
 ```
 
-### Accessibility
-
-Be sure to add `aria-labelledby="..."`, referencing the modal title, to the `<dialog>`. Additionally, you may give a description of your modal dialog with `aria-describedby`. Note that the native `<dialog>` element already provides the dialog role, `aria-modal` semantics, focus trapping, and background inertness — don't add `role`, `aria-modal`, `aria-hidden`, or `tabindex` yourself.
-
 ### Embedding YouTube videos
 
 Embedding YouTube videos in modals requires additional JavaScript not in CoreUI to automatically stop playback and more. [See this helpful Stack Overflow post](https://stackoverflow.com/questions/18622508/bootstrap-3-and-youtube-in-modal) for more information.
@@ -440,7 +440,7 @@ Our default modal without modifier class constitutes the "medium" size modal.
   </div>
 </dialog>
 
-## Fullscreen Modal
+## Fullscreen modal
 
 Another override is the option to pop up a modal that covers the user viewport, available via modifier classes that are placed on the `<dialog class="modal">`.
 
@@ -539,6 +539,10 @@ Another override is the option to pop up a modal that covers the user viewport, 
     <button type="button" class="btn-solid theme-secondary" data-coreui-dismiss="modal">Close</button>
   </div>
 </dialog>
+
+## Accessibility
+
+Be sure to add `aria-labelledby="..."`, referencing the modal title, to the `<dialog>`. Additionally, you may give a description of your modal dialog with `aria-describedby`. Note that the native `<dialog>` element already provides the dialog role, `aria-modal` semantics, focus trapping, and background inertness — don't add `role`, `aria-modal`, `aria-hidden`, or `tabindex` yourself.
 
 ## Usage
 

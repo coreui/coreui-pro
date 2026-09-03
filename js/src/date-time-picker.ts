@@ -144,6 +144,7 @@ class DateTimePicker extends BaseComponent {
   protected declare _footerTemplate: any
   protected declare _cleanerElement: HTMLElement | null
   protected declare _indicatorElement: HTMLElement
+  protected declare _fieldElement: HTMLElement
   protected declare _initialDate: any
   protected declare _input: any
   protected declare _calendar: any
@@ -242,14 +243,22 @@ class DateTimePicker extends BaseComponent {
   }
 
   override dispose(): void {
-    if (this._addedGroupClass) {
-      this._element.classList.remove(CLASS_NAME_INPUT_GROUP)
+    for (const element of [this._menu, this._indicatorElement, this._cleanerElement]) {
+      EventHandler.off(element, EVENT_KEY)
     }
 
     this._popup.dispose()
     this._input.dispose()
     this._calendar?.dispose()
     this._selection?.dispose()
+    this._fieldElement.remove()
+    this._cleanerElement?.remove()
+    this._indicatorElement.remove()
+
+    if (this._addedGroupClass) {
+      this._element.classList.remove(CLASS_NAME_INPUT_GROUP)
+    }
+
     super.dispose()
   }
 
@@ -287,7 +296,7 @@ class DateTimePicker extends BaseComponent {
     }
 
     const inputEl = document.createElement('div')
-    appendControlGroupField(inputGroup, inputEl, this._config.floatingLabel, `${this.constructor.NAME}-`)
+    this._fieldElement = appendControlGroupField(inputGroup, inputEl, this._config.floatingLabel, `${this.constructor.NAME}-`)
 
     const action = (className: string, icon: string, label: string) => createControlGroupAction({
       className, disabled: this._config.disabled, icon, label, sanitizeIcon: (value: string) => this._sanitizeIcon(value)

@@ -162,6 +162,9 @@ class DateRangePicker extends BaseComponent {
   protected declare _indicatorElement: HTMLElement
   protected declare _startInputElement: HTMLElement
   protected declare _endInputElement: HTMLElement
+  protected declare _startFieldElement: HTMLElement
+  protected declare _endFieldElement: HTMLElement
+  protected declare _separatorElement: HTMLElement
   protected declare _rangesTemplate: any
   protected declare _startInput: any
   protected declare _endInput: any
@@ -269,14 +272,24 @@ class DateRangePicker extends BaseComponent {
   }
 
   override dispose(): void {
-    if (this._addedGroupClass) {
-      this._element.classList.remove(CLASS_NAME_INPUT_GROUP)
+    for (const element of [this._menu, this._indicatorElement, this._cleanerElement, this._startInputElement, this._endInputElement]) {
+      EventHandler.off(element, EVENT_KEY)
     }
 
     this._popup.dispose()
     this._startInput.dispose()
     this._endInput.dispose()
     this._calendar?.dispose()
+    this._startFieldElement.remove()
+    this._separatorElement.remove()
+    this._endFieldElement.remove()
+    this._cleanerElement?.remove()
+    this._indicatorElement.remove()
+
+    if (this._addedGroupClass) {
+      this._element.classList.remove(CLASS_NAME_INPUT_GROUP)
+    }
+
     super.dispose()
   }
 
@@ -379,18 +392,19 @@ class DateRangePicker extends BaseComponent {
     const start = this._createInput(this._config.startDate, this._config.startName, this._floatingLabel(0) ?? this._ariaLabel(0))
     this._startInput = start.input
     this._startInputElement = start.inputEl
-    appendControlGroupField(inputGroup, start.inputEl, this._floatingLabel(0), `${this.constructor.NAME}-`)
+    this._startFieldElement = appendControlGroupField(inputGroup, start.inputEl, this._floatingLabel(0), `${this.constructor.NAME}-`)
 
     const separator = document.createElement('span')
     separator.classList.add(CLASS_NAME_SEPARATOR)
     separator.setAttribute('aria-hidden', 'true')
     separator.innerHTML = this._sanitizeIcon(this._resolveSeparatorIcon())
     inputGroup.append(separator)
+    this._separatorElement = separator
 
     const end = this._createInput(this._config.endDate, this._config.endName, this._floatingLabel(1) ?? this._ariaLabel(1))
     this._endInput = end.input
     this._endInputElement = end.inputEl
-    appendControlGroupField(inputGroup, end.inputEl, this._floatingLabel(1), `${this.constructor.NAME}-`)
+    this._endFieldElement = appendControlGroupField(inputGroup, end.inputEl, this._floatingLabel(1), `${this.constructor.NAME}-`)
 
     // See DatePicker — the bridge from typed values back to the calendar
     EventHandler.on(start.inputEl, DateInput.eventName(DateInput.CHANGE_EVENT_NAME), (event: any) => {

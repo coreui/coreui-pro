@@ -1,6 +1,6 @@
 ---
-title: "Bootstrap 6 Badges"
-name: "Badges"
+title: "Bootstrap 6 Badge"
+name: "Badge"
 description: "Small components for indicating status and counts, or labelling items."
 otherFrameworks:
   - badge
@@ -38,9 +38,9 @@ Badges can be used as part of links or buttons to provide a counter.
     Notifications <span class="badge theme-danger">4</span>
   </button>`} />
 
-Remark that depending on how you use them, badges may be complicated for users of screen readers and related assistive technologies.
+Remark that depending on how you use them, badges may be complicated for users of screen readers and related assistive technologies. The styling gives sighted users a visual cue about the badge's purpose, but a screen reader announces only its content — so a badge can read as a stray word or number at the end of a sentence, link, or button.
 
-Unless the context is clear, consider including additional context with a visually hidden piece of additional text.
+Unless the context is clear — as in the Notifications example above, where the `4` is plainly a count — consider including additional context with a visually hidden piece of additional text.
 
 ### Positioned
 
@@ -48,7 +48,7 @@ Use utilities to modify a `.badge` and position it in the corner of a link or bu
 
 <Example code={`<button type="button" class="btn-solid theme-primary position-relative">
     Inbox
-    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill theme-danger">
+    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill border border-bg theme-danger">
       99+
       <span class="visually-hidden">unread messages</span>
     </span>
@@ -58,7 +58,7 @@ You can also replace the `.badge` class with a few more utilities without a coun
 
 <Example code={`<button type="button" class="btn-solid theme-primary position-relative">
     Profile
-    <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-secondary rounded-circle">
+    <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-bg rounded-circle">
       <span class="visually-hidden">New alerts</span>
     </span>
   </button>`} />

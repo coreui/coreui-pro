@@ -96,7 +96,7 @@ class Stepper extends BaseComponent {
     this._updateStepButtonsDisabledState()
     this._setupAccessibilityAttributes()
 
-    EventHandler.on(this._element, EVENT_KEYDOWN, event => this._keydown(event))
+    EventHandler.on(this._element, EVENT_KEYDOWN, SELECTOR_STEPPER_STEP_BUTTON, event => this._keydown(event))
   }
 
   // Getters
@@ -232,8 +232,7 @@ class Stepper extends BaseComponent {
   }
 
   reset(): void {
-    const steps = this._getEnabledStepButtons()
-    if (!steps.length) {
+    if (!this._stepButtons.length) {
       return
     }
 
@@ -247,10 +246,9 @@ class Stepper extends BaseComponent {
       content.setAttribute('aria-hidden', 'true')
     }
 
-    for (const btn of steps) {
+    for (const btn of this._stepButtons) {
       btn.classList.remove(CLASS_NAME_ACTIVE, CLASS_NAME_COMPLETE)
       this._removeIndicatorIcon(btn)
-      btn.disabled = false
     }
 
     for (const form of this._element.querySelectorAll(`${SELECTOR_STEPPER_PANE} form, ${SELECTOR_STEPPER_STEP_CONTENT} form`)) {
@@ -263,7 +261,7 @@ class Stepper extends BaseComponent {
       }
     }
 
-    const firstStep = this._initialStepButton || steps[0]
+    const firstStep = this._initialStepButton || this._stepButtons[0]
     firstStep.classList.add(CLASS_NAME_ACTIVE)
 
     const pane = this._getTargetPane(firstStep)
@@ -636,13 +634,13 @@ class Stepper extends BaseComponent {
 
       case ARROW_RIGHT_KEY:
       case ARROW_DOWN_KEY: {
-        nextActiveElement = getNextActiveElement(children, event.target, true, true)
+        nextActiveElement = getNextActiveElement(children, event.delegateTarget, true, true)
         break
       }
 
       case ARROW_LEFT_KEY:
       case ARROW_UP_KEY: {
-        nextActiveElement = getNextActiveElement(children, event.target, false, true)
+        nextActiveElement = getNextActiveElement(children, event.delegateTarget, false, true)
         break
       }
 

@@ -16,6 +16,8 @@ import calendarCustomizeCells from './snippets/calendar-customize-cells.js?raw'
 
 Explore the Bootstrap 6 Calendar component's basic usage through sample code snippets demonstrating its core functionality.
 
+A calendar renders unadorned — it has no background, border, or padding of its own, so it takes the surface of whatever contains it. The examples below add `.border` and `.rounded` for that reason; a [card](/components/card/) works just as well.
+
 ### Days
 
 Select specific days using the Bootstrap Calendar component. The example below shows basic usage.
@@ -162,7 +164,7 @@ In this example:
 - `specificDates` is an array of specific dates to disable.
 - The `disabledDates` option combines both, allowing you to disable weekends and specific dates simultaneously.
 
-## Non-english locale
+## Locale
 
 The CoreUI Bootstrap Calendar allows users to display dates in non-English locales, making it suitable for international applications.
 
@@ -349,9 +351,9 @@ Note that for security reasons the `sanitize`, `sanitizeFn`, and `allowList` opt
 | `renderYearCell` | function, null | `null` | Custom function to render year cells. Receives `date` and `meta` object (with `isDisabled`, `isInRange`, `isSelected`) as parameters and should return HTML string. |
 | `sanitize` | boolean | `true` | Enable or disable the sanitization. If activated `renderDayCell`, `renderMonthCell`, `renderQuarterCell`, and `renderYearCell` options will be sanitized. |
 | `sanitizeFn` | null, function | `null` | Here you can supply your own sanitize function. This can be useful if you prefer to use a dedicated library to perform sanitization. |
-| `selectAdjacementDays` | boolean | `false` | Set whether days in adjacent months shown before or after the current month are selectable. This only applies if the `showAdjacementDays` option is set to true. |
+| `selectAdjacentDays` | boolean | `false` | Set whether days in adjacent months shown before or after the current month are selectable. This only applies if the `showAdjacentDays` option is set to true. |
 | `selectionType` | `'day'`, `'week'`, `'month'`, `'quarter'`, `'year'` | `day` | Specify the type of date selection as day, week, month, quarter, or year. |
-| `showAdjacementDays` | boolean | `true` | Set whether to display dates in adjacent months (non-selectable) at the start and end of the current month. |
+| `showAdjacentDays` | boolean | `true` | Set whether to display dates in adjacent months (non-selectable) at the start and end of the current month. |
 | `showWeekNumber` | boolean | `false` | Set whether to display week numbers in the calendar. |
 | `startDate` | date, number, string, null | `null` | Initial selected date. |
 | `weekdayFormat` | number, `'long'`, `'narrow'`, `'short'` | `2` | Set length or format of day name. |

@@ -57,7 +57,7 @@
     "js-test-jquery": "cross-env JQUERY=true vitest run --config js/tests/vitest.config.mts",
     "lint": "npm-run-all --aggregate-output --continue-on-error --parallel js-lint js-typecheck js-test-default-type css-lint lockfile-lint",
     "docs": "npm-run-all docs-build docs-lint",
-    "docs-build": "astro build --root docs",
+    "docs-build": "npm run css-compile && astro build --root docs",
     "docs-compile": "npm run docs-build",
     "docs-vnu": "node build/vnu-jar.mjs",
     "docs-lint": "npm run docs-vnu",
@@ -76,6 +76,26 @@
     "watch-js-main": "nodemon --watch js/src/ --ext ts --exec \"npm-run-all js-lint js-compile\""
   },
   "types": "./js/dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./js/dist/index.d.ts",
+      "import": "./dist/js/coreui.esm.js",
+      "require": "./dist/js/coreui.js"
+    },
+    "./js/src/*.js": "./js/dist/*.js",
+    "./js/src/*": "./js/src/*",
+    "./js/dist/*.js": "./js/dist/*.js",
+    "./js/dist/*": "./js/dist/*.js",
+    "./dist/js/*": "./dist/js/*",
+    "./dist/css/*": "./dist/css/*",
+    "./scss/*": "./scss/*",
+    "./package.json": "./package.json"
+  },
+  "sideEffects": [
+    "./js/src/*.ts",
+    "./js/dist/*.js",
+    "./dist/js/*.js"
+  ],
   "style": "dist/css/coreui.css",
   "sass": "scss/coreui.scss",
   "main": "dist/js/coreui.js",
@@ -93,7 +113,7 @@
   },
   "devDependencies": {
     "@astrojs/mdx": "^7.0.3",
-    "@coreui/astro-docs": "^0.1.9",
+    "@coreui/astro-docs": "^0.1.10",
     "@eslint/markdown": "^7.5.1",
     "@floating-ui/dom": "^1.8.0",
     "@rollup/plugin-replace": "^6.0.3",

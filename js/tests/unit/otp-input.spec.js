@@ -104,7 +104,7 @@ describe('OTPInput', () => {
 
       const inputs = otpContainer.querySelectorAll('.form-otp-control')
       for (const [index, input] of [...inputs].entries()) {
-        expect(input.hasAttribute('required')).toBe(true)
+        expect(input.required).toBe(false)
         expect(input.inputMode).toBe('numeric')
         expect(input.pattern).toBe('[0-9]*')
         expect(input.getAttribute('autocorrect')).toBe('off')
@@ -113,6 +113,22 @@ describe('OTPInput', () => {
         expect(input.autocomplete).toBe(index === 0 ? 'one-time-code' : 'off')
         // The empty first slot has to fit a whole autofilled code
         expect(input.maxLength).toBe(index === 0 ? inputs.length : 1)
+      }
+    })
+
+    it('should set required on every input when required is true', () => {
+      fixtureEl.innerHTML = `
+        <div class="form-otp">
+          <input type="text" class="form-otp-control">
+          <input type="text" class="form-otp-control">
+        </div>
+      `
+
+      const otpContainer = fixtureEl.querySelector('.form-otp')
+      new OTPInput(otpContainer, { required: true }) // eslint-disable-line no-new
+
+      for (const input of otpContainer.querySelectorAll('.form-otp-control')) {
+        expect(input.required).toBe(true)
       }
     })
 
@@ -386,6 +402,28 @@ describe('OTPInput', () => {
       }
     })
 
+    it('should put every slot back into the tab order when linear is switched off', () => {
+      fixtureEl.innerHTML = `
+        <div class="form-otp">
+          <input type="text" class="form-otp-control">
+          <input type="text" class="form-otp-control">
+          <input type="text" class="form-otp-control">
+        </div>
+      `
+
+      const otpContainer = fixtureEl.querySelector('.form-otp')
+      const otpInput = new OTPInput(otpContainer)
+      const inputs = otpContainer.querySelectorAll('.form-otp-control')
+
+      expect(inputs[2].getAttribute('tabindex')).toBe('-1')
+
+      otpInput.update({ linear: false })
+
+      for (const input of inputs) {
+        expect(input.hasAttribute('tabindex')).toBe(false)
+      }
+    })
+
     it('should handle non-object config gracefully', () => {
       fixtureEl.innerHTML = `
         <div class="form-otp">
@@ -510,6 +548,27 @@ describe('OTPInput', () => {
         const inputEvent = createEvent('input')
         inputs[0].dispatchEvent(inputEvent)
       })
+    })
+
+    it('should update the hidden input and trigger change event when a digit is deleted', () => {
+      fixtureEl.innerHTML = `
+        <div class="form-otp">
+          <input type="text" class="form-otp-control">
+          <input type="text" class="form-otp-control">
+        </div>
+      `
+
+      const otpContainer = fixtureEl.querySelector('.form-otp')
+      const otpInput = new OTPInput(otpContainer, { value: '12' })
+      const changeSpy = jasmine.createSpy('change')
+      otpContainer.addEventListener('change.coreui.otp-input', event => changeSpy(event.value))
+
+      const inputs = otpContainer.querySelectorAll('.form-otp-control')
+      inputs[1].value = ''
+      inputs[1].dispatchEvent(createEvent('input'))
+
+      expect(otpInput._inputElement.value).toBe('1')
+      expect(changeSpy).toHaveBeenCalledWith('1')
     })
   })
 
@@ -702,6 +761,52 @@ describe('OTPInput', () => {
       expect(inputs[0].value).toBe('')
       expect(inputs[1].value).toBe('2')
       expect(inputs[2].value).toBe('3')
+    })
+  })
+
+  describe('paste after dispose', () => {
+    const paste = (input, text) => {
+      const pasteEvent = new ClipboardEvent('paste', {
+        clipboardData: new DataTransfer(),
+        bubbles: true
+      })
+      pasteEvent.clipboardData.setData('text', text)
+      input.dispatchEvent(pasteEvent)
+    }
+
+    beforeEach(() => {
+      fixtureEl.innerHTML = `
+        <div class="form-otp">
+          <input type="text" class="form-otp-control">
+          <input type="text" class="form-otp-control">
+        </div>
+      `
+    })
+
+    it('should stop handling paste once disposed', () => {
+      const otpContainer = fixtureEl.querySelector('.form-otp')
+      const inputs = otpContainer.querySelectorAll('.form-otp-control')
+
+      new OTPInput(otpContainer).dispose()
+      paste(inputs[0], '12')
+
+      expect(inputs[0].value).toBe('')
+      expect(inputs[1].value).toBe('')
+    })
+
+    it('should distribute a paste once after re-initialization', () => {
+      const otpContainer = fixtureEl.querySelector('.form-otp')
+      const inputs = otpContainer.querySelectorAll('.form-otp-control')
+      const changeSpy = jasmine.createSpy('change')
+
+      new OTPInput(otpContainer).dispose()
+      new OTPInput(otpContainer) // eslint-disable-line no-new
+      otpContainer.addEventListener('change.coreui.otp-input', changeSpy)
+      paste(inputs[0], '12')
+
+      expect(inputs[0].value).toBe('1')
+      expect(inputs[1].value).toBe('2')
+      expect(changeSpy).toHaveBeenCalledTimes(1)
     })
   })
 

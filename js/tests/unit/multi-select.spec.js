@@ -1,4 +1,6 @@
 
+import Chip from '../../src/chip.js'
+import ChipSet from '../../src/chip-set.js'
 import MultiSelect from '../../src/multi-select.js'
 import EventHandler from '../../src/dom/event-handler.js'
 import {
@@ -2539,6 +2541,27 @@ describe('MultiSelect', () => {
       expect(multiSelect._selected[0].value).toBe('1')
     })
 
+    it('should not activate a disabled option on click or Enter', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [
+          { value: '1', text: 'Opt 1' },
+          { value: '2', text: 'Opt 2', disabled: true }
+        ]
+      })
+
+      multiSelect.show()
+      const option = multiSelect._optionsElement.querySelector('[data-value="2"]')
+
+      expect(option.tabIndex).toBe(-1)
+
+      option.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
+      option.click()
+
+      expect(multiSelect._selected.length).toBe(0)
+    })
+
     it('should deselect option when clicking selected option in multiple mode', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
@@ -2600,6 +2623,26 @@ describe('MultiSelect', () => {
       const option = multiSelect._optionsElement.querySelector('[data-value="1"]')
       multiSelect._onOptionsClick(option)
 
+      expect(multiSelect._wrapperElement.classList.contains('show')).toBe(false)
+    })
+
+    it('should select an option and hide dropdown in single mode without search', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [
+          { value: '1', text: 'Opt 1' },
+          { value: '2', text: 'Opt 2' }
+        ],
+        multiple: false
+      })
+
+      multiSelect.show()
+      const option = multiSelect._optionsElement.querySelector('[data-value="1"]')
+
+      expect(() => option.click()).not.toThrow()
+      expect(multiSelect._selected.length).toBe(1)
+      expect(multiSelect._selected[0].value).toBe('1')
       expect(multiSelect._wrapperElement.classList.contains('show')).toBe(false)
     })
 
@@ -3782,6 +3825,40 @@ describe('MultiSelect', () => {
 
       expect(multiSelect._wrapperElement).not.toBe(oldClone)
     })
+
+    it('should tear down the previous selection and menu on update', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const options = [{ value: '1', text: 'Option 1', selected: true }]
+      const multiSelect = new MultiSelect(selectEl, {
+        options,
+        search: 'global',
+        selectionType: 'tags'
+      })
+
+      const previousSelection = multiSelect._selectionElement
+      const previousChip = previousSelection.querySelector('.chip')
+      const previousMenu = multiSelect._menu
+
+      multiSelect.update({ options })
+      multiSelect.update({ options })
+
+      expect(Chip.getInstance(previousChip)).toBeNull()
+      expect(ChipSet.getInstance(previousSelection)).toBeNull()
+
+      const deselectSpy = spyOn(multiSelect, '_deselectOption')
+      const focusSpy = spyOn(multiSelect._searchElement, 'focus')
+
+      EventHandler.trigger(previousChip, 'remove.coreui.chip')
+      previousMenu.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'a' }))
+
+      expect(deselectSpy).not.toHaveBeenCalled()
+      expect(focusSpy).not.toHaveBeenCalled()
+
+      EventHandler.trigger(multiSelect._selectionElement.querySelector('.chip'), 'remove.coreui.chip')
+
+      expect(deselectSpy).toHaveBeenCalledTimes(1)
+    })
   })
 
   describe('events', () => {
@@ -3854,6 +3931,26 @@ describe('MultiSelect', () => {
       expect(multiSelect._element).toEqual(selectEl)
       multiSelect.dispose()
       expect(multiSelect._element).toBeNull()
+    })
+
+    it('should dispose the selection chips and their chip set', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [{ value: '1', text: 'Option 1', selected: true }],
+        selectionType: 'tags'
+      })
+
+      const selectionEl = multiSelect._selectionElement
+      const chipEl = selectionEl.querySelector('.chip')
+
+      expect(Chip.getInstance(chipEl)).not.toBeNull()
+      expect(ChipSet.getInstance(selectionEl)).not.toBeNull()
+
+      multiSelect.dispose()
+
+      expect(Chip.getInstance(chipEl)).toBeNull()
+      expect(ChipSet.getInstance(selectionEl)).toBeNull()
     })
 
     it('should dispose the positioning cleanup when disposing', () => {

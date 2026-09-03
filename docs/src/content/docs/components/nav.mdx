@@ -324,25 +324,25 @@ If you're using navs to provide a navigation bar, be sure to add a `role="naviga
 
 Note that navigation bars, even if visually styled as tabs with the `.nav-tabs` class, should **not** be given `role="tablist"`, `role="tab"` or `role="tabpanel"` attributes. These are only appropriate for dynamic tabbed interfaces, as described in the [ARIA Authoring Practices Guide tabs pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tabpanel/). See the [tab plugin](/components/tab/) for dynamic tabbed interfaces. The `aria-current` attribute is not necessary on dynamic tabbed interfaces since our JavaScript handles the selected state by adding `aria-selected="true"` on the active tab.
 
-## Using dropdowns
+## Using menus
 
-Add dropdown menus with a little extra HTML and the [dropdowns JavaScript plugin](/components/dropdowns/#usage).
+Add menus with a little extra HTML and the [menu JavaScript plugin](/components/menu/#usage).
 
-### Tabs with dropdowns
+### Tabs with menus
 
 <Example code={`<ul class="nav nav-tabs">
     <li class="nav-item">
       <a class="nav-link active" aria-current="page" href="#">Active</a>
     </li>
-    <li class="nav-item dropdown">
-      <a class="nav-link dropdown-toggle" data-coreui-toggle="dropdown" href="#" role="button" aria-expanded="false">Dropdown</a>
-      <ul class="dropdown-menu">
-        <li><a class="dropdown-item" href="#">Action</a></li>
-        <li><a class="dropdown-item" href="#">Another action</a></li>
-        <li><a class="dropdown-item" href="#">Something else here</a></li>
-        <li><hr class="dropdown-divider"></li>
-        <li><a class="dropdown-item" href="#">Separated link</a></li>
-      </ul>
+    <li class="nav-item">
+      <a class="nav-link" href="#" role="button" data-coreui-toggle="menu" aria-expanded="false">Menu</a>
+      <div class="menu">
+        <a class="menu-item" href="#">Action</a>
+        <a class="menu-item" href="#">Another action</a>
+        <a class="menu-item" href="#">Something else here</a>
+        <hr class="menu-divider">
+        <a class="menu-item" href="#">Separated link</a>
+      </div>
     </li>
     <li class="nav-item">
       <a class="nav-link" href="#">Link</a>
@@ -352,21 +352,21 @@ Add dropdown menus with a little extra HTML and the [dropdowns JavaScript plugin
     </li>
   </ul>`} />
 
-### Pills with dropdowns
+### Pills with menus
 
 <Example code={`<ul class="nav nav-pills">
     <li class="nav-item">
       <a class="nav-link active" aria-current="page" href="#">Active</a>
     </li>
-    <li class="nav-item dropdown">
-      <a class="nav-link dropdown-toggle" data-coreui-toggle="dropdown" href="#" role="button" aria-expanded="false">Dropdown</a>
-      <ul class="dropdown-menu">
-        <li><a class="dropdown-item" href="#">Action</a></li>
-        <li><a class="dropdown-item" href="#">Another action</a></li>
-        <li><a class="dropdown-item" href="#">Something else here</a></li>
-        <li><hr class="dropdown-divider"></li>
-        <li><a class="dropdown-item" href="#">Separated link</a></li>
-      </ul>
+    <li class="nav-item">
+      <a class="nav-link" href="#" role="button" data-coreui-toggle="menu" aria-expanded="false">Menu</a>
+      <div class="menu">
+        <a class="menu-item" href="#">Action</a>
+        <a class="menu-item" href="#">Another action</a>
+        <a class="menu-item" href="#">Something else here</a>
+        <hr class="menu-divider">
+        <a class="menu-item" href="#">Separated link</a>
+      </div>
     </li>
     <li class="nav-item">
       <a class="nav-link" href="#">Link</a>

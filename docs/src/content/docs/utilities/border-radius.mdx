@@ -2,7 +2,7 @@
 title: "Bootstrap 6 Border Radius"
 name: "Border radius"
 description: "Round the corners of an element with our border-radius utilities, from a subtle radius to a full pill."
-utility: "rounded"
+utility: ["rounded-size", "rounded"]
 ---
 
 ## Examples
@@ -22,6 +22,7 @@ Add classes to an element to easily round its corners.
   <svg class="docs-placeholder-img rounded-5 rounded-top-0" width="75" height="75" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Example extra large bottom rounded image" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Example extra large bottom rounded image</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text></svg>`} />
 
 ## Sizing
+
 Use the scaling classes for larger or smaller rounded corners. Sizes range from `0` to `5` including `circle` and `pill`, and can be configured by modifying the utilities API.
 
 <Example class="docs-example-rounded-utils" code={`<svg class="docs-placeholder-img rounded-0" width="75" height="75" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Example non-rounded image" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Example non-rounded image</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text></svg>
@@ -32,6 +33,18 @@ Use the scaling classes for larger or smaller rounded corners. Sizes range from 
   <svg class="docs-placeholder-img rounded-5" width="75" height="75" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Example extra large rounded image" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Example extra large rounded image</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text></svg>
   <svg class="docs-placeholder-img rounded-circle" width="75" height="75" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Completely round image" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Completely round image</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text></svg>
   <svg class="docs-placeholder-img rounded-pill" width="150" height="75" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Rounded pill image" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Rounded pill image</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text></svg>`} />
+
+## Setting the size without applying it
+
+<AddedIn version="6.0.0" /> `.rounded-size-*` writes the radius into `--cui-rounded-size` without setting `border-radius` itself. The unprefixed corner classes — `.rounded`, `.rounded-top`, `.rounded-end`, `.rounded-bottom`, `.rounded-start` — read that token, so one size class drives whichever corners you round.
+
+<Example class="docs-example-rounded-utils" html={`<div class="rounded-size-5 d-flex gap-3">
+    <div class="rounded-top bg-3 p-4">Top</div>
+    <div class="rounded-start bg-3 p-4">Start</div>
+    <div class="rounded bg-3 p-4">All</div>
+  </div>`} />
+
+Without a `.rounded-size-*` in scope the corner classes fall back to `--cui-border-radius`, so existing markup is unaffected. Numbered classes such as `.rounded-3` and `.rounded-top-3` set their own value and ignore the token.
 
 ## Customizing
 

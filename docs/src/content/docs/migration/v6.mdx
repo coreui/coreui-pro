@@ -238,7 +238,7 @@ finished, not whether the state changed.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **The open item is neutral, and `.theme-{color}` is what tints it.**
   `--cui-accordion-active-bg` and `--cui-accordion-active-color` were fixed to
-  `--cui-primary-bg-subtle` / `--cui-primary-text-emphasis`, so every accordion
+  `--cui-primary-bg-subtle` / `--cui-primary-fg-emphasis`, so every accordion
   turned the brand colour on open whether or not that suited the page. They are
   `--cui-bg-4` and `--cui-fg-body` now, and the active tokens resolve
   through `--cui-theme-fg` / `-bg-subtle` / `-border` first — so the colour is a
@@ -273,6 +273,18 @@ finished, not whether the state changed.
   the one visible change is that a breadcrumb **given a background** now has
   rounded corners like every other surface. Set
   `--cui-breadcrumb-border-radius: 0` to square it off.
+- **`--cui-breadcrumb-divider` is now declared on `.breadcrumb`, so set it
+  there and not on a wrapper.** The property was read but never emitted, which
+  left it out of DevTools and out of the CSS variables table, and meant a value
+  set anywhere above the list reached the separators by inheritance. It is a
+  real token now — and a token declared on `.breadcrumb` beats one inherited
+  from an ancestor, so `<nav style="--cui-breadcrumb-divider: '>'">` stops
+  working. Move it onto the `<ol class="breadcrumb">`.
+- **A custom divider now survives in RTL.** `--cui-breadcrumb-divider-flipped`
+  defaults to the main divider instead of to a second copy of the Sass default,
+  so setting only `--cui-breadcrumb-divider` no longer leaves right-to-left
+  pages on the built-in `/`. Set the flipped one only for a separator that
+  points somewhere — `>` becomes `<` — as before.
 - **New: `.breadcrumb-link`, an opt-in class that gives a step a padded,
   hoverable target.** Bare links keep rendering as they always did. On a
   `<button>` it looks identical to a link, which is what lets one step toggle a
@@ -339,7 +351,7 @@ finished, not whether the state changed.
   separated; the last avatar drops its negative margin, which used to drag
   the content after the stack underneath it. The overlap is a token now —
   `--cui-avatar-stack-spacing`, the fraction of the avatar size — and
-  `.avatars-stack-sm` through `-xl` size every avatar in a stack at once.
+  `.avatar-stack-xs` through `-xl` size every avatar in a stack at once.
 - **The status indicator follows `.theme-{color}` and is never invisible.**
   `.avatar-status` reads the theme slot and falls back to the new
   `--cui-avatar-status-bg` (a neutral grey), so a bare indicator reads as
@@ -627,12 +639,18 @@ check, radio, carousel and toggler icons already work:
   slide entry variants; Drawer is a floating, inset, rounded panel with
   translucent/sheet/fullscreen/fit-content variants and responsive classes
   (`.drawer-sm`…`.drawer-xxl`). Both share the DialogBase behavior with
-  Modal/Offcanvas (which keep the classic look and the v5 vocabulary) —
-  pick per surface, they are independent components. See the
+  Modal/Offcanvas, which keep the classic look and the v5 vocabulary as
+  **compatibility layers over it — deprecated in v6 and removable in v7**, so
+  reach for Dialog and Drawer in new work. See the
   [Dialog docs](/components/dialog/) and [Drawer docs](/components/drawer/).
 
 #### Calendar
 
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`selectAdjacementDays` and `showAdjacementDays` are spelled `selectAdjacentDays`
+  and `showAdjacentDays`** — the option keys, the `data-coreui-select-adjacent-days`
+  / `data-coreui-show-adjacent-days` attributes and the picker passthrough alike. The
+  typo is fixed in the React and Vue libraries in the same release.
 - **Behavior change:** `update()` now **merges** the given options over the
   current configuration instead of resolving them against the defaults. A
   partial call like `calendar.update({ selectEndDate: true })` no longer resets
@@ -1079,9 +1097,32 @@ adornment in the library — so the button needs no icon markup at all:
 #### ScrollSpy
 
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The active link is chosen by an activation line, not by scroll
+  direction.** The plugin used to compare each section's offset with the
+  previous scroll position, so the same scroll offset could highlight a
+  different link depending on which way you arrived. It now activates the
+  lowest section whose top edge has crossed a line drawn `topMargin` below
+  the top of the scroll container — a pure function of the scroll position.
+  Two visible consequences: **the last active link stays highlighted while a
+  gap between sections crosses the line** (the navigation no longer goes
+  blank), and **a short last section is activated when the container is
+  scrolled to the bottom**, even though its top never reaches the line.
+- **New option `topMargin`** (default `12%`) places the activation line; it
+  takes a percentage of the container's height or a pixel value (`96px`).
+  A pixel line is recomputed on resize.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`rootMargin` defaults to `null` and is now the raw override.** Set it and
+  it is handed to the `IntersectionObserver` unchanged, taking precedence over
+  `topMargin`; a v5 configuration such as `rootMargin: '0px 0px -25%'` keeps
+  working as written. `threshold` defaults to `[0]` instead of
+  `[0.1, 0.5, 1]` — with an activation line a section only needs to report
+  whether it crosses it.
+- **`smoothScroll` finishes the navigation.** Once the scroll settles, the
+  URL hash is replaced with the link's target and focus moves to the section.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **The deprecated `offset` option is removed** — it has been a thin alias
-  since the IntersectionObserver rewrite. Use `rootMargin` instead; the exact
-  equivalence is `offset: 100` &rarr; `rootMargin: '100px 0px -30%'`.
+  since the IntersectionObserver rewrite. Use `topMargin` instead:
+  `offset: 100` &rarr; `topMargin: '100px'`.
 
 #### Tab
 
@@ -1586,7 +1627,7 @@ Multi Select's option indicators moved with it — they render as a decorative
 - **The underline sits `.2em` below the text.** `<a>` reads the new
   `--cui-link-underline-offset` token (knob: `$link-underline-offset`), so
   underlines clear descenders instead of cutting through them. The
-  `.link-offset-*` utilities and `.icon-link` still override it per element;
+  `.underline-offset-*` utilities and `.icon-link` still override it per element;
   set the token to `auto` for the old browser default.
 - **`accent-color: var(--cui-primary)` on `:root`.** Native controls we don't
   restyle — a bare checkbox, radio, range or `<progress>` — follow the brand
@@ -2037,19 +2078,19 @@ Multi Select's option indicators moved with it — they render as a decorative
 
   ```html
   <!-- v5 -->
-  <a href="#" class="link-primary link-underline-opacity-25">Primary link</a>
+  <a href="#" class="link-primary underline-opacity-25">Primary link</a>
 
   <!-- v6 -->
-  <a href="#" class="theme-primary link-underline link-underline-opacity-25">Primary link</a>
+  <a href="#" class="theme-primary underline underline-opacity-25">Primary link</a>
   ```
 
   Two things change beyond the class name. The theme slot is a **tone picked for
   text** rather than the raw brand colour — it darkens on a light background and
   lightens on a dark one, where `.link-*` gave the same colour in both, so the
   link is more readable in dark mode and slightly different in light. And the
-  underline needs `.link-underline` to carry it; its colour now defaults to
+  underline needs `.underline` to carry it; its colour now defaults to
   `currentColor`, so it follows the theme unless you name one with
-  `.link-underline-{color}`.
+  `.underline-{color}`.
 
   `.link-body-emphasis` becomes `.text-body-emphasis`.
 
@@ -2273,6 +2314,26 @@ them. A state names a theme colour now, and every value is a slot of it.
   the toggler had no focus indicator at all. The ring is an `outline` now,
   like everywhere else; restyle it through `--cui-focus-ring-width`,
   `--cui-focus-ring-color` and `--cui-focus-ring-offset`.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`add()` and `subtract()` are removed.** They wrapped `calc()` to keep a
+  unitless `0` from making the expression invalid. v6 computes derived values
+  in the browser, so the stylesheet reaches for `calc()` directly — 243 times,
+  and not once for these two. Write the `calc()` yourself; guard a possible
+  `0` with `if($value == 0, …)` where it can actually occur. `divide()` stays,
+  the grid still uses it.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The theme colour tokens finish the rename to the slot names.**
+  `--cui-{color}-text-emphasis` is `--cui-{color}-fg-emphasis` and
+  `--cui-{color}-border-subtle` is `--cui-{color}-border`. The theme slots
+  (`--cui-theme-fg-emphasis`, `--cui-theme-border`) already carried these
+  names; the colour tokens they read did not, so the two halves of the same
+  system spelled the same idea differently. `--cui-{color}-base` is added
+  alongside the bare `--cui-{color}`, which stays. The Sass keys move with
+  them: `"text-emphasis"` → `"fg-emphasis"` and `"border-subtle"` → `"border"`
+  in `$theme-colors`, `$theme-colors-text` → `$theme-colors-fg-emphasis`,
+  `$theme-colors-border-subtle` → `$theme-colors-border`. **No class names
+  change** — `.text-primary-emphasis` and `.border-primary-subtle` take their
+  suffix from the utility definition, not from the token.
 - **`form-validation-state()` takes `$theme` where it took `$color`**, and the
   variables moved from `scss/_config.scss` into the partials that use them
   alongside `$form-text-*` and `$form-feedback-*`.
@@ -2489,7 +2550,8 @@ emitted as:
 ```
 
 `$input-height-inner`, `-half` and `-quarter` are geometry rather than aliases,
-so they follow the validation mixin they serve into `scss/mixins/_forms.scss`;
+so they follow the validation mixin they serve into
+`scss/mixins/_form-validation.scss`;
 `$input-height-border` had one reader and is written where it is used.
 
 #### The control variables moved out of the shared config
@@ -2725,8 +2787,8 @@ pair, and `[data#{$data-infix}theme="dark"]` only declares `color-scheme: dark`.
   `$grays-dark` map. Every one of them was defined as exactly its light
   counterpart, so they generated nothing — read `$gray-*` directly. The bundled
   Bootstrap theme no longer passes `$grays-dark: ()` through its `with()` block.
-- **`$theme-colors-dark` is gone**, along with `$theme-colors-text-dark`,
-  `$theme-colors-bg-subtle-dark`, `$theme-colors-border-subtle-dark` and
+- **`$theme-colors-dark` is gone**, along with `$theme-colors-fg-emphasis-dark`,
+  `$theme-colors-bg-subtle-dark`, `$theme-colors-border-dark` and
   `$theme-colors-contrast-dark`, and the eight `$primary-dark` … `$dark-dark`
   variables behind them. Theme colours themselves no longer change
   between colour modes — the old dark variants were a 10% desaturation, which
@@ -2842,7 +2904,7 @@ now, and the two neutrals swap ends of the gray scale between schemes.
 - **Every `-light` and `-dark` class is gone.** Rename `-dark` to `-inverse` and
   `-light` to `-secondary` across `alert`, `bg`, `border` (and its per-side
   variants), `btn`, `btn-ghost`, `btn-outline`, `btn-subtle`, `callout`, `chip`,
-  `focus-ring`, `link-underline`, `list-group-item`, `shadow`, `table`, `text`,
+  `focus-ring`, `underline`, `list-group-item`, `shadow`, `table`, `text`,
   `text-bg` and `theme`, plus the `-subtle` and `-emphasis` families. The
   colour-scheme opt-ins keep their names: `.navbar-dark`, `.dropdown-menu-dark`,
   `.carousel-dark` and `.sidebar-dark` are unaffected, as is `.fw-light`.
@@ -3042,7 +3104,7 @@ and still compose. What changes is where the translucency expression lives:
   ignored the opacity knob every other colour utility honoured.
 - Every custom property a utility assigns is registered
   `@property { inherits: false }`, which now covers `--cui-bg`, `--cui-text`,
-  `--cui-border` and `--cui-link-underline` as well — so a colour set on a
+  `--cui-border` and `--cui-underline` as well — so a colour set on a
   container cannot leak into a descendant that only carries an opacity class.
 
 `at-property: false` still opts a utility out of that registration, for the one
@@ -3156,7 +3218,8 @@ Nothing existing changes; these are additions. See
   default to `$tooltip-*`, so overriding `$tooltip-padding-y` alone no longer
   moves feedback tooltips at compile time — use the runtime link (add the
   class) or set `$form-feedback-tooltip-*` explicitly. The tooltip variables
-  moved to `scss/_tooltip.scss`, the feedback set to `scss/mixins/_forms.scss`.
+  moved to `scss/_tooltip.scss`, the feedback set to
+  `scss/mixins/_form-validation.scss`.
 - **Validation composes through the tokens**: `.is-invalid` / `.is-valid` set
   `--cui-control-border-color`, `-focus-border-color` and `-focus-ring`
   instead of restating declarations, so state styling follows any control
@@ -3182,7 +3245,7 @@ Five names are now registered with
 `inherits: false`, so each utility is scoped to the element it is applied to:
 `--cui-text-opacity`, `--cui-bg-opacity`,
 `--cui-border-opacity`, `--cui-link-opacity`,
-`--cui-link-underline-opacity`. Upstream v6 does the same.
+`--cui-underline-opacity`. Upstream v6 does the same.
 
 - **If you relied on the leak** — one `.link-opacity-*` on a wrapper fading a
   whole block of links — put the utility on each element, or set the custom
@@ -3632,3 +3695,46 @@ Prefer the `.d-sidebar-narrow*` names in new markup.
   support the media feature gets no transition at all. Rules that force
   `transition: none` stay outside the query — they disable motion on purpose,
   so they have to reach every reader.
+- **The sizing utilities spell the property out: `.mw-100` → `.max-w-100`,
+  `.mh-100` → `.max-h-100`.** The abbreviations were the only ones on that axis:
+  the floor classes are `.min-vw-100`, `.min-vh-100`, `.min-dvw-100`, and the
+  new `.min-w-*` / `.min-h-*` join them, so `.mw` sitting next to `.min-w` read
+  as two conventions for one property. Both ends are now written the same way.
+- **`.link-offset-*` is `.underline-offset-*`.** Same three steps, same
+  `-hover` variants — `.link-offset-2-hover` becomes
+  `.underline-offset-2-hover`. The class sets `text-underline-offset` on any
+  element, not just a link, and `.underline-thickness-*` next to it already
+  carried the property-based name.
+- **New utilities:** `.border-x` / `.border-y` (and their `-0` forms) set the
+  `border-inline` / `border-block` shorthands, so a facing pair of borders takes
+  one class instead of two; `.min-w-{0|100}` and `.min-h-{0|100}` set a floor —
+  `.min-w-0` is what releases the `min-width: auto` on a flex child so a
+  `.text-truncate` sibling can actually truncate; `.animation-{shake|pop}` ship
+  their keyframes with them, prefixed so they cannot be redefined by a bare
+  `shake` or `pop` of your own, and stand down under
+  `prefers-reduced-motion: reduce`; `.color-scheme-{light|dark}` sets CSS
+  `color-scheme`, which is what the browser reads to paint form controls and
+  scrollbars — it changes no colours of its own.
+- **`.link-underline-*` is `.underline-*`.** `.link-underline-danger` becomes
+  `.underline-danger`, and the opacity steps become `.underline-opacity-*`
+  (`.link-underline-opacity-50-hover` → `.underline-opacity-50-hover`). Like
+  `.underline-offset-*`, the class sets a `text-decoration-*` property on any
+  element rather than only on a link, and it now sits beside
+  `.underline-thickness-*`, which already carried that name. **We keep the
+  `-opacity-` segment** where upstream folds opacity into the colour class as
+  `.underline-50` — every other opacity family here reads
+  `.bg-opacity-*` / `.text-opacity-*` / `.link-opacity-*`, and one family
+  spelling it differently is what this pass is removing.
+- **New `.rounded-size-*`.** It writes the radius into `--cui-rounded-size`
+  without setting `border-radius` itself, and the unprefixed corner classes
+  (`.rounded`, `.rounded-top`, `.rounded-end`, `.rounded-bottom`,
+  `.rounded-start`) now read that token, so one size class drives whichever
+  corners you round. With no `.rounded-size-*` in scope they fall back to
+  `--cui-border-radius`, so existing markup renders unchanged; the numbered
+  classes (`.rounded-3`, `.rounded-top-3`) set their own value and ignore it.
+- **The derived colour utilities compose with their opacity classes.**
+  `.bg-*-subtle`, `.bg-*-muted`, `.border-*-subtle` and `.text-*-emphasis` each
+  wrote the property directly, so `.bg-opacity-50` on a `.bg-primary-subtle`
+  did nothing while the same class on `.bg-primary` worked. They now declare
+  `--cui-bg` / `--cui-border` / `--cui-text` and resolve through the same
+  `color-mix()` as the base families. Nothing changes at full opacity.

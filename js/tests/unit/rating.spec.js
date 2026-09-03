@@ -1,5 +1,6 @@
 
 import Rating from '../../src/rating.js'
+import Tooltip from '../../src/tooltip.js'
 import {
   getFixture, clearFixture, createEvent, jQueryMock
 } from '../helpers/fixture.js'
@@ -496,6 +497,39 @@ describe('Rating', () => {
       rating.update({ itemCount: 5, value: 4 })
       const checkedInput = div.querySelector('.rating-item-input:checked')
       expect(checkedInput.value).toEqual('4')
+    })
+
+    it('should keep one set of listeners across updates', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div, { itemCount: 3 })
+      const spy = jasmine.createSpy('change')
+
+      rating.update({ itemCount: 3 })
+      rating.update({ itemCount: 3 })
+      div.addEventListener('change.coreui.rating', spy)
+
+      const input = div.querySelectorAll('.rating-item-input')[1]
+      input.checked = true
+      input.dispatchEvent(createEvent('change', { bubbles: true }))
+
+      expect(spy).toHaveBeenCalledTimes(1)
+    })
+
+    it('should dispose the tooltips of the items it replaces', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div, { itemCount: 3, tooltips: true })
+
+      const label = div.querySelectorAll('.rating-item-label')[1]
+      label.dispatchEvent(createEvent('mouseover'))
+      const item = label.parentElement
+      expect(Tooltip.getInstance(item)).not.toBeNull()
+
+      rating.update({ itemCount: 3, tooltips: true })
+
+      expect(Tooltip.getInstance(item)).toBeNull()
+      expect(rating._tooltip).toBeNull()
     })
 
     it('should update disabled state', () => {
@@ -1285,6 +1319,22 @@ describe('Rating', () => {
       expect(Rating.getInstance(div)).not.toBeNull()
       rating.dispose()
       expect(Rating.getInstance(div)).toBeNull()
+    })
+
+    it('should dispose every tooltip created on the items', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div, { itemCount: 3, tooltips: true })
+
+      const labels = div.querySelectorAll('.rating-item-label')
+      labels[0].dispatchEvent(createEvent('mouseover'))
+      labels[2].dispatchEvent(createEvent('mouseover'))
+      const items = [labels[0].parentElement, labels[2].parentElement]
+      expect(items.map(item => Tooltip.getInstance(item))).not.toContain(null)
+
+      rating.dispose()
+
+      expect(items.map(item => Tooltip.getInstance(item))).toEqual([null, null])
     })
   })
 

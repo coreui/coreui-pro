@@ -77,6 +77,7 @@ There is no inline modifier: the control is an inline element, so a row is a fle
   </div>`} />
 
 ## Sizing
+
 `.radio-sm` and `.radio-lg` size the whole row — the box, its label, and the space they sit in. Each sets one font size: the box is `1em`, so it follows, and so does the alignment margin, which is computed from the line. Nothing needs re-tuning per size, and a size of your own is one custom property.
 
 <Example code={`<div class="d-flex align-items-start gap-3">
@@ -121,6 +122,17 @@ Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label 
       <input class="radio" type="radio" name="fieldRadio" id="fieldRadio2">
       <label for="fieldRadio2">Express</label>
       <div class="form-text">Next working day, where available.</div>
+    </div>
+  </div>`} />
+## Description
+
+Add a description after the label and wrap both in a `.form-field-content`, so the description sits under the label rather than beside the radio.
+
+<Example code={`<div class="form-field">
+    <input type="radio" id="radioDescription" class="radio" name="radioDescription" checked />
+    <div class="form-field-content">
+      <label for="radioDescription">Example radio</label>
+      <small class="form-text">Supporting description for the label above.</small>
     </div>
   </div>`} />
 
@@ -174,7 +186,7 @@ The v5 toggle button — `.btn-check` on the input, with a sibling `.btn` label 
 
 See the [v6 migration guide](/migration/v6/) for the full picture.
 
-## Theme colors
+## Theme variants
 
 Modify the appearance of checked radios by adding a [`.theme-{color}` class](/customize/components/#theme-variants) to the `.form-check` element. This sets the checked background and border color to the theme color.
 

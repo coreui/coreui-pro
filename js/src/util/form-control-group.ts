@@ -93,11 +93,12 @@ type ActionOptions = {
  * @param {HTMLElement} field The control to append.
  * @param {string | null} floatingLabel The label text, or null to append bare.
  * @param {string} uidPrefix Prefix for the generated id the label points at.
+ * @returns {HTMLElement} The node appended to the group — the field, or its `.form-floating` wrapper.
  */
-export const appendControlGroupField = (group: HTMLElement, field: HTMLElement, floatingLabel: string | null, uidPrefix: string): void => {
+export const appendControlGroupField = (group: HTMLElement, field: HTMLElement, floatingLabel: string | null, uidPrefix: string): HTMLElement => {
   if (!floatingLabel) {
     group.append(field)
-    return
+    return field
   }
 
   const wrapper = document.createElement('div')
@@ -109,6 +110,8 @@ export const appendControlGroupField = (group: HTMLElement, field: HTMLElement, 
   // Label first — a screen reader announces it before the field's value.
   wrapper.append(label, field)
   group.append(wrapper)
+
+  return wrapper
 }
 
 export const createControlGroupAction = (options: ActionOptions): HTMLButtonElement => {

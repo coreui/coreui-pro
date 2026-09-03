@@ -125,8 +125,8 @@ Here's an example that changes the `background-color` and `color` for the `<body
 
 ```scss
 @use "@coreui/coreui/scss/coreui" with (
-  $body-bg: #000,
-  $body-color: #111
+  $bg-body: #000,
+  $fg-body: #111
 )
 ```
 
@@ -194,7 +194,7 @@ $custom-colors: (
     "base":          #900,
     "contrast":      #fff,
     "fg":            light-dark(var(--cui-custom-color-600), var(--cui-custom-color-400)),
-    "text-emphasis": light-dark(var(--cui-custom-color-800), var(--cui-custom-color-200)),
+    "fg-emphasis": light-dark(var(--cui-custom-color-800), var(--cui-custom-color-200)),
     "bg-subtle":     light-dark(var(--cui-custom-color-100), var(--cui-custom-color-900)),
     "bg-muted":      light-dark(var(--cui-custom-color-200), var(--cui-custom-color-800)),
     "border-subtle": light-dark(var(--cui-custom-color-300), var(--cui-custom-color-600)),
@@ -216,7 +216,7 @@ To remove colors from `$theme-colors`, or any other map, use `map-remove`. Be aw
 @use "@coreui/coreui/scss/theme" as *;
 
 $theme-colors: map-remove($theme-colors, "info", "light", "dark");
-$theme-colors-border-subtle: map.remove($theme-colors-border-subtle, "info", "light", "dark");
+$theme-colors-border: map.remove($theme-colors-border, "info", "light", "dark");
 
 @use "@coreui/coreui/scss/coreui";
 ```
@@ -377,53 +377,13 @@ $subtle-backgrounds: map-slot($theme-colors, "bg-subtle");
 // => ("primary": …, "secondary": …, "success": …, …)
 ```
 
-`scss/functions/maps` also carries the general-purpose helpers the library uses internally: `map-get-multiple()` (pick several keys), `map-merge-multiple()` (merge several maps), and `map-get-nested()` (pull one sub-key out of every entry).
-
-### Add and Subtract functions
-
-We use the `add` and `subtract` functions to wrap the CSS `calc` function. The primary purpose of these functions is to avoid errors when a "unitless" `0` value is passed into a `calc` expression. Expressions like `calc(10px - 0)` will return an error in all browsers, despite being mathematically correct.
-
-Example where the calc is valid:
-
-```scss
-@use "@coreui/coreui/scss/functions/math" as *;
-
-$border-radius: .25rem;
-$border-width: 1px;
-
-.element {
-  // Output calc(.25rem - 1px) is valid
-  border-radius: calc($border-radius - $border-width);
-}
-
-.element {
-  // Output the same calc(.25rem - 1px) as above
-  border-radius: subtract($border-radius, $border-width);
-}
-```
-
-Example where the calc is invalid:
-
-```scss
-@use "@coreui/coreui/scss/functions/math" as *;
-
-$border-radius: .25rem;
-$border-width: 0;
-
-.element {
-  // Output calc(.25rem - 0) is invalid
-  border-radius: calc($border-radius - $border-width);
-}
-
-.element {
-  // Output .25rem
-  border-radius: subtract($border-radius, $border-width);
-}
-```
+`scss/functions/maps` also carries the general-purpose helpers the library uses internally: `map-get-multiple()` (pick several keys), `map-merge-multiple()` (merge several maps), `map-get-nested()` (pull one sub-key out of every entry), and `negativify-map()` (turn a scale into its negative counterpart, as the spacing utilities do).
 
 ## Mixins
 
 Our `scss/mixins/` directory has a ton of mixins that power parts of CoreUI for Bootstrap and can also be used across your own project.
+
+Two of the mixins you are most likely to reach for are documented elsewhere, next to the systems they belong to: `tokens()`, which turns a token map into custom properties on a class, in [Architecture](/customize/architecture/#component-tokens), and the theme class generator in [Theme](/customize/theme/#theme-classes).
 
 ### Color schemes
 
@@ -444,3 +404,20 @@ A shorthand mixin for the `prefers-color-scheme` media query is available with s
   }
 }
 ```
+
+### Mask icons
+
+An icon carried as a `background-image` paints the colour baked into the SVG, so it cannot follow a theme. `mask-icon()` renders the shape through a CSS mask instead, which paints it with the element's `background-color` — so the icon takes whatever token that property reads.
+
+<ScssDocs file="scss/mixins/_mask-icon.scss" capture="mask-icon-mixin" />
+
+```scss
+@use "@coreui/coreui/scss/mixins/mask-icon" as *;
+
+.my-toggle {
+  @include mask-icon(url("data:image/svg+xml,…"));
+  background-color: var(--cui-theme-fg, var(--cui-fg-2));
+}
+```
+
+Pass `null` for the icon when the shape is applied conditionally — per state, or per direction — and set `mask-image` in the branch that needs it.

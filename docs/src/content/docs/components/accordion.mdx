@@ -129,6 +129,29 @@ Add `.accordion-flush` to remove the default `background-color`, some borders, a
     </details>
   </div>`} />
 
+## Gap
+
+Add `.accordion-gap` to space the items apart. Each one keeps its full border radius, so the accordion reads as a stack of cards rather than one block.
+
+The gap sits on the accordion, not on the panel, so opening and closing still animates only the panel's height.
+
+<Example code={`<div class="accordion accordion-gap">
+    <details class="accordion-item" name="accordionGapExample" open>
+      <summary class="accordion-header">Accordion Item #1</summary>
+      <div class="accordion-body">Placeholder content for this accordion, which is intended to demonstrate the <code>.accordion-gap</code> class. Each item keeps a full border radius while the panel opens and closes.</div>
+    </details>
+    <details class="accordion-item" name="accordionGapExample">
+      <summary class="accordion-header">Accordion Item #2</summary>
+      <div class="accordion-body">Placeholder content for this accordion, which is intended to demonstrate the <code>.accordion-gap</code> class. This is the second item's accordion body.</div>
+    </details>
+    <details class="accordion-item" name="accordionGapExample">
+      <summary class="accordion-header">Accordion Item #3</summary>
+      <div class="accordion-body">Placeholder content for this accordion, which is intended to demonstrate the <code>.accordion-gap</code> class. This is the third item's accordion body.</div>
+    </details>
+  </div>`} />
+
+Set the distance with `--cui-accordion-gap`, which defaults to `--cui-spacer-2`.
+
 ## Always open
 
 Omit the `name` attribute on each `.accordion-item` to make accordion items stay open when another item is opened.
