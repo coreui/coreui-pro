@@ -32,20 +32,31 @@
   @return $list;
 }
 
+@function collect-property-vars($list, $properties) {
+  @if meta.type-of($properties) == "map" {
+    @each $prop, $value in $properties {
+      @if meta.type-of($prop) == "string" and string.slice($prop, 1, 2) == "--" {
+        $list: append-unique($list, $prop);
+      }
+    }
+  } @else if meta.type-of($properties) == "list" {
+    @each $prop in $properties {
+      @if meta.type-of($prop) == "string" and string.slice($prop, 1, 2) == "--" {
+        $list: append-unique($list, $prop);
+      }
+    }
+  } @else if meta.type-of($properties) == "string" and string.slice($properties, 1, 2) == "--" {
+    $list: append-unique($list, $properties);
+  }
+  @return $list;
+}
+
 @mixin generate-utility-at-properties($utilities) {
   $names: ();
 
   @each $key, $utility in $utilities {
     @if meta.type-of($utility) == "map" and map.get($utility, enabled) != false and map.get($utility, at-property) != false {
-      $properties: map.get($utility, property);
-
-      @if meta.type-of($properties) == "map" {
-        @each $property, $declared in $properties {
-          @if string.slice($property, 1, 2) == "--" {
-            $names: append-unique($names, $property);
-          }
-        }
-      }
+      $names: collect-property-vars($names, map.get($utility, property));
     }
   }
 
