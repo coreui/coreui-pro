@@ -9,7 +9,7 @@
 // scss-docs-start switch-variables
 $switch-aspect-ratio:         1.75 !default;
 $switch-height:               1.25rem !default;
-$switch-border-radius:        var(--#{$prefix}border-radius-pill) !default;
+$switch-border-radius:        var(--#{$prefix}radius-pill) !default;
 $switch-transition-duration:  var(--#{$prefix}control-transition-duration) !default;
 $switch-transition-timing:    var(--#{$prefix}control-transition-timing) !default;
 $switch-bg:                   var(--#{$prefix}bg-3) !default;

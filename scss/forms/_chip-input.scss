@@ -13,7 +13,7 @@ $chip-input-bg:                var(--#{$prefix}btn-input-bg) !default;
 $chip-input-color:             var(--#{$prefix}btn-input-color) !default;
 $chip-input-border-width:      var(--#{$prefix}btn-input-border-width) !default;
 $chip-input-border-color:      var(--#{$prefix}border-color) !default;
-$chip-input-border-radius:     var(--#{$prefix}border-radius) !default;
+$chip-input-border-radius:     var(--#{$prefix}radius-4) !default;
 $chip-input-gap:               .375rem !default;
 $chip-input-transition-property: var(--#{$prefix}btn-input-transition-property) !default;
 $chip-input-transition-duration: var(--#{$prefix}btn-input-transition-duration) !default;
@@ -23,14 +23,14 @@ $chip-input-min-height-sm:     var(--#{$prefix}btn-input-sm-min-height) !default
 $chip-input-padding-y-sm:      .125rem !default;
 $chip-input-padding-x-sm:      .5rem !default;
 $chip-input-font-size-sm:      var(--#{$prefix}btn-input-sm-font-size) !default;
-$chip-input-border-radius-sm:  var(--#{$prefix}border-radius-sm) !default;
+$chip-input-border-radius-sm:  var(--#{$prefix}radius-3) !default;
 $chip-input-gap-sm:            .125rem !default;
 
 $chip-input-min-height-lg:     var(--#{$prefix}btn-input-lg-min-height) !default;
 $chip-input-padding-y-lg:      .375rem !default;
 $chip-input-padding-x-lg:      1rem !default;
 $chip-input-font-size-lg:      var(--#{$prefix}btn-input-lg-font-size) !default;
-$chip-input-border-radius-lg:  var(--#{$prefix}border-radius-lg) !default;
+$chip-input-border-radius-lg:  var(--#{$prefix}radius-5) !default;
 $chip-input-gap-lg:            .5rem !default;
 // scss-docs-end chip-input-variables
 

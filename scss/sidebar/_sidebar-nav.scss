@@ -23,7 +23,7 @@ $sidebar-nav-link-color:                      var(--#{$prefix}fg-body) !default;
 $sidebar-nav-link-bg:                         transparent !default;
 $sidebar-nav-link-border-width:               0 !default;
 $sidebar-nav-link-border-color:               transparent !default;
-$sidebar-nav-link-border-radius:              var(--#{$prefix}border-radius) !default;
+$sidebar-nav-link-border-radius:              var(--#{$prefix}radius-4) !default;
 $sidebar-nav-link-transition:                 background .15s ease, color .15s ease, padding .15s ease !default;
 
 $sidebar-compact-nav-link-padding-y:          .5625rem !default;
@@ -63,7 +63,7 @@ $sidebar-nav-link-disabled-icon-bullet-border-color:  var(--#{$prefix}fg-3) !def
 $sidebar-nav-group-bg:                        transparent !default;
 $sidebar-nav-group-border-width:              0 !default;
 $sidebar-nav-group-border-color:              transparent !default;
-$sidebar-nav-group-border-radius:             var(--#{$prefix}border-radius) !default;
+$sidebar-nav-group-border-radius:             var(--#{$prefix}radius-4) !default;
 $sidebar-nav-group-transition:                background .15s ease-in-out !default;
 $sidebar-nav-group-toggle-show-color:         $sidebar-nav-link-color !default;
 

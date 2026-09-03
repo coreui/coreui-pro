@@ -39,7 +39,7 @@ $header-toggler-padding-x:      .75rem !default;
 $header-toggler-font-size:      var(--#{$prefix}font-size-lg) !default;
 $header-toggler-color:          color-mix(in srgb, var(--#{$prefix}emphasis-color) 65%, transparent) !default;
 $header-toggler-bg:             transparent !default;
-$header-toggler-border-radius:  var(--#{$prefix}border-radius) !default;
+$header-toggler-border-radius:  var(--#{$prefix}radius-4) !default;
 $header-toggler-hover-color:    color-mix(in srgb, var(--#{$prefix}emphasis-color) 100%, transparent) !default;
 
 $header-toggler-icon-bg:        url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='black' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>") !default;

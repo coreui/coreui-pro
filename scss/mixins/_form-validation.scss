@@ -42,7 +42,7 @@ $form-feedback-tooltip-padding-y:     var(--#{$prefix}spacer-1) !default;
 $form-feedback-tooltip-padding-x:     var(--#{$prefix}spacer-2) !default;
 $form-feedback-tooltip-font-size:     var(--#{$prefix}font-size-sm) !default;
 $form-feedback-tooltip-line-height:   null !default;
-$form-feedback-tooltip-border-radius: var(--#{$prefix}border-radius) !default;
+$form-feedback-tooltip-border-radius: var(--#{$prefix}radius-4) !default;
 // scss-docs-end tooltip-feedback-variables
 
 // stylelint-disable scss/dollar-variable-default

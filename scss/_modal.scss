@@ -23,7 +23,7 @@ $modal-content-color:               var(--#{$prefix}fg-body) !default;
 $modal-content-bg:                  var(--#{$prefix}bg-body) !default;
 $modal-content-border-color:        var(--#{$prefix}border-color-translucent) !default;
 $modal-content-border-width:        var(--#{$prefix}border-width) !default;
-$modal-content-border-radius:       var(--#{$prefix}border-radius-lg) !default;
+$modal-content-border-radius:       var(--#{$prefix}radius-5) !default;
 $modal-content-inner-border-radius: calc(#{$modal-content-border-radius} - #{$modal-content-border-width}) !default;
 $modal-content-box-shadow-xs:       var(--#{$prefix}box-shadow-sm) !default;
 $modal-content-box-shadow-sm-up:    var(--#{$prefix}box-shadow) !default;
