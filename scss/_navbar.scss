@@ -117,6 +117,7 @@ $navbar-nav-tokens: defaults(
     (
       --#{$prefix}nav-gap: #{$navbar-nav-gap},
       --#{$prefix}nav-link-padding-x: 0,
+      --#{$prefix}nav-link-justify: flex-start,
       --#{$prefix}nav-link-color: var(--#{$prefix}navbar-color),
       --#{$prefix}nav-link-hover-color: var(--#{$prefix}navbar-hover-color),
       --#{$prefix}nav-link-hover-bg: transparent,
