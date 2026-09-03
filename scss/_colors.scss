@@ -1,5 +1,6 @@
 @use "sass:map";
 @use "config" as *;
+@use "mixins/tokens" as *;
 @use "functions/color" as *;
 @use "functions/defaults" as *;
 
@@ -56,6 +57,16 @@ $teal:    #20c997 !default;
 $cyan:    #0dcaf0 !default;
 // scss-docs-end color-variables
 
+// The theme colours that carry a hue of their own. `secondary` and `inverse` are
+// grays, so they stay role-only in _theme.scss and get no scale.
+// scss-docs-start theme-color-variables
+$primary:   #5856d6 !default;
+$success:   #1b9e3e !default;
+$info:      #39f !default;
+$warning:   #f9b115 !default;
+$danger:    #e55353 !default;
+// scss-docs-end theme-color-variables
+
 // scss-docs-start colors-map
 $colors: (
   "blue":       $blue,
@@ -68,6 +79,11 @@ $colors: (
   "green":      $green,
   "teal":       $teal,
   "cyan":       $cyan,
+  "primary":    $primary,
+  "success":    $success,
+  "info":       $info,
+  "warning":    $warning,
+  "danger":     $danger,
   "black":      $black,
   "white":      $white,
   "gray":       $gray-600,
@@ -155,3 +171,12 @@ $-color-defaults: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
 $color-tokens: defaults($-color-defaults, $color-tokens);
 // scss-docs-end color-tokens
+
+// Registered before the `@layer` declaration in _root.scss, which is safe only
+// because `colors` is the first name that declaration lists.
+@layer colors {
+  :root,
+  :host {
+    @include tokens($color-tokens);
+  }
+}

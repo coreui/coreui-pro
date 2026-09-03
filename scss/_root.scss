@@ -345,17 +345,6 @@ $root-tokens: defaults($root-token-defaults, $root-tokens);
 
 @layer colors, config, root, reboot, layout, content, forms, components, custom, helpers, utilities;
 
-// Emitted here rather than in _colors.scss: a `:root` block in that file would
-// ship wherever the module is loaded for its maps, which puts the whole palette
-// into coreui-grid.css, and would push this declaration off the top of every
-// bundle.
-@layer colors {
-  :root,
-  :host {
-    @include tokens($color-tokens);
-  }
-}
-
 @layer root {
   :root,
   :host,

@@ -216,7 +216,7 @@ $utilities: map.merge(
       property: (--#{$prefix}shadow-tint: null),
       class: shadow,
       values: map.merge(
-        map-slot($theme-colors, "base"),
+        theme-color-refs("bg"),
         (
           "current": currentcolor,
           "black": var(--#{$prefix}black),
@@ -344,22 +344,22 @@ $utilities: map.merge(
     "border-top-color": (
       property: border-top-color,
       class: border-top,
-      values: map.merge(map-slot($theme-colors, "base"), ("white": var(--#{$prefix}white)))
+      values: map.merge(theme-color-refs("bg"), ("white": var(--#{$prefix}white)))
     ),
     "border-end-color": (
       property: border-inline-end-color,
       class: border-end,
-      values: map.merge(map-slot($theme-colors, "base"), ("white": var(--#{$prefix}white)))
+      values: map.merge(theme-color-refs("bg"), ("white": var(--#{$prefix}white)))
     ),
     "border-bottom-color": (
       property: border-bottom-color,
       class: border-bottom,
-      values: map.merge(map-slot($theme-colors, "base"), ("white": var(--#{$prefix}white)))
+      values: map.merge(theme-color-refs("bg"), ("white": var(--#{$prefix}white)))
     ),
     "border-start-color": (
       property: border-inline-start-color,
       class: border-start,
-      values: map.merge(map-slot($theme-colors, "base"), ("white": var(--#{$prefix}white)))
+      values: map.merge(theme-color-refs("bg"), ("white": var(--#{$prefix}white)))
     ),
     // scss-docs-end utils-border-color
     // scss-docs-start utils-border-width
