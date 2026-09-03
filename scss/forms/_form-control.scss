@@ -100,14 +100,14 @@ $form-control-tokens: defaults(
 // scss-docs-end form-control-frame-mixin
 
 // scss-docs-start form-control-select-variables
-$form-control-select-indicator-color:      $gray-800 !default;
-$form-control-select-indicator:            url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='#{$form-control-select-indicator-color}' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/></svg>") !default;
-$form-control-select-bg-position:          right var(--#{$prefix}control-padding-x) center !default;
-$form-control-select-bg-size:              16px 12px !default; // In pixels because image dimensions
-$form-control-select-padding-end:          calc(var(--#{$prefix}control-padding-x) * 3) !default;
+$form-control-select-indicator-color:           $gray-800 !default;
+$form-control-select-indicator:                 url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='#{$form-control-select-indicator-color}' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/></svg>") !default;
+$form-control-select-bg-position:               right var(--#{$prefix}control-padding-x) center !default;
+$form-control-select-bg-size:                   16px 12px !default; // In pixels because image dimensions
+$form-control-select-padding-end:               calc(var(--#{$prefix}control-padding-x) * 3) !default;
 $form-control-select-feedback-icon-padding-end: calc(var(--#{$prefix}control-padding-x) * 2.5 + var(--#{$prefix}control-select-padding-end)) !default;
-$form-control-select-feedback-icon-position: center right var(--#{$prefix}control-select-padding-end) !default;
-$form-control-select-feedback-icon-size:   $input-height-inner-half $input-height-inner-half !default;
+$form-control-select-feedback-icon-position:    center right var(--#{$prefix}control-select-padding-end) !default;
+$form-control-select-feedback-icon-size:        $input-height-inner-half $input-height-inner-half !default;
 // scss-docs-end form-control-select-variables
 
 // scss-docs-start form-control-select-dark-variables

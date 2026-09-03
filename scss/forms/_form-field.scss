@@ -4,14 +4,14 @@
 @use "../mixins/border-radius" as *;
 
 // scss-docs-start form-field-variables
-$form-field-gap:            .5rem !default;
-$form-field-column-gap:     .5rem !default;
-$form-field-card-padding:   calc(var(--#{$prefix}spacer) * .75) !default;
-$form-field-card-radius:    var(--#{$prefix}radius-7) !default;
-$form-field-card-hover-bg:  var(--#{$prefix}bg-1) !default;
-$form-field-card-checked-bg: var(--#{$prefix}bg-1) !default;
+$form-field-gap:                       .5rem !default;
+$form-field-column-gap:                .5rem !default;
+$form-field-card-padding:              calc(var(--#{$prefix}spacer) * .75) !default;
+$form-field-card-radius:               var(--#{$prefix}radius-7) !default;
+$form-field-card-hover-bg:             var(--#{$prefix}bg-1) !default;
+$form-field-card-checked-bg:           var(--#{$prefix}bg-1) !default;
 $form-field-card-checked-border-color: var(--#{$prefix}border-color) !default;
-$form-group-gap:            .5rem !default;
+$form-group-gap:                       .5rem !default;
 // scss-docs-end form-field-variables
 
 $form-field-tokens: () !default;
