@@ -1836,6 +1836,13 @@ Multi Select's option indicators moved with it — they render as a decorative
   [`.contains-inline`](/utilities/container-queries/) on an ancestor, or the
   list stays vertical. Plain `.list-group-horizontal` is unconditional and
   needs no container.
+- **An active item under a `.theme-*` class is filled, like a page link.**
+  `.list-group-item.active` reads `--cui-theme-contrast` for its text and
+  `--cui-theme-bg` for its background and border — the same slots the
+  pagination, the badge and the button use — so the active item of a
+  `.theme-danger` list is the same red as the active page of a
+  `.theme-danger` pagination. A pressed action (`:active`) reads
+  `--cui-theme-bg-muted`, like hover. Without a theme class nothing changes.
 
 #### Tab
 
