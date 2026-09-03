@@ -14,6 +14,8 @@
 $menu-zindex:                   var(--#{$prefix}z-dropdown) !default;
 $menu-gap:                      .125rem !default;
 $menu-min-width:                10rem !default;
+$menu-max-height:               none !default;
+$menu-overflow-y:               visible !default;
 $menu-padding-x:                .25rem !default;
 $menu-padding-y:                .25rem !default;
 $menu-spacer:                   .125rem !default;
@@ -59,6 +61,8 @@ $menu-tokens: defaults(
     --#{$prefix}menu-zindex: #{$menu-zindex},
     --#{$prefix}menu-gap: #{$menu-gap},
     --#{$prefix}menu-min-width: #{$menu-min-width},
+    --#{$prefix}menu-max-height: #{$menu-max-height},
+    --#{$prefix}menu-overflow-y: #{$menu-overflow-y},
     --#{$prefix}menu-padding-x: #{$menu-padding-x},
     --#{$prefix}menu-padding-y: #{$menu-padding-y},
     --#{$prefix}menu-spacer: #{$menu-spacer},
@@ -109,10 +113,10 @@ $menu-tokens: defaults(
     flex-direction: column;
     gap: var(--#{$prefix}menu-gap);
     min-width: var(--#{$prefix}menu-min-width);
-    max-height: var(--#{$prefix}menu-max-height, none);
+    max-height: var(--#{$prefix}menu-max-height);
     padding: var(--#{$prefix}menu-padding-y) var(--#{$prefix}menu-padding-x);
     margin: 0;
-    overflow-y: var(--#{$prefix}menu-overflow-y, initial);
+    overflow-y: var(--#{$prefix}menu-overflow-y);
     overscroll-behavior: contain;
     font-size: var(--#{$prefix}menu-font-size);
     color: var(--#{$prefix}menu-color);
