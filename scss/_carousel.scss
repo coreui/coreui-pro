@@ -210,12 +210,12 @@ $carousel-tokens: defaults(
     }
   }
   .carousel-control-prev {
-    left: 0;
+    inset-inline-start: 0;
     // stylelint-disable-next-line scss/at-function-named-arguments
     background-image: if(sass($enable-gradients): linear-gradient(90deg, color-mix(in srgb, var(--#{$prefix}black) 25%, transparent), color-mix(in srgb, var(--#{$prefix}black) .1%, transparent)));
   }
   .carousel-control-next {
-    right: 0;
+    inset-inline-end: 0;
     // stylelint-disable-next-line scss/at-function-named-arguments
     background-image: if(sass($enable-gradients): linear-gradient(270deg, color-mix(in srgb, var(--#{$prefix}black) 25%, transparent), color-mix(in srgb, var(--#{$prefix}black) .1%, transparent)));
   }
@@ -304,17 +304,15 @@ $carousel-tokens: defaults(
 
   .carousel-indicators {
     position: absolute;
-    right: 0;
+    inset-inline: 0;
     bottom: 0;
-    left: 0;
     z-index: 2;
     display: flex;
     justify-content: center;
     padding: 0;
     // Use the .carousel-control's width as margin so we don't overlay those
-    margin-right: var(--#{$prefix}carousel-control-width);
+    margin-inline: var(--#{$prefix}carousel-control-width);
     margin-bottom: var(--#{$prefix}carousel-indicators-margin-bottom);
-    margin-left: var(--#{$prefix}carousel-control-width);
 
     [data#{$data-infix}target] {
       box-sizing: content-box;
@@ -322,8 +320,7 @@ $carousel-tokens: defaults(
       width: var(--#{$prefix}carousel-indicator-width);
       height: var(--#{$prefix}carousel-indicator-height);
       padding: 0;
-      margin-right: var(--#{$prefix}carousel-indicator-spacer);
-      margin-left: var(--#{$prefix}carousel-indicator-spacer);
+      margin-inline: var(--#{$prefix}carousel-indicator-spacer);
       text-indent: -999px;
       cursor: pointer;
       background-color: var(--#{$prefix}carousel-indicator-active-bg);
@@ -374,9 +371,8 @@ $carousel-tokens: defaults(
 
   .carousel-caption {
     position: absolute;
-    right: calc((100% - var(--#{$prefix}carousel-caption-width)) / 2);
+    inset-inline: calc((100% - var(--#{$prefix}carousel-caption-width)) / 2);
     bottom: var(--#{$prefix}carousel-caption-spacer);
-    left: calc((100% - var(--#{$prefix}carousel-caption-width)) / 2);
     padding-block: var(--#{$prefix}carousel-caption-padding-y);
     color: var(--#{$prefix}carousel-caption-color);
     text-align: center;
