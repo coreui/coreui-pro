@@ -92,18 +92,18 @@ $small-font-size:             .875em !default;
 $font-weight-base:            var(--#{$prefix}font-weight-normal) !default;
 
 // scss-docs-start input-btn-variables
-$input-btn-gap:               .375rem !default;
-$input-btn-padding-y:         .375rem !default;
-$input-btn-padding-x:         .75rem !default;
-$input-btn-font-family:       null !default;
-$input-btn-font-size:         var(--#{$prefix}body-font-size) !default;
-$input-btn-line-height:       var(--#{$prefix}body-line-height) !default;
-$input-btn-border-width:      var(--#{$prefix}border-width) !default;
-$input-btn-transition-duration:          .15s !default;
-$input-btn-transition-timing:            ease-in-out !default;
-$input-btn-transition-property:          "border-color, box-shadow" !default;
-$input-btn-action-transition-property:   "color, background-color, border-color, box-shadow" !default;
-$input-btn-disabled-opacity:  .65 !default;
+$input-btn-gap:                        .375rem !default;
+$input-btn-padding-y:                  .375rem !default;
+$input-btn-padding-x:                  .75rem !default;
+$input-btn-font-family:                null !default;
+$input-btn-font-size:                  var(--#{$prefix}body-font-size) !default;
+$input-btn-line-height:                var(--#{$prefix}body-line-height) !default;
+$input-btn-border-width:               var(--#{$prefix}border-width) !default;
+$input-btn-transition-duration:        .15s !default;
+$input-btn-transition-timing:          ease-in-out !default;
+$input-btn-transition-property:        "border-color, box-shadow" !default;
+$input-btn-action-transition-property: "color, background-color, border-color, box-shadow" !default;
+$input-btn-disabled-opacity:           .65 !default;
 
 $input-btn-gap-xs:            .25rem !default;
 $input-btn-padding-y-xs:      .125rem !default;
