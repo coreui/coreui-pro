@@ -248,6 +248,10 @@ $navbar-dark-tokens: defaults(
       }
     }
 
+    .nav-item {
+      flex-direction: column;
+    }
+
     .dropdown-menu {
       position: static;
     }
