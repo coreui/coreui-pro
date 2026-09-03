@@ -2773,9 +2773,25 @@ pair, and `[data#{$data-infix}theme="dark"]` only declares `color-scheme: dark`.
   **The palette is written in `oklch()` and mixes in `oklch`.** The base colours
   are unchanged — every hex converts to the same sRGB pixel — but the 100–900
   steps mixed from them shift, because `oklch` holds chroma where `lab` drained
-  it (measured: 5.9 per RGB channel on average, 28 at most). `$tint-color` and
-  `$shade-color` drop the hue of the colour they mix towards, so a shade darkens
-  without rotating towards our near-black's blue cast.
+  it (measured: 5.9 per RGB channel on average, 28 at most). `$black` is `#000`
+  now rather than a near-black with a blue cast: `oklch` interpolates hue, so
+  mixing a scale towards a tinted black rotated every shade towards blue.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The gray ramp is generated like every other colour.** `$gray-025` …
+  `$gray-975` were thirteen hand-picked values; they are now one `$gray` base
+  run through the same generator, and `gray` is an entry of `$colors`. The Sass
+  variables stay, derived from the base, so `$gray-600` keeps working — but the
+  ramp is set by `$gray` plus `$color-tints` / `$color-shades`, not by
+  overriding a stop.
+
+  `$color-tints` and `$color-shades` gained `025`, `050`, `950` and `975`, so
+  **every** colour now carries the full thirteen stops, and their percentages
+  moved to the curve the gray ramp used: the light stops are much lighter than
+  before (measured: `-400` moves 80 per RGB channel, `-300` 57, `-200` 38,
+  `-100` 19; the dark side moves 6 to 42). The grays themselves are unchanged
+  bar a rounding step in the light band and up to 12 in the dark, where the
+  hand-picked ramp was more chromatic than one base can be.
+
 - **`-bg-subtle`, `-border-subtle` and `-text-emphasis` are pairs of those
   stops** rather than hand-picked hexes:
 
