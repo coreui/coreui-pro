@@ -22,11 +22,11 @@ With that in mind, consider the following demos for our custom form validation s
 
 ## Custom styles
 
-For custom CoreUI for Bootstrap form validation messages, add `data-coreui-validate` and the `novalidate` boolean attribute to your `<form>`. The `data-coreui-validate` attribute opts in to the `:user-invalid` styling, while `novalidate` disables the browser default feedback tooltips but still provides access to the form validation APIs in JavaScript. Try to submit the form below; our JavaScript will intercept the submit button and relay feedback to you.
+For custom CoreUI for Bootstrap form validation messages, add `data-coreui-validate` and the `novalidate` boolean attribute to your `<form>`. The examples on this page use `data-coreui-validate="valid"`, so the fields that pass show their success message too. The `data-coreui-validate` attribute opts in to the `:user-invalid` styling, while `novalidate` disables the browser default feedback tooltips but still provides access to the form validation APIs in JavaScript. Try to submit the form below; our JavaScript will intercept the submit button and relay feedback to you.
 
 Custom feedback styles apply custom colors, borders, focus styles, and background icons to better communicate feedback.
 
-<Example code={`<form class="row g-3" data-coreui-validate novalidate>
+<Example code={`<form class="row g-3" data-coreui-validate="valid" novalidate>
     <div class="col-md-4">
       <label for="validationCustom01" class="form-label">First name</label>
       <input type="text" class="form-control" id="validationCustom01" value="Mark" required>
@@ -282,7 +282,7 @@ Validation styles are available for the following form controls and components:
 
 If your form layout allows it, you can swap the `.{valid|invalid}-feedback` classes for `.{valid|invalid}-tooltip` classes to display validation feedback in a styled tooltip. Be sure to have a parent with `position: relative` on it for tooltip positioning. In the example below, our column classes have this already, but your project may require an alternative setup.
 
-<Example code={`<form class="row g-3" data-coreui-validate novalidate>
+<Example code={`<form class="row g-3" data-coreui-validate="valid" novalidate>
     <div class="col-md-4 position-relative">
       <label for="validationTooltip01" class="form-label">First name</label>
       <input type="text" class="form-control" id="validationTooltip01" value="Mark" required>
