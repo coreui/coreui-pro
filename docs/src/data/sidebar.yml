@@ -130,14 +130,6 @@
       badge:
         color: danger
         text: PRO
-    - title: Date Time Picker
-      to: /forms/date-time-picker/
-      badge:
-        - color: success
-          text: NEW
-        - color: danger
-          text: PRO
-          className: ms-1
     - title: Date Range Picker
       to: /forms/date-range-picker/
       badge:
@@ -145,6 +137,14 @@
         text: PRO
     - title: Date Time Input
       to: /forms/date-time-input/
+      badge:
+        - color: success
+          text: NEW
+        - color: danger
+          text: PRO
+          className: ms-1
+    - title: Date Time Picker
+      to: /forms/date-time-picker/
       badge:
         - color: success
           text: NEW
@@ -202,13 +202,13 @@
         text: PRO
     - title: Select
       to: /forms/select/
-    - title: Switch
-      to: /forms/switch/
     - title: Stepper
       to: /forms/stepper/
       badge:
         color: danger
         text: PRO
+    - title: Switch
+      to: /forms/switch/
     - title: Textarea
       to: /forms/textarea/
     - title: Time Input
@@ -296,10 +296,10 @@
         text: NEW
     - title: Modal
       to: /components/modal/
-    - title: Navbar
-      to: /components/navbar/
     - title: Nav
       to: /components/nav/
+    - title: Navbar
+      to: /components/navbar/
     - title: Offcanvas
       to: /components/offcanvas/
     - title: Pagination
