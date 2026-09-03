@@ -1,94 +1,109 @@
+// stylelint-disable hue-degree-notation, @stylistic/number-leading-zero
+
 @use "sass:map";
 @use "config" as *;
+@use "functions" as *;
 @use "mixins/tokens" as *;
-@use "functions/color" as *;
-@use "functions/defaults" as *;
 
 // Color system
+//
+// Easily convert colors to oklch() with https://oklch.com/
 
 // scss-docs-start gray-color-variables
 $white:     #fff !default;
-$gray-025:  #fcfcfd !default;
-$gray-050:  #f8f9fb !default;
-$gray-100:  #f3f4f7 !default;
-$gray-200:  #e7eaee !default;
-$gray-300:  #dbdfe6 !default;
-$gray-400:  #cfd4de !default;
-$gray-500:  #8c98b1 !default;
-$gray-600:  #5c6c8a !default;
-$gray-700:  #4a566d !default;
-$gray-800:  #323a49 !default;
-$gray-900:  #212631 !default;
-$gray-950:  #15181f !default;
-$gray-975:  #0e1115 !default;
-$black:     #080a0c !default;
+$gray-025:  oklch(99.135% 0.00132 286.38) !default;
+$gray-050:  oklch(98.192% 0.00286 264.54) !default;
+$gray-100:  oklch(96.724% 0.00414 271.37) !default;
+$gray-200:  oklch(93.59% 0.00629 255.48) !default;
+$gray-300:  oklch(90.262% 0.01048 261.79) !default;
+$gray-400:  oklch(86.905% 0.01481 264.49) !default;
+$gray-500:  oklch(67.863% 0.03948 265.02) !default;
+$gray-600:  oklch(52.981% 0.05128 262.81) !default;
+$gray-700:  oklch(45.204% 0.04077 263.26) !default;
+$gray-800:  oklch(34.739% 0.02847 262.9) !default;
+$gray-900:  oklch(26.859% 0.02181 265.78) !default;
+$gray-950:  oklch(20.911% 0.01467 266.87) !default;
+$gray-975:  oklch(17.622% 0.00959 255.65) !default;
+$black:     oklch(14.326% 0.00565 246.44) !default;
 // scss-docs-end gray-color-variables
 
 // fusv-disable
 // scss-docs-start gray-colors-map
-$grays: (
-  "025": $gray-025,
-  "050": $gray-050,
-  "100": $gray-100,
-  "200": $gray-200,
-  "300": $gray-300,
-  "400": $gray-400,
-  "500": $gray-500,
-  "600": $gray-600,
-  "700": $gray-700,
-  "800": $gray-800,
-  "900": $gray-900,
-  "950": $gray-950,
-  "975": $gray-975
-) !default;
+$grays: () !default;
+
+// stylelint-disable-next-line scss/dollar-variable-default
+$grays: defaults(
+  (
+    "025": $gray-025,
+    "050": $gray-050,
+    "100": $gray-100,
+    "200": $gray-200,
+    "300": $gray-300,
+    "400": $gray-400,
+    "500": $gray-500,
+    "600": $gray-600,
+    "700": $gray-700,
+    "800": $gray-800,
+    "900": $gray-900,
+    "950": $gray-950,
+    "975": $gray-975
+  ),
+  $grays
+);
 // scss-docs-end gray-colors-map
 // fusv-enable
 
 // scss-docs-start color-variables
-$blue:    #0d6efd !default;
-$indigo:  #6610f2 !default;
-$purple:  #6f42c1 !default;
-$pink:    #d63384 !default;
-$red:     #dc3545 !default;
-$orange:  #fd7e14 !default;
-$yellow:  #ffc107 !default;
-$green:   #198754 !default;
-$teal:    #20c997 !default;
-$cyan:    #0dcaf0 !default;
+$blue:    oklch(57.82% 0.22821 260.03) !default;
+$indigo:  oklch(49.43% 0.27796 286.98) !default;
+$purple:  oklch(50.152% 0.18835 294.99) !default;
+$pink:    oklch(59.56% 0.20859 355.48) !default;
+$red:     oklch(59.155% 0.20203 21.24) !default;
+$orange:  oklch(72.654% 0.18318 51.48) !default;
+$yellow:  oklch(84.417% 0.17216 84.93) !default;
+$green:   oklch(55.203% 0.1234 157.01) !default;
+$teal:    oklch(74.409% 0.14802 166.36) !default;
+$cyan:    oklch(77.493% 0.13797 218.05) !default;
 // scss-docs-end color-variables
 
 // The theme colours that carry a hue of their own. `secondary` and `inverse` are
 // grays, so they stay role-only in _theme.scss and get no scale.
 // scss-docs-start theme-color-variables
-$primary:   #5856d6 !default;
-$success:   #1b9e3e !default;
-$info:      #39f !default;
-$warning:   #f9b115 !default;
-$danger:    #e55353 !default;
+$primary:   oklch(52.945% 0.19103 278.34) !default;
+$success:   oklch(61.237% 0.17298 146.95) !default;
+$info:      oklch(67.55% 0.17646 252.26) !default;
+$warning:   oklch(80.791% 0.16473 78.5) !default;
+$danger:    oklch(63.864% 0.18175 23.81) !default;
 // scss-docs-end theme-color-variables
 
 // scss-docs-start colors-map
-$colors: (
-  "blue":       $blue,
-  "indigo":     $indigo,
-  "purple":     $purple,
-  "pink":       $pink,
-  "red":        $red,
-  "orange":     $orange,
-  "yellow":     $yellow,
-  "green":      $green,
-  "teal":       $teal,
-  "cyan":       $cyan,
-  "primary":    $primary,
-  "success":    $success,
-  "info":       $info,
-  "warning":    $warning,
-  "danger":     $danger,
-  "black":      $black,
-  "white":      $white,
-  "gray":       $gray-600,
-  "gray-dark":  $gray-800
-) !default;
+$colors: () !default;
+
+// stylelint-disable-next-line scss/dollar-variable-default
+$colors: defaults(
+  (
+    "blue":       $blue,
+    "indigo":     $indigo,
+    "purple":     $purple,
+    "pink":       $pink,
+    "red":        $red,
+    "orange":     $orange,
+    "yellow":     $yellow,
+    "green":      $green,
+    "teal":       $teal,
+    "cyan":       $cyan,
+    "primary":    $primary,
+    "success":    $success,
+    "info":       $info,
+    "warning":    $warning,
+    "danger":     $danger,
+    "black":      $black,
+    "white":      $white,
+    "gray":       $gray-600,
+    "gray-dark":  $gray-800
+  ),
+  $colors
+);
 // scss-docs-end colors-map
 
 // Color scales
@@ -97,26 +112,40 @@ $colors: (
 // `color-mix()` against the color's own token, so overriding the token retints
 // the whole scale in the browser.
 
+// The ends drop their hue: `oklch` interpolates hue, and our black carries a
+// residual blue cast, so mixing towards it rotates every shade towards blue.
 // scss-docs-start color-scale-variables
-$color-mix-space: lab !default;
-$tint-color:      var(--#{$prefix}white) !default;
-$shade-color:     var(--#{$prefix}black) !default;
+$color-mix-space: oklch !default;
+$tint-color:      oklch(from var(--#{$prefix}white) l 0 none) !default;
+$shade-color:     oklch(from var(--#{$prefix}black) l 0 none) !default;
 // scss-docs-end color-scale-variables
 
 // scss-docs-start color-scale-maps
-$color-tints: (
-  "100": 80%,
-  "200": 60%,
-  "300": 40%,
-  "400": 20%
-) !default;
+$color-tints: () !default;
 
-$color-shades: (
-  "600": 20%,
-  "700": 40%,
-  "800": 60%,
-  "900": 80%
-) !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$color-tints: defaults(
+  (
+    "100": 80%,
+    "200": 60%,
+    "300": 40%,
+    "400": 20%
+  ),
+  $color-tints
+);
+
+$color-shades: () !default;
+
+// stylelint-disable-next-line scss/dollar-variable-default
+$color-shades: defaults(
+  (
+    "600": 20%,
+    "700": 40%,
+    "800": 60%,
+    "900": 80%
+  ),
+  $color-shades
+);
 // scss-docs-end color-scale-maps
 
 // The palette colors that get a scale. `black` and `white` are the ends the
@@ -125,29 +154,6 @@ $color-shades: (
 // scss-docs-start palette-scales-map
 $palette-scales: map.remove($colors, "black", "white", "gray", "gray-dark") !default;
 // scss-docs-end palette-scales-map
-
-@function color-scale-tokens($color) {
-  $tokens: ();
-
-  @each $stop, $weight in $color-tints {
-    $tokens: map.set($tokens, --#{$prefix}#{$color}-#{$stop}, color-mix(in $color-mix-space, $tint-color $weight, var(--#{$prefix}#{$color})));
-  }
-
-  $tokens: map.set($tokens, --#{$prefix}#{$color}-500, var(--#{$prefix}#{$color}));
-
-  @each $stop, $weight in $color-shades {
-    $tokens: map.set($tokens, --#{$prefix}#{$color}-#{$stop}, color-mix(in $color-mix-space, $shade-color $weight, var(--#{$prefix}#{$color})));
-  }
-
-  @return $tokens;
-}
-
-// See https://www.w3.org/TR/WCAG/#contrast-minimum
-$min-contrast-ratio:   4.5 !default;
-
-// Customize the light and dark text colors for use in our color contrast function.
-$color-contrast-dark:      $black !default;
-$color-contrast-light:     $white !default;
 
 // The palette: the base colours, the grays, and their scales. The theme colour
 // system built on top of them lives in _theme.scss.
@@ -165,7 +171,15 @@ $-color-defaults: () !default;
 }
 
 @each $color, $value in $palette-scales {
-  $-color-defaults: map.merge($-color-defaults, color-scale-tokens($color));
+  @each $stop, $weight in $color-tints {
+    $-color-defaults: map.set($-color-defaults, --#{$prefix}#{$color}-#{$stop}, color-mix(in $color-mix-space, $tint-color $weight, var(--#{$prefix}#{$color})));
+  }
+
+  $-color-defaults: map.set($-color-defaults, --#{$prefix}#{$color}-500, var(--#{$prefix}#{$color}));
+
+  @each $stop, $weight in $color-shades {
+    $-color-defaults: map.set($-color-defaults, --#{$prefix}#{$color}-#{$stop}, color-mix(in $color-mix-space, $shade-color $weight, var(--#{$prefix}#{$color})));
+  }
 }
 
 // stylelint-disable-next-line scss/dollar-variable-default

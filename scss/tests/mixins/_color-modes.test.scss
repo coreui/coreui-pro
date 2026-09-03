@@ -1,4 +1,4 @@
-// stylelint-disable selector-attribute-quotes
+// stylelint-disable @stylistic/number-leading-zero, selector-attribute-quotes
 
 @use "../../colors" as *;
 @use "../../config" as *;
@@ -24,7 +24,7 @@
           background-color: var(--cui-primary-bg-subtle);
         }
         [data-coreui-theme=dark] {
-          --custom-color: #6610f2;
+          --custom-color: oklch(49.43% 0.27796 286.98deg);
         }
       }
     }
@@ -57,7 +57,7 @@
         @media (prefers-color-scheme: dark) {
           :root,
           :host {
-            --custom-color: #6610f2;
+            --custom-color: oklch(49.43% 0.27796 286.98deg);
           }
         }
       }

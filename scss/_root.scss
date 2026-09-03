@@ -121,7 +121,7 @@ $input-btn-padding-x-lg:      1rem !default;
 $input-btn-font-size-lg:      var(--#{$prefix}font-size-lg) !default;
 // scss-docs-end input-btn-variables
 
-$code-color: light-dark($pink, tint-color($pink, 40%)) !default;
+$code-color: light-dark(var(--#{$prefix}pink), var(--#{$prefix}pink-300)) !default;
 
 // `config` is reserved and empty, matching upstream's declaration: a slot below
 // `root` for a configuration sheet of your own. `custom` is the same idea

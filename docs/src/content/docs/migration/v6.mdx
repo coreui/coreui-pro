@@ -2762,12 +2762,20 @@ pair, and `[data#{$data-infix}theme="dark"]` only declares `color-scheme: dark`.
   `color-translucent()` helper has to run in Sass), and the colours baked into the
   select chevron and switch knob SVGs keep a dark counterpart next to their
   component (`$form-select-indicator-dark`, `$form-switch-bg-image-dark`).
-- **Every theme colour gets a 100–900 scale of tokens in `:root`**, mixed at
+- **Every palette colour gets a 100–900 scale of tokens in `:root`**, mixed at
   runtime from the colour's own token: `--cui-primary-100` …
-  `--cui-primary-900`, for each key of `$theme-colors`. Knobs:
-  `$color-tints`, `$color-shades`, `$color-mix-space` (`lab`), `$tint-color`,
-  `$shade-color`. Override `$primary` — or the `--cui-primary` token at
-  runtime — and the whole family retints.
+  `--cui-primary-900`, for each key of `$colors`. Knobs: `$color-tints`,
+  `$color-shades`, `$color-mix-space` (`oklch`), `$tint-color`, `$shade-color`.
+  Override `$primary` — or the `--cui-primary` token at runtime — and the whole
+  family retints. `secondary` and `inverse` are built from the grays and carry
+  no scale.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The palette is written in `oklch()` and mixes in `oklch`.** The base colours
+  are unchanged — every hex converts to the same sRGB pixel — but the 100–900
+  steps mixed from them shift, because `oklch` holds chroma where `lab` drained
+  it (measured: 5.9 per RGB channel on average, 28 at most). `$tint-color` and
+  `$shade-color` drop the hue of the colour they mix towards, so a shade darkens
+  without rotating towards our near-black's blue cast.
 - **`-bg-subtle`, `-border-subtle` and `-text-emphasis` are pairs of those
   stops** rather than hand-picked hexes:
 
