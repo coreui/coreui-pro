@@ -46,15 +46,6 @@
         opacity: 0;
       }
 
-      // The brand pair is the canonical CoreUI sidebar markup — every admin
-      // template ships a full logo and a narrow signet side by side — so these
-      // two aliases stay despite being deprecated. They cost two selectors.
-      .d-narrow-none,
-      .sidebar-brand-full,
-      .d-sidebar-narrow-none {
-        display: none !important // stylelint-disable-line declaration-no-important
-      }
-
       .sidebar-toggler::before {
         @include ltr-rtl("transform", rotate(-180deg), null, rotate(0deg));
       }
@@ -69,10 +60,6 @@
     // scss-docs-start sidebar-narrow-unfoldable-css-vars
     --#{$prefix}sidebar-narrow-unfoldable-box-shadow: #{$sidebar-narrow-unfoldable-box-shadow};
     // scss-docs-end sidebar-narrow-unfoldable-css-vars
-
-    .d-sidebar-narrow-unfoldable-none {
-      display: none !important // stylelint-disable-line declaration-no-important
-    }
 
     @extend .sidebar-fixed;
 
@@ -104,13 +91,26 @@
       }
     }
   }
+}
 
-  .sidebar:not(.sidebar-narrow) .sidebar-brand-narrow,
-  .sidebar:not(.sidebar-narrow) .d-sidebar-narrow {
-    display: none !important; // stylelint-disable-line declaration-no-important
+@layer utilities {
+  .sidebar-narrow {
+    @include media-breakpoint-up($mobile-breakpoint) {
+      // The brand pair is the canonical CoreUI sidebar markup — every admin
+      // template ships a full logo and a narrow signet side by side — so these
+      // two aliases stay despite being deprecated. They cost two selectors.
+      .d-narrow-none,
+      .sidebar-brand-full,
+      .d-sidebar-narrow-none {
+        display: none;
+      }
+    }
   }
 
+  .sidebar-narrow-unfoldable .d-sidebar-narrow-unfoldable-none,
+  .sidebar:not(.sidebar-narrow) .sidebar-brand-narrow,
+  .sidebar:not(.sidebar-narrow) .d-sidebar-narrow,
   .sidebar:not(.sidebar-narrow-unfoldable) .d-sidebar-narrow-unfoldable {
-    display: none !important; // stylelint-disable-line declaration-no-important
+    display: none;
   }
 }
