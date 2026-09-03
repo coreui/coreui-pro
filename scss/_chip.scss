@@ -34,7 +34,7 @@ $chip-active-bg:             var(--#{$prefix}primary) !default;
 $chip-active-border-color:   transparent !default;
 
 $chip-hover-color:           $chip-color !default;
-$chip-hover-bg:              color-mix(in srgb, var(--#{$prefix}bg-4) 95%, #000) !default;
+$chip-hover-bg:              color-mix(in oklch, var(--#{$prefix}bg-4) 95%, var(--#{$prefix}fg-body)) !default;
 $chip-hover-border-color:    transparent !default;
 
 $chip-font-size-sm:          .75rem !default;
