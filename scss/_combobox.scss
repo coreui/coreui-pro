@@ -24,7 +24,7 @@ $combobox-header-border-color: var(--#{$prefix}border-color) !default;
 
 $combobox-select-all-padding-y:       .5rem !default;
 $combobox-select-all-padding-x:       .75rem !default;
-$combobox-select-all-color:           var(--#{$prefix}body-secondary-color) !default;
+$combobox-select-all-color:           var(--#{$prefix}fg-2) !default;
 $combobox-select-all-bg:              transparent !default;
 $combobox-select-all-hover-color:     var(--#{$prefix}fg-body) !default;
 $combobox-select-all-hover-bg:        var(--#{$prefix}bg-3) !default;
