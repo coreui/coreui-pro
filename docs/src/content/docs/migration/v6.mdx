@@ -2162,7 +2162,12 @@ as such.
   (`--cui-card-border-radius: .375rem`); to retune the whole page, override
   the stops or `$radius`. The `$border-radius(-sm/-lg/-xl/-xxl/-pill)`
   variables and their tokens are unchanged and keep driving the `rounded-*`
-  utilities.
+  utilities — but no component reads them any more: the modal, the chip,
+  the switch, the chip input, the search button's key, the sidebar nav, the
+  header toggler, the password-strength segments and the validation tooltip
+  moved to the stop with the same value (`--cui-border-radius` →
+  `--cui-radius-4`, `-sm` → `-3`, `-lg` → `-5`, `-pill` → `--cui-radius-pill`),
+  so overriding `--cui-border-radius` now retunes the utilities only.
 
 #### Interaction surfaces sit two rungs lighter on the ladder
 
