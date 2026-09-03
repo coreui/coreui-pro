@@ -155,7 +155,7 @@ $range-slider-vertical-tokens: defaults(
     // No fallback on purpose: with `track: false` the plugin never writes the edges and the whole declaration must drop to `none`.
     background-image:
       linear-gradient(
-        var(--cui-range-slider-track-direction, to right),
+        var(--#{$prefix}range-slider-track-direction, to right),
         transparent 0%,
         transparent var(--cui-range-slider-track-from),
         var(--#{$prefix}range-slider-track-in-range-bg) var(--cui-range-slider-track-from),
@@ -302,7 +302,7 @@ $range-slider-vertical-tokens: defaults(
 
   .range-slider:not(.range-slider-vertical) {
     @include rtl() {
-      --cui-range-slider-track-direction: to left;
+      --#{$prefix}range-slider-track-direction: to left;
     }
 
 
@@ -332,7 +332,7 @@ $range-slider-vertical-tokens: defaults(
   .range-slider-vertical {
     @include tokens($range-slider-vertical-tokens);
 
-    --cui-range-slider-track-direction: to top;
+    --#{$prefix}range-slider-track-direction: to top;
 
     flex-direction: row;
     height: var(--#{$prefix}range-slider-vertical-track-height);
