@@ -1,11 +1,6 @@
-// Toggles
-//
-// Used in conjunction with global variables to enable certain theme features.
-
 // LTR & RTL
 @forward "ltr-rtl";
 
-// Vendor
 // Deprecate
 @forward "deprecate";
 
@@ -13,6 +8,7 @@
 @forward "../layout/breakpoints";
 @forward "color-mode";
 @forward "color-scheme";
+@forward "focus-ring";
 @forward "image";
 @forward "resize";
 @forward "visually-hidden";
@@ -26,6 +22,7 @@
 // Components
 @forward "backdrop";
 @forward "caret";
+@forward "chip";
 @forward "form-validation";
 @forward "icon";
 @forward "lists";
