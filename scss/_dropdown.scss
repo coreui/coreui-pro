@@ -37,7 +37,7 @@ $dropdown-item-padding-y:           var(--#{$prefix}spacer-1) !default;
 $dropdown-item-padding-x:           var(--#{$prefix}spacer-3) !default;
 $dropdown-item-border-radius:       0 !default;
 
-$dropdown-header-color:             var(--#{$prefix}gray-600) !default;
+$dropdown-header-color:             var(--#{$prefix}fg-3) !default;
 $dropdown-header-padding-x:         $dropdown-item-padding-x !default;
 $dropdown-header-padding-y:         $dropdown-padding-y !default;
 // scss-docs-end dropdown-variables
