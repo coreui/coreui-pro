@@ -53,6 +53,7 @@ $avatar-tokens: () !default;
 $avatar-tokens: defaults(
   (
     --#{$prefix}avatar-size: #{$avatar-size},
+    --#{$prefix}avatar-font-size: calc(var(--#{$prefix}avatar-size) * #{$avatar-font-size-ratio}),
     --#{$prefix}avatar-color: var(--#{$prefix}theme-contrast, #{$avatar-color}),
     --#{$prefix}avatar-bg: var(--#{$prefix}theme-bg, #{$avatar-bg}),
     --#{$prefix}avatar-border-radius: #{$avatar-border-radius},
@@ -111,7 +112,7 @@ $avatar-variants: defaults(
     height: var(--#{$prefix}avatar-size);
     // Declared as a fallback rather than a token, so the derived size is the
     // default and an explicit one still wins.
-    font-size: var(--#{$prefix}avatar-font-size, calc(var(--#{$prefix}avatar-size) * #{$avatar-font-size-ratio}));
+    font-size: var(--#{$prefix}avatar-font-size);
     color: var(--#{$prefix}avatar-color);
     vertical-align: middle;
     background-color: var(--#{$prefix}avatar-bg);
