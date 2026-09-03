@@ -54,7 +54,7 @@ $form-control-tokens: defaults(
     --#{$prefix}control-transition-property: var(--#{$prefix}btn-input-transition-property),
     --#{$prefix}control-transition-duration: var(--#{$prefix}btn-input-transition-duration),
     --#{$prefix}control-transition-timing: var(--#{$prefix}btn-input-transition-timing),
-    --#{$prefix}control-placeholder-color: var(--#{$prefix}input-placeholder-color, var(--#{$prefix}fg-3)),
+    --#{$prefix}control-placeholder-color: var(--#{$prefix}fg-3),
     --#{$prefix}control-focus-color: var(--#{$prefix}btn-input-focus-color),
     --#{$prefix}control-focus-bg: var(--#{$prefix}btn-input-focus-bg),
     --#{$prefix}control-focus-border-color: var(--#{$prefix}btn-input-focus-border-color),
