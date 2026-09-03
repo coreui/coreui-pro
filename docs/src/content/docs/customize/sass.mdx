@@ -134,7 +134,7 @@ Repeat as necessary for any variable in CoreUI, including the global options bel
 
 ## Token defaults
 
-Every CSS custom property the library emits is built from a Sass map you can override the same way: `$root-tokens` holds everything declared on `:root`, and each component keeps its surface in `$<component>-tokens`. Hand the map your overrides through `with ()` — you only include the keys you want to change, and a `null` value removes the token from the output entirely:
+Every CSS custom property the library emits is built from a Sass map you can override the same way: `$color-tokens` holds the palette, `$root-tokens` everything else declared on `:root`, and each component keeps its surface in `$<component>-tokens`. Hand the map your overrides through `with ()` — you only include the keys you want to change, and a `null` value removes the token from the output entirely:
 
 ```scss
 @use "@coreui/coreui/scss/coreui" with (

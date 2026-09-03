@@ -1,7 +1,7 @@
 @use "sass:map";
-@use "mixins/tokens" as *;
 @use "config" as *;
 @use "functions/color" as *;
+@use "functions/defaults" as *;
 
 // Color system
 
@@ -133,36 +133,25 @@ $min-contrast-ratio:   4.5 !default;
 $color-contrast-dark:      $black !default;
 $color-contrast-light:     $white !default;
 
-// The palette: the base colours, the grays, and their maps. The theme colour
+// The palette: the base colours, the grays, and their scales. The theme colour
 // system built on top of them lives in _theme.scss.
-//
-// Emitted as a mixin rather than its own `:root` block, so the tokens stay in the
-// single `:root` rule _root.scss already writes. A second block would compile
-// identically but would push the `@layer` declaration below the first rule that
-// uses a layer, which is not somewhere it should ever sit.
+// scss-docs-start color-tokens
+$color-tokens: () !default;
 
-// Colors
-//
-// Palettes for full colors and grays, as a token map so the caller can merge it
-// into a larger one rather than emitting it in place.
-@function color-tokens() {
-  $tokens: ();
+$-color-defaults: () !default;
 
-  @each $color, $value in $colors {
-    $tokens: map.set($tokens, --#{$prefix}#{$color}, $value);
-  }
-
-  @each $color, $value in $grays {
-    $tokens: map.set($tokens, --#{$prefix}gray-#{$color}, $value);
-  }
-
-  @each $color, $value in $palette-scales {
-    $tokens: map.merge($tokens, color-scale-tokens($color));
-  }
-
-  @return $tokens;
+@each $color, $value in $colors {
+  $-color-defaults: map.set($-color-defaults, --#{$prefix}#{$color}, $value);
 }
 
-@mixin color-tokens() {
-  @include tokens(color-tokens());
+@each $color, $value in $grays {
+  $-color-defaults: map.set($-color-defaults, --#{$prefix}gray-#{$color}, $value);
 }
+
+@each $color, $value in $palette-scales {
+  $-color-defaults: map.merge($-color-defaults, color-scale-tokens($color));
+}
+
+// stylelint-disable-next-line scss/dollar-variable-default
+$color-tokens: defaults($-color-defaults, $color-tokens);
+// scss-docs-end color-tokens

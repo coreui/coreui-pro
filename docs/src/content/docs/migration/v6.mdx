@@ -2629,9 +2629,11 @@ tintable and lets dark mode deepen every shadow at once.
 
 - **All library CSS now lives in cascade layers**, declared as
   `@layer colors, config, root, reboot, layout, content, forms, components, custom, helpers, utilities;`.
-  Three of those are empty and reserved for you: `colors` and `config` sit below
-  everything, for a palette or a configuration sheet that should lose to nothing
-  but still beat the library, and `custom` slots between components and helpers.
+  The palette ships in `colors`, so your own `@layer colors` block overrides a
+  token like `--cui-blue-500` by source order alone. Two of the layers are empty
+  and reserved for you: `config`, below `root`, for a configuration sheet the
+  library should read but never fight, and `custom`, between components and
+  helpers.
 - **Unlayered CSS wins over layered CSS regardless of specificity**, so your
   existing stylesheets now override the library more easily, not less. No
   action needed — selectors that worked before keep working, and low-specificity

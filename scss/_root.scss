@@ -123,19 +123,19 @@ $input-btn-font-size-lg:      var(--#{$prefix}font-size-lg) !default;
 
 $code-color: light-dark($pink, tint-color($pink, 40%)) !default;
 
-// `colors` and `config` are reserved and empty, matching upstream's declaration:
-// two slots below `root` for a palette or a configuration sheet of your own, so
-// yours loses to nothing but still beats the library. `custom` is the same idea
+// `config` is reserved and empty, matching upstream's declaration: a slot below
+// `root` for a configuration sheet of your own. `custom` is the same idea
 // between components and helpers.
 $root-tokens: () !default;
 
 // stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
-// Everything the library declares on the root, assembled as one map and emitted
-// with a single `tokens()` call. Building it here rather than writing the
-// declarations inside `:root` keeps the rule a list of values instead of a mix
-// of declarations and loops, and gives the whole set one override point.
-$root-token-defaults: map.merge(color-tokens(), theme-color-tokens());
+// Everything the library declares on the root beyond the palette, assembled as
+// one map and emitted with a single `tokens()` call. Building it here rather
+// than writing the declarations inside `:root` keeps the rule a list of values
+// instead of a mix of declarations and loops, and gives the whole set one
+// override point.
+$root-token-defaults: theme-color-tokens();
 
 // Fonts
 //
@@ -344,6 +344,17 @@ $root-tokens: defaults($root-token-defaults, $root-tokens);
 // stylelint-enable custom-property-no-missing-var-function, scss/dollar-variable-default
 
 @layer colors, config, root, reboot, layout, content, forms, components, custom, helpers, utilities;
+
+// Emitted here rather than in _colors.scss: a `:root` block in that file would
+// ship wherever the module is loaded for its maps, which puts the whole palette
+// into coreui-grid.css, and would push this declaration off the top of every
+// bundle.
+@layer colors {
+  :root,
+  :host {
+    @include tokens($color-tokens);
+  }
+}
 
 @layer root {
   :root,

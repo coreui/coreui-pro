@@ -11,9 +11,9 @@ Where each piece lives, from the raw hue up to the component:
 
 | Layer | File | What it defines |
 | --- | --- | --- |
-| Color scales | `scss/_colors.scss` | One base token per color, expanded into the `100`–`900` steps with `color-mix()` against `$tint-color` / `$shade-color`. The mix names the base token, not its value, so overriding `--cui-primary` retints the whole scale in the browser. The grays are hand-picked stops rather than a mix, because a neutral ramp has to stay neutral. |
+| Color scales | `scss/_colors.scss` | `$color-tokens`, emitted on `:root, :host` in the `colors` layer: one base token per color, expanded into the `100`–`900` steps with `color-mix()` against `$tint-color` / `$shade-color`. The mix names the base token, not its value, so overriding `--cui-primary` retints the whole scale in the browser. The grays are hand-picked stops rather than a mix, because a neutral ramp has to stay neutral. |
 | Theme colors | `scss/_theme.scss` | `$theme-colors`, one nested map per role (`primary`, `danger`, …), each holding `base`, `fg`, `text-emphasis`, `bg`, `bg-subtle`, `bg-muted`, `border-subtle`, `focus-ring` and `contrast` |
-| Global tokens | `scss/_root.scss` | `$root-tokens`, everything emitted on `:root, :host` — spacing, radii, typography, z-index and the surface ladders |
+| Global tokens | `scss/_root.scss` | `$root-tokens`, everything else emitted on `:root, :host` — spacing, radii, typography, z-index and the surface ladders |
 | Component tokens | the component's own partial | `$alert-tokens`, `$card-tokens` and the rest, emitted on the component's base class |
 
 Each layer reads the one below it, so a change low down travels upward: retint `--cui-blue-500` and every theme role built on blue follows, along with every component reading those roles.
@@ -30,13 +30,14 @@ Later layers beat earlier ones regardless of selector specificity, which settles
 
 - **Utilities win over components** because `utilities` comes last — no `!important` involved. That's why [`$enable-important-utilities`](/customize/options/) defaults to `false` in v6.
 - **Your unlayered CSS wins over everything of ours**, because unlayered styles beat every layer. A plain `.card { … }` in your stylesheet overrides the library no matter how simple the selector.
-- **Three layers are empty and reserved for you.** `colors` and `config` sit below everything, for a palette or configuration sheet that the whole library should read but never fight; `custom` slots between `components` and `helpers`, for component overrides that should still lose to utilities. Put your CSS in `@layer custom` when you want `.text-center` on the element to keep working.
+- **`colors` is where the palette ships**, below everything else, so your own `@layer colors` block sits in the same layer and overrides a token like `--cui-blue-500` by source order alone.
+- **Two layers are empty and reserved for you.** `config` sits below `root`, for a configuration sheet the whole library should read but never fight; `custom` slots between `components` and `helpers`, for component overrides that should still lose to utilities. Put your CSS in `@layer custom` when you want `.text-center` on the element to keep working.
 
 One caveat: if your build concatenates our CSS with other stylesheets, make sure the layer declaration emitted at the top of the bundle survives minification — a minifier that predates `@layer` can strip it, and with it the whole ordering.
 
 ## Design tokens
 
-Global design decisions — colors, spacing, typography, borders, shadows — are emitted as CSS custom properties on `:root` (in the `root` layer). Components never read Sass variables at run time; they read tokens:
+Global design decisions — colors, spacing, typography, borders, shadows — are emitted as CSS custom properties on `:root` (the palette in the `colors` layer, everything else in `root`). Components never read Sass variables at run time; they read tokens:
 
 ```css
 .alert {
