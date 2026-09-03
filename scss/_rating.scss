@@ -112,7 +112,7 @@ $rating-tokens: defaults(
 
     &.active {
       color: var(--#{$prefix}rating-item-active-color);
-      opacity: 1 !important; // stylelint-disable-line declaration-no-important
+      opacity: 1;
 
       .rating-item-icon {
         background-color: var(--#{$prefix}rating-item-active-color);

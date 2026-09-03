@@ -2038,6 +2038,9 @@ Multi Select's option indicators moved with it — they render as a decorative
   components accepted `fixed` and rendered a class the stylesheet did not
   define, so it did nothing. Use `.fixed-top` or `.fixed-bottom`; on the
   framework components, `position` renders those utilities now.
+- **`.prevent-hide` on `.header-toggler` is removed.** It forced
+  `display: block !important` against a hide rule that no longer exists;
+  nothing in the library or the admin templates sets the class.
 
 #### Callout
 
