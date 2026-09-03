@@ -279,7 +279,7 @@ For example, we use the `primary`, `success`, and `danger` keys from `$theme-col
 
 ### Defaults
 
-`defaults()` is the merge behind every overridable map on this page — token maps, size maps, variant maps. It layers your overrides on top of the library's defaults, drops every key whose value is `null`, and accepts a plain list as the defaults (each item becomes a key set to `true`, which is how the size maps are written):
+`defaults()` is the merge behind every overridable map on this page — token maps, size maps, variant maps. It layers your overrides on top of the library's defaults, drops every key whose value is `null` (a `null` variable interpolated into a map arrives as an empty string and is dropped the same way), and accepts a plain list as the defaults (each item becomes a key set to `true`, which is how the size maps are written):
 
 <ScssDocs file="scss/functions/_defaults.scss" capture="defaults-function" />
 

@@ -2,7 +2,7 @@
 @use "sass:meta";
 
 // scss-docs-start defaults-function
-// Merge overrides on top of defaults, stripping null entries.
+// Merge overrides on top of defaults, stripping null and empty entries.
 // Null values let users remove map keys via @use ... with().
 // Accepts a list as $defaults (converted to a map with `true` values).
 @function defaults($defaults, $overrides) {
@@ -15,7 +15,7 @@
   }
   $merged: map.merge($defaults, $overrides);
   @each $key, $value in $merged {
-    @if $value == null {
+    @if $value == null or $value == "" {
       $merged: map.remove($merged, $key);
     }
   }
