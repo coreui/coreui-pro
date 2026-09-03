@@ -105,20 +105,18 @@ $validated-controls: if(sass($enable-deprecated-form-check): ".check, .radio, .s
   // The state has to reach the group: a custom property set on the control
   // inside it only inherits downwards, never back up to the frame.
   .form-control-group.is-#{$state},
-  .form-control-group:has(> .form-control.is-#{$state}),
-  .autocomplete.is-#{$state} .form-control-group,
-  .form-multi-select.is-#{$state} .form-control-group {
+  .form-control-group:has(> .form-control.is-#{$state}) {
     @include form-control-group-validation-state($color, $border-color, $focus-ring-color);
   }
 
   @if $state == "invalid" {
     [data-coreui-validate] .form-control-group:has(> .form-control:user-invalid),
-    [data-coreui-validate] .form-multi-select:has(> select:user-invalid) .form-control-group {
+    [data-coreui-validate] .form-control-group:has(> select:user-invalid) {
       @include form-control-group-validation-state($color, $border-color, $focus-ring-color);
     }
   } @else if $state == "valid" {
     [data-coreui-validate~="valid"] .form-control-group:has(> .form-control:user-valid),
-    [data-coreui-validate~="valid"] .form-multi-select:has(> select:user-valid) .form-control-group {
+    [data-coreui-validate~="valid"] .form-control-group:has(> select:user-valid) {
       @include form-control-group-validation-state($color, $border-color, $focus-ring-color);
     }
   }

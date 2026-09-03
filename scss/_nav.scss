@@ -420,7 +420,7 @@ $tab-pane-tokens: defaults(
     .show > .nav-link {
       color: var(--#{$prefix}nav-enclosed-link-active-color);
       background-color: var(--#{$prefix}nav-enclosed-link-active-bg);
-      border: 1px solid var(--#{$prefix}nav-enclosed-link-active-border-color);
+      border: var(--#{$prefix}nav-enclosed-link-border-width) solid var(--#{$prefix}nav-enclosed-link-active-border-color);
 
       &:not(:focus-visible) {
         box-shadow: var(--#{$prefix}nav-enclosed-link-hover-box-shadow);
