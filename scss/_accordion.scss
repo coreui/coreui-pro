@@ -20,13 +20,13 @@ $accordion-border-color:                  var(--#{$prefix}border-color) !default
 $accordion-border-radius:                 var(--#{$prefix}radius-7) !default;
 $accordion-gap:                           var(--#{$prefix}spacer-2) !default;
 
-$accordion-button-color:                  var(--#{$prefix}fg-2) !default;
-$accordion-button-bg:                     var(--#{$prefix}accordion-bg) !default;
+$accordion-header-color:                  var(--#{$prefix}fg-2) !default;
+$accordion-header-bg:                     var(--#{$prefix}accordion-bg) !default;
 $accordion-transition-property:           #{var(--#{$prefix}btn-input-action-transition-property), border-radius} !default;
 $accordion-transition-duration:           var(--#{$prefix}btn-input-transition-duration) !default;
 $accordion-transition-timing:             var(--#{$prefix}btn-input-transition-timing) !default;
-$accordion-button-active-bg:              var(--#{$prefix}bg-2) !default;
-$accordion-button-active-color:           var(--#{$prefix}fg-body) !default;
+$accordion-header-active-bg:              var(--#{$prefix}bg-2) !default;
+$accordion-header-active-color:           var(--#{$prefix}fg-body) !default;
 $accordion-active-border-color:           $accordion-border-color !default;
 
 
@@ -39,8 +39,8 @@ $accordion-icon-active-color:             currentcolor !default;
 $accordion-icon-transition:               transform .2s ease-in-out !default;
 $accordion-icon-transform:                rotate(-180deg) !default;
 
-$accordion-button-icon:                   url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-linecap='round' stroke-linejoin='round'><path d='m2 5 6 6 6-6'/></svg>") !default;
-$accordion-button-active-icon:            var(--#{$prefix}accordion-btn-icon) !default;
+$accordion-header-icon:                   url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-linecap='round' stroke-linejoin='round'><path d='m2 5 6 6 6-6'/></svg>") !default;
+$accordion-header-active-icon:            var(--#{$prefix}accordion-header-icon) !default;
 // scss-docs-end accordion-variables
 
 $accordion-tokens: () !default;
@@ -53,6 +53,10 @@ $accordion-tokens: defaults(
   (
     --#{$prefix}accordion-padding-x: #{$accordion-padding-x},
     --#{$prefix}accordion-padding-y: #{$accordion-padding-y},
+    --#{$prefix}accordion-header-padding-x: var(--#{$prefix}accordion-padding-x),
+    --#{$prefix}accordion-header-padding-y: var(--#{$prefix}accordion-padding-y),
+    --#{$prefix}accordion-body-padding-x: var(--#{$prefix}accordion-padding-x),
+    --#{$prefix}accordion-body-padding-y: var(--#{$prefix}accordion-padding-y),
     --#{$prefix}accordion-font-size: #{$accordion-font-size},
     --#{$prefix}accordion-color: #{$accordion-color},
     --#{$prefix}accordion-bg: #{$accordion-bg},
@@ -63,17 +67,17 @@ $accordion-tokens: defaults(
     --#{$prefix}accordion-border-width: #{$accordion-border-width},
     --#{$prefix}accordion-border-radius: #{$accordion-border-radius},
     --#{$prefix}accordion-gap: #{$accordion-gap},
-    --#{$prefix}accordion-btn-color: #{$accordion-button-color},
-    --#{$prefix}accordion-btn-bg: #{$accordion-button-bg},
-    --#{$prefix}accordion-btn-icon: #{escape-svg($accordion-button-icon)},
-    --#{$prefix}accordion-btn-active-icon: #{escape-svg($accordion-button-active-icon)},
-    --#{$prefix}accordion-btn-icon-width: #{$accordion-icon-width},
-    --#{$prefix}accordion-btn-icon-color: #{$accordion-icon-color},
-    --#{$prefix}accordion-btn-active-icon-color: #{$accordion-icon-active-color},
-    --#{$prefix}accordion-btn-icon-transform: #{$accordion-icon-transform},
-    --#{$prefix}accordion-btn-icon-transition: #{$accordion-icon-transition},
-    --#{$prefix}accordion-active-color: #{$accordion-button-active-color},
-    --#{$prefix}accordion-active-bg: #{$accordion-button-active-bg},
+    --#{$prefix}accordion-header-color: #{$accordion-header-color},
+    --#{$prefix}accordion-header-bg: #{$accordion-header-bg},
+    --#{$prefix}accordion-header-icon: #{escape-svg($accordion-header-icon)},
+    --#{$prefix}accordion-header-active-icon: #{escape-svg($accordion-header-active-icon)},
+    --#{$prefix}accordion-header-icon-width: #{$accordion-icon-width},
+    --#{$prefix}accordion-header-icon-color: #{$accordion-icon-color},
+    --#{$prefix}accordion-header-active-icon-color: #{$accordion-icon-active-color},
+    --#{$prefix}accordion-header-icon-transform: #{$accordion-icon-transform},
+    --#{$prefix}accordion-header-icon-transition: #{$accordion-icon-transition},
+    --#{$prefix}accordion-active-color: #{$accordion-header-active-color},
+    --#{$prefix}accordion-active-bg: #{$accordion-header-active-bg},
     --#{$prefix}accordion-active-border-color: #{$accordion-active-border-color},
     --#{$prefix}accordion-content-duration: #{$accordion-content-duration},
     --#{$prefix}accordion-content-easing: #{$accordion-content-easing},
@@ -159,17 +163,17 @@ $accordion-tokens: defaults(
         box-shadow: inset 0 calc(-1 * var(--#{$prefix}accordion-border-width)) 0 var(--#{$prefix}theme-border, var(--#{$prefix}accordion-active-border-color));
 
         &::after {
-          mask-image: var(--#{$prefix}accordion-btn-active-icon);
+          mask-image: var(--#{$prefix}accordion-header-active-icon);
         }
 
         &::after,
         .accordion-icon {
-          color: var(--#{$prefix}accordion-btn-active-icon-color);
+          color: var(--#{$prefix}accordion-header-active-icon-color);
         }
 
         &:not(:has(.accordion-icon-active))::after,
         &:not(:has(.accordion-icon-active)) .accordion-icon {
-          transform: var(--#{$prefix}accordion-btn-icon-transform);
+          transform: var(--#{$prefix}accordion-header-icon-transform);
         }
 
         &:has(.accordion-icon-active) {
@@ -193,13 +197,13 @@ $accordion-tokens: defaults(
     display: flex;
     align-items: center;
     width: 100%;
-    padding: var(--#{$prefix}accordion-btn-padding-y, var(--#{$prefix}accordion-padding-y)) var(--#{$prefix}accordion-btn-padding-x, var(--#{$prefix}accordion-padding-x));
+    padding: var(--#{$prefix}accordion-header-padding-y) var(--#{$prefix}accordion-header-padding-x);
     font-size: var(--#{$prefix}accordion-font-size);
-    color: var(--#{$prefix}accordion-btn-color);
+    color: var(--#{$prefix}accordion-header-color);
     text-align: start;
     list-style: none;
     cursor: pointer;
-    background-color: var(--#{$prefix}accordion-btn-bg);
+    background-color: var(--#{$prefix}accordion-header-bg);
     @include transition-props(
       var(--#{$prefix}accordion-transition-property),
       var(--#{$prefix}accordion-transition-duration),
@@ -212,14 +216,14 @@ $accordion-tokens: defaults(
 
     &:not(:has(.accordion-icon))::after {
       flex-shrink: 0;
-      width: var(--#{$prefix}accordion-btn-icon-width);
-      height: var(--#{$prefix}accordion-btn-icon-width);
+      width: var(--#{$prefix}accordion-header-icon-width);
+      height: var(--#{$prefix}accordion-header-icon-width);
       margin-inline-start: auto;
-      color: var(--#{$prefix}accordion-btn-icon-color);
+      color: var(--#{$prefix}accordion-header-icon-color);
       content: "";
       background-color: currentcolor;
-      @include mask-icon(var(--#{$prefix}accordion-btn-icon), var(--#{$prefix}accordion-btn-icon-width), null);
-      @include transition(var(--#{$prefix}accordion-btn-icon-transition));
+      @include mask-icon(var(--#{$prefix}accordion-header-icon), var(--#{$prefix}accordion-header-icon-width), null);
+      @include transition(var(--#{$prefix}accordion-header-icon-transition));
     }
 
     .accordion-icon {
@@ -227,13 +231,13 @@ $accordion-tokens: defaults(
       flex-shrink: 0;
       align-items: center;
       justify-content: center;
-      width: var(--#{$prefix}accordion-btn-icon-width);
-      height: var(--#{$prefix}accordion-btn-icon-width);
+      width: var(--#{$prefix}accordion-header-icon-width);
+      height: var(--#{$prefix}accordion-header-icon-width);
       margin-inline-start: auto;
-      font-size: var(--#{$prefix}accordion-btn-icon-width);
+      font-size: var(--#{$prefix}accordion-header-icon-width);
       line-height: 1;
-      color: var(--#{$prefix}accordion-btn-icon-color);
-      @include transition(var(--#{$prefix}accordion-btn-icon-transition));
+      color: var(--#{$prefix}accordion-header-icon-color);
+      @include transition(var(--#{$prefix}accordion-header-icon-transition));
     }
 
     .accordion-icon-active {
@@ -262,7 +266,7 @@ $accordion-tokens: defaults(
   }
 
   .accordion-body {
-    padding: var(--#{$prefix}accordion-body-padding-y, var(--#{$prefix}accordion-padding-y)) var(--#{$prefix}accordion-body-padding-x, var(--#{$prefix}accordion-padding-x));
+    padding: var(--#{$prefix}accordion-body-padding-y) var(--#{$prefix}accordion-body-padding-x);
     font-size: var(--#{$prefix}accordion-font-size);
   }
 

@@ -230,7 +230,7 @@ finished, not whether the state changed.
 - **The indicator can be an element instead of a background image.** Put an
   `<svg class="accordion-icon">` in the `<summary>` and the header stops drawing
   its own icon, so any icon set or `<img>` can be used without URL escaping an
-  SVG into a custom property. `--cui-accordion-btn-active-icon` selects the
+  SVG into a custom property. `--cui-accordion-header-active-icon` selects the
   shape shown while the item is open, and a second element marked
   `.accordion-icon-active` does the same in markup — that is what a plus/minus
   accordion needs, where the icon is swapped rather than rotated. The default
@@ -257,7 +257,7 @@ finished, not whether the state changed.
 - **One padding token and one font size for the whole control.**
   `--cui-accordion-padding-x` / `-y` and `--cui-accordion-font-size` are read by
   the header and the body alike, so resizing an accordion is one declaration
-  instead of four. `--cui-accordion-btn-padding-*` and
+  instead of four. `--cui-accordion-header-padding-*` and
   `--cui-accordion-body-padding-*` are no longer declared by default, but they
   still override their part where they are set, so existing overrides keep
   working.
@@ -2980,16 +2980,16 @@ the accordion swapped in a second SVG, the carousel inverted the first with a
 Upstream v6 does the same, with a `mask-icon()` mixin.
 
 - **The accordion's icon is one shape recoloured per state, not two images.**
-  `--cui-accordion-btn-active-icon` no longer has to carry a second copy
-  of the artwork: it defaults to `--cui-accordion-btn-icon`, and the open
-  state changes `--cui-accordion-btn-active-icon-color` instead. Set it
+  `--cui-accordion-header-active-icon` no longer has to carry a second copy
+  of the artwork: it defaults to `--cui-accordion-header-icon`, and the open
+  state changes `--cui-accordion-header-active-icon-color` instead. Set it
   only when the open state is a genuinely different shape — a minus against a
-  plus. New tokens: `--cui-accordion-btn-icon-color` and
-  `--cui-accordion-btn-active-icon-color`.
+  plus. New tokens: `--cui-accordion-header-icon-color` and
+  `--cui-accordion-header-active-icon-color`.
 - **A custom icon is now a shape, not a coloured image.** Whatever colour you put
   inside `$accordion-button-icon` or `$carousel-control-prev-icon-bg` /
   `$carousel-control-next-icon-bg` is ignored — only the alpha of the SVG is used.
-  Set the colour through the token (`--cui-accordion-btn-icon-color`,
+  Set the colour through the token (`--cui-accordion-header-icon-color`,
   `--cui-carousel-control-color`).
 - **`$accordion-icon-color` and `$accordion-icon-active-color` are
   `currentcolor` now**, not Sass colours — Sass colour functions on them no
