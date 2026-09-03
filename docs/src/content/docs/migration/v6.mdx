@@ -1391,6 +1391,12 @@ adornment in the library — so the button needs no icon markup at all:
   by design.
 - **`.btn-xs` (new).** A fourth size below `.btn-sm`, reading the shared
   `--cui-btn-input-xs-*` tokens.
+- **The resting button shadow is gone.** `$btn-box-shadow` and
+  `--cui-btn-box-shadow` are removed; a `.btn` draws no `box-shadow` at rest
+  even with `$enable-shadows: true`, only the pressed state keeps its inset
+  (`--cui-btn-active-shadow`). The removed default was the v4 bevel
+  (`inset 0 1px 0 rgba(white, .15), 0 1px 1px rgba(black, .075)`); put it back
+  with your own `.btn { box-shadow: … }` if you want it.
 
 #### Navbar
 
