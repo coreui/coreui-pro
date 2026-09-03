@@ -133,7 +133,7 @@ $theme-colors-focus-ring: map-slot($theme-colors, "focus-ring") !default;
 
 // scss-docs-start theme-token-refs
 $theme-token-refs: (
-  "bg": "",
+  "bg": "-bg",
   "contrast": "-contrast",
   "fg": "-fg",
   "fg-emphasis": "-fg-emphasis",
