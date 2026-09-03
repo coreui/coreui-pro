@@ -33,6 +33,7 @@ $menu-item-hover-bg:            var(--#{$prefix}bg-1) !default;
 $menu-item-active-color:        var(--#{$prefix}primary-contrast) !default;
 $menu-item-active-bg:           var(--#{$prefix}primary-bg) !default;
 $menu-item-disabled-color:      var(--#{$prefix}fg-3) !default;
+$menu-item-font-weight:         var(--#{$prefix}font-weight-normal) !default;
 $menu-item-gap:                 .5rem !default;
 $menu-item-padding-x:           .75rem !default;
 $menu-item-padding-y:           .25rem !default;
@@ -64,6 +65,9 @@ $menu-tokens: defaults(
     --#{$prefix}menu-font-size: #{$menu-font-size},
     --#{$prefix}menu-color: #{$menu-color},
     --#{$prefix}menu-bg: #{$menu-bg},
+    --#{$prefix}menu-border-color: #{$menu-border-color},
+    --#{$prefix}menu-border-radius: #{$menu-border-radius},
+    --#{$prefix}menu-border-width: #{$menu-border-width},
     --#{$prefix}menu-box-shadow: #{$menu-box-shadow},
     --#{$prefix}menu-divider-bg: #{$menu-divider-bg},
     --#{$prefix}menu-divider-margin-y: #{$menu-divider-margin-y},
@@ -74,6 +78,7 @@ $menu-tokens: defaults(
     --#{$prefix}menu-item-active-color: #{$menu-item-active-color},
     --#{$prefix}menu-item-active-bg: #{$menu-item-active-bg},
     --#{$prefix}menu-item-disabled-color: #{$menu-item-disabled-color},
+    --#{$prefix}menu-item-font-weight: #{$menu-item-font-weight},
     --#{$prefix}menu-item-gap: #{$menu-item-gap},
     --#{$prefix}menu-item-padding-x: #{$menu-item-padding-x},
     --#{$prefix}menu-item-padding-y: #{$menu-item-padding-y},
@@ -115,8 +120,8 @@ $menu-tokens: defaults(
     list-style-type: "";
     background-color: var(--#{$prefix}menu-bg);
     background-clip: padding-box;
-    border: var(--#{$prefix}menu-border-width, #{$menu-border-width}) solid var(--#{$prefix}menu-border-color, #{$menu-border-color});
-    @include border-radius(var(--#{$prefix}menu-border-radius, #{$menu-border-radius}));
+    border: var(--#{$prefix}menu-border-width) solid var(--#{$prefix}menu-border-color);
+    @include border-radius(var(--#{$prefix}menu-border-radius));
     @include box-shadow(var(--#{$prefix}menu-box-shadow));
     opacity: 0;
     transform: scale(.95);
@@ -190,7 +195,7 @@ $menu-tokens: defaults(
     align-items: center;
     width: 100%;
     padding: var(--#{$prefix}menu-item-padding-y) var(--#{$prefix}menu-item-padding-x);
-    font-weight: var(--#{$prefix}menu-item-font-weight, var(--#{$prefix}font-weight-normal));
+    font-weight: var(--#{$prefix}menu-item-font-weight);
     color: var(--#{$prefix}theme-fg-emphasis, var(--#{$prefix}menu-item-color));
     text-align: inherit;
     text-decoration: none;
