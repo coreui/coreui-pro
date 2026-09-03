@@ -3,8 +3,7 @@
 
 @layer components {
   .btn-loading {
-    // The spinner slides in on its own margins, so the button's gap would only
-    // add a fixed offset the animation cannot take back.
+    // No gap: the spinner slides in on its own margins and a gap would leave a fixed offset behind.
     --#{$prefix}btn-gap: 0;
 
     position: relative;

@@ -6,8 +6,6 @@
     position: relative;
 
     &.show {
-      // The popup takes the focus away from the frame, but the control is
-      // still the one being operated — active treatment, no ring.
       @include form-control-group-active();
 
       // The chevron turns when the popup opens.
@@ -24,8 +22,6 @@
     inset-inline-start: 0;
     width: 100%;
     height: 100%;
-    // The group carries the frame padding and zeroes it on inner controls, so
-    // the overlay has to restate it or the ghost text starts at the frame edge.
     padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
     pointer-events: none;
     opacity: .5;

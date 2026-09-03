@@ -109,12 +109,6 @@ $form-multi-select-tokens: defaults(
     }
   }
 
-  // Multi Select has no input to ask, so the float is re-bound to the JS-managed
-  // `.form-multi-select-filled` on the component itself — the same shape the
-  // date input uses with `.form-date-time-filled`, and the only signal that
-  // covers search mode, where a single selection lives in the search input's
-  // placeholder attribute and the placeholder element never renders. The shared
-  // `.form-control-group` rules in forms/_floating-labels.scss cover the height.
   .form-floating > .form-multi-select {
     &:focus-within,
     &.form-multi-select-filled {
@@ -144,8 +138,6 @@ $form-multi-select-tokens: defaults(
     }
   }
 
-  // Label-first — the filled state is a class on the element itself, so both
-  // directions read it plainly.
   .form-floating > label:has(~ .form-multi-select:focus-within),
   .form-floating > label:has(~ .form-multi-select.form-multi-select-filled) {
     transform: var(--#{$prefix}form-floating-label-transform);

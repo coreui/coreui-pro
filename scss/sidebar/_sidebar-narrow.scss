@@ -96,9 +96,6 @@
 @layer utilities {
   .sidebar-narrow {
     @include media-breakpoint-up($mobile-breakpoint) {
-      // The brand pair is the canonical CoreUI sidebar markup — every admin
-      // template ships a full logo and a narrow signet side by side — so these
-      // two aliases stay despite being deprecated. They cost two selectors.
       .d-narrow-none,
       .sidebar-brand-full,
       .d-sidebar-narrow-none {

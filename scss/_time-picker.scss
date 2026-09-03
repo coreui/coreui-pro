@@ -67,15 +67,11 @@ $time-picker-tokens: defaults(
   .time-picker {
     position: relative;
 
-    // The popup takes the focus away from the group, but the control is still
-    // active — so the frame keeps its focus treatment while it is open.
     &.show {
       @include form-control-group-active();
     }
   }
 
-  // See .date-picker-popup: the panel owns its tokens so it survives being
-  // teleported or portaled away from the field.
   .time-picker-popup {
     @include tokens($time-picker-tokens);
   }
