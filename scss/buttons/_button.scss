@@ -55,10 +55,19 @@ $button-tokens: defaults(
     --#{$prefix}btn-line-height: var(--#{$prefix}btn-input-line-height),
     --#{$prefix}btn-white-space: $btn-white-space,
     --#{$prefix}btn-color: #{$btn-color},
+    --#{$prefix}btn-bg: #{$btn-bg},
     --#{$prefix}btn-border-width: var(--#{$prefix}btn-input-border-width),
     --#{$prefix}btn-border-color: transparent,
     --#{$prefix}btn-border-radius: var(--#{$prefix}btn-input-border-radius),
+    --#{$prefix}btn-hover-color: #{$btn-color},
+    --#{$prefix}btn-hover-bg: #{$btn-hover-bg},
     --#{$prefix}btn-hover-border-color: transparent,
+    --#{$prefix}btn-active-color: #{$btn-color},
+    --#{$prefix}btn-active-bg: #{$btn-hover-bg},
+    --#{$prefix}btn-active-border-color: transparent,
+    --#{$prefix}btn-disabled-color: #{$btn-color},
+    --#{$prefix}btn-disabled-bg: #{$btn-bg},
+    --#{$prefix}btn-disabled-border-color: transparent,
     --#{$prefix}btn-active-shadow: #{$btn-active-box-shadow},
     --#{$prefix}btn-disabled-opacity: var(--#{$prefix}btn-input-disabled-opacity),
     --#{$prefix}btn-transition-property: var(--#{$prefix}btn-input-action-transition-property),
@@ -265,7 +274,7 @@ $btn-check-deprecated: ".btn-check:not(#{$btn-variant-selectors})" !default;
     user-select: none;
     border: var(--#{$prefix}btn-border-width) solid var(--#{$prefix}btn-border-color);
     @include border-radius(var(--#{$prefix}btn-border-radius));
-    @include gradient-bg(var(--#{$prefix}btn-bg, #{$btn-bg}));
+    @include gradient-bg(var(--#{$prefix}btn-bg));
     @include transition-props(
       var(--#{$prefix}btn-transition-property),
       var(--#{$prefix}btn-transition-duration),
@@ -273,22 +282,22 @@ $btn-check-deprecated: ".btn-check:not(#{$btn-variant-selectors})" !default;
     );
 
     &:hover {
-      color: var(--#{$prefix}btn-hover-color, #{$btn-color});
+      color: var(--#{$prefix}btn-hover-color);
       // stylelint-disable-next-line scss/at-function-named-arguments
       text-decoration: if(sass($link-hover-decoration == underline): none);
-      background-color: var(--#{$prefix}btn-hover-bg, #{$btn-hover-bg});
+      background-color: var(--#{$prefix}btn-hover-bg);
       border-color: var(--#{$prefix}btn-hover-border-color);
     }
 
     &.btn-check:hover {
       color: var(--#{$prefix}btn-color);
-      background-color: var(--#{$prefix}btn-bg, #{$btn-bg});
+      background-color: var(--#{$prefix}btn-bg);
       border-color: var(--#{$prefix}btn-border-color);
     }
 
     &:focus-visible {
-      color: var(--#{$prefix}btn-hover-color, #{$btn-color});
-      @include gradient-bg(var(--#{$prefix}btn-hover-bg, #{$btn-hover-bg}));
+      color: var(--#{$prefix}btn-hover-color);
+      @include gradient-bg(var(--#{$prefix}btn-hover-bg));
       border-color: var(--#{$prefix}btn-hover-border-color);
       @include focus-ring(true);
     }
@@ -302,11 +311,11 @@ $btn-check-deprecated: ".btn-check:not(#{$btn-variant-selectors})" !default;
     &:active,
     &.active,
     &.show {
-      color: var(--#{$prefix}btn-active-color, #{$btn-color});
-      background-color: var(--#{$prefix}btn-active-bg, #{$btn-hover-bg});
+      color: var(--#{$prefix}btn-active-color);
+      background-color: var(--#{$prefix}btn-active-bg);
       // stylelint-disable-next-line scss/at-function-named-arguments
       background-image: if(sass($enable-gradients): none);
-      border-color: var(--#{$prefix}btn-active-border-color, transparent);
+      border-color: var(--#{$prefix}btn-active-border-color);
       @include box-shadow(var(--#{$prefix}btn-active-shadow));
 
       &:focus-visible {
@@ -321,12 +330,12 @@ $btn-check-deprecated: ".btn-check:not(#{$btn-variant-selectors})" !default;
     &:disabled,
     &.disabled,
     fieldset:disabled & {
-      color: var(--#{$prefix}btn-disabled-color, #{$btn-color});
+      color: var(--#{$prefix}btn-disabled-color);
       pointer-events: none;
-      background-color: var(--#{$prefix}btn-disabled-bg, #{$btn-bg});
+      background-color: var(--#{$prefix}btn-disabled-bg);
       // stylelint-disable-next-line scss/at-function-named-arguments
       background-image: if(sass($enable-gradients): none);
-      border-color: var(--#{$prefix}btn-disabled-border-color, transparent);
+      border-color: var(--#{$prefix}btn-disabled-border-color);
       opacity: var(--#{$prefix}btn-disabled-opacity);
       @include box-shadow(none);
     }
@@ -363,7 +372,7 @@ $btn-check-deprecated: ".btn-check:not(#{$btn-variant-selectors})" !default;
 
     + .btn:hover {
       color: var(--#{$prefix}btn-color);
-      background-color: var(--#{$prefix}btn-bg, #{$btn-bg});
+      background-color: var(--#{$prefix}btn-bg);
       border-color: var(--#{$prefix}btn-border-color);
     }
 
@@ -374,11 +383,11 @@ $btn-check-deprecated: ".btn-check:not(#{$btn-variant-selectors})" !default;
     }
 
     &:checked + .btn {
-      color: var(--#{$prefix}btn-active-color, #{$btn-color});
-      background-color: var(--#{$prefix}btn-active-bg, #{$btn-hover-bg});
+      color: var(--#{$prefix}btn-active-color);
+      background-color: var(--#{$prefix}btn-active-bg);
       // stylelint-disable-next-line scss/at-function-named-arguments
       background-image: if(sass($enable-gradients): none);
-      border-color: var(--#{$prefix}btn-active-border-color, transparent);
+      border-color: var(--#{$prefix}btn-active-border-color);
       @include box-shadow(var(--#{$prefix}btn-active-shadow));
     }
 
