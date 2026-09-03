@@ -43,6 +43,7 @@ $drawer-tokens: defaults(
     --#{$prefix}drawer-zindex: var(--#{$prefix}z-offcanvas),
     --#{$prefix}drawer-width: #{$drawer-width},
     --#{$prefix}drawer-height: #{$drawer-height},
+    --#{$prefix}drawer-sheet-width: #{$drawer-sheet-width},
     --#{$prefix}drawer-padding-x: #{$drawer-padding-x},
     --#{$prefix}drawer-padding-y: #{$drawer-padding-y},
     --#{$prefix}drawer-color: #{$drawer-color},
@@ -281,7 +282,7 @@ $drawer-tokens: defaults(
     border-end-end-radius: 0;
 
     @include media-breakpoint-up(lg) {
-      max-width: var(--#{$prefix}drawer-sheet-width, #{$drawer-sheet-width});
+      max-width: var(--#{$prefix}drawer-sheet-width);
     }
   }
 
