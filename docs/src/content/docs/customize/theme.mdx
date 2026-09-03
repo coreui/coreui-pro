@@ -26,7 +26,7 @@ From this one map the library generates:
 | `danger` | `#e55353` | Destructive actions and error states |
 | `inverse` | `light-dark(var(--cui-gray-900), var(--cui-gray-100))` | Surfaces that flip against the page, e.g. a dark bar on a light page |
 
-Each base value is a standalone Sass variable (`$primary`, `$danger`, …) feeding the `base` slot of its entry, so overriding the one variable retints the whole family. `secondary` and `inverse` are `light-dark()` pairs rather than fixed hexes, so they follow the color mode on their own.
+`primary`, `success`, `info`, `warning` and `danger` take their base from the palette, so overriding `$primary` — or the `--cui-primary` token at run time — retints the whole family. `secondary` and `inverse` are `light-dark()` pairs of gray tokens rather than a hue of their own, so they follow the color mode and carry no scale; they keep a `base` slot in the map.
 
 ## Color slots
 
