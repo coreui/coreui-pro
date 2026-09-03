@@ -13,7 +13,7 @@ Here are the variables we include (note that the `:root, :host` selector is requ
 
 `:host` is there so the tokens also land when our CSS is loaded inside a shadow root — `:root` matches the document, never a shadow tree, so without it every global token would be unset in a web component.
 
-<ScssDocs file="scss/_root.scss" capture="root-body-variables" />
+<Code lang="css" filePath="dist/css/coreui.css" fileMatch=":root[^{}]*\{[^{}]*\}" fullHeight />
 
 ### Dark mode
 
