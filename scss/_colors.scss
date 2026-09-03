@@ -96,11 +96,7 @@ $colors: defaults(
     "success":    $success,
     "info":       $info,
     "warning":    $warning,
-    "danger":     $danger,
-    "black":      $black,
-    "white":      $white,
-    "gray":       $gray-600,
-    "gray-dark":  $gray-800
+    "danger":     $danger
   ),
   $colors
 );
@@ -146,13 +142,6 @@ $color-shades: defaults(
 );
 // scss-docs-end color-scale-maps
 
-// The palette colors that get a scale. `black` and `white` are the ends the
-// scale mixes towards, and `gray`/`gray-dark` are aliases of `$grays` stops that
-// carry their own.
-// scss-docs-start palette-scales-map
-$palette-scales: map.remove($colors, "black", "white", "gray", "gray-dark") !default;
-// scss-docs-end palette-scales-map
-
 // The palette: the base colours, the grays, and their scales. The theme colour
 // system built on top of them lives in _theme.scss.
 // scss-docs-start color-tokens
@@ -160,15 +149,13 @@ $color-tokens: () !default;
 
 $-color-defaults: () !default;
 
-@each $color, $value in $colors {
-  $-color-defaults: map.set($-color-defaults, --#{$prefix}#{$color}, $value);
-}
-
 @each $color, $value in $grays {
   $-color-defaults: map.set($-color-defaults, --#{$prefix}gray-#{$color}, $value);
 }
 
-@each $color, $value in $palette-scales {
+@each $color, $value in $colors {
+  $-color-defaults: map.set($-color-defaults, --#{$prefix}#{$color}, $value);
+
   @each $stop, $weight in $color-tints {
     $-color-defaults: map.set($-color-defaults, --#{$prefix}#{$color}-#{$stop}, color-mix(in $color-mix-space, $tint-color $weight, var(--#{$prefix}#{$color})));
   }

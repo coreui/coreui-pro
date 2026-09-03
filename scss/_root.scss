@@ -196,6 +196,8 @@ $root-token-defaults: map.set($root-token-defaults, --#{$prefix}radius-pill, 50r
 $root-token-defaults: map.merge(
   $root-token-defaults,
   (
+    --#{$prefix}black: $black,
+    --#{$prefix}white: $white,
     --#{$prefix}font-sans-serif: meta.inspect($font-family-sans-serif),
     --#{$prefix}font-monospace: meta.inspect($font-family-monospace),
     --#{$prefix}gradient: $gradient,

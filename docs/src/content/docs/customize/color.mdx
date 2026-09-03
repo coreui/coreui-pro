@@ -411,12 +411,6 @@ every theme color gets a 100–900 scale of `color-mix()` custom properties on
 or `--cui-primary` and the whole family follows, in both color schemes. See
 [the theme colors page](/customize/theme/).
 
-Which palette colors get a scale is a map of its own: `$black` and `$white` are
-the ends the mix runs towards, and `$gray` / `$gray-dark` are aliases of `$grays`
-stops that carry their own.
-
-<ScssDocs file="scss/_colors.scss" capture="palette-scales-map" />
-
 `tint-color()` and `shade-color()` still exist in `scss/functions/_color.scss` for
 Sass-side blending. They use `mix()`, which is not the same as `lighten()` and
 `darken()`: the former blends the color with white or black, the latter only
