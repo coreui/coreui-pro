@@ -2214,6 +2214,13 @@ single place to retune what "filled with the theme colour" means without
 touching the base colour that text and borders derive from. (The `secondary`
 colour's slot takes over the name of the former surface alias — see the
 ladder entry above.)
+- **A `.theme-*` class reads the colour's `-bg` slot, not its base.**
+  `--cui-theme-bg` is `var(--cui-danger-bg)` now (was `var(--cui-danger)`),
+  so overriding `--cui-danger-bg` retunes every checked, active and filled
+  state under the class, as the colour slots page describes. The trade-off:
+  `--cui-danger-bg` resolves on `:root`, so a `--cui-danger` override on a
+  single element no longer reaches the theme class on it — override the
+  colour on `:root`, or set `--cui-danger-bg` on the element.
 
 #### Colour decisions are written, not computed
 
