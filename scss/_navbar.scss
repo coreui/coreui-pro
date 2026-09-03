@@ -112,15 +112,18 @@ $navbar-nav-tokens: () !default;
 
 // scss-docs-start navbar-nav-css-vars
 $navbar-nav-tokens: defaults(
-  (
-    --#{$prefix}nav-gap: #{$navbar-nav-gap},
-    --#{$prefix}nav-link-padding-x: 0,
-    --#{$prefix}nav-link-padding-y: #{$nav-link-padding-y},
-    --#{$prefix}nav-link-font-size: #{$nav-link-font-size},
-    --#{$prefix}nav-link-font-weight: #{$nav-link-font-weight},
-    --#{$prefix}nav-link-color: var(--#{$prefix}navbar-color),
-    --#{$prefix}nav-link-hover-color: var(--#{$prefix}navbar-hover-color),
-    --#{$prefix}nav-link-disabled-color: var(--#{$prefix}navbar-disabled-color),
+  map.merge(
+    $nav-tokens,
+    (
+      --#{$prefix}nav-gap: #{$navbar-nav-gap},
+      --#{$prefix}nav-link-padding-x: 0,
+      --#{$prefix}nav-link-color: var(--#{$prefix}navbar-color),
+      --#{$prefix}nav-link-hover-color: var(--#{$prefix}navbar-hover-color),
+      --#{$prefix}nav-link-hover-bg: transparent,
+      --#{$prefix}nav-link-active-color: var(--#{$prefix}navbar-active-color),
+      --#{$prefix}nav-link-active-bg: transparent,
+      --#{$prefix}nav-link-disabled-color: var(--#{$prefix}navbar-disabled-color),
+    )
   ),
   $navbar-nav-tokens
 );

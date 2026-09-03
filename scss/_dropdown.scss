@@ -259,8 +259,9 @@ $dropdown-dark-tokens: defaults(
     }
   }
 
-  // In a button the caret is a flex item, so the gap already sets it apart.
-  .btn.dropdown-toggle {
+  // In a button and a nav link the caret is a flex item, so the gap already sets it apart.
+  .btn.dropdown-toggle,
+  .nav-link.dropdown-toggle {
     &::after,
     &::before {
       margin-inline: 0;
