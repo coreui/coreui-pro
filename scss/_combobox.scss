@@ -147,7 +147,7 @@ $combobox-tokens: defaults(
 
     &:focus-visible {
       z-index: 5;
-      border-color: var(--#{$prefix}input-focus-border-color, var(--#{$prefix}btn-input-focus-border-color));
+      border-color: var(--#{$prefix}btn-input-focus-border-color);
       @include focus-ring(true);
     }
   }
@@ -180,7 +180,7 @@ $combobox-tokens: defaults(
 
     &:focus-visible {
       z-index: 5;
-      border-color: var(--#{$prefix}input-focus-border-color, var(--#{$prefix}btn-input-focus-border-color));
+      border-color: var(--#{$prefix}btn-input-focus-border-color);
       @include focus-ring(true);
     }
 
@@ -222,7 +222,7 @@ $combobox-tokens: defaults(
 
       &:focus-visible {
         z-index: 5;
-        border-color: var(--#{$prefix}input-focus-border-color, var(--#{$prefix}btn-input-focus-border-color));
+        border-color: var(--#{$prefix}btn-input-focus-border-color);
         @include focus-ring(true);
       }
     }

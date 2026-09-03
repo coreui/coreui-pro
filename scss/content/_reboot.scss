@@ -470,7 +470,7 @@ $th-font-weight:       null !default;
   caption {
     padding-top: $caption-padding-y;
     padding-bottom: $caption-padding-y;
-    color: var(--#{$prefix}table-caption-color, #{$caption-color});
+    color: $caption-color;
     text-align: start;
   }
 

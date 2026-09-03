@@ -3234,7 +3234,12 @@ Nothing existing changes; these are additions. See
   `--cui-chip-input-padding-x` and the rest of their frame sets are now
   `--cui-control-*` on the same elements. Runtime overrides written against
   the old names must be updated. Component-specific tokens (indicators,
-  dropdowns, tags, cells, cleaner buttons) keep their names.
+  dropdowns, tags, cells, cleaner buttons) keep their names. Three v5 names
+  that survived as undeclared fallbacks are gone too:
+  `--cui-input-placeholder-color` (set `--cui-control-placeholder-color`),
+  `--cui-input-focus-border-color` in the combobox (set
+  `--cui-btn-input-focus-border-color`) and `--cui-table-caption-color` (the
+  caption reads `$caption-color`).
 - **Component Sass variables survive with new defaults**: `$date-picker-bg`,
   `$autocomplete-padding-y` and the rest now default to the shared knob
   (`var(--cui-btn-input-bg)` …). Untouched, the control follows the shared
