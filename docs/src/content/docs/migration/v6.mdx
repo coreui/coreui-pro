@@ -2352,6 +2352,13 @@ them. A state names a theme colour now, and every value is a slot of it.
 - **`form-validation-state()` takes `$theme` where it took `$color`**, and the
   variables moved from `scss/_config.scss` into the partials that use them
   alongside `$form-text-*` and `$form-feedback-*`.
+- **The validation tooltip is opaque and sits on the state's `-bg` slot.**
+  It was `color-mix(in srgb, var(--cui-danger) 90%, transparent)`, with the
+  percentage frozen at build time from `$form-feedback-tooltip-opacity`. It
+  reads `var(--cui-danger-bg)` (`-success-bg`, or your state's `-bg`) now,
+  the same slot the alert and the badge use, so it follows a theme override
+  with them. `$form-feedback-tooltip-opacity` is removed; for a translucent
+  tooltip set `background-color` on `.invalid-tooltip` / `.valid-tooltip`.
 
 #### `$component-active-color` and `$component-active-bg` are removed
 
