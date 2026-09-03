@@ -24,7 +24,7 @@ $gray-800:  oklch(34.739% 0.02847 262.9) !default;
 $gray-900:  oklch(26.859% 0.02181 265.78) !default;
 $gray-950:  oklch(20.911% 0.01467 266.87) !default;
 $gray-975:  oklch(17.622% 0.00959 255.65) !default;
-$black:     oklch(14.326% 0.00565 246.44) !default;
+$black:     #000 !default;
 // scss-docs-end gray-color-variables
 
 // fusv-disable
@@ -112,12 +112,10 @@ $colors: defaults(
 // `color-mix()` against the color's own token, so overriding the token retints
 // the whole scale in the browser.
 
-// The ends drop their hue: `oklch` interpolates hue, and our black carries a
-// residual blue cast, so mixing towards it rotates every shade towards blue.
 // scss-docs-start color-scale-variables
 $color-mix-space: oklch !default;
-$tint-color:      oklch(from var(--#{$prefix}white) l 0 none) !default;
-$shade-color:     oklch(from var(--#{$prefix}black) l 0 none) !default;
+$tint-color:      var(--#{$prefix}white) !default;
+$shade-color:     var(--#{$prefix}black) !default;
 // scss-docs-end color-scale-variables
 
 // scss-docs-start color-scale-maps
