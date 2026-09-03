@@ -47,7 +47,7 @@ $calendar-cell-hover-bg:                     var(--#{$prefix}bg-3) !default;
 $calendar-cell-disabled-color:               var(--#{$prefix}fg-3) !default;
 
 
-$calendar-cell-selected-color:               var(--#{$prefix}white) !default;
+$calendar-cell-selected-color:               var(--#{$prefix}primary-contrast) !default;
 $calendar-cell-selected-bg:                  var(--#{$prefix}primary) !default;
 
 $calendar-cell-range-bg:                     color-mix(in srgb, var(--#{$prefix}primary) 12.5%, transparent) !default;
@@ -271,8 +271,8 @@ $calendar-tokens: defaults(
         width: 100%;
         height: 100%;
         content: "";
-        border-block-start: 1px dashed var(--#{$prefix}calendar-cell-selected-bg);
-        border-block-end: 1px dashed var(--#{$prefix}calendar-cell-selected-bg);
+        border-block-start: var(--#{$prefix}border-width) dashed var(--#{$prefix}calendar-cell-range-hover-border-color);
+        border-block-end: var(--#{$prefix}border-width) dashed var(--#{$prefix}calendar-cell-range-hover-border-color);
         @include border-radius(0);
       }
     }
@@ -311,13 +311,13 @@ $calendar-tokens: defaults(
     &.range-hover:first-of-type,
     &:not(.range-hover) + &.range-hover {
       .calendar-cell-inner::before {
-        border-inline-start: 1px dashed var(--#{$prefix}calendar-cell-selected-bg);
+        border-inline-start: var(--#{$prefix}border-width) dashed var(--#{$prefix}calendar-cell-range-hover-border-color);
         @include border-start-radius($border-radius);
       }
     }
 
     &.range-hover:not(:has(~ .range-hover)) .calendar-cell-inner::before {
-      border-inline-end: 1px dashed var(--#{$prefix}calendar-cell-selected-bg);
+      border-inline-end: var(--#{$prefix}border-width) dashed var(--#{$prefix}calendar-cell-range-hover-border-color);
       @include border-end-radius($border-radius);
     }
 
@@ -331,7 +331,7 @@ $calendar-tokens: defaults(
       }
 
       &:nth-last-child(1 of .range-hover) .calendar-cell-inner::before {
-        border-inline-end: 1px dashed var(--#{$prefix}calendar-cell-selected-bg);
+        border-inline-end: var(--#{$prefix}border-width) dashed var(--#{$prefix}calendar-cell-range-hover-border-color);
         @include border-end-radius($border-radius);
       }
     }
@@ -383,11 +383,11 @@ $calendar-tokens: defaults(
     }
 
     &.range-hover .calendar-cell:first-of-type .calendar-cell-inner::before {
-      border-inline-start: 1px dashed var(--#{$prefix}calendar-cell-selected-bg);
+      border-inline-start: var(--#{$prefix}border-width) dashed var(--#{$prefix}calendar-cell-range-hover-border-color);
     }
 
     &.range-hover .calendar-cell:last-of-type .calendar-cell-inner::before {
-      border-inline-end: 1px dashed var(--#{$prefix}calendar-cell-selected-bg);
+      border-inline-end: var(--#{$prefix}border-width) dashed var(--#{$prefix}calendar-cell-range-hover-border-color);
     }
 
     &:focus-visible {
