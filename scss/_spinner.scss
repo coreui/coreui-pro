@@ -15,7 +15,7 @@ $spinner-grow-animation-timing-function:   ease-in-out !default;
 $spinner-width-sm:                         .75em !default;
 $spinner-height-sm:                        $spinner-width-sm !default;
 
-$spinner-reduced-motion-animation-speed:   $spinner-animation-speed * 1.5 !default;
+$spinner-reduced-motion-animation-speed:   1.5s !default;
 // scss-docs-end spinner-variables
 
 $spinner-border-tokens: () !default;
