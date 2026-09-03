@@ -42,6 +42,9 @@ $enable-deprecated-form-check: true !default;
 $enable-deprecated-classes:   true !default;
 $enable-dark-mode:            true !default;
 $color-mode-type:             data !default; // `data` or `media-query`
+$color-contrast-dark:         #000 !default;
+$color-contrast-light:        #fff !default;
+$min-contrast-ratio:          4.5 !default;
 
 // Prefix for data attributes
 

@@ -1,27 +1,22 @@
 @use "sass:map";
 @use "functions/maps" as *;
 @use "mixins/tokens" as *;
-@use "colors" as *;
 @use "config" as *;
 
-// scss-docs-start theme-color-variables
-$primary:       #5856d6 !default;
+// The two theme colours built from the grays rather than from a hue of their
+// own. The rest are palette colours; scss/_colors.scss holds them.
+// scss-docs-start theme-neutral-variables
 $secondary:     light-dark(var(--#{$prefix}gray-100), var(--#{$prefix}gray-600)) !default;
-$success:       #1b9e3e !default;
-$info:          #39f !default;
-$warning:       #f9b115 !default;
-$danger:        #e55353 !default;
 $inverse:       light-dark(var(--#{$prefix}gray-900), var(--#{$prefix}gray-100)) !default;
-// scss-docs-end theme-color-variables
+// scss-docs-end theme-neutral-variables
 
-$link-color:    $primary !default;
+$link-color:    var(--#{$prefix}primary) !default;
 
 
 // scss-docs-start theme-colors-map
 $theme-colors: (
   "primary": (
-    "base":          $primary,
-    "contrast":      $white,
+    "contrast":      var(--#{$prefix}white),
     "fg":            light-dark(var(--#{$prefix}primary-600), var(--#{$prefix}primary-400)),
     "fg-emphasis":   light-dark(var(--#{$prefix}primary-800), var(--#{$prefix}primary-200)),
     "bg-subtle":     light-dark(var(--#{$prefix}primary-100), var(--#{$prefix}primary-900)),
@@ -40,8 +35,7 @@ $theme-colors: (
     "focus-ring":    color-mix(in srgb, light-dark(var(--#{$prefix}gray-500), var(--#{$prefix}gray-300)) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
   ),
   "success": (
-    "base":          $success,
-    "contrast":      $black,
+    "contrast":      var(--#{$prefix}black),
     "fg":            light-dark(var(--#{$prefix}success-600), var(--#{$prefix}success-400)),
     "fg-emphasis":   light-dark(var(--#{$prefix}success-800), var(--#{$prefix}success-200)),
     "bg-subtle":     light-dark(var(--#{$prefix}success-100), var(--#{$prefix}success-900)),
@@ -50,8 +44,7 @@ $theme-colors: (
     "focus-ring":    color-mix(in srgb, var(--#{$prefix}success) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
   ),
   "info": (
-    "base":          $info,
-    "contrast":      $black,
+    "contrast":      var(--#{$prefix}black),
     "fg":            light-dark(var(--#{$prefix}info-700), var(--#{$prefix}info-300)),
     "fg-emphasis":   light-dark(var(--#{$prefix}info-800), var(--#{$prefix}info-200)),
     "bg-subtle":     light-dark(var(--#{$prefix}info-100), var(--#{$prefix}info-900)),
@@ -60,8 +53,7 @@ $theme-colors: (
     "focus-ring":    color-mix(in srgb, var(--#{$prefix}info) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
   ),
   "warning": (
-    "base":          $warning,
-    "contrast":      $black,
+    "contrast":      var(--#{$prefix}black),
     "fg":            light-dark(var(--#{$prefix}warning-700), var(--#{$prefix}warning-300)),
     "fg-emphasis":   light-dark(var(--#{$prefix}warning-800), var(--#{$prefix}warning-200)),
     "bg-subtle":     light-dark(var(--#{$prefix}warning-100), var(--#{$prefix}warning-900)),
@@ -70,8 +62,7 @@ $theme-colors: (
     "focus-ring":    color-mix(in srgb, var(--#{$prefix}warning) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
   ),
   "danger": (
-    "base":          $danger,
-    "contrast":      $black,
+    "contrast":      var(--#{$prefix}black),
     "fg":            light-dark(var(--#{$prefix}danger-600), var(--#{$prefix}danger-400)),
     "fg-emphasis":   light-dark(var(--#{$prefix}danger-800), var(--#{$prefix}danger-200)),
     "bg-subtle":     light-dark(var(--#{$prefix}danger-100), var(--#{$prefix}danger-900)),
@@ -95,11 +86,10 @@ $theme-colors: (
 
 // Color scales
 //
-// Every theme color gets a 100–900 scale of `color-mix()` tokens in `:root`,
-// mixed at runtime from the color's own token. Override `--#{$prefix}primary`
-// (or `$primary`) and the whole family — subtle backgrounds, borders, emphasis
-// text — follows, in both color schemes. The stops and the mixing space live in
-// `scss/_colors.scss`, with the palette that uses the same generator.
+// The 100–900 scales come from the palette in `scss/_colors.scss`, mixed at
+// runtime from each color's own token. Override `--#{$prefix}primary` (or
+// `$primary`) and the whole family — subtle backgrounds, borders, emphasis text
+// — follows, in both color schemes.
 
 // The families below read the scales through `light-dark()`, so a theme color
 // reads correctly in both schemes without a second set of variables. `secondary`
@@ -230,7 +220,9 @@ $theme-state-colors: (
   $tokens: ();
 
   @each $color, $slots in $theme-colors {
-    $tokens: map.set($tokens, --#{$prefix}#{$color}, map.get($slots, "base"));
+    @if map.has-key($slots, "base") {
+      $tokens: map.set($tokens, --#{$prefix}#{$color}, map.get($slots, "base"));
+    }
     $tokens: map.set($tokens, --#{$prefix}#{$color}-base, var(--#{$prefix}#{$color}));
   }
 
@@ -238,13 +230,6 @@ $theme-state-colors: (
   // Points at the base color, so overriding either retunes every action state.
   @each $color in map.keys($theme-colors) {
     $tokens: map.set($tokens, --#{$prefix}#{$color}-bg, var(--#{$prefix}#{$color}));
-  }
-
-  // A 100-900 scale per theme color, on the same generator the palette uses. The
-  // subtle backgrounds, borders and emphasis text below are `light-dark()` pairs
-  // of these stops.
-  @each $color, $slots in $theme-colors {
-    $tokens: map.merge($tokens, color-scale-tokens($color));
   }
 
   @each $color, $value in $theme-colors-fg-emphasis {

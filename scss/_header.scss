@@ -32,7 +32,7 @@ $header-brand-padding-y:        calc((#{$nav-link-height} - #{$header-brand-heig
 $header-brand-margin-end:       1rem !default;
 $header-brand-font-size:        var(--#{$prefix}font-size-lg) !default;
 $header-brand-color:            var(--#{$prefix}gray-900) !default;
-$header-brand-hover-color:      shade-color($gray-900, 10%) !default;
+$header-brand-hover-color:      color-mix(in $color-mix-space, var(--#{$prefix}black) 10%, var(--#{$prefix}gray-900)) !default;
 
 $header-toggler-padding-y:      .25rem !default;
 $header-toggler-padding-x:      .75rem !default;

@@ -121,21 +121,21 @@ $input-btn-padding-x-lg:      1rem !default;
 $input-btn-font-size-lg:      var(--#{$prefix}font-size-lg) !default;
 // scss-docs-end input-btn-variables
 
-$code-color: light-dark($pink, tint-color($pink, 40%)) !default;
+$code-color: light-dark(var(--#{$prefix}pink), var(--#{$prefix}pink-300)) !default;
 
-// `colors` and `config` are reserved and empty, matching upstream's declaration:
-// two slots below `root` for a palette or a configuration sheet of your own, so
-// yours loses to nothing but still beats the library. `custom` is the same idea
+// `config` is reserved and empty, matching upstream's declaration: a slot below
+// `root` for a configuration sheet of your own. `custom` is the same idea
 // between components and helpers.
 $root-tokens: () !default;
 
 // stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
-// Everything the library declares on the root, assembled as one map and emitted
-// with a single `tokens()` call. Building it here rather than writing the
-// declarations inside `:root` keeps the rule a list of values instead of a mix
-// of declarations and loops, and gives the whole set one override point.
-$root-token-defaults: map.merge(color-tokens(), theme-color-tokens());
+// Everything the library declares on the root beyond the palette, assembled as
+// one map and emitted with a single `tokens()` call. Building it here rather
+// than writing the declarations inside `:root` keeps the rule a list of values
+// instead of a mix of declarations and loops, and gives the whole set one
+// override point.
+$root-token-defaults: theme-color-tokens();
 
 // Fonts
 //
@@ -196,6 +196,8 @@ $root-token-defaults: map.set($root-token-defaults, --#{$prefix}radius-pill, 50r
 $root-token-defaults: map.merge(
   $root-token-defaults,
   (
+    --#{$prefix}black: $black,
+    --#{$prefix}white: $white,
     --#{$prefix}font-sans-serif: meta.inspect($font-family-sans-serif),
     --#{$prefix}font-monospace: meta.inspect($font-family-monospace),
     --#{$prefix}gradient: $gradient,

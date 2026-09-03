@@ -1,4 +1,4 @@
-@use "../colors" as *;
+@use "../config" as *;
 @use "contrast-ratio" as *;
 
 // Color contrast
@@ -6,7 +6,7 @@
 
 // scss-docs-start color-contrast-function
 @function color-contrast($background, $color-contrast-dark: $color-contrast-dark, $color-contrast-light: $color-contrast-light, $min-contrast-ratio: $min-contrast-ratio) {
-  $foregrounds: $color-contrast-light, $color-contrast-dark, $white, $black;
+  $foregrounds: $color-contrast-light, $color-contrast-dark, #fff, #000;
   $max-ratio: 0;
   $max-ratio-color: null;
 
