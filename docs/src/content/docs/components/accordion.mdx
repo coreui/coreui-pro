@@ -240,9 +240,9 @@ Everything composes with it: in an exclusive accordion the browser closes the pr
 
 <AddedIn version="6.0.0" />
 
-The chevron is drawn by the header itself, from the `--cui-accordion-btn-icon` custom property, and rotated by `--cui-accordion-btn-icon-transform` while the item is open. Point the property at your own URL-escaped SVG to change it everywhere. The example takes `cil-chevron-right` from [CoreUI Icons](https://coreui.io/icons/) and turns it a quarter clockwise when the item opens.
+The chevron is drawn by the header itself, from the `--cui-accordion-header-icon` custom property, and rotated by `--cui-accordion-header-icon-transform` while the item is open. Point the property at your own URL-escaped SVG to change it everywhere. The example takes `cil-chevron-right` from [CoreUI Icons](https://coreui.io/icons/) and turns it a quarter clockwise when the item opens.
 
-<Example code={`<div class="accordion" style="--cui-accordion-btn-icon: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%23000' d='m183.505 496-97.268-97.27 143.175-143.174L86.237 112.38l97.268-97.27 143.227 143.228 11.316 11.209 85.9 85.9.051.05-11.311 11.419-85.9 85.9-.055-.054Zm-52.013-97.27 52.013 52.014L326.629 307.62l.055.054 52.116-52.118-52.127-52.128-11.308-11.2-131.86-131.862-52.013 52.014 143.175 143.176Z'/%3E%3C/svg%3E&quot;); --cui-accordion-btn-icon-transform: rotate(90deg);">
+<Example code={`<div class="accordion" style="--cui-accordion-header-icon: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%23000' d='m183.505 496-97.268-97.27 143.175-143.174L86.237 112.38l97.268-97.27 143.227 143.228 11.316 11.209 85.9 85.9.051.05-11.311 11.419-85.9 85.9-.055-.054Zm-52.013-97.27 52.013 52.014L326.629 307.62l.055.054 52.116-52.118-52.127-52.128-11.308-11.2-131.86-131.862-52.013 52.014 143.175 143.176Z'/%3E%3C/svg%3E&quot;); --cui-accordion-header-icon-transform: rotate(90deg);">
     <details class="accordion-item" name="accordionIconToken" open>
       <summary class="accordion-header">Accordion Item #1</summary>
       <div class="accordion-body">The icon comes from the custom property, so no item carries markup for it.</div>
@@ -293,9 +293,9 @@ An inline `<svg>` goes in the same slot, and nothing about it has to be URL esca
 
 ### A different icon when open
 
-A plus that becomes a minus is a swap, not a rotation. Set `--cui-accordion-btn-active-icon` to the open-state shape and turn the rotation off:
+A plus that becomes a minus is a swap, not a rotation. Set `--cui-accordion-header-active-icon` to the open-state shape and turn the rotation off:
 
-<Example code={`<div class="accordion" style="--cui-accordion-btn-icon: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%23000' d='M440 240H272V72h-32v168H72v32h168v168h32V272h168z'/%3E%3C/svg%3E&quot;); --cui-accordion-btn-active-icon: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%23000' d='M72 240h368v32H72z'/%3E%3C/svg%3E&quot;); --cui-accordion-btn-icon-transform: none;">
+<Example code={`<div class="accordion" style="--cui-accordion-header-icon: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%23000' d='M440 240H272V72h-32v168H72v32h168v168h32V272h168z'/%3E%3C/svg%3E&quot;); --cui-accordion-header-active-icon: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%23000' d='M72 240h368v32H72z'/%3E%3C/svg%3E&quot;); --cui-accordion-header-icon-transform: none;">
     <details class="accordion-item" name="accordionIconPair" open>
       <summary class="accordion-header">Accordion Item #1</summary>
       <div class="accordion-body">Placeholder content for the first accordion item.</div>
