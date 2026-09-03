@@ -34,16 +34,16 @@ Navbars come with built-in support for a handful of sub-components. Choose from 
 - `.collapse.navbar-collapse` for grouping and hiding navbar contents by a parent breakpoint.
 - Add an optional `.navbar-nav-scroll` to set a `max-height` and [scroll expanded navbar content](#scrolling).
 
-Here's an example of all the sub-components included in a responsive light-themed navbar that automatically collapses at the `lg` (large) breakpoint.
+Here's an example of all the sub-components included in a responsive light-themed navbar that automatically collapses at the `sm` (small) breakpoint. The examples on this page use `sm` because a navbar expands by its own width, not the window's (see [responsive behaviors](#responsive-behaviors)), and the demo box is narrower than `lg`; on a full-width page you will usually reach for `.navbar-expand-lg`.
 
-<Example code={`<nav class="navbar navbar-expand-lg bg-3">
+<Example code={`<nav class="navbar navbar-expand-sm bg-3">
     <div class="container-fluid">
       <a class="navbar-brand" href="#">Navbar</a>
       <button class="navbar-toggler" type="button" data-coreui-toggle="collapse" data-coreui-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <ul class="navbar-nav me-auto mb-2 mb-sm-0">
           <li class="nav-item">
             <a class="nav-link active" aria-current="page" href="#">Home</a>
           </li>
@@ -73,7 +73,7 @@ Here's an example of all the sub-components included in a responsive light-theme
     </div>
   </nav>`} />
 
-This example uses [background](/utilities/background/) (`bg-3"`) and [spacing](/utilities/margin/) (`me-auto`, `mb-2`, `mb-lg-0`, `me-2`) utility classes.
+This example uses [background](/utilities/background/) (`bg-3"`) and [spacing](/utilities/margin/) (`me-auto`, `mb-2`, `mb-sm-0`, `me-2`) utility classes.
 
 ### Brand
 
@@ -130,7 +130,7 @@ Add the `.active` class on `.nav-link` to indicate the current page.
 
 Please note that you should also add the `aria-current` attribute on the active `.nav-link`.
 
-<Example code={`<nav class="navbar navbar-expand-lg bg-3">
+<Example code={`<nav class="navbar navbar-expand-sm bg-3">
     <div class="container-fluid">
       <a class="navbar-brand" href="#">Navbar</a>
       <button class="navbar-toggler" type="button" data-coreui-toggle="collapse" data-coreui-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -157,7 +157,7 @@ Please note that you should also add the `aria-current` attribute on the active 
 
 And because we use classes for our navs, you can avoid the list-based approach entirely if you like.
 
-<Example code={`<nav class="navbar navbar-expand-lg bg-3">
+<Example code={`<nav class="navbar navbar-expand-sm bg-3">
     <div class="container-fluid">
       <a class="navbar-brand" href="#">Navbar</a>
       <button class="navbar-toggler" type="button" data-coreui-toggle="collapse" data-coreui-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
@@ -176,7 +176,7 @@ And because we use classes for our navs, you can avoid the list-based approach e
 
 You can also use dropdowns in your navbar. Dropdown menus require a wrapping element for positioning, so be sure to use separate and nested elements for `.nav-item` and `.nav-link` as shown below.
 
-<Example code={`<nav class="navbar navbar-expand-lg bg-3">
+<Example code={`<nav class="navbar navbar-expand-sm bg-3">
     <div class="container-fluid">
       <a class="navbar-brand" href="#">Navbar</a>
       <button class="navbar-toggler" type="button" data-coreui-toggle="collapse" data-coreui-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
@@ -267,14 +267,14 @@ Navbars may contain bits of text with the help of `.navbar-text`. This class adj
 
 Mix and match with other components and utilities as needed.
 
-<Example code={`<nav class="navbar navbar-expand-lg bg-3">
+<Example code={`<nav class="navbar navbar-expand-sm bg-3">
     <div class="container-fluid">
       <a class="navbar-brand" href="#">Navbar w/ text</a>
       <button class="navbar-toggler" type="button" data-coreui-toggle="collapse" data-coreui-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarText">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <ul class="navbar-nav me-auto mb-2 mb-sm-0">
           <li class="nav-item">
             <a class="nav-link active" aria-current="page" href="#">Home</a>
           </li>
@@ -300,7 +300,7 @@ Prefer `data-coreui-theme="dark"` over `.navbar-dark`: it sets a component-speci
 
 Navbar themes are easier than ever thanks to CoreUI for Bootstrap's combination of Sass and CSS variables. The default is our "light navbar" for use with light background colors, but you can also apply `data-coreui-theme="dark"` for dark background colors. Then, customize with `.bg-*` utilities.
 
-<Example html={[`<nav class="navbar navbar-expand-lg bg-3 border-bottom" data-coreui-theme="dark">`, `  <div class="container-fluid">`, `    <a class="navbar-brand" href="#">Navbar</a>`, `    <button class="navbar-toggler" type="button" data-coreui-toggle="collapse" data-coreui-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">`, `      <span class="navbar-toggler-icon"></span>`, `    </button>`, `    <div class="collapse navbar-collapse" id="navbarColor01">`, `      <ul class="navbar-nav me-auto mb-2 mb-lg-0">`, `        <li class="nav-item">`, `          <a class="nav-link active" aria-current="page" href="#">Home</a>`, `        </li>`, `        <li class="nav-item">`, `          <a class="nav-link" href="#">Features</a>`, `        </li>`, `        <li class="nav-item">`, `          <a class="nav-link" href="#">Pricing</a>`, `        </li>`, `        <li class="nav-item">`, `          <a class="nav-link" href="#">About</a>`, `        </li>`, `      </ul>`, `      <form class="d-flex" role="search">`, `        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">`, `        <button class="btn-outline theme-inverse" type="submit">Search</button>`, `      </form>`, `  </div>`, `  </div>`, `</nav>`, ``, `<nav class="navbar navbar-expand-lg bg-primary" data-coreui-theme="dark">`, `  <div class="container-fluid">`, `    <a class="navbar-brand" href="#">Navbar</a>`, `    <button class="navbar-toggler" type="button" data-coreui-toggle="collapse" data-coreui-target="#navbarColor02" aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">`, `      <span class="navbar-toggler-icon"></span>`, `    </button>`, `    <div class="collapse navbar-collapse" id="navbarColor02">`, `      <ul class="navbar-nav me-auto mb-2 mb-lg-0">`, `        <li class="nav-item">`, `          <a class="nav-link active" aria-current="page" href="#">Home</a>`, `        </li>`, `        <li class="nav-item">`, `          <a class="nav-link" href="#">Features</a>`, `        </li>`, `        <li class="nav-item">`, `          <a class="nav-link" href="#">Pricing</a>`, `        </li>`, `        <li class="nav-item">`, `          <a class="nav-link" href="#">About</a>`, `        </li>`, `      </ul>`, `      <form class="d-flex" role="search">`, `        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">`, `        <button class="btn-outline theme-inverse" type="submit">Search</button>`, `      </form>`, `  </div>`, `    </div>`, `</nav>`, ``, `<nav class="navbar navbar-expand-lg" style="background-color: #e3f2fd;" data-coreui-theme="light">`, `  <div class="container-fluid">`, `    <a class="navbar-brand" href="#">Navbar</a>`, `    <button class="navbar-toggler" type="button" data-coreui-toggle="collapse" data-coreui-target="#navbarColor03" aria-controls="navbarColor03" aria-expanded="false" aria-label="Toggle navigation">`, `      <span class="navbar-toggler-icon"></span>`, `    </button>`, `    <div class="collapse navbar-collapse" id="navbarColor03">`, `      <ul class="navbar-nav me-auto mb-2 mb-lg-0">`, `        <li class="nav-item">`, `          <a class="nav-link active" aria-current="page" href="#">Home</a>`, `        </li>`, `        <li class="nav-item">`, `          <a class="nav-link" href="#">Features</a>`, `        </li>`, `        <li class="nav-item">`, `          <a class="nav-link" href="#">Pricing</a>`, `        </li>`, `        <li class="nav-item">`, `          <a class="nav-link" href="#">About</a>`, `        </li>`, `      </ul>`, `      <form class="d-flex" role="search">`, `        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">`, `        <button class="btn-outline theme-primary" type="submit">Search</button>`, `      </form>`, `    </div>`, `    </div>`, `</nav>`]} />
+<Example html={[`<nav class="navbar navbar-expand-sm bg-3 border-bottom" data-coreui-theme="dark">`, `  <div class="container-fluid">`, `    <a class="navbar-brand" href="#">Navbar</a>`, `    <button class="navbar-toggler" type="button" data-coreui-toggle="collapse" data-coreui-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">`, `      <span class="navbar-toggler-icon"></span>`, `    </button>`, `    <div class="collapse navbar-collapse" id="navbarColor01">`, `      <ul class="navbar-nav me-auto mb-2 mb-sm-0">`, `        <li class="nav-item">`, `          <a class="nav-link active" aria-current="page" href="#">Home</a>`, `        </li>`, `        <li class="nav-item">`, `          <a class="nav-link" href="#">Features</a>`, `        </li>`, `        <li class="nav-item">`, `          <a class="nav-link" href="#">Pricing</a>`, `        </li>`, `        <li class="nav-item">`, `          <a class="nav-link" href="#">About</a>`, `        </li>`, `      </ul>`, `      <form class="d-flex" role="search">`, `        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">`, `        <button class="btn-outline theme-inverse" type="submit">Search</button>`, `      </form>`, `  </div>`, `  </div>`, `</nav>`, ``, `<nav class="navbar navbar-expand-sm bg-primary" data-coreui-theme="dark">`, `  <div class="container-fluid">`, `    <a class="navbar-brand" href="#">Navbar</a>`, `    <button class="navbar-toggler" type="button" data-coreui-toggle="collapse" data-coreui-target="#navbarColor02" aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">`, `      <span class="navbar-toggler-icon"></span>`, `    </button>`, `    <div class="collapse navbar-collapse" id="navbarColor02">`, `      <ul class="navbar-nav me-auto mb-2 mb-sm-0">`, `        <li class="nav-item">`, `          <a class="nav-link active" aria-current="page" href="#">Home</a>`, `        </li>`, `        <li class="nav-item">`, `          <a class="nav-link" href="#">Features</a>`, `        </li>`, `        <li class="nav-item">`, `          <a class="nav-link" href="#">Pricing</a>`, `        </li>`, `        <li class="nav-item">`, `          <a class="nav-link" href="#">About</a>`, `        </li>`, `      </ul>`, `      <form class="d-flex" role="search">`, `        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">`, `        <button class="btn-outline theme-inverse" type="submit">Search</button>`, `      </form>`, `  </div>`, `    </div>`, `</nav>`, ``, `<nav class="navbar navbar-expand-sm" style="background-color: #e3f2fd;" data-coreui-theme="light">`, `  <div class="container-fluid">`, `    <a class="navbar-brand" href="#">Navbar</a>`, `    <button class="navbar-toggler" type="button" data-coreui-toggle="collapse" data-coreui-target="#navbarColor03" aria-controls="navbarColor03" aria-expanded="false" aria-label="Toggle navigation">`, `      <span class="navbar-toggler-icon"></span>`, `    </button>`, `    <div class="collapse navbar-collapse" id="navbarColor03">`, `      <ul class="navbar-nav me-auto mb-2 mb-sm-0">`, `        <li class="nav-item">`, `          <a class="nav-link active" aria-current="page" href="#">Home</a>`, `        </li>`, `        <li class="nav-item">`, `          <a class="nav-link" href="#">Features</a>`, `        </li>`, `        <li class="nav-item">`, `          <a class="nav-link" href="#">Pricing</a>`, `        </li>`, `        <li class="nav-item">`, `          <a class="nav-link" href="#">About</a>`, `        </li>`, `      </ul>`, `      <form class="d-flex" role="search">`, `        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">`, `        <button class="btn-outline theme-primary" type="submit">Search</button>`, `      </form>`, `    </div>`, `    </div>`, `</nav>`]} />
 
 ```html
 <nav class="navbar bg-3 border-bottom" data-coreui-theme="dark">
@@ -318,13 +318,13 @@ Navbar themes are easier than ever thanks to CoreUI for Bootstrap's combination 
 
 A [theme class](/customize/components/#theme-variants) accents the brand and the active link with the theme's foreground colors, on top of either scheme:
 
-<Example html={[`<nav class="navbar navbar-expand-lg theme-primary bg-3">`, `  <div class="container-fluid">`, `    <a class="navbar-brand" href="#">Navbar</a>`, `    <ul class="navbar-nav me-auto mb-2 mb-lg-0">`, `      <li class="nav-item">`, `        <a class="nav-link active" aria-current="page" href="#">Home</a>`, `      </li>`, `      <li class="nav-item">`, `        <a class="nav-link" href="#">Features</a>`, `      </li>`, `    </ul>`, `  </div>`, `</nav>`]} />
+<Example html={[`<nav class="navbar navbar-expand-sm theme-primary bg-3">`, `  <div class="container-fluid">`, `    <a class="navbar-brand" href="#">Navbar</a>`, `    <ul class="navbar-nav me-auto mb-2 mb-sm-0">`, `      <li class="nav-item">`, `        <a class="nav-link active" aria-current="page" href="#">Home</a>`, `      </li>`, `      <li class="nav-item">`, `        <a class="nav-link" href="#">Features</a>`, `      </li>`, `    </ul>`, `  </div>`, `</nav>`]} />
 
 ## Translucent
 
 Add `.navbar-translucent` to let the page through the navbar and blur it. The tint is mixed from `--cui-navbar-bg`, which defaults to the body background — set that token when the navbar sits on a surface of its own.
 
-<Example class="p-0" code={`<nav class="navbar navbar-expand-lg navbar-translucent">
+<Example class="p-0" code={`<nav class="navbar navbar-expand-sm navbar-translucent">
     <div class="container-fluid">
       <a class="navbar-brand" href="#">Navbar</a>
       <ul class="navbar-nav">
@@ -340,7 +340,7 @@ Add `.navbar-translucent` to let the page through the navbar and blur it. The ti
 Although it's not required, you can wrap a navbar in a `.container` to center it on a page–though note that an inner container is still required. Or you can add a container inside the `.navbar` to only center the contents of a [fixed or static top navbar](#placement).
 
 <Example code={`<div class="container">
-    <nav class="navbar navbar-expand-lg bg-3">
+    <nav class="navbar navbar-expand-sm bg-3">
       <div class="container-fluid">
         <a class="navbar-brand" href="#">Navbar</a>
       </div>
@@ -349,7 +349,7 @@ Although it's not required, you can wrap a navbar in a `.container` to center it
 
 Use any of the responsive containers to change how wide the content in your navbar is presented.
 
-<Example code={`<nav class="navbar navbar-expand-lg bg-3">
+<Example code={`<nav class="navbar navbar-expand-sm bg-3">
     <div class="container-md">
       <a class="navbar-brand" href="#">Navbar</a>
     </div>
@@ -399,14 +399,14 @@ Please note that this behavior comes with a potential drawback of `overflow`—w
 
 Here's an example navbar using `.navbar-nav-scroll` with `style="--cui-scroll-height: 100px;"`, with some extra margin utilities for optimum spacing.
 
-<Example code={`<nav class="navbar navbar-expand-lg bg-3">
+<Example code={`<nav class="navbar navbar-expand-sm bg-3">
     <div class="container-fluid">
       <a class="navbar-brand" href="#">Navbar scroll</a>
       <button class="navbar-toggler" type="button" data-coreui-toggle="collapse" data-coreui-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarScroll">
-        <ul class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll" style="--cui-scroll-height: 100px;">
+        <ul class="navbar-nav me-auto my-2 my-sm-0 navbar-nav-scroll" style="--cui-scroll-height: 100px;">
           <li class="nav-item">
             <a class="nav-link active" aria-current="page" href="#">Home</a>
           </li>
@@ -443,7 +443,7 @@ Navbars can use `.navbar-toggler`, `.navbar-collapse`, and `.navbar-expand{-sm|-
 For navbars that never collapse, add the `.navbar-expand` class on the navbar. For navbars that always collapse, don't add any `.navbar-expand` class.
 
 <Callout color="info">
-**The breakpoint is the navbar's own width, not the window's.** Every `.navbar` is a [query container](/utilities/container-queries/), so `.navbar-expand-lg` collapses when the navbar itself is narrower than `lg`. A navbar in a sidebar or a narrow dashboard column collapses there while a full-width one on the same page stays expanded — which is what you wanted from it in the first place. Nothing changes for a navbar that spans the page: its width *is* the viewport's.
+**The breakpoint is the navbar's own width, not the window's.** Every `.navbar` is a [query container](/utilities/container-queries/), so `.navbar-expand-sm` collapses when the navbar itself is narrower than `lg`. A navbar in a sidebar or a narrow dashboard column collapses there while a full-width one on the same page stays expanded — which is what you wanted from it in the first place. Nothing changes for a navbar that spans the page: its width *is* the viewport's.
 </Callout>
 
 ### Toggler
@@ -452,14 +452,14 @@ Navbar togglers are left-aligned by default, but should they follow a sibling el
 
 With no `.navbar-brand` shown at the smallest breakpoint:
 
-<Example code={`<nav class="navbar navbar-expand-lg bg-3">
+<Example code={`<nav class="navbar navbar-expand-sm bg-3">
     <div class="container-fluid">
       <button class="navbar-toggler" type="button" data-coreui-toggle="collapse" data-coreui-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
         <a class="navbar-brand" href="#">Hidden brand</a>
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <ul class="navbar-nav me-auto mb-2 mb-sm-0">
           <li class="nav-item">
             <a class="nav-link active" aria-current="page" href="#">Home</a>
           </li>
@@ -480,14 +480,14 @@ With no `.navbar-brand` shown at the smallest breakpoint:
 
 With a brand name shown on the left and toggler on the right:
 
-<Example code={`<nav class="navbar navbar-expand-lg bg-3">
+<Example code={`<nav class="navbar navbar-expand-sm bg-3">
     <div class="container-fluid">
       <a class="navbar-brand" href="#">Navbar</a>
       <button class="navbar-toggler" type="button" data-coreui-toggle="collapse" data-coreui-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <ul class="navbar-nav me-auto mb-2 mb-sm-0">
           <li class="nav-item">
             <a class="nav-link active" aria-current="page" href="#">Home</a>
           </li>
@@ -508,14 +508,14 @@ With a brand name shown on the left and toggler on the right:
 
 With a toggler on the left and brand name on the right:
 
-<Example code={`<nav class="navbar navbar-expand-lg bg-3">
+<Example code={`<nav class="navbar navbar-expand-sm bg-3">
     <div class="container-fluid">
       <button class="navbar-toggler" type="button" data-coreui-toggle="collapse" data-coreui-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <a class="navbar-brand" href="#">Navbar</a>
       <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <ul class="navbar-nav me-auto mb-2 mb-sm-0">
           <li class="nav-item">
             <a class="nav-link active" aria-current="page" href="#">Home</a>
           </li>
@@ -560,7 +560,7 @@ Turn an expanding navbar into a side panel with the [drawer component](/componen
 
 The example below slides in from the end; `.drawer-start`, `.drawer-top` and `.drawer-bottom` pick another edge, and `start`/`end` follow the reading direction.
 
-<Example code={`<nav class="navbar navbar-expand-lg bg-3">
+<Example code={`<nav class="navbar navbar-expand-sm bg-3">
     <div class="container-fluid">
       <a class="navbar-brand" href="#">Drawer navbar</a>
       <button class="navbar-toggler" type="button" data-coreui-toggle="drawer" data-coreui-target="#drawerNavbar" aria-controls="drawerNavbar">
@@ -636,10 +636,10 @@ In the example below, to create an offcanvas navbar that is always collapsed acr
     </div>
   </nav>`} />
 
-To create an offcanvas navbar that expands into a normal navbar at a specific breakpoint like `lg`, use `.navbar-expand-lg`.
+To create an offcanvas navbar that expands into a normal navbar at a specific breakpoint like `sm`, use `.navbar-expand-sm`.
 
 ```html
-<nav class="navbar navbar-expand-lg bg-3 fixed-top">
+<nav class="navbar navbar-expand-sm bg-3 fixed-top">
   <a class="navbar-brand" href="#">Offcanvas navbar</a>
   <button class="navbar-toggler" type="button" data-coreui-toggle="offcanvas" data-coreui-target="#navbarOffcanvasLg" aria-controls="navbarOffcanvasLg">
     <span class="navbar-toggler-icon"></span>
@@ -726,6 +726,6 @@ The `.navbar-translucent` mix amount and backdrop filter are build-time only —
 
 ### Sass loops
 
-[Responsive navbar expand/collapse classes](#responsive-behaviors) (e.g., `.navbar-expand-lg`) are combined with the `$breakpoints` map and generated through a loop in `scss/_navbar.scss`.
+[Responsive navbar expand/collapse classes](#responsive-behaviors) (e.g., `.navbar-expand-sm`) are combined with the `$breakpoints` map and generated through a loop in `scss/_navbar.scss`.
 
 <ScssDocs file="scss/_navbar.scss" capture="navbar-expand-loop" />
