@@ -152,11 +152,7 @@ $range-slider-vertical-tokens: defaults(
     height: var(--#{$prefix}range-slider-track-height);
     cursor: var(--#{$prefix}range-slider-track-cursor);
     background-color: var(--#{$prefix}range-slider-track-bg);
-    // The filled band, between the lowest and the highest handle. The edges are
-    // deliberately given no fallback: with `track: false` the plugin never
-    // writes them, the substitution fails and the whole declaration falls back
-    // to `none`, so nothing is painted. Their names sit outside `$prefix` for
-    // the same reason as the tooltip's position — the plugin writes them.
+    // No fallback on purpose: with `track: false` the plugin never writes the edges and the whole declaration must drop to `none`.
     background-image:
       linear-gradient(
         var(--cui-range-slider-track-direction, to right),
@@ -269,9 +265,7 @@ $range-slider-vertical-tokens: defaults(
   }
 
   .range-slider-tooltip {
-    // The thumb's centre: half a thumb in, then the track minus a thumb.
-    // Deliberately outside `$prefix`: the plugin writes this name, so a
-    // configurable one would let the two sides disagree.
+    // Outside `$prefix` on purpose: the plugin writes this name.
     position: absolute;
     inset-inline-start: calc(var(--#{$prefix}range-slider-thumb-width) * .5 + var(--cui-range-slider-tooltip-position, 0) * (100% - var(--#{$prefix}range-slider-thumb-width)));
     z-index: var(--#{$prefix}range-slider-tooltip-zindex);
@@ -307,9 +301,6 @@ $range-slider-vertical-tokens: defaults(
   }
 
   .range-slider:not(.range-slider-vertical) {
-    // Gradients take no logical direction, so the horizontal one is mirrored
-    // here. Scoped away from the vertical slider so neither rule depends on
-    // source order.
     @include rtl() {
       --cui-range-slider-track-direction: to left;
     }

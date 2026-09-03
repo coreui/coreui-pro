@@ -38,8 +38,6 @@ $form-date-time-tokens: defaults(
 
     display: flex;
     align-items: center;
-    // The sections are injected by JS; without this the empty container
-    // collapses and flashes on load.
     min-height: var(--#{$prefix}btn-input-min-height);
     cursor: text;
 
@@ -100,8 +98,6 @@ $form-date-time-tokens: defaults(
     color: var(--#{$prefix}form-date-time-placeholder-color);
   }
 
-  // `:placeholder-shown` never matches a div, so the float is re-bound to
-  // `:focus-within` and the JS-managed `.form-date-time-filled`.
   .form-floating > .form-date-time {
     height: var(--#{$prefix}form-floating-height);
     min-height: var(--#{$prefix}form-floating-height);
@@ -133,25 +129,13 @@ $form-date-time-tokens: defaults(
     }
   }
 
-  // The label may sit either side of the control (see forms/_floating-labels.scss)
-  // — the block above catches the label written after it, this one the label
-  // written first, the order the docs use.
   .form-floating > label:has(~ .form-date-time:focus-within),
   .form-floating > label:has(~ .form-date-time.form-date-time-filled) {
     transform: var(--#{$prefix}form-floating-label-transform);
   }
 
-  // Per-field labels: with `startLabel` / `endLabel` set, the range picker
-  // wraps each of its controls in its own `.form-floating` inside the group,
-  // and the direct-child block above runs the states per field. What is left
-  // is geometry: the wrapper takes over the control's flex share, and the
-  // group gives up its block padding so the floating height fits inside the
-  // frame instead of stacking on top of it.
   .form-control-group:has(> .form-floating) {
     padding-block: 0;
-    // The inline start too: the field keeps its own inline padding, so the
-    // group's would stack under it and indent label and value twice. The end
-    // stays — that is the cleaner and toggle buttons' cushion.
     padding-inline-start: 0;
 
     > .form-floating {
@@ -167,13 +151,6 @@ $form-date-time-tokens: defaults(
     }
   }
 
-  // The pickers wrap this control in `.form-control-group` — one of them for
-  // Date/Time/DateTime Picker, two side by side for the range picker — so the
-  // direct-child block above never matches there. The group's shared rules in
-  // forms/_floating-labels.scss give it the height; this block re-binds the
-  // states the same way: focus is `:focus-within` on the group, so opening the
-  // calendar from the action button floats the label too, and filled is "any
-  // control inside carries the JS-managed class".
   .form-floating > .form-control-group:has(> .form-date-time) {
     &:focus-within > .form-date-time,
     &:has(.form-date-time-filled) > .form-date-time {
@@ -181,10 +158,6 @@ $form-date-time-tokens: defaults(
       padding-bottom: var(--#{$prefix}form-floating-input-padding-b);
     }
 
-    // Each control reveals its own mask — a control neither focused nor filled
-    // keeps it hidden even while its sibling floats the label. With one control
-    // that is exactly the old group-at-rest state; with two, the range's empty
-    // end no longer stands bare under no label once the start is set.
     > .form-date-time:not(:focus-within, .form-date-time-filled) {
       .form-date-time-section,
       .form-date-time-separator {
@@ -192,10 +165,6 @@ $form-date-time-tokens: defaults(
       }
     }
 
-    // The arrow shows only when there is something on both of its sides: while
-    // the group has focus, or once the end date is set. Blurred with only the
-    // start filled, the fields flex 50/50 and the arrow would hang mid-field
-    // over nothing — an orphan, not a hint.
     &:not(:focus-within) > .form-control-icon:has(+ .form-date-time:not(.form-date-time-filled)) {
       color: transparent;
     }
@@ -210,9 +179,6 @@ $form-date-time-tokens: defaults(
     }
   }
 
-  // Label-first over a picker group. Focus-forward comes from the shared block;
-  // what is missing there is "a following group holds a filled control" — as a
-  // descendant match, because `:has()` cannot nest inside `:has()`.
   .form-floating > label:has(~ .form-control-group .form-date-time-filled) {
     transform: var(--#{$prefix}form-floating-label-transform);
   }

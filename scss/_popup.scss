@@ -38,12 +38,6 @@ $popup-tokens: defaults(
 // stylelint-enable scss/dollar-variable-default
 
 @layer components {
-  // The floating surface of the field components — one chrome for the pickers'
-  // dropdowns and the combobox listbox, whatever body it holds. This is the
-  // anchored presentation; the fullscreen/modal one (the v1 pickers' mobile
-  // mode, coming back at the primitive level) is designed but lands
-  // separately. The popup borrows the *look* of a menu, never its interaction
-  // semantics: the body inside owns those.
   .popup {
     @include tokens($popup-tokens);
 
@@ -57,16 +51,7 @@ $popup-tokens: defaults(
     opacity: 0;
     @include box-shadow(var(--#{$prefix}popup-box-shadow));
 
-    // `display` is what makes a popup appear, and it cannot be interpolated,
-    // so `allow-discrete` lets it flip at the right end of the transition while
-    // opacity and transform carry the motion. `@starting-style` supplies the
-    // state to animate FROM: the element does not exist to be styled before it
-    // is shown, so the base rule cannot express it.
     //
-    // Opacity only, no scale. A popup carries no placement attribute, so a
-    // scale would need an origin we cannot know — and on a panel the size of a
-    // calendar even a 2% scale reads as the panel jumping rather than
-    // appearing. The combobox list hides it; the pickers do not.
     @include transition(
       opacity var(--#{$prefix}popup-transition-duration) var(--#{$prefix}popup-transition-timing),
       display var(--#{$prefix}popup-transition-duration) allow-discrete

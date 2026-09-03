@@ -102,9 +102,7 @@ $sidebar-widths: (
     }
 
     @include media-breakpoint-down($mobile-breakpoint) {
-      // Read by the plugin to detect the sidebar's mobile behavior, so the name
-      // cannot follow `$prefix` — the two sides would disagree in a build that
-      // changes it.
+      // Read by the plugin, so the name stays outside `$prefix`.
       --cui-is-mobile: true;
 
       position: fixed;
@@ -293,9 +291,6 @@ $sidebar-widths: (
   }
 
   .sidebar-dark {
-    // Every color the sidebar would otherwise pin is a light-dark() pair on
-    // :root, so declaring the scheme is enough — the tokens and the native
-    // widgets both follow.
     color-scheme: dark;
   }
 }
