@@ -41,6 +41,9 @@ jobs:
       - name: Install npm dependencies
         run: npm ci
 
+      - name: Build CSS
+        run: npm run css
+
       - name: Build docs
         run: npm run docs-build
 
