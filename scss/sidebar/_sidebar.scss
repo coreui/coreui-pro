@@ -297,9 +297,5 @@ $sidebar-widths: (
     // :root, so declaring the scheme is enough — the tokens and the native
     // widgets both follow.
     color-scheme: dark;
-
-    .sidebar-toggler {
-      filter: var(--#{$prefix}sidebar-toggler-white-filter);
-    }
   }
 }
