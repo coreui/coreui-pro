@@ -117,9 +117,9 @@ $list-group-tokens: defaults(
     // Include both here for `<a>`s and `<button>`s
     &.active {
       z-index: 2; // Place active items above their siblings for proper border styling
-      color: var(--#{$prefix}theme-bg-subtle, var(--#{$prefix}list-group-active-color));
-      background-color: var(--#{$prefix}theme-fg-emphasis, var(--#{$prefix}list-group-active-bg));
-      border-color: var(--#{$prefix}theme-fg-emphasis, var(--#{$prefix}list-group-active-border-color));
+      color: var(--#{$prefix}theme-contrast, var(--#{$prefix}list-group-active-color));
+      background-color: var(--#{$prefix}theme-bg, var(--#{$prefix}list-group-active-bg));
+      border-color: var(--#{$prefix}theme-bg, var(--#{$prefix}list-group-active-border-color));
     }
 
     // stylelint-disable-next-line scss/selector-no-redundant-nesting-selector
@@ -155,7 +155,7 @@ $list-group-tokens: defaults(
 
       &:active {
         color: var(--#{$prefix}theme-fg-emphasis, var(--#{$prefix}list-group-action-active-color));
-        background-color: var(--#{$prefix}theme-border, var(--#{$prefix}list-group-action-active-bg));
+        background-color: var(--#{$prefix}theme-bg-muted, var(--#{$prefix}list-group-action-active-bg));
       }
     }
   }
