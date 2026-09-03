@@ -266,6 +266,7 @@ $root-token-defaults: map.merge(
     // drawer, menu and popup. One override restyles all four.
     --#{$prefix}transition-timing-overlay: $transition-timing-overlay,
     // scss-docs-end root-transition-variables
+    --#{$prefix}spacer: $spacer,
     // Focus styles
     // scss-docs-start root-focus-variables
     --#{$prefix}focus-ring-width: $focus-ring-width,
