@@ -161,6 +161,10 @@ $dropdown-dark-tokens: defaults(
     @include border-radius(var(--#{$prefix}dropdown-border-radius));
     @include box-shadow(var(--#{$prefix}dropdown-box-shadow));
 
+    > li {
+      display: block;
+    }
+
     &[data#{$data-infix}popper] {
       inset-inline-start: 0;
       top: 100%;
