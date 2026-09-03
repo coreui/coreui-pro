@@ -16,7 +16,7 @@ $avatar-color:                 inherit !default;
 $avatar-bg:                    var(--#{$prefix}bg-2) !default;
 $avatar-border-radius:         50em !default;
 $avatar-status-size:           .5rem !default;
-$avatar-status-bg:             var(--#{$prefix}secondary) !default;
+$avatar-status-bg:             var(--#{$prefix}fg-4) !default;
 $avatar-status-border-radius:  50em !default;
 $avatar-status-border-width:   1px !default;
 $avatar-status-border-color:   var(--#{$prefix}bg-body) !default;
