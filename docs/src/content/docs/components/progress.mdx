@@ -127,7 +127,7 @@ Include multiple progress bars in a progress component if you need.
 
 ## On a colored surface
 
-Add `.progress-white` to draw the bar in the current text color and the track as a faint tint of it. That way a progress bar sitting on a solid or brand-colored surface takes its colors from the text around it rather than needing a color of its own.
+Add `.progress-white` to draw the bar in white and the track as translucent white. That way a progress bar sitting on a dark or brand-colored surface stays readable without a color of its own; the bar stays white even under a `.theme-*` class.
 
 <Example class="p-3 text-bg-primary" code={`<div class="progress progress-white">
     <div class="progress-bar" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
