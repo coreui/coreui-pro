@@ -22,7 +22,7 @@ $range-slider-track-border-radius:         1rem !default;
 $range-slider-track-box-shadow:            var(--#{$prefix}box-shadow-inset) !default;
 
 $range-slider-track-in-range-bg:           color-mix(in srgb, var(--#{$prefix}theme-bg, var(--#{$prefix}primary)) 50%, transparent) !default;
-$range-slider-disabled-track-in-range-bg:  color-mix(in srgb, var(--#{$prefix}secondary) 37.5%, transparent) !default;
+$range-slider-disabled-track-in-range-bg:  var(--#{$prefix}fg-4) !default;
 
 $range-slider-label-padding-y:             0 !default;
 $range-slider-label-padding-x:             0 !default;
@@ -36,7 +36,7 @@ $range-slider-thumb-border:                0 !default;
 $range-slider-thumb-border-radius:         1rem !default;
 $range-slider-thumb-box-shadow:            0 .1rem .25rem color-mix(in srgb, var(--#{$prefix}black) 10%, transparent) !default;
 $range-slider-thumb-active-bg:             color-mix(in srgb, var(--#{$prefix}theme-bg, var(--#{$prefix}primary)) 30%, var(--#{$prefix}bg-body)) !default;
-$range-slider-thumb-disabled-bg:           color-mix(in srgb, var(--#{$prefix}secondary) 100%, transparent) !default;
+$range-slider-thumb-disabled-bg:           var(--#{$prefix}fg-3) !default;
 $range-slider-thumb-transition:            background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out !default;
 
 $range-slider-tooltip-max-width:           200px !default;
