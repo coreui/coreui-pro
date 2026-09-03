@@ -1,6 +1,6 @@
 @use "sass:map";
 @use "functions/defaults" as *;
-@use "mixins/gradients" as *;
+@use "mixins/border-radius" as *;
 @use "mixins/tokens" as *;
 @use "config" as *;
 
@@ -56,7 +56,7 @@ $badge-tokens: defaults(
     --#{$prefix}badge-font-size: clamp(#{$badge-font-size-floor}, #{$badge-font-size}, #{$badge-font-size}),
     --#{$prefix}badge-font-weight: #{$badge-font-weight},
     --#{$prefix}badge-color: var(--#{$prefix}theme-contrast, #{$badge-color}),
-    --#{$prefix}badge-bg: #{$badge-bg},
+    --#{$prefix}badge-bg: var(--#{$prefix}theme-bg, #{$badge-bg}),
     --#{$prefix}badge-border-width: #{$badge-border-width},
     --#{$prefix}badge-border-color: #{$badge-border-color},
     --#{$prefix}badge-border-radius: #{$badge-border-radius},
@@ -105,9 +105,9 @@ $badge-variants: defaults(
     text-decoration: none;
     white-space: nowrap;
     vertical-align: baseline;
+    background-color: var(--#{$prefix}badge-bg);
     border: var(--#{$prefix}badge-border-width) solid var(--#{$prefix}badge-border-color);
-    border-radius: var(--#{$prefix}badge-border-radius, 0); // stylelint-disable-line property-disallowed-list
-    @include gradient-bg(var(--#{$prefix}theme-bg, var(--#{$prefix}badge-bg)));
+    @include border-radius(var(--#{$prefix}badge-border-radius));
 
     // Empty badges collapse automatically
     &:empty {
@@ -133,8 +133,8 @@ $badge-variants: defaults(
       }
 
       color: var(--#{$prefix}badge-color);
+      background-color: var(--#{$prefix}badge-bg);
       border-color: var(--#{$prefix}badge-border-color);
-      @include gradient-bg(var(--#{$prefix}badge-bg));
     }
   }
   // scss-docs-end badge-modifiers
