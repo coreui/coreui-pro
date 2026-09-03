@@ -117,14 +117,14 @@
       to: /forms/checkbox/
     - title: Chip input
       to: /forms/chip-input/
-      badge:
-        color: success
-        text: NEW
     - title: Date Input
       to: /forms/date-input/
       badge:
-        color: danger
-        text: PRO
+        - color: success
+          text: NEW
+        - color: danger
+          text: PRO
+          className: ms-1
     - title: Date Picker
       to: /forms/date-picker/
       badge:
@@ -133,8 +133,11 @@
     - title: Date Time Picker
       to: /forms/date-time-picker/
       badge:
-        color: danger
-        text: PRO
+        - color: success
+          text: NEW
+        - color: danger
+          text: PRO
+          className: ms-1
     - title: Date Range Picker
       to: /forms/date-range-picker/
       badge:
@@ -143,10 +146,16 @@
     - title: Date Time Input
       to: /forms/date-time-input/
       badge:
-        color: danger
-        text: PRO
+        - color: success
+          text: NEW
+        - color: danger
+          text: PRO
+          className: ms-1
     - title: Field
       to: /forms/field/
+      badge:
+        color: success
+        text: NEW
     - title: Floating labels
       to: /forms/floating-labels/
     - title: Form control
@@ -165,6 +174,9 @@
         text: PRO
     - title: Number Input
       to: /forms/number-input/
+      badge:
+        color: success
+        text: NEW
     - title: OTP Input
       to: /forms/otp-input/
     - title: Password Input
@@ -202,8 +214,11 @@
     - title: Time Input
       to: /forms/time-input/
       badge:
-        color: danger
-        text: PRO
+        - color: success
+          text: NEW
+        - color: danger
+          text: PRO
+          className: ms-1
     - title: Time Picker
       to: /forms/time-picker/
       badge:
@@ -243,14 +258,8 @@
       to: /components/carousel/
     - title: Chip
       to: /components/chip/
-      badge:
-        color: success
-        text: NEW
     - title: Chip set
       to: /components/chip-set/
-      badge:
-        color: success
-        text: NEW
     - title: Close button
       to: /components/close-button/
     - title: Collapse
@@ -282,6 +291,9 @@
         text: PRO
     - title: Menu
       to: /components/menu/
+      badge:
+        color: success
+        text: NEW
     - title: Modal
       to: /components/modal/
     - title: Navbar
@@ -302,14 +314,8 @@
       to: /components/scrollspy/
     - title: Search Button
       to: /components/search-button/
-      badge:
-        color: success
-        text: NEW
     - title: Sidebar
       to: /components/sidebar/
-      badge:
-        color: success
-        text: NEW
     - title: Spinner
       to: /components/spinners/
     - title: Tab
