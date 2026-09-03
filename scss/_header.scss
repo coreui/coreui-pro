@@ -30,9 +30,8 @@ $header-transition:             box-shadow .15s ease-in-out !default;
 $header-brand-height:           calc(#{$header-brand-font-size} * var(--#{$prefix}body-line-height)) !default;
 $header-brand-padding-y:        calc((#{$nav-link-height} - #{$header-brand-height}) * .5) !default;
 $header-brand-margin-end:       1rem !default;
-$header-brand-font-size:        var(--#{$prefix}font-size-lg) !default;
-$header-brand-color:            var(--#{$prefix}gray-900) !default;
-$header-brand-hover-color:      color-mix(in $color-mix-space, var(--#{$prefix}black) 10%, var(--#{$prefix}gray-900)) !default;
+$header-brand-color:            var(--#{$prefix}fg-body) !default;
+$header-brand-hover-color:      var(--#{$prefix}fg-1) !default;
 
 $header-toggler-padding-y:      .25rem !default;
 $header-toggler-padding-x:      .75rem !default;
