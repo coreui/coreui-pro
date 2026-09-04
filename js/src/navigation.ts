@@ -77,100 +77,58 @@ class Navigation extends BaseComponent {
   // Private
 
   _setActiveLink(): void {
-    for (const element of Array.from(this._element.querySelectorAll(SELECTOR_NAV_LINK))) {
+    const currentUrl = String(window.location).split(/[?#]/)[0]
+
+    for (const element of SelectorEngine.find<HTMLAnchorElement>(SELECTOR_NAV_LINK, this._element)) {
       if (element.classList.contains(CLASS_NAME_NAV_GROUP_TOGGLE)) {
         continue
       }
 
-      let currentUrl = String(window.location)
+      const isActive = this._config.activeLinksExact ? element.href === currentUrl : currentUrl.startsWith(element.href)
 
-      const urlHasParams = /\?.*=/
-      const urlHasQueryString = /\?./
-      const urlHasHash = /#./
-
-      if (urlHasParams.test(currentUrl) || urlHasQueryString.test(currentUrl)) {
-        currentUrl = currentUrl.split('?')[0]
+      if (!isActive) {
+        continue
       }
 
-      if (urlHasHash.test(currentUrl)) {
-        currentUrl = currentUrl.split('#')[0]
-      }
+      element.classList.add(CLASS_NAME_ACTIVE)
 
-      if (this._config.activeLinksExact && (element as HTMLAnchorElement).href === currentUrl) {
-        element.classList.add(CLASS_NAME_ACTIVE)
-        // eslint-disable-next-line unicorn/no-array-for-each
-        Array.from(this._getParents(element as HTMLElement, SELECTOR_NAV_GROUP)).forEach(element => {
-          element.classList.add(CLASS_NAME_SHOW)
-          element.setAttribute('aria-expanded', true as unknown as string)
-        })
-      }
-
-      if (!this._config.activeLinksExact && currentUrl.startsWith((element as HTMLAnchorElement).href)) {
-        element.classList.add(CLASS_NAME_ACTIVE)
-        // eslint-disable-next-line unicorn/no-array-for-each
-        Array.from(this._getParents(element as HTMLElement, SELECTOR_NAV_GROUP)).forEach(element => {
-          element.classList.add(CLASS_NAME_SHOW)
-          element.setAttribute('aria-expanded', true as unknown as string)
-        })
+      for (const group of this._getParentGroups(element)) {
+        this._setExpanded(group, true)
       }
     }
   }
 
-  _getParents(element: any, selector: string): HTMLElement[] {
-    // Setup parents array
-    const parents: HTMLElement[] = []
+  _getParentGroups(element: Element): HTMLElement[] {
+    const groups: HTMLElement[] = []
+    let group = element.closest<HTMLElement>(SELECTOR_NAV_GROUP)
 
-    // Get matching parent elements
-    for (; element && element !== document; element = element.parentNode) {
-      // Add matching parents to array
-      if (selector) {
-        if (element.matches(selector)) {
-          parents.push(element)
-        }
-      } else {
-        parents.push(element)
-      }
+    while (group && this._element.contains(group)) {
+      groups.push(group)
+      group = group.parentElement ? group.parentElement.closest<HTMLElement>(SELECTOR_NAV_GROUP) : null
     }
 
-    return parents
+    return groups
   }
 
-  _getAllSiblings(element: any, filter: (element: any) => boolean): HTMLElement[] {
-    const siblings: HTMLElement[] = []
-    element = element.parentNode.firstChild
-    do {
-      if (element.nodeType === 3) {
-        continue // text node
-      }
+  _setExpanded(group: HTMLElement, expanded: boolean): void {
+    const toggle = group.querySelector(`:scope > ${SELECTOR_NAV_GROUP_TOGGLE}`)
 
-      if (element.nodeType === 8) {
-        continue // comment node
-      }
-
-      if (!filter || filter(element)) {
-        siblings.push(element)
-      }
-
-    // eslint-disable-next-line no-cond-assign
-    } while (element = element.nextSibling)
-
-    return siblings
-  }
-
-  _getChildren(n: any, skipMe: any): HTMLElement[] {
-    const children = []
-    for (; n; n = n.nextSibling) {
-      if (n.nodeType === 1 && n !== skipMe) {
-        children.push(n)
-      }
+    if (toggle) {
+      toggle.setAttribute('aria-expanded', String(expanded))
     }
 
-    return children
-  }
+    if (expanded) {
+      group.classList.add(CLASS_NAME_SHOW)
+      return
+    }
 
-  _getSiblings(element: any, filter: (element: any) => boolean): HTMLElement[] {
-    const siblings = this._getChildren(element.parentNode.firstChild, element).filter(filter)
-    return siblings
+    const items = SelectorEngine.findOne<HTMLElement>(SELECTOR_NAV_GROUP_ITEMS, group)
+
+    if (items) {
+      this._slideUp(items, () => group.classList.remove(CLASS_NAME_SHOW))
+    } else {
+      group.classList.remove(CLASS_NAME_SHOW)
+    }
   }
 
   _slideDown(element: HTMLElement): void {
@@ -186,57 +144,50 @@ class Navigation extends BaseComponent {
     }, element, true)
   }
 
-  _slideUp(element: any, callback: (...args: any[]) => void): void {
+  _slideUp(element: HTMLElement, callback: () => void): void {
     const height = element.clientHeight
     element.style.height = `${height}px`
     setTimeout(() => {
       element.style.height = '0px'
     }, 0)
 
-    this._queueCallback(() => {
-      if (typeof callback === 'function') {
-        callback()
-      }
-    }, element, true)
+    this._queueCallback(callback, element, true)
   }
 
-  _toggleGroupItems(event: any): void {
-    let toggler = event.target
-    if (!toggler.classList.contains(CLASS_NAME_NAV_GROUP_TOGGLE)) {
-      toggler = toggler.closest(SELECTOR_NAV_GROUP_TOGGLE)
-    }
+  _toggleGroupItems(event: Event): void {
+    const toggler = (event.target as Element).closest<HTMLElement>(SELECTOR_NAV_GROUP_TOGGLE)
+    const group = toggler ? toggler.closest<HTMLElement>(SELECTOR_NAV_GROUP) : null
 
-    const filter = (element: HTMLElement) => Boolean(element.classList.contains(CLASS_NAME_NAV_GROUP) && element.classList.contains(CLASS_NAME_SHOW))
-
-    // Close other groups
-    if (this._config.groupsAutoCollapse === true) {
-      for (const element of this._getSiblings(toggler.parentNode, filter)) {
-        this._slideUp(SelectorEngine.findOne(SELECTOR_NAV_GROUP_ITEMS, element), () => {
-          element.classList.remove(CLASS_NAME_SHOW)
-          element.setAttribute('aria-expanded', false as unknown as string)
-        })
-      }
-    }
-
-    if (toggler.parentNode.classList.contains(CLASS_NAME_SHOW)) {
-      this._slideUp(SelectorEngine.findOne(SELECTOR_NAV_GROUP_ITEMS, toggler.parentNode), () => {
-        toggler.parentNode.classList.remove(CLASS_NAME_SHOW)
-        toggler.parentNode.setAttribute('aria-expanded', false as unknown as string)
-      })
+    if (!group) {
       return
     }
 
-    toggler.parentNode.classList.add(CLASS_NAME_SHOW)
-    toggler.parentNode.setAttribute('aria-expanded', true as unknown as string)
-    this._slideDown(SelectorEngine.findOne(SELECTOR_NAV_GROUP_ITEMS, toggler.parentNode as ParentNode)!)
+    const items = SelectorEngine.findOne<HTMLElement>(SELECTOR_NAV_GROUP_ITEMS, group)
+
+    if (this._config.groupsAutoCollapse === true && group.parentElement) {
+      for (const sibling of Array.from(group.parentElement.children) as HTMLElement[]) {
+        if (sibling !== group && sibling.classList.contains(CLASS_NAME_NAV_GROUP) && sibling.classList.contains(CLASS_NAME_SHOW)) {
+          this._setExpanded(sibling, false)
+        }
+      }
+    }
+
+    if (group.classList.contains(CLASS_NAME_SHOW)) {
+      this._setExpanded(group, false)
+      return
+    }
+
+    this._setExpanded(group, true)
+
+    if (items) {
+      this._slideDown(items)
+    }
   }
 
   _addEventListeners(): any {
     EventHandler.on(this._element, EVENT_CLICK_DATA_API, SELECTOR_NAV_GROUP_TOGGLE, event => {
       event.preventDefault()
-      // @ts-expect-error -- the call passes an argument the method ignores.
-      // Dropping it is a behaviour change, so it is flagged rather than typed away.
-      this._toggleGroupItems(event, this)
+      this._toggleGroupItems(event)
     })
   }
 
