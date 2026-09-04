@@ -2919,12 +2919,24 @@ pair, and `[data#{$data-infix}theme="dark"]` only declares `color-scheme: dark`.
   select chevron and switch knob SVGs keep a dark counterpart next to their
   component (`$form-select-indicator-dark`, `$form-switch-bg-image-dark`).
 - **Every palette colour gets a 100–900 scale of tokens in `:root`**, mixed at
-  runtime from the colour's own token: `--cui-primary-100` …
-  `--cui-primary-900`, for each key of `$colors`. Knobs: `$color-tints`,
-  `$color-shades`, `$color-mix-space` (`oklch`), `$tint-color`, `$shade-color`.
-  Override `$primary` — or the `--cui-primary` token at runtime — and the whole
-  family retints. `secondary` and `inverse` are built from the grays and carry
-  no scale.
+  runtime from the colour's own token: `--cui-blue-100` … `--cui-blue-900`, for
+  each key of `$colors`, and the same for every theme colour whose `base` is a
+  single colour (`--cui-primary-100` … `--cui-primary-900`). Knobs:
+  `$color-tints`, `$color-shades`, `$color-mix-space` (`oklch`), `$tint-color`,
+  `$shade-color`. Override `$primary` — or the `--cui-primary` token at
+  runtime — and the whole family retints. A `base` written as a `light-dark()`
+  pair (`secondary`, `inverse`) emits only its own token: a scale mixed from a
+  colour that swaps between schemes has no meaning.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`$colors` holds the palette only; the theme colours live in
+  `$theme-colors`.** `primary`, `success`, `info`, `warning` and `danger` are
+  no longer keys of `$colors` — each theme colour carries its own colour in the
+  `base` slot of its `$theme-colors` entry, next to the slots it derives, and
+  the Sass knobs `$primary` … `$inverse` sit together in `scss/_theme.scss`.
+  `map.get($colors, "primary")` becomes `map.get($theme-colors, "primary",
+  "base")`; a colour added to `$colors` is a palette colour with a scale, a
+  colour added to `$theme-colors` with a `base` is a theme colour with a scale
+  and the `.theme-*` class.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **The palette is written in `oklch()` and mixes in `oklch`.** The base colours
   are unchanged — every hex converts to the same sRGB pixel — but the 100–900

@@ -26,16 +26,6 @@ $cyan:    oklch(77.493% 0.13797 218.05) !default;
 $gray:    oklch(67.863% 0.03948 265.02) !default;
 // scss-docs-end color-variables
 
-// The theme colours that carry a hue of their own. `secondary` and `inverse` are
-// grays, so they stay role-only in _theme.scss and get no scale.
-// scss-docs-start theme-color-variables
-$primary:   oklch(52.945% 0.19103 278.34) !default;
-$success:   oklch(61.237% 0.17298 146.95) !default;
-$info:      oklch(67.55% 0.17646 252.26) !default;
-$warning:   oklch(80.791% 0.16473 78.5) !default;
-$danger:    oklch(63.864% 0.18175 23.81) !default;
-// scss-docs-end theme-color-variables
-
 // scss-docs-start colors-map
 $colors: () !default;
 
@@ -52,12 +42,7 @@ $colors: defaults(
     "green":      $green,
     "teal":       $teal,
     "cyan":       $cyan,
-    "gray":       $gray,
-    "primary":    $primary,
-    "success":    $success,
-    "info":       $info,
-    "warning":    $warning,
-    "danger":     $danger
+    "gray":       $gray
   ),
   $colors
 );
@@ -167,25 +152,29 @@ $grays: defaults(
 // scss-docs-end gray-colors-map
 // fusv-enable
 
-// The palette: the base colours, the grays, and their scales. The theme colour
-// system built on top of them lives in _theme.scss.
+@function color-scale-tokens($color, $value) {
+  $tokens: (--#{$prefix}#{$color}: $value);
+
+  @each $stop, $weight in $color-tints {
+    $tokens: map.set($tokens, --#{$prefix}#{$color}-#{$stop}, color-mix(in $color-mix-space, $tint-color $weight, var(--#{$prefix}#{$color})));
+  }
+
+  $tokens: map.set($tokens, --#{$prefix}#{$color}-500, var(--#{$prefix}#{$color}));
+
+  @each $stop, $weight in $color-shades {
+    $tokens: map.set($tokens, --#{$prefix}#{$color}-#{$stop}, color-mix(in $color-mix-space, $shade-color $weight, var(--#{$prefix}#{$color})));
+  }
+
+  @return $tokens;
+}
+
 // scss-docs-start color-tokens
 $color-tokens: () !default;
 
 $-color-defaults: () !default;
 
 @each $color, $value in $colors {
-  $-color-defaults: map.set($-color-defaults, --#{$prefix}#{$color}, $value);
-
-  @each $stop, $weight in $color-tints {
-    $-color-defaults: map.set($-color-defaults, --#{$prefix}#{$color}-#{$stop}, color-mix(in $color-mix-space, $tint-color $weight, var(--#{$prefix}#{$color})));
-  }
-
-  $-color-defaults: map.set($-color-defaults, --#{$prefix}#{$color}-500, var(--#{$prefix}#{$color}));
-
-  @each $stop, $weight in $color-shades {
-    $-color-defaults: map.set($-color-defaults, --#{$prefix}#{$color}-#{$stop}, color-mix(in $color-mix-space, $shade-color $weight, var(--#{$prefix}#{$color})));
-  }
+  $-color-defaults: map.merge($-color-defaults, color-scale-tokens($color, $value));
 }
 
 // stylelint-disable-next-line scss/dollar-variable-default
