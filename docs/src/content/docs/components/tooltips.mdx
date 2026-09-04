@@ -67,6 +67,15 @@ Feel free to personalize the look of your tooltips with [CSS variables](#css-var
     Custom tooltip
   </button>`} />
 
+### Theme variants
+
+A tooltip reads the `.theme-{color}` slots, so a theme class on the tip colours its surface and picks the contrasting text. The class lands on the tip through `data-coreui-custom-class`; without one the tip keeps its default look, the page's foreground colour.
+
+<Example class="tooltip-demo" sandboxJsId="enable-tooltips" code={`<button type="button" class="btn-outline" data-coreui-toggle="tooltip" data-coreui-custom-class="theme-primary" data-coreui-title="Primary tooltip">Primary</button>
+  <button type="button" class="btn-outline" data-coreui-toggle="tooltip" data-coreui-custom-class="theme-secondary" data-coreui-title="Secondary tooltip">Secondary</button>
+  <button type="button" class="btn-outline" data-coreui-toggle="tooltip" data-coreui-custom-class="theme-success" data-coreui-title="Success tooltip">Success</button>
+  <button type="button" class="btn-outline" data-coreui-toggle="tooltip" data-coreui-custom-class="theme-danger" data-coreui-title="Danger tooltip">Danger</button>`} />
+
 ### Positioning
 
 Bootstrap Tooltips support multiple placements: top, right, bottom, and left. The default is top. Directions are mirrored when using CoreUI in RTL. To change placement, use the `data-coreui-placement` attribute:
