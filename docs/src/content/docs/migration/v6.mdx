@@ -2472,6 +2472,19 @@ root token rather than that variable. Restyle the whole family through the
 `--cui-btn-input-*` tokens, or set the matching `$form-otp-control-*` variable
 alongside it.
 
+#### The OTP cell is a `.form-control` frame
+
+`.form-otp-control` now declares the whole `$form-control-tokens` map and
+renders through the same `form-control-frame()` mixin as `.form-control`, so
+a change to the text-control frame reaches the cell without a second copy.
+The nineteen `$form-otp-control-*` variables that only re-pointed a
+`--cui-btn-input-*` token (`$form-otp-control-bg`, `-font-size`,
+`-focus-ring` and the rest) are gone with it; what remains is what the cell
+sets differently — `$form-otp-control-width`, `$form-otp-control-padding-x`
+and the size trios. Rendered values are unchanged. To restyle one cell set
+the `--cui-control-*` token on it; to restyle the family, the
+`--cui-btn-input-*` token on `:root`.
+
 #### The input frame is complete on `:root`
 
 The shared `--cui-btn-input-*` frame gains the slots every field was
