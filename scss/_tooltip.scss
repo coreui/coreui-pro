@@ -13,7 +13,7 @@ $tooltip-bg:                        var(--#{$prefix}fg-body) !default;
 $tooltip-border-radius:             var(--#{$prefix}radius-5) !default;
 $tooltip-opacity:                   .95 !default;
 $tooltip-padding-y:                 calc(var(--#{$prefix}spacer) * .375) !default;
-$tooltip-padding-x:                 var(--#{$prefix}spacer-3) !default;
+$tooltip-padding-x:                 calc(var(--#{$prefix}spacer) * .75) !default;
 
 $tooltip-arrow-width:               .8rem !default;
 $tooltip-arrow-height:              .4rem !default;
