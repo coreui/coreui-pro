@@ -40,18 +40,7 @@ $utilities-bg-muted: theme-color-refs("bg-muted", "-muted") !default;
 // scss-docs-end utilities-bg-colors
 
 // scss-docs-start utilities-border-colors
-$utilities-border-colors: map.merge(
-  theme-color-refs("bg"),
-  (
-    "black": var(--#{$prefix}black),
-    "white": var(--#{$prefix}white),
-    "bg": var(--#{$prefix}bg-body),
-    "subtle": var(--#{$prefix}border-subtle),
-    "muted": var(--#{$prefix}border-muted),
-    "body": var(--#{$prefix}border-color),
-    "emphasized": var(--#{$prefix}border-emphasized)
-  )
-) !default;
+$utilities-border-colors: map.merge(theme-color-refs("bg"), theme-token-refs($theme-borders, "border")) !default;
 
 $utilities-border-subtle: theme-color-refs("border", "-subtle") !default;
 // scss-docs-end utilities-border-colors
@@ -1005,13 +994,7 @@ $utilities: map.merge(
         color: color-mix(in srgb, var(--#{$prefix}text) calc(var(--#{$prefix}text-opacity) * 100%), transparent),
       ),
       class: fg,
-      values: (
-        "body": var(--#{$prefix}fg-body),
-        "1": var(--#{$prefix}fg-1),
-        "2": var(--#{$prefix}fg-2),
-        "3": var(--#{$prefix}fg-3),
-        "4": var(--#{$prefix}fg-4),
-      )
+      values: theme-token-refs($theme-fgs, "fg")
     ),
     "text-opacity": (
       property: (--#{$prefix}text-opacity: null),
@@ -1107,13 +1090,8 @@ $utilities: map.merge(
       ),
       class: bg,
       values: map.merge(
-        $utilities-bg-colors,
+        map.merge($utilities-bg-colors, theme-token-refs($theme-bgs, "bg")),
         (
-          "transparent": transparent,
-          "1": var(--#{$prefix}bg-1),
-          "2": var(--#{$prefix}bg-2),
-          "3": var(--#{$prefix}bg-3),
-          "4": var(--#{$prefix}bg-4),
           "body-secondary": var(--#{$prefix}bg-4), // deprecated
           "body-tertiary": var(--#{$prefix}bg-3), // deprecated
         )

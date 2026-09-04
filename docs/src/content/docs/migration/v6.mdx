@@ -2335,6 +2335,32 @@ as such.
   tokens — cards, list groups, tables, inputs, tabs, the switch and check
   frames — follows.
 
+#### The neutral ladder is three maps
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`$theme-bgs`, `$theme-fgs` and `$theme-borders` replace the neutral
+  scalars.** `$fg-body`, `$fg-1` … `$fg-4`, `$bg-body`, `$bg-1` … `$bg-4`,
+  `$border-subtle`, `$border-muted` and `$border-emphasized` are gone; each
+  map lives in `scss/_theme.scss` in the `defaults()` shape, `:root` emits
+  every entry as `--cui-bg-{key}`, `--cui-fg-{key}` or `--cui-border-{key}`,
+  and the `.bg-*`, `.fg-*` and `.border-*` utilities are generated from the
+  same maps. `$border-color` stays a scalar — it is the default every
+  component reads, not a rung. Override an entry instead of a variable:
+
+  ```diff
+  - $bg-body: #000;
+  - $fg-body: #111;
+  + $theme-bgs: ("body": #000);
+  + $theme-fgs: ("body": #111);
+  ```
+
+  The maps also carry `white`, `black`, `bg`/`fg` (the opposite ladder's
+  body) and, for backgrounds, `transparent`, so `.bg-fg`, `.fg-bg`,
+  `.fg-white`, `.fg-black`, `.border-bg`, `.border-white` and
+  `.border-black` read tokens like every other rung. `.border-body` reads
+  `--cui-border-body`, `light-dark(gray-300, gray-800)`, a step heavier than
+  `--cui-border-color`; it was an alias of the default border before.
+
 #### Theme colours have no bare token
 
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
@@ -3132,10 +3158,10 @@ Two consequences for the tokens:
 - **`.text-body` and `.text-body-emphasis` are unaffected** — they are not
   ordinal, any more than `.text-primary` is.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
-  **The Sass knobs follow the ladder.** `$fg-body`, `$fg-1` … `$fg-4`,
-  `$bg-body`, `$bg-1` … `$bg-4` replace `$body-color`, `$body-bg`,
+  **The Sass knobs follow the ladder.** The `$theme-fgs` and `$theme-bgs`
+  maps (`"body"`, `"1"` … `"4"`) replace `$body-color`, `$body-bg`,
   `$body-secondary-color`, `$body-secondary-bg`, `$body-tertiary-color` and
-  `$body-tertiary-bg`; every knob holds one `light-dark()` expression, so
+  `$body-tertiary-bg`; every entry holds one `light-dark()` expression, so
   `$body-bg-dark` and `$body-tertiary-bg-dark` are gone too — the translucent
   tints that needed their Sass colors read the grays inline, which also means
   the bundled Bootstrap theme recomputes them from its own grays instead of

@@ -99,6 +99,10 @@ Grayscale colors are also available, but only a subset are used to generate any 
 
 ### Sass maps
 
+The surface ladder is one map: each key is one `.bg-{key}` utility and the `--cui-bg-{key}` token behind it, in light and dark mode. Add a key to add a rung, override one to retune it:
+
+<ScssDocs file="scss/_theme.scss" capture="theme-bgs-map" />
+
 Each entry sets `background-color` for one `.bg-{color}-subtle` utility, in light and dark mode:
 
 <ScssDocs file="scss/_theme.scss" capture="theme-bg-subtle-map" />
