@@ -3,6 +3,7 @@
 @use "sass:meta";
 @use "sass:string";
 @use "../config" as *;
+@use "../layout/breakpoints" as *;
 
 // Registers every custom property a utility assigns to as non-inheriting.
 //
@@ -220,3 +221,33 @@
     }
   }
 }
+
+// scss-docs-start generate-utilities-loop
+@mixin generate-utilities-loop($utilities, $breakpoints) {
+  @each $breakpoint in map.keys($breakpoints) {
+    @include media-breakpoint-up($breakpoint, $breakpoints) {
+      $infix: breakpoint-infix($breakpoint, $breakpoints);
+
+      @each $key, $utility in $utilities {
+        // The utility can be disabled by replacing it with `false` or by setting
+        // `enabled: false`, thus check if the utility is a map first.
+        // Only proceed if responsive media queries are enabled or if it's the base media query
+        @if meta.type-of($utility) == "map" and map.get($utility, enabled) != false and (map.get($utility, responsive) or $infix == "") {
+          @include generate-utility($utility, $infix);
+        }
+      }
+    }
+  }
+
+  // Print utilities
+  @media print {
+    @each $key, $utility in $utilities {
+      // The utility can be disabled with `false`, thus check if the utility is a map first
+      // Then check if the utility needs print styles
+      @if meta.type-of($utility) == "map" and map.get($utility, enabled) != false and map.get($utility, print) == true {
+        @include generate-utility($utility, "-print");
+      }
+    }
+  }
+}
+// scss-docs-end generate-utilities-loop

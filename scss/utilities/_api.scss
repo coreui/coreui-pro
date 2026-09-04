@@ -1,7 +1,6 @@
 @use "sass:map";
 @use "sass:meta";
 @use "../utilities" as *;
-@use "../layout/breakpoints" as *;
 @use "../mixins/ltr-rtl" as *;
 @use "../mixins/utilities" as *;
 @use "../config" as *;
@@ -11,24 +10,7 @@
 @include generate-utility-at-properties($utilities);
 
 @layer utilities {
-  // Loop over each breakpoint
-  @each $breakpoint in map.keys($grid-breakpoints) {
-
-    // Generate media query if needed
-    @include media-breakpoint-up($breakpoint) {
-      $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
-
-      // Loop over each utility property
-      @each $key, $utility in $utilities {
-        // The utility can be disabled by replacing it with `false` or by setting
-        // `enabled: false`, thus check if the utility is a map first.
-        // Only proceed if responsive media queries are enabled or if it's the base media query
-        @if meta.type-of($utility) == "map" and map.get($utility, enabled) != false and (map.get($utility, responsive) or $infix == "") {
-          @include generate-utility($utility, $infix);
-        }
-      }
-    }
-  }
+  @include generate-utilities-loop($utilities, $grid-breakpoints);
 
   // `transform` is not direction-aware, so the one utility that centres an
   // element on a logical inset has to be flipped by hand: in an RTL document
@@ -58,17 +40,6 @@
       .animation-shake,
       .animation-pop {
         animation: none;
-      }
-    }
-  }
-
-  // Print utilities
-  @media print {
-    @each $key, $utility in $utilities {
-      // The utility can be disabled with `false`, thus check if the utility is a map first
-      // Then check if the utility needs print styles
-      @if meta.type-of($utility) == "map" and map.get($utility, enabled) != false and map.get($utility, print) == true {
-        @include generate-utility($utility, "-print");
       }
     }
   }

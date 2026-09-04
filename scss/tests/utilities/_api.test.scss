@@ -1,57 +1,87 @@
-@use "sass:map";
+@use "../../mixins/utilities" as *;
 
-@use "../../config" with (
-  // Stated rather than inherited: this spec is about breakpoints, so it should
-  // not change meaning when the importance default does.
-  $enable-important-utilities: false,
-  $grid-breakpoints: (
-    xs: 0,
-    sm: 333px,
-    md: 666px
-  )
+$test-breakpoints: (
+  xs: 0,
+  sm: 333px,
+  md: 666px
 );
 
-@use "../../utilities" as *;
+@include describe("utilities/api loop") {
+  @include describe("enabled") {
+    @include it("skips utilities with enabled: false") {
+      $test-utilities: (
+        opacity: (
+          property: opacity,
+          values: (50: .5)
+        ),
+        float: (
+          property: float,
+          enabled: false,
+          values: (start: inline-start, end: inline-end)
+        )
+      );
 
-$utilities: (
-  margin: (
-    property: margin,
-    values: auto
-  ),
-  padding: (
-    property: padding,
-    responsive: true,
-    values: 1rem
-  ),
-  font-size: (
-    property: font-size,
-    values: (large: 1.25rem),
-    print: true
-  )
-);
+      @include assert() {
+        @include output() {
+          @include generate-utilities-loop($test-utilities, $test-breakpoints);
+        }
 
-@include describe("utilities/api") {
-  @include it("generates utilities for each breakpoints") {
-    @include assert() {
-      @include output() {
-        @import "../../utilities/api";
+        @include expect() {
+          .opacity-50 {
+            opacity: .5;
+          }
+        }
       }
+    }
 
-      @include expect() {
-        // The API emits into the utilities cascade layer.
-        @layer utilities {
-          // margin is not set to responsive
+    @include it("outputs utilities without an explicit enabled key") {
+      $test-utilities: (
+        opacity: (
+          property: opacity,
+          values: (25: .25)
+        )
+      );
+
+      @include assert() {
+        @include output() {
+          @include generate-utilities-loop($test-utilities, $test-breakpoints);
+        }
+
+        @include expect() {
+          .opacity-25 {
+            opacity: .25;
+          }
+        }
+      }
+    }
+  }
+
+  @include describe("responsive") {
+    @include it("generates responsive classes only for utilities with responsive: true") {
+      $test-utilities: (
+        margin: (
+          property: margin,
+          values: auto
+        ),
+        padding: (
+          property: padding,
+          responsive: true,
+          values: 1rem
+        )
+      );
+
+      @include assert() {
+        @include output() {
+          @include generate-utilities-loop($test-utilities, $test-breakpoints);
+        }
+
+        @include expect() {
           .margin-auto {
             margin: auto;
           }
 
-          // padding is, though
           .padding-1rem {
             padding: 1rem;
-          }
-
-          .font-size-large {
-            font-size: 1.25rem;
           }
 
           @media (width >= 333px) {
@@ -65,6 +95,38 @@ $utilities: (
               padding: 1rem;
             }
           }
+        }
+      }
+    }
+  }
+
+  @include describe("print") {
+    @include it("generates print classes only for utilities with print: true") {
+      $test-utilities: (
+        font-size: (
+          property: font-size,
+          values: (large: 1.25rem),
+          print: true
+        ),
+        opacity: (
+          property: opacity,
+          values: (50: .5)
+        )
+      );
+
+      @include assert() {
+        @include output() {
+          @include generate-utilities-loop($test-utilities, $test-breakpoints);
+        }
+
+        @include expect() {
+          .font-size-large {
+            font-size: 1.25rem;
+          }
+
+          .opacity-50 {
+            opacity: .5;
+          }
 
           @media print {
             .font-size-print-large {
@@ -73,7 +135,6 @@ $utilities: (
           }
         }
       }
-
     }
   }
 }

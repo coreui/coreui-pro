@@ -466,6 +466,10 @@ Sass cannot read a module and configure the same module in one file, which is th
 
 Your map is merged over the defaults, and the merge is shallow: a group you supply replaces the whole default group under that key. Include `property` and `values` in every group that emits CSS.
 
+The API module hands the map to the `generate-utilities-loop()` mixin, which walks it once per breakpoint and once more for print. Call it yourself to emit a map of your own outside `$utilities` — in a component partial, or against a different set of breakpoints:
+
+<ScssDocs file="scss/mixins/_utilities.scss" capture="generate-utilities-loop" />
+
 For a utilities-only build, load the utilities module and then the API module, which emits the classes and nothing else:
 
 ```scss
