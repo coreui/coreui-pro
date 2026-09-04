@@ -15,6 +15,14 @@ Width utilities are generated from the utility API in `_utilities.scss`. Include
   <div class="w-100 p-3" style="background-color: #eee;">Width 100%</div>
   <div class="w-auto p-3" style="background-color: #eee;">Width auto</div>`} />
 
+## Fixed widths
+
+`.w-1` through `.w-12` set a width from the `$sizes` map, one `$spacer` (1rem) per step, for boxes that should hold their size whatever the parent does — an avatar column, a fixed label, a swatch.
+
+<Example code={`<div class="w-4 p-2 bg-2">.w-4</div>
+<div class="w-8 p-2 bg-2">.w-8</div>
+<div class="w-12 p-2 bg-2">.w-12</div>`} />
+
 ## Max width
 
 Use `.max-w-100` to cap an element at the width of its parent — the usual reason to reach for it is an image or an SVG that would otherwise overflow.
@@ -63,6 +71,12 @@ Size an element from its content instead of its container: `.w-min` (the widest 
   <div class="w-fit p-2 bg-4 border">Fit width</div>`} />
 
 ## Customizing
+
+### Sass maps
+
+Each entry is one `.w-{step}` class and the width it sets. Add a key to define a step, or set one to `null` to drop it:
+
+<ScssDocs file="scss/_config.scss" capture="sizes-map" />
 
 ### Utilities API
 

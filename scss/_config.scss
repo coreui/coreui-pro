@@ -86,6 +86,28 @@ $negative-spacers: defaults(
   $negative-spacers
 );
 // scss-docs-end negative-spacers-map
+
+// scss-docs-start sizes-map
+$sizes: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$sizes: defaults(
+  (
+    1: $spacer,
+    2: $spacer * 2,
+    3: $spacer * 3,
+    4: $spacer * 4,
+    5: $spacer * 5,
+    6: $spacer * 6,
+    7: $spacer * 7,
+    8: $spacer * 8,
+    9: $spacer * 9,
+    10: $spacer * 10,
+    11: $spacer * 11,
+    12: $spacer * 12
+  ),
+  $sizes
+);
+// scss-docs-end sizes-map
 // scss-docs-end spacers-map
 
 // Style anchor elements.
@@ -134,12 +156,16 @@ $container-max-widths: defaults(
 
 $grid-columns:                12 !default;
 $grid-row-columns:            6 !default;
-$grid-gutter-width:           1.5rem !default;
+$grid-gutter-x:               1.5rem !default;
+$grid-gutter-y:               0 !default;
+// fusv-disable
+$grid-gutter-width:           $grid-gutter-x !default; // Deprecated in v6.0.0, removed in v7
+// fusv-enable
 $gutters:                     $spacers !default;
 
 // Container padding
 
-$container-padding-x: $grid-gutter-width !default;
+$container-padding-x: $grid-gutter-x !default;
 
 // scss-docs-start variable-gradient
 $gradient: linear-gradient(180deg, color-mix(in srgb, var(--#{$prefix}white) 15%, transparent), color-mix(in srgb, var(--#{$prefix}white) 0%, transparent)) !default;

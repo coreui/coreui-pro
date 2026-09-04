@@ -385,11 +385,12 @@ Using our built-in grid Sass variables and maps, it's possible to completely cus
 
 ### Columns and gutters
 
-The number of grid columns can be modified via Sass variables. `$grid-columns` is used to generate the widths (in percent) of each individual column while `$grid-gutter-width` sets the width for the column gutters.
+The number of grid columns can be modified via Sass variables. `$grid-columns` is used to generate the widths (in percent) of each individual column while `$grid-gutter-x` sets the width of the column gutters and `$grid-gutter-y` the height of the row gutters.
 
 ```scss
 $grid-columns: 12 !default;
-$grid-gutter-width: 1.5rem !default;
+$grid-gutter-x: 1.5rem !default;
+$grid-gutter-y: 0 !default;
 ```
 
 ### Grid tiers
@@ -422,8 +423,8 @@ When using CoreUI for Bootstrap's source Sass files, you have the option of usin
 Variables and maps determine the number of columns, the gutter width, and the media query point at which to begin floating columns. We use these to generate the predefined grid classes documented above, as well as for the custom mixins listed below.
 
 ```scss
-$grid-columns:      12;
-$grid-gutter-width: 1.5rem;
+$grid-columns:  12;
+$grid-gutter-x: 1.5rem;
 ```
 
 <ScssDocs file="scss/_config.scss" capture="breakpoints" />

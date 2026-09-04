@@ -2417,6 +2417,18 @@ as such.
   mobile mode, `$mobile-breakpoint: lg`, now starts below `1024px` — a tablet
   in landscape gets the mobile layout.
 
+#### Fixed widths and a vertical gutter knob
+
+- **New: `.w-1` … `.w-12`**, one `$spacer` per step from the `$sizes` map,
+  merged into the width utility next to the percentages.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`$grid-gutter-width` is `$grid-gutter-x`, and `$grid-gutter-y` joins it.**
+  `make-row()` takes both (`make-row($gutter-x, $gutter-y)`) and writes them to
+  `--cui-gutter-x` / `--cui-gutter-y`; the row gutter defaults to `0` as
+  before, so nothing moves unless you set it. `make-grid-columns()` and the
+  card group read `$grid-gutter-x`. `$grid-gutter-width` stays as a deprecated
+  alias of `$grid-gutter-x` until v7 — set the new name, the alias only reads.
+
 #### Every theme colour gets an action-background slot
 
 `:root` emits `--cui-{color}-bg` for every theme colour, pointing at the
