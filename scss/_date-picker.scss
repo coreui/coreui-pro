@@ -3,7 +3,7 @@
 @use "functions/defaults" as *;
 @use "mixins/tokens" as *;
 @use "config" as *;
-@use "forms/form-control-group" as *;
+@use "mixins/form-control" as *;
 
 // scss-docs-start date-picker-variables
 $date-picker-footer-padding:           .5rem !default;

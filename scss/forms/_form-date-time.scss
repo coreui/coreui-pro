@@ -2,7 +2,7 @@
 @use "../mixins/border-radius" as *;
 @use "../mixins/tokens" as *;
 @use "../config" as *;
-@use "form-control-group" as *;
+@use "../mixins/form-control" as *;
 
 // scss-docs-start form-date-time-variables
 $form-date-time-placeholder-color:       var(--#{$prefix}fg-2) !default;

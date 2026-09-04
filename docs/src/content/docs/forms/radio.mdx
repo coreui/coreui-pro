@@ -211,6 +211,12 @@ Sass variables set these defaults at build time and are removed in v7. The CSS v
 
 <ScssDocs file="scss/forms/_radio.scss" capture="radio-variables" />
 
+### Sass maps
+
+Each size is one entry, and the map merges with your overrides — add a key to define a size, or set one to `null` to drop it:
+
+<ScssDocs file="scss/forms/_radio.scss" capture="radio-sizes" />
+
 ### Shared variables
 
 The checkbox, the radio and the switch share their size and their focus, active and disabled states. Those live on `:root` as `--cui-control-*`, so one declaration retunes all three at runtime; the Sass variables behind them set the defaults:

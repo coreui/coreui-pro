@@ -18,11 +18,17 @@ $check-mark-checked:         url("data:image/svg+xml,<svg xmlns='http://www.w3.o
 $check-mark-indeterminate:   url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path fill='none' stroke='black' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10h8'/></svg>") !default;
 // scss-docs-end check-variables
 
+$check-sizes: () !default;
+
 // scss-docs-start check-sizes
-$check-sizes: (
-  sm: (size: .875rem, margin-top: .21875rem, font-size: var(--#{$prefix}font-size-sm)),
-  lg: (size: 1.25rem, margin-top: .3125rem, font-size: var(--#{$prefix}font-size-lg))
-) !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$check-sizes: defaults(
+  (
+    sm: (size: .875rem, margin-top: .21875rem, font-size: var(--#{$prefix}font-size-sm)),
+    lg: (size: 1.25rem, margin-top: .3125rem, font-size: var(--#{$prefix}font-size-lg))
+  ),
+  $check-sizes
+);
 // scss-docs-end check-sizes
 
 $check-tokens: () !default;
