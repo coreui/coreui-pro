@@ -2,8 +2,6 @@
 @use "../theme" as *;
 @use "../config" as *;
 
-// The opacity utilities scale a runtime var, so calc() is unavoidable here.
-
 @layer helpers {
   @each $color in map.keys($theme-colors) {
     .text-bg-#{$color} {

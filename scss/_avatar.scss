@@ -110,8 +110,6 @@ $avatar-variants: defaults(
     justify-content: center;
     width: var(--#{$prefix}avatar-size);
     height: var(--#{$prefix}avatar-size);
-    // Declared as a fallback rather than a token, so the derived size is the
-    // default and an explicit one still wins.
     font-size: var(--#{$prefix}avatar-font-size);
     color: var(--#{$prefix}avatar-color);
     vertical-align: middle;

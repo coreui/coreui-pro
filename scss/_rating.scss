@@ -103,11 +103,6 @@ $rating-tokens: defaults(
 
     svg {
       height: var(--#{$prefix}rating-item-height);
-      pointer-events: none;
-
-      * {
-        pointer-events: none;
-      }
     }
 
     &.active {
