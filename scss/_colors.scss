@@ -4,7 +4,6 @@
 @use "sass:map";
 @use "config" as *;
 @use "functions" as *;
-@use "mixins/tokens" as *;
 
 // Color system
 //
@@ -192,12 +191,3 @@ $-color-defaults: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
 $color-tokens: defaults($-color-defaults, $color-tokens);
 // scss-docs-end color-tokens
-
-// Registered before the `@layer` declaration in _root.scss, which is safe only
-// because `colors` is the first name that declaration lists.
-@layer colors {
-  :root,
-  :host {
-    @include tokens($color-tokens);
-  }
-}

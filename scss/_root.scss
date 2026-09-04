@@ -371,6 +371,13 @@ $root-tokens: defaults($root-token-defaults, $root-tokens);
 
 @layer colors, config, root, reboot, layout, content, forms, components, custom, helpers, utilities;
 
+@layer colors {
+  :root,
+  :host {
+    @include tokens($color-tokens);
+  }
+}
+
 @layer root {
   :root,
   :host,
