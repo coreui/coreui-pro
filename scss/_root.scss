@@ -2,7 +2,6 @@
 @use "sass:meta";
 @use "functions/defaults" as *;
 @use "mixins/tokens" as *;
-@use "functions/color-translucent" as *;
 @use "mixins/color-mode" as *;
 @use "theme" as *;
 @use "colors" as *;
@@ -45,7 +44,7 @@ $bg-4:        light-dark(var(--#{$prefix}gray-200), var(--#{$prefix}gray-700)) !
 // scss-docs-start border-variables
 $border-width:             1px !default;
 $border-style:             solid !default;
-$border-color-translucent: light-dark(color-translucent($gray-300, .175), color-translucent($gray-800, .25, $gray-975)) !default;
+$border-color-translucent: color-mix(in oklch, var(--#{$prefix}fg-body) 15%, transparent) !default;
 // scss-docs-end border-variables
 
 // scss-docs-start border-radius-variables
