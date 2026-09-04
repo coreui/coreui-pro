@@ -137,11 +137,7 @@ Four style utilities pair a themed surface with its matching text color — comp
 
 Sass variables set these defaults at build time and are removed in v7. The CSS variables above reach the same values without recompiling, and can be set on a single element.
 
-<ScssDocs file="scss/_colors.scss" capture="theme-color-variables" />
-
-`secondary` and `inverse` are built from the grays instead of a hue of their own, so they live with the theme rather than with the palette:
-
-<ScssDocs file="scss/_theme.scss" capture="theme-neutral-variables" />
+<ScssDocs file="scss/_theme.scss" capture="theme-color-variables" />
 
 Each theme class also carries its own interaction shades, computed from the color in the browser, so a component asking for "this color, one step darker" reads a token instead of recomputing it. These two multipliers set how far a shade travels:
 

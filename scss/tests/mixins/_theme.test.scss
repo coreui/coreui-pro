@@ -2,6 +2,17 @@
 @use "../../theme" as *;
 
 @include describe("theme helpers") {
+  @include it("theme-color-scale-tokens gives a fixed base its scale and a scheme pair only the base") {
+    $tokens: theme-color-scale-tokens();
+
+    @include assert-equal(map-get($tokens, --cui-primary), $primary);
+    @include assert-equal(map-get($tokens, --cui-primary-500), var(--cui-primary));
+    @include assert-equal(map-get($tokens, --cui-primary-100), color-mix(in oklch, var(--cui-white) 89.8%, var(--cui-primary)));
+    @include assert-equal(map-get($tokens, --cui-secondary), $secondary);
+    @include assert-equal(map-has-key($tokens, --cui-secondary-500), false);
+    @include assert-equal(map-has-key($tokens, --cui-inverse-100), false);
+  }
+
   @include it("theme-color-refs points every colour at the slot's root token") {
     $refs: theme-color-refs("bg-subtle");
 

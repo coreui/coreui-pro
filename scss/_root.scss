@@ -369,7 +369,7 @@ $root-tokens: defaults($root-token-defaults, $root-tokens);
 @layer colors {
   :root,
   :host {
-    @include tokens($color-tokens);
+    @include tokens(map.merge($color-tokens, theme-color-scale-tokens()));
   }
 }
 

@@ -1,14 +1,22 @@
 @use "sass:map";
+@use "sass:meta";
+@use "sass:string";
 @use "functions/maps" as *;
 @use "mixins/tokens" as *;
+@use "colors" as *;
 @use "config" as *;
 
-// The two theme colours built from the grays rather than from a hue of their
-// own. The rest are palette colours; scss/_colors.scss holds them.
-// scss-docs-start theme-neutral-variables
+// stylelint-disable hue-degree-notation, @stylistic/number-leading-zero
+// scss-docs-start theme-color-variables
+$primary:       oklch(52.945% 0.19103 278.34) !default;
 $secondary:     light-dark(var(--#{$prefix}gray-100), var(--#{$prefix}gray-600)) !default;
+$success:       oklch(61.237% 0.17298 146.95) !default;
+$info:          oklch(67.55% 0.17646 252.26) !default;
+$warning:       oklch(80.791% 0.16473 78.5) !default;
+$danger:        oklch(63.864% 0.18175 23.81) !default;
 $inverse:       light-dark(var(--#{$prefix}gray-900), var(--#{$prefix}gray-100)) !default;
-// scss-docs-end theme-neutral-variables
+// scss-docs-end theme-color-variables
+// stylelint-enable hue-degree-notation, @stylistic/number-leading-zero
 
 $link-color:    var(--#{$prefix}primary) !default;
 
@@ -16,6 +24,7 @@ $link-color:    var(--#{$prefix}primary) !default;
 // scss-docs-start theme-colors-map
 $theme-colors: (
   "primary": (
+    "base":          $primary,
     "contrast":      var(--#{$prefix}white),
     "fg":            light-dark(var(--#{$prefix}primary-600), var(--#{$prefix}primary-400)),
     "fg-emphasis":   light-dark(var(--#{$prefix}primary-800), var(--#{$prefix}primary-200)),
@@ -35,6 +44,7 @@ $theme-colors: (
     "focus-ring":    color-mix(in srgb, light-dark(var(--#{$prefix}gray-500), var(--#{$prefix}gray-300)) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
   ),
   "success": (
+    "base":          $success,
     "contrast":      var(--#{$prefix}black),
     "fg":            light-dark(var(--#{$prefix}success-600), var(--#{$prefix}success-400)),
     "fg-emphasis":   light-dark(var(--#{$prefix}success-800), var(--#{$prefix}success-200)),
@@ -44,6 +54,7 @@ $theme-colors: (
     "focus-ring":    color-mix(in srgb, var(--#{$prefix}success) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
   ),
   "info": (
+    "base":          $info,
     "contrast":      var(--#{$prefix}black),
     "fg":            light-dark(var(--#{$prefix}info-700), var(--#{$prefix}info-300)),
     "fg-emphasis":   light-dark(var(--#{$prefix}info-800), var(--#{$prefix}info-200)),
@@ -53,6 +64,7 @@ $theme-colors: (
     "focus-ring":    color-mix(in srgb, var(--#{$prefix}info) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
   ),
   "warning": (
+    "base":          $warning,
     "contrast":      var(--#{$prefix}black),
     "fg":            light-dark(var(--#{$prefix}warning-700), var(--#{$prefix}warning-300)),
     "fg-emphasis":   light-dark(var(--#{$prefix}warning-800), var(--#{$prefix}warning-200)),
@@ -62,6 +74,7 @@ $theme-colors: (
     "focus-ring":    color-mix(in srgb, var(--#{$prefix}warning) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
   ),
   "danger": (
+    "base":          $danger,
     "contrast":      var(--#{$prefix}black),
     "fg":            light-dark(var(--#{$prefix}danger-600), var(--#{$prefix}danger-400)),
     "fg-emphasis":   light-dark(var(--#{$prefix}danger-800), var(--#{$prefix}danger-200)),
@@ -83,19 +96,6 @@ $theme-colors: (
 ) !default;
 // scss-docs-end theme-colors-map
 
-
-// Color scales
-//
-// The 100–900 scales come from the palette in `scss/_colors.scss`, mixed at
-// runtime from each color's own token. Override `--#{$prefix}primary` (or
-// `$primary`) and the whole family — subtle backgrounds, borders, emphasis text
-// — follows, in both color schemes.
-
-// The families below read the scales through `light-dark()`, so a theme color
-// reads correctly in both schemes without a second set of variables. `secondary`
-// and `inverse` read `$grays` instead: they are grays already, and their fill
-// swaps ends of the scale between schemes, which a scale mixed from one base
-// cannot do.
 
 // scss-docs-start theme-fg-emphasis-map
 $theme-colors-fg-emphasis: map-slot($theme-colors, "fg-emphasis") !default;
@@ -220,13 +220,30 @@ $theme-state-colors: (
 }
 // scss-docs-end theme-reset
 
-@function theme-color-tokens() {
+@function -scheme-pair($value) {
+  @return meta.type-of($value) != color and string.index(meta.inspect($value), "light-dark(") == 1;
+}
+
+@function theme-color-scale-tokens() {
   $tokens: ();
 
   @each $color, $slots in $theme-colors {
-    @if map.has-key($slots, "base") {
-      $tokens: map.set($tokens, --#{$prefix}#{$color}, map.get($slots, "base"));
+    $base: map.get($slots, "base");
+
+    @if -scheme-pair($base) {
+      $tokens: map.set($tokens, --#{$prefix}#{$color}, $base);
+    } @else if $base != null {
+      $tokens: map.merge($tokens, color-scale-tokens($color, $base));
     }
+  }
+
+  @return $tokens;
+}
+
+@function theme-color-tokens() {
+  $tokens: ();
+
+  @each $color in map.keys($theme-colors) {
     $tokens: map.set($tokens, --#{$prefix}#{$color}-base, var(--#{$prefix}#{$color}));
   }
 
