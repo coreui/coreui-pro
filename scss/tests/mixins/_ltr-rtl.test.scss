@@ -1,0 +1,70 @@
+@use "../../config" as *;
+@use "../../mixins/ltr-rtl" as *;
+
+@include describe("ltr-rtl mixins") {
+  @include it("reflect swaps left and right") {
+    @include assert-equal(reflect(margin-left), margin-right);
+    @include assert-equal(reflect(right), left);
+    @include assert-equal(reflect(center), center);
+  }
+
+  @include it("ltr-rtl writes the base value and the mirrored one under [dir=rtl]") {
+    @include assert() {
+      @include output() {
+        .test {
+          @include ltr-rtl("margin-left", 1rem);
+        }
+      }
+
+      @include expect() {
+        .test {
+          margin-left: 1rem;
+        }
+
+        *[dir="rtl"] & .test {
+          margin-right: 1rem;
+        }
+      }
+    }
+  }
+
+  @include it("ltr-rtl takes an explicit rtl property and value") {
+    @include assert() {
+      @include output() {
+        .test {
+          @include ltr-rtl("transform", translateX(-50%), null, translateX(50%));
+        }
+      }
+
+      @include expect() {
+        .test {
+          transform: translateX(-50%);
+        }
+
+        *[dir="rtl"] & .test {
+          transform: translateX(50%);
+        }
+      }
+    }
+  }
+
+  @include it("ltr-rtl-value-only keeps the property and mirrors the value") {
+    @include assert() {
+      @include output() {
+        .test {
+          @include ltr-rtl-value-only("float", left);
+        }
+      }
+
+      @include expect() {
+        .test {
+          float: left;
+        }
+
+        *[dir="rtl"] & .test {
+          float: right;
+        }
+      }
+    }
+  }
+}

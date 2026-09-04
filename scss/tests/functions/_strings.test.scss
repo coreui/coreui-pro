@@ -1,0 +1,30 @@
+@use "../../functions/escape-svg" as *;
+@use "../../functions/str-replace" as *;
+
+@include describe("str-replace function") {
+  @include it("replaces every occurrence") {
+    @include assert-equal(str-replace("a-b-c", "-", "+"), "a+b+c");
+  }
+
+  @include it("removes the search string when no replacement is given") {
+    @include assert-equal(str-replace("a-b-c", "-"), "abc");
+  }
+
+  @include it("returns the string untouched when the search is absent") {
+    @include assert-equal(str-replace("abc", "x", "y"), "abc");
+  }
+}
+
+@include describe("escape-svg function") {
+  @include it("percent-encodes the characters a data URI cannot carry") {
+    @include assert-equal(escape-svg("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><path fill='#fff' d='M0 0'/></svg>"), "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg'%3e%3cpath fill='%23fff' d='M0 0'/%3e%3c/svg%3e");
+  }
+
+  @include it("keeps the url() wrapper and its quotes") {
+    @include assert-equal(escape-svg(url("data:image/svg+xml,<svg></svg>")), url("data:image/svg+xml,%3csvg%3e%3c/svg%3e"));
+  }
+
+  @include it("leaves a string without a data URI alone") {
+    @include assert-equal(escape-svg("<b>(x)</b>"), "<b>(x)</b>");
+  }
+}

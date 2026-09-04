@@ -1,0 +1,72 @@
+// stylelint-disable property-disallowed-list
+@use "../../config" as *;
+@use "../../mixins/border-radius" as *;
+
+$original-enable-rounded: $enable-rounded;
+
+@include describe("border-radius mixins") {
+  @include it("emits the radius when rounding is enabled") {
+    $enable-rounded: true !global;
+
+    @include assert() {
+      @include output() {
+        .test {
+          @include border-radius(.5rem);
+          @include border-end-radius(.25rem);
+        }
+      }
+
+      @include expect() {
+        .test {
+          border-radius: .5rem;
+          border-start-end-radius: .25rem;
+          border-end-end-radius: .25rem;
+        }
+      }
+    }
+
+    $enable-rounded: $original-enable-rounded !global;
+  }
+
+  @include it("clamps a negative radius to 0") {
+    $enable-rounded: true !global;
+
+    @include assert() {
+      @include output() {
+        .test {
+          @include border-radius(-1px);
+        }
+      }
+
+      @include expect() {
+        .test {
+          border-radius: 0;
+        }
+      }
+    }
+
+    $enable-rounded: $original-enable-rounded !global;
+  }
+
+  @include it("emits nothing but the fallback when rounding is disabled") {
+    $enable-rounded: false !global;
+
+    @include assert() {
+      @include output() {
+        .test {
+          @include border-radius(.5rem);
+          @include border-top-radius(.5rem);
+          @include border-radius(.5rem, 0);
+        }
+      }
+
+      @include expect() {
+        .test {
+          border-radius: 0;
+        }
+      }
+    }
+
+    $enable-rounded: $original-enable-rounded !global;
+  }
+}

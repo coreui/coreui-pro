@@ -1,0 +1,20 @@
+@use "../../mixins/tokens" as *;
+
+@include describe("tokens mixin") {
+  @include it("writes every map entry as a custom property") {
+    @include assert() {
+      @include output() {
+        .test {
+          @include tokens((--cui-a: 1rem, --cui-b: var(--cui-a)));
+        }
+      }
+
+      @include expect() {
+        .test {
+          --cui-a: 1rem;
+          --cui-b: var(--cui-a);
+        }
+      }
+    }
+  }
+}

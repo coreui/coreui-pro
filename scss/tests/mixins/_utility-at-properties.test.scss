@@ -1,0 +1,72 @@
+// stylelint-disable custom-property-no-missing-var-function, block-no-empty
+@use "../../mixins/utilities" as *;
+
+@include describe("generate-utility-at-properties mixin") {
+  @include it("registers every custom property a utility writes, once, as non-inheriting") {
+    $utilities: (
+      "opacity": (
+        property: --cui-opacity,
+        values: (50: .5)
+      ),
+      "bg": (
+        property: (--cui-bg, --cui-opacity),
+        values: (white: #fff)
+      ),
+      "rounded-size": (
+        property: (--cui-rounded-size: null, border-radius: var(--cui-rounded-size)),
+        values: (4: 1rem)
+      )
+    );
+
+    @include assert() {
+      @include output() {
+        @include generate-utility-at-properties($utilities);
+      }
+
+      @include expect() {
+        @property --cui-opacity {
+          syntax: "*";
+          inherits: false;
+        }
+
+        @property --cui-bg {
+          syntax: "*";
+          inherits: false;
+        }
+
+        @property --cui-rounded-size {
+          syntax: "*";
+          inherits: false;
+        }
+      }
+    }
+  }
+
+  @include it("skips plain properties, disabled utilities and at-property: false") {
+    $utilities: (
+      "float": (
+        property: float,
+        values: (start: inline-start)
+      ),
+      "off": (
+        property: --cui-off,
+        enabled: false,
+        values: (1: 1)
+      ),
+      "focus-ring": (
+        property: --cui-focus-ring-color,
+        at-property: false,
+        values: (primary: red)
+      )
+    );
+
+    @include assert() {
+      @include output() {
+        @include generate-utility-at-properties($utilities);
+      }
+
+      @include expect() {
+      }
+    }
+  }
+}

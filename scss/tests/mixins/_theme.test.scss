@@ -1,0 +1,82 @@
+@use "../../config" as *;
+@use "../../theme" as *;
+
+@include describe("theme helpers") {
+  @include it("theme-color-refs points every colour at the slot's root token") {
+    $refs: theme-color-refs("bg-subtle");
+
+    @include assert-equal(map-get($refs, "primary"), var(--cui-primary-bg-subtle));
+    @include assert-equal(map-get($refs, "danger"), var(--cui-danger-bg-subtle));
+  }
+
+  @include it("theme-color-refs appends the key suffix") {
+    @include assert-equal(map-get(theme-color-refs("bg", "-hover"), "primary-hover"), var(--cui-primary-bg));
+  }
+
+  @include it("theme-tokens fills every slot from the colour's root tokens and derives the states") {
+    @include assert() {
+      @include output() {
+        .test {
+          @include theme-tokens("primary");
+        }
+      }
+
+      @include expect() {
+        .test {
+          --cui-theme-bg: var(--cui-primary-bg);
+          --cui-theme-contrast: var(--cui-primary-contrast);
+          --cui-theme-fg: var(--cui-primary-fg);
+          --cui-theme-fg-emphasis: var(--cui-primary-fg-emphasis);
+          --cui-theme-bg-subtle: var(--cui-primary-bg-subtle);
+          --cui-theme-bg-muted: var(--cui-primary-bg-muted);
+          --cui-theme-border: var(--cui-primary-border);
+          --cui-theme-focus-ring: var(--cui-primary-focus-ring);
+          --cui-theme-hover: oklch(from var(--cui-primary) calc(l * .85) c h);
+          --cui-theme-active: oklch(from var(--cui-primary) calc(l * .8) c h);
+        }
+      }
+    }
+  }
+
+  @include it("theme-tokens takes the neutral pair's states from the gray scale") {
+    @include assert() {
+      @include output() {
+        .test {
+          @include theme-tokens("secondary");
+        }
+      }
+
+      @include contains() {
+        .test {
+          --cui-theme-hover: light-dark(var(--cui-gray-200), var(--cui-gray-700));
+          --cui-theme-active: light-dark(var(--cui-gray-300), var(--cui-gray-800));
+        }
+      }
+    }
+  }
+
+  @include it("theme-reset sets every slot back to initial") {
+    @include assert() {
+      @include output() {
+        .test {
+          @include theme-reset();
+        }
+      }
+
+      @include expect() {
+        .test {
+          --cui-theme-bg: initial;
+          --cui-theme-contrast: initial;
+          --cui-theme-fg: initial;
+          --cui-theme-fg-emphasis: initial;
+          --cui-theme-bg-subtle: initial;
+          --cui-theme-bg-muted: initial;
+          --cui-theme-border: initial;
+          --cui-theme-focus-ring: initial;
+          --cui-theme-hover: initial;
+          --cui-theme-active: initial;
+        }
+      }
+    }
+  }
+}
