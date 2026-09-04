@@ -28,6 +28,9 @@ const F10_KEY = 'F10'
 const EVENT_CONTEXTMENU_DATA_API = `contextmenu${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_KEYDOWN_DATA_API = `keydown${EVENT_KEY}${DATA_API_KEY}`
 
+const SCROLL_EVENTS = ['wheel', 'touchmove', 'keydown']
+const SCROLL_KEYS = new Set([' ', 'PageUp', 'PageDown'])
+
 const CLASS_NAME_SHOW = 'show'
 
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="context-menu"]'
@@ -52,11 +55,13 @@ const DefaultType: Record<string, string> = {
 class ContextMenu extends Menu {
   declare ['constructor']: typeof ContextMenu
   protected declare _point: Point | null
+  protected declare _scrollBlocker: ((event: Event) => void) | null
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
 
     this._point = null
+    this._scrollBlocker = null
 
     if (this._menu && !this._menu.hasAttribute('tabindex')) {
       this._menu.setAttribute('tabindex', '-1')
@@ -89,6 +94,11 @@ class ContextMenu extends Menu {
     this._show(point, { relatedTarget: this._element })
   }
 
+  override dispose(): void {
+    this._unlockScroll()
+    super.dispose()
+  }
+
   // Private
   protected _show(point: Point | undefined, relatedTarget: Record<string, unknown>): void {
     if (isDisabled(this._element) || this._isShown()) {
@@ -105,6 +115,7 @@ class ContextMenu extends Menu {
 
     this._moveMenuToContainer()
     this._createFloating()
+    this._lockScroll()
 
     if ('ontouchstart' in document.documentElement) {
       for (const element of document.body.children) {
@@ -135,6 +146,7 @@ class ContextMenu extends Menu {
 
     const hadFocus = this._menu.contains(document.activeElement)
 
+    this._unlockScroll()
     this._disposeFloating()
     this._restoreMenuToOriginalParent()
 
@@ -148,6 +160,46 @@ class ContextMenu extends Menu {
 
     Menu._openInstances.delete(this)
     EventHandler.trigger(this._element, this.constructor.eventName('hidden'), relatedTarget)
+  }
+
+  // The trigger is an area, not a button: a click anywhere outside the menu
+  // closes it, the trigger included.
+  protected override _isToggleTarget(): boolean {
+    return false
+  }
+
+  // Wheel and touch listeners on the document are passive by default, so the
+  // blocker goes through the native API to be allowed to prevent the scroll.
+  protected _lockScroll(): void {
+    if (this._scrollBlocker) {
+      return
+    }
+
+    this._scrollBlocker = (event: Event) => {
+      if (event.type === 'keydown' && !SCROLL_KEYS.has((event as KeyboardEvent).key)) {
+        return
+      }
+
+      if (!this._menu.contains(event.target as Node) || (event.type === 'keydown' && event.target === this._menu)) {
+        event.preventDefault()
+      }
+    }
+
+    for (const type of SCROLL_EVENTS) {
+      document.addEventListener(type, this._scrollBlocker, { passive: false })
+    }
+  }
+
+  protected _unlockScroll(): void {
+    if (!this._scrollBlocker) {
+      return
+    }
+
+    for (const type of SCROLL_EVENTS) {
+      document.removeEventListener(type, this._scrollBlocker)
+    }
+
+    this._scrollBlocker = null
   }
 
   override _getConfig(config?: ComponentConfig | null): ComponentConfig {

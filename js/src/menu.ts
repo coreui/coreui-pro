@@ -431,6 +431,10 @@ class Menu extends BaseComponent {
     return this._menu.classList.contains(CLASS_NAME_SHOW)
   }
 
+  protected _isToggleTarget(composedPath: EventTarget[]): boolean {
+    return composedPath.includes(this._element)
+  }
+
   protected _getPlacement(): string {
     const placement = this._responsivePlacements ?
       getResponsivePlacement(this._responsivePlacements, DEFAULT_PLACEMENT) :
@@ -965,7 +969,7 @@ class Menu extends BaseComponent {
       const composedPath = event.composedPath()
       const isMenuTarget = composedPath.includes(instance._menu)
       if (
-        composedPath.includes(instance._element) ||
+        instance._isToggleTarget(composedPath) ||
         (instance._config.autoClose === 'inside' && !isMenuTarget) ||
         (instance._config.autoClose === 'outside' && isMenuTarget)
       ) {

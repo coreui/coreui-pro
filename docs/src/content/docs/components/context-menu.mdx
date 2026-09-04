@@ -163,7 +163,7 @@ Focus moves into the menu when it opens and returns to the trigger when it close
 
 ## Usage
 
-The plugin listens on the document: a `contextmenu` event (a right-click, or a long-press on touch devices that dispatch it) or a <kbd>Shift</kbd>+<kbd>F10</kbd> / <kbd>Menu</kbd> keydown inside an element with `data-coreui-toggle="context-menu"` opens its `.menu` and suppresses the browser menu. A right-click inside the open menu keeps it open; one elsewhere closes it, and a left-click, <kbd>Esc</kbd> or tabbing out dismisses it the same way a [Menu](/components/menu/) closes.
+The plugin listens on the document: a `contextmenu` event (a right-click, or a long-press on touch devices that dispatch it) or a <kbd>Shift</kbd>+<kbd>F10</kbd> / <kbd>Menu</kbd> keydown inside an element with `data-coreui-toggle="context-menu"` opens its `.menu` and suppresses the browser menu. A right-click inside the open menu keeps it open; one elsewhere closes it, and so does a left-click anywhere outside the menu (the trigger area included), <kbd>Esc</kbd> or tabbing out. While the menu is open the page does not scroll - wheel, touch and the scroll keys are held, as with the native menu - but a `.menu-scrollable` still scrolls inside.
 
 <Callout>
 iOS Safari does not dispatch `contextmenu` for a long-press. Call `show()` yourself from a `touchstart`/`pointerdown` timer when the gesture matters on iOS.
@@ -212,7 +212,7 @@ The context menu accepts every [Menu option](/components/menu/#options). Two def
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
-| `autoClose` | boolean, string | `true` | Configure the auto close behavior of the menu: <ul class="my-2"><li>`true` - the menu will be closed by clicking outside or inside the menu.</li><li>`false` - the menu will be closed by manually calling `hide` or `toggle` method. (Also will not be closed by pressing <kbd>Esc</kbd> key)</li><li>`'inside'` - the menu will be closed (only) by clicking inside the menu.</li> <li>`'outside'` - the menu will be closed (only) by clicking outside the menu.</li></ul> A right-click elsewhere closes the menu under the same rules as a left-click outside. |
+| `autoClose` | boolean, string | `true` | Configure the auto close behavior of the menu: <ul class="my-2"><li>`true` - the menu will be closed by clicking outside or inside the menu. A click on the trigger area counts as outside.</li><li>`false` - the menu will be closed by manually calling `hide` or `toggle` method. (Also will not be closed by pressing <kbd>Esc</kbd> key)</li><li>`'inside'` - the menu will be closed (only) by clicking inside the menu.</li> <li>`'outside'` - the menu will be closed (only) by clicking outside the menu.</li></ul> A right-click elsewhere closes the menu under the same rules as a left-click outside. |
 | `boundary` | string, element | `'clippingParents'` | Overflow constraint boundary of the menu (applies only to the shift middleware). By default it's `clippingParents` and can accept an HTMLElement reference (via JavaScript only). For more information refer to Floating UI's [shift docs](https://floating-ui.com/docs/shift). |
 | `container` | string, element, boolean | `false` | Appends the menu to a specific element when shown. Use `'body'` or `true` to append to the document body, which helps escape ancestors that act as a containing block for fixed elements. The menu is moved back to its original position when hidden. |
 | `display` | string | `'dynamic'` | By default, we use Floating UI for dynamic positioning. Disable this with `static`. |

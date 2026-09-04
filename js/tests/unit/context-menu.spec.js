@@ -624,6 +624,86 @@ describe('ContextMenu', () => {
       return done
     })
 
+    it('should close on click inside the trigger but outside the menu', () => {
+      fixtureEl.innerHTML = markup()
+
+      const area = fixtureEl.querySelector('.area')
+      const menu = fixtureEl.querySelector('.menu')
+
+      const done = new Promise(resolve => {
+        area.addEventListener('hidden.coreui.context-menu', () => {
+          expect(menu).not.toHaveClass('show')
+          resolve()
+        })
+      })
+
+      whenShown(area, () => {
+        area.click()
+      })
+
+      rightClick(area)
+      return done
+    })
+
+    it('should block wheel and touch scrolling outside the menu while open', () => {
+      fixtureEl.innerHTML = markup()
+
+      const area = fixtureEl.querySelector('.area')
+      const menu = fixtureEl.querySelector('.menu')
+      const item = menu.querySelector('.menu-item')
+      const scroll = (target, type) => {
+        const event = new Event(type, { bubbles: true, cancelable: true })
+        target.dispatchEvent(event)
+        return event.defaultPrevented
+      }
+
+      expect(scroll(document.body, 'wheel')).toBeFalse()
+
+      const done = new Promise(resolve => {
+        area.addEventListener('hidden.coreui.context-menu', () => {
+          expect(scroll(document.body, 'wheel')).toBeFalse()
+          expect(scroll(area, 'touchmove')).toBeFalse()
+          resolve()
+        })
+      })
+
+      whenShown(area, () => {
+        expect(scroll(document.body, 'wheel')).toBeTrue()
+        expect(scroll(area, 'wheel')).toBeTrue()
+        expect(scroll(document.body, 'touchmove')).toBeTrue()
+        expect(scroll(item, 'wheel')).toBeFalse()
+        expect(scroll(item, 'touchmove')).toBeFalse()
+        ContextMenu.getInstance(area).hide()
+      })
+
+      rightClick(area)
+      return done
+    })
+
+    it('should block the scroll keys on the menu container but not on its items', () => {
+      fixtureEl.innerHTML = markup()
+
+      const area = fixtureEl.querySelector('.area')
+      const menu = fixtureEl.querySelector('.menu')
+      const item = menu.querySelector('.menu-item')
+      const press = (target, key) => {
+        const event = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key })
+        target.dispatchEvent(event)
+        return event.defaultPrevented
+      }
+
+      const done = whenShown(area, () => {
+        expect(press(menu, ' ')).toBeTrue()
+        expect(press(menu, 'PageDown')).toBeTrue()
+        expect(press(document.body, 'PageUp')).toBeTrue()
+        expect(press(item, ' ')).toBeFalse()
+        expect(press(menu, 'a')).toBeFalse()
+      })
+
+      rightClick(area)
+      return done
+    })
+
     it('should close on click on an item', () => {
       fixtureEl.innerHTML = markup()
 
@@ -818,6 +898,10 @@ describe('ContextMenu', () => {
         contextMenu.dispose()
         expect(ContextMenu.getInstance(area)).toBeNull()
         expect(Menu._openInstances.has(contextMenu)).toBeFalse()
+
+        const wheel = new Event('wheel', { bubbles: true, cancelable: true })
+        document.body.dispatchEvent(wheel)
+        expect(wheel.defaultPrevented).toBeFalse()
       })
 
       contextMenu.show({ x: 5, y: 5 })
