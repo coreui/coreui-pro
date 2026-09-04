@@ -1134,6 +1134,18 @@ adornment in the library — so the button needs no icon markup at all:
 - **`--cui-range-slider-label-padding-x`/`-y` reach the label.** Both were
   declared and nothing read them, so the knob existed and did nothing. They
   default to `0`, so no label moves.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The value bubble is a tooltip.** The plugin renders
+  `<output class="range-slider-tooltip tooltip bs-tooltip-top">` (vertical:
+  `bs-tooltip-start`) with `.tooltip-arrow` and `.tooltip-inner`, so the
+  bubble looks like every other tooltip on the page — dark on a light page —
+  and follows `--cui-tooltip-*` and the theme slots. The twelve
+  `--cui-range-slider-tooltip-*` look tokens (`-bg`, `-color`, `-padding-*`,
+  `-font-size`, `-border-radius`, `-box-shadow`, `-arrow-*`, `-max-width`,
+  `-transition`, `-zindex`) and their Sass variables are gone; only
+  `-margin-bottom` and `-margin-end` (the offset from the thumb) remain. For
+  the previous light bubble set `--cui-tooltip-bg: var(--cui-bg-4)` and
+  `--cui-tooltip-color: var(--cui-fg-body)` on the slider.
 
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **The pressed thumb adapts to the color mode.** Its color was 70% white
