@@ -56,18 +56,23 @@ $spacer: 1rem !default;
 // scss-docs-end spacer-variables
 
 // scss-docs-start spacers-map
-$spacers: (
-  0: 0,
-  1: $spacer * .25,
-  2: $spacer * .5,
-  3: $spacer,
-  4: $spacer * 1.5,
-  5: $spacer * 3,
-  6: $spacer * 4,
-  7: $spacer * 5,
-  8: $spacer * 6,
-  9: $spacer * 8,
-) !default;
+$spacers: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$spacers: defaults(
+  (
+    0: 0,
+    1: $spacer * .25,
+    2: $spacer * .5,
+    3: $spacer,
+    4: $spacer * 1.5,
+    5: $spacer * 3,
+    6: $spacer * 4,
+    7: $spacer * 5,
+    8: $spacer * 6,
+    9: $spacer * 8,
+  ),
+  $spacers
+);
 
 // scss-docs-start negative-spacers-map
 $negative-spacers: () !default;
@@ -108,13 +113,18 @@ $grid-breakpoints: (
 // Define the maximum width of `.container` for different screen sizes.
 
 // scss-docs-start container-max-widths
-$container-max-widths: (
-  sm: 540px,
-  md: 720px,
-  lg: 960px,
-  xl: 1140px,
-  xxl: 1320px
-) !default;
+$container-max-widths: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$container-max-widths: defaults(
+  (
+    sm: 540px,
+    md: 720px,
+    lg: 960px,
+    xl: 1140px,
+    xxl: 1320px
+  ),
+  $container-max-widths
+);
 // scss-docs-end container-max-widths
 
 @include assert-ascending($container-max-widths, "$container-max-widths");
@@ -148,18 +158,23 @@ $radius:                      .5rem !default;
 // scss-docs-end radius-variables
 
 // scss-docs-start radii-map
-$radii: (
-  0: 0,
-  1: $radius * .25,
-  2: $radius * .375,
-  3: $radius * .5,
-  4: $radius * .75,
-  5: $radius,
-  6: $radius * 1.25,
-  7: $radius * 1.5,
-  8: $radius * 2,
-  9: $radius * 3,
-) !default;
+$radii: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$radii: defaults(
+  (
+    0: 0,
+    1: $radius * .25,
+    2: $radius * .375,
+    3: $radius * .5,
+    4: $radius * .75,
+    5: $radius,
+    6: $radius * 1.25,
+    7: $radius * 1.5,
+    8: $radius * 2,
+    9: $radius * 3,
+  ),
+  $radii
+);
 // scss-docs-end radii-map
 
 // Every layer's alpha is base * strength * opacity, so the tint, the depth and
@@ -189,8 +204,6 @@ $font-family-base:            var(--#{$prefix}font-sans-serif) !default;
 // $font-size-base affects the font size of the body text
 $font-size-root:              null !default;
 $font-size-base:              1rem !default; // Assumes the browser default, typically `16px`
-$font-size-sm:                calc(var(--#{$prefix}body-font-size) * .875) !default;
-$font-size-lg:                calc(var(--#{$prefix}body-font-size) * 1.25) !default;
 
 $font-weight-lighter:         lighter !default;
 $font-weight-light:           300 !default;
@@ -200,29 +213,22 @@ $font-weight-semibold:        600 !default;
 $font-weight-bold:            700 !default;
 $font-weight-bolder:          bolder !default;
 
-// Composed from the variables above rather than replacing them, so a Sass
-// override of one step still reaches the token, the utility and every
-// component that reads it.
 // scss-docs-start font-weights
-$font-weights: (
-  lighter: $font-weight-lighter,
-  light: $font-weight-light,
-  normal: $font-weight-normal,
-  medium: $font-weight-medium,
-  semibold: $font-weight-semibold,
-  bold: $font-weight-bold,
-  bolder: $font-weight-bolder
-) !default;
+$font-weights: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$font-weights: defaults(
+  (
+    lighter: $font-weight-lighter,
+    light: $font-weight-light,
+    normal: $font-weight-normal,
+    medium: $font-weight-medium,
+    semibold: $font-weight-semibold,
+    bold: $font-weight-bold,
+    bolder: $font-weight-bolder
+  ),
+  $font-weights
+);
 // scss-docs-end font-weights
-
-$h1-font-size:                clamp(1.375rem, 1.375rem + 1.5vw, 2.5rem) !default;
-$h2-font-size:                clamp(1.325rem, 1.325rem + .9vw, 2rem) !default;
-$h3-font-size:                clamp(1.3rem, 1.3rem + .6vw, 1.75rem) !default;
-$h4-font-size:                clamp(1.275rem, 1.275rem + .3vw, 1.5rem) !default;
-$h5-font-size:                $font-size-lg !default;
-$h6-font-size:                var(--#{$prefix}body-font-size) !default;
-$font-size-5xl:               clamp(1.425rem, 1.425rem + 2.1vw, 3rem) !default;
-$font-size-6xl:               clamp(1.475rem, 1.475rem + 2.7vw, 3.5rem) !default;
 // scss-docs-end font-variables
 
 // scss-docs-start headings-variables
@@ -241,68 +247,66 @@ $headings-color:              inherit !default;
 // rendered, so nothing moves on screen.
 
 // scss-docs-start font-sizes
-$font-sizes: (
-  "xs":  ("font-size": calc(var(--#{$prefix}body-font-size) * .75), "line-height": var(--#{$prefix}body-line-height)),
-  "sm":  ("font-size": $font-size-sm,         "line-height": var(--#{$prefix}body-line-height)),
-  "md":  ("font-size": $h6-font-size,         "line-height": var(--#{$prefix}body-line-height)),
-  "lg":  ("font-size": $h5-font-size,         "line-height": $headings-line-height),
-  "xl":  ("font-size": $h4-font-size,         "line-height": $headings-line-height),
-  "2xl": ("font-size": $h3-font-size,         "line-height": $headings-line-height),
-  "3xl": ("font-size": $h2-font-size,         "line-height": $headings-line-height),
-  "4xl": ("font-size": $h1-font-size,         "line-height": $headings-line-height),
-  "5xl": ("font-size": $font-size-5xl,        "line-height": $headings-line-height),
-  "6xl": ("font-size": $font-size-6xl,        "line-height": $headings-line-height)
-) !default;
+$font-sizes: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$font-sizes: defaults(
+  (
+    "xs":  ("font-size": calc(var(--#{$prefix}body-font-size) * .75),   "line-height": var(--#{$prefix}body-line-height)),
+    "sm":  ("font-size": calc(var(--#{$prefix}body-font-size) * .875),  "line-height": var(--#{$prefix}body-line-height)),
+    "md":  ("font-size": var(--#{$prefix}body-font-size),               "line-height": var(--#{$prefix}body-line-height)),
+    "lg":  ("font-size": calc(var(--#{$prefix}body-font-size) * 1.25),  "line-height": $headings-line-height),
+    "xl":  ("font-size": clamp(1.275rem, 1.275rem + .3vw, 1.5rem),  "line-height": $headings-line-height),
+    "2xl": ("font-size": clamp(1.3rem, 1.3rem + .6vw, 1.75rem),     "line-height": $headings-line-height),
+    "3xl": ("font-size": clamp(1.325rem, 1.325rem + .9vw, 2rem),    "line-height": $headings-line-height),
+    "4xl": ("font-size": clamp(1.375rem, 1.375rem + 1.5vw, 2.5rem), "line-height": $headings-line-height),
+    "5xl": ("font-size": clamp(1.425rem, 1.425rem + 2.1vw, 3rem),   "line-height": $headings-line-height),
+    "6xl": ("font-size": clamp(1.475rem, 1.475rem + 2.7vw, 3.5rem), "line-height": $headings-line-height)
+  ),
+  $font-sizes
+);
 // scss-docs-end font-sizes
 
 // Warning: Avoid customizing these values. They're used for a bird's eye view
 // of components dependent on the z-axis and are designed to all work together.
 
-// scss-docs-start zindex-stack
-$zindex-dropdown:                   1000 !default;
-$zindex-sticky:                     1020 !default;
-$zindex-fixed:                      1030 !default;
-$zindex-sidebar-backdrop:           1034 !default;
-$zindex-sidebar:                    1035 !default;
-$zindex-offcanvas:                  1045 !default;
-$zindex-modal:                      1055 !default;
-$zindex-popover:                    1070 !default;
-$zindex-tooltip:                    1080 !default;
-$zindex-toast:                      1090 !default;
-// scss-docs-end zindex-stack
-
-// The whole z-axis in one place: the small steps for stacking inside a
-// component, then the library's overlay layers. Composed from the variables
-// above rather than replacing them, so overriding `$zindex-modal` still reaches
-// the 15 files that read it, and the map follows.
 // scss-docs-start zindex-levels-map
-$zindex-levels: (
-  n1: -1,
-  0: 0,
-  1: 1,
-  2: 2,
-  3: 3,
-  dropdown: $zindex-dropdown,
-  sticky: $zindex-sticky,
-  fixed: $zindex-fixed,
-  sidebar-backdrop: $zindex-sidebar-backdrop,
-  sidebar: $zindex-sidebar,
-  offcanvas: $zindex-offcanvas,
-  modal: $zindex-modal,
-  popover: $zindex-popover,
-  tooltip: $zindex-tooltip,
-  toast: $zindex-toast
-) !default;
+$zindex-levels: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$zindex-levels: defaults(
+  (
+    n1: -1,
+    0: 0,
+    1: 1,
+    2: 2,
+    3: 3,
+    dropdown: 1000,
+    sticky: 1020,
+    fixed: 1030,
+    sidebar-backdrop: 1034,
+    sidebar: 1035,
+    offcanvas: 1045,
+    modal: 1055,
+    popover: 1070,
+    tooltip: 1080,
+    toast: 1090
+  ),
+  $zindex-levels
+);
 // scss-docs-end zindex-levels-map
 
 // scss-docs-start aspect-ratios
-$aspect-ratios: (
-  "auto":  auto,
-  "1x1":   #{"1 / 1"},
-  "4x3":   #{"4 / 3"},
-  "16x9":  #{"16 / 9"},
-  "21x9":  #{"21 / 9"}
-) !default;
+$aspect-ratios: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$aspect-ratios: defaults(
+  (
+    "auto":  auto,
+    "1x1":   #{"1 / 1"},
+    "4x3":   #{"4 / 3"},
+    "16x9":  #{"16 / 9"},
+    "21x9":  #{"21 / 9"}
+  ),
+  $aspect-ratios
+);
 // scss-docs-end aspect-ratios
 
 // Code

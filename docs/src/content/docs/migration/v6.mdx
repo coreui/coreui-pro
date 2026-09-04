@@ -3466,11 +3466,11 @@ Nothing existing changes; these are additions. See
   mixins, no `$enable-rfs`, no `rfs` option in the utilities API, and none of
   the `$rfs-*` knobs (`$rfs-base-value`, `$rfs-breakpoint`, `$rfs-factor`,
   `$rfs-mode`, `$rfs-unit`, `$rfs-two-dimensional`, `$rfs-class`, …). Fluid type is
-  written as literal `clamp()` values in `$h1-font-size`–`$h4-font-size`,
+  written as literal `clamp()` values in the `$font-sizes` map,
   `$display-font-sizes` and `$legend-font-size`; rendering is unchanged at
   every viewport width.
 - **Headings no longer derive from `$font-size-base`** — a `clamp()` cannot be
-  multiplied. Override the `$h*-font-size` variables directly.
+  multiplied. Override the stop in `$font-sizes` directly.
 - A temporary `scss/vendor/_rfs.scss` shim (pass-through `font-size()`/`rfs()`
   mixins) exists only for the docs engine and will be removed — do not depend
   on it.
@@ -3769,7 +3769,7 @@ line height that belongs to it — upstream's mechanic, with our values, so
 $font-sizes: (
   "xs":  ("font-size": .75rem,        "line-height": 1.5),
   ...
-  "4xl": ("font-size": $h1-font-size, "line-height": 1.2)
+  "4xl": ("font-size": clamp(1.375rem, 1.375rem + 1.5vw, 2.5rem), "line-height": 1.2)
 );
 ```
 
@@ -3784,7 +3784,11 @@ $font-sizes: (
 - **`:root` gets `--cui-font-size-*` and `--cui-line-height-*` per
   stop**, and `h1`–`h6` read the tokens instead of the Sass variables. Restyling a
   stop at runtime now moves every heading and utility that uses it.
-  `$h1-font-size` … `$h6-font-size` are unchanged and still feed the scale.
+  `$h1-font-size` … `$h6-font-size`, `$font-size-sm`/`-lg`, `$font-size-5xl`/`-6xl`
+  and `$zindex-*` are gone: each was read only by the map it fed, so the maps
+  (`$font-sizes`, `$zindex-levels`) hold the values and are the override
+  point, in the `defaults()` shape — set one key and the rest stays.
+  `$font-weight-*` remain and feed `$font-weights` the same way.
 - **New: `.fs-{stop}`** alongside `.fs-1` … `.fs-6`, which keep working and render
   identically — `.fs-1` is `.fs-4xl`, down to `.fs-6`, which is `.fs-md`.
 - **New: `.text-{stop}`**, which sets `font-size` and `line-height` together.
