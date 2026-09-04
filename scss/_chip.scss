@@ -32,7 +32,7 @@ $chip-border-width:          var(--#{$prefix}border-width) !default;
 $chip-border-color:          transparent !default;
 
 $chip-active-color:          var(--#{$prefix}primary-contrast) !default;
-$chip-active-bg:             var(--#{$prefix}primary) !default;
+$chip-active-bg:             var(--#{$prefix}primary-base) !default;
 $chip-active-border-color:   transparent !default;
 
 $chip-hover-color:           $chip-color !default;

@@ -152,17 +152,17 @@ $grays: defaults(
 // scss-docs-end gray-colors-map
 // fusv-enable
 
-@function color-scale-tokens($color, $value) {
-  $tokens: (--#{$prefix}#{$color}: $value);
+@function color-scale-tokens($color, $value, $anchor: --#{$prefix}#{$color}) {
+  $tokens: ($anchor: $value);
 
   @each $stop, $weight in $color-tints {
-    $tokens: map.set($tokens, --#{$prefix}#{$color}-#{$stop}, color-mix(in $color-mix-space, $tint-color $weight, var(--#{$prefix}#{$color})));
+    $tokens: map.set($tokens, --#{$prefix}#{$color}-#{$stop}, color-mix(in $color-mix-space, $tint-color $weight, var(#{$anchor})));
   }
 
-  $tokens: map.set($tokens, --#{$prefix}#{$color}-500, var(--#{$prefix}#{$color}));
+  $tokens: map.set($tokens, --#{$prefix}#{$color}-500, var(#{$anchor}));
 
   @each $stop, $weight in $color-shades {
-    $tokens: map.set($tokens, --#{$prefix}#{$color}-#{$stop}, color-mix(in $color-mix-space, $shade-color $weight, var(--#{$prefix}#{$color})));
+    $tokens: map.set($tokens, --#{$prefix}#{$color}-#{$stop}, color-mix(in $color-mix-space, $shade-color $weight, var(#{$anchor})));
   }
 
   @return $tokens;

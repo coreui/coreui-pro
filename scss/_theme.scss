@@ -18,7 +18,7 @@ $inverse:       light-dark(var(--#{$prefix}gray-900), var(--#{$prefix}gray-100))
 // scss-docs-end theme-color-variables
 // stylelint-enable hue-degree-notation, @stylistic/number-leading-zero
 
-$link-color:    var(--#{$prefix}primary) !default;
+$link-color:    var(--#{$prefix}primary-base) !default;
 
 
 // scss-docs-start theme-colors-map
@@ -31,7 +31,7 @@ $theme-colors: (
     "bg-subtle":     light-dark(var(--#{$prefix}primary-100), var(--#{$prefix}primary-900)),
     "bg-muted":      light-dark(var(--#{$prefix}primary-200), var(--#{$prefix}primary-800)),
     "border":        light-dark(var(--#{$prefix}primary-300), var(--#{$prefix}primary-600)),
-    "focus-ring":    color-mix(in srgb, var(--#{$prefix}primary) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
+    "focus-ring":    color-mix(in srgb, var(--#{$prefix}primary-base) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
   ),
   "secondary": (
     "base":          $secondary,
@@ -51,7 +51,7 @@ $theme-colors: (
     "bg-subtle":     light-dark(var(--#{$prefix}success-100), var(--#{$prefix}success-900)),
     "bg-muted":      light-dark(var(--#{$prefix}success-200), var(--#{$prefix}success-800)),
     "border":        light-dark(var(--#{$prefix}success-300), var(--#{$prefix}success-600)),
-    "focus-ring":    color-mix(in srgb, var(--#{$prefix}success) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
+    "focus-ring":    color-mix(in srgb, var(--#{$prefix}success-base) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
   ),
   "info": (
     "base":          $info,
@@ -61,7 +61,7 @@ $theme-colors: (
     "bg-subtle":     light-dark(var(--#{$prefix}info-100), var(--#{$prefix}info-900)),
     "bg-muted":      light-dark(var(--#{$prefix}info-200), var(--#{$prefix}info-800)),
     "border":        light-dark(var(--#{$prefix}info-300), var(--#{$prefix}info-600)),
-    "focus-ring":    color-mix(in srgb, var(--#{$prefix}info) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
+    "focus-ring":    color-mix(in srgb, var(--#{$prefix}info-base) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
   ),
   "warning": (
     "base":          $warning,
@@ -71,7 +71,7 @@ $theme-colors: (
     "bg-subtle":     light-dark(var(--#{$prefix}warning-100), var(--#{$prefix}warning-900)),
     "bg-muted":      light-dark(var(--#{$prefix}warning-200), var(--#{$prefix}warning-800)),
     "border":        light-dark(var(--#{$prefix}warning-300), var(--#{$prefix}warning-600)),
-    "focus-ring":    color-mix(in srgb, var(--#{$prefix}warning) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
+    "focus-ring":    color-mix(in srgb, var(--#{$prefix}warning-base) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
   ),
   "danger": (
     "base":          $danger,
@@ -81,7 +81,7 @@ $theme-colors: (
     "bg-subtle":     light-dark(var(--#{$prefix}danger-100), var(--#{$prefix}danger-900)),
     "bg-muted":      light-dark(var(--#{$prefix}danger-200), var(--#{$prefix}danger-800)),
     "border":        light-dark(var(--#{$prefix}danger-300), var(--#{$prefix}danger-600)),
-    "focus-ring":    color-mix(in srgb, var(--#{$prefix}danger) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
+    "focus-ring":    color-mix(in srgb, var(--#{$prefix}danger-base) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
   ),
   "inverse": (
     "base":          $inverse,
@@ -191,7 +191,7 @@ $theme-state-colors: (
     @if $override {
       --#{$prefix}theme-#{$token}: #{$override};
     } @else {
-      --#{$prefix}theme-#{$token}: oklch(from var(--#{$prefix}#{$state}) calc(l * #{$lightness}) c h);
+      --#{$prefix}theme-#{$token}: oklch(from var(--#{$prefix}#{$state}-bg) calc(l * #{$lightness}) c h);
     }
   }
 }
@@ -231,9 +231,9 @@ $theme-state-colors: (
     $base: map.get($slots, "base");
 
     @if -scheme-pair($base) {
-      $tokens: map.set($tokens, --#{$prefix}#{$color}, $base);
+      $tokens: map.set($tokens, --#{$prefix}#{$color}-base, $base);
     } @else if $base != null {
-      $tokens: map.merge($tokens, color-scale-tokens($color, $base));
+      $tokens: map.merge($tokens, color-scale-tokens($color, $base, --#{$prefix}#{$color}-base));
     }
   }
 
@@ -243,14 +243,10 @@ $theme-state-colors: (
 @function theme-color-tokens() {
   $tokens: ();
 
-  @each $color in map.keys($theme-colors) {
-    $tokens: map.set($tokens, --#{$prefix}#{$color}-base, var(--#{$prefix}#{$color}));
-  }
-
   // The action-background slot: what checked, active and filled states read.
   // Points at the base color, so overriding either retunes every action state.
   @each $color in map.keys($theme-colors) {
-    $tokens: map.set($tokens, --#{$prefix}#{$color}-bg, var(--#{$prefix}#{$color}));
+    $tokens: map.set($tokens, --#{$prefix}#{$color}-bg, var(--#{$prefix}#{$color}-base));
   }
 
   @each $color, $value in $theme-colors-fg-emphasis {

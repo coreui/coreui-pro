@@ -92,7 +92,7 @@ The helpers are nothing more than the first two tokens set on the element:
 
 A look the helpers do not cover is a matter of the same tokens — a brand-coloured tint with no blur:
 
-<dialog class="dialog" id="exampleBackdropCustom" aria-labelledby="exampleBackdropCustomLabel" style="--cui-backdrop-color: var(--cui-primary); --cui-backdrop-opacity: 35%; --cui-backdrop-blur: 0;">
+<dialog class="dialog" id="exampleBackdropCustom" aria-labelledby="exampleBackdropCustomLabel" style="--cui-backdrop-color: var(--cui-primary-base); --cui-backdrop-opacity: 35%; --cui-backdrop-blur: 0;">
   <div class="dialog-header">
     <h5 class="dialog-title" id="exampleBackdropCustomLabel">Custom backdrop</h5>
     <button type="button" class="btn-close" data-coreui-dismiss="dialog" aria-label="Close"></button>
@@ -105,7 +105,7 @@ A look the helpers do not cover is a matter of the same tokens — a brand-colou
 <Example html={[`<button type="button" class="btn-solid theme-primary" data-coreui-toggle="dialog" data-coreui-target="#exampleBackdropCustom">`, `  Launch dialog with a custom backdrop`, `</button>`]} />
 
 ```html
-<dialog class="dialog" id="exampleBackdropCustom" style="--cui-backdrop-color: var(--cui-primary); --cui-backdrop-opacity: 35%; --cui-backdrop-blur: 0;">
+<dialog class="dialog" id="exampleBackdropCustom" style="--cui-backdrop-color: var(--cui-primary-base); --cui-backdrop-opacity: 35%; --cui-backdrop-blur: 0;">
   …
 </dialog>
 ```

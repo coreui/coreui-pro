@@ -176,7 +176,7 @@ $menu-tokens: defaults(
 
   .menu-translucent {
     --#{$prefix}menu-item-hover-bg: color-mix(in oklch, var(--#{$prefix}bg-1) 85%, transparent);
-    --#{$prefix}menu-item-active-bg: color-mix(in oklch, var(--#{$prefix}primary) 75%, transparent);
+    --#{$prefix}menu-item-active-bg: color-mix(in oklch, var(--#{$prefix}primary-base) 75%, transparent);
 
     @include translucent(var(--#{$prefix}menu-bg));
   }

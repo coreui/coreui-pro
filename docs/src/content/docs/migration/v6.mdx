@@ -2335,6 +2335,30 @@ as such.
   tokens — cards, list groups, tables, inputs, tabs, the switch and check
   frames — follows.
 
+#### Theme colours have no bare token
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`--cui-primary`, `--cui-secondary`, `--cui-success`, `--cui-info`,
+  `--cui-warning`, `--cui-danger` and `--cui-inverse` are gone.** A theme
+  colour is its set of slots — `-base`, `-bg`, `-fg`, `-fg-emphasis`,
+  `-bg-subtle`, `-bg-muted`, `-border`, `-focus-ring`, `-contrast` — and the
+  colour itself is the `-base` slot: `--cui-primary-base` is what
+  `--cui-primary` was, the 100–900 scale is mixed from it, and `-bg` (the
+  action background) points at it. The palette hues keep their bare token
+  (`--cui-blue`, `--cui-gray`): they are colours, not roles. Rename reads
+  one to one, and set the base to retint a colour:
+
+  ```diff
+  - .brand { color: var(--cui-primary); }
+  + .brand { color: var(--cui-primary-base); }
+
+  - :root { --cui-primary: #6f42c1; }
+  + :root { --cui-primary-base: #6f42c1; }
+  ```
+
+  Components that filled with the bare colour read `-base` now; the derived
+  hover and active states of a `.theme-*` class are computed from `-bg`.
+
 #### Every theme colour gets an action-background slot
 
 `:root` emits `--cui-{color}-bg` for every theme colour, pointing at the

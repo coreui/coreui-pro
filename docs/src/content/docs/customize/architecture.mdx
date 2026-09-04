@@ -99,4 +99,4 @@ When no theme class is present, the slot is unset and the fallback applies. A th
 }
 ```
 
-The slot values come from per-color scales generated with `color-mix()` from each color's base token, and the interactive states are derived at run time with relative color syntax — `oklch(from var(--cui-primary) calc(l * .85) c h)` — so overriding `--cui-primary` alone re-colors the subtle backgrounds, borders, emphasis text, hover and active states with it. The color system is documented on [Color](/customize/color/), the scheme switching on [Color modes](/customize/color-modes/).
+The slot values come from per-color scales generated with `color-mix()` from each color's base token, and the interactive states are derived at run time with relative color syntax — `oklch(from var(--cui-primary-base) calc(l * .85) c h)` — so overriding `--cui-primary` alone re-colors the subtle backgrounds, borders, emphasis text, hover and active states with it. The color system is documented on [Color](/customize/color/), the scheme switching on [Color modes](/customize/color-modes/).

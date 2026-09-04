@@ -5,10 +5,10 @@
   @include it("theme-color-scale-tokens gives a fixed base its scale and a scheme pair only the base") {
     $tokens: theme-color-scale-tokens();
 
-    @include assert-equal(map-get($tokens, --cui-primary), $primary);
-    @include assert-equal(map-get($tokens, --cui-primary-500), var(--cui-primary));
-    @include assert-equal(map-get($tokens, --cui-primary-100), color-mix(in oklch, var(--cui-white) 80%, var(--cui-primary)));
-    @include assert-equal(map-get($tokens, --cui-secondary), $secondary);
+    @include assert-equal(map-get($tokens, --cui-primary-base), $primary);
+    @include assert-equal(map-get($tokens, --cui-primary-500), var(--cui-primary-base));
+    @include assert-equal(map-get($tokens, --cui-primary-100), color-mix(in oklch, var(--cui-white) 80%, var(--cui-primary-base)));
+    @include assert-equal(map-get($tokens, --cui-secondary-base), $secondary);
     @include assert-equal(map-has-key($tokens, --cui-secondary-500), false);
     @include assert-equal(map-has-key($tokens, --cui-inverse-100), false);
   }
@@ -42,8 +42,8 @@
           --cui-theme-bg-muted: var(--cui-primary-bg-muted);
           --cui-theme-border: var(--cui-primary-border);
           --cui-theme-focus-ring: var(--cui-primary-focus-ring);
-          --cui-theme-hover: oklch(from var(--cui-primary) calc(l * .85) c h);
-          --cui-theme-active: oklch(from var(--cui-primary) calc(l * .8) c h);
+          --cui-theme-hover: oklch(from var(--cui-primary-bg) calc(l * .85) c h);
+          --cui-theme-active: oklch(from var(--cui-primary-bg) calc(l * .8) c h);
         }
       }
     }

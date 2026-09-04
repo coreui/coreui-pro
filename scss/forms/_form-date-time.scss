@@ -7,7 +7,7 @@
 // scss-docs-start form-date-time-variables
 $form-date-time-placeholder-color:       var(--#{$prefix}fg-3) !default;
 $form-date-time-section-border-radius:   .25rem !default;
-$form-date-time-section-focus-bg:        color-mix(in srgb, var(--#{$prefix}theme-bg, var(--#{$prefix}primary)) 25%, transparent) !default;
+$form-date-time-section-focus-bg:        color-mix(in srgb, var(--#{$prefix}theme-bg, var(--#{$prefix}primary-base)) 25%, transparent) !default;
 // scss-docs-end form-date-time-variables
 
 // stylelint-disable scss/dollar-variable-default
