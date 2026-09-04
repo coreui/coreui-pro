@@ -75,6 +75,18 @@ describe('RangeSlider', () => {
       expect([...tooltip.children].map(child => child.tagName)).toEqual(['SPAN', 'SPAN'])
     })
 
+    it('should add customClass to the tooltip only', () => {
+      fixtureEl.innerHTML = '<div data-coreui-toggle="range-slider" data-coreui-custom-class="theme-secondary my-bubble"></div>'
+
+      const element = fixtureEl.querySelector('[data-coreui-toggle="range-slider"]')
+      const rangeSlider = new RangeSlider(element)
+      const tooltip = element.querySelector('.range-slider-tooltip')
+
+      expect(tooltip.classList.contains('theme-secondary')).toBeTrue()
+      expect(tooltip.classList.contains('my-bubble')).toBeTrue()
+      expect(element.classList.contains('theme-secondary')).toBeFalse()
+    })
+
     it('should render the tooltip with the Tooltip markup, placed by orientation', () => {
       fixtureEl.innerHTML = '<div data-coreui-toggle="range-slider" data-coreui-value="40"></div><div data-coreui-toggle="range-slider" data-coreui-vertical="true"></div>'
 

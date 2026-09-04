@@ -8,6 +8,7 @@
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
 @use "config" as *;
+@use "theme" as *;
 
 // stylelint-disable custom-property-no-missing-var-function
 
@@ -238,6 +239,8 @@ $range-slider-vertical-tokens: defaults(
   }
 
   .range-slider-tooltip {
+    @include theme-reset();
+
     // Outside `$prefix` on purpose: the plugin writes this name.
     position: absolute;
     inset-inline-start: calc(var(--#{$prefix}range-slider-thumb-width) * .5 + var(--cui-range-slider-tooltip-position, 0) * (100% - var(--#{$prefix}range-slider-thumb-width)));
