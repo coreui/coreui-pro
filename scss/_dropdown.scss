@@ -165,7 +165,7 @@ $dropdown-dark-tokens: defaults(
       display: block;
     }
 
-    &[data#{$data-infix}popper] {
+    &[data-coreui-popper] {
       inset-inline-start: 0;
       top: 100%;
       margin-top: var(--#{$prefix}dropdown-spacer);
@@ -196,7 +196,7 @@ $dropdown-dark-tokens: defaults(
         // Read by the plugin, so the name stays outside `$prefix`.
         --cui-position: start;
 
-        &[data#{$data-infix}popper] {
+        &[data-coreui-popper] {
           inset-inline-start: 0;
           inset-inline-end: auto;
         }
@@ -205,7 +205,7 @@ $dropdown-dark-tokens: defaults(
       .dropdown-menu#{$infix}-end {
         --cui-position: end;
 
-        &[data#{$data-infix}popper] {
+        &[data-coreui-popper] {
           inset-inline-start: auto;
           inset-inline-end: 0;
         }
@@ -217,7 +217,7 @@ $dropdown-dark-tokens: defaults(
   // Allow for dropdowns to go bottom up (aka, dropup-menu)
   // Just add .dropup after the standard .dropdown class and you're set.
   .dropup {
-    .dropdown-menu[data#{$data-infix}popper] {
+    .dropdown-menu[data-coreui-popper] {
       top: auto;
       bottom: 100%;
       margin-top: 0;
@@ -230,7 +230,7 @@ $dropdown-dark-tokens: defaults(
   }
 
   .dropend {
-    .dropdown-menu[data#{$data-infix}popper] {
+    .dropdown-menu[data-coreui-popper] {
       inset-inline-start: 100%;
       inset-inline-end: auto;
       top: 0;
@@ -247,7 +247,7 @@ $dropdown-dark-tokens: defaults(
   }
 
   .dropstart {
-    .dropdown-menu[data#{$data-infix}popper] {
+    .dropdown-menu[data-coreui-popper] {
       inset-inline-start: auto;
       inset-inline-end: 100%;
       top: 0;

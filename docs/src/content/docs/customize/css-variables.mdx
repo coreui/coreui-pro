@@ -47,6 +47,8 @@ Most CSS variables use a prefix to avoid collisions with your own codebase. This
 
 Customize the prefix via the `$prefix` Sass variable. By default, it's set to `cui-` (note the trailing dash).
 
+The `data-*` attributes you write in your markup — `data-coreui-theme`, `data-coreui-target` — carry a second knob, `$data-infix` (`-coreui-` by default), so a theme can rename them: the Bootstrap theme sets it to `-bs-` and reads `data-bs-theme`. Attributes the JavaScript sets on elements while it runs (`data-coreui-popper`, `data-coreui-placement`, `data-coreui-validate`) are always `data-coreui-*` and do not follow it.
+
 ## Examples
 
 CSS variables offer similar flexibility to Sass's variables, but without the need for compilation before being served to the browser. For example, here we're resetting our page's font and link styles with CSS variables.
