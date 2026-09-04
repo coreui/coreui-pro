@@ -75,8 +75,8 @@ describe('RangeSlider', () => {
       expect([...tooltip.children].map(child => child.tagName)).toEqual(['SPAN', 'SPAN'])
     })
 
-    it('should add customClass to the tooltip only', () => {
-      fixtureEl.innerHTML = '<div data-coreui-toggle="range-slider" data-coreui-custom-class="theme-secondary my-bubble"></div>'
+    it('should add tooltipClass to the tooltip only', () => {
+      fixtureEl.innerHTML = '<div data-coreui-toggle="range-slider" data-coreui-tooltip-class="theme-secondary my-bubble"></div>'
 
       const element = fixtureEl.querySelector('[data-coreui-toggle="range-slider"]')
       const rangeSlider = new RangeSlider(element)

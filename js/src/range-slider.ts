@@ -59,7 +59,6 @@ type RangeSliderConfig = {
   allowList: SanitizerAllowList
   ariaLabels: string[] | null
   clickableLabels: boolean
-  customClass: string
   disabled: boolean
   distance: number
   labels: RangeSliderLabel[] | boolean | string
@@ -69,6 +68,7 @@ type RangeSliderConfig = {
   sanitize: boolean
   sanitizeFn: ((unsafeHtml: string) => string) | null
   step: number | string
+  tooltipClass: string
   tooltips: boolean
   tooltipsFormat: ((value: number | string) => string) | null
   track: boolean | string
@@ -80,7 +80,6 @@ const Default: RangeSliderConfig = {
   allowList: DefaultAllowlist,
   ariaLabels: null,
   clickableLabels: true,
-  customClass: '',
   disabled: false,
   distance: 0,
   labels: false,
@@ -90,6 +89,7 @@ const Default: RangeSliderConfig = {
   sanitize: true,
   sanitizeFn: null,
   step: 1,
+  tooltipClass: '',
   tooltips: true,
   tooltipsFormat: null,
   track: 'fill',
@@ -101,7 +101,6 @@ const DefaultType: Record<string, string> = {
   allowList: 'object',
   ariaLabels: '(array|null)',
   clickableLabels: 'boolean',
-  customClass: 'string',
   disabled: 'boolean',
   distance: 'number',
   labels: '(array|boolean|string)',
@@ -111,6 +110,7 @@ const DefaultType: Record<string, string> = {
   sanitize: 'boolean',
   sanitizeFn: '(null|function)',
   step: '(number|string)',
+  tooltipClass: 'string',
   tooltips: 'boolean',
   tooltipsFormat: '(function|null)',
   track: '(boolean|string)',
@@ -425,8 +425,8 @@ class RangeSlider extends BaseComponent {
       // `<output>` is a live region; the input already announces the value.
       const tooltipElement = this._createElement('output', CLASS_NAME_RANGE_SLIDER_TOOLTIP)
       tooltipElement.classList.add(CLASS_NAME_TOOLTIP, this._config.vertical ? CLASS_NAME_TOOLTIP_START : CLASS_NAME_TOOLTIP_TOP)
-      if (this._config.customClass) {
-        tooltipElement.classList.add(...this._config.customClass.split(' ').filter(Boolean))
+      if (this._config.tooltipClass) {
+        tooltipElement.classList.add(...this._config.tooltipClass.split(' ').filter(Boolean))
       }
 
       tooltipElement.setAttribute('aria-hidden', 'true')
