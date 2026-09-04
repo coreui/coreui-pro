@@ -18,9 +18,6 @@ $sizes: (
     @include assert-equal(map-get-multiple(("a": 1, "b": 2, "c": 3), ("c", "a")), ("a": 1, "c": 3));
   }
 
-  @include it("negativify-map prefixes keys with n and negates values, skipping 0") {
-    @include assert-equal(negativify-map((0: 0, 1: .25rem, 2: .5rem)), ("n1": -.25rem, "n2": -.5rem));
-  }
 
   @include it("map-merge-multiple merges left to right") {
     @include assert-equal(map-merge-multiple(("a": 1), ("a": 2, "b": 2), ("c": 3)), ("a": 2, "b": 2, "c": 3));

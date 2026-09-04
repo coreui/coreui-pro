@@ -5,10 +5,8 @@
 @layer helpers {
   @each $color in map.keys($theme-colors) {
     .text-bg-#{$color} {
-      // stylelint-disable-next-line scss/at-function-named-arguments
-      color: var(--#{$prefix}#{$color}-contrast) if(sass($enable-important-utilities): !important);
-      // stylelint-disable-next-line scss/at-function-named-arguments
-      background-color: color-mix(in srgb, var(--#{$prefix}#{$color}-bg) calc(var(--#{$prefix}bg-opacity, 1) * 100%), transparent) if(sass($enable-important-utilities): !important);
+      color: var(--#{$prefix}#{$color}-contrast);
+      background-color: color-mix(in srgb, var(--#{$prefix}#{$color}-bg) calc(var(--#{$prefix}bg-opacity, 1) * 100%), transparent);
     }
   }
 }

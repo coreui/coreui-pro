@@ -28,7 +28,7 @@ Every rule the library ships lives in a [cascade layer](https://developer.mozill
 
 Later layers beat earlier ones regardless of selector specificity, which settles by declaration the fights v5 settled with `!important` and specificity hacks:
 
-- **Utilities win over components** because `utilities` comes last — no `!important` involved. That's why [`$enable-important-utilities`](/customize/options/) defaults to `false` in v6.
+- **Utilities win over components** because `utilities` comes last — no `!important` involved, and no switch to bring it back.
 - **Your unlayered CSS wins over everything of ours**, because unlayered styles beat every layer. A plain `.card { … }` in your stylesheet overrides the library no matter how simple the selector.
 - **`colors` is where the palette ships**, below everything else, so your own `@layer colors` block sits in the same layer and overrides a token like `--cui-blue-500` by source order alone.
 - **Two layers are empty and reserved for you.** `config` sits below `root`, for a configuration sheet the whole library should read but never fight; `custom` slots between `components` and `helpers`, for component overrides that should still lose to utilities. Put your CSS in `@layer custom` when you want `.text-center` on the element to keep working.

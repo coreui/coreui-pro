@@ -47,9 +47,6 @@ $utilities-border-subtle: theme-color-refs("border", "-subtle") !default;
 
 $utilities-links-underline: theme-color-refs("fg") !default;
 
-// stylelint-disable-next-line scss/at-function-named-arguments
-$negative-spacers: if(sass($enable-negative-margins): negativify-map($spacers)) !default;
-
 // scss-docs-start border-widths-map
 $border-widths: (
   keyline: .5px,
@@ -706,7 +703,7 @@ $utilities: map.merge(
       responsive: true,
       property: margin-inline-end,
       class: me,
-      values: map.merge($spacers, (auto: auto)),
+      values: map-merge-multiple($spacers, $negative-spacers, (auto: auto)),
     ),
     "margin-bottom": (
       responsive: true,
@@ -718,50 +715,7 @@ $utilities: map.merge(
       responsive: true,
       property: margin-inline-start,
       class: ms,
-      values: map.merge($spacers, (auto: auto)),
-    ),
-    // Negative margin utilities
-    "negative-margin": (
-      responsive: true,
-      property: margin,
-      class: m,
-      values: $negative-spacers
-    ),
-    "negative-margin-x": (
-      responsive: true,
-      property: margin-inline,
-      class: mx,
-      values: $negative-spacers
-    ),
-    "negative-margin-y": (
-      responsive: true,
-      property: margin-block,
-      class: my,
-      values: $negative-spacers
-    ),
-    "negative-margin-top": (
-      responsive: true,
-      property: margin-top,
-      class: mt,
-      values: $negative-spacers
-    ),
-    "negative-margin-end": (
-      responsive: true,
-      property: margin-inline-end,
-      class: me,
-      values: $negative-spacers
-    ),
-    "negative-margin-bottom": (
-      responsive: true,
-      property: margin-bottom,
-      class: mb,
-      values: $negative-spacers
-    ),
-    "negative-margin-start": (
-      responsive: true,
-      property: margin-inline-start,
-      class: ms,
-      values: $negative-spacers
+      values: map-merge-multiple($spacers, $negative-spacers, (auto: auto)),
     ),
     // Padding utilities
     // scss-docs-end utils-margin
