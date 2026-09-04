@@ -55,7 +55,7 @@ $nav-underline-border-link-disabled-color:  var(--#{$prefix}fg-3) !default;
 
 $nav-enclosed-padding:                   .125rem !default;
 $nav-enclosed-bg:                        var(--#{$prefix}bg-3) !default;
-$nav-enclosed-border-radius:             $border-radius-lg !default;
+$nav-enclosed-border-radius:             var(--#{$prefix}radius-5) !default;
 $nav-enclosed-link-padding-y:            .375rem !default;
 $nav-enclosed-link-padding-x:            .875rem !default;
 $nav-enclosed-link-color:                var(--#{$prefix}fg-body) !default;
@@ -431,7 +431,7 @@ $tab-pane-tokens: defaults(
   // Enclosed pills
 
   .nav-enclosed-pills {
-    --#{$prefix}nav-enclosed-border-radius: #{$border-radius-pill};
+    --#{$prefix}nav-enclosed-border-radius: var(--#{$prefix}radius-pill);
   }
 
 
