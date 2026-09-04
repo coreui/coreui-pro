@@ -68,6 +68,7 @@ type RangeSliderConfig = {
   sanitize: boolean
   sanitizeFn: ((unsafeHtml: string) => string) | null
   step: number | string
+  tooltipClass: string
   tooltips: boolean
   tooltipsFormat: ((value: number | string) => string) | null
   track: boolean | string
@@ -88,6 +89,7 @@ const Default: RangeSliderConfig = {
   sanitize: true,
   sanitizeFn: null,
   step: 1,
+  tooltipClass: '',
   tooltips: true,
   tooltipsFormat: null,
   track: 'fill',
@@ -108,6 +110,7 @@ const DefaultType: Record<string, string> = {
   sanitize: 'boolean',
   sanitizeFn: '(null|function)',
   step: '(number|string)',
+  tooltipClass: 'string',
   tooltips: 'boolean',
   tooltipsFormat: '(function|null)',
   track: '(boolean|string)',
@@ -422,6 +425,10 @@ class RangeSlider extends BaseComponent {
       // `<output>` is a live region; the input already announces the value.
       const tooltipElement = this._createElement('output', CLASS_NAME_RANGE_SLIDER_TOOLTIP)
       tooltipElement.classList.add(CLASS_NAME_TOOLTIP, this._config.vertical ? CLASS_NAME_TOOLTIP_START : CLASS_NAME_TOOLTIP_TOP)
+      if (this._config.tooltipClass) {
+        tooltipElement.classList.add(...this._config.tooltipClass.split(' ').filter(Boolean))
+      }
+
       tooltipElement.setAttribute('aria-hidden', 'true')
       const tooltipArrowElement = this._createElement('span', CLASS_NAME_TOOLTIP_ARROW)
       const tooltipInnerElement = this._createElement('span', CLASS_NAME_TOOLTIP_INNER)
