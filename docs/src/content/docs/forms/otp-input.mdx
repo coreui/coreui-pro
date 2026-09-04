@@ -212,6 +212,39 @@ Create custom one-time password layouts with separators and different field coun
     </div>
   </div>`} />
 
+## Grouped cells
+
+Wrap cells in `.form-otp-group` to join them into one field: the cells share their borders and only the outer corners keep the radius. One group joins the whole code; several groups split it into segments, spaced by the `--cui-form-otp-gap` of the wrapper.
+
+<Example pro code={`<div class="mb-3">
+    <label class="form-label">6-digit OTP, one group</label>
+    <div class="form-otp" data-coreui-toggle="otp">
+      <div class="form-otp-group">
+        <input class="form-otp-control">
+        <input class="form-otp-control">
+        <input class="form-otp-control">
+        <input class="form-otp-control">
+        <input class="form-otp-control">
+        <input class="form-otp-control">
+      </div>
+    </div>
+  </div>
+  <div>
+    <label class="form-label">6-digit OTP, two groups</label>
+    <div class="form-otp" data-coreui-toggle="otp">
+      <div class="form-otp-group">
+        <input class="form-otp-control">
+        <input class="form-otp-control">
+        <input class="form-otp-control">
+      </div>
+      <div class="form-otp-group">
+        <input class="form-otp-control">
+        <input class="form-otp-control">
+        <input class="form-otp-control">
+      </div>
+    </div>
+  </div>`} />
+
 ## Sizing variants
 
 One-time password input supports different sizes. You may choose from small, normal (default), and large inputs to match our similarly sized text inputs.  To adjust the size of a component, use `.form-otp-lg` or `.form-otp-sm`.
