@@ -11,9 +11,9 @@ $tooltip-max-width:                 200px !default;
 $tooltip-color:                     var(--#{$prefix}bg-body) !default;
 $tooltip-bg:                        var(--#{$prefix}fg-body) !default;
 $tooltip-border-radius:             var(--#{$prefix}radius-5) !default;
-$tooltip-opacity:                   .9 !default;
-$tooltip-padding-y:                 var(--#{$prefix}spacer-1) !default;
-$tooltip-padding-x:                 var(--#{$prefix}spacer-2) !default;
+$tooltip-opacity:                   .95 !default;
+$tooltip-padding-y:                 calc(var(--#{$prefix}spacer) * .375) !default;
+$tooltip-padding-x:                 var(--#{$prefix}spacer-3) !default;
 
 $tooltip-arrow-width:               .8rem !default;
 $tooltip-arrow-height:              .4rem !default;
@@ -35,8 +35,8 @@ $tooltip-tokens: defaults(
     --#{$prefix}tooltip-padding-x: #{$tooltip-padding-x},
     --#{$prefix}tooltip-padding-y: #{$tooltip-padding-y},
     --#{$prefix}tooltip-font-size: #{$tooltip-font-size},
-    --#{$prefix}tooltip-color: #{$tooltip-color},
-    --#{$prefix}tooltip-bg: #{$tooltip-bg},
+    --#{$prefix}tooltip-color: var(--#{$prefix}theme-contrast, #{$tooltip-color}),
+    --#{$prefix}tooltip-bg: var(--#{$prefix}theme-bg, #{$tooltip-bg}),
     --#{$prefix}tooltip-border-radius: #{$tooltip-border-radius},
     --#{$prefix}tooltip-opacity: #{$tooltip-opacity},
     --#{$prefix}tooltip-arrow-width: #{$tooltip-arrow-width},
