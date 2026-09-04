@@ -4,7 +4,6 @@
 @use "../mixins/box-shadow" as *;
 @use "../mixins/color-mode" as *;
 @use "../mixins/focus-ring" as *;
-@use "../mixins/gradients" as *;
 @use "../mixins/ltr-rtl" as *;
 @use "../mixins/tokens" as *;
 @use "../mixins/form-validation" as *;
@@ -210,8 +209,8 @@ $form-control-select-tokens: defaults(
       margin: calc(var(--#{$prefix}control-padding-y) * -1) calc(var(--#{$prefix}control-padding-x) * -1);
       margin-inline-end: var(--#{$prefix}control-padding-x);
       color: var(--#{$prefix}control-action-color);
-      @include gradient-bg(var(--#{$prefix}control-action-bg));
       pointer-events: none;
+      background-color: var(--#{$prefix}control-action-bg);
       border-color: inherit;
       border-style: solid;
       border-width: 0;

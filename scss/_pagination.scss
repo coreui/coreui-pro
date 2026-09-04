@@ -1,7 +1,6 @@
 @use "functions/defaults" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/focus-ring" as *;
-@use "mixins/gradients" as *;
 @use "mixins/lists" as *;
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
@@ -122,7 +121,7 @@ $pagination-sizes: defaults(
     .active > & {
       z-index: 3;
       color: var(--#{$prefix}theme-contrast, var(--#{$prefix}pagination-active-color));
-      @include gradient-bg(var(--#{$prefix}theme-bg, var(--#{$prefix}pagination-active-bg)));
+      background-color: var(--#{$prefix}theme-bg, var(--#{$prefix}pagination-active-bg));
       border-color: var(--#{$prefix}theme-bg, var(--#{$prefix}pagination-active-border-color));
     }
 

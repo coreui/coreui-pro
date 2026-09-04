@@ -185,7 +185,7 @@ $menu-tokens: defaults(
     height: 0;
     margin: var(--#{$prefix}menu-divider-margin-y) var(--#{$prefix}menu-divider-margin-x);
     overflow: hidden;
-    border-block-start: 1px solid var(--#{$prefix}menu-divider-bg);
+    border-block-start: var(--#{$prefix}border-width) solid var(--#{$prefix}menu-divider-bg);
     opacity: 1;
   }
 
