@@ -1,35 +1,15 @@
 @use "sass:map";
-@use "sass:math";
 @use "../functions/defaults" as *;
 @use "../mixins/border-radius" as *;
-@use "../mixins/box-shadow" as *;
 @use "../mixins/focus-ring" as *;
 @use "../mixins/tokens" as *;
-@use "../mixins/transition" as *;
 @use "../config" as *;
+@use "form-control" as *;
 
 // scss-docs-start form-otp-variables
 $form-otp-gap:                         .125rem !default;
 $form-otp-control-width:               2rem !default;
-$form-otp-control-padding-y:           var(--#{$prefix}btn-input-padding-y) !default;
 $form-otp-control-padding-x:           0 !default;
-$form-otp-control-font-family:         var(--#{$prefix}btn-input-font-family) !default;
-$form-otp-control-font-size:           var(--#{$prefix}btn-input-font-size) !default;
-$form-otp-control-font-weight:         var(--#{$prefix}btn-input-font-weight) !default;
-$form-otp-control-line-height:         var(--#{$prefix}btn-input-line-height) !default;
-$form-otp-control-color:               var(--#{$prefix}btn-input-color) !default;
-$form-otp-control-bg:                  var(--#{$prefix}btn-input-bg) !default;
-$form-otp-control-border-width:        var(--#{$prefix}btn-input-border-width) !default;
-$form-otp-control-border-color:        var(--#{$prefix}btn-input-border-color) !default;
-$form-otp-control-border-radius:       var(--#{$prefix}btn-input-border-radius) !default;
-$form-otp-control-box-shadow:          var(--#{$prefix}btn-input-box-shadow) !default;
-$form-otp-control-transition-property: var(--#{$prefix}btn-input-transition-property) !default;
-$form-otp-control-transition-duration: var(--#{$prefix}btn-input-transition-duration) !default;
-$form-otp-control-transition-timing:   var(--#{$prefix}btn-input-transition-timing) !default;
-$form-otp-control-focus-color:         var(--#{$prefix}btn-input-focus-color) !default;
-$form-otp-control-focus-bg:            var(--#{$prefix}btn-input-focus-bg) !default;
-$form-otp-control-focus-border-color:  var(--#{$prefix}btn-input-focus-border-color) !default;
-$form-otp-control-focus-ring:          var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring-color)) !default;
 
 $form-otp-control-width-sm:            1.5rem !default;
 $form-otp-control-padding-y-sm:        var(--#{$prefix}btn-input-sm-padding-y) !default;
@@ -89,25 +69,7 @@ $form-otp-tokens: defaults(
 $form-otp-control-tokens: () !default;
 $form-otp-control-tokens: defaults(
   (
-    --#{$prefix}control-padding-y: #{$form-otp-control-padding-y},
     --#{$prefix}control-padding-x: #{$form-otp-control-padding-x},
-    --#{$prefix}control-font-family: #{$form-otp-control-font-family},
-    --#{$prefix}control-font-size: #{$form-otp-control-font-size},
-    --#{$prefix}control-font-weight: #{$form-otp-control-font-weight},
-    --#{$prefix}control-line-height: #{$form-otp-control-line-height},
-    --#{$prefix}control-color: #{$form-otp-control-color},
-    --#{$prefix}control-bg: #{$form-otp-control-bg},
-    --#{$prefix}control-border-width: #{$form-otp-control-border-width},
-    --#{$prefix}control-border-color: #{$form-otp-control-border-color},
-    --#{$prefix}control-border-radius: #{$form-otp-control-border-radius},
-    --#{$prefix}control-box-shadow: #{$form-otp-control-box-shadow},
-    --#{$prefix}control-transition-property: #{$form-otp-control-transition-property},
-    --#{$prefix}control-transition-duration: #{$form-otp-control-transition-duration},
-    --#{$prefix}control-transition-timing: #{$form-otp-control-transition-timing},
-    --#{$prefix}control-focus-color: #{$form-otp-control-focus-color},
-    --#{$prefix}control-focus-bg: #{$form-otp-control-focus-bg},
-    --#{$prefix}control-focus-border-color: #{$form-otp-control-focus-border-color},
-    --#{$prefix}control-focus-ring: #{$form-otp-control-focus-ring},
     --#{$prefix}form-otp-control-width: #{$form-otp-control-width},
   ),
   $form-otp-control-tokens
@@ -126,30 +88,12 @@ $form-otp-control-tokens: defaults(
   }
 
   .form-otp-control {
-    @include tokens($form-otp-control-tokens);
+    @include tokens(map.merge($form-control-tokens, $form-otp-control-tokens));
 
     width: var(--#{$prefix}form-otp-control-width);
-    padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
-    font-family: var(--#{$prefix}control-font-family);
-    font-size: var(--#{$prefix}control-font-size);
-    font-weight: var(--#{$prefix}control-font-weight);
-    line-height: var(--#{$prefix}control-line-height);
-    color: var(--#{$prefix}control-color);
     text-align: center;
-    appearance: none; // Fix appearance for date inputs in Safari
-    background-color: var(--#{$prefix}control-bg);
-    background-clip: padding-box;
-    border: var(--#{$prefix}control-border-width) solid var(--#{$prefix}control-border-color);
-
-    // Note: This has no effect on <select>s in some browsers, due to the limited stylability of `<select>`s in CSS.
-    @include border-radius(var(--#{$prefix}control-border-radius), 0);
-
-    @include box-shadow(var(--#{$prefix}control-box-shadow));
-    @include transition-props(
-      var(--#{$prefix}control-transition-property),
-      var(--#{$prefix}control-transition-duration),
-      var(--#{$prefix}control-transition-timing)
-    );
+    appearance: none;
+    @include form-control-frame();
 
     &:focus {
       color: var(--#{$prefix}control-focus-color);
