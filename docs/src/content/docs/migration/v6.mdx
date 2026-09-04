@@ -1246,7 +1246,7 @@ adornment in the library — so the button needs no icon markup at all:
   a tooltip with the JS `offset` option instead.
 - **Roomier tip, less see-through.** `--cui-tooltip-padding-y` is
   `calc(var(--cui-spacer) * .375)` (was `--cui-spacer-1`),
-  `--cui-tooltip-padding-x` is `--cui-spacer-3` (was `--cui-spacer-2`) and
+  `--cui-tooltip-padding-x` is `calc(var(--cui-spacer) * .75)` (was `--cui-spacer-2`) and
   `--cui-tooltip-opacity` is `.95` (was `.9`). Set the three tokens on
   `.tooltip` to keep the old proportions.
 - **Tooltips take theme classes.** `--cui-tooltip-bg` and `--cui-tooltip-color`
