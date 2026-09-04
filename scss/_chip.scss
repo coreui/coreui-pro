@@ -197,7 +197,7 @@ $chip-outline-tokens: defaults(
     margin-inline-start: calc(var(--#{$prefix}chip-gap) * -.25);
 
     > svg {
-      display: block; // Prevents baseline alignment issues
+      display: block;
       width: var(--#{$prefix}chip-icon-size);
       height: var(--#{$prefix}chip-icon-size);
     }
@@ -218,7 +218,7 @@ $chip-outline-tokens: defaults(
     margin-inline-start: calc(var(--#{$prefix}chip-gap) * -.25);
 
     > svg {
-      display: block; // Prevents baseline alignment issues
+      display: block;
       width: var(--#{$prefix}chip-icon-size);
       height: var(--#{$prefix}chip-icon-size);
     }
@@ -250,7 +250,7 @@ $chip-outline-tokens: defaults(
     }
 
     > svg {
-      display: block; // Prevents baseline alignment issues
+      display: block;
       width: var(--#{$prefix}chip-remove-size);
       height: var(--#{$prefix}chip-remove-size);
     }

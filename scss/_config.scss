@@ -5,10 +5,6 @@
 
 $prefix:                      cui- !default;
 
-// Gradients
-
-// Characters which are escaped by the escape-svg function
-
 // Quickly modify global styling by enabling or disabling optional features.
 
 $enable-caret:                true !default;
@@ -54,8 +50,6 @@ $data-infix:                  -coreui- !default;
 
 $mobile-breakpoint:           lg !default;
 
-// This gradient is also added to elements with `.bg-gradient`
-
 // You can add more entries to the $spacers map, should you need more variation.
 
 // scss-docs-start spacer-variables
@@ -76,10 +70,6 @@ $spacers: (
   9: $spacer * 8,
 ) !default;
 // scss-docs-end spacers-map
-
-// Define the edge positioning anchors of the position utilities.
-
-// Define common box shadows
 
 // Style anchor elements.
 
@@ -256,18 +246,6 @@ $font-sizes: (
   "6xl": ("font-size": $font-size-6xl,        "line-height": $headings-line-height)
 ) !default;
 // scss-docs-end font-sizes
-
-// Icons
-
-// Customizes the `.table` component with basic values, each used across all table variations.
-
-// Shared variables that are reassigned to `$input-` and `$btn-` specific variables.
-
-// For each of Bootstrap's buttons, define text, background, and border color.
-
-// Forms
-
-// Form validation
 
 // Warning: Avoid customizing these values. They're used for a bird's eye view
 // of components dependent on the z-axis and are designed to all work together.

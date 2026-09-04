@@ -51,7 +51,6 @@ $popup-tokens: defaults(
     opacity: 0;
     @include box-shadow(var(--#{$prefix}popup-box-shadow));
 
-    //
     @include transition(
       opacity var(--#{$prefix}popup-transition-duration) var(--#{$prefix}popup-transition-timing),
       display var(--#{$prefix}popup-transition-duration) allow-discrete

@@ -1,9 +1,7 @@
-@use "sass:color";
 @use "sass:map";
 @use "sass:meta";
 @use "functions/defaults" as *;
 @use "mixins/tokens" as *;
-@use "functions/color" as *;
 @use "functions/color-translucent" as *;
 @use "mixins/color-mode" as *;
 @use "theme" as *;
