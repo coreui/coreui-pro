@@ -60,7 +60,7 @@ $dialog-tokens: () !default;
 // scss-docs-start dialog-css-vars
 $dialog-tokens: defaults(
   (
-    --#{$prefix}dialog-zindex: var(--#{$prefix}z-modal),
+    --#{$prefix}dialog-zindex: var(--#{$prefix}z-dialog),
     --#{$prefix}dialog-padding: #{$dialog-padding},
     --#{$prefix}dialog-width: #{$dialog-width},
     --#{$prefix}dialog-margin: #{$dialog-margin},

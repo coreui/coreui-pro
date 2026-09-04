@@ -44,7 +44,7 @@ $drawer-tokens: () !default;
 $drawer-tokens: defaults(
   (
     --#{$prefix}drawer-inset: #{$drawer-inset},
-    --#{$prefix}drawer-zindex: var(--#{$prefix}z-offcanvas),
+    --#{$prefix}drawer-zindex: var(--#{$prefix}z-drawer),
     --#{$prefix}drawer-width: #{$drawer-width},
     --#{$prefix}drawer-height: #{$drawer-height},
     --#{$prefix}drawer-sheet-width: #{$drawer-sheet-width},
