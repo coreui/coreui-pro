@@ -2437,6 +2437,18 @@ as such.
   dialog read their own key instead of the legacy component's. The legacy keys
   stay; both spellings of a pair always resolve to one number.
 
+#### Every type stop carries its own line height
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`$font-sizes` sets a line height per stop instead of one value for all
+  headings.** `xs` is 1.25, `sm` … `lg` the body leading (`--cui-body-line-height`, 1.5), `xl` 2.5⁄1.75, `2xl` 3⁄2.25,
+  `3xl` 1.2, `4xl` and `5xl` 1.1, `6xl` 1 — the larger the type, the tighter
+  the leading, and the small stops read at body leading instead of 1.2. The
+  sizes are unchanged. Headings follow their stop through
+  `--cui-line-height-*`: `h5` (`lg`) and `h4` (`xl`) get taller lines, `h1`
+  (`4xl`) a tighter one. `$headings-line-height` still feeds
+  `--cui-heading-line-height` for anything that reads it directly.
+
 #### Every theme colour gets an action-background slot
 
 `:root` emits `--cui-{color}-bg` for every theme colour, pointing at the
