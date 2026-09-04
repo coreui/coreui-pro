@@ -315,6 +315,10 @@ Buttons use local CSS variables on `.btn` for enhanced real-time customization.
 
 <ScssDocs file="scss/buttons/_button.scss" capture="btn-tokens" />
 
+`.btn-link` rewrites the ones that make it read as a link:
+
+<ScssDocs file="scss/buttons/_button.scss" capture="btn-link-tokens" />
+
 Each variant class rewrites those variables from the theme tokens, falling back to a neutral value, which is why one set of rules serves every colour — including a theme colour you add yourself, with no Sass to compile.
 
 A brand colour of your own is a theme, not a button: set the theme tokens anywhere above the buttons and every variant follows, in plain CSS. The tokens inherit, so one ancestor themes the whole subtree.
