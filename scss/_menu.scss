@@ -5,6 +5,7 @@
 @use "mixins/box-shadow" as *;
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
+@use "mixins/translucent" as *;
 
 // The Menu component, ported from Bootstrap v6. Dropdown keeps its own partial
 // and classes — Menu is the new-generation surface the JS implementation is
@@ -177,8 +178,7 @@ $menu-tokens: defaults(
     --#{$prefix}menu-item-hover-bg: color-mix(in oklch, var(--#{$prefix}bg-1) 85%, transparent);
     --#{$prefix}menu-item-active-bg: color-mix(in oklch, var(--#{$prefix}primary) 75%, transparent);
 
-    background-color: color-mix(in oklch, var(--#{$prefix}menu-bg) 80%, transparent);
-    backdrop-filter: blur(5px) saturate(180%);
+    @include translucent(var(--#{$prefix}menu-bg));
   }
 
   .menu-divider {

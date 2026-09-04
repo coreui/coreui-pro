@@ -751,6 +751,6 @@ Sass variables set these defaults at build time and are removed in v7. The CSS v
 
 <ScssDocs file="scss/_card.scss" capture="card-variables" />
 
-The `.card-translucent` mix amounts and backdrop filter are build-time only — they are not tokens, so a card does not carry three custom properties it will never read.
+`.card-translucent` mixes and blurs through the shared [`--cui-translucent-*` tokens](/customize/components/#translucent); the caps' own mix amount is `--cui-card-translucent-cap-bg-opacity` on the element, set from:
 
 <ScssDocs file="scss/_card.scss" capture="card-translucent-variables" />

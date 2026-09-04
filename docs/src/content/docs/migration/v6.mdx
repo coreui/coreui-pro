@@ -663,6 +663,24 @@ check, radio, carousel and toggler icons already work:
   reach for Dialog and Drawer in new work. See the
   [Dialog docs](/components/dialog/) and [Drawer docs](/components/drawer/).
 
+
+#### Translucent surfaces share two tokens
+
+`.navbar-translucent`, `.toast-translucent`, `.card-translucent`,
+`.drawer-translucent` and `.menu-translucent` used to carry their own mix
+amount and filter — two as Sass variables, three as literals — at 85% or 80%
+depending on the component. All five now read `--cui-translucent-opacity`
+(80%) and `--cui-translucent-backdrop-filter` (`blur(5px) saturate(180%)`)
+from `:root`, so one override retunes every translucent surface and one on an
+element retunes that surface alone. Consequences: the navbar, the toast and
+the card become slightly more see-through (85% → 80%; set
+`--cui-translucent-opacity: 85%` on them to keep the old look), and
+`$navbar-translucent-bg-opacity`, `$navbar-translucent-backdrop-filter`,
+`$toast-translucent-bg-opacity`, `$toast-translucent-backdrop-filter`,
+`$card-translucent-bg-opacity` and `$card-translucent-backdrop-filter` are
+removed in favour of `$translucent-opacity` and
+`$translucent-backdrop-filter`. The card's caps keep their own amount as the
+`--cui-card-translucent-cap-bg-opacity` token on `.card-translucent`.
 #### Calendar
 
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
@@ -1467,7 +1485,7 @@ adornment in the library — so the button needs no icon markup at all:
   keep the previous rendering.
 - **`.navbar-translucent` is new.** It tints and blurs the navbar the way
   `.toast-translucent` does for a toast, mixing `--cui-navbar-bg` — a new token,
-  defaulting to the body background — at 85%.
+  defaulting to the body background — at `--cui-translucent-opacity`.
 - **A theme beats a navbar token, as everywhere else.** `--cui-navbar-brand-color`,
   `-brand-hover-color` and `-active-color` carried the `--cui-theme-*` slot inside
   their own default, so setting one of them inside a `.theme-{color}` navbar
@@ -1840,9 +1858,10 @@ Multi Select's option indicators moved with it — they render as a decorative
 - **New: `.card-subtle`** swaps the theme's solid fill for its subtle
   background, border and emphasis text.
 - **New: `.card-translucent`** blurs and saturates whatever is behind the card
-  and thins out the caps to match. Tuned at build time through
-  `$card-translucent-bg-opacity`, `$card-translucent-cap-bg-opacity` and
-  `$card-translucent-backdrop-filter`.
+  and thins out the caps to match. The mix and the filter are the shared
+  `--cui-translucent-*` tokens; the caps read
+  `--cui-card-translucent-cap-bg-opacity` (Sass default
+  `$card-translucent-cap-bg-opacity`).
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **`.card-group` attaches its cards from a container query, not a media
   query.** The `sm` breakpoint is now the width of the nearest query container,

@@ -101,6 +101,16 @@ Every overlay that dims the page — the dialog and the drawer through their nat
 
 The colour and the opacity are mixed on the element (`color-mix(in oklch, var(--cui-backdrop-color) var(--cui-backdrop-opacity), transparent)`), so either can be changed alone, globally on `:root` or on one overlay. The dialog keeps the defaults, a dark scrim that deepens in the dark scheme; the drawer sets its own tint of the page (`--cui-bg-body` at 25%). The [backdrop helper](/helpers/backdrop/) picks either look — or no backdrop at all — from the markup.
 
+## Translucent
+
+The `*-translucent` variants — `.navbar-translucent`, `.toast-translucent`, `.card-translucent`, `.drawer-translucent` and `.menu-translucent` — let the page show through a blurred, saturated surface. All five mix the component's own background with one opacity and apply one filter, both tokens on `:root`:
+
+<ScssDocs file="scss/_root.scss" capture="root-translucent-variables" />
+
+Set them on `:root` to retune every translucent surface at once, or on one element to change just that one — `style="--cui-translucent-opacity: 60%"` on a card leaves the navbar alone. Their build-time defaults:
+
+<ScssDocs file="scss/_root.scss" capture="translucent-variables" />
+
 ## Responsive
 
 These Sass loops aren't limited to color maps, either. You can also generate responsive variations of your components. Take for example our responsive alignment of the dropdowns where we mix an `@each` loop for the `$grid-breakpoints` Sass map with a media query include.

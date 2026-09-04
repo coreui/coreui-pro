@@ -78,6 +78,11 @@ $backdrop-opacity:            50% !default;
 $backdrop-opacity-dark:       65% !default;
 $backdrop-blur:               8px !default;
 // scss-docs-end backdrop-variables
+
+// scss-docs-start translucent-variables
+$translucent-opacity:         80% !default;
+$translucent-backdrop-filter: blur(5px) saturate(180%) !default;
+// scss-docs-end translucent-variables
 // scss-docs-start focus-ring-variables
 // scss-docs-end focus-ring-variables
 
@@ -289,6 +294,10 @@ $root-token-defaults: map.merge(
     --#{$prefix}backdrop-opacity: $backdrop-opacity,
     --#{$prefix}backdrop-blur: $backdrop-blur,
     // scss-docs-end root-backdrop-variables
+    // scss-docs-start root-translucent-variables
+    --#{$prefix}translucent-opacity: $translucent-opacity,
+    --#{$prefix}translucent-backdrop-filter: $translucent-backdrop-filter,
+    // scss-docs-end root-translucent-variables
     // scss-docs-start root-btn-input-variables
     // Sizing shared by buttons and form controls, so neither has to reach for
     // the other's Sass variables to line up.

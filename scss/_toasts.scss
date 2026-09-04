@@ -2,6 +2,7 @@
 @use "mixins/border-radius" as *;
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
+@use "mixins/translucent" as *;
 @use "config" as *;
 
 // stylelint-disable custom-property-no-missing-var-function
@@ -26,11 +27,6 @@ $toast-header-color:                var(--#{$prefix}fg-3) !default;
 $toast-header-background-color:     $toast-background-color !default;
 $toast-header-border-color:         $toast-border-color !default;
 // scss-docs-end toast-variables
-
-// scss-docs-start toast-translucent-variables
-$toast-translucent-bg-opacity:      85% !default;
-$toast-translucent-backdrop-filter: blur(5px) saturate(180%) !default;
-// scss-docs-end toast-translucent-variables
 
 $toast-tokens: () !default;
 
@@ -141,11 +137,10 @@ $toast-tokens: defaults(
   }
 
   .toast-translucent {
-    background-color: color-mix(in oklch, var(--#{$prefix}toast-bg) #{$toast-translucent-bg-opacity}, transparent);
-    backdrop-filter: $toast-translucent-backdrop-filter;
+    @include translucent(var(--#{$prefix}toast-bg));
 
     .toast-header {
-      background-color: color-mix(in oklch, var(--#{$prefix}theme-bg-subtle, var(--#{$prefix}toast-header-bg)) #{$toast-translucent-bg-opacity}, transparent);
+      background-color: color-mix(in oklch, var(--#{$prefix}theme-bg-subtle, var(--#{$prefix}toast-header-bg)) var(--#{$prefix}translucent-opacity), transparent);
     }
   }
 }
