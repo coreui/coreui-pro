@@ -1,36 +1,6 @@
 @use "sass:list";
 @use "sass:map";
 @use "sass:meta";
-@use "color" as *;
-@use "color-var-ref" as *;
-@use "translucent-css-var" as *;
-@use "to-rgb" as *;
-@use "../config" as *;
-
-// stylelint-disable scss/dollar-variable-pattern
-@function map-loop($map, $func, $args...) {
-  $_map: ();
-
-  @each $key, $value in $map {
-    // allow to pass the $key and $value of the map as an function argument
-    $_args: ();
-    @each $arg in $args {
-      @if $arg == "$prefix" {
-        $_args: list.append($_args, $prefix);
-      } @else if $arg == "$key" {
-        $_args: list.append($_args, $key);
-      } @else if $arg == "$value" {
-        $_args: list.append($_args, $value);
-      } @else {
-        $_args: list.append($_args, $arg);
-      }
-    }
-
-    $_map: map.merge($_map, ($key: meta.call(meta.get-function($func), $_args...)));
-  }
-  @return $_map;
-}
-// stylelint-enable scss/dollar-variable-pattern
 
 // Internal Bootstrap function to turn maps into its negative variant.
 // It prefixes the keys with `n` and makes the value negative.
