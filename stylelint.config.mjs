@@ -34,7 +34,8 @@ export default {
       rules: {
         'declaration-property-value-disallowed-list': {
           border: 'none',
-          outline: 'none'
+          outline: 'none',
+          '/^border-(start|end)-(start|end)-radius$/': ['/^(?!0$).+/']
         },
         'function-disallowed-list': [
           'lighten',
