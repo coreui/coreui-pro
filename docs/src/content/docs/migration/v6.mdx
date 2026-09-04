@@ -240,7 +240,7 @@ finished, not whether the state changed.
   `--cui-accordion-active-bg` and `--cui-accordion-active-color` were fixed to
   `--cui-primary-bg-subtle` / `--cui-primary-fg-emphasis`, so every accordion
   turned the brand colour on open whether or not that suited the page. They are
-  `--cui-bg-4` and `--cui-fg-body` now, and the active tokens resolve
+  `--cui-bg-2` and `--cui-fg-body` now, and the active tokens resolve
   through `--cui-theme-fg` / `-bg-subtle` / `-border` first — so the colour is a
   decision you make per accordion instead of one baked into the component. To
   keep the old look, put `.theme-primary` on the `.accordion`.
@@ -486,7 +486,7 @@ check, radio, carousel and toggler icons already work:
   `.badge` used to be white text with no background of its own, so it was
   invisible until a `.text-bg-*` utility supplied both. It renders neutral on
   its own now — `--cui-badge-color` is `inherit` and `--cui-badge-bg` is
-  `--cui-bg-4` — and a `.theme-*` class colours it:
+  `--cui-bg-2` — and a `.theme-*` class colours it:
   `<span class="badge theme-danger">`. The `.badge-*` namespace carries the
   three variants instead: solid (default), `.badge-subtle` and
   `.badge-outline`, each mapping the same theme roles.
@@ -1492,7 +1492,7 @@ adornment in the library — so the button needs no icon markup at all:
   colour of your own gets the whole set for free.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **A bare `.btn` is a neutral button, not an invisible one.** It renders in the
-  surface colours (`--cui-bg-4`, one step darker on hover) instead of
+  surface colours (`--cui-bg-2`, one step darker on hover) instead of
   being transparent and unstyled. Buttons that carry a variant or a colour class
   are unaffected. For the old behaviour use `.btn-ghost`, which is transparent
   by design.
@@ -2300,6 +2300,40 @@ as such.
   so buttons match the fields they sit next to in input groups; `.btn-group`
   clips to the same stop. Set `$btn-bg`/`$btn-hover-bg` or the `--cui-btn-*`
   tokens to keep the old look.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The rest of the library steps down the same two rungs.** The first pass
+  left a group of components on the old surfaces; they now read the rungs
+  their neighbours read. Hover surfaces on `--cui-bg-1`: the dropdown link,
+  combobox options and the select-all row (Autocomplete, Multi Select), the
+  calendar cell, the time-picker roll cell, the control-group action button
+  and pagination focus (was `--cui-bg-4`, three rungs above its own hover).
+  Rest and selected surfaces on `--cui-bg-2`: the active nav link and nav
+  tab (was `--cui-bg-4`), the selected combobox option, the neutral chip
+  (hovering on `--cui-bg-3` instead of a mix with the foreground), the
+  password-strength track and the search button's key cap (active on
+  `--cui-bg-3`). The range slider track sits on `--cui-bg-3` like the
+  native range. The card header and footer read `--cui-bg-1` instead of a
+  3 % foreground wash, so a card on a tinted parent keeps a neutral cap.
+  The tab's hover border reads `--cui-border-subtle` rather than a surface
+  rung.
+- **Foreground roles line up too.** The disabled calendar cell and the
+  disabled combobox option read `--cui-fg-4` / `--cui-fg-3` like every other
+  disabled control, the weekday header and the date-input placeholder read
+  `--cui-fg-3` like every other caption and placeholder, and the active
+  breadcrumb reads `--cui-fg-1`, one rung above the hovered link instead of
+  the same one.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **Border tokens move one rung towards the page.** `--cui-border-color` is
+  `light-dark(gray-200, gray-700)` (was `gray-300` / `gray-800`): lighter
+  in the light scheme, and in the dark scheme one rung further from the
+  body, where the old value sat too close to `--cui-bg-body` to read as a
+  line. `--cui-border-subtle` is a half step, mixed from `gray-100` and
+  `gray-200` (`gray-800` / `gray-900` in dark) — plain `gray-100` had become
+  invisible against `--cui-bg-1` on the spread-out light band.
+  `--cui-border-emphasized` is `gray-600` in the dark scheme (was
+  `gray-700`, one rung from the plain border). Everything that reads the
+  tokens — cards, list groups, tables, inputs, tabs, the switch and check
+  frames — follows.
 
 #### Every theme colour gets an action-background slot
 
