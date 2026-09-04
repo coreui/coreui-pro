@@ -2316,8 +2316,9 @@ assembles maps of CSS expressions and the browser resolves them.
 
 - **Every `--cui-{name}-rgb` custom property is gone**, along with the
   `$theme-colors-rgb` and `$theme-colors-rgb-dark` maps, the `to-rgb()`
-  function's role in `:root`, and the `rgba-css-var()` helper (now
-  `translucent-css-var()`). They existed only so
+  function's role in `:root`, and the `rgba-css-var()` and
+  `translucent-css-var()` helpers (`color-var-ref()` is the function that
+  stays — see the utilities section). They existed only so
   `rgba(var(--cui-primary-rgb), .5)` could apply an alpha to a token; that is
   what `color-mix()` does directly:
 
@@ -3241,8 +3242,10 @@ and still compose. What changes is where the translucency expression lives:
   (`var(--cui-primary)`, `var(--cui-primary-fg)`) instead of a `color-mix()`
   expression per entry. The
   expression is written once, in the utility's `property` map. If you built a
-  map of your own by calling `translucent-css-var()`, call the new
-  `color-var-ref()` instead — same arguments, without the wrapper.
+  map of your own by calling `translucent-css-var()`, call
+  `color-var-ref()` instead — same arguments, without the wrapper;
+  `translucent-css-var()` is removed, along with the unused `map-loop()` and
+  `color-contrast-variables()`.
 - **`.text-muted`, `.text-black-50`, `.text-white-50` and `.text-body-secondary`
   now respond to `.text-opacity-*`.** They rendered the same colour before and
   render the same colour now; they simply went through the plain value and so
