@@ -23,7 +23,7 @@ $calendar-nav-btn-font-size:                 var(--#{$prefix}font-size-sm) !defa
 $calendar-nav-btn-bg:                        transparent !default;
 $calendar-nav-btn-border-width:              1px !default;
 $calendar-nav-btn-border-color:              transparent !default;
-$calendar-nav-btn-border-radius:             $border-radius !default;
+$calendar-nav-btn-border-radius:             var(--#{$prefix}radius-4) !default;
 
 $calendar-nav-btn-hover-bg:                  transparent !default;
 $calendar-nav-btn-hover-border-color:        transparent !default;
@@ -42,6 +42,7 @@ $calendar-nav-icon-hover-color:              var(--#{$prefix}fg-body) !default;
 $calendar-cell-header-inner-font-weight:     600 !default;
 $calendar-cell-header-inner-color:           var(--#{$prefix}fg-2) !default;
 
+$calendar-cell-border-radius:                var(--#{$prefix}radius-4) !default;
 $calendar-cell-hover-color:                  var(--#{$prefix}fg-body) !default;
 $calendar-cell-hover-bg:                     var(--#{$prefix}bg-3) !default;
 $calendar-cell-disabled-color:               var(--#{$prefix}fg-3) !default;
@@ -79,6 +80,7 @@ $calendar-tokens: defaults(
     --#{$prefix}calendar-nav-btn-border-width: #{$calendar-nav-btn-border-width},
     --#{$prefix}calendar-nav-btn-border-color: #{$calendar-nav-btn-border-color},
     --#{$prefix}calendar-nav-btn-border-radius: #{$calendar-nav-btn-border-radius},
+    --#{$prefix}calendar-cell-border-radius: #{$calendar-cell-border-radius},
     --#{$prefix}calendar-nav-btn-hover-bg: #{$calendar-nav-btn-hover-bg},
     --#{$prefix}calendar-nav-btn-hover-border-color: #{$calendar-nav-btn-hover-border-color},
     --#{$prefix}calendar-nav-btn-focus-border-color: #{$calendar-nav-btn-focus-border-color},
@@ -296,29 +298,29 @@ $calendar-tokens: defaults(
         color: var(--#{$prefix}calendar-cell-hover-color);
         cursor: pointer;
         background-color: var(--#{$prefix}calendar-cell-hover-bg);
-        @include border-radius($border-radius);
+        @include border-radius(var(--#{$prefix}calendar-cell-border-radius));
       }
     }
 
     .calendars:not(.select-week) &.range:not(.range ~ *) .calendar-cell-inner::after {
-      @include border-start-radius($border-radius);
+      @include border-start-radius(var(--#{$prefix}calendar-cell-border-radius));
     }
 
     .calendars:not(.select-week) &.range:not(:has(~ .range)) .calendar-cell-inner::after {
-      @include border-end-radius($border-radius);
+      @include border-end-radius(var(--#{$prefix}calendar-cell-border-radius));
     }
 
     &.range-hover:first-of-type,
     &:not(.range-hover) + &.range-hover {
       .calendar-cell-inner::before {
         border-inline-start: var(--#{$prefix}border-width) dashed var(--#{$prefix}calendar-cell-range-hover-border-color);
-        @include border-start-radius($border-radius);
+        @include border-start-radius(var(--#{$prefix}calendar-cell-border-radius));
       }
     }
 
     &.range-hover:not(:has(~ .range-hover)) .calendar-cell-inner::before {
       border-inline-end: var(--#{$prefix}border-width) dashed var(--#{$prefix}calendar-cell-range-hover-border-color);
-      @include border-end-radius($border-radius);
+      @include border-end-radius(var(--#{$prefix}calendar-cell-border-radius));
     }
 
     // stylelint-disable-next-line at-rule-no-vendor-prefix
@@ -326,18 +328,18 @@ $calendar-tokens: defaults(
       .calendars:not(.select-week) &:nth-last-child(1 of .range),
       .calendars:not(.select-week) &:nth-last-child(1 of .available) {
         .calendar-cell-inner::after {
-          @include border-end-radius($border-radius);
+          @include border-end-radius(var(--#{$prefix}calendar-cell-border-radius));
         }
       }
 
       &:nth-last-child(1 of .range-hover) .calendar-cell-inner::before {
         border-inline-end: var(--#{$prefix}border-width) dashed var(--#{$prefix}calendar-cell-range-hover-border-color);
-        @include border-end-radius($border-radius);
+        @include border-end-radius(var(--#{$prefix}calendar-cell-border-radius));
       }
     }
 
     &.selected:not(th) .calendar-cell-inner {
-      @include border-radius($border-radius);
+      @include border-radius(var(--#{$prefix}calendar-cell-border-radius));
     }
 
     .calendars:not(.select-week) &:focus-visible {
@@ -347,7 +349,7 @@ $calendar-tokens: defaults(
 
       .calendar-cell-inner {
         @include focus-ring(true);
-        @include border-radius($border-radius);
+        @include border-radius(var(--#{$prefix}calendar-cell-border-radius));
       }
     }
   }
@@ -363,22 +365,22 @@ $calendar-tokens: defaults(
     }
 
     .selected:not(th) .calendar-cell-inner {
-      @include border-radius($border-radius);
+      @include border-radius(var(--#{$prefix}calendar-cell-border-radius));
     }
 
     .calendar-cell:first-of-type .calendar-cell-inner {
-      @include border-start-radius($border-radius);
+      @include border-start-radius(var(--#{$prefix}calendar-cell-border-radius));
       &::before,
       &::after {
-        @include border-start-radius($border-radius);
+        @include border-start-radius(var(--#{$prefix}calendar-cell-border-radius));
       }
     }
 
     .calendar-cell:last-of-type .calendar-cell-inner {
-      @include border-end-radius($border-radius);
+      @include border-end-radius(var(--#{$prefix}calendar-cell-border-radius));
       &::before,
       &::after {
-        @include border-end-radius($border-radius);
+        @include border-end-radius(var(--#{$prefix}calendar-cell-border-radius));
       }
     }
 
@@ -392,7 +394,7 @@ $calendar-tokens: defaults(
 
     &:focus-visible {
       @include focus-ring(true);
-      @include border-radius($border-radius);
+      @include border-radius(var(--#{$prefix}calendar-cell-border-radius));
     }
   }
 }
