@@ -52,11 +52,11 @@ $sidebar-tokens: defaults(
   (
     --#{$prefix}sidebar-zindex: var(--#{$prefix}z-sidebar),
     --#{$prefix}sidebar-width: #{$sidebar-width},
-    --#{$prefix}sidebar-bg: #{$sidebar-bg},
+    --#{$prefix}sidebar-bg: var(--#{$prefix}theme-bg, #{$sidebar-bg}),
     --#{$prefix}sidebar-padding-x: #{$sidebar-padding-x},
     --#{$prefix}sidebar-padding-y: #{$sidebar-padding-y},
-    --#{$prefix}sidebar-color: #{$sidebar-color},
-    --#{$prefix}sidebar-brand-color: #{$sidebar-brand-color},
+    --#{$prefix}sidebar-color: var(--#{$prefix}theme-contrast, #{$sidebar-color}),
+    --#{$prefix}sidebar-brand-color: var(--#{$prefix}theme-contrast, #{$sidebar-brand-color}),
     --#{$prefix}sidebar-transition: #{$sidebar-transition},
     --#{$prefix}sidebar-toggler-height: #{$sidebar-toggler-height},
   ),
@@ -82,10 +82,10 @@ $sidebar-toggler-tokens: defaults(
     --#{$prefix}sidebar-toggler-padding-x: #{$sidebar-toggler-padding-x},
     --#{$prefix}sidebar-toggler-padding-y: #{$sidebar-toggler-padding-y},
     --#{$prefix}sidebar-toggler-bg: #{$sidebar-toggler-bg},
-    --#{$prefix}sidebar-toggler-color: #{$sidebar-toggler-color},
+    --#{$prefix}sidebar-toggler-color: var(--#{$prefix}theme-contrast, #{$sidebar-toggler-color}),
     --#{$prefix}sidebar-toggler-icon: #{escape-svg($sidebar-toggler-icon)},
-    --#{$prefix}sidebar-toggler-hover-color: #{$sidebar-toggler-hover-color},
-    --#{$prefix}sidebar-toggler-focus-color: #{$sidebar-toggler-focus-color},
+    --#{$prefix}sidebar-toggler-hover-color: var(--#{$prefix}theme-contrast, #{$sidebar-toggler-hover-color}),
+    --#{$prefix}sidebar-toggler-focus-color: var(--#{$prefix}theme-contrast, #{$sidebar-toggler-focus-color}),
     --#{$prefix}sidebar-toggler-border-radius: #{$sidebar-toggler-border-radius},
     --#{$prefix}sidebar-toggler-transition: #{$sidebar-toggler-transition},
   ),
@@ -320,6 +320,10 @@ $sidebar-backdrop-tokens: defaults(
     @include media-breakpoint-down($mobile-breakpoint) {
       @include overlay-backdrop(var(--#{$prefix}sidebar-backdrop-zindex), var(--#{$prefix}sidebar-backdrop-bg), var(--#{$prefix}sidebar-backdrop-opacity));
     }
+  }
+
+  .sidebar-light {
+    color-scheme: light;
   }
 
   .sidebar-dark {

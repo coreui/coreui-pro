@@ -42,17 +42,17 @@ $sidebar-nav-link-icon-bullet-border-width:   var(--#{$prefix}border-width) !def
 $sidebar-nav-link-icon-bullet-border-color:   var(--#{$prefix}fg-3) !default;
 $sidebar-nav-link-icon-bullet-border-radius:  var(--#{$prefix}radius-pill) !default;
 
-$sidebar-nav-link-hover-color:                        var(--#{$prefix}emphasis-color) !default;
-$sidebar-nav-link-hover-bg:                           var(--#{$prefix}tertiary-bg-translucent) !default;
+$sidebar-nav-link-hover-color:                        var(--#{$prefix}fg-body) !default;
+$sidebar-nav-link-hover-bg:                           color-mix(in srgb, var(--#{$prefix}fg-body) 10%, transparent) !default;
 $sidebar-nav-link-hover-icon-color:                   var(--#{$prefix}fg-body) !default;
 $sidebar-nav-link-hover-icon-bullet-bg:               transparent !default;
 $sidebar-nav-link-hover-icon-bullet-border-color:     var(--#{$prefix}fg-body) !default;
 
-$sidebar-nav-link-active-color:                       var(--#{$prefix}emphasis-color) !default;
-$sidebar-nav-link-active-bg:                          var(--#{$prefix}tertiary-bg-translucent) !default;
-$sidebar-nav-link-active-icon-color:                  var(--#{$prefix}emphasis-color) !default;
+$sidebar-nav-link-active-color:                       var(--#{$prefix}fg-body) !default;
+$sidebar-nav-link-active-bg:                          color-mix(in srgb, var(--#{$prefix}fg-body) 10%, transparent) !default;
+$sidebar-nav-link-active-icon-color:                  var(--#{$prefix}fg-body) !default;
 $sidebar-nav-link-active-icon-bullet-bg:              transparent !default;
-$sidebar-nav-link-active-icon-bullet-border-color:    var(--#{$prefix}emphasis-color) !default;
+$sidebar-nav-link-active-icon-bullet-border-color:    var(--#{$prefix}fg-body) !default;
 
 $sidebar-nav-link-disabled-color:                     var(--#{$prefix}fg-3) !default;
 $sidebar-nav-link-disabled-icon-color:                var(--#{$prefix}fg-3) !default;
@@ -198,7 +198,7 @@ $sidebar-nav-tree-tokens: defaults(
       margin-top: var(--#{$prefix}sidebar-nav-title-margin-top);
       font-size: var(--#{$prefix}sidebar-nav-title-font-size);
       font-weight: var(--#{$prefix}sidebar-nav-title-font-weight);
-      color: var(--#{$prefix}sidebar-nav-title-color);
+      color: var(--#{$prefix}theme-contrast, var(--#{$prefix}sidebar-nav-title-color));
       text-transform: uppercase;
       @include transition(var(--#{$prefix}sidebar-nav-title-transition));
     }
@@ -208,7 +208,7 @@ $sidebar-nav-tree-tokens: defaults(
       flex: 1;
       align-items: center;
       padding: var(--#{$prefix}sidebar-nav-link-padding-y) var(--#{$prefix}sidebar-nav-link-padding-x);
-      color: var(--#{$prefix}sidebar-nav-link-color);
+      color: var(--#{$prefix}theme-contrast, var(--#{$prefix}sidebar-nav-link-color));
       text-decoration: none;
       white-space: nowrap;
       background: var(--#{$prefix}sidebar-nav-link-bg);
@@ -217,11 +217,11 @@ $sidebar-nav-tree-tokens: defaults(
       @include transition(var(--#{$prefix}sidebar-nav-link-transition));
 
       &.active {
-        color: var(--#{$prefix}sidebar-nav-link-active-color);
-        background: var(--#{$prefix}sidebar-nav-link-active-bg);
+        color: var(--#{$prefix}theme-contrast, var(--#{$prefix}sidebar-nav-link-active-color));
+        background: var(--#{$prefix}theme-active, var(--#{$prefix}sidebar-nav-link-active-bg));
 
         .nav-icon {
-          color: var(--#{$prefix}sidebar-nav-link-active-icon-color);
+          color: var(--#{$prefix}theme-contrast, var(--#{$prefix}sidebar-nav-link-active-icon-color));
         }
 
         .nav-icon-bullet {
@@ -248,12 +248,12 @@ $sidebar-nav-tree-tokens: defaults(
 
       @media (hover: hover) {
         &:hover {
-          color: var(--#{$prefix}sidebar-nav-link-hover-color);
+          color: var(--#{$prefix}theme-contrast, var(--#{$prefix}sidebar-nav-link-hover-color));
           text-decoration: none;
-          background: var(--#{$prefix}sidebar-nav-link-hover-bg);
+          background: var(--#{$prefix}theme-hover, var(--#{$prefix}sidebar-nav-link-hover-bg));
 
           .nav-icon {
-            color: var(--#{$prefix}sidebar-nav-link-hover-icon-color);
+            color: var(--#{$prefix}theme-contrast, var(--#{$prefix}sidebar-nav-link-hover-icon-color));
           }
 
           .nav-icon-bullet {
@@ -272,7 +272,7 @@ $sidebar-nav-tree-tokens: defaults(
       height: var(--#{$prefix}sidebar-nav-link-icon-height);
       margin-inline-end: var(--#{$prefix}sidebar-nav-link-icon-margin);
       font-size: var(--#{$prefix}sidebar-nav-link-icon-font-size);
-      color: var(--#{$prefix}sidebar-nav-link-icon-color);
+      color: var(--#{$prefix}theme-contrast, var(--#{$prefix}sidebar-nav-link-icon-color));
       text-align: center;
       pointer-events: none;
       fill: currentcolor;
@@ -334,14 +334,14 @@ $sidebar-nav-tree-tokens: defaults(
         height: var(--#{$prefix}sidebar-nav-group-indicator-size);
         margin-inline-start: auto;
         content: "";
-        background-color: var(--#{$prefix}sidebar-nav-group-indicator-color);
+        background-color: var(--#{$prefix}theme-contrast, var(--#{$prefix}sidebar-nav-group-indicator-color));
         mask-image: var(--#{$prefix}sidebar-nav-group-indicator-icon);
         @include transition(var(--#{$prefix}sidebar-nav-group-indicator-transition));
       }
 
       @media (hover: hover) {
         &:hover:not(:has(.nav-group-toggle-indicator))::after {
-          background-color: var(--#{$prefix}sidebar-nav-group-indicator-hover-color);
+          background-color: var(--#{$prefix}theme-contrast, var(--#{$prefix}sidebar-nav-group-indicator-hover-color));
           mask-image: var(--#{$prefix}sidebar-nav-group-indicator-hover-icon);
         }
       }
@@ -349,7 +349,7 @@ $sidebar-nav-tree-tokens: defaults(
 
     .nav-group-toggle-indicator {
       margin-inline-start: auto;
-      color: var(--#{$prefix}sidebar-nav-group-indicator-color);
+      color: var(--#{$prefix}theme-contrast, var(--#{$prefix}sidebar-nav-group-indicator-color));
     }
 
     .nav-group-items {

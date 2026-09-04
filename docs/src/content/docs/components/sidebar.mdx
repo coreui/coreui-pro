@@ -8,6 +8,8 @@ css:
   - "https://cdn.jsdelivr.net/npm/@coreui/icons@3.1.0/css/free.min.css"
 ---
 
+import { getData } from '@coreui/astro-docs/data'
+
 ## How it works
 
 Here's what you need to know before getting started with the sidebar:
@@ -461,9 +463,9 @@ Use `.show` and `.hide` inside `.nav-group-toggle-indicator` to control which ic
     </ul>
   </div>`} />
 
-## Dark sidebar
+## Color schemes
 
-Change the appearance of sidebars with the `.sidebar-dark` class.
+A sidebar follows the page's color scheme. `.sidebar-dark` and `.sidebar-light` pin it to one scheme whatever the page uses — the same switch as `data-coreui-theme="dark"` or `"light"` on the element — so a dark navigation column can sit on a light page.
 
 <Example class="p-0 rounded-bottom-0 overflow-hidden" code={`<div class="sidebar sidebar-dark border-end">
     <div class="sidebar-header">
@@ -525,6 +527,18 @@ Change the appearance of sidebars with the `.sidebar-dark` class.
       <button class="sidebar-toggler" type="button"></button>
     </div>
   </div>`} />
+
+## Theme variants
+
+Add a [`.theme-{color}` class](/customize/components/#theme-variants) to the sidebar and it paints its surface, text, icons and the hover and active links from that colour's slots — the background from `--cui-theme-bg`, the text from `--cui-theme-contrast`, the hovered and active links from `--cui-theme-hover` and `--cui-theme-active`. Combine it with a scheme class when the colour needs a fixed scheme.
+
+<Example class="p-0 rounded-bottom-0 overflow-hidden d-flex gap-0" code={getData('theme-colors').map((c) => `<div class="sidebar theme-${c.name}" style="--cui-sidebar-width: 12rem">
+    <div class="sidebar-header"><div class="sidebar-brand">${c.title}</div></div>
+    <ul class="sidebar-nav">
+      <li class="nav-item"><a class="nav-link active" href="#"><svg class="nav-icon"><use xlink:href="/bootstrap/docs/assets/icons/free.svg#cil-speedometer"></use></svg> Active</a></li>
+      <li class="nav-item"><a class="nav-link" href="#"><svg class="nav-icon"><use xlink:href="/bootstrap/docs/assets/icons/free.svg#cil-puzzle"></use></svg> Link</a></li>
+    </ul>
+  </div>`)} />
 
 ## Placement
 
