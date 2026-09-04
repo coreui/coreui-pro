@@ -122,10 +122,10 @@ $container-padding-x: $grid-gutter-width !default;
 
 // scss-docs-start border-variables
 
-$border-color:                light-dark(var(--#{$prefix}gray-300), var(--#{$prefix}gray-800)) !default;
-$border-subtle:               light-dark(var(--#{$prefix}gray-100), var(--#{$prefix}gray-900)) !default;
+$border-color:                light-dark(var(--#{$prefix}gray-200), var(--#{$prefix}gray-700)) !default;
+$border-subtle:               light-dark(color-mix(in oklch, var(--#{$prefix}gray-100), var(--#{$prefix}gray-200)), color-mix(in oklch, var(--#{$prefix}gray-800), var(--#{$prefix}gray-900))) !default;
 $border-muted:                light-dark(var(--#{$prefix}gray-200), var(--#{$prefix}gray-800)) !default;
-$border-emphasized:           light-dark(var(--#{$prefix}gray-400), var(--#{$prefix}gray-700)) !default;
+$border-emphasized:           light-dark(var(--#{$prefix}gray-400), var(--#{$prefix}gray-600)) !default;
 // scss-docs-end border-variables
 
 // scss-docs-start border-radius-variables
