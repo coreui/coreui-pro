@@ -1,5 +1,4 @@
 @use "sass:string";
-@use "forms/form-range" as *;
 @use "functions/defaults" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/box-shadow" as *;
@@ -219,7 +218,6 @@ $range-slider-vertical-tokens: defaults(
       pointer-events: all;
       cursor: pointer;
       @include gradient-bg(var(--#{$prefix}range-slider-thumb-bg));
-      border: $form-range-thumb-border;
       border: var(--#{$prefix}range-slider-thumb-border);
       @include border-radius(var(--#{$prefix}range-slider-thumb-border-radius));
       @include box-shadow(var(--#{$prefix}range-slider-thumb-box-shadow));
