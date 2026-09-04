@@ -68,7 +68,9 @@ $sidebar-nav-group-toggle-show-color:         $sidebar-nav-link-color !default;
 
 $sidebar-nav-group-items-padding-y:           0 !default;
 $sidebar-nav-group-items-padding-x:           0 !default;
-$sidebar-nav-group-items-transition:          height .15s ease !default;
+$sidebar-nav-group-items-transition-property: height, display !default;
+$sidebar-nav-group-items-transition-duration: .15s !default;
+$sidebar-nav-group-items-transition-timing:   ease !default;
 
 $sidebar-nav-group-indicator-size:            12px !default;
 $sidebar-nav-group-indicator-color:           var(--#{$prefix}fg-3) !default;
@@ -133,7 +135,9 @@ $sidebar-nav-tokens: defaults(
     --#{$prefix}sidebar-nav-group-transition: #{$sidebar-nav-group-transition},
     --#{$prefix}sidebar-nav-group-items-padding-y: #{$sidebar-nav-group-items-padding-y},
     --#{$prefix}sidebar-nav-group-items-padding-x: #{$sidebar-nav-group-items-padding-x},
-    --#{$prefix}sidebar-nav-group-items-transition: #{$sidebar-nav-group-items-transition},
+    --#{$prefix}sidebar-nav-group-items-transition-property: #{$sidebar-nav-group-items-transition-property},
+    --#{$prefix}sidebar-nav-group-items-transition-duration: #{$sidebar-nav-group-items-transition-duration},
+    --#{$prefix}sidebar-nav-group-items-transition-timing: #{$sidebar-nav-group-items-transition-timing},
     --#{$prefix}sidebar-nav-group-indicator-size: #{$sidebar-nav-group-indicator-size},
     --#{$prefix}sidebar-nav-group-indicator-color: #{$sidebar-nav-group-indicator-color},
     --#{$prefix}sidebar-nav-group-indicator-icon: #{escape-svg($sidebar-nav-group-indicator-icon)},
@@ -282,11 +286,8 @@ $sidebar-nav-tokens: defaults(
       @include border-radius(var(--#{$prefix}sidebar-nav-group-border-radius));
       @include transition(var(--#{$prefix}sidebar-nav-group-transition));
 
-      &:not(.show) {
-        .nav-group-items,
-        .nav-group-toggle-indicator .show {
-          display: none;
-        }
+      &:not(.show) .nav-group-toggle-indicator .show {
+        display: none;
       }
 
       &.show {
@@ -336,9 +337,7 @@ $sidebar-nav-tokens: defaults(
 
     .nav-group-items {
       padding: var(--#{$prefix}sidebar-nav-group-items-padding-y) var(--#{$prefix}sidebar-nav-group-items-padding-x);
-      overflow: hidden;
       list-style-type: "";
-      @include transition(var(--#{$prefix}sidebar-nav-group-items-transition));
 
       .nav-link {
         padding-inline-start: calc(var(--#{$prefix}sidebar-nav-link-padding-x) + var(--#{$prefix}sidebar-nav-link-icon-width) + var(--#{$prefix}sidebar-nav-link-icon-margin));
@@ -346,6 +345,49 @@ $sidebar-nav-tokens: defaults(
 
       .nav-icon {
         margin-inline-start: calc(-1 * (var(--#{$prefix}sidebar-nav-link-icon-width) + var(--#{$prefix}sidebar-nav-link-icon-margin)));
+      }
+    }
+
+    @supports (interpolate-size: allow-keywords) {
+      .nav-group-items {
+        interpolate-size: allow-keywords;
+        @include transition-props(
+          var(--#{$prefix}sidebar-nav-group-items-transition-property),
+          var(--#{$prefix}sidebar-nav-group-items-transition-duration),
+          var(--#{$prefix}sidebar-nav-group-items-transition-timing),
+          allow-discrete
+        );
+
+        &.collapsing {
+          overflow: hidden;
+        }
+      }
+
+      .nav-group:not(.show) > .nav-group-items {
+        display: none;
+        height: 0;
+      }
+
+      .show > .nav-group-items.collapsing {
+        @starting-style {
+          height: 0;
+        }
+      }
+    }
+
+    @supports not (interpolate-size: allow-keywords) {
+      .nav-group:not(.show) > .nav-group-items:not(.collapsing) {
+        display: none;
+      }
+
+      .nav-group-items.collapsing {
+        height: 0;
+        overflow: hidden;
+        @include transition-props(
+          var(--#{$prefix}sidebar-nav-group-items-transition-property),
+          var(--#{$prefix}sidebar-nav-group-items-transition-duration),
+          var(--#{$prefix}sidebar-nav-group-items-transition-timing)
+        );
       }
     }
 

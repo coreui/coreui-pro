@@ -10,6 +10,7 @@ import type { ComponentConfig } from './util/config.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { defineJQueryPlugin } from './util/index.js'
+import { startSizeTransition, supportsInterpolateSize } from './util/size-transition.js'
 
 /**
  * ------------------------------------------------------------------------
@@ -33,6 +34,7 @@ const DefaultType = {
 }
 
 const CLASS_NAME_ACTIVE = 'active'
+const CLASS_NAME_COLLAPSING = 'collapsing'
 const CLASS_NAME_SHOW = 'show'
 
 const CLASS_NAME_NAV_GROUP = 'nav-group'
@@ -93,7 +95,7 @@ class Navigation extends BaseComponent {
       element.classList.add(CLASS_NAME_ACTIVE)
 
       for (const group of this._getParentGroups(element)) {
-        this._setExpanded(group, true)
+        this._setExpanded(group, true, false)
       }
     }
   }
@@ -110,48 +112,34 @@ class Navigation extends BaseComponent {
     return groups
   }
 
-  _setExpanded(group: HTMLElement, expanded: boolean): void {
+  _setExpanded(group: HTMLElement, expanded: boolean, animate = true): void {
     const toggle = group.querySelector(`:scope > ${SELECTOR_NAV_GROUP_TOGGLE}`)
 
     if (toggle) {
       toggle.setAttribute('aria-expanded', String(expanded))
     }
 
-    if (expanded) {
-      group.classList.add(CLASS_NAME_SHOW)
+    const items = SelectorEngine.findOne<HTMLElement>(`:scope > ${SELECTOR_NAV_GROUP_ITEMS}`, group)
+
+    if (!items || !animate) {
+      group.classList.toggle(CLASS_NAME_SHOW, expanded)
       return
     }
 
-    const items = SelectorEngine.findOne<HTMLElement>(SELECTOR_NAV_GROUP_ITEMS, group)
+    const cssPath = supportsInterpolateSize()
+    const size = expanded || cssPath ? 0 : items.getBoundingClientRect().height
 
-    if (items) {
-      this._slideUp(items, () => group.classList.remove(CLASS_NAME_SHOW))
-    } else {
-      group.classList.remove(CLASS_NAME_SHOW)
+    items.classList.add(CLASS_NAME_COLLAPSING)
+    group.classList.toggle(CLASS_NAME_SHOW, expanded)
+
+    if (!cssPath) {
+      startSizeTransition(items, 'height', expanded ? 0 : size, expanded ? items.scrollHeight : 0)
     }
-  }
-
-  _slideDown(element: HTMLElement): void {
-    element.style.height = 'auto'
-    const height = element.clientHeight
-    element.style.height = '0px'
-    setTimeout(() => {
-      element.style.height = `${height}px`
-    }, 0)
 
     this._queueCallback(() => {
-      element.style.height = 'auto'
-    }, element, true)
-  }
-
-  _slideUp(element: HTMLElement, callback: () => void): void {
-    const height = element.clientHeight
-    element.style.height = `${height}px`
-    setTimeout(() => {
-      element.style.height = '0px'
-    }, 0)
-
-    this._queueCallback(callback, element, true)
+      items.classList.remove(CLASS_NAME_COLLAPSING)
+      items.style.height = ''
+    }, items, true)
   }
 
   _toggleGroupItems(event: Event): void {
@@ -162,8 +150,6 @@ class Navigation extends BaseComponent {
       return
     }
 
-    const items = SelectorEngine.findOne<HTMLElement>(SELECTOR_NAV_GROUP_ITEMS, group)
-
     if (this._config.groupsAutoCollapse === true && group.parentElement) {
       for (const sibling of Array.from(group.parentElement.children) as HTMLElement[]) {
         if (sibling !== group && sibling.classList.contains(CLASS_NAME_NAV_GROUP) && sibling.classList.contains(CLASS_NAME_SHOW)) {
@@ -172,16 +158,7 @@ class Navigation extends BaseComponent {
       }
     }
 
-    if (group.classList.contains(CLASS_NAME_SHOW)) {
-      this._setExpanded(group, false)
-      return
-    }
-
-    this._setExpanded(group, true)
-
-    if (items) {
-      this._slideDown(items)
-    }
+    this._setExpanded(group, !group.classList.contains(CLASS_NAME_SHOW))
   }
 
   _addEventListeners(): any {
