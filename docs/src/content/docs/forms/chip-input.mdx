@@ -288,7 +288,7 @@ The Bootstrap Chip Input component follows WAI-ARIA patterns to ensure the chip 
 
 ### CSS variables
 
-Chips inputs use local CSS variables on `.chip-input` for enhanced real-time customization.
+A chip input is a `.form-control-group`, so it reads the group's `--cui-control-*` tokens; `.chip-input` only re-points the ones it sets differently — padding, border colour and radius, and the gap between chips. Override any group token on the element to restyle a single chip input.
 
 <ScssDocs file="scss/forms/_chip-input.scss" capture="chip-input-css-vars" />
 
