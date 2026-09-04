@@ -378,15 +378,7 @@ class Menu extends BaseComponent {
       return
     }
 
-    let referenceElement: ReferenceElement = this._element
-
-    if (this._config.reference === 'parent') {
-      referenceElement = this._parent
-    } else if (isElement(this._config.reference)) {
-      referenceElement = getElement(this._config.reference)!
-    } else if (typeof this._config.reference === 'object') {
-      referenceElement = this._config.reference as ReferenceElement
-    }
+    const referenceElement = this._getReferenceElement()
 
     this._updateFloatingPosition(referenceElement)
 
@@ -402,17 +394,7 @@ class Menu extends BaseComponent {
       return
     }
 
-    if (!referenceElement) {
-      if (this._config.reference === 'parent') {
-        referenceElement = this._parent
-      } else if (isElement(this._config.reference)) {
-        referenceElement = getElement(this._config.reference)
-      } else if (typeof this._config.reference === 'object') {
-        referenceElement = this._config.reference as ReferenceElement
-      } else {
-        referenceElement = this._element
-      }
-    }
+    referenceElement ??= this._getReferenceElement()
 
     const placement = this._getPlacement()
     const middleware = this._getFloatingMiddleware()
@@ -425,6 +407,24 @@ class Menu extends BaseComponent {
       floatingConfig.middleware,
       floatingConfig.strategy
     )
+  }
+
+  protected _getReferenceElement(): ReferenceElement {
+    const { reference } = this._config
+
+    if (reference === 'parent') {
+      return this._parent
+    }
+
+    if (isElement(reference)) {
+      return getElement(reference)!
+    }
+
+    if (typeof reference === 'object') {
+      return reference as ReferenceElement
+    }
+
+    return this._element
   }
 
   protected _isShown(): boolean {
@@ -953,7 +953,7 @@ class Menu extends BaseComponent {
   }
 
   static clearMenus(event: CoreUIEvent): void {
-    if (event.button === RIGHT_MOUSE_BUTTON || (event.type === 'keyup' && event.key !== TAB_KEY)) {
+    if ((event.type === 'click' && event.button === RIGHT_MOUSE_BUTTON) || (event.type === 'keyup' && event.key !== TAB_KEY)) {
       return
     }
 
@@ -1014,17 +1014,11 @@ class Menu extends BaseComponent {
       return
     }
 
-    const getToggleButton: any = delegateTarget.matches(this.SELECTOR_DATA_TOGGLE) ?
-      delegateTarget :
-      (SelectorEngine.prev(delegateTarget, this.SELECTOR_DATA_TOGGLE)[0] ||
-        SelectorEngine.next(delegateTarget, this.SELECTOR_DATA_TOGGLE)[0] ||
-        SelectorEngine.findOne(this.SELECTOR_DATA_TOGGLE, delegateTarget.parentNode ?? undefined))
+    const instance = this._getKeyboardInstance(delegateTarget)
 
-    if (!getToggleButton) {
+    if (!instance) {
       return
     }
-
-    const instance = this.getOrCreateInstance(getToggleButton)
 
     if ((isLeftOrRightEvent || isHomeOrEndEvent || (isEnterOrSpaceEvent && isSubmenuTrigger)) && instance._handleSubmenuKeydown(event)) {
       return
@@ -1056,8 +1050,27 @@ class Menu extends BaseComponent {
       }
 
       instance.hide()
-      getToggleButton.focus()
+      instance._element.focus()
     }
+  }
+
+  // A key event from inside an open menu belongs to the instance that opened
+  // it, whatever its class and wherever `container` moved the menu; only a
+  // closed menu is resolved through the toggle next to it.
+  protected static _getKeyboardInstance(delegateTarget: HTMLElement): Menu | null {
+    for (const instance of Menu._openInstances) {
+      if (instance._menu.contains(delegateTarget)) {
+        return instance
+      }
+    }
+
+    const toggle = delegateTarget.matches(this.SELECTOR_DATA_TOGGLE) ?
+      delegateTarget :
+      (SelectorEngine.prev(delegateTarget, this.SELECTOR_DATA_TOGGLE)[0] ||
+        SelectorEngine.next(delegateTarget, this.SELECTOR_DATA_TOGGLE)[0] ||
+        SelectorEngine.findOne(this.SELECTOR_DATA_TOGGLE, delegateTarget.parentNode ?? undefined))
+
+    return toggle ? this.getOrCreateInstance(toggle) : null
   }
 
   static jQueryInterface(this: any, config: any): void {
