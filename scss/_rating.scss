@@ -111,11 +111,11 @@ $rating-tokens: defaults(
     }
 
     &.active {
-      color: var(--#{$prefix}rating-item-active-color);
+      color: var(--#{$prefix}theme-bg, var(--#{$prefix}rating-item-active-color));
       opacity: 1;
 
       .rating-item-icon {
-        background-color: var(--#{$prefix}rating-item-active-color);
+        background-color: var(--#{$prefix}theme-bg, var(--#{$prefix}rating-item-active-color));
       }
 
       .rating-item-custom-icon:has(+ .rating-item-custom-icon-active) {

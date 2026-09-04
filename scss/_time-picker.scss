@@ -162,13 +162,13 @@ $time-picker-tokens: defaults(
     }
 
     &.selected {
-      color: var(--#{$prefix}time-picker-roll-cell-selected-color);
-      background: var(--#{$prefix}time-picker-roll-cell-selected-bg);
+      color: var(--#{$prefix}theme-contrast, var(--#{$prefix}time-picker-roll-cell-selected-color));
+      background: var(--#{$prefix}theme-bg, var(--#{$prefix}time-picker-roll-cell-selected-bg));
 
       &:hover,
       &:focus-visible {
-        color: var(--#{$prefix}time-picker-roll-cell-selected-hover-color);
-        background: var(--#{$prefix}time-picker-roll-cell-selected-hover-bg);
+        color: var(--#{$prefix}theme-contrast, var(--#{$prefix}time-picker-roll-cell-selected-hover-color));
+        background: var(--#{$prefix}theme-bg, var(--#{$prefix}time-picker-roll-cell-selected-hover-bg));
       }
     }
 
