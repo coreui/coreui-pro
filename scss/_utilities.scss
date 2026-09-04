@@ -47,17 +47,6 @@ $utilities-border-subtle: theme-color-refs("border", "-subtle") !default;
 
 $utilities-links-underline: theme-color-refs("fg") !default;
 
-// scss-docs-start border-widths-map
-$border-widths: (
-  keyline: .5px,
-  1: 1px,
-  2: 2px,
-  3: 3px,
-  4: 4px,
-  5: 5px
-) !default;
-// scss-docs-end border-widths-map
-
 // scss-docs-start font-sizes-legacy
 // The numeric keys v5 shipped, kept so `.fs-1` … `.fs-6` keep rendering. They
 // read the named scale, so overriding a stop moves both.
@@ -73,14 +62,6 @@ $font-sizes-legacy: (
 
 $line-height-lg:              2 !default;
 $line-height-sm:              1.25 !default;
-
-// scss-docs-start position-map
-$position-values: (
-  0: 0,
-  50: 50%,
-  100: 100%
-) !default;
-// scss-docs-end position-map
 
 
 // Utilities

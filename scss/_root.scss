@@ -19,17 +19,11 @@ $control-disabled-opacity:                      .5 !default;
 $control-label-disabled-opacity:                $control-disabled-opacity !default;
 // scss-docs-end control-state-variables
 
-// scss-docs-start variable-gradient
-$gradient: linear-gradient(180deg, rgba($white, .15), rgba($white, 0)) !default;
-// scss-docs-end variable-gradient
-
 $body-text-align:     null !default;
 $body-emphasis-color: light-dark($black, $white) !default;
 $link-hover-color:    color-mix(in oklch, var(--#{$prefix}link-color) 90%, var(--#{$prefix}black)) !default;
 
 // scss-docs-start border-variables
-$border-width:             1px !default;
-$border-style:             solid !default;
 $border-color-translucent: color-mix(in oklch, var(--#{$prefix}fg-body) 15%, transparent) !default;
 // scss-docs-end border-variables
 

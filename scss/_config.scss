@@ -13,6 +13,7 @@ $enable-rounded:              true !default;
 $enable-shadows:              false !default;
 $enable-gradients:            false !default;
 $enable-transitions:          true !default;
+$enable-smooth-scroll:        true !default;
 $enable-reduced-motion:       true !default;
 $enable-grid-classes:         true !default;
 $enable-container-classes:    true !default;
@@ -132,6 +133,7 @@ $container-max-widths: defaults(
 // Set the number of columns and specify the width of the gutters.
 
 $grid-columns:                12 !default;
+$grid-row-columns:            6 !default;
 $grid-gutter-width:           1.5rem !default;
 $gutters:                     $spacers !default;
 
@@ -139,12 +141,46 @@ $gutters:                     $spacers !default;
 
 $container-padding-x: $grid-gutter-width !default;
 
+// scss-docs-start variable-gradient
+$gradient: linear-gradient(180deg, color-mix(in srgb, var(--#{$prefix}white) 15%, transparent), color-mix(in srgb, var(--#{$prefix}white) 0%, transparent)) !default;
+// scss-docs-end variable-gradient
+
+// scss-docs-start position-map
+$position-values: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$position-values: defaults(
+  (
+    0: 0,
+    50: 50%,
+    100: 100%
+  ),
+  $position-values
+);
+// scss-docs-end position-map
+
 // Define common padding and border radius sizes and more.
 
 // scss-docs-start border-variables
-
+$border-width:                1px !default;
+$border-style:                solid !default;
 $border-color:                light-dark(var(--#{$prefix}gray-200), var(--#{$prefix}gray-700)) !default;
 // scss-docs-end border-variables
+
+// scss-docs-start border-widths-map
+$border-widths: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$border-widths: defaults(
+  (
+    keyline: .5px,
+    1: 1px,
+    2: 2px,
+    3: 3px,
+    4: 4px,
+    5: 5px
+  ),
+  $border-widths
+);
+// scss-docs-end border-widths-map
 
 // scss-docs-start border-radius-variables
 $border-radius:               .375rem !default;
