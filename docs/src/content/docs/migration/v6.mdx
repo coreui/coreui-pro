@@ -1187,6 +1187,12 @@ adornment in the library — so the button needs no icon markup at all:
   styles beyond the sidebar's own padding. `.sidebar-self-hiding-*` had already
   gone in v6 — a sidebar that hides itself below a breakpoint is `hide()` from
   a resize handler, or the mobile mode the sidebar takes below `lg` on its own.
+- **The mobile backdrop reads the shared backdrop tokens.** `.sidebar-backdrop`
+  mixes `--cui-backdrop-color` at `--cui-backdrop-opacity` and blurs by
+  `--cui-backdrop-blur`, like the dialog and the drawer; `--cui-sidebar-backdrop-bg`
+  carries the mix and `--cui-sidebar-backdrop-blur` the blur, and
+  `--cui-sidebar-backdrop-opacity` (`.5`, the old fade target) is gone. The
+  `.backdrop-*` helpers work on the sidebar too.
 - **`.sidebar-narrow` gets its bottom padding back.** It read
   `--cui-sidebar-toggler-height` from a token declared on the toggler, a
   descendant, so the padding silently fell to 0; the token is declared on

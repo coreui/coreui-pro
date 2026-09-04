@@ -17,8 +17,8 @@ $sidebar-color:                            var(--#{$prefix}fg-body) !default;
 $sidebar-bg:                               var(--#{$prefix}bg-body) !default;
 $sidebar-transition:                       margin-left .15s, margin-right .15s, box-shadow .075s, transform .15s, width .15s, z-index 0s ease .15s !default;
 $sidebar-brand-color:                      var(--#{$prefix}fg-body) !default;
-$sidebar-backdrop-bg:                      var(--#{$prefix}black) !default;
-$sidebar-backdrop-opacity:                 .5 !default;
+$sidebar-backdrop-bg:                      color-mix(in oklch, var(--#{$prefix}backdrop-color) var(--#{$prefix}backdrop-opacity), transparent) !default;
+$sidebar-backdrop-blur:                    var(--#{$prefix}backdrop-blur) !default;
 $sidebar-overlaid-box-shadow:              var(--#{$prefix}box-shadow) !default;
 // scss-docs-end sidebar-variables
 
@@ -91,7 +91,7 @@ $sidebar-backdrop-tokens: defaults(
   (
     --#{$prefix}sidebar-backdrop-zindex: var(--#{$prefix}z-sidebar-backdrop),
     --#{$prefix}sidebar-backdrop-bg: #{$sidebar-backdrop-bg},
-    --#{$prefix}sidebar-backdrop-opacity: #{$sidebar-backdrop-opacity},
+    --#{$prefix}sidebar-backdrop-blur: #{$sidebar-backdrop-blur},
   ),
   $sidebar-backdrop-tokens
 );
@@ -294,7 +294,7 @@ $sidebar-backdrop-tokens: defaults(
     @include tokens($sidebar-backdrop-tokens);
 
     @include media-breakpoint-down($mobile-breakpoint) {
-      @include overlay-backdrop(var(--#{$prefix}sidebar-backdrop-zindex), var(--#{$prefix}sidebar-backdrop-bg), var(--#{$prefix}sidebar-backdrop-opacity));
+      @include overlay-backdrop(var(--#{$prefix}sidebar-backdrop-zindex), var(--#{$prefix}sidebar-backdrop-bg), 1, var(--#{$prefix}sidebar-backdrop-blur));
     }
   }
 
