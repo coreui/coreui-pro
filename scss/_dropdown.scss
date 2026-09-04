@@ -25,7 +25,7 @@ $dropdown-box-shadow:               var(--#{$prefix}box-shadow) !default;
 
 $dropdown-link-color:               var(--#{$prefix}fg-body) !default;
 $dropdown-link-hover-color:         $dropdown-link-color !default;
-$dropdown-link-hover-bg:            var(--#{$prefix}bg-3) !default;
+$dropdown-link-hover-bg:            var(--#{$prefix}bg-1) !default;
 
 $dropdown-link-active-color:        var(--#{$prefix}primary-contrast) !default;
 $dropdown-link-active-bg:           var(--#{$prefix}primary) !default;

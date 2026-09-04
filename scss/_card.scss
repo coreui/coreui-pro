@@ -19,7 +19,7 @@ $card-box-shadow:                   none !default;
 $card-inner-border-radius:          calc(#{$card-border-radius} - #{$card-border-width}) !default;
 $card-cap-padding-y:                calc(#{$card-spacer-y} * .5) !default;
 $card-cap-padding-x:                $card-spacer-x !default;
-$card-cap-bg:                       color-mix(in srgb, var(--#{$prefix}fg-body) 3%, transparent) !default;
+$card-cap-bg:                       var(--#{$prefix}bg-1) !default;
 $card-cap-color:                    inherit !default;
 $card-height:                       auto !default;
 $card-color:                        inherit !default;

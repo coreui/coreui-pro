@@ -40,12 +40,12 @@ $calendar-nav-icon-color:                    var(--#{$prefix}fg-3) !default;
 $calendar-nav-icon-hover-color:              var(--#{$prefix}fg-body) !default;
 
 $calendar-cell-header-inner-font-weight:     600 !default;
-$calendar-cell-header-inner-color:           var(--#{$prefix}fg-2) !default;
+$calendar-cell-header-inner-color:           var(--#{$prefix}fg-3) !default;
 
 $calendar-cell-border-radius:                var(--#{$prefix}radius-4) !default;
 $calendar-cell-hover-color:                  var(--#{$prefix}fg-body) !default;
-$calendar-cell-hover-bg:                     var(--#{$prefix}bg-3) !default;
-$calendar-cell-disabled-color:               var(--#{$prefix}fg-3) !default;
+$calendar-cell-hover-bg:                     var(--#{$prefix}bg-1) !default;
+$calendar-cell-disabled-color:               var(--#{$prefix}fg-4) !default;
 
 $calendar-cell-selected-color:               var(--#{$prefix}primary-contrast) !default;
 $calendar-cell-selected-bg:                  var(--#{$prefix}primary) !default;
