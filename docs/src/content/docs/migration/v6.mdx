@@ -642,6 +642,16 @@ check, radio, carousel and toggler icons already work:
 
 #### Dialog (new) and Drawer (new)
 
+- **One backdrop model for both.** `:root` emits `--cui-backdrop-color`,
+  `--cui-backdrop-opacity` and `--cui-backdrop-blur`; the dialog's and the
+  drawer's `::backdrop` mix colour and opacity from them, so either can be
+  retuned alone. The looks are unchanged (dialog: black at 50%/65%, drawer:
+  the page colour at 25%), and `.backdrop-scrim`, `.backdrop-translucent` and
+  `.backdrop-none` swap them from the markup. `.dialog-no-backdrop` and
+  `.drawer-no-backdrop` keep working. The sidebar's backdrop tokens are
+  `--cui-sidebar-backdrop-zindex/-bg/-opacity` now (were unprefixed
+  `--cui-backdrop-*`, which the new root tokens would have shadowed).
+
 - **New components: Dialog and Drawer** — the native-`<dialog>` popup and
   side panel with the Bootstrap 6 look and `dialog-*` / `drawer-*` classes:
   Dialog is a centered floating panel over a blurred backdrop with optional

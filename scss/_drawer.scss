@@ -1,5 +1,6 @@
 @use "sass:map";
 @use "functions/defaults" as *;
+@use "mixins/backdrop" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/box-shadow" as *;
 @use "layout/breakpoints" as *;
@@ -27,8 +28,10 @@ $drawer-transition-duration:        .3s !default;
 $drawer-transition-timing:          var(--#{$prefix}transition-timing-overlay) !default;
 $drawer-scale-transform:            scale(1.02) !default;
 $drawer-title-line-height:          var(--#{$prefix}body-line-height) !default;
-$drawer-backdrop-bg:                color-mix(in oklch, var(--#{$prefix}bg-body) 25%, transparent) !default;
-$drawer-backdrop-blur:              8px !default;
+$drawer-backdrop-color:             var(--#{$prefix}bg-body) !default;
+$drawer-backdrop-opacity:           25% !default;
+$drawer-backdrop-bg:                color-mix(in oklch, var(--#{$prefix}backdrop-color) var(--#{$prefix}backdrop-opacity), transparent) !default;
+$drawer-backdrop-blur:              var(--#{$prefix}backdrop-blur) !default;
 $drawer-sheet-width:                760px !default;
 // scss-docs-end drawer-variables
 
@@ -56,6 +59,8 @@ $drawer-tokens: defaults(
     --#{$prefix}drawer-transition-duration: #{$drawer-transition-duration},
     --#{$prefix}drawer-transition-timing: #{$drawer-transition-timing},
     --#{$prefix}drawer-title-line-height: #{$drawer-title-line-height},
+    --#{$prefix}backdrop-color: #{$drawer-backdrop-color},
+    --#{$prefix}backdrop-opacity: #{$drawer-backdrop-opacity},
     --#{$prefix}drawer-backdrop-bg: #{$drawer-backdrop-bg},
     --#{$prefix}drawer-backdrop-blur: #{$drawer-backdrop-blur},
   ),
@@ -184,10 +189,7 @@ $drawer-tokens: defaults(
           &::backdrop {
             background-color: var(--#{$prefix}drawer-backdrop-bg);
             backdrop-filter: blur(var(--#{$prefix}drawer-backdrop-blur));
-            @include transition(
-              background-color var(--#{$prefix}drawer-transition-duration) var(--#{$prefix}drawer-transition-timing),
-              backdrop-filter var(--#{$prefix}drawer-transition-duration) var(--#{$prefix}drawer-transition-timing)
-            );
+            @include backdrop-transitions(var(--#{$prefix}drawer-transition-duration), var(--#{$prefix}drawer-transition-timing));
           }
 
           &.hiding::backdrop {

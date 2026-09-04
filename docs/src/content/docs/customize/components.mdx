@@ -93,6 +93,22 @@ The second line is the part that is easy to miss. Set the token alone and the ba
 
 While no theme class is present the token behaves as an override point; under one, the theme wins.
 
+## Backdrop
+
+Every overlay that dims the page — the dialog and the drawer through their native `::backdrop` — paints that layer from three tokens on `:root`:
+
+<ScssDocs file="scss/_root.scss" capture="root-backdrop-variables" />
+
+The colour and the opacity are mixed on the element (`color-mix(in oklch, var(--cui-backdrop-color) var(--cui-backdrop-opacity), transparent)`), so either can be changed alone, globally on `:root` or on one overlay. The dialog keeps the defaults, a dark scrim that deepens in the dark scheme; the drawer sets its own tint of the page (`--cui-bg-body` at 25%). Three presets pick a look from the markup:
+
+| Class | Backdrop |
+| --- | --- |
+| `.backdrop-scrim` | Black at 50% (65% in the dark scheme) — the dialog's default |
+| `.backdrop-translucent` | The page colour at 25% — the drawer's default |
+| `.backdrop-none` | No backdrop; the overlay still takes the top layer and traps focus |
+
+Put the class on the overlay element itself, next to `.dialog` or `.drawer`.
+
 ## Responsive
 
 These Sass loops aren't limited to color maps, either. You can also generate responsive variations of your components. Take for example our responsive alignment of the dropdowns where we mix an `@each` loop for the `$grid-breakpoints` Sass map with a media query include.

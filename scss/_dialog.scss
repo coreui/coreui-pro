@@ -1,5 +1,6 @@
 @use "sass:map";
 @use "functions/defaults" as *;
+@use "mixins/backdrop" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/box-shadow" as *;
 @use "layout/breakpoints" as *;
@@ -24,8 +25,8 @@ $dialog-transition-duration:        .3s !default;
 $dialog-transition-timing:          var(--#{$prefix}transition-timing-overlay) !default;
 $dialog-slide-distance:             3rem !default;
 $dialog-scale-transform:            scale(1.02) !default;
-$dialog-backdrop-bg:                light-dark(rgb(0 0 0 / 50%), rgb(0 0 0 / 65%)) !default;
-$dialog-backdrop-blur:              8px !default;
+$dialog-backdrop-bg:                color-mix(in oklch, var(--#{$prefix}backdrop-color) var(--#{$prefix}backdrop-opacity), transparent) !default;
+$dialog-backdrop-blur:              var(--#{$prefix}backdrop-blur) !default;
 $dialog-header-padding:             var(--#{$prefix}spacer-3) !default;
 $dialog-header-border-color:        var(--#{$prefix}border-color-translucent) !default;
 $dialog-header-border-width:        var(--#{$prefix}border-width) !default;
@@ -146,10 +147,7 @@ $dialog-tokens: defaults(
       &::backdrop {
         background-color: var(--#{$prefix}dialog-backdrop-bg);
         backdrop-filter: blur(var(--#{$prefix}dialog-backdrop-blur));
-        @include transition(
-          background-color var(--#{$prefix}dialog-transition-duration) var(--#{$prefix}dialog-transition-timing),
-          backdrop-filter var(--#{$prefix}dialog-transition-duration) var(--#{$prefix}dialog-transition-timing)
-        );
+        @include backdrop-transitions(var(--#{$prefix}dialog-transition-duration), var(--#{$prefix}dialog-transition-timing));
       }
 
       // Exit: fade the native backdrop out alongside the dialog — it is still

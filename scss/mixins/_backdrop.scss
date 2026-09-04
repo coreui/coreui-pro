@@ -1,4 +1,5 @@
 @use "../config" as *;
+@use "transition" as *;
 
 // The full-viewport scrim behind an overlay. Used by the sidebar; exported for
 // anything else that needs the same surface.
@@ -15,4 +16,11 @@
   // Fade for backdrop
   &.fade { opacity: 0; }
   &.show { opacity: $backdrop-opacity; }
+}
+
+@mixin backdrop-transitions($duration, $timing) {
+  @include transition(
+    background-color $duration $timing,
+    backdrop-filter $duration $timing
+  );
 }
