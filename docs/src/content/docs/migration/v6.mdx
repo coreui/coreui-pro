@@ -2913,11 +2913,10 @@ pair, and `[data#{$data-infix}theme="dark"]` only declares `color-scheme: dark`.
   + $body-color:      light-dark(rgba(shift-color($gray-base, +26%), .95), rgba($white, .87));
   ```
 
-  Two exceptions remain, because `light-dark()` resolves to a `<color>` and these
-  are not colours: `$body-bg-dark` and `$body-tertiary-bg-dark` still exist (the
-  `color-translucent()` helper has to run in Sass), and the colours baked into the
-  select chevron and switch knob SVGs keep a dark counterpart next to their
-  component (`$form-select-indicator-dark`, `$form-switch-bg-image-dark`).
+  One exception remains, because a colour baked into an SVG cannot read
+  `light-dark()`: the select chevron and the switch knob keep a dark counterpart
+  next to their component (`$form-select-indicator-dark`,
+  `$form-switch-bg-image-dark`).
 - **Every palette colour gets a 100–900 scale of tokens in `:root`**, mixed at
   runtime from the colour's own token: `--cui-blue-100` … `--cui-blue-900`, for
   each key of `$colors`, and the same for every theme colour whose `base` is a
@@ -2953,12 +2952,17 @@ pair, and `[data#{$data-infix}theme="dark"]` only declares `color-scheme: dark`.
   overriding a stop.
 
   `$color-tints` and `$color-shades` gained `025`, `050`, `950` and `975`, so
-  **every** colour now carries the full thirteen stops, and their percentages
-  moved to the curve the gray ramp used: the light stops are much lighter than
-  before (measured: `-400` moves 80 per RGB channel, `-300` 57, `-200` 38,
-  `-100` 19; the dark side moves 6 to 42). The grays themselves are unchanged
-  bar a rounding step in the light band and up to 12 in the dark, where the
-  hand-picked ramp was more chromatic than one base can be.
+  **every** colour now carries the full thirteen stops. The curve is
+  `94 / 90 / 80 / 60 / 40 / 20 %` of white for `025` … `400` and
+  `16 / 32 / 48 / 64 / 70 / 76 %` of black for `600` … `975`, and `$gray` is
+  `oklch(60% 0.02 245)`. The light band is far more spread out than the v5
+  ramp it replaces: against white, `gray-100` reads 1.27:1 (was 1.10),
+  `gray-200` 1.63 (was 1.21), `gray-300` 2.14 (was 1.34), `gray-400` 2.87
+  (was 1.49); `gray-600` and below are within a step of where they were.
+  Everything that reads a light stop moves with it — the neutral surfaces
+  `bg-1` … `bg-4`, `border-color`, `theme-secondary`, every `-bg-subtle` and
+  `-border` slot — which is what makes a plain badge or a secondary button
+  visible on a white page again.
 
 - **`-bg-subtle`, `-border-subtle` and `-text-emphasis` are pairs of those
   stops** rather than hand-picked hexes:
@@ -3044,11 +3048,11 @@ Two consequences for the tokens:
   and `gray-900`: the body sits on `gray-975` (was `gray-900`), `bg-1` on
   `gray-950`, `bg-2` on `gray-900`, `bg-3` on `gray-800` and `bg-4` on
   `gray-700`. Dark mode reads darker overall and surfaces have more room to
-  step away from the page; the light side is unchanged. Translucent values
-  un-blended against the body (`$border-color-translucent`, the tertiary
-  surface) carry a higher alpha for the same rendered color over the darker
-  page. Override the `$bg-*` knobs or the `--cui-bg-*` tokens to keep the
-  previous palette.
+  step away from the page. `--cui-border-color-translucent` is one expression
+  for both schemes, `color-mix(in oklch, var(--cui-fg-body) 15%, transparent)`,
+  instead of two `rgba()` values computed in Sass; the `color-translucent()`
+  function is gone. Override the `$bg-*` knobs or the `--cui-bg-*` tokens to
+  keep the previous palette.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **The text ladder is solid grays, and components use all of its rungs.**
   `--cui-fg-body` through `--cui-fg-4` were alpha blends of one color
