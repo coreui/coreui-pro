@@ -1156,6 +1156,42 @@ adornment in the library — so the button needs no icon markup at all:
   theme slots, so a `.theme-*` class recolors them; without one they stay
   on primary as before.
 
+#### Sidebar
+
+- **Every `--cui-sidebar-*` token comes from a Sass map** (`$sidebar-tokens`,
+  `$sidebar-nav-tokens`, `$sidebar-narrow-tokens` and the variant maps), so the
+  sidebar takes `@use ... with ()` overrides like every other component. The
+  narrow variant's variables (`$sidebar-narrow-*`) live in
+  `sidebar/_sidebar-narrow.scss`.
+- **Hover and active links read the foreground ladder.** Their text was the
+  pure black/white `--cui-emphasis-color` and their background the
+  Sass-computed `--cui-tertiary-bg-translucent`; they are `--cui-fg-body` and
+  `color-mix(in srgb, var(--cui-fg-body) 10%, transparent)` now — a tint that
+  works on any surface and can be retuned in the browser. Slightly stronger
+  than before on a light sidebar, slightly weaker on a dark one.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`--cui-tertiary-bg-translucent` is gone from `:root`.** The sidebar was
+  its only reader. Set `--cui-sidebar-nav-link-hover-bg` /
+  `-active-bg` on `.sidebar-nav` for a different tint.
+- **Theme variants.** `.sidebar.theme-{color}` paints the surface, text,
+  icons and the hover/active links from that colour's slots. `.sidebar-light`
+  joins `.sidebar-dark` as the scheme switch.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`.sidebar-body` and `.sidebar-form` are removed.** Neither carried
+  styles beyond the sidebar's own padding. `.sidebar-self-hiding-*` had already
+  gone in v6 — a sidebar that hides itself below a breakpoint is `hide()` from
+  a resize handler, or the mobile mode the sidebar takes below `lg` on its own.
+- **The mobile backdrop reads the shared backdrop tokens.** `.sidebar-backdrop`
+  mixes `--cui-backdrop-color` at `--cui-backdrop-opacity` and blurs by
+  `--cui-backdrop-blur`, like the dialog and the drawer; `--cui-sidebar-backdrop-bg`
+  carries the mix and `--cui-sidebar-backdrop-blur` the blur, and
+  `--cui-sidebar-backdrop-opacity` (`.5`, the old fade target) is gone. The
+  `.backdrop-*` helpers work on the sidebar too.
+- **`.sidebar-narrow` gets its bottom padding back.** It read
+  `--cui-sidebar-toggler-height` from a token declared on the toggler, a
+  descendant, so the padding silently fell to 0; the token is declared on
+  `.sidebar` now.
+
 #### ScrollSpy
 
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>

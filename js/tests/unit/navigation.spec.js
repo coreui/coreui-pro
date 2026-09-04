@@ -241,7 +241,11 @@ describe('Navigation', () => {
       toggle.click()
 
       expect(group.classList.contains('show')).toBe(true)
-      expect(group.getAttribute('aria-expanded')).toBe('true')
+      expect(toggle.getAttribute('aria-expanded')).toBe('true')
+
+      toggle.click()
+
+      expect(toggle.getAttribute('aria-expanded')).toBe('false')
     })
   })
 

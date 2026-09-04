@@ -243,9 +243,6 @@ $root-token-defaults: map.merge(
     --#{$prefix}tertiary-color: var(--#{$prefix}fg-3),
     --#{$prefix}tertiary-bg: var(--#{$prefix}bg-3),
     --#{$prefix}emphasis-color: $body-emphasis-color,
-    // `color-translucent()` un-blends a color against a background — channel
-    // algebra, so it reads the grays as Sass colors, not as tokens.
-    --#{$prefix}tertiary-bg-translucent: light-dark(color-translucent($gray-100), color-translucent($gray-800, .25, $gray-975)),
     // scss-docs-end root-body-variables
     --#{$prefix}heading-color: $headings-color,
     --#{$prefix}link-color: $link-color,
