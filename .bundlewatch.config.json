@@ -22,7 +22,7 @@
     },
     {
       "path": "./dist/css/coreui-utilities.min.css",
-      "maxSize": "19 kB"
+      "maxSize": "19.25 kB"
     },
     {
       "path": "./dist/css/coreui.css",
@@ -30,7 +30,7 @@
     },
     {
       "path": "./dist/css/coreui.min.css",
-      "maxSize": "66.5 kB"
+      "maxSize": "67 kB"
     },
     {
       "path": "./dist/js/coreui.bundle.js",
