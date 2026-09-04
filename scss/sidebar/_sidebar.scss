@@ -36,15 +36,7 @@ $sidebar-toggler-border-radius:     var(--#{$prefix}radius-4) !default;
 $sidebar-toggler-transition:        transform .15s !default;
 // scss-docs-end sidebar-toggler
 
-// scss-docs-start sidebar-widths
-$sidebar-widths: (
-  sm: 12rem,
-  lg: 20rem,
-  xl: 24rem
-) !default;
-// scss-docs-end sidebar-widths
-
-// stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
+// stylelint-disable scss/dollar-variable-default
 
 // scss-docs-start sidebar-css-vars
 $sidebar-tokens: () !default;
@@ -105,7 +97,7 @@ $sidebar-backdrop-tokens: defaults(
 );
 // scss-docs-end sidebar-backdrop-css-vars
 
-// stylelint-enable custom-property-no-missing-var-function, scss/dollar-variable-default
+// stylelint-enable scss/dollar-variable-default
 
 // The content next to the sidebar reads how much of the row it occupies.
 @mixin sidebar-occupy($width) {
@@ -224,18 +216,6 @@ $sidebar-backdrop-tokens: defaults(
     }
   }
 
-  @each $width, $value in $sidebar-widths {
-    .sidebar-#{$width} {
-      --#{$prefix}sidebar-width: #{$value};
-
-      @include media-breakpoint-up($mobile-breakpoint) {
-        &:not(.hide, .sidebar-narrow, .sidebar-narrow-unfoldable, .sidebar-overlaid) {
-          @include sidebar-occupy($value);
-        }
-      }
-    }
-  }
-
   .sidebar-brand {
     color: var(--#{$prefix}sidebar-brand-color);
     white-space: nowrap;
@@ -253,10 +233,6 @@ $sidebar-backdrop-tokens: defaults(
       margin-top: calc(-.5 * var(--#{$prefix}sidebar-padding-y));
       margin-bottom: calc(-.5 * var(--#{$prefix}sidebar-padding-y));
     }
-  }
-
-  .sidebar-body {
-    padding: var(--#{$prefix}sidebar-padding-y) var(--#{$prefix}sidebar-padding-x);
   }
 
   .sidebar-footer {

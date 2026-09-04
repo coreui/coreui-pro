@@ -60,7 +60,7 @@ Below is a more complete sidebar example shown by default on desktop devices. It
         <i class="icon icon-lg cil-sidebar-close d-sidebar-narrow-unfoldable-none"></i>
       </button>
     </div>
-    <ul class="sidebar-nav sidebar-nav-tree" data-coreui-navigation>
+    <ul class="sidebar-nav" data-coreui-navigation>
       <li class="nav-title">Nav Title</li>
       <li class="nav-item">
         <a class="nav-link active" href="#">
@@ -358,44 +358,6 @@ Use `.compact` on `.sidebar-nav` to make the entire navigation denser, or on `.n
     </ul>
   </div>`} />
 
-### Tree navigation
-
-Add the `.sidebar-nav-tree` class to `.sidebar-nav` to render nested groups as a tree. Nested `.nav-group-items` get connector lines automatically, making deeper navigation levels easier to scan.
-
-<Example class="bg-4 p-0 rounded-bottom-0 overflow-hidden" code={`<div class="sidebar border-end">
-    <ul class="sidebar-nav sidebar-nav-tree" data-coreui-navigation>
-      <li class="nav-item nav-group show">
-        <a class="nav-link nav-group-toggle" href="#">
-          <i class="nav-icon cil-folder"></i> Parent item
-        </a>
-        <ul class="nav-group-items">
-          <li class="nav-item">
-            <a class="nav-link" href="#">
-              <span class="nav-icon"><span class="nav-icon-bullet"></span></span> Child item
-            </a>
-          </li>
-          <li class="nav-item nav-group show">
-            <a class="nav-link nav-group-toggle" href="#">
-              <span class="nav-icon"><span class="nav-icon-bullet"></span></span> Nested group
-            </a>
-            <ul class="nav-group-items">
-              <li class="nav-item">
-                <a class="nav-link" href="#">
-                  <span class="nav-icon"><span class="nav-icon-bullet"></span></span> Nested child
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">
-                  <span class="nav-icon"><span class="nav-icon-bullet"></span></span> Nested child
-                </a>
-              </li>
-            </ul>
-          </li>
-        </ul>
-      </li>
-    </ul>
-  </div>`} />
-
 ### Group indicator
 
 By default, `.nav-group-toggle` renders its own indicator with a pseudo-element. No additional markup is required.
@@ -605,8 +567,6 @@ Sidebars use local CSS variables on `.sidebar`, `.sidebar-backdrop`, `.sidebar-n
 
 <ScssDocs file="scss/sidebar/_sidebar-nav.scss" capture="sidebar-nav-css-vars" />
 
-<ScssDocs file="scss/sidebar/_sidebar-nav.scss" capture="sidebar-nav-tree-css-vars" />
-
 <ScssDocs file="scss/sidebar/_sidebar.scss" capture="sidebar-toggler-css-vars" />
 
 <ScssDocs file="scss/sidebar/_sidebar.scss" capture="sidebar-backdrop-css-vars" />
@@ -624,9 +584,3 @@ Sass variables set these defaults at build time and are removed in v7. The CSS v
 <ScssDocs file="scss/sidebar/_sidebar-nav.scss" capture="sidebar-nav-variables" />
 
 <ScssDocs file="scss/sidebar/_sidebar-narrow.scss" capture="sidebar-narrow-variables" />
-
-### Sass maps
-
-Each entry is one `.sidebar-{width}` class and the width it sets — on the sidebar itself and on the space it reserves for the content next to it. Add a key to define a width, or set one to `null` to drop it:
-
-<ScssDocs file="scss/sidebar/_sidebar.scss" capture="sidebar-widths" />

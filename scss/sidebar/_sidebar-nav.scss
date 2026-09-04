@@ -76,11 +76,6 @@ $sidebar-nav-group-indicator-icon:            url("data:image/svg+xml,<svg xmlns
 $sidebar-nav-group-indicator-hover-color:     $sidebar-nav-link-hover-color !default;
 $sidebar-nav-group-indicator-hover-icon:      $sidebar-nav-group-indicator-icon !default;
 $sidebar-nav-group-indicator-transition:      transform .15s !default;
-
-$sidebar-nav-tree-group-border-color:          var(--#{$prefix}border-color) !default;
-$sidebar-nav-tree-link-icon-bullet-bg:         var(--#{$prefix}border-color) !default;
-$sidebar-nav-tree-link-hover-icon-bullet-bg:   var(--#{$prefix}border-color) !default;
-$sidebar-nav-tree-link-active-icon-bullet-bg:  var(--#{$prefix}border-color) !default;
 // scss-docs-end sidebar-nav-variables
 
 // stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
@@ -150,19 +145,6 @@ $sidebar-nav-tokens: defaults(
   $sidebar-nav-tokens
 );
 // scss-docs-end sidebar-nav-css-vars
-
-// scss-docs-start sidebar-nav-tree-css-vars
-$sidebar-nav-tree-tokens: () !default;
-$sidebar-nav-tree-tokens: defaults(
-  (
-    --#{$prefix}sidebar-nav-tree-group-border-color: #{$sidebar-nav-tree-group-border-color},
-    --#{$prefix}sidebar-nav-link-icon-bullet-bg: #{$sidebar-nav-tree-link-icon-bullet-bg},
-    --#{$prefix}sidebar-nav-link-hover-icon-bullet-bg: #{$sidebar-nav-tree-link-hover-icon-bullet-bg},
-    --#{$prefix}sidebar-nav-link-active-icon-bullet-bg: #{$sidebar-nav-tree-link-active-icon-bullet-bg},
-  ),
-  $sidebar-nav-tree-tokens
-);
-// scss-docs-end sidebar-nav-tree-css-vars
 
 // stylelint-enable custom-property-no-missing-var-function, scss/dollar-variable-default
 
@@ -371,33 +353,6 @@ $sidebar-nav-tree-tokens: defaults(
     .compact {
       .nav-link {
         --#{$prefix}sidebar-nav-link-padding-y: #{$sidebar-compact-nav-link-padding-y};
-      }
-    }
-
-    &.sidebar-nav-tree {
-      @include tokens($sidebar-nav-tree-tokens);
-
-      .nav-group .nav-group-items {
-        $indent: calc((var(--#{$prefix}sidebar-nav-link-padding-x) + var(--#{$prefix}sidebar-nav-link-icon-width) + var(--#{$prefix}sidebar-nav-link-icon-margin)) * .5);
-
-        position: relative;
-        z-index: 0;
-        padding-inline-start: $indent;
-
-        &::before {
-          position: absolute;
-          inset-inline-start: calc(#{$indent} + var(--#{$prefix}border-width) * 1.5);
-          top: 0;
-          z-index: -1;
-          height: 100%;
-          content: "";
-          border-inline-start: var(--#{$prefix}border-width) solid var(--#{$prefix}sidebar-nav-tree-group-border-color);
-        }
-
-        // stylelint-disable-next-line selector-max-class
-        .nav-link {
-          margin-inline-start: calc(-1 * #{$indent});
-        }
       }
     }
   }

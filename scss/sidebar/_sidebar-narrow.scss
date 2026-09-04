@@ -68,8 +68,7 @@ $sidebar-narrow-unfoldable-tokens: defaults(
 
       .nav-label,
       .nav-title,
-      .nav-group-items,
-      .sidebar-form {
+      .nav-group-items {
         height: 0 !important; // stylelint-disable-line declaration-no-important
         padding: 0 !important; // stylelint-disable-line declaration-no-important
         margin: 0 !important; // stylelint-disable-line declaration-no-important
