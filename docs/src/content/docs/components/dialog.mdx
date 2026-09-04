@@ -113,6 +113,28 @@ When backdrop is set to `static`, the dialog will not close when clicking outsid
 
 <Example html={[`<button type="button" class="btn-solid theme-primary" data-coreui-toggle="dialog" data-coreui-target="#exampleDialogStatic">`, `  Launch static backdrop dialog`, `</button>`]} />
 
+## Backdrop
+
+The backdrop reads three tokens from `:root` — `--cui-backdrop-color`, `--cui-backdrop-opacity` and `--cui-backdrop-blur` — and every overlay component paints it the same way. A dialog defaults to a dark scrim; the drawer defaults to a translucent tint of the page. Pick the other look with a [backdrop preset](/customize/components/#backdrop) on the element: `.backdrop-translucent` here, `.backdrop-scrim` on a drawer, `.backdrop-none` on either.
+
+<dialog class="dialog backdrop-translucent" id="exampleDialogTranslucent" aria-labelledby="exampleDialogTranslucentLabel">
+  <div class="dialog-header">
+    <h5 class="dialog-title" id="exampleDialogTranslucentLabel">Translucent backdrop</h5>
+    <button type="button" class="btn-close" data-coreui-dismiss="dialog" aria-label="Close"></button>
+  </div>
+  <div class="dialog-body">
+    <p>The page behind stays readable through a light tint instead of a dark scrim.</p>
+  </div>
+</dialog>
+
+<Example html={[`<button type="button" class="btn-solid theme-primary" data-coreui-toggle="dialog" data-coreui-target="#exampleDialogTranslucent">`, `  Launch dialog with a translucent backdrop`, `</button>`]} />
+
+```html
+<dialog class="dialog backdrop-translucent" id="exampleDialogTranslucent" aria-labelledby="exampleDialogTranslucentLabel">
+  …
+</dialog>
+```
+
 ## Scrolling long content
 
 Add `.dialog-scrollable` — the header and footer stay fixed while the dialog body scrolls.

@@ -1,0 +1,26 @@
+@use "../config" as *;
+@use "../mixins/color-mode" as *;
+
+@layer helpers {
+  .backdrop-scrim {
+    --#{$prefix}backdrop-color: var(--#{$prefix}black);
+    --#{$prefix}backdrop-opacity: 50%;
+  }
+
+  @if $enable-dark-mode {
+    @include color-mode(dark) {
+      .backdrop-scrim {
+        --#{$prefix}backdrop-opacity: 65%;
+      }
+    }
+  }
+
+  .backdrop-translucent {
+    --#{$prefix}backdrop-color: var(--#{$prefix}bg-body);
+    --#{$prefix}backdrop-opacity: 25%;
+  }
+
+  .backdrop-none::backdrop {
+    display: none;
+  }
+}

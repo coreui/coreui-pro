@@ -140,6 +140,24 @@ Add a `.drawer-footer` below the `.drawer-body` for the panel's actions. It is a
 
 <Example html={[`<div class="drawer-footer">`, `  <button type="button" class="btn-outline theme-secondary" data-coreui-dismiss="drawer">Close</button>`, `  <button type="button" class="btn-solid theme-primary">Save changes</button>`, `</div>`]} />
 
+### Backdrop presets
+
+The backdrop reads `--cui-backdrop-color`, `--cui-backdrop-opacity` and `--cui-backdrop-blur`; a drawer defaults to a translucent tint of the page. For the dialog's dark scrim add `.backdrop-scrim`; the [presets](/customize/components/#backdrop) work on every overlay component.
+
+<Example code={`<button class="btn-solid theme-primary" type="button" data-coreui-toggle="drawer" data-coreui-target="#drawerScrim">
+    Toggle drawer with a dark backdrop
+  </button>
+
+  <dialog class="drawer drawer-start backdrop-scrim" id="drawerScrim" aria-labelledby="drawerScrimLabel">
+    <div class="drawer-header">
+      <h5 class="drawer-title" id="drawerScrimLabel">Dark backdrop</h5>
+      <button type="button" class="btn-close" data-coreui-dismiss="drawer" aria-label="Close"></button>
+    </div>
+    <div class="drawer-body">
+      The scrim the dialog uses, on a drawer.
+    </div>
+  </dialog>`} />
+
 ### No backdrop
 
 Add `.drawer-no-backdrop` to hide the backdrop while keeping the drawer modal — the panel still takes the top layer and traps focus, but nothing dims the page behind it.

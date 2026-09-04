@@ -280,13 +280,13 @@ $sidebar-widths: (
 
   .sidebar-backdrop {
     // scss-docs-start sidebar-backdrop-css-vars
-    --#{$prefix}backdrop-zindex: var(--#{$prefix}z-sidebar-backdrop);
-    --#{$prefix}backdrop-bg: #{$sidebar-backdrop-bg};
-    --#{$prefix}backdrop-opacity: #{$sidebar-backdrop-opacity};
+    --#{$prefix}sidebar-backdrop-zindex: var(--#{$prefix}z-sidebar-backdrop);
+    --#{$prefix}sidebar-backdrop-bg: #{$sidebar-backdrop-bg};
+    --#{$prefix}sidebar-backdrop-opacity: #{$sidebar-backdrop-opacity};
     // scss-docs-end sidebar-backdrop-css-vars
 
     @include media-breakpoint-down($mobile-breakpoint) {
-      @include overlay-backdrop(var(--#{$prefix}backdrop-zindex), var(--#{$prefix}backdrop-bg), var(--#{$prefix}backdrop-opacity));
+      @include overlay-backdrop(var(--#{$prefix}sidebar-backdrop-zindex), var(--#{$prefix}sidebar-backdrop-bg), var(--#{$prefix}sidebar-backdrop-opacity));
     }
   }
 
