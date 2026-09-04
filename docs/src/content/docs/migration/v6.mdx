@@ -978,6 +978,19 @@ A chip input has no control to wrap — the element *is* the frame — so it add
 `.form-control-group` to itself rather than asking you to write both. Writing
 both still works; the component only removes on `dispose()` a class it added.
 
+#### Chip Input reads the group's tokens
+
+`.chip-input` no longer keeps a private copy of the frame. `--cui-chip-input-min-height`
+and `--cui-chip-input-gap` are gone: the element reads `--cui-control-min-height`
+and `--cui-control-group-gap` from `.form-control-group` like every other group,
+and `.chip-input-sm`/`-lg` switch those tokens instead of private ones. The Sass
+variables that only re-pointed a `--cui-btn-input-*` token (`$chip-input-min-height`,
+`-font-size`, `-bg`, `-color`, `-border-width`, `-transition-*` and the size
+variants of min-height and font-size) are removed; what remains is what the chip
+input sets differently — padding, border colour and radius, and the gap, per
+size. The disabled chip's opacity reads `--cui-control-group-disabled-opacity`
+instead of a literal `.65`. Rendered values are unchanged.
+
 #### Number Input (new)
 
 - **New component: [Number Input](/forms/number-input/)** (PRO) — a number field
