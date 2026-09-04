@@ -1,0 +1,46 @@
+@use "../config" as *;
+@use "border-radius" as *;
+@use "box-shadow" as *;
+@use "focus-ring" as *;
+@use "transition" as *;
+
+// scss-docs-start form-control-frame-mixin
+@mixin form-control-frame() {
+  padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
+  font-family: var(--#{$prefix}control-font-family);
+  font-size: var(--#{$prefix}control-font-size);
+  font-weight: var(--#{$prefix}control-font-weight);
+  line-height: var(--#{$prefix}control-line-height);
+  color: var(--#{$prefix}control-color);
+  background-color: var(--#{$prefix}control-bg);
+  background-clip: padding-box;
+  border: var(--#{$prefix}control-border-width) solid var(--#{$prefix}control-border-color);
+
+  // Note: This has no effect on <select>s in some browsers, due to the limited stylability of `<select>`s in CSS.
+  @include border-radius(var(--#{$prefix}control-border-radius), 0);
+
+  @include box-shadow(var(--#{$prefix}control-box-shadow));
+  @include transition-props(
+    var(--#{$prefix}control-transition-property),
+    var(--#{$prefix}control-transition-duration),
+    var(--#{$prefix}control-transition-timing)
+  );
+}
+// scss-docs-end form-control-frame-mixin
+
+// scss-docs-start form-control-group-active-mixin
+@mixin form-control-group-active() {
+  color: var(--#{$prefix}control-focus-color);
+  background-color: var(--#{$prefix}control-focus-bg);
+  border-color: var(--#{$prefix}control-focus-border-color);
+}
+// scss-docs-end form-control-group-active-mixin
+
+// scss-docs-start form-control-group-focus-mixin
+// Only where focus actually is: a ring on a field while the user arrows around
+// its popup gives a keyboard user two focus indicators (WCAG 2.4.7).
+@mixin form-control-group-focus() {
+  @include form-control-group-active();
+  @include focus-ring(true, $color: var(--#{$prefix}control-focus-ring));
+}
+// scss-docs-end form-control-group-focus-mixin

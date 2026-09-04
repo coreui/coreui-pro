@@ -4,6 +4,7 @@
 @use "../mixins/box-shadow" as *;
 @use "../mixins/color-mode" as *;
 @use "../mixins/focus-ring" as *;
+@use "../mixins/form-control" as *;
 @use "../mixins/ltr-rtl" as *;
 @use "../mixins/tokens" as *;
 @use "../mixins/form-validation" as *;
@@ -72,30 +73,6 @@ $form-control-tokens: defaults(
 // scss-docs-end form-control-tokens
 
 // stylelint-enable scss/dollar-variable-default, custom-property-no-missing-var-function
-
-// scss-docs-start form-control-frame-mixin
-@mixin form-control-frame() {
-  padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
-  font-family: var(--#{$prefix}control-font-family);
-  font-size: var(--#{$prefix}control-font-size);
-  font-weight: var(--#{$prefix}control-font-weight);
-  line-height: var(--#{$prefix}control-line-height);
-  color: var(--#{$prefix}control-color);
-  background-color: var(--#{$prefix}control-bg);
-  background-clip: padding-box;
-  border: var(--#{$prefix}control-border-width) solid var(--#{$prefix}control-border-color);
-
-  // Note: This has no effect on <select>s in some browsers, due to the limited stylability of `<select>`s in CSS.
-  @include border-radius(var(--#{$prefix}control-border-radius), 0);
-
-  @include box-shadow(var(--#{$prefix}control-box-shadow));
-  @include transition-props(
-    var(--#{$prefix}control-transition-property),
-    var(--#{$prefix}control-transition-duration),
-    var(--#{$prefix}control-transition-timing)
-  );
-}
-// scss-docs-end form-control-frame-mixin
 
 // scss-docs-start form-control-select-variables
 $form-control-select-indicator-color:           $gray-800 !default;

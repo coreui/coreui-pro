@@ -1,7 +1,6 @@
 @use "sass:map";
 @use "../functions/defaults" as *;
 @use "../functions/escape-svg" as *;
-@use "check" as *;
 @use "../mixins/focus-ring" as *;
 @use "../mixins/mask-icon" as *;
 @use "../mixins/tokens" as *;
@@ -17,6 +16,19 @@ $radio-border-radius:     50% !default;
 $radio-mark-color:        var(--#{$prefix}primary-contrast) !default;
 $radio-mark:              url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='2' fill='black'/></svg>") !default;
 // scss-docs-end radio-variables
+
+$radio-sizes: () !default;
+
+// scss-docs-start radio-sizes
+// stylelint-disable-next-line scss/dollar-variable-default
+$radio-sizes: defaults(
+  (
+    sm: (size: .875rem, margin-top: .21875rem, font-size: var(--#{$prefix}font-size-sm)),
+    lg: (size: 1.25rem, margin-top: .3125rem, font-size: var(--#{$prefix}font-size-lg))
+  ),
+  $radio-sizes
+);
+// scss-docs-end radio-sizes
 
 $radio-tokens: () !default;
 
@@ -107,7 +119,7 @@ $radio-selector: if(sass($enable-deprecated-form-check): ".radio, .form-check-in
     }
   }
 
-  @each $size, $map in $check-sizes {
+  @each $size, $map in $radio-sizes {
     .radio-#{$size} {
       --#{$prefix}radio-size: #{map.get($map, "size")};
       --#{$prefix}radio-margin-top: #{map.get($map, "margin-top")};
