@@ -12,7 +12,7 @@
 // built around (see js/src/menu.ts).
 
 // scss-docs-start menu-variables
-$menu-zindex:                   var(--#{$prefix}z-dropdown) !default;
+$menu-zindex:                   var(--#{$prefix}z-menu) !default;
 $menu-gap:                      .125rem !default;
 $menu-min-width:                10rem !default;
 $menu-max-height:               none !default;

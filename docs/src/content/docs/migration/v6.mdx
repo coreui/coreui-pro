@@ -2429,6 +2429,14 @@ as such.
   card group read `$grid-gutter-x`. `$grid-gutter-width` stays as a deprecated
   alias of `$grid-gutter-x` until v7 — set the new name, the alias only reads.
 
+#### The z-axis names the new components
+
+- **New keys in `$zindex-levels`: `menu`, `drawer`, `dialog`**, on the same
+  values as `dropdown`, `offcanvas` and `modal` (1000, 1045, 1055). Each
+  emits a `--cui-z-*` token and a `.z-*` utility, and the menu, drawer and
+  dialog read their own key instead of the legacy component's. The legacy keys
+  stay; both spellings of a pair always resolve to one number.
+
 #### Every theme colour gets an action-background slot
 
 `:root` emits `--cui-{color}-bg` for every theme colour, pointing at the
