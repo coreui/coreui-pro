@@ -1,0 +1,23 @@
+@use "../../functions/defaults" as *;
+
+@include describe("defaults function") {
+  @include it("merges overrides on top of defaults") {
+    @include assert-equal(defaults(("a": 1, "b": 2), ("b": 3, "c": 4)), ("a": 1, "b": 3, "c": 4));
+  }
+
+  @include it("drops keys set to null so @use ... with () can remove an entry") {
+    @include assert-equal(defaults(("a": 1, "b": 2), ("a": null)), ("b": 2));
+  }
+
+  @include it("drops keys set to an empty string, the value an interpolated null leaves behind") {
+    @include assert-equal(defaults(("a": 1, "b": 2), ("b": "")), ("a": 1));
+  }
+
+  @include it("turns a list of defaults into a map of true") {
+    @include assert-equal(defaults(("sm", "lg"), ()), ("sm": true, "lg": true));
+  }
+
+  @include it("lets an override remove a list entry") {
+    @include assert-equal(defaults(("sm", "lg"), ("sm": null)), ("lg": true));
+  }
+}

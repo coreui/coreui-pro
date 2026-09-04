@@ -1,0 +1,23 @@
+@use "../../mixins/color-scheme" as *;
+
+@include describe("color-scheme mixin") {
+  @include it("wraps the content in a prefers-color-scheme query") {
+    @include assert() {
+      @include output() {
+        @include color-scheme(dark) {
+          .test {
+            color: #fff;
+          }
+        }
+      }
+
+      @include expect() {
+        @media (prefers-color-scheme: dark) {
+          .test {
+            color: #fff;
+          }
+        }
+      }
+    }
+  }
+}
