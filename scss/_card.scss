@@ -3,6 +3,7 @@
 @use "mixins/box-shadow" as *;
 @use "layout/breakpoints" as *;
 @use "mixins/tokens" as *;
+@use "mixins/translucent" as *;
 @use "config" as *;
 
 // scss-docs-start card-variables
@@ -28,9 +29,7 @@ $card-group-margin:                 $grid-gutter-width * .5 !default;
 // scss-docs-end card-variables
 
 // scss-docs-start card-translucent-variables
-$card-translucent-bg-opacity:       80% !default;
 $card-translucent-cap-bg-opacity:   60% !default;
-$card-translucent-backdrop-filter:  blur(5px) saturate(180%) !default;
 // scss-docs-end card-translucent-variables
 
 $card-tokens: () !default;
@@ -182,12 +181,12 @@ $card-tokens: defaults(
   }
 
   .card-translucent {
-    background-color: color-mix(in oklch, var(--#{$prefix}card-bg) #{$card-translucent-bg-opacity}, transparent);
-    backdrop-filter: $card-translucent-backdrop-filter;
+    --#{$prefix}card-translucent-cap-bg-opacity: #{$card-translucent-cap-bg-opacity};
+    @include translucent(var(--#{$prefix}card-bg));
 
     .card-header,
     .card-footer {
-      background-color: color-mix(in oklch, var(--#{$prefix}card-cap-bg) #{$card-translucent-cap-bg-opacity}, transparent);
+      background-color: color-mix(in oklch, var(--#{$prefix}card-cap-bg) var(--#{$prefix}card-translucent-cap-bg-opacity), transparent);
     }
   }
 

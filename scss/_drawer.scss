@@ -7,6 +7,7 @@
 @use "mixins/ltr-rtl" as *;
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
+@use "mixins/translucent" as *;
 @use "config" as *;
 
 // stylelint-disable custom-property-no-missing-var-function
@@ -270,8 +271,7 @@ $drawer-tokens: defaults(
   }
 
   .drawer-translucent {
-    background-color: color-mix(in oklch, var(--#{$prefix}drawer-bg) 80%, transparent);
-    backdrop-filter: blur(5px) saturate(180%);
+    @include translucent(var(--#{$prefix}drawer-bg));
   }
 
   .drawer-sheet {

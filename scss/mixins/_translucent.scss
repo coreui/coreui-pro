@@ -1,0 +1,6 @@
+@use "../config" as *;
+
+@mixin translucent($bg) {
+  background-color: color-mix(in oklch, #{$bg} var(--#{$prefix}translucent-opacity), transparent);
+  backdrop-filter: var(--#{$prefix}translucent-backdrop-filter);
+}

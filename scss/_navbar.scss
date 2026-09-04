@@ -12,6 +12,7 @@
 @use "mixins/gradients" as *;
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
+@use "mixins/translucent" as *;
 @use "nav" as *;
 @use "colors" as *;
 @use "config" as *;
@@ -51,11 +52,6 @@ $navbar-light-toggler-border-color: color-mix(in srgb, var(--#{$prefix}emphasis-
 $navbar-light-brand-color:          $navbar-light-active-color !default;
 $navbar-light-brand-hover-color:    $navbar-light-active-color !default;
 // scss-docs-end navbar-variables
-
-// scss-docs-start navbar-translucent-variables
-$navbar-translucent-bg-opacity:      85% !default;
-$navbar-translucent-backdrop-filter: blur(5px) saturate(180%) !default;
-// scss-docs-end navbar-translucent-variables
 
 // scss-docs-start navbar-dark-variables
 $navbar-dark-color:                 rgba($white, .55) !default;
@@ -420,8 +416,7 @@ $navbar-dark-tokens: defaults(
   // `.navbar` itself stays transparent, so the tint reads the token rather than
   // the painted background.
   .navbar-translucent {
-    background-color: color-mix(in oklch, var(--#{$prefix}navbar-bg) #{$navbar-translucent-bg-opacity}, transparent);
-    backdrop-filter: $navbar-translucent-backdrop-filter;
+    @include translucent(var(--#{$prefix}navbar-bg));
   }
 
   .navbar-dark,
