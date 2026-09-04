@@ -99,15 +99,7 @@ Every overlay that dims the page — the dialog and the drawer through their nat
 
 <ScssDocs file="scss/_root.scss" capture="root-backdrop-variables" />
 
-The colour and the opacity are mixed on the element (`color-mix(in oklch, var(--cui-backdrop-color) var(--cui-backdrop-opacity), transparent)`), so either can be changed alone, globally on `:root` or on one overlay. The dialog keeps the defaults, a dark scrim that deepens in the dark scheme; the drawer sets its own tint of the page (`--cui-bg-body` at 25%). Three presets pick a look from the markup:
-
-| Class | Backdrop |
-| --- | --- |
-| `.backdrop-scrim` | Black at 50% (65% in the dark scheme) — the dialog's default |
-| `.backdrop-translucent` | The page colour at 25% — the drawer's default |
-| `.backdrop-none` | No backdrop; the overlay still takes the top layer and traps focus |
-
-Put the class on the overlay element itself, next to `.dialog` or `.drawer`.
+The colour and the opacity are mixed on the element (`color-mix(in oklch, var(--cui-backdrop-color) var(--cui-backdrop-opacity), transparent)`), so either can be changed alone, globally on `:root` or on one overlay. The dialog keeps the defaults, a dark scrim that deepens in the dark scheme; the drawer sets its own tint of the page (`--cui-bg-body` at 25%). The [backdrop helper](/helpers/backdrop/) picks either look — or no backdrop at all — from the markup.
 
 ## Responsive
 
