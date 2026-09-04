@@ -1,8 +1,8 @@
 @use "../functions/defaults" as *;
 @use "../mixins/border-radius" as *;
-@use "../mixins/focus-ring" as *;
 @use "../mixins/tokens" as *;
 @use "../config" as *;
+@use "form-control-group" as *;
 
 // scss-docs-start form-date-time-variables
 $form-date-time-placeholder-color:       var(--#{$prefix}fg-2) !default;
@@ -38,22 +38,11 @@ $form-date-time-tokens: defaults(
 
     display: flex;
     align-items: center;
-    min-height: var(--#{$prefix}btn-input-min-height);
+    min-height: var(--#{$prefix}control-min-height);
     cursor: text;
 
-    &.form-control-sm {
-      min-height: var(--#{$prefix}btn-input-sm-min-height);
-    }
-
-    &.form-control-lg {
-      min-height: var(--#{$prefix}btn-input-lg-min-height);
-    }
-
     &:focus-within {
-      color: var(--#{$prefix}control-focus-color);
-      background-color: var(--#{$prefix}control-focus-bg);
-      border-color: var(--#{$prefix}control-focus-border-color);
-      @include focus-ring(true, $color: var(--#{$prefix}control-focus-ring));
+      @include form-control-group-focus();
     }
 
     &.disabled {
