@@ -83,32 +83,12 @@ Use the included utility classes to recreate the small secondary heading text fr
     <small class="text-muted">With faded secondary text</small>
   </h3>`} />
 
-## Display headings
+## Display headings and lead text
 
-Traditional heading elements are designed to work best in the meat of your page content. When you need a heading to stand out, consider using a **display heading**—a larger, slightly more opinionated heading style.
+`.display-1` … `.display-6` and `.lead` are gone. Both were fixed sizes and a fixed weight, so they are composed from the [font size](/utilities/font-size/), [font weight](/utilities/text/#font-weight-and-italics) and [line height](/utilities/text/#line-height) utilities instead — `.fs-6xl` and `.fs-5xl` are the sizes the two largest display headings used, and a lead paragraph is `.fs-lg .fw-light`:
 
-<Example html={[`<div class="display-1 pb-3 mb-3 border-bottom">Display 1</div>`, `<div class="display-2 pb-3 mb-3 border-bottom">Display 2</div>`, `<div class="display-3 pb-3 mb-3 border-bottom">Display 3</div>`, `<div class="display-4 pb-3 mb-3 border-bottom">Display 4</div>`, `<div class="display-5 pb-3 mb-3 border-bottom">Display 5</div>`, `<div class="display-6">Display 6</div>`]} />
-
-```html
-<h1 class="display-1">Display 1</h1>
-<h1 class="display-2">Display 2</h1>
-<h1 class="display-3">Display 3</h1>
-<h1 class="display-4">Display 4</h1>
-<h1 class="display-5">Display 5</h1>
-<h1 class="display-6">Display 6</h1>
-```
-
-Display headings are configured via the `$display-font-sizes` Sass map and two variables, `$display-font-weight` and `$display-line-height`.
-
-<ScssDocs file="scss/content/_type.scss" capture="display-headings" />
-
-## Lead
-
-Make a paragraph stand out by adding `.lead`.
-
-<Example code={`<p class="lead">
-    This is a lead paragraph. It stands out from regular paragraphs.
-  </p>`} />
+<Example code={`<h1 class="fs-6xl fw-light lh-1">Display heading</h1>
+  <p class="fs-lg fw-light">This is a lead paragraph. It stands out from regular paragraphs.</p>`} />
 
 ## Inline text elements
 
@@ -302,8 +282,6 @@ Headings have some dedicated variables for sizing and spacing.
 Miscellaneous typography elements covered here and in [Reboot](/content/reboot/) also have dedicated variables.
 
 <ScssDocs file="scss/_root.scss" capture="type-variables" />
-
-<ScssDocs file="scss/content/_type.scss" capture="type-variables" />
 
 <ScssDocs file="scss/content/_blockquote.scss" capture="blockquote-variables" />
 

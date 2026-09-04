@@ -1667,8 +1667,8 @@ Multi Select's option indicators moved with it — they render as a decorative
   next to the elements they mirror, instead of `@extend`-ing them from
   `_type.scss`. Only `.initialism` changes cascade layer (`content` → `reboot`);
   the others were already emitted there, because `@extend` hoists a class to
-  wherever the extended selector is defined. `_type.scss` keeps `.lead` and
-  `.display-*` and no longer depends on the Reboot module.
+  wherever the extended selector is defined. `_type.scss` is gone with
+  `.lead` and `.display-*` (see the type scale below).
 - **Hardcoded spacing in Reboot now reads the `--cui-spacer-*` scale**
   (`address`, `ol`/`ul`/`dl`, `dd`, `blockquote`, `pre`, `figure`). Values are
   unchanged.
@@ -3533,7 +3533,7 @@ $font-sizes: (
   and is now keyed `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl`, `4xl`, `5xl`, `6xl`,
   with a nested map per stop. The two top stops sit above the headings — display
   sizes (`$font-size-5xl`/`-6xl`, up to `3rem` and `3.5rem`) continuing the same
-  fluid progression, numerically level with `.display-5` and `.display-4`.
+  fluid progression, numerically level with the former `.display-5` and `.display-4`.
   <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   If you overrode `$font-sizes`, move your values into the new shape. The numeric
   keys live on in `$font-sizes-legacy`, which is derived from the named scale.
@@ -3545,10 +3545,21 @@ $font-sizes: (
   identically — `.fs-1` is `.fs-4xl`, down to `.fs-6`, which is `.fs-md`.
 - **New: `.text-{stop}`**, which sets `font-size` and `line-height` together.
 
-**We did not follow upstream's classes here.** Bootstrap v6 deletes `.fs-1` …
-`.fs-6`, every `.display-*` and `.lead`, and retunes the sizes — h1–h3 grow up to
-10px on small screens while h4–h6 shrink at every width. Those classes stay, at
-their current sizes.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`.display-1` … `.display-6` and `.lead` are removed**, with
+  `$display-font-sizes`, `$display-font-family`, `$display-font-style`,
+  `$display-font-weight`, `$display-line-height`, `$lead-font-size` and
+  `$lead-font-weight`. They were a fixed size and weight next to a scale that
+  already carries those sizes: `.display-4` is `.fs-6xl`, `.display-5` is
+  `.fs-5xl`, and `.lead` is `.fs-lg`; add `.fw-light` for the weight the old
+  classes carried and `.lh-1` for the display line height. The three larger
+  display sizes have no stop of their own — set `font-size` yourself or extend
+  `$font-sizes`.
+
+**We did not follow upstream's other typography changes.** Bootstrap v6 also
+deletes `.fs-1` … `.fs-6` and retunes the sizes — h1–h3 grow up to 10px on small
+screens while h4–h6 shrink at every width. Those classes stay, at their current
+sizes.
 
 #### The focus ring is an outline
 
