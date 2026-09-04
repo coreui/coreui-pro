@@ -150,7 +150,7 @@ $input-group-tokens: defaults(
   .input-group {
     $validation-messages: "";
     @each $state in map.keys($form-validation-states) {
-      $validation-messages: $validation-messages + ":not(." + string.unquote($state) + "-tooltip)" + ":not(." + string.unquote($state) + "-feedback)";
+      $validation-messages: $validation-messages + ", ." + string.unquote($state) + "-tooltip, ." + string.unquote($state) + "-feedback";
     }
 
     > :not(:last-child, .dropdown-toggle, .dropdown-menu, .input-group-ignore, .form-floating, :has(+ :is(.dropdown-menu, .input-group-ignore):last-child)),
@@ -160,13 +160,13 @@ $input-group-tokens: defaults(
       @include border-end-radius(0);
     }
 
-    > :not(:first-child):not(.dropdown-menu):not(.input-group-ignore)#{$validation-messages} {
+    > :not(:first-child, .dropdown-menu, .input-group-ignore#{$validation-messages}) {
       margin-inline-start: calc(-1 * var(--#{$prefix}btn-input-border-width));
       @include border-start-radius(0);
     }
 
     > :first-child:is(.input-group-ignore) + :not(.dropdown-menu, .input-group-ignore) {
-      @include border-start-radius(var(--#{$prefix}control-border-radius));
+      @include border-start-radius(var(--#{$prefix}btn-input-border-radius));
     }
 
     > .form-floating:not(:first-child) > .form-control,
