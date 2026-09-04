@@ -4,7 +4,6 @@
 @use "../config" as *;
 
 // scss-docs-start reboot-type-variables
-$enable-smooth-scroll:        true !default;
 $paragraph-margin-bottom:     var(--#{$prefix}spacer-3) !default;
 $font-family-code:            var(--#{$prefix}font-monospace) !default;
 $headings-margin-bottom:      var(--#{$prefix}spacer-2) !default;
