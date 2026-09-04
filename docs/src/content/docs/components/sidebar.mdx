@@ -303,6 +303,25 @@ Use the sidebar visibility helpers to swap content between regular, narrow, and 
 - `.d-sidebar-narrow-unfoldable` shows content only when the sidebar uses the `sidebar-narrow-unfoldable` variant
 - `.d-sidebar-narrow-unfoldable-none` hides content when the sidebar uses the `sidebar-narrow-unfoldable` variant
 
+### Sizes
+
+The default width is `--cui-sidebar-width`. Add `.sidebar-sm`, `.sidebar-lg` or `.sidebar-xl` for the other widths from the `$sidebar-widths` map; each class also sets the space the sidebar reserves for the content next to it, so the layout follows the width.
+
+<Example class="bg-4 p-0 rounded-bottom-0 overflow-hidden" code={`<div class="sidebar sidebar-lg border-end">
+    <ul class="sidebar-nav" data-coreui-navigation>
+      <li class="nav-item">
+        <a class="nav-link active" href="#">
+          <i class="nav-icon cil-speedometer"></i> Dashboard
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">
+          <i class="nav-icon cil-puzzle"></i> Components
+        </a>
+      </li>
+    </ul>
+  </div>`} />
+
 ## Navigation
 
 Use `.sidebar-nav` as the main navigation container inside a sidebar. It supports plain links, section titles, nested groups, tree navigation, and custom group indicators.
@@ -584,3 +603,9 @@ Sass variables set these defaults at build time and are removed in v7. The CSS v
 <ScssDocs file="scss/sidebar/_sidebar-nav.scss" capture="sidebar-nav-variables" />
 
 <ScssDocs file="scss/sidebar/_sidebar-narrow.scss" capture="sidebar-narrow-variables" />
+
+### Sass maps
+
+Each entry is one `.sidebar-{width}` class and the width it sets — on the sidebar itself and on the space it reserves for the content next to it. Add a key to define a width, or set one to `null` to drop it:
+
+<ScssDocs file="scss/sidebar/_sidebar.scss" capture="sidebar-widths" />
