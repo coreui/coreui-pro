@@ -117,6 +117,21 @@ Enable range selection by adding `data-coreui-range="true"` to allow users to pi
     ></div>
   </div>`} />
 
+## Theme colors
+
+Colour the selection with a [`.theme-*` class](/customize/components/#theme-variants) on the calendar: the selected day, the range tint, the range-hover outline and the date hover in the header all follow it.
+
+<Example pro code={`<div class="d-flex justify-content-center">
+    <div
+      class="border rounded theme-success"
+      data-coreui-locale="en-US"
+      data-coreui-start-date="2024/02/13"
+      data-coreui-end-date="2024/02/20"
+      data-coreui-range="true"
+      data-coreui-toggle="calendar"
+    ></div>
+  </div>`} />
+
 ## Disabled dates
 
 The Bootstrap Calendar component includes functionality to disable specific dates, such as weekends or holidays, using the `disabledDates` option. It accepts:
