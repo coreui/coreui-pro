@@ -39,8 +39,11 @@ const CLASS_NAME_RANGE_SLIDER_INPUTS_CONTAINER = 'range-slider-inputs-container'
 const CLASS_NAME_RANGE_SLIDER_LABEL = 'range-slider-label'
 const CLASS_NAME_RANGE_SLIDER_LABELS_CONTAINER = 'range-slider-labels-container'
 const CLASS_NAME_RANGE_SLIDER_TOOLTIP = 'range-slider-tooltip'
-const CLASS_NAME_RANGE_SLIDER_TOOLTIP_ARROW = 'range-slider-tooltip-arrow'
-const CLASS_NAME_RANGE_SLIDER_TOOLTIP_INNER = 'range-slider-tooltip-inner'
+const CLASS_NAME_TOOLTIP = 'tooltip'
+const CLASS_NAME_TOOLTIP_ARROW = 'tooltip-arrow'
+const CLASS_NAME_TOOLTIP_INNER = 'tooltip-inner'
+const CLASS_NAME_TOOLTIP_START = 'bs-tooltip-start'
+const CLASS_NAME_TOOLTIP_TOP = 'bs-tooltip-top'
 const CLASS_NAME_RANGE_SLIDER_TRACK = 'range-slider-track'
 const CLASS_NAME_RANGE_SLIDER_VERTICAL = 'range-slider-vertical'
 
@@ -418,14 +421,15 @@ class RangeSlider extends BaseComponent {
     for (const input of inputs) {
       // `<output>` is a live region; the input already announces the value.
       const tooltipElement = this._createElement('output', CLASS_NAME_RANGE_SLIDER_TOOLTIP)
+      tooltipElement.classList.add(CLASS_NAME_TOOLTIP, this._config.vertical ? CLASS_NAME_TOOLTIP_START : CLASS_NAME_TOOLTIP_TOP)
       tooltipElement.setAttribute('aria-hidden', 'true')
-      const tooltipInnerElement = this._createElement('span', CLASS_NAME_RANGE_SLIDER_TOOLTIP_INNER)
-      const tooltipArrowElement = this._createElement('span', CLASS_NAME_RANGE_SLIDER_TOOLTIP_ARROW)
+      const tooltipArrowElement = this._createElement('span', CLASS_NAME_TOOLTIP_ARROW)
+      const tooltipInnerElement = this._createElement('span', CLASS_NAME_TOOLTIP_INNER)
 
       tooltipInnerElement.innerHTML = this._config.tooltipsFormat ?
         (this._config.sanitize ? sanitizeHtml(this._config.tooltipsFormat(input.value), this._config.allowList, this._config.sanitizeFn) : this._config.tooltipsFormat(input.value)) :
         input.value
-      tooltipElement.append(tooltipInnerElement, tooltipArrowElement)
+      tooltipElement.append(tooltipArrowElement, tooltipInnerElement)
 
       input.parentNode!.insertBefore(tooltipElement, input.nextSibling)
       this._positionTooltip(tooltipElement, input)
@@ -445,7 +449,7 @@ class RangeSlider extends BaseComponent {
     }
 
     if (this._tooltips[index]) {
-      this._tooltips[index].children[0].innerHTML = this._config.tooltipsFormat ?
+      this._tooltips[index].children[1].innerHTML = this._config.tooltipsFormat ?
         (this._config.sanitize ? sanitizeHtml(this._config.tooltipsFormat(value), this._config.allowList, this._config.sanitizeFn) : this._config.tooltipsFormat(value)) :
         value
       const input = SelectorEngine.find(SELECTOR_RANGE_SLIDER_INPUT, this._element as ParentNode)[index] as HTMLInputElement

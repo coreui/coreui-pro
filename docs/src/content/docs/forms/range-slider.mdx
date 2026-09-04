@@ -113,6 +113,8 @@ By default, users can click on labels to set the slider to specific values. You 
 
 ## Tooltips
 
+The value bubble is a [tooltip](/components/tooltips/): the plugin renders `<output class="range-slider-tooltip tooltip bs-tooltip-top">` with the tooltip's arrow and body, so it takes the tooltip's look, its `--cui-tooltip-*` tokens and its theme slots. A `.theme-{color}` class on the slider colours the thumb and the bubble alike.
+
 By default, tooltips display the current value of each handle. You can disable tooltips by setting `tooltips` to `false`
 
 <Example pro code={`<div data-coreui-toggle="range-slider" data-coreui-value="40,60" data-coreui-tooltips="false"></div>`} />

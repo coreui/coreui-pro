@@ -75,6 +75,25 @@ describe('RangeSlider', () => {
       expect([...tooltip.children].map(child => child.tagName)).toEqual(['SPAN', 'SPAN'])
     })
 
+    it('should render the tooltip with the Tooltip markup, placed by orientation', () => {
+      fixtureEl.innerHTML = '<div data-coreui-toggle="range-slider" data-coreui-value="40"></div><div data-coreui-toggle="range-slider" data-coreui-vertical="true"></div>'
+
+      const [horizontal, vertical] = fixtureEl.querySelectorAll('[data-coreui-toggle="range-slider"]')
+      const horizontalSlider = new RangeSlider(horizontal)
+      const verticalSlider = new RangeSlider(vertical)
+      const tooltip = horizontal.querySelector('.range-slider-tooltip')
+
+      expect(tooltip.classList.contains('tooltip')).toBeTrue()
+      expect(tooltip.classList.contains('bs-tooltip-top')).toBeTrue()
+      expect([...tooltip.children].map(child => child.className)).toEqual(['tooltip-arrow', 'tooltip-inner'])
+      expect(tooltip.querySelector('.tooltip-inner').textContent).toBe('40')
+      expect(vertical.querySelector('.range-slider-tooltip').classList.contains('bs-tooltip-start')).toBeTrue()
+
+      horizontalSlider.update({ value: 70 })
+      expect(horizontal.querySelector('.tooltip-inner').textContent).toBe('70')
+      verticalSlider.dispose()
+    })
+
     it('should position the tooltip through a custom property, not inline offsets', () => {
       fixtureEl.innerHTML = '<div data-coreui-toggle="range-slider" data-coreui-min="0" data-coreui-max="200" data-coreui-value="50"></div>'
 
@@ -137,7 +156,7 @@ describe('RangeSlider', () => {
       expect(labels[1].textContent).toBe('Medium')
       expect(labels[2].textContent).toBe('High')
 
-      const tooltips = element.querySelectorAll('.range-slider-tooltip-inner')
+      const tooltips = element.querySelectorAll('.tooltip-inner')
       expect(tooltips.length).toBe(2)
       expect(tooltips[0].textContent).toBe('50%')
       expect(tooltips[1].textContent).toBe('150%')
@@ -154,7 +173,7 @@ describe('RangeSlider', () => {
 
       rangeSlider._updateTooltip(0, 60)
 
-      const inner = element.querySelector('.range-slider-tooltip-inner')
+      const inner = element.querySelector('.tooltip-inner')
       expect(inner.querySelector('img').hasAttribute('onerror')).toBeFalse()
     })
 
@@ -600,7 +619,7 @@ describe('RangeSlider', () => {
 
       const tooltip = element.querySelector('.range-slider-tooltip')
       expect(tooltip).not.toBeNull()
-      expect(tooltip.querySelector('.range-slider-tooltip-inner').textContent).toBe('60')
+      expect(tooltip.querySelector('.tooltip-inner').textContent).toBe('60')
     })
 
     it('should not display tooltips when disabled', () => {
@@ -617,7 +636,7 @@ describe('RangeSlider', () => {
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, { tooltips: true, value: 50 })
 
-      const arrow = element.querySelector('.range-slider-tooltip-arrow')
+      const arrow = element.querySelector('.tooltip-arrow')
       expect(arrow).not.toBeNull()
     })
 
@@ -639,7 +658,7 @@ describe('RangeSlider', () => {
         value: [25]
       })
 
-      const tooltip = element.querySelector('.range-slider-tooltip-inner')
+      const tooltip = element.querySelector('.tooltip-inner')
       expect(tooltip.textContent).toBe('$25')
     })
 
@@ -655,7 +674,7 @@ describe('RangeSlider', () => {
       input.value = 70
       input.dispatchEvent(new Event('input', { bubbles: true }))
 
-      const tooltip = element.querySelector('.range-slider-tooltip-inner')
+      const tooltip = element.querySelector('.tooltip-inner')
       expect(tooltip.textContent).toBe('70')
     })
 
@@ -672,7 +691,7 @@ describe('RangeSlider', () => {
       input.value = 70
       input.dispatchEvent(new Event('input', { bubbles: true }))
 
-      const tooltip = element.querySelector('.range-slider-tooltip-inner')
+      const tooltip = element.querySelector('.tooltip-inner')
       expect(tooltip.textContent).toBe('70%')
     })
 
@@ -701,7 +720,7 @@ describe('RangeSlider', () => {
         value: [50]
       })
 
-      const tooltip = element.querySelector('.range-slider-tooltip-inner')
+      const tooltip = element.querySelector('.tooltip-inner')
       // sanitizeHtml should allow <b> tag
       expect(tooltip.innerHTML).toContain('50')
     })
@@ -716,7 +735,7 @@ describe('RangeSlider', () => {
         value: [50]
       })
 
-      const tooltip = element.querySelector('.range-slider-tooltip-inner')
+      const tooltip = element.querySelector('.tooltip-inner')
       expect(tooltip.innerHTML).toBe('<b>50</b>')
     })
   })
@@ -937,7 +956,7 @@ describe('RangeSlider', () => {
       expect(rangeSlider._currentValue).toEqual([0.3])
       expect(input.value).toBe('0.3')
       expect(input.getAttribute('aria-valuenow')).toBe('0.3')
-      expect(element.querySelector('.range-slider-tooltip-inner').textContent).toBe('0.3')
+      expect(element.querySelector('.tooltip-inner').textContent).toBe('0.3')
     })
   })
 
