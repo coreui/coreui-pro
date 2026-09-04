@@ -19,7 +19,7 @@ $include-column-box-sizing: false !default;
     .grid {
       --#{$prefix}rows: 1;
       --#{$prefix}columns: #{$grid-columns};
-      --#{$prefix}gap: #{$grid-gutter-width};
+      --#{$prefix}gap: #{$grid-gutter-x};
 
       // The grid is its own query container, so `.g-col-*` responds to the width of
       // the grid rather than the viewport. `container-type` implies layout containment,
