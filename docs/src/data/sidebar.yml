@@ -264,6 +264,11 @@
       to: /components/close-button/
     - title: Collapse
       to: /components/collapse/
+    - title: Context Menu
+      to: /components/context-menu/
+      badge:
+        color: danger
+        text: PRO
     - title: Dialog
       to: /components/dialog/
       badge:
