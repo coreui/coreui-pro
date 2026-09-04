@@ -1,5 +1,5 @@
 {
-  "*-xxl": "Renamed in v6: the largest breakpoint is `2xl` (1536px) — .container-xxl becomes .container-2xl, .hstack-xxl .hstack-2xl. Size variants that happen to spell xxl (.drawer-xxl, .offcanvas-xxl, .icon-xxl) are not breakpoints and keep their name.",
+  "*-xxl": "Renamed in v6: the largest breakpoint is `2xl` (1536px) — .container-xxl becomes .container-2xl, .hstack-xxl .hstack-2xl, .drawer-xxl .drawer-2xl, .offcanvas-xxl .offcanvas-2xl. Only .icon-xxl is a size, not a breakpoint, and keeps its name.",
   "*-xxl-*": "Renamed in v6: the largest breakpoint is `2xl` (1536px), so every responsive class reads -2xl- where it read -xxl- (.col-xxl-6 becomes .col-2xl-6). The lg and xl breakpoints also move, to 1024px and 1280px.",
   "accordion-button": "The accordion is built on <details>/<summary> now, so the trigger is the summary itself. Put .accordion-header on the <summary> element and drop the nested button.",
   "accordion-collapse": "The panel is the <details> element's own content now, revealed by the browser and styled through ::details-content. Nothing wraps the .accordion-body any more.",

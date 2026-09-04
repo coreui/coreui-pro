@@ -25,8 +25,7 @@ interface BreakpointListener {
 }
 
 /**
- * Breakpoints for responsive placement (matches SCSS $breakpoints —
- * CoreUI keeps the classic scale, not upstream's Tailwind-style one)
+ * Breakpoints for responsive placement (matches SCSS $breakpoints)
  */
 export const BREAKPOINTS: Record<string, number> = {
   sm: 576,

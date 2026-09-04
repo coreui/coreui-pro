@@ -38,7 +38,7 @@ const OPEN_SELECTOR = 'dialog[open][class*="offcanvas"]'
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="offcanvas"]'
 // Responsive variants replace the base class, so the dismiss fallback must
 // match them too
-const SELECTOR_DISMISS_SCOPE = '.offcanvas, .offcanvas-sm, .offcanvas-md, .offcanvas-lg, .offcanvas-xl, .offcanvas-xxl'
+const SELECTOR_DISMISS_SCOPE = '.offcanvas, .offcanvas-sm, .offcanvas-md, .offcanvas-lg, .offcanvas-xl, .offcanvas-2xl'
 
 const Default = {
   backdrop: true,

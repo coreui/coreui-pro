@@ -113,11 +113,11 @@ Set them on `:root` to retune every translucent surface at once, or on one eleme
 
 ## Responsive
 
-These Sass loops aren't limited to color maps, either. You can also generate responsive variations of your components. Take for example our responsive alignment of the dropdowns where we mix an `@each` loop for the `$grid-breakpoints` Sass map with a media query include.
+These Sass loops aren't limited to color maps, either. You can also generate responsive variations of your components. Take for example our responsive alignment of the dropdowns where we mix an `@each` loop for the `$breakpoints` Sass map with a media query include.
 
 <ScssDocs file="scss/_dropdown.scss" capture="responsive-breakpoints" />
 
-Should you modify your `$grid-breakpoints`, your changes will apply to all the loops iterating over that map.
+Should you modify your `$breakpoints`, your changes will apply to all the loops iterating over that map.
 
 <ScssDocs file="scss/_config.scss" capture="breakpoints" />
 

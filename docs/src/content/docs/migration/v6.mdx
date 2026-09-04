@@ -657,7 +657,7 @@ check, radio, carousel and toggler icons already work:
   Dialog is a centered floating panel over a blurred backdrop with optional
   slide entry variants; Drawer is a floating, inset, rounded panel with
   translucent/sheet/fullscreen/fit-content variants and responsive classes
-  (`.drawer-sm`…`.drawer-xxl`). Both share the DialogBase behavior with
+  (`.drawer-sm`…`.drawer-2xl`). Both share the DialogBase behavior with
   Modal/Offcanvas, which keep the classic look and the v5 vocabulary as
   **compatibility layers over it — deprecated in v6 and removable in v7**, so
   reach for Dialog and Drawer in new work. See the
@@ -2405,12 +2405,13 @@ as such.
   `1536px` (was `xxl` at 1400); `sm` and `md` stay. Every responsive class
   spells the tier the new way — `.col-xxl-6` is `.col-2xl-6`, `.container-xxl`
   `.container-2xl`, `.modal-fullscreen-xxl-down` `.modal-fullscreen-2xl-down`,
-  `.hstack-xxl` `.hstack-2xl` — and the containers grow with them: `.container`
-  is `1200px` at `xl` (was 1140) and `1440px` at `2xl` (was 1320). Size
-  variants that happen to spell `xxl` (`.drawer-xxl`, `.offcanvas-xxl`,
-  `.icon-xxl`, `--cui-border-radius-xxl`) are not breakpoints and keep their
-  name. The Sass map is `$breakpoints` (was `$grid-breakpoints`) and the mixins
-  take it under that name; `$container-max-widths` keeps its name. The
+  `.hstack-xxl` `.hstack-2xl`, `.drawer-xxl` `.drawer-2xl`, `.offcanvas-xxl`
+  `.offcanvas-2xl` — and the containers grow with them: `.container` is
+  `1200px` at `xl` (was 1140) and `1440px` at `2xl` (was 1320). Only
+  `.icon-xxl` and `--cui-border-radius-xxl` keep the spelling: they are
+  sizes, not breakpoints. The Sass map is `$breakpoints` (was
+  `$grid-breakpoints`) and the mixins take it under that name;
+  `$container-max-widths` keeps its name. The
   responsive placement of menus, tooltips and popovers
   (`data-coreui-placement="lg:end"`) reads the same values, and the sidebar's
   mobile mode, `$mobile-breakpoint: lg`, now starts below `1024px` — a tablet
