@@ -103,6 +103,26 @@ $form-otp-control-tokens: defaults(
     }
   }
 
+  .form-otp-group {
+    display: flex;
+
+    > .form-otp-control {
+      &:not(:first-child) {
+        margin-inline-start: calc(var(--#{$prefix}control-border-width) * -1);
+        @include border-start-radius(0);
+      }
+
+      &:not(:last-child) {
+        @include border-end-radius(0);
+      }
+
+      &:focus {
+        position: relative;
+        z-index: 1;
+      }
+    }
+  }
+
   // scss-docs-start form-otp-sizes-loop
   @each $size, $values in $form-otp-sizes {
     .form-otp-#{$size} .form-otp-control {
