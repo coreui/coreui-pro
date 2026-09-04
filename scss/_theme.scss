@@ -19,7 +19,7 @@ $inverse:       light-dark(var(--#{$prefix}gray-900), var(--#{$prefix}gray-100))
 // scss-docs-end theme-color-variables
 // stylelint-enable hue-degree-notation, @stylistic/number-leading-zero
 
-$link-color:    var(--#{$prefix}primary-base) !default;
+$link-color:    light-dark(var(--#{$prefix}primary-base), var(--#{$prefix}primary-fg)) !default;
 
 
 // scss-docs-start theme-colors-map

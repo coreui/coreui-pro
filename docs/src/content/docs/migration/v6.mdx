@@ -2361,6 +2361,18 @@ as such.
   `--cui-border-body`, `light-dark(gray-300, gray-800)`, a step heavier than
   `--cui-border-color`; it was an alias of the default border before.
 
+#### Links and rules read the ladder
+
+- **`--cui-link-color` is `light-dark(var(--cui-primary-base), var(--cui-primary-fg))`**
+  (was the base in both schemes), so a link on the dark page reads the
+  lighter foreground stop instead of the fill colour, and
+  **`--cui-link-hover-color` is a 10 % darkening of the link colour**
+  (`color-mix(in oklch, var(--cui-link-color) 90%, var(--cui-black))`) instead
+  of `--cui-primary-fg`; override `--cui-link-color` and the hover follows.
+- **`--cui-hr-border-color` is `var(--cui-border-color)`** (was
+  `currentcolor`): a rule is the same line as every other border, not a
+  faint copy of the text colour.
+
 #### Theme colours have no bare token
 
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>

@@ -25,7 +25,7 @@ $gradient: linear-gradient(180deg, rgba($white, .15), rgba($white, 0)) !default;
 
 $body-text-align:     null !default;
 $body-emphasis-color: light-dark($black, $white) !default;
-$link-hover-color:    var(--#{$prefix}primary-fg) !default;
+$link-hover-color:    color-mix(in oklch, var(--#{$prefix}link-color) 90%, var(--#{$prefix}black)) !default;
 
 // scss-docs-start border-variables
 $border-width:             1px !default;
@@ -83,7 +83,7 @@ $mark-bg:    light-dark(var(--#{$prefix}yellow-100), var(--#{$prefix}yellow-800)
 
 $icon-size-base: 1rem !default;
 
-$hr-border-color:             currentcolor !default;
+$hr-border-color:             var(--#{$prefix}border-color) !default;
 $line-height-base:            1.5 !default;
 $small-font-size:             .875em !default;
 $font-weight-base:            var(--#{$prefix}font-weight-normal) !default;
