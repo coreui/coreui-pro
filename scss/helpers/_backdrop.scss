@@ -2,6 +2,7 @@
 @use "../mixins/color-mode" as *;
 
 @layer helpers {
+  // scss-docs-start backdrop-presets
   .backdrop-scrim {
     --#{$prefix}backdrop-color: var(--#{$prefix}black);
     --#{$prefix}backdrop-opacity: 50%;
@@ -23,4 +24,5 @@
   .backdrop-none::backdrop {
     display: none;
   }
+  // scss-docs-end backdrop-presets
 }
