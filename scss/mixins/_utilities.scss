@@ -84,19 +84,16 @@
         @if string.slice($property, 1, 2) == "--" {
           #{$property}: #{$actual};
         } @else {
-          // stylelint-disable-next-line scss/at-function-named-arguments
-          #{$property}: $actual if(sass($enable-important-utilities): !important);
+          #{$property}: $actual;
         }
       }
     }
   } @else {
     @each $property in $properties {
       @if meta.type-of($value) == "map" {
-        // stylelint-disable-next-line scss/at-function-named-arguments
-        #{$property}: map.get($value, $property) if(sass($enable-important-utilities): !important);
+        #{$property}: map.get($value, $property);
       } @else {
-        // stylelint-disable-next-line scss/at-function-named-arguments
-        #{$property}: $value if(sass($enable-important-utilities): !important);
+        #{$property}: $value;
       }
     }
   }

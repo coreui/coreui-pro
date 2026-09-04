@@ -74,6 +74,10 @@ Or remove borders:
 
 ### Sass maps
 
+Each neutral border is one entry: the key is one `.border-{key}` utility and the `--cui-border-{key}` token behind it, in light and dark mode. `--cui-border-color`, the default every component reads, is a separate knob above:
+
+<ScssDocs file="scss/_theme.scss" capture="theme-borders-map" />
+
 Each entry is one `.border-{width}` class and the width it sets. Add a key to define a width, or set one to `null` to drop it:
 
 <ScssDocs file="scss/_utilities.scss" capture="border-widths-map" />

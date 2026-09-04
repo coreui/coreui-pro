@@ -242,7 +242,7 @@ Output:
 
 ```css
 .bg-primary {
-  --cui-bg: var(--cui-primary);
+  --cui-bg: var(--cui-primary-base);
   --cui-bg-opacity: 1;
   background-color: color-mix(in srgb, var(--cui-bg) calc(var(--cui-bg-opacity) * 100%), transparent);
 }
@@ -436,14 +436,7 @@ One case the suffix did cover is CSS of your own written **outside** any layer:
 unlayered styles beat every layer, so a plain `.card-title { text-align: left }`
 loaded after CoreUI wins over `.text-center`. Move that CSS into `@layer custom`
 — the slot reserved for it, between components and helpers — and utilities win
-again. If it is easier to flip one switch than to move a legacy stylesheet, set
-`$enable-important-utilities: true` to bring the suffix back everywhere.
-
-```scss
-@use "@coreui/coreui-pro/scss/coreui" with (
-  $enable-important-utilities: true
-);
-```
+again. There is no switch that brings the suffix back: the layer is the mechanism.
 ## Using the API
 
 Now that you're familiar with how the utilities API works, learn how to add your own custom classes and modify our default utilities.

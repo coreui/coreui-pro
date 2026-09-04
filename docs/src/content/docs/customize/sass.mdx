@@ -125,8 +125,8 @@ Here's an example that changes the `background-color` and `color` for the `<body
 
 ```scss
 @use "@coreui/coreui/scss/coreui" with (
-  $bg-body: #000,
-  $fg-body: #111
+  $theme-bgs: ("body": #000),
+  $theme-fgs: ("body": #111)
 )
 ```
 
@@ -377,7 +377,7 @@ $subtle-backgrounds: map-slot($theme-colors, "bg-subtle");
 // => ("primary": …, "secondary": …, "success": …, …)
 ```
 
-`scss/functions/maps` also carries the general-purpose helpers the library uses internally: `map-get-multiple()` (pick several keys), `map-merge-multiple()` (merge several maps), `map-get-nested()` (pull one sub-key out of every entry), and `negativify-map()` (turn a scale into its negative counterpart, as the spacing utilities do).
+`scss/functions/maps` also carries the general-purpose helpers the library uses internally: `map-get-multiple()` (pick several keys), `map-merge-multiple()` (merge several maps), and `map-get-nested()` (pull one sub-key out of every entry).
 
 ## Mixins
 

@@ -28,7 +28,7 @@ Every rule the library ships lives in a [cascade layer](https://developer.mozill
 
 Later layers beat earlier ones regardless of selector specificity, which settles by declaration the fights v5 settled with `!important` and specificity hacks:
 
-- **Utilities win over components** because `utilities` comes last — no `!important` involved. That's why [`$enable-important-utilities`](/customize/options/) defaults to `false` in v6.
+- **Utilities win over components** because `utilities` comes last — no `!important` involved, and no switch to bring it back.
 - **Your unlayered CSS wins over everything of ours**, because unlayered styles beat every layer. A plain `.card { … }` in your stylesheet overrides the library no matter how simple the selector.
 - **`colors` is where the palette ships**, below everything else, so your own `@layer colors` block sits in the same layer and overrides a token like `--cui-blue-500` by source order alone.
 - **Two layers are empty and reserved for you.** `config` sits below `root`, for a configuration sheet the whole library should read but never fight; `custom` slots between `components` and `helpers`, for component overrides that should still lose to utilities. Put your CSS in `@layer custom` when you want `.text-center` on the element to keep working.
@@ -99,4 +99,4 @@ When no theme class is present, the slot is unset and the fallback applies. A th
 }
 ```
 
-The slot values come from per-color scales generated with `color-mix()` from each color's base token, and the interactive states are derived at run time with relative color syntax — `oklch(from var(--cui-primary) calc(l * .85) c h)` — so overriding `--cui-primary` alone re-colors the subtle backgrounds, borders, emphasis text, hover and active states with it. The color system is documented on [Color](/customize/color/), the scheme switching on [Color modes](/customize/color-modes/).
+The slot values come from per-color scales generated with `color-mix()` from each color's base token, and the interactive states are derived at run time with relative color syntax — `oklch(from var(--cui-primary-base) calc(l * .85) c h)` — so overriding `--cui-primary` alone re-colors the subtle backgrounds, borders, emphasis text, hover and active states with it. The color system is documented on [Color](/customize/color/), the scheme switching on [Color modes](/customize/color-modes/).

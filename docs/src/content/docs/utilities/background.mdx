@@ -32,7 +32,7 @@ Five neutral surfaces run from the page background to the deepest panel. The num
 <div class="p-3 mb-2 bg-3">.bg-3</div>
 <div class="p-3 mb-2 bg-4">.bg-4</div>`} />
 
-`.bg-body-secondary` and `.bg-body-tertiary` are deprecated names for `.bg-4` and `.bg-3` — they render identically and go away in v7. The ordinal names replace them because the old adjectives ran backwards for backgrounds: "tertiary" sat *closer* to the page than "secondary".
+`.bg-body-secondary` and `.bg-body-tertiary` are deprecated names for `.bg-3` and `.bg-2` — they render identically and go away in v7. The ordinal names replace them because the old adjectives ran backwards for backgrounds: "tertiary" sat *closer* to the page than "secondary".
 
 ## Background gradient
 
@@ -54,7 +54,7 @@ Consider our default `.bg-success` utility.
 
 ```css
 .bg-success {
-  --cui-bg: var(--cui-success);
+  --cui-bg: var(--cui-success-base);
   --cui-bg-opacity: 1;
   background-color: color-mix(in srgb, var(--cui-bg) calc(var(--cui-bg-opacity) * 100%), transparent);
 }
@@ -98,6 +98,10 @@ Grayscale colors are also available, but only a subset are used to generate any 
 <ScssDocs file="scss/_colors.scss" capture="gray-color-variables" />
 
 ### Sass maps
+
+The surface ladder is one map: each key is one `.bg-{key}` utility and the `--cui-bg-{key}` token behind it, in light and dark mode. Add a key to add a rung, override one to retune it:
+
+<ScssDocs file="scss/_theme.scss" capture="theme-bgs-map" />
 
 Each entry sets `background-color` for one `.bg-{color}-subtle` utility, in light and dark mode:
 

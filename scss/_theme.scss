@@ -1,6 +1,7 @@
 @use "sass:map";
 @use "sass:meta";
 @use "sass:string";
+@use "functions/defaults" as *;
 @use "functions/maps" as *;
 @use "mixins/tokens" as *;
 @use "colors" as *;
@@ -18,7 +19,7 @@ $inverse:       light-dark(var(--#{$prefix}gray-900), var(--#{$prefix}gray-100))
 // scss-docs-end theme-color-variables
 // stylelint-enable hue-degree-notation, @stylistic/number-leading-zero
 
-$link-color:    var(--#{$prefix}primary) !default;
+$link-color:    light-dark(var(--#{$prefix}primary-base), var(--#{$prefix}primary-fg)) !default;
 
 
 // scss-docs-start theme-colors-map
@@ -31,7 +32,7 @@ $theme-colors: (
     "bg-subtle":     light-dark(var(--#{$prefix}primary-100), var(--#{$prefix}primary-900)),
     "bg-muted":      light-dark(var(--#{$prefix}primary-200), var(--#{$prefix}primary-800)),
     "border":        light-dark(var(--#{$prefix}primary-300), var(--#{$prefix}primary-600)),
-    "focus-ring":    color-mix(in srgb, var(--#{$prefix}primary) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
+    "focus-ring":    color-mix(in srgb, var(--#{$prefix}primary-base) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
   ),
   "secondary": (
     "base":          $secondary,
@@ -51,7 +52,7 @@ $theme-colors: (
     "bg-subtle":     light-dark(var(--#{$prefix}success-100), var(--#{$prefix}success-900)),
     "bg-muted":      light-dark(var(--#{$prefix}success-200), var(--#{$prefix}success-800)),
     "border":        light-dark(var(--#{$prefix}success-300), var(--#{$prefix}success-600)),
-    "focus-ring":    color-mix(in srgb, var(--#{$prefix}success) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
+    "focus-ring":    color-mix(in srgb, var(--#{$prefix}success-base) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
   ),
   "info": (
     "base":          $info,
@@ -61,7 +62,7 @@ $theme-colors: (
     "bg-subtle":     light-dark(var(--#{$prefix}info-100), var(--#{$prefix}info-900)),
     "bg-muted":      light-dark(var(--#{$prefix}info-200), var(--#{$prefix}info-800)),
     "border":        light-dark(var(--#{$prefix}info-300), var(--#{$prefix}info-600)),
-    "focus-ring":    color-mix(in srgb, var(--#{$prefix}info) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
+    "focus-ring":    color-mix(in srgb, var(--#{$prefix}info-base) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
   ),
   "warning": (
     "base":          $warning,
@@ -71,7 +72,7 @@ $theme-colors: (
     "bg-subtle":     light-dark(var(--#{$prefix}warning-100), var(--#{$prefix}warning-900)),
     "bg-muted":      light-dark(var(--#{$prefix}warning-200), var(--#{$prefix}warning-800)),
     "border":        light-dark(var(--#{$prefix}warning-300), var(--#{$prefix}warning-600)),
-    "focus-ring":    color-mix(in srgb, var(--#{$prefix}warning) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
+    "focus-ring":    color-mix(in srgb, var(--#{$prefix}warning-base) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
   ),
   "danger": (
     "base":          $danger,
@@ -81,7 +82,7 @@ $theme-colors: (
     "bg-subtle":     light-dark(var(--#{$prefix}danger-100), var(--#{$prefix}danger-900)),
     "bg-muted":      light-dark(var(--#{$prefix}danger-200), var(--#{$prefix}danger-800)),
     "border":        light-dark(var(--#{$prefix}danger-300), var(--#{$prefix}danger-600)),
-    "focus-ring":    color-mix(in srgb, var(--#{$prefix}danger) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
+    "focus-ring":    color-mix(in srgb, var(--#{$prefix}danger-base) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
   ),
   "inverse": (
     "base":          $inverse,
@@ -95,6 +96,62 @@ $theme-colors: (
   ),
 ) !default;
 // scss-docs-end theme-colors-map
+
+// scss-docs-start theme-bgs-map
+$theme-bgs: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$theme-bgs: defaults(
+  (
+    "body":        light-dark(var(--#{$prefix}white), var(--#{$prefix}gray-975)),
+    "1":           light-dark(var(--#{$prefix}gray-025), var(--#{$prefix}gray-950)),
+    "2":           light-dark(var(--#{$prefix}gray-050), var(--#{$prefix}gray-900)),
+    "3":           light-dark(var(--#{$prefix}gray-100), var(--#{$prefix}gray-800)),
+    "4":           light-dark(var(--#{$prefix}gray-200), var(--#{$prefix}gray-700)),
+    "fg":          var(--#{$prefix}fg-body),
+    "white":       var(--#{$prefix}white),
+    "black":       var(--#{$prefix}black),
+    "transparent": transparent,
+    "inherit":     inherit,
+  ),
+  $theme-bgs
+);
+// scss-docs-end theme-bgs-map
+
+// scss-docs-start theme-fgs-map
+$theme-fgs: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$theme-fgs: defaults(
+  (
+    "body":        light-dark(var(--#{$prefix}gray-900), var(--#{$prefix}gray-050)),
+    "1":           light-dark(var(--#{$prefix}gray-800), var(--#{$prefix}gray-200)),
+    "2":           light-dark(var(--#{$prefix}gray-700), var(--#{$prefix}gray-300)),
+    "3":           light-dark(var(--#{$prefix}gray-600), var(--#{$prefix}gray-500)),
+    "4":           light-dark(var(--#{$prefix}gray-500), var(--#{$prefix}gray-600)),
+    "bg":          var(--#{$prefix}bg-body),
+    "white":       var(--#{$prefix}white),
+    "black":       var(--#{$prefix}black),
+    "inherit":     inherit,
+  ),
+  $theme-fgs
+);
+// scss-docs-end theme-fgs-map
+
+// scss-docs-start theme-borders-map
+$theme-borders: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$theme-borders: defaults(
+  (
+    "bg":          var(--#{$prefix}bg-body),
+    "body":        light-dark(var(--#{$prefix}gray-300), var(--#{$prefix}gray-800)),
+    "muted":       light-dark(var(--#{$prefix}gray-200), var(--#{$prefix}gray-800)),
+    "subtle":      light-dark(color-mix(in oklch, var(--#{$prefix}gray-100), var(--#{$prefix}gray-200)), color-mix(in oklch, var(--#{$prefix}gray-800), var(--#{$prefix}gray-900))),
+    "emphasized":  light-dark(var(--#{$prefix}gray-400), var(--#{$prefix}gray-600)),
+    "white":       var(--#{$prefix}white),
+    "black":       var(--#{$prefix}black),
+  ),
+  $theme-borders
+);
+// scss-docs-end theme-borders-map
 
 
 // scss-docs-start theme-fg-emphasis-map
@@ -156,6 +213,23 @@ $theme-token-refs: (
   @return $result;
 }
 
+// Theme token to root tokens
+//
+// Returns the global :root token reference for a given a given token map, prefix, and key.
+// Ex: theme-token-refs($theme-bgs, "bg") => (body: var(--bg-body), 1: var(--bg-1), ...)
+// Skips `inherit` since it's a CSS-wide keyword that can't be stored in a custom property.
+@function theme-token-refs($map, $token) {
+  $result: ();
+
+  @each $key, $value in $map {
+    @if $value != inherit {
+      $result: map.merge($result, ($key: var(--#{$prefix}#{$token}-#{$key})));
+    }
+  }
+
+  @return $result;
+}
+
 // scss-docs-start theme-interaction-variables
 // Tuned to land near the shade-color() amounts compiled before the states moved into CSS.
 $theme-hover-lightness:   .85 !default;
@@ -191,7 +265,7 @@ $theme-state-colors: (
     @if $override {
       --#{$prefix}theme-#{$token}: #{$override};
     } @else {
-      --#{$prefix}theme-#{$token}: oklch(from var(--#{$prefix}#{$state}) calc(l * #{$lightness}) c h);
+      --#{$prefix}theme-#{$token}: oklch(from var(--#{$prefix}#{$state}-bg) calc(l * #{$lightness}) c h);
     }
   }
 }
@@ -231,9 +305,9 @@ $theme-state-colors: (
     $base: map.get($slots, "base");
 
     @if -scheme-pair($base) {
-      $tokens: map.set($tokens, --#{$prefix}#{$color}, $base);
+      $tokens: map.set($tokens, --#{$prefix}#{$color}-base, $base);
     } @else if $base != null {
-      $tokens: map.merge($tokens, color-scale-tokens($color, $base));
+      $tokens: map.merge($tokens, color-scale-tokens($color, $base, --#{$prefix}#{$color}-base));
     }
   }
 
@@ -243,14 +317,10 @@ $theme-state-colors: (
 @function theme-color-tokens() {
   $tokens: ();
 
-  @each $color in map.keys($theme-colors) {
-    $tokens: map.set($tokens, --#{$prefix}#{$color}-base, var(--#{$prefix}#{$color}));
-  }
-
   // The action-background slot: what checked, active and filled states read.
   // Points at the base color, so overriding either retunes every action state.
   @each $color in map.keys($theme-colors) {
-    $tokens: map.set($tokens, --#{$prefix}#{$color}-bg, var(--#{$prefix}#{$color}));
+    $tokens: map.set($tokens, --#{$prefix}#{$color}-bg, var(--#{$prefix}#{$color}-base));
   }
 
   @each $color, $value in $theme-colors-fg-emphasis {

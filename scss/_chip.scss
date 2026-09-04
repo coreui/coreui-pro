@@ -27,16 +27,16 @@ $chip-active-opacity:        .9 !default;
 $chip-transition:            background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out, color .15s ease-in-out !default;
 
 $chip-color:                 var(--#{$prefix}fg-body) !default;
-$chip-bg:                    var(--#{$prefix}bg-4) !default;
+$chip-bg:                    var(--#{$prefix}bg-2) !default;
 $chip-border-width:          var(--#{$prefix}border-width) !default;
 $chip-border-color:          transparent !default;
 
 $chip-active-color:          var(--#{$prefix}primary-contrast) !default;
-$chip-active-bg:             var(--#{$prefix}primary) !default;
+$chip-active-bg:             var(--#{$prefix}primary-base) !default;
 $chip-active-border-color:   transparent !default;
 
 $chip-hover-color:           $chip-color !default;
-$chip-hover-bg:              color-mix(in oklch, var(--#{$prefix}bg-4) 95%, var(--#{$prefix}fg-body)) !default;
+$chip-hover-bg:              var(--#{$prefix}bg-3) !default;
 $chip-hover-border-color:    transparent !default;
 
 $chip-font-size-sm:          .75rem !default;

@@ -126,7 +126,7 @@ $th-font-weight:       null !default;
   :root {
     @include tokens($reboot-tokens);
 
-    accent-color: var(--#{$prefix}primary);
+    accent-color: var(--#{$prefix}primary-base);
 
     @if $font-size-root != null {
       font-size: var(--#{$prefix}root-font-size);

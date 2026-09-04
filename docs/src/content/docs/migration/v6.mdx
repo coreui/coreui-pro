@@ -240,7 +240,7 @@ finished, not whether the state changed.
   `--cui-accordion-active-bg` and `--cui-accordion-active-color` were fixed to
   `--cui-primary-bg-subtle` / `--cui-primary-fg-emphasis`, so every accordion
   turned the brand colour on open whether or not that suited the page. They are
-  `--cui-bg-4` and `--cui-fg-body` now, and the active tokens resolve
+  `--cui-bg-2` and `--cui-fg-body` now, and the active tokens resolve
   through `--cui-theme-fg` / `-bg-subtle` / `-border` first — so the colour is a
   decision you make per accordion instead of one baked into the component. To
   keep the old look, put `.theme-primary` on the `.accordion`.
@@ -486,7 +486,7 @@ check, radio, carousel and toggler icons already work:
   `.badge` used to be white text with no background of its own, so it was
   invisible until a `.text-bg-*` utility supplied both. It renders neutral on
   its own now — `--cui-badge-color` is `inherit` and `--cui-badge-bg` is
-  `--cui-bg-4` — and a `.theme-*` class colours it:
+  `--cui-bg-2` — and a `.theme-*` class colours it:
   `<span class="badge theme-danger">`. The `.badge-*` namespace carries the
   three variants instead: solid (default), `.badge-subtle` and
   `.badge-outline`, each mapping the same theme roles.
@@ -1492,7 +1492,7 @@ adornment in the library — so the button needs no icon markup at all:
   colour of your own gets the whole set for free.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **A bare `.btn` is a neutral button, not an invisible one.** It renders in the
-  surface colours (`--cui-bg-4`, one step darker on hover) instead of
+  surface colours (`--cui-bg-2`, one step darker on hover) instead of
   being transparent and unstyled. Buttons that carry a variant or a colour class
   are unaffected. For the old behaviour use `.btn-ghost`, which is transparent
   by design.
@@ -2300,6 +2300,102 @@ as such.
   so buttons match the fields they sit next to in input groups; `.btn-group`
   clips to the same stop. Set `$btn-bg`/`$btn-hover-bg` or the `--cui-btn-*`
   tokens to keep the old look.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The rest of the library steps down the same two rungs.** The first pass
+  left a group of components on the old surfaces; they now read the rungs
+  their neighbours read. Hover surfaces on `--cui-bg-1`: the dropdown link,
+  combobox options and the select-all row (Autocomplete, Multi Select), the
+  calendar cell, the time-picker roll cell, the control-group action button
+  and pagination focus (was `--cui-bg-4`, three rungs above its own hover).
+  Rest and selected surfaces on `--cui-bg-2`: the active nav link and nav
+  tab (was `--cui-bg-4`), the selected combobox option, the neutral chip
+  (hovering on `--cui-bg-3` instead of a mix with the foreground), the
+  password-strength track and the search button's key cap (active on
+  `--cui-bg-3`). The range slider track sits on `--cui-bg-3` like the
+  native range. The card header and footer read `--cui-bg-1` instead of a
+  3 % foreground wash, so a card on a tinted parent keeps a neutral cap.
+  The tab's hover border reads `--cui-border-subtle` rather than a surface
+  rung.
+- **Foreground roles line up too.** The disabled calendar cell and the
+  disabled combobox option read `--cui-fg-4` / `--cui-fg-3` like every other
+  disabled control, the weekday header and the date-input placeholder read
+  `--cui-fg-3` like every other caption and placeholder, and the active
+  breadcrumb reads `--cui-fg-1`, one rung above the hovered link instead of
+  the same one.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **Border tokens move one rung towards the page.** `--cui-border-color` is
+  `light-dark(gray-200, gray-700)` (was `gray-300` / `gray-800`): lighter
+  in the light scheme, and in the dark scheme one rung further from the
+  body, where the old value sat too close to `--cui-bg-body` to read as a
+  line. `--cui-border-subtle` is a half step, mixed from `gray-100` and
+  `gray-200` (`gray-800` / `gray-900` in dark) — plain `gray-100` had become
+  invisible against `--cui-bg-1` on the spread-out light band.
+  `--cui-border-emphasized` is `gray-600` in the dark scheme (was
+  `gray-700`, one rung from the plain border). Everything that reads the
+  tokens — cards, list groups, tables, inputs, tabs, the switch and check
+  frames — follows.
+
+#### The neutral ladder is three maps
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`$theme-bgs`, `$theme-fgs` and `$theme-borders` replace the neutral
+  scalars.** `$fg-body`, `$fg-1` … `$fg-4`, `$bg-body`, `$bg-1` … `$bg-4`,
+  `$border-subtle`, `$border-muted` and `$border-emphasized` are gone; each
+  map lives in `scss/_theme.scss` in the `defaults()` shape, `:root` emits
+  every entry as `--cui-bg-{key}`, `--cui-fg-{key}` or `--cui-border-{key}`,
+  and the `.bg-*`, `.fg-*` and `.border-*` utilities are generated from the
+  same maps. `$border-color` stays a scalar — it is the default every
+  component reads, not a rung. Override an entry instead of a variable:
+
+  ```diff
+  - $bg-body: #000;
+  - $fg-body: #111;
+  + $theme-bgs: ("body": #000);
+  + $theme-fgs: ("body": #111);
+  ```
+
+  The maps also carry `white`, `black`, `bg`/`fg` (the opposite ladder's
+  body) and, for backgrounds, `transparent`, so `.bg-fg`, `.fg-bg`,
+  `.fg-white`, `.fg-black`, `.border-bg`, `.border-white` and
+  `.border-black` read tokens like every other rung. `.border-body` reads
+  `--cui-border-body`, `light-dark(gray-300, gray-800)`, a step heavier than
+  `--cui-border-color`; it was an alias of the default border before.
+
+#### Links and rules read the ladder
+
+- **`--cui-link-color` is `light-dark(var(--cui-primary-base), var(--cui-primary-fg))`**
+  (was the base in both schemes), so a link on the dark page reads the
+  lighter foreground stop instead of the fill colour, and
+  **`--cui-link-hover-color` is a 10 % darkening of the link colour**
+  (`color-mix(in oklch, var(--cui-link-color) 90%, var(--cui-black))`) instead
+  of `--cui-primary-fg`; override `--cui-link-color` and the hover follows.
+- **`--cui-hr-border-color` is `var(--cui-border-color)`** (was
+  `currentcolor`): a rule is the same line as every other border, not a
+  faint copy of the text colour.
+
+#### Theme colours have no bare token
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`--cui-primary`, `--cui-secondary`, `--cui-success`, `--cui-info`,
+  `--cui-warning`, `--cui-danger` and `--cui-inverse` are gone.** A theme
+  colour is its set of slots — `-base`, `-bg`, `-fg`, `-fg-emphasis`,
+  `-bg-subtle`, `-bg-muted`, `-border`, `-focus-ring`, `-contrast` — and the
+  colour itself is the `-base` slot: `--cui-primary-base` is what
+  `--cui-primary` was, the 100–900 scale is mixed from it, and `-bg` (the
+  action background) points at it. The palette hues keep their bare token
+  (`--cui-blue`, `--cui-gray`): they are colours, not roles. Rename reads
+  one to one, and set the base to retint a colour:
+
+  ```diff
+  - .brand { color: var(--cui-primary); }
+  + .brand { color: var(--cui-primary-base); }
+
+  - :root { --cui-primary: #6f42c1; }
+  + :root { --cui-primary-base: #6f42c1; }
+  ```
+
+  Components that filled with the bare colour read `-base` now; the derived
+  hover and active states of a `.theme-*` class are computed from `-bg`.
 
 #### Every theme colour gets an action-background slot
 
@@ -2796,17 +2892,16 @@ tintable and lets dark mode deepen every shadow at once.
   overrides that used to lose on specificity now win.
 - **Utilities no longer carry `!important`.**
   <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
-  `$enable-important-utilities` now defaults to `false`, because the layer order
-  above already puts every utility past every component — the suffix was doing
-  nothing our own stylesheet needed. That takes 556 bytes gzip (19 kB
+  The `$enable-important-utilities` switch is gone with the suffix, because the
+  layer order above already puts every utility past every component — the
+  suffix was doing nothing our own stylesheet needed. That takes 556 bytes gzip (19 kB
   uncompressed) off the build.
 
   The one case it did cover is your own **unlayered** CSS: since unlayered styles
   beat every layer, a plain `.card-title { text-align: left }` in a stylesheet
   loaded after ours now wins over `.text-center`. Two ways out, and the choice is
   yours per rule rather than ours for all of them — move that CSS into
-  `@layer custom` so utilities win, or set
-  `$enable-important-utilities: true` to keep the v5 behavior everywhere.
+  `@layer custom` so utilities win.
 
 - If your build concatenates CoreUI with other CSS, make sure the layer
   declaration (emitted at the top of the bundle) is not stripped by a minifier
@@ -2955,7 +3050,8 @@ pair, and `[data#{$data-infix}theme="dark"]` only declares `color-scheme: dark`.
   **every** colour now carries the full thirteen stops. The curve is
   `94 / 90 / 80 / 60 / 40 / 20 %` of white for `025` … `400` and
   `16 / 32 / 48 / 64 / 70 / 76 %` of black for `600` … `975`, and `$gray` is
-  `oklch(60% 0.02 245)`. The light band is far more spread out than the v5
+  `oklch(60% 0.03948 265.02)` — the v5 hue and chroma, a cool gray, at the
+  lightness the curve is tuned for. The light band is far more spread out than the v5
   ramp it replaces: against white, `gray-100` reads 1.27:1 (was 1.10),
   `gray-200` 1.63 (was 1.21), `gray-300` 2.14 (was 1.34), `gray-400` 2.87
   (was 1.49); `gray-600` and below are within a step of where they were.
@@ -3024,14 +3120,22 @@ page than "secondary" — because for text, where the names came from, "stronger
 means more visible, while for a surface it means further from the page. Numbers
 say how far from the body a rung sits and read the same on both sides.
 
+The deprecated surface names follow the two-rung step of the rest of the
+library: `.bg-body-secondary` renders `--cui-bg-3` and `.bg-body-tertiary`
+`--cui-bg-2` (`gray-100` / `gray-050` in the light scheme, the v5 stops one
+rung apart), `.text-body-secondary` stays `--cui-fg-2` and
+`.text-body-tertiary` `--cui-fg-3` — tertiary text was the lighter of the
+two in v5 and still is.
+
 Two consequences for the tokens:
 
 - <span class="badge text-warning-emphasis bg-warning-subtle">Deprecated</span>
   **The surface tokens move out of the theme-color namespace.**
   `--cui-bg-body`, `--cui-bg-1` … `--cui-bg-4` and `--cui-fg-body`,
   `--cui-fg-1` … `--cui-fg-4` are canonical; `--cui-body-bg`, `--cui-body-color`,
-  `--cui-secondary-color`, `--cui-tertiary-bg` and `--cui-tertiary-color`
-  remain as aliases with identical values, and go away in v7 — at which point
+  `--cui-secondary-color` (`--cui-fg-2`), `--cui-tertiary-color`
+  (`--cui-fg-3`) and `--cui-tertiary-bg` (`--cui-bg-2`) remain as aliases
+  with identical values, and go away in v7 — at which point
   the `--cui-secondary-*` prefix belongs to the `secondary` theme color alone.
   One alias is already gone:
   <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
@@ -3074,10 +3178,10 @@ Two consequences for the tokens:
 - **`.text-body` and `.text-body-emphasis` are unaffected** — they are not
   ordinal, any more than `.text-primary` is.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
-  **The Sass knobs follow the ladder.** `$fg-body`, `$fg-1` … `$fg-4`,
-  `$bg-body`, `$bg-1` … `$bg-4` replace `$body-color`, `$body-bg`,
+  **The Sass knobs follow the ladder.** The `$theme-fgs` and `$theme-bgs`
+  maps (`"body"`, `"1"` … `"4"`) replace `$body-color`, `$body-bg`,
   `$body-secondary-color`, `$body-secondary-bg`, `$body-tertiary-color` and
-  `$body-tertiary-bg`; every knob holds one `light-dark()` expression, so
+  `$body-tertiary-bg`; every entry holds one `light-dark()` expression, so
   `$body-bg-dark` and `$body-tertiary-bg-dark` are gone too — the translucent
   tints that needed their Sass colors read the grays inline, which also means
   the bundled Bootstrap theme recomputes them from its own grays instead of
@@ -3362,11 +3466,11 @@ Nothing existing changes; these are additions. See
   mixins, no `$enable-rfs`, no `rfs` option in the utilities API, and none of
   the `$rfs-*` knobs (`$rfs-base-value`, `$rfs-breakpoint`, `$rfs-factor`,
   `$rfs-mode`, `$rfs-unit`, `$rfs-two-dimensional`, `$rfs-class`, …). Fluid type is
-  written as literal `clamp()` values in `$h1-font-size`–`$h4-font-size`,
+  written as literal `clamp()` values in the `$font-sizes` map,
   `$display-font-sizes` and `$legend-font-size`; rendering is unchanged at
   every viewport width.
 - **Headings no longer derive from `$font-size-base`** — a `clamp()` cannot be
-  multiplied. Override the `$h*-font-size` variables directly.
+  multiplied. Override the stop in `$font-sizes` directly.
 - A temporary `scss/vendor/_rfs.scss` shim (pass-through `font-size()`/`rfs()`
   mixins) exists only for the docs engine and will be removed — do not depend
   on it.
@@ -3665,7 +3769,7 @@ line height that belongs to it — upstream's mechanic, with our values, so
 $font-sizes: (
   "xs":  ("font-size": .75rem,        "line-height": 1.5),
   ...
-  "4xl": ("font-size": $h1-font-size, "line-height": 1.2)
+  "4xl": ("font-size": clamp(1.375rem, 1.375rem + 1.5vw, 2.5rem), "line-height": 1.2)
 );
 ```
 
@@ -3680,7 +3784,11 @@ $font-sizes: (
 - **`:root` gets `--cui-font-size-*` and `--cui-line-height-*` per
   stop**, and `h1`–`h6` read the tokens instead of the Sass variables. Restyling a
   stop at runtime now moves every heading and utility that uses it.
-  `$h1-font-size` … `$h6-font-size` are unchanged and still feed the scale.
+  `$h1-font-size` … `$h6-font-size`, `$font-size-sm`/`-lg`, `$font-size-5xl`/`-6xl`
+  and `$zindex-*` are gone: each was read only by the map it fed, so the maps
+  (`$font-sizes`, `$zindex-levels`) hold the values and are the override
+  point, in the `defaults()` shape — set one key and the rest stays.
+  `$font-weight-*` remain and feed `$font-weights` the same way.
 - **New: `.fs-{stop}`** alongside `.fs-1` … `.fs-6`, which keep working and render
   identically — `.fs-1` is `.fs-4xl`, down to `.fs-6`, which is `.fs-md`.
 - **New: `.text-{stop}`**, which sets `font-size` and `line-height` together.

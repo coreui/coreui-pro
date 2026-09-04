@@ -40,26 +40,12 @@ $utilities-bg-muted: theme-color-refs("bg-muted", "-muted") !default;
 // scss-docs-end utilities-bg-colors
 
 // scss-docs-start utilities-border-colors
-$utilities-border-colors: map.merge(
-  theme-color-refs("bg"),
-  (
-    "black": var(--#{$prefix}black),
-    "white": var(--#{$prefix}white),
-    "bg": var(--#{$prefix}bg-body),
-    "subtle": var(--#{$prefix}border-subtle),
-    "muted": var(--#{$prefix}border-muted),
-    "body": var(--#{$prefix}border-color),
-    "emphasized": var(--#{$prefix}border-emphasized)
-  )
-) !default;
+$utilities-border-colors: map.merge(theme-color-refs("bg"), theme-token-refs($theme-borders, "border")) !default;
 
 $utilities-border-subtle: theme-color-refs("border", "-subtle") !default;
 // scss-docs-end utilities-border-colors
 
 $utilities-links-underline: theme-color-refs("fg") !default;
-
-// stylelint-disable-next-line scss/at-function-named-arguments
-$negative-spacers: if(sass($enable-negative-margins): negativify-map($spacers)) !default;
 
 // scss-docs-start border-widths-map
 $border-widths: (
@@ -717,7 +703,7 @@ $utilities: map.merge(
       responsive: true,
       property: margin-inline-end,
       class: me,
-      values: map.merge($spacers, (auto: auto)),
+      values: map-merge-multiple($spacers, $negative-spacers, (auto: auto)),
     ),
     "margin-bottom": (
       responsive: true,
@@ -729,50 +715,7 @@ $utilities: map.merge(
       responsive: true,
       property: margin-inline-start,
       class: ms,
-      values: map.merge($spacers, (auto: auto)),
-    ),
-    // Negative margin utilities
-    "negative-margin": (
-      responsive: true,
-      property: margin,
-      class: m,
-      values: $negative-spacers
-    ),
-    "negative-margin-x": (
-      responsive: true,
-      property: margin-inline,
-      class: mx,
-      values: $negative-spacers
-    ),
-    "negative-margin-y": (
-      responsive: true,
-      property: margin-block,
-      class: my,
-      values: $negative-spacers
-    ),
-    "negative-margin-top": (
-      responsive: true,
-      property: margin-top,
-      class: mt,
-      values: $negative-spacers
-    ),
-    "negative-margin-end": (
-      responsive: true,
-      property: margin-inline-end,
-      class: me,
-      values: $negative-spacers
-    ),
-    "negative-margin-bottom": (
-      responsive: true,
-      property: margin-bottom,
-      class: mb,
-      values: $negative-spacers
-    ),
-    "negative-margin-start": (
-      responsive: true,
-      property: margin-inline-start,
-      class: ms,
-      values: $negative-spacers
+      values: map-merge-multiple($spacers, $negative-spacers, (auto: auto)),
     ),
     // Padding utilities
     // scss-docs-end utils-margin
@@ -1005,13 +948,7 @@ $utilities: map.merge(
         color: color-mix(in srgb, var(--#{$prefix}text) calc(var(--#{$prefix}text-opacity) * 100%), transparent),
       ),
       class: fg,
-      values: (
-        "body": var(--#{$prefix}fg-body),
-        "1": var(--#{$prefix}fg-1),
-        "2": var(--#{$prefix}fg-2),
-        "3": var(--#{$prefix}fg-3),
-        "4": var(--#{$prefix}fg-4),
-      )
+      values: theme-token-refs($theme-fgs, "fg")
     ),
     "text-opacity": (
       property: (--#{$prefix}text-opacity: null),
@@ -1107,15 +1044,10 @@ $utilities: map.merge(
       ),
       class: bg,
       values: map.merge(
-        $utilities-bg-colors,
+        map.merge($utilities-bg-colors, theme-token-refs($theme-bgs, "bg")),
         (
-          "transparent": transparent,
-          "1": var(--#{$prefix}bg-1),
-          "2": var(--#{$prefix}bg-2),
-          "3": var(--#{$prefix}bg-3),
-          "4": var(--#{$prefix}bg-4),
-          "body-secondary": var(--#{$prefix}bg-4), // deprecated
-          "body-tertiary": var(--#{$prefix}bg-3), // deprecated
+          "body-secondary": var(--#{$prefix}bg-3), // deprecated
+          "body-tertiary": var(--#{$prefix}bg-2), // deprecated
         )
       )
     ),

@@ -17,11 +17,11 @@
 $range-slider-track-width:                 100% !default;
 $range-slider-track-height:                .5rem !default;
 $range-slider-track-cursor:                pointer !default;
-$range-slider-track-bg:                    var(--#{$prefix}bg-4) !default;
+$range-slider-track-bg:                    var(--#{$prefix}bg-3) !default;
 $range-slider-track-border-radius:         var(--#{$prefix}radius-pill) !default;
 $range-slider-track-box-shadow:            var(--#{$prefix}box-shadow-inset) !default;
 
-$range-slider-track-in-range-bg:           color-mix(in srgb, var(--#{$prefix}theme-bg, var(--#{$prefix}primary)) 50%, transparent) !default;
+$range-slider-track-in-range-bg:           color-mix(in srgb, var(--#{$prefix}theme-bg, var(--#{$prefix}primary-base)) 50%, transparent) !default;
 $range-slider-disabled-track-in-range-bg:  var(--#{$prefix}fg-4) !default;
 
 $range-slider-label-padding-y:             0 !default;
@@ -31,11 +31,11 @@ $range-slider-label-color:                 var(--#{$prefix}fg-body) !default;
 
 $range-slider-thumb-width:                 1rem !default;
 $range-slider-thumb-height:                $range-slider-thumb-width !default;
-$range-slider-thumb-bg:                    var(--#{$prefix}theme-bg, var(--#{$prefix}primary)) !default;
+$range-slider-thumb-bg:                    var(--#{$prefix}theme-bg, var(--#{$prefix}primary-base)) !default;
 $range-slider-thumb-border:                0 !default;
 $range-slider-thumb-border-radius:         var(--#{$prefix}radius-pill) !default;
 $range-slider-thumb-box-shadow:            0 .1rem .25rem color-mix(in srgb, var(--#{$prefix}black) 10%, transparent) !default;
-$range-slider-thumb-active-bg:             color-mix(in srgb, var(--#{$prefix}theme-bg, var(--#{$prefix}primary)) 30%, var(--#{$prefix}bg-body)) !default;
+$range-slider-thumb-active-bg:             color-mix(in srgb, var(--#{$prefix}theme-bg, var(--#{$prefix}primary-base)) 30%, var(--#{$prefix}bg-body)) !default;
 $range-slider-thumb-disabled-bg:           var(--#{$prefix}fg-3) !default;
 $range-slider-thumb-transition:            background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out !default;
 

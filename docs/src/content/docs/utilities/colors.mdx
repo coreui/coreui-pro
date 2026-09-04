@@ -57,7 +57,7 @@ Consider our default `.text-primary` utility.
 
 ```css
 .text-primary {
-  --cui-text: var(--cui-primary);
+  --cui-text: var(--cui-primary-base);
   --cui-text-opacity: 1;
   color: color-mix(in srgb, var(--cui-text) calc(var(--cui-text-opacity) * 100%), transparent);
 }
@@ -111,6 +111,10 @@ Grayscale colors are also available, but only a subset are used to generate any 
 <ScssDocs file="scss/_colors.scss" capture="gray-color-variables" />
 
 ### Sass maps
+
+The foreground ladder is one map: each key is one `.fg-{key}` utility and the `--cui-fg-{key}` token behind it, in light and dark mode:
+
+<ScssDocs file="scss/_theme.scss" capture="theme-fgs-map" />
 
 Theme colors are then put into a Sass map so we can loop over them to generate our utilities, component modifiers, and more.
 
