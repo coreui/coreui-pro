@@ -2449,6 +2449,19 @@ as such.
   (`4xl`) a tighter one. `$headings-line-height` still feeds
   `--cui-heading-line-height` for anything that reads it directly.
 
+#### Layered shadows
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **Every shadow is a stack of two to four layers with a negative spread**
+  instead of one wide blur: a tight layer for contact, wider ones for
+  ambient light, each at 4–9 % alpha, so a card reads as lifted rather than
+  smeared. `.shadow-xs` and `--cui-box-shadow-xs` are new (one thin layer).
+  The inset shadow reads 8 % in the light scheme and 26 % in the dark one.
+  `--cui-shadow-strength` in the dark scheme is `2.4` (was 2.5). The knobs are
+  unchanged: `--cui-shadow-color` and `--cui-shadow-strength` on `:root`,
+  `.shadow-{color}` and `.shadow-opacity-*` on the element, `$shadows` in
+  Sass — a custom entry is now a comma-separated list of layers.
+
 #### Every theme colour gets an action-background slot
 
 `:root` emits `--cui-{color}-bg` for every theme colour, pointing at the
