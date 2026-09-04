@@ -23,7 +23,7 @@ $yellow:  oklch(84.417% 0.17216 84.93) !default;
 $green:   oklch(55.203% 0.1234 157.01) !default;
 $teal:    oklch(74.409% 0.14802 166.36) !default;
 $cyan:    oklch(77.493% 0.13797 218.05) !default;
-$gray:    oklch(60% 0.02 245) !default;
+$gray:    oklch(64% 0.03948 265.02) !default;
 // scss-docs-end color-variables
 
 // scss-docs-start colors-map
@@ -81,12 +81,12 @@ $color-shades: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
 $color-shades: defaults(
   (
-    "600": 16%,
-    "700": 32%,
-    "800": 48%,
-    "900": 64%,
-    "950": 70%,
-    "975": 76%
+    "600": 21.9%,
+    "700": 33.4%,
+    "800": 48.8%,
+    "900": 60.4%,
+    "950": 69.2%,
+    "975": 74%
   ),
   $color-shades
 );
