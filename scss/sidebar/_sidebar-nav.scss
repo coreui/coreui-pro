@@ -218,7 +218,7 @@ $sidebar-nav-tree-link-active-icon-bullet-bg:  var(--#{$prefix}border-color) !de
         }
       }
 
-      @media (hover: hover), (-ms-high-contrast: none) {
+      @media (hover: hover) {
         &:hover {
           color: var(--#{$prefix}sidebar-nav-link-hover-color);
           text-decoration: none;
@@ -309,7 +309,7 @@ $sidebar-nav-tree-link-active-icon-bullet-bg:  var(--#{$prefix}border-color) !de
         @include transition($sidebar-nav-group-indicator-transition);
       }
 
-      @media (hover: hover), (-ms-high-contrast: none) {
+      @media (hover: hover) {
         &:hover:not(:has(.nav-group-toggle-indicator))::after {
           background-color: var(--#{$prefix}sidebar-nav-group-indicator-hover-color);
           mask-image: var(--#{$prefix}sidebar-nav-group-indicator-hover-icon);

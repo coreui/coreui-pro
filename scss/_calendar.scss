@@ -47,7 +47,6 @@ $calendar-cell-hover-color:                  var(--#{$prefix}fg-body) !default;
 $calendar-cell-hover-bg:                     var(--#{$prefix}bg-3) !default;
 $calendar-cell-disabled-color:               var(--#{$prefix}fg-3) !default;
 
-
 $calendar-cell-selected-color:               var(--#{$prefix}primary-contrast) !default;
 $calendar-cell-selected-bg:                  var(--#{$prefix}primary) !default;
 
@@ -321,21 +320,6 @@ $calendar-tokens: defaults(
     &.range-hover:not(:has(~ .range-hover)) .calendar-cell-inner::before {
       border-inline-end: var(--#{$prefix}border-width) dashed var(--#{$prefix}theme-bg, var(--#{$prefix}calendar-cell-range-hover-border-color));
       @include border-end-radius(var(--#{$prefix}calendar-cell-border-radius));
-    }
-
-    // stylelint-disable-next-line at-rule-no-vendor-prefix
-    @-moz-document url-prefix() {
-      .calendars:not(.select-week) &:nth-last-child(1 of .range),
-      .calendars:not(.select-week) &:nth-last-child(1 of .available) {
-        .calendar-cell-inner::after {
-          @include border-end-radius(var(--#{$prefix}calendar-cell-border-radius));
-        }
-      }
-
-      &:nth-last-child(1 of .range-hover) .calendar-cell-inner::before {
-        border-inline-end: var(--#{$prefix}border-width) dashed var(--#{$prefix}theme-bg, var(--#{$prefix}calendar-cell-range-hover-border-color));
-        @include border-end-radius(var(--#{$prefix}calendar-cell-border-radius));
-      }
     }
 
     &.selected:not(th) .calendar-cell-inner {
