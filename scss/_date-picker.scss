@@ -1,4 +1,3 @@
-@use "sass:math";
 @use "calendar" as *;
 @use "time-picker" as *;
 @use "functions/defaults" as *;
@@ -47,22 +46,7 @@ $date-picker-tokens: defaults(
     }
 
     .time-picker-body {
-      --#{$prefix}time-picker-body-padding: #{$time-picker-body-padding};
-      --#{$prefix}time-picker-roll-cell-height: #{$time-picker-roll-cell-height};
-      --#{$prefix}time-picker-roll-cell-width: #{$time-picker-roll-cell-width};
-      --#{$prefix}time-picker-roll-cell-hover-bg: #{$time-picker-roll-cell-hover-bg};
-      --#{$prefix}time-picker-roll-cell-hover-color: #{$time-picker-roll-cell-hover-color};
-      --#{$prefix}time-picker-roll-cell-selected-bg: #{$time-picker-roll-cell-selected-bg};
-      --#{$prefix}time-picker-roll-cell-selected-color: #{$time-picker-roll-cell-selected-color};
-      --#{$prefix}time-picker-roll-cell-selected-hover-bg: #{$time-picker-roll-cell-selected-hover-bg};
-      --#{$prefix}time-picker-roll-cell-selected-hover-color: #{$time-picker-roll-cell-selected-hover-color};
-      --#{$prefix}time-picker-roll-col-border-color: #{$time-picker-roll-col-border-color};
-      --#{$prefix}time-picker-roll-col-border-width: #{$time-picker-roll-col-border-width};
-      --#{$prefix}time-picker-inline-select-color: #{$time-picker-inline-select-color};
-      --#{$prefix}time-picker-inline-select-disabled-color: #{$time-picker-inline-select-disabled-color};
-      --#{$prefix}time-picker-inline-select-font-size: #{$time-picker-inline-select-font-size};
-      --#{$prefix}time-picker-inline-select-padding-x: #{$time-picker-inline-select-padding-x};
-      --#{$prefix}time-picker-inline-select-padding-y: #{$time-picker-inline-select-padding-y};
+      @include tokens($time-picker-tokens);
     }
   }
 
