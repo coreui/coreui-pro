@@ -3378,6 +3378,15 @@ Nothing existing changes; these are additions. See
   instead of restating declarations, so state styling follows any control
   automatically.
 
+#### Spacing utilities write logical shorthands
+
+`.mx-*`, `.my-*`, `.px-*` and `.py-*` (and their negative-margin variants)
+emit `margin-inline`, `margin-block`, `padding-inline` and `padding-block`
+instead of two physical longhands each. Rendering is identical in both
+directions; the only visible difference is in DevTools, where one shorthand
+replaces the pair, and in a stylesheet of your own that overrode one of the
+longhands after ours — a shorthand still yields to a later longhand.
+
 #### Opacity utilities no longer cascade to descendants
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>

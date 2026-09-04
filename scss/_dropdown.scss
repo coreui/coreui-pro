@@ -4,7 +4,6 @@
 @use "mixins/box-shadow" as *;
 @use "layout/breakpoints" as *;
 @use "mixins/caret" as *;
-@use "mixins/gradients" as *;
 @use "mixins/tokens" as *;
 @use "config" as *;
 
@@ -278,7 +277,7 @@ $dropdown-dark-tokens: defaults(
     height: 0;
     margin: var(--#{$prefix}dropdown-divider-margin-y) 0;
     overflow: hidden;
-    border-block-start: 1px solid var(--#{$prefix}dropdown-divider-bg);
+    border-block-start: var(--#{$prefix}border-width) solid var(--#{$prefix}dropdown-divider-bg);
     opacity: 1; // Revisit in v6 to de-dupe styles that conflict with <hr> element
   }
 
@@ -304,14 +303,14 @@ $dropdown-dark-tokens: defaults(
       color: var(--#{$prefix}dropdown-link-hover-color);
       // stylelint-disable-next-line scss/at-function-named-arguments
       text-decoration: if(sass($link-hover-decoration == underline): none);
-      @include gradient-bg(var(--#{$prefix}dropdown-link-hover-bg));
+      background-color: var(--#{$prefix}dropdown-link-hover-bg);
     }
 
     &.active,
     &:active {
       color: var(--#{$prefix}dropdown-link-active-color);
       text-decoration: none;
-      @include gradient-bg(var(--#{$prefix}dropdown-link-active-bg));
+      background-color: var(--#{$prefix}dropdown-link-active-bg);
     }
 
     &.disabled,

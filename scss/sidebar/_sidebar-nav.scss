@@ -168,7 +168,7 @@ $sidebar-nav-tree-link-active-icon-bullet-bg:  var(--#{$prefix}border-color) !de
       padding: var(--#{$prefix}sidebar-nav-title-padding-y) var(--#{$prefix}sidebar-nav-title-padding-x);
       margin-top: var(--#{$prefix}sidebar-nav-title-margin-top);
       font-size: 80%;
-      font-weight: 700;
+      font-weight: var(--#{$prefix}font-weight-bold);
       color: var(--#{$prefix}sidebar-nav-title-color);
       text-transform: uppercase;
       @include transition($sidebar-nav-title-transition);
@@ -365,7 +365,7 @@ $sidebar-nav-tree-link-active-icon-bullet-bg:  var(--#{$prefix}border-color) !de
           z-index: -1;
           height: 100%;
           content: "";
-          border-inline-start: 1px solid var(--#{$prefix}sidebar-nav-tree-group-border-color);
+          border-inline-start: var(--#{$prefix}border-width) solid var(--#{$prefix}sidebar-nav-tree-group-border-color);
         }
 
         // stylelint-disable-next-line selector-max-class

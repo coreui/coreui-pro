@@ -22,6 +22,8 @@ $chip-img-border-radius:     50% !default;
 $chip-remove-size:           1rem !default;
 $chip-remove-opacity:        .65 !default;
 $chip-remove-hover-opacity:  1 !default;
+$chip-disabled-opacity:      .65 !default;
+$chip-active-opacity:        .9 !default;
 $chip-transition:            background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out, color .15s ease-in-out !default;
 
 $chip-color:                 var(--#{$prefix}fg-body) !default;
@@ -73,6 +75,8 @@ $chip-tokens: defaults(
     --#{$prefix}chip-remove-size: #{$chip-remove-size},
     --#{$prefix}chip-remove-opacity: #{$chip-remove-opacity},
     --#{$prefix}chip-remove-hover-opacity: #{$chip-remove-hover-opacity},
+    --#{$prefix}chip-disabled-opacity: #{$chip-disabled-opacity},
+    --#{$prefix}chip-active-opacity: #{$chip-active-opacity},
     --#{$prefix}chip-transition: #{$chip-transition},
     --#{$prefix}chip-color: var(--#{$prefix}theme-fg-emphasis, #{$chip-color}),
     --#{$prefix}chip-bg: var(--#{$prefix}theme-bg-subtle, #{$chip-bg}),
@@ -141,7 +145,7 @@ $chip-outline-tokens: defaults(
     &.disabled,
     &:disabled {
       pointer-events: none;
-      opacity: .65;
+      opacity: var(--#{$prefix}chip-disabled-opacity);
     }
 
     &:focus-visible {
@@ -175,7 +179,7 @@ $chip-outline-tokens: defaults(
     &.active:hover {
       color: var(--#{$prefix}chip-active-color);
       background-color: var(--#{$prefix}chip-active-bg);
-      opacity: .9;
+      opacity: var(--#{$prefix}chip-active-opacity);
     }
   }
 

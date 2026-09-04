@@ -198,7 +198,7 @@ $stepper-tokens: defaults(
     color: var(--#{$prefix}stepper-step-indicator-color);
     background: var(--#{$prefix}stepper-step-indicator-bg);
     border: var(--#{$prefix}stepper-step-indicator-border-width) solid var(--#{$prefix}stepper-step-indicator-border-color);
-    @include border-radius(50em);
+    @include border-radius(50%);
     @include transition(var(--#{$prefix}stepper-step-indicator-transition));
   }
 

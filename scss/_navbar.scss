@@ -9,7 +9,6 @@
 @use "layout/breakpoints" as *;
 @use "mixins/color-mode" as *;
 @use "mixins/deprecate" as *;
-@use "mixins/gradients" as *;
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
 @use "mixins/translucent" as *;
@@ -176,7 +175,6 @@ $navbar-dark-tokens: defaults(
     justify-content: space-between; // space out brand from logo
     min-height: var(--#{$prefix}navbar-min-height);
     padding: var(--#{$prefix}navbar-padding-y) var(--#{$prefix}navbar-padding-x);
-    @include gradient-bg();
     // The navbar answers to the width it is given, not to the window's: a navbar
     // in a narrow column collapses there while a full-width one stays expanded.
     @include set-container();
