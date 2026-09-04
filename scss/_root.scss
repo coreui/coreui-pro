@@ -213,8 +213,8 @@ $root-token-defaults: map.merge(
     --#{$prefix}body-color: var(--#{$prefix}fg-body),
     --#{$prefix}body-bg: var(--#{$prefix}bg-body),
     --#{$prefix}secondary-color: var(--#{$prefix}fg-2),
-    --#{$prefix}tertiary-color: var(--#{$prefix}fg-1),
-    --#{$prefix}tertiary-bg: var(--#{$prefix}bg-1),
+    --#{$prefix}tertiary-color: var(--#{$prefix}fg-3),
+    --#{$prefix}tertiary-bg: var(--#{$prefix}bg-2),
     --#{$prefix}emphasis-color: $body-emphasis-color,
     // scss-docs-end root-body-variables
     --#{$prefix}heading-color: $headings-color,

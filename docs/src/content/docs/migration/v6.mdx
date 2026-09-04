@@ -3121,14 +3121,22 @@ page than "secondary" — because for text, where the names came from, "stronger
 means more visible, while for a surface it means further from the page. Numbers
 say how far from the body a rung sits and read the same on both sides.
 
+The deprecated surface names follow the two-rung step of the rest of the
+library: `.bg-body-secondary` renders `--cui-bg-3` and `.bg-body-tertiary`
+`--cui-bg-2` (`gray-100` / `gray-050` in the light scheme, the v5 stops one
+rung apart), `.text-body-secondary` stays `--cui-fg-2` and
+`.text-body-tertiary` `--cui-fg-3` — tertiary text was the lighter of the
+two in v5 and still is.
+
 Two consequences for the tokens:
 
 - <span class="badge text-warning-emphasis bg-warning-subtle">Deprecated</span>
   **The surface tokens move out of the theme-color namespace.**
   `--cui-bg-body`, `--cui-bg-1` … `--cui-bg-4` and `--cui-fg-body`,
   `--cui-fg-1` … `--cui-fg-4` are canonical; `--cui-body-bg`, `--cui-body-color`,
-  `--cui-secondary-color`, `--cui-tertiary-bg` and `--cui-tertiary-color`
-  remain as aliases with identical values, and go away in v7 — at which point
+  `--cui-secondary-color` (`--cui-fg-2`), `--cui-tertiary-color`
+  (`--cui-fg-3`) and `--cui-tertiary-bg` (`--cui-bg-2`) remain as aliases
+  with identical values, and go away in v7 — at which point
   the `--cui-secondary-*` prefix belongs to the `secondary` theme color alone.
   One alias is already gone:
   <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
