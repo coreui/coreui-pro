@@ -449,11 +449,11 @@ Another override is the option to pop up a modal that covers the user viewport, 
 | `.modal-fullscreen` | Always |
 | `.modal-fullscreen-sm-down` | `576px` |
 | `.modal-fullscreen-md-down` | `768px` |
-| `.modal-fullscreen-lg-down` | `992px` |
-| `.modal-fullscreen-xl-down` | `1200px` |
-| `.modal-fullscreen-xxl-down` | `1400px` |
+| `.modal-fullscreen-lg-down` | `1024px` |
+| `.modal-fullscreen-xl-down` | `1280px` |
+| `.modal-fullscreen-2xl-down` | `1536px` |
 
-<Example html={[`<button type="button" class="btn-solid theme-primary" data-coreui-toggle="modal" data-coreui-target="#exampleModalFullscreen">Full screen</button>`, `<button type="button" class="btn-solid theme-primary" data-coreui-toggle="modal" data-coreui-target="#exampleModalFullscreenSm">Full screen below sm</button>`, `<button type="button" class="btn-solid theme-primary" data-coreui-toggle="modal" data-coreui-target="#exampleModalFullscreenMd">Full screen below md</button>`, `<button type="button" class="btn-solid theme-primary" data-coreui-toggle="modal" data-coreui-target="#exampleModalFullscreenLg">Full screen below lg</button>`, `<button type="button" class="btn-solid theme-primary" data-coreui-toggle="modal" data-coreui-target="#exampleModalFullscreenXl">Full screen below xl</button>`, `<button type="button" class="btn-solid theme-primary" data-coreui-toggle="modal" data-coreui-target="#exampleModalFullscreenXxl">Full screen below xxl</button>`]} />
+<Example html={[`<button type="button" class="btn-solid theme-primary" data-coreui-toggle="modal" data-coreui-target="#exampleModalFullscreen">Full screen</button>`, `<button type="button" class="btn-solid theme-primary" data-coreui-toggle="modal" data-coreui-target="#exampleModalFullscreenSm">Full screen below sm</button>`, `<button type="button" class="btn-solid theme-primary" data-coreui-toggle="modal" data-coreui-target="#exampleModalFullscreenMd">Full screen below md</button>`, `<button type="button" class="btn-solid theme-primary" data-coreui-toggle="modal" data-coreui-target="#exampleModalFullscreenLg">Full screen below lg</button>`, `<button type="button" class="btn-solid theme-primary" data-coreui-toggle="modal" data-coreui-target="#exampleModalFullscreenXl">Full screen below xl</button>`, `<button type="button" class="btn-solid theme-primary" data-coreui-toggle="modal" data-coreui-target="#exampleModalFullscreenXxl">Full screen below 2xl</button>`]} />
 
 ```html
 <!-- Full screen modal -->
@@ -527,9 +527,9 @@ Another override is the option to pop up a modal that covers the user viewport, 
   </div>
 </dialog>
 
-<dialog class="modal modal-fullscreen-xxl-down" id="exampleModalFullscreenXxl" aria-labelledby="exampleModalFullscreenXxlLabel">
+<dialog class="modal modal-fullscreen-2xl-down" id="exampleModalFullscreenXxl" aria-labelledby="exampleModalFullscreenXxlLabel">
   <div class="modal-header">
-    <h5 class="modal-title h4" id="exampleModalFullscreenXxlLabel">Full screen below xxl</h5>
+    <h5 class="modal-title h4" id="exampleModalFullscreenXxlLabel">Full screen below 2xl</h5>
     <button type="button" class="btn-close" data-coreui-dismiss="modal" aria-label="Close"></button>
   </div>
   <div class="modal-body">

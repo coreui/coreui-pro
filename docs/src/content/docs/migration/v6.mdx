@@ -1699,7 +1699,7 @@ Multi Select's option indicators moved with it — they render as a decorative
 
 #### Stacks
 
-- **New: `.hstack{-sm|-md|-lg|-xl|-xxl}` and `.vstack{-sm|-md|-lg|-xl|-xxl}`** switch
+- **New: `.hstack{-sm|-md|-lg|-xl|-2xl}` and `.vstack{-sm|-md|-lg|-xl|-2xl}`** switch
   direction at a breakpoint. The breakpoint is the width of the nearest query
   container, so mark an ancestor with the new `.stack-container` (or the
   [`.contains-inline`](/utilities/container-queries/) utility) — without one the
@@ -1793,7 +1793,7 @@ Multi Select's option indicators moved with it — they render as a decorative
 - **`.table-responsive*` is a query container.** It still scrolls horizontally
   below its breakpoint; the addition is that things inside it can now respond to
   its width.
-- **New: `.table-stacked{-sm|-md|-lg|-xl|-xxl}`** turns rows into stacked blocks
+- **New: `.table-stacked{-sm|-md|-lg|-xl|-2xl}`** turns rows into stacked blocks
   below the breakpoint, reading the width from the `.table-responsive*` wrapper.
   Give every `<td>` past the first a `data-cell` attribute for its label; the
   header is hidden visually and kept in the accessibility tree. See
@@ -1930,7 +1930,7 @@ Multi Select's option indicators moved with it — they render as a decorative
 #### List group
 
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
-  **`.list-group-horizontal-{sm|md|lg|xl|xxl}` turns horizontal from a
+  **`.list-group-horizontal-{sm|md|lg|xl|2xl}` turns horizontal from a
   container query.** Same change and same fix as `.card-group`: put
   [`.contains-inline`](/utilities/container-queries/) on an ancestor, or the
   list stays vertical. Plain `.list-group-horizontal` is unconditional and
@@ -2268,7 +2268,7 @@ as such.
   Everything that used the `.375rem` default is visibly rounder. To keep a
   component on its old radius, set its own token
   (`--cui-card-border-radius: .375rem`); to retune the whole page, override
-  the stops or `$radius`. The `$border-radius(-sm/-lg/-xl/-xxl/-pill)`
+  the stops or `$radius`. The `$border-radius(-sm/-lg/-xl/-2xl/-pill)`
   variables and their tokens are unchanged and keep driving the `rounded-*`
   utilities — but no component reads them any more: the modal, the chip,
   the switch, the chip input, the search button's key, the sidebar nav, the
@@ -2396,6 +2396,25 @@ as such.
 
   Components that filled with the bare colour read `-base` now; the derived
   hover and active states of a `.theme-*` class are computed from `-bg`.
+
+#### Breakpoints: `lg` 1024, `xl` 1280, `2xl` 1536
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The three largest breakpoints move and the largest is renamed.** `lg` is
+  `1024px` (was 992), `xl` `1280px` (was 1200) and the top tier is `2xl` at
+  `1536px` (was `xxl` at 1400); `sm` and `md` stay. Every responsive class
+  spells the tier the new way — `.col-xxl-6` is `.col-2xl-6`, `.container-xxl`
+  `.container-2xl`, `.modal-fullscreen-xxl-down` `.modal-fullscreen-2xl-down`,
+  `.hstack-xxl` `.hstack-2xl` — and the containers grow with them: `.container`
+  is `1200px` at `xl` (was 1140) and `1440px` at `2xl` (was 1320). Size
+  variants that happen to spell `xxl` (`.drawer-xxl`, `.offcanvas-xxl`,
+  `.icon-xxl`, `--cui-border-radius-xxl`) are not breakpoints and keep their
+  name. The Sass map is `$breakpoints` (was `$grid-breakpoints`) and the mixins
+  take it under that name; `$container-max-widths` keeps its name. The
+  responsive placement of menus, tooltips and popovers
+  (`data-coreui-placement="lg:end"`) reads the same values, and the sidebar's
+  mobile mode, `$mobile-breakpoint: lg`, now starts below `1024px` — a tablet
+  in landscape gets the mobile layout.
 
 #### Every theme colour gets an action-background slot
 

@@ -7,7 +7,7 @@
 
 @layer root {
   :root {
-    @each $name, $value in $grid-breakpoints {
+    @each $name, $value in $breakpoints {
       --#{$prefix}breakpoint-#{$name}: #{$value};
     }
   }

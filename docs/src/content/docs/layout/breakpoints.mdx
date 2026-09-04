@@ -21,15 +21,15 @@ CoreUI for Bootstrap includes six default breakpoints, sometimes referred to as 
 | Extra small | <em>None</em>  |&lt;576px |
 | Small | `sm` | &ge;576px |
 | Medium | `md` | &ge;768px |
-| Large | `lg` | &ge;992px |
-| Extra large | `xl` | &ge;1200px |
-| Extra extra large | `xxl` | &ge;1400px |
+| Large | `lg` | &ge;1024px |
+| Extra large | `xl` | &ge;1280px |
+| Extra extra large | `2xl` | &ge;1536px |
 
 Each breakpoint was chosen to comfortably hold containers whose widths are multiples of 12. Breakpoints are also representative of a subset of common device sizes and viewport dimensions—they don't specifically target every use case or device. Instead, the ranges provide a strong and consistent foundation to build on for nearly any device.
 
 These breakpoints are customizable via Sass—you'll find them in a Sass map in our `_config.scss` stylesheet.
 
-<ScssDocs file="scss/_config.scss" capture="grid-breakpoints" />
+<ScssDocs file="scss/_config.scss" capture="breakpoints" />
 
 For more information and examples on how to modify our Sass maps and variables, please refer to [the Sass section of the Grid documentation](/layout/grid/#customizing).
 
@@ -49,7 +49,7 @@ CoreUI for Bootstrap primarily uses the following media query ranges—or breakp
 @include media-breakpoint-up(md) { ... }
 @include media-breakpoint-up(lg) { ... }
 @include media-breakpoint-up(xl) { ... }
-@include media-breakpoint-up(xxl) { ... }
+@include media-breakpoint-up(2xl) { ... }
 
 // Usage
 
@@ -76,14 +76,14 @@ These Sass mixins translate in our compiled CSS using the values declared in our
 // Medium devices (tablets, 768px and up)
 @media (width >= 768px) { ... }
 
-// Large devices (desktops, 992px and up)
-@media (width >= 992px) { ... }
+// Large devices (desktops, 1024px and up)
+@media (width >= 1024px) { ... }
 
-// X-Large devices (large desktops, 1200px and up)
-@media (width >= 1200px) { ... }
+// X-Large devices (large desktops, 1280px and up)
+@media (width >= 1280px) { ... }
 
-// XX-Large devices (larger desktops, 1400px and up)
-@media (width >= 1400px) { ... }
+// XX-Large devices (larger desktops, 1536px and up)
+@media (width >= 1536px) { ... }
 ```
 
 ### Max-width
@@ -96,7 +96,7 @@ We occasionally use media queries that go in the other direction (the given scre
 @include media-breakpoint-down(md) { ... }
 @include media-breakpoint-down(lg) { ... }
 @include media-breakpoint-down(xl) { ... }
-@include media-breakpoint-down(xxl) { ... }
+@include media-breakpoint-down(2xl) { ... }
 
 // Example: Style from medium breakpoint and down
 @include media-breakpoint-down(md) {
@@ -118,14 +118,14 @@ These mixins use the declared breakpoint as an exclusive upper bound. For exampl
 // `md` applies to small devices (landscape phones, less than 768px)
 @media (width < 768px) { ... }
 
-// `lg` applies to medium devices (tablets, less than 992px)
-@media (width < 992px) { ... }
+// `lg` applies to medium devices (tablets, less than 1024px)
+@media (width < 1024px) { ... }
 
-// `xl` applies to large devices (desktops, less than 1200px)
-@media (width < 1200px) { ... }
+// `xl` applies to large devices (desktops, less than 1280px)
+@media (width < 1280px) { ... }
 
-// `xxl` applies to x-large devices (large desktops, less than 1400px)
-@media (width < 1400px) { ... }
+// `2xl` applies to x-large devices (large desktops, less than 1536px)
+@media (width < 1536px) { ... }
 ```
 
 <Callout color="info">
@@ -142,13 +142,13 @@ There are also media queries and mixins for targeting a single segment of screen
 @include media-breakpoint-only(md) { ... }
 @include media-breakpoint-only(lg) { ... }
 @include media-breakpoint-only(xl) { ... }
-@include media-breakpoint-only(xxl) { ... }
+@include media-breakpoint-only(2xl) { ... }
 ```
 
 For example the `@include media-breakpoint-only(md) { ... }` will result in :
 
 ```scss
-@media (width >= 768px) and (width < 992px) { ... }
+@media (width >= 768px) and (width < 1024px) { ... }
 ```
 
 ### Between breakpoints
@@ -164,7 +164,7 @@ Which results in:
 ```scss
 // Example
 // Apply styles starting from medium devices and up to extra large devices
-@media (width >= 768px) and (width < 1200px) { ... }
+@media (width >= 768px) and (width < 1280px) { ... }
 ```
 
 ## Container queries

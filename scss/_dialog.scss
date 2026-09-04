@@ -209,8 +209,8 @@ $dialog-tokens: defaults(
   }
 
   // scss-docs-start dialog-fullscreen-loop
-  @each $breakpoint in map.keys($grid-breakpoints) {
-    $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
+  @each $breakpoint in map.keys($breakpoints) {
+    $infix: breakpoint-infix($breakpoint, $breakpoints);
     // stylelint-disable-next-line scss/at-function-named-arguments
     $postfix: if(sass($infix != ""): $infix + "-down"; else: "");
 
