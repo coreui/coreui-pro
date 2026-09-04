@@ -245,8 +245,8 @@ $table-variants: map.keys($theme-colors) !default;
   // Generate series of `.table-responsive-*` classes that act as query containers
   // and turn on horizontal scrolling below their breakpoint.
 
-  @each $breakpoint in map.keys($grid-breakpoints) {
-    $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
+  @each $breakpoint in map.keys($breakpoints) {
+    $infix: breakpoint-infix($breakpoint, $breakpoints);
 
     .table-responsive#{$infix} {
       @include set-container();
@@ -265,8 +265,8 @@ $table-variants: map.keys($theme-colors) !default;
   // `.table-responsive*` ancestor to query, and `data-cell` on every `<td>` past
   // the first to label the value the way the hidden header would.
 
-  @each $breakpoint in map.keys($grid-breakpoints) {
-    $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
+  @each $breakpoint in map.keys($breakpoints) {
+    $infix: breakpoint-infix($breakpoint, $breakpoints);
 
     @include container-breakpoint-down($breakpoint) {
       .table-stacked#{$infix} {

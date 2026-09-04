@@ -25,15 +25,15 @@ interface BreakpointListener {
 }
 
 /**
- * Breakpoints for responsive placement (matches SCSS $grid-breakpoints —
+ * Breakpoints for responsive placement (matches SCSS $breakpoints —
  * CoreUI keeps the classic scale, not upstream's Tailwind-style one)
  */
 export const BREAKPOINTS: Record<string, number> = {
   sm: 576,
   md: 768,
-  lg: 992,
-  xl: 1200,
-  xxl: 1400
+  lg: 1024,
+  xl: 1280,
+  '2xl': 1536
 }
 
 /**
@@ -101,8 +101,8 @@ export const getResponsivePlacement = (responsivePlacements: ResponsivePlacement
   // Find the largest breakpoint that matches
   let activePlacement = responsivePlacements.xs || defaultPlacement
 
-  // Check breakpoints in order (sm, md, lg, xl, xxl)
-  const breakpointOrder = ['sm', 'md', 'lg', 'xl', 'xxl']
+  // Check breakpoints in order (sm, md, lg, xl, 2xl)
+  const breakpointOrder = ['sm', 'md', 'lg', 'xl', '2xl']
 
   for (const breakpoint of breakpointOrder) {
     const minWidth = BREAKPOINTS[breakpoint]

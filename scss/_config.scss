@@ -97,19 +97,19 @@ $link-hover-decoration:                   null !default;
 // Define the minimum dimensions at which your layout will change,
 // adapting to different screen sizes, for use in media queries.
 
-// scss-docs-start grid-breakpoints
-$grid-breakpoints: (
+// scss-docs-start breakpoints
+$breakpoints: (
   xs: 0,
   sm: 576px,
   md: 768px,
-  lg: 992px,
-  xl: 1200px,
-  xxl: 1400px
+  lg: 1024px,
+  xl: 1280px,
+  2xl: 1536px
 ) !default;
-// scss-docs-end grid-breakpoints
+// scss-docs-end breakpoints
 
-@include assert-ascending($grid-breakpoints, "$grid-breakpoints");
-@include assert-starts-at-zero($grid-breakpoints, "$grid-breakpoints");
+@include assert-ascending($breakpoints, "$breakpoints");
+@include assert-starts-at-zero($breakpoints, "$breakpoints");
 
 // Define the maximum width of `.container` for different screen sizes.
 
@@ -121,8 +121,8 @@ $container-max-widths: defaults(
     sm: 540px,
     md: 720px,
     lg: 960px,
-    xl: 1140px,
-    xxl: 1320px
+    xl: 1200px,
+    2xl: 1440px
   ),
   $container-max-widths
 );

@@ -10,7 +10,7 @@
 @include generate-utility-at-properties($utilities);
 
 @layer utilities {
-  @include generate-utilities-loop($utilities, $grid-breakpoints);
+  @include generate-utilities-loop($utilities, $breakpoints);
 
   // `transform` is not direction-aware, so the one utility that centres an
   // element on a logical inset has to be flipped by hand: in an RTL document

@@ -13,9 +13,9 @@ describe('FloatingUI Util', () => {
       expect(BREAKPOINTS).toEqual(jasmine.any(Object))
       expect(BREAKPOINTS.sm).toBe(576)
       expect(BREAKPOINTS.md).toBe(768)
-      expect(BREAKPOINTS.lg).toBe(992)
-      expect(BREAKPOINTS.xl).toBe(1200)
-      expect(BREAKPOINTS.xxl).toBe(1400)
+      expect(BREAKPOINTS.lg).toBe(1024)
+      expect(BREAKPOINTS.xl).toBe(1280)
+      expect(BREAKPOINTS['2xl']).toBe(1536)
     })
   })
 
@@ -93,14 +93,14 @@ describe('FloatingUI Util', () => {
     })
 
     it('should parse all breakpoints', () => {
-      const result = parseResponsivePlacement('bottom sm:top md:left lg:right xl:bottom-start xxl:top-end')
+      const result = parseResponsivePlacement('bottom sm:top md:left lg:right xl:bottom-start 2xl:top-end')
       expect(result).toEqual({
         xs: 'bottom',
         sm: 'top',
         md: 'left',
         lg: 'right',
         xl: 'bottom-start',
-        xxl: 'top-end'
+        '2xl': 'top-end'
       })
     })
 
@@ -183,17 +183,17 @@ describe('FloatingUI Util', () => {
       expect(getResponsivePlacement(placements)).toBe('left')
     })
 
-    it('should return appropriate placement for xxl viewport', () => {
+    it('should return appropriate placement for 2xl viewport', () => {
       spyOnProperty(window, 'innerWidth').and.returnValue(1600)
 
-      const placements = { xs: 'bottom', xl: 'top', xxl: 'right-start' }
+      const placements = { xs: 'bottom', xl: 'top', '2xl': 'right-start' }
       expect(getResponsivePlacement(placements)).toBe('right-start')
     })
 
     it('should cascade to smaller breakpoints when larger ones are not defined', () => {
       spyOnProperty(window, 'innerWidth').and.returnValue(1600)
 
-      // Only xs and md defined, viewport is xxl
+      // Only xs and md defined, viewport is 2xl
       const placements = { xs: 'bottom', md: 'top' }
       expect(getResponsivePlacement(placements)).toBe('top')
     })
