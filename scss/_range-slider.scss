@@ -243,6 +243,10 @@ $range-slider-vertical-tokens: defaults(
     inset-inline-start: calc(var(--#{$prefix}range-slider-thumb-width) * .5 + var(--cui-range-slider-tooltip-position, 0) * (100% - var(--#{$prefix}range-slider-thumb-width)));
     pointer-events: none;
     @include ltr-rtl("transform", translateX(-50%), null, translateX(50%));
+
+    .tooltip-inner {
+      display: block;
+    }
   }
 
   .range-slider:not(.range-slider-vertical) {
