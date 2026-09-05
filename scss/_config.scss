@@ -74,6 +74,7 @@ $spacers: defaults(
   ),
   $spacers
 );
+// scss-docs-end spacers-map
 
 // scss-docs-start negative-spacers-map
 $negative-spacers: () !default;
@@ -108,7 +109,6 @@ $sizes: defaults(
   $sizes
 );
 // scss-docs-end sizes-map
-// scss-docs-end spacers-map
 
 // Define the minimum dimensions at which your layout will change,
 // adapting to different screen sizes, for use in media queries.
