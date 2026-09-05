@@ -2717,10 +2717,21 @@ editing four blocks. It is a map of maps now — one name, eight slots.
 
   ```diff
   - $success-bg-subtle: #e8f5ec;
-  + $theme-colors: map.merge($theme-colors, (
-  +   "success": map.merge(map.get($theme-colors, "success"), ("bg-subtle": #e8f5ec))
-  + ));
+  + @use "@coreui/coreui/scss/coreui" with (
+  +   $theme-colors: (
+  +     "success": (
+  +       "base": $success,
+  +       "bg-subtle": #e8f5ec,
+  +       // …the remaining slots of the built-in entry
+  +     ),
+  +   )
+  + );
   ```
+
+  The map merges one level deep, so a built-in colour is replaced as a whole:
+  copy its sub-map from `scss/_theme.scss` and change the slot. `$theme-colors`
+  goes through `defaults()` like every other configuration map, so a new colour
+  is one entry passed through `with ()` and `null` removes one.
 
   Every `--cui-{color}-*` custom property keeps its name and its value, so
   a runtime override is unaffected.

@@ -237,23 +237,20 @@ A theme color is one entry in the `$theme-colors` map — a map of slots coverin
 <Callout color="info"><Fragment set:html={`<p> <strong>Heads up!</strong> Reach our Sass with <code>@use</code>. The <code>*.import.scss</code> files that let <code>@import</code> resolve our modules are gone, so the snippet below will not compile behind an <code>@import</code>. </p>`} /></Callout>
 
 ```scss
-@use "sass:map";
-@use "@coreui/coreui/scss/theme" as *;
-
-$theme-colors: map.merge($theme-colors, (
-  "custom-color": (
-    "base":          #712cf9,
-    "contrast":      #fff,
-    "fg":            light-dark(var(--cui-custom-color-600), var(--cui-custom-color-400)),
-    "fg-emphasis": light-dark(var(--cui-custom-color-800), var(--cui-custom-color-200)),
-    "bg-subtle":     light-dark(var(--cui-custom-color-100), var(--cui-custom-color-900)),
-    "bg-muted":      light-dark(var(--cui-custom-color-200), var(--cui-custom-color-800)),
-    "border-subtle": light-dark(var(--cui-custom-color-300), var(--cui-custom-color-600)),
-    "focus-ring":    color-mix(in srgb, var(--cui-custom-color) calc(var(--cui-focus-ring-opacity) * 100%), transparent),
-  ),
-));
-
-@use "@coreui/coreui/scss/coreui";
+@use "@coreui/coreui/scss/coreui" with (
+  $theme-colors: (
+    "custom-color": (
+      "base":        #712cf9,
+      "contrast":    #fff,
+      "fg":          light-dark(var(--cui-custom-color-600), var(--cui-custom-color-400)),
+      "fg-emphasis": light-dark(var(--cui-custom-color-800), var(--cui-custom-color-200)),
+      "bg-subtle":   light-dark(var(--cui-custom-color-100), var(--cui-custom-color-900)),
+      "bg-muted":    light-dark(var(--cui-custom-color-200), var(--cui-custom-color-800)),
+      "border":      light-dark(var(--cui-custom-color-300), var(--cui-custom-color-600)),
+      "focus-ring":  color-mix(in srgb, var(--cui-custom-color-base) calc(var(--cui-focus-ring-opacity) * 100%), transparent),
+    ),
+  )
+);
 ```
 
 The slots are `light-dark()` pairs of the runtime scale, so both color modes are covered by the one entry — there is no second, dark set of maps to fill in.
