@@ -101,6 +101,8 @@ A [`.bg-*` utility](/utilities/background/) still paints a bar, but it sets the 
 
 ## Gradients
 
+<AddedIn version="6.0.0" />
+
 Set `--cui-progress-bar-bg-image` to paint the bar with a gradient instead of a flat colour. The image is sized to the bar, so the whole gradient is visible at any width and the label keeps the colour set by the theme. Set it on the `.progress` to share one gradient between every bar inside, or on a single `.progress-bar`.
 
 <Example code={`<div class="progress mb-3" style="--cui-progress-bar-bg-image: linear-gradient(to right, #e6412c, #ffb400, #ffe25a)">
@@ -143,6 +145,8 @@ Include multiple progress bars in a progress component if you need.
   </div>`} />
 
 ## Segmented
+
+<AddedIn version="6.0.0" />
 
 Add `.progress-segmented` to a `.progress` or `.progress-stacked` to cut the track into a row of rounded segments. It is a CSS mask over the whole component, so the bar underneath keeps its transition, theme, gradient and stripes; only the rendering changes. Segments are `--cui-progress-segment-min-width` wide (.25rem) and `--cui-progress-segment-gap` apart, as many as fit; set `--cui-progress-segments` instead and the track holds exactly that many, scaled to its width, with the gap staying put.
 
@@ -275,6 +279,8 @@ Or stack a header above the bar, with the value pushed to the end by `.ms-auto`:
   </div>`} />
 
 ## Usage
+
+<AddedIn version="6.0.0" />
 
 The plugin only runs on `.progress-segmented`; a plain `.progress` is CSS only and never gets an instance.
 
