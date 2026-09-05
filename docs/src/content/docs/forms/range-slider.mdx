@@ -24,8 +24,8 @@ The **Bootstrap 6 Range Slider** component allows users to select a value or ran
 ## Features
 
 - **Multiple Handles:** Select single or multiple values within the range.
-- **Custom Labels:** Display labels at specific points on the slider.
-- **Tooltips:** Show dynamic tooltips displaying current values.
+- **Custom Labels:** Display labels and tick marks at specific points on the slider, or read them from a `<datalist>`.
+- **Tooltips:** Show the current value of each handle while it is hovered, dragged or focused, or all the time.
 - **Vertical Orientation:** Rotate the slider for vertical layouts.
 - **Clickable Labels:** Enable users to click on labels to set slider values.
 - **Disabled State:** Disable the slider to prevent user interaction.
@@ -105,6 +105,19 @@ Labels can be configured as an array of strings or objects. When using objects, 
 
 <Code code={rangeSliderCustomLabels} lang="js" />
 
+### Tick marks from a datalist
+
+Point the `list` option at the `id` of a `<datalist>` and every `<option>` becomes a tick at its value, with the option's `label` shown beneath it. Ticks with a label are drawn taller than bare ones. Datalist ticks and `labels` can be combined; both are laid out on one grid, so unevenly spaced values stay aligned.
+
+<Example pro code={`<div data-coreui-toggle="range-slider" data-coreui-value="25,75" data-coreui-list="rangeSliderStops"></div>
+  <datalist id="rangeSliderStops">
+    <option value="0" label="Cold"></option>
+    <option value="25"></option>
+    <option value="50" label="Mild"></option>
+    <option value="75"></option>
+    <option value="100" label="Hot"></option>
+  </datalist>`} />
+
 ### Clickable labels
 
 By default, users can click on labels to set the slider to specific values. You can disable this feature by setting `clickableLabels` to `false`.
@@ -113,11 +126,12 @@ By default, users can click on labels to set the slider to specific values. You 
 
 ## Tooltips
 
-The value tooltip is the [Tooltip](/components/tooltips/) component's markup: the plugin renders `<output class="range-slider-tooltip tooltip bs-tooltip-top">` with `.tooltip-arrow` and `.tooltip-inner`, so it takes the tooltip's look and its `--cui-tooltip-*` tokens. It does not inherit the slider's theme class; give it its own through `customClass`, as on the Tooltip plugin.
+The value tooltip is the [Tooltip](/components/tooltips/) component's markup: the plugin renders `<output class="range-slider-tooltip tooltip bs-tooltip-top">` with `.tooltip-arrow` and `.tooltip-inner`, so it takes the tooltip's look and its `--cui-tooltip-*` tokens. It does not inherit the slider's theme class; give it its own through `tooltipClass`.
 
-By default, tooltips display the current value of each handle. You can disable tooltips by setting `tooltips` to `false`
+By default, tooltips show the current value of a handle while the pointer is over it, while it is held, and while it has a visible focus. Set `tooltips` to `"always"` to keep them visible at all times, or to `false` to turn them off.
 
-<Example pro code={`<div data-coreui-toggle="range-slider" data-coreui-value="40,60" data-coreui-tooltips="false"></div>`} />
+<Example pro class="d-flex flex-column gap-4 pt-4" code={`<div data-coreui-toggle="range-slider" data-coreui-value="40,60" data-coreui-tooltips="always"></div>
+  <div data-coreui-toggle="range-slider" data-coreui-value="40,60" data-coreui-tooltips="false"></div>`} />
 
 ### Tooltips formatting
 
@@ -145,10 +159,10 @@ Color the filled track and the handles by adding a [`.theme-{color}` class](/cus
 
 <Example pro class="d-flex flex-column gap-3" code={getData('theme-colors').map((c) => `<div class="theme-${c.name}" data-coreui-toggle="range-slider" data-coreui-value="25, 75" data-coreui-aria-labels='["${c.title} minimum", "${c.title} maximum"]'></div>`)} />
 
-The theme class on the slider colours the track and the handles; the tooltip keeps its default look. To theme the tooltip, set `customClass` (`data-coreui-custom-class`), the same option the [Tooltip](/components/tooltips/#custom-tooltips) plugin has — the class lands on the tooltip only. `theme-secondary` gives a grey tooltip on the default slider; `theme-danger` makes the tooltip match a danger slider.
+The theme class on the slider colours the track and the handles; the tooltip keeps its default look. To theme the tooltip, set `tooltipClass` (`data-coreui-tooltip-class`) — the class lands on the tooltip only. `theme-secondary` gives a grey tooltip on the default slider; `theme-danger` makes the tooltip match a danger slider.
 
-<Example pro class="d-flex flex-column gap-3" code={`<div data-coreui-toggle="range-slider" data-coreui-value="40" data-coreui-custom-class="theme-secondary" data-coreui-aria-labels='["Secondary tooltip"]'></div>
-  <div class="theme-danger" data-coreui-toggle="range-slider" data-coreui-value="60" data-coreui-custom-class="theme-danger" data-coreui-aria-labels='["Danger slider, danger tooltip"]'></div>`} />
+<Example pro class="d-flex flex-column gap-3" code={`<div data-coreui-toggle="range-slider" data-coreui-value="40" data-coreui-tooltip-class="theme-secondary" data-coreui-aria-labels='["Secondary tooltip"]'></div>
+  <div class="theme-danger" data-coreui-toggle="range-slider" data-coreui-value="60" data-coreui-tooltip-class="theme-danger" data-coreui-aria-labels='["Danger slider, danger tooltip"]'></div>`} />
 
 ## Usage
 
@@ -186,7 +200,7 @@ const rangeSlider = new RangeSlider(rangeSliderElement, {
 
 ### Options
 
-Options can be passed using data attributes or JavaScript. To do this, append an option name to `data-coreui-`, such as `data-coreui-animation="{value}"`. Remember to convert the case of the option name from "_camelCase_" to "_kebab-case_" when using data attributes. For instance, you should write `data-coreui-custom-class="beautifier"` rather than `data-coreui-customClass="beautifier"`.
+Options can be passed using data attributes or JavaScript. To do this, append an option name to `data-coreui-`, such as `data-coreui-tooltips="always"`. Remember to convert the case of the option name from "_camelCase_" to "_kebab-case_" when using data attributes. For instance, you should write `data-coreui-tooltip-class="beautifier"` rather than `data-coreui-tooltipClass="beautifier"`.
 
 Starting with CoreUI 4.2.6, all components support an **experimental** reserved data attribute named `data-coreui-config`, which can contain simple component configurations as a JSON string. If an element has attributes `data-coreui-config='{"delay":50, "title":689}'` and `data-coreui-title="Custom Title"`, then the final value for `title` will be `Custom Title`, as the standard data attributes will take precedence over values specified in `data-coreui-config`. Moreover, existing data attributes can also hold JSON values like `data-coreui-delay='{"show":50, "hide":250}'`.
 
@@ -199,17 +213,18 @@ Please note that for security reasons, the `sanitize`, `sanitizeFn`, and `allowL
 | `allowList` | object | [Default value](/getting-started/javascript#sanitizer) |  Defines the set of permitted HTML tags and attributes that can safely appear in the tooltip content when HTML content is passedd. This helps maintain control over the output and prevent injection of malicious code. |
 | `ariaLabels` | array, null | `null` | Accessible name of each handle, in order. Handles are otherwise indistinguishable to a screen reader, so a slider with more than one wants this. A shorter array leaves the remaining handles unnamed. |
 | `clickableLabels` | boolean | `true` | Enables or disables the ability to click on labels to set slider values. |
-| `customClass` | string | `''` | Adds one or more classes to the tooltip, as the Tooltip plugin's option does — a `theme-{color}` class themes the tooltip without touching the slider. |
 | `disabled` | boolean | `false` | Disables the slider, making it non-interactive and grayed out. |
 | `distance` | number | `0` | Sets the minimum distance between multiple slider handles. |
 | `labels` | array, boolean, string | `false` | Adds labels to the slider. Can be an array of label objects, a comma-separated string, or false.|
+| `list` | string, null | `null` | `id` of a `<datalist>` whose options become tick marks, with their `label` shown beneath. Combines with `labels`. |
 | `max` | number | `100` | Defines the maximum value of the slider. |
 | `min` | number | `0` | Defines the minimum value of the slider. |
 | `name` | array, string, null | `null` | Sets the name attribute for each slider input. |
 | `sanitize` | boolean | `true` | Controls whether HTML content in the tooltip should be sanitized before rendering. Strongly recommended to leave enabled unless you’re fully managing the content and trust its source. |
 | `sanitizeFn` | null, function | `null` | You can define your own custom sanitization logic by passing a function here. Ideal if you want to use a specialized HTML sanitizer or integrate with existing security tool. |
 | `step` | number, string | `1` | Specifies the increment step for slider values. |
-| `tooltips` | boolean | `true` | Enables or disables tooltips that display current slider values. |
+| `tooltipClass` | string | `''` | Adds one or more classes to the tooltip — a `theme-{color}` class themes the tooltip without touching the slider. |
+| `tooltips` | boolean, `'always'` | `true` | Shows the current value of each handle: `true` on hover, drag and focus, `'always'` at all times, `false` never. |
 | `tooltipsFormat` | function, null | `null` | Provides a custom formatting function for tooltip values. |
 | `track` | boolean, 'fill' | `'fill'` | Controls the visual representation of the slider's track. When set to `'fill'`, the track is dynamically filled based on the slider's value(s). Setting it to `false` disables the filled track. |
 | `value` | array, number | `0` | Sets the initial value(s) of the slider. |
@@ -256,7 +271,11 @@ Additionally, ensure that labels and tooltips are clear and descriptive to provi
 
 ### CSS variables
 
-Bootstap Range Sliders use local CSS variables on `.range-slider` for enhanced real-time customization.
+The track and the handles read the same tokens as the [range](/forms/range/#css-variables), declared on `.range-slider`, so one setting styles both controls; `--cui-range-track-fill-bg` colours the band between the handles and `--cui-range-tick-*` the tick marks under the labels.
+
+<ScssDocs file="scss/forms/_form-range.scss" capture="form-range-tokens" />
+
+The slider adds its own tokens for the labels and the tooltip offsets.
 
 <ScssDocs file="scss/_range-slider.scss" capture="range-slider-css-vars" />
 

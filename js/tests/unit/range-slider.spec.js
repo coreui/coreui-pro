@@ -389,21 +389,26 @@ describe('RangeSlider', () => {
       expect(input.getAttribute('aria-orientation')).toBe('horizontal')
     })
 
-    it('should position labels with bottom for vertical mode', () => {
+    it('should lay labels out on grid rows from max at the top to min at the bottom in vertical mode', () => {
       fixtureEl.innerHTML = '<div id="slider"></div>'
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, {
         vertical: true,
         value: [25],
-        labels: ['Start', 'End']
+        labels: ['Start', 'Middle', 'End']
       })
 
+      const container = element.querySelector('.range-slider-labels-container')
+      expect(container.style.gridTemplateRows).toBe('0fr 0.5fr 0.5fr 0fr')
+      expect(container.style.gridTemplateColumns).toBe('')
+
       const labels = element.querySelectorAll('.range-slider-label')
-      expect(labels[0].style.bottom).toBe('0%')
-      expect(labels[1].style.bottom).toBe('100%')
+      expect(labels[0].style.gridRowStart).toBe('4')
+      expect(labels[1].style.gridRowStart).toBe('3')
+      expect(labels[2].style.gridRowStart).toBe('2')
     })
 
-    it('should position labels with left for horizontal mode', () => {
+    it('should lay labels out on grid columns in horizontal mode', () => {
       fixtureEl.innerHTML = '<div id="slider"></div>'
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, {
@@ -412,9 +417,12 @@ describe('RangeSlider', () => {
         labels: ['Start', 'End']
       })
 
+      const container = element.querySelector('.range-slider-labels-container')
+      expect(container.style.gridTemplateColumns).toBe('0fr 1fr 0fr')
+
       const labels = element.querySelectorAll('.range-slider-label')
-      expect(labels[0].style.left).toBe('0%')
-      expect(labels[1].style.left).toBe('100%')
+      expect(labels[0].style.gridColumnStart).toBe('2')
+      expect(labels[1].style.gridColumnStart).toBe('3')
     })
   })
 
@@ -434,7 +442,7 @@ describe('RangeSlider', () => {
       expect(labels[2].textContent).toBe('High')
     })
 
-    it('should position labels correctly', () => {
+    it('should place each label on a grid line built from the gaps between values', () => {
       fixtureEl.innerHTML = '<div id="slider"></div>'
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, {
@@ -442,10 +450,58 @@ describe('RangeSlider', () => {
         labels: ['Start', 'Middle', 'End']
       })
 
+      expect(element.querySelector('.range-slider-labels-container').style.gridTemplateColumns).toBe('0fr 0.5fr 0.5fr 0fr')
+
       const labels = element.querySelectorAll('.range-slider-label')
-      expect(labels[0].style.left).toBe('0%')
-      expect(labels[1].style.left).toBe('50%')
-      expect(labels[2].style.left).toBe('100%')
+      expect(labels[0].style.gridColumnStart).toBe('2')
+      expect(labels[1].style.gridColumnStart).toBe('3')
+      expect(labels[2].style.gridColumnStart).toBe('4')
+      expect(labels[0].style.left).toBe('')
+    })
+
+    it('should sort labels by value so uneven values still land on grid lines', () => {
+      fixtureEl.innerHTML = '<div id="slider"></div>'
+      const element = fixtureEl.querySelector('#slider')
+      const rangeSlider = new RangeSlider(element, {
+        value: [50],
+        labels: [
+          { label: 'High', value: 100 },
+          { label: 'Low', value: 0 },
+          { label: 'Ten', value: 10 }
+        ]
+      })
+
+      expect(element.querySelector('.range-slider-labels-container').style.gridTemplateColumns).toBe('0fr 0.1fr 0.9fr 0fr')
+      expect([...element.querySelectorAll('.range-slider-label')].map(label => label.textContent)).toEqual(['Low', 'Ten', 'High'])
+    })
+
+    it('should render ticks from a linked datalist through the list option', () => {
+      fixtureEl.innerHTML = `
+        <div id="slider"></div>
+        <datalist id="stops">
+          <option value="0" label="Cold"></option>
+          <option value="50"></option>
+          <option value="100" label="Hot"></option>
+        </datalist>
+      `
+      const element = fixtureEl.querySelector('#slider')
+      const rangeSlider = new RangeSlider(element, { value: [50], list: 'stops' })
+
+      const labels = [...element.querySelectorAll('.range-slider-label')]
+      expect(labels.map(label => label.textContent)).toEqual(['Cold', '', 'Hot'])
+      expect(labels.map(label => label.dataset.coreuiValue)).toEqual(['0', '50', '100'])
+      expect(element.querySelector('.range-slider-labels-container').style.gridTemplateColumns).toBe('0fr 0.5fr 0.5fr 0fr')
+    })
+
+    it('should merge datalist ticks with labels', () => {
+      fixtureEl.innerHTML = `
+        <div id="slider"></div>
+        <datalist id="stops"><option value="75"></option></datalist>
+      `
+      const element = fixtureEl.querySelector('#slider')
+      const rangeSlider = new RangeSlider(element, { value: [50], list: 'stops', labels: ['Low', 'High'] })
+
+      expect([...element.querySelectorAll('.range-slider-label')].map(label => label.dataset.coreuiValue)).toEqual(['0', '75', '100'])
     })
 
     it('should handle labels with specific values (object labels)', () => {
@@ -463,8 +519,7 @@ describe('RangeSlider', () => {
       expect(labels.length).toBe(2)
       expect(labels[0].textContent).toBe('Min')
       expect(labels[1].textContent).toBe('Max')
-      expect(labels[0].style.left).toBe('10%')
-      expect(labels[1].style.left).toBe('90%')
+      expect(element.querySelector('.range-slider-labels-container').style.gridTemplateColumns).toBe('0.1fr 0.8fr 0.1fr')
     })
 
     it('should handle labels with class property as string', () => {
@@ -525,6 +580,7 @@ describe('RangeSlider', () => {
 
       const labels = element.querySelectorAll('.range-slider-label')
       expect(labels[0].textContent).toBe('NoStyle')
+      expect(labels[0].getAttribute('style')).toBe('grid-column-start: 2;')
     })
 
     it('should add clickable class when clickableLabels is true and not disabled', () => {
@@ -632,6 +688,24 @@ describe('RangeSlider', () => {
       const tooltip = element.querySelector('.range-slider-tooltip')
       expect(tooltip).not.toBeNull()
       expect(tooltip.querySelector('.tooltip-inner').textContent).toBe('60')
+    })
+
+    it('should keep the tooltip hidden until interaction by default', () => {
+      fixtureEl.innerHTML = '<div id="slider"></div>'
+      const element = fixtureEl.querySelector('#slider')
+      const rangeSlider = new RangeSlider(element, { value: [50], tooltips: true })
+
+      expect(element.querySelector('.range-slider-tooltip')).not.toHaveClass('show')
+    })
+
+    it('should show the tooltip permanently with tooltips "always"', () => {
+      fixtureEl.innerHTML = '<div data-coreui-toggle="range-slider" data-coreui-tooltips="always" data-coreui-value="20,80"></div>'
+      const element = fixtureEl.querySelector('[data-coreui-toggle="range-slider"]')
+      const rangeSlider = new RangeSlider(element)
+
+      const tooltips = element.querySelectorAll('.range-slider-tooltip')
+      expect(tooltips).toHaveSize(2)
+      expect([...tooltips].every(tooltip => tooltip.classList.contains('show'))).toBeTrue()
     })
 
     it('should not display tooltips when disabled', () => {
@@ -763,7 +837,7 @@ describe('RangeSlider', () => {
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, { track: 'fill', value: 50 })
 
-      expect(edges(element.querySelector('.range-slider-track'))).toEqual(['0%', '50%'])
+      expect(edges(element.querySelector('.range-slider-track'))).toEqual(['', '0.5'])
     })
 
     it('should leave the band unset when track is false', () => {
@@ -774,14 +848,17 @@ describe('RangeSlider', () => {
       // Unset rather than zero-width: the stylesheet has no fallback for these,
       // so the whole `background-image` falls back to `none`.
       expect(edges(element.querySelector('.range-slider-track'))).toEqual(['', ''])
+      expect(element.querySelector('.range-slider-track').style.getPropertyValue('--cui-range-slider-track-from-edge')).toBe('')
     })
 
-    it('should start a single-thumb band at zero', () => {
+    it('should start a single-thumb band at the track edge, not at the thumb centre', () => {
       fixtureEl.innerHTML = '<div id="slider"></div>'
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, { track: 'fill', value: [50] })
 
-      expect(edges(element.querySelector('.range-slider-track'))).toEqual(['0%', '50%'])
+      const track = element.querySelector('.range-slider-track')
+      expect(track.style.getPropertyValue('--cui-range-slider-track-from-edge')).toBe('0')
+      expect(edges(track)).toEqual(['', '0.5'])
     })
 
     it('should span a multi-thumb band between the outermost handles', () => {
@@ -789,7 +866,7 @@ describe('RangeSlider', () => {
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, { track: 'fill', value: [25, 75] })
 
-      expect(edges(element.querySelector('.range-slider-track'))).toEqual(['25%', '75%'])
+      expect(edges(element.querySelector('.range-slider-track'))).toEqual(['0.25', '0.75'])
     })
 
     it('should write the same band whatever the orientation', () => {
@@ -798,7 +875,7 @@ describe('RangeSlider', () => {
       const rangeSlider = new RangeSlider(element, { track: 'fill', value: [50], vertical: true })
 
       // Direction is the stylesheet's business now.
-      expect(edges(element.querySelector('.range-slider-track'))).toEqual(['0%', '50%'])
+      expect(edges(element.querySelector('.range-slider-track'))).toEqual(['', '0.5'])
       expect(element.querySelector('.range-slider-track').style.backgroundImage).toBe('')
     })
   })
@@ -1570,7 +1647,7 @@ describe('RangeSlider', () => {
 
   describe('_getThumbSize', () => {
     it('should handle CSS custom property with unit', () => {
-      fixtureEl.innerHTML = '<div id="slider" style="--cui-range-slider-thumb-width: 16px;"></div>'
+      fixtureEl.innerHTML = '<div id="slider" style="--cui-range-thumb-width: 16px;"></div>'
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, { value: 50, tooltips: true })
 
@@ -1592,7 +1669,7 @@ describe('RangeSlider', () => {
 
   describe('_positionTooltip', () => {
     it('should write the ratio for horizontal mode', () => {
-      fixtureEl.innerHTML = '<div id="slider" style="--cui-range-slider-thumb-width: 16px;"></div>'
+      fixtureEl.innerHTML = '<div id="slider" style="--cui-range-thumb-width: 16px;"></div>'
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, {
         value: [75],
@@ -1605,7 +1682,7 @@ describe('RangeSlider', () => {
     })
 
     it('should write the same ratio for vertical mode', () => {
-      fixtureEl.innerHTML = '<div id="slider" style="--cui-range-slider-thumb-height: 16px;"></div>'
+      fixtureEl.innerHTML = '<div id="slider" style="--cui-range-thumb-height: 16px;"></div>'
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, {
         value: [75],
@@ -1645,7 +1722,7 @@ describe('RangeSlider', () => {
 
     it('should not fall back to a thumb size read from the stylesheet', () => {
       // The old parser only matched a bare number and unit.
-      fixtureEl.innerHTML = '<div id="slider" style="--cui-range-slider-thumb-width: calc(1rem + 2px);"></div>'
+      fixtureEl.innerHTML = '<div id="slider" style="--cui-range-thumb-width: calc(1rem + 2px);"></div>'
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, {
         value: [100],
@@ -1655,47 +1732,6 @@ describe('RangeSlider', () => {
       const tooltip = element.querySelector('.range-slider-tooltip')
       expect(tooltip.style.getPropertyValue('--cui-range-slider-tooltip-position')).toBe('1')
       expect(tooltip.style.marginInlineStart).toBe('')
-    })
-  })
-
-  describe('_updateLabelsContainerSize', () => {
-    it('should set height on labels container for horizontal mode', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        value: [50],
-        labels: ['A', 'B', 'C'],
-        vertical: false
-      })
-
-      const labelsContainer = element.querySelector('.range-slider-labels-container')
-      // In jsdom, offsetHeight is 0 so it will be "0px"
-      expect(labelsContainer.style.height).toBeDefined()
-    })
-
-    it('should set width on labels container for vertical mode', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        value: [50],
-        labels: ['A', 'B', 'C'],
-        vertical: true
-      })
-
-      const labelsContainer = element.querySelector('.range-slider-labels-container')
-      expect(labelsContainer.style.width).toBeDefined()
-    })
-
-    it('should do nothing when labels is false', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        value: [50],
-        labels: false
-      })
-
-      const labelsContainer = element.querySelector('.range-slider-labels-container')
-      expect(labelsContainer).toBeNull()
     })
   })
 
@@ -2061,16 +2097,13 @@ describe('RangeSlider', () => {
 
       const first = new RangeSlider(fixtureEl.querySelector('#first'), { value: [10, 40] })
       const second = new RangeSlider(fixtureEl.querySelector('#second'), { value: [10, 40] })
-      const resizeSpy = spyOn(second, '_updateLabelsContainerSize')
 
       first.dispose()
 
       second._isDragging = true
       document.documentElement.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }))
-      window.dispatchEvent(new Event('resize'))
 
       expect(second._isDragging).toBeFalse()
-      expect(resizeSpy).toHaveBeenCalledTimes(1)
 
       second.dispose()
     })
