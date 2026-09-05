@@ -25,9 +25,9 @@ A close button takes the color it inherits, so a colored surface needs nothing e
 <Example class="text-bg-inverse p-3" code={`<button type="button" class="btn-close" aria-label="Close"></button>
   <button type="button" class="btn-close" disabled aria-label="Close"></button>`} />
 
-`data-coreui-theme` on a section flips the tokens but paints nothing by itself, so give that section a surface — `.bg-body` and `.text-body` read the flipped tokens — and the close button follows the text like everything else in it.
+`data-coreui-theme` on a section flips the tokens but paints nothing by itself, so give that section a surface — `.bg-body` and `.fg-body` read the flipped tokens — and the close button follows the text like everything else in it.
 
-<Example code={`<div data-coreui-theme="dark" class="bg-body text-body p-3">
+<Example code={`<div data-coreui-theme="dark" class="bg-body fg-body p-3">
     <button type="button" class="btn-close" aria-label="Close"></button>
     <button type="button" class="btn-close" disabled aria-label="Close"></button>
   </div>`} />

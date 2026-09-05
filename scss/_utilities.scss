@@ -60,9 +60,6 @@ $font-sizes-legacy: (
 ) !default;
 // scss-docs-end font-sizes-legacy
 
-$line-height-lg:              2 !default;
-$line-height-sm:              1.25 !default;
-
 
 // Utilities
 
@@ -194,7 +191,13 @@ $utilities: map.merge(
     "shadow-opacity": (
       property: (--#{$prefix}shadow-opacity: null),
       class: shadow-opacity,
-      values: (25: .25, 50: .5, 75: .75, 100: 1)
+      values: map.merge(
+        $util-opacity,
+        (
+          25: .25, // deprecated
+          75: .75, // deprecated
+        )
+      )
     ),
     // scss-docs-end utils-shadow-opacity
     // scss-docs-start utils-focus-ring
@@ -300,8 +303,7 @@ $utilities: map.merge(
     "border-color": (
       property: (
         --#{$prefix}border: null,
-        --#{$prefix}border-opacity: 1,
-        border-color: color-mix(in oklch, var(--#{$prefix}border) calc(var(--#{$prefix}border-opacity) * 100%), transparent),
+        border-color: var(--#{$prefix}border),
       ),
       class: border,
       values: $utilities-border-colors
@@ -355,25 +357,33 @@ $utilities: map.merge(
     ),
     // scss-docs-end utils-border-width
     // scss-docs-start utils-border-color-subtle
-    "subtle-border-color": (
+    "border-color-subtle": (
       property: (
         --#{$prefix}border: null,
-        --#{$prefix}border-opacity: 1,
-        border-color: color-mix(in oklch, var(--#{$prefix}border) calc(var(--#{$prefix}border-opacity) * 100%), transparent),
+        border-color: var(--#{$prefix}border),
+      ),
+      class: border-subtle,
+      values: theme-color-refs("border")
+    ),
+    "border-opacity": (
+      class: border,
+      property: border-color,
+      values: theme-opacity-values(--#{$prefix}border)
+    ),
+    // deprecated
+    "border-color-subtle-legacy": (
+      property: (
+        --#{$prefix}border: null,
+        border-color: var(--#{$prefix}border),
       ),
       class: border,
       values: $utilities-border-subtle
     ),
-    "border-opacity": (
-      property: (--#{$prefix}border-opacity: null),
+    // deprecated
+    "border-opacity-legacy": (
       class: border-opacity,
-      values: (
-        10: .1,
-        25: .25,
-        50: .5,
-        75: .75,
-        100: 1
-      )
+      property: border-color,
+      values: theme-opacity-values(--#{$prefix}border, null, (10: .1, 25: .25, 50: .5, 75: .75, 100: 1))
     ),
     // scss-docs-end utils-border-color-subtle
     // scss-docs-end utils-borders
@@ -852,9 +862,10 @@ $utilities: map.merge(
       class: lh,
       values: (
         1: 1,
-        sm: $line-height-sm,
-        base: var(--#{$prefix}body-line-height),
-        lg: $line-height-lg,
+        sm: var(--#{$prefix}line-height-sm),
+        md: var(--#{$prefix}line-height-md),
+        lg: var(--#{$prefix}line-height-lg),
+        base: var(--#{$prefix}body-line-height), // deprecated
       )
     ),
     // scss-docs-end utils-line-height
@@ -905,67 +916,78 @@ $utilities: map.merge(
     // scss-docs-end utils-text-wrap
     // scss-docs-end utils-text
     // scss-docs-start utils-color
-    "color": (
+    "fg": (
       property: (
-        --#{$prefix}text: null,
-        --#{$prefix}text-opacity: 1,
-        color: color-mix(in oklch, var(--#{$prefix}text) calc(var(--#{$prefix}text-opacity) * 100%), transparent),
+        --#{$prefix}fg: null,
+        color: var(--#{$prefix}fg),
+      ),
+      class: fg,
+      values: map.merge(
+        map.merge(theme-color-refs("fg"), theme-token-refs($theme-fgs, "fg")),
+        (reset: inherit)
+      )
+    ),
+    "fg-emphasis": (
+      property: (
+        --#{$prefix}fg: null,
+        color: var(--#{$prefix}fg),
+      ),
+      class: fg-emphasis,
+      values: theme-color-refs("fg-emphasis")
+    ),
+    "fg-contrast": (
+      property: (
+        --#{$prefix}fg: null,
+        color: var(--#{$prefix}fg),
+      ),
+      class: fg-contrast,
+      values: theme-color-refs("contrast")
+    ),
+    "fg-opacity": (
+      class: fg,
+      property: color,
+      values: theme-opacity-values(--#{$prefix}fg)
+    ),
+    // deprecated
+    "text-color": (
+      property: (
+        --#{$prefix}fg: null,
+        color: var(--#{$prefix}fg),
       ),
       class: text,
       values: map.merge(
-        $utilities-text-colors,
+        map.merge($utilities-text-colors, $utilities-text-emphasis-colors),
         (
-          "muted": var(--#{$prefix}fg-2), // deprecated
-          "black-50": color-mix(in oklch, var(--#{$prefix}black) 50%, transparent), // deprecated
-          "white-50": color-mix(in oklch, var(--#{$prefix}white) 50%, transparent), // deprecated
-          "body-secondary": var(--#{$prefix}fg-2), // deprecated
-          "body-tertiary": var(--#{$prefix}fg-3), // deprecated
+          "muted": var(--#{$prefix}fg-2),
+          "black-50": color-mix(in oklch, var(--#{$prefix}black) 50%, transparent),
+          "white-50": color-mix(in oklch, var(--#{$prefix}white) 50%, transparent),
+          "body-secondary": var(--#{$prefix}fg-2),
+          "body-tertiary": var(--#{$prefix}fg-3),
           "body-emphasis": var(--#{$prefix}emphasis-color),
           "reset": inherit
         )
       )
     ),
-    "fg-color": (
-      property: (
-        --#{$prefix}text: null,
-        --#{$prefix}text-opacity: 1,
-        color: color-mix(in oklch, var(--#{$prefix}text) calc(var(--#{$prefix}text-opacity) * 100%), transparent),
-      ),
-      class: fg,
-      values: theme-token-refs($theme-fgs, "fg")
-    ),
+    // deprecated
     "text-opacity": (
-      property: (--#{$prefix}text-opacity: null),
       class: text-opacity,
-      values: (
-        25: .25,
-        50: .5,
-        75: .75,
-        100: 1
-      )
-    ),
-    "text-color": (
-      property: (
-        --#{$prefix}text: null,
-        --#{$prefix}text-opacity: 1,
-        color: color-mix(in oklch, var(--#{$prefix}text) calc(var(--#{$prefix}text-opacity) * 100%), transparent),
-      ),
-      class: text,
-      values: $utilities-text-emphasis-colors
+      property: color,
+      values: theme-opacity-values(--#{$prefix}fg, null, (25: .25, 50: .5, 75: .75, 100: 1))
     ),
     // scss-docs-end utils-color
     // scss-docs-start utils-links
-    "link-opacity": (
-      property: (--#{$prefix}link-opacity: null),
-      class: link-opacity,
+    "link": (
+      class: link,
+      property: color,
       state: hover,
-      values: (
-        10: .1,
-        25: .25,
-        50: .5,
-        75: .75,
-        100: 1
-      )
+      values: theme-opacity-values(--#{$prefix}link-color)
+    ),
+    // deprecated
+    "link-opacity": (
+      class: link-opacity,
+      property: color,
+      state: hover,
+      values: theme-opacity-values(--#{$prefix}link-color, null, (10: .1, 25: .25, 50: .5, 75: .75, 100: 1))
     ),
     "underline-offset": (
       property: text-underline-offset,
@@ -992,8 +1014,7 @@ $utilities: map.merge(
     "underline-color": (
       property: (
         --#{$prefix}underline: null,
-        --#{$prefix}underline-opacity: 1,
-        text-decoration-color: color-mix(in oklch, var(--#{$prefix}underline) calc(var(--#{$prefix}underline-opacity) * 100%), transparent),
+        text-decoration-color: var(--#{$prefix}underline),
       ),
       class: underline,
       values: map.merge(
@@ -1006,25 +1027,24 @@ $utilities: map.merge(
       )
     ),
     "underline-opacity": (
-      property: (--#{$prefix}underline-opacity: null),
-      class: underline-opacity,
+      class: underline,
+      property: text-decoration-color,
       state: hover,
-      values: (
-        0: 0,
-        10: .1,
-        25: .25,
-        50: .5,
-        75: .75,
-        100: 1
-      ),
+      values: theme-opacity-values(--#{$prefix}underline, currentcolor)
+    ),
+    // deprecated
+    "underline-opacity-legacy": (
+      class: underline-opacity,
+      property: text-decoration-color,
+      state: hover,
+      values: theme-opacity-values(--#{$prefix}underline, currentcolor, (0: 0, 10: .1, 25: .25, 50: .5, 75: .75, 100: 1))
     ),
     // scss-docs-end utils-links
     // scss-docs-start utils-bg-color
-    "background-color": (
+    "bg-color": (
       property: (
         --#{$prefix}bg: null,
-        --#{$prefix}bg-opacity: 1,
-        background-color: color-mix(in oklch, var(--#{$prefix}bg) calc(var(--#{$prefix}bg-opacity) * 100%), transparent),
+        background-color: var(--#{$prefix}bg),
       ),
       class: bg,
       values: map.merge(
@@ -1035,35 +1055,50 @@ $utilities: map.merge(
         )
       )
     ),
-    "bg-opacity": (
-      property: (--#{$prefix}bg-opacity: null),
-      class: bg-opacity,
-      values: (
-        10: .1,
-        15: .15,
-        25: .25,
-        50: .5,
-        75: .75,
-        100: 1
-      )
-    ),
-    "subtle-background-color": (
+    "bg-color-subtle": (
       property: (
         --#{$prefix}bg: null,
-        --#{$prefix}bg-opacity: 1,
-        background-color: color-mix(in oklch, var(--#{$prefix}bg) calc(var(--#{$prefix}bg-opacity) * 100%), transparent),
+        background-color: var(--#{$prefix}bg),
+      ),
+      class: bg-subtle,
+      values: theme-color-refs("bg-subtle")
+    ),
+    "bg-color-muted": (
+      property: (
+        --#{$prefix}bg: null,
+        background-color: var(--#{$prefix}bg),
+      ),
+      class: bg-muted,
+      values: theme-color-refs("bg-muted")
+    ),
+    "bg-opacity": (
+      class: bg,
+      property: background-color,
+      values: theme-opacity-values(--#{$prefix}bg)
+    ),
+    // deprecated
+    "bg-color-subtle-legacy": (
+      property: (
+        --#{$prefix}bg: null,
+        background-color: var(--#{$prefix}bg),
       ),
       class: bg,
       values: $utilities-bg-subtle
     ),
-    "muted-background-color": (
+    // deprecated
+    "bg-color-muted-legacy": (
       property: (
         --#{$prefix}bg: null,
-        --#{$prefix}bg-opacity: 1,
-        background-color: color-mix(in oklch, var(--#{$prefix}bg) calc(var(--#{$prefix}bg-opacity) * 100%), transparent),
+        background-color: var(--#{$prefix}bg),
       ),
       class: bg,
       values: $utilities-bg-muted
+    ),
+    // deprecated
+    "bg-opacity-legacy": (
+      class: bg-opacity,
+      property: background-color,
+      values: theme-opacity-values(--#{$prefix}bg, null, (10: .1, 15: .15, 25: .25, 50: .5, 75: .75, 100: 1))
     ),
     // scss-docs-end utils-bg-color
     // scss-docs-start utils-theme

@@ -38,7 +38,7 @@ $icon-link-tokens: defaults(
     display: inline-flex;
     gap: var(--#{$prefix}icon-link-gap);
     align-items: center;
-    text-decoration-color: color-mix(in oklch, var(--#{$prefix}link-color) calc(var(--#{$prefix}link-opacity, .5) * 100%), transparent);
+    text-decoration-color: color-mix(in oklch, var(--#{$prefix}link-color) 50%, transparent);
     text-underline-offset: var(--#{$prefix}icon-link-underline-offset);
     backface-visibility: hidden;
 

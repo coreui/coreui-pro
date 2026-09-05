@@ -235,6 +235,48 @@ $theme-token-refs: (
   @return $result;
 }
 
+// scss-docs-start util-opacity-map
+$util-opacity: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$util-opacity: defaults(
+  (
+    10: .1,
+    20: .2,
+    30: .3,
+    40: .4,
+    50: .5,
+    60: .6,
+    70: .7,
+    80: .8,
+    90: .9,
+    100: 1
+  ),
+  $util-opacity
+);
+// scss-docs-end util-opacity-map
+
+// Generate opacity values using color-mix()
+// $fallback lets the referenced $color-var fall back to another color (e.g. currentcolor)
+// when it hasn't been set by a companion color utility.
+@function theme-opacity-values($color-var, $fallback: null, $opacities: $util-opacity) {
+  $result: ();
+  // stylelint-disable-next-line scss/at-function-named-arguments, @stylistic/function-whitespace-after
+  $color: if(sass($fallback): var($color-var, $fallback); else: var($color-var));
+
+  @each $key, $value in $opacities {
+    @if $key == 100 {
+      // For 100%, use direct variable reference (more efficient)
+      $result: map.merge($result, ($key: $color));
+    } @else {
+      // For other values, use color-mix()
+      $percentage: $key * 1%;
+      $result: map.merge($result, ($key: color-mix(in oklch, $color $percentage, transparent)));
+    }
+  }
+
+  @return $result;
+}
+
 // scss-docs-start theme-interaction-variables
 // Tuned to land near the shade-color() amounts compiled before the states moved into CSS.
 $theme-hover-lightness:   .85 !default;

@@ -4182,15 +4182,43 @@ Prefer the `.d-sidebar-narrow*` names in new markup.
   `color-scheme`, which is what the browser reads to paint form controls and
   scrollbars — it changes no colours of its own.
 - **`.link-underline-*` is `.underline-*`.** `.link-underline-danger` becomes
-  `.underline-danger`, and the opacity steps become `.underline-opacity-*`
-  (`.link-underline-opacity-50-hover` → `.underline-opacity-50-hover`). Like
+  `.underline-danger`, and the opacity steps become `.underline-{n}`
+  (`.link-underline-opacity-50-hover` → `.underline-50-hover`). Like
   `.underline-offset-*`, the class sets a `text-decoration-*` property on any
   element rather than only on a link, and it now sits beside
-  `.underline-thickness-*`, which already carried that name. **We keep the
-  `-opacity-` segment** where upstream folds opacity into the colour class as
-  `.underline-50` — every other opacity family here reads
-  `.bg-opacity-*` / `.text-opacity-*` / `.link-opacity-*`, and one family
-  spelling it differently is what this pass is removing.
+  `.underline-thickness-*`, which already carried that name.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The colour utilities take upstream's names, and opacity is a step of the
+  same family.** Text colour is `.fg-{color}` (`.fg-emphasis-{color}`,
+  `.fg-contrast-{color}`, `.fg-reset`, plus the `.fg-body` / `.fg-1` … `.fg-4`
+  ladder that already carried the name); the light surfaces are
+  `.bg-subtle-{color}` and `.bg-muted-{color}`, the light border
+  `.border-subtle-{color}`. Opacity is no longer a separate `-opacity-` family
+  with its own token: `.fg-{n}`, `.bg-{n}`, `.border-{n}`, `.link-{n}`
+  (`.link-{n}-hover`) and `.underline-{n}` (`.underline-{n}-hover`) run from
+  `10` to `100` in steps of ten and mix the colour the companion class wrote into
+  `--cui-fg` / `--cui-bg` / `--cui-border` / `--cui-link-color` /
+  `--cui-underline` with `transparent` through `color-mix()`. `.lh-md` is the
+  body line height (`.lh-sm` and `.lh-lg` read the type scale's stops) and
+  `.shadow-opacity-*` counts the same ten steps.
+
+  Every v5 spelling **still ships as a deprecated alias** and renders the same,
+  so existing markup is unaffected until v7: `.text-{color}`,
+  `.text-{color}-emphasis`, `.text-body`, `.text-black`, `.text-white`,
+  `.text-reset`, `.text-muted`, `.text-body-secondary`, `.text-body-tertiary`,
+  `.text-black-50`, `.text-white-50`, `.bg-{color}-subtle`, `.bg-{color}-muted`,
+  `.border-{color}-subtle`, `.text-opacity-*`, `.bg-opacity-*`,
+  `.border-opacity-*`, `.link-opacity-*(-hover)`, `.underline-opacity-*(-hover)`,
+  `.lh-base`, `.shadow-opacity-25` and `-75`. The deprecated opacity steps keep
+  their old values (`25`, `75`); the new scale rounds them to `30` and `70`.
+
+  What does change: the `--cui-text`, `--cui-text-opacity`, `--cui-bg-opacity`,
+  `--cui-border-opacity`, `--cui-underline-opacity` and `--cui-link-opacity`
+  tokens are gone (`--cui-text` is `--cui-fg`), so an inline
+  `style="--cui-bg-opacity: .5"` no longer fades a `.bg-*` — use `.bg-50`, or
+  set `--cui-bg` to a translucent colour. Reboot's `a` reads
+  `var(--cui-theme-fg, var(--cui-link-color))` directly instead of mixing the
+  link colour through `--cui-link-opacity` on every link.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **`.rounded-*` counts the stops of the radius scale.** The numbers are the
   keys of `$radii` (`--cui-radius-0` … `-9`) instead of the five v5 sizes, so
