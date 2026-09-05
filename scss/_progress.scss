@@ -19,7 +19,7 @@ $progress-bar-stripe-color:            color-mix(in oklch, var(--#{$prefix}white
 $progress-bar-transition:              width .6s ease !default;
 $progress-bar-animation:               progress-bar-stripes 1s linear infinite !default;
 
-$progress-segment-width:               .375rem !default;
+$progress-segments:                    40 !default;
 $progress-segment-gap:                 .375rem !default;
 $progress-segment-border-radius:       var(--#{$prefix}radius-2) !default;
 
@@ -55,7 +55,7 @@ $progress-segmented-tokens: () !default;
 // scss-docs-start progress-segmented-css-vars
 $progress-segmented-tokens: defaults(
   (
-    --#{$prefix}progress-segment-width: #{$progress-segment-width},
+    --#{$prefix}progress-segments: #{$progress-segments},
     --#{$prefix}progress-segment-gap: #{$progress-segment-gap},
     --#{$prefix}progress-segment-border-radius: #{$progress-segment-border-radius},
   ),
@@ -129,22 +129,28 @@ $progress-segmented-tokens: defaults(
   .progress-segmented {
     @include tokens($progress-segmented-tokens);
 
-    $width: var(--#{$prefix}progress-segment-width);
-    $radius: min(var(--#{$prefix}progress-segment-border-radius), calc(#{$width} * .5));
-    $tile: calc(#{$width} + var(--#{$prefix}progress-segment-gap));
+    $gap: var(--#{$prefix}progress-segment-gap);
+    $radius: var(--#{$prefix}progress-segment-border-radius);
+    $tile: calc((100% + #{$gap}) / var(--#{$prefix}progress-segments));
 
     --#{$prefix}progress-border-radius: 0;
     --#{$prefix}progress-box-shadow: none;
 
-    // A rounded rectangle per segment: two bars crossed plus a circle in each corner, tiled with
-    // `space` along the track so every segment is whole and the gaps absorb the remaining width.
-    mask-image: linear-gradient(to right, #000 #{$width}, transparent #{$width}), linear-gradient(to right, transparent #{$radius}, #000 #{$radius}, #000 calc(#{$width} - #{$radius}), transparent calc(#{$width} - #{$radius})), radial-gradient(circle #{$radius} at #{$radius} #{$radius}, #000 100%, transparent), radial-gradient(circle #{$radius} at calc(#{$width} - #{$radius}) #{$radius}, #000 100%, transparent), radial-gradient(circle #{$radius} at #{$radius} calc(100% - #{$radius}), #000 100%, transparent), radial-gradient(circle #{$radius} at calc(#{$width} - #{$radius}) calc(100% - #{$radius}), #000 100%, transparent);
-    mask-repeat: space no-repeat;
+    // One tile per segment, a rounded rectangle from two crossed bars plus a circle in each
+    // corner; the trailing gap of the last tile is what the element's edge clips away.
+    mask-image: linear-gradient(to right, #000 calc(100% - #{$gap}), transparent calc(100% - #{$gap})), linear-gradient(to right, transparent #{$radius}, #000 #{$radius}, #000 calc(100% - #{$gap} - #{$radius}), transparent calc(100% - #{$gap} - #{$radius})), radial-gradient(circle #{$radius} at #{$radius} #{$radius}, #000 100%, transparent), radial-gradient(circle #{$radius} at calc(100% - #{$gap} - #{$radius}) #{$radius}, #000 100%, transparent), radial-gradient(circle #{$radius} at #{$radius} calc(100% - #{$radius}), #000 100%, transparent), radial-gradient(circle #{$radius} at calc(100% - #{$gap} - #{$radius}) calc(100% - #{$radius}), #000 100%, transparent);
+    mask-repeat: repeat no-repeat;
     mask-position: 0 50%, 0 0, 0 0, 0 0, 0 0, 0 0;
     mask-size: #{$tile} calc(100% - #{$radius} * 2), #{$tile} 100%, #{$tile} 100%, #{$tile} 100%, #{$tile} 100%, #{$tile} 100%;
 
     > .progress {
       --#{$prefix}progress-border-radius: 0;
+    }
+
+    // Whole segments: the Progress plugin (or the page) sets the count to fill, and the bar
+    // ends on that segment's far edge instead of wherever the value lands.
+    > .progress-bar {
+      width: calc(var(--#{$prefix}progress-segments-filled) * #{$tile} - #{$gap});
     }
   }
 

@@ -1,0 +1,213 @@
+import Progress from '../../src/progress.js'
+import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
+
+describe('Progress', () => {
+  let fixtureEl
+
+  beforeAll(() => {
+    fixtureEl = getFixture()
+  })
+
+  afterEach(() => {
+    clearFixture()
+  })
+
+  // The segment count is a token from the stylesheet, which the unit specs do not load
+  const getProgressHtml = (barAttributes = 'aria-valuenow="45" aria-valuemin="0" aria-valuemax="100"', wrapperStyle = '--cui-progress-segments: 40') => {
+    return `
+      <div class="progress progress-segmented" style="${wrapperStyle}">
+        <div class="progress-bar" role="progressbar" ${barAttributes}></div>
+      </div>
+    `
+  }
+
+  const filled = element => element.querySelector('.progress-bar').style.getPropertyValue('--cui-progress-segments-filled')
+
+  describe('VERSION', () => {
+    it('should return plugin version', () => {
+      expect(Progress.VERSION).toEqual(jasmine.any(String))
+    })
+  })
+
+  describe('DATA_KEY', () => {
+    it('should return plugin data key', () => {
+      expect(Progress.DATA_KEY).toEqual('coreui.progress')
+    })
+  })
+
+  describe('constructor', () => {
+    it('should take care of element either passed as a CSS selector or DOM element', () => {
+      fixtureEl.innerHTML = getProgressHtml()
+
+      const progressEl = fixtureEl.querySelector('.progress')
+      const progressBySelector = new Progress('.progress')
+      expect(progressBySelector._element).toEqual(progressEl)
+
+      progressBySelector.dispose()
+
+      const progressByElement = new Progress(progressEl)
+      expect(progressByElement._element).toEqual(progressEl)
+    })
+
+    it('should write the whole segments the value covers, rounded down', () => {
+      fixtureEl.innerHTML = getProgressHtml('aria-valuenow="46" aria-valuemin="0" aria-valuemax="100"')
+
+      const progressEl = fixtureEl.querySelector('.progress')
+      // eslint-disable-next-line no-new
+      new Progress(progressEl)
+
+      expect(filled(progressEl)).toEqual('18')
+    })
+
+    it('should read the segment count from the CSS variable', () => {
+      fixtureEl.innerHTML = getProgressHtml('aria-valuenow="99" aria-valuemin="0" aria-valuemax="100"', '--cui-progress-segments: 10')
+
+      const progressEl = fixtureEl.querySelector('.progress')
+      // eslint-disable-next-line no-new
+      new Progress(progressEl)
+
+      expect(filled(progressEl)).toEqual('9')
+    })
+
+    it('should scale the value against aria-valuemin and aria-valuemax', () => {
+      fixtureEl.innerHTML = getProgressHtml('aria-valuenow="15" aria-valuemin="10" aria-valuemax="20"')
+
+      const progressEl = fixtureEl.querySelector('.progress')
+      // eslint-disable-next-line no-new
+      new Progress(progressEl)
+
+      expect(filled(progressEl)).toEqual('20')
+    })
+
+    it('should default min and max to 0 and 100 and clamp the value', () => {
+      fixtureEl.innerHTML = getProgressHtml('aria-valuenow="130"')
+
+      const progressEl = fixtureEl.querySelector('.progress')
+      // eslint-disable-next-line no-new
+      new Progress(progressEl)
+
+      expect(filled(progressEl)).toEqual('40')
+    })
+
+    it('should leave a bar without aria-valuenow alone', () => {
+      fixtureEl.innerHTML = getProgressHtml('style="--cui-progress-segments-filled: 5"')
+
+      const progressEl = fixtureEl.querySelector('.progress')
+      // eslint-disable-next-line no-new
+      new Progress(progressEl)
+
+      expect(filled(progressEl)).toEqual('5')
+    })
+
+    it('should not throw without a bar', () => {
+      fixtureEl.innerHTML = '<div class="progress progress-segmented"></div>'
+
+      const progressEl = fixtureEl.querySelector('.progress')
+
+      expect(() => new Progress(progressEl)).not.toThrow()
+    })
+  })
+
+  describe('update', () => {
+    it('should follow aria-valuenow changes on its own', async () => {
+      fixtureEl.innerHTML = getProgressHtml()
+
+      const progressEl = fixtureEl.querySelector('.progress')
+      // eslint-disable-next-line no-new
+      new Progress(progressEl)
+
+      progressEl.querySelector('.progress-bar').setAttribute('aria-valuenow', '75')
+      await new Promise(resolve => {
+        setTimeout(resolve, 0)
+      })
+
+      expect(filled(progressEl)).toEqual('30')
+    })
+
+    it('should recompute on demand', () => {
+      fixtureEl.innerHTML = getProgressHtml()
+
+      const progressEl = fixtureEl.querySelector('.progress')
+      const progress = new Progress(progressEl)
+
+      progressEl.style.setProperty('--cui-progress-segments', '20')
+      progress.update()
+
+      expect(filled(progressEl)).toEqual('9')
+    })
+  })
+
+  describe('dispose', () => {
+    it('should stop observing and remove the variable', async () => {
+      fixtureEl.innerHTML = getProgressHtml()
+
+      const progressEl = fixtureEl.querySelector('.progress')
+      const progress = new Progress(progressEl)
+
+      progress.dispose()
+
+      expect(filled(progressEl)).toEqual('')
+      expect(Progress.getInstance(progressEl)).toBeNull()
+
+      progressEl.querySelector('.progress-bar').setAttribute('aria-valuenow', '75')
+      await new Promise(resolve => {
+        setTimeout(resolve, 0)
+      })
+
+      expect(filled(progressEl)).toEqual('')
+    })
+  })
+
+  describe('data-api', () => {
+    it('should initialize every segmented progress on DOMContentLoaded', () => {
+      fixtureEl.innerHTML = [
+        getProgressHtml(),
+        '<div class="progress" id="plain"><div class="progress-bar" style="width: 50%"></div></div>'
+      ].join('')
+
+      document.dispatchEvent(new Event('DOMContentLoaded'))
+
+      expect(Progress.getInstance(fixtureEl.querySelector('.progress-segmented'))).toBeInstanceOf(Progress)
+      expect(Progress.getInstance(fixtureEl.querySelector('#plain'))).toBeNull()
+    })
+  })
+
+  describe('jQueryInterface', () => {
+    it('should create a progress via jQueryInterface', () => {
+      fixtureEl.innerHTML = getProgressHtml()
+      const progressEl = fixtureEl.querySelector('.progress')
+
+      jQueryMock.fn.progress = Progress.jQueryInterface
+      jQueryMock.elements = [progressEl]
+      jQueryMock.fn.progress.call(jQueryMock)
+
+      expect(Progress.getInstance(progressEl)).not.toBeNull()
+    })
+
+    it('should call a public method by name', () => {
+      fixtureEl.innerHTML = getProgressHtml()
+      const progressEl = fixtureEl.querySelector('.progress')
+
+      jQueryMock.fn.progress = Progress.jQueryInterface
+      jQueryMock.elements = [progressEl]
+      jQueryMock.fn.progress.call(jQueryMock)
+
+      progressEl.style.setProperty('--cui-progress-segments', '20')
+      jQueryMock.fn.progress.call(jQueryMock, 'update')
+
+      expect(filled(progressEl)).toEqual('9')
+    })
+
+    it('should throw error on undefined method', () => {
+      fixtureEl.innerHTML = getProgressHtml()
+      const progressEl = fixtureEl.querySelector('.progress')
+
+      jQueryMock.fn.progress = Progress.jQueryInterface
+      jQueryMock.elements = [progressEl]
+
+      expect(() => {
+        jQueryMock.fn.progress.call(jQueryMock, 'noMethod')
+      }).toThrowError(TypeError, 'No method named "noMethod"')
+    })
+  })
+})

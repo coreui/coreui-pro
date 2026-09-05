@@ -2142,12 +2142,17 @@ Multi Select's option indicators moved with it — they render as a decorative
   shift only the first background layer, so the image underneath stays put.
 
 - **`.progress-segmented`.** A mask that cuts a `.progress` or
-  `.progress-stacked` into a row of rounded segments, sized by
-  `--cui-progress-segment-width`, `--cui-progress-segment-gap` and
-  `--cui-progress-segment-border-radius` (`--cui-radius-2` by default, capped at
-  half the width; `0px` for square segments). Everything
-  under the mask — width, transition, theme, gradient, stripes — behaves as
-  before.
+  `.progress-stacked` into a row of rounded segments: `--cui-progress-segments`
+  of them (40 by default), separated by `--cui-progress-segment-gap`, with
+  corners from `--cui-progress-segment-border-radius` (`--cui-radius-2` by
+  default, `0px` for square). Everything under the mask — transition, theme,
+  gradient, stripes — behaves as before.
+
+- **New `Progress` plugin.** Initialized on every `.progress-segmented`, it
+  reads the bar's `aria-valuenow`, `aria-valuemin` and `aria-valuemax` and sets
+  `--cui-progress-segments-filled`, which the stylesheet turns into the bar's
+  width, so the fill ends on a whole segment. Bars that keep an inline `width`
+  are not touched. `coreui.Progress` is exported next to the other plugins.
 
 #### Spinner
 
