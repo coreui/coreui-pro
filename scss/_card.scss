@@ -124,8 +124,6 @@ $card-tokens: defaults(
     }
   }
 
-  // The body aligns its children to the start so a button keeps its own width;
-  // text has to opt back into the full column.
   .card-title,
   .card-subtitle,
   .card-text {
