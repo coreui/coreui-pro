@@ -251,13 +251,5 @@ $form-range-tokens: defaults(
     font-size: var(--#{$prefix}range-tick-label-font-size);
     color: var(--#{$prefix}range-tick-label-color);
     white-space: nowrap;
-
-    .form-range-tick:first-child > & {
-      align-self: flex-start;
-    }
-
-    .form-range-tick:last-child > & {
-      align-self: flex-end;
-    }
   }
 }
