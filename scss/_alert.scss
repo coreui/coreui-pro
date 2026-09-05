@@ -7,8 +7,8 @@
 @use "config" as *;
 
 // scss-docs-start alert-variables
-$alert-padding-y:               var(--#{$prefix}spacer-3) !default;
-$alert-padding-x:               var(--#{$prefix}spacer-3) !default;
+$alert-padding-y:               var(--#{$prefix}spacer) !default;
+$alert-padding-x:               var(--#{$prefix}spacer) !default;
 $alert-gap:                     var(--#{$prefix}spacer-2) !default;
 $alert-margin-bottom:           1rem !default;
 $alert-border-radius:           var(--#{$prefix}radius-5) !default;

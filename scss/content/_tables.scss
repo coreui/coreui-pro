@@ -107,7 +107,7 @@ $table-variants: map.keys($theme-colors) !default;
     // End of reset
 
     width: 100%;
-    margin-bottom: var(--#{$prefix}spacer-3);
+    margin-bottom: var(--#{$prefix}spacer);
     vertical-align: var(--#{$prefix}table-cell-vertical-align);
     border-color: var(--#{$prefix}table-border-color);
 

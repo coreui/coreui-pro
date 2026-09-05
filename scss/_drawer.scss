@@ -13,11 +13,11 @@
 // stylelint-disable custom-property-no-missing-var-function
 
 // scss-docs-start drawer-variables
-$drawer-inset:                      var(--#{$prefix}spacer-3) !default;
+$drawer-inset:                      var(--#{$prefix}spacer) !default;
 $drawer-width:                      400px !default;
 $drawer-height:                     30vh !default;
-$drawer-padding-y:                  var(--#{$prefix}spacer-3) !default;
-$drawer-padding-x:                  var(--#{$prefix}spacer-3) !default;
+$drawer-padding-y:                  var(--#{$prefix}spacer) !default;
+$drawer-padding-x:                  var(--#{$prefix}spacer) !default;
 $drawer-color:                      var(--#{$prefix}fg-body) !default;
 $drawer-bg:                         var(--#{$prefix}bg-body) !default;
 $drawer-border-color:               var(--#{$prefix}border-color-translucent) !default;
@@ -44,7 +44,7 @@ $drawer-tokens: () !default;
 $drawer-tokens: defaults(
   (
     --#{$prefix}drawer-inset: #{$drawer-inset},
-    --#{$prefix}drawer-zindex: var(--#{$prefix}z-offcanvas),
+    --#{$prefix}drawer-zindex: var(--#{$prefix}z-drawer),
     --#{$prefix}drawer-width: #{$drawer-width},
     --#{$prefix}drawer-height: #{$drawer-height},
     --#{$prefix}drawer-sheet-width: #{$drawer-sheet-width},

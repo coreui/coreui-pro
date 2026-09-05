@@ -64,13 +64,13 @@ $spacers: defaults(
     0: 0,
     1: $spacer * .25,
     2: $spacer * .5,
-    3: $spacer,
-    4: $spacer * 1.5,
-    5: $spacer * 3,
-    6: $spacer * 4,
-    7: $spacer * 5,
-    8: $spacer * 6,
-    9: $spacer * 8,
+    3: $spacer * .75,
+    4: $spacer,
+    5: $spacer * 1.25,
+    6: $spacer * 1.5,
+    7: $spacer * 2,
+    8: $spacer * 2.5,
+    9: $spacer * 3,
   ),
   $spacers
 );
@@ -86,6 +86,28 @@ $negative-spacers: defaults(
   $negative-spacers
 );
 // scss-docs-end negative-spacers-map
+
+// scss-docs-start sizes-map
+$sizes: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$sizes: defaults(
+  (
+    1: $spacer,
+    2: $spacer * 2,
+    3: $spacer * 3,
+    4: $spacer * 4,
+    5: $spacer * 5,
+    6: $spacer * 6,
+    7: $spacer * 7,
+    8: $spacer * 8,
+    9: $spacer * 9,
+    10: $spacer * 10,
+    11: $spacer * 11,
+    12: $spacer * 12
+  ),
+  $sizes
+);
+// scss-docs-end sizes-map
 // scss-docs-end spacers-map
 
 // Style anchor elements.
@@ -134,12 +156,16 @@ $container-max-widths: defaults(
 
 $grid-columns:                12 !default;
 $grid-row-columns:            6 !default;
-$grid-gutter-width:           1.5rem !default;
+$grid-gutter-x:               1.5rem !default;
+$grid-gutter-y:               0 !default;
+// fusv-disable
+$grid-gutter-width:           $grid-gutter-x !default; // Deprecated in v6.0.0, removed in v7
+// fusv-enable
 $gutters:                     $spacers !default;
 
 // Container padding
 
-$container-padding-x: $grid-gutter-width !default;
+$container-padding-x: $grid-gutter-x !default;
 
 // scss-docs-start variable-gradient
 $gradient: linear-gradient(180deg, color-mix(in srgb, var(--#{$prefix}white) 15%, transparent), color-mix(in srgb, var(--#{$prefix}white) 0%, transparent)) !default;
@@ -222,11 +248,29 @@ $radii: defaults(
 // scss-docs-start box-shadow-variables
 
 $shadows: (
-  null:  0 .5rem 1rem color-mix(in oklch, var(--#{$prefix}shadow-tint, var(--#{$prefix}shadow-color)) calc(15% * var(--#{$prefix}shadow-strength) * var(--#{$prefix}shadow-opacity, 1)), transparent),
-  sm:    0 .125rem .25rem color-mix(in oklch, var(--#{$prefix}shadow-tint, var(--#{$prefix}shadow-color)) calc(7.5% * var(--#{$prefix}shadow-strength) * var(--#{$prefix}shadow-opacity, 1)), transparent),
-  lg:    0 1rem 3rem color-mix(in oklch, var(--#{$prefix}shadow-tint, var(--#{$prefix}shadow-color)) calc(17.5% * var(--#{$prefix}shadow-strength) * var(--#{$prefix}shadow-opacity, 1)), transparent),
-  xl:    0 1.5rem 4rem color-mix(in oklch, var(--#{$prefix}shadow-tint, var(--#{$prefix}shadow-color)) calc(20% * var(--#{$prefix}shadow-strength) * var(--#{$prefix}shadow-opacity, 1)), transparent),
-  inset: inset 0 1px 2px color-mix(in oklch, var(--#{$prefix}shadow-tint, var(--#{$prefix}shadow-color)) calc(7.5% * var(--#{$prefix}shadow-strength) * var(--#{$prefix}shadow-opacity, 1)), transparent),
+  null: #{(
+    "0 .125rem .25rem -.0625rem color-mix(in oklch, var(--#{$prefix}shadow-tint, var(--#{$prefix}shadow-color)) calc(4% * var(--#{$prefix}shadow-strength) * var(--#{$prefix}shadow-opacity, 1)), transparent)",
+    "0 .375rem .75rem -.125rem color-mix(in oklch, var(--#{$prefix}shadow-tint, var(--#{$prefix}shadow-color)) calc(5% * var(--#{$prefix}shadow-strength) * var(--#{$prefix}shadow-opacity, 1)), transparent)",
+    "0 .75rem 1.5rem -.25rem color-mix(in oklch, var(--#{$prefix}shadow-tint, var(--#{$prefix}shadow-color)) calc(6% * var(--#{$prefix}shadow-strength) * var(--#{$prefix}shadow-opacity, 1)), transparent)"
+  )},
+  xs: 0 .0625rem .125rem color-mix(in oklch, var(--#{$prefix}shadow-tint, var(--#{$prefix}shadow-color)) calc(4% * var(--#{$prefix}shadow-strength) * var(--#{$prefix}shadow-opacity, 1)), transparent),
+  sm: #{(
+    "0 .0625rem .125rem color-mix(in oklch, var(--#{$prefix}shadow-tint, var(--#{$prefix}shadow-color)) calc(4% * var(--#{$prefix}shadow-strength) * var(--#{$prefix}shadow-opacity, 1)), transparent)",
+    "0 .125rem .375rem -.0625rem color-mix(in oklch, var(--#{$prefix}shadow-tint, var(--#{$prefix}shadow-color)) calc(5% * var(--#{$prefix}shadow-strength) * var(--#{$prefix}shadow-opacity, 1)), transparent)"
+  )},
+  lg: #{(
+    "0 .125rem .375rem -.0625rem color-mix(in oklch, var(--#{$prefix}shadow-tint, var(--#{$prefix}shadow-color)) calc(5% * var(--#{$prefix}shadow-strength) * var(--#{$prefix}shadow-opacity, 1)), transparent)",
+    "0 .375rem 1rem -.1875rem color-mix(in oklch, var(--#{$prefix}shadow-tint, var(--#{$prefix}shadow-color)) calc(6% * var(--#{$prefix}shadow-strength) * var(--#{$prefix}shadow-opacity, 1)), transparent)",
+    "0 .75rem 2rem -.375rem color-mix(in oklch, var(--#{$prefix}shadow-tint, var(--#{$prefix}shadow-color)) calc(7% * var(--#{$prefix}shadow-strength) * var(--#{$prefix}shadow-opacity, 1)), transparent)",
+    "0 1.5rem 3.5rem -.75rem color-mix(in oklch, var(--#{$prefix}shadow-tint, var(--#{$prefix}shadow-color)) calc(8% * var(--#{$prefix}shadow-strength) * var(--#{$prefix}shadow-opacity, 1)), transparent)"
+  )},
+  xl: #{(
+    "0 .1875rem .5rem -.0625rem color-mix(in oklch, var(--#{$prefix}shadow-tint, var(--#{$prefix}shadow-color)) calc(5% * var(--#{$prefix}shadow-strength) * var(--#{$prefix}shadow-opacity, 1)), transparent)",
+    "0 .5rem 1.25rem -.1875rem color-mix(in oklch, var(--#{$prefix}shadow-tint, var(--#{$prefix}shadow-color)) calc(6% * var(--#{$prefix}shadow-strength) * var(--#{$prefix}shadow-opacity, 1)), transparent)",
+    "0 1rem 2.5rem -.375rem color-mix(in oklch, var(--#{$prefix}shadow-tint, var(--#{$prefix}shadow-color)) calc(7% * var(--#{$prefix}shadow-strength) * var(--#{$prefix}shadow-opacity, 1)), transparent)",
+    "0 2rem 5rem -.75rem color-mix(in oklch, var(--#{$prefix}shadow-tint, var(--#{$prefix}shadow-color)) calc(9% * var(--#{$prefix}shadow-strength) * var(--#{$prefix}shadow-opacity, 1)), transparent)"
+  )},
+  inset: inset 0 1px 2px light-dark(color-mix(in oklch, var(--#{$prefix}shadow-tint, var(--#{$prefix}shadow-color)) calc(8% * var(--#{$prefix}shadow-opacity, 1)), transparent), color-mix(in oklch, var(--#{$prefix}shadow-tint, var(--#{$prefix}shadow-color)) calc(26% * var(--#{$prefix}shadow-opacity, 1)), transparent)),
 ) !default;
 // scss-docs-end box-shadow-variables
 
@@ -287,16 +331,16 @@ $font-sizes: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
 $font-sizes: defaults(
   (
-    "xs":  ("font-size": calc(var(--#{$prefix}body-font-size) * .75),   "line-height": var(--#{$prefix}body-line-height)),
+    "xs":  ("font-size": calc(var(--#{$prefix}body-font-size) * .75),   "line-height": 1.25),
     "sm":  ("font-size": calc(var(--#{$prefix}body-font-size) * .875),  "line-height": var(--#{$prefix}body-line-height)),
     "md":  ("font-size": var(--#{$prefix}body-font-size),               "line-height": var(--#{$prefix}body-line-height)),
-    "lg":  ("font-size": calc(var(--#{$prefix}body-font-size) * 1.25),  "line-height": $headings-line-height),
-    "xl":  ("font-size": clamp(1.275rem, 1.275rem + .3vw, 1.5rem),  "line-height": $headings-line-height),
-    "2xl": ("font-size": clamp(1.3rem, 1.3rem + .6vw, 1.75rem),     "line-height": $headings-line-height),
-    "3xl": ("font-size": clamp(1.325rem, 1.325rem + .9vw, 2rem),    "line-height": $headings-line-height),
-    "4xl": ("font-size": clamp(1.375rem, 1.375rem + 1.5vw, 2.5rem), "line-height": $headings-line-height),
-    "5xl": ("font-size": clamp(1.425rem, 1.425rem + 2.1vw, 3rem),   "line-height": $headings-line-height),
-    "6xl": ("font-size": clamp(1.475rem, 1.475rem + 2.7vw, 3.5rem), "line-height": $headings-line-height)
+    "lg":  ("font-size": calc(var(--#{$prefix}body-font-size) * 1.25),  "line-height": var(--#{$prefix}body-line-height)),
+    "xl":  ("font-size": clamp(1.275rem, 1.275rem + .3vw, 1.5rem),  "line-height": calc(2.5 / 1.75)),
+    "2xl": ("font-size": clamp(1.3rem, 1.3rem + .6vw, 1.75rem),     "line-height": calc(3 / 2.25)),
+    "3xl": ("font-size": clamp(1.325rem, 1.325rem + .9vw, 2rem),    "line-height": 1.2),
+    "4xl": ("font-size": clamp(1.375rem, 1.375rem + 1.5vw, 2.5rem), "line-height": 1.1),
+    "5xl": ("font-size": clamp(1.425rem, 1.425rem + 2.1vw, 3rem),   "line-height": 1.1),
+    "6xl": ("font-size": clamp(1.475rem, 1.475rem + 2.7vw, 3.5rem), "line-height": 1)
   ),
   $font-sizes
 );
@@ -316,12 +360,15 @@ $zindex-levels: defaults(
     2: 2,
     3: 3,
     dropdown: 1000,
+    menu: 1000,
     sticky: 1020,
     fixed: 1030,
     sidebar-backdrop: 1034,
     sidebar: 1035,
     offcanvas: 1045,
+    drawer: 1045,
     modal: 1055,
+    dialog: 1055,
     popover: 1070,
     tooltip: 1080,
     toast: 1090

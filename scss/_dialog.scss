@@ -11,7 +11,7 @@
 // stylelint-disable custom-property-no-missing-var-function
 
 // scss-docs-start dialog-variables
-$dialog-padding:                    var(--#{$prefix}spacer-3) !default;
+$dialog-padding:                    var(--#{$prefix}spacer) !default;
 $dialog-width:                      500px !default;
 $dialog-margin:                     1.75rem !default;
 $dialog-color:                      var(--#{$prefix}fg-body) !default;
@@ -27,11 +27,11 @@ $dialog-slide-distance:             3rem !default;
 $dialog-scale-transform:            scale(1.02) !default;
 $dialog-backdrop-bg:                color-mix(in oklch, var(--#{$prefix}backdrop-color) var(--#{$prefix}backdrop-opacity), transparent) !default;
 $dialog-backdrop-blur:              var(--#{$prefix}backdrop-blur) !default;
-$dialog-header-padding:             var(--#{$prefix}spacer-3) !default;
+$dialog-header-padding:             var(--#{$prefix}spacer) !default;
 $dialog-header-border-color:        var(--#{$prefix}border-color-translucent) !default;
 $dialog-header-border-width:        var(--#{$prefix}border-width) !default;
 $dialog-title-line-height:          var(--#{$prefix}body-line-height) !default;
-$dialog-footer-padding:             var(--#{$prefix}spacer-3) !default;
+$dialog-footer-padding:             var(--#{$prefix}spacer) !default;
 $dialog-footer-border-color:        var(--#{$prefix}border-color-translucent) !default;
 $dialog-footer-border-width:        var(--#{$prefix}border-width) !default;
 $dialog-footer-gap:                 .5rem !default;
@@ -60,7 +60,7 @@ $dialog-tokens: () !default;
 // scss-docs-start dialog-css-vars
 $dialog-tokens: defaults(
   (
-    --#{$prefix}dialog-zindex: var(--#{$prefix}z-modal),
+    --#{$prefix}dialog-zindex: var(--#{$prefix}z-dialog),
     --#{$prefix}dialog-padding: #{$dialog-padding},
     --#{$prefix}dialog-width: #{$dialog-width},
     --#{$prefix}dialog-margin: #{$dialog-margin},

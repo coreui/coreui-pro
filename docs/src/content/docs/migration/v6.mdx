@@ -663,7 +663,7 @@ check, radio, carousel and toggler icons already work:
   Dialog is a centered floating panel over a blurred backdrop with optional
   slide entry variants; Drawer is a floating, inset, rounded panel with
   translucent/sheet/fullscreen/fit-content variants and responsive classes
-  (`.drawer-sm`…`.drawer-xxl`). Both share the DialogBase behavior with
+  (`.drawer-sm`…`.drawer-2xl`). Both share the DialogBase behavior with
   Modal/Offcanvas, which keep the classic look and the v5 vocabulary as
   **compatibility layers over it — deprecated in v6 and removable in v7**, so
   reach for Dialog and Drawer in new work. See the
@@ -2411,16 +2411,76 @@ as such.
   `1536px` (was `xxl` at 1400); `sm` and `md` stay. Every responsive class
   spells the tier the new way — `.col-xxl-6` is `.col-2xl-6`, `.container-xxl`
   `.container-2xl`, `.modal-fullscreen-xxl-down` `.modal-fullscreen-2xl-down`,
-  `.hstack-xxl` `.hstack-2xl` — and the containers grow with them: `.container`
-  is `1200px` at `xl` (was 1140) and `1440px` at `2xl` (was 1320). Size
-  variants that happen to spell `xxl` (`.drawer-xxl`, `.offcanvas-xxl`,
-  `.icon-xxl`, `--cui-border-radius-xxl`) are not breakpoints and keep their
-  name. The Sass map is `$breakpoints` (was `$grid-breakpoints`) and the mixins
-  take it under that name; `$container-max-widths` keeps its name. The
+  `.hstack-xxl` `.hstack-2xl`, `.drawer-xxl` `.drawer-2xl`, `.offcanvas-xxl`
+  `.offcanvas-2xl` — and the containers grow with them: `.container` is
+  `1200px` at `xl` (was 1140) and `1440px` at `2xl` (was 1320). Only
+  `.icon-xxl` and `--cui-border-radius-xxl` keep the spelling: they are
+  sizes, not breakpoints. The Sass map is `$breakpoints` (was
+  `$grid-breakpoints`) and the mixins take it under that name;
+  `$container-max-widths` keeps its name. The
   responsive placement of menus, tooltips and popovers
   (`data-coreui-placement="lg:end"`) reads the same values, and the sidebar's
   mobile mode, `$mobile-breakpoint: lg`, now starts below `1024px` — a tablet
   in landscape gets the mobile layout.
+
+#### Fixed widths and a vertical gutter knob
+
+- **New: `.w-1` … `.w-12`**, one `$spacer` per step from the `$sizes` map,
+  merged into the width utility next to the percentages.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`$grid-gutter-width` is `$grid-gutter-x`, and `$grid-gutter-y` joins it.**
+  `make-row()` takes both (`make-row($gutter-x, $gutter-y)`) and writes them to
+  `--cui-gutter-x` / `--cui-gutter-y`; the row gutter defaults to `0` as
+  before, so nothing moves unless you set it. `make-grid-columns()` and the
+  card group read `$grid-gutter-x`. `$grid-gutter-width` stays as a deprecated
+  alias of `$grid-gutter-x` until v7 — set the new name, the alias only reads.
+
+#### The z-axis names the new components
+
+- **New keys in `$zindex-levels`: `menu`, `drawer`, `dialog`**, on the same
+  values as `dropdown`, `offcanvas` and `modal` (1000, 1045, 1055). Each
+  emits a `--cui-z-*` token and a `.z-*` utility, and the menu, drawer and
+  dialog read their own key instead of the legacy component's. The legacy keys
+  stay; both spellings of a pair always resolve to one number.
+
+#### Every type stop carries its own line height
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`$font-sizes` sets a line height per stop instead of one value for all
+  headings.** `xs` is 1.25, `sm` … `lg` the body leading (`--cui-body-line-height`, 1.5), `xl` 2.5⁄1.75, `2xl` 3⁄2.25,
+  `3xl` 1.2, `4xl` and `5xl` 1.1, `6xl` 1 — the larger the type, the tighter
+  the leading, and the small stops read at body leading instead of 1.2. The
+  sizes are unchanged. Headings follow their stop through
+  `--cui-line-height-*`: `h5` (`lg`) and `h4` (`xl`) get taller lines, `h1`
+  (`4xl`) a tighter one. `$headings-line-height` still feeds
+  `--cui-heading-line-height` for anything that reads it directly.
+
+#### Layered shadows
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **Every shadow is a stack of two to four layers with a negative spread**
+  instead of one wide blur: a tight layer for contact, wider ones for
+  ambient light, each at 4–9 % alpha, so a card reads as lifted rather than
+  smeared. `.shadow-xs` and `--cui-box-shadow-xs` are new (one thin layer).
+  The inset shadow reads 8 % in the light scheme and 26 % in the dark one.
+  `--cui-shadow-strength` in the dark scheme is `2.4` (was 2.5). The knobs are
+  unchanged: `--cui-shadow-color` and `--cui-shadow-strength` on `:root`,
+  `.shadow-{color}` and `.shadow-opacity-*` on the element, `$shadows` in
+  Sass — a custom entry is now a comma-separated list of layers.
+
+#### A denser spacing scale
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`$spacers` steps 3–9 are closer together.** `1` and `2` stay at `.25rem`
+  and `.5rem`; from there the scale is `.75 / 1 / 1.25 / 1.5 / 2 / 2.5 / 3 rem`
+  (was `1 / 1.5 / 3 / 4 / 5 / 6 / 8`). Every spacing, gap and gutter utility
+  follows: `.p-3` is `.75rem` (was `1rem`), `.p-4` is `1rem` (was `1.5rem`),
+  `.p-5` `1.25rem` (was `3rem`) — a layout that leaned on `.p-5` or `.mb-5`
+  for large gaps needs a bigger step now, `.p-9` being the old `.p-5`. The
+  components are unchanged: everything that padded with the old step 3
+  reads `--cui-spacer` (`1rem`) instead of `--cui-spacer-3`, so cards,
+  alerts, modals, drawers, popovers, callouts, list groups, the sidebar and
+  the reboot margins keep their size.
 
 #### Every theme colour gets an action-background slot
 

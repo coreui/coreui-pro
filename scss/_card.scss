@@ -7,8 +7,8 @@
 @use "config" as *;
 
 // scss-docs-start card-variables
-$card-spacer-y:                     var(--#{$prefix}spacer-3) !default;
-$card-spacer-x:                     var(--#{$prefix}spacer-3) !default;
+$card-spacer-y:                     var(--#{$prefix}spacer) !default;
+$card-spacer-x:                     var(--#{$prefix}spacer) !default;
 $card-body-gap:                     calc(#{$card-spacer-y} * .5) !default;
 $card-title-color:                  inherit !default;
 $card-subtitle-color:               inherit !default;
@@ -24,8 +24,8 @@ $card-cap-color:                    inherit !default;
 $card-height:                       auto !default;
 $card-color:                        inherit !default;
 $card-bg:                           var(--#{$prefix}bg-body) !default;
-$card-img-overlay-padding:          var(--#{$prefix}spacer-3) !default;
-$card-group-margin:                 $grid-gutter-width * .5 !default;
+$card-img-overlay-padding:          var(--#{$prefix}spacer) !default;
+$card-group-margin:                 $grid-gutter-x * .5 !default;
 // scss-docs-end card-variables
 
 // scss-docs-start card-translucent-variables
