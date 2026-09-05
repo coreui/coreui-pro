@@ -34,8 +34,8 @@ $form-range-thumb-transition-timing:       ease-in-out !default;
 
 $form-range-tick-width:                    var(--#{$prefix}border-width) !default;
 $form-range-tick-height:                   .5rem !default;
-$form-range-tick-minor-height:             .25rem !default;
-$form-range-tick-bg:                       var(--#{$prefix}range-track-bg) !default;
+$form-range-tick-minor-height:             calc(var(--#{$prefix}range-tick-height) * .75) !default;
+$form-range-tick-bg:                       var(--#{$prefix}bg-4) !default;
 $form-range-tick-label-margin-top:         .125rem !default;
 $form-range-tick-label-font-size:          var(--#{$prefix}font-size-sm) !default;
 $form-range-tick-label-color:              var(--#{$prefix}fg-2) !default;
