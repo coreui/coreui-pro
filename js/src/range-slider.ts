@@ -553,10 +553,15 @@ class RangeSlider extends BaseComponent {
 
     const [min, max] = [Math.min(...this._currentValue), Math.max(...this._currentValue)]
     const span = this._config.max - this._config.min
-    const edge = (value: number): string => `${((value - this._config.min) / span) * 100}%`
+    const ratio = (value: number): string => `${(value - this._config.min) / span}`
 
-    this._sliderTrack.style.setProperty('--cui-range-slider-track-from', this._currentValue.length === 1 ? '0%' : edge(min))
-    this._sliderTrack.style.setProperty('--cui-range-slider-track-to', edge(max))
+    if (this._currentValue.length === 1) {
+      this._sliderTrack.style.setProperty('--cui-range-slider-track-from-edge', '0')
+    } else {
+      this._sliderTrack.style.setProperty('--cui-range-slider-track-from', ratio(min))
+    }
+
+    this._sliderTrack.style.setProperty('--cui-range-slider-track-to', ratio(max))
   }
 
   _updateNearestValue(value: number): void {

@@ -837,7 +837,7 @@ describe('RangeSlider', () => {
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, { track: 'fill', value: 50 })
 
-      expect(edges(element.querySelector('.range-slider-track'))).toEqual(['0%', '50%'])
+      expect(edges(element.querySelector('.range-slider-track'))).toEqual(['', '0.5'])
     })
 
     it('should leave the band unset when track is false', () => {
@@ -848,14 +848,17 @@ describe('RangeSlider', () => {
       // Unset rather than zero-width: the stylesheet has no fallback for these,
       // so the whole `background-image` falls back to `none`.
       expect(edges(element.querySelector('.range-slider-track'))).toEqual(['', ''])
+      expect(element.querySelector('.range-slider-track').style.getPropertyValue('--cui-range-slider-track-from-edge')).toBe('')
     })
 
-    it('should start a single-thumb band at zero', () => {
+    it('should start a single-thumb band at the track edge, not at the thumb centre', () => {
       fixtureEl.innerHTML = '<div id="slider"></div>'
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, { track: 'fill', value: [50] })
 
-      expect(edges(element.querySelector('.range-slider-track'))).toEqual(['0%', '50%'])
+      const track = element.querySelector('.range-slider-track')
+      expect(track.style.getPropertyValue('--cui-range-slider-track-from-edge')).toBe('0')
+      expect(edges(track)).toEqual(['', '0.5'])
     })
 
     it('should span a multi-thumb band between the outermost handles', () => {
@@ -863,7 +866,7 @@ describe('RangeSlider', () => {
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, { track: 'fill', value: [25, 75] })
 
-      expect(edges(element.querySelector('.range-slider-track'))).toEqual(['25%', '75%'])
+      expect(edges(element.querySelector('.range-slider-track'))).toEqual(['0.25', '0.75'])
     })
 
     it('should write the same band whatever the orientation', () => {
@@ -872,7 +875,7 @@ describe('RangeSlider', () => {
       const rangeSlider = new RangeSlider(element, { track: 'fill', value: [50], vertical: true })
 
       // Direction is the stylesheet's business now.
-      expect(edges(element.querySelector('.range-slider-track'))).toEqual(['0%', '50%'])
+      expect(edges(element.querySelector('.range-slider-track'))).toEqual(['', '0.5'])
       expect(element.querySelector('.range-slider-track').style.backgroundImage).toBe('')
     })
   })

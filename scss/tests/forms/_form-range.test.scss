@@ -22,12 +22,13 @@
       }
       @include expect() {
         .test {
+          --cui-range-fill-edge: calc(var(--cui-range-thumb-width) * .5 + var(--cui-range-fill, 0) * (100% - var(--cui-range-thumb-width)));
           width: var(--cui-range-track-width);
           height: var(--cui-range-track-height);
           color: transparent;
           cursor: var(--cui-range-track-cursor);
           background-color: var(--cui-range-track-bg);
-          background-image: linear-gradient(var(--cui-range-track-direction, to right), color-mix(in oklch, var(--cui-theme-bg, var(--cui-range-track-fill-bg)) 50%, transparent) calc(var(--cui-range-fill, 0) * 100%), transparent calc(var(--cui-range-fill, 0) * 100%));
+          background-image: linear-gradient(var(--cui-range-track-direction, to right), color-mix(in oklch, var(--cui-theme-bg, var(--cui-range-track-fill-bg)) 50%, transparent) var(--cui-range-fill-edge), transparent var(--cui-range-fill-edge));
           border-color: transparent;
           border-radius: var(--cui-range-track-border-radius);
         }

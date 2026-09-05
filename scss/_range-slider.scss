@@ -85,19 +85,25 @@ $range-slider-vertical-tokens: defaults(
   }
 
   .range-slider-track {
+    // Outside `$prefix` on purpose: the plugin writes these names. No fallback for the ratios
+    // either: with `track: false` nothing is written and the whole declaration must drop to `none`.
+    // A single thumb gets `--cui-range-slider-track-from-edge: 0` inline, so its band starts at the track's end.
+    --#{$prefix}range-slider-track-thumb: var(--#{$prefix}range-thumb-width);
+    --cui-range-slider-track-from-edge: calc(var(--#{$prefix}range-slider-track-thumb) * .5 + var(--cui-range-slider-track-from) * (100% - var(--#{$prefix}range-slider-track-thumb)));
+    --cui-range-slider-track-to-edge: calc(var(--#{$prefix}range-slider-track-thumb) * .5 + var(--cui-range-slider-track-to) * (100% - var(--#{$prefix}range-slider-track-thumb)));
+
     width: var(--#{$prefix}range-track-width);
     height: var(--#{$prefix}range-track-height);
     cursor: var(--#{$prefix}range-track-cursor);
     background-color: var(--#{$prefix}range-track-bg);
-    // No fallback on purpose: with `track: false` the plugin never writes the edges and the whole declaration must drop to `none`.
     background-image:
       linear-gradient(
         var(--#{$prefix}range-track-direction, to right),
         transparent 0%,
-        transparent var(--cui-range-slider-track-from),
-        color-mix(in oklch, var(--#{$prefix}theme-bg, var(--#{$prefix}range-track-fill-bg)) 50%, transparent) var(--cui-range-slider-track-from),
-        color-mix(in oklch, var(--#{$prefix}theme-bg, var(--#{$prefix}range-track-fill-bg)) 50%, transparent) var(--cui-range-slider-track-to),
-        transparent var(--cui-range-slider-track-to),
+        transparent var(--cui-range-slider-track-from-edge),
+        color-mix(in oklch, var(--#{$prefix}theme-bg, var(--#{$prefix}range-track-fill-bg)) 50%, transparent) var(--cui-range-slider-track-from-edge),
+        color-mix(in oklch, var(--#{$prefix}theme-bg, var(--#{$prefix}range-track-fill-bg)) 50%, transparent) var(--cui-range-slider-track-to-edge),
+        transparent var(--cui-range-slider-track-to-edge),
         transparent 100%
       );
     border-color: transparent;
@@ -248,6 +254,8 @@ $range-slider-vertical-tokens: defaults(
     }
 
     .range-slider-track {
+      --#{$prefix}range-slider-track-thumb: var(--#{$prefix}range-thumb-height);
+
       width: var(--#{$prefix}range-slider-vertical-track-width);
       height: 100%;
     }
