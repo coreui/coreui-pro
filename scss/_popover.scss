@@ -20,11 +20,11 @@ $popover-header-font-size:          var(--#{$prefix}body-font-size) !default;
 $popover-header-bg:                 var(--#{$prefix}bg-1) !default;
 $popover-header-color:              var(--#{$prefix}heading-color) !default;
 $popover-header-padding-y:          .5rem !default;
-$popover-header-padding-x:          var(--#{$prefix}spacer-3) !default;
+$popover-header-padding-x:          var(--#{$prefix}spacer) !default;
 
 $popover-body-color:                var(--#{$prefix}fg-body) !default;
-$popover-body-padding-y:            var(--#{$prefix}spacer-3) !default;
-$popover-body-padding-x:            var(--#{$prefix}spacer-3) !default;
+$popover-body-padding-y:            var(--#{$prefix}spacer) !default;
+$popover-body-padding-x:            var(--#{$prefix}spacer) !default;
 
 $popover-arrow-width:               1rem !default;
 $popover-arrow-height:              .5rem !default;

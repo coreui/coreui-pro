@@ -10,7 +10,7 @@
 // stylelint-disable custom-property-no-missing-var-function
 
 // scss-docs-start modal-variables
-$modal-inner-padding:               var(--#{$prefix}spacer-3) !default;
+$modal-inner-padding:               var(--#{$prefix}spacer) !default;
 
 $modal-footer-margin-between:       .5rem !default;
 
