@@ -1,0 +1,18 @@
+@use "sass:map";
+@use "../progress" as *;
+
+@include describe("progress") {
+  @include it("exposes the bar image and stripe tokens with an empty image by default") {
+    @include assert-equal(map.get($progress-tokens, --cui-progress-bar-bg-image), none);
+    @include assert-true(map.has-key($progress-tokens, --cui-progress-bar-stripes));
+    @include assert-true(map.has-key($progress-tokens, --cui-progress-bar-stripe-color));
+  }
+
+  @include it("keeps the segment geometry in its own map, read only by .progress-segmented") {
+    @include assert-true(map.has-key($progress-segmented-tokens, --cui-progress-segment-width));
+    @include assert-true(map.has-key($progress-segmented-tokens, --cui-progress-segment-gap));
+    @include assert-true(map.has-key($progress-segmented-tokens, --cui-progress-segment-border-radius));
+    @include assert-false(map.has-key($progress-tokens, --cui-progress-segment-width));
+  }
+
+}
