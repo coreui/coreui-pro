@@ -1138,8 +1138,8 @@ adornment in the library — so the button needs no icon markup at all:
   Wrap the input in `<div class="form-range">` and give the input
   `.form-range-input`; the plugin writes `--cui-range-fill` (`0`–`1`) on the
   wrapper and the CSS draws the fill from it, `data-coreui-tooltips` adds a
-  value tooltip (the same `tooltips`/`tooltipsFormat` options as the range
-  slider), and a linked `<datalist>` renders tick
+  value tooltip on hover, drag and focus, or permanently with `"always"` (the
+  same `tooltips`/`tooltipsFormat` options as the range slider), and a linked `<datalist>` renders tick
   marks laid out on a grid. Every such wrapper initializes itself. The input
   fires `changed.coreui.range` with the numeric `value`. **The bare
   `<input class="form-range">` keeps working unchanged** as the CSS-only form of

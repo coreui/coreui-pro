@@ -259,3 +259,10 @@ $form-range-tokens: defaults(
     white-space: nowrap;
   }
 }
+
+// Same layer as `.tooltip { opacity: 0 }`, which would otherwise win over `forms` regardless of specificity.
+@layer components {
+  .form-range-input:is(:hover, :active, :focus-visible) + .form-range-tooltip {
+    opacity: 1;
+  }
+}

@@ -31,6 +31,7 @@ const EVENT_DOM_CONTENT_LOADED = `DOMContentLoaded${EVENT_KEY}${DATA_API_KEY}`
 const SELECTOR_RANGE = '.form-range:has(> .form-range-input)'
 const SELECTOR_INPUT = '.form-range-input'
 
+const CLASS_NAME_SHOW = 'show'
 const CLASS_NAME_TOOLTIP = 'form-range-tooltip'
 const CLASS_NAME_TICKS = 'form-range-ticks'
 const CLASS_NAME_TICK = 'form-range-tick'
@@ -39,7 +40,7 @@ const CLASS_NAME_TICK_LABEL = 'form-range-tick-label'
 const PROPERTY_FILL = '--cui-range-fill'
 
 type RangeConfig = {
-  tooltips: boolean | null
+  tooltips: boolean | 'always' | null
   tooltipsFormat: ((value: number) => string) | null
 }
 
@@ -49,7 +50,7 @@ const Default: RangeConfig = {
 }
 
 const DefaultType = {
-  tooltips: '(boolean|null)',
+  tooltips: '(boolean|string|null)',
   tooltipsFormat: '(function|null)'
 }
 
@@ -171,7 +172,8 @@ class Range extends BaseComponent {
   protected _createTooltip(): void {
     // Reuse the tooltip markup so we don't duplicate the pill and arrow styles
     this._tooltip = document.createElement('output')
-    this._tooltip.className = `${CLASS_NAME_TOOLTIP} tooltip bs-tooltip-top show`
+    this._tooltip.className = `${CLASS_NAME_TOOLTIP} tooltip bs-tooltip-top`
+    this._tooltip.classList.toggle(CLASS_NAME_SHOW, this._config.tooltips === 'always')
     this._tooltip.setAttribute('aria-hidden', 'true')
 
     // Match the Tooltip template's block-level markup: `.tooltip-inner` has no `display` rule,

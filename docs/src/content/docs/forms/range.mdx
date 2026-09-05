@@ -33,11 +33,18 @@ The fill is a single custom property, so a static fill needs no plugin at all: s
 
 ## Tooltip
 
-Add `data-coreui-tooltips` to the wrapper to show a tooltip with the value that follows the thumb. It is the same markup and look as the [tooltip](/components/tooltips/) component, and the [range slider](/forms/range-slider/) uses the same option names.
+Add `data-coreui-tooltips` to the wrapper to show a tooltip with the value that follows the thumb. It appears while the pointer is over the input, while the thumb is held, and while the input has focus. It is the same markup and look as the [tooltip](/components/tooltips/) component, and the [range slider](/forms/range-slider/) uses the same option names.
 
 <Example code={`<label for="rangeTooltip" class="form-label">Brightness</label>
   <div class="form-range" data-coreui-tooltips>
     <input type="range" class="form-range-input" min="0" max="100" value="60" id="rangeTooltip">
+  </div>`} />
+
+Set `data-coreui-tooltips="always"` to keep the tooltip visible at all times.
+
+<Example code={`<label for="rangeTooltipAlways" class="form-label">Brightness</label>
+  <div class="form-range mt-4" data-coreui-tooltips="always">
+    <input type="range" class="form-range-input" min="0" max="100" value="60" id="rangeTooltipAlways">
   </div>`} />
 
 ## Tick marks
@@ -112,7 +119,7 @@ Every `.form-range` wrapper that contains a `.form-range-input` is initialized o
 
 | Attribute | Description |
 | --- | --- |
-| `data-coreui-tooltips` | Add to the `.form-range` wrapper to show a [tooltip](#tooltip) with the value. |
+| `data-coreui-tooltips` | Add to the `.form-range` wrapper to show a [tooltip](#tooltip) with the value on hover, drag and focus; `"always"` keeps it visible. |
 | `list` (on the input) + `<datalist>` | Renders [tick marks](#tick-marks) from the datalist options. |
 
 ```html
@@ -137,7 +144,7 @@ Options can be passed using data attributes or JavaScript. To do this, append an
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
-| `tooltips` | boolean | `false` | Shows a tooltip with the current value above the thumb. |
+| `tooltips` | boolean, `'always'` | `false` | Shows a tooltip with the current value above the thumb: `true` on hover, drag and focus, `'always'` at all times. |
 | `tooltipsFormat` | function, null | `null` | `(value) => string` that formats the tooltip text. |
 
 ### Methods

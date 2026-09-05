@@ -168,6 +168,22 @@ describe('Range', () => {
       expect(tooltip.querySelector('.tooltip-inner').textContent).toEqual('50')
     })
 
+    it('should keep the tooltip hidden until interaction unless tooltips is "always"', () => {
+      fixtureEl.innerHTML = getRangeHtml('data-coreui-tooltips')
+
+      new Range(fixtureEl.querySelector('.form-range')) // eslint-disable-line no-new
+
+      expect(fixtureEl.querySelector('.form-range-tooltip')).not.toHaveClass('show')
+    })
+
+    it('should show the tooltip permanently with tooltips "always"', () => {
+      fixtureEl.innerHTML = getRangeHtml('data-coreui-tooltips="always"')
+
+      new Range(fixtureEl.querySelector('.form-range')) // eslint-disable-line no-new
+
+      expect(fixtureEl.querySelector('.form-range-tooltip')).toHaveClass('show')
+    })
+
     it('should not create a tooltip by default', () => {
       fixtureEl.innerHTML = getRangeHtml()
 
