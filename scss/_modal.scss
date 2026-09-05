@@ -2,6 +2,7 @@
 @use "functions/defaults" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/box-shadow" as *;
+@use "mixins/dialog-shared" as *;
 @use "layout/breakpoints" as *;
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
@@ -204,10 +205,7 @@ $modal-tokens: defaults(
   }
 
   .modal-header {
-    display: flex;
-    flex-shrink: 0;
-    align-items: center;
-    padding: var(--#{$prefix}modal-header-padding);
+    @include dialog-header(var(--#{$prefix}modal-header-padding));
     border-block-end: var(--#{$prefix}modal-header-border-width) solid var(--#{$prefix}modal-header-border-color);
     @include border-top-radius(var(--#{$prefix}modal-inner-border-radius));
 
@@ -221,26 +219,17 @@ $modal-tokens: defaults(
   }
 
   .modal-title {
-    margin-bottom: 0;
-    line-height: var(--#{$prefix}modal-title-line-height);
+    @include dialog-title(var(--#{$prefix}modal-title-line-height));
   }
 
   .modal-body {
     position: relative;
-    flex: 1 1 auto;
-    padding: var(--#{$prefix}modal-padding);
+    @include dialog-body(var(--#{$prefix}modal-padding));
   }
 
   .modal-footer {
-    display: flex;
-    flex-shrink: 0;
-    flex-wrap: wrap;
-    gap: var(--#{$prefix}modal-footer-gap);
-    align-items: center; // vertically center
-    justify-content: flex-end; // Right align buttons with flex property because text-align doesn't work on flex items
-    padding: var(--#{$prefix}modal-padding);
+    @include dialog-footer(var(--#{$prefix}modal-padding), var(--#{$prefix}modal-footer-gap), var(--#{$prefix}modal-footer-border-width), var(--#{$prefix}modal-footer-border-color));
     background-color: var(--#{$prefix}modal-footer-bg, transparent);
-    border-block-start: var(--#{$prefix}modal-footer-border-width) solid var(--#{$prefix}modal-footer-border-color);
     @include border-bottom-radius(var(--#{$prefix}modal-inner-border-radius));
   }
 

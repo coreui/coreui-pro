@@ -3,6 +3,7 @@
 @use "mixins/backdrop" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/box-shadow" as *;
+@use "mixins/dialog-shared" as *;
 @use "layout/breakpoints" as *;
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
@@ -241,10 +242,7 @@ $dialog-tokens: defaults(
 
   // Dialog header
   .dialog-header {
-    display: flex;
-    flex-shrink: 0;
-    align-items: center;
-    padding: var(--#{$prefix}dialog-header-padding);
+    @include dialog-header(var(--#{$prefix}dialog-header-padding));
     border-block-end: var(--#{$prefix}dialog-header-border-width) solid var(--#{$prefix}dialog-header-border-color);
 
     .btn-close {
@@ -254,26 +252,17 @@ $dialog-tokens: defaults(
 
   // Dialog title
   .dialog-title {
-    margin-bottom: 0;
-    line-height: var(--#{$prefix}dialog-title-line-height);
+    @include dialog-title(var(--#{$prefix}dialog-title-line-height));
   }
 
   // Dialog body
   .dialog-body {
     position: relative;
-    flex: 1 1 auto;
-    padding: var(--#{$prefix}dialog-padding);
+    @include dialog-body(var(--#{$prefix}dialog-padding));
   }
 
   // Dialog footer
   .dialog-footer {
-    display: flex;
-    flex-shrink: 0;
-    flex-wrap: wrap;
-    gap: var(--#{$prefix}dialog-footer-gap);
-    align-items: center;
-    justify-content: flex-end;
-    padding: var(--#{$prefix}dialog-footer-padding);
-    border-block-start: var(--#{$prefix}dialog-footer-border-width) solid var(--#{$prefix}dialog-footer-border-color);
+    @include dialog-footer(var(--#{$prefix}dialog-footer-padding), var(--#{$prefix}dialog-footer-gap), var(--#{$prefix}dialog-footer-border-width), var(--#{$prefix}dialog-footer-border-color));
   }
 }
