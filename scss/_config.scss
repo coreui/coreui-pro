@@ -162,7 +162,7 @@ $gutters:                     $spacers !default;
 $container-padding-x: $grid-gutter-x !default;
 
 // scss-docs-start variable-gradient
-$gradient: linear-gradient(180deg, color-mix(in srgb, var(--#{$prefix}white) 15%, transparent), color-mix(in srgb, var(--#{$prefix}white) 0%, transparent)) !default;
+$gradient: linear-gradient(180deg, color-mix(in oklch, var(--#{$prefix}white) 15%, transparent), color-mix(in oklch, var(--#{$prefix}white) 0%, transparent)) !default;
 // scss-docs-end variable-gradient
 
 // scss-docs-start position-map

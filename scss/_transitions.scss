@@ -9,7 +9,7 @@ $transition-fade-timing:      linear !default;
 // scss-docs-end fade-transition
 
 // scss-docs-start collapse-transition
-$transition-collapse-property: "height, display" !default;
+$transition-collapse-property: "block-size, display" !default;
 $transition-collapse-duration: .35s !default;
 $transition-collapse-timing:   ease !default;
 // scss-docs-end collapse-transition

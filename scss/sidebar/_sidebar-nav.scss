@@ -43,13 +43,13 @@ $sidebar-nav-link-icon-bullet-border-color:   var(--#{$prefix}fg-3) !default;
 $sidebar-nav-link-icon-bullet-border-radius:  var(--#{$prefix}radius-pill) !default;
 
 $sidebar-nav-link-hover-color:                        var(--#{$prefix}fg-body) !default;
-$sidebar-nav-link-hover-bg:                           color-mix(in srgb, var(--#{$prefix}fg-body) 10%, transparent) !default;
+$sidebar-nav-link-hover-bg:                           color-mix(in oklch, var(--#{$prefix}fg-body) 10%, transparent) !default;
 $sidebar-nav-link-hover-icon-color:                   var(--#{$prefix}fg-body) !default;
 $sidebar-nav-link-hover-icon-bullet-bg:               transparent !default;
 $sidebar-nav-link-hover-icon-bullet-border-color:     var(--#{$prefix}fg-body) !default;
 
 $sidebar-nav-link-active-color:                       var(--#{$prefix}fg-body) !default;
-$sidebar-nav-link-active-bg:                          color-mix(in srgb, var(--#{$prefix}fg-body) 10%, transparent) !default;
+$sidebar-nav-link-active-bg:                          color-mix(in oklch, var(--#{$prefix}fg-body) 10%, transparent) !default;
 $sidebar-nav-link-active-icon-color:                  var(--#{$prefix}fg-body) !default;
 $sidebar-nav-link-active-icon-bullet-bg:              transparent !default;
 $sidebar-nav-link-active-icon-bullet-border-color:    var(--#{$prefix}fg-body) !default;

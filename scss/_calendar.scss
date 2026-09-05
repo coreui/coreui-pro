@@ -50,7 +50,7 @@ $calendar-cell-disabled-color:               var(--#{$prefix}fg-4) !default;
 $calendar-cell-selected-color:               var(--#{$prefix}primary-contrast) !default;
 $calendar-cell-selected-bg:                  var(--#{$prefix}primary-base) !default;
 
-$calendar-cell-range-bg:                     color-mix(in srgb, var(--#{$prefix}theme-bg, var(--#{$prefix}primary-base)) 12.5%, transparent) !default;
+$calendar-cell-range-bg:                     color-mix(in oklch, var(--#{$prefix}theme-bg, var(--#{$prefix}primary-base)) 12.5%, transparent) !default;
 $calendar-cell-range-hover-border-color:     var(--#{$prefix}primary-base) !default;
 
 $calendar-cell-today-color:                  var(--#{$prefix}danger-base) !default;

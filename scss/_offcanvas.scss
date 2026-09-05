@@ -158,7 +158,7 @@ $offcanvas-tokens: defaults(
           }
 
           &::backdrop {
-            background-color: color-mix(in srgb, var(--#{$prefix}offcanvas-backdrop-bg) calc(var(--#{$prefix}offcanvas-backdrop-opacity) * 100%), transparent);
+            background-color: color-mix(in oklch, var(--#{$prefix}offcanvas-backdrop-bg) calc(var(--#{$prefix}offcanvas-backdrop-opacity) * 100%), transparent);
             @include transition(background-color var(--#{$prefix}offcanvas-transition-duration) var(--#{$prefix}offcanvas-transition-timing));
           }
 
@@ -168,7 +168,7 @@ $offcanvas-tokens: defaults(
         }
 
         &.offcanvas-instant::backdrop {
-          background-color: color-mix(in srgb, var(--#{$prefix}offcanvas-backdrop-bg) calc(var(--#{$prefix}offcanvas-backdrop-opacity) * 100%), transparent);
+          background-color: color-mix(in oklch, var(--#{$prefix}offcanvas-backdrop-bg) calc(var(--#{$prefix}offcanvas-backdrop-opacity) * 100%), transparent);
         }
 
         &[open]:not(.hiding) {

@@ -204,7 +204,7 @@
             property: (
               --cui-bg: null,
               --cui-bg-opacity: 1,
-              background-color: color-mix(in srgb, var(--cui-bg) calc(var(--cui-bg-opacity) * 100%), transparent),
+              background-color: color-mix(in oklch, var(--cui-bg) calc(var(--cui-bg-opacity) * 100%), transparent),
             ),
             class: bg,
             values: (blue: var(--cui-blue))
@@ -213,7 +213,7 @@
           .bg-blue {
             --cui-bg: var(--cui-blue);
             --cui-bg-opacity: 1;
-            background-color: color-mix(in srgb, var(--cui-bg) calc(var(--cui-bg-opacity) * 100%), transparent);
+            background-color: color-mix(in oklch, var(--cui-bg) calc(var(--cui-bg-opacity) * 100%), transparent);
           }
         }
       }

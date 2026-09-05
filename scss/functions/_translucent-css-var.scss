@@ -16,5 +16,5 @@
     $color: var(--#{$prefix}#{$identifier}-#{$suffix});
   }
 
-  @return color-mix(in srgb, #{$color} calc(var(--#{$prefix}#{$target}-opacity) * 100%), transparent);
+  @return color-mix(in oklch, #{$color} calc(var(--#{$prefix}#{$target}-opacity) * 100%), transparent);
 }

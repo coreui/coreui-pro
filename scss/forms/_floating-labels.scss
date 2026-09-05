@@ -84,7 +84,7 @@ $form-floating-tokens: defaults(
       height: 100%; // allow textareas
       padding: var(--#{$prefix}form-floating-padding-y) var(--#{$prefix}form-floating-padding-x);
       overflow: hidden;
-      color: color-mix(in srgb, var(--#{$prefix}fg-body) calc(var(--#{$prefix}form-floating-label-opacity) * 100%), transparent);
+      color: color-mix(in oklch, var(--#{$prefix}fg-body) calc(var(--#{$prefix}form-floating-label-opacity) * 100%), transparent);
       text-align: start;
       text-overflow: ellipsis;
       white-space: nowrap;
