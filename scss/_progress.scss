@@ -134,7 +134,7 @@ $progress-segmented-tokens: defaults(
 
     // Two circles for the caps and a bar for the body, tiled with `space` so every pill
     // is whole and the gaps absorb the remainder of the width.
-    mask-image: radial-gradient(circle var(--#{$prefix}progress-segment-radius) at var(--#{$prefix}progress-segment-radius) var(--#{$prefix}progress-segment-radius), #000 calc(100% - 1px), transparent), radial-gradient(circle var(--#{$prefix}progress-segment-radius) at var(--#{$prefix}progress-segment-radius) calc(100% - var(--#{$prefix}progress-segment-radius)), #000 calc(100% - 1px), transparent), linear-gradient(to right, #000 var(--#{$prefix}progress-segment-width), transparent var(--#{$prefix}progress-segment-width));
+    mask-image: radial-gradient(circle var(--#{$prefix}progress-segment-radius) at var(--#{$prefix}progress-segment-radius) var(--#{$prefix}progress-segment-radius), #000 100%, transparent), radial-gradient(circle var(--#{$prefix}progress-segment-radius) at var(--#{$prefix}progress-segment-radius) calc(100% - var(--#{$prefix}progress-segment-radius)), #000 100%, transparent), linear-gradient(to right, #000 var(--#{$prefix}progress-segment-width), transparent var(--#{$prefix}progress-segment-width));
     mask-repeat: space no-repeat;
     mask-position: 0 0, 0 0, 0 50%;
     mask-size: var(--#{$prefix}progress-segment-tile) 100%, var(--#{$prefix}progress-segment-tile) 100%, var(--#{$prefix}progress-segment-tile) calc(100% - var(--#{$prefix}progress-segment-width));
