@@ -48,7 +48,6 @@ $button-tokens: defaults(
     --#{$prefix}btn-min-height: var(--#{$prefix}btn-input-min-height),
     --#{$prefix}btn-padding-y: var(--#{$prefix}btn-input-padding-y),
     --#{$prefix}btn-padding-x: var(--#{$prefix}btn-input-padding-x),
-    --#{$prefix}btn-font-family: var(--#{$prefix}btn-input-font-family),
     --#{$prefix}btn-font-size: var(--#{$prefix}btn-input-font-size),
     --#{$prefix}btn-font-weight: var(--#{$prefix}font-weight-normal),
     --#{$prefix}btn-line-height: var(--#{$prefix}btn-input-line-height),
@@ -259,7 +258,6 @@ $btn-check-deprecated: ".btn-check:not(#{$btn-variant-selectors})" !default;
     justify-content: center;
     min-height: var(--#{$prefix}btn-min-height);
     padding: var(--#{$prefix}btn-padding-y) var(--#{$prefix}btn-padding-x);
-    font-family: var(--#{$prefix}btn-font-family);
     font-size: var(--#{$prefix}btn-font-size);
     font-weight: var(--#{$prefix}btn-font-weight);
     line-height: var(--#{$prefix}btn-line-height);

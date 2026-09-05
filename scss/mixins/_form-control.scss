@@ -7,7 +7,6 @@
 // scss-docs-start form-control-frame-mixin
 @mixin form-control-frame() {
   padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
-  font-family: var(--#{$prefix}control-font-family);
   font-size: var(--#{$prefix}control-font-size);
   font-weight: var(--#{$prefix}control-font-weight);
   line-height: var(--#{$prefix}control-line-height);

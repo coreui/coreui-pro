@@ -43,7 +43,7 @@ $validated-controls: if(sass($enable-deprecated-form-check): ".check, .radio, .s
     width: 100%;
     margin-top: var(--#{$prefix}form-feedback-margin-top);
     font-size: var(--#{$prefix}form-feedback-font-size);
-    font-style: var(--#{$prefix}form-feedback-font-style);
+    font-style: var(--#{$prefix}form-feedback-font-style, inherit);
     color: $color;
   }
 
@@ -60,7 +60,7 @@ $validated-controls: if(sass($enable-deprecated-form-check): ".check, .radio, .s
     padding: var(--#{$prefix}tooltip-padding-y, var(--#{$prefix}form-feedback-tooltip-padding-y)) var(--#{$prefix}tooltip-padding-x, var(--#{$prefix}form-feedback-tooltip-padding-x));
     margin-top: .1rem;
     font-size: var(--#{$prefix}tooltip-font-size, var(--#{$prefix}form-feedback-tooltip-font-size));
-    line-height: var(--#{$prefix}form-feedback-tooltip-line-height);
+    line-height: var(--#{$prefix}form-feedback-tooltip-line-height, inherit);
     color: $tooltip-color;
     background-color: var(--#{$prefix}#{$theme}-bg);
     opacity: 1;

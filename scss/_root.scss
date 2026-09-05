@@ -19,7 +19,6 @@ $control-disabled-opacity:                      .5 !default;
 $control-label-disabled-opacity:                $control-disabled-opacity !default;
 // scss-docs-end control-state-variables
 
-$body-text-align:     null !default;
 $body-emphasis-color: light-dark($black, $white) !default;
 $link-hover-color:    color-mix(in oklch, var(--#{$prefix}link-color) 90%, var(--#{$prefix}black)) !default;
 
@@ -86,7 +85,6 @@ $font-weight-base:            var(--#{$prefix}font-weight-normal) !default;
 $input-btn-gap:                        .375rem !default;
 $input-btn-padding-y:                  .375rem !default;
 $input-btn-padding-x:                  .75rem !default;
-$input-btn-font-family:                null !default;
 $input-btn-font-size:                  var(--#{$prefix}body-font-size) !default;
 $input-btn-line-height:                var(--#{$prefix}body-line-height) !default;
 $input-btn-border-width:               var(--#{$prefix}border-width) !default;
@@ -201,7 +199,6 @@ $root-token-defaults: map.merge(
     --#{$prefix}icon-size-base: $icon-size-base,
     --#{$prefix}body-font-weight: $font-weight-base,
     --#{$prefix}body-line-height: $line-height-base,
-    --#{$prefix}body-text-align: $body-text-align,
     // Deprecated in v6.0.0 aliases of the ladder above; removed in v7, when the
     // secondary/tertiary namespace goes back to the theme colors alone.
     --#{$prefix}body-color: var(--#{$prefix}fg-body),
@@ -262,7 +259,6 @@ $root-token-defaults: map.merge(
     --#{$prefix}btn-input-gap: $input-btn-gap,
     --#{$prefix}btn-input-padding-y: $input-btn-padding-y,
     --#{$prefix}btn-input-padding-x: $input-btn-padding-x,
-    --#{$prefix}btn-input-font-family: $input-btn-font-family,
     --#{$prefix}btn-input-font-size: $input-btn-font-size,
     --#{$prefix}btn-input-line-height: $input-btn-line-height,
     --#{$prefix}btn-input-border-width: $input-btn-border-width,
