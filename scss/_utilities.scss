@@ -331,7 +331,7 @@ $utilities: map.merge(
     "border-width": (
       property: border-width,
       class: border,
-      values: $border-widths
+      values: map.merge($border-widths, (keyline: var(--#{$prefix}border-width-keyline)))
     ),
     "border-top-width": (
       property: border-top-width,
@@ -814,7 +814,7 @@ $utilities: map.merge(
       property: font-family,
       class: font,
       values: (
-        monospace: var(--#{$prefix}font-monospace),
+        monospace: var(--#{$prefix}font-mono),
         body: var(--#{$prefix}body-font-family)
       )
     ),

@@ -4027,6 +4027,11 @@ no output at all.
 `--cui-border-radius` itself stays as a deprecated alias of `--cui-radius-4`),
 `--cui-dropdown-inner-border-radius` and
 `--cui-calendar-cell-range-hover-bg` (declared and never read),
+`--cui-font-monospace` (renamed `--cui-font-mono`), `--cui-highlight-color` and
+`--cui-highlight-bg` (renamed `--cui-mark-color` / `--cui-mark-bg`),
+`--cui-btn-input-color` (renamed `--cui-btn-input-fg`) and `--cui-control-color`
+(renamed `--cui-control-fg`, on `.form-control` and everything sharing its
+frame),
 `--cui-body-text-align`, `--cui-btn-input-font-family`, `--cui-btn-font-family`,
 `--cui-control-font-family` and `--cui-search-button-font-family` (never emitted,
 see the Sass variables above). Optional knobs that stay `null` by default —
@@ -4207,6 +4212,14 @@ Prefer the `.d-sidebar-narrow*` names in new markup.
   classes set logical corners (`border-start-start-radius`, …), so
   `.rounded-top` flips with the writing direction like `.rounded-start`
   already did.
+- **Buttons and controls carry a line height per size.** `:root` emits
+  `--cui-btn-input-xs-line-height` (`1.125`), `-sm-line-height`
+  (`--cui-line-height-sm`) and `-lg-line-height` (`--cui-line-height-md`), the
+  size classes hand them to `--cui-btn-line-height` / `--cui-control-line-height`,
+  and each size's `min-height` is computed from its own line height. `.btn-xs`
+  and `.form-control-xs` get tighter (their line height was the body's `1.5`);
+  `sm` and `lg` keep the body value. `--cui-border-width-keyline` (`.5px`) is
+  a root token now and `.border-keyline` reads it.
 - **New `.rounded-size-*`.** It writes the radius into `--cui-rounded-size`
   without setting `border-radius` itself, and the unprefixed side classes
   (`.rounded-top`, `.rounded-end`, `.rounded-bottom`, `.rounded-start`) read
