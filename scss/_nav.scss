@@ -218,8 +218,8 @@ $tab-pane-tokens: defaults(
     align-items: var(--#{$prefix}nav-link-align);
     justify-content: var(--#{$prefix}nav-link-justify);
     padding: var(--#{$prefix}nav-link-padding-y) var(--#{$prefix}nav-link-padding-x);
-    font-size: var(--#{$prefix}nav-link-font-size);
-    font-weight: var(--#{$prefix}nav-link-font-weight);
+    font-size: var(--#{$prefix}nav-link-font-size, inherit);
+    font-weight: var(--#{$prefix}nav-link-font-weight, inherit);
     color: var(--#{$prefix}theme-fg, var(--#{$prefix}nav-link-color));
     text-decoration: none;
     background: none;

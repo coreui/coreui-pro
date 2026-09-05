@@ -154,7 +154,6 @@ $th-font-weight:       null !default;
     font-weight: var(--#{$prefix}body-font-weight);
     line-height: var(--#{$prefix}body-line-height);
     color: var(--#{$prefix}fg-body);
-    text-align: var(--#{$prefix}body-text-align);
     background-color: var(--#{$prefix}bg-body); // 2
     -webkit-text-size-adjust: 100%; // 3
     -webkit-tap-highlight-color: transparent; // 4

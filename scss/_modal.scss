@@ -239,7 +239,7 @@ $modal-tokens: defaults(
     align-items: center; // vertically center
     justify-content: flex-end; // Right align buttons with flex property because text-align doesn't work on flex items
     padding: var(--#{$prefix}modal-padding);
-    background-color: var(--#{$prefix}modal-footer-bg);
+    background-color: var(--#{$prefix}modal-footer-bg, transparent);
     border-block-start: var(--#{$prefix}modal-footer-border-width) solid var(--#{$prefix}modal-footer-border-color);
     @include border-bottom-radius(var(--#{$prefix}modal-inner-border-radius));
   }
