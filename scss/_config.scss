@@ -110,9 +110,6 @@ $sizes: defaults(
 // scss-docs-end sizes-map
 // scss-docs-end spacers-map
 
-// Style anchor elements.
-
-
 // Define the minimum dimensions at which your layout will change,
 // adapting to different screen sizes, for use in media queries.
 
@@ -270,7 +267,6 @@ $shadows: (
   inset: inset 0 1px 2px light-dark(color-mix(in oklch, var(--#{$prefix}shadow-tint, var(--#{$prefix}shadow-color)) calc(8% * var(--#{$prefix}shadow-opacity, 1)), transparent), color-mix(in oklch, var(--#{$prefix}shadow-tint, var(--#{$prefix}shadow-color)) calc(26% * var(--#{$prefix}shadow-opacity, 1)), transparent)),
 ) !default;
 // scss-docs-end box-shadow-variables
-
 
 // Font, line-height, and color for body text, headings, and more.
 
