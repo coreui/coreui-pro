@@ -140,14 +140,12 @@ $header-tokens: defaults(
     margin-inline-end: $header-brand-margin-end;
     font-size: $header-brand-font-size;
     color: var(--#{$prefix}header-brand-color);
-    text-decoration: if(not sass($link-decoration == none): none);
+    text-decoration: none;
     white-space: nowrap;
 
     &:hover,
     &:focus {
       color: var(--#{$prefix}header-brand-hover-color);
-      // stylelint-disable-next-line scss/at-function-named-arguments
-      text-decoration: if(sass($link-hover-decoration == underline): none);
     }
   }
 

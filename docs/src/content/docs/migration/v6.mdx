@@ -2476,6 +2476,19 @@ as such.
   alerts, modals, drawers, popovers, callouts, list groups, the sidebar and
   the reboot margins keep their size.
 
+#### Link decoration is a token, not a Sass knob
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`$link-decoration`, `$link-underline-offset` and `$link-hover-decoration`
+  are gone.** The underline lives on `:root` as `--cui-link-decoration`
+  (`underline`) and `--cui-link-underline-offset` (`.2em`); set the token
+  instead of recompiling. `--cui-link-hover-decoration` is no longer declared
+  — the hover falls back to `--cui-link-decoration`, so declare it yourself
+  for a different hover. Nav links, list-group actions, page links, the
+  header, the dropdown item and the button write `text-decoration: none`
+  outright (they used to skip it when the knob was already `none`), and
+  `.btn-link` reads the tokens.
+
 #### Every theme colour gets an action-background slot
 
 `:root` emits `--cui-{color}-bg` for every theme colour, pointing at the
