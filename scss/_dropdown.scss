@@ -18,7 +18,6 @@ $dropdown-bg:                       var(--#{$prefix}bg-body) !default;
 $dropdown-border-color:             var(--#{$prefix}border-color-translucent) !default;
 $dropdown-border-radius:            var(--#{$prefix}radius-7) !default;
 $dropdown-border-width:             var(--#{$prefix}border-width) !default;
-$dropdown-inner-border-radius:      calc(var(--#{$prefix}dropdown-border-radius) - var(--#{$prefix}dropdown-border-width)) !default;
 $dropdown-divider-bg:               $dropdown-border-color !default;
 $dropdown-divider-margin-y:         var(--#{$prefix}spacer-2) !default;
 $dropdown-box-shadow:               var(--#{$prefix}box-shadow) !default;
@@ -74,7 +73,6 @@ $dropdown-tokens: defaults(
     --#{$prefix}dropdown-border-color: #{$dropdown-border-color},
     --#{$prefix}dropdown-border-radius: #{$dropdown-border-radius},
     --#{$prefix}dropdown-border-width: #{$dropdown-border-width},
-    --#{$prefix}dropdown-inner-border-radius: #{$dropdown-inner-border-radius},
     --#{$prefix}dropdown-divider-bg: #{$dropdown-divider-bg},
     --#{$prefix}dropdown-divider-margin-y: #{$dropdown-divider-margin-y},
     --#{$prefix}dropdown-box-shadow: #{$dropdown-box-shadow},
@@ -168,18 +166,6 @@ $dropdown-dark-tokens: defaults(
       inset-inline-start: 0;
       top: 100%;
       margin-top: var(--#{$prefix}dropdown-spacer);
-    }
-
-    @if $dropdown-padding-y == 0 {
-      > .dropdown-item:first-child,
-      > li:first-child .dropdown-item {
-        @include border-top-radius(var(--#{$prefix}dropdown-inner-border-radius));
-      }
-      > .dropdown-item:last-child,
-      > li:last-child .dropdown-item {
-        @include border-bottom-radius(var(--#{$prefix}dropdown-inner-border-radius));
-      }
-
     }
   }
 

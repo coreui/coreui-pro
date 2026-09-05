@@ -19,7 +19,6 @@ $menu-max-height:               none !default;
 $menu-overflow-y:               visible !default;
 $menu-padding-x:                .25rem !default;
 $menu-padding-y:                .25rem !default;
-$menu-spacer:                   .125rem !default;
 $menu-font-size:                var(--#{$prefix}font-size-sm) !default;
 $menu-color:                    var(--#{$prefix}fg-body) !default;
 $menu-bg:                       var(--#{$prefix}bg-body) !default;
@@ -66,7 +65,6 @@ $menu-tokens: defaults(
     --#{$prefix}menu-overflow-y: #{$menu-overflow-y},
     --#{$prefix}menu-padding-x: #{$menu-padding-x},
     --#{$prefix}menu-padding-y: #{$menu-padding-y},
-    --#{$prefix}menu-spacer: #{$menu-spacer},
     --#{$prefix}menu-font-size: #{$menu-font-size},
     --#{$prefix}menu-color: #{$menu-color},
     --#{$prefix}menu-bg: #{$menu-bg},

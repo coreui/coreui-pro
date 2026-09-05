@@ -136,6 +136,10 @@ $switch-selector: if(sass($enable-deprecated-form-check): ".switch, .form-switch
       @include focus-ring(true);
     }
 
+    &:active {
+      filter: var(--#{$prefix}switch-active-filter);
+    }
+
     &:disabled {
       pointer-events: none;
       filter: none;

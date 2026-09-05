@@ -51,7 +51,6 @@ $calendar-cell-selected-color:               var(--#{$prefix}primary-contrast) !
 $calendar-cell-selected-bg:                  var(--#{$prefix}primary-base) !default;
 
 $calendar-cell-range-bg:                     color-mix(in srgb, var(--#{$prefix}theme-bg, var(--#{$prefix}primary-base)) 12.5%, transparent) !default;
-$calendar-cell-range-hover-bg:               color-mix(in srgb, var(--#{$prefix}theme-bg, var(--#{$prefix}primary-base)) 25%, transparent) !default;
 $calendar-cell-range-hover-border-color:     var(--#{$prefix}primary-base) !default;
 
 $calendar-cell-today-color:                  var(--#{$prefix}danger-base) !default;
@@ -100,7 +99,6 @@ $calendar-tokens: defaults(
     --#{$prefix}calendar-cell-selected-color: #{$calendar-cell-selected-color},
     --#{$prefix}calendar-cell-selected-bg: #{$calendar-cell-selected-bg},
     --#{$prefix}calendar-cell-range-bg: #{$calendar-cell-range-bg},
-    --#{$prefix}calendar-cell-range-hover-bg: #{$calendar-cell-range-hover-bg},
     --#{$prefix}calendar-cell-range-hover-border-color: #{$calendar-cell-range-hover-border-color},
     --#{$prefix}calendar-cell-today-color: #{$calendar-cell-today-color},
   ),
