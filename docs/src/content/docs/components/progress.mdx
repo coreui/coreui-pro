@@ -158,15 +158,6 @@ Add `.progress-segmented` to a `.progress` or `.progress-stacked` to cut the tra
 
 The fill ends where the value puts it, so a pill on the boundary can be partly coloured. Where the design calls for whole pills only, round the width to a multiple of the pill pitch before setting it.
 
-<Example code={`<div class="progress-stacked progress-segmented" style="height: 2rem">
-    <div class="progress" role="progressbar" aria-label="Segment one" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100" style="width: 30%">
-      <div class="progress-bar"></div>
-    </div>
-    <div class="progress" role="progressbar" aria-label="Segment two" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" style="width: 25%">
-      <div class="progress-bar theme-warning"></div>
-    </div>
-  </div>`} />
-
 ## On a colored surface
 
 Add `.progress-white` to draw the bar in white and the track as translucent white. That way a progress bar sitting on a dark or brand-colored surface stays readable without a color of its own; the bar stays white even under a `.theme-*` class.
