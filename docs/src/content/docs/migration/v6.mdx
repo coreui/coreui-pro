@@ -2462,6 +2462,20 @@ as such.
   `.shadow-{color}` and `.shadow-opacity-*` on the element, `$shadows` in
   Sass — a custom entry is now a comma-separated list of layers.
 
+#### A denser spacing scale
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`$spacers` steps 3–9 are closer together.** `1` and `2` stay at `.25rem`
+  and `.5rem`; from there the scale is `.75 / 1 / 1.25 / 1.5 / 2 / 2.5 / 3 rem`
+  (was `1 / 1.5 / 3 / 4 / 5 / 6 / 8`). Every spacing, gap and gutter utility
+  follows: `.p-3` is `.75rem` (was `1rem`), `.p-4` is `1rem` (was `1.5rem`),
+  `.p-5` `1.25rem` (was `3rem`) — a layout that leaned on `.p-5` or `.mb-5`
+  for large gaps needs a bigger step now, `.p-9` being the old `.p-5`. The
+  components are unchanged: everything that padded with the old step 3
+  reads `--cui-spacer` (`1rem`) instead of `--cui-spacer-3`, so cards,
+  alerts, modals, drawers, popovers, callouts, list groups, the sidebar and
+  the reboot margins keep their size.
+
 #### Every theme colour gets an action-background slot
 
 `:root` emits `--cui-{color}-bg` for every theme colour, pointing at the

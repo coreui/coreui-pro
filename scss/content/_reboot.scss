@@ -4,14 +4,14 @@
 @use "../config" as *;
 
 // scss-docs-start reboot-type-variables
-$paragraph-margin-bottom:     var(--#{$prefix}spacer-3) !default;
+$paragraph-margin-bottom:     var(--#{$prefix}spacer) !default;
 $font-family-code:            var(--#{$prefix}font-monospace) !default;
 $headings-margin-bottom:      var(--#{$prefix}spacer-2) !default;
 $headings-font-family:        inherit !default;
 $headings-font-style:         inherit !default;
 $headings-font-weight:        500 !default;
 $sub-sup-font-size:           .75em !default;
-$hr-margin-y:                 var(--#{$prefix}spacer-3) !default;
+$hr-margin-y:                 var(--#{$prefix}spacer) !default;
 $hr-color:                    inherit !default;
 $hr-border-width:             var(--#{$prefix}border-width) !default;
 $hr-opacity:                  .25 !default;
@@ -261,7 +261,7 @@ $th-font-weight:       null !default;
   // Address
 
   address {
-    margin-bottom: var(--#{$prefix}spacer-3);
+    margin-bottom: var(--#{$prefix}spacer);
     font-style: normal;
     line-height: inherit;
   }
@@ -278,7 +278,7 @@ $th-font-weight:       null !default;
   ul,
   dl {
     margin-top: 0;
-    margin-bottom: var(--#{$prefix}spacer-3);
+    margin-bottom: var(--#{$prefix}spacer);
   }
 
   ol ol,
@@ -303,7 +303,7 @@ $th-font-weight:       null !default;
   // Blockquote
 
   blockquote {
-    margin: 0 0 var(--#{$prefix}spacer-3);
+    margin: 0 0 var(--#{$prefix}spacer);
   }
 
 
@@ -399,7 +399,7 @@ $th-font-weight:       null !default;
   pre {
     display: block;
     margin-top: 0; // 1
-    margin-bottom: var(--#{$prefix}spacer-3); // 2
+    margin-bottom: var(--#{$prefix}spacer); // 2
     overflow: auto; // 3
     font-size: var(--#{$prefix}code-font-size);
     color: var(--#{$prefix}pre-color);
@@ -445,7 +445,7 @@ $th-font-weight:       null !default;
   // Apply a consistent margin strategy (matches our type styles).
 
   figure {
-    margin: 0 0 var(--#{$prefix}spacer-3);
+    margin: 0 0 var(--#{$prefix}spacer);
   }
 
 

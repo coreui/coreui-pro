@@ -33,7 +33,7 @@ $dropdown-link-active-bg:           var(--#{$prefix}primary-base) !default;
 $dropdown-link-disabled-color:      var(--#{$prefix}fg-3) !default;
 
 $dropdown-item-padding-y:           var(--#{$prefix}spacer-1) !default;
-$dropdown-item-padding-x:           var(--#{$prefix}spacer-3) !default;
+$dropdown-item-padding-x:           var(--#{$prefix}spacer) !default;
 $dropdown-item-border-radius:       0 !default;
 
 $dropdown-header-color:             var(--#{$prefix}fg-3) !default;

@@ -11,8 +11,8 @@
 
 // scss-docs-start sidebar-variables
 $sidebar-width:                            16rem !default;
-$sidebar-padding-y:                        var(--#{$prefix}spacer-3) !default;
-$sidebar-padding-x:                        var(--#{$prefix}spacer-3) !default;
+$sidebar-padding-y:                        var(--#{$prefix}spacer) !default;
+$sidebar-padding-x:                        var(--#{$prefix}spacer) !default;
 $sidebar-color:                            var(--#{$prefix}fg-body) !default;
 $sidebar-bg:                               var(--#{$prefix}bg-body) !default;
 $sidebar-transition:                       margin-left .15s, margin-right .15s, box-shadow .075s, transform .15s, width .15s, z-index 0s ease .15s !default;
