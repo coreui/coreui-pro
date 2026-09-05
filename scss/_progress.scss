@@ -1,7 +1,6 @@
 @use "functions/defaults" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/box-shadow" as *;
-@use "mixins/gradients" as *;
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
 @use "config" as *;
@@ -14,8 +13,14 @@ $progress-border-radius:               var(--#{$prefix}radius-5) !default;
 $progress-box-shadow:                  var(--#{$prefix}box-shadow-inset) !default;
 $progress-bar-color:                   var(--#{$prefix}primary-contrast) !default;
 $progress-bar-bg:                      var(--#{$prefix}primary-bg) !default;
+$progress-bar-bg-image:                none !default;
+$progress-bar-stripes:                 linear-gradient(45deg, var(--#{$prefix}progress-bar-stripe-color) 25%, transparent 25%, transparent 50%, var(--#{$prefix}progress-bar-stripe-color) 50%, var(--#{$prefix}progress-bar-stripe-color) 75%, transparent 75%, transparent) !default;
+$progress-bar-stripe-color:            color-mix(in oklch, var(--#{$prefix}white) 15%, transparent) !default;
 $progress-bar-transition:              width .6s ease !default;
 $progress-bar-animation:               progress-bar-stripes 1s linear infinite !default;
+
+$progress-segment-width:               .375rem !default;
+$progress-segment-gap:                 .375rem !default;
 
 $progress-contrast-track-opacity:      20% !default;
 // scss-docs-end progress-variables
@@ -34,12 +39,27 @@ $progress-tokens: defaults(
     --#{$prefix}progress-box-shadow: #{$progress-box-shadow},
     --#{$prefix}progress-bar-color: #{$progress-bar-color},
     --#{$prefix}progress-bar-bg: #{$progress-bar-bg},
+    --#{$prefix}progress-bar-bg-image: #{$progress-bar-bg-image},
+    --#{$prefix}progress-bar-stripes: #{$progress-bar-stripes},
+    --#{$prefix}progress-bar-stripe-color: #{$progress-bar-stripe-color},
     --#{$prefix}progress-bar-transition: #{$progress-bar-transition},
     --#{$prefix}progress-bar-animation: #{$progress-bar-animation},
   ),
   $progress-tokens
 );
 // scss-docs-end progress-css-vars
+
+$progress-segmented-tokens: () !default;
+
+// scss-docs-start progress-segmented-css-vars
+$progress-segmented-tokens: defaults(
+  (
+    --#{$prefix}progress-segment-width: #{$progress-segment-width},
+    --#{$prefix}progress-segment-gap: #{$progress-segment-gap},
+  ),
+  $progress-segmented-tokens
+);
+// scss-docs-end progress-segmented-css-vars
 
 // stylelint-enable custom-property-no-missing-var-function, scss/dollar-variable-default
 @layer components {
@@ -48,7 +68,7 @@ $progress-tokens: defaults(
   // scss-docs-start progress-keyframes
   @if $enable-transitions {
     @keyframes progress-bar-stripes {
-      0% { background-position-x: var(--#{$prefix}progress-height); }
+      0% { background-position-x: var(--#{$prefix}progress-height), 0; }
     }
   }
   // scss-docs-end progress-keyframes
@@ -75,12 +95,13 @@ $progress-tokens: defaults(
     text-align: center;
     white-space: nowrap;
     background-color: var(--#{$prefix}theme-bg, var(--#{$prefix}progress-bar-bg));
+    background-image: var(--#{$prefix}progress-bar-bg-image);
     @include transition(var(--#{$prefix}progress-bar-transition));
   }
 
   .progress-bar-striped {
-    @include gradient-striped();
-    background-size: var(--#{$prefix}progress-height) var(--#{$prefix}progress-height);
+    background-image: var(--#{$prefix}progress-bar-stripes), var(--#{$prefix}progress-bar-bg-image);
+    background-size: var(--#{$prefix}progress-height) var(--#{$prefix}progress-height), auto;
   }
 
   .progress-stacked > .progress {
@@ -100,6 +121,26 @@ $progress-tokens: defaults(
           animation: none;
         }
       }
+    }
+  }
+
+  .progress-segmented {
+    @include tokens($progress-segmented-tokens);
+
+    --#{$prefix}progress-border-radius: 0;
+    --#{$prefix}progress-box-shadow: none;
+    --#{$prefix}progress-segment-radius: calc(var(--#{$prefix}progress-segment-width) * .5);
+    --#{$prefix}progress-segment-tile: calc(var(--#{$prefix}progress-segment-width) + var(--#{$prefix}progress-segment-gap));
+
+    // Two circles for the caps and a bar for the body, tiled with `space` so every pill
+    // is whole and the gaps absorb the remainder of the width.
+    mask-image: radial-gradient(circle var(--#{$prefix}progress-segment-radius) at var(--#{$prefix}progress-segment-radius) var(--#{$prefix}progress-segment-radius), #000 calc(100% - 1px), transparent), radial-gradient(circle var(--#{$prefix}progress-segment-radius) at var(--#{$prefix}progress-segment-radius) calc(100% - var(--#{$prefix}progress-segment-radius)), #000 calc(100% - 1px), transparent), linear-gradient(to right, #000 var(--#{$prefix}progress-segment-width), transparent var(--#{$prefix}progress-segment-width));
+    mask-repeat: space no-repeat;
+    mask-position: 0 0, 0 0, 0 50%;
+    mask-size: var(--#{$prefix}progress-segment-tile) 100%, var(--#{$prefix}progress-segment-tile) 100%, var(--#{$prefix}progress-segment-tile) calc(100% - var(--#{$prefix}progress-segment-width));
+
+    > .progress {
+      --#{$prefix}progress-border-radius: 0;
     }
   }
 

@@ -99,6 +99,23 @@ The class works one level up as well — put it on the `.progress` and every bar
 
 A [`.bg-*` utility](/utilities/background/) still paints a bar, but it sets the fill alone — the label keeps the default foreground colour rather than the one that reads on the fill.
 
+## Gradients
+
+Set `--cui-progress-bar-bg-image` to paint the bar with a gradient instead of a flat colour. The image is sized to the bar, so the whole gradient is visible at any width and the label keeps the colour set by the theme. Set it on the `.progress` to share one gradient between every bar inside, or on a single `.progress-bar`.
+
+<Example code={`<div class="progress mb-3" style="--cui-progress-bar-bg-image: linear-gradient(to right, #e6412c, #ffb400, #ffe25a)">
+    <div class="progress-bar" role="progressbar" style="width: 45%" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100"></div>
+  </div>
+  <div class="progress" style="--cui-progress-bar-bg-image: linear-gradient(to right, var(--cui-info-base), var(--cui-success-base))">
+    <div class="progress-bar" role="progressbar" style="width: 70%" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100">70%</div>
+  </div>`} />
+
+Stripes are a second layer over the gradient, so `.progress-bar-striped` and `.progress-bar-animated` combine with it. Change the stripe pattern itself with `--cui-progress-bar-stripes`, or just its colour with `--cui-progress-bar-stripe-color`.
+
+<Example code={`<div class="progress" style="--cui-progress-bar-bg-image: linear-gradient(to right, #e6412c, #ffb400, #ffe25a)">
+    <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 65%" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"></div>
+  </div>`} />
+
 ## Multiple bars
 
 Include multiple progress bars in a progress component if you need.
@@ -122,6 +139,31 @@ Include multiple progress bars in a progress component if you need.
     </div>
     <div class="progress" role="progressbar" aria-label="Segment three" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width: 20%">
       <div class="progress-bar theme-info"></div>
+    </div>
+  </div>`} />
+
+## Segmented
+
+Add `.progress-segmented` to a `.progress` or `.progress-stacked` to cut the track into a row of rounded pills. It is a CSS mask over the whole component, so the bar underneath keeps its width, transition, theme, gradient and stripes; only the rendering changes. Pill width and gap come from `--cui-progress-segment-width` and `--cui-progress-segment-gap`; pills are always whole, and the gaps absorb whatever is left of the width.
+
+<Example code={`<div class="progress progress-segmented mb-3" style="height: 3rem; --cui-progress-bar-bg-image: linear-gradient(to right, #e6412c, #ffb400, #ffe25a)">
+    <div class="progress-bar" role="progressbar" style="width: 45%" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100"></div>
+  </div>
+  <div class="progress progress-segmented mb-3">
+    <div class="progress-bar theme-success" role="progressbar" style="width: 70%" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
+  </div>
+  <div class="progress progress-segmented" style="height: 1.5rem; --cui-progress-segment-width: .75rem; --cui-progress-segment-gap: .25rem">
+    <div class="progress-bar theme-info" role="progressbar" style="width: 30%" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>
+  </div>`} />
+
+The fill ends where the value puts it, so a pill on the boundary can be partly coloured. Where the design calls for whole pills only, round the width to a multiple of the pill pitch before setting it.
+
+<Example code={`<div class="progress-stacked progress-segmented" style="height: 2rem">
+    <div class="progress" role="progressbar" aria-label="Segment one" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100" style="width: 30%">
+      <div class="progress-bar"></div>
+    </div>
+    <div class="progress" role="progressbar" aria-label="Segment two" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" style="width: 25%">
+      <div class="progress-bar theme-warning"></div>
     </div>
   </div>`} />
 
@@ -229,6 +271,10 @@ Or stack a header above the bar, with the value pushed to the end by `.ms-auto`:
 Progress bars use local CSS variables on `.progress` for enhanced real-time customization.
 
 <ScssDocs file="scss/_progress.scss" capture="progress-css-vars" />
+
+`.progress-segmented` adds the pill geometry:
+
+<ScssDocs file="scss/_progress.scss" capture="progress-segmented-css-vars" />
 
 ### Sass variables
 

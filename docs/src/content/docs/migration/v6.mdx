@@ -2133,6 +2133,20 @@ Multi Select's option indicators moved with it — they render as a decorative
   `.theme-*` class, as the variant is meant for dark and brand-coloured
   surfaces.
 
+- **Gradient bars.** `--cui-progress-bar-bg-image` (default `none`) paints the
+  bar with an image on top of its colour, so a gradient is one variable on the
+  `.progress` or the bar. The stripes moved to their own tokens for the same
+  reason: `--cui-progress-bar-stripes` holds the pattern and
+  `--cui-progress-bar-stripe-color` its colour, and `.progress-bar-striped`
+  layers the pattern over the image. The `progress-bar-stripes` keyframes now
+  shift only the first background layer, so the image underneath stays put.
+
+- **`.progress-segmented`.** A mask that cuts a `.progress` or
+  `.progress-stacked` into a row of rounded pills, sized by
+  `--cui-progress-segment-width` and `--cui-progress-segment-gap`. Everything
+  under the mask — width, transition, theme, gradient, stripes — behaves as
+  before.
+
 #### Spinner
 
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
