@@ -1,6 +1,7 @@
 @use "sass:map";
 @use "functions/defaults" as *;
 @use "mixins/box-shadow" as *;
+@use "mixins/dialog-shared" as *;
 @use "layout/breakpoints" as *;
 @use "mixins/ltr-rtl" as *;
 @use "mixins/tokens" as *;
@@ -230,10 +231,7 @@ $offcanvas-tokens: defaults(
   }
 
   .offcanvas-header {
-    display: flex;
-    flex-shrink: 0;
-    align-items: center;
-    padding: var(--#{$prefix}offcanvas-padding-y) var(--#{$prefix}offcanvas-padding-x);
+    @include dialog-header(var(--#{$prefix}offcanvas-padding-y) var(--#{$prefix}offcanvas-padding-x));
 
     .btn-close {
       padding: calc(var(--#{$prefix}offcanvas-padding-y) * .5) calc(var(--#{$prefix}offcanvas-padding-x) * .5);
@@ -245,14 +243,12 @@ $offcanvas-tokens: defaults(
   }
 
   .offcanvas-title {
-    margin-bottom: 0;
-    line-height: var(--#{$prefix}offcanvas-title-line-height);
+    @include dialog-title(var(--#{$prefix}offcanvas-title-line-height));
   }
 
   .offcanvas-body {
     position: relative;
-    flex-grow: 1;
-    padding: var(--#{$prefix}offcanvas-padding-y) var(--#{$prefix}offcanvas-padding-x);
+    @include dialog-body(var(--#{$prefix}offcanvas-padding-y) var(--#{$prefix}offcanvas-padding-x));
     overflow-y: auto;
   }
 }
