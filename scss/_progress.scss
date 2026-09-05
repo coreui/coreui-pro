@@ -21,7 +21,7 @@ $progress-bar-animation:               progress-bar-stripes 1s linear infinite !
 
 $progress-segment-width:               .375rem !default;
 $progress-segment-gap:                 .375rem !default;
-$progress-segment-border-radius:       calc(var(--#{$prefix}progress-segment-width) * .5) !default;
+$progress-segment-border-radius:       var(--#{$prefix}radius-2) !default;
 
 $progress-contrast-track-opacity:      20% !default;
 // scss-docs-end progress-variables
@@ -130,7 +130,7 @@ $progress-segmented-tokens: defaults(
     @include tokens($progress-segmented-tokens);
 
     $width: var(--#{$prefix}progress-segment-width);
-    $radius: var(--#{$prefix}progress-segment-border-radius);
+    $radius: min(var(--#{$prefix}progress-segment-border-radius), calc(#{$width} * .5));
     $tile: calc(#{$width} + var(--#{$prefix}progress-segment-gap));
 
     --#{$prefix}progress-border-radius: 0;
