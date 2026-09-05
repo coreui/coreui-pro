@@ -265,7 +265,7 @@ $btn-check-deprecated: ".btn-check:not(#{$btn-variant-selectors})" !default;
     line-height: var(--#{$prefix}btn-line-height);
     color: var(--#{$prefix}btn-color);
     text-align: center;
-    text-decoration: if(not sass($link-decoration == none): none);
+    text-decoration: none;
     white-space: var(--#{$prefix}btn-white-space);
     vertical-align: middle;
     // stylelint-disable-next-line scss/at-function-named-arguments
@@ -282,8 +282,6 @@ $btn-check-deprecated: ".btn-check:not(#{$btn-variant-selectors})" !default;
 
     &:hover {
       color: var(--#{$prefix}btn-hover-color);
-      // stylelint-disable-next-line scss/at-function-named-arguments
-      text-decoration: if(sass($link-hover-decoration == underline): none);
       background-color: var(--#{$prefix}btn-hover-bg);
       border-color: var(--#{$prefix}btn-hover-border-color);
     }
@@ -440,14 +438,14 @@ $btn-check-deprecated: ".btn-check:not(#{$btn-variant-selectors})" !default;
   .btn-link {
     @include tokens($button-link-tokens);
 
-    text-decoration: $link-decoration;
+    text-decoration: var(--#{$prefix}link-decoration);
     @if $enable-gradients {
       background-image: none;
     }
 
     &:hover,
     &:focus-visible {
-      text-decoration: $link-hover-decoration;
+      text-decoration: var(--#{$prefix}link-hover-decoration, var(--#{$prefix}link-decoration));
     }
 
     &:focus-visible {
