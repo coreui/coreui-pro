@@ -144,7 +144,7 @@ The menu is positioned with `position: fixed` at the pointer, so it escapes ance
 
 ## Accessibility
 
-Pointing devices are not the only way in: with focus on the trigger, <kbd>Shift</kbd>+<kbd>F10</kbd> and the <kbd>Menu</kbd> key open the menu anchored to the element instead of the pointer - on every platform, including the ones whose browsers never turn these keys into a `contextmenu` event. Give a non-interactive trigger `tabindex="0"` so keyboard users can reach it, and describe the gesture somewhere nearby - nothing in the markup announces that an element has a context menu.
+Pointing devices are not the only way in: with focus on the trigger, <kbd>Shift</kbd>+<kbd>F10</kbd> and the <kbd>Menu</kbd> key open the menu anchored to the element instead of the pointer. <kbd>Shift</kbd>+<kbd>F10</kbd> is the Windows convention the [WAI-ARIA Authoring Practices](https://www.w3.org/WAI/ARIA/apg/patterns/menubar/) adopt for opening a context menu from the keyboard; the plugin handles the keys itself, so they work on macOS too, where no system shortcut exists and browsers never turn them into a `contextmenu` event. On Apple keyboards the function keys default to their media actions, so the shortcut is <kbd>Fn</kbd>+<kbd>Shift</kbd>+<kbd>F10</kbd> unless the system is set to use them as standard function keys. Give a non-interactive trigger `tabindex="0"` so keyboard users can reach it, and describe the gesture somewhere nearby - nothing in the markup announces that an element has a context menu.
 
 Focus moves into the menu when it opens and returns to the trigger when it closes. Like [Menu](/components/menu/#accessibility), the plugin adds no `role="menu"`/`menuitem` attributes on its own; add them yourself when the menu is a true application menu.
 
@@ -152,7 +152,7 @@ Focus moves into the menu when it opens and returns to the trigger when it close
 
 | Key | Action |
 | --- | --- |
-| <kbd>Shift</kbd>+<kbd>F10</kbd>, <kbd>Menu</kbd> | Open the context menu anchored to the focused trigger |
+| <kbd>Shift</kbd>+<kbd>F10</kbd>, <kbd>Menu</kbd> | Open the context menu anchored to the focused trigger (<kbd>Fn</kbd>+<kbd>Shift</kbd>+<kbd>F10</kbd> on Apple keyboards) |
 | `↓` / `↑` | Navigate to next/previous menu item |
 | `→` | Enter submenu (or `←` in RTL) |
 | `←` | Exit submenu and return to parent (or `→` in RTL) |
