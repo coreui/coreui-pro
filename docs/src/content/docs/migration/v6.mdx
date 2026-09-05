@@ -1134,6 +1134,27 @@ adornment in the library — so the button needs no icon markup at all:
 
 #### Range / Range Slider
 
+- **The filled track, value tooltip and tick marks come from a `Range` plugin.**
+  Wrap the input in `<div class="form-range">` and give the input
+  `.form-range-input`; the plugin writes `--cui-range-fill` (`0`–`1`) on the
+  wrapper and the CSS draws the fill from it, `data-coreui-tooltips` adds a
+  value tooltip on hover, drag and focus, or permanently with `"always"` (the
+  same `tooltips`/`tooltipsFormat` options as the range slider), and a linked `<datalist>` renders tick
+  marks laid out on a grid. Every such wrapper initializes itself. The input
+  fires `changed.coreui.range` with the numeric `value`. **The bare
+  `<input class="form-range">` keeps working unchanged** as the CSS-only form of
+  the control; it gets no plugin, no fill and no instance. New tokens on
+  `.form-range`: `--cui-range-track-fill-bg`, `--cui-range-track-disabled-bg`
+  and the `--cui-range-tick-*` family (labelled ticks use `-height`, unlabelled
+  ones `-minor-height`).
+- **The range track sits halfway between `--cui-bg-2` and `--cui-bg-3`**
+  (`color-mix(in oklch, …)`, was `--cui-bg-3`), in both the native range and
+  the range slider. `--cui-bg-3` and the `secondary` colour
+  resolve to the same grey in light mode, so a `theme-secondary` thumb and
+  fill vanished against the track.
+- **Validation reaches the range.** `.is-invalid`/`.is-valid` on the input
+  (either form) colour the thumb and its focus ring with the state, and a
+  feedback element after the wrapper toggles through `:has()`.
 - **A theme beats `--cui-range-thumb-bg`, as everywhere else.** The token carried
   the `--cui-theme-*` slot inside its own default, so setting it inside a themed
   container dropped the theme. The slot sits on the property now.
@@ -2319,8 +2340,8 @@ as such.
   tab (was `--cui-bg-4`), the selected combobox option, the neutral chip
   (hovering on `--cui-bg-3` instead of a mix with the foreground), the
   password-strength track and the search button's key cap (active on
-  `--cui-bg-3`). The range slider track sits on `--cui-bg-3` like the
-  native range. The card header and footer read `--cui-bg-1` instead of a
+  `--cui-bg-3`). The range slider track sits halfway between `--cui-bg-2`
+  and `--cui-bg-3` like the native range. The card header and footer read `--cui-bg-1` instead of a
   3 % foreground wash, so a card on a tinted parent keeps a neutral cap.
   The tab's hover border reads `--cui-border-subtle` rather than a surface
   rung.

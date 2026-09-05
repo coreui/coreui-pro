@@ -169,6 +169,32 @@ $validated-controls: if(sass($enable-deprecated-form-check): ".check, .radio, .s
     }
   }
 
+  // Range — the validation class lives on .form-range-input, while feedback sits outside
+  // the .form-range wrapper, so we use :has() to toggle it.
+  // stylelint-disable selector-no-qualifying-type
+  .form-range-input,
+  input.form-range {
+    @include form-validation-state-selector($state) {
+      &::-webkit-slider-thumb { background: var(--#{$prefix}#{$theme}-bg); }
+      &::-moz-range-thumb { background: var(--#{$prefix}#{$theme}-bg); }
+
+      &:focus-visible {
+        &::-webkit-slider-thumb {
+          @include focus-ring(true, $color: $focus-ring-color);
+        }
+        &::-moz-range-thumb {
+          @include focus-ring(true, $color: $focus-ring-color);
+        }
+      }
+    }
+  }
+  // stylelint-enable selector-no-qualifying-type
+
+  .form-range:has(.form-range-input.is-#{$state}) {
+    ~ .#{$state}-feedback,
+    ~ .#{$state}-tooltip { display: block; }
+  }
+
   #{$validated-controls} {
     @include form-validation-state-selector($state) {
       border-color: $border-color;
