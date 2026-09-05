@@ -362,6 +362,56 @@ export const a11yComponents = [
     ]
   },
   {
+    component: 'components/context-menu',
+    html: `<div id="a11yContextMenuArea" tabindex="0" data-coreui-toggle="context-menu">Right-click here</div>
+  <div class="menu">
+    <a class="menu-item" href="#">Menu item 1</a>
+    <a class="menu-item" href="#">Menu item 2</a>
+  </div>`,
+    assertions: [
+      {
+        criterion: '2.1.1',
+        label: 'Shift+F10 on the focused trigger opens the menu and moves focus into it',
+        steps: [{ focus: '#a11yContextMenuArea' }, { press: 'Shift+F10' }, { wait: 100 }],
+        run: 'return !!(document.activeElement && document.activeElement.classList.contains(\'menu\'))'
+      },
+      {
+        criterion: '2.1.1',
+        label: 'ArrowDown in the open menu moves focus to a menu item',
+        steps: [{ press: 'ArrowDown' }, { wait: 100 }],
+        run: 'return !!(document.activeElement && document.activeElement.classList.contains(\'menu-item\'))'
+      },
+      {
+        criterion: '2.1.2',
+        label: 'Escape closes the menu and returns focus to the trigger',
+        steps: [{ press: 'Escape' }, { wait: 100 }],
+        run: 'return document.activeElement === document.getElementById(\'a11yContextMenuArea\')'
+      }
+    ],
+    criteria: [
+      {
+        criterion: '2.1.1',
+        status: 'built-in',
+        note: 'Shift+F10 and the Menu key open the menu anchored to the focused trigger; arrows, Enter/Space, Home/End, Esc and Tab operate it. Verified here: Shift+F10 moves focus into the menu and ArrowDown reaches an item.'
+      },
+      {
+        criterion: '2.1.2',
+        status: 'built-in',
+        note: 'Esc closes the menu and returns focus to the trigger; Tab leaves and closes it. Verified here.'
+      },
+      {
+        criterion: '2.4.7',
+        status: 'built-in',
+        note: 'Focused menu items show a visible focus indicator (verify visually).'
+      },
+      {
+        criterion: '4.1.2',
+        status: 'author',
+        note: 'Give a non-interactive trigger tabindex="0" and a nearby hint that a context menu exists; add role=\'menu\'/\'menuitem\' yourself for a true ARIA menu widget.'
+      }
+    ]
+  },
+  {
     component: 'components/navs-tabs',
     html: `<ul class="nav nav-tabs" id="a11yTab" role="tablist">
     <li class="nav-item" role="presentation">

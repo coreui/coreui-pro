@@ -580,6 +580,12 @@ check, radio, carousel and toggler icons already work:
   teleport, responsive placement and logical (`start`/`end`) placements,
   ported from Bootstrap v6 with CoreUI's class conventions. See the
   [Menu docs](/components/menu/).
+- **New component: [Context Menu](/components/context-menu/)** (PRO) — a
+  right-click, long-press or <kbd>Shift</kbd>+<kbd>F10</kbd> inside an element
+  with `data-coreui-toggle="context-menu"` opens a `.menu` at the pointer and
+  suppresses the browser's own menu. Built on Menu, so items, submenus,
+  keyboard navigation and dismissal are the same; `show({ x, y })` opens it at
+  a point from JavaScript.
 - **Dropdown is now a compatibility layer over Menu.** The v5 markup, classes
   and `*.coreui.dropdown` events keep working unchanged — the plugin shares
   Menu's engine underneath. Where their options overlap, Dropdown also
