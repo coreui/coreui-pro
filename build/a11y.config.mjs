@@ -273,6 +273,26 @@ export const a11yComponents = [
     ]
   },
   {
+    component: 'forms/range',
+    criteria: [
+      {
+        criterion: '4.1.2',
+        status: 'built-in',
+        note: 'The control is a native range input in both forms; the tooltip and the tick marks the plugin adds are aria-hidden decorations, so the value is announced once.'
+      },
+      {
+        criterion: '2.1.1',
+        status: 'built-in',
+        note: 'Native range input, operable with the arrow keys; the plugin adds no focusable element.'
+      },
+      {
+        criterion: '3.3.2',
+        status: 'author',
+        note: 'Label the input; the tooltip is aria-hidden and not a substitute for a label.'
+      }
+    ]
+  },
+  {
     component: 'forms/range-slider',
     criteria: [
       {

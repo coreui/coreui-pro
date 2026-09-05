@@ -34,6 +34,7 @@ import NumberInput from './src/number-input.js'
 import PasswordInput from './src/password-input.js'
 import PasswordStrength from './src/password-strength.js'
 import Popover from './src/popover.js'
+import Range from './src/range.js'
 import RangeSlider from './src/range-slider.js'
 import Rating from './src/rating.js'
 import ScrollSpy from './src/scrollspy.js'
@@ -76,6 +77,7 @@ export default {
   PasswordInput,
   PasswordStrength,
   Popover,
+  Range,
   RangeSlider,
   Rating,
   ScrollSpy,

@@ -1,0 +1,66 @@
+// stylelint-disable property-disallowed-list
+@use "sass:map";
+@use "../../forms/form-range" as *;
+
+@include describe("form-range") {
+  @include it("tokens: the fill, disabled fill and tick keys are declared next to the track and thumb") {
+    @include assert-true(map.has-key($form-range-tokens, --cui-range-track-fill-bg));
+    @include assert-true(map.has-key($form-range-tokens, --cui-range-track-disabled-bg));
+    @include assert-true(map.has-key($form-range-tokens, --cui-range-tick-width));
+    @include assert-true(map.has-key($form-range-tokens, --cui-range-tick-height));
+    @include assert-true(map.has-key($form-range-tokens, --cui-range-tick-bg));
+    @include assert-true(map.has-key($form-range-tokens, --cui-range-tick-label-font-size));
+  }
+
+  @include it("track: paints the fill from --cui-range-fill and falls back to an empty track without the plugin") {
+    @include assert() {
+      @include output() {
+        .test {
+          @include form-range-track();
+        }
+      }
+      @include expect() {
+        .test {
+          width: var(--cui-range-track-width);
+          height: var(--cui-range-track-height);
+          color: transparent;
+          cursor: var(--cui-range-track-cursor);
+          background-color: var(--cui-range-track-bg);
+          background-image: linear-gradient(var(--cui-range-track-direction, to right), var(--cui-theme-bg, var(--cui-range-track-fill-bg)) calc(var(--cui-range-fill, 0) * 100%), transparent calc(var(--cui-range-fill, 0) * 100%));
+          border-color: transparent;
+          border-radius: var(--cui-range-track-border-radius);
+        }
+      }
+    }
+  }
+
+  @include it("thumb: a theme class wins over --cui-range-thumb-bg") {
+    @include assert() {
+      @include output() {
+        .test {
+          @include form-range-thumb();
+        }
+      }
+      @include expect() {
+        .test {
+          width: var(--cui-range-thumb-width);
+          height: var(--cui-range-thumb-height);
+          appearance: none;
+          background-color: var(--cui-theme-bg, var(--cui-range-thumb-bg));
+          border: var(--cui-range-thumb-border);
+          border-radius: var(--cui-range-thumb-border-radius);
+        }
+        @media (prefers-reduced-motion: no-preference) {
+          .test {
+            transition-timing-function: var(--cui-range-thumb-transition-timing);
+            transition-duration: var(--cui-range-thumb-transition-duration);
+            transition-property: var(--cui-range-thumb-transition-property);
+          }
+        }
+        .test:active {
+          background-color: var(--cui-range-thumb-active-bg);
+        }
+      }
+    }
+  }
+}
