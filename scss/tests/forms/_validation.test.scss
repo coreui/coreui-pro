@@ -1,0 +1,77 @@
+@use "../../mixins/form-validation" as *;
+
+@include describe("form-validation-state-selector") {
+
+  @include it("invalid: gates :user-invalid behind [data-coreui-validate] and keeps .is-invalid global") {
+    @include assert() {
+      @include output() {
+        .form-control {
+          @include form-validation-state-selector("invalid") {
+            border-color: #d00;
+          }
+        }
+      }
+      @include expect() {
+        @at-root [data-coreui-validate] #{&} .form-control:user-invalid,
+        #{&} .form-control.is-invalid {
+          border-color: #d00;
+        }
+      }
+    }
+  }
+
+  @include it("valid: gates :user-valid behind [data-coreui-validate~=valid] and keeps .is-valid global") {
+    @include assert() {
+      @include output() {
+        .form-control {
+          @include form-validation-state-selector("valid") {
+            border-color: #0d0;
+          }
+        }
+      }
+      @include expect() {
+        @at-root [data-coreui-validate~="valid"] #{&} .form-control:user-valid,
+        #{&} .form-control.is-valid {
+          border-color: #0d0;
+        }
+      }
+    }
+  }
+
+  @include it("custom state (warning): only .is-warning, no :user-*") {
+    @include assert() {
+      @include output() {
+        .form-control {
+          @include form-validation-state-selector("warning") {
+            border-color: #f80;
+          }
+        }
+      }
+      @include expect() {
+        .form-control.is-warning {
+          border-color: #f80;
+        }
+      }
+    }
+  }
+
+  @include it("sibling combinator works for feedback display") {
+    @include assert() {
+      @include output() {
+        .form-control {
+          @include form-validation-state-selector("invalid") {
+            ~ .invalid-feedback {
+              display: block;
+            }
+          }
+        }
+      }
+      @include expect() {
+        @at-root [data-coreui-validate] #{&} .form-control:user-invalid ~ .invalid-feedback,
+        #{&} .form-control.is-invalid ~ .invalid-feedback {
+          display: block;
+        }
+      }
+    }
+  }
+}

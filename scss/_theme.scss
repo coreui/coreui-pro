@@ -23,78 +23,83 @@ $link-color:    light-dark(var(--#{$prefix}primary-base), var(--#{$prefix}primar
 
 
 // scss-docs-start theme-colors-map
-$theme-colors: (
-  "primary": (
-    "base":          $primary,
-    "contrast":      var(--#{$prefix}white),
-    "fg":            light-dark(var(--#{$prefix}primary-600), var(--#{$prefix}primary-400)),
-    "fg-emphasis":   light-dark(var(--#{$prefix}primary-800), var(--#{$prefix}primary-200)),
-    "bg-subtle":     light-dark(var(--#{$prefix}primary-100), var(--#{$prefix}primary-900)),
-    "bg-muted":      light-dark(var(--#{$prefix}primary-200), var(--#{$prefix}primary-800)),
-    "border":        light-dark(var(--#{$prefix}primary-300), var(--#{$prefix}primary-600)),
-    "focus-ring":    color-mix(in srgb, var(--#{$prefix}primary-base) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
+$theme-colors: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$theme-colors: defaults(
+  (
+    "primary": (
+      "base":          $primary,
+      "contrast":      var(--#{$prefix}white),
+      "fg":            light-dark(var(--#{$prefix}primary-600), var(--#{$prefix}primary-400)),
+      "fg-emphasis":   light-dark(var(--#{$prefix}primary-800), var(--#{$prefix}primary-200)),
+      "bg-subtle":     light-dark(var(--#{$prefix}primary-100), var(--#{$prefix}primary-900)),
+      "bg-muted":      light-dark(var(--#{$prefix}primary-200), var(--#{$prefix}primary-800)),
+      "border":        light-dark(var(--#{$prefix}primary-300), var(--#{$prefix}primary-600)),
+      "focus-ring":    color-mix(in srgb, var(--#{$prefix}primary-base) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
+    ),
+    "secondary": (
+      "base":          $secondary,
+      "contrast":      light-dark(var(--#{$prefix}gray-900), var(--#{$prefix}white)),
+      "fg":            light-dark(var(--#{$prefix}gray-600), var(--#{$prefix}gray-400)),
+      "fg-emphasis":   light-dark(var(--#{$prefix}gray-800), var(--#{$prefix}gray-200)),
+      "bg-subtle":     light-dark(var(--#{$prefix}gray-025), var(--#{$prefix}gray-800)),
+      "bg-muted":      light-dark(var(--#{$prefix}gray-050), var(--#{$prefix}gray-700)),
+      "border":        light-dark(var(--#{$prefix}gray-300), var(--#{$prefix}gray-600)),
+      "focus-ring":    color-mix(in srgb, light-dark(var(--#{$prefix}gray-500), var(--#{$prefix}gray-300)) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
+    ),
+    "success": (
+      "base":          $success,
+      "contrast":      var(--#{$prefix}black),
+      "fg":            light-dark(var(--#{$prefix}success-600), var(--#{$prefix}success-400)),
+      "fg-emphasis":   light-dark(var(--#{$prefix}success-800), var(--#{$prefix}success-200)),
+      "bg-subtle":     light-dark(var(--#{$prefix}success-100), var(--#{$prefix}success-900)),
+      "bg-muted":      light-dark(var(--#{$prefix}success-200), var(--#{$prefix}success-800)),
+      "border":        light-dark(var(--#{$prefix}success-300), var(--#{$prefix}success-600)),
+      "focus-ring":    color-mix(in srgb, var(--#{$prefix}success-base) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
+    ),
+    "info": (
+      "base":          $info,
+      "contrast":      var(--#{$prefix}black),
+      "fg":            light-dark(var(--#{$prefix}info-700), var(--#{$prefix}info-300)),
+      "fg-emphasis":   light-dark(var(--#{$prefix}info-800), var(--#{$prefix}info-200)),
+      "bg-subtle":     light-dark(var(--#{$prefix}info-100), var(--#{$prefix}info-900)),
+      "bg-muted":      light-dark(var(--#{$prefix}info-200), var(--#{$prefix}info-800)),
+      "border":        light-dark(var(--#{$prefix}info-300), var(--#{$prefix}info-600)),
+      "focus-ring":    color-mix(in srgb, var(--#{$prefix}info-base) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
+    ),
+    "warning": (
+      "base":          $warning,
+      "contrast":      var(--#{$prefix}black),
+      "fg":            light-dark(var(--#{$prefix}warning-700), var(--#{$prefix}warning-300)),
+      "fg-emphasis":   light-dark(var(--#{$prefix}warning-800), var(--#{$prefix}warning-200)),
+      "bg-subtle":     light-dark(var(--#{$prefix}warning-100), var(--#{$prefix}warning-900)),
+      "bg-muted":      light-dark(var(--#{$prefix}warning-200), var(--#{$prefix}warning-800)),
+      "border":        light-dark(var(--#{$prefix}warning-300), var(--#{$prefix}warning-600)),
+      "focus-ring":    color-mix(in srgb, var(--#{$prefix}warning-base) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
+    ),
+    "danger": (
+      "base":          $danger,
+      "contrast":      var(--#{$prefix}black),
+      "fg":            light-dark(var(--#{$prefix}danger-600), var(--#{$prefix}danger-400)),
+      "fg-emphasis":   light-dark(var(--#{$prefix}danger-800), var(--#{$prefix}danger-200)),
+      "bg-subtle":     light-dark(var(--#{$prefix}danger-100), var(--#{$prefix}danger-900)),
+      "bg-muted":      light-dark(var(--#{$prefix}danger-200), var(--#{$prefix}danger-800)),
+      "border":        light-dark(var(--#{$prefix}danger-300), var(--#{$prefix}danger-600)),
+      "focus-ring":    color-mix(in srgb, var(--#{$prefix}danger-base) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
+    ),
+    "inverse": (
+      "base":          $inverse,
+      "contrast":      light-dark(var(--#{$prefix}white), var(--#{$prefix}gray-900)),
+      "fg":            light-dark(var(--#{$prefix}gray-900), var(--#{$prefix}gray-200)),
+      "fg-emphasis":   light-dark(var(--#{$prefix}black), var(--#{$prefix}white)),
+      "bg-subtle":     light-dark(var(--#{$prefix}gray-100), var(--#{$prefix}gray-900)),
+      "bg-muted":      light-dark(var(--#{$prefix}gray-200), var(--#{$prefix}gray-700)),
+      "border":        light-dark(var(--#{$prefix}gray-400), var(--#{$prefix}gray-600)),
+      "focus-ring":    color-mix(in srgb, light-dark(var(--#{$prefix}gray-900), var(--#{$prefix}gray-100)) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
+    ),
   ),
-  "secondary": (
-    "base":          $secondary,
-    "contrast":      light-dark(var(--#{$prefix}gray-900), var(--#{$prefix}white)),
-    "fg":            light-dark(var(--#{$prefix}gray-600), var(--#{$prefix}gray-400)),
-    "fg-emphasis":   light-dark(var(--#{$prefix}gray-800), var(--#{$prefix}gray-200)),
-    "bg-subtle":     light-dark(var(--#{$prefix}gray-025), var(--#{$prefix}gray-800)),
-    "bg-muted":      light-dark(var(--#{$prefix}gray-050), var(--#{$prefix}gray-700)),
-    "border":        light-dark(var(--#{$prefix}gray-300), var(--#{$prefix}gray-600)),
-    "focus-ring":    color-mix(in srgb, light-dark(var(--#{$prefix}gray-500), var(--#{$prefix}gray-300)) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
-  ),
-  "success": (
-    "base":          $success,
-    "contrast":      var(--#{$prefix}black),
-    "fg":            light-dark(var(--#{$prefix}success-600), var(--#{$prefix}success-400)),
-    "fg-emphasis":   light-dark(var(--#{$prefix}success-800), var(--#{$prefix}success-200)),
-    "bg-subtle":     light-dark(var(--#{$prefix}success-100), var(--#{$prefix}success-900)),
-    "bg-muted":      light-dark(var(--#{$prefix}success-200), var(--#{$prefix}success-800)),
-    "border":        light-dark(var(--#{$prefix}success-300), var(--#{$prefix}success-600)),
-    "focus-ring":    color-mix(in srgb, var(--#{$prefix}success-base) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
-  ),
-  "info": (
-    "base":          $info,
-    "contrast":      var(--#{$prefix}black),
-    "fg":            light-dark(var(--#{$prefix}info-700), var(--#{$prefix}info-300)),
-    "fg-emphasis":   light-dark(var(--#{$prefix}info-800), var(--#{$prefix}info-200)),
-    "bg-subtle":     light-dark(var(--#{$prefix}info-100), var(--#{$prefix}info-900)),
-    "bg-muted":      light-dark(var(--#{$prefix}info-200), var(--#{$prefix}info-800)),
-    "border":        light-dark(var(--#{$prefix}info-300), var(--#{$prefix}info-600)),
-    "focus-ring":    color-mix(in srgb, var(--#{$prefix}info-base) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
-  ),
-  "warning": (
-    "base":          $warning,
-    "contrast":      var(--#{$prefix}black),
-    "fg":            light-dark(var(--#{$prefix}warning-700), var(--#{$prefix}warning-300)),
-    "fg-emphasis":   light-dark(var(--#{$prefix}warning-800), var(--#{$prefix}warning-200)),
-    "bg-subtle":     light-dark(var(--#{$prefix}warning-100), var(--#{$prefix}warning-900)),
-    "bg-muted":      light-dark(var(--#{$prefix}warning-200), var(--#{$prefix}warning-800)),
-    "border":        light-dark(var(--#{$prefix}warning-300), var(--#{$prefix}warning-600)),
-    "focus-ring":    color-mix(in srgb, var(--#{$prefix}warning-base) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
-  ),
-  "danger": (
-    "base":          $danger,
-    "contrast":      var(--#{$prefix}black),
-    "fg":            light-dark(var(--#{$prefix}danger-600), var(--#{$prefix}danger-400)),
-    "fg-emphasis":   light-dark(var(--#{$prefix}danger-800), var(--#{$prefix}danger-200)),
-    "bg-subtle":     light-dark(var(--#{$prefix}danger-100), var(--#{$prefix}danger-900)),
-    "bg-muted":      light-dark(var(--#{$prefix}danger-200), var(--#{$prefix}danger-800)),
-    "border":        light-dark(var(--#{$prefix}danger-300), var(--#{$prefix}danger-600)),
-    "focus-ring":    color-mix(in srgb, var(--#{$prefix}danger-base) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
-  ),
-  "inverse": (
-    "base":          $inverse,
-    "contrast":      light-dark(var(--#{$prefix}white), var(--#{$prefix}gray-900)),
-    "fg":            light-dark(var(--#{$prefix}gray-900), var(--#{$prefix}gray-200)),
-    "fg-emphasis":   light-dark(var(--#{$prefix}black), var(--#{$prefix}white)),
-    "bg-subtle":     light-dark(var(--#{$prefix}gray-100), var(--#{$prefix}gray-900)),
-    "bg-muted":      light-dark(var(--#{$prefix}gray-200), var(--#{$prefix}gray-700)),
-    "border":        light-dark(var(--#{$prefix}gray-400), var(--#{$prefix}gray-600)),
-    "focus-ring":    color-mix(in srgb, light-dark(var(--#{$prefix}gray-900), var(--#{$prefix}gray-100)) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
-  ),
-) !default;
+  $theme-colors
+);
 // scss-docs-end theme-colors-map
 
 // scss-docs-start theme-bgs-map
@@ -240,16 +245,21 @@ $theme-active-lightness:  .8 !default;
 // fill swaps ends between schemes, so one multiplier would darken a dark fill in
 // one scheme and wash out a light one in the other.
 // scss-docs-start theme-state-colors
-$theme-state-colors: (
-  "secondary": (
-    "hover":  light-dark(var(--#{$prefix}gray-200), var(--#{$prefix}gray-700)),
-    "active": light-dark(var(--#{$prefix}gray-300), var(--#{$prefix}gray-800))
+$theme-state-colors: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$theme-state-colors: defaults(
+  (
+    "secondary": (
+      "hover":  light-dark(var(--#{$prefix}gray-200), var(--#{$prefix}gray-700)),
+      "active": light-dark(var(--#{$prefix}gray-300), var(--#{$prefix}gray-800))
+    ),
+    "inverse": (
+      "hover":  light-dark(var(--#{$prefix}gray-800), var(--#{$prefix}gray-200)),
+      "active": light-dark(var(--#{$prefix}gray-700), var(--#{$prefix}gray-300))
+    )
   ),
-  "inverse": (
-    "hover":  light-dark(var(--#{$prefix}gray-800), var(--#{$prefix}gray-200)),
-    "active": light-dark(var(--#{$prefix}gray-700), var(--#{$prefix}gray-300))
-  )
-) !default;
+  $theme-state-colors
+);
 // scss-docs-end theme-state-colors
 
 @mixin theme-tokens($state) {
