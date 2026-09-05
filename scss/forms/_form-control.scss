@@ -17,7 +17,7 @@ $form-color-width:                3rem !default;
 // scss-docs-end form-color-variables
 
 // scss-docs-start form-file-variables
-$form-file-button-color:          var(--#{$prefix}btn-input-color) !default;
+$form-file-button-color:          var(--#{$prefix}btn-input-fg) !default;
 $form-file-button-bg:             var(--#{$prefix}bg-1) !default;
 $form-file-button-hover-bg:       var(--#{$prefix}bg-2) !default;
 // scss-docs-end form-file-variables
@@ -43,7 +43,7 @@ $form-control-tokens: defaults(
     --#{$prefix}control-font-size: var(--#{$prefix}btn-input-font-size),
     --#{$prefix}control-font-weight: var(--#{$prefix}btn-input-font-weight),
     --#{$prefix}control-line-height: var(--#{$prefix}btn-input-line-height),
-    --#{$prefix}control-color: var(--#{$prefix}btn-input-color),
+    --#{$prefix}control-fg: var(--#{$prefix}btn-input-fg),
     --#{$prefix}control-bg: var(--#{$prefix}btn-input-bg),
     --#{$prefix}control-border-width: var(--#{$prefix}btn-input-border-width),
     --#{$prefix}control-border-color: var(--#{$prefix}btn-input-border-color),
@@ -57,7 +57,7 @@ $form-control-tokens: defaults(
     --#{$prefix}control-focus-bg: var(--#{$prefix}btn-input-focus-bg),
     --#{$prefix}control-focus-border-color: var(--#{$prefix}btn-input-focus-border-color),
     --#{$prefix}control-focus-ring: var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring-color)),
-    --#{$prefix}control-disabled-color: var(--#{$prefix}control-color),
+    --#{$prefix}control-disabled-color: var(--#{$prefix}control-fg),
     --#{$prefix}control-disabled-bg: var(--#{$prefix}bg-2),
     --#{$prefix}control-disabled-border-color: var(--#{$prefix}control-border-color),
     --#{$prefix}control-action-color: #{$form-file-button-color},
@@ -252,6 +252,7 @@ $form-control-select-tokens: defaults(
       --#{$prefix}control-padding-y: var(--#{$prefix}btn-input-#{$size}-padding-y);
       --#{$prefix}control-padding-x: var(--#{$prefix}btn-input-#{$size}-padding-x);
       --#{$prefix}control-font-size: var(--#{$prefix}btn-input-#{$size}-font-size);
+      --#{$prefix}control-line-height: var(--#{$prefix}btn-input-#{$size}-line-height);
       --#{$prefix}control-border-radius: var(--#{$prefix}btn-input-#{$size}-border-radius);
 
       min-height: var(--#{$prefix}control-min-height);
@@ -294,7 +295,7 @@ $form-control-select-tokens: defaults(
     // Remove the dotted focus outline Firefox draws inside a select
     &:-moz-focusring {
       color: transparent;
-      text-shadow: 0 0 0 var(--#{$prefix}control-color);
+      text-shadow: 0 0 0 var(--#{$prefix}control-fg);
     }
   }
 

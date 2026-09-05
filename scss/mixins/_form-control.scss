@@ -10,7 +10,7 @@
   font-size: var(--#{$prefix}control-font-size);
   font-weight: var(--#{$prefix}control-font-weight);
   line-height: var(--#{$prefix}control-line-height);
-  color: var(--#{$prefix}control-color);
+  color: var(--#{$prefix}control-fg);
   background-color: var(--#{$prefix}control-bg);
   background-clip: padding-box;
   border: var(--#{$prefix}control-border-width) solid var(--#{$prefix}control-border-color);

@@ -24,7 +24,7 @@ $time-picker-roll-cell-selected-hover-color:  var(--#{$prefix}primary-contrast) 
 $time-picker-roll-cell-selected-hover-bg:     oklch(from var(--#{$prefix}primary-base) calc(l * .85) c h) !default;
 
 $time-picker-inline-select-font-size:       var(--#{$prefix}btn-input-sm-font-size) !default;
-$time-picker-inline-select-color:           var(--#{$prefix}btn-input-color) !default;
+$time-picker-inline-select-color:           var(--#{$prefix}btn-input-fg) !default;
 $time-picker-inline-select-padding-y:       var(--#{$prefix}btn-input-sm-padding-y) !default;
 $time-picker-inline-select-padding-x:       var(--#{$prefix}btn-input-sm-padding-x) !default;
 $time-picker-inline-select-disabled-color:  var(--#{$prefix}fg-body) !default;
