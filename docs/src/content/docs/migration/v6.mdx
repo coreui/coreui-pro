@@ -1145,7 +1145,8 @@ adornment in the library — so the button needs no icon markup at all:
   `<input class="form-range">` keeps working unchanged** as the CSS-only form of
   the control; it gets no plugin, no fill and no instance. New tokens on
   `.form-range`: `--cui-range-track-fill-bg`, `--cui-range-track-disabled-bg`
-  and the `--cui-range-tick-*` family.
+  and the `--cui-range-tick-*` family (labelled ticks use `-height`, unlabelled
+  ones `-minor-height`).
 - **The range track sits halfway between `--cui-bg-2` and `--cui-bg-3`**
   (`color-mix(in oklch, …)`, was `--cui-bg-3`), in both the native range and
   the range slider. `--cui-bg-3` and the `secondary` colour

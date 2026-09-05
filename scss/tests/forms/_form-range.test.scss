@@ -8,6 +8,7 @@
     @include assert-true(map.has-key($form-range-tokens, --cui-range-track-disabled-bg));
     @include assert-true(map.has-key($form-range-tokens, --cui-range-tick-width));
     @include assert-true(map.has-key($form-range-tokens, --cui-range-tick-height));
+    @include assert-true(map.has-key($form-range-tokens, --cui-range-tick-minor-height));
     @include assert-true(map.has-key($form-range-tokens, --cui-range-tick-bg));
     @include assert-true(map.has-key($form-range-tokens, --cui-range-tick-label-font-size));
   }

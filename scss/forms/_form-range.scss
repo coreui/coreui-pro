@@ -34,6 +34,7 @@ $form-range-thumb-transition-timing:       ease-in-out !default;
 
 $form-range-tick-width:                    var(--#{$prefix}border-width) !default;
 $form-range-tick-height:                   .5rem !default;
+$form-range-tick-minor-height:             .25rem !default;
 $form-range-tick-bg:                       var(--#{$prefix}range-track-bg) !default;
 $form-range-tick-label-margin-top:         .125rem !default;
 $form-range-tick-label-font-size:          var(--#{$prefix}font-size-sm) !default;
@@ -68,6 +69,7 @@ $form-range-tokens: defaults(
     --#{$prefix}range-thumb-transition-timing: #{$form-range-thumb-transition-timing},
     --#{$prefix}range-tick-width: #{$form-range-tick-width},
     --#{$prefix}range-tick-height: #{$form-range-tick-height},
+    --#{$prefix}range-tick-minor-height: #{$form-range-tick-minor-height},
     --#{$prefix}range-tick-bg: #{$form-range-tick-bg},
     --#{$prefix}range-tick-label-margin-top: #{$form-range-tick-label-margin-top},
     --#{$prefix}range-tick-label-font-size: #{$form-range-tick-label-font-size},
@@ -240,9 +242,13 @@ $form-range-tokens: defaults(
 
     &::before {
       width: var(--#{$prefix}range-tick-width);
-      height: var(--#{$prefix}range-tick-height);
+      height: var(--#{$prefix}range-tick-minor-height);
       content: "";
       background-color: var(--#{$prefix}range-tick-bg);
+    }
+
+    &:has(> .form-range-tick-label)::before {
+      height: var(--#{$prefix}range-tick-height);
     }
   }
 
