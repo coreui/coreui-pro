@@ -6,7 +6,7 @@
   @each $color in map.keys($theme-colors) {
     .text-bg-#{$color} {
       color: var(--#{$prefix}#{$color}-contrast);
-      background-color: color-mix(in srgb, var(--#{$prefix}#{$color}-bg) calc(var(--#{$prefix}bg-opacity, 1) * 100%), transparent);
+      background-color: color-mix(in oklch, var(--#{$prefix}#{$color}-bg) calc(var(--#{$prefix}bg-opacity, 1) * 100%), transparent);
     }
   }
 }

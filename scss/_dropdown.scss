@@ -48,7 +48,7 @@ $dropdown-dark-divider-bg:          $dropdown-divider-bg !default;
 $dropdown-dark-box-shadow:          null !default;
 $dropdown-dark-link-color:          $dropdown-dark-color !default;
 $dropdown-dark-link-hover-color:    var(--#{$prefix}white) !default;
-$dropdown-dark-link-hover-bg:       color-mix(in srgb, var(--#{$prefix}white) 15%, transparent) !default;
+$dropdown-dark-link-hover-bg:       color-mix(in oklch, var(--#{$prefix}white) 15%, transparent) !default;
 $dropdown-dark-link-active-color:   $dropdown-link-active-color !default;
 $dropdown-dark-link-active-bg:      $dropdown-link-active-bg !default;
 $dropdown-dark-link-disabled-color: var(--#{$prefix}gray-500) !default;

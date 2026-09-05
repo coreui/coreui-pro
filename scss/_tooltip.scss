@@ -57,7 +57,7 @@ $tooltip-tokens: defaults(
     // Fold `--#{$prefix}tooltip-opacity` into the surface colour instead of the
     // element: element-level opacity also faded the label text, compositing it
     // below the WCAG 1.4.3 contrast minimum.
-    --#{$prefix}tooltip-surface-bg: color-mix(in srgb, var(--#{$prefix}tooltip-bg) calc(var(--#{$prefix}tooltip-opacity) * 100%), transparent);
+    --#{$prefix}tooltip-surface-bg: color-mix(in oklch, var(--#{$prefix}tooltip-bg) calc(var(--#{$prefix}tooltip-opacity) * 100%), transparent);
 
     z-index: var(--#{$prefix}tooltip-zindex);
     display: block;

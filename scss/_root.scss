@@ -269,7 +269,7 @@ $root-token-defaults: map.merge(
     --#{$prefix}btn-input-box-shadow: var(--#{$prefix}box-shadow-inset),
     --#{$prefix}btn-input-focus-color: var(--#{$prefix}btn-input-fg),
     --#{$prefix}btn-input-focus-bg: var(--#{$prefix}btn-input-bg),
-    --#{$prefix}btn-input-focus-border-color: color-mix(in srgb, var(--#{$prefix}primary-base) 50%, var(--#{$prefix}bg-body)),
+    --#{$prefix}btn-input-focus-border-color: color-mix(in oklch, var(--#{$prefix}primary-base) 50%, var(--#{$prefix}bg-body)),
     --#{$prefix}btn-input-min-height: calc(var(--#{$prefix}btn-input-line-height) * 1em + var(--#{$prefix}btn-input-padding-y) * 2 + var(--#{$prefix}btn-input-border-width) * 2),
     --#{$prefix}btn-input-xs-gap: $input-btn-gap-xs,
     --#{$prefix}btn-input-xs-padding-y: $input-btn-padding-y-xs,

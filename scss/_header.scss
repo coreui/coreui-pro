@@ -17,13 +17,13 @@
 $header-padding-y:              var(--#{$prefix}spacer-2) !default;
 $header-padding-x:              var(--#{$prefix}spacer-2) !default;
 $header-brand-font-size:        var(--#{$prefix}font-size-lg) !default;
-$header-color:                  color-mix(in srgb, var(--#{$prefix}emphasis-color) 65%, transparent) !default;
+$header-color:                  color-mix(in oklch, var(--#{$prefix}emphasis-color) 65%, transparent) !default;
 $header-bg:                     var(--#{$prefix}bg-body) !default;
 $header-border-color:           var(--#{$prefix}border-color) !default;
 $header-border-width:           var(--#{$prefix}border-width) !default;
-$header-hover-color:            color-mix(in srgb, var(--#{$prefix}emphasis-color) 80%, transparent) !default;
-$header-active-color:           color-mix(in srgb, var(--#{$prefix}emphasis-color) 100%, transparent) !default;
-$header-disabled-color:         color-mix(in srgb, var(--#{$prefix}emphasis-color) 30%, transparent) !default;
+$header-hover-color:            color-mix(in oklch, var(--#{$prefix}emphasis-color) 80%, transparent) !default;
+$header-active-color:           color-mix(in oklch, var(--#{$prefix}emphasis-color) 100%, transparent) !default;
+$header-disabled-color:         color-mix(in oklch, var(--#{$prefix}emphasis-color) 30%, transparent) !default;
 $header-transition:             box-shadow .15s ease-in-out !default;
 
 // Compute the header-brand padding-y so the header-brand will have the same height as header-text and nav-link
@@ -36,10 +36,10 @@ $header-brand-hover-color:      var(--#{$prefix}fg-1) !default;
 $header-toggler-padding-y:      .25rem !default;
 $header-toggler-padding-x:      .75rem !default;
 $header-toggler-font-size:      var(--#{$prefix}font-size-lg) !default;
-$header-toggler-color:          color-mix(in srgb, var(--#{$prefix}emphasis-color) 65%, transparent) !default;
+$header-toggler-color:          color-mix(in oklch, var(--#{$prefix}emphasis-color) 65%, transparent) !default;
 $header-toggler-bg:             transparent !default;
 $header-toggler-border-radius:  var(--#{$prefix}radius-4) !default;
-$header-toggler-hover-color:    color-mix(in srgb, var(--#{$prefix}emphasis-color) 100%, transparent) !default;
+$header-toggler-hover-color:    color-mix(in oklch, var(--#{$prefix}emphasis-color) 100%, transparent) !default;
 
 $header-toggler-icon-bg:        url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='black' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>") !default;
 

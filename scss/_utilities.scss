@@ -301,7 +301,7 @@ $utilities: map.merge(
       property: (
         --#{$prefix}border: null,
         --#{$prefix}border-opacity: 1,
-        border-color: color-mix(in srgb, var(--#{$prefix}border) calc(var(--#{$prefix}border-opacity) * 100%), transparent),
+        border-color: color-mix(in oklch, var(--#{$prefix}border) calc(var(--#{$prefix}border-opacity) * 100%), transparent),
       ),
       class: border,
       values: $utilities-border-colors
@@ -359,7 +359,7 @@ $utilities: map.merge(
       property: (
         --#{$prefix}border: null,
         --#{$prefix}border-opacity: 1,
-        border-color: color-mix(in srgb, var(--#{$prefix}border) calc(var(--#{$prefix}border-opacity) * 100%), transparent),
+        border-color: color-mix(in oklch, var(--#{$prefix}border) calc(var(--#{$prefix}border-opacity) * 100%), transparent),
       ),
       class: border,
       values: $utilities-border-subtle
@@ -909,15 +909,15 @@ $utilities: map.merge(
       property: (
         --#{$prefix}text: null,
         --#{$prefix}text-opacity: 1,
-        color: color-mix(in srgb, var(--#{$prefix}text) calc(var(--#{$prefix}text-opacity) * 100%), transparent),
+        color: color-mix(in oklch, var(--#{$prefix}text) calc(var(--#{$prefix}text-opacity) * 100%), transparent),
       ),
       class: text,
       values: map.merge(
         $utilities-text-colors,
         (
           "muted": var(--#{$prefix}fg-2), // deprecated
-          "black-50": color-mix(in srgb, var(--#{$prefix}black) 50%, transparent), // deprecated
-          "white-50": color-mix(in srgb, var(--#{$prefix}white) 50%, transparent), // deprecated
+          "black-50": color-mix(in oklch, var(--#{$prefix}black) 50%, transparent), // deprecated
+          "white-50": color-mix(in oklch, var(--#{$prefix}white) 50%, transparent), // deprecated
           "body-secondary": var(--#{$prefix}fg-2), // deprecated
           "body-tertiary": var(--#{$prefix}fg-3), // deprecated
           "body-emphasis": var(--#{$prefix}emphasis-color),
@@ -929,7 +929,7 @@ $utilities: map.merge(
       property: (
         --#{$prefix}text: null,
         --#{$prefix}text-opacity: 1,
-        color: color-mix(in srgb, var(--#{$prefix}text) calc(var(--#{$prefix}text-opacity) * 100%), transparent),
+        color: color-mix(in oklch, var(--#{$prefix}text) calc(var(--#{$prefix}text-opacity) * 100%), transparent),
       ),
       class: fg,
       values: theme-token-refs($theme-fgs, "fg")
@@ -948,7 +948,7 @@ $utilities: map.merge(
       property: (
         --#{$prefix}text: null,
         --#{$prefix}text-opacity: 1,
-        color: color-mix(in srgb, var(--#{$prefix}text) calc(var(--#{$prefix}text-opacity) * 100%), transparent),
+        color: color-mix(in oklch, var(--#{$prefix}text) calc(var(--#{$prefix}text-opacity) * 100%), transparent),
       ),
       class: text,
       values: $utilities-text-emphasis-colors
@@ -993,7 +993,7 @@ $utilities: map.merge(
       property: (
         --#{$prefix}underline: null,
         --#{$prefix}underline-opacity: 1,
-        text-decoration-color: color-mix(in srgb, var(--#{$prefix}underline) calc(var(--#{$prefix}underline-opacity) * 100%), transparent),
+        text-decoration-color: color-mix(in oklch, var(--#{$prefix}underline) calc(var(--#{$prefix}underline-opacity) * 100%), transparent),
       ),
       class: underline,
       values: map.merge(
@@ -1024,7 +1024,7 @@ $utilities: map.merge(
       property: (
         --#{$prefix}bg: null,
         --#{$prefix}bg-opacity: 1,
-        background-color: color-mix(in srgb, var(--#{$prefix}bg) calc(var(--#{$prefix}bg-opacity) * 100%), transparent),
+        background-color: color-mix(in oklch, var(--#{$prefix}bg) calc(var(--#{$prefix}bg-opacity) * 100%), transparent),
       ),
       class: bg,
       values: map.merge(
@@ -1051,7 +1051,7 @@ $utilities: map.merge(
       property: (
         --#{$prefix}bg: null,
         --#{$prefix}bg-opacity: 1,
-        background-color: color-mix(in srgb, var(--#{$prefix}bg) calc(var(--#{$prefix}bg-opacity) * 100%), transparent),
+        background-color: color-mix(in oklch, var(--#{$prefix}bg) calc(var(--#{$prefix}bg-opacity) * 100%), transparent),
       ),
       class: bg,
       values: $utilities-bg-subtle
@@ -1060,7 +1060,7 @@ $utilities: map.merge(
       property: (
         --#{$prefix}bg: null,
         --#{$prefix}bg-opacity: 1,
-        background-color: color-mix(in srgb, var(--#{$prefix}bg) calc(var(--#{$prefix}bg-opacity) * 100%), transparent),
+        background-color: color-mix(in oklch, var(--#{$prefix}bg) calc(var(--#{$prefix}bg-opacity) * 100%), transparent),
       ),
       class: bg,
       values: $utilities-bg-muted

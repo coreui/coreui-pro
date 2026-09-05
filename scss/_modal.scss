@@ -157,7 +157,7 @@ $modal-tokens: defaults(
       }
 
       &::backdrop {
-        background-color: color-mix(in srgb, var(--#{$prefix}modal-backdrop-bg) calc(var(--#{$prefix}modal-backdrop-opacity) * 100%), transparent);
+        background-color: color-mix(in oklch, var(--#{$prefix}modal-backdrop-bg) calc(var(--#{$prefix}modal-backdrop-opacity) * 100%), transparent);
         @include transition(background-color var(--#{$prefix}modal-transition-duration) var(--#{$prefix}modal-transition-timing));
       }
 
@@ -167,7 +167,7 @@ $modal-tokens: defaults(
     }
 
     &.modal-instant::backdrop {
-      background-color: color-mix(in srgb, var(--#{$prefix}modal-backdrop-bg) calc(var(--#{$prefix}modal-backdrop-opacity) * 100%), transparent);
+      background-color: color-mix(in oklch, var(--#{$prefix}modal-backdrop-bg) calc(var(--#{$prefix}modal-backdrop-opacity) * 100%), transparent);
     }
 
     &[open]:not(.hiding) {
@@ -200,7 +200,7 @@ $modal-tokens: defaults(
     }
 
     .modal.modal-swap-in:not(.modal-instant)::backdrop {
-      background-color: color-mix(in srgb, var(--#{$prefix}modal-backdrop-bg) calc(var(--#{$prefix}modal-backdrop-opacity) * 100%), transparent);
+      background-color: color-mix(in oklch, var(--#{$prefix}modal-backdrop-bg) calc(var(--#{$prefix}modal-backdrop-opacity) * 100%), transparent);
     }
   }
 
