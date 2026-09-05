@@ -26,11 +26,6 @@ $link-hover-color:    color-mix(in oklch, var(--#{$prefix}link-color) 90%, var(-
 $border-color-translucent: color-mix(in oklch, var(--#{$prefix}fg-body) 15%, transparent) !default;
 // scss-docs-end border-variables
 
-// scss-docs-start border-radius-variables
-$border-radius-xl:  1rem !default;
-$border-radius-xxl: 2rem !default;
-// scss-docs-end border-radius-variables
-
 // scss-docs-start box-shadow-variables
 $shadow-color:         #000 !default;
 $shadow-strength:      1 !default;
@@ -221,12 +216,7 @@ $root-token-defaults: map.merge(
     --#{$prefix}border-style: $border-style,
     --#{$prefix}border-color: $border-color,
     --#{$prefix}border-color-translucent: $border-color-translucent,
-    --#{$prefix}border-radius: $border-radius,
-    --#{$prefix}border-radius-sm: $border-radius-sm,
-    --#{$prefix}border-radius-lg: $border-radius-lg,
-    --#{$prefix}border-radius-xl: $border-radius-xl,
-    --#{$prefix}border-radius-xxl: $border-radius-xxl,
-    --#{$prefix}border-radius-pill: $border-radius-pill,
+    --#{$prefix}border-radius: var(--#{$prefix}radius-4),
     // scss-docs-end root-border-var
     --#{$prefix}shadow-color: $shadow-color,
     --#{$prefix}shadow-strength: $shadow-strength,
