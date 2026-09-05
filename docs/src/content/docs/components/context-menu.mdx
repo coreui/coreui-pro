@@ -117,12 +117,12 @@ Preventing the `show` event keeps the browser's own menu away too - the right-cl
 
 ### Menu elsewhere in the DOM
 
-By default the plugin looks for the `.menu` next to the trigger. Point `data-coreui-menu` at a selector when the menu lives elsewhere, for example one menu shared by several independent areas.
+By default the plugin looks for the `.menu` next to the trigger. Point `data-coreui-target` at it when the menu lives elsewhere, for example one menu shared by several independent areas.
 
-<Example class="d-flex flex-wrap gap-3" code={`<div class="border rounded-3 p-4 flex-fill text-center fg-2" tabindex="0" data-coreui-toggle="context-menu" data-coreui-menu="#sharedContextMenu">
+<Example class="d-flex flex-wrap gap-3" code={`<div class="border rounded-3 p-4 flex-fill text-center fg-2" tabindex="0" data-coreui-toggle="context-menu" data-coreui-target="#sharedContextMenu">
     Area one
   </div>
-  <div class="border rounded-3 p-4 flex-fill text-center fg-2" tabindex="0" data-coreui-toggle="context-menu" data-coreui-menu="#sharedContextMenu">
+  <div class="border rounded-3 p-4 flex-fill text-center fg-2" tabindex="0" data-coreui-toggle="context-menu" data-coreui-target="#sharedContextMenu">
     Area two
   </div>
   <div class="menu" id="sharedContextMenu">
@@ -171,12 +171,12 @@ iOS Safari does not dispatch `contextmenu` for a long-press. Call `show()` yours
 
 ### Via data attributes
 
-Add `data-coreui-toggle="context-menu"` to the element that should own the menu and place the `.menu` right after it (or point at it with `data-coreui-menu`).
+Add `data-coreui-toggle="context-menu"` to the element that should own the menu and place the `.menu` right after it (or point at it with `data-coreui-target`).
 
 | Attribute | Description |
 | --- | --- |
 | `data-coreui-toggle="context-menu"` | Initializes the context menu on the element and wires the `contextmenu` listener. |
-| `data-coreui-menu` | Selector of the `.menu` to open when it isn't a sibling of the trigger. |
+| `data-coreui-target` | Selector of the `.menu` to open when it isn't a sibling of the trigger. |
 
 ```html
 <div data-coreui-toggle="context-menu">
@@ -208,7 +208,7 @@ contextMenu.hide()
 
 ### Options
 
-The context menu accepts every [Menu option](/components/menu/#options). Two defaults differ, and `menu` also takes a selector.
+The context menu accepts every [Menu option](/components/menu/#options). Two defaults differ.
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -218,7 +218,7 @@ The context menu accepts every [Menu option](/components/menu/#options). Two def
 | `display` | string | `'dynamic'` | By default, we use Floating UI for dynamic positioning. Disable this with `static`. |
 | `offset` | array, string, function | `[0, 2]` | Offset of the menu relative to the pointer. You can pass a string in data attributes with comma separated values like: `data-coreui-offset="10,20"`. When a function is used to determine the offset, it is called with an object containing the placement, the reference, and floating rects as its first argument. The triggering element DOM node is passed as the second argument. The function must return an array with two numbers: [skidding, distance]. For more information refer to Floating UI's [offset docs](https://floating-ui.com/docs/offset). |
 | `floatingConfig` | null, object, function | `null` | To change the default Floating UI config, see [Floating UI's configuration](https://floating-ui.com/docs/computePosition). When a function is used to create the Floating UI configuration, it's called with an object that contains the default Floating UI configuration. It helps you use and merge the default with your own configuration. The function must return a configuration object for Floating UI. |
-| `menu` | null, string, element | `null` | The `.menu` to open. A selector (also via `data-coreui-menu`) or an element; by default the plugin looks for a `.menu` next to the trigger. |
+| `menu` | null, element | `null` | The `.menu` to open (JavaScript only). By default the plugin takes the element `data-coreui-target` points at, or a `.menu` next to the trigger. |
 | `placement` | string | `'bottom-start'` | Placement of the menu relative to the pointer. Physical placements: `'top'`, `'bottom'`, `'left'`, `'right'`. Logical placements (RTL-aware): `'start'`, `'end'`. All support alignment modifiers: `-start`, `-end`. Supports responsive prefixes like `'bottom-start md:end'`. |
 | `reference` | string, element, object | `'pointer'` | What the menu is positioned against. `'pointer'` opens it at the right-click point (falling back to the trigger for keyboard invocation); `'toggle'` and `'parent'` anchor it to the trigger element or its parent regardless of the pointer; an HTMLElement or an object providing `getBoundingClientRect` anchors it elsewhere. For more information refer to Floating UI's [virtual elements docs](https://floating-ui.com/docs/virtual-elements). |
 | `strategy` | string | `'fixed'` | Positioning strategy for the menu. `'fixed'` places it in viewport coordinates, which is what the pointer position is; use `'absolute'` only when anchoring to an element inside a scrolling container. For more information refer to Floating UI's [strategy docs](https://floating-ui.com/docs/computePosition#strategy). |

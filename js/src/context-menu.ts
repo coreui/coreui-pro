@@ -7,11 +7,10 @@
 
 import type { ReferenceElement } from '@floating-ui/dom'
 import EventHandler, { type CoreUIEvent } from './dom/event-handler.js'
+import SelectorEngine from './dom/selector-engine.js'
 import Menu, { type MenuConfig } from './menu.js'
 import type { ComponentConfig } from './util/config.js'
-import {
-  defineJQueryPlugin, getElement, isDisabled, noop
-} from './util/index.js'
+import { defineJQueryPlugin, isDisabled, noop } from './util/index.js'
 
 /**
  * Constants
@@ -44,8 +43,7 @@ const Default: MenuConfig = {
 }
 
 const DefaultType: Record<string, string> = {
-  ...Menu.DefaultType,
-  menu: '(null|string|element)'
+  ...Menu.DefaultType
 }
 
 /**
@@ -202,14 +200,8 @@ class ContextMenu extends Menu {
     this._scrollBlocker = null
   }
 
-  override _getConfig(config?: ComponentConfig | null): ComponentConfig {
-    config = super._getConfig(config)
-
-    if (typeof config.menu === 'string') {
-      config.menu = getElement(config.menu)
-    }
-
-    return config
+  protected override _findMenu(): Element | null {
+    return SelectorEngine.getElementFromSelector(this._element) || super._findMenu()
   }
 
   protected override _getReferenceElement(): ReferenceElement {

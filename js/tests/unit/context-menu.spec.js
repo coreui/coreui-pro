@@ -112,9 +112,9 @@ describe('ContextMenu', () => {
       expect(menu.getAttribute('tabindex')).toEqual('0')
     })
 
-    it('should resolve the menu option passed as a selector', () => {
+    it('should resolve the menu from data-coreui-target', () => {
       fixtureEl.innerHTML = [
-        '<div class="area" data-coreui-toggle="context-menu" data-coreui-menu="#sharedMenu">Right click here</div>',
+        '<div class="area" data-coreui-toggle="context-menu" data-coreui-target="#sharedMenu">Right click here</div>',
         '<div class="menu" id="sharedMenu">',
         '  <a class="menu-item" href="#">Item</a>',
         '</div>'
@@ -125,6 +125,20 @@ describe('ContextMenu', () => {
       const contextMenu = new ContextMenu(area)
 
       expect(contextMenu._menu).toEqual(menu)
+    })
+
+    it('should prefer the menu option over data-coreui-target', () => {
+      fixtureEl.innerHTML = [
+        '<div class="area" data-coreui-toggle="context-menu" data-coreui-target="#sharedMenu">Right click here</div>',
+        '<div class="menu" id="sharedMenu"></div>',
+        '<div class="menu" id="otherMenu"></div>'
+      ].join('')
+
+      const area = fixtureEl.querySelector('.area')
+      const other = fixtureEl.querySelector('#otherMenu')
+      const contextMenu = new ContextMenu(area, { menu: other })
+
+      expect(contextMenu._menu).toEqual(other)
     })
 
     it('should not throw when no menu is present', () => {
