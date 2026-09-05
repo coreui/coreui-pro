@@ -855,16 +855,40 @@ class Menu extends BaseComponent {
   // Keyboard navigation
   // -------------------------------------------------------------------------
 
+  // Items sit either directly in `.menu`, or as a submenu trigger one level deeper
+  // (`.menu > .submenu > .menu-item`). Both are navigable at the same level.
+  protected _getItemsInMenu(menu: Element): HTMLElement[] {
+    return SelectorEngine.find(
+      `:scope > ${this.constructor.SELECTOR_VISIBLE_ITEMS}, :scope > ${this.constructor.SELECTOR_SUBMENU} > ${this.constructor.SELECTOR_VISIBLE_ITEMS}`,
+      menu
+    ).filter(element => isVisible(element))
+  }
+
   protected _selectMenuItem({ key, target }: CoreUIEvent): void {
     const currentMenu = (target as Element).closest(this.constructor.SELECTOR_MENU) || this._menu
-    const items = SelectorEngine.find(`:scope > ${this.constructor.SELECTOR_VISIBLE_ITEMS}`, currentMenu)
-      .filter(element => isVisible(element))
+    const items = this._getItemsInMenu(currentMenu)
 
     if (!items.length) {
       return
     }
 
-    getNextActiveElement(items, target as HTMLElement, key === ARROW_DOWN_KEY, !items.includes(target as HTMLElement)).focus()
+    const nextItem = getNextActiveElement(items, target as HTMLElement, key === ARROW_DOWN_KEY, !items.includes(target as HTMLElement))
+    nextItem.focus()
+    this._closeUnrelatedSubmenus(currentMenu, nextItem)
+  }
+
+  // Moving focus along one level closes the submenus focus left behind, matching
+  // what hover and click already do through `_closeSiblingSubmenus`.
+  protected _closeUnrelatedSubmenus(currentMenu: Element, focusedElement: HTMLElement): void {
+    for (const [submenu] of this._openSubmenus) {
+      const submenuWrapper = submenu.closest(this.constructor.SELECTOR_SUBMENU)
+
+      if (!submenuWrapper || submenuWrapper.parentElement !== currentMenu || submenuWrapper.contains(focusedElement)) {
+        continue
+      }
+
+      this._closeSubmenu(submenu, submenuWrapper)
+    }
   }
 
   protected _handleSubmenuKeydown(event: CoreUIEvent): boolean {
@@ -938,12 +962,12 @@ class Menu extends BaseComponent {
       event.stopPropagation()
 
       const currentMenu = (target as Element).closest(this.constructor.SELECTOR_MENU)!
-      const items = SelectorEngine.find(`:scope > ${this.constructor.SELECTOR_VISIBLE_ITEMS}`, currentMenu)
-        .filter(element => isVisible(element))
+      const items = this._getItemsInMenu(currentMenu)
 
       if (items.length) {
-        const targetItem = key === HOME_KEY ? items[0] : items[items.length - 1]
+        const targetItem = key === HOME_KEY ? items[0] : items.at(-1)!
         targetItem.focus()
+        this._closeUnrelatedSubmenus(currentMenu, targetItem)
       }
 
       return true

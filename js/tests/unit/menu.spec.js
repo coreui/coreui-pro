@@ -4394,6 +4394,110 @@ describe('Menu', () => {
   })
 
   describe('scoped keyboard navigation', () => {
+    it('should walk submenu triggers, items past a divider, Home and End at one level', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<div>',
+          '  <button class="btn" data-coreui-toggle="menu">Menu</button>',
+          '  <div class="menu">',
+          '    <div class="submenu">',
+          '      <button id="trigger-1" class="menu-item" type="button">File</button>',
+          '      <div class="menu">',
+          '        <a id="sub-item-1" class="menu-item" href="#">New</a>',
+          '      </div>',
+          '    </div>',
+          '    <div class="submenu">',
+          '      <button id="trigger-2" class="menu-item" type="button">Edit</button>',
+          '      <div class="menu">',
+          '        <a class="menu-item" href="#">Cut</a>',
+          '      </div>',
+          '    </div>',
+          '    <hr class="menu-divider">',
+          '    <a id="top-item" class="menu-item" href="#">Preferences</a>',
+          '  </div>',
+          '</div>'
+        ].join('')
+
+        const btnMenu = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+        const trigger1 = fixtureEl.querySelector('#trigger-1')
+        const trigger2 = fixtureEl.querySelector('#trigger-2')
+        const topItem = fixtureEl.querySelector('#top-item')
+        const menu = new Menu(btnMenu)
+        const press = (element, key) => {
+          const keydown = createEvent('keydown', { bubbles: true })
+          keydown.key = key
+          element.dispatchEvent(keydown)
+        }
+
+        btnMenu.addEventListener('shown.coreui.menu', () => {
+          press(btnMenu, 'ArrowDown')
+          expect(document.activeElement).toEqual(trigger1)
+
+          press(trigger1, 'ArrowDown')
+          expect(document.activeElement).toEqual(trigger2)
+
+          press(trigger2, 'ArrowDown')
+          expect(document.activeElement).toEqual(topItem)
+
+          press(topItem, 'ArrowUp')
+          expect(document.activeElement).toEqual(trigger2)
+
+          press(trigger2, 'End')
+          expect(document.activeElement).toEqual(topItem)
+
+          press(topItem, 'Home')
+          expect(document.activeElement).toEqual(trigger1)
+
+          resolve()
+        })
+
+        menu.show()
+      })
+    })
+
+    it('should close the submenu focus leaves when arrowing along the parent level', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<div>',
+          '  <button class="btn" data-coreui-toggle="menu">Menu</button>',
+          '  <div class="menu">',
+          '    <div class="submenu">',
+          '      <button id="trigger-1" class="menu-item" type="button">File</button>',
+          '      <div id="submenu-1" class="menu">',
+          '        <a class="menu-item" href="#">New</a>',
+          '      </div>',
+          '    </div>',
+          '    <a id="top-item" class="menu-item" href="#">Preferences</a>',
+          '  </div>',
+          '</div>'
+        ].join('')
+
+        const btnMenu = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+        const trigger1 = fixtureEl.querySelector('#trigger-1')
+        const submenu1 = fixtureEl.querySelector('#submenu-1')
+        const topItem = fixtureEl.querySelector('#top-item')
+        const menu = new Menu(btnMenu)
+
+        btnMenu.addEventListener('shown.coreui.menu', () => {
+          trigger1.focus()
+          const enter = createEvent('keydown', { bubbles: true })
+          enter.key = 'Enter'
+          trigger1.dispatchEvent(enter)
+          expect(submenu1).toHaveClass('show')
+
+          const arrowDown = createEvent('keydown', { bubbles: true })
+          arrowDown.key = 'ArrowDown'
+          trigger1.dispatchEvent(arrowDown)
+
+          expect(document.activeElement).toEqual(topItem)
+          expect(submenu1).not.toHaveClass('show')
+          resolve()
+        })
+
+        menu.show()
+      })
+    })
+
     it('should scope ArrowDown/ArrowUp to direct children of the current menu level', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = [
