@@ -34,7 +34,7 @@ $form-range-thumb-transition-timing:       ease-in-out !default;
 
 $form-range-tick-width:                    var(--#{$prefix}border-width) !default;
 $form-range-tick-height:                   .5rem !default;
-$form-range-tick-bg:                       var(--#{$prefix}border-color) !default;
+$form-range-tick-bg:                       var(--#{$prefix}fg-4) !default;
 $form-range-tick-label-margin-top:         .125rem !default;
 $form-range-tick-label-font-size:          var(--#{$prefix}font-size-sm) !default;
 $form-range-tick-label-color:              var(--#{$prefix}fg-2) !default;
@@ -222,10 +222,11 @@ $form-range-tokens: defaults(
 
   // Tick marks generated from the linked <datalist>. Plugin builds `grid-template-columns`
   // from the gaps between values so each tick lands on a grid line (handles uneven values).
-  // Track is inset by 1/4th of the thumb width to keep alignment.
+  // The grid is inset by half the thumb, so the first and last tick sit under the thumb's
+  // centre at min and max.
   .form-range-ticks {
     display: grid;
-    padding-inline: calc(var(--#{$prefix}range-thumb-width) * .25);
+    padding-inline: calc(var(--#{$prefix}range-thumb-width) * .5);
   }
 
   .form-range-tick {
@@ -243,14 +244,6 @@ $form-range-tokens: defaults(
       content: "";
       background-color: var(--#{$prefix}range-tick-bg);
     }
-
-    &:first-child {
-      align-items: flex-start;
-    }
-
-    &:last-child {
-      align-items: flex-end;
-    }
   }
 
   .form-range-tick-label {
@@ -258,5 +251,13 @@ $form-range-tokens: defaults(
     font-size: var(--#{$prefix}range-tick-label-font-size);
     color: var(--#{$prefix}range-tick-label-color);
     white-space: nowrap;
+
+    .form-range-tick:first-child > & {
+      align-self: flex-start;
+    }
+
+    .form-range-tick:last-child > & {
+      align-self: flex-end;
+    }
   }
 }
