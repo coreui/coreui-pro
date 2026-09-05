@@ -273,6 +273,12 @@ finished, not whether the state changed.
 
 #### Breadcrumb
 
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The breadcrumb has no bottom margin.** `.breadcrumb` sat on
+  `margin-bottom: 1rem` through `$breadcrumb-margin-bottom` and
+  `--cui-breadcrumb-margin-bottom`; both are gone and the list ends where its
+  content ends, like every other navigation component. Add `.mb-4` (or set
+  `margin-bottom` on the `<nav>`) where the page relied on that gap.
 - **Three breadcrumb tokens have real defaults.** `--cui-breadcrumb-bg`,
   `--cui-breadcrumb-border-radius` and `--cui-breadcrumb-font-size` were `null`
   in Sass, so the first two were emitted empty (`--cui-breadcrumb-bg: ;`) and
@@ -2262,9 +2268,9 @@ as such.
   stops instead of the one global `--cui-border-radius`: buttons, inputs,
   alerts, list groups, tabs, nav links, progress, tooltips, thumbnails,
   callouts, combobox options and the range slider's tooltip sit on
-  `--cui-radius-5` (`.5rem`), badges, cards, popovers, dialogs, drawers,
-  menus, accordions, toasts, dropdowns and popups on `--cui-radius-7`
-  (`.75rem`), pills on `--cui-radius-9` (`1.5rem`).
+  `--cui-radius-5` (`.5rem`), badges, popovers, dialogs, drawers, menus,
+  accordions, toasts, dropdowns and popups on `--cui-radius-7` (`.75rem`),
+  cards on `--cui-radius-8` (`1rem`), pills on `--cui-radius-9` (`1.5rem`).
   Everything that used the `.375rem` default is visibly rounder. To keep a
   component on its old radius, set its own token
   (`--cui-card-border-radius: .375rem`); to retune the whole page, override
