@@ -1,43 +1,20 @@
 @use "sass:string";
 @use "functions/defaults" as *;
+@use "forms/form-range" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/box-shadow" as *;
 @use "mixins/focus-ring" as *;
-@use "mixins/gradients" as *;
 @use "mixins/ltr-rtl" as *;
 @use "mixins/tokens" as *;
-@use "mixins/transition" as *;
 @use "config" as *;
 @use "theme" as *;
 
-// stylelint-disable custom-property-no-missing-var-function
-
 // Range Slider
 // scss-docs-start range-slider-variables
-$range-slider-track-width:                 100% !default;
-$range-slider-track-height:                .5rem !default;
-$range-slider-track-cursor:                pointer !default;
-$range-slider-track-bg:                    color-mix(in oklch, var(--#{$prefix}bg-2), var(--#{$prefix}bg-3)) !default;
-$range-slider-track-border-radius:         var(--#{$prefix}radius-pill) !default;
-$range-slider-track-box-shadow:            var(--#{$prefix}box-shadow-inset) !default;
-
-$range-slider-track-in-range-bg:           color-mix(in oklch, var(--#{$prefix}theme-bg, var(--#{$prefix}primary-base)) 50%, transparent) !default;
-$range-slider-disabled-track-in-range-bg:  var(--#{$prefix}fg-4) !default;
-
 $range-slider-label-padding-y:             0 !default;
 $range-slider-label-padding-x:             0 !default;
 $range-slider-label-font-size:             var(--#{$prefix}font-size-sm) !default;
 $range-slider-label-color:                 var(--#{$prefix}fg-body) !default;
-
-$range-slider-thumb-width:                 1rem !default;
-$range-slider-thumb-height:                $range-slider-thumb-width !default;
-$range-slider-thumb-bg:                    var(--#{$prefix}theme-bg, var(--#{$prefix}primary-base)) !default;
-$range-slider-thumb-border:                0 !default;
-$range-slider-thumb-border-radius:         var(--#{$prefix}radius-pill) !default;
-$range-slider-thumb-box-shadow:            0 .1rem .25rem color-mix(in oklch, var(--#{$prefix}black) 10%, transparent) !default;
-$range-slider-thumb-active-bg:             color-mix(in oklch, var(--#{$prefix}theme-bg, var(--#{$prefix}primary-base)) 30%, var(--#{$prefix}bg-body)) !default;
-$range-slider-thumb-disabled-bg:           var(--#{$prefix}fg-3) !default;
-$range-slider-thumb-transition:            background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out !default;
 
 $range-slider-tooltip-margin-end:          .25rem !default;
 $range-slider-tooltip-margin-bottom:       .25rem !default;
@@ -53,27 +30,10 @@ $range-slider-tokens: () !default;
 // scss-docs-start range-slider-css-vars
 $range-slider-tokens: defaults(
   (
-    --#{$prefix}range-slider-track-width: #{$range-slider-track-width},
-    --#{$prefix}range-slider-track-height: #{$range-slider-track-height},
-    --#{$prefix}range-slider-track-cursor: #{$range-slider-track-cursor},
-    --#{$prefix}range-slider-track-bg: #{$range-slider-track-bg},
-    --#{$prefix}range-slider-track-border-radius: #{$range-slider-track-border-radius},
-    --#{$prefix}range-slider-track-box-shadow: #{$range-slider-track-box-shadow},
-    --#{$prefix}range-slider-track-in-range-bg: #{$range-slider-track-in-range-bg},
-    --#{$prefix}range-slider-disabled-track-in-range-bg: #{$range-slider-disabled-track-in-range-bg},
     --#{$prefix}range-slider-label-padding-y: #{$range-slider-label-padding-y},
     --#{$prefix}range-slider-label-padding-x: #{$range-slider-label-padding-x},
     --#{$prefix}range-slider-label-font-size: #{$range-slider-label-font-size},
     --#{$prefix}range-slider-label-color: #{$range-slider-label-color},
-    --#{$prefix}range-slider-thumb-width: #{$range-slider-thumb-width},
-    --#{$prefix}range-slider-thumb-height: #{$range-slider-thumb-height},
-    --#{$prefix}range-slider-thumb-bg: #{$range-slider-thumb-bg},
-    --#{$prefix}range-slider-thumb-border: #{$range-slider-thumb-border},
-    --#{$prefix}range-slider-thumb-border-radius: #{$range-slider-thumb-border-radius},
-    --#{$prefix}range-slider-thumb-box-shadow: #{$range-slider-thumb-box-shadow},
-    --#{$prefix}range-slider-thumb-active-bg: #{$range-slider-thumb-active-bg},
-    --#{$prefix}range-slider-thumb-disabled-bg: #{$range-slider-thumb-disabled-bg},
-    --#{$prefix}range-slider-thumb-transition: #{$range-slider-thumb-transition},
     --#{$prefix}range-slider-tooltip-margin-end: #{$range-slider-tooltip-margin-end},
     --#{$prefix}range-slider-tooltip-margin-bottom: #{$range-slider-tooltip-margin-bottom},
   ),
@@ -100,6 +60,7 @@ $range-slider-vertical-tokens: defaults(
 // stylelint-enable scss/dollar-variable-default
 @layer components {
   .range-slider {
+    @include tokens($form-range-tokens);
     @include tokens($range-slider-tokens);
 
     position: relative;
@@ -108,9 +69,9 @@ $range-slider-vertical-tokens: defaults(
     align-items: center;
 
     &.disabled {
-      --#{$prefix}range-slider-track-in-range-bg: var(--#{$prefix}range-slider-disabled-track-in-range-bg);
-
       .range-slider-track {
+        --#{$prefix}theme-bg: var(--#{$prefix}range-track-disabled-bg);
+
         cursor: initial;
       }
     }
@@ -120,28 +81,28 @@ $range-slider-vertical-tokens: defaults(
     position: relative;
     display: flex;
     align-items: center;
-    height: string.unquote("max(var(--#{$prefix}range-slider-thumb-height), var(--#{$prefix}range-slider-track-height))");
+    height: string.unquote("max(var(--#{$prefix}range-thumb-height), var(--#{$prefix}range-track-height))");
   }
 
   .range-slider-track {
-    width: var(--#{$prefix}range-slider-track-width);
-    height: var(--#{$prefix}range-slider-track-height);
-    cursor: var(--#{$prefix}range-slider-track-cursor);
-    background-color: var(--#{$prefix}range-slider-track-bg);
+    width: var(--#{$prefix}range-track-width);
+    height: var(--#{$prefix}range-track-height);
+    cursor: var(--#{$prefix}range-track-cursor);
+    background-color: var(--#{$prefix}range-track-bg);
     // No fallback on purpose: with `track: false` the plugin never writes the edges and the whole declaration must drop to `none`.
     background-image:
       linear-gradient(
-        var(--#{$prefix}range-slider-track-direction, to right),
+        var(--#{$prefix}range-track-direction, to right),
         transparent 0%,
         transparent var(--cui-range-slider-track-from),
-        var(--#{$prefix}range-slider-track-in-range-bg) var(--cui-range-slider-track-from),
-        var(--#{$prefix}range-slider-track-in-range-bg) var(--cui-range-slider-track-to),
+        color-mix(in oklch, var(--#{$prefix}theme-bg, var(--#{$prefix}range-track-fill-bg)) 50%, transparent) var(--cui-range-slider-track-from),
+        color-mix(in oklch, var(--#{$prefix}theme-bg, var(--#{$prefix}range-track-fill-bg)) 50%, transparent) var(--cui-range-slider-track-to),
         transparent var(--cui-range-slider-track-to),
         transparent 100%
       );
     border-color: transparent;
-    @include border-radius(var(--#{$prefix}range-slider-track-border-radius));
-    @include box-shadow(var(--#{$prefix}range-slider-track-box-shadow));
+    @include border-radius(var(--#{$prefix}range-track-border-radius));
+    @include box-shadow(var(--#{$prefix}range-track-box-shadow));
   }
 
   .range-slider-input {
@@ -152,8 +113,7 @@ $range-slider-vertical-tokens: defaults(
     pointer-events: none;
     background-color: transparent;
 
-    &:hover + .range-slider-tooltip,
-    &:focus + .range-slider-tooltip {
+    &:is(:hover, :active, :focus-visible) + .range-slider-tooltip {
       opacity: 1;
     }
 
@@ -171,37 +131,15 @@ $range-slider-vertical-tokens: defaults(
     }
 
     &::-webkit-slider-thumb {
-      width: var(--#{$prefix}range-slider-thumb-width);
-      height: var(--#{$prefix}range-slider-thumb-height);
-      appearance: none;
       pointer-events: all;
       cursor: pointer;
-      @include gradient-bg(var(--#{$prefix}range-slider-thumb-bg));
-      border: var(--#{$prefix}range-slider-thumb-border);
-      @include border-radius(var(--#{$prefix}range-slider-thumb-border-radius));
-      @include box-shadow(var(--#{$prefix}range-slider-thumb-box-shadow));
-      @include transition(var(--#{$prefix}range-slider-thumb-transition));
-
-      &:active {
-        @include gradient-bg(var(--#{$prefix}range-slider-thumb-active-bg));
-      }
+      @include form-range-thumb();
     }
 
     &::-moz-range-thumb {
-      width: var(--#{$prefix}range-slider-thumb-width);
-      height: var(--#{$prefix}range-slider-thumb-height);
-      appearance: none;
       pointer-events: all;
       cursor: pointer;
-      @include gradient-bg(var(--#{$prefix}range-slider-thumb-bg));
-      border: var(--#{$prefix}range-slider-thumb-border);
-      @include border-radius(var(--#{$prefix}range-slider-thumb-border-radius));
-      @include box-shadow(var(--#{$prefix}range-slider-thumb-box-shadow));
-      @include transition(var(--#{$prefix}range-slider-thumb-transition));
-
-      &:active {
-        @include gradient-bg(var(--#{$prefix}range-slider-thumb-active-bg));
-      }
+      @include form-range-thumb();
     }
 
     &:disabled {
@@ -210,28 +148,46 @@ $range-slider-vertical-tokens: defaults(
 
       &::-webkit-slider-thumb {
         pointer-events: none;
-        background-color: var(--#{$prefix}range-slider-thumb-disabled-bg);
+        background-color: var(--#{$prefix}range-thumb-disabled-bg);
         opacity: 1;
       }
 
       &::-moz-range-thumb {
         pointer-events: none;
-        background-color: var(--#{$prefix}range-slider-thumb-disabled-bg);
+        background-color: var(--#{$prefix}range-thumb-disabled-bg);
         opacity: 1;
       }
     }
   }
 
+  // The plugin builds the grid template from the gaps between label values, so every label
+  // sits on a grid line and a labelled stop draws a taller tick than a bare one.
   .range-slider-labels-container {
-    position: relative;
+    display: grid;
   }
 
   .range-slider-label {
-    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-self: start;
+    width: 0;
     padding: var(--#{$prefix}range-slider-label-padding-y) var(--#{$prefix}range-slider-label-padding-x);
     font-size: var(--#{$prefix}range-slider-label-font-size);
     color: var(--#{$prefix}range-slider-label-color);
-    @include ltr-rtl("transform", translateX(-50%), null, translateX(50%));
+    white-space: nowrap;
+
+    &::before {
+      width: var(--#{$prefix}range-tick-width);
+      height: var(--#{$prefix}range-tick-minor-height);
+      margin-bottom: var(--#{$prefix}range-tick-label-margin-top);
+      content: "";
+      background-color: var(--#{$prefix}range-tick-bg);
+    }
+
+    &:not(:empty)::before {
+      height: var(--#{$prefix}range-tick-height);
+    }
 
     &.clickable {
       cursor: pointer;
@@ -243,7 +199,7 @@ $range-slider-vertical-tokens: defaults(
 
     // Outside `$prefix` on purpose: the plugin writes this name.
     position: absolute;
-    inset-inline-start: calc(var(--#{$prefix}range-slider-thumb-width) * .5 + var(--cui-range-slider-tooltip-position, 0) * (100% - var(--#{$prefix}range-slider-thumb-width)));
+    inset-inline-start: calc(var(--#{$prefix}range-thumb-width) * .5 + var(--cui-range-slider-tooltip-position, 0) * (100% - var(--#{$prefix}range-thumb-width)));
     pointer-events: none;
     @include ltr-rtl("transform", translateX(-50%), null, translateX(50%));
 
@@ -254,20 +210,20 @@ $range-slider-vertical-tokens: defaults(
 
   .range-slider:not(.range-slider-vertical) {
     @include rtl() {
-      --#{$prefix}range-slider-track-direction: to left;
+      --#{$prefix}range-track-direction: to left;
     }
-
 
     .range-slider-inputs-container {
       width: 100%;
     }
 
     .range-slider-labels-container {
-      width: calc(var(--#{$prefix}range-slider-track-width) - var(--#{$prefix}range-slider-thumb-width));
+      width: 100%;
+      padding-inline: calc(var(--#{$prefix}range-thumb-width) * .5);
     }
 
     .range-slider-tooltip {
-      bottom: calc(var(--#{$prefix}range-slider-tooltip-margin-bottom) + var(--#{$prefix}range-slider-thumb-height));
+      bottom: calc(var(--#{$prefix}range-slider-tooltip-margin-bottom) + var(--#{$prefix}tooltip-arrow-height) + var(--#{$prefix}range-thumb-height));
 
       .tooltip-arrow {
         position: absolute;
@@ -280,14 +236,14 @@ $range-slider-vertical-tokens: defaults(
   .range-slider-vertical {
     @include tokens($range-slider-vertical-tokens);
 
-    --#{$prefix}range-slider-track-direction: to top;
+    --#{$prefix}range-track-direction: to top;
 
     flex-direction: row;
     height: var(--#{$prefix}range-slider-vertical-track-height);
 
     .range-slider-inputs-container {
       justify-content: center;
-      width: string.unquote("max(var(--#{$prefix}range-slider-thumb-width), var(--#{$prefix}range-slider-vertical-track-width))");
+      width: string.unquote("max(var(--#{$prefix}range-thumb-width), var(--#{$prefix}range-slider-vertical-track-width))");
       height: 100%;
     }
 
@@ -304,8 +260,8 @@ $range-slider-vertical-tokens: defaults(
 
     .range-slider-tooltip {
       inset-inline-start: auto;
-      inset-inline-end: calc(var(--#{$prefix}range-slider-tooltip-margin-end) + var(--#{$prefix}range-slider-thumb-width));
-      bottom: calc(var(--#{$prefix}range-slider-thumb-height) * .5 + var(--cui-range-slider-tooltip-position, 0) * (100% - var(--#{$prefix}range-slider-thumb-height)));
+      inset-inline-end: calc(var(--#{$prefix}range-slider-tooltip-margin-end) + var(--#{$prefix}tooltip-arrow-height) + var(--#{$prefix}range-thumb-width));
+      bottom: calc(var(--#{$prefix}range-thumb-height) * .5 + var(--cui-range-slider-tooltip-position, 0) * (100% - var(--#{$prefix}range-thumb-height)));
       transform: translateY(50%);
 
       .tooltip-arrow {
@@ -317,11 +273,28 @@ $range-slider-vertical-tokens: defaults(
 
     .range-slider-labels-container {
       flex-shrink: 0;
-      height: calc(var(--#{$prefix}range-slider-vertical-track-height) - var(--#{$prefix}range-slider-thumb-height));
+      height: 100%;
+      padding-block: calc(var(--#{$prefix}range-thumb-height) * .5);
     }
 
     .range-slider-label {
-      transform: translateY(50%);
+      flex-direction: row;
+      align-self: start;
+      justify-self: auto;
+      width: auto;
+      height: 0;
+
+      &::before {
+        width: var(--#{$prefix}range-tick-minor-height);
+        height: var(--#{$prefix}range-tick-width);
+        margin-inline-end: var(--#{$prefix}range-tick-label-margin-top);
+        margin-bottom: 0;
+      }
+
+      &:not(:empty)::before {
+        width: var(--#{$prefix}range-tick-height);
+        height: var(--#{$prefix}range-tick-width);
+      }
     }
   }
 }

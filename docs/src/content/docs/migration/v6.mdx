@@ -1141,7 +1141,8 @@ adornment in the library — so the button needs no icon markup at all:
   value tooltip on hover, drag and focus, or permanently with `"always"` (the
   same `tooltips`/`tooltipsFormat` options as the range slider), and a linked `<datalist>` renders tick
   marks laid out on a grid. Every such wrapper initializes itself. The input
-  fires `changed.coreui.range` with the numeric `value`. **The bare
+  fires `changed.coreui.range` with the numeric `value`. The fill is the
+  theme colour at half strength, a shade lighter than the thumb. **The bare
   `<input class="form-range">` keeps working unchanged** as the CSS-only form of
   the control; it gets no plugin, no fill and no instance. New tokens on
   `.form-range`: `--cui-range-track-fill-bg`, `--cui-range-track-disabled-bg`
@@ -1155,6 +1156,33 @@ adornment in the library — so the button needs no icon markup at all:
 - **Validation reaches the range.** `.is-invalid`/`.is-valid` on the input
   (either form) colour the thumb and its focus ring with the state, and a
   feedback element after the wrapper toggles through `:has()`.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The range slider's handles and track read the range's tokens.** The
+  `--cui-range-slider-thumb-*` and `--cui-range-slider-track-*` families are
+  gone; `.range-slider` declares the `--cui-range-*` family instead, so one
+  setting styles both controls. Rename: `--cui-range-slider-thumb-{width,
+  height,bg,border,border-radius,box-shadow,active-bg,disabled-bg}` →
+  `--cui-range-thumb-*`, `--cui-range-slider-thumb-transition` →
+  `--cui-range-thumb-transition-{property,duration,timing}`,
+  `--cui-range-slider-track-{width,height,cursor,bg,border-radius,box-shadow}`
+  → `--cui-range-track-*`, `--cui-range-slider-track-in-range-bg` →
+  `--cui-range-track-fill-bg`, `--cui-range-slider-disabled-track-in-range-bg`
+  → `--cui-range-track-disabled-bg`. The Sass variables follow
+  (`$range-slider-thumb-*`, `$range-slider-track-*` → `$form-range-*`).
+  `--cui-range-slider-label-*`, `--cui-range-slider-tooltip-margin-*` and
+  `--cui-range-slider-vertical-*` stay. The filled band keeps its half-strength mix of the theme colour, now
+  shared with the range's fill, and a disabled slider greys the band through
+  the theme slot on the track.
+- **Range slider labels sit on a grid, with tick marks.** The plugin builds
+  `grid-template-columns` (rows when vertical) from the gaps between label
+  values, so labels are in normal flow: the container sizes itself, and the
+  resize listener plus the measured container height are gone. Every label
+  draws a tick from `--cui-range-tick-*` — taller when it has text — and the
+  labels are sorted by value. The new `list` option reads a `<datalist>`
+  like the range does and merges its options with `labels`. Custom CSS that
+  positioned `.range-slider-label` through `left`/`bottom` no longer applies.
+- **Range slider tooltips follow the range's modes.** `tooltips: true` shows a
+  handle's tooltip on hover, drag and visible focus; `"always"` keeps them on.
 - **A theme beats `--cui-range-thumb-bg`, as everywhere else.** The token carried
   the `--cui-theme-*` slot inside its own default, so setting it inside a themed
   container dropped the theme. The slot sits on the property now.

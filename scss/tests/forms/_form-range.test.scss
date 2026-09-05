@@ -13,7 +13,7 @@
     @include assert-true(map.has-key($form-range-tokens, --cui-range-tick-label-font-size));
   }
 
-  @include it("track: paints the fill from --cui-range-fill and falls back to an empty track without the plugin") {
+  @include it("track: paints the fill at half strength from --cui-range-fill and falls back to an empty track without the plugin") {
     @include assert() {
       @include output() {
         .test {
@@ -27,7 +27,7 @@
           color: transparent;
           cursor: var(--cui-range-track-cursor);
           background-color: var(--cui-range-track-bg);
-          background-image: linear-gradient(var(--cui-range-track-direction, to right), var(--cui-theme-bg, var(--cui-range-track-fill-bg)) calc(var(--cui-range-fill, 0) * 100%), transparent calc(var(--cui-range-fill, 0) * 100%));
+          background-image: linear-gradient(var(--cui-range-track-direction, to right), color-mix(in oklch, var(--cui-theme-bg, var(--cui-range-track-fill-bg)) 50%, transparent) calc(var(--cui-range-fill, 0) * 100%), transparent calc(var(--cui-range-fill, 0) * 100%));
           border-color: transparent;
           border-radius: var(--cui-range-track-border-radius);
         }

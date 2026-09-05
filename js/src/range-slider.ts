@@ -29,7 +29,6 @@ const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_MOUSEDOWN = `mousedown${EVENT_KEY}`
 const EVENT_MOUSEMOVE = `mousemove${EVENT_KEY}`
 const EVENT_MOUSEUP = `mouseup${EVENT_KEY}`
-const EVENT_RESIZE = `resize${EVENT_KEY}`
 
 const CLASS_NAME_CLICKABLE = 'clickable'
 const CLASS_NAME_DISABLED = 'disabled'
@@ -46,12 +45,12 @@ const CLASS_NAME_TOOLTIP_START = 'bs-tooltip-start'
 const CLASS_NAME_TOOLTIP_TOP = 'bs-tooltip-top'
 const CLASS_NAME_RANGE_SLIDER_TRACK = 'range-slider-track'
 const CLASS_NAME_RANGE_SLIDER_VERTICAL = 'range-slider-vertical'
+const CLASS_NAME_SHOW = 'show'
 
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="range-slider"]'
 const SELECTOR_RANGE_SLIDER_INPUT = '.range-slider-input'
 const SELECTOR_RANGE_SLIDER_INPUTS_CONTAINER = '.range-slider-inputs-container'
 const SELECTOR_RANGE_SLIDER_LABEL = '.range-slider-label'
-const SELECTOR_RANGE_SLIDER_LABELS_CONTAINER = '.range-slider-labels-container'
 
 type RangeSliderLabel = string | { class?: string | string[], label?: string, style?: Record<string, string>, value?: number }
 
@@ -62,6 +61,7 @@ type RangeSliderConfig = {
   disabled: boolean
   distance: number
   labels: RangeSliderLabel[] | boolean | string
+  list: string | null
   max: number
   min: number
   name: string[] | string | null
@@ -69,7 +69,7 @@ type RangeSliderConfig = {
   sanitizeFn: ((unsafeHtml: string) => string) | null
   step: number | string
   tooltipClass: string
-  tooltips: boolean
+  tooltips: boolean | 'always'
   tooltipsFormat: ((value: number | string) => string) | null
   track: boolean | string
   value: number[] | number
@@ -83,6 +83,7 @@ const Default: RangeSliderConfig = {
   disabled: false,
   distance: 0,
   labels: false,
+  list: null,
   max: 100,
   min: 0,
   name: null,
@@ -104,6 +105,7 @@ const DefaultType: Record<string, string> = {
   disabled: 'boolean',
   distance: 'number',
   labels: '(array|boolean|string)',
+  list: '(string|null)',
   max: 'number',
   min: 'number',
   name: '(array|string|null)',
@@ -111,7 +113,7 @@ const DefaultType: Record<string, string> = {
   sanitizeFn: '(null|function)',
   step: '(number|string)',
   tooltipClass: 'string',
-  tooltips: 'boolean',
+  tooltips: '(boolean|string)',
   tooltipsFormat: '(function|null)',
   track: '(boolean|string)',
   value: '(array|number)',
@@ -129,7 +131,6 @@ class RangeSlider extends BaseComponent {
   protected declare _isDragging: boolean
   protected declare _onDocumentMouseMove: (event: any) => void
   protected declare _onDocumentMouseUp: () => void
-  protected declare _onWindowResize: () => void
   protected declare _sliderTrack: any
   protected declare _tooltips: HTMLElement[]
 
@@ -157,10 +158,6 @@ class RangeSlider extends BaseComponent {
       this._isDragging = false
     }
 
-    this._onWindowResize = () => {
-      this._updateLabelsContainerSize()
-    }
-
     this._initializeRangeSlider()
   }
 
@@ -186,7 +183,6 @@ class RangeSlider extends BaseComponent {
   }
 
   override dispose(): void {
-    EventHandler.off(window, EVENT_RESIZE, this._onWindowResize)
     EventHandler.off(document.documentElement, EVENT_MOUSEMOVE, this._onDocumentMouseMove)
     EventHandler.off(document.documentElement, EVENT_MOUSEUP, this._onDocumentMouseUp)
 
@@ -241,7 +237,6 @@ class RangeSlider extends BaseComponent {
 
     EventHandler.on(document.documentElement, EVENT_MOUSEUP, this._onDocumentMouseUp)
     EventHandler.on(document.documentElement, EVENT_MOUSEMOVE, this._onDocumentMouseMove)
-    EventHandler.on(window, EVENT_RESIZE, this._onWindowResize)
   }
 
   _initializeRangeSlider(): void {
@@ -258,7 +253,6 @@ class RangeSlider extends BaseComponent {
     this._sliderTrack = this._createSliderTrack()
     this._createInputs()
     this._createLabels()
-    this._updateLabelsContainerSize()
     this._createTooltips()
     this._updateGradient()
     this._addEventListeners()
@@ -335,50 +329,46 @@ class RangeSlider extends BaseComponent {
   }
 
   _createLabels(): void {
-    const { clickableLabels, disabled, labels, min, max, vertical } = this._config
+    const points = this._labelPoints()
 
-    if (!labels || !Array.isArray(labels) || labels.length === 0) {
+    if (points.length === 0) {
       return
     }
 
+    const { clickableLabels, disabled, vertical } = this._config
     const labelsContainer = this._createElement('div', CLASS_NAME_RANGE_SLIDER_LABELS_CONTAINER)
 
-    for (const [index, label] of this._config.labels.entries()) {
+    // Columns (rows when vertical) are the gaps between 0, each point and 1, so every label lands on a grid line
+    const stops = [0, ...points.map(point => point.ratio), 1]
+    const tracks = stops.slice(1).map((stop, index) => `${stop - stops[index]}fr`)
+    if (vertical) {
+      labelsContainer.style.gridTemplateRows = tracks.toReversed().join(' ')
+    } else {
+      labelsContainer.style.gridTemplateColumns = tracks.join(' ')
+    }
+
+    for (const [index, point] of points.entries()) {
       const labelElement = this._createElement('div', CLASS_NAME_RANGE_SLIDER_LABEL)
 
       if (clickableLabels && !disabled) {
         labelElement.classList.add(CLASS_NAME_CLICKABLE)
       }
 
-      if (label.class) {
-        const classNames = Array.isArray(label.class) ? label.class : [label.class]
-        labelElement.classList.add(...classNames)
+      if (point.class) {
+        labelElement.classList.add(...(Array.isArray(point.class) ? point.class : [point.class]))
       }
 
-      if (label.style && typeof label.style === 'object') {
-        Object.assign(labelElement.style, label.style)
+      if (point.style && typeof point.style === 'object') {
+        Object.assign(labelElement.style, point.style)
       }
 
-      // Calculate percentage based on index
-      const percentage = labels.length === 1 ? 0 : (index / (labels.length - 1)) * 100
+      Manipulator.setDataAttribute(labelElement, 'value', point.value)
+      labelElement.textContent = point.label
 
-      // Determine label value
-      const labelValue = typeof label === 'object' ? label.value : min + ((percentage / 100) * (max - min))
-
-      // Set data-coreui-value attribute
-      Manipulator.setDataAttribute(labelElement, 'value', labelValue)
-
-      // Set label content
-      labelElement.textContent = typeof label === 'object' ? label.label : label
-
-      // Calculate and set position
-      // @ts-expect-error -- the call passes an argument the method ignores.
-      // Dropping it is a behaviour change, so it is flagged rather than typed away.
-      const position = this._calculateLabelPosition(label, index, percentage)
       if (vertical) {
-        labelElement.style.bottom = position
+        labelElement.style.gridRowStart = `${points.length - index + 1}`
       } else {
-        labelElement.style[isRTL() ? 'right' : 'left'] = position
+        labelElement.style.gridColumnStart = `${index + 2}`
       }
 
       labelsContainer.append(labelElement)
@@ -387,31 +377,40 @@ class RangeSlider extends BaseComponent {
     this._element.append(labelsContainer)
   }
 
-  _calculateLabelPosition(label: RangeSliderLabel, index: number): string {
-    // Check if label is an object with a specific value
-    if (typeof label === 'object' && label.value !== undefined) {
-      return `${((label.value - this._config.min) / (this._config.max - this._config.min)) * 100}%`
+  _labelPoints(): Array<{ class?: string | string[], label: string, ratio: number, style?: Record<string, string>, value: number }> {
+    const { labels, list, min, max } = this._config
+    const span = max - min || 1
+    const ratio = (value: number) => Math.min(Math.max((value - min) / span, 0), 1)
+    const points = []
+
+    if (Array.isArray(labels) && labels.length > 0) {
+      for (const [index, label] of labels.entries()) {
+        const value = typeof label === 'object' && label.value !== undefined ?
+          label.value :
+          min + (labels.length === 1 ? 0 : (index / (labels.length - 1)) * span)
+
+        points.push({
+          class: typeof label === 'object' ? label.class : undefined,
+          label: typeof label === 'object' ? (label.label ?? '') : label,
+          ratio: ratio(value),
+          style: typeof label === 'object' ? label.style : undefined,
+          value
+        })
+      }
     }
 
-    // Calculate position based on index when label is not an object
-    return `${(index / (this._config.labels.length - 1)) * 100}%`
-  }
+    const datalist = list ? document.getElementById(list) : null
+    if (datalist) {
+      for (const option of SelectorEngine.find<HTMLOptionElement>('option', datalist)) {
+        const value = Number.parseFloat(option.value)
 
-  _updateLabelsContainerSize(): void {
-    const labelsContainer = SelectorEngine.findOne(SELECTOR_RANGE_SLIDER_LABELS_CONTAINER, this._element as ParentNode)
-
-    if (!this._config.labels || !labelsContainer) {
-      return
+        if (!Number.isNaN(value)) {
+          points.push({ label: option.label, ratio: ratio(value), value })
+        }
+      }
     }
 
-    const labels = SelectorEngine.find(SELECTOR_RANGE_SLIDER_LABEL, this._element as ParentNode)
-    if (labels.length === 0) {
-      return
-    }
-
-    const maxSize = Math.max(...labels.map(label => (this._config.vertical ? label.offsetWidth : label.offsetHeight)))
-
-    labelsContainer.style[this._config.vertical ? 'width' : 'height'] = `${maxSize}px`
+    return points.toSorted((a, b) => a.ratio - b.ratio)
   }
 
   _createTooltips(): void {
@@ -425,6 +424,7 @@ class RangeSlider extends BaseComponent {
       // `<output>` is a live region; the input already announces the value.
       const tooltipElement = this._createElement('output', CLASS_NAME_RANGE_SLIDER_TOOLTIP)
       tooltipElement.classList.add(CLASS_NAME_TOOLTIP, this._config.vertical ? CLASS_NAME_TOOLTIP_START : CLASS_NAME_TOOLTIP_TOP)
+      tooltipElement.classList.toggle(CLASS_NAME_SHOW, this._config.tooltips === 'always')
       if (this._config.tooltipClass) {
         tooltipElement.classList.add(...this._config.tooltipClass.split(' ').filter(Boolean))
       }
