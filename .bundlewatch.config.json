@@ -18,19 +18,19 @@
     },
     {
       "path": "./dist/css/coreui-utilities.css",
-      "maxSize": "21 kB"
+      "maxSize": "21.5 kB"
     },
     {
       "path": "./dist/css/coreui-utilities.min.css",
-      "maxSize": "19.75 kB"
+      "maxSize": "20.25 kB"
     },
     {
       "path": "./dist/css/coreui.css",
-      "maxSize": "71.5 kB"
+      "maxSize": "72 kB"
     },
     {
       "path": "./dist/css/coreui.min.css",
-      "maxSize": "67.5 kB"
+      "maxSize": "68 kB"
     },
     {
       "path": "./dist/js/coreui.bundle.js",

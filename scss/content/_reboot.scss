@@ -356,12 +356,12 @@ $th-font-weight:       null !default;
   // Links
 
   a {
-    color: color-mix(in oklch, var(--#{$prefix}theme-fg, var(--#{$prefix}link-color)) calc(var(--#{$prefix}link-opacity, 1) * 100%), transparent);
+    color: var(--#{$prefix}theme-fg, var(--#{$prefix}link-color));
     text-decoration: var(--#{$prefix}link-decoration);
     text-underline-offset: var(--#{$prefix}link-underline-offset);
 
     &:hover {
-      color: color-mix(in oklch, var(--#{$prefix}theme-fg-emphasis, var(--#{$prefix}link-hover-color)) calc(var(--#{$prefix}link-opacity, 1) * 100%), transparent);
+      color: var(--#{$prefix}theme-fg-emphasis, var(--#{$prefix}link-hover-color));
       text-decoration: var(--#{$prefix}link-hover-decoration, var(--#{$prefix}link-decoration));
     }
   }

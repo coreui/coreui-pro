@@ -109,7 +109,7 @@ const initCalendar = async () => {
 
       return `<div class="py-1">
         <div>${date.toLocaleDateString('en-US', { day: '2-digit' })}</div>
-        <div class="${meta.isSelected ? 'text-reset' : `text-body-tertiary${meta.isInCurrentMonth ? '' : ' opacity-75'}`}" style="font-size: 0.75rem;">${price ? `$${price}` : '-'}</div>
+        <div class="${meta.isSelected ? 'fg-reset' : `fg-3${meta.isInCurrentMonth ? '' : ' opacity-75'}`}" style="font-size: 0.75rem;">${price ? `$${price}` : '-'}</div>
       </div>`
     },
     renderMonthCell(date, meta) {
@@ -117,7 +117,7 @@ const initCalendar = async () => {
 
       return `<div class="py-1">
         <div>${date.toLocaleDateString('en-US', { month: 'short' })}</div>
-        <div class="${meta.isSelected ? 'text-reset' : 'text-body-tertiary'}" style="font-size: 0.75rem;">${priceRange ? `$${priceRange.min}-$${priceRange.max}` : '-'}</div>
+        <div class="${meta.isSelected ? 'fg-reset' : 'fg-3'}" style="font-size: 0.75rem;">${priceRange ? `$${priceRange.min}-$${priceRange.max}` : '-'}</div>
       </div>`
     },
     renderYearCell(date, meta) {
@@ -125,7 +125,7 @@ const initCalendar = async () => {
 
       return `<div class="py-1">
         <div>${date.getFullYear()}</div>
-        <div class="${meta.isSelected ? 'text-reset' : 'text-body-tertiary'}" style="font-size: 0.75rem;">${priceRange ? `$${priceRange.min}-$${priceRange.max}` : '-'}</div>
+        <div class="${meta.isSelected ? 'fg-reset' : 'fg-3'}" style="font-size: 0.75rem;">${priceRange ? `$${priceRange.min}-$${priceRange.max}` : '-'}</div>
       </div>`
     }
   })

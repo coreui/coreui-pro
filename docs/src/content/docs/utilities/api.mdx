@@ -226,11 +226,10 @@ entry is written as declared:
 
 ```scss
 $utilities: (
-  "background-color": (
+  "bg-color": (
     property: (
       --#{$prefix}bg: null,
-      --#{$prefix}bg-opacity: 1,
-      background-color: color-mix(in srgb, var(--#{$prefix}bg) calc(var(--#{$prefix}bg-opacity) * 100%), transparent),
+      background-color: var(--#{$prefix}bg),
     ),
     class: bg,
     values: $utilities-bg-colors
@@ -242,39 +241,36 @@ Output:
 
 ```css
 .bg-primary {
-  --cui-bg: var(--cui-primary-base);
-  --cui-bg-opacity: 1;
-  background-color: color-mix(in srgb, var(--cui-bg) calc(var(--cui-bg-opacity) * 100%), transparent);
+  --cui-bg: var(--cui-primary-bg);
+  background-color: var(--cui-bg);
 }
 ```
 
 This is what lets a utility **store its value in a custom property and consume
-it in the same rule**. The gain is that the expression around the value — here
-the translucency formula — is written once, in the map, instead of being baked
-into every entry of `values`; the values only have to name a colour. A companion
-utility then modifies the result by setting the same custom property:
+it in the same rule**. The colour lives in `--cui-bg`, so anything that reads
+the token sees the colour the class chose. A companion utility then reads it
+back through an expression of its own:
 
 ```scss
 $utilities: (
   "bg-opacity": (
-    property: (--#{$prefix}bg-opacity: null),
-    class: bg-opacity,
-    values: (25: .25, 50: .5, 75: .75)
+    class: bg,
+    property: background-color,
+    values: theme-opacity-values(--#{$prefix}bg)
   )
 );
 ```
 
 ```css
-.bg-opacity-50 { --cui-bg-opacity: .5; }
+.bg-50 { background-color: color-mix(in oklch, var(--cui-bg) 50%, transparent); }
 ```
 
-Note what that composition does **not** rely on: the two rules touch different
-properties, so `.bg-primary.bg-opacity-50` works regardless of which one the
-stylesheet declares first, and `.bg-opacity-50` on its own simply sets a variable
-nobody reads rather than producing an invalid declaration.
+The two rules write the same property, so the order of the map decides: the
+opacity family is declared after the colour family, and `.bg-primary.bg-50`
+mixes the primary colour whichever order the classes appear in the attribute.
+On its own, `.bg-50` reads a token nobody set, so the declaration is invalid at
+computed-value time and the background stays as it was.
 
-A map with only custom properties in it is the way to write a utility that sets
-no real property at all — which is what `bg-opacity` above is.
 
 <Callout color="info">
   Every custom property a utility assigns to is registered with

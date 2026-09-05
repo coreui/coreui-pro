@@ -7,7 +7,7 @@ const optionsRangeSliderCustomLabels = {
     {
       value: -50,
       label: '-50°C',
-      class: 'text-info'
+      class: 'fg-info'
     },
     {
       value: 0,
@@ -19,12 +19,12 @@ const optionsRangeSliderCustomLabels = {
     {
       value: 20,
       label: '20°C',
-      class: ['text-warning']
+      class: ['fg-warning']
     },
     {
       value: 100,
       label: '100°C',
-      class: 'text-danger'
+      class: 'fg-danger'
     }
   ],
   tooltipsFormat: value => `${value}°C`,
