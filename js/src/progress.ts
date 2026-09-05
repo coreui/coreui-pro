@@ -31,9 +31,11 @@ const ATTRIBUTE_VALUE_MAX = 'aria-valuemax'
 
 const PROPERTY_SEGMENTS = '--cui-progress-segments'
 const PROPERTY_SEGMENTS_FIT = '--cui-progress-segments-fit'
+const PROPERTY_SEGMENT_RADIUS_FIT = '--cui-progress-segment-radius-fit'
 const PROPERTY_SEGMENTS_FILLED = '--cui-progress-segments-filled'
 const PROPERTY_SEGMENT_GAP = '--cui-progress-segment-gap'
 const PROPERTY_SEGMENT_MIN_WIDTH = '--cui-progress-segment-min-width'
+const PROPERTY_SEGMENT_BORDER_RADIUS = '--cui-progress-segment-border-radius'
 
 /**
  * Class definition
@@ -78,6 +80,7 @@ class Progress extends BaseComponent {
     this._observer?.disconnect()
     this._resizeObserver?.disconnect()
     this._element.style.removeProperty(PROPERTY_SEGMENTS_FIT)
+    this._element.style.removeProperty(PROPERTY_SEGMENT_RADIUS_FIT)
     this._bar?.style.removeProperty(PROPERTY_SEGMENTS_FILLED)
 
     super.dispose()
@@ -129,17 +132,30 @@ class Progress extends BaseComponent {
     return Math.max(1, Math.min(segments, Math.floor((width + gap) / (minWidth + gap))))
   }
 
+  // Half the segment, half the track height, or the token, whichever is smallest — as `border-radius` would
+  protected _radiusThatFits(segments: number): number {
+    const style = getComputedStyle(this._element)
+    const gap = this._length(style.getPropertyValue(PROPERTY_SEGMENT_GAP))
+    const radius = this._length(style.getPropertyValue(PROPERTY_SEGMENT_BORDER_RADIUS))
+    const { width, height } = this._element.getBoundingClientRect()
+    const segmentWidth = ((width + gap) / segments) - gap
+
+    return Math.round(Math.max(0, Math.min(radius, segmentWidth / 2, height / 2)) * 1000) / 1000
+  }
+
   protected _update(): void {
     const segments = this._segmentsThatFit()
 
     // Nothing to count against: no token and no minimum width, so the stylesheet's fallback tiles apply
     if (!Number.isFinite(segments)) {
       this._element.style.removeProperty(PROPERTY_SEGMENTS_FIT)
+      this._element.style.removeProperty(PROPERTY_SEGMENT_RADIUS_FIT)
       this._bar!.style.removeProperty(PROPERTY_SEGMENTS_FILLED)
       return
     }
 
     this._element.style.setProperty(PROPERTY_SEGMENTS_FIT, `${segments}`)
+    this._element.style.setProperty(PROPERTY_SEGMENT_RADIUS_FIT, `${this._radiusThatFits(segments)}px`)
 
     // No value on the bar means the page sets the fill itself, so leave its variable alone
     if (!this._bar!.hasAttribute(ATTRIBUTE_VALUE_NOW)) {

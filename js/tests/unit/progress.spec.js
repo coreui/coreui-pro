@@ -15,7 +15,7 @@ describe('Progress', () => {
   // The segment tokens come from the stylesheet, which the unit specs do not load
   const getProgressHtml = (barAttributes = 'aria-valuenow="45" aria-valuemin="0" aria-valuemax="100"', wrapperStyle = '--cui-progress-segments: 40') => {
     return `
-      <div class="progress progress-segmented" style="width: 1000px; --cui-progress-segment-gap: 6px; --cui-progress-segment-min-width: 6px; ${wrapperStyle}">
+      <div class="progress progress-segmented" style="width: 1000px; height: 16px; --cui-progress-segment-gap: 6px; --cui-progress-segment-min-width: 6px; --cui-progress-segment-border-radius: 3px; ${wrapperStyle}">
         <div class="progress-bar" role="progressbar" ${barAttributes}></div>
       </div>
     `
@@ -23,6 +23,7 @@ describe('Progress', () => {
 
   const filled = element => element.querySelector('.progress-bar').style.getPropertyValue('--cui-progress-segments-filled')
   const segments = element => element.style.getPropertyValue('--cui-progress-segments-fit')
+  const radius = element => element.style.getPropertyValue('--cui-progress-segment-radius-fit')
   const settle = () => new Promise(resolve => {
     setTimeout(resolve, 50)
   })
@@ -127,6 +128,23 @@ describe('Progress', () => {
       expect(filled(progressEl)).toEqual('')
     })
 
+    it('should cap the corner radius at half the segment and half the height', () => {
+      fixtureEl.innerHTML = getProgressHtml('aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"', '--cui-progress-segments: 40; width: 100px; --cui-progress-segment-border-radius: 5px')
+
+      const progressEl = fixtureEl.querySelector('.progress')
+      const progress = new Progress(progressEl)
+
+      expect(radius(progressEl)).toEqual('3.625px')
+
+      progressEl.style.width = '1000px'
+      progress.update()
+      expect(radius(progressEl)).toEqual('5px')
+
+      progressEl.style.height = '4px'
+      progress.update()
+      expect(radius(progressEl)).toEqual('2px')
+    })
+
     it('should keep the count when the minimum width is unset', () => {
       fixtureEl.innerHTML = getProgressHtml('aria-valuenow="99" aria-valuemin="0" aria-valuemax="100"', '--cui-progress-segments: 10; --cui-progress-segment-min-width: 0px; width: 20px')
 
@@ -216,6 +234,7 @@ describe('Progress', () => {
 
       expect(filled(progressEl)).toEqual('')
       expect(segments(progressEl)).toEqual('')
+      expect(radius(progressEl)).toEqual('')
       expect(Progress.getInstance(progressEl)).toBeNull()
 
       progressEl.querySelector('.progress-bar').setAttribute('aria-valuenow', '75')

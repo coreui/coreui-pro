@@ -137,7 +137,9 @@ $progress-segmented-tokens: defaults(
     @include tokens($progress-segmented-tokens);
 
     $gap: var(--#{$prefix}progress-segment-gap);
-    $radius: var(--#{$prefix}progress-segment-border-radius);
+    // Capped at half the segment so the corner circles never cross; the plugin writes the exact cap,
+    // the stylesheet's fallback knows only the minimum width
+    $radius: var(--#{$prefix}progress-segment-radius-fit, min(var(--#{$prefix}progress-segment-border-radius), calc(var(--#{$prefix}progress-segment-min-width) * .5)));
     // Without a count (neither the token nor the plugin's fit) the pitch is invalid and the
     // tiles fall back to the minimum width, so a page without JavaScript still gets segments
     $pitch: var(--#{$prefix}progress-segment-pitch, calc(var(--#{$prefix}progress-segment-min-width) + #{$gap}));
