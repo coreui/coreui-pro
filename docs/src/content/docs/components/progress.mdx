@@ -156,7 +156,7 @@ Add `.progress-segmented` to a `.progress` or `.progress-stacked` to cut the tra
     <div class="progress-bar theme-info" role="progressbar" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>
   </div>`} />
 
-The bars above carry no `width`. The Progress plugin picks up every `.progress-segmented` on page load, reads `aria-valuenow`, `aria-valuemin` and `aria-valuemax` from the bar, and sets `--cui-progress-segments-filled` to the number of whole segments the value covers, rounded down; the stylesheet turns that into the bar's width, so the fill always ends on a segment's edge. Change `aria-valuenow` and the bar follows. Without the plugin, set `--cui-progress-segments-filled` on the bar yourself, or give the bar a `width` as usual and accept a partly coloured segment on the boundary.
+The bars above carry no `width`. The Progress plugin picks up every `.progress-segmented` on page load, reads `aria-valuenow`, `aria-valuemin` and `aria-valuemax` from the bar, and sets `--cui-progress-segments-filled` to the number of whole segments the value covers, rounded down; the stylesheet turns that into the bar's width, so the fill always ends on a segment's edge. Change `aria-valuenow` and the bar follows. The plugin also watches the track's width: when the segments would drop below `--cui-progress-segment-min-width`, it writes the count that fits to `--cui-progress-segments-fit` and recounts the fill, so a narrow screen shows fewer segments rather than thinner ones; the token itself stays the ceiling. Without the plugin, set `--cui-progress-segments-filled` on the bar yourself, or give the bar a `width` as usual and accept a partly coloured segment on the boundary.
 
 <Example code={`<div class="progress progress-segmented mb-3" style="--cui-progress-segments: 10">
     <div class="progress-bar" style="--cui-progress-segments-filled: 4"></div>
@@ -277,7 +277,7 @@ The plugin only runs on `.progress-segmented`; a plain `.progress` is CSS only a
 
 ### Via data attributes
 
-Every `.progress-segmented` is initialized on page load — no toggle attribute needed. The bar's `aria-valuenow`, `aria-valuemin` and `aria-valuemax` are the value; leave `width` off the bar.
+Every `.progress-segmented` is initialized on page load — no toggle attribute needed. The bar's `aria-valuenow`, `aria-valuemin` and `aria-valuemax` are the value; leave `width` off the bar. `--cui-progress-segments` is the ceiling the plugin starts from, and `--cui-progress-segment-min-width` the width below which it starts dropping segments; both are read from the stylesheet, so set them on the element or on a parent.
 
 ```html
 <div class="progress progress-segmented">
@@ -296,8 +296,8 @@ const progress = new coreui.Progress(element)
 
 | Method | Description |
 | --- | --- |
-| `update` | Recomputes the filled segments from the bar's `aria-*` attributes. The plugin already watches those attributes, so this is for a change of `--cui-progress-segments` made from script. |
-| `dispose` | Destroys the instance and removes the variable it set on the bar. |
+| `update` | Recomputes the segment count and the filled segments. The plugin already watches the bar's `aria-*` attributes and the track's width, so this is for a change of the tokens made from script. |
+| `dispose` | Destroys the instance and removes the variables it set. |
 | `getInstance` | Static method which allows you to get the Progress instance associated to a DOM element, you can use it like this: `coreui.Progress.getInstance(element)` |
 | `getOrCreateInstance` | Static method which returns a Progress instance associated to a DOM element or create a new one in case it wasn't initialized. You can use it like this: `coreui.Progress.getOrCreateInstance(element)` |
 

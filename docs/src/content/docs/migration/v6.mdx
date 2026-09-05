@@ -2151,8 +2151,10 @@ Multi Select's option indicators moved with it — they render as a decorative
 - **New `Progress` plugin.** Initialized on every `.progress-segmented`, it
   reads the bar's `aria-valuenow`, `aria-valuemin` and `aria-valuemax` and sets
   `--cui-progress-segments-filled`, which the stylesheet turns into the bar's
-  width, so the fill ends on a whole segment. Bars that keep an inline `width`
-  are not touched. `coreui.Progress` is exported next to the other plugins.
+  width, so the fill ends on a whole segment. It also lowers the count when the
+  track is too narrow for `--cui-progress-segment-min-width` and restores it as
+  the track grows. Bars that keep an inline `width` are not touched.
+  `coreui.Progress` is exported next to the other plugins.
 
 #### Spinner
 

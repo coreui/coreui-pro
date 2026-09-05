@@ -12,16 +12,20 @@ describe('Progress', () => {
     clearFixture()
   })
 
-  // The segment count is a token from the stylesheet, which the unit specs do not load
+  // The segment tokens come from the stylesheet, which the unit specs do not load
   const getProgressHtml = (barAttributes = 'aria-valuenow="45" aria-valuemin="0" aria-valuemax="100"', wrapperStyle = '--cui-progress-segments: 40') => {
     return `
-      <div class="progress progress-segmented" style="${wrapperStyle}">
+      <div class="progress progress-segmented" style="width: 1000px; --cui-progress-segment-gap: 6px; --cui-progress-segment-min-width: 6px; ${wrapperStyle}">
         <div class="progress-bar" role="progressbar" ${barAttributes}></div>
       </div>
     `
   }
 
   const filled = element => element.querySelector('.progress-bar').style.getPropertyValue('--cui-progress-segments-filled')
+  const segments = element => element.style.getPropertyValue('--cui-progress-segments-fit')
+  const settle = () => new Promise(resolve => {
+    setTimeout(resolve, 50)
+  })
 
   describe('VERSION', () => {
     it('should return plugin version', () => {
@@ -61,6 +65,48 @@ describe('Progress', () => {
 
     it('should read the segment count from the CSS variable', () => {
       fixtureEl.innerHTML = getProgressHtml('aria-valuenow="99" aria-valuemin="0" aria-valuemax="100"', '--cui-progress-segments: 10')
+
+      const progressEl = fixtureEl.querySelector('.progress')
+      // eslint-disable-next-line no-new
+      new Progress(progressEl)
+
+      expect(segments(progressEl)).toEqual('10')
+      expect(filled(progressEl)).toEqual('9')
+    })
+
+    it('should lower the count to what fits above the minimum segment width', () => {
+      fixtureEl.innerHTML = getProgressHtml('aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"', '--cui-progress-segments: 40; width: 100px')
+
+      const progressEl = fixtureEl.querySelector('.progress')
+      // eslint-disable-next-line no-new
+      new Progress(progressEl)
+
+      expect(segments(progressEl)).toEqual('8')
+      expect(filled(progressEl)).toEqual('4')
+    })
+
+    it('should follow the track width', async () => {
+      fixtureEl.innerHTML = getProgressHtml('aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"', '--cui-progress-segments: 40; width: 100px')
+
+      const progressEl = fixtureEl.querySelector('.progress')
+      // eslint-disable-next-line no-new
+      new Progress(progressEl)
+
+      progressEl.style.width = '200px'
+      await settle()
+
+      expect(segments(progressEl)).toEqual('17')
+      expect(filled(progressEl)).toEqual('8')
+
+      progressEl.style.width = '1000px'
+      await settle()
+
+      expect(segments(progressEl)).toEqual('40')
+      expect(filled(progressEl)).toEqual('20')
+    })
+
+    it('should keep the count when the minimum width is unset', () => {
+      fixtureEl.innerHTML = getProgressHtml('aria-valuenow="99" aria-valuemin="0" aria-valuemax="100"', '--cui-progress-segments: 10; --cui-progress-segment-min-width: 0px; width: 20px')
 
       const progressEl = fixtureEl.querySelector('.progress')
       // eslint-disable-next-line no-new
@@ -138,7 +184,7 @@ describe('Progress', () => {
   })
 
   describe('dispose', () => {
-    it('should stop observing and remove the variable', async () => {
+    it('should stop observing and remove the variables', async () => {
       fixtureEl.innerHTML = getProgressHtml()
 
       const progressEl = fixtureEl.querySelector('.progress')
@@ -147,6 +193,7 @@ describe('Progress', () => {
       progress.dispose()
 
       expect(filled(progressEl)).toEqual('')
+      expect(segments(progressEl)).toEqual('')
       expect(Progress.getInstance(progressEl)).toBeNull()
 
       progressEl.querySelector('.progress-bar').setAttribute('aria-valuenow', '75')

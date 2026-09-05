@@ -21,6 +21,7 @@ $progress-bar-animation:               progress-bar-stripes 1s linear infinite !
 
 $progress-segments:                    40 !default;
 $progress-segment-gap:                 .375rem !default;
+$progress-segment-min-width:           .375rem !default;
 $progress-segment-border-radius:       var(--#{$prefix}radius-2) !default;
 
 $progress-contrast-track-opacity:      20% !default;
@@ -57,6 +58,7 @@ $progress-segmented-tokens: defaults(
   (
     --#{$prefix}progress-segments: #{$progress-segments},
     --#{$prefix}progress-segment-gap: #{$progress-segment-gap},
+    --#{$prefix}progress-segment-min-width: #{$progress-segment-min-width},
     --#{$prefix}progress-segment-border-radius: #{$progress-segment-border-radius},
   ),
   $progress-segmented-tokens
@@ -131,7 +133,8 @@ $progress-segmented-tokens: defaults(
 
     $gap: var(--#{$prefix}progress-segment-gap);
     $radius: var(--#{$prefix}progress-segment-border-radius);
-    $pitch: calc((100% + #{$gap}) / var(--#{$prefix}progress-segments));
+    // The plugin writes `--cui-progress-segments-fit` when the track is too narrow for the token's count
+    $pitch: calc((100% + #{$gap}) / var(--#{$prefix}progress-segments-fit, var(--#{$prefix}progress-segments)));
 
     --#{$prefix}progress-border-radius: 0;
     --#{$prefix}progress-box-shadow: none;
