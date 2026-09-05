@@ -2142,8 +2142,10 @@ Multi Select's option indicators moved with it — they render as a decorative
   shift only the first background layer, so the image underneath stays put.
 
 - **`.progress-segmented`.** A mask that cuts a `.progress` or
-  `.progress-stacked` into a row of rounded pills, sized by
-  `--cui-progress-segment-width` and `--cui-progress-segment-gap`. Everything
+  `.progress-stacked` into a row of rounded segments, sized by
+  `--cui-progress-segment-width`, `--cui-progress-segment-gap` and
+  `--cui-progress-segment-border-radius` (half the width by default, `0px` for
+  square segments). Everything
   under the mask — width, transition, theme, gradient, stripes — behaves as
   before.
 

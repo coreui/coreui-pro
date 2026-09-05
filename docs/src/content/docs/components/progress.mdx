@@ -144,7 +144,7 @@ Include multiple progress bars in a progress component if you need.
 
 ## Segmented
 
-Add `.progress-segmented` to a `.progress` or `.progress-stacked` to cut the track into a row of rounded pills. It is a CSS mask over the whole component, so the bar underneath keeps its width, transition, theme, gradient and stripes; only the rendering changes. Pill width and gap come from `--cui-progress-segment-width` and `--cui-progress-segment-gap`; pills are always whole, and the gaps absorb whatever is left of the width.
+Add `.progress-segmented` to a `.progress` or `.progress-stacked` to cut the track into a row of rounded pills. It is a CSS mask over the whole component, so the bar underneath keeps its width, transition, theme, gradient and stripes; only the rendering changes. Segment width and gap come from `--cui-progress-segment-width` and `--cui-progress-segment-gap`; segments are always whole, and the gaps absorb whatever is left of the width.
 
 <Example code={`<div class="progress progress-segmented mb-3" style="height: 3rem; --cui-progress-bar-bg-image: linear-gradient(to right, #e6412c, #ffb400, #ffe25a)">
     <div class="progress-bar" role="progressbar" style="width: 45%" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100"></div>
@@ -156,7 +156,16 @@ Add `.progress-segmented` to a `.progress` or `.progress-stacked` to cut the tra
     <div class="progress-bar theme-info" role="progressbar" style="width: 30%" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>
   </div>`} />
 
-The fill ends where the value puts it, so a pill on the boundary can be partly coloured. Where the design calls for whole pills only, round the width to a multiple of the pill pitch before setting it.
+The corners follow `--cui-progress-segment-border-radius`, half the segment width by default. Set it to `0px` for square segments, or anything in between. The value feeds the mask's `calc()`, so it has to be a length — a unitless `0` drops the whole mask.
+
+<Example code={`<div class="progress progress-segmented mb-3" style="height: 1.5rem; --cui-progress-segment-border-radius: 0px">
+    <div class="progress-bar" role="progressbar" style="width: 60%" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+  </div>
+  <div class="progress progress-segmented" style="height: 1.5rem; --cui-progress-segment-width: .75rem; --cui-progress-segment-border-radius: .125rem">
+    <div class="progress-bar theme-warning" role="progressbar" style="width: 60%" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+  </div>`} />
+
+The fill ends where the value puts it, so a segment on the boundary can be partly coloured. Where the design calls for whole segments only, round the width to a multiple of the segment pitch before setting it.
 
 ## On a colored surface
 
