@@ -1,3 +1,4 @@
+@use "sass:map";
 @use "functions/defaults" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/box-shadow" as *;
@@ -19,9 +20,9 @@ $progress-bar-stripe-color:            color-mix(in oklch, var(--#{$prefix}white
 $progress-bar-transition:              width .6s ease !default;
 $progress-bar-animation:               progress-bar-stripes 1s linear infinite !default;
 
-$progress-segments:                    40 !default;
-$progress-segment-gap:                 .375rem !default;
-$progress-segment-min-width:           .375rem !default;
+$progress-segments:                    null !default;
+$progress-segment-gap:                 .25rem !default;
+$progress-segment-min-width:           .25rem !default;
 $progress-segment-border-radius:       var(--#{$prefix}radius-2) !default;
 
 $progress-contrast-track-opacity:      20% !default;
@@ -56,13 +57,17 @@ $progress-segmented-tokens: () !default;
 // scss-docs-start progress-segmented-css-vars
 $progress-segmented-tokens: defaults(
   (
-    --#{$prefix}progress-segments: #{$progress-segments},
     --#{$prefix}progress-segment-gap: #{$progress-segment-gap},
     --#{$prefix}progress-segment-min-width: #{$progress-segment-min-width},
     --#{$prefix}progress-segment-border-radius: #{$progress-segment-border-radius},
   ),
   $progress-segmented-tokens
 );
+
+// Unset by default: the plugin then packs as many segments as fit above the minimum width
+@if $progress-segments != null {
+  $progress-segmented-tokens: map.set($progress-segmented-tokens, --#{$prefix}progress-segments, $progress-segments);
+}
 // scss-docs-end progress-segmented-css-vars
 
 // stylelint-enable custom-property-no-missing-var-function, scss/dollar-variable-default
@@ -133,11 +138,13 @@ $progress-segmented-tokens: defaults(
 
     $gap: var(--#{$prefix}progress-segment-gap);
     $radius: var(--#{$prefix}progress-segment-border-radius);
-    // The plugin writes `--cui-progress-segments-fit` when the track is too narrow for the token's count
-    $pitch: calc((100% + #{$gap}) / var(--#{$prefix}progress-segments-fit, var(--#{$prefix}progress-segments)));
+    // Without a count (neither the token nor the plugin's fit) the pitch is invalid and the
+    // tiles fall back to the minimum width, so a page without JavaScript still gets segments
+    $pitch: var(--#{$prefix}progress-segment-pitch, calc(var(--#{$prefix}progress-segment-min-width) + #{$gap}));
 
     --#{$prefix}progress-border-radius: 0;
     --#{$prefix}progress-box-shadow: none;
+    --#{$prefix}progress-segment-pitch: calc((100% + #{$gap}) / var(--#{$prefix}progress-segments-fit, var(--#{$prefix}progress-segments)));
 
     // One tile per segment: a rounded rectangle from two crossed bars plus a circle in each corner,
     // intersected with the segment's box so a corner wider than the segment is cut off at the gap

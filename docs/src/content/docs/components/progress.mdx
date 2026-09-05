@@ -144,7 +144,7 @@ Include multiple progress bars in a progress component if you need.
 
 ## Segmented
 
-Add `.progress-segmented` to a `.progress` or `.progress-stacked` to cut the track into a row of rounded segments. It is a CSS mask over the whole component, so the bar underneath keeps its transition, theme, gradient and stripes; only the rendering changes. The track holds `--cui-progress-segments` segments (40 by default) separated by `--cui-progress-segment-gap`, so the segments scale with the track and the gap stays put.
+Add `.progress-segmented` to a `.progress` or `.progress-stacked` to cut the track into a row of rounded segments. It is a CSS mask over the whole component, so the bar underneath keeps its transition, theme, gradient and stripes; only the rendering changes. Segments are `--cui-progress-segment-min-width` wide (.25rem) and `--cui-progress-segment-gap` apart, as many as fit; set `--cui-progress-segments` instead and the track holds exactly that many, scaled to its width, with the gap staying put.
 
 <Example code={`<div class="progress progress-segmented mb-3" style="height: 3rem; --cui-progress-bar-bg-image: linear-gradient(to right, #e6412c, #ffb400, #ffe25a)">
     <div class="progress-bar" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100"></div>
@@ -152,11 +152,14 @@ Add `.progress-segmented` to a `.progress` or `.progress-stacked` to cut the tra
   <div class="progress progress-segmented mb-3">
     <div class="progress-bar theme-success" role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
   </div>
-  <div class="progress progress-segmented" style="height: 1.5rem; --cui-progress-segments: 20; --cui-progress-segment-gap: .25rem">
+  <div class="progress progress-segmented mb-3" style="height: 1.5rem; --cui-progress-segments: 20; --cui-progress-segment-gap: .5rem">
     <div class="progress-bar theme-info" role="progressbar" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>
+  </div>
+  <div class="progress progress-segmented" style="height: 1.5rem; --cui-progress-segment-min-width: 1rem">
+    <div class="progress-bar theme-danger" role="progressbar" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>
   </div>`} />
 
-The bars above carry no `width`. The Progress plugin picks up every `.progress-segmented` on page load, reads `aria-valuenow`, `aria-valuemin` and `aria-valuemax` from the bar, and sets `--cui-progress-segments-filled` to the number of whole segments the value covers, rounded down; the stylesheet turns that into the bar's width, so the fill always ends on a segment's edge. Change `aria-valuenow` and the bar follows. The plugin also watches the track's width: when the segments would drop below `--cui-progress-segment-min-width`, it writes the count that fits to `--cui-progress-segments-fit` and recounts the fill, so a narrow screen shows fewer segments rather than thinner ones; the token itself stays the ceiling. Without the plugin, set `--cui-progress-segments-filled` on the bar yourself, or give the bar a `width` as usual and accept a partly coloured segment on the boundary.
+The bars above carry no `width`. The Progress plugin picks up every `.progress-segmented` on page load, reads `aria-valuenow`, `aria-valuemin` and `aria-valuemax` from the bar, and sets `--cui-progress-segments-filled` to the number of whole segments the value covers, rounded down; the stylesheet turns that into the bar's width, so the fill always ends on a segment's edge. Change `aria-valuenow` and the bar follows. The plugin also watches the track's width and writes the count that fits above `--cui-progress-segment-min-width` to `--cui-progress-segments-fit`, capped at `--cui-progress-segments` when that is set, and recounts the fill — so a narrow screen shows fewer segments rather than thinner ones, and the last segment is always whole. Without the plugin and without a count, the stylesheet tiles the minimum width and clips whatever is left at the end of the track. Without the plugin, set `--cui-progress-segments-filled` on the bar yourself, or give the bar a `width` as usual and accept a partly coloured segment on the boundary.
 
 <Example code={`<div class="progress progress-segmented mb-3" style="--cui-progress-segments: 10">
     <div class="progress-bar" style="--cui-progress-segments-filled: 4"></div>
@@ -277,7 +280,7 @@ The plugin only runs on `.progress-segmented`; a plain `.progress` is CSS only a
 
 ### Via data attributes
 
-Every `.progress-segmented` is initialized on page load — no toggle attribute needed. The bar's `aria-valuenow`, `aria-valuemin` and `aria-valuemax` are the value; leave `width` off the bar. `--cui-progress-segments` is the ceiling the plugin starts from, and `--cui-progress-segment-min-width` the width below which it starts dropping segments; both are read from the stylesheet, so set them on the element or on a parent.
+Every `.progress-segmented` is initialized on page load — no toggle attribute needed. The bar's `aria-valuenow`, `aria-valuemin` and `aria-valuemax` are the value; leave `width` off the bar. `--cui-progress-segment-min-width` sets how many segments fit, and `--cui-progress-segments`, when set, caps that; both are read from the stylesheet, so set them on the element or on a parent.
 
 ```html
 <div class="progress progress-segmented">

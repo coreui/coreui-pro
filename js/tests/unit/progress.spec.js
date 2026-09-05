@@ -105,6 +105,28 @@ describe('Progress', () => {
       expect(filled(progressEl)).toEqual('20')
     })
 
+    it('should pack as many segments as fit when the count is unset', () => {
+      fixtureEl.innerHTML = getProgressHtml('aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"', 'width: 250px')
+
+      const progressEl = fixtureEl.querySelector('.progress')
+      // eslint-disable-next-line no-new
+      new Progress(progressEl)
+
+      expect(segments(progressEl)).toEqual('21')
+      expect(filled(progressEl)).toEqual('10')
+    })
+
+    it('should leave the variables to the stylesheet without a count or a minimum width', () => {
+      fixtureEl.innerHTML = getProgressHtml('aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"', '--cui-progress-segment-min-width: 0px')
+
+      const progressEl = fixtureEl.querySelector('.progress')
+      // eslint-disable-next-line no-new
+      new Progress(progressEl)
+
+      expect(segments(progressEl)).toEqual('')
+      expect(filled(progressEl)).toEqual('')
+    })
+
     it('should keep the count when the minimum width is unset', () => {
       fixtureEl.innerHTML = getProgressHtml('aria-valuenow="99" aria-valuemin="0" aria-valuemax="100"', '--cui-progress-segments: 10; --cui-progress-segment-min-width: 0px; width: 20px')
 

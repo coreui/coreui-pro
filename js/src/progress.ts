@@ -117,7 +117,7 @@ class Progress extends BaseComponent {
   // The token is the ceiling; the track is cut into fewer segments when it is too narrow for them
   protected _segmentsThatFit(): number {
     const style = getComputedStyle(this._element)
-    const segments = Number.parseInt(style.getPropertyValue(PROPERTY_SEGMENTS), 10) || 1
+    const segments = Number.parseInt(style.getPropertyValue(PROPERTY_SEGMENTS), 10) || Number.POSITIVE_INFINITY
     const gap = this._length(style.getPropertyValue(PROPERTY_SEGMENT_GAP))
     const minWidth = this._length(style.getPropertyValue(PROPERTY_SEGMENT_MIN_WIDTH))
     const { width } = this._element.getBoundingClientRect()
@@ -131,6 +131,14 @@ class Progress extends BaseComponent {
 
   protected _update(): void {
     const segments = this._segmentsThatFit()
+
+    // Nothing to count against: no token and no minimum width, so the stylesheet's fallback tiles apply
+    if (!Number.isFinite(segments)) {
+      this._element.style.removeProperty(PROPERTY_SEGMENTS_FIT)
+      this._bar!.style.removeProperty(PROPERTY_SEGMENTS_FILLED)
+      return
+    }
+
     this._element.style.setProperty(PROPERTY_SEGMENTS_FIT, `${segments}`)
 
     // No value on the bar means the page sets the fill itself, so leave its variable alone
