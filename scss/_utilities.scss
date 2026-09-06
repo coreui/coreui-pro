@@ -46,6 +46,7 @@ $utilities-border-subtle: theme-color-refs("border", "-subtle") !default;
 // scss-docs-end utilities-border-colors
 
 $utilities-links-underline: theme-color-refs("fg") !default;
+$utilities-radii: theme-token-refs($radii, "radius") !default;
 
 // scss-docs-start font-sizes-legacy
 // The numeric keys v5 shipped, kept so `.fs-1` … `.fs-6` keep rendering. They
@@ -1162,9 +1163,9 @@ $utilities: map.merge(
       ),
       class: rounded,
       values: map.merge(
-        $radii,
+        $utilities-radii,
         (
-          null: map.get($radii, 5),
+          null: var(--#{$prefix}radius-5),
           circle: 50%,
           pill: var(--#{$prefix}radius-pill)
         )
@@ -1174,9 +1175,9 @@ $utilities: map.merge(
       property: --#{$prefix}rounded-size,
       class: rounded-size,
       values: map.merge(
-        $radii,
+        $utilities-radii,
         (
-          null: map.get($radii, 5),
+          null: var(--#{$prefix}radius-5),
           circle: 50%,
           pill: var(--#{$prefix}radius-pill)
         )
@@ -1186,7 +1187,7 @@ $utilities: map.merge(
       property: border-start-start-radius border-start-end-radius,
       class: rounded-top,
       values: map.merge(
-        $radii,
+        $utilities-radii,
         (
           null: var(--#{$prefix}rounded-size, var(--#{$prefix}radius-5)),
           circle: 50%,
@@ -1198,7 +1199,7 @@ $utilities: map.merge(
       property: border-start-end-radius border-end-end-radius,
       class: rounded-end,
       values: map.merge(
-        $radii,
+        $utilities-radii,
         (
           null: var(--#{$prefix}rounded-size, var(--#{$prefix}radius-5)),
           circle: 50%,
@@ -1210,7 +1211,7 @@ $utilities: map.merge(
       property: border-end-start-radius border-end-end-radius,
       class: rounded-bottom,
       values: map.merge(
-        $radii,
+        $utilities-radii,
         (
           null: var(--#{$prefix}rounded-size, var(--#{$prefix}radius-5)),
           circle: 50%,
@@ -1222,7 +1223,7 @@ $utilities: map.merge(
       property: border-start-start-radius border-end-start-radius,
       class: rounded-start,
       values: map.merge(
-        $radii,
+        $utilities-radii,
         (
           null: var(--#{$prefix}rounded-size, var(--#{$prefix}radius-5)),
           circle: 50%,
