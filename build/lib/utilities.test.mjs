@@ -47,3 +47,19 @@ test('the class index covers the full stylesheet', () => {
     assert.ok(full.includes(`.${name.replace('-hover', '-hover:hover')} {`), name)
   }
 })
+
+test('extend merges a plain object the way a user file does', () => {
+  const extended = loadUtilities({
+    extend: {
+      rotate: {
+        responsive: true, property: 'transform', class: 'rotate', values: { 45: 'rotate(45deg)' }
+      },
+      width: null
+    }
+  })
+  assert.ok(extended.has('rotate'))
+  assert.ok(!extended.has('width'))
+  const css = stylesheet(extended)
+  assert.match(css, /\.rotate-md-45 \{\n {6}transform: rotate\(45deg\);/)
+  assert.doesNotMatch(css, /\.w-25 \{/)
+})

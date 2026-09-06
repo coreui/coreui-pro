@@ -10,13 +10,15 @@
  * file merged over utilities.json (a key replaces the whole entry, `null`
  * removes it, a new key is appended); `--only` keeps just the keys those
  * files name. `--scan <glob>` (repeatable) keeps just the classes found in
- * the matching source files, plus `--safelist a,b`. A `.css` argument is the
- * output path, otherwise stdout.
+ * the matching source files, plus `--safelist a,b`. `--config <file>` reads
+ * the `utilities` section (`extend`, `safelist`, `scan`) of a config module —
+ * its default export, or the object itself. A `.css` argument is the output
+ * path, otherwise stdout.
  */
 
 import { globSync, readFileSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 import {
   LAYERS, loadUtilities, scanFiles, stylesheet
 } from './lib/utilities.mjs'
@@ -27,10 +29,13 @@ const only = process.argv.includes('--only')
 const output = process.argv.find(argument => !argument.startsWith('-') && argument.endsWith('.css'))
 const files = process.argv.slice(2).filter(argument => argument.endsWith('.json'))
 const option = name => process.argv.flatMap((argument, index) => (argument === name ? [process.argv[index + 1]] : []))
-const patterns = option('--scan')
-const safelist = option('--safelist').flatMap(list => list.split(','))
+const configFile = option('--config')[0]
+const config = configFile ? await import(pathToFileURL(path.resolve(configFile)).href) : null
+const configured = config?.default?.utilities ?? config?.utilities ?? {}
+const patterns = [...(configured.scan ?? []), ...option('--scan')]
+const safelist = [...(configured.safelist ?? []), ...option('--safelist').flatMap(list => list.split(','))]
 
-const utilities = loadUtilities({ files, only })
+const utilities = loadUtilities({ files, extend: configured.extend ?? {}, only })
 let used = null
 if (patterns.length > 0) {
   const sources = patterns.flatMap(pattern => globSync(pattern))
@@ -44,7 +49,7 @@ if (patterns.length > 0) {
   }
 }
 
-const css = stylesheet(utilities, { layer: files.length > 0 || used !== null, only: used })
+const css = stylesheet(utilities, { layer: files.length > 0 || configFile !== undefined || used !== null, only: used })
 
 if (check) {
   const rootScss = readFileSync(path.join(root, 'scss/_root.scss'), 'utf8')

@@ -739,4 +739,23 @@ Either way the file starts with the cascade layer order, so your classes land in
 npx coreui-utilities --scan "src/**/*.{html,tsx,vue}" css/utilities.css
 ```
 
+The same three settings can live in a config module instead of on the command line — `extend` with the JSON shape above, `safelist` and `scan` — which is what `defineConfig()` in the React binding produces:
+
+```js
+// coreui.config.mjs
+export default {
+  utilities: {
+    extend: { rotate: { responsive: true, property: 'transform', class: 'rotate', values: { 45: 'rotate(45deg)' } } },
+    safelist: ['mt-1'],
+    scan: ['src/**/*.{html,tsx}'],
+  },
+}
+```
+
+```sh
+npx coreui-utilities --config coreui.config.mjs css/utilities.css
+```
+
+A `.ts` config works on a Node that strips types (22.6 and later). Flags on the command line add to what the config says.
+
 The rules come out in the order of the map, not the order of use, so two utilities on one element resolve exactly as they do in the full stylesheet, and only the `@property` registrations and keyframes those rules need are written. A name built at runtime (`` `mt-${n}` ``) cannot be found this way — pass it with `--safelist mt-1,mt-2`, or keep the set of names static. During development generate the full stylesheet instead and scan for the production build.

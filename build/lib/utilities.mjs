@@ -18,11 +18,26 @@ export const LAYERS = ['colors', 'config', 'root', 'reboot', 'layout', 'content'
 // The package map with user files merged over it the way `$utilities` merges:
 // an existing key replaces the whole group, `null` removes it, a new key is
 // appended. `only` keeps just the keys the user files name.
-export const loadUtilities = ({ files = [], only = false } = {}) => {
+// A plain object (a config file's `utilities.extend`) in the Map shape the
+// generator reads; arrays and scalars pass through.
+const toMap = value => {
+  if (Array.isArray(value)) {
+    return value.map(item => toMap(item))
+  }
+
+  if (value && typeof value === 'object') {
+    return new Map(Object.entries(value).map(([key, item]) => [key, toMap(item)]))
+  }
+
+  return value
+}
+
+export const loadUtilities = ({ files = [], extend = {}, only = false } = {}) => {
   const utilities = parseOrdered(readFileSync(path.join(root, 'utilities.json'), 'utf8'))
   const userKeys = new Set()
-  for (const file of files) {
-    for (const [key, utility] of parseOrdered(readFileSync(path.resolve(file), 'utf8'))) {
+  const overrides = [...files.map(file => parseOrdered(readFileSync(path.resolve(file), 'utf8'))), toMap(extend)]
+  for (const override of overrides) {
+    for (const [key, utility] of override) {
       userKeys.add(key)
       if (utility === null || utility === false) {
         utilities.delete(key)
