@@ -3,8 +3,8 @@
 @use "../mixins/border-radius" as *;
 @use "../mixins/tokens" as *;
 @use "../mixins/transition" as *;
-@use "sidebar" as *;
 @use "../config" as *;
+@use "sidebar" as *;
 
 // scss-docs-start sidebar-nav-variables
 $sidebar-nav-padding-y:                       calc(#{$sidebar-padding-y} * .5) !default;

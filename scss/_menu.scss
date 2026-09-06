@@ -1,11 +1,11 @@
-@use "config" as *;
-@use "functions" as *;
-@use "mixins/ltr-rtl" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/box-shadow" as *;
+@use "mixins/ltr-rtl" as *;
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
 @use "mixins/translucent" as *;
+@use "config" as *;
+@use "functions" as *;
 
 // The Menu component, ported from Bootstrap v6. Dropdown keeps its own partial
 // and classes — Menu is the new-generation surface the JS implementation is

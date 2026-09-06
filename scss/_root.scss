@@ -1,11 +1,11 @@
 @use "sass:map";
 @use "sass:meta";
 @use "functions/defaults" as *;
-@use "mixins/tokens" as *;
 @use "mixins/color-mode" as *;
-@use "theme" as *;
+@use "mixins/tokens" as *;
 @use "colors" as *;
 @use "config" as *;
+@use "theme" as *;
 
 // scss-docs-start control-state-variables
 $control-size:                                  1em !default;

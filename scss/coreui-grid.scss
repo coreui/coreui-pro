@@ -6,8 +6,8 @@
 @forward "layout" with (
   $include-column-box-sizing: true !default,
 );
-@use "utilities" as *;
 @use "functions/maps" as *;
+@use "utilities" as *;
 
 // Only use the utilities we need
 // stylelint-disable-next-line scss/dollar-variable-default

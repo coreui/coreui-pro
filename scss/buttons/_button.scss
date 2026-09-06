@@ -8,8 +8,8 @@
 @use "../mixins/focus-ring" as *;
 @use "../mixins/tokens" as *;
 @use "../mixins/transition" as *;
-@use "../theme" as *;
 @use "../config" as *;
+@use "../theme" as *;
 
 // scss-docs-start btn-variables
 $btn-white-space:             nowrap !default; // Set to `normal` to let button text wrap

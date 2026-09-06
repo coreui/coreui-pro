@@ -1,5 +1,5 @@
-@use "../config" as *;
 @use "../mixins/color-mode" as *;
+@use "../config" as *;
 
 @layer helpers {
   // scss-docs-start backdrop-presets

@@ -1,6 +1,6 @@
-@use "breakpoints" as *;
 @use "../mixins/container" as *;
 @use "../config" as *;
+@use "breakpoints" as *;
 
 @layer layout {
   @if $enable-container-classes {

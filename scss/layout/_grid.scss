@@ -1,6 +1,6 @@
 @use "../mixins/grid" as *;
-@use "breakpoints" as *;
 @use "../config" as *;
+@use "breakpoints" as *;
 
 $include-column-box-sizing: false !default;
 

@@ -1,7 +1,7 @@
 @use "../mixins/border-radius" as *;
 @use "../mixins/box-shadow" as *;
-@use "button" as *;
 @use "../config" as *;
+@use "button" as *;
 
 // A v6 button may carry only its variant class (`.btn-solid`), so the group
 // plumbing cannot key on `.btn` alone.
