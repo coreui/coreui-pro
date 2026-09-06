@@ -290,7 +290,7 @@ finished, not whether the state changed.
   `--cui-breadcrumb-border-radius` and `--cui-breadcrumb-font-size` were `null`
   in Sass, so the first two were emitted empty (`--cui-breadcrumb-bg: ;`) and
   the third was not emitted at all. They are `transparent`,
-  `var(--cui-border-radius)` and `inherit` now. Nothing renders differently on
+  `var(--cui-radius-5)` and `inherit` now. Nothing renders differently on
   a default breadcrumb, and a font size set on an ancestor still reaches it —
   the one visible change is that a breadcrumb **given a background** now has
   rounded corners like every other surface. Set
@@ -2350,9 +2350,10 @@ as such.
 
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **Components read stops of a radius scale, and most got rounder.** `:root`
-  emits `--cui-radius-0` through `--cui-radius-9` (multiples of `$radius`,
-  `.5rem` by default) plus `--cui-radius-pill`, and component tokens read
-  stops instead of the one global `--cui-border-radius`: buttons, inputs,
+  emits `--cui-radius` (`$radius`, `.5rem` by default) and the stops
+  `--cui-radius-0` through `--cui-radius-9` as `calc()` multiples of it, plus
+  `--cui-radius-pill`, and component tokens read stops instead of the one
+  global `--cui-border-radius`: buttons, inputs,
   alerts, list groups, tabs, nav links, progress, tooltips, thumbnails,
   callouts, combobox options and the range slider's tooltip sit on
   `--cui-radius-5` (`.5rem`), badges, popovers, dialogs, drawers, menus,
@@ -2360,17 +2361,18 @@ as such.
   cards on `--cui-radius-8` (`1rem`), pills on `--cui-radius-9` (`1.5rem`).
   Everything that used the `.375rem` default is visibly rounder. To keep a
   component on its old radius, set its own token
-  (`--cui-card-border-radius: .375rem`); to retune the whole page, override
-  the stops or `$radius`. The `$border-radius(-sm/-lg/-xl/-xxl/-pill)`
+  (`--cui-card-border-radius: .375rem`); to retune the whole page, set
+  `--cui-radius` (every stop follows) or override single stops. The `$border-radius(-sm/-lg/-xl/-xxl/-pill)`
   variables and their `--cui-border-radius-*` tokens are gone with it: no
   component read them any more (the modal, the chip, the switch, the chip
   input, the search button's key, the sidebar nav, the header toggler, the
   password-strength segments and the validation tooltip moved to the stop
   with the same value: `--cui-border-radius` → `--cui-radius-4`, `-sm` →
   `-3`, `-lg` → `-5`, `-pill` → `--cui-radius-pill`), and the `.rounded-*`
-  utilities now read the scale too (see the utilities section). Only
-  `--cui-border-radius` survives on `:root`, as a deprecated alias of
-  `--cui-radius-4` for stylesheets written against v5.
+  utilities now read the scale too (see the utilities section).
+  `--cui-border-radius` is gone from `:root` as well: nothing in the library
+  read it, so a stylesheet setting it changed nothing — set `--cui-radius` or
+  a stop instead.
 
 #### Interaction surfaces sit two rungs lighter on the ladder
 
@@ -4110,8 +4112,8 @@ no output at all.
 **CSS custom properties** — `--cui-high-emphasis`,
 `--cui-medium-emphasis`, `--cui-disabled`, and the three
 `-inverse` counterparts, plus `--cui-border-radius-sm`, `-lg`, `-xl`, `-xxl`,
-`-2xl` and `-pill` (use `--cui-radius-0` … `-9` and `--cui-radius-pill`;
-`--cui-border-radius` itself stays as a deprecated alias of `--cui-radius-4`),
+`-2xl`, `-pill` and `--cui-border-radius` itself (use `--cui-radius`,
+`--cui-radius-0` … `-9` and `--cui-radius-pill`),
 `--cui-dropdown-inner-border-radius` and
 `--cui-calendar-cell-range-hover-bg` (declared and never read),
 `--cui-font-monospace` (renamed `--cui-font-mono`), `--cui-highlight-color` and
@@ -4323,7 +4325,9 @@ Prefer the `.d-sidebar-narrow*` names in new markup.
 
   The same numbering applies to `.rounded-size-*` and the side classes
   (`.rounded-top-*`, `.rounded-end-*`, `.rounded-bottom-*`, `.rounded-start-*`);
-  `.rounded-0`, `.rounded-circle` and `.rounded-pill` are unchanged. The side
+  `.rounded-0`, `.rounded-circle` and `.rounded-pill` are unchanged. Each class
+  writes `var(--cui-radius-{n})` rather than the stop's value, so a stop
+  overridden on `:root` re-rounds the utilities along with the components. The side
   classes set logical corners (`border-start-start-radius`, …), so
   `.rounded-top` flips with the writing direction like `.rounded-start`
   already did.

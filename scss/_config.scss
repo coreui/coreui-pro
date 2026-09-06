@@ -212,15 +212,15 @@ $radii: () !default;
 $radii: defaults(
   (
     0: 0,
-    1: $radius * .25,
-    2: $radius * .375,
-    3: $radius * .5,
-    4: $radius * .75,
-    5: $radius,
-    6: $radius * 1.25,
-    7: $radius * 1.5,
-    8: $radius * 2,
-    9: $radius * 3,
+    1: calc(var(--#{$prefix}radius) * .25),
+    2: calc(var(--#{$prefix}radius) * .375),
+    3: calc(var(--#{$prefix}radius) * .5),
+    4: calc(var(--#{$prefix}radius) * .75),
+    5: var(--#{$prefix}radius),
+    6: calc(var(--#{$prefix}radius) * 1.25),
+    7: calc(var(--#{$prefix}radius) * 1.5),
+    8: calc(var(--#{$prefix}radius) * 2),
+    9: calc(var(--#{$prefix}radius) * 3),
   ),
   $radii
 );

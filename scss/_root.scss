@@ -149,6 +149,7 @@ $root-token-defaults: theme-color-tokens();
 // scss-docs-start root-radius-loop
 // One token per stop of the radius scale, so a page can re-round the library
 // at runtime; components read stops instead of the one global radius.
+$root-token-defaults: map.set($root-token-defaults, --#{$prefix}radius, $radius);
 @each $key, $value in $radii {
   $root-token-defaults: map.set($root-token-defaults, --#{$prefix}radius-#{$key}, $value);
 }
@@ -220,7 +221,6 @@ $root-token-defaults: map.merge(
     --#{$prefix}border-style: $border-style,
     --#{$prefix}border-color: $border-color,
     --#{$prefix}border-color-translucent: $border-color-translucent,
-    --#{$prefix}border-radius: var(--#{$prefix}radius-4),
     // scss-docs-end root-border-var
     --#{$prefix}shadow-color: $shadow-color,
     --#{$prefix}shadow-strength: $shadow-strength,
