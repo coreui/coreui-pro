@@ -93,7 +93,10 @@
     "./dist/js/*": "./dist/js/*",
     "./dist/css/*": "./dist/css/*",
     "./scss/*": "./scss/*",
+    "./tokens": "./build/lib/tokens.mjs",
     "./tokens.json": "./tokens.json",
+    "./utilities": "./build/lib/utilities.mjs",
+    "./utilities.json": "./utilities.json",
     "./package.json": "./package.json"
   },
   "bin": {
@@ -176,6 +179,7 @@
     "!scss/tests/**",
     ".browserslistrc",
     "build/lib/tokens.mjs",
+    "build/lib/utilities.mjs",
     "build/utilities.mjs",
     "tokens.json",
     "utilities.json"
