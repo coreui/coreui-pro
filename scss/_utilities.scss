@@ -46,6 +46,7 @@ $utilities-border-subtle: theme-color-refs("border", "-subtle") !default;
 // scss-docs-end utilities-border-colors
 
 $utilities-links-underline: theme-color-refs("fg") !default;
+$utilities-border-widths: theme-token-refs($border-widths, "border-width") !default;
 $utilities-radii: theme-token-refs($radii, "radius") !default;
 $utilities-spacers: theme-token-refs($spacers, "spacer") !default;
 
@@ -335,27 +336,27 @@ $utilities: map.merge(
     "border-width": (
       property: border-width,
       class: border,
-      values: map.merge($border-widths, (keyline: var(--#{$prefix}border-width-keyline)))
+      values: $utilities-border-widths
     ),
     "border-top-width": (
       property: border-top-width,
       class: border-top,
-      values: $border-widths
+      values: $utilities-border-widths
     ),
     "border-end-width": (
       property: border-inline-end-width,
       class: border-end,
-      values: $border-widths,
+      values: $utilities-border-widths,
     ),
     "border-bottom-width": (
       property: border-bottom-width,
       class: border-bottom,
-      values: $border-widths
+      values: $utilities-border-widths
     ),
     "border-start-width": (
       property: border-inline-start-width,
       class: border-start,
-      values: $border-widths,
+      values: $utilities-border-widths,
     ),
     // scss-docs-end utils-border-width
     // scss-docs-start utils-border-color-subtle

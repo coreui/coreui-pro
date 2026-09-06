@@ -3751,6 +3751,22 @@ Nothing existing changes; these are additions. See
   a `--cui-spacer-*` key no longer reaches it — override the custom property
   instead.
 
+#### The border-width scale is computed from `--cui-border-width` in the browser
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`--cui-border-width-1` … `-5` and `-keyline` are `calc()` multiples of
+  `--cui-border-width`, and the `.border-*` width classes read them.**
+  `$border-widths` shipped literal pixel values and every `.border-2`,
+  `.border-top-3`, `.border-start-5` class carried the length, so changing
+  `--cui-border-width` re-weighted the components and left the utilities
+  where they were. Now `:root` declares the stops as multiples of
+  `--cui-border-width` (`1px`): `-keyline` is half of it, `-1` the base,
+  `-2` … `-5` its multiples, and the width classes write
+  `var(--cui-border-width-n)`. `:root { --cui-border-width: 2px }` re-weights
+  utilities and components together; overriding one stop re-weights every
+  class on it. `--cui-border-width-keyline` keeps its name and moves into the
+  scale.
+
 #### Spacing utilities write logical shorthands
 
 `.mx-*`, `.my-*`, `.px-*` and `.py-*` (and their negative-margin variants)
