@@ -147,6 +147,20 @@ describe('RangeSlider', () => {
       expect(inputs[1].value).toBe('30')
     })
 
+    it('should draw a bare number in labels as a tick without text', () => {
+      fixtureEl.innerHTML = '<div id="slider"></div>'
+
+      const element = fixtureEl.querySelector('#slider')
+      // eslint-disable-next-line no-new
+      new RangeSlider(element, { labels: [{ value: 0, label: 'Cold' }, 25, { value: 50, label: 'Mild' }] })
+
+      const labels = element.querySelectorAll('.range-slider-label')
+      expect(labels.length).toBe(3)
+      expect(labels[1].textContent).toBe('')
+      expect(labels[1].dataset.coreuiValue).toBe('25')
+      expect(labels[1].style.gridColumnStart).toBe('3')
+    })
+
     it('should initialize with custom configuration via JavaScript', () => {
       fixtureEl.innerHTML = '<div id="slider"></div>'
 
