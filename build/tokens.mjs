@@ -133,6 +133,10 @@ const lookup = ref => {
     return { node, segments }
   }
 
+  if (node instanceof Map) {
+    throw new TypeError(`tokens.json: ${ref} is a group, not a token`)
+  }
+
   const [group, kind, color, stop] = segments
   const owner = get(tokens, 'color', kind, color)
   const scaled = segments.length === 4 && group === 'color' && (kind === 'theme' || kind === 'palette') && SCALE_STOPS.has(stop) && (isToken(owner) || isToken(owner?.get('base')))
@@ -150,6 +154,13 @@ const cssName = ref => {
     return override
   }
 
+  for (let depth = segments.length - 1; depth > 0; depth--) {
+    const prefix = get(tokens, ...segments.slice(0, depth), '$extensions', 'coreui', 'css')
+    if (prefix) {
+      return [prefix, ...segments.slice(depth)].join('-')
+    }
+  }
+
   const [, ...rest] = segments
   if (rest[0] === 'palette' || rest[0] === 'theme') {
     rest.shift()
@@ -159,10 +170,25 @@ const cssName = ref => {
 }
 
 const cssVar = ref => `var(--#{$prefix}${cssName(ref)})`
+const sassVar = ref => `$${cssName(ref)}`
+const number = n => String(n).replace(/^(-?)0\./, '$1.')
 
-const render = value => {
+const render = (value, refs = 'var') => {
+  if (typeof value === 'number') {
+    return number(value)
+  }
+
   if (typeof value === 'string') {
-    return value.startsWith('{') ? cssVar(value) : value
+    if (value.startsWith('{')) {
+      return refs === 'sass' ? sassVar(value) : cssVar(value)
+    }
+
+    return /^\d+ \/ \d+$/.test(value) ? `#{"${value}"}` : value
+  }
+
+  if (value.has('multiply')) {
+    const [ref, factor] = value.get('multiply')
+    return refs === 'sass' ? `${sassVar(ref)} * ${number(factor)}` : `calc(${cssVar(ref)} * ${number(factor)})`
   }
 
   if (value.has('light')) {
@@ -181,27 +207,47 @@ const render = value => {
   throw new Error(`tokens.json: unsupported value ${JSON.stringify([...value])}`)
 }
 
-const pad = (key, width) => `${key}:`.padEnd(width)
+const pad = (key, width) => width ? `${key}:`.padEnd(width) : `${key}: `
+const name = (key, quoted) => quoted ? `"${key}"` : key
 
 const scalars = (group, width) => entries(group)
   .map(([key, token]) => `${pad(`$${key}`, width)}${render(valueOf(token))} !default;`)
   .join('\n')
 
-const rows = (items, width, indent, trailing) => items
-  .map(([key, value], index) => `${indent}${pad(`"${key}"`, width)}${value}${trailing || index < items.length - 1 ? ',' : ''}`)
+const rows = (items, width, indent, trailing, quoted = true) => items
+  .map(([key, value], index) => `${indent}${pad(name(key, quoted), width)}${value}${trailing || index < items.length - 1 ? ',' : ''}`)
   .join('\n')
 
-const map = ({ name, body, blank = false }) => [
-  `$${name}: () !default;`,
-  ...(blank ? [''] : []),
-  '// stylelint-disable-next-line scss/dollar-variable-default',
-  `$${name}: defaults(`,
-  '  (',
-  body,
-  '  ),',
-  `  $${name}`,
-  ');'
-].join('\n')
+const map = ({ name, body, blank = false, plain = false }) => (plain ?
+  [
+    `$${name}: (`,
+    body,
+    ') !default;'
+  ] :
+  [
+    `$${name}: () !default;`,
+    ...(blank ? [''] : []),
+    '// stylelint-disable-next-line scss/dollar-variable-default',
+    `$${name}: defaults(`,
+    '  (',
+    body,
+    '  ),',
+    `  $${name}`,
+    ');'
+  ]).join('\n')
+
+const scale = (path, refs) => entries(get(tokens, ...path)).map(([key, token]) => [key, render(valueOf(token), refs)])
+
+const typeScale = () => {
+  const items = entries(get(tokens, 'typography', 'size')).map(([key, token]) => {
+    const value = valueOf(token)
+    return [key, `"font-size": ${render(value.get('fontSize'))},`, `"line-height": ${render(value.get('lineHeight'))}`]
+  })
+  const width = Math.max(...items.map(([, size]) => size.length)) + 1
+  return items
+    .map(([key, size, height], index) => `    ${pad(`"${key}"`, 7)}(${size.padEnd(width)}${height})${index < items.length - 1 ? ',' : ''}`)
+    .join('\n')
+}
 
 const nested = (groups, width, trailing) => groups
   .map(([key, items], index) => [
@@ -230,6 +276,21 @@ const BLOCKS = {
       '',
       map({ name: 'color-shades', blank: true, body: rows(stops('shades'), 7, '    ', false) })
     ].join('\n')
+  },
+  'scss/_config.scss': {
+    'spacer-variables': () => scalars(new Map([['spacer', get(tokens, 'space', 'spacer')]]), 0),
+    'spacers-map': () => map({ name: 'spacers', body: rows(scale(['space', 'scale'], 'sass'), 0, '    ', true, false) }),
+    'negative-spacers-map': () => map({ name: 'negative-spacers', body: rows(scale(['space', 'negative'], 'sass'), 0, '    ', true) }),
+    'sizes-map': () => map({ name: 'sizes', body: rows(scale(['space', 'size'], 'sass'), 0, '    ', false, false) }),
+    breakpoints: () => map({ name: 'breakpoints', plain: true, body: rows(scale(['breakpoint']), 0, '  ', false, false) }),
+    'container-max-widths': () => map({ name: 'container-max-widths', body: rows(scale(['container']), 0, '    ', false, false) }),
+    'border-widths-map': () => map({ name: 'border-widths', body: rows(scale(['border', 'width']), 0, '    ', false, false) }),
+    'radius-variables': () => scalars(new Map([['radius', get(tokens, 'radius', 'base')]]), 30),
+    'radii-map': () => map({ name: 'radii', body: rows(scale(['radius', 'scale']), 0, '    ', true, false) }),
+    'font-weights': () => map({ name: 'font-weights', body: rows(entries(get(tokens, 'typography', 'weight')).map(([key]) => [key, `$font-weight-${key}`]), 0, '    ', false, false) }),
+    'font-sizes': () => map({ name: 'font-sizes', body: typeScale() }),
+    'zindex-levels-map': () => map({ name: 'zindex-levels', body: rows(scale(['z-index']), 0, '    ', false, false) }),
+    'aspect-ratios': () => map({ name: 'aspect-ratios', body: rows(scale(['aspect-ratio']), 9, '    ', false) })
   },
   'scss/_theme.scss': {
     'theme-color-variables': () => scalars(new Map(themeColors.map(([key, token]) => [key, token.get('base')])), 16),
