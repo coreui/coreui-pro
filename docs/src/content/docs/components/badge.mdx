@@ -44,21 +44,21 @@ Unless the context is clear — as in the Notifications example above, where the
 
 ### Positioned
 
-Use utilities to modify a `.badge` and position it in the corner of a link or button.
+<AddedIn version="6.0.0" /> `.badge-position-{block}-{inline}` pins a badge to a corner of its positioned parent, centred on that corner: `block` is `top` or `bottom`, `inline` is `start` or `end`, and the classes follow the writing direction.
 
 <Example code={`<button type="button" class="btn-solid theme-primary position-relative">
     Inbox
-    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill border border-bg theme-danger">
+    <span class="badge badge-position-top-end rounded-pill border border-bg theme-danger">
       99+
       <span class="visually-hidden">unread messages</span>
     </span>
   </button>`} />
 
-You can also replace the `.badge` class with a few more utilities without a count for a more generic indicator.
+Without a count, a `.badge-position-*` on any element makes a generic indicator — here a padded, rounded dot:
 
 <Example code={`<button type="button" class="btn-solid theme-primary position-relative">
     Profile
-    <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-bg rounded-circle">
+    <span class="badge-position-top-end p-2 bg-danger border border-bg rounded-circle">
       <span class="visually-hidden">New alerts</span>
     </span>
   </button>`} />

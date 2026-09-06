@@ -1,6 +1,7 @@
 @use "sass:map";
 @use "functions/defaults" as *;
 @use "mixins/border-radius" as *;
+@use "mixins/ltr-rtl" as *;
 @use "mixins/tokens" as *;
 @use "config" as *;
 
@@ -116,10 +117,27 @@ $badge-variants: defaults(
   }
 
   // Quick fix for badges in buttons
-  .btn .badge {
+  .btn :where(.badge) {
     position: relative;
     top: -1px;
   }
+
+  // scss-docs-start badge-positions
+  @each $block, $inset-block in (top: 0, bottom: 100%) {
+    @each $inline, $inset-inline in (start: 0, end: 100%) {
+      .badge-position-#{$block}-#{$inline} {
+        position: absolute;
+        inset-block-start: $inset-block;
+        inset-inline-start: $inset-inline;
+        translate: -50% -50%;
+
+        @include rtl() {
+          translate: 50% -50%;
+        }
+      }
+    }
+  }
+  // scss-docs-end badge-positions
 
   // scss-docs-start badge-modifiers
   @each $variant, $properties in $badge-variants {
