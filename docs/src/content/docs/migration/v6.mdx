@@ -3733,6 +3733,24 @@ Nothing existing changes; these are additions. See
   instead of restating declarations, so state styling follows any control
   automatically.
 
+#### The spacing scale is computed from `--cui-spacer` in the browser
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`--cui-spacer-1` … `-9` are `calc()` multiples of `--cui-spacer`, and the
+  spacing utilities read the stops.** `$spacers` used to multiply `$spacer`
+  when the stylesheet was built and every `.m-*`, `.p-*`, `.gap-*`,
+  `.space-*` and `.g-*` class carried the literal length, so the only way to
+  rescale spacing was to recompile. Now `:root` declares `--cui-spacer`
+  (`$spacer`, 1rem) and the stops as `calc(var(--cui-spacer) * n)`, the
+  utilities write `var(--cui-spacer-n)`, the negative margins and the
+  `.w-*` sizes `calc(var(--cui-spacer) * n)`, and the gutters read the same
+  stops. `:root { --cui-spacer: .75rem }` rescales all of it at run time,
+  and overriding one stop re-spaces every utility on it. The scale moved
+  next to the breakpoints in `scss/layout/_tokens.scss`, so the grid,
+  utilities and reboot bundles each declare it; a `$root-tokens` override of
+  a `--cui-spacer-*` key no longer reaches it — override the custom property
+  instead.
+
 #### Spacing utilities write logical shorthands
 
 `.mx-*`, `.my-*`, `.px-*` and `.py-*` (and their negative-margin variants)

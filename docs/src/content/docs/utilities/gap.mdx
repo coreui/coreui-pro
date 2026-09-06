@@ -46,7 +46,7 @@ Support includes responsive options for all of CoreUI's grid breakpoints, as wel
 
 ### Sass variables
 
-`$spacer` is the step the whole scale is built from, so changing it rescales every spacing utility at once.
+`$spacer` sets the default of `--cui-spacer`, the step the whole scale is built from: the stops `--cui-spacer-1` … `-9` are `calc()` multiples of it on `:root`, the utilities read the stops, so `:root { --cui-spacer: .75rem }` rescales every spacing utility at run time, no recompile.
 
 <ScssDocs file="scss/_config.scss" capture="spacer-variables" />
 
