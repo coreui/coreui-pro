@@ -102,9 +102,10 @@ $form-range-tokens: defaults(
 }
 
 @mixin form-range-track() {
-  // Fill (progress) up to the thumb. The Range plugin keeps `--cui-range-fill` (0–1) in sync.
-  // The thumb travels between half its width from either end, so the edge follows the same path.
-  --#{$prefix}range-fill-edge: calc(var(--#{$prefix}range-thumb-width) * .5 + var(--#{$prefix}range-fill, 0) * (100% - var(--#{$prefix}range-thumb-width)));
+  // Fill (progress) up to the thumb. The Range plugin keeps `--cui-range-fill` (0–1) in sync; without it
+  // the edge is invalid and the gradient falls back to an empty track. The thumb travels between half
+  // its width from either end, so the edge follows the same path.
+  --#{$prefix}range-fill-edge: calc(var(--#{$prefix}range-thumb-width) * .5 + var(--#{$prefix}range-fill) * (100% - var(--#{$prefix}range-thumb-width)));
 
   width: var(--#{$prefix}range-track-width);
   height: var(--#{$prefix}range-track-height);
@@ -114,8 +115,8 @@ $form-range-tokens: defaults(
   background-image:
     linear-gradient(
       var(--#{$prefix}range-track-direction, to right),
-      color-mix(in oklch, var(--#{$prefix}theme-bg, var(--#{$prefix}range-track-fill-bg)) 50%, transparent) var(--#{$prefix}range-fill-edge),
-      transparent var(--#{$prefix}range-fill-edge)
+      color-mix(in oklch, var(--#{$prefix}theme-bg, var(--#{$prefix}range-track-fill-bg)) 50%, transparent) var(--#{$prefix}range-fill-edge, 0),
+      transparent var(--#{$prefix}range-fill-edge, 0)
     );
   border-color: transparent;
   @include border-radius(var(--#{$prefix}range-track-border-radius));
