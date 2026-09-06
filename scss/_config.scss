@@ -144,7 +144,7 @@ $container-max-widths: defaults(
 );
 // scss-docs-end container-max-widths
 
-@include assert-ascending($container-max-widths, "$container-max-widths");
+@include assert-ascending($container-max-widths, "$container-max-widths", $allow-equal: true);
 
 // Set the number of columns and specify the width of the gutters.
 
