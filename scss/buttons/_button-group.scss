@@ -1,11 +1,12 @@
 @use "../mixins/border-radius" as *;
 @use "../mixins/box-shadow" as *;
 @use "../config" as *;
-@use "button" as *;
 
-// A v6 button may carry only its variant class (`.btn-solid`), so the group
-// plumbing cannot key on `.btn` alone.
-$group-button: ":is(#{$btn-variant-selectors})" !default;
+// `[class*="btn-"]` covers the variant-only button spellings; a bare
+// `class="btn"` has no `btn-` substring, hence the explicit `.btn`. The
+// deprecated toggle input carries `.btn-check` too and is not a button.
+$group-button: ":is(.btn, [class*=\"btn-\"]):not(input)" !default;
+$group-toggle-input: "input.btn-check" !default;
 
 @layer components {
   // Make the div behave like a button
@@ -26,14 +27,14 @@ $group-button: ":is(#{$btn-variant-selectors})" !default;
 
     // Bring the hover, focused, and "active" buttons to the front to overlay
     // the borders properly
-    > #{$btn-check-deprecated}:checked + #{$group-button},
+    > #{$group-toggle-input}:checked + #{$group-button},
     > .btn-check:has(input:checked),
     > #{$group-button}:active,
     > #{$group-button}.active {
       z-index: 2;
     }
 
-    > #{$btn-check-deprecated}:focus + #{$group-button},
+    > #{$group-toggle-input}:focus + #{$group-button},
     > .btn-check:has(input:focus),
     > #{$group-button}:focus {
       z-index: 3;
@@ -79,7 +80,7 @@ $group-button: ":is(#{$btn-variant-selectors})" !default;
     @include border-radius(var(--#{$prefix}btn-input-border-radius));
 
     // Prevent double borders when buttons are next to each other
-    > :not(#{$btn-check-deprecated}:first-child) + #{$group-button},
+    > :not(#{$group-toggle-input}:first-child) + #{$group-button},
     > .btn-group:not(:first-child) {
       margin-inline-start: calc(-1 * var(--#{$prefix}btn-border-width));
     }
@@ -100,7 +101,7 @@ $group-button: ":is(#{$btn-variant-selectors})" !default;
     //   input (making it the first child visually)
     // - part of a btn-group which isn't the first child
     > #{$group-button}:nth-child(n + 3),
-    > :not(#{$btn-check-deprecated}) + #{$group-button},
+    > :not(#{$group-toggle-input}) + #{$group-button},
     > .btn-group:not(:first-child) > #{$group-button} {
       @include border-start-radius(0);
     }
@@ -115,7 +116,7 @@ $group-button: ":is(#{$btn-variant-selectors})" !default;
   // The clickable button for toggling the menu
   // Set the same inset shadow as the :active state
   .btn-group.show .dropdown-toggle {
-    @include box-shadow($btn-active-box-shadow);
+    @include box-shadow(var(--#{$prefix}btn-active-shadow));
 
     // Show no shadow for `.btn-link` since it has no other button styles.
     &.btn-link {
@@ -155,7 +156,7 @@ $group-button: ":is(#{$btn-variant-selectors})" !default;
     //   input (making it the first child visually)
     // - part of a btn-group which isn't the first child
     > #{$group-button}:nth-child(n + 3),
-    > :not(#{$btn-check-deprecated}) + #{$group-button},
+    > :not(#{$group-toggle-input}) + #{$group-button},
     > .btn-group:not(:first-child) > #{$group-button} {
       @include border-top-radius(0);
     }
