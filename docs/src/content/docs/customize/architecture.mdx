@@ -58,6 +58,8 @@ The global decisions — the palette, the color scale stops, the eight slots of 
 
 Four value shapes appear in the file. A plain string is a value or a `{path}` alias, which the generator writes as `var(--cui-…)` so the reference resolves in the browser (or as the Sass variable, in the few maps that are still multiplied at build time); `{ "light": …, "dark": … }` becomes `light-dark()`; `{ "color": …, "alpha": … }` becomes the `color-mix()` behind the focus ring; `{ "multiply": [alias, factor] }` becomes `calc(var(--cui-…) * factor)`. The CSS syntax belongs to the generator, not to the JSON.
 
+The utility classes are described the same way: `utilities.json` lists every utility — its property, class, values and the responsive, print, state and child-selector switches — and `build/utilities.mjs` writes the utilities stylesheet from it and from the token scales. During the v6 alpha the shipped stylesheet is still compiled by Sass from the `$utilities` map; the generator is checked against that output in CI so the two cannot drift.
+
 ## Component tokens
 
 Every component declares its complete styling surface as custom properties on its root class, built from a `$<component>-tokens` Sass map:
