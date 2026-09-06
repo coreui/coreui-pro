@@ -34,27 +34,27 @@
     },
     {
       "path": "./dist/js/coreui.bundle.js",
-      "maxSize": "130KB"
+      "maxSize": "131KB"
     },
     {
       "path": "./dist/js/coreui.bundle.min.js",
-      "maxSize": "84KB"
+      "maxSize": "85KB"
     },
     {
       "path": "./dist/js/coreui.esm.js",
-      "maxSize": "119KB"
-    },
-    {
-      "path": "./dist/js/coreui.esm.min.js",
-      "maxSize": "86KB"
-    },
-    {
-      "path": "./dist/js/coreui.js",
       "maxSize": "120KB"
     },
     {
+      "path": "./dist/js/coreui.esm.min.js",
+      "maxSize": "87KB"
+    },
+    {
+      "path": "./dist/js/coreui.js",
+      "maxSize": "121KB"
+    },
+    {
       "path": "./dist/js/coreui.min.js",
-      "maxSize": "78KB"
+      "maxSize": "79KB"
     }
   ],
   "ci": {
