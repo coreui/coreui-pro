@@ -1,5 +1,4 @@
 @use "../mixins/focus-ring" as *;
-@use "../config" as *;
 
 @layer helpers {
   .focus-ring:focus-visible {

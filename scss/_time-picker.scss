@@ -3,7 +3,6 @@
 @use "mixins/form-control" as *;
 @use "mixins/tokens" as *;
 @use "config" as *;
-@use "theme" as *;
 
 // scss-docs-start time-picker-variables
 $time-picker-body-padding:                  var(--#{$prefix}spacer-2) !default;

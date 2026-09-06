@@ -1,5 +1,4 @@
 @use "../../mixins/ltr-rtl" as *;
-@use "../../config" as *;
 
 @include describe("ltr-rtl mixins") {
   @include it("reflect swaps left and right") {
