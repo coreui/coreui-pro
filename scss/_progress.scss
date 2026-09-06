@@ -1,7 +1,7 @@
+@use "sass:map";
 @use "functions/defaults" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/box-shadow" as *;
-@use "mixins/gradients" as *;
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
 @use "config" as *;
@@ -14,8 +14,16 @@ $progress-border-radius:               var(--#{$prefix}radius-5) !default;
 $progress-box-shadow:                  var(--#{$prefix}box-shadow-inset) !default;
 $progress-bar-color:                   var(--#{$prefix}primary-contrast) !default;
 $progress-bar-bg:                      var(--#{$prefix}primary-bg) !default;
+$progress-bar-bg-image:                none !default;
+$progress-bar-stripes:                 linear-gradient(45deg, var(--#{$prefix}progress-bar-stripe-color) 25%, transparent 25%, transparent 50%, var(--#{$prefix}progress-bar-stripe-color) 50%, var(--#{$prefix}progress-bar-stripe-color) 75%, transparent 75%, transparent) !default;
+$progress-bar-stripe-color:            color-mix(in oklch, var(--#{$prefix}white) 15%, transparent) !default;
 $progress-bar-transition:              width .6s ease !default;
 $progress-bar-animation:               progress-bar-stripes 1s linear infinite !default;
+
+$progress-segments:                    null !default;
+$progress-segment-gap:                 .25rem !default;
+$progress-segment-min-width:           .25rem !default;
+$progress-segment-border-radius:       var(--#{$prefix}radius-2) !default;
 
 $progress-contrast-track-opacity:      20% !default;
 // scss-docs-end progress-variables
@@ -34,12 +42,33 @@ $progress-tokens: defaults(
     --#{$prefix}progress-box-shadow: #{$progress-box-shadow},
     --#{$prefix}progress-bar-color: #{$progress-bar-color},
     --#{$prefix}progress-bar-bg: #{$progress-bar-bg},
+    --#{$prefix}progress-bar-bg-image: #{$progress-bar-bg-image},
+    --#{$prefix}progress-bar-stripes: #{$progress-bar-stripes},
+    --#{$prefix}progress-bar-stripe-color: #{$progress-bar-stripe-color},
     --#{$prefix}progress-bar-transition: #{$progress-bar-transition},
     --#{$prefix}progress-bar-animation: #{$progress-bar-animation},
   ),
   $progress-tokens
 );
 // scss-docs-end progress-css-vars
+
+$progress-segmented-tokens: () !default;
+
+// scss-docs-start progress-segmented-css-vars
+$progress-segmented-tokens: defaults(
+  (
+    --#{$prefix}progress-segment-gap: #{$progress-segment-gap},
+    --#{$prefix}progress-segment-min-width: #{$progress-segment-min-width},
+    --#{$prefix}progress-segment-border-radius: #{$progress-segment-border-radius},
+  ),
+  $progress-segmented-tokens
+);
+
+// Unset by default: the plugin then packs as many segments as fit above the minimum width
+@if $progress-segments != null {
+  $progress-segmented-tokens: map.set($progress-segmented-tokens, --#{$prefix}progress-segments, $progress-segments);
+}
+// scss-docs-end progress-segmented-css-vars
 
 // stylelint-enable custom-property-no-missing-var-function, scss/dollar-variable-default
 @layer components {
@@ -48,7 +77,7 @@ $progress-tokens: defaults(
   // scss-docs-start progress-keyframes
   @if $enable-transitions {
     @keyframes progress-bar-stripes {
-      0% { background-position-x: var(--#{$prefix}progress-height); }
+      0% { background-position-x: var(--#{$prefix}progress-height), 0; }
     }
   }
   // scss-docs-end progress-keyframes
@@ -75,12 +104,13 @@ $progress-tokens: defaults(
     text-align: center;
     white-space: nowrap;
     background-color: var(--#{$prefix}theme-bg, var(--#{$prefix}progress-bar-bg));
+    background-image: var(--#{$prefix}progress-bar-bg-image);
     @include transition(var(--#{$prefix}progress-bar-transition));
   }
 
   .progress-bar-striped {
-    @include gradient-striped();
-    background-size: var(--#{$prefix}progress-height) var(--#{$prefix}progress-height);
+    background-image: var(--#{$prefix}progress-bar-stripes), var(--#{$prefix}progress-bar-bg-image);
+    background-size: var(--#{$prefix}progress-height) var(--#{$prefix}progress-height), auto;
   }
 
   .progress-stacked > .progress {
@@ -100,6 +130,41 @@ $progress-tokens: defaults(
           animation: none;
         }
       }
+    }
+  }
+
+  .progress-segmented {
+    @include tokens($progress-segmented-tokens);
+
+    $gap: var(--#{$prefix}progress-segment-gap);
+    // Capped at half the segment so the corner circles never cross; the plugin writes the exact cap,
+    // the stylesheet's fallback knows only the minimum width
+    $radius: var(--#{$prefix}progress-segment-radius-fit, min(var(--#{$prefix}progress-segment-border-radius), calc(var(--#{$prefix}progress-segment-min-width) * .5)));
+    // Without a count (neither the token nor the plugin's fit) the pitch is invalid and the
+    // tiles fall back to the minimum width, so a page without JavaScript still gets segments
+    $pitch: var(--#{$prefix}progress-segment-pitch, calc(var(--#{$prefix}progress-segment-min-width) + #{$gap}));
+
+    --#{$prefix}progress-border-radius: 0;
+    --#{$prefix}progress-box-shadow: none;
+    --#{$prefix}progress-segment-pitch: calc((100% + #{$gap}) / var(--#{$prefix}progress-segments-fit, var(--#{$prefix}progress-segments)));
+
+    // One tile per segment: a rounded rectangle from two crossed bars plus a circle in each corner,
+    // intersected with the segment's box so a corner wider than the segment is cut off at the gap
+    // instead of spilling into it. The trailing gap of the last tile is what the element's edge clips.
+    mask-image: linear-gradient(to right, #000 calc(100% - #{$gap}), transparent calc(100% - #{$gap})), linear-gradient(#000, #000), linear-gradient(to right, transparent #{$radius}, #000 #{$radius}, #000 calc(100% - #{$gap} - #{$radius}), transparent calc(100% - #{$gap} - #{$radius})), radial-gradient(circle #{$radius} at #{$radius} #{$radius}, #000 100%, transparent), radial-gradient(circle #{$radius} at calc(100% - #{$gap} - #{$radius}) #{$radius}, #000 100%, transparent), radial-gradient(circle #{$radius} at #{$radius} calc(100% - #{$radius}), #000 100%, transparent), radial-gradient(circle #{$radius} at calc(100% - #{$gap} - #{$radius}) calc(100% - #{$radius}), #000 100%, transparent);
+    mask-repeat: repeat no-repeat;
+    mask-position: 0 0, 0 50%, 0 0, 0 0, 0 0, 0 0, 0 0;
+    mask-size: #{$pitch} 100%, #{$pitch} calc(100% - #{$radius} * 2), #{$pitch} 100%, #{$pitch} 100%, #{$pitch} 100%, #{$pitch} 100%, #{$pitch} 100%;
+    mask-composite: intersect, add, add, add, add, add, add;
+
+    > .progress {
+      --#{$prefix}progress-border-radius: 0;
+    }
+
+    // Whole segments: the Progress plugin (or the page) sets the count to fill, and the bar
+    // ends on that segment's far edge instead of wherever the value lands.
+    > .progress-bar {
+      width: calc(var(--#{$prefix}progress-segments-filled) * #{$pitch} - #{$gap});
     }
   }
 

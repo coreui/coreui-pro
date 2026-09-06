@@ -2133,6 +2133,30 @@ Multi Select's option indicators moved with it — they render as a decorative
   `.theme-*` class, as the variant is meant for dark and brand-coloured
   surfaces.
 
+- **Gradient bars.** `--cui-progress-bar-bg-image` (default `none`) paints the
+  bar with an image on top of its colour, so a gradient is one variable on the
+  `.progress` or the bar. The stripes moved to their own tokens for the same
+  reason: `--cui-progress-bar-stripes` holds the pattern and
+  `--cui-progress-bar-stripe-color` its colour, and `.progress-bar-striped`
+  layers the pattern over the image. The `progress-bar-stripes` keyframes now
+  shift only the first background layer, so the image underneath stays put.
+
+- **`.progress-segmented`.** A mask that cuts a `.progress` or
+  `.progress-stacked` into a row of rounded segments, `--cui-progress-segment-min-width`
+  wide and `--cui-progress-segment-gap` apart — or exactly `--cui-progress-segments`
+  of them when that is set — with corners from
+  `--cui-progress-segment-border-radius` (`--cui-radius-2` by default, `0px`
+  for square). Everything under the mask — transition, theme,
+  gradient, stripes — behaves as before.
+
+- **New `Progress` plugin.** Initialized on every `.progress-segmented`, it
+  reads the bar's `aria-valuenow`, `aria-valuemin` and `aria-valuemax` and sets
+  `--cui-progress-segments-filled`, which the stylesheet turns into the bar's
+  width, so the fill ends on a whole segment. It also counts how many segments
+  of `--cui-progress-segment-min-width` fit the track, capped at
+  `--cui-progress-segments` when set, and follows the track as it resizes. Bars that keep an inline `width` are not touched.
+  `coreui.Progress` is exported next to the other plugins.
+
 #### Spinner
 
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
