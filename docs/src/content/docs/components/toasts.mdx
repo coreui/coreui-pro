@@ -215,27 +215,27 @@ By default, toasts fade in and out. To disable the animation, add `.toast-instan
 
 ## Placement
 
-Place toasts with custom CSS where needed. The top right and top middle are common positions for notifications. If you're only ever going to display one toast at a time, apply the positioning styles directly to the `.toast`.
+<AddedIn version="6.0.0" /> Nine `.toast-container-{block}-{inline}` classes pin the container to the viewport: `block` is `top`, `middle` or `bottom`, `inline` is `start`, `center` or `end`. They set `position: fixed` and read the distance from the edge from `--cui-toast-container-inset` (`--cui-spacer-4` by default). Inside a positioned box — like the example below — add `.position-absolute` to pin the container to that box instead of the viewport.
 
 <Example code={`<form>
     <div class="mb-3">
       <label for="selectToastPlacement">Toast placement</label>
       <select class="form-control mt-2" id="selectToastPlacement">
         <option value="" selected>Select a position...</option>
-        <option value="top-0 start-0">Top left</option>
-        <option value="top-0 start-50 translate-middle-x">Top center</option>
-        <option value="top-0 end-0">Top right</option>
-        <option value="top-50 start-0 translate-middle-y">Middle left</option>
-        <option value="top-50 start-50 translate-middle">Middle center</option>
-        <option value="top-50 end-0 translate-middle-y">Middle right</option>
-        <option value="bottom-0 start-0">Bottom left</option>
-        <option value="bottom-0 start-50 translate-middle-x">Bottom center</option>
-        <option value="bottom-0 end-0">Bottom right</option>
+        <option value="toast-container-top-start">Top start</option>
+        <option value="toast-container-top-center">Top center</option>
+        <option value="toast-container-top-end">Top end</option>
+        <option value="toast-container-middle-start">Middle start</option>
+        <option value="toast-container-middle-center">Middle center</option>
+        <option value="toast-container-middle-end">Middle end</option>
+        <option value="toast-container-bottom-start">Bottom start</option>
+        <option value="toast-container-bottom-center">Bottom center</option>
+        <option value="toast-container-bottom-end">Bottom end</option>
       </select>
     </div>
   </form>
   <div aria-live="polite" aria-atomic="true" class="bg-black position-relative docs-example-toasts">
-    <div class="toast-container position-absolute p-3" id="toastPlacement">
+    <div class="toast-container position-absolute" id="toastPlacement">
       <div class="toast show">
         <div class="toast-header">
           <svg class="docs-placeholder-img rounded me-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text></svg>
@@ -254,9 +254,9 @@ For systems that generate more notifications, consider using a wrapping element 
 <Example class="bg-black docs-example-toasts p-0" code={`<div aria-live="polite" aria-atomic="true" class="position-relative">
     <!-- Position it: -->
     <!-- - \`.toast-container\` for spacing between toasts -->
-    <!-- - \`top-0\` & \`end-0\` to position the toasts in the upper right corner -->
-    <!-- - \`.p-3\` to prevent the toasts from sticking to the edge of the container  -->
-    <div class="toast-container top-0 end-0 p-3">
+    <!-- - \`.toast-container-top-end\` to pin the toasts to the upper end corner, inset by the container's inset token -->
+    <!-- - \`.position-absolute\` to pin them to this box rather than the viewport -->
+    <div class="toast-container toast-container-top-end position-absolute">
 
       <!-- Then put toasts within -->
       <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
@@ -407,6 +407,10 @@ myToastEl.addEventListener('hidden.coreui.toast', () => {
 Toasts use local CSS variables on `.toast` for enhanced real-time customization.
 
 <ScssDocs file="scss/_toasts.scss" capture="toast-css-vars" />
+
+The container declares its own two, on `.toast-container`:
+
+<ScssDocs file="scss/_toasts.scss" capture="toast-container-css-vars" />
 
 ### Sass variables
 
