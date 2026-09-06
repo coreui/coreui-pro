@@ -55,7 +55,7 @@
     "js-test-integration-bundle": "rolldown --config js/tests/integration/rolldown.bundle.mjs",
     "js-test-integration-modularity": "rolldown --config js/tests/integration/rolldown.bundle-modularity.mjs",
     "js-test-jquery": "cross-env JQUERY=true vitest run --config js/tests/vitest.config.mts",
-    "lint": "npm-run-all --aggregate-output --continue-on-error --parallel js-lint js-typecheck js-test-default-type css-lint lockfile-lint",
+    "lint": "npm-run-all --aggregate-output --continue-on-error --parallel js-lint js-typecheck js-test-default-type css-lint lockfile-lint tokens-check",
     "docs": "npm-run-all docs-build docs-lint",
     "docs-build": "npm run css-compile && astro build --root docs",
     "docs-compile": "npm run docs-build",
@@ -69,6 +69,8 @@
     "release-version": "node build/change-version.mjs",
     "release-zip": "cross-env-shell \"rm -rf coreui-pro-$npm_package_version-dist coreui-pro-$npm_package_version-dist.zip && cp -r dist/ coreui-pro-$npm_package_version-dist && zip -qr9 coreui-pro-$npm_package_version-dist.zip coreui-pro-$npm_package_version-dist && rm -rf coreui-pro-$npm_package_version-dist\"",
     "dist": "npm-run-all --aggregate-output --parallel css js",
+    "tokens": "node build/tokens.mjs",
+    "tokens-check": "node build/tokens.mjs --check",
     "test": "npm-run-all lint dist js-test docs-build docs-lint",
     "watch": "npm-run-all --parallel watch-*",
     "watch-css-main": "nodemon --watch scss/ --ext scss --exec \"npm-run-all css-lint css-compile css-prefix\"",
@@ -89,6 +91,7 @@
     "./dist/js/*": "./dist/js/*",
     "./dist/css/*": "./dist/css/*",
     "./scss/*": "./scss/*",
+    "./tokens.json": "./tokens.json",
     "./package.json": "./package.json"
   },
   "sideEffects": [
@@ -166,7 +169,8 @@
     "js/src/**/*.ts",
     "scss/**/*.scss",
     "!scss/tests/**",
-    ".browserslistrc"
+    ".browserslistrc",
+    "tokens.json"
   ],
   "jspm": {
     "registry": "npm",
