@@ -12,6 +12,12 @@
 #                                                   grouping is driven off
 #                                                   `details.name`, which reads
 #                                                   back undefined below it
+#   color-mix() hue carry-over Safari/iOS 18        a mix in oklch with an achromatic
+#                                                   operand (transparent, white,
+#                                                   black, the greys) keeps the
+#                                                   other side's hue only from 18;
+#                                                   17.x interpolates it towards 0°
+#                                                   and indigo comes out pink
 #   light-dark()               Chrome 123           every theme decision resolves
 #                              Safari/iOS 17.5      through it, with no fallback
 #   @starting-style            Firefox 129          Menu's entry animation
@@ -26,15 +32,17 @@
 #                                                   ranges, rating icons
 #
 # Only the topmost entry per browser binds; the rest are kept because they say
-# what actually breaks below each version. On Firefox that is now
-# `<details name>`: an unsupported @starting-style merely drops an animation and
+# what actually breaks below each version. On Safari that is the colour mix:
+# below 18 nothing fails, every translucent or tinted colour is simply the
+# wrong hue. On Firefox it is `<details name>`: an unsupported @starting-style merely drops an animation and
 # an ignored `inherits: false` leaks a utility into its descendants, but a
 # `details.name` that reads back undefined leaves an exclusive accordion with
 # every panel open at once.
 #
 # Declaring anything lower would be fiction; raising it further is a product
 # choice we have not made. Upstream Bootstrap v6 sits at Chrome 130 / Firefox 132
-# / Safari 18, so this line stays more permissive than theirs.
+# / Safari 18, so this line matches theirs on Safari and stays more permissive
+# on Chrome and Firefox.
 #
 # Run `npx browserslist --coverage` after any change and update the figure on
 # the browsers & devices docs page.
@@ -46,8 +54,8 @@ unreleased versions
 Chrome >= 123
 Edge >= 123
 Firefox >= 130
-iOS >= 17.5
-Safari >= 17.5
+iOS >= 18
+Safari >= 18
 
 not and_uc > 0
 not and_qq > 0

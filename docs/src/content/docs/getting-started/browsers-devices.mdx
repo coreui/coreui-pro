@@ -10,8 +10,8 @@ CoreUI for Bootstrap supports the **latest, stable releases** of all major brows
 Alternative browsers which use the latest version of WebKit, Blink, or Gecko, whether directly or via the platform's web view API, are not explicitly supported. However, CoreUI for Bootstrap should (in most cases) display and function correctly in these browsers as well. More specific support information is provided below.
 
 The floor is set by the platform features v6 depends on, with no fallbacks
-shipped: **Chrome 123, Edge 123, Firefox 130, Safari 17.5 and iOS 17.5**.
-Together with the evergreen lines below, this covers about 89% of global usage
+shipped: **Chrome 123, Edge 123, Firefox 130, Safari 18 and iOS 18**.
+Together with the evergreen lines below, this covers about 88% of global usage
 as measured with `npx browserslist --coverage`.
 
 ### Why these versions?
@@ -21,15 +21,17 @@ has to hold for the whole 6.x line:
 
 | Feature | Sets the floor for |
 | --- | --- |
-| `light-dark()` | Chrome and Edge 123, Safari and iOS 17.5 — every theme decision resolves through it, and `color-mix()`, with no fallback |
+| `color-mix()` hue carry-over | Safari and iOS 18 — a mix in `oklch` with an achromatic operand (`transparent`, white, black, the greys) keeps the other colour's hue only from Safari 18; 17.x interpolates the hue towards 0°, so every translucent or tinted colour comes out the wrong hue (indigo turns pink) |
+| `light-dark()` | Chrome and Edge 123 — every theme decision resolves through it, and `color-mix()`, with no fallback |
 | `<details name="…">` | Firefox 130 — exclusive accordions, which group their panels by `details.name` |
 | `@starting-style`, `transition-behavior: allow-discrete` | Firefox 129 — the Menu's entry animation |
 | `@property` | Firefox 128 — `inherits: false` on the colour and opacity utilities' custom properties |
 | `:has()` | Firefox 121 — validation and focus states on Multi Select and Autocomplete, the sidebar navigation indicators, calendar ranges and the rating icons are all selected with it |
 
 A browser below the floor does not merely lose polish. An unsupported `:has()`
-invalidates the whole rule it appears in, and unresolved `light-dark()` leaves
-colors unset. Where `details.name` reads back undefined, an exclusive accordion
+invalidates the whole rule it appears in, unresolved `light-dark()` leaves
+colors unset, and a Safari 17 renders the palette with rotated hues — nothing
+fails, the colours are just not the ones you set. Where `details.name` reads back undefined, an exclusive accordion
 stops closing its siblings and every panel can stand open at once. `@property`
 is the quietest of them and the one worth knowing about: without it the
 registrations are ignored, custom properties inherit again, and a colour or
@@ -49,8 +51,8 @@ unreleased versions
 Chrome >= 123
 Edge >= 123
 Firefox >= 130
-iOS >= 17.5
-Safari >= 17.5
+iOS >= 18
+Safari >= 18
 
 not and_uc > 0
 not and_qq > 0
@@ -104,13 +106,10 @@ Versions come from MDN's browser compatibility data, same as the floor table.
 
 ### Not available yet
 
-These sit above at least one of our floors, so v6 cannot rely on them without a fallback — and neither should you if you target the same range. Note that with the Safari floor at 17.5, **Safari is the blocker as often as Firefox**:
+These sit above at least one of our floors, so v6 cannot rely on them without a fallback — and neither should you if you target the same range. With Safari at 18, **Firefox is now the blocker most of the time**:
 
 | Feature | First fully supported in |
 | --- | --- |
-| Unprefixed `backdrop-filter` | Safari 18 — keep the `-webkit-` prefix; our build emits both |
-| `content-visibility` | Chrome 85, Firefox 125, Safari 18 |
-| Relative color syntax with number channel values | Chrome 122, Firefox 128, Safari 18 — the slice v6 uses, `calc()` on channel keywords, works on Safari 17.5; passing plain numbers as replacement channels is what Safari below 18 gets wrong |
 | `interpolate-size` / `calc-size()` | Chrome 129, no Firefox or Safari yet |
 | View transitions | Chrome 111, Firefox 144, Safari 18 |
 | Anchor positioning | Chrome 125, Firefox 147, Safari 26 |
@@ -120,7 +119,7 @@ These sit above at least one of our floors, so v6 cannot rely on them without a 
 | Scrollbar styling (`scrollbar-color`) | Chrome 121, Firefox 64, Safari 26.2 |
 | `text-box-trim` | Chrome 133, Firefox 154, Safari 18.2 |
 
-Two of these the library already touches, carefully: `interpolate-size` sits behind `@supports`, so accordions and collapses animate to their intrinsic height where it exists and jump without it; `backdrop-filter` is emitted with both spellings by the build. Anchor positioning is the one most worth waiting for — it would let Menu, Tooltip, Popover and Combobox drop their [Floating UI](https://floating-ui.com/) dependency. Re-check these before you assume one has landed.
+One of these the library already touches, carefully: `interpolate-size` sits behind `@supports`, so accordions and collapses animate to their intrinsic height where it exists and jump without it. Unprefixed `backdrop-filter`, `content-visibility` and relative color syntax with number channel values landed in Safari 18 and are inside the floor now. Anchor positioning is the one most worth waiting for — it would let Menu, Tooltip, Popover and Combobox drop their [Floating UI](https://floating-ui.com/) dependency. Re-check these before you assume one has landed.
 
 ## JavaScript
 
@@ -133,8 +132,8 @@ Generally speaking, CoreUI for Bootstrap supports the latest versions of each ma
 | Platform | Supported browsers |
 | --- | --- |
 | Android | Chrome (last two major versions) |
-| iOS and iPadOS | Safari 17.5+, Chrome (uses WebKit on iOS) |
-| Windows, macOS, Linux | Chrome 123+, Edge 123+, Firefox 130+; Safari 17.5+ on macOS |
+| iOS and iPadOS | Safari 18+, Chrome (uses WebKit on iOS) |
+| Windows, macOS, Linux | Chrome 123+, Edge 123+, Firefox 130+; Safari 18+ on macOS |
 
 For Firefox, in addition to the latest normal stable release, we also support the latest [Extended Support Release (ESR)](https://www.mozilla.org/en-US/firefox/enterprise/) version of Firefox.
 

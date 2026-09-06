@@ -62,7 +62,14 @@ description: "Track and review changes to the CoreUI for Bootstrap source files,
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
 
 **The minimum supported browsers are now Chrome 123, Edge 123, Firefox 129,
-Safari 17.5 and iOS 17.5.** `light-dark()` sets the Chrome/Edge/Safari floor;
+Safari 18 and iOS 18.** Safari 18 is set by `color-mix()`: a mix in `oklch` with
+an achromatic operand — `transparent`, white, black, the greys, which is how
+every translucent and tinted colour in v6 is made — keeps the other colour's
+hue only from Safari 18, where WebKit started carrying missing components
+forward as the spec requires; Safari 17.x interpolates the hue towards 0° and
+renders indigo as pink. Apple ships Safari 18 for macOS 13 and 14 as well, so
+the cut only affects browsers left un-updated. `light-dark()` sets the
+Chrome/Edge floor;
 `@starting-style` and `transition-behavior: allow-discrete` set Firefox 129 (the
 Menu's entry animation) and `@property` needs 128 — its `inherits: false`
 registrations are what stop the colour and opacity utilities leaking into
