@@ -96,6 +96,9 @@
     "./tokens.json": "./tokens.json",
     "./package.json": "./package.json"
   },
+  "bin": {
+    "coreui-utilities": "build/utilities.mjs"
+  },
   "sideEffects": [
     "./js/src/*.ts",
     "./js/dist/*.js",
@@ -172,7 +175,10 @@
     "scss/**/*.scss",
     "!scss/tests/**",
     ".browserslistrc",
-    "tokens.json"
+    "build/lib/tokens.mjs",
+    "build/utilities.mjs",
+    "tokens.json",
+    "utilities.json"
   ],
   "jspm": {
     "registry": "npm",

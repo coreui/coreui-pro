@@ -693,3 +693,40 @@ $utilities: map.merge(
   )
 );
 ```
+
+## Without Sass
+
+<AddedIn version="6.0.0" /> The same map exists as data: `utilities.json` in the package lists every utility with the keys described above, and `coreui-utilities` writes the utilities stylesheet from it and from the token scales in `tokens.json`. No Sass, no build step beyond running the command — the file it writes sits next to `coreui.css` in a plain HTML page.
+
+Describe your utilities in a JSON file. Keys are the ones from this page, written as JSON: `property` is a string, a list or an object (the [property map](#property-map)), `values` a list, an object or one of the value sources the package itself uses, and `responsive`, `print`, `state`, `child-selector` and `selector` work as above. A value can be a CSS value, a `{path}` into `tokens.json` (written as `var(--cui-…)`) or a source such as `{ "$theme": "bg" }`, which expands to one entry per theme color:
+
+```json
+// coreui.utilities.json
+{
+  "rotate": {
+    "responsive": true,
+    "property": "transform",
+    "class": "rotate",
+    "values": { "45": "rotate(45deg)", "90": "rotate(90deg)" }
+  },
+  "opacity": {
+    "property": "opacity",
+    "values": { "0": "0", "50": ".5", "100": "1" }
+  },
+  "width": null
+}
+```
+
+The file is merged over the package map with the same rules as `$utilities`: a key that already exists replaces the whole default group, `null` removes it, a new key is appended. Then:
+
+```sh
+npx coreui-utilities coreui.utilities.json css/utilities.css
+```
+
+writes the complete utilities stylesheet — the defaults with your changes applied, responsive and print variants included — to `css/utilities.css`. Load it instead of `coreui-utilities.css`, or after `coreui.css` when you keep the full bundle. With `--only` the command writes just the groups your file names, which is the right shape for a few additions on top of the shipped stylesheet:
+
+```sh
+npx coreui-utilities coreui.utilities.json --only css/my-utilities.css
+```
+
+Either way the file starts with the cascade layer order, so your classes land in the `utilities` layer whether the browser sees this file first or `coreui.css` first.

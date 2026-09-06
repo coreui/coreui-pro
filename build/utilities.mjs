@@ -6,21 +6,49 @@
  * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
  *
  * `--check` compiles scss/utilities/_api.scss with Sass and exits 1 unless the
- * two stylesheets are byte-identical; a path writes the stylesheet there.
+ * two stylesheets are byte-identical. Every other `.json` argument is a user
+ * file merged over utilities.json (a key replaces the whole entry, `null`
+ * removes it, a new key is appended); `--only` keeps just the keys those
+ * files name. A `.css` argument is the output path, otherwise stdout.
  */
 
 import { readFileSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { compile } from 'sass-embedded'
 import {
   css, cssName, entries, get, parseOrdered, render, tokens, valueOf
 } from './lib/tokens.mjs'
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
-const utilities = parseOrdered(readFileSync(path.join(root, 'utilities.json'), 'utf8'))
+const LAYERS = ['colors', 'config', 'root', 'reboot', 'layout', 'content', 'forms', 'components', 'custom', 'helpers', 'utilities']
+
 const check = process.argv.includes('--check')
+const only = process.argv.includes('--only')
 const output = process.argv.find(argument => !argument.startsWith('-') && argument.endsWith('.css'))
+const userFiles = process.argv.slice(2).filter(argument => argument.endsWith('.json'))
+
+const utilities = parseOrdered(readFileSync(path.join(root, 'utilities.json'), 'utf8'))
+const userKeys = new Set()
+for (const file of userFiles) {
+  for (const [key, utility] of parseOrdered(readFileSync(path.resolve(file), 'utf8'))) {
+    userKeys.add(key)
+    if (utility === null || utility === false) {
+      utilities.delete(key)
+    } else {
+      utilities.set(key, utility)
+    }
+  }
+}
+
+if (only) {
+  for (const key of utilities.keys()) {
+    if (!userKeys.has(key)) {
+      utilities.delete(key)
+    }
+  }
+}
+
+const enabled = [...utilities.values()].filter(utility => utility.get('enabled') !== false)
 
 const leadingZero = value => value.replaceAll(/(^|[\s(,])(-?)\.(\d)/g, '$1$20.$3')
 const division = value => value.replaceAll(/^calc\((\d+(?:\.\d+)?) \/ (\d+(?:\.\d+)?)\)$/g, (_, a, b) => String(Math.round((a / b) * 1e10) / 1e10))
@@ -162,7 +190,7 @@ const rules = (utility, infix, indent) => {
 }
 
 const registered = []
-for (const [, utility] of utilities) {
+for (const utility of enabled) {
   if (utility.get('at-property') === false) {
     continue
   }
@@ -176,7 +204,7 @@ for (const [, utility] of utilities) {
   }
 }
 
-const lines = []
+const lines = userFiles.length > 0 ? [`@layer ${LAYERS.join(', ')};`] : []
 for (const name of registered) {
   lines.push(`@property ${name} {`, '  syntax: "*";', '  inherits: false;', '}')
 }
@@ -189,7 +217,7 @@ for (const [name, min] of breakpoints) {
     lines.push(`  @media (width >= ${min}) {`)
   }
 
-  for (const [, utility] of utilities) {
+  for (const utility of enabled) {
     if (utility.get('responsive') || infix === '') {
       lines.push(...rules(utility, infix, indent))
     }
@@ -200,14 +228,15 @@ for (const [name, min] of breakpoints) {
   }
 }
 
-lines.push('  @media print {')
-for (const [, utility] of utilities) {
-  if (utility.get('print')) {
+const printed = enabled.filter(utility => utility.get('print'))
+if (printed.length > 0) {
+  lines.push('  @media print {')
+  for (const utility of printed) {
     lines.push(...rules(utility, '-print', '    '))
   }
-}
 
-lines.push('  }')
+  lines.push('  }')
+}
 
 if (utilities.has('translate-middle')) {
   lines.push(
@@ -250,6 +279,13 @@ if (utilities.has('animation')) {
 
 const stylesheet = `${lines.join('\n')}\n`
 if (check) {
+  const rootScss = readFileSync(path.join(root, 'scss/_root.scss'), 'utf8')
+  if (!rootScss.includes(`@layer ${LAYERS.join(', ')};`)) {
+    console.error('utilities: the layer order in build/utilities.mjs differs from scss/_root.scss')
+    process.exit(1)
+  }
+
+  const { compile } = await import('sass-embedded')
   const compiled = `${compile(path.join(root, 'scss/utilities/_api.scss'), { style: 'expanded' }).css}\n`
   if (compiled !== stylesheet) {
     const expected = compiled.split('\n')
