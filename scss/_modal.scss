@@ -2,6 +2,7 @@
 @use "functions/defaults" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/box-shadow" as *;
+@use "mixins/dialog-shared" as *;
 @use "layout/breakpoints" as *;
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
@@ -24,7 +25,7 @@ $modal-content-bg:                  var(--#{$prefix}bg-body) !default;
 $modal-content-border-color:        var(--#{$prefix}border-color-translucent) !default;
 $modal-content-border-width:        var(--#{$prefix}border-width) !default;
 $modal-content-border-radius:       var(--#{$prefix}radius-5) !default;
-$modal-content-inner-border-radius: calc(#{$modal-content-border-radius} - #{$modal-content-border-width}) !default;
+$modal-content-inner-border-radius: calc(var(--#{$prefix}modal-border-radius) - var(--#{$prefix}modal-border-width)) !default;
 $modal-content-box-shadow-xs:       var(--#{$prefix}box-shadow-sm) !default;
 $modal-content-box-shadow-sm-up:    var(--#{$prefix}box-shadow) !default;
 
@@ -156,7 +157,7 @@ $modal-tokens: defaults(
       }
 
       &::backdrop {
-        background-color: color-mix(in srgb, var(--#{$prefix}modal-backdrop-bg) calc(var(--#{$prefix}modal-backdrop-opacity) * 100%), transparent);
+        background-color: color-mix(in oklch, var(--#{$prefix}modal-backdrop-bg) calc(var(--#{$prefix}modal-backdrop-opacity) * 100%), transparent);
         @include transition(background-color var(--#{$prefix}modal-transition-duration) var(--#{$prefix}modal-transition-timing));
       }
 
@@ -166,7 +167,7 @@ $modal-tokens: defaults(
     }
 
     &.modal-instant::backdrop {
-      background-color: color-mix(in srgb, var(--#{$prefix}modal-backdrop-bg) calc(var(--#{$prefix}modal-backdrop-opacity) * 100%), transparent);
+      background-color: color-mix(in oklch, var(--#{$prefix}modal-backdrop-bg) calc(var(--#{$prefix}modal-backdrop-opacity) * 100%), transparent);
     }
 
     &[open]:not(.hiding) {
@@ -199,15 +200,12 @@ $modal-tokens: defaults(
     }
 
     .modal.modal-swap-in:not(.modal-instant)::backdrop {
-      background-color: color-mix(in srgb, var(--#{$prefix}modal-backdrop-bg) calc(var(--#{$prefix}modal-backdrop-opacity) * 100%), transparent);
+      background-color: color-mix(in oklch, var(--#{$prefix}modal-backdrop-bg) calc(var(--#{$prefix}modal-backdrop-opacity) * 100%), transparent);
     }
   }
 
   .modal-header {
-    display: flex;
-    flex-shrink: 0;
-    align-items: center;
-    padding: var(--#{$prefix}modal-header-padding);
+    @include dialog-header(var(--#{$prefix}modal-header-padding));
     border-block-end: var(--#{$prefix}modal-header-border-width) solid var(--#{$prefix}modal-header-border-color);
     @include border-top-radius(var(--#{$prefix}modal-inner-border-radius));
 
@@ -221,26 +219,17 @@ $modal-tokens: defaults(
   }
 
   .modal-title {
-    margin-bottom: 0;
-    line-height: var(--#{$prefix}modal-title-line-height);
+    @include dialog-title(var(--#{$prefix}modal-title-line-height));
   }
 
   .modal-body {
     position: relative;
-    flex: 1 1 auto;
-    padding: var(--#{$prefix}modal-padding);
+    @include dialog-body(var(--#{$prefix}modal-padding));
   }
 
   .modal-footer {
-    display: flex;
-    flex-shrink: 0;
-    flex-wrap: wrap;
-    gap: var(--#{$prefix}modal-footer-gap);
-    align-items: center; // vertically center
-    justify-content: flex-end; // Right align buttons with flex property because text-align doesn't work on flex items
-    padding: var(--#{$prefix}modal-padding);
-    background-color: var(--#{$prefix}modal-footer-bg);
-    border-block-start: var(--#{$prefix}modal-footer-border-width) solid var(--#{$prefix}modal-footer-border-color);
+    @include dialog-footer(var(--#{$prefix}modal-padding), var(--#{$prefix}modal-footer-gap), var(--#{$prefix}modal-footer-border-width), var(--#{$prefix}modal-footer-border-color));
+    background-color: var(--#{$prefix}modal-footer-bg, transparent);
     @include border-bottom-radius(var(--#{$prefix}modal-inner-border-radius));
   }
 

@@ -218,10 +218,10 @@ $tab-pane-tokens: defaults(
     align-items: var(--#{$prefix}nav-link-align);
     justify-content: var(--#{$prefix}nav-link-justify);
     padding: var(--#{$prefix}nav-link-padding-y) var(--#{$prefix}nav-link-padding-x);
-    font-size: var(--#{$prefix}nav-link-font-size);
-    font-weight: var(--#{$prefix}nav-link-font-weight);
+    font-size: var(--#{$prefix}nav-link-font-size, inherit);
+    font-weight: var(--#{$prefix}nav-link-font-weight, inherit);
     color: var(--#{$prefix}theme-fg, var(--#{$prefix}nav-link-color));
-    text-decoration: if(not sass($link-decoration == none): none);
+    text-decoration: none;
     background: none;
     border: 0;
     @include border-radius(var(--#{$prefix}nav-link-border-radius));
@@ -234,8 +234,6 @@ $tab-pane-tokens: defaults(
     &:hover,
     &:focus {
       color: var(--#{$prefix}theme-fg, var(--#{$prefix}nav-link-hover-color));
-      // stylelint-disable-next-line scss/at-function-named-arguments
-      text-decoration: if(sass($link-hover-decoration == underline): none);
       background-color: var(--#{$prefix}theme-bg-subtle, var(--#{$prefix}nav-link-hover-bg));
     }
 

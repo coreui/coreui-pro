@@ -1,0 +1,54 @@
+@use "sass:map";
+
+// Configure a custom theme through the entrypoint. This fails if `coreui.scss`
+// does not forward the `theme` module or `$theme-colors` replaces the map
+// instead of merging into it.
+@use "../../coreui" as * with (
+  $theme-colors: (
+    "custom": (
+      "base": var(--cui-black),
+      "contrast": var(--cui-white),
+    ),
+  )
+);
+
+$true-terminal-output: false;
+
+@include describe("Theme color configuration") {
+  @include describe("@use coreui with $theme-colors") {
+    @include it("should add a custom theme through the entrypoint") {
+      @include assert-equal(
+        map.get(map.get($theme-colors, "custom"), "base"),
+        var(--cui-black),
+        "The custom theme base color should be configurable via @use ... with"
+      );
+    }
+
+    @include it("should merge custom themes on top of the built-ins") {
+      @include assert-true(
+        map.has-key($theme-colors, "primary"),
+        "Adding a theme must not drop the built-in primary theme"
+      );
+    }
+
+    @include it("should emit CSS custom properties for the custom theme") {
+      @include assert() {
+        @include output() {
+          .test {
+            base: map.get(theme-color-scale-tokens(), --cui-custom-base);
+            bg: map.get(theme-color-tokens(), --cui-custom-bg);
+            contrast: map.get(theme-color-tokens(), --cui-custom-contrast);
+          }
+        }
+
+        @include expect() {
+          .test {
+            base: var(--cui-black);
+            bg: var(--cui-custom-base);
+            contrast: var(--cui-white);
+          }
+        }
+      }
+    }
+  }
+}

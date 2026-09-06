@@ -273,6 +273,12 @@ finished, not whether the state changed.
 
 #### Breadcrumb
 
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The breadcrumb has no bottom margin.** `.breadcrumb` sat on
+  `margin-bottom: 1rem` through `$breadcrumb-margin-bottom` and
+  `--cui-breadcrumb-margin-bottom`; both are gone and the list ends where its
+  content ends, like every other navigation component. Add `.mb-4` (or set
+  `margin-bottom` on the `<nav>`) where the page relied on that gap.
 - **Three breadcrumb tokens have real defaults.** `--cui-breadcrumb-bg`,
   `--cui-breadcrumb-border-radius` and `--cui-breadcrumb-font-size` were `null`
   in Sass, so the first two were emitted empty (`--cui-breadcrumb-bg: ;`) and
@@ -1134,6 +1140,56 @@ adornment in the library — so the button needs no icon markup at all:
 
 #### Range / Range Slider
 
+- **The filled track, value tooltip and tick marks come from a `Range` plugin.**
+  Wrap the input in `<div class="form-range">` and give the input
+  `.form-range-input`; the plugin writes `--cui-range-fill` (`0`–`1`) on the
+  wrapper and the CSS draws the fill from it, `data-coreui-tooltips` adds a
+  value tooltip on hover, drag and focus, or permanently with `"always"` (the
+  same `tooltips`/`tooltipsFormat` options as the range slider), and a linked `<datalist>` renders tick
+  marks laid out on a grid. Every such wrapper initializes itself. The input
+  fires `changed.coreui.range` with the numeric `value`. The fill is the
+  theme colour at half strength, a shade lighter than the thumb. **The bare
+  `<input class="form-range">` keeps working unchanged** as the CSS-only form of
+  the control; it gets no plugin, no fill and no instance. New tokens on
+  `.form-range`: `--cui-range-track-fill-bg`, `--cui-range-track-disabled-bg`
+  and the `--cui-range-tick-*` family (labelled ticks use `-height`, unlabelled
+  ones `-minor-height`).
+- **The range track sits halfway between `--cui-bg-2` and `--cui-bg-3`**
+  (`color-mix(in oklch, …)`, was `--cui-bg-3`), in both the native range and
+  the range slider. `--cui-bg-3` and the `secondary` colour
+  resolve to the same grey in light mode, so a `theme-secondary` thumb and
+  fill vanished against the track.
+- **Validation reaches the range.** `.is-invalid`/`.is-valid` on the input
+  (either form) colour the thumb and its focus ring with the state, and a
+  feedback element after the wrapper toggles through `:has()`.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The range slider's handles and track read the range's tokens.** The
+  `--cui-range-slider-thumb-*` and `--cui-range-slider-track-*` families are
+  gone; `.range-slider` declares the `--cui-range-*` family instead, so one
+  setting styles both controls. Rename: `--cui-range-slider-thumb-{width,
+  height,bg,border,border-radius,box-shadow,active-bg,disabled-bg}` →
+  `--cui-range-thumb-*`, `--cui-range-slider-thumb-transition` →
+  `--cui-range-thumb-transition-{property,duration,timing}`,
+  `--cui-range-slider-track-{width,height,cursor,bg,border-radius,box-shadow}`
+  → `--cui-range-track-*`, `--cui-range-slider-track-in-range-bg` →
+  `--cui-range-track-fill-bg`, `--cui-range-slider-disabled-track-in-range-bg`
+  → `--cui-range-track-disabled-bg`. The Sass variables follow
+  (`$range-slider-thumb-*`, `$range-slider-track-*` → `$form-range-*`).
+  `--cui-range-slider-label-*`, `--cui-range-slider-tooltip-margin-*` and
+  `--cui-range-slider-vertical-*` stay. The filled band keeps its half-strength mix of the theme colour, now
+  shared with the range's fill, and a disabled slider greys the band through
+  the theme slot on the track.
+- **Range slider labels sit on a grid, with tick marks.** The plugin builds
+  `grid-template-columns` (rows when vertical) from the gaps between label
+  values, so labels are in normal flow: the container sizes itself, and the
+  resize listener plus the measured container height are gone. Every label
+  draws a tick from `--cui-range-tick-*` — taller when it has text — and the
+  labels are sorted by value. A bare number in `labels` is a tick without
+  text at that value. The new `list` option reads a `<datalist>` like the
+  range does and merges its options with `labels`. Custom CSS that
+  positioned `.range-slider-label` through `left`/`bottom` no longer applies.
+- **Range slider tooltips follow the range's modes.** `tooltips: true` shows a
+  handle's tooltip on hover, drag and visible focus; `"always"` keeps them on.
 - **A theme beats `--cui-range-thumb-bg`, as everywhere else.** The token carried
   the `--cui-theme-*` slot inside its own default, so setting it inside a themed
   container dropped the theme. The slot sits on the property now.
@@ -2084,6 +2140,30 @@ Multi Select's option indicators moved with it — they render as a decorative
   `.theme-*` class, as the variant is meant for dark and brand-coloured
   surfaces.
 
+- **Gradient bars.** `--cui-progress-bar-bg-image` (default `none`) paints the
+  bar with an image on top of its colour, so a gradient is one variable on the
+  `.progress` or the bar. The stripes moved to their own tokens for the same
+  reason: `--cui-progress-bar-stripes` holds the pattern and
+  `--cui-progress-bar-stripe-color` its colour, and `.progress-bar-striped`
+  layers the pattern over the image. The `progress-bar-stripes` keyframes now
+  shift only the first background layer, so the image underneath stays put.
+
+- **`.progress-segmented`.** A mask that cuts a `.progress` or
+  `.progress-stacked` into a row of rounded segments, `--cui-progress-segment-min-width`
+  wide and `--cui-progress-segment-gap` apart — or exactly `--cui-progress-segments`
+  of them when that is set — with corners from
+  `--cui-progress-segment-border-radius` (`--cui-radius-2` by default, `0px`
+  for square). Everything under the mask — transition, theme,
+  gradient, stripes — behaves as before.
+
+- **New `Progress` plugin.** Initialized on every `.progress-segmented`, it
+  reads the bar's `aria-valuenow`, `aria-valuemin` and `aria-valuemax` and sets
+  `--cui-progress-segments-filled`, which the stylesheet turns into the bar's
+  width, so the fill ends on a whole segment. It also counts how many segments
+  of `--cui-progress-segment-min-width` fit the track, capped at
+  `--cui-progress-segments` when set, and follows the track as it resizes. Bars that keep an inline `width` are not touched.
+  `coreui.Progress` is exported next to the other plugins.
+
 #### Spinner
 
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
@@ -2268,20 +2348,22 @@ as such.
   stops instead of the one global `--cui-border-radius`: buttons, inputs,
   alerts, list groups, tabs, nav links, progress, tooltips, thumbnails,
   callouts, combobox options and the range slider's tooltip sit on
-  `--cui-radius-5` (`.5rem`), badges, cards, popovers, dialogs, drawers,
-  menus, accordions, toasts, dropdowns and popups on `--cui-radius-7`
-  (`.75rem`), pills on `--cui-radius-9` (`1.5rem`).
+  `--cui-radius-5` (`.5rem`), badges, popovers, dialogs, drawers, menus,
+  accordions, toasts, dropdowns and popups on `--cui-radius-7` (`.75rem`),
+  cards on `--cui-radius-8` (`1rem`), pills on `--cui-radius-9` (`1.5rem`).
   Everything that used the `.375rem` default is visibly rounder. To keep a
   component on its old radius, set its own token
   (`--cui-card-border-radius: .375rem`); to retune the whole page, override
-  the stops or `$radius`. The `$border-radius(-sm/-lg/-xl/-2xl/-pill)`
-  variables and their tokens are unchanged and keep driving the `rounded-*`
-  utilities — but no component reads them any more: the modal, the chip,
-  the switch, the chip input, the search button's key, the sidebar nav, the
-  header toggler, the password-strength segments and the validation tooltip
-  moved to the stop with the same value (`--cui-border-radius` →
-  `--cui-radius-4`, `-sm` → `-3`, `-lg` → `-5`, `-pill` → `--cui-radius-pill`),
-  so overriding `--cui-border-radius` now retunes the utilities only.
+  the stops or `$radius`. The `$border-radius(-sm/-lg/-xl/-xxl/-pill)`
+  variables and their `--cui-border-radius-*` tokens are gone with it: no
+  component read them any more (the modal, the chip, the switch, the chip
+  input, the search button's key, the sidebar nav, the header toggler, the
+  password-strength segments and the validation tooltip moved to the stop
+  with the same value: `--cui-border-radius` → `--cui-radius-4`, `-sm` →
+  `-3`, `-lg` → `-5`, `-pill` → `--cui-radius-pill`), and the `.rounded-*`
+  utilities now read the scale too (see the utilities section). Only
+  `--cui-border-radius` survives on `:root`, as a deprecated alias of
+  `--cui-radius-4` for stylesheets written against v5.
 
 #### Interaction surfaces sit two rungs lighter on the ladder
 
@@ -2317,8 +2399,8 @@ as such.
   tab (was `--cui-bg-4`), the selected combobox option, the neutral chip
   (hovering on `--cui-bg-3` instead of a mix with the foreground), the
   password-strength track and the search button's key cap (active on
-  `--cui-bg-3`). The range slider track sits on `--cui-bg-3` like the
-  native range. The card header and footer read `--cui-bg-1` instead of a
+  `--cui-bg-3`). The range slider track sits halfway between `--cui-bg-2`
+  and `--cui-bg-3` like the native range. The card header and footer read `--cui-bg-1` instead of a
   3 % foreground wash, so a card on a tinted parent keeps a neutral cap.
   The tab's hover border reads `--cui-border-subtle` rather than a surface
   rung.
@@ -2414,8 +2496,7 @@ as such.
   `.hstack-xxl` `.hstack-2xl`, `.drawer-xxl` `.drawer-2xl`, `.offcanvas-xxl`
   `.offcanvas-2xl` — and the containers grow with them: `.container` is
   `1200px` at `xl` (was 1140) and `1440px` at `2xl` (was 1320). Only
-  `.icon-xxl` and `--cui-border-radius-xxl` keep the spelling: they are
-  sizes, not breakpoints. The Sass map is `$breakpoints` (was
+  `.icon-xxl` keeps the spelling: it is a size, not a breakpoint. The Sass map is `$breakpoints` (was
   `$grid-breakpoints`) and the mixins take it under that name;
   `$container-max-widths` keeps its name. The
   responsive placement of menus, tooltips and popovers
@@ -2481,6 +2562,19 @@ as such.
   reads `--cui-spacer` (`1rem`) instead of `--cui-spacer-3`, so cards,
   alerts, modals, drawers, popovers, callouts, list groups, the sidebar and
   the reboot margins keep their size.
+
+#### Link decoration is a token, not a Sass knob
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`$link-decoration`, `$link-underline-offset` and `$link-hover-decoration`
+  are gone.** The underline lives on `:root` as `--cui-link-decoration`
+  (`underline`) and `--cui-link-underline-offset` (`.2em`); set the token
+  instead of recompiling. `--cui-link-hover-decoration` is no longer declared
+  — the hover falls back to `--cui-link-decoration`, so declare it yourself
+  for a different hover. Nav links, list-group actions, page links, the
+  header, the dropdown item and the button write `text-decoration: none`
+  outright (they used to skip it when the knob was already `none`), and
+  `.btn-link` reads the tokens.
 
 #### Every theme colour gets an action-background slot
 
@@ -2709,10 +2803,21 @@ editing four blocks. It is a map of maps now — one name, eight slots.
 
   ```diff
   - $success-bg-subtle: #e8f5ec;
-  + $theme-colors: map.merge($theme-colors, (
-  +   "success": map.merge(map.get($theme-colors, "success"), ("bg-subtle": #e8f5ec))
-  + ));
+  + @use "@coreui/coreui/scss/coreui" with (
+  +   $theme-colors: (
+  +     "success": (
+  +       "base": $success,
+  +       "bg-subtle": #e8f5ec,
+  +       // …the remaining slots of the built-in entry
+  +     ),
+  +   )
+  + );
   ```
+
+  The map merges one level deep, so a built-in colour is replaced as a whole:
+  copy its sub-map from `scss/_theme.scss` and change the slot. `$theme-colors`
+  goes through `defaults()` like every other configuration map, so a new colour
+  is one entry passed through `with ()` and `null` removes one.
 
   Every `--cui-{color}-*` custom property keeps its name and its value, so
   a runtime override is unaffected.
@@ -3973,8 +4078,10 @@ Some of these carried a "to be removed in v6" note since v4.2. This is v6.
 `alert-variant()`, `list-group-item-variant()`, `avatar()`. The contextual classes
 they used to build are generated by a Sass loop over the theme tokens instead.
 
-**Sass variables** — `$variable-prefix` (use `$prefix`), `$border-radius-2xl` (use
-`$border-radius-xxl`), `$text-muted`, `$hr-bg-color`, `$hr-height`,
+**Sass variables** — `$variable-prefix` (use `$prefix`), `$border-radius`,
+`$border-radius-sm`, `$border-radius-lg`, `$border-radius-xl`, `$border-radius-xxl`,
+`$border-radius-2xl` and `$border-radius-pill` (use the `$radii` map and `$radius`),
+`$text-muted`, `$hr-bg-color`, `$hr-height`,
 `$alert-bg-scale`, `$alert-border-scale`, `$alert-color-scale`,
 `$list-group-item-bg-scale`, `$list-group-item-color-scale`,
 `$tooltip-arrow-color`, `$popover-arrow-color`, `$popover-arrow-outer-color`,
@@ -3982,15 +4089,36 @@ they used to build are generated by a Sass loop over the theme tokens instead.
 `$dropdown-header-padding` (use `-padding-y` / `-padding-x`),
 `$nested-kbd-font-weight`, `$btn-close-white-filter` and `$btn-close-filter-dark`,
 `$high-emphasis`, `$medium-emphasis`, `$disabled`, `$high-emphasis-inverse`,
-`$medium-emphasis-inverse`, `$disabled-inverse`.
+`$medium-emphasis-inverse`, `$disabled-inverse`, `$dropdown-inner-border-radius`
+(its only reader sat behind `$dropdown-padding-y == 0`, which is never true),
+`$calendar-cell-range-hover-bg` (the range hover state draws dashed borders, not a
+background), `$body-text-align` and `$input-btn-font-family` (both defaulted to
+`null`, so the tokens they fed were never emitted and every `font-family` /
+`text-align` that read them was invalid; buttons and controls inherit the body
+font, set `font-family` on the element to change it).
 
 Thirteen of those were already dead — nothing read them, so removing them changed
 no output at all.
 
 **CSS custom properties** — `--cui-high-emphasis`,
 `--cui-medium-emphasis`, `--cui-disabled`, and the three
-`-inverse` counterparts, plus `--cui-border-radius-2xl` (use
-`--cui-border-radius-xxl`).
+`-inverse` counterparts, plus `--cui-border-radius-sm`, `-lg`, `-xl`, `-xxl`,
+`-2xl` and `-pill` (use `--cui-radius-0` … `-9` and `--cui-radius-pill`;
+`--cui-border-radius` itself stays as a deprecated alias of `--cui-radius-4`),
+`--cui-dropdown-inner-border-radius` and
+`--cui-calendar-cell-range-hover-bg` (declared and never read),
+`--cui-font-monospace` (renamed `--cui-font-mono`), `--cui-highlight-color` and
+`--cui-highlight-bg` (renamed `--cui-mark-color` / `--cui-mark-bg`),
+`--cui-btn-input-color` (renamed `--cui-btn-input-fg`) and `--cui-control-color`
+(renamed `--cui-control-fg`, on `.form-control` and everything sharing its
+frame),
+`--cui-body-text-align`, `--cui-btn-input-font-family`, `--cui-btn-font-family`,
+`--cui-control-font-family` and `--cui-search-button-font-family` (never emitted,
+see the Sass variables above). Optional knobs that stay `null` by default —
+`--cui-nav-link-font-size`, `--cui-nav-link-font-weight`, `--cui-modal-footer-bg`,
+`--cui-form-feedback-font-style`, `--cui-form-feedback-tooltip-line-height` — are
+now read with a fallback (`inherit` / `transparent`), so the declaration is valid
+until you set them.
 
 **Classes** — eleven, every one a CoreUI-only addition:
 
@@ -4134,22 +4262,80 @@ Prefer the `.d-sidebar-narrow*` names in new markup.
   `color-scheme`, which is what the browser reads to paint form controls and
   scrollbars — it changes no colours of its own.
 - **`.link-underline-*` is `.underline-*`.** `.link-underline-danger` becomes
-  `.underline-danger`, and the opacity steps become `.underline-opacity-*`
-  (`.link-underline-opacity-50-hover` → `.underline-opacity-50-hover`). Like
+  `.underline-danger`, and the opacity steps become `.underline-{n}`
+  (`.link-underline-opacity-50-hover` → `.underline-50-hover`). Like
   `.underline-offset-*`, the class sets a `text-decoration-*` property on any
   element rather than only on a link, and it now sits beside
-  `.underline-thickness-*`, which already carried that name. **We keep the
-  `-opacity-` segment** where upstream folds opacity into the colour class as
-  `.underline-50` — every other opacity family here reads
-  `.bg-opacity-*` / `.text-opacity-*` / `.link-opacity-*`, and one family
-  spelling it differently is what this pass is removing.
+  `.underline-thickness-*`, which already carried that name.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The colour utilities take upstream's names, and opacity is a step of the
+  same family.** Text colour is `.fg-{color}` (`.fg-emphasis-{color}`,
+  `.fg-contrast-{color}`, `.fg-reset`, plus the `.fg-body` / `.fg-1` … `.fg-4`
+  ladder that already carried the name); the light surfaces are
+  `.bg-subtle-{color}` and `.bg-muted-{color}`, the light border
+  `.border-subtle-{color}`. Opacity is no longer a separate `-opacity-` family
+  with its own token: `.fg-{n}`, `.bg-{n}`, `.border-{n}`, `.link-{n}`
+  (`.link-{n}-hover`) and `.underline-{n}` (`.underline-{n}-hover`) run from
+  `10` to `100` in steps of ten and mix the colour the companion class wrote into
+  `--cui-fg` / `--cui-bg` / `--cui-border` / `--cui-link-color` /
+  `--cui-underline` with `transparent` through `color-mix()`. `.lh-md` is the
+  body line height (`.lh-sm` and `.lh-lg` read the type scale's stops) and
+  `.shadow-opacity-*` counts the same ten steps.
+
+  Every v5 spelling **still ships as a deprecated alias** and renders the same,
+  so existing markup is unaffected until v7: `.text-{color}`,
+  `.text-{color}-emphasis`, `.text-body`, `.text-black`, `.text-white`,
+  `.text-reset`, `.text-muted`, `.text-body-secondary`, `.text-body-tertiary`,
+  `.text-black-50`, `.text-white-50`, `.bg-{color}-subtle`, `.bg-{color}-muted`,
+  `.border-{color}-subtle`, `.text-opacity-*`, `.bg-opacity-*`,
+  `.border-opacity-*`, `.link-opacity-*(-hover)`, `.underline-opacity-*(-hover)`,
+  `.lh-base`, `.shadow-opacity-25` and `-75`. The deprecated opacity steps keep
+  their old values (`25`, `75`); the new scale rounds them to `30` and `70`.
+
+  What does change: the `--cui-text`, `--cui-text-opacity`, `--cui-bg-opacity`,
+  `--cui-border-opacity`, `--cui-underline-opacity` and `--cui-link-opacity`
+  tokens are gone (`--cui-text` is `--cui-fg`), so an inline
+  `style="--cui-bg-opacity: .5"` no longer fades a `.bg-*` — use `.bg-50`, or
+  set `--cui-bg` to a translucent colour. Reboot's `a` reads
+  `var(--cui-theme-fg, var(--cui-link-color))` directly instead of mixing the
+  link colour through `--cui-link-opacity` on every link.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`.rounded-*` counts the stops of the radius scale.** The numbers are the
+  keys of `$radii` (`--cui-radius-0` … `-9`) instead of the five v5 sizes, so
+  every numbered class changes value and four new ones appear:
+
+  | class | v5 | v6 | closest v6 class for the old value |
+  | --- | --- | --- | --- |
+  | `.rounded` | `.375rem` | `.5rem` (`--cui-radius-5`) | `.rounded-4` |
+  | `.rounded-1` | `.25rem` | `.125rem` | `.rounded-3` |
+  | `.rounded-2` | `.375rem` | `.1875rem` | `.rounded-4` |
+  | `.rounded-3` | `.5rem` | `.25rem` | `.rounded-5` |
+  | `.rounded-4` | `1rem` | `.375rem` | `.rounded-8` |
+  | `.rounded-5` | `2rem` | `.5rem` | `.rounded-9` (`1.5rem`) |
+  | `.rounded-6` … `.rounded-9` | — | `.625rem`, `.75rem`, `1rem`, `1.5rem` | — |
+
+  The same numbering applies to `.rounded-size-*` and the side classes
+  (`.rounded-top-*`, `.rounded-end-*`, `.rounded-bottom-*`, `.rounded-start-*`);
+  `.rounded-0`, `.rounded-circle` and `.rounded-pill` are unchanged. The side
+  classes set logical corners (`border-start-start-radius`, …), so
+  `.rounded-top` flips with the writing direction like `.rounded-start`
+  already did.
+- **Buttons and controls carry a line height per size.** `:root` emits
+  `--cui-btn-input-xs-line-height` (`1.125`), `-sm-line-height`
+  (`--cui-line-height-sm`) and `-lg-line-height` (`--cui-line-height-md`), the
+  size classes hand them to `--cui-btn-line-height` / `--cui-control-line-height`,
+  and each size's `min-height` is computed from its own line height. `.btn-xs`
+  and `.form-control-xs` get tighter (their line height was the body's `1.5`);
+  `sm` and `lg` keep the body value. `--cui-border-width-keyline` (`.5px`) is
+  a root token now and `.border-keyline` reads it.
 - **New `.rounded-size-*`.** It writes the radius into `--cui-rounded-size`
-  without setting `border-radius` itself, and the unprefixed corner classes
-  (`.rounded`, `.rounded-top`, `.rounded-end`, `.rounded-bottom`,
-  `.rounded-start`) now read that token, so one size class drives whichever
-  corners you round. With no `.rounded-size-*` in scope they fall back to
-  `--cui-border-radius`, so existing markup renders unchanged; the numbered
-  classes (`.rounded-3`, `.rounded-top-3`) set their own value and ignore it.
+  without setting `border-radius` itself, and the unprefixed side classes
+  (`.rounded-top`, `.rounded-end`, `.rounded-bottom`, `.rounded-start`) read
+  that token, so one size class drives whichever corners you round. With no
+  size in scope they fall back to `--cui-radius-5`. A numbered `.rounded-{n}`
+  writes the token as well, so `.rounded-3 .rounded-top` keeps the top on
+  size 3; a side class with its own number (`.rounded-top-3`) sets that side
+  directly.
 - **The derived colour utilities compose with their opacity classes.**
   `.bg-*-subtle`, `.bg-*-muted`, `.border-*-subtle` and `.text-*-emphasis` each
   wrote the property directly, so `.bg-opacity-50` on a `.bg-primary-subtle`

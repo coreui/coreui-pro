@@ -2,7 +2,7 @@
 title: "Bootstrap 6 Border Color"
 name: "Border color"
 description: "Change the border color of an element with utilities built on our theme colors, and fade it with the opacity utilities."
-utility: [{prefix: "border", property: "border-color"}, "border-opacity"]
+utility: [{prefix: "border", property: "border-color"}, "border-color-subtle", "border-opacity"]
 ---
 
 import { getData } from '@coreui/astro-docs/data'
@@ -12,7 +12,7 @@ import { getData } from '@coreui/astro-docs/data'
 Change the border color using utilities built on our theme colors.
 
 <Example class="docs-example-border-utils" code={[...getData('theme-colors').map((c) => `<span class="border border-${c.name}"></span>
-  <span class="border border-${c.name}-subtle"></span>`), ``, `<span class="border border-black"></span>
+  <span class="border border-subtle-${c.name}"></span>`), ``, `<span class="border border-black"></span>
   <span class="border border-white"></span>`]} />
 
 ## Neutral
@@ -54,50 +54,38 @@ The same utilities repaint the border a component ships with:
     <input type="email" class="form-control border-success" id="exampleFormControlInput1" placeholder="name@example.com">
   </div>
 
-  <div class="h4 pb-2 mb-4 text-danger border-bottom border-danger">
+  <div class="h4 pb-2 mb-4 fg-danger border-bottom border-danger">
     Dangerous heading
   </div>
 
-  <div class="p-3 bg-info bg-opacity-10 border border-info border-start-0 rounded-end">
+  <div class="p-3 bg-info bg-10 border border-info border-start-0 rounded-end">
     Changing border color and width
   </div>`} />
 
 ## Opacity
 
-<AddedIn version="4.2.6" />
-
-Every `.border-{color}` utility resolves its color in the browser, so both the color and its alpha transparency can change without recompiling Sass.
-
-### How it works
-
-Consider our default `.border-success` utility.
+Every `.border-{color}` utility writes its colour into `--cui-border` and reads it back, so a companion `.border-{percentage}` class can mix that colour with `transparent` through `color-mix()`, in the browser, without recompiling Sass.
 
 ```css
 .border-success {
-  --cui-border: var(--cui-success-base);
-  --cui-border-opacity: 1;
-  border-color: color-mix(in srgb, var(--cui-border) calc(var(--cui-border-opacity) * 100%), transparent);
+  --cui-border: var(--cui-success-bg);
+  border-color: var(--cui-border);
+}
+
+.border-50 {
+  border-color: color-mix(in oklch, var(--cui-border) 50%, transparent);
 }
 ```
 
-The utility points `--cui-border` at the theme color and sets `--cui-border-opacity` to `1`. `color-mix()` then fades that color toward `transparent` by whatever share the opacity leaves, so `.border-success` computes to the solid color by default.
-
-Both halves are separate knobs: override `--cui-border` to repaint the utility with another color, or `--cui-border-opacity` to change only the alpha. Both are declared on the class itself, so a nested instance of the utility starts from the default again instead of inheriting a modified transparency.
-
-### Example
-
-To change that opacity, override `--cui-border-opacity` via custom styles or inline styles.
+Override `--cui-border` to repaint the utility with another colour; the opacity class keeps working, because it reads whatever the token holds.
 
 <Example code={`<div class="border border-success p-2 mb-2">This is default success border</div>
-  <div class="border border-success p-2" style="--cui-border-opacity: .5;">This is 50% opacity success border</div>`} />
+<div class="border border-success p-2 mb-2 border-70">This is 70% opacity success border</div>
+<div class="border border-success p-2 mb-2 border-50">This is 50% opacity success border</div>
+<div class="border border-success p-2 mb-2 border-30">This is 30% opacity success border</div>
+<div class="border border-success p-2 border-10">This is 10% opacity success border</div>`} />
 
-Or, choose from any of the `.border-opacity` utilities:
-
-<Example code={`<div class="border border-success p-2 mb-2">This is default success border</div>
-  <div class="border border-success p-2 mb-2 border-opacity-75">This is 75% opacity success border</div>
-  <div class="border border-success p-2 mb-2 border-opacity-50">This is 50% opacity success border</div>
-  <div class="border border-success p-2 mb-2 border-opacity-25">This is 25% opacity success border</div>
-  <div class="border border-success p-2 border-opacity-10">This is 10% opacity success border</div>`} />
+`.border-opacity-{10|25|50|75|100}` and `.border-{color}-subtle` are the deprecated v5 spellings of `.border-{percentage}` and `.border-subtle-{color}`; they still render and are removed in v7.
 
 ## Customizing
 

@@ -14,9 +14,9 @@ $card-title-color:                  inherit !default;
 $card-subtitle-color:               inherit !default;
 $card-border-width:                 var(--#{$prefix}border-width) !default;
 $card-border-color:                 var(--#{$prefix}border-color-translucent) !default;
-$card-border-radius:                var(--#{$prefix}radius-7) !default;
+$card-border-radius:                var(--#{$prefix}radius-8) !default;
 $card-box-shadow:                   none !default;
-$card-inner-border-radius:          calc(#{$card-border-radius} - #{$card-border-width}) !default;
+$card-inner-border-radius:          calc(var(--#{$prefix}card-border-radius) - var(--#{$prefix}card-border-width)) !default;
 $card-cap-padding-y:                calc(#{$card-spacer-y} * .5) !default;
 $card-cap-padding-x:                $card-spacer-x !default;
 $card-cap-bg:                       var(--#{$prefix}bg-1) !default;
@@ -124,8 +124,6 @@ $card-tokens: defaults(
     }
   }
 
-  // The body aligns its children to the start so a button keeps its own width;
-  // text has to opt back into the full column.
   .card-title,
   .card-subtitle,
   .card-text {

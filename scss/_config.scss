@@ -74,6 +74,7 @@ $spacers: defaults(
   ),
   $spacers
 );
+// scss-docs-end spacers-map
 
 // scss-docs-start negative-spacers-map
 $negative-spacers: () !default;
@@ -108,13 +109,6 @@ $sizes: defaults(
   $sizes
 );
 // scss-docs-end sizes-map
-// scss-docs-end spacers-map
-
-// Style anchor elements.
-
-$link-decoration:                         underline !default;
-$link-underline-offset:                   .2em !default;
-$link-hover-decoration:                   null !default;
 
 // Define the minimum dimensions at which your layout will change,
 // adapting to different screen sizes, for use in media queries.
@@ -168,7 +162,7 @@ $gutters:                     $spacers !default;
 $container-padding-x: $grid-gutter-x !default;
 
 // scss-docs-start variable-gradient
-$gradient: linear-gradient(180deg, color-mix(in srgb, var(--#{$prefix}white) 15%, transparent), color-mix(in srgb, var(--#{$prefix}white) 0%, transparent)) !default;
+$gradient: linear-gradient(180deg, color-mix(in oklch, var(--#{$prefix}white) 15%, transparent), color-mix(in oklch, var(--#{$prefix}white) 0%, transparent)) !default;
 // scss-docs-end variable-gradient
 
 // scss-docs-start position-map
@@ -207,13 +201,6 @@ $border-widths: defaults(
   $border-widths
 );
 // scss-docs-end border-widths-map
-
-// scss-docs-start border-radius-variables
-$border-radius:               .375rem !default;
-$border-radius-sm:            .25rem !default;
-$border-radius-lg:            .5rem !default;
-$border-radius-pill:          50rem !default;
-// scss-docs-end border-radius-variables
 
 // scss-docs-start radius-variables
 $radius:                      .5rem !default;
@@ -273,7 +260,6 @@ $shadows: (
   inset: inset 0 1px 2px light-dark(color-mix(in oklch, var(--#{$prefix}shadow-tint, var(--#{$prefix}shadow-color)) calc(8% * var(--#{$prefix}shadow-opacity, 1)), transparent), color-mix(in oklch, var(--#{$prefix}shadow-tint, var(--#{$prefix}shadow-color)) calc(26% * var(--#{$prefix}shadow-opacity, 1)), transparent)),
 ) !default;
 // scss-docs-end box-shadow-variables
-
 
 // Font, line-height, and color for body text, headings, and more.
 

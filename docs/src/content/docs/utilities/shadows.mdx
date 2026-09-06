@@ -25,7 +25,7 @@ A shadow does not have to be grey. Add a `.shadow-{color}` class next to the siz
     <div class="shadow shadow-primary p-3 bg-body rounded">Primary</div>
     <div class="shadow shadow-success p-3 bg-body rounded">Success</div>
     <div class="shadow shadow-danger p-3 bg-body rounded">Danger</div>
-    <div class="shadow shadow-current p-3 bg-body rounded text-info">Current color</div>
+    <div class="shadow shadow-current p-3 bg-body rounded fg-info">Current color</div>
   </div>`} />
 
 The tint does not reach nested shadows: an element inside a `.shadow-primary` box draws its own shadow in the default colour, so a tinted card does not silently recolour everything inside it.
@@ -38,12 +38,12 @@ The tint does not reach nested shadows: an element inside a `.shadow-primary` bo
 
 <AddedIn version="6.0.0" />
 
-`.shadow-opacity-{25|50|75|100}` scales the shadow without touching its colour or geometry, which is the usual way to soften a shadow on a busy surface.
+`.shadow-opacity-{10…100}`, in steps of ten, scales the shadow without touching its colour or geometry, which is the usual way to soften a shadow on a busy surface. `.shadow-opacity-25` and `-75` are deprecated v5 steps, removed in v7.
 
 <Example code={`<div class="d-flex flex-wrap gap-4">
-    <div class="shadow shadow-opacity-25 p-3 bg-body rounded">25%</div>
+    <div class="shadow shadow-opacity-30 p-3 bg-body rounded">30%</div>
     <div class="shadow shadow-opacity-50 p-3 bg-body rounded">50%</div>
-    <div class="shadow shadow-opacity-75 p-3 bg-body rounded">75%</div>
+    <div class="shadow shadow-opacity-70 p-3 bg-body rounded">70%</div>
     <div class="shadow shadow-opacity-100 p-3 bg-body rounded">100%</div>
   </div>`} />
 

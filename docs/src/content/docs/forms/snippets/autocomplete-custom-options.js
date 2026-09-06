@@ -95,7 +95,7 @@ new coreui.Autocomplete(myAutocompleteCountriesAndCities, {
   indicator: true,
   options: cities,
   optionsGroupsTemplate(optionGroup) {
-    return `<div class="d-flex align-items-center gap-2"><span class="text-body fs-5">${optionGroup.flag}</span><span>${optionGroup.label}</span></div>`
+    return `<div class="d-flex align-items-center gap-2"><span class="fg-body fs-5">${optionGroup.flag}</span><span>${optionGroup.label}</span></div>`
   },
   placeholder: 'Select city',
   showHints: true,

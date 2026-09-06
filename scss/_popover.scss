@@ -13,7 +13,7 @@ $popover-max-width:                 276px !default;
 $popover-border-width:              var(--#{$prefix}border-width) !default;
 $popover-border-color:              var(--#{$prefix}border-color-translucent) !default;
 $popover-border-radius:             var(--#{$prefix}radius-7) !default;
-$popover-inner-border-radius:       calc(#{$popover-border-radius} - #{$popover-border-width}) !default;
+$popover-inner-border-radius:       calc(var(--#{$prefix}popover-border-radius) - var(--#{$prefix}popover-border-width)) !default;
 $popover-box-shadow:                var(--#{$prefix}box-shadow) !default;
 
 $popover-header-font-size:          var(--#{$prefix}body-font-size) !default;

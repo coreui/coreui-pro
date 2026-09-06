@@ -23,7 +23,7 @@ Add classes to an element to easily round its corners.
 
 ## Sizing
 
-Use the scaling classes for larger or smaller rounded corners. Sizes range from `0` to `5` including `circle` and `pill`, and can be configured by modifying the utilities API.
+Use the scaling classes for larger or smaller rounded corners. Sizes range from `0` to `9` — the stops of the `$radii` scale, `--cui-radius-0` through `--cui-radius-9` — plus `circle` and `pill`, and can be configured by modifying the utilities API. `.rounded` without a number is size `5`, the radius buttons and form controls use.
 
 <Example class="docs-example-rounded-utils" code={`<svg class="docs-placeholder-img rounded-0" width="75" height="75" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Example non-rounded image" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Example non-rounded image</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text></svg>
   <svg class="docs-placeholder-img rounded-1" width="75" height="75" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Example small rounded image" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Example small rounded image</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text></svg>
@@ -31,6 +31,10 @@ Use the scaling classes for larger or smaller rounded corners. Sizes range from 
   <svg class="docs-placeholder-img rounded-3" width="75" height="75" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Example large rounded image" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Example large rounded image</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text></svg>
   <svg class="docs-placeholder-img rounded-4" width="75" height="75" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Example larger rounded image" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Example larger rounded image</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text></svg>
   <svg class="docs-placeholder-img rounded-5" width="75" height="75" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Example extra large rounded image" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Example extra large rounded image</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text></svg>
+  <svg class="docs-placeholder-img rounded-6" width="75" height="75" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Example rounded image, size 6" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Example rounded image, size 6</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text></svg>
+  <svg class="docs-placeholder-img rounded-7" width="75" height="75" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Example rounded image, size 7" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Example rounded image, size 7</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text></svg>
+  <svg class="docs-placeholder-img rounded-8" width="75" height="75" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Example rounded image, size 8" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Example rounded image, size 8</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text></svg>
+  <svg class="docs-placeholder-img rounded-9" width="75" height="75" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Example rounded image, size 9" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Example rounded image, size 9</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text></svg>
   <svg class="docs-placeholder-img rounded-circle" width="75" height="75" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Completely round image" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Completely round image</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text></svg>
   <svg class="docs-placeholder-img rounded-pill" width="150" height="75" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Rounded pill image" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Rounded pill image</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text></svg>`} />
 
@@ -44,7 +48,7 @@ Use the scaling classes for larger or smaller rounded corners. Sizes range from 
     <div class="rounded bg-3 p-4">All</div>
   </div>`} />
 
-Without a `.rounded-size-*` in scope the corner classes fall back to `--cui-border-radius`, so existing markup is unaffected. Numbered classes such as `.rounded-3` and `.rounded-top-3` set their own value and ignore the token.
+Without a `.rounded-size-*` in scope the corner classes fall back to `--cui-radius-5`. A numbered `.rounded-{n}` also writes the token, so `.rounded-3 .rounded-top` keeps the top corners on size 3 while a side class with its own number (`.rounded-top-3`) sets that side directly and ignores the token.
 
 ## Customizing
 
@@ -61,8 +65,6 @@ The radius scale is emitted on `:root` as `--cui-radius-0` through `--cui-radius
 <ScssDocs file="scss/_config.scss" capture="radius-variables" />
 
 
-<ScssDocs file="scss/_config.scss" capture="border-radius-variables" />
-<ScssDocs file="scss/_root.scss" capture="border-radius-variables" />
 
 ### Sass maps
 

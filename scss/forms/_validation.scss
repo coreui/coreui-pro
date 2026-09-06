@@ -43,7 +43,7 @@ $validated-controls: if(sass($enable-deprecated-form-check): ".check, .radio, .s
     width: 100%;
     margin-top: var(--#{$prefix}form-feedback-margin-top);
     font-size: var(--#{$prefix}form-feedback-font-size);
-    font-style: var(--#{$prefix}form-feedback-font-style);
+    font-style: var(--#{$prefix}form-feedback-font-style, inherit);
     color: $color;
   }
 
@@ -60,7 +60,7 @@ $validated-controls: if(sass($enable-deprecated-form-check): ".check, .radio, .s
     padding: var(--#{$prefix}tooltip-padding-y, var(--#{$prefix}form-feedback-tooltip-padding-y)) var(--#{$prefix}tooltip-padding-x, var(--#{$prefix}form-feedback-tooltip-padding-x));
     margin-top: .1rem;
     font-size: var(--#{$prefix}tooltip-font-size, var(--#{$prefix}form-feedback-tooltip-font-size));
-    line-height: var(--#{$prefix}form-feedback-tooltip-line-height);
+    line-height: var(--#{$prefix}form-feedback-tooltip-line-height, inherit);
     color: $tooltip-color;
     background-color: var(--#{$prefix}#{$theme}-bg);
     opacity: 1;
@@ -167,6 +167,32 @@ $validated-controls: if(sass($enable-deprecated-form-check): ".check, .radio, .s
         width: calc(var(--#{$prefix}control-color-width) + #{$input-height-inner});
       }
     }
+  }
+
+  // Range — the validation class lives on .form-range-input, while feedback sits outside
+  // the .form-range wrapper, so we use :has() to toggle it.
+  // stylelint-disable selector-no-qualifying-type
+  .form-range-input,
+  input.form-range {
+    @include form-validation-state-selector($state) {
+      &::-webkit-slider-thumb { background: var(--#{$prefix}#{$theme}-bg); }
+      &::-moz-range-thumb { background: var(--#{$prefix}#{$theme}-bg); }
+
+      &:focus-visible {
+        &::-webkit-slider-thumb {
+          @include focus-ring(true, $color: $focus-ring-color);
+        }
+        &::-moz-range-thumb {
+          @include focus-ring(true, $color: $focus-ring-color);
+        }
+      }
+    }
+  }
+  // stylelint-enable selector-no-qualifying-type
+
+  .form-range:has(.form-range-input.is-#{$state}) {
+    ~ .#{$state}-feedback,
+    ~ .#{$state}-tooltip { display: block; }
   }
 
   #{$validated-controls} {

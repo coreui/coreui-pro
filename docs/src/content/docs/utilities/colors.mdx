@@ -2,7 +2,7 @@
 title: "Bootstrap 6 Colors"
 name: "Colors"
 description: "Convey meaning through `color` with a handful of color utility classes. Includes support for styling links with hover states, too."
-utility: [{prefix: "text", property: "color"}, "text-opacity"]
+utility: ["fg", "fg-emphasis", "fg-contrast", "fg-opacity"]
 ---
 
 import { getData } from '@coreui/astro-docs/data'
@@ -12,32 +12,17 @@ import { getData } from '@coreui/astro-docs/data'
 Colorize text with color utilities. To colorize a link, give it a [theme class](/customize/theme/) instead — Reboot resolves a link's colour from the theme, and the theme slot carries a hover tone with it. See [link utilities](/utilities/link/).
 
 <Example code={[
-  ...getData('theme-colors').map((c) => `<p class="text-${c.name}">.text-${c.name}</p>
-<p class="text-${c.name}-emphasis">.text-${c.name}-emphasis</p>`),
-  `<p class="text-body">.text-body</p>
-<p class="text-body-emphasis">.text-body-emphasis</p>
+  ...getData('theme-colors').map((c) => `<p class="fg-${c.name}">.fg-${c.name}</p>
+<p class="fg-emphasis-${c.name}">.fg-emphasis-${c.name}</p>`),
+  `<p class="fg-body">.fg-body</p>
 
-<p class="text-black bg-white">.text-black</p>
-<p class="text-white bg-black">.text-white</p>
-<p class="text-black-50 bg-white">.text-black-50</p>
-<p class="text-white-50 bg-black">.text-white-50</p>`
+<p class="fg-black bg-white">.fg-black</p>
+<p class="fg-white bg-black">.fg-white</p>`
 ]} />
 
 <Callout color="warning">
-**Deprecation:** `.text-black-50` and `.text-white-50` still ship, but `.text-opacity-*` composes with any text color and is the spelling to reach for. Write `.text-black.text-opacity-50` instead.
+**Deprecation:** the v5 spellings — `.text-{color}`, `.text-{color}-emphasis`, `.text-body`, `.text-black`, `.text-white`, `.text-reset`, `.text-muted`, `.text-body-secondary`, `.text-body-tertiary`, `.text-black-50` and `.text-white-50` — still ship and render the same, but are removed in v7. Write `.fg-{color}`, `.fg-emphasis-{color}`, `.fg-body`, `.fg-black`, `.fg-white`, `.fg-reset`, `.fg-2`, `.fg-3` and `.fg-black.fg-50`.
 </Callout>
-
-## Foreground ladder
-
-The neutral text hierarchy is a ladder, mirroring the [surface ladder](/utilities/background/#surface-ladder): `.fg-body` is the body text color and the numbers step away from it — `.fg-1` barely, `.fg-4` down to a watermark. The `.text-opacity-*` knob composes with all of them.
-
-<Example code={`<p class="fg-body">.fg-body</p>
-<p class="fg-1">.fg-1</p>
-<p class="fg-2">.fg-2</p>
-<p class="fg-3">.fg-3</p>
-<p class="fg-4">.fg-4</p>`} />
-
-`.text-body-secondary` and `.text-body-tertiary` are deprecated names for `.fg-2` and `.fg-3` — they render identically and go away in v7.
 
 <Callout color="info">
 ##### Conveying meaning to assistive technologies
@@ -45,48 +30,68 @@ The neutral text hierarchy is a ladder, mirroring the [surface ladder](/utilitie
 Relying on color to convey meaning creates a visual cue that assistive technologies, like screen readers, cannot perceive. It's essential that any information represented by color is either apparent from the content itself (e.g., the visible text) or supplemented by alternative methods, such as extra text using the `.visually-hidden` class.
 </Callout>
 
+## Foreground ladder
+
+The neutral text hierarchy is a ladder, mirroring the [surface ladder](/utilities/background/#surface-ladder): `.fg-body` is the body text color and the numbers step away from it — `.fg-1` barely, `.fg-4` down to a watermark. The `.fg-{percentage}` opacity utilities compose with all of them.
+
+<Example code={`<p class="fg-body">.fg-body</p>
+<p class="fg-1">.fg-1</p>
+<p class="fg-2">.fg-2</p>
+<p class="fg-3">.fg-3</p>
+<p class="fg-4">.fg-4</p>`} />
+
+`.fg-2` and `.fg-3` are deprecated names for `.fg-2` and `.fg-3` — they render identically and go away in v7.
+
 ## Opacity
 
-<AddedIn version="4.1.0" />
-
-Every `.text-*` utility resolves its color in the browser, so both the color and its alpha transparency can change without recompiling Sass.
-
-### How it works
-
-Consider our default `.text-primary` utility.
+Every `.fg-*` utility writes its colour into `--cui-fg` and reads it back, so a companion `.fg-{percentage}` class can mix that colour with `transparent` through `color-mix()`, in the browser, without recompiling Sass.
 
 ```css
-.text-primary {
-  --cui-text: var(--cui-primary-base);
-  --cui-text-opacity: 1;
-  color: color-mix(in srgb, var(--cui-text) calc(var(--cui-text-opacity) * 100%), transparent);
+.fg-primary {
+  --cui-fg: var(--cui-primary-fg);
+  color: var(--cui-fg);
+}
+
+.fg-50 {
+  color: color-mix(in oklch, var(--cui-fg) 50%, transparent);
 }
 ```
 
-The utility points `--cui-text` at the theme color and sets `--cui-text-opacity` to `1`. `color-mix()` then fades that color toward `transparent` by whatever share the opacity leaves, so `.text-primary` computes to the solid color by default.
+Override `--cui-fg` to repaint the utility with another colour; the opacity class keeps working, because it reads whatever the token holds.
 
-Both halves are separate knobs: override `--cui-text` to repaint the utility with another color, or `--cui-text-opacity` to change only the alpha. Both are declared on the class itself, so a nested instance of the utility starts from the default again instead of inheriting a modified transparency.
+<Example class="d-flex flex-column gap-2" code={`<div class="fg-primary">This is default primary text</div>
+<div class="fg-primary fg-90">This is 90% opacity primary text</div>
+<div class="fg-primary fg-80">This is 80% opacity primary text</div>
+<div class="fg-primary fg-70">This is 70% opacity primary text</div>
+<div class="fg-primary fg-60">This is 60% opacity primary text</div>
+<div class="fg-primary fg-50">This is 50% opacity primary text</div>
+<div class="fg-primary fg-40">This is 40% opacity primary text</div>
+<div class="fg-primary fg-30">This is 30% opacity primary text</div>
+<div class="fg-primary fg-20">This is 20% opacity primary text</div>
+<div class="fg-primary fg-10">This is 10% opacity primary text</div>`} />
 
-### Example
+`.text-opacity-{25|50|75|100}` are the deprecated v5 names of the same knob and are removed in v7.
 
-To change that opacity, override `--cui-text-opacity` via custom styles or inline styles.
+## Contrast colors
 
-<Example code={`<div class="text-primary">This is default primary text</div>
-  <div class="text-primary" style="--cui-text-opacity: .5;">This is 50% opacity primary text</div>`} />
+`.fg-contrast-{color}` sets `--cui-fg` to the theme colour's `contrast` slot — the text colour that reads on the solid colour — so a label on a `.bg-{color}` surface picks the right ink without naming it.
 
-Or, choose from any of the `.text-opacity` utilities:
+<Example code={[
+  ...getData('theme-colors').map((c) => `<p class="bg-${c.name} fg-contrast-${c.name} p-2">.fg-contrast-${c.name}</p>`)
+]} />
 
-<Example code={`<div class="text-primary">This is default primary text</div>
-  <div class="text-primary text-opacity-75">This is 75% opacity primary text</div>
-  <div class="text-primary text-opacity-50">This is 50% opacity primary text</div>
-  <div class="text-primary text-opacity-25">This is 25% opacity primary text</div>`} />
+These compose with the opacity utilities too.
+
+<Example class="d-flex flex-column gap-2" code={`<p class="bg-primary fg-contrast-primary fg-100 p-2">.fg-contrast-primary .fg-100</p>
+<p class="bg-primary fg-contrast-primary fg-70 p-2">.fg-contrast-primary .fg-70</p>
+<p class="bg-primary fg-contrast-primary fg-40 p-2">.fg-contrast-primary .fg-40</p>`} />
 
 ## Reset color
 
-Reset a text or link's color with `.text-reset`, so that it inherits the color from its parent.
+Reset a text or link's color with `.fg-reset`, so that it inherits the color from its parent.
 
-<Example code={`<p class="text-body-secondary">
-    Secondary body text with a <a href="#" class="text-reset">reset link</a>.
+<Example code={`<p class="fg-2">
+    Secondary body text with a <a href="#" class="fg-reset">reset link</a>.
   </p>`} />
 
 ## Specificity

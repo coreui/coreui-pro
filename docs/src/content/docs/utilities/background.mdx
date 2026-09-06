@@ -8,18 +8,18 @@ import { getData } from '@coreui/astro-docs/data'
 
 ## Background color
 
-Similar to the contextual text color classes, set the background of an element to any contextual class. Background utilities **do not set `color`**, so in some cases you'll want to use `.text-*` [color utilities](/utilities/colors/).
+Similar to the contextual text color classes, set the background of an element to any contextual class. Background utilities **do not set `color`**, so in some cases you'll want to use `.fg-*` [color utilities](/utilities/colors/).
 
-Each theme color comes in three weights: the solid color, `.bg-*-muted` and `.bg-*-subtle`. The two lighter ones are surfaces to read text on, and `.text-*-emphasis` is the color that reads on them — `.bg-*-muted` is the step you want when a subtle surface has to separate from a subtle surface behind it, which is what a hovered row or a selected item needs.
+Each theme color comes in three weights: the solid color, `.bg-muted-*` and `.bg-subtle-*`. The two lighter ones are surfaces to read text on, and `.fg-emphasis-*` is the color that reads on them — `.bg-muted-*` is the step you want when a subtle surface has to separate from a subtle surface behind it, which is what a hovered row or a selected item needs.
 
 <Example code={[
   ...getData('theme-colors').map((c) => `<div class="p-3 mb-2 text-bg-${c.name}">.bg-${c.name}</div>
-<div class="p-3 mb-2 bg-${c.name}-muted text-${c.name}-emphasis">.bg-${c.name}-muted</div>
-<div class="p-3 mb-2 bg-${c.name}-subtle text-${c.name}-emphasis">.bg-${c.name}-subtle</div>`),
-  `<div class="p-3 mb-2 bg-body text-body">.bg-body</div>
-<div class="p-3 mb-2 bg-black text-white">.bg-black</div>
-<div class="p-3 mb-2 bg-white text-black">.bg-white</div>
-<div class="p-3 mb-2 bg-transparent text-body">.bg-transparent</div>`
+<div class="p-3 mb-2 bg-muted-${c.name} fg-emphasis-${c.name}">.bg-muted-${c.name}</div>
+<div class="p-3 mb-2 bg-subtle-${c.name} fg-emphasis-${c.name}">.bg-subtle-${c.name}</div>`),
+  `<div class="p-3 mb-2 bg-body fg-body">.bg-body</div>
+<div class="p-3 mb-2 bg-black fg-white">.bg-black</div>
+<div class="p-3 mb-2 bg-white fg-black">.bg-white</div>
+<div class="p-3 mb-2 bg-transparent fg-body">.bg-transparent</div>`
 ]} />
 
 ## Surface ladder
@@ -40,44 +40,33 @@ By adding a `.bg-gradient` class, a linear gradient is added as background image
 
 Do you need a gradient in your custom CSS? Read the token: `background-image: var(--cui-gradient);`.
 
-<Example code={[`<div class="p-3 mb-2 text-bg-primary bg-gradient">.bg-primary.bg-gradient</div>`, `<div class="p-3 mb-2 text-bg-secondary bg-gradient">.bg-secondary.bg-gradient</div>`, `<div class="p-3 mb-2 text-bg-success bg-gradient">.bg-success.bg-gradient</div>`, `<div class="p-3 mb-2 text-bg-danger bg-gradient">.bg-danger.bg-gradient</div>`, `<div class="p-3 mb-2 text-bg-warning bg-gradient">.bg-warning.bg-gradient</div>`, `<div class="p-3 mb-2 text-bg-info bg-gradient">.bg-info.bg-gradient</div>`, `<div class="p-3 mb-2 bg-black bg-gradient text-white">.bg-black.bg-gradient</div>`]} />
+<Example code={[`<div class="p-3 mb-2 text-bg-primary bg-gradient">.bg-primary.bg-gradient</div>`, `<div class="p-3 mb-2 text-bg-secondary bg-gradient">.bg-secondary.bg-gradient</div>`, `<div class="p-3 mb-2 text-bg-success bg-gradient">.bg-success.bg-gradient</div>`, `<div class="p-3 mb-2 text-bg-danger bg-gradient">.bg-danger.bg-gradient</div>`, `<div class="p-3 mb-2 text-bg-warning bg-gradient">.bg-warning.bg-gradient</div>`, `<div class="p-3 mb-2 text-bg-info bg-gradient">.bg-info.bg-gradient</div>`, `<div class="p-3 mb-2 bg-black bg-gradient fg-white">.bg-black.bg-gradient</div>`]} />
 
 ## Opacity
 
-<AddedIn version="4.1.0" />
-
-Every `.bg-*` utility resolves its color in the browser, so both the color and its alpha transparency can change without recompiling Sass.
-
-### How it works
-
-Consider our default `.bg-success` utility.
+Every `.bg-*` utility writes its colour into `--cui-bg` and reads it back, so a companion `.bg-{percentage}` class can mix that colour with `transparent` through `color-mix()`, in the browser, without recompiling Sass.
 
 ```css
 .bg-success {
-  --cui-bg: var(--cui-success-base);
-  --cui-bg-opacity: 1;
-  background-color: color-mix(in srgb, var(--cui-bg) calc(var(--cui-bg-opacity) * 100%), transparent);
+  --cui-bg: var(--cui-success-bg);
+  background-color: var(--cui-bg);
+}
+
+.bg-50 {
+  background-color: color-mix(in oklch, var(--cui-bg) 50%, transparent);
 }
 ```
 
-The utility points `--cui-bg` at the theme color and sets `--cui-bg-opacity` to `1`. `color-mix()` then fades that color toward `transparent` by whatever share the opacity leaves, so `.bg-success` computes to the solid color by default.
+Override `--cui-bg` to repaint the utility with another colour; the opacity class keeps working, because it reads whatever the token holds.
 
-Both halves are separate knobs: override `--cui-bg` to repaint the utility with another color, or `--cui-bg-opacity` to change only the alpha. Both are declared on the class itself, so a nested instance of the utility starts from the default again instead of inheriting a modified transparency.
+<Example class="d-flex flex-column gap-2" code={`<div class="text-bg-success p-2">This is default success background</div>
+<div class="bg-success p-2 bg-90">This is 90% opacity success background</div>
+<div class="bg-success p-2 bg-70">This is 70% opacity success background</div>
+<div class="bg-success p-2 bg-50">This is 50% opacity success background</div>
+<div class="bg-success p-2 bg-30">This is 30% opacity success background</div>
+<div class="bg-success p-2 bg-10">This is 10% opacity success background</div>`} />
 
-### Example
-
-To change that opacity, override `--cui-bg-opacity` via custom styles or inline styles.
-
-<Example code={`<div class="text-bg-success p-2">This is default success background</div>
-  <div class="bg-success p-2" style="--cui-bg-opacity: .5;">This is 50% opacity success background</div>`} />
-
-Or, choose from any of the `.bg-opacity` utilities:
-
-<Example code={`<div class="text-bg-success p-2">This is default success background</div>
-  <div class="bg-success p-2 bg-opacity-75">This is 75% opacity success background</div>
-  <div class="bg-success p-2 bg-opacity-50">This is 50% opacity success background</div>
-  <div class="bg-success p-2 bg-opacity-25">This is 25% opacity success background</div>
-  <div class="bg-success p-2 bg-opacity-10">This is 10% opacity success background</div>`} />
+`.bg-opacity-{10|15|25|50|75|100}` and `.bg-{color}-subtle` / `.bg-{color}-muted` are the deprecated v5 spellings of `.bg-{percentage}`, `.bg-subtle-{color}` and `.bg-muted-{color}`; they still render and are removed in v7.
 
 ## Customizing
 

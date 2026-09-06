@@ -71,9 +71,9 @@ $inverse:       light-dark($gray-900, $gray-100) !default;
   $inverse:                       $inverse !default,
   $theme-fgs: (
     "body": light-dark($gray-900, $gray-300),
-    "1": light-dark(color-mix(in srgb, var(--bs-gray-900) 85%, transparent), color-mix(in srgb, var(--bs-gray-300) 85%, transparent)),
-    "2": light-dark(color-mix(in srgb, var(--bs-gray-900) 75%, transparent), color-mix(in srgb, var(--bs-gray-300) 75%, transparent)),
-    "3": light-dark(color-mix(in srgb, var(--bs-gray-900) 50%, transparent), color-mix(in srgb, var(--bs-gray-300) 50%, transparent)),
-    "4": light-dark(color-mix(in srgb, var(--bs-gray-900) 25%, transparent), color-mix(in srgb, var(--bs-gray-300) 25%, transparent)),
+    "1": light-dark(color-mix(in oklch, var(--bs-gray-900) 85%, transparent), color-mix(in oklch, var(--bs-gray-300) 85%, transparent)),
+    "2": light-dark(color-mix(in oklch, var(--bs-gray-900) 75%, transparent), color-mix(in oklch, var(--bs-gray-300) 75%, transparent)),
+    "3": light-dark(color-mix(in oklch, var(--bs-gray-900) 50%, transparent), color-mix(in oklch, var(--bs-gray-300) 50%, transparent)),
+    "4": light-dark(color-mix(in oklch, var(--bs-gray-900) 25%, transparent), color-mix(in oklch, var(--bs-gray-300) 25%, transparent)),
   ) !default,
 );

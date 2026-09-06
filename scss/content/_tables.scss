@@ -20,15 +20,15 @@ $table-accent-bg:             transparent !default;
 
 $table-striped-color:         var(--#{$prefix}table-color) !default;
 $table-striped-bg-factor:     5% !default;
-$table-striped-bg:            color-mix(in srgb, var(--#{$prefix}table-color) var(--#{$prefix}table-striped-bg-factor), transparent) !default;
+$table-striped-bg:            color-mix(in oklch, var(--#{$prefix}table-color) var(--#{$prefix}table-striped-bg-factor), transparent) !default;
 
 $table-active-color:          var(--#{$prefix}table-color) !default;
 $table-active-bg-factor:      10% !default;
-$table-active-bg:             color-mix(in srgb, var(--#{$prefix}table-color) var(--#{$prefix}table-active-bg-factor), transparent) !default;
+$table-active-bg:             color-mix(in oklch, var(--#{$prefix}table-color) var(--#{$prefix}table-active-bg-factor), transparent) !default;
 
 $table-hover-color:           var(--#{$prefix}table-color) !default;
 $table-hover-bg-factor:       7.5% !default;
-$table-hover-bg:              color-mix(in srgb, var(--#{$prefix}table-color) var(--#{$prefix}table-hover-bg-factor), transparent) !default;
+$table-hover-bg:              color-mix(in oklch, var(--#{$prefix}table-color) var(--#{$prefix}table-hover-bg-factor), transparent) !default;
 
 $table-border-width:          var(--#{$prefix}border-width) !default;
 $table-border-color:          var(--#{$prefix}border-color) !default;

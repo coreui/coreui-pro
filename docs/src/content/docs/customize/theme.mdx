@@ -100,24 +100,23 @@ Because the tokens are ordinary custom properties, they inherit: put a `.theme-*
 A new theme color is one entry in the map. Point the slots at the runtime scale and the library generates the tokens, the scale, and the `.theme-*` class for it:
 
 ```scss
-@use "sass:map";
-@use "@coreui/coreui/scss/theme" as *;
-
-$theme-colors: map.merge($theme-colors, (
-  "brand": (
-    "base":        #6f42c1,
-    "contrast":    #fff,
-    "fg":          light-dark(var(--cui-brand-600), var(--cui-brand-400)),
-    "fg-emphasis": light-dark(var(--cui-brand-800), var(--cui-brand-200)),
-    "bg-subtle":   light-dark(var(--cui-brand-100), var(--cui-brand-900)),
-    "bg-muted":    light-dark(var(--cui-brand-200), var(--cui-brand-800)),
-    "border":      light-dark(var(--cui-brand-300), var(--cui-brand-600)),
-    "focus-ring":  color-mix(in srgb, var(--cui-brand) calc(var(--cui-focus-ring-opacity) * 100%), transparent),
-  ),
-));
-
-@use "@coreui/coreui/scss/coreui";
+@use "@coreui/coreui/scss/coreui" with (
+  $theme-colors: (
+    "brand": (
+      "base":        #6f42c1,
+      "contrast":    #fff,
+      "fg":          light-dark(var(--cui-brand-600), var(--cui-brand-400)),
+      "fg-emphasis": light-dark(var(--cui-brand-800), var(--cui-brand-200)),
+      "bg-subtle":   light-dark(var(--cui-brand-100), var(--cui-brand-900)),
+      "bg-muted":    light-dark(var(--cui-brand-200), var(--cui-brand-800)),
+      "border":      light-dark(var(--cui-brand-300), var(--cui-brand-600)),
+      "focus-ring":  color-mix(in srgb, var(--cui-brand-base) calc(var(--cui-focus-ring-opacity) * 100%), transparent),
+    ),
+  )
+);
 ```
+
+Each theme color is a nested map and the merge is one level deep: pass the whole sub-map to change a built-in color, and set a color to `null` to remove it.
 
 For a runtime-only brand — no Sass compilation — set the generic tokens on a container instead, as shown in [the theme variants section](/customize/components/#theme-variants).
 

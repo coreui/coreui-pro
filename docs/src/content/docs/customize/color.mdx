@@ -322,9 +322,9 @@ To fade any of these colors, mix it toward `transparent` rather than reaching fo
 
 ### Using the colors
 
-These colors are accessible via CSS variables and utility classes—like `--cui-primary-bg-subtle` and `.bg-primary-subtle`—allowing you to compose your own CSS rules with the variables, or to quickly apply styles via classes. The utilities are built with the color's associated CSS variables, and since we customize those CSS variables for dark mode, they are also adaptive to color mode by default.
+These colors are accessible via CSS variables and utility classes—like `--cui-primary-bg-subtle` and `.bg-subtle-primary`—allowing you to compose your own CSS rules with the variables, or to quickly apply styles via classes. The utilities are built with the color's associated CSS variables, and since we customize those CSS variables for dark mode, they are also adaptive to color mode by default.
 
-<Example code={`<div class="p-3 text-primary-emphasis bg-primary-subtle border border-primary-subtle rounded-3">
+<Example code={`<div class="p-3 fg-emphasis-primary bg-subtle-primary border border-subtle-primary rounded-3">
     Example element with utilities
   </div>`} />
 
@@ -392,7 +392,7 @@ Be sure to monitor contrast ratios as you customize colors. As shown below, we'v
   </div>
 
   <div class="col-md-4 mb-3">
-    <div class="p-3 mb-2 docs-black text-white">
+    <div class="p-3 mb-2 docs-black fg-white">
       <strong class="d-block">$black</strong>
       #000
     </div>
@@ -463,7 +463,7 @@ palette, but you can generate them with the [utility API](/utilities/api/).
 3. Merge that map into the `values` of any utility group.
 
 Here's an example that generates text color utilities for every palette color and
-every theme color's emphasis tone (e.g., `.text-purple`, `.text-success`).
+every theme color's emphasis tone (e.g., `.text-purple`, `.fg-success`).
 
 ```scss
 // _my-colors.scss

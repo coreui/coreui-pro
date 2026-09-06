@@ -3,6 +3,7 @@
 @use "mixins/backdrop" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/box-shadow" as *;
+@use "mixins/dialog-shared" as *;
 @use "layout/breakpoints" as *;
 @use "mixins/ltr-rtl" as *;
 @use "mixins/tokens" as *;
@@ -293,10 +294,7 @@ $drawer-tokens: defaults(
   }
 
   .drawer-header {
-    display: flex;
-    flex-shrink: 0;
-    align-items: center;
-    padding: var(--#{$prefix}drawer-padding-y) var(--#{$prefix}drawer-padding-x);
+    @include dialog-header(var(--#{$prefix}drawer-padding-y) var(--#{$prefix}drawer-padding-x));
 
     .btn-close {
       margin-block: calc(-.5 * var(--#{$prefix}drawer-padding-y));
@@ -305,8 +303,7 @@ $drawer-tokens: defaults(
   }
 
   .drawer-title {
-    margin-bottom: 0;
-    line-height: var(--#{$prefix}drawer-title-line-height);
+    @include dialog-title(var(--#{$prefix}drawer-title-line-height));
   }
 
   .drawer-body {
@@ -314,22 +311,14 @@ $drawer-tokens: defaults(
     // the body instead of being clipped by the drawer's overflow.
     position: relative;
     display: flex;
-    flex: 1 1 auto;
     flex-direction: column;
     gap: var(--#{$prefix}drawer-padding-y);
+    @include dialog-body(var(--#{$prefix}drawer-padding-y) var(--#{$prefix}drawer-padding-x));
     min-height: 0; // allow the body to shrink for inner scrolling
-    padding: var(--#{$prefix}drawer-padding-y) var(--#{$prefix}drawer-padding-x);
     overflow-y: auto;
   }
 
   .drawer-footer {
-    display: flex;
-    flex-shrink: 0;
-    flex-wrap: wrap;
-    gap: .5rem;
-    align-items: center;
-    justify-content: flex-end;
-    padding: var(--#{$prefix}drawer-padding-y) var(--#{$prefix}drawer-padding-x);
-    border-block-start: var(--#{$prefix}drawer-border-width) solid var(--#{$prefix}drawer-border-color);
+    @include dialog-footer(var(--#{$prefix}drawer-padding-y) var(--#{$prefix}drawer-padding-x), .5rem, var(--#{$prefix}drawer-border-width), var(--#{$prefix}drawer-border-color));
   }
 }

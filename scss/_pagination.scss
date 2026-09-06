@@ -96,7 +96,7 @@ $pagination-sizes: defaults(
     padding: var(--#{$prefix}pagination-padding-y) var(--#{$prefix}pagination-padding-x);
     font-size: var(--#{$prefix}pagination-font-size);
     color: var(--#{$prefix}theme-fg, var(--#{$prefix}pagination-color));
-    text-decoration: if(not sass($link-decoration == none): none);
+    text-decoration: none;
     background-color: var(--#{$prefix}pagination-bg);
     border: var(--#{$prefix}pagination-border-width) solid var(--#{$prefix}pagination-border-color);
     @include transition($pagination-transition);
@@ -104,8 +104,6 @@ $pagination-sizes: defaults(
     &:hover {
       z-index: 2;
       color: var(--#{$prefix}theme-fg-emphasis, var(--#{$prefix}pagination-hover-color));
-      // stylelint-disable-next-line scss/at-function-named-arguments
-      text-decoration: if(sass($link-hover-decoration == underline): none);
       background-color: var(--#{$prefix}theme-bg-subtle, var(--#{$prefix}pagination-hover-bg));
       border-color: var(--#{$prefix}theme-border, var(--#{$prefix}pagination-hover-border-color));
     }

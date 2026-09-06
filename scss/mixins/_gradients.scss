@@ -43,7 +43,7 @@
   background-image: radial-gradient(circle, $inner-color, $outer-color);
 }
 
-@mixin gradient-striped($color: color-mix(in srgb, var(--#{$prefix}white) 15%, transparent), $angle: 45deg) {
+@mixin gradient-striped($color: color-mix(in oklch, var(--#{$prefix}white) 15%, transparent), $angle: 45deg) {
   background-image: linear-gradient($angle, $color 25%, transparent 25%, transparent 50%, $color 50%, $color 75%, transparent 75%, transparent);
 }
 // scss-docs-end gradient-mixins

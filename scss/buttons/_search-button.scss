@@ -9,7 +9,6 @@
 // scss-docs-start search-button-variables
 $search-button-height:              var(--#{$prefix}btn-input-min-height) !default;
 $search-button-padding-x:           var(--#{$prefix}btn-input-padding-x) !default;
-$search-button-font-family:         var(--#{$prefix}btn-input-font-family) !default;
 $search-button-font-size:           var(--#{$prefix}btn-input-font-size) !default;
 $search-button-font-weight:         var(--#{$prefix}btn-input-font-weight) !default;
 $search-button-color:               var(--#{$prefix}fg-2) !default;
@@ -49,7 +48,6 @@ $search-button-tokens: defaults(
   (
     --#{$prefix}search-button-height: #{$search-button-height},
     --#{$prefix}search-button-padding-x: #{$search-button-padding-x},
-    --#{$prefix}search-button-font-family: #{$search-button-font-family},
     --#{$prefix}search-button-font-size: #{$search-button-font-size},
     --#{$prefix}search-button-font-weight: #{$search-button-font-weight},
     --#{$prefix}search-button-color: #{$search-button-color},
@@ -88,7 +86,6 @@ $search-button-tokens: defaults(
     align-items: center;
     height: var(--#{$prefix}search-button-height);
     padding-inline: var(--#{$prefix}search-button-padding-x);
-    font-family: var(--#{$prefix}search-button-font-family);
     font-size: var(--#{$prefix}search-button-font-size);
     font-weight: var(--#{$prefix}search-button-font-weight);
     color: var(--#{$prefix}search-button-color);

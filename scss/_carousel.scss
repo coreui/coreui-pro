@@ -36,7 +36,7 @@ $carousel-control-icon-width:        2rem !default;
 
 $carousel-play-pause-size:           2.5rem !default;
 $carousel-play-pause-icon-width:     1rem !default;
-$carousel-play-pause-bg:             color-mix(in srgb, var(--#{$prefix}black) 25%, transparent) !default;
+$carousel-play-pause-bg:             color-mix(in oklch, var(--#{$prefix}black) 25%, transparent) !default;
 
 $carousel-control-prev-icon-bg:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0'/></svg>") !default;
 $carousel-control-next-icon-bg:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708'/></svg>") !default;
@@ -212,12 +212,12 @@ $carousel-tokens: defaults(
   .carousel-control-prev {
     inset-inline-start: 0;
     // stylelint-disable-next-line scss/at-function-named-arguments
-    background-image: if(sass($enable-gradients): linear-gradient(90deg, color-mix(in srgb, var(--#{$prefix}black) 25%, transparent), color-mix(in srgb, var(--#{$prefix}black) .1%, transparent)));
+    background-image: if(sass($enable-gradients): linear-gradient(90deg, color-mix(in oklch, var(--#{$prefix}black) 25%, transparent), color-mix(in oklch, var(--#{$prefix}black) .1%, transparent)));
   }
   .carousel-control-next {
     inset-inline-end: 0;
     // stylelint-disable-next-line scss/at-function-named-arguments
-    background-image: if(sass($enable-gradients): linear-gradient(270deg, color-mix(in srgb, var(--#{$prefix}black) 25%, transparent), color-mix(in srgb, var(--#{$prefix}black) .1%, transparent)));
+    background-image: if(sass($enable-gradients): linear-gradient(270deg, color-mix(in oklch, var(--#{$prefix}black) 25%, transparent), color-mix(in oklch, var(--#{$prefix}black) .1%, transparent)));
   }
 
   // Icons for within
@@ -350,7 +350,7 @@ $carousel-tokens: defaults(
       @media (prefers-reduced-motion: no-preference) {
         position: relative;
         overflow: hidden;
-        background-color: color-mix(in srgb, var(--#{$prefix}carousel-indicator-active-bg) 35%, transparent);
+        background-color: color-mix(in oklch, var(--#{$prefix}carousel-indicator-active-bg) 35%, transparent);
 
         &::after {
           position: absolute;

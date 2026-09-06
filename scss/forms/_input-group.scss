@@ -10,7 +10,7 @@
 $input-group-addon-padding-y:           var(--#{$prefix}btn-input-padding-y) !default;
 $input-group-addon-padding-x:           var(--#{$prefix}btn-input-padding-x) !default;
 $input-group-addon-font-weight:         var(--#{$prefix}btn-input-font-weight) !default;
-$input-group-addon-color:               var(--#{$prefix}btn-input-color) !default;
+$input-group-addon-color:               var(--#{$prefix}btn-input-fg) !default;
 $input-group-addon-bg:                  var(--#{$prefix}bg-2) !default;
 $input-group-addon-border-color:        var(--#{$prefix}btn-input-border-color) !default;
 // scss-docs-end input-group-variables
@@ -127,6 +127,7 @@ $input-group-tokens: defaults(
       --#{$prefix}control-padding-y: var(--#{$prefix}btn-input-#{$size}-padding-y);
       --#{$prefix}control-padding-x: var(--#{$prefix}btn-input-#{$size}-padding-x);
       --#{$prefix}control-font-size: var(--#{$prefix}btn-input-#{$size}-font-size);
+      --#{$prefix}control-line-height: var(--#{$prefix}btn-input-#{$size}-line-height);
       --#{$prefix}control-border-radius: var(--#{$prefix}btn-input-#{$size}-border-radius);
 
       padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
