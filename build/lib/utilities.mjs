@@ -65,20 +65,10 @@ const pathOf = dotted => dotted.split('.')
 
 const tokenMap = (dotted, mapValue) => new Map(entries(get(tokens, ...pathOf(dotted))).map(([key, token]) => [key, mapValue(token, key)]))
 
-const evaluate = value => {
-  if (typeof value === 'string') {
-    return value.startsWith('{') ? evaluate(valueOf(get(tokens, ...pathOf(value.slice(1, -1))))) : cssValue(value)
-  }
-
-  const [ref, factor] = value.get('multiply')
-  const base = /^(-?[\d.]+)([a-z%]*)$/.exec(valueOf(get(tokens, ...pathOf(ref.slice(1, -1)))))
-  return `${Math.round(Number(base[1]) * factor * 1e6) / 1e6}${base[2]}`
-}
-
 const sources = {
   $theme: (slot, source) => new Map(entries(get(tokens, 'color', 'theme')).map(([color]) => [`${color}${source.get('$suffix') ?? ''}`, `var(--cui-${color}-${slot})`])),
   $family: family => new Map(entries(get(tokens, 'color', family)).filter(([, token]) => valueOf(token) !== 'inherit').map(([key]) => [key, `var(--cui-${family}-${key})`])),
-  $scale: dotted => tokenMap(dotted, token => evaluate(valueOf(token))),
+  $scale: dotted => tokenMap(dotted, token => cssValue(valueOf(token))),
   $refs: dotted => tokenMap(dotted, (token, key) => `var(--cui-${cssName(`{${dotted}.${key}}`)})`),
   $tokens: dotted => tokenMap(dotted, token => cssValue(valueOf(token))),
   $opacity(property, source) {

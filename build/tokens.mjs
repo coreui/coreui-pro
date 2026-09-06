@@ -117,9 +117,9 @@ const BLOCKS = {
   },
   'scss/_config.scss': {
     'spacer-variables': () => scalars(new Map([['spacer', get(tokens, 'space', 'spacer')]]), 0),
-    'spacers-map': () => map({ name: 'spacers', body: rows(scale(['space', 'scale'], 'sass'), 0, '    ', true, false) }),
-    'negative-spacers-map': () => map({ name: 'negative-spacers', body: rows(scale(['space', 'negative'], 'sass'), 0, '    ', true) }),
-    'sizes-map': () => map({ name: 'sizes', body: rows(scale(['space', 'size'], 'sass'), 0, '    ', false, false) }),
+    'spacers-map': () => map({ name: 'spacers', body: rows(scale(['space', 'scale']), 0, '    ', true, false) }),
+    'negative-spacers-map': () => map({ name: 'negative-spacers', body: rows(scale(['space', 'negative']), 0, '    ', true) }),
+    'sizes-map': () => map({ name: 'sizes', body: rows(scale(['space', 'size']), 0, '    ', false, false) }),
     breakpoints: () => map({ name: 'breakpoints', plain: true, body: rows(scale(['breakpoint']), 0, '  ', false, false) }),
     'container-max-widths': () => map({ name: 'container-max-widths', body: rows(scale(['container']), 0, '    ', false, false) }),
     'border-widths-map': () => map({ name: 'border-widths', body: rows(scale(['border', 'width']), 0, '    ', false, false) }),
