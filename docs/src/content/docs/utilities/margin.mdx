@@ -76,7 +76,7 @@ Additionally, CoreUI for Bootstrap also includes an `.mx-auto` class for horizon
 
 ## Negative margin
 
-Two negative steps ship for the inline margins, `.me--1`, `.me--2`, `.ms--1` and `.ms--2`, for pulling an element back over its neighbour's gap. They come from the `$negative-spacers` map; add a key there to extend the set (`"-3": $spacer * -.75`), or set one to `null` to drop it. The block margins have no negative form.
+Two negative steps ship for the inline margins, `.me--1`, `.me--2`, `.ms--1` and `.ms--2`, for pulling an element back over its neighbour's gap. They come from the `$negative-spacers` map; add a key there to extend the set (`"-3": calc(var(--cui-spacer) * -.75)`), or set one to `null` to drop it. The block margins have no negative form.
 
 <ScssDocs file="scss/_config.scss" capture="negative-spacers-map" />
 
@@ -84,7 +84,7 @@ Two negative steps ship for the inline margins, `.me--1`, `.me--2`, `.ms--1` and
 
 ### Sass variables
 
-`$spacer` is the step the whole scale is built from, so changing it rescales every spacing utility at once.
+`$spacer` sets the default of `--cui-spacer`, the step the whole scale is built from: the stops `--cui-spacer-1` … `-9` are `calc()` multiples of it on `:root`, the utilities read the stops, so `:root { --cui-spacer: .75rem }` rescales every spacing utility at run time, no recompile.
 
 <ScssDocs file="scss/_config.scss" capture="spacer-variables" />
 

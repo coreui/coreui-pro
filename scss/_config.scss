@@ -1,3 +1,4 @@
+@use "sass:map";
 @use "functions/assert-ascending" as *;
 @use "functions/assert-starts-at-zero" as *;
 @use "functions/defaults" as *;
@@ -62,15 +63,15 @@ $spacers: () !default;
 $spacers: defaults(
   (
     0: 0,
-    1: $spacer * .25,
-    2: $spacer * .5,
-    3: $spacer * .75,
-    4: $spacer,
-    5: $spacer * 1.25,
-    6: $spacer * 1.5,
-    7: $spacer * 2,
-    8: $spacer * 2.5,
-    9: $spacer * 3,
+    1: calc(var(--#{$prefix}spacer) * .25),
+    2: calc(var(--#{$prefix}spacer) * .5),
+    3: calc(var(--#{$prefix}spacer) * .75),
+    4: var(--#{$prefix}spacer),
+    5: calc(var(--#{$prefix}spacer) * 1.25),
+    6: calc(var(--#{$prefix}spacer) * 1.5),
+    7: calc(var(--#{$prefix}spacer) * 2),
+    8: calc(var(--#{$prefix}spacer) * 2.5),
+    9: calc(var(--#{$prefix}spacer) * 3),
   ),
   $spacers
 );
@@ -81,8 +82,8 @@ $negative-spacers: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
 $negative-spacers: defaults(
   (
-    "-1": $spacer * -.25,
-    "-2": $spacer * -.5,
+    "-1": calc(var(--#{$prefix}spacer) * -.25),
+    "-2": calc(var(--#{$prefix}spacer) * -.5),
   ),
   $negative-spacers
 );
@@ -93,18 +94,18 @@ $sizes: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
 $sizes: defaults(
   (
-    1: $spacer,
-    2: $spacer * 2,
-    3: $spacer * 3,
-    4: $spacer * 4,
-    5: $spacer * 5,
-    6: $spacer * 6,
-    7: $spacer * 7,
-    8: $spacer * 8,
-    9: $spacer * 9,
-    10: $spacer * 10,
-    11: $spacer * 11,
-    12: $spacer * 12
+    1: var(--#{$prefix}spacer),
+    2: calc(var(--#{$prefix}spacer) * 2),
+    3: calc(var(--#{$prefix}spacer) * 3),
+    4: calc(var(--#{$prefix}spacer) * 4),
+    5: calc(var(--#{$prefix}spacer) * 5),
+    6: calc(var(--#{$prefix}spacer) * 6),
+    7: calc(var(--#{$prefix}spacer) * 7),
+    8: calc(var(--#{$prefix}spacer) * 8),
+    9: calc(var(--#{$prefix}spacer) * 9),
+    10: calc(var(--#{$prefix}spacer) * 10),
+    11: calc(var(--#{$prefix}spacer) * 11),
+    12: calc(var(--#{$prefix}spacer) * 12)
   ),
   $sizes
 );
@@ -155,7 +156,13 @@ $grid-gutter-y:               0 !default;
 // fusv-disable
 $grid-gutter-width:           $grid-gutter-x !default; // Deprecated in v6.0.0, removed in v7
 // fusv-enable
-$gutters:                     $spacers !default;
+$gutters:                     null !default;
+@if $gutters == null {
+  $gutters: ();
+  @each $key in map.keys($spacers) {
+    $gutters: map.set($gutters, $key, var(--#{$prefix}spacer-#{$key}));
+  }
+}
 
 // Container padding
 
@@ -191,12 +198,12 @@ $border-widths: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
 $border-widths: defaults(
   (
-    keyline: .5px,
-    1: 1px,
-    2: 2px,
-    3: 3px,
-    4: 4px,
-    5: 5px
+    keyline: calc(var(--#{$prefix}border-width) * .5),
+    1: var(--#{$prefix}border-width),
+    2: calc(var(--#{$prefix}border-width) * 2),
+    3: calc(var(--#{$prefix}border-width) * 3),
+    4: calc(var(--#{$prefix}border-width) * 4),
+    5: calc(var(--#{$prefix}border-width) * 5)
   ),
   $border-widths
 );

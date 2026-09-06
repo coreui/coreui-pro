@@ -17,7 +17,7 @@ Width utilities are generated from the utility API in `_utilities.scss`. Include
 
 ## Fixed widths
 
-`.w-1` through `.w-12` set a width from the `$sizes` map, one `$spacer` (1rem) per step, for boxes that should hold their size whatever the parent does — an avatar column, a fixed label, a swatch.
+`.w-1` through `.w-12` set a width from the `$sizes` map, one `--cui-spacer` (1rem) per step, computed in the browser, for boxes that should hold their size whatever the parent does — an avatar column, a fixed label, a swatch.
 
 <Example code={`<div class="w-4 p-2 bg-2">.w-4</div>
 <div class="w-8 p-2 bg-2">.w-8</div>

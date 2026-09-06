@@ -137,15 +137,6 @@ $root-token-defaults: theme-color-tokens();
 }
 // scss-docs-end root-font-size-loop
 
-// scss-docs-start root-spacer-loop
-// One token per stop of the spacing scale, so rescaling the system is a
-// runtime change rather than a recompile. Components read these instead of
-// multiplying `$spacer` when the stylesheet is built.
-@each $key, $value in $spacers {
-  $root-token-defaults: map.set($root-token-defaults, --#{$prefix}spacer-#{$key}, $value);
-}
-// scss-docs-end root-spacer-loop
-
 // scss-docs-start root-radius-loop
 // One token per stop of the radius scale, so a page can re-round the library
 // at runtime; components read stops instead of the one global radius.
@@ -155,6 +146,12 @@ $root-token-defaults: map.set($root-token-defaults, --#{$prefix}radius, $radius)
 }
 $root-token-defaults: map.set($root-token-defaults, --#{$prefix}radius-pill, 50rem);
 // scss-docs-end root-radius-loop
+
+// scss-docs-start root-border-width-loop
+@each $key, $value in $border-widths {
+  $root-token-defaults: map.set($root-token-defaults, --#{$prefix}border-width-#{$key}, $value);
+}
+// scss-docs-end root-border-width-loop
 
 // scss-docs-start root-zindex-loop
 // One token per stop of the z-axis, so a page can relayer the library without
@@ -217,7 +214,6 @@ $root-token-defaults: map.merge(
     --#{$prefix}mark-bg: $mark-bg,
     // scss-docs-start root-border-var
     --#{$prefix}border-width: $border-width,
-    --#{$prefix}border-width-keyline: #{map.get($border-widths, keyline)},
     --#{$prefix}border-style: $border-style,
     --#{$prefix}border-color: $border-color,
     --#{$prefix}border-color-translucent: $border-color-translucent,
@@ -229,7 +225,6 @@ $root-token-defaults: map.merge(
     // drawer, menu and popup. One override restyles all four.
     --#{$prefix}transition-timing-overlay: $transition-timing-overlay,
     // scss-docs-end root-transition-variables
-    --#{$prefix}spacer: $spacer,
     // Focus styles
     // scss-docs-start root-focus-variables
     --#{$prefix}focus-ring-width: $focus-ring-width,
