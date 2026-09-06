@@ -730,3 +730,13 @@ npx coreui-utilities coreui.utilities.json --only css/my-utilities.css
 ```
 
 Either way the file starts with the cascade layer order, so your classes land in the `utilities` layer whether the browser sees this file first or `coreui.css` first.
+
+### Only what you use
+
+`--scan` reads your source files and keeps only the utility classes they use — the words of a static `class` or `className` attribute, and the string literals inside `utilities={[…]}`, `:utilities="[…]"` and `ux(…)`, which is how the React and Vue components take utilities:
+
+```sh
+npx coreui-utilities --scan "src/**/*.{html,tsx,vue}" css/utilities.css
+```
+
+The rules come out in the order of the map, not the order of use, so two utilities on one element resolve exactly as they do in the full stylesheet, and only the `@property` registrations and keyframes those rules need are written. A name built at runtime (`` `mt-${n}` ``) cannot be found this way — pass it with `--safelist mt-1,mt-2`, or keep the set of names static. During development generate the full stylesheet instead and scan for the production build.

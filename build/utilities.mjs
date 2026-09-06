@@ -9,21 +9,42 @@
  * two stylesheets are byte-identical. Every other `.json` argument is a user
  * file merged over utilities.json (a key replaces the whole entry, `null`
  * removes it, a new key is appended); `--only` keeps just the keys those
- * files name. A `.css` argument is the output path, otherwise stdout.
+ * files name. `--scan <glob>` (repeatable) keeps just the classes found in
+ * the matching source files, plus `--safelist a,b`. A `.css` argument is the
+ * output path, otherwise stdout.
  */
 
-import { readFileSync, writeFileSync } from 'node:fs'
+import { globSync, readFileSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { LAYERS, loadUtilities, stylesheet } from './lib/utilities.mjs'
+import {
+  LAYERS, loadUtilities, scanFiles, stylesheet
+} from './lib/utilities.mjs'
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
 const check = process.argv.includes('--check')
 const only = process.argv.includes('--only')
 const output = process.argv.find(argument => !argument.startsWith('-') && argument.endsWith('.css'))
 const files = process.argv.slice(2).filter(argument => argument.endsWith('.json'))
+const option = name => process.argv.flatMap((argument, index) => (argument === name ? [process.argv[index + 1]] : []))
+const patterns = option('--scan')
+const safelist = option('--safelist').flatMap(list => list.split(','))
 
-const css = stylesheet(loadUtilities({ files, only }), { layer: files.length > 0 })
+const utilities = loadUtilities({ files, only })
+let used = null
+if (patterns.length > 0) {
+  const sources = patterns.flatMap(pattern => globSync(pattern))
+  used = scanFiles(sources, utilities)
+  for (const name of safelist) {
+    used.add(name)
+  }
+
+  if (!check) {
+    console.error(`utilities: ${used.size} class(es) in ${sources.length} file(s)`)
+  }
+}
+
+const css = stylesheet(utilities, { layer: files.length > 0 || used !== null, only: used })
 
 if (check) {
   const rootScss = readFileSync(path.join(root, 'scss/_root.scss'), 'utf8')

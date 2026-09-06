@@ -145,7 +145,7 @@ const declarations = (propertyMap, properties, value, indent) => {
   return lines
 }
 
-const rules = (name, utility, infix, indent, index) => {
+const rules = (name, utility, infix, indent, index, only) => {
   const lines = []
   const property = utility.get('property')
   const propertyMap = property instanceof Map ? property : null
@@ -172,12 +172,18 @@ const rules = (name, utility, infix, indent, index) => {
     }
 
     if (value !== null || propertyMap) {
-      lines.push(`${indent}${selector} {`, ...declarations(propertyMap, properties, value, indent), `${indent}}`)
+      if (!only || only.has(className)) {
+        lines.push(`${indent}${selector} {`, ...declarations(propertyMap, properties, value, indent), `${indent}}`)
+      }
+
       index?.set(className, {
         utility: name, value: key === 'null' ? null : key, breakpoint: infix.slice(1) || null, state: null
       })
       for (const pseudo of states) {
-        lines.push(`${indent}.${className}-${pseudo}:${pseudo} {`, ...declarations(propertyMap, properties, value, indent), `${indent}}`)
+        if (!only || only.has(`${className}-${pseudo}`)) {
+          lines.push(`${indent}.${className}-${pseudo}:${pseudo} {`, ...declarations(propertyMap, properties, value, indent), `${indent}}`)
+        }
+
         index?.set(`${className}-${pseudo}`, {
           utility: name, value: key === 'null' ? null : key, breakpoint: infix.slice(1) || null, state: pseudo
         })
@@ -188,10 +194,61 @@ const rules = (name, utility, infix, indent, index) => {
   return lines
 }
 
-const build = (utilities, { layer = false, index = null } = {}) => {
+const build = (utilities, { layer = false, index = null, only = null } = {}) => {
   const enabled = [...utilities.entries()].filter(([, utility]) => utility.get('enabled') !== false)
+  const emitted = new Map()
+  const emit = (key, utility, infix, indent) => {
+    const lines = rules(key, utility, infix, indent, index, only)
+    if (lines.length > 0) {
+      emitted.set(key, utility)
+    }
+
+    return lines
+  }
+
+  const body = []
+  for (const [name, min] of breakpoints) {
+    const infix = min ? `-${name}` : ''
+    const indent = min ? '    ' : '  '
+    const block = []
+    for (const [key, utility] of enabled) {
+      if (utility.get('responsive') || infix === '') {
+        block.push(...emit(key, utility, infix, indent))
+      }
+    }
+
+    if (min && block.length > 0) {
+      body.push(`  @media (width >= ${min}) {`, ...block, '  }')
+    } else {
+      body.push(...block)
+    }
+  }
+
+  const printed = []
+  for (const [key, utility] of enabled) {
+    if (utility.get('print')) {
+      printed.push(...emit(key, utility, '-print', '    '))
+    }
+  }
+
+  if (printed.length > 0) {
+    body.push('  @media print {', ...printed, '  }')
+  }
+
+  const uses = name => !only || only.has(name)
+  if (utilities.has('translate-middle') && (uses('translate-middle') || uses('translate-middle-x'))) {
+    body.push(
+      '  *[dir=rtl] .translate-middle {', '    transform: translate(50%, -50%);', '  }', '  *[dir=rtl] .translate-middle-x {', '    transform: translateX(50%);', '  }'
+    )
+  }
+
+  const animated = utilities.has('animation') && (uses('animation-shake') || uses('animation-pop'))
+  if (animated) {
+    body.push('  @media (prefers-reduced-motion: reduce) {', '    .animation-shake,', '    .animation-pop {', '      animation: none;', '    }', '  }')
+  }
+
   const registered = []
-  for (const [, utility] of enabled) {
+  for (const utility of emitted.values()) {
     if (utility.get('at-property') === false) {
       continue
     }
@@ -210,48 +267,9 @@ const build = (utilities, { layer = false, index = null } = {}) => {
     lines.push(`@property ${name} {`, '  syntax: "*";', '  inherits: false;', '}')
   }
 
-  lines.push('@layer utilities {')
-  for (const [name, min] of breakpoints) {
-    const infix = min ? `-${name}` : ''
-    const indent = min ? '    ' : '  '
-    if (min) {
-      lines.push(`  @media (width >= ${min}) {`)
-    }
+  lines.push('@layer utilities {', ...body, '}')
 
-    for (const [key, utility] of enabled) {
-      if (utility.get('responsive') || infix === '') {
-        lines.push(...rules(key, utility, infix, indent, index))
-      }
-    }
-
-    if (min) {
-      lines.push('  }')
-    }
-  }
-
-  const printed = enabled.filter(([, utility]) => utility.get('print'))
-  if (printed.length > 0) {
-    lines.push('  @media print {')
-    for (const [key, utility] of printed) {
-      lines.push(...rules(key, utility, '-print', '    ', index))
-    }
-
-    lines.push('  }')
-  }
-
-  if (utilities.has('translate-middle')) {
-    lines.push(
-      '  *[dir=rtl] .translate-middle {', '    transform: translate(50%, -50%);', '  }', '  *[dir=rtl] .translate-middle-x {', '    transform: translateX(50%);', '  }'
-    )
-  }
-
-  if (utilities.has('animation')) {
-    lines.push('  @media (prefers-reduced-motion: reduce) {', '    .animation-shake,', '    .animation-pop {', '      animation: none;', '    }', '  }')
-  }
-
-  lines.push('}')
-
-  if (utilities.has('animation')) {
+  if (animated) {
     lines.push(
       '@keyframes animation-shake {',
       '  10%, 90% {',
@@ -290,4 +308,49 @@ export const classNames = utilities => {
   const index = new Map()
   build(utilities, { index })
   return index
+}
+
+const LITERALS = /'([^'\\]*)'|"([^"\\]*)"|`([^`$\\]*)`/g
+const CALLS = [
+  /\butilities=\{\[([^\]]*)\]\}/g,
+  /(?::utilities|v-bind:utilities)="\[([^\]]*)\]"/g,
+  /\bux\(([^)]*)\)/g,
+  /\b(?:class|className)=(?:"([^"]*)"|'([^']*)'|\{\s*(?:'([^']*)'|"([^"]*)")\s*\})/g
+]
+
+// The utility class names a piece of source uses, read without running it: the
+// string literals inside utilities={[…]}, :utilities="[…]" and ux(…), and the
+// words of a static class / className attribute. Anything else — a template
+// literal with an expression, a computed name — is not seen; safelist those.
+export const scan = source => {
+  const found = new Set()
+  for (const pattern of CALLS) {
+    for (const match of source.matchAll(pattern)) {
+      const inner = match.slice(1).find(group => group !== undefined) ?? ''
+      const literals = [...inner.matchAll(LITERALS)].map(literal => literal.slice(1).find(group => group !== undefined))
+      const words = literals.length > 0 ? literals : [inner]
+      for (const word of words.flatMap(text => text.split(/\s+/))) {
+        if (word) {
+          found.add(word)
+        }
+      }
+    }
+  }
+
+  return found
+}
+
+// scan() over files, keeping only the names the stylesheet actually declares.
+export const scanFiles = (files, utilities) => {
+  const known = classNames(utilities)
+  const used = new Set()
+  for (const file of files) {
+    for (const name of scan(readFileSync(file, 'utf8'))) {
+      if (known.has(name)) {
+        used.add(name)
+      }
+    }
+  }
+
+  return used
 }
