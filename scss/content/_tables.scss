@@ -3,8 +3,8 @@
 @use "../layout/breakpoints" as *;
 @use "../mixins/tokens" as *;
 @use "../mixins/visually-hidden" as *;
-@use "../theme" as *;
 @use "../config" as *;
+@use "../theme" as *;
 
 // scss-docs-start table-variables
 $table-cell-padding-y:        .5rem !default;

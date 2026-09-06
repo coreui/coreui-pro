@@ -1,6 +1,6 @@
 @use "sass:map";
-@use "../theme" as *;
 @use "../config" as *;
+@use "../theme" as *;
 
 @layer helpers {
   @each $color in map.keys($theme-colors) {

@@ -1,10 +1,10 @@
 @use "sass:map";
 @use "functions/defaults" as *;
-@use "mixins/border-radius" as *;
 @use "layout/breakpoints" as *;
+@use "mixins/border-radius" as *;
 @use "mixins/tokens" as *;
-@use "theme" as *;
 @use "config" as *;
+@use "theme" as *;
 
 // List group
 // scss-docs-start list-group-variables

@@ -1,9 +1,9 @@
 @use "sass:map";
 @use "sass:meta";
-@use "../utilities" as *;
 @use "../mixins/ltr-rtl" as *;
 @use "../mixins/utilities" as *;
 @use "../config" as *;
+@use "../utilities" as *;
 
 // Outside the cascade layer on purpose: `@property` registration is global and
 // layers do not apply to it.

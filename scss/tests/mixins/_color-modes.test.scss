@@ -1,8 +1,8 @@
 // stylelint-disable @stylistic/number-leading-zero, selector-attribute-quotes
 
+@use "../../mixins/color-mode" as *;
 @use "../../colors" as *;
 @use "../../config" as *;
-@use "../../mixins/color-mode" as *;
 
 @include describe("global $color-mode-type: data") {
   @include it("generates data attribute selectors for dark mode") {

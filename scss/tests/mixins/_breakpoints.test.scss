@@ -1,5 +1,5 @@
-@use "../../config" as *;
 @use "../../layout/breakpoints" as *;
+@use "../../config" as *;
 
 $test-breakpoints: (xs: 0, sm: 576px, md: 768px, lg: 992px);
 

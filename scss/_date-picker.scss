@@ -1,9 +1,9 @@
-@use "calendar" as *;
-@use "time-picker" as *;
 @use "functions/defaults" as *;
-@use "mixins/tokens" as *;
-@use "config" as *;
 @use "mixins/form-control" as *;
+@use "mixins/tokens" as *;
+@use "calendar" as *;
+@use "config" as *;
+@use "time-picker" as *;
 
 // scss-docs-start date-picker-variables
 $date-picker-footer-padding:           .5rem !default;

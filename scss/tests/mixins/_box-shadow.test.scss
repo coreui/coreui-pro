@@ -1,5 +1,5 @@
-@use "../../config" as *;
 @use "../../mixins/box-shadow" as *;
+@use "../../config" as *;
 
 // Store original value
 $original-enable-shadows: $enable-shadows;

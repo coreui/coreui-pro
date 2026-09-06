@@ -1,20 +1,18 @@
-@use "mixins/mask-icon" as *;
 @use "sass:map";
 @use "buttons/button" as *;
-@use "functions/color" as *;
 @use "functions/defaults" as *;
 @use "functions/escape-svg" as *;
+@use "layout/breakpoints" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/box-shadow" as *;
-@use "layout/breakpoints" as *;
-@use "mixins/color-mode" as *;
 @use "mixins/deprecate" as *;
+@use "mixins/mask-icon" as *;
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
 @use "mixins/translucent" as *;
-@use "nav" as *;
 @use "colors" as *;
 @use "config" as *;
+@use "nav" as *;
 
 // scss-docs-start navbar-variables
 $navbar-padding-y:                  var(--#{$prefix}spacer-2) !default;

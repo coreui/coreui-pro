@@ -1,8 +1,8 @@
 @use "../functions/defaults" as *;
 @use "../mixins/border-radius" as *;
+@use "../mixins/form-control" as *;
 @use "../mixins/tokens" as *;
 @use "../config" as *;
-@use "../mixins/form-control" as *;
 
 // scss-docs-start form-date-time-variables
 $form-date-time-placeholder-color:       var(--#{$prefix}fg-3) !default;

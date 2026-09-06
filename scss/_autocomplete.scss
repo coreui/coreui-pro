@@ -1,5 +1,5 @@
-@use "config" as *;
 @use "mixins/form-control" as *;
+@use "config" as *;
 
 @layer components {
   .autocomplete {
