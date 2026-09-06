@@ -712,7 +712,7 @@
     "values": {
       "$merge": [
         {
-          "$scale": "space.scale"
+          "$refs": "space.scale"
         },
         {
           "auto": "auto"
@@ -727,7 +727,7 @@
     "values": {
       "$merge": [
         {
-          "$scale": "space.scale"
+          "$refs": "space.scale"
         },
         {
           "auto": "auto"
@@ -742,7 +742,7 @@
     "values": {
       "$merge": [
         {
-          "$scale": "space.scale"
+          "$refs": "space.scale"
         },
         {
           "auto": "auto"
@@ -757,7 +757,7 @@
     "values": {
       "$merge": [
         {
-          "$scale": "space.scale"
+          "$refs": "space.scale"
         },
         {
           "auto": "auto"
@@ -772,7 +772,7 @@
     "values": {
       "$merge": [
         {
-          "$scale": "space.scale"
+          "$refs": "space.scale"
         },
         {
           "$scale": "space.negative"
@@ -790,7 +790,7 @@
     "values": {
       "$merge": [
         {
-          "$scale": "space.scale"
+          "$refs": "space.scale"
         },
         {
           "auto": "auto"
@@ -805,7 +805,7 @@
     "values": {
       "$merge": [
         {
-          "$scale": "space.scale"
+          "$refs": "space.scale"
         },
         {
           "$scale": "space.negative"
@@ -821,7 +821,7 @@
     "property": "padding",
     "class": "p",
     "values": {
-      "$scale": "space.scale"
+      "$refs": "space.scale"
     }
   },
   "padding-x": {
@@ -829,7 +829,7 @@
     "property": "padding-inline",
     "class": "px",
     "values": {
-      "$scale": "space.scale"
+      "$refs": "space.scale"
     }
   },
   "padding-y": {
@@ -837,7 +837,7 @@
     "property": "padding-block",
     "class": "py",
     "values": {
-      "$scale": "space.scale"
+      "$refs": "space.scale"
     }
   },
   "padding-top": {
@@ -845,7 +845,7 @@
     "property": "padding-top",
     "class": "pt",
     "values": {
-      "$scale": "space.scale"
+      "$refs": "space.scale"
     }
   },
   "padding-end": {
@@ -853,7 +853,7 @@
     "property": "padding-inline-end",
     "class": "pe",
     "values": {
-      "$scale": "space.scale"
+      "$refs": "space.scale"
     }
   },
   "padding-bottom": {
@@ -861,7 +861,7 @@
     "property": "padding-bottom",
     "class": "pb",
     "values": {
-      "$scale": "space.scale"
+      "$refs": "space.scale"
     }
   },
   "padding-start": {
@@ -869,7 +869,7 @@
     "property": "padding-inline-start",
     "class": "ps",
     "values": {
-      "$scale": "space.scale"
+      "$refs": "space.scale"
     }
   },
   "gap": {
@@ -877,7 +877,7 @@
     "property": "gap",
     "class": "gap",
     "values": {
-      "$scale": "space.scale"
+      "$refs": "space.scale"
     }
   },
   "row-gap": {
@@ -885,7 +885,7 @@
     "property": "row-gap",
     "class": "row-gap",
     "values": {
-      "$scale": "space.scale"
+      "$refs": "space.scale"
     }
   },
   "column-gap": {
@@ -893,7 +893,7 @@
     "property": "column-gap",
     "class": "column-gap",
     "values": {
-      "$scale": "space.scale"
+      "$refs": "space.scale"
     }
   },
   "space-x": {
@@ -902,7 +902,7 @@
     "class": "space-x",
     "child-selector": "> :not(:last-child)",
     "values": {
-      "$scale": "space.scale"
+      "$refs": "space.scale"
     }
   },
   "space-y": {
@@ -911,7 +911,7 @@
     "class": "space-y",
     "child-selector": "> :not(:last-child)",
     "values": {
-      "$scale": "space.scale"
+      "$refs": "space.scale"
     }
   },
   "divide-x": {
