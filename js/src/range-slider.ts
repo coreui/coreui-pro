@@ -52,7 +52,7 @@ const SELECTOR_RANGE_SLIDER_INPUT = '.range-slider-input'
 const SELECTOR_RANGE_SLIDER_INPUTS_CONTAINER = '.range-slider-inputs-container'
 const SELECTOR_RANGE_SLIDER_LABEL = '.range-slider-label'
 
-type RangeSliderLabel = string | { class?: string | string[], label?: string, style?: Record<string, string>, value?: number }
+type RangeSliderLabel = number | string | { class?: string | string[], label?: string, style?: Record<string, string>, value?: number }
 
 type RangeSliderConfig = {
   allowList: SanitizerAllowList
@@ -385,13 +385,16 @@ class RangeSlider extends BaseComponent {
 
     if (Array.isArray(labels) && labels.length > 0) {
       for (const [index, label] of labels.entries()) {
-        const value = typeof label === 'object' && label.value !== undefined ?
-          label.value :
-          min + (labels.length === 1 ? 0 : (index / (labels.length - 1)) * span)
+        // A bare number is a tick without text at that value
+        const value = typeof label === 'number' ?
+          label :
+          (typeof label === 'object' && label.value !== undefined ?
+            label.value :
+            min + (labels.length === 1 ? 0 : (index / (labels.length - 1)) * span))
 
         points.push({
           class: typeof label === 'object' ? label.class : undefined,
-          label: typeof label === 'object' ? (label.label ?? '') : label,
+          label: typeof label === 'number' ? '' : (typeof label === 'object' ? (label.label ?? '') : label),
           ratio: ratio(value),
           style: typeof label === 'object' ? label.style : undefined,
           value

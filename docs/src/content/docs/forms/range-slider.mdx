@@ -99,11 +99,15 @@ Add labels to specific points on the slider for better context. If you provide a
 
 ### Labels customization
 
-Labels can be configured as an array of strings or objects. When using objects, you can specify additional properties like `value`, `label`, `class`, and `style`.
+Labels can be configured as an array of strings, numbers or objects. A number is a bare tick at that value, with no text; with objects you can specify additional properties like `value`, `label`, `class`, and `style`. Every entry draws a tick, taller when it has text, and all of them are laid out on one grid, so unevenly spaced values stay aligned.
 
 <Example pro code={`<div id="myRangeSliderCustomLabels"></div>`} sandboxJs={rangeSliderCustomLabels} />
 
 <Code code={rangeSliderCustomLabels} lang="js" />
+
+Numbers and labelled points mix in one array; passed through a data attribute, the array is JSON.
+
+<Example pro code={`<div data-coreui-toggle="range-slider" data-coreui-value="25,75" data-coreui-labels='[{"value": 0, "label": "Cold"}, 25, {"value": 50, "label": "Mild"}, 75, {"value": 100, "label": "Hot"}]'></div>`} />
 
 ### Tick marks from a datalist
 

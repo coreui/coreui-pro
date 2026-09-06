@@ -1178,8 +1178,9 @@ adornment in the library — so the button needs no icon markup at all:
   values, so labels are in normal flow: the container sizes itself, and the
   resize listener plus the measured container height are gone. Every label
   draws a tick from `--cui-range-tick-*` — taller when it has text — and the
-  labels are sorted by value. The new `list` option reads a `<datalist>`
-  like the range does and merges its options with `labels`. Custom CSS that
+  labels are sorted by value. A bare number in `labels` is a tick without
+  text at that value. The new `list` option reads a `<datalist>` like the
+  range does and merges its options with `labels`. Custom CSS that
   positioned `.range-slider-label` through `left`/`bottom` no longer applies.
 - **Range slider tooltips follow the range's modes.** `tooltips: true` shows a
   handle's tooltip on hover, drag and visible focus; `"always"` keeps them on.
