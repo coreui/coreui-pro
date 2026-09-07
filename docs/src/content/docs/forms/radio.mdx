@@ -140,27 +140,27 @@ Add a description after the label and wrap both in a `.form-field-content`, so t
 
 Create button-like radios by putting `.btn-check` on a `<label>` with the button classes, and nesting the input inside it. The label is the button, so there is no `id`/`for` pair to keep in sync. They can be grouped in a [button group](/components/button-group/).
 
-<Example code={`<label class="btn btn-secondary btn-check">
+<Example code={`<label class="btn-solid theme-secondary btn-check">
     <input type="radio" name="options" checked autocomplete="off">
     Checked
   </label>
 
-  <label class="btn btn-secondary btn-check">
+  <label class="btn-solid theme-secondary btn-check">
     <input type="radio" name="options" autocomplete="off">
     Radio
   </label>
 
-  <label class="btn btn-secondary btn-check">
+  <label class="btn-solid theme-secondary btn-check">
     <input type="radio" name="options" disabled autocomplete="off">
     Disabled
   </label>`} />
 
-<Example code={`<label class="btn btn-outline-success btn-check">
+<Example code={`<label class="btn-outline theme-success btn-check">
     <input type="radio" name="options-outlined" checked autocomplete="off">
     Checked success radio
   </label>
 
-  <label class="btn btn-outline-danger btn-check">
+  <label class="btn-outline theme-danger btn-check">
     <input type="radio" name="options-outlined" autocomplete="off">
     Danger radio
   </label>`} />

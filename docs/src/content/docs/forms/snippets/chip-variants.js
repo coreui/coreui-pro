@@ -3,13 +3,13 @@ const chipInput = new coreui.ChipInput(chipInputElement, {
   // Class is resolved dynamically from chip value.
   chipClassName(value) {
     const variants = {
-      approved: 'chip-success',
-      blocking: 'chip-danger',
-      feature: 'chip-primary',
-      'needs review': 'chip-warning'
+      approved: 'theme-success',
+      blocking: 'theme-danger',
+      feature: 'theme-primary',
+      'needs review': 'theme-warning'
     }
 
-    return variants[value.trim().toLowerCase()] || 'chip-secondary'
+    return variants[value.trim().toLowerCase()] || 'theme-secondary'
   },
   placeholder: 'Add a bug...'
 })
