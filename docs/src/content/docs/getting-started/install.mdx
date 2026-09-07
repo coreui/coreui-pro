@@ -210,6 +210,7 @@ coreui/
 │   ├── components/
 │   │   ├── accordion.css
 │   │   ├── … one stylesheet per component …
+│   │   ├── classes.json
 │   │   └── manifest.json
 │   ├── coreui-grid.css
 │   ├── coreui-grid.css.map
@@ -357,6 +358,26 @@ listed files and the component's own, and the component renders exactly as it
 does from the full bundle. The list covers markup the JavaScript renders as
 well as the Sass a component builds on — the date picker draws a calendar and a
 time picker inside a form control group, which is why it asks for all three.
+
+`css/components/classes.json` maps a class name to the entry that owns it, so
+you can go from the markup you write to the files you need — look up each class,
+then load those entries together with their `requires`:
+
+```json
+{
+  "card-body": "card",
+  "fade": "transitions",
+  "input-group": "forms/input-group"
+}
+```
+
+A class belongs to the stylesheet that declares it as a rule of its own; a class
+no stylesheet declares that way goes to the single stylesheet that styles it —
+`.tab-pane` is only ever styled under `.tab-content`, `.number-input` only ever
+as the context of the field inside it. Classes several stylesheets style are
+absent, which is what keeps the states out: `.show`, `.active` and `.disabled`
+belong to the component they sit on, not to a file of their own. `.theme-*` is
+absent too — it lives in `base.css`, which you load anyway.
 
 A page that uses a card, a button group and an input group loads:
 
