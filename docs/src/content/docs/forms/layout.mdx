@@ -89,9 +89,9 @@ More complex layouts can also be created with the grid system.
       <input type="text" class="form-control" id="inputZip">
     </div>
     <div class="col-12">
-      <div class="form-check">
-        <input class="form-check-input" type="checkbox" id="gridCheck">
-        <label class="form-check-label" for="gridCheck">
+      <div class="form-field">
+        <input class="check" type="checkbox" id="gridCheck">
+        <label for="gridCheck">
           Check me out
         </label>
       </div>
@@ -123,21 +123,21 @@ At times, you maybe need to use margin or padding utilities to create that perfe
     <fieldset class="row mb-3">
       <legend class="col-form-label col-sm-2 pt-0">Radios</legend>
       <div class="col-sm-10">
-        <div class="form-check">
-          <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios1" value="option1" checked>
-          <label class="form-check-label" for="gridRadios1">
+        <div class="form-field">
+          <input class="radio" type="radio" name="gridRadios" id="gridRadios1" value="option1" checked>
+          <label for="gridRadios1">
             First radio
           </label>
         </div>
-        <div class="form-check">
-          <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios2" value="option2">
-          <label class="form-check-label" for="gridRadios2">
+        <div class="form-field">
+          <input class="radio" type="radio" name="gridRadios" id="gridRadios2" value="option2">
+          <label for="gridRadios2">
             Second radio
           </label>
         </div>
-        <div class="form-check disabled">
-          <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios3" value="option3" disabled>
-          <label class="form-check-label" for="gridRadios3">
+        <div class="form-field">
+          <input class="radio" type="radio" name="gridRadios" id="gridRadios3" value="option3" disabled>
+          <label for="gridRadios3">
             Third disabled radio
           </label>
         </div>
@@ -145,9 +145,9 @@ At times, you maybe need to use margin or padding utilities to create that perfe
     </fieldset>
     <div class="row mb-3">
       <div class="col-sm-10 offset-sm-2">
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" id="gridCheck1">
-          <label class="form-check-label" for="gridCheck1">
+        <div class="form-field">
+          <input class="check" type="checkbox" id="gridCheck1">
+          <label for="gridCheck1">
             Example checkbox
           </label>
         </div>
@@ -221,9 +221,9 @@ The example below uses a flexbox utility to vertically center the contents and c
       </select>
     </div>
     <div class="col-auto">
-      <div class="form-check">
-        <input class="form-check-input" type="checkbox" id="autoSizingCheck">
-        <label class="form-check-label" for="autoSizingCheck">
+      <div class="form-field">
+        <input class="check" type="checkbox" id="autoSizingCheck">
+        <label for="autoSizingCheck">
           Remember me
         </label>
       </div>
@@ -257,9 +257,9 @@ You can then remix that once again with size-specific column classes.
       </select>
     </div>
     <div class="col-auto">
-      <div class="form-check">
-        <input class="form-check-input" type="checkbox" id="autoSizingCheck2">
-        <label class="form-check-label" for="autoSizingCheck2">
+      <div class="form-field">
+        <input class="check" type="checkbox" id="autoSizingCheck2">
+        <label for="autoSizingCheck2">
           Remember me
         </label>
       </div>
@@ -271,7 +271,7 @@ You can then remix that once again with size-specific column classes.
 
 ## Inline forms
 
-Use the `.row-cols-*` classes to create responsive horizontal layouts. By adding [gutter modifier classes](/layout/gutters/), we'll have gutters in horizontal and vertical directions. On narrow mobile viewports, the `.col-12` helps stack the form controls and more. The `.align-items-center` aligns the form elements to the middle, making the `.form-check` align properly.
+Use the `.row-cols-*` classes to create responsive horizontal layouts. By adding [gutter modifier classes](/layout/gutters/), we'll have gutters in horizontal and vertical directions. On narrow mobile viewports, the `.col-12` helps stack the form controls and more. The `.align-items-center` aligns the form elements to the middle, making the `.form-field` align properly.
 
 <Example code={`<form class="row row-cols-lg-auto g-3 align-items-center">
     <div class="col-12">
@@ -293,9 +293,9 @@ Use the `.row-cols-*` classes to create responsive horizontal layouts. By adding
     </div>
 
     <div class="col-12">
-      <div class="form-check">
-        <input class="form-check-input" type="checkbox" id="inlineFormCheck">
-        <label class="form-check-label" for="inlineFormCheck">
+      <div class="form-field">
+        <input class="check" type="checkbox" id="inlineFormCheck">
+        <label for="inlineFormCheck">
           Remember me
         </label>
       </div>
