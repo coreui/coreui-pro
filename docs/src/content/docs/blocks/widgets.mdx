@@ -6,7 +6,9 @@ js:
   - https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.js
 ---
 
-import widgetCharts from './snippets/widget-charts.js?raw'
+import statCharts from './snippets/widget-charts-stat.js?raw'
+import groupCharts from './snippets/widget-charts-group.js?raw'
+import compactCharts from './snippets/widget-charts-compact.js?raw'
 
 ## How it works
 
@@ -113,7 +115,7 @@ A colored card carrying one figure, a menu and a chart running to the bottom edg
         </div>
       </div>
     </div>
-  </div>`} sandboxJs={widgetCharts} />
+  </div>`} sandboxJs={statCharts} />
 
 ## Stat with progress
 
@@ -133,12 +135,12 @@ A figure, its label and a progress bar reading the same value. Color the card wi
       </div>
     </div>
     <div class="col-sm-6">
-      <div class="card text-bg-primary mb-3">
+      <div class="card bg-primary fg-white mb-3">
         <div class="card-body">
           <div class="fs-4 fw-semibold">89.9%</div>
           <div>Widget title</div>
           <div class="progress my-2 w-100" style="height: 4px;">
-            <div class="progress-bar" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" aria-label="Widget title"></div>
+            <div class="progress-bar progress-white" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" aria-label="Widget title"></div>
           </div>
           <small class="fg-white fg-70">Widget helper text</small>
         </div>
@@ -166,7 +168,7 @@ The same shape with an icon set against the top corner.
       </div>
     </div>
     <div class="col-sm-6">
-      <div class="card text-bg-primary mb-3">
+      <div class="card bg-primary fg-white mb-3">
         <div class="card-body">
           <div class="text-end mb-4 fg-white fg-70 w-100">
             <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 512 512" role="img" aria-hidden="true"><path fill="currentColor" d="M105.361 398.32A195.891 195.891 0 0 1 343.42 91.125l23.256-23.255A227.875 227.875 0 0 0 82.733 420.948 228.03 228.03 0 0 0 366.24 452.1l-23.312-23.312c-75.028 43.98-173.271 33.829-237.567-30.468"/><path fill="currentColor" d="M468.916 353.07a243.54 243.54 0 0 0 0-186.459 248 248 0 0 0-2.747-6.354 242.3 242.3 0 0 0-50.059-72.686L404.8 76.257l-11.317 11.314-172.27 172.269 172.63 172.631 10.957 10.953 11.31-11.314a242.2 242.2 0 0 0 49.452-71.358 249 249 0 0 0 3.354-7.682m-64.557-231.12a211.57 211.57 0 0 1 0 275.781L266.468 259.84Z"/></svg>
@@ -174,7 +176,7 @@ The same shape with an icon set against the top corner.
           <div class="fs-4 fw-semibold">89.9%</div>
           <div class="fg-white fg-70">Widget title</div>
           <div class="progress mt-3 mb-0 w-100" style="height: 4px;">
-            <div class="progress-bar" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" aria-label="Widget title"></div>
+            <div class="progress-bar progress-white" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" aria-label="Widget title"></div>
           </div>
         </div>
       </div>
@@ -183,13 +185,14 @@ The same shape with an icon set against the top corner.
 
 ## Stat group
 
-Several figures in one card, divided by a border, under a header that holds the chart. The header reads `--cui-card-cap-bg`, so a brand color goes on the card without a new class.
+Several figures in one card, divided by a border, under a header where an icon sits over the chart. The header colour comes from `--cui-card-cap-bg`, so a brand colour needs no new class.
 
 <Example code={`<div class="row">
     <div class="col-sm-6">
       <div class="card mb-3" style="--cui-card-cap-bg: #3b5998;">
-        <div class="card-header p-0 fg-white">
-          <svg width="100%" height="70" viewBox="0 0 200 70" preserveAspectRatio="none" role="img" aria-label="Chart" focusable="false"><title>Chart</title><path fill="rgba(255,255,255,.2)" d="M0,50 25,35 50,45 75,20 100,38 125,18 150,32 175,12 200,28 200,70 0,70Z"/><polyline fill="none" stroke="rgba(255,255,255,.55)" stroke-width="2" points="0,50 25,35 50,45 75,20 100,38 125,18 150,32 175,12 200,28"/></svg>
+        <div class="card-header position-relative d-flex justify-content-center align-items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="my-4 fg-white" width="52" height="52" viewBox="0 0 32 32" role="img" aria-hidden="true"><path fill="currentColor" d="M32 16c0-8.839-7.167-16-16-16C7.161 0 0 7.161 0 16c0 7.984 5.849 14.604 13.5 15.803V20.626H9.437v-4.625H13.5v-3.527c0-4.009 2.385-6.223 6.041-6.223 1.751 0 3.584.312 3.584.312V10.5h-2.021c-1.984 0-2.604 1.235-2.604 2.5v3h4.437l-.713 4.625H18.5v11.177C26.145 30.603 32 23.983 32 15.999z"/></svg>
+          <canvas class="position-absolute w-100 h-100" id="blockChart5"></canvas>
         </div>
         <div class="card-body">
           <div class="row text-center w-100">
@@ -207,8 +210,9 @@ Several figures in one card, divided by a border, under a header that holds the 
     </div>
     <div class="col-sm-6">
       <div class="card mb-3" style="--cui-card-cap-bg: #00aced;">
-        <div class="card-header p-0 fg-white">
-          <svg width="100%" height="70" viewBox="0 0 200 70" preserveAspectRatio="none" role="img" aria-label="Chart" focusable="false"><title>Chart</title><path fill="rgba(255,255,255,.2)" d="M0,25 25,42 50,22 75,45 100,18 125,38 150,16 175,36 200,14 200,70 0,70Z"/><polyline fill="none" stroke="rgba(255,255,255,.55)" stroke-width="2" points="0,25 25,42 50,22 75,45 100,18 125,38 150,16 175,36 200,14"/></svg>
+        <div class="card-header position-relative d-flex justify-content-center align-items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="my-4 fg-white" width="52" height="52" viewBox="0 0 32 32" role="img" aria-hidden="true"><path fill="currentColor" d="M31.937 6.093a13.4 13.4 0 0 1-3.765 1.032 6.6 6.6 0 0 0 2.885-3.631 13.7 13.7 0 0 1-4.172 1.579 6.56 6.56 0 0 0-11.178 5.973c-5.453-.255-10.287-2.875-13.52-6.833a6.46 6.46 0 0 0-.891 3.303 6.56 6.56 0 0 0 2.916 5.457 6.5 6.5 0 0 1-2.968-.817v.079a6.57 6.57 0 0 0 5.26 6.437 6.8 6.8 0 0 1-1.724.229c-.421 0-.823-.041-1.224-.115a6.59 6.59 0 0 0 6.14 4.557 13.17 13.17 0 0 1-8.135 2.801 13 13 0 0 1-1.563-.088 18.66 18.66 0 0 0 10.079 2.948c12.067 0 18.661-9.995 18.661-18.651 0-.276 0-.557-.021-.839a13.1 13.1 0 0 0 3.281-3.396z"/></svg>
+          <canvas class="position-absolute w-100 h-100" id="blockChart6"></canvas>
         </div>
         <div class="card-body">
           <div class="row text-center w-100">
@@ -224,7 +228,7 @@ Several figures in one card, divided by a border, under a header that holds the 
         </div>
       </div>
     </div>
-  </div>`} />
+  </div>`} sandboxJs={groupCharts} />
 
 ## Compact stat
 
@@ -236,7 +240,9 @@ A label, a figure and a chart, centered — the block to reach for when several 
         <div class="card-body text-center">
           <div class="fg-2 small text-uppercase fw-semibold w-100">Widget title</div>
           <div class="fs-6 fw-semibold py-3 w-100">89.9%</div>
-          <svg class="mx-auto" width="80" height="40" viewBox="0 0 80 40" role="img" aria-label="Chart" focusable="false"><title>Chart</title><g fill="var(--cui-primary)"><rect width="8" height="14" x="0" y="26"/><rect width="8" height="22" x="12" y="18"/><rect width="8" height="10" x="24" y="30"/><rect width="8" height="30" x="36" y="10"/><rect width="8" height="18" x="48" y="22"/><rect width="8" height="26" x="60" y="14"/><rect width="8" height="12" x="72" y="28"/></g></svg>
+          <div class="mx-auto" style="height: 40px; width: 80px;">
+            <canvas id="blockChart7"></canvas>
+          </div>
         </div>
       </div>
     </div>
@@ -245,15 +251,17 @@ A label, a figure and a chart, centered — the block to reach for when several 
         <div class="card-body text-center">
           <div class="fg-2 small text-uppercase fw-semibold w-100">Widget title</div>
           <div class="fs-6 fw-semibold py-3 w-100">89.9%</div>
-          <svg class="mx-auto" width="80" height="40" viewBox="0 0 80 40" role="img" aria-label="Chart" focusable="false"><title>Chart</title><polyline fill="none" stroke="var(--cui-primary)" stroke-width="2" points="0,30 13,18 26,26 40,8 53,20 66,10 80,22"/></svg>
+          <div class="mx-auto" style="height: 40px; width: 80px;">
+            <canvas id="blockChart8"></canvas>
+          </div>
         </div>
       </div>
     </div>
-  </div>`} />
+  </div>`} sandboxJs={compactCharts} />
 
 ## Stat with icon
 
-A colored icon tile beside the figure. Drop the padding utilities from the body and the tile runs to the card's edges.
+A colored icon tile beside the figure. Drop the body's padding and the tile runs to the card's edges; add a `.card-footer` for a link out.
 
 <Example code={`<div class="row">
     <div class="col-sm-6">
@@ -282,6 +290,8 @@ A colored icon tile beside the figure. Drop the padding utilities from the body 
         </div>
       </div>
     </div>
+  </div>
+  <div class="row">
     <div class="col-sm-6">
       <div class="card mb-3">
         <div class="card-body d-flex flex-row align-items-center p-0">
@@ -305,6 +315,46 @@ A colored icon tile beside the figure. Drop the padding utilities from the body 
             <div class="fs-6 fw-semibold fg-warning">89.9%</div>
             <div class="fg-2 text-uppercase fw-semibold small">Widget title</div>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-6">
+      <div class="card mb-3">
+        <div class="card-body d-flex flex-row align-items-center">
+          <div class="me-3 fg-white bg-primary p-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 512 512" role="img" aria-hidden="true"><path fill="currentColor" d="M105.361 398.32A195.891 195.891 0 0 1 343.42 91.125l23.256-23.255A227.875 227.875 0 0 0 82.733 420.948 228.03 228.03 0 0 0 366.24 452.1l-23.312-23.312c-75.028 43.98-173.271 33.829-237.567-30.468"/><path fill="currentColor" d="M468.916 353.07a243.54 243.54 0 0 0 0-186.459 248 248 0 0 0-2.747-6.354 242.3 242.3 0 0 0-50.059-72.686L404.8 76.257l-11.317 11.314-172.27 172.269 172.63 172.631 10.957 10.953 11.31-11.314a242.2 242.2 0 0 0 49.452-71.358 249 249 0 0 0 3.354-7.682m-64.557-231.12a211.57 211.57 0 0 1 0 275.781L266.468 259.84Z"/></svg>
+          </div>
+          <div>
+            <div class="fs-6 fw-semibold fg-primary">89.9%</div>
+            <div class="fg-2 text-uppercase fw-semibold small">Widget title</div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <a class="fw-semibold small fg-2" href="https://coreui.io/" rel="noopener noreferrer" target="_blank">
+            View more
+            <svg xmlns="http://www.w3.org/2000/svg" class="float-end" width="16" height="16" viewBox="0 0 512 512" role="img" aria-hidden="true"><polygon fill="currentColor" points="160 128.4 192.3 96 352 256 192.3 416 160 383.6 287.3 256 160 128.4"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6">
+      <div class="card mb-3">
+        <div class="card-body d-flex flex-row align-items-center">
+          <div class="me-3 fg-white bg-warning p-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 512 512" role="img" aria-hidden="true"><path fill="currentColor" d="M105.361 398.32A195.891 195.891 0 0 1 343.42 91.125l23.256-23.255A227.875 227.875 0 0 0 82.733 420.948 228.03 228.03 0 0 0 366.24 452.1l-23.312-23.312c-75.028 43.98-173.271 33.829-237.567-30.468"/><path fill="currentColor" d="M468.916 353.07a243.54 243.54 0 0 0 0-186.459 248 248 0 0 0-2.747-6.354 242.3 242.3 0 0 0-50.059-72.686L404.8 76.257l-11.317 11.314-172.27 172.269 172.63 172.631 10.957 10.953 11.31-11.314a242.2 242.2 0 0 0 49.452-71.358 249 249 0 0 0 3.354-7.682m-64.557-231.12a211.57 211.57 0 0 1 0 275.781L266.468 259.84Z"/></svg>
+          </div>
+          <div>
+            <div class="fs-6 fw-semibold fg-warning">89.9%</div>
+            <div class="fg-2 text-uppercase fw-semibold small">Widget title</div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <a class="fw-semibold small fg-2" href="https://coreui.io/" rel="noopener noreferrer" target="_blank">
+            View more
+            <svg xmlns="http://www.w3.org/2000/svg" class="float-end" width="16" height="16" viewBox="0 0 512 512" role="img" aria-hidden="true"><polygon fill="currentColor" points="160 128.4 192.3 96 352 256 192.3 416 160 383.6 287.3 256 160 128.4"/></svg>
+          </a>
         </div>
       </div>
     </div>
