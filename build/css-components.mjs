@@ -287,7 +287,6 @@ const claim = (map, className, name) => {
 
 export const classIndex = sheets => {
   const declared = new Map()
-  const subjects = new Map()
   const mentioned = new Map()
 
   for (const [name, css] of sheets) {
@@ -302,10 +301,6 @@ export const classIndex = sheets => {
 
         if (own) {
           claim(declared, own, name)
-        }
-
-        for (const [, className] of (parts.at(-1) ?? '').matchAll(/\.([a-zA-Z][\w-]*)/g)) {
-          claim(subjects, className, name)
         }
 
         for (const [, className] of parts.join(' ').matchAll(/\.([a-zA-Z][\w-]*)/g)) {
@@ -325,14 +320,8 @@ export const classIndex = sheets => {
     }
   }
 
-  for (const [className, names] of subjects) {
-    if (!declared.has(className) && names.size === 1) {
-      index.set(className, [...names][0])
-    }
-  }
-
   for (const [className, names] of mentioned) {
-    if (!index.has(className) && names.size === 1) {
+    if (!declared.has(className) && names.size === 1) {
       index.set(className, [...names][0])
     }
   }
