@@ -42,6 +42,9 @@ In your `custom.scss`, you'll load CoreUI's source Sass files with `@use`. You h
 
 @use "@coreui/coreui/scss/coreui";
 
+// Utilities: `scss/coreui` no longer loads them, so emit them from `$utilities`
+@use "@coreui/coreui/scss/utilities/api";
+
 // Then add additional custom code here
 ```
 
