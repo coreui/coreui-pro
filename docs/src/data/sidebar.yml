@@ -63,7 +63,7 @@
     - title: Optimize
       to: /customize/optimize/
 - title: Layout
-  icon: <path fill="var(--ci-primary-color, currentColor)" d="M16,64V448H496V64ZM464,240H192V96H464ZM192,272H312V416H192ZM48,96H160V416H48ZM344,416V272H464V416Z" class="ci-primary"></path>
+  icon: <path fill="var(--ci-primary-color, currentColor)" d="M16,64V448H496V64ZM320,96V416H192V96ZM48,96H160V416H48ZM464,416H352V96H464Z" class="ci-primary"></path>
   pages:
     - title: Breakpoints
       to: /layout/breakpoints/
@@ -469,6 +469,11 @@
       to: /utilities/width/
     - title: Z-index
       to: /utilities/z-index/
+- title: Blocks
+  icon: <path fill="var(--ci-primary-color, currentColor)" d="M16,64V448H496V64ZM464,240H192V96H464ZM192,272H312V416H192ZM48,96H160V416H48ZM344,416V272H464V416Z" class="ci-primary"></path>
+  pages:
+    - title: Widgets
+      to: /blocks/widgets/
 - title: Templates
   icon: <path fill="var(--ci-primary-color, currentColor)" d="M472,232H424V120a24.028,24.028,0,0,0-24-24H40a24.028,24.028,0,0,0-24,24V366a24.028,24.028,0,0,0,24,24H212v50H152v32H304V440H244V390h92v58a24.027,24.027,0,0,0,24,24H472a24.027,24.027,0,0,0,24-24V256A24.027,24.027,0,0,0,472,232ZM336,256V358H48V128H392V232H360A24.027,24.027,0,0,0,336,256ZM464,440H368V264h96Z" class="ci-primary"/>
   pages:
