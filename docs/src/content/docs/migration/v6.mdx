@@ -3583,6 +3583,57 @@ Upstream v6 does the same, with a `mask-icon()` mixin.
   a disabled toggle is dimmed rather than repainted, so a disabled checked
   toggle still reads as checked.
 
+#### The utilities stylesheet is written from `utilities.json`
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+- **`scss/coreui` and `scss/coreui-utilities` no longer load the utilities API
+  module.** The utilities layer of `dist/css/coreui.css` and
+  `dist/css/coreui-utilities.css` is generated from `utilities.json` and the
+  token scales in `tokens.json`, and appended after Sass has written the rest —
+  byte for byte what the Sass loop used to emit. If you compile the library
+  yourself, load the API module after it, or the classes are missing entirely:
+
+  ```diff
+    @use "@coreui/coreui/scss/coreui";
+  + @use "@coreui/coreui/scss/utilities/api";
+  ```
+
+- **A `$utilities` override no longer reaches the shipped stylesheet.**
+  `@use "@coreui/coreui/scss/coreui" with ($utilities: …)` and the
+  `map.merge($utilities, …)` partial still work in *your* Sass build — the map,
+  the `generate-utilities-loop()` mixin and `scss/utilities/_api.scss` all
+  remain — but they change nothing in `coreui.css` or `coreui-utilities.css`.
+  The same change as data goes in a JSON file merged over `utilities.json` with
+  the same rules (a key replaces the whole group, `null` removes it, a new key
+  is appended):
+
+  ```json
+  // coreui.utilities.json
+  {
+    "cursor": { "property": "cursor", "class": "cursor", "responsive": true, "values": ["auto", "pointer", "grab"] },
+    "width": null
+  }
+  ```
+
+  ```sh
+  npx coreui-utilities coreui.utilities.json css/utilities.css
+  ```
+
+  The [utility API page](/utilities/api/#without-sass) covers the JSON keys, the
+  `--config` module the React binding's `defineConfig()` produces, and `--scan`.
+
+- **Three Sass settings stop reaching the utilities.** The generator reads
+  `utilities.json` and `tokens.json`, so `@use "config" with ()` overrides of
+  `$prefix`, `$breakpoints` and `$enable-reduced-motion` no longer change the
+  generated layer: the class prefix is fixed at `cui-`, the breakpoints come
+  from the `breakpoint` tokens, and the reduced-motion rule that stands the
+  animation utilities down is always written. Move the breakpoints to
+  `tokens.json`; a build that has to respell the prefix or drop the
+  reduced-motion rule emits the layer itself through the API module, as above.
+  The Bootstrap theme (`scss/themes/bootstrap/bootstrap.scss`) does exactly
+  that, because it writes `bs-`.
+
 #### Utilities API: one `property` map replaces `css-var`, `css-variable-name` and `local-vars`
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
