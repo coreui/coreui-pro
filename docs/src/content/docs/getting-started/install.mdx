@@ -315,10 +315,18 @@ covers the button and the button group), while a component that stands on its
 own gets its own file — the close button, the loading button and the search
 button are separate from `buttons.css`.
 
-`base.css` carries the design tokens on `:root` and [Reboot](/content/reboot/).
-Every component stylesheet reads those tokens and Reboot sets the element
-defaults components build on, so `base.css` always comes first — a component
-file on its own has nothing to resolve its tokens against.
+`base.css` carries the design tokens on `:root`, [Reboot](/content/reboot/) and
+the `.theme-*` classes. Every component stylesheet reads those tokens, Reboot
+sets the element defaults components build on, and the theme classes are how a
+component is coloured — `<button class="btn-solid theme-primary">` is grey
+without them. So `base.css` always comes first; a component file on its own has
+nothing to resolve its tokens against.
+
+The rest of the [helpers](/helpers/) and all
+[utilities](/utilities/api/) ship in `coreui-utilities.css`, not per component:
+they are written on your markup, not on a component's. The one exception is
+`.visually-hidden`, which the chip set's JavaScript renders for its live region,
+so it has its own file that `chip-set` requires.
 
 Each file in `css/components/` opens with the same cascade layer order, so
 component stylesheets can be interleaved with `coreui-utilities.css` or with

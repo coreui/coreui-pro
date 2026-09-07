@@ -34,11 +34,11 @@
     },
     {
       "path": "./dist/css/base.css",
-      "maxSize": "7 kB"
+      "maxSize": "7.75 kB"
     },
     {
       "path": "./dist/css/base.min.css",
-      "maxSize": "6.5 kB"
+      "maxSize": "7.25 kB"
     },
     {
       "path": "./dist/css/components/sidebar.css",

@@ -17,12 +17,12 @@ const scssDir = path.join(process.cwd(), 'scss')
 const outDir = path.join(process.cwd(), 'dist/css')
 const componentsDir = path.join(outDir, 'components')
 
-const baseModules = ['root', 'layout/tokens', 'content/reboot']
+const baseModules = ['root', 'layout/tokens', 'content/reboot', 'helpers/theme-colors']
 const tailModules = ['helpers', 'utilities/api']
 
 const renders = {
   autocomplete: ['combobox', 'forms/form-control', 'forms/form-control-group'],
-  'chip-set': ['chip'],
+  'chip-set': ['chip', 'helpers/visually-hidden'],
   'loading-button': ['buttons', 'spinner'],
   'date-picker': ['forms/floating-labels', 'forms/form-control', 'forms/form-control-group', 'forms/form-date-time', 'popup'],
   'range-slider': ['tooltip'],
@@ -97,7 +97,8 @@ const groups = [
   { name: 'time-picker', modules: ['time-picker'] },
   { name: 'toasts', modules: ['toasts'] },
   { name: 'tooltip', modules: ['tooltip'] },
-  { name: 'transitions', modules: ['transitions'] }
+  { name: 'transitions', modules: ['transitions'] },
+  { name: 'helpers/visually-hidden', modules: ['helpers/visually-hidden'] }
 ]
 
 const sassOptions = { loadPaths: [scssDir], style: 'expanded', quietDeps: true }
@@ -166,16 +167,25 @@ const expand = id => {
   return path.basename(file).startsWith('_') ? [file] : directUses(file)
 }
 
-const allGroups = [{ name: 'base', modules: baseModules }, ...groups, { name: 'utilities', modules: tailModules }]
-const groupByName = new Map(allGroups.map(group => [group.name, group]))
-const groupFiles = new Map(allGroups.map(group => [group.name, group.modules.flatMap(id => expand(id))]))
+const named = [{ name: 'base', modules: baseModules }, ...groups]
+const groupFiles = new Map(named.map(group => [group.name, group.modules.flatMap(id => expand(id))]))
 
 const ownerOf = new Map()
-for (const group of allGroups) {
+for (const group of named) {
   for (const file of groupFiles.get(group.name)) {
     ownerOf.set(file, group.name)
   }
 }
+
+// Whatever helpers and utilities nothing else claims still ship in coreui-utilities.css.
+const tailFiles = tailModules.flatMap(id => expand(id)).filter(file => !ownerOf.has(file))
+groupFiles.set('utilities', tailFiles)
+for (const file of tailFiles) {
+  ownerOf.set(file, 'utilities')
+}
+
+const allGroups = [...named, { name: 'utilities', modules: tailFiles.map(file => idOf(file)) }]
+const groupByName = new Map(allGroups.map(group => [group.name, group]))
 
 const ruleFree = new Set()
 const dependsOn = name => {
