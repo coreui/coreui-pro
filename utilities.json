@@ -337,42 +337,35 @@
     "property": "border-width",
     "class": "border",
     "values": {
-      "$merge": [
-        {
-          "$tokens": "border.width"
-        },
-        {
-          "keyline": "var(--cui-border-width-keyline)"
-        }
-      ]
+      "$refs": "border.width"
     }
   },
   "border-top-width": {
     "property": "border-top-width",
     "class": "border-top",
     "values": {
-      "$tokens": "border.width"
+      "$refs": "border.width"
     }
   },
   "border-end-width": {
     "property": "border-inline-end-width",
     "class": "border-end",
     "values": {
-      "$tokens": "border.width"
+      "$refs": "border.width"
     }
   },
   "border-bottom-width": {
     "property": "border-bottom-width",
     "class": "border-bottom",
     "values": {
-      "$tokens": "border.width"
+      "$refs": "border.width"
     }
   },
   "border-start-width": {
     "property": "border-inline-start-width",
     "class": "border-start",
     "values": {
-      "$tokens": "border.width"
+      "$refs": "border.width"
     }
   },
   "border-color-subtle": {
