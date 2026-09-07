@@ -6,3 +6,7 @@
 @forward "@coreui-docs-source/scss/config" with (
   $enable-deprecation-messages: false
 );
+
+// The pages that document the deprecated v5 spellings render them live, and the
+// engine's stylesheet loads `scss/coreui` alone.
+@forward "@coreui-docs-source/scss/legacy";

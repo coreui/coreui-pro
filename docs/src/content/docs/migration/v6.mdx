@@ -65,6 +65,38 @@ description: "Track and review changes to the CoreUI for Bootstrap source files,
   use a few components can now ship a few kilobytes of CSS instead of the whole
   library. See [per-component CSS files](/getting-started/install/#per-component-css-files).
 
+- **`dist/css` gained `coreui-legacy.css`, and `coreui.css` lost the v5
+  spellings it carries.**
+  <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  `coreui.css` is the v6 class API only. The deprecated v5 spellings — the
+  colour modifiers (`.alert-{color}`, `.btn-{color}`, `.btn-outline-{color}`,
+  `.btn-subtle-{color}`, `.btn-ghost-{color}`, `.callout-{color}`,
+  `.chip-{color}`, `.list-group-item-{color}`), the form check markup
+  (`.form-check`, `.form-check-input`, `.form-check-label`,
+  `.form-check-inline`, `.form-switch`, `.form-switch-lg` / `-xl`) and
+  `.btn-check` on the input — moved to `coreui-legacy.css`, 3.4&nbsp;kB gzip.
+  That takes 2.1&nbsp;kB gzip off `coreui.css` for markup that has already
+  moved, and turns the compatibility layer into something you can see on a
+  network tab and delete in one line.
+
+  **What to change:** if your markup still uses any of them, add the sheet
+  after `coreui.css` (or last, after `base.css` and the component files):
+
+  ```html
+  <link href="css/coreui.min.css" rel="stylesheet">
+  <link href="css/coreui-legacy.min.css" rel="stylesheet">
+  ```
+
+  From Sass, `@use "coreui-legacy";` next to your `@use "coreui";`. Everything
+  in it is still removed in v7. See
+  [v5 compatibility CSS](/getting-started/install/#v5-compatibility-css).
+
+- **`$enable-deprecated-classes` and `$enable-deprecated-form-check` are gone.**
+  <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  A separate stylesheet answers the question both flags existed for, without a
+  recompile: `false` is now "do not load `coreui-legacy.css`". Sass builds that
+  set either flag fail with an unknown-variable error — delete the line.
+
 ### Browser support
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
@@ -1654,17 +1686,17 @@ compatibility layer — **aliases of the new controls**, not a second
 implementation, so there is one engine to maintain and the old markup lays out
 exactly as it did. Verified by measuring geometry across six markup variants and
 eight dimensions each: zero differences. It is deprecated in v6 and removed in
-v7. Set `$enable-deprecated-form-check: false` to leave it out of your build once
-your markup has moved; that takes **455 bytes gzip** off the stylesheet and
-leaves no `.form-check*` selector behind.
+v7. It ships in `coreui-legacy.css`, not in `coreui.css`, so a build whose markup
+has moved leaves the sheet out and carries no `.form-check*` selector at all.
 
-`.btn-check` is **not** part of that layer — toggle buttons are a current
-feature, and they live with the buttons now rather than with the form check.
+`.btn-check` on the `<label>` is a current feature and lives with the buttons.
+The v5 spelling — `.btn-check` on the `<input>`, with a sibling `<label
+class="btn">` — is in `coreui-legacy.css` alongside the rest.
 
-The variables that shape the wrapper moved with it, into `forms/_form-check.scss`,
+The variables that shape the wrapper moved with it, into `scss/_legacy.scss`,
 and go when it does:
 
-<ScssDocs file="scss/forms/_form-check.scss" capture="form-check-wrapper-variables" />
+<ScssDocs file="scss/_legacy.scss" capture="form-check-wrapper-variables" />
 
 **Five Sass variables shaped the old artwork and cannot be honoured any more**,
 because the compatibility layer draws through the new engine:
@@ -2273,20 +2305,17 @@ Multi Select's option indicators moved with it — they render as a decorative
   is unchanged.
 
 
-#### The deprecated colour classes are behind a flag
+#### The deprecated colour classes are a separate stylesheet
 
-- **`$enable-deprecated-classes` drops the v5 colour modifiers from the build.**
-  It defaults to `true`, so nothing changes unless you set it: with the flag on,
-  the compiled CSS is byte-identical to a build without it. Set it to `false`
-  once your markup uses the theme classes and `.alert-{color}`,
-  `.btn-{color}`, `.btn-outline-{color}`, `.btn-ghost-{color}`,
-  `.callout-{color}`, `.chip-{color}` and `.list-group-item-{color}` leave the
-  stylesheet. They are removed outright in v7.
-- **The buttons lose the colour spelling in two places, not one.** Besides the
-  loop that points each class at a theme colour, `btn-variant-selectors()`
-  appends the colour classes to the selector list that carries a variant's base
-  declarations — the flag gates both, so `.btn-primary` disappears whole rather
-  than surviving as a rule with no colour.
+- **`.alert-{color}`, `.btn-{color}`, `.btn-outline-{color}`,
+  `.btn-subtle-{color}`, `.btn-ghost-{color}`, `.callout-{color}`,
+  `.chip-{color}` and `.list-group-item-{color}` ship in `coreui-legacy.css`.**
+  Load it after `coreui.css` and they render exactly as before; leave it out
+  once your markup uses the theme classes. They are removed outright in v7.
+- **The buttons carry the colour spelling in two places, not one.** Besides the
+  loop that points each class at a theme colour, a variant's base declarations
+  are repeated for the colour classes — the legacy sheet carries both, so
+  `.btn-primary` moves whole rather than surviving as a rule with no colour.
 - **`alert-modifiers` and `btn-variant-loops` each covered two loops, one
   deprecated and one not.** They are split, so the docs can mark the deprecated
   half without mislabelling the other: the alert variants loop is

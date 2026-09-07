@@ -169,7 +169,7 @@ Create button-like radios by putting `.btn-check` on a `<label>` with the button
 
 <DeprecatedIn version="6.0.0" />
 
-The v5 spelling — `.form-check` wrapping a `.form-check-input` and a `.form-check-label` — still works and renders exactly as it did. It is removed in v7, and `$enable-deprecated-form-check: false` leaves it out of your build today.
+The v5 spelling — `.form-check` wrapping a `.form-check-input` and a `.form-check-label` — still works and renders exactly as it did. It ships in the opt-in [`coreui-legacy.css`](/getting-started/install/#v5-compatibility-css) rather than in `coreui.css`, and is removed in v7.
 
 ```diff
 - <div class="form-check">
@@ -201,7 +201,7 @@ Modify the appearance of checked radios by adding a [`.theme-{color}` class](/cu
 
 Radios read their own custom properties, so restyling one control does not touch the other two. Set them on the control itself — an ancestor cannot override a token the element declares for itself.
 
-<ScssDocs file="scss/forms/_radio.scss" capture="radio-css-vars" />
+<ScssDocs file="scss/mixins/_radio.scss" capture="radio-css-vars" />
 
 ### Sass variables
 
@@ -209,13 +209,13 @@ Radios read their own custom properties, so restyling one control does not touch
 
 Sass variables set these defaults at build time and are removed in v7. The CSS variables above reach the same values without recompiling, and can be set on a single element.
 
-<ScssDocs file="scss/forms/_radio.scss" capture="radio-variables" />
+<ScssDocs file="scss/mixins/_radio.scss" capture="radio-variables" />
 
 ### Sass maps
 
 Each size is one entry, and the map merges with your overrides — add a key to define a size, or set one to `null` to drop it:
 
-<ScssDocs file="scss/forms/_radio.scss" capture="radio-sizes" />
+<ScssDocs file="scss/mixins/_radio.scss" capture="radio-sizes" />
 
 ### Shared variables
 

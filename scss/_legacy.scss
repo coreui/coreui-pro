@@ -1,0 +1,242 @@
+@use "sass:list";
+@use "sass:map";
+@use "sass:string";
+@use "functions/defaults" as *;
+@use "mixins/box-shadow" as *;
+@use "mixins/button" as *;
+@use "mixins/check" as *;
+@use "mixins/focus-ring" as *;
+@use "mixins/form-field" as *;
+@use "mixins/form-validation" as *;
+@use "mixins/radio" as *;
+@use "mixins/switch" as *;
+@use "mixins/tokens" as *;
+@use "config" as *;
+@use "layers";
+@use "theme" as *;
+
+// scss-docs-start form-check-wrapper-variables
+$form-check-min-height:                   calc(var(--#{$prefix}body-font-size) * var(--#{$prefix}body-line-height)) !default;
+$form-check-margin-bottom:                .125rem !default;
+$form-check-inline-margin-end:            1rem !default;
+
+$form-check-label-color:                  null !default;
+$form-check-label-cursor:                 null !default;
+// scss-docs-end form-check-wrapper-variables
+
+// stylelint-disable scss/dollar-variable-default
+
+// scss-docs-start form-check-tokens
+$form-check-tokens: () !default;
+$form-check-tokens: defaults(
+  (
+    --#{$prefix}form-check-min-height: #{$form-check-min-height},
+    --#{$prefix}form-check-margin-bottom: #{$form-check-margin-bottom},
+    --#{$prefix}form-check-inline-margin-end: #{$form-check-inline-margin-end},
+    --#{$prefix}form-check-label-color: $form-check-label-color,
+    --#{$prefix}form-check-label-cursor: $form-check-label-cursor,
+  ),
+  $form-check-tokens
+);
+// scss-docs-end form-check-tokens
+
+// stylelint-enable scss/dollar-variable-default
+
+$form-switch-sizes: () !default;
+
+// The v5 spelling shipped two sizes; both take their height from the map above.
+// scss-docs-start form-switch-sizes
+// stylelint-disable-next-line scss/dollar-variable-default
+$form-switch-sizes: defaults(
+  ("lg", "xl"),
+  $form-switch-sizes
+);
+// scss-docs-end form-switch-sizes
+
+// The v6 spelling puts `.btn-check` on the `<label>` styled as a button, so the
+// deprecated one — the class on the input — is the `.btn-check` that carries
+// no button spelling at all.
+$btn-check-deprecated: ".btn-check:not(#{$btn-variant-selectors})" !default;
+
+// A v5 switch input is a checkbox too: without the `:not()` it would collect
+// the check mark on top of the switch thumb.
+$check-selector:  ".form-check-input[type=checkbox]:not(.form-switch *)" !default;
+$radio-selector:  ".form-check-input[type=radio]" !default;
+$switch-selector: ".form-switch .form-check-input" !default;
+
+@layer forms {
+  .form-field,
+  .form-check {
+    @include form-field(
+      "> .check, > .radio, > .switch, > .form-check-input",
+      ".check, .radio, .switch, .form-check-input"
+    );
+  }
+
+  .form-check {
+    @include tokens($form-check-tokens);
+
+    min-height: var(--#{$prefix}form-check-min-height);
+    margin-bottom: var(--#{$prefix}form-check-margin-bottom);
+  }
+
+  .form-check-label {
+    color: var(--#{$prefix}form-check-label-color, inherit);
+    cursor: var(--#{$prefix}form-check-label-cursor, inherit);
+  }
+
+  .form-check-inline {
+    display: inline-grid;
+    margin-inline-end: var(--#{$prefix}form-check-inline-margin-end);
+    vertical-align: top;
+  }
+
+  #{$check-selector} {
+    @include check();
+  }
+
+  #{$radio-selector} {
+    @include radio();
+  }
+
+  #{$switch-selector} {
+    @include switch();
+  }
+
+  @each $size, $map in $switch-sizes {
+    @if map.has-key($form-switch-sizes, $size) {
+      // Set on the input — the control declares these tokens itself, so an
+      // inherited value would lose to its own declaration.
+      .form-switch-#{$size} .form-check-input {
+        --#{$prefix}switch-height: #{map.get($map, "height")};
+      }
+
+      .form-switch-#{$size} {
+        --#{$prefix}switch-height: #{map.get($map, "height")};
+        min-height: var(--#{$prefix}switch-height);
+
+        .form-check-label {
+          padding-top: calc((var(--#{$prefix}switch-height) - var(--#{$prefix}body-font-size)) * .5);
+        }
+      }
+    }
+  }
+
+  @each $state, $data in $form-validation-states {
+    @include form-validation-controls(".form-check-input", $state, $data...);
+
+    .form-check-inline .form-check-input {
+      ~ .#{$state}-feedback {
+        margin-inline-start: .5em;
+      }
+    }
+  }
+}
+
+@layer components {
+  // Deprecated in v6: the class on the input, with a sibling `.btn` label.
+  #{$btn-check-deprecated} {
+    position: absolute;
+    clip: rect(0, 0, 0, 0);
+    pointer-events: none;
+
+    + .btn:hover {
+      color: var(--#{$prefix}btn-color);
+      background-color: var(--#{$prefix}btn-bg);
+      border-color: var(--#{$prefix}btn-border-color);
+    }
+
+    &:focus-visible + .btn,
+    &:checked:focus-visible + .btn {
+      border-color: var(--#{$prefix}btn-hover-border-color);
+      @include focus-ring(true);
+    }
+
+    &:checked + .btn {
+      color: var(--#{$prefix}btn-active-color);
+      background-color: var(--#{$prefix}btn-active-bg);
+      // stylelint-disable-next-line scss/at-function-named-arguments
+      background-image: if(sass($enable-gradients): none);
+      border-color: var(--#{$prefix}btn-active-border-color);
+      @include box-shadow(var(--#{$prefix}btn-active-shadow));
+    }
+
+    &[disabled],
+    &:disabled {
+      + .btn {
+        pointer-events: none;
+        filter: none;
+        opacity: var(--#{$prefix}btn-disabled-opacity);
+      }
+    }
+  }
+
+  // scss-docs-start btn-deprecated-variant-loops
+  @each $variant, $config in $button-variants {
+    // stylelint-disable-next-line scss/at-function-named-arguments
+    $infix: if(sass($variant == "solid"): ""; else: "#{$variant}-");
+    $selectors: ();
+
+    @each $color in map.keys($theme-colors) {
+      $selectors: list.append($selectors, string.unquote(".btn-#{$infix}#{$color}"), comma);
+    }
+
+    #{$selectors} {
+      @include button-variant($variant);
+    }
+  }
+  // scss-docs-end btn-deprecated-variant-loops
+
+  // scss-docs-start btn-deprecated-modifiers
+  @each $color in map.keys($theme-colors) {
+    $selectors: (string.unquote(".btn-#{$color}"));
+
+    @each $variant, $_ in $button-variants {
+      @if $variant != "solid" {
+        $selectors: list.append($selectors, string.unquote(".btn-#{$variant}-#{$color}"), comma);
+      }
+    }
+
+    #{$selectors} {
+      @include theme-tokens($color);
+    }
+  }
+  // scss-docs-end btn-deprecated-modifiers
+
+  // scss-docs-start alert-modifiers
+  @each $state in map.keys($theme-colors) {
+    .alert-#{$state} {
+      @include theme-tokens($state);
+    }
+  }
+  // scss-docs-end alert-modifiers
+
+  // scss-docs-start callout-modifiers
+  @each $state in map.keys($theme-colors) {
+    .callout-#{$state} {
+      @include theme-tokens($state);
+    }
+  }
+  // scss-docs-end callout-modifiers
+
+  // scss-docs-start chip-modifiers
+  // The variant sets the theme tokens and lets the base .chip tokens read
+  // them, the way the alert and table variants do.
+  @each $state in map.keys($theme-colors) {
+    .chip-#{$state} {
+      @include theme-tokens($state);
+    }
+  }
+  // scss-docs-end chip-modifiers
+
+  // scss-docs-start list-group-modifiers
+  // List group contextual variants
+  //
+  // Add modifier classes to change text and background color on individual items.
+  @each $state in map.keys($theme-colors) {
+    .list-group-item-#{$state} {
+      @include theme-tokens($state);
+    }
+  }
+  // scss-docs-end list-group-modifiers
+}

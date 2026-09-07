@@ -19,7 +19,7 @@
     "css": "npm-run-all css-compile css-components css-prefix css-minify",
     "css-components": "node build/css-components.mjs",
     "css-components-test": "node --test \"build/*.test.mjs\"",
-    "css-compile": "sass --style expanded --source-map --embed-sources --no-error-css scss/coreui.scss:dist/css/coreui.css scss/coreui-grid.scss:dist/css/coreui-grid.css scss/coreui-reboot.scss:dist/css/coreui-reboot.css scss/coreui-utilities.scss:dist/css/coreui-utilities.css scss/themes/bootstrap/bootstrap.scss:dist/css/themes/bootstrap/bootstrap.css",
+    "css-compile": "sass --style expanded --source-map --embed-sources --no-error-css scss/coreui.scss:dist/css/coreui.css scss/coreui-grid.scss:dist/css/coreui-grid.css scss/coreui-legacy.scss:dist/css/coreui-legacy.css scss/coreui-reboot.scss:dist/css/coreui-reboot.css scss/coreui-utilities.scss:dist/css/coreui-utilities.css scss/themes/bootstrap/bootstrap.scss:dist/css/themes/bootstrap/bootstrap.css",
     "css-lint": "npm-run-all --aggregate-output --continue-on-error --parallel css-lint-*",
     "css-lint-components": "node build/check-css-components.mjs",
     "css-lint-stylelint": "stylelint \"**/*.{css,scss}\" --cache --cache-location .cache/.stylelintcache",

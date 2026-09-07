@@ -216,6 +216,10 @@ coreui/
 │   ├── coreui-grid.css.map
 │   ├── coreui-grid.min.css
 │   ├── coreui-grid.min.css.map
+│   ├── coreui-legacy.css
+│   ├── coreui-legacy.css.map
+│   ├── coreui-legacy.min.css
+│   ├── coreui-legacy.min.css.map
 │   ├── coreui-reboot.css
 │   ├── coreui-reboot.css.map
 │   ├── coreui-reboot.min.css
@@ -300,15 +304,52 @@ CoreUI for Bootstrap includes a handful of options for including some or all of 
       <td class="fg-2">&mdash;</td>
       <td class="fg-2">&mdash;</td>
     </tr>
+    <tr>
+      <th scope="row">
+        <div><code class="fw-normal text-nowrap">coreui-legacy.css</code></div>
+        <div><code class="fw-normal text-nowrap">coreui-legacy.min.css</code></div>
+      </th>
+      <td class="fg-2">&mdash;</td>
+      <td class="fg-2">&mdash;</td>
+      <td><a class="link-secondary" href="#v5-compatibility-css">Only the v5 spellings</a></td>
+      <td class="fg-2">&mdash;</td>
+    </tr>
   </tbody>
 </table>
+
+### v5 compatibility CSS
+
+`coreui.css` carries the v6 class API only. The v5 spellings that v6 deprecated
+ship in `coreui-legacy.css`, which you load after it:
+
+```html
+<link href="css/coreui.min.css" rel="stylesheet">
+<link href="css/coreui-legacy.min.css" rel="stylesheet">
+```
+
+It is 3.4&nbsp;kB gzip and covers:
+
+- the colour modifiers `.alert-{color}`, `.btn-{color}`, `.btn-outline-{color}`,
+  `.btn-subtle-{color}`, `.btn-ghost-{color}`, `.callout-{color}`,
+  `.chip-{color}` and `.list-group-item-{color}` — each an alias of the matching
+  [`.theme-{color}`](/customize/components/#theme-variants) class;
+- the form check markup `.form-check`, `.form-check-input`, `.form-check-label`,
+  `.form-check-inline`, `.form-switch` and `.form-switch-lg` / `-xl` — aliases of
+  [`.form-field`](/forms/field/), [`.check`](/forms/checkbox/),
+  [`.radio`](/forms/radio/) and [`.switch`](/forms/switch/);
+- `.btn-check` on the input, with a sibling `<label class="btn">`, which v6
+  spells as `.btn-check` on the label.
+
+Everything in it is removed in v7, so treat the sheet as a migration budget: drop
+it once your markup uses the v6 spellings. It also loads on its own alongside
+`base.css` and the per-component files, last in the order.
 
 ### Per-component CSS files
 
 `coreui.css` is one file for the whole library. When a page uses a handful of
 components, `base.css` plus one stylesheet per component ships far less CSS:
 a card, a button group and an input group come to about 3.5&nbsp;kB gzip on top
-of a 6.4&nbsp;kB base, against 73.6&nbsp;kB for the full bundle.
+of a 6.4&nbsp;kB base, against 71.4&nbsp;kB for the full bundle.
 
 The split follows the Sass partials, so a component and its parts share one file
 (`card.css` covers `.card`, `.card-header` and `.card-body`; `buttons.css`

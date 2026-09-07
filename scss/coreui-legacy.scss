@@ -1,0 +1,6 @@
+@use "banner" with (
+  $file: "Legacy"
+);
+
+@forward "config";
+@forward "legacy";

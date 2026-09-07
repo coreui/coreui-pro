@@ -9,6 +9,14 @@
       "maxSize": "10.5 kB"
     },
     {
+      "path": "./dist/css/coreui-legacy.css",
+      "maxSize": "4 kB"
+    },
+    {
+      "path": "./dist/css/coreui-legacy.min.css",
+      "maxSize": "3.75 kB"
+    },
+    {
       "path": "./dist/css/coreui-reboot.css",
       "maxSize": "6.5 kB"
     },
@@ -26,11 +34,11 @@
     },
     {
       "path": "./dist/css/coreui.css",
-      "maxSize": "74 kB"
+      "maxSize": "72 kB"
     },
     {
       "path": "./dist/css/coreui.min.css",
-      "maxSize": "69.75 kB"
+      "maxSize": "68 kB"
     },
     {
       "path": "./dist/css/base.css",
