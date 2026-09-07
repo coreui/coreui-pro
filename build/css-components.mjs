@@ -2,7 +2,8 @@
 
 /*!
  * Script to compile dist/css/base.css and one stylesheet per component,
- * together with the manifest that records the dependencies between them.
+ * together with the manifest that records the dependencies between them and
+ * the index that records which stylesheet owns which class.
  * Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
  * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
  */
@@ -11,6 +12,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
+import postcss from 'postcss'
 import { compileString } from 'sass-embedded'
 
 const scssDir = path.join(process.cwd(), 'scss')
@@ -258,6 +260,57 @@ const closure = name => {
   return [...reached].toSorted()
 }
 
+const soleClass = selector => {
+  let stripped = selector
+  let previous
+
+  do {
+    previous = stripped
+    stripped = stripped.replace(/\(([^()]*)\)/g, '')
+  } while (stripped !== previous)
+
+  const match = stripped.trim().match(/^\.([a-zA-Z][\w-]*)(?::+[\w-]+)*$/)
+  return match ? match[1] : null
+}
+
+export const classIndex = sheets => {
+  const owners = new Map()
+
+  for (const [name, css] of sheets) {
+    if (name === 'base') {
+      continue
+    }
+
+    postcss.parse(css).walkRules(rule => {
+      for (const selector of rule.selectors) {
+        const className = soleClass(selector)
+
+        if (!className) {
+          continue
+        }
+
+        if (!owners.has(className)) {
+          owners.set(className, new Set())
+        }
+
+        owners.get(className).add(name)
+      }
+    })
+  }
+
+  const index = {}
+
+  for (const [className, names] of [...owners].toSorted(([a], [b]) => a.localeCompare(b))) {
+    const owner = names.size === 1 ? [...names][0] : [...names].find(name => name.split('/').at(-1) === className)
+
+    if (owner) {
+      index[className] = owner
+    }
+  }
+
+  return index
+}
+
 export const stylesheets = () => {
   const sheets = new Map([['base', render('base')]])
   const manifest = { base: { file: 'base.css', order: 0, requires: [] } }
@@ -280,12 +333,12 @@ export const stylesheets = () => {
   }
 
   return {
-    sheets, manifest, renders, tail: ownCss('utilities'), layerOrder
+    sheets, manifest, classes: classIndex(sheets), renders, tail: ownCss('utilities'), layerOrder
   }
 }
 
 if (path.resolve(process.argv[1] ?? '') === fileURLToPath(import.meta.url)) {
-  const { sheets, manifest } = stylesheets()
+  const { sheets, manifest, classes } = stylesheets()
 
   fs.rmSync(componentsDir, { recursive: true, force: true })
 
@@ -299,4 +352,8 @@ if (path.resolve(process.argv[1] ?? '') === fileURLToPath(import.meta.url)) {
   const manifestPath = path.join(componentsDir, 'manifest.json')
   fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`)
   console.log(`\u2713 ${path.relative(process.cwd(), manifestPath)}`)
+
+  const classesPath = path.join(componentsDir, 'classes.json')
+  fs.writeFileSync(classesPath, `${JSON.stringify(classes, null, 2)}\n`)
+  console.log(`\u2713 ${path.relative(process.cwd(), classesPath)} (${Object.keys(classes).length} classes)`)
 }
