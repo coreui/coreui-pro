@@ -35,6 +35,8 @@ Or remove borders:
 
 <AddedIn version="6.0.0" /> `.border-keyline` sits below `1px`, for a hairline that stays hairline on a high-density screen instead of thickening to a full device pixel.
 
+The widths are a scale on `--cui-border-width`: `.border-1` is the base, `.border-keyline` half of it, `.border-2` … `.border-5` its multiples, computed in the browser. `:root { --cui-border-width: 2px }` re-weights every width class and every component border at once.
+
 <Example class="docs-example-border-utils" code={`<span class="border border-keyline"></span>
   <span class="border border-1"></span>
   <span class="border border-2"></span>
@@ -67,6 +69,10 @@ Or remove borders:
 
 <ScssDocs file="scss/_root.scss" capture="root-border-var" />
 
+Each stop of the width scale is one token, `--cui-border-width-{key}`, a `calc()` multiple of `--cui-border-width`; the `.border-{key}` classes read the stops, so overriding one stop re-weights every class on it:
+
+<ScssDocs file="scss/_root.scss" capture="root-border-width-loop" />
+
 ### Sass variables
 
 <ScssDocs file="scss/_config.scss" capture="border-variables" />
@@ -78,7 +84,7 @@ Each neutral border is one entry: the key is one `.border-{key}` utility and the
 
 <ScssDocs file="scss/_theme.scss" capture="theme-borders-map" />
 
-Each entry is one `.border-{width}` class and the width it sets. Add a key to define a width, or set one to `null` to drop it:
+Each entry is one `.border-{width}` class and the `--cui-border-width-{width}` token it reads. Add a key to define a width (`6: calc(var(--cui-border-width) * 6)`), or set one to `null` to drop it:
 
 <ScssDocs file="scss/_config.scss" capture="border-widths-map" />
 

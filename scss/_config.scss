@@ -198,12 +198,12 @@ $border-widths: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
 $border-widths: defaults(
   (
-    keyline: .5px,
-    1: 1px,
-    2: 2px,
-    3: 3px,
-    4: 4px,
-    5: 5px
+    keyline: calc(var(--#{$prefix}border-width) * .5),
+    1: var(--#{$prefix}border-width),
+    2: calc(var(--#{$prefix}border-width) * 2),
+    3: calc(var(--#{$prefix}border-width) * 3),
+    4: calc(var(--#{$prefix}border-width) * 4),
+    5: calc(var(--#{$prefix}border-width) * 5)
   ),
   $border-widths
 );

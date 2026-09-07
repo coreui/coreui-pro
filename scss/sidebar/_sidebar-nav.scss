@@ -185,6 +185,7 @@ $sidebar-nav-tree-tokens: defaults(
     list-style-type: "";
 
     .nav-item {
+      display: flex;
       flex-direction: column;
     }
 

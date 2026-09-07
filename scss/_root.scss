@@ -147,6 +147,12 @@ $root-token-defaults: map.set($root-token-defaults, --#{$prefix}radius, $radius)
 $root-token-defaults: map.set($root-token-defaults, --#{$prefix}radius-pill, 50rem);
 // scss-docs-end root-radius-loop
 
+// scss-docs-start root-border-width-loop
+@each $key, $value in $border-widths {
+  $root-token-defaults: map.set($root-token-defaults, --#{$prefix}border-width-#{$key}, $value);
+}
+// scss-docs-end root-border-width-loop
+
 // scss-docs-start root-zindex-loop
 // One token per stop of the z-axis, so a page can relayer the library without
 // recompiling — a third-party overlay that must sit above the modal sets
@@ -208,7 +214,6 @@ $root-token-defaults: map.merge(
     --#{$prefix}mark-bg: $mark-bg,
     // scss-docs-start root-border-var
     --#{$prefix}border-width: $border-width,
-    --#{$prefix}border-width-keyline: #{map.get($border-widths, keyline)},
     --#{$prefix}border-style: $border-style,
     --#{$prefix}border-color: $border-color,
     --#{$prefix}border-color-translucent: $border-color-translucent,

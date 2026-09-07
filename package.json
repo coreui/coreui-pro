@@ -16,9 +16,12 @@
   "scripts": {
     "start": "npm-run-all --parallel watch docs-serve",
     "bundlewatch": "bundlewatch --config .bundlewatch.config.json",
-    "css": "npm-run-all css-compile css-prefix css-minify",
+    "css": "npm-run-all css-compile css-components css-prefix css-minify",
+    "css-components": "node build/css-components.mjs",
+    "css-components-test": "node --test \"build/*.test.mjs\"",
     "css-compile": "sass --style expanded --source-map --embed-sources --no-error-css scss/coreui.scss:dist/css/coreui.css scss/coreui-grid.scss:dist/css/coreui-grid.css scss/coreui-reboot.scss:dist/css/coreui-reboot.css scss/coreui-utilities.scss:dist/css/coreui-utilities.css scss/themes/bootstrap/bootstrap.scss:dist/css/themes/bootstrap/bootstrap.css",
     "css-lint": "npm-run-all --aggregate-output --continue-on-error --parallel css-lint-*",
+    "css-lint-components": "node build/check-css-components.mjs",
     "css-lint-stylelint": "stylelint \"**/*.{css,scss}\" --cache --cache-location .cache/.stylelintcache",
     "css-lint-vars": "fusv scss/",
     "css-minify": "node build/css-minify.mjs",
@@ -55,7 +58,7 @@
     "js-test-integration-bundle": "rolldown --config js/tests/integration/rolldown.bundle.mjs",
     "js-test-integration-modularity": "rolldown --config js/tests/integration/rolldown.bundle-modularity.mjs",
     "js-test-jquery": "cross-env JQUERY=true vitest run --config js/tests/vitest.config.mts",
-    "lint": "npm-run-all --aggregate-output --continue-on-error --parallel js-lint js-typecheck js-test-default-type css-lint lockfile-lint tokens-check utilities-check utilities-test",
+    "lint": "npm-run-all --aggregate-output --continue-on-error --parallel js-lint js-typecheck js-test-default-type css-lint css-components-test lockfile-lint tokens-check utilities-check utilities-test",
     "docs": "npm-run-all docs-build docs-lint",
     "docs-build": "npm run css-compile && astro build --root docs",
     "docs-compile": "npm run docs-build",
@@ -93,6 +96,9 @@
     "./js/dist/*": "./js/dist/*.js",
     "./dist/js/*": "./dist/js/*",
     "./dist/css/*": "./dist/css/*",
+    "./css/base.css": "./dist/css/base.css",
+    "./css/base.min.css": "./dist/css/base.min.css",
+    "./css/components/*": "./dist/css/components/*",
     "./scss/*": "./scss/*",
     "./tokens": "./build/lib/tokens.mjs",
     "./tokens.json": "./tokens.json",
@@ -104,6 +110,8 @@
     "coreui-utilities": "build/utilities.mjs"
   },
   "sideEffects": [
+    "**/*.css",
+    "**/*.scss",
     "./js/src/*.ts",
     "./js/dist/*.js",
     "./dist/js/*.js"
@@ -125,7 +133,7 @@
   },
   "devDependencies": {
     "@astrojs/mdx": "^7.0.3",
-    "@coreui/astro-docs": "^0.1.11",
+    "@coreui/astro-docs": "^0.1.12",
     "@eslint/markdown": "^7.5.1",
     "@floating-ui/dom": "^1.8.0",
     "@rollup/plugin-replace": "^6.0.3",
@@ -174,6 +182,8 @@
   },
   "files": [
     "dist/{css,js}/**/*.{css,js,map}",
+    "dist/css/components/classes.json",
+    "dist/css/components/manifest.json",
     "js/dist/**/*.{js,map,d.ts}",
     "js/src/**/*.ts",
     "scss/**/*.scss",
