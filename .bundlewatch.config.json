@@ -33,6 +33,22 @@
       "maxSize": "69.75 kB"
     },
     {
+      "path": "./dist/css/base.css",
+      "maxSize": "7.75 kB"
+    },
+    {
+      "path": "./dist/css/base.min.css",
+      "maxSize": "7.25 kB"
+    },
+    {
+      "path": "./dist/css/components/sidebar.css",
+      "maxSize": "4.5 kB"
+    },
+    {
+      "path": "./dist/css/components/layout/grid.css",
+      "maxSize": "3.75 kB"
+    },
+    {
       "path": "./dist/js/coreui.bundle.js",
       "maxSize": "131KB"
     },
