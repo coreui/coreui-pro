@@ -11,36 +11,47 @@ import { classIndex } from './css-components.mjs'
 const index = sheets => classIndex(new Map(Object.entries(sheets)))
 
 describe('classIndex', () => {
-  it('owns a class whose rule is a single compound', () => {
+  it('gives a class to the stylesheet that declares it as a rule of its own', () => {
     assert.deepEqual(index({ transitions: '.fade { transition: opacity .15s linear }' }), { fade: 'transitions' })
   })
 
-  it('keeps a class whose only rule carries pseudo-classes', () => {
+  it('reads a declaration that carries pseudo-classes', () => {
     assert.deepEqual(index({ buttons: '.btn:disabled { pointer-events: none }' }), { btn: 'buttons' })
   })
 
-  it('owns no class of a descendant selector', () => {
-    assert.deepEqual(index({ carousel: '.carousel-indicators .active { opacity: 1 }' }), {})
+  it('prefers the declaring stylesheet over one that only styles a descendant', () => {
+    assert.deepEqual(
+      index({ buttons: '.btn { padding: 0 }', badge: '.btn .badge { top: 0 }' }),
+      { badge: 'badge', btn: 'buttons' }
+    )
   })
 
-  it('owns no class of a child selector', () => {
-    assert.deepEqual(index({ nav: '.tab-content > .active { display: block }' }), {})
+  it('gives a class no stylesheet declares to the one that styles it as a subject', () => {
+    assert.deepEqual(
+      index({ nav: '.tab-content > .tab-pane { display: none }', card: '.card { border: 0 }' }),
+      { card: 'card', 'tab-content': 'nav', 'tab-pane': 'nav' }
+    )
   })
 
-  it('does not own a class used as the context of another component rule', () => {
-    assert.deepEqual(index({ badge: '.btn .badge { top: 0 }' }), {})
+  it('gives a class only ever used as a context to the one stylesheet that styles under it', () => {
+    assert.deepEqual(
+      index({ 'forms/number-input': '.number-input .form-control { padding: 0 }', 'forms/form-control': '.form-control { display: block }' }),
+      { 'form-control': 'forms/form-control', 'number-input': 'forms/number-input' }
+    )
   })
 
-  it('does not own a class combined with another class in the same compound', () => {
-    assert.deepEqual(index({ alert: '.alert.fade.show { opacity: 1 }' }), {})
+  it('leaves out a state several stylesheets style', () => {
+    const owners = index({ alert: '.alert.fade.show { opacity: 1 }', modal: '.modal.show { display: block }' })
+    assert.equal(owners.show, undefined)
+    assert.deepEqual([owners.alert, owners.modal], ['alert', 'modal'])
   })
 
   it('ignores the arguments of a functional pseudo-class', () => {
-    assert.deepEqual(index({ 'forms/input-group': '.input-group > :not(.dropdown-menu) { flex: 1 1 auto }' }), {})
+    assert.deepEqual(index({ 'forms/input-group': '.input-group > :not(.dropdown-menu) { flex: 1 1 auto }' }), { 'input-group': 'forms/input-group' })
   })
 
   it('leaves out a class two stylesheets declare', () => {
-    assert.deepEqual(index({ chip: '.chip-input-sm { padding: 0 }', 'forms/chip-input': '.chip-input-sm { padding: 0 }' }), {})
+    assert.deepEqual(index({ chip: '.chip-input-sm { padding: 0 }', 'forms/chip-input': '.chip-input-sm { padding: 1px }' }), {})
   })
 
   it('gives a class two stylesheets declare to the stylesheet named after it', () => {
@@ -64,5 +75,11 @@ describe('classIndex', () => {
     assert.deepEqual(index({ modal: '@layer components { @media (min-width: 576px) { .modal-dialog { max-width: 500px } } }' }), {
       'modal-dialog': 'modal'
     })
+  })
+
+  it('sorts the index by class name', () => {
+    assert.deepEqual(Object.keys(index({ card: '.card-title { margin: 0 } .card { border: 0 } .card-body { padding: 0 }' })), [
+      'card', 'card-body', 'card-title'
+    ])
   })
 })

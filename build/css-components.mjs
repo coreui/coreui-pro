@@ -260,7 +260,7 @@ const closure = name => {
   return [...reached].toSorted()
 }
 
-const soleClass = selector => {
+const compounds = selector => {
   let stripped = selector
   let previous
 
@@ -269,12 +269,26 @@ const soleClass = selector => {
     stripped = stripped.replace(/\(([^()]*)\)/g, '')
   } while (stripped !== previous)
 
-  const match = stripped.trim().match(/^\.([a-zA-Z][\w-]*)(?::+[\w-]+)*$/)
+  return stripped.trim().split(/[\s>+~]+/).filter(Boolean)
+}
+
+const soleClass = compound => {
+  const match = compound.match(/^\.([a-zA-Z][\w-]*)(?::+[\w-]+)*$/)
   return match ? match[1] : null
 }
 
+const claim = (map, className, name) => {
+  if (!map.has(className)) {
+    map.set(className, new Set())
+  }
+
+  map.get(className).add(name)
+}
+
 export const classIndex = sheets => {
-  const owners = new Map()
+  const declared = new Map()
+  const subjects = new Map()
+  const mentioned = new Map()
 
   for (const [name, css] of sheets) {
     if (name === 'base') {
@@ -283,32 +297,47 @@ export const classIndex = sheets => {
 
     postcss.parse(css).walkRules(rule => {
       for (const selector of rule.selectors) {
-        const className = soleClass(selector)
+        const parts = compounds(selector)
+        const own = parts.length === 1 ? soleClass(parts[0]) : null
 
-        if (!className) {
-          continue
+        if (own) {
+          claim(declared, own, name)
         }
 
-        if (!owners.has(className)) {
-          owners.set(className, new Set())
+        for (const [, className] of (parts.at(-1) ?? '').matchAll(/\.([a-zA-Z][\w-]*)/g)) {
+          claim(subjects, className, name)
         }
 
-        owners.get(className).add(name)
+        for (const [, className] of parts.join(' ').matchAll(/\.([a-zA-Z][\w-]*)/g)) {
+          claim(mentioned, className, name)
+        }
       }
     })
   }
 
-  const index = {}
+  const index = new Map()
 
-  for (const [className, names] of [...owners].toSorted(([a], [b]) => a.localeCompare(b))) {
+  for (const [className, names] of declared) {
     const owner = names.size === 1 ? [...names][0] : [...names].find(name => name.split('/').at(-1) === className)
 
     if (owner) {
-      index[className] = owner
+      index.set(className, owner)
     }
   }
 
-  return index
+  for (const [className, names] of subjects) {
+    if (!declared.has(className) && names.size === 1) {
+      index.set(className, [...names][0])
+    }
+  }
+
+  for (const [className, names] of mentioned) {
+    if (!index.has(className) && names.size === 1) {
+      index.set(className, [...names][0])
+    }
+  }
+
+  return Object.fromEntries([...index].toSorted(([a], [b]) => a.localeCompare(b)))
 }
 
 export const stylesheets = () => {

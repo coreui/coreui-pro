@@ -371,10 +371,13 @@ then load those entries together with their `requires`:
 }
 ```
 
-It lists every class exactly one component stylesheet declares on its own.
-Classes that only ever appear next to another class are absent — `.show` and
-`.active` are states of the component they sit on, and `.theme-*` belongs to
-`base.css`, which you load anyway.
+A class belongs to the stylesheet that declares it as a rule of its own; a class
+no stylesheet declares that way goes to the single stylesheet that styles it —
+`.tab-pane` is only ever styled under `.tab-content`, `.number-input` only ever
+as the context of the field inside it. Classes several stylesheets style are
+absent, which is what keeps the states out: `.show`, `.active` and `.disabled`
+belong to the component they sit on, not to a file of their own. `.theme-*` is
+absent too — it lives in `base.css`, which you load anyway.
 
 A page that uses a card, a button group and an input group loads:
 
