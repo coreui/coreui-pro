@@ -203,6 +203,14 @@ Once downloaded, unzip the compressed folder and you'll see something like this:
 ```text
 coreui/
 ├── css/
+│   ├── base.css
+│   ├── base.css.map
+│   ├── base.min.css
+│   ├── base.min.css.map
+│   ├── components/
+│   │   ├── accordion.css
+│   │   ├── … one stylesheet per component …
+│   │   └── manifest.json
 │   ├── coreui-grid.css
 │   ├── coreui-grid.css.map
 │   ├── coreui-grid.min.css
@@ -293,6 +301,65 @@ CoreUI for Bootstrap includes a handful of options for including some or all of 
     </tr>
   </tbody>
 </table>
+
+### Per-component CSS files
+
+`coreui.css` is one file for the whole library. When a page uses a handful of
+components, `base.css` plus one stylesheet per component ships far less CSS:
+a card, a button group and an input group come to about 3.5&nbsp;kB gzip on top
+of a 6.4&nbsp;kB base, against 73.6&nbsp;kB for the full bundle.
+
+`base.css` carries the design tokens on `:root` and [Reboot](/content/reboot/).
+Every component stylesheet reads those tokens and Reboot sets the element
+defaults components build on, so `base.css` always comes first — a component
+file on its own has nothing to resolve its tokens against.
+
+Each file in `css/components/` opens with the same cascade layer order, so
+component stylesheets can be interleaved with `coreui-utilities.css` or with
+your own layers in any order:
+
+```css
+@layer colors, config, root, reboot, layout, content, forms, components, custom, helpers, utilities;
+```
+
+Within one layer the last rule still wins, so load the files in the order
+`css/components/manifest.json` gives — the same order `coreui.css` uses. Each
+entry names its stylesheet, its position in that order, and the components it
+needs alongside it:
+
+```json
+{
+  "card": { "file": "components/card.css", "order": 34, "requires": [] },
+  "date-picker": {
+    "file": "components/date-picker.css",
+    "order": 39,
+    "requires": ["calendar", "forms/floating-labels", "forms/form-control", "forms/form-control-group", "forms/form-date-time", "popup", "time-picker"]
+  }
+}
+```
+
+`requires` is the full closure, so nothing else has to be resolved: load the
+listed files and the component's own, and the component renders exactly as it
+does from the full bundle. The list covers markup the JavaScript renders as
+well as the Sass a component builds on — the date picker draws a calendar and a
+time picker inside a form control group, which is why it asks for all three.
+
+A page that uses a card, a button group and an input group loads:
+
+```html
+<link href="css/base.css" rel="stylesheet">
+<link href="css/components/forms/form-control.css" rel="stylesheet">
+<link href="css/components/forms/input-group.css" rel="stylesheet">
+<link href="css/components/buttons.css" rel="stylesheet">
+<link href="css/components/card.css" rel="stylesheet">
+```
+
+From npm the same files are reachable as
+`@coreui/coreui-pro/css/base.css` and
+`@coreui/coreui-pro/css/components/card.css`, minified twins included.
+
+`coreui.css` is unchanged and remains the recommended drop-in for pages that do
+not build their CSS.
 
 ### JS files
 
