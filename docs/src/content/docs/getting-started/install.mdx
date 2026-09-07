@@ -309,6 +309,12 @@ components, `base.css` plus one stylesheet per component ships far less CSS:
 a card, a button group and an input group come to about 3.5&nbsp;kB gzip on top
 of a 6.4&nbsp;kB base, against 73.6&nbsp;kB for the full bundle.
 
+The split follows the Sass partials, so a component and its parts share one file
+(`card.css` covers `.card`, `.card-header` and `.card-body`; `buttons.css`
+covers the button and the button group), while a component that stands on its
+own gets its own file — the close button, the loading button and the search
+button are separate from `buttons.css`.
+
 `base.css` carries the design tokens on `:root` and [Reboot](/content/reboot/).
 Every component stylesheet reads those tokens and Reboot sets the element
 defaults components build on, so `base.css` always comes first — a component
@@ -329,10 +335,10 @@ needs alongside it:
 
 ```json
 {
-  "card": { "file": "components/card.css", "order": 34, "requires": [] },
+  "card": { "file": "components/card.css", "order": 37, "requires": [] },
   "date-picker": {
     "file": "components/date-picker.css",
-    "order": 39,
+    "order": 42,
     "requires": ["calendar", "forms/floating-labels", "forms/form-control", "forms/form-control-group", "forms/form-date-time", "popup", "time-picker"]
   }
 }
