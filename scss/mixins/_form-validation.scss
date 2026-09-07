@@ -1,4 +1,5 @@
 @use "../functions/defaults" as *;
+@use "focus-ring" as *;
 @use "../config" as *;
 @use "../theme" as *;
 
@@ -84,3 +85,34 @@ $form-feedback-tokens: defaults(
   }
 }
 // scss-docs-end form-validation-state-selector
+
+// scss-docs-start form-validation-controls-mixin
+@mixin form-validation-controls(
+  $selectors,
+  $state,
+  $theme,
+  $icon: null,
+  $color: var(--#{$prefix}#{$theme}-fg),
+  $tooltip-color: null,
+  $focus-ring-color: var(--#{$prefix}#{$theme}-focus-ring),
+  $border-color: var(--#{$prefix}#{$theme}-fg)
+) {
+  #{$selectors} {
+    @include form-validation-state-selector($state) {
+      border-color: $border-color;
+
+      &:checked {
+        background-color: $color;
+      }
+
+      &:focus-visible {
+        @include focus-ring(true, $color: $focus-ring-color);
+      }
+
+      ~ label {
+        color: $color;
+      }
+    }
+  }
+}
+// scss-docs-end form-validation-controls-mixin

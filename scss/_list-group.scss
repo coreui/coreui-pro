@@ -4,7 +4,6 @@
 @use "mixins/border-radius" as *;
 @use "mixins/tokens" as *;
 @use "config" as *;
-@use "theme" as *;
 
 // List group
 // scss-docs-start list-group-variables
@@ -220,19 +219,4 @@ $list-group-tokens: defaults(
       }
     }
   }
-
-  // scss-docs-start list-group-modifiers
-  // List group contextual variants
-  //
-  // Add modifier classes to change text and background color on individual items.
-  // Organizationally, this must come after the `:hover` states.
-
-  @if $enable-deprecated-classes {
-    @each $state in map.keys($theme-colors) {
-      .list-group-item-#{$state} {
-        @include theme-tokens($state);
-      }
-    }
-  }
-  // scss-docs-end list-group-modifiers
 }

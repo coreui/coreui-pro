@@ -14,8 +14,6 @@
 // `:user-valid` is scoped behind `[data-coreui-validate~="valid"]` so success styling is opt-in.
 // Custom states (e.g., "warning") use only `.is-*` classes.
 
-// stylelint-disable scss/at-function-named-arguments
-
 @mixin form-control-group-validation-state($color, $border-color, $focus-ring-color) {
   --#{$prefix}control-border-color: #{$border-color};
   --#{$prefix}control-focus-border-color: #{$border-color};
@@ -23,8 +21,6 @@
   --#{$prefix}control-group-icon-color: #{$color};
   --#{$prefix}control-group-action-color: #{$color};
 }
-
-$validated-controls: if(sass($enable-deprecated-form-check): ".check, .radio, .switch, .form-check-input"; else: ".check, .radio, .switch") !default;
 
 // scss-docs-start form-validation-state-mixin
 @mixin form-validation-state(
@@ -195,31 +191,14 @@ $validated-controls: if(sass($enable-deprecated-form-check): ".check, .radio, .s
     ~ .#{$state}-tooltip { display: block; }
   }
 
-  #{$validated-controls} {
-    @include form-validation-state-selector($state) {
-      border-color: $border-color;
-
-      &:checked {
-        background-color: $color;
-      }
-
-      &:focus-visible {
-        @include focus-ring(true, $color: $focus-ring-color);
-      }
-
-      ~ label {
-        color: $color;
-      }
-    }
-  }
-
-  @if $enable-deprecated-form-check {
-    .form-check-inline .form-check-input {
-      ~ .#{$state}-feedback {
-        margin-inline-start: .5em;
-      }
-    }
-  }
+  @include form-validation-controls(
+    ".check, .radio, .switch",
+    $state,
+    $theme,
+    $color: $color,
+    $focus-ring-color: $focus-ring-color,
+    $border-color: $border-color
+  );
 
   // Input group — feedback lives outside the input-group in the parent
   // .form-field, so we use :has() to toggle display.
@@ -266,8 +245,6 @@ $validated-controls: if(sass($enable-deprecated-form-check): ".check, .radio, .s
   }
 }
 // scss-docs-end form-validation-state-mixin
-
-// stylelint-enable scss/at-function-named-arguments
 
 @layer forms {
   // scss-docs-start form-validation-states-loop
