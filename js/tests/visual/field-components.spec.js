@@ -399,7 +399,7 @@ describe('input group', () => {
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor"><path d="M464 240H272V48h-32v192H48v32h192v192h32V272h192z"/></svg>
           </span>
         </div>
-        <button class="btn btn-outline-secondary" type="button">Go</button>
+        <button class="btn btn-outline theme-secondary" type="button">Go</button>
       </div>`)
     await shoot(container.querySelector('.input-group'), 'input-group-frame')
   })
