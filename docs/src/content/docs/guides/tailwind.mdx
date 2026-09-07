@@ -85,7 +85,7 @@ Tailwind's utilities take their values from its `@theme` block, and a theme valu
 
 `--spacing` is Tailwind's multiplier — `p-4` is four times it — and `--cui-spacer-1` is a quarter of `--cui-spacer`, so the two scales line up. Override `--cui-primary-base` on `:root` and both libraries repaint. Every token that can be mapped is listed on the [CSS variables](/customize/css-variables/) page.
 
-The other direction needs nothing: a component reads its color from the [theme slots](/customize/theme/) on the element, so `<button class="btn btn-solid theme-primary">` is themed the same way whether Tailwind is on the page or not, and a `.theme-brand` class of your own works next to Tailwind's `bg-*` classes.
+The other direction needs nothing: a component reads its color from the [theme slots](/customize/theme/) on the element, so `<button class="btn-solid theme-primary">` is themed the same way whether Tailwind is on the page or not, and a `.theme-brand` class of your own works next to Tailwind's `bg-*` classes.
 
 ## What CoreUI's components never need
 
