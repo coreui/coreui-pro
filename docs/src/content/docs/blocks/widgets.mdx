@@ -2,7 +2,11 @@
 title: "Bootstrap 6 Widgets"
 name: "Widgets"
 description: "Ready-made dashboard statistic blocks built from a Bootstrap card and utilities — copy the markup, keep it, change it."
+js:
+  - https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.js
 ---
+
+import widgetCharts from './snippets/widget-charts.js?raw'
 
 ## How it works
 
@@ -12,11 +16,9 @@ That is the whole point of keeping them as blocks: a statistic card is a layout 
 
 A `.card-body` lays its children out in a column and packs them to the start, so anything meant to sit side by side inside one needs `.flex-row`, and a `.row` inside one needs `.w-100`. Putting `.row` on the body itself does not work: the body's own `flex-direction: column` wins and the columns stack.
 
-The charts below are placeholder shapes. Any charting library renders into them — the blocks only reserve the space and set its height.
-
 ## Stat with chart
 
-A colored card carrying one figure, a menu and a chart running to the bottom edge. Two shapes for the chart area: inset with `.mx-3`, or full width with `.card-img-bottom`, which also rounds it into the card's bottom corners.
+A colored card carrying one figure, a menu and a chart running to the bottom edge. The chart is a `<canvas>` the block only reserves room for — here [Chart.js](https://www.chartjs.org/) draws into it, and the fill runs the full card width when the wrapper drops `.mx-3`.
 
 <Example code={`<div class="row">
     <div class="col-sm-6">
@@ -37,20 +39,8 @@ A colored card carrying one figure, a menu and a chart running to the bottom edg
             </ul>
           </div>
         </div>
-        <div class="mt-3 mx-3">
-          <svg width="100%" height="70" viewBox="0 0 311 70" preserveAspectRatio="none" role="img" aria-label="Chart" focusable="false">
-            <title>Chart</title>
-            <polyline fill="none" stroke="rgba(255,255,255,.55)" stroke-width="2" points="6,52 43,45 81,25 118,28 156,48 193,44 231,55 268,38 305,30"/>
-            <circle cx="6" cy="52" r="4" fill="var(--cui-primary-bg)" stroke="rgba(255,255,255,.55)" stroke-width="2"/>
-            <circle cx="43" cy="45" r="4" fill="var(--cui-primary-bg)" stroke="rgba(255,255,255,.55)" stroke-width="2"/>
-            <circle cx="81" cy="25" r="4" fill="var(--cui-primary-bg)" stroke="rgba(255,255,255,.55)" stroke-width="2"/>
-            <circle cx="118" cy="28" r="4" fill="var(--cui-primary-bg)" stroke="rgba(255,255,255,.55)" stroke-width="2"/>
-            <circle cx="156" cy="48" r="4" fill="var(--cui-primary-bg)" stroke="rgba(255,255,255,.55)" stroke-width="2"/>
-            <circle cx="193" cy="44" r="4" fill="var(--cui-primary-bg)" stroke="rgba(255,255,255,.55)" stroke-width="2"/>
-            <circle cx="231" cy="55" r="4" fill="var(--cui-primary-bg)" stroke="rgba(255,255,255,.55)" stroke-width="2"/>
-            <circle cx="268" cy="38" r="4" fill="var(--cui-primary-bg)" stroke="rgba(255,255,255,.55)" stroke-width="2"/>
-            <circle cx="305" cy="30" r="4" fill="var(--cui-primary-bg)" stroke="rgba(255,255,255,.55)" stroke-width="2"/>
-          </svg>
+        <div class="mt-3 mx-3" style="height: 70px;">
+          <canvas id="blockChart1"></canvas>
         </div>
       </div>
     </div>
@@ -72,20 +62,8 @@ A colored card carrying one figure, a menu and a chart running to the bottom edg
             </ul>
           </div>
         </div>
-        <div class="mt-3 mx-3">
-          <svg width="100%" height="70" viewBox="0 0 311 70" preserveAspectRatio="none" role="img" aria-label="Chart" focusable="false">
-            <title>Chart</title>
-            <polyline fill="none" stroke="rgba(255,255,255,.55)" stroke-width="2" points="6,58 43,40 81,50 118,44 156,26 193,34 231,20 268,36 305,24"/>
-            <circle cx="6" cy="58" r="4" fill="var(--cui-info-bg)" stroke="rgba(255,255,255,.55)" stroke-width="2"/>
-            <circle cx="43" cy="40" r="4" fill="var(--cui-info-bg)" stroke="rgba(255,255,255,.55)" stroke-width="2"/>
-            <circle cx="81" cy="50" r="4" fill="var(--cui-info-bg)" stroke="rgba(255,255,255,.55)" stroke-width="2"/>
-            <circle cx="118" cy="44" r="4" fill="var(--cui-info-bg)" stroke="rgba(255,255,255,.55)" stroke-width="2"/>
-            <circle cx="156" cy="26" r="4" fill="var(--cui-info-bg)" stroke="rgba(255,255,255,.55)" stroke-width="2"/>
-            <circle cx="193" cy="34" r="4" fill="var(--cui-info-bg)" stroke="rgba(255,255,255,.55)" stroke-width="2"/>
-            <circle cx="231" cy="20" r="4" fill="var(--cui-info-bg)" stroke="rgba(255,255,255,.55)" stroke-width="2"/>
-            <circle cx="268" cy="36" r="4" fill="var(--cui-info-bg)" stroke="rgba(255,255,255,.55)" stroke-width="2"/>
-            <circle cx="305" cy="24" r="4" fill="var(--cui-info-bg)" stroke="rgba(255,255,255,.55)" stroke-width="2"/>
-          </svg>
+        <div class="mt-3 mx-3" style="height: 70px;">
+          <canvas id="blockChart2"></canvas>
         </div>
       </div>
     </div>
@@ -107,11 +85,9 @@ A colored card carrying one figure, a menu and a chart running to the bottom edg
             </ul>
           </div>
         </div>
-        <svg class="card-img-bottom mt-3" width="100%" height="70" viewBox="0 0 311 70" preserveAspectRatio="none" role="img" aria-label="Chart" focusable="false">
-          <title>Chart</title>
-          <path fill="rgba(255,255,255,.35)" d="M0,30 39,28 78,26 117,38 156,46 194,50 233,54 272,48 311,40 311,70 0,70Z"/>
-          <polyline fill="none" stroke="rgba(255,255,255,.85)" stroke-width="2" points="0,30 39,28 78,26 117,38 156,46 194,50 233,54 272,48 311,40"/>
-        </svg>
+        <div class="mt-3" style="height: 70px;">
+          <canvas id="blockChart3"></canvas>
+        </div>
       </div>
     </div>
     <div class="col-sm-6">
@@ -132,30 +108,12 @@ A colored card carrying one figure, a menu and a chart running to the bottom edg
             </ul>
           </div>
         </div>
-        <svg class="card-img-bottom mt-3" width="100%" height="70" viewBox="0 0 311 70" preserveAspectRatio="none" role="img" aria-label="Chart" focusable="false">
-          <title>Chart</title>
-          <g fill="rgba(255,255,255,.35)">
-            <rect width="10.7" height="26" x="4.4" y="44"/>
-            <rect width="10.7" height="34" x="23.8" y="36"/>
-            <rect width="10.7" height="30" x="43.2" y="40"/>
-            <rect width="10.7" height="18" x="62.7" y="52"/>
-            <rect width="10.7" height="12" x="82.1" y="58"/>
-            <rect width="10.7" height="8" x="101.6" y="62"/>
-            <rect width="10.7" height="16" x="121.0" y="54"/>
-            <rect width="10.7" height="40" x="140.4" y="30"/>
-            <rect width="10.7" height="24" x="159.9" y="46"/>
-            <rect width="10.7" height="10" x="179.3" y="60"/>
-            <rect width="10.7" height="6" x="198.7" y="64"/>
-            <rect width="10.7" height="36" x="218.2" y="34"/>
-            <rect width="10.7" height="14" x="237.6" y="56"/>
-            <rect width="10.7" height="30" x="257.1" y="40"/>
-            <rect width="10.7" height="22" x="276.5" y="48"/>
-            <rect width="10.7" height="32" x="295.9" y="38"/>
-          </g>
-        </svg>
+        <div class="mt-3 mx-3" style="height: 70px;">
+          <canvas id="blockChart4"></canvas>
+        </div>
       </div>
     </div>
-  </div>`} />
+  </div>`} sandboxJs={widgetCharts} />
 
 ## Stat with progress
 

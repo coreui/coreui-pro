@@ -282,6 +282,7 @@ export default [
     languageOptions: {
       globals: {
         ...globals.browser,
+        Chart: 'readonly',
         coreui: 'readonly',
         dayjs: 'readonly'
       }
