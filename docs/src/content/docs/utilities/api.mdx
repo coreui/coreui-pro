@@ -1,11 +1,11 @@
 ---
 title: "Utility API"
-description: "The utility API is a Sass-based tool to generate utility classes."
+description: "The utility API generates families of utility classes from utilities.json — and from the same map in Sass."
 ---
 
-CoreUI for Bootstrap utilities are generated with our utility API and can be used to modify or extend our default set of utility classes via Sass. Our utility API is based on a series of Sass maps and functions for generating families of classes with various options. If you're unfamiliar with Sass maps, read up on the [official Sass docs](https://sass-lang.com/documentation/values/maps/) to get started.
+CoreUI for Bootstrap utilities are generated with our utility API: one definition per family of classes, with options for the property, the values, responsive and print variants, states and the selector shape. The definitions live in `utilities.json` at the root of the package, and the same map exists in Sass as `$utilities` for builds that compile our source; both produce the same stylesheet, and the library refuses to ship when they differ.
 
-The `$utilities` map contains all our utilities and is later merged with your custom `$utilities` map, if present. The utility map contains a keyed list of utility groups which accept the following options:
+A definition is a keyed group which accepts the following options:
 
 | Option | Type | Default&nbsp;value | Description |
 | --- | --- | --- | --- |
@@ -24,21 +24,22 @@ Every key is checked while the utility is generated: `property` and `values` are
 
 ## API explained
 
-All utility variables are added to the `$utilities` variable within our `_utilities.scss` stylesheet. Each group of utilities looks something like this:
+Every group is an entry of `utilities.json`. The `opacity` one looks like this:
+
+```json
+"opacity": {
+  "property": "opacity",
+  "values": { "0": "0", "25": ".25", "50": ".5", "75": ".75", "100": "1" }
+}
+```
+
+In Sass the same group is a map entry of `$utilities`, with the keys unquoted:
 
 ```scss
-$utilities: (
-  "opacity": (
-    property: opacity,
-    values: (
-      0: 0,
-      25: .25,
-      50: .5,
-      75: .75,
-      100: 1,
-    )
-  )
-);
+"opacity": (
+  property: opacity,
+  values: (0: 0, 25: .25, 50: .5, 75: .75, 100: 1),
+),
 ```
 
 Which outputs the following:
@@ -437,14 +438,77 @@ again. There is no switch that brings the suffix back: the layer is the mechanis
 
 Now that you're familiar with how the utilities API works, learn how to add your own custom classes and modify our default utilities.
 
-<Callout color="info">
-### The same utilities exist as JSON
+### Your own utilities.json
 
-<AddedIn version="6.0.0" /> [`utilities.json`](#without-sass) carries every
-utility on this page, and `$utilities` is written from it. Sass stays the way to
-change them in a Sass build; making the change in JSON instead reaches the class
-list and the typed class names too, and needs no compiler.
-</Callout>
+<AddedIn version="6.0.0" /> `utilities.json` in the package lists every utility with the keys described above, and `coreui-utilities` writes the utilities stylesheet from it and from the token scales in `tokens.json`. No compiler, no build step beyond running the command — the file it writes sits next to `coreui.css` in a plain HTML page, and a change made here also reaches the typed class names of the React and Vue bindings.
+
+Describe your utilities in a JSON file. Keys are the ones from this page, written as JSON: `property` is a string, a list or an object (the [property map](#property-map)), `values` a list, an object or one of the value sources the package itself uses, and `responsive`, `print`, `state`, `child-selector` and `selector` work as above. A value can be a CSS value, a `{path}` into `tokens.json` (written as `var(--cui-…)`) or a source such as `{ "$theme": "bg" }`, which expands to one entry per theme color:
+
+```json
+// coreui.utilities.json
+{
+  "rotate": {
+    "responsive": true,
+    "property": "transform",
+    "class": "rotate",
+    "values": { "45": "rotate(45deg)", "90": "rotate(90deg)" }
+  },
+  "opacity": {
+    "property": "opacity",
+    "values": { "0": "0", "50": ".5", "100": "1" }
+  },
+  "width": null
+}
+```
+
+The file is merged over the package map with the same rules as `$utilities`: a key that already exists replaces the whole default group, `null` removes it, a new key is appended. Then:
+
+```sh
+npx coreui-utilities coreui.utilities.json css/utilities.css
+```
+
+writes the complete utilities stylesheet — the defaults with your changes applied, responsive and print variants included — to `css/utilities.css`. Load it instead of `coreui-utilities.css`, or after `coreui.css` when you keep the full bundle. With `--only` the command writes just the groups your file names, which is the right shape for a few additions on top of the shipped stylesheet:
+
+```sh
+npx coreui-utilities coreui.utilities.json --only css/my-utilities.css
+```
+
+Either way the file starts with the cascade layer order, so your classes land in the `utilities` layer whether the browser sees this file first or `coreui.css` first.
+
+### Only what you use
+
+`--scan` reads your source files and keeps only the utility classes they use — the words of a static `class` or `className` attribute, and the string literals inside `utilities={[…]}`, `:utilities="[…]"` and `ux(…)`, which is how the React and Vue components take utilities:
+
+```sh
+npx coreui-utilities --scan "src/**/*.{html,tsx,vue}" css/utilities.css
+```
+
+### In a config file
+
+The same three settings can live in a config module instead of on the command line — `extend` with the JSON shape above, `safelist` and `scan` — which is what `defineConfig()` in the React and Vue bindings produces:
+
+```js
+// coreui.config.mjs
+export default {
+  utilities: {
+    extend: { rotate: { responsive: true, property: 'transform', class: 'rotate', values: { 45: 'rotate(45deg)' } } },
+    safelist: ['mt-1'],
+    scan: ['src/**/*.{html,tsx}'],
+  },
+}
+```
+
+```sh
+npx coreui-utilities --config coreui.config.mjs css/utilities.css
+```
+
+A `.ts` config works on a Node that strips types (22.6 and later). Flags on the command line add to what the config says.
+
+The rules come out in the order of the map, not the order of use, so two utilities on one element resolve exactly as they do in the full stylesheet, and only the `@property` registrations and keyframes those rules need are written. A name built at runtime (`` `mt-${n}` ``) cannot be found this way — pass it with `--safelist mt-1,mt-2`, or keep the set of names static. During development generate the full stylesheet instead and scan for the production build.
+
+### In Sass
+
+A build that compiles our Sass changes the same groups through the `$utilities` map. The map is hand-kept next to `utilities.json` and `npm run utilities-check` compiles both and refuses a byte of difference, so whatever this section produces, the JSON path produces too.
 
 `$utilities` is a configurable variable of the `scss/utilities` module, so you change it with `@use ... with ()` rather than by reassigning it after an import. Two patterns cover every case:
 
@@ -480,7 +544,7 @@ For a utilities-only build, load the utilities module and then the API module, w
 @use "@coreui/coreui/scss/utilities/api";
 ```
 
-### Override utilities
+#### Override utilities
 
 Override an existing utility by reusing its key. For example, to make the overflow utilities responsive and change their values:
 
@@ -499,7 +563,7 @@ Override an existing utility by reusing its key. For example, to make the overfl
 
 Your group replaces the default one, so keep the `property` key or the build stops with an error.
 
-### Add utilities
+#### Add utilities
 
 Add a new utility the same way — supply only what is new:
 
@@ -517,7 +581,7 @@ Add a new utility the same way — supply only what is new:
 );
 ```
 
-### Modify utilities
+#### Modify utilities
 
 Modifying a utility means reading its default definition first, so this needs the two-file pattern. Below we add another value to the `width` utilities:
 
@@ -551,7 +615,7 @@ Load your partial first, then CoreUI:
 @use "@coreui/coreui/scss/coreui";
 ```
 
-#### Enable responsive
+##### Enable responsive
 
 You can turn on responsive classes for a group that isn't responsive by default. This keeps the rest of the definition, so it takes the two-file pattern:
 
@@ -603,7 +667,7 @@ This will now generate responsive variations of `.border` and `.border-0` for ea
 }
 ```
 
-#### Rename utilities
+##### Rename utilities
 
 Missing v4 utilities, or used to another naming convention? The utilities API can override the resulting `class` of a given utility — for example, to rename `.ms-*` back to `.ml-*`. It reads the default definition, so it takes the two-file pattern:
 
@@ -623,7 +687,7 @@ $utilities: map.merge(
 );
 ```
 
-### Remove utilities
+#### Remove utilities
 
 Set a group to `null` to drop it:
 
@@ -651,7 +715,7 @@ $utilities: map.merge(
 );
 ```
 
-### Add, remove, modify
+#### Add, remove, modify
 
 Anything that only adds or removes goes in one file:
 
@@ -703,68 +767,3 @@ $utilities: map.merge(
 );
 ```
 
-## Without Sass
-
-<AddedIn version="6.0.0" /> The same map exists as data: `utilities.json` in the package lists every utility with the keys described above, and `coreui-utilities` writes the utilities stylesheet from it and from the token scales in `tokens.json`. No Sass, no build step beyond running the command — the file it writes sits next to `coreui.css` in a plain HTML page. The library's own `npm run utilities-check` compiles the Sass map alongside it and refuses a byte of difference, so the two paths cannot drift.
-
-Describe your utilities in a JSON file. Keys are the ones from this page, written as JSON: `property` is a string, a list or an object (the [property map](#property-map)), `values` a list, an object or one of the value sources the package itself uses, and `responsive`, `print`, `state`, `child-selector` and `selector` work as above. A value can be a CSS value, a `{path}` into `tokens.json` (written as `var(--cui-…)`) or a source such as `{ "$theme": "bg" }`, which expands to one entry per theme color:
-
-```json
-// coreui.utilities.json
-{
-  "rotate": {
-    "responsive": true,
-    "property": "transform",
-    "class": "rotate",
-    "values": { "45": "rotate(45deg)", "90": "rotate(90deg)" }
-  },
-  "opacity": {
-    "property": "opacity",
-    "values": { "0": "0", "50": ".5", "100": "1" }
-  },
-  "width": null
-}
-```
-
-The file is merged over the package map with the same rules as `$utilities`: a key that already exists replaces the whole default group, `null` removes it, a new key is appended. Then:
-
-```sh
-npx coreui-utilities coreui.utilities.json css/utilities.css
-```
-
-writes the complete utilities stylesheet — the defaults with your changes applied, responsive and print variants included — to `css/utilities.css`. Load it instead of `coreui-utilities.css`, or after `coreui.css` when you keep the full bundle. With `--only` the command writes just the groups your file names, which is the right shape for a few additions on top of the shipped stylesheet:
-
-```sh
-npx coreui-utilities coreui.utilities.json --only css/my-utilities.css
-```
-
-Either way the file starts with the cascade layer order, so your classes land in the `utilities` layer whether the browser sees this file first or `coreui.css` first.
-
-### Only what you use
-
-`--scan` reads your source files and keeps only the utility classes they use — the words of a static `class` or `className` attribute, and the string literals inside `utilities={[…]}`, `:utilities="[…]"` and `ux(…)`, which is how the React and Vue components take utilities:
-
-```sh
-npx coreui-utilities --scan "src/**/*.{html,tsx,vue}" css/utilities.css
-```
-
-The same three settings can live in a config module instead of on the command line — `extend` with the JSON shape above, `safelist` and `scan` — which is what `defineConfig()` in the React binding produces:
-
-```js
-// coreui.config.mjs
-export default {
-  utilities: {
-    extend: { rotate: { responsive: true, property: 'transform', class: 'rotate', values: { 45: 'rotate(45deg)' } } },
-    safelist: ['mt-1'],
-    scan: ['src/**/*.{html,tsx}'],
-  },
-}
-```
-
-```sh
-npx coreui-utilities --config coreui.config.mjs css/utilities.css
-```
-
-A `.ts` config works on a Node that strips types (22.6 and later). Flags on the command line add to what the config says.
-
-The rules come out in the order of the map, not the order of use, so two utilities on one element resolve exactly as they do in the full stylesheet, and only the `@property` registrations and keyframes those rules need are written. A name built at runtime (`` `mt-${n}` ``) cannot be found this way — pass it with `--safelist mt-1,mt-2`, or keep the set of names static. During development generate the full stylesheet instead and scan for the production build.
