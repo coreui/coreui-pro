@@ -100,6 +100,7 @@
     "./css/base.css": "./dist/css/base.css",
     "./css/base.min.css": "./dist/css/base.min.css",
     "./css/components/*": "./dist/css/components/*",
+    "./css/*": "./dist/css/*",
     "./scss/*": "./scss/*",
     "./tokens": "./build/lib/tokens.mjs",
     "./tokens.json": "./tokens.json",
