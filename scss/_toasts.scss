@@ -22,8 +22,8 @@ $toast-spacing:                     $container-padding-x !default;
 $toast-container-inset:             var(--#{$prefix}spacer-4) !default;
 $toast-slide:                       .5rem !default;
 $toast-transition-property:         "opacity, translate, display" !default;
-$toast-transition-duration:         .15s !default;
-$toast-transition-timing:           linear !default;
+$toast-transition-duration:         .3s !default;
+$toast-transition-timing:           ease-out !default;
 
 $toast-header-color:                var(--#{$prefix}fg-3) !default;
 $toast-header-background-color:     $toast-background-color !default;
@@ -100,6 +100,8 @@ $toast-tokens: defaults(
 
     &[data-coreui-limited] {
       display: none;
+      opacity: 0;
+      translate: var(--#{$prefix}toast-translate, 0 calc(-1 * var(--#{$prefix}toast-slide)));
     }
   }
 
@@ -158,10 +160,25 @@ $toast-tokens: defaults(
     margin-block: auto;
   }
 
-  .toast-container-bottom-start,
-  .toast-container-bottom-center,
+  .toast-container-top-start,
+  .toast-container-middle-start,
+  .toast-container-bottom-start {
+    --#{$prefix}toast-translate: calc(-100% - var(--#{$prefix}toast-container-inset)) 0;
+  }
+
+  .toast-container-top-end,
+  .toast-container-middle-end,
   .toast-container-bottom-end {
-    --#{$prefix}toast-translate: 0 var(--#{$prefix}toast-slide);
+    --#{$prefix}toast-translate: calc(100% + var(--#{$prefix}toast-container-inset)) 0;
+  }
+
+  .toast-container-top-center,
+  .toast-container-middle-center {
+    --#{$prefix}toast-translate: 0 calc(-100% - var(--#{$prefix}toast-container-inset));
+  }
+
+  .toast-container-bottom-center {
+    --#{$prefix}toast-translate: 0 calc(100% + var(--#{$prefix}toast-container-inset));
   }
 
   @each $inline, $property in (start: inset-inline-start, end: inset-inline-end) {

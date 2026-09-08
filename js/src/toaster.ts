@@ -437,6 +437,8 @@ class Toaster extends BaseComponent {
   _applyLimit(): void {
     const entries = [...this._entries.values()]
     const overflow = this._config.limit > 0 ? Math.max(0, entries.length - this._config.limit) : 0
+    const layout = this._layout()
+    let settleAfter = 0
 
     for (const [index, entry] of entries.entries()) {
       const limited = index < overflow
@@ -451,9 +453,16 @@ class Toaster extends BaseComponent {
 
       if (limited) {
         entry.instance._clearTimeout()
+        settleAfter = Math.max(settleAfter, getTransitionDurationFromElement(entry.toast.element))
       } else {
         entry.instance._maybeScheduleHide()
       }
+    }
+
+    if (settleAfter > 0) {
+      setTimeout(() => this._settle(layout), settleAfter)
+    } else {
+      this._settle(layout)
     }
   }
 
