@@ -197,4 +197,4 @@ export const render = (value, refs = 'var') => {
   throw new Error(`tokens.json: unsupported value ${JSON.stringify([...value])}`)
 }
 
-export const css = value => value.replaceAll('#{$prefix}', 'cui-').replaceAll(/#\{"(.*?)"\}/g, '$1')
+export const css = (value, prefix = 'cui-') => value.replaceAll('#{$prefix}', prefix).replaceAll(/#\{"(.*?)"\}/g, '$1')

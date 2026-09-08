@@ -1,23 +1,7 @@
-@use "../config" as *;
-
 // The breakpoint and spacing scales as custom properties, for consumers reading
 // them at runtime. They live with layout rather than in _root.scss because
 // coreui-grid.scss ships layout without root, and the partial is forwarded ahead
 // of the layout partials so the root layer registers before the layout one in
 // that bundle too.
 
-@layer root {
-  :root {
-    @each $name, $value in $breakpoints {
-      --#{$prefix}breakpoint-#{$name}: #{$value};
-    }
-
-    // scss-docs-start root-spacer-loop
-    --#{$prefix}spacer: #{$spacer};
-
-    @each $key, $value in $spacers {
-      --#{$prefix}spacer-#{$key}: #{$value};
-    }
-    // scss-docs-end root-spacer-loop
-  }
-}
+/*! @coreui:layout-tokens */
