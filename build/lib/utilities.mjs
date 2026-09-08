@@ -199,7 +199,11 @@ const rules = (name, utility, infix, indent, index, only) => {
   return lines
 }
 
-const build = (utilities, { layer = false, index = null, only = null } = {}) => {
+// Every custom property the generator writes carries the package prefix, and
+// nothing else in the stylesheet spells it, so a theme respells the whole sheet.
+const respell = (text, prefix) => (prefix === 'cui-' ? text : text.replaceAll('--cui-', `--${prefix}`))
+
+const build = (utilities, { layer = false, index = null, only = null, prefix = 'cui-' } = {}) => {
   const enabled = [...utilities.entries()].filter(([, utility]) => utility.get('enabled') !== false)
   const emitted = new Map()
   const emit = (key, utility, infix, indent) => {
@@ -301,7 +305,7 @@ const build = (utilities, { layer = false, index = null, only = null } = {}) => 
     )
   }
 
-  return `${lines.join('\n')}\n`
+  return respell(`${lines.join('\n')}\n`, prefix)
 }
 
 // The utilities stylesheet, byte for byte what scss/utilities/_api.scss compiles to.

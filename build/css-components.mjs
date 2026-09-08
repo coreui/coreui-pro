@@ -14,6 +14,7 @@ import process from 'node:process'
 import { fileURLToPath } from 'node:url'
 import postcss from 'postcss'
 import { compileString } from 'sass-embedded'
+import { layers, withLayers } from './css-compose.mjs'
 
 const scssDir = path.join(process.cwd(), 'scss')
 const outDir = path.join(process.cwd(), 'dist/css')
@@ -155,10 +156,12 @@ const loadOrder = (files, seen = new Set()) => {
   return order
 }
 
+const generated = layers()
 const compileCache = new Map()
 const compile = source => {
   if (!compileCache.has(source)) {
-    compileCache.set(source, compileString(source, sassOptions).css.replace(/^@charset "UTF-8";\n/, ''))
+    const compiled = compileString(source, sassOptions).css.replace(/^@charset "UTF-8";\n/, '')
+    compileCache.set(source, withLayers(compiled, generated).css)
   }
 
   return compileCache.get(source)

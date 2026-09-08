@@ -1,0 +1,65 @@
+// The layers the build writes from tokens.json, kept in Sass as the reference
+// the generator is checked against. Nothing in the library loads this file:
+// `npm run layers-check` compiles it and refuses a byte of drift.
+
+@use "sass:map";
+@use "../colors" as *;
+@use "../config" as *;
+@use "../mixins/color-mode" as *;
+@use "../mixins/tokens" as *;
+@use "../root" as *;
+@use "../theme" as *;
+
+@layer colors {
+  :root,
+  :host {
+    @include tokens(map.merge($color-tokens, theme-color-scale-tokens()));
+  }
+}
+
+@layer root {
+  :root,
+  :host,
+  [data#{$data-infix}theme="light"] {
+    @include tokens($root-tokens);
+
+    // Declared explicitly so light-dark() resolves deterministically rather
+    // than inheriting the initial `normal`, and so native widgets match.
+    color-scheme: light;
+  }
+
+  @if $enable-dark-mode {
+    @include color-mode(dark, true) {
+      // scss-docs-start root-dark-mode-vars
+      // A shadow reads as depth against the surface behind it, and a dark
+      // surface swallows the same alpha, so the strength rises instead of the
+      // colour changing.
+      --#{$prefix}shadow-strength: #{$shadow-strength-dark};
+      --#{$prefix}backdrop-opacity: #{$backdrop-opacity-dark};
+      // scss-docs-end root-dark-mode-vars
+
+      color-scheme: dark;
+    }
+  }
+}
+
+@layer root {
+  :root {
+    @each $name, $value in $breakpoints {
+      --#{$prefix}breakpoint-#{$name}: #{$value};
+    }
+
+    // scss-docs-start root-spacer-loop
+    --#{$prefix}spacer: #{$spacer};
+
+    @each $key, $value in $spacers {
+      --#{$prefix}spacer-#{$key}: #{$value};
+    }
+    // scss-docs-end root-spacer-loop
+  }
+}
+
+@layer helpers {
+  @include generate-theme-classes();
+  @include generate-theme-reset();
+}

@@ -48,6 +48,8 @@ The slot values are `light-dark()` pairs of stops from the runtime scale, so a t
 
 <ScssDocs file="scss/_theme.scss" capture="theme-colors-map" />
 
+The build writes the tokens and the `.theme-*` classes behind this map from `tokens.json`, so the map above documents their shape rather than compiling into the shipped stylesheet — see [CSS variables](/customize/css-variables/#the-root-layer-comes-from-tokensjson) for what that changes about overriding them.
+
 ### Pairings
 
 The slots are not interchangeable — each foreground is tuned against a particular background, so a legible combination is one of these:
