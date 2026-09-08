@@ -1975,6 +1975,17 @@ Multi Select's option indicators moved with it — they render as a decorative
 
 #### Toast
 
+- **New: `Toaster`** creates toasts from options and keeps them in a store keyed
+  by id — `add()` returns the id (an existing id updates in place), `update()`
+  rewrites a toast, `close()` hides one or all, `promise()` follows an
+  asynchronous operation through loading, success and error. It creates its
+  own `.toast-container` placed by `placement`, caps visible toasts with
+  `limit` (the oldest stay in the DOM, `inert` and hidden), announces by
+  `priority` (`status`/`polite` or `alert`/`assertive`) and can render an
+  action button. Nine `.toast-container-{block}-{inline}` classes pin a
+  container to the viewport in place of the `position-fixed top-0 end-0`
+  utility stacks. New classes: `.toast-title`, `.toast-description`,
+  `.toast-action`.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **The fade moved to CSS.** Toast was the last component driving its animation
   from JavaScript — it toggled `.fade`, forced a reflow, then juggled `.show`,

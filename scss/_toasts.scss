@@ -93,6 +93,10 @@ $toast-tokens: defaults(
       display: block;
       opacity: 1;
     }
+
+    &[data-coreui-limited] {
+      display: none;
+    }
   }
 
   // The toast is not rendered before `.show` lands, so the fade-in needs an
@@ -180,9 +184,23 @@ $toast-tokens: defaults(
     }
   }
 
+  .toast-title {
+    flex: 1 1 auto;
+  }
+
   .toast-body {
     padding: var(--#{$prefix}toast-padding-x);
     word-wrap: break-word;
+
+    &:has(> .toast-action, > .btn-close) {
+      display: flex;
+      gap: var(--#{$prefix}toast-padding-x);
+      align-items: center;
+    }
+  }
+
+  .toast-description {
+    flex: 1 1 auto;
   }
 
   .toast-translucent {

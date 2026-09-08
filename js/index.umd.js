@@ -47,6 +47,7 @@ import Tab from './src/tab.js'
 import TimeInput from './src/time-input.js'
 import TimePicker from './src/time-picker.js'
 import Toast from './src/toast.js'
+import Toaster from './src/toaster.js'
 import Tooltip from './src/tooltip.js'
 
 export default {
@@ -92,5 +93,6 @@ export default {
   TimeInput,
   TimePicker,
   Toast,
+  Toaster,
   Tooltip
 }
