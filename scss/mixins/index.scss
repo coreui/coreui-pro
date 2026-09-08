@@ -21,14 +21,19 @@
 
 // Components
 @forward "backdrop";
+@forward "button";
 @forward "caret";
+@forward "check";
 @forward "chip";
 @forward "dialog-shared";
 @forward "form-control";
+@forward "form-field";
 @forward "form-validation";
 @forward "icon";
 @forward "lists";
 @forward "mask-icon";
+@forward "radio";
+@forward "switch";
 
 // Skins
 @forward "border-radius";

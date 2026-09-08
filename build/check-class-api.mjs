@@ -3,7 +3,9 @@
 /*!
  * Script to guard the class API against silent losses.
  * Compares the compiled class list against the v5 snapshot in
- * build/class-api-v5.txt. A class may be removed — but the removal has to be
+ * build/class-api-v5.txt. The surface is coreui.css plus the opt-in
+ * coreui-legacy.css, so a v5 spelling that moved to the compatibility sheet
+ * still counts as shipped. A class may be removed — but the removal has to be
  * declared in build/class-api-removals.json with a reason, so every one of them
  * has an answer for the user in the migration guide.
  * Copyright 2025 The CoreUI Authors
@@ -17,6 +19,7 @@ import path from 'node:path'
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
 const cssPath = path.join(root, 'dist/css/coreui.css')
+const legacyCssPath = path.join(root, 'dist/css/coreui-legacy.css')
 const baselinePath = path.join(root, 'build/class-api-v5.txt')
 const removalsPath = path.join(root, 'build/class-api-removals.json')
 
@@ -49,7 +52,10 @@ function patternToRegExp(pattern) {
   return new RegExp(`^${escaped.replaceAll(String.raw`\*`, '.*')}$`)
 }
 
-const current = classNames(readFileSync(cssPath, 'utf8'))
+const main = classNames(readFileSync(cssPath, 'utf8'))
+const legacy = classNames(readFileSync(legacyCssPath, 'utf8'))
+const current = new Set([...main, ...legacy])
+const legacyOnly = baselineNames => baselineNames.filter(name => !main.has(name) && legacy.has(name))
 const baseline = readFileSync(baselinePath, 'utf8').split('\n').filter(Boolean)
 const removals = JSON.parse(readFileSync(removalsPath, 'utf8'))
 
@@ -78,6 +84,12 @@ const stale = declared.filter(({ matched }) => matched === 0)
 
 console.log(`Class API: ${baseline.length} classes in the v5 snapshot, ${current.size} compiled now.`)
 console.log(`${gone.length} removed, ${current.size - (baseline.length - gone.length)} added.`)
+
+const moved = legacyOnly(baseline)
+
+if (moved.length > 0) {
+  console.log(`${moved.length} of them ship only in the opt-in coreui-legacy.css.`)
+}
 
 if (gone.length > 0) {
   console.log('\nDeclared removals:')

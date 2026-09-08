@@ -17,6 +17,10 @@ emits, so a build with no compiler drops `utilities/api` and `root` and takes
 those layers as files. See [the utility API](/utilities/api/#your-own-utilitiesjson) and
 [CSS variables](/customize/css-variables/#the-root-layer-comes-from-tokensjson).
 
+The v5 spellings this stack does not carry are their own entrypoint — add
+`@use "coreui-legacy";` after it while your markup still needs them, and drop
+that line once it does not. See [v5 compatibility CSS](/getting-started/install/#v5-compatibility-css).
+
 If you're not using a component, comment it out or delete it entirely. For example, if you're not using the carousel, remove that `@forward` to save some file size in your compiled CSS. Keep in mind there are some dependencies between our Sass modules that may make it more difficult to omit a file.
 
 ## Lean JavaScript

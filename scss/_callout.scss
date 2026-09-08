@@ -1,9 +1,7 @@
-@use "sass:map";
 @use "functions/defaults" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/tokens" as *;
 @use "config" as *;
-@use "theme" as *;
 
 // Callouts
 // scss-docs-start callout-variables
@@ -50,14 +48,4 @@ $callout-tokens: defaults(
     border-inline-start-width: var(--#{$prefix}callout-border-left-width);
     @include border-radius(var(--#{$prefix}callout-border-radius));
   }
-
-  // scss-docs-start callout-modifiers
-  @if $enable-deprecated-classes {
-    @each $state in map.keys($theme-colors) {
-      .callout-#{$state} {
-        @include theme-tokens($state);
-      }
-    }
-  }
-  // scss-docs-end callout-modifiers
 }

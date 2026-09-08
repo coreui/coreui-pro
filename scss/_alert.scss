@@ -1,10 +1,8 @@
-@use "sass:map";
 @use "functions/defaults" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
 @use "config" as *;
-@use "theme" as *;
 
 // scss-docs-start alert-variables
 $alert-padding-y:               var(--#{$prefix}spacer) !default;
@@ -123,16 +121,6 @@ $alert-variants: defaults(
     margin-inline-start: auto;
   }
 
-
-  // scss-docs-start alert-modifiers
-  @if $enable-deprecated-classes {
-    @each $state in map.keys($theme-colors) {
-      .alert-#{$state} {
-        @include theme-tokens($state);
-      }
-    }
-  }
-  // scss-docs-end alert-modifiers
 
   // scss-docs-start alert-variant-loop
   @each $variant, $properties in $alert-variants {

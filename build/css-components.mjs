@@ -19,7 +19,7 @@ const scssDir = path.join(process.cwd(), 'scss')
 const outDir = path.join(process.cwd(), 'dist/css')
 const componentsDir = path.join(outDir, 'components')
 
-const baseModules = ['root', 'layout/tokens', 'content/reboot', 'helpers/theme-colors']
+const baseModules = ['layers', 'root', 'layout/tokens', 'content/reboot', 'helpers/theme-colors']
 const tailModules = ['helpers', 'utilities/api']
 
 const renders = {
@@ -45,7 +45,6 @@ const groups = [
   { name: 'forms/form-control-group', modules: ['forms/form-control-group'] },
   { name: 'forms/chip-input', modules: ['forms/chip-input'] },
   { name: 'forms/number-input', modules: ['forms/number-input'] },
-  { name: 'forms/form-check', modules: ['forms/form-check'] },
   { name: 'forms/check', modules: ['forms/check'] },
   { name: 'forms/radio', modules: ['forms/radio'] },
   { name: 'forms/switch', modules: ['forms/switch'] },

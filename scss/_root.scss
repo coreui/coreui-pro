@@ -5,6 +5,7 @@
 @use "mixins/tokens" as *;
 @use "colors" as *;
 @use "config" as *;
+@use "layers";
 @use "theme" as *;
 
 // scss-docs-start control-state-variables
@@ -328,8 +329,6 @@ $root-tokens: defaults($root-token-defaults, $root-tokens);
 // scss-docs-end root-tokens
 
 // stylelint-enable custom-property-no-missing-var-function, scss/dollar-variable-default
-
-@layer colors, config, root, reboot, layout, content, forms, components, custom, helpers, utilities;
 
 @layer colors {
   :root,
