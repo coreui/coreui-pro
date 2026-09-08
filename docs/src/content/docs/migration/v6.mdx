@@ -644,6 +644,24 @@ check, radio, carousel and toggler icons already work:
   Menu's engine underneath. Where their options overlap, Dropdown also
   understands Menu's additions (for example `container`). **Deprecation
   notice: Dropdown may be removed in v7** — prefer Menu for new work.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The responsive alignment classes `.dropdown-menu{-sm|-md|-lg|-xl|-2xl}{-start|-end}`
+  moved to `coreui-legacy.css`, and `.dropup`/`.dropend`/`.dropstart` no longer
+  carry the menu's static position.** Alignment that changes with the viewport
+  is a responsive placement on the toggle — `data-coreui-placement="bottom-start
+  lg:bottom-end"` — which now also works with `data-coreui-display="static"` and
+  inside a navbar, because the plugin writes the resolved placement onto the
+  menu as `data-coreui-placement` and the stylesheet positions the static menu
+  from that attribute rather than from the wrapper class. `dropdown.css`
+  loses every `@media`; the direction classes keep the caret and still decide
+  the placement when no option is given. `.dropdown-menu-end` and
+  `.dropdown-menu-start` stay.
+
+  ```diff
+  - <ul class="dropdown-menu dropdown-menu-lg-end">
+  + <button data-coreui-toggle="dropdown" data-coreui-placement="bottom-start lg:bottom-end">
+  + <ul class="dropdown-menu">
+  ```
 
 
 #### Modal and Offcanvas on the native `<dialog>`

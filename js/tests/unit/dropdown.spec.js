@@ -178,6 +178,133 @@ describe('Dropdown', () => {
       }))
       expect(floatingConfig.placement).toEqual('left')
     })
+
+    it('should derive the placement from the wrapper classes without a placement option', () => {
+      fixtureEl.innerHTML = [
+        '<div class="dropup">',
+        '  <button class="btn dropdown-toggle" data-coreui-toggle="dropdown">Dropdown</button>',
+        '  <div class="dropdown-menu dropdown-menu-end" style="--cui-position: end">',
+        '    <a class="dropdown-item" href="#">Secondary link</a>',
+        '  </div>',
+        '</div>'
+      ].join('')
+
+      const btnDropdown = fixtureEl.querySelector('[data-coreui-toggle="dropdown"]')
+      const dropdown = new Dropdown(btnDropdown)
+
+      expect(dropdown._config.placement).toBeNull()
+      expect(dropdown._getPlacement()).toEqual('top-end')
+    })
+
+    it('should let the placement option win over the wrapper classes', () => {
+      fixtureEl.innerHTML = [
+        '<div class="dropup">',
+        '  <button class="btn dropdown-toggle" data-coreui-toggle="dropdown" data-coreui-placement="bottom-end">Dropdown</button>',
+        '  <div class="dropdown-menu">',
+        '    <a class="dropdown-item" href="#">Secondary link</a>',
+        '  </div>',
+        '</div>'
+      ].join('')
+
+      const btnDropdown = fixtureEl.querySelector('[data-coreui-toggle="dropdown"]')
+      const dropdown = new Dropdown(btnDropdown)
+
+      expect(dropdown._getPlacement()).toEqual('bottom-end')
+    })
+
+    it('should resolve a logical placement like Menu does', () => {
+      fixtureEl.innerHTML = [
+        '<div class="dropdown">',
+        '  <button class="btn dropdown-toggle" data-coreui-toggle="dropdown" data-coreui-placement="end-start">Dropdown</button>',
+        '  <div class="dropdown-menu">',
+        '    <a class="dropdown-item" href="#">Secondary link</a>',
+        '  </div>',
+        '</div>'
+      ].join('')
+
+      const btnDropdown = fixtureEl.querySelector('[data-coreui-toggle="dropdown"]')
+      const dropdown = new Dropdown(btnDropdown)
+
+      expect(dropdown._getPlacement()).toEqual('right-start')
+    })
+
+    it('should resolve a responsive placement like Menu does', () => {
+      fixtureEl.innerHTML = [
+        '<div class="dropdown">',
+        '  <button class="btn dropdown-toggle" data-coreui-toggle="dropdown" data-coreui-placement="bottom-start md:top-end">Dropdown</button>',
+        '  <div class="dropdown-menu">',
+        '    <a class="dropdown-item" href="#">Secondary link</a>',
+        '  </div>',
+        '</div>'
+      ].join('')
+
+      const btnDropdown = fixtureEl.querySelector('[data-coreui-toggle="dropdown"]')
+      const dropdown = new Dropdown(btnDropdown)
+      const innerWidth = spyOnProperty(window, 'innerWidth', 'get')
+
+      innerWidth.and.returnValue(500)
+      expect(dropdown._getPlacement()).toEqual('bottom-start')
+
+      innerWidth.and.returnValue(1000)
+      expect(dropdown._getPlacement()).toEqual('top-end')
+    })
+  })
+
+  describe('static display', () => {
+    it('should write the resolved placement onto the menu when positioned by the stylesheet', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<div class="dropup">',
+          '  <button class="btn dropdown-toggle" data-coreui-toggle="dropdown" data-coreui-display="static">Dropdown</button>',
+          '  <div class="dropdown-menu">',
+          '    <a class="dropdown-item" href="#">Secondary link</a>',
+          '  </div>',
+          '</div>'
+        ].join('')
+
+        const btnDropdown = fixtureEl.querySelector('[data-coreui-toggle="dropdown"]')
+        const dropdownMenu = fixtureEl.querySelector('.dropdown-menu')
+        const dropdown = new Dropdown(btnDropdown)
+
+        btnDropdown.addEventListener('shown.coreui.dropdown', () => {
+          expect(dropdownMenu.getAttribute('data-coreui-popper')).toEqual('static')
+          expect(dropdownMenu.getAttribute('data-coreui-placement')).toEqual('top-start')
+          resolve()
+        })
+
+        dropdown.show()
+      })
+    })
+
+    it('should re-resolve a responsive placement on the static menu when the breakpoint changes', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<div class="dropdown">',
+          '  <button class="btn dropdown-toggle" data-coreui-toggle="dropdown" data-coreui-display="static" data-coreui-placement="bottom-start md:bottom-end">Dropdown</button>',
+          '  <div class="dropdown-menu">',
+          '    <a class="dropdown-item" href="#">Secondary link</a>',
+          '  </div>',
+          '</div>'
+        ].join('')
+
+        const btnDropdown = fixtureEl.querySelector('[data-coreui-toggle="dropdown"]')
+        const dropdownMenu = fixtureEl.querySelector('.dropdown-menu')
+        const dropdown = new Dropdown(btnDropdown)
+        const innerWidth = spyOnProperty(window, 'innerWidth', 'get').and.returnValue(500)
+
+        btnDropdown.addEventListener('shown.coreui.dropdown', async () => {
+          expect(dropdownMenu.getAttribute('data-coreui-placement')).toEqual('bottom-start')
+
+          innerWidth.and.returnValue(1000)
+          await dropdown._updateFloatingPosition()
+
+          expect(dropdownMenu.getAttribute('data-coreui-placement')).toEqual('bottom-end')
+          resolve()
+        })
+
+        dropdown.show()
+      })
+    })
   })
 
   describe('toggle', () => {
