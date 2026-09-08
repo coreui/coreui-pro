@@ -1,1 +1,6 @@
-/*! @coreui:theme-classes */
+@use "../theme" as *;
+
+@layer helpers {
+  @include generate-theme-classes();
+  @include generate-theme-reset();
+}

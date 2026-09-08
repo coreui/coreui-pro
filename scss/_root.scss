@@ -1,6 +1,8 @@
 @use "sass:map";
 @use "sass:meta";
 @use "functions/defaults" as *;
+@use "mixins/color-mode" as *;
+@use "mixins/tokens" as *;
 @use "colors" as *;
 @use "config" as *;
 @use "theme" as *;
@@ -113,7 +115,7 @@ $code-color: light-dark(var(--#{$prefix}pink), var(--#{$prefix}pink-300)) !defau
 // between components and helpers.
 $root-tokens: () !default;
 
-// stylelint-disable scss/dollar-variable-default
+// stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
 // Everything the library declares on the root beyond the palette, assembled as
 // one map and emitted with a single `tokens()` call. Building it here rather
@@ -325,10 +327,39 @@ $root-token-defaults: map.merge(
 $root-tokens: defaults($root-token-defaults, $root-tokens);
 // scss-docs-end root-tokens
 
-// stylelint-enable scss/dollar-variable-default
+// stylelint-enable custom-property-no-missing-var-function, scss/dollar-variable-default
 
 @layer colors, config, root, reboot, layout, content, forms, components, custom, helpers, utilities;
 
-/*! @coreui:colors */
+@layer colors {
+  :root,
+  :host {
+    @include tokens(map.merge($color-tokens, theme-color-scale-tokens()));
+  }
+}
 
-/*! @coreui:root */
+@layer root {
+  :root,
+  :host,
+  [data#{$data-infix}theme="light"] {
+    @include tokens($root-tokens);
+
+    // Declared explicitly so light-dark() resolves deterministically rather
+    // than inheriting the initial `normal`, and so native widgets match.
+    color-scheme: light;
+  }
+
+  @if $enable-dark-mode {
+    @include color-mode(dark, true) {
+      // scss-docs-start root-dark-mode-vars
+      // A shadow reads as depth against the surface behind it, and a dark
+      // surface swallows the same alpha, so the strength rises instead of the
+      // colour changing.
+      --#{$prefix}shadow-strength: #{$shadow-strength-dark};
+      --#{$prefix}backdrop-opacity: #{$backdrop-opacity-dark};
+      // scss-docs-end root-dark-mode-vars
+
+      color-scheme: dark;
+    }
+  }
+}

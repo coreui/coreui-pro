@@ -9,19 +9,12 @@ When using Sass in your asset pipeline, make sure you optimize CoreUI for Bootst
 
 <ScssDocs file="scss/coreui.scss" capture="import-stack" />
 
-Utilities are not in that stack: `coreui.css` and `coreui-utilities.css` take
-their utilities layer from `utilities.json` at build time, not from Sass. A Sass
-build of your own emits it by loading the API module after the library
-(`@use "@coreui/coreui/scss/utilities/api";`), and `coreui-utilities` writes the
-same stylesheet — trimmed to the classes your markup uses — without Sass at all.
-See [the utility API](/utilities/api/#without-sass).
-
-`root` carries no rules in that stack either. The palette, the root tokens, the
-breakpoint and spacer tokens and the `.theme-*` classes are written from
-`tokens.json` at build time and composed into the compiled stylesheet where
-Sass used to emit them; `@forward "root"` is there for the maps the components
-read. A Sass build of your own emits the four layers by loading
-`@use "@coreui/coreui/scss/tokens/api";` after the library. See
+Two blocks of that stack are also available without Sass: `coreui-utilities`
+writes the utilities layer from `utilities.json`, trimmed to the classes your
+markup uses, and the same generator writes the palette, the root tokens and the
+`.theme-*` classes from `tokens.json`. Both emit what the Sass in this stack
+emits, so a build with no compiler drops `utilities/api` and `root` and takes
+those layers as files. See [the utility API](/utilities/api/#without-sass) and
 [CSS variables](/customize/css-variables/#the-root-layer-comes-from-tokensjson).
 
 If you're not using a component, comment it out or delete it entirely. For example, if you're not using the carousel, remove that `@forward` to save some file size in your compiled CSS. Keep in mind there are some dependencies between our Sass modules that may make it more difficult to omit a file.

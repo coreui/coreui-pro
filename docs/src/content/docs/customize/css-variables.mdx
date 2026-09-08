@@ -9,7 +9,7 @@ CoreUI for Bootstrap declares several hundred [CSS custom properties (variables)
 
 ## Root variables
 
-Here are the variables we include (note that the `:root, :host` selector is required) that can be accessed anywhere CoreUI for Bootstrap's CSS is loaded. The build writes this layer from [`tokens.json`](#the-root-layer-comes-from-tokensjson), not from a Sass loop, and appends it to the compiled dist files. Most of them pick their light and dark value in a single declaration through the CSS [`light-dark()`](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/light-dark) function, so one declaration covers both [color modes](/customize/color-modes/).
+Here are the variables we include (note that the `:root, :host` selector is required) that can be accessed anywhere CoreUI for Bootstrap's CSS is loaded. They're located in our `_root.scss` file and included in our compiled dist files, from maps the build writes from [`tokens.json`](#the-root-layer-comes-from-tokensjson). Most of them pick their light and dark value in a single declaration through the CSS [`light-dark()`](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/light-dark) function, so one declaration covers both [color modes](/customize/color-modes/).
 
 `:host` is there so the tokens also land when our CSS is loaded inside a shadow root — `:root` matches the document, never a shadow tree, so without it every global token would be unset in a web component.
 
@@ -19,21 +19,16 @@ Here are the variables we include (note that the `:root, :host` selector is requ
 
 Because `light-dark()` resolves both modes above, only one value still needs a dark-mode declaration of its own — a shadow reads as depth against the surface behind it, and a dark surface swallows the same alpha, so its strength rises rather than its color changing.
 
-<ScssDocs file="scss/tokens/_api.scss" capture="root-dark-mode-vars" />
+<ScssDocs file="scss/_root.scss" capture="root-dark-mode-vars" />
 
 ### The root layer comes from `tokens.json`
 
-<AddedIn version="6.0.0" /> Every declaration above is written by the build from `tokens.json` — the palette and its scales, the theme color slots, the type, radius, border, z-index and shadow scales, and the shared `--cui-btn-input-*` and `--cui-control-*` tokens. The Sass maps behind them stay in `scss/_root.scss`, `scss/_colors.scss` and `scss/_theme.scss` as the documented shape of each group, and `scss/tokens/_api.scss` is the Sass that emits them; the build refuses a byte of drift between the two.
+<AddedIn version="6.0.0" /> `tokens.json` in the package is the source of every declaration above — the palette and its scales, the theme color slots, the type, radius, border, z-index and shadow scales, and the shared `--cui-btn-input-*` and `--cui-control-*` tokens. `npm run tokens` writes the Sass maps in `scss/_root.scss`, `scss/_colors.scss` and `scss/_theme.scss` from it, Sass emits the layer from those maps, and `npm run layers-check` compiles the same tokens with a JavaScript generator and refuses a byte of drift between the two.
 
-Two consequences for a Sass build of your own:
+So both paths stay open, and neither is second-hand:
 
-- `@use "@coreui/coreui/scss/coreui" with ($primary: …, $body-bg: …, $font-family-sans-serif: …)` no longer reaches `:root`. Set the token in your own CSS instead — every one of them is a plain custom property on `:root`, so `--cui-primary-base: hotpink` is the whole change and it needs no compiler.
-- If you would rather keep the Sass path, load the token API module after the library. It emits the same four layers from the Sass maps, so `with ()` overrides apply again:
-
-  ```diff
-    @use "@coreui/coreui/scss/coreui" with ($primary: hotpink);
-  + @use "@coreui/coreui/scss/tokens/api";
-  ```
+- `@use "@coreui/coreui/scss/coreui" with ($primary: …, $body-bg: …, $font-family-sans-serif: …)` reaches `:root` the way it always has.
+- Without a compiler, set the token in your own CSS — every one of them is a plain custom property on `:root`, so `--cui-primary-base: hotpink` is the whole change. Read the same values as data from `tokens.json`.
 
 ## Component variables
 
@@ -61,7 +56,7 @@ Most CSS variables use a prefix to avoid collisions with your own codebase. This
 
 Customize the prefix via the `$prefix` Sass variable. By default, it's set to `cui-` (note the trailing dash).
 
-The generated layers — the palette, the root tokens, the theme classes and the utilities — take the prefix from the build rather than from that variable, so respelling it in Sass alone leaves them on `cui-` and the two halves stop matching. A theme that renames the prefix declares it once for both halves; `scss/themes/bootstrap/bootstrap.scss` and its `tokens.json` are the worked example.
+A theme that renames the prefix states it twice — once for the Sass build, once for the generator that writes the same layers without Sass; `scss/themes/bootstrap/bootstrap.scss` and its `tokens.json` are the worked example.
 
 The `data-*` attributes you write in your markup — `data-coreui-theme`, `data-coreui-target` — carry a second knob, `$data-infix` (`-coreui-` by default), so a theme can rename them: the Bootstrap theme sets it to `-bs-` and reads `data-bs-theme`. Attributes the JavaScript sets on elements while it runs (`data-coreui-popper`, `data-coreui-placement`, `data-coreui-validate`) are always `data-coreui-*` and do not follow it.
 

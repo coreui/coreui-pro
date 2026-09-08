@@ -13,8 +13,6 @@ import process from 'node:process'
 import postcss from 'postcss'
 import { compileString } from 'sass-embedded'
 import { stylesheets } from './css-components.mjs'
-import { layers, withLayers } from './css-compose.mjs'
-import { loadUtilities, stylesheet } from './lib/utilities.mjs'
 
 const scssDir = path.join(process.cwd(), 'scss')
 
@@ -74,9 +72,7 @@ const merge = sources => {
 
 const { sheets, manifest, tail } = stylesheets()
 const split = merge([...sheets.values(), tail])
-const compiled = compileString('@forward "coreui";', { loadPaths: [scssDir], style: 'expanded', quietDeps: true }).css
-const { css: composed } = withLayers(compiled, layers())
-const bundle = rules(`${composed}\n${stylesheet(loadUtilities(), { layer: false })}`)
+const bundle = rules(compileString('@forward "coreui";', { loadPaths: [scssDir], style: 'expanded', quietDeps: true }).css)
 
 const report = []
 for (const [key, count] of split.counted) {
