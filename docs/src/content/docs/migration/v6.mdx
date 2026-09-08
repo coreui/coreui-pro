@@ -3656,10 +3656,10 @@ and still compose. What changes is where the translucency expression lives:
   `color-var-ref()` instead — same arguments, without the wrapper;
   `translucent-css-var()` is removed, along with the unused `map-loop()` and
   `color-contrast-variables()`.
-- **`.text-muted`, `.text-black-50`, `.text-white-50` and `.text-body-secondary`
-  now respond to `.text-opacity-*`.** They rendered the same colour before and
-  render the same colour now; they simply went through the plain value and so
-  ignored the opacity knob every other colour utility honoured.
+- **`.text-body-secondary` now responds to `.text-opacity-*`.** It rendered the
+  same colour before and renders the same colour now; it simply went through the
+  plain value and so ignored the opacity knob every other colour utility
+  honoured.
 - Every custom property a utility assigns is registered
   `@property { inherits: false }`, which now covers `--cui-bg`, `--cui-text`,
   `--cui-border` and `--cui-underline` as well — so a colour set on a
@@ -4218,29 +4218,28 @@ see the Sass variables above). Optional knobs that stay `null` by default —
 now read with a fallback (`inherit` / `transparent`), so the declaration is valid
 until you set them.
 
-**Classes** — eleven, every one a CoreUI-only addition:
+**Classes** — eleven CoreUI-only additions, plus the three text utilities
+Bootstrap deprecated in 5.0 and removes in 6:
 
 | Removed | Use instead |
 | --- | --- |
 | `.text-high-emphasis`, `.text-medium-emphasis` | `.text-body`, `.fg-2` |
 | `.text-disabled` | `.fg-3` |
 | `.text-high-emphasis-inverse`, `.text-medium-emphasis-inverse`, `.text-disabled-inverse` | `.text-white` with an opacity utility |
+| `.text-muted` | `.fg-2` |
+| `.text-black-50`, `.text-white-50` | `.fg-black.fg-50`, `.fg-white.fg-50` |
 
-(The `.dark:` variants of the emphasis utilities go with them.)
+(The `.dark:` variants of the emphasis utilities go with them.) The
+`$navbar-light-*` Sass variables stay.
 
-**What we deliberately kept.** `.text-muted`, `.text-black-50`, `.text-white-50`
-and `.navbar-light` are all deprecated, and Bootstrap v6 deletes all four. They
-are Bootstrap heritage rather than CoreUI additions, and they are in the markup of
-a very large number of existing projects — so they stay, at their current
-rendering.
-
-`.sidebar-brand-full`, `.sidebar-brand-narrow` and `.d-narrow-none` stay too,
-though they are CoreUI's own. They are the brand pair every admin template ships
-in its sidebar header, and they are exact aliases of `.d-sidebar-narrow-none` /
-`.d-sidebar-narrow` — two extra selectors in a rule that already exists. Removing
-them would break the most recognisable piece of CoreUI markup, silently: both
-logos would render at once in the narrow state, with nothing to indicate why.
-Prefer the `.d-sidebar-narrow*` names in new markup.
+**What we deliberately kept.** `.sidebar-brand-full`, `.sidebar-brand-narrow`
+and `.d-narrow-none` stay, though they are CoreUI's own. They are the brand pair
+every admin template ships in its sidebar header, and they are exact aliases of
+`.d-sidebar-narrow-none` / `.d-sidebar-narrow` — two extra selectors in a rule
+that already exists. Removing them would break the most recognisable piece of
+CoreUI markup, silently: both logos would render at once in the narrow state,
+with nothing to indicate why. Prefer the `.d-sidebar-narrow*` names in new
+markup.
 
 ### Sass & CSS
 
@@ -4383,8 +4382,8 @@ Prefer the `.d-sidebar-narrow*` names in new markup.
   Every v5 spelling **still ships as a deprecated alias** and renders the same,
   so existing markup is unaffected until v7: `.text-{color}`,
   `.text-{color}-emphasis`, `.text-body`, `.text-black`, `.text-white`,
-  `.text-reset`, `.text-muted`, `.text-body-secondary`, `.text-body-tertiary`,
-  `.text-black-50`, `.text-white-50`, `.bg-{color}-subtle`, `.bg-{color}-muted`,
+  `.text-reset`, `.text-body-secondary`, `.text-body-tertiary`,
+  `.bg-{color}-subtle`, `.bg-{color}-muted`,
   `.border-{color}-subtle`, `.text-opacity-*`, `.bg-opacity-*`,
   `.border-opacity-*`, `.link-opacity-*(-hover)`, `.underline-opacity-*(-hover)`,
   `.lh-base`, `.shadow-opacity-25` and `-75`. The deprecated opacity steps keep
