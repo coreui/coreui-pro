@@ -199,6 +199,7 @@ class MultiSelect extends Combobox {
   protected declare _searchElement: any
   protected declare _wrapperElement: any
   protected declare _refocusOnHide: boolean
+  protected declare _nativeKeydownHandler: any
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
@@ -218,6 +219,7 @@ class MultiSelect extends Combobox {
 
     this._wrapperElement = null
     this._menu = null
+    this._nativeKeydownHandler = null
     this._selected = []
     this._options = this._getOptions()
     this._floatingCleanup = null
@@ -455,7 +457,11 @@ class MultiSelect extends Combobox {
     this._addTogglerKeydownListeners()
 
     // Validation focuses the overlay select; hand its keystrokes to the custom control.
-    EventHandler.on(this._element, EVENT_KEYDOWN, (event: any) => {
+    if (this._nativeKeydownHandler) {
+      EventHandler.off(this._element, EVENT_KEYDOWN, this._nativeKeydownHandler)
+    }
+
+    this._nativeKeydownHandler = (event: any) => {
       if (event.key === TAB_KEY || event.key === ESCAPE_KEY) {
         return
       }
@@ -481,7 +487,9 @@ class MultiSelect extends Combobox {
       } else {
         this._togglerElement.focus()
       }
-    })
+    }
+
+    EventHandler.on(this._element, EVENT_KEYDOWN, this._nativeKeydownHandler)
 
     EventHandler.on(this._indicatorElement, EVENT_CLICK, (event: any) => {
       event.preventDefault()
