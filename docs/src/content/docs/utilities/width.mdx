@@ -7,7 +7,7 @@ utility: ["w", "max-w", "min-w", "vw", "min-vw", "dvw", "min-dvw"]
 
 ## Relative to the parent
 
-Width utilities are generated from the utility API in `_utilities.scss`. Includes support for `25%`, `50%`, `75%`, `100%`, and `auto` by default. Modify those values as you need to generate different utilities here.
+Width utilities are generated from the utilities API in `utilities.json`. Includes support for `25%`, `50%`, `75%`, `100%`, and `auto` by default. Modify those values as you need to generate different utilities here.
 
 <Example code={`<div class="w-25 p-3" style="background-color: #eee;">Width 25%</div>
   <div class="w-50 p-3" style="background-color: #eee;">Width 50%</div>
@@ -80,6 +80,12 @@ Each entry is one `.w-{step}` class and the width it sets. Add a key to define a
 
 ### Utilities API
 
-Width utilities are declared in our utilities API in `scss/_utilities.scss`. [Learn how to use the utilities API.](/utilities/api/#using-the-api)
+Width utilities are declared in our utilities API in `utilities.json`. [Learn how to use the utilities API.](/utilities/api/#using-the-api)
 
-<ScssDocs file="scss/_utilities.scss" capture="utils-width" />
+<UtilityDocs name="width" />
+<UtilityDocs name="max-width" />
+<UtilityDocs name="min-width" />
+<UtilityDocs name="viewport-width" />
+<UtilityDocs name="min-viewport-width" />
+<UtilityDocs name="dynamic-viewport-width" />
+<UtilityDocs name="min-dynamic-viewport-width" />
