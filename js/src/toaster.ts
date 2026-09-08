@@ -449,9 +449,8 @@ class Toaster extends BaseComponent {
 
       if (limited) {
         entry.instance._clearTimeout()
-        entry.toast.element.style.display = 'block'
-        entry.toast.element.toggleAttribute(ATTRIBUTE_LIMITED, true)
         const settle = this._collapse(entry.toast.element)
+        entry.toast.element.toggleAttribute(ATTRIBUTE_LIMITED, true)
         setTimeout(() => {
           if (entry.toast.limited) {
             entry.toast.element.style.display = 'none'
