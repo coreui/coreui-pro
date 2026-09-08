@@ -33,6 +33,8 @@
       to: /guides/vite/
     - title: Laravel
       to: /guides/laravel/
+    - title: Tailwind CSS
+      to: /guides/tailwind/
     - title: Django
       to: /guides/django/
     - title: Build tools

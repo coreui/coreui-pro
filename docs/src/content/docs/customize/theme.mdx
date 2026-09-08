@@ -26,7 +26,7 @@ From this one map the library generates:
 | `danger` | `#e55353` | Destructive actions and error states |
 | `inverse` | `light-dark(var(--cui-gray-900), var(--cui-gray-100))` | Surfaces that flip against the page, e.g. a dark bar on a light page |
 
-`primary`, `success`, `info`, `warning` and `danger` take their base from the palette, so overriding `$primary` — or the `--cui-primary` token at run time — retints the whole family. `secondary` and `inverse` are `light-dark()` pairs of gray tokens rather than a hue of their own, so they follow the color mode and carry no scale; they keep a `base` slot in the map.
+`primary`, `success`, `info`, `warning` and `danger` take their base from the palette, so overriding `$primary` — or the `--cui-primary-base` token at run time — retints the whole family. `secondary` and `inverse` are `light-dark()` pairs of gray tokens rather than a hue of their own, so they follow the color mode and carry no scale; they keep a `base` slot in the map.
 
 ## Color slots
 
@@ -34,7 +34,7 @@ Every entry defines the same slots, emitted as `--cui-{color}-{slot}` on `:root`
 
 | Slot | Emitted token | Description |
 | --- | --- | --- |
-| `base` | `--cui-primary`, `--cui-primary-base` | The color itself, e.g. a solid button background. Both spellings are emitted; `-base` matches the slot name, the bare form is the one every utility and component reads |
+| `base` | `--cui-primary-base` | The color itself, e.g. a solid button background. There is no bare `--cui-primary`: the slot is the token, and every utility and component reads it |
 | — | `--cui-primary-bg` | The action-background slot: what checked, active and filled states read; points at the base |
 | `contrast` | `--cui-primary-contrast` | Text and icons sitting on the solid base |
 | `fg` | `--cui-primary-fg` | The color readable as text, one step lighter than the emphasis |
@@ -75,7 +75,7 @@ Reading a foreground against a background it was not paired with is where contra
 
 ## The runtime scale
 
-Every theme color gets a 100–900 scale of `color-mix()` tokens, mixed at runtime from the color's own token. Override `--cui-primary` (or `$primary`) and the whole family — subtle backgrounds, borders, emphasis text — follows, in both color schemes:
+Every theme color gets a 100–900 scale of `color-mix()` tokens, mixed at runtime from the color's own token. Override `--cui-primary-base` (or `$primary`) and the whole family — subtle backgrounds, borders, emphasis text — follows, in both color schemes:
 
 <ScssDocs file="scss/_colors.scss" capture="color-scale-variables" />
 
