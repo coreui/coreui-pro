@@ -321,6 +321,8 @@ Without an element the toaster creates its own `.toast-container` in `<body>`, p
 
 A toast is a plain options object. `title` renders the header with a close button, `description` the body; a toast without a title puts the close button in the body. `theme` adds the `theme-{color}` class, `timeout` overrides the toaster's default (`0` keeps the toast until it is closed), `priority: 'high'` announces it as an alert instead of a status, and `action` adds a button to the body. Passing an `id` that already exists updates that toast instead of adding a second one, and bumps its `updateKey`, so a "Draft saved" toast clicked twice stays a single toast.
 
+A toast slides in from the container's edge while it fades in — from above in the `top` placements, from below in the `bottom` ones — and slides back out when it closes; the distance is `--cui-toast-slide`. When a toast leaves, or a new one is inserted above the others, the remaining toasts glide into their new positions instead of jumping. Both respect `prefers-reduced-motion`.
+
 `limit` caps how many toasts are visible at once. The newest stay on screen; older ones remain in the DOM with `inert` and `data-coreui-limited`, hidden, and return as the visible ones go away.
 
 Strings are written as text. Set `html: true` on the toaster to render markup; it runs through the same sanitizer as tooltips, configurable with `allowList` and `sanitizeFn`.

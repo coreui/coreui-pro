@@ -12,7 +12,7 @@ import Toast, { type ToastConfig } from './toast.js'
 import type { TemplateContentEntry } from './util/template-factory.js'
 import { DefaultAllowlist, sanitizeHtml, type SanitizerAllowList } from './util/sanitizer.js'
 import {
-  defineJQueryPlugin, execute, getElement, getUID, isElement
+  defineJQueryPlugin, execute, getElement, getTransitionDurationFromElement, getUID, isElement
 } from './util/index.js'
 
 /**
@@ -182,6 +182,7 @@ type Entry = {
 class Toaster extends BaseComponent {
   protected declare _config: ToasterConfig
   protected declare _entries: Map<string, Entry>
+  protected declare _layoutBeforeHide: Map<Element, number> | null
   protected declare _ownsContainer: boolean
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
@@ -189,6 +190,7 @@ class Toaster extends BaseComponent {
     super(ownsContainer ? document.createElement('div') : element, config)
 
     this._entries = new Map()
+    this._layoutBeforeHide = null
     this._ownsContainer = ownsContainer
 
     if (!PLACEMENTS.has(this._config.placement)) {
@@ -244,17 +246,23 @@ class Toaster extends BaseComponent {
     const entry = { instance, toast }
     this._entries.set(toast.id, entry)
 
-    EventHandler.one(toast.element, EVENT_HIDE_TOAST, () => execute(entry.toast.onClose, [undefined, entry.toast]))
+    EventHandler.one(toast.element, EVENT_HIDE_TOAST, () => {
+      this._layoutBeforeHide = this._layout()
+      execute(entry.toast.onClose, [undefined, entry.toast])
+    })
     EventHandler.one(toast.element, EVENT_HIDDEN_TOAST, () => this._remove(entry))
     EventHandler.on(toast.element, 'click', SELECTOR_ACTION, event => {
       execute(entry.toast.action?.onClick, [undefined, event, entry.toast])
     })
 
+    const layout = this._layout()
     if (this._config.placement.startsWith('top')) {
       this._element.prepend(toast.element)
     } else {
       this._element.append(toast.element)
     }
+
+    this._settle(layout)
 
     this._applyLimit()
     instance.show()
@@ -419,6 +427,8 @@ class Toaster extends BaseComponent {
     this._entries.delete(entry.toast.id)
     entry.instance.dispose()
     entry.toast.element.remove()
+    this._settle(this._layoutBeforeHide)
+    this._layoutBeforeHide = null
     execute(entry.toast.onRemove, [undefined, entry.toast])
     this._applyLimit()
     EventHandler.trigger(this._element, EVENT_REMOVE, { id: entry.toast.id })
@@ -445,6 +455,44 @@ class Toaster extends BaseComponent {
         entry.instance._maybeScheduleHide()
       }
     }
+  }
+
+  _layout(): Map<Element, number> | null {
+    if (this._prefersReducedMotion()) {
+      return null
+    }
+
+    const layout = new Map<Element, number>()
+    for (const child of this._element.children) {
+      layout.set(child, child.getBoundingClientRect().top)
+    }
+
+    return layout
+  }
+
+  _settle(layout: Map<Element, number> | null): void {
+    if (!layout) {
+      return
+    }
+
+    for (const child of this._element.children) {
+      const previous = layout.get(child)
+      if (previous === undefined) {
+        continue
+      }
+
+      const delta = previous - child.getBoundingClientRect().top
+      if (delta !== 0) {
+        child.animate(
+          [{ transform: `translateY(${delta}px)` }, { transform: 'none' }],
+          { duration: getTransitionDurationFromElement(child) || 150, easing: 'ease-out' }
+        )
+      }
+    }
+  }
+
+  _prefersReducedMotion(): boolean {
+    return typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
   }
 
   _promiseState<Value>(state: PromiseState<Value>, value?: Value): ToastOptions {

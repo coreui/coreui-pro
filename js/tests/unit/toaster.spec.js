@@ -334,6 +334,41 @@ describe('Toaster', () => {
     })
   })
 
+  describe('motion', () => {
+    it('should slide the remaining toasts into place when one is removed', async () => {
+      toaster = new Toaster(null, { container: fixtureEl })
+      const animate = spyOn(Element.prototype, 'animate').and.callThrough()
+      spyOn(toaster, '_prefersReducedMotion').and.returnValue(false)
+
+      toaster.add({ description: 'first', instant: true })
+      const second = toaster.add({ description: 'second', instant: true })
+      animate.calls.reset()
+
+      const secondEl = fixtureEl.querySelector(`[data-coreui-toast-id="${second}"]`)
+      const removed = hidden(secondEl)
+      toaster.close(second)
+      await removed
+
+      expect(animate).toHaveBeenCalledTimes(1)
+      expect(animate.calls.mostRecent().args[0][0].transform).toMatch(/^translateY\(-?\d/)
+    })
+
+    it('should not animate positions when reduced motion is preferred', async () => {
+      toaster = new Toaster(null, { container: fixtureEl })
+      const animate = spyOn(Element.prototype, 'animate').and.callThrough()
+      spyOn(toaster, '_prefersReducedMotion').and.returnValue(true)
+
+      const first = toaster.add({ description: 'first', instant: true })
+      toaster.add({ description: 'second', instant: true })
+      const firstEl = fixtureEl.querySelector(`[data-coreui-toast-id="${first}"]`)
+      const removed = hidden(firstEl)
+      toaster.close(first)
+      await removed
+
+      expect(animate).not.toHaveBeenCalled()
+    })
+  })
+
   describe('promise', () => {
     it('should show the loading state and switch to success', async () => {
       toaster = new Toaster(null, { container: fixtureEl, timeout: 0 })

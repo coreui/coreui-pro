@@ -20,7 +20,8 @@ $toast-border-radius:               var(--#{$prefix}radius-7) !default;
 $toast-box-shadow:                  var(--#{$prefix}box-shadow) !default;
 $toast-spacing:                     $container-padding-x !default;
 $toast-container-inset:             var(--#{$prefix}spacer-4) !default;
-$toast-transition-property:         "opacity, display" !default;
+$toast-slide:                       .5rem !default;
+$toast-transition-property:         "opacity, translate, display" !default;
 $toast-transition-duration:         .15s !default;
 $toast-transition-timing:           linear !default;
 
@@ -51,6 +52,7 @@ $toast-tokens: defaults(
     --#{$prefix}toast-header-bg: #{$toast-header-background-color},
     --#{$prefix}toast-header-border-color: #{$toast-header-border-color},
     --#{$prefix}toast-font-size: $toast-font-size,
+    --#{$prefix}toast-slide: #{$toast-slide},
     --#{$prefix}toast-transition-property: #{$toast-transition-property},
     --#{$prefix}toast-transition-duration: #{$toast-transition-duration},
     --#{$prefix}toast-transition-timing: #{$toast-transition-timing},
@@ -81,6 +83,7 @@ $toast-tokens: defaults(
     // `.toast-instant` to skip the animation.
     &:not(.toast-instant) {
       opacity: 0;
+      translate: var(--#{$prefix}toast-translate, 0 calc(-1 * var(--#{$prefix}toast-slide)));
       @include transition-props(
         var(--#{$prefix}toast-transition-property),
         var(--#{$prefix}toast-transition-duration),
@@ -92,6 +95,7 @@ $toast-tokens: defaults(
     &.show {
       display: block;
       opacity: 1;
+      translate: 0 0;
     }
 
     &[data-coreui-limited] {
@@ -104,6 +108,7 @@ $toast-tokens: defaults(
   @starting-style {
     .toast:not(.toast-instant).show {
       opacity: 0;
+      translate: var(--#{$prefix}toast-translate, 0 calc(-1 * var(--#{$prefix}toast-slide)));
     }
   }
 
@@ -151,6 +156,12 @@ $toast-tokens: defaults(
     inset-block: var(--#{$prefix}toast-container-inset);
     height: fit-content;
     margin-block: auto;
+  }
+
+  .toast-container-bottom-start,
+  .toast-container-bottom-center,
+  .toast-container-bottom-end {
+    --#{$prefix}toast-translate: 0 var(--#{$prefix}toast-slide);
   }
 
   @each $inline, $property in (start: inset-inline-start, end: inset-inline-end) {
