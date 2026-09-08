@@ -147,14 +147,14 @@ describe('RangeSlider', () => {
       expect(inputs[1].value).toBe('30')
     })
 
-    it('should draw a bare number in labels as a tick without text', () => {
+    it('should draw a bare number in ticks as a tick without text', () => {
       fixtureEl.innerHTML = '<div id="slider"></div>'
 
       const element = fixtureEl.querySelector('#slider')
       // eslint-disable-next-line no-new
-      new RangeSlider(element, { labels: [{ value: 0, label: 'Cold' }, 25, { value: 50, label: 'Mild' }] })
+      new RangeSlider(element, { ticks: [{ value: 0, label: 'Cold' }, 25, { value: 50, label: 'Mild' }] })
 
-      const labels = element.querySelectorAll('.range-slider-label')
+      const labels = element.querySelectorAll('.range-slider-tick')
       expect(labels.length).toBe(3)
       expect(labels[1].textContent).toBe('')
       expect(labels[1].dataset.coreuiValue).toBe('25')
@@ -170,13 +170,13 @@ describe('RangeSlider', () => {
         max: 200,
         step: 10,
         value: [50, 150],
-        labels: ['Low', 'Medium', 'High'],
+        ticks: ['Low', 'Medium', 'High'],
         tooltipsFormat: value => `${value}%`,
         vertical: false
       }
       const rangeSlider = new RangeSlider(element, config)
 
-      const labels = element.querySelectorAll('.range-slider-label')
+      const labels = element.querySelectorAll('.range-slider-tick')
       expect(labels.length).toBe(3)
       expect(labels[0].textContent).toBe('Low')
       expect(labels[1].textContent).toBe('Medium')
@@ -403,90 +403,90 @@ describe('RangeSlider', () => {
       expect(input.getAttribute('aria-orientation')).toBe('horizontal')
     })
 
-    it('should lay labels out on grid rows from max at the top to min at the bottom in vertical mode', () => {
+    it('should lay ticks out on grid rows from max at the top to min at the bottom in vertical mode', () => {
       fixtureEl.innerHTML = '<div id="slider"></div>'
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, {
         vertical: true,
         value: [25],
-        labels: ['Start', 'Middle', 'End']
+        ticks: ['Start', 'Middle', 'End']
       })
 
-      const container = element.querySelector('.range-slider-labels-container')
+      const container = element.querySelector('.range-slider-ticks')
       expect(container.style.gridTemplateRows).toBe('0fr 0.5fr 0.5fr 0fr')
       expect(container.style.gridTemplateColumns).toBe('')
 
-      const labels = element.querySelectorAll('.range-slider-label')
+      const labels = element.querySelectorAll('.range-slider-tick')
       expect(labels[0].style.gridRowStart).toBe('4')
       expect(labels[1].style.gridRowStart).toBe('3')
       expect(labels[2].style.gridRowStart).toBe('2')
     })
 
-    it('should lay labels out on grid columns in horizontal mode', () => {
+    it('should lay ticks out on grid columns in horizontal mode', () => {
       fixtureEl.innerHTML = '<div id="slider"></div>'
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, {
         vertical: false,
         value: [25],
-        labels: ['Start', 'End']
+        ticks: ['Start', 'End']
       })
 
-      const container = element.querySelector('.range-slider-labels-container')
+      const container = element.querySelector('.range-slider-ticks')
       expect(container.style.gridTemplateColumns).toBe('0fr 1fr 0fr')
 
-      const labels = element.querySelectorAll('.range-slider-label')
+      const labels = element.querySelectorAll('.range-slider-tick')
       expect(labels[0].style.gridColumnStart).toBe('2')
       expect(labels[1].style.gridColumnStart).toBe('3')
     })
   })
 
-  describe('Labels', () => {
-    it('should create labels based on provided array', () => {
+  describe('Ticks', () => {
+    it('should create ticks based on provided array', () => {
       fixtureEl.innerHTML = '<div id="slider"></div>'
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, {
         value: [20, 80],
-        labels: ['Low', 'Medium', 'High']
+        ticks: ['Low', 'Medium', 'High']
       })
 
-      const labels = element.querySelectorAll('.range-slider-label')
+      const labels = element.querySelectorAll('.range-slider-tick')
       expect(labels.length).toBe(3)
       expect(labels[0].textContent).toBe('Low')
       expect(labels[1].textContent).toBe('Medium')
       expect(labels[2].textContent).toBe('High')
     })
 
-    it('should place each label on a grid line built from the gaps between values', () => {
+    it('should place each tick on a grid line built from the gaps between values', () => {
       fixtureEl.innerHTML = '<div id="slider"></div>'
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, {
         value: [0, 50, 100],
-        labels: ['Start', 'Middle', 'End']
+        ticks: ['Start', 'Middle', 'End']
       })
 
-      expect(element.querySelector('.range-slider-labels-container').style.gridTemplateColumns).toBe('0fr 0.5fr 0.5fr 0fr')
+      expect(element.querySelector('.range-slider-ticks').style.gridTemplateColumns).toBe('0fr 0.5fr 0.5fr 0fr')
 
-      const labels = element.querySelectorAll('.range-slider-label')
+      const labels = element.querySelectorAll('.range-slider-tick')
       expect(labels[0].style.gridColumnStart).toBe('2')
       expect(labels[1].style.gridColumnStart).toBe('3')
       expect(labels[2].style.gridColumnStart).toBe('4')
       expect(labels[0].style.left).toBe('')
     })
 
-    it('should sort labels by value so uneven values still land on grid lines', () => {
+    it('should sort ticks by value so uneven values still land on grid lines', () => {
       fixtureEl.innerHTML = '<div id="slider"></div>'
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, {
         value: [50],
-        labels: [
+        ticks: [
           { label: 'High', value: 100 },
           { label: 'Low', value: 0 },
           { label: 'Ten', value: 10 }
         ]
       })
 
-      expect(element.querySelector('.range-slider-labels-container').style.gridTemplateColumns).toBe('0fr 0.1fr 0.9fr 0fr')
-      expect([...element.querySelectorAll('.range-slider-label')].map(label => label.textContent)).toEqual(['Low', 'Ten', 'High'])
+      expect(element.querySelector('.range-slider-ticks').style.gridTemplateColumns).toBe('0fr 0.1fr 0.9fr 0fr')
+      expect([...element.querySelectorAll('.range-slider-tick')].map(label => label.textContent)).toEqual(['Low', 'Ten', 'High'])
     })
 
     it('should render ticks from a linked datalist through the list option', () => {
@@ -501,83 +501,83 @@ describe('RangeSlider', () => {
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, { value: [50], list: 'stops' })
 
-      const labels = [...element.querySelectorAll('.range-slider-label')]
+      const labels = [...element.querySelectorAll('.range-slider-tick')]
       expect(labels.map(label => label.textContent)).toEqual(['Cold', '', 'Hot'])
       expect(labels.map(label => label.dataset.coreuiValue)).toEqual(['0', '50', '100'])
-      expect(element.querySelector('.range-slider-labels-container').style.gridTemplateColumns).toBe('0fr 0.5fr 0.5fr 0fr')
+      expect(element.querySelector('.range-slider-ticks').style.gridTemplateColumns).toBe('0fr 0.5fr 0.5fr 0fr')
     })
 
-    it('should merge datalist ticks with labels', () => {
+    it('should merge datalist ticks with the ticks option', () => {
       fixtureEl.innerHTML = `
         <div id="slider"></div>
         <datalist id="stops"><option value="75"></option></datalist>
       `
       const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: [50], list: 'stops', labels: ['Low', 'High'] })
+      const rangeSlider = new RangeSlider(element, { value: [50], list: 'stops', ticks: ['Low', 'High'] })
 
-      expect([...element.querySelectorAll('.range-slider-label')].map(label => label.dataset.coreuiValue)).toEqual(['0', '75', '100'])
+      expect([...element.querySelectorAll('.range-slider-tick')].map(label => label.dataset.coreuiValue)).toEqual(['0', '75', '100'])
     })
 
-    it('should handle labels with specific values (object labels)', () => {
+    it('should handle ticks with specific values (object ticks)', () => {
       fixtureEl.innerHTML = '<div id="slider"></div>'
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, {
         value: [10, 90],
-        labels: [
+        ticks: [
           { label: 'Min', value: 10 },
           { label: 'Max', value: 90 }
         ]
       })
 
-      const labels = element.querySelectorAll('.range-slider-label')
+      const labels = element.querySelectorAll('.range-slider-tick')
       expect(labels.length).toBe(2)
       expect(labels[0].textContent).toBe('Min')
       expect(labels[1].textContent).toBe('Max')
-      expect(element.querySelector('.range-slider-labels-container').style.gridTemplateColumns).toBe('0.1fr 0.8fr 0.1fr')
+      expect(element.querySelector('.range-slider-ticks').style.gridTemplateColumns).toBe('0.1fr 0.8fr 0.1fr')
     })
 
-    it('should handle labels with class property as string', () => {
+    it('should handle ticks with class property as string', () => {
       fixtureEl.innerHTML = '<div id="slider"></div>'
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, {
         value: [50],
-        labels: [
+        ticks: [
           { label: 'A', value: 0, class: 'custom-class' },
           { label: 'B', value: 100, class: 'another-class' }
         ]
       })
 
-      const labels = element.querySelectorAll('.range-slider-label')
+      const labels = element.querySelectorAll('.range-slider-tick')
       expect(labels[0].classList.contains('custom-class')).toBeTrue()
       expect(labels[1].classList.contains('another-class')).toBeTrue()
     })
 
-    it('should handle labels with class property as array', () => {
+    it('should handle ticks with class property as array', () => {
       fixtureEl.innerHTML = '<div id="slider"></div>'
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, {
         value: [50],
-        labels: [
+        ticks: [
           { label: 'A', value: 0, class: ['cls1', 'cls2'] }
         ]
       })
 
-      const labels = element.querySelectorAll('.range-slider-label')
+      const labels = element.querySelectorAll('.range-slider-tick')
       expect(labels[0].classList.contains('cls1')).toBeTrue()
       expect(labels[0].classList.contains('cls2')).toBeTrue()
     })
 
-    it('should handle labels with style property', () => {
+    it('should handle ticks with style property', () => {
       fixtureEl.innerHTML = '<div id="slider"></div>'
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, {
         value: [50],
-        labels: [
+        ticks: [
           { label: 'Styled', value: 50, style: { color: 'red', fontWeight: 'bold' } }
         ]
       })
 
-      const labels = element.querySelectorAll('.range-slider-label')
+      const labels = element.querySelectorAll('.range-slider-tick')
       expect(labels[0].style.color).toBe('red')
       expect(labels[0].style.fontWeight).toBe('bold')
     })
@@ -587,41 +587,41 @@ describe('RangeSlider', () => {
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, {
         value: [50],
-        labels: [
+        ticks: [
           { label: 'NoStyle', value: 50, style: 'not-an-object' }
         ]
       })
 
-      const labels = element.querySelectorAll('.range-slider-label')
+      const labels = element.querySelectorAll('.range-slider-tick')
       expect(labels[0].textContent).toBe('NoStyle')
       expect(labels[0].getAttribute('style')).toBe('grid-column-start: 2;')
     })
 
-    it('should add clickable class when clickableLabels is true and not disabled', () => {
+    it('should add clickable class when clickableTicks is true and not disabled', () => {
       fixtureEl.innerHTML = '<div id="slider"></div>'
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, {
         value: [50],
-        labels: ['A', 'B'],
-        clickableLabels: true,
+        ticks: ['A', 'B'],
+        clickableTicks: true,
         disabled: false
       })
 
-      const labels = element.querySelectorAll('.range-slider-label')
+      const labels = element.querySelectorAll('.range-slider-tick')
       expect(labels[0].classList.contains('clickable')).toBeTrue()
       expect(labels[1].classList.contains('clickable')).toBeTrue()
     })
 
-    it('should not add clickable class when clickableLabels is false', () => {
+    it('should not add clickable class when clickableTicks is false', () => {
       fixtureEl.innerHTML = '<div id="slider"></div>'
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, {
         value: [50],
-        labels: ['A', 'B'],
-        clickableLabels: false
+        ticks: ['A', 'B'],
+        clickableTicks: false
       })
 
-      const labels = element.querySelectorAll('.range-slider-label')
+      const labels = element.querySelectorAll('.range-slider-tick')
       expect(labels[0].classList.contains('clickable')).toBeFalse()
     })
 
@@ -630,62 +630,62 @@ describe('RangeSlider', () => {
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, {
         value: [50],
-        labels: ['A', 'B'],
-        clickableLabels: true,
+        ticks: ['A', 'B'],
+        clickableTicks: true,
         disabled: true
       })
 
-      const labels = element.querySelectorAll('.range-slider-label')
+      const labels = element.querySelectorAll('.range-slider-tick')
       expect(labels[0].classList.contains('clickable')).toBeFalse()
     })
 
-    it('should not create labels when labels is false', () => {
+    it('should not create ticks when ticks is false', () => {
       fixtureEl.innerHTML = '<div id="slider"></div>'
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, {
         value: [50],
-        labels: false
+        ticks: false
       })
 
-      const labels = element.querySelectorAll('.range-slider-label')
+      const labels = element.querySelectorAll('.range-slider-tick')
       expect(labels.length).toBe(0)
     })
 
-    it('should not create labels when labels is empty array', () => {
+    it('should not create ticks when ticks is empty array', () => {
       fixtureEl.innerHTML = '<div id="slider"></div>'
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, {
         value: [50],
-        labels: []
+        ticks: []
       })
 
-      const labels = element.querySelectorAll('.range-slider-label')
+      const labels = element.querySelectorAll('.range-slider-tick')
       expect(labels.length).toBe(0)
     })
 
-    it('should handle a single label', () => {
+    it('should handle a single tick', () => {
       fixtureEl.innerHTML = '<div id="slider"></div>'
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, {
         value: [50],
-        labels: ['Only']
+        ticks: ['Only']
       })
 
-      const labels = element.querySelectorAll('.range-slider-label')
+      const labels = element.querySelectorAll('.range-slider-tick')
       expect(labels.length).toBe(1)
       // Single label with string value: position calculation uses index/(length-1) = 0/0 = NaN
       expect(labels[0].textContent).toBe('Only')
     })
 
-    it('should split string labels by comma', () => {
+    it('should split string ticks by comma', () => {
       fixtureEl.innerHTML = '<div id="slider"></div>'
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, {
         value: [50],
-        labels: 'Low, Medium, High'
+        ticks: 'Low, Medium, High'
       })
 
-      const labels = element.querySelectorAll('.range-slider-label')
+      const labels = element.querySelectorAll('.range-slider-tick')
       expect(labels.length).toBe(3)
       expect(labels[0].textContent).toBe('Low')
       expect(labels[1].textContent).toBe('Medium')
@@ -954,12 +954,12 @@ describe('RangeSlider', () => {
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, {
         value: [20, 80],
-        labels: ['A', 'B', 'C']
+        ticks: ['A', 'B', 'C']
       })
 
-      rangeSlider.update({ value: 50, labels: false })
+      rangeSlider.update({ value: 50, ticks: false })
 
-      const labels = element.querySelectorAll('.range-slider-label')
+      const labels = element.querySelectorAll('.range-slider-tick')
       expect(labels.length).toBe(0)
 
       const inputs = element.querySelectorAll('.range-slider-input')
@@ -1195,15 +1195,15 @@ describe('RangeSlider', () => {
   })
 
   describe('_configAfterMerge', () => {
-    it('should convert string labels to array', () => {
+    it('should convert string ticks to array', () => {
       fixtureEl.innerHTML = '<div id="slider"></div>'
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, {
         value: 50,
-        labels: 'A, B, C'
+        ticks: 'A, B, C'
       })
 
-      const labels = element.querySelectorAll('.range-slider-label')
+      const labels = element.querySelectorAll('.range-slider-tick')
       expect(labels.length).toBe(3)
       expect(labels[0].textContent).toBe('A')
       expect(labels[1].textContent).toBe('B')
@@ -1403,21 +1403,21 @@ describe('RangeSlider', () => {
     })
   })
 
-  describe('Clickable labels interaction', () => {
-    it('should update value when clicking on a label with clickableLabels true', () => {
+  describe('Clickable ticks interaction', () => {
+    it('should update value when clicking on a tick with clickableTicks true', () => {
       fixtureEl.innerHTML = '<div id="slider"></div>'
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, {
         value: [50],
-        labels: [
+        ticks: [
           { label: 'Zero', value: 0 },
           { label: 'Half', value: 50 },
           { label: 'Full', value: 100 }
         ],
-        clickableLabels: true
+        clickableTicks: true
       })
 
-      const labels = element.querySelectorAll('.range-slider-label')
+      const labels = element.querySelectorAll('.range-slider-tick')
 
       // Click on the "Full" label
       const mousedownEvent = new MouseEvent('mousedown', {
@@ -1430,19 +1430,19 @@ describe('RangeSlider', () => {
       expect(input.value).toBe('100')
     })
 
-    it('should not update value when clickableLabels is false', () => {
+    it('should not update value when clickableTicks is false', () => {
       fixtureEl.innerHTML = '<div id="slider"></div>'
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, {
         value: [50],
-        labels: [
+        ticks: [
           { label: 'Zero', value: 0 },
           { label: 'Full', value: 100 }
         ],
-        clickableLabels: false
+        clickableTicks: false
       })
 
-      const labels = element.querySelectorAll('.range-slider-label')
+      const labels = element.querySelectorAll('.range-slider-tick')
       const mousedownEvent = new MouseEvent('mousedown', {
         bubbles: true,
         button: 0
@@ -1453,19 +1453,19 @@ describe('RangeSlider', () => {
       expect(input.value).toBe('50')
     })
 
-    it('should not update value on right-click on label', () => {
+    it('should not update value on right-click on tick', () => {
       fixtureEl.innerHTML = '<div id="slider"></div>'
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, {
         value: [50],
-        labels: [
+        ticks: [
           { label: 'Zero', value: 0 },
           { label: 'Full', value: 100 }
         ],
-        clickableLabels: true
+        clickableTicks: true
       })
 
-      const labels = element.querySelectorAll('.range-slider-label')
+      const labels = element.querySelectorAll('.range-slider-tick')
       const mousedownEvent = new MouseEvent('mousedown', {
         bubbles: true,
         button: 2
@@ -1976,12 +1976,12 @@ describe('RangeSlider', () => {
   })
 
   describe('Resize handling', () => {
-    it('should update labels container size on window resize', () => {
+    it('should update ticks container size on window resize', () => {
       fixtureEl.innerHTML = '<div id="slider"></div>'
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, {
         value: [50],
-        labels: ['A', 'B', 'C']
+        ticks: ['A', 'B', 'C']
       })
 
       // Trigger resize
@@ -1989,7 +1989,7 @@ describe('RangeSlider', () => {
       window.dispatchEvent(resizeEvent)
 
       // Just ensure no error is thrown
-      const labelsContainer = element.querySelector('.range-slider-labels-container')
+      const labelsContainer = element.querySelector('.range-slider-ticks')
       expect(labelsContainer).not.toBeNull()
     })
   })

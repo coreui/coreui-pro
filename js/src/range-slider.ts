@@ -35,8 +35,8 @@ const CLASS_NAME_DISABLED = 'disabled'
 const CLASS_NAME_RANGE_SLIDER = 'range-slider'
 const CLASS_NAME_RANGE_SLIDER_INPUT = 'range-slider-input'
 const CLASS_NAME_RANGE_SLIDER_INPUTS_CONTAINER = 'range-slider-inputs-container'
-const CLASS_NAME_RANGE_SLIDER_LABEL = 'range-slider-label'
-const CLASS_NAME_RANGE_SLIDER_LABELS_CONTAINER = 'range-slider-labels-container'
+const CLASS_NAME_RANGE_SLIDER_TICK = 'range-slider-tick'
+const CLASS_NAME_RANGE_SLIDER_TICKS = 'range-slider-ticks'
 const CLASS_NAME_RANGE_SLIDER_TOOLTIP = 'range-slider-tooltip'
 const CLASS_NAME_TOOLTIP = 'tooltip'
 const CLASS_NAME_TOOLTIP_ARROW = 'tooltip-arrow'
@@ -50,17 +50,16 @@ const CLASS_NAME_SHOW = 'show'
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="range-slider"]'
 const SELECTOR_RANGE_SLIDER_INPUT = '.range-slider-input'
 const SELECTOR_RANGE_SLIDER_INPUTS_CONTAINER = '.range-slider-inputs-container'
-const SELECTOR_RANGE_SLIDER_LABEL = '.range-slider-label'
+const SELECTOR_RANGE_SLIDER_TICK = '.range-slider-tick'
 
-type RangeSliderLabel = number | string | { class?: string | string[], label?: string, style?: Record<string, string>, value?: number }
+type RangeSliderTick = number | string | { class?: string | string[], label?: string, style?: Record<string, string>, value?: number }
 
 type RangeSliderConfig = {
   allowList: SanitizerAllowList
   ariaLabels: string[] | null
-  clickableLabels: boolean
+  clickableTicks: boolean
   disabled: boolean
   distance: number
-  labels: RangeSliderLabel[] | boolean | string
   list: string | null
   max: number
   min: number
@@ -68,6 +67,7 @@ type RangeSliderConfig = {
   sanitize: boolean
   sanitizeFn: ((unsafeHtml: string) => string) | null
   step: number | string
+  ticks: RangeSliderTick[] | boolean | string
   tooltipClass: string
   tooltips: boolean | 'always'
   tooltipsFormat: ((value: number | string) => string) | null
@@ -79,10 +79,9 @@ type RangeSliderConfig = {
 const Default: RangeSliderConfig = {
   allowList: DefaultAllowlist,
   ariaLabels: null,
-  clickableLabels: true,
+  clickableTicks: true,
   disabled: false,
   distance: 0,
-  labels: false,
   list: null,
   max: 100,
   min: 0,
@@ -90,6 +89,7 @@ const Default: RangeSliderConfig = {
   sanitize: true,
   sanitizeFn: null,
   step: 1,
+  ticks: false,
   tooltipClass: '',
   tooltips: true,
   tooltipsFormat: null,
@@ -101,10 +101,9 @@ const Default: RangeSliderConfig = {
 const DefaultType: Record<string, string> = {
   allowList: 'object',
   ariaLabels: '(array|null)',
-  clickableLabels: 'boolean',
+  clickableTicks: 'boolean',
   disabled: 'boolean',
   distance: 'number',
-  labels: '(array|boolean|string)',
   list: '(string|null)',
   max: 'number',
   min: 'number',
@@ -112,6 +111,7 @@ const DefaultType: Record<string, string> = {
   sanitize: 'boolean',
   sanitizeFn: '(null|function)',
   step: '(number|string)',
+  ticks: '(array|boolean|string)',
   tooltipClass: 'string',
   tooltips: '(boolean|string)',
   tooltipsFormat: '(function|null)',
@@ -208,8 +208,8 @@ class RangeSlider extends BaseComponent {
       EventHandler.trigger(this._element, EVENT_CHANGE, { value: this._currentValue })
     })
 
-    EventHandler.on(this._element, EVENT_MOUSEDOWN, SELECTOR_RANGE_SLIDER_LABEL, (event: any) => {
-      if (!this._config.clickableLabels || event.button !== 0) {
+    EventHandler.on(this._element, EVENT_MOUSEDOWN, SELECTOR_RANGE_SLIDER_TICK, (event: any) => {
+      if (!this._config.clickableTicks || event.button !== 0) {
         return
       }
 
@@ -252,7 +252,7 @@ class RangeSlider extends BaseComponent {
 
     this._sliderTrack = this._createSliderTrack()
     this._createInputs()
-    this._createLabels()
+    this._createTicks()
     this._createTooltips()
     this._updateGradient()
     this._addEventListeners()
@@ -328,75 +328,75 @@ class RangeSlider extends BaseComponent {
     return typeof this._config.tooltipsFormat === 'function' ? `${this._config.tooltipsFormat(value)}` : null
   }
 
-  _createLabels(): void {
-    const points = this._labelPoints()
+  _createTicks(): void {
+    const points = this._tickPoints()
 
     if (points.length === 0) {
       return
     }
 
-    const { clickableLabels, disabled, vertical } = this._config
-    const labelsContainer = this._createElement('div', CLASS_NAME_RANGE_SLIDER_LABELS_CONTAINER)
+    const { clickableTicks, disabled, vertical } = this._config
+    const ticksContainer = this._createElement('div', CLASS_NAME_RANGE_SLIDER_TICKS)
 
-    // Columns (rows when vertical) are the gaps between 0, each point and 1, so every label lands on a grid line
+    // Columns (rows when vertical) are the gaps between 0, each point and 1, so every tick lands on a grid line
     const stops = [0, ...points.map(point => point.ratio), 1]
     const tracks = stops.slice(1).map((stop, index) => `${stop - stops[index]}fr`)
     if (vertical) {
-      labelsContainer.style.gridTemplateRows = tracks.toReversed().join(' ')
+      ticksContainer.style.gridTemplateRows = tracks.toReversed().join(' ')
     } else {
-      labelsContainer.style.gridTemplateColumns = tracks.join(' ')
+      ticksContainer.style.gridTemplateColumns = tracks.join(' ')
     }
 
     for (const [index, point] of points.entries()) {
-      const labelElement = this._createElement('div', CLASS_NAME_RANGE_SLIDER_LABEL)
+      const tickElement = this._createElement('div', CLASS_NAME_RANGE_SLIDER_TICK)
 
-      if (clickableLabels && !disabled) {
-        labelElement.classList.add(CLASS_NAME_CLICKABLE)
+      if (clickableTicks && !disabled) {
+        tickElement.classList.add(CLASS_NAME_CLICKABLE)
       }
 
       if (point.class) {
-        labelElement.classList.add(...(Array.isArray(point.class) ? point.class : [point.class]))
+        tickElement.classList.add(...(Array.isArray(point.class) ? point.class : [point.class]))
       }
 
       if (point.style && typeof point.style === 'object') {
-        Object.assign(labelElement.style, point.style)
+        Object.assign(tickElement.style, point.style)
       }
 
-      Manipulator.setDataAttribute(labelElement, 'value', point.value)
-      labelElement.textContent = point.label
+      Manipulator.setDataAttribute(tickElement, 'value', point.value)
+      tickElement.textContent = point.label
 
       if (vertical) {
-        labelElement.style.gridRowStart = `${points.length - index + 1}`
+        tickElement.style.gridRowStart = `${points.length - index + 1}`
       } else {
-        labelElement.style.gridColumnStart = `${index + 2}`
+        tickElement.style.gridColumnStart = `${index + 2}`
       }
 
-      labelsContainer.append(labelElement)
+      ticksContainer.append(tickElement)
     }
 
-    this._element.append(labelsContainer)
+    this._element.append(ticksContainer)
   }
 
-  _labelPoints(): Array<{ class?: string | string[], label: string, ratio: number, style?: Record<string, string>, value: number }> {
-    const { labels, list, min, max } = this._config
+  _tickPoints(): Array<{ class?: string | string[], label: string, ratio: number, style?: Record<string, string>, value: number }> {
+    const { list, min, max, ticks } = this._config
     const span = max - min || 1
     const ratio = (value: number) => Math.min(Math.max((value - min) / span, 0), 1)
     const points = []
 
-    if (Array.isArray(labels) && labels.length > 0) {
-      for (const [index, label] of labels.entries()) {
+    if (Array.isArray(ticks) && ticks.length > 0) {
+      for (const [index, tick] of ticks.entries()) {
         // A bare number is a tick without text at that value
-        const value = typeof label === 'number' ?
-          label :
-          (typeof label === 'object' && label.value !== undefined ?
-            label.value :
-            min + (labels.length === 1 ? 0 : (index / (labels.length - 1)) * span))
+        const value = typeof tick === 'number' ?
+          tick :
+          (typeof tick === 'object' && tick.value !== undefined ?
+            tick.value :
+            min + (ticks.length === 1 ? 0 : (index / (ticks.length - 1)) * span))
 
         points.push({
-          class: typeof label === 'object' ? label.class : undefined,
-          label: typeof label === 'number' ? '' : (typeof label === 'object' ? (label.label ?? '') : label),
+          class: typeof tick === 'object' ? tick.class : undefined,
+          label: typeof tick === 'number' ? '' : (typeof tick === 'object' ? (tick.label ?? '') : tick),
           ratio: ratio(value),
-          style: typeof label === 'object' ? label.style : undefined,
+          style: typeof tick === 'object' ? tick.style : undefined,
           value
         })
       }
@@ -647,8 +647,8 @@ class RangeSlider extends BaseComponent {
   }
 
   override _configAfterMerge(config: any): any {
-    if (typeof config.labels === 'string') {
-      config.labels = config.labels.split(/,\s*/)
+    if (typeof config.ticks === 'string') {
+      config.ticks = config.ticks.split(/,\s*/)
     }
 
     if (typeof config.name === 'string' && config.name.includes(',')) {

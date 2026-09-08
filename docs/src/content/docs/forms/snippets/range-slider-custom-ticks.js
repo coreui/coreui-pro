@@ -1,9 +1,9 @@
-const myRangeSliderCustomLabels = document.getElementById('myRangeSliderCustomLabels')
+const myRangeSliderCustomTicks = document.getElementById('myRangeSliderCustomTicks')
 
-const optionsRangeSliderCustomLabels = {
+const optionsRangeSliderCustomTicks = {
   min: -50,
   max: 100,
-  labels: [
+  ticks: [
     {
       value: -50,
       label: '-50°C',
@@ -30,4 +30,4 @@ const optionsRangeSliderCustomLabels = {
   tooltipsFormat: value => `${value}°C`,
   value: [-10, 40]
 }
-new coreui.RangeSlider(myRangeSliderCustomLabels, optionsRangeSliderCustomLabels)
+new coreui.RangeSlider(myRangeSliderCustomTicks, optionsRangeSliderCustomTicks)

@@ -9,25 +9,25 @@ otherFrameworks:
 
 import { getData } from '@coreui/astro-docs/data'
 
-import rangeSliderCustomLabels from './snippets/range-slider-custom-labels.js?raw'
+import rangeSliderCustomTicks from './snippets/range-slider-custom-ticks.js?raw'
 import rangeSliderCustomTooltips from './snippets/range-slider-custom-tooltips.js?raw'
 
 ## Overview
 
-The **Bootstrap 6 Range Slider** component allows users to select a value or range of values within a predefined range. Unlike the standard `<input type="range" />`, the Range Slider offers enhanced customization options, including multiple handles, labels, tooltips, and vertical orientation. It ensures consistent styling across browsers and provides a rich set of features for advanced use cases.
+The **Bootstrap 6 Range Slider** component allows users to select a value or range of values within a predefined range. Unlike the standard `<input type="range" />`, the Range Slider offers enhanced customization options, including multiple handles, ticks, tooltips, and vertical orientation. It ensures consistent styling across browsers and provides a rich set of features for advanced use cases.
 
 <Example pro code={`<div data-coreui-toggle="range-slider"
        data-coreui-value="25,75"
-       data-coreui-labels="Low, Medium, High">
+       data-coreui-ticks="Low, Medium, High">
   </div>`} />
 
 ## Features
 
 - **Multiple Handles:** Select single or multiple values within the range.
-- **Custom Labels:** Display labels and tick marks at specific points on the slider, or read them from a `<datalist>`.
+- **Ticks:** Draw tick marks, with or without a label, at specific points on the slider, or read them from a `<datalist>`.
 - **Tooltips:** Show the current value of each handle while it is hovered, dragged or focused, or all the time.
 - **Vertical Orientation:** Rotate the slider for vertical layouts.
-- **Clickable Labels:** Enable users to click on labels to set slider values.
+- **Clickable Ticks:** Enable users to click on ticks to set slider values.
 - **Disabled State:** Disable the slider to prevent user interaction.
 
 ## Basic Range Slider
@@ -91,27 +91,27 @@ Sets the minimum distance between multiple slider handles by setting `distance` 
 
 <Example pro code={`<div data-coreui-toggle="range-slider" data-coreui-distance="10" data-coreui-value="50, 75"></div>`} />
 
-## Labels
+## Ticks
 
-Add labels to specific points on the slider for better context. If you provide an array of strings, as in the example below, then labels will be spaced at equal distances from the beginning to the end of the slider.
+Add ticks at specific points on the slider for better context. If you provide an array of strings, as in the example below, then labelled ticks will be spaced at equal distances from the beginning to the end of the slider.
 
-<Example pro code={`<div data-coreui-toggle="range-slider" data-coreui-value="30,70" data-coreui-labels="Start, Middle, End"></div>`} />
+<Example pro code={`<div data-coreui-toggle="range-slider" data-coreui-value="30,70" data-coreui-ticks="Start, Middle, End"></div>`} />
 
-### Labels customization
+### Ticks customization
 
-Labels can be configured as an array of strings, numbers or objects. A number is a bare tick at that value, with no text; with objects you can specify additional properties like `value`, `label`, `class`, and `style`. Every entry draws a tick, taller when it has text, and all of them are laid out on one grid, so unevenly spaced values stay aligned.
+Ticks can be configured as an array of strings, numbers or objects. A number is a bare tick at that value, with no text; with objects you can specify additional properties like `value`, `label`, `class`, and `style`. Every entry draws a tick, taller when it has text, and all of them are laid out on one grid, so unevenly spaced values stay aligned.
 
-<Example pro code={`<div id="myRangeSliderCustomLabels"></div>`} sandboxJs={rangeSliderCustomLabels} />
+<Example pro code={`<div id="myRangeSliderCustomTicks"></div>`} sandboxJs={rangeSliderCustomTicks} />
 
-<Code code={rangeSliderCustomLabels} lang="js" />
+<Code code={rangeSliderCustomTicks} lang="js" />
 
 Numbers and labelled points mix in one array; passed through a data attribute, the array is JSON.
 
-<Example pro code={`<div data-coreui-toggle="range-slider" data-coreui-value="25,75" data-coreui-labels='[{"value": 0, "label": "Cold"}, 25, {"value": 50, "label": "Mild"}, 75, {"value": 100, "label": "Hot"}]'></div>`} />
+<Example pro code={`<div data-coreui-toggle="range-slider" data-coreui-value="25,75" data-coreui-ticks='[{"value": 0, "label": "Cold"}, 25, {"value": 50, "label": "Mild"}, 75, {"value": 100, "label": "Hot"}]'></div>`} />
 
 ### Tick marks from a datalist
 
-Point the `list` option at the `id` of a `<datalist>` and every `<option>` becomes a tick at its value, with the option's `label` shown beneath it. Ticks with a label are drawn taller than bare ones. Datalist ticks and `labels` can be combined; both are laid out on one grid, so unevenly spaced values stay aligned.
+Point the `list` option at the `id` of a `<datalist>` and every `<option>` becomes a tick at its value, with the option's `label` shown beneath it. Ticks with a label are drawn taller than bare ones. Datalist ticks and `ticks` can be combined; both are laid out on one grid, so unevenly spaced values stay aligned.
 
 <Example pro code={`<div data-coreui-toggle="range-slider" data-coreui-value="25,75" data-coreui-list="rangeSliderStops"></div>
   <datalist id="rangeSliderStops">
@@ -122,11 +122,11 @@ Point the `list` option at the `id` of a `<datalist>` and every `<option>` becom
     <option value="100" label="Hot"></option>
   </datalist>`} />
 
-### Clickable labels
+### Clickable ticks
 
-By default, users can click on labels to set the slider to specific values. You can disable this feature by setting `clickableLabels` to `false`.
+By default, users can click on ticks to set the slider to specific values. You can disable this feature by setting `clickableTicks` to `false`.
 
-<Example pro code={`<div data-coreui-toggle="range-slider" data-coreui-clickable-labels="false" data-coreui-value="20,80" data-coreui-labels="Low,Medium,High"></div>`} />
+<Example pro code={`<div data-coreui-toggle="range-slider" data-coreui-clickable-ticks="false" data-coreui-value="20,80" data-coreui-ticks="Low,Medium,High"></div>`} />
 
 ## Tooltips
 
@@ -195,8 +195,8 @@ const rangeSlider = new RangeSlider(rangeSliderElement, {
   step: 1,
   distance: 10,
   value: [20, 80],
-  labels: ['Low', 'Medium', 'High'],
-  clickableLabels: true,
+  ticks: ['Low', 'Medium', 'High'],
+  clickableTicks: true,
   tooltips: true,
   tooltipsFormat: value => `$${value}`
 })
@@ -216,17 +216,17 @@ Please note that for security reasons, the `sanitize`, `sanitizeFn`, and `allowL
 | --- | --- | --- | --- |
 | `allowList` | object | [Default value](/getting-started/javascript#sanitizer) |  Defines the set of permitted HTML tags and attributes that can safely appear in the tooltip content when HTML content is passedd. This helps maintain control over the output and prevent injection of malicious code. |
 | `ariaLabels` | array, null | `null` | Accessible name of each handle, in order. Handles are otherwise indistinguishable to a screen reader, so a slider with more than one wants this. A shorter array leaves the remaining handles unnamed. |
-| `clickableLabels` | boolean | `true` | Enables or disables the ability to click on labels to set slider values. |
+| `clickableTicks` | boolean | `true` | Enables or disables the ability to click on ticks to set slider values. |
 | `disabled` | boolean | `false` | Disables the slider, making it non-interactive and grayed out. |
 | `distance` | number | `0` | Sets the minimum distance between multiple slider handles. |
-| `labels` | array, boolean, string | `false` | Adds labels to the slider. Can be an array of label objects, a comma-separated string, or false.|
-| `list` | string, null | `null` | `id` of a `<datalist>` whose options become tick marks, with their `label` shown beneath. Combines with `labels`. |
+| `list` | string, null | `null` | `id` of a `<datalist>` whose options become tick marks, with their `label` shown beneath. Combines with `ticks`. |
 | `max` | number | `100` | Defines the maximum value of the slider. |
 | `min` | number | `0` | Defines the minimum value of the slider. |
 | `name` | array, string, null | `null` | Sets the name attribute for each slider input. |
 | `sanitize` | boolean | `true` | Controls whether HTML content in the tooltip should be sanitized before rendering. Strongly recommended to leave enabled unless you’re fully managing the content and trust its source. |
 | `sanitizeFn` | null, function | `null` | You can define your own custom sanitization logic by passing a function here. Ideal if you want to use a specialized HTML sanitizer or integrate with existing security tool. |
 | `step` | number, string | `1` | Specifies the increment step for slider values. |
+| `ticks` | array, boolean, string | `false` | Adds ticks to the slider: an array of strings spaced evenly, numbers as bare ticks at that value, or objects with `value`, `label`, `class` and `style`; a comma-separated string works as a data attribute. |
 | `tooltipClass` | string | `''` | Adds one or more classes to the tooltip — a `theme-{color}` class themes the tooltip without touching the slider. |
 | `tooltips` | boolean, `'always'` | `true` | Shows the current value of each handle: `true` on hover, drag and focus, `'always'` at all times, `false` never. |
 | `tooltipsFormat` | function, null | `null` | Provides a custom formatting function for tooltip values. |
