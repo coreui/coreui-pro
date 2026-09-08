@@ -438,14 +438,12 @@ again. There is no switch that brings the suffix back: the layer is the mechanis
 Now that you're familiar with how the utilities API works, learn how to add your own custom classes and modify our default utilities.
 
 <Callout color="info">
-### The shipped stylesheet is written from JSON
+### The same utilities exist as JSON
 
-<AddedIn version="6.0.0" /> `coreui.css` and `coreui-utilities.css` take their
-utilities layer from [`utilities.json`](#without-sass), so a `$utilities` change
-reaches only a stylesheet you compile yourself — and `scss/coreui` no longer
-loads the API module, so add `@use "@coreui/coreui/scss/utilities/api";` after
-the library to emit the classes. Making the change in JSON instead feeds the
-shipped stylesheet, the class list and the typed class names from one place.
+<AddedIn version="6.0.0" /> [`utilities.json`](#without-sass) carries every
+utility on this page, and `$utilities` is written from it. Sass stays the way to
+change them in a Sass build; making the change in JSON instead reaches the class
+list and the typed class names too, and needs no compiler.
 </Callout>
 
 `$utilities` is a configurable variable of the `scss/utilities` module, so you change it with `@use ... with ()` rather than by reassigning it after an import. Two patterns cover every case:
@@ -707,7 +705,7 @@ $utilities: map.merge(
 
 ## Without Sass
 
-<AddedIn version="6.0.0" /> The same map exists as data: `utilities.json` in the package lists every utility with the keys described above, and `coreui-utilities` writes the utilities stylesheet from it and from the token scales in `tokens.json`. No Sass, no build step beyond running the command — the file it writes sits next to `coreui.css` in a plain HTML page. It is how the shipped stylesheets are built: the library's own `npm run css` appends exactly this output to `coreui.css` and `coreui-utilities.css`.
+<AddedIn version="6.0.0" /> The same map exists as data: `utilities.json` in the package lists every utility with the keys described above, and `coreui-utilities` writes the utilities stylesheet from it and from the token scales in `tokens.json`. No Sass, no build step beyond running the command — the file it writes sits next to `coreui.css` in a plain HTML page. The library's own `npm run utilities-check` compiles the Sass map alongside it and refuses a byte of difference, so the two paths cannot drift.
 
 Describe your utilities in a JSON file. Keys are the ones from this page, written as JSON: `property` is a string, a list or an object (the [property map](#property-map)), `values` a list, an object or one of the value sources the package itself uses, and `responsive`, `print`, `state`, `child-selector` and `selector` work as above. A value can be a CSS value, a `{path}` into `tokens.json` (written as `var(--cui-…)`) or a source such as `{ "$theme": "bg" }`, which expands to one entry per theme color:
 

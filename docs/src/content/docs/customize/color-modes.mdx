@@ -261,7 +261,7 @@ The slots are `light-dark()` pairs of the runtime scale, so both color modes are
 
 Global colors are declared once as `light-dark()` pairs, so the color mode selector — which defaults to `data-coreui-theme` but [can be configured](#building-with-sass) to use a `prefers-color-scheme` media query — only declares the scheme:
 
-<ScssDocs file="scss/tokens/_api.scss" capture="root-dark-mode-vars" />
+<ScssDocs file="scss/_root.scss" capture="root-dark-mode-vars" />
 
 Do the same in your own color modes: declare `color-scheme` and override only the tokens whose value is genuinely mode-specific.
 

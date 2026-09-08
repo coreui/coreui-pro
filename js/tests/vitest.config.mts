@@ -13,8 +13,6 @@ import process from 'node:process'
 import { fileURLToPath } from 'node:url'
 import { playwright } from '@vitest/browser-playwright'
 import { defineConfig } from 'vitest/config'
-// @ts-expect-error -- the build scripts ship no types
-import { layers, withLayers } from '../../build/css-compose.mjs'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 const root = path.resolve(dirname, '../..')
@@ -48,32 +46,12 @@ const tsResolve = () => {
   }
 }
 
-// A spec that imports scss/coreui.scss gets what Sass writes, and Sass leaves
-// the generated layers to the build. Without this the tokens are missing and
-// every component renders unstyled.
-const generatedLayers = () => {
-  const generated = layers()
-
-  return {
-    name: 'generated-layers',
-    transform(code: string, id: string) {
-      if (!id.endsWith('.scss')) {
-        return null
-      }
-
-      const { css } = withLayers(code, generated)
-
-      return css === code ? null : { code: css, map: null }
-    }
-  }
-}
-
 export default defineConfig({
   root,
   // Parallel instances (js-test runs the unit and jQuery projects together)
   // must not share the Vite cache — two optimizers corrupt one directory.
   cacheDir: JQUERY_TEST ? 'node_modules/.vite-jquery' : 'node_modules/.vite',
-  plugins: [tsResolve(), generatedLayers()],
+  plugins: [tsResolve()],
   define: {
     'process.env.NODE_ENV': '"dev"'
   },
