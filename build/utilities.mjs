@@ -52,9 +52,9 @@ if (patterns.length > 0) {
 const css = stylesheet(utilities, { layer: files.length > 0 || configFile !== undefined || used !== null, only: used })
 
 if (check) {
-  const rootScss = readFileSync(path.join(root, 'scss/_root.scss'), 'utf8')
+  const rootScss = readFileSync(path.join(root, 'scss/_layers.scss'), 'utf8')
   if (!rootScss.includes(`@layer ${LAYERS.join(', ')};`)) {
-    console.error('utilities: the layer order in build/lib/utilities.mjs differs from scss/_root.scss')
+    console.error('utilities: the layer order in build/lib/utilities.mjs differs from scss/_layers.scss')
     process.exit(1)
   }
 
