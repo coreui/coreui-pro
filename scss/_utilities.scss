@@ -961,9 +961,6 @@ $utilities: map.merge(
       values: map.merge(
         map.merge($utilities-text-colors, $utilities-text-emphasis-colors),
         (
-          "muted": var(--#{$prefix}fg-2),
-          "black-50": color-mix(in oklch, var(--#{$prefix}black) 50%, transparent),
-          "white-50": color-mix(in oklch, var(--#{$prefix}white) 50%, transparent),
           "body-secondary": var(--#{$prefix}fg-2),
           "body-tertiary": var(--#{$prefix}fg-3),
           "body-emphasis": var(--#{$prefix}emphasis-color),
