@@ -16,6 +16,14 @@ build of your own emits it by loading the API module after the library
 same stylesheet — trimmed to the classes your markup uses — without Sass at all.
 See [the utility API](/utilities/api/#without-sass).
 
+`root` carries no rules in that stack either. The palette, the root tokens, the
+breakpoint and spacer tokens and the `.theme-*` classes are written from
+`tokens.json` at build time and composed into the compiled stylesheet where
+Sass used to emit them; `@forward "root"` is there for the maps the components
+read. A Sass build of your own emits the four layers by loading
+`@use "@coreui/coreui/scss/tokens/api";` after the library. See
+[CSS variables](/customize/css-variables/#the-root-layer-comes-from-tokensjson).
+
 If you're not using a component, comment it out or delete it entirely. For example, if you're not using the carousel, remove that `@forward` to save some file size in your compiled CSS. Keep in mind there are some dependencies between our Sass modules that may make it more difficult to omit a file.
 
 ## Lean JavaScript

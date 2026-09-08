@@ -3626,13 +3626,53 @@ Upstream v6 does the same, with a `mask-icon()` mixin.
 - **Three Sass settings stop reaching the utilities.** The generator reads
   `utilities.json` and `tokens.json`, so `@use "config" with ()` overrides of
   `$prefix`, `$breakpoints` and `$enable-reduced-motion` no longer change the
-  generated layer: the class prefix is fixed at `cui-`, the breakpoints come
-  from the `breakpoint` tokens, and the reduced-motion rule that stands the
-  animation utilities down is always written. Move the breakpoints to
-  `tokens.json`; a build that has to respell the prefix or drop the
+  generated layer: the class prefix comes from the build rather than from the
+  Sass variable, the breakpoints come from the `breakpoint` tokens, and the
+  reduced-motion rule that stands the animation utilities down is always
+  written. Move the breakpoints to `tokens.json`; a build that has to drop the
   reduced-motion rule emits the layer itself through the API module, as above.
-  The Bootstrap theme (`scss/themes/bootstrap/bootstrap.scss`) does exactly
-  that, because it writes `bs-`.
+
+#### The root layer and the theme classes are written from `tokens.json`
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+- **Four layers of the compiled stylesheet no longer come from Sass.** The
+  palette and its scales (`@layer colors`), the root tokens and the dark-mode
+  block (`@layer root`), the breakpoint and spacer tokens, and the
+  `.theme-*` / `.theme-reset` classes (`@layer helpers`) are written from
+  `tokens.json` and composed into `dist/css/coreui.css`,
+  `coreui-reboot.css`, `coreui-utilities.css`, `coreui-grid.css` and
+  `themes/bootstrap/bootstrap.css` at the position Sass used to emit them —
+  byte for byte what the Sass loops used to write.
+
+- **A `with ()` override no longer reaches `:root`.**
+  `@use "@coreui/coreui/scss/coreui" with ($primary: …, $body-bg: …,
+  $font-family-sans-serif: …, $radius: …, $spacer: …, $zindex-levels: …)` and
+  the theme maps (`$theme-colors`, `$theme-bgs`, `$theme-fgs`,
+  `$theme-borders`, `$color-tokens`, `$root-tokens`) still work in *your* Sass
+  build — every map, function and mixin remains, and the docs still quote them
+  — but they change nothing in the shipped stylesheets. Two ways to make the
+  change instead:
+
+  ```css
+  /* the token is a plain custom property, so this needs no compiler */
+  :root {
+    --cui-primary-base: hotpink;
+    --cui-spacer: 1.25rem;
+  }
+  ```
+
+  ```diff
+    /* or keep Sass: the API module emits the four layers from the maps */
+    @use "@coreui/coreui/scss/coreui" with ($primary: hotpink);
+  + @use "@coreui/coreui/scss/tokens/api";
+  ```
+
+- **A theme states its palette as JSON.** `scss/themes/bootstrap/tokens.json`
+  is the worked example: it overlays `tokens.json` with Bootstrap's
+  hand-picked gray ramp and theme colors, and the build passes the theme's
+  `bs-` prefix and `-bs-` data infix to the same generator, so
+  `bootstrap.css` no longer loads the Sass utilities API module either.
 
 #### Utilities API: one `property` map replaces `css-var`, `css-variable-name` and `local-vars`
 
