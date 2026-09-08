@@ -350,7 +350,7 @@ describe('Toaster', () => {
       await removed
 
       expect(animate).toHaveBeenCalledTimes(1)
-      expect(animate.calls.mostRecent().args[0][0].transform).toMatch(/^translateY\(-?\d/)
+      expect(animate.calls.mostRecent().args[0][1].transform).toMatch(/^translateY\(-?\d/)
     })
 
     it('should not animate positions when reduced motion is preferred', async () => {

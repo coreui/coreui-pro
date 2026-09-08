@@ -172,6 +172,7 @@ type PromiseOptions<Value> = {
 
 type Entry = {
   instance: Toast
+  settle: (() => void) | null
   toast: ToastObject
 }
 
@@ -182,7 +183,6 @@ type Entry = {
 class Toaster extends BaseComponent {
   protected declare _config: ToasterConfig
   protected declare _entries: Map<string, Entry>
-  protected declare _layoutBeforeHide: Map<Element, number> | null
   protected declare _ownsContainer: boolean
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
@@ -190,7 +190,6 @@ class Toaster extends BaseComponent {
     super(ownsContainer ? document.createElement('div') : element, config)
 
     this._entries = new Map()
-    this._layoutBeforeHide = null
     this._ownsContainer = ownsContainer
 
     if (!PLACEMENTS.has(this._config.placement)) {
@@ -243,11 +242,11 @@ class Toaster extends BaseComponent {
 
     const timeout = toast.timeout ?? this._config.timeout
     const instance = new Toast(toast.element, { autohide: timeout > 0, delay: timeout })
-    const entry = { instance, toast }
+    const entry: Entry = { instance, settle: null, toast }
     this._entries.set(toast.id, entry)
 
     EventHandler.one(toast.element, EVENT_HIDE_TOAST, () => {
-      this._layoutBeforeHide = this._layout()
+      entry.settle = this._collapse(toast.element)
       execute(entry.toast.onClose, [undefined, entry.toast])
     })
     EventHandler.one(toast.element, EVENT_HIDDEN_TOAST, () => this._remove(entry))
@@ -262,10 +261,9 @@ class Toaster extends BaseComponent {
       this._element.append(toast.element)
     }
 
-    this._settle(layout)
-
-    this._applyLimit()
     instance.show()
+    this._settle(layout)
+    this._applyLimit()
     EventHandler.trigger(this._element, EVENT_ADD, { id: toast.id })
 
     return toast.id
@@ -427,8 +425,7 @@ class Toaster extends BaseComponent {
     this._entries.delete(entry.toast.id)
     entry.instance.dispose()
     entry.toast.element.remove()
-    this._settle(this._layoutBeforeHide)
-    this._layoutBeforeHide = null
+    entry.settle?.()
     execute(entry.toast.onRemove, [undefined, entry.toast])
     this._applyLimit()
     EventHandler.trigger(this._element, EVENT_REMOVE, { id: entry.toast.id })
@@ -438,7 +435,7 @@ class Toaster extends BaseComponent {
     const entries = [...this._entries.values()]
     const overflow = this._config.limit > 0 ? Math.max(0, entries.length - this._config.limit) : 0
     const layout = this._layout()
-    let settleAfter = 0
+    let unlimited = false
 
     for (const [index, entry] of entries.entries()) {
       const limited = index < overflow
@@ -449,19 +446,27 @@ class Toaster extends BaseComponent {
 
       entry.toast.limited = limited
       entry.toast.element.inert = limited
-      entry.toast.element.toggleAttribute(ATTRIBUTE_LIMITED, limited)
 
       if (limited) {
         entry.instance._clearTimeout()
-        settleAfter = Math.max(settleAfter, getTransitionDurationFromElement(entry.toast.element))
+        entry.toast.element.style.display = 'block'
+        entry.toast.element.toggleAttribute(ATTRIBUTE_LIMITED, true)
+        const settle = this._collapse(entry.toast.element)
+        setTimeout(() => {
+          if (entry.toast.limited) {
+            entry.toast.element.style.display = 'none'
+            settle()
+          }
+        }, getTransitionDurationFromElement(entry.toast.element))
       } else {
+        entry.toast.element.style.display = ''
+        entry.toast.element.toggleAttribute(ATTRIBUTE_LIMITED, false)
         entry.instance._maybeScheduleHide()
+        unlimited = true
       }
     }
 
-    if (settleAfter > 0) {
-      setTimeout(() => this._settle(layout), settleAfter)
-    } else {
+    if (unlimited) {
       this._settle(layout)
     }
   }
@@ -473,10 +478,46 @@ class Toaster extends BaseComponent {
 
     const layout = new Map<Element, number>()
     for (const child of this._element.children) {
-      layout.set(child, child.getBoundingClientRect().top)
+      if (child.getClientRects().length > 0) {
+        layout.set(child, child.getBoundingClientRect().top)
+      }
     }
 
     return layout
+  }
+
+  _collapse(element: HTMLElement): () => void {
+    if (this._prefersReducedMotion()) {
+      element.style.display = 'block'
+      return () => {}
+    }
+
+    const siblings = [...this._element.children].filter(child => child !== element && child.getClientRects().length > 0)
+    const before = siblings.map(child => child.getBoundingClientRect().top)
+    const { transition } = element.style
+    element.style.transition = 'none'
+    element.style.display = 'none'
+    const after = siblings.map(child => child.getBoundingClientRect().top)
+    element.style.display = 'block'
+    element.getBoundingClientRect()
+    element.style.transition = transition
+
+    const animations = siblings.map((child, index) => {
+      const delta = after[index] - before[index]
+
+      return delta === 0 ?
+        null :
+        child.animate(
+          [{ transform: 'none' }, { transform: `translateY(${delta}px)` }],
+          { duration: getTransitionDurationFromElement(element) || 150, easing: 'ease-out', fill: 'forwards' }
+        )
+    })
+
+    return () => {
+      for (const animation of animations) {
+        animation?.cancel()
+      }
+    }
   }
 
   _settle(layout: Map<Element, number> | null): void {
