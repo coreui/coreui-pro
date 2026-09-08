@@ -50,11 +50,13 @@ const PLACEMENT_TOPCENTER = 'top'
 const PLACEMENT_BOTTOMCENTER = 'bottom'
 
 const Default: MenuConfig = {
-  ...Menu.Default
+  ...Menu.Default,
+  placement: null
 }
 
 const DefaultType: Record<string, string> = {
-  ...Menu.DefaultType
+  ...Menu.DefaultType,
+  placement: '(null|string)'
 }
 
 /**
@@ -102,9 +104,13 @@ class Dropdown extends Menu {
     super.update()
   }
 
-  // The v5 dropdown derives its placement from the wrapper classes and the
-  // `--cui-position` custom property, not from a `placement` option.
+  // Without a `placement` option the v5 dropdown derives its placement from
+  // the wrapper classes and the `--cui-position` custom property.
   protected override _getPlacement(): string {
+    if (this._config.placement) {
+      return super._getPlacement()
+    }
+
     const parentDropdown = this._parent
 
     if (parentDropdown.classList.contains(CLASS_NAME_DROPEND)) {
