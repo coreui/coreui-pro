@@ -323,7 +323,7 @@ A toast is a plain options object. `title` renders the header with a close butto
 
 A toast slides in from beyond the container's edge while it fades in — from the side in the `start` and `end` placements, from above or below in the `center` ones — and slides back out when it closes. A toast outside a placed container slides by `--cui-toast-slide` instead. When a toast leaves, or a new one is inserted above the others, the remaining toasts glide into their new positions instead of jumping. Both respect `prefers-reduced-motion`.
 
-`limit` caps how many toasts are visible at once. The newest stay on screen; older ones fade out and remain in the DOM with `inert` and `data-coreui-limited`, then slide back in as the visible ones go away.
+`limit` caps how many toasts are visible at once. The newest stay on screen; older ones sink away from the edge and fade, remain in the DOM with `inert` and `data-coreui-limited`, and rise back in as the visible ones go away.
 
 Strings are written as text. Set `html: true` on the toaster to render markup; it runs through the same sanitizer as tooltips, configurable with `allowList` and `sanitizeFn`.
 

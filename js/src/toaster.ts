@@ -459,8 +459,14 @@ class Toaster extends BaseComponent {
           }
         }, getTransitionDurationFromElement(entry.toast.element))
       } else {
-        entry.toast.element.style.display = ''
-        entry.toast.element.toggleAttribute(ATTRIBUTE_LIMITED, false)
+        const { element } = entry.toast
+        element.style.translate = getComputedStyle(element).translate
+        element.style.display = ''
+        element.toggleAttribute(ATTRIBUTE_LIMITED, false)
+        element.getBoundingClientRect()
+        requestAnimationFrame(() => {
+          element.style.translate = ''
+        })
         entry.instance._maybeScheduleHide()
         unlimited = true
       }
