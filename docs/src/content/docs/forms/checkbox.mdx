@@ -51,7 +51,7 @@ Add the `disabled` attribute; the associated `<label>` is styled to match, in a 
 
 ## Stacked
 
-Any number of checkboxes that are immediate siblings stack vertically and are spaced by `.form-check`.
+Any number of checkboxes that are immediate siblings stack vertically and are spaced by `.form-field`.
 
 <Example code={`<div class="form-field">
     <input class="check" type="checkbox" value="" id="defaultCheck1">
@@ -137,27 +137,27 @@ Add a description after the label and wrap both in a `.form-field-content`, so t
 
 Create button-like checkboxes by putting `.btn-check` on a `<label>` with the button classes, and nesting the input inside it. The label is the button, so there is no `id`/`for` pair to keep in sync. They can be grouped in a [button group](/components/button-group/).
 
-<Example code={`<label class="btn btn-primary btn-check">
+<Example code={`<label class="btn-solid theme-primary btn-check">
     <input type="checkbox" autocomplete="off">
     Single toggle
   </label>
 
-  <label class="btn btn-primary btn-check">
+  <label class="btn-solid theme-primary btn-check">
     <input type="checkbox" checked autocomplete="off">
     Checked
   </label>
 
-  <label class="btn btn-primary btn-check">
+  <label class="btn-solid theme-primary btn-check">
     <input type="checkbox" disabled autocomplete="off">
     Disabled
   </label>`} />
 
-<Example code={`<label class="btn btn-outline-primary btn-check">
+<Example code={`<label class="btn-outline theme-primary btn-check">
     <input type="checkbox" autocomplete="off">
     Single toggle
   </label>
 
-  <label class="btn btn-outline-secondary btn-check">
+  <label class="btn-outline theme-secondary btn-check">
     <input type="checkbox" checked autocomplete="off">
     Checked
   </label>`} />
@@ -198,11 +198,11 @@ See the [v6 migration guide](/migration/v6/) for the full picture.
 
 ## Theme variants
 
-Modify the appearance of checked checkboxes by adding a [`.theme-{color}` class](/customize/components/#theme-variants) to the `.form-check` element. This sets the checked background and border color to the theme color.
+Modify the appearance of checked checkboxes by adding a [`.theme-{color}` class](/customize/components/#theme-variants) to the `.check` input, or to any element above it. This sets the checked background and border color to the theme color.
 
-<Example class="d-flex flex-column gap-2" code={getData('theme-colors').map((c) => `<div class="form-check theme-${c.name}">
-    <input class="form-check-input" type="checkbox" id="check-${c.name}" checked>
-    <label class="form-check-label" for="check-${c.name}">${c.title} checkbox</label>
+<Example class="d-flex flex-column gap-2" code={getData('theme-colors').map((c) => `<div class="form-field theme-${c.name}">
+    <input class="check" type="checkbox" id="check-${c.name}" checked>
+    <label for="check-${c.name}">${c.title} checkbox</label>
   </div>`)} />
 
 ## Customizing
