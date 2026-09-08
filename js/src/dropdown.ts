@@ -10,6 +10,7 @@
  * --------------------------------------------------------------------------
  */
 
+import { type ReferenceElement } from '@floating-ui/dom'
 import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
@@ -142,12 +143,26 @@ class Dropdown extends Menu {
   // In a navbar (or with static display) the menu is positioned by the
   // dropdown CSS, which keys on this attribute — the engine stays out of it.
   protected override _createFloating(): void {
-    if (this._inNavbar || this._config.display === 'static') {
+    if (this._isStatic()) {
       Manipulator.setDataAttribute(this._menu, 'popper', 'static')
+      Manipulator.setDataAttribute(this._menu, 'placement', this._getPlacement())
       return
     }
 
     super._createFloating()
+  }
+
+  protected override async _updateFloatingPosition(referenceElement: ReferenceElement | null = null): Promise<void> {
+    if (this._isStatic()) {
+      Manipulator.setDataAttribute(this._menu, 'placement', this._getPlacement())
+      return
+    }
+
+    return super._updateFloatingPosition(referenceElement)
+  }
+
+  private _isStatic(): boolean {
+    return this._inNavbar || this._config.display === 'static'
   }
 
   protected override _removeMenuAttributes(): void {

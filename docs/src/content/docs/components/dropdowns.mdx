@@ -353,7 +353,7 @@ Trigger dropdown menus at the left of the elements by adding `.dropstart` to the
     </ul>
   </div>`} />
 
-Inside a `.navbar`, or with `display: 'static'`, the menu is positioned by the direction classes alone and the option is ignored.
+Inside a `.navbar`, or with `display: 'static'`, the plugin writes the resolved placement onto the menu and the stylesheet positions it from that, so the option works there too — every placement except the centered ones.
 
 ## Menu items
 
@@ -420,35 +420,31 @@ By default, a dropdown menu is automatically positioned 100% from the top and al
 
 ### Responsive alignment
 
-If you want to use responsive alignment, disable dynamic positioning by adding the `data-coreui-display="static"` attribute and use the responsive variation classes.
-
-To align **right** the dropdown menu with the given breakpoint or larger, add `.dropdown-menu{-sm|-md|-lg|-xl|-2xl}-end`.
+Alignment that changes with the viewport is a responsive [placement](#placement-option): `data-coreui-placement="bottom-start lg:bottom-end"` aligns the menu left and switches to right from `lg` up. It works with dynamic positioning and, because the plugin writes the resolved placement onto the menu, with `data-coreui-display="static"` and inside a navbar too.
 
 <Example code={`<div class="btn-group">
-    <button type="button" class="btn-solid theme-secondary dropdown-toggle" data-coreui-toggle="dropdown" data-coreui-display="static" aria-expanded="false">
+    <button type="button" class="btn-solid theme-secondary dropdown-toggle" data-coreui-toggle="dropdown" data-coreui-display="static" data-coreui-placement="bottom-start lg:bottom-end" aria-expanded="false">
       Left-aligned but right aligned when large screen
     </button>
-    <ul class="dropdown-menu dropdown-menu-lg-end">
+    <ul class="dropdown-menu">
       <li><button class="dropdown-item" type="button">Action</button></li>
       <li><button class="dropdown-item" type="button">Another action</button></li>
       <li><button class="dropdown-item" type="button">Something else here</button></li>
     </ul>
   </div>`} />
-
-To align **left** the dropdown menu with the given breakpoint or larger, add `.dropdown-menu-end` and `.dropdown-menu{-sm|-md|-lg|-xl|-2xl}-start`.
 
 <Example code={`<div class="btn-group">
-    <button type="button" class="btn-solid theme-secondary dropdown-toggle" data-coreui-toggle="dropdown" data-coreui-display="static" aria-expanded="false">
+    <button type="button" class="btn-solid theme-secondary dropdown-toggle" data-coreui-toggle="dropdown" data-coreui-display="static" data-coreui-placement="bottom-end lg:bottom-start" aria-expanded="false">
       Right-aligned but left aligned when large screen
     </button>
-    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-lg-start">
+    <ul class="dropdown-menu">
       <li><button class="dropdown-item" type="button">Action</button></li>
       <li><button class="dropdown-item" type="button">Another action</button></li>
       <li><button class="dropdown-item" type="button">Something else here</button></li>
     </ul>
   </div>`} />
 
-Note that you don't need to add a `data-coreui-display="static"` attribute to dropdown buttons in navbars, since Floating UI isn't used in navbars.
+The v5 classes `.dropdown-menu{-sm|-md|-lg|-xl|-2xl}{-start|-end}` ship in [`coreui-legacy.css`](/getting-started/install/#v5-compatibility-css) for markup that still uses them.
 
 ### Alignment options
 
@@ -477,10 +473,10 @@ Taking most of the options shown above, here's a small kitchen sink demo of vari
   </div>
 
   <div class="btn-group">
-    <button type="button" class="btn-solid theme-secondary dropdown-toggle" data-coreui-toggle="dropdown" data-coreui-display="static" aria-expanded="false">
+    <button type="button" class="btn-solid theme-secondary dropdown-toggle" data-coreui-toggle="dropdown" data-coreui-display="static" data-coreui-placement="bottom-start lg:bottom-end" aria-expanded="false">
       Left-aligned, right-aligned lg
     </button>
-    <ul class="dropdown-menu dropdown-menu-lg-end">
+    <ul class="dropdown-menu">
       <li><a class="dropdown-item" href="#">Menu item</a></li>
       <li><a class="dropdown-item" href="#">Menu item</a></li>
       <li><a class="dropdown-item" href="#">Menu item</a></li>
@@ -488,10 +484,10 @@ Taking most of the options shown above, here's a small kitchen sink demo of vari
   </div>
 
   <div class="btn-group">
-    <button type="button" class="btn-solid theme-secondary dropdown-toggle" data-coreui-toggle="dropdown" data-coreui-display="static" aria-expanded="false">
+    <button type="button" class="btn-solid theme-secondary dropdown-toggle" data-coreui-toggle="dropdown" data-coreui-display="static" data-coreui-placement="bottom-end lg:bottom-start" aria-expanded="false">
       Right-aligned, left-aligned lg
     </button>
-    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-lg-start">
+    <ul class="dropdown-menu">
       <li><a class="dropdown-item" href="#">Menu item</a></li>
       <li><a class="dropdown-item" href="#">Menu item</a></li>
       <li><a class="dropdown-item" href="#">Menu item</a></li>
