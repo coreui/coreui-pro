@@ -20,28 +20,28 @@ new coreui.MultiSelect(myMultiSelectHeader, {
 
     const selectAll = document.createElement('button')
     selectAll.type = 'button'
-    selectAll.className = 'btn btn-sm btn-primary'
+    selectAll.className = 'btn-solid theme-primary btn-sm'
     selectAll.textContent = `Select all (${state.total})`
     selectAll.disabled = state.selected >= state.total
     selectAll.addEventListener('click', () => actions.selectAll())
 
     const selectFiltered = document.createElement('button')
     selectFiltered.type = 'button'
-    selectFiltered.className = 'btn btn-sm btn-secondary'
+    selectFiltered.className = 'btn-solid theme-secondary btn-sm'
     selectFiltered.textContent = `Select filtered (${state.filtered})`
     selectFiltered.disabled = state.filtered === state.filteredSelected
     selectFiltered.addEventListener('click', () => actions.selectFiltered())
 
     const deselectFiltered = document.createElement('button')
     deselectFiltered.type = 'button'
-    deselectFiltered.className = 'btn btn-sm btn-outline-secondary'
+    deselectFiltered.className = 'btn-outline theme-secondary btn-sm'
     deselectFiltered.textContent = `Deselect filtered (${state.filteredSelected})`
     deselectFiltered.disabled = state.filteredSelected === 0
     deselectFiltered.addEventListener('click', () => actions.deselectFiltered())
 
     const deselectAll = document.createElement('button')
     deselectAll.type = 'button'
-    deselectAll.className = 'btn btn-sm btn-outline-danger'
+    deselectAll.className = 'btn-outline theme-danger btn-sm'
     deselectAll.textContent = `Deselect all (${state.selected})`
     deselectAll.disabled = state.selected === 0
     deselectAll.addEventListener('click', () => actions.deselectAll())

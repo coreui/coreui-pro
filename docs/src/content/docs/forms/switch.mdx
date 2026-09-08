@@ -108,11 +108,11 @@ See the [v6 migration guide](/migration/v6/) for the full picture.
 
 ## Theme variants
 
-Modify the appearance of checked switches by adding a [`.theme-{color}` class](/customize/components/#theme-variants) to the `.form-check` element. This sets the checked background and border color to the theme color.
+Modify the appearance of checked switches by adding a [`.theme-{color}` class](/customize/components/#theme-variants) to the `.switch` input, or to any element above it. This sets the checked background and border color to the theme color.
 
-<Example class="d-flex flex-column gap-2" code={getData('theme-colors').map((c) => `<div class="form-check form-switch theme-${c.name}">
-    <input class="form-check-input" type="checkbox" role="switch" id="switch-${c.name}" checked>
-    <label class="form-check-label" for="switch-${c.name}">${c.title} switch</label>
+<Example class="d-flex flex-column gap-2" code={getData('theme-colors').map((c) => `<div class="form-field theme-${c.name}">
+    <input class="switch" type="checkbox" role="switch" id="switch-${c.name}" checked>
+    <label for="switch-${c.name}">${c.title} switch</label>
   </div>`)} />
 
 ## Customizing
