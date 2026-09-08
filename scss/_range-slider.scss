@@ -11,10 +11,10 @@
 
 // Range Slider
 // scss-docs-start range-slider-variables
-$range-slider-label-padding-y:             0 !default;
-$range-slider-label-padding-x:             0 !default;
-$range-slider-label-font-size:             var(--#{$prefix}font-size-sm) !default;
-$range-slider-label-color:                 var(--#{$prefix}fg-body) !default;
+$range-slider-tick-label-padding-y:        0 !default;
+$range-slider-tick-label-padding-x:        0 !default;
+$range-slider-tick-label-font-size:        var(--#{$prefix}font-size-sm) !default;
+$range-slider-tick-label-color:            var(--#{$prefix}fg-body) !default;
 
 $range-slider-tooltip-margin-end:          .25rem !default;
 $range-slider-tooltip-margin-bottom:       .25rem !default;
@@ -30,10 +30,10 @@ $range-slider-tokens: () !default;
 // scss-docs-start range-slider-css-vars
 $range-slider-tokens: defaults(
   (
-    --#{$prefix}range-slider-label-padding-y: #{$range-slider-label-padding-y},
-    --#{$prefix}range-slider-label-padding-x: #{$range-slider-label-padding-x},
-    --#{$prefix}range-slider-label-font-size: #{$range-slider-label-font-size},
-    --#{$prefix}range-slider-label-color: #{$range-slider-label-color},
+    --#{$prefix}range-slider-tick-label-padding-y: #{$range-slider-tick-label-padding-y},
+    --#{$prefix}range-slider-tick-label-padding-x: #{$range-slider-tick-label-padding-x},
+    --#{$prefix}range-slider-tick-label-font-size: #{$range-slider-tick-label-font-size},
+    --#{$prefix}range-slider-tick-label-color: #{$range-slider-tick-label-color},
     --#{$prefix}range-slider-tooltip-margin-end: #{$range-slider-tooltip-margin-end},
     --#{$prefix}range-slider-tooltip-margin-bottom: #{$range-slider-tooltip-margin-bottom},
   ),
@@ -166,21 +166,21 @@ $range-slider-vertical-tokens: defaults(
     }
   }
 
-  // The plugin builds the grid template from the gaps between label values, so every label
-  // sits on a grid line and a labelled stop draws a taller tick than a bare one.
-  .range-slider-labels-container {
+  // The plugin builds the grid template from the gaps between tick values, so every tick
+  // sits on a grid line and a labelled one is drawn taller than a bare one.
+  .range-slider-ticks {
     display: grid;
   }
 
-  .range-slider-label {
+  .range-slider-tick {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-self: start;
     width: 0;
-    padding: var(--#{$prefix}range-slider-label-padding-y) var(--#{$prefix}range-slider-label-padding-x);
-    font-size: var(--#{$prefix}range-slider-label-font-size);
-    color: var(--#{$prefix}range-slider-label-color);
+    padding: var(--#{$prefix}range-slider-tick-label-padding-y) var(--#{$prefix}range-slider-tick-label-padding-x);
+    font-size: var(--#{$prefix}range-slider-tick-label-font-size);
+    color: var(--#{$prefix}range-slider-tick-label-color);
     white-space: nowrap;
 
     &::before {
@@ -223,7 +223,7 @@ $range-slider-vertical-tokens: defaults(
       width: 100%;
     }
 
-    .range-slider-labels-container {
+    .range-slider-ticks {
       width: 100%;
       padding-inline: calc(var(--#{$prefix}range-thumb-width) * .5);
     }
@@ -279,13 +279,13 @@ $range-slider-vertical-tokens: defaults(
       }
     }
 
-    .range-slider-labels-container {
+    .range-slider-ticks {
       flex-shrink: 0;
       height: 100%;
       padding-block: calc(var(--#{$prefix}range-thumb-height) * .5);
     }
 
-    .range-slider-label {
+    .range-slider-tick {
       flex-direction: row;
       align-self: start;
       justify-self: auto;

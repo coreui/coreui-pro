@@ -1248,27 +1248,38 @@ adornment in the library — so the button needs no icon markup at all:
   `--cui-range-track-fill-bg`, `--cui-range-slider-disabled-track-in-range-bg`
   → `--cui-range-track-disabled-bg`. The Sass variables follow
   (`$range-slider-thumb-*`, `$range-slider-track-*` → `$form-range-*`).
-  `--cui-range-slider-label-*`, `--cui-range-slider-tooltip-margin-*` and
-  `--cui-range-slider-vertical-*` stay. The filled band keeps its half-strength mix of the theme colour, now
+  `--cui-range-slider-tick-label-*`, `--cui-range-slider-tooltip-margin-*`
+  and `--cui-range-slider-vertical-*` stay. The filled band keeps its half-strength mix of the theme colour, now
   shared with the range's fill, and a disabled slider greys the band through
   the theme slot on the track.
-- **Range slider labels sit on a grid, with tick marks.** The plugin builds
-  `grid-template-columns` (rows when vertical) from the gaps between label
-  values, so labels are in normal flow: the container sizes itself, and the
-  resize listener plus the measured container height are gone. Every label
-  draws a tick from `--cui-range-tick-*` — taller when it has text — and the
-  labels are sorted by value. A bare number in `labels` is a tick without
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The range slider's `labels` option is `ticks`.** Every entry draws a tick
+  mark, with or without text, so the option and everything around it carry the
+  name the `Range` plugin uses: `labels` → `ticks`, `clickableLabels` →
+  `clickableTicks` (`data-coreui-ticks`, `data-coreui-clickable-ticks`),
+  `.range-slider-labels-container` → `.range-slider-ticks`,
+  `.range-slider-label` → `.range-slider-tick`, `--cui-range-slider-label-*`
+  → `--cui-range-slider-tick-label-*` and `$range-slider-label-*` →
+  `$range-slider-tick-label-*`. The entry shape is unchanged: a string, a
+  bare number, or `{ value, label, class, style }`. `ariaLabels` names the
+  handles and keeps its name.
+- **Range slider ticks sit on a grid.** The plugin builds
+  `grid-template-columns` (rows when vertical) from the gaps between tick
+  values, so ticks are in normal flow: the container sizes itself, and the
+  resize listener plus the measured container height are gone. Every tick
+  draws its mark from `--cui-range-tick-*` — taller when it has text — and
+  the ticks are sorted by value. A bare number in `ticks` is a tick without
   text at that value. The new `list` option reads a `<datalist>` like the
-  range does and merges its options with `labels`. Custom CSS that
-  positioned `.range-slider-label` through `left`/`bottom` no longer applies.
+  range does and merges its options with `ticks`. Custom CSS that
+  positioned `.range-slider-tick` through `left`/`bottom` no longer applies.
 - **Range slider tooltips follow the range's modes.** `tooltips: true` shows a
   handle's tooltip on hover, drag and visible focus; `"always"` keeps them on.
 - **A theme beats `--cui-range-thumb-bg`, as everywhere else.** The token carried
   the `--cui-theme-*` slot inside its own default, so setting it inside a themed
   container dropped the theme. The slot sits on the property now.
-- **`--cui-range-slider-label-padding-x`/`-y` reach the label.** Both were
+- **`--cui-range-slider-tick-label-padding-x`/`-y` reach the tick.** Both were
   declared and nothing read them, so the knob existed and did nothing. They
-  default to `0`, so no label moves.
+  default to `0`, so no tick moves.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **The value bubble is a tooltip.** The plugin renders
   `<output class="range-slider-tooltip tooltip bs-tooltip-top">` (vertical:
@@ -3683,10 +3694,10 @@ and still compose. What changes is where the translucency expression lives:
   `color-var-ref()` instead — same arguments, without the wrapper;
   `translucent-css-var()` is removed, along with the unused `map-loop()` and
   `color-contrast-variables()`.
-- **`.text-muted`, `.text-black-50`, `.text-white-50` and `.text-body-secondary`
-  now respond to `.text-opacity-*`.** They rendered the same colour before and
-  render the same colour now; they simply went through the plain value and so
-  ignored the opacity knob every other colour utility honoured.
+- **`.text-body-secondary` now responds to `.text-opacity-*`.** It rendered the
+  same colour before and renders the same colour now; it simply went through the
+  plain value and so ignored the opacity knob every other colour utility
+  honoured.
 - Every custom property a utility assigns is registered
   `@property { inherits: false }`, which now covers `--cui-bg`, `--cui-text`,
   `--cui-border` and `--cui-underline` as well — so a colour set on a
@@ -4245,29 +4256,28 @@ see the Sass variables above). Optional knobs that stay `null` by default —
 now read with a fallback (`inherit` / `transparent`), so the declaration is valid
 until you set them.
 
-**Classes** — eleven, every one a CoreUI-only addition:
+**Classes** — eleven CoreUI-only additions, plus the three text utilities
+Bootstrap deprecated in 5.0 and removes in 6:
 
 | Removed | Use instead |
 | --- | --- |
 | `.text-high-emphasis`, `.text-medium-emphasis` | `.text-body`, `.fg-2` |
 | `.text-disabled` | `.fg-3` |
 | `.text-high-emphasis-inverse`, `.text-medium-emphasis-inverse`, `.text-disabled-inverse` | `.text-white` with an opacity utility |
+| `.text-muted` | `.fg-2` |
+| `.text-black-50`, `.text-white-50` | `.fg-black.fg-50`, `.fg-white.fg-50` |
 
-(The `.dark:` variants of the emphasis utilities go with them.)
+(The `.dark:` variants of the emphasis utilities go with them.) The
+`$navbar-light-*` Sass variables stay.
 
-**What we deliberately kept.** `.text-muted`, `.text-black-50`, `.text-white-50`
-and `.navbar-light` are all deprecated, and Bootstrap v6 deletes all four. They
-are Bootstrap heritage rather than CoreUI additions, and they are in the markup of
-a very large number of existing projects — so they stay, at their current
-rendering.
-
-`.sidebar-brand-full`, `.sidebar-brand-narrow` and `.d-narrow-none` stay too,
-though they are CoreUI's own. They are the brand pair every admin template ships
-in its sidebar header, and they are exact aliases of `.d-sidebar-narrow-none` /
-`.d-sidebar-narrow` — two extra selectors in a rule that already exists. Removing
-them would break the most recognisable piece of CoreUI markup, silently: both
-logos would render at once in the narrow state, with nothing to indicate why.
-Prefer the `.d-sidebar-narrow*` names in new markup.
+**What we deliberately kept.** `.sidebar-brand-full`, `.sidebar-brand-narrow`
+and `.d-narrow-none` stay, though they are CoreUI's own. They are the brand pair
+every admin template ships in its sidebar header, and they are exact aliases of
+`.d-sidebar-narrow-none` / `.d-sidebar-narrow` — two extra selectors in a rule
+that already exists. Removing them would break the most recognisable piece of
+CoreUI markup, silently: both logos would render at once in the narrow state,
+with nothing to indicate why. Prefer the `.d-sidebar-narrow*` names in new
+markup.
 
 ### Sass & CSS
 
@@ -4410,8 +4420,8 @@ Prefer the `.d-sidebar-narrow*` names in new markup.
   Every v5 spelling **still ships as a deprecated alias** and renders the same,
   so existing markup is unaffected until v7: `.text-{color}`,
   `.text-{color}-emphasis`, `.text-body`, `.text-black`, `.text-white`,
-  `.text-reset`, `.text-muted`, `.text-body-secondary`, `.text-body-tertiary`,
-  `.text-black-50`, `.text-white-50`, `.bg-{color}-subtle`, `.bg-{color}-muted`,
+  `.text-reset`, `.text-body-secondary`, `.text-body-tertiary`,
+  `.bg-{color}-subtle`, `.bg-{color}-muted`,
   `.border-{color}-subtle`, `.text-opacity-*`, `.bg-opacity-*`,
   `.border-opacity-*`, `.link-opacity-*(-hover)`, `.underline-opacity-*(-hover)`,
   `.lh-base`, `.shadow-opacity-25` and `-75`. The deprecated opacity steps keep
