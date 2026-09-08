@@ -166,85 +166,68 @@ $dropdown-dark-tokens: defaults(
       inset-inline-start: 0;
       top: 100%;
       margin-top: var(--#{$prefix}dropdown-spacer);
-    }
-  }
 
-  // scss-docs-start responsive-breakpoints
-  // We deliberately hardcode the `cui-` prefix because we check
-  // this custom property in JS to determine Popper's positioning
-
-  @each $breakpoint in map.keys($breakpoints) {
-    @include media-breakpoint-up($breakpoint) {
-      $infix: breakpoint-infix($breakpoint, $breakpoints);
-
-      .dropdown-menu#{$infix}-start {
-        // Read by the plugin, so the name stays outside `$prefix`.
-        --cui-position: start;
-
-        &[data-coreui-popper] {
-          inset-inline-start: 0;
-          inset-inline-end: auto;
-        }
+      &[data-coreui-placement$="-start"] {
+        right: auto;
+        left: 0;
       }
 
-      .dropdown-menu#{$infix}-end {
-        --cui-position: end;
-
-        &[data-coreui-popper] {
-          inset-inline-start: auto;
-          inset-inline-end: 0;
-        }
+      &[data-coreui-placement$="-end"] {
+        right: 0;
+        left: auto;
       }
-    }
-  }
-  // scss-docs-end responsive-breakpoints
 
-  // Allow for dropdowns to go bottom up (aka, dropup-menu)
-  // Just add .dropup after the standard .dropdown class and you're set.
-  .dropup {
-    .dropdown-menu[data-coreui-popper] {
-      top: auto;
-      bottom: 100%;
-      margin-top: 0;
-      margin-bottom: var(--#{$prefix}dropdown-spacer);
-    }
+      &[data-coreui-placement^="top"] {
+        top: auto;
+        bottom: 100%;
+        margin-top: 0;
+        margin-bottom: var(--#{$prefix}dropdown-spacer);
+      }
 
-    .dropdown-toggle {
-      @include caret(up);
-    }
-  }
+      &[data-coreui-placement^="right"] {
+        top: 0;
+        right: auto;
+        left: 100%;
+        margin-inline-start: var(--#{$prefix}dropdown-spacer);
+        margin-top: 0;
+      }
 
-  .dropend {
-    .dropdown-menu[data-coreui-popper] {
-      inset-inline-start: 100%;
-      inset-inline-end: auto;
-      top: 0;
-      margin-inline-start: var(--#{$prefix}dropdown-spacer);
-      margin-top: 0;
-    }
-
-    .dropdown-toggle {
-      @include caret(end);
-      &::after {
-        vertical-align: 0;
+      &[data-coreui-placement^="left"] {
+        top: 0;
+        right: 100%;
+        left: auto;
+        margin-inline-end: var(--#{$prefix}dropdown-spacer);
+        margin-top: 0;
       }
     }
   }
 
-  .dropstart {
-    .dropdown-menu[data-coreui-popper] {
-      inset-inline-start: auto;
-      inset-inline-end: 100%;
-      top: 0;
-      margin-inline-end: var(--#{$prefix}dropdown-spacer);
-      margin-top: 0;
-    }
+  // scss-docs-start dropdown-alignment
+  // Read by the plugin, so the name stays outside `$prefix`.
+  .dropdown-menu-start {
+    --cui-position: start;
+  }
 
-    .dropdown-toggle {
-      @include caret(start);
-      &::before {
-        vertical-align: 0;
-      }
+  .dropdown-menu-end {
+    --cui-position: end;
+  }
+  // scss-docs-end dropdown-alignment
+
+  .dropup .dropdown-toggle {
+    @include caret(up);
+  }
+
+  .dropend .dropdown-toggle {
+    @include caret(end);
+    &::after {
+      vertical-align: 0;
+    }
+  }
+
+  .dropstart .dropdown-toggle {
+    @include caret(start);
+    &::before {
+      vertical-align: 0;
     }
   }
 

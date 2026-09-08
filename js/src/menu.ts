@@ -108,7 +108,7 @@ type MenuConfig = {
   offset: FloatingOffsetOption
   floatingConfig: FloatingConfigOption
   menu: HTMLElement | null
-  placement: string
+  placement: string | null
   reference: string | Element | Record<string, any>
   strategy: string
   submenuTrigger: string
@@ -438,7 +438,7 @@ class Menu extends BaseComponent {
   protected _getPlacement(): string {
     const placement = this._responsivePlacements ?
       getResponsivePlacement(this._responsivePlacements, DEFAULT_PLACEMENT) :
-      this._config.placement
+      (this._config.placement ?? DEFAULT_PLACEMENT)
 
     return resolveLogicalPlacement(placement)
   }
