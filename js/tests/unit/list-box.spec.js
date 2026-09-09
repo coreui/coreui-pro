@@ -1,4 +1,5 @@
 import ListBox from '../../src/list-box.js'
+import { DefaultAllowlist } from '../../src/util/sanitizer.js'
 import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
 
 describe('ListBox', () => {
@@ -81,8 +82,14 @@ describe('ListBox', () => {
     it('should return default configuration', () => {
       expect(ListBox.Default).toEqual({
         activeDescendant: null,
+        allowList: DefaultAllowlist,
         disabled: false,
+        html: false,
         indicator: 'none',
+        items: [],
+        loading: false,
+        sanitize: true,
+        sanitizeFn: null,
         selected: null,
         selectionLimit: null,
         selectionMode: 'single',
@@ -885,6 +892,284 @@ describe('ListBox', () => {
 
       keydown(field, 'ArrowDown')
       expect(field.getAttribute('aria-activedescendant')).toBeNull()
+    })
+  })
+
+  describe('items', () => {
+    const setEmptyMarkup = (attrs = '') => {
+      fixtureEl.innerHTML = `<div class="list-box"${attrs}></div>`
+      return fixtureEl.querySelector('.list-box')
+    }
+
+    it('should render flat items and create the options element', () => {
+      const el = setEmptyMarkup()
+      const listBox = new ListBox(el, {
+        items: [
+          { value: 'lettuce', label: 'Lettuce' },
+          { value: 'tomato', label: 'Tomato' }
+        ]
+      })
+
+      expect(list(el)).not.toBeNull()
+      expect(list(el).getAttribute('role')).toEqual('listbox')
+      expect(el.querySelectorAll('.list-box-option')).toHaveSize(2)
+      expect(item(el, 'lettuce').textContent).toEqual('Lettuce')
+      expect(item(el, 'tomato').getAttribute('role')).toEqual('option')
+      expect(listBox.getSelected()).toEqual([])
+    })
+
+    it('should render sections', () => {
+      const el = setEmptyMarkup()
+      // eslint-disable-next-line no-new
+      new ListBox(el, {
+        items: [
+          { label: 'Veggies', items: [{ value: 'lettuce', label: 'Lettuce' }] },
+          { label: 'Protein', items: [{ value: 'ham', label: 'Ham' }] }
+        ]
+      })
+
+      const sections = el.querySelectorAll('.list-box-section')
+
+      expect(sections).toHaveSize(2)
+      expect(sections[0].getAttribute('role')).toEqual('group')
+
+      const label = sections[0].querySelector('.list-box-section-label')
+
+      expect(label.textContent).toEqual('Veggies')
+      expect(sections[0].getAttribute('aria-labelledby')).toEqual(label.id)
+      expect(sections[0].querySelector('.list-box-option')).toEqual(item(el, 'lettuce'))
+    })
+
+    it('should render a description', () => {
+      const el = setEmptyMarkup()
+      // eslint-disable-next-line no-new
+      new ListBox(el, {
+        items: [{ value: 'free', label: 'Free', description: 'One project' }]
+      })
+
+      expect(item(el, 'free').querySelector('.list-box-option-label').textContent).toEqual('Free')
+      expect(item(el, 'free').querySelector('.list-box-option-description').textContent).toEqual('One project')
+    })
+
+    it('should render a disabled item', () => {
+      const el = setEmptyMarkup()
+      const listBox = new ListBox(el, {
+        items: [
+          { value: 'lettuce', label: 'Lettuce' },
+          { value: 'tomato', label: 'Tomato', disabled: true }
+        ]
+      })
+
+      expect(item(el, 'tomato').classList.contains('disabled')).toBeTrue()
+      expect(item(el, 'tomato').getAttribute('aria-disabled')).toEqual('true')
+
+      listBox.select('tomato')
+      expect(listBox.getSelected()).toEqual([])
+    })
+
+    it('should take the initial selection from the items', () => {
+      const el = setEmptyMarkup(' data-coreui-selection-mode="multiple"')
+      const listBox = new ListBox(el, {
+        items: [
+          { value: 'lettuce', label: 'Lettuce', selected: true },
+          { value: 'tomato', label: 'Tomato' },
+          { value: 'onion', label: 'Onion', selected: true }
+        ]
+      })
+
+      expect(listBox.getSelected()).toEqual(['lettuce', 'onion'])
+      expect(item(el, 'lettuce').getAttribute('aria-selected')).toEqual('true')
+    })
+
+    it('should replace the markup already present in the options', () => {
+      const el = setMarkup()
+      const listBox = new ListBox(el, {
+        items: [{ value: 'ham', label: 'Ham' }]
+      })
+
+      expect(el.querySelectorAll('.list-box-option')).toHaveSize(1)
+      expect(item(el, 'lettuce')).toBeNull()
+      expect(listBox.getItems()).toEqual([{ value: 'ham', label: 'Ham' }])
+    })
+
+    it('should keep the empty state element when rendering', () => {
+      fixtureEl.innerHTML = [
+        '<div class="list-box">',
+        '<div class="list-box-options" aria-label="Results">',
+        '<div class="list-box-empty">No results</div>',
+        '</div>',
+        '</div>'
+      ].join('')
+
+      const el = fixtureEl.querySelector('.list-box')
+      const listBox = new ListBox(el, { items: [{ value: 'ham', label: 'Ham' }] })
+
+      expect(el.querySelector('.list-box-empty').hasAttribute('hidden')).toBeTrue()
+
+      listBox.setItems([])
+      expect(el.querySelectorAll('.list-box-option')).toHaveSize(0)
+      expect(el.querySelector('.list-box-empty').hasAttribute('hidden')).toBeFalse()
+    })
+
+    it('should normalize the items', () => {
+      const el = setEmptyMarkup()
+      const listBox = new ListBox(el, {
+        items: [
+          { value: 'lettuce' },
+          { label: 'Tomato' },
+          'nonsense',
+          {
+            label: 'Protein', items: [{
+              value: 'ham', label: 'Ham', description: 'Cured', disabled: true
+            }]
+          }
+        ]
+      })
+
+      expect(listBox.getItems()).toEqual([
+        { value: 'lettuce', label: 'lettuce' },
+        { value: 'Tomato', label: 'Tomato' },
+        {
+          label: 'Protein', items: [{
+            value: 'ham', label: 'Ham', description: 'Cured', disabled: true
+          }]
+        }
+      ])
+    })
+
+    it('should keep the selection of the values that are still there', () => {
+      const el = setEmptyMarkup(' data-coreui-selection-mode="multiple"')
+      const listBox = new ListBox(el, {
+        items: [
+          { value: 'lettuce', label: 'Lettuce' },
+          { value: 'tomato', label: 'Tomato' },
+          { value: 'onion', label: 'Onion' }
+        ]
+      })
+
+      listBox.selectAll()
+      expect(listBox.getSelected()).toEqual(['lettuce', 'tomato', 'onion'])
+
+      const changed = []
+      el.addEventListener('change.coreui.list-box', event => changed.push(event.selected))
+
+      listBox.setItems([
+        { value: 'tomato', label: 'Tomato' },
+        { value: 'cheese', label: 'Cheese' }
+      ])
+
+      expect(listBox.getSelected()).toEqual(['tomato'])
+      expect(changed).toEqual([['tomato']])
+      expect(item(el, 'tomato').classList.contains('selected')).toBeTrue()
+    })
+
+    it('should not fire change when the selection survived the rebuild', () => {
+      const el = setEmptyMarkup()
+      const listBox = new ListBox(el, {
+        items: [{ value: 'lettuce', label: 'Lettuce' }],
+        selected: 'lettuce'
+      })
+
+      const spy = jasmine.createSpy('change')
+      el.addEventListener('change.coreui.list-box', spy)
+
+      listBox.setItems([
+        { value: 'lettuce', label: 'Lettuce' },
+        { value: 'tomato', label: 'Tomato' }
+      ])
+
+      expect(listBox.getSelected()).toEqual(['lettuce'])
+      expect(spy).not.toHaveBeenCalled()
+    })
+
+    it('should escape the labels by default and sanitize them with html', () => {
+      const el = setEmptyMarkup()
+      const listBox = new ListBox(el, {
+        items: [{ value: 'a', label: '<span>Ok</span>' }]
+      })
+
+      expect(item(el, 'a').textContent).toEqual('<span>Ok</span>')
+      expect(item(el, 'a').querySelector('span')).toBeNull()
+
+      listBox.dispose()
+
+      const html = setEmptyMarkup()
+      // eslint-disable-next-line no-new
+      new ListBox(html, {
+        html: true,
+        items: [{ value: 'a', label: '<span>Ok</span><script>alert(1)</script>' }]
+      })
+
+      expect(item(html, 'a').querySelector('span').textContent).toEqual('Ok')
+      expect(item(html, 'a').querySelector('script')).toBeNull()
+    })
+
+    it('should keep unsanitized html when sanitize is false', () => {
+      const el = setEmptyMarkup()
+      // eslint-disable-next-line no-new
+      new ListBox(el, {
+        html: true,
+        items: [{ value: 'a', label: '<em>Ok</em>' }],
+        sanitize: false
+      })
+
+      expect(item(el, 'a').querySelector('em').textContent).toEqual('Ok')
+    })
+  })
+
+  describe('loading', () => {
+    const setLoadingMarkup = (attrs = '') => {
+      fixtureEl.innerHTML = [
+        `<div class="list-box"${attrs}>`,
+        '<div class="list-box-options" aria-label="Results">',
+        '<div class="list-box-option" data-coreui-value="lettuce">Lettuce</div>',
+        '<div class="list-box-empty">No results</div>',
+        '</div>',
+        '</div>'
+      ].join('')
+
+      return fixtureEl.querySelector('.list-box')
+    }
+
+    it('should reflect the loading option on init', () => {
+      const el = setLoadingMarkup(' data-coreui-loading="true"')
+      // eslint-disable-next-line no-new
+      new ListBox(el)
+
+      expect(el.classList.contains('loading')).toBeTrue()
+      expect(list(el).getAttribute('aria-busy')).toEqual('true')
+    })
+
+    it('should toggle the loading state and hide the empty state while loading', () => {
+      const el = setLoadingMarkup()
+      const listBox = new ListBox(el)
+      const empty = el.querySelector('.list-box-empty')
+
+      expect(el.classList.contains('loading')).toBeFalse()
+      expect(list(el).getAttribute('aria-busy')).toBeNull()
+
+      listBox.setItems([])
+      expect(empty.hasAttribute('hidden')).toBeFalse()
+
+      listBox.setLoading(true)
+      expect(el.classList.contains('loading')).toBeTrue()
+      expect(list(el).getAttribute('aria-busy')).toEqual('true')
+      expect(empty.hasAttribute('hidden')).toBeTrue()
+
+      listBox.setItems([{ value: 'ham', label: 'Ham' }])
+      listBox.setLoading(false)
+
+      expect(el.classList.contains('loading')).toBeFalse()
+      expect(list(el).getAttribute('aria-busy')).toBeNull()
+      expect(empty.hasAttribute('hidden')).toBeTrue()
+    })
+
+    it('should drop the loading class on dispose', () => {
+      const el = setLoadingMarkup(' data-coreui-loading="true"')
+      const listBox = new ListBox(el)
+
+      listBox.dispose()
+      expect(el.classList.contains('loading')).toBeFalse()
     })
   })
 

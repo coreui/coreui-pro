@@ -16,6 +16,7 @@ $list-box-border-width:                 var(--#{$prefix}border-width) !default;
 $list-box-border-color:                 var(--#{$prefix}border-color) !default;
 $list-box-border-radius:                var(--#{$prefix}radius-7) !default;
 $list-box-focus-ring-color:             var(--#{$prefix}focus-ring-color) !default;
+$list-box-loading-opacity:              .65 !default;
 
 $list-box-header-border-width:          var(--#{$prefix}border-width) !default;
 $list-box-header-border-color:          var(--#{$prefix}border-color) !default;
@@ -64,6 +65,7 @@ $list-box-tokens: defaults(
     --#{$prefix}list-box-border-color: #{$list-box-border-color},
     --#{$prefix}list-box-border-radius: #{$list-box-border-radius},
     --#{$prefix}list-box-focus-ring-color: #{$list-box-focus-ring-color},
+    --#{$prefix}list-box-loading-opacity: #{$list-box-loading-opacity},
     --#{$prefix}list-box-header-border-width: #{$list-box-header-border-width},
     --#{$prefix}list-box-header-border-color: #{$list-box-header-border-color},
     --#{$prefix}list-box-title-font-size: #{$list-box-title-font-size},
@@ -108,6 +110,11 @@ $list-box-tokens: defaults(
     background-clip: padding-box;
     border: var(--#{$prefix}list-box-border-width) solid var(--#{$prefix}list-box-border-color);
     @include border-radius(var(--#{$prefix}list-box-border-radius));
+  }
+
+  .list-box.loading .list-box-options {
+    pointer-events: none;
+    opacity: var(--#{$prefix}list-box-loading-opacity);
   }
 
   .list-box-translucent {
