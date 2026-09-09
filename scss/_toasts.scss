@@ -84,7 +84,7 @@ $toast-tokens: defaults(
     // `.toast-instant` to skip the animation.
     &:not(.toast-instant) {
       opacity: 0;
-      translate: var(--#{$prefix}toast-translate, 0 calc(-1 * var(--#{$prefix}toast-slide)));
+      translate: var(--#{$prefix}toast-leave-translate, var(--#{$prefix}toast-translate, 0 calc(-1 * var(--#{$prefix}toast-slide))));
       @include transition-props(
         var(--#{$prefix}toast-transition-property),
         var(--#{$prefix}toast-transition-duration),
@@ -111,7 +111,7 @@ $toast-tokens: defaults(
   @starting-style {
     .toast:not(.toast-instant).show {
       opacity: 0;
-      translate: var(--#{$prefix}toast-translate, 0 calc(-1 * var(--#{$prefix}toast-slide)));
+      translate: var(--#{$prefix}toast-enter-translate, var(--#{$prefix}toast-translate, 0 calc(-1 * var(--#{$prefix}toast-slide))));
     }
   }
 

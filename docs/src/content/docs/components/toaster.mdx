@@ -129,7 +129,11 @@ A stack works in every placement: it grows away from the edge it is pinned to, s
 
 ### Motion
 
-A toast slides in from beyond the container's edge while it fades in — from the side in the `start` and `end` placements, from above or below in the `center` ones — and slides back out when it closes. While a toast leaves, the ones behind it glide into the freed space; when a new one arrives, they make room the same way. A toast outside a placed container slides by `--cui-toast-slide` instead. All of it respects `prefers-reduced-motion`.
+A toast slides in from beyond the container's edge while it fades in — from the side in the `start` and `end` placements, from above or below in the `center` ones — and slides back out when it closes. While a toast leaves, the ones behind it glide into the freed space; when a new one arrives, they make room the same way. `enter` and `leave` pick other edges — a `top-end` toaster can drop its toasts in from above and still send them out to the side — and a toast outside a placed container slides by `--cui-toast-slide` instead. All of it respects `prefers-reduced-motion`.
+
+```js
+const toaster = new coreui.Toaster(null, { placement: 'top-end', enter: 'top', leave: 'end' })
+```
 
 ## Placement
 
@@ -184,8 +188,10 @@ const id = toaster.add({ title: 'Saved', description: 'Your changes are live.', 
 | --- | --- | --- | --- |
 | `allowList` | object | [Default value](/getting-started/javascript#sanitizer) | Tags and attributes allowed in toast content when `html` is `true`. |
 | `container` | string, element | `'body'` | Where the toaster appends the container it creates. Ignored when the toaster is given an existing element. |
+| `enter` | string | `'auto'` | Edge a toast slides in from: `'start'`, `'end'`, `'top'` or `'bottom'`. `'auto'` follows the placement — the side in the `start` and `end` columns, above or below in the `center` one. |
 | `html` | boolean | `false` | Render `title` and `description` as HTML instead of text. |
 | `label` | string | `'Notifications'` | Accessible name of the container's `region` landmark. |
+| `leave` | string | `'auto'` | Edge a toast slides out to, same values as `enter`. |
 | `limit` | number | `3` | How many toasts stay visible; the oldest beyond it are hidden and `inert` until a slot frees. `0` disables the limit. |
 | `pauseOnHover` | boolean | `true` | Pause every toast's timer while the pointer or focus is inside the container, and resume when it leaves. Each toast still pauses on its own hover and focus. |
 | `placement` | string | `'top-end'` | Corner or edge of the viewport for the container the toaster creates: `top`, `middle` or `bottom` × `start`, `center` or `end`. Toasts in the `top` placements are inserted first, in the others last, so the newest always sits closest to the edge. |
@@ -241,7 +247,7 @@ Events fire on the container. Each toast still fires the [toast events](/compone
 
 ### CSS variables
 
-The toaster renders regular toasts, so their tokens apply — see the [toast CSS variables](/components/toasts/#css-variables). Two are its own: `--cui-toast-container-inset` on the container sets the distance from the viewport edge, and `--cui-toast-limited-translate` on a toast sets where a toast over the limit sinks to.
+The toaster renders regular toasts, so their tokens apply — see the [toast CSS variables](/components/toasts/#css-variables). Three are its own: `--cui-toast-container-inset` on the container sets the distance from the viewport edge, `--cui-toast-translate` on the container is where a toast enters from and leaves to, overridden separately by `--cui-toast-enter-translate` and `--cui-toast-leave-translate` (the `enter` and `leave` options write those; set them yourself for any other offset), and `--cui-toast-limited-translate` on a toast sets where a toast over the limit sinks to.
 
 <ScssDocs file="scss/_toasts.scss" capture="toast-container-css-vars" />
 

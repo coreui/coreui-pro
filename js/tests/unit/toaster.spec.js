@@ -69,6 +69,27 @@ describe('Toaster', () => {
     })
   })
 
+  describe('enter and leave', () => {
+    it('should set the edges on the container', () => {
+      toaster = new Toaster(null, {
+        container: fixtureEl, placement: 'top-end', enter: 'top', leave: 'end'
+      })
+
+      expect(toaster._element.style.getPropertyValue('--cui-toast-enter-translate')).toEqual('0 calc(-100% - var(--cui-toast-container-inset))')
+      expect(toaster._element.style.getPropertyValue('--cui-toast-leave-translate')).toEqual('calc(100% + var(--cui-toast-container-inset)) 0')
+    })
+
+    it('should leave both to the placement by default and reject unknown values', () => {
+      toaster = new Toaster(null, { container: fixtureEl })
+      expect(toaster._element.style.getPropertyValue('--cui-toast-enter-translate')).toEqual('')
+      expect(toaster._element.style.getPropertyValue('--cui-toast-leave-translate')).toEqual('')
+
+      expect(() => {
+        new Toaster(null, { container: fixtureEl, leave: 'left' }) // eslint-disable-line no-new
+      }).toThrowError(TypeError, /leave/)
+    })
+  })
+
   describe('add', () => {
     it('should render a toast with title, description and a close button in the header', () => {
       toaster = new Toaster(null, { container: fixtureEl })
