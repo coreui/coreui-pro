@@ -12,19 +12,34 @@ describe('ListBox', () => {
     clearFixture()
   })
 
-  const setMarkup = (attrs = '', items = null) => {
+  const setMarkup = (attrs = '', items = null, header = '') => {
     const options = items ?? [
-      '<div class="list-box-item" data-coreui-value="lettuce">Lettuce</div>',
-      '<div class="list-box-item" data-coreui-value="tomato">Tomato</div>',
-      '<div class="list-box-item" data-coreui-value="onion">Onion</div>',
-      '<div class="list-box-item disabled" data-coreui-value="ham">Ham</div>',
-      '<div class="list-box-item" data-coreui-value="cheese">Cheese</div>'
+      '<div class="list-box-option" data-coreui-value="lettuce">Lettuce</div>',
+      '<div class="list-box-option" data-coreui-value="tomato">Tomato</div>',
+      '<div class="list-box-option" data-coreui-value="onion">Onion</div>',
+      '<div class="list-box-option disabled" data-coreui-value="ham">Ham</div>',
+      '<div class="list-box-option" data-coreui-value="cheese">Cheese</div>'
     ]
 
-    fixtureEl.innerHTML = [`<div class="list-box"${attrs}>`, ...options, '</div>'].join('')
+    fixtureEl.innerHTML = [
+      `<div class="list-box"${attrs}>`,
+      header,
+      '<div class="list-box-options" aria-label="Sandwich">',
+      ...options,
+      '</div>',
+      '</div>'
+    ].join('')
 
     return fixtureEl.querySelector('.list-box')
   }
+
+  const selectAllMarkup = [
+    '<div class="list-box-header">',
+    '<button type="button" class="list-box-select-all" data-coreui-select-all>Select all</button>',
+    '<div class="list-box-title">Sandwich</div>',
+    '</div>'
+  ].join('')
+  const list = element => element.querySelector('.list-box-options')
 
   const keydown = (target, key, modifiers = {}) => {
     target.dispatchEvent(new KeyboardEvent('keydown', {
@@ -89,8 +104,8 @@ describe('ListBox', () => {
       // eslint-disable-next-line no-new
       new ListBox(el)
 
-      expect(el.getAttribute('role')).toEqual('listbox')
-      expect(el.getAttribute('aria-multiselectable')).toBeNull()
+      expect(list(el).getAttribute('role')).toEqual('listbox')
+      expect(list(el).getAttribute('aria-multiselectable')).toBeNull()
       expect(item(el, 'lettuce').getAttribute('role')).toEqual('option')
       expect(item(el, 'lettuce').getAttribute('aria-selected')).toEqual('false')
       expect(item(el, 'lettuce').getAttribute('tabindex')).toEqual('0')
@@ -102,7 +117,7 @@ describe('ListBox', () => {
       const listBox = new ListBox(el)
 
       expect(listBox._config.selectionMode).toEqual('multiple')
-      expect(el.getAttribute('aria-multiselectable')).toEqual('true')
+      expect(list(el).getAttribute('aria-multiselectable')).toEqual('true')
     })
 
     it('should not expose aria-selected when the selection mode is none', () => {
@@ -130,19 +145,19 @@ describe('ListBox', () => {
     it('should add a role to every section', () => {
       const el = setMarkup('', [
         '<div class="list-box-section" aria-labelledby="veg"><div class="list-box-section-label" id="veg">Veggies</div>',
-        '<div class="list-box-item" data-coreui-value="lettuce">Lettuce</div></div>'
+        '<div class="list-box-option" data-coreui-value="lettuce">Lettuce</div></div>'
       ])
       // eslint-disable-next-line no-new
       new ListBox(el)
 
-      expect(el.querySelector('.list-box-section').getAttribute('role')).toEqual('group')
+      expect(list(el).querySelector('.list-box-section').getAttribute('role')).toEqual('group')
     })
 
     it('should mark a disabled listbox', () => {
       const el = setMarkup(' data-coreui-disabled="true"')
       const listBox = new ListBox(el)
 
-      expect(el.getAttribute('aria-disabled')).toEqual('true')
+      expect(list(el).getAttribute('aria-disabled')).toEqual('true')
 
       click(item(el, 'lettuce'))
       expect(listBox.getSelected()).toEqual([])
@@ -233,20 +248,19 @@ describe('ListBox', () => {
       expect(listBox.getSelected()).toEqual(['lettuce', 'tomato'])
     })
 
-    it('should keep the select all option in step with the visible options only', () => {
+    it('should keep the select all button in step with the visible options only', () => {
       const el = setMarkup(' data-coreui-selection-mode="multiple"', [
-        '<div class="list-box-item" data-coreui-select-all>Select all</div>',
-        '<div class="list-box-item" data-coreui-value="lettuce">Lettuce</div>',
-        '<div class="list-box-item" data-coreui-value="tomato" hidden>Tomato</div>',
-        '<div class="list-box-item disabled" data-coreui-value="ham">Ham</div>'
-      ])
+        '<div class="list-box-option" data-coreui-value="lettuce">Lettuce</div>',
+        '<div class="list-box-option" data-coreui-value="tomato" hidden>Tomato</div>',
+        '<div class="list-box-option disabled" data-coreui-value="ham">Ham</div>'
+      ], selectAllMarkup)
       const listBox = new ListBox(el)
       const selectAll = el.querySelector('[data-coreui-select-all]')
 
       click(selectAll)
 
       expect(listBox.getSelected()).toEqual(['lettuce'])
-      expect(selectAll.getAttribute('aria-selected')).toEqual('true')
+      expect(selectAll.getAttribute('aria-pressed')).toEqual('true')
       expect(selectAll).not.toHaveClass('indeterminate')
     })
 
@@ -298,22 +312,54 @@ describe('ListBox', () => {
       expect(listBox.getSelected()).toEqual(['lettuce', 'onion', 'cheese'])
     })
 
-    it('should treat a select all option as one switch for the whole list', () => {
+    it('should treat the select all button as one switch for the whole list', () => {
       const el = setMarkup(' data-coreui-selection-mode="multiple"', [
-        '<div class="list-box-item" data-coreui-select-all>Select all</div>',
-        '<div class="list-box-item" data-coreui-value="lettuce">Lettuce</div>',
-        '<div class="list-box-item" data-coreui-value="tomato">Tomato</div>'
-      ])
+        '<div class="list-box-option" data-coreui-value="lettuce">Lettuce</div>',
+        '<div class="list-box-option" data-coreui-value="tomato">Tomato</div>'
+      ], selectAllMarkup)
       const listBox = new ListBox(el)
       const selectAll = el.querySelector('[data-coreui-select-all]')
 
+      expect(selectAll.getAttribute('role')).toBeNull()
+      expect(selectAll.closest('.list-box-header')).not.toBeNull()
+      expect(selectAll.getAttribute('aria-controls')).toEqual(list(el).id)
+      expect(list(el).id).toMatch(/^list-box-options-/)
+      expect(selectAll.getAttribute('aria-pressed')).toEqual('false')
+
       click(selectAll)
       expect(listBox.getSelected()).toEqual(['lettuce', 'tomato'])
-      expect(selectAll.getAttribute('aria-selected')).toEqual('true')
+      expect(selectAll.getAttribute('aria-pressed')).toEqual('true')
+      expect(selectAll).toHaveClass('selected')
 
       click(selectAll)
       expect(listBox.getSelected()).toEqual([])
-      expect(selectAll.getAttribute('aria-selected')).toEqual('false')
+      expect(selectAll.getAttribute('aria-pressed')).toEqual('false')
+      expect(selectAll).not.toHaveClass('selected')
+    })
+
+    it('should keep the select all button out of the options and out of the arrow navigation', () => {
+      const el = setMarkup(' data-coreui-selection-mode="multiple"', null, selectAllMarkup)
+      const listBox = new ListBox(el)
+      const selectAll = el.querySelector('[data-coreui-select-all]')
+
+      expect(el.querySelectorAll('[role="option"]').length).toEqual(5)
+      expect(selectAll.closest('[role="listbox"]')).toBeNull()
+      expect(selectAll.hasAttribute('tabindex')).toBeFalse()
+
+      keydown(list(el), 'End')
+      expect(listBox.getActive()).toEqual('cheese')
+
+      keydown(list(el), 'ArrowDown')
+      expect(listBox.getActive()).toEqual('cheese')
+    })
+
+    it('should disable the select all button with the list box', () => {
+      const el = setMarkup(' data-coreui-disabled="true" data-coreui-selection-mode="multiple"', null, selectAllMarkup)
+      // eslint-disable-next-line no-new
+      new ListBox(el)
+
+      expect(el.querySelector('[data-coreui-select-all]').disabled).toBeTrue()
+      expect(list(el).getAttribute('aria-disabled')).toEqual('true')
     })
   })
 
@@ -354,7 +400,7 @@ describe('ListBox', () => {
 
       el.addEventListener('selectionLimit.coreui.list-box', event => reported.push([event.limit, event.value]))
 
-      keydown(el, 'a', { ctrlKey: true })
+      keydown(list(el), 'a', { ctrlKey: true })
 
       expect(listBox.getSelected()).toEqual(['lettuce', 'tomato'])
       expect(reported).toEqual([[2, 'onion']])
@@ -384,24 +430,23 @@ describe('ListBox', () => {
       expect(listBox.getSelected()).toEqual(['tomato'])
     })
 
-    it('should treat the select all option as full at the limit and clear from there', () => {
+    it('should treat the select all button as full at the limit and clear from there', () => {
       const el = setMarkup(' data-coreui-selection-mode="multiple" data-coreui-selection-limit="2"', [
-        '<div class="list-box-item" data-coreui-select-all>Select all</div>',
-        '<div class="list-box-item" data-coreui-value="lettuce">Lettuce</div>',
-        '<div class="list-box-item" data-coreui-value="tomato">Tomato</div>',
-        '<div class="list-box-item" data-coreui-value="onion">Onion</div>'
-      ])
+        '<div class="list-box-option" data-coreui-value="lettuce">Lettuce</div>',
+        '<div class="list-box-option" data-coreui-value="tomato">Tomato</div>',
+        '<div class="list-box-option" data-coreui-value="onion">Onion</div>'
+      ], selectAllMarkup)
       const listBox = new ListBox(el)
       const selectAll = el.querySelector('[data-coreui-select-all]')
 
       expect(listBox._config.selectionLimit).toEqual(2)
 
       listBox.select('lettuce')
-      expect(selectAll).toHaveClass('indeterminate')
+      expect(selectAll.getAttribute('aria-pressed')).toEqual('mixed')
 
       click(selectAll)
       expect(listBox.getSelected()).toEqual(['lettuce', 'tomato'])
-      expect(selectAll).toHaveClass('selected')
+      expect(selectAll.getAttribute('aria-pressed')).toEqual('true')
       expect(selectAll).not.toHaveClass('indeterminate')
 
       click(selectAll)
@@ -415,18 +460,18 @@ describe('ListBox', () => {
       // eslint-disable-next-line no-new
       new ListBox(el)
 
-      expect(el.querySelector('.list-box-item-indicator')).toBeNull()
-      expect(item(el, 'lettuce')).not.toHaveClass('list-box-item-with-indicator')
+      expect(el.querySelector('.list-box-option-indicator')).toBeNull()
+      expect(item(el, 'lettuce')).not.toHaveClass('list-box-option-with-indicator')
     })
 
     it('should render one indicator per option and never a second one', () => {
       const el = setMarkup()
       const listBox = new ListBox(el, { indicator: 'checkbox' })
 
-      expect(el.querySelectorAll('.list-box-item-indicator').length).toEqual(5)
-      expect(item(el, 'lettuce')).toHaveClass('list-box-item-with-indicator')
+      expect(el.querySelectorAll('.list-box-option-indicator').length).toEqual(5)
+      expect(item(el, 'lettuce')).toHaveClass('list-box-option-with-indicator')
 
-      const indicator = item(el, 'lettuce').querySelector('.list-box-item-indicator')
+      const indicator = item(el, 'lettuce').querySelector('.list-box-option-indicator')
       expect(indicator).toHaveClass('check')
       expect(indicator.getAttribute('aria-hidden')).toEqual('true')
 
@@ -434,14 +479,14 @@ describe('ListBox', () => {
       listBox.update()
       listBox.update()
 
-      expect(el.querySelectorAll('.list-box-item-indicator').length).toEqual(5)
+      expect(el.querySelectorAll('.list-box-option-indicator').length).toEqual(5)
       expect(item(el, 'lettuce').firstElementChild).toEqual(indicator)
     })
 
     it('should keep the option value out of the indicator markup', () => {
       const el = setMarkup(' data-coreui-indicator="checkbox"', [
-        '<div class="list-box-item">Lettuce</div>',
-        '<div class="list-box-item">Tomato</div>'
+        '<div class="list-box-option">Lettuce</div>',
+        '<div class="list-box-option">Tomato</div>'
       ])
       const listBox = new ListBox(el)
 
@@ -450,26 +495,29 @@ describe('ListBox', () => {
       expect(listBox.getSelected()).toEqual(['Lettuce'])
     })
 
-    it('should mark the select all option as indeterminate for a partial selection', () => {
+    it('should mark the select all button as mixed for a partial selection', () => {
       const el = setMarkup(' data-coreui-selection-mode="multiple" data-coreui-indicator="checkbox"', [
-        '<div class="list-box-item" data-coreui-select-all>Select all</div>',
-        '<div class="list-box-item" data-coreui-value="lettuce">Lettuce</div>',
-        '<div class="list-box-item" data-coreui-value="tomato">Tomato</div>'
-      ])
+        '<div class="list-box-option" data-coreui-value="lettuce">Lettuce</div>',
+        '<div class="list-box-option" data-coreui-value="tomato">Tomato</div>'
+      ], selectAllMarkup)
       const listBox = new ListBox(el)
       const selectAll = el.querySelector('[data-coreui-select-all]')
 
-      expect(selectAll).not.toHaveClass('indeterminate')
+      expect(selectAll.getAttribute('aria-pressed')).toEqual('false')
+      expect(selectAll.querySelectorAll('.list-box-option-indicator').length).toEqual(1)
 
       listBox.select('lettuce')
+      expect(selectAll.getAttribute('aria-pressed')).toEqual('mixed')
       expect(selectAll).toHaveClass('indeterminate')
-      expect(selectAll.getAttribute('aria-selected')).toEqual('false')
 
       listBox.select('tomato')
+      expect(selectAll.getAttribute('aria-pressed')).toEqual('true')
+      expect(selectAll).toHaveClass('selected')
       expect(selectAll).not.toHaveClass('indeterminate')
-      expect(selectAll.getAttribute('aria-selected')).toEqual('true')
+      expect(selectAll.querySelectorAll('.list-box-option-indicator').length).toEqual(1)
 
       listBox.clear()
+      expect(selectAll.getAttribute('aria-pressed')).toEqual('false')
       expect(selectAll).not.toHaveClass('indeterminate')
     })
   })
@@ -538,8 +586,8 @@ describe('ListBox', () => {
 
     it('should fire action on a link and in the none mode', () => {
       const el = setMarkup(' data-coreui-selection-mode="none"', [
-        '<div class="list-box-item" data-coreui-value="lettuce">Lettuce</div>',
-        '<a class="list-box-item" href="#docs" data-coreui-value="docs">Docs</a>'
+        '<div class="list-box-option" data-coreui-value="lettuce">Lettuce</div>',
+        '<a class="list-box-option" href="#docs" data-coreui-value="docs">Docs</a>'
       ])
       const listBox = new ListBox(el)
       const values = []
@@ -548,7 +596,7 @@ describe('ListBox', () => {
 
       click(item(el, 'lettuce'))
       listBox.setActive('docs')
-      keydown(el, 'Enter')
+      keydown(list(el), 'Enter')
 
       expect(values).toEqual(['lettuce', 'docs'])
       expect(listBox.getSelected()).toEqual([])
@@ -560,15 +608,15 @@ describe('ListBox', () => {
       const el = setMarkup()
       const listBox = new ListBox(el)
 
-      keydown(el, 'ArrowDown')
+      keydown(list(el), 'ArrowDown')
       expect(listBox.getActive()).toEqual('lettuce')
       expect(item(el, 'lettuce')).toHaveClass('active')
 
-      keydown(el, 'ArrowDown')
+      keydown(list(el), 'ArrowDown')
       expect(listBox.getActive()).toEqual('tomato')
 
-      keydown(el, 'ArrowUp')
-      keydown(el, 'ArrowUp')
+      keydown(list(el), 'ArrowUp')
+      keydown(list(el), 'ArrowUp')
       expect(listBox.getActive()).toEqual('lettuce')
     })
 
@@ -579,10 +627,10 @@ describe('ListBox', () => {
 
       listBox.update()
       listBox.setActive('lettuce')
-      keydown(el, 'ArrowDown')
+      keydown(list(el), 'ArrowDown')
       expect(listBox.getActive()).toEqual('onion')
 
-      keydown(el, 'ArrowDown')
+      keydown(list(el), 'ArrowDown')
       expect(listBox.getActive()).toEqual('cheese')
     })
 
@@ -590,10 +638,10 @@ describe('ListBox', () => {
       const el = setMarkup()
       const listBox = new ListBox(el)
 
-      keydown(el, 'End')
+      keydown(list(el), 'End')
       expect(listBox.getActive()).toEqual('cheese')
 
-      keydown(el, 'Home')
+      keydown(list(el), 'Home')
       expect(listBox.getActive()).toEqual('lettuce')
     })
 
@@ -601,12 +649,12 @@ describe('ListBox', () => {
       const el = setMarkup()
       const listBox = new ListBox(el)
 
-      keydown(el, 'ArrowDown')
-      keydown(el, ' ')
+      keydown(list(el), 'ArrowDown')
+      keydown(list(el), ' ')
       expect(listBox.getSelected()).toEqual(['lettuce'])
 
-      keydown(el, 'ArrowDown')
-      keydown(el, 'Enter')
+      keydown(list(el), 'ArrowDown')
+      keydown(list(el), 'Enter')
       expect(listBox.getSelected()).toEqual(['tomato'])
     })
 
@@ -614,13 +662,13 @@ describe('ListBox', () => {
       const el = setMarkup()
       const listBox = new ListBox(el, { selectionMode: 'multiple' })
 
-      keydown(el, 'ArrowDown')
-      keydown(el, ' ')
-      keydown(el, 'ArrowDown')
-      keydown(el, ' ')
+      keydown(list(el), 'ArrowDown')
+      keydown(list(el), ' ')
+      keydown(list(el), 'ArrowDown')
+      keydown(list(el), ' ')
       expect(listBox.getSelected()).toEqual(['lettuce', 'tomato'])
 
-      keydown(el, ' ')
+      keydown(list(el), ' ')
       expect(listBox.getSelected()).toEqual(['lettuce'])
     })
 
@@ -628,10 +676,10 @@ describe('ListBox', () => {
       const el = setMarkup()
       const listBox = new ListBox(el, { selectionMode: 'multiple' })
 
-      keydown(el, 'ArrowDown')
-      keydown(el, ' ')
-      keydown(el, 'ArrowDown', { shiftKey: true })
-      keydown(el, 'ArrowDown', { shiftKey: true })
+      keydown(list(el), 'ArrowDown')
+      keydown(list(el), ' ')
+      keydown(list(el), 'ArrowDown', { shiftKey: true })
+      keydown(list(el), 'ArrowDown', { shiftKey: true })
 
       expect(listBox.getSelected()).toEqual(['lettuce', 'tomato', 'onion'])
     })
@@ -641,12 +689,12 @@ describe('ListBox', () => {
       const listBox = new ListBox(el, { selectionMode: 'multiple' })
 
       listBox.setActive('onion')
-      keydown(el, 'End', { shiftKey: true })
+      keydown(list(el), 'End', { shiftKey: true })
       expect(listBox.getSelected()).toEqual(['onion', 'cheese'])
 
       listBox.clear()
       listBox.setActive('tomato')
-      keydown(el, 'Home', { shiftKey: true })
+      keydown(list(el), 'Home', { shiftKey: true })
       expect(listBox.getSelected()).toEqual(['lettuce', 'tomato'])
     })
 
@@ -654,13 +702,13 @@ describe('ListBox', () => {
       const el = setMarkup()
       const single = new ListBox(el)
 
-      keydown(el, 'a', { ctrlKey: true })
+      keydown(list(el), 'a', { ctrlKey: true })
       expect(single.getSelected()).toEqual([])
 
       single.dispose()
 
       const multiple = new ListBox(el, { selectionMode: 'multiple' })
-      keydown(el, 'a', { metaKey: true })
+      keydown(list(el), 'a', { metaKey: true })
       expect(multiple.getSelected()).toEqual(['lettuce', 'tomato', 'onion', 'cheese'])
     })
 
@@ -668,13 +716,13 @@ describe('ListBox', () => {
       const el = setMarkup()
       const listBox = new ListBox(el)
 
-      keydown(el, 'o')
+      keydown(list(el), 'o')
       expect(listBox.getActive()).toEqual('onion')
 
       listBox.dispose()
 
       const second = new ListBox(el)
-      keydown(el, 'c')
+      keydown(list(el), 'c')
       expect(second.getActive()).toEqual('cheese')
     })
 
@@ -682,19 +730,19 @@ describe('ListBox', () => {
       const el = setMarkup()
       const listBox = new ListBox(el)
 
-      keydown(el, 't')
-      keydown(el, 'o')
+      keydown(list(el), 't')
+      keydown(list(el), 'o')
       expect(listBox.getActive()).toEqual('tomato')
     })
 
     it('should read the typeahead text from the option label', () => {
       const el = setMarkup('', [
-        '<div class="list-box-item" data-coreui-value="lettuce"><span class="list-box-item-label">Lettuce</span><span class="list-box-item-description">Crisp</span></div>',
-        '<div class="list-box-item" data-coreui-value="tomato"><span class="list-box-item-label">Tomato</span><span class="list-box-item-description">Ripe</span></div>'
+        '<div class="list-box-option" data-coreui-value="lettuce"><span class="list-box-option-label">Lettuce</span><span class="list-box-option-description">Crisp</span></div>',
+        '<div class="list-box-option" data-coreui-value="tomato"><span class="list-box-option-label">Tomato</span><span class="list-box-option-description">Ripe</span></div>'
       ])
       const listBox = new ListBox(el)
 
-      keydown(el, 't')
+      keydown(list(el), 't')
       expect(listBox.getActive()).toEqual('tomato')
     })
 
@@ -702,7 +750,7 @@ describe('ListBox', () => {
       const el = setMarkup()
       const listBox = new ListBox(el, { typeahead: false })
 
-      keydown(el, 'o')
+      keydown(list(el), 'o')
 
       expect(listBox.getActive()).toBeNull()
     })
@@ -713,8 +761,8 @@ describe('ListBox', () => {
       fixtureEl.innerHTML = [
         '<input type="text" id="field">',
         '<div class="list-box">',
-        '<div class="list-box-item" data-coreui-value="lettuce">Lettuce</div>',
-        '<div class="list-box-item" data-coreui-value="tomato">Tomato</div>',
+        '<div class="list-box-option" data-coreui-value="lettuce">Lettuce</div>',
+        '<div class="list-box-option" data-coreui-value="tomato">Tomato</div>',
         '</div>'
       ].join('')
 
@@ -723,7 +771,7 @@ describe('ListBox', () => {
       const listBox = new ListBox(el, { activeDescendant: '#field' })
 
       expect(field.getAttribute('aria-controls')).toEqual(el.id)
-      expect(item(el, 'lettuce').id).toMatch(/^list-box-item-/)
+      expect(item(el, 'lettuce').id).toMatch(/^list-box-option-/)
       expect(item(el, 'lettuce').getAttribute('tabindex')).toBeNull()
 
       field.focus()
@@ -743,7 +791,7 @@ describe('ListBox', () => {
       const el = setMarkup()
       const listBox = new ListBox(el)
 
-      el.insertAdjacentHTML('beforeend', '<div class="list-box-item" data-coreui-value="bacon">Bacon</div>')
+      list(el).insertAdjacentHTML('beforeend', '<div class="list-box-option" data-coreui-value="bacon">Bacon</div>')
       listBox.update()
 
       expect(item(el, 'bacon').getAttribute('role')).toEqual('option')
@@ -775,7 +823,7 @@ describe('ListBox', () => {
 
     it('should show the empty state when nothing is left to navigate', () => {
       const el = setMarkup('', [
-        '<div class="list-box-item" data-coreui-value="lettuce">Lettuce</div>',
+        '<div class="list-box-option" data-coreui-value="lettuce">Lettuce</div>',
         '<div class="list-box-empty" hidden>No results</div>'
       ])
       const listBox = new ListBox(el)
@@ -818,7 +866,7 @@ describe('ListBox', () => {
       fixtureEl.innerHTML = [
         '<input type="text" id="field">',
         '<div class="list-box">',
-        '<div class="list-box-item" data-coreui-value="lettuce">Lettuce</div>',
+        '<div class="list-box-option" data-coreui-value="lettuce">Lettuce</div>',
         '</div>'
       ].join('')
 

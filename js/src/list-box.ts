@@ -52,16 +52,18 @@ const CLASS_NAME_ACTIVE = 'active'
 const CLASS_NAME_CHECK = 'check'
 const CLASS_NAME_DISABLED = 'disabled'
 const CLASS_NAME_INDETERMINATE = 'indeterminate'
-const CLASS_NAME_ITEM_INDICATOR = 'list-box-item-indicator'
-const CLASS_NAME_ITEM_WITH_INDICATOR = 'list-box-item-with-indicator'
+const CLASS_NAME_OPTION_INDICATOR = 'list-box-option-indicator'
+const CLASS_NAME_OPTION_WITH_INDICATOR = 'list-box-option-with-indicator'
 const CLASS_NAME_SELECTED = 'selected'
 
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="list-box"]'
 const SELECTOR_EMPTY = '.list-box-empty'
-const SELECTOR_ITEM = '.list-box-item'
-const SELECTOR_ITEM_INDICATOR = '.list-box-item-indicator'
-const SELECTOR_ITEM_LABEL = '.list-box-item-label'
+const SELECTOR_OPTION = '.list-box-option'
+const SELECTOR_OPTION_INDICATOR = '.list-box-option-indicator'
+const SELECTOR_OPTION_LABEL = '.list-box-option-label'
+const SELECTOR_OPTIONS = '.list-box-options'
 const SELECTOR_SECTION = '.list-box-section'
+const SELECTOR_SELECT_ALL = '[data-coreui-select-all]'
 
 const INDICATOR_CHECKBOX = 'checkbox'
 
@@ -108,9 +110,11 @@ class ListBox extends BaseComponent {
   protected declare _anchor: string | null
   protected declare _field: HTMLElement | null
   protected declare _limited: string | null
+  protected declare _list: HTMLElement
   protected declare _search: string
   protected declare _searchTimeout: ReturnType<typeof setTimeout> | null
   protected declare _selected: Set<string>
+  protected declare _selectAll: HTMLButtonElement | null
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
@@ -119,8 +123,10 @@ class ListBox extends BaseComponent {
     this._anchor = null
     this._field = getElement(this._config.activeDescendant)
     this._limited = null
+    this._list = SelectorEngine.findOne(SELECTOR_OPTIONS, this._element) ?? this._element
     this._search = ''
     this._searchTimeout = null
+    this._selectAll = SelectorEngine.findOne(SELECTOR_SELECT_ALL, this._element) as HTMLButtonElement | null
     this._selected = new Set(this._initialSelection())
 
     this._addEventListeners()
@@ -172,7 +178,7 @@ class ListBox extends BaseComponent {
       return
     }
 
-    const scope = values ?? this._selectableItems().map(item => this._itemValue(item))
+    const scope = values ?? this._navigableOptions().map(option => this._optionValue(option))
     let changed = false
 
     this._limited = null
@@ -230,71 +236,67 @@ class ListBox extends BaseComponent {
   }
 
   update(): void {
-    this._element.setAttribute('role', 'listbox')
+    this._list.setAttribute('role', 'listbox')
 
     if (this._config.selectionMode === SELECTION_MODE_MULTIPLE) {
-      this._element.setAttribute('aria-multiselectable', 'true')
+      this._list.setAttribute('aria-multiselectable', 'true')
     } else {
-      this._element.removeAttribute('aria-multiselectable')
+      this._list.removeAttribute('aria-multiselectable')
     }
 
     if (this._config.disabled) {
-      this._element.setAttribute('aria-disabled', 'true')
+      this._list.setAttribute('aria-disabled', 'true')
     } else {
-      this._element.removeAttribute('aria-disabled')
+      this._list.removeAttribute('aria-disabled')
     }
 
-    for (const section of SelectorEngine.find(SELECTOR_SECTION, this._element)) {
+    for (const section of SelectorEngine.find(SELECTOR_SECTION, this._list)) {
       if (!section.hasAttribute('role')) {
         section.setAttribute('role', 'group')
       }
     }
 
-    if (this._active !== null && !this._navigableItems().some(item => this._itemValue(item) === this._active)) {
+    if (this._active !== null && !this._navigableOptions().some(option => this._optionValue(option) === this._active)) {
       this._active = null
     }
 
-    const navigable = this._navigableItems()
+    const navigable = this._navigableOptions()
     const roving = this._active === null && !this._field ? navigable[0] : null
 
-    for (const item of this._items()) {
-      item.setAttribute('role', 'option')
+    for (const option of this._allOptions()) {
+      option.setAttribute('role', 'option')
 
-      if (this._field && !item.id) {
-        item.id = getUID(`${NAME}-item-`)
+      if (this._field && !option.id) {
+        option.id = getUID(`${NAME}-option-`)
       }
 
-      const value = this._itemValue(item)
-      const selected = this._isSelectAll(item) ? this._allSelected() : this._selected.has(value)
+      const value = this._optionValue(option)
 
-      this._decorateItem(item)
-
-      if (this._isSelectAll(item)) {
-        item.classList.toggle(CLASS_NAME_INDETERMINATE, !selected && this._someSelected())
-      }
+      this._decorateOption(option)
 
       if (this._config.selectionMode === SELECTION_MODE_NONE) {
-        item.removeAttribute('aria-selected')
+        option.removeAttribute('aria-selected')
       } else {
-        item.setAttribute('aria-selected', String(selected))
+        option.setAttribute('aria-selected', String(this._selected.has(value)))
       }
 
-      item.classList.toggle(CLASS_NAME_SELECTED, selected)
-      item.classList.toggle(CLASS_NAME_ACTIVE, value === this._active)
+      option.classList.toggle(CLASS_NAME_SELECTED, this._selected.has(value))
+      option.classList.toggle(CLASS_NAME_ACTIVE, value === this._active)
 
       if (this._field) {
-        item.removeAttribute('tabindex')
+        option.removeAttribute('tabindex')
         continue
       }
 
-      item.setAttribute('tabindex', value === this._active || item === roving ? '0' : '-1')
+      option.setAttribute('tabindex', value === this._active || option === roving ? '0' : '-1')
     }
 
-    const empty = SelectorEngine.findOne(SELECTOR_EMPTY, this._element)
+    const empty = SelectorEngine.findOne(SELECTOR_EMPTY, this._list)
     if (empty) {
       empty.toggleAttribute('hidden', navigable.length > 0)
     }
 
+    this._updateSelectAll()
     this._updateActiveDescendant()
   }
 
@@ -302,6 +304,8 @@ class ListBox extends BaseComponent {
     if (this._searchTimeout) {
       clearTimeout(this._searchTimeout)
     }
+
+    EventHandler.off(this._list, EVENT_KEY)
 
     if (this._field) {
       EventHandler.off(this._field, EVENT_KEY)
@@ -324,66 +328,58 @@ class ListBox extends BaseComponent {
     return selectionMode === SELECTION_MODE_SINGLE ? values.slice(0, 1) : values
   }
 
-  _items(): HTMLElement[] {
-    return SelectorEngine.find(SELECTOR_ITEM, this._element)
+  _allOptions(): HTMLElement[] {
+    return SelectorEngine.find(SELECTOR_OPTION, this._list)
   }
 
-  _navigableItems(): HTMLElement[] {
-    return this._items().filter(item => !this._isHidden(item) && !this._isDisabled(item))
+  _navigableOptions(): HTMLElement[] {
+    return this._allOptions().filter(option => !this._isHidden(option) && !this._isDisabled(option))
   }
 
-  _selectableItems(): HTMLElement[] {
-    return this._navigableItems().filter(item => !this._isSelectAll(item))
+  _isHidden(option: HTMLElement): boolean {
+    return option.hasAttribute('hidden') || option.closest('[hidden]') !== null
   }
 
-  _isHidden(item: HTMLElement): boolean {
-    return item.hasAttribute('hidden') || item.closest('[hidden]') !== null
+  _isDisabled(option: HTMLElement): boolean {
+    return option.classList.contains(CLASS_NAME_DISABLED) || option.getAttribute('aria-disabled') === 'true'
   }
 
-  _isDisabled(item: HTMLElement): boolean {
-    return item.classList.contains(CLASS_NAME_DISABLED) || item.getAttribute('aria-disabled') === 'true'
+  _isLink(option: HTMLElement): boolean {
+    return option.tagName === 'A' && option.hasAttribute('href')
   }
 
-  _isSelectAll(item: HTMLElement): boolean {
-    return item.hasAttribute('data-coreui-select-all')
+  _optionValue(option: HTMLElement): string {
+    return option.dataset.coreuiValue ?? option.textContent?.trim() ?? ''
   }
 
-  _isLink(item: HTMLElement): boolean {
-    return item.tagName === 'A' && item.hasAttribute('href')
+  _optionText(option: HTMLElement): string {
+    const label = SelectorEngine.findOne(SELECTOR_OPTION_LABEL, option)
+    return (label ?? option).textContent?.trim().toLowerCase() ?? ''
   }
 
-  _itemValue(item: HTMLElement): string {
-    return item.dataset.coreuiValue ?? item.textContent?.trim() ?? ''
+  _findOption(value: string): HTMLElement | undefined {
+    return this._allOptions().find(option => this._optionValue(option) === value)
   }
 
-  _itemText(item: HTMLElement): string {
-    const label = SelectorEngine.findOne(SELECTOR_ITEM_LABEL, item)
-    return (label ?? item).textContent?.trim().toLowerCase() ?? ''
+  _activeOption(): HTMLElement | null {
+    return this._active === null ? null : (this._findOption(this._active) ?? null)
   }
 
-  _findItem(value: string): HTMLElement | undefined {
-    return this._items().find(item => this._itemValue(item) === value)
-  }
-
-  _activeItem(): HTMLElement | null {
-    return this._active === null ? null : (this._findItem(this._active) ?? null)
-  }
-
-  _decorateItem(item: HTMLElement): void {
+  _decorateOption(option: HTMLElement): void {
     if (this._config.indicator !== INDICATOR_CHECKBOX) {
       return
     }
 
-    item.classList.add(CLASS_NAME_ITEM_WITH_INDICATOR)
+    option.classList.add(CLASS_NAME_OPTION_WITH_INDICATOR)
 
-    if (SelectorEngine.findOne(SELECTOR_ITEM_INDICATOR, item)) {
+    if (SelectorEngine.findOne(SELECTOR_OPTION_INDICATOR, option)) {
       return
     }
 
     const indicator = document.createElement('span')
-    indicator.classList.add(CLASS_NAME_CHECK, CLASS_NAME_ITEM_INDICATOR)
+    indicator.classList.add(CLASS_NAME_CHECK, CLASS_NAME_OPTION_INDICATOR)
     indicator.setAttribute('aria-hidden', 'true')
-    item.prepend(indicator)
+    option.prepend(indicator)
   }
 
   _atLimit(): boolean {
@@ -407,18 +403,48 @@ class ListBox extends BaseComponent {
 
   _selectionCap(): number {
     const { selectionLimit, selectionMode } = this._config
-    const items = this._selectableItems().length
+    const options = this._navigableOptions().length
 
-    return selectionMode === SELECTION_MODE_MULTIPLE && selectionLimit !== null ? Math.min(selectionLimit, items) : items
+    return selectionMode === SELECTION_MODE_MULTIPLE && selectionLimit !== null ? Math.min(selectionLimit, options) : options
+  }
+
+  _selectedNavigable(): number {
+    return this._navigableOptions().filter(option => this._selected.has(this._optionValue(option))).length
   }
 
   _allSelected(): boolean {
     const cap = this._selectionCap()
-    return cap > 0 && this._selectableItems().filter(item => this._selected.has(this._itemValue(item))).length >= cap
+    return cap > 0 && this._selectedNavigable() >= cap
   }
 
-  _someSelected(): boolean {
-    return this._selectableItems().some(item => this._selected.has(this._itemValue(item)))
+  _updateSelectAll(): void {
+    if (!this._selectAll) {
+      return
+    }
+
+    if (!this._list.id) {
+      this._list.id = getUID(`${NAME}-options-`)
+    }
+
+    this._selectAll.setAttribute('aria-controls', this._list.id)
+    this._selectAll.disabled = this._config.disabled || this._config.selectionMode !== SELECTION_MODE_MULTIPLE
+
+    const all = this._allSelected()
+    const some = this._selectedNavigable() > 0
+
+    this._decorateOption(this._selectAll)
+    this._selectAll.setAttribute('aria-pressed', all ? 'true' : (some ? 'mixed' : 'false'))
+    this._selectAll.classList.toggle(CLASS_NAME_SELECTED, all)
+    this._selectAll.classList.toggle(CLASS_NAME_INDETERMINATE, !all && some)
+  }
+
+  _toggleSelectAll(): void {
+    if (this._allSelected()) {
+      this.clear()
+      return
+    }
+
+    this.selectAll()
   }
 
   _selectValue(value: string): boolean {
@@ -426,9 +452,9 @@ class ListBox extends BaseComponent {
       return false
     }
 
-    const item = this._findItem(value)
+    const option = this._findOption(value)
 
-    if (!item || this._isDisabled(item) || this._isSelectAll(item) || this._selected.has(value)) {
+    if (!option || this._isDisabled(option) || this._selected.has(value)) {
       return false
     }
 
@@ -444,8 +470,8 @@ class ListBox extends BaseComponent {
     if (this._config.selectionMode === SELECTION_MODE_SINGLE) {
       const previous = this.getSelected()
 
-      for (const value of previous) {
-        this._removeSelection(value)
+      for (const selected of previous) {
+        this._removeSelection(selected)
       }
     }
 
@@ -479,20 +505,22 @@ class ListBox extends BaseComponent {
   }
 
   _selectRange(from: string | null, to: string): void {
-    const items = this._selectableItems()
-    const start = items.findIndex(item => this._itemValue(item) === from)
-    const end = items.findIndex(item => this._itemValue(item) === to)
+    const options = this._navigableOptions()
+    const start = options.findIndex(option => this._optionValue(option) === from)
+    const end = options.findIndex(option => this._optionValue(option) === to)
 
     if (end === -1) {
       return
     }
 
+    const first = Math.min(start === -1 ? end : start, end)
+    const last = Math.max(start === -1 ? end : start, end)
     let changed = false
 
     this._limited = null
 
-    for (const item of items.slice(Math.min(start === -1 ? end : start, end), Math.max(start === -1 ? end : start, end) + 1)) {
-      changed = this._selectValue(this._itemValue(item)) || changed
+    for (const option of options.slice(first, last + 1)) {
+      changed = this._selectValue(this._optionValue(option)) || changed
     }
 
     if (changed) {
@@ -515,13 +543,13 @@ class ListBox extends BaseComponent {
     this._active = value
     this.update()
 
-    const item = this._activeItem()
+    const option = this._activeOption()
 
-    if (item) {
-      item.scrollIntoView({ block: 'nearest' })
+    if (option) {
+      option.scrollIntoView({ block: 'nearest' })
 
       if (focus && !this._field) {
-        item.focus()
+        option.focus()
       }
 
       EventHandler.trigger(this._element, this.constructor.eventName(EVENT_ACTIVATE), { value })
@@ -533,16 +561,16 @@ class ListBox extends BaseComponent {
       return
     }
 
-    if (!this._element.id) {
-      this._element.id = getUID(`${NAME}-`)
+    if (!this._list.id) {
+      this._list.id = getUID(`${NAME}-options-`)
     }
 
-    this._field.setAttribute('aria-controls', this._element.id)
+    this._field.setAttribute('aria-controls', this._list.id)
 
-    const item = this._activeItem()
+    const option = this._activeOption()
 
-    if (item) {
-      this._field.setAttribute('aria-activedescendant', item.id)
+    if (option) {
+      this._field.setAttribute('aria-activedescendant', option.id)
       return
     }
 
@@ -550,42 +578,31 @@ class ListBox extends BaseComponent {
   }
 
   _move(forward: boolean): void {
-    const items = this._navigableItems()
+    const options = this._navigableOptions()
 
-    if (items.length === 0) {
+    if (options.length === 0) {
       return
     }
 
-    const current = this._activeItem()
-    const next = current ? getNextActiveElement(items, current, forward, false) : items[forward ? 0 : items.length - 1]
+    const current = this._activeOption()
+    const next = current ? getNextActiveElement(options, current, forward, false) : options[forward ? 0 : options.length - 1]
 
-    this._setActive(this._itemValue(next), true)
+    this._setActive(this._optionValue(next), true)
   }
 
   _moveToEdge(index: number): void {
-    const items = this._navigableItems()
-    const item = items.at(index)
+    const option = this._navigableOptions().at(index)
 
-    if (item) {
-      this._setActive(this._itemValue(item), true)
+    if (option) {
+      this._setActive(this._optionValue(option), true)
     }
   }
 
-  _activate(item: HTMLElement): void {
-    const value = this._itemValue(item)
+  _activate(option: HTMLElement): void {
+    const value = this._optionValue(option)
 
-    if (this._isSelectAll(item)) {
-      if (this._allSelected()) {
-        this.clear()
-        return
-      }
-
-      this.selectAll()
-      return
-    }
-
-    if (this._config.selectionMode === SELECTION_MODE_NONE || this._isLink(item)) {
-      EventHandler.trigger(this._element, this.constructor.eventName(EVENT_ACTION), { value, relatedTarget: item })
+    if (this._config.selectionMode === SELECTION_MODE_NONE || this._isLink(option)) {
+      EventHandler.trigger(this._element, this.constructor.eventName(EVENT_ACTION), { value, relatedTarget: option })
     }
 
     if (this._config.selectionMode === SELECTION_MODE_MULTIPLE) {
@@ -612,45 +629,49 @@ class ListBox extends BaseComponent {
       this._search = ''
     }, TYPEAHEAD_TIMEOUT)
 
-    const items = this._navigableItems()
-    const start = items.findIndex(item => this._itemValue(item) === this._active) + 1
-    const ordered = this._search.length > 1 ?
-      [...items.slice(start - 1), ...items.slice(0, start - 1)] :
-      [...items.slice(start), ...items.slice(0, start)]
-    const match = ordered.find(item => this._itemText(item).startsWith(this._search))
+    const options = this._navigableOptions()
+    const start = options.findIndex(option => this._optionValue(option) === this._active) + 1
+    const from = this._search.length > 1 ? start - 1 : start
+    const ordered = [...options.slice(from), ...options.slice(0, from)]
+    const match = ordered.find(option => this._optionText(option).startsWith(this._search))
 
     if (match) {
-      this._setActive(this._itemValue(match), true)
+      this._setActive(this._optionValue(match), true)
     }
   }
 
   _addEventListeners(): void {
-    EventHandler.on(this._element, this.constructor.eventName(EVENT_CLICK), SELECTOR_ITEM, (event: any) => this._handleClick(event))
-    EventHandler.on(this._element, this.constructor.eventName(EVENT_FOCUSIN), SELECTOR_ITEM, (event: any) => {
+    EventHandler.on(this._element, this.constructor.eventName(EVENT_CLICK), SELECTOR_OPTION, (event: any) => this._handleClick(event))
+    EventHandler.on(this._element, this.constructor.eventName(EVENT_CLICK), SELECTOR_SELECT_ALL, () => {
+      if (!this._config.disabled) {
+        this._toggleSelectAll()
+      }
+    })
+    EventHandler.on(this._element, this.constructor.eventName(EVENT_FOCUSIN), SELECTOR_OPTION, (event: any) => {
       if (!this._config.disabled && !this._field) {
-        this._setActive(this._itemValue(event.target.closest(SELECTOR_ITEM)), false)
+        this._setActive(this._optionValue(event.target.closest(SELECTOR_OPTION)), false)
       }
     })
 
-    const target = this._field ?? this._element
+    const target = this._field ?? this._list
     EventHandler.on(target, this.constructor.eventName(EVENT_KEYDOWN), (event: any) => this._handleKeydown(event))
   }
 
   _handleClick(event: any): void {
-    const item = (event.target as HTMLElement).closest(SELECTOR_ITEM) as HTMLElement | null
+    const option = (event.target as HTMLElement).closest(SELECTOR_OPTION) as HTMLElement | null
 
-    if (!item || this._config.disabled) {
+    if (!option || this._config.disabled) {
       return
     }
 
-    if (this._isDisabled(item)) {
+    if (this._isDisabled(option)) {
       event.preventDefault()
       return
     }
 
-    const value = this._itemValue(item)
+    const value = this._optionValue(option)
 
-    if (event.shiftKey && this._config.selectionMode === SELECTION_MODE_MULTIPLE && !this._isSelectAll(item)) {
+    if (event.shiftKey && this._config.selectionMode === SELECTION_MODE_MULTIPLE) {
       event.preventDefault()
       this._setActive(value, !this._field)
       this._selectRange(this._anchor, value)
@@ -659,14 +680,14 @@ class ListBox extends BaseComponent {
 
     this._setActive(value, !this._field)
 
-    if ((event.ctrlKey || event.metaKey) && this._config.selectionMode === SELECTION_MODE_MULTIPLE && !this._isSelectAll(item)) {
+    if ((event.ctrlKey || event.metaKey) && this._config.selectionMode === SELECTION_MODE_MULTIPLE) {
       this._anchor = value
       this.toggle(value)
       return
     }
 
     this._anchor = value
-    this._activate(item)
+    this._activate(option)
   }
 
   _handleKeydown(event: any): void {
@@ -729,13 +750,13 @@ class ListBox extends BaseComponent {
   }
 
   _handleActivationKey(event: any, isEnter: boolean): void {
-    const item = this._activeItem()
+    const option = this._activeOption()
 
-    if (!item) {
+    if (!option) {
       return
     }
 
-    const follows = isEnter && this._isLink(item)
+    const follows = isEnter && this._isLink(option)
 
     if (!follows) {
       event.preventDefault()
@@ -746,10 +767,10 @@ class ListBox extends BaseComponent {
     }
 
     this._anchor = this._active
-    this._activate(item)
+    this._activate(option)
 
     if (follows && this._field) {
-      item.click()
+      option.click()
     }
   }
 

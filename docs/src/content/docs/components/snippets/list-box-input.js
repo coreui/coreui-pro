@@ -6,8 +6,8 @@ const output = document.getElementById('listBoxFieldOutput')
 field.addEventListener('input', () => {
   const query = field.value.trim().toLowerCase()
 
-  for (const item of element.querySelectorAll('.list-box-item')) {
-    item.toggleAttribute('hidden', !item.textContent.toLowerCase().includes(query))
+  for (const option of element.querySelectorAll('.list-box-option')) {
+    option.toggleAttribute('hidden', !option.textContent.toLowerCase().includes(query))
   }
 
   listBox.update()

@@ -6,35 +6,48 @@
 @use "config" as *;
 
 // scss-docs-start list-box-variables
-$list-box-padding-y:                  .375rem !default;
-$list-box-padding-x:                  .375rem !default;
-$list-box-gap:                        .125rem !default;
-$list-box-color:                      var(--#{$prefix}fg-body) !default;
-$list-box-bg:                         var(--#{$prefix}bg-body) !default;
-$list-box-font-size:                  var(--#{$prefix}body-font-size) !default;
-$list-box-border-width:               var(--#{$prefix}border-width) !default;
-$list-box-border-color:               var(--#{$prefix}border-color) !default;
-$list-box-border-radius:              var(--#{$prefix}radius-7) !default;
-$list-box-focus-ring-color:           var(--#{$prefix}focus-ring-color) !default;
+$list-box-padding-y:                    .375rem !default;
+$list-box-padding-x:                    .375rem !default;
+$list-box-gap:                          .125rem !default;
+$list-box-color:                        var(--#{$prefix}fg-body) !default;
+$list-box-bg:                           var(--#{$prefix}bg-body) !default;
+$list-box-font-size:                    var(--#{$prefix}body-font-size) !default;
+$list-box-border-width:                 var(--#{$prefix}border-width) !default;
+$list-box-border-color:                 var(--#{$prefix}border-color) !default;
+$list-box-border-radius:                var(--#{$prefix}radius-7) !default;
+$list-box-focus-ring-color:             var(--#{$prefix}focus-ring-color) !default;
 
-$list-box-item-padding-y:             .5rem !default;
-$list-box-item-padding-x:             .75rem !default;
-$list-box-item-gap:                   .125rem !default;
-$list-box-item-border-radius:         var(--#{$prefix}radius-5) !default;
-$list-box-item-hover-color:           var(--#{$prefix}fg-body) !default;
-$list-box-item-hover-bg:              var(--#{$prefix}bg-1) !default;
-$list-box-item-active-color:          var(--#{$prefix}fg-body) !default;
-$list-box-item-active-bg:             var(--#{$prefix}bg-1) !default;
-$list-box-item-selected-color:        var(--#{$prefix}fg-body) !default;
-$list-box-item-selected-bg:           var(--#{$prefix}bg-2) !default;
-$list-box-item-disabled-color:        var(--#{$prefix}fg-3) !default;
-$list-box-item-description-color:     var(--#{$prefix}fg-3) !default;
-$list-box-item-description-font-size: calc(var(--#{$prefix}body-font-size) * .875) !default;
-$list-box-item-indicator-width:       var(--#{$prefix}check-size, var(--#{$prefix}control-size)) !default;
+$list-box-header-padding-y:             .5rem !default;
+$list-box-header-padding-x:             .75rem !default;
+$list-box-header-gap:                   .5rem !default;
+$list-box-header-border-width:          var(--#{$prefix}border-width) !default;
+$list-box-header-border-color:          var(--#{$prefix}border-color) !default;
 
-$list-box-section-label-color:        var(--#{$prefix}fg-3) !default;
-$list-box-section-label-font-size:    80% !default;
-$list-box-section-label-padding:      .5rem .625rem !default;
+$list-box-title-font-size:              var(--#{$prefix}body-font-size) !default;
+$list-box-title-font-weight:            var(--#{$prefix}font-weight-semibold) !default;
+$list-box-title-color:                  var(--#{$prefix}fg-body) !default;
+
+$list-box-subtitle-font-size:           calc(var(--#{$prefix}body-font-size) * .875) !default;
+$list-box-subtitle-color:               var(--#{$prefix}fg-3) !default;
+
+$list-box-option-padding-y:             .5rem !default;
+$list-box-option-padding-x:             .75rem !default;
+$list-box-option-gap:                   .125rem !default;
+$list-box-option-border-radius:         var(--#{$prefix}radius-5) !default;
+$list-box-option-hover-color:           var(--#{$prefix}fg-body) !default;
+$list-box-option-hover-bg:              var(--#{$prefix}bg-1) !default;
+$list-box-option-active-color:          var(--#{$prefix}fg-body) !default;
+$list-box-option-active-bg:             var(--#{$prefix}bg-1) !default;
+$list-box-option-selected-color:        var(--#{$prefix}fg-body) !default;
+$list-box-option-selected-bg:           var(--#{$prefix}bg-2) !default;
+$list-box-option-disabled-color:        var(--#{$prefix}fg-3) !default;
+$list-box-option-description-color:     var(--#{$prefix}fg-3) !default;
+$list-box-option-description-font-size: calc(var(--#{$prefix}body-font-size) * .875) !default;
+$list-box-option-indicator-width:       var(--#{$prefix}check-size, var(--#{$prefix}control-size)) !default;
+
+$list-box-section-label-color:          var(--#{$prefix}fg-3) !default;
+$list-box-section-label-font-size:      80% !default;
+$list-box-section-label-padding:        .5rem .625rem !default;
 // scss-docs-end list-box-variables
 
 $list-box-tokens: () !default;
@@ -54,20 +67,30 @@ $list-box-tokens: defaults(
     --#{$prefix}list-box-border-color: #{$list-box-border-color},
     --#{$prefix}list-box-border-radius: #{$list-box-border-radius},
     --#{$prefix}list-box-focus-ring-color: #{$list-box-focus-ring-color},
-    --#{$prefix}list-box-item-padding-y: #{$list-box-item-padding-y},
-    --#{$prefix}list-box-item-padding-x: #{$list-box-item-padding-x},
-    --#{$prefix}list-box-item-gap: #{$list-box-item-gap},
-    --#{$prefix}list-box-item-border-radius: #{$list-box-item-border-radius},
-    --#{$prefix}list-box-item-hover-color: #{$list-box-item-hover-color},
-    --#{$prefix}list-box-item-hover-bg: #{$list-box-item-hover-bg},
-    --#{$prefix}list-box-item-active-color: #{$list-box-item-active-color},
-    --#{$prefix}list-box-item-active-bg: #{$list-box-item-active-bg},
-    --#{$prefix}list-box-item-selected-color: #{$list-box-item-selected-color},
-    --#{$prefix}list-box-item-selected-bg: #{$list-box-item-selected-bg},
-    --#{$prefix}list-box-item-disabled-color: #{$list-box-item-disabled-color},
-    --#{$prefix}list-box-item-description-color: #{$list-box-item-description-color},
-    --#{$prefix}list-box-item-description-font-size: #{$list-box-item-description-font-size},
-    --#{$prefix}list-box-item-indicator-width: #{$list-box-item-indicator-width},
+    --#{$prefix}list-box-header-padding-y: #{$list-box-header-padding-y},
+    --#{$prefix}list-box-header-padding-x: #{$list-box-header-padding-x},
+    --#{$prefix}list-box-header-gap: #{$list-box-header-gap},
+    --#{$prefix}list-box-header-border-width: #{$list-box-header-border-width},
+    --#{$prefix}list-box-header-border-color: #{$list-box-header-border-color},
+    --#{$prefix}list-box-title-font-size: #{$list-box-title-font-size},
+    --#{$prefix}list-box-title-font-weight: #{$list-box-title-font-weight},
+    --#{$prefix}list-box-title-color: #{$list-box-title-color},
+    --#{$prefix}list-box-subtitle-font-size: #{$list-box-subtitle-font-size},
+    --#{$prefix}list-box-subtitle-color: #{$list-box-subtitle-color},
+    --#{$prefix}list-box-option-padding-y: #{$list-box-option-padding-y},
+    --#{$prefix}list-box-option-padding-x: #{$list-box-option-padding-x},
+    --#{$prefix}list-box-option-gap: #{$list-box-option-gap},
+    --#{$prefix}list-box-option-border-radius: #{$list-box-option-border-radius},
+    --#{$prefix}list-box-option-hover-color: #{$list-box-option-hover-color},
+    --#{$prefix}list-box-option-hover-bg: #{$list-box-option-hover-bg},
+    --#{$prefix}list-box-option-active-color: #{$list-box-option-active-color},
+    --#{$prefix}list-box-option-active-bg: #{$list-box-option-active-bg},
+    --#{$prefix}list-box-option-selected-color: #{$list-box-option-selected-color},
+    --#{$prefix}list-box-option-selected-bg: #{$list-box-option-selected-bg},
+    --#{$prefix}list-box-option-disabled-color: #{$list-box-option-disabled-color},
+    --#{$prefix}list-box-option-description-color: #{$list-box-option-description-color},
+    --#{$prefix}list-box-option-description-font-size: #{$list-box-option-description-font-size},
+    --#{$prefix}list-box-option-indicator-width: #{$list-box-option-indicator-width},
     --#{$prefix}list-box-section-label-color: #{$list-box-section-label-color},
     --#{$prefix}list-box-section-label-font-size: #{$list-box-section-label-font-size},
     --#{$prefix}list-box-section-label-padding: #{$list-box-section-label-padding},
@@ -84,27 +107,52 @@ $list-box-tokens: defaults(
 
     display: flex;
     flex-direction: column;
-    gap: var(--#{$prefix}list-box-gap);
-    padding: var(--#{$prefix}list-box-padding-y) var(--#{$prefix}list-box-padding-x);
-    overflow-y: auto;
-    overscroll-behavior: contain;
+    overflow: hidden;
     font-size: var(--#{$prefix}list-box-font-size);
     color: var(--#{$prefix}list-box-color);
     background-color: var(--#{$prefix}list-box-bg);
     background-clip: padding-box;
     border: var(--#{$prefix}list-box-border-width) solid var(--#{$prefix}list-box-border-color);
     @include border-radius(var(--#{$prefix}list-box-border-radius));
-
-    &[aria-disabled="true"] {
-      color: var(--#{$prefix}list-box-item-disabled-color);
-      pointer-events: none;
-    }
   }
 
   .list-box-translucent {
-    --#{$prefix}list-box-item-hover-bg: color-mix(in oklch, var(--#{$prefix}bg-1) 85%, transparent);
+    --#{$prefix}list-box-option-hover-bg: color-mix(in oklch, var(--#{$prefix}bg-1) 85%, transparent);
 
     @include translucent(var(--#{$prefix}list-box-bg));
+  }
+
+  .list-box-header {
+    display: flex;
+    gap: var(--#{$prefix}list-box-header-gap);
+    align-items: center;
+    padding: var(--#{$prefix}list-box-header-padding-y) var(--#{$prefix}list-box-header-padding-x);
+    border-block-end: var(--#{$prefix}list-box-header-border-width) solid var(--#{$prefix}list-box-header-border-color);
+  }
+
+  .list-box-title {
+    font-size: var(--#{$prefix}list-box-title-font-size);
+    font-weight: var(--#{$prefix}list-box-title-font-weight);
+    color: var(--#{$prefix}list-box-title-color);
+  }
+
+  .list-box-subtitle {
+    font-size: var(--#{$prefix}list-box-subtitle-font-size);
+    color: var(--#{$prefix}list-box-subtitle-color);
+  }
+
+  .list-box-options {
+    display: flex;
+    flex-direction: column;
+    gap: var(--#{$prefix}list-box-gap);
+    padding: var(--#{$prefix}list-box-padding-y) var(--#{$prefix}list-box-padding-x);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+
+    &[aria-disabled="true"] {
+      color: var(--#{$prefix}list-box-option-disabled-color);
+      pointer-events: none;
+    }
   }
 
   .list-box-section {
@@ -121,38 +169,39 @@ $list-box-tokens: defaults(
     text-transform: uppercase;
   }
 
-  .list-box-item {
+  .list-box-option,
+  .list-box-select-all {
     position: relative;
     z-index: 2;
     display: flex;
     flex-direction: column;
-    gap: var(--#{$prefix}list-box-item-gap);
-    padding: var(--#{$prefix}list-box-item-padding-y) var(--#{$prefix}list-box-item-padding-x);
+    gap: var(--#{$prefix}list-box-option-gap);
+    padding: var(--#{$prefix}list-box-option-padding-y) var(--#{$prefix}list-box-option-padding-x);
     color: inherit;
     text-align: start;
     text-decoration: none;
     cursor: pointer;
-    @include border-radius(var(--#{$prefix}list-box-item-border-radius), 0);
+    @include border-radius(var(--#{$prefix}list-box-option-border-radius), 0);
 
     &:hover {
-      color: var(--#{$prefix}list-box-item-hover-color);
+      color: var(--#{$prefix}list-box-option-hover-color);
       text-decoration: none;
-      background-color: var(--#{$prefix}list-box-item-hover-bg);
+      background-color: var(--#{$prefix}list-box-option-hover-bg);
     }
 
     &.active {
-      color: var(--#{$prefix}list-box-item-active-color);
-      background-color: var(--#{$prefix}list-box-item-active-bg);
+      color: var(--#{$prefix}list-box-option-active-color);
+      background-color: var(--#{$prefix}list-box-option-active-bg);
     }
 
     &.selected {
-      color: var(--#{$prefix}theme-fg-emphasis, var(--#{$prefix}list-box-item-selected-color));
-      background-color: var(--#{$prefix}theme-bg-subtle, var(--#{$prefix}list-box-item-selected-bg));
+      color: var(--#{$prefix}theme-fg-emphasis, var(--#{$prefix}list-box-option-selected-color));
+      background-color: var(--#{$prefix}theme-bg-subtle, var(--#{$prefix}list-box-option-selected-bg));
     }
 
     &.disabled,
     &[aria-disabled="true"] {
-      color: var(--#{$prefix}list-box-item-disabled-color);
+      color: var(--#{$prefix}list-box-option-disabled-color);
       pointer-events: none;
       background-color: transparent;
     }
@@ -163,25 +212,30 @@ $list-box-tokens: defaults(
     }
   }
 
-  .list-box-item-with-indicator {
-    padding-inline-start: calc(var(--#{$prefix}list-box-item-padding-x) + var(--#{$prefix}list-box-item-indicator-width));
+  .list-box-select-all {
+    background-color: transparent;
+    border: 0;
+  }
+
+  .list-box-option-with-indicator {
+    padding-inline-start: calc(var(--#{$prefix}list-box-option-padding-x) + var(--#{$prefix}list-box-option-indicator-width));
   }
 
   // The indicator is a decorative `.check` (a span, so it never matches
-  // `:checked`), which is why the states are driven by classes on the option and
+  // `:checked`), which is why the state is driven by a class on the option and
   // the mark's opacity is set here rather than by the control's own state rules.
-  .list-box-item-indicator {
+  .list-box-option-indicator {
     position: absolute;
-    inset-inline-start: calc(var(--#{$prefix}list-box-item-padding-x) * .5);
+    inset-inline-start: calc(var(--#{$prefix}list-box-option-padding-x) * .5);
     top: 50%;
-    width: var(--#{$prefix}list-box-item-indicator-width);
-    height: var(--#{$prefix}list-box-item-indicator-width);
+    width: var(--#{$prefix}list-box-option-indicator-width);
+    height: var(--#{$prefix}list-box-option-indicator-width);
     margin: 0;
     pointer-events: none;
     transform: translateY(-50%);
   }
 
-  .selected > .list-box-item-indicator {
+  .selected > .list-box-option-indicator {
     background-color: var(--#{$prefix}check-checked-bg);
     border-color: var(--#{$prefix}check-checked-border-color);
 
@@ -191,7 +245,7 @@ $list-box-tokens: defaults(
     }
   }
 
-  .indeterminate > .list-box-item-indicator {
+  .indeterminate > .list-box-option-indicator {
     background-color: var(--#{$prefix}check-indeterminate-bg);
     border-color: var(--#{$prefix}check-indeterminate-border-color);
 
@@ -202,18 +256,19 @@ $list-box-tokens: defaults(
     }
   }
 
-  .disabled > .list-box-item-indicator {
+  .disabled > .list-box-option-indicator,
+  :disabled > .list-box-option-indicator {
     opacity: var(--#{$prefix}check-disabled-opacity);
   }
 
-  .list-box-item-description {
-    font-size: var(--#{$prefix}list-box-item-description-font-size);
+  .list-box-option-description {
+    font-size: var(--#{$prefix}list-box-option-description-font-size);
     font-weight: var(--#{$prefix}font-weight-normal);
-    color: var(--#{$prefix}list-box-item-description-color);
+    color: var(--#{$prefix}list-box-option-description-color);
   }
 
   .list-box-empty {
-    padding: var(--#{$prefix}list-box-item-padding-y) var(--#{$prefix}list-box-item-padding-x);
-    color: var(--#{$prefix}list-box-item-disabled-color);
+    padding: var(--#{$prefix}list-box-option-padding-y) var(--#{$prefix}list-box-option-padding-x);
+    color: var(--#{$prefix}list-box-option-disabled-color);
   }
 }
