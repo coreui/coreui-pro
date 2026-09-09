@@ -75,6 +75,19 @@ With `none` nothing is ever selected and no `aria-selected` is written; activati
     <div class="list-box-item" data-coreui-value="delete">Delete</div>
   </div>`} />
 
+### Selection limit
+
+`selectionLimit` caps how many options can be selected at once in `multiple` mode. Once the cap is reached the plugin refuses any further selection — from a click, <kbd>Space</kbd>, a range, <kbd>Ctrl</kbd> + <kbd>A</kbd>, the select-all option or the API — and fires `selectionLimit.coreui.list-box` once per interaction, with `event.limit` and `event.value` (the first refused value). Options are never disabled and deselecting always works, so the user picks what to give up rather than being locked out. A range, <kbd>Ctrl</kbd> + <kbd>A</kbd> and the select-all option take options in document order until the cap is reached.
+
+<Example code={`<div class="list-box" role="listbox" data-coreui-toggle="list-box" data-coreui-selection-mode="multiple" data-coreui-selection-limit="2" data-coreui-indicator="checkbox" aria-label="Toppings, pick two" style="max-width: 20rem">
+    <div class="list-box-item" data-coreui-value="lettuce">Lettuce</div>
+    <div class="list-box-item" data-coreui-value="tomato">Tomato</div>
+    <div class="list-box-item" data-coreui-value="onion">Onion</div>
+    <div class="list-box-item" data-coreui-value="cheese">Cheese</div>
+  </div>`} />
+
+With a limit, the select-all option counts as full at `min(limit, visible enabled options)` — it shows the selected state there, the indeterminate one below it, and activating it once full clears the selection.
+
 ## Checkboxes
 
 Nothing marks the selection on its own — `aria-selected` and the `.selected` background carry it. Set `indicator: 'checkbox'` and the plugin puts a checkbox in front of every option and keeps it in step with the selection; the select-all option shows the indeterminate mark while only part of the list is selected — part of the visible, enabled options, the same set `selectAll()` acts on.
@@ -220,6 +233,7 @@ const listBox = new coreui.ListBox('#myListBox', {
 | `disabled` | boolean | `false` | Turns the whole list box off and writes `aria-disabled` on it. |
 | `indicator` | string | `'none'` | `'checkbox'` puts a decorative checkbox in front of every option and adds `.list-box-item-with-indicator` to it. |
 | `selected` | null, string, array | `null` | Initially selected values. In `single` mode only the first one is taken. |
+| `selectionLimit` | null, number | `null` | How many options can be selected at once in `multiple` mode. Further selections are refused and reported through `selectionLimit.coreui.list-box`; nothing is disabled and deselecting always works. |
 | `selectionMode` | string | `'single'` | `'none'`, `'single'` or `'multiple'`. |
 | `typeahead` | boolean | `true` | Move the highlight to the option matching what the user types. The buffer resets after 500 ms. |
 
@@ -253,6 +267,7 @@ Events fire on the `.list-box` element.
 | `deselect.coreui.list-box` | Fires before a value is removed from the selection. Cancelable. |
 | `deselected.coreui.list-box` | Fired after the value was removed from the selection. |
 | `change.coreui.list-box` | Fired once per operation after the selection settled; `event.selected` is the array of selected values. |
+| `selectionLimit.coreui.list-box` | Fired once per interaction when `selectionLimit` refused a selection; `event.limit` is the cap and `event.value` the first refused value. |
 | `activate.coreui.list-box` | Fired when the highlight moves; `event.value` is the newly highlighted value. |
 | `action.coreui.list-box` | Fired when an option is activated in `none` mode or when the option is a link; `event.value` is the value and `event.relatedTarget` the option. |
 

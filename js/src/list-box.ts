@@ -42,6 +42,7 @@ const EVENT_DESELECT = 'deselect'
 const EVENT_DESELECTED = 'deselected'
 const EVENT_SELECT = 'select'
 const EVENT_SELECTED = 'selected'
+const EVENT_SELECTION_LIMIT = 'selectionLimit'
 
 const EVENT_CLICK = 'click'
 const EVENT_FOCUSIN = 'focusin'
@@ -73,6 +74,7 @@ type ListBoxConfig = {
   disabled: boolean
   indicator: string
   selected: string | string[] | null
+  selectionLimit: number | null
   selectionMode: string
   typeahead: boolean
 }
@@ -82,6 +84,7 @@ const Default: ListBoxConfig = {
   disabled: false,
   indicator: 'none',
   selected: null,
+  selectionLimit: null,
   selectionMode: SELECTION_MODE_SINGLE,
   typeahead: true
 }
@@ -91,6 +94,7 @@ const DefaultType: Record<string, string> = {
   disabled: 'boolean',
   indicator: 'string',
   selected: '(string|array|null)',
+  selectionLimit: '(null|number)',
   selectionMode: 'string',
   typeahead: 'boolean'
 }
@@ -103,6 +107,7 @@ class ListBox extends BaseComponent {
   protected declare _active: string | null
   protected declare _anchor: string | null
   protected declare _field: HTMLElement | null
+  protected declare _limited: string | null
   protected declare _search: string
   protected declare _searchTimeout: ReturnType<typeof setTimeout> | null
   protected declare _selected: Set<string>
@@ -113,6 +118,7 @@ class ListBox extends BaseComponent {
     this._active = null
     this._anchor = null
     this._field = getElement(this._config.activeDescendant)
+    this._limited = null
     this._search = ''
     this._searchTimeout = null
     this._selected = new Set(this._initialSelection())
@@ -136,10 +142,14 @@ class ListBox extends BaseComponent {
 
   // Public
   select(value: string): void {
+    this._limited = null
+
     if (this._selectValue(value)) {
       this._anchor = value
       this._triggerChange()
     }
+
+    this._reportLimit()
   }
 
   deselect(value: string): void {
@@ -165,6 +175,8 @@ class ListBox extends BaseComponent {
     const scope = values ?? this._selectableItems().map(item => this._itemValue(item))
     let changed = false
 
+    this._limited = null
+
     for (const value of scope) {
       changed = this._selectValue(value) || changed
     }
@@ -172,6 +184,8 @@ class ListBox extends BaseComponent {
     if (changed) {
       this._triggerChange()
     }
+
+    this._reportLimit()
   }
 
   clear(): void {
@@ -372,9 +386,35 @@ class ListBox extends BaseComponent {
     item.prepend(indicator)
   }
 
+  _atLimit(): boolean {
+    const { selectionLimit, selectionMode } = this._config
+    return selectionMode === SELECTION_MODE_MULTIPLE && selectionLimit !== null && this._selected.size >= selectionLimit
+  }
+
+  _reportLimit(): void {
+    if (this._limited === null) {
+      return
+    }
+
+    const value = this._limited
+    this._limited = null
+
+    EventHandler.trigger(this._element, this.constructor.eventName(EVENT_SELECTION_LIMIT), {
+      limit: this._config.selectionLimit,
+      value
+    })
+  }
+
+  _selectionCap(): number {
+    const { selectionLimit, selectionMode } = this._config
+    const items = this._selectableItems().length
+
+    return selectionMode === SELECTION_MODE_MULTIPLE && selectionLimit !== null ? Math.min(selectionLimit, items) : items
+  }
+
   _allSelected(): boolean {
-    const items = this._selectableItems()
-    return items.length > 0 && items.every(item => this._selected.has(this._itemValue(item)))
+    const cap = this._selectionCap()
+    return cap > 0 && this._selectableItems().filter(item => this._selected.has(this._itemValue(item))).length >= cap
   }
 
   _someSelected(): boolean {
@@ -389,6 +429,11 @@ class ListBox extends BaseComponent {
     const item = this._findItem(value)
 
     if (!item || this._isDisabled(item) || this._isSelectAll(item) || this._selected.has(value)) {
+      return false
+    }
+
+    if (this._atLimit()) {
+      this._limited ??= value
       return false
     }
 
@@ -444,6 +489,8 @@ class ListBox extends BaseComponent {
 
     let changed = false
 
+    this._limited = null
+
     for (const item of items.slice(Math.min(start === -1 ? end : start, end), Math.max(start === -1 ? end : start, end) + 1)) {
       changed = this._selectValue(this._itemValue(item)) || changed
     }
@@ -451,6 +498,8 @@ class ListBox extends BaseComponent {
     if (changed) {
       this._triggerChange()
     }
+
+    this._reportLimit()
   }
 
   _triggerChange(): void {

@@ -68,8 +68,9 @@ describe('ListBox', () => {
       expect(ListBox.Default).toEqual({
         activeDescendant: null,
         disabled: false,
-        selected: null,
         indicator: 'none',
+        selected: null,
+        selectionLimit: null,
         selectionMode: 'single',
         typeahead: true
       })
@@ -313,6 +314,98 @@ describe('ListBox', () => {
       click(selectAll)
       expect(listBox.getSelected()).toEqual([])
       expect(selectAll.getAttribute('aria-selected')).toEqual('false')
+    })
+  })
+
+  describe('selectionLimit', () => {
+    it('stops selecting at the selection limit and reports it', () => {
+      const el = setMarkup()
+      const listBox = new ListBox(el, { selectionMode: 'multiple', selectionLimit: 2 })
+      const reported = []
+
+      el.addEventListener('selectionLimit.coreui.list-box', event => reported.push([event.limit, event.value]))
+
+      click(item(el, 'lettuce'))
+      click(item(el, 'tomato'))
+      expect(listBox.getSelected()).toEqual(['lettuce', 'tomato'])
+      expect(reported).toEqual([])
+
+      click(item(el, 'onion'))
+      expect(listBox.getSelected()).toEqual(['lettuce', 'tomato'])
+      expect(reported).toEqual([[2, 'onion']])
+      expect(item(el, 'onion')).not.toHaveClass('disabled')
+
+      listBox.select('cheese')
+      expect(listBox.getSelected()).toEqual(['lettuce', 'tomato'])
+      expect(reported.length).toEqual(2)
+
+      click(item(el, 'lettuce'))
+      expect(listBox.getSelected()).toEqual(['tomato'])
+
+      click(item(el, 'onion'))
+      expect(listBox.getSelected()).toEqual(['tomato', 'onion'])
+      expect(reported.length).toEqual(2)
+    })
+
+    it('should fire once for a batch and take the options in document order', () => {
+      const el = setMarkup()
+      const listBox = new ListBox(el, { selectionMode: 'multiple', selectionLimit: 2 })
+      const reported = []
+
+      el.addEventListener('selectionLimit.coreui.list-box', event => reported.push([event.limit, event.value]))
+
+      keydown(el, 'a', { ctrlKey: true })
+
+      expect(listBox.getSelected()).toEqual(['lettuce', 'tomato'])
+      expect(reported).toEqual([[2, 'onion']])
+    })
+
+    it('should stop a range at the limit and report it once', () => {
+      const el = setMarkup()
+      const listBox = new ListBox(el, { selectionMode: 'multiple', selectionLimit: 2 })
+      const reported = []
+
+      el.addEventListener('selectionLimit.coreui.list-box', event => reported.push(event.value))
+
+      click(item(el, 'lettuce'))
+      click(item(el, 'cheese'), { shiftKey: true })
+
+      expect(listBox.getSelected()).toEqual(['lettuce', 'tomato'])
+      expect(reported).toEqual(['onion'])
+    })
+
+    it('should ignore the limit outside multiple mode', () => {
+      const el = setMarkup()
+      const listBox = new ListBox(el, { selectionLimit: 1 })
+
+      listBox.select('lettuce')
+      listBox.select('tomato')
+
+      expect(listBox.getSelected()).toEqual(['tomato'])
+    })
+
+    it('should treat the select all option as full at the limit and clear from there', () => {
+      const el = setMarkup(' data-coreui-selection-mode="multiple" data-coreui-selection-limit="2"', [
+        '<div class="list-box-item" data-coreui-select-all>Select all</div>',
+        '<div class="list-box-item" data-coreui-value="lettuce">Lettuce</div>',
+        '<div class="list-box-item" data-coreui-value="tomato">Tomato</div>',
+        '<div class="list-box-item" data-coreui-value="onion">Onion</div>'
+      ])
+      const listBox = new ListBox(el)
+      const selectAll = el.querySelector('[data-coreui-select-all]')
+
+      expect(listBox._config.selectionLimit).toEqual(2)
+
+      listBox.select('lettuce')
+      expect(selectAll).toHaveClass('indeterminate')
+
+      click(selectAll)
+      expect(listBox.getSelected()).toEqual(['lettuce', 'tomato'])
+      expect(selectAll).toHaveClass('selected')
+      expect(selectAll).not.toHaveClass('indeterminate')
+
+      click(selectAll)
+      expect(listBox.getSelected()).toEqual([])
     })
   })
 
