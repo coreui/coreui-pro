@@ -203,6 +203,8 @@ $toast-tokens: defaults(
   .toast-container-top-center,
   .toast-container-middle-center,
   .toast-container-bottom-center {
+    --#{$prefix}toast-leave-translate: calc(100% + var(--#{$prefix}toast-container-inset)) 0;
+
     inset-inline: var(--#{$prefix}toast-container-inset);
     margin-inline: auto;
   }

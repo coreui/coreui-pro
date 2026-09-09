@@ -69,6 +69,8 @@ const EDGES: Record<string, string> = {
   top: '0 calc(-100% - var(--cui-toast-container-inset))'
 }
 
+const LEAVE_EDGES = new Set(['auto', 'end', 'start'])
+
 const PLACEMENTS = new Set([
   'top-start',
   'top-center',
@@ -156,6 +158,7 @@ const ToastDefaultType = {
  */
 
 type Edge = 'auto' | 'bottom' | 'end' | 'start' | 'top'
+type LeaveEdge = 'auto' | 'end' | 'start'
 
 type ToasterConfig = {
   allowList: SanitizerAllowList
@@ -163,7 +166,7 @@ type ToasterConfig = {
   enter: Edge
   html: boolean
   label: string
-  leave: Edge
+  leave: LeaveEdge
   limit: number
   pauseOnHover: boolean
   placement: string
@@ -241,10 +244,12 @@ class Toaster extends BaseComponent {
       throw new TypeError(`${NAME.toUpperCase()}: Option "placement" provided value "${this._config.placement}" but expected one of ${[...PLACEMENTS].join(', ')}.`)
     }
 
-    for (const option of ['enter', 'leave'] as const) {
-      if (this._config[option] !== 'auto' && !(this._config[option] in EDGES)) {
-        throw new TypeError(`${NAME.toUpperCase()}: Option "${option}" provided value "${this._config[option]}" but expected one of auto, ${Object.keys(EDGES).join(', ')}.`)
-      }
+    if (this._config.enter !== 'auto' && !(this._config.enter in EDGES)) {
+      throw new TypeError(`${NAME.toUpperCase()}: Option "enter" provided value "${this._config.enter}" but expected one of auto, ${Object.keys(EDGES).join(', ')}.`)
+    }
+
+    if (!LEAVE_EDGES.has(this._config.leave)) {
+      throw new TypeError(`${NAME.toUpperCase()}: Option "leave" provided value "${this._config.leave}" but expected one of ${[...LEAVE_EDGES].join(', ')}.`)
     }
 
     if (ownsContainer) {

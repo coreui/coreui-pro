@@ -129,7 +129,7 @@ A stack works in every placement: it grows away from the edge it is pinned to, s
 
 ### Motion
 
-A toast slides in from beyond the container's edge while it fades in — from the side in the `start` and `end` placements, from above or below in the `center` ones — and slides back out when it closes. While a toast leaves, the ones behind it glide into the freed space; when a new one arrives, they make room the same way. `enter` and `leave` pick other edges — a `top-end` toaster can drop its toasts in from above and still send them out to the side — and a toast outside a placed container slides by `--cui-toast-slide` instead. All of it respects `prefers-reduced-motion`.
+A toast slides in from beyond the container's edge while it fades in — from the side in the `start` and `end` placements, from above or below in the `center` ones — and slides out sideways when it closes, so a toast closed in the middle of a list never has to pass through its neighbours. While a toast leaves, the ones behind it glide into the freed space; when a new one arrives, they make room the same way. `enter` picks another edge for the entry and `leave` the side for the exit — a `top-end` toaster can drop its toasts in from above and still send them out to the right — and a toast outside a placed container slides by `--cui-toast-slide` instead. All of it respects `prefers-reduced-motion`.
 
 ```js
 const toaster = new coreui.Toaster(null, { placement: 'top-end', enter: 'top', leave: 'end' })
@@ -191,7 +191,7 @@ const id = toaster.add({ title: 'Saved', description: 'Your changes are live.', 
 | `enter` | string | `'auto'` | Edge a toast slides in from: `'start'`, `'end'`, `'top'` or `'bottom'`. `'auto'` follows the placement — the side in the `start` and `end` columns, above or below in the `center` one. |
 | `html` | boolean | `false` | Render `title` and `description` as HTML instead of text. |
 | `label` | string | `'Notifications'` | Accessible name of the container's `region` landmark. |
-| `leave` | string | `'auto'` | Edge a toast slides out to, same values as `enter`. |
+| `leave` | string | `'auto'` | Side a toast slides out to: `'start'` or `'end'`. A toast always leaves sideways, so it never has to pass through the toasts above or below it; `'auto'` is the side of the placement, `end` in the `center` column. |
 | `limit` | number | `3` | How many toasts stay visible; the oldest beyond it are hidden and `inert` until a slot frees. `0` disables the limit. |
 | `pauseOnHover` | boolean | `true` | Pause every toast's timer while the pointer or focus is inside the container, and resume when it leaves. Each toast still pauses on its own hover and focus. |
 | `placement` | string | `'top-end'` | Corner or edge of the viewport for the container the toaster creates: `top`, `middle` or `bottom` × `start`, `center` or `end`. Toasts in the `top` placements are inserted first, in the others last, so the newest always sits closest to the edge. |

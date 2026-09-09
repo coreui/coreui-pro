@@ -85,7 +85,10 @@ describe('Toaster', () => {
       expect(toaster._element.style.getPropertyValue('--cui-toast-leave-translate')).toEqual('')
 
       expect(() => {
-        new Toaster(null, { container: fixtureEl, leave: 'left' }) // eslint-disable-line no-new
+        new Toaster(null, { container: fixtureEl, enter: 'left' }) // eslint-disable-line no-new
+      }).toThrowError(TypeError, /enter/)
+      expect(() => {
+        new Toaster(null, { container: fixtureEl, leave: 'top' }) // eslint-disable-line no-new
       }).toThrowError(TypeError, /leave/)
     })
   })
