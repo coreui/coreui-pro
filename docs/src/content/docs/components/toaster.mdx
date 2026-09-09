@@ -33,9 +33,10 @@ Without an element the toaster creates its own `.toast-container` in `<body>`, p
 
 ### Live example
 
-The toaster below places its container in the top end corner of the viewport. Every other example on this page passes a container that sits inside the example, so its toasts stay put.
+Two toasters, each with its container in a top corner of the viewport: a list on the end side and a [stack](#stacking) on the start side. Every other example on this page passes a container that sits inside the example, so its toasts stay put.
 
-<Example code={`<button type="button" class="btn-solid theme-primary" id="toasterLiveBtn">Add a toast</button>`} sandboxJs={toaster} />
+<Example code={`<button type="button" class="btn-solid theme-primary" id="toasterLiveBtn">Add a toast</button>
+  <button type="button" class="btn-solid theme-secondary" id="toasterLiveStackBtn">Add to the stack</button>`} sandboxJs={toaster} />
 
 <Code code={toaster} lang="js" />
 
