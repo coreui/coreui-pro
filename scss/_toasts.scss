@@ -220,9 +220,10 @@ $toast-tokens: defaults(
     --#{$prefix}toast-stack-scale: .1;
     // Every toast behind is scaled by the same ratio again and pushed towards a vanishing depth,
     // so the corners of the stack line up and each strip is the previous one times the ratio
+    --#{$prefix}toast-stack-visible: 3;
     --#{$prefix}toast-stack-ratio: calc(1 - var(--#{$prefix}toast-stack-scale));
     --#{$prefix}toast-stack-depth: calc(var(--#{$prefix}toast-stack-front-height) + var(--#{$prefix}toast-stack-peek) / var(--#{$prefix}toast-stack-scale));
-    --#{$prefix}toast-stack-last: calc(var(--#{$prefix}toast-stack-count) - 1);
+    --#{$prefix}toast-stack-last: calc(min(var(--#{$prefix}toast-stack-count), var(--#{$prefix}toast-stack-visible)) - 1);
 
     width: var(--#{$prefix}toast-max-width);
     max-width: 100%;
@@ -261,6 +262,11 @@ $toast-tokens: defaults(
       }
     }
 
+    > .toast[data-coreui-stack-hidden] {
+      pointer-events: none;
+      opacity: 0;
+    }
+
     &:is(:hover, :focus-within) {
       height: calc(var(--#{$prefix}toast-stack-heights) + (var(--#{$prefix}toast-stack-count) - 1) * var(--#{$prefix}toast-spacing));
 
@@ -272,6 +278,11 @@ $toast-tokens: defaults(
         > * {
           opacity: 1;
         }
+      }
+
+      > .toast[data-coreui-stack-hidden]:not([data-coreui-limited]) {
+        pointer-events: auto;
+        opacity: 1;
       }
     }
   }

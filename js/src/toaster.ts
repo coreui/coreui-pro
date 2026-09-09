@@ -48,9 +48,12 @@ const SELECTOR_CLOSE = '.btn-close'
 const ATTRIBUTE_ID = 'data-coreui-toast-id'
 const ATTRIBUTE_LIMITED = 'data-coreui-limited'
 const ATTRIBUTE_STACK_INDEX = 'data-coreui-stack-index'
+const ATTRIBUTE_STACK_HIDDEN = 'data-coreui-stack-hidden'
 const ATTRIBUTE_UPDATE_KEY = 'data-coreui-update-key'
 
 const PROPERTY_STACK_INDEX = '--cui-toast-stack-index'
+const STACK_VISIBLE = 3
+
 const PROPERTY_STACK_BEFORE = '--cui-toast-stack-before'
 const PROPERTY_STACK_COUNT = '--cui-toast-stack-count'
 const PROPERTY_STACK_FRONT_HEIGHT = '--cui-toast-stack-front-height'
@@ -604,13 +607,16 @@ class Toaster extends BaseComponent {
 
     for (const entry of entries.filter(entry => entry.toast.limited)) {
       entry.toast.element.removeAttribute(ATTRIBUTE_STACK_INDEX)
+      entry.toast.element.removeAttribute(ATTRIBUTE_STACK_HIDDEN)
     }
 
     for (const [index, element] of ordered.entries()) {
       const height = this._naturalHeight(element)
-      const instance = Toast.getInstance(element)!
-      if (index === 0) {
-        if ((instance as unknown as { _timeout: number | null })._timeout === null) {
+      const instance = Toast.getInstance(element)! as unknown as Toast & { _config: ToastConfig, _timeout: number | null }
+      instance._config.autohide = index === 0 && instance._config.delay > 0
+
+      if (instance._config.autohide) {
+        if (instance._timeout === null) {
           instance._maybeScheduleHide()
         }
       } else {
@@ -618,6 +624,7 @@ class Toaster extends BaseComponent {
       }
 
       element.setAttribute(ATTRIBUTE_STACK_INDEX, String(index))
+      element.toggleAttribute(ATTRIBUTE_STACK_HIDDEN, index >= STACK_VISIBLE)
       element.style.setProperty(PROPERTY_STACK_INDEX, String(index))
       element.style.setProperty(PROPERTY_STACK_BEFORE, `${before}px`)
       element.style.setProperty(PROPERTY_TOAST_HEIGHT, `${height}px`)
