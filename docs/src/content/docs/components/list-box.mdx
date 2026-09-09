@@ -294,7 +294,7 @@ const listBox = new coreui.ListBox('#myListBox', {
 | --- | --- | --- | --- |
 | `activeDescendant` | null, string, element | `null` | Field that keeps the focus. The plugin drops the roving `tabindex`, gives the options ids, and writes `aria-activedescendant` and `aria-controls` on the field. The keyboard is handled on the field. |
 | `disabled` | boolean | `false` | Turns the whole list box off: `aria-disabled` on `.list-box-options` and the select-all button disabled. |
-| `indicator` | string | `'none'` | `'checkbox'` puts a decorative checkbox in front of every option and adds `.list-box-option-with-indicator` to it. |
+| `indicator` | string | `'none'` | `'checkbox'` puts a decorative checkbox in front of every option and marks the container with `data-coreui-indicator="checkbox"`, which is what lays the options out in two columns. |
 | `selected` | null, string, array | `null` | Initially selected values. In `single` mode only the first one is taken. |
 | `selectionLimit` | null, number | `null` | How many options can be selected at once in `multiple` mode. Further selections are refused and reported through `selectionLimit.coreui.list-box`; nothing is disabled and deselecting always works. |
 | `selectionMode` | string | `'single'` | `'none'`, `'single'` or `'multiple'`. |

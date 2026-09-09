@@ -53,7 +53,6 @@ const CLASS_NAME_CHECK = 'check'
 const CLASS_NAME_DISABLED = 'disabled'
 const CLASS_NAME_INDETERMINATE = 'indeterminate'
 const CLASS_NAME_OPTION_INDICATOR = 'list-box-option-indicator'
-const CLASS_NAME_OPTION_WITH_INDICATOR = 'list-box-option-with-indicator'
 const CLASS_NAME_SELECTED = 'selected'
 
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="list-box"]'
@@ -64,6 +63,8 @@ const SELECTOR_OPTION_LABEL = '.list-box-option-label'
 const SELECTOR_OPTIONS = '.list-box-options'
 const SELECTOR_SECTION = '.list-box-section'
 const SELECTOR_SELECT_ALL = '[data-coreui-select-all]'
+
+const ATTRIBUTE_INDICATOR = 'data-coreui-indicator'
 
 const INDICATOR_CHECKBOX = 'checkbox'
 
@@ -238,6 +239,10 @@ class ListBox extends BaseComponent {
   update(): void {
     this._list.setAttribute('role', 'listbox')
 
+    if (this._config.indicator === INDICATOR_CHECKBOX) {
+      this._element.setAttribute(ATTRIBUTE_INDICATOR, INDICATOR_CHECKBOX)
+    }
+
     if (this._config.selectionMode === SELECTION_MODE_MULTIPLE) {
       this._list.setAttribute('aria-multiselectable', 'true')
     } else {
@@ -305,6 +310,8 @@ class ListBox extends BaseComponent {
       clearTimeout(this._searchTimeout)
     }
 
+    this._element.removeAttribute(ATTRIBUTE_INDICATOR)
+
     EventHandler.off(this._list, EVENT_KEY)
 
     if (this._field) {
@@ -369,8 +376,6 @@ class ListBox extends BaseComponent {
     if (this._config.indicator !== INDICATOR_CHECKBOX) {
       return
     }
-
-    option.classList.add(CLASS_NAME_OPTION_WITH_INDICATOR)
 
     if (SelectorEngine.findOne(SELECTOR_OPTION_INDICATOR, option)) {
       return

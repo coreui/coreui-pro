@@ -17,7 +17,6 @@ $list-box-border-color:                 var(--#{$prefix}border-color) !default;
 $list-box-border-radius:                var(--#{$prefix}radius-7) !default;
 $list-box-focus-ring-color:             var(--#{$prefix}focus-ring-color) !default;
 
-$list-box-header-gap:                   .5rem !default;
 $list-box-header-border-width:          var(--#{$prefix}border-width) !default;
 $list-box-header-border-color:          var(--#{$prefix}border-color) !default;
 
@@ -30,7 +29,7 @@ $list-box-subtitle-color:               var(--#{$prefix}fg-3) !default;
 
 $list-box-option-padding-y:             .5rem !default;
 $list-box-option-padding-x:             .75rem !default;
-$list-box-option-gap:                   .125rem !default;
+$list-box-option-gap:                   .5rem !default;
 $list-box-option-border-radius:         var(--#{$prefix}radius-5) !default;
 $list-box-option-hover-color:           var(--#{$prefix}fg-body) !default;
 $list-box-option-hover-bg:              var(--#{$prefix}bg-1) !default;
@@ -65,7 +64,6 @@ $list-box-tokens: defaults(
     --#{$prefix}list-box-border-color: #{$list-box-border-color},
     --#{$prefix}list-box-border-radius: #{$list-box-border-radius},
     --#{$prefix}list-box-focus-ring-color: #{$list-box-focus-ring-color},
-    --#{$prefix}list-box-header-gap: #{$list-box-header-gap},
     --#{$prefix}list-box-header-border-width: #{$list-box-header-border-width},
     --#{$prefix}list-box-header-border-color: #{$list-box-header-border-color},
     --#{$prefix}list-box-title-font-size: #{$list-box-title-font-size},
@@ -120,7 +118,7 @@ $list-box-tokens: defaults(
 
   .list-box-header {
     display: flex;
-    gap: var(--#{$prefix}list-box-header-gap);
+    gap: var(--#{$prefix}list-box-option-gap);
     align-items: center;
     padding: var(--#{$prefix}list-box-padding-y) var(--#{$prefix}list-box-padding-x);
     border-block-end: var(--#{$prefix}list-box-header-border-width) solid var(--#{$prefix}list-box-header-border-color);
@@ -169,9 +167,10 @@ $list-box-tokens: defaults(
   .list-box-select-all {
     position: relative;
     z-index: 2;
-    display: flex;
-    flex-direction: column;
-    gap: var(--#{$prefix}list-box-option-gap);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    column-gap: var(--#{$prefix}list-box-option-gap);
+    align-items: center;
     padding: var(--#{$prefix}list-box-option-padding-y) var(--#{$prefix}list-box-option-padding-x);
     color: inherit;
     text-align: start;
@@ -218,22 +217,33 @@ $list-box-tokens: defaults(
     }
   }
 
-  .list-box-option-with-indicator {
-    padding-inline-start: calc(var(--#{$prefix}list-box-option-padding-x) + var(--#{$prefix}list-box-option-indicator-width));
+  .list-box[data-coreui-indicator="checkbox"] {
+    .list-box-option,
+    .list-box-select-all {
+      grid-template-columns: auto minmax(0, 1fr);
+    }
   }
 
   // The indicator is a decorative `.check` (a span, so it never matches
   // `:checked`), which is why the state is driven by a class on the option and
   // the mark's opacity is set here rather than by the control's own state rules.
+  // A described option is two rows, and a negative grid line resolves against
+  // the explicit grid, which has none here — so the span is stated outright.
+  :has(> .list-box-option-description) > .list-box-option-indicator {
+    grid-row: 1 / span 2;
+  }
+
   .list-box-option-indicator {
-    position: absolute;
-    inset-inline-start: calc(var(--#{$prefix}list-box-option-padding-x) * .5);
-    top: 50%;
+    grid-row: 1 / -1;
     width: var(--#{$prefix}list-box-option-indicator-width);
     height: var(--#{$prefix}list-box-option-indicator-width);
     margin: 0;
     pointer-events: none;
-    transform: translateY(-50%);
+  }
+
+  .list-box-option-label,
+  .list-box-option-description {
+    grid-column: -2 / -1;
   }
 
   .selected > .list-box-option-indicator {

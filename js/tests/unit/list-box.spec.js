@@ -460,7 +460,7 @@ describe('ListBox', () => {
       new ListBox(el)
 
       expect(el.querySelector('.list-box-option-indicator')).toBeNull()
-      expect(item(el, 'lettuce')).not.toHaveClass('list-box-option-with-indicator')
+      expect(el.hasAttribute('data-coreui-indicator')).toBeFalse()
     })
 
     it('should render one indicator per option and never a second one', () => {
@@ -468,7 +468,7 @@ describe('ListBox', () => {
       const listBox = new ListBox(el, { indicator: 'checkbox' })
 
       expect(el.querySelectorAll('.list-box-option-indicator').length).toEqual(5)
-      expect(item(el, 'lettuce')).toHaveClass('list-box-option-with-indicator')
+      expect(el.getAttribute('data-coreui-indicator')).toEqual('checkbox')
 
       const indicator = item(el, 'lettuce').querySelector('.list-box-option-indicator')
       expect(indicator).toHaveClass('check')
@@ -879,6 +879,7 @@ describe('ListBox', () => {
       listBox.dispose()
 
       expect(ListBox.getInstance(el)).toBeNull()
+      expect(el.hasAttribute('data-coreui-indicator')).toBeFalse()
       expect(field.getAttribute('aria-activedescendant')).toBeNull()
       expect(field.getAttribute('aria-controls')).toBeNull()
 
