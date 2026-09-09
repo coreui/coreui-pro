@@ -13,6 +13,7 @@ import toasterPromise from './snippets/toaster-promise.js?raw'
 import toasterAction from './snippets/toaster-action.js?raw'
 import toasterLimit from './snippets/toaster-limit.js?raw'
 import toasterStack from './snippets/toaster-stack.js?raw'
+import toasterPlacement from './snippets/toaster-placement.js?raw'
 
 ## Overview
 
@@ -115,10 +116,27 @@ A toast slides in from beyond the container's edge while it fades in — from th
 
 ## Placement
 
-`placement` pins the container the toaster creates to the viewport with one of the nine [`.toast-container-{block}-{inline}`](/components/toasts/#placement) classes: `top`, `middle` or `bottom` × `start`, `center` or `end`. In the `top` placements a new toast is inserted first, in the others last, so the newest always sits closest to the edge. A container you pass in is used as is — position it yourself.
+`placement` pins the container the toaster creates to the viewport with one of the nine [`.toast-container-{block}-{inline}`](/components/toasts/#placement) classes: `top`, `middle` or `bottom` × `start`, `center` or `end`. In the `top` placements a new toast is inserted first, in the others last, so the newest always sits closest to the edge.
+
+Each button below adds a toast through a toaster placed at that spot, so you can see where a toast enters from: from the side in the `start` and `end` columns, from above or below in the `center` column.
+
+<Example code={`<div class="d-grid gap-2" style="grid-template-columns: repeat(3, 1fr); max-width: 30rem" id="toasterPlacement">
+    <button type="button" class="btn-outline theme-secondary" data-placement="top-start">Top start</button>
+    <button type="button" class="btn-outline theme-secondary" data-placement="top-center">Top center</button>
+    <button type="button" class="btn-outline theme-secondary" data-placement="top-end">Top end</button>
+    <button type="button" class="btn-outline theme-secondary" data-placement="middle-start">Middle start</button>
+    <button type="button" class="btn-outline theme-secondary" data-placement="middle-center">Middle center</button>
+    <button type="button" class="btn-outline theme-secondary" data-placement="middle-end">Middle end</button>
+    <button type="button" class="btn-outline theme-secondary" data-placement="bottom-start">Bottom start</button>
+    <button type="button" class="btn-outline theme-secondary" data-placement="bottom-center">Bottom center</button>
+    <button type="button" class="btn-outline theme-secondary" data-placement="bottom-end">Bottom end</button>
+  </div>`} sandboxJs={toasterPlacement} />
+
+<Code code={toasterPlacement} lang="js" />
+
+A container you pass in is used as is — position it yourself:
 
 ```js
-const toaster = new coreui.Toaster(null, { placement: 'bottom-center' })
 const inline = new coreui.Toaster('#notifications')
 ```
 
