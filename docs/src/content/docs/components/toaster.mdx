@@ -114,15 +114,15 @@ The toaster keeps the geometry in tokens the CSS reads: `--cui-toast-stack-index
 A stack works in every placement: it grows away from the edge it is pinned to, so at the bottom the newest toast is the lowest one and the stack peeks upward.
 
 <Example code={`<div class="d-grid gap-2" style="grid-template-columns: repeat(3, 1fr); max-width: 30rem" id="toasterPlacementStack">
-    <button type="button" class="btn-outline theme-secondary" data-placement="top-start">Top start</button>
-    <button type="button" class="btn-outline theme-secondary" data-placement="top-center">Top center</button>
-    <button type="button" class="btn-outline theme-secondary" data-placement="top-end">Top end</button>
-    <button type="button" class="btn-outline theme-secondary" data-placement="middle-start">Middle start</button>
-    <button type="button" class="btn-outline theme-secondary" data-placement="middle-center">Middle center</button>
-    <button type="button" class="btn-outline theme-secondary" data-placement="middle-end">Middle end</button>
-    <button type="button" class="btn-outline theme-secondary" data-placement="bottom-start">Bottom start</button>
-    <button type="button" class="btn-outline theme-secondary" data-placement="bottom-center">Bottom center</button>
-    <button type="button" class="btn-outline theme-secondary" data-placement="bottom-end">Bottom end</button>
+    <button type="button" class="btn-outline theme-secondary" data-coreui-placement="top-start">Top start</button>
+    <button type="button" class="btn-outline theme-secondary" data-coreui-placement="top-center">Top center</button>
+    <button type="button" class="btn-outline theme-secondary" data-coreui-placement="top-end">Top end</button>
+    <button type="button" class="btn-outline theme-secondary" data-coreui-placement="middle-start">Middle start</button>
+    <button type="button" class="btn-outline theme-secondary" data-coreui-placement="middle-center">Middle center</button>
+    <button type="button" class="btn-outline theme-secondary" data-coreui-placement="middle-end">Middle end</button>
+    <button type="button" class="btn-outline theme-secondary" data-coreui-placement="bottom-start">Bottom start</button>
+    <button type="button" class="btn-outline theme-secondary" data-coreui-placement="bottom-center">Bottom center</button>
+    <button type="button" class="btn-outline theme-secondary" data-coreui-placement="bottom-end">Bottom end</button>
   </div>`} sandboxJs={toasterPlacementStack} />
 
 <Code code={toasterPlacementStack} lang="js" />
@@ -138,15 +138,15 @@ A toast slides in from beyond the container's edge while it fades in — from th
 Each button below adds a toast through a toaster placed at that spot, so you can see where a toast enters from: from the side in the `start` and `end` columns, from above or below in the `center` column.
 
 <Example code={`<div class="d-grid gap-2" style="grid-template-columns: repeat(3, 1fr); max-width: 30rem" id="toasterPlacement">
-    <button type="button" class="btn-outline theme-secondary" data-placement="top-start">Top start</button>
-    <button type="button" class="btn-outline theme-secondary" data-placement="top-center">Top center</button>
-    <button type="button" class="btn-outline theme-secondary" data-placement="top-end">Top end</button>
-    <button type="button" class="btn-outline theme-secondary" data-placement="middle-start">Middle start</button>
-    <button type="button" class="btn-outline theme-secondary" data-placement="middle-center">Middle center</button>
-    <button type="button" class="btn-outline theme-secondary" data-placement="middle-end">Middle end</button>
-    <button type="button" class="btn-outline theme-secondary" data-placement="bottom-start">Bottom start</button>
-    <button type="button" class="btn-outline theme-secondary" data-placement="bottom-center">Bottom center</button>
-    <button type="button" class="btn-outline theme-secondary" data-placement="bottom-end">Bottom end</button>
+    <button type="button" class="btn-outline theme-secondary" data-coreui-placement="top-start">Top start</button>
+    <button type="button" class="btn-outline theme-secondary" data-coreui-placement="top-center">Top center</button>
+    <button type="button" class="btn-outline theme-secondary" data-coreui-placement="top-end">Top end</button>
+    <button type="button" class="btn-outline theme-secondary" data-coreui-placement="middle-start">Middle start</button>
+    <button type="button" class="btn-outline theme-secondary" data-coreui-placement="middle-center">Middle center</button>
+    <button type="button" class="btn-outline theme-secondary" data-coreui-placement="middle-end">Middle end</button>
+    <button type="button" class="btn-outline theme-secondary" data-coreui-placement="bottom-start">Bottom start</button>
+    <button type="button" class="btn-outline theme-secondary" data-coreui-placement="bottom-center">Bottom center</button>
+    <button type="button" class="btn-outline theme-secondary" data-coreui-placement="bottom-end">Bottom end</button>
   </div>`} sandboxJs={toasterPlacement} />
 
 <Code code={toasterPlacement} lang="js" />

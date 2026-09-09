@@ -1,8 +1,8 @@
 const stacks = new Map()
 
-for (const button of document.querySelectorAll('#toasterPlacementStack [data-placement]')) {
+for (const button of document.querySelectorAll('#toasterPlacementStack [data-coreui-placement]')) {
   button.addEventListener('click', () => {
-    const { placement } = button.dataset
+    const placement = button.dataset.coreuiPlacement
 
     if (!stacks.has(placement)) {
       stacks.set(placement, new coreui.Toaster(null, { placement, stack: true, limit: 0 }))
