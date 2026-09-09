@@ -247,6 +247,43 @@ describe('Transfer', () => {
       expect(transfer.getTarget()).toEqual([])
     })
 
+    it('should return a value to its original place in the source', () => {
+      const el = setMarkup()
+      const transfer = new Transfer(el)
+
+      transfer.moveToTarget(['two'])
+
+      expect(transfer.getSource()).toEqual(['one', 'three'])
+      expect(transfer.getTarget()).toEqual(['four', 'two'])
+
+      transfer.moveToSource(['two'])
+
+      expect(transfer.getSource()).toEqual(['one', 'two', 'three'])
+    })
+
+    it('should return several values to their original places at once', () => {
+      const el = setMarkup()
+      const transfer = new Transfer(el)
+
+      transfer.moveToTarget(['three', 'one'])
+
+      expect(transfer.getTarget()).toEqual(['four', 'one', 'three'])
+
+      transfer.moveToSource(['three', 'one'])
+
+      expect(transfer.getSource()).toEqual(['one', 'two', 'three'])
+      expect(transfer.getTarget()).toEqual(['four'])
+    })
+
+    it('should send a value that started in the target back after its own neighbours', () => {
+      const el = setMarkup()
+      const transfer = new Transfer(el)
+
+      transfer.moveToSource(['four'])
+
+      expect(transfer.getSource()).toEqual(['one', 'two', 'three', 'four'])
+    })
+
     it('should move the values passed to the api without a selection', () => {
       const el = setMarkup()
       const transfer = new Transfer(el)
@@ -257,13 +294,18 @@ describe('Transfer', () => {
       expect(transfer.getTarget()).toEqual(['four', 'two'])
     })
 
-    it('should keep the source order of the moved options', () => {
+    it('should append to the target in the order the values arrive', () => {
       const el = setMarkup()
       const transfer = new Transfer(el)
 
       transfer.moveToTarget(['three', 'one'])
 
       expect(transfer.getTarget()).toEqual(['four', 'one', 'three'])
+
+      transfer.moveToSource(['one'])
+      transfer.moveToTarget(['one'])
+
+      expect(transfer.getTarget()).toEqual(['four', 'three', 'one'])
     })
 
     it('should take the text of an option that carries no value', () => {
@@ -567,6 +609,19 @@ describe('Transfer', () => {
   })
 
   describe('update', () => {
+    it('should place an option added later after the ones already there', () => {
+      const el = setMarkup()
+      const transfer = new Transfer(el)
+
+      side(el, 'source').querySelector('.list-box-options')
+        .insertAdjacentHTML('afterbegin', '<div class="list-box-option" data-coreui-value="five">five</div>')
+      transfer.update()
+      transfer.moveToTarget(['five'])
+      transfer.moveToSource(['five'])
+
+      expect(transfer.getSource()).toEqual(['one', 'two', 'three', 'five'])
+    })
+
     it('should take options added to the dom', () => {
       const el = setMarkup()
       const transfer = new Transfer(el)

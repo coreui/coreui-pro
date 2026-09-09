@@ -46,6 +46,8 @@ Each side is a `.list-box.transfer-list` marked `data-coreui-transfer-list="sour
 
 "All" is the same scope the select-all button works on — the visible, enabled options — so with a search running, the all button moves what the search left behind and nothing more.
 
+The two lists order themselves differently, and on purpose: the target keeps the order values arrived in, so a chosen list reads as a history of what was picked, while the source puts a returned value back exactly where it started rather than at the end. Each option's place in the source is fixed when the transfer initializes — `update()` gives one added later a place after the options already there.
+
 The transfer caps how tall a list gets — `--cui-transfer-list-max-height` puts a `max-height` and `overflow-y: auto` on `.list-box-options`, so a long list scrolls inside its own box instead of stretching the row.
 
 ## Search

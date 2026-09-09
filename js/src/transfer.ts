@@ -146,6 +146,8 @@ const DefaultType: Record<string, string> = {
 class Transfer extends BaseComponent {
   protected declare _announcer: HTMLElement
   protected declare _onListBoxChange: () => void
+  protected declare _order: WeakMap<HTMLElement, number>
+  protected declare _ranks: number
   protected declare _sides: Record<string, TransferSide>
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
@@ -157,6 +159,8 @@ class Transfer extends BaseComponent {
       [SIDE_TARGET]: this._createSide(SIDE_TARGET)
     }
     this._onListBoxChange = () => this._refresh()
+    this._order = new WeakMap()
+    this._ranks = 0
 
     this._addEventListeners()
     this.update()
@@ -205,6 +209,8 @@ class Transfer extends BaseComponent {
   }
 
   update(): void {
+    this._rankOptions()
+
     for (const side of Object.values(this._sides)) {
       this._decorateSide(side)
       this._filter(side)
@@ -394,6 +400,33 @@ class Transfer extends BaseComponent {
     return this._options(side).filter(option => !option.hasAttribute('hidden'))
   }
 
+  _rankOptions(): void {
+    for (const side of [this._sides[SIDE_SOURCE], this._sides[SIDE_TARGET]]) {
+      for (const option of this._options(side)) {
+        if (!this._order.has(option)) {
+          this._order.set(option, this._ranks++)
+        }
+      }
+    }
+  }
+
+  _rankOf(option: HTMLElement): number {
+    return this._order.get(option) ?? Number.MAX_SAFE_INTEGER
+  }
+
+  _insertInOriginalOrder(to: TransferSide, options: HTMLElement[]): void {
+    for (const option of options.toSorted((a, b) => this._rankOf(a) - this._rankOf(b))) {
+      const next = this._options(to).find(existing => this._rankOf(existing) > this._rankOf(option))
+
+      if (next) {
+        next.before(option)
+        continue
+      }
+
+      to.options.append(option)
+    }
+  }
+
   _movableValues(side: TransferSide): string[] {
     return this._visibleOptions(side)
       .filter(option => !option.classList.contains(CLASS_NAME_DISABLED) && option.getAttribute('aria-disabled') !== 'true')
@@ -482,7 +515,11 @@ class Transfer extends BaseComponent {
       from.listBox.deselect(value)
     }
 
-    to.options.append(...options)
+    if (side === SIDE_TARGET) {
+      to.options.append(...options)
+    } else {
+      this._insertInOriginalOrder(to, options)
+    }
 
     this._filter(from)
     this._filter(to)
