@@ -6,7 +6,7 @@
  */
 
 import BaseComponent from './base-component.js'
-import ListBox from './list-box.js'
+import ListBox, { type ListBoxEntry, type ListBoxGroup, type ListBoxItem } from './list-box.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import type { ComponentConfig } from './util/config.js'
@@ -25,6 +25,7 @@ const DATA_API_KEY = '.data-api'
 const EVENT_CHANGE = 'change'
 const EVENT_MOVE = 'move'
 const EVENT_MOVED = 'moved'
+const EVENT_SEARCH = 'search'
 
 const EVENT_CLICK = 'click'
 const EVENT_INPUT = 'input'
@@ -32,6 +33,7 @@ const EVENT_LIST_BOX_CHANGE = 'change.coreui.list-box'
 
 const CLASS_NAME_ANNOUNCER = 'transfer-announcer'
 const CLASS_NAME_DISABLED = 'disabled'
+const CLASS_NAME_OPTIONS = 'list-box-options'
 const CLASS_NAME_SEARCH = 'transfer-search'
 const CLASS_NAME_SUBTITLE = 'list-box-subtitle'
 const CLASS_NAME_VISUALLY_HIDDEN = 'visually-hidden'
@@ -45,6 +47,8 @@ const SELECTOR_OPTION_LABEL = '.list-box-option-label'
 const SELECTOR_OPTIONS = '.list-box-options'
 const SELECTOR_SEARCH = '[data-coreui-transfer-search]'
 const SELECTOR_SELECT_ALL = '[data-coreui-select-all]'
+
+const SEARCH_EXTERNAL = 'external'
 
 const SIDE_SOURCE = 'source'
 const SIDE_TARGET = 'target'
@@ -75,7 +79,10 @@ type TransferConfig = {
   ariaMoveToTargetLabel: string
   ariaMovedAnnouncement: string
   disabled: boolean
+  html: boolean
   indicator: string
+  items: ListBoxEntry[]
+  loading: boolean
   moveAllToSourceIcon: string
   moveAllToTargetIcon: string
   moveToSourceIcon: string
@@ -83,12 +90,13 @@ type TransferConfig = {
   oneWay: boolean
   sanitize: boolean
   sanitizeFn: ((unsafeHtml: string) => string) | null
-  search: boolean
+  search: boolean | string
   searchPlaceholder: string
   selectedCounterText: string
   sourceTitle: string
   targetTitle: string
   typeahead: boolean
+  value: string[]
 }
 
 const Default: TransferConfig = {
@@ -99,7 +107,10 @@ const Default: TransferConfig = {
   ariaMoveToTargetLabel: 'Move to chosen',
   ariaMovedAnnouncement: '{count} moved to {title}',
   disabled: false,
+  html: false,
   indicator: 'checkbox',
+  items: [],
+  loading: false,
   moveAllToSourceIcon: CHEVRON_DOUBLE_LEFT_ICON,
   moveAllToTargetIcon: CHEVRON_DOUBLE_RIGHT_ICON,
   moveToSourceIcon: CHEVRON_LEFT_ICON,
@@ -112,7 +123,8 @@ const Default: TransferConfig = {
   selectedCounterText: 'selected',
   sourceTitle: 'Available',
   targetTitle: 'Chosen',
-  typeahead: true
+  typeahead: true,
+  value: []
 }
 
 const DefaultType: Record<string, string> = {
@@ -123,7 +135,10 @@ const DefaultType: Record<string, string> = {
   ariaMoveToTargetLabel: 'string',
   ariaMovedAnnouncement: 'string',
   disabled: 'boolean',
+  html: 'boolean',
   indicator: 'string',
+  items: 'array',
+  loading: 'boolean',
   moveAllToSourceIcon: 'string',
   moveAllToTargetIcon: 'string',
   moveToSourceIcon: 'string',
@@ -131,12 +146,13 @@ const DefaultType: Record<string, string> = {
   oneWay: 'boolean',
   sanitize: 'boolean',
   sanitizeFn: '(function|null)',
-  search: 'boolean',
+  search: '(boolean|string)',
   searchPlaceholder: 'string',
   selectedCounterText: 'string',
   sourceTitle: 'string',
   targetTitle: 'string',
-  typeahead: 'boolean'
+  typeahead: 'boolean',
+  value: 'array'
 }
 
 /**
@@ -145,6 +161,8 @@ const DefaultType: Record<string, string> = {
 
 class Transfer extends BaseComponent {
   protected declare _announcer: HTMLElement
+  protected declare _itemRanks: Map<string, number>
+  protected declare _items: ListBoxEntry[] | null
   protected declare _onListBoxChange: () => void
   protected declare _order: WeakMap<HTMLElement, number>
   protected declare _ranks: number
@@ -154,6 +172,8 @@ class Transfer extends BaseComponent {
     super(element, config)
 
     this._announcer = this._createAnnouncer()
+    this._itemRanks = new Map()
+    this._items = this._config.items.length > 0 ? this._config.items : null
     this._sides = {
       [SIDE_SOURCE]: this._createSide(SIDE_SOURCE),
       [SIDE_TARGET]: this._createSide(SIDE_TARGET)
@@ -161,6 +181,10 @@ class Transfer extends BaseComponent {
     this._onListBoxChange = () => this._refresh()
     this._order = new WeakMap()
     this._ranks = 0
+
+    if (this._items) {
+      this._applyItems(this._config.value)
+    }
 
     this._addEventListeners()
     this.update()
@@ -208,6 +232,24 @@ class Transfer extends BaseComponent {
     return this._sides[side].listBox.getSelected()
   }
 
+  setItems(items: ListBoxEntry[]): void {
+    this._items = Array.isArray(items) ? items : []
+    this._applyItems(this.getTarget())
+    this.update()
+  }
+
+  getItems(): ListBoxEntry[] {
+    return this._items ?? []
+  }
+
+  setLoading(loading: boolean, side?: string): void {
+    for (const [name, entry] of Object.entries(this._sides)) {
+      if (side === undefined || side === name) {
+        entry.listBox.setLoading(loading)
+      }
+    }
+  }
+
   update(): void {
     this._rankOptions()
 
@@ -253,14 +295,19 @@ class Transfer extends BaseComponent {
     }
 
     const title = name === SIDE_SOURCE ? this._config.sourceTitle : this._config.targetTitle
-    const options = (SelectorEngine.findOne(SELECTOR_OPTIONS, element) ?? element) as HTMLElement
+    const options = this._resolveOptions(element)
 
     return {
       counter: this._resolveCounter(element),
       element,
       listBox: ListBox.getOrCreateInstance(element, {
+        allowList: this._config.allowList,
         disabled: this._config.disabled,
+        html: this._config.html,
         indicator: this._config.indicator,
+        loading: this._config.loading,
+        sanitize: this._config.sanitize,
+        sanitizeFn: this._config.sanitizeFn,
         selectionMode: 'multiple',
         typeahead: this._config.typeahead
       }) as ListBox,
@@ -269,6 +316,25 @@ class Transfer extends BaseComponent {
       selectAll: SelectorEngine.findOne(SELECTOR_SELECT_ALL, element),
       title
     }
+  }
+
+  _resolveOptions(element: HTMLElement): HTMLElement {
+    const existing = SelectorEngine.findOne(SELECTOR_OPTIONS, element) as HTMLElement | null
+
+    if (existing) {
+      return existing
+    }
+
+    if (!this._items) {
+      return element
+    }
+
+    const options = document.createElement('div')
+
+    options.classList.add(CLASS_NAME_OPTIONS)
+    element.append(options)
+
+    return options
   }
 
   _resolveCounter(element: HTMLElement): HTMLElement | null {
@@ -400,7 +466,62 @@ class Transfer extends BaseComponent {
     return this._options(side).filter(option => !option.hasAttribute('hidden'))
   }
 
+  _applyItems(values: string[]): void {
+    const items = this._items ?? []
+    const flat = this._flatItems(items)
+    const byValue = new Map(flat.map(item => [this._itemValue(item), item]))
+
+    this._itemRanks = new Map([...byValue.keys()].map((value, index) => [value, index]))
+
+    const chosen = (Array.isArray(values) ? values : []).filter(value => byValue.has(value))
+    const taken = new Set(chosen)
+
+    this._sides[SIDE_TARGET].listBox.setItems(chosen.map(value => byValue.get(value) as ListBoxItem))
+    this._sides[SIDE_SOURCE].listBox.setItems(this._availableItems(items, taken))
+  }
+
+  _availableItems(items: ListBoxEntry[], taken: Set<string>): ListBoxEntry[] {
+    const available: ListBoxEntry[] = []
+
+    for (const entry of items) {
+      if (entry === null || typeof entry !== 'object') {
+        continue
+      }
+
+      if (!Array.isArray((entry as ListBoxGroup).items)) {
+        if (!taken.has(this._itemValue(entry as ListBoxItem))) {
+          available.push(entry)
+        }
+
+        continue
+      }
+
+      const group = entry as ListBoxGroup
+      const rest = group.items.filter(item => !taken.has(this._itemValue(item)))
+
+      if (rest.length > 0) {
+        available.push({ label: group.label, items: rest })
+      }
+    }
+
+    return available
+  }
+
+  _flatItems(items: ListBoxEntry[]): ListBoxItem[] {
+    return items
+      .filter(entry => entry !== null && typeof entry === 'object')
+      .flatMap(entry => (Array.isArray((entry as ListBoxGroup).items) ? (entry as ListBoxGroup).items : [entry as ListBoxItem]))
+  }
+
+  _itemValue(item: ListBoxItem): string {
+    return String(item.value ?? item.label ?? '')
+  }
+
   _rankOptions(): void {
+    if (this._items) {
+      return
+    }
+
     for (const side of [this._sides[SIDE_SOURCE], this._sides[SIDE_TARGET]]) {
       for (const option of this._options(side)) {
         if (!this._order.has(option)) {
@@ -411,6 +532,10 @@ class Transfer extends BaseComponent {
   }
 
   _rankOf(option: HTMLElement): number {
+    if (this._items) {
+      return this._itemRanks.get(this._optionValue(option)) ?? Number.MAX_SAFE_INTEGER
+    }
+
     return this._order.get(option) ?? Number.MAX_SAFE_INTEGER
   }
 
@@ -447,7 +572,7 @@ class Transfer extends BaseComponent {
   }
 
   _filter(side: TransferSide): void {
-    if (!side.search) {
+    if (!side.search || this._config.search === SEARCH_EXTERNAL) {
       return
     }
 
@@ -567,13 +692,23 @@ class Transfer extends BaseComponent {
     })
 
     EventHandler.on(this._element, this.constructor.eventName(EVENT_INPUT), SELECTOR_SEARCH, (event: any) => {
-      const side = Object.values(this._sides).find(({ search }) => search === event.target)
+      const name = Object.keys(this._sides).find(key => this._sides[key].search === event.target)
 
-      if (side) {
-        this._filter(side)
-        side.listBox.update()
-        this._refresh()
+      if (!name) {
+        return
       }
+
+      if (this._config.search === SEARCH_EXTERNAL) {
+        EventHandler.trigger(this._element, this.constructor.eventName(EVENT_SEARCH), {
+          query: (event.target as HTMLInputElement).value,
+          side: name
+        })
+        return
+      }
+
+      this._filter(this._sides[name])
+      this._sides[name].listBox.update()
+      this._refresh()
     })
 
     this._element.addEventListener(EVENT_LIST_BOX_CHANGE, this._onListBoxChange)

@@ -103,7 +103,10 @@ describe('Transfer', () => {
         ariaMoveToTargetLabel: 'Move to chosen',
         ariaMovedAnnouncement: '{count} moved to {title}',
         disabled: false,
+        html: false,
         indicator: 'checkbox',
+        items: [],
+        loading: false,
         moveAllToSourceIcon: jasmine.any(String),
         moveAllToTargetIcon: jasmine.any(String),
         moveToSourceIcon: jasmine.any(String),
@@ -116,7 +119,8 @@ describe('Transfer', () => {
         selectedCounterText: 'selected',
         sourceTitle: 'Available',
         targetTitle: 'Chosen',
-        typeahead: true
+        typeahead: true,
+        value: []
       })
     })
   })
@@ -512,6 +516,110 @@ describe('Transfer', () => {
     })
   })
 
+  describe('items', () => {
+    const users = [
+      { value: 'ada', label: 'Ada' },
+      { value: 'bob', label: 'Bob' },
+      { value: 'cleo', label: 'Cleo' }
+    ]
+
+    it('should build both lists from the items and the value', () => {
+      const el = setMarkup('', [], [])
+      const transfer = new Transfer(el, { items: users, value: ['cleo', 'ada'] })
+
+      expect(transfer.getSource()).toEqual(['bob'])
+      expect(transfer.getTarget()).toEqual(['cleo', 'ada'])
+      expect(option(el, 'source', 'bob').textContent).toEqual('Bob')
+    })
+
+    it('should return the configured items', () => {
+      const el = setMarkup('', [], [])
+      const transfer = new Transfer(el, { items: users })
+
+      expect(transfer.getItems()).toEqual(users)
+    })
+
+    it('should keep a group together in the source list', () => {
+      const el = setMarkup('', [], [])
+      const transfer = new Transfer(el, {
+        items: [{ label: 'Crew', items: users }],
+        value: ['bob']
+      })
+
+      expect(transfer.getSource()).toEqual(['ada', 'cleo'])
+      expect(side(el, 'source').querySelector('.list-box-section-label').textContent).toEqual('Crew')
+    })
+
+    it('should build the options element when the markup has none', () => {
+      fixtureEl.innerHTML = [
+        '<div class="transfer">',
+        '<div class="list-box transfer-list" data-coreui-transfer-list="source"></div>',
+        '<div class="list-box transfer-list" data-coreui-transfer-list="target"></div>',
+        '</div>'
+      ].join('')
+      const el = fixtureEl.querySelector('.transfer')
+      const transfer = new Transfer(el, { items: users, value: ['ada'] })
+
+      expect(transfer.getSource()).toEqual(['bob', 'cleo'])
+      expect(transfer.getTarget()).toEqual(['ada'])
+    })
+
+    it('should put a value returned to the source back in the items order', () => {
+      const el = setMarkup('', [], [])
+      const transfer = new Transfer(el, { items: users, value: ['ada'] })
+
+      transfer.moveToSource(['ada'])
+
+      expect(transfer.getSource()).toEqual(['ada', 'bob', 'cleo'])
+    })
+
+    it('should keep the target when the items change', () => {
+      const el = setMarkup('', [], [])
+      const transfer = new Transfer(el, { items: users, value: ['cleo'] })
+
+      transfer.setItems([...users, { value: 'dan', label: 'Dan' }])
+
+      expect(transfer.getTarget()).toEqual(['cleo'])
+      expect(transfer.getSource()).toEqual(['ada', 'bob', 'dan'])
+    })
+
+    it('should drop a target value that the new items no longer carry', () => {
+      const el = setMarkup('', [], [])
+      const transfer = new Transfer(el, { items: users, value: ['cleo'] })
+
+      transfer.setItems([{ value: 'ada', label: 'Ada' }])
+
+      expect(transfer.getTarget()).toEqual([])
+      expect(transfer.getSource()).toEqual(['ada'])
+    })
+
+    it('should parse a label as markup only with the html option', () => {
+      const el = setMarkup('', [], [])
+      const transfer = new Transfer(el, { html: true, items: [{ value: 'ada', label: '<b>Ada</b>' }] })
+
+      expect(option(el, 'source', 'ada').querySelector('b')).not.toBeNull()
+      expect(transfer.getSource()).toEqual(['ada'])
+    })
+
+    it('should mark a loading list as busy', () => {
+      const el = setMarkup('', [], [])
+      const transfer = new Transfer(el, { items: users })
+
+      transfer.setLoading(true, 'source')
+
+      expect(side(el, 'source').querySelector('.list-box-options').getAttribute('aria-busy')).toEqual('true')
+      expect(side(el, 'target').querySelector('.list-box-options').hasAttribute('aria-busy')).toBeFalse()
+
+      transfer.setLoading(true)
+
+      expect(side(el, 'target').querySelector('.list-box-options').getAttribute('aria-busy')).toEqual('true')
+
+      transfer.setLoading(false)
+
+      expect(side(el, 'source').querySelector('.list-box-options').hasAttribute('aria-busy')).toBeFalse()
+    })
+  })
+
   describe('search', () => {
     it('should hide the options that do not match', () => {
       const el = setMarkup('', ['one', 'two', 'three'], ['four'], true)
@@ -553,6 +661,35 @@ describe('Transfer', () => {
 
       expect(option(el, 'source', 'one').hasAttribute('hidden')).toBeFalse()
       expect(transfer.getSource()).toEqual(['one'])
+    })
+
+    it('should not filter in external search mode and report the query', () => {
+      const el = setMarkup('', [], [])
+      const transfer = new Transfer(el, {
+        items: [{ value: 'ada', label: 'Ada' }, { value: 'bob', label: 'Bob' }],
+        search: 'external'
+      })
+      const spy = jasmine.createSpy('search')
+
+      el.addEventListener('search.coreui.transfer', event => spy(event.side, event.query))
+      type(searchField(el, 'source'), 'zzz')
+
+      expect(spy).toHaveBeenCalledWith('source', 'zzz')
+      expect(option(el, 'source', 'ada').hasAttribute('hidden')).toBeFalse()
+      expect(option(el, 'source', 'bob').hasAttribute('hidden')).toBeFalse()
+      expect(transfer.getSource()).toEqual(['ada', 'bob'])
+    })
+
+    it('should report the side the external search was typed in', () => {
+      const el = setMarkup('', [], [])
+      // eslint-disable-next-line no-new
+      new Transfer(el, { items: [{ value: 'ada', label: 'Ada' }], search: 'external', value: ['ada'] })
+      const spy = jasmine.createSpy('search')
+
+      el.addEventListener('search.coreui.transfer', event => spy(event.side, event.query))
+      type(searchField(el, 'target'), 'ad')
+
+      expect(spy).toHaveBeenCalledWith('target', 'ad')
     })
 
     it('should build the search field when the search option is on', () => {
