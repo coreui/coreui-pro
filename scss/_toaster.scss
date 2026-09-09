@@ -1,0 +1,136 @@
+@use "mixins/transition" as *;
+@use "mixins/visually-hidden" as *;
+@use "config" as *;
+@use "toasts";
+
+@layer components {
+  .toast-title {
+    flex: 1 1 auto;
+  }
+
+  .toast-row {
+    display: flex;
+    gap: var(--#{$prefix}toast-padding-x);
+    align-items: center;
+  }
+
+  .toast-description {
+    flex: 1 1 auto;
+  }
+
+  .toast[data-coreui-limited] {
+    display: none;
+    opacity: 0;
+    translate: var(--#{$prefix}toast-limited-translate, 0 50%);
+  }
+
+  .toast-container-bottom-start,
+  .toast-container-bottom-center,
+  .toast-container-bottom-end {
+    --#{$prefix}toast-limited-translate: 0 -50%;
+  }
+
+  .toast-announcer {
+    @include visually-hidden();
+  }
+
+  // scss-docs-start toast-stack
+  .toast-container-stack {
+    --#{$prefix}toast-stack-peek: .75rem;
+    --#{$prefix}toast-stack-scale: .1;
+    // Every toast behind is scaled by the same ratio again and pushed towards a vanishing depth,
+    // so the corners of the stack line up and each strip is the previous one times the ratio
+    --#{$prefix}toast-stack-visible: 3;
+    --#{$prefix}toast-stack-ratio: calc(1 - var(--#{$prefix}toast-stack-scale));
+    --#{$prefix}toast-stack-depth: calc(var(--#{$prefix}toast-stack-front-height) + var(--#{$prefix}toast-stack-peek) / var(--#{$prefix}toast-stack-scale));
+    --#{$prefix}toast-stack-last: calc(min(var(--#{$prefix}toast-stack-count), var(--#{$prefix}toast-stack-visible)) - 1);
+
+    width: var(--#{$prefix}toast-max-width);
+    max-width: 100%;
+    height: calc(var(--#{$prefix}toast-stack-depth) * (1 - pow(var(--#{$prefix}toast-stack-ratio), var(--#{$prefix}toast-stack-last))) + var(--#{$prefix}toast-stack-front-height) * pow(var(--#{$prefix}toast-stack-ratio), var(--#{$prefix}toast-stack-last)));
+    pointer-events: auto;
+    @include transition-props(height, var(--#{$prefix}toast-transition-duration), var(--#{$prefix}toast-transition-timing));
+
+    > .toast {
+      position: absolute;
+      inset-block-start: calc(var(--#{$prefix}toast-stack-depth) * (1 - pow(var(--#{$prefix}toast-stack-ratio), var(--#{$prefix}toast-stack-index))));
+      inset-inline: 0;
+      z-index: calc(var(--#{$prefix}toast-stack-count) - var(--#{$prefix}toast-stack-index));
+      height: var(--#{$prefix}toast-stack-front-height);
+      margin-block-end: 0;
+      overflow: hidden;
+      transform-origin: top center;
+      scale: pow(var(--#{$prefix}toast-stack-ratio), var(--#{$prefix}toast-stack-index));
+
+      &:not(.toast-instant) {
+        @include transition-props(
+          #{"opacity, translate, display, inset-block-start, height, scale"},
+          var(--#{$prefix}toast-transition-duration),
+          var(--#{$prefix}toast-transition-timing),
+          allow-discrete
+        );
+
+        > * {
+          @include transition-props(opacity, var(--#{$prefix}toast-transition-duration), var(--#{$prefix}toast-transition-timing));
+        }
+      }
+    }
+
+    > .toast:not([data-coreui-stack-index="0"]) {
+      --#{$prefix}toast-leave-translate: 0 0;
+      --#{$prefix}toast-limited-translate: 0 0;
+
+      > * {
+        opacity: 0;
+      }
+    }
+
+    > .toast[data-coreui-stack-hidden] {
+      pointer-events: none;
+      opacity: 0;
+    }
+
+    &:is(:hover, :focus-within) {
+      height: calc(var(--#{$prefix}toast-stack-heights) + (var(--#{$prefix}toast-stack-count) - 1) * var(--#{$prefix}toast-spacing));
+
+      > .toast {
+        inset-block-start: calc(var(--#{$prefix}toast-stack-before) + var(--#{$prefix}toast-stack-index) * var(--#{$prefix}toast-spacing));
+        height: var(--#{$prefix}toast-height);
+        scale: 1;
+
+        > * {
+          opacity: 1;
+        }
+      }
+
+      > .toast[data-coreui-stack-hidden]:not([data-coreui-limited]) {
+        pointer-events: auto;
+        opacity: 1;
+      }
+    }
+  }
+
+  .toast-container-bottom-start.toast-container-stack,
+  .toast-container-bottom-center.toast-container-stack,
+  .toast-container-bottom-end.toast-container-stack {
+    > .toast {
+      inset-block-start: auto;
+      inset-block-end: calc(var(--#{$prefix}toast-stack-depth) * (1 - pow(var(--#{$prefix}toast-stack-ratio), var(--#{$prefix}toast-stack-index))));
+      transform-origin: bottom center;
+
+      &:not(.toast-instant) {
+        @include transition-props(
+          #{"opacity, translate, display, inset-block-end, height, scale"},
+          var(--#{$prefix}toast-transition-duration),
+          var(--#{$prefix}toast-transition-timing),
+          allow-discrete
+        );
+      }
+    }
+
+    &:is(:hover, :focus-within) > .toast {
+      inset-block-end: calc(var(--#{$prefix}toast-stack-before) + var(--#{$prefix}toast-stack-index) * var(--#{$prefix}toast-spacing));
+    }
+  }
+  // scss-docs-end toast-stack
+}

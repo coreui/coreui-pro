@@ -97,6 +97,7 @@ const groups = [
   { name: 'stepper', modules: ['stepper'] },
   { name: 'time-picker', modules: ['time-picker'] },
   { name: 'toasts', modules: ['toasts'] },
+  { name: 'toaster', modules: ['toaster'] },
   { name: 'tooltip', modules: ['tooltip'] },
   { name: 'transitions', modules: ['transitions'] },
   { name: 'helpers/visually-hidden', modules: ['helpers/visually-hidden'] }

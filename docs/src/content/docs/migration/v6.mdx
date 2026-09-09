@@ -558,6 +558,14 @@ check, radio, carousel and toggler icons already work:
 - **The font size has a legibility floor.** `--cui-badge-font-size` is
   `clamp(12px, .75em, .75em)`, so a badge inside small text stops shrinking at
   12px while still scaling up with a larger parent.
+- **New: `.badge-position-{top|bottom}-{start|end}`.** One class pins a badge to
+  a corner of its positioned parent, centred on the corner, and flips with the
+  writing direction. It replaces the `position-absolute top-0 start-100
+  translate-middle` utility stack the docs used to recommend; that stack still
+  works. The `.btn .badge` nudge (`position: relative; top: -1px`) is written as
+  `.btn :where(.badge)` so a position class on a badge inside a button wins;
+  a stylesheet that relied on beating `.btn .badge` with two classes now beats
+  it with one.
 
 - **New: `--cui-badge-border-width` / `--cui-badge-border-color` (transparent),
   `.badge-lg`, and a link reset.** The border tokens are what `.badge-outline`
@@ -1978,6 +1986,20 @@ Multi Select's option indicators moved with it — they render as a decorative
 
 #### Toast
 
+- **New: `Toaster`** creates toasts from options and keeps them in a store keyed
+  by id — `add()` returns the id (an existing id updates in place), `update()`
+  rewrites a toast, `close()` hides one or all, `promise()` follows an
+  asynchronous operation through loading, success and error. It creates its
+  own `.toast-container` placed by `placement`, caps visible toasts with
+  `limit` (the oldest stay in the DOM, `inert` and hidden), announces by
+  `priority` (`status`/`polite` or `alert`/`assertive`) and can render an
+  action button. Toasts slide in from beyond the container's edge and back
+  out, toasts over the `limit` fade out instead of vanishing, and the toaster
+  glides the remaining toasts into place when one leaves; `stack: true`
+  piles them up, newest in front, and spreads them on hover or focus. Nine `.toast-container-{block}-{inline}` classes pin a
+  container to the viewport in place of the `position-fixed top-0 end-0`
+  utility stacks. New classes: `.toast-title`, `.toast-description`,
+  `.toast-action`.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **The fade moved to CSS.** Toast was the last component driving its animation
   from JavaScript — it toggled `.fade`, forced a reflow, then juggled `.show`,
@@ -2000,6 +2022,14 @@ Multi Select's option indicators moved with it — they render as a decorative
   `var(--cui-body-bg)`. Add `.toast-translucent` for the see-through look, which
   puts `blur(5px) saturate(180%)` behind the toast and thins the header to match,
   the same way `.card-translucent` and `.menu-translucent` work.
+- **New: `.toast-container-{top|middle|bottom}-{start|center|end}`.** Nine
+  classes pin a `.toast-container` to the viewport (`position: fixed`), inset
+  from the edge by `--cui-toast-container-inset` (`--cui-spacer-4`, 1rem, by
+  default) and centred with logical insets and auto margins rather than
+  transforms, so they hold in RTL. They replace the `position-fixed top-0 end-0
+  p-3` utility stack; inside a positioned box add `.position-absolute` to pin
+  the container to the box. `--cui-toast-container-inset` is declared on
+  `.toast-container` next to `--cui-toast-zindex`.
 
 #### Card
 
