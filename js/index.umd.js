@@ -50,6 +50,7 @@ import TimePicker from './src/time-picker.js'
 import Toast from './src/toast.js'
 import Toaster from './src/toaster.js'
 import Tooltip from './src/tooltip.js'
+import Transfer from './src/transfer.js'
 
 export default {
   Accordion,
@@ -96,5 +97,6 @@ export default {
   TimePicker,
   Toast,
   Toaster,
-  Tooltip
+  Tooltip,
+  Transfer
 }

@@ -47,6 +47,7 @@ const EVENT_SELECTION_LIMIT = 'selectionLimit'
 
 const EVENT_CLICK = 'click'
 const EVENT_FOCUSIN = 'focusin'
+const EVENT_FOCUSOUT = 'focusout'
 const EVENT_KEYDOWN = 'keydown'
 
 const CLASS_NAME_ACTIVE = 'active'
@@ -152,6 +153,7 @@ class ListBox extends BaseComponent {
   protected declare _anchor: string | null
   protected declare _field: HTMLElement | null
   protected declare _items: ListBoxEntry[] | null
+  protected declare _focused: boolean
   protected declare _limited: string | null
   protected declare _list: HTMLElement
   protected declare _search: string
@@ -166,6 +168,7 @@ class ListBox extends BaseComponent {
     this._anchor = null
     this._field = getElement(this._config.activeDescendant)
     this._items = this._config.items.length > 0 ? this._normalizeItems(this._config.items) : null
+    this._focused = false
     this._limited = null
     this._list = this._resolveList()
     this._search = ''
@@ -367,7 +370,7 @@ class ListBox extends BaseComponent {
       }
 
       option.classList.toggle(CLASS_NAME_SELECTED, this._selected.has(value))
-      option.classList.toggle(CLASS_NAME_ACTIVE, value === this._active)
+      option.classList.toggle(CLASS_NAME_ACTIVE, value === this._active && (this._focused || Boolean(this._field)))
 
       if (this._field) {
         option.removeAttribute('tabindex')
@@ -862,6 +865,16 @@ class ListBox extends BaseComponent {
     EventHandler.on(this._element, this.constructor.eventName(EVENT_CLICK), SELECTOR_SELECT_ALL, () => {
       if (!this._config.disabled) {
         this._toggleSelectAll()
+      }
+    })
+    EventHandler.on(this._list, this.constructor.eventName(EVENT_FOCUSIN), () => {
+      this._focused = true
+      this.update()
+    })
+    EventHandler.on(this._list, this.constructor.eventName(EVENT_FOCUSOUT), (event: any) => {
+      if (!this._list.contains(event.relatedTarget as Node)) {
+        this._focused = false
+        this.update()
       }
     })
     EventHandler.on(this._element, this.constructor.eventName(EVENT_FOCUSIN), SELECTOR_OPTION, (event: any) => {

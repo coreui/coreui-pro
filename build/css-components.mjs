@@ -30,7 +30,8 @@ const renders = {
   'date-picker': ['forms/floating-labels', 'forms/form-control', 'forms/form-control-group', 'forms/form-date-time', 'popup'],
   'range-slider': ['tooltip'],
   sidebar: ['transitions'],
-  'time-picker': ['forms/floating-labels', 'forms/form-control', 'forms/form-control-group', 'forms/form-date-time', 'popup']
+  'time-picker': ['forms/floating-labels', 'forms/form-control', 'forms/form-control-group', 'forms/form-date-time', 'popup'],
+  transfer: ['list-box', 'buttons', 'forms/form-control', 'helpers/visually-hidden', 'icon']
 }
 
 const groups = [
@@ -101,6 +102,7 @@ const groups = [
   { name: 'toasts', modules: ['toasts'] },
   { name: 'toaster', modules: ['toaster'] },
   { name: 'tooltip', modules: ['tooltip'] },
+  { name: 'transfer', modules: ['transfer'] },
   { name: 'transitions', modules: ['transitions'] },
   { name: 'helpers/visually-hidden', modules: ['helpers/visually-hidden'] }
 ]
