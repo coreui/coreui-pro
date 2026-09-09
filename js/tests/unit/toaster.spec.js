@@ -369,8 +369,12 @@ describe('Toaster', () => {
       const animate = spyOn(Element.prototype, 'animate').and.callThrough()
       spyOn(toaster, '_prefersReducedMotion').and.returnValue(false)
 
-      toaster.add({ description: 'first', instant: true })
-      const second = toaster.add({ description: 'second', instant: true })
+      toaster.add({ description: 'first' })
+      const second = toaster.add({ description: 'second' })
+      for (const element of fixtureEl.querySelectorAll('.toast')) {
+        element.style.transitionDuration = '20ms'
+      }
+
       animate.calls.reset()
 
       const secondEl = fixtureEl.querySelector(`[data-coreui-toast-id="${second}"]`)
@@ -380,6 +384,23 @@ describe('Toaster', () => {
 
       expect(animate).toHaveBeenCalledTimes(1)
       expect(animate.calls.mostRecent().args[0].map(frame => frame.transform).join(' ')).toMatch(/translateY\(-?\d/)
+    })
+
+    it('should not glide the neighbours of an instant toast', async () => {
+      toaster = new Toaster(null, { container: fixtureEl })
+      const animate = spyOn(Element.prototype, 'animate').and.callThrough()
+      spyOn(toaster, '_prefersReducedMotion').and.returnValue(false)
+
+      toaster.add({ description: 'first', instant: true })
+      const second = toaster.add({ description: 'second', instant: true })
+      animate.calls.reset()
+
+      const secondEl = fixtureEl.querySelector(`[data-coreui-toast-id="${second}"]`)
+      const removed = hidden(secondEl)
+      toaster.close(second)
+      await removed
+
+      expect(animate).not.toHaveBeenCalled()
     })
 
     it('should not animate positions when reduced motion is preferred', async () => {

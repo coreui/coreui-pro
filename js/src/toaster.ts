@@ -728,6 +728,11 @@ class Toaster extends BaseComponent {
     element.getBoundingClientRect()
     element.style.transition = transition
 
+    const duration = getTransitionDurationFromElement(element)
+    if (duration === 0) {
+      return
+    }
+
     for (const [index, child] of siblings.entries()) {
       const from = visual[index] - layout[index]
       const to = target[index] - layout[index]
@@ -736,7 +741,7 @@ class Toaster extends BaseComponent {
         child.animate(
           [{ transform: `translateY(${from}px)` }, { transform: `translateY(${to}px)` }],
           {
-            duration: getTransitionDurationFromElement(element) || 150, easing: 'ease-out', fill: 'forwards', id: GLIDE_ID
+            duration, easing: 'ease-out', fill: 'forwards', id: GLIDE_ID
           }
         )
       }
@@ -757,10 +762,11 @@ class Toaster extends BaseComponent {
       this._cancelGlide(child)
 
       const delta = previous - child.getBoundingClientRect().top
-      if (delta !== 0) {
+      const duration = getTransitionDurationFromElement(child)
+      if (delta !== 0 && duration > 0) {
         child.animate(
           [{ transform: `translateY(${delta}px)` }, { transform: 'none' }],
-          { duration: getTransitionDurationFromElement(child) || 150, easing: 'ease-out', id: GLIDE_ID }
+          { duration, easing: 'ease-out', id: GLIDE_ID }
         )
       }
     }

@@ -61,15 +61,18 @@
       overflow: hidden;
       transform-origin: top center;
       scale: pow(var(--#{$prefix}toast-stack-ratio), var(--#{$prefix}toast-stack-index));
-      @include transition-props(
-        #{"opacity, translate, display, inset-block-start, height, scale"},
-        var(--#{$prefix}toast-transition-duration),
-        var(--#{$prefix}toast-transition-timing),
-        allow-discrete
-      );
 
-      > * {
-        @include transition-props(opacity, var(--#{$prefix}toast-transition-duration), var(--#{$prefix}toast-transition-timing));
+      &:not(.toast-instant) {
+        @include transition-props(
+          #{"opacity, translate, display, inset-block-start, height, scale"},
+          var(--#{$prefix}toast-transition-duration),
+          var(--#{$prefix}toast-transition-timing),
+          allow-discrete
+        );
+
+        > * {
+          @include transition-props(opacity, var(--#{$prefix}toast-transition-duration), var(--#{$prefix}toast-transition-timing));
+        }
       }
     }
 
@@ -114,12 +117,15 @@
       inset-block-start: auto;
       inset-block-end: calc(var(--#{$prefix}toast-stack-depth) * (1 - pow(var(--#{$prefix}toast-stack-ratio), var(--#{$prefix}toast-stack-index))));
       transform-origin: bottom center;
-      @include transition-props(
-        #{"opacity, translate, display, inset-block-end, height, scale"},
-        var(--#{$prefix}toast-transition-duration),
-        var(--#{$prefix}toast-transition-timing),
-        allow-discrete
-      );
+
+      &:not(.toast-instant) {
+        @include transition-props(
+          #{"opacity, translate, display, inset-block-end, height, scale"},
+          var(--#{$prefix}toast-transition-duration),
+          var(--#{$prefix}toast-transition-timing),
+          allow-discrete
+        );
+      }
     }
 
     &:is(:hover, :focus-within) > .toast {
