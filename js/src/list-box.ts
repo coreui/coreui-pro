@@ -9,6 +9,7 @@ import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import type { ComponentConfig } from './util/config.js'
+import { DefaultAllowlist, sanitizeHtml, type SanitizerAllowList } from './util/sanitizer.js'
 import {
   defineJQueryPlugin,
   getElement,
@@ -52,7 +53,14 @@ const CLASS_NAME_ACTIVE = 'active'
 const CLASS_NAME_CHECK = 'check'
 const CLASS_NAME_DISABLED = 'disabled'
 const CLASS_NAME_INDETERMINATE = 'indeterminate'
+const CLASS_NAME_LOADING = 'loading'
+const CLASS_NAME_OPTION = 'list-box-option'
+const CLASS_NAME_OPTION_DESCRIPTION = 'list-box-option-description'
 const CLASS_NAME_OPTION_INDICATOR = 'list-box-option-indicator'
+const CLASS_NAME_OPTION_LABEL = 'list-box-option-label'
+const CLASS_NAME_OPTIONS = 'list-box-options'
+const CLASS_NAME_SECTION = 'list-box-section'
+const CLASS_NAME_SECTION_LABEL = 'list-box-section-label'
 const CLASS_NAME_SELECTED = 'selected'
 
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="list-box"]'
@@ -72,10 +80,31 @@ const SELECTION_MODE_MULTIPLE = 'multiple'
 const SELECTION_MODE_NONE = 'none'
 const SELECTION_MODE_SINGLE = 'single'
 
+type ListBoxItem = {
+  value: string
+  label?: string
+  description?: string
+  disabled?: boolean
+  selected?: boolean
+}
+
+type ListBoxGroup = {
+  label: string
+  items: ListBoxItem[]
+}
+
+type ListBoxEntry = ListBoxItem | ListBoxGroup
+
 type ListBoxConfig = {
   activeDescendant: string | Element | null
+  allowList: SanitizerAllowList
   disabled: boolean
+  html: boolean
   indicator: string
+  items: ListBoxEntry[]
+  loading: boolean
+  sanitize: boolean
+  sanitizeFn: ((unsafeHtml: string) => string) | null
   selected: string | string[] | null
   selectionLimit: number | null
   selectionMode: string
@@ -84,8 +113,14 @@ type ListBoxConfig = {
 
 const Default: ListBoxConfig = {
   activeDescendant: null,
+  allowList: DefaultAllowlist,
   disabled: false,
+  html: false,
   indicator: 'none',
+  items: [],
+  loading: false,
+  sanitize: true,
+  sanitizeFn: null,
   selected: null,
   selectionLimit: null,
   selectionMode: SELECTION_MODE_SINGLE,
@@ -94,8 +129,14 @@ const Default: ListBoxConfig = {
 
 const DefaultType: Record<string, string> = {
   activeDescendant: '(string|element|null)',
+  allowList: 'object',
   disabled: 'boolean',
+  html: 'boolean',
   indicator: 'string',
+  items: 'array',
+  loading: 'boolean',
+  sanitize: 'boolean',
+  sanitizeFn: '(null|function)',
   selected: '(string|array|null)',
   selectionLimit: '(null|number)',
   selectionMode: 'string',
@@ -110,6 +151,7 @@ class ListBox extends BaseComponent {
   protected declare _active: string | null
   protected declare _anchor: string | null
   protected declare _field: HTMLElement | null
+  protected declare _items: ListBoxEntry[] | null
   protected declare _limited: string | null
   protected declare _list: HTMLElement
   protected declare _search: string
@@ -123,13 +165,15 @@ class ListBox extends BaseComponent {
     this._active = null
     this._anchor = null
     this._field = getElement(this._config.activeDescendant)
+    this._items = this._config.items.length > 0 ? this._normalizeItems(this._config.items) : null
     this._limited = null
-    this._list = SelectorEngine.findOne(SELECTOR_OPTIONS, this._element) ?? this._element
+    this._list = this._resolveList()
     this._search = ''
     this._searchTimeout = null
     this._selectAll = SelectorEngine.findOne(SELECTOR_SELECT_ALL, this._element) as HTMLButtonElement | null
     this._selected = new Set(this._initialSelection())
 
+    this._render()
     this._addEventListeners()
     this.update()
   }
@@ -212,6 +256,35 @@ class ListBox extends BaseComponent {
     return [...this._selected]
   }
 
+  setItems(items: ListBoxEntry[]): void {
+    const previous = this.getSelected()
+
+    this._items = this._normalizeItems(items)
+    this._render()
+
+    const values = new Set(this._flatItems().map(item => item.value))
+    const kept = previous.filter(value => values.has(value))
+    const marked = this._flatItems().filter(item => item.selected).map(item => item.value)
+    const next = [...new Set([...kept, ...marked])]
+
+    this._anchor = null
+    this._selected = new Set(this._selectionFor(next))
+    this.update()
+
+    if (previous.length !== this._selected.size || previous.some(value => !this._selected.has(value))) {
+      this._triggerChange()
+    }
+  }
+
+  getItems(): ListBoxEntry[] {
+    return this._items ?? []
+  }
+
+  setLoading(loading: boolean): void {
+    this._config.loading = loading
+    this.update()
+  }
+
   setActive(value: string | null): void {
     this._setActive(value, false)
   }
@@ -253,6 +326,14 @@ class ListBox extends BaseComponent {
       this._list.setAttribute('aria-disabled', 'true')
     } else {
       this._list.removeAttribute('aria-disabled')
+    }
+
+    this._element.classList.toggle(CLASS_NAME_LOADING, this._config.loading)
+
+    if (this._config.loading) {
+      this._list.setAttribute('aria-busy', 'true')
+    } else {
+      this._list.removeAttribute('aria-busy')
     }
 
     for (const section of SelectorEngine.find(SELECTOR_SECTION, this._list)) {
@@ -298,7 +379,7 @@ class ListBox extends BaseComponent {
 
     const empty = SelectorEngine.findOne(SELECTOR_EMPTY, this._list)
     if (empty) {
-      empty.toggleAttribute('hidden', navigable.length > 0)
+      empty.toggleAttribute('hidden', this._config.loading || navigable.length > 0)
     }
 
     this._updateSelectAll()
@@ -311,6 +392,7 @@ class ListBox extends BaseComponent {
     }
 
     this._element.removeAttribute(ATTRIBUTE_INDICATOR)
+    this._element.classList.remove(CLASS_NAME_LOADING)
 
     EventHandler.off(this._list, EVENT_KEY)
 
@@ -325,14 +407,144 @@ class ListBox extends BaseComponent {
 
   // Private
   _initialSelection(): string[] {
-    const { selected, selectionMode } = this._config
+    const { selected } = this._config
+    const configured = selected === null ? [] : (Array.isArray(selected) ? selected : [selected])
+    const marked = this._flatItems().filter(item => item.selected).map(item => item.value)
 
-    if (selectionMode === SELECTION_MODE_NONE || selected === null) {
+    return this._selectionFor([...new Set([...configured, ...marked])])
+  }
+
+  _selectionFor(values: string[]): string[] {
+    const { selectionMode } = this._config
+
+    if (selectionMode === SELECTION_MODE_NONE) {
       return []
     }
 
-    const values = Array.isArray(selected) ? selected : [selected]
     return selectionMode === SELECTION_MODE_SINGLE ? values.slice(0, 1) : values
+  }
+
+  _normalizeItems(items: ListBoxEntry[]): ListBoxEntry[] {
+    return (Array.isArray(items) ? items : [])
+      .filter(entry => entry !== null && typeof entry === 'object')
+      .map(entry => (Array.isArray((entry as ListBoxGroup).items) ? this._normalizeGroup(entry as ListBoxGroup) : this._normalizeItem(entry as ListBoxItem)))
+  }
+
+  _normalizeGroup(group: ListBoxGroup): ListBoxGroup {
+    return {
+      label: String(group.label ?? ''),
+      items: group.items.filter(item => item !== null && typeof item === 'object').map(item => this._normalizeItem(item))
+    }
+  }
+
+  _normalizeItem(item: ListBoxItem): ListBoxItem {
+    const value = String(item.value ?? item.label ?? '')
+    const normalized: ListBoxItem = { value, label: String(item.label ?? value) }
+
+    if (item.description !== undefined) {
+      normalized.description = String(item.description)
+    }
+
+    if (item.disabled) {
+      normalized.disabled = true
+    }
+
+    if (item.selected) {
+      normalized.selected = true
+    }
+
+    return normalized
+  }
+
+  _flatItems(): ListBoxItem[] {
+    return (this._items ?? []).flatMap(entry => (Array.isArray((entry as ListBoxGroup).items) ? (entry as ListBoxGroup).items : [entry as ListBoxItem]))
+  }
+
+  _resolveList(): HTMLElement {
+    const list = SelectorEngine.findOne(SELECTOR_OPTIONS, this._element) as HTMLElement | null
+
+    if (list) {
+      return list
+    }
+
+    if (this._items === null) {
+      return this._element
+    }
+
+    const created = document.createElement('div')
+    created.classList.add(CLASS_NAME_OPTIONS)
+    this._element.append(created)
+
+    return created
+  }
+
+  _render(): void {
+    if (this._items === null) {
+      return
+    }
+
+    const empty = SelectorEngine.findOne(SELECTOR_EMPTY, this._list)
+
+    this._list.replaceChildren(...this._items.map(entry => (Array.isArray((entry as ListBoxGroup).items) ? this._renderSection(entry as ListBoxGroup) : this._renderOption(entry as ListBoxItem))))
+
+    if (empty) {
+      this._list.append(empty)
+    }
+  }
+
+  _renderSection(group: ListBoxGroup): HTMLElement {
+    const section = document.createElement('div')
+    const label = document.createElement('div')
+
+    label.classList.add(CLASS_NAME_SECTION_LABEL)
+    label.id = getUID(`${NAME}-section-`)
+    this._setContent(label, group.label)
+
+    section.classList.add(CLASS_NAME_SECTION)
+    section.setAttribute('role', 'group')
+    section.setAttribute('aria-labelledby', label.id)
+    section.append(label, ...group.items.map(item => this._renderOption(item)))
+
+    return section
+  }
+
+  _renderOption(item: ListBoxItem): HTMLElement {
+    const option = document.createElement('div')
+
+    option.classList.add(CLASS_NAME_OPTION)
+    option.dataset.coreuiValue = item.value
+
+    if (item.disabled) {
+      option.classList.add(CLASS_NAME_DISABLED)
+      option.setAttribute('aria-disabled', 'true')
+    }
+
+    if (item.description === undefined) {
+      this._setContent(option, item.label ?? item.value)
+      return option
+    }
+
+    const label = document.createElement('span')
+    const description = document.createElement('span')
+
+    label.classList.add(CLASS_NAME_OPTION_LABEL)
+    this._setContent(label, item.label ?? item.value)
+
+    description.classList.add(CLASS_NAME_OPTION_DESCRIPTION)
+    this._setContent(description, item.description)
+
+    option.append(label, description)
+
+    return option
+  }
+
+  _setContent(target: HTMLElement, content: string): void {
+    if (this._config.html) {
+      target.innerHTML = this._config.sanitize ? sanitizeHtml(content, this._config.allowList, this._config.sanitizeFn) : content
+      return
+    }
+
+    target.textContent = content
   }
 
   _allOptions(): HTMLElement[] {
@@ -814,4 +1026,9 @@ EventHandler.on(document, `DOMContentLoaded${EVENT_KEY}${DATA_API_KEY}`, () => {
 defineJQueryPlugin(ListBox)
 
 export default ListBox
-export type { ListBoxConfig }
+export type {
+  ListBoxConfig,
+  ListBoxEntry,
+  ListBoxGroup,
+  ListBoxItem
+}

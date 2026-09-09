@@ -7,6 +7,8 @@ otherFrameworks:
 ---
 
 import listBoxInput from './snippets/list-box-input.js?raw'
+import listBoxItems from './snippets/list-box-items.js?raw'
+import listBoxRemote from './snippets/list-box-remote.js?raw'
 
 ## Overview
 
@@ -108,6 +110,37 @@ A `.list-box-select-all` button marked `data-coreui-select-all`, anywhere in the
   </div>`} />
 
 With a limit, the select-all button counts as pressed at `min(limit, visible enabled options)` — `mixed` below it — and clicking it there clears the selection.
+
+## Items from configuration
+
+Instead of writing every option by hand, hand the plugin an `items` array and it renders the list — the same markup the sections above document, so every class, role and attribute is where you would have put it. An item is `{ value, label, description, disabled, selected }`; an entry with its own `items` array is a section, and its `label` becomes the `.list-box-section-label` the group is named by.
+
+Labels are text: they land as `textContent`, so a label carrying markup shows up as characters. Set `html: true` to have them parsed instead — the result runs through the sanitizer first, and `sanitize`, `sanitizeFn` and `allowList` steer it the same way they do everywhere else.
+
+Leave an empty `.list-box-options` in the markup so you can name it; the plugin appends one when it is missing, but then the list has no accessible name. Options already written inside it are replaced — `items` owns the list from the moment it is set.
+
+<Example code={`<div class="list-box" id="listBoxItems" style="max-width: 20rem">
+    <div class="list-box-options" role="listbox" aria-label="Sandwich"></div>
+  </div>`} sandboxJs={listBoxItems} />
+
+<Code code={listBoxItems} lang="js" />
+
+## Remote data
+
+`setItems(items)` rebuilds the list at any time and keeps the selection for every value that survived the rebuild — a value that is gone drops out and `change.coreui.list-box` fires once, with the selection that is left. `getItems()` hands back the normalized array. Nothing changed means no event, so re-fetching the same page costs the user nothing.
+
+`loading` covers the wait: it writes `aria-busy="true"` on the options element, puts `.loading` on the container — which dims the options and stops them responding — and holds the empty state back, so "No results" never flashes before the answer arrives. `setLoading(value)` turns it on and off around the request.
+
+<Example code={`<div class="list-box" id="listBoxRemote" style="max-width: 22rem">
+    <div class="list-box-header">
+      <button type="button" class="btn btn-sm btn-ghost" id="listBoxReload">Reload</button>
+    </div>
+    <div class="list-box-options" role="listbox" aria-label="Users" style="max-height: 14rem; overflow-y: auto">
+      <div class="list-box-empty">No users</div>
+    </div>
+  </div>`} sandboxJs={listBoxRemote} />
+
+<Code code={listBoxRemote} lang="js" />
 
 ## Checkboxes
 
@@ -268,6 +301,7 @@ Add `data-coreui-toggle="list-box"` to a `.list-box` and the plugin initializes 
 | `data-coreui-value` | The value of an option. Defaults to the option's text. |
 | `data-coreui-select-all` | Marks a button anywhere in the container as the switch for the whole list. |
 | `data-coreui-indicator="checkbox"` | Renders the checkbox indicator in front of every option. |
+| `data-coreui-loading="true"` | Marks the list as loading: `aria-busy` on the options element, `.loading` on the container, empty state held back. |
 
 ```html
 <div class="list-box" data-coreui-toggle="list-box" data-coreui-selection-mode="multiple">
@@ -295,8 +329,14 @@ const listBox = new coreui.ListBox('#myListBox', {
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
 | `activeDescendant` | null, string, element | `null` | Field that keeps the focus. The plugin drops the roving `tabindex`, gives the options ids, and writes `aria-activedescendant` and `aria-controls` on the field. The keyboard is handled on the field. |
+| `allowList` | object | [Default value](/getting-started/javascript/#sanitizer) | Object which contains allowed attributes and tags for the labels rendered from `items`. |
 | `disabled` | boolean | `false` | Turns the whole list box off: `aria-disabled` on `.list-box-options` and the select-all button disabled. |
+| `html` | boolean | `false` | Parses the labels rendered from `items` as HTML instead of inserting them as text. |
 | `indicator` | string | `'none'` | `'checkbox'` puts a decorative checkbox in front of every option and marks the container with `data-coreui-indicator="checkbox"`, which is what lays the options out in two columns. |
+| `items` | array | `[]` | The options to render: `{ value, label, description, disabled, selected }`, or `{ label, items }` for a section. Replaces whatever `.list-box-options` already holds. |
+| `loading` | boolean | `false` | Marks the list as loading: `aria-busy` on the options element, `.loading` on the container, empty state held back. |
+| `sanitize` | boolean | `true` | Enables the sanitization of the labels rendered from `items` with `html`. |
+| `sanitizeFn` | null, function | `null` | Sanitization function of your own, used instead of the built-in one. |
 | `selected` | null, string, array | `null` | Initially selected values. In `single` mode only the first one is taken. |
 | `selectionLimit` | null, number | `null` | How many options can be selected at once in `multiple` mode. Further selections are refused and reported through `selectionLimit.coreui.list-box`; nothing is disabled and deselecting always works. |
 | `selectionMode` | string | `'single'` | `'none'`, `'single'` or `'multiple'`. |
@@ -316,6 +356,9 @@ const listBox = new coreui.ListBox('#myListBox', {
 | `getActive()` | The highlighted value, or `null`. |
 | `next` / `prev` | Moves the highlight one option down/up. |
 | `first` / `last` | Moves the highlight to the first/last option. |
+| `setItems(items)` | Rebuilds the list from an `items` array. Values that are still there keep their selection, the rest drop out, and `change` fires only when the selection actually changed. |
+| `getItems()` | The normalized `items` array. |
+| `setLoading(loading)` | Turns the loading state on or off. |
 | `update` | Re-reads the DOM: new options get their roles and ids, an option that is now `hidden` or gone leaves the navigation, the empty state and the select-all button are re-evaluated. The selection survives all of it. |
 | `dispose` | Destroys the list box and releases the field. |
 | `getInstance` | Static method which allows you to get the list box instance associated to a DOM element, you can use it like this: `coreui.ListBox.getInstance(element)`. |
