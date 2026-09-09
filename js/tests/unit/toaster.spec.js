@@ -107,17 +107,22 @@ describe('Toaster', () => {
       expect(fixtureEl.querySelector('.btn-close')).toBeNull()
     })
 
-    it('should announce by priority', () => {
+    it('should announce the title and description through a live region by priority', async () => {
       toaster = new Toaster(null, { container: fixtureEl })
+      const status = fixtureEl.querySelector('.toast-announcer[role="status"]')
+      const alert = fixtureEl.querySelector('.toast-announcer[role="alert"]')
+      expect(status.getAttribute('aria-live')).toEqual('polite')
+      expect(alert.getAttribute('aria-live')).toEqual('assertive')
 
-      toaster.add({ description: 'polite', instant: true })
-      toaster.add({ description: 'urgent', priority: 'high', instant: true })
+      toaster.add({ title: 'Saved', description: 'Done', instant: true })
+      toaster.add({ description: 'Failed', priority: 'high', instant: true })
+      await new Promise(resolve => {
+        requestAnimationFrame(() => requestAnimationFrame(resolve))
+      })
 
-      const [urgent, polite] = fixtureEl.querySelectorAll('.toast')
-      expect(polite.getAttribute('role')).toEqual('status')
-      expect(polite.getAttribute('aria-live')).toEqual('polite')
-      expect(urgent.getAttribute('role')).toEqual('alert')
-      expect(urgent.getAttribute('aria-live')).toEqual('assertive')
+      expect(status.textContent).toEqual('Saved. Done')
+      expect(alert.textContent).toEqual('Failed')
+      expect(fixtureEl.querySelector('.toast').hasAttribute('role')).toBeFalse()
     })
 
     it('should add the theme, translucent and custom classes', () => {
@@ -138,13 +143,13 @@ describe('Toaster', () => {
       toaster = new Toaster(null, { container: fixtureEl })
       toaster.add({ description: 'first', instant: true })
       toaster.add({ description: 'second', instant: true })
-      expect(toaster._element.firstElementChild.textContent.trim()).toEqual('second')
+      expect(toaster._element.querySelector('.toast').textContent.trim()).toEqual('second')
       toaster.dispose()
 
       toaster = new Toaster(null, { container: fixtureEl, placement: 'bottom-end' })
       toaster.add({ description: 'first', instant: true })
       toaster.add({ description: 'second', instant: true })
-      expect(toaster._element.lastElementChild.textContent.trim()).toEqual('second')
+      expect([...toaster._element.querySelectorAll('.toast')].at(-1).textContent.trim()).toEqual('second')
     })
 
     it('should fire add.coreui.toaster with the id', () => {
@@ -390,8 +395,9 @@ describe('Toaster', () => {
       toaster.add({ description: 'first', instant: true })
       toaster.add({ description: 'second', instant: true })
 
-      expect(toaster._element.lastElementChild.getAttribute('data-coreui-stack-index')).toEqual('0')
-      expect(toaster._element.firstElementChild.getAttribute('data-coreui-stack-index')).toEqual('1')
+      const toasts = toaster._element.querySelectorAll('.toast')
+      expect(toasts[1].getAttribute('data-coreui-stack-index')).toEqual('0')
+      expect(toasts[0].getAttribute('data-coreui-stack-index')).toEqual('1')
     })
 
     it('should leave limited toasts out of the stack', () => {
@@ -426,7 +432,7 @@ describe('Toaster', () => {
       const entry = toaster._entries.get(id)
 
       toaster._element.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
-      toaster._element.firstElementChild.dispatchEvent(new MouseEvent('mouseout', { bubbles: true, relatedTarget: toaster._element.lastElementChild }))
+      toaster._element.querySelector('.toast').dispatchEvent(new MouseEvent('mouseout', { bubbles: true, relatedTarget: [...toaster._element.querySelectorAll('.toast')].at(-1) }))
 
       expect(entry.instance._timeout).toBeNull()
     })

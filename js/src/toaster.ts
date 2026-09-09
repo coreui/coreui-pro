@@ -34,6 +34,7 @@ const EVENT_HIDDEN_TOAST = 'hidden.coreui.toast'
 
 const CLASS_NAME_CONTAINER = 'toast-container'
 const CLASS_NAME_STACK = 'toast-container-stack'
+const CLASS_NAME_ANNOUNCER = 'toast-announcer'
 const CLASS_NAME_INSTANT = 'toast-instant'
 const CLASS_NAME_SHOW = 'show'
 const CLASS_NAME_TRANSLUCENT = 'toast-translucent'
@@ -72,7 +73,7 @@ const PLACEMENTS = new Set([
 ])
 
 const TEMPLATE = [
-  '<div class="toast" aria-atomic="true">',
+  '<div class="toast">',
   '  <div class="toast-header">',
   '    <strong class="toast-title"></strong>',
   '    <button type="button" class="btn-close" data-coreui-dismiss="toast" aria-label="Close"></button>',
@@ -210,6 +211,7 @@ class Toaster extends BaseComponent {
   protected declare _entries: Map<string, Entry>
   protected declare _ownsContainer: boolean
   protected declare _resizeObserver: ResizeObserver | null
+  protected declare _announcers: Record<'high' | 'low', HTMLElement>
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     const ownsContainer = !getElement(element)
@@ -229,6 +231,10 @@ class Toaster extends BaseComponent {
 
     this._element.setAttribute('role', 'region')
     this._element.setAttribute('aria-label', this._config.label)
+    this._announcers = {
+      high: this._createAnnouncer('alert', 'assertive'),
+      low: this._createAnnouncer('status', 'polite')
+    }
 
     if (this._config.pauseOnHover) {
       EventHandler.on(this._element, EVENT_MOUSEOVER, () => this.pause())
@@ -303,6 +309,7 @@ class Toaster extends BaseComponent {
     instance.show()
     this._settle(layout)
     this._applyLimit()
+    this._announce(toast)
 
     if (this._config.restartOnAdd) {
       for (const other of this._entries.values()) {
@@ -345,9 +352,7 @@ class Toaster extends BaseComponent {
     previous.element.classList.toggle(CLASS_NAME_SHOW, shown)
     previous.element.replaceChildren(...rendered.children)
 
-    for (const name of ['role', 'aria-live', ATTRIBUTE_UPDATE_KEY]) {
-      previous.element.setAttribute(name, rendered.getAttribute(name)!)
-    }
+    previous.element.setAttribute(ATTRIBUTE_UPDATE_KEY, rendered.getAttribute(ATTRIBUTE_UPDATE_KEY)!)
 
     if (next.timeout !== previous.timeout) {
       const timeout = next.timeout ?? this._config.timeout
@@ -360,6 +365,7 @@ class Toaster extends BaseComponent {
 
     entry.toast = next
     this._layoutStack()
+    this._announce(next)
   }
 
   close(id?: string): void {
@@ -407,6 +413,8 @@ class Toaster extends BaseComponent {
 
     this._entries.clear()
     this._resizeObserver?.disconnect()
+    this._announcers.high.remove()
+    this._announcers.low.remove()
 
     if (this._ownsContainer) {
       this._element.remove()
@@ -455,8 +463,6 @@ class Toaster extends BaseComponent {
       element.classList.add(...toast.class.split(' '))
     }
 
-    element.setAttribute('role', toast.priority === 'high' ? 'alert' : 'status')
-    element.setAttribute('aria-live', toast.priority === 'high' ? 'assertive' : 'polite')
     element.setAttribute(ATTRIBUTE_UPDATE_KEY, String(toast.updateKey))
 
     return element
@@ -577,6 +583,30 @@ class Toaster extends BaseComponent {
     this._element.style.setProperty(PROPERTY_STACK_HEIGHTS, `${before}px`)
   }
 
+  _createAnnouncer(role: string, live: string): HTMLElement {
+    const announcer = document.createElement('div')
+    announcer.className = CLASS_NAME_ANNOUNCER
+    announcer.setAttribute('role', role)
+    announcer.setAttribute('aria-live', live)
+    announcer.setAttribute('aria-atomic', 'true')
+    this._element.append(announcer)
+    return announcer
+  }
+
+  _announce(toast: ToastObject): void {
+    const announcer = this._announcers[toast.priority === 'high' ? 'high' : 'low']
+    const text = [toast.title, toast.description]
+      .map(part => execute(part, [undefined, this]) as string | Element | null | undefined)
+      .map(part => (isElement(part) ? part.textContent : part))
+      .filter(Boolean)
+      .join('. ')
+
+    announcer.textContent = ''
+    requestAnimationFrame(() => {
+      announcer.textContent = text
+    })
+  }
+
   _onLeave(event: any): void {
     const next = event.relatedTarget
     if (next && this._element.contains(next)) {
@@ -597,7 +627,7 @@ class Toaster extends BaseComponent {
     }
 
     const layout = new Map<Element, number>()
-    for (const child of this._element.children) {
+    for (const child of this._element.querySelectorAll(':scope > .toast')) {
       if (child.getClientRects().length > 0) {
         layout.set(child, child.getBoundingClientRect().top)
       }
@@ -612,7 +642,7 @@ class Toaster extends BaseComponent {
       return () => {}
     }
 
-    const siblings = [...this._element.children].filter(child => child !== element && child.getClientRects().length > 0)
+    const siblings = [...this._element.querySelectorAll(':scope > .toast')].filter(child => child !== element && child.getClientRects().length > 0)
     const before = siblings.map(child => child.getBoundingClientRect().top)
     const { transition } = element.style
     element.style.transition = 'none'
@@ -645,7 +675,7 @@ class Toaster extends BaseComponent {
       return
     }
 
-    for (const child of this._element.children) {
+    for (const child of this._element.querySelectorAll(':scope > .toast')) {
       const previous = layout.get(child)
       if (previous === undefined) {
         continue

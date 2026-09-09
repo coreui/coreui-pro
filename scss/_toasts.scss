@@ -3,6 +3,7 @@
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
 @use "mixins/translucent" as *;
+@use "mixins/visually-hidden" as *;
 @use "config" as *;
 
 // stylelint-disable custom-property-no-missing-var-function
@@ -206,6 +207,10 @@ $toast-tokens: defaults(
     margin-inline: auto;
   }
   // scss-docs-end toast-container-placements
+
+  .toast-announcer {
+    @include visually-hidden();
+  }
 
   // scss-docs-start toast-stack
   .toast-container-stack {
