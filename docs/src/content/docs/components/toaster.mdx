@@ -100,7 +100,7 @@ Passing an `id` that already exists updates that toast instead of adding a secon
 
 ### Stacking
 
-With `stack: true` the toasts sit on top of each other: the newest in front at full size, the two behind it scaled down by `--cui-toast-stack-scale` per step and receding towards a vanishing depth, anything further back hidden. The first toast behind peeks out by `--cui-toast-stack-peek` and every further one by that strip times the scale ratio, so the corners of the stack line up like a deck of cards seen in perspective. Only the front toast's timer runs; the ones behind wait their turn and start counting when they reach the front, so the stack empties from the front. Hovering or focusing the container spreads the stack into a list; leaving it folds the stack back. The stack takes the place of the flow layout, so `limit` still decides how many toasts exist, and the stack decides how many of them show — three by default (`--cui-toast-stack-visible`).
+With `stack: true` the toasts sit on top of each other: the newest in front at full size, the ones behind it scaled down by `--cui-toast-stack-scale` per step and receding towards a vanishing depth. The first toast behind peeks out by `--cui-toast-stack-peek` and every further one by that strip times the scale ratio, so the corners of the stack line up like a deck of cards seen in perspective. Only the front toast's timer runs; the ones behind wait their turn and start counting when they reach the front, so the stack empties from the front. Hovering or focusing the container spreads the stack into a list; leaving it folds the stack back. The stack takes the place of the flow layout; `limit` decides how many toasts it holds, three by default.
 
 <Example code={`<div class="hstack gap-2 mb-3">
     <button type="button" class="btn-solid theme-primary" id="toasterStackBtn">Add a toast</button>
@@ -110,7 +110,7 @@ With `stack: true` the toasts sit on top of each other: the newest in front at f
 
 <Code code={toasterStack} lang="js" />
 
-The toaster keeps the geometry in tokens the CSS reads: `--cui-toast-stack-index`, `--cui-toast-stack-before` (the height of the toasts in front) and `--cui-toast-height` on each toast, `--cui-toast-stack-count`, `--cui-toast-stack-front-height` and `--cui-toast-stack-heights` on the container. Style the stack by these — the `data-coreui-stack-index` and `data-coreui-stack-hidden` attributes mark a toast's place in it.
+The toaster keeps the geometry in tokens the CSS reads: `--cui-toast-stack-index`, `--cui-toast-stack-before` (the height of the toasts in front) and `--cui-toast-height` on each toast, `--cui-toast-stack-count`, `--cui-toast-stack-front-height` and `--cui-toast-stack-heights` on the container. Style the stack by these — the `data-coreui-stack-index` attribute marks a toast's place in it.
 
 A stack works in every placement: it grows away from the edge it is pinned to, so at the bottom the newest toast is the lowest one and the stack peeks upward.
 
@@ -252,7 +252,7 @@ The toaster renders regular toasts, so their tokens apply — see the [toast CSS
 
 <ScssDocs file="scss/_toasts.scss" capture="toast-container-css-vars" />
 
-The stack's peek, scale step and visible count are tokens on `.toast-container-stack`:
+The stack's peek and scale step are tokens on `.toast-container-stack`:
 
 <ScssDocs file="scss/_toasts.scss" capture="toast-stack" />
 

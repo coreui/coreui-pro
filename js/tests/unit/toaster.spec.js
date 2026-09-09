@@ -399,7 +399,7 @@ describe('Toaster', () => {
   })
 
   describe('stack', () => {
-    it('should index the toasts from the newest and hide those behind the third', () => {
+    it('should index the toasts from the newest', () => {
       toaster = new Toaster(null, { container: fixtureEl, stack: true, limit: 0 })
       const ids = ['one', 'two', 'three', 'four'].map(description => toaster.add({ description, instant: true }))
       const byId = id => fixtureEl.querySelector(`[data-coreui-toast-id="${id}"]`)
@@ -407,8 +407,6 @@ describe('Toaster', () => {
       expect(toaster._element).toHaveClass('toast-container-stack')
       expect(byId(ids[3]).getAttribute('data-coreui-stack-index')).toEqual('0')
       expect(byId(ids[0]).getAttribute('data-coreui-stack-index')).toEqual('3')
-      expect(byId(ids[0]).hasAttribute('data-coreui-stack-hidden')).toBeTrue()
-      expect(byId(ids[1]).hasAttribute('data-coreui-stack-hidden')).toBeFalse()
       expect(byId(ids[3]).style.getPropertyValue('--cui-toast-stack-before')).toEqual('0px')
       expect(Number.parseFloat(byId(ids[2]).style.getPropertyValue('--cui-toast-stack-before'))).toBeGreaterThan(0)
       expect(toaster._element.style.getPropertyValue('--cui-toast-stack-count')).toEqual('4')

@@ -218,12 +218,11 @@ $toast-tokens: defaults(
   .toast-container-stack {
     --#{$prefix}toast-stack-peek: .75rem;
     --#{$prefix}toast-stack-scale: .1;
-    --#{$prefix}toast-stack-visible: 3;
     // Every toast behind is scaled by the same ratio again and pushed towards a vanishing depth,
     // so the corners of the stack line up and each strip is the previous one times the ratio
     --#{$prefix}toast-stack-ratio: calc(1 - var(--#{$prefix}toast-stack-scale));
     --#{$prefix}toast-stack-depth: calc(var(--#{$prefix}toast-stack-front-height) + var(--#{$prefix}toast-stack-peek) / var(--#{$prefix}toast-stack-scale));
-    --#{$prefix}toast-stack-last: calc(min(var(--#{$prefix}toast-stack-count), var(--#{$prefix}toast-stack-visible)) - 1);
+    --#{$prefix}toast-stack-last: calc(var(--#{$prefix}toast-stack-count) - 1);
 
     width: var(--#{$prefix}toast-max-width);
     max-width: 100%;
@@ -235,7 +234,7 @@ $toast-tokens: defaults(
       position: absolute;
       inset-block-start: calc(var(--#{$prefix}toast-stack-depth) * (1 - pow(var(--#{$prefix}toast-stack-ratio), var(--#{$prefix}toast-stack-index))));
       inset-inline: 0;
-      z-index: calc(var(--#{$prefix}toast-stack-visible) - var(--#{$prefix}toast-stack-index));
+      z-index: calc(var(--#{$prefix}toast-stack-count) - var(--#{$prefix}toast-stack-index));
       height: var(--#{$prefix}toast-stack-front-height);
       margin-block-end: 0;
       overflow: hidden;
@@ -257,11 +256,6 @@ $toast-tokens: defaults(
       opacity: 0;
     }
 
-    > .toast[data-coreui-stack-hidden] {
-      pointer-events: none;
-      opacity: 0;
-    }
-
     &:is(:hover, :focus-within) {
       height: calc(var(--#{$prefix}toast-stack-heights) + (var(--#{$prefix}toast-stack-count) - 1) * var(--#{$prefix}toast-spacing));
 
@@ -273,11 +267,6 @@ $toast-tokens: defaults(
         > * {
           opacity: 1;
         }
-      }
-
-      > .toast[data-coreui-stack-hidden]:not([data-coreui-limited]) {
-        pointer-events: auto;
-        opacity: 1;
       }
     }
   }
