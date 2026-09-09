@@ -14,6 +14,7 @@ import toasterAction from './snippets/toaster-action.js?raw'
 import toasterLimit from './snippets/toaster-limit.js?raw'
 import toasterStack from './snippets/toaster-stack.js?raw'
 import toasterPlacement from './snippets/toaster-placement.js?raw'
+import toasterPlacementStack from './snippets/toaster-placement-stack.js?raw'
 
 ## Overview
 
@@ -109,6 +110,22 @@ With `stack: true` the toasts sit on top of each other: the newest in front at f
 <Code code={toasterStack} lang="js" />
 
 The toaster keeps the geometry in tokens the CSS reads: `--cui-toast-stack-index`, `--cui-toast-stack-before` (the height of the toasts in front) and `--cui-toast-height` on each toast, `--cui-toast-stack-count`, `--cui-toast-stack-front-height` and `--cui-toast-stack-heights` on the container. Style the stack by these — the `data-coreui-stack-index` and `data-coreui-stack-hidden` attributes mark a toast's place in it.
+
+A stack works in every placement: it grows away from the edge it is pinned to, so at the bottom the newest toast is the lowest one and the stack peeks upward.
+
+<Example code={`<div class="d-grid gap-2" style="grid-template-columns: repeat(3, 1fr); max-width: 30rem" id="toasterPlacementStack">
+    <button type="button" class="btn-outline theme-secondary" data-placement="top-start">Top start</button>
+    <button type="button" class="btn-outline theme-secondary" data-placement="top-center">Top center</button>
+    <button type="button" class="btn-outline theme-secondary" data-placement="top-end">Top end</button>
+    <button type="button" class="btn-outline theme-secondary" data-placement="middle-start">Middle start</button>
+    <button type="button" class="btn-outline theme-secondary" data-placement="middle-center">Middle center</button>
+    <button type="button" class="btn-outline theme-secondary" data-placement="middle-end">Middle end</button>
+    <button type="button" class="btn-outline theme-secondary" data-placement="bottom-start">Bottom start</button>
+    <button type="button" class="btn-outline theme-secondary" data-placement="bottom-center">Bottom center</button>
+    <button type="button" class="btn-outline theme-secondary" data-placement="bottom-end">Bottom end</button>
+  </div>`} sandboxJs={toasterPlacementStack} />
+
+<Code code={toasterPlacementStack} lang="js" />
 
 ### Motion
 
