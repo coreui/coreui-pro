@@ -216,6 +216,7 @@ type PromiseOptions<Value> = {
 
 type Entry = {
   instance: Toast
+  leaving: boolean
   toast: ToastObject
 }
 
@@ -324,11 +325,13 @@ class Toaster extends BaseComponent {
 
     const timeout = toast.timeout ?? this._config.timeout
     const instance = new Toast(toast.element, { autohide: timeout > 0, delay: timeout })
-    const entry: Entry = { instance, toast }
+    const entry: Entry = { instance, leaving: false, toast }
     this._entries.set(toast.id, entry)
 
     EventHandler.one(toast.element, EVENT_HIDE_TOAST, () => {
+      entry.leaving = true
       this._collapse(toast.element)
+      this._layoutStack()
       execute(entry.toast.onClose, [undefined, entry.toast])
     })
     EventHandler.one(toast.element, EVENT_HIDDEN_TOAST, () => this._remove(entry))
@@ -594,7 +597,7 @@ class Toaster extends BaseComponent {
     }
 
     const entries = [...this._entries.values()]
-    const shown = entries.filter(entry => !entry.toast.limited).map(entry => entry.toast.element)
+    const shown = entries.filter(entry => !entry.toast.limited && !entry.leaving).map(entry => entry.toast.element)
     const ordered = shown.toReversed()
     let before = 0
 
