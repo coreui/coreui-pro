@@ -161,6 +161,28 @@ An option can carry a second line. Wrap the name in `.list-box-option-label` and
     </div>
   </div>`} />
 
+Descriptions and the checkbox indicator work together: the indicator stays centred against the whole option and both lines of the text start past it, so a two-line option keeps the same left column as the select-all button above.
+
+<Example code={`<div class="list-box" data-coreui-toggle="list-box" data-coreui-selection-mode="multiple" data-coreui-indicator="checkbox" style="max-width: 22rem">
+    <div class="list-box-header">
+      <button type="button" class="list-box-select-all" data-coreui-select-all>Select all</button>
+    </div>
+    <div class="list-box-options" role="listbox" aria-label="Plan">
+      <div class="list-box-option" data-coreui-value="free">
+        <span class="list-box-option-label">Free</span>
+        <span class="list-box-option-description">One project, community support</span>
+      </div>
+      <div class="list-box-option" data-coreui-value="team">
+        <span class="list-box-option-label">Team</span>
+        <span class="list-box-option-description">Unlimited projects, shared billing</span>
+      </div>
+      <div class="list-box-option" data-coreui-value="enterprise">
+        <span class="list-box-option-label">Enterprise</span>
+        <span class="list-box-option-description">SSO, audit log and a named contact</span>
+      </div>
+    </div>
+  </div>`} />
+
 ## Links
 
 An option that is an `<a>` with an `href` navigates on click and on <kbd>Enter</kbd>, and fires `action.coreui.list-box` on the way out — so a list of destinations keeps working with the keyboard without losing the browser's own link behavior.
