@@ -79,6 +79,7 @@ const groups = [
   { name: 'dropdown', modules: ['dropdown'] },
   { name: 'header', modules: ['header'] },
   { name: 'icon', modules: ['icon'] },
+  { name: 'list-box', modules: ['list-box'] },
   { name: 'list-group', modules: ['list-group'] },
   { name: 'menu', modules: ['menu'] },
   { name: 'modal', modules: ['modal'] },

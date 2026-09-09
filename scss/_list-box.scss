@@ -1,0 +1,174 @@
+@use "functions/defaults" as *;
+@use "mixins/border-radius" as *;
+@use "mixins/focus-ring" as *;
+@use "mixins/tokens" as *;
+@use "mixins/translucent" as *;
+@use "config" as *;
+
+// scss-docs-start list-box-variables
+$list-box-padding-y:                  .375rem !default;
+$list-box-padding-x:                  .375rem !default;
+$list-box-gap:                        .125rem !default;
+$list-box-color:                      var(--#{$prefix}fg-body) !default;
+$list-box-bg:                         var(--#{$prefix}bg-body) !default;
+$list-box-font-size:                  var(--#{$prefix}body-font-size) !default;
+$list-box-border-width:               var(--#{$prefix}border-width) !default;
+$list-box-border-color:               var(--#{$prefix}border-color) !default;
+$list-box-border-radius:              var(--#{$prefix}radius-7) !default;
+$list-box-focus-ring-color:           var(--#{$prefix}focus-ring-color) !default;
+
+$list-box-item-padding-y:             .5rem !default;
+$list-box-item-padding-x:             .75rem !default;
+$list-box-item-gap:                   .125rem !default;
+$list-box-item-border-radius:         var(--#{$prefix}radius-5) !default;
+$list-box-item-hover-color:           var(--#{$prefix}fg-body) !default;
+$list-box-item-hover-bg:              var(--#{$prefix}bg-1) !default;
+$list-box-item-active-color:          var(--#{$prefix}fg-body) !default;
+$list-box-item-active-bg:             var(--#{$prefix}bg-1) !default;
+$list-box-item-selected-color:        var(--#{$prefix}fg-body) !default;
+$list-box-item-selected-bg:           var(--#{$prefix}bg-2) !default;
+$list-box-item-disabled-color:        var(--#{$prefix}fg-3) !default;
+$list-box-item-description-color:     var(--#{$prefix}fg-3) !default;
+$list-box-item-description-font-size: calc(var(--#{$prefix}body-font-size) * .875) !default;
+
+$list-box-section-label-color:        var(--#{$prefix}fg-3) !default;
+$list-box-section-label-font-size:    80% !default;
+$list-box-section-label-padding:      .5rem .625rem !default;
+// scss-docs-end list-box-variables
+
+$list-box-tokens: () !default;
+
+// stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
+
+// scss-docs-start list-box-css-vars
+$list-box-tokens: defaults(
+  (
+    --#{$prefix}list-box-padding-y: #{$list-box-padding-y},
+    --#{$prefix}list-box-padding-x: #{$list-box-padding-x},
+    --#{$prefix}list-box-gap: #{$list-box-gap},
+    --#{$prefix}list-box-color: #{$list-box-color},
+    --#{$prefix}list-box-bg: #{$list-box-bg},
+    --#{$prefix}list-box-font-size: #{$list-box-font-size},
+    --#{$prefix}list-box-border-width: #{$list-box-border-width},
+    --#{$prefix}list-box-border-color: #{$list-box-border-color},
+    --#{$prefix}list-box-border-radius: #{$list-box-border-radius},
+    --#{$prefix}list-box-focus-ring-color: #{$list-box-focus-ring-color},
+    --#{$prefix}list-box-item-padding-y: #{$list-box-item-padding-y},
+    --#{$prefix}list-box-item-padding-x: #{$list-box-item-padding-x},
+    --#{$prefix}list-box-item-gap: #{$list-box-item-gap},
+    --#{$prefix}list-box-item-border-radius: #{$list-box-item-border-radius},
+    --#{$prefix}list-box-item-hover-color: #{$list-box-item-hover-color},
+    --#{$prefix}list-box-item-hover-bg: #{$list-box-item-hover-bg},
+    --#{$prefix}list-box-item-active-color: #{$list-box-item-active-color},
+    --#{$prefix}list-box-item-active-bg: #{$list-box-item-active-bg},
+    --#{$prefix}list-box-item-selected-color: #{$list-box-item-selected-color},
+    --#{$prefix}list-box-item-selected-bg: #{$list-box-item-selected-bg},
+    --#{$prefix}list-box-item-disabled-color: #{$list-box-item-disabled-color},
+    --#{$prefix}list-box-item-description-color: #{$list-box-item-description-color},
+    --#{$prefix}list-box-item-description-font-size: #{$list-box-item-description-font-size},
+    --#{$prefix}list-box-section-label-color: #{$list-box-section-label-color},
+    --#{$prefix}list-box-section-label-font-size: #{$list-box-section-label-font-size},
+    --#{$prefix}list-box-section-label-padding: #{$list-box-section-label-padding},
+  ),
+  $list-box-tokens
+);
+// scss-docs-end list-box-css-vars
+
+// stylelint-enable scss/dollar-variable-default, custom-property-no-missing-var-function
+
+@layer components {
+  .list-box {
+    @include tokens($list-box-tokens);
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--#{$prefix}list-box-gap);
+    padding: var(--#{$prefix}list-box-padding-y) var(--#{$prefix}list-box-padding-x);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    font-size: var(--#{$prefix}list-box-font-size);
+    color: var(--#{$prefix}list-box-color);
+    background-color: var(--#{$prefix}list-box-bg);
+    background-clip: padding-box;
+    border: var(--#{$prefix}list-box-border-width) solid var(--#{$prefix}list-box-border-color);
+    @include border-radius(var(--#{$prefix}list-box-border-radius));
+
+    &[aria-disabled="true"] {
+      color: var(--#{$prefix}list-box-item-disabled-color);
+      pointer-events: none;
+    }
+  }
+
+  .list-box-translucent {
+    --#{$prefix}list-box-item-hover-bg: color-mix(in oklch, var(--#{$prefix}bg-1) 85%, transparent);
+
+    @include translucent(var(--#{$prefix}list-box-bg));
+  }
+
+  .list-box-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--#{$prefix}list-box-gap);
+  }
+
+  .list-box-section-label {
+    padding: var(--#{$prefix}list-box-section-label-padding);
+    font-size: var(--#{$prefix}list-box-section-label-font-size);
+    font-weight: var(--#{$prefix}font-weight-bold);
+    color: var(--#{$prefix}list-box-section-label-color);
+    text-transform: uppercase;
+  }
+
+  .list-box-item {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: var(--#{$prefix}list-box-item-gap);
+    padding: var(--#{$prefix}list-box-item-padding-y) var(--#{$prefix}list-box-item-padding-x);
+    color: inherit;
+    text-align: start;
+    text-decoration: none;
+    cursor: pointer;
+    @include border-radius(var(--#{$prefix}list-box-item-border-radius), 0);
+
+    &:hover {
+      color: var(--#{$prefix}list-box-item-hover-color);
+      text-decoration: none;
+      background-color: var(--#{$prefix}list-box-item-hover-bg);
+    }
+
+    &.active {
+      color: var(--#{$prefix}list-box-item-active-color);
+      background-color: var(--#{$prefix}list-box-item-active-bg);
+    }
+
+    &.selected {
+      color: var(--#{$prefix}theme-fg-emphasis, var(--#{$prefix}list-box-item-selected-color));
+      background-color: var(--#{$prefix}theme-bg-subtle, var(--#{$prefix}list-box-item-selected-bg));
+    }
+
+    &.disabled,
+    &[aria-disabled="true"] {
+      color: var(--#{$prefix}list-box-item-disabled-color);
+      pointer-events: none;
+      background-color: transparent;
+    }
+
+    &:focus-visible {
+      z-index: 5;
+      @include focus-ring(true, var(--#{$prefix}list-box-focus-ring-color));
+    }
+  }
+
+  .list-box-item-description {
+    font-size: var(--#{$prefix}list-box-item-description-font-size);
+    font-weight: var(--#{$prefix}font-weight-normal);
+    color: var(--#{$prefix}list-box-item-description-color);
+  }
+
+  .list-box-empty {
+    padding: var(--#{$prefix}list-box-item-padding-y) var(--#{$prefix}list-box-item-padding-x);
+    color: var(--#{$prefix}list-box-item-disabled-color);
+  }
+}

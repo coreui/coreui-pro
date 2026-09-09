@@ -1,0 +1,258 @@
+---
+title: "Bootstrap 6 List Box"
+name: "List Box"
+description: "A keyboard-driven list of values built on the ARIA listbox pattern: single, multiple or no selection, sections, descriptions, links, an empty state and an aria-activedescendant mode that keeps the focus in your own input."
+otherFrameworks:
+  - list-box
+---
+
+import listBoxInput from './snippets/list-box-input.js?raw'
+
+## Overview
+
+<AddedIn version="6.0.0" />
+
+A list box presents a set of values and lets the user pick from them. The plugin owns the roles, the selection state and the keyboard: it writes `role="listbox"` and `role="option"`, keeps `aria-selected` in step with the selection, moves a roving `tabindex` as the highlight moves, and scrolls the highlighted option into view.
+
+<Example code={`<div class="list-box" role="listbox" data-coreui-toggle="list-box" aria-label="Sandwich" style="max-width: 20rem">
+    <div class="list-box-item" data-coreui-value="lettuce">Lettuce</div>
+    <div class="list-box-item" data-coreui-value="tomato">Tomato</div>
+    <div class="list-box-item" data-coreui-value="onion">Onion</div>
+    <div class="list-box-item" data-coreui-value="cheese">Cheese</div>
+  </div>`} />
+
+Every option carries its value in `data-coreui-value`; an option without one is worth its text. Values are what the methods take and what the events report, so an option can be hidden, moved or re-rendered without disturbing the selection.
+
+### When to use
+
+<div class="table-responsive">
+
+| Component | Use it for |
+| --- | --- |
+| List box | Choosing a value — the choice stays on screen and is reported back to you. |
+| [Menu](/components/menu/) | Running an action — the surface opens, something happens, it closes. |
+| [List group](/components/list-group/) | Displaying content — a list of things to read, not to pick from. |
+
+</div>
+
+A list box is also the primitive the picker components are built from, so its markup and classes carry over to them.
+
+## Selection
+
+`selectionMode` decides what a click and <kbd>Space</kbd> do. In `single` (the default) one option is selected at a time and picking another replaces it.
+
+<Example code={`<div class="list-box" role="listbox" data-coreui-toggle="list-box" data-coreui-selected="tomato" aria-label="Single" style="max-width: 20rem">
+    <div class="list-box-item" data-coreui-value="lettuce">Lettuce</div>
+    <div class="list-box-item" data-coreui-value="tomato">Tomato</div>
+    <div class="list-box-item" data-coreui-value="onion">Onion</div>
+  </div>`} />
+
+In `multiple` a click toggles one option, <kbd>Shift</kbd> extends the selection from the last one, <kbd>Ctrl</kbd> (<kbd>Cmd</kbd> on macOS) adds one without clearing the rest, and <kbd>Ctrl</kbd> + <kbd>A</kbd> takes everything. `aria-multiselectable` is written for you.
+
+<Example code={`<div class="list-box" role="listbox" data-coreui-toggle="list-box" data-coreui-selection-mode="multiple" aria-label="Multiple" style="max-width: 20rem">
+    <div class="list-box-item" data-coreui-value="lettuce">Lettuce</div>
+    <div class="list-box-item" data-coreui-value="tomato">Tomato</div>
+    <div class="list-box-item" data-coreui-value="onion">Onion</div>
+    <div class="list-box-item" data-coreui-value="cheese">Cheese</div>
+  </div>`} />
+
+An option marked with `data-coreui-select-all` is an ordinary option that switches the whole list: it selects everything, or clears it when everything is already selected, and its own `aria-selected` reports which of the two the next activation will do.
+
+<Example code={`<div class="list-box" role="listbox" data-coreui-toggle="list-box" data-coreui-selection-mode="multiple" aria-label="Toppings" style="max-width: 20rem">
+    <div class="list-box-item" data-coreui-select-all>Select all</div>
+    <div class="list-box-item" data-coreui-value="lettuce">Lettuce</div>
+    <div class="list-box-item" data-coreui-value="tomato">Tomato</div>
+    <div class="list-box-item" data-coreui-value="onion">Onion</div>
+  </div>`} />
+
+With `none` nothing is ever selected and no `aria-selected` is written; activating an option fires `action.coreui.list-box` instead, which turns the list into a keyboard-navigable list of commands.
+
+<Example code={`<div class="list-box" role="listbox" data-coreui-toggle="list-box" data-coreui-selection-mode="none" aria-label="Actions" style="max-width: 20rem">
+    <div class="list-box-item" data-coreui-value="copy">Copy</div>
+    <div class="list-box-item" data-coreui-value="rename">Rename</div>
+    <div class="list-box-item" data-coreui-value="delete">Delete</div>
+  </div>`} />
+
+## Sections
+
+Group options in a `.list-box-section` and name it with a `.list-box-section-label`. The plugin adds `role="group"`; point `aria-labelledby` at the label so the group is announced with its name.
+
+<Example code={`<div class="list-box" role="listbox" data-coreui-toggle="list-box" aria-label="Sandwich" style="max-width: 20rem">
+    <div class="list-box-section" aria-labelledby="listBoxVeggies">
+      <div class="list-box-section-label" id="listBoxVeggies">Veggies</div>
+      <div class="list-box-item" data-coreui-value="lettuce">Lettuce</div>
+      <div class="list-box-item" data-coreui-value="tomato">Tomato</div>
+    </div>
+    <div class="list-box-section" aria-labelledby="listBoxProtein">
+      <div class="list-box-section-label" id="listBoxProtein">Protein</div>
+      <div class="list-box-item" data-coreui-value="ham">Ham</div>
+      <div class="list-box-item" data-coreui-value="tuna">Tuna</div>
+    </div>
+  </div>`} />
+
+## Descriptions
+
+An option can carry a second line. Wrap the name in `.list-box-item-label` and the explanation in `.list-box-item-description` — typeahead then matches the label alone, so typing skips the description text.
+
+<Example code={`<div class="list-box" role="listbox" data-coreui-toggle="list-box" aria-label="Plan" style="max-width: 20rem">
+    <div class="list-box-item" data-coreui-value="free">
+      <span class="list-box-item-label">Free</span>
+      <span class="list-box-item-description">One project, community support</span>
+    </div>
+    <div class="list-box-item" data-coreui-value="team">
+      <span class="list-box-item-label">Team</span>
+      <span class="list-box-item-description">Unlimited projects, shared billing</span>
+    </div>
+  </div>`} />
+
+## Links
+
+An option that is an `<a>` with an `href` navigates on click and on <kbd>Enter</kbd>, and fires `action.coreui.list-box` on the way out — so a list of destinations keeps working with the keyboard without losing the browser's own link behavior.
+
+<Example code={`<div class="list-box" role="listbox" data-coreui-toggle="list-box" data-coreui-selection-mode="none" aria-label="Documentation" style="max-width: 20rem">
+    <a class="list-box-item" href="/components/menu/" data-coreui-value="menu">Menu</a>
+    <a class="list-box-item" href="/components/list-group/" data-coreui-value="list-group">List group</a>
+    <a class="list-box-item" href="/components/dropdowns/" data-coreui-value="dropdown">Dropdown</a>
+  </div>`} />
+
+## Disabled items
+
+`.disabled` (with `aria-disabled="true"` for assistive technology) takes an option out of the keyboard order and out of every selection method. `data-coreui-disabled="true"` on the list itself does the same for all of it and writes `aria-disabled` on the list.
+
+<Example code={`<div class="list-box" role="listbox" data-coreui-toggle="list-box" aria-label="Sandwich" style="max-width: 20rem">
+    <div class="list-box-item" data-coreui-value="lettuce">Lettuce</div>
+    <div class="list-box-item disabled" aria-disabled="true" data-coreui-value="tomato">Tomato — out of stock</div>
+    <div class="list-box-item" data-coreui-value="onion">Onion</div>
+  </div>`} />
+
+## Empty state
+
+A `.list-box-empty` element is shown whenever nothing is left to navigate and hidden as soon as something is, so filtering a list has somewhere to land. `update()` re-evaluates it.
+
+<Example code={`<div class="list-box" role="listbox" data-coreui-toggle="list-box" aria-label="Results" style="max-width: 20rem">
+    <div class="list-box-item" data-coreui-value="lettuce" hidden>Lettuce</div>
+    <div class="list-box-empty">No results</div>
+  </div>`} />
+
+## With an input
+
+Pass `activeDescendant` an input and the focus never leaves it: the plugin drops the roving `tabindex`, gives every option an `id`, and keeps `aria-activedescendant` and `aria-controls` on the field pointing at the highlighted option. The arrows, <kbd>Home</kbd>, <kbd>End</kbd>, <kbd>Space</kbd> and <kbd>Enter</kbd> are handled on the field, so typing and choosing happen in one place — a combobox in two elements. Hiding an option with `hidden` takes it out of the navigation and leaves the selection alone.
+
+<Example code={`<label for="listBoxField" class="form-label">Filter</label>
+  <input type="text" class="form-control mb-2" id="listBoxField" role="combobox" aria-expanded="true" autocomplete="off" style="max-width: 20rem">
+  <div class="list-box" role="listbox" id="listBoxWithInput" aria-label="Sandwich" style="max-width: 20rem">
+    <div class="list-box-item" data-coreui-value="lettuce">Lettuce</div>
+    <div class="list-box-item" data-coreui-value="tomato">Tomato</div>
+    <div class="list-box-item" data-coreui-value="onion">Onion</div>
+    <div class="list-box-item" data-coreui-value="cheese">Cheese</div>
+  </div>
+  <p class="mt-2 mb-0">Selected: <span id="listBoxFieldOutput">nothing</span></p>`} sandboxJs={listBoxInput} />
+
+<Code code={listBoxInput} lang="js" />
+
+## Accessibility
+
+The plugin writes `role="listbox"` on the container, `role="option"` on every item, `role="group"` on every section, `aria-multiselectable` in `multiple` mode and `aria-selected` on every option outside `none` mode. Name the list yourself with `aria-label` or `aria-labelledby`, and name each section with `aria-labelledby` pointing at its label.
+
+| Key | Action |
+| --- | --- |
+| `↓` / `↑` | Move the highlight to the next/previous option; it stops at the ends |
+| `Home` / `End` | Move the highlight to the first/last option |
+| `Space` | Toggle the option in `multiple` mode, select it in `single` |
+| `Enter` | Select the option; on a link, follow it; in `none` mode, fire `action` |
+| `Shift` + `↓` / `↑` | Extend the selection to the next/previous option |
+| `Shift` + `Home` / `End` | Extend the selection to the first/last option |
+| `Ctrl` / `Cmd` + `A` | Select every option (`multiple` mode) |
+| `A` – `Z` | Move the highlight to the next option whose label starts with what you typed |
+
+## Usage
+
+### Via data attributes
+
+Add `data-coreui-toggle="list-box"` to a `.list-box` and the plugin initializes it on page load. Every option is a `.list-box-item`, and its value comes from `data-coreui-value`.
+
+| Attribute | Description |
+| --- | --- |
+| `data-coreui-toggle="list-box"` | Initializes the list box on page load. |
+| `data-coreui-value` | The value of an option. Defaults to the option's text. |
+| `data-coreui-select-all` | Marks an option as the switch for the whole list. |
+
+```html
+<div class="list-box" role="listbox" data-coreui-toggle="list-box" data-coreui-selection-mode="multiple" aria-label="Sandwich">
+  <div class="list-box-item" data-coreui-value="lettuce">Lettuce</div>
+  <div class="list-box-item" data-coreui-value="tomato">Tomato</div>
+</div>
+```
+
+### Via JavaScript
+
+```js
+const listBox = new coreui.ListBox('#myListBox', {
+  selectionMode: 'multiple',
+  selected: ['lettuce']
+})
+```
+
+### Options
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `activeDescendant` | null, string, element | `null` | Field that keeps the focus. The plugin drops the roving `tabindex`, gives the options ids, and writes `aria-activedescendant` and `aria-controls` on the field. The keyboard is handled on the field. |
+| `disabled` | boolean | `false` | Turns the whole list box off and writes `aria-disabled` on it. |
+| `selected` | null, string, array | `null` | Initially selected values. In `single` mode only the first one is taken. |
+| `selectionMode` | string | `'single'` | `'none'`, `'single'` or `'multiple'`. |
+| `typeahead` | boolean | `true` | Move the highlight to the option matching what the user types. The buffer resets after 500 ms. |
+
+### Methods
+
+| Method | Description |
+| --- | --- |
+| `select(value)` | Selects the option. In `single` mode it replaces the current selection. |
+| `deselect(value)` | Removes the value from the selection. |
+| `toggle(value)` | Selects the value, or deselects it when it is already selected. |
+| `selectAll()` | Selects every option that is neither hidden nor disabled (`multiple` mode). |
+| `clear()` | Empties the selection. |
+| `getSelected()` | The selected values, in selection order. |
+| `setActive(value)` | Moves the highlight without taking the focus. |
+| `getActive()` | The highlighted value, or `null`. |
+| `next` / `prev` | Moves the highlight one option down/up. |
+| `first` / `last` | Moves the highlight to the first/last option. |
+| `update` | Re-reads the DOM: new options get their roles and ids, an option that is now `hidden` or gone leaves the navigation, and the empty state is re-evaluated. The selection survives all of it. |
+| `dispose` | Destroys the list box and releases the field. |
+| `getInstance` | Static method which allows you to get the list box instance associated to a DOM element, you can use it like this: `coreui.ListBox.getInstance(element)`. |
+| `getOrCreateInstance` | Static method which returns a list box instance associated to a DOM element or creates a new one in case it wasn't initialized. You can use it like this: `coreui.ListBox.getOrCreateInstance(element)`. |
+
+### Events
+
+Events fire on the `.list-box` element.
+
+| Event type | Description |
+| --- | --- |
+| `select.coreui.list-box` | Fires before a value is selected; `event.value` is the value. Cancelable — calling `preventDefault()` keeps the selection as it was. |
+| `selected.coreui.list-box` | Fired after the value was selected. |
+| `deselect.coreui.list-box` | Fires before a value is removed from the selection. Cancelable. |
+| `deselected.coreui.list-box` | Fired after the value was removed from the selection. |
+| `change.coreui.list-box` | Fired once per operation after the selection settled; `event.selected` is the array of selected values. |
+| `activate.coreui.list-box` | Fired when the highlight moves; `event.value` is the newly highlighted value. |
+| `action.coreui.list-box` | Fired when an option is activated in `none` mode or when the option is a link; `event.value` is the value and `event.relatedTarget` the option. |
+
+```js
+const myListBox = document.getElementById('myListBox')
+myListBox.addEventListener('change.coreui.list-box', event => {
+  console.log(event.selected)
+})
+```
+
+## Customizing
+
+### CSS variables
+
+<ScssDocs file="scss/_list-box.scss" capture="list-box-css-vars" />
+
+### Sass variables
+
+<DeprecatedIn version="6.0.0" />
+
+Sass variables set these defaults at build time and are removed in v7. The CSS variables above reach the same values without recompiling, and can be set on a single element.
+
+<ScssDocs file="scss/_list-box.scss" capture="list-box-variables" />
