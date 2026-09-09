@@ -58,6 +58,8 @@ In `multiple` a click toggles one option, <kbd>Shift</kbd> extends the selection
 
 An option marked with `data-coreui-select-all` is an ordinary option that switches the whole list: it selects everything, or clears it when everything is already selected, and its own `aria-selected` reports which of the two the next activation will do.
 
+"Everything" means the options the user can actually reach — `selectAll()`, <kbd>Ctrl</kbd> + <kbd>A</kbd> and the select-all option take the visible, enabled options and leave anything `hidden` or `disabled` alone, and the same set decides whether the list counts as fully selected. Pass an explicit list to `selectAll(values)` to select beyond the filter.
+
 <Example code={`<div class="list-box" role="listbox" data-coreui-toggle="list-box" data-coreui-selection-mode="multiple" aria-label="Toppings" style="max-width: 20rem">
     <div class="list-box-item" data-coreui-select-all>Select all</div>
     <div class="list-box-item" data-coreui-value="lettuce">Lettuce</div>
@@ -72,6 +74,20 @@ With `none` nothing is ever selected and no `aria-selected` is written; activati
     <div class="list-box-item" data-coreui-value="rename">Rename</div>
     <div class="list-box-item" data-coreui-value="delete">Delete</div>
   </div>`} />
+
+## Checkboxes
+
+Nothing marks the selection on its own — `aria-selected` and the `.selected` background carry it. Set `indicator: 'checkbox'` and the plugin puts a checkbox in front of every option and keeps it in step with the selection; the select-all option shows the indeterminate mark while only part of the list is selected — part of the visible, enabled options, the same set `selectAll()` acts on.
+
+<Example code={`<div class="list-box" role="listbox" data-coreui-toggle="list-box" data-coreui-selection-mode="multiple" data-coreui-indicator="checkbox" aria-label="Toppings" style="max-width: 20rem">
+    <div class="list-box-item" data-coreui-select-all>Select all</div>
+    <div class="list-box-item" data-coreui-value="lettuce">Lettuce</div>
+    <div class="list-box-item" data-coreui-value="tomato">Tomato</div>
+    <div class="list-box-item" data-coreui-value="onion">Onion</div>
+    <div class="list-box-item" data-coreui-value="cheese">Cheese</div>
+  </div>`} />
+
+The checkbox is a decorative `<span class="list-box-item-indicator check">`, not an input, so it never takes the focus and never has a state of its own — the option's `.selected` and `.indeterminate` classes drive it.
 
 ## Sections
 
@@ -154,6 +170,8 @@ Pass `activeDescendant` an input and the focus never leaves it: the plugin drops
 
 The plugin writes `role="listbox"` on the container, `role="option"` on every item, `role="group"` on every section, `aria-multiselectable` in `multiple` mode and `aria-selected` on every option outside `none` mode. Name the list yourself with `aria-label` or `aria-labelledby`, and name each section with `aria-labelledby` pointing at its label.
 
+The checkbox indicator is decorative — it is a `<span>` marked `aria-hidden="true"`, so assistive technology reads the selection from `aria-selected` alone and never announces a second control per option.
+
 | Key | Action |
 | --- | --- |
 | `↓` / `↑` | Move the highlight to the next/previous option; it stops at the ends |
@@ -176,6 +194,7 @@ Add `data-coreui-toggle="list-box"` to a `.list-box` and the plugin initializes 
 | `data-coreui-toggle="list-box"` | Initializes the list box on page load. |
 | `data-coreui-value` | The value of an option. Defaults to the option's text. |
 | `data-coreui-select-all` | Marks an option as the switch for the whole list. |
+| `data-coreui-indicator="checkbox"` | Renders the checkbox indicator in front of every option. |
 
 ```html
 <div class="list-box" role="listbox" data-coreui-toggle="list-box" data-coreui-selection-mode="multiple" aria-label="Sandwich">
@@ -199,6 +218,7 @@ const listBox = new coreui.ListBox('#myListBox', {
 | --- | --- | --- | --- |
 | `activeDescendant` | null, string, element | `null` | Field that keeps the focus. The plugin drops the roving `tabindex`, gives the options ids, and writes `aria-activedescendant` and `aria-controls` on the field. The keyboard is handled on the field. |
 | `disabled` | boolean | `false` | Turns the whole list box off and writes `aria-disabled` on it. |
+| `indicator` | string | `'none'` | `'checkbox'` puts a decorative checkbox in front of every option and adds `.list-box-item-with-indicator` to it. |
 | `selected` | null, string, array | `null` | Initially selected values. In `single` mode only the first one is taken. |
 | `selectionMode` | string | `'single'` | `'none'`, `'single'` or `'multiple'`. |
 | `typeahead` | boolean | `true` | Move the highlight to the option matching what the user types. The buffer resets after 500 ms. |
@@ -210,7 +230,7 @@ const listBox = new coreui.ListBox('#myListBox', {
 | `select(value)` | Selects the option. In `single` mode it replaces the current selection. |
 | `deselect(value)` | Removes the value from the selection. |
 | `toggle(value)` | Selects the value, or deselects it when it is already selected. |
-| `selectAll()` | Selects every option that is neither hidden nor disabled (`multiple` mode). |
+| `selectAll(values?)` | Selects every visible, enabled option (`multiple` mode). Pass an array of values to select exactly those instead, filter or no filter. |
 | `clear()` | Empties the selection. |
 | `getSelected()` | The selected values, in selection order. |
 | `setActive(value)` | Moves the highlight without taking the focus. |

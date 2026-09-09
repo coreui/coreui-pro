@@ -69,6 +69,7 @@ describe('ListBox', () => {
         activeDescendant: null,
         disabled: false,
         selected: null,
+        indicator: 'none',
         selectionMode: 'single',
         typeahead: true
       })
@@ -213,6 +214,41 @@ describe('ListBox', () => {
       expect(listBox.getSelected()).toEqual([])
     })
 
+    it('selects only the visible enabled options', () => {
+      const el = setMarkup()
+      const listBox = new ListBox(el, { selectionMode: 'multiple' })
+      const selectAll = el.querySelector('[data-coreui-select-all]')
+
+      expect(selectAll).toBeNull()
+
+      item(el, 'tomato').setAttribute('hidden', '')
+      listBox.update()
+
+      listBox.selectAll()
+      expect(listBox.getSelected()).toEqual(['lettuce', 'onion', 'cheese'])
+
+      listBox.clear()
+      listBox.selectAll(['lettuce', 'tomato'])
+      expect(listBox.getSelected()).toEqual(['lettuce', 'tomato'])
+    })
+
+    it('should keep the select all option in step with the visible options only', () => {
+      const el = setMarkup(' data-coreui-selection-mode="multiple"', [
+        '<div class="list-box-item" data-coreui-select-all>Select all</div>',
+        '<div class="list-box-item" data-coreui-value="lettuce">Lettuce</div>',
+        '<div class="list-box-item" data-coreui-value="tomato" hidden>Tomato</div>',
+        '<div class="list-box-item disabled" data-coreui-value="ham">Ham</div>'
+      ])
+      const listBox = new ListBox(el)
+      const selectAll = el.querySelector('[data-coreui-select-all]')
+
+      click(selectAll)
+
+      expect(listBox.getSelected()).toEqual(['lettuce'])
+      expect(selectAll.getAttribute('aria-selected')).toEqual('true')
+      expect(selectAll).not.toHaveClass('indeterminate')
+    })
+
     it('should not select all outside of multiple mode', () => {
       const listBox = new ListBox(setMarkup())
 
@@ -277,6 +313,71 @@ describe('ListBox', () => {
       click(selectAll)
       expect(listBox.getSelected()).toEqual([])
       expect(selectAll.getAttribute('aria-selected')).toEqual('false')
+    })
+  })
+
+  describe('indicator', () => {
+    it('should not render an indicator by default', () => {
+      const el = setMarkup()
+      // eslint-disable-next-line no-new
+      new ListBox(el)
+
+      expect(el.querySelector('.list-box-item-indicator')).toBeNull()
+      expect(item(el, 'lettuce')).not.toHaveClass('list-box-item-with-indicator')
+    })
+
+    it('should render one indicator per option and never a second one', () => {
+      const el = setMarkup()
+      const listBox = new ListBox(el, { indicator: 'checkbox' })
+
+      expect(el.querySelectorAll('.list-box-item-indicator').length).toEqual(5)
+      expect(item(el, 'lettuce')).toHaveClass('list-box-item-with-indicator')
+
+      const indicator = item(el, 'lettuce').querySelector('.list-box-item-indicator')
+      expect(indicator).toHaveClass('check')
+      expect(indicator.getAttribute('aria-hidden')).toEqual('true')
+
+      listBox.select('tomato')
+      listBox.update()
+      listBox.update()
+
+      expect(el.querySelectorAll('.list-box-item-indicator').length).toEqual(5)
+      expect(item(el, 'lettuce').firstElementChild).toEqual(indicator)
+    })
+
+    it('should keep the option value out of the indicator markup', () => {
+      const el = setMarkup(' data-coreui-indicator="checkbox"', [
+        '<div class="list-box-item">Lettuce</div>',
+        '<div class="list-box-item">Tomato</div>'
+      ])
+      const listBox = new ListBox(el)
+
+      listBox.select('Lettuce')
+
+      expect(listBox.getSelected()).toEqual(['Lettuce'])
+    })
+
+    it('should mark the select all option as indeterminate for a partial selection', () => {
+      const el = setMarkup(' data-coreui-selection-mode="multiple" data-coreui-indicator="checkbox"', [
+        '<div class="list-box-item" data-coreui-select-all>Select all</div>',
+        '<div class="list-box-item" data-coreui-value="lettuce">Lettuce</div>',
+        '<div class="list-box-item" data-coreui-value="tomato">Tomato</div>'
+      ])
+      const listBox = new ListBox(el)
+      const selectAll = el.querySelector('[data-coreui-select-all]')
+
+      expect(selectAll).not.toHaveClass('indeterminate')
+
+      listBox.select('lettuce')
+      expect(selectAll).toHaveClass('indeterminate')
+      expect(selectAll.getAttribute('aria-selected')).toEqual('false')
+
+      listBox.select('tomato')
+      expect(selectAll).not.toHaveClass('indeterminate')
+      expect(selectAll.getAttribute('aria-selected')).toEqual('true')
+
+      listBox.clear()
+      expect(selectAll).not.toHaveClass('indeterminate')
     })
   })
 

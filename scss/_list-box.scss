@@ -30,6 +30,7 @@ $list-box-item-selected-bg:           var(--#{$prefix}bg-2) !default;
 $list-box-item-disabled-color:        var(--#{$prefix}fg-3) !default;
 $list-box-item-description-color:     var(--#{$prefix}fg-3) !default;
 $list-box-item-description-font-size: calc(var(--#{$prefix}body-font-size) * .875) !default;
+$list-box-item-indicator-width:       var(--#{$prefix}check-size, var(--#{$prefix}control-size)) !default;
 
 $list-box-section-label-color:        var(--#{$prefix}fg-3) !default;
 $list-box-section-label-font-size:    80% !default;
@@ -66,6 +67,7 @@ $list-box-tokens: defaults(
     --#{$prefix}list-box-item-disabled-color: #{$list-box-item-disabled-color},
     --#{$prefix}list-box-item-description-color: #{$list-box-item-description-color},
     --#{$prefix}list-box-item-description-font-size: #{$list-box-item-description-font-size},
+    --#{$prefix}list-box-item-indicator-width: #{$list-box-item-indicator-width},
     --#{$prefix}list-box-section-label-color: #{$list-box-section-label-color},
     --#{$prefix}list-box-section-label-font-size: #{$list-box-section-label-font-size},
     --#{$prefix}list-box-section-label-padding: #{$list-box-section-label-padding},
@@ -159,6 +161,49 @@ $list-box-tokens: defaults(
       z-index: 5;
       @include focus-ring(true, var(--#{$prefix}list-box-focus-ring-color));
     }
+  }
+
+  .list-box-item-with-indicator {
+    padding-inline-start: calc(var(--#{$prefix}list-box-item-padding-x) + var(--#{$prefix}list-box-item-indicator-width));
+  }
+
+  // The indicator is a decorative `.check` (a span, so it never matches
+  // `:checked`), which is why the states are driven by classes on the option and
+  // the mark's opacity is set here rather than by the control's own state rules.
+  .list-box-item-indicator {
+    position: absolute;
+    inset-inline-start: calc(var(--#{$prefix}list-box-item-padding-x) * .5);
+    top: 50%;
+    width: var(--#{$prefix}list-box-item-indicator-width);
+    height: var(--#{$prefix}list-box-item-indicator-width);
+    margin: 0;
+    pointer-events: none;
+    transform: translateY(-50%);
+  }
+
+  .selected > .list-box-item-indicator {
+    background-color: var(--#{$prefix}check-checked-bg);
+    border-color: var(--#{$prefix}check-checked-border-color);
+
+    &::before {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .indeterminate > .list-box-item-indicator {
+    background-color: var(--#{$prefix}check-indeterminate-bg);
+    border-color: var(--#{$prefix}check-indeterminate-border-color);
+
+    &::before {
+      opacity: 1;
+      mask-image: var(--#{$prefix}check-mark-indeterminate);
+      transform: scale(1);
+    }
+  }
+
+  .disabled > .list-box-item-indicator {
+    opacity: var(--#{$prefix}check-disabled-opacity);
   }
 
   .list-box-item-description {

@@ -48,14 +48,21 @@ const EVENT_FOCUSIN = 'focusin'
 const EVENT_KEYDOWN = 'keydown'
 
 const CLASS_NAME_ACTIVE = 'active'
+const CLASS_NAME_CHECK = 'check'
 const CLASS_NAME_DISABLED = 'disabled'
+const CLASS_NAME_INDETERMINATE = 'indeterminate'
+const CLASS_NAME_ITEM_INDICATOR = 'list-box-item-indicator'
+const CLASS_NAME_ITEM_WITH_INDICATOR = 'list-box-item-with-indicator'
 const CLASS_NAME_SELECTED = 'selected'
 
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="list-box"]'
 const SELECTOR_EMPTY = '.list-box-empty'
 const SELECTOR_ITEM = '.list-box-item'
+const SELECTOR_ITEM_INDICATOR = '.list-box-item-indicator'
 const SELECTOR_ITEM_LABEL = '.list-box-item-label'
 const SELECTOR_SECTION = '.list-box-section'
+
+const INDICATOR_CHECKBOX = 'checkbox'
 
 const SELECTION_MODE_MULTIPLE = 'multiple'
 const SELECTION_MODE_NONE = 'none'
@@ -64,6 +71,7 @@ const SELECTION_MODE_SINGLE = 'single'
 type ListBoxConfig = {
   activeDescendant: string | Element | null
   disabled: boolean
+  indicator: string
   selected: string | string[] | null
   selectionMode: string
   typeahead: boolean
@@ -72,6 +80,7 @@ type ListBoxConfig = {
 const Default: ListBoxConfig = {
   activeDescendant: null,
   disabled: false,
+  indicator: 'none',
   selected: null,
   selectionMode: SELECTION_MODE_SINGLE,
   typeahead: true
@@ -80,6 +89,7 @@ const Default: ListBoxConfig = {
 const DefaultType: Record<string, string> = {
   activeDescendant: '(string|element|null)',
   disabled: 'boolean',
+  indicator: 'string',
   selected: '(string|array|null)',
   selectionMode: 'string',
   typeahead: 'boolean'
@@ -147,15 +157,16 @@ class ListBox extends BaseComponent {
     this.select(value)
   }
 
-  selectAll(): void {
+  selectAll(values?: string[]): void {
     if (this._config.selectionMode !== SELECTION_MODE_MULTIPLE) {
       return
     }
 
+    const scope = values ?? this._selectableItems().map(item => this._itemValue(item))
     let changed = false
 
-    for (const item of this._selectableItems()) {
-      changed = this._selectValue(this._itemValue(item)) || changed
+    for (const value of scope) {
+      changed = this._selectValue(value) || changed
     }
 
     if (changed) {
@@ -241,6 +252,12 @@ class ListBox extends BaseComponent {
 
       const value = this._itemValue(item)
       const selected = this._isSelectAll(item) ? this._allSelected() : this._selected.has(value)
+
+      this._decorateItem(item)
+
+      if (this._isSelectAll(item)) {
+        item.classList.toggle(CLASS_NAME_INDETERMINATE, !selected && this._someSelected())
+      }
 
       if (this._config.selectionMode === SELECTION_MODE_NONE) {
         item.removeAttribute('aria-selected')
@@ -338,9 +355,30 @@ class ListBox extends BaseComponent {
     return this._active === null ? null : (this._findItem(this._active) ?? null)
   }
 
+  _decorateItem(item: HTMLElement): void {
+    if (this._config.indicator !== INDICATOR_CHECKBOX) {
+      return
+    }
+
+    item.classList.add(CLASS_NAME_ITEM_WITH_INDICATOR)
+
+    if (SelectorEngine.findOne(SELECTOR_ITEM_INDICATOR, item)) {
+      return
+    }
+
+    const indicator = document.createElement('span')
+    indicator.classList.add(CLASS_NAME_CHECK, CLASS_NAME_ITEM_INDICATOR)
+    indicator.setAttribute('aria-hidden', 'true')
+    item.prepend(indicator)
+  }
+
   _allSelected(): boolean {
     const items = this._selectableItems()
     return items.length > 0 && items.every(item => this._selected.has(this._itemValue(item)))
+  }
+
+  _someSelected(): boolean {
+    return this._selectableItems().some(item => this._selected.has(this._itemValue(item)))
   }
 
   _selectValue(value: string): boolean {
