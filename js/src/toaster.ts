@@ -24,6 +24,10 @@ const DATA_KEY = 'coreui.toaster'
 const EVENT_KEY = `.${DATA_KEY}`
 
 const EVENT_ADD = `add${EVENT_KEY}`
+const EVENT_MOUSEOVER = `mouseover${EVENT_KEY}`
+const EVENT_MOUSEOUT = `mouseout${EVENT_KEY}`
+const EVENT_FOCUSIN = `focusin${EVENT_KEY}`
+const EVENT_FOCUSOUT = `focusout${EVENT_KEY}`
 const EVENT_REMOVE = `remove${EVENT_KEY}`
 const EVENT_HIDE_TOAST = 'hide.coreui.toast'
 const EVENT_HIDDEN_TOAST = 'hidden.coreui.toast'
@@ -87,7 +91,9 @@ const Default: ToasterConfig = {
   html: false,
   label: 'Notifications',
   limit: 3,
+  pauseOnHover: true,
   placement: 'top-end',
+  restartOnAdd: false,
   sanitize: true,
   sanitizeFn: null,
   stack: false,
@@ -100,7 +106,9 @@ const DefaultType = {
   html: 'boolean',
   label: 'string',
   limit: 'number',
+  pauseOnHover: 'boolean',
   placement: 'string',
+  restartOnAdd: 'boolean',
   sanitize: 'boolean',
   sanitizeFn: '(null|function)',
   stack: 'boolean',
@@ -139,7 +147,9 @@ type ToasterConfig = {
   html: boolean
   label: string
   limit: number
+  pauseOnHover: boolean
   placement: string
+  restartOnAdd: boolean
   sanitize: boolean
   sanitizeFn: ((unsafeHtml: string) => string) | null
   stack: boolean
@@ -220,6 +230,13 @@ class Toaster extends BaseComponent {
     this._element.setAttribute('role', 'region')
     this._element.setAttribute('aria-label', this._config.label)
 
+    if (this._config.pauseOnHover) {
+      EventHandler.on(this._element, EVENT_MOUSEOVER, () => this.pause())
+      EventHandler.on(this._element, EVENT_FOCUSIN, () => this.pause())
+      EventHandler.on(this._element, EVENT_MOUSEOUT, event => this._onLeave(event))
+      EventHandler.on(this._element, EVENT_FOCUSOUT, event => this._onLeave(event))
+    }
+
     this._resizeObserver = null
     if (this._config.stack) {
       this._element.classList.add(CLASS_NAME_STACK)
@@ -286,6 +303,16 @@ class Toaster extends BaseComponent {
     instance.show()
     this._settle(layout)
     this._applyLimit()
+
+    if (this._config.restartOnAdd) {
+      for (const other of this._entries.values()) {
+        if (other !== entry && !other.toast.limited) {
+          other.instance._clearTimeout()
+          other.instance._maybeScheduleHide()
+        }
+      }
+    }
+
     this._resizeObserver?.observe(toast.element)
     this._layoutStack()
     EventHandler.trigger(this._element, EVENT_ADD, { id: toast.id })
@@ -352,6 +379,20 @@ class Toaster extends BaseComponent {
     )
 
     return promise
+  }
+
+  pause(): void {
+    for (const entry of this._entries.values()) {
+      entry.instance._clearTimeout()
+    }
+  }
+
+  resume(): void {
+    for (const entry of this._entries.values()) {
+      if (!entry.toast.limited && entry.instance.isShown()) {
+        entry.instance._maybeScheduleHide()
+      }
+    }
   }
 
   getToasts(): ToastObject[] {
@@ -534,6 +575,15 @@ class Toaster extends BaseComponent {
     this._element.style.setProperty(PROPERTY_STACK_COUNT, String(ordered.length))
     this._element.style.setProperty(PROPERTY_STACK_FRONT_HEIGHT, `${ordered.length > 0 ? this._naturalHeight(ordered[0]) : 0}px`)
     this._element.style.setProperty(PROPERTY_STACK_HEIGHTS, `${before}px`)
+  }
+
+  _onLeave(event: any): void {
+    const next = event.relatedTarget
+    if (next && this._element.contains(next)) {
+      return
+    }
+
+    this.resume()
   }
 
   _naturalHeight(element: HTMLElement): number {

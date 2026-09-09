@@ -144,7 +144,7 @@ const inline = new coreui.Toaster('#notifications')
 
 The container is a `region` landmark named by `label` (`Notifications` by default). Each toast announces itself by `priority`: `low`, the default, renders `role="status"` and `aria-live="polite"`, so it is read when the user is idle; `high` renders `role="alert"` and `aria-live="assertive"` for messages that should interrupt, such as a failed save. Keep `high` for the few messages that warrant it — every toast is announced either way.
 
-A toast with an action should not hide on its own: give it a long `timeout` or `0`, so keyboard and screen-reader users can reach the button. The autohide timer pauses while the pointer or focus is inside the toast, as it does for every [toast](/components/toasts/#accessibility).
+Timers stop while the pointer or focus is inside the container (`pauseOnHover`), so a spread stack or a toast being read does not disappear mid-way. A toast with an action should not hide on its own: give it a long `timeout` or `0`, so keyboard and screen-reader users can reach the button. The autohide timer pauses while the pointer or focus is inside the toast, as it does for every [toast](/components/toasts/#accessibility).
 
 ## Usage
 
@@ -170,7 +170,9 @@ const id = toaster.add({ title: 'Saved', description: 'Your changes are live.', 
 | `html` | boolean | `false` | Render `title` and `description` as HTML instead of text. |
 | `label` | string | `'Notifications'` | Accessible name of the container's `region` landmark. |
 | `limit` | number | `3` | How many toasts stay visible; the oldest beyond it are hidden and `inert` until a slot frees. `0` disables the limit. |
+| `pauseOnHover` | boolean | `true` | Pause every toast's timer while the pointer or focus is inside the container, and resume when it leaves. Each toast still pauses on its own hover and focus. |
 | `placement` | string | `'top-end'` | Corner or edge of the viewport for the container the toaster creates: `top`, `middle` or `bottom` × `start`, `center` or `end`. Toasts in the `top` placements are inserted first, in the others last, so the newest always sits closest to the edge. |
+| `restartOnAdd` | boolean | `false` | Restart the timers of the visible toasts whenever a new one is added, so a burst of notifications leaves together. |
 | `sanitize` | boolean | `true` | Sanitize HTML content. |
 | `sanitizeFn` | null, function | `null` | Your own sanitizer, used instead of the built-in one. |
 | `stack` | boolean | `false` | Stack the toasts on top of each other, newest in front, and spread them out on hover or focus. |
@@ -203,6 +205,7 @@ const id = toaster.add({ title: 'Saved', description: 'Your changes are live.', 
 | `update(id, options)` | Rewrites the toast in place and increments its `updateKey`. `options` may be a function receiving the current toast object and returning the changes. |
 | `close(id?)` | Hides the toast, which removes it from the DOM and the store once the fade ends. Without an id, hides every toast. |
 | `promise(promise, { loading, success, error })` | Adds a toast in the `loading` state and updates it when the promise settles: `success` gets the resolved value, `error` the rejection. Each state is a description string or a full options object, or a function returning either. Returns the promise. |
+| `pause()` / `resume()` | Stop and restart every toast's timer; `pauseOnHover` calls these for the container. |
 | `getToasts()` | The toast objects in insertion order, each with `id`, `updateKey`, `limited`, `element` and the options it was created with. |
 | `dispose` | Removes every toast, and the container if the toaster created it. |
 | `getInstance` | *Static* method that returns the toaster bound to a container element. |

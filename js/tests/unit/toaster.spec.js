@@ -404,6 +404,45 @@ describe('Toaster', () => {
     })
   })
 
+  describe('timers', () => {
+    it('should pause every toast while the pointer is over the container and resume on leave', () => {
+      toaster = new Toaster(null, { container: fixtureEl })
+      const first = toaster.add({ description: 'first', instant: true })
+      const second = toaster.add({ description: 'second', instant: true })
+      const entries = [first, second].map(id => toaster._entries.get(id))
+      expect(entries.every(entry => entry.instance._timeout !== null)).toBeTrue()
+
+      toaster._element.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+      expect(entries.every(entry => entry.instance._timeout === null)).toBeTrue()
+
+      toaster._element.dispatchEvent(new MouseEvent('mouseout', { bubbles: true, relatedTarget: document.body }))
+      expect(entries.every(entry => entry.instance._timeout !== null)).toBeTrue()
+    })
+
+    it('should not resume when the pointer moves between toasts', () => {
+      toaster = new Toaster(null, { container: fixtureEl })
+      const id = toaster.add({ description: 'first', instant: true })
+      toaster.add({ description: 'second', instant: true })
+      const entry = toaster._entries.get(id)
+
+      toaster._element.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+      toaster._element.firstElementChild.dispatchEvent(new MouseEvent('mouseout', { bubbles: true, relatedTarget: toaster._element.lastElementChild }))
+
+      expect(entry.instance._timeout).toBeNull()
+    })
+
+    it('should restart the visible timers when a toast is added with restartOnAdd', () => {
+      toaster = new Toaster(null, { container: fixtureEl, restartOnAdd: true })
+      const first = toaster.add({ description: 'first', instant: true })
+      const entry = toaster._entries.get(first)
+      const spy = spyOn(entry.instance, '_maybeScheduleHide').and.callThrough()
+
+      toaster.add({ description: 'second', instant: true })
+
+      expect(spy).toHaveBeenCalledTimes(1)
+    })
+  })
+
   describe('promise', () => {
     it('should show the loading state and switch to success', async () => {
       toaster = new Toaster(null, { container: fixtureEl, timeout: 0 })
