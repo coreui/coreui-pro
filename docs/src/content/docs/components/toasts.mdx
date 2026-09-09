@@ -7,7 +7,6 @@ otherFrameworks:
 ---
 
 import liveToast from './snippets/live-toast.js?raw'
-import toaster from './snippets/toaster.js?raw'
 
 Bootstrap toasts are lightweight notifications that mimic the push notifications popularized by mobile and desktop operating systems. They utilize flexbox, making them simple to align and position.
 
@@ -307,25 +306,7 @@ You can also get fancy with flexbox utilities to align toasts horizontally and/o
 
 ## Toaster
 
-<AddedIn version="6.0.0" /> The `Toaster` plugin creates toasts from options, so nothing has to be in the markup up front. It keeps a store of the toasts it shows, keyed by id, and one instance serves the whole page: `add()` returns the id, `update()` rewrites a toast in place, `close()` hides one or all of them, and `promise()` follows an asynchronous operation through its loading, success and error states.
-
-Without an element the toaster creates its own `.toast-container` in `<body>`, placed by the `placement` option; pass an existing container instead to keep control over where the toasts land. The container is a `region` landmark named `Notifications`, so users of assistive technology can navigate to it.
-
-<Example code={`<button type="button" class="btn-solid theme-primary" id="toasterAddBtn">Add a toast</button>
-  <button type="button" class="btn-solid theme-secondary" id="toasterUpdateBtn">Update in place</button>
-  <button type="button" class="btn-solid theme-secondary" id="toasterPromiseBtn">Follow a promise</button>
-  <button type="button" class="btn-solid theme-secondary" id="toasterUndoBtn">With an action</button>
-  <button type="button" class="btn-outline theme-secondary" id="toasterCloseBtn">Close all</button>`} sandboxJs={toaster} />
-
-<Code code={toaster} lang="js" />
-
-A toast is a plain options object. `title` renders the header with a close button, `description` the body; a toast without a title puts the close button in the body. `theme` adds the `theme-{color}` class, `timeout` overrides the toaster's default (`0` keeps the toast until it is closed), `priority: 'high'` announces it as an alert instead of a status, and `action` adds a button to the body. Passing an `id` that already exists updates that toast instead of adding a second one, and bumps its `updateKey`, so a "Draft saved" toast clicked twice stays a single toast.
-
-A toast slides in from beyond the container's edge while it fades in — from the side in the `start` and `end` placements, from above or below in the `center` ones — and slides back out when it closes. A toast outside a placed container slides by `--cui-toast-slide` instead. When a toast leaves, or a new one is inserted above the others, the remaining toasts glide into their new positions instead of jumping. Both respect `prefers-reduced-motion`.
-
-`limit` caps how many toasts are visible at once. The newest stay on screen; older ones sink away from the edge and fade, remain in the DOM with `inert` and `data-coreui-limited`, and rise back in as the visible ones go away.
-
-Strings are written as text. Set `html: true` on the toaster to render markup; it runs through the same sanitizer as tooltips, configurable with `allowList` and `sanitizeFn`.
+Toasts you create at runtime — from a form submission, a request that settled, a background job — come from the [Toaster](/components/toaster/): a store keyed by id with `add()`, `update()`, `close()` and `promise()`, its own placed container, a visible-toasts limit and screen-reader priority. The markup and classes on this page are what it renders.
 
 ## Accessibility
 
@@ -422,70 +403,6 @@ myToastEl.addEventListener('hidden.coreui.toast', () => {
 })
 ```
 
-
-### Toaster
-
-Create a toaster once and keep the instance; every toast on the page goes through it.
-
-```js
-const toaster = new coreui.Toaster(null, { placement: 'bottom-end', limit: 3 })
-const id = toaster.add({ title: 'Saved', description: 'Your changes are live.', theme: 'success' })
-```
-
-#### Toaster options
-
-| Name | Type | Default | Description |
-| --- | --- | --- | --- |
-| `allowList` | object | [Default value](/getting-started/javascript#sanitizer) | Tags and attributes allowed in toast content when `html` is `true`. |
-| `container` | string, element | `'body'` | Where the toaster appends the container it creates. Ignored when the toaster is given an existing element. |
-| `html` | boolean | `false` | Render `title` and `description` as HTML instead of text. |
-| `label` | string | `'Notifications'` | Accessible name of the container's `region` landmark. |
-| `limit` | number | `3` | How many toasts stay visible; the oldest beyond it are hidden and `inert` until a slot frees. `0` disables the limit. |
-| `placement` | string | `'top-end'` | Corner or edge of the viewport for the container the toaster creates: `top`, `middle` or `bottom` × `start`, `center` or `end`. Toasts in the `top` placements are inserted first, in the others last, so the newest always sits closest to the edge. |
-| `sanitize` | boolean | `true` | Sanitize HTML content. |
-| `sanitizeFn` | null, function | `null` | Your own sanitizer, used instead of the built-in one. |
-| `timeout` | number | `5000` | Default time (ms) before a toast hides. `0` keeps toasts until they are closed. |
-
-#### Toast options
-
-| Name | Type | Default | Description |
-| --- | --- | --- | --- |
-| `action` | object, null | — | `{ label, onClick(event, toast) }` renders a button in the body. |
-| `class` | string | — | Extra classes on the `.toast`. |
-| `data` | object | — | Anything you want to read back from the toast object later, e.g. in `update(id, previous => …)`. |
-| `description` | string, element, function | — | Body of the toast. |
-| `dismissible` | boolean | `true` | Render the close button. |
-| `id` | string | generated | Stable id; adding with an existing id updates that toast in place. |
-| `instant` | boolean | `false` | Skip the fade (`.toast-instant`). |
-| `onClose` | function | — | Called when the toast starts hiding, with the toast object. |
-| `onRemove` | function | — | Called after the toast left the DOM, with the toast object. |
-| `priority` | string | `'low'` | `'low'` renders `role="status"` and `aria-live="polite"`; `'high'` renders `role="alert"` and `aria-live="assertive"`. |
-| `theme` | string | — | Adds `theme-{color}`. |
-| `timeout` | number | toaster's `timeout` | Time (ms) before this toast hides; `0` keeps it. |
-| `title` | string, element, function | — | Header of the toast, with the close button next to it. |
-| `translucent` | boolean | `false` | Adds `.toast-translucent`. |
-
-#### Toaster methods
-
-| Method | Description |
-| --- | --- |
-| `add(options)` | Renders and shows a toast. Returns its id. With an `id` that already exists it behaves like `update`. |
-| `update(id, options)` | Rewrites the toast in place and increments its `updateKey`. `options` may be a function receiving the current toast object and returning the changes. |
-| `close(id?)` | Hides the toast, which removes it from the DOM and the store once the fade ends. Without an id, hides every toast. |
-| `promise(promise, { loading, success, error })` | Adds a toast in the `loading` state and updates it when the promise settles: `success` gets the resolved value, `error` the rejection. Each state is a description string or a full options object, or a function returning either. Returns the promise. |
-| `getToasts()` | The toast objects in insertion order, each with `id`, `updateKey`, `limited`, `element` and the options it was created with. |
-| `dispose` | Removes every toast, and the container if the toaster created it. |
-| `getInstance` | *Static* method that returns the toaster bound to a container element. |
-| `getOrCreateInstance` | *Static* method that returns the toaster bound to a container element or creates one on it. |
-
-#### Toaster events
-
-Events fire on the container. Each toast still fires the [toast events](#events) on its own element.
-
-| Event | Description |
-| --- | --- |
-| `add.coreui.toaster` | Fired after a toast was added; `event.id` is its id. |
-| `remove.coreui.toaster` | Fired after a toast left the DOM; `event.id` is its id. |
 
 ## Customizing
 

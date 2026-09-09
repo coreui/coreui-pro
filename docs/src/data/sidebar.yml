@@ -329,6 +329,8 @@
       to: /components/tab/
     - title: Toast
       to: /components/toasts/
+    - title: Toaster
+      to: /components/toaster/
     - title: Tooltip
       to: /components/tooltips/
 - title: Icons
