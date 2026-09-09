@@ -140,8 +140,6 @@ $list-box-tokens: defaults(
     flex-direction: column;
     gap: var(--#{$prefix}list-box-gap);
     padding: var(--#{$prefix}list-box-padding-y) var(--#{$prefix}list-box-padding-x);
-    overflow-y: auto;
-    overscroll-behavior: contain;
 
     &[aria-disabled="true"] {
       color: var(--#{$prefix}list-box-option-disabled-color);

@@ -25,6 +25,8 @@ A list box presents a set of values and lets the user pick from them. `.list-box
 
 Every option carries its value in `data-coreui-value`; an option without one is worth its text. Values are what the methods take and what the events report, so an option can be hidden, moved or re-rendered without disturbing the selection.
 
+The options element is not a scroll container — a list with no height grows with its content. Cap it where you want one: `<div class="list-box-options" style="max-height: 12rem; overflow-y: auto">`. The plugin keeps the highlighted option in view either way, with `scrollIntoView({ block: 'nearest' })`.
+
 ### When to use
 
 <div class="table-responsive">
