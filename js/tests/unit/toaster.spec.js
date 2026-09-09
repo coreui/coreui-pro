@@ -503,17 +503,6 @@ describe('Toaster', () => {
 
       expect(entry.instance._timeout).toBeNull()
     })
-
-    it('should restart the visible timers when a toast is added with restartOnAdd', () => {
-      toaster = new Toaster(null, { container: fixtureEl, restartOnAdd: true })
-      const first = toaster.add({ description: 'first', instant: true })
-      const entry = toaster._entries.get(first)
-      const spy = spyOn(entry.instance, '_maybeScheduleHide').and.callThrough()
-
-      toaster.add({ description: 'second', instant: true })
-
-      expect(spy).toHaveBeenCalledTimes(1)
-    })
   })
 
   describe('promise', () => {

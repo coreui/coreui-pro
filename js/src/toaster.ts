@@ -108,7 +108,6 @@ const Default: ToasterConfig = {
   limit: 3,
   pauseOnHover: true,
   placement: 'top-end',
-  restartOnAdd: false,
   sanitize: true,
   sanitizeFn: null,
   stack: false,
@@ -125,7 +124,6 @@ const DefaultType = {
   limit: 'number',
   pauseOnHover: 'boolean',
   placement: 'string',
-  restartOnAdd: 'boolean',
   sanitize: 'boolean',
   sanitizeFn: '(null|function)',
   stack: 'boolean',
@@ -171,7 +169,6 @@ type ToasterConfig = {
   limit: number
   pauseOnHover: boolean
   placement: string
-  restartOnAdd: boolean
   sanitize: boolean
   sanitizeFn: ((unsafeHtml: string) => string) | null
   stack: boolean
@@ -350,15 +347,6 @@ class Toaster extends BaseComponent {
     this._settle(layout)
     this._applyLimit()
     this._announce(toast)
-
-    if (this._config.restartOnAdd) {
-      for (const other of this._entries.values()) {
-        if (other !== entry && !other.toast.limited) {
-          other.instance._clearTimeout()
-          other.instance._maybeScheduleHide()
-        }
-      }
-    }
 
     this._resizeObserver?.observe(toast.element)
     this._layoutStack()

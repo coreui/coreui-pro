@@ -207,7 +207,6 @@ const id = toaster.add({ title: 'Saved', description: 'Your changes are live.', 
 | `limit` | number | `3` | How many toasts stay visible; the oldest beyond it are hidden and `inert` until a slot frees. `0` disables the limit. |
 | `pauseOnHover` | boolean | `true` | Pause every toast's timer while the pointer or focus is inside the container, and resume when it leaves. Each toast still pauses on its own hover and focus. |
 | `placement` | string | `'top-end'` | Corner or edge of the viewport for the container the toaster creates: `top`, `middle` or `bottom` × `start`, `center` or `end`. Toasts in the `top` placements are inserted first, in the others last, so the newest always sits closest to the edge. |
-| `restartOnAdd` | boolean | `false` | Restart the timers of the visible toasts whenever a new one is added, so a burst of notifications leaves together. |
 | `sanitize` | boolean | `true` | Sanitize HTML content. |
 | `sanitizeFn` | null, function | `null` | Your own sanitizer, used instead of the built-in one. |
 | `stack` | boolean | `false` | Stack the toasts on top of each other, newest in front, and spread them out on hover or focus. |
