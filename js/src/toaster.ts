@@ -669,6 +669,10 @@ class Toaster extends BaseComponent {
     this.resume()
   }
 
+  _isSettled(element: Element): boolean {
+    return element.classList.contains(CLASS_NAME_SHOW) && !element.hasAttribute(ATTRIBUTE_LIMITED) && element.getClientRects().length > 0
+  }
+
   _naturalHeight(element: HTMLElement): number {
     const content = [...element.children].reduce((sum, child) => sum + (child as HTMLElement).offsetHeight, 0)
     return content + element.offsetHeight - element.clientHeight
@@ -681,7 +685,7 @@ class Toaster extends BaseComponent {
 
     const layout = new Map<Element, number>()
     for (const child of this._element.querySelectorAll(':scope > .toast')) {
-      if (child.getClientRects().length > 0) {
+      if (this._isSettled(child)) {
         layout.set(child, child.getBoundingClientRect().top)
       }
     }
@@ -695,7 +699,7 @@ class Toaster extends BaseComponent {
       return () => {}
     }
 
-    const siblings = [...this._element.querySelectorAll(':scope > .toast')].filter(child => child !== element && child.getClientRects().length > 0)
+    const siblings = [...this._element.querySelectorAll(':scope > .toast')].filter(child => child !== element && this._isSettled(child))
     const before = siblings.map(child => child.getBoundingClientRect().top)
     const { transition } = element.style
     element.style.transition = 'none'
