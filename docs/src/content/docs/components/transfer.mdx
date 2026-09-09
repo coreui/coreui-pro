@@ -1,0 +1,358 @@
+---
+title: "Bootstrap 6 Transfer"
+name: "Transfer"
+description: "Two lists side by side and four buttons that move options between them — the selection or everything at once: a select-all header with a counter, an optional per-list search, a one-way mode and a live region that announces every move."
+otherFrameworks:
+  - transfer
+---
+
+## Overview
+
+<AddedIn version="6.0.0" />
+
+A transfer moves values between two lists — what is available on the left, what has been chosen on the right. It is two [list boxes](/components/list-box/) and a column of buttons: the plugin puts each list in `multiple` selection mode with the checkbox indicator, enables each button while it has something to move, and moves the option elements from one `.list-box-options` to the other.
+
+<Example code={`<div class="transfer" data-coreui-toggle="transfer">
+    <div class="list-box transfer-list" data-coreui-transfer-list="source">
+      <div class="list-box-header">
+        <button type="button" class="list-box-select-all" data-coreui-select-all></button>
+      </div>
+      <div class="list-box-options" role="listbox">
+        <div class="list-box-option" data-coreui-value="1">List item 1</div>
+        <div class="list-box-option" data-coreui-value="2">List item 2</div>
+        <div class="list-box-option" data-coreui-value="3">List item 3</div>
+        <div class="list-box-option" data-coreui-value="4">List item 4</div>
+      </div>
+    </div>
+    <div class="transfer-actions">
+      <button type="button" class="btn btn-subtle btn-sm" data-coreui-transfer-move="target-all"></button>
+      <button type="button" class="btn btn-subtle btn-sm" data-coreui-transfer-move="target"></button>
+      <button type="button" class="btn btn-subtle btn-sm" data-coreui-transfer-move="source"></button>
+      <button type="button" class="btn btn-subtle btn-sm" data-coreui-transfer-move="source-all"></button>
+    </div>
+    <div class="list-box transfer-list" data-coreui-transfer-list="target">
+      <div class="list-box-header">
+        <button type="button" class="list-box-select-all" data-coreui-select-all></button>
+      </div>
+      <div class="list-box-options" role="listbox">
+        <div class="list-box-option" data-coreui-value="5">List item 5</div>
+      </div>
+    </div>
+  </div>`} />
+
+Everything inside a list is the list box's: the options and their values, the selection, the arrow keys, the typeahead and the select-all button. The transfer owns what happens between the lists, so nothing here is a second implementation of the same behavior — read the [List box](/components/list-box/) page for the parts a list is made of.
+
+Each side is a `.list-box.transfer-list` marked `data-coreui-transfer-list="source"` or `="target"`, and each button a `[data-coreui-transfer-move]` naming what it does: `target` and `source` move the selection, `target-all` and `source-all` move everything the list currently shows. The rest is filled in for you: an empty select-all button takes the list's title, an empty move button takes its chevron, the header gets a `{selected}/{visible} selected` counter, the options element gets the title as its accessible name, and the buttons get their labels and an `aria-controls`.
+
+"All" is the same scope the select-all button works on — the visible, enabled options — so with a search running, the all button moves what the search left behind and nothing more.
+
+The two lists order themselves differently, and on purpose: the target keeps the order values arrived in, so a chosen list reads as a history of what was picked, while the source puts a returned value back exactly where it started rather than at the end. Each option's place in the source is fixed when the transfer initializes — `update()` gives one added later a place after the options already there.
+
+The transfer caps how tall a list gets — `--cui-transfer-list-max-height` puts a `max-height` and `overflow-y: auto` on `.list-box-options`, so a long list scrolls inside its own box instead of stretching the row.
+
+## Search
+
+`search` puts a search field above each list. It hides the options that do not match what was typed, and because a hidden option leaves the list box's navigation, everything downstream follows: the arrows skip it, the counter drops it, and the select-all button takes only what is left on screen. The selection itself survives filtering.
+
+<Example code={`<div class="transfer" data-coreui-toggle="transfer" data-coreui-search="true">
+    <div class="list-box transfer-list" data-coreui-transfer-list="source">
+      <div class="list-box-header">
+        <button type="button" class="list-box-select-all" data-coreui-select-all></button>
+      </div>
+      <div class="list-box-options" role="listbox">
+        <div class="list-box-option" data-coreui-value="apple">Apple</div>
+        <div class="list-box-option" data-coreui-value="apricot">Apricot</div>
+        <div class="list-box-option" data-coreui-value="banana">Banana</div>
+        <div class="list-box-option" data-coreui-value="blueberry">Blueberry</div>
+        <div class="list-box-option" data-coreui-value="cherry">Cherry</div>
+        <div class="list-box-option" data-coreui-value="cranberry">Cranberry</div>
+      </div>
+    </div>
+    <div class="transfer-actions">
+      <button type="button" class="btn btn-subtle btn-sm" data-coreui-transfer-move="target-all"></button>
+      <button type="button" class="btn btn-subtle btn-sm" data-coreui-transfer-move="target"></button>
+      <button type="button" class="btn btn-subtle btn-sm" data-coreui-transfer-move="source"></button>
+      <button type="button" class="btn btn-subtle btn-sm" data-coreui-transfer-move="source-all"></button>
+    </div>
+    <div class="list-box transfer-list" data-coreui-transfer-list="target">
+      <div class="list-box-header">
+        <button type="button" class="list-box-select-all" data-coreui-select-all></button>
+      </div>
+      <div class="list-box-options" role="listbox">
+      </div>
+    </div>
+  </div>`} />
+
+Put your own `[data-coreui-transfer-search]` input in a list and it is used as it is, `search` option or not — that is how you change its classes, its placeholder or its position.
+
+## One way
+
+`oneWay` takes the return trip away: both buttons that move back are hidden, `moveToSource()` and `moveAllToSource()` refuse, and a value that has been chosen stays chosen.
+
+<Example code={`<div class="transfer" data-coreui-toggle="transfer" data-coreui-one-way="true">
+    <div class="list-box transfer-list" data-coreui-transfer-list="source">
+      <div class="list-box-header">
+        <button type="button" class="list-box-select-all" data-coreui-select-all></button>
+      </div>
+      <div class="list-box-options" role="listbox">
+        <div class="list-box-option" data-coreui-value="1">List item 1</div>
+        <div class="list-box-option" data-coreui-value="2">List item 2</div>
+        <div class="list-box-option" data-coreui-value="3">List item 3</div>
+      </div>
+    </div>
+    <div class="transfer-actions">
+      <button type="button" class="btn btn-subtle btn-sm" data-coreui-transfer-move="target-all"></button>
+      <button type="button" class="btn btn-subtle btn-sm" data-coreui-transfer-move="target"></button>
+      <button type="button" class="btn btn-subtle btn-sm" data-coreui-transfer-move="source"></button>
+      <button type="button" class="btn btn-subtle btn-sm" data-coreui-transfer-move="source-all"></button>
+    </div>
+    <div class="list-box transfer-list" data-coreui-transfer-list="target">
+      <div class="list-box-header">
+        <button type="button" class="list-box-select-all" data-coreui-select-all></button>
+      </div>
+      <div class="list-box-options" role="listbox">
+      </div>
+    </div>
+  </div>`} />
+
+## Titles
+
+`sourceTitle` and `targetTitle` name the two lists. The title is written into the select-all button when the button is empty, so a button with its own text keeps it, and it becomes the list's accessible name and the destination named in the move announcement.
+
+<Example code={`<div class="transfer" data-coreui-toggle="transfer" data-coreui-source-title="Team" data-coreui-target-title="On call" data-coreui-selected-counter-text="picked">
+    <div class="list-box transfer-list" data-coreui-transfer-list="source">
+      <div class="list-box-header">
+        <button type="button" class="list-box-select-all" data-coreui-select-all></button>
+      </div>
+      <div class="list-box-options" role="listbox">
+        <div class="list-box-option" data-coreui-value="ada">Ada</div>
+        <div class="list-box-option" data-coreui-value="grace">Grace</div>
+        <div class="list-box-option" data-coreui-value="linus">Linus</div>
+      </div>
+    </div>
+    <div class="transfer-actions">
+      <button type="button" class="btn btn-subtle btn-sm" data-coreui-transfer-move="target-all"></button>
+      <button type="button" class="btn btn-subtle btn-sm" data-coreui-transfer-move="target"></button>
+      <button type="button" class="btn btn-subtle btn-sm" data-coreui-transfer-move="source"></button>
+      <button type="button" class="btn btn-subtle btn-sm" data-coreui-transfer-move="source-all"></button>
+    </div>
+    <div class="list-box transfer-list" data-coreui-transfer-list="target">
+      <div class="list-box-header">
+        <button type="button" class="list-box-select-all" data-coreui-select-all></button>
+      </div>
+      <div class="list-box-options" role="listbox">
+      </div>
+    </div>
+  </div>`} />
+
+## Descriptions
+
+An option is the list box's, so it takes a `.list-box-option-label` and a `.list-box-option-description` here too — and the search matches on the label, not on the description.
+
+<Example code={`<div class="transfer" data-coreui-toggle="transfer">
+    <div class="list-box transfer-list" data-coreui-transfer-list="source">
+      <div class="list-box-header">
+        <button type="button" class="list-box-select-all" data-coreui-select-all></button>
+      </div>
+      <div class="list-box-options" role="listbox">
+        <div class="list-box-option" data-coreui-value="read">
+          <span class="list-box-option-label">Read</span>
+          <span class="list-box-option-description">See the contents of a file</span>
+        </div>
+        <div class="list-box-option" data-coreui-value="write">
+          <span class="list-box-option-label">Write</span>
+          <span class="list-box-option-description">Change the contents of a file</span>
+        </div>
+        <div class="list-box-option" data-coreui-value="share">
+          <span class="list-box-option-label">Share</span>
+          <span class="list-box-option-description">Give someone else access</span>
+        </div>
+      </div>
+    </div>
+    <div class="transfer-actions">
+      <button type="button" class="btn btn-subtle btn-sm" data-coreui-transfer-move="target-all"></button>
+      <button type="button" class="btn btn-subtle btn-sm" data-coreui-transfer-move="target"></button>
+      <button type="button" class="btn btn-subtle btn-sm" data-coreui-transfer-move="source"></button>
+      <button type="button" class="btn btn-subtle btn-sm" data-coreui-transfer-move="source-all"></button>
+    </div>
+    <div class="list-box transfer-list" data-coreui-transfer-list="target">
+      <div class="list-box-header">
+        <button type="button" class="list-box-select-all" data-coreui-select-all></button>
+      </div>
+      <div class="list-box-options" role="listbox">
+      </div>
+    </div>
+  </div>`} />
+
+## Disabled items
+
+`.disabled` with `aria-disabled="true"` takes an option out of the keyboard order and out of every selection method, so it never moves. `data-coreui-disabled="true"` on the transfer does the same for all of it: both lists go quiet and both buttons are disabled.
+
+<Example code={`<div class="transfer" data-coreui-toggle="transfer">
+    <div class="list-box transfer-list" data-coreui-transfer-list="source">
+      <div class="list-box-header">
+        <button type="button" class="list-box-select-all" data-coreui-select-all></button>
+      </div>
+      <div class="list-box-options" role="listbox">
+        <div class="list-box-option" data-coreui-value="1">List item 1</div>
+        <div class="list-box-option disabled" aria-disabled="true" data-coreui-value="2">List item 2 — locked</div>
+        <div class="list-box-option" data-coreui-value="3">List item 3</div>
+      </div>
+    </div>
+    <div class="transfer-actions">
+      <button type="button" class="btn btn-subtle btn-sm" data-coreui-transfer-move="target-all"></button>
+      <button type="button" class="btn btn-subtle btn-sm" data-coreui-transfer-move="target"></button>
+      <button type="button" class="btn btn-subtle btn-sm" data-coreui-transfer-move="source"></button>
+      <button type="button" class="btn btn-subtle btn-sm" data-coreui-transfer-move="source-all"></button>
+    </div>
+    <div class="list-box transfer-list" data-coreui-transfer-list="target">
+      <div class="list-box-header">
+        <button type="button" class="list-box-select-all" data-coreui-select-all></button>
+      </div>
+      <div class="list-box-options" role="listbox">
+      </div>
+    </div>
+  </div>`} />
+
+## Accessibility
+
+Each list is a listbox of its own with the title as its accessible name, and the select-all button carries the state of its list in `aria-pressed` — all of that comes from [List box](/components/list-box/#accessibility), keyboard included: the arrows, <kbd>Home</kbd>, <kbd>End</kbd>, <kbd>Space</kbd>, <kbd>Shift</kbd> ranges, <kbd>Ctrl</kbd> + <kbd>A</kbd> and the typeahead all work inside the list that has the focus.
+
+What the transfer adds is the crossing. Each move button is named — `ariaMoveToTargetLabel`, `ariaMoveToSourceLabel`, `ariaMoveAllToTargetLabel`, `ariaMoveAllToSourceLabel` (a button that already carries an `aria-label` keeps it) — points at the list it fills through `aria-controls`, and is disabled while it has nothing to move, so the keyboard never lands on a button that would do nothing. The chevrons are decorative `aria-hidden` SVGs, so the name is all a screen reader gets.
+
+The move happens away from the focus, and the button that did it usually turns off in the process — a list with nothing selected left. Rather than dropping the focus on the document, the plugin puts it on the first option that just arrived.
+
+A `.transfer-announcer` region marked `role="status"` reports the move either way: `ariaMovedAnnouncement` is `'{count} moved to {title}'` by default, with `{title}` the destination's title. `{count}` and `{title}` are replaced wherever they appear, so the sentence can be reordered for a translation.
+
+| Key | Action |
+| --- | --- |
+| `Tab` | Move between the select-all button, the search field, the options and the move buttons |
+| `↓` / `↑` | Move the highlight inside the focused list |
+| `Space` | Toggle the highlighted option |
+| `Shift` + `↓` / `↑` | Extend the selection inside the focused list |
+| `Ctrl` / `Cmd` + `A` | Select every visible, enabled option of the focused list |
+| `Enter` / `Space` | Move the selection when the focus is on a move button |
+
+## Usage
+
+### Via data attributes
+
+Add `data-coreui-toggle="transfer"` to a `.transfer` and the plugin initializes it on page load. Mark each `.list-box` with `data-coreui-transfer-list` and each button with `data-coreui-transfer-move`.
+
+| Attribute | Description |
+| --- | --- |
+| `data-coreui-toggle="transfer"` | Initializes the transfer on page load. |
+| `data-coreui-transfer-list` | Marks a `.list-box` as the `source` or the `target` list. |
+| `data-coreui-transfer-move` | Marks a move button: `target` / `source` move the selection, `target-all` / `source-all` move every visible, enabled option. |
+| `data-coreui-transfer-search` | Marks an input as the search field of the list it sits in. |
+| `data-coreui-transfer-counter` | Marks the element that holds the `{selected}/{visible}` counter. Created in the header when it is missing. |
+
+A move button left empty gets the chevron its direction calls for; put anything of your own in it — a label, your own icon — and that is what stays.
+
+```html
+<div class="transfer" data-coreui-toggle="transfer">
+  <div class="list-box transfer-list" data-coreui-transfer-list="source">
+    <div class="list-box-header">
+      <button type="button" class="list-box-select-all" data-coreui-select-all></button>
+    </div>
+    <div class="list-box-options" role="listbox">
+      <div class="list-box-option" data-coreui-value="1">List item 1</div>
+    </div>
+  </div>
+  <div class="transfer-actions">
+    <button type="button" class="btn btn-subtle btn-sm" data-coreui-transfer-move="target-all"></button>
+    <button type="button" class="btn btn-subtle btn-sm" data-coreui-transfer-move="target"></button>
+    <button type="button" class="btn btn-subtle btn-sm" data-coreui-transfer-move="source"></button>
+    <button type="button" class="btn btn-subtle btn-sm" data-coreui-transfer-move="source-all"></button>
+  </div>
+  <div class="list-box transfer-list" data-coreui-transfer-list="target">
+    <div class="list-box-header">
+      <button type="button" class="list-box-select-all" data-coreui-select-all></button>
+    </div>
+    <div class="list-box-options" role="listbox"></div>
+  </div>
+</div>
+```
+
+### Via JavaScript
+
+```js
+const transfer = new coreui.Transfer('#myTransfer', {
+  search: true,
+  sourceTitle: 'Team',
+  targetTitle: 'On call'
+})
+```
+
+### Options
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `allowList` | object | `SVGAllowlist` | What the icon sanitizer keeps. |
+| `ariaMoveAllToSourceLabel` | string | `'Move all to available'` | Accessible name of the button that moves everything back to the source list. |
+| `ariaMoveAllToTargetLabel` | string | `'Move all to chosen'` | Accessible name of the button that moves everything to the target list. |
+| `ariaMoveToSourceLabel` | string | `'Move to available'` | Accessible name of the button that moves the selection back to the source list. A button with its own `aria-label` keeps it. |
+| `ariaMoveToTargetLabel` | string | `'Move to chosen'` | Accessible name of the button that moves the selection to the target list. |
+| `ariaMovedAnnouncement` | string | `'{count} moved to {title}'` | What the live region says after a move. `{count}` is how many options moved, `{title}` the destination's title. |
+| `disabled` | boolean | `false` | Turns the whole transfer off: both list boxes, both move buttons and both search fields. |
+| `indicator` | string | `'checkbox'` | Passed to both list boxes. `'none'` drops the checkbox in front of every option. |
+| `moveAllToSourceIcon` | string | `cil-chevron-double-left-alt` | Icon of the button that moves everything back. Inline SVG, put in the button only when the markup left it empty. |
+| `moveAllToTargetIcon` | string | `cil-chevron-double-right-alt` | Icon of the button that moves everything across. |
+| `moveToSourceIcon` | string | `cil-chevron-left-alt` | Icon of the button that moves the selection back. |
+| `moveToTargetIcon` | string | `cil-chevron-right-alt` | Icon of the button that moves the selection across. |
+| `oneWay` | boolean | `false` | Hides and disables both buttons that move back, and makes `moveToSource()` and `moveAllToSource()` no-ops. |
+| `sanitize` | boolean | `true` | Run the icon strings through the sanitizer. |
+| `sanitizeFn` | null, function | `null` | Your own sanitizer, used instead of the built-in one. |
+| `search` | boolean | `false` | Builds a search field above each list. An input the markup already carries is used instead. |
+| `searchPlaceholder` | string | `'Search'` | Placeholder of the built search field, and the first half of its accessible name. |
+| `selectedCounterText` | string | `'selected'` | The word after the `{selected}/{visible}` counter in each header. |
+| `sourceTitle` | string | `'Available'` | Title of the source list: its select-all label when the button is empty, and its accessible name. |
+| `targetTitle` | string | `'Chosen'` | Title of the target list. |
+| `typeahead` | boolean | `true` | Passed to both list boxes: move the highlight to the option matching what the user types. |
+
+### Methods
+
+| Method | Description |
+| --- | --- |
+| `moveToTarget(values?)` | Moves the source list's selection to the target list. Pass an array of values to move exactly those, selected or not. |
+| `moveToSource(values?)` | The same in the other direction. Does nothing with `oneWay`. |
+| `moveAllToTarget()` | Moves every visible, enabled option of the source list — the same scope the select-all button works on. |
+| `moveAllToSource()` | The same in the other direction. Does nothing with `oneWay`. |
+| `getSource()` | The values in the source list, in document order. |
+| `getTarget()` | The values in the target list, in document order. |
+| `getSelected(list)` | The selected values of `'source'` or `'target'`. |
+| `update` | Re-reads the DOM: options added or removed reach both list boxes, the search is re-applied, and the counters and the buttons are re-evaluated. |
+| `dispose` | Destroys the transfer and both list boxes, and removes the live region. |
+| `getInstance` | Static method which allows you to get the transfer instance associated to a DOM element, you can use it like this: `coreui.Transfer.getInstance(element)`. |
+| `getOrCreateInstance` | Static method which returns a transfer instance associated to a DOM element or creates a new one in case it wasn't initialized. You can use it like this: `coreui.Transfer.getOrCreateInstance(element)`. |
+
+### Events
+
+Events fire on the `.transfer` element.
+
+| Event type | Description |
+| --- | --- |
+| `move.coreui.transfer` | Fires before options are moved; `event.direction` is `'source'` or `'target'` and `event.values` the values about to move. Cancelable — calling `preventDefault()` leaves both lists as they were. |
+| `moved.coreui.transfer` | Fired after the options were moved, with the same `direction` and `values`. |
+| `change.coreui.transfer` | Fired after a move settled; `event.sourceValues` and `event.targetValues` are the values of the two lists. The names avoid `event.target`, which stays the `.transfer` element. |
+
+```js
+const myTransfer = document.getElementById('myTransfer')
+myTransfer.addEventListener('change.coreui.transfer', event => {
+  console.log(event.targetValues)
+})
+```
+
+## Customizing
+
+### CSS variables
+
+<ScssDocs file="scss/_transfer.scss" capture="transfer-css-vars" />
+
+### Sass variables
+
+<DeprecatedIn version="6.0.0" />
+
+Sass variables set these defaults at build time and are removed in v7. The CSS variables above reach the same values without recompiling, and can be set on a single element.
+
+<ScssDocs file="scss/_transfer.scss" capture="transfer-variables" />
