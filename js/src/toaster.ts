@@ -100,10 +100,10 @@ const TEMPLATE = [
 
 const Default: ToasterConfig = {
   allowList: DefaultAllowlist,
+  ariaLabel: 'Notifications',
   container: 'body',
   enter: 'auto',
   html: false,
-  label: 'Notifications',
   leave: 'auto',
   limit: 3,
   pauseOnHover: true,
@@ -117,10 +117,10 @@ const Default: ToasterConfig = {
 
 const DefaultType = {
   allowList: 'object',
+  ariaLabel: 'string',
   container: '(string|element)',
   enter: 'string',
   html: 'boolean',
-  label: 'string',
   leave: 'string',
   limit: 'number',
   pauseOnHover: 'boolean',
@@ -163,10 +163,10 @@ type LeaveEdge = 'auto' | 'end' | 'start'
 
 type ToasterConfig = {
   allowList: SanitizerAllowList
+  ariaLabel: string
   container: string | Element
   enter: Edge
   html: boolean
-  label: string
   leave: LeaveEdge
   limit: number
   pauseOnHover: boolean
@@ -260,7 +260,7 @@ class Toaster extends BaseComponent {
     }
 
     this._element.setAttribute('role', 'region')
-    this._element.setAttribute('aria-label', this._config.label)
+    this._element.setAttribute('aria-label', this._config.ariaLabel)
 
     if (this._config.enter !== 'auto') {
       this._element.style.setProperty(PROPERTY_ENTER_TRANSLATE, EDGES[this._config.enter])
