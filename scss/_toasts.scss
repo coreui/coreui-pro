@@ -219,23 +219,28 @@ $toast-tokens: defaults(
     --#{$prefix}toast-stack-peek: .75rem;
     --#{$prefix}toast-stack-scale: .05;
     --#{$prefix}toast-stack-visible: 3;
+    // Every toast behind is scaled by the same ratio again and pushed towards a vanishing depth,
+    // so the corners of the stack line up and each strip is the previous one times the ratio
+    --#{$prefix}toast-stack-ratio: calc(1 - var(--#{$prefix}toast-stack-scale));
+    --#{$prefix}toast-stack-depth: calc(var(--#{$prefix}toast-stack-front-height) + var(--#{$prefix}toast-stack-peek) / var(--#{$prefix}toast-stack-scale));
+    --#{$prefix}toast-stack-last: calc(min(var(--#{$prefix}toast-stack-count), var(--#{$prefix}toast-stack-visible)) - 1);
 
     width: var(--#{$prefix}toast-max-width);
     max-width: 100%;
-    height: calc(var(--#{$prefix}toast-stack-front-height) + (min(var(--#{$prefix}toast-stack-count), var(--#{$prefix}toast-stack-visible)) - 1) * var(--#{$prefix}toast-stack-peek));
+    height: calc(var(--#{$prefix}toast-stack-depth) * (1 - pow(var(--#{$prefix}toast-stack-ratio), var(--#{$prefix}toast-stack-last))) + var(--#{$prefix}toast-stack-front-height) * pow(var(--#{$prefix}toast-stack-ratio), var(--#{$prefix}toast-stack-last)));
     pointer-events: auto;
     @include transition-props(height, var(--#{$prefix}toast-transition-duration), var(--#{$prefix}toast-transition-timing));
 
     > .toast {
       position: absolute;
-      inset-block-start: calc(var(--#{$prefix}toast-stack-index) * var(--#{$prefix}toast-stack-peek));
+      inset-block-start: calc(var(--#{$prefix}toast-stack-depth) * (1 - pow(var(--#{$prefix}toast-stack-ratio), var(--#{$prefix}toast-stack-index))));
       inset-inline: 0;
       z-index: calc(var(--#{$prefix}toast-stack-visible) - var(--#{$prefix}toast-stack-index));
       height: var(--#{$prefix}toast-stack-front-height);
       margin-block-end: 0;
       overflow: hidden;
       transform-origin: top center;
-      scale: calc(1 - var(--#{$prefix}toast-stack-index) * var(--#{$prefix}toast-stack-scale));
+      scale: pow(var(--#{$prefix}toast-stack-ratio), var(--#{$prefix}toast-stack-index));
       @include transition-props(
         #{"opacity, translate, display, inset-block-start, height, scale"},
         var(--#{$prefix}toast-transition-duration),
@@ -282,7 +287,7 @@ $toast-tokens: defaults(
   .toast-container-bottom-end.toast-container-stack {
     > .toast {
       inset-block-start: auto;
-      inset-block-end: calc(var(--#{$prefix}toast-stack-index) * var(--#{$prefix}toast-stack-peek));
+      inset-block-end: calc(var(--#{$prefix}toast-stack-depth) * (1 - pow(var(--#{$prefix}toast-stack-ratio), var(--#{$prefix}toast-stack-index))));
       transform-origin: bottom center;
       @include transition-props(
         #{"opacity, translate, display, inset-block-end, height, scale"},
