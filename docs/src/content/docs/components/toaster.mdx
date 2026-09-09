@@ -15,6 +15,7 @@ import toasterLimit from './snippets/toaster-limit.js?raw'
 import toasterStack from './snippets/toaster-stack.js?raw'
 import toasterPlacement from './snippets/toaster-placement.js?raw'
 import toasterPlacementStack from './snippets/toaster-placement-stack.js?raw'
+import toasterInstant from './snippets/toaster-instant.js?raw'
 
 ## Overview
 
@@ -29,9 +30,7 @@ toaster.close(id)
 
 Without an element the toaster creates its own `.toast-container` in `<body>`, placed by the `placement` option; pass an existing container instead to keep control over where the toasts land. The container is a `region` landmark named `Notifications`, so users of assistive technology can navigate to it.
 
-## Examples
-
-### Live example
+## Live example
 
 Two toasters, each with its container in a top corner of the viewport: a list on the end side and a [stack](#stacking) on the start side. Every other example on this page passes a container that sits inside the example, so its toasts stay put.
 
@@ -40,7 +39,7 @@ Two toasters, each with its container in a top corner of the viewport: a list on
 
 <Code code={toaster} lang="js" />
 
-### Title, description and theme
+## Title, description and theme
 
 A toast is a plain options object. `title` renders the header with a close button, `description` the body; a toast without a title puts the close button in the body. `theme` adds the `theme-{color}` class, `priority: 'high'` makes it an alert for screen readers, `timeout` overrides the toaster's default (`0` keeps the toast until it is closed) and `dismissible: false` drops the close button.
 
@@ -56,7 +55,7 @@ A toast is a plain options object. `title` renders the header with a close butto
 
 Strings are written as text. Set `html: true` on the toaster to render markup; it runs through the same sanitizer as tooltips, configurable with `allowList` and `sanitizeFn`.
 
-### Updating a toast
+## Updating a toast
 
 Passing an `id` that already exists updates that toast instead of adding a second one, and bumps its `updateKey`, so a "Draft saved" toast clicked twice stays a single toast. `update()` does the same for a toast whose id you kept, and accepts a function of the current toast when the change depends on it: `toaster.update(id, previous => ({ description: previous.data.step + 1 }))`.
 
@@ -68,7 +67,7 @@ Passing an `id` that already exists updates that toast instead of adding a secon
 
 <Code code={toasterUpdate} lang="js" />
 
-### Promises
+## Promises
 
 `promise()` adds a toast in the `loading` state and updates it when the promise settles: `success` receives the resolved value, `error` the rejection. Each state is a description string, a full options object, or a function returning either.
 
@@ -77,7 +76,7 @@ Passing an `id` that already exists updates that toast instead of adding a secon
 
 <Code code={toasterPromise} lang="js" />
 
-### Action
+## Action
 
 `action` renders a button in the body; its `onClick` receives the click event and the toast object, so an undo can rewrite the same toast.
 
@@ -86,7 +85,7 @@ Passing an `id` that already exists updates that toast instead of adding a secon
 
 <Code code={toasterAction} lang="js" />
 
-### Limit
+## Limit
 
 `limit` caps how many toasts are visible at once. The newest stay on screen; older ones sink away from the edge and fade, remain in the DOM with `inert` and `data-coreui-limited`, and rise back in as the visible ones go away. `limit: 0` shows everything.
 
@@ -98,7 +97,7 @@ Passing an `id` that already exists updates that toast instead of adding a secon
 
 <Code code={toasterLimit} lang="js" />
 
-### Stacking
+## Stacking
 
 With `stack: true` the toasts sit on top of each other: the newest in front at full size, the ones behind it scaled down by `--cui-toast-stack-scale` per step and receding towards a vanishing depth. The first toast behind peeks out by `--cui-toast-stack-peek` and every further one by that strip times the scale ratio, so the corners of the stack line up like a deck of cards seen in perspective. Only the front toast's timer runs; the ones behind wait their turn and start counting when they reach the front, so the stack empties from the front. A toast that leaves from behind — closed by id, or pushed over the limit — fades where it is instead of sliding out from under the deck. Hovering or focusing the container spreads the stack into a list; leaving it folds the stack back. The stack takes the place of the flow layout; `limit` decides how many toasts it holds. Folded, the deck shows the front toast and two behind it (`--cui-toast-stack-visible`); spreading it reveals every toast within the limit.
 
@@ -128,13 +127,25 @@ A stack works in every placement: it grows away from the edge it is pinned to, s
 
 <Code code={toasterPlacementStack} lang="js" />
 
-### Motion
+## Motion
 
-A toast slides in from beyond the container's edge while it fades in — from the side in the `start` and `end` placements, from above or below in the `center` ones — and slides out sideways when it closes, so a toast closed in the middle of a list never has to pass through its neighbours. While a toast leaves, the ones behind it glide into the freed space; when a new one arrives, they make room the same way. A toast with `instant: true` skips all of it — no slide, no fade, no glide of its neighbours, no stack transition — and so does every toast when the user prefers reduced motion: the stylesheet emits no transitions under `prefers-reduced-motion: reduce` and the toaster skips its position animations, so toasts appear, move and vanish in place. `enter` picks another edge for the entry and `leave` the side for the exit — a `top-end` toaster can drop its toasts in from above and still send them out to the right — and a toast outside a placed container slides by `--cui-toast-slide` instead. All of it respects `prefers-reduced-motion`.
+A toast slides in from beyond the container's edge while it fades in — from the side in the `start` and `end` placements, from above or below in the `center` ones — and slides out sideways when it closes, so a toast closed in the middle of a list never has to pass through its neighbours. While a toast leaves, the ones behind it glide into the freed space; when a new one arrives, they make room the same way. `enter` picks another edge for the entry and `leave` the side for the exit — a `top-end` toaster can drop its toasts in from above and still send them out to the right — and a toast outside a placed container slides by `--cui-toast-slide` instead. All of it respects `prefers-reduced-motion`.
 
 ```js
 const toaster = new coreui.Toaster(null, { placement: 'top-end', enter: 'top', leave: 'end' })
 ```
+
+### Instant
+
+A toast with `instant: true` skips all of it — no slide, no fade, no glide of its neighbours, no stack transition — and so does every toast when the user prefers reduced motion: the stylesheet emits no transitions under `prefers-reduced-motion: reduce` and the toaster skips its position animations, so toasts appear, move and vanish in place.
+
+<Example code={`<div class="hstack gap-2 mb-3">
+    <button type="button" class="btn-solid theme-primary" id="toasterInstantBtn">Add an instant toast</button>
+    <button type="button" class="btn-solid theme-secondary" id="toasterAnimatedBtn">Add an animated toast</button>
+  </div>
+  <div class="toast-container position-static" id="toasterInstant"></div>`} sandboxJs={toasterInstant} />
+
+<Code code={toasterInstant} lang="js" />
 
 ## Placement
 
