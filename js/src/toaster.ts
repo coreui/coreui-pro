@@ -38,6 +38,7 @@ const CLASS_NAME_ANNOUNCER = 'toast-announcer'
 const CLASS_NAME_INSTANT = 'toast-instant'
 const CLASS_NAME_SHOW = 'show'
 const CLASS_NAME_TRANSLUCENT = 'toast-translucent'
+const CLASS_NAME_ROW = 'toast-row'
 
 const SELECTOR_TITLE = '.toast-title'
 const SELECTOR_DESCRIPTION = '.toast-description'
@@ -482,6 +483,8 @@ class Toaster extends BaseComponent {
         close.remove()
       }
     }
+
+    body.classList.toggle(CLASS_NAME_ROW, body.querySelector(`${SELECTOR_ACTION}, ${SELECTOR_CLOSE}`) !== null)
 
     if (toast.theme) {
       element.classList.add(`theme-${toast.theme}`)

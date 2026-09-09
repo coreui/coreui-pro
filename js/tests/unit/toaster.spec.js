@@ -119,6 +119,7 @@ describe('Toaster', () => {
 
       expect(toastEl.querySelector('.toast-header')).toBeNull()
       expect(toastEl.querySelector('.toast-body .btn-close')).not.toBeNull()
+      expect(toastEl.querySelector('.toast-body')).toHaveClass('toast-row')
     })
 
     it('should drop the close button when dismissible is false', () => {

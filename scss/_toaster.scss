@@ -8,7 +8,7 @@
     flex: 1 1 auto;
   }
 
-  .toast-body:has(> .toast-action, > .btn-close) {
+  .toast-row {
     display: flex;
     gap: var(--#{$prefix}toast-padding-x);
     align-items: center;
