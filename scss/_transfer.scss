@@ -1,0 +1,86 @@
+@use "functions/defaults" as *;
+@use "layout/breakpoints" as *;
+@use "mixins/tokens" as *;
+@use "config" as *;
+
+// scss-docs-start transfer-variables
+$transfer-gap:              1rem !default;
+$transfer-actions-gap:      .5rem !default;
+$transfer-list-min-height:  8rem !default;
+$transfer-list-max-height:  16rem !default;
+$transfer-search-margin:    .375rem .375rem 0 !default;
+// scss-docs-end transfer-variables
+
+$transfer-tokens: () !default;
+
+// stylelint-disable scss/dollar-variable-default
+
+// scss-docs-start transfer-css-vars
+$transfer-tokens: defaults(
+  (
+    --#{$prefix}transfer-gap: #{$transfer-gap},
+    --#{$prefix}transfer-actions-gap: #{$transfer-actions-gap},
+    --#{$prefix}transfer-list-min-height: #{$transfer-list-min-height},
+    --#{$prefix}transfer-list-max-height: #{$transfer-list-max-height},
+    --#{$prefix}transfer-search-margin: #{$transfer-search-margin},
+  ),
+  $transfer-tokens
+);
+// scss-docs-end transfer-css-vars
+
+// stylelint-enable scss/dollar-variable-default
+
+@layer components {
+  .transfer {
+    @include tokens($transfer-tokens);
+
+    display: flex;
+    gap: var(--#{$prefix}transfer-gap);
+
+    @include media-breakpoint-down(sm) {
+      flex-direction: column;
+    }
+  }
+
+  .transfer-list {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .transfer-list .list-box-header {
+    justify-content: space-between;
+  }
+
+  .transfer-list .list-box-select-all {
+    flex: 1 1 auto;
+    width: auto;
+    min-width: 0;
+  }
+
+  .transfer-list .list-box-subtitle {
+    flex: 0 0 auto;
+  }
+
+  .transfer-list .list-box-options {
+    min-height: var(--#{$prefix}transfer-list-min-height);
+    max-height: var(--#{$prefix}transfer-list-max-height);
+    overflow-y: auto;
+  }
+
+  .transfer-search {
+    width: auto;
+    margin: var(--#{$prefix}transfer-search-margin);
+  }
+
+  .transfer-actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--#{$prefix}transfer-actions-gap);
+    align-items: center;
+    justify-content: center;
+
+    @include media-breakpoint-down(sm) {
+      flex-direction: row;
+    }
+  }
+}
