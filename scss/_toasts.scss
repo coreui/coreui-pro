@@ -252,8 +252,13 @@ $toast-tokens: defaults(
       }
     }
 
-    > .toast:not([data-coreui-stack-index="0"]) > * {
-      opacity: 0;
+    > .toast:not([data-coreui-stack-index="0"]) {
+      --#{$prefix}toast-leave-translate: 0 0;
+      --#{$prefix}toast-limited-translate: 0 0;
+
+      > * {
+        opacity: 0;
+      }
     }
 
     &:is(:hover, :focus-within) {
