@@ -134,6 +134,10 @@ $toast-tokens: defaults(
     > :not(:last-child) {
       margin-bottom: var(--#{$prefix}toast-spacing);
     }
+
+    > .toast {
+      position: relative;
+    }
   }
 
   // scss-docs-start toast-container-placements

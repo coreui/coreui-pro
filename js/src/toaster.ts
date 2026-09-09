@@ -53,6 +53,7 @@ const ATTRIBUTE_UPDATE_KEY = 'data-coreui-update-key'
 
 const PROPERTY_STACK_INDEX = '--cui-toast-stack-index'
 const STACK_VISIBLE = 3
+const GLIDE_ID = 'coreui.toaster.glide'
 
 const PROPERTY_STACK_BEFORE = '--cui-toast-stack-before'
 const PROPERTY_STACK_COUNT = '--cui-toast-stack-count'
@@ -230,6 +231,7 @@ class Toaster extends BaseComponent {
   protected declare _entries: Map<string, Entry>
   protected declare _ownsContainer: boolean
   protected declare _resizeObserver: ResizeObserver | null
+  protected declare _order: number
   protected declare _announcers: Record<'high' | 'low', HTMLElement>
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
@@ -237,6 +239,7 @@ class Toaster extends BaseComponent {
     super(ownsContainer ? document.createElement('div') : element, config)
 
     this._entries = new Map()
+    this._order = 0
     this._ownsContainer = ownsContainer
 
     if (!PLACEMENTS.has(this._config.placement)) {
@@ -320,6 +323,7 @@ class Toaster extends BaseComponent {
 
     toast.element = this._render(toast)
     toast.element.setAttribute(ATTRIBUTE_ID, toast.id)
+    toast.element.style.zIndex = String(++this._order)
 
     const timeout = toast.timeout ?? this._config.timeout
     const instance = new Toast(toast.element, { autohide: timeout > 0, delay: timeout })
@@ -670,6 +674,14 @@ class Toaster extends BaseComponent {
     this.resume()
   }
 
+  _cancelGlide(element: Element): void {
+    for (const animation of element.getAnimations()) {
+      if (animation.id === GLIDE_ID) {
+        animation.cancel()
+      }
+    }
+  }
+
   _isSettled(element: Element): boolean {
     return element.classList.contains(CLASS_NAME_SHOW) && !element.hasAttribute(ATTRIBUTE_LIMITED) && element.getClientRects().length > 0
   }
@@ -686,7 +698,7 @@ class Toaster extends BaseComponent {
 
     const layout = new Map<Element, number>()
     for (const child of this._element.querySelectorAll(':scope > .toast')) {
-      if (this._isSettled(child)) {
+      if (child.getClientRects().length > 0) {
         layout.set(child, child.getBoundingClientRect().top)
       }
     }
@@ -704,9 +716,7 @@ class Toaster extends BaseComponent {
     const siblings = [...this._element.querySelectorAll(':scope > .toast')].filter(child => child !== element && this._isSettled(child))
     const visual = siblings.map(child => child.getBoundingClientRect().top)
     for (const child of siblings) {
-      for (const animation of child.getAnimations()) {
-        animation.cancel()
-      }
+      this._cancelGlide(child)
     }
 
     const layout = siblings.map(child => child.getBoundingClientRect().top)
@@ -725,7 +735,9 @@ class Toaster extends BaseComponent {
       if (from !== to) {
         child.animate(
           [{ transform: `translateY(${from}px)` }, { transform: `translateY(${to}px)` }],
-          { duration: getTransitionDurationFromElement(element) || 150, easing: 'ease-out', fill: 'forwards' }
+          {
+            duration: getTransitionDurationFromElement(element) || 150, easing: 'ease-out', fill: 'forwards', id: GLIDE_ID
+          }
         )
       }
     }
@@ -742,15 +754,13 @@ class Toaster extends BaseComponent {
         continue
       }
 
-      for (const animation of child.getAnimations()) {
-        animation.cancel()
-      }
+      this._cancelGlide(child)
 
       const delta = previous - child.getBoundingClientRect().top
       if (delta !== 0) {
         child.animate(
           [{ transform: `translateY(${delta}px)` }, { transform: 'none' }],
-          { duration: getTransitionDurationFromElement(child) || 150, easing: 'ease-out' }
+          { duration: getTransitionDurationFromElement(child) || 150, easing: 'ease-out', id: GLIDE_ID }
         )
       }
     }
