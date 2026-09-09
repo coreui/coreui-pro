@@ -12,6 +12,7 @@ import toasterUpdate from './snippets/toaster-update.js?raw'
 import toasterPromise from './snippets/toaster-promise.js?raw'
 import toasterAction from './snippets/toaster-action.js?raw'
 import toasterLimit from './snippets/toaster-limit.js?raw'
+import toasterStack from './snippets/toaster-stack.js?raw'
 
 ## Overview
 
@@ -94,6 +95,20 @@ Passing an `id` that already exists updates that toast instead of adding a secon
 
 <Code code={toasterLimit} lang="js" />
 
+### Stacking
+
+With `stack: true` the toasts sit on top of each other: the newest in front at full size, the two behind it peeking out by `--cui-toast-stack-peek` and scaled down by `--cui-toast-stack-scale` per step, anything further back hidden. Hovering or focusing the container spreads the stack into a list; leaving it folds the stack back. The stack takes the place of the flow layout, so `limit` still decides how many toasts exist, and the stack decides how many of them show — three by default (`--cui-toast-stack-visible`).
+
+<Example code={`<div class="hstack gap-2 mb-3">
+    <button type="button" class="btn-solid theme-primary" id="toasterStackBtn">Add a toast</button>
+    <button type="button" class="btn-outline theme-secondary" id="toasterStackCloseBtn">Close all</button>
+  </div>
+  <div class="toast-container position-relative" id="toasterStack"></div>`} sandboxJs={toasterStack} />
+
+<Code code={toasterStack} lang="js" />
+
+The toaster keeps the geometry in tokens the CSS reads: `--cui-toast-stack-index`, `--cui-toast-stack-before` (the height of the toasts in front) and `--cui-toast-height` on each toast, `--cui-toast-stack-count`, `--cui-toast-stack-front-height` and `--cui-toast-stack-heights` on the container. Style the stack by these — the `data-coreui-stack-index` and `data-coreui-stack-hidden` attributes mark a toast's place in it.
+
 ### Motion
 
 A toast slides in from beyond the container's edge while it fades in — from the side in the `start` and `end` placements, from above or below in the `center` ones — and slides back out when it closes. While a toast leaves, the ones behind it glide into the freed space; when a new one arrives, they make room the same way. A toast outside a placed container slides by `--cui-toast-slide` instead. All of it respects `prefers-reduced-motion`.
@@ -140,6 +155,7 @@ const id = toaster.add({ title: 'Saved', description: 'Your changes are live.', 
 | `placement` | string | `'top-end'` | Corner or edge of the viewport for the container the toaster creates: `top`, `middle` or `bottom` × `start`, `center` or `end`. Toasts in the `top` placements are inserted first, in the others last, so the newest always sits closest to the edge. |
 | `sanitize` | boolean | `true` | Sanitize HTML content. |
 | `sanitizeFn` | null, function | `null` | Your own sanitizer, used instead of the built-in one. |
+| `stack` | boolean | `false` | Stack the toasts on top of each other, newest in front, and spread them out on hover or focus. |
 | `timeout` | number | `5000` | Default time (ms) before a toast hides. `0` keeps toasts until they are closed. |
 
 ### Toast options
@@ -190,6 +206,10 @@ Events fire on the container. Each toast still fires the [toast events](/compone
 The toaster renders regular toasts, so their tokens apply — see the [toast CSS variables](/components/toasts/#css-variables). Two are its own: `--cui-toast-container-inset` on the container sets the distance from the viewport edge, and `--cui-toast-limited-translate` on a toast sets where a toast over the limit sinks to.
 
 <ScssDocs file="scss/_toasts.scss" capture="toast-container-css-vars" />
+
+The stack's peek, scale step and visible count are tokens on `.toast-container-stack`:
+
+<ScssDocs file="scss/_toasts.scss" capture="toast-stack" />
 
 ### Sass variables
 

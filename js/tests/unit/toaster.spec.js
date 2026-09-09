@@ -369,6 +369,41 @@ describe('Toaster', () => {
     })
   })
 
+  describe('stack', () => {
+    it('should index the toasts from the newest and hide those behind the third', () => {
+      toaster = new Toaster(null, { container: fixtureEl, stack: true, limit: 0 })
+      const ids = ['one', 'two', 'three', 'four'].map(description => toaster.add({ description, instant: true }))
+      const byId = id => fixtureEl.querySelector(`[data-coreui-toast-id="${id}"]`)
+
+      expect(toaster._element).toHaveClass('toast-container-stack')
+      expect(byId(ids[3]).getAttribute('data-coreui-stack-index')).toEqual('0')
+      expect(byId(ids[0]).getAttribute('data-coreui-stack-index')).toEqual('3')
+      expect(byId(ids[0]).hasAttribute('data-coreui-stack-hidden')).toBeTrue()
+      expect(byId(ids[1]).hasAttribute('data-coreui-stack-hidden')).toBeFalse()
+      expect(byId(ids[3]).style.getPropertyValue('--cui-toast-stack-before')).toEqual('0px')
+      expect(Number.parseFloat(byId(ids[2]).style.getPropertyValue('--cui-toast-stack-before'))).toBeGreaterThan(0)
+      expect(toaster._element.style.getPropertyValue('--cui-toast-stack-count')).toEqual('4')
+    })
+
+    it('should count from the last toast in a bottom placement', () => {
+      toaster = new Toaster(null, { container: fixtureEl, stack: true, placement: 'bottom-end' })
+      toaster.add({ description: 'first', instant: true })
+      toaster.add({ description: 'second', instant: true })
+
+      expect(toaster._element.lastElementChild.getAttribute('data-coreui-stack-index')).toEqual('0')
+      expect(toaster._element.firstElementChild.getAttribute('data-coreui-stack-index')).toEqual('1')
+    })
+
+    it('should leave limited toasts out of the stack', () => {
+      toaster = new Toaster(null, { container: fixtureEl, stack: true, limit: 1 })
+      const first = toaster.add({ description: 'first', instant: true })
+      toaster.add({ description: 'second', instant: true })
+
+      expect(fixtureEl.querySelector(`[data-coreui-toast-id="${first}"]`).hasAttribute('data-coreui-stack-index')).toBeFalse()
+      expect(toaster._element.style.getPropertyValue('--cui-toast-stack-count')).toEqual('1')
+    })
+  })
+
   describe('promise', () => {
     it('should show the loading state and switch to success', async () => {
       toaster = new Toaster(null, { container: fixtureEl, timeout: 0 })

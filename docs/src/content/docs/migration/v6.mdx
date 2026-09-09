@@ -1995,7 +1995,8 @@ Multi Select's option indicators moved with it — they render as a decorative
   `priority` (`status`/`polite` or `alert`/`assertive`) and can render an
   action button. Toasts slide in from beyond the container's edge and back
   out, toasts over the `limit` fade out instead of vanishing, and the toaster
-  glides the remaining toasts into place when one leaves. Nine `.toast-container-{block}-{inline}` classes pin a
+  glides the remaining toasts into place when one leaves; `stack: true`
+  piles them up, newest in front, and spreads them on hover or focus. Nine `.toast-container-{block}-{inline}` classes pin a
   container to the viewport in place of the `position-fixed top-0 end-0`
   utility stacks. New classes: `.toast-title`, `.toast-description`,
   `.toast-action`.

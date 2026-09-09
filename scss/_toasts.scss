@@ -118,6 +118,8 @@ $toast-tokens: defaults(
     // scss-docs-start toast-container-css-vars
     --#{$prefix}toast-zindex: var(--#{$prefix}z-toast);
     --#{$prefix}toast-container-inset: #{$toast-container-inset};
+    --#{$prefix}toast-max-width: #{$toast-max-width};
+    --#{$prefix}toast-spacing: #{$toast-spacing};
     // scss-docs-end toast-container-css-vars
 
     position: absolute;
@@ -202,6 +204,89 @@ $toast-tokens: defaults(
     margin-inline: auto;
   }
   // scss-docs-end toast-container-placements
+
+  // scss-docs-start toast-stack
+  .toast-container-stack {
+    --#{$prefix}toast-stack-peek: .5rem;
+    --#{$prefix}toast-stack-scale: .05;
+    --#{$prefix}toast-stack-visible: 3;
+
+    width: var(--#{$prefix}toast-max-width);
+    max-width: 100%;
+    height: calc(var(--#{$prefix}toast-stack-front-height) + (min(var(--#{$prefix}toast-stack-count), var(--#{$prefix}toast-stack-visible)) - 1) * var(--#{$prefix}toast-stack-peek));
+    @include transition-props(height, var(--#{$prefix}toast-transition-duration), var(--#{$prefix}toast-transition-timing));
+
+    > .toast {
+      position: absolute;
+      inset-block-start: calc(var(--#{$prefix}toast-stack-index) * var(--#{$prefix}toast-stack-peek));
+      inset-inline: 0;
+      z-index: calc(var(--#{$prefix}toast-stack-visible) - var(--#{$prefix}toast-stack-index));
+      height: var(--#{$prefix}toast-stack-front-height);
+      margin-block-end: 0;
+      overflow: hidden;
+      transform-origin: top center;
+      scale: calc(1 - var(--#{$prefix}toast-stack-index) * var(--#{$prefix}toast-stack-scale));
+      @include transition-props(
+        "opacity, translate, display, inset-block-start, height, scale",
+        var(--#{$prefix}toast-transition-duration),
+        var(--#{$prefix}toast-transition-timing),
+        allow-discrete
+      );
+
+      > * {
+        @include transition-props(opacity, var(--#{$prefix}toast-transition-duration), var(--#{$prefix}toast-transition-timing));
+      }
+    }
+
+    > .toast:not([data-coreui-stack-index="0"]) > * {
+      opacity: 0;
+    }
+
+    > .toast[data-coreui-stack-hidden] {
+      pointer-events: none;
+      opacity: 0;
+    }
+
+    &:is(:hover, :focus-within) {
+      height: calc(var(--#{$prefix}toast-stack-heights) + (var(--#{$prefix}toast-stack-count) - 1) * var(--#{$prefix}toast-spacing));
+
+      > .toast {
+        inset-block-start: calc(var(--#{$prefix}toast-stack-before) + var(--#{$prefix}toast-stack-index) * var(--#{$prefix}toast-spacing));
+        height: var(--#{$prefix}toast-height);
+        scale: 1;
+
+        > * {
+          opacity: 1;
+        }
+      }
+
+      > .toast[data-coreui-stack-hidden]:not([data-coreui-limited]) {
+        pointer-events: auto;
+        opacity: 1;
+      }
+    }
+  }
+
+  .toast-container-bottom-start.toast-container-stack,
+  .toast-container-bottom-center.toast-container-stack,
+  .toast-container-bottom-end.toast-container-stack {
+    > .toast {
+      inset-block-start: auto;
+      inset-block-end: calc(var(--#{$prefix}toast-stack-index) * var(--#{$prefix}toast-stack-peek));
+      transform-origin: bottom center;
+      @include transition-props(
+        "opacity, translate, display, inset-block-end, height, scale",
+        var(--#{$prefix}toast-transition-duration),
+        var(--#{$prefix}toast-transition-timing),
+        allow-discrete
+      );
+    }
+
+    &:is(:hover, :focus-within) > .toast {
+      inset-block-end: calc(var(--#{$prefix}toast-stack-before) + var(--#{$prefix}toast-stack-index) * var(--#{$prefix}toast-spacing));
+    }
+  }
+  // scss-docs-end toast-stack
 
   .toast-header {
     display: flex;

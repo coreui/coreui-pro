@@ -29,6 +29,7 @@ const EVENT_HIDE_TOAST = 'hide.coreui.toast'
 const EVENT_HIDDEN_TOAST = 'hidden.coreui.toast'
 
 const CLASS_NAME_CONTAINER = 'toast-container'
+const CLASS_NAME_STACK = 'toast-container-stack'
 const CLASS_NAME_INSTANT = 'toast-instant'
 const CLASS_NAME_SHOW = 'show'
 const CLASS_NAME_TRANSLUCENT = 'toast-translucent'
@@ -41,7 +42,18 @@ const SELECTOR_CLOSE = '.btn-close'
 
 const ATTRIBUTE_ID = 'data-coreui-toast-id'
 const ATTRIBUTE_LIMITED = 'data-coreui-limited'
+const ATTRIBUTE_STACK_INDEX = 'data-coreui-stack-index'
+const ATTRIBUTE_STACK_HIDDEN = 'data-coreui-stack-hidden'
 const ATTRIBUTE_UPDATE_KEY = 'data-coreui-update-key'
+
+const STACK_VISIBLE = 3
+
+const PROPERTY_STACK_INDEX = '--cui-toast-stack-index'
+const PROPERTY_STACK_BEFORE = '--cui-toast-stack-before'
+const PROPERTY_STACK_COUNT = '--cui-toast-stack-count'
+const PROPERTY_STACK_FRONT_HEIGHT = '--cui-toast-stack-front-height'
+const PROPERTY_STACK_HEIGHTS = '--cui-toast-stack-heights'
+const PROPERTY_TOAST_HEIGHT = '--cui-toast-height'
 
 const PLACEMENTS = new Set([
   'top-start',
@@ -78,6 +90,7 @@ const Default: ToasterConfig = {
   placement: 'top-end',
   sanitize: true,
   sanitizeFn: null,
+  stack: false,
   timeout: 5000
 }
 
@@ -90,6 +103,7 @@ const DefaultType = {
   placement: 'string',
   sanitize: 'boolean',
   sanitizeFn: '(null|function)',
+  stack: 'boolean',
   timeout: 'number'
 }
 
@@ -128,6 +142,7 @@ type ToasterConfig = {
   placement: string
   sanitize: boolean
   sanitizeFn: ((unsafeHtml: string) => string) | null
+  stack: boolean
   timeout: number
 }
 
@@ -184,6 +199,7 @@ class Toaster extends BaseComponent {
   protected declare _config: ToasterConfig
   protected declare _entries: Map<string, Entry>
   protected declare _ownsContainer: boolean
+  protected declare _resizeObserver: ResizeObserver | null
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     const ownsContainer = !getElement(element)
@@ -203,6 +219,12 @@ class Toaster extends BaseComponent {
 
     this._element.setAttribute('role', 'region')
     this._element.setAttribute('aria-label', this._config.label)
+
+    this._resizeObserver = null
+    if (this._config.stack) {
+      this._element.classList.add(CLASS_NAME_STACK)
+      this._resizeObserver = typeof ResizeObserver === 'function' ? new ResizeObserver(() => this._layoutStack()) : null
+    }
   }
 
   // Getters
@@ -264,6 +286,8 @@ class Toaster extends BaseComponent {
     instance.show()
     this._settle(layout)
     this._applyLimit()
+    this._resizeObserver?.observe(toast.element)
+    this._layoutStack()
     EventHandler.trigger(this._element, EVENT_ADD, { id: toast.id })
 
     return toast.id
@@ -308,6 +332,7 @@ class Toaster extends BaseComponent {
     }
 
     entry.toast = next
+    this._layoutStack()
   }
 
   close(id?: string): void {
@@ -340,6 +365,7 @@ class Toaster extends BaseComponent {
     }
 
     this._entries.clear()
+    this._resizeObserver?.disconnect()
 
     if (this._ownsContainer) {
       this._element.remove()
@@ -424,8 +450,10 @@ class Toaster extends BaseComponent {
 
     this._entries.delete(entry.toast.id)
     entry.instance.dispose()
+    this._resizeObserver?.unobserve(entry.toast.element)
     entry.toast.element.remove()
     entry.settle?.()
+    this._layoutStack()
     execute(entry.toast.onRemove, [undefined, entry.toast])
     this._applyLimit()
     EventHandler.trigger(this._element, EVENT_REMOVE, { id: entry.toast.id })
@@ -474,10 +502,47 @@ class Toaster extends BaseComponent {
     if (unlimited) {
       this._settle(layout)
     }
+
+    this._layoutStack()
+  }
+
+  _layoutStack(): void {
+    if (!this._config.stack || !this._element) {
+      return
+    }
+
+    const entries = [...this._entries.values()]
+    const shown = entries.filter(entry => !entry.toast.limited).map(entry => entry.toast.element)
+    const ordered = shown.toReversed()
+    let before = 0
+
+    for (const entry of entries.filter(entry => entry.toast.limited)) {
+      entry.toast.element.removeAttribute(ATTRIBUTE_STACK_INDEX)
+      entry.toast.element.removeAttribute(ATTRIBUTE_STACK_HIDDEN)
+    }
+
+    for (const [index, element] of ordered.entries()) {
+      const height = this._naturalHeight(element)
+      element.setAttribute(ATTRIBUTE_STACK_INDEX, String(index))
+      element.toggleAttribute(ATTRIBUTE_STACK_HIDDEN, index >= STACK_VISIBLE)
+      element.style.setProperty(PROPERTY_STACK_INDEX, String(index))
+      element.style.setProperty(PROPERTY_STACK_BEFORE, `${before}px`)
+      element.style.setProperty(PROPERTY_TOAST_HEIGHT, `${height}px`)
+      before += height
+    }
+
+    this._element.style.setProperty(PROPERTY_STACK_COUNT, String(ordered.length))
+    this._element.style.setProperty(PROPERTY_STACK_FRONT_HEIGHT, `${ordered.length > 0 ? this._naturalHeight(ordered[0]) : 0}px`)
+    this._element.style.setProperty(PROPERTY_STACK_HEIGHTS, `${before}px`)
+  }
+
+  _naturalHeight(element: HTMLElement): number {
+    const content = [...element.children].reduce((sum, child) => sum + (child as HTMLElement).offsetHeight, 0)
+    return content + element.offsetHeight - element.clientHeight
   }
 
   _layout(): Map<Element, number> | null {
-    if (this._prefersReducedMotion()) {
+    if (this._config.stack || this._prefersReducedMotion()) {
       return null
     }
 
@@ -492,7 +557,7 @@ class Toaster extends BaseComponent {
   }
 
   _collapse(element: HTMLElement): () => void {
-    if (this._prefersReducedMotion()) {
+    if (this._config.stack || this._prefersReducedMotion()) {
       element.style.display = 'block'
       return () => {}
     }
