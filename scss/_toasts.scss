@@ -216,6 +216,7 @@ $toast-tokens: defaults(
     width: var(--#{$prefix}toast-max-width);
     max-width: 100%;
     height: calc(var(--#{$prefix}toast-stack-front-height) + (min(var(--#{$prefix}toast-stack-count), var(--#{$prefix}toast-stack-visible)) - 1) * var(--#{$prefix}toast-stack-peek));
+    pointer-events: auto;
     @include transition-props(height, var(--#{$prefix}toast-transition-duration), var(--#{$prefix}toast-transition-timing));
 
     > .toast {
