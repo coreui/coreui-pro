@@ -120,6 +120,8 @@ $toast-tokens: defaults(
     --#{$prefix}toast-container-inset: #{$toast-container-inset};
     --#{$prefix}toast-max-width: #{$toast-max-width};
     --#{$prefix}toast-spacing: #{$toast-spacing};
+    --#{$prefix}toast-transition-duration: #{$toast-transition-duration};
+    --#{$prefix}toast-transition-timing: #{$toast-transition-timing};
     // scss-docs-end toast-container-css-vars
 
     position: absolute;
@@ -227,7 +229,7 @@ $toast-tokens: defaults(
       transform-origin: top center;
       scale: calc(1 - var(--#{$prefix}toast-stack-index) * var(--#{$prefix}toast-stack-scale));
       @include transition-props(
-        "opacity, translate, display, inset-block-start, height, scale",
+        #{"opacity, translate, display, inset-block-start, height, scale"},
         var(--#{$prefix}toast-transition-duration),
         var(--#{$prefix}toast-transition-timing),
         allow-discrete
@@ -275,7 +277,7 @@ $toast-tokens: defaults(
       inset-block-end: calc(var(--#{$prefix}toast-stack-index) * var(--#{$prefix}toast-stack-peek));
       transform-origin: bottom center;
       @include transition-props(
-        "opacity, translate, display, inset-block-end, height, scale",
+        #{"opacity, translate, display, inset-block-end, height, scale"},
         var(--#{$prefix}toast-transition-duration),
         var(--#{$prefix}toast-transition-timing),
         allow-discrete
