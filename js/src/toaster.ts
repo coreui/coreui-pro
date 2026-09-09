@@ -218,7 +218,6 @@ type PromiseOptions<Value> = {
 
 type Entry = {
   instance: Toast
-  settle: (() => void) | null
   toast: ToastObject
 }
 
@@ -324,11 +323,11 @@ class Toaster extends BaseComponent {
 
     const timeout = toast.timeout ?? this._config.timeout
     const instance = new Toast(toast.element, { autohide: timeout > 0, delay: timeout })
-    const entry: Entry = { instance, settle: null, toast }
+    const entry: Entry = { instance, toast }
     this._entries.set(toast.id, entry)
 
     EventHandler.one(toast.element, EVENT_HIDE_TOAST, () => {
-      entry.settle = this._collapse(toast.element)
+      this._collapse(toast.element)
       execute(entry.toast.onClose, [undefined, entry.toast])
     })
     EventHandler.one(toast.element, EVENT_HIDDEN_TOAST, () => this._remove(entry))
@@ -533,15 +532,16 @@ class Toaster extends BaseComponent {
   }
 
   _remove(entry: Entry): void {
-    if (!this._entries.has(entry.toast.id)) {
+    if (!this._entries?.has(entry.toast.id)) {
       return
     }
 
     this._entries.delete(entry.toast.id)
     entry.instance.dispose()
     this._resizeObserver?.unobserve(entry.toast.element)
+    const layout = this._layout()
     entry.toast.element.remove()
-    entry.settle?.()
+    this._settle(layout)
     this._layoutStack()
     execute(entry.toast.onRemove, [undefined, entry.toast])
     this._applyLimit()
@@ -566,12 +566,13 @@ class Toaster extends BaseComponent {
 
       if (limited) {
         entry.instance._clearTimeout()
-        const settle = this._collapse(entry.toast.element)
+        this._collapse(entry.toast.element)
         entry.toast.element.toggleAttribute(ATTRIBUTE_LIMITED, true)
         setTimeout(() => {
           if (entry.toast.limited) {
+            const layout = this._layout()
             entry.toast.element.style.display = 'none'
-            settle()
+            this._settle(layout)
           }
         }, getTransitionDurationFromElement(entry.toast.element))
       } else {
@@ -679,7 +680,7 @@ class Toaster extends BaseComponent {
   }
 
   _layout(): Map<Element, number> | null {
-    if (this._config.stack || this._prefersReducedMotion()) {
+    if (!this._element || this._config.stack || this._prefersReducedMotion()) {
       return null
     }
 
@@ -693,42 +694,45 @@ class Toaster extends BaseComponent {
     return layout
   }
 
-  _collapse(element: HTMLElement): () => void {
-    if (this._config.stack || this._prefersReducedMotion()) {
-      element.style.display = 'block'
-      return () => {}
+  _collapse(element: HTMLElement): void {
+    element.style.display = 'block'
+
+    if (!this._element || this._config.stack || this._prefersReducedMotion()) {
+      return
     }
 
     const siblings = [...this._element.querySelectorAll(':scope > .toast')].filter(child => child !== element && this._isSettled(child))
-    const before = siblings.map(child => child.getBoundingClientRect().top)
+    const visual = siblings.map(child => child.getBoundingClientRect().top)
+    for (const child of siblings) {
+      for (const animation of child.getAnimations()) {
+        animation.cancel()
+      }
+    }
+
+    const layout = siblings.map(child => child.getBoundingClientRect().top)
     const { transition } = element.style
     element.style.transition = 'none'
     element.style.display = 'none'
-    const after = siblings.map(child => child.getBoundingClientRect().top)
+    const target = siblings.map(child => child.getBoundingClientRect().top)
     element.style.display = 'block'
     element.getBoundingClientRect()
     element.style.transition = transition
 
-    const animations = siblings.map((child, index) => {
-      const delta = after[index] - before[index]
+    for (const [index, child] of siblings.entries()) {
+      const from = visual[index] - layout[index]
+      const to = target[index] - layout[index]
 
-      return delta === 0 ?
-        null :
+      if (from !== to) {
         child.animate(
-          [{ transform: 'none' }, { transform: `translateY(${delta}px)` }],
+          [{ transform: `translateY(${from}px)` }, { transform: `translateY(${to}px)` }],
           { duration: getTransitionDurationFromElement(element) || 150, easing: 'ease-out', fill: 'forwards' }
         )
-    })
-
-    return () => {
-      for (const animation of animations) {
-        animation?.cancel()
       }
     }
   }
 
   _settle(layout: Map<Element, number> | null): void {
-    if (!layout) {
+    if (!layout || !this._element) {
       return
     }
 
@@ -736,6 +740,10 @@ class Toaster extends BaseComponent {
       const previous = layout.get(child)
       if (previous === undefined) {
         continue
+      }
+
+      for (const animation of child.getAnimations()) {
+        animation.cancel()
       }
 
       const delta = previous - child.getBoundingClientRect().top
