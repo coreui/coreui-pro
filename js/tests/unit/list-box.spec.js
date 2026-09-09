@@ -36,7 +36,6 @@ describe('ListBox', () => {
   const selectAllMarkup = [
     '<div class="list-box-header">',
     '<button type="button" class="list-box-select-all" data-coreui-select-all>Select all</button>',
-    '<div class="list-box-title">Sandwich</div>',
     '</div>'
   ].join('')
   const list = element => element.querySelector('.list-box-options')

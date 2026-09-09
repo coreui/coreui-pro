@@ -6,7 +6,6 @@ otherFrameworks:
   - list-box
 ---
 
-import listBoxSelectAll from './snippets/list-box-select-all.js?raw'
 import listBoxInput from './snippets/list-box-input.js?raw'
 
 ## Overview
@@ -77,12 +76,11 @@ With `none` nothing is ever selected and no `aria-selected` is written; activati
 
 A `.list-box-select-all` button marked `data-coreui-select-all`, anywhere in the container, switches the whole list. It is not an option — it never takes an `option` role, never appears in `getSelected()` and is reached with <kbd>Tab</kbd> rather than with the arrows. The plugin keeps its `aria-pressed` in step with the list (`true`, `false` or `mixed`) and points its `aria-controls` at the options element; clicking it selects everything or, when everything is already selected, clears the selection. Its own text is its name, so it needs no label.
 
-`.list-box-header` is the strip above the options it usually sits in: a plain `<div>`, a flex row, free for whatever else belongs there.
+`.list-box-header` is the strip above the options it usually sits in: a plain `<div>`, a flex row that takes whatever content belongs there — a title (`.list-box-title`), a counter (`.list-box-subtitle`), a button of your own — next to or instead of the switch.
 
 <Example code={`<div class="list-box" data-coreui-toggle="list-box" data-coreui-selection-mode="multiple" data-coreui-indicator="checkbox" style="max-width: 20rem">
     <div class="list-box-header">
       <button type="button" class="list-box-select-all" data-coreui-select-all>Select all</button>
-      <div class="list-box-title">Toppings</div>
     </div>
     <div class="list-box-options" role="listbox" aria-label="Toppings">
       <div class="list-box-option" data-coreui-value="lettuce">Lettuce</div>
@@ -113,13 +111,9 @@ With a limit, the select-all button counts as pressed at `min(limit, visible ena
 
 Nothing marks the selection on its own — `aria-selected` and the `.selected` background carry it. Set `indicator: 'checkbox'` and the plugin puts a checkbox in front of every option and keeps it in step with the selection.
 
-<Example code={`<div class="list-box" id="listBoxCheckboxes" data-coreui-toggle="list-box" data-coreui-selection-mode="multiple" data-coreui-indicator="checkbox" style="max-width: 20rem">
+<Example code={`<div class="list-box" data-coreui-toggle="list-box" data-coreui-selection-mode="multiple" data-coreui-indicator="checkbox" style="max-width: 20rem">
     <div class="list-box-header">
       <button type="button" class="list-box-select-all" data-coreui-select-all>Select all</button>
-      <div>
-        <div class="list-box-title">Toppings</div>
-        <div class="list-box-subtitle" id="listBoxCounter">0/4 selected</div>
-      </div>
     </div>
     <div class="list-box-options" role="listbox" aria-label="Toppings">
       <div class="list-box-option" data-coreui-value="lettuce">Lettuce</div>
@@ -127,11 +121,7 @@ Nothing marks the selection on its own — `aria-selected` and the `.selected` b
       <div class="list-box-option" data-coreui-value="onion">Onion</div>
       <div class="list-box-option" data-coreui-value="cheese">Cheese</div>
     </div>
-  </div>`} sandboxJs={listBoxSelectAll} />
-
-<Code code={listBoxSelectAll} lang="js" />
-
-`.list-box-title` and `.list-box-subtitle` style the header text; the counter above is the page's own, kept current from the `change` event.
+  </div>`} />
 
 The checkbox is a decorative `<span class="list-box-option-indicator check">`, not an input, so it never takes the focus and never has a state of its own — the `.selected` and `.indeterminate` classes drive it. The select-all button gets the same indicator, its own `mixed` state included, and stays a button: focusable, operable, and named by its text.
 
@@ -259,7 +249,6 @@ Add `data-coreui-toggle="list-box"` to a `.list-box` and the plugin initializes 
 <div class="list-box" data-coreui-toggle="list-box" data-coreui-selection-mode="multiple">
   <div class="list-box-header">
     <button type="button" class="list-box-select-all" data-coreui-select-all>Select all</button>
-    <div class="list-box-title">Sandwich</div>
   </div>
   <div class="list-box-options" role="listbox" aria-label="Sandwich">
     <div class="list-box-option" data-coreui-value="lettuce">Lettuce</div>

@@ -17,8 +17,6 @@ $list-box-border-color:                 var(--#{$prefix}border-color) !default;
 $list-box-border-radius:                var(--#{$prefix}radius-7) !default;
 $list-box-focus-ring-color:             var(--#{$prefix}focus-ring-color) !default;
 
-$list-box-header-padding-y:             .5rem !default;
-$list-box-header-padding-x:             .75rem !default;
 $list-box-header-gap:                   .5rem !default;
 $list-box-header-border-width:          var(--#{$prefix}border-width) !default;
 $list-box-header-border-color:          var(--#{$prefix}border-color) !default;
@@ -67,8 +65,6 @@ $list-box-tokens: defaults(
     --#{$prefix}list-box-border-color: #{$list-box-border-color},
     --#{$prefix}list-box-border-radius: #{$list-box-border-radius},
     --#{$prefix}list-box-focus-ring-color: #{$list-box-focus-ring-color},
-    --#{$prefix}list-box-header-padding-y: #{$list-box-header-padding-y},
-    --#{$prefix}list-box-header-padding-x: #{$list-box-header-padding-x},
     --#{$prefix}list-box-header-gap: #{$list-box-header-gap},
     --#{$prefix}list-box-header-border-width: #{$list-box-header-border-width},
     --#{$prefix}list-box-header-border-color: #{$list-box-header-border-color},
@@ -126,7 +122,7 @@ $list-box-tokens: defaults(
     display: flex;
     gap: var(--#{$prefix}list-box-header-gap);
     align-items: center;
-    padding: var(--#{$prefix}list-box-header-padding-y) var(--#{$prefix}list-box-header-padding-x);
+    padding: var(--#{$prefix}list-box-padding-y) var(--#{$prefix}list-box-padding-x);
     border-block-end: var(--#{$prefix}list-box-header-border-width) solid var(--#{$prefix}list-box-header-border-color);
   }
 
@@ -213,8 +209,13 @@ $list-box-tokens: defaults(
   }
 
   .list-box-select-all {
+    width: 100%;
     background-color: transparent;
     border: 0;
+
+    &.indeterminate {
+      background-color: transparent;
+    }
   }
 
   .list-box-option-with-indicator {
