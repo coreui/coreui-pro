@@ -7,6 +7,11 @@ otherFrameworks:
 ---
 
 import toaster from './snippets/toaster.js?raw'
+import toasterContent from './snippets/toaster-content.js?raw'
+import toasterUpdate from './snippets/toaster-update.js?raw'
+import toasterPromise from './snippets/toaster-promise.js?raw'
+import toasterAction from './snippets/toaster-action.js?raw'
+import toasterLimit from './snippets/toaster-limit.js?raw'
 
 ## Overview
 
@@ -25,48 +30,69 @@ Without an element the toaster creates its own `.toast-container` in `<body>`, p
 
 ### Live example
 
-<Example code={`<button type="button" class="btn-solid theme-primary" id="toasterAddBtn">Add a toast</button>
-  <button type="button" class="btn-solid theme-secondary" id="toasterUpdateBtn">Update in place</button>
-  <button type="button" class="btn-solid theme-secondary" id="toasterPromiseBtn">Follow a promise</button>
-  <button type="button" class="btn-solid theme-secondary" id="toasterUndoBtn">With an action</button>
-  <button type="button" class="btn-outline theme-secondary" id="toasterCloseBtn">Close all</button>`} sandboxJs={toaster} />
+The toaster below places its container in the top end corner of the viewport. Every other example on this page passes a container that sits inside the example, so its toasts stay put.
+
+<Example code={`<button type="button" class="btn-solid theme-primary" id="toasterLiveBtn">Add a toast</button>`} sandboxJs={toaster} />
 
 <Code code={toaster} lang="js" />
 
-### Content
+### Title, description and theme
 
-A toast is a plain options object. `title` renders the header with a close button, `description` the body; a toast without a title puts the close button in the body. `theme` adds the `theme-{color}` class, `timeout` overrides the toaster's default (`0` keeps the toast until it is closed), `dismissible: false` drops the close button, and `action` adds a button to the body.
+A toast is a plain options object. `title` renders the header with a close button, `description` the body; a toast without a title puts the close button in the body. `theme` adds the `theme-{color}` class, `priority: 'high'` makes it an alert for screen readers, `timeout` overrides the toaster's default (`0` keeps the toast until it is closed) and `dismissible: false` drops the close button.
 
-```js
-toaster.add({ title: 'Archived', description: 'The message is in the archive.', theme: 'info', timeout: 10000, action: { label: 'Undo', onClick: (event, toast) => restore(toast.id) } })
-```
+<Example code={`<div class="hstack gap-2 flex-wrap mb-3">
+    <button type="button" class="btn-solid theme-primary" id="toasterTitleBtn">Title and description</button>
+    <button type="button" class="btn-solid theme-secondary" id="toasterDescriptionBtn">Description only</button>
+    <button type="button" class="btn-solid theme-danger" id="toasterThemeBtn">Themed, high priority</button>
+    <button type="button" class="btn-outline theme-secondary" id="toasterStickyBtn">Not dismissible</button>
+  </div>
+  <div class="toast-container position-static" id="toasterContent"></div>`} sandboxJs={toasterContent} />
+
+<Code code={toasterContent} lang="js" />
 
 Strings are written as text. Set `html: true` on the toaster to render markup; it runs through the same sanitizer as tooltips, configurable with `allowList` and `sanitizeFn`.
 
 ### Updating a toast
 
-Passing an `id` that already exists updates that toast instead of adding a second one, and bumps its `updateKey`, so a "Draft saved" toast clicked twice stays a single toast. `update()` does the same for a toast whose id you kept, and accepts a function of the current toast when the change depends on it.
+Passing an `id` that already exists updates that toast instead of adding a second one, and bumps its `updateKey`, so a "Draft saved" toast clicked twice stays a single toast. `update()` does the same for a toast whose id you kept, and accepts a function of the current toast when the change depends on it: `toaster.update(id, previous => ({ description: previous.data.step + 1 }))`.
 
-```js
-toaster.add({ id: 'draft', title: 'Draft saved' })
-toaster.update('draft', previous => ({ description: `Saved ${previous.data.count} times` }))
-```
+<Example code={`<div class="hstack gap-2 flex-wrap mb-3">
+    <button type="button" class="btn-solid theme-primary" id="toasterDraftBtn">Save draft</button>
+    <button type="button" class="btn-solid theme-secondary" id="toasterUploadBtn">Upload with progress</button>
+  </div>
+  <div class="toast-container position-static" id="toasterUpdate"></div>`} sandboxJs={toasterUpdate} />
+
+<Code code={toasterUpdate} lang="js" />
 
 ### Promises
 
 `promise()` adds a toast in the `loading` state and updates it when the promise settles: `success` receives the resolved value, `error` the rejection. Each state is a description string, a full options object, or a function returning either.
 
-```js
-toaster.promise(save(), {
-  loading: 'Saving…',
-  success: files => `Saved ${files.length} files`,
-  error: error => ({ title: 'Not saved', description: error.message, priority: 'high' })
-})
-```
+<Example code={`<button type="button" class="btn-solid theme-primary mb-3" id="toasterPromiseBtn">Save</button>
+  <div class="toast-container position-static" id="toasterPromise"></div>`} sandboxJs={toasterPromise} />
+
+<Code code={toasterPromise} lang="js" />
+
+### Action
+
+`action` renders a button in the body; its `onClick` receives the click event and the toast object, so an undo can rewrite the same toast.
+
+<Example code={`<button type="button" class="btn-solid theme-primary mb-3" id="toasterArchiveBtn">Archive message</button>
+  <div class="toast-container position-static" id="toasterAction"></div>`} sandboxJs={toasterAction} />
+
+<Code code={toasterAction} lang="js" />
 
 ### Limit
 
 `limit` caps how many toasts are visible at once. The newest stay on screen; older ones sink away from the edge and fade, remain in the DOM with `inert` and `data-coreui-limited`, and rise back in as the visible ones go away. `limit: 0` shows everything.
+
+<Example code={`<div class="hstack gap-2 mb-3">
+    <button type="button" class="btn-solid theme-primary" id="toasterLimitBtn">Add a toast</button>
+    <button type="button" class="btn-outline theme-secondary" id="toasterLimitCloseBtn">Close all</button>
+  </div>
+  <div class="toast-container position-static" id="toasterLimit"></div>`} sandboxJs={toasterLimit} />
+
+<Code code={toasterLimit} lang="js" />
 
 ### Motion
 
