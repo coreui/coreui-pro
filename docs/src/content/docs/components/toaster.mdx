@@ -99,7 +99,7 @@ Passing an `id` that already exists updates that toast instead of adding a secon
 
 ### Stacking
 
-With `stack: true` the toasts sit on top of each other: the newest in front at full size, the two behind it peeking out by `--cui-toast-stack-peek` and scaled down by `--cui-toast-stack-scale` per step, anything further back hidden. Hovering or focusing the container spreads the stack into a list; leaving it folds the stack back. The stack takes the place of the flow layout, so `limit` still decides how many toasts exist, and the stack decides how many of them show — three by default (`--cui-toast-stack-visible`).
+With `stack: true` the toasts sit on top of each other: the newest in front at full size, the two behind it peeking out by `--cui-toast-stack-peek` and scaled down by `--cui-toast-stack-scale` per step, anything further back hidden. The offset of each step adds the height the scaling takes away, so every toast behind shows the same strip. Hovering or focusing the container spreads the stack into a list; leaving it folds the stack back. The stack takes the place of the flow layout, so `limit` still decides how many toasts exist, and the stack decides how many of them show — three by default (`--cui-toast-stack-visible`).
 
 <Example code={`<div class="hstack gap-2 mb-3">
     <button type="button" class="btn-solid theme-primary" id="toasterStackBtn">Add a toast</button>

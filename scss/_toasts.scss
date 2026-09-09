@@ -216,19 +216,21 @@ $toast-tokens: defaults(
 
   // scss-docs-start toast-stack
   .toast-container-stack {
-    --#{$prefix}toast-stack-peek: .5rem;
+    --#{$prefix}toast-stack-peek: .75rem;
     --#{$prefix}toast-stack-scale: .05;
     --#{$prefix}toast-stack-visible: 3;
+    // Each step behind loses scale × height at the peeking edge, so the offset makes up for it
+    --#{$prefix}toast-stack-step: calc(var(--#{$prefix}toast-stack-peek) + var(--#{$prefix}toast-stack-scale) * var(--#{$prefix}toast-stack-front-height));
 
     width: var(--#{$prefix}toast-max-width);
     max-width: 100%;
-    height: calc(var(--#{$prefix}toast-stack-front-height) + (min(var(--#{$prefix}toast-stack-count), var(--#{$prefix}toast-stack-visible)) - 1) * var(--#{$prefix}toast-stack-peek));
+    height: calc(var(--#{$prefix}toast-stack-front-height) + (min(var(--#{$prefix}toast-stack-count), var(--#{$prefix}toast-stack-visible)) - 1) * var(--#{$prefix}toast-stack-step));
     pointer-events: auto;
     @include transition-props(height, var(--#{$prefix}toast-transition-duration), var(--#{$prefix}toast-transition-timing));
 
     > .toast {
       position: absolute;
-      inset-block-start: calc(var(--#{$prefix}toast-stack-index) * var(--#{$prefix}toast-stack-peek));
+      inset-block-start: calc(var(--#{$prefix}toast-stack-index) * var(--#{$prefix}toast-stack-step));
       inset-inline: 0;
       z-index: calc(var(--#{$prefix}toast-stack-visible) - var(--#{$prefix}toast-stack-index));
       height: var(--#{$prefix}toast-stack-front-height);
@@ -282,7 +284,7 @@ $toast-tokens: defaults(
   .toast-container-bottom-end.toast-container-stack {
     > .toast {
       inset-block-start: auto;
-      inset-block-end: calc(var(--#{$prefix}toast-stack-index) * var(--#{$prefix}toast-stack-peek));
+      inset-block-end: calc(var(--#{$prefix}toast-stack-index) * var(--#{$prefix}toast-stack-step));
       transform-origin: bottom center;
       @include transition-props(
         #{"opacity, translate, display, inset-block-end, height, scale"},
