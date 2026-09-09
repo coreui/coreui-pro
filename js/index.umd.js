@@ -24,6 +24,7 @@ import DateTimeInput from './src/date-time-input.js'
 import Dialog from './src/dialog.js'
 import Drawer from './src/drawer.js'
 import Dropdown from './src/dropdown.js'
+import ListBox from './src/list-box.js'
 import LoadingButton from './src/loading-button.js'
 import Menu from './src/menu.js'
 import Modal from './src/modal.js'
@@ -70,6 +71,7 @@ export default {
   Dialog,
   Drawer,
   Dropdown,
+  ListBox,
   LoadingButton,
   Menu,
   Modal,

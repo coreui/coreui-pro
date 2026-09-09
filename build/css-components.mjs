@@ -25,6 +25,7 @@ const tailModules = ['helpers', 'utilities/api']
 const renders = {
   autocomplete: ['combobox', 'forms/form-control', 'forms/form-control-group'],
   'chip-set': ['chip', 'helpers/visually-hidden'],
+  'list-box': ['forms/check'],
   'loading-button': ['buttons', 'spinner'],
   'date-picker': ['forms/floating-labels', 'forms/form-control', 'forms/form-control-group', 'forms/form-date-time', 'popup'],
   'range-slider': ['tooltip'],
@@ -79,6 +80,7 @@ const groups = [
   { name: 'dropdown', modules: ['dropdown'] },
   { name: 'header', modules: ['header'] },
   { name: 'icon', modules: ['icon'] },
+  { name: 'list-box', modules: ['list-box'] },
   { name: 'list-group', modules: ['list-group'] },
   { name: 'menu', modules: ['menu'] },
   { name: 'modal', modules: ['modal'] },
