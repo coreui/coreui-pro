@@ -431,6 +431,11 @@ class Toaster extends BaseComponent {
   }
 
   resume(): void {
+    if (this._config.stack) {
+      this._layoutStack()
+      return
+    }
+
     for (const entry of this._entries.values()) {
       if (!entry.toast.limited && entry.instance.isShown()) {
         entry.instance._maybeScheduleHide()
@@ -607,6 +612,15 @@ class Toaster extends BaseComponent {
 
     for (const [index, element] of ordered.entries()) {
       const height = this._naturalHeight(element)
+      const instance = Toast.getInstance(element)!
+      if (index === 0) {
+        if ((instance as unknown as { _timeout: number | null })._timeout === null) {
+          instance._maybeScheduleHide()
+        }
+      } else {
+        instance._clearTimeout()
+      }
+
       element.setAttribute(ATTRIBUTE_STACK_INDEX, String(index))
       element.toggleAttribute(ATTRIBUTE_STACK_HIDDEN, index >= STACK_VISIBLE)
       element.style.setProperty(PROPERTY_STACK_INDEX, String(index))

@@ -414,6 +414,15 @@ describe('Toaster', () => {
       expect(toaster._element.style.getPropertyValue('--cui-toast-stack-count')).toEqual('4')
     })
 
+    it('should run the timer of the front toast only', () => {
+      toaster = new Toaster(null, { container: fixtureEl, stack: true, limit: 0 })
+      const first = toaster.add({ description: 'first', instant: true })
+      const second = toaster.add({ description: 'second', instant: true })
+
+      expect(toaster._entries.get(first).instance._timeout).toBeNull()
+      expect(toaster._entries.get(second).instance._timeout).not.toBeNull()
+    })
+
     it('should count from the last toast in a bottom placement', () => {
       toaster = new Toaster(null, { container: fixtureEl, stack: true, placement: 'bottom-end' })
       toaster.add({ description: 'first', instant: true })

@@ -217,7 +217,7 @@ $toast-tokens: defaults(
   // scss-docs-start toast-stack
   .toast-container-stack {
     --#{$prefix}toast-stack-peek: .75rem;
-    --#{$prefix}toast-stack-scale: .05;
+    --#{$prefix}toast-stack-scale: .1;
     --#{$prefix}toast-stack-visible: 3;
     // Every toast behind is scaled by the same ratio again and pushed towards a vanishing depth,
     // so the corners of the stack line up and each strip is the previous one times the ratio
