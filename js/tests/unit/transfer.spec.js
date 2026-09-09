@@ -441,18 +441,32 @@ describe('Transfer', () => {
       expect(transfer.getTarget()).toEqual(['four'])
     })
 
+    it('should leave the dom event target alone', () => {
+      const el = setMarkup()
+      const transfer = new Transfer(el)
+      let target = null
+
+      el.addEventListener('change.coreui.transfer', event => {
+        target = event.target
+      })
+
+      transfer.moveToTarget(['one'])
+
+      expect(target).toEqual(el)
+    })
+
     it('should report both lists on change', () => {
       const el = setMarkup()
       const transfer = new Transfer(el)
       let payload = null
 
       el.addEventListener('change.coreui.transfer', event => {
-        payload = { source: event.source, target: event.target }
+        payload = { sourceValues: event.sourceValues, targetValues: event.targetValues }
       })
 
       transfer.moveToTarget(['one'])
 
-      expect(payload).toEqual({ source: ['two', 'three'], target: ['four', 'one'] })
+      expect(payload).toEqual({ sourceValues: ['two', 'three'], targetValues: ['four', 'one'] })
     })
   })
 

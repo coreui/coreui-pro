@@ -245,6 +245,8 @@ Add `data-coreui-toggle="transfer"` to a `.transfer` and the plugin initializes 
 | `data-coreui-transfer-search` | Marks an input as the search field of the list it sits in. |
 | `data-coreui-transfer-counter` | Marks the element that holds the `{selected}/{visible}` counter. Created in the header when it is missing. |
 
+A move button left empty gets the chevron its direction calls for; put anything of your own in it — a label, your own icon — and that is what stays.
+
 ```html
 <div class="transfer" data-coreui-toggle="transfer">
   <div class="list-box transfer-list" data-coreui-transfer-list="source">
@@ -330,12 +332,12 @@ Events fire on the `.transfer` element.
 | --- | --- |
 | `move.coreui.transfer` | Fires before options are moved; `event.direction` is `'source'` or `'target'` and `event.values` the values about to move. Cancelable — calling `preventDefault()` leaves both lists as they were. |
 | `moved.coreui.transfer` | Fired after the options were moved, with the same `direction` and `values`. |
-| `change.coreui.transfer` | Fired after a move settled; `event.source` and `event.target` are the values of the two lists. |
+| `change.coreui.transfer` | Fired after a move settled; `event.sourceValues` and `event.targetValues` are the values of the two lists. The names avoid `event.target`, which stays the `.transfer` element. |
 
 ```js
 const myTransfer = document.getElementById('myTransfer')
 myTransfer.addEventListener('change.coreui.transfer', event => {
-  console.log(event.target)
+  console.log(event.targetValues)
 })
 ```
 
