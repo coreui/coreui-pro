@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI PRO combobox.ts
+ * CoreUI PRO combobox-base.ts
  * License (https://coreui.io/pro/license/)
  * --------------------------------------------------------------------------
  */
@@ -15,10 +15,10 @@ import { escapeHtml, sanitizeHtml } from './util/sanitizer.js'
 import { executeAfterTransition, getElement } from './util/index.js'
 
 /**
- * Internal shared engine for the combobox-pattern components (Autocomplete,
- * MultiSelect). Not exported from the package and not documented — the public
- * surfaces stay the subclasses, which keep their own markup, class names,
- * events and options.
+ * Internal shared engine for the combobox-pattern components (Combobox,
+ * Autocomplete, MultiSelect). Not exported from the package and not
+ * documented — the public surfaces stay the subclasses, which keep their own
+ * markup, class names, events and options.
  *
  * The panel is a `.popup` wrapping a ListBox instance: the list renders the
  * options, owns the selection state it shows, and runs the keyboard from the
@@ -44,8 +44,8 @@ const EVENT_LIST_BOX_DESELECTED = 'deselected.coreui.list-box'
 const EVENT_LIST_BOX_SELECTED = 'selected.coreui.list-box'
 const EVENT_LIST_BOX_SELECTION_LIMIT = 'selectionLimit.coreui.list-box'
 
-class Combobox extends BaseComponent {
-  declare ['constructor']: typeof Combobox
+class ComboboxBase extends BaseComponent {
+  declare ['constructor']: typeof ComboboxBase
   protected declare _uniqueId: any
   protected declare _togglerElement: any
   protected declare _optionsElement: any
@@ -233,19 +233,7 @@ class Combobox extends BaseComponent {
 
     listBoxDiv.append(optionsDiv)
 
-    // The menu mounts outside the component while open, so its keystrokes no
-    // longer bubble through the frame — Escape is handled on the panel itself.
-    // Focus goes home before the panel unmounts, or a keyboard user is
-    // dropped on <body>; preventDefault keeps the same press from also
-    // closing an enclosing modal dialog.
-    EventHandler.on(popupDiv, this.constructor.eventName('keydown'), (event: any) => {
-      if (event.key === ESCAPE_KEY) {
-        event.preventDefault()
-        event.stopPropagation()
-        this._escapeFocusTarget()?.focus()
-        this.hide()
-      }
-    })
+    this._addPanelEscapeListener(popupDiv)
 
     this._optionsElement = optionsDiv
     this._menu = popupDiv
@@ -254,6 +242,22 @@ class Combobox extends BaseComponent {
     this._listBox = new ListBox(listBoxDiv, this._getListBoxConfig())
     this._addListBoxListeners()
     this._afterMenuCreated()
+  }
+
+  // The menu mounts outside the component while open, so its keystrokes no
+  // longer bubble through the frame — Escape is handled on the panel itself.
+  // Focus goes home before the panel unmounts, or a keyboard user is dropped
+  // on <body>; preventDefault keeps the same press from also closing an
+  // enclosing modal dialog.
+  _addPanelEscapeListener(popup: HTMLElement): void {
+    EventHandler.on(popup, this.constructor.eventName('keydown'), (event: any) => {
+      if (event.key === ESCAPE_KEY) {
+        event.preventDefault()
+        event.stopPropagation()
+        this._escapeFocusTarget()?.focus()
+        this.hide()
+      }
+    })
   }
 
   // Hooks: dropdown header (MultiSelect select-all / header template),
@@ -498,4 +502,4 @@ class Combobox extends BaseComponent {
   }
 }
 
-export default Combobox
+export default ComboboxBase
