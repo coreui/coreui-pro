@@ -562,6 +562,23 @@ class DateRangePicker extends BaseComponent {
       }
     })
   }
+
+  // Static
+  static jQueryInterface(this: any, config: any): void {
+    return this.each(function (this: HTMLElement) {
+      const data: any = DateRangePicker.getOrCreateInstance(this, config)
+
+      if (typeof config !== 'string') {
+        return
+      }
+
+      if (data[config] === undefined || config.startsWith('_') || config === 'constructor') {
+        throw new TypeError(`No method named "${config}"`)
+      }
+
+      data[config]()
+    })
+  }
 }
 
 /**
@@ -578,8 +595,6 @@ EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
  * jQuery
  */
 
-// The v2 pickers define no `jQueryInterface`, so the plugin registers as
-// `undefined` — preserved as-is; fixing it is a behaviour change.
-defineJQueryPlugin(DateRangePicker as any)
+defineJQueryPlugin(DateRangePicker)
 
 export default DateRangePicker

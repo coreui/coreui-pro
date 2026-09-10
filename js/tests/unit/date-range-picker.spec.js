@@ -1,5 +1,5 @@
 import DateRangePicker from '../../src/date-range-picker.js'
-import { clearFixture, getFixture } from '../helpers/fixture.js'
+import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
 
 describe('DateRangePicker', () => {
   let fixtureEl
@@ -253,6 +253,65 @@ describe('DateRangePicker', () => {
 
       expect(picker.getStartDate()).toBeNull()
       expect(picker.getEndDate()).toBeNull()
+    })
+  })
+
+  describe('jQueryInterface', () => {
+    it('should create date-range-picker', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const el = fixtureEl.querySelector('#host')
+
+      jQueryMock.fn.dateRangePicker = DateRangePicker.jQueryInterface
+      jQueryMock.elements = [el]
+
+      jQueryMock.fn.dateRangePicker.call(jQueryMock)
+
+      expect(DateRangePicker.getInstance(el)).not.toBeNull()
+      DateRangePicker.getInstance(el).dispose()
+    })
+
+    it('should not re-create date-range-picker', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const el = fixtureEl.querySelector('#host')
+      const picker = new DateRangePicker(el)
+
+      jQueryMock.fn.dateRangePicker = DateRangePicker.jQueryInterface
+      jQueryMock.elements = [el]
+
+      jQueryMock.fn.dateRangePicker.call(jQueryMock)
+
+      expect(DateRangePicker.getInstance(el)).toEqual(picker)
+      picker.dispose()
+    })
+
+    it('should call a public method by name', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const el = fixtureEl.querySelector('#host')
+      const picker = new DateRangePicker(el)
+      const spy = spyOn(picker, 'show')
+
+      jQueryMock.fn.dateRangePicker = DateRangePicker.jQueryInterface
+      jQueryMock.elements = [el]
+
+      jQueryMock.fn.dateRangePicker.call(jQueryMock, 'show')
+
+      expect(spy).toHaveBeenCalled()
+      picker.dispose()
+    })
+
+    it('should throw error on undefined method', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const el = fixtureEl.querySelector('#host')
+      const picker = new DateRangePicker(el)
+
+      jQueryMock.fn.dateRangePicker = DateRangePicker.jQueryInterface
+      jQueryMock.elements = [el]
+
+      expect(() => {
+        jQueryMock.fn.dateRangePicker.call(jQueryMock, 'undefinedMethod')
+      }).toThrowError(TypeError, 'No method named "undefinedMethod"')
+
+      picker.dispose()
     })
   })
 
