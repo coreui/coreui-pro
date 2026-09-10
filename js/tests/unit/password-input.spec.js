@@ -335,6 +335,13 @@ describe('PasswordInput', () => {
       expect(fixtureEl.querySelector('.form-control-group')).toBeNull()
     })
 
+    it('should keep state classes on the input', () => {
+      const input = initialized('<input type="password" class="form-control is-invalid js-secret" data-coreui-toggle="password-input">')
+
+      expect(input.className).toBe('form-control is-invalid js-secret')
+      expect(input.parentElement.classList.contains('is-invalid')).toBe(false)
+    })
+
     it('should keep a group the author wrote', () => {
       fixtureEl.innerHTML = `<div class="form-control-group">
           <span class="form-control-icon"></span>

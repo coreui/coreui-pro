@@ -231,6 +231,25 @@ describe('NumberInput', () => {
       expect(group.classList.contains('form-control')).toBe(false)
     })
 
+    it('should keep state classes and js- hooks on the input', () => {
+      fixtureEl.innerHTML = '<input type="number" class="form-control is-invalid was-validated js-price mb-3" value="1">'
+      const input = fixtureEl.querySelector('input')
+      const numberInput = new NumberInput(input)
+      const group = input.parentElement
+
+      for (const name of ['is-invalid', 'was-validated', 'js-price']) {
+        expect(input.classList.contains(name)).toBe(true)
+        expect(group.classList.contains(name)).toBe(false)
+      }
+
+      expect(group.classList.contains('mb-3')).toBe(true)
+      expect(group.matches(':has(> .form-control.is-invalid)')).toBe(true)
+
+      numberInput.dispose()
+
+      expect(input.className).toBe('form-control is-invalid was-validated js-price mb-3')
+    })
+
     it('should use a group the author already wrote', () => {
       const input = markup('value="1"')
       const group = input.closest('.form-control-group')

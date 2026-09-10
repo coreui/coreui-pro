@@ -14,6 +14,7 @@ import { getUID } from './index.js'
 const CLASS_NAME_FORM_FLOATING = 'form-floating'
 const CLASS_NAME_GROUP = 'form-control-group'
 const CLASS_NAME_FORM_CONTROL = 'form-control'
+const CLASS_NAME_STAYS_ON_CONTROL = /^(?:is|was|js)-/
 
 export type ControlGroup = {
   created: boolean
@@ -29,7 +30,9 @@ export type ControlGroup = {
  * Everything the author wrote on that control except `.form-control` moves to
  * the group: a class on the control describes the field, and once it is
  * wrapped the field is the frame — a margin left behind would sit inside the
- * border.
+ * border. State classes (`is-*`, `was-*`) and `js-*` hooks stay: the control
+ * is the source of truth the frame reads through `:has()`, and application
+ * code keeps finding the control it wrote them on.
  * @param {HTMLElement} element The control.
  * @returns {ControlGroup} The group, whether it was created, and the classes moved onto it.
  */
@@ -43,7 +46,7 @@ export const ensureControlGroup = (element: HTMLElement): ControlGroup => {
   const group = document.createElement('div')
   group.classList.add(CLASS_NAME_GROUP)
 
-  const movedClassNames = [...element.classList].filter(name => name !== CLASS_NAME_FORM_CONTROL)
+  const movedClassNames = [...element.classList].filter(name => name !== CLASS_NAME_FORM_CONTROL && !CLASS_NAME_STAYS_ON_CONTROL.test(name))
   element.classList.remove(...movedClassNames)
   group.classList.add(...movedClassNames)
 
