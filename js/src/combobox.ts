@@ -517,6 +517,7 @@ class Combobox extends ComboboxBase {
     if (this._isShown()) {
       if (key === ESCAPE_KEY) {
         event.preventDefault()
+        event.stopPropagation()
         this.hide()
       }
 

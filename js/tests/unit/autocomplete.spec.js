@@ -1,4 +1,6 @@
+import { userEvent } from '@vitest/browser/context'
 import Autocomplete from '../../src/autocomplete.js'
+import Dialog from '../../src/dialog.js'
 import {
   clearFixture, createEvent, getFixture, jQueryMock
 } from '../helpers/fixture.js'
@@ -459,6 +461,34 @@ describe('Autocomplete', () => {
 
         autocomplete.show()
       })
+    })
+
+    it('should take the first Escape for itself inside a dialog and leave the second to it', async () => {
+      fixtureEl.innerHTML = '<dialog class="dialog dialog-instant" id="dialog"><div class="autocomplete"></div></dialog>'
+      const dialogEl = fixtureEl.querySelector('#dialog')
+      const dialog = new Dialog(dialogEl)
+      const autocomplete = new Autocomplete(fixtureEl.querySelector('.autocomplete'), {
+        options: [{ label: 'Option 1', value: '1' }]
+      })
+      const hidden = new Promise(resolve => {
+        dialogEl.addEventListener('hidden.coreui.dialog', resolve)
+      })
+
+      await dialog.show()
+      autocomplete._inputElement.focus()
+      autocomplete.show()
+      expect(autocomplete._isShown()).toBeTrue()
+
+      await userEvent.keyboard('{Escape}')
+      expect(autocomplete._isShown()).toBeFalse()
+      expect(dialogEl.open).toBeTrue()
+
+      await userEvent.keyboard('{Escape}')
+      await hidden
+      expect(dialogEl.open).toBeFalse()
+
+      autocomplete.dispose()
+      dialog.dispose()
     })
 
     it('should not show when the show event is prevented', () => {

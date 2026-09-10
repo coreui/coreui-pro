@@ -1,4 +1,6 @@
+import { userEvent } from '@vitest/browser/context'
 import DatePicker from '../../src/date-picker.js'
+import Dialog from '../../src/dialog.js'
 import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
 
 describe('DatePicker', () => {
@@ -221,6 +223,31 @@ describe('DatePicker', () => {
       picker.show()
 
       expect(picker._popup.isShown).toBeFalse()
+    })
+  })
+
+  describe('inside a dialog', () => {
+    it('should take the first Escape for itself and leave the second to the dialog', async () => {
+      const picker = buildPicker({}, '<dialog class="dialog dialog-instant" id="dialog"><div id="picker"></div></dialog>')
+      const dialogEl = fixtureEl.querySelector('#dialog')
+      const dialog = new Dialog(dialogEl)
+      const hidden = new Promise(resolve => {
+        dialogEl.addEventListener('hidden.coreui.dialog', resolve)
+      })
+
+      await dialog.show()
+      picker.show()
+      expect(picker._popup.isShown).toBeTrue()
+
+      await userEvent.keyboard('{Escape}')
+      expect(picker._popup.isShown).toBeFalse()
+      expect(dialogEl.open).toBeTrue()
+
+      await userEvent.keyboard('{Escape}')
+      await hidden
+      expect(dialogEl.open).toBeFalse()
+
+      dialog.dispose()
     })
   })
 

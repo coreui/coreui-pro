@@ -416,6 +416,11 @@ class MultiSelect extends ComboboxBase {
 
     EventHandler.on(this._wrapperElement, EVENT_KEYDOWN, (event: any) => {
       if (event.key === ESCAPE_KEY) {
+        if (this._isShown()) {
+          event.preventDefault()
+          event.stopPropagation()
+        }
+
         this.hide()
         return
       }
