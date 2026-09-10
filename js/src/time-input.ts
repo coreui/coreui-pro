@@ -11,7 +11,7 @@ import SectionInput, { type SectionInputConfig } from './section-input.js'
 import { convertToDateObject } from './util/calendar.js'
 import { type DateSection, getTimeSectionsFromLocale } from './util/date-sections.js'
 import { convert12hTo24h } from './util/time.js'
-import { defineJQueryPlugin } from './util/index.js'
+import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
 
 /**
  * Constants
@@ -85,17 +85,7 @@ class TimeInput extends SectionInput {
 
   // Static
   static jQueryInterface(this: any, config: any): any {
-    return this.each(function (this: HTMLElement) {
-      const data: any = TimeInput.getOrCreateInstance(this)
-
-      if (typeof config === 'string') {
-        if (typeof data[config] === 'undefined') {
-          throw new TypeError(`No method named "${config}"`)
-        }
-
-        data[config]()
-      }
-    })
+    return jQueryDispatch(this, TimeInput, config)
   }
 }
 

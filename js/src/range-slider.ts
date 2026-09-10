@@ -10,7 +10,7 @@ import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
 import type { ComponentConfig } from './util/config.js'
-import { defineJQueryPlugin, isRTL } from './util/index.js'
+import { defineJQueryPlugin, isRTL, jQueryDispatch } from './util/index.js'
 import { DefaultAllowlist, type SanitizerAllowList, sanitizeHtml } from './util/sanitizer.js'
 
 /**
@@ -679,19 +679,7 @@ class RangeSlider extends BaseComponent {
   }
 
   static jQueryInterface(this: any, config: any): any {
-    return this.each(function (this: HTMLElement) {
-      const data: any = RangeSlider.getOrCreateInstance(this)
-
-      if (typeof config !== 'string') {
-        return
-      }
-
-      if (data[config] === undefined || config.startsWith('_') || config === 'constructor') {
-        throw new TypeError(`No method named "${config}"`)
-      }
-
-      data[config](this)
-    })
+    return jQueryDispatch(this, RangeSlider, config, element => [element])
   }
 }
 

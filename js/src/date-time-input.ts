@@ -10,7 +10,7 @@ import SelectorEngine from './dom/selector-engine.js'
 import SectionInput, { type SectionInputConfig } from './section-input.js'
 import { convertToDateObject } from './util/calendar.js'
 import { type DateSection, getDateTimeSectionsFromLocale } from './util/date-sections.js'
-import { defineJQueryPlugin } from './util/index.js'
+import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
 
 /**
  * Constants
@@ -76,17 +76,7 @@ class DateTimeInput extends SectionInput {
 
   // Static
   static jQueryInterface(this: any, config: any): any {
-    return this.each(function (this: HTMLElement) {
-      const data: any = DateTimeInput.getOrCreateInstance(this)
-
-      if (typeof config === 'string') {
-        if (typeof data[config] === 'undefined') {
-          throw new TypeError(`No method named "${config}"`)
-        }
-
-        data[config]()
-      }
-    })
+    return jQueryDispatch(this, DateTimeInput, config)
   }
 }
 

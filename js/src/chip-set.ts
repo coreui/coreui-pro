@@ -12,7 +12,9 @@ import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { CHECK_ICON, REMOVE_ICON } from './util/icons.js'
-import { defineJQueryPlugin, getNextActiveElement, isRTL } from './util/index.js'
+import {
+  defineJQueryPlugin, getNextActiveElement, isRTL, jQueryDispatch
+} from './util/index.js'
 
 /**
  * Constants
@@ -568,19 +570,7 @@ class ChipSet extends BaseComponent {
   }
 
   static jQueryInterface(this: any, config: any): void {
-    return this.each(function (this: HTMLElement) {
-      const data: any = ChipSet.getOrCreateInstance(this)
-
-      if (typeof config !== 'string') {
-        return
-      }
-
-      if (data[config as string] === undefined || config.startsWith('_') || config === 'constructor') {
-        throw new TypeError(`No method named "${config}"`)
-      }
-
-      data[config as string](this)
-    })
+    return jQueryDispatch(this, ChipSet, config, element => [element])
   }
 }
 

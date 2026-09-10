@@ -11,7 +11,7 @@ import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { sanitizeHtml, SVGAllowlist, type SanitizerAllowList } from './util/sanitizer.js'
 import { CHECK_ICON, REMOVE_ICON } from './util/icons.js'
-import { defineJQueryPlugin } from './util/index.js'
+import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
 
 /**
  * Constants
@@ -380,19 +380,7 @@ class Chip extends BaseComponent {
   }
 
   static jQueryInterface(this: any, config: any): void {
-    return this.each(function (this: HTMLElement) {
-      const data: any = Chip.getOrCreateInstance(this)
-
-      if (typeof config !== 'string') {
-        return
-      }
-
-      if (data[config as string] === undefined || config.startsWith('_') || config === 'constructor') {
-        throw new TypeError(`No method named "${config}"`)
-      }
-
-      data[config as string](this)
-    })
+    return jQueryDispatch(this, Chip, config, element => [element])
   }
 }
 

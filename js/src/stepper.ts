@@ -11,7 +11,7 @@ import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
 import {
-  defineJQueryPlugin, getNextActiveElement, getUID, isDisabled
+  defineJQueryPlugin, getNextActiveElement, getUID, isDisabled, jQueryDispatch
 } from './util/index.js'
 
 /**
@@ -654,18 +654,7 @@ class Stepper extends BaseComponent {
 
   // Static
   static jQueryInterface(this: any, config: any): void {
-    return this.each(function (this: HTMLElement) {
-      const data: any = Stepper.getOrCreateInstance(this)
-      if (typeof config !== 'string') {
-        return
-      }
-
-      if (data[config as string] === undefined || config.startsWith('_') || config === 'constructor') {
-        throw new TypeError(`No method named "${config}"`)
-      }
-
-      data[config as string]()
-    })
+    return jQueryDispatch(this, Stepper, config)
   }
 }
 

@@ -24,7 +24,7 @@ import EventHandler, { type CoreUIEvent } from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import type { ComponentConfig } from './util/config.js'
 import {
-  defineJQueryPlugin, execute, findShadowRoot, getElement, getUID, isRTL, noop
+  defineJQueryPlugin, execute, findShadowRoot, getElement, getUID, isRTL, jQueryDispatch, noop
 } from './util/index.js'
 import { DefaultAllowlist, type SanitizerAllowList } from './util/sanitizer.js'
 import TemplateFactory, { type TemplateContentEntry } from './util/template-factory.js'
@@ -916,19 +916,7 @@ class Tooltip extends BaseComponent {
   }
 
   static jQueryInterface(this: any, config: any): void {
-    return this.each(function (this: HTMLElement) {
-      const data: any = Tooltip.getOrCreateInstance(this, config)
-
-      if (typeof config !== 'string') {
-        return
-      }
-
-      if (typeof data[config as string] === 'undefined') {
-        throw new TypeError(`No method named "${config}"`)
-      }
-
-      data[config as string]()
-    })
+    return jQueryDispatch(this, Tooltip, config)
   }
 }
 

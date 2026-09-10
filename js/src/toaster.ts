@@ -12,7 +12,7 @@ import Toast, { type ToastConfig } from './toast.js'
 import type { TemplateContentEntry } from './util/template-factory.js'
 import { DefaultAllowlist, sanitizeHtml, type SanitizerAllowList } from './util/sanitizer.js'
 import {
-  defineJQueryPlugin, execute, getElement, getTransitionDurationFromElement, getUID, isElement
+  defineJQueryPlugin, execute, getElement, getTransitionDurationFromElement, getUID, isElement, jQueryDispatch
 } from './util/index.js'
 
 /**
@@ -778,17 +778,7 @@ class Toaster extends BaseComponent {
 
   // Static
   static jQueryInterface(this: any, config: any): void {
-    return this.each(function (this: HTMLElement) {
-      const data: any = Toaster.getOrCreateInstance(this, config)
-
-      if (typeof config === 'string') {
-        if (typeof data[config as string] === 'undefined') {
-          throw new TypeError(`No method named "${config}"`)
-        }
-
-        data[config as string](this)
-      }
-    })
+    return jQueryDispatch(this, Toaster, config, element => [element])
   }
 }
 

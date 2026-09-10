@@ -11,10 +11,7 @@ import SelectorEngine from './dom/selector-engine.js'
 import type { ComponentConfig } from './util/config.js'
 import { DefaultAllowlist, sanitizeHtml, type SanitizerAllowList } from './util/sanitizer.js'
 import {
-  defineJQueryPlugin,
-  getElement,
-  getNextActiveElement,
-  getUID
+  defineJQueryPlugin, getElement, getNextActiveElement, getUID, jQueryDispatch
 } from './util/index.js'
 
 /**
@@ -1298,19 +1295,7 @@ class ListBox extends BaseComponent {
 
   // Static
   static jQueryInterface(this: any, config: any, ...args: any[]): any {
-    return this.each(function (this: HTMLElement) {
-      const data: any = ListBox.getOrCreateInstance(this, typeof config === 'object' ? config : null)
-
-      if (typeof config !== 'string') {
-        return
-      }
-
-      if (data[config as string] === undefined || config.startsWith('_') || config === 'constructor') {
-        throw new TypeError(`No method named "${config}"`)
-      }
-
-      data[config as string](...args)
-    })
+    return jQueryDispatch(this, ListBox, config, args)
   }
 }
 

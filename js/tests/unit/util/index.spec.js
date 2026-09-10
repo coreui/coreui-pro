@@ -512,6 +512,58 @@ describe('Util', () => {
     })
   })
 
+  describe('jQueryDispatch', () => {
+    const collection = elements => ({
+      each(callback) {
+        for (const element of elements) {
+          callback.call(element)
+        }
+
+        return collection
+      }
+    })
+
+    const component = () => {
+      const instance = { show: jasmine.createSpy('show'), _private: jasmine.createSpy('_private') }
+      return {
+        instance,
+        getOrCreateInstance: jasmine.createSpy('getOrCreateInstance').and.returnValue(instance)
+      }
+    }
+
+    it('should create or reuse the instance and stop there for a config object', () => {
+      const Component = component()
+      const el = document.createElement('div')
+
+      Util.jQueryDispatch(collection([el]), Component, { a: 1 })
+
+      expect(Component.getOrCreateInstance).toHaveBeenCalledWith(el, { a: 1 })
+      expect(Component.instance.show).not.toHaveBeenCalled()
+    })
+
+    it('should call a public method by name with the given arguments', () => {
+      const Component = component()
+      const el = document.createElement('div')
+
+      Util.jQueryDispatch(collection([el]), Component, 'show', ['x'])
+      Util.jQueryDispatch(collection([el]), Component, 'show', element => [element])
+
+      expect(Component.instance.show).toHaveBeenCalledWith('x')
+      expect(Component.instance.show).toHaveBeenCalledWith(el)
+    })
+
+    it('should throw on an unknown, private or constructor name', () => {
+      const Component = component()
+      const el = document.createElement('div')
+
+      for (const name of ['missing', '_private', 'constructor']) {
+        expect(() => Util.jQueryDispatch(collection([el]), Component, name)).toThrowError(TypeError, `No method named "${name}"`)
+      }
+
+      expect(Component.instance._private).not.toHaveBeenCalled()
+    })
+  })
+
   describe('execute', () => {
     it('should execute if arg is function', () => {
       const spy = jasmine.createSpy('spy')

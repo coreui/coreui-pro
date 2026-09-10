@@ -13,7 +13,7 @@ import {
 } from './util/form-control-group.js'
 import { PASSWORD_HIDE_ICON, PASSWORD_SHOW_ICON } from './util/icons.js'
 import { sanitizeHtml, SVGAllowlist, type SanitizerAllowList } from './util/sanitizer.js'
-import { defineJQueryPlugin } from './util/index.js'
+import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
 
 /**
  * Constants
@@ -154,11 +154,7 @@ class PasswordInput extends BaseComponent {
 
   // Static
   static jQueryInterface(this: any, config: any): void {
-    return this.each(function (this: HTMLElement) {
-      const data: any = PasswordInput.getOrCreateInstance(this)
-
-      data[config as string](this)
-    })
+    return jQueryDispatch(this, PasswordInput, config, element => [element])
   }
 }
 
