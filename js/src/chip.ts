@@ -8,7 +8,6 @@
 import BaseComponent from './base-component.js'
 import type { ComponentConfig } from './util/config.js'
 import EventHandler from './dom/event-handler.js'
-import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { sanitizeHtml, SVGAllowlist, type SanitizerAllowList } from './util/sanitizer.js'
 import { CHECK_ICON, REMOVE_ICON } from './util/icons.js'
@@ -41,8 +40,6 @@ const CLASS_NAME_CHIP_CLICKABLE = 'chip-clickable'
 const CLASS_NAME_CHIP_REMOVE = 'chip-remove'
 const CLASS_NAME_ACTIVE = 'active'
 const CLASS_NAME_DISABLED = 'disabled'
-
-const DISALLOWED_ATTRIBUTES = new Set(['sanitize', 'allowList', 'sanitizeFn'])
 
 type ChipConfig = {
   allowList: SanitizerAllowList
@@ -367,26 +364,6 @@ class Chip extends BaseComponent {
 
   _sanitizeIcon(icon: string): string {
     return this._config.sanitize ? sanitizeHtml(icon, this._config.allowList, this._config.sanitizeFn) : icon
-  }
-
-  _getConfig(config: any): any {
-    const dataAttributes = Manipulator.getDataAttributes(this._element)
-
-    for (const dataAttribute of Object.keys(dataAttributes)) {
-      if (DISALLOWED_ATTRIBUTES.has(dataAttribute)) {
-        delete dataAttributes[dataAttribute]
-      }
-    }
-
-    config = {
-      ...dataAttributes,
-      ...(typeof config === 'object' && config ? config : {})
-    }
-    config = this._mergeConfigObj(config)
-    config = this._configAfterMerge(config)
-    this._typeCheckConfig(config)
-
-    return config
   }
 
   // Static
