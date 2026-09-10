@@ -147,6 +147,7 @@ class Popup extends Config {
   protected declare _previouslyFocused: HTMLElement | null
   protected declare _clickListener: any
   protected declare _keydownListener: any
+  protected declare _contentKeydownListener: any
   protected declare _anchorKeydownListener: any
   protected declare _focustrap: any
   protected declare _config: PopupConfig
@@ -162,6 +163,7 @@ class Popup extends Config {
     this._previouslyFocused = null
     this._clickListener = null
     this._keydownListener = null
+    this._contentKeydownListener = null
     this._anchorKeydownListener = null
     // The panel now always lives outside the anchor, so the trap has to be told
     // about it unconditionally — otherwise moving into it reads as escaping the
@@ -444,15 +446,32 @@ class Popup extends Config {
       }
     }
 
+    // Focus sits in the panel while it is open, the way it does in a native
+    // date control, so the panel takes Escape for itself: the press must not
+    // reach an enclosing <dialog>, neither as a bubbling keydown nor as the
+    // native `cancel` the browser derives from an unhandled one.
+    this._contentKeydownListener = (event: KeyboardEvent) => {
+      if (event.key === ESCAPE_KEY) {
+        event.preventDefault()
+        event.stopPropagation()
+        this.hide()
+      }
+    }
+
     EventHandler.on(document, EVENT_CLICK, this._clickListener)
     EventHandler.on(document, EVENT_KEYDOWN, this._keydownListener)
+    EventHandler.on(this._content!, EVENT_KEYDOWN, this._contentKeydownListener)
+    EventHandler.on(this._anchor!, EVENT_KEYDOWN, this._contentKeydownListener)
   }
 
   _removeDismissListeners(): void {
     EventHandler.off(document, EVENT_CLICK, this._clickListener)
     EventHandler.off(document, EVENT_KEYDOWN, this._keydownListener)
+    EventHandler.off(this._content, EVENT_KEYDOWN, this._contentKeydownListener)
+    EventHandler.off(this._anchor, EVENT_KEYDOWN, this._contentKeydownListener)
     this._clickListener = null
     this._keydownListener = null
+    this._contentKeydownListener = null
   }
 }
 

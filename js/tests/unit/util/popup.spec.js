@@ -447,6 +447,21 @@ describe('Popup', () => {
       expect(popup.isShown).toBeTrue()
     })
 
+    it('should consume Escape pressed inside the panel', () => {
+      const popup = buildPopup()
+      const reachedDocument = jasmine.createSpy('document keydown')
+      document.addEventListener('keydown', reachedDocument)
+      popup.show()
+
+      const event = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true })
+      fixtureEl.querySelector('#option').dispatchEvent(event)
+      document.removeEventListener('keydown', reachedDocument)
+
+      expect(popup.isShown).toBeFalse()
+      expect(event.defaultPrevented).toBeTrue()
+      expect(reachedDocument).not.toHaveBeenCalled()
+    })
+
     it('should hide on Escape', () => {
       const popup = buildPopup()
       popup.show()

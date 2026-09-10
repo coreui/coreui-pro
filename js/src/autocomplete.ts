@@ -301,6 +301,13 @@ class Autocomplete extends ComboboxBase {
 
     EventHandler.on(this._element, EVENT_KEYDOWN, (event: any) => {
       if (event.key === ESCAPE_KEY) {
+        // An open menu owns the press; a closed one leaves it to whatever
+        // encloses the field, such as a modal dialog.
+        if (this._isShown()) {
+          event.preventDefault()
+          event.stopPropagation()
+        }
+
         this.hide()
         if (this._config.allowOnlyDefinedOptions && this._selected.length === 0) {
           this.search('')
@@ -356,7 +363,7 @@ class Autocomplete extends ComboboxBase {
       // same press must not reopen it or match the value it just wrote.
       const handledByList = event.key === ENTER_KEY && event.defaultPrevented
 
-      if (!handledByList && !this._isShown() && event.key !== TAB_KEY) {
+      if (!handledByList && !this._isShown() && event.key !== TAB_KEY && event.key !== ESCAPE_KEY) {
         this.show()
       }
 
