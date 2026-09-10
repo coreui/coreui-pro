@@ -52,7 +52,6 @@ const NAME = 'calendar'
 const DATA_KEY = 'coreui.calendar'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
-const DISALLOWED_ATTRIBUTES = new Set(['sanitize', 'allowList', 'sanitizeFn'])
 
 const ARROW_UP_KEY = 'ArrowUp'
 const ARROW_RIGHT_KEY = 'ArrowRight'
@@ -1258,26 +1257,6 @@ class Calendar extends BaseComponent {
     }
 
     return html
-  }
-
-  override _getConfig(config: any): any {
-    const dataAttributes = Manipulator.getDataAttributes(this._element)
-
-    for (const dataAttribute of Object.keys(dataAttributes)) {
-      if (DISALLOWED_ATTRIBUTES.has(dataAttribute)) {
-        delete dataAttributes[dataAttribute]
-      }
-    }
-
-    config = {
-      ...dataAttributes,
-      ...(typeof config === 'object' && config ? config : {})
-    }
-    config = this._mergeConfigObj(config)
-    config = this._configAfterMerge(config)
-    this._typeCheckConfig(config)
-
-    return config
   }
 
   // Static

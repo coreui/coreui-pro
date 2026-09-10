@@ -78,6 +78,15 @@ describe('Chip', () => {
       expect(chip._selected).toBeTrue()
     })
 
+    it('should initialize as disabled via data-coreui-config', () => {
+      fixtureEl.innerHTML = '<span class="chip" data-coreui-config=\'{"disabled": true}\'>Tag</span>'
+
+      const chipEl = fixtureEl.querySelector('.chip')
+      const chip = new Chip(chipEl)
+
+      expect(chip._disabled).toBeTrue()
+    })
+
     it('should initialize as disabled via config', () => {
       fixtureEl.innerHTML = '<span class="chip">Tag</span>'
 

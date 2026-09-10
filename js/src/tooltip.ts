@@ -45,7 +45,6 @@ import {
  */
 
 const NAME = 'tooltip'
-const DISALLOWED_ATTRIBUTES = new Set(['sanitize', 'allowList', 'sanitizeFn'])
 
 const ESCAPE_KEY = 'Escape'
 
@@ -854,25 +853,6 @@ class Tooltip extends BaseComponent {
 
   protected _isWithActiveTrigger(): boolean {
     return Object.values(this._activeTrigger).includes(true)
-  }
-
-  override _getConfig(config?: ComponentConfig | null): ComponentConfig {
-    const dataAttributes = Manipulator.getDataAttributes(this._element)
-
-    for (const dataAttribute of Object.keys(dataAttributes)) {
-      if (DISALLOWED_ATTRIBUTES.has(dataAttribute)) {
-        delete dataAttributes[dataAttribute]
-      }
-    }
-
-    config = {
-      ...dataAttributes,
-      ...(typeof config === 'object' && config ? config : {})
-    }
-    config = this._mergeConfigObj(config)
-    config = this._configAfterMerge(config)
-    this._typeCheckConfig(config)
-    return config
   }
 
   override _configAfterMerge(config: ComponentConfig): ComponentConfig {

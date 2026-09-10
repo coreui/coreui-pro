@@ -8,7 +8,6 @@
 import BaseComponent from './base-component.js'
 import type { ComponentConfig } from './util/config.js'
 import EventHandler from './dom/event-handler.js'
-import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { sanitizeHtml, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 import { defineJQueryPlugin, getUID } from './util/index.js'
@@ -22,7 +21,6 @@ const NAME = 'rating'
 const DATA_KEY = 'coreui.rating'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
-const DISALLOWED_ATTRIBUTES = new Set(['sanitize', 'allowList', 'sanitizeFn'])
 
 const EVENT_CHANGE = `change${EVENT_KEY}`
 const EVENT_CLICK = `click${EVENT_KEY}`
@@ -471,26 +469,6 @@ class Rating extends BaseComponent {
 
   _sanitizeIcon(icon: any): any {
     return this._config.sanitize ? sanitizeHtml(icon, this._config.allowList, this._config.sanitizeFn) : icon
-  }
-
-  override _getConfig(config?: any): ComponentConfig {
-    const dataAttributes = Manipulator.getDataAttributes(this._element)
-
-    for (const dataAttribute of Object.keys(dataAttributes)) {
-      if (DISALLOWED_ATTRIBUTES.has(dataAttribute)) {
-        delete dataAttributes[dataAttribute]
-      }
-    }
-
-    config = {
-      ...dataAttributes,
-      ...(typeof config === 'object' && config ? config : {})
-    }
-    config = this._mergeConfigObj(config)
-    config = this._configAfterMerge(config)
-    this._typeCheckConfig(config)
-
-    return config
   }
 
   // Static

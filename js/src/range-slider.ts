@@ -21,7 +21,6 @@ const NAME = 'range-slider'
 const DATA_KEY = 'coreui.range-slider'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
-const DISALLOWED_ATTRIBUTES = new Set(['sanitize', 'allowList', 'sanitizeFn'])
 
 const EVENT_CHANGE = `change${EVENT_KEY}`
 const EVENT_INPUT = `input${EVENT_KEY}`
@@ -662,26 +661,6 @@ class RangeSlider extends BaseComponent {
     if (typeof config.value === 'string') {
       config.value = config.value.split(/,\s*/).map(Number)
     }
-
-    return config
-  }
-
-  override _getConfig(config: any): any {
-    const dataAttributes = Manipulator.getDataAttributes(this._element)
-
-    for (const dataAttribute of Object.keys(dataAttributes)) {
-      if (DISALLOWED_ATTRIBUTES.has(dataAttribute)) {
-        delete dataAttributes[dataAttribute]
-      }
-    }
-
-    config = {
-      ...dataAttributes,
-      ...(typeof config === 'object' && config ? config : {})
-    }
-    config = this._mergeConfigObj(config)
-    config = this._configAfterMerge(config)
-    this._typeCheckConfig(config)
 
     return config
   }
