@@ -5,7 +5,7 @@
  * --------------------------------------------------------------------------
  */
 
-import Combobox from './combobox.js'
+import ComboboxBase from './combobox-base.js'
 import Data from './dom/data.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
@@ -122,7 +122,7 @@ const DefaultType: Record<string, string> = {
  * ------------------------------------------------------------------------
  */
 
-class Autocomplete extends Combobox {
+class Autocomplete extends ComboboxBase {
   protected declare _indicatorElement: any
   protected declare _cleanerElement: any
   protected declare _inputElement: any

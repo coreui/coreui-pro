@@ -99,6 +99,7 @@ describe('ListBox', () => {
         sanitize: true,
         sanitizeFn: null,
         search: false,
+        searchNormalize: false,
         searchPlaceholder: 'Search',
         sectionsSelectable: false,
         selected: null,
@@ -1303,6 +1304,53 @@ describe('ListBox', () => {
       new ListBox(el, { disabled: true, search: true })
 
       expect(searchField(el).disabled).toBeTrue()
+    })
+  })
+
+  describe('searchNormalize', () => {
+    const accentedMarkup = [
+      '<div class="list-box-option" data-coreui-value="zoe">Zo\u00EB</div>',
+      '<div class="list-box-option" data-coreui-value="rene">Ren\u00E9e</div>',
+      '<div class="list-box-option" data-coreui-value="ana">Ana</div>'
+    ]
+
+    it('should match an accented label from an unaccented query', () => {
+      const el = setMarkup('', accentedMarkup)
+      const listBox = new ListBox(el, { searchNormalize: true })
+
+      listBox.filter('zoe')
+
+      expect(item(el, 'zoe').hasAttribute('hidden')).toBeFalse()
+      expect(item(el, 'rene').hasAttribute('hidden')).toBeTrue()
+    })
+
+    it('should match an unaccented label from an accented query', () => {
+      const el = setMarkup('', accentedMarkup)
+      const listBox = new ListBox(el, { searchNormalize: true })
+
+      listBox.filter('an\u00E1')
+
+      expect(item(el, 'ana').hasAttribute('hidden')).toBeFalse()
+    })
+
+    it('should normalize the built-in search field too', () => {
+      const el = setMarkup('', accentedMarkup)
+      // eslint-disable-next-line no-new
+      new ListBox(el, { search: true, searchNormalize: true })
+
+      type(searchField(el), 'renee')
+
+      expect(item(el, 'rene').hasAttribute('hidden')).toBeFalse()
+      expect(item(el, 'zoe').hasAttribute('hidden')).toBeTrue()
+    })
+
+    it('should keep the accents apart when it is off', () => {
+      const el = setMarkup('', accentedMarkup)
+      const listBox = new ListBox(el)
+
+      listBox.filter('zoe')
+
+      expect(item(el, 'zoe').hasAttribute('hidden')).toBeTrue()
     })
   })
 

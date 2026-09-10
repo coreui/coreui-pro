@@ -123,6 +123,7 @@ type ListBoxConfig = {
   sanitize: boolean
   sanitizeFn: ((unsafeHtml: string) => string) | null
   search: boolean | string
+  searchNormalize: boolean
   searchPlaceholder: string
   sectionsSelectable: boolean
   selected: string | string[] | null
@@ -145,6 +146,7 @@ const Default: ListBoxConfig = {
   sanitize: true,
   sanitizeFn: null,
   search: false,
+  searchNormalize: false,
   searchPlaceholder: 'Search',
   sectionsSelectable: false,
   selected: null,
@@ -167,6 +169,7 @@ const DefaultType: Record<string, string> = {
   sanitize: 'boolean',
   sanitizeFn: '(null|function)',
   search: '(boolean|string)',
+  searchNormalize: 'boolean',
   searchPlaceholder: 'string',
   sectionsSelectable: 'boolean',
   selected: '(string|array|null)',
@@ -327,7 +330,7 @@ class ListBox extends BaseComponent {
   }
 
   filter(query: string | null): void {
-    this._query = query === null ? null : query.trim().toLowerCase()
+    this._query = query === null ? null : this._normalizeText(query.trim().toLowerCase())
 
     if (this._query === null) {
       for (const element of [...this._allOptions(), ...SelectorEngine.find(SELECTOR_SECTION, this._list)]) {
@@ -557,15 +560,19 @@ class ListBox extends BaseComponent {
       return
     }
 
-    const query = this._query ?? this._searchField!.value.trim().toLowerCase()
+    const query = this._query ?? this._normalizeText(this._searchField!.value.trim().toLowerCase())
 
     for (const option of this._allOptions()) {
-      option.toggleAttribute('hidden', query !== '' && !this._optionText(option).includes(query))
+      option.toggleAttribute('hidden', query !== '' && !this._normalizeText(this._optionText(option)).includes(query))
     }
 
     for (const section of SelectorEngine.find(SELECTOR_SECTION, this._list)) {
       section.toggleAttribute('hidden', SelectorEngine.find(SELECTOR_OPTION, section).every(option => option.hasAttribute('hidden')))
     }
+  }
+
+  _normalizeText(text: string): string {
+    return this._config.searchNormalize ? text.normalize('NFD').replaceAll(/[\u0300-\u036F]/g, '') : text
   }
 
   _initialSelection(): string[] {

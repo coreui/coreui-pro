@@ -1,501 +1,605 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI PRO combobox.ts
+ * CoreUI combobox.ts
  * License (https://coreui.io/pro/license/)
  * --------------------------------------------------------------------------
  */
 
-import BaseComponent from './base-component.js'
-import ListBox from './list-box.js'
+import ComboboxBase from './combobox-base.js'
+import Data from './dom/data.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
-import { createAnchoredPosition } from './util/floating-ui.js'
-import { resolvePopupContainer } from './util/popup.js'
-import { escapeHtml, sanitizeHtml } from './util/sanitizer.js'
-import { executeAfterTransition, getElement } from './util/index.js'
+import ListBox, { type ListBoxEntry } from './list-box.js'
+import type { ComponentConfig } from './util/config.js'
+import { CARET_ICON } from './util/icons.js'
+import { DefaultAllowlist, type SanitizerAllowList } from './util/sanitizer.js'
+import { defineJQueryPlugin, getUID } from './util/index.js'
 
 /**
- * Internal shared engine for the combobox-pattern components (Autocomplete,
- * MultiSelect). Not exported from the package and not documented — the public
- * surfaces stay the subclasses, which keep their own markup, class names,
- * events and options.
- *
- * The panel is a `.popup` wrapping a ListBox instance: the list renders the
- * options, owns the selection state it shows, and runs the keyboard from the
- * host's own field through `activeDescendant`. The engine keeps the panel
- * (mounting, width, anchored position, Escape) and translates between the
- * host's option model and the list's items.
+ * Constants
  */
 
-const ARROW_DOWN_KEY = 'ArrowDown'
-const ESCAPE_KEY = 'Escape'
-const ENTER_KEY = 'Enter'
+const NAME = 'combobox'
+const DATA_KEY = 'coreui.combobox'
+const EVENT_KEY = `.${DATA_KEY}`
+const DATA_API_KEY = '.data-api'
 
-const CLASS_NAME_SHOW = 'show'
-const CLASS_NAME_POPUP = 'combobox-popup'
-const CLASS_NAME_EMPTY = 'list-box-empty'
+const ARROW_UP_KEY = 'ArrowUp'
+const ARROW_DOWN_KEY = 'ArrowDown'
+const ENTER_KEY = 'Enter'
+const ESCAPE_KEY = 'Escape'
+const SPACE_KEY = ' '
+const TAB_KEY = 'Tab'
+const RIGHT_MOUSE_BUTTON = 2
+
+const EVENT_CHANGE = `change${EVENT_KEY}`
+const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
+const EVENT_SEARCH = `search${EVENT_KEY}`
+const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
+const EVENT_KEYUP_DATA_API = `keyup${EVENT_KEY}${DATA_API_KEY}`
+const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
+
+const EVENT_LIST_BOX = '.coreui.list-box'
+const EVENT_LIST_BOX_SEARCH = `search${EVENT_LIST_BOX}`
+
+const CLASS_NAME_CARET = 'combobox-caret'
+const CLASS_NAME_DISABLED = 'disabled'
 const CLASS_NAME_LIST_BOX = 'list-box'
 const CLASS_NAME_OPTIONS = 'list-box-options'
+const CLASS_NAME_PLACEHOLDER = 'combobox-placeholder'
+const CLASS_NAME_POPUP = 'popup'
+const CLASS_NAME_POPUP_COMBOBOX = 'combobox-popup'
+const CLASS_NAME_SEARCH = 'list-box-search'
+const CLASS_NAME_SELECTED = 'selected'
+const CLASS_NAME_SHOW = 'show'
+const CLASS_NAME_TOGGLE = 'combobox-toggle'
+const CLASS_NAME_VALUE = 'combobox-value'
 
+const SELECTOR_CARET = '.combobox-caret'
+const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="combobox"]'
+const SELECTOR_DATA_TOGGLE_SHOWN = `.${CLASS_NAME_TOGGLE}.${CLASS_NAME_SHOW}`
+const SELECTOR_LIST_BOX = '.list-box'
 const SELECTOR_OPTION = '.list-box-option'
+const SELECTOR_OPTION_LABEL = '.list-box-option-label'
+const SELECTOR_OPTIONS = '.list-box-options'
+const SELECTOR_POPUP = '.popup'
+const SELECTOR_SEARCH = '[data-coreui-list-box-search]'
+const SELECTOR_VALUE = '.combobox-value'
 
-const EVENT_LIST_BOX_CHANGE = 'change.coreui.list-box'
-const EVENT_LIST_BOX_DESELECTED = 'deselected.coreui.list-box'
-const EVENT_LIST_BOX_SELECTED = 'selected.coreui.list-box'
-const EVENT_LIST_BOX_SELECTION_LIMIT = 'selectionLimit.coreui.list-box'
+const COUNT_PLACEHOLDER = '{count}'
 
-class Combobox extends BaseComponent {
-  declare ['constructor']: typeof Combobox
-  protected declare _uniqueId: any
-  protected declare _togglerElement: any
-  protected declare _optionsElement: any
-  protected declare _listBox: ListBox | null
-  protected declare _listBoxElement: any
-  protected declare _menu: any
-  protected declare _selected: any
-  protected declare _options: any
-  protected declare _search: any
-  protected declare _syncing: boolean
-  protected declare _floatingCleanup: (() => void) | null
-  protected declare _widthObserver: ResizeObserver | null
-  protected declare _anchoredPosition: ReturnType<typeof createAnchoredPosition> | null
+type ComboboxConfig = {
+  allowList: SanitizerAllowList
+  ariaSearchLabel: string
+  caretIcon: string
+  container: string | Element | boolean
+  disabled: boolean
+  html: boolean
+  indicator: string
+  items: ListBoxEntry[]
+  multiple: boolean
+  name: string | null
+  placeholder: string
+  sanitize: boolean
+  sanitizeFn: ((unsafeHtml: string) => string) | null
+  search: boolean | string
+  searchNormalize: boolean
+  searchPlaceholder: string
+  selectedText: string
+  selectionLimit: number | null
+  typeahead: boolean
+  value: string | string[] | null
+}
 
-  // Show / hide lifecycle — one event contract for every combobox surface.
-  // Subclasses adjust behavior through the hooks below, never by overriding
-  // the template methods, so the event order stays identical across surfaces.
+const Default: ComboboxConfig = {
+  allowList: DefaultAllowlist,
+  ariaSearchLabel: 'Search options',
+  caretIcon: CARET_ICON,
+  container: false,
+  disabled: false,
+  html: false,
+  indicator: 'none',
+  items: [],
+  multiple: false,
+  name: null,
+  placeholder: '',
+  sanitize: true,
+  sanitizeFn: null,
+  search: false,
+  searchNormalize: false,
+  searchPlaceholder: 'Search',
+  selectedText: '{count} selected',
+  selectionLimit: null,
+  typeahead: true,
+  value: null
+}
 
-  toggle(): void {
-    return this._isShown() ? this.hide() : this.show()
+const DefaultType: Record<string, string> = {
+  allowList: 'object',
+  ariaSearchLabel: 'string',
+  caretIcon: 'string',
+  container: '(string|element|boolean)',
+  disabled: 'boolean',
+  html: 'boolean',
+  indicator: 'string',
+  items: 'array',
+  multiple: 'boolean',
+  name: '(string|null)',
+  placeholder: 'string',
+  sanitize: 'boolean',
+  sanitizeFn: '(null|function)',
+  search: '(boolean|string)',
+  searchNormalize: 'boolean',
+  searchPlaceholder: 'string',
+  selectedText: 'string',
+  selectionLimit: '(null|number)',
+  typeahead: 'boolean',
+  value: '(string|array|null)'
+}
+
+/**
+ * Class definition
+ */
+
+class Combobox extends ComboboxBase {
+  protected declare _caretElement: HTMLElement | null
+  protected declare _hiddenInput: HTMLInputElement | null
+  protected declare _searchElement: HTMLInputElement | null
+  protected declare _valueElement: HTMLElement
+
+  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
+    super(element, config)
+
+    this._uniqueId = this._element.id || getUID(NAME)
+    this._togglerElement = this._element
+    this._caretElement = null
+    this._hiddenInput = null
+    this._searchElement = null
+    this._listBox = null
+    this._listBoxElement = null
+    this._menu = null
+    this._optionsElement = null
+    this._floatingCleanup = null
+    this._anchoredPosition = null
+    this._search = ''
+    this._syncing = false
+
+    this._createCombobox()
+    this._addEventListeners()
+
+    Data.set(this._element, DATA_KEY, this)
   }
 
-  show(): void {
-    if (this._config.disabled || this._isShown() || !this._canShow()) {
+  // Getters
+  static override get Default(): ComboboxConfig {
+    return Default
+  }
+
+  static override get DefaultType(): typeof DefaultType {
+    return DefaultType
+  }
+
+  static override get NAME(): string {
+    return NAME
+  }
+
+  // Public
+  getValue(): string | string[] | null {
+    const selected = this._listBox ? this._listBox.getSelected() : []
+
+    return this._config.multiple ? selected : (selected[0] ?? null)
+  }
+
+  setValue(value: string | string[] | null): void {
+    this._applySelection(value === null ? [] : (Array.isArray(value) ? value.map(String) : [String(value)]))
+  }
+
+  clear(): void {
+    this._applySelection([])
+  }
+
+  setItems(items: ListBoxEntry[]): void {
+    this._listBox?.setItems(items)
+    this._updateValue()
+  }
+
+  update(): void {
+    this._listBox?.update()
+    this._updateValue()
+  }
+
+  override dispose(): void {
+    this._disposeFloating()
+    this._disposeListBox()
+
+    this._hiddenInput?.remove()
+
+    if (this._caretElement) {
+      this._caretElement.classList.remove(CLASS_NAME_CARET)
+      this._caretElement.removeAttribute('aria-hidden')
+    }
+
+    // The panel is markup the page owns, so it goes back where it came from
+    // rather than being destroyed with the instance.
+    if (this._menu) {
+      this._menu.classList.remove(CLASS_NAME_SHOW)
+      this._element.after(this._menu)
+      EventHandler.off(this._menu, EVENT_KEY)
+    }
+
+    if (this._listBoxElement) {
+      EventHandler.off(this._listBoxElement, EVENT_LIST_BOX)
+    }
+
+    this._element.classList.remove(CLASS_NAME_SHOW)
+    this._element.removeAttribute('aria-expanded')
+    this._element.removeAttribute('aria-haspopup')
+
+    super.dispose()
+  }
+
+  // Private
+  override _configAfterMerge(config: any): any {
+    config = this._normalizeContainerConfig(config)
+
+    if (typeof config.value === 'string' && config.value.includes(',')) {
+      config.value = config.value.split(/,\s*/)
+    }
+
+    return config
+  }
+
+  _createCombobox(): void {
+    this._element.classList.add(CLASS_NAME_TOGGLE)
+    this._element.setAttribute('aria-haspopup', 'listbox')
+    this._element.setAttribute('aria-expanded', 'false')
+
+    if (this._element instanceof HTMLButtonElement) {
+      this._element.type = 'button'
+      this._config.disabled = this._config.disabled || this._element.disabled
+      this._element.disabled = this._config.disabled
+    }
+
+    this._config.disabled = this._config.disabled || this._element.classList.contains(CLASS_NAME_DISABLED)
+    this._element.classList.toggle(CLASS_NAME_DISABLED, this._config.disabled)
+
+    this._createValueElement()
+    this._createCaret()
+    this._createHiddenInput()
+    this._resolveMenu()
+    this._createSearchInput()
+
+    this._listBox = new ListBox(this._listBoxElement, this._getListBoxConfig())
+    this._addListBoxListeners()
+    this._addPanelEscapeListener(this._menu)
+
+    this._updateValue()
+  }
+
+  _createValueElement(): void {
+    const existing = SelectorEngine.findOne(SELECTOR_VALUE, this._element) as HTMLElement | null
+
+    if (existing) {
+      this._valueElement = existing
       return
     }
 
-    EventHandler.trigger(this._element, this.constructor.eventName('show'))
-    const showTarget = this._getShowTarget()
-    this._mountMenu()
-    showTarget.classList.add(CLASS_NAME_SHOW)
-    this._getAriaExpandedTarget().setAttribute('aria-expanded', 'true')
+    const value = document.createElement('span')
+    value.classList.add(CLASS_NAME_VALUE)
+    this._element.prepend(value)
 
-    // The panel carries its own open state, teleported or not: `.popup` keys
-    // both its display and its entry transition on it, so a panel shown only
-    // through an ancestor's class would be laid out and never fade in.
-    this._menu.classList.add(CLASS_NAME_SHOW)
-
-    EventHandler.trigger(this._element, this.constructor.eventName('shown'))
-
-    this._createFloating()
-    this._afterShow()
+    this._valueElement = value
   }
 
-  hide(): void {
-    EventHandler.trigger(this._element, this.constructor.eventName('hide'))
-    this._onHideStart()
+  _createCaret(): void {
+    const existing = SelectorEngine.findOne(SELECTOR_CARET, this._element) as HTMLElement | null
 
-    this._disposeFloating()
-    this._afterHideDispose()
-
-    this._getShowTarget().classList.remove(CLASS_NAME_SHOW)
-    this._getAriaExpandedTarget().setAttribute('aria-expanded', 'false')
-    this._menu.classList.remove(CLASS_NAME_SHOW)
-
-    // A closed panel has no highlighted option, so reopening starts from the
-    // top and the field's activation keys stop reaching a stale one.
-    this._listBox?.setActive(null)
-
-    this._onHideEnd()
-    EventHandler.trigger(this._element, this.constructor.eventName('hidden'))
-
-    // The panel lives in the DOM only while a choice is being made; let the
-    // exit transition play before it goes. dispose() can run before the
-    // transition ends — it nulls every field and removes the panel itself.
-    executeAfterTransition(() => {
-      if (this._menu && !this._isShown()) {
-        this._menu.remove()
-      }
-    }, this._menu)
-  }
-
-  _isShown(): boolean {
-    return this._getShowTarget().classList.contains(CLASS_NAME_SHOW)
-  }
-
-  // Lifecycle hooks
-
-  _canShow(): boolean {
-    return true
-  }
-
-  _afterShow(): void {}
-
-  _onHideStart(): void {}
-
-  _afterHideDispose(): void {}
-
-  _onHideEnd(): void {}
-
-  _getShowTarget(): HTMLElement {
-    return this._element
-  }
-
-  // Mounted for the duration of the interaction, into a container decided
-  // fresh on each open (in place, the open dialog's subtree, or body when an
-  // ancestor would clip the panel). In place means next to the frame, not
-  // inside it — the frame is a flex control chrome. The frame cannot size the
-  // panel through CSS once the panel can leave it, so the width rides along
-  // inline.
-  _mountMenu(): void {
-    const showTarget = this._getShowTarget()
-    const container = resolvePopupContainer(showTarget, this._config.container ? getElement(this._config.container) : null)
-
-    if (container) {
-      container.append(this._menu)
-    } else {
-      showTarget.after(this._menu)
+    if (existing || !this._config.caretIcon) {
+      this._caretElement = existing
+      return
     }
 
-    // The frame used to size the panel through CSS (min-width: 100%), which
-    // tracked resizes for free; an inline snapshot must follow the frame
-    // itself for as long as the panel is open.
-    this._syncMenuWidth()
-    this._widthObserver = new ResizeObserver(() => this._syncMenuWidth())
-    this._widthObserver.observe(showTarget)
+    this._element.insertAdjacentHTML('beforeend', this._config.caretIcon)
+
+    const caret = this._element.lastElementChild as HTMLElement
+    caret.classList.add(CLASS_NAME_CARET)
+    caret.setAttribute('aria-hidden', 'true')
+
+    this._caretElement = caret
   }
 
-  _syncMenuWidth(): void {
-    if (this._menu) {
-      this._menu.style.minWidth = `${this._getShowTarget().offsetWidth}px`
-    }
-  }
-
-  _getAriaExpandedTarget(): HTMLElement {
-    return this._togglerElement
-  }
-
-  _escapeFocusTarget(): HTMLElement | null {
-    return this._togglerElement
-  }
-
-  // Shared keyboard wiring — the list itself runs the arrows, Home/End and the
-  // activation keys off the field it was given, so the frame only has to open.
-
-  _addTogglerKeydownListeners(): void {
-    EventHandler.on(this._togglerElement, this.constructor.eventName('keydown'), (event: any) => {
-      // A nested control that owns its own keyboard handling marks the event
-      // handled — Multi Select's native <select> overlay lives inside the frame
-      // and hands the keystroke over itself, so the frame must not act on the
-      // same press a second time and jump into the menu.
-      if (event.defaultPrevented) {
-        return
-      }
-
-      if (!this._isShown() && (event.key === ENTER_KEY || event.key === ARROW_DOWN_KEY)) {
-        event.preventDefault()
-        this.show()
-      }
-    })
-  }
-
-  // Options panel — one render path for every combobox surface
-
-  _createOptionsContainer(): void {
-    const popupDiv = document.createElement('div')
-    popupDiv.classList.add('popup', CLASS_NAME_POPUP)
-
-    const listBoxDiv = document.createElement('div')
-    listBoxDiv.classList.add(CLASS_NAME_LIST_BOX)
-    popupDiv.append(listBoxDiv)
-    this._listBoxElement = listBoxDiv
-
-    this._buildMenuHeader(listBoxDiv)
-
-    const optionsDiv = document.createElement('div')
-    optionsDiv.classList.add(CLASS_NAME_OPTIONS)
-    optionsDiv.setAttribute('id', `${this._uniqueId}-listbox`)
-
-    this._decorateListbox(optionsDiv)
-
-    if (this._config.optionsMaxHeight !== 'auto') {
-      optionsDiv.style.maxHeight = `${this._config.optionsMaxHeight}px`
-      optionsDiv.style.overflowY = 'auto'
+  _createHiddenInput(): void {
+    if (!this._config.name) {
+      return
     }
 
-    if (this._config.searchNoResultsLabel) {
-      const empty = document.createElement('div')
-      empty.classList.add(CLASS_NAME_EMPTY)
-      empty.setAttribute('role', 'status')
-      empty.setAttribute('hidden', '')
-      empty.textContent = this._config.searchNoResultsLabel
-      optionsDiv.append(empty)
-    }
+    const input = document.createElement('input')
+    input.type = 'hidden'
+    input.name = this._config.name
+    this._element.before(input)
 
-    listBoxDiv.append(optionsDiv)
-
-    // The menu mounts outside the component while open, so its keystrokes no
-    // longer bubble through the frame — Escape is handled on the panel itself.
-    // Focus goes home before the panel unmounts, or a keyboard user is
-    // dropped on <body>; preventDefault keeps the same press from also
-    // closing an enclosing modal dialog.
-    EventHandler.on(popupDiv, this.constructor.eventName('keydown'), (event: any) => {
-      if (event.key === ESCAPE_KEY) {
-        event.preventDefault()
-        event.stopPropagation()
-        this._escapeFocusTarget()?.focus()
-        this.hide()
-      }
-    })
-
-    this._optionsElement = optionsDiv
-    this._menu = popupDiv
-    this._syncing = false
-
-    this._listBox = new ListBox(listBoxDiv, this._getListBoxConfig())
-    this._addListBoxListeners()
-    this._afterMenuCreated()
+    this._hiddenInput = input
   }
 
-  // Hooks: dropdown header (MultiSelect select-all / header template),
-  // listbox decoration (aria-multiselectable, labelling) and post-create work.
-  _buildMenuHeader(listBoxDiv: HTMLElement): void {} // eslint-disable-line @typescript-eslint/no-unused-vars
+  // The panel is written next to the toggle, or built here when the options
+  // come from `items`. Either way it leaves the document until the first
+  // open — a `.popup` is laid out absolutely, so it would otherwise sit in
+  // the flow of whatever follows the toggle.
+  _resolveMenu(): void {
+    const popup = (SelectorEngine.next(this._element, SELECTOR_POPUP)[0] ?? document.createElement('div')) as HTMLElement
+    popup.classList.add(CLASS_NAME_POPUP, CLASS_NAME_POPUP_COMBOBOX)
 
-  _decorateListbox(optionsDiv: HTMLElement): void {} // eslint-disable-line @typescript-eslint/no-unused-vars
+    let listBox = SelectorEngine.findOne(SELECTOR_LIST_BOX, popup) as HTMLElement | null
 
-  _afterMenuCreated(): void {}
+    if (!listBox) {
+      listBox = document.createElement('div')
+      listBox.classList.add(CLASS_NAME_LIST_BOX)
+      popup.append(listBox)
+    }
 
-  _getListBoxConfig(): any {
+    let options = SelectorEngine.findOne(SELECTOR_OPTIONS, listBox) as HTMLElement | null
+
+    if (!options) {
+      options = document.createElement('div')
+      options.classList.add(CLASS_NAME_OPTIONS)
+      listBox.append(options)
+    }
+
+    if (!options.id) {
+      options.id = `${this._uniqueId}-listbox`
+    }
+
+    popup.remove()
+
+    this._menu = popup
+    this._listBoxElement = listBox
+    this._optionsElement = options
+  }
+
+  // The list builds its own search field, but only after it has resolved the
+  // field that keeps the focus — so the one the focus stays in has to exist
+  // first.
+  _createSearchInput(): void {
+    if (!this._config.search) {
+      return
+    }
+
+    const existing = SelectorEngine.findOne(SELECTOR_SEARCH, this._listBoxElement) as HTMLInputElement | null
+
+    if (existing) {
+      this._searchElement = existing
+      return
+    }
+
+    const search = document.createElement('input')
+    search.type = 'search'
+    search.className = `form-control ${CLASS_NAME_SEARCH}`
+    search.setAttribute('data-coreui-list-box-search', '')
+    this._optionsElement.before(search)
+
+    this._searchElement = search
+  }
+
+  override _getListBoxConfig(): any {
     return {
-      activeDescendant: this._getActiveDescendantField(),
+      activeDescendant: this._searchElement ?? this._element,
       allowList: this._config.allowList,
-      html: this._hasOptionTemplates(),
-      items: this._getListBoxItems(),
+      ariaSearchLabel: this._config.ariaSearchLabel,
+      disabled: this._config.disabled,
+      html: this._config.html,
+      indicator: this._config.indicator,
+      items: this._config.items,
       sanitize: this._config.sanitize,
       sanitizeFn: this._config.sanitizeFn,
-      selectionMode: 'single',
-      typeahead: false
+      search: this._config.search,
+      searchNormalize: this._config.searchNormalize,
+      searchPlaceholder: this._config.searchPlaceholder,
+      selected: this._initialValues(),
+      selectionLimit: this._config.selectionLimit,
+      selectionMode: this._config.multiple ? 'multiple' : 'single',
+      typeahead: this._config.typeahead
     }
   }
 
-  // The field that keeps the focus while the list moves its active option.
-  _getActiveDescendantField(): HTMLElement {
-    return this._togglerElement
+  _initialValues(): string[] {
+    const { value } = this._config
+    const configured = value === null ? [] : (Array.isArray(value) ? value : [value]).map(String)
+    const marked = SelectorEngine.find(`${SELECTOR_OPTION}.${CLASS_NAME_SELECTED}`, this._optionsElement)
+      .map(option => this._valueOf(option as HTMLElement))
+
+    return [...new Set([...configured, ...marked])]
   }
 
-  _hasOptionTemplates(): boolean {
-    return typeof this._config.optionsTemplate === 'function' ||
-      typeof this._config.optionsGroupsTemplate === 'function'
+  _valueOf(option: HTMLElement): string {
+    return option.dataset.coreuiValue ?? option.textContent?.trim() ?? ''
   }
 
-  _getListBoxItems(options: any[] = this._options): any[] {
-    return options.map((option: any) => {
-      if (Array.isArray(option.options)) {
-        return {
-          label: this._renderGroupLabel(option),
-          items: this._getListBoxItems(option.options)
-        }
-      }
-
-      return {
-        value: String(option.value),
-        label: this._renderOptionLabel(option),
-        ...option.disabled && { disabled: true }
-      }
-    })
-  }
-
-  _renderOptionLabel(option: any): string {
-    if (typeof this._config.optionsTemplate === 'function') {
-      return this._config.optionsTemplate(option)
-    }
-
-    return this._plainLabel(this._optionText(option))
-  }
-
-  _renderGroupLabel(option: any): string {
-    if (typeof this._config.optionsGroupsTemplate === 'function') {
-      return this._config.optionsGroupsTemplate(option)
-    }
-
-    return this._plainLabel(option.label)
-  }
-
-  // Hook: the property each surface stores an option's text in.
-  _optionText(option: any): string {
-    return option.label
-  }
-
-  // The list renders every label through one path, so a surface that has any
-  // template at all takes its plain labels escaped rather than as markup.
-  _plainLabel(label: string): string {
-    return this._hasOptionTemplates() ? escapeHtml(String(label)) : String(label)
-  }
-
-  _setListBoxItems(): void {
-    this._listBox?.setItems(this._getListBoxItems())
-    this._afterOptionsRendered()
-  }
-
-  _afterOptionsRendered(): void {}
-
-  _disposeListBox(): void {
-    this._listBox?.dispose()
-    this._listBox = null
-  }
-
-  // Selection — the list holds the state it renders, every surface keeps its
-  // own model and mirrors it here.
-
-  _addListBoxListeners(): void {
-    EventHandler.on(this._listBoxElement, EVENT_LIST_BOX_SELECTED, (event: any) => {
-      if (!this._syncing) {
-        this._onOptionSelected(String(event.value))
-      }
-    })
-
-    EventHandler.on(this._listBoxElement, EVENT_LIST_BOX_DESELECTED, (event: any) => {
-      if (!this._syncing) {
-        this._onOptionDeselected(String(event.value))
-      }
-    })
-
-    // `change` is a native event name, so EventHandler registers the listener
-    // under the bare type while the list dispatches the namespaced one.
-    this._listBoxElement.addEventListener(EVENT_LIST_BOX_CHANGE, () => {
-      if (!this._syncing) {
-        this._onSelectionChange()
-      }
-    })
-
-    EventHandler.on(this._listBoxElement, EVENT_LIST_BOX_SELECTION_LIMIT, () => {
-      if (!this._syncing) {
-        this._onSelectionLimit()
-      }
-    })
-  }
-
-  _onOptionSelected(value: string): void {} // eslint-disable-line @typescript-eslint/no-unused-vars
-
-  _onOptionDeselected(value: string): void {} // eslint-disable-line @typescript-eslint/no-unused-vars
-
-  _onSelectionChange(): void {}
-
-  _onSelectionLimit(): void {}
-
-  // Reflect the model's state on the list without the list reporting it back.
-  _syncOptionElementState(value: any, selected: boolean): void {
+  _applySelection(values: string[]): void {
     if (!this._listBox) {
       return
     }
 
     this._syncing = true
+    this._listBox.clear()
 
-    if (selected) {
-      this._listBox.select(String(value))
-    } else {
-      this._listBox.deselect(String(value))
+    for (const value of (this._config.multiple ? values : values.slice(0, 1))) {
+      this._listBox.select(value)
     }
 
     this._syncing = false
+
+    this._updateValue()
+    EventHandler.trigger(this._element, EVENT_CHANGE, { value: this.getValue() })
   }
 
-  // Option model
+  _updateValue(): void {
+    const values = this._listBox ? this._listBox.getSelected() : []
 
-  _flattenOptions(options: any[] = this._options, flat: any[] = []): any[] {
-    for (const option of options) {
-      if (option && Array.isArray(option.options)) {
-        this._flattenOptions(option.options, flat)
+    if (this._hiddenInput) {
+      this._hiddenInput.value = values.join(',')
+    }
+
+    if (values.length === 0) {
+      this._valueElement.textContent = this._config.placeholder
+      this._valueElement.classList.add(CLASS_NAME_PLACEHOLDER)
+      return
+    }
+
+    this._valueElement.classList.remove(CLASS_NAME_PLACEHOLDER)
+    this._valueElement.textContent = this._config.multiple && values.length > 1 ?
+      this._config.selectedText.replace(COUNT_PLACEHOLDER, String(values.length)) :
+      this._optionLabel(values[0])
+  }
+
+  _optionLabel(value: string): string {
+    const option = SelectorEngine.find(SELECTOR_OPTION, this._optionsElement)
+      .find(element => this._valueOf(element as HTMLElement) === value) as HTMLElement | undefined
+
+    if (!option) {
+      return value
+    }
+
+    const label = SelectorEngine.findOne(SELECTOR_OPTION_LABEL, option)
+
+    return (label ?? option).textContent?.trim() ?? value
+  }
+
+  override _afterShow(): void {
+    this._searchElement?.focus()
+  }
+
+  override _afterHideDispose(): void {
+    if (this._searchElement) {
+      this._searchElement.value = ''
+      this._listBox?.update()
+    }
+  }
+
+  override _onSelectionChange(): void {
+    this._updateValue()
+    EventHandler.trigger(this._element, EVENT_CHANGE, { value: this.getValue() })
+
+    // One value, one decision: the panel has nothing left to offer, so it
+    // closes and hands the focus back to the control the user came from.
+    if (!this._config.multiple && this._isShown()) {
+      this.hide()
+      this._element.focus()
+    }
+  }
+
+  _addEventListeners(): void {
+    EventHandler.on(this._element, EVENT_KEYDOWN, (event: any) => this._handleToggleKeydown(event))
+
+    EventHandler.on(this._listBoxElement, EVENT_LIST_BOX_SEARCH, (event: any) => {
+      EventHandler.trigger(this._element, EVENT_SEARCH, { query: event.query })
+    })
+
+    if (this._searchElement) {
+      EventHandler.on(this._searchElement, EVENT_KEYDOWN, (event: any) => {
+        if (event.key === TAB_KEY) {
+          this.hide()
+        }
+      })
+    }
+  }
+
+  _handleToggleKeydown(event: any): void {
+    const { key } = event
+
+    if (key === TAB_KEY) {
+      if (this._isShown()) {
+        this.hide()
+      }
+
+      return
+    }
+
+    if (this._isShown()) {
+      if (key === ESCAPE_KEY) {
+        event.preventDefault()
+        this.hide()
+      }
+
+      return
+    }
+
+    if (key === ARROW_DOWN_KEY || key === ARROW_UP_KEY) {
+      event.preventDefault()
+      this.show()
+      return
+    }
+
+    // The list runs its own typeahead off the same field, so a press it has
+    // already spent on a value must not also open the panel.
+    if ((key === ENTER_KEY || key === SPACE_KEY) && !event.defaultPrevented) {
+      event.preventDefault()
+      this.show()
+    }
+  }
+
+  // Static
+  static clearMenus(event: any): void {
+    if (event.button === RIGHT_MOUSE_BUTTON || (event.type === 'keyup' && event.key !== TAB_KEY)) {
+      return
+    }
+
+    for (const toggle of SelectorEngine.find(SELECTOR_DATA_TOGGLE_SHOWN)) {
+      const context = Combobox.getInstance(toggle) as Combobox | null
+
+      if (!context) {
         continue
       }
 
-      flat.push(option)
-    }
+      const composedPath = event.composedPath()
 
-    return flat
-  }
-
-  _findOptionByValue(value: any, options: any[] = this._options): any {
-    for (const option of options) {
-      if (String(option.value) === String(value)) {
-        return option
+      if (composedPath.includes(context._element) || composedPath.includes(context._menu)) {
+        continue
       }
 
-      if (option.options && Array.isArray(option.options)) {
-        const found = this._findOptionByValue(value, option.options)
-        if (found) {
-          return found
-        }
+      context.hide()
+    }
+  }
+
+  static jQueryInterface(this: any, config: any, ...args: any[]): any {
+    return this.each(function (this: HTMLElement) {
+      const data: any = Combobox.getOrCreateInstance(this, typeof config === 'object' ? config : null)
+
+      if (typeof config !== 'string') {
+        return
       }
-    }
 
-    return null
-  }
+      if (data[config as string] === undefined || config.startsWith('_') || config === 'constructor') {
+        throw new TypeError(`No method named "${config}"`)
+      }
 
-  // Anchored positioning (shared wiring around util/floating-ui)
-
-  _createFloating(): void {
-    this._anchoredPosition = createAnchoredPosition(this._togglerElement, this._menu)
-    this._floatingCleanup = this._anchoredPosition.destroy
-  }
-
-  async _updateFloatingPosition(): Promise<void> {
-    await this._anchoredPosition?.update()
-  }
-
-  _disposeFloating(): void {
-    // The width observer shares the floating lifecycle exactly: both live
-    // while the panel is interactive, and every hide/dispose path ends here.
-    this._widthObserver?.disconnect()
-    this._widthObserver = null
-
-    if (this._floatingCleanup) {
-      this._floatingCleanup()
-      this._floatingCleanup = null
-      this._anchoredPosition = null
-    }
-  }
-
-  // Filtering — the list hides what does not match and follows with its empty
-  // state, its select-all scope and its keyboard order.
-
-  _filterOptionsList(): void {
-    this._listBox?.filter(this._search === '' ? null : this._search)
-    this._afterOptionsRendered()
-    this._afterFilter(this._getDisplayedOptions().length)
-  }
-
-  _afterFilter(visibleOptions: number): void {} // eslint-disable-line @typescript-eslint/no-unused-vars
-
-  _getDisplayedOptions(): HTMLElement[] {
-    return SelectorEngine.find(SELECTOR_OPTION, this._optionsElement)
-      .filter(element => this._isOptionDisplayed(element))
-  }
-
-  _isOptionDisplayed(element: Element): boolean {
-    return !element.hasAttribute('hidden') && element.closest('[hidden]') === null
-  }
-
-  // Templates
-
-  _maybeSanitize(content: string): string {
-    return this._config.sanitize ?
-      sanitizeHtml(content, this._config.allowList, this._config.sanitizeFn) :
-      content
-  }
-
-  // Config normalization shared by every combobox surface
-
-  _normalizeContainerConfig(config: any): any {
-    if (config.container === true) {
-      config.container = document.body
-    }
-
-    if (typeof config.container === 'object' || typeof config.container === 'string') {
-      config.container = getElement(config.container)
-    }
-
-    return config
+      data[config as string](...args)
+    })
   }
 }
 
+/**
+ * Data API implementation
+ */
+
+EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
+  for (const toggle of SelectorEngine.find(SELECTOR_DATA_TOGGLE)) {
+    Combobox.getOrCreateInstance(toggle)
+  }
+})
+
+EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, function (this: HTMLElement, event: any) {
+  event.preventDefault()
+  Combobox.getOrCreateInstance(this).toggle()
+})
+
+EventHandler.on(document, EVENT_CLICK_DATA_API, Combobox.clearMenus)
+EventHandler.on(document, EVENT_KEYUP_DATA_API, Combobox.clearMenus)
+
+/**
+ * jQuery
+ */
+
+defineJQueryPlugin(Combobox)
+
 export default Combobox
+export type { ComboboxConfig }

@@ -1,9 +1,10 @@
 @use "functions/defaults" as *;
 @use "mixins/tokens" as *;
+@use "mixins/transition" as *;
 @use "config" as *;
 
 // The options panel rendered by the internal combobox engine
-// (js/src/combobox.ts) for Autocomplete and Multi Select. The panel is a
+// (js/src/combobox-base.ts) for Autocomplete and Multi Select. The panel is a
 // `.popup` around a ListBox instance, so everything inside it — options,
 // sections, indicators, select-all — is styled by `_list-box.scss`.
 
@@ -13,7 +14,18 @@ $combobox-popup-min-width: 100% !default;
 
 // scss-docs-end combobox-variables
 
+// scss-docs-start combobox-toggle-variables
+$combobox-toggle-gap:                       .5rem !default;
+$combobox-toggle-show-bg:                   var(--#{$prefix}bg-1) !default;
+$combobox-toggle-placeholder-color:         var(--#{$prefix}control-placeholder-color) !default;
+$combobox-toggle-caret-color:               var(--#{$prefix}fg-3) !default;
+$combobox-toggle-caret-size:                .75em !default;
+$combobox-toggle-caret-transition-duration: .2s !default;
+$combobox-toggle-caret-transition-timing:   var(--#{$prefix}btn-input-transition-timing) !default;
+// scss-docs-end combobox-toggle-variables
+
 $combobox-tokens: () !default;
+$combobox-toggle-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
@@ -26,9 +38,77 @@ $combobox-tokens: defaults(
 );
 // scss-docs-end combobox-css-vars
 
+// scss-docs-start combobox-toggle-css-vars
+$combobox-toggle-tokens: defaults(
+  (
+    --#{$prefix}combobox-toggle-gap: #{$combobox-toggle-gap},
+    --#{$prefix}combobox-toggle-show-bg: #{$combobox-toggle-show-bg},
+    --#{$prefix}combobox-toggle-placeholder-color: #{$combobox-toggle-placeholder-color},
+    --#{$prefix}combobox-toggle-caret-color: #{$combobox-toggle-caret-color},
+    --#{$prefix}combobox-toggle-caret-size: #{$combobox-toggle-caret-size},
+    --#{$prefix}combobox-toggle-caret-transition-duration: #{$combobox-toggle-caret-transition-duration},
+    --#{$prefix}combobox-toggle-caret-transition-timing: #{$combobox-toggle-caret-transition-timing},
+  ),
+  $combobox-toggle-tokens
+);
+// scss-docs-end combobox-toggle-css-vars
+
 // stylelint-enable scss/dollar-variable-default
 
 @layer components {
+  // The frame comes from `.form-control`, which the toggle carries so the two
+  // read as one control and the `-sm`/`-lg` modifiers reach it unchanged. Only
+  // the parts a button needs and an input does not are restated here.
+  .combobox-toggle {
+    @include tokens($combobox-toggle-tokens);
+
+    display: inline-flex;
+    gap: var(--#{$prefix}combobox-toggle-gap);
+    align-items: center;
+    justify-content: space-between;
+    text-align: start;
+    cursor: pointer;
+
+    &.show {
+      background-color: var(--#{$prefix}combobox-toggle-show-bg);
+    }
+
+    &:disabled,
+    &.disabled {
+      cursor: not-allowed;
+    }
+  }
+
+  .combobox-value {
+    display: flex;
+    flex: 1;
+    gap: var(--#{$prefix}combobox-toggle-gap);
+    align-items: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .combobox-placeholder {
+    color: var(--#{$prefix}combobox-toggle-placeholder-color);
+  }
+
+  .combobox-caret {
+    flex-shrink: 0;
+    width: var(--#{$prefix}combobox-toggle-caret-size);
+    height: var(--#{$prefix}combobox-toggle-caret-size);
+    color: var(--#{$prefix}combobox-toggle-caret-color);
+    @include transition(
+      transform
+      var(--#{$prefix}combobox-toggle-caret-transition-duration)
+      var(--#{$prefix}combobox-toggle-caret-transition-timing)
+    );
+
+    .show > & {
+      transform: rotate(180deg);
+    }
+  }
+
   // The chrome comes from the `.popup` primitive the panel carries; the
   // listbox keeps its width behaviour and the parent-driven open state.
   .combobox-popup {

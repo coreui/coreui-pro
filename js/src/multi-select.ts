@@ -7,7 +7,7 @@
 
 import Chip from './chip.js'
 import ChipSet from './chip-set.js'
-import Combobox from './combobox.js'
+import ComboboxBase from './combobox-base.js'
 import Data from './dom/data.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
@@ -170,7 +170,7 @@ class MultiSelectChipSet extends ChipSet {
   override _applyAccessibilityRoles(): void {}
 }
 
-class MultiSelect extends Combobox {
+class MultiSelect extends ComboboxBase {
   protected declare _uniqueName: any
   protected declare _indicatorElement: any
   protected declare _selectAllElement: any

@@ -15,6 +15,7 @@ import Chip from './src/chip.js'
 import ChipInput from './src/chip-input.js'
 import ChipSet from './src/chip-set.js'
 import Collapse from './src/collapse.js'
+import Combobox from './src/combobox.js'
 import ContextMenu from './src/context-menu.js'
 import DateInput from './src/date-input.js'
 import DatePicker from './src/date-picker.js'
@@ -63,6 +64,7 @@ export default {
   ChipInput,
   ChipSet,
   Collapse,
+  Combobox,
   ContextMenu,
   DateInput,
   DatePicker,
