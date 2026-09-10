@@ -212,7 +212,7 @@ If you prefer to show a counter indicating the number of selected options, add t
 
 When `multiple` is enabled, a **select all** button is rendered in the dropdown header (toggle it with the `selectAll` option, on by default). The button works as a toggle: it selects every option and its label switches to `deselectAllLabel`, then deselects everything on the next click.
 
-With the default `selectAllStyle: 'checkbox'` the button shows a tri-state indicator that mirrors the overall selection — `none` when nothing is selected, `all` when everything is, and `indeterminate` in between. Set `selectAllStyle: 'text'` for a plain text toggle instead.
+With the default `optionsStyle: 'checkbox'` the button shows the same tri-state indicator as the options and mirrors the overall selection — `none` when nothing is selected, `all` when everything is, and `indeterminate` in between; `aria-pressed` carries the same three states. With `optionsStyle: 'text'` the button is a plain text toggle. It sits in the panel header, outside the options list, so <kbd>Tab</kbd> reaches it — the arrows stay on the options.
 
 <Example pro code={`<select id="multiSelectSelectAll" data-coreui-multi-select multiple data-coreui-search="true">
     <option value="0">Angular</option>
@@ -388,7 +388,7 @@ We use the following JavaScript to set up our multi-select:
 
 <AddedIn version="5.26.0" />
 
-Enable `optionsGroupsSelectable` to turn each group label into its own tri-state checkbox that toggles the whole group. Because the indicator is rendered with CSS, it supports a third, `indeterminate` state — shown when only some of a group's options are selected — without any real `<input />` element. The same tri-state logic drives the header [select all](#select-all) button when `selectAllStyle: 'checkbox'`. Each section's indicator follows its own `*Style` option (`optionsStyle`, `optionsGroupsStyle`, `selectAllStyle`, all defaulting to `'checkbox'`) and requires `multiple`.
+Enable `optionsGroupsSelectable` to turn each group label into its own tri-state button (`aria-pressed` `false` / `mixed` / `true`) that toggles the group's visible options. Because the indicator is rendered with CSS, it supports a third, `indeterminate` state — shown when only some of a group's options are selected — without any real `<input />` element. The same tri-state logic drives the header [select all](#select-all) button. Group labels join the arrow-key order, and the indicator on options, groups and select all follows the one `optionsStyle` option; the whole feature requires `multiple`.
 
 <Example pro code={`<select id="myMultiSelectIndeterminate" data-coreui-multi-select></select>`} sandboxJs={multiSelectIndeterminate} />
 
@@ -527,11 +527,10 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `multiple` | boolean | `true` | It specifies that multiple options can be selected at once. |
 | `name` | string, null | `null` | Set the name attribute for the native select element. |
 | `options` | boolean, array | `false` | List of option elements. |
-| `optionsGroupsSelectable` | boolean | `false` | When enabled (with `optionsGroupsStyle: 'checkbox'` and `multiple`), each option group label becomes a tri-state checkbox: clicking it toggles the whole group, and it reflects `none` / `all` / `indeterminate` based on the group's selected options. |
-| `optionsGroupsStyle` | string | `'checkbox'` | Sets the option group label style: `'checkbox'` or `'text'`. Controls the checkbox appearance used by `optionsGroupsSelectable`. |
+| `optionsGroupsSelectable` | boolean | `false` | When enabled (with `multiple`), each option group label becomes a tri-state button: clicking it toggles the group's visible options, and it reflects `none` / `all` / `indeterminate` based on the group's selected options. |
 | `optionsGroupsTemplate` | function, null | `null` | Custom template function for rendering option group labels. Receives the group object as parameter. |
 | `optionsMaxHeight` | number, string | `'auto'` | Sets `max-height` of options list.	 |
-| `optionsStyle` | string | `'checkbox'` | Sets the option style: `'checkbox'` or `'text'`. |
+| `optionsStyle` | string | `'checkbox'` | Sets the indicator used by the options, the selectable group labels and the select all button: `'checkbox'` or `'text'`. |
 | `optionsTemplate` | function, null | `null` | Custom template function for rendering individual options. Receives the option object as parameter. |
 | `placeholder` | string | `'Select...'` | Specifies a short hint that is visible in the input. |
 | `required` | boolean | `false` | Makes the input field required for form validation. |
@@ -542,7 +541,6 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `selectAll` | boolean | `true` | Enables select all button.|
 | `selectAllLabel` | string | `'Select all'` | Sets the select all button label shown until everything is selected. The button is a toggle: it shows `selectAllLabel` (and selects all) until everything is selected, then shows `deselectAllLabel` (and deselects all). |
 | `selectAllMode` | string | `'all'` | Scope of the built-in select all button: `'all'` toggles every option (ignoring the search filter), `'filtered'` toggles only the search-filtered options. With no active filter both behave the same. |
-| `selectAllStyle` | string | `'checkbox'` | Sets the select all button style: `'checkbox'` or `'text'`. With `'checkbox'` (and `multiple`), the built-in select all button shows a tri-state checkbox indicator (`none` / `all` / `indeterminate`) reflecting the overall selection, and clicking it toggles between selecting and deselecting all. |
 | `selectFilteredLabel` | string | `'Select filtered'` | Label shown instead of `selectAllLabel` when `selectAllMode: 'filtered'` and a search filter narrows the list, so the button reads as acting on the filtered options rather than the whole list. |
 | `selectionLimit` | number, null | `null` | Sets the maximum number of selectable options. The select all button stays enabled and selects up to the limit (firing the `selectionLimit` event), then toggles to deselect all once the limit is reached. |
 | `selectionType` | string | `'tags'` | Sets the selection style: `'chips'`, `'counter'`, `'tags'` or `'text'`. Selections render as [Chip](/components/chip/) components — `'tags'` and `'chips'` are the same thing, kept as synonyms. |
@@ -588,15 +586,17 @@ myMutliSelect.addEventListener('changed.coreui.multi-select', event => {
 
 ## Accessibility
 
+The focus never enters the options list: it stays on the toggler, or on the search input when `search` is on, and `aria-activedescendant` points at the highlighted option. The select all button sits in the panel header outside the list, so <kbd>Tab</kbd> reaches it.
+
 ### Keyboard shortcuts
 
 | Key | Action |
 | --- | --- |
-| <kbd>Tab</kbd> | Navigate to/from the component |
-| <kbd>Enter</kbd>/<kbd>Space</kbd> | Open dropdown or select focused option |
-| <kbd>Arrow Up</kbd>/<kbd>Arrow Down</kbd> | Navigate through options |
-| <kbd>Home</kbd> | Focus the first option |
-| <kbd>End</kbd> | Focus the last option |
+| <kbd>Tab</kbd> | Navigate to/from the component, and to the select all button |
+| <kbd>Enter</kbd>/<kbd>Space</kbd> | Open dropdown or select the highlighted option |
+| <kbd>Arrow Up</kbd>/<kbd>Arrow Down</kbd> | Move the highlight through the options (and the selectable group labels) |
+| <kbd>Home</kbd> | Highlight the first option (not while typing in the search input) |
+| <kbd>End</kbd> | Highlight the last option (not while typing in the search input) |
 | <kbd>Escape</kbd> | Close the dropdown |
 | <kbd>Backspace</kbd>/<kbd>Delete</kbd> | Remove last selected item (when search is empty) |
 
@@ -608,9 +608,11 @@ MultiSelects use local CSS variables on `.form-multi-select` for enhanced real-t
 
 <ScssDocs file="scss/forms/_form-multi-select.scss" capture="form-multi-select-css-vars" />
 
-The options dropdown is the shared combobox surface and uses its own `--cui-combobox-*` variables:
+The options panel is the shared combobox surface, which only sizes itself:
 
 <ScssDocs file="scss/_combobox.scss" capture="combobox-css-vars" />
+
+Everything inside it — options, section labels, checkbox indicators and the select all button — is a [List box](/components/list-box/) and takes its `--cui-list-box-*` variables. Set them on `.combobox-popup` to restyle one Multi Select, or on `:root` for all of them.
 
 ### Sass variables
 

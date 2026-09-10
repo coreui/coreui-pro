@@ -379,17 +379,15 @@ The Autocomplete component includes several accessibility features:
 - **ARIA attributes**: Proper `role`, `aria-expanded`, `aria-haspopup`, and `aria-autocomplete` attributes
 - **Screen reader support**: Descriptive labels and announcements for state changes
 - **Keyboard navigation**: Full keyboard support with arrow keys, Enter, Escape, and Tab
-- **Focus management**: Proper focus handling and visual focus indicators
+- **Focus management**: The focus never leaves the input — `aria-activedescendant` points at the highlighted option, so typing and choosing happen in one place. <kbd>Home</kbd>, <kbd>End</kbd> and the space bar stay with the text.
 - **Semantic markup**: Uses appropriate HTML elements and structure
 
 ### Keyboard shortcuts
 
 | Key | Action |
 | --- | --- |
-| <kbd>Arrow Down</kbd> | Navigate to the next option or open dropdown |
-| <kbd>Arrow Up</kbd> | Navigate to the previous option |
-| <kbd>Home</kbd> | Focus the first option |
-| <kbd>End</kbd> | Focus the last option |
+| <kbd>Arrow Down</kbd> | Highlight the next option or open dropdown |
+| <kbd>Arrow Up</kbd> | Highlight the previous option |
 | <kbd>Enter</kbd> | Select the highlighted option |
 | <kbd>Escape</kbd> | Close the dropdown and clear focus |
 | <kbd>Tab</kbd> | Accept hint completion (when hints are enabled) |
@@ -399,9 +397,11 @@ The Autocomplete component includes several accessibility features:
 
 ### CSS variables
 
-Autocomplete has no variables of its own: the field is a [`.form-control-group`](/forms/form-control-group/) and takes the `--cui-control-*` properties, and the options dropdown is the shared combobox surface with its own `--cui-combobox-*` ones.
+Autocomplete has no variables of its own: the field is a [`.form-control-group`](/forms/form-control-group/) and takes the `--cui-control-*` properties, while the options panel is the shared combobox surface, which only sizes itself.
 
 <ScssDocs file="scss/_combobox.scss" capture="combobox-css-vars" />
+
+The options themselves are a [List box](/components/list-box/), so their padding, colors, indicator and section labels come from its `--cui-list-box-*` variables — set them on `.combobox-popup` to restyle one Autocomplete, or on `:root` for all of them.
 
 ### Sass variables
 

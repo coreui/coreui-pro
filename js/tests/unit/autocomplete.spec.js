@@ -108,7 +108,7 @@ describe('Autocomplete', () => {
         options: [{ value: 1, label: 'One' }, { value: 2, label: 'Two' }]
       })
 
-      const optionEls = autocomplete._optionsElement.querySelectorAll('.combobox-option')
+      const optionEls = autocomplete._optionsElement.querySelectorAll('.list-box-option')
       expect(optionEls.length).toBe(2)
       for (const optionEl of optionEls) {
         expect(optionEl.getAttribute('role')).toBe('option')
@@ -145,7 +145,7 @@ describe('Autocomplete', () => {
 
       expect(autocomplete._options).toEqual(options)
       expect(autocomplete._optionsElement).toBeTruthy()
-      expect(autocomplete._optionsElement.classList.contains('combobox-options')).toBe(true)
+      expect(autocomplete._optionsElement.classList.contains('list-box-options')).toBe(true)
     })
 
     it('should create disabled autocomplete', () => {
@@ -260,7 +260,7 @@ describe('Autocomplete', () => {
       })
 
       expect(autocomplete._optionsElement.style.maxHeight).toBe('200px')
-      expect(autocomplete._optionsElement.style.overflow).toBe('auto')
+      expect(autocomplete._optionsElement.style.overflowY).toBe('auto')
     })
 
     it('should not set maxHeight when optionsMaxHeight is auto', () => {
@@ -523,7 +523,7 @@ describe('Autocomplete', () => {
       autocomplete._search = 'nonexistent'
       autocomplete._filterOptionsList()
 
-      const placeholder = autocomplete._menu.querySelector('.combobox-options-empty')
+      const placeholder = autocomplete._menu.querySelector('.list-box-empty')
       expect(placeholder.getAttribute('role')).toBe('status')
     })
 
@@ -539,7 +539,7 @@ describe('Autocomplete', () => {
       autocomplete._search = 'nonexistent'
       autocomplete._filterOptionsList()
 
-      const placeholder = autocomplete._menu.querySelector('.combobox-options-empty')
+      const placeholder = autocomplete._menu.querySelector('.list-box-empty')
       expect(placeholder.querySelector('img')).toBeNull()
       expect(placeholder.textContent).toBe('<img src=x onerror="window.xss = true">')
     })
@@ -810,7 +810,7 @@ describe('Autocomplete', () => {
         ]
       })
 
-      const optionElements = autocomplete._optionsElement.querySelectorAll('.combobox-option')
+      const optionElements = autocomplete._optionsElement.querySelectorAll('.list-box-option')
       expect(optionElements.length).toBe(3)
       expect(optionElements[0].textContent).toBe('A')
       expect(optionElements[1].textContent).toBe('B')
@@ -1082,7 +1082,7 @@ describe('Autocomplete', () => {
       })
     })
 
-    it('should focus the first/last option on Home/End keys', () => {
+    it('should walk the options with the arrow keys while the focus stays in the input', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = '<div class="autocomplete"></div>'
         const autocompleteEl = fixtureEl.querySelector('.autocomplete')
@@ -1095,17 +1095,28 @@ describe('Autocomplete', () => {
         })
 
         autocompleteEl.addEventListener('shown.coreui.autocomplete', () => {
-          const options = autocomplete._optionsElement.querySelectorAll('.combobox-option')
+          const options = autocomplete._optionsElement.querySelectorAll('.list-box-option')
+          autocomplete._inputElement.focus()
 
-          const endEvent = createEvent('keydown')
-          endEvent.key = 'End'
-          autocomplete._optionsElement.dispatchEvent(endEvent)
-          expect(document.activeElement).toBe(options[options.length - 1])
+          const downEvent = createEvent('keydown', { bubbles: true })
+          downEvent.key = 'ArrowDown'
+          autocomplete._inputElement.dispatchEvent(downEvent)
 
-          const homeEvent = createEvent('keydown')
-          homeEvent.key = 'Home'
-          autocomplete._optionsElement.dispatchEvent(homeEvent)
-          expect(document.activeElement).toBe(options[0])
+          expect(document.activeElement).toBe(autocomplete._inputElement)
+          expect(autocomplete._inputElement.getAttribute('aria-activedescendant')).toBe(options[0].id)
+          expect(options[0].classList.contains('active')).toBe(true)
+
+          const secondDownEvent = createEvent('keydown', { bubbles: true })
+          secondDownEvent.key = 'ArrowDown'
+          autocomplete._inputElement.dispatchEvent(secondDownEvent)
+
+          expect(autocomplete._inputElement.getAttribute('aria-activedescendant')).toBe(options[1].id)
+
+          const upEvent = createEvent('keydown', { bubbles: true })
+          upEvent.key = 'ArrowUp'
+          autocomplete._inputElement.dispatchEvent(upEvent)
+
+          expect(autocomplete._inputElement.getAttribute('aria-activedescendant')).toBe(options[0].id)
           resolve()
         })
 
@@ -1459,9 +1470,8 @@ describe('Autocomplete', () => {
           resolve()
         })
 
-        const optionEl = autocomplete._optionsElement.querySelector('.combobox-option')
-        const keydownEvent = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })
-        optionEl.dispatchEvent(keydownEvent)
+        autocomplete._listBox.setActive('1')
+        autocomplete._inputElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }))
       })
     })
 
@@ -1680,7 +1690,7 @@ describe('Autocomplete', () => {
       const option = { label: 'Option 1', value: '1' }
       autocomplete._selectOption(option)
 
-      const optionEl = autocomplete._optionsElement.querySelector('[data-value="1"]')
+      const optionEl = autocomplete._optionsElement.querySelector('[data-coreui-value="1"]')
       expect(optionEl.classList.contains('selected')).toBe(true)
       expect(optionEl.getAttribute('aria-selected')).toBe('true')
     })
@@ -1703,7 +1713,7 @@ describe('Autocomplete', () => {
     })
   })
 
-  describe('_onOptionsClick', () => {
+  describe('option clicks', () => {
     it('should select option when clicking on option element', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = '<div class="autocomplete"></div>'
@@ -1719,13 +1729,13 @@ describe('Autocomplete', () => {
           resolve()
         })
 
-        const optionEl = autocomplete._optionsElement.querySelector('.combobox-option')
+        const optionEl = autocomplete._optionsElement.querySelector('.list-box-option')
         const clickEvent = new Event('click', { bubbles: true })
         optionEl.dispatchEvent(clickEvent)
       })
     })
 
-    it('should do nothing when clicking on label element', () => {
+    it('should do nothing when clicking outside an option', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
       const autocomplete = new Autocomplete(autocompleteEl, {
@@ -1734,12 +1744,11 @@ describe('Autocomplete', () => {
 
       autocomplete.show()
 
-      // Create a label element inside the options
       const labelEl = document.createElement('div')
       labelEl.classList.add('label')
       autocomplete._optionsElement.append(labelEl)
 
-      autocomplete._onOptionsClick(labelEl)
+      labelEl.dispatchEvent(new Event('click', { bubbles: true }))
       expect(autocomplete._selected.length).toBe(0)
     })
 
@@ -1758,16 +1767,16 @@ describe('Autocomplete', () => {
           resolve()
         })
 
-        const optionEl = autocomplete._optionsElement.querySelector('.combobox-option')
+        const optionEl = autocomplete._optionsElement.querySelector('.list-box-option')
         const childEl = document.createElement('span')
         childEl.textContent = 'inner text'
         optionEl.append(childEl)
 
-        autocomplete._onOptionsClick(childEl)
+        childEl.dispatchEvent(new Event('click', { bubbles: true }))
       })
     })
 
-    it('should do nothing when clicking on non-option element with no closest option', () => {
+    it('should do nothing when clicking the options container itself', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
       const autocomplete = new Autocomplete(autocompleteEl, {
@@ -1776,8 +1785,7 @@ describe('Autocomplete', () => {
 
       autocomplete.show()
 
-      // Clicking on the options container itself (not on an option)
-      autocomplete._onOptionsClick(autocomplete._optionsElement)
+      autocomplete._optionsElement.dispatchEvent(new Event('click', { bubbles: true }))
       expect(autocomplete._selected.length).toBe(0)
     })
   })
@@ -1844,8 +1852,8 @@ describe('Autocomplete', () => {
       autocomplete._search = 'app'
       autocomplete._filterOptionsList()
 
-      const visibleOptions = Array.from(autocomplete._optionsElement.querySelectorAll('.combobox-option'))
-        .filter(option => option.style.display !== 'none')
+      const visibleOptions = Array.from(autocomplete._optionsElement.querySelectorAll('.list-box-option'))
+        .filter(option => !option.hasAttribute('hidden'))
 
       expect(visibleOptions).toHaveSize(1)
       expect(visibleOptions[0].textContent).toBe('Apple')
@@ -1866,7 +1874,7 @@ describe('Autocomplete', () => {
       autocomplete._search = 'xyz'
       autocomplete._filterOptionsList()
 
-      const emptyMessage = autocomplete._menu.querySelector('.combobox-options-empty')
+      const emptyMessage = autocomplete._menu.querySelector('.list-box-empty')
       expect(emptyMessage).toBeTruthy()
       expect(emptyMessage.innerHTML).toBe('No results found')
     })
@@ -1901,15 +1909,13 @@ describe('Autocomplete', () => {
 
       autocomplete.show()
 
-      // First filter to show no results
       autocomplete._search = 'xyz'
       autocomplete._filterOptionsList()
-      expect(autocomplete._menu.querySelector('.combobox-options-empty')).toBeTruthy()
+      expect(autocomplete._menu.querySelector('.list-box-empty').hasAttribute('hidden')).toBe(false)
 
-      // Then filter to show results
       autocomplete._search = 'app'
       autocomplete._filterOptionsList()
-      expect(autocomplete._menu.querySelector('.combobox-options-empty')).toBeNull()
+      expect(autocomplete._menu.querySelector('.list-box-empty').hasAttribute('hidden')).toBe(true)
     })
 
     it('should not duplicate no results message when filtering multiple times', () => {
@@ -1928,7 +1934,7 @@ describe('Autocomplete', () => {
       autocomplete._filterOptionsList()
       autocomplete._filterOptionsList()
 
-      const emptyMessages = autocomplete._menu.querySelectorAll('.combobox-options-empty')
+      const emptyMessages = autocomplete._menu.querySelectorAll('.list-box-empty')
       expect(emptyMessages.length).toBe(1)
     })
 
@@ -1947,8 +1953,8 @@ describe('Autocomplete', () => {
       autocomplete._search = 'app'
       autocomplete._filterOptionsList()
 
-      const visibleOption = Array.from(autocomplete._optionsElement.querySelectorAll('.combobox-option'))
-        .find(option => option.style.display !== 'none')
+      const visibleOption = Array.from(autocomplete._optionsElement.querySelectorAll('.list-box-option'))
+        .find(option => !option.hasAttribute('hidden'))
 
       expect(visibleOption.innerHTML).toContain('<strong>')
     })
@@ -1969,8 +1975,8 @@ describe('Autocomplete', () => {
       autocomplete._search = 'app'
       autocomplete._filterOptionsList()
 
-      const visibleOption = Array.from(autocomplete._optionsElement.querySelectorAll('.combobox-option'))
-        .find(option => option.style.display !== 'none')
+      const visibleOption = Array.from(autocomplete._optionsElement.querySelectorAll('.list-box-option'))
+        .find(option => !option.hasAttribute('hidden'))
 
       // Should not highlight since optionsTemplate is set
       expect(visibleOption.innerHTML).not.toContain('<strong>App</strong>')
@@ -2001,10 +2007,10 @@ describe('Autocomplete', () => {
       autocomplete._search = 'carr'
       autocomplete._filterOptionsList()
 
-      const optgroups = autocomplete._menu.querySelectorAll('.combobox-optgroup')
+      const optgroups = autocomplete._menu.querySelectorAll('.list-box-section')
       // Fruits group should be hidden, Vegetables should be visible
-      expect(optgroups[0].style.display).toBe('none')
-      expect(optgroups[1].style.display).not.toBe('none')
+      expect(optgroups[0].hasAttribute('hidden')).toBe(true)
+      expect(optgroups[1].hasAttribute('hidden')).toBe(false)
     })
 
     it('should show optgroup when at least one child is visible', () => {
@@ -2026,8 +2032,8 @@ describe('Autocomplete', () => {
       autocomplete._search = 'app'
       autocomplete._filterOptionsList()
 
-      const optgroup = autocomplete._menu.querySelector('.combobox-optgroup')
-      expect(optgroup.style.display).not.toBe('none')
+      const optgroup = autocomplete._menu.querySelector('.list-box-section')
+      expect(optgroup.hasAttribute('hidden')).toBe(false)
     })
   })
 
@@ -2275,7 +2281,7 @@ describe('Autocomplete', () => {
       const toggleSpy = spyOn(autocomplete, 'toggle')
       const searchSpy = spyOn(autocomplete, 'search')
       const clearSpy = spyOn(autocomplete, 'clear')
-      const optionsClickSpy = spyOn(autocomplete, '_onOptionsClick')
+      const optionSelectedSpy = spyOn(autocomplete, '_onOptionSelected')
 
       input.value = 'O'
       input.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'ArrowDown' }))
@@ -2290,7 +2296,7 @@ describe('Autocomplete', () => {
       expect(toggleSpy).not.toHaveBeenCalled()
       expect(searchSpy).not.toHaveBeenCalled()
       expect(clearSpy).not.toHaveBeenCalled()
-      expect(optionsClickSpy).not.toHaveBeenCalled()
+      expect(optionSelectedSpy).not.toHaveBeenCalled()
     })
   })
 
@@ -2386,8 +2392,8 @@ describe('Autocomplete', () => {
       autocomplete._search = 'vue'
       autocomplete._filterOptionsList()
 
-      const visibleOption = Array.from(autocomplete._optionsElement.querySelectorAll('.combobox-option'))
-        .find(option => option.style.display !== 'none')
+      const visibleOption = Array.from(autocomplete._optionsElement.querySelectorAll('.list-box-option'))
+        .find(option => !option.hasAttribute('hidden'))
       expect(visibleOption.textContent).toBe('Vue.js')
 
       const mousedown = createEvent('mousedown', { bubbles: true, cancelable: true })
@@ -2413,8 +2419,8 @@ describe('Autocomplete', () => {
         autocomplete._search = 'vue'
         autocomplete._filterOptionsList()
 
-        const visibleOption = Array.from(autocomplete._optionsElement.querySelectorAll('.combobox-option'))
-          .find(option => option.style.display !== 'none')
+        const visibleOption = Array.from(autocomplete._optionsElement.querySelectorAll('.list-box-option'))
+          .find(option => !option.hasAttribute('hidden'))
 
         autocompleteEl.addEventListener('changed.coreui.autocomplete', event => {
           expect(event.value.label).toBe('Vue.js')
@@ -2666,7 +2672,7 @@ describe('Autocomplete', () => {
         options: [{ label: 'Option 1', value: '1' }]
       })
 
-      const optionEl = autocomplete._optionsElement.querySelector('.combobox-option')
+      const optionEl = autocomplete._optionsElement.querySelector('.list-box-option')
       expect(optionEl.innerHTML).toContain('<span class="custom">Option 1</span>')
     })
 
@@ -2678,7 +2684,7 @@ describe('Autocomplete', () => {
         options: [{ label: 'Option 1', value: '1' }]
       })
 
-      const optionEl = autocomplete._optionsElement.querySelector('.combobox-option')
+      const optionEl = autocomplete._optionsElement.querySelector('.list-box-option')
       expect(optionEl.innerHTML).not.toContain('<script>')
     })
 
@@ -2691,7 +2697,7 @@ describe('Autocomplete', () => {
         options: [{ label: 'Option 1', value: '1' }]
       })
 
-      const optionEl = autocomplete._optionsElement.querySelector('.combobox-option')
+      const optionEl = autocomplete._optionsElement.querySelector('.list-box-option')
       expect(optionEl.innerHTML).toContain('onerror')
     })
 
@@ -2710,7 +2716,7 @@ describe('Autocomplete', () => {
         ]
       })
 
-      const groupLabel = autocomplete._optionsElement.querySelector('.combobox-optgroup-label')
+      const groupLabel = autocomplete._optionsElement.querySelector('.list-box-section-label')
       expect(groupLabel.innerHTML).toContain('<strong class="group-title">Fruits</strong>')
     })
 
@@ -2729,7 +2735,7 @@ describe('Autocomplete', () => {
         ]
       })
 
-      const groupLabel = autocomplete._optionsElement.querySelector('.combobox-optgroup-label')
+      const groupLabel = autocomplete._optionsElement.querySelector('.list-box-section-label')
       expect(groupLabel.innerHTML).not.toContain('<script>')
     })
 
@@ -2749,7 +2755,7 @@ describe('Autocomplete', () => {
         ]
       })
 
-      const groupLabel = autocomplete._optionsElement.querySelector('.combobox-optgroup-label')
+      const groupLabel = autocomplete._optionsElement.querySelector('.list-box-section-label')
       expect(groupLabel.innerHTML).toContain('onerror')
     })
 
@@ -2767,7 +2773,7 @@ describe('Autocomplete', () => {
         ]
       })
 
-      const groupLabel = autocomplete._optionsElement.querySelector('.combobox-optgroup-label')
+      const groupLabel = autocomplete._optionsElement.querySelector('.list-box-section-label')
       expect(groupLabel.textContent).toBe('Fruits')
     })
 
@@ -2781,10 +2787,9 @@ describe('Autocomplete', () => {
       })
 
       autocomplete._search = 'app'
-      autocomplete._optionsElement.innerHTML = ''
-      autocomplete._createOptions(autocomplete._optionsElement, autocomplete._options)
+      autocomplete._setListBoxItems()
 
-      const optionEl = autocomplete._optionsElement.querySelector('.combobox-option')
+      const optionEl = autocomplete._optionsElement.querySelector('.list-box-option')
       expect(optionEl.innerHTML).toContain('<strong>')
     })
   })
@@ -2811,13 +2816,13 @@ describe('Autocomplete', () => {
         ]
       })
 
-      const optgroups = autocomplete._optionsElement.querySelectorAll('.combobox-optgroup')
+      const optgroups = autocomplete._optionsElement.querySelectorAll('.list-box-section')
       expect(optgroups.length).toBe(2)
 
-      const firstGroupLabel = optgroups[0].querySelector('.combobox-optgroup-label')
+      const firstGroupLabel = optgroups[0].querySelector('.list-box-section-label')
       expect(firstGroupLabel.textContent).toBe('Fruits')
 
-      const firstGroupOptions = optgroups[0].querySelectorAll('.combobox-option')
+      const firstGroupOptions = optgroups[0].querySelectorAll('.list-box-option')
       expect(firstGroupOptions.length).toBe(2)
     })
 
@@ -2851,12 +2856,12 @@ describe('Autocomplete', () => {
         ]
       })
 
-      const optionEl = autocomplete._optionsElement.querySelector('[data-value="1"]')
+      const optionEl = autocomplete._optionsElement.querySelector('[data-coreui-value="1"]')
       expect(optionEl.classList.contains('disabled')).toBe(true)
       expect(optionEl.getAttribute('aria-disabled')).toBe('true')
     })
 
-    it('should keep disabled options out of the tab order and not activate them', () => {
+    it('should keep disabled options out of the keyboard order and not activate them', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
       const autocomplete = new Autocomplete(autocompleteEl, {
@@ -2867,12 +2872,13 @@ describe('Autocomplete', () => {
       })
 
       autocomplete.show()
-      const optionEl = autocomplete._optionsElement.querySelector('[data-value="1"]')
+      const optionEl = autocomplete._optionsElement.querySelector('[data-coreui-value="1"]')
 
-      expect(optionEl.tabIndex).toBe(-1)
-      expect(autocomplete._optionsElement.querySelector('[data-value="2"]').tabIndex).toBe(0)
+      expect(optionEl.hasAttribute('tabindex')).toBe(false)
 
-      optionEl.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
+      autocomplete._inputElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true }))
+      expect(autocomplete._listBox.getActive()).toBe('2')
+
       optionEl.click()
 
       expect(autocomplete._selected).toEqual([])
@@ -2887,7 +2893,7 @@ describe('Autocomplete', () => {
       })
 
       autocomplete.show()
-      const option = autocomplete._menu.querySelector('.combobox-option')
+      const option = autocomplete._menu.querySelector('.list-box-option')
       option.tabIndex = 0
       option.focus()
 
@@ -2937,8 +2943,8 @@ describe('Autocomplete', () => {
     })
   })
 
-  describe('_selectMenuItem', () => {
-    it('should do nothing when no visible items', () => {
+  describe('keyboard with no navigable option', () => {
+    it('should do nothing when every option is disabled', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
       const autocomplete = new Autocomplete(autocompleteEl, {
@@ -2948,11 +2954,9 @@ describe('Autocomplete', () => {
       })
 
       autocomplete.show()
+      autocomplete._inputElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true }))
 
-      // All options are disabled, so no visible items
-      // Should not throw
-      autocomplete._selectMenuItem({ key: 'ArrowDown', target: autocomplete._inputElement })
-      expect(true).toBe(true)
+      expect(autocomplete._listBox.getActive()).toBeNull()
     })
   })
 
@@ -3303,12 +3307,12 @@ describe('Autocomplete', () => {
       autocomplete._search = 'app'
       autocomplete._filterOptionsList()
 
-      const visibleOptions = Array.from(autocomplete._optionsElement.querySelectorAll('.combobox-option'))
-        .filter(option => option.style.display !== 'none')
+      const visibleOptions = Array.from(autocomplete._optionsElement.querySelectorAll('.list-box-option'))
+        .filter(option => !option.hasAttribute('hidden'))
 
       expect(visibleOptions).toHaveSize(1)
       expect(visibleOptions[0].textContent).toBe('Apple')
-      expect(visibleOptions[0].dataset.value).toBe('1')
+      expect(visibleOptions[0].dataset.coreuiValue).toBe('1')
     })
 
     it('should handle mixed string and number values by converting to strings', () => {
@@ -3474,7 +3478,7 @@ describe('Autocomplete', () => {
 
       // First select
       autocomplete._selectOption({ label: 'Option 1', value: '1' })
-      const optionEl = autocomplete._optionsElement.querySelector('[data-value="1"]')
+      const optionEl = autocomplete._optionsElement.querySelector('[data-coreui-value="1"]')
       expect(optionEl.classList.contains('selected')).toBe(true)
 
       // Then deselect
@@ -3550,7 +3554,7 @@ describe('Autocomplete', () => {
       const autocomplete = new Autocomplete(autocompleteEl, { options: [] })
 
       const el = document.createElement('div')
-      el.style.display = 'none'
+      el.setAttribute('hidden', '')
       document.body.append(el)
       expect(autocomplete._isOptionDisplayed(el)).toBe(false)
       el.remove()
