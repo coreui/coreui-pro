@@ -35,12 +35,9 @@ const EVENT_LIST_BOX_SEARCH = 'search.coreui.list-box'
 const CLASS_NAME_ANNOUNCER = 'transfer-announcer'
 const CLASS_NAME_DISABLED = 'disabled'
 const CLASS_NAME_OPTIONS = 'list-box-options'
-const CLASS_NAME_SUBTITLE = 'list-box-subtitle'
 const CLASS_NAME_VISUALLY_HIDDEN = 'visually-hidden'
 
-const SELECTOR_COUNTER = '[data-coreui-transfer-counter]'
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="transfer"]'
-const SELECTOR_HEADER = '.list-box-header'
 const SELECTOR_LIST = '[data-coreui-transfer-list]'
 const SELECTOR_MOVE = '[data-coreui-transfer-move]'
 const SELECTOR_OPTION = '.list-box-option'
@@ -60,7 +57,6 @@ const CHEVRON_DOUBLE_LEFT_ICON: string = '<svg class="icon" xmlns="http://www.w3
 const CHEVRON_DOUBLE_RIGHT_ICON: string = '<svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" aria-hidden="true"><path fill="var(--ci-primary-color, currentcolor)" d="m95.314 447.313-22.628-22.626L245.373 252 72.686 79.313l22.628-22.626L290.627 252z" class="ci-primary"/><path fill="var(--ci-primary-color, currentcolor)" d="m255.314 447.313-22.628-22.626L405.373 252 232.686 79.313l22.628-22.626L450.627 252z" class="ci-primary"/></svg>'
 
 type TransferSide = {
-  counter: HTMLElement | null
   element: HTMLElement
   listBox: ListBox
   name: string
@@ -304,11 +300,11 @@ class Transfer extends BaseComponent {
     const options = this._resolveOptions(element)
 
     return {
-      counter: this._resolveCounter(element),
       element,
       listBox: ListBox.getOrCreateInstance(element, {
         allowList: this._config.allowList,
         ariaSearchLabel: `${this._config.searchPlaceholder} ${title}`,
+        counter: true,
         disabled: this._config.disabled,
         html: this._config.html,
         indicator: this._config.indicator,
@@ -317,6 +313,7 @@ class Transfer extends BaseComponent {
         sanitizeFn: this._config.sanitizeFn,
         search: this._config.search,
         searchPlaceholder: this._config.searchPlaceholder,
+        selectedCounterText: this._config.selectedCounterText,
         selectionMode: 'multiple',
         typeahead: this._config.typeahead
       }) as ListBox,
@@ -344,28 +341,6 @@ class Transfer extends BaseComponent {
     element.append(options)
 
     return options
-  }
-
-  _resolveCounter(element: HTMLElement): HTMLElement | null {
-    const existing = SelectorEngine.findOne(SELECTOR_COUNTER, element)
-
-    if (existing) {
-      return existing
-    }
-
-    const header = SelectorEngine.findOne(SELECTOR_HEADER, element)
-
-    if (!header) {
-      return null
-    }
-
-    const counter = document.createElement('div')
-
-    counter.classList.add(CLASS_NAME_SUBTITLE)
-    counter.setAttribute('data-coreui-transfer-counter', '')
-    header.append(counter)
-
-    return counter
   }
 
   _decorateSide(side: TransferSide): void {
@@ -601,23 +576,7 @@ class Transfer extends BaseComponent {
   }
 
   _refresh(): void {
-    for (const side of Object.values(this._sides)) {
-      this._refreshCounter(side)
-    }
-
     this._refreshMoveButtons()
-  }
-
-  _refreshCounter(side: TransferSide): void {
-    if (!side.counter) {
-      return
-    }
-
-    const visible = this._visibleOptions(side)
-    const selected = side.listBox.getSelected()
-    const count = visible.filter(option => selected.includes(this._optionValue(option))).length
-
-    side.counter.textContent = `${count}/${visible.length} ${this._config.selectedCounterText}`
   }
 
   _refreshMoveButtons(): void {

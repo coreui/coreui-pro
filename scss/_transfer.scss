@@ -45,18 +45,9 @@ $transfer-tokens: defaults(
     min-width: 0;
   }
 
-  .transfer-list .list-box-header {
-    justify-content: space-between;
-  }
-
   .transfer-list .list-box-select-all {
-    flex: 1 1 auto;
     width: auto;
     min-width: 0;
-  }
-
-  .transfer-list .list-box-subtitle {
-    flex: 0 0 auto;
   }
 
   .transfer-list .list-box-options {

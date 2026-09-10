@@ -56,6 +56,7 @@ const CLASS_NAME_ACTIVE = 'active'
 const CLASS_NAME_CHECK = 'check'
 const CLASS_NAME_DISABLED = 'disabled'
 const CLASS_NAME_FORM_CONTROL = 'form-control'
+const CLASS_NAME_HEADER = 'list-box-header'
 const CLASS_NAME_INDETERMINATE = 'indeterminate'
 const CLASS_NAME_LOADING = 'loading'
 const CLASS_NAME_OPTION = 'list-box-option'
@@ -66,10 +67,13 @@ const CLASS_NAME_OPTIONS = 'list-box-options'
 const CLASS_NAME_SEARCH = 'list-box-search'
 const CLASS_NAME_SECTION = 'list-box-section'
 const CLASS_NAME_SECTION_LABEL = 'list-box-section-label'
+const CLASS_NAME_SUBTITLE = 'list-box-subtitle'
 const CLASS_NAME_SELECTED = 'selected'
 
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="list-box"]'
+const SELECTOR_COUNTER = '[data-coreui-list-box-counter]'
 const SELECTOR_EMPTY = '.list-box-empty'
+const SELECTOR_HEADER = '.list-box-header'
 const SELECTOR_OPTION = '.list-box-option'
 const SELECTOR_OPTION_INDICATOR = '.list-box-option-indicator'
 const SELECTOR_OPTION_LABEL = '.list-box-option-label'
@@ -107,6 +111,7 @@ type ListBoxConfig = {
   activeDescendant: string | Element | null
   allowList: SanitizerAllowList
   ariaSearchLabel: string
+  counter: boolean
   disabled: boolean
   html: boolean
   indicator: string
@@ -117,6 +122,7 @@ type ListBoxConfig = {
   search: boolean | string
   searchPlaceholder: string
   selected: string | string[] | null
+  selectedCounterText: string
   selectionLimit: number | null
   selectionMode: string
   typeahead: boolean
@@ -126,6 +132,7 @@ const Default: ListBoxConfig = {
   activeDescendant: null,
   allowList: DefaultAllowlist,
   ariaSearchLabel: 'Search options',
+  counter: false,
   disabled: false,
   html: false,
   indicator: 'none',
@@ -136,6 +143,7 @@ const Default: ListBoxConfig = {
   search: false,
   searchPlaceholder: 'Search',
   selected: null,
+  selectedCounterText: 'selected',
   selectionLimit: null,
   selectionMode: SELECTION_MODE_SINGLE,
   typeahead: true
@@ -145,6 +153,7 @@ const DefaultType: Record<string, string> = {
   activeDescendant: '(string|element|null)',
   allowList: 'object',
   ariaSearchLabel: 'string',
+  counter: 'boolean',
   disabled: 'boolean',
   html: 'boolean',
   indicator: 'string',
@@ -155,6 +164,7 @@ const DefaultType: Record<string, string> = {
   search: '(boolean|string)',
   searchPlaceholder: 'string',
   selected: '(string|array|null)',
+  selectedCounterText: 'string',
   selectionLimit: '(null|number)',
   selectionMode: 'string',
   typeahead: 'boolean'
@@ -167,6 +177,7 @@ const DefaultType: Record<string, string> = {
 class ListBox extends BaseComponent {
   protected declare _active: string | null
   protected declare _anchor: string | null
+  protected declare _counter: HTMLElement | null
   protected declare _field: HTMLElement | null
   protected declare _items: ListBoxEntry[] | null
   protected declare _focused: boolean
@@ -188,6 +199,7 @@ class ListBox extends BaseComponent {
     this._focused = false
     this._limited = null
     this._list = this._resolveList()
+    this._counter = this._resolveCounter()
     this._search = ''
     this._searchField = this._resolveSearch()
     this._searchTimeout = null
@@ -407,6 +419,7 @@ class ListBox extends BaseComponent {
     }
 
     this._updateSelectAll()
+    this._updateCounter()
     this._updateActiveDescendant()
   }
 
@@ -430,6 +443,48 @@ class ListBox extends BaseComponent {
   }
 
   // Private
+  _resolveCounter(): HTMLElement | null {
+    const existing = SelectorEngine.findOne(SELECTOR_COUNTER, this._element) as HTMLElement | null
+
+    if (existing || !this._config.counter) {
+      return existing
+    }
+
+    const counter = document.createElement('div')
+
+    counter.classList.add(CLASS_NAME_SUBTITLE)
+    counter.setAttribute('data-coreui-list-box-counter', '')
+    this._resolveHeader().append(counter)
+
+    return counter
+  }
+
+  _resolveHeader(): HTMLElement {
+    const existing = SelectorEngine.findOne(SELECTOR_HEADER, this._element) as HTMLElement | null
+
+    if (existing) {
+      return existing
+    }
+
+    const header = document.createElement('div')
+
+    header.classList.add(CLASS_NAME_HEADER)
+    this._element.prepend(header)
+
+    return header
+  }
+
+  _updateCounter(): void {
+    if (!this._counter) {
+      return
+    }
+
+    const navigable = this._navigableOptions()
+    const count = navigable.filter(option => this._selected.has(this._optionValue(option))).length
+
+    this._counter.textContent = `${count}/${navigable.length} ${this._config.selectedCounterText}`
+  }
+
   _resolveSearch(): HTMLInputElement | null {
     const existing = SelectorEngine.findOne(SELECTOR_SEARCH, this._element) as HTMLInputElement | null
 

@@ -90,6 +90,7 @@ describe('ListBox', () => {
         activeDescendant: null,
         allowList: DefaultAllowlist,
         ariaSearchLabel: 'Search options',
+        counter: false,
         disabled: false,
         html: false,
         indicator: 'none',
@@ -100,6 +101,7 @@ describe('ListBox', () => {
         search: false,
         searchPlaceholder: 'Search',
         selected: null,
+        selectedCounterText: 'selected',
         selectionLimit: null,
         selectionMode: 'single',
         typeahead: true
@@ -1123,6 +1125,76 @@ describe('ListBox', () => {
       })
 
       expect(item(el, 'a').querySelector('em').textContent).toEqual('Ok')
+    })
+  })
+
+  describe('counter', () => {
+    it('should count the selection in the header', () => {
+      const el = setMarkup('', null, selectAllMarkup)
+      const listBox = new ListBox(el, { counter: true, selectionMode: 'multiple' })
+      const counter = el.querySelector('[data-coreui-list-box-counter]')
+
+      expect(counter.parentElement.classList.contains('list-box-header')).toBeTrue()
+      expect(counter.previousElementSibling.classList.contains('list-box-select-all')).toBeTrue()
+      expect(counter.classList.contains('list-box-subtitle')).toBeTrue()
+      expect(counter.textContent).toEqual('0/4 selected')
+
+      listBox.select('tomato')
+
+      expect(counter.textContent).toEqual('1/4 selected')
+
+      listBox.deselect('tomato')
+
+      expect(counter.textContent).toEqual('0/4 selected')
+    })
+
+    it('should count against the options the search left', () => {
+      const el = setMarkup()
+      const listBox = new ListBox(el, { counter: true, search: true, selectionMode: 'multiple' })
+      const counter = el.querySelector('[data-coreui-list-box-counter]')
+
+      listBox.select('tomato')
+
+      expect(counter.textContent).toEqual('1/4 selected')
+
+      type(searchField(el), 'on')
+
+      expect(counter.textContent).toEqual('0/1 selected')
+    })
+
+    it('should follow the items it was given', () => {
+      const el = setMarkup()
+      const listBox = new ListBox(el, { counter: true, selectedCounterText: 'picked', selectionMode: 'multiple' })
+      const counter = el.querySelector('[data-coreui-list-box-counter]')
+
+      listBox.setItems([{ value: 'ada', label: 'Ada' }, { value: 'bob', label: 'Bob', selected: true }])
+
+      expect(counter.textContent).toEqual('1/2 picked')
+    })
+
+    it('should build the header when the markup has none', () => {
+      const el = setMarkup()
+      // eslint-disable-next-line no-new
+      new ListBox(el, { counter: true })
+
+      const header = el.querySelector('.list-box-header')
+
+      expect(header).not.toBeNull()
+      expect(el.firstElementChild).toEqual(header)
+      expect(header.querySelector('[data-coreui-list-box-counter]')).not.toBeNull()
+    })
+
+    it('should use the counter the markup already carries', () => {
+      const el = setMarkup('', null, [
+        '<div class="list-box-header">',
+        '<span class="list-box-subtitle" data-coreui-list-box-counter></span>',
+        '</div>'
+      ].join(''))
+      // eslint-disable-next-line no-new
+      new ListBox(el, { counter: true })
+
+      expect(el.querySelectorAll('[data-coreui-list-box-counter]').length).toEqual(1)
+      expect(el.querySelector('[data-coreui-list-box-counter]').tagName).toEqual('SPAN')
     })
   })
 

@@ -141,6 +141,8 @@ $list-box-tokens: defaults(
   }
 
   .list-box-subtitle {
+    flex: 0 0 auto;
+    margin-inline-start: auto;
     font-size: var(--#{$prefix}list-box-subtitle-font-size);
     color: var(--#{$prefix}list-box-subtitle-color);
   }

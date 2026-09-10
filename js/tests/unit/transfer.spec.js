@@ -55,7 +55,7 @@ describe('Transfer', () => {
 
   const side = (el, name) => el.querySelector(`[data-coreui-transfer-list="${name}"]`)
   const moveButton = (el, name) => el.querySelector(`[data-coreui-transfer-move="${name}"]`)
-  const counter = (el, name) => side(el, name).querySelector('[data-coreui-transfer-counter]')
+  const counter = (el, name) => side(el, name).querySelector('[data-coreui-list-box-counter]')
   const searchField = (el, name) => side(el, name).querySelector('[data-coreui-list-box-search]')
   const option = (el, name, value) => side(el, name).querySelector(`[data-coreui-value="${value}"]`)
 

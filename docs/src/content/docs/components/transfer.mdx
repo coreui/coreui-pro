@@ -45,7 +45,7 @@ A transfer moves values between two lists — what is available on the left, wha
 
 Everything inside a list is the list box's: the options and their values, the selection, the arrow keys, the typeahead and the select-all button. The transfer owns what happens between the lists, so nothing here is a second implementation of the same behavior — read the [List box](/components/list-box/) page for the parts a list is made of.
 
-Each side is a `.list-box.transfer-list` marked `data-coreui-transfer-list="source"` or `="target"`, and each button a `[data-coreui-transfer-move]` naming what it does: `target` and `source` move the selection, `target-all` and `source-all` move everything the list currently shows. The rest is filled in for you: an empty select-all button takes the list's title, an empty move button takes its chevron, the header gets a `{selected}/{visible} selected` counter, the options element gets the title as its accessible name, and the buttons get their labels and an `aria-controls`.
+Each side is a `.list-box.transfer-list` marked `data-coreui-transfer-list="source"` or `="target"`, and each button a `[data-coreui-transfer-move]` naming what it does: `target` and `source` move the selection, `target-all` and `source-all` move everything the list currently shows. The rest is filled in for you: an empty select-all button takes the list's title, an empty move button takes its chevron, each header gets the list box's `{selected}/{available} selected` counter, the options element gets the title as its accessible name, and the buttons get their labels and an `aria-controls`.
 
 "All" is the same scope the select-all button works on — the visible, enabled options — so with a search running, the all button moves what the search left behind and nothing more.
 
@@ -88,7 +88,7 @@ Leave an empty `.list-box-options` in each list so you can name it; the plugin a
 
 ## Search
 
-The search belongs to the list box — `search` and `searchPlaceholder` are passed to both of them, so each list gets its own field and filters itself; how it works, and how to bring your own input, is on the [List box](/components/list-box/#search) page. What the transfer adds is that a filtered list still counts: the header reads `{selected}/{visible}`, the select-all button takes only what is left on screen, and "all" moves exactly that.
+The search belongs to the list box — `search` and `searchPlaceholder` are passed to both of them, so each list gets its own field and filters itself; how it works, and how to bring your own input, is on the [List box](/components/list-box/#search) page. What the transfer adds is that a filtered list still counts: the [counter](/components/list-box/#counter) in the header drops what the search hid, the select-all button takes only what is left on screen, and "all" moves exactly that.
 
 <Example code={`<div class="transfer" data-coreui-toggle="transfer" data-coreui-search="true">
     <div class="list-box transfer-list" data-coreui-transfer-list="source">
@@ -309,7 +309,6 @@ Add `data-coreui-toggle="transfer"` to a `.transfer` and the plugin initializes 
 | `data-coreui-toggle="transfer"` | Initializes the transfer on page load. |
 | `data-coreui-transfer-list` | Marks a `.list-box` as the `source` or the `target` list. |
 | `data-coreui-transfer-move` | Marks a move button: `target` / `source` move the selection, `target-all` / `source-all` move every visible, enabled option. |
-| `data-coreui-transfer-counter` | Marks the element that holds the `{selected}/{visible}` counter. Created in the header when it is missing. |
 
 A move button left empty gets the chevron its direction calls for; put anything of your own in it — a label, your own icon — and that is what stays.
 
@@ -372,7 +371,7 @@ const transfer = new coreui.Transfer('#myTransfer', {
 | `sanitizeFn` | null, function | `null` | Your own sanitizer, used instead of the built-in one. |
 | `search` | boolean, string | `false` | Passed to both list boxes: builds a search field above each list. `'external'` filters nothing — every keystroke fires `search.coreui.transfer` and you answer with `setItems()`. |
 | `searchPlaceholder` | string | `'Search'` | Passed to both list boxes as the placeholder of their search field, and used as the first half of each field's accessible name so the two are told apart. |
-| `selectedCounterText` | string | `'selected'` | The word after the `{selected}/{visible}` counter in each header. |
+| `selectedCounterText` | string | `'selected'` | Passed to both list boxes: the word after the count in each header. The transfer turns their [counter](/components/list-box/#counter) on. |
 | `sourceTitle` | string | `'Available'` | Title of the source list: its select-all label when the button is empty, and its accessible name. |
 | `targetTitle` | string | `'Chosen'` | Title of the target list. |
 | `typeahead` | boolean | `true` | Passed to both list boxes: move the highlight to the option matching what the user types. |
@@ -392,7 +391,7 @@ const transfer = new coreui.Transfer('#myTransfer', {
 | `setItems(items)` | Rebuilds both lists from a new `items` array. The values the target holds keep their place as long as the new items still carry them; everything else goes to the source in the items order. Both selections come back empty. |
 | `getItems()` | The items array both lists were built from. |
 | `setLoading(loading, list?)` | Marks a list busy while you fetch: pass `'source'` or `'target'` for one of them, nothing for both. A list left busy stays dimmed and unclickable, so release every list you marked. |
-| `update` | Re-reads the DOM: options added or removed reach both list boxes, the search is re-applied, and the counters and the buttons are re-evaluated. |
+| `update` | Re-reads the DOM: options added or removed reach both list boxes, which re-apply their search and counter, and the move buttons are re-evaluated. |
 | `dispose` | Destroys the transfer and both list boxes, and removes the live region. |
 | `getInstance` | Static method which allows you to get the transfer instance associated to a DOM element, you can use it like this: `coreui.Transfer.getInstance(element)`. |
 | `getOrCreateInstance` | Static method which returns a transfer instance associated to a DOM element or creates a new one in case it wasn't initialized. You can use it like this: `coreui.Transfer.getOrCreateInstance(element)`. |

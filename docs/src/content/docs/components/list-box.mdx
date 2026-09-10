@@ -194,6 +194,26 @@ Nothing marks the selection on its own — `aria-selected` and the `.selected` b
 
 The checkbox is a decorative `<span class="list-box-option-indicator check">`, not an input, so it never takes the focus and never has a state of its own — the `.selected` and `.indeterminate` classes drive it. The select-all button gets the same indicator, its own `mixed` state included, and stays a button: focusable, operable, and named by its text.
 
+## Counter
+
+`counter` puts a `{selected}/{available} selected` readout in the header — the last child of `.list-box-header`, a `.list-box-subtitle` carrying `data-coreui-list-box-counter`. There is no header in the markup? One is created. Bring your own element with that attribute and the plugin writes into it wherever you put it.
+
+What it counts is what the user can actually act on: the options that are visible and enabled, which is the same scope the select-all button works on. Filter the list and the denominator drops with it; disable an option and it never appears in either number. `selectedCounterText` is the word after the count, so a translated list reads in its own language.
+
+<Example code={`<div class="list-box" data-coreui-toggle="list-box" data-coreui-counter="true" data-coreui-search="true" data-coreui-selection-mode="multiple" data-coreui-indicator="checkbox" style="max-width: 20rem">
+    <div class="list-box-header">
+      <button type="button" class="list-box-select-all" data-coreui-select-all>Fruit</button>
+    </div>
+    <div class="list-box-options" role="listbox" aria-label="Fruit">
+      <div class="list-box-option" data-coreui-value="apple">Apple</div>
+      <div class="list-box-option" data-coreui-value="apricot">Apricot</div>
+      <div class="list-box-option" data-coreui-value="banana">Banana</div>
+      <div class="list-box-option disabled" data-coreui-value="blueberry">Blueberry</div>
+      <div class="list-box-option" data-coreui-value="cherry">Cherry</div>
+      <div class="list-box-empty">No fruit matches</div>
+    </div>
+  </div>`} />
+
 ## Sections
 
 Group options in a `.list-box-section` and name it with a `.list-box-section-label`. The plugin adds `role="group"`; point `aria-labelledby` at the label so the group is announced with its name.
@@ -335,6 +355,7 @@ Add `data-coreui-toggle="list-box"` to a `.list-box` and the plugin initializes 
 | `data-coreui-value` | The value of an option. Defaults to the option's text. |
 | `data-coreui-select-all` | Marks a button anywhere in the container as the switch for the whole list. |
 | `data-coreui-indicator="checkbox"` | Renders the checkbox indicator in front of every option. |
+| `data-coreui-list-box-counter` | Marks the element that holds the `{selected}/{available}` counter. Created in the header when `counter` is on and the markup has none. |
 | `data-coreui-list-box-search` | Marks an input as the search field of the list. Built for you when `search` is on and the markup has none. |
 | `data-coreui-loading="true"` | Marks the list as loading: `aria-busy` on the options element, `.loading` on the container, empty state held back. |
 
@@ -366,6 +387,7 @@ const listBox = new coreui.ListBox('#myListBox', {
 | `activeDescendant` | null, string, element | `null` | Field that keeps the focus. The plugin drops the roving `tabindex`, gives the options ids, and writes `aria-activedescendant` and `aria-controls` on the field. The keyboard is handled on the field. |
 | `allowList` | object | [Default value](/getting-started/javascript/#sanitizer) | Object which contains allowed attributes and tags for the labels rendered from `items`. |
 | `ariaSearchLabel` | string | `'Search options'` | Accessible name of the search field. An input with its own `aria-label` keeps it. |
+| `counter` | boolean | `false` | Puts a `{selected}/{available} selected` readout in the header, counting the visible, enabled options. Builds the header when the markup has none. |
 | `disabled` | boolean | `false` | Turns the whole list box off: `aria-disabled` on `.list-box-options` and the select-all button disabled. |
 | `html` | boolean | `false` | Parses the labels rendered from `items` as HTML instead of inserting them as text. |
 | `indicator` | string | `'none'` | `'checkbox'` puts a decorative checkbox in front of every option and marks the container with `data-coreui-indicator="checkbox"`, which is what lays the options out in two columns. |
@@ -376,6 +398,7 @@ const listBox = new coreui.ListBox('#myListBox', {
 | `search` | boolean, string | `false` | Builds a search field above the options. `true` filters the list itself; `'external'` filters nothing and fires `search.coreui.list-box` instead. An input the markup already carries is used either way. |
 | `searchPlaceholder` | string | `'Search'` | Placeholder of the built search field. |
 | `selected` | null, string, array | `null` | Initially selected values. In `single` mode only the first one is taken. |
+| `selectedCounterText` | string | `'selected'` | The word after the count in the header. |
 | `selectionLimit` | null, number | `null` | How many options can be selected at once in `multiple` mode. Further selections are refused and reported through `selectionLimit.coreui.list-box`; nothing is disabled and deselecting always works. |
 | `selectionMode` | string | `'single'` | `'none'`, `'single'` or `'multiple'`. |
 | `typeahead` | boolean | `true` | Move the highlight to the option matching what the user types. The buffer resets after 500 ms. |
