@@ -29,7 +29,7 @@ $form-date-time-tokens: defaults(
 // stylelint-enable scss/dollar-variable-default
 
 @layer forms {
-  .form-control-group:has(> .form-date-time):not(:has(> .form-date-time-filled)) > .form-control-cleaner {
+  .form-control-group:has(> .form-date-time, > .form-floating > .form-date-time):not(:has(> .form-date-time-filled, > .form-floating > .form-date-time-filled)) > .form-control-cleaner {
     display: none;
   }
 
