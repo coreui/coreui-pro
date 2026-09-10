@@ -6,7 +6,7 @@
 
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
-import { classIndex } from './css-components.mjs'
+import { classIndex, layersOf } from './css-components.mjs'
 
 const index = sheets => classIndex(new Map(Object.entries(sheets)))
 
@@ -81,5 +81,18 @@ describe('classIndex', () => {
     assert.deepEqual(Object.keys(index({ card: '.card-title { margin: 0 } .card { border: 0 } .card-body { padding: 0 }' })), [
       'card', 'card-body', 'card-title'
     ])
+  })
+})
+
+describe('layersOf', () => {
+  it('lists the layers a stylesheet writes rules into, in cascade order', () => {
+    assert.deepEqual(
+      layersOf('@layer forms, components;\n@layer components { .sidebar { display: flex } }\n@layer forms { .form-range { width: 100% } }'),
+      ['forms', 'components']
+    )
+  })
+
+  it('ignores the layer order declaration and an empty layer block', () => {
+    assert.deepEqual(layersOf('@layer colors, config, root;\n@layer root {}\n@layer components { .card { border: 0 } }'), ['components'])
   })
 })

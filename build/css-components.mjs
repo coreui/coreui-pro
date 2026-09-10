@@ -235,6 +235,7 @@ const ownCss = name => {
 
 const banner = file => compile(`@use "banner" with ($file: "${file}");`).trim()
 const layerOrder = '@layer colors, config, root, reboot, layout, content, forms, components, custom, helpers, utilities;'
+const layerNames = layerOrder.slice('@layer '.length, -1).split(', ')
 
 const label = name => {
   const words = name.split('/').at(-1).replaceAll('-', ' ')
@@ -246,6 +247,18 @@ const render = name => {
   const order = css.startsWith(layerOrder) ? '' : `${layerOrder}\n`
 
   return `@charset "UTF-8";\n${banner(label(name))}\n${order}${css}`
+}
+
+export const layersOf = css => {
+  const found = new Set()
+
+  postcss.parse(css).walkAtRules('layer', rule => {
+    if (rule.nodes?.length) {
+      found.add(rule.params)
+    }
+  })
+
+  return [...found].toSorted((a, b) => layerNames.indexOf(a) - layerNames.indexOf(b))
 }
 
 const closure = name => {
@@ -337,7 +350,11 @@ export const classIndex = sheets => {
 
 export const stylesheets = () => {
   const sheets = new Map([['base', render('base')]])
-  const manifest = { base: { file: 'base.css', order: 0, requires: [] } }
+  const manifest = {
+    base: {
+      file: 'base.css', order: 0, layers: layersOf(sheets.get('base')), requires: []
+    }
+  }
 
   for (const group of groups) {
     const requires = closure(group.name)
@@ -347,7 +364,12 @@ export const stylesheets = () => {
     }
 
     sheets.set(group.name, render(group.name))
-    manifest[group.name] = { file: `components/${group.name}.css`, order: groups.indexOf(group) + 1, requires }
+    manifest[group.name] = {
+      file: `components/${group.name}.css`,
+      order: groups.indexOf(group) + 1,
+      layers: layersOf(sheets.get(group.name)),
+      requires
+    }
   }
 
   for (const file of ruleFree) {

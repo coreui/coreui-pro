@@ -59,8 +59,8 @@ description: "Track and review changes to the CoreUI for Bootstrap source files,
 
 - **`dist/css` gained `base.css` and a stylesheet per component.**
   `base.css` holds the `:root` tokens and Reboot; `css/components/` holds one
-  file per component plus `manifest.json`, which records each file's load order
-  and the components it needs alongside it. Nothing was taken away —
+  file per component plus `manifest.json`, which records each file's load order,
+  the cascade layers it writes to and the components it needs alongside it. Nothing was taken away —
   `coreui.css` still carries everything — so this is additive, and pages that
   use a few components can now ship a few kilobytes of CSS instead of the whole
   library. See [per-component CSS files](/getting-started/install/#per-component-css-files).

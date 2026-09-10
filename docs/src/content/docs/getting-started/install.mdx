@@ -381,15 +381,16 @@ your own layers in any order:
 
 Within one layer the last rule still wins, so load the files in the order
 `css/components/manifest.json` gives — the same order `coreui.css` uses. Each
-entry names its stylesheet, its position in that order, and the components it
-needs alongside it:
+entry names its stylesheet, its position in that order, the layers its rules
+sit in, and the components it needs alongside it:
 
 ```json
 {
-  "card": { "file": "components/card.css", "order": 37, "requires": [] },
+  "card": { "file": "components/card.css", "order": 37, "layers": ["components"], "requires": [] },
   "date-picker": {
     "file": "components/date-picker.css",
     "order": 42,
+    "layers": ["components"],
     "requires": ["calendar", "forms/floating-labels", "forms/form-control", "forms/form-control-group", "forms/form-date-time", "popup", "time-picker"]
   }
 }
@@ -400,6 +401,11 @@ listed files and the component's own, and the component renders exactly as it
 does from the full bundle. The list covers markup the JavaScript renders as
 well as the Sass a component builds on — the date picker draws a calendar and a
 time picker inside a form control group, which is why it asks for all three.
+
+`layers` tells you when that order matters. Two files in different layers can
+load in either order, because the layer declaration above settles which one
+wins; only files that share a layer have to keep the manifest's order between
+them.
 
 `css/components/classes.json` maps a class name to the entry that owns it, so
 you can go from the markup you write to the files you need — look up each class,
