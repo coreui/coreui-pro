@@ -151,6 +151,42 @@ describe('floating labels', () => {
     expect(labelFloats(root)).toBeTrue()
   })
 
+  // `floatingLabel` puts the field inside `.form-floating` inside the group, so
+  // the cleaner and validation rules keyed to `> .form-date-time` must reach
+  // one level deeper as well.
+  const buildLabelled = config => {
+    container = document.createElement('div')
+    container.style.cssText = 'padding: 1rem; width: 420px;'
+    container.innerHTML = '<div id="host"></div>'
+    document.body.append(container)
+
+    new DatePicker(container.querySelector('#host'), { locale: 'en-US', floatingLabel: 'Delivery date', ...config })
+    return container.querySelector('.form-control-group')
+  }
+
+  it('hides the cleaner of a floating-labelled picker while it is empty', () => {
+    const group = buildLabelled({})
+    expect(getComputedStyle(group.querySelector('.form-control-cleaner')).display).toBe('none')
+  })
+
+  it('shows the cleaner of a floating-labelled picker once it is filled', () => {
+    const group = buildLabelled({ date: DATE })
+    expect(getComputedStyle(group.querySelector('.form-control-cleaner')).display).not.toBe('none')
+  })
+
+  it('carries the invalid state of a floating-labelled field to the frame', () => {
+    const plain = build(HOST_DIV, DatePicker, { locale: 'en-US', date: DATE })
+    plain.querySelector('.form-date-time').classList.add('is-invalid')
+    const reference = getComputedStyle(plain.querySelector('.form-control-group')).borderColor
+
+    const valid = buildLabelled({ date: DATE })
+    expect(getComputedStyle(valid).borderColor).not.toBe(reference)
+
+    const invalid = buildLabelled({ date: DATE })
+    invalid.querySelector('.form-date-time').classList.add('is-invalid')
+    expect(getComputedStyle(invalid).borderColor).toBe(reference)
+  })
+
   // The per-field mode: startLabel / endLabel render a label inside the group
   // over each date, no wrapper markup. Each floats on its own field's state.
   const buildTwoLabel = config => {
