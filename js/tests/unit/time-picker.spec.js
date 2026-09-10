@@ -1,5 +1,5 @@
 import TimePicker from '../../src/time-picker.js'
-import { clearFixture, getFixture } from '../helpers/fixture.js'
+import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
 
 describe('TimePicker', () => {
   let fixtureEl
@@ -338,6 +338,65 @@ describe('TimePicker', () => {
       first.focus()
       first.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }))
       expect(document.activeElement).toEqual(first)
+    })
+  })
+
+  describe('jQueryInterface', () => {
+    it('should create time-picker', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const el = fixtureEl.querySelector('#host')
+
+      jQueryMock.fn.timePicker = TimePicker.jQueryInterface
+      jQueryMock.elements = [el]
+
+      jQueryMock.fn.timePicker.call(jQueryMock)
+
+      expect(TimePicker.getInstance(el)).not.toBeNull()
+      TimePicker.getInstance(el).dispose()
+    })
+
+    it('should not re-create time-picker', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const el = fixtureEl.querySelector('#host')
+      const picker = new TimePicker(el)
+
+      jQueryMock.fn.timePicker = TimePicker.jQueryInterface
+      jQueryMock.elements = [el]
+
+      jQueryMock.fn.timePicker.call(jQueryMock)
+
+      expect(TimePicker.getInstance(el)).toEqual(picker)
+      picker.dispose()
+    })
+
+    it('should call a public method by name', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const el = fixtureEl.querySelector('#host')
+      const picker = new TimePicker(el)
+      const spy = spyOn(picker, 'show')
+
+      jQueryMock.fn.timePicker = TimePicker.jQueryInterface
+      jQueryMock.elements = [el]
+
+      jQueryMock.fn.timePicker.call(jQueryMock, 'show')
+
+      expect(spy).toHaveBeenCalled()
+      picker.dispose()
+    })
+
+    it('should throw error on undefined method', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const el = fixtureEl.querySelector('#host')
+      const picker = new TimePicker(el)
+
+      jQueryMock.fn.timePicker = TimePicker.jQueryInterface
+      jQueryMock.elements = [el]
+
+      expect(() => {
+        jQueryMock.fn.timePicker.call(jQueryMock, 'undefinedMethod')
+      }).toThrowError(TypeError, 'No method named "undefinedMethod"')
+
+      picker.dispose()
     })
   })
 
