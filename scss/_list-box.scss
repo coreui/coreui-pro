@@ -141,10 +141,14 @@ $list-box-tokens: defaults(
   }
 
   .list-box-subtitle {
-    flex: 0 0 auto;
-    margin-inline-start: auto;
     font-size: var(--#{$prefix}list-box-subtitle-font-size);
     color: var(--#{$prefix}list-box-subtitle-color);
+  }
+
+  .list-box-header .list-box-subtitle {
+    flex: 0 0 auto;
+    margin-inline-start: auto;
+    margin-inline-end: var(--#{$prefix}list-box-option-padding-x);
   }
 
   .list-box-search {
