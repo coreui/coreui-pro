@@ -151,6 +151,35 @@ describe('floating labels', () => {
     expect(labelFloats(root)).toBeTrue()
   })
 
+  // The label anchors its scale at the inline start, so in RTL the origin and
+  // the inline shift have to mirror or the label drifts off its own field.
+  it('scales the label from the inline-start edge in RTL', () => {
+    document.documentElement.dir = 'rtl'
+
+    try {
+      const root = mount('<input type="text" class="form-control" id="host" placeholder=" " value="x">')
+      const label = root.querySelector('label')
+      const { transform, transformOrigin } = getComputedStyle(label)
+      const [originX] = transformOrigin.split(' ')
+      const translateX = Number(transform.match(/matrix\((?:[^,]+,){4}\s*([^,]+)/)[1])
+
+      expect(Math.round(Number.parseFloat(originX))).toBe(label.offsetWidth)
+      expect(translateX).toBeLessThan(0)
+    } finally {
+      document.documentElement.dir = ''
+    }
+  })
+
+  it('scales the label from the left edge in LTR', () => {
+    const root = mount('<input type="text" class="form-control" id="host" placeholder=" " value="x">')
+    const label = root.querySelector('label')
+    const { transform, transformOrigin } = getComputedStyle(label)
+    const translateX = Number(transform.match(/matrix\((?:[^,]+,){4}\s*([^,]+)/)[1])
+
+    expect(transformOrigin).toMatch(/^0px 0px/)
+    expect(translateX).toBeGreaterThan(0)
+  })
+
   // `floatingLabel` puts the field inside `.form-floating` inside the group, so
   // the cleaner and validation rules keyed to `> .form-date-time` must reach
   // one level deeper as well.
