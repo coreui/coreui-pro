@@ -358,12 +358,13 @@ class TimePicker extends BaseComponent {
       anchor: this._element,
       container: this._config.container,
       content: this._menu,
+      onBeforeHide: () => !EventHandler.trigger(this._element, EVENT_HIDE)?.defaultPrevented,
+      onBeforeShow: () => !EventHandler.trigger(this._element, EVENT_SHOW)?.defaultPrevented,
       onHidden: () => EventHandler.trigger(this._element, EVENT_HIDDEN),
       onHide: () => {
         this._menu.classList.remove(CLASS_NAME_SHOW)
         this._element.classList.remove(CLASS_NAME_SHOW)
         this._element.setAttribute('aria-expanded', 'false')
-        EventHandler.trigger(this._element, EVENT_HIDE)
       },
       onShow: () => {
         // the classes come first: the selection body scrolls the selected cell
@@ -372,7 +373,6 @@ class TimePicker extends BaseComponent {
         this._element.classList.add(CLASS_NAME_SHOW)
         this._ensureSelection()
         this._element.setAttribute('aria-expanded', 'true')
-        EventHandler.trigger(this._element, EVENT_SHOW)
       },
       onShown: () => EventHandler.trigger(this._element, EVENT_SHOWN)
     })

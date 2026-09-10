@@ -73,7 +73,12 @@ class ComboboxBase extends BaseComponent {
       return
     }
 
-    EventHandler.trigger(this._element, this.constructor.eventName('show'))
+    const showEvent = EventHandler.trigger(this._element, this.constructor.eventName('show'))
+
+    if (showEvent.defaultPrevented) {
+      return
+    }
+
     const showTarget = this._getShowTarget()
     this._mountMenu()
     showTarget.classList.add(CLASS_NAME_SHOW)
@@ -91,7 +96,16 @@ class ComboboxBase extends BaseComponent {
   }
 
   hide(): void {
-    EventHandler.trigger(this._element, this.constructor.eventName('hide'))
+    if (!this._isShown()) {
+      return
+    }
+
+    const hideEvent = EventHandler.trigger(this._element, this.constructor.eventName('hide'))
+
+    if (hideEvent.defaultPrevented) {
+      return
+    }
+
     this._onHideStart()
 
     this._disposeFloating()

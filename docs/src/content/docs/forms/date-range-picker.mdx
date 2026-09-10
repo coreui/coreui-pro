@@ -351,9 +351,9 @@ context.disabled               // disabled state
 
 | Event | Description |
 | --- | --- |
-| `startDateChange.coreui.date-range-picker` | Fired when the start changes. `event.date` is formatted per `selectionType`, `event.dateObject` is the `Date`. |
+| `startDateChange.coreui.date-range-picker` | Fired when the start changes. `event.date` is the validated `Date`, or `null`; `event.formattedDate` is the same value in the shape of `selectionType` (`2026-01`, `2026W03`, `2026Q1`, `2026`, or the `Date` itself for `day`). |
 | `endDateChange.coreui.date-range-picker` | Fired when the end changes, with the same payload shape. |
-| `show.coreui.date-range-picker` | Fired immediately when `show` is called. |
+| `show.coreui.date-range-picker` | Fired immediately when `show` is called. Call `event.preventDefault()` to keep the popup closed. |
 | `shown.coreui.date-range-picker` | Fired when the popup has been made visible. |
 | `hide.coreui.date-range-picker` | Fired immediately when `hide` is called. |
 | `hidden.coreui.date-range-picker` | Fired when the popup has been hidden. |
@@ -361,7 +361,7 @@ context.disabled               // disabled state
 ```js
 const myPicker = document.getElementById('myPicker')
 myPicker.addEventListener('endDateChange.coreui.date-range-picker', event => {
-  console.log(event.date, event.dateObject)
+  console.log(event.date, event.formattedDate)
 })
 ```
 

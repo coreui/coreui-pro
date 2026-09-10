@@ -50,6 +50,16 @@ describe('Popup', () => {
       expect(calls).toEqual(['show', 'shown'])
     })
 
+    it('should stay hidden when onBeforeShow returns false', () => {
+      const onShow = jasmine.createSpy('onShow')
+      const popup = buildPopup({ onBeforeShow: () => false, onShow })
+
+      popup.show()
+
+      expect(popup.isShown).toBeFalse()
+      expect(onShow).not.toHaveBeenCalled()
+    })
+
     it('should not fire callbacks when already shown', () => {
       const spy = jasmine.createSpy('onShow')
       const popup = buildPopup({ onShow: spy })
@@ -74,6 +84,17 @@ describe('Popup', () => {
   })
 
   describe('hide', () => {
+    it('should stay shown when onBeforeHide returns false', () => {
+      const onHide = jasmine.createSpy('onHide')
+      const popup = buildPopup({ onBeforeHide: () => false, onHide })
+
+      popup.show()
+      popup.hide()
+
+      expect(popup.isShown).toBeTrue()
+      expect(onHide).not.toHaveBeenCalled()
+    })
+
     it('should clear isShown and fire onHide/onHidden in order', () => {
       const calls = []
       const popup = buildPopup({

@@ -461,6 +461,22 @@ describe('Autocomplete', () => {
       })
     })
 
+    it('should not show when the show event is prevented', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        options: [{ label: 'Option 1', value: '1' }]
+      })
+      const shown = jasmine.createSpy('shown')
+      autocompleteEl.addEventListener('show.coreui.autocomplete', event => event.preventDefault())
+      autocompleteEl.addEventListener('shown.coreui.autocomplete', shown)
+
+      autocomplete.show()
+
+      expect(autocomplete._isShown()).toBeFalse()
+      expect(shown).not.toHaveBeenCalled()
+    })
+
     it('should not show if disabled', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
@@ -602,6 +618,38 @@ describe('Autocomplete', () => {
 
         autocomplete.show()
       })
+    })
+
+    it('should stay open when the hide event is prevented', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        options: [{ label: 'Option 1', value: '1' }]
+      })
+      const hidden = jasmine.createSpy('hidden')
+      autocompleteEl.addEventListener('hide.coreui.autocomplete', event => event.preventDefault())
+      autocompleteEl.addEventListener('hidden.coreui.autocomplete', hidden)
+
+      autocomplete.show()
+      autocomplete.hide()
+
+      expect(autocomplete._isShown()).toBeTrue()
+      expect(hidden).not.toHaveBeenCalled()
+    })
+
+    it('should not fire hide events for a menu that is not shown', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        options: [{ label: 'Option 1', value: '1' }]
+      })
+      const spy = jasmine.createSpy('hide')
+      autocompleteEl.addEventListener('hide.coreui.autocomplete', spy)
+      autocompleteEl.addEventListener('hidden.coreui.autocomplete', spy)
+
+      autocomplete.hide()
+
+      expect(spy).not.toHaveBeenCalled()
     })
 
     it('should clear input hint element when hiding', () => {

@@ -38,6 +38,8 @@ type PopupConfig = {
   focusTrap: boolean
   mobileBreakpoint: number
   offset: [number, number]
+  onBeforeHide: (() => boolean | void) | null
+  onBeforeShow: (() => boolean | void) | null
   onHidden: (() => void) | null
   onHide: (() => void) | null
   onShow: (() => void) | null
@@ -54,6 +56,8 @@ const Default: PopupConfig = {
   focusTrap: true,
   mobileBreakpoint: 768,
   offset: [0, 2],
+  onBeforeHide: null,
+  onBeforeShow: null,
   onHidden: null,
   onHide: null,
   onShow: null,
@@ -70,6 +74,8 @@ const DefaultType = {
   focusTrap: 'boolean',
   mobileBreakpoint: 'number',
   offset: 'array',
+  onBeforeHide: '(null|function)',
+  onBeforeShow: '(null|function)',
   onHidden: '(function|null)',
   onHide: '(function|null)',
   onShow: '(function|null)',
@@ -194,7 +200,7 @@ class Popup extends Config {
 
   // Public
   show(): void {
-    if (this._isShown) {
+    if (this._isShown || execute(this._config.onBeforeShow) === false) {
       return
     }
 
@@ -229,10 +235,16 @@ class Popup extends Config {
   }
 
   hide(): any {
-    if (!this._isShown) {
+    if (!this._isShown || execute(this._config.onBeforeHide) === false) {
       return
     }
 
+    this._hide()
+  }
+
+  // Dispose goes through here: the owner is going away, so `onBeforeHide`
+  // gets no say.
+  _hide(): void {
     execute(this._config.onHide)
     this._isShown = false
     this._stopPositioning()
@@ -266,7 +278,10 @@ class Popup extends Config {
   }
 
   dispose(): void {
-    this.hide()
+    if (this._isShown) {
+      this._hide()
+    }
+
     this._unmount()
 
     if (this._anchorKeydownListener) {
