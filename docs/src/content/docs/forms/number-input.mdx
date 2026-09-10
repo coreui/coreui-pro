@@ -58,6 +58,12 @@ class you wrote except `.form-control` itself**. Spacing, width and the rest
 describe the field as a whole, and the field is now the frame; leaving `mb-3`
 on the input would put the margin inside the border.
 
+State classes stay where you wrote them: `.is-valid`, `.is-invalid` and
+anything else starting with `is-` or `was-`, plus `js-` hooks your own code
+selects by. The frame picks the validation state up from the input, so
+`document.querySelector('.form-control.is-invalid')` still finds the control
+and a validator that toggles the class keeps working.
+
 <Example pro code={`<input type="number" class="form-control form-control-sm mb-3" value="3" aria-label="Quantity" data-coreui-toggle="number-input">
   <input type="number" class="form-control form-control-lg" value="3" aria-label="Quantity" data-coreui-toggle="number-input">`} />
 
