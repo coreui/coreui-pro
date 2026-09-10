@@ -10,7 +10,7 @@ import type { ComponentConfig } from './util/config.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { sanitizeHtml, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
-import { defineJQueryPlugin, getUID } from './util/index.js'
+import { defineJQueryPlugin, getUID, jQueryDispatch } from './util/index.js'
 import Tooltip from './tooltip.js'
 
 /**
@@ -485,19 +485,7 @@ class Rating extends BaseComponent {
   }
 
   static jQueryInterface(this: any, config: any): void {
-    return this.each(function (this: HTMLElement) {
-      const data: any = Rating.getOrCreateInstance(this, config)
-
-      if (typeof config !== 'string') {
-        return
-      }
-
-      if (data[config as string] === undefined || config.startsWith('_') || config === 'constructor') {
-        throw new TypeError(`No method named "${config}"`)
-      }
-
-      data[config as string](this)
-    })
+    return jQueryDispatch(this, Rating, config, element => [element])
   }
 }
 

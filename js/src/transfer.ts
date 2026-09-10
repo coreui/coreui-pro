@@ -13,7 +13,7 @@ import type { ComponentConfig } from './util/config.js'
 import {
   CHEVRON_DOUBLE_LEFT_ICON, CHEVRON_DOUBLE_RIGHT_ICON, CHEVRON_LEFT_ICON, CHEVRON_RIGHT_ICON
 } from './util/icons.js'
-import { defineJQueryPlugin, getUID } from './util/index.js'
+import { defineJQueryPlugin, getUID, jQueryDispatch } from './util/index.js'
 import { sanitizeHtml, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 
 /**
@@ -679,19 +679,7 @@ class Transfer extends BaseComponent {
 
   // Static
   static jQueryInterface(this: any, config: any, ...args: any[]): any {
-    return this.each(function (this: HTMLElement) {
-      const data: any = Transfer.getOrCreateInstance(this, typeof config === 'object' ? config : null)
-
-      if (typeof config !== 'string') {
-        return
-      }
-
-      if (data[config as string] === undefined || config.startsWith('_') || config === 'constructor') {
-        throw new TypeError(`No method named "${config}"`)
-      }
-
-      data[config as string](...args)
-    })
+    return jQueryDispatch(this, Transfer, config, args)
   }
 }
 

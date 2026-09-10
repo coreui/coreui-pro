@@ -13,7 +13,7 @@ import {
 } from './util/form-control-group.js'
 import { MINUS_ICON, PLUS_ICON } from './util/icons.js'
 import { sanitizeHtml, SVGAllowlist, type SanitizerAllowList } from './util/sanitizer.js'
-import { defineJQueryPlugin } from './util/index.js'
+import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
 
 /**
  * Constants
@@ -304,13 +304,7 @@ class NumberInput extends BaseComponent {
   }
 
   static jQueryInterface(this: any, config: any): void {
-    return this.each(function (this: HTMLElement) {
-      const data: any = NumberInput.getOrCreateInstance(this)
-
-      if (typeof config === 'string') {
-        data[config]()
-      }
-    })
+    return jQueryDispatch(this, NumberInput, config)
   }
 }
 

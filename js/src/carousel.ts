@@ -12,7 +12,9 @@ import BaseComponent from './base-component.js'
 import EventHandler, { type CoreUIEvent } from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
-import { defineJQueryPlugin, isRTL, isVisible } from './util/index.js'
+import {
+  defineJQueryPlugin, isRTL, isVisible, jQueryDispatch
+} from './util/index.js'
 
 /**
  * Constants
@@ -308,22 +310,13 @@ class Carousel extends BaseComponent {
 
   // Static
   static jQueryInterface(this: any, config: any): void {
-    return this.each(function (this: HTMLElement) {
-      const data: any = Carousel.getOrCreateInstance(this, config)
+    if (typeof config === 'number') {
+      return this.each(function (this: HTMLElement) {
+        Carousel.getOrCreateInstance(this).to(config)
+      })
+    }
 
-      if (typeof config === 'number') {
-        data.to(config)
-        return
-      }
-
-      if (typeof config === 'string') {
-        if (data[config as string] === undefined || config.startsWith('_') || config === 'constructor') {
-          throw new TypeError(`No method named "${config}"`)
-        }
-
-        data[config as string]()
-      }
-    })
+    return jQueryDispatch(this, Carousel, config)
   }
 
   // Private

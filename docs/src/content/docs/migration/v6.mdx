@@ -204,6 +204,15 @@ alias of the same class, so existing scripts keep working:
 + const offcanvas = new coreui.Offcanvas('#offcanvasExample')
 ```
 
+#### One jQuery dispatcher for every plugin
+
+Every `$(el).plugin('method')` call now goes through the same dispatcher:
+the instance is created or reused, a string argument names a **public**
+method, and anything else throws `TypeError: No method named "…"`. A few
+plugins used to let a private name through (`$(el).tooltip('_getConfig')`
+called it) or skipped the check altogether (`button`, `number-input`,
+`password-input`); they now reject those names like the rest.
+
 #### Lifecycle methods return a promise
 
 `show()`, `hide()`, `toggle()` and `close()` returned before the transition
