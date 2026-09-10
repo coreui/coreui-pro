@@ -1,6 +1,5 @@
 const element = document.getElementById('transferExternalSearch')
 const transfer = coreui.Transfer.getOrCreateInstance(element, {
-  loading: true,
   search: 'external',
   sourceTitle: 'Users',
   targetTitle: 'Invited'

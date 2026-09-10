@@ -601,6 +601,87 @@ describe('Transfer', () => {
       expect(transfer.getSource()).toEqual(['ada'])
     })
 
+    it('should leave the target unselected after setItems', () => {
+      const el = setMarkup('', [], [])
+      const transfer = new Transfer(el, { items: users, value: ['cleo'] })
+
+      transfer.moveToTarget(['ada'])
+
+      const chosen = option(el, 'target', 'cleo')
+
+      chosen.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }))
+      click(chosen)
+
+      expect(transfer.getSelected('target')).toEqual(['cleo'])
+
+      transfer.setItems([...users, { value: 'dan', label: 'Dan' }])
+
+      expect(transfer.getTarget()).toEqual(['cleo', 'ada'])
+      expect(transfer.getSelected('target')).toEqual([])
+      expect(transfer.getSelected('source')).toEqual([])
+      expect(option(el, 'target', 'cleo').getAttribute('aria-selected')).toEqual('false')
+    })
+
+    it('should let a target option be toggled after an external re-fetch', () => {
+      const el = setMarkup('', [], [])
+      const transfer = new Transfer(el, { items: users, search: 'external', value: ['cleo'] })
+
+      type(searchField(el, 'source'), 'a')
+      transfer.setItems(users)
+
+      const target = option(el, 'target', 'cleo')
+
+      target.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }))
+      click(target)
+
+      expect(transfer.getSelected('target')).toEqual(['cleo'])
+      expect(target.hasAttribute('aria-disabled')).toBeFalse()
+      expect(side(el, 'target').classList.contains('loading')).toBeFalse()
+
+      transfer.moveToSource(['cleo'])
+
+      expect(transfer.getTarget()).toEqual([])
+      expect(transfer.getSource()).toEqual(['ada', 'bob', 'cleo'])
+    })
+
+    it('should honour a selected item on the first render only', () => {
+      const el = setMarkup('', [], [])
+      const marked = [{ value: 'ada', label: 'Ada', selected: true }, { value: 'bob', label: 'Bob' }]
+      const transfer = new Transfer(el, { items: marked })
+
+      expect(transfer.getSelected('source')).toEqual(['ada'])
+
+      transfer.setItems(marked)
+
+      expect(transfer.getSelected('source')).toEqual([])
+    })
+
+    it('should clear the destination selection after a move', () => {
+      const el = setMarkup('', [], [])
+      const transfer = new Transfer(el, { items: users, value: ['cleo'] })
+
+      const chosen = option(el, 'target', 'cleo')
+
+      chosen.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }))
+      click(chosen)
+      transfer.moveToTarget(['ada'])
+
+      expect(transfer.getSelected('target')).toEqual([])
+    })
+
+    it('should release both lists when setLoading is called without a side', () => {
+      const el = setMarkup('', [], [])
+      const transfer = new Transfer(el, { items: users, loading: true })
+
+      expect(side(el, 'source').classList.contains('loading')).toBeTrue()
+      expect(side(el, 'target').classList.contains('loading')).toBeTrue()
+
+      transfer.setLoading(false)
+
+      expect(side(el, 'source').classList.contains('loading')).toBeFalse()
+      expect(side(el, 'target').classList.contains('loading')).toBeFalse()
+    })
+
     it('should mark a loading list as busy', () => {
       const el = setMarkup('', [], [])
       const transfer = new Transfer(el, { items: users })

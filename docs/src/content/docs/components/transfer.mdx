@@ -125,7 +125,9 @@ Put your own `[data-coreui-transfer-search]` input in a list and it is used as i
 
 `search: 'external'` hands the searching over to you: the fields are still built, but nothing is filtered and no option is hidden. Every keystroke fires `search.coreui.transfer` with the `side` that was typed in and the `query`, and you answer with `setItems()` — one method for both lists, so pass the whole set you want shown and leave out what the query rules out. Values already in the target stay there as long as your set still carries them, which is why the example below keeps the chosen users in what it sends back.
 
-`loading` covers the wait: `setLoading(true, 'source')` writes `aria-busy="true"` on that list's options element and dims it until the answer arrives; without a second argument it covers both lists.
+`loading` covers the wait: `setLoading(true, 'source')` writes `aria-busy="true"` on that list's options element and dims it until the answer arrives. The second argument is what scopes it — `setLoading(true)` and the `loading` option both cover *both* lists, so a list you never fetch for stays dimmed and unclickable until something releases it. Fetch one list, mark one list.
+
+Rebuilding is a fresh start for the selection: after `setItems()` neither list has anything checked, and `selected` on an item applies to the first render only, so a re-fetch never brings the checkboxes back. Moving options across clears the destination's selection too — what arrives is ready to be picked, not already picked.
 
 <Example code={`<div class="transfer" id="transferExternalSearch">
     <div class="list-box transfer-list" data-coreui-transfer-list="source">
@@ -362,8 +364,8 @@ const transfer = new coreui.Transfer('#myTransfer', {
 | `disabled` | boolean | `false` | Turns the whole transfer off: both list boxes, both move buttons and both search fields. |
 | `html` | boolean | `false` | Parse the labels and descriptions of `items` as markup instead of text. Passed to both list boxes. |
 | `indicator` | string | `'checkbox'` | Passed to both list boxes. `'none'` drops the checkbox in front of every option. |
-| `items` | array | `[]` | The options of both lists, rendered instead of the markup: `{ value, label, description, disabled, selected }`, or `{ label, items }` for a section. `value` decides which of them start in the target list. |
-| `loading` | boolean | `false` | Marks both lists as busy: `aria-busy="true"` on the options element and `.loading` on the list. |
+| `items` | array | `[]` | The options of both lists, rendered instead of the markup: `{ value, label, description, disabled, selected }`, or `{ label, items }` for a section. `value` decides which of them start in the target list, `selected` which start checked — on the first render only. |
+| `loading` | boolean | `false` | Marks both lists as busy: `aria-busy="true"` on the options element and `.loading` on the list, which dims it and stops it responding. Release it with `setLoading(false)`, or scope it per list with `setLoading(value, list)`. |
 | `moveAllToSourceIcon` | string | `cil-chevron-double-left-alt` | Icon of the button that moves everything back. Inline SVG, put in the button only when the markup left it empty. |
 | `moveAllToTargetIcon` | string | `cil-chevron-double-right-alt` | Icon of the button that moves everything across. |
 | `moveToSourceIcon` | string | `cil-chevron-left-alt` | Icon of the button that moves the selection back. |
@@ -390,9 +392,9 @@ const transfer = new coreui.Transfer('#myTransfer', {
 | `getSource()` | The values in the source list, in document order. |
 | `getTarget()` | The values in the target list, in document order. |
 | `getSelected(list)` | The selected values of `'source'` or `'target'`. |
-| `setItems(items)` | Rebuilds both lists from a new `items` array. The values the target holds keep their place as long as the new items still carry them; everything else goes to the source in the items order. |
+| `setItems(items)` | Rebuilds both lists from a new `items` array. The values the target holds keep their place as long as the new items still carry them; everything else goes to the source in the items order. Both selections come back empty. |
 | `getItems()` | The items array both lists were built from. |
-| `setLoading(loading, list?)` | Marks a list busy while you fetch: pass `'source'` or `'target'` for one of them, nothing for both. |
+| `setLoading(loading, list?)` | Marks a list busy while you fetch: pass `'source'` or `'target'` for one of them, nothing for both. A list left busy stays dimmed and unclickable, so release every list you marked. |
 | `update` | Re-reads the DOM: options added or removed reach both list boxes, the search is re-applied, and the counters and the buttons are re-evaluated. |
 | `dispose` | Destroys the transfer and both list boxes, and removes the live region. |
 | `getInstance` | Static method which allows you to get the transfer instance associated to a DOM element, you can use it like this: `coreui.Transfer.getInstance(element)`. |

@@ -166,6 +166,7 @@ class Transfer extends BaseComponent {
   protected declare _onListBoxChange: () => void
   protected declare _order: WeakMap<HTMLElement, number>
   protected declare _ranks: number
+  protected declare _rendered: boolean
   protected declare _sides: Record<string, TransferSide>
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
@@ -181,6 +182,7 @@ class Transfer extends BaseComponent {
     this._onListBoxChange = () => this._refresh()
     this._order = new WeakMap()
     this._ranks = 0
+    this._rendered = false
 
     if (this._items) {
       this._applyItems(this._config.value)
@@ -243,6 +245,10 @@ class Transfer extends BaseComponent {
   }
 
   setLoading(loading: boolean, side?: string): void {
+    if (side === undefined) {
+      this._config.loading = loading
+    }
+
     for (const [name, entry] of Object.entries(this._sides)) {
       if (side === undefined || side === name) {
         entry.listBox.setLoading(loading)
@@ -476,8 +482,41 @@ class Transfer extends BaseComponent {
     const chosen = (Array.isArray(values) ? values : []).filter(value => byValue.has(value))
     const taken = new Set(chosen)
 
-    this._sides[SIDE_TARGET].listBox.setItems(chosen.map(value => byValue.get(value) as ListBoxItem))
-    this._sides[SIDE_SOURCE].listBox.setItems(this._availableItems(items, taken))
+    this._sides[SIDE_TARGET].listBox.setItems(this._forwardItems(chosen.map(value => byValue.get(value) as ListBoxItem)))
+    this._sides[SIDE_SOURCE].listBox.setItems(this._forwardItems(this._availableItems(items, taken)))
+
+    if (this._rendered) {
+      for (const side of Object.values(this._sides)) {
+        side.listBox.clear()
+      }
+    }
+
+    this._rendered = true
+  }
+
+  _forwardItems(entries: ListBoxEntry[]): ListBoxEntry[] {
+    if (!this._rendered) {
+      return entries
+    }
+
+    return entries.map(entry => {
+      if (Array.isArray((entry as ListBoxGroup).items)) {
+        const group = entry as ListBoxGroup
+        return { label: group.label, items: group.items.map(item => this._unmarked(item)) }
+      }
+
+      return this._unmarked(entry as ListBoxItem)
+    })
+  }
+
+  _unmarked(item: ListBoxItem): ListBoxItem {
+    if (!item.selected) {
+      return item
+    }
+
+    const { selected, ...rest } = item
+
+    return rest
   }
 
   _availableItems(items: ListBoxEntry[], taken: Set<string>): ListBoxEntry[] {
@@ -646,6 +685,7 @@ class Transfer extends BaseComponent {
       this._insertInOriginalOrder(to, options)
     }
 
+    to.listBox.clear()
     this._filter(from)
     this._filter(to)
     from.listBox.update()
