@@ -88,7 +88,7 @@ Leave an empty `.list-box-options` in each list so you can name it; the plugin a
 
 ## Search
 
-`search` puts a search field above each list. It hides the options that do not match what was typed, and because a hidden option leaves the list box's navigation, everything downstream follows: the arrows skip it, the counter drops it, and the select-all button takes only what is left on screen. The selection itself survives filtering.
+The search belongs to the list box — `search` and `searchPlaceholder` are passed to both of them, so each list gets its own field and filters itself; how it works, and how to bring your own input, is on the [List box](/components/list-box/#search) page. What the transfer adds is that a filtered list still counts: the header reads `{selected}/{visible}`, the select-all button takes only what is left on screen, and "all" moves exactly that.
 
 <Example code={`<div class="transfer" data-coreui-toggle="transfer" data-coreui-search="true">
     <div class="list-box transfer-list" data-coreui-transfer-list="source">
@@ -119,11 +119,9 @@ Leave an empty `.list-box-options` in each list so you can name it; the plugin a
     </div>
   </div>`} />
 
-Put your own `[data-coreui-transfer-search]` input in a list and it is used as it is, `search` option or not — that is how you change its classes, its placeholder or its position.
-
 ## External search
 
-`search: 'external'` hands the searching over to you: the fields are still built, but nothing is filtered and no option is hidden. Every keystroke fires `search.coreui.transfer` with the `side` that was typed in and the `query`, and you answer with `setItems()` — one method for both lists, so pass the whole set you want shown and leave out what the query rules out. Values already in the target stay there as long as your set still carries them, which is why the example below keeps the chosen users in what it sends back.
+`search: 'external'` hands the searching over to you — the [list box's external mode](/components/list-box/#external-search) on both lists at once. The transfer re-emits what they report as `search.coreui.transfer`, adding the `side` that was typed in, and you answer with `setItems()` — one method for both lists, so pass the whole set you want shown and leave out what the query rules out. Values already in the target stay there as long as your set still carries them, which is why the example below keeps the chosen users in what it sends back.
 
 `loading` covers the wait: `setLoading(true, 'source')` writes `aria-busy="true"` on that list's options element and dims it until the answer arrives. The second argument is what scopes it — `setLoading(true)` and the `loading` option both cover *both* lists, so a list you never fetch for stays dimmed and unclickable until something releases it. Fetch one list, mark one list.
 
@@ -311,7 +309,6 @@ Add `data-coreui-toggle="transfer"` to a `.transfer` and the plugin initializes 
 | `data-coreui-toggle="transfer"` | Initializes the transfer on page load. |
 | `data-coreui-transfer-list` | Marks a `.list-box` as the `source` or the `target` list. |
 | `data-coreui-transfer-move` | Marks a move button: `target` / `source` move the selection, `target-all` / `source-all` move every visible, enabled option. |
-| `data-coreui-transfer-search` | Marks an input as the search field of the list it sits in. |
 | `data-coreui-transfer-counter` | Marks the element that holds the `{selected}/{visible}` counter. Created in the header when it is missing. |
 
 A move button left empty gets the chevron its direction calls for; put anything of your own in it — a label, your own icon — and that is what stays.
@@ -373,8 +370,8 @@ const transfer = new coreui.Transfer('#myTransfer', {
 | `oneWay` | boolean | `false` | Hides and disables both buttons that move back, and makes `moveToSource()` and `moveAllToSource()` no-ops. |
 | `sanitize` | boolean | `true` | Run the icon strings through the sanitizer. |
 | `sanitizeFn` | null, function | `null` | Your own sanitizer, used instead of the built-in one. |
-| `search` | boolean, string | `false` | Builds a search field above each list. An input the markup already carries is used instead. `'external'` builds the fields but filters nothing — every keystroke fires `search.coreui.transfer` and you answer with `setItems()`. |
-| `searchPlaceholder` | string | `'Search'` | Placeholder of the built search field, and the first half of its accessible name. |
+| `search` | boolean, string | `false` | Passed to both list boxes: builds a search field above each list. `'external'` filters nothing — every keystroke fires `search.coreui.transfer` and you answer with `setItems()`. |
+| `searchPlaceholder` | string | `'Search'` | Passed to both list boxes as the placeholder of their search field, and used as the first half of each field's accessible name so the two are told apart. |
 | `selectedCounterText` | string | `'selected'` | The word after the `{selected}/{visible}` counter in each header. |
 | `sourceTitle` | string | `'Available'` | Title of the source list: its select-all label when the button is empty, and its accessible name. |
 | `targetTitle` | string | `'Chosen'` | Title of the target list. |

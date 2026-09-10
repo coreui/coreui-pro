@@ -25,13 +25,13 @@ const tailModules = ['helpers', 'utilities/api']
 const renders = {
   autocomplete: ['combobox', 'forms/form-control', 'forms/form-control-group'],
   'chip-set': ['chip', 'helpers/visually-hidden'],
-  'list-box': ['forms/check'],
+  'list-box': ['forms/check', 'forms/form-control'],
   'loading-button': ['buttons', 'spinner'],
   'date-picker': ['forms/floating-labels', 'forms/form-control', 'forms/form-control-group', 'forms/form-date-time', 'popup'],
   'range-slider': ['tooltip'],
   sidebar: ['transitions'],
   'time-picker': ['forms/floating-labels', 'forms/form-control', 'forms/form-control-group', 'forms/form-date-time', 'popup'],
-  transfer: ['list-box', 'buttons', 'forms/form-control', 'helpers/visually-hidden', 'icon']
+  transfer: ['list-box', 'buttons', 'helpers/visually-hidden', 'icon']
 }
 
 const groups = [

@@ -30,25 +30,23 @@ const EVENT_SEARCH = 'search'
 const EVENT_CLICK = 'click'
 const EVENT_INPUT = 'input'
 const EVENT_LIST_BOX_CHANGE = 'change.coreui.list-box'
+const EVENT_LIST_BOX_SEARCH = 'search.coreui.list-box'
 
 const CLASS_NAME_ANNOUNCER = 'transfer-announcer'
 const CLASS_NAME_DISABLED = 'disabled'
 const CLASS_NAME_OPTIONS = 'list-box-options'
-const CLASS_NAME_SEARCH = 'transfer-search'
 const CLASS_NAME_SUBTITLE = 'list-box-subtitle'
 const CLASS_NAME_VISUALLY_HIDDEN = 'visually-hidden'
 
 const SELECTOR_COUNTER = '[data-coreui-transfer-counter]'
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="transfer"]'
 const SELECTOR_HEADER = '.list-box-header'
+const SELECTOR_LIST = '[data-coreui-transfer-list]'
 const SELECTOR_MOVE = '[data-coreui-transfer-move]'
 const SELECTOR_OPTION = '.list-box-option'
-const SELECTOR_OPTION_LABEL = '.list-box-option-label'
 const SELECTOR_OPTIONS = '.list-box-options'
-const SELECTOR_SEARCH = '[data-coreui-transfer-search]'
+const SELECTOR_SEARCH = '[data-coreui-list-box-search]'
 const SELECTOR_SELECT_ALL = '[data-coreui-select-all]'
-
-const SEARCH_EXTERNAL = 'external'
 
 const SIDE_SOURCE = 'source'
 const SIDE_TARGET = 'target'
@@ -65,8 +63,8 @@ type TransferSide = {
   counter: HTMLElement | null
   element: HTMLElement
   listBox: ListBox
+  name: string
   options: HTMLElement
-  search: HTMLInputElement | null
   selectAll: HTMLElement | null
   title: string
 }
@@ -164,6 +162,7 @@ class Transfer extends BaseComponent {
   protected declare _itemRanks: Map<string, number>
   protected declare _items: ListBoxEntry[] | null
   protected declare _onListBoxChange: () => void
+  protected declare _onListBoxSearch: (event: Event) => void
   protected declare _order: WeakMap<HTMLElement, number>
   protected declare _ranks: number
   protected declare _rendered: boolean
@@ -180,6 +179,7 @@ class Transfer extends BaseComponent {
       [SIDE_TARGET]: this._createSide(SIDE_TARGET)
     }
     this._onListBoxChange = () => this._refresh()
+    this._onListBoxSearch = (event: Event) => this._reportSearch(event)
     this._order = new WeakMap()
     this._ranks = 0
     this._rendered = false
@@ -261,7 +261,6 @@ class Transfer extends BaseComponent {
 
     for (const side of Object.values(this._sides)) {
       this._decorateSide(side)
-      this._filter(side)
       side.listBox.update()
     }
 
@@ -271,6 +270,7 @@ class Transfer extends BaseComponent {
 
   override dispose(): void {
     this._element.removeEventListener(EVENT_LIST_BOX_CHANGE, this._onListBoxChange)
+    this._element.removeEventListener(EVENT_LIST_BOX_SEARCH, this._onListBoxSearch)
     EventHandler.off(this._element, EVENT_KEY)
 
     for (const side of Object.values(this._sides)) {
@@ -308,17 +308,20 @@ class Transfer extends BaseComponent {
       element,
       listBox: ListBox.getOrCreateInstance(element, {
         allowList: this._config.allowList,
+        ariaSearchLabel: `${this._config.searchPlaceholder} ${title}`,
         disabled: this._config.disabled,
         html: this._config.html,
         indicator: this._config.indicator,
         loading: this._config.loading,
         sanitize: this._config.sanitize,
         sanitizeFn: this._config.sanitizeFn,
+        search: this._config.search,
+        searchPlaceholder: this._config.searchPlaceholder,
         selectionMode: 'multiple',
         typeahead: this._config.typeahead
       }) as ListBox,
+      name,
       options,
-      search: this._resolveSearch(element, options, title),
       selectAll: SelectorEngine.findOne(SELECTOR_SELECT_ALL, element),
       title
     }
@@ -365,25 +368,6 @@ class Transfer extends BaseComponent {
     return counter
   }
 
-  _resolveSearch(element: HTMLElement, options: HTMLElement, title: string): HTMLInputElement | null {
-    const existing = SelectorEngine.findOne(SELECTOR_SEARCH, element) as HTMLInputElement | null
-
-    if (existing || !this._config.search) {
-      return existing
-    }
-
-    const search = document.createElement('input')
-
-    search.type = 'search'
-    search.className = `form-control ${CLASS_NAME_SEARCH}`
-    search.setAttribute('data-coreui-transfer-search', '')
-    search.placeholder = this._config.searchPlaceholder
-    search.setAttribute('aria-label', `${this._config.searchPlaceholder} ${title}`)
-    options.before(search)
-
-    return search
-  }
-
   _decorateSide(side: TransferSide): void {
     if (!side.options.id) {
       side.options.id = getUID(`${NAME}-options-`)
@@ -395,14 +379,6 @@ class Transfer extends BaseComponent {
 
     if (side.selectAll && side.selectAll.textContent?.trim() === '') {
       side.selectAll.textContent = side.title
-    }
-
-    if (side.search) {
-      side.search.disabled = this._config.disabled
-
-      if (!side.search.hasAttribute('aria-label')) {
-        side.search.setAttribute('aria-label', `${this._config.searchPlaceholder} ${side.title}`)
-      }
     }
   }
 
@@ -605,21 +581,23 @@ class Transfer extends BaseComponent {
     return option.dataset.coreuiValue ?? option.textContent?.trim() ?? ''
   }
 
-  _optionText(option: HTMLElement): string {
-    const label = SelectorEngine.findOne(SELECTOR_OPTION_LABEL, option)
-    return (label ?? option).textContent?.trim().toLowerCase() ?? ''
+  _sideOf(element: HTMLElement): TransferSide | null {
+    const list = element.closest(SELECTOR_LIST) as HTMLElement | null
+
+    return list ? this._sides[list.dataset.coreuiTransferList as string] ?? null : null
   }
 
-  _filter(side: TransferSide): void {
-    if (!side.search || this._config.search === SEARCH_EXTERNAL) {
+  _reportSearch(event: Event): void {
+    const side = this._sideOf(event.target as HTMLElement)
+
+    if (!side) {
       return
     }
 
-    const query = side.search.value.trim().toLowerCase()
-
-    for (const option of this._options(side)) {
-      option.toggleAttribute('hidden', query !== '' && !this._optionText(option).includes(query))
-    }
+    EventHandler.trigger(this._element, this.constructor.eventName(EVENT_SEARCH), {
+      query: (event as CustomEvent & { query: string }).query,
+      side: side.name
+    })
   }
 
   _refresh(): void {
@@ -686,8 +664,6 @@ class Transfer extends BaseComponent {
     }
 
     to.listBox.clear()
-    this._filter(from)
-    this._filter(to)
     from.listBox.update()
     to.listBox.update()
     this._refresh()
@@ -732,26 +708,16 @@ class Transfer extends BaseComponent {
     })
 
     EventHandler.on(this._element, this.constructor.eventName(EVENT_INPUT), SELECTOR_SEARCH, (event: any) => {
-      const name = Object.keys(this._sides).find(key => this._sides[key].search === event.target)
+      const side = this._sideOf(event.target as HTMLElement)
 
-      if (!name) {
-        return
+      if (side) {
+        side.listBox.update()
+        this._refresh()
       }
-
-      if (this._config.search === SEARCH_EXTERNAL) {
-        EventHandler.trigger(this._element, this.constructor.eventName(EVENT_SEARCH), {
-          query: (event.target as HTMLInputElement).value,
-          side: name
-        })
-        return
-      }
-
-      this._filter(this._sides[name])
-      this._sides[name].listBox.update()
-      this._refresh()
     })
 
     this._element.addEventListener(EVENT_LIST_BOX_CHANGE, this._onListBoxChange)
+    this._element.addEventListener(EVENT_LIST_BOX_SEARCH, this._onListBoxSearch)
   }
 
   // Static

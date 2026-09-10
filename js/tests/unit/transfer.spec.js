@@ -18,7 +18,7 @@ describe('Transfer', () => {
 
   const setMarkup = (attrs = '', source = ['one', 'two', 'three'], target = ['four'], search = false) => {
     const searchInput = search ?
-      '<input class="form-control transfer-search" type="search" data-coreui-transfer-search>' :
+      '<input class="form-control list-box-search" type="search" data-coreui-list-box-search>' :
       ''
 
     fixtureEl.innerHTML = [
@@ -56,7 +56,7 @@ describe('Transfer', () => {
   const side = (el, name) => el.querySelector(`[data-coreui-transfer-list="${name}"]`)
   const moveButton = (el, name) => el.querySelector(`[data-coreui-transfer-move="${name}"]`)
   const counter = (el, name) => side(el, name).querySelector('[data-coreui-transfer-counter]')
-  const searchField = (el, name) => side(el, name).querySelector('[data-coreui-transfer-search]')
+  const searchField = (el, name) => side(el, name).querySelector('[data-coreui-list-box-search]')
   const option = (el, name, value) => side(el, name).querySelector(`[data-coreui-value="${value}"]`)
 
   const click = element => {
