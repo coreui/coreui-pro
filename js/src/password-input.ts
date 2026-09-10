@@ -24,6 +24,8 @@ const DATA_KEY = 'coreui.password-input'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
+const EVENT_CLICK = `click${EVENT_KEY}`
+
 const CLASS_NAME_ACTION = 'form-control-action'
 const CLASS_NAME_PASSWORD_INPUT = 'password-input'
 
@@ -94,7 +96,10 @@ class PasswordInput extends BaseComponent {
   }
 
   override dispose(): void {
-    this._toggleElement?.remove()
+    if (this._toggleElement) {
+      EventHandler.off(this._toggleElement, EVENT_KEY)
+      this._toggleElement.remove()
+    }
 
     if (this._group) {
       this._group.element.classList.remove(CLASS_NAME_PASSWORD_INPUT)
@@ -119,7 +124,7 @@ class PasswordInput extends BaseComponent {
       sanitizeIcon: (icon: string) => this._sanitizeIcon(icon)
     })
 
-    EventHandler.on(this._toggleElement, 'click', () => this.toggle())
+    EventHandler.on(this._toggleElement, EVENT_CLICK, () => this.toggle())
     this._group.element.append(this._toggleElement)
   }
 

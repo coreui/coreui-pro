@@ -287,6 +287,16 @@ describe('PasswordInput', () => {
       expect(toggle.getAttribute('aria-pressed')).toBe('false')
     })
 
+    it('should drop the button listener on dispose', () => {
+      const input = initialized('<input type="password" class="form-control" data-coreui-toggle="password-input">')
+      const toggle = fixtureEl.querySelector('.form-control-action')
+
+      PasswordInput.getInstance(input).dispose()
+      toggle.dispatchEvent(createEvent('click'))
+
+      expect(input.type).toBe('password')
+    })
+
     it('should disable its button for a disabled control', () => {
       initialized('<input type="password" class="form-control" disabled data-coreui-toggle="password-input">')
 
