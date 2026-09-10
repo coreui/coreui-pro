@@ -1148,18 +1148,25 @@ describe('ListBox', () => {
       expect(counter.textContent).toEqual('0/4 selected')
     })
 
-    it('should count against the options the search left', () => {
+    it('should count both sides against the visible, enabled options', () => {
       const el = setMarkup()
       const listBox = new ListBox(el, { counter: true, search: true, selectionMode: 'multiple' })
       const counter = el.querySelector('[data-coreui-list-box-counter]')
 
       listBox.select('tomato')
+      listBox.select('onion')
 
-      expect(counter.textContent).toEqual('1/4 selected')
+      expect(counter.textContent).toEqual('2/4 selected')
 
       type(searchField(el), 'on')
 
-      expect(counter.textContent).toEqual('0/1 selected')
+      expect(item(el, 'tomato').hasAttribute('hidden')).toBeTrue()
+      expect(counter.textContent).toEqual('1/1 selected')
+      expect(listBox.getSelected()).toEqual(['tomato', 'onion'])
+
+      type(searchField(el), 'ham')
+
+      expect(counter.textContent).toEqual('0/0 selected')
     })
 
     it('should follow the items it was given', () => {

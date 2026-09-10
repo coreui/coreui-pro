@@ -88,7 +88,7 @@ Leave an empty `.list-box-options` in each list so you can name it; the plugin a
 
 ## Search
 
-The search belongs to the list box — `search` and `searchPlaceholder` are passed to both of them, so each list gets its own field and filters itself; how it works, and how to bring your own input, is on the [List box](/components/list-box/#search) page. What the transfer adds is that a filtered list still counts: the [counter](/components/list-box/#counter) in the header drops what the search hid, the select-all button takes only what is left on screen, and "all" moves exactly that.
+The search belongs to the list box — `search` and `searchPlaceholder` are passed to both of them, so each list gets its own field and filters itself; how it works, and how to bring your own input, is on the [List box](/components/list-box/#search) page. What the transfer adds is that a filtered list still counts: the [counter](/components/list-box/#counter) in the header reads only what the search left — on both sides of the slash, so a selected value it hid stops counting without being deselected — the select-all button takes only what is left on screen, and "all" moves exactly that.
 
 <Example code={`<div class="transfer" data-coreui-toggle="transfer" data-coreui-search="true">
     <div class="list-box transfer-list" data-coreui-transfer-list="source">

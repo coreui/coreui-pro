@@ -198,7 +198,7 @@ The checkbox is a decorative `<span class="list-box-option-indicator check">`, n
 
 `counter` puts a `{selected}/{available} selected` readout in the header — the last child of `.list-box-header`, a `.list-box-subtitle` carrying `data-coreui-list-box-counter`. There is no header in the markup? One is created. Bring your own element with that attribute and the plugin writes into it wherever you put it.
 
-What it counts is what the user can actually act on: the options that are visible and enabled, which is the same scope the select-all button works on. Filter the list and the denominator drops with it; disable an option and it never appears in either number. `selectedCounterText` is the word after the count, so a translated list reads in its own language.
+Both numbers read the same set — the options that are visible and enabled, which is also what the select-all button works on — so the counter always describes what is on screen. Filter the list and the denominator drops with it, and a selected value the filter hid drops out of the numerator too: it stays selected, it just stops being counted, so `2/4` can become `1/1` without anything being deselected. A disabled option never appears in either number. `selectedCounterText` is the word after the count, so a translated list reads in its own language.
 
 <Example code={`<div class="list-box" data-coreui-toggle="list-box" data-coreui-counter="true" data-coreui-search="true" data-coreui-selection-mode="multiple" data-coreui-indicator="checkbox" style="max-width: 20rem">
     <div class="list-box-header">
