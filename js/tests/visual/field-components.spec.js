@@ -299,9 +299,9 @@ describe('multi select', () => {
     const ms = new MultiSelect(mountSelect(), { selectAll: true })
     ms.show()
 
-    // A real key press, so :focus-visible matches like it does for a user
-    ms._togglerElement.focus()
-    await userEvent.keyboard('{ArrowDown}')
+    // The button sits in the panel header, outside the listbox, so the arrows
+    // never reach it. `focusVisible` asks for the ring a keyboard user gets.
+    ms._selectAllElement.focus({ focusVisible: true })
 
     await shoot(popup(), 'multi-select-select-all-focus', { tolerant: true })
     ms.dispose()

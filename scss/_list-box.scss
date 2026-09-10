@@ -182,6 +182,32 @@ $list-box-tokens: defaults(
     text-transform: uppercase;
   }
 
+  .list-box-section-label[data-coreui-section-toggle] {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    column-gap: var(--#{$prefix}list-box-option-gap);
+    align-items: center;
+    padding-inline: var(--#{$prefix}list-box-option-padding-x);
+    cursor: pointer;
+    @include border-radius(var(--#{$prefix}list-box-option-border-radius), 0);
+
+    &:hover,
+    &.active {
+      background-color: var(--#{$prefix}list-box-option-hover-bg);
+    }
+
+    &:focus-visible {
+      z-index: 5;
+      @include focus-ring(true, var(--#{$prefix}list-box-focus-ring-color));
+    }
+
+    // The label runs at a reduced font-size; the indicator is sized in `em`,
+    // so it takes the list's font-size to match the option checkboxes.
+    > .list-box-option-indicator {
+      font-size: var(--#{$prefix}list-box-font-size);
+    }
+  }
+
   .list-box-option,
   .list-box-select-all {
     position: relative;
@@ -238,6 +264,7 @@ $list-box-tokens: defaults(
 
   .list-box[data-coreui-indicator="checkbox"] {
     .list-box-option,
+    .list-box-section-label[data-coreui-section-toggle],
     .list-box-select-all {
       grid-template-columns: auto minmax(0, 1fr);
     }

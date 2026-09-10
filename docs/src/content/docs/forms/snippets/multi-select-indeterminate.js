@@ -23,6 +23,5 @@ new coreui.MultiSelect(myMultiSelectIndeterminate, {
   ],
   placeholder: 'Select frameworks',
   search: true,
-  selectAllStyle: 'checkbox',
   selectionType: 'counter'
 })

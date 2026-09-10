@@ -7,6 +7,7 @@ otherFrameworks:
 ---
 
 import listBoxExternalSearch from './snippets/list-box-external-search.js?raw'
+import listBoxFilter from './snippets/list-box-filter.js?raw'
 import listBoxInput from './snippets/list-box-input.js?raw'
 import listBoxItems from './snippets/list-box-items.js?raw'
 import listBoxRemote from './snippets/list-box-remote.js?raw'
@@ -176,6 +177,28 @@ The field is a `.form-control.list-box-search` carrying `data-coreui-list-box-se
 
 <Code code={listBoxExternalSearch} lang="js" />
 
+## Filtering from your own field
+
+The built-in search field is not the only way in. `filter(query)` runs the same text filter from wherever you like — a field elsewhere on the page, a chip bar, a URL parameter — and everything downstream follows it: the arrows skip what is hidden, a section left without a match is hidden with its label, the select-all button takes only what is on screen, and the empty state appears when nothing is left. `filter(null)` clears it and shows every option again. The selection is untouched throughout: filter a selected value out and it stays selected, it just leaves the list.
+
+<Example code={`<label for="listBoxOwnField" class="form-label">Fruit</label>
+  <input type="search" class="form-control mb-2" id="listBoxOwnField" autocomplete="off" style="max-width: 20rem">
+  <div class="list-box" id="listBoxOwnFieldList" style="max-width: 20rem">
+    <div class="list-box-header">
+      <button type="button" class="list-box-select-all" data-coreui-select-all>Select all</button>
+    </div>
+    <div class="list-box-options" role="listbox" aria-label="Fruit">
+      <div class="list-box-option" data-coreui-value="apple">Apple</div>
+      <div class="list-box-option" data-coreui-value="apricot">Apricot</div>
+      <div class="list-box-option" data-coreui-value="banana">Banana</div>
+      <div class="list-box-option" data-coreui-value="cherry">Cherry</div>
+      <div class="list-box-empty">No fruit matches</div>
+    </div>
+  </div>
+  <button type="button" class="btn btn-secondary mt-2" id="listBoxOwnFieldReset">Clear the filter</button>`} sandboxJs={listBoxFilter} />
+
+<Code code={listBoxFilter} lang="js" />
+
 ## Checkboxes
 
 Nothing marks the selection on its own — `aria-selected` and the `.selected` background carry it. Set `indicator: 'checkbox'` and the plugin puts a checkbox in front of every option and keeps it in step with the selection.
@@ -227,6 +250,25 @@ Group options in a `.list-box-section` and name it with a `.list-box-section-lab
       </div>
       <div class="list-box-section" aria-labelledby="listBoxProtein">
         <div class="list-box-section-label" id="listBoxProtein">Protein</div>
+        <div class="list-box-option" data-coreui-value="ham">Ham</div>
+        <div class="list-box-option" data-coreui-value="tuna">Tuna</div>
+      </div>
+    </div>
+  </div>`} />
+
+### Selectable sections
+
+`sectionsSelectable` turns every section label into a tri-state button that toggles its own section: `aria-pressed` reads `false`, `mixed` or `true`, and with `indicator: 'checkbox'` the label carries the same checkbox as the options. It works in `multiple` mode and covers the section's visible, enabled options only, so a filtered list toggles what is on screen; `selectionLimit` still applies. The labels join the arrow-key order in document position, so <kbd>↓</kbd> walks label, options, next label.
+
+<Example code={`<div class="list-box" data-coreui-toggle="list-box" data-coreui-selection-mode="multiple" data-coreui-sections-selectable="true" data-coreui-indicator="checkbox" style="max-width: 20rem">
+    <div class="list-box-options" role="listbox" aria-label="Sandwich">
+      <div class="list-box-section" aria-labelledby="listBoxSelectableVeggies">
+        <div class="list-box-section-label" id="listBoxSelectableVeggies">Veggies</div>
+        <div class="list-box-option" data-coreui-value="lettuce">Lettuce</div>
+        <div class="list-box-option" data-coreui-value="tomato">Tomato</div>
+      </div>
+      <div class="list-box-section" aria-labelledby="listBoxSelectableProtein">
+        <div class="list-box-section-label" id="listBoxSelectableProtein">Protein</div>
         <div class="list-box-option" data-coreui-value="ham">Ham</div>
         <div class="list-box-option" data-coreui-value="tuna">Tuna</div>
       </div>
@@ -309,7 +351,7 @@ A `.list-box-empty` element inside the options is shown whenever nothing is left
 
 ## With an input
 
-Pass `activeDescendant` an input and the focus never leaves it: the plugin drops the roving `tabindex`, gives every option an `id`, and keeps `aria-activedescendant` and `aria-controls` on the field pointing at the highlighted option and at `.list-box-options`. The arrows, <kbd>Home</kbd>, <kbd>End</kbd>, <kbd>Space</kbd> and <kbd>Enter</kbd> are handled on the field, so typing and choosing happen in one place — a combobox in two elements. Hiding an option with `hidden` takes it out of the navigation and leaves the selection alone.
+Pass `activeDescendant` an input and the focus never leaves it: the plugin drops the roving `tabindex`, gives every option an `id`, and keeps `aria-activedescendant` and `aria-controls` on the field pointing at the highlighted option and at `.list-box-options`. The arrows and <kbd>Enter</kbd> are handled on the field, so typing and choosing happen in one place — a combobox in two elements. A text field keeps <kbd>Home</kbd>, <kbd>End</kbd> and the space bar for its own text; give `activeDescendant` a non-text element (a button, a `tabindex` div) and those select instead. Hiding an option with `hidden`, or calling `filter()`, takes it out of the navigation and leaves the selection alone.
 
 <Example code={`<label for="listBoxField" class="form-label">Filter</label>
   <input type="text" class="form-control mb-2" id="listBoxField" role="combobox" aria-expanded="true" autocomplete="off" style="max-width: 20rem">
@@ -334,8 +376,8 @@ The option's checkbox indicator is decorative — it is a `<span>` marked `aria-
 | Key | Action |
 | --- | --- |
 | `↓` / `↑` | Move the highlight to the next/previous option; it stops at the ends |
-| `Home` / `End` | Move the highlight to the first/last option |
-| `Space` | Toggle the option in `multiple` mode, select it in `single` |
+| `Home` / `End` | Move the highlight to the first/last option; a text `activeDescendant` field keeps them for the caret |
+| `Space` | Toggle the option in `multiple` mode, select it in `single`; a text `activeDescendant` field keeps it for typing |
 | `Enter` | Select the option; on a link, follow it; in `none` mode, fire `action` |
 | `Shift` + `↓` / `↑` | Extend the selection to the next/previous option |
 | `Shift` + `Home` / `End` | Extend the selection to the first/last option |
@@ -397,6 +439,7 @@ const listBox = new coreui.ListBox('#myListBox', {
 | `sanitizeFn` | null, function | `null` | Sanitization function of your own, used instead of the built-in one. |
 | `search` | boolean, string | `false` | Builds a search field above the options. `true` filters the list itself; `'external'` filters nothing and fires `search.coreui.list-box` instead. An input the markup already carries is used either way. |
 | `searchPlaceholder` | string | `'Search'` | Placeholder of the built search field. |
+| `sectionsSelectable` | boolean | `false` | Turns every section label into a tri-state button (`aria-pressed`) that toggles the section's visible, enabled options, and puts it in the arrow-key order. `multiple` mode only. |
 | `selected` | null, string, array | `null` | Initially selected values. In `single` mode only the first one is taken. |
 | `selectedCounterText` | string | `'selected'` | The word after the count in the header. |
 | `selectionLimit` | null, number | `null` | How many options can be selected at once in `multiple` mode. Further selections are refused and reported through `selectionLimit.coreui.list-box`; nothing is disabled and deselecting always works. |
@@ -412,6 +455,7 @@ const listBox = new coreui.ListBox('#myListBox', {
 | `toggle(value)` | Selects the value, or deselects it when it is already selected. |
 | `selectAll(values?)` | Selects every visible, enabled option (`multiple` mode). Pass an array of values to select exactly those instead, filter or no filter. |
 | `clear()` | Empties the selection. |
+| `filter(query)` | Hides the options that do not contain `query`, and a section left without a match with them. `null` clears the filter. The selection is untouched. |
 | `getSelected()` | The selected values, in selection order. |
 | `setActive(value)` | Moves the highlight without taking the focus. |
 | `getActive()` | The highlighted value, or `null`. |

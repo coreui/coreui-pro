@@ -100,6 +100,7 @@ describe('ListBox', () => {
         sanitizeFn: null,
         search: false,
         searchPlaceholder: 'Search',
+        sectionsSelectable: false,
         selected: null,
         selectedCounterText: 'selected',
         selectionLimit: null,
@@ -798,8 +799,31 @@ describe('ListBox', () => {
       expect(field.getAttribute('aria-activedescendant')).toEqual(item(el, 'lettuce').id)
       expect(document.activeElement).toEqual(field)
 
-      keydown(field, ' ')
+      keydown(field, 'Enter')
       expect(listBox.getSelected()).toEqual(['lettuce'])
+    })
+
+    it('should leave the space bar and Home/End to a text field', () => {
+      fixtureEl.innerHTML = [
+        '<input type="text" id="field">',
+        '<div class="list-box">',
+        '<div class="list-box-option" data-coreui-value="lettuce">Lettuce</div>',
+        '<div class="list-box-option" data-coreui-value="tomato">Tomato</div>',
+        '</div>'
+      ].join('')
+
+      const field = fixtureEl.querySelector('#field')
+      const el = fixtureEl.querySelector('.list-box')
+      const listBox = new ListBox(el, { activeDescendant: '#field' })
+
+      field.focus()
+      keydown(field, 'ArrowDown')
+
+      keydown(field, ' ')
+      expect(listBox.getSelected()).toEqual([])
+
+      keydown(field, 'End')
+      expect(listBox.getActive()).toEqual('lettuce')
     })
   })
 
@@ -1279,6 +1303,177 @@ describe('ListBox', () => {
       new ListBox(el, { disabled: true, search: true })
 
       expect(searchField(el).disabled).toBeTrue()
+    })
+  })
+
+  describe('filter', () => {
+    const sectionsMarkup = [
+      '<div class="list-box-section">',
+      '<div class="list-box-section-label">Veggies</div>',
+      '<div class="list-box-option" data-coreui-value="lettuce">Lettuce</div>',
+      '<div class="list-box-option" data-coreui-value="tomato">Tomato</div>',
+      '</div>',
+      '<div class="list-box-section">',
+      '<div class="list-box-section-label">Meat</div>',
+      '<div class="list-box-option" data-coreui-value="ham">Ham</div>',
+      '</div>'
+    ]
+
+    it('should hide the options that do not match the query', () => {
+      const el = setMarkup()
+      const listBox = new ListBox(el)
+
+      listBox.filter('TO')
+
+      expect(item(el, 'tomato').hasAttribute('hidden')).toBeFalse()
+      expect(item(el, 'lettuce').hasAttribute('hidden')).toBeTrue()
+    })
+
+    it('should show every option again when the query is null', () => {
+      const el = setMarkup()
+      const listBox = new ListBox(el)
+
+      listBox.filter('to')
+      listBox.filter(null)
+
+      expect(item(el, 'lettuce').hasAttribute('hidden')).toBeFalse()
+      expect(item(el, 'tomato').hasAttribute('hidden')).toBeFalse()
+    })
+
+    it('should hide a section left without a matching option', () => {
+      const el = setMarkup('', sectionsMarkup)
+      const listBox = new ListBox(el)
+
+      listBox.filter('ham')
+
+      expect(el.querySelectorAll('.list-box-section')[0].hasAttribute('hidden')).toBeTrue()
+      expect(el.querySelectorAll('.list-box-section')[1].hasAttribute('hidden')).toBeFalse()
+    })
+
+    it('should show the empty state and narrow the select all scope', () => {
+      const el = setMarkup('', [
+        ...sectionsMarkup,
+        '<div class="list-box-empty" hidden>No results</div>'
+      ], selectAllMarkup)
+      const listBox = new ListBox(el, { selectionMode: 'multiple' })
+
+      listBox.filter('ham')
+      listBox.selectAll()
+
+      expect(listBox.getSelected()).toEqual(['ham'])
+      expect(el.querySelector('.list-box-empty').hasAttribute('hidden')).toBeTrue()
+
+      listBox.filter('zzz')
+
+      expect(el.querySelector('.list-box-empty').hasAttribute('hidden')).toBeFalse()
+    })
+
+    it('should keep a hidden option out of the keyboard navigation', () => {
+      const el = setMarkup()
+      const listBox = new ListBox(el)
+
+      listBox.filter('to')
+      keydown(list(el), 'ArrowDown')
+
+      expect(listBox.getActive()).toEqual('tomato')
+    })
+  })
+
+  describe('sectionsSelectable', () => {
+    const setSections = (attrs = '') => setMarkup(attrs, [
+      '<div class="list-box-section">',
+      '<div class="list-box-section-label">Veggies</div>',
+      '<div class="list-box-option" data-coreui-value="lettuce">Lettuce</div>',
+      '<div class="list-box-option" data-coreui-value="tomato">Tomato</div>',
+      '</div>',
+      '<div class="list-box-section">',
+      '<div class="list-box-section-label">Meat</div>',
+      '<div class="list-box-option" data-coreui-value="ham">Ham</div>',
+      '</div>'
+    ])
+
+    const label = (element, index) => element.querySelectorAll('.list-box-section-label')[index]
+
+    it('should turn the section label into a tri-state button', () => {
+      const el = setSections()
+      const listBox = new ListBox(el, { selectionMode: 'multiple', sectionsSelectable: true })
+
+      expect(label(el, 0).getAttribute('role')).toEqual('button')
+      expect(label(el, 0).getAttribute('aria-pressed')).toEqual('false')
+
+      listBox.select('lettuce')
+      expect(label(el, 0).getAttribute('aria-pressed')).toEqual('mixed')
+      expect(label(el, 0).classList.contains('indeterminate')).toBeTrue()
+
+      listBox.select('tomato')
+      expect(label(el, 0).getAttribute('aria-pressed')).toEqual('true')
+      expect(label(el, 0).classList.contains('selected')).toBeTrue()
+    })
+
+    it('should toggle the visible options of its own section', () => {
+      const el = setSections()
+      const listBox = new ListBox(el, { selectionMode: 'multiple', sectionsSelectable: true })
+
+      click(label(el, 0))
+      expect(listBox.getSelected()).toEqual(['lettuce', 'tomato'])
+
+      click(label(el, 0))
+      expect(listBox.getSelected()).toEqual([])
+    })
+
+    it('should leave a filtered out option alone', () => {
+      const el = setSections()
+      const listBox = new ListBox(el, { selectionMode: 'multiple', sectionsSelectable: true })
+
+      listBox.filter('lettuce')
+      click(label(el, 0))
+
+      expect(listBox.getSelected()).toEqual(['lettuce'])
+    })
+
+    it('should sit in the arrow key order', () => {
+      const el = setSections()
+      const listBox = new ListBox(el, { selectionMode: 'multiple', sectionsSelectable: true })
+
+      keydown(list(el), 'ArrowDown')
+      expect(listBox.getActive()).toEqual(label(el, 0).id)
+
+      keydown(list(el), 'ArrowDown')
+      expect(listBox.getActive()).toEqual('lettuce')
+
+      keydown(list(el), 'End')
+      expect(listBox.getActive()).toEqual('ham')
+    })
+
+    it('should toggle the section from the keyboard', () => {
+      const el = setSections()
+      const listBox = new ListBox(el, { selectionMode: 'multiple', sectionsSelectable: true })
+
+      keydown(list(el), 'ArrowDown')
+      keydown(list(el), ' ')
+
+      expect(listBox.getSelected()).toEqual(['lettuce', 'tomato'])
+    })
+
+    it('should stop at the selection limit', () => {
+      const el = setSections()
+      const listBox = new ListBox(el, { selectionLimit: 1, selectionMode: 'multiple', sectionsSelectable: true })
+      const spy = jasmine.createSpy('selectionLimit')
+
+      el.addEventListener('selectionLimit.coreui.list-box', spy)
+      click(label(el, 0))
+
+      expect(listBox.getSelected()).toEqual(['lettuce'])
+      expect(spy).toHaveBeenCalled()
+    })
+
+    it('should leave the section labels alone when it is off', () => {
+      const el = setSections()
+      // eslint-disable-next-line no-new
+      new ListBox(el, { selectionMode: 'multiple' })
+
+      expect(label(el, 0).getAttribute('role')).toBeNull()
+      expect(label(el, 0).hasAttribute('data-coreui-section-toggle')).toBeFalse()
     })
   })
 

@@ -4,13 +4,7 @@ const listBox = coreui.ListBox.getOrCreateInstance(element, { activeDescendant: 
 const output = document.getElementById('listBoxFieldOutput')
 
 field.addEventListener('input', () => {
-  const query = field.value.trim().toLowerCase()
-
-  for (const option of element.querySelectorAll('.list-box-option')) {
-    option.toggleAttribute('hidden', !option.textContent.toLowerCase().includes(query))
-  }
-
-  listBox.update()
+  listBox.filter(field.value)
 })
 
 element.addEventListener('change.coreui.list-box', event => {

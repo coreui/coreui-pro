@@ -27,7 +27,6 @@ const DATA_KEY = 'coreui.autocomplete'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
-const ARROW_DOWN_KEY = 'ArrowDown'
 const BACKSPACE_KEY = 'Backspace'
 const DELETE_KEY = 'Delete'
 const ENTER_KEY = 'Enter'
@@ -189,6 +188,7 @@ class Autocomplete extends Combobox {
 
   override dispose(): void {
     this._disposeFloating()
+    this._disposeListBox()
 
     for (const element of [
       this._menu,
@@ -234,8 +234,7 @@ class Autocomplete extends Combobox {
 
     this._config = { ...this._config, ...this._configAfterMerge(config) }
     this._options = this._getOptionsFromConfig()
-    this._optionsElement.innerHTML = ''
-    this._createOptions(this._optionsElement, this._options)
+    this._setListBoxItems()
   }
 
   deselectAll(options: any[] = this._selected): void {
@@ -353,12 +352,15 @@ class Autocomplete extends Combobox {
     })
 
     EventHandler.on(this._inputElement, EVENT_KEYDOWN, (event: any) => {
-      if (!this._isShown() && event.key !== TAB_KEY) {
+      // The list activated its highlighted option and closed the panel; the
+      // same press must not reopen it or match the value it just wrote.
+      const handledByList = event.key === ENTER_KEY && event.defaultPrevented
+
+      if (!handledByList && !this._isShown() && event.key !== TAB_KEY) {
         this.show()
       }
 
-      if (event.key === ARROW_DOWN_KEY && this._inputElement.value.length === this._inputElement.selectionStart) {
-        this._selectMenuItem(event)
+      if (handledByList) {
         return
       }
 
@@ -425,12 +427,6 @@ class Autocomplete extends Combobox {
       event.preventDefault()
     })
 
-    EventHandler.on(this._optionsElement, EVENT_CLICK, (event: any) => {
-      event.preventDefault()
-      event.stopPropagation()
-      this._onOptionsClick(event.target)
-    })
-
     EventHandler.on(this._cleanerElement, EVENT_CLICK, (event: any) => {
       if (!this._config.disabled) {
         event.preventDefault()
@@ -446,8 +442,6 @@ class Autocomplete extends Combobox {
         this.clear()
       }
     })
-
-    this._addOptionsKeydownListeners()
   }
 
   _getOptionsFromConfig(options: any = this._config.options): any[] {
@@ -616,27 +610,11 @@ class Autocomplete extends Combobox {
     }
   }
 
-  override _decorateOption(optionDiv: HTMLElement, option: any): void {
-    if (option.disabled) {
-      optionDiv.setAttribute('aria-disabled', 'true')
-    }
+  override _getActiveDescendantField(): HTMLElement {
+    return this._inputElement
   }
 
-  override _isOptionSelectedInitially(option: any): boolean {
-    return this._selected.some((selected: any) => selected.value === option.value)
-  }
-
-  override _renderOptionContent(optionDiv: HTMLElement, option: any): void {
-    if (this._isExternalSearch() && this._config.highlightOptionsOnSearch && this._search) {
-      optionDiv.innerHTML = this._highlightOption(option.label)
-    } else if (this._config.optionsTemplate && typeof this._config.optionsTemplate === 'function') {
-      optionDiv.innerHTML = this._maybeSanitize(this._config.optionsTemplate(option))
-    } else {
-      optionDiv.textContent = option.label
-    }
-  }
-
-  override _onOptionActivate(value: string, element: HTMLElement): void { // eslint-disable-line @typescript-eslint/no-unused-vars
+  override _onOptionSelected(value: string): void {
     const foundOption = this._findOptionByValue(value)
 
     if (foundOption) {
@@ -703,19 +681,20 @@ class Autocomplete extends Combobox {
     }
   }
 
-  override _decorateFilteredOption(option: HTMLElement): void {
-    if (this._config.highlightOptionsOnSearch && !this._config.optionsTemplate) {
+  override _afterOptionsRendered(): void {
+    if (!this._config.highlightOptionsOnSearch || this._config.optionsTemplate) {
+      return
+    }
+
+    for (const option of this._getDisplayedOptions()) {
       option.innerHTML = this._highlightOption(option.textContent!)
     }
   }
 
   override _afterFilter(visibleOptions: number): void {
-    if (visibleOptions > 0 || this._config.searchNoResultsLabel) {
-      this._syncNoResultsPlaceholder(visibleOptions)
-      return
+    if (visibleOptions === 0 && !this._config.searchNoResultsLabel) {
+      this.hide()
     }
-
-    this.hide()
   }
 
   override _configAfterMerge(config: any): any {

@@ -25,6 +25,8 @@ const tailModules = ['helpers', 'utilities/api']
 const renders = {
   autocomplete: ['combobox', 'forms/form-control', 'forms/form-control-group'],
   'chip-set': ['chip', 'helpers/visually-hidden'],
+  combobox: ['popup', 'list-box'],
+  'forms/form-multi-select': ['combobox', 'chip', 'chip-set', 'forms/form-control-group'],
   'list-box': ['forms/check', 'forms/form-control'],
   'loading-button': ['buttons', 'spinner'],
   'date-picker': ['forms/floating-labels', 'forms/form-control', 'forms/form-control-group', 'forms/form-date-time', 'popup'],

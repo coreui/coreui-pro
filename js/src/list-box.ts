@@ -80,9 +80,12 @@ const SELECTOR_OPTION_LABEL = '.list-box-option-label'
 const SELECTOR_OPTIONS = '.list-box-options'
 const SELECTOR_SEARCH = '[data-coreui-list-box-search]'
 const SELECTOR_SECTION = '.list-box-section'
+const SELECTOR_SECTION_LABEL = '.list-box-section-label'
+const SELECTOR_SECTION_TOGGLE = '[data-coreui-section-toggle]'
 const SELECTOR_SELECT_ALL = '[data-coreui-select-all]'
 
 const ATTRIBUTE_INDICATOR = 'data-coreui-indicator'
+const ATTRIBUTE_SECTION_TOGGLE = 'data-coreui-section-toggle'
 
 const INDICATOR_CHECKBOX = 'checkbox'
 
@@ -121,6 +124,7 @@ type ListBoxConfig = {
   sanitizeFn: ((unsafeHtml: string) => string) | null
   search: boolean | string
   searchPlaceholder: string
+  sectionsSelectable: boolean
   selected: string | string[] | null
   selectedCounterText: string
   selectionLimit: number | null
@@ -142,6 +146,7 @@ const Default: ListBoxConfig = {
   sanitizeFn: null,
   search: false,
   searchPlaceholder: 'Search',
+  sectionsSelectable: false,
   selected: null,
   selectedCounterText: 'selected',
   selectionLimit: null,
@@ -163,6 +168,7 @@ const DefaultType: Record<string, string> = {
   sanitizeFn: '(null|function)',
   search: '(boolean|string)',
   searchPlaceholder: 'string',
+  sectionsSelectable: 'boolean',
   selected: '(string|array|null)',
   selectedCounterText: 'string',
   selectionLimit: '(null|number)',
@@ -183,6 +189,7 @@ class ListBox extends BaseComponent {
   protected declare _focused: boolean
   protected declare _limited: string | null
   protected declare _list: HTMLElement
+  protected declare _query: string | null
   protected declare _search: string
   protected declare _searchField: HTMLInputElement | null
   protected declare _searchTimeout: ReturnType<typeof setTimeout> | null
@@ -200,6 +207,7 @@ class ListBox extends BaseComponent {
     this._limited = null
     this._list = this._resolveList()
     this._counter = this._resolveCounter()
+    this._query = null
     this._search = ''
     this._searchField = this._resolveSearch()
     this._searchTimeout = null
@@ -318,6 +326,18 @@ class ListBox extends BaseComponent {
     this.update()
   }
 
+  filter(query: string | null): void {
+    this._query = query === null ? null : query.trim().toLowerCase()
+
+    if (this._query === null) {
+      for (const element of [...this._allOptions(), ...SelectorEngine.find(SELECTOR_SECTION, this._list)]) {
+        element.removeAttribute('hidden')
+      }
+    }
+
+    this.update()
+  }
+
   setActive(value: string | null): void {
     this._setActive(value, false)
   }
@@ -347,7 +367,48 @@ class ListBox extends BaseComponent {
 
     this._decorateSearch()
     this._filter()
+    this._updateListAttributes()
 
+    for (const section of SelectorEngine.find(SELECTOR_SECTION, this._list)) {
+      if (!section.hasAttribute('role')) {
+        section.setAttribute('role', 'group')
+      }
+
+      this._decorateSection(section)
+    }
+
+    if (this._active !== null && !this._navigable().some(element => this._optionValue(element) === this._active)) {
+      this._active = null
+    }
+
+    this._updateOptions()
+    this._updateSections()
+    this._updateSelectAll()
+    this._updateCounter()
+    this._updateActiveDescendant()
+  }
+
+  override dispose(): void {
+    if (this._searchTimeout) {
+      clearTimeout(this._searchTimeout)
+    }
+
+    this._element.removeAttribute(ATTRIBUTE_INDICATOR)
+    this._element.classList.remove(CLASS_NAME_LOADING)
+
+    EventHandler.off(this._list, EVENT_KEY)
+
+    if (this._field) {
+      EventHandler.off(this._field, EVENT_KEY)
+      this._field.removeAttribute('aria-activedescendant')
+      this._field.removeAttribute('aria-controls')
+    }
+
+    super.dispose()
+  }
+
+  // Private
+  _updateListAttributes(): void {
     if (this._config.indicator === INDICATOR_CHECKBOX) {
       this._element.setAttribute(ATTRIBUTE_INDICATOR, INDICATOR_CHECKBOX)
     }
@@ -371,17 +432,9 @@ class ListBox extends BaseComponent {
     } else {
       this._list.removeAttribute('aria-busy')
     }
+  }
 
-    for (const section of SelectorEngine.find(SELECTOR_SECTION, this._list)) {
-      if (!section.hasAttribute('role')) {
-        section.setAttribute('role', 'group')
-      }
-    }
-
-    if (this._active !== null && !this._navigableOptions().some(option => this._optionValue(option) === this._active)) {
-      this._active = null
-    }
-
+  _updateOptions(): void {
     const navigable = this._navigableOptions()
     const roving = this._active === null && !this._field ? navigable[0] : null
 
@@ -417,32 +470,8 @@ class ListBox extends BaseComponent {
     if (empty) {
       empty.toggleAttribute('hidden', this._config.loading || navigable.length > 0)
     }
-
-    this._updateSelectAll()
-    this._updateCounter()
-    this._updateActiveDescendant()
   }
 
-  override dispose(): void {
-    if (this._searchTimeout) {
-      clearTimeout(this._searchTimeout)
-    }
-
-    this._element.removeAttribute(ATTRIBUTE_INDICATOR)
-    this._element.classList.remove(CLASS_NAME_LOADING)
-
-    EventHandler.off(this._list, EVENT_KEY)
-
-    if (this._field) {
-      EventHandler.off(this._field, EVENT_KEY)
-      this._field.removeAttribute('aria-activedescendant')
-      this._field.removeAttribute('aria-controls')
-    }
-
-    super.dispose()
-  }
-
-  // Private
   _resolveCounter(): HTMLElement | null {
     const existing = SelectorEngine.findOne(SELECTOR_COUNTER, this._element) as HTMLElement | null
 
@@ -524,14 +553,18 @@ class ListBox extends BaseComponent {
   }
 
   _filter(): void {
-    if (!this._searchField || this._config.search === SEARCH_EXTERNAL) {
+    if (this._query === null && (!this._searchField || this._config.search === SEARCH_EXTERNAL)) {
       return
     }
 
-    const query = this._searchField.value.trim().toLowerCase()
+    const query = this._query ?? this._searchField!.value.trim().toLowerCase()
 
     for (const option of this._allOptions()) {
       option.toggleAttribute('hidden', query !== '' && !this._optionText(option).includes(query))
+    }
+
+    for (const section of SelectorEngine.find(SELECTOR_SECTION, this._list)) {
+      section.toggleAttribute('hidden', SelectorEngine.find(SELECTOR_OPTION, section).every(option => option.hasAttribute('hidden')))
     }
   }
 
@@ -684,6 +717,91 @@ class ListBox extends BaseComponent {
     return this._allOptions().filter(option => !this._isHidden(option) && !this._isDisabled(option))
   }
 
+  _navigable(): HTMLElement[] {
+    if (!this._sectionsSelectable()) {
+      return this._navigableOptions()
+    }
+
+    return SelectorEngine.find(`${SELECTOR_OPTION}, ${SELECTOR_SECTION_TOGGLE}`, this._list)
+      .filter(element => !this._isHidden(element) && !this._isDisabled(element))
+  }
+
+  _sectionsSelectable(): boolean {
+    return this._config.sectionsSelectable && this._config.selectionMode === SELECTION_MODE_MULTIPLE
+  }
+
+  _isSectionToggle(element: HTMLElement): boolean {
+    return element.hasAttribute(ATTRIBUTE_SECTION_TOGGLE)
+  }
+
+  _sectionOptions(section: HTMLElement): HTMLElement[] {
+    return SelectorEngine.find(SELECTOR_OPTION, section).filter(option => !this._isHidden(option) && !this._isDisabled(option))
+  }
+
+  _decorateSection(section: HTMLElement): void {
+    const label = SelectorEngine.findOne(SELECTOR_SECTION_LABEL, section) as HTMLElement | null
+
+    if (!label || !this._sectionsSelectable()) {
+      return
+    }
+
+    if (!label.id) {
+      label.id = getUID(`${NAME}-section-`)
+    }
+
+    label.setAttribute(ATTRIBUTE_SECTION_TOGGLE, '')
+    label.setAttribute('role', 'button')
+    label.dataset.coreuiValue = label.id
+    this._decorateOption(label)
+  }
+
+  _updateSections(): void {
+    if (!this._sectionsSelectable()) {
+      return
+    }
+
+    for (const label of SelectorEngine.find(SELECTOR_SECTION_TOGGLE, this._list)) {
+      const options = this._sectionOptions(label.closest(SELECTOR_SECTION) as HTMLElement)
+      const selected = options.filter(option => this._selected.has(this._optionValue(option))).length
+      const all = options.length > 0 && selected >= options.length
+      const some = selected > 0
+
+      label.setAttribute('aria-pressed', all ? 'true' : (some ? 'mixed' : 'false'))
+      label.classList.toggle(CLASS_NAME_SELECTED, all)
+      label.classList.toggle(CLASS_NAME_INDETERMINATE, !all && some)
+      label.classList.toggle(CLASS_NAME_ACTIVE, this._optionValue(label) === this._active && (this._focused || Boolean(this._field)))
+
+      if (this._field) {
+        label.removeAttribute('tabindex')
+        continue
+      }
+
+      label.setAttribute('tabindex', this._optionValue(label) === this._active ? '0' : '-1')
+    }
+  }
+
+  _toggleSection(section: HTMLElement | null): void {
+    if (!section || !this._sectionsSelectable()) {
+      return
+    }
+
+    const values = this._sectionOptions(section).map(option => this._optionValue(option))
+    const all = values.length > 0 && values.every(value => this._selected.has(value))
+    let changed = false
+
+    this._limited = null
+
+    for (const value of values) {
+      changed = (all ? this._deselectValue(value) : this._selectValue(value)) || changed
+    }
+
+    if (changed) {
+      this._triggerChange()
+    }
+
+    this._reportLimit()
+  }
+
   _isHidden(option: HTMLElement): boolean {
     return option.hasAttribute('hidden') || option.closest('[hidden]') !== null
   }
@@ -694,6 +812,10 @@ class ListBox extends BaseComponent {
 
   _isLink(option: HTMLElement): boolean {
     return option.tagName === 'A' && option.hasAttribute('href')
+  }
+
+  _fieldTakesText(): boolean {
+    return this._field instanceof HTMLInputElement || this._field instanceof HTMLTextAreaElement
   }
 
   _optionValue(option: HTMLElement): string {
@@ -709,8 +831,12 @@ class ListBox extends BaseComponent {
     return this._allOptions().find(option => this._optionValue(option) === value)
   }
 
+  _findNavigable(value: string): HTMLElement | undefined {
+    return this._navigable().find(element => this._optionValue(element) === value)
+  }
+
   _activeOption(): HTMLElement | null {
-    return this._active === null ? null : (this._findOption(this._active) ?? null)
+    return this._active === null ? null : (this._findNavigable(this._active) ?? null)
   }
 
   _decorateOption(option: HTMLElement): void {
@@ -924,7 +1050,7 @@ class ListBox extends BaseComponent {
   }
 
   _move(forward: boolean): void {
-    const options = this._navigableOptions()
+    const options = this._navigable()
 
     if (options.length === 0) {
       return
@@ -937,7 +1063,7 @@ class ListBox extends BaseComponent {
   }
 
   _moveToEdge(index: number): void {
-    const option = this._navigableOptions().at(index)
+    const option = this._navigable().at(index)
 
     if (option) {
       this._setActive(this._optionValue(option), true)
@@ -946,6 +1072,11 @@ class ListBox extends BaseComponent {
 
   _activate(option: HTMLElement): void {
     const value = this._optionValue(option)
+
+    if (this._isSectionToggle(option)) {
+      this._toggleSection(option.closest(SELECTOR_SECTION) as HTMLElement)
+      return
+    }
 
     if (this._config.selectionMode === SELECTION_MODE_NONE || this._isLink(option)) {
       EventHandler.trigger(this._element, this.constructor.eventName(EVENT_ACTION), { value, relatedTarget: option })
@@ -1013,9 +1144,19 @@ class ListBox extends BaseComponent {
 
       this.update()
     })
-    EventHandler.on(this._element, this.constructor.eventName(EVENT_FOCUSIN), SELECTOR_OPTION, (event: any) => {
+    EventHandler.on(this._element, this.constructor.eventName(EVENT_CLICK), SELECTOR_SECTION_TOGGLE, (event: any) => {
+      const label = (event.target as HTMLElement).closest(SELECTOR_SECTION_TOGGLE) as HTMLElement | null
+
+      if (!label || this._config.disabled) {
+        return
+      }
+
+      this._setActive(this._optionValue(label), !this._field)
+      this._toggleSection(label.closest(SELECTOR_SECTION) as HTMLElement)
+    })
+    EventHandler.on(this._element, this.constructor.eventName(EVENT_FOCUSIN), `${SELECTOR_OPTION}, ${SELECTOR_SECTION_TOGGLE}`, (event: any) => {
       if (!this._config.disabled && !this._field) {
-        this._setActive(this._optionValue(event.target.closest(SELECTOR_OPTION)), false)
+        this._setActive(this._optionValue(event.target.closest(`${SELECTOR_OPTION}, ${SELECTOR_SECTION_TOGGLE}`)), false)
       }
     })
 
@@ -1079,12 +1220,20 @@ class ListBox extends BaseComponent {
     }
 
     if (key === HOME_KEY || key === END_KEY) {
+      if (this._fieldTakesText()) {
+        return
+      }
+
       event.preventDefault()
       this._handleEdgeKey(key === HOME_KEY ? 0 : -1, event.shiftKey)
       return
     }
 
     if (key === SPACE_KEY || key === ENTER_KEY) {
+      if (key === SPACE_KEY && this._fieldTakesText()) {
+        return
+      }
+
       this._handleActivationKey(event, key === ENTER_KEY)
       return
     }
