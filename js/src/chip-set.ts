@@ -11,6 +11,7 @@ import Chip from './chip.js'
 import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
+import { CHECK_ICON, REMOVE_ICON } from './util/icons.js'
 import { defineJQueryPlugin, getNextActiveElement, isRTL } from './util/index.js'
 
 /**
@@ -44,9 +45,6 @@ const CLASS_NAME_DISABLED = 'disabled'
 
 const SELECTION_MODE_SINGLE = 'single'
 
-const DEFAULT_REMOVE_ICON: string = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="4" x2="12" y2="12"/><line x1="12" y1="4" x2="4" y2="12"/></svg>'
-const DEFAULT_SELECTED_ICON: string = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512" fill="currentColor"><path d="M425.373 89.373 196 318.745 86.627 209.373l-45.254 45.254L196 409.255l274.627-274.628z"/></svg>'
-
 export type ChipSetConfig = {
   ariaAddedAnnouncement: string
   ariaRemoveLabel: string
@@ -72,9 +70,9 @@ const Default: ChipSetConfig = {
   filter: false,
   maxChips: null,
   removable: false,
-  removeIcon: DEFAULT_REMOVE_ICON,
+  removeIcon: REMOVE_ICON,
   selectable: false,
-  selectedIcon: DEFAULT_SELECTED_ICON,
+  selectedIcon: CHECK_ICON,
   selectionMode: 'multiple',
   unique: false
 }

@@ -17,7 +17,7 @@ import TimeSelection from './util/time-selection.js'
 import { sanitizeHtml, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 import type { ComponentConfig } from './util/config.js'
 import { appendControlGroupField, createControlGroupAction } from './util/form-control-group.js'
-import { CLEANER_ICON } from './util/icons.js'
+import { CLEANER_ICON, CLOCK_ICON } from './util/icons.js'
 import { defineJQueryPlugin } from './util/index.js'
 
 /**
@@ -55,7 +55,6 @@ const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="time-picker"]'
 const SELECTOR_TEMPLATE_FOOTER = 'template[data-coreui-template="footer"]'
 
 // Icons live in JavaScript, not in CSS masks — the chips pattern.
-const DEFAULT_INDICATOR_ICON: string = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512" fill="currentColor"><path d="M256 16C123.452 16 16 123.452 16 256s107.452 240 240 240 240-107.452 240-240S388.548 16 256 16Zm0 448c-114.875 0-208-93.125-208-208S141.125 48 256 48s208 93.125 208 208-93.125 208-208 208Z"/><path d="M272 128h-32v139.314l84.686 84.687 22.628-22.628L272 254.059V128Z"/></svg>'
 
 type TimePickerConfig = {
   allowList: SanitizerAllowList
@@ -87,7 +86,7 @@ const Default: TimePickerConfig = {
   container: false,
   disabled: false,
   floatingLabel: null,
-  indicatorIcon: DEFAULT_INDICATOR_ICON,
+  indicatorIcon: CLOCK_ICON,
   inputOptions: {},
   locale: navigator.language,
   name: null,

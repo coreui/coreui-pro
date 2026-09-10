@@ -10,6 +10,9 @@ import ListBox, { type ListBoxEntry, type ListBoxGroup, type ListBoxItem } from 
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import type { ComponentConfig } from './util/config.js'
+import {
+  CHEVRON_DOUBLE_LEFT_ICON, CHEVRON_DOUBLE_RIGHT_ICON, CHEVRON_LEFT_ICON, CHEVRON_RIGHT_ICON
+} from './util/icons.js'
 import { defineJQueryPlugin, getUID } from './util/index.js'
 import { sanitizeHtml, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 
@@ -50,11 +53,6 @@ const SIDE_TARGET = 'target'
 const SUFFIX_ALL = '-all'
 
 const MOVE_KINDS = new Set([SIDE_SOURCE, SIDE_TARGET, `${SIDE_SOURCE}${SUFFIX_ALL}`, `${SIDE_TARGET}${SUFFIX_ALL}`])
-
-const CHEVRON_LEFT_ICON: string = '<svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" aria-hidden="true"><path fill="var(--ci-primary-color, currentcolor)" d="M324.687 451.313 129.373 256 324.687 60.687l22.626 22.626L174.628 256l172.685 172.687z" class="ci-primary"/></svg>'
-const CHEVRON_RIGHT_ICON: string = '<svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" aria-hidden="true"><path fill="var(--ci-primary-color, currentcolor)" d="m179.313 451.313-22.626-22.626L329.372 256 156.687 83.313l22.626-22.626L374.627 256z" class="ci-primary"/></svg>'
-const CHEVRON_DOUBLE_LEFT_ICON: string = '<svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" aria-hidden="true"><path fill="var(--ci-primary-color, currentcolor)" d="M416.686 447.313 221.373 252 416.686 56.687l22.628 22.626L266.627 252l172.687 172.687z" class="ci-primary"/><path fill="var(--ci-primary-color, currentcolor)" d="M256.686 447.313 61.373 252 256.686 56.687l22.628 22.626L106.627 252l172.687 172.687z" class="ci-primary"/></svg>'
-const CHEVRON_DOUBLE_RIGHT_ICON: string = '<svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" aria-hidden="true"><path fill="var(--ci-primary-color, currentcolor)" d="m95.314 447.313-22.628-22.626L245.373 252 72.686 79.313l22.628-22.626L290.627 252z" class="ci-primary"/><path fill="var(--ci-primary-color, currentcolor)" d="m255.314 447.313-22.628-22.626L405.373 252 232.686 79.313l22.628-22.626L450.627 252z" class="ci-primary"/></svg>'
 
 type TransferSide = {
   element: HTMLElement

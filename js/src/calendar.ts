@@ -14,6 +14,9 @@ import SelectorEngine from './dom/selector-engine.js'
 import {
  escapeHtml, sanitizeHtml, type SanitizerAllowList, SVGAllowlist
 } from './util/sanitizer.js'
+import {
+ CHEVRON_DOUBLE_LEFT_ICON, CHEVRON_DOUBLE_RIGHT_ICON, CHEVRON_LEFT_ICON, CHEVRON_RIGHT_ICON
+} from './util/icons.js'
 import { defineJQueryPlugin } from './util/index.js'
 import {
   convertToDateObject,
@@ -99,10 +102,6 @@ const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="calendar"]'
 // Navigation icons live in JavaScript, not in CSS masks — the chips pattern:
 // inline SVG on currentColor, swappable through an option, sanitized like any
 // user-provided markup.
-const DEFAULT_NAV_ICON_DOUBLE_NEXT: string = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" fill="currentColor"><polygon points="95.314 447.313 72.686 424.687 245.373 252 72.686 79.313 95.314 56.687 290.627 252 95.314 447.313"></polygon><polygon points="255.314 447.313 232.686 424.687 405.373 252 232.686 79.313 255.314 56.687 450.627 252 255.314 447.313"></polygon></svg>'
-const DEFAULT_NAV_ICON_DOUBLE_PREV: string = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" fill="currentColor"><polygon points="416.686 447.313 221.373 252 416.686 56.687 439.314 79.313 266.627 252 439.314 424.687 416.686 447.313"></polygon><polygon points="256.686 447.313 61.373 252 256.686 56.687 279.314 79.313 106.627 252 279.314 424.687 256.686 447.313"></polygon></svg>'
-const DEFAULT_NAV_ICON_NEXT: string = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" fill="currentColor"><polygon points="179.313 451.313 156.687 428.687 329.372 256 156.687 83.313 179.313 60.687 374.627 256 179.313 451.313"></polygon></svg>'
-const DEFAULT_NAV_ICON_PREV: string = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" fill="currentColor"><polygon points="324.687 451.313 129.373 256 324.687 60.687 347.313 83.313 174.628 256 347.313 428.687 324.687 451.313"></polygon></svg>'
 
 type CalendarConfig = {
   allowList: SanitizerAllowList
@@ -158,10 +157,10 @@ const Default: CalendarConfig = {
   maxDate: null,
   minDate: null,
   monthFormat: 'short',
-  navIconDoubleNext: DEFAULT_NAV_ICON_DOUBLE_NEXT,
-  navIconDoublePrev: DEFAULT_NAV_ICON_DOUBLE_PREV,
-  navIconNext: DEFAULT_NAV_ICON_NEXT,
-  navIconPrev: DEFAULT_NAV_ICON_PREV,
+  navIconDoubleNext: CHEVRON_DOUBLE_RIGHT_ICON,
+  navIconDoublePrev: CHEVRON_DOUBLE_LEFT_ICON,
+  navIconNext: CHEVRON_RIGHT_ICON,
+  navIconPrev: CHEVRON_LEFT_ICON,
   range: false,
   renderDayCell: null,
   renderMonthCell: null,

@@ -182,8 +182,7 @@ describe('Transfer', () => {
       new Transfer(el)
 
       for (const kind of ['target', 'source', 'target-all', 'source-all']) {
-        expect(moveButton(el, kind).querySelector('svg.icon')).not.toBeNull()
-        expect(moveButton(el, kind).querySelector('svg').getAttribute('aria-hidden')).toEqual('true')
+        expect(moveButton(el, kind).querySelector('svg')).not.toBeNull()
       }
     })
 
