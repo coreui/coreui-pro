@@ -149,6 +149,14 @@ describe('NumberInput', () => {
 
       expect(buttons()[1].querySelector('svg').getAttribute('data-keep')).toBe('1')
     })
+
+    it('should keep sanitizing when the markup asks to turn it off', () => {
+      const numberInput = new NumberInput(markup('value="1" data-coreui-sanitize="false"'), { // eslint-disable-line no-unused-vars
+        incrementIcon: '<svg viewBox="0 0 16 16" data-keep="1"><path d="M0 0h16v16H0z"/></svg>'
+      })
+
+      expect(buttons()[1].querySelector('svg').getAttribute('data-keep')).toBeNull()
+    })
   })
 
   describe('the frame', () => {

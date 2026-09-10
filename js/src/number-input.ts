@@ -7,7 +7,6 @@
 
 import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
-import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
 import {
   createControlGroupAction, ensureControlGroup, releaseControlGroup, type ControlGroup
@@ -40,8 +39,6 @@ const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="number-input"]'
 // starts it, then fast enough to cross a range without waiting.
 const REPEAT_DELAY = 400
 const REPEAT_INTERVAL = 60
-
-const DISALLOWED_ATTRIBUTES = new Set(['sanitize', 'allowList', 'sanitizeFn'])
 
 interface NumberInputConfig {
   allowList: SanitizerAllowList
@@ -262,18 +259,6 @@ class NumberInput extends BaseComponent {
 
   _sanitizeIcon(icon: string): string {
     return this._config.sanitize ? sanitizeHtml(icon, this._config.allowList, this._config.sanitizeFn) : icon
-  }
-
-  override _getConfig(config: any): any {
-    const dataAttributes = Manipulator.getDataAttributes(this._element)
-
-    for (const dataAttribute of Object.keys(dataAttributes)) {
-      if (DISALLOWED_ATTRIBUTES.has(dataAttribute)) {
-        delete dataAttributes[dataAttribute]
-      }
-    }
-
-    return super._getConfig({ ...dataAttributes, ...(typeof config === 'object' ? config : {}) })
   }
 
   // Static
