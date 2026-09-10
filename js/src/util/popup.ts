@@ -342,7 +342,6 @@ class Popup extends Config {
       }
 
       Object.assign(this._content.style, {
-        insetInlineStart: '0',
         left: `${x}px`,
         position: 'absolute',
         top: `${y}px`

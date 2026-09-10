@@ -507,6 +507,36 @@ describe('Popup', () => {
       expect(fixtureEl.querySelector('#content').style.position).toEqual('')
     })
 
+    it('should position with physical offsets only, so RTL gets no competing inline-start', () => {
+      return new Promise((resolve, reject) => {
+        document.documentElement.dir = 'rtl'
+        const popup = buildPopup({ mobileBreakpoint: 0 })
+        const content = fixtureEl.querySelector('#content')
+        popup.show()
+
+        const waitForPosition = deadline => {
+          if (content.style.position === 'absolute') {
+            document.documentElement.dir = ''
+            expect(content.style.left).not.toEqual('')
+            expect(content.style.right).toEqual('')
+            expect(content.style.insetInlineStart).toEqual('')
+            resolve()
+            return
+          }
+
+          if (Date.now() > deadline) {
+            document.documentElement.dir = ''
+            reject(new Error('content was never positioned'))
+            return
+          }
+
+          setTimeout(() => waitForPosition(deadline), 25)
+        }
+
+        waitForPosition(Date.now() + 2000)
+      })
+    })
+
     it('should absolutely position the content after show', () => {
       return new Promise((resolve, reject) => {
         const popup = buildPopup({ mobileBreakpoint: 0 })
