@@ -1,5 +1,6 @@
 @use "../functions/defaults" as *;
 @use "../mixins/border-radius" as *;
+@use "../mixins/ltr-rtl" as *;
 @use "../mixins/tokens" as *;
 @use "../mixins/transition" as *;
 @use "../config" as *;
@@ -15,6 +16,7 @@ $form-floating-input-padding-b:         .625rem !default;
 $form-floating-label-height:            1.5em !default;
 $form-floating-label-opacity:           .65 !default;
 $form-floating-label-transform:         scale(.85) translateY(-.5rem) translateX(.15rem) !default;
+$form-floating-label-transform-rtl:     scale(.85) translateY(-.5rem) translateX(-.15rem) !default;
 $form-floating-label-disabled-color:    var(--#{$prefix}fg-3) !default;
 // The label is a sibling of the control, so it cannot inherit the control's own
 // background — the textarea mask has to be told the same colour a second time.
@@ -27,6 +29,8 @@ $form-floating-transition-timing:       ease-in-out !default;
 // scss-docs-end form-floating-variables
 
 // stylelint-disable scss/dollar-variable-default
+
+// stylelint-disable custom-property-no-missing-var-function
 
 // scss-docs-start form-floating-tokens
 $form-floating-tokens: () !default;
@@ -53,6 +57,8 @@ $form-floating-tokens: defaults(
 );
 // scss-docs-end form-floating-tokens
 
+// stylelint-enable custom-property-no-missing-var-function
+
 // stylelint-enable scss/dollar-variable-default
 
 @layer forms {
@@ -64,6 +70,10 @@ $form-floating-tokens: defaults(
     @include tokens($form-floating-tokens);
 
     position: relative;
+
+    @include rtl() {
+      --#{$prefix}form-floating-label-transform: #{$form-floating-label-transform-rtl};
+    }
 
     > .form-control,
     > .form-control-plaintext,
@@ -90,7 +100,7 @@ $form-floating-tokens: defaults(
       white-space: nowrap;
       pointer-events: none;
       border: var(--#{$prefix}btn-input-border-width) solid transparent; // Required for aligning label's text with the input as it affects inner box model
-      transform-origin: 0 0;
+      @include ltr-rtl-value-only("transform-origin", 0 0, 100% 0);
       @include transition-props(
         var(--#{$prefix}form-floating-transition-property),
         var(--#{$prefix}form-floating-transition-duration),
