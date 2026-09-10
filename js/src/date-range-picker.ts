@@ -16,6 +16,7 @@ import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import Popup from './util/popup.js'
 import { appendControlGroupField, createControlGroupAction } from './util/form-control-group.js'
+import { getDateBySelectionType } from './util/calendar.js'
 import type { ComponentConfig } from './util/config.js'
 import { getWeekSectionsFromLocale } from './util/date-sections.js'
 import {
@@ -409,14 +410,14 @@ class DateRangePicker extends BaseComponent {
     EventHandler.on(start.inputEl, DateInput.eventName(DateInput.CHANGE_EVENT_NAME), (event: any) => {
       if (!this._syncingFromPanel) {
         this._calendar?.update({ startDate: event.date })
-        EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, { date: event.date })
+        this._triggerDateChange(EVENT_START_DATE_CHANGE, this._startInput)
       }
     })
 
     EventHandler.on(end.inputEl, DateInput.eventName(DateInput.CHANGE_EVENT_NAME), (event: any) => {
       if (!this._syncingFromPanel) {
         this._calendar?.update({ endDate: event.date })
-        EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, { date: event.date })
+        this._triggerDateChange(EVENT_END_DATE_CHANGE, this._endInput)
       }
     })
 
@@ -484,24 +485,30 @@ class DateRangePicker extends BaseComponent {
     })
 
     EventHandler.on(this._calendar._element, 'startDateChange.coreui.calendar', event => {
-      const { date, dateObject } = event
       this._syncingFromPanel = true
-      this._startInput.update({ date: dateObject })
+      this._startInput.update({ date: event.dateObject })
       this._syncingFromPanel = false
-      EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, { date, dateObject })
+      this._triggerDateChange(EVENT_START_DATE_CHANGE, this._startInput)
     })
 
     EventHandler.on(this._calendar._element, 'endDateChange.coreui.calendar', event => {
-      const { date, dateObject } = event
       this._syncingFromPanel = true
-      this._endInput.update({ date: dateObject })
+      this._endInput.update({ date: event.dateObject })
       this._syncingFromPanel = false
-      EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, { date, dateObject })
+      this._triggerDateChange(EVENT_END_DATE_CHANGE, this._endInput)
 
-      if (dateObject && this.getStartDate() && !this._footerTemplate) {
+      if (this.getEndDate() && this.getStartDate() && !this._footerTemplate) {
         this.hide()
       }
     })
+  }
+
+  // The field validates the date, so the event reports what the field holds —
+  // a selection the field refused (min/max) is announced as null, not as the
+  // day that was clicked.
+  _triggerDateChange(eventName: string, input: any): void {
+    const date = input.getDate()
+    EventHandler.trigger(this._element, eventName, { date, formattedDate: getDateBySelectionType(date, this._config.selectionType) })
   }
 
   _createPopup(): void {
@@ -509,19 +516,19 @@ class DateRangePicker extends BaseComponent {
       anchor: this._element,
       container: this._config.container,
       content: this._menu,
+      onBeforeHide: () => !EventHandler.trigger(this._element, EVENT_HIDE)?.defaultPrevented,
+      onBeforeShow: () => !EventHandler.trigger(this._element, EVENT_SHOW)?.defaultPrevented,
       onHidden: () => EventHandler.trigger(this._element, EVENT_HIDDEN),
       onHide: () => {
         this._menu.classList.remove(CLASS_NAME_SHOW)
         this._element.classList.remove(CLASS_NAME_SHOW)
         this._element.setAttribute('aria-expanded', 'false')
-        EventHandler.trigger(this._element, EVENT_HIDE)
       },
       onShow: () => {
         this._ensureCalendar()
         this._menu.classList.add(CLASS_NAME_SHOW)
         this._element.classList.add(CLASS_NAME_SHOW)
         this._element.setAttribute('aria-expanded', 'true')
-        EventHandler.trigger(this._element, EVENT_SHOW)
       },
       onShown: () => EventHandler.trigger(this._element, EVENT_SHOWN)
     })

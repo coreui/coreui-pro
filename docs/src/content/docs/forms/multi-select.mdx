@@ -571,9 +571,9 @@ Multi Select component exposes a few events for hooking into multi select functi
 | --- | --- |
 | `changed.coreui.multi-select` | Fires immediately when an option is selected or deselected. |
 | `selectionLimit.coreui.multi-select` | Fires when selecting an option is blocked because the selection limit has been reached. |
-| `show.coreui.multi-select` | Fires immediately when the show instance method is called. |
+| `show.coreui.multi-select` | Fires immediately when the show instance method is called. Call `event.preventDefault()` to keep the menu closed. |
 | `shown.coreui.multi-select` | Fired when the multi select options have been made visible to the user and CSS transitions have completed. |
-| `hide.coreui.multi-select` | Fires immediately when the hide instance method has been called. |
+| `hide.coreui.multi-select` | Fires immediately when the hide instance method has been called. Call `event.preventDefault()` to keep the menu open. |
 | `hidden.coreui.multi-select` | Fired when the multi select options have finished being hidden from the user and CSS transitions have completed. |
 
 ```js

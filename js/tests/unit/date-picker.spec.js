@@ -180,6 +180,34 @@ describe('DatePicker', () => {
       expect(picker._popup.isShown).toBeFalse()
     })
 
+    it('should not open when show is prevented', () => {
+      const picker = buildPicker()
+      const el = fixtureEl.querySelector('#picker')
+      const shown = jasmine.createSpy('shown')
+      el.addEventListener('show.coreui.date-picker', event => event.preventDefault())
+      el.addEventListener('shown.coreui.date-picker', shown)
+
+      picker.show()
+
+      expect(picker._popup.isShown).toBeFalse()
+      expect(el.classList.contains('show')).toBeFalse()
+      expect(shown).not.toHaveBeenCalled()
+    })
+
+    it('should stay open when hide is prevented', () => {
+      const picker = buildPicker()
+      const el = fixtureEl.querySelector('#picker')
+      const hidden = jasmine.createSpy('hidden')
+      el.addEventListener('hide.coreui.date-picker', event => event.preventDefault())
+      el.addEventListener('hidden.coreui.date-picker', hidden)
+
+      picker.show()
+      picker.hide()
+
+      expect(picker._popup.isShown).toBeTrue()
+      expect(hidden).not.toHaveBeenCalled()
+    })
+
     it('should disable the indicator button when the picker is disabled', () => {
       buildPicker({ disabled: true })
 
@@ -193,6 +221,44 @@ describe('DatePicker', () => {
       picker.show()
 
       expect(picker._popup.isShown).toBeFalse()
+    })
+  })
+
+  describe('dateChange payload', () => {
+    it('should carry the same shape whether the day comes from the calendar or the field', () => {
+      const picker = buildPicker({ locale: 'en-US', date: new Date(2026, 6, 14) })
+      const el = fixtureEl.querySelector('#picker')
+      const emitted = []
+      el.addEventListener('dateChange.coreui.date-picker', event => emitted.push(event))
+
+      picker.show()
+      fixtureEl.querySelector('.date-picker-popup .calendar-cell[tabindex="0"]').click()
+      picker.setDate(new Date(2026, 6, 20))
+
+      expect(emitted.length).toBe(2)
+      for (const event of emitted) {
+        expect(event.date).toBeInstanceOf(Date)
+        expect(event.formattedDate).toBeInstanceOf(Date)
+        expect('dateObject' in event).toBeFalse()
+      }
+    })
+
+    it('should report null when the field refuses the calendar selection', () => {
+      const picker = buildPicker({
+        locale: 'en-US', date: new Date(2026, 6, 14),
+        inputOptions: { maxDate: new Date(2026, 6, 14) }, calendarOptions: { maxDate: new Date(2026, 6, 31) }
+      })
+      const el = fixtureEl.querySelector('#picker')
+      let emitted = null
+      el.addEventListener('dateChange.coreui.date-picker', event => {
+        emitted = event
+      })
+
+      picker.show()
+      fixtureEl.querySelector('.date-picker-popup .calendar-cell[data-coreui-date^="Mon Jul 20 2026"]').click()
+
+      expect(emitted.date).toBeNull()
+      expect(picker.getDate()).toBeNull()
     })
   })
 
@@ -240,14 +306,15 @@ describe('DatePicker', () => {
       const el = fixtureEl.querySelector('#picker')
       let emitted = null
       el.addEventListener('dateChange.coreui.date-picker', event => {
-        emitted = event.date
+        emitted = event
       })
 
       picker.show()
       fixtureEl.querySelector('.date-picker-popup .calendar-row[tabindex="0"] .calendar-cell').click()
 
-      expect(emitted).toMatch(/^\d{4}W\d{2}$/)
-      expect(el.querySelector('input[type="hidden"]').value).toEqual(`Week ${emitted.slice(5)}, ${emitted.slice(0, 4)}`)
+      expect(emitted.date).toBeInstanceOf(Date)
+      expect(emitted.formattedDate).toMatch(/^\d{4}W\d{2}$/)
+      expect(el.querySelector('input[type="hidden"]').value).toEqual(`Week ${emitted.formattedDate.slice(5)}, ${emitted.formattedDate.slice(0, 4)}`)
     })
 
     it('should keep the ISO week-numbering year around January 1st', () => {

@@ -937,8 +937,34 @@ behaviour, v5 is the reference. Mapping:
   calendar is built then); later opens are unchanged. Code reaching into the
   private `picker._calendar` before the first open now finds `null`.
 
+#### Picker events can be cancelled, and `dateChange` has one shape
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`dateChange` / `startDateChange` / `endDateChange` on the Date Picker and
+  Date Range Picker carry the same payload whichever way the date arrived.**
+  `event.date` is the validated `Date` (or `null`) the field holds, and
+  `event.formattedDate` is that value in the shape of `selectionType`. A
+  selection from the calendar used to put the formatted value in `event.date`
+  and the `Date` in `event.dateObject`, while a date typed into the field put
+  the `Date` in `event.date` — the same listener saw two shapes.
+
+  ```diff
+  - const date = event.dateObject ?? event.date
+  + const date = event.date
+  ```
+
+- **`show` and `hide` can be cancelled** on the Autocomplete, Multi Select,
+  Date Picker, Date Range Picker, Date Time Picker and Time Picker, the way
+  they already could on Modal and Dialog: `event.preventDefault()` in a `show`
+  listener keeps the panel closed, in a `hide` listener keeps it open, and the
+  matching `shown` / `hidden` does not fire. `hide` on a panel that is not
+  shown no longer emits anything.
+
 #### Date Input / Time Input / Date Time Input
 
+- **`reset()` restores the date the field was created with**, not the last one
+  passed to `update()`, and emits `dateChange` when the value moves. A native
+  form reset (`form.reset()`, a reset button) now resets the field too.
 - **RTL keyboard navigation now follows the visual direction in nested RTL
   contexts.** Arrow keys (and `Home`/`End`) mirror when the field renders
   right-to-left; the direction is read from the element's computed style
