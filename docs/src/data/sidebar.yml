@@ -119,6 +119,8 @@
       to: /forms/checkbox/
     - title: Chip input
       to: /forms/chip-input/
+    - title: Combobox
+      to: /forms/combobox/
     - title: Date Input
       to: /forms/date-input/
       badge:

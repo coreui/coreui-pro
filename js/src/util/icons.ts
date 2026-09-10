@@ -20,6 +20,10 @@ export const CLEANER_ICON: string = '<svg xmlns="http://www.w3.org/2000/svg" vie
 // byte between them until now. Full-bleed horizontally, so it needs no crop.
 export const INDICATOR_ICON: string = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor"><path d="M256.045 416.136.717 160.807l29.579-29.579 225.749 225.748 225.749-225.748 29.579 29.579-255.328 255.329z"/></svg>'
 
+// `cil-chevron-bottom-alt`, the combobox toggle's caret. Full-bleed like the
+// indicator chevron above, so it needs no crop.
+export const CARET_ICON: string = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor"><path d="M256 382.627 60.687 187.313l22.626-22.626L256 337.372l172.687-172.685 22.626 22.626z"/></svg>'
+
 // The password toggle's pair, moved out of CSS masks: the same two glyphs the
 // `$form-password-icon-*` variables used to encode as data URIs, which every
 // stylesheet carried whether or not the page had a password field.
