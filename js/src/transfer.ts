@@ -6,7 +6,7 @@
  */
 
 import BaseComponent from './base-component.js'
-import ListBox from './list-box.js'
+import ListBox, { type ListBoxEntry, type ListBoxGroup, type ListBoxItem } from './list-box.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import type { ComponentConfig } from './util/config.js'
@@ -25,25 +25,24 @@ const DATA_API_KEY = '.data-api'
 const EVENT_CHANGE = 'change'
 const EVENT_MOVE = 'move'
 const EVENT_MOVED = 'moved'
+const EVENT_SEARCH = 'search'
 
 const EVENT_CLICK = 'click'
 const EVENT_INPUT = 'input'
 const EVENT_LIST_BOX_CHANGE = 'change.coreui.list-box'
+const EVENT_LIST_BOX_SEARCH = 'search.coreui.list-box'
 
 const CLASS_NAME_ANNOUNCER = 'transfer-announcer'
 const CLASS_NAME_DISABLED = 'disabled'
-const CLASS_NAME_SEARCH = 'transfer-search'
-const CLASS_NAME_SUBTITLE = 'list-box-subtitle'
+const CLASS_NAME_OPTIONS = 'list-box-options'
 const CLASS_NAME_VISUALLY_HIDDEN = 'visually-hidden'
 
-const SELECTOR_COUNTER = '[data-coreui-transfer-counter]'
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="transfer"]'
-const SELECTOR_HEADER = '.list-box-header'
+const SELECTOR_LIST = '[data-coreui-transfer-list]'
 const SELECTOR_MOVE = '[data-coreui-transfer-move]'
 const SELECTOR_OPTION = '.list-box-option'
-const SELECTOR_OPTION_LABEL = '.list-box-option-label'
 const SELECTOR_OPTIONS = '.list-box-options'
-const SELECTOR_SEARCH = '[data-coreui-transfer-search]'
+const SELECTOR_SEARCH = '[data-coreui-list-box-search]'
 const SELECTOR_SELECT_ALL = '[data-coreui-select-all]'
 
 const SIDE_SOURCE = 'source'
@@ -58,11 +57,10 @@ const CHEVRON_DOUBLE_LEFT_ICON: string = '<svg class="icon" xmlns="http://www.w3
 const CHEVRON_DOUBLE_RIGHT_ICON: string = '<svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" aria-hidden="true"><path fill="var(--ci-primary-color, currentcolor)" d="m95.314 447.313-22.628-22.626L245.373 252 72.686 79.313l22.628-22.626L290.627 252z" class="ci-primary"/><path fill="var(--ci-primary-color, currentcolor)" d="m255.314 447.313-22.628-22.626L405.373 252 232.686 79.313l22.628-22.626L450.627 252z" class="ci-primary"/></svg>'
 
 type TransferSide = {
-  counter: HTMLElement | null
   element: HTMLElement
   listBox: ListBox
+  name: string
   options: HTMLElement
-  search: HTMLInputElement | null
   selectAll: HTMLElement | null
   title: string
 }
@@ -75,7 +73,10 @@ type TransferConfig = {
   ariaMoveToTargetLabel: string
   ariaMovedAnnouncement: string
   disabled: boolean
+  html: boolean
   indicator: string
+  items: ListBoxEntry[]
+  loading: boolean
   moveAllToSourceIcon: string
   moveAllToTargetIcon: string
   moveToSourceIcon: string
@@ -83,12 +84,13 @@ type TransferConfig = {
   oneWay: boolean
   sanitize: boolean
   sanitizeFn: ((unsafeHtml: string) => string) | null
-  search: boolean
+  search: boolean | string
   searchPlaceholder: string
   selectedCounterText: string
   sourceTitle: string
   targetTitle: string
   typeahead: boolean
+  value: string[]
 }
 
 const Default: TransferConfig = {
@@ -99,7 +101,10 @@ const Default: TransferConfig = {
   ariaMoveToTargetLabel: 'Move to chosen',
   ariaMovedAnnouncement: '{count} moved to {title}',
   disabled: false,
+  html: false,
   indicator: 'checkbox',
+  items: [],
+  loading: false,
   moveAllToSourceIcon: CHEVRON_DOUBLE_LEFT_ICON,
   moveAllToTargetIcon: CHEVRON_DOUBLE_RIGHT_ICON,
   moveToSourceIcon: CHEVRON_LEFT_ICON,
@@ -112,7 +117,8 @@ const Default: TransferConfig = {
   selectedCounterText: 'selected',
   sourceTitle: 'Available',
   targetTitle: 'Chosen',
-  typeahead: true
+  typeahead: true,
+  value: []
 }
 
 const DefaultType: Record<string, string> = {
@@ -123,7 +129,10 @@ const DefaultType: Record<string, string> = {
   ariaMoveToTargetLabel: 'string',
   ariaMovedAnnouncement: 'string',
   disabled: 'boolean',
+  html: 'boolean',
   indicator: 'string',
+  items: 'array',
+  loading: 'boolean',
   moveAllToSourceIcon: 'string',
   moveAllToTargetIcon: 'string',
   moveToSourceIcon: 'string',
@@ -131,12 +140,13 @@ const DefaultType: Record<string, string> = {
   oneWay: 'boolean',
   sanitize: 'boolean',
   sanitizeFn: '(function|null)',
-  search: 'boolean',
+  search: '(boolean|string)',
   searchPlaceholder: 'string',
   selectedCounterText: 'string',
   sourceTitle: 'string',
   targetTitle: 'string',
-  typeahead: 'boolean'
+  typeahead: 'boolean',
+  value: 'array'
 }
 
 /**
@@ -145,22 +155,34 @@ const DefaultType: Record<string, string> = {
 
 class Transfer extends BaseComponent {
   protected declare _announcer: HTMLElement
+  protected declare _itemRanks: Map<string, number>
+  protected declare _items: ListBoxEntry[] | null
   protected declare _onListBoxChange: () => void
+  protected declare _onListBoxSearch: (event: Event) => void
   protected declare _order: WeakMap<HTMLElement, number>
   protected declare _ranks: number
+  protected declare _rendered: boolean
   protected declare _sides: Record<string, TransferSide>
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
 
     this._announcer = this._createAnnouncer()
+    this._itemRanks = new Map()
+    this._items = this._config.items.length > 0 ? this._config.items : null
     this._sides = {
       [SIDE_SOURCE]: this._createSide(SIDE_SOURCE),
       [SIDE_TARGET]: this._createSide(SIDE_TARGET)
     }
     this._onListBoxChange = () => this._refresh()
+    this._onListBoxSearch = (event: Event) => this._reportSearch(event)
     this._order = new WeakMap()
     this._ranks = 0
+    this._rendered = false
+
+    if (this._items) {
+      this._applyItems(this._config.value)
+    }
 
     this._addEventListeners()
     this.update()
@@ -208,12 +230,33 @@ class Transfer extends BaseComponent {
     return this._sides[side].listBox.getSelected()
   }
 
+  setItems(items: ListBoxEntry[]): void {
+    this._items = Array.isArray(items) ? items : []
+    this._applyItems(this.getTarget())
+    this.update()
+  }
+
+  getItems(): ListBoxEntry[] {
+    return this._items ?? []
+  }
+
+  setLoading(loading: boolean, side?: string): void {
+    if (side === undefined) {
+      this._config.loading = loading
+    }
+
+    for (const [name, entry] of Object.entries(this._sides)) {
+      if (side === undefined || side === name) {
+        entry.listBox.setLoading(loading)
+      }
+    }
+  }
+
   update(): void {
     this._rankOptions()
 
     for (const side of Object.values(this._sides)) {
       this._decorateSide(side)
-      this._filter(side)
       side.listBox.update()
     }
 
@@ -223,6 +266,7 @@ class Transfer extends BaseComponent {
 
   override dispose(): void {
     this._element.removeEventListener(EVENT_LIST_BOX_CHANGE, this._onListBoxChange)
+    this._element.removeEventListener(EVENT_LIST_BOX_SEARCH, this._onListBoxSearch)
     EventHandler.off(this._element, EVENT_KEY)
 
     for (const side of Object.values(this._sides)) {
@@ -253,63 +297,50 @@ class Transfer extends BaseComponent {
     }
 
     const title = name === SIDE_SOURCE ? this._config.sourceTitle : this._config.targetTitle
-    const options = (SelectorEngine.findOne(SELECTOR_OPTIONS, element) ?? element) as HTMLElement
+    const options = this._resolveOptions(element)
 
     return {
-      counter: this._resolveCounter(element),
       element,
       listBox: ListBox.getOrCreateInstance(element, {
+        allowList: this._config.allowList,
+        ariaSearchLabel: `${this._config.searchPlaceholder} ${title}`,
+        counter: true,
         disabled: this._config.disabled,
+        html: this._config.html,
         indicator: this._config.indicator,
+        loading: this._config.loading,
+        sanitize: this._config.sanitize,
+        sanitizeFn: this._config.sanitizeFn,
+        search: this._config.search,
+        searchPlaceholder: this._config.searchPlaceholder,
+        selectedCounterText: this._config.selectedCounterText,
         selectionMode: 'multiple',
         typeahead: this._config.typeahead
       }) as ListBox,
+      name,
       options,
-      search: this._resolveSearch(element, options, title),
       selectAll: SelectorEngine.findOne(SELECTOR_SELECT_ALL, element),
       title
     }
   }
 
-  _resolveCounter(element: HTMLElement): HTMLElement | null {
-    const existing = SelectorEngine.findOne(SELECTOR_COUNTER, element)
+  _resolveOptions(element: HTMLElement): HTMLElement {
+    const existing = SelectorEngine.findOne(SELECTOR_OPTIONS, element) as HTMLElement | null
 
     if (existing) {
       return existing
     }
 
-    const header = SelectorEngine.findOne(SELECTOR_HEADER, element)
-
-    if (!header) {
-      return null
+    if (!this._items) {
+      return element
     }
 
-    const counter = document.createElement('div')
+    const options = document.createElement('div')
 
-    counter.classList.add(CLASS_NAME_SUBTITLE)
-    counter.setAttribute('data-coreui-transfer-counter', '')
-    header.append(counter)
+    options.classList.add(CLASS_NAME_OPTIONS)
+    element.append(options)
 
-    return counter
-  }
-
-  _resolveSearch(element: HTMLElement, options: HTMLElement, title: string): HTMLInputElement | null {
-    const existing = SelectorEngine.findOne(SELECTOR_SEARCH, element) as HTMLInputElement | null
-
-    if (existing || !this._config.search) {
-      return existing
-    }
-
-    const search = document.createElement('input')
-
-    search.type = 'search'
-    search.className = `form-control ${CLASS_NAME_SEARCH}`
-    search.setAttribute('data-coreui-transfer-search', '')
-    search.placeholder = this._config.searchPlaceholder
-    search.setAttribute('aria-label', `${this._config.searchPlaceholder} ${title}`)
-    options.before(search)
-
-    return search
+    return options
   }
 
   _decorateSide(side: TransferSide): void {
@@ -323,14 +354,6 @@ class Transfer extends BaseComponent {
 
     if (side.selectAll && side.selectAll.textContent?.trim() === '') {
       side.selectAll.textContent = side.title
-    }
-
-    if (side.search) {
-      side.search.disabled = this._config.disabled
-
-      if (!side.search.hasAttribute('aria-label')) {
-        side.search.setAttribute('aria-label', `${this._config.searchPlaceholder} ${side.title}`)
-      }
     }
   }
 
@@ -400,7 +423,95 @@ class Transfer extends BaseComponent {
     return this._options(side).filter(option => !option.hasAttribute('hidden'))
   }
 
+  _applyItems(values: string[]): void {
+    const items = this._items ?? []
+    const flat = this._flatItems(items)
+    const byValue = new Map(flat.map(item => [this._itemValue(item), item]))
+
+    this._itemRanks = new Map([...byValue.keys()].map((value, index) => [value, index]))
+
+    const chosen = (Array.isArray(values) ? values : []).filter(value => byValue.has(value))
+    const taken = new Set(chosen)
+
+    this._sides[SIDE_TARGET].listBox.setItems(this._forwardItems(chosen.map(value => byValue.get(value) as ListBoxItem)))
+    this._sides[SIDE_SOURCE].listBox.setItems(this._forwardItems(this._availableItems(items, taken)))
+
+    if (this._rendered) {
+      for (const side of Object.values(this._sides)) {
+        side.listBox.clear()
+      }
+    }
+
+    this._rendered = true
+  }
+
+  _forwardItems(entries: ListBoxEntry[]): ListBoxEntry[] {
+    if (!this._rendered) {
+      return entries
+    }
+
+    return entries.map(entry => {
+      if (Array.isArray((entry as ListBoxGroup).items)) {
+        const group = entry as ListBoxGroup
+        return { label: group.label, items: group.items.map(item => this._unmarked(item)) }
+      }
+
+      return this._unmarked(entry as ListBoxItem)
+    })
+  }
+
+  _unmarked(item: ListBoxItem): ListBoxItem {
+    if (!item.selected) {
+      return item
+    }
+
+    const { selected, ...rest } = item
+
+    return rest
+  }
+
+  _availableItems(items: ListBoxEntry[], taken: Set<string>): ListBoxEntry[] {
+    const available: ListBoxEntry[] = []
+
+    for (const entry of items) {
+      if (entry === null || typeof entry !== 'object') {
+        continue
+      }
+
+      if (!Array.isArray((entry as ListBoxGroup).items)) {
+        if (!taken.has(this._itemValue(entry as ListBoxItem))) {
+          available.push(entry)
+        }
+
+        continue
+      }
+
+      const group = entry as ListBoxGroup
+      const rest = group.items.filter(item => !taken.has(this._itemValue(item)))
+
+      if (rest.length > 0) {
+        available.push({ label: group.label, items: rest })
+      }
+    }
+
+    return available
+  }
+
+  _flatItems(items: ListBoxEntry[]): ListBoxItem[] {
+    return items
+      .filter(entry => entry !== null && typeof entry === 'object')
+      .flatMap(entry => (Array.isArray((entry as ListBoxGroup).items) ? (entry as ListBoxGroup).items : [entry as ListBoxItem]))
+  }
+
+  _itemValue(item: ListBoxItem): string {
+    return String(item.value ?? item.label ?? '')
+  }
+
   _rankOptions(): void {
+    if (this._items) {
+      return
+    }
+
     for (const side of [this._sides[SIDE_SOURCE], this._sides[SIDE_TARGET]]) {
       for (const option of this._options(side)) {
         if (!this._order.has(option)) {
@@ -411,6 +522,10 @@ class Transfer extends BaseComponent {
   }
 
   _rankOf(option: HTMLElement): number {
+    if (this._items) {
+      return this._itemRanks.get(this._optionValue(option)) ?? Number.MAX_SAFE_INTEGER
+    }
+
     return this._order.get(option) ?? Number.MAX_SAFE_INTEGER
   }
 
@@ -441,41 +556,27 @@ class Transfer extends BaseComponent {
     return option.dataset.coreuiValue ?? option.textContent?.trim() ?? ''
   }
 
-  _optionText(option: HTMLElement): string {
-    const label = SelectorEngine.findOne(SELECTOR_OPTION_LABEL, option)
-    return (label ?? option).textContent?.trim().toLowerCase() ?? ''
+  _sideOf(element: HTMLElement): TransferSide | null {
+    const list = element.closest(SELECTOR_LIST) as HTMLElement | null
+
+    return list ? this._sides[list.dataset.coreuiTransferList as string] ?? null : null
   }
 
-  _filter(side: TransferSide): void {
-    if (!side.search) {
+  _reportSearch(event: Event): void {
+    const side = this._sideOf(event.target as HTMLElement)
+
+    if (!side) {
       return
     }
 
-    const query = side.search.value.trim().toLowerCase()
-
-    for (const option of this._options(side)) {
-      option.toggleAttribute('hidden', query !== '' && !this._optionText(option).includes(query))
-    }
+    EventHandler.trigger(this._element, this.constructor.eventName(EVENT_SEARCH), {
+      query: (event as CustomEvent & { query: string }).query,
+      side: side.name
+    })
   }
 
   _refresh(): void {
-    for (const side of Object.values(this._sides)) {
-      this._refreshCounter(side)
-    }
-
     this._refreshMoveButtons()
-  }
-
-  _refreshCounter(side: TransferSide): void {
-    if (!side.counter) {
-      return
-    }
-
-    const visible = this._visibleOptions(side)
-    const selected = side.listBox.getSelected()
-    const count = visible.filter(option => selected.includes(this._optionValue(option))).length
-
-    side.counter.textContent = `${count}/${visible.length} ${this._config.selectedCounterText}`
   }
 
   _refreshMoveButtons(): void {
@@ -521,8 +622,7 @@ class Transfer extends BaseComponent {
       this._insertInOriginalOrder(to, options)
     }
 
-    this._filter(from)
-    this._filter(to)
+    to.listBox.clear()
     from.listBox.update()
     to.listBox.update()
     this._refresh()
@@ -567,16 +667,16 @@ class Transfer extends BaseComponent {
     })
 
     EventHandler.on(this._element, this.constructor.eventName(EVENT_INPUT), SELECTOR_SEARCH, (event: any) => {
-      const side = Object.values(this._sides).find(({ search }) => search === event.target)
+      const side = this._sideOf(event.target as HTMLElement)
 
       if (side) {
-        this._filter(side)
         side.listBox.update()
         this._refresh()
       }
     })
 
     this._element.addEventListener(EVENT_LIST_BOX_CHANGE, this._onListBoxChange)
+    this._element.addEventListener(EVENT_LIST_BOX_SEARCH, this._onListBoxSearch)
   }
 
   // Static

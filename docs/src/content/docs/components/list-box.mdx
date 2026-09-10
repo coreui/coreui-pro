@@ -6,6 +6,7 @@ otherFrameworks:
   - list-box
 ---
 
+import listBoxExternalSearch from './snippets/list-box-external-search.js?raw'
 import listBoxInput from './snippets/list-box-input.js?raw'
 import listBoxItems from './snippets/list-box-items.js?raw'
 import listBoxRemote from './snippets/list-box-remote.js?raw'
@@ -142,6 +143,39 @@ Leave an empty `.list-box-options` in the markup so you can name it; the plugin 
 
 <Code code={listBoxRemote} lang="js" />
 
+## Search
+
+`search` puts a search field between the header and the options. It hides what does not match, and because a hidden option leaves the navigation, everything downstream follows: the arrows skip it, the select-all button takes only what is left on screen, and the empty state appears when nothing matches. The selection itself survives filtering — filter something out and it stays selected.
+
+The field is a `.form-control.list-box-search` carrying `data-coreui-list-box-search`, built for you unless the markup already has an input with that attribute — put one there and it is used as it is, wherever you placed it. `searchPlaceholder` fills the placeholder and `ariaSearchLabel` the accessible name; `--cui-list-box-search-margin` sets how it sits between the two.
+
+<Example code={`<div class="list-box" data-coreui-toggle="list-box" data-coreui-search="true" data-coreui-selection-mode="multiple" data-coreui-indicator="checkbox" style="max-width: 20rem">
+    <div class="list-box-header">
+      <button type="button" class="list-box-select-all" data-coreui-select-all>Fruit</button>
+    </div>
+    <div class="list-box-options" role="listbox" aria-label="Fruit">
+      <div class="list-box-option" data-coreui-value="apple">Apple</div>
+      <div class="list-box-option" data-coreui-value="apricot">Apricot</div>
+      <div class="list-box-option" data-coreui-value="banana">Banana</div>
+      <div class="list-box-option" data-coreui-value="blueberry">Blueberry</div>
+      <div class="list-box-option" data-coreui-value="cherry">Cherry</div>
+      <div class="list-box-option" data-coreui-value="cranberry">Cranberry</div>
+      <div class="list-box-empty">No fruit matches</div>
+    </div>
+  </div>`} />
+
+### External search
+
+`search: 'external'` builds the same field and filters nothing. Every keystroke fires `search.coreui.list-box` with the `query`, and you answer with `setItems()` — the list shows what you hand it, so the query is yours to interpret. Debounce the request and put `setLoading()` around it, and the list dims instead of flickering between two answers.
+
+<Example code={`<div class="list-box" id="listBoxExternalSearch" style="max-width: 22rem">
+    <div class="list-box-options" role="listbox" aria-label="Users" style="max-height: 14rem; overflow-y: auto">
+      <div class="list-box-empty">No users</div>
+    </div>
+  </div>`} sandboxJs={listBoxExternalSearch} />
+
+<Code code={listBoxExternalSearch} lang="js" />
+
 ## Checkboxes
 
 Nothing marks the selection on its own — `aria-selected` and the `.selected` background carry it. Set `indicator: 'checkbox'` and the plugin puts a checkbox in front of every option and keeps it in step with the selection.
@@ -159,6 +193,26 @@ Nothing marks the selection on its own — `aria-selected` and the `.selected` b
   </div>`} />
 
 The checkbox is a decorative `<span class="list-box-option-indicator check">`, not an input, so it never takes the focus and never has a state of its own — the `.selected` and `.indeterminate` classes drive it. The select-all button gets the same indicator, its own `mixed` state included, and stays a button: focusable, operable, and named by its text.
+
+## Counter
+
+`counter` puts a `{selected}/{available} selected` readout in the header — the last child of `.list-box-header`, a `.list-box-subtitle` carrying `data-coreui-list-box-counter`. There is no header in the markup? One is created. Bring your own element with that attribute and the plugin writes into it wherever you put it.
+
+Both numbers read the same set — the options that are visible and enabled, which is also what the select-all button works on — so the counter always describes what is on screen. Filter the list and the denominator drops with it, and a selected value the filter hid drops out of the numerator too: it stays selected, it just stops being counted, so `2/4` can become `1/1` without anything being deselected. A disabled option never appears in either number. `selectedCounterText` is the word after the count, so a translated list reads in its own language.
+
+<Example code={`<div class="list-box" data-coreui-toggle="list-box" data-coreui-counter="true" data-coreui-search="true" data-coreui-selection-mode="multiple" data-coreui-indicator="checkbox" style="max-width: 20rem">
+    <div class="list-box-header">
+      <button type="button" class="list-box-select-all" data-coreui-select-all>Fruit</button>
+    </div>
+    <div class="list-box-options" role="listbox" aria-label="Fruit">
+      <div class="list-box-option" data-coreui-value="apple">Apple</div>
+      <div class="list-box-option" data-coreui-value="apricot">Apricot</div>
+      <div class="list-box-option" data-coreui-value="banana">Banana</div>
+      <div class="list-box-option disabled" data-coreui-value="blueberry">Blueberry</div>
+      <div class="list-box-option" data-coreui-value="cherry">Cherry</div>
+      <div class="list-box-empty">No fruit matches</div>
+    </div>
+  </div>`} />
 
 ## Sections
 
@@ -301,6 +355,8 @@ Add `data-coreui-toggle="list-box"` to a `.list-box` and the plugin initializes 
 | `data-coreui-value` | The value of an option. Defaults to the option's text. |
 | `data-coreui-select-all` | Marks a button anywhere in the container as the switch for the whole list. |
 | `data-coreui-indicator="checkbox"` | Renders the checkbox indicator in front of every option. |
+| `data-coreui-list-box-counter` | Marks the element that holds the `{selected}/{available}` counter. Created in the header when `counter` is on and the markup has none. |
+| `data-coreui-list-box-search` | Marks an input as the search field of the list. Built for you when `search` is on and the markup has none. |
 | `data-coreui-loading="true"` | Marks the list as loading: `aria-busy` on the options element, `.loading` on the container, empty state held back. |
 
 ```html
@@ -330,6 +386,8 @@ const listBox = new coreui.ListBox('#myListBox', {
 | --- | --- | --- | --- |
 | `activeDescendant` | null, string, element | `null` | Field that keeps the focus. The plugin drops the roving `tabindex`, gives the options ids, and writes `aria-activedescendant` and `aria-controls` on the field. The keyboard is handled on the field. |
 | `allowList` | object | [Default value](/getting-started/javascript/#sanitizer) | Object which contains allowed attributes and tags for the labels rendered from `items`. |
+| `ariaSearchLabel` | string | `'Search options'` | Accessible name of the search field. An input with its own `aria-label` keeps it. |
+| `counter` | boolean | `false` | Puts a `{selected}/{available} selected` readout in the header, counting the visible, enabled options. Builds the header when the markup has none. |
 | `disabled` | boolean | `false` | Turns the whole list box off: `aria-disabled` on `.list-box-options` and the select-all button disabled. |
 | `html` | boolean | `false` | Parses the labels rendered from `items` as HTML instead of inserting them as text. |
 | `indicator` | string | `'none'` | `'checkbox'` puts a decorative checkbox in front of every option and marks the container with `data-coreui-indicator="checkbox"`, which is what lays the options out in two columns. |
@@ -337,7 +395,10 @@ const listBox = new coreui.ListBox('#myListBox', {
 | `loading` | boolean | `false` | Marks the list as loading: `aria-busy` on the options element, `.loading` on the container, empty state held back. |
 | `sanitize` | boolean | `true` | Enables the sanitization of the labels rendered from `items` with `html`. |
 | `sanitizeFn` | null, function | `null` | Sanitization function of your own, used instead of the built-in one. |
+| `search` | boolean, string | `false` | Builds a search field above the options. `true` filters the list itself; `'external'` filters nothing and fires `search.coreui.list-box` instead. An input the markup already carries is used either way. |
+| `searchPlaceholder` | string | `'Search'` | Placeholder of the built search field. |
 | `selected` | null, string, array | `null` | Initially selected values. In `single` mode only the first one is taken. |
+| `selectedCounterText` | string | `'selected'` | The word after the count in the header. |
 | `selectionLimit` | null, number | `null` | How many options can be selected at once in `multiple` mode. Further selections are refused and reported through `selectionLimit.coreui.list-box`; nothing is disabled and deselecting always works. |
 | `selectionMode` | string | `'single'` | `'none'`, `'single'` or `'multiple'`. |
 | `typeahead` | boolean | `true` | Move the highlight to the option matching what the user types. The buffer resets after 500 ms. |
@@ -377,6 +438,7 @@ Events fire on the `.list-box` element.
 | `change.coreui.list-box` | Fired once per operation after the selection settled; `event.selected` is the array of selected values. |
 | `selectionLimit.coreui.list-box` | Fired once per interaction when `selectionLimit` refused a selection; `event.limit` is the cap and `event.value` the first refused value. |
 | `activate.coreui.list-box` | Fired when the highlight moves; `event.value` is the newly highlighted value. |
+| `search.coreui.list-box` | Fired on every keystroke in the search field with `search: 'external'`; `event.query` is what was typed. Nothing is filtered — answer with `setItems()`. |
 | `action.coreui.list-box` | Fired when an option is activated in `none` mode or when the option is a link; `event.value` is the value and `event.relatedTarget` the option. |
 
 ```js

@@ -41,6 +41,7 @@ const EVENT_ACTIVATE = 'activate'
 const EVENT_CHANGE = 'change'
 const EVENT_DESELECT = 'deselect'
 const EVENT_DESELECTED = 'deselected'
+const EVENT_SEARCH = 'search'
 const EVENT_SELECT = 'select'
 const EVENT_SELECTED = 'selected'
 const EVENT_SELECTION_LIMIT = 'selectionLimit'
@@ -48,11 +49,14 @@ const EVENT_SELECTION_LIMIT = 'selectionLimit'
 const EVENT_CLICK = 'click'
 const EVENT_FOCUSIN = 'focusin'
 const EVENT_FOCUSOUT = 'focusout'
+const EVENT_INPUT = 'input'
 const EVENT_KEYDOWN = 'keydown'
 
 const CLASS_NAME_ACTIVE = 'active'
 const CLASS_NAME_CHECK = 'check'
 const CLASS_NAME_DISABLED = 'disabled'
+const CLASS_NAME_FORM_CONTROL = 'form-control'
+const CLASS_NAME_HEADER = 'list-box-header'
 const CLASS_NAME_INDETERMINATE = 'indeterminate'
 const CLASS_NAME_LOADING = 'loading'
 const CLASS_NAME_OPTION = 'list-box-option'
@@ -60,22 +64,29 @@ const CLASS_NAME_OPTION_DESCRIPTION = 'list-box-option-description'
 const CLASS_NAME_OPTION_INDICATOR = 'list-box-option-indicator'
 const CLASS_NAME_OPTION_LABEL = 'list-box-option-label'
 const CLASS_NAME_OPTIONS = 'list-box-options'
+const CLASS_NAME_SEARCH = 'list-box-search'
 const CLASS_NAME_SECTION = 'list-box-section'
 const CLASS_NAME_SECTION_LABEL = 'list-box-section-label'
+const CLASS_NAME_SUBTITLE = 'list-box-subtitle'
 const CLASS_NAME_SELECTED = 'selected'
 
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="list-box"]'
+const SELECTOR_COUNTER = '[data-coreui-list-box-counter]'
 const SELECTOR_EMPTY = '.list-box-empty'
+const SELECTOR_HEADER = '.list-box-header'
 const SELECTOR_OPTION = '.list-box-option'
 const SELECTOR_OPTION_INDICATOR = '.list-box-option-indicator'
 const SELECTOR_OPTION_LABEL = '.list-box-option-label'
 const SELECTOR_OPTIONS = '.list-box-options'
+const SELECTOR_SEARCH = '[data-coreui-list-box-search]'
 const SELECTOR_SECTION = '.list-box-section'
 const SELECTOR_SELECT_ALL = '[data-coreui-select-all]'
 
 const ATTRIBUTE_INDICATOR = 'data-coreui-indicator'
 
 const INDICATOR_CHECKBOX = 'checkbox'
+
+const SEARCH_EXTERNAL = 'external'
 
 const SELECTION_MODE_MULTIPLE = 'multiple'
 const SELECTION_MODE_NONE = 'none'
@@ -99,6 +110,8 @@ type ListBoxEntry = ListBoxItem | ListBoxGroup
 type ListBoxConfig = {
   activeDescendant: string | Element | null
   allowList: SanitizerAllowList
+  ariaSearchLabel: string
+  counter: boolean
   disabled: boolean
   html: boolean
   indicator: string
@@ -106,7 +119,10 @@ type ListBoxConfig = {
   loading: boolean
   sanitize: boolean
   sanitizeFn: ((unsafeHtml: string) => string) | null
+  search: boolean | string
+  searchPlaceholder: string
   selected: string | string[] | null
+  selectedCounterText: string
   selectionLimit: number | null
   selectionMode: string
   typeahead: boolean
@@ -115,6 +131,8 @@ type ListBoxConfig = {
 const Default: ListBoxConfig = {
   activeDescendant: null,
   allowList: DefaultAllowlist,
+  ariaSearchLabel: 'Search options',
+  counter: false,
   disabled: false,
   html: false,
   indicator: 'none',
@@ -122,7 +140,10 @@ const Default: ListBoxConfig = {
   loading: false,
   sanitize: true,
   sanitizeFn: null,
+  search: false,
+  searchPlaceholder: 'Search',
   selected: null,
+  selectedCounterText: 'selected',
   selectionLimit: null,
   selectionMode: SELECTION_MODE_SINGLE,
   typeahead: true
@@ -131,6 +152,8 @@ const Default: ListBoxConfig = {
 const DefaultType: Record<string, string> = {
   activeDescendant: '(string|element|null)',
   allowList: 'object',
+  ariaSearchLabel: 'string',
+  counter: 'boolean',
   disabled: 'boolean',
   html: 'boolean',
   indicator: 'string',
@@ -138,7 +161,10 @@ const DefaultType: Record<string, string> = {
   loading: 'boolean',
   sanitize: 'boolean',
   sanitizeFn: '(null|function)',
+  search: '(boolean|string)',
+  searchPlaceholder: 'string',
   selected: '(string|array|null)',
+  selectedCounterText: 'string',
   selectionLimit: '(null|number)',
   selectionMode: 'string',
   typeahead: 'boolean'
@@ -151,12 +177,14 @@ const DefaultType: Record<string, string> = {
 class ListBox extends BaseComponent {
   protected declare _active: string | null
   protected declare _anchor: string | null
+  protected declare _counter: HTMLElement | null
   protected declare _field: HTMLElement | null
   protected declare _items: ListBoxEntry[] | null
   protected declare _focused: boolean
   protected declare _limited: string | null
   protected declare _list: HTMLElement
   protected declare _search: string
+  protected declare _searchField: HTMLInputElement | null
   protected declare _searchTimeout: ReturnType<typeof setTimeout> | null
   protected declare _selected: Set<string>
   protected declare _selectAll: HTMLButtonElement | null
@@ -171,7 +199,9 @@ class ListBox extends BaseComponent {
     this._focused = false
     this._limited = null
     this._list = this._resolveList()
+    this._counter = this._resolveCounter()
     this._search = ''
+    this._searchField = this._resolveSearch()
     this._searchTimeout = null
     this._selectAll = SelectorEngine.findOne(SELECTOR_SELECT_ALL, this._element) as HTMLButtonElement | null
     this._selected = new Set(this._initialSelection())
@@ -315,6 +345,9 @@ class ListBox extends BaseComponent {
   update(): void {
     this._list.setAttribute('role', 'listbox')
 
+    this._decorateSearch()
+    this._filter()
+
     if (this._config.indicator === INDICATOR_CHECKBOX) {
       this._element.setAttribute(ATTRIBUTE_INDICATOR, INDICATOR_CHECKBOX)
     }
@@ -386,6 +419,7 @@ class ListBox extends BaseComponent {
     }
 
     this._updateSelectAll()
+    this._updateCounter()
     this._updateActiveDescendant()
   }
 
@@ -409,6 +443,98 @@ class ListBox extends BaseComponent {
   }
 
   // Private
+  _resolveCounter(): HTMLElement | null {
+    const existing = SelectorEngine.findOne(SELECTOR_COUNTER, this._element) as HTMLElement | null
+
+    if (existing || !this._config.counter) {
+      return existing
+    }
+
+    const counter = document.createElement('div')
+
+    counter.classList.add(CLASS_NAME_SUBTITLE)
+    counter.setAttribute('data-coreui-list-box-counter', '')
+    this._resolveHeader().append(counter)
+
+    return counter
+  }
+
+  _resolveHeader(): HTMLElement {
+    const existing = SelectorEngine.findOne(SELECTOR_HEADER, this._element) as HTMLElement | null
+
+    if (existing) {
+      return existing
+    }
+
+    const header = document.createElement('div')
+
+    header.classList.add(CLASS_NAME_HEADER)
+    this._element.prepend(header)
+
+    return header
+  }
+
+  _updateCounter(): void {
+    if (!this._counter) {
+      return
+    }
+
+    const navigable = this._navigableOptions()
+    const count = navigable.filter(option => this._selected.has(this._optionValue(option))).length
+
+    this._counter.textContent = `${count}/${navigable.length} ${this._config.selectedCounterText}`
+  }
+
+  _resolveSearch(): HTMLInputElement | null {
+    const existing = SelectorEngine.findOne(SELECTOR_SEARCH, this._element) as HTMLInputElement | null
+
+    if (existing || !this._config.search) {
+      return existing
+    }
+
+    const search = document.createElement('input')
+
+    search.type = 'search'
+    search.className = `${CLASS_NAME_FORM_CONTROL} ${CLASS_NAME_SEARCH}`
+    search.setAttribute('data-coreui-list-box-search', '')
+    this._list.before(search)
+
+    return search
+  }
+
+  _decorateSearch(): void {
+    if (!this._searchField) {
+      return
+    }
+
+    if (!this._list.id) {
+      this._list.id = getUID(`${NAME}-options-`)
+    }
+
+    if (!this._searchField.placeholder) {
+      this._searchField.placeholder = this._config.searchPlaceholder
+    }
+
+    if (!this._searchField.hasAttribute('aria-label')) {
+      this._searchField.setAttribute('aria-label', this._config.ariaSearchLabel)
+    }
+
+    this._searchField.setAttribute('aria-controls', this._list.id)
+    this._searchField.disabled = this._config.disabled
+  }
+
+  _filter(): void {
+    if (!this._searchField || this._config.search === SEARCH_EXTERNAL) {
+      return
+    }
+
+    const query = this._searchField.value.trim().toLowerCase()
+
+    for (const option of this._allOptions()) {
+      option.toggleAttribute('hidden', query !== '' && !this._optionText(option).includes(query))
+    }
+  }
+
   _initialSelection(): string[] {
     const { selected } = this._config
     const configured = selected === null ? [] : (Array.isArray(selected) ? selected : [selected])
@@ -876,6 +1002,16 @@ class ListBox extends BaseComponent {
         this._focused = false
         this.update()
       }
+    })
+    EventHandler.on(this._element, this.constructor.eventName(EVENT_INPUT), SELECTOR_SEARCH, (event: any) => {
+      if (this._config.search === SEARCH_EXTERNAL) {
+        EventHandler.trigger(this._element, this.constructor.eventName(EVENT_SEARCH), {
+          query: (event.target as HTMLInputElement).value
+        })
+        return
+      }
+
+      this.update()
     })
     EventHandler.on(this._element, this.constructor.eventName(EVENT_FOCUSIN), SELECTOR_OPTION, (event: any) => {
       if (!this._config.disabled && !this._field) {

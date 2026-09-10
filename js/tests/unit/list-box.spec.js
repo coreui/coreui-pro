@@ -40,6 +40,12 @@ describe('ListBox', () => {
     '</div>'
   ].join('')
   const list = element => element.querySelector('.list-box-options')
+  const searchField = element => element.querySelector('[data-coreui-list-box-search]')
+
+  const type = (element, value) => {
+    element.value = value
+    element.dispatchEvent(new Event('input', { bubbles: true }))
+  }
 
   const keydown = (target, key, modifiers = {}) => {
     target.dispatchEvent(new KeyboardEvent('keydown', {
@@ -83,6 +89,8 @@ describe('ListBox', () => {
       expect(ListBox.Default).toEqual({
         activeDescendant: null,
         allowList: DefaultAllowlist,
+        ariaSearchLabel: 'Search options',
+        counter: false,
         disabled: false,
         html: false,
         indicator: 'none',
@@ -90,7 +98,10 @@ describe('ListBox', () => {
         loading: false,
         sanitize: true,
         sanitizeFn: null,
+        search: false,
+        searchPlaceholder: 'Search',
         selected: null,
+        selectedCounterText: 'selected',
         selectionLimit: null,
         selectionMode: 'single',
         typeahead: true
@@ -1114,6 +1125,160 @@ describe('ListBox', () => {
       })
 
       expect(item(el, 'a').querySelector('em').textContent).toEqual('Ok')
+    })
+  })
+
+  describe('counter', () => {
+    it('should count the selection in the header', () => {
+      const el = setMarkup('', null, selectAllMarkup)
+      const listBox = new ListBox(el, { counter: true, selectionMode: 'multiple' })
+      const counter = el.querySelector('[data-coreui-list-box-counter]')
+
+      expect(counter.parentElement.classList.contains('list-box-header')).toBeTrue()
+      expect(counter.previousElementSibling.classList.contains('list-box-select-all')).toBeTrue()
+      expect(counter.classList.contains('list-box-subtitle')).toBeTrue()
+      expect(counter.textContent).toEqual('0/4 selected')
+
+      listBox.select('tomato')
+
+      expect(counter.textContent).toEqual('1/4 selected')
+
+      listBox.deselect('tomato')
+
+      expect(counter.textContent).toEqual('0/4 selected')
+    })
+
+    it('should count both sides against the visible, enabled options', () => {
+      const el = setMarkup()
+      const listBox = new ListBox(el, { counter: true, search: true, selectionMode: 'multiple' })
+      const counter = el.querySelector('[data-coreui-list-box-counter]')
+
+      listBox.select('tomato')
+      listBox.select('onion')
+
+      expect(counter.textContent).toEqual('2/4 selected')
+
+      type(searchField(el), 'on')
+
+      expect(item(el, 'tomato').hasAttribute('hidden')).toBeTrue()
+      expect(counter.textContent).toEqual('1/1 selected')
+      expect(listBox.getSelected()).toEqual(['tomato', 'onion'])
+
+      type(searchField(el), 'ham')
+
+      expect(counter.textContent).toEqual('0/0 selected')
+    })
+
+    it('should follow the items it was given', () => {
+      const el = setMarkup()
+      const listBox = new ListBox(el, { counter: true, selectedCounterText: 'picked', selectionMode: 'multiple' })
+      const counter = el.querySelector('[data-coreui-list-box-counter]')
+
+      listBox.setItems([{ value: 'ada', label: 'Ada' }, { value: 'bob', label: 'Bob', selected: true }])
+
+      expect(counter.textContent).toEqual('1/2 picked')
+    })
+
+    it('should build the header when the markup has none', () => {
+      const el = setMarkup()
+      // eslint-disable-next-line no-new
+      new ListBox(el, { counter: true })
+
+      const header = el.querySelector('.list-box-header')
+
+      expect(header).not.toBeNull()
+      expect(el.firstElementChild).toEqual(header)
+      expect(header.querySelector('[data-coreui-list-box-counter]')).not.toBeNull()
+    })
+
+    it('should use the counter the markup already carries', () => {
+      const el = setMarkup('', null, [
+        '<div class="list-box-header">',
+        '<span class="list-box-subtitle" data-coreui-list-box-counter></span>',
+        '</div>'
+      ].join(''))
+      // eslint-disable-next-line no-new
+      new ListBox(el, { counter: true })
+
+      expect(el.querySelectorAll('[data-coreui-list-box-counter]').length).toEqual(1)
+      expect(el.querySelector('[data-coreui-list-box-counter]').tagName).toEqual('SPAN')
+    })
+  })
+
+  describe('search', () => {
+    it('should build the search field between the header and the options', () => {
+      const el = setMarkup('', null, selectAllMarkup)
+      // eslint-disable-next-line no-new
+      new ListBox(el, { search: true, searchPlaceholder: 'Filter' })
+
+      const field = searchField(el)
+
+      expect(field).not.toBeNull()
+      expect(field.previousElementSibling.classList.contains('list-box-header')).toBeTrue()
+      expect(field.nextElementSibling.classList.contains('list-box-options')).toBeTrue()
+      expect(field.placeholder).toEqual('Filter')
+      expect(field.getAttribute('aria-label')).toEqual('Search options')
+      expect(field.getAttribute('aria-controls')).toEqual(list(el).id)
+    })
+
+    it('should use the search field the markup already carries', () => {
+      const el = setMarkup()
+      list(el).insertAdjacentHTML(
+        'beforebegin',
+        '<input class="form-control list-box-search" type="search" data-coreui-list-box-search aria-label="Find">'
+      )
+      // eslint-disable-next-line no-new
+      new ListBox(el, { search: true })
+
+      expect(el.querySelectorAll('[data-coreui-list-box-search]').length).toEqual(1)
+      expect(searchField(el).getAttribute('aria-label')).toEqual('Find')
+    })
+
+    it('should filter the options with the built-in search', () => {
+      const el = setMarkup()
+      const listBox = new ListBox(el, { search: true })
+
+      type(searchField(el), 'to')
+
+      expect(item(el, 'tomato').hasAttribute('hidden')).toBeFalse()
+      expect(item(el, 'lettuce').hasAttribute('hidden')).toBeTrue()
+      expect(listBox.getActive()).toBeNull()
+
+      type(searchField(el), '')
+
+      expect(item(el, 'lettuce').hasAttribute('hidden')).toBeFalse()
+    })
+
+    it('should let select all take only the options left by the search', () => {
+      const el = setMarkup('', null, selectAllMarkup)
+      const listBox = new ListBox(el, { search: true, selectionMode: 'multiple' })
+
+      type(searchField(el), 'on')
+      listBox.selectAll()
+
+      expect(listBox.getSelected()).toEqual(['onion'])
+    })
+
+    it('should not filter in external search mode and report the query', () => {
+      const el = setMarkup()
+      // eslint-disable-next-line no-new
+      new ListBox(el, { search: 'external' })
+      const spy = jasmine.createSpy('search')
+
+      el.addEventListener('search.coreui.list-box', event => spy(event.query))
+      type(searchField(el), 'zzz')
+
+      expect(spy).toHaveBeenCalledWith('zzz')
+      expect(item(el, 'lettuce').hasAttribute('hidden')).toBeFalse()
+      expect(item(el, 'tomato').hasAttribute('hidden')).toBeFalse()
+    })
+
+    it('should disable the search field with the list box', () => {
+      const el = setMarkup()
+      // eslint-disable-next-line no-new
+      new ListBox(el, { disabled: true, search: true })
+
+      expect(searchField(el).disabled).toBeTrue()
     })
   })
 

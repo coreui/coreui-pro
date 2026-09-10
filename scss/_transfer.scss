@@ -8,7 +8,6 @@ $transfer-gap:              1rem !default;
 $transfer-actions-gap:      .5rem !default;
 $transfer-list-min-height:  8rem !default;
 $transfer-list-max-height:  16rem !default;
-$transfer-search-margin:    1rem 1rem 0 !default;
 // scss-docs-end transfer-variables
 
 $transfer-tokens: () !default;
@@ -22,7 +21,6 @@ $transfer-tokens: defaults(
     --#{$prefix}transfer-actions-gap: #{$transfer-actions-gap},
     --#{$prefix}transfer-list-min-height: #{$transfer-list-min-height},
     --#{$prefix}transfer-list-max-height: #{$transfer-list-max-height},
-    --#{$prefix}transfer-search-margin: #{$transfer-search-margin},
   ),
   $transfer-tokens
 );
@@ -47,29 +45,15 @@ $transfer-tokens: defaults(
     min-width: 0;
   }
 
-  .transfer-list .list-box-header {
-    justify-content: space-between;
-  }
-
   .transfer-list .list-box-select-all {
-    flex: 1 1 auto;
     width: auto;
     min-width: 0;
-  }
-
-  .transfer-list .list-box-subtitle {
-    flex: 0 0 auto;
   }
 
   .transfer-list .list-box-options {
     min-height: var(--#{$prefix}transfer-list-min-height);
     max-height: var(--#{$prefix}transfer-list-max-height);
     overflow-y: auto;
-  }
-
-  .transfer-search {
-    width: auto;
-    margin: var(--#{$prefix}transfer-search-margin);
   }
 
   .transfer-actions {

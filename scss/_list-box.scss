@@ -28,6 +28,8 @@ $list-box-title-color:                  var(--#{$prefix}fg-body) !default;
 $list-box-subtitle-font-size:           calc(var(--#{$prefix}body-font-size) * .875) !default;
 $list-box-subtitle-color:               var(--#{$prefix}fg-3) !default;
 
+$list-box-search-margin:                1rem 1rem 0 !default;
+
 $list-box-option-padding-y:             .5rem !default;
 $list-box-option-padding-x:             .75rem !default;
 $list-box-option-gap:                   .5rem !default;
@@ -73,6 +75,7 @@ $list-box-tokens: defaults(
     --#{$prefix}list-box-title-color: #{$list-box-title-color},
     --#{$prefix}list-box-subtitle-font-size: #{$list-box-subtitle-font-size},
     --#{$prefix}list-box-subtitle-color: #{$list-box-subtitle-color},
+    --#{$prefix}list-box-search-margin: #{$list-box-search-margin},
     --#{$prefix}list-box-option-padding-y: #{$list-box-option-padding-y},
     --#{$prefix}list-box-option-padding-x: #{$list-box-option-padding-x},
     --#{$prefix}list-box-option-gap: #{$list-box-option-gap},
@@ -140,6 +143,17 @@ $list-box-tokens: defaults(
   .list-box-subtitle {
     font-size: var(--#{$prefix}list-box-subtitle-font-size);
     color: var(--#{$prefix}list-box-subtitle-color);
+  }
+
+  .list-box-header .list-box-subtitle {
+    flex: 0 0 auto;
+    margin-inline-start: auto;
+    margin-inline-end: var(--#{$prefix}list-box-option-padding-x);
+  }
+
+  .list-box-search {
+    width: auto;
+    margin: var(--#{$prefix}list-box-search-margin);
   }
 
   .list-box-options {
