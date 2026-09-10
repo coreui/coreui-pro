@@ -85,6 +85,31 @@ describe('NumberInput', () => {
       expect(input.value).toBe('1')
     })
 
+    it('should step by one when step is any', () => {
+      const input = markup('value="1.5" step="any" max="2"')
+      const numberInput = new NumberInput(input)
+
+      numberInput.increment()
+      expect(input.value).toBe('2')
+
+      numberInput.decrement()
+      numberInput.decrement()
+      expect(input.value).toBe('0')
+    })
+
+    it('should not fire events when the value cannot move', () => {
+      const input = markup('value="2" max="2"')
+      const numberInput = new NumberInput(input)
+      const seen = []
+
+      input.addEventListener('input', () => seen.push('input'))
+      input.addEventListener('change.coreui.number-input', () => seen.push('change'))
+
+      numberInput.increment()
+
+      expect(seen).toEqual([])
+    })
+
     it('should fire input and change on the element', () => {
       const input = markup('value="1"')
       const numberInput = new NumberInput(input)
@@ -111,6 +136,25 @@ describe('NumberInput', () => {
 
       expect(buttons()[0].disabled).toBe(false)
       expect(buttons()[1].disabled).toBe(true)
+    })
+
+    it('should follow a form reset', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = '<form><input type="number" class="form-control" value="1" max="2"></form>'
+        const input = fixtureEl.querySelector('input')
+        const numberInput = new NumberInput(input)
+
+        numberInput.increment()
+        expect(buttons()[1].disabled).toBe(true)
+
+        fixtureEl.querySelector('form').reset()
+
+        setTimeout(() => {
+          expect(input.value).toBe('1')
+          expect(buttons()[1].disabled).toBe(false)
+          resolve()
+        }, 10)
+      })
     })
 
     it('should follow a value typed into the input', () => {
@@ -241,6 +285,23 @@ describe('NumberInput', () => {
       input.dispatchEvent(new Event('input'))
 
       expect(input.value).toBe('2')
+    })
+
+    it('should drop its form listener', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = '<form><input type="number" class="form-control" value="1" max="2"></form>'
+        const input = fixtureEl.querySelector('input')
+        const numberInput = new NumberInput(input)
+        const spy = spyOn(numberInput, '_updateButtonState').and.callThrough()
+
+        numberInput.dispose()
+        fixtureEl.querySelector('form').reset()
+
+        setTimeout(() => {
+          expect(spy).not.toHaveBeenCalled()
+          resolve()
+        }, 10)
+      })
     })
 
     it('should drop its document listeners', () => {

@@ -28,6 +28,7 @@ const EVENT_CHANGE = `change${EVENT_KEY}`
 const EVENT_CLICK = `click${EVENT_KEY}`
 const EVENT_INPUT = `input${EVENT_KEY}`
 const EVENT_POINTERDOWN = `pointerdown${EVENT_KEY}`
+const EVENT_RESET = `reset${EVENT_KEY}`
 const EVENTS_STOP_REPEAT = ['pointerup', 'pointercancel', 'pointerleave'].map(event => `${event}${EVENT_KEY}`)
 
 const CLASS_NAME_ACTION = 'form-control-action'
@@ -87,6 +88,9 @@ class NumberInput extends BaseComponent {
   private _repeatTimeout: ReturnType<typeof setTimeout> | null = null
   private _repeatInterval: ReturnType<typeof setInterval> | null = null
   private _stopRepeatingHandler = (): void => this._stopRepeating()
+  private _resetHandler = (): void => {
+    setTimeout(() => this._updateButtonState())
+  }
 
   constructor(element: string | Element, config?: Partial<NumberInputConfig>) {
     super(element, config)
@@ -125,6 +129,8 @@ class NumberInput extends BaseComponent {
       EventHandler.off(document, event, this._stopRepeatingHandler)
     }
 
+    EventHandler.off(this._element.form, EVENT_RESET, this._resetHandler)
+
     for (const button of [this._decrementElement, this._incrementElement]) {
       EventHandler.off(button, EVENT_KEY)
       button?.remove()
@@ -148,18 +154,43 @@ class NumberInput extends BaseComponent {
       return
     }
 
-    if (this._element.value === '') {
+    const previousValue = this._element.value
+
+    if (previousValue === '') {
       this._element.value = this._element.min === '' ? '0' : this._element.min
+    } else if (this._element.step === 'any') {
+      this._stepByOne(direction)
     } else if (direction === 'up') {
       this._element.stepUp()
     } else {
       this._element.stepDown()
     }
 
+    if (this._element.value === previousValue) {
+      return
+    }
+
     this._updateButtonState()
     EventHandler.trigger(this._element, 'input', { bubbles: true })
     EventHandler.trigger(this._element, 'change', { bubbles: true })
     EventHandler.trigger(this._element, EVENT_CHANGE, { value: this._element.value })
+  }
+
+  // stepUp()/stepDown() throw on step="any"; the native spinner moves such a
+  // field by one, so the buttons do the same.
+  _stepByOne(direction: 'up' | 'down'): void {
+    const { max, min, value } = this._element
+    let next = Number(value) + (direction === 'up' ? 1 : -1)
+
+    if (min !== '') {
+      next = Math.max(next, Number(min))
+    }
+
+    if (max !== '') {
+      next = Math.min(next, Number(max))
+    }
+
+    this._element.value = String(next)
   }
 
   _createButtons(): void {
@@ -213,9 +244,13 @@ class NumberInput extends BaseComponent {
       }
     }
 
-    // The value can change without the buttons — typing, a form reset, a script
-    // — and the bounds have to follow it.
+    // The value can change without the buttons — typing, a form reset — and the
+    // bounds have to follow it. The reset event precedes the reset itself.
     EventHandler.on(this._element, EVENT_INPUT, () => this._updateButtonState())
+
+    if (this._element.form) {
+      EventHandler.on(this._element.form, EVENT_RESET, this._resetHandler)
+    }
 
     for (const event of EVENTS_STOP_REPEAT) {
       EventHandler.on(document, event, this._stopRepeatingHandler)
