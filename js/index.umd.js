@@ -31,7 +31,7 @@ import Menu from './src/menu.js'
 import Modal from './src/modal.js'
 import MultiSelect from './src/multi-select.js'
 import Navigation from './src/navigation.js'
-import OffCanvas from './src/offcanvas.js'
+import Offcanvas from './src/offcanvas.js'
 import OTPInput from './src/otp-input.js'
 import NumberInput from './src/number-input.js'
 import PasswordInput from './src/password-input.js'
@@ -80,7 +80,8 @@ export default {
   Modal,
   MultiSelect,
   Navigation,
-  OffCanvas,
+  Offcanvas,
+  OffCanvas: Offcanvas,
   OTPInput,
   NumberInput,
   PasswordInput,

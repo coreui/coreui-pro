@@ -192,6 +192,18 @@ They are no longer part of the published package. Use the built bundle instead:
 or, if you are already resolving the package by name, `import { Tooltip } from
 '@coreui/coreui-pro'` — `module` points at the same ESM bundle.
 
+#### `coreui.Offcanvas` in the UMD bundle
+
+The UMD bundle exposed the offcanvas plugin as `coreui.OffCanvas`, while the
+ESM bundle, the per-plugin file and the docs all call it `Offcanvas`. The UMD
+global now carries `coreui.Offcanvas` as well; `coreui.OffCanvas` stays as an
+alias of the same class, so existing scripts keep working:
+
+```diff
+- const offcanvas = new coreui.OffCanvas('#offcanvasExample')
++ const offcanvas = new coreui.Offcanvas('#offcanvasExample')
+```
+
 #### Lifecycle methods return a promise
 
 `show()`, `hide()`, `toggle()` and `close()` returned before the transition
