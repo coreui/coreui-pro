@@ -19,7 +19,7 @@ import TimeSelection from './util/time-selection.js'
 import { sanitizeHtml, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 import type { ComponentConfig } from './util/config.js'
 import { appendControlGroupField, createControlGroupAction } from './util/form-control-group.js'
-import { CLEANER_ICON } from './util/icons.js'
+import { CALENDAR_ICON, CLEANER_ICON } from './util/icons.js'
 import { defineJQueryPlugin } from './util/index.js'
 
 /**
@@ -62,7 +62,6 @@ const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="date-time-picker"]'
 const SELECTOR_TEMPLATE_FOOTER = 'template[data-coreui-template="footer"]'
 
 // Icons live in JavaScript, not in CSS masks — the chips pattern.
-const DEFAULT_INDICATOR_ICON: string = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512" fill="currentColor"><path d="M472 96h-88V40h-32v56H160V40h-32v56H40a24.03 24.03 0 0 0-24 24v336a24.03 24.03 0 0 0 24 24h432a24.03 24.03 0 0 0 24-24V120a24.03 24.03 0 0 0-24-24Zm-8 352H48V128h80v40h32v-40h192v40h32v-40h80Z"/><rect width="32" height="32" x="112" y="224"/><rect width="32" height="32" x="200" y="224"/><rect width="32" height="32" x="280" y="224"/><rect width="32" height="32" x="368" y="224"/><rect width="32" height="32" x="112" y="296"/><rect width="32" height="32" x="200" y="296"/><rect width="32" height="32" x="280" y="296"/><rect width="32" height="32" x="368" y="296"/><rect width="32" height="32" x="112" y="368"/><rect width="32" height="32" x="200" y="368"/><rect width="32" height="32" x="280" y="368"/><rect width="32" height="32" x="368" y="368"/></svg>'
 
 type DateTimePickerConfig = {
   allowList: SanitizerAllowList
@@ -99,7 +98,7 @@ const Default: DateTimePickerConfig = {
   date: null,
   disabled: false,
   floatingLabel: null,
-  indicatorIcon: DEFAULT_INDICATOR_ICON,
+  indicatorIcon: CALENDAR_ICON,
   inputOptions: {},
   locale: navigator.language,
   maxDate: null,

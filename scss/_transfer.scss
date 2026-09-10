@@ -6,6 +6,7 @@
 // scss-docs-start transfer-variables
 $transfer-gap:              1rem !default;
 $transfer-actions-gap:      .5rem !default;
+$transfer-icon-size:        1rem !default;
 $transfer-list-min-height:  8rem !default;
 $transfer-list-max-height:  16rem !default;
 // scss-docs-end transfer-variables
@@ -19,6 +20,7 @@ $transfer-tokens: defaults(
   (
     --#{$prefix}transfer-gap: #{$transfer-gap},
     --#{$prefix}transfer-actions-gap: #{$transfer-actions-gap},
+    --#{$prefix}transfer-icon-size: #{$transfer-icon-size},
     --#{$prefix}transfer-list-min-height: #{$transfer-list-min-height},
     --#{$prefix}transfer-list-max-height: #{$transfer-list-max-height},
   ),
@@ -65,6 +67,12 @@ $transfer-tokens: defaults(
 
     @include media-breakpoint-down(sm) {
       flex-direction: row;
+    }
+
+    svg {
+      display: block;
+      width: var(--#{$prefix}transfer-icon-size);
+      height: var(--#{$prefix}transfer-icon-size);
     }
   }
 }

@@ -18,7 +18,9 @@ import Popup from './util/popup.js'
 import { appendControlGroupField, createControlGroupAction } from './util/form-control-group.js'
 import type { ComponentConfig } from './util/config.js'
 import { getWeekSectionsFromLocale } from './util/date-sections.js'
-import { CLEANER_ICON } from './util/icons.js'
+import {
+  CALENDAR_ICON, CLEANER_ICON, SEPARATOR_ICON, SEPARATOR_ICON_RTL
+} from './util/icons.js'
 import { defineJQueryPlugin } from './util/index.js'
 import { sanitizeHtml, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 
@@ -64,9 +66,6 @@ const SELECTOR_TEMPLATE_RANGES = 'template[data-coreui-template="ranges"]'
 const SELECTOR_ACTION = '[data-coreui-picker-action]'
 
 // Icons live in JavaScript, not in CSS masks — the chips pattern.
-const DEFAULT_INDICATOR_ICON: string = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512" fill="currentColor"><path d="M472 96h-88V40h-32v56H160V40h-32v56H40a24.03 24.03 0 0 0-24 24v336a24.03 24.03 0 0 0 24 24h432a24.03 24.03 0 0 0 24-24V120a24.03 24.03 0 0 0-24-24Zm-8 352H48V128h80v40h32v-40h192v40h32v-40h80Z"/><rect width="32" height="32" x="112" y="224"/><rect width="32" height="32" x="200" y="224"/><rect width="32" height="32" x="280" y="224"/><rect width="32" height="32" x="368" y="224"/><rect width="32" height="32" x="112" y="296"/><rect width="32" height="32" x="200" y="296"/><rect width="32" height="32" x="280" y="296"/><rect width="32" height="32" x="368" y="296"/><rect width="32" height="32" x="112" y="368"/><rect width="32" height="32" x="200" y="368"/><rect width="32" height="32" x="280" y="368"/><rect width="32" height="32" x="368" y="368"/></svg>'
-const DEFAULT_SEPARATOR_ICON: string = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512" fill="currentColor"><path d="m359.873 121.377-22.627 22.627 95.997 95.997H16v32.001h417.24l-95.994 95.994 22.627 22.627L494.498 256z"/></svg>'
-const DEFAULT_SEPARATOR_ICON_RTL: string = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512" fill="currentColor"><path d="m152.127 121.377 22.627 22.627L78.757 240H496v32.001H78.76l95.994 95.994-22.627 22.627L17.502 256z"/></svg>'
 
 type DateRangePickerConfig = {
   allowList: SanitizerAllowList
@@ -110,15 +109,15 @@ const Default: DateRangePickerConfig = {
   endDate: null,
   endName: null,
   floatingLabels: null,
-  indicatorIcon: DEFAULT_INDICATOR_ICON,
+  indicatorIcon: CALENDAR_ICON,
   inputOptions: {},
   locale: navigator.language,
   maxDate: null,
   minDate: null,
   sanitize: true,
   sanitizeFn: null,
-  separatorIcon: DEFAULT_SEPARATOR_ICON,
-  separatorIconRtl: DEFAULT_SEPARATOR_ICON_RTL,
+  separatorIcon: SEPARATOR_ICON,
+  separatorIconRtl: SEPARATOR_ICON_RTL,
   size: null,
   startDate: null,
   startName: null
