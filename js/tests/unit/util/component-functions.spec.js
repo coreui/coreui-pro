@@ -1,6 +1,5 @@
 import BaseComponent from '../../../src/base-component.js'
-import EventHandler from '../../../src/dom/event-handler.js'
-import { enableDismissTrigger, initializeOnReady } from '../../../src/util/component-functions.js'
+import { enableDismissTrigger } from '../../../src/util/component-functions.js'
 import { clearFixture, createEvent, getFixture } from '../../helpers/fixture.js'
 
 class DummyClass2 extends BaseComponent {
@@ -26,35 +25,6 @@ describe('Plugin functions', () => {
 
   afterEach(() => {
     clearFixture()
-  })
-
-  describe('initializeOnReady', () => {
-    const component = () => ({
-      EVENT_KEY: '.coreui.probe',
-      getOrCreateInstance: jasmine.createSpy('getOrCreateInstance')
-    })
-
-    it('should initialise every match on load by default', () => {
-      fixtureEl.innerHTML = '<div class="probe"></div><div class="probe"></div>'
-      const Probe = component()
-
-      initializeOnReady(Probe, '.probe')
-      EventHandler.trigger(window, 'load')
-
-      expect(Probe.getOrCreateInstance).toHaveBeenCalledTimes(2)
-      EventHandler.off(window, 'load.coreui.probe.data-api')
-    })
-
-    it('should initialise on DOMContentLoaded when asked', () => {
-      fixtureEl.innerHTML = '<div class="probe"></div>'
-      const Probe = component()
-
-      initializeOnReady(Probe, '.probe', 'DOMContentLoaded')
-      EventHandler.trigger(document, 'DOMContentLoaded')
-
-      expect(Probe.getOrCreateInstance).toHaveBeenCalledWith(fixtureEl.querySelector('.probe'))
-      EventHandler.off(document, 'DOMContentLoaded.coreui.probe.data-api')
-    })
   })
 
   describe('data-coreui-dismiss functionality', () => {

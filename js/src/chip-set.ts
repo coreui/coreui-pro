@@ -6,7 +6,6 @@
  */
 
 import BaseComponent from './base-component.js'
-import { initializeOnReady } from './util/component-functions.js'
 import type { ComponentConfig } from './util/config.js'
 import Chip from './chip.js'
 import EventHandler from './dom/event-handler.js'
@@ -22,6 +21,9 @@ import {
  */
 
 const NAME = 'chip-set'
+const DATA_KEY = 'coreui.chip-set'
+const EVENT_KEY = `.${DATA_KEY}`
+const DATA_API_KEY = '.data-api'
 
 const EVENT_ADD = 'add'
 const EVENT_REMOVE = 'remove'
@@ -576,7 +578,11 @@ class ChipSet extends BaseComponent {
  * Data API implementation
  */
 
-initializeOnReady(ChipSet, SELECTOR_DATA_CHIP_SET, 'DOMContentLoaded')
+EventHandler.on(document, `DOMContentLoaded${EVENT_KEY}${DATA_API_KEY}`, () => {
+  for (const element of SelectorEngine.find(SELECTOR_DATA_CHIP_SET)) {
+    ChipSet.chipSetInterface(element)
+  }
+})
 
 /**
  * jQuery

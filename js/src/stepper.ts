@@ -6,7 +6,6 @@
  */
 
 import BaseComponent from './base-component.js'
-import { initializeOnReady } from './util/component-functions.js'
 import type { ComponentConfig } from './util/config.js'
 import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
@@ -30,6 +29,7 @@ const EVENT_STEP_VALIDATION_COMPLETE = `stepValidationComplete${EVENT_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}`
 const EVENT_INPUT = `input${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
+const EVENT_LOAD_DATA_API = `load${EVENT_KEY}`
 
 const CLASS_NAME_ACTIVE = 'active'
 const CLASS_NAME_COMPLETE = 'complete'
@@ -692,7 +692,11 @@ EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_STEPPER_ACTION, functio
   }
 })
 
-initializeOnReady(Stepper, SELECTOR_DATA_TOGGLE)
+EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
+  for (const element of SelectorEngine.find(SELECTOR_DATA_TOGGLE)) {
+    Stepper.getOrCreateInstance(element)
+  }
+})
 
 /**
  * jQuery integration

@@ -34,15 +34,6 @@ const enableDismissTrigger = (component: typeof BaseComponent, method = 'hide', 
   })
 }
 
-const initializeOnReady = (component: typeof BaseComponent, selector: string, event: 'DOMContentLoaded' | 'load' = 'load'): void => {
-  EventHandler.on(event === 'load' ? window : document, `${event}${component.EVENT_KEY}.data-api`, () => {
-    for (const element of SelectorEngine.find(selector)) {
-      component.getOrCreateInstance(element)
-    }
-  })
-}
-
 export {
-  enableDismissTrigger,
-  initializeOnReady
+  enableDismissTrigger
 }

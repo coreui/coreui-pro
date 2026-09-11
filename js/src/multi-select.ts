@@ -14,7 +14,7 @@ import SelectorEngine from './dom/selector-engine.js'
 import type { ComponentConfig } from './util/config.js'
 import { CLEANER_ICON, INDICATOR_ICON } from './util/icons.js'
 import { DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList } from './util/sanitizer.js'
-import { defineJQueryPlugin, getUID, jQueryDispatch } from './util/index.js'
+import { defineJQueryPlugin, getUID } from './util/index.js'
 
 /**
  * ------------------------------------------------------------------------
@@ -1416,7 +1416,9 @@ class MultiSelect extends ComboboxBase {
   }
 
   static jQueryInterface(this: any, config: any): any {
-    return jQueryDispatch(this, MultiSelect, config)
+    return this.each(function (this: HTMLElement) {
+      MultiSelect.multiSelectInterface(this, config)
+    })
   }
 
   static clearMenus(event: any): void {
