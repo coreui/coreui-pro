@@ -3,9 +3,6 @@
 @use "mixins/tokens" as *;
 @use "config" as *;
 
-$link-color:    light-dark(var(--#{$prefix}primary-base), var(--#{$prefix}primary-fg)) !default;
-
-
 // scss-docs-start theme-colors-map
 $theme-colors: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
