@@ -9,13 +9,12 @@ import ComboboxBase from './combobox-base.js'
 import Data from './dom/data.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
-import { initializeOnReady } from './util/component-functions.js'
 import type { ComponentConfig } from './util/config.js'
 import {
   DefaultAllowlist, escapeHtml, type SanitizerAllowList
 } from './util/sanitizer.js'
 import { CLEANER_ICON, INDICATOR_ICON } from './util/icons.js'
-import { defineJQueryPlugin, getUID, jQueryDispatch } from './util/index.js'
+import { defineJQueryPlugin, getUID } from './util/index.js'
 
 /**
  * ------------------------------------------------------------------------
@@ -44,6 +43,7 @@ const EVENT_KEYUP = `keyup${EVENT_KEY}`
 const EVENT_MOUSEDOWN = `mousedown${EVENT_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_KEYUP_DATA_API = `keyup${EVENT_KEY}${DATA_API_KEY}`
+const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
 const CLASS_NAME_AUTOCOMPLETE = 'autocomplete'
 const CLASS_NAME_CLEANER = 'form-control-cleaner'
@@ -733,7 +733,9 @@ class Autocomplete extends ComboboxBase {
   }
 
   static jQueryInterface(this: any, config: any): any {
-    return jQueryDispatch(this, Autocomplete, config)
+    return this.each(function (this: HTMLElement) {
+      Autocomplete.autocompleteInterface(this, config)
+    })
   }
 
   static clearMenus(event: any): void {
@@ -777,7 +779,11 @@ class Autocomplete extends ComboboxBase {
  * Data API implementation
  */
 
-initializeOnReady(Autocomplete, SELECTOR_DATA_TOGGLE)
+EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
+  for (const autocomplete of SelectorEngine.find(SELECTOR_DATA_TOGGLE)) {
+    Autocomplete.autocompleteInterface(autocomplete)
+  }
+})
 EventHandler.on(document, EVENT_CLICK_DATA_API, Autocomplete.clearMenus)
 EventHandler.on(document, EVENT_KEYUP_DATA_API, Autocomplete.clearMenus)
 

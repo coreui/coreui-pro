@@ -11,7 +11,6 @@
 import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
-import { initializeOnReady } from './util/component-functions.js'
 import type { ComponentConfig } from './util/config.js'
 import {
   defineJQueryPlugin, getElement, isDisabled, isVisible, jQueryDispatch
@@ -24,12 +23,14 @@ import {
 const NAME = 'scrollspy'
 const DATA_KEY = 'coreui.scrollspy'
 const EVENT_KEY = `.${DATA_KEY}`
+const DATA_API_KEY = '.data-api'
 
 const EVENT_ACTIVATE = `activate${EVENT_KEY}`
 const EVENT_CLICK = `click${EVENT_KEY}`
 const EVENT_SCROLL = `scroll${EVENT_KEY}`
 const EVENT_SCROLLEND = `scrollend${EVENT_KEY}`
 const EVENT_RESIZE = `resize${EVENT_KEY}`
+const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
 const CLASS_NAME_MENU_ITEM = 'menu-item'
 const CLASS_NAME_DROPDOWN_ITEM = 'dropdown-item'
@@ -601,7 +602,11 @@ function decodeFragment(hash: string): string {
  * Data API implementation
  */
 
-initializeOnReady(ScrollSpy, SELECTOR_DATA_SPY)
+EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
+  for (const spy of SelectorEngine.find(SELECTOR_DATA_SPY)) {
+    ScrollSpy.getOrCreateInstance(spy)
+  }
+})
 
 /**
  * jQuery

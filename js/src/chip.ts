@@ -6,7 +6,6 @@
  */
 
 import BaseComponent from './base-component.js'
-import { initializeOnReady } from './util/component-functions.js'
 import type { ComponentConfig } from './util/config.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
@@ -21,6 +20,7 @@ import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
 const NAME = 'chip'
 const DATA_KEY = 'coreui.chip'
 const EVENT_KEY = `.${DATA_KEY}`
+const DATA_API_KEY = '.data-api'
 
 const EVENT_REMOVE = `remove${EVENT_KEY}`
 const EVENT_REMOVED = `removed${EVENT_KEY}`
@@ -384,7 +384,11 @@ class Chip extends BaseComponent {
  * Data API implementation
  */
 
-initializeOnReady(Chip, SELECTOR_DATA_CHIP, 'DOMContentLoaded')
+EventHandler.on(document, `DOMContentLoaded${EVENT_KEY}${DATA_API_KEY}`, () => {
+  for (const element of SelectorEngine.find(SELECTOR_DATA_CHIP)) {
+    Chip.chipInterface(element)
+  }
+})
 
 /**
  * jQuery

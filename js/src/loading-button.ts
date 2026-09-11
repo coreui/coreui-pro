@@ -8,7 +8,7 @@
 import BaseComponent from './base-component.js'
 import type { ComponentConfig } from './util/config.js'
 import EventHandler from './dom/event-handler.js'
-import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
+import { defineJQueryPlugin } from './util/index.js'
 
 /**
  * Constants
@@ -189,7 +189,9 @@ class LoadingButton extends BaseComponent {
   }
 
   static jQueryInterface(this: any, config: any): void {
-    return jQueryDispatch(this, LoadingButton, config)
+    return this.each(function (this: HTMLElement) {
+      LoadingButton.loadingButtonInterface(this, config)
+    })
   }
 }
 

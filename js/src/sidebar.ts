@@ -6,11 +6,10 @@
  */
 
 import BaseComponent from './base-component.js'
-import { initializeOnReady } from './util/component-functions.js'
 import type { ComponentConfig } from './util/config.js'
 import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
-import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
+import { defineJQueryPlugin } from './util/index.js'
 import Backdrop from './util/backdrop.js'
 import ScrollBarHelper from './util/scrollbar.js'
 
@@ -42,6 +41,7 @@ const EVENT_RESIZE = `resize${EVENT_KEY}`
 const EVENT_SHOW = `show${EVENT_KEY}`
 const EVENT_SHOWN = `shown${EVENT_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
+const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
 const SELECTOR_DATA_CLOSE = '[data-coreui-close="sidebar"]'
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="narrow"], [data-coreui-toggle="unfoldable"]'
@@ -321,7 +321,9 @@ class Sidebar extends BaseComponent {
   }
 
   static jQueryInterface(this: any, config: any): void {
-    return jQueryDispatch(this, Sidebar, config)
+    return this.each(function (this: HTMLElement) {
+      Sidebar.sidebarInterface(this, config)
+    })
   }
 }
 
@@ -331,7 +333,11 @@ class Sidebar extends BaseComponent {
  * ------------------------------------------------------------------------
  */
 
-initializeOnReady(Sidebar, SELECTOR_SIDEBAR)
+EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
+  for (const element of Array.from(document.querySelectorAll(SELECTOR_SIDEBAR))) {
+    Sidebar.sidebarInterface(element)
+  }
+})
 
 /**
  * ------------------------------------------------------------------------

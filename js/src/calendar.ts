@@ -7,7 +7,6 @@
  */
 
 import BaseComponent from './base-component.js'
-import { initializeOnReady } from './util/component-functions.js'
 import type { ComponentConfig } from './util/config.js'
 import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
@@ -77,6 +76,7 @@ const EVENT_SELECT_END_CHANGE = `selectEndChange${EVENT_KEY}`
 const EVENT_START_DATE_CHANGE = `startDateChange${EVENT_KEY}`
 const EVENT_MOUSEENTER = `mouseenter${EVENT_KEY}`
 const EVENT_MOUSELEAVE = `mouseleave${EVENT_KEY}`
+const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
 
 const CLASS_NAME_CALENDAR_CELL = 'calendar-cell'
@@ -1274,7 +1274,11 @@ class Calendar extends BaseComponent {
  * Data API implementation
  */
 
-initializeOnReady(Calendar, SELECTOR_DATA_TOGGLE)
+EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
+  for (const element of Array.from(document.querySelectorAll(SELECTOR_DATA_TOGGLE))) {
+    Calendar.calendarInterface(element)
+  }
+})
 
 /**
  * jQuery

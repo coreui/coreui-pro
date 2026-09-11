@@ -11,7 +11,6 @@
 import BaseComponent from './base-component.js'
 import EventHandler, { type CoreUIEvent } from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
-import { initializeOnReady } from './util/component-functions.js'
 import {
   defineJQueryPlugin, getNextActiveElement, getTransitionDurationFromElement, isDisabled, jQueryDispatch, setAriaAttribute
 } from './util/index.js'
@@ -30,6 +29,7 @@ const EVENT_SHOW = `show${EVENT_KEY}`
 const EVENT_SHOWN = `shown${EVENT_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
+const EVENT_LOAD_DATA_API = `load${EVENT_KEY}`
 
 const ARROW_LEFT_KEY = 'ArrowLeft'
 const ARROW_RIGHT_KEY = 'ArrowRight'
@@ -307,7 +307,11 @@ EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, function (
 /**
  * Initialize on focus
  */
-initializeOnReady(Tab, SELECTOR_DATA_TOGGLE_ACTIVE)
+EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
+  for (const element of SelectorEngine.find(SELECTOR_DATA_TOGGLE_ACTIVE)) {
+    Tab.getOrCreateInstance(element)
+  }
+})
 /**
  * jQuery
  */
