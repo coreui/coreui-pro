@@ -56,72 +56,99 @@ type DateRangeInputConfig = {
   allowList: SanitizerAllowList
   ariaEndLabel: string
   ariaStartLabel: string
+  autofocus: boolean
   disabled: boolean
   disabledDates: any
   endDate: Date | string | null
   endFloatingLabel: string | null
   endName: string | null
   format: any
+  inputDateParse: ((value: string) => Date | null) | null
   inputOptions: Record<string, any>
+  invalid: boolean
   locale: string
   maxDate: Date | string | null
   minDate: Date | string | null
+  monthNames: string[] | null
+  placeholders: Record<string, string> | null
+  readonly: boolean
+  required: boolean
   sanitize: boolean
   sanitizeFn: ((unsafeHtml: string) => string) | null
+  sectionLabels: Record<string, string> | null
   separatorIcon: string
   separatorIconRtl: string
   size: string | null
   startDate: Date | string | null
   startFloatingLabel: string | null
   startName: string | null
+  valid: boolean
 }
 
 const Default: DateRangeInputConfig = {
   allowList: SVGAllowlist,
   ariaEndLabel: 'End date',
   ariaStartLabel: 'Start date',
+  autofocus: false,
   disabled: false,
   disabledDates: null,
   endDate: null,
   endFloatingLabel: null,
   endName: null,
   format: null,
+  inputDateParse: null,
   inputOptions: {},
+  invalid: false,
   locale: navigator.language,
   maxDate: null,
   minDate: null,
+  monthNames: null,
+  placeholders: null,
+  readonly: false,
+  required: false,
   sanitize: true,
   sanitizeFn: null,
+  sectionLabels: null,
   separatorIcon: SEPARATOR_ICON,
   separatorIconRtl: SEPARATOR_ICON_RTL,
   size: null,
   startDate: null,
   startFloatingLabel: null,
-  startName: null
+  startName: null,
+  valid: false
 }
 
 const DefaultType: Record<string, string> = {
   allowList: 'object',
   ariaEndLabel: 'string',
   ariaStartLabel: 'string',
+  autofocus: 'boolean',
   disabled: 'boolean',
   disabledDates: '(array|date|function|null)',
   endDate: '(date|string|null)',
   endFloatingLabel: '(string|null)',
   endName: '(string|null)',
   format: '(function|string|null)',
+  inputDateParse: '(function|null)',
   inputOptions: 'object',
+  invalid: 'boolean',
   locale: 'string',
   maxDate: '(date|string|null)',
   minDate: '(date|string|null)',
+  monthNames: '(array|null)',
+  placeholders: '(object|null)',
+  readonly: 'boolean',
+  required: 'boolean',
   sanitize: 'boolean',
   sanitizeFn: '(function|null)',
+  sectionLabels: '(object|null)',
   separatorIcon: 'string',
   separatorIconRtl: 'string',
   size: '(string|null)',
   startDate: '(date|string|null)',
   startFloatingLabel: '(string|null)',
-  startName: '(string|null)'
+  startName: '(string|null)',
+  valid: 'boolean'
 }
 
 /**
@@ -264,22 +291,38 @@ class DateRangeInput extends BaseComponent {
     this._created.end = !ownEnd
     this._endFieldElement = ownEnd ?? appendControlGroupField(group, this._endElement, this._config.endFloatingLabel, `${NAME}-`)
 
-    this._startInput = this._createInput(this._startElement, this._config.startDate, this._config.startName, this._config.startFloatingLabel ?? this._config.ariaStartLabel)
-    this._endInput = this._createInput(this._endElement, this._config.endDate, this._config.endName, this._config.endFloatingLabel ?? this._config.ariaEndLabel)
+    this._startInput = this._createInput(this._startElement, {
+      ariaLabel: this._config.startFloatingLabel ?? this._config.ariaStartLabel,
+      date: this._config.startDate,
+      name: this._config.startName
+    })
+
+    this._endInput = this._createInput(this._endElement, {
+      ariaLabel: this._config.endFloatingLabel ?? this._config.ariaEndLabel,
+      date: this._config.endDate,
+      name: this._config.endName
+    })
+
+    if (this._config.autofocus && !this._config.disabled) {
+      SelectorEngine.find(SELECTOR_SECTION, this._startElement)[0]?.focus()
+    }
   }
 
-  _createInput(element: HTMLElement, date: Date | string | null, name: string | null, ariaLabel: string): any {
+  // Options DateInput knows about are forwarded by name, so
+  // `data-coreui-month-names`, `data-coreui-readonly`, … reach both fields
+  // without this component restating the whole field surface. `inputOptions`
+  // stays as the programmatic escape hatch.
+  _createInput(element: HTMLElement, overrides: Record<string, any>): any {
+    const forwarded: Record<string, any> = {}
+
+    for (const key of Object.keys(DateInput.Default)) {
+      if (key in this._config && this._config[key] !== (Default as Record<string, any>)[key]) {
+        forwarded[key] = this._config[key]
+      }
+    }
+
     return new DateInput(element, {
-      ariaLabel,
-      date,
-      disabled: this._config.disabled,
-      disabledDates: this._config.disabledDates,
-      locale: this._config.locale,
-      maxDate: this._config.maxDate,
-      minDate: this._config.minDate,
-      name,
-      ...(this._config.format ? { format: this._config.format } : {}),
-      ...this._config.inputOptions
+      ...forwarded, ...overrides, autofocus: false, ...this._config.inputOptions
     })
   }
 
