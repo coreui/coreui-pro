@@ -228,9 +228,10 @@ $util-opacity: defaults(
 }
 
 // scss-docs-start theme-interaction-variables
-// Tuned to land near the shade-color() amounts compiled before the states moved into CSS.
 $theme-hover-lightness:   .85 !default;
+$theme-hover-chroma:      1.1 !default;
 $theme-active-lightness:  .8 !default;
+$theme-active-chroma:     1.15 !default;
 // scss-docs-end theme-interaction-variables
 
 // The neutral pair steps along the gray scale instead of shifting lightness: its
@@ -261,13 +262,13 @@ $theme-state-colors: defaults(
 
   $overrides: map.get($theme-state-colors, $state) or ();
 
-  @each $token, $lightness in ("hover": $theme-hover-lightness, "active": $theme-active-lightness) {
+  @each $token in ("hover", "active") {
     $override: map.get($overrides, $token);
 
     @if $override {
       --#{$prefix}theme-#{$token}: #{$override};
     } @else {
-      --#{$prefix}theme-#{$token}: oklch(from var(--#{$prefix}#{$state}-bg) calc(l * #{$lightness}) c h);
+      --#{$prefix}theme-#{$token}: oklch(from var(--#{$prefix}#{$state}-bg) calc(l * var(--#{$prefix}theme-#{$token}-lightness)) calc(c * var(--#{$prefix}theme-#{$token}-chroma)) h);
     }
   }
 }

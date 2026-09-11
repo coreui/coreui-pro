@@ -140,7 +140,7 @@ Four style utilities pair a themed surface with its matching text color — comp
 
 Sass variables set these defaults at build time and are removed in v7. The CSS variables above reach the same values without recompiling, and can be set on a single element.
 
-Each theme class also carries its own interaction shades, computed from the color in the browser, so a component asking for "this color, one step darker" reads a token instead of recomputing it. These two multipliers set how far a shade travels:
+Each theme class also carries its own interaction shades, computed from the color in the browser, so a component asking for "this color, one step darker" reads a token instead of recomputing it. How far a shade travels is set by four `:root` tokens — `--cui-theme-hover-lightness`, `--cui-theme-hover-chroma`, `--cui-theme-active-lightness`, `--cui-theme-active-chroma` — so the strength of every hover and active state is one override, on the page or on a subtree. These variables set their defaults:
 
 <ScssDocs file="scss/_theme.scss" capture="theme-interaction-variables" />
 
