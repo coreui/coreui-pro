@@ -19,6 +19,7 @@ import Combobox from './src/combobox.js'
 import ContextMenu from './src/context-menu.js'
 import DateInput from './src/date-input.js'
 import DatePicker from './src/date-picker.js'
+import DateRangeInput from './src/date-range-input.js'
 import DateRangePicker from './src/date-range-picker.js'
 import DateTimePicker from './src/date-time-picker.js'
 import DateTimeInput from './src/date-time-input.js'
@@ -68,6 +69,7 @@ export default {
   ContextMenu,
   DateInput,
   DatePicker,
+  DateRangeInput,
   DateRangePicker,
   DateTimePicker,
   DateTimeInput,

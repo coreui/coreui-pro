@@ -1,0 +1,161 @@
+---
+pro: true
+title: "Bootstrap 6 Date Range Input"
+name: "Date Range Input"
+description: "Create a start and end date field in one frame, with the section-based mask of the date input on both ends and the range validated as a whole."
+otherFrameworks:
+  - date-range-input
+---
+
+## Example
+
+<AddedIn version="6.0.0" />
+
+Use an empty container with `data-coreui-date-range-input` to create a range field. It is two [date inputs](/forms/date-input/) — start and end — and a separator, held together by the range the component owns: set one end and the other follows the same limits, and an end before the start marks the whole field invalid.
+
+<Example pro code={`<label class="form-label" id="basicDateRangeInputLabel">Stay</label>
+  <div data-coreui-date-range-input data-coreui-locale="en-US" data-coreui-start-name="check-in" data-coreui-end-name="check-out"></div>`} />
+
+## With form field
+
+Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label and description, and to get validation feedback in the right place.
+
+<Example pro code={`<div class="form-field">
+    <span class="form-label">Stay</span>
+    <div data-coreui-date-range-input data-coreui-locale="en-US" data-coreui-start-name="check-in" data-coreui-end-name="check-out"></div>
+    <div class="form-text">Check-out has to be on or after check-in.</div>
+  </div>`} />
+
+## Initial value
+
+Seed either end with `startDate` and `endDate`; a string is parsed like a typed value.
+
+<Example pro code={`<div data-coreui-date-range-input data-coreui-locale="en-US" data-coreui-start-date="2026-07-14" data-coreui-end-date="2026-07-20"></div>`} />
+
+## Min and max dates
+
+`minDate` and `maxDate` apply to both ends. A date outside them is refused by its field, the same way the [date input](/forms/date-input/#min-and-max-dates) refuses it, and the range reports `null` for that end.
+
+<Example pro code={`<div data-coreui-date-range-input data-coreui-locale="en-US" data-coreui-min-date="2026-07-01" data-coreui-max-date="2026-07-31"></div>`} />
+
+## Validation
+
+An end before the start is a state of the range, not of either field: the frame gets `.is-invalid`, both fields keep what was typed and stay editable, and `isRangeValid()` answers `false` until the order is fixed.
+
+<Example pro code={`<div data-coreui-date-range-input data-coreui-locale="en-US" data-coreui-start-date="2026-07-20" data-coreui-end-date="2026-07-14"></div>`} />
+
+## Floating labels
+
+Each end can carry its own [floating label](/forms/floating-labels/); the text is also that field's accessible name.
+
+<Example pro code={`<div data-coreui-date-range-input data-coreui-locale="en-US" data-coreui-start-floating-label="Check-in" data-coreui-end-floating-label="Check-out"></div>`} />
+
+## Composing the markup
+
+The component adopts the parts you write inside its element and generates the rest:
+
+| Role | Element | What the component does with it |
+| --- | --- | --- |
+| `data-coreui-range-start` | a `div` | Hosts the start field's sections. |
+| `data-coreui-range-separator` | any element | Sits between the fields; marked `aria-hidden`, as is an `<svg>` inside it. Without it an arrow is generated from `separatorIcon` / `separatorIconRtl`. |
+| `data-coreui-range-end` | a `div` | Hosts the end field's sections. |
+
+<Example pro code={`<div data-coreui-date-range-input data-coreui-locale="en-US">
+    <div data-coreui-range-start></div>
+    <span class="mx-2 text-body-secondary" data-coreui-range-separator>to</span>
+    <div data-coreui-range-end></div>
+  </div>`} />
+
+## Sizing
+
+Set heights with `data-coreui-size="lg"` or `data-coreui-size="sm"`; the frame carries the size and both fields follow.
+
+<Example pro code={`<div class="mb-3" data-coreui-date-range-input data-coreui-locale="en-US" data-coreui-size="lg"></div>
+  <div data-coreui-date-range-input data-coreui-locale="en-US" data-coreui-size="sm"></div>`} />
+
+## Disabled
+
+<Example pro code={`<div data-coreui-date-range-input data-coreui-locale="en-US" data-coreui-disabled="true" data-coreui-start-date="2026-07-14" data-coreui-end-date="2026-07-20"></div>`} />
+
+## Accessibility
+
+Each field is named for assistive technology — `ariaStartLabel` and `ariaEndLabel` by default, the floating label text when one is set — and the separator is hidden from it. Keyboard behaviour inside a field is the [date input's](/forms/date-input/#keyboard-support); <kbd>Tab</kbd> moves between the two.
+
+## Usage
+
+### Via data attributes
+
+Add `data-coreui-date-range-input` to a `div` element.
+
+```html
+<div data-coreui-date-range-input></div>
+```
+
+### Via JavaScript
+
+```html
+<div class="my-date-range-input"></div>
+```
+
+```js
+const dateRangeInputList = Array.prototype.slice.call(document.querySelectorAll('.my-date-range-input'))
+const dateRangeInputs = dateRangeInputList.map(el => new coreui.DateRangeInput(el))
+```
+
+### Options
+
+Options can be passed via data attributes or JavaScript. For data attributes, append the option name to `data-coreui-`, as in `data-coreui-start-name=""`.
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `allowList` | object | SVG allow list | Allowed tags and attributes for the generated separator icon. |
+| `ariaEndLabel` | string | `'End date'` | Accessible name of the end field when it has no floating label. |
+| `ariaStartLabel` | string | `'Start date'` | Accessible name of the start field when it has no floating label. |
+| `disabled` | boolean | `false` | Disables both fields. |
+| `disabledDates` | array, date, function, null | `null` | Dates neither end can hold; see the [date input](/forms/date-input/#disabled-dates). |
+| `endDate` | date, string, null | `null` | Initial end date. |
+| `endFloatingLabel` | string, null | `null` | Floating label of the end field. |
+| `endName` | string, null | `null` | Name of the hidden input carrying the end date. |
+| `format` | function, string, null | `null` | Section mask for both fields; see the [date input](/forms/date-input/#formats). |
+| `inputOptions` | object | `{}` | Extra options passed to both date inputs. |
+| `locale` | string | browser locale | Locale for the masks. |
+| `maxDate` | date, string, null | `null` | Latest date either end can hold. |
+| `minDate` | date, string, null | `null` | Earliest date either end can hold. |
+| `sanitize` | boolean | `true` | Sanitize the generated separator icon. |
+| `sanitizeFn` | function, null | `null` | Custom sanitizer. |
+| `separatorIcon` | string | arrow SVG | Icon of the generated separator; ignored for a `data-coreui-range-separator` you wrote. |
+| `separatorIconRtl` | string | mirrored arrow SVG | Its right-to-left counterpart. |
+| `size` | string, null | `null` | `'sm'` or `'lg'`. |
+| `startDate` | date, string, null | `null` | Initial start date. |
+| `startFloatingLabel` | string, null | `null` | Floating label of the start field. |
+| `startName` | string, null | `null` | Name of the hidden input carrying the start date. |
+
+### Methods
+
+| Method | Description |
+| --- | --- |
+| `getStartDate` | Returns the start `Date`, or `null`. |
+| `getEndDate` | Returns the end `Date`, or `null`. |
+| `setRange` | Sets both ends: `setRange(start, end)`. Each field validates its own date; what the range keeps is what the fields kept. |
+| `clear` | Empties both ends. |
+| `reset` | Restores the dates the component was created with. A native form reset does the same through the fields. |
+| `isDateSelectable` | Whether a date passes the fields' limits. |
+| `isRangeValid` | `false` while the end is before the start. |
+| `dispose` | Destroys the component, removing what it built and leaving the parts you wrote. |
+| `getInstance` | Static method which allows you to get the instance associated with a DOM element. |
+| `getOrCreateInstance` | Static method which returns the instance or creates one. |
+
+### Events
+
+| Event | Description |
+| --- | --- |
+| `startDateChange.coreui.date-range-input` | Fired when the start changes; `event.date` is the validated `Date`, or `null`. |
+| `endDateChange.coreui.date-range-input` | Fired when the end changes, with the same payload. |
+| `rangeChange.coreui.date-range-input` | Fired once after either end changed; `event.startDate` and `event.endDate`. |
+
+```js
+const myRange = document.getElementById('myRange')
+myRange.addEventListener('rangeChange.coreui.date-range-input', event => {
+  console.log(event.startDate, event.endDate)
+})
+```
