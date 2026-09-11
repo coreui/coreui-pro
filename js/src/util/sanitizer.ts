@@ -170,4 +170,10 @@ export function sanitizeHtml(unsafeHtml: string, allowList: SanitizerAllowList, 
   return createdDocument.body.innerHTML
 }
 
-export type { SanitizerAllowList }
+type SanitizerConfig = { allowList?: SanitizerAllowList, sanitize?: boolean, sanitizeFn?: ((unsafeHtml: string) => string) | null }
+
+export function sanitizeByConfig(unsafeHtml: string, config: SanitizerConfig): string {
+  return config.sanitize ? sanitizeHtml(unsafeHtml, config.allowList ?? DefaultAllowlist, config.sanitizeFn) : unsafeHtml
+}
+
+export type { SanitizerAllowList, SanitizerConfig }

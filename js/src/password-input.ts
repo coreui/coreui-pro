@@ -12,7 +12,7 @@ import {
   createControlGroupAction, ensureControlGroup, releaseControlGroup, type ControlGroup
 } from './util/form-control-group.js'
 import { PASSWORD_HIDE_ICON, PASSWORD_SHOW_ICON } from './util/icons.js'
-import { sanitizeHtml, SVGAllowlist, type SanitizerAllowList } from './util/sanitizer.js'
+import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
 
 /**
@@ -121,7 +121,7 @@ class PasswordInput extends BaseComponent {
       disabled: this._element.disabled,
       icon: this._config.showIcon,
       label: this._config.ariaToggleLabel,
-      sanitizeIcon: (icon: string) => this._sanitizeIcon(icon)
+      sanitizeIcon: (icon: string) => sanitizeByConfig(icon, this._config)
     })
 
     EventHandler.on(this._toggleElement, EVENT_CLICK, () => this.toggle())
@@ -138,11 +138,7 @@ class PasswordInput extends BaseComponent {
     const visible = this._element.type === 'text'
 
     this._toggleElement.setAttribute('aria-pressed', visible ? 'true' : 'false')
-    this._toggleElement.innerHTML = this._sanitizeIcon(visible ? this._config.hideIcon : this._config.showIcon)
-  }
-
-  _sanitizeIcon(icon: string): string {
-    return this._config.sanitize ? sanitizeHtml(icon, this._config.allowList, this._config.sanitizeFn) : icon
+    this._toggleElement.innerHTML = sanitizeByConfig(visible ? this._config.hideIcon : this._config.showIcon, this._config)
   }
 
   // Static

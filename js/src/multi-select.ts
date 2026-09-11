@@ -13,7 +13,7 @@ import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import type { ComponentConfig } from './util/config.js'
 import { CLEANER_ICON, INDICATOR_ICON } from './util/icons.js'
-import { DefaultAllowlist, type SanitizerAllowList } from './util/sanitizer.js'
+import { DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList } from './util/sanitizer.js'
 import { defineJQueryPlugin, getUID, jQueryDispatch } from './util/index.js'
 
 /**
@@ -1321,7 +1321,7 @@ class MultiSelect extends ComboboxBase {
     if (result instanceof Node) {
       this._headerElement.replaceChildren(result)
     } else {
-      this._headerElement.innerHTML = this._maybeSanitize(result)
+      this._headerElement.innerHTML = sanitizeByConfig(result, this._config)
     }
   }
 

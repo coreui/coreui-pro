@@ -10,7 +10,7 @@ import { initializeOnReady } from './util/component-functions.js'
 import type { ComponentConfig } from './util/config.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
-import { sanitizeHtml, SVGAllowlist, type SanitizerAllowList } from './util/sanitizer.js'
+import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 import { CHECK_ICON, REMOVE_ICON } from './util/icons.js'
 import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
 
@@ -288,7 +288,7 @@ class Chip extends BaseComponent {
     const check = document.createElement('span')
     check.className = CLASS_NAME_CHIP_CHECK
     check.setAttribute('aria-hidden', 'true')
-    check.innerHTML = this._sanitizeIcon(this._config.selectedIcon)
+    check.innerHTML = sanitizeByConfig(this._config.selectedIcon, this._config)
     this._element.prepend(check)
   }
 
@@ -298,7 +298,7 @@ class Chip extends BaseComponent {
     button.className = CLASS_NAME_CHIP_REMOVE
     button.setAttribute('aria-label', this._config.ariaRemoveLabel)
     button.setAttribute('tabindex', '-1') // Not in tab order, chips handle keyboard
-    button.innerHTML = this._sanitizeIcon(this._config.removeIcon)
+    button.innerHTML = sanitizeByConfig(this._config.removeIcon, this._config)
     return button
   }
 
@@ -360,10 +360,6 @@ class Chip extends BaseComponent {
     EventHandler.trigger(this._element, EVENT_REMOVED)
     this._element.remove()
     this.dispose()
-  }
-
-  _sanitizeIcon(icon: string): string {
-    return this._config.sanitize ? sanitizeHtml(icon, this._config.allowList, this._config.sanitizeFn) : icon
   }
 
   // Static

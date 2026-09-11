@@ -12,7 +12,7 @@ import {
   createControlGroupAction, ensureControlGroup, releaseControlGroup, type ControlGroup
 } from './util/form-control-group.js'
 import { MINUS_ICON, PLUS_ICON } from './util/icons.js'
-import { sanitizeHtml, SVGAllowlist, type SanitizerAllowList } from './util/sanitizer.js'
+import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
 
 /**
@@ -203,14 +203,14 @@ class NumberInput extends BaseComponent {
       className: CLASS_NAME_ACTION,
       icon: this._config.decrementIcon,
       label: this._config.ariaDecrementLabel,
-      sanitizeIcon: (icon: string) => this._sanitizeIcon(icon)
+      sanitizeIcon: (icon: string) => sanitizeByConfig(icon, this._config)
     })
 
     this._incrementElement = createControlGroupAction({
       className: CLASS_NAME_ACTION,
       icon: this._config.incrementIcon,
       label: this._config.ariaIncrementLabel,
-      sanitizeIcon: (icon: string) => this._sanitizeIcon(icon)
+      sanitizeIcon: (icon: string) => sanitizeByConfig(icon, this._config)
     })
 
     // A number field already steps with the up and down arrows, so putting the
@@ -290,10 +290,6 @@ class NumberInput extends BaseComponent {
     if (this._incrementElement) {
       this._incrementElement.disabled = max !== '' && value !== '' && Number(value) >= Number(max)
     }
-  }
-
-  _sanitizeIcon(icon: string): string {
-    return this._config.sanitize ? sanitizeHtml(icon, this._config.allowList, this._config.sanitizeFn) : icon
   }
 
   // Static

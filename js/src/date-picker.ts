@@ -23,7 +23,7 @@ import { getWeekSectionsFromLocale } from './util/date-sections.js'
 import { appendControlGroupField, createControlGroupAction } from './util/form-control-group.js'
 import { CALENDAR_ICON, CLEANER_ICON } from './util/icons.js'
 import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
-import { sanitizeHtml, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
+import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 
 /**
  * Constants
@@ -284,10 +284,6 @@ class DatePicker extends BaseComponent {
     return (byType as Record<string, any>)[this._config.selectionType] ?? null
   }
 
-  _sanitizeIcon(icon: string): string {
-    return this._config.sanitize ? sanitizeHtml(icon, this._config.allowList, this._config.sanitizeFn) : icon
-  }
-
   _createDatePicker(): void {
     this._element.classList.add(CLASS_NAME_DATE_PICKER, CLASS_NAME_PICKER)
 
@@ -306,7 +302,7 @@ class DatePicker extends BaseComponent {
     this._fieldElement = appendControlGroupField(inputGroup, inputEl, this._config.floatingLabel, `${this.constructor.NAME}-`)
 
     const action = (className: string, icon: string, label: string) => createControlGroupAction({
-      className, disabled: this._config.disabled, icon, label, sanitizeIcon: (value: string) => this._sanitizeIcon(value)
+      className, disabled: this._config.disabled, icon, label, sanitizeIcon: (value: string) => sanitizeByConfig(value, this._config)
     })
 
     if (this._config.cleaner) {

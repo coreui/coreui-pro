@@ -13,7 +13,7 @@ import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
 import {
- escapeHtml, sanitizeHtml, type SanitizerAllowList, SVGAllowlist
+ escapeHtml, sanitizeByConfig, type SanitizerAllowList, SVGAllowlist
 } from './util/sanitizer.js'
 import {
  CHEVRON_DOUBLE_LEFT_ICON, CHEVRON_DOUBLE_RIGHT_ICON, CHEVRON_LEFT_ICON, CHEVRON_RIGHT_ICON
@@ -856,7 +856,7 @@ class Calendar extends BaseComponent {
                     data-coreui-date="${date}"
                   >
                     <div class="${CLASS_NAME_CALENDAR_CELL_INNER} day">
-                      ${this._config.renderDayCell ? this._sanitizeHtml(this._config.renderDayCell(date, cellAttributes.meta)) : date.toLocaleDateString(this._config.locale, { day: this._config.dayFormat })}
+                      ${this._config.renderDayCell ? sanitizeByConfig(this._config.renderDayCell(date, cellAttributes.meta), this._config) : date.toLocaleDateString(this._config.locale, { day: this._config.dayFormat })}
                     </div>
                   </td>` :
                   '<td></td>'
@@ -877,7 +877,7 @@ class Calendar extends BaseComponent {
                   data-coreui-date="${date.toDateString()}"
                 >
                   <div class="${CLASS_NAME_CALENDAR_CELL_INNER} month">
-                    ${this._config.renderMonthCell ? this._sanitizeHtml(this._config.renderMonthCell(date, cellAttributes.meta)) : month}
+                    ${this._config.renderMonthCell ? sanitizeByConfig(this._config.renderMonthCell(date, cellAttributes.meta), this._config) : month}
                   </div>
                 </td>`
               )
@@ -897,7 +897,7 @@ class Calendar extends BaseComponent {
                   data-coreui-date="${date.toDateString()}"
                 >
                   <div class="${CLASS_NAME_CALENDAR_CELL_INNER} quarter">
-                    ${this._config.renderQuarterCell ? this._sanitizeHtml(this._config.renderQuarterCell(date, cellAttributes.meta)) : `Q${index + 1}`}
+                    ${this._config.renderQuarterCell ? sanitizeByConfig(this._config.renderQuarterCell(date, cellAttributes.meta), this._config) : `Q${index + 1}`}
                   </div>
                 </td>`
               )
@@ -916,7 +916,7 @@ class Calendar extends BaseComponent {
                   data-coreui-date="${date.toDateString()}"
                 >
                   <div class="${CLASS_NAME_CALENDAR_CELL_INNER} year">
-                    ${this._config.renderYearCell ? this._sanitizeHtml(this._config.renderYearCell(date, cellAttributes.meta)) : date.toLocaleDateString(this._config.locale, { year: this._config.yearFormat })}
+                    ${this._config.renderYearCell ? sanitizeByConfig(this._config.renderYearCell(date, cellAttributes.meta), this._config) : date.toLocaleDateString(this._config.locale, { year: this._config.yearFormat })}
                   </div>
                 </td>`
               )
@@ -1248,15 +1248,7 @@ class Calendar extends BaseComponent {
       navIconPrev: 'navIconNext'
     }
 
-    return this._sanitizeHtml(this._config[this._isRtl() ? (mirrored as Record<string, string>)[name] : name])
-  }
-
-  _sanitizeHtml(html: string): string {
-    if (this._config.sanitize) {
-      return sanitizeHtml(html, this._config.allowList, this._config.sanitizeFn)
-    }
-
-    return html
+    return sanitizeByConfig(this._config[this._isRtl() ? (mirrored as Record<string, string>)[name] : name], this._config)
   }
 
   // Static

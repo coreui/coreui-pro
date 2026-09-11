@@ -12,7 +12,7 @@ import SelectorEngine from './dom/selector-engine.js'
 import { initializeOnReady } from './util/component-functions.js'
 import type { ComponentConfig } from './util/config.js'
 import { defineJQueryPlugin, isRTL, jQueryDispatch } from './util/index.js'
-import { DefaultAllowlist, type SanitizerAllowList, sanitizeHtml } from './util/sanitizer.js'
+import { DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList } from './util/sanitizer.js'
 
 /**
  * Constants
@@ -435,7 +435,7 @@ class RangeSlider extends BaseComponent {
       const tooltipInnerElement = this._createElement('span', CLASS_NAME_TOOLTIP_INNER)
 
       tooltipInnerElement.innerHTML = this._config.tooltipsFormat ?
-        (this._config.sanitize ? sanitizeHtml(this._config.tooltipsFormat(input.value), this._config.allowList, this._config.sanitizeFn) : this._config.tooltipsFormat(input.value)) :
+        sanitizeByConfig(this._config.tooltipsFormat(input.value), this._config) :
         input.value
       tooltipElement.append(tooltipArrowElement, tooltipInnerElement)
 
@@ -458,8 +458,8 @@ class RangeSlider extends BaseComponent {
 
     if (this._tooltips[index]) {
       this._tooltips[index].children[1].innerHTML = this._config.tooltipsFormat ?
-        (this._config.sanitize ? sanitizeHtml(this._config.tooltipsFormat(value), this._config.allowList, this._config.sanitizeFn) : this._config.tooltipsFormat(value)) :
-        value
+        sanitizeByConfig(this._config.tooltipsFormat(value), this._config) :
+        String(value)
       const input = SelectorEngine.find(SELECTOR_RANGE_SLIDER_INPUT, this._element as ParentNode)[index] as HTMLInputElement
       this._positionTooltip(this._tooltips[index], input)
     }
