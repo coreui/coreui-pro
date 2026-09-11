@@ -174,7 +174,8 @@ describe('DatePicker', () => {
 
       el.querySelector('.form-control-action').click()
       expect(el.classList.contains('show')).toBeTrue()
-      expect(el.getAttribute('aria-expanded')).toEqual('true')
+      expect(el.querySelector('.form-control-action').getAttribute('aria-expanded')).toEqual('true')
+      expect(el.querySelector('.form-control-action').getAttribute('aria-controls')).toEqual(picker._menu.id)
 
       el.querySelector('.form-control-action').click()
       expect(el.classList.contains('show')).toBeFalse()
@@ -223,6 +224,95 @@ describe('DatePicker', () => {
       picker.show()
 
       expect(picker._popup.isShown).toBeFalse()
+    })
+  })
+
+  describe('markup roles', () => {
+    const OWN_MARKUP = `<div id="picker" data-coreui-locale="en-US">
+        <div data-coreui-picker-field></div>
+        <button type="button" class="btn btn-subtle btn-sm" data-coreui-picker-cleaner><svg viewBox="0 0 16 16"><path d="M0 0h16"/></svg></button>
+        <button type="button" class="btn btn-subtle btn-sm" data-coreui-picker-toggle>Pick a date <svg viewBox="0 0 16 16"><path d="M0 0h16"/></svg></button>
+      </div>`
+
+    it('should adopt the field, toggle and cleaner the author wrote instead of building its own', () => {
+      const picker = buildPicker({ date: new Date(2026, 6, 14) }, OWN_MARKUP)
+      const el = fixtureEl.querySelector('#picker')
+
+      expect(el.querySelector('.form-control-action')).toBeNull()
+      expect(el.querySelector('.form-control-cleaner')).toBeNull()
+      expect(el.querySelector('[data-coreui-picker-field] .form-date-time-section')).not.toBeNull()
+      expect(el.querySelector('input[type="hidden"]').value).toEqual('07/14/2026')
+
+      el.querySelector('[data-coreui-picker-toggle]').click()
+      expect(picker._popup.isShown).toBeTrue()
+      el.querySelector('[data-coreui-picker-toggle]').click()
+      expect(picker._popup.isShown).toBeFalse()
+
+      el.querySelector('[data-coreui-picker-cleaner]').click()
+      expect(picker.getDate()).toBeNull()
+    })
+
+    it('should give an adopted toggle the accessibility it would have given its own', () => {
+      const picker = buildPicker({}, OWN_MARKUP)
+      const el = fixtureEl.querySelector('#picker')
+      const toggle = el.querySelector('[data-coreui-picker-toggle]')
+
+      expect(toggle.getAttribute('aria-label')).toEqual('Toggle the calendar')
+      expect(toggle.getAttribute('aria-haspopup')).toEqual('dialog')
+      expect(toggle.getAttribute('aria-controls')).toEqual(picker._menu.id)
+      expect(toggle.getAttribute('aria-expanded')).toEqual('false')
+      expect(el.querySelector('[data-coreui-picker-cleaner]').getAttribute('aria-label')).toEqual('Clear the value')
+
+      for (const svg of el.querySelectorAll('svg')) {
+        expect(svg.getAttribute('aria-hidden')).toEqual('true')
+      }
+
+      picker.show()
+      expect(toggle.getAttribute('aria-expanded')).toEqual('true')
+    })
+
+    it('should keep the name the author gave the toggle', () => {
+      buildPicker({}, '<div id="picker"><div data-coreui-picker-field></div><button type="button" aria-label="Open" data-coreui-picker-toggle></button></div>')
+
+      expect(fixtureEl.querySelector('[data-coreui-picker-toggle]').getAttribute('aria-label')).toEqual('Open')
+    })
+
+    it('should disable an adopted toggle and cleaner when the picker is disabled', () => {
+      buildPicker({ disabled: true }, OWN_MARKUP)
+
+      expect(fixtureEl.querySelector('[data-coreui-picker-toggle]').disabled).toBeTrue()
+      expect(fixtureEl.querySelector('[data-coreui-picker-cleaner]').disabled).toBeTrue()
+    })
+
+    it('should leave the author\'s elements in place on dispose', () => {
+      const picker = buildPicker({}, OWN_MARKUP)
+      const el = fixtureEl.querySelector('#picker')
+
+      picker.dispose()
+      pickers.length = 0
+
+      expect(el.querySelector('[data-coreui-picker-field]')).not.toBeNull()
+      expect(el.querySelector('[data-coreui-picker-toggle]')).not.toBeNull()
+      expect(el.querySelector('[data-coreui-picker-cleaner]')).not.toBeNull()
+    })
+
+    it('should keep the field and the calendar on the one date the picker owns', () => {
+      const picker = buildPicker({ locale: 'en-US', date: new Date(2026, 6, 14) })
+      const emitted = []
+      fixtureEl.querySelector('#picker').addEventListener('dateChange.coreui.date-picker', event => emitted.push(event.date))
+
+      picker.show()
+      fixtureEl.querySelector('.date-picker-popup .calendar-cell[data-coreui-date^="Mon Jul 20 2026"]').click()
+      expect(picker.getDate()).toEqual(new Date(2026, 6, 20))
+      expect(picker._calendar._startDate).toEqual(new Date(2026, 6, 20))
+
+      picker.setDate(new Date(2026, 6, 20))
+      expect(emitted.length).toBe(1)
+
+      picker.setDate(new Date(2026, 6, 21))
+      expect(fixtureEl.querySelector('#picker input[type="hidden"]').value).toEqual('07/21/2026')
+      expect(picker._calendar._startDate).toEqual(new Date(2026, 6, 21))
+      expect(emitted.length).toBe(2)
     })
   })
 

@@ -946,6 +946,21 @@ behaviour, v5 is the reference. Mapping:
   calendar is built then); later opens are unchanged. Code reaching into the
   private `picker._calendar` before the first open now finds `null`.
 
+#### The date picker adopts the markup you write
+
+The date picker is composed from the date input, the calendar and a popup,
+joined by the one date it owns. Mark a `div` with `data-coreui-picker-field`,
+a button with `data-coreui-picker-toggle` or `data-coreui-picker-cleaner`
+inside the picker element and it uses them instead of generating its own —
+a trigger can be a regular button with text, the icons can be plain `<svg>`
+in the HTML. Nothing changes for the bare `<div data-coreui-toggle="date-picker">`.
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+`aria-expanded` moved from the picker's root element to the toggle button,
+where it describes the control that opens the calendar; the toggle also
+carries `aria-controls` and `aria-haspopup="dialog"`. Styles keyed to the
+root's `.show` class are unaffected.
+
 #### The date range picker is built on the date range input
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
