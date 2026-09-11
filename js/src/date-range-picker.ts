@@ -14,6 +14,7 @@ import Calendar from './calendar.js'
 import DateInput from './date-input.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
+import { initializeOnReady } from './util/component-functions.js'
 import Popup from './util/popup.js'
 import { appendControlGroupField, createControlGroupAction } from './util/form-control-group.js'
 import { getDateBySelectionType } from './util/calendar.js'
@@ -32,7 +33,6 @@ import { sanitizeHtml, type SanitizerAllowList, SVGAllowlist } from './util/sani
 const NAME = 'date-range-picker'
 const DATA_KEY = 'coreui.date-range-picker'
 const EVENT_KEY = `.${DATA_KEY}`
-const DATA_API_KEY = '.data-api'
 
 const EVENT_CLICK = `click${EVENT_KEY}`
 const EVENT_END_DATE_CHANGE = `endDateChange${EVENT_KEY}`
@@ -42,7 +42,6 @@ const EVENT_HIDE = `hide${EVENT_KEY}`
 const EVENT_SHOW = `show${EVENT_KEY}`
 const EVENT_SHOWN = `shown${EVENT_KEY}`
 const EVENT_START_DATE_CHANGE = `startDateChange${EVENT_KEY}`
-const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
 const CLASS_NAME_BODY = 'date-picker-body'
 const CLASS_NAME_CALENDAR = 'date-picker-calendar'
@@ -580,11 +579,7 @@ class DateRangePicker extends BaseComponent {
  * Data API implementation
  */
 
-EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
-  for (const element of SelectorEngine.find(SELECTOR_DATA_TOGGLE)) {
-    DateRangePicker.getOrCreateInstance(element)
-  }
-})
+initializeOnReady(DateRangePicker, SELECTOR_DATA_TOGGLE)
 
 /**
  * jQuery

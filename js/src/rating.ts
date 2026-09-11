@@ -6,6 +6,7 @@
  */
 
 import BaseComponent from './base-component.js'
+import { initializeOnReady } from './util/component-functions.js'
 import type { ComponentConfig } from './util/config.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
@@ -20,14 +21,12 @@ import Tooltip from './tooltip.js'
 const NAME = 'rating'
 const DATA_KEY = 'coreui.rating'
 const EVENT_KEY = `.${DATA_KEY}`
-const DATA_API_KEY = '.data-api'
 
 const EVENT_CHANGE = `change${EVENT_KEY}`
 const EVENT_CLICK = `click${EVENT_KEY}`
 const EVENT_FOCUSIN = `focusin${EVENT_KEY}`
 const EVENT_FOCUSOUT = `focusout${EVENT_KEY}`
 const EVENT_HOVER = `hover${EVENT_KEY}`
-const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_MOUSEENTER = `mouseenter${EVENT_KEY}`
 const EVENT_MOUSELEAVE = `mouseleave${EVENT_KEY}`
 
@@ -493,12 +492,7 @@ class Rating extends BaseComponent {
  * Data API implementation
  */
 
-EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
-  const ratings = SelectorEngine.find(SELECTOR_DATA_TOGGLE)
-  for (let i = 0, len = ratings.length; i < len; i++) {
-    Rating.ratingInterface(ratings[i])
-  }
-})
+initializeOnReady(Rating, SELECTOR_DATA_TOGGLE)
 
 /**
  * jQuery

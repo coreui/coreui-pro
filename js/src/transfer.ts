@@ -9,6 +9,7 @@ import BaseComponent from './base-component.js'
 import ListBox, { type ListBoxEntry, type ListBoxGroup, type ListBoxItem } from './list-box.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
+import { initializeOnReady } from './util/component-functions.js'
 import type { ComponentConfig } from './util/config.js'
 import {
   CHEVRON_DOUBLE_LEFT_ICON, CHEVRON_DOUBLE_RIGHT_ICON, CHEVRON_LEFT_ICON, CHEVRON_RIGHT_ICON
@@ -23,7 +24,6 @@ import { sanitizeHtml, type SanitizerAllowList, SVGAllowlist } from './util/sani
 const NAME = 'transfer'
 const DATA_KEY = 'coreui.transfer'
 const EVENT_KEY = `.${DATA_KEY}`
-const DATA_API_KEY = '.data-api'
 
 const EVENT_CHANGE = 'change'
 const EVENT_MOVE = 'move'
@@ -687,11 +687,7 @@ class Transfer extends BaseComponent {
  * Data API implementation
  */
 
-EventHandler.on(document, `DOMContentLoaded${EVENT_KEY}${DATA_API_KEY}`, () => {
-  for (const element of SelectorEngine.find(SELECTOR_DATA_TOGGLE)) {
-    Transfer.getOrCreateInstance(element)
-  }
-})
+initializeOnReady(Transfer, SELECTOR_DATA_TOGGLE, 'DOMContentLoaded')
 
 /**
  * jQuery

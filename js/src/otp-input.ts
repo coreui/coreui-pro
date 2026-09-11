@@ -8,6 +8,7 @@
 import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
+import { initializeOnReady } from './util/component-functions.js'
 import {
   defineJQueryPlugin, getNextActiveElement, isRTL, jQueryDispatch
 } from './util/index.js'
@@ -19,7 +20,6 @@ import {
 const NAME = 'otp-input'
 const DATA_KEY = 'coreui.otp-input'
 const EVENT_KEY = `.${DATA_KEY}`
-const DATA_API_KEY = '.data-api'
 
 const ARROW_RIGHT_KEY = 'ArrowRight'
 const ARROW_LEFT_KEY = 'ArrowLeft'
@@ -31,7 +31,6 @@ const EVENT_FOCUS = `focus${EVENT_KEY}`
 const EVENT_INPUT = `input${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 const EVENT_PASTE = `paste${EVENT_KEY}`
-const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
 const SELECTOR_FORM_OTP_CONTROL = '.form-otp-control'
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="otp"]'
@@ -525,11 +524,7 @@ class OTPInput extends BaseComponent {
  * Data API implementation
  */
 
-EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
-  for (const otp of SelectorEngine.find(SELECTOR_DATA_TOGGLE)) {
-    OTPInput.otpInputInterface(otp)
-  }
-})
+initializeOnReady(OTPInput, SELECTOR_DATA_TOGGLE)
 
 /**
  * jQuery
