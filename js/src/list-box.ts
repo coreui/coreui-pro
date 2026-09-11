@@ -10,7 +10,7 @@ import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { initializeOnReady } from './util/component-functions.js'
 import type { ComponentConfig } from './util/config.js'
-import { DefaultAllowlist, sanitizeHtml, type SanitizerAllowList } from './util/sanitizer.js'
+import { DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList } from './util/sanitizer.js'
 import {
   defineJQueryPlugin, getElement, getNextActiveElement, getUID, jQueryDispatch
 } from './util/index.js'
@@ -706,7 +706,7 @@ class ListBox extends BaseComponent {
 
   _setContent(target: HTMLElement, content: string): void {
     if (this._config.html) {
-      target.innerHTML = this._config.sanitize ? sanitizeHtml(content, this._config.allowList, this._config.sanitizeFn) : content
+      target.innerHTML = sanitizeByConfig(content, this._config)
       return
     }
 

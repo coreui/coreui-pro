@@ -10,7 +10,7 @@ import { initializeOnReady } from './util/component-functions.js'
 import type { ComponentConfig } from './util/config.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
-import { sanitizeHtml, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
+import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 import { defineJQueryPlugin, getUID, jQueryDispatch } from './util/index.js'
 import Tooltip from './tooltip.js'
 
@@ -412,7 +412,7 @@ class Rating extends BaseComponent {
       if (this._config.icon) {
         const ratingItemIconElement = document.createElement('div')
         ratingItemIconElement.classList.add(CLASS_NAME_RATING_ITEM_CUSTOM_ICON)
-        ratingItemIconElement.innerHTML = this._sanitizeIcon(typeof this._config.icon === 'object' ? this._config.icon[index + 1] : this._config.icon)
+        ratingItemIconElement.innerHTML = sanitizeByConfig(typeof this._config.icon === 'object' ? this._config.icon[index + 1] : this._config.icon, this._config)
 
         ratingItemLabelElement.append(ratingItemIconElement)
       } else {
@@ -425,7 +425,7 @@ class Rating extends BaseComponent {
       if (this._config.icon && this._config.activeIcon) {
         const ratingItemIconActiveElement = document.createElement('div')
         ratingItemIconActiveElement.classList.add(CLASS_NAME_RATING_ITEM_CUSTOM_ICON_ACTIVE)
-        ratingItemIconActiveElement.innerHTML = this._sanitizeIcon(typeof this._config.activeIcon === 'object' ? this._config.activeIcon[index + 1] : this._config.activeIcon)
+        ratingItemIconActiveElement.innerHTML = sanitizeByConfig(typeof this._config.activeIcon === 'object' ? this._config.activeIcon[index + 1] : this._config.activeIcon, this._config)
 
         ratingItemLabelElement.append(ratingItemIconActiveElement)
       }
@@ -464,10 +464,6 @@ class Rating extends BaseComponent {
     })
 
     this._element.append(ratingItemElement)
-  }
-
-  _sanitizeIcon(icon: any): any {
-    return this._config.sanitize ? sanitizeHtml(icon, this._config.allowList, this._config.sanitizeFn) : icon
   }
 
   // Static

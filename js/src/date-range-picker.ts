@@ -24,7 +24,7 @@ import {
   CALENDAR_ICON, CLEANER_ICON, SEPARATOR_ICON, SEPARATOR_ICON_RTL
 } from './util/icons.js'
 import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
-import { sanitizeHtml, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
+import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 
 /**
  * Constants
@@ -330,10 +330,6 @@ class DateRangePicker extends BaseComponent {
     this._calendar?.update({ selectEndDate: value })
   }
 
-  _sanitizeIcon(icon: string): string {
-    return this._config.sanitize ? sanitizeHtml(icon, this._config.allowList, this._config.sanitizeFn) : icon
-  }
-
   // The separator is a directional arrow, so it has an RTL counterpart (v1 did
   // the same with two icon variables, swapped in CSS). Read the element's
   // computed direction rather than isRTL(): the document can be LTR while an
@@ -396,7 +392,7 @@ class DateRangePicker extends BaseComponent {
     const separator = document.createElement('span')
     separator.classList.add(CLASS_NAME_SEPARATOR)
     separator.setAttribute('aria-hidden', 'true')
-    separator.innerHTML = this._sanitizeIcon(this._resolveSeparatorIcon())
+    separator.innerHTML = sanitizeByConfig(this._resolveSeparatorIcon(), this._config)
     inputGroup.append(separator)
     this._separatorElement = separator
 
@@ -421,7 +417,7 @@ class DateRangePicker extends BaseComponent {
     })
 
     const action = (className: string, icon: string, label: string) => createControlGroupAction({
-      className, disabled: this._config.disabled, icon, label, sanitizeIcon: (value: string) => this._sanitizeIcon(value)
+      className, disabled: this._config.disabled, icon, label, sanitizeIcon: (value: string) => sanitizeByConfig(value, this._config)
     })
 
     if (this._config.cleaner) {

@@ -11,7 +11,7 @@ import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { createAnchoredPosition } from './util/floating-ui.js'
 import { resolvePopupContainer } from './util/popup.js'
-import { escapeHtml, sanitizeHtml } from './util/sanitizer.js'
+import { escapeHtml } from './util/sanitizer.js'
 import { executeAfterTransition, getElement } from './util/index.js'
 
 /**
@@ -494,12 +494,6 @@ class ComboboxBase extends BaseComponent {
   }
 
   // Templates
-
-  _maybeSanitize(content: string): string {
-    return this._config.sanitize ?
-      sanitizeHtml(content, this._config.allowList, this._config.sanitizeFn) :
-      content
-  }
 
   // Config normalization shared by every combobox surface
 

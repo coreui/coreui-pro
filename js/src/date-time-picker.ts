@@ -17,7 +17,7 @@ import SelectorEngine from './dom/selector-engine.js'
 import { initializeOnReady } from './util/component-functions.js'
 import Popup from './util/popup.js'
 import TimeSelection from './util/time-selection.js'
-import { sanitizeHtml, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
+import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 import type { ComponentConfig } from './util/config.js'
 import { appendControlGroupField, createControlGroupAction } from './util/form-control-group.js'
 import { CALENDAR_ICON, CLEANER_ICON } from './util/icons.js'
@@ -273,10 +273,6 @@ class DateTimePicker extends BaseComponent {
     return { ...forwarded, ...overrides, ...extra }
   }
 
-  _sanitizeIcon(icon: string): string {
-    return this._config.sanitize ? sanitizeHtml(icon, this._config.allowList, this._config.sanitizeFn) : icon
-  }
-
   _createDateTimePicker(): void {
     this._element.classList.add(
       CLASS_NAME_DATE_PICKER, CLASS_NAME_DATE_TIME_PICKER, CLASS_NAME_PICKER
@@ -297,7 +293,7 @@ class DateTimePicker extends BaseComponent {
     this._fieldElement = appendControlGroupField(inputGroup, inputEl, this._config.floatingLabel, `${this.constructor.NAME}-`)
 
     const action = (className: string, icon: string, label: string) => createControlGroupAction({
-      className, disabled: this._config.disabled, icon, label, sanitizeIcon: (value: string) => this._sanitizeIcon(value)
+      className, disabled: this._config.disabled, icon, label, sanitizeIcon: (value: string) => sanitizeByConfig(value, this._config)
     })
 
     if (this._config.cleaner) {

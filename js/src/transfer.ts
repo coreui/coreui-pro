@@ -15,7 +15,7 @@ import {
   CHEVRON_DOUBLE_LEFT_ICON, CHEVRON_DOUBLE_RIGHT_ICON, CHEVRON_LEFT_ICON, CHEVRON_RIGHT_ICON
 } from './util/icons.js'
 import { defineJQueryPlugin, getUID, jQueryDispatch } from './util/index.js'
-import { sanitizeHtml, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
+import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 
 /**
  * Constants
@@ -365,7 +365,7 @@ class Transfer extends BaseComponent {
       }
 
       if (button.innerHTML.trim() === '') {
-        button.innerHTML = this._sanitizeIcon(this._moveIcon(kind))
+        button.innerHTML = sanitizeByConfig(this._moveIcon(kind), this._config)
       }
 
       button.setAttribute('aria-controls', this._sides[side].options.id)
@@ -403,10 +403,6 @@ class Transfer extends BaseComponent {
     }
 
     return this._moveSide(kind) === SIDE_TARGET ? this._config.moveToTargetIcon : this._config.moveToSourceIcon
-  }
-
-  _sanitizeIcon(icon: string): string {
-    return this._config.sanitize ? sanitizeHtml(icon, this._config.allowList, this._config.sanitizeFn) : icon
   }
 
   _moveButtons(): HTMLButtonElement[] {

@@ -10,7 +10,7 @@ import type { ComponentConfig } from './util/config.js'
 import EventHandler from './dom/event-handler.js'
 import Toast, { type ToastConfig } from './toast.js'
 import type { TemplateContentEntry } from './util/template-factory.js'
-import { DefaultAllowlist, sanitizeHtml, type SanitizerAllowList } from './util/sanitizer.js'
+import { DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList } from './util/sanitizer.js'
 import {
   defineJQueryPlugin, execute, getElement, getTransitionDurationFromElement, getUID, isElement, jQueryDispatch
 } from './util/index.js'
@@ -522,7 +522,7 @@ class Toaster extends BaseComponent {
     }
 
     if (this._config.html) {
-      target.innerHTML = this._config.sanitize ? sanitizeHtml(resolved, this._config.allowList, this._config.sanitizeFn) : resolved
+      target.innerHTML = sanitizeByConfig(resolved, this._config)
       return
     }
 
