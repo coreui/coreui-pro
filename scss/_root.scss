@@ -234,6 +234,12 @@ $root-token-defaults: map.merge(
     --#{$prefix}focus-ring-offset: $focus-ring-offset,
     --#{$prefix}focus-ring: var(--#{$prefix}focus-ring-width) solid var(--#{$prefix}focus-ring-color),
     // scss-docs-end root-focus-variables
+    // scss-docs-start root-theme-state-variables
+    --#{$prefix}theme-hover-lightness: $theme-hover-lightness,
+    --#{$prefix}theme-hover-chroma: $theme-hover-chroma,
+    --#{$prefix}theme-active-lightness: $theme-active-lightness,
+    --#{$prefix}theme-active-chroma: $theme-active-chroma,
+    // scss-docs-end root-theme-state-variables
     // scss-docs-start root-backdrop-variables
     --#{$prefix}backdrop-color: $backdrop-color,
     --#{$prefix}backdrop-opacity: $backdrop-opacity,

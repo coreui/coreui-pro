@@ -42,8 +42,8 @@
           --cui-theme-border: var(--cui-primary-border);
           --cui-theme-focus-ring: var(--cui-primary-focus-ring);
           --cui-theme-contrast: var(--cui-primary-contrast);
-          --cui-theme-hover: oklch(from var(--cui-primary-bg) calc(l * .85) c h);
-          --cui-theme-active: oklch(from var(--cui-primary-bg) calc(l * .8) c h);
+          --cui-theme-hover: oklch(from var(--cui-primary-bg) calc(l * var(--cui-theme-hover-lightness)) calc(c * var(--cui-theme-hover-chroma)) h);
+          --cui-theme-active: oklch(from var(--cui-primary-bg) calc(l * var(--cui-theme-active-lightness)) calc(c * var(--cui-theme-active-chroma)) h);
         }
       }
     }

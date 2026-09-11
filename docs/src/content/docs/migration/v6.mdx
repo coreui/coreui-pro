@@ -3777,6 +3777,14 @@ Upstream v6 does the same, with a `mask-icon()` mixin.
   `$btn-active-lightness` and `$btn-lightness-overrides` are now
   `$theme-hover-lightness`, `$theme-active-lightness` and
   `$theme-state-colors` in `scss/_theme.scss`.
+- **The interaction shade is a runtime knob, and it keeps its saturation.**
+  The multipliers are `:root` tokens — `--cui-theme-hover-lightness`,
+  `--cui-theme-hover-chroma`, `--cui-theme-active-lightness`,
+  `--cui-theme-active-chroma` — so the strength of every hover and active
+  state is one override, on the page or on a subtree, where it used to be a
+  Sass value baked into each theme class. The shade also multiplies chroma
+  (1.1 on hover, 1.15 on active) where it used to keep it, so a pressed
+  button no longer fades as it darkens; the lightness steps are unchanged.
 - **The dark-mode button block is gone** (~160 lines of CSS) — variants follow
   the root color tokens, which already switch in dark mode.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
