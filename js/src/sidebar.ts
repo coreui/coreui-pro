@@ -9,7 +9,7 @@ import BaseComponent from './base-component.js'
 import type { ComponentConfig } from './util/config.js'
 import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
-import { defineJQueryPlugin } from './util/index.js'
+import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
 import Backdrop from './util/backdrop.js'
 import ScrollBarHelper from './util/scrollbar.js'
 
@@ -321,9 +321,7 @@ class Sidebar extends BaseComponent {
   }
 
   static jQueryInterface(this: any, config: any): void {
-    return this.each(function (this: HTMLElement) {
-      Sidebar.sidebarInterface(this, config)
-    })
+    return jQueryDispatch(this, Sidebar, config)
   }
 }
 

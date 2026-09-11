@@ -14,7 +14,7 @@ import {
   DefaultAllowlist, escapeHtml, type SanitizerAllowList
 } from './util/sanitizer.js'
 import { CLEANER_ICON, INDICATOR_ICON } from './util/icons.js'
-import { defineJQueryPlugin, getUID } from './util/index.js'
+import { defineJQueryPlugin, getUID, jQueryDispatch } from './util/index.js'
 
 /**
  * ------------------------------------------------------------------------
@@ -733,9 +733,7 @@ class Autocomplete extends ComboboxBase {
   }
 
   static jQueryInterface(this: any, config: any): any {
-    return this.each(function (this: HTMLElement) {
-      Autocomplete.autocompleteInterface(this, config)
-    })
+    return jQueryDispatch(this, Autocomplete, config)
   }
 
   static clearMenus(event: any): void {
