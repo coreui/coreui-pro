@@ -1,15 +1,15 @@
 @use "../../theme" as *;
 
 @include describe("theme helpers") {
-  @include it("theme-color-scale-tokens gives a fixed base its scale and a scheme pair only the base") {
-    $tokens: theme-color-scale-tokens();
+  @include it("theme-color-tokens emits every slot of every colour as its root token") {
+    $tokens: theme-color-tokens();
 
-    @include assert-equal(map-get($tokens, --cui-primary-base), $primary);
-    @include assert-equal(map-get($tokens, --cui-primary-500), var(--cui-primary-base));
-    @include assert-equal(map-get($tokens, --cui-primary-100), color-mix(in oklch, var(--cui-white) 80%, var(--cui-primary-base)));
-    @include assert-equal(map-get($tokens, --cui-secondary-base), $secondary);
-    @include assert-equal(map-has-key($tokens, --cui-secondary-500), false);
-    @include assert-equal(map-has-key($tokens, --cui-inverse-100), false);
+    @include assert-equal(map-get($tokens, --cui-primary-base), var(--cui-primary-500));
+    @include assert-equal(map-get($tokens, --cui-primary-bg), var(--cui-primary-500));
+    @include assert-equal(map-get($tokens, --cui-primary-bg-subtle), light-dark(var(--cui-primary-100), var(--cui-primary-900)));
+    @include assert-equal(map-get($tokens, --cui-secondary-base), var(--cui-gray-200));
+    @include assert-equal(map-get($tokens, --cui-secondary-bg), light-dark(var(--cui-gray-100), var(--cui-gray-600)));
+    @include assert-equal(map-has-key($tokens, --cui-primary-500), false);
   }
 
   @include it("theme-color-refs points every colour at the slot's root token") {
@@ -33,14 +33,15 @@
 
       @include expect() {
         .test {
-          --cui-theme-bg: var(--cui-primary-bg);
-          --cui-theme-contrast: var(--cui-primary-contrast);
+          --cui-theme-base: var(--cui-primary-base);
           --cui-theme-fg: var(--cui-primary-fg);
           --cui-theme-fg-emphasis: var(--cui-primary-fg-emphasis);
+          --cui-theme-bg: var(--cui-primary-bg);
           --cui-theme-bg-subtle: var(--cui-primary-bg-subtle);
           --cui-theme-bg-muted: var(--cui-primary-bg-muted);
           --cui-theme-border: var(--cui-primary-border);
           --cui-theme-focus-ring: var(--cui-primary-focus-ring);
+          --cui-theme-contrast: var(--cui-primary-contrast);
           --cui-theme-hover: oklch(from var(--cui-primary-bg) calc(l * .85) c h);
           --cui-theme-active: oklch(from var(--cui-primary-bg) calc(l * .8) c h);
         }
@@ -75,14 +76,15 @@
 
       @include expect() {
         .test {
-          --cui-theme-bg: initial;
-          --cui-theme-contrast: initial;
+          --cui-theme-base: initial;
           --cui-theme-fg: initial;
           --cui-theme-fg-emphasis: initial;
+          --cui-theme-bg: initial;
           --cui-theme-bg-subtle: initial;
           --cui-theme-bg-muted: initial;
           --cui-theme-border: initial;
           --cui-theme-focus-ring: initial;
+          --cui-theme-contrast: initial;
           --cui-theme-hover: initial;
           --cui-theme-active: initial;
         }

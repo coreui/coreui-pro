@@ -67,7 +67,7 @@ $font-family-monospace:  SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mo
 
 // scss-docs-start type-variables
 $mark-color: var(--#{$prefix}fg-body) !default;
-$mark-bg:    light-dark(var(--#{$prefix}yellow-100), var(--#{$prefix}yellow-800)) !default;
+$mark-bg:    light-dark(oklch(96.883% .03443 84.93deg), oklch(43.897% .08952 84.93deg)) !default;
 // scss-docs-end type-variables
 
 $icon-size-base: 1rem !default;
@@ -109,7 +109,7 @@ $input-btn-font-size-lg:      var(--#{$prefix}font-size-lg) !default;
 $input-btn-line-height-lg:    var(--#{$prefix}line-height-md) !default;
 // scss-docs-end input-btn-variables
 
-$code-color: light-dark(var(--#{$prefix}pink), var(--#{$prefix}pink-300)) !default;
+$code-color: light-dark(oklch(59.56% .20859 355.48deg), oklch(75.736% .12515 355.48deg)) !default;
 
 // `config` is reserved and empty, matching upstream's declaration: a slot below
 // `root` for a configuration sheet of your own. `custom` is the same idea
@@ -333,7 +333,7 @@ $root-tokens: defaults($root-token-defaults, $root-tokens);
 @layer colors {
   :root,
   :host {
-    @include tokens(map.merge($color-tokens, theme-color-scale-tokens()));
+    @include tokens($color-tokens);
   }
 }
 

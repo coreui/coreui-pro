@@ -13,18 +13,20 @@ $white:     #fff !default;
 $black:     #000 !default;
 
 // scss-docs-start color-variables
-$blue:    oklch(57.82% 0.22821 260.03) !default;
-$indigo:  oklch(49.43% 0.27796 286.98) !default;
-$purple:  oklch(50.152% 0.18835 294.99) !default;
-$pink:    oklch(59.56% 0.20859 355.48) !default;
-$red:     oklch(59.155% 0.20203 21.24) !default;
-$orange:  oklch(72.654% 0.18318 51.48) !default;
-$yellow:  oklch(84.417% 0.17216 84.93) !default;
-$green:   oklch(55.203% 0.1234 157.01) !default;
-$teal:    oklch(74.409% 0.14802 166.36) !default;
-$cyan:    oklch(77.493% 0.13797 218.05) !default;
+$primary: oklch(52.945% 0.19103 278.34) !default;
+$success: oklch(61.237% 0.17298 146.95) !default;
+$info:    oklch(67.55% 0.17646 252.26) !default;
+$warning: oklch(80.791% 0.16473 78.5) !default;
+$danger:  oklch(63.864% 0.18175 23.81) !default;
 $gray:    oklch(60% 0.03948 265.02) !default;
 // scss-docs-end color-variables
+
+// fusv-disable
+// No token and no rule reads these: the shared docs engine derives its chrome
+// from them, and it serves v5 as well, so it cannot be adapted to their removal.
+$blue: oklch(57.82% 0.22821 260.03) !default;
+$pink: oklch(59.56% 0.20859 355.48) !default;
+// fusv-enable
 
 // scss-docs-start colors-map
 $colors: () !default;
@@ -32,16 +34,11 @@ $colors: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
 $colors: defaults(
   (
-    "blue":       $blue,
-    "indigo":     $indigo,
-    "purple":     $purple,
-    "pink":       $pink,
-    "red":        $red,
-    "orange":     $orange,
-    "yellow":     $yellow,
-    "green":      $green,
-    "teal":       $teal,
-    "cyan":       $cyan,
+    "primary":    $primary,
+    "success":    $success,
+    "info":       $info,
+    "warning":    $warning,
+    "danger":     $danger,
     "gray":       $gray
   ),
   $colors
@@ -50,9 +47,8 @@ $colors: defaults(
 
 // Color scales
 //
-// One generator for the palette and for the theme colors: every stop is a
-// `color-mix()` against the color's own token, so overriding the token retints
-// the whole scale in the browser.
+// Every stop is a `color-mix()` against the color's 500 stop, so overriding
+// that one token retints the whole scale in the browser.
 
 // scss-docs-start color-scale-variables
 $color-mix-space: oklch !default;
@@ -152,14 +148,15 @@ $grays: defaults(
 // scss-docs-end gray-colors-map
 // fusv-enable
 
-@function color-scale-tokens($color, $value, $anchor: --#{$prefix}#{$color}) {
-  $tokens: ($anchor: $value);
+@function color-scale-tokens($color, $value) {
+  $anchor: --#{$prefix}#{$color}-500;
+  $tokens: ();
 
   @each $stop, $weight in $color-tints {
     $tokens: map.set($tokens, --#{$prefix}#{$color}-#{$stop}, color-mix(in $color-mix-space, $tint-color $weight, var(#{$anchor})));
   }
 
-  $tokens: map.set($tokens, --#{$prefix}#{$color}-500, var(#{$anchor}));
+  $tokens: map.set($tokens, $anchor, $value);
 
   @each $stop, $weight in $color-shades {
     $tokens: map.set($tokens, --#{$prefix}#{$color}-#{$stop}, color-mix(in $color-mix-space, $shade-color $weight, var(#{$anchor})));
