@@ -45,10 +45,14 @@ const CLASS_NAME_INPUT_GROUP = 'form-control-group'
 const CLASS_NAME_IS_INVALID = 'is-invalid'
 const CLASS_NAME_SEPARATOR = 'form-control-icon'
 
+const ATTRIBUTE_ROLE_END = 'data-coreui-range-end'
+const ATTRIBUTE_ROLE_SEPARATOR = 'data-coreui-range-separator'
+const ATTRIBUTE_ROLE_START = 'data-coreui-range-start'
+
 const SELECTOR_DATA_DATE_RANGE_INPUT = '[data-coreui-date-range-input]'
-const SELECTOR_ROLE_END = '[data-coreui-range-end]'
-const SELECTOR_ROLE_SEPARATOR = '[data-coreui-range-separator]'
-const SELECTOR_ROLE_START = '[data-coreui-range-start]'
+const SELECTOR_ROLE_END = `[${ATTRIBUTE_ROLE_END}]`
+const SELECTOR_ROLE_SEPARATOR = `[${ATTRIBUTE_ROLE_SEPARATOR}]`
+const SELECTOR_ROLE_START = `[${ATTRIBUTE_ROLE_START}]`
 const SELECTOR_SECTION = '.form-date-time-section'
 const SELECTOR_SVG = 'svg'
 
@@ -284,11 +288,13 @@ class DateRangeInput extends BaseComponent {
     const ownStart = SelectorEngine.findOne(SELECTOR_ROLE_START, group)
     this._startElement = ownStart ?? document.createElement('div')
     this._created.start = !ownStart
+    this._startElement.setAttribute(ATTRIBUTE_ROLE_START, '')
     this._startFieldElement = ownStart ?? appendControlGroupField(group, this._startElement, this._config.startFloatingLabel, `${NAME}-`)
 
     const ownSeparator = SelectorEngine.findOne(SELECTOR_ROLE_SEPARATOR, group)
     this._separatorElement = ownSeparator ?? this._createSeparator()
     this._created.separator = !ownSeparator
+    this._separatorElement.setAttribute(ATTRIBUTE_ROLE_SEPARATOR, '')
     this._separatorElement.setAttribute('aria-hidden', 'true')
 
     if (!ownSeparator) {
@@ -298,6 +304,7 @@ class DateRangeInput extends BaseComponent {
     const ownEnd = SelectorEngine.findOne(SELECTOR_ROLE_END, group)
     this._endElement = ownEnd ?? document.createElement('div')
     this._created.end = !ownEnd
+    this._endElement.setAttribute(ATTRIBUTE_ROLE_END, '')
     this._endFieldElement = ownEnd ?? appendControlGroupField(group, this._endElement, this._config.endFloatingLabel, `${NAME}-`)
 
     this._startInput = this._createInput(this._startElement, {
