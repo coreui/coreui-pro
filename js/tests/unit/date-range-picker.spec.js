@@ -73,16 +73,30 @@ describe('DateRangePicker', () => {
       expect(fixtureEl.querySelector('input[name="trip-end"]')).not.toBeNull()
     })
 
+    it('should build its field inside the element rather than on it', () => {
+      const picker = buildPicker()
+      const el = fixtureEl.querySelector('#picker')
+
+      expect(el.classList.contains('form-control-group')).toBeFalse()
+      expect(el.classList.contains('date-range-picker')).toBeTrue()
+      expect(picker._frameElement.classList.contains('form-control-group')).toBeTrue()
+      expect(picker._frameElement.classList.contains('form-date-range')).toBeTrue()
+      expect(picker._frameElement.parentElement).toBe(el)
+      expect(el.querySelector('.form-control-action').getAttribute('aria-expanded')).toEqual('false')
+    })
+
     it('should render the LTR separator arrow by default', () => {
       const picker = buildPicker()
 
-      expect(picker._resolveSeparatorIcon()).toEqual(picker._config.separatorIcon)
+      expect(picker._frameElement.querySelector('.form-control-icon svg')).not.toBeNull()
+      expect(picker._rangeInput._config.separatorIcon).toEqual(picker._config.separatorIcon)
     })
 
     it('should render the mirrored separator arrow inside an RTL ancestor', () => {
       const picker = buildPicker({}, '<div dir="rtl"><div id="picker"></div></div>')
 
-      expect(picker._resolveSeparatorIcon()).toEqual(picker._config.separatorIconRtl)
+      expect(picker._frameElement.querySelector('.form-control-icon path').getAttribute('d'))
+        .toEqual(new DOMParser().parseFromString(picker._config.separatorIconRtl, 'image/svg+xml').querySelector('path').getAttribute('d'))
       expect(fixtureEl.querySelector('.form-control-icon svg')).not.toBeNull()
     })
 

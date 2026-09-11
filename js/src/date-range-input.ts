@@ -226,6 +226,16 @@ class DateRangeInput extends BaseComponent {
     return this._startInput.isDateSelectable(date)
   }
 
+  // The two ends as elements, for a component that composes this one and has
+  // to tell them apart — which end has the focus, where to put an adornment.
+  getStartElement(): HTMLElement {
+    return this._startElement
+  }
+
+  getEndElement(): HTMLElement {
+    return this._endElement
+  }
+
   isRangeValid(): boolean {
     return this._startDate === null || this._endDate === null || this._endDate >= this._startDate
   }

@@ -122,9 +122,9 @@ Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label 
 
 ## Floating labels
 
-Each field carries its own [floating label](/forms/floating-labels/): set `floatingLabels` and the picker renders a label over each date, floating independently — fill in the check-in date and only its label rises. The label text also becomes the field's accessible name, so the visible and spoken labels stay one thing. No wrapper markup is needed.
+Each field carries its own [floating label](/forms/floating-labels/): set `startFloatingLabel` and `endFloatingLabel` and the picker renders a label over each date, floating independently — fill in the check-in date and only its label rises. The label text also becomes the field's accessible name, so the visible and spoken labels stay one thing. No wrapper markup is needed.
 
-<Example pro code={`<div data-coreui-locale="en-US" data-coreui-floating-labels='["Check-in", "Check-out"]' data-coreui-toggle="date-range-picker"></div>`} />
+<Example pro code={`<div data-coreui-locale="en-US" data-coreui-start-floating-label="Check-in" data-coreui-end-floating-label="Check-out" data-coreui-toggle="date-range-picker"></div>`} />
 
 ## Sizing
 
@@ -291,7 +291,8 @@ attributes work on the picker element too.
 | --- | --- | --- | --- |
 | `allowList` | object | `SVGAllowlist` | Allowlist used when sanitizing icon markup. |
 | `ariaCleanerLabel` | string | `'Clear the value'` | Accessible label of the cleaner button. |
-| `ariaLabels` | array | `['Start date', 'End date']` | Accessible name of each field, in order. Both halves are the same control, so naming them apart is what tells a screen reader which end of the range it is on. A shorter array leaves the remaining field on its default. |
+| `ariaEndLabel` | string | `'End date'` | Accessible name of the end field when it has no floating label. Both halves are the same control, so naming them apart is what tells a screen reader which end of the range it is on. |
+| `ariaStartLabel` | string | `'Start date'` | Accessible name of the start field when it has no floating label. |
 | `ariaToggleLabel` | string | `'Toggle the calendar'` | Accessible label of the indicator button. |
 | `cleaner` | boolean | `true` | Renders a button that clears the value. It appears only once the field holds one. |
 | `cleanerIcon` | string | cross SVG | Inline SVG rendered by the component (sanitized). |
@@ -301,7 +302,7 @@ attributes work on the picker element too.
 | `disabled` | boolean | `false` | Disables the fields and the popup. |
 | `endDate` | date, string, null | `null` | Initial end of the range. |
 | `endName` | string, null | `null` | Name of the end hidden input. |
-| `floatingLabels` | array, null | `null` | Renders a floating label over each field — `['Check-in', 'Check-out']` — which also becomes that field's accessible name. |
+| `endFloatingLabel` | string, null | `null` | Renders a floating label over the end field, which also becomes that field's accessible name. |
 | `indicatorIcon` | string | calendar SVG | Inline SVG rendered by the component (sanitized). |
 | `inputOptions` | object | `{}` | Programmatic escape hatch for date input options. |
 | `locale` | string | browser locale | Drives section order, separators, and calendar labels. |
@@ -313,6 +314,7 @@ attributes work on the picker element too.
 | `separatorIconRtl` | string | mirrored arrow SVG | Inline SVG used when the picker renders in an RTL context. |
 | `size` | string, null | `null` | `'sm'` or `'lg'`. |
 | `startDate` | date, string, null | `null` | Initial start of the range. |
+| `startFloatingLabel` | string, null | `null` | Renders a floating label over the start field, which also becomes that field's accessible name. |
 | `startName` | string, null | `null` | Name of the start hidden input. |
 
 ### Methods

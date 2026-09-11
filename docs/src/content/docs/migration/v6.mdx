@@ -946,6 +946,31 @@ behaviour, v5 is the reference. Mapping:
   calendar is built then); later opens are unchanged. Code reaching into the
   private `picker._calendar` before the first open now finds `null`.
 
+#### The date range picker is built on the date range input
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+The range picker no longer builds its two fields itself: it composes the new
+[date range input](/forms/date-range-input/), which owns both dates, their
+validation and the arrow between them. Two consequences:
+
+- **The picker element is no longer the frame.** It wraps one:
+  `<div class="date-picker date-range-picker picker"><div class="form-control-group form-date-range">…`.
+  CSS or scripts that reached for `.form-control-group` on the picker's own
+  element now find it one level down; `.show`, `.date-range-picker` and the
+  `data-coreui-toggle` attribute stay where they were. `aria-expanded` moved
+  from the element to the toggle button, which also carries `aria-controls`
+  and `aria-haspopup="dialog"`.
+- **The two array options are split in two**, following the rule that every
+  label is its own option: `ariaLabels: ['Start date', 'End date']` becomes
+  `ariaStartLabel` / `ariaEndLabel`, and `floatingLabels: ['Check-in',
+  'Check-out']` becomes `startFloatingLabel` / `endFloatingLabel`.
+
+  ```diff
+  - data-coreui-floating-labels='["Check-in", "Check-out"]'
+  + data-coreui-start-floating-label="Check-in" data-coreui-end-floating-label="Check-out"
+  ```
+
 #### Picker events can be cancelled, and `dateChange` has one shape
 
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
