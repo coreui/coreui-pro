@@ -3078,9 +3078,9 @@ editing four blocks. It is a map of maps now — one name, eight slots.
   Every `--cui-{color}-*` custom property keeps its name and its value, so
   a runtime override is unaffected.
 - **`$theme-colors` is a map of maps**, so `@each $name, $value in $theme-colors`
-  now yields a map. Use `map-slot($theme-colors, "base")` where a flat
-  `name → colour` map is what you want; the `$theme-colors-*` families in
-  `scss/_theme.scss` are built that way.
+  now yields a map. Use `map-get-nested($theme-colors, "base")` where a flat
+  `name → value` map is what you want, or `theme-color-refs("base")` for the
+  `:root` tokens the utilities read.
 - **New slots:** `fg` (the state colour readable as text, one step lighter than
   `text-emphasis`), `bg-muted` (between `bg-subtle` and the solid colour) and
   `focus-ring` (the hue the `.theme-*` ring mixes from). They emit
@@ -3694,7 +3694,7 @@ now, and the two neutrals swap ends of the gray scale between schemes.
   `color-contrast()` or the tint/shade functions — read `$gray-*` for that.
 - **`$utilities-colors` is removed.** It was a flat `name → colour` copy of the
   map's `base` slot, and no utility reads the raw colour for every family any
-  more. Call `map-slot($theme-colors, "base")` where you need one, or
+  more. Call `map-get-nested($theme-colors, "base")` where you need one, or
   `theme-color-refs("fg")` for the slot a text utility uses.
 - **`$theme-lightness-overrides` is now `$theme-state-colors`** and carries
   ready values rather than lightness multipliers. A single multiplier cannot

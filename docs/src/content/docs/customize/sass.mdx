@@ -362,19 +362,21 @@ We use the `escape-svg` function to escape the `<`, `>` and `#` characters for S
 
 ### Map helpers
 
-The theme system keeps its definitions nested — one entry per color, holding every slot. `map-slot()` flattens that for consumers that want a single family across all colors:
+The theme system keeps its definitions nested — one entry per color, holding every slot. `map-get-nested()` flattens that for consumers that want a single family across all colors:
 
-<ScssDocs file="scss/functions/_maps.scss" capture="map-slot-function" />
+<ScssDocs file="scss/functions/_maps.scss" capture="map-get-nested-function" />
 
 ```scss
 @use "@coreui/coreui/scss/functions/maps" as *;
 @use "@coreui/coreui/scss/theme" as *;
 
-$subtle-backgrounds: map-slot($theme-colors, "bg-subtle");
+$subtle-backgrounds: map-get-nested($theme-colors, "bg-subtle");
 // => ("primary": …, "secondary": …, "success": …, …)
 ```
 
-`scss/functions/maps` also carries the general-purpose helpers the library uses internally: `map-get-multiple()` (pick several keys), `map-merge-multiple()` (merge several maps), and `map-get-nested()` (pull one sub-key out of every entry).
+Entries without the key are skipped, so a color that drops a slot drops out of the family rather than landing in it as `null`. For the `:root` token behind a slot rather than a copy of its value, reach for `theme-color-refs()` instead — that is what the utilities read.
+
+`scss/functions/maps` also carries `map-get-multiple()` (pick several keys) and `map-merge-multiple()` (merge several maps).
 
 ## Mixins
 

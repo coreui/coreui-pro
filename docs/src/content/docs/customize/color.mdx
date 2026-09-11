@@ -454,25 +454,33 @@ instead, so read `var(--cui-primary-300)` where you used to write
 
 <AddedIn version="4.1.0" />
 
-We don't ship `color` and `background-color` utilities for every color in the
-palette, but you can generate them with the [utility API](/utilities/api/).
+We ship `color` and `background-color` utilities for the theme colors, but not
+for every stop of their scales, and not for a color of your own. You can
+generate those with the [utility API](/utilities/api/).
 
 1. Load the color maps and the utilities module in a partial.
 2. Use our `map-merge-multiple()` function to merge several maps into one.
 3. Merge that map into the `values` of any utility group.
 
-Here's an example that generates text color utilities for every palette color and
-every theme color's emphasis tone (e.g., `.text-purple`, `.fg-success`).
+Here's an example that generates text color utilities for two stops of every
+palette color and for one brand color (e.g., `.text-primary-300`, `.text-brand`).
 
 ```scss
 // _my-colors.scss
 @use "sass:map";
 @use "@coreui/coreui/scss/functions/maps" as *;
 @use "@coreui/coreui/scss/colors" as *;
-@use "@coreui/coreui/scss/theme" as *;
 @use "@coreui/coreui/scss/utilities" as *;
 
-$all-colors: map-merge-multiple($colors, map-slot($theme-colors, "fg-emphasis"));
+$scale-colors: ();
+
+@each $color in map.keys($colors) {
+  @each $stop in (300, 700) {
+    $scale-colors: map.set($scale-colors, "#{$color}-#{$stop}", var(--cui-#{$color}-#{$stop}));
+  }
+}
+
+$all-colors: map-merge-multiple($scale-colors, ("brand": #6f42c1));
 
 $utilities: map.merge(
   $utilities,

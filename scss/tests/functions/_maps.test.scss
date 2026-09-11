@@ -1,15 +1,6 @@
 @use "../../functions/maps" as *;
 
-$sizes: (
-  "sm": ("font-size": .875rem, "padding": .25rem),
-  "lg": ("font-size": 1.25rem, "padding": .5rem)
-);
-
 @include describe("maps functions") {
-  @include it("map-slot pulls one slot out of every entry") {
-    @include assert-equal(map-slot($sizes, "font-size"), ("sm": .875rem, "lg": 1.25rem));
-  }
-
   @include it("map-get-nested skips entries without the key") {
     @include assert-equal(map-get-nested(("sm": ("padding": .25rem), "lg": ("font-size": 1.25rem)), "font-size"), ("lg": 1.25rem));
   }
