@@ -16,7 +16,7 @@ import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { isSameDateAs } from './util/calendar.js'
 import type { ComponentConfig } from './util/config.js'
-import { appendControlGroupField } from './util/form-control-group.js'
+import { appendControlGroupField, applyControlGroupClasses } from './util/form-control-group.js'
 import { SEPARATOR_ICON, SEPARATOR_ICON_RTL } from './util/icons.js'
 import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
 import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
@@ -272,9 +272,8 @@ class DateRangeInput extends BaseComponent {
   // Private
   _createDateRangeInput(): void {
     const group = this._element
-    group.classList.add(CLASS_NAME_DATE_RANGE)
     this._addedGroupClass = !group.classList.contains(CLASS_NAME_INPUT_GROUP)
-    group.classList.add(CLASS_NAME_INPUT_GROUP)
+    applyControlGroupClasses(group, CLASS_NAME_INPUT_GROUP, CLASS_NAME_DATE_RANGE)
 
     if (this._config.size) {
       group.classList.add(`${CLASS_NAME_FORM_CONTROL}-${this._config.size}`)
