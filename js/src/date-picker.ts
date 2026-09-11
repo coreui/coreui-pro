@@ -3,10 +3,13 @@
  * CoreUI PRO date-picker.js
  * License (https://coreui.io/pro/license/)
  *
- * Composed from existing primitives — DateInput (section field), Calendar, and
- * the Popup anchored-overlay util — rather than one monolith. Projected regions
- * (footer) come from a <template> child and act through the slot context, not
- * through configuration props.
+ * Composed from existing components — DateInput (section field), Calendar and
+ * the Popup — joined by one piece of state, the date, that the picker owns.
+ * The markup is the composition surface: a field, a toggle and a cleaner the
+ * author wrote (by role attribute) are adopted; whatever is missing is
+ * generated, so a bare `<div data-coreui-toggle="date-picker">` keeps working.
+ * Projected regions (footer) come from a <template> child and act through the
+ * slot context, not through configuration props.
  * --------------------------------------------------------------------------
  */
 
@@ -16,12 +19,12 @@ import DateInput from './date-input.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import Popup from './util/popup.js'
-import { getDateBySelectionType } from './util/calendar.js'
+import { getDateBySelectionType, isSameDateAs } from './util/calendar.js'
 import type { ComponentConfig } from './util/config.js'
 import { getWeekSectionsFromLocale } from './util/date-sections.js'
 import { appendControlGroupField, applyControlGroupClasses, createControlGroupAction } from './util/form-control-group.js'
 import { CALENDAR_ICON, CLEANER_ICON } from './util/icons.js'
-import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
+import { defineJQueryPlugin, getUID, jQueryDispatch } from './util/index.js'
 import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 
 /**
@@ -58,11 +61,14 @@ const CLASS_NAME_SHOW = 'show'
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="date-picker"]'
 const SELECTOR_TEMPLATE_FOOTER = 'template[data-coreui-template="footer"]'
 const SELECTOR_ACTION = '[data-coreui-picker-action]'
+const SELECTOR_ROLE_CLEANER = '[data-coreui-picker-cleaner]'
+const SELECTOR_ROLE_FIELD = '[data-coreui-picker-field]'
+const SELECTOR_ROLE_TOGGLE = '[data-coreui-picker-toggle]'
+const SELECTOR_SVG = 'svg'
 const SELECTOR_ACTION_TODAY = '[data-coreui-picker-action="today"]'
 
-// Icons live in JavaScript, not in CSS masks — the chips pattern: inline SVG on
-// currentColor, swappable through an option, sanitized like any user-provided
-// markup.
+// Icons live in JavaScript only as the fallback for the minimal markup: an
+// author who writes the toggle or the cleaner puts the SVG in the HTML.
 
 type DatePickerConfig = {
   allowList: SanitizerAllowList
@@ -137,14 +143,16 @@ const DefaultType: Record<string, string> = {
 class DatePicker extends BaseComponent {
   protected declare _footerTemplate: any
   protected declare _cleanerElement: HTMLElement | null
-  protected declare _indicatorElement: HTMLElement
+  protected declare _toggleElement: HTMLElement
   protected declare _fieldElement: HTMLElement
+  protected declare _created: { cleaner: boolean, field: boolean, toggle: boolean }
   protected declare _initialDate: any
+  protected declare _date: Date | null
   protected declare _input: any
   protected declare _calendar: any
   protected declare _calendarElement: any
   protected declare _menu: any
-  protected declare _syncingFromPanel: boolean
+  protected declare _applying: boolean
   protected declare _addedGroupClass: boolean
   protected declare _popup: any
 
@@ -152,18 +160,18 @@ class DatePicker extends BaseComponent {
     super(element, config)
 
     this._footerTemplate = SelectorEngine.findOne(SELECTOR_TEMPLATE_FOOTER, this._element)
-    // setDate() goes through the field's update(), which rewrites its config —
-    // so the shell keeps the initial value for reset() itself
     this._initialDate = config?.date ?? this._config.date
     this._cleanerElement = null
+    this._created = { cleaner: false, field: false, toggle: false }
     this._input = null
     this._calendar = null
-    this._syncingFromPanel = false
+    this._applying = false
     this._calendarElement = null
     this._menu = null
     this._popup = null
 
     this._createDatePicker()
+    this._date = this._input.getDate()
     this._createPopup()
     this._addEventListeners()
   }
@@ -199,25 +207,25 @@ class DatePicker extends BaseComponent {
   }
 
   getDate(): Date | null {
-    return this._input.getDate()
+    return this._date
   }
 
   // The field validates the date against min/max — the emitted value and the
   // calendar selection follow the validation outcome, not the argument.
   setDate(date: Date | null): void {
-    this._input.update({ date })
+    this._applyDate(date)
   }
 
   clear(): void {
-    this._input.clear()
+    this._applyDate(null)
   }
 
   reset(): void {
-    this.setDate(this._initialDate)
+    this._applyDate(this._initialDate)
   }
 
   today(): void {
-    this.setDate(new Date())
+    this._applyDate(new Date())
   }
 
   getContext(): Record<string, any> {
@@ -234,16 +242,25 @@ class DatePicker extends BaseComponent {
   }
 
   override dispose(): void {
-    for (const element of [this._menu, this._indicatorElement, this._cleanerElement]) {
+    for (const element of [this._menu, this._toggleElement, this._cleanerElement]) {
       EventHandler.off(element, EVENT_KEY)
     }
 
     this._popup.dispose()
     this._input.dispose()
     this._calendar?.dispose()
-    this._fieldElement.remove()
-    this._cleanerElement?.remove()
-    this._indicatorElement.remove()
+
+    if (this._created.field) {
+      this._fieldElement.remove()
+    }
+
+    if (this._created.cleaner) {
+      this._cleanerElement?.remove()
+    }
+
+    if (this._created.toggle) {
+      this._toggleElement.remove()
+    }
 
     if (this._addedGroupClass) {
       this._element.classList.remove(CLASS_NAME_INPUT_GROUP)
@@ -299,21 +316,35 @@ class DatePicker extends BaseComponent {
       inputGroup.classList.add(`${CLASS_NAME_FORM_CONTROL}-${this._config.size}`)
     }
 
-    const inputEl = document.createElement('div')
-    this._fieldElement = appendControlGroupField(inputGroup, inputEl, this._config.floatingLabel, `${this.constructor.NAME}-`)
+    // Markup first: a part the author wrote is adopted, a missing one is built.
+    const ownField = SelectorEngine.findOne(SELECTOR_ROLE_FIELD, inputGroup)
+    const inputEl = ownField ?? document.createElement('div')
+    this._created.field = !ownField
+    this._fieldElement = ownField ?? appendControlGroupField(inputGroup, inputEl, this._config.floatingLabel, `${this.constructor.NAME}-`)
 
     const action = (className: string, icon: string, label: string) => createControlGroupAction({
       className, disabled: this._config.disabled, icon, label, sanitizeIcon: (value: string) => sanitizeByConfig(value, this._config)
     })
 
-    if (this._config.cleaner) {
+    const ownCleaner = SelectorEngine.findOne(SELECTOR_ROLE_CLEANER, inputGroup)
+
+    if (ownCleaner) {
+      this._cleanerElement = this._adoptAction(ownCleaner, this._config.ariaCleanerLabel)
+    } else if (this._config.cleaner) {
       this._cleanerElement = action(CLASS_NAME_CLEANER, this._config.cleanerIcon, this._config.ariaCleanerLabel)
+      this._created.cleaner = true
       inputGroup.append(this._cleanerElement)
     }
 
-    const indicator = action(CLASS_NAME_INDICATOR, this._config.indicatorIcon, this._config.ariaToggleLabel)
-    inputGroup.append(indicator)
-    this._indicatorElement = indicator
+    const ownToggle = SelectorEngine.findOne(SELECTOR_ROLE_TOGGLE, inputGroup)
+
+    if (ownToggle) {
+      this._toggleElement = this._adoptAction(ownToggle, this._config.ariaToggleLabel)
+    } else {
+      this._toggleElement = action(CLASS_NAME_INDICATOR, this._config.indicatorIcon, this._config.ariaToggleLabel)
+      this._created.toggle = true
+      inputGroup.append(this._toggleElement)
+    }
 
     this._input = new DateInput(inputEl, this._forwardConfig(DateInput, {
       date: this._config.date,
@@ -323,19 +354,16 @@ class DatePicker extends BaseComponent {
       ...(this._resolveFormat() ? { format: this._resolveFormat() } : {})
     }, { ...(this._config.floatingLabel ? { ariaLabel: this._config.floatingLabel } : {}), ...this._config.inputOptions }))
 
-    // Selection flows panel → field; this is the only bridge back, so a date
-    // typed into the field reaches the calendar too. The guard stops the echo
-    // of the panel's own updates — without it, picking a range start would
-    // re-render the calendar mid-interaction.
     EventHandler.on(inputEl, DateInput.eventName(DateInput.CHANGE_EVENT_NAME), (event: any) => {
-      if (!this._syncingFromPanel) {
-        this._calendar?.update({ startDate: event.date })
-        this._triggerDateChange()
-      }
+      this._applyDate(event.date, { field: false })
     })
 
     this._menu = document.createElement('div')
+    this._menu.id = getUID(`${this.constructor.NAME}-popup-`)
     this._menu.classList.add(CLASS_NAME_POPUP, CLASS_NAME_DROPDOWN)
+    this._toggleElement.setAttribute('aria-controls', this._menu.id)
+    this._toggleElement.setAttribute('aria-expanded', 'false')
+    this._toggleElement.setAttribute('aria-haspopup', 'dialog')
 
     const body = document.createElement('div')
     body.classList.add(CLASS_NAME_BODY)
@@ -387,20 +415,59 @@ class DatePicker extends BaseComponent {
     }, this._config.calendarOptions))
 
     EventHandler.on(this._calendar._element, 'startDateChange.coreui.calendar', event => {
-      this._syncingFromPanel = true
-      this._input.update({ date: event.dateObject })
-      this._syncingFromPanel = false
-      this._triggerDateChange()
+      this._applyDate(event.dateObject, { calendar: false })
       this.hide()
     })
   }
 
-  // The field validates the date, so the event reports what the field holds —
-  // a selection the field refused (min/max) is announced as null, not as the
-  // day that was clicked.
-  _triggerDateChange(): void {
-    const date = this.getDate()
-    EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date, formattedDate: getDateBySelectionType(date, this._config.selectionType) })
+  // The one place the date changes. The field validates it, so what the
+  // picker keeps and announces is what the field holds — a selection the
+  // field refused (min/max) becomes null, not the day that was clicked. The
+  // side that reported the change is not written back to.
+  _applyDate(date: Date | null, { calendar = true, field = true }: { calendar?: boolean, field?: boolean } = {}): void {
+    if (this._applying) {
+      return
+    }
+
+    this._applying = true
+
+    if (field) {
+      this._input.update({ date })
+    }
+
+    const applied = field ? this._input.getDate() : date
+    this._applying = false
+
+    const changed = !isSameDateAs(applied, this._date)
+    this._date = applied
+
+    if (calendar) {
+      this._calendar?.update({ startDate: applied })
+    }
+
+    if (changed) {
+      EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date: applied, formattedDate: getDateBySelectionType(applied, this._config.selectionType) })
+    }
+  }
+
+  // An element the author wrote gets the accessibility the component would
+  // have given its own: a name when it has none, hidden decoration.
+  _adoptAction(element: HTMLElement, label: string): HTMLElement {
+    if (!element.hasAttribute('aria-label') && !element.hasAttribute('aria-labelledby')) {
+      element.setAttribute('aria-label', label)
+    }
+
+    for (const svg of SelectorEngine.find(SELECTOR_SVG, element)) {
+      if (!svg.hasAttribute('aria-hidden')) {
+        svg.setAttribute('aria-hidden', 'true')
+      }
+    }
+
+    if (this._config.disabled && 'disabled' in element) {
+      (element as HTMLButtonElement).disabled = true
+    }
+
+    return element
   }
 
   _createPopup(): void {
@@ -414,13 +481,13 @@ class DatePicker extends BaseComponent {
       onHide: () => {
         this._menu.classList.remove(CLASS_NAME_SHOW)
         this._element.classList.remove(CLASS_NAME_SHOW)
-        this._element.setAttribute('aria-expanded', 'false')
+        this._toggleElement.setAttribute('aria-expanded', 'false')
       },
       onShow: () => {
         this._ensureCalendar()
         this._menu.classList.add(CLASS_NAME_SHOW)
         this._element.classList.add(CLASS_NAME_SHOW)
-        this._element.setAttribute('aria-expanded', 'true')
+        this._toggleElement.setAttribute('aria-expanded', 'true')
       },
       onShown: () => EventHandler.trigger(this._element, EVENT_SHOWN)
     })
@@ -434,7 +501,7 @@ class DatePicker extends BaseComponent {
       })
     }
 
-    EventHandler.on(this._indicatorElement, EVENT_CLICK, () => {
+    EventHandler.on(this._toggleElement, EVENT_CLICK, () => {
       if (!this._config.disabled) {
         this.toggle()
       }

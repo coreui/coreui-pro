@@ -158,6 +158,31 @@ Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label 
     <div class="form-text">We deliver on working days only.</div>
   </div>`} />
 
+## Composing the markup
+
+The picker is built from other components — the [date input](/forms/date-input/) field, the [calendar](/components/calendar/) and a popup — held together by the date it owns. The markup is where you choose the parts: mark an element with a role attribute and the picker adopts it instead of building its own; leave a part out and it is generated as in the examples above.
+
+| Role | Element | What the picker does with it |
+| --- | --- | --- |
+| `data-coreui-picker-field` | a `div` | Hosts the date input's sections. Without it the field is generated (and wrapped in `.form-floating` when `floatingLabel` is set). |
+| `data-coreui-picker-toggle` | a `button` or any element | Opens and closes the calendar. Gets `aria-expanded`, `aria-controls` and `aria-haspopup`, and `ariaToggleLabel` as its name unless it has one. |
+| `data-coreui-picker-cleaner` | a `button` | Clears the value. Gets `ariaCleanerLabel` as its name unless it has one. |
+
+A decorative `<svg>` inside an adopted button is marked `aria-hidden` for you. So a trigger can be a regular button with its own text and icon, the way a combobox has one:
+
+<Example pro code={`<div data-coreui-locale="en-US" data-coreui-toggle="date-picker">
+    <div data-coreui-picker-field></div>
+    <button type="button" class="btn btn-subtle btn-sm" data-coreui-picker-cleaner>
+      <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3l10 10M13 3L3 13"/></svg>
+    </button>
+    <button type="button" class="btn btn-subtle btn-sm" data-coreui-picker-toggle>
+      <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1.5" y="2.5" width="13" height="12" rx="1.5"/><path d="M1.5 6.5h13M5 1v3M11 1v3"/></svg>
+      Pick a date
+    </button>
+  </div>`} />
+
+The `cleanerIcon` and `indicatorIcon` options only feed the generated buttons; with your own markup the icon is whatever you put in the HTML, and nothing is sanitized because nothing is rendered from a string.
+
 ## Floating labels
 
 The date picker supports [floating labels](/forms/floating-labels/): set `floatingLabel` and the component renders the label itself — no wrapper markup needed — and the text also becomes the field's accessible name. The mask placeholders stay hidden while the label rests inside the field; focusing any part of the field — the sections or the picker button — floats the label and reveals the mask.
@@ -342,6 +367,8 @@ Add `data-coreui-toggle="date-picker"` to a `div` element.
 <div data-coreui-toggle="date-picker"></div>
 ```
 
+Inside it, `data-coreui-picker-field`, `data-coreui-picker-toggle` and `data-coreui-picker-cleaner` name the parts you supply yourself — see [Composing the markup](#composing-the-markup).
+
 ### Via JavaScript
 
 ```html
@@ -373,12 +400,12 @@ attributes work on the picker element too.
 | `ariaLabel` | string | `'Date input'` | Accessible name of the field. It lands on the `role="group"` container the sections sit in, so it names the whole control rather than one part of it. |
 | `ariaToggleLabel` | string | `'Toggle the calendar'` | Accessible label of the indicator button. |
 | `cleaner` | boolean | `true` | Renders a button that clears the value. It appears only once the field holds one. |
-| `cleanerIcon` | string | cross SVG | Inline SVG rendered by the component (sanitized). |
+| `cleanerIcon` | string | cross SVG | Inline SVG of the generated cleaner (sanitized). Not used for a `data-coreui-picker-cleaner` you wrote. |
 | `calendarOptions` | object | `{}` | Programmatic escape hatch for calendar options. |
 | `container` | string, element, false | `false` | Teleport target for the dropdown. |
 | `date` | date, string, null | `null` | Initial value. |
 | `disabled` | boolean | `false` | Disables the field and the popup. |
-| `indicatorIcon` | string | calendar SVG | Inline SVG rendered by the component (sanitized). |
+| `indicatorIcon` | string | calendar SVG | Inline SVG of the generated toggle (sanitized). Not used for a `data-coreui-picker-toggle` you wrote. |
 | `inputOptions` | object | `{}` | Programmatic escape hatch for date input options. |
 | `locale` | string | browser locale | Drives section order, separators, and calendar labels. |
 | `maxDate` | date, string, null | `null` | Upper bound, enforced by both layers. |
