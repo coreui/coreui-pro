@@ -5,10 +5,9 @@
  * --------------------------------------------------------------------------
  */
 
-import EventHandler from './dom/event-handler.js'
-import SelectorEngine from './dom/selector-engine.js'
 import SectionInput, { type SectionInputConfig } from './section-input.js'
 import { convertToDateObject } from './util/calendar.js'
+import { initializeOnReady } from './util/component-functions.js'
 import { type DateSection, getDateTimeSectionsFromLocale } from './util/date-sections.js'
 import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
 
@@ -17,11 +16,6 @@ import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
  */
 
 const NAME = 'date-time-input'
-const DATA_KEY = 'coreui.date-time-input'
-const EVENT_KEY = `.${DATA_KEY}`
-const DATA_API_KEY = '.data-api'
-
-const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
 const SELECTOR_DATA_DATE_TIME_INPUT = '[data-coreui-date-time-input]'
 
@@ -84,11 +78,7 @@ class DateTimeInput extends SectionInput {
  * Data API implementation
  */
 
-EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
-  for (const dateTimeInput of SelectorEngine.find(SELECTOR_DATA_DATE_TIME_INPUT)) {
-    DateTimeInput.componentInterface(dateTimeInput)
-  }
-})
+initializeOnReady(DateTimeInput, SELECTOR_DATA_DATE_TIME_INPUT)
 
 /**
  * jQuery

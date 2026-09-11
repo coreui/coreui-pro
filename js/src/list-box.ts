@@ -8,6 +8,7 @@
 import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
+import { initializeOnReady } from './util/component-functions.js'
 import type { ComponentConfig } from './util/config.js'
 import { DefaultAllowlist, sanitizeHtml, type SanitizerAllowList } from './util/sanitizer.js'
 import {
@@ -21,7 +22,6 @@ import {
 const NAME = 'list-box'
 const DATA_KEY = 'coreui.list-box'
 const EVENT_KEY = `.${DATA_KEY}`
-const DATA_API_KEY = '.data-api'
 
 const ARROW_UP_KEY = 'ArrowUp'
 const ARROW_DOWN_KEY = 'ArrowDown'
@@ -1303,11 +1303,7 @@ class ListBox extends BaseComponent {
  * Data API implementation
  */
 
-EventHandler.on(document, `DOMContentLoaded${EVENT_KEY}${DATA_API_KEY}`, () => {
-  for (const element of SelectorEngine.find(SELECTOR_DATA_TOGGLE)) {
-    ListBox.getOrCreateInstance(element)
-  }
-})
+initializeOnReady(ListBox, SELECTOR_DATA_TOGGLE, 'DOMContentLoaded')
 
 /**
  * jQuery

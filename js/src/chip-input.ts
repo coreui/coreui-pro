@@ -8,6 +8,7 @@
 import ChipSet, { type ChipSetConfig } from './chip-set.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
+import { initializeOnReady } from './util/component-functions.js'
 import type { ComponentConfig } from './util/config.js'
 import { getUID, isRTL } from './util/index.js'
 
@@ -18,7 +19,6 @@ import { getUID, isRTL } from './util/index.js'
 const NAME = 'chip-input'
 const DATA_KEY = 'coreui.chip-input'
 const EVENT_KEY = `.${DATA_KEY}`
-const DATA_API_KEY = '.data-api'
 
 const EVENT_BLUR = `blur${EVENT_KEY}`
 const EVENT_CLICK = `click${EVENT_KEY}`
@@ -417,10 +417,6 @@ class ChipInput extends ChipSet {
  * Data API implementation
  */
 
-EventHandler.on(document, `DOMContentLoaded${EVENT_KEY}${DATA_API_KEY}`, () => {
-  for (const element of SelectorEngine.find(SELECTOR_DATA_CHIP_INPUT)) {
-    ChipInput.getOrCreateInstance(element)
-  }
-})
+initializeOnReady(ChipInput, SELECTOR_DATA_CHIP_INPUT, 'DOMContentLoaded')
 
 export default ChipInput

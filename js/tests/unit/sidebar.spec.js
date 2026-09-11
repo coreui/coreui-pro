@@ -716,7 +716,7 @@ describe('Sidebar', () => {
     it('should initialize sidebar on elements with .sidebar class on window load', () => {
       fixtureEl.innerHTML = '<div class="sidebar"></div>'
       const sidebarEl = fixtureEl.querySelector('.sidebar')
-      const spySidebarInterface = spyOn(Sidebar, 'sidebarInterface')
+      const spySidebarInterface = spyOn(Sidebar, 'getOrCreateInstance')
 
       const loadEvent = new Event('load')
       window.dispatchEvent(loadEvent)
@@ -773,7 +773,7 @@ describe('Sidebar', () => {
       fixtureEl.innerHTML = '<div class="sidebar"></div>'
       const sidebarEl = fixtureEl.querySelector('.sidebar')
       const sidebar = new Sidebar(sidebarEl)
-      const spySidebarInterface = spyOn(Sidebar, 'sidebarInterface')
+      const spySidebarInterface = spyOn(Sidebar, 'getOrCreateInstance')
 
       sidebar.dispose()
       window.dispatchEvent(new Event('load'))

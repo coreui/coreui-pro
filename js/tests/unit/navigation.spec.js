@@ -80,23 +80,23 @@ describe('Navigation', () => {
     it('should initialize navigation on elements with data-coreui-navigation', () => {
       fixtureEl.innerHTML = '<nav data-coreui-navigation></nav>'
       const navEl = fixtureEl.querySelector('nav')
-      spyOn(Navigation, 'navigationInterface')
+      spyOn(Navigation, 'getOrCreateInstance')
 
       const loadEvent = new Event('load')
       window.dispatchEvent(loadEvent)
 
-      expect(Navigation.navigationInterface).toHaveBeenCalledWith(navEl)
+      expect(Navigation.getOrCreateInstance).toHaveBeenCalledWith(navEl)
     })
 
     it('should initialize navigation on elements with legacy data-coreui="navigation"', () => {
       fixtureEl.innerHTML = '<nav data-coreui="navigation"></nav>'
       const navEl = fixtureEl.querySelector('nav')
-      spyOn(Navigation, 'navigationInterface')
+      spyOn(Navigation, 'getOrCreateInstance')
 
       const loadEvent = new Event('load')
       window.dispatchEvent(loadEvent)
 
-      expect(Navigation.navigationInterface).toHaveBeenCalledWith(navEl)
+      expect(Navigation.getOrCreateInstance).toHaveBeenCalledWith(navEl)
     })
   })
 

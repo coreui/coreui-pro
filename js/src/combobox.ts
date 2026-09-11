@@ -10,6 +10,7 @@ import Data from './dom/data.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import ListBox, { type ListBoxEntry } from './list-box.js'
+import { initializeOnReady } from './util/component-functions.js'
 import type { ComponentConfig } from './util/config.js'
 import { CARET_ICON } from './util/icons.js'
 import { DefaultAllowlist, type SanitizerAllowList } from './util/sanitizer.js'
@@ -37,7 +38,6 @@ const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 const EVENT_SEARCH = `search${EVENT_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_KEYUP_DATA_API = `keyup${EVENT_KEY}${DATA_API_KEY}`
-const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
 const EVENT_LIST_BOX = '.coreui.list-box'
 const EVENT_LIST_BOX_SEARCH = `search${EVENT_LIST_BOX}`
@@ -570,11 +570,7 @@ class Combobox extends ComboboxBase {
  * Data API implementation
  */
 
-EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
-  for (const toggle of SelectorEngine.find(SELECTOR_DATA_TOGGLE)) {
-    Combobox.getOrCreateInstance(toggle)
-  }
-})
+initializeOnReady(Combobox, SELECTOR_DATA_TOGGLE)
 
 EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, function (this: HTMLElement, event: any) {
   event.preventDefault()

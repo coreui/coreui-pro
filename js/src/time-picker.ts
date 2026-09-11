@@ -12,6 +12,7 @@ import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import TimeInput from './time-input.js'
+import { initializeOnReady } from './util/component-functions.js'
 import Popup from './util/popup.js'
 import TimeSelection from './util/time-selection.js'
 import { sanitizeHtml, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
@@ -27,12 +28,10 @@ import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
 const NAME = 'time-picker'
 const DATA_KEY = 'coreui.time-picker'
 const EVENT_KEY = `.${DATA_KEY}`
-const DATA_API_KEY = '.data-api'
 
 const EVENT_CLICK = `click${EVENT_KEY}`
 const EVENT_HIDDEN = `hidden${EVENT_KEY}`
 const EVENT_HIDE = `hide${EVENT_KEY}`
-const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_SHOW = `show${EVENT_KEY}`
 const EVENT_SHOWN = `shown${EVENT_KEY}`
 const EVENT_TIME_CHANGE = `timeChange${EVENT_KEY}`
@@ -412,11 +411,7 @@ class TimePicker extends BaseComponent {
  * Data API implementation
  */
 
-EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
-  for (const element of SelectorEngine.find(SELECTOR_DATA_TOGGLE)) {
-    TimePicker.getOrCreateInstance(element)
-  }
-})
+initializeOnReady(TimePicker, SELECTOR_DATA_TOGGLE)
 
 /**
  * jQuery

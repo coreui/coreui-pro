@@ -9,6 +9,7 @@ import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
+import { initializeOnReady } from './util/component-functions.js'
 import type { ComponentConfig } from './util/config.js'
 import { defineJQueryPlugin, isRTL, jQueryDispatch } from './util/index.js'
 import { DefaultAllowlist, type SanitizerAllowList, sanitizeHtml } from './util/sanitizer.js'
@@ -20,11 +21,9 @@ import { DefaultAllowlist, type SanitizerAllowList, sanitizeHtml } from './util/
 const NAME = 'range-slider'
 const DATA_KEY = 'coreui.range-slider'
 const EVENT_KEY = `.${DATA_KEY}`
-const DATA_API_KEY = '.data-api'
 
 const EVENT_CHANGE = `change${EVENT_KEY}`
 const EVENT_INPUT = `input${EVENT_KEY}`
-const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_MOUSEDOWN = `mousedown${EVENT_KEY}`
 const EVENT_MOUSEMOVE = `mousemove${EVENT_KEY}`
 const EVENT_MOUSEUP = `mouseup${EVENT_KEY}`
@@ -687,12 +686,7 @@ class RangeSlider extends BaseComponent {
  * Data API implementation
  */
 
-EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
-  const ratings = SelectorEngine.find(SELECTOR_DATA_TOGGLE)
-  for (let i = 0, len = ratings.length; i < len; i++) {
-    RangeSlider.rangeSliderInterface(ratings[i])
-  }
-})
+initializeOnReady(RangeSlider, SELECTOR_DATA_TOGGLE)
 
 /**
  * jQuery

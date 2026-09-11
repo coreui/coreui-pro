@@ -12,6 +12,7 @@ import BaseComponent from './base-component.js'
 import EventHandler, { type CoreUIEvent } from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
+import { initializeOnReady } from './util/component-functions.js'
 import {
   defineJQueryPlugin, isRTL, isVisible, jQueryDispatch
 } from './util/index.js'
@@ -37,7 +38,6 @@ const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 const EVENT_MOUSEENTER = `mouseenter${EVENT_KEY}`
 const EVENT_MOUSELEAVE = `mouseleave${EVENT_KEY}`
 const EVENT_POINTERDOWN = `pointerdown${EVENT_KEY}`
-const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
 
 const CLASS_NAME_CAROUSEL = 'carousel'
@@ -941,13 +941,7 @@ EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_PLAY_PAUSE, function (e
   Carousel.getOrCreateInstance(target)._togglePlayPause()
 })
 
-EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
-  const carousels = SelectorEngine.find(SELECTOR_DATA_AUTOPLAY)
-
-  for (const carousel of carousels) {
-    Carousel.getOrCreateInstance(carousel)
-  }
-})
+initializeOnReady(Carousel, SELECTOR_DATA_AUTOPLAY)
 
 /**
  * jQuery

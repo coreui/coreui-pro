@@ -6,10 +6,11 @@
  */
 
 import BaseComponent from './base-component.js'
+import { initializeOnReady } from './util/component-functions.js'
 import type { ComponentConfig } from './util/config.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
-import { defineJQueryPlugin } from './util/index.js'
+import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
 import { startSizeTransition, supportsInterpolateSize } from './util/size-transition.js'
 
 /**
@@ -41,7 +42,6 @@ const CLASS_NAME_NAV_GROUP = 'nav-group'
 const CLASS_NAME_NAV_GROUP_TOGGLE = 'nav-group-toggle'
 
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
-const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
 const SELECTOR_NAV_GROUP = '.nav-group'
 const SELECTOR_NAV_GROUP_ITEMS = '.nav-group-items'
@@ -183,9 +183,7 @@ class Navigation extends BaseComponent {
   }
 
   static jQueryInterface(this: any, config: any): void {
-    return this.each(function (this: HTMLElement) {
-      Navigation.navigationInterface(this, config)
-    })
+    return jQueryDispatch(this, Navigation, config)
   }
 }
 
@@ -194,11 +192,7 @@ class Navigation extends BaseComponent {
  * Data Api implementation
  * ------------------------------------------------------------------------
  */
-EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
-  for (const element of Array.from(document.querySelectorAll(SELECTOR_DATA_NAVIGATION))) {
-    Navigation.navigationInterface(element)
-  }
-})
+initializeOnReady(Navigation, SELECTOR_DATA_NAVIGATION)
 
 /**
  * ------------------------------------------------------------------------
