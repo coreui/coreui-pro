@@ -33,7 +33,11 @@ const DATA_API_KEY = '.data-api'
 const EVENT_END_DATE_CHANGE = `endDateChange${EVENT_KEY}`
 const EVENT_RANGE_CHANGE = `rangeChange${EVENT_KEY}`
 const EVENT_START_DATE_CHANGE = `startDateChange${EVENT_KEY}`
+const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
+
+const ARROW_LEFT_KEY = 'ArrowLeft'
+const ARROW_RIGHT_KEY = 'ArrowRight'
 
 const CLASS_NAME_DATE_RANGE = 'form-date-range'
 const CLASS_NAME_FORM_CONTROL = 'form-control'
@@ -45,6 +49,7 @@ const SELECTOR_DATA_DATE_RANGE_INPUT = '[data-coreui-date-range-input]'
 const SELECTOR_ROLE_END = '[data-coreui-range-end]'
 const SELECTOR_ROLE_SEPARATOR = '[data-coreui-range-separator]'
 const SELECTOR_ROLE_START = '[data-coreui-range-start]'
+const SELECTOR_SECTION = '.form-date-time-section'
 const SELECTOR_SVG = 'svg'
 
 type DateRangeInputConfig = {
@@ -346,6 +351,25 @@ class DateRangeInput extends BaseComponent {
     for (const svg of SelectorEngine.find(SELECTOR_SVG, this._separatorElement)) {
       svg.setAttribute('aria-hidden', 'true')
     }
+
+    // Each field walks its own sections with the arrows and stops at its
+    // edge; the range carries the same press across the separator.
+    EventHandler.on(this._element, EVENT_KEYDOWN, (event: any) => {
+      if (event.key !== ARROW_LEFT_KEY && event.key !== ARROW_RIGHT_KEY) {
+        return
+      }
+
+      const isRtl = window.getComputedStyle(this._element).direction === 'rtl'
+      const forward = event.key === (isRtl ? ARROW_LEFT_KEY : ARROW_RIGHT_KEY)
+      const startSections = SelectorEngine.find(SELECTOR_SECTION, this._startElement)
+      const endSections = SelectorEngine.find(SELECTOR_SECTION, this._endElement)
+
+      if (forward && event.target === startSections.at(-1)) {
+        endSections[0]?.focus()
+      } else if (!forward && event.target === endSections[0]) {
+        startSections.at(-1)?.focus()
+      }
+    })
   }
 
   // Static

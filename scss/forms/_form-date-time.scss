@@ -140,6 +140,15 @@ $form-date-time-tokens: defaults(
     }
   }
 
+  // Two fields in one frame read as one value, so neither takes the frame's
+  // spare width — the arrow stays next to the dates, not in the middle.
+  .form-date-range {
+    > .form-date-time.form-control,
+    &.form-control-group:has(> .form-floating) > .form-floating {
+      flex: 0 1 auto;
+    }
+  }
+
   .form-floating > .form-control-group:has(> .form-date-time) {
     &:focus-within > .form-date-time,
     &:has(.form-date-time-filled) > .form-date-time {

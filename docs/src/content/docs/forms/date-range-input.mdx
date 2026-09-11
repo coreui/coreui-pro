@@ -11,7 +11,7 @@ otherFrameworks:
 
 <AddedIn version="6.0.0" />
 
-Use an empty container with `data-coreui-date-range-input` to create a range field. It is two [date inputs](/forms/date-input/) — start and end — and a separator, held together by the range the component owns: set one end and the other follows the same limits, and an end before the start marks the whole field invalid.
+Use an empty container with `data-coreui-date-range-input` to create a range field. It is two [date inputs](/forms/date-input/) — start and end — and a separator, held together by the range the component owns: set one end and the other follows the same limits, and an end before the start marks the whole field invalid. The element becomes the frame (`.form-control-group.form-date-range`); the fields keep their natural width, and the arrow keys walk from the last section of the start date into the end date and back.
 
 <Example pro code={`<label class="form-label" id="basicDateRangeInputLabel">Stay</label>
   <div data-coreui-date-range-input data-coreui-locale="en-US" data-coreui-start-name="check-in" data-coreui-end-name="check-out"></div>`} />

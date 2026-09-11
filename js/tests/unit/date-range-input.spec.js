@@ -163,6 +163,46 @@ describe('DateRangeInput', () => {
     })
   })
 
+  describe('keyboard', () => {
+    const sections = element => [...element.querySelectorAll('.form-date-time-section')]
+    const press = (target, key) => target.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }))
+
+    it('should carry the arrows across the separator', () => {
+      build()
+      const [start, end] = fields()
+      const lastOfStart = sections(start).at(-1)
+      const firstOfEnd = sections(end)[0]
+
+      lastOfStart.focus()
+      press(lastOfStart, 'ArrowRight')
+      expect(document.activeElement).toBe(firstOfEnd)
+
+      press(firstOfEnd, 'ArrowLeft')
+      expect(document.activeElement).toBe(lastOfStart)
+    })
+
+    it('should keep the arrows inside a field away from its edge', () => {
+      build()
+      const [start] = fields()
+      const first = sections(start)[0]
+
+      first.focus()
+      press(first, 'ArrowRight')
+      expect(start.contains(document.activeElement)).toBeTrue()
+      expect(document.activeElement).not.toBe(first)
+    })
+
+    it('should mirror the crossing in RTL', () => {
+      build({}, '<div id="range" dir="rtl"></div>')
+      const [start, end] = fields()
+      const lastOfStart = sections(start).at(-1)
+
+      lastOfStart.focus()
+      press(lastOfStart, 'ArrowLeft')
+      expect(document.activeElement).toBe(sections(end)[0])
+    })
+  })
+
   describe('markup roles', () => {
     const OWN_MARKUP = `<div id="range">
         <div data-coreui-range-start></div>
