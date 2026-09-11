@@ -15,7 +15,7 @@
           }
         }
         @include color-mode(dark, true) {
-          --custom-color: #{$indigo};
+          --custom-color: #{$gray};
         }
       }
       @include expect() {
@@ -24,7 +24,7 @@
           background-color: var(--cui-primary-bg-subtle);
         }
         [data-coreui-theme=dark] {
-          --custom-color: oklch(49.43% 0.27796 286.98deg);
+          --custom-color: oklch(60% 0.03948 265.02deg);
         }
       }
     }
@@ -44,7 +44,7 @@
           }
         }
         @include color-mode(dark, true) {
-          --custom-color: #{$indigo};
+          --custom-color: #{$gray};
         }
       }
       @include expect() {
@@ -57,7 +57,7 @@
         @media (prefers-color-scheme: dark) {
           :root,
           :host {
-            --custom-color: oklch(49.43% 0.27796 286.98deg);
+            --custom-color: oklch(60% 0.03948 265.02deg);
           }
         }
       }

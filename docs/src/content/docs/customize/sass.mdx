@@ -166,16 +166,16 @@ $primary: #0074d9;
 $danger: #ff4136;
 ```
 
-Later on, these variables feed the `base` slot of the entry in CoreUI for Bootstrap's `$theme-colors` map, and the rest of the entry — the subtle backgrounds, borders and emphasis text — is mixed from that base at runtime, so overriding the one variable retints the whole family:
+The variable feeds the palette, whose `500` stop the entry in CoreUI for Bootstrap's `$theme-colors` map points its `base` at, and the rest of the entry — the subtle backgrounds, borders and emphasis text — reads the runtime scale mixed from that stop, so overriding the one variable retints the whole family:
 
 ```scss
 $theme-colors: (
   "primary": (
-    "base": $primary,
-    // …the remaining slots read the runtime scale mixed from the base
+    "base": var(--cui-primary-500),
+    // …the remaining slots read the primary scale
   ),
   "danger": (
-    "base": $danger,
+    "base": var(--cui-danger-500),
     // …
   ),
 );
@@ -183,20 +183,24 @@ $theme-colors: (
 
 ### Add to map
 
-Add new colors to `$theme-colors`, or any other map, through `with ()`: `defaults()` merges your entries on top of the built-ins, so you pass only what you add. A theme colour entry is a map of slots: give the new colour a `base` and a `contrast`, and point the remaining slots at the 100–900 scale the library mixes from the base at runtime, the same way the built-in colours do.
+Add new colors to `$theme-colors`, or any other map, through `with ()`: `defaults()` merges your entries on top of the built-ins, so you pass only what you add. A theme colour entry is a map of slots that read one hue of the palette: add the hue to `$colors`, point `base` and `bg` at its `500` stop, and the remaining slots at the 025–975 scale the library mixes from it at runtime, the same way the built-in colours do.
 
 ```scss
 @use "@coreui/coreui/scss/coreui" with (
+  $colors: (
+    "custom-color": #900,
+  ),
   $theme-colors: (
     "custom-color": (
-      "base":        #900,
-      "contrast":    #fff,
+      "base":        var(--cui-custom-color-500),
       "fg":          light-dark(var(--cui-custom-color-600), var(--cui-custom-color-400)),
       "fg-emphasis": light-dark(var(--cui-custom-color-800), var(--cui-custom-color-200)),
+      "bg":          var(--cui-custom-color-500),
       "bg-subtle":   light-dark(var(--cui-custom-color-100), var(--cui-custom-color-900)),
       "bg-muted":    light-dark(var(--cui-custom-color-200), var(--cui-custom-color-800)),
       "border":      light-dark(var(--cui-custom-color-300), var(--cui-custom-color-600)),
-      "focus-ring":  color-mix(in srgb, var(--cui-custom-color-base) calc(var(--cui-focus-ring-opacity) * 100%), transparent),
+      "focus-ring":  color-mix(in oklch, var(--cui-custom-color-500) calc(var(--cui-focus-ring-opacity) * 100%), transparent),
+      "contrast":    var(--cui-white),
     ),
   )
 );
