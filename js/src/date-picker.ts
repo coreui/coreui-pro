@@ -19,7 +19,7 @@ import Popup from './util/popup.js'
 import { getDateBySelectionType } from './util/calendar.js'
 import type { ComponentConfig } from './util/config.js'
 import { getWeekSectionsFromLocale } from './util/date-sections.js'
-import { appendControlGroupField, createControlGroupAction } from './util/form-control-group.js'
+import { appendControlGroupField, applyControlGroupClasses, createControlGroupAction } from './util/form-control-group.js'
 import { CALENDAR_ICON, CLEANER_ICON } from './util/icons.js'
 import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
 import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
@@ -292,7 +292,7 @@ class DatePicker extends BaseComponent {
     // carries `.form-control-group` itself instead of nesting one.
     const inputGroup = this._element
     this._addedGroupClass = !inputGroup.classList.contains(CLASS_NAME_INPUT_GROUP)
-    inputGroup.classList.add(CLASS_NAME_INPUT_GROUP)
+    applyControlGroupClasses(inputGroup, CLASS_NAME_INPUT_GROUP)
 
     // Sizing rides the standard control classes on the frame itself
     if (this._config.size) {

@@ -140,7 +140,19 @@ $form-date-time-tokens: defaults(
     }
   }
 
-  .form-floating > .form-control-group:has(> .form-date-time) {
+  // Two fields in one frame read as one value, so neither takes the frame's
+  // spare width — the arrow stays next to the dates, not in the middle.
+  .form-date-range {
+    > .form-date-time.form-control,
+    &.form-control-group:has(> .form-floating) > .form-floating {
+      flex: 0 1 auto;
+    }
+  }
+
+  // The frame is a direct child of the floating wrapper for a plain field, and
+  // one level deeper for a picker, which composes a field component — so the
+  // frame is matched by descent rather than by one fixed depth.
+  .form-floating .form-control-group:has(> .form-date-time) {
     &:focus-within > .form-date-time,
     &:has(.form-date-time-filled) > .form-date-time {
       padding-top: var(--#{$prefix}form-floating-input-padding-t);
@@ -157,7 +169,12 @@ $form-date-time-tokens: defaults(
     &:not(:focus-within) > .form-control-icon:has(+ .form-date-time:not(.form-date-time-filled)) {
       color: transparent;
     }
+  }
 
+  // The label is a sibling of whatever the wrapper holds — the frame itself,
+  // or the picker around it.
+  .form-floating > .form-control-group:has(> .form-date-time),
+  .form-floating > .picker:has(> .form-control-group > .form-date-time) {
     &:not(:focus-within, :has(.form-date-time-filled)) ~ label {
       transform: none;
     }
@@ -168,7 +185,8 @@ $form-date-time-tokens: defaults(
     }
   }
 
-  .form-floating > label:has(~ .form-control-group .form-date-time-filled) {
+  .form-floating > label:has(~ .form-control-group .form-date-time-filled),
+  .form-floating > label:has(~ .picker .form-date-time-filled) {
     transform: var(--#{$prefix}form-floating-label-transform);
   }
 }

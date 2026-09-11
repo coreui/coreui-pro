@@ -3,26 +3,28 @@
  * CoreUI PRO date-range-picker.js
  * License (https://coreui.io/pro/license/)
  *
- * Composed from two DateInput section fields and one multi-month Calendar in a
- * Popup. The calendar owns the range mechanics (start/end, auto-advance); the
- * shell wires fields, popup, and the projected footer/ranges regions.
+ * Composed from a DateRangeInput field and one multi-month Calendar in a
+ * Popup. The field owns the range — both dates and their validation — the
+ * calendar owns the range mechanics (start/end, auto-advance), and the picker
+ * joins them and projects the footer/ranges regions. The element is the
+ * picker, not the frame: the frame is the field inside it.
  * --------------------------------------------------------------------------
  */
 
 import BaseComponent from './base-component.js'
 import Calendar from './calendar.js'
-import DateInput from './date-input.js'
+import DateRangeInput from './date-range-input.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import Popup from './util/popup.js'
-import { appendControlGroupField, createControlGroupAction } from './util/form-control-group.js'
+import { createControlGroupAction } from './util/form-control-group.js'
 import { getDateBySelectionType } from './util/calendar.js'
 import type { ComponentConfig } from './util/config.js'
 import { getWeekSectionsFromLocale } from './util/date-sections.js'
 import {
   CALENDAR_ICON, CLEANER_ICON, SEPARATOR_ICON, SEPARATOR_ICON_RTL
 } from './util/icons.js'
-import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
+import { defineJQueryPlugin, getUID, jQueryDispatch } from './util/index.js'
 import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 
 /**
@@ -53,12 +55,9 @@ const CLASS_NAME_DROPDOWN = 'date-picker-popup'
 const CLASS_NAME_FOOTER = 'date-picker-footer'
 const CLASS_NAME_CLEANER = 'form-control-cleaner'
 const CLASS_NAME_INDICATOR = 'form-control-action'
-const CLASS_NAME_FORM_CONTROL = 'form-control'
-const CLASS_NAME_INPUT_GROUP = 'form-control-group'
 const CLASS_NAME_PICKER = 'picker'
 const CLASS_NAME_POPUP = 'popup'
 const CLASS_NAME_RANGES = 'date-picker-ranges'
-const CLASS_NAME_SEPARATOR = 'form-control-icon'
 const CLASS_NAME_SHOW = 'show'
 
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="date-range-picker"]'
@@ -66,12 +65,13 @@ const SELECTOR_TEMPLATE_FOOTER = 'template[data-coreui-template="footer"]'
 const SELECTOR_TEMPLATE_RANGES = 'template[data-coreui-template="ranges"]'
 const SELECTOR_ACTION = '[data-coreui-picker-action]'
 
-// Icons live in JavaScript, not in CSS masks — the chips pattern.
+// Icons live in JavaScript only as the fallback for the generated buttons.
 
 type DateRangePickerConfig = {
   allowList: SanitizerAllowList
   ariaCleanerLabel: string
-  ariaLabels: string[]
+  ariaEndLabel: string
+  ariaStartLabel: string
   ariaToggleLabel: string
   cleaner: boolean
   cleanerIcon: string
@@ -88,18 +88,20 @@ type DateRangePickerConfig = {
   size: string | null
   calendars: number
   endDate: Date | string | null
+  endFloatingLabel: string | null
   endName: string | null
-  floatingLabels: string[] | null
   separatorIcon: string
   separatorIconRtl: string
   startDate: Date | string | null
+  startFloatingLabel: string | null
   startName: string | null
 }
 
 const Default: DateRangePickerConfig = {
   allowList: SVGAllowlist,
   ariaCleanerLabel: 'Clear the value',
-  ariaLabels: ['Start date', 'End date'],
+  ariaEndLabel: 'End date',
+  ariaStartLabel: 'Start date',
   ariaToggleLabel: 'Toggle the calendar',
   cleaner: true,
   cleanerIcon: CLEANER_ICON,
@@ -108,8 +110,8 @@ const Default: DateRangePickerConfig = {
   container: false,
   disabled: false,
   endDate: null,
+  endFloatingLabel: null,
   endName: null,
-  floatingLabels: null,
   indicatorIcon: CALENDAR_ICON,
   inputOptions: {},
   locale: navigator.language,
@@ -121,13 +123,15 @@ const Default: DateRangePickerConfig = {
   separatorIconRtl: SEPARATOR_ICON_RTL,
   size: null,
   startDate: null,
+  startFloatingLabel: null,
   startName: null
 }
 
 const DefaultType: Record<string, string> = {
   allowList: 'object',
   ariaCleanerLabel: 'string',
-  ariaLabels: 'array',
+  ariaEndLabel: 'string',
+  ariaStartLabel: 'string',
   ariaToggleLabel: 'string',
   cleaner: 'boolean',
   cleanerIcon: 'string',
@@ -136,8 +140,8 @@ const DefaultType: Record<string, string> = {
   container: '(string|element|boolean)',
   disabled: 'boolean',
   endDate: '(date|string|null)',
+  endFloatingLabel: '(string|null)',
   endName: '(string|null)',
-  floatingLabels: '(array|null)',
   indicatorIcon: 'string',
   inputOptions: 'object',
   locale: 'string',
@@ -149,6 +153,7 @@ const DefaultType: Record<string, string> = {
   separatorIconRtl: 'string',
   size: '(string|null)',
   startDate: '(date|string|null)',
+  startFloatingLabel: '(string|null)',
   startName: '(string|null)'
 }
 
@@ -160,23 +165,15 @@ class DateRangePicker extends BaseComponent {
   protected declare _footerTemplate: any
   protected declare _cleanerElement: HTMLElement | null
   protected declare _indicatorElement: HTMLElement
-  protected declare _startInputElement: HTMLElement
-  protected declare _endInputElement: HTMLElement
-  protected declare _startFieldElement: HTMLElement
-  protected declare _endFieldElement: HTMLElement
-  protected declare _separatorElement: HTMLElement
+  protected declare _frameElement: HTMLElement
   protected declare _rangesTemplate: any
-  protected declare _startInput: any
-  protected declare _endInput: any
+  protected declare _rangeInput: any
   protected declare _calendar: any
   protected declare _syncingFromPanel: boolean
   protected declare _calendarElement: any
   protected declare _menu: any
-  protected declare _addedGroupClass: boolean
   protected declare _popup: any
   protected declare _selectEndDate: any
-  protected declare _initialStartDate: any
-  protected declare _initialEndDate: any
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
@@ -184,17 +181,13 @@ class DateRangePicker extends BaseComponent {
     this._footerTemplate = SelectorEngine.findOne(SELECTOR_TEMPLATE_FOOTER, this._element)
     this._rangesTemplate = SelectorEngine.findOne(SELECTOR_TEMPLATE_RANGES, this._element)
     this._cleanerElement = null
-    this._startInput = null
-    this._endInput = null
+    this._rangeInput = null
     this._calendar = null
     this._syncingFromPanel = false
     this._calendarElement = null
     this._menu = null
     this._popup = null
     this._selectEndDate = false
-    // see DatePicker — the shell owns the initial range for reset()
-    this._initialStartDate = config?.startDate ?? this._config.startDate
-    this._initialEndDate = config?.endDate ?? this._config.endDate
 
     this._createDateRangePicker()
     this._createPopup()
@@ -232,30 +225,30 @@ class DateRangePicker extends BaseComponent {
   }
 
   getStartDate(): Date | null {
-    return this._startInput.getDate()
+    return this._rangeInput.getStartDate()
   }
 
   getEndDate(): Date | null {
-    return this._endInput.getDate()
+    return this._rangeInput.getEndDate()
   }
 
-  // See DatePicker.setDate — the emitted values and the calendar selection
-  // follow the fields' validation outcome, not the arguments.
+  // The field validates both dates, so the emitted values and the calendar
+  // selection follow its outcome, not the arguments. Its change events carry
+  // each date into the calendar; only the selection phase is this method's own
+  // business.
   setRange(startDate: Date | null, endDate: Date | null): void {
-    // The field listeners carry each date into the calendar and emit the
-    // events; only the selection phase is this method's own business.
-    this._startInput.update({ date: startDate })
-    this._endInput.update({ date: endDate })
-    this._selectEndDate = false
-    this._calendar?.update({ selectEndDate: false })
+    this._rangeInput.setRange(startDate, endDate)
+    this._setSelectEndDate(false)
   }
 
   clear(): void {
-    this.setRange(null, null)
+    this._rangeInput.clear()
+    this._setSelectEndDate(false)
   }
 
   reset(): void {
-    this.setRange(this._initialStartDate, this._initialEndDate)
+    this._rangeInput.reset()
+    this._setSelectEndDate(false)
   }
 
   getContext(): Record<string, any> {
@@ -264,7 +257,7 @@ class DateRangePicker extends BaseComponent {
       close: () => this.hide(),
       disabled: this._config.disabled,
       endDate: this.getEndDate(),
-      isDateSelectable: (date: Date | null) => this._startInput.isDateSelectable(date),
+      isDateSelectable: (date: Date | null) => this._rangeInput.isDateSelectable(date),
       reset: () => this.reset(),
       setRange: (startDate: Date | null, endDate: Date | null) => this.setRange(startDate, endDate),
       startDate: this.getStartDate()
@@ -272,23 +265,15 @@ class DateRangePicker extends BaseComponent {
   }
 
   override dispose(): void {
-    for (const element of [this._menu, this._indicatorElement, this._cleanerElement, this._startInputElement, this._endInputElement]) {
+    for (const element of [this._menu, this._indicatorElement, this._cleanerElement, this._frameElement]) {
       EventHandler.off(element, EVENT_KEY)
     }
 
     this._popup.dispose()
-    this._startInput.dispose()
-    this._endInput.dispose()
+    this._rangeInput.dispose()
     this._calendar?.dispose()
-    this._startFieldElement.remove()
-    this._separatorElement.remove()
-    this._endFieldElement.remove()
-    this._cleanerElement?.remove()
-    this._indicatorElement.remove()
-
-    if (this._addedGroupClass) {
-      this._element.classList.remove(CLASS_NAME_INPUT_GROUP)
-    }
+    this._frameElement.remove()
+    this._element.classList.remove(CLASS_NAME_DATE_PICKER, CLASS_NAME_DATE_RANGE_PICKER, CLASS_NAME_PICKER)
 
     super.dispose()
   }
@@ -331,89 +316,38 @@ class DateRangePicker extends BaseComponent {
     this._calendar?.update({ selectEndDate: value })
   }
 
-  // The separator is a directional arrow, so it has an RTL counterpart (v1 did
-  // the same with two icon variables, swapped in CSS). Read the element's
-  // computed direction rather than isRTL(): the document can be LTR while an
-  // ancestor sets dir="rtl" around the picker.
-  _resolveSeparatorIcon(): string {
-    const isRtl = window.getComputedStyle(this._element).direction === 'rtl'
-
-    return isRtl ? this._config.separatorIconRtl : this._config.separatorIcon
-  }
-
-  // Both halves are the same primitive, so without a name of its own each would
-  // announce identically and give no clue which end of the range it is.
-  _floatingLabel(index: number): string | null {
-    const labels = this._config.floatingLabels
-    return (Array.isArray(labels) && labels[index]) || null
-  }
-
-  _ariaLabel(index: number): string {
-    const labels = this._config.ariaLabels
-    return (Array.isArray(labels) && labels[index]) || (Default.ariaLabels as string[])[index]
-  }
-
-  _createInput(date: Date | null, name: string, ariaLabel: string): any {
-    const inputEl = document.createElement('div')
-
-    const input = new DateInput(inputEl, this._forwardConfig(DateInput, {
-      ariaLabel,
-      date,
-      disabled: this._config.disabled,
-      locale: this._config.locale,
-      name,
-      ...(this._resolveFormat() ? { format: this._resolveFormat() } : {})
-    }, this._config.inputOptions))
-
-    return { input, inputEl }
-  }
-
   _createDateRangePicker(): void {
     this._element.classList.add(CLASS_NAME_DATE_PICKER, CLASS_NAME_DATE_RANGE_PICKER, CLASS_NAME_PICKER)
 
-    // The root is the frame: a field component has nothing to wrap, so it
-    // carries `.form-control-group` itself instead of nesting one.
-    const inputGroup = this._element
-    this._addedGroupClass = !inputGroup.classList.contains(CLASS_NAME_INPUT_GROUP)
-    inputGroup.classList.add(CLASS_NAME_INPUT_GROUP)
+    // Only one component can own an element, and the range field owns the
+    // frame — so the picker's element wraps it rather than being it. The
+    // adornments still go inside the frame, where the layout expects them.
+    const inputGroup = document.createElement('div')
+    this._element.append(inputGroup)
+    this._frameElement = inputGroup
 
-    // Sizing rides the standard control classes on the frame itself
-    if (this._config.size) {
-      inputGroup.classList.add(`${CLASS_NAME_FORM_CONTROL}-${this._config.size}`)
-    }
+    this._rangeInput = new DateRangeInput(inputGroup, this._forwardConfig(DateRangeInput, {
+      disabled: this._config.disabled,
+      endDate: this._config.endDate,
+      locale: this._config.locale,
+      size: this._config.size,
+      startDate: this._config.startDate,
+      ...(this._resolveFormat() ? { format: this._resolveFormat() } : {})
+    }, { inputOptions: this._config.inputOptions }))
 
-    // With floating labels each field gets its own `.form-floating` inside the
-    // group, so the two labels float independently — the label text is also the
-    // field's accessible name, keeping the visible and spoken labels one thing.
-    const start = this._createInput(this._config.startDate, this._config.startName, this._floatingLabel(0) ?? this._ariaLabel(0))
-    this._startInput = start.input
-    this._startInputElement = start.inputEl
-    this._startFieldElement = appendControlGroupField(inputGroup, start.inputEl, this._floatingLabel(0), `${this.constructor.NAME}-`)
-
-    const separator = document.createElement('span')
-    separator.classList.add(CLASS_NAME_SEPARATOR)
-    separator.setAttribute('aria-hidden', 'true')
-    separator.innerHTML = sanitizeByConfig(this._resolveSeparatorIcon(), this._config)
-    inputGroup.append(separator)
-    this._separatorElement = separator
-
-    const end = this._createInput(this._config.endDate, this._config.endName, this._floatingLabel(1) ?? this._ariaLabel(1))
-    this._endInput = end.input
-    this._endInputElement = end.inputEl
-    this._endFieldElement = appendControlGroupField(inputGroup, end.inputEl, this._floatingLabel(1), `${this.constructor.NAME}-`)
-
-    // See DatePicker — the bridge from typed values back to the calendar
-    EventHandler.on(start.inputEl, DateInput.eventName(DateInput.CHANGE_EVENT_NAME), (event: any) => {
+    // The bridge from typed values back to the calendar. The guard stops the
+    // echo of the panel's own updates.
+    EventHandler.on(inputGroup, DateRangeInput.eventName('startDateChange'), (event: any) => {
       if (!this._syncingFromPanel) {
         this._calendar?.update({ startDate: event.date })
-        this._triggerDateChange(EVENT_START_DATE_CHANGE, this._startInput)
+        this._triggerDateChange(EVENT_START_DATE_CHANGE, event.date)
       }
     })
 
-    EventHandler.on(end.inputEl, DateInput.eventName(DateInput.CHANGE_EVENT_NAME), (event: any) => {
+    EventHandler.on(inputGroup, DateRangeInput.eventName('endDateChange'), (event: any) => {
       if (!this._syncingFromPanel) {
         this._calendar?.update({ endDate: event.date })
-        this._triggerDateChange(EVENT_END_DATE_CHANGE, this._endInput)
+        this._triggerDateChange(EVENT_END_DATE_CHANGE, event.date)
       }
     })
 
@@ -431,7 +365,11 @@ class DateRangePicker extends BaseComponent {
     this._indicatorElement = indicator
 
     this._menu = document.createElement('div')
+    this._menu.id = getUID(`${this.constructor.NAME}-popup-`)
     this._menu.classList.add(CLASS_NAME_POPUP, CLASS_NAME_DROPDOWN)
+    indicator.setAttribute('aria-controls', this._menu.id)
+    indicator.setAttribute('aria-expanded', 'false')
+    indicator.setAttribute('aria-haspopup', 'dialog')
 
     const body = document.createElement('div')
     body.classList.add(CLASS_NAME_BODY)
@@ -482,16 +420,16 @@ class DateRangePicker extends BaseComponent {
 
     EventHandler.on(this._calendar._element, 'startDateChange.coreui.calendar', event => {
       this._syncingFromPanel = true
-      this._startInput.update({ date: event.dateObject })
+      this._rangeInput.setRange(event.dateObject, this.getEndDate())
       this._syncingFromPanel = false
-      this._triggerDateChange(EVENT_START_DATE_CHANGE, this._startInput)
+      this._triggerDateChange(EVENT_START_DATE_CHANGE, this.getStartDate())
     })
 
     EventHandler.on(this._calendar._element, 'endDateChange.coreui.calendar', event => {
       this._syncingFromPanel = true
-      this._endInput.update({ date: event.dateObject })
+      this._rangeInput.setRange(this.getStartDate(), event.dateObject)
       this._syncingFromPanel = false
-      this._triggerDateChange(EVENT_END_DATE_CHANGE, this._endInput)
+      this._triggerDateChange(EVENT_END_DATE_CHANGE, this.getEndDate())
 
       if (this.getEndDate() && this.getStartDate() && !this._footerTemplate) {
         this.hide()
@@ -502,14 +440,13 @@ class DateRangePicker extends BaseComponent {
   // The field validates the date, so the event reports what the field holds —
   // a selection the field refused (min/max) is announced as null, not as the
   // day that was clicked.
-  _triggerDateChange(eventName: string, input: any): void {
-    const date = input.getDate()
+  _triggerDateChange(eventName: string, date: Date | null): void {
     EventHandler.trigger(this._element, eventName, { date, formattedDate: getDateBySelectionType(date, this._config.selectionType) })
   }
 
   _createPopup(): void {
     this._popup = new Popup({
-      anchor: this._element,
+      anchor: this._frameElement,
       container: this._config.container,
       content: this._menu,
       onBeforeHide: () => !EventHandler.trigger(this._element, EVENT_HIDE)?.defaultPrevented,
@@ -518,13 +455,13 @@ class DateRangePicker extends BaseComponent {
       onHide: () => {
         this._menu.classList.remove(CLASS_NAME_SHOW)
         this._element.classList.remove(CLASS_NAME_SHOW)
-        this._element.setAttribute('aria-expanded', 'false')
+        this._indicatorElement.setAttribute('aria-expanded', 'false')
       },
       onShow: () => {
         this._ensureCalendar()
         this._menu.classList.add(CLASS_NAME_SHOW)
         this._element.classList.add(CLASS_NAME_SHOW)
-        this._element.setAttribute('aria-expanded', 'true')
+        this._indicatorElement.setAttribute('aria-expanded', 'true')
       },
       onShown: () => EventHandler.trigger(this._element, EVENT_SHOWN)
     })
@@ -548,11 +485,11 @@ class DateRangePicker extends BaseComponent {
     // the v1 behavior of clicking the start/end input, on section fields. The
     // guard matters: focusin fires per section, and an unguarded update would
     // re-render the calendar on every keystroke-navigation between sections.
-    EventHandler.on(this._startInputElement, EVENT_FOCUSIN, () => {
+    EventHandler.on(this._rangeInput.getStartElement(), EVENT_FOCUSIN, () => {
       this._setSelectEndDate(false)
     })
 
-    EventHandler.on(this._endInputElement, EVENT_FOCUSIN, () => {
+    EventHandler.on(this._rangeInput.getEndElement(), EVENT_FOCUSIN, () => {
       this._setSelectEndDate(true)
     })
 

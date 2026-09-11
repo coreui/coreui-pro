@@ -160,7 +160,14 @@ $form-floating-tokens: defaults(
     // Select — wrap their control in `.form-control-group`, so every `> .form-control`
     // rule above misses it and the label never moves. The group takes the height,
     // and the control inside it takes the padding shift.
-    > .form-control-group {
+    // A picker composes a field component, so its frame is one level deeper;
+    // the wrapper takes the height and the frame fills it.
+    > .picker {
+      height: var(--#{$prefix}form-floating-height);
+    }
+
+    > .form-control-group,
+    > .picker > .form-control-group {
       height: var(--#{$prefix}form-floating-height);
       min-height: var(--#{$prefix}form-floating-height);
       line-height: var(--#{$prefix}form-floating-line-height);
@@ -188,6 +195,8 @@ $form-floating-tokens: defaults(
     // `:not(:placeholder-shown)` is vacuously true on the div-based
     // `.form-date-time`, so it is excluded here; its filled state lives in
     // forms/_form-date-time.scss, keyed to the JS-managed class instead.
+    > label:has(~ .picker:focus-within),
+    > .picker:focus-within ~ label,
     > label:has(~ .form-control-group:focus-within),
     > label:has(~ .form-control-group > .form-control:not(.form-date-time, :placeholder-shown)),
     > .form-control-group:focus-within ~ label,

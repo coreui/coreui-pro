@@ -9,12 +9,35 @@
  * --------------------------------------------------------------------------
  */
 
-import { getUID } from './index.js'
+import { getUID, reflow } from './index.js'
 
 const CLASS_NAME_FORM_FLOATING = 'form-floating'
 const CLASS_NAME_GROUP = 'form-control-group'
 const CLASS_NAME_FORM_CONTROL = 'form-control'
 const CLASS_NAME_STAYS_ON_CONTROL = /^(?:is|was|js)-/
+
+/**
+ * Turns an element the author wrote into the frame. The frame transitions its
+ * border colour, and an element that was not one a moment ago still carries the
+ * initial `currentColor` — so without silencing the transition for that one
+ * frame the takeover animates from the text colour to the border colour, a
+ * black-to-grey flash on load. An element that is already a frame just gets
+ * the extra classes.
+ * @param {HTMLElement} element The element to turn into a frame.
+ * @param {...string} classNames The frame class plus any component classes.
+ */
+export const applyControlGroupClasses = (element: HTMLElement, ...classNames: string[]): void => {
+  if (element.classList.contains(CLASS_NAME_GROUP)) {
+    element.classList.add(...classNames)
+    return
+  }
+
+  const previous = element.style.transitionProperty
+  element.style.transitionProperty = 'none'
+  element.classList.add(...classNames)
+  reflow(element)
+  element.style.transitionProperty = previous
+}
 
 export type ControlGroup = {
   created: boolean

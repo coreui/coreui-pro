@@ -134,6 +134,14 @@
       badge:
         color: danger
         text: PRO
+    - title: Date Range Input
+      to: /forms/date-range-input/
+      badge:
+        - color: success
+          text: NEW
+        - color: danger
+          text: PRO
+          className: ms-1
     - title: Date Range Picker
       to: /forms/date-range-picker/
       badge:

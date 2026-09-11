@@ -225,7 +225,7 @@ describe('floating labels', () => {
     document.body.append(container)
 
     new DateRangePicker(container.querySelector('#host'), {
-      locale: 'en-US', floatingLabels: ['Check-in', 'Check-out'], ...config
+      locale: 'en-US', startFloatingLabel: 'Check-in', endFloatingLabel: 'Check-out', ...config
     })
     return container.querySelector('.form-control-group')
   }

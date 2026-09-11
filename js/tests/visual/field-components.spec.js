@@ -21,6 +21,7 @@ import '../../../scss/coreui.scss'
 import Autocomplete from '../../src/autocomplete.js'
 import ChipInput from '../../src/chip-input.js'
 import DatePicker from '../../src/date-picker.js'
+import DateRangeInput from '../../src/date-range-input.js'
 import DateRangePicker from '../../src/date-range-picker.js'
 import DateTimePicker from '../../src/date-time-picker.js'
 import MultiSelect from '../../src/multi-select.js'
@@ -184,6 +185,20 @@ describe('time picker', () => {
     const tp = new TimePicker(mount(), { locale: 'en-US', time: TIME })
     await shoot(frame(), 'time-picker-filled')
     tp.dispose()
+  })
+})
+
+describe('date range input', () => {
+  it('empty', async () => {
+    const dri = new DateRangeInput(mount(), { locale: 'en-US' })
+    await shoot(frame(), 'date-range-input-empty')
+    dri.dispose()
+  })
+
+  it('range filled', async () => {
+    const dri = new DateRangeInput(mount(), { locale: 'en-US', startDate: DATE, endDate: DATE_END })
+    await shoot(frame(), 'date-range-input-filled')
+    dri.dispose()
   })
 })
 
