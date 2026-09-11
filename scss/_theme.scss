@@ -3,6 +3,134 @@
 @use "mixins/tokens" as *;
 @use "config" as *;
 
+// Themes map sub-keys
+//
+// Return var() references to root tokens instead of raw values.
+// Ex: theme-color-refs("bg") => (primary: var(--cui-primary-bg), success: var(--cui-success-bg), ...)
+@function theme-color-refs($slot, $key-suffix: "") {
+  $result: ();
+
+  @each $color in map.keys($theme-colors) {
+    $result: map.set($result, "#{$color}#{$key-suffix}", var(--#{$prefix}#{$color}-#{$slot}));
+  }
+
+  @return $result;
+}
+
+// Theme token to root tokens
+//
+// Returns the global :root token reference for a given a given token map, prefix, and key.
+// Ex: theme-token-refs($theme-bgs, "bg") => (body: var(--cui-bg-body), 1: var(--cui-bg-1), ...)
+// Skips `inherit` since it's a CSS-wide keyword that can't be stored in a custom property.
+@function theme-token-refs($map, $token) {
+  $result: ();
+
+  @each $key, $value in $map {
+    @if $value != inherit {
+      $result: map.merge($result, ($key: var(--#{$prefix}#{$token}-#{$key})));
+    }
+  }
+
+  @return $result;
+}
+
+// Generate opacity values using color-mix()
+// $fallback lets the referenced $color-var fall back to another color (e.g. currentcolor)
+// when it hasn't been set by a companion color utility.
+@function theme-opacity-values($color-var, $fallback: null, $opacities: $util-opacity) {
+  $result: ();
+  // stylelint-disable-next-line scss/at-function-named-arguments, @stylistic/function-whitespace-after
+  $color: if(sass($fallback): var($color-var, $fallback); else: var($color-var));
+
+  @each $key, $value in $opacities {
+    @if $key == 100 {
+      // For 100%, use direct variable reference (more efficient)
+      $result: map.merge($result, ($key: $color));
+    } @else {
+      // For other values, use color-mix()
+      $percentage: $key * 1%;
+      $result: map.merge($result, ($key: color-mix(in oklch, $color $percentage, transparent)));
+    }
+  }
+
+  @return $result;
+}
+
+@function theme-color-tokens() {
+  $tokens: ();
+
+  @each $color, $slots in $theme-colors {
+    @each $slot, $value in $slots {
+      $tokens: map.set($tokens, --#{$prefix}#{$color}-#{$slot}, $value);
+    }
+  }
+
+  @return $tokens;
+}
+
+@mixin theme-color-tokens() {
+  @include tokens(theme-color-tokens());
+}
+
+@mixin theme-tokens($state) {
+  @each $slot in map.keys(map.get($theme-colors, $state)) {
+    --#{$prefix}theme-#{$slot}: var(--#{$prefix}#{$state}-#{$slot});
+  }
+
+  $overrides: map.get($theme-state-colors, $state) or ();
+
+  @each $token in ("hover", "active") {
+    $override: map.get($overrides, $token);
+
+    @if $override {
+      --#{$prefix}theme-#{$token}: #{$override};
+    } @else {
+      --#{$prefix}theme-#{$token}: oklch(from var(--#{$prefix}#{$state}-bg) calc(l * var(--#{$prefix}theme-#{$token}-lightness)) calc(c * var(--#{$prefix}theme-#{$token}-chroma)) h);
+    }
+  }
+}
+
+// Set each --theme-* token to `initial` so descendants drop inherited theme colors.
+// Use `initial`, not `unset`. `unset` inherits from the parent again.
+// scss-docs-start theme-reset
+@mixin theme-reset() {
+  $slots: ();
+
+  @each $slots-of-color in map.values($theme-colors) {
+    @each $slot in map.keys($slots-of-color) {
+      $slots: map.set($slots, $slot, true);
+    }
+  }
+
+  @each $slot in map.keys(map.merge($slots, ("hover": true, "active": true))) {
+    --#{$prefix}theme-#{$slot}: initial;
+  }
+}
+
+@mixin generate-theme-reset() {
+  .theme-reset {
+    @include theme-reset();
+  }
+}
+// scss-docs-end theme-reset
+
+// Generate theme classes dynamically based on the keys in each theme color map
+// scss-docs-start theme-classes
+@mixin generate-theme-classes() {
+  @each $state in map.keys($theme-colors) {
+    .theme-#{$state} {
+      @include theme-tokens($state);
+    }
+  }
+
+  @include generate-theme-reset();
+}
+// scss-docs-end theme-classes
+
+// Theme maps use the `defaults()` pattern so `@use ... with (...)` merges custom
+// values on top of the built-ins instead of replacing the whole map. Set a key
+// to `null` to remove it. See scss/_config.scss for `defaults()`.
+
 // scss-docs-start theme-colors-map
 $theme-colors: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
@@ -146,42 +274,6 @@ $theme-borders: defaults(
 );
 // scss-docs-end theme-borders-map
 
-
-// Contextual theme tokens
-//
-// Components consume colors through the --#{$prefix}theme-* indirection so a
-// single set of component styles works with every theme color. Each slot of a
-// theme color becomes one such token.
-
-// The :root tokens behind one slot, keyed by color name, for utility maps that
-// need to point a whole family at the same slot.
-@function theme-color-refs($slot, $key-suffix: "") {
-  $result: ();
-
-  @each $color in map.keys($theme-colors) {
-    $result: map.set($result, "#{$color}#{$key-suffix}", var(--#{$prefix}#{$color}-#{$slot}));
-  }
-
-  @return $result;
-}
-
-// Theme token to root tokens
-//
-// Returns the global :root token reference for a given a given token map, prefix, and key.
-// Ex: theme-token-refs($theme-bgs, "bg") => (body: var(--bg-body), 1: var(--bg-1), ...)
-// Skips `inherit` since it's a CSS-wide keyword that can't be stored in a custom property.
-@function theme-token-refs($map, $token) {
-  $result: ();
-
-  @each $key, $value in $map {
-    @if $value != inherit {
-      $result: map.merge($result, ($key: var(--#{$prefix}#{$token}-#{$key})));
-    }
-  }
-
-  @return $result;
-}
-
 // scss-docs-start util-opacity-map
 $util-opacity: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
@@ -201,28 +293,6 @@ $util-opacity: defaults(
   $util-opacity
 );
 // scss-docs-end util-opacity-map
-
-// Generate opacity values using color-mix()
-// $fallback lets the referenced $color-var fall back to another color (e.g. currentcolor)
-// when it hasn't been set by a companion color utility.
-@function theme-opacity-values($color-var, $fallback: null, $opacities: $util-opacity) {
-  $result: ();
-  // stylelint-disable-next-line scss/at-function-named-arguments, @stylistic/function-whitespace-after
-  $color: if(sass($fallback): var($color-var, $fallback); else: var($color-var));
-
-  @each $key, $value in $opacities {
-    @if $key == 100 {
-      // For 100%, use direct variable reference (more efficient)
-      $result: map.merge($result, ($key: $color));
-    } @else {
-      // For other values, use color-mix()
-      $percentage: $key * 1%;
-      $result: map.merge($result, ($key: color-mix(in oklch, $color $percentage, transparent)));
-    }
-  }
-
-  @return $result;
-}
 
 // scss-docs-start theme-interaction-variables
 $theme-hover-lightness:   .85 !default;
@@ -251,69 +321,3 @@ $theme-state-colors: defaults(
   $theme-state-colors
 );
 // scss-docs-end theme-state-colors
-
-@mixin theme-tokens($state) {
-  @each $slot in map.keys(map.get($theme-colors, $state)) {
-    --#{$prefix}theme-#{$slot}: var(--#{$prefix}#{$state}-#{$slot});
-  }
-
-  $overrides: map.get($theme-state-colors, $state) or ();
-
-  @each $token in ("hover", "active") {
-    $override: map.get($overrides, $token);
-
-    @if $override {
-      --#{$prefix}theme-#{$token}: #{$override};
-    } @else {
-      --#{$prefix}theme-#{$token}: oklch(from var(--#{$prefix}#{$state}-bg) calc(l * var(--#{$prefix}theme-#{$token}-lightness)) calc(c * var(--#{$prefix}theme-#{$token}-chroma)) h);
-    }
-  }
-}
-
-// scss-docs-start theme-classes
-@mixin generate-theme-classes() {
-  @each $state in map.keys($theme-colors) {
-    .theme-#{$state} {
-      @include theme-tokens($state);
-    }
-  }
-}
-// scss-docs-end theme-classes
-
-// scss-docs-start theme-reset
-@mixin theme-reset() {
-  $slots: ();
-
-  @each $slots-of-color in map.values($theme-colors) {
-    @each $slot in map.keys($slots-of-color) {
-      $slots: map.set($slots, $slot, true);
-    }
-  }
-
-  @each $slot in map.keys(map.merge($slots, ("hover": true, "active": true))) {
-    --#{$prefix}theme-#{$slot}: initial;
-  }
-}
-
-@mixin generate-theme-reset() {
-  .theme-reset {
-    @include theme-reset();
-  }
-}
-// scss-docs-end theme-reset
-
-@function theme-color-tokens() {
-  $tokens: ();
-
-  @each $color, $slots in $theme-colors {
-    @each $slot, $value in $slots {
-      $tokens: map.set($tokens, --#{$prefix}#{$color}-#{$slot}, $value);
-    }
-  }
-
-  @return $tokens;
-}
-
-@mixin theme-color-tokens() {
-  @include tokens(theme-color-tokens());
-}

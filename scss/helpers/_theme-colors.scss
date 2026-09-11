@@ -2,5 +2,4 @@
 
 @layer helpers {
   @include generate-theme-classes();
-  @include generate-theme-reset();
 }
