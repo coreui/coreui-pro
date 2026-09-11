@@ -2725,8 +2725,8 @@ as such.
   `-bg-subtle`, `-bg-muted`, `-border`, `-focus-ring`, `-contrast` — and the
   colour itself is the `-base` slot: `--cui-primary-base` is what
   `--cui-primary` was, the 100–900 scale is mixed from it, and `-bg` (the
-  action background) points at it. The palette hues keep their bare token
-  (`--cui-blue`, `--cui-gray`): they are colours, not roles. Rename reads
+  action background) points at it. The neutral ramp keeps its bare token
+  (`--cui-gray`): it is a colour, not a role. Rename reads
   one to one, and set the base to retint a colour:
 
   ```diff
@@ -2739,6 +2739,38 @@ as such.
 
   Components that filled with the bare colour read `-base` now; the derived
   hover and active states of a `.theme-*` class are computed from `-bg`.
+
+#### The hue palette is gone; theme colours carry the hues
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`$blue`, `$indigo`, `$purple`, `$pink`, `$red`, `$orange`, `$yellow`,
+  `$green`, `$teal` and `$cyan` are removed, together with their
+  `--cui-{hue}` and `--cui-{hue}-{stop}` tokens.** They styled nothing: no
+  utility was generated from them and the theme colours never read them, so
+  every build carried 140 token declarations it never used. `$colors` now
+  holds the neutral ramp alone, and `$gray` with its 025–975 scale is
+  untouched.
+
+  Read the colour you actually mean from a theme colour, which has the same
+  runtime scale:
+
+  ```diff
+  - .chart-line { stroke: var(--cui-blue-500); }
+  + .chart-line { stroke: var(--cui-info-base); }
+
+  - .chart-fill { fill: var(--cui-teal-100); }
+  + .chart-fill { fill: var(--cui-success-100); }
+  ```
+
+  For a hue the theme does not cover, add a theme colour: it gets the scale,
+  the slots and a `.theme-*` class in one step. See
+  [adding a theme colour](/customize/theme/#adding-a-theme-color).
+
+  Two library defaults moved with them: `--cui-code-color` is
+  `var(--cui-fg-2)` instead of pink, and `--cui-mark-bg` mixes from
+  `--cui-warning-*` instead of `--cui-yellow-*`. The
+  `gradient-x-three-colors()` and `gradient-y-three-colors()` mixins keep
+  their signature and default to `info`, `primary` and `danger`.
 
 #### Breakpoints: `lg` 1024, `xl` 1280, `2xl` 1536
 

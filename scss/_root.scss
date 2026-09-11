@@ -67,7 +67,7 @@ $font-family-monospace:  SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mo
 
 // scss-docs-start type-variables
 $mark-color: var(--#{$prefix}fg-body) !default;
-$mark-bg:    light-dark(var(--#{$prefix}yellow-100), var(--#{$prefix}yellow-800)) !default;
+$mark-bg:    light-dark(var(--#{$prefix}warning-100), var(--#{$prefix}warning-800)) !default;
 // scss-docs-end type-variables
 
 $icon-size-base: 1rem !default;
@@ -109,7 +109,7 @@ $input-btn-font-size-lg:      var(--#{$prefix}font-size-lg) !default;
 $input-btn-line-height-lg:    var(--#{$prefix}line-height-md) !default;
 // scss-docs-end input-btn-variables
 
-$code-color: light-dark(var(--#{$prefix}pink), var(--#{$prefix}pink-300)) !default;
+$code-color: var(--#{$prefix}fg-2) !default;
 
 // `config` is reserved and empty, matching upstream's declaration: a slot below
 // `root` for a configuration sheet of your own. `custom` is the same idea

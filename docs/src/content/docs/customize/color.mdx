@@ -3,7 +3,7 @@ title: "Color"
 description: "CoreUI for Bootstrap is supported by an extensive color system that themes our styles and components. This enables more comprehensive customization and extension for any project."
 ---
 
-import { getData, getSequence } from '@coreui/astro-docs/data'
+import { getData } from '@coreui/astro-docs/data'
 
 ## Colors
 
@@ -348,43 +348,26 @@ Check out [our Sass maps and loops docs](/customize/sass/#maps-and-loops) for ho
 
 ## From colors to theme
 
-The `--cui-{color}-{stop}` tokens are the raw palette. On their own they style nothing — a chosen subset feeds the **theme layer**, where each color picks up semantic roles and every theme-aware component follows. The pipeline, end to end:
+Color reaches a component through two layers. The **theme colors** carry the hues and generate their own scales; the **neutral ramp** carries gray, which every surface, divider and muted text tone reads. There is no third palette underneath them. The pipeline, end to end:
 
-1. **`$colors`** (`scss/_colors.scss`) defines the base hues, and each one gets a 100–900 scale of `color-mix()` tokens on `:root` — `--cui-blue-300` and friends, mixed in the browser from the color's own token.
-2. **Theme colors** (`$primary`, `$success`, … in `scss/_theme.scss`) get the same runtime scale from their own tokens — `--cui-primary-300`.
-3. **`$theme-colors`** maps each semantic name to a family of slots (`base`, `contrast`, `fg`, `text-emphasis`, `bg-subtle`, `bg-muted`, `border-subtle`, `focus-ring`), mostly reading that scale through `light-dark()` so every slot adapts to the color mode.
-4. The slots are emitted as **`--cui-{name}-{slot}`** tokens — `--cui-primary-bg-subtle` — the ones the table at the top of this page shows.
-5. **`.theme-{name}`** classes (and component variants like `.alert-danger`) remap them onto generic **`--cui-theme-{slot}`** tokens that components read — so one class restyles any theme-aware component, and overriding `--cui-primary` alone retints the whole family.
+1. **Theme colors** (`$primary`, `$success`, … in `scss/_theme.scss`) each get a 025–975 scale of `color-mix()` tokens on `:root`, mixed in the browser from the color's own token — `--cui-primary-300`.
+2. **`$theme-colors`** maps each semantic name to a family of slots (`base`, `contrast`, `fg`, `fg-emphasis`, `bg-subtle`, `bg-muted`, `border`, `focus-ring`), mostly reading that scale through `light-dark()` so every slot adapts to the color mode.
+3. The slots are emitted as **`--cui-{name}-{slot}`** tokens — `--cui-primary-bg-subtle` — the ones the table at the top of this page shows.
+4. **`.theme-{name}`** classes remap them onto generic **`--cui-theme-{slot}`** tokens that components read, so one class restyles any theme-aware component.
+5. **`$gray`** (`scss/_colors.scss`) gets the same scale through the same generator, and feeds the `bg`, `fg` and `border` ladders plus the `secondary` and `inverse` theme colors.
 
-The theme layer — the slots, the runtime scale, the classes — is documented in full on [Theme](/customize/theme/), and the mechanics of the slot indirection on [Architecture](/customize/architecture/#theme-slots). The rest of this page stays on the base color layer.
+Override `--cui-primary-base` and the whole family follows, in both color schemes. The theme layer is documented in full on [Theme](/customize/theme/), and the mechanics of the slot indirection on [Architecture](/customize/architecture/#theme-slots).
 
 ## All colors
 
-All CoreUI for Bootstrap colors are available as Sass variables and a Sass map in `scss/_colors.scss` file. To avoid increased file sizes, we don't create text or background color classes for each of these variables. Instead, we choose a subset of these colors for a [theme palette](#theme-colors).
+v6 ships one hue-free scale, the neutral ramp, plus black and white. Every other color the library draws comes from a theme color, so there is no separate palette of `blue`, `teal` or `pink` variables to pick from. If you need a hue the theme does not cover, add it as a theme color — see [adding a theme color](/customize/theme/#adding-a-theme-color) — and it gets the same scale and the same slots.
 
-Be sure to monitor contrast ratios as you customize colors. As shown below, we've added three contrast ratios to each of the main colors—one for the swatch's current colors, one for against white, and one for against black.
+Be sure to monitor contrast ratios as you customize colors. Each swatch below carries three: against its own text color, against white, and against black.
 
 <div class="row font-monospace">
-  {getData('colors').map((color) => {
-    if (color.name !== 'white' && color.name !== 'gray' && color.name !== 'gray-dark') {
-      return (
-        <div class="col-md-4 mb-3">
-          <div class={`p-3 mb-2 position-relative swatch-${color.name}`}>
-            <strong class="d-block">${color.name}</strong>
-            {color.hex}
-          </div>
-          {getSequence(100, 900, 100).map((value) => (
-            <div class={`p-3 docs-${color.name}-${value}`}>${color.name}-{value}</div>
-          ))}
-        </div>
-      )
-    }
-  })}
-
   <div class="col-md-4 mb-3">
     <div class="p-3 mb-2 position-relative swatch-gray-500">
       <strong class="d-block">$gray-500</strong>
-      #aab3c5
     </div>
     {getData('grays').map((gray) => (
       <div class={`p-3 docs-gray-${gray.name}`}>$gray-{gray.name}</div>
@@ -405,11 +388,15 @@ Be sure to monitor contrast ratios as you customize colors. As shown below, we'v
 
 ### Notes on Sass
 
-The tints and shades are not Sass variables any more. Every palette color and
-every theme color gets a 100–900 scale of `color-mix()` custom properties on
-`:root`, mixed in the browser from the color's own token — override `--cui-blue`
-or `--cui-primary` and the whole family follows, in both color schemes. See
+The tints and shades are not Sass variables any more. Every theme color and the
+neutral ramp get a 025–975 scale of `color-mix()` custom properties on `:root`,
+mixed in the browser from the color's own token — override `--cui-primary-base`
+or `--cui-gray` and the whole family follows, in both color schemes. See
 [the theme colors page](/customize/theme/).
+
+The gray stops stay available as Sass values as well, because a few places
+cannot read a token: channel math, colors baked into an SVG, and the docs
+engine.
 
 `tint-color()` and `shade-color()` still exist in `scss/functions/_color.scss` for
 Sass-side blending. They use `mix()`, which is not the same as `lighten()` and
@@ -420,15 +407,17 @@ adjusts its lightness value.
 
 CoreUI for Bootstrap's source Sass files include three maps to help you quickly and easily loop over a list of colors and their values.
 
-- `$colors` lists all our available base (`500`) colors
-- `$theme-colors` lists all semantically named theme colors (shown below)
+- `$colors` lists the hue-free base colors — in v6 that is `gray` alone
+- `$theme-colors` lists all semantically named theme colors (shown above)
 - `$grays` lists all tints and shades of gray
 
-Within `scss/_colors.scss`, you'll find CoreUI for Bootstrap's color variables and Sass map. Here's an example of the `$colors` Sass map:
+Within `scss/_colors.scss`, you'll find the color variable and the Sass map:
+
+<ScssDocs file="scss/_colors.scss" capture="color-variables" />
 
 <ScssDocs file="scss/_colors.scss" capture="colors-map" />
 
-Add, remove, or modify values within the map to update how they're used in many other components. Unfortunately at this time, not _every_ component utilizes this Sass map. Future updates will strive to improve upon this. Until then, plan on making use of the `${color}` variables and this Sass map.
+Adding an entry here gives it the same runtime scale every theme color gets, without any of the semantic slots. Reach for `$theme-colors` instead when the color needs a foreground, a border and a subtle background that travel together.
 
 ### Example
 
@@ -437,19 +426,21 @@ Here's how you can use these in your Sass:
 ```scss
 @use "@coreui/coreui/scss/colors" as *;
 
-.alpha { color: $purple; }
+.alpha { color: $gray-700; }
 .beta {
-  color: $yellow;
+  color: $gray-100;
   background-color: $gray-900;
 }
 ```
 
-The numbered shades — `$yellow-300`, `$indigo-900` and the rest — are gone in v6.
-Each theme color gets its 100–900 scale as `color-mix()` tokens on `:root`
-instead, so read `var(--cui-primary-300)` where you used to write
-`$blue-300`. See [the theme colors page](/customize/theme/).
+The numbered shades of the hues — `$yellow-300`, `$indigo-900` and the rest — are
+gone in v6, along with the hues themselves. Each theme color gets its 025–975
+scale as `color-mix()` tokens on `:root` instead, so read
+`var(--cui-primary-300)` where you used to write `$blue-300`. See
+[the theme colors page](/customize/theme/).
 
-[Color](/utilities/colors/) and [background](/utilities/background/) utility classes are also available for setting `color` and `background-color` using the `500` color values.
+[Color](/utilities/colors/) and [background](/utilities/background/) utility classes are also available for setting `color` and `background-color` from the theme colors.
+
 
 ## Generating utilities
 

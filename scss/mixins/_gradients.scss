@@ -31,11 +31,11 @@
   background-image: linear-gradient($deg, $start-color, $end-color);
 }
 
-@mixin gradient-x-three-colors($start-color: var(--#{$prefix}blue), $mid-color: var(--#{$prefix}purple), $color-stop: 50%, $end-color: var(--#{$prefix}red)) {
+@mixin gradient-x-three-colors($start-color: var(--#{$prefix}info-base), $mid-color: var(--#{$prefix}primary-base), $color-stop: 50%, $end-color: var(--#{$prefix}danger-base)) {
   background-image: linear-gradient(to right, $start-color, $mid-color $color-stop, $end-color);
 }
 
-@mixin gradient-y-three-colors($start-color: var(--#{$prefix}blue), $mid-color: var(--#{$prefix}purple), $color-stop: 50%, $end-color: var(--#{$prefix}red)) {
+@mixin gradient-y-three-colors($start-color: var(--#{$prefix}info-base), $mid-color: var(--#{$prefix}primary-base), $color-stop: 50%, $end-color: var(--#{$prefix}danger-base)) {
   background-image: linear-gradient($start-color, $mid-color $color-stop, $end-color);
 }
 

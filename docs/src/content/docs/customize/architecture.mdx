@@ -16,7 +16,7 @@ Where each piece lives, from the raw hue up to the component:
 | Global tokens | `scss/_root.scss` | `$root-tokens`, everything else emitted on `:root, :host` — spacing, radii, typography, z-index and the surface ladders |
 | Component tokens | the component's own partial | `$alert-tokens`, `$card-tokens` and the rest, emitted on the component's base class |
 
-Each layer reads the one below it, so a change low down travels upward: retint `--cui-blue-500` and every theme role built on blue follows, along with every component reading those roles.
+Each layer reads the one below it, so a change low down travels upward: retint `--cui-primary-base` and every slot of that theme color follows, along with every component reading those slots.
 
 ## Cascade layers
 
@@ -30,7 +30,7 @@ Later layers beat earlier ones regardless of selector specificity, which settles
 
 - **Utilities win over components** because `utilities` comes last — no `!important` involved, and no switch to bring it back.
 - **Your unlayered CSS wins over everything of ours**, because unlayered styles beat every layer. A plain `.card { … }` in your stylesheet overrides the library no matter how simple the selector.
-- **`colors` is where the palette ships**, below everything else, so your own `@layer colors` block sits in the same layer and overrides a token like `--cui-blue-500` by source order alone.
+- **`colors` is where the color scales ship**, below everything else, so your own `@layer colors` block sits in the same layer and overrides a token like `--cui-primary-300` by source order alone.
 - **Two layers are empty and reserved for you.** `config` sits below `root`, for a configuration sheet the whole library should read but never fight; `custom` slots between `components` and `helpers`, for component overrides that should still lose to utilities. Put your CSS in `@layer custom` when you want `.text-center` on the element to keep working.
 
 One caveat: if your build concatenates our CSS with other stylesheets, make sure the layer declaration emitted at the top of the bundle survives minification — a minifier that predates `@layer` can strip it, and with it the whole ordering.
