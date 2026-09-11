@@ -299,6 +299,10 @@ $headings-line-height:        1.2 !default;
 $headings-color:              inherit !default;
 // scss-docs-end headings-variables
 
+// scss-docs-start link-variables
+$link-color:                  light-dark(var(--#{$prefix}primary-base), var(--#{$prefix}primary-fg)) !default;
+// scss-docs-end link-variables
+
 // The type scale
 //
 // One named scale carries every font size the library renders, each stop with
