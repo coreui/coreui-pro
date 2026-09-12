@@ -130,6 +130,33 @@ describe('Popup', () => {
       expect(document.activeElement).toEqual(outside)
     })
 
+    it('should fall back to the anchor when the element it remembered is gone', () => {
+      const popup = buildPopup()
+      const anchor = fixtureEl.querySelector('#anchor')
+
+      fixtureEl.querySelector('#inside').focus()
+      popup.show()
+      fixtureEl.querySelector('#option').focus()
+      // The field rebuilds its markup as the value lands, taking the remembered
+      // node with it.
+      anchor.innerHTML = '<button id="rebuilt">toggle</button>'
+      popup.hide()
+
+      expect(document.activeElement).toEqual(fixtureEl.querySelector('#rebuilt'))
+    })
+
+    it('should leave focus alone when it already moved outside the panel', () => {
+      const popup = buildPopup()
+      const outside = fixtureEl.querySelector('#outside')
+
+      fixtureEl.querySelector('#inside').focus()
+      popup.show()
+      outside.focus()
+      popup.hide()
+
+      expect(document.activeElement).toEqual(outside)
+    })
+
     it('should not restore focus when returnFocus is false', () => {
       const popup = buildPopup({ returnFocus: false })
       const outside = fixtureEl.querySelector('#outside')

@@ -160,6 +160,22 @@ export const a11yComponents = [
       { click: '.picker .form-control-action' },
       { wait: 200 }
     ],
+    assertions: [
+      {
+        criterion: '2.4.3',
+        label: 'picking a day with the keyboard hands focus back to the field',
+        steps: [
+          { press: 'Escape' },
+          { wait: 200 },
+          { focus: '.picker .form-date-time-section' },
+          { press: 'Alt+ArrowDown' },
+          { wait: 250 },
+          { press: 'Enter' },
+          { wait: 400 }
+        ],
+        run: 'const picker = document.querySelector(\'.date-picker\'); return Boolean(document.activeElement && picker && picker.contains(document.activeElement))'
+      }
+    ],
     criteria: [
       {
         criterion: '4.1.2',
@@ -175,6 +191,11 @@ export const a11yComponents = [
         criterion: '2.1.1',
         status: 'partial',
         note: 'Alt+ArrowDown opens the panel, Esc closes it, and the calendar is walked with the arrow keys; verify manually for full conformance.'
+      },
+      {
+        criterion: '2.4.3',
+        status: 'built-in',
+        note: 'Closing the panel hands focus back to the field, whether the panel was dismissed with Esc or a day was picked. Verified here: the field rebuilds its sections as the value lands, so the target is resolved at close time rather than remembered from before.'
       }
     ]
   },
