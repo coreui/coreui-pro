@@ -174,13 +174,26 @@ export const a11yComponents = [
           { wait: 400 }
         ],
         run: 'const picker = document.querySelector(\'.date-picker\'); return Boolean(document.activeElement && picker && picker.contains(document.activeElement))'
+      },
+      {
+        criterion: '2.4.3',
+        label: 'Tab stays inside the open panel and never lands back on the field',
+        steps: [
+          { focus: '.picker .form-date-time-section' },
+          { press: 'Alt+ArrowDown' },
+          { wait: 250 },
+          { press: 'Tab' },
+          { press: 'Tab' },
+          { wait: 150 }
+        ],
+        run: 'const panel = document.querySelector(\'.date-picker-popup.show\'); return Boolean(panel && document.activeElement && panel.contains(document.activeElement))'
       }
     ],
     criteria: [
       {
         criterion: '4.1.2',
         status: 'built-in',
-        note: 'The toggle carries aria-haspopup=dialog, aria-controls pointing at the panel and aria-expanded tracking it; the calendar inside is audited open.'
+        note: 'The toggle carries aria-haspopup=dialog, aria-controls pointing at the panel and aria-expanded tracking it, and the panel answers that promise with role=dialog and aria-modal; the calendar inside is audited open.'
       },
       {
         criterion: '1.3.1',
@@ -195,7 +208,7 @@ export const a11yComponents = [
       {
         criterion: '2.4.3',
         status: 'built-in',
-        note: 'Closing the panel hands focus back to the field, whether the panel was dismissed with Esc or a day was picked. Verified here: the field rebuilds its sections as the value lands, so the target is resolved at close time rather than remembered from before.'
+        note: 'The panel is the dialog, so Tab cycles inside it and the field stays out of the cycle; closing hands focus back to the field, whether the panel was dismissed with Esc or a day was picked. Both verified here — the field rebuilds its sections as the value lands, so the target is resolved at close time rather than remembered from before.'
       }
     ]
   },
