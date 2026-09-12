@@ -1,10 +1,18 @@
-# The v6 theme colours, overriding the engine's v5-shaped list. Names only: the
-# contrast pairing comes from `.text-bg-*` at runtime, so nothing here can drift
-# out of step with the stylesheet. Order matches `$theme-colors` in _theme.scss.
+# The v6 theme colours, overriding the engine's v5-shaped list. Name and label
+# only: the contrast pairing comes from `.text-bg-*` at runtime, so nothing here
+# can drift out of step with the stylesheet. Order matches `$theme-colors` in
+# _theme.scss.
 - name: primary
+  title: Primary
 - name: secondary
+  title: Secondary
 - name: success
+  title: Success
 - name: info
+  title: Info
 - name: warning
+  title: Warning
 - name: danger
+  title: Danger
 - name: inverse
+  title: Inverse
