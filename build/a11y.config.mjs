@@ -14,7 +14,9 @@
  * Entry shape:
  *   component   Logical id; also the default docs path the test renders from,
  *               i.e. docs/src/content/docs/<component>.mdx (its `<Example>`
- *               snippets are the markup under test).
+ *               snippets are the markup under test, each one's `sandboxJs`
+ *               snippet running alongside it so options-driven examples render
+ *               the same as on the page).
  *   criteria[]  { criterion, status?, note? }
  *                 criterion  Key into wcagCriteria (e.g. '4.1.2').
  *                 status     'built-in' | 'partial' | 'author' (default 'author').
@@ -149,6 +151,37 @@ export const a11yComponents = [
         criterion: '3.3.2',
         status: 'author',
         note: 'Associate a visible <label> (or aria-label) with the control; default examples rely on a placeholder.'
+      }
+    ]
+  },
+  {
+    component: 'forms/combobox',
+    // The options live in a popup that starts hidden, so open one before axe
+    // runs — a collapsed combobox hides the listbox from the audit entirely.
+    interactions: [
+      { click: '.combobox-toggle[data-coreui-name="option"]' },
+      { wait: 100 }
+    ],
+    criteria: [
+      {
+        criterion: '4.1.2',
+        status: 'built-in',
+        note: 'The toggle is a <button> carrying aria-haspopup=listbox and aria-expanded, so the state lands on an element whose role supports it; the panel is a role=listbox of role=option items with aria-selected, and the replaced native input stays out of the accessibility tree.'
+      },
+      {
+        criterion: '1.3.1',
+        status: 'built-in',
+        note: 'The opened listbox contains only option and group children — the caret and the hidden input sit outside it.'
+      },
+      {
+        criterion: '2.1.1',
+        status: 'partial',
+        note: 'Arrow keys, Home/End, Enter, Esc and Tab operate the panel; verify manually for full conformance.'
+      },
+      {
+        criterion: '3.3.2',
+        status: 'author',
+        note: 'Name the toggle with a visible <label> or aria-label; the examples rely on a placeholder.'
       }
     ]
   },
@@ -336,6 +369,63 @@ export const a11yComponents = [
   // ---------------------------------------------------------------------------
   // Components
   // ---------------------------------------------------------------------------
+  {
+    component: 'components/list-box',
+    criteria: [
+      {
+        criterion: '4.1.2',
+        status: 'built-in',
+        note: 'The options element is a role=listbox with aria-multiselectable, aria-disabled and aria-busy tracking the config; every option is a role=option with aria-selected and aria-disabled; a companion field gets aria-controls and aria-activedescendant, and the search input is named from ariaSearchLabel.'
+      },
+      {
+        criterion: '1.3.1',
+        status: 'author',
+        note: 'GAP: two listbox children break the required-children rule. A sections-selectable section label is written as role=button inside the listbox (js/src/list-box.ts:757), and the .list-box-empty placeholder stays inside the listbox when a filter hides every option, leaving it with no option or group child.'
+      },
+      {
+        criterion: '2.1.1',
+        status: 'partial',
+        note: 'Arrow keys, Home/End, Space, Shift and Ctrl ranges and Ctrl+A operate the list, and the highlighted option is kept in view; verify manually for full conformance.'
+      }
+    ]
+  },
+  {
+    component: 'components/transfer',
+    criteria: [
+      {
+        criterion: '4.1.2',
+        status: 'built-in',
+        note: 'Each move button is named from its ariaMoveLabel default and points at the list it fills through aria-controls; each side\'s options element is a role=listbox named from the side title when the author gives it no name of its own.'
+      },
+      {
+        criterion: '1.3.1',
+        status: 'built-in',
+        note: 'Both sides are listboxes holding only option and group children; the select-all header and the move buttons sit outside them.'
+      },
+      {
+        criterion: '2.1.1',
+        status: 'partial',
+        note: 'Each list is operated like a standalone list box, and the move buttons are reachable in tab order between them; verify manually for full conformance.'
+      },
+      {
+        criterion: '4.1.3',
+        status: 'built-in',
+        note: 'Moving options updates a visually hidden role=status region with ariaMovedAnnouncement. Verified here: selecting an option and moving it right announces the count and the destination title.'
+      }
+    ],
+    assertions: [
+      {
+        criterion: '4.1.3',
+        label: 'moving an option is announced in the status region',
+        steps: [
+          { click: '#transferItems [data-coreui-transfer-list="source"] .list-box-option' },
+          { click: '#transferItems [data-coreui-transfer-move="target"]' },
+          { wait: 100 }
+        ],
+        run: 'const region = document.querySelector(\'#transferItems .transfer-announcer\'); return Boolean(region && region.textContent.includes(\'moved to\'))'
+      }
+    ]
+  },
   {
     component: 'components/menu',
     html: `<button class="btn btn-primary" type="button" id="a11yMenuToggle" data-coreui-toggle="menu" aria-expanded="false">
