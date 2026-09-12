@@ -258,10 +258,11 @@ class Popup extends Config {
 
     // Focus goes home while the panel is still connected: unmounting with the
     // focus inside drops it on <body> and a keyboard user loses their place.
-    if (this._config.returnFocus && this._previouslyFocused) {
-      this._previouslyFocused.focus()
-      this._previouslyFocused = null
+    if (this._config.returnFocus && this._holdsFocus()) {
+      this._returnFocusTarget()?.focus()
     }
+
+    this._previouslyFocused = null
 
     execute(this._config.onHidden)
 
@@ -317,6 +318,26 @@ class Popup extends Config {
     // In place — next to the field, not inside it: the frame is a flex control
     // chrome and the panel is not one of its items.
     this._anchor?.after(this._content)
+  }
+
+  // Only the panel's own focus is ours to hand back. Focus already parked on
+  // the anchor belongs to whatever put it there — the toggle the user clicked,
+  // or the trap reacting to a click outside — and moving it again overrides a
+  // decision that was made after the panel lost it.
+  _holdsFocus(): boolean {
+    const active = document.activeElement
+    return Boolean(active && (active === document.body || this._content?.contains(active)))
+  }
+
+  // The field rebuilds its markup as the value changes, so the node captured at
+  // show time can be gone by now; the anchor outlives it and its first
+  // focusable is where the field's own tab stop sits.
+  _returnFocusTarget(): HTMLElement | null {
+    if (this._previouslyFocused?.isConnected) {
+      return this._previouslyFocused
+    }
+
+    return this._anchor ? SelectorEngine.focusableChildren(this._anchor)[0] ?? null : null
   }
 
   _unmount(): void {
