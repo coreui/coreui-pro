@@ -167,7 +167,7 @@ $theme-colors: defaults(
       "bg-muted":      light-dark(var(--#{$prefix}success-200), var(--#{$prefix}success-800)),
       "border":        light-dark(var(--#{$prefix}success-300), var(--#{$prefix}success-600)),
       "focus-ring":    color-mix(in oklch, var(--#{$prefix}success-base) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
-      "contrast":      var(--#{$prefix}black),
+      "contrast":      var(--#{$prefix}white),
     ),
     "info": (
       "base":          var(--#{$prefix}info-500),
@@ -178,7 +178,7 @@ $theme-colors: defaults(
       "bg-muted":      light-dark(var(--#{$prefix}info-200), var(--#{$prefix}info-800)),
       "border":        light-dark(var(--#{$prefix}info-300), var(--#{$prefix}info-600)),
       "focus-ring":    color-mix(in oklch, var(--#{$prefix}info-base) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
-      "contrast":      var(--#{$prefix}black),
+      "contrast":      var(--#{$prefix}white),
     ),
     "warning": (
       "base":          var(--#{$prefix}warning-500),
@@ -200,7 +200,7 @@ $theme-colors: defaults(
       "bg-muted":      light-dark(var(--#{$prefix}danger-200), var(--#{$prefix}danger-800)),
       "border":        light-dark(var(--#{$prefix}danger-300), var(--#{$prefix}danger-600)),
       "focus-ring":    color-mix(in oklch, var(--#{$prefix}danger-base) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
-      "contrast":      var(--#{$prefix}black),
+      "contrast":      var(--#{$prefix}white),
     ),
     "inverse": (
       "base":          var(--#{$prefix}gray-900),

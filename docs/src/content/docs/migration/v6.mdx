@@ -2875,6 +2875,42 @@ assembles maps of CSS expressions and the browser resolves them.
   also follow colour modes now, where before they stayed on light-palette
   values in dark mode.
 
+#### The theme colours are retuned so white text reads on them
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+**Four of the five base colours moved, and `success`, `info` and `danger` now
+carry white contrast text instead of black.** The bases were picked at the
+brightest point where white text still clears both contrast gates: WCAG 4.5:1
+and APCA Lc 75, the APCA threshold for body text. Before this, only `primary`
+paired with white, because the bases sat at lightnesses between 61 and 81 that
+no dark-on-light pairing and no light-on-dark pairing could both satisfy.
+
+| Colour | Before | After |
+| --- | --- | --- |
+| `$primary` | `oklch(52.945% 0.19103 278.34)` | unchanged |
+| `$success` | `oklch(61.237% 0.17298 146.95)` | `oklch(55.1% 0.173 145)` |
+| `$info` | `oklch(67.55% 0.17646 252.26)` | `oklch(57.4% 0.196 256)` |
+| `$warning` | `oklch(80.791% 0.16473 78.5)` | `oklch(84% 0.172 85)` |
+| `$danger` | `oklch(63.864% 0.18175 23.81)` | `oklch(58.7% 0.237 23.81)` |
+
+`success` and `info` get darker, `danger` gains chroma, and `warning` goes the
+other way: it is the one colour that cannot take white text at any hue, so it
+stays on black and moved brighter, where black reads at Lc 75 instead of 69.
+`info` also shifts four degrees of hue, which sounds cosmetic and is not: at
+252 degrees the sRGB gamut caps chroma at 0.171 and the colour reads as petrol,
+while at 256 the cap rises to 0.196 and it reads as blue.
+
+Every colour is a `500` stop, so the whole scale moves with it and any component
+tinted from these colours changes tone. If you pinned a base, nothing changes
+for you. To keep the old look, set the five variables back through
+`@use ... with()`; to keep the old contrast text, set `"contrast"` on the colour
+in `$theme-colors`.
+
+Two pairings are still open and are tracked rather than fixed here. Dark-mode
+`fg` reads from the `400` stop and lands at Lc 42, well under the gate, and
+`fg-emphasis` on `bg-muted` in light mode tops out at Lc 74 because a `200`
+background is too dark for any text to clear 75 against it.
+
 #### RGB channel tokens and the elevation system removed
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
