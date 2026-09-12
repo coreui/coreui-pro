@@ -20,7 +20,7 @@ import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/
 import type { ComponentConfig } from './util/config.js'
 import { appendControlGroupField, applyControlGroupClasses, createControlGroupAction } from './util/form-control-group.js'
 import { CALENDAR_ICON, CLEANER_ICON } from './util/icons.js'
-import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
+import { defineJQueryPlugin, getUID, jQueryDispatch } from './util/index.js'
 
 /**
  * Constants
@@ -323,7 +323,11 @@ class DateTimePicker extends BaseComponent {
     })
 
     this._menu = document.createElement('div')
+    this._menu.id = getUID(`${this.constructor.NAME}-popup-`)
     this._menu.classList.add(CLASS_NAME_POPUP, CLASS_NAME_DROPDOWN)
+    this._indicatorElement.setAttribute('aria-controls', this._menu.id)
+    this._indicatorElement.setAttribute('aria-expanded', 'false')
+    this._indicatorElement.setAttribute('aria-haspopup', 'dialog')
 
     const body = document.createElement('div')
     body.classList.add(CLASS_NAME_BODY)
@@ -439,7 +443,7 @@ class DateTimePicker extends BaseComponent {
       onHide: () => {
         this._menu.classList.remove(CLASS_NAME_SHOW)
         this._element.classList.remove(CLASS_NAME_SHOW)
-        this._element.setAttribute('aria-expanded', 'false')
+        this._indicatorElement.setAttribute('aria-expanded', 'false')
       },
       onShow: () => {
         // the classes come first: the selection body scrolls the selected cell
@@ -447,7 +451,7 @@ class DateTimePicker extends BaseComponent {
         this._menu.classList.add(CLASS_NAME_SHOW)
         this._element.classList.add(CLASS_NAME_SHOW)
         this._ensureBodies()
-        this._element.setAttribute('aria-expanded', 'true')
+        this._indicatorElement.setAttribute('aria-expanded', 'true')
       },
       onShown: () => EventHandler.trigger(this._element, EVENT_SHOWN)
     })

@@ -188,6 +188,19 @@ const picker = new coreui.TimePicker(element, {
     </div>
   </div>`} />
 
+## Accessibility
+
+The toggle button carries the panel's state — `aria-haspopup="dialog"`, `aria-controls` pointing at the popup, and `aria-expanded` tracking whether it is open — so a screen reader announces what the button does and whether the panel is showing. The field itself is a [time input](/forms/time-input/#accessibility), a group of spinbutton sections, so its arrow keys belong to the value and the popup opens on the native dropdown keys.
+
+### Keyboard support
+
+| Key | Action |
+| --- | --- |
+| <kbd>Alt</kbd> + <kbd>Arrow Down</kbd> / <kbd>F4</kbd> | Open the time popup and move focus into it |
+| <kbd>Escape</kbd> | Close the popup and return focus to the field |
+| <kbd>Tab</kbd> / <kbd>Shift</kbd> + <kbd>Tab</kbd> | Cycle between the field, its buttons, and the open popup |
+| <kbd>Arrow Up</kbd> / <kbd>Arrow Down</kbd> | Move through the focused hour, minute or second list |
+
 ## Usage
 
 ### Via data attributes

@@ -128,6 +128,8 @@ The date time picker supports [floating labels](/forms/floating-labels/): set `f
 
 The field and the popup answer to the [same keys as the date picker](/forms/date-picker/#keyboard-support): <kbd>Alt</kbd> + <kbd>Arrow Down</kbd> or <kbd>F4</kbd> opens the panel, <kbd>Escape</kbd> closes it and returns focus, and arrows, <kbd>Home</kbd> / <kbd>End</kbd>, and <kbd>Page Down</kbd> / <kbd>Page Up</kbd> (with <kbd>Shift</kbd> for years) move the focused date.
 
+The toggle button carries the panel's state — `aria-haspopup="dialog"`, `aria-controls` pointing at the popup, and `aria-expanded` tracking whether it is open — so a screen reader announces what the button does and whether the panel is showing.
+
 ## Usage
 
 ### Via data attributes
