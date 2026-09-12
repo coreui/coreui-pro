@@ -221,6 +221,14 @@ describe('DateRangeInput', () => {
       expect(range.getStartDate()).toEqual(new Date(2026, 6, 14))
     })
 
+    it('should mark the parts it builds with the same roles', () => {
+      build({})
+
+      expect(root().querySelector('[data-coreui-range-start]')).toEqual(root().children[0])
+      expect(root().querySelector('[data-coreui-range-separator]')).toEqual(root().children[1])
+      expect(root().querySelector('[data-coreui-range-end]')).toEqual(root().children[2])
+    })
+
     it('should leave the author\'s elements in place on dispose', () => {
       const range = build({}, OWN_MARKUP)
 

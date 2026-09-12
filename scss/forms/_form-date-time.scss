@@ -140,12 +140,18 @@ $form-date-time-tokens: defaults(
     }
   }
 
-  // Two fields in one frame read as one value, so neither takes the frame's
-  // spare width — the arrow stays next to the dates, not in the middle.
+  // Two fields in one frame read as one value, so the arrow stays next to the
+  // dates instead of drifting to the middle. The spare width goes to the end
+  // field alone, which keeps the cleaner and the toggle on the frame's edge.
   .form-date-range {
     > .form-date-time.form-control,
     &.form-control-group:has(> .form-floating) > .form-floating {
       flex: 0 1 auto;
+    }
+
+    > .form-date-time[data-coreui-range-end],
+    &.form-control-group:has(> .form-floating) > .form-floating:has([data-coreui-range-end]) {
+      flex: 1 1 auto;
     }
   }
 
