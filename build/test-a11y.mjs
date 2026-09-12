@@ -105,9 +105,13 @@ function validateConfig(entries) {
 // Markup resolution
 // ---------------------------------------------------------------------------
 
-// Pull the HTML out of every `<Example code={`...`} />` template literal.
+// Pull the HTML out of every `<Example code={`...`} />` template literal, plus
+// the snippet named by its `sandboxJs` prop. An example whose options come from
+// a snippet renders as inert markup without it — unlabelled buttons, empty
+// listboxes — and axe reports the missing wiring as the component's own defect.
 function extractExamples(src) {
   const examples = []
+  const sandboxIds = []
   const re = /code=\{`([\s\S]*?)`\}/g
   let match
   while ((match = re.exec(src)) !== null) {
@@ -116,32 +120,61 @@ function extractExamples(src) {
     // Components that need a specific rendered state (e.g. for `interactions`)
     // should provide inline `html` in the config instead of relying on docs
     // extraction (see build/a11y.config.mjs).
-    if (!match[1].includes('${')) {
-      examples.push(match[1])
+    if (match[1].includes('${')) {
+      continue
+    }
+
+    examples.push(match[1])
+
+    const tagRest = src.slice(re.lastIndex, src.indexOf('/>', re.lastIndex))
+    const sandbox = /sandboxJs=\{(\w+)\}/.exec(tagRest)
+    if (sandbox) {
+      sandboxIds.push(sandbox[1])
     }
   }
 
-  return examples
+  return { examples, sandboxIds }
+}
+
+// Resolve a `sandboxJs` identifier back to the file its `?raw` import names.
+function readSandboxScripts(src, docFile, ids) {
+  const scripts = []
+  for (const id of ids) {
+    const importRe = new RegExp(`import\\s+${id}\\s+from\\s+'([^']+)'`)
+    const match = importRe.exec(src)
+    if (!match) {
+      continue
+    }
+
+    const file = path.resolve(path.dirname(docFile), match[1].replace(/\?raw$/, ''))
+    if (fs.existsSync(file)) {
+      scripts.push(fs.readFileSync(file, 'utf8'))
+    }
+  }
+
+  return scripts
 }
 
 function resolveExamples(entry) {
   if (Array.isArray(entry.html)) {
-    return entry.html
+    return { examples: entry.html, scripts: [] }
   }
 
   if (typeof entry.html === 'string') {
-    return [entry.html]
+    return { examples: [entry.html], scripts: [] }
   }
 
   const docId = entry.examplesFrom ?? entry.component
   for (const ext of ['.mdx', '.md']) {
     const file = path.join(docsDir, `${docId}${ext}`)
     if (fs.existsSync(file)) {
-      return extractExamples(fs.readFileSync(file, 'utf8'))
+      const src = fs.readFileSync(file, 'utf8')
+      const { examples, sandboxIds } = extractExamples(src)
+      return { examples, scripts: readSandboxScripts(src, file, sandboxIds) }
     }
   }
 
-  return []
+  return { examples: [], scripts: [] }
 }
 
 const configErrors = validateConfig(a11yComponents)
@@ -160,7 +193,7 @@ const components = a11yComponents
     criteria: entry.criteria,
     interactions: entry.interactions ?? [],
     assertions: entry.assertions ?? [],
-    examples: resolveExamples(entry)
+    ...resolveExamples(entry)
   }))
   .toSorted((a, b) => a.id.localeCompare(b.id))
 
@@ -170,7 +203,8 @@ const components = a11yComponents
 
 const ROOT_ID = 'a11y-root'
 
-function pageHtml(examplesHtml) {
+function pageHtml(examplesHtml, scripts = []) {
+  const sandbox = scripts.map(script => `<script type="module">${script}</script>`).join('\n    ')
   return `<!doctype html>
 <html lang="en">
   <head>
@@ -181,6 +215,7 @@ function pageHtml(examplesHtml) {
   <body>
     <main id="${ROOT_ID}">${examplesHtml}</main>
     <script src="${jsHref}"></script>
+    ${sandbox}
   </body>
 </html>`
 }
@@ -259,7 +294,7 @@ async function runAssertions(page, assertions = []) {
 }
 
 async function evaluateComponent(page, component, ruleIds) {
-  const html = pageHtml(component.examples.join('\n'))
+  const html = pageHtml(component.examples.join('\n'), component.scripts)
   const file = path.join(tmpDir, `${component.id.replace(/\//g, '__')}.html`)
   fs.writeFileSync(file, html)
 
@@ -388,6 +423,12 @@ for (const component of components) {
     const statusLabel = c.dim(a11yStatusLabels[item.status ?? 'author'])
 
     console.log(`  ${badge} ${id} ${level} ${meta.title} ${c.dim('·')} ${statusLabel}`)
+
+    // A criterion the component itself does not satisfy reads as the app's
+    // problem otherwise — the status vocabulary has no word for "ours, open".
+    if (item.note?.includes('GAP:')) {
+      console.log(`         ${c.warn('gap')} ${item.note.slice(item.note.indexOf('GAP:') + 5)}`)
+    }
 
     if (verdict === 'fail') {
       for (const violation of violations ?? []) {
