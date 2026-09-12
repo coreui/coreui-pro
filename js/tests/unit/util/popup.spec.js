@@ -440,22 +440,59 @@ describe('Popup', () => {
     })
   })
 
+  // The panel is the dialog: Tab belongs to it, and the field it was opened
+  // from sits outside and stays out of the cycle.
+  describe('the trapped panel', () => {
+    it('should announce itself as a modal dialog', () => {
+      const popup = buildPopup({ focusTrap: true })
+
+      popup.show()
+
+      const content = fixtureEl.querySelector('#content')
+      expect(content.getAttribute('role')).toEqual('dialog')
+      expect(content.getAttribute('aria-modal')).toEqual('true')
+    })
+
+    it('should leave an untrapped panel without a dialog role', () => {
+      const popup = buildPopup()
+
+      popup.show()
+
+      expect(fixtureEl.querySelector('#content').getAttribute('role')).toBeNull()
+    })
+
+    it('should keep focus moving out of the panel from reaching the field', () => {
+      const popup = buildPopup({ focusTrap: true })
+
+      popup.show()
+      fixtureEl.querySelector('#outside').focus()
+
+      expect(fixtureEl.querySelector('#content').contains(document.activeElement)).toBeTrue()
+    })
+  })
+
   describe('dismissal', () => {
-    it('should hide on outside click', () => {
+    // The press closes the panel, not the click that follows it: the focus has
+    // to be free before the browser moves it onto whatever was pressed.
+    const press = element => {
+      element.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true }))
+    }
+
+    it('should hide on an outside press', () => {
       const popup = buildPopup()
       popup.show()
 
-      fixtureEl.querySelector('#outside').click()
+      press(fixtureEl.querySelector('#outside'))
 
       expect(popup.isShown).toBeFalse()
     })
 
-    it('should not hide on click inside the anchor or content', () => {
+    it('should not hide on a press inside the anchor or content', () => {
       const popup = buildPopup()
       popup.show()
 
-      fixtureEl.querySelector('#inside').click()
-      fixtureEl.querySelector('#option').click()
+      press(fixtureEl.querySelector('#inside'))
+      press(fixtureEl.querySelector('#option'))
 
       expect(popup.isShown).toBeTrue()
     })

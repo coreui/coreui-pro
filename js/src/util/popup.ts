@@ -24,7 +24,7 @@ const NAME = 'popup'
 const DATA_KEY = 'coreui.popup'
 const EVENT_KEY = `.${DATA_KEY}`
 
-const EVENT_CLICK = `click${EVENT_KEY}`
+const EVENT_POINTERDOWN = `pointerdown${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 
 const ESCAPE_KEY = 'Escape'
@@ -145,7 +145,7 @@ class Popup extends Config {
   protected declare _cleanupAutoUpdate: (() => void) | null
   protected declare _isShown: boolean
   protected declare _previouslyFocused: HTMLElement | null
-  protected declare _clickListener: any
+  protected declare _pointerdownListener: any
   protected declare _keydownListener: any
   protected declare _contentKeydownListener: any
   protected declare _anchorKeydownListener: any
@@ -161,18 +161,17 @@ class Popup extends Config {
     this._cleanupAutoUpdate = null
     this._isShown = false
     this._previouslyFocused = null
-    this._clickListener = null
+    this._pointerdownListener = null
     this._keydownListener = null
     this._contentKeydownListener = null
     this._anchorKeydownListener = null
-    // The panel now always lives outside the anchor, so the trap has to be told
-    // about it unconditionally — otherwise moving into it reads as escaping the
-    // trap and focus is yanked back to the field, which makes the calendar
-    // unreachable from the keyboard.
+    // The panel is the dialog, so it is what the trap holds: Tab cycles inside
+    // the calendar and the field, which sits outside it, stays out of the cycle.
+    // `_focusPanel` picks the entry point, so the trap must not also focus one.
     this._focustrap = this._config.focusTrap ?
       new FocusTrap({
-        additionalElement: this._content,
-        trapElement: this._anchor
+        autofocus: false,
+        trapElement: this._content
       }) :
       null
 
@@ -306,6 +305,11 @@ class Popup extends Config {
   _mount(): void {
     if (!this._content) {
       return
+    }
+
+    if (this._config.focusTrap) {
+      this._content.setAttribute('role', 'dialog')
+      this._content.setAttribute('aria-modal', 'true')
     }
 
     const container = this._resolveContainer()
@@ -449,8 +453,11 @@ class Popup extends Config {
   }
 
   _addDismissListeners(): void {
-    this._clickListener = (event: Event) => {
-      // composedPath, not contains(): the click may re-render part of the
+    this._pointerdownListener = (event: Event) => {
+      // pointerdown, not click: the press has to close the panel before the
+      // browser moves the focus, or the trap takes it back from whatever was
+      // clicked and the press ends with the focus still in the picker.
+      // composedPath, not contains(): the press may re-render part of the
       // content (calendar navigation) and detach the target before the event
       // reaches document — the dispatch-time path still holds the ancestors
       const path = event.composedPath()
@@ -479,18 +486,18 @@ class Popup extends Config {
       }
     }
 
-    EventHandler.on(document, EVENT_CLICK, this._clickListener)
+    EventHandler.on(document, EVENT_POINTERDOWN, this._pointerdownListener)
     EventHandler.on(document, EVENT_KEYDOWN, this._keydownListener)
     EventHandler.on(this._content!, EVENT_KEYDOWN, this._contentKeydownListener)
     EventHandler.on(this._anchor!, EVENT_KEYDOWN, this._contentKeydownListener)
   }
 
   _removeDismissListeners(): void {
-    EventHandler.off(document, EVENT_CLICK, this._clickListener)
+    EventHandler.off(document, EVENT_POINTERDOWN, this._pointerdownListener)
     EventHandler.off(document, EVENT_KEYDOWN, this._keydownListener)
     EventHandler.off(this._content, EVENT_KEYDOWN, this._contentKeydownListener)
     EventHandler.off(this._anchor, EVENT_KEYDOWN, this._contentKeydownListener)
-    this._clickListener = null
+    this._pointerdownListener = null
     this._keydownListener = null
     this._contentKeydownListener = null
   }
