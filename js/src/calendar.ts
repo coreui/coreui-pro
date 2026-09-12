@@ -807,6 +807,7 @@ class Calendar extends BaseComponent {
     const weekDays = monthDetails[0].days
 
     const calendarTable = document.createElement('table')
+    calendarTable.setAttribute('role', 'grid')
     calendarTable.innerHTML = `
     ${this._view === 'days' ? `
       <thead>
@@ -849,6 +850,7 @@ class Calendar extends BaseComponent {
                 return month === 'current' || this._config.showAdjacentDays ?
                   `<td
                     class="${cellAttributes.className}"
+                    role="gridcell"
                     tabindex="${cellAttributes.tabIndex}"
                     ${cellAttributes.ariaSelected ? 'aria-selected="true"' : ''}
                     ${cellAttributes.ariaCurrent ? 'aria-current="date"' : ''}
@@ -859,7 +861,7 @@ class Calendar extends BaseComponent {
                       ${this._config.renderDayCell ? sanitizeByConfig(this._config.renderDayCell(date, cellAttributes.meta), this._config) : date.toLocaleDateString(this._config.locale, { day: this._config.dayFormat })}
                     </div>
                   </td>` :
-                  '<td></td>'
+                  '<td role="gridcell"></td>'
               }
             ).join('')}</tr>`
           )
@@ -872,6 +874,7 @@ class Calendar extends BaseComponent {
               return (
                 `<td
                   class="${cellAttributes.className}"
+                  role="gridcell"
                   tabindex="${cellAttributes.tabIndex}"
                   ${cellAttributes.ariaSelected ? 'aria-selected="true"' : ''}
                   data-coreui-date="${date.toDateString()}"
@@ -892,6 +895,7 @@ class Calendar extends BaseComponent {
               return (
                 `<td
                   class="${cellAttributes.className}"
+                  role="gridcell"
                   tabindex="${cellAttributes.tabIndex}"
                   ${cellAttributes.ariaSelected ? 'aria-selected="true"' : ''}
                   data-coreui-date="${date.toDateString()}"
@@ -911,6 +915,7 @@ class Calendar extends BaseComponent {
               return (
                 `<td
                   class="${cellAttributes.className}"
+                  role="gridcell"
                   tabindex="${cellAttributes.tabIndex}"
                   ${cellAttributes.ariaSelected ? 'aria-selected="true"' : ''}
                   data-coreui-date="${date.toDateString()}"
