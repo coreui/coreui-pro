@@ -3737,6 +3737,19 @@ describe('MultiSelect', () => {
       expect(multiSelect._element).toBeNull()
     })
 
+    it('should hand a keystroke on the native select to the control once after update()', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }] })
+      const spy = spyOn(multiSelect, 'show')
+
+      multiSelect.update({ options: [{ value: '2', text: 'Option 2' }] })
+      multiSelect.update({ options: [{ value: '3', text: 'Option 3' }] })
+      selectEl.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true }))
+
+      expect(spy).toHaveBeenCalledTimes(1)
+    })
+
     it('should destroy popper when disposing', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')

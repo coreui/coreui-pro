@@ -242,6 +242,19 @@ class Autocomplete extends BaseComponent {
       this._popper.destroy()
     }
 
+    for (const element of [
+      this._menu,
+      this._togglerElement,
+      this._indicatorElement,
+      this._inputElement,
+      this._optionsElement,
+      this._cleanerElement
+    ]) {
+      if (element) {
+        EventHandler.off(element, EVENT_KEY)
+      }
+    }
+
     super.dispose()
   }
 
