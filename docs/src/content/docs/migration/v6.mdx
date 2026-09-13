@@ -1596,6 +1596,18 @@ adornment in the library — so the button needs no icon markup at all:
   and the submitted value was empty. The slots also gained `enterkeyhint`,
   `autocorrect="off"` and `spellcheck="false"`.
 
+#### Rating
+
+- **The read-only option is spelled `readonly`.** It was the one component in
+  the library spelling it `readOnly`, which made its data attribute
+  `data-coreui-read-only` while every other field component answers to
+  `data-coreui-readonly`. Both spellings now agree with the HTML attribute:
+  `data-coreui-read-only="true"` becomes `data-coreui-readonly="true"`, and
+  `new Rating(element, { readOnly: true })` becomes `{ readonly: true }`. The
+  `.readonly` class the component writes is unchanged, and the React and Vue
+  props stay `readOnly` — that is how those frameworks spell the native
+  attribute.
+
 #### Alert
 
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
