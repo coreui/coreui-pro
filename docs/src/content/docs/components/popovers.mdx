@@ -64,20 +64,28 @@ You can choose to use either `title` or `data-coreui-title` in your HTML. If you
 
 ### Four directions
 
-Four options are available: top, right, bottom, and left aligned. Directions are mirrored when using CoreUI in RTL.
+Four options are available: `top`, `end`, `bottom` and `start`.
 
 <Example code={`<button type="button" class="btn-solid theme-secondary" data-coreui-container="body" data-coreui-toggle="popover" data-coreui-placement="top" data-coreui-content="Top popover">
     Popover on top
   </button>
-  <button type="button" class="btn-solid theme-secondary" data-coreui-container="body" data-coreui-toggle="popover" data-coreui-placement="right" data-coreui-content="Right popover">
-    Popover on right
+  <button type="button" class="btn-solid theme-secondary" data-coreui-container="body" data-coreui-toggle="popover" data-coreui-placement="end" data-coreui-content="End popover">
+    Popover at the end
   </button>
   <button type="button" class="btn-solid theme-secondary" data-coreui-container="body" data-coreui-toggle="popover" data-coreui-placement="bottom" data-coreui-content="Bottom popover">
     Popover on bottom
   </button>
-  <button type="button" class="btn-solid theme-secondary" data-coreui-container="body" data-coreui-toggle="popover" data-coreui-placement="left" data-coreui-content="Left popover">
-    Popover on left
+  <button type="button" class="btn-solid theme-secondary" data-coreui-container="body" data-coreui-toggle="popover" data-coreui-placement="start" data-coreui-content="Start popover">
+    Popover at the start
   </button>`} sandboxJs={popoverDirections} />
+
+`start` and `end` are logical: they follow the reading direction, so `end` is the right side in LTR and the left side in RTL. The same names place a [menu](/components/menu/) and a [dropdown](/components/dropdowns/).
+
+#### Deprecated physical names
+
+<DeprecatedIn version="6.0.0" />
+
+`left` and `right` still work and behave exactly like `start` and `end` — they have always mirrored in RTL, so `right` never meant "the right side" there either. The logical names say that plainly; the physical ones are removed in v7.
 
 ### Responsive placement
 
@@ -180,7 +188,7 @@ Note that for security reasons the `sanitize`, `sanitizeFn`, and `allowList` opt
 | `fallbackPlacements` | string, array | `['top', 'right', 'bottom', 'left']` | Define fallback placements by providing a list of placements in array (in order of preference). For more information refer to Floating UI's [flip docs](https://floating-ui.com/docs/flip/#fallbackplacements). |
 | `html` | boolean | `false` | Allow HTML in the popover. If true, HTML tags in the popover's `title` will be rendered in the popover. If false, `innerText` property will be used to insert content into the DOM. Use text if you're worried about XSS attacks. |
 | `offset` | number, string, function | `[0, 8]` | Offset of the popover relative to its target. You can pass a string in data attributes with comma separated values like: `data-coreui-offset="10,20"`. When a function is used to determine the offset, it is called with an object containing the placement, the reference, and floating rects as its first argument. The triggering element DOM node is passed as the second argument. The function must return an array with two numbers: skidding (along the edge) and distance (away from it). For more information refer to Floating UI's [offset docs](https://floating-ui.com/docs/offset/#options). |
-| `placement` | string, function | `'right'` | How to position the popover: auto, top, bottom, left, right. When `auto` is specified, it will dynamically reorient the popover. When a function is used to determine the placement, it is called with the popover DOM node as its first argument and the triggering element DOM node as its second. The `this` context is set to the popover instance. |
+| `placement` | string, function | `'right'` | How to position the popover: `'auto'`, `'top'`, `'end'`, `'bottom'` or `'start'`, plus responsive variants such as `'top md:end'`. `'left'` and `'right'` are the deprecated spellings of `'start'` and `'end'`. When `auto` is specified, it will dynamically reorient the popover. When a function is used to determine the placement, it is called with the popover DOM node as its first argument and the triggering element DOM node as its second. The `this` context is set to the popover instance. |
 | `floatingConfig` | null, object, function | `null` | To change CoreUI's default Floating UI config, see Floating UI's [computePosition docs](https://floating-ui.com/docs/computePosition/#options). When a function is used to create the configuration, it's called with an object that contains the default configuration. It helps you use and merge the default with your own configuration. The function must return a configuration object for Floating UI.|
 | `sanitize` | boolean | `true` | Enable or disable the sanitization. If activated `'template'`, `'content'` and `'title'` options will be sanitized. |
 | `sanitizeFn` | null, function | `null` | Here you can supply your own sanitize function. This can be useful if you prefer to use a dedicated library to perform sanitization. |

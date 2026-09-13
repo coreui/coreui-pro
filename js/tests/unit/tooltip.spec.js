@@ -483,6 +483,21 @@ describe('Tooltip', () => {
     })
   })
 
+  describe('_getPlacement', () => {
+    it('should resolve the logical placements the same way as their physical spellings', () => {
+      fixtureEl.innerHTML = '<a href="#" rel="tooltip" title="Logical tooltip"></a>'
+
+      const tooltipEl = fixtureEl.querySelector('a')
+      const tip = document.createElement('div')
+
+      const placementOf = value => new Tooltip(tooltipEl, { placement: value })._getPlacement(tip)
+
+      expect(placementOf('start')).toEqual(placementOf('left'))
+      expect(placementOf('end')).toEqual(placementOf('right'))
+      expect(placementOf('top')).toEqual('top')
+    })
+  })
+
   describe('show', () => {
     it('should show a tooltip', () => {
       return new Promise(resolve => {

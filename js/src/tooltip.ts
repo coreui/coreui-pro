@@ -79,7 +79,9 @@ const AttachmentMap: Record<string, string> = {
   TOP: 'top',
   RIGHT: isRTL() ? 'left' : 'right',
   BOTTOM: 'bottom',
-  LEFT: isRTL() ? 'right' : 'left'
+  LEFT: isRTL() ? 'right' : 'left',
+  START: isRTL() ? 'right' : 'left',
+  END: isRTL() ? 'left' : 'right'
 }
 
 type TooltipConfig = {
