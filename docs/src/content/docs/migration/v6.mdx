@@ -2403,6 +2403,14 @@ Multi Select's option indicators moved with it — they render as a decorative
 
 #### Popover and Tooltip
 
+- <span className="badge bg-warning text-dark">Deprecated</span> **`placement`
+  takes the logical `start` and `end`; `left` and `right` are deprecated.**
+  The physical names never meant a physical side — both components have always
+  mirrored them in RTL, which their own pages documented — so `right` was
+  already "the end of the reading direction" wearing the wrong name. The new
+  spellings say it, and match the ones Menu and Dropdown already take. Nothing
+  breaks: `left` and `right` keep working and resolve identically, and they are
+  removed in v7.
 - **The fade moved to CSS.** Neither component renders the `fade` helper class
   any more; `.show` alone drives the transition, with `@starting-style`
   supplying the state to animate from. `animation: false` renders

@@ -78,11 +78,22 @@ A tooltip reads the `.theme-{color}` slots, so a theme class on the tip colours 
 
 ### Positioning
 
-Bootstrap Tooltips support multiple placements: top, right, bottom, and left. The default is top. Directions are mirrored when using CoreUI in RTL. To change placement, use the `data-coreui-placement` attribute:
+Tooltips support four placements: `top`, `end`, `bottom` and `start`. The default is `top`. Set them with the `data-coreui-placement` attribute:
 
 <Example class="tooltip-demo" sandboxJsId="enable-tooltips" code={`<button type="button" class="btn-outline" data-coreui-toggle="tooltip" data-coreui-placement="top" title="Tooltip on top">Tooltip on top</button>
-  <button type="button" class="btn-outline" data-coreui-toggle="tooltip" data-coreui-placement="right" title="Tooltip on right">Tooltip on right</button>
+  <button type="button" class="btn-outline" data-coreui-toggle="tooltip" data-coreui-placement="end" title="Tooltip at the end">Tooltip at the end</button>
   <button type="button" class="btn-outline" data-coreui-toggle="tooltip" data-coreui-placement="bottom" title="Tooltip on bottom">Tooltip on bottom</button>
+  <button type="button" class="btn-outline" data-coreui-toggle="tooltip" data-coreui-placement="start" title="Tooltip at the start">Tooltip at the start</button>`} />
+
+`start` and `end` are logical: they follow the reading direction, so `end` is the right side in LTR and the left side in RTL. The same names place a [menu](/components/menu/) and a [dropdown](/components/dropdowns/).
+
+#### Deprecated physical names
+
+<DeprecatedIn version="6.0.0" />
+
+`left` and `right` still work and behave exactly like `start` and `end` — they have always mirrored in RTL, so `right` never meant "the right side" there either. The logical names say that plainly; the physical ones are removed in v7.
+
+<Example class="tooltip-demo" sandboxJsId="enable-tooltips" code={`<button type="button" class="btn-outline" data-coreui-toggle="tooltip" data-coreui-placement="right" title="Tooltip on right">Tooltip on right</button>
   <button type="button" class="btn-outline" data-coreui-toggle="tooltip" data-coreui-placement="left" title="Tooltip on left">Tooltip on left</button>`} />
 
 ### Responsive placement
@@ -193,7 +204,7 @@ Please note that for security reasons, the `sanitize`, `sanitizeFn`, and `allowL
 | `container` | string, element, false | `false` | Specifies the parent container in which the tooltip should be inserted. Commonly used value is `'body'`, which helps avoid layout or overflow issues by ensuring the tooltip isn't clipped by parent elements. |
 | `delay` | number, object | `0` | Defines how long (in milliseconds) to wait before showing or hiding the tooltip. A single number applies to both actions, or you can provide an object like `{ show: 500, hide: 200 }` for separate control over each. |
 | `html` | boolean | `false` | Enables support for HTML content inside the tooltip. When set to `true`, the `title` attribute may include tags like `<strong>`, `<em>`, or even icons. Be cautious with untrusted content as it increases XSS risk. |
-| `placement` | string, function | `'top'` | Sets the tooltip’s position relative to its target element. Valid values include `'top'`, `'bottom'`, `'left'`, `'right'`, or `'auto'`. You can also pass a function for dynamic placement based on element size or context. |
+| `placement` | string, function | `'top'` | Sets the tooltip’s position relative to its target element: `'top'`, `'end'`, `'bottom'`, `'start'` or `'auto'`, plus responsive variants such as `'top md:end'`. `'left'` and `'right'` are the deprecated spellings of `'start'` and `'end'`. With `'auto'` the tooltip reorients itself. You can also pass a function for dynamic placement based on element size or context. |
 | `selector` | string, false | `false` | Used to delegate tooltip activation to child elements within a container. This is particularly useful when you’re dynamically adding elements to the DOM that require tooltips. Note: the `title` attribute itself should not be used as a selector. |
 | `template` | string | `'<div class="tooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>'` | Provides the HTML structure used to generate the tooltip. You can override it to include custom classes or elements. The `title` content is placed inside `.tooltip-inner`, and `.tooltip-arrow` is the visual pointer. |
 | `title` | string, element, function | `''` | The content displayed inside the tooltip. If a value is not provided, the component will fall back to the `title` attribute on the element. You can also provide a function that returns the content dynamically.|
