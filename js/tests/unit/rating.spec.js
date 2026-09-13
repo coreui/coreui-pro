@@ -53,12 +53,12 @@ describe('Rating', () => {
       const rating = new Rating(div, {
         itemCount: 3,
         value: 2,
-        readOnly: true
+        readonly: true
       })
 
       expect(rating._config.itemCount).toEqual(3)
       expect(rating._currentValue).toEqual(2)
-      expect(rating._config.readOnly).toBeTrue()
+      expect(rating._config.readonly).toBeTrue()
     })
 
     it('should apply the "disabled" class when config.disabled = true', () => {
@@ -69,11 +69,11 @@ describe('Rating', () => {
       expect(rating._element.classList).toContain('disabled')
     })
 
-    it('should apply the "readonly" class when config.readOnly = true', () => {
+    it('should apply the "readonly" class when config.readonly = true', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
-      const rating = new Rating(div, { readOnly: true })
+      const rating = new Rating(div, { readonly: true })
       expect(rating._element.classList).toContain('readonly')
     })
 
@@ -173,10 +173,10 @@ describe('Rating', () => {
       }
     })
 
-    it('should disable all inputs when readOnly is true', () => {
+    it('should disable all inputs when readonly is true', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
-      new Rating(div, { readOnly: true }) // eslint-disable-line no-new
+      new Rating(div, { readonly: true }) // eslint-disable-line no-new
 
       const inputs = div.querySelectorAll('.rating-item-input')
       for (const input of inputs) {
@@ -824,10 +824,10 @@ describe('Rating', () => {
   })
 
   describe('readonly & disabled', () => {
-    it('should not change or hover if readOnly is true', () => {
+    it('should not change or hover if readonly is true', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
-      new Rating(div, { itemCount: 3, readOnly: true }) // eslint-disable-line no-new
+      new Rating(div, { itemCount: 3, readonly: true }) // eslint-disable-line no-new
 
       // Attempt to click on an input
       const inputs = div.querySelectorAll('.rating-item-input')
@@ -872,10 +872,10 @@ describe('Rating', () => {
       expect(listener).not.toHaveBeenCalled()
     })
 
-    it('should not emit change event when readOnly and input is clicked', () => {
+    it('should not emit change event when readonly and input is clicked', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
-      new Rating(div, { itemCount: 3, readOnly: true }) // eslint-disable-line no-new
+      new Rating(div, { itemCount: 3, readonly: true }) // eslint-disable-line no-new
 
       const listener = jasmine.createSpy('listener')
       div.addEventListener('change.coreui.rating', listener)
@@ -899,10 +899,10 @@ describe('Rating', () => {
       expect(activeLabels).toHaveSize(0)
     })
 
-    it('should not clear labels on mouseleave when readOnly', () => {
+    it('should not clear labels on mouseleave when readonly', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
-      new Rating(div, { itemCount: 3, readOnly: true, value: 2 }) // eslint-disable-line no-new
+      new Rating(div, { itemCount: 3, readonly: true, value: 2 }) // eslint-disable-line no-new
 
       const label = div.querySelectorAll('.rating-item-label')[2]
       const mouseout = createEvent('mouseout')
@@ -913,11 +913,11 @@ describe('Rating', () => {
       expect(activeLabels).toHaveSize(2)
     })
 
-    it('should not clear on click when readOnly even with allowClear', () => {
+    it('should not clear on click when readonly even with allowClear', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
       const rating = new Rating(div, { // eslint-disable-line no-unused-vars
-        itemCount: 3, readOnly: true, value: 2, allowClear: true
+        itemCount: 3, readonly: true, value: 2, allowClear: true
       })
 
       const inputs = div.querySelectorAll('.rating-item-input')
@@ -1119,9 +1119,9 @@ describe('Rating', () => {
       expect(ratingEl.classList.contains('disabled')).toBeTrue()
     })
 
-    it('should initialize with data attributes for readOnly', () => {
+    it('should initialize with data attributes for readonly', () => {
       fixtureEl.innerHTML = `
-        <div id="myRating" data-coreui-toggle="rating" data-coreui-read-only="true"></div>
+        <div id="myRating" data-coreui-toggle="rating" data-coreui-readonly="true"></div>
       `
       const ratingEl = fixtureEl.querySelector('#myRating')
 
@@ -1129,7 +1129,7 @@ describe('Rating', () => {
       window.dispatchEvent(loadEvent)
 
       const ratingInstance = Rating.getInstance(ratingEl)
-      expect(ratingInstance._config.readOnly).toBeTrue()
+      expect(ratingInstance._config.readonly).toBeTrue()
       expect(ratingEl.classList.contains('readonly')).toBeTrue()
     })
 
@@ -1561,14 +1561,14 @@ describe('Rating', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
       // eslint-disable-next-line no-new
-      new Rating(div, { readOnly: true, value: 1, icon: '<img src=x onerror="window.xss = true">' })
+      new Rating(div, { readonly: true, value: 1, icon: '<img src=x onerror="window.xss = true">' })
 
       const icon = div.querySelector('.rating-item-custom-icon img')
       expect(icon.hasAttribute('onerror')).toBeFalse()
     })
 
     it('should not disable sanitization via a data attribute', () => {
-      fixtureEl.innerHTML = '<div data-coreui-sanitize="false" data-coreui-read-only="true" data-coreui-value="1" data-coreui-icon="<img src=x onerror=alert(1)>"></div>'
+      fixtureEl.innerHTML = '<div data-coreui-sanitize="false" data-coreui-readonly="true" data-coreui-value="1" data-coreui-icon="<img src=x onerror=alert(1)>"></div>'
       const div = fixtureEl.querySelector('div')
       const rating = new Rating(div)
 

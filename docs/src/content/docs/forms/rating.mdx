@@ -47,9 +47,9 @@ Our Bootstrap Rating component allows users to assign and reset a star rating wi
 
 ## Readonly
 
-Set the Rating component to read-only by adding `data-coreui-read-only="true"`. This disables interaction, preventing users from changing the displayed rating value.
+Set the Rating component to read-only by adding `data-coreui-readonly="true"`. This disables interaction, preventing users from changing the displayed rating value.
 
-<Example pro code={`<div data-coreui-read-only="true" data-coreui-toggle="rating" data-coreui-value="3"></div>`} />
+<Example pro code={`<div data-coreui-readonly="true" data-coreui-toggle="rating" data-coreui-value="3"></div>`} />
 
 ## Disabled
 
@@ -178,7 +178,7 @@ Note that for security reasons the `sanitize`, `sanitizeFn`, and `allowList` opt
 | `itemCount` | number | `5` | The maximum value the user can select. |
 | `name` | string | `null` | The name attribute of the radio input elements. |
 | `precision` | number | `1` | Minimum increment value change allowed. |
-| `readOnly` | boolean | `false` | Toggle the readonly state for the component. |
+| `readonly` | boolean | `false` | Toggle the readonly state for the component. |
 | `sanitize` | boolean | `true` |  Enable or disable the sanitization. If activated `activeIcon`, and `icon` options will be sanitized. |
 | `sanitizeFn` | null, function | `null` |  Here you can supply your own sanitize function. This can be useful if you prefer to use a dedicated library to perform sanitization. |
 | `size` | `'sm'`, `'lg'` | `null` | Size the component small or large. |

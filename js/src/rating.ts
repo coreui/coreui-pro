@@ -58,7 +58,7 @@ type RatingConfig = {
   itemCount: number
   name: string | null
   precision: number
-  readOnly: boolean
+  readonly: boolean
   sanitize: boolean
   sanitizeFn: ((unsafeHtml: string) => string) | null
   size: string | null
@@ -77,7 +77,7 @@ const Default: RatingConfig = {
   itemCount: 5,
   name: null,
   precision: 1,
-  readOnly: false,
+  readonly: false,
   sanitize: true,
   sanitizeFn: null,
   size: null,
@@ -96,7 +96,7 @@ const DefaultType = {
   itemCount: 'number',
   name: '(string|null)',
   precision: 'number',
-  readOnly: 'boolean',
+  readonly: 'boolean',
   sanitize: 'boolean',
   sanitizeFn: '(null|function)',
   size: '(string|null)',
@@ -177,7 +177,7 @@ class Rating extends BaseComponent {
 
   _addEventListeners(): void {
     EventHandler.on(this._element, EVENT_CLICK, SELECTOR_RATING_ITEM_INPUT, ({ target }: any) => {
-      if (this._config.disabled || this._config.readOnly) {
+      if (this._config.disabled || this._config.readonly) {
         return
       }
 
@@ -194,7 +194,7 @@ class Rating extends BaseComponent {
     })
 
     EventHandler.on(this._element, EVENT_CHANGE, SELECTOR_RATING_ITEM_INPUT, ({ target }: any) => {
-      if (this._config.disabled || this._config.readOnly) {
+      if (this._config.disabled || this._config.readonly) {
         return
       }
 
@@ -226,7 +226,7 @@ class Rating extends BaseComponent {
     })
 
     EventHandler.on(this._element, EVENT_MOUSEENTER, SELECTOR_RATING_ITEM_LABEL, ({ target }) => {
-      if (this._config.disabled || this._config.readOnly) {
+      if (this._config.disabled || this._config.readonly) {
         return
       }
 
@@ -257,7 +257,7 @@ class Rating extends BaseComponent {
     })
 
     EventHandler.on(this._element, EVENT_MOUSELEAVE, SELECTOR_RATING_ITEM_LABEL, () => {
-      if (this._config.disabled || this._config.readOnly) {
+      if (this._config.disabled || this._config.readonly) {
         return
       }
 
@@ -368,7 +368,7 @@ class Rating extends BaseComponent {
       this._element.classList.add(CLASS_NAME_DISABLED)
     }
 
-    if (this._config.readOnly) {
+    if (this._config.readonly) {
       this._element.classList.add(CLASS_NAME_READONLY)
     }
 
@@ -443,7 +443,7 @@ class Rating extends BaseComponent {
         ratingItemInputElement.setAttribute('aria-label', this._config.ariaLabel(value, this._config.itemCount))
       }
 
-      if (this._config.disabled || this._config.readOnly) {
+      if (this._config.disabled || this._config.readonly) {
         ratingItemInputElement.setAttribute('disabled', true as any)
       }
 
