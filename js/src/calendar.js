@@ -806,7 +806,7 @@ class Calendar extends BaseComponent {
     this._createCalendar()
 
     if (callback) {
-      setTimeout(callback, 1)
+      callback()
     }
   }
 

@@ -44,6 +44,7 @@ const CLASS_NAME_RATING_ITEM_LABEL = 'rating-item-label'
 const CLASS_NAME_READONLY = 'readonly'
 
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="rating"]'
+const SELECTOR_RATING_ITEM = '.rating-item'
 const SELECTOR_RATING_ITEM_INPUT = '.rating-item-input'
 const SELECTOR_RATING_ITEM_LABEL = '.rating-item-label'
 
@@ -120,21 +121,27 @@ class Rating extends BaseComponent {
     this._config = this._getConfig(config)
     this._currentValue = this._config.value
 
+    this._disposeTooltips()
     this._element.innerHTML = ''
     this._createRating()
-    this._addEventListeners()
   }
 
   reset(value = null) {
     this._currentValue = value
 
+    this._disposeTooltips()
     this._element.innerHTML = ''
     this._createRating()
-    this._addEventListeners()
 
     EventHandler.trigger(this._element, EVENT_CHANGE, {
       value
     })
+  }
+
+  dispose() {
+    this._disposeTooltips()
+
+    super.dispose()
   }
 
   // Private
@@ -274,6 +281,14 @@ class Rating extends BaseComponent {
         this._tooltip.hide()
       }
     })
+  }
+
+  _disposeTooltips() {
+    for (const item of SelectorEngine.find(SELECTOR_RATING_ITEM, this._element)) {
+      Tooltip.getInstance(item)?.dispose()
+    }
+
+    this._tooltip = null
   }
 
   _createTooltip(selector, value) {

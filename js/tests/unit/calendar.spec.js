@@ -2384,6 +2384,23 @@ describe('Calendar', () => {
       // Should remove all event handlers
       expect(spy.calls.count()).toBeGreaterThan(0)
     })
+
+    it('should leave no callback pending that could run after dispose', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div)
+
+      // Deferring the callback meant dispose() could land between the redraw
+      // and the callback, which then read the nulled fields.
+      let called = false
+      calendar._updateCalendar(() => {
+        called = true
+      })
+
+      expect(called).toBeTrue()
+
+      calendar.dispose()
+    })
   })
 
   describe('calendarInterface', () => {
