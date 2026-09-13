@@ -1,6 +1,7 @@
 /* eslint-env jasmine */
 
 import Rating from '../../src/rating.js'
+import Tooltip from '../../src/tooltip.js'
 import {
   getFixture, clearFixture, createEvent, jQueryMock
 } from '../helpers/fixture.js'
@@ -526,6 +527,40 @@ describe('Rating', () => {
         const label = div.querySelectorAll('.rating-item-label')[1]
         label.click()
       })
+    })
+
+    it('should keep one set of listeners across updates', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div, { itemCount: 3 })
+      const spy = jasmine.createSpy('change')
+
+      rating.update({ itemCount: 3 })
+      rating.update({ itemCount: 3 })
+      div.addEventListener('change.coreui.rating', spy)
+
+      const input = div.querySelectorAll('.rating-item-input')[1]
+      input.checked = true
+      input.dispatchEvent(createEvent('change', { bubbles: true }))
+
+      expect(spy).toHaveBeenCalledTimes(1)
+    })
+
+    it('should dispose the tooltips of the items it replaces', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div, { itemCount: 3, tooltips: true })
+
+      const label = div.querySelectorAll('.rating-item-label')[1]
+      label.dispatchEvent(createEvent('mouseover'))
+      const item = label.parentElement
+
+      expect(Tooltip.getInstance(item)).not.toBeNull()
+
+      rating.update({ itemCount: 3, tooltips: true })
+
+      expect(Tooltip.getInstance(item)).toBeNull()
+      expect(rating._tooltip).toBeNull()
     })
   })
 
