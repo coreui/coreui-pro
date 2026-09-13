@@ -213,6 +213,36 @@ plugins used to let a private name through (`$(el).tooltip('_getConfig')`
 called it) or skipped the check altogether (`button`, `number-input`,
 `password-input`); they now reject those names like the rest.
 
+#### The attribute that enables a plugin
+
+`data-coreui-toggle="…"` now means one thing only: **this element is a control
+the user activates.** It stays on the `<button>`, `<a>` or `<input>` that opens,
+closes or presses something — Modal, Offcanvas, Dialog, Drawer, Collapse, Tab,
+Tooltip, Popover, Context Menu, Combobox, Button, Loading Button.
+
+Everywhere else the element is a mount point or a source: the plugin builds the
+component inside or around it, and nothing is toggled. Those take a bare
+`data-coreui-<name>`, the shape Chip Input, Chip Set, Multi Select and the
+masked date and time fields already used. Renamed:
+
+```diff
+- <div data-coreui-toggle="date-picker"></div>
++ <div data-coreui-date-picker></div>
+```
+
+| was | is |
+| --- | --- |
+| `data-coreui-toggle="autocomplete"` | `data-coreui-autocomplete` |
+| `data-coreui-toggle="date-picker"` | `data-coreui-date-picker` |
+| `data-coreui-toggle="date-range-picker"` | `data-coreui-date-range-picker` |
+| `data-coreui-toggle="date-time-picker"` | `data-coreui-date-time-picker` |
+| `data-coreui-toggle="time-picker"` | `data-coreui-time-picker` |
+| `data-coreui-toggle="otp"` | `data-coreui-otp` |
+| `data-coreui-toggle="password-strength"` | `data-coreui-password-strength` |
+
+The JavaScript constructors are unchanged — this is the markup entry point
+only, and only in the vanilla package.
+
 #### Lifecycle methods return a promise
 
 `show()`, `hide()`, `toggle()` and `close()` returned before the transition
@@ -878,7 +908,7 @@ removed in favour of `$translucent-opacity` and
 are now a composition of the section-based input fields
 ([date input](/forms/date-input/)), the [calendar](/components/calendar/) and a
 shared popup primitive, instead of the v1 monolith. The rewrite ships **under
-the existing names** — `DatePicker`, `data-coreui-toggle="date-picker"`,
+the existing names** — `DatePicker`, `data-coreui-date-picker`,
 `.date-picker` — so no renaming is needed on your side, but the options below
 changed. The v1 shells are gone; if you need to compare against the old
 behaviour, v5 is the reference. Mapping:
@@ -905,7 +935,7 @@ behaviour, v5 is the reference. Mapping:
   `disabledDates`, `selectionType`, `showWeekNumber`, custom cell renderers, …),
   `container`, `startDate`/`endDate`/`date`, `startName`/`endName`/`name`,
   `size`, validation states, the data API
-  (`data-coreui-toggle="date-picker"`), and the imperative API
+  (`data-coreui-date-picker`), and the imperative API
   (`show`/`hide`/`toggle`/`clear`/`reset`).
 - **Passthrough is by name.** Options that belong to the inner calendar or date
   input are forwarded automatically, so `data-coreui-selection-type`,
@@ -954,7 +984,7 @@ joined by the one date it owns. Mark a `div` with `data-coreui-picker-field`,
 a button with `data-coreui-picker-toggle` or `data-coreui-picker-cleaner`
 inside the picker element and it uses them instead of generating its own —
 a trigger can be a regular button with text, the icons can be plain `<svg>`
-in the HTML. Nothing changes for the bare `<div data-coreui-toggle="date-picker">`.
+in the HTML. Nothing changes for the bare `<div data-coreui-date-picker>`.
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
 `aria-expanded` moved from the picker's root element to the toggle button,

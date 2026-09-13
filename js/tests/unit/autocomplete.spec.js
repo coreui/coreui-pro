@@ -43,12 +43,12 @@ describe('Autocomplete', () => {
   describe('constructor', () => {
     it('should take care of element either passed as a CSS selector or DOM element', () => {
       fixtureEl.innerHTML = [
-        '<div class="autocomplete" data-coreui-toggle="autocomplete">',
+        '<div class="autocomplete" data-coreui-autocomplete>',
         '</div>'
       ].join('')
 
-      const autocompleteEl = fixtureEl.querySelector('[data-coreui-toggle="autocomplete"]')
-      const autocompleteBySelector = new Autocomplete('[data-coreui-toggle="autocomplete"]', { options: [] })
+      const autocompleteEl = fixtureEl.querySelector('[data-coreui-autocomplete]')
+      const autocompleteBySelector = new Autocomplete('[data-coreui-autocomplete]', { options: [] })
       expect(autocompleteBySelector._element).toEqual(autocompleteEl)
 
       const autocompleteByElement = new Autocomplete(autocompleteEl, { options: [] })
@@ -3142,7 +3142,7 @@ describe('Autocomplete', () => {
 
     describe('clearMenus', () => {
       it('should ignore right mouse button click', () => {
-        fixtureEl.innerHTML = '<div class="autocomplete" data-coreui-toggle="autocomplete"></div>'
+        fixtureEl.innerHTML = '<div class="autocomplete" data-coreui-autocomplete></div>'
         const autocompleteEl = fixtureEl.querySelector('.autocomplete')
         const autocomplete = new Autocomplete(autocompleteEl, {
           options: [{ label: 'Option 1', value: '1' }]
@@ -3158,7 +3158,7 @@ describe('Autocomplete', () => {
       })
 
       it('should ignore non-Tab keyup events', () => {
-        fixtureEl.innerHTML = '<div class="autocomplete" data-coreui-toggle="autocomplete"></div>'
+        fixtureEl.innerHTML = '<div class="autocomplete" data-coreui-autocomplete></div>'
         const autocompleteEl = fixtureEl.querySelector('.autocomplete')
         const autocomplete = new Autocomplete(autocompleteEl, {
           options: [{ label: 'Option 1', value: '1' }]
@@ -3174,7 +3174,7 @@ describe('Autocomplete', () => {
       })
 
       it('should close on Tab keyup', () => {
-        fixtureEl.innerHTML = '<div class="autocomplete" data-coreui-toggle="autocomplete"></div>'
+        fixtureEl.innerHTML = '<div class="autocomplete" data-coreui-autocomplete></div>'
         const autocompleteEl = fixtureEl.querySelector('.autocomplete')
         const autocomplete = new Autocomplete(autocompleteEl, {
           options: [{ label: 'Option 1', value: '1' }]
@@ -3191,7 +3191,7 @@ describe('Autocomplete', () => {
       })
 
       it('should not close when click is inside the autocomplete element', () => {
-        fixtureEl.innerHTML = '<div class="autocomplete" data-coreui-toggle="autocomplete"></div>'
+        fixtureEl.innerHTML = '<div class="autocomplete" data-coreui-autocomplete></div>'
         const autocompleteEl = fixtureEl.querySelector('.autocomplete')
         const autocomplete = new Autocomplete(autocompleteEl, {
           options: [{ label: 'Option 1', value: '1' }]
@@ -3208,7 +3208,7 @@ describe('Autocomplete', () => {
       })
 
       it('should close when click is outside the autocomplete element', () => {
-        fixtureEl.innerHTML = '<div class="autocomplete" data-coreui-toggle="autocomplete"></div>'
+        fixtureEl.innerHTML = '<div class="autocomplete" data-coreui-autocomplete></div>'
         const autocompleteEl = fixtureEl.querySelector('.autocomplete')
         const autocomplete = new Autocomplete(autocompleteEl, {
           options: [{ label: 'Option 1', value: '1' }]
@@ -3225,7 +3225,7 @@ describe('Autocomplete', () => {
       })
 
       it('should clear input when allowOnlyDefinedOptions and no selection on outside click', () => {
-        fixtureEl.innerHTML = '<div class="autocomplete" data-coreui-toggle="autocomplete"></div>'
+        fixtureEl.innerHTML = '<div class="autocomplete" data-coreui-autocomplete></div>'
         const autocompleteEl = fixtureEl.querySelector('.autocomplete')
         const autocomplete = new Autocomplete(autocompleteEl, {
           allowOnlyDefinedOptions: true,
@@ -3244,7 +3244,7 @@ describe('Autocomplete', () => {
       })
 
       it('should not clear input when allowOnlyDefinedOptions and has selection on outside click', () => {
-        fixtureEl.innerHTML = '<div class="autocomplete" data-coreui-toggle="autocomplete"></div>'
+        fixtureEl.innerHTML = '<div class="autocomplete" data-coreui-autocomplete></div>'
         const autocompleteEl = fixtureEl.querySelector('.autocomplete')
         const autocomplete = new Autocomplete(autocompleteEl, {
           allowOnlyDefinedOptions: true,
@@ -3263,7 +3263,7 @@ describe('Autocomplete', () => {
       })
 
       it('should handle click event type with clickEvent in relatedTarget', () => {
-        fixtureEl.innerHTML = '<div class="autocomplete" data-coreui-toggle="autocomplete"></div>'
+        fixtureEl.innerHTML = '<div class="autocomplete" data-coreui-autocomplete></div>'
         const autocompleteEl = fixtureEl.querySelector('.autocomplete')
         const autocomplete = new Autocomplete(autocompleteEl, {
           options: [{ label: 'Option 1', value: '1' }]
@@ -3284,8 +3284,8 @@ describe('Autocomplete', () => {
 
   describe('data-api', () => {
     it('should initialize autocomplete on data-api elements', () => {
-      fixtureEl.innerHTML = '<div data-coreui-toggle="autocomplete"></div>'
-      const autocompleteEl = fixtureEl.querySelector('[data-coreui-toggle="autocomplete"]')
+      fixtureEl.innerHTML = '<div data-coreui-autocomplete></div>'
+      const autocompleteEl = fixtureEl.querySelector('[data-coreui-autocomplete]')
 
       const _autocomplete = new Autocomplete(autocompleteEl, { options: [{ label: 'Test', value: '1' }] })
 
@@ -3294,7 +3294,7 @@ describe('Autocomplete', () => {
 
     it('should close autocomplete when clicking outside', () => {
       return new Promise(resolve => {
-        fixtureEl.innerHTML = '<div class="autocomplete" data-coreui-toggle="autocomplete"></div>'
+        fixtureEl.innerHTML = '<div class="autocomplete" data-coreui-autocomplete></div>'
         const autocompleteEl = fixtureEl.querySelector('.autocomplete')
         const autocomplete = new Autocomplete(autocompleteEl, {
           options: [{ label: 'Option 1', value: '1' }]

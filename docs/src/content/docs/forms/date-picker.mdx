@@ -31,10 +31,10 @@ parsing and no debounce: the field always holds a valid partial date.
 
 <Example pro code={`<div class="row">
     <div class="col-sm-6 col-lg-5 mb-3 mb-sm-0">
-      <div data-coreui-locale="en-US" data-coreui-toggle="date-picker"></div>
+      <div data-coreui-locale="en-US" data-coreui-date-picker></div>
     </div>
     <div class="col-sm-6 col-lg-5">
-      <div data-coreui-date="2026/03/15" data-coreui-locale="en-US" data-coreui-toggle="date-picker"></div>
+      <div data-coreui-date="2026/03/15" data-coreui-locale="en-US" data-coreui-date-picker></div>
     </div>
   </div>`} />
 
@@ -50,7 +50,7 @@ ever sets `disabled`, so a button you disable in the template stays disabled.
 
 <Example pro code={`<div class="row">
     <div class="col-lg-5">
-      <div data-coreui-locale="en-US" data-coreui-toggle="date-picker">
+      <div data-coreui-locale="en-US" data-coreui-date-picker>
         <template data-coreui-template="footer">
           <button type="button" class="btn-ghost theme-danger btn-sm me-auto" data-coreui-picker-action="today">Today</button>
           <button type="button" class="btn-ghost theme-primary btn-sm" data-coreui-picker-action="clear">Clear</button>
@@ -100,7 +100,7 @@ Set `data-coreui-format="yyyy-Www"`.
         data-coreui-locale="en-US"
         data-coreui-selection-type="week"
         data-coreui-show-week-number="true"
-        data-coreui-toggle="date-picker"></div>
+        data-coreui-date-picker></div>
     </div>
   </div>`} />
 
@@ -114,7 +114,7 @@ narrows to month and year automatically.
       <div
         data-coreui-locale="en-US"
         data-coreui-selection-type="month"
-        data-coreui-toggle="date-picker"></div>
+        data-coreui-date-picker></div>
     </div>
   </div>`} />
 
@@ -130,7 +130,7 @@ first day of the selected quarter.
       <div
         data-coreui-locale="en-US"
         data-coreui-selection-type="quarter"
-        data-coreui-toggle="date-picker"></div>
+        data-coreui-date-picker></div>
     </div>
   </div>`} />
 
@@ -144,7 +144,7 @@ to the year automatically.
       <div
         data-coreui-locale="en-US"
         data-coreui-selection-type="year"
-        data-coreui-toggle="date-picker"></div>
+        data-coreui-date-picker></div>
     </div>
   </div>`} />
 
@@ -154,7 +154,7 @@ Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label 
 
 <Example pro code={`<div class="form-field">
     <span class="form-label">Delivery date</span>
-    <div data-coreui-locale="en-US" data-coreui-toggle="date-picker"></div>
+    <div data-coreui-locale="en-US" data-coreui-date-picker></div>
     <div class="form-text">We deliver on working days only.</div>
   </div>`} />
 
@@ -170,7 +170,7 @@ The picker is built from other components — the [date input](/forms/date-input
 
 A decorative `<svg>` inside an adopted button is marked `aria-hidden` for you. So a trigger can be a regular button with its own text and icon, the way a combobox has one:
 
-<Example pro code={`<div data-coreui-locale="en-US" data-coreui-toggle="date-picker">
+<Example pro code={`<div data-coreui-locale="en-US" data-coreui-date-picker>
     <div data-coreui-picker-field></div>
     <button type="button" class="btn btn-subtle btn-sm" data-coreui-picker-cleaner>
       <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3l10 10M13 3L3 13"/></svg>
@@ -187,7 +187,7 @@ The `cleanerIcon` and `indicatorIcon` options only feed the generated buttons; w
 
 The date picker supports [floating labels](/forms/floating-labels/): set `floatingLabel` and the component renders the label itself — no wrapper markup needed — and the text also becomes the field's accessible name. The mask placeholders stay hidden while the label rests inside the field; focusing any part of the field — the sections or the picker button — floats the label and reveals the mask.
 
-<Example pro code={`<div data-coreui-locale="en-US" data-coreui-floating-label="Delivery date" data-coreui-toggle="date-picker"></div>`} />
+<Example pro code={`<div data-coreui-locale="en-US" data-coreui-floating-label="Delivery date" data-coreui-date-picker></div>`} />
 
 ## Sizing
 
@@ -196,12 +196,12 @@ and `data-coreui-size="sm"`.
 
 <Example pro code={`<div class="row mb-3">
     <div class="col-lg-5">
-      <div data-coreui-locale="en-US" data-coreui-size="lg" data-coreui-toggle="date-picker"></div>
+      <div data-coreui-locale="en-US" data-coreui-size="lg" data-coreui-date-picker></div>
     </div>
   </div>
   <div class="row">
     <div class="col-lg-5">
-      <div data-coreui-locale="en-US" data-coreui-size="sm" data-coreui-toggle="date-picker"></div>
+      <div data-coreui-locale="en-US" data-coreui-size="sm" data-coreui-date-picker></div>
     </div>
   </div>`} />
 
@@ -212,7 +212,7 @@ appearance and remove pointer events.
 
 <Example pro code={`<div class="row">
     <div class="col-lg-5">
-      <div data-coreui-disabled="true" data-coreui-locale="en-US" data-coreui-toggle="date-picker"></div>
+      <div data-coreui-disabled="true" data-coreui-locale="en-US" data-coreui-date-picker></div>
     </div>
   </div>`} />
 
@@ -260,7 +260,7 @@ browser.
 
 <Example pro code={`<div class="row">
     <div class="col-lg-5">
-      <div data-coreui-toggle="date-picker"></div>
+      <div data-coreui-date-picker></div>
     </div>
   </div>`} />
 
@@ -268,7 +268,7 @@ browser.
 
 <Example pro code={`<div class="row">
     <div class="col-lg-5">
-      <div data-coreui-locale="zh-CN" data-coreui-toggle="date-picker"></div>
+      <div data-coreui-locale="zh-CN" data-coreui-date-picker></div>
     </div>
   </div>`} />
 
@@ -276,7 +276,7 @@ browser.
 
 <Example pro code={`<div class="row">
     <div class="col-lg-5">
-      <div data-coreui-locale="ja" data-coreui-toggle="date-picker"></div>
+      <div data-coreui-locale="ja" data-coreui-date-picker></div>
     </div>
   </div>`} />
 
@@ -284,7 +284,7 @@ browser.
 
 <Example pro code={`<div class="row">
     <div class="col-lg-5">
-      <div data-coreui-locale="ko" data-coreui-toggle="date-picker"></div>
+      <div data-coreui-locale="ko" data-coreui-date-picker></div>
     </div>
   </div>`} />
 
@@ -298,7 +298,7 @@ document direction.
 
 <Example pro code={`<div class="row" dir="rtl">
     <div class="col-lg-5">
-      <div data-coreui-locale="he-IL" data-coreui-toggle="date-picker"></div>
+      <div data-coreui-locale="he-IL" data-coreui-date-picker></div>
     </div>
   </div>`} />
 
@@ -306,7 +306,7 @@ document direction.
 
 <Example pro code={`<div class="row" dir="rtl">
     <div class="col-lg-5">
-      <div data-coreui-locale="fa-IR" data-coreui-toggle="date-picker"></div>
+      <div data-coreui-locale="fa-IR" data-coreui-date-picker></div>
     </div>
   </div>`} />
 
@@ -322,11 +322,11 @@ field forwards from the shell. The parser accepts both dayjs/moment-style tokens
 <Example pro code={`<div class="row">
     <div class="col-sm-6 col-lg-5 mb-3 mb-sm-0">
       <label class="form-label">dd.MM.yyyy</label>
-      <div data-coreui-format="dd.MM.yyyy" data-coreui-locale="en-US" data-coreui-toggle="date-picker"></div>
+      <div data-coreui-format="dd.MM.yyyy" data-coreui-locale="en-US" data-coreui-date-picker></div>
     </div>
     <div class="col-sm-6 col-lg-5">
       <label class="form-label">YYYY-MM-DD</label>
-      <div data-coreui-format="YYYY-MM-DD" data-coreui-locale="en-US" data-coreui-toggle="date-picker"></div>
+      <div data-coreui-format="YYYY-MM-DD" data-coreui-locale="en-US" data-coreui-date-picker></div>
     </div>
   </div>`} />
 
@@ -335,7 +335,7 @@ the first day of the month.
 
 <Example pro code={`<div class="row">
     <div class="col-lg-5">
-      <div data-coreui-format="MMMM yyyy" data-coreui-locale="en-US" data-coreui-toggle="date-picker"></div>
+      <div data-coreui-format="MMMM yyyy" data-coreui-locale="en-US" data-coreui-date-picker></div>
     </div>
   </div>`} sandboxJs={datePickerFormats} />
 
@@ -361,10 +361,10 @@ The field is a [date input](/forms/date-input/#accessibility) — a group of spi
 
 ### Via data attributes
 
-Add `data-coreui-toggle="date-picker"` to a `div` element.
+Add `data-coreui-date-picker` to a `div` element.
 
 ```html
-<div data-coreui-toggle="date-picker"></div>
+<div data-coreui-date-picker></div>
 ```
 
 Inside it, `data-coreui-picker-field`, `data-coreui-picker-toggle` and `data-coreui-picker-cleaner` name the parts you supply yourself — see [Composing the markup](#composing-the-markup).

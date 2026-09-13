@@ -20,10 +20,10 @@ value, so typing and picking stay in sync.
 
 <Example pro code={`<div class="row">
     <div class="col-sm-6 col-lg-4 mb-3 mb-sm-0">
-      <div data-coreui-locale="en-US" data-coreui-toggle="time-picker"></div>
+      <div data-coreui-locale="en-US" data-coreui-time-picker></div>
     </div>
     <div class="col-sm-6 col-lg-4">
-      <div data-coreui-locale="en-US" data-coreui-time="14:30:00" data-coreui-toggle="time-picker"></div>
+      <div data-coreui-locale="en-US" data-coreui-time="14:30:00" data-coreui-time-picker></div>
     </div>
   </div>`} />
 
@@ -34,7 +34,7 @@ The default `roll` variant shows scrollable columns. Set
 
 <Example pro code={`<div class="row">
     <div class="col-lg-4">
-      <div data-coreui-locale="en-US" data-coreui-variant="select" data-coreui-toggle="time-picker"></div>
+      <div data-coreui-locale="en-US" data-coreui-variant="select" data-coreui-time-picker></div>
     </div>
   </div>`} />
 
@@ -44,7 +44,7 @@ A [`.theme-*` class](/customize/components/#theme-variants) on the picker colour
 
 <Example pro code={`<div class="row">
     <div class="col-lg-4">
-      <div class="theme-success" data-coreui-locale="en-US" data-coreui-time="14:30:00" data-coreui-toggle="time-picker"></div>
+      <div class="theme-success" data-coreui-locale="en-US" data-coreui-time="14:30:00" data-coreui-time-picker></div>
     </div>
   </div>`} />
 
@@ -56,7 +56,7 @@ child. Buttons act through `data-coreui-picker-action` (`now`, `clear`, `reset`,
 
 <Example pro code={`<div class="row">
     <div class="col-lg-4">
-      <div data-coreui-locale="en-US" data-coreui-toggle="time-picker">
+      <div data-coreui-locale="en-US" data-coreui-time-picker>
         <template data-coreui-template="footer">
           <button type="button" class="btn-ghost theme-danger btn-sm me-auto" data-coreui-picker-action="now">Now</button>
           <button type="button" class="btn-ghost theme-primary btn-sm" data-coreui-picker-action="clear">Clear</button>
@@ -72,7 +72,7 @@ Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label 
 
 <Example pro code={`<div class="form-field">
     <span class="form-label">Meeting time</span>
-    <div data-coreui-locale="en-US" data-coreui-toggle="time-picker"></div>
+    <div data-coreui-locale="en-US" data-coreui-time-picker></div>
     <div class="form-text">Local time, in your own time zone.</div>
   </div>`} />
 
@@ -80,18 +80,18 @@ Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label 
 
 The time picker supports [floating labels](/forms/floating-labels/): set `floatingLabel` and the component renders the label itself — no wrapper markup needed — and the text also becomes the field's accessible name. The mask placeholders stay hidden while the label rests inside the field; focusing any part of the field — the sections or the picker button — floats the label and reveals the mask.
 
-<Example pro code={`<div data-coreui-locale="en-US" data-coreui-floating-label="Meeting time" data-coreui-toggle="time-picker"></div>`} />
+<Example pro code={`<div data-coreui-locale="en-US" data-coreui-floating-label="Meeting time" data-coreui-time-picker></div>`} />
 
 ## Sizing
 
 <Example pro code={`<div class="row mb-3">
     <div class="col-lg-4">
-      <div data-coreui-locale="en-US" data-coreui-size="lg" data-coreui-toggle="time-picker"></div>
+      <div data-coreui-locale="en-US" data-coreui-size="lg" data-coreui-time-picker></div>
     </div>
   </div>
   <div class="row">
     <div class="col-lg-4">
-      <div data-coreui-locale="en-US" data-coreui-size="sm" data-coreui-toggle="time-picker"></div>
+      <div data-coreui-locale="en-US" data-coreui-size="sm" data-coreui-time-picker></div>
     </div>
   </div>`} />
 
@@ -99,7 +99,7 @@ The time picker supports [floating labels](/forms/floating-labels/): set `floati
 
 <Example pro code={`<div class="row">
     <div class="col-lg-4">
-      <div data-coreui-disabled="true" data-coreui-locale="en-US" data-coreui-toggle="time-picker"></div>
+      <div data-coreui-disabled="true" data-coreui-locale="en-US" data-coreui-time-picker></div>
     </div>
   </div>`} />
 
@@ -115,11 +115,11 @@ The time picker supports [floating labels](/forms/floating-labels/): set `floati
 <Example pro code={`<div class="row">
     <div class="col-sm-6 col-lg-4 mb-3 mb-sm-0">
       <label class="form-label">Without seconds</label>
-      <div data-coreui-locale="en-US" data-coreui-seconds="false" data-coreui-toggle="time-picker"></div>
+      <div data-coreui-locale="en-US" data-coreui-seconds="false" data-coreui-time-picker></div>
     </div>
     <div class="col-sm-6 col-lg-4">
       <label class="form-label">Hours only</label>
-      <div data-coreui-locale="en-US" data-coreui-minutes="false" data-coreui-seconds="false" data-coreui-toggle="time-picker"></div>
+      <div data-coreui-locale="en-US" data-coreui-minutes="false" data-coreui-seconds="false" data-coreui-time-picker></div>
     </div>
   </div>`} />
 
@@ -142,7 +142,7 @@ const picker = new coreui.TimePicker(element, {
 
 <Example pro code={`<div class="row">
     <div class="col-lg-4">
-      <div data-coreui-toggle="time-picker"></div>
+      <div data-coreui-time-picker></div>
     </div>
   </div>`} />
 
@@ -150,7 +150,7 @@ const picker = new coreui.TimePicker(element, {
 
 <Example pro code={`<div class="row">
     <div class="col-lg-4">
-      <div data-coreui-locale="zh-CN" data-coreui-toggle="time-picker"></div>
+      <div data-coreui-locale="zh-CN" data-coreui-time-picker></div>
     </div>
   </div>`} />
 
@@ -158,7 +158,7 @@ const picker = new coreui.TimePicker(element, {
 
 <Example pro code={`<div class="row">
     <div class="col-lg-4">
-      <div data-coreui-locale="ja" data-coreui-toggle="time-picker"></div>
+      <div data-coreui-locale="ja" data-coreui-time-picker></div>
     </div>
   </div>`} />
 
@@ -166,7 +166,7 @@ const picker = new coreui.TimePicker(element, {
 
 <Example pro code={`<div class="row">
     <div class="col-lg-4">
-      <div data-coreui-locale="ko" data-coreui-toggle="time-picker"></div>
+      <div data-coreui-locale="ko" data-coreui-time-picker></div>
     </div>
   </div>`} />
 
@@ -176,7 +176,7 @@ const picker = new coreui.TimePicker(element, {
 
 <Example pro code={`<div class="row" dir="rtl">
     <div class="col-lg-4">
-      <div data-coreui-locale="he-IL" data-coreui-toggle="time-picker"></div>
+      <div data-coreui-locale="he-IL" data-coreui-time-picker></div>
     </div>
   </div>`} />
 
@@ -184,7 +184,7 @@ const picker = new coreui.TimePicker(element, {
 
 <Example pro code={`<div class="row" dir="rtl">
     <div class="col-lg-4">
-      <div data-coreui-locale="fa-IR" data-coreui-toggle="time-picker"></div>
+      <div data-coreui-locale="fa-IR" data-coreui-time-picker></div>
     </div>
   </div>`} />
 
@@ -206,7 +206,7 @@ The toggle button carries the panel's state — `aria-haspopup="dialog"`, `aria-
 ### Via data attributes
 
 ```html
-<div data-coreui-toggle="time-picker"></div>
+<div data-coreui-time-picker></div>
 ```
 
 ### Via JavaScript

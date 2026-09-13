@@ -7,7 +7,7 @@
  * the Popup — joined by one piece of state, the date, that the picker owns.
  * The markup is the composition surface: a field, a toggle and a cleaner the
  * author wrote (by role attribute) are adopted; whatever is missing is
- * generated, so a bare `<div data-coreui-toggle="date-picker">` keeps working.
+ * generated, so a bare `<div data-coreui-date-picker>` keeps working.
  * Projected regions (footer) come from a <template> child and act through the
  * slot context, not through configuration props.
  * --------------------------------------------------------------------------
@@ -58,7 +58,7 @@ const CLASS_NAME_PICKER = 'picker'
 const CLASS_NAME_POPUP = 'popup'
 const CLASS_NAME_SHOW = 'show'
 
-const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="date-picker"]'
+const SELECTOR_DATA_DATE_PICKER = '[data-coreui-date-picker]'
 const SELECTOR_TEMPLATE_FOOTER = 'template[data-coreui-template="footer"]'
 const SELECTOR_ACTION = '[data-coreui-picker-action]'
 const SELECTOR_ROLE_CLEANER = '[data-coreui-picker-cleaner]'
@@ -528,7 +528,7 @@ class DatePicker extends BaseComponent {
  */
 
 EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
-  for (const element of SelectorEngine.find(SELECTOR_DATA_TOGGLE)) {
+  for (const element of SelectorEngine.find(SELECTOR_DATA_DATE_PICKER)) {
     DatePicker.getOrCreateInstance(element)
   }
 })
