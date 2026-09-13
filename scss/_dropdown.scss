@@ -162,6 +162,20 @@ $dropdown-dark-tokens: defaults(
       display: block;
     }
 
+    // At zero vertical padding the edge items sit on the menu's own rounded
+    // corners, so they carry what is left of that radius once the padding has
+    // eaten into it — full radius at no padding, nothing once the padding
+    // clears it.
+    > .dropdown-item:first-child,
+    > li:first-child .dropdown-item {
+      @include border-top-radius(max(0px, calc(var(--#{$prefix}dropdown-border-radius) - var(--#{$prefix}dropdown-border-width) - var(--#{$prefix}dropdown-padding-y))));
+    }
+
+    > .dropdown-item:last-child,
+    > li:last-child .dropdown-item {
+      @include border-bottom-radius(max(0px, calc(var(--#{$prefix}dropdown-border-radius) - var(--#{$prefix}dropdown-border-width) - var(--#{$prefix}dropdown-padding-y))));
+    }
+
     &[data-coreui-popper] {
       inset-inline-start: 0;
       top: 100%;
