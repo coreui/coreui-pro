@@ -48,6 +48,10 @@ type FocusTrapConfig = {
   trapElement: HTMLElement | null
 }
 
+// Only the most recently activated trap reacts. Two traps over disjoint
+// elements would otherwise throw focus at each other without end.
+const activeTraps: FocusTrap[] = []
+
 /**
  * Class definition
  */
@@ -94,6 +98,7 @@ class FocusTrap extends Config {
     EventHandler.on(document, EVENT_FOCUSIN, this._focusinHandler)
     EventHandler.on(document, EVENT_KEYDOWN_TAB, this._keydownHandler)
 
+    activeTraps.push(this)
     this._isActive = true
   }
 
@@ -103,15 +108,20 @@ class FocusTrap extends Config {
     }
 
     this._isActive = false
+    activeTraps.splice(activeTraps.indexOf(this), 1)
     EventHandler.off(document, EVENT_FOCUSIN, this._focusinHandler)
     EventHandler.off(document, EVENT_KEYDOWN_TAB, this._keydownHandler)
   }
 
   // Private
+  _isTopmost(): boolean {
+    return activeTraps[activeTraps.length - 1] === this
+  }
+
   _handleFocusin(event: CoreUIEvent): void {
     const { additionalElement, trapElement } = this._config
 
-    if (event.target === document || event.target === trapElement || trapElement!.contains(event.target as Node)) {
+    if (!this._isTopmost() || event.target === document || event.target === trapElement || trapElement!.contains(event.target as Node)) {
       return
     }
 
@@ -131,7 +141,7 @@ class FocusTrap extends Config {
   }
 
   _handleKeydown(event: CoreUIEvent): void {
-    if (event.key !== TAB_KEY) {
+    if (!this._isTopmost() || event.key !== TAB_KEY) {
       return
     }
 
