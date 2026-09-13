@@ -58,28 +58,42 @@ const SELECTOR_SVG = 'svg'
 
 type DateRangeInputConfig = {
   allowList: SanitizerAllowList
+  ariaDayLabel: string
   ariaEndLabel: string
+  ariaHourLabel: string
+  ariaMeridiemLabel: string
+  ariaMinuteLabel: string
+  ariaMonthLabel: string
+  ariaQuarterLabel: string
+  ariaSecondLabel: string
   ariaStartLabel: string
+  ariaWeekLabel: string
+  ariaYearLabel: string
   autofocus: boolean
+  dayPlaceholder: string | null
   disabled: boolean
   disabledDates: any
   endDate: Date | string | null
   endFloatingLabel: string | null
   endName: string | null
   format: any
+  hourPlaceholder: string | null
   inputDateParse: ((value: string) => Date | null) | null
   inputOptions: Record<string, any>
   invalid: boolean
   locale: string
   maxDate: Date | string | null
+  meridiemPlaceholder: string | null
   minDate: Date | string | null
+  minutePlaceholder: string | null
   monthNames: string[] | null
-  placeholders: Record<string, string> | null
+  monthPlaceholder: string | null
+  quarterPlaceholder: string | null
   readonly: boolean
   required: boolean
   sanitize: boolean
   sanitizeFn: ((unsafeHtml: string) => string) | null
-  sectionLabels: Record<string, string> | null
+  secondPlaceholder: string | null
   separatorIcon: string
   separatorIconRtl: string
   size: string | null
@@ -87,72 +101,109 @@ type DateRangeInputConfig = {
   startFloatingLabel: string | null
   startName: string | null
   valid: boolean
+  weekPlaceholder: string | null
+  yearPlaceholder: string | null
+
 }
 
 const Default: DateRangeInputConfig = {
   allowList: SVGAllowlist,
+  ariaDayLabel: 'Day',
   ariaEndLabel: 'End date',
+  ariaHourLabel: 'Hour',
+  ariaMeridiemLabel: 'AM/PM',
+  ariaMinuteLabel: 'Minute',
+  ariaMonthLabel: 'Month',
+  ariaQuarterLabel: 'Quarter',
+  ariaSecondLabel: 'Second',
   ariaStartLabel: 'Start date',
+  ariaWeekLabel: 'Week',
+  ariaYearLabel: 'Year',
   autofocus: false,
+  dayPlaceholder: null,
   disabled: false,
   disabledDates: null,
   endDate: null,
   endFloatingLabel: null,
   endName: null,
   format: null,
+  hourPlaceholder: null,
   inputDateParse: null,
   inputOptions: {},
   invalid: false,
   locale: navigator.language,
   maxDate: null,
+  meridiemPlaceholder: null,
   minDate: null,
+  minutePlaceholder: null,
   monthNames: null,
-  placeholders: null,
+  monthPlaceholder: null,
+  quarterPlaceholder: null,
   readonly: false,
   required: false,
   sanitize: true,
   sanitizeFn: null,
-  sectionLabels: null,
+  secondPlaceholder: null,
   separatorIcon: SEPARATOR_ICON,
   separatorIconRtl: SEPARATOR_ICON_RTL,
   size: null,
   startDate: null,
   startFloatingLabel: null,
   startName: null,
-  valid: false
+  valid: false,
+  weekPlaceholder: null,
+  yearPlaceholder: null
+
 }
 
 const DefaultType: Record<string, string> = {
   allowList: 'object',
+  ariaDayLabel: 'string',
   ariaEndLabel: 'string',
+  ariaHourLabel: 'string',
+  ariaMeridiemLabel: 'string',
+  ariaMinuteLabel: 'string',
+  ariaMonthLabel: 'string',
+  ariaQuarterLabel: 'string',
+  ariaSecondLabel: 'string',
   ariaStartLabel: 'string',
+  ariaWeekLabel: 'string',
+  ariaYearLabel: 'string',
   autofocus: 'boolean',
+  dayPlaceholder: '(string|null)',
   disabled: 'boolean',
   disabledDates: '(array|date|function|null)',
   endDate: '(date|string|null)',
   endFloatingLabel: '(string|null)',
   endName: '(string|null)',
   format: '(function|string|null)',
+  hourPlaceholder: '(string|null)',
   inputDateParse: '(function|null)',
   inputOptions: 'object',
   invalid: 'boolean',
   locale: 'string',
   maxDate: '(date|string|null)',
+  meridiemPlaceholder: '(string|null)',
   minDate: '(date|string|null)',
+  minutePlaceholder: '(string|null)',
   monthNames: '(array|null)',
-  placeholders: '(object|null)',
+  monthPlaceholder: '(string|null)',
+  quarterPlaceholder: '(string|null)',
   readonly: 'boolean',
   required: 'boolean',
   sanitize: 'boolean',
   sanitizeFn: '(function|null)',
-  sectionLabels: '(object|null)',
+  secondPlaceholder: '(string|null)',
   separatorIcon: 'string',
   separatorIconRtl: 'string',
   size: '(string|null)',
   startDate: '(date|string|null)',
   startFloatingLabel: '(string|null)',
   startName: '(string|null)',
-  valid: 'boolean'
+  valid: 'boolean',
+  weekPlaceholder: '(string|null)',
+  yearPlaceholder: '(string|null)'
+
 }
 
 /**

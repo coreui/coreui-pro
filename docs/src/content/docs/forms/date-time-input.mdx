@@ -186,25 +186,41 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
+| `ariaDayLabel` | string | `'Day'` | The `aria-label` of the day section. |
+| `ariaHourLabel` | string | `'Hour'` | The `aria-label` of the hour section. |
 | `ariaLabel` | string | `'Date and time input'` | The `aria-label` of the `role="group"` container |
+| `ariaMeridiemLabel` | string | `'AM/PM'` | The `aria-label` of the meridiem section. |
+| `ariaMinuteLabel` | string | `'Minute'` | The `aria-label` of the minute section. |
+| `ariaMonthLabel` | string | `'Month'` | The `aria-label` of the month section. |
+| `ariaQuarterLabel` | string | `'Quarter'` | The `aria-label` of the quarter section. |
+| `ariaSecondLabel` | string | `'Second'` | The `aria-label` of the second section. |
+| `ariaWeekLabel` | string | `'Week'` | The `aria-label` of the week section. |
+| `ariaYearLabel` | string | `'Year'` | The `aria-label` of the year section. |
 | `autofocus` | boolean | `false` | Focus the first section right after initialization |
 | `date` | date, number, string, null | `null` | Initial value — a `Date` or a string with a time part like `'2026-07-14 14:30'` |
+| `dayPlaceholder` | string, null | `null` | Replaces the `DD` the day section shows while it is empty. |
 | `disabled` | boolean | `false` | Disable the component |
 | `disabledDates` | array, date, function, null | `null` | Dates (or a matcher function) that can't be selected |
 | `format` | function, string, null | `null` | Mask layout: `null` derives it from the locale, a string is parsed as format tokens, a function receives the locale and returns the section layout |
+| `hourPlaceholder` | string, null | `null` | Replaces the `HH` the hour section shows while it is empty. |
 | `inputDateParse` | function, null | `null` | Custom parser used for pasted text, e.g. a date library |
 | `invalid` | boolean | `false` | Force the invalid state (`.is-invalid`) |
 | `locale` | string | `'default'` | Locale used to derive the mask layout, month names, and hour cycle |
 | `maxDate` | date, number, string, null | `null` | Latest selectable value |
+| `meridiemPlaceholder` | string, null | `null` | Replaces the `AM` the meridiem section shows while it is empty. |
 | `minDate` | date, number, string, null | `null` | Earliest selectable value |
+| `minutePlaceholder` | string, null | `null` | Replaces the `mm` the minute section shows while it is empty. |
 | `monthNames` | array, null | `null` | Twelve custom month names for text month sections (`MMM`/`MMMM`), overriding the locale-derived, date-context grammatical form |
+| `monthPlaceholder` | string, null | `null` | Replaces the `MM` the month section shows while it is empty. |
 | `name` | string, null | `null` | Name attribute of the hidden input |
-| `placeholders` | object, null | `null` | Per-section placeholder overrides, e.g. `{"day": "DD", "hour": "gg"}` |
+| `quarterPlaceholder` | string, null | `null` | Replaces the `Q` the quarter section shows while it is empty. |
 | `readonly` | boolean | `false` | Make the field focusable but non-editable |
 | `required` | boolean | `false` | Required attribute of the hidden input |
+| `secondPlaceholder` | string, null | `null` | Replaces the `ss` the second section shows while it is empty. |
 | `seconds` | boolean | `false` | Include a seconds section in the locale-derived layout |
-| `sectionLabels` | object, null | `null` | Per-section `aria-label` overrides, e.g. `{"day": "Dzień", "hour": "Godzina"}` |
 | `valid` | boolean | `false` | Force the valid state (`.is-valid`) |
+| `weekPlaceholder` | string, null | `null` | Replaces the `WW` the week section shows while it is empty. |
+| `yearPlaceholder` | string, null | `null` | Replaces the `YYYY` the year section shows while it is empty. |
 
 ### Methods
 

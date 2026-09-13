@@ -189,23 +189,29 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
+| `ariaHourLabel` | string | `'Hour'` | The `aria-label` of the hour section. |
 | `ariaLabel` | string | `'Time input'` | The `aria-label` of the `role="group"` container |
+| `ariaMeridiemLabel` | string | `'AM/PM'` | The `aria-label` of the meridiem section. |
+| `ariaMinuteLabel` | string | `'Minute'` | The `aria-label` of the minute section. |
+| `ariaSecondLabel` | string | `'Second'` | The `aria-label` of the second section. |
 | `autofocus` | boolean | `false` | Focus the first section right after initialization |
 | `date` | date, number, string, null | `null` | Initial time — a `Date` or a time string like `'14:30'` |
 | `disabled` | boolean | `false` | Disable the component |
 | `disabledDates` | array, date, function, null | `null` | Times (or a matcher function) that can't be selected |
 | `format` | function, string, null | `null` | Mask layout: `null` derives it from the locale, a string is parsed as format tokens, a function receives the locale and returns the section layout |
+| `hourPlaceholder` | string, null | `null` | Replaces the `HH` the hour section shows while it is empty. |
 | `inputDateParse` | function, null | `null` | Custom parser used for pasted text, e.g. a date library |
 | `invalid` | boolean | `false` | Force the invalid state (`.is-invalid`) |
 | `locale` | string | `'default'` | Locale used to derive the hour cycle and layout |
 | `maxDate` | date, number, string, null | `null` | Latest selectable time |
+| `meridiemPlaceholder` | string, null | `null` | Replaces the `AM` the meridiem section shows while it is empty. |
 | `minDate` | date, number, string, null | `null` | Earliest selectable time |
+| `minutePlaceholder` | string, null | `null` | Replaces the `mm` the minute section shows while it is empty. |
 | `name` | string, null | `null` | Name attribute of the hidden input |
-| `placeholders` | object, null | `null` | Per-section placeholder overrides, e.g. `{"hour": "gg", "minute": "mm"}` |
 | `readonly` | boolean | `false` | Make the field focusable but non-editable |
 | `required` | boolean | `false` | Required attribute of the hidden input |
+| `secondPlaceholder` | string, null | `null` | Replaces the `ss` the second section shows while it is empty. |
 | `seconds` | boolean | `false` | Include a seconds section in the locale-derived layout |
-| `sectionLabels` | object, null | `null` | Per-section `aria-label` overrides, e.g. `{"hour": "Godzina", "minute": "Minuta"}` |
 | `valid` | boolean | `false` | Force the valid state (`.is-valid`) |
 
 ### Methods
