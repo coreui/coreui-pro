@@ -894,7 +894,8 @@ behaviour, v5 is the reference. Mapping:
 - **Removed — obsolete with section fields.** `inputDateFormat`,
   `inputOnChangeDelay`, `inputReadOnly`, `placeholder` — the masked field is
   always a valid partial date; there is no free-text parsing to debounce.
-  Section placeholders come from the input triad's `placeholders`.
+  Section placeholders come from the input triad's own per-section options —
+  `dayPlaceholder`, `monthPlaceholder`, `yearPlaceholder` and the rest.
 - **Changed.** `timepicker: true` is replaced by the standalone
   [date time picker](/forms/date-time-picker/) — a DateTimeInput field with a
   calendar and the time selection body side by side. Because the two halves own
@@ -3427,7 +3428,8 @@ tintable and lets dark mode deepen every shadow at once.
   `$time-picker-invalid-border-color` / `$time-picker-valid-border-color` and
   the matching indicator-icon variables are gone — theme the state through the
   standard `$form-invalid-*` / `$form-valid-*` variables instead. Section
-  placeholders come from the field's `placeholders` option, not a colour token.
+  placeholders come from the field's own `hourPlaceholder` /
+  `minutePlaceholder` / `secondPlaceholder` options, not a colour token.
 - `$input-padding-x-lg` was removed: `.form-control-lg` reads
   `--cui-btn-input-lg-padding-x` from the shared button/input token system, and
   the time picker's dead `gap-lg` was the variable's last consumer.
