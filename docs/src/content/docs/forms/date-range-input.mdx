@@ -262,9 +262,15 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
 | `allowList` | object | SVG allow list | Allowed tags and attributes for the generated separator icon |
+| `ariaDayLabel` | string | `'Day'` | The `aria-label` of the day section. |
 | `ariaEndLabel` | string | `'End date'` | Accessible name of the end field when it has no floating label |
+| `ariaMonthLabel` | string | `'Month'` | The `aria-label` of the month section. |
+| `ariaQuarterLabel` | string | `'Quarter'` | The `aria-label` of the quarter section. |
 | `ariaStartLabel` | string | `'Start date'` | Accessible name of the start field when it has no floating label |
+| `ariaWeekLabel` | string | `'Week'` | The `aria-label` of the week section. |
+| `ariaYearLabel` | string | `'Year'` | The `aria-label` of the year section. |
 | `autofocus` | boolean | `false` | Focus the first section of the start date right after initialization |
+| `dayPlaceholder` | string, null | `null` | Replaces the `DD` the day section shows while it is empty. |
 | `disabled` | boolean | `false` | Disable both ends |
 | `disabledDates` | array, date, function, null | `null` | Dates (or a matcher function) neither end can hold |
 | `endDate` | date, string, null | `null` | Initial end date |
@@ -278,20 +284,12 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | `maxDate` | date, string, null | `null` | Latest date either end can hold |
 | `minDate` | date, string, null | `null` | Earliest date either end can hold |
 | `monthNames` | array, null | `null` | Twelve custom month names for text month sections (`MMM`/`MMMM`) |
-| `dayPlaceholder` | string, null | `null` | Replaces the `DD` the day section shows while it is empty. |
-| `weekPlaceholder` | string, null | `null` | Replaces the `WW` the week section shows while it is empty. |
 | `monthPlaceholder` | string, null | `null` | Replaces the `MM` the month section shows while it is empty. |
 | `quarterPlaceholder` | string, null | `null` | Replaces the `Q` the quarter section shows while it is empty. |
-| `yearPlaceholder` | string, null | `null` | Replaces the `YYYY` the year section shows while it is empty. |
 | `readonly` | boolean | `false` | Make both ends focusable but non-editable |
 | `required` | boolean | `false` | Required attribute of the hidden inputs |
 | `sanitize` | boolean | `true` | Sanitize the generated separator icon |
 | `sanitizeFn` | function, null | `null` | Custom sanitizer |
-| `ariaDayLabel` | string | `'Day'` | The `aria-label` of the day section. |
-| `ariaWeekLabel` | string | `'Week'` | The `aria-label` of the week section. |
-| `ariaMonthLabel` | string | `'Month'` | The `aria-label` of the month section. |
-| `ariaQuarterLabel` | string | `'Quarter'` | The `aria-label` of the quarter section. |
-| `ariaYearLabel` | string | `'Year'` | The `aria-label` of the year section. |
 | `separatorIcon` | string | arrow SVG | Icon of the generated separator; ignored for a `data-coreui-range-separator` you wrote |
 | `separatorIconRtl` | string | mirrored arrow SVG | Its right-to-left counterpart |
 | `size` | string, null | `null` | `'sm'` or `'lg'` |
@@ -299,6 +297,8 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | `startFloatingLabel` | string, null | `null` | Floating label of the start field |
 | `startName` | string, null | `null` | Name attribute of the hidden input carrying the start date |
 | `valid` | boolean | `false` | Force the valid state (`.is-valid`) on both ends |
+| `weekPlaceholder` | string, null | `null` | Replaces the `WW` the week section shows while it is empty. |
+| `yearPlaceholder` | string, null | `null` | Replaces the `YYYY` the year section shows while it is empty. |
 
 ### Methods
 
