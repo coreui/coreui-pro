@@ -11,7 +11,6 @@
 import {
   autoUpdate, computePosition, flip, offset, shift
 } from '@floating-ui/dom'
-import { isRTL } from './index.js'
 
 /**
  * Types
@@ -33,19 +32,6 @@ export const BREAKPOINTS: Record<string, number> = {
   lg: 1024,
   xl: 1280,
   '2xl': 1536
-}
-
-/**
- * Default placement with RTL support
- */
-export const getDefaultPlacement = (fallback = 'bottom'): string => {
-  if (fallback.includes('-start') || fallback.includes('-end')) {
-    const [side, alignment] = fallback.split('-')
-    const flippedAlignment = alignment === 'start' ? 'end' : 'start'
-    return isRTL() ? `${side}-${flippedAlignment}` : fallback
-  }
-
-  return fallback
 }
 
 /**
@@ -196,7 +182,7 @@ export const createAnchoredPosition = (anchor: Element, content: HTMLElement): {
         flip(),
         shift({ boundary: 'clippingAncestors' })
       ],
-      placement: isRTL() ? 'bottom-end' : 'bottom-start'
+      placement: 'bottom-start'
     })
 
     if (disposed || !content.isConnected) {
