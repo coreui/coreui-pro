@@ -2212,6 +2212,36 @@ describe('Autocomplete', () => {
       expect(autocomplete._element).toBeNull()
     })
 
+    it('should stop reacting to its child elements after dispose', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        cleaner: true,
+        indicator: true,
+        options: [{ value: '1', label: 'Option 1' }]
+      })
+
+      const indicator = autocomplete._indicatorElement
+      const options = autocomplete._optionsElement
+      const cleaner = autocomplete._cleanerElement
+
+      expect(indicator).not.toBeNull()
+      expect(options).not.toBeNull()
+      expect(cleaner).not.toBeNull()
+
+      autocomplete.dispose()
+
+      const toggleSpy = spyOn(autocomplete, 'toggle')
+      const optionsClickSpy = spyOn(autocomplete, '_onOptionsClick')
+
+      indicator.click()
+      options.click()
+      cleaner.click()
+
+      expect(toggleSpy).not.toHaveBeenCalled()
+      expect(optionsClickSpy).not.toHaveBeenCalled()
+    })
+
     it('should destroy popper when disposing', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')

@@ -238,9 +238,7 @@ class Autocomplete extends BaseComponent {
   }
 
   dispose() {
-    if (this._popper) {
-      this._popper.destroy()
-    }
+    this._destroyAutocomplete()
 
     super.dispose()
   }
@@ -585,6 +583,25 @@ class Autocomplete extends BaseComponent {
     }
 
     return _options
+  }
+
+  _destroyAutocomplete() {
+    if (this._popper) {
+      this._popper.destroy()
+    }
+
+    for (const element of [
+      this._menu,
+      this._togglerElement,
+      this._indicatorElement,
+      this._inputElement,
+      this._optionsElement,
+      this._cleanerElement
+    ]) {
+      if (element) {
+        EventHandler.off(element, EVENT_KEY)
+      }
+    }
   }
 
   _createAutocomplete() {
