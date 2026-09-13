@@ -3,8 +3,8 @@
 @use "../range-slider" as *;
 
 @include describe("range-slider") {
-  @include it("keeps only the label, tooltip offset and vertical tokens as its own; thumb and track come from the range") {
-    @include assert-true(map.has-key($range-slider-tokens, --cui-range-slider-label-color));
+  @include it("keeps only the tick label, tooltip offset and vertical tokens as its own; thumb and track come from the range") {
+    @include assert-true(map.has-key($range-slider-tokens, --cui-range-slider-tick-label-color));
     @include assert-true(map.has-key($range-slider-tokens, --cui-range-slider-tooltip-margin-bottom));
     @include assert-true(map.has-key($range-slider-vertical-tokens, --cui-range-slider-vertical-track-height));
     @include assert-false(map.has-key($range-slider-tokens, --cui-range-slider-thumb-bg));

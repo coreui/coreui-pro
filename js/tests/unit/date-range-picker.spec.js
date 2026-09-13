@@ -1,5 +1,5 @@
 import DateRangePicker from '../../src/date-range-picker.js'
-import { clearFixture, getFixture } from '../helpers/fixture.js'
+import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
 
 describe('DateRangePicker', () => {
   let fixtureEl
@@ -73,16 +73,30 @@ describe('DateRangePicker', () => {
       expect(fixtureEl.querySelector('input[name="trip-end"]')).not.toBeNull()
     })
 
+    it('should build its field inside the element rather than on it', () => {
+      const picker = buildPicker()
+      const el = fixtureEl.querySelector('#picker')
+
+      expect(el.classList.contains('form-control-group')).toBeFalse()
+      expect(el.classList.contains('date-range-picker')).toBeTrue()
+      expect(picker._frameElement.classList.contains('form-control-group')).toBeTrue()
+      expect(picker._frameElement.classList.contains('form-date-range')).toBeTrue()
+      expect(picker._frameElement.parentElement).toBe(el)
+      expect(el.querySelector('.form-control-action').getAttribute('aria-expanded')).toEqual('false')
+    })
+
     it('should render the LTR separator arrow by default', () => {
       const picker = buildPicker()
 
-      expect(picker._resolveSeparatorIcon()).toEqual(picker._config.separatorIcon)
+      expect(picker._frameElement.querySelector('.form-control-icon svg')).not.toBeNull()
+      expect(picker._rangeInput._config.separatorIcon).toEqual(picker._config.separatorIcon)
     })
 
     it('should render the mirrored separator arrow inside an RTL ancestor', () => {
       const picker = buildPicker({}, '<div dir="rtl"><div id="picker"></div></div>')
 
-      expect(picker._resolveSeparatorIcon()).toEqual(picker._config.separatorIconRtl)
+      expect(picker._frameElement.querySelector('.form-control-icon path').getAttribute('d'))
+        .toEqual(new DOMParser().parseFromString(picker._config.separatorIconRtl, 'image/svg+xml').querySelector('path').getAttribute('d'))
       expect(fixtureEl.querySelector('.form-control-icon svg')).not.toBeNull()
     })
 
@@ -253,6 +267,65 @@ describe('DateRangePicker', () => {
 
       expect(picker.getStartDate()).toBeNull()
       expect(picker.getEndDate()).toBeNull()
+    })
+  })
+
+  describe('jQueryInterface', () => {
+    it('should create date-range-picker', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const el = fixtureEl.querySelector('#host')
+
+      jQueryMock.fn.dateRangePicker = DateRangePicker.jQueryInterface
+      jQueryMock.elements = [el]
+
+      jQueryMock.fn.dateRangePicker.call(jQueryMock)
+
+      expect(DateRangePicker.getInstance(el)).not.toBeNull()
+      DateRangePicker.getInstance(el).dispose()
+    })
+
+    it('should not re-create date-range-picker', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const el = fixtureEl.querySelector('#host')
+      const picker = new DateRangePicker(el)
+
+      jQueryMock.fn.dateRangePicker = DateRangePicker.jQueryInterface
+      jQueryMock.elements = [el]
+
+      jQueryMock.fn.dateRangePicker.call(jQueryMock)
+
+      expect(DateRangePicker.getInstance(el)).toEqual(picker)
+      picker.dispose()
+    })
+
+    it('should call a public method by name', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const el = fixtureEl.querySelector('#host')
+      const picker = new DateRangePicker(el)
+      const spy = spyOn(picker, 'show')
+
+      jQueryMock.fn.dateRangePicker = DateRangePicker.jQueryInterface
+      jQueryMock.elements = [el]
+
+      jQueryMock.fn.dateRangePicker.call(jQueryMock, 'show')
+
+      expect(spy).toHaveBeenCalled()
+      picker.dispose()
+    })
+
+    it('should throw error on undefined method', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const el = fixtureEl.querySelector('#host')
+      const picker = new DateRangePicker(el)
+
+      jQueryMock.fn.dateRangePicker = DateRangePicker.jQueryInterface
+      jQueryMock.elements = [el]
+
+      expect(() => {
+        jQueryMock.fn.dateRangePicker.call(jQueryMock, 'undefinedMethod')
+      }).toThrowError(TypeError, 'No method named "undefinedMethod"')
+
+      picker.dispose()
     })
   })
 

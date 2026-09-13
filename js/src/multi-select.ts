@@ -1,5 +1,3 @@
-/* eslint-disable max-lines */
-
 /**
  * --------------------------------------------------------------------------
  * CoreUI PRO multi-select.js
@@ -9,14 +7,14 @@
 
 import Chip from './chip.js'
 import ChipSet from './chip-set.js'
-import Combobox from './combobox.js'
+import ComboboxBase from './combobox-base.js'
 import Data from './dom/data.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import type { ComponentConfig } from './util/config.js'
 import { CLEANER_ICON, INDICATOR_ICON } from './util/icons.js'
-import { DefaultAllowlist, type SanitizerAllowList } from './util/sanitizer.js'
-import { defineJQueryPlugin, getUID } from './util/index.js'
+import { DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList } from './util/sanitizer.js'
+import { defineJQueryPlugin, getUID, jQueryDispatch } from './util/index.js'
 
 /**
  * ------------------------------------------------------------------------
@@ -29,30 +27,24 @@ const DATA_KEY = 'coreui.multi-select'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
-const ARROW_UP_KEY = 'ArrowUp'
 const ARROW_DOWN_KEY = 'ArrowDown'
 const BACKSPACE_KEY = 'Backspace'
 const DELETE_KEY = 'Delete'
-const END_KEY = 'End'
 const ENTER_KEY = 'Enter'
 const ESCAPE_KEY = 'Escape'
-const HOME_KEY = 'Home'
-const SPACE_KEY = ' '
 const TAB_KEY = 'Tab'
 const RIGHT_MOUSE_BUTTON = 2 // MouseEvent.button value for the secondary button, usually the right button
 
 const SELECTOR_CHIP = '.chip'
 const SELECTOR_CLEANER = '.form-control-cleaner'
-const SELECTOR_OPTGROUP = '.combobox-optgroup'
-const SELECTOR_OPTION = '.combobox-option'
+const SELECTOR_OPTION = '.list-box-option'
 const SELECTOR_SEARCH = '.form-multi-select-search'
+const SELECTOR_SELECT_ALL = '[data-coreui-select-all]'
 const SELECTOR_DATA_MULTI_SELECT = '[data-coreui-multi-select]'
 // The class-based selector stays alongside the data attribute: pages relying
 // on class-only auto-init keep working (the v6 bet).
 const SELECTOR_SELECT = 'select.form-multi-select'
 const SELECTOR_SELECTION = '.form-multi-select-selection'
-const SELECTOR_VISIBLE_ITEMS = '.combobox-options .combobox-option:not(.disabled):not(:disabled)'
-const SELECTOR_NAVIGABLE_ITEMS = `.combobox-all:not(.disabled):not(:disabled), ${SELECTOR_VISIBLE_ITEMS}, .combobox-options .combobox-optgroup-label-with-checkbox`
 
 const EVENT_CHANGED = `changed${EVENT_KEY}`
 const EVENT_CLICK = `click${EVENT_KEY}`
@@ -69,15 +61,11 @@ const EVENT_CHIP_REMOVE = 'remove.coreui.chip'
 const CLASS_NAME_CHIP = 'chip'
 const CLASS_NAME_CLEANER = 'form-control-cleaner'
 const CLASS_NAME_DISABLED = 'disabled'
-const CLASS_NAME_HEADER = 'combobox-header'
+const CLASS_NAME_HEADER = 'list-box-header'
 const CLASS_NAME_INPUT_GROUP = 'form-control-group'
 const CLASS_NAME_SELECT = 'form-multi-select'
 const CLASS_NAME_SELECT_FILLED = 'form-multi-select-filled'
-const CLASS_NAME_SELECT_ALL = 'combobox-all'
-const CLASS_NAME_SELECT_ALL_WITH_CHECKBOX = 'combobox-all-with-checkbox'
-const CLASS_NAME_OPTGROUP_LABEL_WITH_CHECKBOX = 'combobox-optgroup-label-with-checkbox'
-const CLASS_NAME_OPTION_INDICATOR = 'combobox-option-indicator'
-const CLASS_NAME_OPTION_WITH_CHECKBOX = 'combobox-option-with-checkbox'
+const CLASS_NAME_SELECT_ALL = 'list-box-select-all'
 const CLASS_NAME_SEARCH = 'form-multi-select-search'
 const CLASS_NAME_SELECTED = 'selected'
 const CLASS_NAME_INDETERMINATE = 'indeterminate'
@@ -105,7 +93,6 @@ const Default = {
   name: null,
   options: false,
   optionsGroupsSelectable: false,
-  optionsGroupsStyle: 'checkbox',
   optionsGroupsTemplate: null,
   optionsMaxHeight: 'auto',
   optionsStyle: 'checkbox',
@@ -119,7 +106,6 @@ const Default = {
   selectAll: true,
   selectAllLabel: 'Select all',
   selectAllMode: 'all',
-  selectAllStyle: 'checkbox',
   selectionLimit: null,
   selectionType: 'tags',
   selectionTypeCounterText: 'item(s) selected',
@@ -148,7 +134,6 @@ const DefaultType: Record<string, string> = {
   name: '(string|null)',
   options: '(boolean|array)',
   optionsGroupsSelectable: 'boolean',
-  optionsGroupsStyle: 'string',
   optionsGroupsTemplate: '(function|null)',
   optionsMaxHeight: '(number|string)',
   optionsStyle: 'string',
@@ -160,7 +145,6 @@ const DefaultType: Record<string, string> = {
   search: '(boolean|string)',
   searchNoResultsLabel: 'string',
   selectAll: 'boolean',
-  selectAllStyle: 'string',
   selectAllLabel: 'string',
   selectAllMode: 'string',
   selectionLimit: '(number|null)',
@@ -186,7 +170,7 @@ class MultiSelectChipSet extends ChipSet {
   override _applyAccessibilityRoles(): void {}
 }
 
-class MultiSelect extends Combobox {
+class MultiSelect extends ComboboxBase {
   protected declare _uniqueName: any
   protected declare _indicatorElement: any
   protected declare _selectAllElement: any
@@ -199,6 +183,7 @@ class MultiSelect extends Combobox {
   protected declare _searchElement: any
   protected declare _wrapperElement: any
   protected declare _refocusOnHide: boolean
+  protected declare _nativeKeydownHandler: any
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
@@ -218,6 +203,7 @@ class MultiSelect extends Combobox {
 
     this._wrapperElement = null
     this._menu = null
+    this._nativeKeydownHandler = null
     this._selected = []
     this._options = this._getOptions()
     this._floatingCleanup = null
@@ -245,14 +231,6 @@ class MultiSelect extends Combobox {
 
   static override get NAME(): string {
     return NAME
-  }
-
-  static override get navigableItemsSelector(): string {
-    return SELECTOR_NAVIGABLE_ITEMS
-  }
-
-  static override get activationKeys(): string[] {
-    return [ENTER_KEY, SPACE_KEY]
   }
 
   // Public
@@ -346,7 +324,7 @@ class MultiSelect extends Combobox {
         break
       }
 
-      const value = String(item.dataset.value)
+      const value = String(item.dataset.coreuiValue)
       const option = this._findOptionByValue(value)
       if (option && !this._selected.some((selected: any) => selected.value === value)) {
         this._selectOption(value, option.text, { refresh: false })
@@ -364,7 +342,7 @@ class MultiSelect extends Combobox {
     const items = this._getDisplayedItems()
 
     for (const item of items) {
-      const value = String(item.dataset.value)
+      const value = String(item.dataset.coreuiValue)
       if (this._selected.some((selected: any) => selected.value === value)) {
         this._deselectOption(value, { refresh: false })
       }
@@ -381,6 +359,7 @@ class MultiSelect extends Combobox {
 
   _destroySelect(): void {
     this._disposeFloating()
+    this._disposeListBox()
     this._disposeSelection()
 
     for (const element of [
@@ -437,6 +416,11 @@ class MultiSelect extends Combobox {
 
     EventHandler.on(this._wrapperElement, EVENT_KEYDOWN, (event: any) => {
       if (event.key === ESCAPE_KEY) {
+        if (this._isShown()) {
+          event.preventDefault()
+          event.stopPropagation()
+        }
+
         this.hide()
         return
       }
@@ -455,7 +439,11 @@ class MultiSelect extends Combobox {
     this._addTogglerKeydownListeners()
 
     // Validation focuses the overlay select; hand its keystrokes to the custom control.
-    EventHandler.on(this._element, EVENT_KEYDOWN, (event: any) => {
+    if (this._nativeKeydownHandler) {
+      EventHandler.off(this._element, EVENT_KEYDOWN, this._nativeKeydownHandler)
+    }
+
+    this._nativeKeydownHandler = (event: any) => {
       if (event.key === TAB_KEY || event.key === ESCAPE_KEY) {
         return
       }
@@ -481,7 +469,9 @@ class MultiSelect extends Combobox {
       } else {
         this._togglerElement.focus()
       }
-    })
+    }
+
+    EventHandler.on(this._element, EVENT_KEYDOWN, this._nativeKeydownHandler)
 
     EventHandler.on(this._indicatorElement, EVENT_CLICK, (event: any) => {
       event.preventDefault()
@@ -498,11 +488,6 @@ class MultiSelect extends Combobox {
         this.show()
       }
 
-      if (event.key === ARROW_DOWN_KEY && this._searchElement.value.length === this._searchElement.selectionStart) {
-        this._selectMenuItem(event)
-        return
-      }
-
       if ((event.key === BACKSPACE_KEY || event.key === DELETE_KEY) && event.target.value.length === 0) {
         this._deselectLastOption()
       }
@@ -511,40 +496,17 @@ class MultiSelect extends Combobox {
     })
 
     if (this._selectAllElement) {
-      EventHandler.on(this._selectAllElement, EVENT_CLICK, (event: any) => {
-        if (this._selectAllElement.disabled) {
-          return
-        }
-
+      // Bound on the panel, which the capture phase reaches before the list's
+      // own delegated handler — the scope stays this component's to decide.
+      EventHandler.on(this._menu, EVENT_CLICK, SELECTOR_SELECT_ALL, (event: any) => {
         event.preventDefault()
         event.stopPropagation()
 
-        this._toggleSelectAll()
-      })
-
-      // The select all button lives in the header, outside the options list, so it
-      // needs its own arrow-key handler to join the navigation flow (Enter/Space
-      // already toggle via the native button click above).
-      EventHandler.on(this._selectAllElement, EVENT_KEYDOWN, (event: any) => {
-        if ([ARROW_UP_KEY, ARROW_DOWN_KEY].includes(event.key)) {
-          event.preventDefault()
-          this._selectMenuItem(event)
-        }
-
-        if ([HOME_KEY, END_KEY].includes(event.key)) {
-          event.preventDefault()
-          this._selectFirstOrLastMenuItem(event.key === HOME_KEY)
+        if (!this._config.disabled) {
+          this._toggleSelectAll()
         }
       })
     }
-
-    EventHandler.on(this._optionsElement, EVENT_CLICK, (event: any) => {
-      event.preventDefault()
-      event.stopPropagation()
-      this._onOptionsClick(event.target)
-    })
-
-    this._addOptionsKeydownListeners()
   }
 
   _getOptions(): any[] {
@@ -831,7 +793,7 @@ class MultiSelect extends Combobox {
     this._selectionElement.append(input)
   }
 
-  override _buildMenuHeader(popupDiv: HTMLElement): void {
+  override _buildMenuHeader(listBoxDiv: HTMLElement): void {
     const hasHeaderTemplate = typeof this._config.headerTemplate === 'function'
     const showSelectAll = this._config.selectAll && this._config.multiple
 
@@ -858,11 +820,7 @@ class MultiSelect extends Combobox {
       const selectAllButton = document.createElement('button')
       selectAllButton.type = 'button'
       selectAllButton.classList.add(CLASS_NAME_SELECT_ALL)
-
-      if (this._config.selectAllStyle === 'checkbox' && this._config.multiple) {
-        selectAllButton.classList.add(CLASS_NAME_SELECT_ALL_WITH_CHECKBOX)
-        selectAllButton.append(this._createCheckboxIndicator())
-      }
+      selectAllButton.setAttribute('data-coreui-select-all', '')
 
       const selectAllLabel = document.createElement('span')
       selectAllButton.append(selectAllLabel)
@@ -871,59 +829,30 @@ class MultiSelect extends Combobox {
       header.append(selectAllButton)
     }
 
-    popupDiv.append(header)
-  }
-
-  override _decorateListbox(optionsDiv: HTMLElement): void {
-    if (this._config.multiple) {
-      optionsDiv.setAttribute('aria-multiselectable', 'true')
-    }
+    listBoxDiv.append(header)
   }
 
   override _afterMenuCreated(): void {
     this._updateHeader()
-    this._updateGroupsState()
     this._updateMasterCheckbox()
   }
 
-  _createCheckboxIndicator(): HTMLElement {
-    // A span, so it is valid inside the select-all <button> and never matches
-    // `:checked` — the host's selected/indeterminate classes drive its state.
-    const indicator = document.createElement('span')
-    indicator.classList.add('check', CLASS_NAME_OPTION_INDICATOR)
-    indicator.setAttribute('aria-hidden', 'true')
-    return indicator
-  }
-
-  override _decorateOption(optionDiv: HTMLElement, _option: any): void {
-    if (this._config.optionsStyle === 'checkbox') {
-      optionDiv.classList.add(CLASS_NAME_OPTION_WITH_CHECKBOX)
+  override _getListBoxConfig(): any {
+    return {
+      ...super._getListBoxConfig(),
+      indicator: this._config.optionsStyle === 'checkbox' ? 'checkbox' : 'none',
+      sectionsSelectable: this._config.optionsGroupsSelectable,
+      selectionLimit: this._config.selectionLimit,
+      selectionMode: this._config.multiple ? 'multiple' : 'single'
     }
   }
 
-  override _isOptionSelectedInitially(option: any): boolean {
-    return option.selected === true
+  override _getActiveDescendantField(): HTMLElement {
+    return this._config.search ? this._searchElement : this._togglerElement
   }
 
-  override _renderOptionContent(optionDiv: HTMLElement, option: any): void {
-    if (typeof this._config.optionsTemplate === 'function') {
-      optionDiv.innerHTML = this._maybeSanitize(this._config.optionsTemplate(option))
-    } else {
-      optionDiv.textContent = option.text
-    }
-
-    if (this._config.optionsStyle === 'checkbox') {
-      optionDiv.prepend(this._createCheckboxIndicator())
-    }
-  }
-
-  override _decorateOptgroupLabel(label: HTMLElement, _option: any): void {
-    if (this._config.optionsGroupsSelectable && this._config.optionsGroupsStyle === 'checkbox' && this._config.multiple) {
-      label.classList.add(CLASS_NAME_OPTGROUP_LABEL_WITH_CHECKBOX)
-      label.tabIndex = 0
-      label.setAttribute('role', 'button')
-      label.prepend(this._createCheckboxIndicator())
-    }
+  override _optionText(option: any): string {
+    return option.text
   }
 
   _createChip(value: any, text: string, disabled: boolean): HTMLElement {
@@ -975,31 +904,16 @@ class MultiSelect extends Combobox {
     }
   }
 
-  override _interceptOptionsClick(element: any): boolean {
-    if (!this._config.optionsGroupsSelectable) {
-      return false
-    }
-
-    const groupLabel = element.closest(`.${CLASS_NAME_OPTGROUP_LABEL_WITH_CHECKBOX}`)
-    if (groupLabel) {
-      this._toggleGroup(groupLabel.closest(SELECTOR_OPTGROUP))
-      return true
-    }
-
-    return false
+  override _onOptionSelected(value: string): void {
+    const option = this._findOptionByValue(value)
+    this._selectOption(value, option ? option.text : value, { refresh: false })
   }
 
-  override _onOptionActivate(value: string, element: HTMLElement): void {
-    const { text } = this._findOptionByValue(value)
+  override _onOptionDeselected(value: string): void {
+    this._deselectOption(value, { refresh: false })
+  }
 
-    if (this._config.multiple && element.classList.contains(CLASS_NAME_SELECTED)) {
-      this._deselectOption(value)
-    } else if (this._config.multiple && !element.classList.contains(CLASS_NAME_SELECTED)) {
-      this._selectOption(value, text)
-    } else if (!this._config.multiple) {
-      this._selectOption(value, text)
-    }
-
+  override _onSelectionChange(): void {
     if (!this._config.multiple) {
       this.hide()
       this.search('')
@@ -1013,6 +927,12 @@ class MultiSelect extends Combobox {
       this._searchElement.value = null
       this._searchElement.focus()
     }
+
+    this._refreshAfterSelectionChange()
+  }
+
+  override _onSelectionLimit(): void {
+    this._triggerSelectionLimit()
   }
 
   _selectAllOptions(options: any[]): boolean {
@@ -1059,12 +979,11 @@ class MultiSelect extends Combobox {
   }
 
   _getOptionElement(value: any): any {
-    return SelectorEngine.findOne(`[data-value="${CSS.escape(value)}"]`, this._optionsElement)
+    return SelectorEngine.findOne(`[data-coreui-value="${CSS.escape(value)}"]`, this._optionsElement)
   }
 
-  _getDisplayedItems(): any[] {
-    return SelectorEngine.find(SELECTOR_VISIBLE_ITEMS, this._menu)
-      .filter(element => this._isOptionDisplayed(element))
+  _getDisplayedItems(): HTMLElement[] {
+    return this._getDisplayedOptions().filter(element => !element.classList.contains(CLASS_NAME_DISABLED))
   }
 
   _isOptionGroup(option: any): boolean {
@@ -1144,43 +1063,7 @@ class MultiSelect extends Combobox {
     this._updateSearch()
     this._updateSearchSize()
     this._updateHeader()
-    this._updateGroupsState()
     this._updateMasterCheckbox()
-  }
-
-  _toggleGroup(optgroupEl: HTMLElement): void {
-    if (!optgroupEl) {
-      return
-    }
-
-    const items = SelectorEngine.children(optgroupEl, SELECTOR_OPTION)
-      .filter(element => !element.classList.contains(CLASS_NAME_DISABLED))
-    const allSelected = items.length > 0 && items.every(element => element.classList.contains(CLASS_NAME_SELECTED))
-
-    let limitReached = false
-    for (const item of items) {
-      const value = String(item.dataset.value)
-
-      if (allSelected) {
-        this._deselectOption(value, { refresh: false })
-      } else if (!item.classList.contains(CLASS_NAME_SELECTED)) {
-        if (this._isSelectionLimitReached()) {
-          limitReached = true
-          break
-        }
-
-        const option = this._findOptionByValue(value)
-        if (option) {
-          this._selectOption(value, option.text, { refresh: false })
-        }
-      }
-    }
-
-    this._refreshAfterSelectionChange()
-
-    if (limitReached) {
-      this._triggerSelectionLimit()
-    }
   }
 
   _selectInitialOptions(): void {
@@ -1416,28 +1299,11 @@ class MultiSelect extends Combobox {
   _applyCheckboxState(element: any, state: string): void {
     element.classList.toggle(CLASS_NAME_SELECTED, state === 'all')
     element.classList.toggle(CLASS_NAME_INDETERMINATE, state === 'indeterminate')
-  }
-
-  _updateGroupsState(): void {
-    if (!this._config.optionsGroupsSelectable) {
-      return
-    }
-
-    for (const optgroup of SelectorEngine.find(SELECTOR_OPTGROUP, this._menu)) {
-      const label = SelectorEngine.findOne(`.${CLASS_NAME_OPTGROUP_LABEL_WITH_CHECKBOX}`, optgroup)
-      if (!label) {
-        continue
-      }
-
-      const items = SelectorEngine.children(optgroup, SELECTOR_OPTION)
-        .filter(element => !element.classList.contains(CLASS_NAME_DISABLED))
-      const selected = items.filter(element => element.classList.contains(CLASS_NAME_SELECTED)).length
-      this._applyCheckboxState(label, this._getCheckboxState(selected, items.length))
-    }
+    element.setAttribute('aria-pressed', state === 'all' ? 'true' : (state === 'none' ? 'false' : 'mixed'))
   }
 
   _updateMasterCheckbox(): void {
-    if (this._config.selectAllStyle !== 'checkbox' || !this._selectAllElement) {
+    if (!this._selectAllElement) {
       return
     }
 
@@ -1455,12 +1321,13 @@ class MultiSelect extends Combobox {
     if (result instanceof Node) {
       this._headerElement.replaceChildren(result)
     } else {
-      this._headerElement.innerHTML = this._maybeSanitize(result)
+      this._headerElement.innerHTML = sanitizeByConfig(result, this._config)
     }
   }
 
   _getSelectionState(): any {
-    const allItems = SelectorEngine.find(SELECTOR_VISIBLE_ITEMS, this._menu)
+    const allItems = SelectorEngine.find(SELECTOR_OPTION, this._optionsElement)
+      .filter(element => !element.classList.contains(CLASS_NAME_DISABLED))
     const filteredItems = allItems.filter(element => this._isOptionDisplayed(element))
 
     return {
@@ -1506,7 +1373,6 @@ class MultiSelect extends Combobox {
     this._updateHeader()
     this._updateMasterCheckbox()
     this._updateSelectAllVisibility(visibleOptions)
-    this._syncNoResultsPlaceholder(visibleOptions)
   }
 
   _updateSelectAllVisibility(visibleOptions: number): void {
@@ -1550,9 +1416,7 @@ class MultiSelect extends Combobox {
   }
 
   static jQueryInterface(this: any, config: any): any {
-    return this.each(function (this: HTMLElement) {
-      MultiSelect.multiSelectInterface(this, config)
-    })
+    return jQueryDispatch(this, MultiSelect, config)
   }
 
   static clearMenus(event: any): void {

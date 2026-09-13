@@ -24,7 +24,7 @@ const NAME = 'popup'
 const DATA_KEY = 'coreui.popup'
 const EVENT_KEY = `.${DATA_KEY}`
 
-const EVENT_CLICK = `click${EVENT_KEY}`
+const EVENT_POINTERDOWN = `pointerdown${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 
 const ESCAPE_KEY = 'Escape'
@@ -38,6 +38,8 @@ type PopupConfig = {
   focusTrap: boolean
   mobileBreakpoint: number
   offset: [number, number]
+  onBeforeHide: (() => boolean | void) | null
+  onBeforeShow: (() => boolean | void) | null
   onHidden: (() => void) | null
   onHide: (() => void) | null
   onShow: (() => void) | null
@@ -54,6 +56,8 @@ const Default: PopupConfig = {
   focusTrap: true,
   mobileBreakpoint: 768,
   offset: [0, 2],
+  onBeforeHide: null,
+  onBeforeShow: null,
   onHidden: null,
   onHide: null,
   onShow: null,
@@ -70,6 +74,8 @@ const DefaultType = {
   focusTrap: 'boolean',
   mobileBreakpoint: 'number',
   offset: 'array',
+  onBeforeHide: '(null|function)',
+  onBeforeShow: '(null|function)',
   onHidden: '(function|null)',
   onHide: '(function|null)',
   onShow: '(function|null)',
@@ -139,8 +145,9 @@ class Popup extends Config {
   protected declare _cleanupAutoUpdate: (() => void) | null
   protected declare _isShown: boolean
   protected declare _previouslyFocused: HTMLElement | null
-  protected declare _clickListener: any
+  protected declare _pointerdownListener: any
   protected declare _keydownListener: any
+  protected declare _contentKeydownListener: any
   protected declare _anchorKeydownListener: any
   protected declare _focustrap: any
   protected declare _config: PopupConfig
@@ -154,17 +161,17 @@ class Popup extends Config {
     this._cleanupAutoUpdate = null
     this._isShown = false
     this._previouslyFocused = null
-    this._clickListener = null
+    this._pointerdownListener = null
     this._keydownListener = null
+    this._contentKeydownListener = null
     this._anchorKeydownListener = null
-    // The panel now always lives outside the anchor, so the trap has to be told
-    // about it unconditionally — otherwise moving into it reads as escaping the
-    // trap and focus is yanked back to the field, which makes the calendar
-    // unreachable from the keyboard.
+    // The panel is the dialog, so it is what the trap holds: Tab cycles inside
+    // the calendar and the field, which sits outside it, stays out of the cycle.
+    // `_focusPanel` picks the entry point, so the trap must not also focus one.
     this._focustrap = this._config.focusTrap ?
       new FocusTrap({
-        additionalElement: this._content,
-        trapElement: this._anchor
+        autofocus: false,
+        trapElement: this._content
       }) :
       null
 
@@ -194,7 +201,7 @@ class Popup extends Config {
 
   // Public
   show(): void {
-    if (this._isShown) {
+    if (this._isShown || execute(this._config.onBeforeShow) === false) {
       return
     }
 
@@ -229,10 +236,16 @@ class Popup extends Config {
   }
 
   hide(): any {
-    if (!this._isShown) {
+    if (!this._isShown || execute(this._config.onBeforeHide) === false) {
       return
     }
 
+    this._hide()
+  }
+
+  // Dispose goes through here: the owner is going away, so `onBeforeHide`
+  // gets no say.
+  _hide(): void {
     execute(this._config.onHide)
     this._isShown = false
     this._stopPositioning()
@@ -244,10 +257,11 @@ class Popup extends Config {
 
     // Focus goes home while the panel is still connected: unmounting with the
     // focus inside drops it on <body> and a keyboard user loses their place.
-    if (this._config.returnFocus && this._previouslyFocused) {
-      this._previouslyFocused.focus()
-      this._previouslyFocused = null
+    if (this._config.returnFocus && this._holdsFocus()) {
+      this._returnFocusTarget()?.focus()
     }
+
+    this._previouslyFocused = null
 
     execute(this._config.onHidden)
 
@@ -266,7 +280,10 @@ class Popup extends Config {
   }
 
   dispose(): void {
-    this.hide()
+    if (this._isShown) {
+      this._hide()
+    }
+
     this._unmount()
 
     if (this._anchorKeydownListener) {
@@ -290,6 +307,11 @@ class Popup extends Config {
       return
     }
 
+    if (this._config.focusTrap) {
+      this._content.setAttribute('role', 'dialog')
+      this._content.setAttribute('aria-modal', 'true')
+    }
+
     const container = this._resolveContainer()
 
     if (container) {
@@ -300,6 +322,26 @@ class Popup extends Config {
     // In place — next to the field, not inside it: the frame is a flex control
     // chrome and the panel is not one of its items.
     this._anchor?.after(this._content)
+  }
+
+  // Only the panel's own focus is ours to hand back. Focus already parked on
+  // the anchor belongs to whatever put it there — the toggle the user clicked,
+  // or the trap reacting to a click outside — and moving it again overrides a
+  // decision that was made after the panel lost it.
+  _holdsFocus(): boolean {
+    const active = document.activeElement
+    return Boolean(active && (active === document.body || this._content?.contains(active)))
+  }
+
+  // The field rebuilds its markup as the value changes, so the node captured at
+  // show time can be gone by now; the anchor outlives it and its first
+  // focusable is where the field's own tab stop sits.
+  _returnFocusTarget(): HTMLElement | null {
+    if (this._previouslyFocused?.isConnected) {
+      return this._previouslyFocused
+    }
+
+    return this._anchor ? SelectorEngine.focusableChildren(this._anchor)[0] ?? null : null
   }
 
   _unmount(): void {
@@ -342,7 +384,6 @@ class Popup extends Config {
       }
 
       Object.assign(this._content.style, {
-        insetInlineStart: '0',
         left: `${x}px`,
         position: 'absolute',
         top: `${y}px`
@@ -412,8 +453,11 @@ class Popup extends Config {
   }
 
   _addDismissListeners(): void {
-    this._clickListener = (event: Event) => {
-      // composedPath, not contains(): the click may re-render part of the
+    this._pointerdownListener = (event: Event) => {
+      // pointerdown, not click: the press has to close the panel before the
+      // browser moves the focus, or the trap takes it back from whatever was
+      // clicked and the press ends with the focus still in the picker.
+      // composedPath, not contains(): the press may re-render part of the
       // content (calendar navigation) and detach the target before the event
       // reaches document — the dispatch-time path still holds the ancestors
       const path = event.composedPath()
@@ -430,15 +474,32 @@ class Popup extends Config {
       }
     }
 
-    EventHandler.on(document, EVENT_CLICK, this._clickListener)
+    // Focus sits in the panel while it is open, the way it does in a native
+    // date control, so the panel takes Escape for itself: the press must not
+    // reach an enclosing <dialog>, neither as a bubbling keydown nor as the
+    // native `cancel` the browser derives from an unhandled one.
+    this._contentKeydownListener = (event: KeyboardEvent) => {
+      if (event.key === ESCAPE_KEY) {
+        event.preventDefault()
+        event.stopPropagation()
+        this.hide()
+      }
+    }
+
+    EventHandler.on(document, EVENT_POINTERDOWN, this._pointerdownListener)
     EventHandler.on(document, EVENT_KEYDOWN, this._keydownListener)
+    EventHandler.on(this._content!, EVENT_KEYDOWN, this._contentKeydownListener)
+    EventHandler.on(this._anchor!, EVENT_KEYDOWN, this._contentKeydownListener)
   }
 
   _removeDismissListeners(): void {
-    EventHandler.off(document, EVENT_CLICK, this._clickListener)
+    EventHandler.off(document, EVENT_POINTERDOWN, this._pointerdownListener)
     EventHandler.off(document, EVENT_KEYDOWN, this._keydownListener)
-    this._clickListener = null
+    EventHandler.off(this._content, EVENT_KEYDOWN, this._contentKeydownListener)
+    EventHandler.off(this._anchor, EVENT_KEYDOWN, this._contentKeydownListener)
+    this._pointerdownListener = null
     this._keydownListener = null
+    this._contentKeydownListener = null
   }
 }
 

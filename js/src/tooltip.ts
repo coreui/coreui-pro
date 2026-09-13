@@ -24,7 +24,7 @@ import EventHandler, { type CoreUIEvent } from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import type { ComponentConfig } from './util/config.js'
 import {
-  defineJQueryPlugin, execute, findShadowRoot, getElement, getUID, isRTL, noop
+  defineJQueryPlugin, execute, findShadowRoot, getElement, getUID, isRTL, jQueryDispatch, noop
 } from './util/index.js'
 import { DefaultAllowlist, type SanitizerAllowList } from './util/sanitizer.js'
 import TemplateFactory, { type TemplateContentEntry } from './util/template-factory.js'
@@ -45,7 +45,6 @@ import {
  */
 
 const NAME = 'tooltip'
-const DISALLOWED_ATTRIBUTES = new Set(['sanitize', 'allowList', 'sanitizeFn'])
 
 const ESCAPE_KEY = 'Escape'
 
@@ -856,25 +855,6 @@ class Tooltip extends BaseComponent {
     return Object.values(this._activeTrigger).includes(true)
   }
 
-  override _getConfig(config?: ComponentConfig | null): ComponentConfig {
-    const dataAttributes = Manipulator.getDataAttributes(this._element)
-
-    for (const dataAttribute of Object.keys(dataAttributes)) {
-      if (DISALLOWED_ATTRIBUTES.has(dataAttribute)) {
-        delete dataAttributes[dataAttribute]
-      }
-    }
-
-    config = {
-      ...dataAttributes,
-      ...(typeof config === 'object' && config ? config : {})
-    }
-    config = this._mergeConfigObj(config)
-    config = this._configAfterMerge(config)
-    this._typeCheckConfig(config)
-    return config
-  }
-
   override _configAfterMerge(config: ComponentConfig): ComponentConfig {
     config.container = config.container === false ? document.body : getElement(config.container)
 
@@ -936,19 +916,7 @@ class Tooltip extends BaseComponent {
   }
 
   static jQueryInterface(this: any, config: any): void {
-    return this.each(function (this: HTMLElement) {
-      const data: any = Tooltip.getOrCreateInstance(this, config)
-
-      if (typeof config !== 'string') {
-        return
-      }
-
-      if (typeof data[config as string] === 'undefined') {
-        throw new TypeError(`No method named "${config}"`)
-      }
-
-      data[config as string]()
-    })
+    return jQueryDispatch(this, Tooltip, config)
   }
 }
 

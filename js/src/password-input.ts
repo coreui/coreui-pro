@@ -12,8 +12,8 @@ import {
   createControlGroupAction, ensureControlGroup, releaseControlGroup, type ControlGroup
 } from './util/form-control-group.js'
 import { PASSWORD_HIDE_ICON, PASSWORD_SHOW_ICON } from './util/icons.js'
-import { sanitizeHtml, SVGAllowlist, type SanitizerAllowList } from './util/sanitizer.js'
-import { defineJQueryPlugin } from './util/index.js'
+import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
+import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
 
 /**
  * Constants
@@ -23,6 +23,8 @@ const NAME = 'password-input'
 const DATA_KEY = 'coreui.password-input'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
+
+const EVENT_CLICK = `click${EVENT_KEY}`
 
 const CLASS_NAME_ACTION = 'form-control-action'
 const CLASS_NAME_PASSWORD_INPUT = 'password-input'
@@ -94,7 +96,10 @@ class PasswordInput extends BaseComponent {
   }
 
   override dispose(): void {
-    this._toggleElement?.remove()
+    if (this._toggleElement) {
+      EventHandler.off(this._toggleElement, EVENT_KEY)
+      this._toggleElement.remove()
+    }
 
     if (this._group) {
       this._group.element.classList.remove(CLASS_NAME_PASSWORD_INPUT)
@@ -116,10 +121,10 @@ class PasswordInput extends BaseComponent {
       disabled: this._element.disabled,
       icon: this._config.showIcon,
       label: this._config.ariaToggleLabel,
-      sanitizeIcon: (icon: string) => this._sanitizeIcon(icon)
+      sanitizeIcon: (icon: string) => sanitizeByConfig(icon, this._config)
     })
 
-    EventHandler.on(this._toggleElement, 'click', () => this.toggle())
+    EventHandler.on(this._toggleElement, EVENT_CLICK, () => this.toggle())
     this._group.element.append(this._toggleElement)
   }
 
@@ -133,11 +138,7 @@ class PasswordInput extends BaseComponent {
     const visible = this._element.type === 'text'
 
     this._toggleElement.setAttribute('aria-pressed', visible ? 'true' : 'false')
-    this._toggleElement.innerHTML = this._sanitizeIcon(visible ? this._config.hideIcon : this._config.showIcon)
-  }
-
-  _sanitizeIcon(icon: string): string {
-    return this._config.sanitize ? sanitizeHtml(icon, this._config.allowList, this._config.sanitizeFn) : icon
+    this._toggleElement.innerHTML = sanitizeByConfig(visible ? this._config.hideIcon : this._config.showIcon, this._config)
   }
 
   // Static
@@ -149,11 +150,7 @@ class PasswordInput extends BaseComponent {
 
   // Static
   static jQueryInterface(this: any, config: any): void {
-    return this.each(function (this: HTMLElement) {
-      const data: any = PasswordInput.getOrCreateInstance(this)
-
-      data[config as string](this)
-    })
+    return jQueryDispatch(this, PasswordInput, config, element => [element])
   }
 }
 

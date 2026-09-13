@@ -25,11 +25,15 @@ const tailModules = ['helpers', 'utilities/api']
 const renders = {
   autocomplete: ['combobox', 'forms/form-control', 'forms/form-control-group'],
   'chip-set': ['chip', 'helpers/visually-hidden'],
+  combobox: ['popup', 'list-box', 'forms/form-control'],
+  'forms/form-multi-select': ['combobox', 'chip', 'chip-set', 'forms/form-control-group'],
+  'list-box': ['forms/check', 'forms/form-control'],
   'loading-button': ['buttons', 'spinner'],
   'date-picker': ['forms/floating-labels', 'forms/form-control', 'forms/form-control-group', 'forms/form-date-time', 'popup'],
   'range-slider': ['tooltip'],
   sidebar: ['transitions'],
-  'time-picker': ['forms/floating-labels', 'forms/form-control', 'forms/form-control-group', 'forms/form-date-time', 'popup']
+  'time-picker': ['forms/floating-labels', 'forms/form-control', 'forms/form-control-group', 'forms/form-date-time', 'popup'],
+  transfer: ['list-box', 'buttons', 'helpers/visually-hidden', 'icon']
 }
 
 const groups = [
@@ -79,6 +83,7 @@ const groups = [
   { name: 'dropdown', modules: ['dropdown'] },
   { name: 'header', modules: ['header'] },
   { name: 'icon', modules: ['icon'] },
+  { name: 'list-box', modules: ['list-box'] },
   { name: 'list-group', modules: ['list-group'] },
   { name: 'menu', modules: ['menu'] },
   { name: 'modal', modules: ['modal'] },
@@ -97,7 +102,9 @@ const groups = [
   { name: 'stepper', modules: ['stepper'] },
   { name: 'time-picker', modules: ['time-picker'] },
   { name: 'toasts', modules: ['toasts'] },
+  { name: 'toaster', modules: ['toaster'] },
   { name: 'tooltip', modules: ['tooltip'] },
+  { name: 'transfer', modules: ['transfer'] },
   { name: 'transitions', modules: ['transitions'] },
   { name: 'helpers/visually-hidden', modules: ['helpers/visually-hidden'] }
 ]

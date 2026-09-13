@@ -159,6 +159,8 @@ class SectionInput extends BaseComponent {
   protected declare _inputElement: any
   protected declare _monthFormatter: any
   protected declare _form: HTMLFormElement | null
+  protected declare _initialDate: Date | null
+  protected declare _resetHandler: () => void
   protected declare _submitHandler: () => void
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
@@ -176,10 +178,15 @@ class SectionInput extends BaseComponent {
     this._inputElement = null
     this._monthFormatter = new Intl.DateTimeFormat(this._config.locale, { month: 'long' })
     this._form = null
+    this._resetHandler = () => {
+      setTimeout(() => this.reset())
+    }
+
     this._submitHandler = () => this._onFormSubmit()
 
     this._createSectionInput()
     this._date = this._applyValidationState()
+    this._initialDate = this._date
     this._addEventListeners()
 
     if (this._config.autofocus && !this._config.disabled) {
@@ -209,14 +216,10 @@ class SectionInput extends BaseComponent {
   }
 
   reset(): void {
-    this._date = this._config.date ? this._convertDate(this._config.date) : null
-    this._sections = setSectionsFromDate(this._sections, this._date)
-    this._date = getDateFromSections(this._sections)
+    this._sections = setSectionsFromDate(this._sections, this._initialDate)
     this._draft = ''
     this._syncSections()
-    this._setHiddenInputValue()
-    this._element.classList.toggle(CLASS_NAME_FILLED, this._date !== null)
-    this._element.classList.remove(CLASS_NAME_IS_INVALID)
+    this._updateDate()
   }
 
   getDate(): Date | null {
@@ -261,6 +264,7 @@ class SectionInput extends BaseComponent {
   }
 
   override dispose(): void {
+    EventHandler.off(this._form, this.constructor.eventName('reset'), this._resetHandler)
     EventHandler.off(this._form, this.constructor.eventName('submit'), this._submitHandler)
     super.dispose()
   }
@@ -369,6 +373,7 @@ class SectionInput extends BaseComponent {
     this._form = this._element.closest('form')
 
     if (this._form) {
+      EventHandler.on(this._form, eventName('reset'), this._resetHandler)
       EventHandler.on(this._form, eventName('submit'), this._submitHandler)
     }
 

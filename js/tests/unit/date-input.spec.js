@@ -812,6 +812,61 @@ describe('DateInput', () => {
       expect(dateInput.getDate()).toEqual(new Date(2026, 6, 14))
       expect(getSections(dateInput._element)[0].textContent).toEqual('14')
     })
+
+    it('should restore the initial date, not the last one set through update()', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 6, 14) })
+
+      dateInput.update({ date: new Date(2026, 6, 20) })
+      dateInput.reset()
+
+      expect(dateInput.getDate()).toEqual(new Date(2026, 6, 14))
+    })
+
+    it('should emit dateChange when the value moves back', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 6, 14) })
+      const spy = jasmine.createSpy('dateChange')
+      dateInput._element.addEventListener('dateChange.coreui.date-input', spy)
+
+      dateInput.clear()
+      dateInput.reset()
+
+      expect(spy).toHaveBeenCalledTimes(2)
+      expect(spy.calls.mostRecent().args[0].date).toEqual(new Date(2026, 6, 14))
+    })
+
+    it('should follow a native form reset', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = '<form><div id="mydateinput"></div></form>'
+        const dateInput = new DateInput(fixtureEl.querySelector('div'), { format: 'dd.MM.yyyy', date: new Date(2026, 6, 14) })
+
+        dateInput.clear()
+        expect(dateInput.getDate()).toBeNull()
+
+        fixtureEl.querySelector('form').reset()
+
+        setTimeout(() => {
+          expect(dateInput.getDate()).toEqual(new Date(2026, 6, 14))
+          expect(dateInput._element.querySelector('input[type="hidden"]').value).toEqual('14.07.2026')
+          resolve()
+        }, 10)
+      })
+    })
+
+    it('should drop the form listener on dispose', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = '<form><div id="mydateinput"></div></form>'
+        const dateInput = new DateInput(fixtureEl.querySelector('div'), { format: 'dd.MM.yyyy', date: new Date(2026, 6, 14) })
+        const spy = spyOn(dateInput, 'reset').and.callThrough()
+
+        dateInput.dispose()
+        fixtureEl.querySelector('form').reset()
+
+        setTimeout(() => {
+          expect(spy).not.toHaveBeenCalled()
+          resolve()
+        }, 10)
+      })
+    })
   })
 
   describe('update', () => {

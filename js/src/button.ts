@@ -11,7 +11,7 @@
 import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
-import { defineJQueryPlugin, setAriaAttribute } from './util/index.js'
+import { defineJQueryPlugin, jQueryDispatch, setAriaAttribute } from './util/index.js'
 
 /**
  * Constants
@@ -45,13 +45,7 @@ class Button extends BaseComponent {
 
   // Static
   static jQueryInterface(this: any, config: any): void {
-    return this.each(function (this: HTMLElement) {
-      const data: any = Button.getOrCreateInstance(this)
-
-      if (config === 'toggle') {
-        data[config as string]()
-      }
-    })
+    return jQueryDispatch(this, Button, config)
   }
 }
 

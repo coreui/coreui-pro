@@ -8,10 +8,9 @@
 import BaseComponent from './base-component.js'
 import type { ComponentConfig } from './util/config.js'
 import EventHandler from './dom/event-handler.js'
-import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
-import { sanitizeHtml, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
-import { defineJQueryPlugin, getUID } from './util/index.js'
+import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
+import { defineJQueryPlugin, getUID, jQueryDispatch } from './util/index.js'
 import Tooltip from './tooltip.js'
 
 /**
@@ -22,7 +21,6 @@ const NAME = 'rating'
 const DATA_KEY = 'coreui.rating'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
-const DISALLOWED_ATTRIBUTES = new Set(['sanitize', 'allowList', 'sanitizeFn'])
 
 const EVENT_CHANGE = `change${EVENT_KEY}`
 const EVENT_CLICK = `click${EVENT_KEY}`
@@ -415,7 +413,7 @@ class Rating extends BaseComponent {
       if (this._config.icon) {
         const ratingItemIconElement = document.createElement('div')
         ratingItemIconElement.classList.add(CLASS_NAME_RATING_ITEM_CUSTOM_ICON)
-        ratingItemIconElement.innerHTML = this._sanitizeIcon(typeof this._config.icon === 'object' ? this._config.icon[index + 1] : this._config.icon)
+        ratingItemIconElement.innerHTML = sanitizeByConfig(typeof this._config.icon === 'object' ? this._config.icon[index + 1] : this._config.icon, this._config)
 
         ratingItemLabelElement.append(ratingItemIconElement)
       } else {
@@ -428,7 +426,7 @@ class Rating extends BaseComponent {
       if (this._config.icon && this._config.activeIcon) {
         const ratingItemIconActiveElement = document.createElement('div')
         ratingItemIconActiveElement.classList.add(CLASS_NAME_RATING_ITEM_CUSTOM_ICON_ACTIVE)
-        ratingItemIconActiveElement.innerHTML = this._sanitizeIcon(typeof this._config.activeIcon === 'object' ? this._config.activeIcon[index + 1] : this._config.activeIcon)
+        ratingItemIconActiveElement.innerHTML = sanitizeByConfig(typeof this._config.activeIcon === 'object' ? this._config.activeIcon[index + 1] : this._config.activeIcon, this._config)
 
         ratingItemLabelElement.append(ratingItemIconActiveElement)
       }
@@ -469,30 +467,6 @@ class Rating extends BaseComponent {
     this._element.append(ratingItemElement)
   }
 
-  _sanitizeIcon(icon: any): any {
-    return this._config.sanitize ? sanitizeHtml(icon, this._config.allowList, this._config.sanitizeFn) : icon
-  }
-
-  override _getConfig(config?: any): ComponentConfig {
-    const dataAttributes = Manipulator.getDataAttributes(this._element)
-
-    for (const dataAttribute of Object.keys(dataAttributes)) {
-      if (DISALLOWED_ATTRIBUTES.has(dataAttribute)) {
-        delete dataAttributes[dataAttribute]
-      }
-    }
-
-    config = {
-      ...dataAttributes,
-      ...(typeof config === 'object' && config ? config : {})
-    }
-    config = this._mergeConfigObj(config)
-    config = this._configAfterMerge(config)
-    this._typeCheckConfig(config)
-
-    return config
-  }
-
   // Static
   static ratingInterface(element: string | Element | null, config?: any): void {
     const data: any = Rating.getOrCreateInstance(element, config)
@@ -507,19 +481,7 @@ class Rating extends BaseComponent {
   }
 
   static jQueryInterface(this: any, config: any): void {
-    return this.each(function (this: HTMLElement) {
-      const data: any = Rating.getOrCreateInstance(this, config)
-
-      if (typeof config !== 'string') {
-        return
-      }
-
-      if (data[config as string] === undefined || config.startsWith('_') || config === 'constructor') {
-        throw new TypeError(`No method named "${config}"`)
-      }
-
-      data[config as string](this)
-    })
+    return jQueryDispatch(this, Rating, config, element => [element])
   }
 }
 

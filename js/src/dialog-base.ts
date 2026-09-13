@@ -36,13 +36,16 @@ class DialogBase extends BaseComponent {
   protected declare _element: HTMLDialogElement
   protected declare _isTransitioning: boolean
   protected declare _openedAsModal: boolean
+  protected declare _closedByComponent: boolean
   protected declare _cancelHandler: (event: Event) => void
+  protected declare _closeHandler: (event: Event) => void
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
 
     this._isTransitioning = false
     this._openedAsModal = false
+    this._closedByComponent = false
     this._addDialogListeners()
   }
 
@@ -107,10 +110,7 @@ class DialogBase extends BaseComponent {
         this._closeAndCleanup()
       }
 
-      this._element.classList.remove(CLASS_NAME_HIDING)
-      this._onAfterHide()
-      this._isTransitioning = false
-      EventHandler.trigger(this._element, this.constructor.eventName('hidden'))
+      this._finishHide()
     }, this._element, this._isAnimated())
   }
 
@@ -122,9 +122,10 @@ class DialogBase extends BaseComponent {
       this._closeAndCleanup()
     }
 
-    // The `cancel` listener is unnamespaced, so super.dispose()'s EVENT_KEY
-    // teardown misses it.
+    // The `cancel` and `close` listeners are unnamespaced, so super.dispose()'s
+    // EVENT_KEY teardown misses them.
     EventHandler.off(this._element, 'cancel', this._cancelHandler)
+    EventHandler.off(this._element, 'close', this._closeHandler)
 
     super.dispose()
   }
@@ -189,12 +190,23 @@ class DialogBase extends BaseComponent {
 
   // Safe to call multiple times — close() is a no-op on a closed dialog.
   protected _closeAndCleanup(): void {
-    this._element.close()
+    if (this._element.open) {
+      this._closedByComponent = true
+      this._element.close()
+    }
+
     this._openedAsModal = false
 
     if (!document.querySelector('dialog[open]:modal')) {
       document.documentElement.classList.remove(CLASS_NAME_OPEN)
     }
+  }
+
+  protected _finishHide(): void {
+    this._element.classList.remove(CLASS_NAME_HIDING)
+    this._onAfterHide()
+    this._isTransitioning = false
+    EventHandler.trigger(this._element, this.constructor.eventName('hidden'))
   }
 
   protected _triggerBackdropTransition(): void {
@@ -253,6 +265,24 @@ class DialogBase extends BaseComponent {
     }
 
     EventHandler.on(this._element, 'cancel', this._cancelHandler)
+
+    // The native close event also follows the component's own close(), a task
+    // later — `_closedByComponent` tells that one apart from a form with
+    // method="dialog", a consumer's dialog.close() or any other native path,
+    // which skip hide() and would otherwise leave the scroll lock and the
+    // lifecycle state behind.
+    this._closeHandler = () => {
+      if (this._closedByComponent) {
+        this._closedByComponent = false
+        return
+      }
+
+      this._hideChildComponents()
+      this._closeAndCleanup()
+      this._finishHide()
+    }
+
+    EventHandler.on(this._element, 'close', this._closeHandler)
 
     // Escape for non-modal dialogs — native cancel doesn't fire for show()
     EventHandler.on(this._element, `keydown${eventKey}`, event => {

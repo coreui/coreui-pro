@@ -15,21 +15,24 @@ import Chip from './src/chip.js'
 import ChipInput from './src/chip-input.js'
 import ChipSet from './src/chip-set.js'
 import Collapse from './src/collapse.js'
+import Combobox from './src/combobox.js'
 import ContextMenu from './src/context-menu.js'
 import DateInput from './src/date-input.js'
 import DatePicker from './src/date-picker.js'
+import DateRangeInput from './src/date-range-input.js'
 import DateRangePicker from './src/date-range-picker.js'
 import DateTimePicker from './src/date-time-picker.js'
 import DateTimeInput from './src/date-time-input.js'
 import Dialog from './src/dialog.js'
 import Drawer from './src/drawer.js'
 import Dropdown from './src/dropdown.js'
+import ListBox from './src/list-box.js'
 import LoadingButton from './src/loading-button.js'
 import Menu from './src/menu.js'
 import Modal from './src/modal.js'
 import MultiSelect from './src/multi-select.js'
 import Navigation from './src/navigation.js'
-import OffCanvas from './src/offcanvas.js'
+import Offcanvas from './src/offcanvas.js'
 import OTPInput from './src/otp-input.js'
 import NumberInput from './src/number-input.js'
 import PasswordInput from './src/password-input.js'
@@ -47,7 +50,9 @@ import Tab from './src/tab.js'
 import TimeInput from './src/time-input.js'
 import TimePicker from './src/time-picker.js'
 import Toast from './src/toast.js'
+import Toaster from './src/toaster.js'
 import Tooltip from './src/tooltip.js'
+import Transfer from './src/transfer.js'
 
 export default {
   Accordion,
@@ -60,21 +65,25 @@ export default {
   ChipInput,
   ChipSet,
   Collapse,
+  Combobox,
   ContextMenu,
   DateInput,
   DatePicker,
+  DateRangeInput,
   DateRangePicker,
   DateTimePicker,
   DateTimeInput,
   Dialog,
   Drawer,
   Dropdown,
+  ListBox,
   LoadingButton,
   Menu,
   Modal,
   MultiSelect,
   Navigation,
-  OffCanvas,
+  Offcanvas,
+  OffCanvas: Offcanvas,
   OTPInput,
   NumberInput,
   PasswordInput,
@@ -92,5 +101,7 @@ export default {
   TimeInput,
   TimePicker,
   Toast,
-  Tooltip
+  Toaster,
+  Tooltip,
+  Transfer
 }

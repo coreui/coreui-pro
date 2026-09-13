@@ -10,7 +10,7 @@
 
 import Tooltip, { type TooltipConfig } from './tooltip.js'
 import type { ComponentConfig } from './util/config.js'
-import { defineJQueryPlugin } from './util/index.js'
+import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
 import EventHandler, { type CoreUIEvent } from './dom/event-handler.js'
 import type { TemplateContentEntry } from './util/template-factory.js'
 
@@ -94,19 +94,7 @@ class Popover extends Tooltip {
 
   // Static
   static jQueryInterface(this: any, config: any): void {
-    return this.each(function (this: HTMLElement) {
-      const data: any = Popover.getOrCreateInstance(this, config)
-
-      if (typeof config !== 'string') {
-        return
-      }
-
-      if (typeof data[config as string] === 'undefined') {
-        throw new TypeError(`No method named "${config}"`)
-      }
-
-      data[config as string]()
-    })
+    return jQueryDispatch(this, Popover, config)
   }
 }
 

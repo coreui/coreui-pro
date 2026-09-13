@@ -12,7 +12,7 @@ import BaseComponent from './base-component.js'
 import type { ComponentConfig } from './util/config.js'
 import EventHandler, { type CoreUIEvent } from './dom/event-handler.js'
 import { enableDismissTrigger } from './util/component-functions.js'
-import { defineJQueryPlugin } from './util/index.js'
+import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
 
 /**
  * Constants
@@ -205,17 +205,7 @@ class Toast extends BaseComponent {
 
   // Static
   static jQueryInterface(this: any, config: any): void {
-    return this.each(function (this: HTMLElement) {
-      const data: any = Toast.getOrCreateInstance(this, config)
-
-      if (typeof config === 'string') {
-        if (typeof data[config as string] === 'undefined') {
-          throw new TypeError(`No method named "${config}"`)
-        }
-
-        data[config as string](this)
-      }
-    })
+    return jQueryDispatch(this, Toast, config, element => [element])
   }
 }
 

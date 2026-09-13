@@ -13,5 +13,5 @@ const dateRangePickerDisabledDates = new coreui.DateRangePicker(myDateRangePicke
 })
 
 myDateRangePickerDisabledDates.addEventListener('endDateChange.coreui.date-range-picker', event => {
-  console.log('endDateChange', event.date, event.dateObject)
+  console.log('endDateChange', event.date, event.formattedDate)
 })

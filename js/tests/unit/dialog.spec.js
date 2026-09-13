@@ -369,6 +369,107 @@ describe('Dialog', () => {
     })
   })
 
+  describe('native close', () => {
+    it('should finish the lifecycle when the dialog is closed natively', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = '<dialog class="dialog dialog-instant"></dialog>'
+
+        const dialogEl = fixtureEl.querySelector('.dialog')
+        const dialog = new Dialog(dialogEl)
+        const hideSpy = jasmine.createSpy('hide')
+
+        dialogEl.addEventListener('hide.coreui.dialog', hideSpy)
+
+        dialogEl.addEventListener('shown.coreui.dialog', () => {
+          dialogEl.close()
+        })
+
+        dialogEl.addEventListener('hidden.coreui.dialog', () => {
+          expect(dialogEl.open).toBeFalse()
+          expect(document.documentElement.classList.contains('dialog-open')).toBeFalse()
+          expect(dialog._openedAsModal).toBeFalse()
+          expect(hideSpy).not.toHaveBeenCalled()
+          resolve()
+        })
+
+        dialog.show()
+      })
+    })
+
+    it('should finish the lifecycle when a form with method="dialog" is submitted', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<dialog class="dialog dialog-instant">',
+          '  <form method="dialog"><button type="submit">Save</button></form>',
+          '</dialog>'
+        ].join('')
+
+        const dialogEl = fixtureEl.querySelector('.dialog')
+        const dialog = new Dialog(dialogEl)
+
+        dialogEl.addEventListener('shown.coreui.dialog', () => {
+          dialogEl.querySelector('button').click()
+        })
+
+        dialogEl.addEventListener('hidden.coreui.dialog', () => {
+          expect(dialogEl.open).toBeFalse()
+          expect(document.documentElement.classList.contains('dialog-open')).toBeFalse()
+          resolve()
+        })
+
+        dialog.show()
+      })
+    })
+
+    it('should fire hidden once when hide() closes the dialog', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = '<dialog class="dialog dialog-instant"></dialog>'
+
+        const dialogEl = fixtureEl.querySelector('.dialog')
+        const dialog = new Dialog(dialogEl)
+        const hiddenSpy = jasmine.createSpy('hidden')
+
+        dialogEl.addEventListener('hidden.coreui.dialog', hiddenSpy)
+
+        dialogEl.addEventListener('shown.coreui.dialog', () => {
+          dialog.hide()
+        })
+
+        dialog.show()
+
+        setTimeout(() => {
+          expect(hiddenSpy).toHaveBeenCalledTimes(1)
+          expect(dialog._closedByComponent).toBeFalse()
+          resolve()
+        }, 50)
+      })
+    })
+
+    it('should not react to a native close after dispose', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = '<dialog class="dialog dialog-instant"></dialog>'
+
+        const dialogEl = fixtureEl.querySelector('.dialog')
+        const dialog = new Dialog(dialogEl)
+        const hiddenSpy = jasmine.createSpy('hidden')
+
+        dialogEl.addEventListener('hidden.coreui.dialog', hiddenSpy)
+
+        dialogEl.addEventListener('shown.coreui.dialog', () => {
+          dialog.dispose()
+          dialogEl.dispatchEvent(createEvent('close'))
+
+          setTimeout(() => {
+            expect(hiddenSpy).not.toHaveBeenCalled()
+            resolve()
+          }, 50)
+        })
+
+        dialog.show()
+      })
+    })
+  })
+
   describe('backdrop static', () => {
     it('should not close dialog when backdrop is static and backdrop is clicked', () => {
       return new Promise(resolve => {

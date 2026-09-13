@@ -151,6 +151,71 @@ describe('floating labels', () => {
     expect(labelFloats(root)).toBeTrue()
   })
 
+  // The label anchors its scale at the inline start, so in RTL the origin and
+  // the inline shift have to mirror or the label drifts off its own field.
+  it('scales the label from the inline-start edge in RTL', () => {
+    document.documentElement.dir = 'rtl'
+
+    try {
+      const root = mount('<input type="text" class="form-control" id="host" placeholder=" " value="x">')
+      const label = root.querySelector('label')
+      const { transform, transformOrigin } = getComputedStyle(label)
+      const [originX] = transformOrigin.split(' ')
+      const translateX = Number(transform.match(/matrix\((?:[^,]+,){4}\s*([^,]+)/)[1])
+
+      expect(Math.round(Number.parseFloat(originX))).toBe(label.offsetWidth)
+      expect(translateX).toBeLessThan(0)
+    } finally {
+      document.documentElement.dir = ''
+    }
+  })
+
+  it('scales the label from the left edge in LTR', () => {
+    const root = mount('<input type="text" class="form-control" id="host" placeholder=" " value="x">')
+    const label = root.querySelector('label')
+    const { transform, transformOrigin } = getComputedStyle(label)
+    const translateX = Number(transform.match(/matrix\((?:[^,]+,){4}\s*([^,]+)/)[1])
+
+    expect(transformOrigin).toMatch(/^0px 0px/)
+    expect(translateX).toBeGreaterThan(0)
+  })
+
+  // `floatingLabel` puts the field inside `.form-floating` inside the group, so
+  // the cleaner and validation rules keyed to `> .form-date-time` must reach
+  // one level deeper as well.
+  const buildLabelled = config => {
+    container = document.createElement('div')
+    container.style.cssText = 'padding: 1rem; width: 420px;'
+    container.innerHTML = '<div id="host"></div>'
+    document.body.append(container)
+
+    new DatePicker(container.querySelector('#host'), { locale: 'en-US', floatingLabel: 'Delivery date', ...config })
+    return container.querySelector('.form-control-group')
+  }
+
+  it('hides the cleaner of a floating-labelled picker while it is empty', () => {
+    const group = buildLabelled({})
+    expect(getComputedStyle(group.querySelector('.form-control-cleaner')).display).toBe('none')
+  })
+
+  it('shows the cleaner of a floating-labelled picker once it is filled', () => {
+    const group = buildLabelled({ date: DATE })
+    expect(getComputedStyle(group.querySelector('.form-control-cleaner')).display).not.toBe('none')
+  })
+
+  it('carries the invalid state of a floating-labelled field to the frame', () => {
+    const plain = build(HOST_DIV, DatePicker, { locale: 'en-US', date: DATE })
+    plain.querySelector('.form-date-time').classList.add('is-invalid')
+    const reference = getComputedStyle(plain.querySelector('.form-control-group')).borderColor
+
+    const valid = buildLabelled({ date: DATE })
+    expect(getComputedStyle(valid).borderColor).not.toBe(reference)
+
+    const invalid = buildLabelled({ date: DATE })
+    invalid.querySelector('.form-date-time').classList.add('is-invalid')
+    expect(getComputedStyle(invalid).borderColor).toBe(reference)
+  })
+
   // The per-field mode: startLabel / endLabel render a label inside the group
   // over each date, no wrapper markup. Each floats on its own field's state.
   const buildTwoLabel = config => {
@@ -160,7 +225,7 @@ describe('floating labels', () => {
     document.body.append(container)
 
     new DateRangePicker(container.querySelector('#host'), {
-      locale: 'en-US', floatingLabels: ['Check-in', 'Check-out'], ...config
+      locale: 'en-US', startFloatingLabel: 'Check-in', endFloatingLabel: 'Check-out', ...config
     })
     return container.querySelector('.form-control-group')
   }

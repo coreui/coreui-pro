@@ -1,26 +1,135 @@
 @use "sass:map";
-@use "sass:meta";
-@use "sass:string";
 @use "functions/defaults" as *;
-@use "functions/maps" as *;
 @use "mixins/tokens" as *;
-@use "colors" as *;
 @use "config" as *;
 
-// stylelint-disable hue-degree-notation, @stylistic/number-leading-zero
-// scss-docs-start theme-color-variables
-$primary:       oklch(52.945% 0.19103 278.34) !default;
-$secondary:     light-dark(var(--#{$prefix}gray-100), var(--#{$prefix}gray-600)) !default;
-$success:       oklch(61.237% 0.17298 146.95) !default;
-$info:          oklch(67.55% 0.17646 252.26) !default;
-$warning:       oklch(80.791% 0.16473 78.5) !default;
-$danger:        oklch(63.864% 0.18175 23.81) !default;
-$inverse:       light-dark(var(--#{$prefix}gray-900), var(--#{$prefix}gray-100)) !default;
-// scss-docs-end theme-color-variables
-// stylelint-enable hue-degree-notation, @stylistic/number-leading-zero
+// Themes map sub-keys
+//
+// Return var() references to root tokens instead of raw values.
+// Ex: theme-color-refs("bg") => (primary: var(--cui-primary-bg), success: var(--cui-success-bg), ...)
+@function theme-color-refs($slot, $key-suffix: "") {
+  $result: ();
 
-$link-color:    light-dark(var(--#{$prefix}primary-base), var(--#{$prefix}primary-fg)) !default;
+  @each $color in map.keys($theme-colors) {
+    $result: map.set($result, "#{$color}#{$key-suffix}", var(--#{$prefix}#{$color}-#{$slot}));
+  }
 
+  @return $result;
+}
+
+// Theme token to root tokens
+//
+// Returns the global :root token reference for a given a given token map, prefix, and key.
+// Ex: theme-token-refs($theme-bgs, "bg") => (body: var(--cui-bg-body), 1: var(--cui-bg-1), ...)
+// Skips `inherit` since it's a CSS-wide keyword that can't be stored in a custom property.
+@function theme-token-refs($map, $token) {
+  $result: ();
+
+  @each $key, $value in $map {
+    @if $value != inherit {
+      $result: map.merge($result, ($key: var(--#{$prefix}#{$token}-#{$key})));
+    }
+  }
+
+  @return $result;
+}
+
+// Generate opacity values using color-mix()
+// $fallback lets the referenced $color-var fall back to another color (e.g. currentcolor)
+// when it hasn't been set by a companion color utility.
+@function theme-opacity-values($color-var, $fallback: null, $opacities: $util-opacity) {
+  $result: ();
+  // stylelint-disable-next-line scss/at-function-named-arguments, @stylistic/function-whitespace-after
+  $color: if(sass($fallback): var($color-var, $fallback); else: var($color-var));
+
+  @each $key, $value in $opacities {
+    @if $key == 100 {
+      // For 100%, use direct variable reference (more efficient)
+      $result: map.merge($result, ($key: $color));
+    } @else {
+      // For other values, use color-mix()
+      $percentage: $key * 1%;
+      $result: map.merge($result, ($key: color-mix(in oklch, $color $percentage, transparent)));
+    }
+  }
+
+  @return $result;
+}
+
+@function theme-color-tokens() {
+  $tokens: ();
+
+  @each $color, $slots in $theme-colors {
+    @each $slot, $value in $slots {
+      $tokens: map.set($tokens, --#{$prefix}#{$color}-#{$slot}, $value);
+    }
+  }
+
+  @return $tokens;
+}
+
+@mixin theme-color-tokens() {
+  @include tokens(theme-color-tokens());
+}
+
+@mixin theme-tokens($state) {
+  @each $slot in map.keys(map.get($theme-colors, $state)) {
+    --#{$prefix}theme-#{$slot}: var(--#{$prefix}#{$state}-#{$slot});
+  }
+
+  $overrides: map.get($theme-state-colors, $state) or ();
+
+  @each $token in ("hover", "active") {
+    $override: map.get($overrides, $token);
+
+    @if $override {
+      --#{$prefix}theme-#{$token}: #{$override};
+    } @else {
+      --#{$prefix}theme-#{$token}: oklch(from var(--#{$prefix}#{$state}-bg) calc(l * var(--#{$prefix}theme-#{$token}-lightness)) calc(c * var(--#{$prefix}theme-#{$token}-chroma)) h);
+    }
+  }
+}
+
+// Set each --theme-* token to `initial` so descendants drop inherited theme colors.
+// Use `initial`, not `unset`. `unset` inherits from the parent again.
+// scss-docs-start theme-reset
+@mixin theme-reset() {
+  $slots: ();
+
+  @each $slots-of-color in map.values($theme-colors) {
+    @each $slot in map.keys($slots-of-color) {
+      $slots: map.set($slots, $slot, true);
+    }
+  }
+
+  @each $slot in map.keys(map.merge($slots, ("hover": true, "active": true))) {
+    --#{$prefix}theme-#{$slot}: initial;
+  }
+}
+
+@mixin generate-theme-reset() {
+  .theme-reset {
+    @include theme-reset();
+  }
+}
+// scss-docs-end theme-reset
+
+// Generate theme classes dynamically based on the keys in each theme color map
+// scss-docs-start theme-classes
+@mixin generate-theme-classes() {
+  @each $state in map.keys($theme-colors) {
+    .theme-#{$state} {
+      @include theme-tokens($state);
+    }
+  }
+
+  @include generate-theme-reset();
+}
+// scss-docs-end theme-classes
+
+// Theme maps use the `defaults()` pattern so `@use ... with (...)` merges custom
+// values on top of the built-ins instead of replacing the whole map. Set a key
+// to `null` to remove it. See scss/_config.scss for `defaults()`.
 
 // scss-docs-start theme-colors-map
 $theme-colors: () !default;
@@ -28,74 +137,81 @@ $theme-colors: () !default;
 $theme-colors: defaults(
   (
     "primary": (
-      "base":          $primary,
-      "contrast":      var(--#{$prefix}white),
+      "base":          var(--#{$prefix}primary-500),
       "fg":            light-dark(var(--#{$prefix}primary-600), var(--#{$prefix}primary-400)),
       "fg-emphasis":   light-dark(var(--#{$prefix}primary-800), var(--#{$prefix}primary-200)),
+      "bg":            var(--#{$prefix}primary-500),
       "bg-subtle":     light-dark(var(--#{$prefix}primary-100), var(--#{$prefix}primary-900)),
       "bg-muted":      light-dark(var(--#{$prefix}primary-200), var(--#{$prefix}primary-800)),
       "border":        light-dark(var(--#{$prefix}primary-300), var(--#{$prefix}primary-600)),
       "focus-ring":    color-mix(in oklch, var(--#{$prefix}primary-base) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
+      "contrast":      var(--#{$prefix}white),
     ),
     "secondary": (
-      "base":          $secondary,
-      "contrast":      light-dark(var(--#{$prefix}gray-900), var(--#{$prefix}white)),
+      "base":          var(--#{$prefix}gray-200),
       "fg":            light-dark(var(--#{$prefix}gray-600), var(--#{$prefix}gray-400)),
       "fg-emphasis":   light-dark(var(--#{$prefix}gray-800), var(--#{$prefix}gray-200)),
+      "bg":            light-dark(var(--#{$prefix}gray-100), var(--#{$prefix}gray-600)),
       "bg-subtle":     light-dark(var(--#{$prefix}gray-025), var(--#{$prefix}gray-800)),
       "bg-muted":      light-dark(var(--#{$prefix}gray-050), var(--#{$prefix}gray-700)),
       "border":        light-dark(var(--#{$prefix}gray-300), var(--#{$prefix}gray-600)),
       "focus-ring":    color-mix(in oklch, light-dark(var(--#{$prefix}gray-500), var(--#{$prefix}gray-300)) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
+      "contrast":      light-dark(var(--#{$prefix}gray-900), var(--#{$prefix}white)),
     ),
     "success": (
-      "base":          $success,
-      "contrast":      var(--#{$prefix}black),
+      "base":          var(--#{$prefix}success-500),
       "fg":            light-dark(var(--#{$prefix}success-600), var(--#{$prefix}success-400)),
       "fg-emphasis":   light-dark(var(--#{$prefix}success-800), var(--#{$prefix}success-200)),
+      "bg":            var(--#{$prefix}success-500),
       "bg-subtle":     light-dark(var(--#{$prefix}success-100), var(--#{$prefix}success-900)),
       "bg-muted":      light-dark(var(--#{$prefix}success-200), var(--#{$prefix}success-800)),
       "border":        light-dark(var(--#{$prefix}success-300), var(--#{$prefix}success-600)),
       "focus-ring":    color-mix(in oklch, var(--#{$prefix}success-base) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
+      "contrast":      var(--#{$prefix}white),
     ),
     "info": (
-      "base":          $info,
-      "contrast":      var(--#{$prefix}black),
+      "base":          var(--#{$prefix}info-500),
       "fg":            light-dark(var(--#{$prefix}info-700), var(--#{$prefix}info-300)),
       "fg-emphasis":   light-dark(var(--#{$prefix}info-800), var(--#{$prefix}info-200)),
+      "bg":            var(--#{$prefix}info-500),
       "bg-subtle":     light-dark(var(--#{$prefix}info-100), var(--#{$prefix}info-900)),
       "bg-muted":      light-dark(var(--#{$prefix}info-200), var(--#{$prefix}info-800)),
       "border":        light-dark(var(--#{$prefix}info-300), var(--#{$prefix}info-600)),
       "focus-ring":    color-mix(in oklch, var(--#{$prefix}info-base) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
+      "contrast":      var(--#{$prefix}white),
     ),
     "warning": (
-      "base":          $warning,
-      "contrast":      var(--#{$prefix}black),
+      "base":          var(--#{$prefix}warning-500),
       "fg":            light-dark(var(--#{$prefix}warning-700), var(--#{$prefix}warning-300)),
       "fg-emphasis":   light-dark(var(--#{$prefix}warning-800), var(--#{$prefix}warning-200)),
+      "bg":            var(--#{$prefix}warning-500),
       "bg-subtle":     light-dark(var(--#{$prefix}warning-100), var(--#{$prefix}warning-900)),
       "bg-muted":      light-dark(var(--#{$prefix}warning-200), var(--#{$prefix}warning-800)),
       "border":        light-dark(var(--#{$prefix}warning-300), var(--#{$prefix}warning-600)),
       "focus-ring":    color-mix(in oklch, var(--#{$prefix}warning-base) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
+      "contrast":      var(--#{$prefix}black),
     ),
     "danger": (
-      "base":          $danger,
-      "contrast":      var(--#{$prefix}black),
+      "base":          var(--#{$prefix}danger-500),
       "fg":            light-dark(var(--#{$prefix}danger-600), var(--#{$prefix}danger-400)),
       "fg-emphasis":   light-dark(var(--#{$prefix}danger-800), var(--#{$prefix}danger-200)),
+      "bg":            var(--#{$prefix}danger-500),
       "bg-subtle":     light-dark(var(--#{$prefix}danger-100), var(--#{$prefix}danger-900)),
       "bg-muted":      light-dark(var(--#{$prefix}danger-200), var(--#{$prefix}danger-800)),
       "border":        light-dark(var(--#{$prefix}danger-300), var(--#{$prefix}danger-600)),
       "focus-ring":    color-mix(in oklch, var(--#{$prefix}danger-base) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
+      "contrast":      var(--#{$prefix}white),
     ),
     "inverse": (
-      "base":          $inverse,
-      "contrast":      light-dark(var(--#{$prefix}white), var(--#{$prefix}gray-900)),
+      "base":          var(--#{$prefix}gray-900),
       "fg":            light-dark(var(--#{$prefix}gray-900), var(--#{$prefix}gray-200)),
       "fg-emphasis":   light-dark(var(--#{$prefix}black), var(--#{$prefix}white)),
+      "bg":            light-dark(var(--#{$prefix}gray-900), var(--#{$prefix}gray-100)),
       "bg-subtle":     light-dark(var(--#{$prefix}gray-100), var(--#{$prefix}gray-900)),
       "bg-muted":      light-dark(var(--#{$prefix}gray-200), var(--#{$prefix}gray-700)),
       "border":        light-dark(var(--#{$prefix}gray-400), var(--#{$prefix}gray-600)),
       "focus-ring":    color-mix(in oklch, light-dark(var(--#{$prefix}gray-900), var(--#{$prefix}gray-100)) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
+      "contrast":      light-dark(var(--#{$prefix}white), var(--#{$prefix}gray-900)),
     ),
   ),
   $theme-colors
@@ -158,83 +274,6 @@ $theme-borders: defaults(
 );
 // scss-docs-end theme-borders-map
 
-
-// scss-docs-start theme-fg-emphasis-map
-$theme-colors-fg-emphasis: map-slot($theme-colors, "fg-emphasis") !default;
-// scss-docs-end theme-fg-emphasis-map
-
-// scss-docs-start theme-bg-subtle-map
-$theme-colors-bg-subtle: map-slot($theme-colors, "bg-subtle") !default;
-// scss-docs-end theme-bg-subtle-map
-
-// scss-docs-start theme-border-map
-$theme-colors-border: map-slot($theme-colors, "border") !default;
-// scss-docs-end theme-border-map
-
-// scss-docs-start theme-contrast-map
-$theme-colors-contrast: map-slot($theme-colors, "contrast") !default;
-// scss-docs-end theme-contrast-map
-
-// scss-docs-start theme-fg-map
-$theme-colors-fg: map-slot($theme-colors, "fg") !default;
-// scss-docs-end theme-fg-map
-
-// scss-docs-start theme-bg-muted-map
-$theme-colors-bg-muted: map-slot($theme-colors, "bg-muted") !default;
-// scss-docs-end theme-bg-muted-map
-
-// scss-docs-start theme-focus-ring-map
-$theme-colors-focus-ring: map-slot($theme-colors, "focus-ring") !default;
-// scss-docs-end theme-focus-ring-map
-
-// Contextual theme tokens
-//
-// Components consume colors through the --#{$prefix}theme-* indirection so a
-// single set of component styles works with every theme color. Each token maps
-// to the per-color custom properties generated in _root.scss.
-
-// scss-docs-start theme-token-refs
-$theme-token-refs: (
-  "bg": "-bg",
-  "contrast": "-contrast",
-  "fg": "-fg",
-  "fg-emphasis": "-fg-emphasis",
-  "bg-subtle": "-bg-subtle",
-  "bg-muted": "-bg-muted",
-  "border": "-border",
-  "focus-ring": "-focus-ring"
-) !default;
-// scss-docs-end theme-token-refs
-
-// The :root tokens behind one slot, keyed by color name, for utility maps that
-// need to point a whole family at the same slot.
-@function theme-color-refs($slot, $key-suffix: "") {
-  $result: ();
-
-  @each $color in map.keys($theme-colors) {
-    $result: map.set($result, "#{$color}#{$key-suffix}", var(--#{$prefix}#{$color}#{map.get($theme-token-refs, $slot)}));
-  }
-
-  @return $result;
-}
-
-// Theme token to root tokens
-//
-// Returns the global :root token reference for a given a given token map, prefix, and key.
-// Ex: theme-token-refs($theme-bgs, "bg") => (body: var(--bg-body), 1: var(--bg-1), ...)
-// Skips `inherit` since it's a CSS-wide keyword that can't be stored in a custom property.
-@function theme-token-refs($map, $token) {
-  $result: ();
-
-  @each $key, $value in $map {
-    @if $value != inherit {
-      $result: map.merge($result, ($key: var(--#{$prefix}#{$token}-#{$key})));
-    }
-  }
-
-  @return $result;
-}
-
 // scss-docs-start util-opacity-map
 $util-opacity: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
@@ -255,32 +294,11 @@ $util-opacity: defaults(
 );
 // scss-docs-end util-opacity-map
 
-// Generate opacity values using color-mix()
-// $fallback lets the referenced $color-var fall back to another color (e.g. currentcolor)
-// when it hasn't been set by a companion color utility.
-@function theme-opacity-values($color-var, $fallback: null, $opacities: $util-opacity) {
-  $result: ();
-  // stylelint-disable-next-line scss/at-function-named-arguments, @stylistic/function-whitespace-after
-  $color: if(sass($fallback): var($color-var, $fallback); else: var($color-var));
-
-  @each $key, $value in $opacities {
-    @if $key == 100 {
-      // For 100%, use direct variable reference (more efficient)
-      $result: map.merge($result, ($key: $color));
-    } @else {
-      // For other values, use color-mix()
-      $percentage: $key * 1%;
-      $result: map.merge($result, ($key: color-mix(in oklch, $color $percentage, transparent)));
-    }
-  }
-
-  @return $result;
-}
-
 // scss-docs-start theme-interaction-variables
-// Tuned to land near the shade-color() amounts compiled before the states moved into CSS.
 $theme-hover-lightness:   .85 !default;
+$theme-hover-chroma:      1.1 !default;
 $theme-active-lightness:  .8 !default;
+$theme-active-chroma:     1.15 !default;
 // scss-docs-end theme-interaction-variables
 
 // The neutral pair steps along the gray scale instead of shifting lightness: its
@@ -303,109 +321,3 @@ $theme-state-colors: defaults(
   $theme-state-colors
 );
 // scss-docs-end theme-state-colors
-
-@mixin theme-tokens($state) {
-  @each $token, $suffix in $theme-token-refs {
-    --#{$prefix}theme-#{$token}: var(--#{$prefix}#{$state}#{$suffix});
-  }
-
-  $overrides: map.get($theme-state-colors, $state) or ();
-
-  @each $token, $lightness in ("hover": $theme-hover-lightness, "active": $theme-active-lightness) {
-    $override: map.get($overrides, $token);
-
-    @if $override {
-      --#{$prefix}theme-#{$token}: #{$override};
-    } @else {
-      --#{$prefix}theme-#{$token}: oklch(from var(--#{$prefix}#{$state}-bg) calc(l * #{$lightness}) c h);
-    }
-  }
-}
-
-// scss-docs-start theme-classes
-@mixin generate-theme-classes() {
-  @each $state in map.keys($theme-colors) {
-    .theme-#{$state} {
-      @include theme-tokens($state);
-    }
-  }
-}
-// scss-docs-end theme-classes
-
-// scss-docs-start theme-reset
-@mixin theme-reset() {
-  @each $token, $suffix in map.merge($theme-token-refs, ("hover": null, "active": null)) {
-    --#{$prefix}theme-#{$token}: initial;
-  }
-}
-
-@mixin generate-theme-reset() {
-  .theme-reset {
-    @include theme-reset();
-  }
-}
-// scss-docs-end theme-reset
-
-@function -scheme-pair($value) {
-  @return meta.type-of($value) != color and string.index(meta.inspect($value), "light-dark(") == 1;
-}
-
-@function theme-color-scale-tokens() {
-  $tokens: ();
-
-  @each $color, $slots in $theme-colors {
-    $base: map.get($slots, "base");
-
-    @if -scheme-pair($base) {
-      $tokens: map.set($tokens, --#{$prefix}#{$color}-base, $base);
-    } @else if $base != null {
-      $tokens: map.merge($tokens, color-scale-tokens($color, $base, --#{$prefix}#{$color}-base));
-    }
-  }
-
-  @return $tokens;
-}
-
-@function theme-color-tokens() {
-  $tokens: ();
-
-  // The action-background slot: what checked, active and filled states read.
-  // Points at the base color, so overriding either retunes every action state.
-  @each $color in map.keys($theme-colors) {
-    $tokens: map.set($tokens, --#{$prefix}#{$color}-bg, var(--#{$prefix}#{$color}-base));
-  }
-
-  @each $color, $value in $theme-colors-fg-emphasis {
-    $tokens: map.set($tokens, --#{$prefix}#{$color}-fg-emphasis, $value);
-  }
-
-  @each $color, $value in $theme-colors-bg-subtle {
-    $tokens: map.set($tokens, --#{$prefix}#{$color}-bg-subtle, $value);
-  }
-
-  @each $color, $value in $theme-colors-border {
-    $tokens: map.set($tokens, --#{$prefix}#{$color}-border, $value);
-  }
-
-  @each $color, $value in $theme-colors-contrast {
-    $tokens: map.set($tokens, --#{$prefix}#{$color}-contrast, $value);
-  }
-
-  @each $color, $value in $theme-colors-fg {
-    $tokens: map.set($tokens, --#{$prefix}#{$color}-fg, $value);
-  }
-
-  @each $color, $value in $theme-colors-bg-muted {
-    $tokens: map.set($tokens, --#{$prefix}#{$color}-bg-muted, $value);
-  }
-
-  @each $color, $value in $theme-colors-focus-ring {
-    $tokens: map.set($tokens, --#{$prefix}#{$color}-focus-ring, $value);
-  }
-
-  @return $tokens;
-}
-
-@mixin theme-color-tokens() {
-  @include tokens(theme-color-tokens());
-}

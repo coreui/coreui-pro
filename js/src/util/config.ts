@@ -20,6 +20,12 @@ import { isElement, toType } from './index.js'
 type ComponentConfig = Record<string, any>
 
 /**
+ * Constants
+ */
+
+const DISALLOWED_ATTRIBUTES = new Set(['sanitize', 'allowList', 'sanitizeFn'])
+
+/**
  * Class definition
  */
 
@@ -55,11 +61,18 @@ class Config {
 
   _mergeConfigObj(config?: ComponentConfig | null, element?: Element): ComponentConfig {
     const jsonConfig = isElement(element) ? Manipulator.getDataAttribute(element, 'config') : {} // try to parse
+    const markupConfig: ComponentConfig = {
+      ...(typeof jsonConfig === 'object' ? jsonConfig : {}),
+      ...(isElement(element) ? Manipulator.getDataAttributes(element as HTMLElement) : {})
+    }
+
+    for (const key of DISALLOWED_ATTRIBUTES) {
+      delete markupConfig[key]
+    }
 
     return {
       ...this.constructor.Default,
-      ...(typeof jsonConfig === 'object' ? jsonConfig : {}),
-      ...(isElement(element) ? Manipulator.getDataAttributes(element as HTMLElement) : {}),
+      ...markupConfig,
       ...(typeof config === 'object' ? config : {})
     }
   }

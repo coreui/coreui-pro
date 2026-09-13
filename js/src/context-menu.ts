@@ -10,7 +10,9 @@ import EventHandler, { type CoreUIEvent } from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import Menu, { type MenuConfig } from './menu.js'
 import type { ComponentConfig } from './util/config.js'
-import { defineJQueryPlugin, isDisabled, noop } from './util/index.js'
+import {
+  defineJQueryPlugin, isDisabled, jQueryDispatch, noop
+} from './util/index.js'
 
 /**
  * Constants
@@ -288,19 +290,7 @@ class ContextMenu extends Menu {
   }
 
   static jQueryInterface(this: any, config: any): void {
-    return this.each(function (this: HTMLElement) {
-      const data: any = ContextMenu.getOrCreateInstance(this, config)
-
-      if (typeof config !== 'string') {
-        return
-      }
-
-      if (typeof data[config as string] === 'undefined') {
-        throw new TypeError(`No method named "${config}"`)
-      }
-
-      data[config as string]()
-    })
+    return jQueryDispatch(this, ContextMenu, config)
   }
 }
 

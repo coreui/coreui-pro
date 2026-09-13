@@ -287,6 +287,16 @@ describe('PasswordInput', () => {
       expect(toggle.getAttribute('aria-pressed')).toBe('false')
     })
 
+    it('should drop the button listener on dispose', () => {
+      const input = initialized('<input type="password" class="form-control" data-coreui-toggle="password-input">')
+      const toggle = fixtureEl.querySelector('.form-control-action')
+
+      PasswordInput.getInstance(input).dispose()
+      toggle.dispatchEvent(createEvent('click'))
+
+      expect(input.type).toBe('password')
+    })
+
     it('should disable its button for a disabled control', () => {
       initialized('<input type="password" class="form-control" disabled data-coreui-toggle="password-input">')
 
@@ -323,6 +333,13 @@ describe('PasswordInput', () => {
 
       expect(input.className).toBe('form-control form-control-lg mb-3')
       expect(fixtureEl.querySelector('.form-control-group')).toBeNull()
+    })
+
+    it('should keep state classes on the input', () => {
+      const input = initialized('<input type="password" class="form-control is-invalid js-secret" data-coreui-toggle="password-input">')
+
+      expect(input.className).toBe('form-control is-invalid js-secret')
+      expect(input.parentElement.classList.contains('is-invalid')).toBe(false)
     })
 
     it('should keep a group the author wrote', () => {

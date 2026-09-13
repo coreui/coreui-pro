@@ -1,5 +1,7 @@
+import { userEvent } from '@vitest/browser/context'
 import DatePicker from '../../src/date-picker.js'
-import { clearFixture, getFixture } from '../helpers/fixture.js'
+import Dialog from '../../src/dialog.js'
+import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
 
 describe('DatePicker', () => {
   let fixtureEl
@@ -172,12 +174,41 @@ describe('DatePicker', () => {
 
       el.querySelector('.form-control-action').click()
       expect(el.classList.contains('show')).toBeTrue()
-      expect(el.getAttribute('aria-expanded')).toEqual('true')
+      expect(el.querySelector('.form-control-action').getAttribute('aria-expanded')).toEqual('true')
+      expect(el.querySelector('.form-control-action').getAttribute('aria-controls')).toEqual(picker._menu.id)
 
       el.querySelector('.form-control-action').click()
       expect(el.classList.contains('show')).toBeFalse()
       expect(calls).toEqual(['show', 'shown', 'hide', 'hidden'])
       expect(picker._popup.isShown).toBeFalse()
+    })
+
+    it('should not open when show is prevented', () => {
+      const picker = buildPicker()
+      const el = fixtureEl.querySelector('#picker')
+      const shown = jasmine.createSpy('shown')
+      el.addEventListener('show.coreui.date-picker', event => event.preventDefault())
+      el.addEventListener('shown.coreui.date-picker', shown)
+
+      picker.show()
+
+      expect(picker._popup.isShown).toBeFalse()
+      expect(el.classList.contains('show')).toBeFalse()
+      expect(shown).not.toHaveBeenCalled()
+    })
+
+    it('should stay open when hide is prevented', () => {
+      const picker = buildPicker()
+      const el = fixtureEl.querySelector('#picker')
+      const hidden = jasmine.createSpy('hidden')
+      el.addEventListener('hide.coreui.date-picker', event => event.preventDefault())
+      el.addEventListener('hidden.coreui.date-picker', hidden)
+
+      picker.show()
+      picker.hide()
+
+      expect(picker._popup.isShown).toBeTrue()
+      expect(hidden).not.toHaveBeenCalled()
     })
 
     it('should disable the indicator button when the picker is disabled', () => {
@@ -193,6 +224,158 @@ describe('DatePicker', () => {
       picker.show()
 
       expect(picker._popup.isShown).toBeFalse()
+    })
+  })
+
+  describe('markup roles', () => {
+    const OWN_MARKUP = `<div id="picker" data-coreui-locale="en-US">
+        <div data-coreui-picker-field></div>
+        <button type="button" class="btn btn-subtle btn-sm" data-coreui-picker-cleaner><svg viewBox="0 0 16 16"><path d="M0 0h16"/></svg></button>
+        <button type="button" class="btn btn-subtle btn-sm" data-coreui-picker-toggle>Pick a date <svg viewBox="0 0 16 16"><path d="M0 0h16"/></svg></button>
+      </div>`
+
+    it('should adopt the field, toggle and cleaner the author wrote instead of building its own', () => {
+      const picker = buildPicker({ date: new Date(2026, 6, 14) }, OWN_MARKUP)
+      const el = fixtureEl.querySelector('#picker')
+
+      expect(el.querySelector('.form-control-action')).toBeNull()
+      expect(el.querySelector('.form-control-cleaner')).toBeNull()
+      expect(el.querySelector('[data-coreui-picker-field] .form-date-time-section')).not.toBeNull()
+      expect(el.querySelector('input[type="hidden"]').value).toEqual('07/14/2026')
+
+      el.querySelector('[data-coreui-picker-toggle]').click()
+      expect(picker._popup.isShown).toBeTrue()
+      el.querySelector('[data-coreui-picker-toggle]').click()
+      expect(picker._popup.isShown).toBeFalse()
+
+      el.querySelector('[data-coreui-picker-cleaner]').click()
+      expect(picker.getDate()).toBeNull()
+    })
+
+    it('should give an adopted toggle the accessibility it would have given its own', () => {
+      const picker = buildPicker({}, OWN_MARKUP)
+      const el = fixtureEl.querySelector('#picker')
+      const toggle = el.querySelector('[data-coreui-picker-toggle]')
+
+      expect(toggle.getAttribute('aria-label')).toEqual('Toggle the calendar')
+      expect(toggle.getAttribute('aria-haspopup')).toEqual('dialog')
+      expect(toggle.getAttribute('aria-controls')).toEqual(picker._menu.id)
+      expect(toggle.getAttribute('aria-expanded')).toEqual('false')
+      expect(el.querySelector('[data-coreui-picker-cleaner]').getAttribute('aria-label')).toEqual('Clear the value')
+
+      for (const svg of el.querySelectorAll('svg')) {
+        expect(svg.getAttribute('aria-hidden')).toEqual('true')
+      }
+
+      picker.show()
+      expect(toggle.getAttribute('aria-expanded')).toEqual('true')
+    })
+
+    it('should keep the name the author gave the toggle', () => {
+      buildPicker({}, '<div id="picker"><div data-coreui-picker-field></div><button type="button" aria-label="Open" data-coreui-picker-toggle></button></div>')
+
+      expect(fixtureEl.querySelector('[data-coreui-picker-toggle]').getAttribute('aria-label')).toEqual('Open')
+    })
+
+    it('should disable an adopted toggle and cleaner when the picker is disabled', () => {
+      buildPicker({ disabled: true }, OWN_MARKUP)
+
+      expect(fixtureEl.querySelector('[data-coreui-picker-toggle]').disabled).toBeTrue()
+      expect(fixtureEl.querySelector('[data-coreui-picker-cleaner]').disabled).toBeTrue()
+    })
+
+    it('should leave the author\'s elements in place on dispose', () => {
+      const picker = buildPicker({}, OWN_MARKUP)
+      const el = fixtureEl.querySelector('#picker')
+
+      picker.dispose()
+      pickers.length = 0
+
+      expect(el.querySelector('[data-coreui-picker-field]')).not.toBeNull()
+      expect(el.querySelector('[data-coreui-picker-toggle]')).not.toBeNull()
+      expect(el.querySelector('[data-coreui-picker-cleaner]')).not.toBeNull()
+    })
+
+    it('should keep the field and the calendar on the one date the picker owns', () => {
+      const picker = buildPicker({ locale: 'en-US', date: new Date(2026, 6, 14) })
+      const emitted = []
+      fixtureEl.querySelector('#picker').addEventListener('dateChange.coreui.date-picker', event => emitted.push(event.date))
+
+      picker.show()
+      fixtureEl.querySelector('.date-picker-popup .calendar-cell[data-coreui-date^="Mon Jul 20 2026"]').click()
+      expect(picker.getDate()).toEqual(new Date(2026, 6, 20))
+      expect(picker._calendar._startDate).toEqual(new Date(2026, 6, 20))
+
+      picker.setDate(new Date(2026, 6, 20))
+      expect(emitted.length).toBe(1)
+
+      picker.setDate(new Date(2026, 6, 21))
+      expect(fixtureEl.querySelector('#picker input[type="hidden"]').value).toEqual('07/21/2026')
+      expect(picker._calendar._startDate).toEqual(new Date(2026, 6, 21))
+      expect(emitted.length).toBe(2)
+    })
+  })
+
+  describe('inside a dialog', () => {
+    it('should take the first Escape for itself and leave the second to the dialog', async () => {
+      const picker = buildPicker({}, '<dialog class="dialog dialog-instant" id="dialog"><div id="picker"></div></dialog>')
+      const dialogEl = fixtureEl.querySelector('#dialog')
+      const dialog = new Dialog(dialogEl)
+      const hidden = new Promise(resolve => {
+        dialogEl.addEventListener('hidden.coreui.dialog', resolve)
+      })
+
+      await dialog.show()
+      picker.show()
+      expect(picker._popup.isShown).toBeTrue()
+
+      await userEvent.keyboard('{Escape}')
+      expect(picker._popup.isShown).toBeFalse()
+      expect(dialogEl.open).toBeTrue()
+
+      await userEvent.keyboard('{Escape}')
+      await hidden
+      expect(dialogEl.open).toBeFalse()
+
+      dialog.dispose()
+    })
+  })
+
+  describe('dateChange payload', () => {
+    it('should carry the same shape whether the day comes from the calendar or the field', () => {
+      const picker = buildPicker({ locale: 'en-US', date: new Date(2026, 6, 14) })
+      const el = fixtureEl.querySelector('#picker')
+      const emitted = []
+      el.addEventListener('dateChange.coreui.date-picker', event => emitted.push(event))
+
+      picker.show()
+      fixtureEl.querySelector('.date-picker-popup .calendar-cell[tabindex="0"]').click()
+      picker.setDate(new Date(2026, 6, 20))
+
+      expect(emitted.length).toBe(2)
+      for (const event of emitted) {
+        expect(event.date).toBeInstanceOf(Date)
+        expect(event.formattedDate).toBeInstanceOf(Date)
+        expect('dateObject' in event).toBeFalse()
+      }
+    })
+
+    it('should report null when the field refuses the calendar selection', () => {
+      const picker = buildPicker({
+        locale: 'en-US', date: new Date(2026, 6, 14),
+        inputOptions: { maxDate: new Date(2026, 6, 14) }, calendarOptions: { maxDate: new Date(2026, 6, 31) }
+      })
+      const el = fixtureEl.querySelector('#picker')
+      let emitted = null
+      el.addEventListener('dateChange.coreui.date-picker', event => {
+        emitted = event
+      })
+
+      picker.show()
+      fixtureEl.querySelector('.date-picker-popup .calendar-cell[data-coreui-date^="Mon Jul 20 2026"]').click()
+
+      expect(emitted.date).toBeNull()
+      expect(picker.getDate()).toBeNull()
     })
   })
 
@@ -240,14 +423,15 @@ describe('DatePicker', () => {
       const el = fixtureEl.querySelector('#picker')
       let emitted = null
       el.addEventListener('dateChange.coreui.date-picker', event => {
-        emitted = event.date
+        emitted = event
       })
 
       picker.show()
       fixtureEl.querySelector('.date-picker-popup .calendar-row[tabindex="0"] .calendar-cell').click()
 
-      expect(emitted).toMatch(/^\d{4}W\d{2}$/)
-      expect(el.querySelector('input[type="hidden"]').value).toEqual(`Week ${emitted.slice(5)}, ${emitted.slice(0, 4)}`)
+      expect(emitted.date).toBeInstanceOf(Date)
+      expect(emitted.formattedDate).toMatch(/^\d{4}W\d{2}$/)
+      expect(el.querySelector('input[type="hidden"]').value).toEqual(`Week ${emitted.formattedDate.slice(5)}, ${emitted.formattedDate.slice(0, 4)}`)
     })
 
     it('should keep the ISO week-numbering year around January 1st', () => {
@@ -513,6 +697,65 @@ describe('DatePicker', () => {
       fixtureEl.querySelector('[data-coreui-picker-action="clear"]').click()
 
       expect(picker.getDate()).toBeNull()
+    })
+  })
+
+  describe('jQueryInterface', () => {
+    it('should create date-picker', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const el = fixtureEl.querySelector('#host')
+
+      jQueryMock.fn.datePicker = DatePicker.jQueryInterface
+      jQueryMock.elements = [el]
+
+      jQueryMock.fn.datePicker.call(jQueryMock)
+
+      expect(DatePicker.getInstance(el)).not.toBeNull()
+      DatePicker.getInstance(el).dispose()
+    })
+
+    it('should not re-create date-picker', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const el = fixtureEl.querySelector('#host')
+      const picker = new DatePicker(el)
+
+      jQueryMock.fn.datePicker = DatePicker.jQueryInterface
+      jQueryMock.elements = [el]
+
+      jQueryMock.fn.datePicker.call(jQueryMock)
+
+      expect(DatePicker.getInstance(el)).toEqual(picker)
+      picker.dispose()
+    })
+
+    it('should call a public method by name', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const el = fixtureEl.querySelector('#host')
+      const picker = new DatePicker(el)
+      const spy = spyOn(picker, 'show')
+
+      jQueryMock.fn.datePicker = DatePicker.jQueryInterface
+      jQueryMock.elements = [el]
+
+      jQueryMock.fn.datePicker.call(jQueryMock, 'show')
+
+      expect(spy).toHaveBeenCalled()
+      picker.dispose()
+    })
+
+    it('should throw error on undefined method', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const el = fixtureEl.querySelector('#host')
+      const picker = new DatePicker(el)
+
+      jQueryMock.fn.datePicker = DatePicker.jQueryInterface
+      jQueryMock.elements = [el]
+
+      expect(() => {
+        jQueryMock.fn.datePicker.call(jQueryMock, 'undefinedMethod')
+      }).toThrowError(TypeError, 'No method named "undefinedMethod"')
+
+      picker.dispose()
     })
   })
 

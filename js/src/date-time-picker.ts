@@ -16,11 +16,11 @@ import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import Popup from './util/popup.js'
 import TimeSelection from './util/time-selection.js'
-import { sanitizeHtml, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
+import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 import type { ComponentConfig } from './util/config.js'
-import { appendControlGroupField, createControlGroupAction } from './util/form-control-group.js'
-import { CLEANER_ICON } from './util/icons.js'
-import { defineJQueryPlugin } from './util/index.js'
+import { appendControlGroupField, applyControlGroupClasses, createControlGroupAction } from './util/form-control-group.js'
+import { CALENDAR_ICON, CLEANER_ICON } from './util/icons.js'
+import { defineJQueryPlugin, getUID, jQueryDispatch } from './util/index.js'
 
 /**
  * Constants
@@ -62,7 +62,6 @@ const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="date-time-picker"]'
 const SELECTOR_TEMPLATE_FOOTER = 'template[data-coreui-template="footer"]'
 
 // Icons live in JavaScript, not in CSS masks — the chips pattern.
-const DEFAULT_INDICATOR_ICON: string = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512" fill="currentColor"><path d="M472 96h-88V40h-32v56H160V40h-32v56H40a24.03 24.03 0 0 0-24 24v336a24.03 24.03 0 0 0 24 24h432a24.03 24.03 0 0 0 24-24V120a24.03 24.03 0 0 0-24-24Zm-8 352H48V128h80v40h32v-40h192v40h32v-40h80Z"/><rect width="32" height="32" x="112" y="224"/><rect width="32" height="32" x="200" y="224"/><rect width="32" height="32" x="280" y="224"/><rect width="32" height="32" x="368" y="224"/><rect width="32" height="32" x="112" y="296"/><rect width="32" height="32" x="200" y="296"/><rect width="32" height="32" x="280" y="296"/><rect width="32" height="32" x="368" y="296"/><rect width="32" height="32" x="112" y="368"/><rect width="32" height="32" x="200" y="368"/><rect width="32" height="32" x="280" y="368"/><rect width="32" height="32" x="368" y="368"/></svg>'
 
 type DateTimePickerConfig = {
   allowList: SanitizerAllowList
@@ -99,7 +98,7 @@ const Default: DateTimePickerConfig = {
   date: null,
   disabled: false,
   floatingLabel: null,
-  indicatorIcon: DEFAULT_INDICATOR_ICON,
+  indicatorIcon: CALENDAR_ICON,
   inputOptions: {},
   locale: navigator.language,
   maxDate: null,
@@ -275,10 +274,6 @@ class DateTimePicker extends BaseComponent {
     return { ...forwarded, ...overrides, ...extra }
   }
 
-  _sanitizeIcon(icon: string): string {
-    return this._config.sanitize ? sanitizeHtml(icon, this._config.allowList, this._config.sanitizeFn) : icon
-  }
-
   _createDateTimePicker(): void {
     this._element.classList.add(
       CLASS_NAME_DATE_PICKER, CLASS_NAME_DATE_TIME_PICKER, CLASS_NAME_PICKER
@@ -288,7 +283,7 @@ class DateTimePicker extends BaseComponent {
     // carries `.form-control-group` itself instead of nesting one.
     const inputGroup = this._element
     this._addedGroupClass = !inputGroup.classList.contains(CLASS_NAME_INPUT_GROUP)
-    inputGroup.classList.add(CLASS_NAME_INPUT_GROUP)
+    applyControlGroupClasses(inputGroup, CLASS_NAME_INPUT_GROUP)
 
     // Sizing rides the standard control classes on the frame itself
     if (this._config.size) {
@@ -299,7 +294,7 @@ class DateTimePicker extends BaseComponent {
     this._fieldElement = appendControlGroupField(inputGroup, inputEl, this._config.floatingLabel, `${this.constructor.NAME}-`)
 
     const action = (className: string, icon: string, label: string) => createControlGroupAction({
-      className, disabled: this._config.disabled, icon, label, sanitizeIcon: (value: string) => this._sanitizeIcon(value)
+      className, disabled: this._config.disabled, icon, label, sanitizeIcon: (value: string) => sanitizeByConfig(value, this._config)
     })
 
     if (this._config.cleaner) {
@@ -328,7 +323,11 @@ class DateTimePicker extends BaseComponent {
     })
 
     this._menu = document.createElement('div')
+    this._menu.id = getUID(`${this.constructor.NAME}-popup-`)
     this._menu.classList.add(CLASS_NAME_POPUP, CLASS_NAME_DROPDOWN)
+    this._indicatorElement.setAttribute('aria-controls', this._menu.id)
+    this._indicatorElement.setAttribute('aria-expanded', 'false')
+    this._indicatorElement.setAttribute('aria-haspopup', 'dialog')
 
     const body = document.createElement('div')
     body.classList.add(CLASS_NAME_BODY)
@@ -438,12 +437,13 @@ class DateTimePicker extends BaseComponent {
       anchor: this._element,
       container: this._config.container,
       content: this._menu,
+      onBeforeHide: () => !EventHandler.trigger(this._element, EVENT_HIDE)?.defaultPrevented,
+      onBeforeShow: () => !EventHandler.trigger(this._element, EVENT_SHOW)?.defaultPrevented,
       onHidden: () => EventHandler.trigger(this._element, EVENT_HIDDEN),
       onHide: () => {
         this._menu.classList.remove(CLASS_NAME_SHOW)
         this._element.classList.remove(CLASS_NAME_SHOW)
-        this._element.setAttribute('aria-expanded', 'false')
-        EventHandler.trigger(this._element, EVENT_HIDE)
+        this._indicatorElement.setAttribute('aria-expanded', 'false')
       },
       onShow: () => {
         // the classes come first: the selection body scrolls the selected cell
@@ -451,8 +451,7 @@ class DateTimePicker extends BaseComponent {
         this._menu.classList.add(CLASS_NAME_SHOW)
         this._element.classList.add(CLASS_NAME_SHOW)
         this._ensureBodies()
-        this._element.setAttribute('aria-expanded', 'true')
-        EventHandler.trigger(this._element, EVENT_SHOW)
+        this._indicatorElement.setAttribute('aria-expanded', 'true')
       },
       onShown: () => EventHandler.trigger(this._element, EVENT_SHOWN)
     })
@@ -481,6 +480,11 @@ class DateTimePicker extends BaseComponent {
       }
     })
   }
+
+  // Static
+  static jQueryInterface(this: any, config: any): void {
+    return jQueryDispatch(this, DateTimePicker, config)
+  }
 }
 
 /**
@@ -497,8 +501,6 @@ EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
  * jQuery
  */
 
-// The v2 pickers define no `jQueryInterface`, so the plugin registers as
-// `undefined` — preserved as-is; fixing it is a behaviour change.
-defineJQueryPlugin(DateTimePicker as any)
+defineJQueryPlugin(DateTimePicker)
 
 export default DateTimePicker

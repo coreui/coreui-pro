@@ -8,10 +8,10 @@
 import BaseComponent from './base-component.js'
 import type { ComponentConfig } from './util/config.js'
 import EventHandler from './dom/event-handler.js'
-import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
-import { sanitizeHtml, SVGAllowlist, type SanitizerAllowList } from './util/sanitizer.js'
-import { defineJQueryPlugin } from './util/index.js'
+import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
+import { CHECK_ICON, REMOVE_ICON } from './util/icons.js'
+import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
 
 /**
  * Constants
@@ -41,11 +41,6 @@ const CLASS_NAME_CHIP_REMOVE = 'chip-remove'
 const CLASS_NAME_ACTIVE = 'active'
 const CLASS_NAME_DISABLED = 'disabled'
 
-const DEFAULT_REMOVE_ICON: string = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="4" x2="12" y2="12"/><line x1="12" y1="4" x2="4" y2="12"/></svg>'
-const DEFAULT_SELECTED_ICON: string = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512" fill="currentColor"><path d="M425.373 89.373 196 318.745 86.627 209.373l-45.254 45.254L196 409.255l274.627-274.628z"/></svg>'
-
-const DISALLOWED_ATTRIBUTES = new Set(['sanitize', 'allowList', 'sanitizeFn'])
-
 type ChipConfig = {
   allowList: SanitizerAllowList
   ariaRemoveLabel: string
@@ -66,12 +61,12 @@ const Default: ChipConfig = {
   disabled: false,
   filter: false,
   removable: false,
-  removeIcon: DEFAULT_REMOVE_ICON,
+  removeIcon: REMOVE_ICON,
   sanitize: true,
   sanitizeFn: null,
   selectable: false,
   selected: false,
-  selectedIcon: DEFAULT_SELECTED_ICON
+  selectedIcon: CHECK_ICON
 }
 
 const DefaultType = {
@@ -293,7 +288,7 @@ class Chip extends BaseComponent {
     const check = document.createElement('span')
     check.className = CLASS_NAME_CHIP_CHECK
     check.setAttribute('aria-hidden', 'true')
-    check.innerHTML = this._sanitizeIcon(this._config.selectedIcon)
+    check.innerHTML = sanitizeByConfig(this._config.selectedIcon, this._config)
     this._element.prepend(check)
   }
 
@@ -303,7 +298,7 @@ class Chip extends BaseComponent {
     button.className = CLASS_NAME_CHIP_REMOVE
     button.setAttribute('aria-label', this._config.ariaRemoveLabel)
     button.setAttribute('tabindex', '-1') // Not in tab order, chips handle keyboard
-    button.innerHTML = this._sanitizeIcon(this._config.removeIcon)
+    button.innerHTML = sanitizeByConfig(this._config.removeIcon, this._config)
     return button
   }
 
@@ -367,30 +362,6 @@ class Chip extends BaseComponent {
     this.dispose()
   }
 
-  _sanitizeIcon(icon: string): string {
-    return this._config.sanitize ? sanitizeHtml(icon, this._config.allowList, this._config.sanitizeFn) : icon
-  }
-
-  _getConfig(config: any): any {
-    const dataAttributes = Manipulator.getDataAttributes(this._element)
-
-    for (const dataAttribute of Object.keys(dataAttributes)) {
-      if (DISALLOWED_ATTRIBUTES.has(dataAttribute)) {
-        delete dataAttributes[dataAttribute]
-      }
-    }
-
-    config = {
-      ...dataAttributes,
-      ...(typeof config === 'object' && config ? config : {})
-    }
-    config = this._mergeConfigObj(config)
-    config = this._configAfterMerge(config)
-    this._typeCheckConfig(config)
-
-    return config
-  }
-
   // Static
   static chipInterface(element: string | Element | null, config?: any): void {
     const data: any = Chip.getOrCreateInstance(element, config)
@@ -405,19 +376,7 @@ class Chip extends BaseComponent {
   }
 
   static jQueryInterface(this: any, config: any): void {
-    return this.each(function (this: HTMLElement) {
-      const data: any = Chip.getOrCreateInstance(this)
-
-      if (typeof config !== 'string') {
-        return
-      }
-
-      if (data[config as string] === undefined || config.startsWith('_') || config === 'constructor') {
-        throw new TypeError(`No method named "${config}"`)
-      }
-
-      data[config as string](this)
-    })
+    return jQueryDispatch(this, Chip, config, element => [element])
   }
 }
 

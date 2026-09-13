@@ -50,6 +50,16 @@ describe('Popup', () => {
       expect(calls).toEqual(['show', 'shown'])
     })
 
+    it('should stay hidden when onBeforeShow returns false', () => {
+      const onShow = jasmine.createSpy('onShow')
+      const popup = buildPopup({ onBeforeShow: () => false, onShow })
+
+      popup.show()
+
+      expect(popup.isShown).toBeFalse()
+      expect(onShow).not.toHaveBeenCalled()
+    })
+
     it('should not fire callbacks when already shown', () => {
       const spy = jasmine.createSpy('onShow')
       const popup = buildPopup({ onShow: spy })
@@ -74,6 +84,17 @@ describe('Popup', () => {
   })
 
   describe('hide', () => {
+    it('should stay shown when onBeforeHide returns false', () => {
+      const onHide = jasmine.createSpy('onHide')
+      const popup = buildPopup({ onBeforeHide: () => false, onHide })
+
+      popup.show()
+      popup.hide()
+
+      expect(popup.isShown).toBeTrue()
+      expect(onHide).not.toHaveBeenCalled()
+    })
+
     it('should clear isShown and fire onHide/onHidden in order', () => {
       const calls = []
       const popup = buildPopup({
@@ -104,6 +125,33 @@ describe('Popup', () => {
       outside.focus()
       popup.show()
       fixtureEl.querySelector('#option').focus()
+      popup.hide()
+
+      expect(document.activeElement).toEqual(outside)
+    })
+
+    it('should fall back to the anchor when the element it remembered is gone', () => {
+      const popup = buildPopup()
+      const anchor = fixtureEl.querySelector('#anchor')
+
+      fixtureEl.querySelector('#inside').focus()
+      popup.show()
+      fixtureEl.querySelector('#option').focus()
+      // The field rebuilds its markup as the value lands, taking the remembered
+      // node with it.
+      anchor.innerHTML = '<button id="rebuilt">toggle</button>'
+      popup.hide()
+
+      expect(document.activeElement).toEqual(fixtureEl.querySelector('#rebuilt'))
+    })
+
+    it('should leave focus alone when it already moved outside the panel', () => {
+      const popup = buildPopup()
+      const outside = fixtureEl.querySelector('#outside')
+
+      fixtureEl.querySelector('#inside').focus()
+      popup.show()
+      outside.focus()
       popup.hide()
 
       expect(document.activeElement).toEqual(outside)
@@ -392,22 +440,59 @@ describe('Popup', () => {
     })
   })
 
+  // The panel is the dialog: Tab belongs to it, and the field it was opened
+  // from sits outside and stays out of the cycle.
+  describe('the trapped panel', () => {
+    it('should announce itself as a modal dialog', () => {
+      const popup = buildPopup({ focusTrap: true })
+
+      popup.show()
+
+      const content = fixtureEl.querySelector('#content')
+      expect(content.getAttribute('role')).toEqual('dialog')
+      expect(content.getAttribute('aria-modal')).toEqual('true')
+    })
+
+    it('should leave an untrapped panel without a dialog role', () => {
+      const popup = buildPopup()
+
+      popup.show()
+
+      expect(fixtureEl.querySelector('#content').getAttribute('role')).toBeNull()
+    })
+
+    it('should keep focus moving out of the panel from reaching the field', () => {
+      const popup = buildPopup({ focusTrap: true })
+
+      popup.show()
+      fixtureEl.querySelector('#outside').focus()
+
+      expect(fixtureEl.querySelector('#content').contains(document.activeElement)).toBeTrue()
+    })
+  })
+
   describe('dismissal', () => {
-    it('should hide on outside click', () => {
+    // The press closes the panel, not the click that follows it: the focus has
+    // to be free before the browser moves it onto whatever was pressed.
+    const press = element => {
+      element.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true }))
+    }
+
+    it('should hide on an outside press', () => {
       const popup = buildPopup()
       popup.show()
 
-      fixtureEl.querySelector('#outside').click()
+      press(fixtureEl.querySelector('#outside'))
 
       expect(popup.isShown).toBeFalse()
     })
 
-    it('should not hide on click inside the anchor or content', () => {
+    it('should not hide on a press inside the anchor or content', () => {
       const popup = buildPopup()
       popup.show()
 
-      fixtureEl.querySelector('#inside').click()
-      fixtureEl.querySelector('#option').click()
+      press(fixtureEl.querySelector('#inside'))
+      press(fixtureEl.querySelector('#option'))
 
       expect(popup.isShown).toBeTrue()
     })
@@ -424,6 +509,21 @@ describe('Popup', () => {
       button.click()
 
       expect(popup.isShown).toBeTrue()
+    })
+
+    it('should consume Escape pressed inside the panel', () => {
+      const popup = buildPopup()
+      const reachedDocument = jasmine.createSpy('document keydown')
+      document.addEventListener('keydown', reachedDocument)
+      popup.show()
+
+      const event = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true })
+      fixtureEl.querySelector('#option').dispatchEvent(event)
+      document.removeEventListener('keydown', reachedDocument)
+
+      expect(popup.isShown).toBeFalse()
+      expect(event.defaultPrevented).toBeTrue()
+      expect(reachedDocument).not.toHaveBeenCalled()
     })
 
     it('should hide on Escape', () => {
@@ -505,6 +605,36 @@ describe('Popup', () => {
 
       expect(popup.isMobile).toBeTrue()
       expect(fixtureEl.querySelector('#content').style.position).toEqual('')
+    })
+
+    it('should position with physical offsets only, so RTL gets no competing inline-start', () => {
+      return new Promise((resolve, reject) => {
+        document.documentElement.dir = 'rtl'
+        const popup = buildPopup({ mobileBreakpoint: 0 })
+        const content = fixtureEl.querySelector('#content')
+        popup.show()
+
+        const waitForPosition = deadline => {
+          if (content.style.position === 'absolute') {
+            document.documentElement.dir = ''
+            expect(content.style.left).not.toEqual('')
+            expect(content.style.right).toEqual('')
+            expect(content.style.insetInlineStart).toEqual('')
+            resolve()
+            return
+          }
+
+          if (Date.now() > deadline) {
+            document.documentElement.dir = ''
+            reject(new Error('content was never positioned'))
+            return
+          }
+
+          setTimeout(() => waitForPosition(deadline), 25)
+        }
+
+        waitForPosition(Date.now() + 2000)
+      })
     })
 
     it('should absolutely position the content after show', () => {

@@ -250,6 +250,25 @@ const defineJQueryPlugin = (plugin: JQueryPlugin): void => {
   })
 }
 
+type JQueryComponent = { getOrCreateInstance: (element: Element, config?: any) => any }
+
+// A string argument names a public method; private members and misses throw.
+const jQueryDispatch = (collection: any, Component: JQueryComponent, config: any, args: unknown[] | ((element: HTMLElement) => unknown[]) = []): any => {
+  return collection.each(function (this: HTMLElement) {
+    const data = Component.getOrCreateInstance(this, config)
+
+    if (typeof config !== 'string') {
+      return
+    }
+
+    if (data[config] === undefined || config.startsWith('_') || config === 'constructor') {
+      throw new TypeError(`No method named "${config}"`)
+    }
+
+    data[config](...(typeof args === 'function' ? args(this) : args))
+  })
+}
+
 const execute = <T = any>(possibleCallback: T | ((...functionArgs: any[]) => T), args: any[] = [], defaultValue: T | ((...functionArgs: any[]) => T) = possibleCallback): T => {
   return typeof possibleCallback === 'function' ? (possibleCallback as (...functionArgs: any[]) => T).call(...args as [any, ...any[]]) : defaultValue as T
 }
@@ -337,6 +356,7 @@ export {
   isElement,
   isRTL,
   isVisible,
+  jQueryDispatch,
   noop,
   onDOMContentLoaded,
   parseSelector,

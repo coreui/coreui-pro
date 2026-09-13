@@ -13,7 +13,7 @@ import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import type { ComponentConfig } from './util/config.js'
 import {
-  defineJQueryPlugin, getElement, isDisabled, isVisible
+  defineJQueryPlugin, getElement, isDisabled, isVisible, jQueryDispatch
 } from './util/index.js'
 
 /**
@@ -585,19 +585,7 @@ class ScrollSpy extends BaseComponent {
 
   // Static
   static jQueryInterface(this: any, config: any): void {
-    return this.each(function (this: HTMLElement) {
-      const data: any = ScrollSpy.getOrCreateInstance(this, config)
-
-      if (typeof config !== 'string') {
-        return
-      }
-
-      if (data[config as string] === undefined || config.startsWith('_') || config === 'constructor') {
-        throw new TypeError(`No method named "${config}"`)
-      }
-
-      data[config as string]()
-    })
+    return jQueryDispatch(this, ScrollSpy, config)
   }
 }
 

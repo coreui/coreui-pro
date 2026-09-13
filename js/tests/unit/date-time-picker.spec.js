@@ -1,5 +1,5 @@
 import DateTimePicker from '../../src/date-time-picker.js'
-import { clearFixture, getFixture } from '../helpers/fixture.js'
+import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
 
 describe('DateTimePicker', () => {
   let fixtureEl
@@ -221,6 +221,65 @@ describe('DateTimePicker', () => {
       picker.getContext().clear()
 
       expect(picker.getDate()).toBeNull()
+    })
+  })
+
+  describe('jQueryInterface', () => {
+    it('should create date-time-picker', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const el = fixtureEl.querySelector('#host')
+
+      jQueryMock.fn.dateTimePicker = DateTimePicker.jQueryInterface
+      jQueryMock.elements = [el]
+
+      jQueryMock.fn.dateTimePicker.call(jQueryMock)
+
+      expect(DateTimePicker.getInstance(el)).not.toBeNull()
+      DateTimePicker.getInstance(el).dispose()
+    })
+
+    it('should not re-create date-time-picker', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const el = fixtureEl.querySelector('#host')
+      const picker = new DateTimePicker(el)
+
+      jQueryMock.fn.dateTimePicker = DateTimePicker.jQueryInterface
+      jQueryMock.elements = [el]
+
+      jQueryMock.fn.dateTimePicker.call(jQueryMock)
+
+      expect(DateTimePicker.getInstance(el)).toEqual(picker)
+      picker.dispose()
+    })
+
+    it('should call a public method by name', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const el = fixtureEl.querySelector('#host')
+      const picker = new DateTimePicker(el)
+      const spy = spyOn(picker, 'show')
+
+      jQueryMock.fn.dateTimePicker = DateTimePicker.jQueryInterface
+      jQueryMock.elements = [el]
+
+      jQueryMock.fn.dateTimePicker.call(jQueryMock, 'show')
+
+      expect(spy).toHaveBeenCalled()
+      picker.dispose()
+    })
+
+    it('should throw error on undefined method', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const el = fixtureEl.querySelector('#host')
+      const picker = new DateTimePicker(el)
+
+      jQueryMock.fn.dateTimePicker = DateTimePicker.jQueryInterface
+      jQueryMock.elements = [el]
+
+      expect(() => {
+        jQueryMock.fn.dateTimePicker.call(jQueryMock, 'undefinedMethod')
+      }).toThrowError(TypeError, 'No method named "undefinedMethod"')
+
+      picker.dispose()
     })
   })
 

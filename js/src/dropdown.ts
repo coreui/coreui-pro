@@ -16,7 +16,7 @@ import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
 import Menu, { type MenuConfig } from './menu.js'
 import {
-  defineJQueryPlugin, getNextActiveElement, isRTL, isVisible
+  defineJQueryPlugin, getNextActiveElement, isRTL, isVisible, jQueryDispatch
 } from './util/index.js'
 
 /**
@@ -191,19 +191,7 @@ class Dropdown extends Menu {
 
   // Static
   static jQueryInterface(this: any, config: any): void {
-    return this.each(function (this: HTMLElement) {
-      const data: any = Dropdown.getOrCreateInstance(this, config)
-
-      if (typeof config !== 'string') {
-        return
-      }
-
-      if (typeof data[config as string] === 'undefined') {
-        throw new TypeError(`No method named "${config}"`)
-      }
-
-      data[config as string]()
-    })
+    return jQueryDispatch(this, Dropdown, config)
   }
 }
 

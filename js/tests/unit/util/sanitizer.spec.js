@@ -1,5 +1,5 @@
 import {
-  DefaultAllowlist, escapeHtml, sanitizeHtml, SVGAllowlist
+  DefaultAllowlist, escapeHtml, sanitizeByConfig, sanitizeHtml, SVGAllowlist
 } from '../../../src/util/sanitizer.js'
 
 describe('Sanitizer', () => {
@@ -20,6 +20,23 @@ describe('Sanitizer', () => {
       expect(SVGAllowlist.svg).toContain('viewbox')
       expect(SVGAllowlist.path).toContain('d')
       expect(SVGAllowlist.line).toContain('x1')
+    })
+  })
+
+  describe('sanitizeByConfig', () => {
+    it('should sanitize with the allow list and function from the config', () => {
+      const html = '<img src="x" onerror="alert(1)"><b>ok</b>'
+      const sanitizeFn = jasmine.createSpy('sanitizeFn').and.returnValue('<i>fn</i>')
+
+      expect(sanitizeByConfig(html, { sanitize: true, allowList: DefaultAllowlist })).toEqual('<img src="x"><b>ok</b>')
+      expect(sanitizeByConfig(html, { sanitize: true, allowList: DefaultAllowlist, sanitizeFn })).toEqual('<i>fn</i>')
+      expect(sanitizeFn).toHaveBeenCalledWith(html)
+    })
+
+    it('should return the html untouched when sanitize is off', () => {
+      const html = '<img src="x" onerror="alert(1)">'
+
+      expect(sanitizeByConfig(html, { sanitize: false, allowList: DefaultAllowlist })).toBe(html)
     })
   })
 

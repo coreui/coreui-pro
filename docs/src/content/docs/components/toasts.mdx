@@ -304,6 +304,10 @@ You can also get fancy with flexbox utilities to align toasts horizontally and/o
     </div>
   </div>`} />
 
+## Toaster
+
+Toasts you create at runtime — from a form submission, a request that settled, a background job — come from the [Toaster](/components/toaster/): a store keyed by id with `add()`, `update()`, `close()` and `promise()`, its own placed container with persistent live regions, a visible-toasts limit and screen-reader priority. The markup and classes on this page are what it renders.
+
 ## Accessibility
 
 Toasts are meant to be brief interruptions for your visitors or users. To assist those using screen readers and similar assistive technologies, you should wrap your toasts in an [`aria-live` region](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Live_Regions). Changes to live regions, such as injecting or updating a toast component, are automatically announced by screen readers without moving the user's focus or interrupting the user. Additionally, include `aria-atomic="true"` to ensure the entire toast is announced as a single, unfragmented unit, rather than just announcing what changed—this prevents issues if only part of the toast is updated or if the same toast appears again later. If the information is critical to the process, such as a list of form errors, use the [alert component](/components/alerts/) instead of a toast.

@@ -11,7 +11,7 @@
 import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import { enableDismissTrigger } from './util/component-functions.js'
-import { defineJQueryPlugin, getTransitionDurationFromElement } from './util/index.js'
+import { defineJQueryPlugin, getTransitionDurationFromElement, jQueryDispatch } from './util/index.js'
 
 /**
  * Constants
@@ -62,19 +62,7 @@ class Alert extends BaseComponent {
 
   // Static
   static jQueryInterface(this: any, config: any): void {
-    return this.each(function (this: HTMLElement) {
-      const data: any = Alert.getOrCreateInstance(this)
-
-      if (typeof config !== 'string') {
-        return
-      }
-
-      if (data[config as string] === undefined || config.startsWith('_') || config === 'constructor') {
-        throw new TypeError(`No method named "${config}"`)
-      }
-
-      data[config as string](this)
-    })
+    return jQueryDispatch(this, Alert, config, element => [element])
   }
 }
 

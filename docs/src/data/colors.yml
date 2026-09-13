@@ -1,0 +1,12 @@
+# The v6 palette: the five chromatic theme colours, overriding the engine's
+# Bootstrap-shaped list. Values mirror `$colors` in scss/_colors.scss.
+- name: primary
+  hex: "oklch(52.945% 0.19103 278.34)"
+- name: success
+  hex: "oklch(61.237% 0.17298 146.95)"
+- name: info
+  hex: "oklch(67.55% 0.17646 252.26)"
+- name: warning
+  hex: "oklch(80.791% 0.16473 78.5)"
+- name: danger
+  hex: "oklch(63.864% 0.18175 23.81)"

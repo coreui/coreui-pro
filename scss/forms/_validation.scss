@@ -101,24 +101,28 @@
   // The state has to reach the group: a custom property set on the control
   // inside it only inherits downwards, never back up to the frame.
   .form-control-group.is-#{$state},
-  .form-control-group:has(> .form-control.is-#{$state}) {
+  .form-control-group:has(> .form-control.is-#{$state}),
+  .form-control-group:has(> .form-floating > .form-control.is-#{$state}) {
     @include form-control-group-validation-state($color, $border-color, $focus-ring-color);
   }
 
   @if $state == "invalid" {
     [data-coreui-validate] .form-control-group:has(> .form-control:user-invalid),
+    [data-coreui-validate] .form-control-group:has(> .form-floating > .form-control:user-invalid),
     [data-coreui-validate] .form-control-group:has(> select:user-invalid) {
       @include form-control-group-validation-state($color, $border-color, $focus-ring-color);
     }
   } @else if $state == "valid" {
     [data-coreui-validate~="valid"] .form-control-group:has(> .form-control:user-valid),
+    [data-coreui-validate~="valid"] .form-control-group:has(> .form-floating > .form-control:user-valid),
     [data-coreui-validate~="valid"] .form-control-group:has(> select:user-valid) {
       @include form-control-group-validation-state($color, $border-color, $focus-ring-color);
     }
   }
 
   @if $enable-validation-icons {
-    .form-control-group > .form-control {
+    .form-control-group > .form-control,
+    .form-control-group > .form-floating > .form-control {
       @include form-validation-state-selector($state) {
         background-image: none;
       }

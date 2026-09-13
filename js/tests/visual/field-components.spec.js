@@ -21,6 +21,7 @@ import '../../../scss/coreui.scss'
 import Autocomplete from '../../src/autocomplete.js'
 import ChipInput from '../../src/chip-input.js'
 import DatePicker from '../../src/date-picker.js'
+import DateRangeInput from '../../src/date-range-input.js'
 import DateRangePicker from '../../src/date-range-picker.js'
 import DateTimePicker from '../../src/date-time-picker.js'
 import MultiSelect from '../../src/multi-select.js'
@@ -187,6 +188,20 @@ describe('time picker', () => {
   })
 })
 
+describe('date range input', () => {
+  it('empty', async () => {
+    const dri = new DateRangeInput(mount(), { locale: 'en-US' })
+    await shoot(frame(), 'date-range-input-empty')
+    dri.dispose()
+  })
+
+  it('range filled', async () => {
+    const dri = new DateRangeInput(mount(), { locale: 'en-US', startDate: DATE, endDate: DATE_END })
+    await shoot(frame(), 'date-range-input-filled')
+    dri.dispose()
+  })
+})
+
 describe('date range picker', () => {
   it('range filled', async () => {
     const drp = new DateRangePicker(mount(), { locale: 'en-US', startDate: DATE, endDate: DATE_END })
@@ -299,9 +314,9 @@ describe('multi select', () => {
     const ms = new MultiSelect(mountSelect(), { selectAll: true })
     ms.show()
 
-    // A real key press, so :focus-visible matches like it does for a user
-    ms._togglerElement.focus()
-    await userEvent.keyboard('{ArrowDown}')
+    // The button sits in the panel header, outside the listbox, so the arrows
+    // never reach it. `focusVisible` asks for the ring a keyboard user gets.
+    ms._selectAllElement.focus({ focusVisible: true })
 
     await shoot(popup(), 'multi-select-select-all-focus', { tolerant: true })
     ms.dispose()

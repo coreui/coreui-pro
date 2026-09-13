@@ -7,6 +7,7 @@
   $theme-colors: (
     "custom": (
       "base": var(--cui-black),
+      "bg": var(--cui-black),
       "contrast": var(--cui-white),
     ),
   )
@@ -35,7 +36,7 @@ $true-terminal-output: false;
       @include assert() {
         @include output() {
           .test {
-            base: map.get(theme-color-scale-tokens(), --cui-custom-base);
+            base: map.get(theme-color-tokens(), --cui-custom-base);
             bg: map.get(theme-color-tokens(), --cui-custom-bg);
             contrast: map.get(theme-color-tokens(), --cui-custom-contrast);
           }
@@ -44,7 +45,7 @@ $true-terminal-output: false;
         @include expect() {
           .test {
             base: var(--cui-black);
-            bg: var(--cui-custom-base);
+            bg: var(--cui-black);
             contrast: var(--cui-white);
           }
         }

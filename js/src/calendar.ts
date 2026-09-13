@@ -12,9 +12,12 @@ import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
 import {
- escapeHtml, sanitizeHtml, type SanitizerAllowList, SVGAllowlist
+ escapeHtml, sanitizeByConfig, type SanitizerAllowList, SVGAllowlist
 } from './util/sanitizer.js'
-import { defineJQueryPlugin } from './util/index.js'
+import {
+ CHEVRON_DOUBLE_LEFT_ICON, CHEVRON_DOUBLE_RIGHT_ICON, CHEVRON_LEFT_ICON, CHEVRON_RIGHT_ICON
+} from './util/icons.js'
+import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
 import {
   convertToDateObject,
   createGroupsInArray,
@@ -49,7 +52,6 @@ const NAME = 'calendar'
 const DATA_KEY = 'coreui.calendar'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
-const DISALLOWED_ATTRIBUTES = new Set(['sanitize', 'allowList', 'sanitizeFn'])
 
 const ARROW_UP_KEY = 'ArrowUp'
 const ARROW_RIGHT_KEY = 'ArrowRight'
@@ -99,10 +101,6 @@ const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="calendar"]'
 // Navigation icons live in JavaScript, not in CSS masks — the chips pattern:
 // inline SVG on currentColor, swappable through an option, sanitized like any
 // user-provided markup.
-const DEFAULT_NAV_ICON_DOUBLE_NEXT: string = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" fill="currentColor"><polygon points="95.314 447.313 72.686 424.687 245.373 252 72.686 79.313 95.314 56.687 290.627 252 95.314 447.313"></polygon><polygon points="255.314 447.313 232.686 424.687 405.373 252 232.686 79.313 255.314 56.687 450.627 252 255.314 447.313"></polygon></svg>'
-const DEFAULT_NAV_ICON_DOUBLE_PREV: string = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" fill="currentColor"><polygon points="416.686 447.313 221.373 252 416.686 56.687 439.314 79.313 266.627 252 439.314 424.687 416.686 447.313"></polygon><polygon points="256.686 447.313 61.373 252 256.686 56.687 279.314 79.313 106.627 252 279.314 424.687 256.686 447.313"></polygon></svg>'
-const DEFAULT_NAV_ICON_NEXT: string = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" fill="currentColor"><polygon points="179.313 451.313 156.687 428.687 329.372 256 156.687 83.313 179.313 60.687 374.627 256 179.313 451.313"></polygon></svg>'
-const DEFAULT_NAV_ICON_PREV: string = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" fill="currentColor"><polygon points="324.687 451.313 129.373 256 324.687 60.687 347.313 83.313 174.628 256 347.313 428.687 324.687 451.313"></polygon></svg>'
 
 type CalendarConfig = {
   allowList: SanitizerAllowList
@@ -158,10 +156,10 @@ const Default: CalendarConfig = {
   maxDate: null,
   minDate: null,
   monthFormat: 'short',
-  navIconDoubleNext: DEFAULT_NAV_ICON_DOUBLE_NEXT,
-  navIconDoublePrev: DEFAULT_NAV_ICON_DOUBLE_PREV,
-  navIconNext: DEFAULT_NAV_ICON_NEXT,
-  navIconPrev: DEFAULT_NAV_ICON_PREV,
+  navIconDoubleNext: CHEVRON_DOUBLE_RIGHT_ICON,
+  navIconDoublePrev: CHEVRON_DOUBLE_LEFT_ICON,
+  navIconNext: CHEVRON_RIGHT_ICON,
+  navIconPrev: CHEVRON_LEFT_ICON,
   range: false,
   renderDayCell: null,
   renderMonthCell: null,
@@ -809,6 +807,7 @@ class Calendar extends BaseComponent {
     const weekDays = monthDetails[0].days
 
     const calendarTable = document.createElement('table')
+    calendarTable.setAttribute('role', 'grid')
     calendarTable.innerHTML = `
     ${this._view === 'days' ? `
       <thead>
@@ -851,6 +850,7 @@ class Calendar extends BaseComponent {
                 return month === 'current' || this._config.showAdjacentDays ?
                   `<td
                     class="${cellAttributes.className}"
+                    role="gridcell"
                     tabindex="${cellAttributes.tabIndex}"
                     ${cellAttributes.ariaSelected ? 'aria-selected="true"' : ''}
                     ${cellAttributes.ariaCurrent ? 'aria-current="date"' : ''}
@@ -858,10 +858,10 @@ class Calendar extends BaseComponent {
                     data-coreui-date="${date}"
                   >
                     <div class="${CLASS_NAME_CALENDAR_CELL_INNER} day">
-                      ${this._config.renderDayCell ? this._sanitizeHtml(this._config.renderDayCell(date, cellAttributes.meta)) : date.toLocaleDateString(this._config.locale, { day: this._config.dayFormat })}
+                      ${this._config.renderDayCell ? sanitizeByConfig(this._config.renderDayCell(date, cellAttributes.meta), this._config) : date.toLocaleDateString(this._config.locale, { day: this._config.dayFormat })}
                     </div>
                   </td>` :
-                  '<td></td>'
+                  '<td role="gridcell"></td>'
               }
             ).join('')}</tr>`
           )
@@ -874,12 +874,13 @@ class Calendar extends BaseComponent {
               return (
                 `<td
                   class="${cellAttributes.className}"
+                  role="gridcell"
                   tabindex="${cellAttributes.tabIndex}"
                   ${cellAttributes.ariaSelected ? 'aria-selected="true"' : ''}
                   data-coreui-date="${date.toDateString()}"
                 >
                   <div class="${CLASS_NAME_CALENDAR_CELL_INNER} month">
-                    ${this._config.renderMonthCell ? this._sanitizeHtml(this._config.renderMonthCell(date, cellAttributes.meta)) : month}
+                    ${this._config.renderMonthCell ? sanitizeByConfig(this._config.renderMonthCell(date, cellAttributes.meta), this._config) : month}
                   </div>
                 </td>`
               )
@@ -894,12 +895,13 @@ class Calendar extends BaseComponent {
               return (
                 `<td
                   class="${cellAttributes.className}"
+                  role="gridcell"
                   tabindex="${cellAttributes.tabIndex}"
                   ${cellAttributes.ariaSelected ? 'aria-selected="true"' : ''}
                   data-coreui-date="${date.toDateString()}"
                 >
                   <div class="${CLASS_NAME_CALENDAR_CELL_INNER} quarter">
-                    ${this._config.renderQuarterCell ? this._sanitizeHtml(this._config.renderQuarterCell(date, cellAttributes.meta)) : `Q${index + 1}`}
+                    ${this._config.renderQuarterCell ? sanitizeByConfig(this._config.renderQuarterCell(date, cellAttributes.meta), this._config) : `Q${index + 1}`}
                   </div>
                 </td>`
               )
@@ -913,12 +915,13 @@ class Calendar extends BaseComponent {
               return (
                 `<td
                   class="${cellAttributes.className}"
+                  role="gridcell"
                   tabindex="${cellAttributes.tabIndex}"
                   ${cellAttributes.ariaSelected ? 'aria-selected="true"' : ''}
                   data-coreui-date="${date.toDateString()}"
                 >
                   <div class="${CLASS_NAME_CALENDAR_CELL_INNER} year">
-                    ${this._config.renderYearCell ? this._sanitizeHtml(this._config.renderYearCell(date, cellAttributes.meta)) : date.toLocaleDateString(this._config.locale, { year: this._config.yearFormat })}
+                    ${this._config.renderYearCell ? sanitizeByConfig(this._config.renderYearCell(date, cellAttributes.meta), this._config) : date.toLocaleDateString(this._config.locale, { year: this._config.yearFormat })}
                   </div>
                 </td>`
               )
@@ -1250,35 +1253,7 @@ class Calendar extends BaseComponent {
       navIconPrev: 'navIconNext'
     }
 
-    return this._sanitizeHtml(this._config[this._isRtl() ? (mirrored as Record<string, string>)[name] : name])
-  }
-
-  _sanitizeHtml(html: string): string {
-    if (this._config.sanitize) {
-      return sanitizeHtml(html, this._config.allowList, this._config.sanitizeFn)
-    }
-
-    return html
-  }
-
-  override _getConfig(config: any): any {
-    const dataAttributes = Manipulator.getDataAttributes(this._element)
-
-    for (const dataAttribute of Object.keys(dataAttributes)) {
-      if (DISALLOWED_ATTRIBUTES.has(dataAttribute)) {
-        delete dataAttributes[dataAttribute]
-      }
-    }
-
-    config = {
-      ...dataAttributes,
-      ...(typeof config === 'object' && config ? config : {})
-    }
-    config = this._mergeConfigObj(config)
-    config = this._configAfterMerge(config)
-    this._typeCheckConfig(config)
-
-    return config
+    return sanitizeByConfig(this._config[this._isRtl() ? (mirrored as Record<string, string>)[name] : name], this._config)
   }
 
   // Static
@@ -1296,19 +1271,7 @@ class Calendar extends BaseComponent {
   }
 
   static jQueryInterface(this: any, config: any): any {
-    return this.each(function (this: HTMLElement) {
-      const data: any = Calendar.getOrCreateInstance(this, config)
-
-      if (typeof config !== 'string') {
-        return
-      }
-
-      if (typeof data[config] === 'undefined') {
-        throw new TypeError(`No method named "${config}"`)
-      }
-
-      data[config]()
-    })
+    return jQueryDispatch(this, Calendar, config)
   }
 }
 

@@ -259,7 +259,8 @@ $chip-outline-tokens: defaults(
   }
 
   .chip-lg,
-  .chip-input-lg .chip {
+  .chip-input-lg .chip,
+  .form-control-group.form-control-lg .chip {
     @include chip-size(
       $chip-height-lg,
       $chip-padding-x-lg,
@@ -272,7 +273,8 @@ $chip-outline-tokens: defaults(
   }
 
   .chip-sm,
-  .chip-input-sm .chip {
+  .chip-input-sm .chip,
+  .form-control-group.form-control-sm .chip {
     @include chip-size(
       $chip-height-sm,
       $chip-padding-x-sm,

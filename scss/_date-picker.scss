@@ -32,7 +32,10 @@ $date-picker-tokens: defaults(
   .date-picker {
     position: relative;
 
-    &.show {
+    // A picker whose element is the frame carries the active state itself; one
+    // that wraps a field component carries it on that field.
+    &.show.form-control-group,
+    &.show > .form-control-group {
       @include form-control-group-active();
     }
   }

@@ -31,15 +31,7 @@ import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
 import type { ComponentConfig } from './util/config.js'
 import {
-  defineJQueryPlugin,
-  execute,
-  getElement,
-  getNextActiveElement,
-  isDisabled,
-  isElement,
-  isRTL,
-  isVisible,
-  noop
+  defineJQueryPlugin, execute, getElement, getNextActiveElement, isDisabled, isElement, isRTL, isVisible, jQueryDispatch, noop
 } from './util/index.js'
 import {
   parseResponsivePlacement,
@@ -1102,19 +1094,7 @@ class Menu extends BaseComponent {
   }
 
   static jQueryInterface(this: any, config: any): void {
-    return this.each(function (this: HTMLElement) {
-      const data: any = Menu.getOrCreateInstance(this, config)
-
-      if (typeof config !== 'string') {
-        return
-      }
-
-      if (typeof data[config as string] === 'undefined') {
-        throw new TypeError(`No method named "${config}"`)
-      }
-
-      data[config as string]()
-    })
+    return jQueryDispatch(this, Menu, config)
   }
 }
 

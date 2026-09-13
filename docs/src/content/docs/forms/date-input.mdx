@@ -333,7 +333,7 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | --- | --- |
 | `clear` | Clear all sections |
 | `getDate` | Return the current date, or `null` when incomplete or invalid |
-| `reset` | Reset the field to its initial date |
+| `reset` | Reset the field to the date it was created with, emitting `dateChange` when the value moves. A native form reset does the same. |
 | `update` | Update the configuration and re-render |
 
 ```javascript

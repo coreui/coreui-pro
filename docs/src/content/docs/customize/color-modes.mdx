@@ -232,22 +232,26 @@ Here's a look at the JavaScript that powers it. Feel free to inspect our own doc
 
 ## Adding theme colors
 
-A theme color is one entry in the `$theme-colors` map — a map of slots covering both color modes, described on [the Theme page](/customize/theme/). Merge your entry and the library generates everything else: the `--cui-custom-color-*` tokens, the 100–900 runtime scale the slots read, and the `.theme-custom-color` class.
+A theme color is a hue in `$colors` and one entry in the `$theme-colors` map — a map of slots covering both color modes, described on [the Theme page](/customize/theme/). Merge both and the library generates everything else: the 025–975 runtime scale of the hue, the `--cui-custom-color-*` slot tokens that read it, and the `.theme-custom-color` class.
 
 <Callout color="info"><Fragment set:html={`<p> <strong>Heads up!</strong> Reach our Sass with <code>@use</code>. The <code>*.import.scss</code> files that let <code>@import</code> resolve our modules are gone, so the snippet below will not compile behind an <code>@import</code>. </p>`} /></Callout>
 
 ```scss
 @use "@coreui/coreui/scss/coreui" with (
+  $colors: (
+    "custom-color": #712cf9,
+  ),
   $theme-colors: (
     "custom-color": (
-      "base":        #712cf9,
-      "contrast":    #fff,
+      "base":        var(--cui-custom-color-500),
       "fg":          light-dark(var(--cui-custom-color-600), var(--cui-custom-color-400)),
       "fg-emphasis": light-dark(var(--cui-custom-color-800), var(--cui-custom-color-200)),
+      "bg":          var(--cui-custom-color-500),
       "bg-subtle":   light-dark(var(--cui-custom-color-100), var(--cui-custom-color-900)),
       "bg-muted":    light-dark(var(--cui-custom-color-200), var(--cui-custom-color-800)),
       "border":      light-dark(var(--cui-custom-color-300), var(--cui-custom-color-600)),
-      "focus-ring":  color-mix(in srgb, var(--cui-custom-color-base) calc(var(--cui-focus-ring-opacity) * 100%), transparent),
+      "focus-ring":  color-mix(in oklch, var(--cui-custom-color-500) calc(var(--cui-focus-ring-opacity) * 100%), transparent),
+      "contrast":    var(--cui-white),
     ),
   )
 );
@@ -271,7 +275,7 @@ Do the same in your own color modes: declare `color-scheme` and override only th
 
 Sass variables set these defaults at build time and are removed in v7. The CSS variables above reach the same values without recompiling, and can be set on a single element.
 
-Each theme color gets a 100–900 scale of `color-mix()` tokens in `:root`, mixed at runtime from the color's own token. The subtle backgrounds, borders and emphasis text are `light-dark()` pairs of those stops, so overriding `$primary` (or the `--cui-primary` token at runtime) retints the whole family in both color modes. These set what the scale mixes towards, and in which color space:
+Each theme color gets a 100–900 scale of `color-mix()` tokens in `:root`, mixed at runtime from the color's own token. The subtle backgrounds, borders and emphasis text are `light-dark()` pairs of those stops, so overriding `$primary` (or the `--cui-primary-500` token at runtime) retints the whole family in both color modes. These set what the scale mixes towards, and in which color space:
 
 <ScssDocs file="scss/_colors.scss" capture="color-scale-variables" />
 

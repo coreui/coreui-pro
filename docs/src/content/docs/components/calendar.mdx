@@ -294,7 +294,7 @@ This example demonstrates advanced usage of custom cell rendering to display pri
 
 ## Accessibility
 
-Keyboard navigation in the grid follows the [date picker dialog pattern](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/examples/datepicker-dialog/). Selected cells carry `aria-selected`, today carries `aria-current="date"`, and every cell announces its full localized date. The months, quarters, and years views answer to the same keys, with arrows moving by cell and row, and no jump ever lands outside `minDate` / `maxDate` — focus stops on the closest date still selectable.
+Keyboard navigation in the grid follows the [date picker dialog pattern](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/examples/datepicker-dialog/). The table is a `grid` of `gridcell` cells, which is what lets a cell report itself as selected: selected cells carry `aria-selected`, today carries `aria-current="date"`, and every cell announces its full localized date. The months, quarters, and years views answer to the same keys, with arrows moving by cell and row, and no jump ever lands outside `minDate` / `maxDate` — focus stops on the closest date still selectable.
 
 ### Keyboard support
 

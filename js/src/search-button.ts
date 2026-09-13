@@ -8,7 +8,7 @@
 import BaseComponent from './base-component.js'
 import type { ComponentConfig } from './util/config.js'
 import EventHandler from './dom/event-handler.js'
-import { defineJQueryPlugin } from './util/index.js'
+import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
 
 /**
  * Constants
@@ -337,9 +337,7 @@ class SearchButton extends BaseComponent {
   }
 
   static jQueryInterface(this: any, config: any): void {
-    return this.each(function (this: HTMLElement) {
-      SearchButton.searchButtonInterface(this, config)
-    })
+    return jQueryDispatch(this, SearchButton, config)
   }
 
   static _initializeDataApi(): void {

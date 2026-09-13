@@ -11,7 +11,7 @@
 import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
-import { defineJQueryPlugin } from './util/index.js'
+import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
 
 /**
  * Constants
@@ -437,11 +437,7 @@ class PasswordStrength extends BaseComponent {
   }
 
   static jQueryInterface(this: any, config: any): void {
-    return this.each(function (this: HTMLElement) {
-      const data: any = PasswordStrength.getOrCreateInstance(this)
-
-      data[config as string](this)
-    })
+    return jQueryDispatch(this, PasswordStrength, config, element => [element])
   }
 }
 
