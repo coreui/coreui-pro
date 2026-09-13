@@ -14,9 +14,9 @@ import ratingCustomFeedback from './snippets/rating-custom-feedback.js?raw'
 
 ## How to use Rating Component.
 
-Embed the Rating component in your HTML by using a `div` with `data-coreui-toggle="rating"`. Set the initial value with `data-coreui-value`.
+Embed the Rating component in your HTML by using a `div` with `data-coreui-rating`. Set the initial value with `data-coreui-value`.
 
-<Example pro code={`<div data-coreui-toggle="rating" data-coreui-value="3"></div>`} />
+<Example pro code={`<div data-coreui-rating data-coreui-value="3"></div>`} />
 
 ## With form field
 
@@ -24,7 +24,7 @@ Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label 
 
 <Example pro code={`<div class="form-field">
     <span class="form-label" id="ratingFieldLabel">Overall rating</span>
-    <div data-coreui-toggle="rating" data-coreui-value="3" aria-labelledby="ratingFieldLabel"></div>
+    <div data-coreui-rating data-coreui-value="3" aria-labelledby="ratingFieldLabel"></div>
     <div class="form-text">Tell us how the delivery went.</div>
   </div>`} />
 
@@ -32,7 +32,7 @@ Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label 
 
 Enable users to clear their selected rating by clicking on the current rating again. This functionality is activated by setting `data-coreui-allow-clear="true"`.
 
-<Example pro code={`<div data-coreui-allow-clear="true" data-coreui-toggle="rating" data-coreui-value="3"></div>`} />
+<Example pro code={`<div data-coreui-allow-clear="true" data-coreui-rating data-coreui-value="3"></div>`} />
 
 This allows the selected rating to be deselected, effectively resetting the rating to a state where no value is selected.
 
@@ -41,7 +41,7 @@ This allows the selected rating to be deselected, effectively resetting the rati
 Our Bootstrap Rating component allows users to assign and reset a star rating within a user interface. In the example below, we use the `button` to clear the selected value.
 
 <Example pro code={`<div class="d-flex align-items-center">
-    <div id="myRatingResettable" data-coreui-toggle="rating" data-coreui-value="3"></div>
+    <div id="myRatingResettable" data-coreui-rating data-coreui-value="3"></div>
     <button class="btn-solid theme-primary ms-3" type="button" onclick="coreui.Rating.getInstance('#myRatingResettable').reset()">reset</button>
   </div>`} />
 
@@ -49,51 +49,51 @@ Our Bootstrap Rating component allows users to assign and reset a star rating wi
 
 Set the Rating component to read-only by adding `data-coreui-readonly="true"`. This disables interaction, preventing users from changing the displayed rating value.
 
-<Example pro code={`<div data-coreui-readonly="true" data-coreui-toggle="rating" data-coreui-value="3"></div>`} />
+<Example pro code={`<div data-coreui-readonly="true" data-coreui-rating data-coreui-value="3"></div>`} />
 
 ## Disabled
 
 Add the `data-coreui-disabled="true"` boolean attribute to give it a grayed out appearance, remove pointer events, and prevent focusing.
 
-<Example pro code={`<div data-coreui-disabled="true" data-coreui-toggle="rating" data-coreui-value="3"></div>`} />
+<Example pro code={`<div data-coreui-disabled="true" data-coreui-rating data-coreui-value="3"></div>`} />
 
 ## Precision
 
 Adjust the granularity of the Rating component by setting `data-coreui-precision`. This attribute allows for fractional ratings, such as quarter values, to provide more precise feedback.
 
-<Example pro code={`<div data-coreui-precision="0.25" data-coreui-toggle="rating" data-coreui-value="1.5"></div>`} />
+<Example pro code={`<div data-coreui-precision="0.25" data-coreui-rating data-coreui-value="1.5"></div>`} />
 
 ## Number of items
 
 Control the total number of rating items displayed by using `data-coreui-item-count`. You can create a Rating component with a custom scale, be it larger for detailed assessments or smaller for simplicity.
 
-<Example pro code={`<div data-coreui-item-count="20" data-coreui-toggle="rating" data-coreui-value="5"></div>`} />
+<Example pro code={`<div data-coreui-item-count="20" data-coreui-rating data-coreui-value="5"></div>`} />
 
-<Example pro code={`<div data-coreui-item-count="3" data-coreui-toggle="rating" data-coreui-value="1"></div>`} />
+<Example pro code={`<div data-coreui-item-count="3" data-coreui-rating data-coreui-value="1"></div>`} />
 
 ## Tooltips
 
 Enable descriptive text on hover by setting `data-coreui-tooltips` to `true`. This provides immediate feedback or guidance as the user interacts with the rating items.
 
-<Example pro code={`<div data-coreui-toggle="rating" data-coreui-tooltips="true" data-coreui-value="3"></div>`} />
+<Example pro code={`<div data-coreui-rating data-coreui-tooltips="true" data-coreui-value="3"></div>`} />
 
 For custom messages, provide a comma-separated list of tooltips corresponding to each rating value to enhance the user's understanding of each rating level.
 
-<Example pro code={`<div data-coreui-toggle="rating" data-coreui-tooltips="Very bad, Bad, Meh, Good, Very good" data-coreui-value="3"></div>`} />
+<Example pro code={`<div data-coreui-rating data-coreui-tooltips="Very bad, Bad, Meh, Good, Very good" data-coreui-value="3"></div>`} />
 
 ## Sizing
 
 Larger or smaller rating component? Add `data-coreui-size="lg"` or `data-coreui-size="sm"` for additional sizes.
 
-<Example pro code={`<div data-coreui-size="sm" data-coreui-toggle="rating" data-coreui-value="3"></div>
-  <div data-coreui-toggle="rating" data-coreui-value="3"></div>
-  <div data-coreui-size="lg" data-coreui-toggle="rating" data-coreui-value="3"></div>`} />
+<Example pro code={`<div data-coreui-size="sm" data-coreui-rating data-coreui-value="3"></div>
+  <div data-coreui-rating data-coreui-value="3"></div>
+  <div data-coreui-size="lg" data-coreui-rating data-coreui-value="3"></div>`} />
 
 ## Theme variants
 
 Colour the active items with a [`.theme-*` class](/customize/components/#theme-variants) on the rating.
 
-<Example pro code={`<div class="theme-danger" data-coreui-toggle="rating" data-coreui-value="3"></div>`} />
+<Example pro code={`<div class="theme-danger" data-coreui-rating data-coreui-value="3"></div>`} />
 
 ## Custom icons
 
@@ -135,10 +135,10 @@ The Bootstrap Rating component integrates interactive star ratings with dynamic 
 
 ### Via data attributes
 
-Add `data-coreui-toggle="rating"` to a `div` element.
+Add `data-coreui-rating` to a `div` element.
 
 ```html
-<div data-coreui-toggle="rating"></div>
+<div data-coreui-rating></div>
 ```
 
 ### Via JavaScript

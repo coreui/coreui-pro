@@ -15,11 +15,11 @@ the component replaces it with two buttons sized like every other adornment in a
 
 <AddedIn version="6.0.0" />
 
-Add `data-coreui-toggle="number-input"` to an `<input type="number">`. The
+Add `data-coreui-number-input` to an `<input type="number">`. The
 component wraps it in a [`form-control-group`](/forms/form-control-group/) and
 adds the buttons — you write neither the frame, the buttons nor their icons.
 
-<Example pro code={`<input type="number" class="form-control" value="3" aria-label="Quantity" data-coreui-toggle="number-input">`} />
+<Example pro code={`<input type="number" class="form-control" value="3" aria-label="Quantity" data-coreui-number-input>`} />
 
 ## With form field
 
@@ -27,7 +27,7 @@ Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label 
 
 <Example pro code={`<div class="form-field">
     <label for="numberInputField" class="form-label">Quantity</label>
-    <input type="number" class="form-control" id="numberInputField" value="3" data-coreui-toggle="number-input">
+    <input type="number" class="form-control" id="numberInputField" value="3" data-coreui-number-input>
     <div class="form-text">Up to ten items per order.</div>
   </div>`} />
 
@@ -38,11 +38,11 @@ reimplement them, it calls the browser's own stepping. **A button that cannot
 move the value any further is disabled**, so the bound is visible rather than
 just unresponsive.
 
-<Example pro code={`<input type="number" class="form-control" value="10" min="0" max="10" aria-label="Quantity" data-coreui-toggle="number-input">`} />
+<Example pro code={`<input type="number" class="form-control" value="10" min="0" max="10" aria-label="Quantity" data-coreui-number-input>`} />
 
 A fractional `step` works the same way:
 
-<Example pro code={`<input type="number" class="form-control" value="2" step="0.5" aria-label="Amount" data-coreui-toggle="number-input">`} />
+<Example pro code={`<input type="number" class="form-control" value="2" step="0.5" aria-label="Amount" data-coreui-number-input>`} />
 
 When the field is empty, the first step starts from `min` — or from zero if
 there is no minimum.
@@ -64,12 +64,12 @@ selects by. The frame picks the validation state up from the input, so
 `document.querySelector('.form-control.is-invalid')` still finds the control
 and a validator that toggles the class keeps working.
 
-<Example pro code={`<input type="number" class="form-control form-control-sm mb-3" value="3" aria-label="Quantity" data-coreui-toggle="number-input">
-  <input type="number" class="form-control form-control-lg" value="3" aria-label="Quantity" data-coreui-toggle="number-input">`} />
+<Example pro code={`<input type="number" class="form-control form-control-sm mb-3" value="3" aria-label="Quantity" data-coreui-number-input>
+  <input type="number" class="form-control form-control-lg" value="3" aria-label="Quantity" data-coreui-number-input>`} />
 
 ## Disabled
 
-<Example pro code={`<input type="number" class="form-control" value="3" aria-label="Quantity" disabled data-coreui-toggle="number-input">`} />
+<Example pro code={`<input type="number" class="form-control" value="3" aria-label="Quantity" disabled data-coreui-number-input>`} />
 
 ## Inside your own group
 
@@ -80,7 +80,7 @@ a number field can share a frame with anything else the group holds:
     <span class="form-control-icon">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor"><path d="M464 240H272V48h-32v192H48v32h192v192h32V272h192z"/></svg>
     </span>
-    <input type="number" class="form-control" value="3" aria-label="Quantity" data-coreui-toggle="number-input">
+    <input type="number" class="form-control" value="3" aria-label="Quantity" data-coreui-number-input>
   </div>`} />
 
 ## Floating labels
@@ -89,7 +89,7 @@ The number input supports [floating labels](/forms/floating-labels/). Wrap the c
 
 <Example pro code={`<div class="form-floating">
     <label for="floatingNumberInput">Quantity</label>
-    <input class="form-control" type="number" placeholder=" " id="floatingNumberInput" value="42" data-coreui-toggle="number-input">
+    <input class="form-control" type="number" placeholder=" " id="floatingNumberInput" value="42" data-coreui-number-input>
   </div>`} />
 
 ## Accessibility

@@ -16,7 +16,7 @@ import rangeSliderCustomTooltips from './snippets/range-slider-custom-tooltips.j
 
 The **Bootstrap 6 Range Slider** component allows users to select a value or range of values within a predefined range. Unlike the standard `<input type="range" />`, the Range Slider offers enhanced customization options, including multiple handles, ticks, tooltips, and vertical orientation. It ensures consistent styling across browsers and provides a rich set of features for advanced use cases.
 
-<Example pro code={`<div data-coreui-toggle="range-slider"
+<Example pro code={`<div data-coreui-range-slider
        data-coreui-value="25,75"
        data-coreui-ticks="Low, Medium, High">
   </div>`} />
@@ -34,7 +34,7 @@ The **Bootstrap 6 Range Slider** component allows users to select a value or ran
 
 Create a simple range slider with default settings.
 
-<Example pro code={`<div data-coreui-toggle="range-slider" data-coreui-value="50"></div>`} />
+<Example pro code={`<div data-coreui-range-slider data-coreui-value="50"></div>`} />
 
 ## With form field
 
@@ -42,7 +42,7 @@ Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label 
 
 <Example pro code={`<div class="form-field">
     <span class="form-label">Budget</span>
-    <div data-coreui-toggle="range-slider" data-coreui-value="25, 75" data-coreui-aria-labels='["Minimum budget", "Maximum budget"]'></div>
+    <div data-coreui-range-slider data-coreui-value="25, 75" data-coreui-aria-labels='["Minimum budget", "Maximum budget"]'></div>
     <div class="form-text">Monthly spend, in thousands.</div>
   </div>`} />
 
@@ -50,52 +50,52 @@ Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label 
 
 Enable multiple handles to allow the selection of a range or/and multiple values.
 
-<Example pro code={`<div class="mb-3" data-coreui-toggle="range-slider" data-coreui-value="20,40"></div>
-  <div class="mb-3" data-coreui-toggle="range-slider" data-coreui-value="20,40,60"></div>
-  <div data-coreui-toggle="range-slider" data-coreui-value="20,40,60,80"></div>`} />
+<Example pro code={`<div class="mb-3" data-coreui-range-slider data-coreui-value="20,40"></div>
+  <div class="mb-3" data-coreui-range-slider data-coreui-value="20,40,60"></div>
+  <div data-coreui-range-slider data-coreui-value="20,40,60,80"></div>`} />
 
 ## Vertical Range Slider
 
 Rotate the slider to a vertical orientation.
 
 <Example pro code={`<div class="d-flex">
-    <div class="me-3" data-coreui-toggle="range-slider" data-coreui-value="20" data-coreui-vertical="true"></div>
-    <div class="me-3" data-coreui-toggle="range-slider" data-coreui-value="20,80" data-coreui-vertical="true"></div>
-    <div data-coreui-toggle="range-slider" data-coreui-value="20,80,100" data-coreui-vertical="true"></div>
+    <div class="me-3" data-coreui-range-slider data-coreui-value="20" data-coreui-vertical="true"></div>
+    <div class="me-3" data-coreui-range-slider data-coreui-value="20,80" data-coreui-vertical="true"></div>
+    <div data-coreui-range-slider data-coreui-value="20,80,100" data-coreui-vertical="true"></div>
   </div>`} />
 
 ## Disabled
 
 Disable the slider to prevent user interaction.
 
-<Example pro code={`<div class="mb-3" data-coreui-toggle="range-slider" data-coreui-value="50" data-coreui-disabled="true"></div>
-  <div data-coreui-toggle="range-slider" data-coreui-value="50, 75" data-coreui-disabled="true"></div>`} />
+<Example pro code={`<div class="mb-3" data-coreui-range-slider data-coreui-value="50" data-coreui-disabled="true"></div>
+  <div data-coreui-range-slider data-coreui-value="50, 75" data-coreui-disabled="true"></div>`} />
 
 ## Min and max
 
 Range Slider has implicit values for `min` and `max`—`0` and `100`, respectively. You may specify new values for those using the `min` and `max` attributes.
 
-<Example pro code={`<div class="mb-3" data-coreui-toggle="range-slider" data-coreui-min="-50" data-coreui-max="150" data-coreui-value="50"></div>
-  <div data-coreui-toggle="range-slider" data-coreui-min="-50" data-coreui-max="150" data-coreui-value="50, 75"></div>`} />
+<Example pro code={`<div class="mb-3" data-coreui-range-slider data-coreui-min="-50" data-coreui-max="150" data-coreui-value="50"></div>
+  <div data-coreui-range-slider data-coreui-min="-50" data-coreui-max="150" data-coreui-value="50, 75"></div>`} />
 
 ## Steps
 
 Range Slider inputs automatically "snap" to whole numbers. To modify this behavior, set a `step` value. In the example below, we increase the number of steps by specifying `step="0.25"`.
 
-<Example pro code={`<div class="mb-3" data-coreui-toggle="range-slider" data-coreui-step="0.25" data-coreui-value="50" ></div>
-  <div data-coreui-toggle="range-slider" data-coreui-step="0.25" data-coreui-value="50, 75"></div>`} />
+<Example pro code={`<div class="mb-3" data-coreui-range-slider data-coreui-step="0.25" data-coreui-value="50" ></div>
+  <div data-coreui-range-slider data-coreui-step="0.25" data-coreui-value="50, 75"></div>`} />
 
 ## Distance
 
 Sets the minimum distance between multiple slider handles by setting `distance` and ensures that the handles do not overlap or get too close.
 
-<Example pro code={`<div data-coreui-toggle="range-slider" data-coreui-distance="10" data-coreui-value="50, 75"></div>`} />
+<Example pro code={`<div data-coreui-range-slider data-coreui-distance="10" data-coreui-value="50, 75"></div>`} />
 
 ## Ticks
 
 Add ticks at specific points on the slider for better context. If you provide an array of strings, as in the example below, then labelled ticks will be spaced at equal distances from the beginning to the end of the slider.
 
-<Example pro code={`<div data-coreui-toggle="range-slider" data-coreui-value="30,70" data-coreui-ticks="Start, Middle, End"></div>`} />
+<Example pro code={`<div data-coreui-range-slider data-coreui-value="30,70" data-coreui-ticks="Start, Middle, End"></div>`} />
 
 ### Ticks customization
 
@@ -107,13 +107,13 @@ Ticks can be configured as an array of strings, numbers or objects. A number is 
 
 Numbers and labelled points mix in one array; passed through a data attribute, the array is JSON.
 
-<Example pro code={`<div data-coreui-toggle="range-slider" data-coreui-value="25,75" data-coreui-ticks='[{"value": 0, "label": "Cold"}, 25, {"value": 50, "label": "Mild"}, 75, {"value": 100, "label": "Hot"}]'></div>`} />
+<Example pro code={`<div data-coreui-range-slider data-coreui-value="25,75" data-coreui-ticks='[{"value": 0, "label": "Cold"}, 25, {"value": 50, "label": "Mild"}, 75, {"value": 100, "label": "Hot"}]'></div>`} />
 
 ### Tick marks from a datalist
 
 Point the `list` option at the `id` of a `<datalist>` and every `<option>` becomes a tick at its value, with the option's `label` shown beneath it. Ticks with a label are drawn taller than bare ones. Datalist ticks and `ticks` can be combined; both are laid out on one grid, so unevenly spaced values stay aligned.
 
-<Example pro code={`<div data-coreui-toggle="range-slider" data-coreui-value="25,75" data-coreui-list="rangeSliderStops"></div>
+<Example pro code={`<div data-coreui-range-slider data-coreui-value="25,75" data-coreui-list="rangeSliderStops"></div>
   <datalist id="rangeSliderStops">
     <option value="0" label="Cold"></option>
     <option value="25"></option>
@@ -126,7 +126,7 @@ Point the `list` option at the `id` of a `<datalist>` and every `<option>` becom
 
 By default, users can click on ticks to set the slider to specific values. You can disable this feature by setting `clickableTicks` to `false`.
 
-<Example pro code={`<div data-coreui-toggle="range-slider" data-coreui-clickable-ticks="false" data-coreui-value="20,80" data-coreui-ticks="Low,Medium,High"></div>`} />
+<Example pro code={`<div data-coreui-range-slider data-coreui-clickable-ticks="false" data-coreui-value="20,80" data-coreui-ticks="Low,Medium,High"></div>`} />
 
 ## Tooltips
 
@@ -134,8 +134,8 @@ The value tooltip is the [Tooltip](/components/tooltips/) component's markup: th
 
 By default, tooltips show the current value of a handle while the pointer is over it, while it is held, and while it has a visible focus. Set `tooltips` to `"always"` to keep them visible at all times, or to `false` to turn them off.
 
-<Example pro class="d-flex flex-column gap-4 pt-4" code={`<div data-coreui-toggle="range-slider" data-coreui-value="40,60" data-coreui-tooltips="always"></div>
-  <div data-coreui-toggle="range-slider" data-coreui-value="40,60" data-coreui-tooltips="false"></div>`} />
+<Example pro class="d-flex flex-column gap-4 pt-4" code={`<div data-coreui-range-slider data-coreui-value="40,60" data-coreui-tooltips="always"></div>
+  <div data-coreui-range-slider data-coreui-value="40,60" data-coreui-tooltips="false"></div>`} />
 
 ### Tooltips formatting
 
@@ -153,29 +153,29 @@ The `data-coreui-track` option allows you to customize how the slider's track is
 
 If you set `data-coreui-track` to `false`, the slider's track will not display any fill. Only the default track background will be visible, which can be useful for minimalist designs or when you use more then two handles.
 
-<Example pro code={`<div class="mb-3" data-coreui-toggle="range-slider" data-coreui-track="false" data-coreui-value="50" ></div>
-  <div class="mb-3" data-coreui-toggle="range-slider" data-coreui-track="false" data-coreui-value="50, 75"></div>
-  <div data-coreui-toggle="range-slider" data-coreui-track="false" data-coreui-value="25, 50, 75"></div>`} />
+<Example pro code={`<div class="mb-3" data-coreui-range-slider data-coreui-track="false" data-coreui-value="50" ></div>
+  <div class="mb-3" data-coreui-range-slider data-coreui-track="false" data-coreui-value="50, 75"></div>
+  <div data-coreui-range-slider data-coreui-track="false" data-coreui-value="25, 50, 75"></div>`} />
 
 ## Theme variants
 
 Color the filled track and the handles by adding a [`.theme-{color}` class](/customize/components/#theme-variants) to the slider element.
 
-<Example pro class="d-flex flex-column gap-3" code={getData('theme-colors').map((c) => `<div class="theme-${c.name}" data-coreui-toggle="range-slider" data-coreui-value="25, 75" data-coreui-aria-labels='["${c.title} minimum", "${c.title} maximum"]'></div>`)} />
+<Example pro class="d-flex flex-column gap-3" code={getData('theme-colors').map((c) => `<div class="theme-${c.name}" data-coreui-range-slider data-coreui-value="25, 75" data-coreui-aria-labels='["${c.title} minimum", "${c.title} maximum"]'></div>`)} />
 
 The theme class on the slider colours the track and the handles; the tooltip keeps its default look. To theme the tooltip, set `tooltipClass` (`data-coreui-tooltip-class`) — the class lands on the tooltip only. `theme-secondary` gives a grey tooltip on the default slider; `theme-danger` makes the tooltip match a danger slider.
 
-<Example pro class="d-flex flex-column gap-3" code={`<div data-coreui-toggle="range-slider" data-coreui-value="40" data-coreui-tooltip-class="theme-secondary" data-coreui-aria-labels='["Secondary tooltip"]'></div>
-  <div class="theme-danger" data-coreui-toggle="range-slider" data-coreui-value="60" data-coreui-tooltip-class="theme-danger" data-coreui-aria-labels='["Danger slider, danger tooltip"]'></div>`} />
+<Example pro class="d-flex flex-column gap-3" code={`<div data-coreui-range-slider data-coreui-value="40" data-coreui-tooltip-class="theme-secondary" data-coreui-aria-labels='["Secondary tooltip"]'></div>
+  <div class="theme-danger" data-coreui-range-slider data-coreui-value="60" data-coreui-tooltip-class="theme-danger" data-coreui-aria-labels='["Danger slider, danger tooltip"]'></div>`} />
 
 ## Usage
 
 ### Via data attributes
 
-Add `data-coreui-toggle="range-slider"` to a `div` element.
+Add `data-coreui-range-slider` to a `div` element.
 
 ```html
-<div data-coreui-toggle="range-slider" data-coreui-value="50">
+<div data-coreui-range-slider data-coreui-value="50">
 </div>
 ```
 

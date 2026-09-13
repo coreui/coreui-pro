@@ -18,7 +18,7 @@ import listBoxRemote from './snippets/list-box-remote.js?raw'
 
 A list box presents a set of values and lets the user pick from them. `.list-box` is the container and the plugin's root; the list of choices lives in a `.list-box-options` child, which is what carries `role="listbox"` and the accessible name. The plugin owns the roles, the selection state and the keyboard: it writes `role="option"` on every `.list-box-option`, keeps `aria-selected` in step with the selection, moves a roving `tabindex` as the highlight moves, and scrolls the highlighted option into view.
 
-<Example code={`<div class="list-box" data-coreui-toggle="list-box" style="max-width: 20rem">
+<Example code={`<div class="list-box" data-coreui-list-box style="max-width: 20rem">
     <div class="list-box-options" role="listbox" aria-label="Sandwich">
       <div class="list-box-option" data-coreui-value="lettuce">Lettuce</div>
       <div class="list-box-option" data-coreui-value="tomato">Tomato</div>
@@ -49,7 +49,7 @@ A list box is also the primitive the picker components are built from, so its ma
 
 `selectionMode` decides what a click and <kbd>Space</kbd> do. In `single` (the default) one option is selected at a time and picking another replaces it.
 
-<Example code={`<div class="list-box" data-coreui-toggle="list-box" data-coreui-selected="tomato" style="max-width: 20rem">
+<Example code={`<div class="list-box" data-coreui-list-box data-coreui-selected="tomato" style="max-width: 20rem">
     <div class="list-box-options" role="listbox" aria-label="Single">
       <div class="list-box-option" data-coreui-value="lettuce">Lettuce</div>
       <div class="list-box-option" data-coreui-value="tomato">Tomato</div>
@@ -59,7 +59,7 @@ A list box is also the primitive the picker components are built from, so its ma
 
 In `multiple` a click toggles one option, <kbd>Shift</kbd> extends the selection from the last one, <kbd>Ctrl</kbd> (<kbd>Cmd</kbd> on macOS) adds one without clearing the rest, and <kbd>Ctrl</kbd> + <kbd>A</kbd> takes everything. `aria-multiselectable` is written for you.
 
-<Example code={`<div class="list-box" data-coreui-toggle="list-box" data-coreui-selection-mode="multiple" style="max-width: 20rem">
+<Example code={`<div class="list-box" data-coreui-list-box data-coreui-selection-mode="multiple" style="max-width: 20rem">
     <div class="list-box-options" role="listbox" aria-label="Multiple">
       <div class="list-box-option" data-coreui-value="lettuce">Lettuce</div>
       <div class="list-box-option" data-coreui-value="tomato">Tomato</div>
@@ -70,7 +70,7 @@ In `multiple` a click toggles one option, <kbd>Shift</kbd> extends the selection
 
 With `none` nothing is ever selected and no `aria-selected` is written; activating an option fires `action.coreui.list-box` instead, which turns the list into a keyboard-navigable list of commands.
 
-<Example code={`<div class="list-box" data-coreui-toggle="list-box" data-coreui-selection-mode="none" style="max-width: 20rem">
+<Example code={`<div class="list-box" data-coreui-list-box data-coreui-selection-mode="none" style="max-width: 20rem">
     <div class="list-box-options" role="listbox" aria-label="Actions">
       <div class="list-box-option" data-coreui-value="copy">Copy</div>
       <div class="list-box-option" data-coreui-value="rename">Rename</div>
@@ -84,7 +84,7 @@ A `.list-box-select-all` button marked `data-coreui-select-all`, anywhere in the
 
 `.list-box-header` is the strip above the options it usually sits in: a plain `<div>`, a flex row that takes whatever content belongs there — a title (`.list-box-title`), a counter (`.list-box-subtitle`), a button of your own — next to or instead of the switch.
 
-<Example code={`<div class="list-box" data-coreui-toggle="list-box" data-coreui-selection-mode="multiple" data-coreui-indicator="checkbox" style="max-width: 20rem">
+<Example code={`<div class="list-box" data-coreui-list-box data-coreui-selection-mode="multiple" data-coreui-indicator="checkbox" style="max-width: 20rem">
     <div class="list-box-header">
       <button type="button" class="list-box-select-all" data-coreui-select-all>Select all</button>
     </div>
@@ -102,7 +102,7 @@ A `.list-box-select-all` button marked `data-coreui-select-all`, anywhere in the
 
 `selectionLimit` caps how many options can be selected at once in `multiple` mode. Once the cap is reached the plugin refuses any further selection — from a click, <kbd>Space</kbd>, a range, <kbd>Ctrl</kbd> + <kbd>A</kbd>, the select-all button or the API — and fires `selectionLimit.coreui.list-box` once per interaction, with `event.limit` and `event.value` (the first refused value). Options are never disabled and deselecting always works, so the user picks what to give up rather than being locked out. A range, <kbd>Ctrl</kbd> + <kbd>A</kbd> and the select-all button take options in document order until the cap is reached.
 
-<Example code={`<div class="list-box" data-coreui-toggle="list-box" data-coreui-selection-mode="multiple" data-coreui-selection-limit="2" data-coreui-indicator="checkbox" style="max-width: 20rem">
+<Example code={`<div class="list-box" data-coreui-list-box data-coreui-selection-mode="multiple" data-coreui-selection-limit="2" data-coreui-indicator="checkbox" style="max-width: 20rem">
     <div class="list-box-options" role="listbox" aria-label="Toppings, pick two">
       <div class="list-box-option" data-coreui-value="lettuce">Lettuce</div>
       <div class="list-box-option" data-coreui-value="tomato">Tomato</div>
@@ -150,7 +150,7 @@ Leave an empty `.list-box-options` in the markup so you can name it; the plugin 
 
 The field is a `.form-control.list-box-search` carrying `data-coreui-list-box-search`, built for you unless the markup already has an input with that attribute — put one there and it is used as it is, wherever you placed it. `searchPlaceholder` fills the placeholder and `ariaSearchLabel` the accessible name; `--cui-list-box-search-margin` sets how it sits between the two.
 
-<Example code={`<div class="list-box" data-coreui-toggle="list-box" data-coreui-search="true" data-coreui-selection-mode="multiple" data-coreui-indicator="checkbox" style="max-width: 20rem">
+<Example code={`<div class="list-box" data-coreui-list-box data-coreui-search="true" data-coreui-selection-mode="multiple" data-coreui-indicator="checkbox" style="max-width: 20rem">
     <div class="list-box-header">
       <button type="button" class="list-box-select-all" data-coreui-select-all>Fruit</button>
     </div>
@@ -203,7 +203,7 @@ The built-in search field is not the only way in. `filter(query)` runs the same 
 
 Nothing marks the selection on its own — `aria-selected` and the `.selected` background carry it. Set `indicator: 'checkbox'` and the plugin puts a checkbox in front of every option and keeps it in step with the selection.
 
-<Example code={`<div class="list-box" data-coreui-toggle="list-box" data-coreui-selection-mode="multiple" data-coreui-indicator="checkbox" style="max-width: 20rem">
+<Example code={`<div class="list-box" data-coreui-list-box data-coreui-selection-mode="multiple" data-coreui-indicator="checkbox" style="max-width: 20rem">
     <div class="list-box-header">
       <button type="button" class="list-box-select-all" data-coreui-select-all>Select all</button>
     </div>
@@ -223,7 +223,7 @@ The checkbox is a decorative `<span class="list-box-option-indicator check">`, n
 
 Both numbers read the same set — the options that are visible and enabled, which is also what the select-all button works on — so the counter always describes what is on screen. Filter the list and the denominator drops with it, and a selected value the filter hid drops out of the numerator too: it stays selected, it just stops being counted, so `2/4` can become `1/1` without anything being deselected. A disabled option never appears in either number. `selectedCounterText` is the word after the count, so a translated list reads in its own language.
 
-<Example code={`<div class="list-box" data-coreui-toggle="list-box" data-coreui-counter="true" data-coreui-search="true" data-coreui-selection-mode="multiple" data-coreui-indicator="checkbox" style="max-width: 20rem">
+<Example code={`<div class="list-box" data-coreui-list-box data-coreui-counter="true" data-coreui-search="true" data-coreui-selection-mode="multiple" data-coreui-indicator="checkbox" style="max-width: 20rem">
     <div class="list-box-header">
       <button type="button" class="list-box-select-all" data-coreui-select-all>Fruit</button>
     </div>
@@ -241,7 +241,7 @@ Both numbers read the same set — the options that are visible and enabled, whi
 
 Group options in a `.list-box-section` and name it with a `.list-box-section-label`. The plugin adds `role="group"`; point `aria-labelledby` at the label so the group is announced with its name.
 
-<Example code={`<div class="list-box" data-coreui-toggle="list-box" style="max-width: 20rem">
+<Example code={`<div class="list-box" data-coreui-list-box style="max-width: 20rem">
     <div class="list-box-options" role="listbox" aria-label="Sandwich">
       <div class="list-box-section" aria-labelledby="listBoxVeggies">
         <div class="list-box-section-label" id="listBoxVeggies">Veggies</div>
@@ -260,7 +260,7 @@ Group options in a `.list-box-section` and name it with a `.list-box-section-lab
 
 `sectionsSelectable` turns every section label into a tri-state button that toggles its own section: `aria-pressed` reads `false`, `mixed` or `true`, and with `indicator: 'checkbox'` the label carries the same checkbox as the options. It works in `multiple` mode and covers the section's visible, enabled options only, so a filtered list toggles what is on screen; `selectionLimit` still applies. The labels join the arrow-key order in document position, so <kbd>↓</kbd> walks label, options, next label.
 
-<Example code={`<div class="list-box" data-coreui-toggle="list-box" data-coreui-selection-mode="multiple" data-coreui-sections-selectable="true" data-coreui-indicator="checkbox" style="max-width: 20rem">
+<Example code={`<div class="list-box" data-coreui-list-box data-coreui-selection-mode="multiple" data-coreui-sections-selectable="true" data-coreui-indicator="checkbox" style="max-width: 20rem">
     <div class="list-box-options" role="listbox" aria-label="Sandwich">
       <div class="list-box-section" aria-labelledby="listBoxSelectableVeggies">
         <div class="list-box-section-label" id="listBoxSelectableVeggies">Veggies</div>
@@ -279,7 +279,7 @@ Group options in a `.list-box-section` and name it with a `.list-box-section-lab
 
 An option can carry a second line. Wrap the name in `.list-box-option-label` and the explanation in `.list-box-option-description` — typeahead then matches the label alone, so typing skips the description text.
 
-<Example code={`<div class="list-box" data-coreui-toggle="list-box" style="max-width: 20rem">
+<Example code={`<div class="list-box" data-coreui-list-box style="max-width: 20rem">
     <div class="list-box-options" role="listbox" aria-label="Plan">
       <div class="list-box-option" data-coreui-value="free">
         <span class="list-box-option-label">Free</span>
@@ -294,7 +294,7 @@ An option can carry a second line. Wrap the name in `.list-box-option-label` and
 
 Descriptions and the checkbox indicator work together: the indicator stays centred against the whole option and both lines of the text start past it, so a two-line option keeps the same left column as the select-all button above.
 
-<Example code={`<div class="list-box" data-coreui-toggle="list-box" data-coreui-selection-mode="multiple" data-coreui-indicator="checkbox" style="max-width: 22rem">
+<Example code={`<div class="list-box" data-coreui-list-box data-coreui-selection-mode="multiple" data-coreui-indicator="checkbox" style="max-width: 22rem">
     <div class="list-box-header">
       <button type="button" class="list-box-select-all" data-coreui-select-all>Select all</button>
     </div>
@@ -318,7 +318,7 @@ Descriptions and the checkbox indicator work together: the indicator stays centr
 
 An option that is an `<a>` with an `href` navigates on click and on <kbd>Enter</kbd>, and fires `action.coreui.list-box` on the way out — so a list of destinations keeps working with the keyboard without losing the browser's own link behavior.
 
-<Example code={`<div class="list-box" data-coreui-toggle="list-box" data-coreui-selection-mode="none" style="max-width: 20rem">
+<Example code={`<div class="list-box" data-coreui-list-box data-coreui-selection-mode="none" style="max-width: 20rem">
     <div class="list-box-options" role="listbox" aria-label="Documentation">
       <a class="list-box-option" href="/components/menu/" data-coreui-value="menu">Menu</a>
       <a class="list-box-option" href="/components/list-group/" data-coreui-value="list-group">List group</a>
@@ -330,7 +330,7 @@ An option that is an `<a>` with an `href` navigates on click and on <kbd>Enter</
 
 `.disabled` (with `aria-disabled="true"` for assistive technology) takes an option out of the keyboard order and out of every selection method. `data-coreui-disabled="true"` on the list box does the same for all of it: `aria-disabled` lands on the options element and the select-all button is disabled.
 
-<Example code={`<div class="list-box" data-coreui-toggle="list-box" style="max-width: 20rem">
+<Example code={`<div class="list-box" data-coreui-list-box style="max-width: 20rem">
     <div class="list-box-options" role="listbox" aria-label="Sandwich">
       <div class="list-box-option" data-coreui-value="lettuce">Lettuce</div>
       <div class="list-box-option disabled" aria-disabled="true" data-coreui-value="tomato">Tomato — out of stock</div>
@@ -342,7 +342,7 @@ An option that is an `<a>` with an `href` navigates on click and on <kbd>Enter</
 
 A `.list-box-empty` element inside the options is shown whenever nothing is left to navigate and hidden as soon as something is, so filtering a list has somewhere to land. `update()` re-evaluates it.
 
-<Example code={`<div class="list-box" data-coreui-toggle="list-box" style="max-width: 20rem">
+<Example code={`<div class="list-box" data-coreui-list-box style="max-width: 20rem">
     <div class="list-box-options" role="listbox" aria-label="Results">
       <div class="list-box-option" data-coreui-value="lettuce" hidden>Lettuce</div>
       <div class="list-box-empty">No results</div>
@@ -389,11 +389,11 @@ The option's checkbox indicator is decorative — it is a `<span>` marked `aria-
 
 ### Via data attributes
 
-Add `data-coreui-toggle="list-box"` to a `.list-box` and the plugin initializes it on page load. Put the choices in a `.list-box-options` child — that is the element the listbox role and the accessible name belong on — and make every option a `.list-box-option` with its value in `data-coreui-value`.
+Add `data-coreui-list-box` to a `.list-box` and the plugin initializes it on page load. Put the choices in a `.list-box-options` child — that is the element the listbox role and the accessible name belong on — and make every option a `.list-box-option` with its value in `data-coreui-value`.
 
 | Attribute | Description |
 | --- | --- |
-| `data-coreui-toggle="list-box"` | Initializes the list box on page load. |
+| `data-coreui-list-box` | Initializes the list box on page load. |
 | `data-coreui-value` | The value of an option. Defaults to the option's text. |
 | `data-coreui-select-all` | Marks a button anywhere in the container as the switch for the whole list. |
 | `data-coreui-indicator="checkbox"` | Renders the checkbox indicator in front of every option. |
@@ -402,7 +402,7 @@ Add `data-coreui-toggle="list-box"` to a `.list-box` and the plugin initializes 
 | `data-coreui-loading="true"` | Marks the list as loading: `aria-busy` on the options element, `.loading` on the container, empty state held back. |
 
 ```html
-<div class="list-box" data-coreui-toggle="list-box" data-coreui-selection-mode="multiple">
+<div class="list-box" data-coreui-list-box data-coreui-selection-mode="multiple">
   <div class="list-box-header">
     <button type="button" class="list-box-select-all" data-coreui-select-all>Select all</button>
   </div>

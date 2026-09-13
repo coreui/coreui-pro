@@ -360,7 +360,7 @@ describe('PasswordStrength', () => {
     const pair = () => {
       fixtureEl.innerHTML = [
         '<div>',
-        '  <input type="password" class="form-control" id="pw" data-coreui-toggle="password-input" value="Str0ng!&Passphrase99">',
+        '  <input type="password" class="form-control" id="pw" data-coreui-password-input value="Str0ng!&Passphrase99">',
         '  <div id="meter"></div>',
         '</div>'
       ].join('')

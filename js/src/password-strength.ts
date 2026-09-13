@@ -38,7 +38,7 @@ const SELECTOR_DATA_PASSWORD_STRENGTH = '[data-coreui-password-strength]'
 // Password Input switches `type` to reveal the value, so a field paired with it
 // is only sometimes `type="password"`. Its toggle attribute is not, which keeps
 // the pairing findable while the password is visible.
-const SELECTOR_PASSWORD = 'input[type="password"], input[data-coreui-toggle="password-input"]'
+const SELECTOR_PASSWORD = 'input[type="password"], input[data-coreui-password-input]'
 
 type StrengthResult = number | { score: number, warning?: string, suggestions?: string[] }
 

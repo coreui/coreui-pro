@@ -67,7 +67,7 @@ const CLASS_NAME_SECTION_LABEL = 'list-box-section-label'
 const CLASS_NAME_SUBTITLE = 'list-box-subtitle'
 const CLASS_NAME_SELECTED = 'selected'
 
-const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="list-box"]'
+const SELECTOR_DATA_LIST_BOX = '[data-coreui-list-box]'
 const SELECTOR_COUNTER = '[data-coreui-list-box-counter]'
 const SELECTOR_EMPTY = '.list-box-empty'
 const SELECTOR_HEADER = '.list-box-header'
@@ -1304,7 +1304,7 @@ class ListBox extends BaseComponent {
  */
 
 EventHandler.on(document, `DOMContentLoaded${EVENT_KEY}${DATA_API_KEY}`, () => {
-  for (const element of SelectorEngine.find(SELECTOR_DATA_TOGGLE)) {
+  for (const element of SelectorEngine.find(SELECTOR_DATA_LIST_BOX)) {
     ListBox.getOrCreateInstance(element)
   }
 })

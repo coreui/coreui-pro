@@ -48,9 +48,9 @@ describe('RangeSlider', () => {
 
   describe('constructor', () => {
     it('should initialize with default configuration', () => {
-      fixtureEl.innerHTML = '<div data-coreui-toggle="range-slider"></div>'
+      fixtureEl.innerHTML = '<div data-coreui-range-slider></div>'
 
-      const element = fixtureEl.querySelector('[data-coreui-toggle="range-slider"]')
+      const element = fixtureEl.querySelector('[data-coreui-range-slider]')
       const rangeSlider = new RangeSlider(element)
 
       expect(element.classList.contains('range-slider')).toBeTrue()
@@ -63,9 +63,9 @@ describe('RangeSlider', () => {
     })
 
     it('should render the tooltip as a hidden <output> of phrasing content', () => {
-      fixtureEl.innerHTML = '<div data-coreui-toggle="range-slider"></div>'
+      fixtureEl.innerHTML = '<div data-coreui-range-slider></div>'
 
-      const element = fixtureEl.querySelector('[data-coreui-toggle="range-slider"]')
+      const element = fixtureEl.querySelector('[data-coreui-range-slider]')
       const rangeSlider = new RangeSlider(element)
       const tooltip = element.querySelector('.range-slider-tooltip')
 
@@ -76,9 +76,9 @@ describe('RangeSlider', () => {
     })
 
     it('should add tooltipClass to the tooltip only', () => {
-      fixtureEl.innerHTML = '<div data-coreui-toggle="range-slider" data-coreui-tooltip-class="theme-secondary my-bubble"></div>'
+      fixtureEl.innerHTML = '<div data-coreui-range-slider data-coreui-tooltip-class="theme-secondary my-bubble"></div>'
 
-      const element = fixtureEl.querySelector('[data-coreui-toggle="range-slider"]')
+      const element = fixtureEl.querySelector('[data-coreui-range-slider]')
       const rangeSlider = new RangeSlider(element)
       const tooltip = element.querySelector('.range-slider-tooltip')
 
@@ -88,9 +88,9 @@ describe('RangeSlider', () => {
     })
 
     it('should render the tooltip with the Tooltip markup, placed by orientation', () => {
-      fixtureEl.innerHTML = '<div data-coreui-toggle="range-slider" data-coreui-value="40"></div><div data-coreui-toggle="range-slider" data-coreui-vertical="true"></div>'
+      fixtureEl.innerHTML = '<div data-coreui-range-slider data-coreui-value="40"></div><div data-coreui-range-slider data-coreui-vertical="true"></div>'
 
-      const [horizontal, vertical] = fixtureEl.querySelectorAll('[data-coreui-toggle="range-slider"]')
+      const [horizontal, vertical] = fixtureEl.querySelectorAll('[data-coreui-range-slider]')
       const horizontalSlider = new RangeSlider(horizontal)
       const verticalSlider = new RangeSlider(vertical)
       const tooltip = horizontal.querySelector('.range-slider-tooltip')
@@ -107,9 +107,9 @@ describe('RangeSlider', () => {
     })
 
     it('should position the tooltip through a custom property, not inline offsets', () => {
-      fixtureEl.innerHTML = '<div data-coreui-toggle="range-slider" data-coreui-min="0" data-coreui-max="200" data-coreui-value="50"></div>'
+      fixtureEl.innerHTML = '<div data-coreui-range-slider data-coreui-min="0" data-coreui-max="200" data-coreui-value="50"></div>'
 
-      const element = fixtureEl.querySelector('[data-coreui-toggle="range-slider"]')
+      const element = fixtureEl.querySelector('[data-coreui-range-slider]')
       const rangeSlider = new RangeSlider(element)
       const tooltip = element.querySelector('.range-slider-tooltip')
 
@@ -126,7 +126,7 @@ describe('RangeSlider', () => {
     it('should initialize with custom configuration via data attributes', () => {
       fixtureEl.innerHTML = `
         <div
-          data-coreui-toggle="range-slider"
+          data-coreui-range-slider
           data-coreui-min="10"
           data-coreui-max="50"
           data-coreui-step="5"
@@ -135,7 +135,7 @@ describe('RangeSlider', () => {
         </div>
       `
 
-      const element = fixtureEl.querySelector('[data-coreui-toggle="range-slider"]')
+      const element = fixtureEl.querySelector('[data-coreui-range-slider]')
       const rangeSlider = new RangeSlider(element)
 
       expect(element.classList.contains('range-slider-vertical')).toBeTrue()
@@ -713,8 +713,8 @@ describe('RangeSlider', () => {
     })
 
     it('should show the tooltip permanently with tooltips "always"', () => {
-      fixtureEl.innerHTML = '<div data-coreui-toggle="range-slider" data-coreui-tooltips="always" data-coreui-value="20,80"></div>'
-      const element = fixtureEl.querySelector('[data-coreui-toggle="range-slider"]')
+      fixtureEl.innerHTML = '<div data-coreui-range-slider data-coreui-tooltips="always" data-coreui-value="20,80"></div>'
+      const element = fixtureEl.querySelector('[data-coreui-range-slider]')
       const rangeSlider = new RangeSlider(element)
 
       const tooltips = element.querySelectorAll('.range-slider-tooltip')
@@ -1781,9 +1781,9 @@ describe('RangeSlider', () => {
 
   describe('jQueryInterface', () => {
     it('should create a range slider via jQuery interface', () => {
-      fixtureEl.innerHTML = '<div data-coreui-toggle="range-slider"></div>'
+      fixtureEl.innerHTML = '<div data-coreui-range-slider></div>'
 
-      const element = fixtureEl.querySelector('[data-coreui-toggle="range-slider"]')
+      const element = fixtureEl.querySelector('[data-coreui-range-slider]')
 
       jQueryMock.fn.rangeSlider = RangeSlider.jQueryInterface
       jQueryMock.elements = [element]
@@ -1794,9 +1794,9 @@ describe('RangeSlider', () => {
     })
 
     it('should not recreate range slider if already exists via jQuery interface', () => {
-      fixtureEl.innerHTML = '<div data-coreui-toggle="range-slider"></div>'
+      fixtureEl.innerHTML = '<div data-coreui-range-slider></div>'
 
-      const element = fixtureEl.querySelector('[data-coreui-toggle="range-slider"]')
+      const element = fixtureEl.querySelector('[data-coreui-range-slider]')
       const rangeSlider = new RangeSlider(element)
 
       jQueryMock.fn.rangeSlider = RangeSlider.jQueryInterface
@@ -1808,9 +1808,9 @@ describe('RangeSlider', () => {
     })
 
     it('should call a method via jQuery interface', () => {
-      fixtureEl.innerHTML = '<div data-coreui-toggle="range-slider"></div>'
+      fixtureEl.innerHTML = '<div data-coreui-range-slider></div>'
 
-      const element = fixtureEl.querySelector('[data-coreui-toggle="range-slider"]')
+      const element = fixtureEl.querySelector('[data-coreui-range-slider]')
       const rangeSlider = new RangeSlider(element, { value: 50 })
 
       jQueryMock.fn.rangeSlider = RangeSlider.jQueryInterface
@@ -1822,9 +1822,9 @@ describe('RangeSlider', () => {
     })
 
     it('should throw error for undefined methods via jQuery interface', () => {
-      fixtureEl.innerHTML = '<div data-coreui-toggle="range-slider"></div>'
+      fixtureEl.innerHTML = '<div data-coreui-range-slider></div>'
 
-      const element = fixtureEl.querySelector('[data-coreui-toggle="range-slider"]')
+      const element = fixtureEl.querySelector('[data-coreui-range-slider]')
       const action = 'undefinedMethod'
 
       jQueryMock.fn.rangeSlider = RangeSlider.jQueryInterface
@@ -1836,9 +1836,9 @@ describe('RangeSlider', () => {
     })
 
     it('should throw error for private methods (starting with _) via jQuery interface', () => {
-      fixtureEl.innerHTML = '<div data-coreui-toggle="range-slider"></div>'
+      fixtureEl.innerHTML = '<div data-coreui-range-slider></div>'
 
-      const element = fixtureEl.querySelector('[data-coreui-toggle="range-slider"]')
+      const element = fixtureEl.querySelector('[data-coreui-range-slider]')
 
       jQueryMock.fn.rangeSlider = RangeSlider.jQueryInterface
       jQueryMock.elements = [element]
@@ -1849,9 +1849,9 @@ describe('RangeSlider', () => {
     })
 
     it('should throw error for constructor via jQuery interface', () => {
-      fixtureEl.innerHTML = '<div data-coreui-toggle="range-slider"></div>'
+      fixtureEl.innerHTML = '<div data-coreui-range-slider></div>'
 
-      const element = fixtureEl.querySelector('[data-coreui-toggle="range-slider"]')
+      const element = fixtureEl.querySelector('[data-coreui-range-slider]')
 
       jQueryMock.fn.rangeSlider = RangeSlider.jQueryInterface
       jQueryMock.elements = [element]
@@ -1862,9 +1862,9 @@ describe('RangeSlider', () => {
     })
 
     it('should return early for non-string config', () => {
-      fixtureEl.innerHTML = '<div data-coreui-toggle="range-slider"></div>'
+      fixtureEl.innerHTML = '<div data-coreui-range-slider></div>'
 
-      const element = fixtureEl.querySelector('[data-coreui-toggle="range-slider"]')
+      const element = fixtureEl.querySelector('[data-coreui-range-slider]')
 
       jQueryMock.fn.rangeSlider = RangeSlider.jQueryInterface
       jQueryMock.elements = [element]
@@ -1877,9 +1877,9 @@ describe('RangeSlider', () => {
 
   describe('Data API', () => {
     it('should initialize from data attributes on load', () => {
-      fixtureEl.innerHTML = '<div data-coreui-toggle="range-slider" data-coreui-value="40"></div>'
+      fixtureEl.innerHTML = '<div data-coreui-range-slider data-coreui-value="40"></div>'
 
-      const element = fixtureEl.querySelector('[data-coreui-toggle="range-slider"]')
+      const element = fixtureEl.querySelector('[data-coreui-range-slider]')
 
       // Trigger the load event
       const loadEvent = new Event('load')
@@ -1899,7 +1899,7 @@ describe('RangeSlider', () => {
     it('should filter out disallowed attributes', () => {
       fixtureEl.innerHTML = `
         <div id="slider"
-             data-coreui-toggle="range-slider"
+             data-coreui-range-slider
              data-coreui-value="50"
              data-coreui-sanitize="true">
         </div>

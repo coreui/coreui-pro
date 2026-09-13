@@ -46,7 +46,7 @@ const CLASS_NAME_RANGE_SLIDER_TRACK = 'range-slider-track'
 const CLASS_NAME_RANGE_SLIDER_VERTICAL = 'range-slider-vertical'
 const CLASS_NAME_SHOW = 'show'
 
-const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="range-slider"]'
+const SELECTOR_DATA_RANGE_SLIDER = '[data-coreui-range-slider]'
 const SELECTOR_RANGE_SLIDER_INPUT = '.range-slider-input'
 const SELECTOR_RANGE_SLIDER_INPUTS_CONTAINER = '.range-slider-inputs-container'
 const SELECTOR_RANGE_SLIDER_TICK = '.range-slider-tick'
@@ -688,7 +688,7 @@ class RangeSlider extends BaseComponent {
  */
 
 EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
-  const ratings = SelectorEngine.find(SELECTOR_DATA_TOGGLE)
+  const ratings = SelectorEngine.find(SELECTOR_DATA_RANGE_SLIDER)
   for (let i = 0, len = ratings.length; i < len; i++) {
     RangeSlider.rangeSliderInterface(ratings[i])
   }

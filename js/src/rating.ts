@@ -42,7 +42,7 @@ const CLASS_NAME_RATING_ITEM_INPUT = 'rating-item-input'
 const CLASS_NAME_RATING_ITEM_LABEL = 'rating-item-label'
 const CLASS_NAME_READONLY = 'readonly'
 
-const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="rating"]'
+const SELECTOR_DATA_RATING = '[data-coreui-rating]'
 const SELECTOR_RATING_ITEM = '.rating-item'
 const SELECTOR_RATING_ITEM_INPUT = '.rating-item-input'
 const SELECTOR_RATING_ITEM_LABEL = '.rating-item-label'
@@ -490,7 +490,7 @@ class Rating extends BaseComponent {
  */
 
 EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
-  const ratings = SelectorEngine.find(SELECTOR_DATA_TOGGLE)
+  const ratings = SelectorEngine.find(SELECTOR_DATA_RATING)
   for (let i = 0, len = ratings.length; i < len; i++) {
     Rating.ratingInterface(ratings[i])
   }
