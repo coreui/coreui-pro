@@ -13,7 +13,7 @@ import SelectorEngine from '../dom/selector-engine.js'
 import Config from './config.js'
 import FocusTrap from './focustrap.js'
 import {
-  execute, executeAfterTransition, getElement, isRTL
+  execute, executeAfterTransition, getElement
 } from './index.js'
 
 /**
@@ -375,7 +375,7 @@ class Popup extends Config {
 
     computePosition(this._anchor!, this._content!, {
       middleware,
-      placement: this._resolvePlacement() as any,
+      placement: this._config.placement as any,
       strategy: 'absolute'
     }).then(({ x, y }) => {
       // dispose() can null the content while computePosition is in flight
@@ -389,17 +389,6 @@ class Popup extends Config {
         top: `${y}px`
       })
     })
-  }
-
-  _resolvePlacement(): any {
-    const { placement } = this._config
-    if (!isRTL()) {
-      return placement
-    }
-
-    return placement.endsWith('-start') ?
-      placement.replace('-start', '-end') :
-      (placement.endsWith('-end') ? placement.replace('-end', '-start') : placement)
   }
 
   // The native `<input type="date">` model: the field's own arrows belong to the

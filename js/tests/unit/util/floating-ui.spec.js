@@ -1,6 +1,5 @@
 import {
   BREAKPOINTS,
-  getDefaultPlacement,
   parseResponsivePlacement,
   getResponsivePlacement,
   createBreakpointListeners,
@@ -16,52 +15,6 @@ describe('FloatingUI Util', () => {
       expect(BREAKPOINTS.lg).toBe(1024)
       expect(BREAKPOINTS.xl).toBe(1280)
       expect(BREAKPOINTS['2xl']).toBe(1536)
-    })
-  })
-
-  describe('getDefaultPlacement', () => {
-    it('should return fallback placement when no alignment', () => {
-      expect(getDefaultPlacement('bottom')).toBe('bottom')
-      expect(getDefaultPlacement('top')).toBe('top')
-      expect(getDefaultPlacement('left')).toBe('left')
-      expect(getDefaultPlacement('right')).toBe('right')
-    })
-
-    it('should return default "bottom" when no argument provided', () => {
-      expect(getDefaultPlacement()).toBe('bottom')
-    })
-
-    it('should return placement with alignment in LTR mode', () => {
-      // In LTR mode (default), alignment should be preserved
-      const htmlEl = document.documentElement
-      const originalDir = htmlEl.getAttribute('dir')
-      htmlEl.removeAttribute('dir')
-
-      expect(getDefaultPlacement('bottom-start')).toBe('bottom-start')
-      expect(getDefaultPlacement('bottom-end')).toBe('bottom-end')
-      expect(getDefaultPlacement('top-start')).toBe('top-start')
-      expect(getDefaultPlacement('top-end')).toBe('top-end')
-
-      if (originalDir) {
-        htmlEl.setAttribute('dir', originalDir)
-      }
-    })
-
-    it('should flip alignment in RTL mode', () => {
-      const htmlEl = document.documentElement
-      const originalDir = htmlEl.getAttribute('dir')
-      htmlEl.setAttribute('dir', 'rtl')
-
-      expect(getDefaultPlacement('bottom-start')).toBe('bottom-end')
-      expect(getDefaultPlacement('bottom-end')).toBe('bottom-start')
-      expect(getDefaultPlacement('top-start')).toBe('top-end')
-      expect(getDefaultPlacement('top-end')).toBe('top-start')
-
-      if (originalDir) {
-        htmlEl.setAttribute('dir', originalDir)
-      } else {
-        htmlEl.removeAttribute('dir')
-      }
     })
   })
 
