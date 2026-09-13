@@ -33,8 +33,8 @@ const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 const EVENT_PASTE = `paste${EVENT_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
+const SELECTOR_DATA_OTP = '[data-coreui-otp]'
 const SELECTOR_FORM_OTP_CONTROL = '.form-otp-control'
-const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="otp"]'
 
 /**
  * Types
@@ -526,7 +526,7 @@ class OTPInput extends BaseComponent {
  */
 
 EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
-  for (const otp of SelectorEngine.find(SELECTOR_DATA_TOGGLE)) {
+  for (const otp of SelectorEngine.find(SELECTOR_DATA_OTP)) {
     OTPInput.otpInputInterface(otp)
   }
 })

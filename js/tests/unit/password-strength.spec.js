@@ -322,7 +322,7 @@ describe('PasswordStrength', () => {
       fixtureEl.innerHTML = [
         '<div>',
         '  <input type="password" class="form-control" value="Str0ng!&Passphrase99">',
-        '  <div id="meter" data-coreui-toggle="password-strength"></div>',
+        '  <div id="meter" data-coreui-password-strength></div>',
         '</div>'
       ].join('')
 
