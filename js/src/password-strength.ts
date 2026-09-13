@@ -34,7 +34,7 @@ const CLASS_NAME_SUGGESTIONS = 'password-strength-suggestions'
 const CLASS_NAME_TEXT = 'password-strength-text'
 const CLASS_NAME_WARNING = 'password-strength-warning'
 
-const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="password-strength"]'
+const SELECTOR_DATA_PASSWORD_STRENGTH = '[data-coreui-password-strength]'
 // Password Input switches `type` to reveal the value, so a field paired with it
 // is only sometimes `type="password"`. Its toggle attribute is not, which keeps
 // the pairing findable while the password is visible.
@@ -431,7 +431,7 @@ class PasswordStrength extends BaseComponent {
 
   // Static
   static _initializeDataApi(): void {
-    for (const element of SelectorEngine.find(SELECTOR_DATA_TOGGLE)) {
+    for (const element of SelectorEngine.find(SELECTOR_DATA_PASSWORD_STRENGTH)) {
       PasswordStrength.getOrCreateInstance(element)
     }
   }

@@ -1589,6 +1589,11 @@ adornment in the library — so the button needs no icon markup at all:
 
 #### OTP input
 
+- **The plugin is enabled with a bare `data-coreui-otp`.** `data-coreui-toggle="otp"`
+  no longer initialises anything. The toggle attribute marks a control the user
+  activates — a button, a link, an input that opens a panel — and the OTP field
+  is none of those: it is a wrapper the plugin builds its slots inside. Chip
+  Input, Multi Select and the masked date and time fields already read that way.
 - **A code delivered by SMS autofill or a password manager now fills the whole
   field.** Only the first slot carries `autocomplete="one-time-code"` (the rest
   are `off`), and a multi-character value arriving in any slot is spread across

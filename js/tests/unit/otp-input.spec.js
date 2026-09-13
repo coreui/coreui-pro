@@ -1082,13 +1082,13 @@ describe('OTPInput', () => {
   describe('data-api', () => {
     it('should initialize on page load', () => {
       fixtureEl.innerHTML = `
-        <div class="form-otp" data-coreui-toggle="otp">
+        <div class="form-otp" data-coreui-otp>
           <input type="text" class="form-otp-control">
           <input type="text" class="form-otp-control">
         </div>
       `
 
-      const otpContainer = fixtureEl.querySelector('[data-coreui-toggle="otp"]')
+      const otpContainer = fixtureEl.querySelector('[data-coreui-otp]')
       const loadEvent = createEvent('load')
       window.dispatchEvent(loadEvent)
 
