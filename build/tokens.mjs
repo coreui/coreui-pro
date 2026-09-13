@@ -133,7 +133,6 @@ const BLOCKS = {
     'box-shadow-variables': () => shadows()
   },
   'scss/_theme.scss': {
-    'theme-color-variables': () => scalars(new Map(themeColors.map(([key, token]) => [key, token.get('base')])), 16),
     'theme-colors-map': () => map({
       name: 'theme-colors',
       body: nested(themeColors.map(([color, token]) => [color, THEME_SLOTS.map(key => key === 'base' ? [key, `$${color}`] : slot(token, key))]), 17, true)
