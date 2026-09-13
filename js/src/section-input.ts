@@ -57,66 +57,116 @@ const SELECTOR_FORM_VALIDATE_VALID = '[data-coreui-validate~="valid"]'
 const SELECTOR_SECTION = '.form-date-time-section'
 
 export type SectionInputConfig = {
+  ariaDayLabel: string
+  ariaHourLabel: string
   ariaLabel: string
+  ariaMeridiemLabel: string
+  ariaMinuteLabel: string
+  ariaMonthLabel: string
+  ariaQuarterLabel: string
+  ariaSecondLabel: string
+  ariaWeekLabel: string
+  ariaYearLabel: string
   autofocus: boolean
   date: Date | number | string | null
+  dayPlaceholder: string | null
   disabled: boolean
   disabledDates: any
   format: ((locale: string) => DateSection[]) | string | null
+  hourPlaceholder: string | null
   inputDateParse: ((value: string) => Date | null) | null
   invalid: boolean
   locale: string
   maxDate: Date | number | string | null
+  meridiemPlaceholder: string | null
   minDate: Date | number | string | null
+  minutePlaceholder: string | null
   monthNames: string[] | null
+  monthPlaceholder: string | null
   name: string | null
-  placeholders: Record<string, string> | null
+  quarterPlaceholder: string | null
   readonly: boolean
   required: boolean
-  sectionLabels: Record<string, string> | null
+  secondPlaceholder: string | null
   valid: boolean
+  weekPlaceholder: string | null
+  yearPlaceholder: string | null
+
 }
 
 const Default: SectionInputConfig = {
+  ariaDayLabel: 'Day',
+  ariaHourLabel: 'Hour',
   ariaLabel: 'Date input',
+  ariaMeridiemLabel: 'AM/PM',
+  ariaMinuteLabel: 'Minute',
+  ariaMonthLabel: 'Month',
+  ariaQuarterLabel: 'Quarter',
+  ariaSecondLabel: 'Second',
+  ariaWeekLabel: 'Week',
+  ariaYearLabel: 'Year',
   autofocus: false,
   date: null,
+  dayPlaceholder: null,
   disabled: false,
   disabledDates: null,
   format: null,
+  hourPlaceholder: null,
   inputDateParse: null,
   invalid: false,
   locale: 'default',
   maxDate: null,
+  meridiemPlaceholder: null,
   minDate: null,
+  minutePlaceholder: null,
   monthNames: null,
+  monthPlaceholder: null,
   name: null,
-  placeholders: null,
+  quarterPlaceholder: null,
   readonly: false,
   required: false,
-  sectionLabels: null,
-  valid: false
+  secondPlaceholder: null,
+  valid: false,
+  weekPlaceholder: null,
+  yearPlaceholder: null
+
 }
 
 const DefaultType: Record<string, string> = {
+  ariaDayLabel: 'string',
+  ariaHourLabel: 'string',
   ariaLabel: 'string',
+  ariaMeridiemLabel: 'string',
+  ariaMinuteLabel: 'string',
+  ariaMonthLabel: 'string',
+  ariaQuarterLabel: 'string',
+  ariaSecondLabel: 'string',
+  ariaWeekLabel: 'string',
+  ariaYearLabel: 'string',
   autofocus: 'boolean',
   date: '(date|number|string|null)',
+  dayPlaceholder: '(string|null)',
   disabled: 'boolean',
   disabledDates: '(array|date|function|null)',
   format: '(function|string|null)',
+  hourPlaceholder: '(string|null)',
   inputDateParse: '(function|null)',
   invalid: 'boolean',
   locale: 'string',
   maxDate: '(date|number|string|null)',
+  meridiemPlaceholder: '(string|null)',
   minDate: '(date|number|string|null)',
+  minutePlaceholder: '(string|null)',
   monthNames: '(array|null)',
+  monthPlaceholder: '(string|null)',
   name: '(string|null)',
-  placeholders: '(object|null)',
+  quarterPlaceholder: '(string|null)',
   readonly: 'boolean',
   required: 'boolean',
-  sectionLabels: '(object|null)',
-  valid: 'boolean'
+  secondPlaceholder: '(string|null)',
+  valid: 'boolean',
+  weekPlaceholder: '(string|null)',
+  yearPlaceholder: '(string|null)'
 }
 
 const DefaultPlaceholders = {
@@ -129,18 +179,6 @@ const DefaultPlaceholders = {
   minute: 'mm',
   second: 'ss',
   meridiem: 'AM'
-}
-
-const DefaultSectionLabels = {
-  day: 'Day',
-  week: 'Week',
-  month: 'Month',
-  quarter: 'Quarter',
-  year: 'Year',
-  hour: 'Hour',
-  minute: 'Minute',
-  second: 'Second',
-  meridiem: 'AM/PM'
 }
 
 /**
@@ -693,8 +731,6 @@ class SectionInput extends BaseComponent {
     this._element.setAttribute('aria-label', this._config.ariaLabel)
     this._element.innerHTML = ''
 
-    const sectionLabels = { ...DefaultSectionLabels, ...this._config.sectionLabels }
-
     for (const section of this._sections) {
       if (section.type === 'literal') {
         const separatorElement = document.createElement('span')
@@ -712,7 +748,7 @@ class SectionInput extends BaseComponent {
       sectionElement.setAttribute('inputmode', section.names ? 'text' : 'numeric')
       sectionElement.setAttribute('autocorrect', 'off')
       sectionElement.setAttribute('spellcheck', 'false')
-      sectionElement.setAttribute('aria-label', sectionLabels[section.type])
+      sectionElement.setAttribute('aria-label', this._sectionLabel(section.type))
       sectionElement.setAttribute('aria-valuemin', min as any)
       sectionElement.setAttribute('aria-valuemax', max as any)
       sectionElement.dataset.coreuiSection = section.type
@@ -759,12 +795,20 @@ class SectionInput extends BaseComponent {
     }
   }
 
+  _sectionLabel(type: string): string {
+    return (this._config as any)[`aria${type[0].toUpperCase()}${type.slice(1)}Label`]
+  }
+
+  _sectionPlaceholder(type: string): string | null {
+    return (this._config as any)[`${type}Placeholder`]
+  }
+
   _syncSections(): void {
     const sectionElements = this._getSectionElements()
 
     for (const [index, sectionElement] of sectionElements.entries()) {
       const section = this._getSection(index)
-      const configuredPlaceholder = this._config.placeholders && this._config.placeholders[section.type]
+      const configuredPlaceholder = this._sectionPlaceholder(section.type)
       const placeholder = configuredPlaceholder || section.placeholder || (DefaultPlaceholders as Record<string, string>)[section.type].slice(0, section.length)
 
       sectionElement.textContent = formatSectionValue(section, placeholder)

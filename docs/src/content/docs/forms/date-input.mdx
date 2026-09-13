@@ -112,7 +112,7 @@ Without an explicit format, the mask follows the locale set via `data-coreui-loc
   </div>
   <div class="mb-3">
     <label class="form-label">pl-PL</label>
-    <div class="form-control form-date-time" data-coreui-date-input data-coreui-locale="pl-PL" data-coreui-placeholders='{"day": "DD", "month": "MM", "year": "RRRR"}'></div>
+    <div class="form-control form-date-time" data-coreui-date-input data-coreui-locale="pl-PL" data-coreui-day-placeholder="DD" data-coreui-month-placeholder="MM" data-coreui-year-placeholder="RRRR"></div>
   </div>
   <div>
     <label class="form-label">ja-JP</label>
@@ -265,7 +265,7 @@ The date input implements the [spinbutton pattern](https://www.w3.org/WAI/ARIA/a
 
 - **Role attributes**: the container has `role="group"`, every section is a `role="spinbutton"` with `aria-valuemin`, `aria-valuemax`, `aria-valuenow`, and `aria-valuetext` (month sections announce the localized month name).
 - **Roving tabindex**: the whole field is a single tab stop; arrow keys move between sections.
-- **Labels**: sections receive `aria-label`s (`Day`, `Month`, `Year`), customizable via the `sectionLabels` option for localization.
+- **Labels**: sections receive `aria-label`s (`Day`, `Month`, `Year`), each replaceable on its own — `ariaDayLabel`, `ariaMonthLabel`, `ariaYearLabel` — for localization.
 - **Mobile input**: sections use `inputmode="numeric"`, so touch devices show the numeric keyboard.
 
 ### Keyboard support
@@ -321,10 +321,18 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | `minDate` | date, number, string, null | `null` | Earliest selectable date |
 | `monthNames` | array, null | `null` | Twelve custom month names for text month sections (`MMM`/`MMMM`), overriding the locale-derived, date-context grammatical form |
 | `name` | string, null | `null` | Name attribute of the hidden input |
-| `placeholders` | object, null | `null` | Per-section placeholder overrides, e.g. `{"day": "DD", "month": "MM", "year": "RRRR"}` |
+| `dayPlaceholder` | string, null | `null` | Replaces the `DD` the day section shows while it is empty. |
+| `weekPlaceholder` | string, null | `null` | Replaces the `WW` the week section shows while it is empty. |
+| `monthPlaceholder` | string, null | `null` | Replaces the `MM` the month section shows while it is empty. |
+| `quarterPlaceholder` | string, null | `null` | Replaces the `Q` the quarter section shows while it is empty. |
+| `yearPlaceholder` | string, null | `null` | Replaces the `YYYY` the year section shows while it is empty. |
 | `readonly` | boolean | `false` | Make the field focusable but non-editable |
 | `required` | boolean | `false` | Required attribute of the hidden input |
-| `sectionLabels` | object, null | `null` | Per-section `aria-label` overrides, e.g. `{"day": "Dzień", "month": "Miesiąc", "year": "Rok"}` |
+| `ariaDayLabel` | string | `'Day'` | The `aria-label` of the day section. |
+| `ariaWeekLabel` | string | `'Week'` | The `aria-label` of the week section. |
+| `ariaMonthLabel` | string | `'Month'` | The `aria-label` of the month section. |
+| `ariaQuarterLabel` | string | `'Quarter'` | The `aria-label` of the quarter section. |
+| `ariaYearLabel` | string | `'Year'` | The `aria-label` of the year section. |
 | `valid` | boolean | `false` | Force the valid state (`.is-valid`) |
 
 ### Methods
