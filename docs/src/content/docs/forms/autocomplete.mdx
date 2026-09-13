@@ -22,7 +22,7 @@ The **Bootstrap Autocomplete Dropdown** component is a powerful autocomplete dro
 A straightforward demonstration of how to implement a basic Bootstrap Autocomplete input field, highlighting essential attributes and configurations.
 
 <Example pro code={`<div
-    data-coreui-toggle="autocomplete"
+    data-coreui-autocomplete
     data-coreui-cleaner="true"
     data-coreui-highlight-options-on-search="true"
     data-coreui-indicator="true"
@@ -41,7 +41,7 @@ Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label 
 <Example pro code={`<div class="form-field">
     <label for="autocompleteField" class="form-label">Framework</label>
     <div
-      data-coreui-toggle="autocomplete"
+      data-coreui-autocomplete
       data-coreui-id="autocompleteField"
       data-coreui-options="Angular, Bootstrap, React.js, Vue.js"
       data-coreui-placeholder="Search frameworks..."
@@ -105,13 +105,13 @@ Configure the search behavior within the component. The `data-coreui-search` opt
 
 By default, search applies only while the input field is focused:
 
-<Example pro code={`<div data-coreui-toggle="autocomplete" data-coreui-options="Angular, Bootstrap, React.js, Vue.js" data-coreui-placeholder="Search technologies..."></div>`} />
+<Example pro code={`<div data-coreui-autocomplete data-coreui-options="Angular, Bootstrap, React.js, Vue.js" data-coreui-placeholder="Search technologies..."></div>`} />
 
 ### Global search
 
 Enable global search functionality that works across the entire component, regardless of focus position:
 
-<Example pro code={`<div data-coreui-toggle="autocomplete" data-coreui-search="global" data-coreui-options="Angular, Bootstrap, React.js, Vue.js" data-coreui-placeholder="Global search enabled..."></div>`} />
+<Example pro code={`<div data-coreui-autocomplete data-coreui-search="global" data-coreui-options="Angular, Bootstrap, React.js, Vue.js" data-coreui-placeholder="Global search enabled..."></div>`} />
 
 ### External search
 
@@ -152,7 +152,7 @@ You can combine it with `'global'` (e.g. search: `['external', 'global']`) to al
 
 Restrict users to only select from predefined options by setting `data-coreui-allow-only-defined-options="true"`:
 
-<Example pro code={`<div data-coreui-toggle="autocomplete" data-coreui-allow-only-defined-options="true" data-coreui-options="Angular, Bootstrap, React.js, Vue.js" data-coreui-placeholder="Only predefined options allowed..."></div>`} />
+<Example pro code={`<div data-coreui-autocomplete data-coreui-allow-only-defined-options="true" data-coreui-options="Angular, Bootstrap, React.js, Vue.js" data-coreui-placeholder="Only predefined options allowed..."></div>`} />
 
 ## Hints and completion
 
@@ -162,27 +162,27 @@ Enable intelligent hints and auto-completion features to improve user experience
 
 Display completion hints as users type:
 
-<Example pro code={`<div data-coreui-toggle="autocomplete" data-coreui-options="Angular, Bootstrap, React.js, Vue.js" data-coreui-placeholder="Type to see hints..." data-coreui-show-hints="true"></div>`} />
+<Example pro code={`<div data-coreui-autocomplete data-coreui-options="Angular, Bootstrap, React.js, Vue.js" data-coreui-placeholder="Type to see hints..." data-coreui-show-hints="true"></div>`} />
 
 ### Highlight matching text
 
 Highlight matching portions of suggestions during search:
 
-<Example pro code={`<div data-coreui-toggle="autocomplete" data-coreui-highlight-options-on-search="true" data-coreui-options="Angular, Bootstrap, React.js, Vue.js" data-coreui-placeholder="Search with highlighting..."></div>`} />
+<Example pro code={`<div data-coreui-autocomplete data-coreui-highlight-options-on-search="true" data-coreui-options="Angular, Bootstrap, React.js, Vue.js" data-coreui-placeholder="Search with highlighting..."></div>`} />
 
 ## Validation states
 
 Apply validation styling to indicate input validity.
 
-<Example pro code={`<div data-coreui-toggle="autocomplete" data-coreui-options="Angular, Bootstrap, React.js, Vue.js" data-coreui-placeholder="Valid autocomplete..." data-coreui-valid="true"></div>`} />
+<Example pro code={`<div data-coreui-autocomplete data-coreui-options="Angular, Bootstrap, React.js, Vue.js" data-coreui-placeholder="Valid autocomplete..." data-coreui-valid="true"></div>`} />
 
-<Example pro code={`<div data-coreui-toggle="autocomplete" data-coreui-options="Angular, Bootstrap, React.js, Vue.js" data-coreui-placeholder="Invalid autocomplete..." data-coreui-invalid="true"></div>`} />
+<Example pro code={`<div data-coreui-autocomplete data-coreui-options="Angular, Bootstrap, React.js, Vue.js" data-coreui-placeholder="Invalid autocomplete..." data-coreui-invalid="true"></div>`} />
 
 ## Disabled
 
 Add the `data-coreui-disabled="true"` attribute to disable the component:
 
-<Example pro code={`<div data-coreui-toggle="autocomplete" data-coreui-disabled="true" data-coreui-options="" data-coreui-placeholder="Disabled autocomplete..." ></div>`} />
+<Example pro code={`<div data-coreui-autocomplete data-coreui-disabled="true" data-coreui-options="" data-coreui-placeholder="Disabled autocomplete..." ></div>`} />
 
 ## Sizing
 
@@ -197,7 +197,7 @@ The frame carries the size. Add `.form-control-sm` or `.form-control-lg` to the 
     data-coreui-placeholder="Large autocomplete..."
     data-coreui-search="global"
     data-coreui-show-hints="true"
-    data-coreui-toggle="autocomplete"
+    data-coreui-autocomplete
   ></div>
   <div 
     data-coreui-cleaner="true"
@@ -207,7 +207,7 @@ The frame carries the size. Add `.form-control-sm` or `.form-control-lg` to the 
     data-coreui-placeholder="Normal autocomplete..."
     data-coreui-search="global"
     data-coreui-show-hints="true"
-    data-coreui-toggle="autocomplete"
+    data-coreui-autocomplete
   ></div>
   <div 
     class="form-control-sm"
@@ -218,7 +218,7 @@ The frame carries the size. Add `.form-control-sm` or `.form-control-lg` to the 
     data-coreui-placeholder="Small autocomplete..."
     data-coreui-search="global"
     data-coreui-show-hints="true"
-    data-coreui-toggle="autocomplete"
+    data-coreui-autocomplete
   ></div>`} />
 
 ## Floating labels
@@ -228,7 +228,7 @@ Autocomplete supports [floating labels](/forms/floating-labels/). Wrap the compo
 <Example pro code={`<div class="form-floating">
     <label for="floatingAutocomplete">Framework</label>
     <div
-      data-coreui-toggle="autocomplete"
+      data-coreui-autocomplete
       data-coreui-id="floatingAutocomplete"
       data-coreui-options="Angular, Bootstrap, React.js, Vue.js"
       data-coreui-placeholder="Search frameworks..."
@@ -239,7 +239,7 @@ Autocomplete supports [floating labels](/forms/floating-labels/). Wrap the compo
 
 Enable a cleaner button to quickly clear input element:
 
-<Example pro code={`<div data-coreui-toggle="autocomplete" data-coreui-cleaner="true" data-coreui-options="Angular, Bootstrap, React.js, Vue.js" data-coreui-placeholder="With cleaner button..."></div>`} />
+<Example pro code={`<div data-coreui-autocomplete data-coreui-cleaner="true" data-coreui-options="Angular, Bootstrap, React.js, Vue.js" data-coreui-placeholder="With cleaner button..."></div>`} />
 
 ## Custom templates
 
@@ -265,7 +265,7 @@ We use the following JavaScript to set up our autocomplete:
 Add `autocomplete` class to a container element with an input field:
 
 ```html
-<div data-coreui-toggle="autocomplete" data-coreui-search="true"></div>
+<div data-coreui-autocomplete data-coreui-search="true"></div>
 ```
 
 ### Via JavaScript
@@ -273,7 +273,7 @@ Add `autocomplete` class to a container element with an input field:
 Initialize the autocomplete component via JavaScript:
 
 ```html
-<div data-coreui-toggle="autocomplete"></div>
+<div data-coreui-autocomplete></div>
 ```
 
 ```js

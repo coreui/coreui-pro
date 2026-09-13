@@ -27,7 +27,7 @@ end-date selection, the way clicking the end input does in v1.
 
 <Example pro code={`<div class="row">
     <div class="col-lg-7 mb-3">
-      <div data-coreui-locale="en-US" data-coreui-toggle="date-range-picker"></div>
+      <div data-coreui-locale="en-US" data-coreui-date-range-picker></div>
     </div>
   </div>
   <div class="row">
@@ -36,7 +36,7 @@ end-date selection, the way clicking the end input does in v1.
         data-coreui-end-date="2026/03/20"
         data-coreui-locale="en-US"
         data-coreui-start-date="2026/03/15"
-        data-coreui-toggle="date-range-picker"></div>
+        data-coreui-date-range-picker></div>
     </div>
   </div>`} />
 
@@ -48,7 +48,7 @@ closing is the footer's job.
 
 <Example pro code={`<div class="row">
     <div class="col-lg-7">
-      <div data-coreui-locale="en-US" data-coreui-toggle="date-range-picker">
+      <div data-coreui-locale="en-US" data-coreui-date-range-picker>
         <template data-coreui-template="footer">
           <button type="button" class="btn-ghost theme-primary btn-sm" data-coreui-picker-action="clear">Clear</button>
           <button type="button" class="btn-solid theme-primary btn-sm" data-coreui-picker-action="close">OK</button>
@@ -71,7 +71,7 @@ note on the ISO week-numbering year.
         data-coreui-locale="en-US"
         data-coreui-selection-type="week"
         data-coreui-show-week-number="true"
-        data-coreui-toggle="date-range-picker"></div>
+        data-coreui-date-range-picker></div>
     </div>
   </div>`} />
 
@@ -82,7 +82,7 @@ note on the ISO week-numbering year.
       <div
         data-coreui-locale="en-US"
         data-coreui-selection-type="month"
-        data-coreui-toggle="date-range-picker"></div>
+        data-coreui-date-range-picker></div>
     </div>
   </div>`} />
 
@@ -95,7 +95,7 @@ The field masks narrow to quarter and year sections (`Q1 2026`).
       <div
         data-coreui-locale="en-US"
         data-coreui-selection-type="quarter"
-        data-coreui-toggle="date-range-picker"></div>
+        data-coreui-date-range-picker></div>
     </div>
   </div>`} />
 
@@ -106,7 +106,7 @@ The field masks narrow to quarter and year sections (`Q1 2026`).
       <div
         data-coreui-locale="en-US"
         data-coreui-selection-type="year"
-        data-coreui-toggle="date-range-picker"></div>
+        data-coreui-date-range-picker></div>
     </div>
   </div>`} />
 
@@ -116,7 +116,7 @@ Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label 
 
 <Example pro code={`<div class="form-field">
     <span class="form-label">Reporting period</span>
-    <div data-coreui-locale="en-US" data-coreui-toggle="date-range-picker"></div>
+    <div data-coreui-locale="en-US" data-coreui-date-range-picker></div>
     <div class="form-text">Both dates are included in the report.</div>
   </div>`} />
 
@@ -124,18 +124,18 @@ Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label 
 
 Each field carries its own [floating label](/forms/floating-labels/): set `startFloatingLabel` and `endFloatingLabel` and the picker renders a label over each date, floating independently — fill in the check-in date and only its label rises. The label text also becomes the field's accessible name, so the visible and spoken labels stay one thing. No wrapper markup is needed.
 
-<Example pro code={`<div data-coreui-locale="en-US" data-coreui-start-floating-label="Check-in" data-coreui-end-floating-label="Check-out" data-coreui-toggle="date-range-picker"></div>`} />
+<Example pro code={`<div data-coreui-locale="en-US" data-coreui-start-floating-label="Check-in" data-coreui-end-floating-label="Check-out" data-coreui-date-range-picker></div>`} />
 
 ## Sizing
 
 <Example pro code={`<div class="row mb-3">
     <div class="col-lg-7">
-      <div data-coreui-locale="en-US" data-coreui-size="lg" data-coreui-toggle="date-range-picker"></div>
+      <div data-coreui-locale="en-US" data-coreui-size="lg" data-coreui-date-range-picker></div>
     </div>
   </div>
   <div class="row">
     <div class="col-lg-7">
-      <div data-coreui-locale="en-US" data-coreui-size="sm" data-coreui-toggle="date-range-picker"></div>
+      <div data-coreui-locale="en-US" data-coreui-size="sm" data-coreui-date-range-picker></div>
     </div>
   </div>`} />
 
@@ -143,7 +143,7 @@ Each field carries its own [floating label](/forms/floating-labels/): set `start
 
 <Example pro code={`<div class="row">
     <div class="col-lg-7">
-      <div data-coreui-disabled="true" data-coreui-locale="en-US" data-coreui-toggle="date-range-picker"></div>
+      <div data-coreui-disabled="true" data-coreui-locale="en-US" data-coreui-date-range-picker></div>
     </div>
   </div>`} />
 
@@ -193,7 +193,7 @@ yours.
 
 <Example pro code={`<div class="row">
     <div class="col-lg-7">
-      <div data-coreui-toggle="date-range-picker"></div>
+      <div data-coreui-date-range-picker></div>
     </div>
   </div>`} />
 
@@ -201,7 +201,7 @@ yours.
 
 <Example pro code={`<div class="row">
     <div class="col-lg-7">
-      <div data-coreui-locale="zh-CN" data-coreui-toggle="date-range-picker"></div>
+      <div data-coreui-locale="zh-CN" data-coreui-date-range-picker></div>
     </div>
   </div>`} />
 
@@ -209,7 +209,7 @@ yours.
 
 <Example pro code={`<div class="row">
     <div class="col-lg-7">
-      <div data-coreui-locale="ja" data-coreui-toggle="date-range-picker"></div>
+      <div data-coreui-locale="ja" data-coreui-date-range-picker></div>
     </div>
   </div>`} />
 
@@ -217,7 +217,7 @@ yours.
 
 <Example pro code={`<div class="row">
     <div class="col-lg-7">
-      <div data-coreui-locale="ko" data-coreui-toggle="date-range-picker"></div>
+      <div data-coreui-locale="ko" data-coreui-date-range-picker></div>
     </div>
   </div>`} />
 
@@ -227,7 +227,7 @@ yours.
 
 <Example pro code={`<div class="row" dir="rtl">
     <div class="col-lg-7">
-      <div data-coreui-locale="he-IL" data-coreui-toggle="date-range-picker"></div>
+      <div data-coreui-locale="he-IL" data-coreui-date-range-picker></div>
     </div>
   </div>`} />
 
@@ -235,7 +235,7 @@ yours.
 
 <Example pro code={`<div class="row" dir="rtl">
     <div class="col-lg-7">
-      <div data-coreui-locale="fa-IR" data-coreui-toggle="date-range-picker"></div>
+      <div data-coreui-locale="fa-IR" data-coreui-date-range-picker></div>
     </div>
   </div>`} />
 
@@ -250,7 +250,7 @@ format. Set it with `data-coreui-format`, forwarded to both fields.
 
 <Example pro code={`<div class="row">
     <div class="col-lg-7">
-      <div data-coreui-format="dd.MM.yyyy" data-coreui-locale="en-US" data-coreui-toggle="date-range-picker"></div>
+      <div data-coreui-format="dd.MM.yyyy" data-coreui-locale="en-US" data-coreui-date-range-picker></div>
     </div>
   </div>`} />
 
@@ -262,10 +262,10 @@ The fields and the popup answer to the [same keys as the date picker](/forms/dat
 
 ### Via data attributes
 
-Add `data-coreui-toggle="date-range-picker"` to a `div` element.
+Add `data-coreui-date-range-picker` to a `div` element.
 
 ```html
-<div data-coreui-toggle="date-range-picker"></div>
+<div data-coreui-date-range-picker></div>
 ```
 
 ### Via JavaScript

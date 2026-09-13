@@ -54,7 +54,7 @@ const CLASS_NAME_INPUT_HINT = 'autocomplete-input-hint'
 const CLASS_NAME_INPUT_GROUP = 'form-control-group'
 const CLASS_NAME_SHOW = 'show'
 
-const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="autocomplete"]:not(.disabled)'
+const SELECTOR_DATA_AUTOCOMPLETE = '[data-coreui-autocomplete]:not(.disabled)'
 const SELECTOR_DATA_TOGGLE_SHOWN = `.autocomplete:not(.disabled).${CLASS_NAME_SHOW}`
 const SELECTOR_INDICATOR = '.form-control-action'
 
@@ -778,7 +778,7 @@ class Autocomplete extends ComboboxBase {
  */
 
 EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
-  for (const autocomplete of SelectorEngine.find(SELECTOR_DATA_TOGGLE)) {
+  for (const autocomplete of SelectorEngine.find(SELECTOR_DATA_AUTOCOMPLETE)) {
     Autocomplete.autocompleteInterface(autocomplete)
   }
 })

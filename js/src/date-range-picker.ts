@@ -60,7 +60,7 @@ const CLASS_NAME_POPUP = 'popup'
 const CLASS_NAME_RANGES = 'date-picker-ranges'
 const CLASS_NAME_SHOW = 'show'
 
-const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="date-range-picker"]'
+const SELECTOR_DATA_DATE_RANGE_PICKER = '[data-coreui-date-range-picker]'
 const SELECTOR_TEMPLATE_FOOTER = 'template[data-coreui-template="footer"]'
 const SELECTOR_TEMPLATE_RANGES = 'template[data-coreui-template="ranges"]'
 const SELECTOR_ACTION = '[data-coreui-picker-action]'
@@ -514,7 +514,7 @@ class DateRangePicker extends BaseComponent {
  */
 
 EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
-  for (const element of SelectorEngine.find(SELECTOR_DATA_TOGGLE)) {
+  for (const element of SelectorEngine.find(SELECTOR_DATA_DATE_RANGE_PICKER)) {
     DateRangePicker.getOrCreateInstance(element)
   }
 })

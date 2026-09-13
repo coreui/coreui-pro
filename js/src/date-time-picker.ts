@@ -58,7 +58,7 @@ const CLASS_NAME_TIME_PICKERS = 'date-picker-timepickers'
 
 const SELECTOR_ACTION = '[data-coreui-picker-action]'
 const SELECTOR_ACTION_TODAY = '[data-coreui-picker-action="today"]'
-const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="date-time-picker"]'
+const SELECTOR_DATA_DATE_TIME_PICKER = '[data-coreui-date-time-picker]'
 const SELECTOR_TEMPLATE_FOOTER = 'template[data-coreui-template="footer"]'
 
 // Icons live in JavaScript, not in CSS masks — the chips pattern.
@@ -492,7 +492,7 @@ class DateTimePicker extends BaseComponent {
  */
 
 EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
-  for (const element of SelectorEngine.find(SELECTOR_DATA_TOGGLE)) {
+  for (const element of SelectorEngine.find(SELECTOR_DATA_DATE_TIME_PICKER)) {
     DateTimePicker.getOrCreateInstance(element)
   }
 })

@@ -24,7 +24,7 @@ keeps the day — so the popup does not auto-close.
 
 <Example pro code={`<div class="row">
     <div class="col-lg-6 mb-3">
-      <div data-coreui-locale="en-US" data-coreui-toggle="date-time-picker"></div>
+      <div data-coreui-locale="en-US" data-coreui-date-time-picker></div>
     </div>
   </div>
   <div class="row">
@@ -32,7 +32,7 @@ keeps the day — so the popup does not auto-close.
       <div
         data-coreui-date="2026/03/15 14:30:00"
         data-coreui-locale="en-US"
-        data-coreui-toggle="date-time-picker"></div>
+        data-coreui-date-time-picker></div>
     </div>
   </div>`} />
 
@@ -40,7 +40,7 @@ keeps the day — so the popup does not auto-close.
 
 <Example pro code={`<div class="row">
     <div class="col-lg-6">
-      <div data-coreui-locale="en-US" data-coreui-variant="select" data-coreui-toggle="date-time-picker"></div>
+      <div data-coreui-locale="en-US" data-coreui-variant="select" data-coreui-date-time-picker></div>
     </div>
   </div>`} />
 
@@ -48,7 +48,7 @@ keeps the day — so the popup does not auto-close.
 
 <Example pro code={`<div class="row">
     <div class="col-lg-6">
-      <div data-coreui-locale="en-US" data-coreui-toggle="date-time-picker">
+      <div data-coreui-locale="en-US" data-coreui-date-time-picker>
         <template data-coreui-template="footer">
           <button type="button" class="btn-ghost theme-danger btn-sm me-auto" data-coreui-picker-action="today">Today</button>
           <button type="button" class="btn-ghost theme-primary btn-sm" data-coreui-picker-action="clear">Clear</button>
@@ -64,7 +64,7 @@ Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label 
 
 <Example pro code={`<div class="form-field">
     <span class="form-label">Appointment</span>
-    <div data-coreui-locale="en-US" data-coreui-toggle="date-time-picker"></div>
+    <div data-coreui-locale="en-US" data-coreui-date-time-picker></div>
     <div class="form-text">Local time, in your own time zone.</div>
   </div>`} />
 
@@ -72,18 +72,18 @@ Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label 
 
 The date time picker supports [floating labels](/forms/floating-labels/): set `floatingLabel` and the component renders the label itself — no wrapper markup needed — and the text also becomes the field's accessible name. The mask placeholders stay hidden while the label rests inside the field; focusing any part of the field — the sections or the picker button — floats the label and reveals the mask.
 
-<Example pro code={`<div data-coreui-locale="en-US" data-coreui-floating-label="Appointment" data-coreui-toggle="date-time-picker"></div>`} />
+<Example pro code={`<div data-coreui-locale="en-US" data-coreui-floating-label="Appointment" data-coreui-date-time-picker></div>`} />
 
 ## Sizing
 
 <Example pro code={`<div class="row mb-3">
     <div class="col-lg-6">
-      <div data-coreui-locale="en-US" data-coreui-size="lg" data-coreui-toggle="date-time-picker"></div>
+      <div data-coreui-locale="en-US" data-coreui-size="lg" data-coreui-date-time-picker></div>
     </div>
   </div>
   <div class="row">
     <div class="col-lg-6">
-      <div data-coreui-locale="en-US" data-coreui-size="sm" data-coreui-toggle="date-time-picker"></div>
+      <div data-coreui-locale="en-US" data-coreui-size="sm" data-coreui-date-time-picker></div>
     </div>
   </div>`} />
 
@@ -91,7 +91,7 @@ The date time picker supports [floating labels](/forms/floating-labels/): set `f
 
 <Example pro code={`<div class="row">
     <div class="col-lg-6">
-      <div data-coreui-disabled="true" data-coreui-locale="en-US" data-coreui-toggle="date-time-picker"></div>
+      <div data-coreui-disabled="true" data-coreui-locale="en-US" data-coreui-date-time-picker></div>
     </div>
   </div>`} />
 
@@ -99,7 +99,7 @@ The date time picker supports [floating labels](/forms/floating-labels/): set `f
 
 <Example pro code={`<div class="row">
     <div class="col-lg-6">
-      <div data-coreui-locale="en-US" data-coreui-seconds="false" data-coreui-toggle="date-time-picker"></div>
+      <div data-coreui-locale="en-US" data-coreui-seconds="false" data-coreui-date-time-picker></div>
     </div>
   </div>`} />
 
@@ -107,12 +107,12 @@ The date time picker supports [floating labels](/forms/floating-labels/): set `f
 
 <Example pro code={`<div class="row mb-3">
     <div class="col-lg-6">
-      <div data-coreui-locale="ja" data-coreui-toggle="date-time-picker"></div>
+      <div data-coreui-locale="ja" data-coreui-date-time-picker></div>
     </div>
   </div>
   <div class="row">
     <div class="col-lg-6">
-      <div data-coreui-locale="ko" data-coreui-toggle="date-time-picker"></div>
+      <div data-coreui-locale="ko" data-coreui-date-time-picker></div>
     </div>
   </div>`} />
 
@@ -120,7 +120,7 @@ The date time picker supports [floating labels](/forms/floating-labels/): set `f
 
 <Example pro code={`<div class="row" dir="rtl">
     <div class="col-lg-6">
-      <div data-coreui-locale="he-IL" data-coreui-toggle="date-time-picker"></div>
+      <div data-coreui-locale="he-IL" data-coreui-date-time-picker></div>
     </div>
   </div>`} />
 
@@ -135,7 +135,7 @@ The toggle button carries the panel's state — `aria-haspopup="dialog"`, `aria-
 ### Via data attributes
 
 ```html
-<div data-coreui-toggle="date-time-picker"></div>
+<div data-coreui-date-time-picker></div>
 ```
 
 ### Via JavaScript
