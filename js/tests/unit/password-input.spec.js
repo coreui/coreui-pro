@@ -261,7 +261,7 @@ describe('PasswordInput', () => {
     }
 
     it('should build the frame and the toggle for a bare control', () => {
-      const input = initialized('<input type="password" class="form-control" data-coreui-toggle="password-input">')
+      const input = initialized('<input type="password" class="form-control" data-coreui-password-input>')
       const group = input.parentElement
 
       expect(group.classList.contains('form-control-group')).toBe(true)
@@ -271,7 +271,7 @@ describe('PasswordInput', () => {
     })
 
     it('should toggle visibility when its button is clicked', () => {
-      const input = initialized('<input type="password" class="form-control" data-coreui-toggle="password-input">')
+      const input = initialized('<input type="password" class="form-control" data-coreui-password-input>')
       const toggle = fixtureEl.querySelector('.form-control-action')
 
       expect(input.type).toBe('password')
@@ -288,7 +288,7 @@ describe('PasswordInput', () => {
     })
 
     it('should drop the button listener on dispose', () => {
-      const input = initialized('<input type="password" class="form-control" data-coreui-toggle="password-input">')
+      const input = initialized('<input type="password" class="form-control" data-coreui-password-input>')
       const toggle = fixtureEl.querySelector('.form-control-action')
 
       PasswordInput.getInstance(input).dispose()
@@ -298,15 +298,15 @@ describe('PasswordInput', () => {
     })
 
     it('should disable its button for a disabled control', () => {
-      initialized('<input type="password" class="form-control" disabled data-coreui-toggle="password-input">')
+      initialized('<input type="password" class="form-control" disabled data-coreui-password-input>')
 
       expect(fixtureEl.querySelector('.form-control-action').disabled).toBe(true)
     })
 
     it('should handle several controls independently', () => {
       fixtureEl.innerHTML = [
-        '<input type="password" class="form-control" data-coreui-toggle="password-input">',
-        '<input type="password" class="form-control" data-coreui-toggle="password-input">'
+        '<input type="password" class="form-control" data-coreui-password-input>',
+        '<input type="password" class="form-control" data-coreui-password-input>'
       ].join('')
       PasswordInput._initializeDataApi()
 
@@ -322,7 +322,7 @@ describe('PasswordInput', () => {
     })
 
     it('should move the author\'s classes onto the frame and back on dispose', () => {
-      const input = initialized('<input type="password" class="form-control form-control-lg mb-3" data-coreui-toggle="password-input">')
+      const input = initialized('<input type="password" class="form-control form-control-lg mb-3" data-coreui-password-input>')
       const group = input.parentElement
 
       expect(input.className).toBe('form-control')
@@ -336,7 +336,7 @@ describe('PasswordInput', () => {
     })
 
     it('should keep state classes on the input', () => {
-      const input = initialized('<input type="password" class="form-control is-invalid js-secret" data-coreui-toggle="password-input">')
+      const input = initialized('<input type="password" class="form-control is-invalid js-secret" data-coreui-password-input>')
 
       expect(input.className).toBe('form-control is-invalid js-secret')
       expect(input.parentElement.classList.contains('is-invalid')).toBe(false)
@@ -345,7 +345,7 @@ describe('PasswordInput', () => {
     it('should keep a group the author wrote', () => {
       fixtureEl.innerHTML = `<div class="form-control-group">
           <span class="form-control-icon"></span>
-          <input type="password" class="form-control" data-coreui-toggle="password-input">
+          <input type="password" class="form-control" data-coreui-password-input>
         </div>`
       PasswordInput._initializeDataApi()
 

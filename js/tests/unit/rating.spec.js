@@ -1079,7 +1079,7 @@ describe('Rating', () => {
 
   describe('configAfterMerge', () => {
     it('should convert comma-separated string tooltips to array', () => {
-      fixtureEl.innerHTML = '<div data-coreui-toggle="rating" data-coreui-tooltips="Bad,OK,Good,Great,Excellent"></div>'
+      fixtureEl.innerHTML = '<div data-coreui-rating data-coreui-tooltips="Bad,OK,Good,Great,Excellent"></div>'
       const div = fixtureEl.querySelector('div')
       const rating = new Rating(div)
 
@@ -1091,7 +1091,7 @@ describe('Rating', () => {
   describe('data-api', () => {
     it('should create rating elements on window load event', () => {
       fixtureEl.innerHTML = `
-        <div id="myRating" data-coreui-toggle="rating" data-coreui-value="2" data-coreui-item-count="4"></div>
+        <div id="myRating" data-coreui-rating data-coreui-value="2" data-coreui-item-count="4"></div>
       `
       const ratingEl = fixtureEl.querySelector('#myRating')
 
@@ -1107,7 +1107,7 @@ describe('Rating', () => {
 
     it('should initialize with data attributes for disabled', () => {
       fixtureEl.innerHTML = `
-        <div id="myRating" data-coreui-toggle="rating" data-coreui-disabled="true"></div>
+        <div id="myRating" data-coreui-rating data-coreui-disabled="true"></div>
       `
       const ratingEl = fixtureEl.querySelector('#myRating')
 
@@ -1121,7 +1121,7 @@ describe('Rating', () => {
 
     it('should initialize with data attributes for readonly', () => {
       fixtureEl.innerHTML = `
-        <div id="myRating" data-coreui-toggle="rating" data-coreui-readonly="true"></div>
+        <div id="myRating" data-coreui-rating data-coreui-readonly="true"></div>
       `
       const ratingEl = fixtureEl.querySelector('#myRating')
 
@@ -1135,7 +1135,7 @@ describe('Rating', () => {
 
     it('should not include disallowed attributes from data attributes', () => {
       fixtureEl.innerHTML = `
-        <div id="myRating" data-coreui-toggle="rating" data-coreui-item-count="3"></div>
+        <div id="myRating" data-coreui-rating data-coreui-item-count="3"></div>
       `
       const ratingEl = fixtureEl.querySelector('#myRating')
 

@@ -16,7 +16,7 @@ If you're looking for a Form Wizard in Bootstrap 6 or a flexible Stepper Compone
 
 A simple multi-step form built with the Bootstrap Stepper. Each step displays form content and controls navigation through buttons (`next`, `prev`, `finish`).
 
-<Example pro code={`<div class="stepper" data-coreui-toggle="stepper" id="myStepper">
+<Example pro code={`<div class="stepper" data-coreui-stepper id="myStepper">
     <ol class="stepper-steps">
       <li class="stepper-step">
         <button type="button" class="stepper-step-button" data-coreui-toggle="step" data-coreui-target="#step-1">
@@ -128,7 +128,7 @@ A simple multi-step form built with the Bootstrap Stepper. Each step displays fo
 
 Display step indicators vertically above labels using the `.vertical` modifier. This provides a compact and stylish layout for narrower screens or vertical designs.
 
-<Example pro code={`<div class="stepper" data-coreui-toggle="stepper">
+<Example pro code={`<div class="stepper" data-coreui-stepper>
     <ol class="stepper-steps">
       <li class="stepper-step vertical">
         <button type="button" class="stepper-step-button active" data-coreui-toggle="step">
@@ -155,7 +155,7 @@ Display step indicators vertically above labels using the `.vertical` modifier. 
 
 Use the `.stepper-vertical` class to build a full vertical stepper, where both indicators and step content stack vertically. Ideal for mobile-first designs or top-to-bottom flows.
 
-<Example pro code={`<div class="stepper stepper-vertical" data-coreui-toggle="stepper">
+<Example pro code={`<div class="stepper stepper-vertical" data-coreui-stepper>
     <ol class="stepper-steps">
       <li class="stepper-step">
         <button type="button" class="stepper-step-button active" data-coreui-toggle="step">
@@ -278,7 +278,7 @@ Use a Linear Bootstrap Stepper when you need a guided and controlled experience,
 - Registration wizards
 - Multistep forms with required validation
 
-<Example pro code={`<div class="stepper" data-coreui-toggle="stepper">
+<Example pro code={`<div class="stepper" data-coreui-stepper>
     <ol class="stepper-steps">
       <li class="stepper-step">
         <button type="button" class="stepper-step-button" data-coreui-toggle="step">
@@ -313,7 +313,7 @@ Use a Non-linear Bootstrap Stepper when users should have full control over navi
 - Onboarding flows where some steps are optional
 - Complex multi-section forms where order doesn't matter
 
-<Example pro code={`<div class="stepper" data-coreui-linear="false" data-coreui-toggle="stepper">
+<Example pro code={`<div class="stepper" data-coreui-linear="false" data-coreui-stepper>
     <ol class="stepper-steps">
       <li class="stepper-step">
         <button type="button" class="stepper-step-button" data-coreui-toggle="step">
@@ -348,7 +348,7 @@ If a form is invalid, the stepper blocks navigation and displays validation mess
 
 This example shows a stepper with native browser validation enabled:
 
-<Example pro code={`<div class="stepper" data-coreui-toggle="stepper" id="validationStepper">
+<Example pro code={`<div class="stepper" data-coreui-stepper id="validationStepper">
     <ol class="stepper-steps">
       <li class="stepper-step">
         <button type="button" class="stepper-step-button active" data-coreui-toggle="step" data-coreui-target="#validation-step-1">
@@ -410,7 +410,7 @@ This example shows a stepper with native browser validation enabled:
 
 To disable native browser styles validation and turn on custom styles, add the `novalidate` attribute to your forms. The stepper then marks the invalid controls with `.is-invalid` when a step fails, and keeps the state updated as the user corrects them; add `data-coreui-validate="valid"` to a form to also mark the valid controls with `.is-valid`:
 
-<Example pro code={`<div class="stepper" data-coreui-toggle="stepper" id="novalidateStepper">
+<Example pro code={`<div class="stepper" data-coreui-stepper id="novalidateStepper">
     <ol class="stepper-steps">
       <li class="stepper-step">
         <button type="button" class="stepper-step-button active" data-coreui-toggle="step" data-coreui-target="#novalidate-step-1">
@@ -472,7 +472,7 @@ To disable native browser styles validation and turn on custom styles, add the `
 
 To completely skip form validation and allow free navigation between steps, add `data-coreui-skip-validation="true"` to the stepper:
 
-<Example pro code={`<div class="stepper" data-coreui-toggle="stepper" data-coreui-skip-validation="true" id="skipValidationStepper">
+<Example pro code={`<div class="stepper" data-coreui-stepper data-coreui-skip-validation="true" id="skipValidationStepper">
     <ol class="stepper-steps">
       <li class="stepper-step">
         <button type="button" class="stepper-step-button active" data-coreui-toggle="step" data-coreui-target="#skip-step-1">
@@ -557,13 +557,13 @@ The Stepper component supports comprehensive keyboard navigation out of the box:
 
 ### Via data attributes
 
-Add `data-coreui-toggle="stepper"` to a `<div>` element to initialize a Stepper Component automatically via JavaScript:
+Add `data-coreui-stepper` to a `<div>` element to initialize a Stepper Component automatically via JavaScript:
 
 ```html
-<div class="stepper" data-coreui-toggle="stepper"></div>
+<div class="stepper" data-coreui-stepper></div>
 ```
 
-**Important**: Every Bootstrap Stepper requires data-coreui-toggle="stepper" to properly initialize and handle steps, navigation, and events.
+**Important**: Every Bootstrap Stepper requires data-coreui-stepper to properly initialize and handle steps, navigation, and events.
 
 ### Via JavaScript
 
@@ -622,7 +622,7 @@ myStepper.addEventListener('stepChange.coreui.stepper', event => {
 
 A [theme class](/customize/components/#theme-variants) colors the active and completed step indicators and the connectors:
 
-<Example code={`<div class="stepper theme-success" data-coreui-toggle="stepper">
+<Example code={`<div class="stepper theme-success" data-coreui-stepper>
     <ol class="stepper-steps">
       <li class="stepper-step complete">
         <button type="button" class="stepper-step-button" data-coreui-step="1">

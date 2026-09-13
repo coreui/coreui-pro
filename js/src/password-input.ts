@@ -29,7 +29,7 @@ const EVENT_CLICK = `click${EVENT_KEY}`
 const CLASS_NAME_ACTION = 'form-control-action'
 const CLASS_NAME_PASSWORD_INPUT = 'password-input'
 
-const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="password-input"]'
+const SELECTOR_DATA_PASSWORD_INPUT = '[data-coreui-password-input]'
 
 interface PasswordInputConfig {
   allowList: SanitizerAllowList
@@ -143,7 +143,7 @@ class PasswordInput extends BaseComponent {
 
   // Static
   static _initializeDataApi(): void {
-    for (const element of SelectorEngine.find(SELECTOR_DATA_TOGGLE)) {
+    for (const element of SelectorEngine.find(SELECTOR_DATA_PASSWORD_INPUT)) {
       PasswordInput.getOrCreateInstance(element)
     }
   }

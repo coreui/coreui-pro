@@ -185,7 +185,7 @@ describe('ListBox', () => {
 
   describe('data api', () => {
     it('should initialize every list box on DOMContentLoaded', () => {
-      const el = setMarkup(' data-coreui-toggle="list-box"')
+      const el = setMarkup(' data-coreui-list-box')
 
       document.dispatchEvent(new Event('DOMContentLoaded'))
 

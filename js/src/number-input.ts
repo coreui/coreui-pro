@@ -34,7 +34,7 @@ const EVENTS_STOP_REPEAT = ['pointerup', 'pointercancel', 'pointerleave'].map(ev
 const CLASS_NAME_ACTION = 'form-control-action'
 const CLASS_NAME_NUMBER_INPUT = 'number-input'
 
-const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="number-input"]'
+const SELECTOR_DATA_NUMBER_INPUT = '[data-coreui-number-input]'
 
 // The repeat while a button is held: long enough that a single click never
 // starts it, then fast enough to cross a range without waiting.
@@ -294,7 +294,7 @@ class NumberInput extends BaseComponent {
 
   // Static
   static _initializeDataApi(): void {
-    for (const element of SelectorEngine.find(SELECTOR_DATA_TOGGLE)) {
+    for (const element of SelectorEngine.find(SELECTOR_DATA_NUMBER_INPUT)) {
       NumberInput.getOrCreateInstance(element)
     }
   }

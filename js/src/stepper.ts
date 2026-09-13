@@ -40,7 +40,7 @@ const CLASS_NAME_STEPPER_STEP_CONNECTOR = 'stepper-step-connector'
 const CLASS_NAME_STEPPER_STEP_INDICATOR_ICON = 'stepper-step-indicator-icon'
 const CLASS_NAME_STEPPER_STEP_INDICATOR_TEXT = 'stepper-step-indicator-text'
 
-const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="stepper"]'
+const SELECTOR_DATA_STEPPER = '[data-coreui-stepper]'
 const SELECTOR_FORM_VALIDATE_VALID = '[data-coreui-validate~="valid"]'
 const SELECTOR_STEPPER = '.stepper'
 const SELECTOR_STEPPER_ACTION = '[data-coreui-stepper-action]'
@@ -693,7 +693,7 @@ EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_STEPPER_ACTION, functio
 })
 
 EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
-  for (const element of SelectorEngine.find(SELECTOR_DATA_TOGGLE)) {
+  for (const element of SelectorEngine.find(SELECTOR_DATA_STEPPER)) {
     Stepper.getOrCreateInstance(element)
   }
 })

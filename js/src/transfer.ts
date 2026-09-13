@@ -40,7 +40,7 @@ const CLASS_NAME_DISABLED = 'disabled'
 const CLASS_NAME_OPTIONS = 'list-box-options'
 const CLASS_NAME_VISUALLY_HIDDEN = 'visually-hidden'
 
-const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="transfer"]'
+const SELECTOR_DATA_TRANSFER = '[data-coreui-transfer]'
 const SELECTOR_LIST = '[data-coreui-transfer-list]'
 const SELECTOR_MOVE = '[data-coreui-transfer-move]'
 const SELECTOR_OPTION = '.list-box-option'
@@ -684,7 +684,7 @@ class Transfer extends BaseComponent {
  */
 
 EventHandler.on(document, `DOMContentLoaded${EVENT_KEY}${DATA_API_KEY}`, () => {
-  for (const element of SelectorEngine.find(SELECTOR_DATA_TOGGLE)) {
+  for (const element of SelectorEngine.find(SELECTOR_DATA_TRANSFER)) {
     Transfer.getOrCreateInstance(element)
   }
 })

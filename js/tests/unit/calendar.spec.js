@@ -2771,8 +2771,8 @@ describe('Calendar', () => {
 
   describe('jQueryInterface', () => {
     it('should create a calendar via jQueryInterface', () => {
-      fixtureEl.innerHTML = '<div data-coreui-toggle="calendar"></div>'
-      const element = fixtureEl.querySelector('[data-coreui-toggle="calendar"]')
+      fixtureEl.innerHTML = '<div data-coreui-calendar></div>'
+      const element = fixtureEl.querySelector('[data-coreui-calendar]')
 
       jQueryMock.fn.calendar = Calendar.jQueryInterface
       jQueryMock.elements = [element]
@@ -2782,8 +2782,8 @@ describe('Calendar', () => {
     })
 
     it('should throw error on undefined method', () => {
-      fixtureEl.innerHTML = '<div data-coreui-toggle="calendar"></div>'
-      const element = fixtureEl.querySelector('[data-coreui-toggle="calendar"]')
+      fixtureEl.innerHTML = '<div data-coreui-calendar></div>'
+      const element = fixtureEl.querySelector('[data-coreui-calendar]')
 
       jQueryMock.fn.calendar = Calendar.jQueryInterface
       jQueryMock.elements = [element]

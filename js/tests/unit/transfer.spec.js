@@ -208,9 +208,9 @@ describe('Transfer', () => {
     })
 
     it('should initialize on page load with the data api', () => {
-      setMarkup(' data-coreui-toggle="transfer"')
+      setMarkup(' data-coreui-transfer')
 
-      const el = fixtureEl.querySelector('[data-coreui-toggle="transfer"]')
+      const el = fixtureEl.querySelector('[data-coreui-transfer]')
       const transfer = Transfer.getOrCreateInstance(el)
 
       expect(transfer).not.toBeNull()

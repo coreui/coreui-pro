@@ -38,7 +38,7 @@ describe('Stepper', () => {
     `).join('')
 
     return `
-      <div class="stepper" data-coreui-toggle="stepper" ${dataAttrs.join(' ')}>
+      <div class="stepper" data-coreui-stepper ${dataAttrs.join(' ')}>
         <ol class="stepper-steps">
           ${buttons}
         </ol>
@@ -61,7 +61,7 @@ describe('Stepper', () => {
     `).join('')
 
     return `
-      <div class="stepper" data-coreui-toggle="stepper">
+      <div class="stepper" data-coreui-stepper>
         <ol class="stepper-steps">
           ${steps}
         </ol>
@@ -70,9 +70,9 @@ describe('Stepper', () => {
   }
 
   describe('constructor', () => {
-    it('should initialize with a DOM element having data-coreui-toggle="stepper"', () => {
+    it('should initialize with a DOM element having data-coreui-stepper', () => {
       fixtureEl.innerHTML = `
-        <div class="stepper" data-coreui-toggle="stepper">
+        <div class="stepper" data-coreui-stepper>
           <ol class="stepper-steps">
             <li class="stepper-step">
               <button type="button" class="stepper-step-button active">Step 1</button>
@@ -136,7 +136,7 @@ describe('Stepper', () => {
 
     it('should wrap indicator text nodes in span', () => {
       fixtureEl.innerHTML = `
-        <div class="stepper" data-coreui-toggle="stepper">
+        <div class="stepper" data-coreui-stepper>
           <ol class="stepper-steps">
             <li class="stepper-step">
               <button type="button" class="stepper-step-button active">
@@ -158,7 +158,7 @@ describe('Stepper', () => {
 
     it('should not wrap indicator text if already wrapped in element', () => {
       fixtureEl.innerHTML = `
-        <div class="stepper" data-coreui-toggle="stepper">
+        <div class="stepper" data-coreui-stepper>
           <ol class="stepper-steps">
             <li class="stepper-step">
               <button type="button" class="stepper-step-button active">
@@ -179,7 +179,7 @@ describe('Stepper', () => {
 
     it('should not wrap indicator text if multiple visible nodes', () => {
       fixtureEl.innerHTML = `
-        <div class="stepper" data-coreui-toggle="stepper">
+        <div class="stepper" data-coreui-stepper>
           <ol class="stepper-steps">
             <li class="stepper-step">
               <button type="button" class="stepper-step-button active">
@@ -254,7 +254,7 @@ describe('Stepper', () => {
 
     it('should not overwrite existing button id', () => {
       fixtureEl.innerHTML = `
-        <div class="stepper" data-coreui-toggle="stepper">
+        <div class="stepper" data-coreui-stepper>
           <ol class="stepper-steps">
             <li class="stepper-step">
               <button type="button" id="my-custom-id" class="stepper-step-button active" data-coreui-target="#step1">
@@ -316,7 +316,7 @@ describe('Stepper', () => {
 
     it('should leave keydown alone outside the step buttons', () => {
       fixtureEl.innerHTML = `
-        <div class="stepper" data-coreui-toggle="stepper">
+        <div class="stepper" data-coreui-stepper>
           <ol class="stepper-steps">
             <li class="stepper-step">
               <button type="button" class="stepper-step-button active" data-coreui-target="#step1">
@@ -446,7 +446,7 @@ describe('Stepper', () => {
 
     it('should not advance if current step validation fails', () => {
       fixtureEl.innerHTML = `
-        <div class="stepper" data-coreui-toggle="stepper">
+        <div class="stepper" data-coreui-stepper>
           <ol class="stepper-steps">
             <li class="stepper-step">
               <button type="button" class="stepper-step-button active" data-coreui-target="#step1">
@@ -573,7 +573,7 @@ describe('Stepper', () => {
 
     it('should do nothing if validation fails', () => {
       fixtureEl.innerHTML = `
-        <div class="stepper" data-coreui-toggle="stepper">
+        <div class="stepper" data-coreui-stepper>
           <ol class="stepper-steps">
             <li class="stepper-step">
               <button type="button" class="stepper-step-button active" data-coreui-target="#step1">
@@ -698,7 +698,7 @@ describe('Stepper', () => {
 
     it('should not finish if validation fails', () => {
       fixtureEl.innerHTML = `
-        <div class="stepper" data-coreui-toggle="stepper">
+        <div class="stepper" data-coreui-stepper>
           <ol class="stepper-steps">
             <li class="stepper-step">
               <button type="button" class="stepper-step-button active" data-coreui-target="#step1">
@@ -761,7 +761,7 @@ describe('Stepper', () => {
     it('should handle stepContent (no pane) with animation on finish', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = `
-          <div class="stepper" data-coreui-toggle="stepper">
+          <div class="stepper" data-coreui-stepper>
             <ol class="stepper-steps">
               <li class="stepper-step">
                 <button type="button" class="stepper-step-button active">
@@ -792,7 +792,7 @@ describe('Stepper', () => {
     it('should call finishHandler directly when neither pane nor stepContent exist', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = `
-          <div class="stepper" data-coreui-toggle="stepper">
+          <div class="stepper" data-coreui-stepper>
             <ol class="stepper-steps">
               <li class="stepper-step">
                 <button type="button" class="stepper-step-button active">
@@ -944,7 +944,7 @@ describe('Stepper', () => {
 
     it('should reset forms inside panes', () => {
       fixtureEl.innerHTML = `
-        <div class="stepper" data-coreui-toggle="stepper">
+        <div class="stepper" data-coreui-stepper>
           <ol class="stepper-steps">
             <li class="stepper-step">
               <button type="button" class="stepper-step-button active" data-coreui-target="#step1">
@@ -988,7 +988,7 @@ describe('Stepper', () => {
 
     it('should do nothing if no enabled steps', () => {
       fixtureEl.innerHTML = `
-        <div class="stepper" data-coreui-toggle="stepper">
+        <div class="stepper" data-coreui-stepper>
           <ol class="stepper-steps">
             <li class="stepper-step">
               <button type="button" class="stepper-step-button active" disabled>
@@ -1084,7 +1084,7 @@ describe('Stepper', () => {
   describe('skipValidation option', () => {
     it('should skip validation when skipValidation is true', () => {
       fixtureEl.innerHTML = `
-        <div class="stepper" data-coreui-toggle="stepper">
+        <div class="stepper" data-coreui-stepper>
           <ol class="stepper-steps">
             <li class="stepper-step">
               <button type="button" class="stepper-step-button active" data-coreui-target="#step1">
@@ -1117,7 +1117,7 @@ describe('Stepper', () => {
 
     it('should enforce validation when skipValidation is false', () => {
       fixtureEl.innerHTML = `
-        <div class="stepper" data-coreui-toggle="stepper">
+        <div class="stepper" data-coreui-stepper>
           <ol class="stepper-steps">
             <li class="stepper-step">
               <button type="button" class="stepper-step-button active" data-coreui-target="#step1">
@@ -1152,7 +1152,7 @@ describe('Stepper', () => {
   describe('form validation (_isCurrentStepValid)', () => {
     it('should return true when no target pane or stepContent', () => {
       fixtureEl.innerHTML = `
-        <div class="stepper" data-coreui-toggle="stepper">
+        <div class="stepper" data-coreui-stepper>
           <ol class="stepper-steps">
             <li class="stepper-step">
               <button type="button" class="stepper-step-button active">
@@ -1180,7 +1180,7 @@ describe('Stepper', () => {
 
     it('should return true when target has no form', () => {
       fixtureEl.innerHTML = `
-        <div class="stepper" data-coreui-toggle="stepper">
+        <div class="stepper" data-coreui-stepper>
           <ol class="stepper-steps">
             <li class="stepper-step">
               <button type="button" class="stepper-step-button active" data-coreui-target="#step1">
@@ -1211,7 +1211,7 @@ describe('Stepper', () => {
 
     it('should validate form and block on invalid', () => {
       fixtureEl.innerHTML = `
-        <div class="stepper" data-coreui-toggle="stepper">
+        <div class="stepper" data-coreui-stepper>
           <ol class="stepper-steps">
             <li class="stepper-step">
               <button type="button" class="stepper-step-button active" data-coreui-target="#step1">
@@ -1243,7 +1243,7 @@ describe('Stepper', () => {
     })
 
     const validationFixture = formAttributes => `
-        <div class="stepper" data-coreui-toggle="stepper">
+        <div class="stepper" data-coreui-stepper>
           <ol class="stepper-steps">
             <li class="stepper-step">
               <button type="button" class="stepper-step-button active" data-coreui-target="#step1">
@@ -1323,7 +1323,7 @@ describe('Stepper', () => {
 
     it('should call reportValidity on non-noValidate forms on failure', () => {
       fixtureEl.innerHTML = `
-        <div class="stepper" data-coreui-toggle="stepper">
+        <div class="stepper" data-coreui-stepper>
           <ol class="stepper-steps">
             <li class="stepper-step">
               <button type="button" class="stepper-step-button active" data-coreui-target="#step1">
@@ -1357,7 +1357,7 @@ describe('Stepper', () => {
 
     it('should allow advancing when form is valid', () => {
       fixtureEl.innerHTML = `
-        <div class="stepper" data-coreui-toggle="stepper">
+        <div class="stepper" data-coreui-stepper>
           <ol class="stepper-steps">
             <li class="stepper-step">
               <button type="button" class="stepper-step-button active" data-coreui-target="#step1">
@@ -1391,7 +1391,7 @@ describe('Stepper', () => {
     it('should trigger stepValidationComplete event', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = `
-          <div class="stepper" data-coreui-toggle="stepper">
+          <div class="stepper" data-coreui-stepper>
             <ol class="stepper-steps">
               <li class="stepper-step">
                 <button type="button" class="stepper-step-button active" data-coreui-target="#step1">
@@ -1432,7 +1432,7 @@ describe('Stepper', () => {
 
     it('should validate forms in stepper-step-content', () => {
       fixtureEl.innerHTML = `
-        <div class="stepper" data-coreui-toggle="stepper">
+        <div class="stepper" data-coreui-stepper>
           <ol class="stepper-steps">
             <li class="stepper-step">
               <button type="button" class="stepper-step-button active">
@@ -1661,7 +1661,7 @@ describe('Stepper', () => {
 
     it('should call next action via data-coreui-stepper-action', () => {
       fixtureEl.innerHTML = `
-        <div class="stepper" data-coreui-toggle="stepper">
+        <div class="stepper" data-coreui-stepper>
           <ol class="stepper-steps">
             <li class="stepper-step">
               <button type="button" class="stepper-step-button active" data-coreui-target="#step1">
@@ -1692,7 +1692,7 @@ describe('Stepper', () => {
 
     it('should call prev action via data-coreui-stepper-action', () => {
       fixtureEl.innerHTML = `
-        <div class="stepper" data-coreui-toggle="stepper">
+        <div class="stepper" data-coreui-stepper>
           <ol class="stepper-steps">
             <li class="stepper-step">
               <button type="button" class="stepper-step-button" data-coreui-target="#step1">
@@ -1723,7 +1723,7 @@ describe('Stepper', () => {
 
     it('should call finish action via data-coreui-stepper-action', () => {
       fixtureEl.innerHTML = `
-        <div class="stepper" data-coreui-toggle="stepper">
+        <div class="stepper" data-coreui-stepper>
           <ol class="stepper-steps">
             <li class="stepper-step">
               <button type="button" class="stepper-step-button active" data-coreui-target="#step1">
@@ -1748,7 +1748,7 @@ describe('Stepper', () => {
 
     it('should call reset action via data-coreui-stepper-action', () => {
       fixtureEl.innerHTML = `
-        <div class="stepper" data-coreui-toggle="stepper">
+        <div class="stepper" data-coreui-stepper>
           <ol class="stepper-steps">
             <li class="stepper-step">
               <button type="button" class="stepper-step-button active" data-coreui-target="#step1">
@@ -1797,7 +1797,7 @@ describe('Stepper', () => {
 
     it('should prevent default on anchor tag step buttons', () => {
       fixtureEl.innerHTML = `
-        <div class="stepper" data-coreui-toggle="stepper">
+        <div class="stepper" data-coreui-stepper>
           <ol class="stepper-steps">
             <li class="stepper-step">
               <a href="#" class="stepper-step-button active" data-coreui-target="#step1">
@@ -1845,7 +1845,7 @@ describe('Stepper', () => {
 
     it('should not add duplicate connectors', () => {
       fixtureEl.innerHTML = `
-        <div class="stepper" data-coreui-toggle="stepper">
+        <div class="stepper" data-coreui-stepper>
           <ol class="stepper-steps">
             <li class="stepper-step">
               <button type="button" class="stepper-step-button active">
@@ -1874,7 +1874,7 @@ describe('Stepper', () => {
 
     it('should not add connector after last step', () => {
       fixtureEl.innerHTML = `
-        <div class="stepper" data-coreui-toggle="stepper">
+        <div class="stepper" data-coreui-stepper>
           <ol class="stepper-steps">
             <li class="stepper-step">
               <button type="button" class="stepper-step-button active">
@@ -2006,7 +2006,7 @@ describe('Stepper', () => {
   describe('jQueryInterface', () => {
     it('should create a stepper via jQueryInterface', () => {
       fixtureEl.innerHTML = `
-        <div class="stepper" data-coreui-toggle="stepper">
+        <div class="stepper" data-coreui-stepper>
           <ol class="stepper-steps">
             <li class="stepper-step">
               <button type="button" class="stepper-step-button active">Step 1</button>
@@ -2027,7 +2027,7 @@ describe('Stepper', () => {
 
     it('should call a stepper method via jQueryInterface', () => {
       fixtureEl.innerHTML = `
-        <div class="stepper" data-coreui-toggle="stepper">
+        <div class="stepper" data-coreui-stepper>
           <ol class="stepper-steps">
             <li class="stepper-step">
               <button type="button" class="stepper-step-button active">Step 1</button>
@@ -2051,7 +2051,7 @@ describe('Stepper', () => {
 
     it('should throw error when calling undefined method via jQueryInterface', () => {
       fixtureEl.innerHTML = `
-        <div class="stepper" data-coreui-toggle="stepper">
+        <div class="stepper" data-coreui-stepper>
           <ol class="stepper-steps">
             <li class="stepper-step">
               <button type="button" class="stepper-step-button active">Step 1</button>
@@ -2072,7 +2072,7 @@ describe('Stepper', () => {
 
     it('should throw error when calling private method via jQueryInterface', () => {
       fixtureEl.innerHTML = `
-        <div class="stepper" data-coreui-toggle="stepper">
+        <div class="stepper" data-coreui-stepper>
           <ol class="stepper-steps">
             <li class="stepper-step">
               <button type="button" class="stepper-step-button active">Step 1</button>
@@ -2093,7 +2093,7 @@ describe('Stepper', () => {
 
     it('should throw error when calling constructor via jQueryInterface', () => {
       fixtureEl.innerHTML = `
-        <div class="stepper" data-coreui-toggle="stepper">
+        <div class="stepper" data-coreui-stepper>
           <ol class="stepper-steps">
             <li class="stepper-step">
               <button type="button" class="stepper-step-button active">Step 1</button>
@@ -2114,7 +2114,7 @@ describe('Stepper', () => {
 
     it('should not throw for non-string config', () => {
       fixtureEl.innerHTML = `
-        <div class="stepper" data-coreui-toggle="stepper">
+        <div class="stepper" data-coreui-stepper>
           <ol class="stepper-steps">
             <li class="stepper-step">
               <button type="button" class="stepper-step-button active">Step 1</button>
@@ -2141,7 +2141,7 @@ describe('Stepper', () => {
 
     it('should return an instance', () => {
       fixtureEl.innerHTML = `
-        <div class="stepper" data-coreui-toggle="stepper">
+        <div class="stepper" data-coreui-stepper>
           <ol class="stepper-steps">
             <li class="stepper-step">
               <button type="button" class="stepper-step-button active">Step 1</button>
@@ -2160,7 +2160,7 @@ describe('Stepper', () => {
   describe('getOrCreateInstance', () => {
     it('should return instance if it exists', () => {
       fixtureEl.innerHTML = `
-        <div class="stepper" data-coreui-toggle="stepper">
+        <div class="stepper" data-coreui-stepper>
           <ol class="stepper-steps">
             <li class="stepper-step">
               <button type="button" class="stepper-step-button active">Step 1</button>
@@ -2177,7 +2177,7 @@ describe('Stepper', () => {
 
     it('should create new instance if it does not exist', () => {
       fixtureEl.innerHTML = `
-        <div class="stepper" data-coreui-toggle="stepper">
+        <div class="stepper" data-coreui-stepper>
           <ol class="stepper-steps">
             <li class="stepper-step">
               <button type="button" class="stepper-step-button active">Step 1</button>
@@ -2196,7 +2196,7 @@ describe('Stepper', () => {
   describe('_removeIndicatorIcon', () => {
     it('should remove indicator icon if present', () => {
       fixtureEl.innerHTML = `
-        <div class="stepper" data-coreui-toggle="stepper">
+        <div class="stepper" data-coreui-stepper>
           <ol class="stepper-steps">
             <li class="stepper-step">
               <button type="button" class="stepper-step-button active" data-coreui-target="#step1">
@@ -2221,7 +2221,7 @@ describe('Stepper', () => {
 
     it('should do nothing if no indicator element', () => {
       fixtureEl.innerHTML = `
-        <div class="stepper" data-coreui-toggle="stepper">
+        <div class="stepper" data-coreui-stepper>
           <ol class="stepper-steps">
             <li class="stepper-step">
               <button type="button" class="stepper-step-button active">
@@ -2245,7 +2245,7 @@ describe('Stepper', () => {
   describe('_appendIndicatorIcon', () => {
     it('should append indicator icon if not present', () => {
       fixtureEl.innerHTML = `
-        <div class="stepper" data-coreui-toggle="stepper">
+        <div class="stepper" data-coreui-stepper>
           <ol class="stepper-steps">
             <li class="stepper-step">
               <button type="button" class="stepper-step-button active">
@@ -2267,7 +2267,7 @@ describe('Stepper', () => {
 
     it('should not duplicate indicator icon if already present', () => {
       fixtureEl.innerHTML = `
-        <div class="stepper" data-coreui-toggle="stepper">
+        <div class="stepper" data-coreui-stepper>
           <ol class="stepper-steps">
             <li class="stepper-step">
               <button type="button" class="stepper-step-button active">
@@ -2292,7 +2292,7 @@ describe('Stepper', () => {
 
     it('should do nothing if no indicator element on button', () => {
       fixtureEl.innerHTML = `
-        <div class="stepper" data-coreui-toggle="stepper">
+        <div class="stepper" data-coreui-stepper>
           <ol class="stepper-steps">
             <li class="stepper-step">
               <button type="button" class="stepper-step-button active">
@@ -2340,7 +2340,7 @@ describe('Stepper', () => {
   describe('_complete', () => {
     it('should do nothing if button parent is not in steps container', () => {
       fixtureEl.innerHTML = `
-        <div class="stepper" data-coreui-toggle="stepper">
+        <div class="stepper" data-coreui-stepper>
           <ol class="stepper-steps">
             <li class="stepper-step">
               <button type="button" class="stepper-step-button active">
@@ -2413,7 +2413,7 @@ describe('Stepper', () => {
   describe('edge cases', () => {
     it('should handle stepper with only one step', () => {
       fixtureEl.innerHTML = `
-        <div class="stepper" data-coreui-toggle="stepper">
+        <div class="stepper" data-coreui-stepper>
           <ol class="stepper-steps">
             <li class="stepper-step">
               <button type="button" class="stepper-step-button active" data-coreui-target="#step1">
@@ -2450,7 +2450,7 @@ describe('Stepper', () => {
 
     it('should handle indicator with only whitespace text', () => {
       fixtureEl.innerHTML = `
-        <div class="stepper" data-coreui-toggle="stepper">
+        <div class="stepper" data-coreui-stepper>
           <ol class="stepper-steps">
             <li class="stepper-step">
               <button type="button" class="stepper-step-button active">

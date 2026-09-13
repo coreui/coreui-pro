@@ -96,7 +96,7 @@ const SELECTOR_CALENDAR_CELL = '.calendar-cell'
 const SELECTOR_CALENDAR_CELL_CLICKABLE = `${SELECTOR_CALENDAR_CELL}[tabindex="0"]`
 const SELECTOR_CALENDAR_ROW = '.calendar-row'
 const SELECTOR_CALENDAR_ROW_CLICKABLE = `${SELECTOR_CALENDAR_ROW}[tabindex="0"]`
-const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="calendar"]'
+const SELECTOR_DATA_CALENDAR = '[data-coreui-calendar]'
 
 // Navigation icons live in JavaScript, not in CSS masks — the chips pattern:
 // inline SVG on currentColor, swappable through an option, sanitized like any
@@ -1280,7 +1280,7 @@ class Calendar extends BaseComponent {
  */
 
 EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
-  for (const element of Array.from(document.querySelectorAll(SELECTOR_DATA_TOGGLE))) {
+  for (const element of Array.from(document.querySelectorAll(SELECTOR_DATA_CALENDAR))) {
     Calendar.calendarInterface(element)
   }
 })

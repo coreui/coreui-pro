@@ -345,7 +345,7 @@ describe('NumberInput', () => {
   describe('data-api', () => {
     it('should initialize inputs carrying the toggle', () => {
       fixtureEl.innerHTML = `<div class="form-control-group">
-          <input type="number" class="form-control" value="1" data-coreui-toggle="number-input">
+          <input type="number" class="form-control" value="1" data-coreui-number-input>
         </div>`
 
       NumberInput._initializeDataApi()

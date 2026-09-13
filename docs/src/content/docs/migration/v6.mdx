@@ -233,15 +233,28 @@ masked date and time fields already used. Renamed:
 | was | is |
 | --- | --- |
 | `data-coreui-toggle="autocomplete"` | `data-coreui-autocomplete` |
+| `data-coreui-toggle="calendar"` | `data-coreui-calendar` |
 | `data-coreui-toggle="date-picker"` | `data-coreui-date-picker` |
 | `data-coreui-toggle="date-range-picker"` | `data-coreui-date-range-picker` |
 | `data-coreui-toggle="date-time-picker"` | `data-coreui-date-time-picker` |
-| `data-coreui-toggle="time-picker"` | `data-coreui-time-picker` |
+| `data-coreui-toggle="list-box"` | `data-coreui-list-box` |
+| `data-coreui-toggle="number-input"` | `data-coreui-number-input` |
 | `data-coreui-toggle="otp"` | `data-coreui-otp` |
+| `data-coreui-toggle="password-input"` | `data-coreui-password-input` |
 | `data-coreui-toggle="password-strength"` | `data-coreui-password-strength` |
+| `data-coreui-toggle="range-slider"` | `data-coreui-range-slider` |
+| `data-coreui-toggle="rating"` | `data-coreui-rating` |
+| `data-coreui-toggle="stepper"` | `data-coreui-stepper` |
+| `data-coreui-toggle="time-picker"` | `data-coreui-time-picker` |
+| `data-coreui-toggle="transfer"` | `data-coreui-transfer` |
 
 The JavaScript constructors are unchanged — this is the markup entry point
 only, and only in the vanilla package.
+
+**`data-coreui="navigation"` is gone.** The sidebar navigation read two
+attributes for one job; the v4-era spelling was kept for compatibility and is
+now dropped. Use `data-coreui-navigation`, which v5 already documented as the
+one to write.
 
 #### Lifecycle methods return a promise
 
@@ -1312,7 +1325,7 @@ them out. The markup is a plain form control carrying the toggle:
 -     <span class="form-password-action-icon"></span>
 -   </button>
 - </div>
-+ <input type="password" class="form-control" data-coreui-toggle="password-input">
++ <input type="password" class="form-control" data-coreui-password-input>
 ```
 
 - **`data-coreui-toggle` moves from the button to the input**, and its value is

@@ -27,7 +27,7 @@ Select specific days using the Bootstrap Calendar component. The example below s
       class="border rounded"
       data-coreui-locale="en-US"
       data-coreui-start-date="2024/02/13"
-      data-coreui-toggle="calendar"
+      data-coreui-calendar
     ></div>
   </div>`} />
 
@@ -42,7 +42,7 @@ Set the `data-coreui-selection-type` to `week` to enable selection of entire wee
       data-coreui-selection-type="week"
       data-coreui-show-week-number="true"
       data-coreui-start-date="2024W15"
-      data-coreui-toggle="calendar"
+      data-coreui-calendar
     ></div>
   </div>`} />
 
@@ -56,7 +56,7 @@ Set the `data-coreui-selection-type` to `month` to enable selection of entire mo
       data-coreui-locale="en-US"
       data-coreui-selection-type="month"
       data-coreui-start-date="2024-2"
-      data-coreui-toggle="calendar"
+      data-coreui-calendar
     ></div>
   </div>`} />
 
@@ -70,7 +70,7 @@ Set the `data-coreui-selection-type` property to `quarter` to enable quarters ra
       data-coreui-locale="en-US"
       data-coreui-selection-type="quarter"
       data-coreui-start-date="2024Q1"
-      data-coreui-toggle="calendar"
+      data-coreui-calendar
     ></div>
   </div>`} />
 
@@ -84,7 +84,7 @@ Set the `data-coreui-selection-type` to `year` to enable years range selection.
       data-coreui-locale="en-US"
       data-coreui-selection-type="year"
       data-coreui-start-date="2024"
-      data-coreui-toggle="calendar"
+      data-coreui-calendar
     ></div>
   </div>`} />
 
@@ -97,7 +97,7 @@ Display multiple calendar panels side by side by setting the `data-coreui-calend
       class="border rounded"
       data-coreui-calendars="2"
       data-coreui-locale="en-US"
-      data-coreui-toggle="calendar"
+      data-coreui-calendar
     ></div>
   </div>`} />
 
@@ -113,7 +113,7 @@ Enable range selection by adding `data-coreui-range="true"` to allow users to pi
       data-coreui-range="true"
       data-coreui-start-date="2022/08/23"
       data-coreui-end-date="2022/09/08"
-      data-coreui-toggle="calendar"
+      data-coreui-calendar
     ></div>
   </div>`} />
 
@@ -128,7 +128,7 @@ Colour the selection with a [`.theme-*` class](/customize/components/#theme-vari
       data-coreui-start-date="2024/02/13"
       data-coreui-end-date="2024/02/20"
       data-coreui-range="true"
-      data-coreui-toggle="calendar"
+      data-coreui-calendar
     ></div>
   </div>`} />
 
@@ -188,7 +188,7 @@ The CoreUI Bootstrap Calendar allows users to display dates in non-English local
 By default, the Calendar component uses the browser's default locale. However, you can easily configure it to use a different locale supported by the JavaScript Internationalization API. This feature helps create inclusive and accessible applications for a diverse audience.
 
 <Example pro code={`<div class="d-flex justify-content-center">
-    <div class="border rounded" data-coreui-toggle="calendar"></div>
+    <div class="border rounded" data-coreui-calendar></div>
   </div>`} />
 
 ### Chinese
@@ -196,7 +196,7 @@ By default, the Calendar component uses the browser's default locale. However, y
 Here is an example of the Bootstrap Calendar component with Chinese locale settings.
 
 <Example pro code={`<div class="d-flex justify-content-center">
-    <div class="border rounded" data-coreui-locale="zh-CN" data-coreui-toggle="calendar"></div>
+    <div class="border rounded" data-coreui-locale="zh-CN" data-coreui-calendar></div>
   </div>`} />
 
 ### Japanese
@@ -204,7 +204,7 @@ Here is an example of the Bootstrap Calendar component with Chinese locale setti
 Below is an example of the Calendar component with Japanese locale settings.
 
 <Example pro code={`<div class="d-flex justify-content-center">
-    <div class="border rounded" data-coreui-locale="ja" data-coreui-toggle="calendar"></div>
+    <div class="border rounded" data-coreui-locale="ja" data-coreui-calendar></div>
   </div>`} />
 
 ### Korean
@@ -212,7 +212,7 @@ Below is an example of the Calendar component with Japanese locale settings.
 Here is an example of the Calendar component with Korean locale settings.
 
 <Example pro code={`<div class="d-flex justify-content-center">
-    <div class="border rounded" data-coreui-locale="ko" data-coreui-toggle="calendar"></div>
+    <div class="border rounded" data-coreui-locale="ko" data-coreui-calendar></div>
   </div>`} />
 
 ## Right to left support
@@ -224,7 +224,7 @@ RTL support is built-in and can be explicitly controlled through the `$enable-rt
 Example of the Calendar component with RTL support, using the Hebrew locale.
 
 <Example pro code={`<div class="d-flex justify-content-center" dir="rtl">
-    <div class="border rounded" data-coreui-locale="he-IL" data-coreui-toggle="calendar"></div>
+    <div class="border rounded" data-coreui-locale="he-IL" data-coreui-calendar></div>
   </div>`} />
 
 ### Persian
@@ -232,7 +232,7 @@ Example of the Calendar component with RTL support, using the Hebrew locale.
 Example of the Bootstrap Calendar component with Persian locale settings.
 
 <Example pro code={`<div class="d-flex justify-content-center">
-    <div class="border rounded" data-coreui-locale="fa-IR" data-coreui-toggle="calendar"></div>
+    <div class="border rounded" data-coreui-locale="fa-IR" data-coreui-calendar></div>
   </div>`} />
 
 ## Custom cell rendering
@@ -311,10 +311,10 @@ Keyboard navigation in the grid follows the [date picker dialog pattern](https:/
 
 ### Via data attributes
 
-Add `data-coreui-toggle="calendar"` to a `div` element.
+Add `data-coreui-calendar` to a `div` element.
 
 ```html
-<div data-coreui-toggle="calendar"></div>
+<div data-coreui-calendar></div>
 ```
 
 ### Via JavaScript
