@@ -47,9 +47,9 @@ describe('Autocomplete', () => {
 
       const autocompleteEl = fixtureEl.querySelector('[data-coreui-toggle="autocomplete"]')
       const autocompleteBySelector = new Autocomplete('[data-coreui-toggle="autocomplete"]', { options: [] })
-      const autocompleteByElement = new Autocomplete(autocompleteEl, { options: [] })
-
       expect(autocompleteBySelector._element).toEqual(autocompleteEl)
+
+      const autocompleteByElement = new Autocomplete(autocompleteEl, { options: [] })
       expect(autocompleteByElement._element).toEqual(autocompleteEl)
     })
 
