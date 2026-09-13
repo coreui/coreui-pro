@@ -13,9 +13,8 @@ import {
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..')
 
-const THEME_SLOTS = ['bg', 'fg-emphasis', 'bg-subtle', 'border', 'contrast', 'fg', 'bg-muted', 'focus-ring']
-const SLOT_ORDER = ['bg', 'contrast', 'fg', 'fg-emphasis', 'bg-subtle', 'bg-muted', 'border', 'focus-ring']
-const STATE_LIGHTNESS = new Map([['hover', 0.85], ['active', 0.8]])
+const SLOT_ORDER = ['base', 'fg', 'fg-emphasis', 'bg', 'bg-subtle', 'bg-muted', 'border', 'focus-ring', 'contrast']
+const STATES = ['hover', 'active']
 const FAMILIES = ['bg', 'fg', 'border']
 
 // A Map tree merged over another: a group merges key by key, a token replaces
@@ -51,17 +50,15 @@ const division = value => value.replaceAll(/^calc\((\d+(?:\.\d+)?) \/ (\d+(?:\.\
 const hueDegrees = value => value.replaceAll(/(oklch\((?!from)[^()]*?\s[\d.]+\s)([\d.]+)\)/g, '$1$2deg)')
 const cssValue = (value, prefix) => hueDegrees(division(leadingZero(css(render(value), prefix))))
 
-const isPair = value => value instanceof Map && value.has('light')
 const themeColors = tree => entries(get(tree, 'color', 'theme'))
 
 const scaleStops = (tree, name, anchor, prefix) => {
   const stops = (group, mixer) => entries(get(tree, 'color', 'scale', group))
-    .map(([key, token]) => [`--${prefix}${name}-${key}`, `color-mix(in oklch, var(--${prefix}${mixer}) ${valueOf(token)}, var(--${prefix}${name}))`])
+    .map(([key, token]) => [`--${prefix}${name}-${key}`, `color-mix(in oklch, var(--${prefix}${mixer}) ${valueOf(token)}, var(--${prefix}${name}-500))`])
 
   return [
-    [`--${prefix}${name}`, anchor],
     ...stops('tints', 'white'),
-    [`--${prefix}${name}-500`, `var(--${prefix}${name})`],
+    [`--${prefix}${name}-500`, anchor],
     ...stops('shades', 'black')
   ]
 }
@@ -73,28 +70,15 @@ const colorsTokens = (tree, prefix) => {
     rows.push(...scaleStops(tree, name, cssValue(valueOf(token), prefix), prefix))
   }
 
-  for (const [name, color] of themeColors(tree)) {
-    const base = valueOf(color.get('base'))
-
-    if (isPair(base)) {
-      rows.push([`--${prefix}${name}-base`, cssValue(base, prefix)])
-    } else {
-      rows.push(...scaleStops(tree, `${name}-base`, cssValue(base, prefix), prefix).map(([key, value]) => [key.replace(`${name}-base-`, `${name}-`), value]))
-    }
-  }
-
   return rows
 }
 
 const themeColorTokens = (tree, prefix) => {
   const rows = []
 
-  for (const slot of THEME_SLOTS) {
-    for (const [name, color] of themeColors(tree)) {
-      rows.push([
-        `--${prefix}${name}-${slot}`,
-        slot === 'bg' ? `var(--${prefix}${name}-base)` : cssValue(valueOf(color.get(slot)), prefix)
-      ])
+  for (const [name, color] of themeColors(tree)) {
+    for (const slot of SLOT_ORDER) {
+      rows.push([`--${prefix}${name}-${slot}`, cssValue(valueOf(color.get(slot)), prefix)])
     }
   }
 
@@ -225,19 +209,19 @@ export const themeClassesLayer = ({ tokens = packageTokens, prefix = 'cui-' } = 
   const blocks = themeColors(tokens).map(([name, color]) => {
     const rows = SLOT_ORDER.map(slot => [`--${prefix}theme-${slot}`, `var(--${prefix}${name}-${slot})`])
 
-    for (const [state, lightness] of STATE_LIGHTNESS) {
+    for (const state of STATES) {
       rows.push([
         `--${prefix}theme-${state}`,
         color.has(state) ?
           cssValue(valueOf(color.get(state)), prefix) :
-          `oklch(from var(--${prefix}${name}-bg) calc(l * ${lightness}) c h)`
+          `oklch(from var(--${prefix}${name}-bg) calc(l * var(--${prefix}theme-${state}-lightness)) calc(c * var(--${prefix}theme-${state}-chroma)) h)`
       ])
     }
 
     return [`  .theme-${name} {`, declarations(rows, '    '), '  }'].join('\n')
   })
 
-  const reset = [...SLOT_ORDER, ...STATE_LIGHTNESS.keys()].map(slot => [`--${prefix}theme-${slot}`, 'initial'])
+  const reset = [...SLOT_ORDER, ...STATES].map(slot => [`--${prefix}theme-${slot}`, 'initial'])
   blocks.push(['  .theme-reset {', declarations(reset, '    '), '  }'].join('\n'))
 
   return ['@layer helpers {', ...blocks, '}', ''].join('\n')

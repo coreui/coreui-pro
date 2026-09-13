@@ -1118,9 +1118,6 @@
           "$suffix": "-emphasis"
         },
         {
-          "muted": "var(--cui-fg-2)",
-          "black-50": "color-mix(in oklch, var(--cui-black) 50%, transparent)",
-          "white-50": "color-mix(in oklch, var(--cui-white) 50%, transparent)",
           "body-secondary": "var(--cui-fg-2)",
           "body-tertiary": "var(--cui-fg-3)",
           "body-emphasis": "var(--cui-emphasis-color)",

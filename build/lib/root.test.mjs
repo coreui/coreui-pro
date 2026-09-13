@@ -51,30 +51,28 @@ describe('the prefix parameter', () => {
 })
 
 describe('the color scales', () => {
-  it('anchors every stop of a palette color on the color itself', () => {
+  it('anchors every stop of a palette color on its 500 stop', () => {
     const rows = new Map(declared(colorsLayer()))
-    assert.equal(rows.get('--cui-blue-400'), 'color-mix(in oklch, var(--cui-white) 20%, var(--cui-blue))')
-    assert.equal(rows.get('--cui-blue-500'), 'var(--cui-blue)')
-    assert.equal(rows.get('--cui-blue-600'), 'color-mix(in oklch, var(--cui-black) 16%, var(--cui-blue))')
+    assert.equal(rows.get('--cui-primary-400'), 'color-mix(in oklch, var(--cui-white) 20%, var(--cui-primary-500))')
+    assert.equal(rows.get('--cui-primary-500'), 'oklch(52.945% 0.19103 278.34deg)')
+    assert.equal(rows.get('--cui-primary-600'), 'color-mix(in oklch, var(--cui-black) 16%, var(--cui-primary-500))')
   })
 
-  it('gives a theme color a scale only when its base is one color in both schemes', () => {
+  it('gives a scale to the palette seeds and to nothing else', () => {
     const rows = new Map(declared(colorsLayer()))
     assert.ok(rows.has('--cui-primary-400'))
-    assert.equal(rows.get('--cui-secondary-base'), 'light-dark(var(--cui-gray-100), var(--cui-gray-600))')
+    assert.ok(rows.has('--cui-gray-400'))
+    // secondary and inverse read the gray scale rather than owning one
     assert.equal(rows.has('--cui-secondary-400'), false)
-
-    const themed = new Map(declared(colorsLayer({ tokens: theme, prefix: 'bs-' })))
-    assert.equal(themed.get('--bs-secondary-base'), '#6c757d')
-    assert.equal(themed.get('--bs-secondary-400'), 'color-mix(in oklch, var(--bs-white) 20%, var(--bs-secondary-base))')
+    assert.equal(rows.has('--cui-inverse-400'), false)
   })
 
   it('lets $tokens replace a generated stop in the slot it already holds', () => {
     const rows = declared(colorsLayer({ tokens: theme, prefix: 'bs-' }))
     const stops = rows.filter(([name]) => name.startsWith('--bs-gray'))
 
-    assert.deepEqual(stops.slice(0, 3), [['--bs-gray', '#adb5bd'], ['--bs-gray-025', '#fdfdfe'], ['--bs-gray-050', '#fbfcfc']])
-    assert.equal(stops.at(-1)[1], 'color-mix(in oklch, var(--bs-black) 76%, var(--bs-gray))')
+    assert.deepEqual(stops.slice(0, 2), [['--bs-gray-025', '#fdfdfe'], ['--bs-gray-050', '#fbfcfc']])
+    assert.equal(stops.at(-1)[1], 'color-mix(in oklch, var(--bs-black) 76%, var(--bs-gray-500))')
   })
 
   it('refuses a $tokens key no layer declares', () => {
@@ -87,13 +85,13 @@ describe('the color scales', () => {
 describe('the theme slots', () => {
   const rows = new Map(declared(rootLayer()))
 
-  it('points the action background at the base color', () => {
-    assert.equal(rows.get('--cui-primary-bg'), 'var(--cui-primary-base)')
+  it('points the action background at the 500 stop', () => {
+    assert.equal(rows.get('--cui-primary-bg'), 'var(--cui-primary-500)')
   })
 
   it('declares every slot for every theme color', () => {
     for (const color of ['primary', 'secondary', 'success', 'info', 'warning', 'danger', 'inverse']) {
-      for (const slot of ['bg', 'contrast', 'fg', 'fg-emphasis', 'bg-subtle', 'bg-muted', 'border', 'focus-ring']) {
+      for (const slot of ['base', 'bg', 'contrast', 'fg', 'fg-emphasis', 'bg-subtle', 'bg-muted', 'border', 'focus-ring']) {
         assert.ok(rows.has(`--cui-${color}-${slot}`), `--cui-${color}-${slot}`)
       }
     }
@@ -110,7 +108,7 @@ describe('the theme classes', () => {
 
   it('maps every slot onto the color and derives the states it has no pair for', () => {
     assert.ok(css.includes('    --cui-theme-bg: var(--cui-primary-bg);'))
-    assert.ok(css.includes('    --cui-theme-hover: oklch(from var(--cui-primary-bg) calc(l * 0.85) c h);'))
+    assert.ok(css.includes('    --cui-theme-hover: oklch(from var(--cui-primary-bg) calc(l * var(--cui-theme-hover-lightness)) calc(c * var(--cui-theme-hover-chroma)) h);'))
     assert.ok(css.includes('    --cui-theme-hover: light-dark(var(--cui-gray-200), var(--cui-gray-700));'))
   })
 

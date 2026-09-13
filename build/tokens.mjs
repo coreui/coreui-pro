@@ -20,7 +20,7 @@ import {
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
 const check = process.argv.includes('--check')
 
-const THEME_SLOTS = ['base', 'contrast', 'fg', 'fg-emphasis', 'bg-subtle', 'bg-muted', 'border', 'focus-ring']
+const THEME_SLOTS = ['base', 'fg', 'fg-emphasis', 'bg', 'bg-subtle', 'bg-muted', 'border', 'focus-ring', 'contrast']
 const STATE_SLOTS = ['hover', 'active']
 
 const pad = (key, width) => width ? `${key}:`.padEnd(width) : `${key}: `
@@ -135,7 +135,7 @@ const BLOCKS = {
   'scss/_theme.scss': {
     'theme-colors-map': () => map({
       name: 'theme-colors',
-      body: nested(themeColors.map(([color, token]) => [color, THEME_SLOTS.map(key => key === 'base' ? [key, `$${color}`] : slot(token, key))]), 17, true)
+      body: nested(themeColors.map(([color, token]) => [color, THEME_SLOTS.map(key => slot(token, key))]), 17, true)
     }),
     'theme-bgs-map': () => map({ name: 'theme-bgs', body: rows(family('bg'), 15, '    ', true) }),
     'theme-fgs-map': () => map({ name: 'theme-fgs', body: rows(family('fg'), 15, '    ', true) }),
