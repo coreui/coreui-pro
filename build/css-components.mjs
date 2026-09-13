@@ -23,7 +23,7 @@ const baseModules = ['layers', 'root', 'layout/tokens', 'content/reboot', 'helpe
 const tailModules = ['helpers', 'utilities/api']
 
 const renders = {
-  autocomplete: ['combobox', 'forms/form-control', 'forms/form-control-group'],
+  autocomplete: ['combobox', 'forms/floating-labels', 'forms/form-control', 'forms/form-control-group'],
   'chip-set': ['chip', 'helpers/visually-hidden'],
   combobox: ['popup', 'list-box', 'forms/form-control'],
   'forms/form-multi-select': ['combobox', 'chip', 'chip-set', 'forms/form-control-group'],

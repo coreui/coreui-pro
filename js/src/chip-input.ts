@@ -9,6 +9,7 @@ import ChipSet, { type ChipSetConfig } from './chip-set.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import type { ComponentConfig } from './util/config.js'
+import { applyControlGroupClasses } from './util/form-control-group.js'
 import { getUID, isRTL } from './util/index.js'
 
 /**
@@ -95,7 +96,7 @@ class ChipInput extends ChipSet {
     // chip input has nothing to wrap, so it takes the frame class itself and
     // the author writes only what the field is.
     this._addedGroupClass = !this._element.classList.contains(CLASS_NAME_GROUP)
-    this._element.classList.add(CLASS_NAME_GROUP)
+    applyControlGroupClasses(this._element, CLASS_NAME_GROUP)
 
     this._input = SelectorEngine.findOne('input', this._element as ParentNode) as HTMLInputElement
     if (this._input) {

@@ -10,6 +10,7 @@ import Data from './dom/data.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import type { ComponentConfig } from './util/config.js'
+import { applyControlGroupClasses } from './util/form-control-group.js'
 import {
   DefaultAllowlist, escapeHtml, type SanitizerAllowList
 } from './util/sanitizer.js'
@@ -526,7 +527,7 @@ class Autocomplete extends ComboboxBase {
     // The root is the frame: a field component has nothing to wrap, so it
     // carries `.form-control-group` itself instead of nesting one.
     const togglerEl = this._element
-    togglerEl.classList.add(CLASS_NAME_INPUT_GROUP)
+    applyControlGroupClasses(togglerEl, CLASS_NAME_INPUT_GROUP)
     this._togglerElement = togglerEl
 
     if (!this._config.search && !this._config.disabled) {
