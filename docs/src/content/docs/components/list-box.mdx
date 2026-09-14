@@ -221,7 +221,7 @@ The checkbox is a decorative `<span class="list-box-option-indicator check">`, n
 
 `counter` puts a `{selected}/{available} selected` readout in the header — the last child of `.list-box-header`, a `.list-box-subtitle` carrying `data-coreui-list-box-counter`. There is no header in the markup? One is created. Bring your own element with that attribute and the plugin writes into it wherever you put it.
 
-Both numbers read the same set — the options that are visible and enabled, which is also what the select-all button works on — so the counter always describes what is on screen. Filter the list and the denominator drops with it, and a selected value the filter hid drops out of the numerator too: it stays selected, it just stops being counted, so `2/4` can become `1/1` without anything being deselected. A disabled option never appears in either number. `selectedCounterText` is the word after the count, so a translated list reads in its own language.
+Both numbers read the same set — the options that are visible and enabled, which is also what the select-all button works on — so the counter always describes what is on screen. Filter the list and the denominator drops with it, and a selected value the filter hid drops out of the numerator too: it stays selected, it just stops being counted, so `2/4` can become `1/1` without anything being deselected. A disabled option never appears in either number. `selectedLabel` builds the whole text, so a translated list reads in its own language and its own word order: pass a function of `(count, total)`, or a string in which `{count}` and `{total}` are replaced.
 
 <Example code={`<div class="list-box" data-coreui-list-box data-coreui-counter="true" data-coreui-search="true" data-coreui-selection-mode="multiple" data-coreui-indicator="checkbox" style="max-width: 20rem">
     <div class="list-box-header">
@@ -441,7 +441,7 @@ const listBox = new coreui.ListBox('#myListBox', {
 | `searchPlaceholder` | string | `'Search'` | Placeholder of the built search field. |
 | `sectionsSelectable` | boolean | `false` | Turns every section label into a tri-state button (`aria-pressed`) that toggles the section's visible, enabled options, and puts it in the arrow-key order. `multiple` mode only. |
 | `selected` | null, string, array | `null` | Initially selected values. In `single` mode only the first one is taken. |
-| `selectedCounterText` | string | `'selected'` | The word after the count in the header. |
+| `selectedLabel` | string, function | `` (count, total) => `${count}/${total} selected` `` | The header's count text. A function `(count, total) => string`, or a string in which `{count}` and `{total}` are replaced. |
 | `selectionLimit` | null, number | `null` | How many options can be selected at once in `multiple` mode. Further selections are refused and reported through `selectionLimit.coreui.list-box`; nothing is disabled and deselecting always works. |
 | `selectionMode` | string | `'single'` | `'none'`, `'single'` or `'multiple'`. |
 | `typeahead` | boolean | `true` | Move the highlight to the option matching what the user types. The buffer resets after 500 ms. |

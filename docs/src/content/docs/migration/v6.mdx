@@ -399,6 +399,46 @@ Password Input's `ariaToggleLabel`, because that button toggles visibility
 rather than opening a picker; and the shared `.form-control-action` class,
 which eight components use for three different jobs.
 
+#### The "N selected" text is one option, and it can be a function
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+Four components rendered the same sentence under three option names and two
+shapes: Combobox substituted `{count}` into `selectedText`, List box and
+Transfer appended `selectedCounterText` after `count/total`, and Multi Select
+appended `selectionTypeCounterText` after the count.
+
+Appending cannot be translated. A translator receives only the tail of the
+sentence, so the number cannot move and the noun cannot be inflected — Polish
+needs "2 zaznaczone", "5 zaznaczonych" and "1 zaznaczony" from the same option,
+and a language that puts the number last cannot be served at all.
+
+```diff
+- new coreui.ListBox(el, { selectedCounterText: 'selected' })
++ new coreui.ListBox(el, { selectedLabel: (count, total) => `${count}/${total} selected` })
+
+- new coreui.Combobox(el, { selectedText: '{count} selected' })
++ new coreui.Combobox(el, { selectedLabel: (count) => `${count} selected` })
+
+- new coreui.MultiSelect(el, { selectionTypeCounterText: 'item(s) selected' })
++ new coreui.MultiSelect(el, { selectedLabel: (count) => `${count} item(s) selected` })
+```
+
+| was | is |
+| --- | --- |
+| `selectedText` (Combobox) | `selectedLabel` |
+| `selectedCounterText` (List box, Transfer) | `selectedLabel` |
+| `selectionTypeCounterText` (Multi Select) | `selectedLabel` |
+
+**The string form stays**, because a function cannot be written into
+`data-coreui-selected-label`: `{count}` and `{total}` are replaced in it, so
+markup-only pages keep a translatable counter.
+
+The argument order matches the two function options the library already ships —
+`Rating.ariaLabel(value, itemCount)` and `OTPInput.ariaLabel(index, total)`.
+`total` is passed everywhere, including the two components whose default text
+ignores it, so one function can serve all four.
+
 ### Components
 
 #### Accordion on the native `<details>`

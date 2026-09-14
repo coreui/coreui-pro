@@ -835,7 +835,7 @@ describe('MultiSelect', () => {
           { value: '2', text: 'Opt 2', selected: true }
         ],
         selectionType: 'counter',
-        selectionTypeCounterText: 'items selected'
+        selectedLabel: count => `${count} items selected`
       })
 
       const selection = multiSelect._wrapperElement.querySelector('.form-multi-select-selection')
@@ -2502,7 +2502,7 @@ describe('MultiSelect', () => {
         search: true,
         multiple: true,
         selectionType: 'counter',
-        selectionTypeCounterText: 'items selected'
+        selectedLabel: count => `${count} items selected`
       })
 
       expect(multiSelect._searchElement.placeholder).toContain('2')
@@ -4628,7 +4628,6 @@ describe('MultiSelect', () => {
         ],
         multiple: true,
         selectionType: 'counter',
-        selectionTypeCounterText: 'item(s) selected',
         search: false
       })
 

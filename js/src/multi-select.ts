@@ -16,7 +16,9 @@ import { CLEANER_ICON, PICKER_ICON } from './util/icons.js'
 import {
   DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList, SVGAllowlist
 } from './util/sanitizer.js'
-import { defineJQueryPlugin, getUID, jQueryDispatch } from './util/index.js'
+import {
+  defineJQueryPlugin, getUID, jQueryDispatch, resolveCountLabel
+} from './util/index.js'
 
 /**
  * ------------------------------------------------------------------------
@@ -109,9 +111,9 @@ const Default = {
   selectAll: true,
   selectAllLabel: 'Select all',
   selectAllMode: 'all',
+  selectedLabel: (count: number) => `${count} item(s) selected`,
   selectionLimit: null,
   selectionType: 'tags',
-  selectionTypeCounterText: 'item(s) selected',
   selectFilteredLabel: 'Select filtered',
   valid: false,
   value: null
@@ -151,9 +153,9 @@ const DefaultType: Record<string, string> = {
   selectAll: 'boolean',
   selectAllLabel: 'string',
   selectAllMode: 'string',
+  selectedLabel: '(string|function)',
   selectionLimit: '(number|null)',
   selectionType: 'string',
-  selectionTypeCounterText: 'string',
   selectFilteredLabel: 'string',
   valid: 'boolean',
   value: '(string|array|null)'
@@ -1099,7 +1101,7 @@ class MultiSelect extends ComboboxBase {
     }
 
     if (this._config.multiple && this._config.selectionType === 'counter' && !this._config.search) {
-      selection.textContent = `${this._selected.length} ${this._config.selectionTypeCounterText}`
+      selection.textContent = resolveCountLabel(this._config.selectedLabel, this._selected.length, this._options.length)
     }
 
     // `tags` and `chips` were the same idea built twice; both render the Chip
@@ -1207,7 +1209,7 @@ class MultiSelect extends ComboboxBase {
     }
 
     if (this._config.multiple && this._config.selectionType === 'counter') {
-      this._searchElement.placeholder = `${this._selected.length} ${this._config.selectionTypeCounterText}`
+      this._searchElement.placeholder = resolveCountLabel(this._config.selectedLabel, this._selected.length, this._options.length)
     }
   }
 

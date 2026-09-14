@@ -103,7 +103,7 @@ describe('ListBox', () => {
         searchPlaceholder: 'Search',
         sectionsSelectable: false,
         selected: null,
-        selectedCounterText: 'selected',
+        selectedLabel: jasmine.any(Function),
         selectionLimit: null,
         selectionMode: 'single',
         typeahead: true
@@ -1196,12 +1196,25 @@ describe('ListBox', () => {
 
     it('should follow the items it was given', () => {
       const el = setMarkup()
-      const listBox = new ListBox(el, { counter: true, selectedCounterText: 'picked', selectionMode: 'multiple' })
+      const listBox = new ListBox(el, { counter: true, selectedLabel: (count, total) => `${count}/${total} picked`, selectionMode: 'multiple' })
       const counter = el.querySelector('[data-coreui-list-box-counter]')
 
       listBox.setItems([{ value: 'ada', label: 'Ada' }, { value: 'bob', label: 'Bob', selected: true }])
 
       expect(counter.textContent).toEqual('1/2 picked')
+    })
+
+    it('should take the count text from a string with placeholders', () => {
+      const el = setMarkup()
+      const listBox = new ListBox(el, {
+        counter: true,
+        selectedLabel: 'wybrano {count} z {total}',
+        selectionMode: 'multiple'
+      })
+
+      listBox.select('tomato')
+
+      expect(el.querySelector('[data-coreui-list-box-counter]').textContent).toEqual('wybrano 1 z 4')
     })
 
     it('should build the header when the markup has none', () => {

@@ -94,7 +94,7 @@ describe('Combobox', () => {
         search: false,
         searchNormalize: false,
         searchPlaceholder: 'Search',
-        selectedText: '{count} selected',
+        selectedLabel: jasmine.any(Function),
         selectionLimit: null,
         typeahead: true,
         value: null
@@ -199,7 +199,7 @@ describe('Combobox', () => {
     })
   })
 
-  describe('placeholder and selectedText', () => {
+  describe('placeholder and selectedLabel', () => {
     it('should show the placeholder while nothing is selected', () => {
       const toggle = setMarkup()
       // eslint-disable-next-line no-new
@@ -246,9 +246,9 @@ describe('Combobox', () => {
       expect(value(toggle)).toEqual('2 selected')
     })
 
-    it('should take the count text from selectedText', () => {
+    it('should take the count text from selectedLabel', () => {
       const toggle = setMarkup()
-      const combobox = new Combobox(toggle, { multiple: true, selectedText: 'wybrano: {count}' })
+      const combobox = new Combobox(toggle, { multiple: true, selectedLabel: 'wybrano: {count}' })
 
       combobox.setValue(['us', 'ca'])
 

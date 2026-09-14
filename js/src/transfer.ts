@@ -13,7 +13,9 @@ import type { ComponentConfig } from './util/config.js'
 import {
   CHEVRON_DOUBLE_LEFT_ICON, CHEVRON_DOUBLE_RIGHT_ICON, CHEVRON_LEFT_ICON, CHEVRON_RIGHT_ICON
 } from './util/icons.js'
-import { defineJQueryPlugin, getUID, jQueryDispatch } from './util/index.js'
+import {
+  type CountLabel, defineJQueryPlugin, getUID, jQueryDispatch
+} from './util/index.js'
 import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 
 /**
@@ -84,7 +86,7 @@ type TransferConfig = {
   sanitizeFn: ((unsafeHtml: string) => string) | null
   search: boolean | string
   searchPlaceholder: string
-  selectedCounterText: string
+  selectedLabel: CountLabel
   sourceTitle: string
   targetTitle: string
   typeahead: boolean
@@ -112,7 +114,7 @@ const Default: TransferConfig = {
   sanitizeFn: null,
   search: false,
   searchPlaceholder: 'Search',
-  selectedCounterText: 'selected',
+  selectedLabel: (count: number, total: number) => `${count}/${total} selected`,
   sourceTitle: 'Available',
   targetTitle: 'Chosen',
   typeahead: true,
@@ -140,7 +142,7 @@ const DefaultType: Record<string, string> = {
   sanitizeFn: '(function|null)',
   search: '(boolean|string)',
   searchPlaceholder: 'string',
-  selectedCounterText: 'string',
+  selectedLabel: '(string|function)',
   sourceTitle: 'string',
   targetTitle: 'string',
   typeahead: 'boolean',
@@ -315,7 +317,7 @@ class Transfer extends BaseComponent {
         sanitizeFn: this._config.sanitizeFn,
         search: this._config.search,
         searchPlaceholder: this._config.searchPlaceholder,
-        selectedCounterText: this._config.selectedCounterText,
+        selectedLabel: this._config.selectedLabel,
         selectionMode: 'multiple',
         typeahead: this._config.typeahead
       }) as ListBox,
