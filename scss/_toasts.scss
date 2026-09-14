@@ -126,7 +126,7 @@ $toast-tokens: defaults(
     max-width: 100%;
     pointer-events: none;
 
-    @include rtl-self() {
+    @include rtl() {
       --#{$prefix}toast-inline-sign: -1;
     }
 

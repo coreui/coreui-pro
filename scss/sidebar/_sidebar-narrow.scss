@@ -77,7 +77,13 @@ $sidebar-narrow-unfoldable-tokens: defaults(
       }
 
       .sidebar-toggler::before {
-        @include ltr-rtl("transform", rotate(-180deg), null, rotate(0deg));
+        transform: rotate(-180deg);
+      }
+
+      .sidebar-toggler {
+        @include rtl-nested("&::before") {
+          transform: rotate(0deg);
+        }
       }
 
       &.sidebar-end .sidebar-toggler::before {
@@ -98,7 +104,13 @@ $sidebar-narrow-unfoldable-tokens: defaults(
       box-shadow: var(--#{$prefix}sidebar-narrow-unfoldable-box-shadow);
 
       .sidebar-toggler::before {
-        @include ltr-rtl("transform", rotate(-180deg), null, rotate(0deg));
+        transform: rotate(-180deg);
+      }
+
+      .sidebar-toggler {
+        @include rtl-nested("&::before") {
+          transform: rotate(0deg);
+        }
       }
 
       &.sidebar-end .sidebar-toggler::before {

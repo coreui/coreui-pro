@@ -77,8 +77,14 @@ Direction support rests on two decisions:
    off-canvas panel, the range slider's label and tooltip, the select and
    validation arrows, the carousel controls, the breadcrumb divider, the
    narrow sidebar's toggler — are written once with the `ltr-rtl()` mixin,
-   which emits the base declaration plus a `[dir="rtl"]` override. There are
-   about twenty of them in the whole library.
+   which emits the base declaration plus a `:dir(rtl)` override. There are
+   about twenty of them in the whole library. The override reads the element's
+   own direction, the same thing a logical property resolves against, so an
+   off-canvas panel inside a `dir="ltr"` island of a right-to-left page slides
+   out the side it is pinned to. Both of them follow the `dir` attribute:
+   setting `direction` from CSS alone turns the logical properties around and
+   leaves the mirrored declarations where they were, so put `dir` on the
+   element or on one of its ancestors.
 
 Together that is why **one stylesheet serves both directions**. Up to v5 we
 published a parallel `*.rtl.css` for every file; it is gone, and so is the
@@ -102,7 +108,7 @@ left-to-right for good you can drop them:
 ### RTL only
 
 The mirror image: the mirrored values become the base declarations and no
-`[dir="rtl"]` selector is emitted at all. Use it when the whole application is
+`:dir(rtl)` selector is emitted at all. Use it when the whole application is
 right-to-left.
 
 ```scss

@@ -295,19 +295,23 @@ $menu-tokens: defaults(
       display: flex;
       align-items: center;
       justify-content: space-between;
-    }
 
-    > .menu-item::after {
-      display: inline-block;
-      flex-shrink: 0;
-      width: .375em;
-      height: .375em;
-      margin-inline-start: auto;
-      content: "";
-      border-color: currentcolor;
-      border-style: solid;
-      border-width: 0 .125em .125em 0;
-      @include ltr-rtl("transform", rotate(-45deg), null, rotate(135deg));
+      &::after {
+        display: inline-block;
+        flex-shrink: 0;
+        width: .375em;
+        height: .375em;
+        margin-inline-start: auto;
+        content: "";
+        border-color: currentcolor;
+        border-style: solid;
+        border-width: 0 .125em .125em 0;
+        transform: rotate(-45deg);
+      }
+
+      @include rtl-nested("&::after") {
+        transform: rotate(135deg);
+      }
     }
 
     > .menu {
