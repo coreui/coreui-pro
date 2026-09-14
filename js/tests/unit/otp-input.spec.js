@@ -1,5 +1,6 @@
 /* eslint-env jasmine */
 
+import { userEvent } from '@vitest/browser/context'
 import OTPInput from '../../src/otp-input.js'
 import {
   getFixture, clearFixture, createEvent, jQueryMock
@@ -114,22 +115,6 @@ describe('OTPInput', () => {
         expect(input.autocomplete).toBe(index === 0 ? 'one-time-code' : 'off')
         // The empty first slot has to fit a whole autofilled code
         expect(input.maxLength).toBe(index === 0 ? inputs.length : 1)
-      }
-    })
-
-    it('should keep required written in the markup when the option is off', () => {
-      fixtureEl.innerHTML = `
-        <div class="form-otp">
-          <input type="text" class="form-otp-control" required>
-          <input type="text" class="form-otp-control" required>
-        </div>
-      `
-
-      const otpContainer = fixtureEl.querySelector('.form-otp')
-      new OTPInput(otpContainer) // eslint-disable-line no-new
-
-      for (const input of otpContainer.querySelectorAll('.form-otp-control')) {
-        expect(input.required).toBe(true)
       }
     })
 
@@ -588,7 +573,7 @@ describe('OTPInput', () => {
       expect(changeSpy).toHaveBeenCalledWith('1')
     })
 
-    it('should update the hidden input when an invalid character is rejected', () => {
+    it('should refuse a character the mask rejects before it lands', async () => {
       fixtureEl.innerHTML = `
         <div class="form-otp">
           <input type="text" class="form-otp-control">
@@ -600,11 +585,69 @@ describe('OTPInput', () => {
       const otpInput = new OTPInput(otpContainer, { type: 'number', value: '12' })
 
       const inputs = otpContainer.querySelectorAll('.form-otp-control')
+      inputs[1].focus()
+      inputs[1].setSelectionRange(0, 1)
+      await userEvent.keyboard('a')
+
+      expect(inputs[1].value).toBe('2')
+      expect(otpInput._inputElement.value).toBe('12')
+    })
+
+    it('should not fire change for a keystroke that changed nothing', () => {
+      fixtureEl.innerHTML = `
+        <div class="form-otp">
+          <input type="text" class="form-otp-control">
+          <input type="text" class="form-otp-control">
+        </div>
+      `
+
+      const otpContainer = fixtureEl.querySelector('.form-otp')
+      new OTPInput(otpContainer, { type: 'number', value: '1' }) // eslint-disable-line no-new
+      const changeSpy = jasmine.createSpy('change')
+      otpContainer.addEventListener('change.coreui.otp-input', changeSpy)
+
+      const inputs = otpContainer.querySelectorAll('.form-otp-control')
       inputs[1].value = 'a'
+      inputs[1].dispatchEvent(createEvent('input'))
+
+      expect(changeSpy).not.toHaveBeenCalled()
+    })
+
+    it('should follow the slot when an inserted string holds nothing valid', () => {
+      fixtureEl.innerHTML = `
+        <div class="form-otp">
+          <input type="text" class="form-otp-control">
+          <input type="text" class="form-otp-control">
+        </div>
+      `
+
+      const otpContainer = fixtureEl.querySelector('.form-otp')
+      const otpInput = new OTPInput(otpContainer, { type: 'number', value: '12' })
+
+      const inputs = otpContainer.querySelectorAll('.form-otp-control')
+      inputs[1].value = 'ab'
       inputs[1].dispatchEvent(createEvent('input'))
 
       expect(inputs[1].value).toBe('')
       expect(otpInput._inputElement.value).toBe('1')
+    })
+
+    it('should stop requiring the inputs when the option is turned off', () => {
+      fixtureEl.innerHTML = `
+        <div class="form-otp">
+          <input type="text" class="form-otp-control">
+          <input type="text" class="form-otp-control">
+        </div>
+      `
+
+      const otpContainer = fixtureEl.querySelector('.form-otp')
+      const otpInput = new OTPInput(otpContainer, { required: true })
+
+      otpInput.update({ required: false })
+
+      for (const input of otpContainer.querySelectorAll('.form-otp-control')) {
+        expect(input.required).toBe(false)
+      }
     })
 
     it('should let the first slot take a whole code again after the field is cleared', () => {
