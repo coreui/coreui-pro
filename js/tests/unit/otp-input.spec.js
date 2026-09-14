@@ -1,4 +1,5 @@
 
+import { userEvent } from '@vitest/browser/context'
 import OTPInput from '../../src/otp-input.js'
 import {
   getFixture, clearFixture, createEvent, jQueryMock
@@ -571,7 +572,7 @@ describe('OTPInput', () => {
       expect(changeSpy).toHaveBeenCalledWith('1')
     })
 
-    it('should refuse a character the mask rejects before it lands', () => {
+    it('should refuse a character the mask rejects before it lands', async () => {
       fixtureEl.innerHTML = `
         <div class="form-otp">
           <input type="text" class="form-otp-control">
@@ -580,22 +581,35 @@ describe('OTPInput', () => {
       `
 
       const otpContainer = fixtureEl.querySelector('.form-otp')
-      new OTPInput(otpContainer, { type: 'number', value: '12' }) // eslint-disable-line no-new
+      const otpInput = new OTPInput(otpContainer, { type: 'number', value: '12' })
 
       const inputs = otpContainer.querySelectorAll('.form-otp-control')
-      const rejected = new InputEvent('beforeinput', {
-        bubbles: true, cancelable: true, inputType: 'insertText', data: 'a'
-      })
-      const accepted = new InputEvent('beforeinput', {
-        bubbles: true, cancelable: true, inputType: 'insertText', data: '3'
-      })
+      inputs[1].focus()
+      inputs[1].setSelectionRange(0, 1)
+      await userEvent.keyboard('a')
 
-      inputs[1].dispatchEvent(rejected)
-      inputs[1].dispatchEvent(accepted)
-
-      expect(rejected.defaultPrevented).toBeTrue()
-      expect(accepted.defaultPrevented).toBeFalse()
       expect(inputs[1].value).toBe('2')
+      expect(otpInput._inputElement.value).toBe('12')
+    })
+
+    it('should not fire change for a keystroke that changed nothing', () => {
+      fixtureEl.innerHTML = `
+        <div class="form-otp">
+          <input type="text" class="form-otp-control">
+          <input type="text" class="form-otp-control">
+        </div>
+      `
+
+      const otpContainer = fixtureEl.querySelector('.form-otp')
+      new OTPInput(otpContainer, { type: 'number', value: '1' }) // eslint-disable-line no-new
+      const changeSpy = jasmine.createSpy('change')
+      otpContainer.addEventListener('change.coreui.otp-input', changeSpy)
+
+      const inputs = otpContainer.querySelectorAll('.form-otp-control')
+      inputs[1].value = 'a'
+      inputs[1].dispatchEvent(createEvent('input'))
+
+      expect(changeSpy).not.toHaveBeenCalled()
     })
 
     it('should fire change once when a digit is deleted and backspace moves on', () => {
