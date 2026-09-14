@@ -196,6 +196,7 @@ export const wcagAxeRules = {
   '3.3.2': ['label', 'form-field-multiple-labels'],
   '4.1.2': [
     'button-name',
+    'nested-interactive',
     'link-name',
     'input-button-name',
     'select-name',

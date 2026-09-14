@@ -98,7 +98,7 @@ class Chip extends BaseComponent {
     this._selected = this._config.selected || this._element.classList.contains(CLASS_NAME_ACTIVE)
 
     this._applyRole()
-    this._ensureRemoveButton()
+    this._ensureRemoveControl()
     this._applyState()
 
     if (this._config.selectable || this._config.removable) {
@@ -292,17 +292,25 @@ class Chip extends BaseComponent {
     this._element.prepend(check)
   }
 
-  _createRemoveButton(): any {
+  _createRemoveControl(): HTMLElement {
+    if (this._element.getAttribute('role') === 'option') {
+      const indicator = document.createElement('span')
+      indicator.className = CLASS_NAME_CHIP_REMOVE
+      indicator.setAttribute('aria-hidden', 'true')
+      indicator.innerHTML = sanitizeByConfig(this._config.removeIcon, this._config)
+      return indicator
+    }
+
     const button = document.createElement('button')
     button.type = 'button'
     button.className = CLASS_NAME_CHIP_REMOVE
     button.setAttribute('aria-label', this._config.ariaRemoveLabel)
-    button.setAttribute('tabindex', '-1') // Not in tab order, chips handle keyboard
+    button.setAttribute('tabindex', '-1')
     button.innerHTML = sanitizeByConfig(this._config.removeIcon, this._config)
     return button
   }
 
-  _ensureRemoveButton(): void {
+  _ensureRemoveControl(): void {
     // A disabled chip is not interactive, so it never shows a remove button.
     if (!this._config.removable || this._disabled) {
       return
@@ -312,7 +320,7 @@ class Chip extends BaseComponent {
       return
     }
 
-    this._element.append(this._createRemoveButton())
+    this._element.append(this._createRemoveControl())
   }
 
   _makeFocusable(): void {
