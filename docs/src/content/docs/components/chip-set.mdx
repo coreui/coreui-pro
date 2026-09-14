@@ -102,8 +102,8 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
 | `ariaAddedAnnouncement` | string | `'added'` | Wording appended to a chip's value when its addition is announced in the status live region. |
-| `ariaRemoveLabel` | string | `'Remove'` | Accessible label applied to each chip's remove button. |
 | `ariaRemovedAnnouncement` | string | `'removed'` | Wording appended to a chip's value when its removal is announced in the status live region. |
+| `ariaRemoveLabel` | string | `'Remove'` | Accessible label applied to each chip's remove button. |
 | `chipClassName` | string, function, null | `null` | CSS class(es) added to chips created through `add`. A function receives the chip value and returns the class string. |
 | `disabled` | boolean | `false` | Disables interactions and focus for the chips in the set. |
 | `filter` | boolean | `false` | Turns the chips into filter chips — a check icon is shown on the selected ones. Implies `selectable`. |
@@ -141,8 +141,8 @@ Chip set events are fired from the chip set element. Individual `*.coreui.chip` 
 | Event type | Description |
 | --- | --- |
 | `add.coreui.chip-set` | Fires immediately before a chip is added through `add`. Cancelable. Carries the `value`. |
-| `remove.coreui.chip-set` | Fires immediately before a chip is removed through `remove`. Cancelable. Carries the `value` and `chip` element. |
 | `change.coreui.chip-set` | Fired when the set's membership changes (a chip is added or removed). Carries the current `values` array. |
+| `remove.coreui.chip-set` | Fires immediately before a chip is removed through `remove`. Cancelable. Carries the `value` and `chip` element. |
 | `select.coreui.chip-set` | Fired when the selection changes. Carries the `selected` array of chip values. |
 
 ```js

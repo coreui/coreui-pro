@@ -179,18 +179,18 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
 | `chipClassName` | string \| function \| null | `null` | Adds classes to chips. Use a string for all chips or a function `(value) => className` for per-chip styling. |
-| `disabled` | boolean | `false` | Disables the input and marks managed chips as non-interactive. |
-| `readonly` | boolean | `false` | Prevents adding and removing chips while keeping input focus behavior. |
-| `id` | string \| null | auto-generated | Custom id for the generated hidden input. |
-| `name` | string \| null | auto-generated | Name for the generated hidden input used in form submission. |
-| `separator` | string \| null | `','` | Character that triggers chip creation when typed. Set to `null` to disable. |
-| `maxChips` | number \| null | `null` | Maximum number of chips allowed. `null` for unlimited. |
-| `placeholder` | string | `''` | Placeholder text for dynamically created inputs. |
-| `selectable` | boolean | `false` | Enables selection behavior for chips managed by Chip Input. |
-| `removable` | boolean | `true` | Add remove buttons to created chips. |
-| `removeIcon` | string | SVG | HTML string for the remove button icon. |
 | `create` | boolean | `true` | Turns typed text into chips. Set to `false` for the controlled mode: chips come only from `add()` — a host component's selection, say — typing never creates one, and no hidden form input is rendered (the host owns the value). |
 | `createOnBlur` | boolean | `true` | Create a chip from the input value when the input loses focus. |
+| `disabled` | boolean | `false` | Disables the input and marks managed chips as non-interactive. |
+| `id` | string \| null | auto-generated | Custom id for the generated hidden input. |
+| `maxChips` | number \| null | `null` | Maximum number of chips allowed. `null` for unlimited. |
+| `name` | string \| null | auto-generated | Name for the generated hidden input used in form submission. |
+| `placeholder` | string | `''` | Placeholder text for dynamically created inputs. |
+| `readonly` | boolean | `false` | Prevents adding and removing chips while keeping input focus behavior. |
+| `removable` | boolean | `true` | Add remove buttons to created chips. |
+| `removeIcon` | string | SVG | HTML string for the remove button icon. |
+| `selectable` | boolean | `false` | Enables selection behavior for chips managed by Chip Input. |
+| `separator` | string \| null | `','` | Character that triggers chip creation when typed. Set to `null` to disable. |
 
 ### Methods
 
@@ -225,10 +225,10 @@ chipInput.clear()
 
 | Event | Description |
 | --- | --- |
-| `input.coreui.chip-input` | Fired when the inline input value changes. Contains `value` and `relatedTarget`. |
 | `add.coreui.chip-input` | Fired before a chip is added. Call `event.preventDefault()` to cancel. |
-| `remove.coreui.chip-input` | Fired before a chip is removed. Call `event.preventDefault()` to cancel. |
 | `change.coreui.chip-input` | Fired after any chip is added or removed. Contains `values`. |
+| `input.coreui.chip-input` | Fired when the inline input value changes. Contains `value` and `relatedTarget`. |
+| `remove.coreui.chip-input` | Fired before a chip is removed. Call `event.preventDefault()` to cancel. |
 | `select.coreui.chip-input` | Fired when chip selection changes. Contains `selected`. |
 
 ```js

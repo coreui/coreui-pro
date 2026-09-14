@@ -475,15 +475,15 @@ Events fire on the `.list-box` element.
 
 | Event type | Description |
 | --- | --- |
-| `select.coreui.list-box` | Fires before a value is selected; `event.value` is the value. Cancelable — calling `preventDefault()` keeps the selection as it was. |
-| `selected.coreui.list-box` | Fired after the value was selected. |
+| `action.coreui.list-box` | Fired when an option is activated in `none` mode or when the option is a link; `event.value` is the value and `event.relatedTarget` the option. |
+| `activate.coreui.list-box` | Fired when the highlight moves; `event.value` is the newly highlighted value. |
+| `change.coreui.list-box` | Fired once per operation after the selection settled; `event.selected` is the array of selected values. |
 | `deselect.coreui.list-box` | Fires before a value is removed from the selection. Cancelable. |
 | `deselected.coreui.list-box` | Fired after the value was removed from the selection. |
-| `change.coreui.list-box` | Fired once per operation after the selection settled; `event.selected` is the array of selected values. |
-| `selectionLimit.coreui.list-box` | Fired once per interaction when `selectionLimit` refused a selection; `event.limit` is the cap and `event.value` the first refused value. |
-| `activate.coreui.list-box` | Fired when the highlight moves; `event.value` is the newly highlighted value. |
 | `search.coreui.list-box` | Fired on every keystroke in the search field with `search: 'external'`; `event.query` is what was typed. Nothing is filtered — answer with `setItems()`. |
-| `action.coreui.list-box` | Fired when an option is activated in `none` mode or when the option is a link; `event.value` is the value and `event.relatedTarget` the option. |
+| `select.coreui.list-box` | Fires before a value is selected; `event.value` is the value. Cancelable — calling `preventDefault()` keeps the selection as it was. |
+| `selected.coreui.list-box` | Fired after the value was selected. |
+| `selectionLimit.coreui.list-box` | Fired once per interaction when `selectionLimit` refused a selection; `event.limit` is the cap and `event.value` the first refused value. |
 
 ```js
 const myListBox = document.getElementById('myListBox')

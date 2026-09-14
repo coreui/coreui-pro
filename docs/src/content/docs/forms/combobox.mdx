@@ -514,12 +514,12 @@ Events fire on the toggle button.
 
 | Event type | Description |
 | --- | --- |
+| `change.coreui.combobox` | Fired after the selection settled; `event.value` is what `getValue()` would return. |
+| `hidden.coreui.combobox` | Fired when the panel has been hidden. |
+| `hide.coreui.combobox` | Fires immediately when `hide` is called. |
+| `search.coreui.combobox` | Fired on every keystroke in the search field with `search: 'external'`; `event.query` is what was typed. Nothing is filtered — answer with `setItems()`. |
 | `show.coreui.combobox` | Fires immediately when `show` is called. |
 | `shown.coreui.combobox` | Fired when the panel has been made visible. |
-| `hide.coreui.combobox` | Fires immediately when `hide` is called. |
-| `hidden.coreui.combobox` | Fired when the panel has been hidden. |
-| `change.coreui.combobox` | Fired after the selection settled; `event.value` is what `getValue()` would return. |
-| `search.coreui.combobox` | Fired on every keystroke in the search field with `search: 'external'`; `event.query` is what was typed. Nothing is filtered — answer with `setItems()`. |
 
 ```js
 const myCombobox = document.getElementById('myCombobox')

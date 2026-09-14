@@ -354,9 +354,9 @@ const transfer = new coreui.Transfer('#myTransfer', {
 | `allowList` | object | `SVGAllowlist` | What the icon sanitizer keeps. |
 | `ariaMoveAllToSourceLabel` | string | `'Move all to available'` | Accessible name of the button that moves everything back to the source list. |
 | `ariaMoveAllToTargetLabel` | string | `'Move all to chosen'` | Accessible name of the button that moves everything to the target list. |
+| `ariaMovedAnnouncement` | string | `'{count} moved to {title}'` | What the live region says after a move. `{count}` is how many options moved, `{title}` the destination's title. |
 | `ariaMoveToSourceLabel` | string | `'Move to available'` | Accessible name of the button that moves the selection back to the source list. A button with its own `aria-label` keeps it. |
 | `ariaMoveToTargetLabel` | string | `'Move to chosen'` | Accessible name of the button that moves the selection to the target list. |
-| `ariaMovedAnnouncement` | string | `'{count} moved to {title}'` | What the live region says after a move. `{count}` is how many options moved, `{title}` the destination's title. |
 | `disabled` | boolean | `false` | Turns the whole transfer off: both list boxes, both move buttons and both search fields. |
 | `html` | boolean | `false` | Parse the labels and descriptions of `items` as markup instead of text. Passed to both list boxes. |
 | `indicator` | string | `'checkbox'` | Passed to both list boxes. `'none'` drops the checkbox in front of every option. |
@@ -402,10 +402,10 @@ Events fire on the `.transfer` element.
 
 | Event type | Description |
 | --- | --- |
+| `change.coreui.transfer` | Fired after a move settled; `event.sourceValues` and `event.targetValues` are the values of the two lists. The names avoid `event.target`, which stays the `.transfer` element. |
 | `move.coreui.transfer` | Fires before options are moved; `event.direction` is `'source'` or `'target'` and `event.values` the values about to move. Cancelable — calling `preventDefault()` leaves both lists as they were. |
 | `moved.coreui.transfer` | Fired after the options were moved, with the same `direction` and `values`. |
 | `search.coreui.transfer` | Fired on every keystroke in a search field with `search: 'external'`; `event.side` is `'source'` or `'target'` and `event.query` what was typed. Nothing is filtered — answer with `setItems()`. |
-| `change.coreui.transfer` | Fired after a move settled; `event.sourceValues` and `event.targetValues` are the values of the two lists. The names avoid `event.target`, which stays the `.transfer` element. |
 
 ```js
 const myTransfer = document.getElementById('myTransfer')

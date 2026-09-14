@@ -331,8 +331,8 @@ All dialog events are fired at the dialog itself (i.e. at the `<dialog class="di
 | Event | Description |
 | --- | --- |
 | `cancel.coreui.dialog` | This event is fired when the dialog is dismissed with the escape key, right before hiding starts. |
-| `hide.coreui.dialog` | This event is fired immediately when the `hide` instance method has been called. |
 | `hidden.coreui.dialog` | This event is fired when the dialog has finished being hidden from the user (will wait for CSS transitions to complete). |
+| `hide.coreui.dialog` | This event is fired immediately when the `hide` instance method has been called. |
 | `hidePrevented.coreui.dialog` | This event is fired when the dialog is shown, its backdrop is `static` and a click outside of the dialog is performed. The event is also fired when the escape key is pressed and the `keyboard` option is set to `false`. |
 | `show.coreui.dialog` | This event fires immediately when the `show` instance method is called. If caused by a click, the clicked element is available as the `relatedTarget` property of the event. |
 | `shown.coreui.dialog` | This event is fired when the dialog has been made visible to the user (will wait for CSS transitions to complete). If caused by a click, the clicked element is available as the `relatedTarget` property of the event. |
