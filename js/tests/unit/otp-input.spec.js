@@ -1155,4 +1155,50 @@ describe('OTPInput', () => {
       expect(inputs[0].maxLength).toBe(4)
     })
   })
+  describe('linear', () => {
+    it('should put every slot back into the tab order when linear is switched off', () => {
+      fixtureEl.innerHTML = [
+        '<div class="form-otp">',
+        '  <input type="text" class="form-otp-control">',
+        '  <input type="text" class="form-otp-control">',
+        '  <input type="text" class="form-otp-control">',
+        '</div>'
+      ].join('')
+
+      const otpContainer = fixtureEl.querySelector('.form-otp')
+      const otpInput = new OTPInput(otpContainer)
+      const inputs = otpContainer.querySelectorAll('.form-otp-control')
+
+      expect(inputs[2].getAttribute('tabindex')).toEqual('-1')
+
+      otpInput.update({ linear: false })
+
+      for (const input of inputs) {
+        expect(input.hasAttribute('tabindex')).toBeFalse()
+      }
+    })
+  })
+
+  describe('dispose', () => {
+    it('should stop handling paste after dispose', () => {
+      fixtureEl.innerHTML = [
+        '<div class="form-otp">',
+        '  <input type="text" class="form-otp-control">',
+        '  <input type="text" class="form-otp-control">',
+        '</div>'
+      ].join('')
+
+      const otpContainer = fixtureEl.querySelector('.form-otp')
+      const otpInput = new OTPInput(otpContainer)
+      const firstInput = otpContainer.querySelector('.form-otp-control')
+
+      otpInput.dispose()
+
+      const event = new Event('paste', { bubbles: true, cancelable: true })
+      event.clipboardData = { getData: () => '12' }
+      firstInput.dispatchEvent(event)
+
+      expect(event.defaultPrevented).toBeFalse()
+    })
+  })
 })
