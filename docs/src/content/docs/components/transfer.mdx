@@ -371,7 +371,7 @@ const transfer = new coreui.Transfer('#myTransfer', {
 | `sanitizeFn` | null, function | `null` | Your own sanitizer, used instead of the built-in one. |
 | `search` | boolean, string | `false` | Passed to both list boxes: builds a search field above each list. `'external'` filters nothing — every keystroke fires `search.coreui.transfer` and you answer with `setItems()`. |
 | `searchPlaceholder` | string | `'Search'` | Passed to both list boxes as the placeholder of their search field, and used as the first half of each field's accessible name so the two are told apart. |
-| `selectedCounterText` | string | `'selected'` | Passed to both list boxes: the word after the count in each header. The transfer turns their [counter](/components/list-box/#counter) on. |
+| `selectedLabel` | string, function | `` (count, total) => `${count}/${total} selected` `` | Passed to both list boxes as their header count text. The transfer turns their [counter](/components/list-box/#counter) on. |
 | `sourceTitle` | string | `'Available'` | Title of the source list: its select-all label when the button is empty, and its accessible name. |
 | `targetTitle` | string | `'Chosen'` | Title of the target list. |
 | `typeahead` | boolean | `true` | Passed to both list boxes: move the highlight to the option matching what the user types. |

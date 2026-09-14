@@ -304,7 +304,7 @@ Group options in a `.list-box-section` and name it with a `.list-box-section-lab
 
 ## Multiple select
 
-`multiple` toggles options instead of replacing the selection, and the panel stays open so several picks cost one opening. The toggle shows the one label while a single option is selected and `selectedText` past that — `{count}` is replaced with how many. `selectionLimit` caps how many can be taken at once.
+`multiple` toggles options instead of replacing the selection, and the panel stays open so several picks cost one opening. The toggle shows the one label while a single option is selected and `selectedLabel` past that — a function of the count, or a string in which `{count}` is replaced. `selectionLimit` caps how many can be taken at once.
 
 <Example code={`<button class="form-control combobox-toggle" type="button"
       data-coreui-toggle="combobox"
@@ -487,7 +487,7 @@ const combobox = new coreui.Combobox('#myCombobox', {
 | `search` | boolean, string | `false` | Builds a search field at the top of the panel. `true` filters the list itself; `'external'` filters nothing and fires `search.coreui.combobox` instead. |
 | `searchNormalize` | boolean | `false` | Compares both sides of the filter without their diacritics, so `zoe` matches `Zoë`. |
 | `searchPlaceholder` | string | `'Search'` | Placeholder of the built search field. |
-| `selectedText` | string | `'{count} selected'` | What the toggle shows past one selected option in `multiple` mode. `{count}` is replaced with the number. |
+| `selectedLabel` | string, function | `` (count) => `${count} selected` `` | What the toggle shows past one selected option in `multiple` mode. A function `(count, total) => string`, or a string in which `{count}` and `{total}` are replaced. |
 | `selectionLimit` | null, number | `null` | How many options can be selected at once in `multiple` mode. |
 | `typeahead` | boolean | `true` | Move the highlight to the option matching what the user types. The buffer resets after 500 ms. |
 | `value` | string, array, null | `null` | Initially selected values, merged with the options marked `.selected` in the markup. |

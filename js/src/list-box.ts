@@ -11,7 +11,7 @@ import SelectorEngine from './dom/selector-engine.js'
 import type { ComponentConfig } from './util/config.js'
 import { DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList } from './util/sanitizer.js'
 import {
-  defineJQueryPlugin, getElement, getNextActiveElement, getUID, jQueryDispatch
+  type CountLabel, defineJQueryPlugin, getElement, getNextActiveElement, getUID, jQueryDispatch, resolveCountLabel
 } from './util/index.js'
 
 /**
@@ -124,7 +124,7 @@ type ListBoxConfig = {
   searchPlaceholder: string
   sectionsSelectable: boolean
   selected: string | string[] | null
-  selectedCounterText: string
+  selectedLabel: CountLabel
   selectionLimit: number | null
   selectionMode: string
   typeahead: boolean
@@ -147,7 +147,7 @@ const Default: ListBoxConfig = {
   searchPlaceholder: 'Search',
   sectionsSelectable: false,
   selected: null,
-  selectedCounterText: 'selected',
+  selectedLabel: (count: number, total: number) => `${count}/${total} selected`,
   selectionLimit: null,
   selectionMode: SELECTION_MODE_SINGLE,
   typeahead: true
@@ -170,7 +170,7 @@ const DefaultType: Record<string, string> = {
   searchPlaceholder: 'string',
   sectionsSelectable: 'boolean',
   selected: '(string|array|null)',
-  selectedCounterText: 'string',
+  selectedLabel: '(string|function)',
   selectionLimit: '(null|number)',
   selectionMode: 'string',
   typeahead: 'boolean'
@@ -511,7 +511,7 @@ class ListBox extends BaseComponent {
     const navigable = this._navigableOptions()
     const count = navigable.filter(option => this._selected.has(this._optionValue(option))).length
 
-    this._counter.textContent = `${count}/${navigable.length} ${this._config.selectedCounterText}`
+    this._counter.textContent = resolveCountLabel(this._config.selectedLabel, count, navigable.length)
   }
 
   _resolveSearch(): HTMLInputElement | null {

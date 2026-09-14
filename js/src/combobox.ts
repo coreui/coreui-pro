@@ -13,7 +13,9 @@ import ListBox, { type ListBoxEntry } from './list-box.js'
 import type { ComponentConfig } from './util/config.js'
 import { CARET_ICON } from './util/icons.js'
 import { DefaultAllowlist, type SanitizerAllowList } from './util/sanitizer.js'
-import { defineJQueryPlugin, getUID, jQueryDispatch } from './util/index.js'
+import {
+  type CountLabel, defineJQueryPlugin, getUID, jQueryDispatch, resolveCountLabel
+} from './util/index.js'
 
 /**
  * Constants
@@ -66,8 +68,6 @@ const SELECTOR_POPUP = '.popup'
 const SELECTOR_SEARCH = '[data-coreui-list-box-search]'
 const SELECTOR_VALUE = '.combobox-value'
 
-const COUNT_PLACEHOLDER = '{count}'
-
 type ComboboxConfig = {
   allowList: SanitizerAllowList
   ariaSearchLabel: string
@@ -85,7 +85,7 @@ type ComboboxConfig = {
   search: boolean | string
   searchNormalize: boolean
   searchPlaceholder: string
-  selectedText: string
+  selectedLabel: CountLabel
   selectionLimit: number | null
   typeahead: boolean
   value: string | string[] | null
@@ -108,7 +108,7 @@ const Default: ComboboxConfig = {
   search: false,
   searchNormalize: false,
   searchPlaceholder: 'Search',
-  selectedText: '{count} selected',
+  selectedLabel: (count: number) => `${count} selected`,
   selectionLimit: null,
   typeahead: true,
   value: null
@@ -131,7 +131,7 @@ const DefaultType: Record<string, string> = {
   search: '(boolean|string)',
   searchNormalize: 'boolean',
   searchPlaceholder: 'string',
-  selectedText: 'string',
+  selectedLabel: '(string|function)',
   selectionLimit: '(null|number)',
   typeahead: 'boolean',
   value: '(string|array|null)'
@@ -447,7 +447,11 @@ class Combobox extends ComboboxBase {
 
     this._valueElement.classList.remove(CLASS_NAME_PLACEHOLDER)
     this._valueElement.textContent = this._config.multiple && values.length > 1 ?
-      this._config.selectedText.replace(COUNT_PLACEHOLDER, String(values.length)) :
+      resolveCountLabel(
+        this._config.selectedLabel,
+        values.length,
+        SelectorEngine.find(SELECTOR_OPTION, this._optionsElement).length
+      ) :
       this._optionLabel(values[0])
   }
 

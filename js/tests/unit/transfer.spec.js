@@ -116,7 +116,7 @@ describe('Transfer', () => {
         sanitizeFn: null,
         search: false,
         searchPlaceholder: 'Search',
-        selectedCounterText: 'selected',
+        selectedLabel: jasmine.any(Function),
         sourceTitle: 'Available',
         targetTitle: 'Chosen',
         typeahead: true,
