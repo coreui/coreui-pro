@@ -938,6 +938,7 @@ class MultiSelect extends BaseComponent {
 
         if (option.disabled) {
           optionDiv.classList.add(CLASS_NAME_DISABLED)
+          optionDiv.setAttribute('aria-disabled', 'true')
         }
 
         if (this._config.optionsStyle === 'checkbox') {
@@ -945,7 +946,7 @@ class MultiSelect extends BaseComponent {
         }
 
         optionDiv.dataset.value = String(option.value)
-        optionDiv.tabIndex = 0
+        optionDiv.tabIndex = option.disabled ? -1 : 0
         optionDiv.setAttribute('role', 'option')
         optionDiv.setAttribute('aria-selected', option.selected === true ? 'true' : 'false')
 
@@ -1058,6 +1059,10 @@ class MultiSelect extends BaseComponent {
       }
     }
 
+    if (element.classList.contains(CLASS_NAME_DISABLED)) {
+      return
+    }
+
     const value = String(element.dataset.value)
     const { text } = this._findOptionByValue(value)
 
@@ -1072,7 +1077,10 @@ class MultiSelect extends BaseComponent {
     if (!this._config.multiple) {
       this.hide()
       this.search('')
-      this._searchElement.value = null
+
+      if (this._config.search) {
+        this._searchElement.value = null
+      }
     }
 
     if (this._config.clearSearchOnSelect && this._config.search) {

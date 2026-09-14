@@ -804,7 +804,7 @@ class Autocomplete extends BaseComponent {
       }
 
       optionDiv.dataset.value = option.value
-      optionDiv.tabIndex = 0
+      optionDiv.tabIndex = option.disabled ? -1 : 0
       if (this._isExternalSearch() && this._config.highlightOptionsOnSearch && this._search) {
         optionDiv.innerHTML = this._highlightOption(option.label)
       } else if (this._config.optionsTemplate && typeof this._config.optionsTemplate === 'function') {
@@ -830,6 +830,10 @@ class Autocomplete extends BaseComponent {
       if (!element) {
         return
       }
+    }
+
+    if (element.classList.contains(CLASS_NAME_DISABLED)) {
+      return
     }
 
     const { value } = element.dataset
