@@ -23,6 +23,7 @@ const ARROW_RIGHT_KEY = 'ArrowRight'
 const ARROW_LEFT_KEY = 'ArrowLeft'
 const BACKSPACE_KEY = 'Backspace'
 
+const EVENT_BEFORE_INPUT = `beforeinput${EVENT_KEY}`
 const EVENT_CHANGE = `change${EVENT_KEY}`
 const EVENT_COMPLETE = `complete${EVENT_KEY}`
 const EVENT_FOCUS = `focus${EVENT_KEY}`
@@ -136,6 +137,14 @@ class OTPInput extends BaseComponent {
 
   // Private
   _addEventListeners() {
+    EventHandler.on(this._element, EVENT_BEFORE_INPUT, SELECTOR_FORM_OTP_CONTROL, event => {
+      const { data, inputType } = event
+
+      if (inputType === 'insertText' && data && data.length === 1 && !this._isValidInput(data)) {
+        event.preventDefault()
+      }
+    })
+
     EventHandler.on(this._element, EVENT_FOCUS, SELECTOR_FORM_OTP_CONTROL, event => {
       const { target } = event
 
@@ -168,9 +177,8 @@ class OTPInput extends BaseComponent {
 
         if (chars) {
           this._distributeChars(target, chars)
+          return
         }
-
-        return
       }
 
       if (target.value.length === 1 && !this._isValidInput(target.value)) {
@@ -183,7 +191,11 @@ class OTPInput extends BaseComponent {
         return
       }
 
-      this._setHiddenInputValue(inputs.map(input => input.value).join(''))
+      const value = inputs.map(input => input.value).join('')
+
+      if (value !== (this._inputElement ? this._inputElement.value : '')) {
+        this._setHiddenInputValue(value)
+      }
 
       if (target.value.length === 1) {
         const nextInput = getNextActiveElement(inputs, target, true)
@@ -399,9 +411,7 @@ class OTPInput extends BaseComponent {
         input.placeholder = placeholder.length > 1 ? placeholder[index] || '' : placeholder
       }
 
-      if (this._config.required) {
-        input.required = true
-      }
+      input.required = this._config.required
 
       switch (this._config.type) {
         case 'number': {
