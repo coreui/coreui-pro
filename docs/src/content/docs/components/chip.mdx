@@ -281,7 +281,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
-| `ariaRemoveLabel` | string | `'Remove'` | Accessible label for the remove button. |
+| `ariaRemoveLabel` | string | `'Remove'` | Accessible label for the remove button. Unused inside a selectable [chip set](/components/chip-set/#accessibility), where the affordance is hidden from assistive technology. |
 | `disabled` | boolean | `false` | Disables interactions and focus. You can also apply the `.disabled` class in markup. |
 | `filter` | boolean | `false` | Shows a check icon while the chip is selected (filter chip). Implies `selectable`. |
 | `removable` | boolean | `false` | Adds a remove button (or enables removal if it exists in markup). |
@@ -349,7 +349,7 @@ The Bootstrap Chip component follows WAI-ARIA patterns for interactive widgets, 
 - Chips become focusable when `selectable` or `removable` is enabled.
 - A standalone selectable chip is exposed as a toggle button (`role="button"`) with `aria-pressed` kept in sync with `.active`. Inside a selectable [Chip set](/components/chip-set/) the set exposes a listbox and each chip becomes a `role="option"` with `aria-selected` instead.
 - `aria-disabled="true"` is applied to disabled chips that carry a role; a role-less chip conveys the state through the `disabled` class and its removed interactivity.
-- Each `.chip-remove` button includes an accessible label via `ariaRemoveLabel`.
+- Each `.chip-remove` button includes an accessible label via `ariaRemoveLabel`. Inside a selectable [chip set](/components/chip-set/#accessibility) the chip is a `role="option"` and the affordance is a `<span aria-hidden="true">` instead, so the label does not apply there.
 - Use descriptive `aria-label` attributes on chip containers when the chip component group has a meaningful role (e.g., "Applied filters").
 
 ## Deprecated markup

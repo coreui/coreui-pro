@@ -116,7 +116,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | --- | --- | --- | --- |
 | `ariaAddedAnnouncement` | string | `'added'` | Wording appended to a chip's value when its addition is announced in the status live region. |
 | `ariaRemovedAnnouncement` | string | `'removed'` | Wording appended to a chip's value when its removal is announced in the status live region. |
-| `ariaRemoveLabel` | string | `'Remove'` | Accessible label applied to each chip's remove button. |
+| `ariaRemoveLabel` | string | `'Remove'` | Accessible label applied to each chip's remove button. A selectable set has no such button — see [Accessibility](#accessibility). |
 | `chipClassName` | string, function, null | `null` | CSS class(es) added to chips created through `add`. A function receives the chip value and returns the class string. |
 | `disabled` | boolean | `false` | Disables interactions and focus for the chips in the set. |
 | `filter` | boolean | `false` | Turns the chips into filter chips — a check icon is shown on the selected ones. Implies `selectable`. |
@@ -184,6 +184,7 @@ Disabled chips (`.chip.disabled`) are skipped while navigating.
 - The chip set manages roving focus, so the arrow keys move focus between chips rather than relying on the browser's default tab order.
 - Add a descriptive `aria-label` to the chip set element when the group has a meaningful role (e.g., "Applied filters").
 - A selectable set is exposed as a horizontal `role="listbox"` (with `aria-multiselectable` in multiple mode) and each chip becomes a `role="option"` with `aria-selected`; a non-selectable set is a `role="group"`.
+- In a selectable set the remove affordance is a `<span aria-hidden="true">` rather than a button: the listbox interaction model cannot reach a control inside an option, so a real button there would be announced and never operable, and its label would join the option's name. Removing stays on <kbd>Backspace</kbd> / <kbd>Delete</kbd> for the keyboard and on the affordance itself for the pointer. A set that is not a listbox keeps a real `<button>` labelled with `ariaRemoveLabel`.
 - Adding and removing chips is announced through a visually hidden `role="status"` region rendered next to the set; customize the wording with the `ariaAddedAnnouncement` and `ariaRemovedAnnouncement` options.
 
 ## Customizing

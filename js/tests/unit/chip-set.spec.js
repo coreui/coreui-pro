@@ -203,6 +203,44 @@ describe('ChipSet', () => {
   })
 
   describe('removal', () => {
+    it('should keep the remove control out of the listbox option', () => {
+      const el = setMarkup(['First', 'Second'])
+      // eslint-disable-next-line no-new
+      new ChipSet(el, { selectable: true, removable: true })
+
+      const chip = el.querySelector('.chip')
+      const control = chip.querySelector('.chip-remove')
+
+      expect(chip.getAttribute('role')).toEqual('option')
+      expect(control.tagName).toEqual('SPAN')
+      expect(control.getAttribute('aria-hidden')).toEqual('true')
+      expect(control.hasAttribute('tabindex')).toBeFalse()
+      expect(control.getAttribute('aria-label')).toBeNull()
+    })
+
+    it('should keep a real button when the set is not a listbox', () => {
+      const el = setMarkup(['First', 'Second'])
+      // eslint-disable-next-line no-new
+      new ChipSet(el, { removable: true })
+
+      const chip = el.querySelector('.chip')
+      const control = chip.querySelector('.chip-remove')
+
+      expect(chip.getAttribute('role')).toBeNull()
+      expect(control.tagName).toEqual('BUTTON')
+      expect(control.getAttribute('aria-label')).toEqual('Remove')
+    })
+
+    it('should remove the chip when the aria-hidden control is clicked', () => {
+      const el = setMarkup(['First', 'Second'])
+      // eslint-disable-next-line no-new
+      new ChipSet(el, { selectable: true, removable: true })
+
+      el.querySelector('.chip .chip-remove').click()
+
+      expect(el.querySelectorAll('.chip')).toHaveSize(1)
+    })
+
     it('should move focus to the next chip after removing a focused chip', () => {
       const el = setMarkup()
       // eslint-disable-next-line no-new
