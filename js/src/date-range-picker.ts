@@ -313,7 +313,7 @@ class DateRangePicker extends BaseComponent {
     }
 
     this._selectEndDate = value
-    this._calendar?.update({ selectEndDate: value })
+    this._calendar?.setConfig({ selectEndDate: value })
   }
 
   _createDateRangePicker(): void {
@@ -339,14 +339,14 @@ class DateRangePicker extends BaseComponent {
     // echo of the panel's own updates.
     EventHandler.on(inputGroup, DateRangeInput.eventName('startDateChange'), (event: any) => {
       if (!this._syncingFromPanel) {
-        this._calendar?.update({ startDate: event.date })
+        this._calendar?.setConfig({ startDate: event.date })
         this._triggerDateChange(EVENT_START_DATE_CHANGE, event.date)
       }
     })
 
     EventHandler.on(inputGroup, DateRangeInput.eventName('endDateChange'), (event: any) => {
       if (!this._syncingFromPanel) {
-        this._calendar?.update({ endDate: event.date })
+        this._calendar?.setConfig({ endDate: event.date })
         this._triggerDateChange(EVENT_END_DATE_CHANGE, event.date)
       }
     })

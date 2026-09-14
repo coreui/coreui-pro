@@ -416,8 +416,8 @@ class DateRangeInput extends BaseComponent {
     this._applying = true
 
     if (fields) {
-      this._startInput.update({ date: startDate })
-      this._endInput.update({ date: endDate })
+      this._startInput.setConfig({ date: startDate })
+      this._endInput.setConfig({ date: endDate })
     }
 
     const start = fields ? this._startInput.getDate() : startDate

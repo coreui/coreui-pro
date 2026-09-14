@@ -191,7 +191,7 @@ class TimePicker extends BaseComponent {
   }
 
   setTime(time: Date | null): void {
-    this._input.update({ date: time })
+    this._input.setConfig({ date: time })
     EventHandler.trigger(this._element, EVENT_TIME_CHANGE, { time })
   }
 
@@ -294,7 +294,7 @@ class TimePicker extends BaseComponent {
     // See DatePicker — the bridge from a typed value back to the panel
     EventHandler.on(inputEl, TimeInput.eventName(TimeInput.CHANGE_EVENT_NAME), (event: any) => {
       if (!this._syncingFromPanel) {
-        this._selection?.update({ time: event.date })
+        this._selection?.setConfig({ time: event.date })
         EventHandler.trigger(this._element, EVENT_TIME_CHANGE, { time: event.date })
       }
     })
@@ -344,7 +344,7 @@ class TimePicker extends BaseComponent {
       locale: this._config.locale,
       onChange: (time: Date | null) => {
         this._syncingFromPanel = true
-        this._input.update({ date: time })
+        this._input.setConfig({ date: time })
         this._syncingFromPanel = false
         EventHandler.trigger(this._element, EVENT_TIME_CHANGE, { time })
       },

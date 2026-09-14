@@ -432,7 +432,7 @@ class DatePicker extends BaseComponent {
     this._applying = true
 
     if (field) {
-      this._input.update({ date })
+      this._input.setConfig({ date })
     }
 
     const applied = field ? this._input.getDate() : date
@@ -442,7 +442,7 @@ class DatePicker extends BaseComponent {
     this._date = applied
 
     if (calendar) {
-      this._calendar?.update({ startDate: applied })
+      this._calendar?.setConfig({ startDate: applied })
     }
 
     if (changed) {

@@ -552,16 +552,16 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 
 | Method | Description |
 | --- | --- |
-| `show` | Shows the multi select's options. |
-| `hide` | Hides the multi select's options. |
-| `update` | Updates the configuration of multi select. |
-| `selectAll` | Select all options. |
-| `selectFiltered` | Select only the currently filtered (search-matched) options. |
-| `deselectFiltered` | Deselect only the currently filtered (search-matched) options. |
 | `deselectAll` | Deselect all options. |
+| `deselectFiltered` | Deselect only the currently filtered (search-matched) options. |
 | `dispose` | Destroys an element's multi select. (Removes stored data on the DOM element) |
 | `getInstance` | Static method which allows you to get the multi select instance associated with a DOM element. |
 | `getValue` | Returns the array with selected elements. |
+| `hide` | Hides the multi select's options. |
+| `selectAll` | Select all options. |
+| `selectFiltered` | Select only the currently filtered (search-matched) options. |
+| `setConfig` | Merges the given options over the current configuration and rebuilds the interface. Options you leave out keep their current value. |
+| `show` | Shows the multi select's options. |
 
 ### Events
 
@@ -570,11 +570,11 @@ Multi Select component exposes a few events for hooking into multi select functi
 | Method | Description |
 | --- | --- |
 | `changed.coreui.multi-select` | Fires immediately when an option is selected or deselected. |
+| `hidden.coreui.multi-select` | Fired when the multi select options have finished being hidden from the user and CSS transitions have completed. |
+| `hide.coreui.multi-select` | Fires immediately when the hide instance method has been called. Call `event.preventDefault()` to keep the menu open. |
 | `selectionLimit.coreui.multi-select` | Fires when selecting an option is blocked because the selection limit has been reached. |
 | `show.coreui.multi-select` | Fires immediately when the show instance method is called. Call `event.preventDefault()` to keep the menu closed. |
 | `shown.coreui.multi-select` | Fired when the multi select options have been made visible to the user and CSS transitions have completed. |
-| `hide.coreui.multi-select` | Fires immediately when the hide instance method has been called. Call `event.preventDefault()` to keep the menu open. |
-| `hidden.coreui.multi-select` | Fired when the multi select options have finished being hidden from the user and CSS transitions have completed. |
 
 ```js
 const myMutliSelect = document.getElementById('myMutliSelect')

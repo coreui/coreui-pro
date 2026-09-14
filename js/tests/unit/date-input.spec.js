@@ -711,7 +711,7 @@ describe('DateInput', () => {
       dateInput._element.addEventListener('dateChange.coreui.date-input', changeSpy)
       dateInput._element.addEventListener('errorChange.coreui.date-input', errorSpy)
 
-      dateInput.update({ date: new Date(2026, 6, 20) })
+      dateInput.setConfig({ date: new Date(2026, 6, 20) })
 
       expect(dateInput._element.classList.contains('is-invalid')).toBeTrue()
       expect(dateInput.getDate()).toBeNull()
@@ -727,7 +727,7 @@ describe('DateInput', () => {
       const changeSpy = jasmine.createSpy('dateChange')
       dateInput._element.addEventListener('dateChange.coreui.date-input', changeSpy)
 
-      dateInput.update({ date: new Date(2026, 6, 10) })
+      dateInput.setConfig({ date: new Date(2026, 6, 10) })
 
       expect(dateInput._element.classList.contains('is-invalid')).toBeFalse()
       expect(dateInput.getDate()).toEqual(new Date(2026, 6, 10))
@@ -816,7 +816,7 @@ describe('DateInput', () => {
     it('should restore the initial date, not the last one set through update()', () => {
       const dateInput = createDateInput({ date: new Date(2026, 6, 14) })
 
-      dateInput.update({ date: new Date(2026, 6, 20) })
+      dateInput.setConfig({ date: new Date(2026, 6, 20) })
       dateInput.reset()
 
       expect(dateInput.getDate()).toEqual(new Date(2026, 6, 14))
@@ -869,11 +869,11 @@ describe('DateInput', () => {
     })
   })
 
-  describe('update', () => {
+  describe('setConfig', () => {
     it('should rebuild the component with the new config', () => {
       const dateInput = createDateInput()
 
-      dateInput.update({ format: 'yyyy-MM-dd', date: new Date(2026, 6, 14) })
+      dateInput.setConfig({ format: 'yyyy-MM-dd', date: new Date(2026, 6, 14) })
 
       const [year] = getSections(dateInput._element)
       expect(year.getAttribute('aria-label')).toEqual('Year')

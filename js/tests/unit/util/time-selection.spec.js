@@ -155,11 +155,11 @@ describe('TimeSelection', () => {
     })
   })
 
-  describe('update and dispose', () => {
+  describe('setConfig and dispose', () => {
     it('should re-render with a merged configuration', () => {
       const selection = build({ time: new Date(2026, 0, 1, 7, 0, 0) })
 
-      selection.update({ seconds: false })
+      selection.setConfig({ seconds: false })
 
       expect(cells('seconds')).toHaveSize(0)
       expect(cells('minutes').length).toBeGreaterThan(0)
@@ -189,7 +189,7 @@ describe('TimeSelection', () => {
     it('should mark the selected cells after an update', () => {
       const selection = build()
 
-      selection.update({ time: new Date(2026, 0, 1, 6, 5, 0) })
+      selection.setConfig({ time: new Date(2026, 0, 1, 6, 5, 0) })
 
       expect(fixtureEl.querySelector('[data-coreui-hours="6"]').classList.contains('selected')).toBeTrue()
     })

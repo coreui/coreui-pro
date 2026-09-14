@@ -840,7 +840,7 @@ describe('Autocomplete', () => {
     })
   })
 
-  describe('update', () => {
+  describe('setConfig', () => {
     it('should update configuration and options', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
@@ -853,7 +853,7 @@ describe('Autocomplete', () => {
         { label: 'New Option 2', value: 'new2' }
       ]
 
-      autocomplete.update({ options: newOptions })
+      autocomplete.setConfig({ options: newOptions })
 
       expect(autocomplete._options).toEqual(newOptions)
     })
@@ -868,7 +868,7 @@ describe('Autocomplete', () => {
 
       autocomplete._selected.push({ label: 'Option 1', value: '1' })
 
-      autocomplete.update({ value: '2' })
+      autocomplete.setConfig({ value: '2' })
 
       expect(autocomplete._selected).toEqual([])
     })
@@ -880,7 +880,7 @@ describe('Autocomplete', () => {
         options: [{ label: 'Option 1', value: '1' }]
       })
 
-      autocomplete.update({
+      autocomplete.setConfig({
         options: [
           { label: 'A', value: 'a' },
           { label: 'B', value: 'b' },

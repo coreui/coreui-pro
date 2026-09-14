@@ -104,7 +104,7 @@ describe('DateRangeInput', () => {
       const seen = []
       root().addEventListener('rangeChange.coreui.date-range-input', event => seen.push(event))
 
-      range._endInput.update({ date: new Date(2026, 6, 20) })
+      range._endInput.setConfig({ date: new Date(2026, 6, 20) })
 
       expect(range.getEndDate()).toEqual(new Date(2026, 6, 20))
       expect(seen).toHaveLength(1)

@@ -52,7 +52,7 @@ const wrongResolution: Promise<Modal> = modal.show()
 
 // PRO components.
 const calendar = new Calendar(element, { calendars: 2, locale: 'en-US' })
-calendar.update({ selectionType: 'week' })
+calendar.setConfig({ selectionType: 'week' })
 
 const multiSelect = new MultiSelect(element, { multiple: true, search: true })
 const selection = multiSelect.getValue()

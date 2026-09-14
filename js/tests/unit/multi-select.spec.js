@@ -246,8 +246,8 @@ describe('MultiSelect', () => {
       const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }] })
       const spy = spyOn(multiSelect, 'show')
 
-      multiSelect.update({ options: [{ value: '2', text: 'Option 2' }] })
-      multiSelect.update({ options: [{ value: '3', text: 'Option 3' }] })
+      multiSelect.setConfig({ options: [{ value: '2', text: 'Option 2' }] })
+      multiSelect.setConfig({ options: [{ value: '3', text: 'Option 3' }] })
       selectEl.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true }))
 
       expect(spy).toHaveBeenCalledTimes(1)
@@ -3727,7 +3727,7 @@ describe('MultiSelect', () => {
     })
   })
 
-  describe('update', () => {
+  describe('setConfig', () => {
     it('should update configuration and options', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
@@ -3740,9 +3740,21 @@ describe('MultiSelect', () => {
         { value: 'new2', text: 'New Option 2' }
       ]
 
-      multiSelect.update({ options: newOptions })
+      multiSelect.setConfig({ options: newOptions })
       expect(multiSelect._options.length).toBe(2)
       expect(multiSelect._options[0].value).toBe('new1')
+    })
+
+    it('should type check the options it is given', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        multiple: false,
+        options: [{ value: '1', text: 'Option 1' }]
+      })
+
+      expect(() => multiSelect.setConfig({ multiple: 'yes' })).toThrowError(TypeError)
+      expect(multiSelect._config.multiple).toBeFalse()
     })
 
     it('should refresh multiple and required on the native select', () => {
@@ -3757,12 +3769,12 @@ describe('MultiSelect', () => {
       expect(selectEl.getAttribute('multiple')).toBe('true')
       expect(selectEl.getAttribute('required')).toBe('true')
 
-      multiSelect.update({ multiple: false, required: false })
+      multiSelect.setConfig({ multiple: false, required: false })
 
       expect(selectEl.hasAttribute('multiple')).toBe(false)
       expect(selectEl.hasAttribute('required')).toBe(false)
 
-      multiSelect.update({ multiple: true, required: true })
+      multiSelect.setConfig({ multiple: true, required: true })
 
       expect(selectEl.getAttribute('multiple')).toBe('true')
       expect(selectEl.getAttribute('required')).toBe('true')
@@ -3779,7 +3791,7 @@ describe('MultiSelect', () => {
 
       expect(multiSelect._selected.length).toBe(1)
 
-      multiSelect.update({
+      multiSelect.setConfig({
         options: [{ value: '3', text: 'Option 3' }],
         value: ['3']
       })
@@ -3797,7 +3809,7 @@ describe('MultiSelect', () => {
 
       const oldClone = multiSelect._wrapperElement
 
-      multiSelect.update({
+      multiSelect.setConfig({
         options: [{ value: '2', text: 'Option 2' }]
       })
 
@@ -3818,8 +3830,8 @@ describe('MultiSelect', () => {
       const previousChip = previousSelection.querySelector('.chip')
       const previousMenu = multiSelect._menu
 
-      multiSelect.update({ options })
-      multiSelect.update({ options })
+      multiSelect.setConfig({ options })
+      multiSelect.setConfig({ options })
 
       expect(Chip.getInstance(previousChip)).toBeNull()
       expect(ChipSet.getInstance(previousSelection)).toBeNull()
