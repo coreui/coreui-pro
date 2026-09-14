@@ -170,6 +170,15 @@ describe('Tooltip', () => {
       expect(offset({ placement: 'top', rects: { reference: {}, floating: {} } })).toEqual({ mainAxis: 20, crossAxis: 10 })
     })
 
+    it('should resolve a logical placement by the direction of the element, not of the document', () => {
+      fixtureEl.innerHTML = '<div dir="rtl"><a href="#" rel="tooltip" title="Tooltip"></a></div>'
+
+      const tooltipEl = fixtureEl.querySelector('a')
+      const tooltip = new Tooltip(tooltipEl, { placement: 'end' })
+
+      expect(tooltip._getPlacement(document.createElement('div'))).toEqual('left')
+    })
+
     it('should not write "undefined" into arrow styles when positioning', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = '<a href="#" rel="tooltip" title="Arrow tooltip"></a>'

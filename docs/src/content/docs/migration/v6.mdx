@@ -1559,9 +1559,9 @@ adornment in the library — so the button needs no icon markup at all:
   document-level direction. The calendar mirrors its prev/next icons the same
   way. **Consequence for custom code:** a component that resolves directional
   icons at construction time must be in its final DOM position when it is
-  created — a detached element has no computed direction (the calendar falls
-  back to the nearest `[dir]` ancestor, but placement first is the reliable
-  path).
+  created — a detached element has no computed direction (the nearest ancestor
+  that declares `dir` answers for it, `dir="auto"` included, and the document
+  after that, but placement first is the reliable path).
 
 #### Range / Range Slider
 
@@ -1801,6 +1801,12 @@ adornment in the library — so the button needs no icon markup at all:
   the field, as a paste already was. Previously such a value stayed in one slot
   and the submitted value was empty. The slots also gained `enterkeyhint`,
   `autocorrect="off"` and `spellcheck="false"`.
+- **In a right-to-left field, `linear` now holds the forward move rather than
+  the `ArrowRight` key.** Forward is `ArrowLeft` when the field reads
+  right-to-left, so that is the key a linear field stops on an empty slot,
+  and `ArrowRight` walks back freely. Previously the guard was attached to the
+  key name, which let the caret jump ahead over empty slots in RTL and refused
+  to walk back.
 
 #### Rating
 

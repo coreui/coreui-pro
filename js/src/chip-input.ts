@@ -215,7 +215,7 @@ class ChipInput extends ChipSet {
       // The arrow key past the last chip moves focus into the text field, which
       // sits after the chips (mirrors the input's "go to last chip" key). The
       // direction is mirrored in RTL.
-      if (event.key === (isRTL() ? 'ArrowLeft' : 'ArrowRight')) {
+      if (event.key === (isRTL(this._element) ? 'ArrowLeft' : 'ArrowRight')) {
         const chips = this._getFocusableChips()
         if (chips.length > 0 && chips[chips.length - 1].contains(event.target as Node)) {
           event.preventDefault()
@@ -333,7 +333,7 @@ class ChipInput extends ChipSet {
       case 'ArrowRight': {
         // The arrow pointing toward the chips (left in LTR, right in RTL) jumps
         // to the last chip when the caret is at the start of the input.
-        const towardChipsKey = isRTL() ? 'ArrowRight' : 'ArrowLeft'
+        const towardChipsKey = isRTL(this._element) ? 'ArrowRight' : 'ArrowLeft'
         if (
           key === towardChipsKey &&
           this._input.selectionStart === 0 &&

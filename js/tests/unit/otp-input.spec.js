@@ -717,6 +717,58 @@ describe('OTPInput', () => {
       expect(document.activeElement).toBe(inputs[1])
     })
 
+    it('should guard the forward move in a linear field by the direction, not by the key', () => {
+      fixtureEl.innerHTML = `
+        <div class="form-otp" dir="rtl">
+          <input type="text" class="form-otp-control" value="1">
+          <input type="text" class="form-otp-control">
+          <input type="text" class="form-otp-control">
+        </div>
+      `
+
+      const otpContainer = fixtureEl.querySelector('.form-otp')
+      // eslint-disable-next-line no-new
+      new OTPInput(otpContainer)
+
+      const inputs = [...otpContainer.querySelectorAll('.form-otp-control')]
+      inputs[1].focus()
+
+      // The field pulls focus back to the first empty box on its own, so the
+      // end state cannot tell a blocked move from one that happened and came
+      // back. The trace can.
+      const focused = []
+      for (const [index, input] of inputs.entries()) {
+        input.addEventListener('focus', () => focused.push(index))
+      }
+
+      // Forward is ArrowLeft here, and the empty box it starts from holds it.
+      inputs[1].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }))
+      expect(focused).toEqual([])
+
+      // Backward is never guarded.
+      inputs[1].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }))
+      expect(focused).toEqual([0])
+    })
+
+    it('should move by the direction of the field, not of the document', () => {
+      fixtureEl.innerHTML = `
+        <div class="form-otp" dir="rtl">
+          <input type="text" class="form-otp-control" value="1">
+          <input type="text" class="form-otp-control">
+        </div>
+      `
+
+      const otpContainer = fixtureEl.querySelector('.form-otp')
+      // eslint-disable-next-line no-new
+      new OTPInput(otpContainer)
+
+      const inputs = otpContainer.querySelectorAll('.form-otp-control')
+      inputs[0].focus()
+      inputs[0].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }))
+
+      expect(document.activeElement).toBe(inputs[1])
+    })
+
     it('should move to previous input on arrow left', () => {
       fixtureEl.innerHTML = `
         <div class="form-otp">

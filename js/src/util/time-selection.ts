@@ -249,7 +249,8 @@ class TimeSelection extends Config {
 
       if (event.key === ARROW_LEFT_KEY || event.key === ARROW_RIGHT_KEY) {
         event.preventDefault()
-        const goLeft = (event.key === ARROW_LEFT_KEY && !isRTL()) || (event.key === ARROW_RIGHT_KEY && isRTL())
+        const rtl = isRTL(target)
+        const goLeft = (event.key === ARROW_LEFT_KEY && !rtl) || (event.key === ARROW_RIGHT_KEY && rtl)
         this._moveFocusToColumn(target, goLeft ? -1 : 1)
       }
     })

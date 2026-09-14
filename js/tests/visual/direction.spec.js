@@ -9,6 +9,7 @@
 
 // eslint-disable-next-line import/no-unassigned-import
 import '../../../scss/coreui.scss'
+import Tooltip from '../../src/tooltip.js'
 
 let host
 
@@ -41,6 +42,20 @@ afterEach(() => {
   host?.remove()
   host = null
   document.documentElement.dir = ''
+})
+
+describe('a component reads the direction of its context', () => {
+  // Reboot keeps `tel`, `url`, `email` and `number` fields left-to-right
+  // whatever the page does, so the field's own direction says nothing about
+  // the context it sits in.
+  it.each(['email', 'url', 'number', 'text'])('mirrors a tooltip on a %s field inside an RTL subtree', type => {
+    const field = mount(`<input type="${type}" data-probe title="Tooltip">`, { document: 'ltr', host: 'rtl' })
+    const tooltip = new Tooltip(field, { placement: 'end' })
+
+    expect(tooltip._attachment('end')).toEqual('left')
+
+    tooltip.dispose()
+  })
 })
 
 describe('mirrored values follow the direction of the element they style', () => {

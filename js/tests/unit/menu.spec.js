@@ -4108,6 +4108,44 @@ describe('Menu', () => {
       })
     })
 
+    it('should carry the toggle direction onto a menu moved to a container', () => {
+      fixtureEl.innerHTML = [
+        '<div dir="rtl">',
+        '  <button class="btn" data-coreui-toggle="menu">Menu</button>',
+        '  <ul class="menu"><li><a class="menu-item" href="#">Action</a></li></ul>',
+        '</div>'
+      ].join('')
+
+      const menu = new Menu(fixtureEl.querySelector('[data-coreui-toggle="menu"]'), { container: true })
+      menu.show()
+
+      expect(menu._menu.parentNode).toEqual(document.body)
+      expect(menu._menu.dir).toEqual('rtl')
+
+      menu.hide()
+      menu._restoreMenuToOriginalParent()
+
+      expect(menu._menu.hasAttribute('dir')).toBeFalse()
+    })
+
+    it('should place a submenu by the direction of the menu, not of the document', () => {
+      fixtureEl.innerHTML = [
+        '<div dir="rtl">',
+        '  <button class="btn" data-coreui-toggle="menu">Menu</button>',
+        '  <ul class="menu">',
+        '    <li class="submenu">',
+        '      <button class="menu-item" type="button">More options</button>',
+        '      <ul class="menu"><li><a class="menu-item" href="#">Sub-action</a></li></ul>',
+        '    </li>',
+        '  </ul>',
+        '</div>'
+      ].join('')
+
+      const menu = new Menu(fixtureEl.querySelector('[data-coreui-toggle="menu"]'), { placement: 'end-start' })
+
+      expect(menu._getPlacement()).toEqual('left-start')
+    })
+
     it('should handle RTL submenu placement', () => {
       return new Promise(resolve => {
         // Set RTL

@@ -458,6 +458,85 @@ describe('Util', () => {
     })
   })
 
+  describe('isRTL', () => {
+    it('should read the direction of the element, not of the document', () => {
+      fixtureEl.innerHTML = '<div dir="rtl"><span id="inside"></span></div><span id="outside"></span>'
+
+      expect(Util.isRTL(fixtureEl.querySelector('#inside'))).toBeTrue()
+      expect(Util.isRTL(fixtureEl.querySelector('#outside'))).toBeFalse()
+    })
+
+    it('should leave an element that sets its own direction out of an RTL subtree', () => {
+      document.documentElement.dir = 'rtl'
+      fixtureEl.innerHTML = '<div dir="ltr"><span id="island"></span></div>'
+
+      expect(Util.isRTL(fixtureEl.querySelector('#island'))).toBeFalse()
+
+      document.documentElement.dir = ''
+    })
+
+    it('should fall back to the document when given nothing', () => {
+      document.documentElement.dir = 'rtl'
+      expect(Util.isRTL()).toBeTrue()
+
+      document.documentElement.dir = ''
+      expect(Util.isRTL()).toBeFalse()
+    })
+
+    it('should answer the same for a detached element as for a connected one', () => {
+      const cases = [
+        ['<div dir="auto">مرحبا<span data-probe></span></div>', true],
+        ['<div dir="rtl"><div dir="auto">hello<span data-probe></span></div></div>', false]
+      ]
+
+      for (const [markup, expected] of cases) {
+        const detached = document.createElement('div')
+        detached.innerHTML = markup
+
+        expect(Util.isRTL(detached.querySelector('[data-probe]'))).toEqual(expected)
+
+        fixtureEl.append(detached)
+
+        expect(Util.isRTL(detached.querySelector('[data-probe]'))).toEqual(expected)
+      }
+    })
+
+    it('should answer for the document when a detached element declares nothing', () => {
+      document.documentElement.dir = 'rtl'
+
+      expect(Util.isRTL(document.createElement('div'))).toBeTrue()
+
+      document.documentElement.dir = ''
+    })
+
+    it('should answer for an element that is not in the document yet', () => {
+      const detached = document.createElement('div')
+      detached.dir = 'rtl'
+      detached.innerHTML = '<span></span>'
+
+      expect(Util.isRTL(detached.firstElementChild)).toBeTrue()
+    })
+
+    it('should resolve dir=auto from the content it has at the time', () => {
+      fixtureEl.innerHTML = '<div dir="auto">مرحبا<span id="arabic"></span></div><div dir="auto">hello<span id="latin"></span></div>'
+
+      expect(Util.isRTL(fixtureEl.querySelector('#arabic'))).toBeTrue()
+      expect(Util.isRTL(fixtureEl.querySelector('#latin'))).toBeFalse()
+    })
+
+    it('should follow a direction set from CSS, which is what the layout follows', () => {
+      fixtureEl.innerHTML = '<div style="direction: rtl"><span id="styled"></span></div>'
+
+      expect(Util.isRTL(fixtureEl.querySelector('#styled'))).toBeTrue()
+
+      const detached = document.createElement('div')
+      detached.style.direction = 'rtl'
+      detached.innerHTML = '<span></span>'
+
+      expect(Util.isRTL(detached.firstElementChild)).toBeFalse()
+    })
+  })
+
   describe('onDOMContentLoaded', () => {
     it('should execute callbacks when DOMContentLoaded is fired and should not add more than one listener', () => {
       const spy = jasmine.createSpy()

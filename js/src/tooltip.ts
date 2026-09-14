@@ -74,14 +74,14 @@ const EVENT_MOUSEENTER = 'mouseenter'
 const EVENT_MOUSELEAVE = 'mouseleave'
 const EVENT_KEYDOWN = 'keydown'
 
-const AttachmentMap: Record<string, string> = {
-  AUTO: 'auto',
-  TOP: 'top',
-  RIGHT: isRTL() ? 'left' : 'right',
-  BOTTOM: 'bottom',
-  LEFT: isRTL() ? 'right' : 'left',
-  START: isRTL() ? 'right' : 'left',
-  END: isRTL() ? 'left' : 'right'
+const ATTACHMENTS: Record<string, [string, string]> = {
+  AUTO: ['auto', 'auto'],
+  TOP: ['top', 'top'],
+  RIGHT: ['right', 'left'],
+  BOTTOM: ['bottom', 'bottom'],
+  LEFT: ['left', 'right'],
+  START: ['left', 'right'],
+  END: ['right', 'left']
 }
 
 type TooltipConfig = {
@@ -291,6 +291,13 @@ class Tooltip extends BaseComponent {
 
     if (!this._element.ownerDocument.documentElement.contains(this.tip)) {
       container.append(tip)
+
+      // The tip usually lands in the body, where it no longer inherits the
+      // direction the trigger is in, so it carries it along.
+      if (!tip.hasAttribute('dir')) {
+        tip.dir = this._isRTL() ? 'rtl' : 'ltr'
+      }
+
       EventHandler.trigger(this._element, this.constructor.eventName(EVENT_INSERTED))
       this._setTipListeners(tip)
     }
@@ -467,13 +474,22 @@ class Tooltip extends BaseComponent {
   protected _getPlacement(tip: HTMLElement): string {
     // If we have responsive placements, get the one for current viewport
     if (this._responsivePlacements) {
-      const placement = getResponsivePlacement(this._responsivePlacements, 'top')
-      return AttachmentMap[placement.toUpperCase()] || placement
+      return this._attachment(getResponsivePlacement(this._responsivePlacements, 'top'))
     }
 
     // Execute placement (can be a function)
-    const placement = execute(this._config.placement, [this, tip, this._element])
-    return AttachmentMap[placement.toUpperCase()] || placement
+    return this._attachment(execute(this._config.placement, [this, tip, this._element]) as string)
+  }
+
+  protected _attachment(placement: string): string {
+    return ATTACHMENTS[placement.toUpperCase()]?.[this._isRTL() ? 1 : 0] ?? placement
+  }
+
+  // A tooltip belongs to the context its trigger sits in, not to the trigger's
+  // own text direction: reboot keeps `tel`, `url`, `email` and `number` fields
+  // left-to-right whatever the page does, and the tip is not part of the value.
+  protected _isRTL(): boolean {
+    return isRTL(this._element.parentElement ?? this._element)
   }
 
   protected _parseResponsivePlacements(): void {

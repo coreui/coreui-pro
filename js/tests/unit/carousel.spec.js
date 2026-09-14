@@ -392,6 +392,20 @@ describe('Carousel', () => {
       expect(slideSpy.calls.mostRecent().args[0].direction).toEqual('left')
     })
 
+    it('should report mirrored slide directions inside an RTL subtree of an LTR page', () => {
+      fixtureEl.innerHTML = `<div dir="rtl">${basicMarkup()}</div>`
+
+      const carouselEl = fixtureEl.querySelector('#myCarousel')
+      const carousel = new Carousel(carouselEl)
+      stubLayout(carousel)
+      const slideSpy = jasmine.createSpy('slide')
+      EventHandler.on(carouselEl, 'slide.coreui.carousel', slideSpy)
+
+      carousel.next()
+
+      expect(slideSpy.calls.mostRecent().args[0].direction).toEqual('right')
+    })
+
     it('should step from the live scroll position, not a stale active index', () => {
       fixtureEl.innerHTML = basicMarkup()
 

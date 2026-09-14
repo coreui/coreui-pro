@@ -18,7 +18,7 @@ import { isSameDateAs } from './util/calendar.js'
 import type { ComponentConfig } from './util/config.js'
 import { appendControlGroupField, applyControlGroupClasses } from './util/form-control-group.js'
 import { SEPARATOR_ICON, SEPARATOR_ICON_RTL } from './util/icons.js'
-import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
+import { defineJQueryPlugin, isRTL, jQueryDispatch } from './util/index.js'
 import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 
 /**
@@ -393,14 +393,12 @@ class DateRangeInput extends BaseComponent {
     })
   }
 
-  // The separator is a directional arrow, so it has an RTL counterpart. The
-  // element's computed direction decides, not the document's: an ancestor can
-  // set dir="rtl" around the field alone.
+  // The separator is a directional arrow, so it has an RTL counterpart.
   _createSeparator(): HTMLElement {
     const separator = document.createElement('span')
     separator.classList.add(CLASS_NAME_SEPARATOR)
-    const isRtl = window.getComputedStyle(this._element).direction === 'rtl'
-    separator.innerHTML = sanitizeByConfig(isRtl ? this._config.separatorIconRtl : this._config.separatorIcon, this._config)
+    const icon = isRTL(this._element) ? this._config.separatorIconRtl : this._config.separatorIcon
+    separator.innerHTML = sanitizeByConfig(icon, this._config)
 
     return separator
   }
@@ -469,8 +467,7 @@ class DateRangeInput extends BaseComponent {
         return
       }
 
-      const isRtl = window.getComputedStyle(this._element).direction === 'rtl'
-      const forward = event.key === (isRtl ? ARROW_LEFT_KEY : ARROW_RIGHT_KEY)
+      const forward = event.key === (isRTL(this._element) ? ARROW_LEFT_KEY : ARROW_RIGHT_KEY)
       const startSections = SelectorEngine.find(SELECTOR_SECTION, this._startElement)
       const endSections = SelectorEngine.find(SELECTOR_SECTION, this._endElement)
 

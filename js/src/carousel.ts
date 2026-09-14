@@ -549,7 +549,7 @@ class Carousel extends BaseComponent {
     // producing a visible secondary nudge after the programmatic scroll.
     const padStart = Number.parseFloat(getComputedStyle(this._viewport).scrollPaddingInlineStart) || 0
 
-    return isRTL() ?
+    return isRTL(this._element) ?
       rect.right - (viewportRect.right - padStart) :
       rect.left - (viewportRect.left + padStart)
   }
@@ -623,7 +623,7 @@ class Carousel extends BaseComponent {
   }
 
   protected _loopDirection(isNext: boolean): string {
-    if (isRTL()) {
+    if (isRTL(this._element)) {
       return isNext ? DIRECTION_RIGHT : DIRECTION_LEFT
     }
 
@@ -789,7 +789,7 @@ class Carousel extends BaseComponent {
 
   protected _direction(from: number, to: number): string {
     const isNext = to > from
-    if (isRTL()) {
+    if (isRTL(this._element)) {
       return isNext ? DIRECTION_RIGHT : DIRECTION_LEFT
     }
 

@@ -45,8 +45,8 @@ const PLACEMENT_TOP = 'top-start'
 const PLACEMENT_TOPEND = 'top-end'
 const PLACEMENT_BOTTOM = 'bottom-start'
 const PLACEMENT_BOTTOMEND = 'bottom-end'
-const PLACEMENT_RIGHT = isRTL() ? 'left-start' : 'right-start'
-const PLACEMENT_LEFT = isRTL() ? 'right-start' : 'left-start'
+const PLACEMENT_END = 'right-start'
+const PLACEMENT_START = 'left-start'
 const PLACEMENT_TOPCENTER = 'top'
 const PLACEMENT_BOTTOMCENTER = 'bottom'
 
@@ -113,13 +113,14 @@ class Dropdown extends Menu {
     }
 
     const parentDropdown = this._parent
+    const rtl = isRTL(this._element)
 
     if (parentDropdown.classList.contains(CLASS_NAME_DROPEND)) {
-      return PLACEMENT_RIGHT
+      return rtl ? PLACEMENT_START : PLACEMENT_END
     }
 
     if (parentDropdown.classList.contains(CLASS_NAME_DROPSTART)) {
-      return PLACEMENT_LEFT
+      return rtl ? PLACEMENT_END : PLACEMENT_START
     }
 
     if (parentDropdown.classList.contains(CLASS_NAME_DROPUP_CENTER)) {

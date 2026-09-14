@@ -500,15 +500,17 @@ class RangeSlider extends BaseComponent {
   }
 
   _calculateHorizontalPosition(mouseX: number, rect: DOMRect): number | string {
+    const rtl = isRTL(this._element)
+
     if (mouseX < rect.left) {
-      return isRTL() ? 'max' : 'min'
+      return rtl ? 'max' : 'min'
     }
 
     if (mouseX > rect.right) {
-      return isRTL() ? 'min' : 'max'
+      return rtl ? 'min' : 'max'
     }
 
-    const relativeX = isRTL() ? rect.right - mouseX : mouseX - rect.left
+    const relativeX = rtl ? rect.right - mouseX : mouseX - rect.left
     return Math.min(Math.max(relativeX / rect.width, 0), 1)
   }
 
@@ -526,7 +528,7 @@ class RangeSlider extends BaseComponent {
       return 1 - (offsetY / offsetHeight)
     }
 
-    return isRTL() ? 1 - (offsetX / offsetWidth) : offsetX / offsetWidth
+    return isRTL(this._element) ? 1 - (offsetX / offsetWidth) : offsetX / offsetWidth
   }
 
   _getNearestValueIndex(value: number): number {

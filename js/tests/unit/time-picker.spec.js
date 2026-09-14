@@ -330,6 +330,19 @@ describe('TimePicker', () => {
       expect(hours.contains(document.activeElement)).toBeTrue()
     })
 
+    it('should move between columns by the direction of the roll, not of the document', () => {
+      const picker = buildPicker({ seconds: false }, '<div dir="rtl"><div id="picker"></div></div>')
+      picker.show()
+
+      const roll = fixtureEl.querySelector('.time-picker-roll')
+      const [hours, minutes] = roll.querySelectorAll('.time-picker-roll-col')
+
+      cellsOf(hours)[0].focus()
+      document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }))
+
+      expect(minutes.contains(document.activeElement)).toBeTrue()
+    })
+
     it('should stay in the first column on ArrowLeft', () => {
       const roll = openRoll()
       const [hours] = roll.querySelectorAll('.time-picker-roll-col')

@@ -46,6 +46,18 @@ describe('RangeSlider', () => {
     })
   })
 
+  describe('direction', () => {
+    it('should measure a click from the direction of the slider, not of the document', () => {
+      fixtureEl.innerHTML = '<div dir="rtl"><div data-coreui-range-slider></div></div>'
+
+      const rangeSlider = new RangeSlider(fixtureEl.querySelector('[data-coreui-range-slider]'))
+      const rect = { left: 0, right: 200, width: 200 }
+
+      expect(rangeSlider._calculateHorizontalPosition(150, rect)).toEqual(0.25)
+      expect(rangeSlider._calculateHorizontalPosition(-10, rect)).toEqual('max')
+    })
+  })
+
   describe('constructor', () => {
     it('should initialize with default configuration', () => {
       fixtureEl.innerHTML = '<div data-coreui-range-slider></div>'

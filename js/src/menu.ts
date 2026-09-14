@@ -79,14 +79,6 @@ const SELECTOR_NAVBAR_NAV = '.navbar-nav'
 const DEFAULT_PLACEMENT = 'bottom-start'
 const SUBMENU_PLACEMENT = 'end-start'
 
-const resolveLogicalPlacement = (placement: string): string => {
-  if (isRTL()) {
-    return placement.replace(/^start(?=-|$)/, 'right').replace(/^end(?=-|$)/, 'left')
-  }
-
-  return placement.replace(/^start(?=-|$)/, 'left').replace(/^end(?=-|$)/, 'right')
-}
-
 type Point = { x: number, y: number }
 
 const triangleSign = (p1: Point, p2: Point, p3: Point): number =>
@@ -155,6 +147,7 @@ class Menu extends BaseComponent {
   protected declare _menu: HTMLElement
   protected declare _isSubmenu: boolean
   protected declare _menuOriginalParent: ParentNode | null
+  protected declare _menuDirection: string | null
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     if (typeof computePosition === 'undefined') {
@@ -184,6 +177,7 @@ class Menu extends BaseComponent {
     this._isSubmenu = this._parent.classList?.contains(this.constructor.SELECTOR_SUBMENU.slice(1))
 
     this._menuOriginalParent = this._menu?.parentNode
+    this._menuDirection = null
 
     this._parseResponsivePlacements()
     this._setupSubmenuListeners()
@@ -432,7 +426,15 @@ class Menu extends BaseComponent {
       getResponsivePlacement(this._responsivePlacements, DEFAULT_PLACEMENT) :
       (this._config.placement ?? DEFAULT_PLACEMENT)
 
-    return resolveLogicalPlacement(placement)
+    return this._resolveLogicalPlacement(placement)
+  }
+
+  protected _resolveLogicalPlacement(placement: string, element: Element = this._element): string {
+    if (isRTL(element)) {
+      return placement.replace(/^start(?=-|$)/, 'right').replace(/^end(?=-|$)/, 'left')
+    }
+
+    return placement.replace(/^start(?=-|$)/, 'left').replace(/^end(?=-|$)/, 'right')
   }
 
   protected _parseResponsivePlacements(): void {
@@ -556,6 +558,13 @@ class Menu extends BaseComponent {
     if (this._menu.parentNode !== container) {
       container.append(this._menu)
     }
+
+    // The menu is styled by its own direction, and out here it no longer
+    // inherits the toggle's, so it carries it along.
+    if (!this._menu.hasAttribute('dir')) {
+      this._menuDirection = isRTL(this._element) ? 'rtl' : 'ltr'
+      this._menu.dir = this._menuDirection
+    }
   }
 
   protected _restoreMenuToOriginalParent(): void {
@@ -565,6 +574,11 @@ class Menu extends BaseComponent {
 
     if (this._menu.parentNode !== this._menuOriginalParent) {
       this._menuOriginalParent.append(this._menu)
+    }
+
+    if (this._menuDirection && this._menu.dir === this._menuDirection) {
+      this._menu.removeAttribute('dir')
+      this._menuDirection = null
     }
   }
 
@@ -755,14 +769,14 @@ class Menu extends BaseComponent {
 
   protected _createSubmenuFloating(trigger: HTMLElement, submenu: HTMLElement, submenuWrapper: Element): () => void {
     const referenceElement = submenuWrapper
-    const placement = resolveLogicalPlacement(SUBMENU_PLACEMENT) as Placement
+    const placement = this._resolveLogicalPlacement(SUBMENU_PLACEMENT, trigger) as Placement
     const middleware = [
       offset({ mainAxis: 0, crossAxis: -4 }),
       flip({
         fallbackPlacements: [
-          resolveLogicalPlacement('start-start'),
-          resolveLogicalPlacement('end-end'),
-          resolveLogicalPlacement('start-end')
+          this._resolveLogicalPlacement('start-start', trigger),
+          this._resolveLogicalPlacement('end-end', trigger),
+          this._resolveLogicalPlacement('start-end', trigger)
         ] as Placement[]
       }),
       shift({ padding: 8 })
@@ -828,7 +842,7 @@ class Menu extends BaseComponent {
     const currentPos = { x: event.clientX, y: event.clientY }
     const lastPos = { x: this._hoverIntentData.x, y: this._hoverIntentData.y }
 
-    const isRtl = isRTL()
+    const isRtl = isRTL(submenu)
     const targetX = isRtl ? submenuRect.right : submenuRect.left
     const topCorner = { x: targetX, y: submenuRect.top }
     const bottomCorner = { x: targetX, y: submenuRect.bottom }
@@ -889,7 +903,7 @@ class Menu extends BaseComponent {
 
   protected _handleSubmenuKeydown(event: CoreUIEvent): boolean {
     const { key, target } = event
-    const isRtl = isRTL()
+    const isRtl = isRTL(target as Element)
 
     const enterKey = isRtl ? ARROW_LEFT_KEY : ARROW_RIGHT_KEY
     const exitKey = isRtl ? ARROW_RIGHT_KEY : ARROW_LEFT_KEY
