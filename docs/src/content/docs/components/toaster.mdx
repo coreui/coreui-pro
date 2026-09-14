@@ -236,14 +236,14 @@ const id = toaster.add({ title: 'Saved', description: 'Your changes are live.', 
 | Method | Description |
 | --- | --- |
 | `add(options)` | Renders and shows a toast. Returns its id. With an `id` that already exists it behaves like `update`. |
-| `update(id, options)` | Rewrites the toast in place and increments its `updateKey`. `options` may be a function receiving the current toast object and returning the changes. |
 | `close(id?)` | Hides the toast, which removes it from the DOM and the store once the fade ends. Without an id, hides every toast. |
-| `promise(promise, { loading, success, error })` | Adds a toast in the `loading` state and updates it when the promise settles: `success` gets the resolved value, `error` the rejection. Each state is a description string or a full options object, or a function returning either. Returns the promise. |
-| `pause()` / `resume()` | Stop and restart every toast's timer; `pauseOnHover` calls these for the container. |
-| `getToasts()` | The toast objects in insertion order, each with `id`, `updateKey`, `limited`, `element` and the options it was created with. |
 | `dispose` | Removes every toast, and the container if the toaster created it. |
 | `getInstance` | *Static* method that returns the toaster bound to a container element. |
 | `getOrCreateInstance` | *Static* method that returns the toaster bound to a container element or creates one on it. |
+| `getToasts()` | The toast objects in insertion order, each with `id`, `updateKey`, `limited`, `element` and the options it was created with. |
+| `pause()` / `resume()` | Stop and restart every toast's timer; `pauseOnHover` calls these for the container. |
+| `promise(promise, { loading, success, error })` | Adds a toast in the `loading` state and updates it when the promise settles: `success` gets the resolved value, `error` the rejection. Each state is a description string or a full options object, or a function returning either. Returns the promise. |
+| `update(id, options)` | Rewrites the toast in place and increments its `updateKey`. `options` may be a function receiving the current toast object and returning the changes. |
 
 ### Events
 

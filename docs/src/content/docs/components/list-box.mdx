@@ -450,24 +450,24 @@ const listBox = new coreui.ListBox('#myListBox', {
 
 | Method | Description |
 | --- | --- |
-| `select(value)` | Selects the option. In `single` mode it replaces the current selection. |
-| `deselect(value)` | Removes the value from the selection. |
-| `toggle(value)` | Selects the value, or deselects it when it is already selected. |
-| `selectAll(values?)` | Selects every visible, enabled option (`multiple` mode). Pass an array of values to select exactly those instead, filter or no filter. |
 | `clear()` | Empties the selection. |
-| `filter(query)` | Hides the options that do not contain `query`, and a section left without a match with them. `null` clears the filter. The selection is untouched. |
-| `getSelected()` | The selected values, in selection order. |
-| `setActive(value)` | Moves the highlight without taking the focus. |
-| `getActive()` | The highlighted value, or `null`. |
-| `next` / `prev` | Moves the highlight one option down/up. |
-| `first` / `last` | Moves the highlight to the first/last option. |
-| `setItems(items)` | Rebuilds the list from an `items` array. Values that are still there keep their selection, the rest drop out, and `change` fires only when the selection actually changed. |
-| `getItems()` | The normalized `items` array. |
-| `setLoading(loading)` | Turns the loading state on or off. |
-| `update` | Re-reads the DOM: new options get their roles and ids, an option that is now `hidden` or gone leaves the navigation, the empty state and the select-all button are re-evaluated. The selection survives all of it. |
+| `deselect(value)` | Removes the value from the selection. |
 | `dispose` | Destroys the list box and releases the field. |
+| `filter(query)` | Hides the options that do not contain `query`, and a section left without a match with them. `null` clears the filter. The selection is untouched. |
+| `first` / `last` | Moves the highlight to the first/last option. |
+| `getActive()` | The highlighted value, or `null`. |
 | `getInstance` | Static method which allows you to get the list box instance associated to a DOM element, you can use it like this: `coreui.ListBox.getInstance(element)`. |
+| `getItems()` | The normalized `items` array. |
 | `getOrCreateInstance` | Static method which returns a list box instance associated to a DOM element or creates a new one in case it wasn't initialized. You can use it like this: `coreui.ListBox.getOrCreateInstance(element)`. |
+| `getSelected()` | The selected values, in selection order. |
+| `next` / `prev` | Moves the highlight one option down/up. |
+| `select(value)` | Selects the option. In `single` mode it replaces the current selection. |
+| `selectAll(values?)` | Selects every visible, enabled option (`multiple` mode). Pass an array of values to select exactly those instead, filter or no filter. |
+| `setActive(value)` | Moves the highlight without taking the focus. |
+| `setItems(items)` | Rebuilds the list from an `items` array. Values that are still there keep their selection, the rest drop out, and `change` fires only when the selection actually changed. |
+| `setLoading(loading)` | Turns the loading state on or off. |
+| `toggle(value)` | Selects the value, or deselects it when it is already selected. |
+| `update` | Re-reads the DOM: new options get their roles and ids, an option that is now `hidden` or gone leaves the navigation, the empty state and the select-all button are re-evaluated. The selection survives all of it. |
 
 ### Events
 

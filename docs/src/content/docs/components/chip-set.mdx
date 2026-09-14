@@ -120,19 +120,19 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | Method | Description |
 | --- | --- |
 | `add` | Adds a chip to the set. Accepts an existing `.chip` element or a label string (a chip element is created for you). Honors `unique` and `maxChips`. Returns the chip element (or `null` if rejected). |
-| `remove` | Removes a chip from the set. Accepts a chip element or its value string. |
-| `removeSelected` | Removes every selected chip from the set. |
 | `clear` | Removes every chip from the set. |
-| `getValues` | Returns the array of chip values. |
-| `getSelected` | Returns an array of the selected (`.active`) chip elements. |
-| `getSelectedValues` | Returns the values of the selected chips. |
-| `selectChip` | Selects a specific chip element belonging to the set. |
-| `selectAll` | Selects every selectable chip in the set. |
-| `deselectAll` | Deselects every selected chip in the set. |
 | `clearSelection` | Deselects all chips and emits a selection change. |
+| `deselectAll` | Deselects every selected chip in the set. |
 | `dispose` | Destroys a chip set instance. (Removes stored data on the DOM element) |
 | `getInstance` | Static method to get the chip set instance: `coreui.ChipSet.getInstance(element)`. |
 | `getOrCreateInstance` | Static method to get or create a chip set instance: `coreui.ChipSet.getOrCreateInstance(element)`. |
+| `getSelected` | Returns an array of the selected (`.active`) chip elements. |
+| `getSelectedValues` | Returns the values of the selected chips. |
+| `getValues` | Returns the array of chip values. |
+| `remove` | Removes a chip from the set. Accepts a chip element or its value string. |
+| `removeSelected` | Removes every selected chip from the set. |
+| `selectAll` | Selects every selectable chip in the set. |
+| `selectChip` | Selects a specific chip element belonging to the set. |
 
 ### Events
 

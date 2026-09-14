@@ -626,16 +626,16 @@ var sidebar = new coreui.Sidebar(mySidebar)
 
 | Method | Description |
 | --- | --- |
-| `show()` | Shows the sidebar. |
-| `hide()` | Hides the sidebar. |
-| `toggle()` | Toggles the sidebar between visible and hidden states. |
-| `narrow()` | Switches the sidebar to the narrow variant on desktop. |
-| `unfoldable()` | Switches the sidebar to the narrow-unfoldable variant on desktop. |
-| `reset()` | Removes `sidebar-narrow` and `sidebar-narrow-unfoldable` from the sidebar on desktop. |
-| `toggleNarrow()` | Toggles the narrow variant on desktop. |
-| `toggleUnfoldable()` | Toggles the narrow-unfoldable variant on desktop. |
 | `getInstance()` | Static method that returns the sidebar instance associated with a DOM element. |
 | `getOrCreateInstance()` | Static method that returns the sidebar instance associated with a DOM element, or creates a new one. |
+| `hide()` | Hides the sidebar. |
+| `narrow()` | Switches the sidebar to the narrow variant on desktop. |
+| `reset()` | Removes `sidebar-narrow` and `sidebar-narrow-unfoldable` from the sidebar on desktop. |
+| `show()` | Shows the sidebar. |
+| `toggle()` | Toggles the sidebar between visible and hidden states. |
+| `toggleNarrow()` | Toggles the narrow variant on desktop. |
+| `toggleUnfoldable()` | Toggles the narrow-unfoldable variant on desktop. |
+| `unfoldable()` | Switches the sidebar to the narrow-unfoldable variant on desktop. |
 
 var sidebarNode = document.querySelector('#mySidebar')
 var sidebar = coreui.Sidebar.getOrCreateInstance(sidebarNode)
