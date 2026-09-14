@@ -62,7 +62,7 @@ describe('TimePicker', () => {
       picker.show()
       picker.hide()
 
-      picker._input.update({ date: '14:30:00' })
+      picker._input.setConfig({ date: '14:30:00' })
 
       picker.show()
 

@@ -284,12 +284,12 @@ class MultiSelect extends ComboboxBase {
     EventHandler.trigger(this._element, EVENT_SEARCH)
   }
 
-  update(config: any): void {
-    if (config.value) {
+  override setConfig(config: any): void {
+    if (config?.value) {
       this.deselectAll()
     }
 
-    this._config = { ...this._config, ...this._configAfterMerge(config) }
+    super.setConfig(config)
     this._selected = []
     this._options = this._getOptions()
     this._destroySelect()

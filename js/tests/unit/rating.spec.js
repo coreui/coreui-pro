@@ -474,14 +474,14 @@ describe('Rating', () => {
     })
   })
 
-  describe('update', () => {
+  describe('setConfig', () => {
     it('should update config and re-render the rating UI', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
       const rating = new Rating(div, { itemCount: 3, value: 1 })
 
       const previousHTML = div.innerHTML
-      rating.update({ itemCount: 5, value: 3 })
+      rating.setConfig({ itemCount: 5, value: 3 })
 
       expect(div.innerHTML).not.toEqual(previousHTML)
       expect(div.querySelectorAll('.rating-item')).toHaveSize(5)
@@ -494,9 +494,29 @@ describe('Rating', () => {
       const div = fixtureEl.querySelector('div')
       const rating = new Rating(div, { itemCount: 5, value: 2 })
 
-      rating.update({ itemCount: 5, value: 4 })
+      rating.setConfig({ itemCount: 5, value: 4 })
       const checkedInput = div.querySelector('.rating-item-input:checked')
       expect(checkedInput.value).toEqual('4')
+    })
+
+    it('should keep the options given to the constructor', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div, { itemCount: 3, value: 1 })
+
+      rating.setConfig({ value: 2 })
+
+      expect(rating._config.itemCount).toEqual(3)
+      expect(div.querySelectorAll('.rating-item')).toHaveSize(3)
+    })
+
+    it('should type check the options it is given', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div)
+
+      expect(() => rating.setConfig({ itemCount: 'five' })).toThrowError(TypeError)
+      expect(rating._config.itemCount).toEqual(5)
     })
 
     it('should keep one set of listeners across updates', () => {
@@ -505,8 +525,8 @@ describe('Rating', () => {
       const rating = new Rating(div, { itemCount: 3 })
       const spy = jasmine.createSpy('change')
 
-      rating.update({ itemCount: 3 })
-      rating.update({ itemCount: 3 })
+      rating.setConfig({ itemCount: 3 })
+      rating.setConfig({ itemCount: 3 })
       div.addEventListener('change.coreui.rating', spy)
 
       const input = div.querySelectorAll('.rating-item-input')[1]
@@ -526,7 +546,7 @@ describe('Rating', () => {
       const item = label.parentElement
       expect(Tooltip.getInstance(item)).not.toBeNull()
 
-      rating.update({ itemCount: 3, tooltips: true })
+      rating.setConfig({ itemCount: 3, tooltips: true })
 
       expect(Tooltip.getInstance(item)).toBeNull()
       expect(rating._tooltip).toBeNull()
@@ -539,7 +559,7 @@ describe('Rating', () => {
 
       expect(div.classList.contains('disabled')).toBeFalse()
 
-      rating.update({ itemCount: 5, disabled: true })
+      rating.setConfig({ itemCount: 5, disabled: true })
       expect(div.classList.contains('disabled')).toBeTrue()
     })
 
@@ -549,7 +569,7 @@ describe('Rating', () => {
         const div = fixtureEl.querySelector('div')
         const rating = new Rating(div, { itemCount: 5 })
 
-        rating.update({ itemCount: 5 })
+        rating.setConfig({ itemCount: 5 })
 
         div.addEventListener('change.coreui.rating', event => {
           expect(event.value).toBeDefined()

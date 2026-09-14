@@ -189,7 +189,7 @@ Note that for security reasons the `sanitize`, `sanitizeFn`, and `allowList` opt
 
 | Method | Description |
 | --- | --- |
-| `update` | Updates the configuration of the rating. |
+| `setConfig` | Merges the given options over the current configuration and re-renders the rating. Options you leave out keep their current value. |
 | `reset` | Reset the value to `null` or to provided value. |
 | `dispose` | Destroys a component. (Removes stored data on the DOM element) |
 | `getInstance` | Static method which allows you to get the rating instance associated to a DOM element, you can use it like this: `coreui.Rating.getInstance(element)` |

@@ -119,7 +119,7 @@ class TimeSelection extends Config {
     return this._date
   }
 
-  update(config: any): void {
+  setConfig(config: any): void {
     this._config = this._getConfig({ ...this._config, ...config }) as typeof Default
     this._date = this._config.time as Date | null
     this._ampm = this._date ? (this._date.getHours() >= 12 ? 'pm' : 'am') : 'am'

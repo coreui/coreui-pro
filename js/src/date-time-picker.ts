@@ -213,7 +213,7 @@ class DateTimePicker extends BaseComponent {
   // See DatePicker.setDate — the emitted value and the calendar/time selection
   // follow the field's validation outcome, not the argument.
   setDate(date: Date | null): void {
-    this._input.update({ date })
+    this._input.setConfig({ date })
   }
 
   today(): void {
@@ -316,8 +316,8 @@ class DateTimePicker extends BaseComponent {
     // See DatePicker — the bridge from a typed value back to both panel halves
     EventHandler.on(inputEl, DateTimeInput.eventName(DateTimeInput.CHANGE_EVENT_NAME), (event: any) => {
       if (!this._syncingFromPanel) {
-        this._calendar?.update({ startDate: event.date })
-        this._selection?.update({ time: event.date })
+        this._calendar?.setConfig({ startDate: event.date })
+        this._selection?.setConfig({ time: event.date })
         EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date: event.date })
       }
     })
@@ -410,9 +410,9 @@ class DateTimePicker extends BaseComponent {
     }
 
     this._syncingFromPanel = true
-    this._input.update({ date: merged })
+    this._input.setConfig({ date: merged })
     this._syncingFromPanel = false
-    this._selection?.update({ time: merged })
+    this._selection?.setConfig({ time: merged })
     EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date: this.getDate() })
   }
 
@@ -426,9 +426,9 @@ class DateTimePicker extends BaseComponent {
     merged.setHours(time.getHours(), time.getMinutes(), time.getSeconds())
 
     this._syncingFromPanel = true
-    this._input.update({ date: merged })
+    this._input.setConfig({ date: merged })
     this._syncingFromPanel = false
-    this._calendar?.update({ startDate: merged })
+    this._calendar?.setConfig({ startDate: merged })
     EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date: this.getDate() })
   }
 

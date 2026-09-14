@@ -37,7 +37,7 @@ describe('DatePicker', () => {
       picker.hide()
 
       // the same path a typed value takes: the field validates and emits
-      picker._input.update({ date: '2026-08-20' })
+      picker._input.setConfig({ date: '2026-08-20' })
 
       picker.show()
 
@@ -550,7 +550,7 @@ describe('DatePicker', () => {
         emitted = event.date
       })
 
-      picker._input.update({ date: '2026-08-20' })
+      picker._input.setConfig({ date: '2026-08-20' })
 
       expect(new Date(emitted).getDate()).toEqual(20)
     })

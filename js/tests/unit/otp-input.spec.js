@@ -366,7 +366,7 @@ describe('OTPInput', () => {
     })
   })
 
-  describe('update', () => {
+  describe('setConfig', () => {
     it('should update config', () => {
       fixtureEl.innerHTML = `
         <div class="form-otp">
@@ -378,7 +378,7 @@ describe('OTPInput', () => {
       const otpContainer = fixtureEl.querySelector('.form-otp')
       const otpInput = new OTPInput(otpContainer, { masked: false })
 
-      otpInput.update({ masked: true })
+      otpInput.setConfig({ masked: true })
 
       expect(otpInput._config.masked).toBe(true)
     })
@@ -394,7 +394,7 @@ describe('OTPInput', () => {
       const otpContainer = fixtureEl.querySelector('.form-otp')
       const otpInput = new OTPInput(otpContainer, { masked: false })
 
-      otpInput.update({ masked: true })
+      otpInput.setConfig({ masked: true })
 
       const inputs = otpContainer.querySelectorAll('.form-otp-control')
       for (const input of inputs) {
@@ -417,7 +417,7 @@ describe('OTPInput', () => {
 
       expect(inputs[2].getAttribute('tabindex')).toBe('-1')
 
-      otpInput.update({ linear: false })
+      otpInput.setConfig({ linear: false })
 
       for (const input of inputs) {
         expect(input.hasAttribute('tabindex')).toBe(false)
@@ -435,7 +435,7 @@ describe('OTPInput', () => {
       const otpInput = new OTPInput(otpContainer)
 
       expect(() => {
-        otpInput.update('string')
+        otpInput.setConfig('string')
       }).not.toThrow()
     })
   })

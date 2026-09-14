@@ -636,7 +636,7 @@ describe('Calendar', () => {
     })
   })
 
-  describe('update', () => {
+  describe('setConfig', () => {
     it('should merge the previous configuration on a partial update', () => {
       fixtureEl.innerHTML = '<div></div>'
 
@@ -648,7 +648,7 @@ describe('Calendar', () => {
 
       expect(div.querySelectorAll('.calendar-nav')).toHaveSize(2)
 
-      calendar.update({ selectEndDate: true })
+      calendar.setConfig({ selectEndDate: true })
 
       expect(calendar._config.range).toBeTrue()
       expect(calendar._config.calendars).toEqual(2)
@@ -662,7 +662,7 @@ describe('Calendar', () => {
       const calendar = new Calendar(div)
       const oldHtml = div.innerHTML
 
-      calendar.update({
+      calendar.setConfig({
         selectionType: 'month'
       })
 
@@ -679,7 +679,7 @@ describe('Calendar', () => {
       const div = fixtureEl.querySelector('div')
       const calendar = new Calendar(div)
 
-      calendar.update({
+      calendar.setConfig({
         showWeekNumber: true
       })
 
@@ -693,7 +693,7 @@ describe('Calendar', () => {
       const div = fixtureEl.querySelector('div')
       const calendar = new Calendar(div)
 
-      calendar.update({
+      calendar.setConfig({
         startDate: new Date(2024, 2, 15)
       })
 

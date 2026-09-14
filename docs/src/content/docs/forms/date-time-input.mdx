@@ -229,13 +229,13 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | `clear` | Clear all sections |
 | `getDate` | Return the current value, or `null` when incomplete or invalid |
 | `reset` | Reset the field to its initial value |
-| `update` | Update the configuration and re-render |
+| `setConfig` | Merges the given options over the current configuration and re-renders the field. Options you leave out keep their current value. |
 
 ```javascript
 const dateTimeInput = coreui.DateTimeInput.getInstance(document.querySelector('#myDateTimeInput'))
 dateTimeInput.clear()
 dateTimeInput.getDate()
-dateTimeInput.update({ format: 'yyyy-MM-dd HH:mm' })
+dateTimeInput.setConfig({ format: 'yyyy-MM-dd HH:mm' })
 ```
 
 ### Events

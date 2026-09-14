@@ -143,13 +143,12 @@ class OTPInput extends BaseComponent {
     this._setInputsTabIndexes()
   }
 
-  update(config: any): void {
+  override setConfig(config: any): void {
     if (typeof config !== 'object') {
       return
     }
 
-    this._config = { ...this._config, ...config }
-    this._typeCheckConfig(this._config)
+    super.setConfig(config)
 
     this._setInputsAttributes()
     this._setInputsTabIndexes()

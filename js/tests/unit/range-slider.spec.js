@@ -101,7 +101,7 @@ describe('RangeSlider', () => {
       expect(tooltip.querySelector('.tooltip-inner').textContent).toBe('40')
       expect(vertical.querySelector('.range-slider-tooltip').classList.contains('bs-tooltip-start')).toBeTrue()
 
-      horizontalSlider.update({ value: 70 })
+      horizontalSlider.setConfig({ value: 70 })
       expect(horizontal.querySelector('.tooltip-inner').textContent).toBe('70')
       verticalSlider.dispose()
     })
@@ -118,7 +118,7 @@ describe('RangeSlider', () => {
       expect(tooltip.style.marginInlineStart).toBe('')
 
       // `update()` rebuilds the subtree, so the tooltip has to be read again.
-      rangeSlider.update({ value: 150 })
+      rangeSlider.setConfig({ value: 150 })
 
       expect(element.querySelector('.range-slider-tooltip').style.getPropertyValue('--cui-range-slider-tooltip-position')).toBe('0.75')
     })
@@ -941,7 +941,7 @@ describe('RangeSlider', () => {
       expect(inputs.length).toBe(1)
       expect(inputs[0].value).toBe('30')
 
-      rangeSlider.update({ value: [10, 90] })
+      rangeSlider.setConfig({ value: [10, 90] })
 
       inputs = element.querySelectorAll('.range-slider-input')
       expect(inputs.length).toBe(2)
@@ -957,7 +957,7 @@ describe('RangeSlider', () => {
         ticks: ['A', 'B', 'C']
       })
 
-      rangeSlider.update({ value: 50, ticks: false })
+      rangeSlider.setConfig({ value: 50, ticks: false })
 
       const labels = element.querySelectorAll('.range-slider-tick')
       expect(labels.length).toBe(0)
@@ -1763,9 +1763,9 @@ describe('RangeSlider', () => {
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, { value: 50 })
 
-      spyOn(rangeSlider, 'update')
-      RangeSlider.rangeSliderInterface(element, 'update')
-      expect(rangeSlider.update).toHaveBeenCalled()
+      spyOn(rangeSlider, 'setConfig')
+      RangeSlider.rangeSliderInterface(element, 'setConfig')
+      expect(rangeSlider.setConfig).toHaveBeenCalled()
     })
 
     it('should throw on undefined method', () => {
@@ -1816,9 +1816,9 @@ describe('RangeSlider', () => {
       jQueryMock.fn.rangeSlider = RangeSlider.jQueryInterface
       jQueryMock.elements = [element]
 
-      spyOn(rangeSlider, 'update')
-      jQueryMock.fn.rangeSlider.call(jQueryMock, 'update')
-      expect(rangeSlider.update).toHaveBeenCalled()
+      spyOn(rangeSlider, 'setConfig')
+      jQueryMock.fn.rangeSlider.call(jQueryMock, 'setConfig')
+      expect(rangeSlider.setConfig).toHaveBeenCalled()
     })
 
     it('should throw error for undefined methods via jQuery interface', () => {

@@ -282,6 +282,41 @@ The promise always settles — a call that does nothing (already open, a prevent
 than stranding the caller. It resolves with no value, so it tells you the call
 finished, not whether the state changed.
 
+#### Replacing options is `setConfig()`, not `update()`
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+`update()` meant two different things. On Combobox, List box, Transfer, Menu,
+Progress, Range, Tooltip and Popup it takes no argument and recomputes from what
+the component already owns; on Autocomplete, Calendar, MultiSelect, OTP Input,
+Range Slider, Rating and the date/time inputs it took an options object and
+replaced the configuration. Calling it the first way on a component that meant
+the second one threw a `TypeError`.
+
+Configuration replacement now has its own name on every component:
+
+```diff
+- multiSelect.update({ options })
++ multiSelect.setConfig({ options })
+```
+
+`setConfig()` is defined once, so the three ways this used to differ are gone:
+
+- **It merges.** Options you leave out keep their current value. Rating and Range
+  Slider used to resolve the given options against the defaults, so
+  `rating.setConfig({ value: 2 })` on a rating built with `{ itemCount: 3 }` no
+  longer brings back the default five items.
+- **It type-checks.** Autocomplete and MultiSelect skipped validation on this
+  path, so `multiSelect.update({ multiple: 'yes' })` stored the string in
+  silence; the same call now throws the `TypeError` the constructor throws, and
+  the configuration is left untouched.
+- **It is reachable the same way everywhere**, including through the static and
+  jQuery dispatchers, which pass a method name and no arguments:
+  `coreui.Rating.ratingInterface(el, 'setConfig')`.
+
+`Toaster.update(id, options)` is unchanged — it rewrites one toast in the store
+rather than reconfiguring the component.
+
 ### Components
 
 #### Accordion on the native `<details>`
@@ -900,13 +935,12 @@ removed in favour of `$translucent-opacity` and
   and `showAdjacentDays`** — the option keys, the `data-coreui-select-adjacent-days`
   / `data-coreui-show-adjacent-days` attributes and the picker passthrough alike. The
   typo is fixed in the React and Vue libraries in the same release.
-- **Behavior change:** `update()` now **merges** the given options over the
-  current configuration instead of resolving them against the defaults. A
-  partial call like `calendar.update({ selectEndDate: true })` no longer resets
-  every other option (`range`, `calendars`, `locale`, …) — this aligns
-  `Calendar.update()` with `DateInput`/`TimeInput`/`DateTimeInput` `update()`
-  semantics. Callers that passed the complete configuration on every update are
-  unaffected.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`update(config)` is `setConfig(config)`**, and it merges the given options
+  over the current configuration instead of resolving them against the defaults,
+  so a partial call like `calendar.setConfig({ selectEndDate: true })` no longer
+  resets every other option (`range`, `calendars`, `locale`, …). See
+  [Replacing options is `setConfig()`, not `update()`](#replacing-options-is-setconfig-not-update).
 - **Additive:** `startDateChange` and `endDateChange` now carry a `dateObject`
   property with the underlying `Date`, alongside the existing `date` property.
   `date` remains formatted per `selectionType` — a `Date` for day selection, but
