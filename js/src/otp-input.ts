@@ -25,6 +25,7 @@ const ARROW_RIGHT_KEY = 'ArrowRight'
 const ARROW_LEFT_KEY = 'ArrowLeft'
 const BACKSPACE_KEY = 'Backspace'
 
+const EVENT_BEFORE_INPUT = `beforeinput${EVENT_KEY}`
 const EVENT_CHANGE = `change${EVENT_KEY}`
 const EVENT_COMPLETE = `complete${EVENT_KEY}`
 const EVENT_FOCUS = `focus${EVENT_KEY}`
@@ -158,6 +159,14 @@ class OTPInput extends BaseComponent {
 
   // Private
   _addEventListeners(): void {
+    EventHandler.on(this._element, EVENT_BEFORE_INPUT, SELECTOR_FORM_OTP_CONTROL, event => {
+      const { data, inputType } = event as unknown as { data: string | null, inputType: string }
+
+      if (inputType === 'insertText' && data && data.length === 1 && !this._isValidInput(data)) {
+        event.preventDefault()
+      }
+    })
+
     EventHandler.on(this._element, EVENT_FOCUS, SELECTOR_FORM_OTP_CONTROL, event => {
       const { target } = event as unknown as { target: HTMLInputElement }
 
@@ -190,14 +199,12 @@ class OTPInput extends BaseComponent {
 
         if (chars) {
           this._distributeChars(target as HTMLInputElement, chars)
+          return
         }
-
-        return
       }
 
       if (target!.value.length === 1 && !this._isValidInput(target!.value)) {
         target!.value = ''
-        return
       }
 
       const inputs = this._getInputs()
@@ -216,6 +223,7 @@ class OTPInput extends BaseComponent {
       }
 
       this._setInputsTabIndexes()
+      this._syncFirstInputMaxLength()
       this._checkAutoSubmit(inputs)
     })
 
@@ -231,9 +239,6 @@ class OTPInput extends BaseComponent {
 
         getNextActiveElement(inputs, target as HTMLInputElement, false).focus()
 
-        const currentValue = inputs.map((input: HTMLInputElement) => input.value).join('')
-
-        this._setHiddenInputValue(currentValue)
         this._setInputsTabIndexes()
         return
       }
