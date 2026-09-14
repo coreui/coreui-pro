@@ -139,8 +139,8 @@ class Rating extends BaseComponent {
   }
 
   // Public
-  override setConfig(config: any): void {
-    super.setConfig(config)
+  setConfig(config: any): void {
+    this._config = this._getConfig({ ...this._config, ...config })
     this._currentValue = this._config.value
 
     this._disposeTooltips()

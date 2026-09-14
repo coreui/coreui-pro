@@ -50,13 +50,6 @@ class BaseComponent extends Config {
   }
 
   // Public
-  setConfig(config?: ComponentConfig | null): void {
-    this._config = this._getConfig({
-      ...this._config,
-      ...(typeof config === 'object' && config ? config : {})
-    })
-  }
-
   dispose(): void {
     Data.remove(this._element, this.constructor.DATA_KEY)
     EventHandler.off(this._element, this.constructor.EVENT_KEY)

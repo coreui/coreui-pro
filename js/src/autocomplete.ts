@@ -228,12 +228,12 @@ class Autocomplete extends ComboboxBase {
     })
   }
 
-  override setConfig(config: any): void {
+  setConfig(config: any): void {
     if (config?.value) {
       this.deselectAll()
     }
 
-    super.setConfig(config)
+    this._config = this._getConfig({ ...this._config, ...config })
     this._options = this._getOptionsFromConfig()
     this._setListBoxItems()
   }

@@ -255,8 +255,8 @@ class Calendar extends BaseComponent {
   }
 
   // Public
-  override setConfig(config: any): void {
-    super.setConfig(config)
+  setConfig(config: any): void {
+    this._config = this._getConfig({ ...this._config, ...config })
     this._initializeDates()
     this._initializeView()
 

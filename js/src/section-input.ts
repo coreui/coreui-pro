@@ -278,12 +278,12 @@ class SectionInput extends BaseComponent {
     return normalized !== null && this._getValidationError(normalized, true) === null
   }
 
-  override setConfig(config: any): void {
+  setConfig(config: any): void {
     if (typeof config !== 'object') {
       return
     }
 
-    super.setConfig(config)
+    this._config = this._getConfig({ ...this._config, ...config })
 
     const previousDate = this._date
     this._date = this._config.date ? this._convertDate(this._config.date) : null
