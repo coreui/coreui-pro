@@ -231,7 +231,23 @@ const onDOMContentLoaded = (callback: () => void): void => {
   }
 }
 
-const isRTL = (): boolean => document.documentElement.dir === 'rtl'
+// The direction an element is laid out in, read from the computed style rather
+// than from `:dir()`: the logical properties that place everything resolve
+// against this one. An element outside the document has no computed direction,
+// so the nearest ancestor that declares one answers for it.
+const isRTL = (element?: Element | null): boolean => {
+  const target = element ?? document.documentElement
+
+  if (target.isConnected) {
+    return window.getComputedStyle(target).direction === 'rtl'
+  }
+
+  const declared = target.closest('[dir]')
+
+  return declared ?
+    declared.matches(':dir(rtl)') :
+    window.getComputedStyle(document.documentElement).direction === 'rtl'
+}
 
 const defineJQueryPlugin = (plugin: JQueryPlugin): void => {
   onDOMContentLoaded(() => {

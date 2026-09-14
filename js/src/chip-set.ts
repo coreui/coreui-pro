@@ -476,17 +476,19 @@ class ChipSet extends BaseComponent {
       return
     }
 
+    const rtl = isRTL(this._element)
+
     switch (event.key) {
       case ARROW_LEFT_KEY: {
         event.preventDefault()
         // In RTL the visual direction is mirrored, so ArrowLeft moves to the next chip.
-        this._moveFocus(this._focusSibling(chip as HTMLElement, isRTL()), event.shiftKey)
+        this._moveFocus(this._focusSibling(chip as HTMLElement, rtl), event.shiftKey)
         break
       }
 
       case ARROW_RIGHT_KEY: {
         event.preventDefault()
-        this._moveFocus(this._focusSibling(chip as HTMLElement, !isRTL()), event.shiftKey)
+        this._moveFocus(this._focusSibling(chip as HTMLElement, !rtl), event.shiftKey)
         break
       }
 

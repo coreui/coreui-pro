@@ -228,6 +228,23 @@ describe('Dropdown', () => {
       expect(dropdown._getPlacement()).toEqual('right-start')
     })
 
+    it('should mirror the wrapper placement by the direction of the toggle, not of the document', () => {
+      fixtureEl.innerHTML = [
+        '<div dir="rtl">',
+        '  <div class="dropend">',
+        '    <button class="btn dropdown-toggle" data-coreui-toggle="dropdown">Dropdown</button>',
+        '    <div class="dropdown-menu">',
+        '      <a class="dropdown-item" href="#">Secondary link</a>',
+        '    </div>',
+        '  </div>',
+        '</div>'
+      ].join('')
+
+      const dropdown = new Dropdown(fixtureEl.querySelector('[data-coreui-toggle="dropdown"]'))
+
+      expect(dropdown._getPlacement()).toEqual('left-start')
+    })
+
     it('should resolve a responsive placement like Menu does', () => {
       fixtureEl.innerHTML = [
         '<div class="dropdown">',

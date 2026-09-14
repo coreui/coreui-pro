@@ -13,6 +13,10 @@ describe('ChipSet', () => {
     clearFixture()
   })
 
+  afterEach(() => {
+    document.documentElement.dir = ''
+  })
+
   const setMarkup = (chips = ['First', 'Second', 'Third'], attrs = '') => {
     fixtureEl.innerHTML = [
       `<div class="chip-set"${attrs}>`,
@@ -155,6 +159,18 @@ describe('ChipSet', () => {
       expect(document.activeElement).toEqual(chips[0])
 
       document.documentElement.dir = ''
+    })
+
+    it('should mirror arrow keys by the direction of the chip set, not of the document', () => {
+      const el = setMarkup(['First', 'Second'], ' dir="rtl"')
+      // eslint-disable-next-line no-new
+      new ChipSet(el, { selectable: true })
+
+      const chips = el.querySelectorAll('.chip')
+      chips[0].focus()
+      chips[0].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }))
+
+      expect(document.activeElement).toEqual(chips[1])
     })
 
     it('should focus first chip on Home key', () => {

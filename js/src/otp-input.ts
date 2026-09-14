@@ -247,8 +247,10 @@ class OTPInput extends BaseComponent {
         return
       }
 
-      if (key === ARROW_RIGHT_KEY) {
-        if (this._config.linear && target!.value === '') {
+      if (key === ARROW_RIGHT_KEY || key === ARROW_LEFT_KEY) {
+        const shouldMoveNext = (key === ARROW_RIGHT_KEY) !== isRTL(this._element)
+
+        if (shouldMoveNext && this._config.linear && target!.value === '') {
           return
         }
 
@@ -258,22 +260,6 @@ class OTPInput extends BaseComponent {
           return
         }
 
-        // In RTL mode, right arrow moves to previous input, in LTR mode it moves to next input
-        const shouldMoveNext = !isRTL()
-        getNextActiveElement(inputs, target, shouldMoveNext).focus()
-
-        return
-      }
-
-      if (key === ARROW_LEFT_KEY) {
-        const inputs = this._getInputs()
-
-        if (!inputs.length) {
-          return
-        }
-
-        // In RTL mode, left arrow moves to next input, in LTR mode it moves to previous input
-        const shouldMoveNext = isRTL()
         getNextActiveElement(inputs, target, shouldMoveNext).focus()
       }
     })

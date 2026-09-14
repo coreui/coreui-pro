@@ -17,7 +17,7 @@ import {
 import {
  CHEVRON_DOUBLE_LEFT_ICON, CHEVRON_DOUBLE_RIGHT_ICON, CHEVRON_LEFT_ICON, CHEVRON_RIGHT_ICON
 } from './util/icons.js'
-import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
+import { defineJQueryPlugin, isRTL, jQueryDispatch } from './util/index.js'
 import {
   convertToDateObject,
   createGroupsInArray,
@@ -1229,20 +1229,6 @@ class Calendar extends BaseComponent {
     }
   }
 
-  // Navigation icons are directional, so prev/next swap when the calendar
-  // renders right-to-left. The direction comes from the element's computed
-  // style rather than isRTL(): the document can be LTR while an ancestor sets
-  // dir="rtl" around the calendar.
-  _isRtl(): boolean {
-    // A detached element has no computed direction, so fall back to the nearest
-    // ancestor that declares one (and finally to the document).
-    if (this._element.isConnected) {
-      return window.getComputedStyle(this._element).direction === 'rtl'
-    }
-
-    return ((this._element.closest('[dir]') as HTMLElement)?.dir ?? document.documentElement.dir) === 'rtl'
-  }
-
   _navIcon(name: string): string {
     const mirrored = {
       navIconDoubleNext: 'navIconDoublePrev',
@@ -1251,7 +1237,7 @@ class Calendar extends BaseComponent {
       navIconPrev: 'navIconNext'
     }
 
-    return sanitizeByConfig(this._config[this._isRtl() ? (mirrored as Record<string, string>)[name] : name], this._config)
+    return sanitizeByConfig(this._config[isRTL(this._element) ? (mirrored as Record<string, string>)[name] : name], this._config)
   }
 
   // Static
