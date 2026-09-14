@@ -317,6 +317,38 @@ Configuration replacement now has its own name on every component:
 `Toaster.update(id, options)` is unchanged — it rewrites one toast in the store
 rather than reconfiguring the component.
 
+#### A getter says what it returns
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+`getSelected()` returned three different things. List box gave the selected
+values, Chip Set gave the selected **elements** while `getSelectedValues()` sat
+next to it giving the values, and Transfer required an argument no other
+component takes:
+
+```js
+chipSet.getSelected().join(',') // [object HTMLDivElement],[object HTMLDivElement]
+transfer.getSelected()          // TypeError: Cannot read properties of undefined
+```
+
+Every getter now carries the noun it returns:
+
+```diff
+- listBox.getSelected()
++ listBox.getSelectedValues()
+
+- chipSet.getSelected()
++ chipSet.getSelectedElements()
+
+- transfer.getSelected('source')
++ transfer.getSelectedValues('source')
+```
+
+Chip Set's `getValues()` and `getSelectedValues()` are unchanged, and Transfer
+still takes `'source'` or `'target'` — the argument its `setLoading(loading,
+list)` already takes. Anything else now throws a `TypeError` naming the two
+lists instead of failing on an undefined property.
+
 ### Components
 
 #### Accordion on the native `<details>`

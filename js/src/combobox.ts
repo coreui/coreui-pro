@@ -185,7 +185,7 @@ class Combobox extends ComboboxBase {
 
   // Public
   getValue(): string | string[] | null {
-    const selected = this._listBox ? this._listBox.getSelected() : []
+    const selected = this._listBox ? this._listBox.getSelectedValues() : []
 
     return this._config.multiple ? selected : (selected[0] ?? null)
   }
@@ -433,7 +433,7 @@ class Combobox extends ComboboxBase {
   }
 
   _updateValue(): void {
-    const values = this._listBox ? this._listBox.getSelected() : []
+    const values = this._listBox ? this._listBox.getSelectedValues() : []
 
     if (this._hiddenInput) {
       this._hiddenInput.value = values.join(',')

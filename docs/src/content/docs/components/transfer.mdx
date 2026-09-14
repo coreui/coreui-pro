@@ -385,7 +385,7 @@ const transfer = new coreui.Transfer('#myTransfer', {
 | `getInstance` | Static method which allows you to get the transfer instance associated to a DOM element, you can use it like this: `coreui.Transfer.getInstance(element)`. |
 | `getItems()` | The items array both lists were built from. |
 | `getOrCreateInstance` | Static method which returns a transfer instance associated to a DOM element or creates a new one in case it wasn't initialized. You can use it like this: `coreui.Transfer.getOrCreateInstance(element)`. |
-| `getSelected(list)` | The selected values of `'source'` or `'target'`. |
+| `getSelectedValues(list)` | The selected values of `'source'` or `'target'`. Throws when `list` is anything else. |
 | `getSource()` | The values in the source list, in document order. |
 | `getTarget()` | The values in the target list, in document order. |
 | `moveAllToSource()` | The same in the other direction. Does nothing with `oneWay`. |

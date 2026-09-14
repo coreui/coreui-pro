@@ -268,7 +268,7 @@ describe('ChipSet', () => {
       Chip.getInstance(chips[0]).select()
       Chip.getInstance(chips[1]).select()
 
-      expect(chipSet.getSelected()).toHaveSize(2)
+      expect(chipSet.getSelectedElements()).toHaveSize(2)
     })
 
     it('should deselect siblings in single selection mode', () => {
@@ -279,7 +279,7 @@ describe('ChipSet', () => {
       Chip.getInstance(chips[0]).select()
       Chip.getInstance(chips[1]).select()
 
-      expect(chipSet.getSelected()).toEqual([chips[1]])
+      expect(chipSet.getSelectedElements()).toEqual([chips[1]])
     })
 
     it('should emit select.coreui.chip-set on selection change', () => {
@@ -317,10 +317,10 @@ describe('ChipSet', () => {
       const chipSet = new ChipSet(el, { selectable: true })
 
       chipSet.selectAll()
-      expect(chipSet.getSelected()).toHaveSize(2)
+      expect(chipSet.getSelectedElements()).toHaveSize(2)
 
       chipSet.deselectAll()
-      expect(chipSet.getSelected()).toHaveSize(0)
+      expect(chipSet.getSelectedElements()).toHaveSize(0)
     })
   })
 
@@ -332,7 +332,7 @@ describe('ChipSet', () => {
       const chips = el.querySelectorAll('.chip')
       chipSet.selectChip(chips[1])
 
-      expect(chipSet.getSelected()).toEqual([chips[1]])
+      expect(chipSet.getSelectedElements()).toEqual([chips[1]])
     })
 
     it('should ignore selectChip for an element outside the set', () => {
@@ -343,7 +343,7 @@ describe('ChipSet', () => {
 
       chipSet.selectChip(outside)
 
-      expect(chipSet.getSelected()).toHaveSize(0)
+      expect(chipSet.getSelectedElements()).toHaveSize(0)
     })
 
     it('should append a chip element with add', () => {

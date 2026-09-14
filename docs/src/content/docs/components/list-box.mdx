@@ -80,7 +80,7 @@ With `none` nothing is ever selected and no `aria-selected` is written; activati
 
 ### Select all
 
-A `.list-box-select-all` button marked `data-coreui-select-all`, anywhere in the container, switches the whole list. It is not an option — it never takes an `option` role, never appears in `getSelected()` and is reached with <kbd>Tab</kbd> rather than with the arrows. The plugin keeps its `aria-pressed` in step with the list (`true`, `false` or `mixed`) and points its `aria-controls` at the options element; clicking it selects everything or, when everything is already selected, clears the selection. Its own text is its name, so it needs no label.
+A `.list-box-select-all` button marked `data-coreui-select-all`, anywhere in the container, switches the whole list. It is not an option — it never takes an `option` role, never appears in `getSelectedValues()` and is reached with <kbd>Tab</kbd> rather than with the arrows. The plugin keeps its `aria-pressed` in step with the list (`true`, `false` or `mixed`) and points its `aria-controls` at the options element; clicking it selects everything or, when everything is already selected, clears the selection. Its own text is its name, so it needs no label.
 
 `.list-box-header` is the strip above the options it usually sits in: a plain `<div>`, a flex row that takes whatever content belongs there — a title (`.list-box-title`), a counter (`.list-box-subtitle`), a button of your own — next to or instead of the switch.
 
@@ -459,7 +459,7 @@ const listBox = new coreui.ListBox('#myListBox', {
 | `getInstance` | Static method which allows you to get the list box instance associated to a DOM element, you can use it like this: `coreui.ListBox.getInstance(element)`. |
 | `getItems()` | The normalized `items` array. |
 | `getOrCreateInstance` | Static method which returns a list box instance associated to a DOM element or creates a new one in case it wasn't initialized. You can use it like this: `coreui.ListBox.getOrCreateInstance(element)`. |
-| `getSelected()` | The selected values, in selection order. |
+| `getSelectedValues()` | The selected values, in selection order. |
 | `next` / `prev` | Moves the highlight one option down/up. |
 | `select(value)` | Selects the option. In `single` mode it replaces the current selection. |
 | `selectAll(values?)` | Selects every visible, enabled option (`multiple` mode). Pass an array of values to select exactly those instead, filter or no filter. |
