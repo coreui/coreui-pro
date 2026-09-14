@@ -175,7 +175,6 @@ class OTPInput extends BaseComponent {
 
       if (target.value.length === 1 && !this._isValidInput(target.value)) {
         target.value = ''
-        return
       }
 
       const inputs = this._getInputs()
@@ -194,6 +193,7 @@ class OTPInput extends BaseComponent {
       }
 
       this._setInputsTabIndexes()
+      this._syncFirstInputMaxLength()
       this._checkAutoSubmit(inputs)
     })
 
@@ -209,9 +209,6 @@ class OTPInput extends BaseComponent {
 
         getNextActiveElement(inputs, target, false).focus()
 
-        const currentValue = inputs.map(input => input.value).join('')
-
-        this._setHiddenInputValue(currentValue)
         this._setInputsTabIndexes()
         return
       }
@@ -402,7 +399,9 @@ class OTPInput extends BaseComponent {
         input.placeholder = placeholder.length > 1 ? placeholder[index] || '' : placeholder
       }
 
-      input.required = this._config.required
+      if (this._config.required) {
+        input.required = true
+      }
 
       switch (this._config.type) {
         case 'number': {

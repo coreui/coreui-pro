@@ -2434,6 +2434,7 @@ describe('MultiSelect', () => {
       const option = multiSelect._optionsElement.querySelector('[data-value="2"]')
 
       expect(option.tabIndex).toBe(-1)
+      expect(option.getAttribute('aria-disabled')).toBe('true')
 
       option.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
       option.click()

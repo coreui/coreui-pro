@@ -117,6 +117,22 @@ describe('OTPInput', () => {
       }
     })
 
+    it('should keep required written in the markup when the option is off', () => {
+      fixtureEl.innerHTML = `
+        <div class="form-otp">
+          <input type="text" class="form-otp-control" required>
+          <input type="text" class="form-otp-control" required>
+        </div>
+      `
+
+      const otpContainer = fixtureEl.querySelector('.form-otp')
+      new OTPInput(otpContainer) // eslint-disable-line no-new
+
+      for (const input of otpContainer.querySelectorAll('.form-otp-control')) {
+        expect(input.required).toBe(true)
+      }
+    })
+
     it('should set required on every input when required is true', () => {
       fixtureEl.innerHTML = `
         <div class="form-otp">
@@ -548,6 +564,69 @@ describe('OTPInput', () => {
 
       expect(otpInput._inputElement.value).toBe('1')
       expect(changeSpy).toHaveBeenCalledWith('1')
+    })
+
+    it('should fire change once when a digit is deleted and backspace moves on', () => {
+      fixtureEl.innerHTML = `
+        <div class="form-otp">
+          <input type="text" class="form-otp-control">
+          <input type="text" class="form-otp-control">
+        </div>
+      `
+
+      const otpContainer = fixtureEl.querySelector('.form-otp')
+      new OTPInput(otpContainer, { value: '12' }) // eslint-disable-line no-new
+      const changeSpy = jasmine.createSpy('change')
+      otpContainer.addEventListener('change.coreui.otp-input', event => changeSpy(event.value))
+
+      const inputs = otpContainer.querySelectorAll('.form-otp-control')
+      inputs[1].value = ''
+      inputs[1].dispatchEvent(createEvent('input'))
+      inputs[1].dispatchEvent(new KeyboardEvent('keydown', { key: 'Backspace', bubbles: true }))
+
+      expect(changeSpy).toHaveBeenCalledTimes(1)
+      expect(changeSpy).toHaveBeenCalledWith('1')
+    })
+
+    it('should update the hidden input when an invalid character is rejected', () => {
+      fixtureEl.innerHTML = `
+        <div class="form-otp">
+          <input type="text" class="form-otp-control">
+          <input type="text" class="form-otp-control">
+        </div>
+      `
+
+      const otpContainer = fixtureEl.querySelector('.form-otp')
+      const otpInput = new OTPInput(otpContainer, { type: 'number', value: '12' })
+
+      const inputs = otpContainer.querySelectorAll('.form-otp-control')
+      inputs[1].value = 'a'
+      inputs[1].dispatchEvent(createEvent('input'))
+
+      expect(inputs[1].value).toBe('')
+      expect(otpInput._inputElement.value).toBe('1')
+    })
+
+    it('should let the first slot take a whole code again after the field is cleared', () => {
+      fixtureEl.innerHTML = `
+        <div class="form-otp">
+          <input type="text" class="form-otp-control">
+          <input type="text" class="form-otp-control">
+        </div>
+      `
+
+      const otpContainer = fixtureEl.querySelector('.form-otp')
+      new OTPInput(otpContainer, { value: '12' }) // eslint-disable-line no-new
+
+      const inputs = otpContainer.querySelectorAll('.form-otp-control')
+      expect(inputs[0].maxLength).toBe(1)
+
+      for (const input of inputs) {
+        input.value = ''
+        input.dispatchEvent(createEvent('input'))
+      }
+
+      expect(inputs[0].maxLength).toBe(inputs.length)
     })
   })
 

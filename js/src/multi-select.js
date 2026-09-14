@@ -938,6 +938,7 @@ class MultiSelect extends BaseComponent {
 
         if (option.disabled) {
           optionDiv.classList.add(CLASS_NAME_DISABLED)
+          optionDiv.setAttribute('aria-disabled', 'true')
         }
 
         if (this._config.optionsStyle === 'checkbox') {
