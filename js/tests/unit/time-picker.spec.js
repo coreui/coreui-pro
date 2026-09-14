@@ -1602,6 +1602,42 @@ describe('TimePicker', () => {
 
       expect(div.classList.contains('show')).toBeFalse()
     })
+
+    it('should hide on Escape pressed inside a menu moved to a container', () => {
+      const containerEl = document.createElement('div')
+      document.body.append(containerEl)
+
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const tp = new TimePicker(div, { container: containerEl })
+
+      tp.show()
+      expect(div.classList.contains('show')).toBeTrue()
+
+      const keydownEvent = new KeyboardEvent('keydown', {
+        key: 'Escape',
+        bubbles: true
+      })
+      tp._menu.dispatchEvent(keydownEvent)
+
+      expect(div.classList.contains('show')).toBeFalse()
+
+      containerEl.remove()
+    })
+
+    it('should focus the input after hiding', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const tp = new TimePicker(div)
+
+      tp.show()
+
+      const spy = spyOn(tp._input, 'focus')
+
+      tp.hide()
+
+      expect(spy).toHaveBeenCalled()
+    })
   })
 
   describe('Indicator', () => {
