@@ -309,8 +309,10 @@ $menu-tokens: defaults(
         transform: rotate(-45deg);
       }
 
-      @include rtl-nested("&::after") {
-        transform: rotate(135deg);
+      @include rtl() {
+        &::after {
+          transform: rotate(135deg);
+        }
       }
     }
 

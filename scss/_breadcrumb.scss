@@ -83,8 +83,10 @@ $breadcrumb-tokens: defaults(
         content: var(--#{$prefix}breadcrumb-divider);
       }
 
-      @include rtl-nested("&::before") {
-        content: var(--#{$prefix}breadcrumb-divider-flipped);
+      @include rtl() {
+        &::before {
+          content: var(--#{$prefix}breadcrumb-divider-flipped);
+        }
       }
     }
 
@@ -120,8 +122,10 @@ $breadcrumb-tokens: defaults(
       content: var(--#{$prefix}breadcrumb-divider);
     }
 
-    @include rtl-nested("&:empty::before") {
-      content: var(--#{$prefix}breadcrumb-divider-flipped);
+    @include rtl() {
+      &:empty::before {
+        content: var(--#{$prefix}breadcrumb-divider-flipped);
+      }
     }
   }
 }
