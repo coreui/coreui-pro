@@ -113,6 +113,7 @@ $toast-tokens: defaults(
     // scss-docs-start toast-container-css-vars
     --#{$prefix}toast-zindex: var(--#{$prefix}z-toast);
     --#{$prefix}toast-container-inset: #{$toast-container-inset};
+    --#{$prefix}toast-inline-sign: 1;
     --#{$prefix}toast-max-width: #{$toast-max-width};
     --#{$prefix}toast-spacing: #{$toast-spacing};
     --#{$prefix}toast-transition-duration: #{$toast-transition-duration};
@@ -124,6 +125,10 @@ $toast-tokens: defaults(
     width: max-content;
     max-width: 100%;
     pointer-events: none;
+
+    @include rtl-self() {
+      --#{$prefix}toast-inline-sign: -1;
+    }
 
     > :not(:last-child) {
       margin-bottom: var(--#{$prefix}toast-spacing);
@@ -166,26 +171,21 @@ $toast-tokens: defaults(
   .toast-container-top-start,
   .toast-container-middle-start,
   .toast-container-bottom-start {
-    --#{$prefix}toast-translate: calc(-100% - var(--#{$prefix}toast-container-inset)) 0;
-
-    @include rtl-self() {
-      --#{$prefix}toast-translate: calc(100% + var(--#{$prefix}toast-container-inset)) 0;
-    }
+    --#{$prefix}toast-translate: calc(var(--#{$prefix}toast-inline-sign) * (-100% - var(--#{$prefix}toast-container-inset))) 0;
   }
 
   .toast-container-top-end,
   .toast-container-middle-end,
   .toast-container-bottom-end {
-    --#{$prefix}toast-translate: calc(100% + var(--#{$prefix}toast-container-inset)) 0;
-
-    @include rtl-self() {
-      --#{$prefix}toast-translate: calc(-100% - var(--#{$prefix}toast-container-inset)) 0;
-    }
+    --#{$prefix}toast-translate: calc(var(--#{$prefix}toast-inline-sign) * (100% + var(--#{$prefix}toast-container-inset))) 0;
   }
 
-  .toast-container-top-center,
-  .toast-container-middle-center {
+  .toast-container-top-center {
     --#{$prefix}toast-translate: 0 calc(-100% - var(--#{$prefix}toast-container-inset));
+  }
+
+  .toast-container-middle-center {
+    --#{$prefix}toast-translate: 0 0;
   }
 
   .toast-container-bottom-center {
@@ -203,8 +203,6 @@ $toast-tokens: defaults(
   .toast-container-top-center,
   .toast-container-middle-center,
   .toast-container-bottom-center {
-    --#{$prefix}toast-leave-translate: calc(100% + var(--#{$prefix}toast-container-inset)) 0;
-
     inset-inline: var(--#{$prefix}toast-container-inset);
     margin-inline: auto;
   }

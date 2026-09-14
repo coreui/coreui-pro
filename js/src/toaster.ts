@@ -66,12 +66,10 @@ const PROPERTY_LEAVE_TRANSLATE = '--cui-toast-leave-translate'
 
 const EDGES: Record<string, string> = {
   bottom: '0 calc(100% + var(--cui-toast-container-inset))',
-  left: 'calc(-100% - var(--cui-toast-container-inset)) 0',
-  right: 'calc(100% + var(--cui-toast-container-inset)) 0',
+  end: 'calc(var(--cui-toast-inline-sign) * (100% + var(--cui-toast-container-inset))) 0',
+  start: 'calc(var(--cui-toast-inline-sign) * (-100% - var(--cui-toast-container-inset))) 0',
   top: '0 calc(-100% - var(--cui-toast-container-inset))'
 }
-
-const LEAVE_EDGES = new Set(['auto', 'left', 'right'])
 
 const PLACEMENTS = new Set([
   'top-start',
@@ -157,8 +155,7 @@ const ToastDefaultType = {
  * Types
  */
 
-type Edge = 'auto' | 'bottom' | 'left' | 'right' | 'top'
-type LeaveEdge = 'auto' | 'left' | 'right'
+type Edge = 'auto' | 'bottom' | 'end' | 'start' | 'top'
 
 type ToasterConfig = {
   allowList: SanitizerAllowList
@@ -166,7 +163,7 @@ type ToasterConfig = {
   container: string | Element
   enter: Edge
   html: boolean
-  leave: LeaveEdge
+  leave: Edge
   limit: number
   pauseOnHover: boolean
   placement: string
@@ -245,12 +242,10 @@ class Toaster extends BaseComponent {
       throw new TypeError(`${NAME.toUpperCase()}: Option "placement" provided value "${this._config.placement}" but expected one of ${[...PLACEMENTS].join(', ')}.`)
     }
 
-    if (this._config.enter !== 'auto' && !(this._config.enter in EDGES)) {
-      throw new TypeError(`${NAME.toUpperCase()}: Option "enter" provided value "${this._config.enter}" but expected one of auto, ${Object.keys(EDGES).join(', ')}.`)
-    }
-
-    if (!LEAVE_EDGES.has(this._config.leave)) {
-      throw new TypeError(`${NAME.toUpperCase()}: Option "leave" provided value "${this._config.leave}" but expected one of ${[...LEAVE_EDGES].join(', ')}.`)
+    for (const option of ['enter', 'leave'] as const) {
+      if (this._config[option] !== 'auto' && !Object.hasOwn(EDGES, this._config[option])) {
+        throw new TypeError(`${NAME.toUpperCase()}: Option "${option}" provided value "${this._config[option]}" but expected one of auto, ${Object.keys(EDGES).join(', ')}.`)
+      }
     }
 
     if (ownsContainer) {
@@ -261,12 +256,14 @@ class Toaster extends BaseComponent {
     this._element.setAttribute('role', 'region')
     this._element.setAttribute('aria-label', this._config.ariaLabel)
 
+    const leave = this._config.leave === 'auto' ? this._config.enter : this._config.leave
+
     if (this._config.enter !== 'auto') {
       this._element.style.setProperty(PROPERTY_ENTER_TRANSLATE, EDGES[this._config.enter])
     }
 
-    if (this._config.leave !== 'auto') {
-      this._element.style.setProperty(PROPERTY_LEAVE_TRANSLATE, EDGES[this._config.leave])
+    if (leave !== 'auto') {
+      this._element.style.setProperty(PROPERTY_LEAVE_TRANSLATE, EDGES[leave])
     }
 
     this._announcers = {
