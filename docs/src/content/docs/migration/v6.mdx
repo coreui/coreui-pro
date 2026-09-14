@@ -354,6 +354,51 @@ Transfer still takes `'source'` or `'target'`, the argument its
 `setLoading(loading, list)` already takes. Anything else now throws a
 `TypeError` naming the two lists instead of failing on an undefined property.
 
+#### The button that opens a panel is `pickerIcon`
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+`indicator` named two unrelated things. On Autocomplete it was a boolean that
+showed the button opening the options menu; on List box, Combobox and Transfer
+it is a string choosing the marker drawn on each option. The button also
+answered to three different names across the family — `indicator`,
+`indicatorIcon`, and `ariaIndicatorLabel` next to `ariaToggleLabel`.
+
+The word stays where it describes something that indicates — the per-option
+marker — and the button takes the name the platform gives it
+([`::picker-icon`](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Selectors/::picker-icon),
+`::picker(select)`, `showPicker()`):
+
+```diff
+- new coreui.Autocomplete(el, { indicator: true })
++ new coreui.Autocomplete(el, { pickerIcon: true })
+
+- new coreui.DatePicker(el, { indicatorIcon: mySvg, ariaToggleLabel: 'Open' })
++ new coreui.DatePicker(el, { pickerIcon: mySvg, ariaPickerLabel: 'Open' })
+
+- new coreui.MultiSelect(el, { optionsStyle: 'text' })
++ new coreui.MultiSelect(el, { indicator: 'none' })
+```
+
+| was | is | on |
+| --- | --- | --- |
+| `indicator: boolean` | `pickerIcon: string \| boolean` | Autocomplete |
+| `indicatorIcon` | `pickerIcon` | the four pickers |
+| `ariaIndicatorLabel` | `ariaPickerLabel` | Autocomplete, Multi Select |
+| `ariaToggleLabel` | `ariaPickerLabel` | the four pickers |
+| `optionsStyle: 'checkbox' \| 'text'` | `indicator: 'checkbox' \| 'none'` | Multi Select |
+
+`pickerIcon` takes over both jobs the old pair did: `false` renders no button,
+`true` renders the built-in icon, and a string renders your own inline SVG
+(sanitized). Autocomplete and Multi Select gained it — their icon used to be
+hard-coded — so `pickerIcon: false` now hides Multi Select's button too.
+
+**Unchanged:** `indicator` on List box, Combobox and Transfer, along with the
+`.list-box-option-indicator` class and the `data-coreui-indicator` attribute;
+Password Input's `ariaToggleLabel`, because that button toggles visibility
+rather than opening a picker; and the shared `.form-control-action` class,
+which eight components use for three different jobs.
+
 ### Components
 
 #### Accordion on the native `<details>`
@@ -797,10 +842,10 @@ check, radio, carousel and toggler icons already work:
   column) rather than the wider `1.25rem` the combobox surface used.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **Multi Select's `selectAllStyle` and `optionsGroupsStyle` are removed.**
-  A list has one indicator, and `optionsStyle` decides it for the options, the
+  A list has one marker, and `indicator` decides it for the options, the
   selectable group labels and the select all button alike. Replace
   `selectAllStyle: 'text'` / `optionsGroupsStyle: 'text'` with
-  `optionsStyle: 'text'` when you want the whole list without checkboxes.
+  `indicator: 'none'` when you want the whole list without checkboxes.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **The focus stays in the field while the options list is open.** Options no
   longer take a `tabindex` and are never focused; the field — Autocomplete's

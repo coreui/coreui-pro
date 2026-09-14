@@ -165,7 +165,7 @@ describe('TimePicker', () => {
     })
 
     it('should skip sanitizing when sanitize is false', () => {
-      buildPicker({ indicatorIcon: '<svg xmlns="http://www.w3.org/2000/svg"><circle r="3" /></svg>', sanitize: false })
+      buildPicker({ pickerIcon: '<svg xmlns="http://www.w3.org/2000/svg"><circle r="3" /></svg>', sanitize: false })
 
       expect(fixtureEl.querySelector('.form-control-action circle')).not.toBeNull()
     })
