@@ -297,6 +297,7 @@ class TimePicker extends BaseComponent {
   _initializeFocusTrap() {
     return new FocusTrap({
       additionalElement: this._config.container ? this._menu : null,
+      returnFocus: true,
       trapElement: this._element
     })
   }
@@ -417,11 +418,13 @@ class TimePicker extends BaseComponent {
       })
     }
 
-    EventHandler.on(this._element, EVENT_KEYDOWN, event => {
-      if (event.key === ESCAPE_KEY) {
-        this.hide()
-      }
-    })
+    for (const element of this._config.container ? [this._element, this._menu] : [this._element]) {
+      EventHandler.on(element, EVENT_KEYDOWN, event => {
+        if (event.key === ESCAPE_KEY) {
+          this.hide()
+        }
+      })
+    }
 
     EventHandler.on(this._element, 'timeChange.coreui.time-picker', () => {
       if (this._config.variant === 'roll') {

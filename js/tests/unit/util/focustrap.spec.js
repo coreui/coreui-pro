@@ -155,6 +155,67 @@ describe('FocusTrap', () => {
       })
     })
 
+    it('should leave Tab alone in the middle of a group when an additional element is configured', () => {
+      fixtureEl.innerHTML = [
+        '<div id="focustrap">',
+        '  <a href="#" id="trap-first">first</a>',
+        '  <a href="#" id="trap-middle">middle</a>',
+        '  <a href="#" id="trap-last">last</a>',
+        '</div>',
+        '<div id="additional">',
+        '  <a href="#" id="additional-first">first</a>',
+        '  <a href="#" id="additional-last">last</a>',
+        '</div>'
+      ].join('')
+
+      const trapElement = document.getElementById('focustrap')
+      const additionalElement = document.getElementById('additional')
+      const focustrap = new FocusTrap({ additionalElement, trapElement })
+      focustrap.activate()
+
+      const middle = document.getElementById('trap-middle')
+      const keydown = createEvent('keydown', { bubbles: true, cancelable: true })
+      keydown.key = 'Tab'
+
+      middle.dispatchEvent(keydown)
+
+      expect(keydown.defaultPrevented).toBeFalse()
+
+      focustrap.deactivate()
+    })
+
+    it('should redirect at the seam between the trap element and the additional one', () => {
+      fixtureEl.innerHTML = [
+        '<div id="focustrap">',
+        '  <a href="#" id="trap-first">first</a>',
+        '  <a href="#" id="trap-last">last</a>',
+        '</div>',
+        '<div id="additional">',
+        '  <a href="#" id="additional-first">first</a>',
+        '  <a href="#" id="additional-last">last</a>',
+        '</div>'
+      ].join('')
+
+      const trapElement = document.getElementById('focustrap')
+      const additionalElement = document.getElementById('additional')
+      const focustrap = new FocusTrap({ additionalElement, trapElement })
+      focustrap.activate()
+
+      const last = document.getElementById('trap-last')
+      const additionalFirst = document.getElementById('additional-first')
+      const spy = spyOn(additionalFirst, 'focus')
+
+      const keydown = createEvent('keydown', { bubbles: true, cancelable: true })
+      keydown.key = 'Tab'
+
+      last.dispatchEvent(keydown)
+
+      expect(keydown.defaultPrevented).toBeTrue()
+      expect(spy).toHaveBeenCalled()
+
+      focustrap.deactivate()
+    })
+
     it('should force focus on itself if there is no focusable content', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = [
@@ -213,6 +274,59 @@ describe('FocusTrap', () => {
       focustrap.deactivate()
 
       expect(spy).not.toHaveBeenCalled()
+    })
+
+    it('should hand focus back to the element focused before activation when configured to', () => {
+      fixtureEl.innerHTML = [
+        '<a href="#" id="opener">opener</a>',
+        '<div id="focustrap">',
+        '  <a href="#" id="inside">inside</a>',
+        '</div>'
+      ].join('')
+
+      const trapElement = document.getElementById('focustrap')
+      const opener = document.getElementById('opener')
+      const inside = document.getElementById('inside')
+
+      opener.focus()
+
+      const focustrap = new FocusTrap({ autofocus: false, returnFocus: true, trapElement })
+      focustrap.activate()
+
+      inside.focus()
+
+      const spy = spyOn(opener, 'focus')
+
+      focustrap.deactivate()
+
+      expect(spy).toHaveBeenCalled()
+    })
+
+    it('should leave focus where it is unless returnFocus is set', () => {
+      fixtureEl.innerHTML = [
+        '<a href="#" id="opener">opener</a>',
+        '<div id="focustrap">',
+        '  <a href="#" id="inside">inside</a>',
+        '</div>'
+      ].join('')
+
+      const trapElement = document.getElementById('focustrap')
+      const opener = document.getElementById('opener')
+      const inside = document.getElementById('inside')
+
+      opener.focus()
+
+      const focustrap = new FocusTrap({ autofocus: false, trapElement })
+      focustrap.activate()
+
+      inside.focus()
+
+      const spy = spyOn(opener, 'focus')
+
+      focustrap.deactivate()
+
+      expect(spy).not.toHaveBeenCalled()
+      expect(document.activeElement).toEqual(inside)
     })
 
     it('should keep the other trap listening when one is deactivated', () => {

@@ -1497,6 +1497,42 @@ describe('DateRangePicker', () => {
 
       expect(spy).toHaveBeenCalled()
     })
+
+    it('should close dropdown on Escape pressed inside a menu moved to a container', () => {
+      const containerEl = document.createElement('div')
+      document.body.append(containerEl)
+
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const dateRangePicker = new DateRangePicker(div, { container: containerEl })
+
+      dateRangePicker.show()
+      expect(div.classList.contains('show')).toBe(true)
+
+      const escapeEvent = new KeyboardEvent('keydown', {
+        key: 'Escape',
+        bubbles: true
+      })
+      dateRangePicker._menu.dispatchEvent(escapeEvent)
+
+      expect(div.classList.contains('show')).toBe(false)
+
+      containerEl.remove()
+    })
+
+    it('should focus start input after closing on a date selection', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const dateRangePicker = new DateRangePicker(div, { range: false, footer: false, timepicker: false })
+
+      dateRangePicker.show()
+
+      const spy = spyOn(dateRangePicker._startInput, 'focus')
+
+      dateRangePicker.hide()
+
+      expect(spy).toHaveBeenCalled()
+    })
   })
 
   describe('indicator', () => {

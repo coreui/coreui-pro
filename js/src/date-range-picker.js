@@ -367,6 +367,7 @@ class DateRangePicker extends BaseComponent {
   _initializeFocusTrap() {
     return new FocusTrap({
       additionalElement: this._config.container ? this._menu : null,
+      returnFocus: true,
       trapElement: this._element
     })
   }
@@ -390,12 +391,13 @@ class DateRangePicker extends BaseComponent {
       }
     })
 
-    EventHandler.on(this._element, EVENT_KEYDOWN, event => {
-      if (event.key === ESCAPE_KEY) {
-        this.hide()
-        this._startInput.focus()
-      }
-    })
+    for (const element of this._config.container ? [this._element, this._menu] : [this._element]) {
+      EventHandler.on(element, EVENT_KEYDOWN, event => {
+        if (event.key === ESCAPE_KEY) {
+          this.hide()
+        }
+      })
+    }
 
     EventHandler.on(this._startInput, EVENT_CLICK, () => {
       this._selectEndDate = false
