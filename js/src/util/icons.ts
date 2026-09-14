@@ -23,7 +23,7 @@ export const CLEANER_ICON: string = '<svg xmlns="http://www.w3.org/2000/svg" vie
 
 export const CLOCK_ICON: string = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor"><path d="M256 16C123.452 16 16 123.452 16 256s107.452 240 240 240 240-107.452 240-240S388.548 16 256 16Zm0 448c-114.875 0-208-93.125-208-208S141.125 48 256 48s208 93.125 208 208-93.125 208-208 208Z"/><path d="M272 128h-32v139.314l84.686 84.687 22.628-22.628L272 254.059V128Z"/></svg>'
 
-export const INDICATOR_ICON: string = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor"><path d="M256.045 416.136.717 160.807l29.579-29.579 225.749 225.748 225.749-225.748 29.579 29.579-255.328 255.329z"/></svg>'
+export const PICKER_ICON: string = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor"><path d="M256.045 416.136.717 160.807l29.579-29.579 225.749 225.748 225.749-225.748 29.579 29.579-255.328 255.329z"/></svg>'
 
 export const MINUS_ICON: string = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor"><path d="M464 240H48v32h416z"/></svg>'
 

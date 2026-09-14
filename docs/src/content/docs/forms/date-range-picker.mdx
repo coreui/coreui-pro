@@ -292,8 +292,8 @@ attributes work on the picker element too.
 | `allowList` | object | `SVGAllowlist` | Allowlist used when sanitizing icon markup. |
 | `ariaCleanerLabel` | string | `'Clear the value'` | Accessible label of the cleaner button. |
 | `ariaEndLabel` | string | `'End date'` | Accessible name of the end field when it has no floating label. Both halves are the same control, so naming them apart is what tells a screen reader which end of the range it is on. |
+| `ariaPickerLabel` | string | `'Toggle the calendar'` | Accessible label of the picker button. |
 | `ariaStartLabel` | string | `'Start date'` | Accessible name of the start field when it has no floating label. |
-| `ariaToggleLabel` | string | `'Toggle the calendar'` | Accessible label of the indicator button. |
 | `calendarOptions` | object | `{}` | Programmatic escape hatch for calendar options. |
 | `calendars` | number | `2` | Months shown side by side. |
 | `cleaner` | boolean | `true` | Renders a button that clears the value. It appears only once the field holds one. |
@@ -303,11 +303,11 @@ attributes work on the picker element too.
 | `endDate` | date, string, null | `null` | Initial end of the range. |
 | `endFloatingLabel` | string, null | `null` | Renders a floating label over the end field, which also becomes that field's accessible name. |
 | `endName` | string, null | `null` | Name of the end hidden input. |
-| `indicatorIcon` | string | calendar SVG | Inline SVG rendered by the component (sanitized). |
 | `inputOptions` | object | `{}` | Programmatic escape hatch for date input options. |
 | `locale` | string | browser locale | Drives section order, separators, and calendar labels. |
 | `maxDate` | date, string, null | `null` | Upper bound, enforced by both layers. |
 | `minDate` | date, string, null | `null` | Lower bound, enforced by both layers. |
+| `pickerIcon` | string | calendar SVG | Inline SVG rendered by the component (sanitized). |
 | `sanitize` | boolean | `true` | Sanitize the icon markup. |
 | `sanitizeFn` | function, null | `null` | Custom sanitizer. |
 | `separatorIcon` | string | arrow SVG | Inline SVG between the two fields (LTR). |

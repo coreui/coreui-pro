@@ -12,9 +12,9 @@ import SelectorEngine from './dom/selector-engine.js'
 import type { ComponentConfig } from './util/config.js'
 import { applyControlGroupClasses } from './util/form-control-group.js'
 import {
-  DefaultAllowlist, escapeHtml, type SanitizerAllowList
+  DefaultAllowlist, escapeHtml, sanitizeByConfig, type SanitizerAllowList, SVGAllowlist
 } from './util/sanitizer.js'
-import { CLEANER_ICON, INDICATOR_ICON } from './util/icons.js'
+import { CLEANER_ICON, PICKER_ICON } from './util/icons.js'
 import { defineJQueryPlugin, getUID, jQueryDispatch } from './util/index.js'
 
 /**
@@ -63,14 +63,14 @@ const Default = {
   allowList: DefaultAllowlist as SanitizerAllowList,
   allowOnlyDefinedOptions: false,
   ariaCleanerLabel: 'Clear selection',
-  ariaIndicatorLabel: 'Toggle visibility of options menu',
+  ariaPickerLabel: 'Toggle visibility of options menu',
   cleaner: false,
   clearSearchOnSelect: true,
   container: false,
   disabled: false,
   highlightOptionsOnSearch: false,
   id: null,
-  indicator: false,
+  pickerIcon: false,
   invalid: false,
   name: null,
   options: false,
@@ -92,14 +92,14 @@ const DefaultType: Record<string, string> = {
   allowList: 'object',
   allowOnlyDefinedOptions: 'boolean',
   ariaCleanerLabel: 'string',
-  ariaIndicatorLabel: 'string',
+  ariaPickerLabel: 'string',
   cleaner: 'boolean',
   clearSearchOnSelect: 'boolean',
   container: '(string|element|boolean)',
   disabled: 'boolean',
   highlightOptionsOnSearch: 'boolean',
   id: '(string|null)',
-  indicator: 'boolean',
+  pickerIcon: '(string|boolean)',
   invalid: 'boolean',
   name: '(string|null)',
   options: '(array|null)',
@@ -573,7 +573,7 @@ class Autocomplete extends ComboboxBase {
   }
 
   _createButtons(): void {
-    if (!this._config.cleaner && !this._config.indicator) {
+    if (!this._config.cleaner && !this._config.pickerIcon) {
       return
     }
 
@@ -593,13 +593,16 @@ class Autocomplete extends ComboboxBase {
       this._cleanerElement = cleaner
     }
 
-    if (this._config.indicator) {
+    if (this._config.pickerIcon) {
       const indicator = document.createElement('button')
       indicator.type = 'button'
       indicator.classList.add(CLASS_NAME_INDICATOR)
       indicator.disabled = this._config.disabled
-      indicator.setAttribute('aria-label', this._config.ariaIndicatorLabel)
-      indicator.innerHTML = INDICATOR_ICON
+      indicator.setAttribute('aria-label', this._config.ariaPickerLabel)
+      indicator.innerHTML = sanitizeByConfig(
+        this._config.pickerIcon === true ? PICKER_ICON : this._config.pickerIcon,
+        { ...this._config, allowList: SVGAllowlist }
+      )
 
       buttons.append(indicator)
       this._indicatorElement = indicator

@@ -68,32 +68,32 @@ const SELECTOR_ACTION = '[data-coreui-picker-action]'
 // Icons live in JavaScript only as the fallback for the generated buttons.
 
 type DateRangePickerConfig = {
-  allowList: SanitizerAllowList
-  ariaCleanerLabel: string
-  ariaEndLabel: string
-  ariaStartLabel: string
-  ariaToggleLabel: string
-  cleaner: boolean
-  cleanerIcon: string
-  calendarOptions: Record<string, any>
-  container: Element | boolean | string
-  disabled: boolean
-  indicatorIcon: string
-  inputOptions: Record<string, any>
-  locale: string
-  maxDate: Date | string | null
-  minDate: Date | string | null
-  sanitize: boolean
-  sanitizeFn: ((unsafeHtml: string) => string) | null
-  size: string | null
-  calendars: number
-  endDate: Date | string | null
-  endFloatingLabel: string | null
-  endName: string | null
-  separatorIcon: string
-  separatorIconRtl: string
-  startDate: Date | string | null
-  startFloatingLabel: string | null
+  allowList: SanitizerAllowList,
+  ariaCleanerLabel: string,
+  ariaEndLabel: string,
+  ariaPickerLabel: string,
+  ariaStartLabel: string,
+  calendarOptions: Record<string, any>,
+  calendars: number,
+  cleaner: boolean,
+  cleanerIcon: string,
+  container: Element | boolean | string,
+  disabled: boolean,
+  endDate: Date | string | null,
+  endFloatingLabel: string | null,
+  endName: string | null,
+  inputOptions: Record<string, any>,
+  locale: string,
+  maxDate: Date | string | null,
+  minDate: Date | string | null,
+  pickerIcon: string,
+  sanitize: boolean,
+  sanitizeFn: ((unsafeHtml: string) => string) | null,
+  separatorIcon: string,
+  separatorIconRtl: string,
+  size: string | null,
+  startDate: Date | string | null,
+  startFloatingLabel: string | null,
   startName: string | null
 }
 
@@ -101,22 +101,22 @@ const Default: DateRangePickerConfig = {
   allowList: SVGAllowlist,
   ariaCleanerLabel: 'Clear the value',
   ariaEndLabel: 'End date',
+  ariaPickerLabel: 'Toggle the calendar',
   ariaStartLabel: 'Start date',
-  ariaToggleLabel: 'Toggle the calendar',
-  cleaner: true,
-  cleanerIcon: CLEANER_ICON,
   calendarOptions: {},
   calendars: 2,
+  cleaner: true,
+  cleanerIcon: CLEANER_ICON,
   container: false,
   disabled: false,
   endDate: null,
   endFloatingLabel: null,
   endName: null,
-  indicatorIcon: CALENDAR_ICON,
   inputOptions: {},
   locale: navigator.language,
   maxDate: null,
   minDate: null,
+  pickerIcon: CALENDAR_ICON,
   sanitize: true,
   sanitizeFn: null,
   separatorIcon: SEPARATOR_ICON,
@@ -131,22 +131,22 @@ const DefaultType: Record<string, string> = {
   allowList: 'object',
   ariaCleanerLabel: 'string',
   ariaEndLabel: 'string',
+  ariaPickerLabel: 'string',
   ariaStartLabel: 'string',
-  ariaToggleLabel: 'string',
-  cleaner: 'boolean',
-  cleanerIcon: 'string',
   calendarOptions: 'object',
   calendars: 'number',
+  cleaner: 'boolean',
+  cleanerIcon: 'string',
   container: '(string|element|boolean)',
   disabled: 'boolean',
   endDate: '(date|string|null)',
   endFloatingLabel: '(string|null)',
   endName: '(string|null)',
-  indicatorIcon: 'string',
   inputOptions: 'object',
   locale: 'string',
   maxDate: '(date|string|null)',
   minDate: '(date|string|null)',
+  pickerIcon: 'string',
   sanitize: 'boolean',
   sanitizeFn: '(function|null)',
   separatorIcon: 'string',
@@ -360,7 +360,7 @@ class DateRangePicker extends BaseComponent {
       inputGroup.append(this._cleanerElement)
     }
 
-    const indicator = action(CLASS_NAME_INDICATOR, this._config.indicatorIcon, this._config.ariaToggleLabel)
+    const indicator = action(CLASS_NAME_INDICATOR, this._config.pickerIcon, this._config.ariaPickerLabel)
     inputGroup.append(indicator)
     this._indicatorElement = indicator
 

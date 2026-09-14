@@ -57,39 +57,39 @@ const SELECTOR_TEMPLATE_FOOTER = 'template[data-coreui-template="footer"]'
 // Icons live in JavaScript, not in CSS masks — the chips pattern.
 
 type TimePickerConfig = {
-  allowList: SanitizerAllowList
-  ariaCleanerLabel: string
-  ariaToggleLabel: string
-  cleaner: boolean
-  cleanerIcon: string
-  container: Element | boolean | string
-  disabled: boolean
-  floatingLabel: string | null
-  indicatorIcon: string
-  inputOptions: Record<string, any>
-  locale: string
-  name: string | null
-  sanitize: boolean
-  sanitizeFn: ((unsafeHtml: string) => string) | null
-  selectionOptions: Record<string, any>
-  size: string | null
-  time: Date | string | null
+  allowList: SanitizerAllowList,
+  ariaCleanerLabel: string,
+  ariaPickerLabel: string,
+  cleaner: boolean,
+  cleanerIcon: string,
+  container: Element | boolean | string,
+  disabled: boolean,
+  floatingLabel: string | null,
+  inputOptions: Record<string, any>,
+  locale: string,
+  name: string | null,
+  pickerIcon: string,
+  sanitize: boolean,
+  sanitizeFn: ((unsafeHtml: string) => string) | null,
+  selectionOptions: Record<string, any>,
+  size: string | null,
+  time: Date | string | null,
   variant: string
 }
 
 const Default: TimePickerConfig = {
   allowList: SVGAllowlist,
   ariaCleanerLabel: 'Clear the value',
-  ariaToggleLabel: 'Toggle the time selection',
+  ariaPickerLabel: 'Toggle the time selection',
   cleaner: true,
   cleanerIcon: CLEANER_ICON,
   container: false,
   disabled: false,
   floatingLabel: null,
-  indicatorIcon: CLOCK_ICON,
   inputOptions: {},
   locale: navigator.language,
   name: null,
+  pickerIcon: CLOCK_ICON,
   sanitize: true,
   sanitizeFn: null,
   selectionOptions: {},
@@ -101,16 +101,16 @@ const Default: TimePickerConfig = {
 const DefaultType: Record<string, string> = {
   allowList: 'object',
   ariaCleanerLabel: 'string',
-  ariaToggleLabel: 'string',
+  ariaPickerLabel: 'string',
   cleaner: 'boolean',
   cleanerIcon: 'string',
   container: '(string|element|boolean)',
   disabled: 'boolean',
   floatingLabel: '(string|null)',
-  indicatorIcon: 'string',
   inputOptions: 'object',
   locale: 'string',
   name: '(string|null)',
+  pickerIcon: 'string',
   sanitize: 'boolean',
   sanitizeFn: '(function|null)',
   selectionOptions: 'object',
@@ -280,7 +280,7 @@ class TimePicker extends BaseComponent {
       inputGroup.append(this._cleanerElement)
     }
 
-    const indicator = action(CLASS_NAME_INDICATOR, this._config.indicatorIcon, this._config.ariaToggleLabel)
+    const indicator = action(CLASS_NAME_INDICATOR, this._config.pickerIcon, this._config.ariaPickerLabel)
     inputGroup.append(indicator)
     this._indicatorElement = indicator
 

@@ -127,7 +127,7 @@ describe('DatePicker', () => {
 
     it('should accept a custom indicator icon and sanitize it', () => {
       buildPicker({
-        indicatorIcon: '<svg xmlns="http://www.w3.org/2000/svg"><script>window.hacked = true</script><circle r="8" /></svg>'
+        pickerIcon: '<svg xmlns="http://www.w3.org/2000/svg"><script>window.hacked = true</script><circle r="8" /></svg>'
       })
 
       const indicator = fixtureEl.querySelector('.form-control-action')

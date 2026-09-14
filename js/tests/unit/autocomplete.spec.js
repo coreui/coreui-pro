@@ -130,7 +130,7 @@ describe('Autocomplete', () => {
     it('should create autocomplete with indicator button when indicator option is true', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
-      const autocomplete = new Autocomplete(autocompleteEl, { indicator: true, options: [] })
+      const autocomplete = new Autocomplete(autocompleteEl, { pickerIcon: true, options: [] })
 
       expect(autocomplete._indicatorElement).toBeTruthy()
       expect(autocomplete._indicatorElement.classList.contains('form-control-action')).toBe(true)
@@ -180,7 +180,7 @@ describe('Autocomplete', () => {
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
       const autocomplete = new Autocomplete(autocompleteEl, {
         disabled: true,
-        indicator: true,
+        pickerIcon: true,
         options: []
       })
 
@@ -2237,7 +2237,7 @@ describe('Autocomplete', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
       const autocomplete = new Autocomplete(autocompleteEl, {
-        indicator: true,
+        pickerIcon: true,
         options: [{ label: 'Option 1', value: '1' }]
       })
 
@@ -2258,7 +2258,7 @@ describe('Autocomplete', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
       const autocomplete = new Autocomplete(autocompleteEl, {
-        indicator: true,
+        pickerIcon: true,
         options: [{ label: 'Option 1', value: '1' }]
       })
 
@@ -2343,7 +2343,7 @@ describe('Autocomplete', () => {
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
       const autocomplete = new Autocomplete(autocompleteEl, {
         cleaner: true,
-        indicator: true,
+        pickerIcon: true,
         options: [{ label: 'Option 1', value: '1' }]
       })
 

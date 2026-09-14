@@ -212,7 +212,7 @@ If you prefer to show a counter indicating the number of selected options, add t
 
 When `multiple` is enabled, a **select all** button is rendered in the dropdown header (toggle it with the `selectAll` option, on by default). The button works as a toggle: it selects every option and its label switches to `deselectAllLabel`, then deselects everything on the next click.
 
-With the default `optionsStyle: 'checkbox'` the button shows the same tri-state indicator as the options and mirrors the overall selection — `none` when nothing is selected, `all` when everything is, and `indeterminate` in between; `aria-pressed` carries the same three states. With `optionsStyle: 'text'` the button is a plain text toggle. It sits in the panel header, outside the options list, so <kbd>Tab</kbd> reaches it — the arrows stay on the options.
+With the default `indicator: 'checkbox'` the button shows the same tri-state indicator as the options and mirrors the overall selection — `none` when nothing is selected, `all` when everything is, and `indeterminate` in between; `aria-pressed` carries the same three states. With `indicator: 'none'` the button is a plain text toggle. It sits in the panel header, outside the options list, so <kbd>Tab</kbd> reaches it — the arrows stay on the options.
 
 <Example pro code={`<select id="multiSelectSelectAll" data-coreui-multi-select multiple data-coreui-search="true">
     <option value="0">Angular</option>
@@ -388,7 +388,7 @@ We use the following JavaScript to set up our multi-select:
 
 <AddedIn version="5.26.0" />
 
-Enable `optionsGroupsSelectable` to turn each group label into its own tri-state button (`aria-pressed` `false` / `mixed` / `true`) that toggles the group's visible options. Because the indicator is rendered with CSS, it supports a third, `indeterminate` state — shown when only some of a group's options are selected — without any real `<input />` element. The same tri-state logic drives the header [select all](#select-all) button. Group labels join the arrow-key order, and the indicator on options, groups and select all follows the one `optionsStyle` option; the whole feature requires `multiple`.
+Enable `optionsGroupsSelectable` to turn each group label into its own tri-state button (`aria-pressed` `false` / `mixed` / `true`) that toggles the group's visible options. Because the indicator is rendered with CSS, it supports a third, `indeterminate` state — shown when only some of a group's options are selected — without any real `<input />` element. The same tri-state logic drives the header [select all](#select-all) button. Group labels join the arrow-key order, and the indicator on options, groups and select all follows the one `indicator` option; the whole feature requires `multiple`.
 
 <Example pro code={`<select id="myMultiSelectIndeterminate" data-coreui-multi-select></select>`} sandboxJs={multiSelectIndeterminate} />
 
@@ -512,7 +512,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | --- | --- | --- | --- |
 | `allowList` | object | `DefaultAllowlist` | Object containing allowed tags and attributes for HTML sanitization when using custom templates. |
 | `ariaCleanerLabel`| string | `Clear all selections` | A string that provides an accessible label for the cleaner button. This label is read by screen readers to describe the action associated with the button. |
-| `ariaIndicatorLabel` | string | `'Toggle visibility of options menu'` | Accessible label of the indicator button. |
+| `ariaPickerLabel` | string | `'Toggle visibility of options menu'` | Accessible label of the picker button. |
 | `ariaSearchLabel`| string | `Search` | Accessible label for the search input (when `search` is enabled). |
 | `ariaTagDeleteLabel`| string | `Remove` | Accessible label prefix for a tag's delete button (selection type `tags`). The selected option's text is appended, so screen readers announce e.g. "Remove Angular". |
 | `cleaner`| boolean | `true` | Enables selection cleaner element. |
@@ -523,6 +523,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `disabled` | boolean | `false` | Toggle the disabled state for the component. |
 | `headerTemplate` | function, null | `null` | Custom template function for rendering the dropdown header (the area above the options list). Renders independently of `selectAll`. Receives a `state` object (`{ selected, total, filtered, filteredSelected }`) and an `actions` object (`{ selectAll, deselectAll, selectFiltered, deselectFiltered }`) with bound component methods. Return an `HTMLElement` (wire your own listeners using `actions`, supports multiple controls) or an HTML string (sanitized, no actions wired). Re-renders on every selection change and search filter. |
 | `hideSelectAllOnSearchNoResults` | boolean | `true` | Hides the dropdown header with the built-in select all button when a search filter leaves no matching options. Set to `false` to keep the select all button visible even when there are no results. |
+| `indicator` | string | `'checkbox'` | Sets the marker used by the options, the selectable group labels and the select all button: `'checkbox'` or `'none'`. |
 | `invalid` | boolean | `false` | Toggle the invalid state for the component. |
 | `multiple` | boolean | `true` | It specifies that multiple options can be selected at once. |
 | `name` | string, null | `null` | Set the name attribute for the native select element. |
@@ -530,7 +531,6 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `optionsGroupsSelectable` | boolean | `false` | When enabled (with `multiple`), each option group label becomes a tri-state button: clicking it toggles the group's visible options, and it reflects `none` / `all` / `indeterminate` based on the group's selected options. |
 | `optionsGroupsTemplate` | function, null | `null` | Custom template function for rendering option group labels. Receives the group object as parameter. |
 | `optionsMaxHeight` | number, string | `'auto'` | Sets `max-height` of options list.	 |
-| `optionsStyle` | string | `'checkbox'` | Sets the indicator used by the options, the selectable group labels and the select all button: `'checkbox'` or `'text'`. |
 | `optionsTemplate` | function, null | `null` | Custom template function for rendering individual options. Receives the option object as parameter. |
 | `placeholder` | string | `'Select...'` | Specifies a short hint that is visible in the input. |
 | `required` | boolean | `false` | Makes the input field required for form validation. |

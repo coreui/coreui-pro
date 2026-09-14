@@ -12,8 +12,10 @@ import Data from './dom/data.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import type { ComponentConfig } from './util/config.js'
-import { CLEANER_ICON, INDICATOR_ICON } from './util/icons.js'
-import { DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList } from './util/sanitizer.js'
+import { CLEANER_ICON, PICKER_ICON } from './util/icons.js'
+import {
+  DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList, SVGAllowlist
+} from './util/sanitizer.js'
 import { defineJQueryPlugin, getUID, jQueryDispatch } from './util/index.js'
 
 /**
@@ -76,7 +78,7 @@ const CLASS_NAME_SHOW = 'show'
 const Default = {
   allowList: DefaultAllowlist as SanitizerAllowList,
   ariaCleanerLabel: 'Clear all selections',
-  ariaIndicatorLabel: 'Toggle visibility of options menu',
+  ariaPickerLabel: 'Toggle visibility of options menu',
   ariaSearchLabel: 'Search',
   ariaTagDeleteLabel: 'Remove',
   cleaner: true,
@@ -88,6 +90,7 @@ const Default = {
   headerTemplate: null,
   hideSelectAllOnSearchNoResults: true,
   id: null,
+  indicator: 'checkbox',
   invalid: false,
   multiple: true,
   name: null,
@@ -95,8 +98,8 @@ const Default = {
   optionsGroupsSelectable: false,
   optionsGroupsTemplate: null,
   optionsMaxHeight: 'auto',
-  optionsStyle: 'checkbox',
   optionsTemplate: null,
+  pickerIcon: true,
   placeholder: 'Select...',
   required: false,
   sanitize: true,
@@ -117,7 +120,7 @@ const Default = {
 const DefaultType: Record<string, string> = {
   allowList: 'object',
   ariaCleanerLabel: 'string',
-  ariaIndicatorLabel: 'string',
+  ariaPickerLabel: 'string',
   ariaSearchLabel: 'string',
   ariaTagDeleteLabel: 'string',
   cleaner: 'boolean',
@@ -129,6 +132,7 @@ const DefaultType: Record<string, string> = {
   headerTemplate: '(function|null)',
   hideSelectAllOnSearchNoResults: 'boolean',
   id: '(string|null)',
+  indicator: 'string',
   invalid: 'boolean',
   multiple: 'boolean',
   name: '(string|null)',
@@ -136,8 +140,8 @@ const DefaultType: Record<string, string> = {
   optionsGroupsSelectable: 'boolean',
   optionsGroupsTemplate: '(function|null)',
   optionsMaxHeight: '(number|string)',
-  optionsStyle: 'string',
   optionsTemplate: '(function|null)',
+  pickerIcon: '(string|boolean)',
   placeholder: 'string',
   required: 'boolean',
   sanitize: 'boolean',
@@ -754,8 +758,11 @@ class MultiSelect extends ComboboxBase {
     indicator.type = 'button'
     indicator.classList.add('form-control-action')
     indicator.disabled = this._config.disabled
-    indicator.setAttribute('aria-label', this._config.ariaIndicatorLabel)
-    indicator.innerHTML = INDICATOR_ICON
+    indicator.setAttribute('aria-label', this._config.ariaPickerLabel)
+    indicator.innerHTML = sanitizeByConfig(
+      this._config.pickerIcon === true ? PICKER_ICON : this._config.pickerIcon,
+      { ...this._config, allowList: SVGAllowlist }
+    )
 
     this._togglerElement.append(indicator)
 
@@ -840,7 +847,7 @@ class MultiSelect extends ComboboxBase {
   override _getListBoxConfig(): any {
     return {
       ...super._getListBoxConfig(),
-      indicator: this._config.optionsStyle === 'checkbox' ? 'checkbox' : 'none',
+      indicator: this._config.indicator,
       sectionsSelectable: this._config.optionsGroupsSelectable,
       selectionLimit: this._config.selectionLimit,
       selectionMode: this._config.multiple ? 'multiple' : 'single'

@@ -221,7 +221,7 @@ describe('date time picker', () => {
 describe('autocomplete', () => {
   it('with value', async () => {
     const ac = new Autocomplete(mount(), {
-      options: OPTIONS, value: 'Bootstrap', cleaner: true, indicator: true
+      options: OPTIONS, value: 'Bootstrap', cleaner: true, pickerIcon: true
     })
     await shoot(frame(), 'autocomplete-value')
     ac.dispose()
@@ -229,7 +229,7 @@ describe('autocomplete', () => {
 
   it('disabled', async () => {
     const ac = new Autocomplete(mount(), {
-      options: OPTIONS, value: 'Vue', indicator: true, disabled: true
+      options: OPTIONS, value: 'Vue', pickerIcon: true, disabled: true
     })
     await shoot(frame(), 'autocomplete-disabled')
     ac.dispose()
@@ -237,7 +237,7 @@ describe('autocomplete', () => {
 
   it('invalid', async () => {
     const ac = new Autocomplete(mount(), {
-      options: OPTIONS, value: 'Vue', cleaner: true, indicator: true, invalid: true
+      options: OPTIONS, value: 'Vue', cleaner: true, pickerIcon: true, invalid: true
     })
     await shoot(frame(), 'autocomplete-invalid')
     ac.dispose()
@@ -251,7 +251,7 @@ describe('autocomplete', () => {
 
   it('open', async () => {
     const ac = new Autocomplete(mount(), {
-      options: OPTIONS, value: 'React', cleaner: true, indicator: true
+      options: OPTIONS, value: 'React', cleaner: true, pickerIcon: true
     })
     ac.show()
     await shoot(frame(), 'autocomplete-open')
@@ -259,7 +259,7 @@ describe('autocomplete', () => {
   })
 
   it('open popup', async () => {
-    const ac = new Autocomplete(mount(), { options: OPTIONS, indicator: true })
+    const ac = new Autocomplete(mount(), { options: OPTIONS, pickerIcon: true })
     ac.show()
     await shoot(popup(), 'autocomplete-popup', { tolerant: true })
     ac.dispose()

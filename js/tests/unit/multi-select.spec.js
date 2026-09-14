@@ -607,7 +607,7 @@ describe('MultiSelect', () => {
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, {
         options: [{ value: '1', text: 'Opt 1' }],
-        optionsStyle: 'checkbox'
+        indicator: 'checkbox'
       })
 
       const optionEl = multiSelect._optionsElement.querySelector('.list-box-option')
@@ -2054,10 +2054,10 @@ describe('MultiSelect', () => {
       expect(label.querySelector('.list-box-option-indicator')).not.toBeNull()
     })
 
-    it('should leave the indicator off group labels when optionsStyle is text', () => {
+    it('should leave the indicator off group labels when the indicator is none', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
-      const multiSelect = new MultiSelect(selectEl, { options: groupedOptions, optionsGroupsSelectable: true, optionsStyle: 'text' })
+      const multiSelect = new MultiSelect(selectEl, { options: groupedOptions, optionsGroupsSelectable: true, indicator: 'none' })
 
       const label = multiSelect._menu.querySelector('.list-box-section-label')
       expect(label.getAttribute('role')).toBe('button')
@@ -2146,10 +2146,10 @@ describe('MultiSelect', () => {
       expect(multiSelect._selectAllElement.querySelector('.list-box-option-indicator')).not.toBeNull()
     })
 
-    it('should leave the indicator off when optionsStyle is text', () => {
+    it('should leave the indicator off when the indicator is none', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
-      const multiSelect = new MultiSelect(selectEl, { options, optionsStyle: 'text' })
+      const multiSelect = new MultiSelect(selectEl, { options, indicator: 'none' })
 
       expect(multiSelect._selectAllElement.querySelector('.list-box-option-indicator')).toBeNull()
     })
@@ -4834,7 +4834,7 @@ describe('MultiSelect', () => {
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, {
         options: [{ value: '1', text: 'Opt 1' }],
-        ariaIndicatorLabel: 'Toggle menu'
+        ariaPickerLabel: 'Toggle menu'
       })
 
       expect(multiSelect._indicatorElement.getAttribute('aria-label')).toBe('Toggle menu')

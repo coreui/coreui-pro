@@ -71,44 +71,44 @@ const SELECTOR_ACTION_TODAY = '[data-coreui-picker-action="today"]'
 // author who writes the toggle or the cleaner puts the SVG in the HTML.
 
 type DatePickerConfig = {
-  allowList: SanitizerAllowList
-  ariaCleanerLabel: string
-  ariaToggleLabel: string
-  cleaner: boolean
-  cleanerIcon: string
-  calendarOptions: Record<string, any>
-  container: Element | boolean | string
-  disabled: boolean
-  floatingLabel: string | null
-  indicatorIcon: string
-  inputOptions: Record<string, any>
-  locale: string
-  maxDate: Date | string | null
-  minDate: Date | string | null
-  sanitize: boolean
-  sanitizeFn: ((unsafeHtml: string) => string) | null
+  allowList: SanitizerAllowList,
+  ariaCleanerLabel: string,
+  ariaPickerLabel: string,
+  calendarOptions: Record<string, any>,
+  cleaner: boolean,
+  cleanerIcon: string,
+  container: Element | boolean | string,
+  date: Date | string | null,
+  disabled: boolean,
+  floatingLabel: string | null,
+  inputOptions: Record<string, any>,
+  locale: string,
+  maxDate: Date | string | null,
+  minDate: Date | string | null,
+  name: string | null,
+  pickerIcon: string,
+  sanitize: boolean,
+  sanitizeFn: ((unsafeHtml: string) => string) | null,
   size: string | null
-  date: Date | string | null
-  name: string | null
 }
 
 const Default: DatePickerConfig = {
   allowList: SVGAllowlist,
   ariaCleanerLabel: 'Clear the value',
-  ariaToggleLabel: 'Toggle the calendar',
+  ariaPickerLabel: 'Toggle the calendar',
+  calendarOptions: {},
   cleaner: true,
   cleanerIcon: CLEANER_ICON,
-  calendarOptions: {},
   container: false,
   date: null,
   disabled: false,
   floatingLabel: null,
-  indicatorIcon: CALENDAR_ICON,
   inputOptions: {},
   locale: navigator.language,
   maxDate: null,
   minDate: null,
   name: null,
+  pickerIcon: CALENDAR_ICON,
   sanitize: true,
   sanitizeFn: null,
   size: null
@@ -117,20 +117,20 @@ const Default: DatePickerConfig = {
 const DefaultType: Record<string, string> = {
   allowList: 'object',
   ariaCleanerLabel: 'string',
-  ariaToggleLabel: 'string',
+  ariaPickerLabel: 'string',
+  calendarOptions: 'object',
   cleaner: 'boolean',
   cleanerIcon: 'string',
-  calendarOptions: 'object',
   container: '(string|element|boolean)',
   date: '(date|string|null)',
   disabled: 'boolean',
   floatingLabel: '(string|null)',
-  indicatorIcon: 'string',
   inputOptions: 'object',
   locale: 'string',
   maxDate: '(date|string|null)',
   minDate: '(date|string|null)',
   name: '(string|null)',
+  pickerIcon: 'string',
   sanitize: 'boolean',
   sanitizeFn: '(function|null)',
   size: '(string|null)'
@@ -339,9 +339,9 @@ class DatePicker extends BaseComponent {
     const ownToggle = SelectorEngine.findOne(SELECTOR_ROLE_TOGGLE, inputGroup)
 
     if (ownToggle) {
-      this._toggleElement = this._adoptAction(ownToggle, this._config.ariaToggleLabel)
+      this._toggleElement = this._adoptAction(ownToggle, this._config.ariaPickerLabel)
     } else {
-      this._toggleElement = action(CLASS_NAME_INDICATOR, this._config.indicatorIcon, this._config.ariaToggleLabel)
+      this._toggleElement = action(CLASS_NAME_INDICATOR, this._config.pickerIcon, this._config.ariaPickerLabel)
       this._created.toggle = true
       inputGroup.append(this._toggleElement)
     }

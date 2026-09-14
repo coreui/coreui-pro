@@ -64,46 +64,46 @@ const SELECTOR_TEMPLATE_FOOTER = 'template[data-coreui-template="footer"]'
 // Icons live in JavaScript, not in CSS masks — the chips pattern.
 
 type DateTimePickerConfig = {
-  allowList: SanitizerAllowList
-  ariaCleanerLabel: string
-  ariaToggleLabel: string
-  cleaner: boolean
-  cleanerIcon: string
-  calendarOptions: Record<string, any>
-  container: Element | boolean | string
-  disabled: boolean
-  floatingLabel: string | null
-  indicatorIcon: string
-  inputOptions: Record<string, any>
-  locale: string
-  maxDate: Date | string | null
-  minDate: Date | string | null
-  sanitize: boolean
-  sanitizeFn: ((unsafeHtml: string) => string) | null
-  size: string | null
-  date: Date | string | null
-  name: string | null
-  selectionOptions: Record<string, any>
+  allowList: SanitizerAllowList,
+  ariaCleanerLabel: string,
+  ariaPickerLabel: string,
+  calendarOptions: Record<string, any>,
+  cleaner: boolean,
+  cleanerIcon: string,
+  container: Element | boolean | string,
+  date: Date | string | null,
+  disabled: boolean,
+  floatingLabel: string | null,
+  inputOptions: Record<string, any>,
+  locale: string,
+  maxDate: Date | string | null,
+  minDate: Date | string | null,
+  name: string | null,
+  pickerIcon: string,
+  sanitize: boolean,
+  sanitizeFn: ((unsafeHtml: string) => string) | null,
+  selectionOptions: Record<string, any>,
+  size: string | null,
   variant: string
 }
 
 const Default: DateTimePickerConfig = {
   allowList: SVGAllowlist,
   ariaCleanerLabel: 'Clear the value',
-  ariaToggleLabel: 'Toggle the calendar',
+  ariaPickerLabel: 'Toggle the calendar',
+  calendarOptions: {},
   cleaner: true,
   cleanerIcon: CLEANER_ICON,
-  calendarOptions: {},
   container: false,
   date: null,
   disabled: false,
   floatingLabel: null,
-  indicatorIcon: CALENDAR_ICON,
   inputOptions: {},
   locale: navigator.language,
   maxDate: null,
   minDate: null,
   name: null,
+  pickerIcon: CALENDAR_ICON,
   sanitize: true,
   sanitizeFn: null,
   selectionOptions: {},
@@ -114,20 +114,20 @@ const Default: DateTimePickerConfig = {
 const DefaultType: Record<string, string> = {
   allowList: 'object',
   ariaCleanerLabel: 'string',
-  ariaToggleLabel: 'string',
+  ariaPickerLabel: 'string',
+  calendarOptions: 'object',
   cleaner: 'boolean',
   cleanerIcon: 'string',
-  calendarOptions: 'object',
   container: '(string|element|boolean)',
   date: '(date|string|null)',
   disabled: 'boolean',
   floatingLabel: '(string|null)',
-  indicatorIcon: 'string',
   inputOptions: 'object',
   locale: 'string',
   maxDate: '(date|string|null)',
   minDate: '(date|string|null)',
   name: '(string|null)',
+  pickerIcon: 'string',
   sanitize: 'boolean',
   sanitizeFn: '(function|null)',
   selectionOptions: 'object',
@@ -302,7 +302,7 @@ class DateTimePicker extends BaseComponent {
       inputGroup.append(this._cleanerElement)
     }
 
-    const indicator = action(CLASS_NAME_INDICATOR, this._config.indicatorIcon, this._config.ariaToggleLabel)
+    const indicator = action(CLASS_NAME_INDICATOR, this._config.pickerIcon, this._config.ariaPickerLabel)
     inputGroup.append(indicator)
     this._indicatorElement = indicator
 

@@ -303,20 +303,20 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `allowList` | object | `DefaultAllowlist` | Object containing allowed tags and attributes for HTML sanitization when using custom templates. |
 | `allowOnlyDefinedOptions` | boolean | `false` | Restricts selection to only predefined options when set to `true`. |
 | `ariaCleanerLabel` | string | `'Clear selection'` | Accessible label for the cleaner button, read by screen readers. |
-| `ariaIndicatorLabel` | string | `'Toggle visibility of options menu'` | Accessible label for the indicator button, read by screen readers. |
+| `ariaPickerLabel` | string | `'Toggle visibility of options menu'` | Accessible label for the picker button, read by screen readers. |
 | `cleaner` | boolean | `false` | Enables the selection cleaner button. |
 | `clearSearchOnSelect` | boolean | `true` | Clears the search input when an option is selected. |
 | `container` | string, element, boolean | `false` | Appends the dropdown to a specific element. Example: `container: 'body'`. |
 | `disabled` | boolean | `false` | Disables the component when set to `true`. |
 | `highlightOptionsOnSearch` | boolean | `false` | Highlights matching text in options during search. |
 | `id` | string, null | `null` | Sets a custom ID for the component. If not provided, a unique ID is auto-generated. |
-| `indicator` | boolean | `false` | Enables the selection indicator button. |
 | `invalid` | boolean | `false` | Applies invalid styling to the component. |
 | `name` | string, null | `null` | Sets the name attribute for the input element. |
 | `options` | boolean, array | `false` | Array of options or option objects to populate the dropdown. |
 | `optionsGroupsTemplate` | function, null | `null` | Custom template function for rendering option group labels. Receives the group object as parameter. |
 | `optionsMaxHeight` | number, string | `'auto'` | Sets the maximum height of the options dropdown. |
 | `optionsTemplate` | function, null | `null` | Custom template function for rendering individual options. Receives the option object as parameter. |
+| `pickerIcon` | string, boolean | `false` | The button that opens the options menu: `true` for the built-in icon, an inline SVG string for your own (sanitized), `false` for no button. |
 | `placeholder` | string, null | `null` | Placeholder text displayed in the input field. |
 | `required` | boolean | `false` | Makes the input field required for form validation. |
 | `sanitize` | boolean | `true` | Enables HTML sanitization for custom templates to prevent XSS attacks. |
