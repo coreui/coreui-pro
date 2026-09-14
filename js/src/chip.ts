@@ -207,6 +207,10 @@ class Chip extends BaseComponent {
         return
       }
 
+      if (event.shiftKey && this._element.getAttribute('role') === 'option') {
+        return
+      }
+
       this.toggle()
     })
 

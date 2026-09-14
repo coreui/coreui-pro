@@ -29,7 +29,17 @@ const EVENT_ADD = 'add'
 const EVENT_REMOVE = 'remove'
 const EVENT_CHANGE = 'change'
 const EVENT_SELECT = 'select'
+const EVENT_CLICK = 'click'
 const EVENT_KEYDOWN = 'keydown'
+
+const A_KEY = 'a'
+const ARROW_LEFT_KEY = 'ArrowLeft'
+const ARROW_RIGHT_KEY = 'ArrowRight'
+const END_KEY = 'End'
+const HOME_KEY = 'Home'
+const SPACE_KEY = ' '
+
+const TYPEAHEAD_TIMEOUT = 500
 
 const EVENT_CHIP_SELECTED = 'selected.coreui.chip'
 const EVENT_CHIP_DESELECTED = 'deselected.coreui.chip'
@@ -60,6 +70,7 @@ export type ChipSetConfig = {
   selectable: boolean
   selectedIcon: string
   selectionMode: string
+  typeahead: boolean
   unique: boolean
 }
 
@@ -76,6 +87,7 @@ const Default: ChipSetConfig = {
   selectable: false,
   selectedIcon: CHECK_ICON,
   selectionMode: 'multiple',
+  typeahead: true,
   unique: false
 }
 
@@ -92,6 +104,7 @@ const DefaultType: Record<string, string> = {
   selectable: 'boolean',
   selectedIcon: 'string',
   selectionMode: 'string',
+  typeahead: 'boolean',
   unique: 'boolean'
 }
 
@@ -105,6 +118,9 @@ class ChipSet extends BaseComponent {
   protected declare _chips: string[]
   protected declare _input: HTMLElement | null
   protected declare _liveRegion: HTMLElement | null
+  protected declare _anchor: HTMLElement | null
+  protected declare _search: string
+  protected declare _searchTimeout: ReturnType<typeof setTimeout> | null
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
@@ -113,6 +129,9 @@ class ChipSet extends BaseComponent {
     this._pendingFocus = null
     this._chips = []
     this._liveRegion = null
+    this._anchor = null
+    this._search = ''
+    this._searchTimeout = null
 
     this._applyAccessibilityRoles()
     this._initChips()
@@ -270,6 +289,10 @@ class ChipSet extends BaseComponent {
 
   override dispose(): void {
     EventHandler.off(this._element, Chip.EVENT_KEY)
+
+    if (this._searchTimeout) {
+      clearTimeout(this._searchTimeout)
+    }
 
     if (this._liveRegion) {
       this._liveRegion.remove()
@@ -430,6 +453,7 @@ class ChipSet extends BaseComponent {
 
   _addEventListeners(): void {
     EventHandler.on(this._element, this.constructor.eventName(EVENT_KEYDOWN), SELECTOR_CHIP, event => this._handleKeydown(event))
+    EventHandler.on(this._element, this.constructor.eventName(EVENT_CLICK), SELECTOR_CHIP, event => this._handleClick(event))
 
     EventHandler.on(this._element, EVENT_CHIP_SELECTED, SELECTOR_CHIP, event => this._handleSelectionChange(event))
     EventHandler.on(this._element, EVENT_CHIP_DESELECTED, SELECTOR_CHIP, event => this._handleSelectionChange(event))
@@ -443,47 +467,132 @@ class ChipSet extends BaseComponent {
       return
     }
 
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === A_KEY) {
+      if (this._selectsRange()) {
+        event.preventDefault()
+        this.selectAll()
+      }
+
+      return
+    }
+
     switch (event.key) {
-      case 'ArrowLeft': {
+      case ARROW_LEFT_KEY: {
         event.preventDefault()
         // In RTL the visual direction is mirrored, so ArrowLeft moves to the next chip.
-        this._focusSibling(chip as HTMLElement, isRTL())
+        this._moveFocus(this._focusSibling(chip as HTMLElement, isRTL()), event.shiftKey)
         break
       }
 
-      case 'ArrowRight': {
+      case ARROW_RIGHT_KEY: {
         event.preventDefault()
-        this._focusSibling(chip as HTMLElement, !isRTL())
+        this._moveFocus(this._focusSibling(chip as HTMLElement, !isRTL()), event.shiftKey)
         break
       }
 
-      case 'Home': {
+      case HOME_KEY: {
         event.preventDefault()
-        this._navigateToEdge(0)
+        this._moveFocus(this._navigateToEdge(0), event.shiftKey)
         break
       }
 
-      case 'End': {
+      case END_KEY: {
         event.preventDefault()
-        this._navigateToEdge(-1)
+        this._moveFocus(this._navigateToEdge(-1), event.shiftKey)
         break
       }
 
-      // No default
+      default: {
+        this._typeahead(event.key)
+      }
     }
   }
 
-  _focusSibling(chip: HTMLElement, shouldGetNext: boolean): void {
+  _handleClick(event: any): void {
+    const chip = (event.target as HTMLElement).closest(SELECTOR_CHIP) as HTMLElement | null
+    if (!chip || chip.classList.contains(CLASS_NAME_DISABLED) || (event.target as HTMLElement).closest(SELECTOR_CHIP_REMOVE)) {
+      return
+    }
+
+    if (event.shiftKey && this._selectsRange()) {
+      this._selectRange(this._anchor ?? chip, chip)
+      return
+    }
+
+    this._anchor = chip
+  }
+
+  _selectsRange(): boolean {
+    return this._config.selectable && this._config.selectionMode !== SELECTION_MODE_SINGLE
+  }
+
+  _moveFocus(target: HTMLElement | null, extend: boolean): void {
+    if (!target) {
+      return
+    }
+
+    if (extend && this._selectsRange()) {
+      this._selectRange(this._anchor ?? target, target)
+      return
+    }
+
+    this._anchor = target
+  }
+
+  _selectRange(from: HTMLElement, to: HTMLElement): void {
+    const chips = this._getFocusableChips()
+    const start = chips.indexOf(from)
+    const end = chips.indexOf(to)
+
+    if (end === -1) {
+      return
+    }
+
+    const first = Math.min(start === -1 ? end : start, end)
+    const last = Math.max(start === -1 ? end : start, end)
+
+    for (const chip of chips.slice(first, last + 1)) {
+      Chip.getInstance(chip)?.select()
+    }
+  }
+
+  _typeahead(key: string): void {
+    if (!this._config.typeahead || key.length !== 1 || key === SPACE_KEY) {
+      return
+    }
+
+    if (this._searchTimeout) {
+      clearTimeout(this._searchTimeout)
+    }
+
+    this._search += key.toLowerCase()
+    this._searchTimeout = setTimeout(() => {
+      this._search = ''
+    }, TYPEAHEAD_TIMEOUT)
+
+    const chips = this._getFocusableChips()
+    const current = chips.indexOf(document.activeElement as HTMLElement)
+    const start = this._search.length > 1 ? Math.max(current, 0) : current + 1
+    const ordered = [...chips.slice(start), ...chips.slice(0, start)]
+    const match = ordered.find(chip => this._getChipValue(chip).toLowerCase().startsWith(this._search))
+
+    match?.focus()
+  }
+
+  _focusSibling(chip: HTMLElement, shouldGetNext: boolean): HTMLElement | null {
     const chips = this._getFocusableChips()
     if (chips.length === 0) {
-      return
+      return null
     }
 
     // No cycling: navigation stops at the edges.
     const sibling = getNextActiveElement(chips, chip, shouldGetNext, false)
     if (sibling && sibling !== chip) {
       sibling.focus()
+      return sibling
     }
+
+    return null
   }
 
   _getRemovalNeighbor(chip: HTMLElement): HTMLElement | null {
@@ -502,9 +611,11 @@ class ChipSet extends BaseComponent {
     return previous && previous !== chip ? previous : null
   }
 
-  _navigateToEdge(targetIndex: number): void {
+  _navigateToEdge(targetIndex: number): HTMLElement | null {
     const chips = this._getFocusableChips()
-    chips[targetIndex < 0 ? chips.length + targetIndex : targetIndex]?.focus()
+    const target = chips[targetIndex < 0 ? chips.length + targetIndex : targetIndex] ?? null
+    target?.focus()
+    return target
   }
 
   _handleSelectionChange(event: any): void {
