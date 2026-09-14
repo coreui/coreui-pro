@@ -224,8 +224,12 @@ class Transfer extends BaseComponent {
     return this._values(this._sides[SIDE_TARGET])
   }
 
-  getSelected(side: string): string[] {
-    return this._sides[side].listBox.getSelected()
+  getSelectedValues(side: string): string[] {
+    if (!(side in this._sides)) {
+      throw new TypeError(`${NAME.toUpperCase()}: Method "getSelectedValues" expects one of ${Object.keys(this._sides).join(', ')}, but received "${side}".`)
+    }
+
+    return this._sides[side].listBox.getSelectedValues()
   }
 
   setItems(items: ListBoxEntry[]): void {
@@ -579,7 +583,7 @@ class Transfer extends BaseComponent {
       const side = this._moveSide(kind)
       const from = this._sides[side === SIDE_TARGET ? SIDE_SOURCE : SIDE_TARGET]
       const blocked = this._config.disabled || (side === SIDE_SOURCE && this._config.oneWay)
-      const movable = this._movesAll(kind) ? this._movableValues(from).length : from.listBox.getSelected().length
+      const movable = this._movesAll(kind) ? this._movableValues(from).length : from.listBox.getSelectedValues().length
 
       button.disabled = blocked || movable === 0
     }
@@ -592,7 +596,7 @@ class Transfer extends BaseComponent {
 
     const to = this._sides[side]
     const from = this._sides[side === SIDE_TARGET ? SIDE_SOURCE : SIDE_TARGET]
-    const wanted = values ?? from.listBox.getSelected()
+    const wanted = values ?? from.listBox.getSelectedValues()
     const options = this._options(from).filter(option => wanted.includes(this._optionValue(option)))
 
     if (options.length === 0) {

@@ -281,7 +281,7 @@ class ListBox extends BaseComponent {
   }
 
   clear(): void {
-    const values = this.getSelected()
+    const values = this.getSelectedValues()
     let changed = false
 
     for (const value of values) {
@@ -293,12 +293,12 @@ class ListBox extends BaseComponent {
     }
   }
 
-  getSelected(): string[] {
+  getSelectedValues(): string[] {
     return [...this._selected]
   }
 
   setItems(items: ListBoxEntry[]): void {
-    const previous = this.getSelected()
+    const previous = this.getSelectedValues()
 
     this._items = this._normalizeItems(items)
     this._render()
@@ -944,7 +944,7 @@ class ListBox extends BaseComponent {
     }
 
     if (this._config.selectionMode === SELECTION_MODE_SINGLE) {
-      const previous = this.getSelected()
+      const previous = this.getSelectedValues()
 
       for (const selected of previous) {
         this._removeSelection(selected)
@@ -1007,7 +1007,7 @@ class ListBox extends BaseComponent {
   }
 
   _triggerChange(): void {
-    EventHandler.trigger(this._element, this.constructor.eventName(EVENT_CHANGE), { selected: this.getSelected() })
+    EventHandler.trigger(this._element, this.constructor.eventName(EVENT_CHANGE), { selected: this.getSelectedValues() })
   }
 
   _setActive(value: string | null, focus: boolean): void {

@@ -218,7 +218,7 @@ class ChipSet extends BaseComponent {
   }
 
   removeSelected(): void {
-    for (const chip of this.getSelected()) {
+    for (const chip of this._getSelectedChipElements()) {
       this.remove(chip)
     }
   }
@@ -248,7 +248,7 @@ class ChipSet extends BaseComponent {
   }
 
   deselectAll(): void {
-    for (const chip of this.getSelected()) {
+    for (const chip of this._getSelectedChipElements()) {
       Chip.getInstance(chip)?.deselect()
     }
   }
@@ -260,16 +260,12 @@ class ChipSet extends BaseComponent {
     })
   }
 
-  getSelected(): HTMLElement[] {
-    return SelectorEngine.find(SELECTOR_CHIP_ACTIVE, this._element as ParentNode)
-  }
-
   getValues(): string[] {
     return [...this._chips]
   }
 
   getSelectedValues(): string[] {
-    return this.getSelected().map(chip => this._getChipValue(chip))
+    return this._getSelectedChipElements().map(chip => this._getChipValue(chip))
   }
 
   override dispose(): void {
@@ -303,6 +299,10 @@ class ChipSet extends BaseComponent {
 
   _getChipElements(): HTMLElement[] {
     return SelectorEngine.find(SELECTOR_CHIP, this._element as ParentNode)
+  }
+
+  _getSelectedChipElements(): HTMLElement[] {
+    return SelectorEngine.find(SELECTOR_CHIP_ACTIVE, this._element as ParentNode)
   }
 
   _findChipByValue(value: string): HTMLElement | undefined {
@@ -519,7 +519,7 @@ class ChipSet extends BaseComponent {
   }
 
   _enforceSingleSelection(selectedChip: HTMLElement): void {
-    for (const chip of this.getSelected()) {
+    for (const chip of this._getSelectedChipElements()) {
       if (chip !== selectedChip) {
         Chip.getInstance(chip)?.deselect()
       }

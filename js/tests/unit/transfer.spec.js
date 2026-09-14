@@ -225,6 +225,18 @@ describe('Transfer', () => {
     })
   })
 
+  describe('getSelectedValues', () => {
+    it('should name the lists it accepts when given anything else', () => {
+      const el = setMarkup()
+      const transfer = new Transfer(el)
+
+      expect(() => transfer.getSelectedValues()).toThrowError(
+        TypeError, 'TRANSFER: Method "getSelectedValues" expects one of source, target, but received "undefined".'
+      )
+      expect(() => transfer.getSelectedValues('left')).toThrowError(TypeError)
+    })
+  })
+
   describe('moving', () => {
     it('should move the selected options to the target list', () => {
       const el = setMarkup()
@@ -236,7 +248,7 @@ describe('Transfer', () => {
 
       expect(transfer.getSource()).toEqual(['two'])
       expect(transfer.getTarget()).toEqual(['four', 'one', 'three'])
-      expect(transfer.getSelected('source')).toEqual([])
+      expect(transfer.getSelectedValues('source')).toEqual([])
     })
 
     it('should move the selected options back to the source list', () => {
@@ -611,13 +623,13 @@ describe('Transfer', () => {
       chosen.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }))
       click(chosen)
 
-      expect(transfer.getSelected('target')).toEqual(['cleo'])
+      expect(transfer.getSelectedValues('target')).toEqual(['cleo'])
 
       transfer.setItems([...users, { value: 'dan', label: 'Dan' }])
 
       expect(transfer.getTarget()).toEqual(['cleo', 'ada'])
-      expect(transfer.getSelected('target')).toEqual([])
-      expect(transfer.getSelected('source')).toEqual([])
+      expect(transfer.getSelectedValues('target')).toEqual([])
+      expect(transfer.getSelectedValues('source')).toEqual([])
       expect(option(el, 'target', 'cleo').getAttribute('aria-selected')).toEqual('false')
     })
 
@@ -633,7 +645,7 @@ describe('Transfer', () => {
       target.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }))
       click(target)
 
-      expect(transfer.getSelected('target')).toEqual(['cleo'])
+      expect(transfer.getSelectedValues('target')).toEqual(['cleo'])
       expect(target.hasAttribute('aria-disabled')).toBeFalse()
       expect(side(el, 'target').classList.contains('loading')).toBeFalse()
 
@@ -648,11 +660,11 @@ describe('Transfer', () => {
       const marked = [{ value: 'ada', label: 'Ada', selected: true }, { value: 'bob', label: 'Bob' }]
       const transfer = new Transfer(el, { items: marked })
 
-      expect(transfer.getSelected('source')).toEqual(['ada'])
+      expect(transfer.getSelectedValues('source')).toEqual(['ada'])
 
       transfer.setItems(marked)
 
-      expect(transfer.getSelected('source')).toEqual([])
+      expect(transfer.getSelectedValues('source')).toEqual([])
     })
 
     it('should clear the destination selection after a move', () => {
@@ -665,7 +677,7 @@ describe('Transfer', () => {
       click(chosen)
       transfer.moveToTarget(['ada'])
 
-      expect(transfer.getSelected('target')).toEqual([])
+      expect(transfer.getSelectedValues('target')).toEqual([])
     })
 
     it('should release both lists when setLoading is called without a side', () => {
@@ -720,7 +732,7 @@ describe('Transfer', () => {
       type(searchField(el, 'source'), 'three')
       click(side(el, 'source').querySelector('.list-box-select-all'))
 
-      expect(transfer.getSelected('source')).toEqual(['three'])
+      expect(transfer.getSelectedValues('source')).toEqual(['three'])
     })
 
     it('should match the label of a described option', () => {

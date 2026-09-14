@@ -151,14 +151,14 @@ describe('ListBox', () => {
       const el = setMarkup()
       const listBox = new ListBox(el, { selected: 'tomato' })
 
-      expect(listBox.getSelected()).toEqual(['tomato'])
+      expect(listBox.getSelectedValues()).toEqual(['tomato'])
       expect(item(el, 'tomato')).toHaveClass('selected')
     })
 
     it('should keep only the first value of an array in single mode', () => {
       const listBox = new ListBox(setMarkup(), { selected: ['tomato', 'onion'] })
 
-      expect(listBox.getSelected()).toEqual(['tomato'])
+      expect(listBox.getSelectedValues()).toEqual(['tomato'])
     })
 
     it('should add a role to every section', () => {
@@ -179,7 +179,7 @@ describe('ListBox', () => {
       expect(list(el).getAttribute('aria-disabled')).toEqual('true')
 
       click(item(el, 'lettuce'))
-      expect(listBox.getSelected()).toEqual([])
+      expect(listBox.getSelectedValues()).toEqual([])
     })
   })
 
@@ -201,7 +201,7 @@ describe('ListBox', () => {
       listBox.select('lettuce')
       listBox.select('tomato')
 
-      expect(listBox.getSelected()).toEqual(['tomato'])
+      expect(listBox.getSelectedValues()).toEqual(['tomato'])
       expect(item(el, 'lettuce')).not.toHaveClass('selected')
       expect(item(el, 'tomato').getAttribute('aria-selected')).toEqual('true')
     })
@@ -212,7 +212,7 @@ describe('ListBox', () => {
       listBox.select('lettuce')
       listBox.select('tomato')
 
-      expect(listBox.getSelected()).toEqual(['lettuce', 'tomato'])
+      expect(listBox.getSelectedValues()).toEqual(['lettuce', 'tomato'])
     })
 
     it('should not select anything when the selection mode is none', () => {
@@ -220,7 +220,7 @@ describe('ListBox', () => {
 
       listBox.select('lettuce')
 
-      expect(listBox.getSelected()).toEqual([])
+      expect(listBox.getSelectedValues()).toEqual([])
     })
 
     it('should not select a disabled option', () => {
@@ -228,7 +228,7 @@ describe('ListBox', () => {
 
       listBox.select('ham')
 
-      expect(listBox.getSelected()).toEqual([])
+      expect(listBox.getSelectedValues()).toEqual([])
     })
 
     it('should toggle, deselect and clear', () => {
@@ -237,16 +237,16 @@ describe('ListBox', () => {
       listBox.toggle('lettuce')
       listBox.toggle('tomato')
       listBox.toggle('lettuce')
-      expect(listBox.getSelected()).toEqual(['tomato'])
+      expect(listBox.getSelectedValues()).toEqual(['tomato'])
 
       listBox.deselect('tomato')
-      expect(listBox.getSelected()).toEqual([])
+      expect(listBox.getSelectedValues()).toEqual([])
 
       listBox.selectAll()
-      expect(listBox.getSelected()).toEqual(['lettuce', 'tomato', 'onion', 'cheese'])
+      expect(listBox.getSelectedValues()).toEqual(['lettuce', 'tomato', 'onion', 'cheese'])
 
       listBox.clear()
-      expect(listBox.getSelected()).toEqual([])
+      expect(listBox.getSelectedValues()).toEqual([])
     })
 
     it('selects only the visible enabled options', () => {
@@ -260,11 +260,11 @@ describe('ListBox', () => {
       listBox.update()
 
       listBox.selectAll()
-      expect(listBox.getSelected()).toEqual(['lettuce', 'onion', 'cheese'])
+      expect(listBox.getSelectedValues()).toEqual(['lettuce', 'onion', 'cheese'])
 
       listBox.clear()
       listBox.selectAll(['lettuce', 'tomato'])
-      expect(listBox.getSelected()).toEqual(['lettuce', 'tomato'])
+      expect(listBox.getSelectedValues()).toEqual(['lettuce', 'tomato'])
     })
 
     it('should keep the select all button in step with the visible options only', () => {
@@ -278,7 +278,7 @@ describe('ListBox', () => {
 
       click(selectAll)
 
-      expect(listBox.getSelected()).toEqual(['lettuce'])
+      expect(listBox.getSelectedValues()).toEqual(['lettuce'])
       expect(selectAll.getAttribute('aria-pressed')).toEqual('true')
       expect(selectAll).not.toHaveClass('indeterminate')
     })
@@ -288,7 +288,7 @@ describe('ListBox', () => {
 
       listBox.selectAll()
 
-      expect(listBox.getSelected()).toEqual([])
+      expect(listBox.getSelectedValues()).toEqual([])
     })
 
     it('should select on click in single mode and toggle in multiple mode', () => {
@@ -296,17 +296,17 @@ describe('ListBox', () => {
       const single = new ListBox(el)
 
       click(item(el, 'tomato'))
-      expect(single.getSelected()).toEqual(['tomato'])
+      expect(single.getSelectedValues()).toEqual(['tomato'])
 
       single.dispose()
 
       const multiple = new ListBox(el, { selectionMode: 'multiple' })
       click(item(el, 'tomato'))
       click(item(el, 'onion'))
-      expect(multiple.getSelected()).toEqual(['tomato', 'onion'])
+      expect(multiple.getSelectedValues()).toEqual(['tomato', 'onion'])
 
       click(item(el, 'tomato'))
-      expect(multiple.getSelected()).toEqual(['onion'])
+      expect(multiple.getSelectedValues()).toEqual(['onion'])
     })
 
     it('should ignore a click on a disabled option', () => {
@@ -315,7 +315,7 @@ describe('ListBox', () => {
 
       click(item(el, 'ham'))
 
-      expect(listBox.getSelected()).toEqual([])
+      expect(listBox.getSelectedValues()).toEqual([])
       expect(listBox.getActive()).toBeNull()
     })
 
@@ -325,10 +325,10 @@ describe('ListBox', () => {
 
       click(item(el, 'lettuce'))
       click(item(el, 'cheese'), { shiftKey: true })
-      expect(listBox.getSelected()).toEqual(['lettuce', 'tomato', 'onion', 'cheese'])
+      expect(listBox.getSelectedValues()).toEqual(['lettuce', 'tomato', 'onion', 'cheese'])
 
       click(item(el, 'tomato'), { ctrlKey: true })
-      expect(listBox.getSelected()).toEqual(['lettuce', 'onion', 'cheese'])
+      expect(listBox.getSelectedValues()).toEqual(['lettuce', 'onion', 'cheese'])
     })
 
     it('should treat the select all button as one switch for the whole list', () => {
@@ -346,12 +346,12 @@ describe('ListBox', () => {
       expect(selectAll.getAttribute('aria-pressed')).toEqual('false')
 
       click(selectAll)
-      expect(listBox.getSelected()).toEqual(['lettuce', 'tomato'])
+      expect(listBox.getSelectedValues()).toEqual(['lettuce', 'tomato'])
       expect(selectAll.getAttribute('aria-pressed')).toEqual('true')
       expect(selectAll).toHaveClass('selected')
 
       click(selectAll)
-      expect(listBox.getSelected()).toEqual([])
+      expect(listBox.getSelectedValues()).toEqual([])
       expect(selectAll.getAttribute('aria-pressed')).toEqual('false')
       expect(selectAll).not.toHaveClass('selected')
     })
@@ -392,23 +392,23 @@ describe('ListBox', () => {
 
       click(item(el, 'lettuce'))
       click(item(el, 'tomato'))
-      expect(listBox.getSelected()).toEqual(['lettuce', 'tomato'])
+      expect(listBox.getSelectedValues()).toEqual(['lettuce', 'tomato'])
       expect(reported).toEqual([])
 
       click(item(el, 'onion'))
-      expect(listBox.getSelected()).toEqual(['lettuce', 'tomato'])
+      expect(listBox.getSelectedValues()).toEqual(['lettuce', 'tomato'])
       expect(reported).toEqual([[2, 'onion']])
       expect(item(el, 'onion')).not.toHaveClass('disabled')
 
       listBox.select('cheese')
-      expect(listBox.getSelected()).toEqual(['lettuce', 'tomato'])
+      expect(listBox.getSelectedValues()).toEqual(['lettuce', 'tomato'])
       expect(reported.length).toEqual(2)
 
       click(item(el, 'lettuce'))
-      expect(listBox.getSelected()).toEqual(['tomato'])
+      expect(listBox.getSelectedValues()).toEqual(['tomato'])
 
       click(item(el, 'onion'))
-      expect(listBox.getSelected()).toEqual(['tomato', 'onion'])
+      expect(listBox.getSelectedValues()).toEqual(['tomato', 'onion'])
       expect(reported.length).toEqual(2)
     })
 
@@ -421,7 +421,7 @@ describe('ListBox', () => {
 
       keydown(list(el), 'a', { ctrlKey: true })
 
-      expect(listBox.getSelected()).toEqual(['lettuce', 'tomato'])
+      expect(listBox.getSelectedValues()).toEqual(['lettuce', 'tomato'])
       expect(reported).toEqual([[2, 'onion']])
     })
 
@@ -435,7 +435,7 @@ describe('ListBox', () => {
       click(item(el, 'lettuce'))
       click(item(el, 'cheese'), { shiftKey: true })
 
-      expect(listBox.getSelected()).toEqual(['lettuce', 'tomato'])
+      expect(listBox.getSelectedValues()).toEqual(['lettuce', 'tomato'])
       expect(reported).toEqual(['onion'])
     })
 
@@ -446,7 +446,7 @@ describe('ListBox', () => {
       listBox.select('lettuce')
       listBox.select('tomato')
 
-      expect(listBox.getSelected()).toEqual(['tomato'])
+      expect(listBox.getSelectedValues()).toEqual(['tomato'])
     })
 
     it('should treat the select all button as full at the limit and clear from there', () => {
@@ -464,12 +464,12 @@ describe('ListBox', () => {
       expect(selectAll.getAttribute('aria-pressed')).toEqual('mixed')
 
       click(selectAll)
-      expect(listBox.getSelected()).toEqual(['lettuce', 'tomato'])
+      expect(listBox.getSelectedValues()).toEqual(['lettuce', 'tomato'])
       expect(selectAll.getAttribute('aria-pressed')).toEqual('true')
       expect(selectAll).not.toHaveClass('indeterminate')
 
       click(selectAll)
-      expect(listBox.getSelected()).toEqual([])
+      expect(listBox.getSelectedValues()).toEqual([])
     })
   })
 
@@ -511,7 +511,7 @@ describe('ListBox', () => {
 
       listBox.select('Lettuce')
 
-      expect(listBox.getSelected()).toEqual(['Lettuce'])
+      expect(listBox.getSelectedValues()).toEqual(['Lettuce'])
     })
 
     it('should mark the select all button as mixed for a partial selection', () => {
@@ -563,7 +563,7 @@ describe('ListBox', () => {
       el.addEventListener('select.coreui.list-box', event => event.preventDefault())
       listBox.select('tomato')
 
-      expect(listBox.getSelected()).toEqual([])
+      expect(listBox.getSelectedValues()).toEqual([])
     })
 
     it('should fire deselect, deselected and change', () => {
@@ -587,7 +587,7 @@ describe('ListBox', () => {
       el.addEventListener('deselect.coreui.list-box', event => event.preventDefault())
       listBox.deselect('tomato')
 
-      expect(listBox.getSelected()).toEqual(['tomato'])
+      expect(listBox.getSelectedValues()).toEqual(['tomato'])
     })
 
     it('should fire activate when the highlight moves', () => {
@@ -618,7 +618,7 @@ describe('ListBox', () => {
       keydown(list(el), 'Enter')
 
       expect(values).toEqual(['lettuce', 'docs'])
-      expect(listBox.getSelected()).toEqual([])
+      expect(listBox.getSelectedValues()).toEqual([])
     })
   })
 
@@ -670,11 +670,11 @@ describe('ListBox', () => {
 
       keydown(list(el), 'ArrowDown')
       keydown(list(el), ' ')
-      expect(listBox.getSelected()).toEqual(['lettuce'])
+      expect(listBox.getSelectedValues()).toEqual(['lettuce'])
 
       keydown(list(el), 'ArrowDown')
       keydown(list(el), 'Enter')
-      expect(listBox.getSelected()).toEqual(['tomato'])
+      expect(listBox.getSelectedValues()).toEqual(['tomato'])
     })
 
     it('should toggle with Space in multiple mode', () => {
@@ -685,10 +685,10 @@ describe('ListBox', () => {
       keydown(list(el), ' ')
       keydown(list(el), 'ArrowDown')
       keydown(list(el), ' ')
-      expect(listBox.getSelected()).toEqual(['lettuce', 'tomato'])
+      expect(listBox.getSelectedValues()).toEqual(['lettuce', 'tomato'])
 
       keydown(list(el), ' ')
-      expect(listBox.getSelected()).toEqual(['lettuce'])
+      expect(listBox.getSelectedValues()).toEqual(['lettuce'])
     })
 
     it('should extend the selection with shift and the arrows', () => {
@@ -700,7 +700,7 @@ describe('ListBox', () => {
       keydown(list(el), 'ArrowDown', { shiftKey: true })
       keydown(list(el), 'ArrowDown', { shiftKey: true })
 
-      expect(listBox.getSelected()).toEqual(['lettuce', 'tomato', 'onion'])
+      expect(listBox.getSelectedValues()).toEqual(['lettuce', 'tomato', 'onion'])
     })
 
     it('should extend the selection to the edge with shift Home and End', () => {
@@ -709,12 +709,12 @@ describe('ListBox', () => {
 
       listBox.setActive('onion')
       keydown(list(el), 'End', { shiftKey: true })
-      expect(listBox.getSelected()).toEqual(['onion', 'cheese'])
+      expect(listBox.getSelectedValues()).toEqual(['onion', 'cheese'])
 
       listBox.clear()
       listBox.setActive('tomato')
       keydown(list(el), 'Home', { shiftKey: true })
-      expect(listBox.getSelected()).toEqual(['lettuce', 'tomato'])
+      expect(listBox.getSelectedValues()).toEqual(['lettuce', 'tomato'])
     })
 
     it('should select everything with Ctrl+A in multiple mode only', () => {
@@ -722,13 +722,13 @@ describe('ListBox', () => {
       const single = new ListBox(el)
 
       keydown(list(el), 'a', { ctrlKey: true })
-      expect(single.getSelected()).toEqual([])
+      expect(single.getSelectedValues()).toEqual([])
 
       single.dispose()
 
       const multiple = new ListBox(el, { selectionMode: 'multiple' })
       keydown(list(el), 'a', { metaKey: true })
-      expect(multiple.getSelected()).toEqual(['lettuce', 'tomato', 'onion', 'cheese'])
+      expect(multiple.getSelectedValues()).toEqual(['lettuce', 'tomato', 'onion', 'cheese'])
     })
 
     it('should move the highlight with typeahead', () => {
@@ -801,7 +801,7 @@ describe('ListBox', () => {
       expect(document.activeElement).toEqual(field)
 
       keydown(field, 'Enter')
-      expect(listBox.getSelected()).toEqual(['lettuce'])
+      expect(listBox.getSelectedValues()).toEqual(['lettuce'])
     })
 
     it('should leave the space bar and Home/End to a text field', () => {
@@ -821,7 +821,7 @@ describe('ListBox', () => {
       keydown(field, 'ArrowDown')
 
       keydown(field, ' ')
-      expect(listBox.getSelected()).toEqual([])
+      expect(listBox.getSelectedValues()).toEqual([])
 
       keydown(field, 'End')
       expect(listBox.getActive()).toEqual('lettuce')
@@ -839,7 +839,7 @@ describe('ListBox', () => {
       expect(item(el, 'bacon').getAttribute('role')).toEqual('option')
 
       listBox.select('bacon')
-      expect(listBox.getSelected()).toEqual(['bacon'])
+      expect(listBox.getSelectedValues()).toEqual(['bacon'])
     })
 
     it('should keep the selection of an option that was hidden', () => {
@@ -849,7 +849,7 @@ describe('ListBox', () => {
       item(el, 'tomato').setAttribute('hidden', '')
       listBox.update()
 
-      expect(listBox.getSelected()).toEqual(['tomato'])
+      expect(listBox.getSelectedValues()).toEqual(['tomato'])
     })
 
     it('should drop the highlight when the active option disappears', () => {
@@ -951,7 +951,7 @@ describe('ListBox', () => {
       expect(el.querySelectorAll('.list-box-option')).toHaveSize(2)
       expect(item(el, 'lettuce').textContent).toEqual('Lettuce')
       expect(item(el, 'tomato').getAttribute('role')).toEqual('option')
-      expect(listBox.getSelected()).toEqual([])
+      expect(listBox.getSelectedValues()).toEqual([])
     })
 
     it('should render sections', () => {
@@ -1000,7 +1000,7 @@ describe('ListBox', () => {
       expect(item(el, 'tomato').getAttribute('aria-disabled')).toEqual('true')
 
       listBox.select('tomato')
-      expect(listBox.getSelected()).toEqual([])
+      expect(listBox.getSelectedValues()).toEqual([])
     })
 
     it('should take the initial selection from the items', () => {
@@ -1013,7 +1013,7 @@ describe('ListBox', () => {
         ]
       })
 
-      expect(listBox.getSelected()).toEqual(['lettuce', 'onion'])
+      expect(listBox.getSelectedValues()).toEqual(['lettuce', 'onion'])
       expect(item(el, 'lettuce').getAttribute('aria-selected')).toEqual('true')
     })
 
@@ -1084,7 +1084,7 @@ describe('ListBox', () => {
       })
 
       listBox.selectAll()
-      expect(listBox.getSelected()).toEqual(['lettuce', 'tomato', 'onion'])
+      expect(listBox.getSelectedValues()).toEqual(['lettuce', 'tomato', 'onion'])
 
       const changed = []
       el.addEventListener('change.coreui.list-box', event => changed.push(event.selected))
@@ -1094,7 +1094,7 @@ describe('ListBox', () => {
         { value: 'cheese', label: 'Cheese' }
       ])
 
-      expect(listBox.getSelected()).toEqual(['tomato'])
+      expect(listBox.getSelectedValues()).toEqual(['tomato'])
       expect(changed).toEqual([['tomato']])
       expect(item(el, 'tomato').classList.contains('selected')).toBeTrue()
     })
@@ -1114,7 +1114,7 @@ describe('ListBox', () => {
         { value: 'tomato', label: 'Tomato' }
       ])
 
-      expect(listBox.getSelected()).toEqual(['lettuce'])
+      expect(listBox.getSelectedValues()).toEqual(['lettuce'])
       expect(spy).not.toHaveBeenCalled()
     })
 
@@ -1187,7 +1187,7 @@ describe('ListBox', () => {
 
       expect(item(el, 'tomato').hasAttribute('hidden')).toBeTrue()
       expect(counter.textContent).toEqual('1/1 selected')
-      expect(listBox.getSelected()).toEqual(['tomato', 'onion'])
+      expect(listBox.getSelectedValues()).toEqual(['tomato', 'onion'])
 
       type(searchField(el), 'ham')
 
@@ -1281,7 +1281,7 @@ describe('ListBox', () => {
       type(searchField(el), 'on')
       listBox.selectAll()
 
-      expect(listBox.getSelected()).toEqual(['onion'])
+      expect(listBox.getSelectedValues()).toEqual(['onion'])
     })
 
     it('should not filter in external search mode and report the query', () => {
@@ -1408,7 +1408,7 @@ describe('ListBox', () => {
       listBox.filter('ham')
       listBox.selectAll()
 
-      expect(listBox.getSelected()).toEqual(['ham'])
+      expect(listBox.getSelectedValues()).toEqual(['ham'])
       expect(el.querySelector('.list-box-empty').hasAttribute('hidden')).toBeTrue()
 
       listBox.filter('zzz')
@@ -1463,10 +1463,10 @@ describe('ListBox', () => {
       const listBox = new ListBox(el, { selectionMode: 'multiple', sectionsSelectable: true })
 
       click(label(el, 0))
-      expect(listBox.getSelected()).toEqual(['lettuce', 'tomato'])
+      expect(listBox.getSelectedValues()).toEqual(['lettuce', 'tomato'])
 
       click(label(el, 0))
-      expect(listBox.getSelected()).toEqual([])
+      expect(listBox.getSelectedValues()).toEqual([])
     })
 
     it('should leave a filtered out option alone', () => {
@@ -1476,7 +1476,7 @@ describe('ListBox', () => {
       listBox.filter('lettuce')
       click(label(el, 0))
 
-      expect(listBox.getSelected()).toEqual(['lettuce'])
+      expect(listBox.getSelectedValues()).toEqual(['lettuce'])
     })
 
     it('should sit in the arrow key order', () => {
@@ -1500,7 +1500,7 @@ describe('ListBox', () => {
       keydown(list(el), 'ArrowDown')
       keydown(list(el), ' ')
 
-      expect(listBox.getSelected()).toEqual(['lettuce', 'tomato'])
+      expect(listBox.getSelectedValues()).toEqual(['lettuce', 'tomato'])
     })
 
     it('should stop at the selection limit', () => {
@@ -1511,7 +1511,7 @@ describe('ListBox', () => {
       el.addEventListener('selectionLimit.coreui.list-box', spy)
       click(label(el, 0))
 
-      expect(listBox.getSelected()).toEqual(['lettuce'])
+      expect(listBox.getSelectedValues()).toEqual(['lettuce'])
       expect(spy).toHaveBeenCalled()
     })
 
@@ -1592,7 +1592,7 @@ describe('ListBox', () => {
       expect(ListBox.getInstance(el)).not.toBeNull()
 
       jQueryMock.fn.listBox.call(jQueryMock, 'select', 'tomato')
-      expect(ListBox.getInstance(el).getSelected()).toEqual(['tomato'])
+      expect(ListBox.getInstance(el).getSelectedValues()).toEqual(['tomato'])
     })
 
     it('should throw an error on undefined method', () => {

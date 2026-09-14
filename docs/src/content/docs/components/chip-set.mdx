@@ -83,6 +83,19 @@ Add `data-coreui-chip-set` to enable the plugin and configure behavior with `dat
 </div>
 ```
 
+### Chip values
+
+Every chip carries a value, and that is what the plugin works with: `unique` and `maxChips` compare values, the `add` and `remove` events report one, and `getValues()` and `getSelectedValues()` return them.
+
+A chip's value is its trimmed text content, with the remove button left out. Add `data-coreui-chip-value` when the value the plugin should carry is not the label the user reads:
+
+```html
+<div class="chip-set" data-coreui-chip-set>
+  <span class="chip" data-coreui-chip-value="pl">Poland</span>
+  <span class="chip" data-coreui-chip-value="de">Germany</span>
+</div>
+```
+
 ### JavaScript
 
 ```js
@@ -126,7 +139,6 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `dispose` | Destroys a chip set instance. (Removes stored data on the DOM element) |
 | `getInstance` | Static method to get the chip set instance: `coreui.ChipSet.getInstance(element)`. |
 | `getOrCreateInstance` | Static method to get or create a chip set instance: `coreui.ChipSet.getOrCreateInstance(element)`. |
-| `getSelected` | Returns an array of the selected (`.active`) chip elements. |
 | `getSelectedValues` | Returns the values of the selected chips. |
 | `getValues` | Returns the array of chip values. |
 | `remove` | Removes a chip from the set. Accepts a chip element or its value string. |
