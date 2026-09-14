@@ -23,6 +23,7 @@ import {
   isMonthDisabled,
   isMonthSelected,
   isMonthInRange,
+  isQuarterDisabled,
   isSameDateAs,
   isToday,
   isYearDisabled,
@@ -409,6 +410,16 @@ describe('Calendar Utilities', () => {
     })
   })
 
+  describe('convertToDateObject', () => {
+    it('should reject a string whose separators are not the locale ones', () => {
+      expect(convertToDateObject('12X31X2022', false, 'en-US')).toBeNull()
+    })
+
+    it('should still accept the locale format', () => {
+      expect(convertToDateObject('12/31/2022', false, 'en-US')).not.toBeNull()
+    })
+  })
+
   describe('isMonthDisabled', () => {
     it('should return true if month < min', () => {
       const date = new Date(2023, 0, 1)
@@ -420,6 +431,18 @@ describe('Calendar Utilities', () => {
       const date = new Date(2023, 5, 1)
       const max = new Date(2023, 3, 1) // April
       expect(isMonthDisabled(date, null, max, undefined)).toBeTrue()
+    })
+
+    it('should return true when disabledDates cover the whole month', () => {
+      const date = new Date(2022, 1, 1)
+      const disabledDates = [[new Date(2022, 1, 1), new Date(2022, 1, 28)]]
+      expect(isMonthDisabled(date, null, null, disabledDates)).toBeTrue()
+    })
+
+    it('should return false when disabledDates leave a day in the month', () => {
+      const date = new Date(2022, 1, 1)
+      const disabledDates = [[new Date(2022, 1, 1), new Date(2022, 1, 10)]]
+      expect(isMonthDisabled(date, null, null, disabledDates)).toBeFalse()
     })
 
     it('should return false if no disabledDates and within min/max', () => {
@@ -485,6 +508,20 @@ describe('Calendar Utilities', () => {
     })
   })
 
+  describe('isQuarterDisabled', () => {
+    it('should return true when disabledDates cover the whole quarter', () => {
+      const date = new Date(2022, 0, 1)
+      const disabledDates = [[new Date(2022, 0, 1), new Date(2022, 2, 31)]]
+      expect(isQuarterDisabled(date, null, null, disabledDates)).toBeTrue()
+    })
+
+    it('should return false when disabledDates leave a day in the quarter', () => {
+      const date = new Date(2022, 0, 1)
+      const disabledDates = [[new Date(2022, 0, 1), new Date(2022, 1, 28)]]
+      expect(isQuarterDisabled(date, null, null, disabledDates)).toBeFalse()
+    })
+  })
+
   describe('isToday', () => {
     it('should return true if date is today', () => {
       const today = new Date()
@@ -515,6 +552,18 @@ describe('Calendar Utilities', () => {
       const min = new Date(2023, 0, 1)
       const max = new Date(2023, 11, 31)
       expect(isYearDisabled(date, min, max, undefined)).toBeFalse()
+    })
+
+    it('should return true when disabledDates cover the whole year', () => {
+      const date = new Date(2022, 0, 1)
+      const disabledDates = [[new Date(2022, 0, 1), new Date(2022, 11, 31)]]
+      expect(isYearDisabled(date, null, null, disabledDates)).toBeTrue()
+    })
+
+    it('should return false when disabledDates leave a day in the year', () => {
+      const date = new Date(2022, 0, 1)
+      const disabledDates = [[new Date(2022, 0, 1), new Date(2022, 10, 30)]]
+      expect(isYearDisabled(date, null, null, disabledDates)).toBeFalse()
     })
   })
 

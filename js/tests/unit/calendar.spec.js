@@ -2720,4 +2720,37 @@ describe('Calendar', () => {
       expect(div.querySelector('.calendar-header-cell-inner img')).toBeNull()
     })
   })
+  describe('week selection', () => {
+    it('should survive a click on the row itself', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, { selectionType: 'week', showWeekNumber: true })
+
+      // The row is what takes the interaction in week selection, so the
+      // handlers get an event with no cell above it.
+      const row = div.querySelector('.calendar-row')
+
+      expect(row).not.toBeNull()
+      expect(() => calendar._handleCalendarClick({ target: row })).not.toThrow()
+      expect(() => calendar._handleCalendarMouseEnter({ target: row })).not.toThrow()
+    })
+
+    it('should hover-highlight only the rows between the range ends', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, { selectionType: 'week', calendarDate: new Date(2022, 5, 1) })
+
+      calendar._startDate = new Date(2022, 2, 1)
+      calendar._hoverDate = new Date(2022, 11, 5)
+      calendar._selectEndDate = true
+
+      const inside = calendar._rowWeekAttributes(new Date(2022, 5, 15))
+      const beforeStart = calendar._rowWeekAttributes(new Date(2022, 0, 5))
+
+      expect(inside.className).toContain('range-hover')
+      expect(beforeStart.className).not.toContain('range-hover')
+    })
+  })
 })
