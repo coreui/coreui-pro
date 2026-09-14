@@ -338,16 +338,21 @@ Every getter now carries the noun it returns:
 + listBox.getSelectedValues()
 
 - chipSet.getSelected()
-+ chipSet.getSelectedElements()
++ chipSet.getSelectedValues()
 
 - transfer.getSelected('source')
 + transfer.getSelectedValues('source')
 ```
 
-Chip Set's `getValues()` and `getSelectedValues()` are unchanged, and Transfer
-still takes `'source'` or `'target'` — the argument its `setLoading(loading,
-list)` already takes. Anything else now throws a `TypeError` naming the two
-lists instead of failing on an undefined property.
+Chip Set's `getValues()` and `getSelectedValues()` are unchanged and are now
+the whole selection API: the element list behind them is internal. A chip
+carries a value of its own — `data-coreui-chip-value`, falling back to the
+chip's text — so values, not nodes, are what the rest of the plugin works
+with.
+
+Transfer still takes `'source'` or `'target'`, the argument its
+`setLoading(loading, list)` already takes. Anything else now throws a
+`TypeError` naming the two lists instead of failing on an undefined property.
 
 ### Components
 
