@@ -38,6 +38,10 @@ const DefaultType = {
   trapElement: 'element'
 }
 
+// Only the most recently activated trap reacts. Two traps over disjoint
+// elements would otherwise throw focus at each other without end.
+const activeTraps = []
+
 /**
  * Class definition
  */
@@ -48,6 +52,8 @@ class FocusTrap extends Config {
     this._config = this._getConfig(config)
     this._isActive = false
     this._lastTabNavDirection = null
+    this._focusinHandler = event => this._handleFocusin(event)
+    this._keydownHandler = event => this._handleKeydown(event)
   }
 
   // Getters
@@ -73,10 +79,10 @@ class FocusTrap extends Config {
       this._config.trapElement.focus()
     }
 
-    EventHandler.off(document, EVENT_KEY) // guard against infinite focus loop
-    EventHandler.on(document, EVENT_FOCUSIN, event => this._handleFocusin(event))
-    EventHandler.on(document, EVENT_KEYDOWN_TAB, event => this._handleKeydown(event))
+    EventHandler.on(document, EVENT_FOCUSIN, this._focusinHandler)
+    EventHandler.on(document, EVENT_KEYDOWN_TAB, this._keydownHandler)
 
+    activeTraps.push(this)
     this._isActive = true
   }
 
@@ -86,14 +92,16 @@ class FocusTrap extends Config {
     }
 
     this._isActive = false
-    EventHandler.off(document, EVENT_KEY)
+    activeTraps.splice(activeTraps.indexOf(this), 1)
+    EventHandler.off(document, EVENT_FOCUSIN, this._focusinHandler)
+    EventHandler.off(document, EVENT_KEYDOWN_TAB, this._keydownHandler)
   }
 
   // Private
   _handleFocusin(event) {
     const { additionalElement, trapElement } = this._config
 
-    if (event.target === document || event.target === trapElement || trapElement.contains(event.target)) {
+    if (!this._isTopmost() || event.target === document || event.target === trapElement || trapElement.contains(event.target)) {
       return
     }
 
@@ -113,7 +121,7 @@ class FocusTrap extends Config {
   }
 
   _handleKeydown(event) {
-    if (event.key !== TAB_KEY) {
+    if (!this._isTopmost() || event.key !== TAB_KEY) {
       return
     }
 
@@ -152,6 +160,10 @@ class FocusTrap extends Config {
     if (additionalElements.indexOf(event.target) === 0 && event.shiftKey) {
       trapElements[trapElements.length - 1].focus()
     }
+  }
+
+  _isTopmost() {
+    return activeTraps[activeTraps.length - 1] === this
   }
 }
 
