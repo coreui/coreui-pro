@@ -316,6 +316,16 @@ describe('Calendar Utilities', () => {
       const week = getISOWeekNumberAndYear(date)
       expect(week.weekNumber).toBe(23)
     })
+
+    it('should handle years below 100', () => {
+      const date = new Date(2000, 0, 15)
+      date.setFullYear(99)
+
+      const week = getISOWeekNumberAndYear(date)
+
+      expect(week.year).toBe(99)
+      expect(week.weekNumber).toBe(3)
+    })
   })
 
   describe('isDateDisabled', () => {
