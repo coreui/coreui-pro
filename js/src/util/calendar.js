@@ -70,6 +70,23 @@ const isOutsideRange = (value, min, max) => {
   return false
 }
 
+const isPeriodDisabled = (start, end, min, max, disabledDates) => {
+  const startTime = min ? Math.max(start.getTime(), min.getTime()) : start.getTime()
+  const endTime = max ? Math.min(end.getTime(), max.getTime()) : end.getTime()
+
+  for (
+    const currentDate = new Date(startTime);
+    currentDate.getTime() <= endTime;
+    currentDate.setDate(currentDate.getDate() + 1)
+  ) {
+    if (!isDateDisabled(currentDate, min, max, disabledDates)) {
+      return false
+    }
+  }
+
+  return true
+}
+
 /**
  * Converts an ISO week string to a Date object representing the Monday of that week.
  * @param isoWeek - The ISO week string (e.g., "2023W05" or "2023w05").
@@ -991,23 +1008,6 @@ export const isDisableDateInRange = (startDate, endDate, disabledDates) => {
  * @param disabledDates - Criteria for disabled dates.
  * @returns True if the month is disabled, false otherwise.
  */
-const isPeriodDisabled = (start, end, min, max, disabledDates) => {
-  const startTime = min ? Math.max(start.getTime(), min.getTime()) : start.getTime()
-  const endTime = max ? Math.min(end.getTime(), max.getTime()) : end.getTime()
-
-  for (
-    const currentDate = new Date(startTime);
-    currentDate.getTime() <= endTime;
-    currentDate.setDate(currentDate.getDate() + 1)
-  ) {
-    if (!isDateDisabled(currentDate, min, max, disabledDates)) {
-      return false
-    }
-  }
-
-  return true
-}
-
 export const isMonthDisabled = (date, min, max, disabledDates) => {
   const current = dateToMonthNumber(date)
   const _min = min ? dateToMonthNumber(min) : null
