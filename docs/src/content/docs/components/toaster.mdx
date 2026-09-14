@@ -19,7 +19,9 @@ import toasterInstant from './snippets/toaster-instant.js?raw'
 
 ## Overview
 
-<AddedIn version="6.0.0" /> The `Toaster` plugin creates [toasts](/components/toasts/) from options, so nothing has to be in the markup up front. It keeps a store of the toasts it shows, keyed by id, and one instance serves the whole page: `add()` returns the id, `update()` rewrites a toast in place, `close()` hides one or all of them, and `promise()` follows an asynchronous operation through its loading, success and error states.
+<AddedIn version="6.0.0" />
+
+The `Toaster` plugin creates [toasts](/components/toasts/) from options, so nothing has to be in the markup up front. It keeps a store of the toasts it shows, keyed by id, and one instance serves the whole page: `add()` returns the id, `update()` rewrites a toast in place, `close()` hides one or all of them, and `promise()` follows an asynchronous operation through its loading, success and error states.
 
 ```js
 const toaster = new coreui.Toaster(null, { placement: 'top-end', limit: 3 })

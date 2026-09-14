@@ -330,7 +330,9 @@ Trigger dropdown menus at the left of the elements by adding `.dropstart` to the
 
 ### Placement option
 
-<AddedIn version="6.0.0" /> The direction classes above pick one of six fixed positions. `data-coreui-placement` on the toggle takes the same values the [Menu](/components/menu/#placement) takes — physical (`top`, `bottom`, `left`, `right`), logical (`start`, `end`, which mirror in RTL) and every `-start`/`-end` alignment — and it wins over the wrapper classes when both are present. Breakpoint prefixes make it responsive: `bottom-start md:top-end` reads as bottom-start below `md` and top-end from `md` up.
+<AddedIn version="6.0.0" />
+
+The direction classes above pick one of six fixed positions. `data-coreui-placement` on the toggle takes the same values the [Menu](/components/menu/#placement) takes — physical (`top`, `bottom`, `left`, `right`), logical (`start`, `end`, which mirror in RTL) and every `-start`/`-end` alignment — and it wins over the wrapper classes when both are present. Breakpoint prefixes make it responsive: `bottom-start md:top-end` reads as bottom-start below `md` and top-end from `md` up.
 
 <Example class="d-flex gap-2" code={`<div class="dropdown">
     <button type="button" class="btn-solid theme-secondary dropdown-toggle" data-coreui-toggle="dropdown" data-coreui-placement="top-end" aria-expanded="false">

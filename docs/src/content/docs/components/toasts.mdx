@@ -215,7 +215,9 @@ By default, toasts fade in and out. To disable the animation, add `.toast-instan
 
 ## Placement
 
-<AddedIn version="6.0.0" /> Nine `.toast-container-{block}-{inline}` classes pin the container to the viewport: `block` is `top`, `middle` or `bottom`, `inline` is `start`, `center` or `end`. They set `position: fixed` and read the distance from the edge from `--cui-toast-container-inset` (`--cui-spacer-4` by default). Inside a positioned box — like the example below — add `.position-absolute` to pin the container to that box instead of the viewport.
+<AddedIn version="6.0.0" />
+
+Nine `.toast-container-{block}-{inline}` classes pin the container to the viewport: `block` is `top`, `middle` or `bottom`, `inline` is `start`, `center` or `end`. They set `position: fixed` and read the distance from the edge from `--cui-toast-container-inset` (`--cui-spacer-4` by default). Inside a positioned box — like the example below — add `.position-absolute` to pin the container to that box instead of the viewport.
 
 <Example code={`<form>
     <div class="mb-3">
