@@ -15,6 +15,7 @@ describe('Toaster', () => {
     }
 
     toaster = null
+    document.documentElement.dir = ''
     clearFixture()
   })
 
@@ -72,11 +73,22 @@ describe('Toaster', () => {
   describe('enter and leave', () => {
     it('should set the edges on the container', () => {
       toaster = new Toaster(null, {
-        container: fixtureEl, placement: 'top-end', enter: 'top', leave: 'end'
+        container: fixtureEl, placement: 'top-end', enter: 'top', leave: 'right'
       })
 
       expect(toaster._element.style.getPropertyValue('--cui-toast-enter-translate')).toEqual('0 calc(-100% - var(--cui-toast-container-inset))')
       expect(toaster._element.style.getPropertyValue('--cui-toast-leave-translate')).toEqual('calc(100% + var(--cui-toast-container-inset)) 0')
+    })
+
+    it('should keep the edges physical in a right-to-left document', () => {
+      document.documentElement.dir = 'rtl'
+
+      toaster = new Toaster(null, {
+        container: fixtureEl, placement: 'top-start', enter: 'left', leave: 'left'
+      })
+
+      expect(toaster._element.style.getPropertyValue('--cui-toast-enter-translate')).toEqual('calc(-100% - var(--cui-toast-container-inset)) 0')
+      expect(toaster._element.style.getPropertyValue('--cui-toast-leave-translate')).toEqual('calc(-100% - var(--cui-toast-container-inset)) 0')
     })
 
     it('should leave both to the placement by default and reject unknown values', () => {
@@ -85,7 +97,7 @@ describe('Toaster', () => {
       expect(toaster._element.style.getPropertyValue('--cui-toast-leave-translate')).toEqual('')
 
       expect(() => {
-        new Toaster(null, { container: fixtureEl, enter: 'left' }) // eslint-disable-line no-new
+        new Toaster(null, { container: fixtureEl, enter: 'start' }) // eslint-disable-line no-new
       }).toThrowError(TypeError, /enter/)
       expect(() => {
         new Toaster(null, { container: fixtureEl, leave: 'top' }) // eslint-disable-line no-new

@@ -47,6 +47,18 @@
   }
 }
 
+// Applies styles when the element's OWN direction is RTL, which is what logical
+// properties resolve against. Unlike `rtl`, which tests an ancestor, this one
+// still agrees with them inside a subtree that sets its own "dir".
+
+@mixin rtl-self {
+  @if $enable-rtl {
+    &:dir(rtl) {
+      @content;
+    }
+  }
+}
+
 // This function takes an element (or string) and returns its "mirrored" version.
 // For example, it will replace "left" with "right" and vice versa.
 

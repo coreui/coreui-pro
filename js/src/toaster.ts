@@ -66,12 +66,12 @@ const PROPERTY_LEAVE_TRANSLATE = '--cui-toast-leave-translate'
 
 const EDGES: Record<string, string> = {
   bottom: '0 calc(100% + var(--cui-toast-container-inset))',
-  end: 'calc(100% + var(--cui-toast-container-inset)) 0',
-  start: 'calc(-100% - var(--cui-toast-container-inset)) 0',
+  left: 'calc(-100% - var(--cui-toast-container-inset)) 0',
+  right: 'calc(100% + var(--cui-toast-container-inset)) 0',
   top: '0 calc(-100% - var(--cui-toast-container-inset))'
 }
 
-const LEAVE_EDGES = new Set(['auto', 'end', 'start'])
+const LEAVE_EDGES = new Set(['auto', 'left', 'right'])
 
 const PLACEMENTS = new Set([
   'top-start',
@@ -157,8 +157,8 @@ const ToastDefaultType = {
  * Types
  */
 
-type Edge = 'auto' | 'bottom' | 'end' | 'start' | 'top'
-type LeaveEdge = 'auto' | 'end' | 'start'
+type Edge = 'auto' | 'bottom' | 'left' | 'right' | 'top'
+type LeaveEdge = 'auto' | 'left' | 'right'
 
 type ToasterConfig = {
   allowList: SanitizerAllowList
