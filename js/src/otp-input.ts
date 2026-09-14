@@ -213,7 +213,11 @@ class OTPInput extends BaseComponent {
         return
       }
 
-      this._setHiddenInputValue(inputs.map((input: HTMLInputElement) => input.value).join(''))
+      const value = inputs.map((input: HTMLInputElement) => input.value).join('')
+
+      if (value !== (this._inputElement ? this._inputElement.value : '')) {
+        this._setHiddenInputValue(value)
+      }
 
       if (target!.value.length === 1) {
         const nextInput = getNextActiveElement(inputs, target as HTMLInputElement, true)
