@@ -219,8 +219,19 @@ class Calendar extends BaseComponent {
     return new Date(Manipulator.getDataAttribute(target, 'date'))
   }
 
+  _getEventTarget(event) {
+    // When weeks are the unit, the row is the focusable thing — a click then
+    // arrives with no cell above it, and the row stands in for one.
+    return event.target.closest(SELECTOR_CALENDAR_CELL) ?? event.target.closest(SELECTOR_CALENDAR_ROW)
+  }
+
   _handleCalendarClick(event) {
-    const target = event.target.closest(SELECTOR_CALENDAR_CELL)
+    const target = this._getEventTarget(event)
+
+    if (!target) {
+      return
+    }
+
     const date = this._getDate(target)
     const cloneDate = new Date(date)
     const index = Manipulator.getDataAttribute(target.closest(SELECTOR_CALENDAR), 'calendar-index')
@@ -368,7 +379,12 @@ class Calendar extends BaseComponent {
   }
 
   _handleCalendarMouseEnter(event) {
-    const target = event.target.closest(SELECTOR_CALENDAR_CELL)
+    const target = this._getEventTarget(event)
+
+    if (!target) {
+      return
+    }
+
     const date = this._getDate(target)
 
     if (isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates)) {
@@ -1037,8 +1053,8 @@ class Calendar extends BaseComponent {
 
     const isRangeHover = this._hoverDate && (
       this._selectEndDate ?
-        isYearInRange(date, this._startDate, this._hoverDate) :
-        isYearInRange(date, this._hoverDate, this._endDate)
+        isDateInRange(date, this._startDate, this._hoverDate) :
+        isDateInRange(date, this._hoverDate, this._endDate)
     )
 
     const classNames = this._classNames({
