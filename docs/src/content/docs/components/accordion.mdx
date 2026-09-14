@@ -358,11 +358,11 @@ accordion.hide(document.querySelector('#myAccordion > .accordion-item'))
 
 | Method | Description |
 | --- | --- |
-| `show(item)` | Opens an accordion item. Returns a promise that settles once it has finished expanding. |
 | `hide(item)` | Closes an accordion item. Returns a promise that settles once it has finished collapsing. |
-| `toggle(item)` | Opens or closes an accordion item, depending on its current state. |
-| `showAll()` | Opens every item of the accordion, dropping the exclusive grouping for as long as they stay open. |
 | `hideAll()` | Closes every item of the accordion and restores the grouping. |
+| `show(item)` | Opens an accordion item. Returns a promise that settles once it has finished expanding. |
+| `showAll()` | Opens every item of the accordion, dropping the exclusive grouping for as long as they stay open. |
+| `toggle(item)` | Opens or closes an accordion item, depending on its current state. |
 
 Items of a nested accordion belong to that accordion, not to the outer one, and an item that is not in this accordion is ignored.
 

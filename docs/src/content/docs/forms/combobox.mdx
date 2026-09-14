@@ -496,17 +496,17 @@ const combobox = new coreui.Combobox('#myCombobox', {
 
 | Method | Description |
 | --- | --- |
-| `show` | Opens the panel. |
-| `hide` | Closes the panel. |
-| `toggle` | Opens the panel, or closes it when it is open. |
-| `getValue()` | The selected value — an array in `multiple` mode, a string or `null` otherwise. |
-| `setValue(value)` | Replaces the selection with `value` (a string, an array, or `null` to empty it). |
 | `clear()` | Empties the selection. |
-| `setItems(items)` | Rebuilds the list from an `items` array. Values that are still there keep their selection, the rest drop out. |
-| `update` | Re-reads the panel: new options get their roles and ids, an option that is now `hidden` or gone leaves the navigation, and the toggle text is read again. |
 | `dispose` | Destroys the combobox, removes the hidden input and puts the panel back after the toggle. |
 | `getInstance` | Static method which allows you to get the combobox instance associated to a DOM element, you can use it like this: `coreui.Combobox.getInstance(element)`. |
 | `getOrCreateInstance` | Static method which returns a combobox instance associated to a DOM element or creates a new one in case it wasn't initialized. You can use it like this: `coreui.Combobox.getOrCreateInstance(element)`. |
+| `getValue()` | The selected value — an array in `multiple` mode, a string or `null` otherwise. |
+| `hide` | Closes the panel. |
+| `setItems(items)` | Rebuilds the list from an `items` array. Values that are still there keep their selection, the rest drop out. |
+| `setValue(value)` | Replaces the selection with `value` (a string, an array, or `null` to empty it). |
+| `show` | Opens the panel. |
+| `toggle` | Opens the panel, or closes it when it is open. |
+| `update` | Re-reads the panel: new options get their roles and ids, an option that is now `hidden` or gone leaves the navigation, and the toggle text is read again. |
 
 ### Events
 

@@ -381,20 +381,20 @@ const transfer = new coreui.Transfer('#myTransfer', {
 
 | Method | Description |
 | --- | --- |
-| `moveToTarget(values?)` | Moves the source list's selection to the target list. Pass an array of values to move exactly those, selected or not. |
-| `moveToSource(values?)` | The same in the other direction. Does nothing with `oneWay`. |
-| `moveAllToTarget()` | Moves every visible, enabled option of the source list — the same scope the select-all button works on. |
-| `moveAllToSource()` | The same in the other direction. Does nothing with `oneWay`. |
-| `getSource()` | The values in the source list, in document order. |
-| `getTarget()` | The values in the target list, in document order. |
-| `getSelected(list)` | The selected values of `'source'` or `'target'`. |
-| `setItems(items)` | Rebuilds both lists from a new `items` array. The values the target holds keep their place as long as the new items still carry them; everything else goes to the source in the items order. Both selections come back empty. |
-| `getItems()` | The items array both lists were built from. |
-| `setLoading(loading, list?)` | Marks a list busy while you fetch: pass `'source'` or `'target'` for one of them, nothing for both. A list left busy stays dimmed and unclickable, so release every list you marked. |
-| `update` | Re-reads the DOM: options added or removed reach both list boxes, which re-apply their search and counter, and the move buttons are re-evaluated. |
 | `dispose` | Destroys the transfer and both list boxes, and removes the live region. |
 | `getInstance` | Static method which allows you to get the transfer instance associated to a DOM element, you can use it like this: `coreui.Transfer.getInstance(element)`. |
+| `getItems()` | The items array both lists were built from. |
 | `getOrCreateInstance` | Static method which returns a transfer instance associated to a DOM element or creates a new one in case it wasn't initialized. You can use it like this: `coreui.Transfer.getOrCreateInstance(element)`. |
+| `getSelected(list)` | The selected values of `'source'` or `'target'`. |
+| `getSource()` | The values in the source list, in document order. |
+| `getTarget()` | The values in the target list, in document order. |
+| `moveAllToSource()` | The same in the other direction. Does nothing with `oneWay`. |
+| `moveAllToTarget()` | Moves every visible, enabled option of the source list — the same scope the select-all button works on. |
+| `moveToSource(values?)` | The same in the other direction. Does nothing with `oneWay`. |
+| `moveToTarget(values?)` | Moves the source list's selection to the target list. Pass an array of values to move exactly those, selected or not. |
+| `setItems(items)` | Rebuilds both lists from a new `items` array. The values the target holds keep their place as long as the new items still carry them; everything else goes to the source in the items order. Both selections come back empty. |
+| `setLoading(loading, list?)` | Marks a list busy while you fetch: pass `'source'` or `'target'` for one of them, nothing for both. A list left busy stays dimmed and unclickable, so release every list you marked. |
+| `update` | Re-reads the DOM: options added or removed reach both list boxes, which re-apply their search and counter, and the move buttons are re-evaluated. |
 
 ### Events
 

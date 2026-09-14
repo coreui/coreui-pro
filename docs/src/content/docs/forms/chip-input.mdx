@@ -197,15 +197,15 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | Method | Description |
 | --- | --- |
 | `add(value)` | Adds a chip with the given value. Returns the chip element or `null` if rejected. |
-| `remove(chipOrValue)` | Removes a chip by element reference or value string. Returns `true` if removed. |
-| `removeSelected()` | Removes all currently selected chips. |
-| `getValues()` | Returns an array of all chip values. |
-| `getSelectedValues()` | Returns an array of selected chip values. |
 | `clear()` | Removes all chips. |
 | `clearSelection()` | Deselects all chips without removing them. |
-| `selectChip(chip)` | Selects a specific chip element. |
-| `focus()` | Focuses the ghost input. |
 | `dispose()` | Destroys the component instance. |
+| `focus()` | Focuses the ghost input. |
+| `getSelectedValues()` | Returns an array of selected chip values. |
+| `getValues()` | Returns an array of all chip values. |
+| `remove(chipOrValue)` | Removes a chip by element reference or value string. Returns `true` if removed. |
+| `removeSelected()` | Removes all currently selected chips. |
+| `selectChip(chip)` | Selects a specific chip element. |
 
 ```js
 const chipInputElement = document.querySelector('.chip-input')
