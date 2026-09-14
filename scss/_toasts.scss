@@ -1,5 +1,6 @@
 @use "functions/defaults" as *;
 @use "mixins/border-radius" as *;
+@use "mixins/ltr-rtl" as *;
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
 @use "mixins/translucent" as *;
@@ -166,12 +167,20 @@ $toast-tokens: defaults(
   .toast-container-middle-start,
   .toast-container-bottom-start {
     --#{$prefix}toast-translate: calc(-100% - var(--#{$prefix}toast-container-inset)) 0;
+
+    @include rtl-self() {
+      --#{$prefix}toast-translate: calc(100% + var(--#{$prefix}toast-container-inset)) 0;
+    }
   }
 
   .toast-container-top-end,
   .toast-container-middle-end,
   .toast-container-bottom-end {
     --#{$prefix}toast-translate: calc(100% + var(--#{$prefix}toast-container-inset)) 0;
+
+    @include rtl-self() {
+      --#{$prefix}toast-translate: calc(-100% - var(--#{$prefix}toast-container-inset)) 0;
+    }
   }
 
   .toast-container-top-center,
