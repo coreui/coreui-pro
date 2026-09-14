@@ -80,12 +80,11 @@ $breadcrumb-tokens: defaults(
       &::before {
         padding-inline-end: var(--#{$prefix}breadcrumb-item-padding-x);
         color: var(--#{$prefix}breadcrumb-divider-color);
-        @include ltr-rtl(
-          "content",
-          var(--#{$prefix}breadcrumb-divider),
-          null,
-          var(--#{$prefix}breadcrumb-divider-flipped)
-        );
+        content: var(--#{$prefix}breadcrumb-divider);
+      }
+
+      @include rtl-nested("&::before") {
+        content: var(--#{$prefix}breadcrumb-divider-flipped);
       }
     }
 
@@ -118,12 +117,11 @@ $breadcrumb-tokens: defaults(
     color: var(--#{$prefix}breadcrumb-divider-color);
 
     &:empty::before {
-      @include ltr-rtl(
-        "content",
-        var(--#{$prefix}breadcrumb-divider),
-        null,
-        var(--#{$prefix}breadcrumb-divider-flipped)
-      );
+      content: var(--#{$prefix}breadcrumb-divider);
+    }
+
+    @include rtl-nested("&:empty::before") {
+      content: var(--#{$prefix}breadcrumb-divider-flipped);
     }
   }
 }

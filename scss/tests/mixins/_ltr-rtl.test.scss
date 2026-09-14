@@ -7,7 +7,7 @@
     @include assert-equal(reflect(center), center);
   }
 
-  @include it("ltr-rtl writes the base value and the mirrored one under [dir=rtl]") {
+  @include it("ltr-rtl writes the base value and the mirrored one for an RTL element") {
     @include assert() {
       @include output() {
         .test {
@@ -20,7 +20,7 @@
           margin-left: 1rem;
         }
 
-        *[dir="rtl"] & .test {
+        .test:dir(rtl) {
           margin-right: 1rem;
         }
       }
@@ -40,7 +40,7 @@
           transform: translateX(-50%);
         }
 
-        *[dir="rtl"] & .test {
+        .test:dir(rtl) {
           transform: translateX(50%);
         }
       }
@@ -60,7 +60,7 @@
           float: left;
         }
 
-        *[dir="rtl"] & .test {
+        .test:dir(rtl) {
           float: right;
         }
       }

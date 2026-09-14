@@ -284,9 +284,10 @@ $sidebar-backdrop-tokens: defaults(
       background-color: var(--#{$prefix}sidebar-toggler-color);
       mask: var(--#{$prefix}sidebar-toggler-icon) no-repeat center;
       @include transition(var(--#{$prefix}sidebar-toggler-transition));
-      @include rtl() {
-        transform: rotate(-180deg);
-      }
+    }
+
+    @include rtl-nested("&::before") {
+      transform: rotate(-180deg);
     }
 
     // Override <a>'s hover style

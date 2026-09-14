@@ -49,8 +49,10 @@ description: "Track and review changes to the CoreUI for Bootstrap source files,
   properties; the six places that genuinely differ (the off-canvas panel, the
   range slider's label and tooltip, the select and validation arrows, the
   carousel controls, the breadcrumb divider) now emit their mirrored
-  declaration from a `[dir="rtl"]` rule in the same file. That costs 396 bytes
-  gzip, where an RTL reader used to download a second 56&nbsp;kB stylesheet.
+  declaration from a `:dir(rtl)` rule in the same file, matched on the
+  element's own direction rather than on an ancestor. That costs about 500
+  bytes gzip, where an RTL reader used to download a second 56&nbsp;kB
+  stylesheet.
 
   **What to change:** drop the `.rtl` from your stylesheet link and keep
   `dir="rtl"` on `<html>`. `$enable-rtl: false` still produces an LTR-only
@@ -4187,7 +4189,7 @@ Nothing existing changes; these are additions. See
   properties now (the position utilities are `inset-inline-start`/`-end`), so
   the flag has nothing left to do. One behaviour change comes with it:
   the RTL behaviour of `.translate-middle` / `.translate-middle-x` is written
-  as a plain `[dir="rtl"]` rule instead of a generator option — `transform` is
+  as a plain `:dir(rtl)` rule instead of a generator option — `transform` is
   not direction-aware, so centring on a logical inset still needs the flip, but
   it is the only utility that does and it no longer costs the whole API a key.
 
@@ -4245,7 +4247,7 @@ Nothing existing changes; these are additions. See
   `$form-select-indicator-padding` and `$form-select-feedback-icon-padding-end`
   are now `calc()` expressions over `var(--cui-control-padding-x)` instead of
   Sass products, and `$form-select-bg-position` carries the `var()` inside it
-  (the mirrored keyword comes from the `[dir="rtl"]` rule in the same sheet).
+  (the mirrored keyword comes from the `:dir(rtl)` rule in the same sheet).
   <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   Sass arithmetic on these variables in your own stylesheets no longer works —
   they are CSS calc strings now, not numbers. Override them with your own

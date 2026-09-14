@@ -2,12 +2,12 @@
 @use "../functions/str-replace" as *;
 @use "../config" as *;
 
-// Applies styles only when LTR is enabled and the HTML does NOT have the "rtl"
-// attribute (i.e., left-to-right contexts).
+// Applies styles only when LTR is enabled and the element's own direction is
+// left-to-right.
 
 @mixin ltr {
   @if $enable-ltr {
-    html:not([dir="rtl"]) & {
+    &:dir(ltr) {
       @content;
     }
   }
@@ -15,7 +15,7 @@
 
 // The direction-sensitive declaration and its RTL counterpart, in one
 // stylesheet. The base value is written plainly and the RTL one overrides it
-// from `[dir="rtl"]`, so the common direction costs no extra selector and the
+// from `:dir(rtl)`, so the common direction costs no extra selector and the
 // other one costs a single rule. With `$enable-rtl: false` only the base is
 // emitted (an LTR-only build); with `$enable-ltr: false` the mirrored value
 // becomes the base (an RTL-only build).
@@ -36,24 +36,33 @@
   }
 }
 
-// Applies styles only when RTL is enabled and the element is within an RTL
-// context (i.e., the element is a descendant of an element with dir="rtl").
+// Applies styles only when RTL is enabled and the element's own direction is
+// right-to-left, which is what logical properties resolve against.
 
 @mixin rtl {
   @if $enable-rtl {
-    *[dir="rtl"] & {
+    &:dir(rtl) {
       @content;
     }
   }
 }
 
-// Applies styles when the element's OWN direction is RTL, which is what logical
-// properties resolve against. Unlike `rtl`, which tests an ancestor, this one
-// still agrees with them inside a subtree that sets its own "dir".
+// The mirrored half of a pair whose declaration sits on a nested selector,
+// typically a pseudo-element: a pseudo-class cannot follow one, so the test
+// belongs on the element. Carries the same build flags as `bidi()`, with the
+// mirrored block standing in for the base in an RTL-only build.
 
-@mixin rtl-self {
-  @if $enable-rtl {
-    &:dir(rtl) {
+@mixin rtl-nested($selector) {
+  @if $enable-ltr {
+    @if $enable-rtl {
+      @include rtl() {
+        #{$selector} {
+          @content;
+        }
+      }
+    }
+  } @else {
+    #{$selector} {
       @content;
     }
   }
