@@ -81,8 +81,10 @@ $sidebar-narrow-unfoldable-tokens: defaults(
       }
 
       .sidebar-toggler {
-        @include rtl-nested("&::before") {
-          transform: rotate(0deg);
+        @include rtl() {
+          &::before {
+            transform: rotate(0deg);
+          }
         }
       }
 
@@ -108,8 +110,10 @@ $sidebar-narrow-unfoldable-tokens: defaults(
       }
 
       .sidebar-toggler {
-        @include rtl-nested("&::before") {
-          transform: rotate(0deg);
+        @include rtl() {
+          &::before {
+            transform: rotate(0deg);
+          }
         }
       }
 

@@ -36,35 +36,20 @@
   }
 }
 
-// Applies styles only when RTL is enabled and the element's own direction is
-// right-to-left, which is what logical properties resolve against.
+// The right-to-left half of a direction-sensitive rule: behind `:dir(rtl)` when
+// both directions are built, which is the direction logical properties resolve
+// against, and the plain base in a right-to-left-only build, the way `bidi()`
+// has always written it.
 
 @mixin rtl {
-  @if $enable-rtl {
-    &:dir(rtl) {
-      @content;
-    }
-  }
-}
-
-// The mirrored half of a pair whose declaration sits on a nested selector,
-// typically a pseudo-element: a pseudo-class cannot follow one, so the test
-// belongs on the element. Carries the same build flags as `bidi()`, with the
-// mirrored block standing in for the base in an RTL-only build.
-
-@mixin rtl-nested($selector) {
   @if $enable-ltr {
     @if $enable-rtl {
-      @include rtl() {
-        #{$selector} {
-          @content;
-        }
+      &:dir(rtl) {
+        @content;
       }
     }
   } @else {
-    #{$selector} {
-      @content;
-    }
+    @content;
   }
 }
 

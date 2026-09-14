@@ -286,8 +286,10 @@ $sidebar-backdrop-tokens: defaults(
       @include transition(var(--#{$prefix}sidebar-toggler-transition));
     }
 
-    @include rtl-nested("&::before") {
-      transform: rotate(-180deg);
+    @include rtl() {
+      &::before {
+        transform: rotate(-180deg);
+      }
     }
 
     // Override <a>'s hover style
