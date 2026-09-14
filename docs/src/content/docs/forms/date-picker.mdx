@@ -399,9 +399,9 @@ attributes work on the picker element too.
 | `ariaCleanerLabel` | string | `'Clear the value'` | Accessible label of the cleaner button. |
 | `ariaLabel` | string | `'Date input'` | Accessible name of the field. It lands on the `role="group"` container the sections sit in, so it names the whole control rather than one part of it. |
 | `ariaToggleLabel` | string | `'Toggle the calendar'` | Accessible label of the indicator button. |
+| `calendarOptions` | object | `{}` | Programmatic escape hatch for calendar options. |
 | `cleaner` | boolean | `true` | Renders a button that clears the value. It appears only once the field holds one. |
 | `cleanerIcon` | string | cross SVG | Inline SVG of the generated cleaner (sanitized). Not used for a `data-coreui-picker-cleaner` you wrote. |
-| `calendarOptions` | object | `{}` | Programmatic escape hatch for calendar options. |
 | `container` | string, element, false | `false` | Teleport target for the dropdown. |
 | `date` | date, string, null | `null` | Initial value. |
 | `disabled` | boolean | `false` | Disables the field and the popup. |
@@ -455,10 +455,10 @@ context.disabled         // disabled state
 | Event | Description |
 | --- | --- |
 | `dateChange.coreui.date-picker` | Fired when the value changes — from the calendar, the field, or a context action. `event.date` is the validated `Date`, or `null`; `event.formattedDate` is the same value in the shape of `selectionType` (`2026-01`, `2026W03`, `2026Q1`, `2026`, or the `Date` itself for `day`). |
+| `hidden.coreui.date-picker` | Fired when the popup has been hidden. |
+| `hide.coreui.date-picker` | Fired immediately when `hide` is called — by the API, the indicator, Escape or an outside click. Call `event.preventDefault()` to keep the popup open. |
 | `show.coreui.date-picker` | Fired immediately when `show` is called. Call `event.preventDefault()` to keep the popup closed. |
 | `shown.coreui.date-picker` | Fired when the popup has been made visible. |
-| `hide.coreui.date-picker` | Fired immediately when `hide` is called — by the API, the indicator, Escape or an outside click. Call `event.preventDefault()` to keep the popup open. |
-| `hidden.coreui.date-picker` | Fired when the popup has been hidden. |
 
 The field's own events (`dateChange.coreui.date-input`,
 `errorChange.coreui.date-input`) still bubble from the inner element — the shell

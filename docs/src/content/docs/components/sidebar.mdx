@@ -647,10 +647,10 @@ CoreUI for Bootstrap's sidebar plugin exposes a few events for hooking into side
 
 | Event | Description |
 | --- | --- |
+| `hidden.coreui.sidebar` | Fired when the sidebar has finished being hidden from the user and CSS transitions have completed. |
+| `hide.coreui.sidebar` | Fired immediately when the `hide()` instance method is called. |
 | `show.coreui.sidebar` | Fired immediately when the `show()` instance method is called. |
 | `shown.coreui.sidebar` | Fired when the sidebar has been made visible to the user and CSS transitions have completed. |
-| `hide.coreui.sidebar` | Fired immediately when the `hide()` instance method is called. |
-| `hidden.coreui.sidebar` | Fired when the sidebar has finished being hidden from the user and CSS transitions have completed. |
 
 var mySidebar = document.getElementById('mySidebar')
 mySidebar.addEventListener('hidden.coreui.sidebar', function () {

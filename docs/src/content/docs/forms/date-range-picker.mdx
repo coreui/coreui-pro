@@ -294,15 +294,15 @@ attributes work on the picker element too.
 | `ariaEndLabel` | string | `'End date'` | Accessible name of the end field when it has no floating label. Both halves are the same control, so naming them apart is what tells a screen reader which end of the range it is on. |
 | `ariaStartLabel` | string | `'Start date'` | Accessible name of the start field when it has no floating label. |
 | `ariaToggleLabel` | string | `'Toggle the calendar'` | Accessible label of the indicator button. |
-| `cleaner` | boolean | `true` | Renders a button that clears the value. It appears only once the field holds one. |
-| `cleanerIcon` | string | cross SVG | Inline SVG rendered by the component (sanitized). |
 | `calendarOptions` | object | `{}` | Programmatic escape hatch for calendar options. |
 | `calendars` | number | `2` | Months shown side by side. |
+| `cleaner` | boolean | `true` | Renders a button that clears the value. It appears only once the field holds one. |
+| `cleanerIcon` | string | cross SVG | Inline SVG rendered by the component (sanitized). |
 | `container` | string, element, false | `false` | Teleport target for the dropdown. |
 | `disabled` | boolean | `false` | Disables the fields and the popup. |
 | `endDate` | date, string, null | `null` | Initial end of the range. |
-| `endName` | string, null | `null` | Name of the end hidden input. |
 | `endFloatingLabel` | string, null | `null` | Renders a floating label over the end field, which also becomes that field's accessible name. |
+| `endName` | string, null | `null` | Name of the end hidden input. |
 | `indicatorIcon` | string | calendar SVG | Inline SVG rendered by the component (sanitized). |
 | `inputOptions` | object | `{}` | Programmatic escape hatch for date input options. |
 | `locale` | string | browser locale | Drives section order, separators, and calendar labels. |
@@ -353,12 +353,12 @@ context.disabled               // disabled state
 
 | Event | Description |
 | --- | --- |
-| `startDateChange.coreui.date-range-picker` | Fired when the start changes. `event.date` is the validated `Date`, or `null`; `event.formattedDate` is the same value in the shape of `selectionType` (`2026-01`, `2026W03`, `2026Q1`, `2026`, or the `Date` itself for `day`). |
 | `endDateChange.coreui.date-range-picker` | Fired when the end changes, with the same payload shape. |
+| `hidden.coreui.date-range-picker` | Fired when the popup has been hidden. |
+| `hide.coreui.date-range-picker` | Fired immediately when `hide` is called. |
 | `show.coreui.date-range-picker` | Fired immediately when `show` is called. Call `event.preventDefault()` to keep the popup closed. |
 | `shown.coreui.date-range-picker` | Fired when the popup has been made visible. |
-| `hide.coreui.date-range-picker` | Fired immediately when `hide` is called. |
-| `hidden.coreui.date-range-picker` | Fired when the popup has been hidden. |
+| `startDateChange.coreui.date-range-picker` | Fired when the start changes. `event.date` is the validated `Date`, or `null`; `event.formattedDate` is the same value in the shape of `selectionType` (`2026-01`, `2026W03`, `2026Q1`, `2026`, or the `Date` itself for `day`). |
 
 ```js
 const myPicker = document.getElementById('myPicker')

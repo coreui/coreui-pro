@@ -308,12 +308,12 @@ All CoreUI chip events are fired from the chip element and bubble.
 
 | Event type | Description |
 | --- | --- |
+| `deselect.coreui.chip` | Fires immediately before a chip is deselected. Cancelable. |
+| `deselected.coreui.chip` | Fired after a chip is deselected. |
 | `remove.coreui.chip` | Fires immediately when `remove` is called. Cancelable. |
 | `removed.coreui.chip` | Fired after the chip has been removed from the DOM. |
 | `select.coreui.chip` | Fires immediately before a chip is selected. Cancelable. |
 | `selected.coreui.chip` | Fired after a chip is selected. |
-| `deselect.coreui.chip` | Fires immediately before a chip is deselected. Cancelable. |
-| `deselected.coreui.chip` | Fired after a chip is deselected. |
 
 ```js
 const myChip = document.getElementById('myChip')
