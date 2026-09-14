@@ -126,6 +126,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `selectable` | boolean | `false` | Enables selection and keyboard selection on the chips. |
 | `selectedIcon` | string | SVG | HTML string used as the check icon on selected filter chips. |
 | `selectionMode` | string | `'multiple'` | Selection behavior: `'multiple'` allows several active chips, `'single'` keeps at most one. |
+| `typeahead` | boolean | `true` | Moves focus to the chip whose value starts with the typed characters. |
 | `unique` | boolean | `false` | Prevents adding a chip whose value already exists in the set. |
 
 ### Methods
@@ -176,6 +177,14 @@ When a chip inside a chip set is focused:
 | `→` | Move focus to the next chip |
 | `Home` | Move focus to the first chip |
 | `End` | Move focus to the last chip |
+| `Shift` + `←` / `→` | Move focus and add the chip it lands on to the selection |
+| `Shift` + `Home` / `End` | Extend the selection to the first or last chip |
+| `Ctrl` / `Cmd` + `A` | Select every chip in the set |
+| a printable character | Move focus to the next chip whose value starts with what you typed (`typeahead`) |
+
+Selecting a range works with the pointer too: `Shift` + click selects every chip between the last one you interacted with and the one you clicked.
+
+The four selection keys are the optional multi-select model from the [listbox pattern](https://www.w3.org/WAI/ARIA/apg/patterns/listbox/) and apply only when `selectable` is on and `selectionMode` is `multiple`. They add to the selection — they never clear it.
 
 Disabled chips (`.chip.disabled`) are skipped while navigating.
 

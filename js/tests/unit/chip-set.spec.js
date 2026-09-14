@@ -202,6 +202,90 @@ describe('ChipSet', () => {
     })
   })
 
+  describe('multi-select keyboard', () => {
+    const keydown = (chip, key, options = {}) => {
+      chip.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, ...options }))
+    }
+
+    it('should select every chip on Ctrl+A', () => {
+      const el = setMarkup(['First', 'Second', 'Third'])
+      const chipSet = new ChipSet(el, { selectable: true })
+
+      const chips = el.querySelectorAll('.chip')
+      chips[0].focus()
+      keydown(chips[0], 'a', { ctrlKey: true })
+
+      expect(chipSet.getSelectedValues()).toEqual(['First', 'Second', 'Third'])
+    })
+
+    it('should leave Ctrl+A alone in single selection mode', () => {
+      const el = setMarkup(['First', 'Second'])
+      const chipSet = new ChipSet(el, { selectable: true, selectionMode: 'single' })
+
+      const chips = el.querySelectorAll('.chip')
+      keydown(chips[0], 'a', { ctrlKey: true })
+
+      expect(chipSet.getSelectedValues()).toEqual([])
+    })
+
+    it('should extend the selection with Shift and an arrow key', () => {
+      const el = setMarkup(['First', 'Second', 'Third'])
+      const chipSet = new ChipSet(el, { selectable: true })
+
+      const chips = el.querySelectorAll('.chip')
+      chips[0].click()
+      keydown(chips[0], 'ArrowRight', { shiftKey: true })
+
+      expect(chipSet.getSelectedValues()).toEqual(['First', 'Second'])
+    })
+
+    it('should extend the selection to the edge with Shift+End', () => {
+      const el = setMarkup(['First', 'Second', 'Third'])
+      const chipSet = new ChipSet(el, { selectable: true })
+
+      const chips = el.querySelectorAll('.chip')
+      chips[0].click()
+      keydown(chips[0], 'End', { shiftKey: true })
+
+      expect(chipSet.getSelectedValues()).toEqual(['First', 'Second', 'Third'])
+    })
+
+    it('should select a range on Shift+click without toggling the clicked chip twice', () => {
+      const el = setMarkup(['First', 'Second', 'Third'])
+      const chipSet = new ChipSet(el, { selectable: true })
+
+      const chips = el.querySelectorAll('.chip')
+      chips[0].click()
+      chips[2].dispatchEvent(new MouseEvent('click', { bubbles: true, shiftKey: true }))
+
+      expect(chipSet.getSelectedValues()).toEqual(['First', 'Second', 'Third'])
+    })
+
+    it('should move focus to the chip matching the typed characters', () => {
+      const el = setMarkup(['Alpha', 'Beta', 'Gamma'])
+      // eslint-disable-next-line no-new
+      new ChipSet(el, { selectable: true })
+
+      const chips = el.querySelectorAll('.chip')
+      chips[0].focus()
+      keydown(chips[0], 'g')
+
+      expect(document.activeElement).toEqual(chips[2])
+    })
+
+    it('should not move focus when typeahead is off', () => {
+      const el = setMarkup(['Alpha', 'Beta', 'Gamma'])
+      // eslint-disable-next-line no-new
+      new ChipSet(el, { selectable: true, typeahead: false })
+
+      const chips = el.querySelectorAll('.chip')
+      chips[0].focus()
+      keydown(chips[0], 'g')
+
+      expect(document.activeElement).toEqual(chips[0])
+    })
+  })
+
   describe('removal', () => {
     it('should keep the remove control out of the listbox option', () => {
       const el = setMarkup(['First', 'Second'])
