@@ -14,7 +14,7 @@ $form-label-tokens: () !default;
 
 // stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
-// scss-docs-start form-label-css-vars
+// scss-docs-start form-label-tokens
 $form-label-tokens: defaults(
   (
     --#{$prefix}label-margin-bottom: $form-label-margin-bottom,
@@ -25,7 +25,7 @@ $form-label-tokens: defaults(
   ),
   $form-label-tokens
 );
-// scss-docs-end form-label-css-vars
+// scss-docs-end form-label-tokens
 
 // stylelint-enable scss/dollar-variable-default, custom-property-no-missing-var-function
 
