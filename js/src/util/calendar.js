@@ -238,28 +238,42 @@ const parseYearString = dateString => {
 }
 
 /**
+ * Default Intl time parts, matching a time picker that shows all three units.
+ */
+const DEFAULT_TIME_OPTIONS = { hour: "numeric", minute: "numeric", second: "numeric" }
+
+/**
+ * Builds the Intl time parts for a time picker configuration, so that formatting
+ * and parsing always agree on which units a value carries.
+ * @param minutes - Whether minutes are offered.
+ * @param seconds - Whether seconds are offered.
+ * @returns Intl.DateTimeFormat options for the time part.
+ */
+export const getTimeFormatOptions = (minutes, seconds) => ({
+  hour: "numeric",
+  ...(minutes && { minute: "numeric" }),
+  ...(minutes && seconds && { second: "numeric" })
+})
+
+/**
  * Helper function to generate multiple date format patterns based on locale.
  * @param locale - The locale to use for date format patterns.
  * @param includeTime - Whether to include time in the patterns.
+ * @param timeOptions - Intl time parts the value carries.
  * @returns Array of date format patterns.
  */
-const generateDatePatterns = (locale, includeTime) => {
+const generateDatePatterns = (locale, includeTime, timeOptions) => {
   const referenceDate = new Date(2013, 11, 31, 17, 19, 22)
+  const dateOptions = { year: "numeric", month: "numeric", day: "numeric" }
+  const format = includeTime ? { ...dateOptions, ...timeOptions } : dateOptions
   const patterns = []
 
   try {
     // Get the standard locale format
-    const standardFormat = includeTime ?
-      referenceDate.toLocaleString(locale) :
-      referenceDate.toLocaleDateString(locale)
-
-    patterns.push(standardFormat)
+    patterns.push(referenceDate.toLocaleString(locale, format))
   } catch {
     // Fallback to default locale if invalid locale provided
-    const standardFormat = includeTime ?
-      referenceDate.toLocaleString("en-US") :
-      referenceDate.toLocaleDateString("en-US")
-    patterns.push(standardFormat)
+    patterns.push(referenceDate.toLocaleString("en-US", format))
   }
 
   // Generate common alternative formats by replacing separators
@@ -471,10 +485,11 @@ const getExpectedPartsCount = patterns => {
  * @param dateString - The day string to parse.
  * @param locale - The locale to use for parsing.
  * @param includeTime - Whether to include time parsing.
+ * @param timeOptions - Intl time parts the value carries.
  * @returns Date object or null if invalid.
  */
-const parseDayString = (dateString, locale, includeTime) => {
-  const patterns = generateDatePatterns(locale, includeTime)
+const parseDayString = (dateString, locale, includeTime, timeOptions) => {
+  const patterns = generateDatePatterns(locale, includeTime, timeOptions)
   const groups = tryParseWithPatterns(dateString, patterns, includeTime)
 
   if (!groups) {
@@ -529,13 +544,15 @@ const parseLocalDateString = dateString => {
  * @param selectionType - The type of selection ('day', 'week', 'month', 'year').
  * @param locale - The locale to use for date parsing (for day parsing).
  * @param includeTime - Whether to include time parsing (for day parsing).
+ * @param timeOptions - Intl time parts the value carries (for day parsing).
  * @returns The corresponding Date object or null if invalid.
  */
 export const convertToDateObject = (
   date,
   selectionType,
   locale = "en-US",
-  includeTime = false
+  includeTime = false,
+  timeOptions = DEFAULT_TIME_OPTIONS
 ) => {
   if (date === null) {
     return null
@@ -566,7 +583,7 @@ export const convertToDateObject = (
 
     default: {
       // Enhanced day parsing with locale support
-      return parseDayString(dateString, locale, includeTime)
+      return parseDayString(dateString, locale, includeTime, timeOptions)
     }
   }
 }
@@ -577,20 +594,22 @@ export const convertToDateObject = (
  * @param locale - The locale to use for date format patterns.
  * @param includeTime - Whether to include time parsing.
  * @param selectionType - The selection type ('day', 'week', 'month', 'quarter', 'year').
+ * @param timeOptions - Intl time parts the value carries.
  * @returns A Date object if parsing succeeds, null if parsing fails.
  */
 export const getLocalDateFromString = (
   dateString,
   locale = "en-US",
   includeTime = false,
-  selectionType = "day"
+  selectionType = "day",
+  timeOptions = DEFAULT_TIME_OPTIONS
 ) => {
   // Input validation
   if (!dateString || typeof dateString !== "string") {
     return null
   }
 
-  return convertToDateObject(dateString, selectionType, locale, includeTime)
+  return convertToDateObject(dateString, selectionType, locale, includeTime, timeOptions)
 }
 
 /**

@@ -15,7 +15,7 @@ import SelectorEngine from './dom/selector-engine.js'
 import { DefaultAllowlist } from './util/sanitizer.js'
 import { defineJQueryPlugin, getElement, isRTL } from './util/index.js'
 import {
-  convertToDateObject, getDateBySelectionType, getLocalDateFromString, isDateDisabled
+  convertToDateObject, getDateBySelectionType, getLocalDateFromString, getTimeFormatOptions, isDateDisabled
 } from './util/calendar.js'
 import FocusTrap from './util/focustrap.js'
 
@@ -100,6 +100,7 @@ const Default = {
   endName: null,
   firstDayOfWeek: 1,
   footer: false,
+  hours: null,
   inputDateFormat: null,
   inputDateParse: null,
   inputOnChangeDelay: 750,
@@ -109,6 +110,7 @@ const Default = {
   locale: 'default',
   maxDate: null,
   minDate: null,
+  minutes: true,
   monthFormat: 'short',
   name: null,
   placeholder: ['Start date', 'End date'],
@@ -123,6 +125,7 @@ const Default = {
   required: true,
   sanitize: true,
   sanitizeFn: null,
+  seconds: true,
   separator: true,
   size: null,
   startDate: null,
@@ -163,6 +166,7 @@ const DefaultType = {
   endName: '(string|null)',
   firstDayOfWeek: 'number',
   footer: 'boolean',
+  hours: '(array|function|null)',
   indicator: 'boolean',
   inputDateFormat: '(function|null)',
   inputDateParse: '(function|null)',
@@ -172,6 +176,7 @@ const DefaultType = {
   locale: 'string',
   maxDate: '(date|number|string|null)',
   minDate: '(date|number|string|null)',
+  minutes: '(array|boolean|function)',
   monthFormat: 'string',
   name: '(string|null)',
   placeholder: '(array|string)',
@@ -186,6 +191,7 @@ const DefaultType = {
   required: 'boolean',
   sanitize: 'boolean',
   sanitizeFn: '(null|function)',
+  seconds: '(array|boolean|function)',
   separator: 'boolean',
   size: '(string|null)',
   startDate: '(date|number|string|null)',
@@ -611,7 +617,10 @@ class DateRangePicker extends BaseComponent {
   _getTimePickerConfig(start) {
     return {
       disabled: start ? !this._startDate : !this._endDate,
+      hours: this._config.hours,
       locale: this._config.locale,
+      minutes: this._config.minutes,
+      seconds: this._config.minutes && this._config.seconds,
       time: start ? this._startDate && new Date(this._startDate) : this._endDate && new Date(this._endDate),
       type: 'inline',
       variant: 'select'
@@ -1033,7 +1042,13 @@ class DateRangePicker extends BaseComponent {
     }
 
     if (this._config.selectionType === 'day') {
-      return getLocalDateFromString(str, this._config.locale, this._config.timepicker)
+      return getLocalDateFromString(
+        str,
+        this._config.locale,
+        this._config.timepicker,
+        this._config.selectionType,
+        this._getTimeFormatOptions()
+      )
     }
 
     return convertToDateObject(str, this._config.selectionType)
@@ -1056,7 +1071,20 @@ class DateRangePicker extends BaseComponent {
 
     const _date = new Date(date)
 
-    return this._config.timepicker ? _date.toLocaleString(this._config.locale) : _date.toLocaleDateString(this._config.locale)
+    if (!this._config.timepicker) {
+      return _date.toLocaleDateString(this._config.locale)
+    }
+
+    return _date.toLocaleString(this._config.locale, {
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric',
+      ...this._getTimeFormatOptions()
+    })
+  }
+
+  _getTimeFormatOptions() {
+    return getTimeFormatOptions(this._config.minutes, this._config.seconds)
   }
 
   _getButtonClasses(classes) {
