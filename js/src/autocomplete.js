@@ -635,7 +635,6 @@ class Autocomplete extends BaseComponent {
     if (!this._config.disabled && this._config.showHints) {
       const inputHintEl = document.createElement('input')
       inputHintEl.classList.add(CLASS_NAME_INPUT, CLASS_NAME_INPUT_HINT)
-      inputHintEl.setAttribute('name', (this._config.name || `${this._uniqueId}-hint`).toString())
       inputHintEl.autocomplete = 'off'
       inputHintEl.readOnly = true
       inputHintEl.tabIndex = -1
