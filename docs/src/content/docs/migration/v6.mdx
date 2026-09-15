@@ -909,6 +909,14 @@ check, radio, carousel and toggler icons already work:
   `new FormData(form).getAll(name)` returns one entry and `form.elements[name]`
   is an input rather than a `RadioNodeList`. Code written around the old shape,
   such as reading `getAll(name)[1]`, needs the plain value.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **Multi Select's search field no longer reaches the server.** The input that
+  filters the options carried a `name` and is a plain text input, so every form
+  holding a Multi Select submitted whatever the user had typed to narrow the
+  list: `search-<name>` when the select had a name, `search-<uid>` when it did
+  not. It carries no `name` now, the `search-…` key is gone from the payload,
+  and the input sets `autocomplete="off"` so the browser stops offering to fill
+  it.
 
 #### Menu (new) and Dropdown
 

@@ -791,7 +791,7 @@ class MultiSelect extends ComboboxBase {
     }
 
     input.setAttribute('id', `search-${this._uniqueId}`)
-    input.setAttribute('name', `search-${this._uniqueName}`)
+    input.autocomplete = 'off'
     input.setAttribute('aria-label', this._config.ariaSearchLabel)
     input.setAttribute('aria-autocomplete', 'list')
     input.setAttribute('aria-controls', `${this._uniqueId}-listbox`)
