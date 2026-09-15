@@ -32,11 +32,16 @@ export const applyControlGroupClasses = (element: HTMLElement, ...classNames: st
     return
   }
 
+  const hadStyleAttribute = element.hasAttribute('style')
   const previous = element.style.transitionProperty
   element.style.transitionProperty = 'none'
   element.classList.add(...classNames)
   reflow(element)
   element.style.transitionProperty = previous
+
+  if (!hadStyleAttribute && element.getAttribute('style') === '') {
+    element.removeAttribute('style')
+  }
 }
 
 export type ControlGroup = {

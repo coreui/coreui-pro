@@ -53,6 +53,8 @@ const CLASS_NAME_INDICATOR = 'form-control-action'
 const CLASS_NAME_INPUT = 'form-control'
 const CLASS_NAME_INPUT_HINT = 'autocomplete-input-hint'
 const CLASS_NAME_INPUT_GROUP = 'form-control-group'
+const CLASS_NAME_IS_INVALID = 'is-invalid'
+const CLASS_NAME_IS_VALID = 'is-valid'
 const CLASS_NAME_SHOW = 'show'
 
 const SELECTOR_DATA_AUTOCOMPLETE = '[data-coreui-autocomplete]:not(.disabled)'
@@ -128,6 +130,8 @@ class Autocomplete extends ComboboxBase {
   protected declare _cleanerElement: any
   protected declare _inputElement: any
   protected declare _inputHintElement: any
+  protected declare _addedClassNames: string[]
+  protected declare _previousTabIndex: string | null
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
@@ -137,6 +141,8 @@ class Autocomplete extends ComboboxBase {
     this._inputElement = null
     this._inputHintElement = null
     this._togglerElement = null
+    this._addedClassNames = []
+    this._previousTabIndex = null
     this._optionsElement = null
 
     this._menu = null
@@ -188,22 +194,34 @@ class Autocomplete extends ComboboxBase {
   }
 
   override dispose(): void {
+    if (!this._element) {
+      return
+    }
+
     this._disposeFloating()
     this._disposeListBox()
 
     for (const element of [
       this._menu,
+      this._optionsElement,
+      this._inputHintElement,
       this._inputElement,
       this._cleanerElement,
-      this._indicatorElement,
-      this._optionsElement
+      this._indicatorElement
     ]) {
       if (element) {
         EventHandler.off(element, EVENT_KEY)
+        element.remove()
       }
     }
 
-    this._menu?.remove()
+    this._element.classList.remove(CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID, CLASS_NAME_SHOW, ...this._addedClassNames)
+
+    if (this._previousTabIndex === null) {
+      this._element.removeAttribute('tabindex')
+    } else {
+      this._element.setAttribute('tabindex', this._previousTabIndex)
+    }
 
     super.dispose()
   }
@@ -264,10 +282,6 @@ class Autocomplete extends ComboboxBase {
     EventHandler.trigger(this._element, EVENT_CHANGED, {
       value
     })
-  }
-
-  _getClassNames(): string[] {
-    return this._element.classList.value.split(' ')
   }
 
   _highlightOption(label: string): string {
@@ -504,17 +518,22 @@ class Autocomplete extends ComboboxBase {
     return _options
   }
 
-  _createAutocomplete(): void {
-    this._element.classList.add(CLASS_NAME_AUTOCOMPLETE)
-    this._element.classList.toggle('is-invalid', this._config.invalid)
-    this._element.classList.toggle('is-valid', this._config.valid)
-
-    if (this._config.disabled) {
-      this._element.classList.add(CLASS_NAME_DISABLED)
+  _addClassName(className: string): void {
+    if (this._element.classList.contains(className)) {
+      return
     }
 
-    for (const className of this._getClassNames()) {
-      this._element.classList.add(className)
+    this._element.classList.add(className)
+    this._addedClassNames.push(className)
+  }
+
+  _createAutocomplete(): void {
+    this._addClassName(CLASS_NAME_AUTOCOMPLETE)
+    this._element.classList.toggle(CLASS_NAME_IS_INVALID, this._config.invalid)
+    this._element.classList.toggle(CLASS_NAME_IS_VALID, this._config.valid)
+
+    if (this._config.disabled) {
+      this._addClassName(CLASS_NAME_DISABLED)
     }
 
     this._createInputGroup()
@@ -527,6 +546,12 @@ class Autocomplete extends ComboboxBase {
     // The root is the frame: a field component has nothing to wrap, so it
     // carries `.form-control-group` itself instead of nesting one.
     const togglerEl = this._element
+    this._previousTabIndex = togglerEl.getAttribute('tabindex')
+
+    if (!togglerEl.classList.contains(CLASS_NAME_INPUT_GROUP)) {
+      this._addedClassNames.push(CLASS_NAME_INPUT_GROUP)
+    }
+
     applyControlGroupClasses(togglerEl, CLASS_NAME_INPUT_GROUP)
     this._togglerElement = togglerEl
 
