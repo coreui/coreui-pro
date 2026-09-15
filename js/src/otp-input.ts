@@ -99,9 +99,9 @@ class OTPInput extends BaseComponent {
     this._config = this._getConfig(config)
     this._inputElement = null
 
-    this._createHiddenInput()
     this._setRoleAttribute()
     this._setInputsAttributes()
+    this._createHiddenInput()
     this._setInputsTabIndexes()
     this._addEventListeners()
   }
@@ -131,15 +131,21 @@ class OTPInput extends BaseComponent {
     this._setInputsTabIndexes()
   }
 
+  override dispose(): void {
+    this._inputElement?.remove()
+
+    super.dispose()
+  }
+
   reset(): void {
     const inputs = this._getInputs()
     for (const [index, input] of inputs.entries()) {
-      const valueString = String(this._config.value || '')
+      const valueString = String(this._config.value ?? '')
 
       input.value = valueString && valueString[index] ? valueString[index] : ''
     }
 
-    this._setHiddenInputValue(null)
+    this._setHiddenInputValue(this._readSlots() || null)
     this._syncFirstInputMaxLength()
     this._setInputsTabIndexes()
   }
@@ -338,6 +344,10 @@ class OTPInput extends BaseComponent {
     return SelectorEngine.find<HTMLInputElement>(SELECTOR_FORM_OTP_CONTROL, this._element)
   }
 
+  _readSlots(): string {
+    return this._getInputs().map(input => input.value).join('')
+  }
+
   _createHiddenInput(): void {
     const hiddenInput = document.createElement('input')
     hiddenInput.type = 'hidden'
@@ -354,7 +364,7 @@ class OTPInput extends BaseComponent {
       hiddenInput.name = this._config.name
     }
 
-    hiddenInput.value = this._config.value || ''
+    hiddenInput.value = this._readSlots()
 
     this._element.append(hiddenInput)
     this._inputElement = hiddenInput
@@ -438,19 +448,15 @@ class OTPInput extends BaseComponent {
         input.disabled = true
       }
 
-      if (this._config.id) {
+      if (this._config.id && !input.id) {
         input.id = `${this._config.id}-${index}`
-      }
-
-      if (this._config.name) {
-        input.name = `${this._config.name}-${index}`
       }
 
       if (this._config.readonly) {
         input.readOnly = true
       }
 
-      const valueString = String(this._config.value || '')
+      const valueString = String(this._config.value ?? '')
 
       if (valueString && valueString[index]) {
         input.value = valueString[index]

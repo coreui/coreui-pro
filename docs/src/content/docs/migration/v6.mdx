@@ -1890,6 +1890,14 @@ adornment in the library — so the button needs no icon markup at all:
   the field, as a paste already was. Previously such a value stayed in one slot
   and the submitted value was empty. The slots also gained `enterkeyhint`,
   `autocorrect="off"` and `spellcheck="false"`.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **Only the hidden input carries the field's `name`.** Each visible slot was
+  given `<name>-<index>` on top of it, so a six-slot field submitted seven
+  keys where the option is documented as the name of the hidden input. The
+  slots are unnamed now, and a `name` or an `id` written on a slot in the
+  markup is left alone instead of being overwritten. The hidden input carries
+  whatever the slots show, so slots rendered with their own `value` attributes
+  are submitted as well, which they were not before.
 - **In a right-to-left field, `linear` now holds the forward move rather than
   the `ArrowRight` key.** Forward is `ArrowLeft` when the field reads
   right-to-left, so that is the key a linear field stops on an empty slot,
