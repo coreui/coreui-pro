@@ -899,6 +899,16 @@ check, radio, carousel and toggler icons already work:
   the panel header, reachable with <kbd>Tab</kbd>, and carries
   `aria-pressed` (`true`/`false`/`mixed`). Selectable group labels are in the
   arrow order in their place.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **Autocomplete's typeahead hint no longer reaches the server.** With
+  `showHints` on, the hint input behind the field carried a `name` and, being
+  readonly rather than disabled, was serialized with the form: the configured
+  `name` when there was one, `<uid>-hint` when there was not. A form therefore
+  submitted either the field twice with an empty string in front of the value,
+  or an extra `…-hint` key nobody asked for. The hint now carries no `name`, so
+  `new FormData(form).getAll(name)` returns one entry and `form.elements[name]`
+  is an input rather than a `RadioNodeList`. Code written around the old shape,
+  such as reading `getAll(name)[1]`, needs the plain value.
 
 #### Menu (new) and Dropdown
 
