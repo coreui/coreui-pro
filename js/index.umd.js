@@ -1,7 +1,7 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI PRO index.esm.js
- * Licensed under MIT (Licensed under MIT (https://coreui.io/pro/license/)
+ * CoreUI PRO index.umd.js
+ * License (https://coreui.io/pro/license/)
  * --------------------------------------------------------------------------
  */
 
