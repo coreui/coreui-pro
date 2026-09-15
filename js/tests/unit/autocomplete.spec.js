@@ -53,10 +53,19 @@ describe('Autocomplete', () => {
       expect(autocompleteByElement._element).toEqual(autocompleteEl)
     })
 
+    it('should create autocomplete without a config', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl)
+
+      expect(autocomplete._config.options).toEqual([])
+      expect(autocomplete._options).toEqual([])
+    })
+
     it('should create autocomplete with default options', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
-      const autocomplete = new Autocomplete(autocompleteEl, { options: [] })
+      const autocomplete = new Autocomplete(autocompleteEl)
 
       expect(autocomplete._config.allowOnlyDefinedOptions).toBe(false)
       expect(autocomplete._config.cleaner).toBe(false)
@@ -3157,6 +3166,18 @@ describe('Autocomplete', () => {
       const _autocomplete = new Autocomplete(autocompleteEl, { options: [{ label: 'Test', value: '1' }] })
 
       expect(Autocomplete.getInstance(autocompleteEl)).toBeInstanceOf(Autocomplete)
+    })
+
+    it('should initialize every autocomplete on the page', () => {
+      fixtureEl.innerHTML = [
+        '<div id="autocompleteWithoutOptions" data-coreui-toggle="autocomplete"></div>',
+        '<div id="autocompleteWithOptions" data-coreui-toggle="autocomplete" data-coreui-options="Angular, React, Vue.js"></div>'
+      ].join('')
+
+      window.dispatchEvent(createEvent('load'))
+
+      expect(Autocomplete.getInstance(fixtureEl.querySelector('#autocompleteWithoutOptions'))).toBeInstanceOf(Autocomplete)
+      expect(Autocomplete.getInstance(fixtureEl.querySelector('#autocompleteWithOptions'))).toBeInstanceOf(Autocomplete)
     })
 
     it('should close autocomplete when clicking outside', () => {
