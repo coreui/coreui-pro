@@ -308,7 +308,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `search` | Performs a search with the provided text parameter. |
 | `update` | Updates the component configuration and rebuilds the interface. |
 | `deselectAll` | Deselects all currently selected options. |
-| `dispose` | Destroys the component instance and removes stored data. |
+| `dispose` | Destroys the component instance, removes the markup it generated and the class names it added, and removes stored data. Class names already present in your markup are left alone. |
 | `getInstance` | Static method to get the Bootstrap autocomplete instance associated with a DOM element. |
 
 ### Events
