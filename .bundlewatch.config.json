@@ -70,7 +70,7 @@
     },
     {
       "path": "./dist/js/coreui.esm.min.js",
-      "maxSize": "101KB"
+      "maxSize": "92KB"
     },
     {
       "path": "./dist/js/coreui.js",
