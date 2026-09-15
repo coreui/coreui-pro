@@ -262,10 +262,10 @@ We use the following JavaScript to set up our autocomplete:
 
 ### Via data attributes
 
-Add `autocomplete` class to a container element with an input field:
+Add the `data-coreui-autocomplete` attribute to a container element:
 
 ```html
-<div data-coreui-autocomplete data-coreui-search="true"></div>
+<div data-coreui-autocomplete data-coreui-options="JavaScript, TypeScript, React, Vue.js, Angular" data-coreui-search="global"></div>
 ```
 
 ### Via JavaScript
@@ -312,7 +312,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `id` | string, null | `null` | Sets a custom ID for the component. If not provided, a unique ID is auto-generated. |
 | `invalid` | boolean | `false` | Applies invalid styling to the component. |
 | `name` | string, null | `null` | Sets the name attribute for the input element. |
-| `options` | boolean, array | `false` | Array of options or option objects to populate the dropdown. |
+| `options` | array, string, null | `[]` | Array of options or option objects to populate the dropdown. |
 | `optionsGroupsTemplate` | function, null | `null` | Custom template function for rendering option group labels. Receives the group object as parameter. |
 | `optionsMaxHeight` | number, string | `'auto'` | Sets the maximum height of the options dropdown. |
 | `optionsTemplate` | function, null | `null` | Custom template function for rendering individual options. Receives the option object as parameter. |
@@ -322,7 +322,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `sanitize` | boolean | `true` | Enables HTML sanitization for custom templates to prevent XSS attacks. |
 | `sanitizeFn` | function, null | `null` | Custom sanitization function. If provided, it will be used instead of the built-in sanitizer. |
 | `search` | array, string, null | `null` | Enables search functionality. Use `'global'` for global search across the component and `'external'` when options are provided from external sources. |
-| `searchNoResultsLabel` | string | `false` | Text displayed when no search results are found. |
+| `searchNoResultsLabel` | boolean, string | `false` | Text displayed when no search results are found. |
 | `showHints` | boolean | `false` | Shows completion hints as users type. |
 | `valid` | boolean | `false` | Applies valid styling to the component. |
 | `value` | number, string, null | `null` | Sets the initial value of the component. |
