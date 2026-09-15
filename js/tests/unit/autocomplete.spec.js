@@ -2376,6 +2376,122 @@ describe('Autocomplete', () => {
       expect(clearSpy).not.toHaveBeenCalled()
       expect(optionSelectedSpy).not.toHaveBeenCalled()
     })
+
+    it('should remove the elements it generated from the host on dispose', () => {
+      fixtureEl.innerHTML = '<div id="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('#autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        cleaner: true,
+        pickerIcon: true,
+        showHints: true,
+        options: [{ label: 'Option 1', value: '1' }]
+      })
+
+      autocomplete.dispose()
+
+      expect(autocompleteEl.innerHTML).toEqual('')
+      expect(autocompleteEl.className).toEqual('')
+      expect(autocompleteEl.hasAttribute('tabindex')).toBeFalse()
+    })
+
+    it('should not accumulate generated elements across dispose and re-init cycles', () => {
+      fixtureEl.innerHTML = '<div id="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('#autocomplete')
+      const config = {
+        cleaner: true,
+        pickerIcon: true,
+        showHints: true,
+        options: [{ label: 'Option 1', value: '1' }]
+      }
+
+      for (let i = 0; i < 3; i++) {
+        const autocomplete = new Autocomplete(autocompleteEl, config)
+
+        expect(autocompleteEl.querySelectorAll('input').length).toEqual(2)
+        expect(autocompleteEl.querySelectorAll('button').length).toEqual(2)
+
+        autocomplete.dispose()
+      }
+
+      expect(autocompleteEl.querySelectorAll('input').length).toEqual(0)
+      expect(autocompleteEl.querySelectorAll('button').length).toEqual(0)
+    })
+
+    it('should take the show class off the host when disposed while open', () => {
+      fixtureEl.innerHTML = '<div id="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('#autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        options: [{ label: 'Option 1', value: '1' }]
+      })
+
+      autocomplete.show()
+      expect(autocompleteEl.classList.contains('show')).toBeTrue()
+
+      autocomplete.dispose()
+
+      expect(autocompleteEl.classList.contains('show')).toBeFalse()
+    })
+
+    it('should tolerate a second dispose', () => {
+      fixtureEl.innerHTML = '<div id="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('#autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, { options: [] })
+
+      autocomplete.dispose()
+
+      expect(() => autocomplete.dispose()).not.toThrow()
+    })
+
+    it('should keep the tab stop the page wrote on the host', () => {
+      fixtureEl.innerHTML = '<div id="autocomplete" tabindex="0"></div>'
+      const autocompleteEl = fixtureEl.querySelector('#autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, { options: [] })
+
+      autocomplete.dispose()
+
+      expect(autocompleteEl.getAttribute('tabindex')).toEqual('0')
+    })
+
+    it('should remove the disabled class it added even after setConfig', () => {
+      fixtureEl.innerHTML = '<div id="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('#autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, { disabled: true, options: [] })
+
+      autocomplete.setConfig({ disabled: false })
+      autocomplete.dispose()
+
+      expect(autocompleteEl.classList.contains('disabled')).toBeFalse()
+    })
+
+    it('should keep a disabled class the page wrote on the host', () => {
+      fixtureEl.innerHTML = '<div id="autocomplete" class="disabled"></div>'
+      const autocompleteEl = fixtureEl.querySelector('#autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, { disabled: true, options: [] })
+
+      autocomplete.dispose()
+
+      expect(autocompleteEl.classList.contains('disabled')).toBeTrue()
+    })
+
+    it('should leave no style attribute behind on a host that had none', () => {
+      fixtureEl.innerHTML = '<div id="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('#autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, { options: [] })
+
+      autocomplete.dispose()
+
+      expect(autocompleteEl.hasAttribute('style')).toBeFalse()
+    })
+
+    it('should keep the classes the page wrote on the host', () => {
+      fixtureEl.innerHTML = '<div id="autocomplete" class="autocomplete form-control-group my-custom-class"></div>'
+      const autocompleteEl = fixtureEl.querySelector('#autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, { options: [] })
+
+      autocomplete.dispose()
+
+      expect(autocompleteEl.className).toEqual('autocomplete form-control-group my-custom-class')
+    })
   })
 
   describe('input blur', () => {
@@ -3656,18 +3772,6 @@ describe('Autocomplete', () => {
       document.body.append(el)
       expect(autocomplete._isOptionDisplayed(el)).toBe(false)
       el.remove()
-    })
-  })
-
-  describe('_getClassNames', () => {
-    it('should return class names from element', () => {
-      fixtureEl.innerHTML = '<div class="autocomplete my-custom-class"></div>'
-      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
-      const autocomplete = new Autocomplete(autocompleteEl, { options: [] })
-
-      const classNames = autocomplete._getClassNames()
-      expect(classNames).toContain('autocomplete')
-      expect(classNames).toContain('my-custom-class')
     })
   })
 
