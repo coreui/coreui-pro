@@ -36,7 +36,7 @@ const TAB_KEY = 'Tab'
 const RIGHT_MOUSE_BUTTON = 2 // MouseEvent.button value for the secondary button, usually the right button
 
 const EVENT_BLUR = `blur${EVENT_KEY}`
-const EVENT_CHANGED = `changed${EVENT_KEY}`
+const EVENT_CHANGE = `change${EVENT_KEY}`
 const EVENT_CLICK = `click${EVENT_KEY}`
 const EVENT_INPUT = `input${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
@@ -279,7 +279,7 @@ class Autocomplete extends ComboboxBase {
   // Helpers
 
   _triggerChangeEvent(value: any): void {
-    EventHandler.trigger(this._element, EVENT_CHANGED, {
+    EventHandler.trigger(this._element, EVENT_CHANGE, {
       value
     })
   }

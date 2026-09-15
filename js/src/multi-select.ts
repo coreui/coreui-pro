@@ -50,7 +50,7 @@ const SELECTOR_DATA_MULTI_SELECT = '[data-coreui-multi-select]'
 const SELECTOR_SELECT = 'select.form-multi-select'
 const SELECTOR_SELECTION = '.form-multi-select-selection'
 
-const EVENT_CHANGED = `changed${EVENT_KEY}`
+const EVENT_CHANGE = `change${EVENT_KEY}`
 const EVENT_CLICK = `click${EVENT_KEY}`
 const EVENT_HIDDEN = `hidden${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
@@ -1026,7 +1026,7 @@ class MultiSelect extends ComboboxBase {
 
     this._syncOptionElementState(value, true)
 
-    EventHandler.trigger(this._element, EVENT_CHANGED, {
+    EventHandler.trigger(this._element, EVENT_CHANGE, {
       value: this._selected
     })
 
@@ -1048,7 +1048,7 @@ class MultiSelect extends ComboboxBase {
 
     this._syncOptionElementState(value, false)
 
-    EventHandler.trigger(this._element, EVENT_CHANGED, {
+    EventHandler.trigger(this._element, EVENT_CHANGE, {
       value: this._selected
     })
 

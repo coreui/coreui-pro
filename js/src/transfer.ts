@@ -643,8 +643,8 @@ class Transfer extends BaseComponent {
 
   _triggerChange(): void {
     EventHandler.trigger(this._element, this.constructor.eventName(EVENT_CHANGE), {
-      sourceValues: this.getSource(),
-      targetValues: this.getTarget()
+      source: this.getSource(),
+      value: this.getTarget()
     })
   }
 

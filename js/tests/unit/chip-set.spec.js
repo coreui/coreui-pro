@@ -597,17 +597,31 @@ describe('ChipSet', () => {
       expect(chipSet.getValues()).toEqual(['First'])
     })
 
-    it('should emit change.coreui.chip-set with the values on add', () => {
+    it('should emit change.coreui.chip-set with the value on add', () => {
       return new Promise(resolve => {
         const el = setMarkup(['First'])
         const chipSet = new ChipSet(el)
 
         el.addEventListener('change.coreui.chip-set', event => {
-          expect(event.values).toEqual(['First', 'Second'])
+          expect(event.value).toEqual(['First', 'Second'])
           resolve()
         })
 
         chipSet.add('Second')
+      })
+    })
+
+    it('should emit change.coreui.chip-set with the value on remove', () => {
+      return new Promise(resolve => {
+        const el = setMarkup(['First', 'Second'])
+        const chipSet = new ChipSet(el)
+
+        el.addEventListener('change.coreui.chip-set', event => {
+          expect(event.value).toEqual(['First'])
+          resolve()
+        })
+
+        chipSet.remove('Second')
       })
     })
   })

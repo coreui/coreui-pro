@@ -189,7 +189,7 @@ class ChipSet extends BaseComponent {
     this._announce(`${value} ${this._config.ariaAddedAnnouncement}`)
 
     EventHandler.trigger(this._element, this.constructor.eventName(EVENT_CHANGE), {
-      values: this.getValues()
+      value: this.getValues()
     })
 
     return element
@@ -662,7 +662,7 @@ class ChipSet extends BaseComponent {
     this._announce(`${value} ${this._config.ariaRemovedAnnouncement}`)
 
     EventHandler.trigger(this._element, this.constructor.eventName(EVENT_CHANGE), {
-      values: this.getValues()
+      value: this.getValues()
     })
     EventHandler.trigger(this._element, this.constructor.eventName(EVENT_SELECT), {
       selected: this.getSelectedValues()

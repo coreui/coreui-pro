@@ -346,7 +346,7 @@ The Autocomplete component exposes several events for integrating with applicati
 
 | Event | Description |
 | --- | --- |
-| `changed.coreui.autocomplete` | Fires when an option is selected or the input value changes. |
+| `change.coreui.autocomplete` | Fires when an option is selected or the input value changes. |
 | `hidden.coreui.autocomplete` | Fired when the dropdown has been hidden and CSS transitions completed. |
 | `hide.coreui.autocomplete` | Event fires immediately when the hide method is called. Call `event.preventDefault()` to keep the menu open. |
 | `input.coreui.autocomplete` | Fires when the search input value changes. |
@@ -355,7 +355,7 @@ The Autocomplete component exposes several events for integrating with applicati
 
 ```js
 const myAutocomplete = document.getElementById('myAutocomplete')
-myAutocomplete.addEventListener('changed.coreui.autocomplete', event => {
+myAutocomplete.addEventListener('change.coreui.autocomplete', event => {
   // Get the selected value
   const selectedValue = event.value
   // Your callback function to handle change

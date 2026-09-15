@@ -364,11 +364,30 @@ describe('ChipInput', () => {
         const chipInput = new ChipInput(el)
 
         el.addEventListener('change.coreui.chip-input', event => {
-          expect(event.values).toEqual(['JavaScript'])
+          expect(event.value).toEqual(['JavaScript'])
           resolve()
         })
 
         chipInput.add('JavaScript')
+      })
+    })
+
+    it('should trigger change event after removing', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
+
+        const el = fixtureEl.querySelector('.chip-input')
+        const chipInput = new ChipInput(el)
+
+        chipInput.add('JavaScript')
+        chipInput.add('TypeScript')
+
+        el.addEventListener('change.coreui.chip-input', event => {
+          expect(event.value).toEqual(['JavaScript'])
+          resolve()
+        })
+
+        chipInput.remove('TypeScript')
       })
     })
 

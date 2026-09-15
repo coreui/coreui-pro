@@ -477,7 +477,7 @@ Events fire on the `.list-box` element.
 | --- | --- |
 | `action.coreui.list-box` | Fired when an option is activated in `none` mode or when the option is a link; `event.value` is the value and `event.relatedTarget` the option. |
 | `activate.coreui.list-box` | Fired when the highlight moves; `event.value` is the newly highlighted value. |
-| `change.coreui.list-box` | Fired once per operation after the selection settled; `event.selected` is the array of selected values. |
+| `change.coreui.list-box` | Fired once per operation after the selection settled; `event.value` is the array of selected values. |
 | `deselect.coreui.list-box` | Fires before a value is removed from the selection. Cancelable. |
 | `deselected.coreui.list-box` | Fired after the value was removed from the selection. |
 | `search.coreui.list-box` | Fired on every keystroke in the search field with `search: 'external'`; `event.query` is what was typed. Nothing is filtered — answer with `setItems()`. |
@@ -488,7 +488,7 @@ Events fire on the `.list-box` element.
 ```js
 const myListBox = document.getElementById('myListBox')
 myListBox.addEventListener('change.coreui.list-box', event => {
-  console.log(event.selected)
+  console.log(event.value)
 })
 ```
 

@@ -402,7 +402,7 @@ Events fire on the `.transfer` element.
 
 | Event type | Description |
 | --- | --- |
-| `change.coreui.transfer` | Fired after a move settled; `event.sourceValues` and `event.targetValues` are the values of the two lists. The names avoid `event.target`, which stays the `.transfer` element. |
+| `change.coreui.transfer` | Fired after a move settled; `event.value` is the target list and `event.source` the source list. `event.target` stays the `.transfer` element. |
 | `move.coreui.transfer` | Fires before options are moved; `event.direction` is `'source'` or `'target'` and `event.values` the values about to move. Cancelable — calling `preventDefault()` leaves both lists as they were. |
 | `moved.coreui.transfer` | Fired after the options were moved, with the same `direction` and `values`. |
 | `search.coreui.transfer` | Fired on every keystroke in a search field with `search: 'external'`; `event.side` is `'source'` or `'target'` and `event.query` what was typed. Nothing is filtered — answer with `setItems()`. |
@@ -410,7 +410,7 @@ Events fire on the `.transfer` element.
 ```js
 const myTransfer = document.getElementById('myTransfer')
 myTransfer.addEventListener('change.coreui.transfer', event => {
-  console.log(event.targetValues)
+  console.log(event.value)
 })
 ```
 
