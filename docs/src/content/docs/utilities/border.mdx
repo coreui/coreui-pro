@@ -17,7 +17,9 @@ Use border utilities to add or remove an element's borders. Choose from all bord
   <span class="border-x"></span>
   <span class="border-y"></span>`} />
 
-<AddedIn version="6.0.0" /> `.border-x` and `.border-y` set the `border-inline` and `border-block` shorthands, so they follow the writing direction the way the single-side classes do.
+<AddedIn version="6.0.0" />
+
+`.border-x` and `.border-y` set the `border-inline` and `border-block` shorthands, so they follow the writing direction the way the single-side classes do.
 
 ## Subtractive
 
@@ -33,7 +35,9 @@ Or remove borders:
 
 ## Width
 
-<AddedIn version="6.0.0" /> `.border-keyline` sits below `1px`, for a hairline that stays hairline on a high-density screen instead of thickening to a full device pixel.
+<AddedIn version="6.0.0" />
+
+`.border-keyline` sits below `1px`, for a hairline that stays hairline on a high-density screen instead of thickening to a full device pixel.
 
 The widths are a scale on `--cui-border-width`: `.border-1` is the base, `.border-keyline` half of it, `.border-2` … `.border-5` its multiples, computed in the browser. `:root { --cui-border-width: 2px }` re-weights every width class and every component border at once.
 
