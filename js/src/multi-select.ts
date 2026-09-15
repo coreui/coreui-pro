@@ -112,9 +112,9 @@ const Default = {
   selectAllLabel: 'Select all',
   selectAllMode: 'all',
   selectedLabel: (count: number) => `${count} item(s) selected`,
+  selectFilteredLabel: 'Select filtered',
   selectionLimit: null,
   selectionType: 'tags',
-  selectFilteredLabel: 'Select filtered',
   valid: false,
   value: null
 }
@@ -154,9 +154,9 @@ const DefaultType: Record<string, string> = {
   selectAllLabel: 'string',
   selectAllMode: 'string',
   selectedLabel: '(string|function)',
+  selectFilteredLabel: 'string',
   selectionLimit: '(number|null)',
   selectionType: 'string',
-  selectFilteredLabel: 'string',
   valid: 'boolean',
   value: '(string|array|null)'
 }
