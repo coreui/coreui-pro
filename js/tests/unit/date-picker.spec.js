@@ -1081,6 +1081,52 @@ describe('DatePicker', () => {
       expect(div.querySelector('.date-picker-timepickers')).toBeTruthy()
     })
 
+    it('should not render the seconds select when seconds are disabled', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const datePicker = new DatePicker(div, { // eslint-disable-line no-unused-vars
+        seconds: false,
+        timepicker: true
+      })
+
+      const timepickers = div.querySelector('.date-picker-timepickers')
+
+      expect(timepickers.querySelector('select.hours')).toBeTruthy()
+      expect(timepickers.querySelector('select.minutes')).toBeTruthy()
+      expect(timepickers.querySelector('select.seconds')).toBeFalsy()
+    })
+
+    it('should not render the minutes select when minutes are disabled', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const datePicker = new DatePicker(div, { // eslint-disable-line no-unused-vars
+        minutes: false,
+        timepicker: true
+      })
+
+      const timepickers = div.querySelector('.date-picker-timepickers')
+
+      expect(timepickers.querySelector('select.hours')).toBeTruthy()
+      expect(timepickers.querySelector('select.minutes')).toBeFalsy()
+      expect(timepickers.querySelector('select.seconds')).toBeFalsy()
+    })
+
+    it('should limit the hours select to the given list', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const datePicker = new DatePicker(div, { // eslint-disable-line no-unused-vars
+        hours: [9, 10, 11],
+        timepicker: true
+      })
+
+      const hours = div.querySelector('.date-picker-timepickers select.hours')
+
+      expect(hours.querySelectorAll('option')).toHaveLength(3)
+    })
+
     it('should not create timepickers container when timepicker is false', () => {
       fixtureEl.innerHTML = '<div></div>'
 
@@ -2139,6 +2185,63 @@ describe('DatePicker', () => {
       const result = datePicker._formatDate(new Date(2023, 5, 15, 14, 30))
       // Should include time component
       expect(result).toContain('2023')
+    })
+
+    it('should omit seconds from the input value when seconds are disabled', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const datePicker = new DatePicker(div, {
+        locale: 'en-US',
+        seconds: false,
+        timepicker: true
+      })
+
+      expect(datePicker._formatDate(new Date(2023, 5, 15, 14, 30, 45))).toBe('6/15/2023, 2:30 PM')
+    })
+
+    it('should omit minutes and seconds from the input value when both are disabled', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const datePicker = new DatePicker(div, {
+        locale: 'en-US',
+        minutes: false,
+        seconds: false,
+        timepicker: true
+      })
+
+      expect(datePicker._formatDate(new Date(2023, 5, 15, 14, 30, 45))).toBe('6/15/2023, 2 PM')
+    })
+
+    it('should drop seconds from the input value when minutes are disabled on their own', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const datePicker = new DatePicker(div, {
+        locale: 'en-US',
+        minutes: false,
+        timepicker: true
+      })
+
+      const date = new Date(2023, 5, 15, 14, 30, 45)
+
+      expect(datePicker._formatDate(date)).toBe('6/15/2023, 2 PM')
+      expect(datePicker._parseDate(datePicker._formatDate(date))).toBeInstanceOf(Date)
+    })
+
+    it('should read back a value formatted without seconds', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const datePicker = new DatePicker(div, {
+        locale: 'en-US',
+        seconds: false,
+        timepicker: true
+      })
+
+      const date = new Date(2023, 5, 15, 14, 30, 45)
+      const parsed = datePicker._parseDate(datePicker._formatDate(date))
+
+      expect(parsed.getHours()).toBe(14)
+      expect(parsed.getMinutes()).toBe(30)
+      expect(parsed.getSeconds()).toBe(0)
     })
   })
 

@@ -14,6 +14,7 @@ import {
   getLocalDateFromString,
   getMonthsNames,
   getSelectableDates,
+  getTimeFormatOptions,
   getYears,
   getMonthDetails,
   isDateDisabled,
@@ -743,6 +744,36 @@ describe('Calendar Utilities', () => {
       expect(result.getHours()).toBe(14)
       expect(result.getMinutes()).toBe(30)
       expect(result.getSeconds()).toBe(45)
+    })
+
+    it('should parse a time without seconds when seconds are not offered', () => {
+      const result = getLocalDateFromString('2/15/2023, 2:30 PM', 'en-US', true, 'day', getTimeFormatOptions(true, false))
+      expect(result).toBeInstanceOf(Date)
+      expect(result.getHours()).toBe(14)
+      expect(result.getMinutes()).toBe(30)
+      expect(result.getSeconds()).toBe(0)
+    })
+
+    it('should parse a time without minutes and seconds when neither is offered', () => {
+      const result = getLocalDateFromString('2/15/2023, 2 PM', 'en-US', true, 'day', getTimeFormatOptions(false, false))
+      expect(result).toBeInstanceOf(Date)
+      expect(result.getHours()).toBe(14)
+      expect(result.getMinutes()).toBe(0)
+      expect(result.getSeconds()).toBe(0)
+    })
+
+    it('should parse a shortened time in a 24-hour locale', () => {
+      const result = getLocalDateFromString('15.02.2023, 14:30', 'pl-PL', true, 'day', getTimeFormatOptions(true, false))
+      expect(result).toBeInstanceOf(Date)
+      expect(result.getHours()).toBe(14)
+      expect(result.getMinutes()).toBe(30)
+      expect(result.getSeconds()).toBe(0)
+    })
+
+    it('should not parse a half-typed time while all units are offered', () => {
+      expect(getLocalDateFromString('15/06/2023, 14:3', 'en-GB', true)).toBeNull()
+      expect(getLocalDateFromString('15/06/2023, 14', 'en-GB', true)).toBeNull()
+      expect(getLocalDateFromString('15.06.2023, 14:3', 'pl-PL', true)).toBeNull()
     })
 
     it('should handle different selection types', () => {
