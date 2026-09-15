@@ -377,6 +377,53 @@ describe('Autocomplete', () => {
       expect(autocomplete._inputHintElement.tabIndex).toBe(-1)
     })
 
+    it('should keep the hint out of the form data', () => {
+      fixtureEl.innerHTML = '<form><div class="autocomplete"></div></form>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        name: 'tech',
+        showHints: true,
+        options: ['Angular', 'React.js']
+      })
+
+      autocomplete._inputElement.value = 'An'
+      autocomplete._inputElement.dispatchEvent(new KeyboardEvent('keyup', { key: 'n', bubbles: true }))
+
+      const data = new FormData(fixtureEl.querySelector('form'))
+
+      expect(autocomplete._inputHintElement.value).toEqual('Angular')
+      expect(autocomplete._inputHintElement.getAttribute('name')).toBeNull()
+      expect([...data.keys()]).toEqual(['tech'])
+      expect(data.getAll('tech')).toEqual(['An'])
+    })
+
+    it('should not send an empty value for a preselected option', () => {
+      fixtureEl.innerHTML = '<form><div class="autocomplete"></div></form>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const _autocomplete = new Autocomplete(autocompleteEl, {
+        name: 'tech',
+        showHints: true,
+        options: [{ value: 1, label: 'Angular', selected: true }]
+      })
+
+      const data = new FormData(fixtureEl.querySelector('form'))
+
+      expect(data.get('tech')).toEqual('Angular')
+    })
+
+    it('should not add a hint key to a form when no name is configured', () => {
+      fixtureEl.innerHTML = '<form><div class="autocomplete"></div></form>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        showHints: true,
+        options: ['Angular', 'React.js']
+      })
+
+      const data = new FormData(fixtureEl.querySelector('form'))
+
+      expect([...data.keys()]).toEqual([autocomplete._uniqueId])
+    })
+
     it('should set togglerElement tabIndex to -1 when search is falsy and not disabled', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
