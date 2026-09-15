@@ -4,10 +4,12 @@
  * Script to keep `Default` and `DefaultType` in sync.
  * `DefaultType` is what validates data attributes at runtime, so an option
  * present in one and missing from the other is either an unvalidated option or
- * a rule for an option that no longer exists. Reads the `.ts` sources through
- * the TypeScript AST rather than the built bundle: importing every component
- * at once registers each data-api listener twice, which is exactly the thing
- * the runtime version of this test kept tripping over.
+ * a rule for an option that no longer exists, and a default that does not pass
+ * its own rule throws on the plainest `new Component(element)`.
+ * Reads the `.ts` sources through the TypeScript AST rather than the built
+ * bundle: importing every component at once registers each data-api listener
+ * twice, which is exactly the thing the runtime version of this test kept
+ * tripping over.
  * Copyright 2026 The CoreUI Authors
  * Copyright 2026 creativeLabs Łukasz Holeczek
  * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
@@ -79,7 +81,13 @@ function typeNames(node) {
   const values = new Map()
 
   for (const property of node.properties) {
-    if (!ts.isPropertyAssignment(property) || !ts.isStringLiteral(property.initializer)) {
+    if (!ts.isPropertyAssignment(property)) {
+      continue
+    }
+
+    const initializer = unwrap(property.initializer)
+
+    if (!ts.isStringLiteral(initializer)) {
       continue
     }
 
@@ -87,11 +95,74 @@ function typeNames(node) {
     const key = ts.isIdentifier(name) || ts.isStringLiteral(name) ? name.text : null
 
     if (key) {
-      values.set(key, property.initializer.text)
+      values.set(key, initializer.text)
     }
   }
 
   return values
+}
+
+// The runtime type each literal default carries, so it can be matched against
+// the component's own rule. A default that is not statically knowable (a call,
+// an imported constant) is left out rather than guessed.
+function valueTypes(node) {
+  const types = new Map()
+
+  for (const property of node.properties) {
+    if (!ts.isPropertyAssignment(property)) {
+      continue
+    }
+
+    const { name } = property
+    const key = ts.isIdentifier(name) || ts.isStringLiteral(name) ? name.text : null
+    const type = valueType(unwrap(property.initializer))
+
+    if (key && type) {
+      types.set(key, type)
+    }
+  }
+
+  return types
+}
+
+function valueType(node) {
+  if (ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node) || ts.isTemplateExpression(node)) {
+    return 'string'
+  }
+
+  if (ts.isNumericLiteral(node)) {
+    return 'number'
+  }
+
+  if (ts.isPrefixUnaryExpression(node) && ts.isNumericLiteral(node.operand)) {
+    return 'number'
+  }
+
+  if (node.kind === ts.SyntaxKind.TrueKeyword || node.kind === ts.SyntaxKind.FalseKeyword) {
+    return 'boolean'
+  }
+
+  if (node.kind === ts.SyntaxKind.NullKeyword) {
+    return 'null'
+  }
+
+  if (ts.isArrayLiteralExpression(node)) {
+    return 'array'
+  }
+
+  if (ts.isObjectLiteralExpression(node)) {
+    return 'object'
+  }
+
+  if (ts.isFunctionExpression(node) || ts.isArrowFunction(node)) {
+    return 'function'
+  }
+
+  return null
+}
+
+function unwrap(node) {
+  return ts.isAsExpression(node) || ts.isParenthesizedExpression(node) ? unwrap(node.expression) : node
 }
 
 function readMaps(file) {
@@ -112,12 +183,46 @@ function readMaps(file) {
       const { initializer } = declaration
 
       if ((name === 'Default' || name === 'DefaultType') && ts.isObjectLiteralExpression(initializer)) {
-        found[name] = { ...objectKeys(initializer, sourceFile), types: typeNames(initializer), sourceFile }
+        found[name] = {
+          ...objectKeys(initializer, sourceFile),
+          types: typeNames(initializer),
+          values: valueTypes(initializer),
+          sourceFile
+        }
       }
     }
   }
 
   return found
+}
+
+// Same walk as `effectiveKeys`, for the per-option maps: the parent's entries
+// first, so an overridden option keeps the child's.
+function effectiveEntries(map, name, field, seen = new Set()) {
+  const entries = new Map()
+
+  for (const binding of map.spreads) {
+    const parentFile = importedFrom(map.sourceFile, binding)
+
+    if (!parentFile || seen.has(parentFile)) {
+      continue
+    }
+
+    seen.add(parentFile)
+    const parent = readMaps(parentFile)[name]
+
+    if (parent) {
+      for (const [key, value] of effectiveEntries(parent, name, field, seen)) {
+        entries.set(key, value)
+      }
+    }
+  }
+
+  for (const [key, value] of map[field]) {
+    entries.set(key, value)
+  }
+
+  return entries
 }
 
 // Resolves `...Parent.Default` chains, so `keys` is what the component really
@@ -179,6 +284,23 @@ for (const file of files.toSorted()) {
       if (!KNOWN_TYPES.has(type.toLowerCase())) {
         problems.push(`${relative}: DefaultType.${key} names an unknown type "${type}" in "${value}"`)
       }
+    }
+  }
+
+  const declaredTypes = effectiveEntries(DefaultType, 'DefaultType', 'types')
+
+  for (const [key, type] of effectiveEntries(Default, 'Default', 'values')) {
+    const expected = declaredTypes.get(key)
+
+    // An element cannot be written as a literal, so an option that expects one
+    // carries a `null` placeholder and is handed the real element by the caller
+    // or by `_configAfterMerge`. Any other value under such a rule is checked.
+    if (!expected || (type === 'null' && expected.includes('element'))) {
+      continue
+    }
+
+    if (!new RegExp(expected).test(type)) {
+      problems.push(`${relative}: Default.${key} is "${type}" but DefaultType.${key} expects "${expected}"`)
     }
   }
 }
