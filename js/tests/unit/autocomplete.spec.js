@@ -2268,6 +2268,73 @@ describe('Autocomplete', () => {
       expect(autocomplete._element).toBeNull()
     })
 
+    it('should return the host to its original markup', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const autocompleteEl = fixtureEl.querySelector('#host')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        cleaner: true,
+        indicator: true,
+        options: ['Angular', 'React.js']
+      })
+
+      expect(autocompleteEl.children.length).toBeGreaterThan(0)
+
+      autocomplete.dispose()
+
+      expect(autocompleteEl.innerHTML).toEqual('')
+      expect(autocompleteEl.className).toEqual('')
+    })
+
+    it('should keep a class name the page wrote itself', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete is-invalid"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, { invalid: true, options: [] })
+
+      autocomplete.dispose()
+
+      expect(autocompleteEl).toHaveClass('autocomplete')
+      expect(autocompleteEl).toHaveClass('is-invalid')
+    })
+
+    it('should not stack controls over a dispose and init cycle', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const autocompleteEl = fixtureEl.querySelector('#host')
+      const config = { cleaner: true, indicator: true, options: ['Angular'] }
+
+      new Autocomplete(autocompleteEl, config).dispose()
+      const autocomplete = new Autocomplete(autocompleteEl, config)
+
+      expect(autocompleteEl.querySelectorAll('.autocomplete-input-group').length).toEqual(1)
+      expect(autocompleteEl.querySelectorAll('.autocomplete-dropdown').length).toEqual(1)
+
+      autocomplete.dispose()
+    })
+
+    it('should remove the menu from a container after dispose', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const autocompleteEl = fixtureEl.querySelector('#host')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        container: 'body',
+        options: ['Angular']
+      })
+
+      expect(document.body.querySelectorAll('.autocomplete-dropdown').length).toEqual(1)
+
+      autocomplete.dispose()
+
+      expect(document.body.querySelectorAll('.autocomplete-dropdown').length).toEqual(0)
+    })
+
+    it('should be safe to dispose twice', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const autocompleteEl = fixtureEl.querySelector('#host')
+      const autocomplete = new Autocomplete(autocompleteEl, { options: [] })
+
+      autocomplete.dispose()
+
+      expect(() => autocomplete.dispose()).not.toThrow()
+    })
+
     it('should stop reacting to its child elements after dispose', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
