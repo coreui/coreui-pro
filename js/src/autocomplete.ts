@@ -72,7 +72,7 @@ const Default = {
   id: null,
   invalid: false,
   name: null,
-  options: false,
+  options: [] as any[],
   optionsGroupsTemplate: null,
   optionsMaxHeight: 'auto',
   optionsTemplate: null,
@@ -111,7 +111,7 @@ const DefaultType: Record<string, string> = {
   sanitize: 'boolean',
   sanitizeFn: '(null|function)',
   search: '(array|string|null)',
-  searchNoResultsLabel: ('boolean|string'),
+  searchNoResultsLabel: 'boolean|string',
   showHints: 'boolean',
   valid: 'boolean',
   value: '(number|string|null)'

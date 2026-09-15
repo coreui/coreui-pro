@@ -58,7 +58,7 @@ describe('Autocomplete', () => {
     it('should create autocomplete with default options', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
-      const autocomplete = new Autocomplete(autocompleteEl, { options: [] })
+      const autocomplete = new Autocomplete(autocompleteEl)
 
       expect(autocomplete._config.allowOnlyDefinedOptions).toBe(false)
       expect(autocomplete._config.cleaner).toBe(false)
@@ -3284,12 +3284,32 @@ describe('Autocomplete', () => {
 
   describe('data-api', () => {
     it('should initialize autocomplete on data-api elements', () => {
-      fixtureEl.innerHTML = '<div data-coreui-autocomplete></div>'
+      fixtureEl.innerHTML = [
+        '<div data-coreui-autocomplete></div>',
+        '<div data-coreui-autocomplete data-coreui-options=\'["one"]\'></div>'
+      ].join('')
+
+      const [first, second] = fixtureEl.querySelectorAll('[data-coreui-autocomplete]')
+
+      window.dispatchEvent(createEvent('load'))
+
+      expect(Autocomplete.getInstance(first)).toBeInstanceOf(Autocomplete)
+      expect(Autocomplete.getInstance(second)).toBeInstanceOf(Autocomplete)
+    })
+
+    it('should initialize autocomplete from data attributes', () => {
+      fixtureEl.innerHTML =
+        '<div data-coreui-autocomplete data-coreui-options="JavaScript, TypeScript" data-coreui-search="global"></div>'
+
       const autocompleteEl = fixtureEl.querySelector('[data-coreui-autocomplete]')
 
-      const _autocomplete = new Autocomplete(autocompleteEl, { options: [{ label: 'Test', value: '1' }] })
+      window.dispatchEvent(createEvent('load'))
 
-      expect(Autocomplete.getInstance(autocompleteEl)).toBeInstanceOf(Autocomplete)
+      const autocomplete = Autocomplete.getInstance(autocompleteEl)
+
+      expect(autocomplete).toBeInstanceOf(Autocomplete)
+      expect(autocomplete._config.options).toEqual(['JavaScript', 'TypeScript'])
+      expect(autocomplete._config.search).toEqual(['global'])
     })
 
     it('should close autocomplete when clicking outside', () => {
