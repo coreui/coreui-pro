@@ -92,10 +92,10 @@ type TooltipConfig = {
   customClass: string | ((...args: any[]) => string)
   delay: number | { show: number, hide: number }
   fallbackPlacements: string[]
+  floatingConfig: FloatingConfigOption
   html: boolean
   offset: FloatingOffsetOption
   placement: string | ((this: Tooltip, tip: HTMLElement, trigger: HTMLElement) => string)
-  floatingConfig: FloatingConfigOption
   sanitize: boolean
   sanitizeFn: ((unsafeHtml: string) => string) | null
   selector: string | boolean
@@ -116,10 +116,10 @@ const Default: TooltipConfig = {
   customClass: '',
   delay: 0,
   fallbackPlacements: ['top', 'right', 'bottom', 'left'],
+  floatingConfig: null,
   html: false,
   offset: [0, 6],
   placement: 'top',
-  floatingConfig: null,
   sanitize: true,
   sanitizeFn: null,
   selector: false,
@@ -139,10 +139,10 @@ const DefaultType = {
   customClass: '(string|function)',
   delay: '(number|object)',
   fallbackPlacements: 'array',
+  floatingConfig: '(null|object|function)',
   html: 'boolean',
   offset: '(array|string|function)',
   placement: '(string|function)',
-  floatingConfig: '(null|object|function)',
   sanitize: 'boolean',
   sanitizeFn: '(null|function)',
   selector: '(string|boolean)',

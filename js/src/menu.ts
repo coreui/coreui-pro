@@ -89,14 +89,14 @@ type MenuConfig = {
   boundary: string | Element
   container: string | Element | boolean
   display: string
-  offset: FloatingOffsetOption
   floatingConfig: FloatingConfigOption
   menu: HTMLElement | null
+  offset: FloatingOffsetOption
   placement: string | null
   reference: string | Element | Record<string, any>
   strategy: string
-  submenuTrigger: string
   submenuDelay: number
+  submenuTrigger: string
 }
 
 const Default: MenuConfig = {
@@ -104,14 +104,14 @@ const Default: MenuConfig = {
   boundary: 'clippingParents',
   container: false,
   display: 'dynamic',
-  offset: [0, 2],
   floatingConfig: null,
   menu: null,
+  offset: [0, 2],
   placement: DEFAULT_PLACEMENT,
   reference: 'toggle',
   strategy: 'absolute',
-  submenuTrigger: 'both',
-  submenuDelay: SUBMENU_CLOSE_DELAY
+  submenuDelay: SUBMENU_CLOSE_DELAY,
+  submenuTrigger: 'both'
 }
 
 const DefaultType = {
@@ -119,14 +119,14 @@ const DefaultType = {
   boundary: '(string|element)',
   container: '(string|element|boolean)',
   display: 'string',
-  offset: '(array|string|function)',
   floatingConfig: '(null|object|function)',
   menu: '(null|element)',
+  offset: '(array|string|function)',
   placement: 'string',
   reference: '(string|element|object)',
   strategy: 'string',
-  submenuTrigger: 'string',
-  submenuDelay: 'number'
+  submenuDelay: 'number',
+  submenuTrigger: 'string'
 }
 
 /**
