@@ -988,6 +988,12 @@ check, radio, carousel and toggler icons already work:
   not. It carries no `name` now, the `search-…` key is gone from the payload,
   and the input sets `autocomplete="off"` so the browser stops offering to fill
   it.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **An unnamed Multi Select stays out of the form.** A `<select>` the page had
+  not named was given `name="<uid>"`, so its value was submitted under a key
+  nobody chose. The attribute is written only when there is a name, from the
+  option or from the element. `dispose()` also takes back the `id` and the
+  `name` the component added, where it used to leave both behind.
 
 #### Menu (new) and Dropdown
 

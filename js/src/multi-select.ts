@@ -68,6 +68,7 @@ const CLASS_NAME_DISABLED = 'disabled'
 const CLASS_NAME_HEADER = 'list-box-header'
 const CLASS_NAME_INPUT_GROUP = 'form-control-group'
 const CLASS_NAME_SELECT = 'form-multi-select'
+const HOST_ATTRIBUTES = ['aria-hidden', 'id', 'multiple', 'name', 'required', 'tabindex']
 const CLASS_NAME_SELECT_FILLED = 'form-multi-select-filled'
 const CLASS_NAME_SELECT_ALL = 'list-box-select-all'
 const CLASS_NAME_SEARCH = 'form-multi-select-search'
@@ -178,6 +179,8 @@ class MultiSelectChipSet extends ChipSet {
 
 class MultiSelect extends ComboboxBase {
   protected declare _uniqueName: any
+  protected declare _hostAttributes: Map<string, string | null>
+  protected declare _addedSelectClass: boolean
   protected declare _indicatorElement: any
   protected declare _selectAllElement: any
   protected declare _selectAllLabelElement: any
@@ -194,8 +197,8 @@ class MultiSelect extends ComboboxBase {
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
 
-    this._uniqueId = this._config.id || this._element.id || getUID(`${this.constructor.NAME}`)
-    this._uniqueName = this._config.name || (this._element as HTMLSelectElement).name || this._uniqueId
+    this._hostAttributes = new Map(HOST_ATTRIBUTES.map(name => [name, this._element.getAttribute(name)]))
+    this._addedSelectClass = !this._element.classList.contains(CLASS_NAME_SELECT)
     this._configureNativeSelect()
     this._indicatorElement = null
     this._selectAllElement = null
@@ -279,7 +282,14 @@ class MultiSelect extends ComboboxBase {
 
   override dispose(): void {
     this._destroySelect()
-    this._element.removeAttribute('tabindex')
+
+    for (const [name, value] of this._hostAttributes) {
+      this._restoreAttribute(name, value)
+    }
+
+    if (this._addedSelectClass) {
+      this._element.classList.remove(CLASS_NAME_SELECT)
+    }
 
     super.dispose()
   }
@@ -650,6 +660,15 @@ class MultiSelect extends ComboboxBase {
     }
   }
 
+  _restoreAttribute(name: string, value: string | null): void {
+    if (value === null) {
+      this._element.removeAttribute(name)
+      return
+    }
+
+    this._element.setAttribute(name, value)
+  }
+
   _hideNativeSelect(): void {
     // The custom control carries the semantics; hide the replaced select from
     // assistive tech (tabindex -1 keeps it out of the tab order, so the
@@ -706,8 +725,14 @@ class MultiSelect extends ComboboxBase {
       this._updateSearch()
     }
 
+    this._uniqueId = this._config.id || this._hostAttributes.get('id') || getUID(`${this.constructor.NAME}`)
+    this._uniqueName = this._config.name || this._hostAttributes.get('name')
     this._element.setAttribute('id', this._uniqueId)
-    this._element.setAttribute('name', this._uniqueName)
+
+    if (this._uniqueName) {
+      this._element.setAttribute('name', this._uniqueName)
+    }
+
     this._wireTogglerAccessibleName()
 
     this._createOptionsContainer()
