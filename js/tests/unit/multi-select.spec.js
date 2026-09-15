@@ -49,6 +49,35 @@ describe('MultiSelect', () => {
   })
 
   describe('constructor', () => {
+    it('should submit nothing when the page did not name the select', () => {
+      fixtureEl.innerHTML = [
+        '<form id="form">',
+        '<select id="multi-select" multiple>',
+        '<option value="1" selected>One</option>',
+        '</select>',
+        '</form>'
+      ].join('')
+
+      const multiSelectEl = fixtureEl.querySelector('#multi-select')
+      // eslint-disable-next-line no-new
+      new MultiSelect(multiSelectEl)
+
+      expect(multiSelectEl.hasAttribute('name')).toBeFalse()
+      expect([...new FormData(fixtureEl.querySelector('#form')).keys()]).toEqual([])
+    })
+
+    it('should name the select from setConfig', () => {
+      fixtureEl.innerHTML = '<form id="form"><select class="multi-select" multiple><option value="1" selected>One</option></select></form>'
+
+      const multiSelectEl = fixtureEl.querySelector('.multi-select')
+      const multiSelect = new MultiSelect(multiSelectEl)
+
+      multiSelect.setConfig({ name: 'tech' })
+
+      expect(multiSelectEl.getAttribute('name')).toEqual('tech')
+      expect([...new FormData(fixtureEl.querySelector('#form')).keys()]).toEqual(['tech'])
+    })
+
     it('should create a MultiSelect instance with default config', () => {
       fixtureEl.innerHTML = '<select></select>'
 
@@ -3934,6 +3963,103 @@ describe('MultiSelect', () => {
   })
 
   describe('dispose', () => {
+    it('should keep the name the page wrote on the select', () => {
+      fixtureEl.innerHTML = '<select id="multi-select" name="tech" multiple></select>'
+
+      const multiSelectEl = fixtureEl.querySelector('#multi-select')
+      const multiSelect = new MultiSelect(multiSelectEl)
+
+      multiSelect.dispose()
+
+      expect(multiSelectEl.getAttribute('name')).toEqual('tech')
+    })
+
+    it('should take back the id and name it added when disposed', () => {
+      fixtureEl.innerHTML = '<select class="multi-select" multiple></select>'
+
+      const multiSelectEl = fixtureEl.querySelector('.multi-select')
+      const multiSelect = new MultiSelect(multiSelectEl, { name: 'tech' })
+
+      expect(multiSelectEl.getAttribute('name')).toEqual('tech')
+      expect(multiSelectEl.hasAttribute('id')).toBeTrue()
+
+      multiSelect.dispose()
+
+      expect(multiSelectEl.hasAttribute('name')).toBeFalse()
+      expect(multiSelectEl.hasAttribute('id')).toBeFalse()
+    })
+
+    it('should keep the id the page wrote on the select', () => {
+      fixtureEl.innerHTML = '<select id="mine" multiple></select>'
+
+      const multiSelectEl = fixtureEl.querySelector('#mine')
+      const multiSelect = new MultiSelect(multiSelectEl)
+
+      multiSelect.dispose()
+
+      expect(multiSelectEl.getAttribute('id')).toEqual('mine')
+    })
+
+    it('should put back an id and a name the config overwrote', () => {
+      fixtureEl.innerHTML = '<select id="mine" name="tech" multiple></select>'
+
+      const multiSelectEl = fixtureEl.querySelector('#mine')
+      const multiSelect = new MultiSelect(multiSelectEl, { id: 'other', name: 'other' })
+
+      multiSelect.dispose()
+
+      expect(multiSelectEl.getAttribute('id')).toEqual('mine')
+      expect(multiSelectEl.getAttribute('name')).toEqual('tech')
+    })
+
+    it('should still take them back after setConfig', () => {
+      fixtureEl.innerHTML = '<select class="multi-select" multiple></select>'
+
+      const multiSelectEl = fixtureEl.querySelector('.multi-select')
+      const multiSelect = new MultiSelect(multiSelectEl, { name: 'tech' })
+
+      multiSelect.setConfig({ search: true })
+      multiSelect.dispose()
+
+      expect(multiSelectEl.hasAttribute('name')).toBeFalse()
+      expect(multiSelectEl.hasAttribute('id')).toBeFalse()
+    })
+
+    it('should give back the shape the select was handed in', () => {
+      fixtureEl.innerHTML = '<select id="mine" multiple></select>'
+
+      const multiSelectEl = fixtureEl.querySelector('#mine')
+      const multiSelect = new MultiSelect(multiSelectEl, { multiple: false, required: true })
+
+      multiSelect.dispose()
+
+      expect(multiSelectEl.hasAttribute('multiple')).toBeTrue()
+      expect(multiSelectEl.hasAttribute('required')).toBeFalse()
+      expect(multiSelectEl.classList.contains('form-multi-select')).toBeFalse()
+    })
+
+    it('should give back a tabindex the page wrote', () => {
+      fixtureEl.innerHTML = '<select class="multi-select" tabindex="3" multiple></select>'
+
+      const multiSelectEl = fixtureEl.querySelector('.multi-select')
+      const multiSelect = new MultiSelect(multiSelectEl)
+
+      multiSelect.dispose()
+
+      expect(multiSelectEl.getAttribute('tabindex')).toEqual('3')
+    })
+
+    it('should not leave the select hidden from assistive tech', () => {
+      fixtureEl.innerHTML = '<select class="multi-select" multiple></select>'
+
+      const multiSelectEl = fixtureEl.querySelector('.multi-select')
+      const multiSelect = new MultiSelect(multiSelectEl)
+
+      multiSelect.dispose()
+
+      expect(multiSelectEl.hasAttribute('aria-hidden')).toBeFalse()
+    })
+
     it('should dispose MultiSelect instance', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
