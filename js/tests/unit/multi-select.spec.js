@@ -2091,6 +2091,30 @@ describe('MultiSelect', () => {
   })
 
   describe('search functionality', () => {
+    it('should keep the search text out of the form data', () => {
+      fixtureEl.innerHTML = [
+        '<form>',
+        '<select name="tech" multiple>',
+        '<option value="1" selected>Angular</option>',
+        '<option value="2">React.js</option>',
+        '</select>',
+        '</form>'
+      ].join('')
+
+      const selectEl = fixtureEl.querySelector('select')
+      const _multiSelect = new MultiSelect(selectEl, { search: true })
+      const searchEl = fixtureEl.querySelector('.form-multi-select-search')
+
+      searchEl.value = 'secret query'
+
+      const data = new FormData(fixtureEl.querySelector('form'))
+
+      expect(searchEl.getAttribute('name')).toBeNull()
+      expect(searchEl.autocomplete).toEqual('off')
+      expect([...data.keys()]).toEqual(['tech'])
+      expect([...data.values()]).not.toContain('secret query')
+    })
+
     it('should filter options based on search term', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
