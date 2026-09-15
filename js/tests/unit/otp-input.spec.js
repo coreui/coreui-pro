@@ -260,7 +260,7 @@ describe('OTPInput', () => {
       }
     })
 
-    it('should set id and name attributes when provided', () => {
+    it('should set id attributes when provided and leave the slots unnamed', () => {
       fixtureEl.innerHTML = `
         <div class="form-otp">
           <input type="text" class="form-otp-control">
@@ -277,11 +277,168 @@ describe('OTPInput', () => {
       const inputs = otpContainer.querySelectorAll('.form-otp-control')
       expect(inputs[0].id).toBe('my-otp-0')
       expect(inputs[1].id).toBe('my-otp-1')
-      expect(inputs[0].name).toBe('otp-code-0')
-      expect(inputs[1].name).toBe('otp-code-1')
+      expect(inputs[0].hasAttribute('name')).toBeFalse()
+      expect(inputs[1].hasAttribute('name')).toBeFalse()
 
       expect(otpInput._inputElement.id).toBe('my-otp')
       expect(otpInput._inputElement.name).toBe('otp-code')
+    })
+
+    it('should keep a name the page wrote on a slot', () => {
+      fixtureEl.innerHTML = `
+        <div class="form-otp">
+          <input type="text" class="form-otp-control" name="digit">
+          <input type="text" class="form-otp-control">
+        </div>
+      `
+
+      const otpContainer = fixtureEl.querySelector('.form-otp')
+      // eslint-disable-next-line no-new
+      new OTPInput(otpContainer, { name: 'otp-code' })
+
+      const inputs = otpContainer.querySelectorAll('.form-otp-control')
+      expect(inputs[0].name).toBe('digit')
+      expect(inputs[1].hasAttribute('name')).toBeFalse()
+    })
+
+    it('should submit the value the slots were rendered with', () => {
+      fixtureEl.innerHTML = `
+        <form id="form">
+          <div class="form-otp">
+            <input type="text" class="form-otp-control" value="4">
+            <input type="text" class="form-otp-control" value="2">
+          </div>
+        </form>
+      `
+
+      const otpContainer = fixtureEl.querySelector('.form-otp')
+      // eslint-disable-next-line no-new
+      new OTPInput(otpContainer, { name: 'code' })
+
+      const formData = new FormData(fixtureEl.querySelector('#form'))
+
+      expect([...formData.entries()]).toEqual([['code', '42']])
+    })
+
+    it('should submit what the slots show after setConfig', () => {
+      fixtureEl.innerHTML = `
+        <form id="form">
+          <div class="form-otp">
+            <input type="text" class="form-otp-control">
+            <input type="text" class="form-otp-control">
+          </div>
+        </form>
+      `
+
+      const otpContainer = fixtureEl.querySelector('.form-otp')
+      const otpInput = new OTPInput(otpContainer, { name: 'code', value: '1' })
+      const inputs = otpContainer.querySelectorAll('.form-otp-control')
+
+      for (const [index, digit] of ['4', '2'].entries()) {
+        inputs[index].value = digit
+        inputs[index].dispatchEvent(new Event('input', { bubbles: true }))
+      }
+
+      otpInput.setConfig({ masked: true })
+
+      const formData = new FormData(fixtureEl.querySelector('#form'))
+      const onScreen = [...otpContainer.querySelectorAll('.form-otp-control')].map(input => input.value).join('')
+
+      expect([...formData.entries()]).toEqual([['code', onScreen]])
+    })
+
+    it('should submit the value reset put back on screen', () => {
+      fixtureEl.innerHTML = `
+        <form id="form">
+          <div class="form-otp">
+            <input type="text" class="form-otp-control">
+            <input type="text" class="form-otp-control">
+          </div>
+        </form>
+      `
+
+      const otpContainer = fixtureEl.querySelector('.form-otp')
+      const otpInput = new OTPInput(otpContainer, { name: 'code', value: '42' })
+
+      otpInput.reset()
+
+      const formData = new FormData(fixtureEl.querySelector('#form'))
+
+      expect([...formData.entries()]).toEqual([['code', '42']])
+    })
+
+    it('should submit a zero value', () => {
+      fixtureEl.innerHTML = `
+        <form id="form">
+          <div class="form-otp">
+            <input type="text" class="form-otp-control">
+          </div>
+        </form>
+      `
+
+      const otpContainer = fixtureEl.querySelector('.form-otp')
+      // eslint-disable-next-line no-new
+      new OTPInput(otpContainer, { name: 'code', value: 0 })
+
+      const formData = new FormData(fixtureEl.querySelector('#form'))
+
+      expect([...formData.entries()]).toEqual([['code', '0']])
+    })
+
+    it('should keep an id the page wrote on a slot', () => {
+      fixtureEl.innerHTML = `
+        <div class="form-otp">
+          <input type="text" class="form-otp-control" id="digit-1">
+          <input type="text" class="form-otp-control">
+        </div>
+      `
+
+      const otpContainer = fixtureEl.querySelector('.form-otp')
+      // eslint-disable-next-line no-new
+      new OTPInput(otpContainer, { id: 'my-otp' })
+
+      const inputs = otpContainer.querySelectorAll('.form-otp-control')
+      expect(inputs[0].id).toBe('digit-1')
+      expect(inputs[1].id).toBe('my-otp-1')
+    })
+
+    it('should leave no hidden input behind when disposed', () => {
+      fixtureEl.innerHTML = `
+        <form id="form">
+          <div class="form-otp">
+            <input type="text" class="form-otp-control">
+          </div>
+        </form>
+      `
+
+      const otpContainer = fixtureEl.querySelector('.form-otp')
+      new OTPInput(otpContainer, { name: 'code', value: '1' }).dispose()
+      // eslint-disable-next-line no-new
+      new OTPInput(otpContainer, { name: 'code', value: '1' })
+
+      const formData = new FormData(fixtureEl.querySelector('#form'))
+
+      expect([...formData.entries()]).toEqual([['code', '1']])
+    })
+
+    it('should submit the configured name once', () => {
+      fixtureEl.innerHTML = `
+        <form id="form">
+          <div class="form-otp">
+            <input type="text" class="form-otp-control">
+            <input type="text" class="form-otp-control">
+            <input type="text" class="form-otp-control">
+          </div>
+        </form>
+      `
+
+      const otpContainer = fixtureEl.querySelector('.form-otp')
+      // eslint-disable-next-line no-new
+      new OTPInput(otpContainer, { name: 'code', value: '123' })
+
+      const formData = new FormData(fixtureEl.querySelector('#form'))
+
+      expect([...formData.entries()]).toEqual([['code', '123']])
     })
   })
 
