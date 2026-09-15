@@ -66,6 +66,8 @@ const CLASS_NAME_INDICATOR = 'autocomplete-indicator'
 const CLASS_NAME_INPUT = 'autocomplete-input'
 const CLASS_NAME_INPUT_HINT = 'autocomplete-input-hint'
 const CLASS_NAME_INPUT_GROUP = 'autocomplete-input-group'
+const CLASS_NAME_IS_INVALID = 'is-invalid'
+const CLASS_NAME_IS_VALID = 'is-valid'
 const CLASS_NAME_LABEL = 'label'
 const CLASS_NAME_OPTGROUP = 'autocomplete-optgroup'
 const CLASS_NAME_OPTGROUP_LABEL = 'autocomplete-optgroup-label'
@@ -153,6 +155,7 @@ class Autocomplete extends BaseComponent {
     super(element, config)
 
     this._uniqueId = this._config.id ?? getUID(`${this.constructor.NAME}`)
+    this._addedClassNames = []
     this._indicatorElement = null
     this._inputElement = null
     this._inputHintElement = null
@@ -238,6 +241,10 @@ class Autocomplete extends BaseComponent {
   }
 
   dispose() {
+    if (!this._element) {
+      return
+    }
+
     this._destroyAutocomplete()
 
     super.dispose()
@@ -600,14 +607,25 @@ class Autocomplete extends BaseComponent {
     ]) {
       if (element) {
         EventHandler.off(element, EVENT_KEY)
+        element.remove()
       }
     }
+
+    this._element.classList.remove(CLASS_NAME_SHOW, ...this._addedClassNames)
+    this._addedClassNames = []
   }
 
   _createAutocomplete() {
+    this._addedClassNames = [
+      CLASS_NAME_AUTOCOMPLETE,
+      this._config.invalid && CLASS_NAME_IS_INVALID,
+      this._config.valid && CLASS_NAME_IS_VALID,
+      this._config.disabled && CLASS_NAME_DISABLED
+    ].filter(className => className && !this._element.classList.contains(className))
+
     this._element.classList.add(CLASS_NAME_AUTOCOMPLETE)
-    this._element.classList.toggle('is-invalid', this._config.invalid)
-    this._element.classList.toggle('is-valid', this._config.valid)
+    this._element.classList.toggle(CLASS_NAME_IS_INVALID, this._config.invalid)
+    this._element.classList.toggle(CLASS_NAME_IS_VALID, this._config.valid)
 
     if (this._config.disabled) {
       this._element.classList.add(CLASS_NAME_DISABLED)
@@ -701,7 +719,6 @@ class Autocomplete extends BaseComponent {
       }
 
       buttons.append(indicator)
-      this._indicatorElement = indicator
       this._indicatorElement = indicator
     }
 
