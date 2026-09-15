@@ -154,14 +154,14 @@ Chip set events are fired from the chip set element. Individual `*.coreui.chip` 
 | Event type | Description |
 | --- | --- |
 | `add.coreui.chip-set` | Fires immediately before a chip is added through `add`. Cancelable. Carries the `value`. |
-| `change.coreui.chip-set` | Fired when the set's membership changes (a chip is added or removed). Carries the current `values` array. |
+| `change.coreui.chip-set` | Fired when the set's membership changes (a chip is added or removed); `event.value` is the array of chip values. |
 | `remove.coreui.chip-set` | Fires immediately before a chip is removed through `remove`. Cancelable. Carries the `value` and `chip` element. |
 | `select.coreui.chip-set` | Fired when the selection changes. Carries the `selected` array of chip values. |
 
 ```js
 const myChipSet = document.getElementById('myChipSet')
 myChipSet.addEventListener('change.coreui.chip-set', event => {
-  // event.values is the array of chip values
+  // event.value is the array of chip values
 })
 ```
 

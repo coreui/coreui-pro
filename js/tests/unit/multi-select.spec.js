@@ -1522,7 +1522,7 @@ describe('MultiSelect', () => {
       const multiSelect = new MultiSelect(selectEl, { options })
       let changeCount = 0
 
-      selectEl.addEventListener('changed.coreui.multi-select', () => {
+      selectEl.addEventListener('change.coreui.multi-select', () => {
         changeCount++
       })
 
@@ -2756,7 +2756,7 @@ describe('MultiSelect', () => {
           options: [{ value: '1', text: 'Opt 1' }]
         })
 
-        selectEl.addEventListener('changed.coreui.multi-select', event => {
+        selectEl.addEventListener('change.coreui.multi-select', event => {
           expect(event.value).toBeDefined()
           expect(event.value.length).toBe(1)
           resolve()
@@ -2774,7 +2774,7 @@ describe('MultiSelect', () => {
           options: [{ value: '1', text: 'Opt 1', selected: true }]
         })
 
-        selectEl.addEventListener('changed.coreui.multi-select', event => {
+        selectEl.addEventListener('change.coreui.multi-select', event => {
           expect(event.value).toBeDefined()
           expect(event.value.length).toBe(0)
           resolve()
@@ -3860,7 +3860,7 @@ describe('MultiSelect', () => {
           options: [{ value: '1', text: 'Option 1' }]
         })
 
-        selectEl.addEventListener('changed.coreui.multi-select', event => {
+        selectEl.addEventListener('change.coreui.multi-select', event => {
           expect(event.value).toBeDefined()
           expect(event.value.length).toBe(1)
           resolve()

@@ -441,6 +441,77 @@ The argument order matches the two function options the library already ships �
 `total` is passed everywhere, including the two components whose default text
 ignores it, so one function can serve all four.
 
+#### One selection event, one payload key
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+Seven components told you the selection had changed, under two event names and
+four payload keys. Autocomplete and Multi Select fired `changed`, everyone else
+fired `change`; the values arrived as `value`, `selected`, `values`, or as the
+pair `sourceValues`/`targetValues`. Nothing announced the difference, so code
+moved between two components of the same family read `undefined`:
+
+```js
+// Multi Select rewritten as a Combobox — the listener never runs
+el.addEventListener('changed.coreui.combobox', event => save(event.value))
+
+// List box — the event fires, the value is undefined
+el.addEventListener('change.coreui.list-box', event => save(event.value))
+```
+
+The verb is now `change` everywhere and the values arrive as `event.value`:
+
+```diff
+- el.addEventListener('changed.coreui.autocomplete', event => save(event.value))
++ el.addEventListener('change.coreui.autocomplete', event => save(event.value))
+
+- el.addEventListener('changed.coreui.multi-select', event => save(event.value))
++ el.addEventListener('change.coreui.multi-select', event => save(event.value))
+
+- el.addEventListener('change.coreui.list-box', event => save(event.selected))
++ el.addEventListener('change.coreui.list-box', event => save(event.value))
+
+- el.addEventListener('change.coreui.chip-set', event => save(event.values))
++ el.addEventListener('change.coreui.chip-set', event => save(event.value))
+
+- el.addEventListener('change.coreui.transfer', event => save(event.targetValues))
++ el.addEventListener('change.coreui.transfer', event => save(event.value))
+```
+
+| was | is |
+| --- | --- |
+| `changed.coreui.autocomplete`, `changed.coreui.multi-select` | `change.coreui.*` |
+| `event.selected` (List box) | `event.value` |
+| `event.values` (Chip Set, Chip Input) | `event.value` |
+| `event.targetValues` (Transfer) | `event.value` |
+| `event.sourceValues` (Transfer) | `event.source` |
+
+`event.value` carries what that component's own getter returns, which is the
+one thing the key never told you before: `getValue()` for Autocomplete and
+Combobox, the selected values for List box (an array even in `single` mode),
+the selected options for Multi Select, the chip values for Chip Set and Chip
+Input. Transfer's value is its target list, with the source list alongside as
+`event.source`; `event.target` stays the `.transfer` element.
+
+Two events keep their own names because they answer a different question.
+`select.coreui.chip-set` still carries `selected` — membership and selection are
+separate in a chip set — and `move`/`moved.coreui.transfer` still carry
+`direction` and the `values` that are moving, which is the change itself rather
+than the state after it.
+
+On a page that loads jQuery, the two renamed events now reach `onchange`
+handlers written as a DOM property or an inline attribute, on the element or
+any ancestor: jQuery's own trigger drops the namespace for that one path.
+Measured in Chromium, a `document.onchange` handler goes from zero calls to one
+per selected option. The five components that already fired `change` have
+always behaved this way. Handlers bound with `$(el).on('change')` are not
+affected, and neither is `addEventListener`.
+
+`changed.coreui.range` keeps its name. It is not a selection event: Range
+relays the value of the native `<input type="range">` it decorates, on every
+native `input` and `change`. Range Slider, the component of this family that
+does have a selection, already fires `change`.
+
 ### Components
 
 #### Accordion on the native `<details>`

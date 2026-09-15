@@ -518,12 +518,12 @@ describe('Transfer', () => {
       let payload = null
 
       el.addEventListener('change.coreui.transfer', event => {
-        payload = { sourceValues: event.sourceValues, targetValues: event.targetValues }
+        payload = { source: event.source, value: event.value }
       })
 
       transfer.moveToTarget(['one'])
 
-      expect(payload).toEqual({ sourceValues: ['two', 'three'], targetValues: ['four', 'one'] })
+      expect(payload).toEqual({ source: ['two', 'three'], value: ['four', 'one'] })
     })
   })
 

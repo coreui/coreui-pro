@@ -785,7 +785,7 @@ describe('Autocomplete', () => {
           value: '1'
         })
 
-        autocompleteEl.addEventListener('changed.coreui.autocomplete', event => {
+        autocompleteEl.addEventListener('change.coreui.autocomplete', event => {
           expect(event.value).toBeNull()
           resolve()
         })
@@ -1418,7 +1418,7 @@ describe('Autocomplete', () => {
           options: [{ label: 'Option 1', value: '1' }]
         })
 
-        autocompleteEl.addEventListener('changed.coreui.autocomplete', event => {
+        autocompleteEl.addEventListener('change.coreui.autocomplete', event => {
           expect(event.value.label).toBe('Option 1')
           resolve()
         })
@@ -1458,7 +1458,7 @@ describe('Autocomplete', () => {
           options: [{ label: 'Option 1', value: '1' }]
         })
 
-        autocompleteEl.addEventListener('changed.coreui.autocomplete', event => {
+        autocompleteEl.addEventListener('change.coreui.autocomplete', event => {
           expect(event.value).toBe('custom value')
           resolve()
         })
@@ -1481,7 +1481,7 @@ describe('Autocomplete', () => {
       })
 
       let changed = false
-      autocompleteEl.addEventListener('changed.coreui.autocomplete', () => {
+      autocompleteEl.addEventListener('change.coreui.autocomplete', () => {
         changed = true
       })
 
@@ -1575,7 +1575,7 @@ describe('Autocomplete', () => {
 
         autocomplete.show()
 
-        autocompleteEl.addEventListener('changed.coreui.autocomplete', event => {
+        autocompleteEl.addEventListener('change.coreui.autocomplete', event => {
           expect(event.value.label).toBe('Option 1')
           resolve()
         })
@@ -1685,7 +1685,7 @@ describe('Autocomplete', () => {
           options: [{ label: 'Option 1', value: '1' }]
         })
 
-        autocompleteEl.addEventListener('changed.coreui.autocomplete', event => {
+        autocompleteEl.addEventListener('change.coreui.autocomplete', event => {
           expect(event.value.label).toBe('Option 1')
           expect(event.value.value).toBe('1')
           resolve()
@@ -1704,7 +1704,7 @@ describe('Autocomplete', () => {
           options: [{ label: 'Option 1', value: '1' }]
         })
 
-        autocompleteEl.addEventListener('changed.coreui.autocomplete', event => {
+        autocompleteEl.addEventListener('change.coreui.autocomplete', event => {
           expect(event.value.label).toBe('Option 1')
           expect(event.value.value).toBe('1')
           resolve()
@@ -1834,7 +1834,7 @@ describe('Autocomplete', () => {
 
         autocomplete.show()
 
-        autocompleteEl.addEventListener('changed.coreui.autocomplete', event => {
+        autocompleteEl.addEventListener('change.coreui.autocomplete', event => {
           expect(event.value.label).toBe('Option 1')
           resolve()
         })
@@ -1872,7 +1872,7 @@ describe('Autocomplete', () => {
 
         autocomplete.show()
 
-        autocompleteEl.addEventListener('changed.coreui.autocomplete', event => {
+        autocompleteEl.addEventListener('change.coreui.autocomplete', event => {
           expect(event.value.label).toBe('Option 1')
           resolve()
         })
@@ -2538,7 +2538,7 @@ describe('Autocomplete', () => {
           ]
         })
 
-        autocompleteEl.addEventListener('changed.coreui.autocomplete', event => {
+        autocompleteEl.addEventListener('change.coreui.autocomplete', event => {
           expect(event.value.label).toBe('Option 1')
           resolve()
         })
@@ -2556,7 +2556,7 @@ describe('Autocomplete', () => {
       })
 
       let changed = false
-      autocompleteEl.addEventListener('changed.coreui.autocomplete', () => {
+      autocompleteEl.addEventListener('change.coreui.autocomplete', () => {
         changed = true
       })
 
@@ -2575,7 +2575,7 @@ describe('Autocomplete', () => {
           options: [{ label: 'Option 1', value: '1' }]
         })
 
-        autocompleteEl.addEventListener('changed.coreui.autocomplete', event => {
+        autocompleteEl.addEventListener('change.coreui.autocomplete', event => {
           expect(event.value).toBe('custom text')
           resolve()
         })
@@ -2648,7 +2648,7 @@ describe('Autocomplete', () => {
         const visibleOption = Array.from(autocomplete._optionsElement.querySelectorAll('.list-box-option'))
           .find(option => !option.hasAttribute('hidden'))
 
-        autocompleteEl.addEventListener('changed.coreui.autocomplete', event => {
+        autocompleteEl.addEventListener('change.coreui.autocomplete', event => {
           expect(event.value.label).toBe('Vue.js')
           resolve()
         })
@@ -2673,7 +2673,7 @@ describe('Autocomplete', () => {
           options: [{ label: 'Option 1', value: '1' }]
         })
 
-        autocompleteEl.addEventListener('changed.coreui.autocomplete', event => {
+        autocompleteEl.addEventListener('change.coreui.autocomplete', event => {
           expect(event.value.label).toBe('Option 1')
           resolve()
         })
@@ -2756,7 +2756,7 @@ describe('Autocomplete', () => {
         autocomplete._selected = [{ label: 'Option 1', value: '1' }]
         autocomplete._inputElement.value = 'O'
 
-        autocompleteEl.addEventListener('changed.coreui.autocomplete', event => {
+        autocompleteEl.addEventListener('change.coreui.autocomplete', event => {
           expect(event.value).toBeNull()
           resolve()
         })
@@ -3510,7 +3510,7 @@ describe('Autocomplete', () => {
           ]
         })
 
-        autocompleteEl.addEventListener('changed.coreui.autocomplete', event => {
+        autocompleteEl.addEventListener('change.coreui.autocomplete', event => {
           expect(event.value.label).toBe('Option 1')
           expect(event.value.value).toBe('1')
           expect(typeof event.value.value).toBe('string')
@@ -3590,7 +3590,7 @@ describe('Autocomplete', () => {
           options: [{ label: 'Zero Option', value: 0 }]
         })
 
-        autocompleteEl.addEventListener('changed.coreui.autocomplete', event => {
+        autocompleteEl.addEventListener('change.coreui.autocomplete', event => {
           expect(event.value.value).toBe('0')
           expect(typeof event.value.value).toBe('string')
           resolve()

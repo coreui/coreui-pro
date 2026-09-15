@@ -34,7 +34,7 @@ element.addEventListener('change.coreui.transfer', event => {
 
   invited.clear()
 
-  for (const value of event.targetValues) {
+  for (const value of event.value) {
     invited.set(value, users.get(value))
   }
 })

@@ -24,7 +24,7 @@ new coreui.Autocomplete(myAutoCompleteValues, {
 })
 
 // Log the selected value to demonstrate that numbers are converted to strings
-myAutoCompleteValues.addEventListener('changed.coreui.autocomplete', event => {
+myAutoCompleteValues.addEventListener('change.coreui.autocomplete', event => {
   console.log('Selected value:', event.value.value)
 
   console.log('Selected label:', event.value.label)

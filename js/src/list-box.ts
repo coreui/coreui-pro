@@ -1007,7 +1007,7 @@ class ListBox extends BaseComponent {
   }
 
   _triggerChange(): void {
-    EventHandler.trigger(this._element, this.constructor.eventName(EVENT_CHANGE), { selected: this.getSelectedValues() })
+    EventHandler.trigger(this._element, this.constructor.eventName(EVENT_CHANGE), { value: this.getSelectedValues() })
   }
 
   _setActive(value: string | null, focus: boolean): void {

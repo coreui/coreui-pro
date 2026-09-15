@@ -549,7 +549,7 @@ describe('ListBox', () => {
 
       el.addEventListener('select.coreui.list-box', event => order.push(`select:${event.value}`))
       el.addEventListener('selected.coreui.list-box', event => order.push(`selected:${event.value}`))
-      el.addEventListener('change.coreui.list-box', event => order.push(`change:${event.selected.join(',')}`))
+      el.addEventListener('change.coreui.list-box', event => order.push(`change:${event.value.join(',')}`))
 
       listBox.select('tomato')
 
@@ -1087,7 +1087,7 @@ describe('ListBox', () => {
       expect(listBox.getSelectedValues()).toEqual(['lettuce', 'tomato', 'onion'])
 
       const changed = []
-      el.addEventListener('change.coreui.list-box', event => changed.push(event.selected))
+      el.addEventListener('change.coreui.list-box', event => changed.push(event.value))
 
       listBox.setItems([
         { value: 'tomato', label: 'Tomato' },

@@ -226,8 +226,8 @@ chipInput.clear()
 | Event | Description |
 | --- | --- |
 | `add.coreui.chip-input` | Fired before a chip is added. Call `event.preventDefault()` to cancel. |
-| `change.coreui.chip-input` | Fired after any chip is added or removed. Contains `values`. |
-| `input.coreui.chip-input` | Fired when the inline input value changes. Contains `value` and `relatedTarget`. |
+| `change.coreui.chip-input` | Fired after any chip is added or removed; `event.value` is the array of chip values. |
+| `input.coreui.chip-input` | Fired when the inline input value changes; `event.value` is the typed text, not the chips. Contains `relatedTarget`. |
 | `remove.coreui.chip-input` | Fired before a chip is removed. Call `event.preventDefault()` to cancel. |
 | `select.coreui.chip-input` | Fired when chip selection changes. Contains `selected`. |
 
@@ -247,7 +247,7 @@ chipInputElement.addEventListener('input.coreui.chip-input', event => {
 
 chipInputElement.addEventListener('change.coreui.chip-input', event => {
   // eslint-disable-next-line no-console
-  console.log('Current values:', event.values)
+  console.log('Current values:', event.value)
 })
 ```
 

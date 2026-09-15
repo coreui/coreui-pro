@@ -8,5 +8,5 @@ field.addEventListener('input', () => {
 })
 
 element.addEventListener('change.coreui.list-box', event => {
-  output.textContent = event.selected.join(', ') || 'nothing'
+  output.textContent = event.value.join(', ') || 'nothing'
 })
