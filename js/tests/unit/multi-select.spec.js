@@ -2224,6 +2224,27 @@ describe('MultiSelect', () => {
   })
 
   describe('search functionality', () => {
+    it('should not submit the search field', () => {
+      fixtureEl.innerHTML = [
+        '<form id="form">',
+        '<select id="multi-select" name="tech" multiple>',
+        '<option value="1" selected>One</option>',
+        '</select>',
+        '</form>'
+      ].join('')
+
+      const multiSelectEl = fixtureEl.querySelector('#multi-select')
+      const multiSelect = new MultiSelect(multiSelectEl, { search: true })
+
+      multiSelect._searchElement.value = 'secret query'
+
+      const formData = new FormData(fixtureEl.querySelector('#form'))
+
+      expect(multiSelect._searchElement.hasAttribute('name')).toBeFalse()
+      expect(multiSelect._searchElement.autocomplete).toEqual('off')
+      expect([...formData.entries()]).toEqual([['tech', '1']])
+    })
+
     it('should filter options based on search term', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
