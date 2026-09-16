@@ -1684,8 +1684,11 @@ permission to submit, naming their hidden input `<component>-<id>` when no
 inherit the rule through the field they embed, and with `floatingLabel` that
 field is given a generated id, so they posted a key that changed on every load
 (`date-input-date-picker-190423`). The hidden input is named from `name` alone
-now, and a field without one stays out of the form. `dispose()` removes that
-input as well, where it used to leave it behind and keep submitting.
+now, and a field without one stays out of the form. `dispose()` gives the host
+back the way the page wrote it: the sections, the separators and the hidden
+input are gone, the `class` attribute and the `role` and `aria-label` the markup
+carried come back verbatim, and the author's own child nodes are the same nodes,
+not copies. It used to leave a live-looking field behind that kept submitting.
 
 #### Range / Range Slider
 

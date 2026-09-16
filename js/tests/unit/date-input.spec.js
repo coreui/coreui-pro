@@ -79,6 +79,101 @@ describe('DateInput', () => {
     })
   })
 
+  describe('dispose', () => {
+    it('should give the host back the way the page wrote it', () => {
+      fixtureEl.innerHTML = '<div class="form-control form-date-time my-own" id="start" role="note"></div>'
+      const dateInputEl = fixtureEl.querySelector('#start')
+      const dateInput = new DateInput(dateInputEl, { date: new Date(2026, 0, 15), format: 'dd.MM.yyyy' })
+
+      dateInput.dispose()
+
+      expect(dateInputEl.outerHTML)
+        .toEqual('<div class="form-control form-date-time my-own" id="start" role="note"></div>')
+    })
+
+    it('should give back a state class and a label the markup carried', () => {
+      fixtureEl.innerHTML = '<div class="form-date-time is-invalid my-own" id="start" aria-label="Start date"></div>'
+      const dateInputEl = fixtureEl.querySelector('#start')
+      const dateInput = new DateInput(dateInputEl, { date: new Date(2026, 0, 15), format: 'dd.MM.yyyy' })
+
+      dateInput.dispose()
+
+      expect(dateInputEl.outerHTML)
+        .toEqual('<div class="form-date-time is-invalid my-own" id="start" aria-label="Start date"></div>')
+    })
+
+    it('should keep a class put on the host while it lived', () => {
+      fixtureEl.innerHTML = '<div id="start"></div>'
+      const dateInputEl = fixtureEl.querySelector('#start')
+      const dateInput = new DateInput(dateInputEl, { date: new Date(2026, 0, 15), format: 'dd.MM.yyyy' })
+
+      dateInputEl.classList.add('d-none')
+      dateInput.dispose()
+
+      expect(dateInputEl.outerHTML).toEqual('<div id="start" class="d-none"></div>')
+    })
+
+    it('should not leave a class attribute on a host that had none', () => {
+      fixtureEl.innerHTML = '<div id="start"></div>'
+      const dateInputEl = fixtureEl.querySelector('#start')
+      const dateInput = new DateInput(dateInputEl, { date: new Date(2026, 0, 15), format: 'dd.MM.yyyy' })
+
+      dateInput.dispose()
+
+      expect(dateInputEl.outerHTML).toEqual('<div id="start"></div>')
+    })
+
+    it('should put the author\'s own nodes back, not copies of them', () => {
+      fixtureEl.innerHTML = '<div id="start"><span id="hint">Pick a date</span></div>'
+      const dateInputEl = fixtureEl.querySelector('#start')
+      const hint = fixtureEl.querySelector('#hint')
+      const dateInput = new DateInput(dateInputEl, { date: new Date(2026, 0, 15), format: 'dd.MM.yyyy' })
+
+      dateInput.dispose()
+
+      expect(fixtureEl.querySelector('#hint')).toBe(hint)
+    })
+
+    it('should build the same field again after a dispose', () => {
+      fixtureEl.innerHTML = '<div id="start"></div>'
+      const dateInputEl = fixtureEl.querySelector('#start')
+      const config = { date: new Date(2026, 0, 15), format: 'dd.MM.yyyy', name: 'from' }
+      const first = new DateInput(dateInputEl, config)
+      const built = dateInputEl.outerHTML
+
+      first.dispose()
+      const second = new DateInput(dateInputEl, config)
+
+      expect(dateInputEl.outerHTML).toEqual(built)
+      expect(dateInputEl.querySelectorAll('input[type="hidden"]')).toHaveLength(1)
+
+      second.dispose()
+    })
+
+    it('should tolerate a second dispose', () => {
+      fixtureEl.innerHTML = '<div id="start"></div>'
+      const dateInput = new DateInput(fixtureEl.querySelector('#start'), { date: new Date(2026, 0, 15) })
+
+      dateInput.dispose()
+
+      expect(() => dateInput.dispose()).not.toThrow()
+    })
+
+    it('should drop a reset queued before the dispose', async () => {
+      fixtureEl.innerHTML = '<form id="form"><div id="start"></div></form>'
+      const dateInput = new DateInput(fixtureEl.querySelector('#start'), { date: new Date(2026, 0, 15) })
+
+      fixtureEl.querySelector('#form').dispatchEvent(new Event('reset'))
+      dateInput.dispose()
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 10)
+      })
+
+      expect(fixtureEl.querySelector('#start').outerHTML).toEqual('<div id="start"></div>')
+    })
+  })
+
   describe('VERSION', () => {
     it('should return plugin version', () => {
       expect(DateInput.VERSION).toEqual(jasmine.any(String))
