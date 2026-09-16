@@ -595,6 +595,158 @@ describe('DateRangePicker', () => {
   })
 
   describe('dispose', () => {
+    it('should return the host to its original markup', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const div = fixtureEl.querySelector('#host')
+      const dateRangePicker = new DateRangePicker(div)
+
+      expect(div.children.length).toBeGreaterThan(0)
+
+      dateRangePicker.dispose()
+
+      expect(div.innerHTML).toEqual('')
+      expect(div.className).toEqual('')
+      expect(div.dataset.coreuiToggle).toBeUndefined()
+    })
+
+    it('should not stack controls over a second construction', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const div = fixtureEl.querySelector('#host')
+
+      const first = new DateRangePicker(div)
+      const second = new DateRangePicker(div)
+
+      expect(div.querySelectorAll('.date-picker-input-group').length).toEqual(1)
+      expect(div.querySelectorAll('input').length).toEqual(4)
+
+      second.dispose()
+      first.dispose()
+    })
+
+    it('should keep the toggle attribute the page wrote itself', () => {
+      fixtureEl.innerHTML = '<div data-coreui-toggle="date-range-picker"></div>'
+      const div = fixtureEl.querySelector('div')
+      const dateRangePicker = new DateRangePicker(div)
+
+      dateRangePicker.dispose()
+
+      expect(div.dataset.coreuiToggle).toEqual('date-range-picker')
+    })
+
+    it('should not take a sibling picker off the form', () => {
+      fixtureEl.innerHTML = [
+        '<form class="was-validated">',
+        '<div id="first"></div>',
+        '<div id="second"></div>',
+        '</form>'
+      ].join('')
+
+      const first = new DateRangePicker(fixtureEl.querySelector('#first'))
+      const second = new DateRangePicker(fixtureEl.querySelector('#second'))
+
+      first.dispose()
+      fixtureEl.querySelector('form').dispatchEvent(createEvent('submit'))
+
+      expect(fixtureEl.querySelector('#second')).toHaveClass('is-invalid')
+
+      second.dispose()
+    })
+
+    it('should dispose every time picker it built', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const div = fixtureEl.querySelector('#host')
+      const dateRangePicker = new DateRangePicker(div, { timepicker: true, calendars: 3 })
+      const built = [...dateRangePicker._ownTimePickers]
+
+      dateRangePicker.dispose()
+
+      expect(built.length).toBeGreaterThan(0)
+      expect(built.every(timePicker => timePicker._element === null)).toBeTrue()
+    })
+
+    it('should keep a class name the page wrote itself', () => {
+      fixtureEl.innerHTML = '<div class="date-picker disabled"></div>'
+      const div = fixtureEl.querySelector('.date-picker')
+      const dateRangePicker = new DateRangePicker(div, { disabled: true })
+
+      dateRangePicker.dispose()
+
+      expect(div.className).toEqual('date-picker disabled')
+    })
+
+    it('should remove the validation class it added', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const div = fixtureEl.querySelector('#host')
+      const dateRangePicker = new DateRangePicker(div, { invalid: true })
+
+      expect(div).toHaveClass('is-invalid')
+
+      dateRangePicker.dispose()
+
+      expect(div.className).toEqual('')
+    })
+
+    it('should not leave aria-expanded on the host', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const div = fixtureEl.querySelector('#host')
+      const dateRangePicker = new DateRangePicker(div)
+
+      dateRangePicker.show()
+      dateRangePicker.dispose()
+
+      expect(div.hasAttribute('aria-expanded')).toBeFalse()
+    })
+
+    it('should not leave a submit listener on the form', () => {
+      fixtureEl.innerHTML = '<form><div id="host"></div></form>'
+      const div = fixtureEl.querySelector('#host')
+      const dateRangePicker = new DateRangePicker(div)
+
+      dateRangePicker.dispose()
+
+      const onError = jasmine.createSpy()
+      window.addEventListener('error', onError)
+      fixtureEl.querySelector('form').dispatchEvent(createEvent('submit'))
+      window.removeEventListener('error', onError)
+
+      expect(onError).not.toHaveBeenCalled()
+    })
+
+    it('should remove the dropdown from a container after dispose', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const div = fixtureEl.querySelector('#host')
+      const dateRangePicker = new DateRangePicker(div, { container: 'body' })
+      const menu = dateRangePicker._menu
+
+      expect(menu.isConnected).toBeTrue()
+
+      dateRangePicker.dispose()
+
+      expect(menu.isConnected).toBeFalse()
+    })
+
+    it('should dispose the pickers it created inside the dropdown', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const div = fixtureEl.querySelector('#host')
+      const dateRangePicker = new DateRangePicker(div, { timepicker: true })
+      const { _calendar: calendar, _timePickerStart: timePicker } = dateRangePicker
+
+      dateRangePicker.dispose()
+
+      expect(calendar._element).toBeNull()
+      expect(timePicker._element).toBeNull()
+    })
+
+    it('should be safe to dispose twice', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const div = fixtureEl.querySelector('#host')
+      const dateRangePicker = new DateRangePicker(div)
+
+      dateRangePicker.dispose()
+
+      expect(() => dateRangePicker.dispose()).not.toThrow()
+    })
+
     it('should dispose DateRangePicker instance', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')

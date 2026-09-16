@@ -18,6 +18,7 @@ import {
   convertToDateObject, getDateBySelectionType, getLocalDateFromString, getTimeFormatOptions, isDateDisabled
 } from './util/calendar.js'
 import FocusTrap from './util/focustrap.js'
+import { addHostClassNames, restoreHost } from './util/host.js'
 
 /**
  * Constants
@@ -228,7 +229,11 @@ class DateRangePicker extends BaseComponent {
     this._popper = null
     this._selectEndDate = this._config.selectEndDate
 
+    this._addedClassNames = []
     this._calendar = null
+    this._hadToggleAttribute = false
+    this._onFormSubmit = null
+    this._ownTimePickers = []
     this._calendars = null
     this._endInput = null
     this._endInputTimeout = null
@@ -310,6 +315,10 @@ class DateRangePicker extends BaseComponent {
   }
 
   dispose() {
+    if (!this._element) {
+      return
+    }
+
     if (this._popper) {
       this._popper.destroy()
     }
@@ -323,6 +332,43 @@ class DateRangePicker extends BaseComponent {
     }
 
     this._focustrap.deactivate()
+
+    for (const component of [this._calendar, ...this._ownTimePickers]) {
+      if (component) {
+        component.dispose()
+      }
+    }
+
+    EventHandler.off(this._element, EVENT_KEY)
+
+    const form = this._startInput?.form
+
+    restoreHost(this._element, {
+      classNames: [CLASS_NAME_SHOW, ...this._addedClassNames],
+      eventKey: EVENT_KEY,
+      nodes: [
+        this._indicatorElement,
+        this._startInput,
+        this._endInput,
+        this._startPreviewInput,
+        this._endPreviewInput,
+        this._togglerElement,
+        this._calendars,
+        this._menu
+      ]
+    })
+
+    this._addedClassNames = []
+
+    this._element.removeAttribute('aria-expanded')
+
+    if (!this._hadToggleAttribute) {
+      Manipulator.removeDataAttribute(this._element, 'toggle')
+    }
+
+    if (form && this._onFormSubmit) {
+      EventHandler.off(form, EVENT_SUBMIT, this._onFormSubmit)
+    }
 
     super.dispose()
   }
@@ -445,7 +491,7 @@ class DateRangePicker extends BaseComponent {
       }, this._config.inputOnChangeDelay)
     })
 
-    EventHandler.on(this._startInput.form, EVENT_SUBMIT, () => {
+    this._onFormSubmit = () => {
       if (this._startInput.form.classList.contains(CLASS_NAME_WAS_VALIDATED)) {
         if (this._config.range && (Number.isNaN(Date.parse(this._startInput.value)) || Number.isNaN(Date.parse(this._endInput.value)))) {
           return this._element.classList.add(CLASS_NAME_IS_INVALID)
@@ -465,7 +511,9 @@ class DateRangePicker extends BaseComponent {
 
         this._element.classList.add(CLASS_NAME_IS_INVALID)
       }
-    })
+    }
+
+    EventHandler.on(this._startInput.form, EVENT_SUBMIT, this._onFormSubmit)
 
     EventHandler.on(this._endInput, EVENT_CLICK, () => {
       this._selectEndDate = true
@@ -628,17 +676,16 @@ class DateRangePicker extends BaseComponent {
   }
 
   _createDateRangePicker() {
-    this._element.classList.add(CLASS_NAME_DATE_PICKER)
+    this._addedClassNames.push(...addHostClassNames(this._element, [
+      CLASS_NAME_DATE_PICKER,
+      this._config.size && `date-picker-${this._config.size}`,
+      this._config.disabled && CLASS_NAME_DISABLED,
+      this._config.invalid && CLASS_NAME_IS_INVALID,
+      this._config.valid && CLASS_NAME_IS_VALID
+    ]))
 
+    this._hadToggleAttribute = this._element.hasAttribute('data-coreui-toggle')
     Manipulator.setDataAttribute(this._element, 'toggle', this._config.range ? CLASS_NAME_DATE_RANGE_PICKER : CLASS_NAME_DATE_PICKER)
-
-    if (this._config.size) {
-      this._element.classList.add(`date-picker-${this._config.size}`)
-    }
-
-    if (this._config.disabled) {
-      this._element.classList.add(CLASS_NAME_DISABLED)
-    }
 
     this._element.classList.toggle(CLASS_NAME_IS_INVALID, this._config.invalid)
     this._element.classList.toggle(CLASS_NAME_IS_VALID, this._config.valid)
@@ -837,6 +884,7 @@ class DateRangePicker extends BaseComponent {
         const timePickerStartEl = document.createElement('div')
         timePickerStartEl.classList.add(CLASS_NAME_TIME_PICKER)
         this._timePickerStart = new TimePicker(timePickerStartEl, this._getTimePickerConfig(true))
+        this._ownTimePickers.push(this._timePickerStart)
 
         this._timepickers.append(timePickerStartEl)
 
@@ -848,6 +896,7 @@ class DateRangePicker extends BaseComponent {
         const timePickerEndEl = document.createElement('div')
         timePickerEndEl.classList.add(CLASS_NAME_TIME_PICKER)
         this._timePickerEnd = new TimePicker(timePickerEndEl, this._getTimePickerConfig(false))
+        this._ownTimePickers.push(this._timePickerEnd)
 
         this._timepickers.append(timePickerEndEl)
 
@@ -861,6 +910,7 @@ class DateRangePicker extends BaseComponent {
           timePickerEl.classList.add(CLASS_NAME_TIME_PICKER)
 
           const _timepicker = new TimePicker(timePickerEl, this._getTimePickerConfig(index === 0))
+          this._ownTimePickers.push(_timepicker)
 
           if (index === 0) {
             this._timePickerStart = _timepicker

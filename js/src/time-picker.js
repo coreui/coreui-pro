@@ -53,7 +53,7 @@ const EVENT_INPUT = `input${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 const EVENT_SHOW = `show${EVENT_KEY}`
 const EVENT_SHOWN = `shown${EVENT_KEY}`
-const EVENT_SUBMIT = `submit${EVENT_KEY}`
+const EVENT_SUBMIT = 'submit'
 const EVENT_TIME_CHANGE = `timeChange${EVENT_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_KEYUP_DATA_API = `keyup${EVENT_KEY}${DATA_API_KEY}`
@@ -167,6 +167,7 @@ class TimePicker extends BaseComponent {
 
     this._addedClassNames = []
     this._indicatorElement = null
+    this._onFormSubmit = null
     this._input = null
     this._menu = null
     this._timePickerBody = null
@@ -275,11 +276,12 @@ class TimePicker extends BaseComponent {
     })
 
     this._addedClassNames = []
-    this._element.removeAttribute('aria-expanded')
     Manipulator.removeDataAttribute(this._element, 'meridiem')
 
-    if (form) {
-      EventHandler.off(form, EVENT_KEY)
+    this._element.removeAttribute('aria-expanded')
+
+    if (form && this._onFormSubmit) {
+      EventHandler.off(form, EVENT_SUBMIT, this._onFormSubmit)
     }
 
     super.dispose()
@@ -487,7 +489,7 @@ class TimePicker extends BaseComponent {
     })
 
     if (this._config.type === 'dropdown') {
-      EventHandler.on(this._input.form, EVENT_SUBMIT, () => {
+      this._onFormSubmit = () => {
         if (this._input.form.classList.contains(CLASS_NAME_WAS_VALIDATED)) {
           if (Number.isNaN(Date.parse(`1970-01-01 ${this._input.value}`))) {
             return this._element.classList.add(CLASS_NAME_IS_INVALID)
@@ -499,18 +501,20 @@ class TimePicker extends BaseComponent {
 
           this._element.classList.add(CLASS_NAME_IS_INVALID)
         }
-      })
+      }
+
+      EventHandler.on(this._input.form, EVENT_SUBMIT, this._onFormSubmit)
     }
   }
 
   _createTimePicker() {
-    this._addedClassNames = addHostClassNames(this._element, [
+    this._addedClassNames.push(...addHostClassNames(this._element, [
       CLASS_NAME_TIME_PICKER,
       this._config.size && `time-picker-${this._config.size}`,
       this._config.disabled && CLASS_NAME_DISABLED,
       this._config.invalid && CLASS_NAME_IS_INVALID,
       this._config.valid && CLASS_NAME_IS_VALID
-    ])
+    ]))
 
     Manipulator.setDataAttribute(
       this._element,
