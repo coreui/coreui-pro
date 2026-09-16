@@ -40,6 +40,12 @@ Components read the tokens rather than a build-time copy, so raising a weight at
 
 ## Customizing
 
+### Sass maps
+
+Each entry is one weight: the key names the `.fw-*` class and the matching `--cui-font-weight-*` token, and `null` drops both.
+
+<ScssDocs file="scss/_config.scss" capture="font-weights" />
+
 ### Utilities API
 
 Font weight utilities are declared in our utilities API in `scss/_utilities.scss`. [Learn how to use the utilities API.](/utilities/api/#using-the-api)

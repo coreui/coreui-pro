@@ -114,10 +114,6 @@ $th-font-weight:       null !default;
 
     accent-color: var(--#{$prefix}primary-base);
 
-    @if $font-size-root != null {
-      font-size: var(--#{$prefix}root-font-size);
-    }
-
     @if $enable-smooth-scroll {
       @media (prefers-reduced-motion: no-preference) {
         scroll-behavior: smooth;

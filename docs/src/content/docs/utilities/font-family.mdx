@@ -19,9 +19,11 @@ Change a selection to our monospace font stack with `.font-monospace`.
 
 ## Customizing
 
-### Sass variables
+### CSS variables
 
-<ScssDocs file="scss/_config.scss" capture="font-variables" />
+Both stacks are one token each on `:root`, so a page can swap a family without recompiling and every class and component reading it follows.
+
+<ScssDocs file="scss/_root.scss" capture="root-font-stacks" />
 
 ### Utilities API
 
