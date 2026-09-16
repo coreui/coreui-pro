@@ -1477,6 +1477,152 @@ describe('TimePicker', () => {
   })
 
   describe('dispose', () => {
+    it('should return the host to its original markup', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const div = fixtureEl.querySelector('#host')
+      const timePicker = new TimePicker(div)
+
+      expect(div.children.length).toBeGreaterThan(0)
+
+      timePicker.dispose()
+
+      expect(div.innerHTML).toEqual('')
+      expect(div.className).toEqual('')
+      expect(div.dataset.coreuiMeridiem).toBeUndefined()
+    })
+
+    it('should not stack controls over a second construction', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const div = fixtureEl.querySelector('#host')
+
+      const first = new TimePicker(div)
+      const second = new TimePicker(div)
+
+      expect(div.querySelectorAll('.time-picker-input-group').length).toEqual(1)
+      expect(div.querySelectorAll('input').length).toEqual(1)
+
+      second.dispose()
+      first.dispose()
+    })
+
+    it('should remove the validation class it added', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const div = fixtureEl.querySelector('#host')
+      const timePicker = new TimePicker(div, { invalid: true })
+
+      expect(div).toHaveClass('is-invalid')
+
+      timePicker.dispose()
+
+      expect(div.className).toEqual('')
+    })
+
+    it('should return an inline time picker host to its original markup', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const div = fixtureEl.querySelector('#host')
+      const timePicker = new TimePicker(div, { type: 'inline' })
+
+      expect(div.children.length).toBeGreaterThan(0)
+
+      timePicker.dispose()
+
+      expect(div.innerHTML).toEqual('')
+      expect(div.className).toEqual('')
+    })
+
+    it('should not leave aria-expanded on the host', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const div = fixtureEl.querySelector('#host')
+      const timePicker = new TimePicker(div)
+
+      timePicker.show()
+      timePicker.dispose()
+
+      expect(div.hasAttribute('aria-expanded')).toBeFalse()
+    })
+
+    it('should not leave a submit listener on the form', () => {
+      fixtureEl.innerHTML = '<form><div id="host"></div></form>'
+      const div = fixtureEl.querySelector('#host')
+      const timePicker = new TimePicker(div)
+
+      timePicker.dispose()
+
+      const onError = jasmine.createSpy()
+      window.addEventListener('error', onError)
+      fixtureEl.querySelector('form').dispatchEvent(createEvent('submit'))
+      window.removeEventListener('error', onError)
+
+      expect(onError).not.toHaveBeenCalled()
+    })
+
+    it('should keep a class name the page wrote itself', () => {
+      fixtureEl.innerHTML = '<div class="time-picker disabled"></div>'
+      const div = fixtureEl.querySelector('.time-picker')
+      const timePicker = new TimePicker(div, { disabled: true })
+
+      timePicker.dispose()
+
+      expect(div.className).toEqual('time-picker disabled')
+    })
+
+    it('should treat the legacy container aliases as a type', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const div = fixtureEl.querySelector('#host')
+
+      expect(() => new TimePicker(div, { container: 'dropdown' })).not.toThrow()
+
+      const timePicker = TimePicker.getInstance(div)
+
+      expect(timePicker._config.type).toEqual('dropdown')
+      expect(timePicker._config.container).toBeFalse()
+
+      timePicker.dispose()
+    })
+
+    it('should fall back when the container selector matches nothing', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const div = fixtureEl.querySelector('#host')
+
+      expect(() => new TimePicker(div, { type: 'inline', container: '#not-here' })).not.toThrow()
+
+      TimePicker.getInstance(div).dispose()
+    })
+
+    it('should accept a selector as the container', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const div = fixtureEl.querySelector('#host')
+      const timePicker = new TimePicker(div, { container: 'body' })
+
+      expect(timePicker._config.container).toEqual(document.body)
+      expect(timePicker._menu.parentElement).toEqual(document.body)
+
+      timePicker.dispose()
+    })
+
+    it('should remove the dropdown from a container after dispose', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const div = fixtureEl.querySelector('#host')
+      const timePicker = new TimePicker(div, { container: 'body' })
+      const menu = timePicker._menu
+
+      expect(menu.isConnected).toBeTrue()
+
+      timePicker.dispose()
+
+      expect(menu.isConnected).toBeFalse()
+    })
+
+    it('should be safe to dispose twice', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const div = fixtureEl.querySelector('#host')
+      const timePicker = new TimePicker(div)
+
+      timePicker.dispose()
+
+      expect(() => timePicker.dispose()).not.toThrow()
+    })
+
     it('should dispose the TimePicker instance', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')

@@ -10,6 +10,7 @@ import BaseComponent from './base-component.js'
 import Data from './dom/data.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
+import { addHostClassNames, restoreHost } from './util/host.js'
 import { DefaultAllowlist, escapeHtml, sanitizeHtml } from './util/sanitizer.js'
 import {
   defineJQueryPlugin,
@@ -598,40 +599,33 @@ class Autocomplete extends BaseComponent {
       this._popper.destroy()
     }
 
-    for (const element of [
-      this._menu,
-      this._optionsElement,
-      this._inputHintElement,
-      this._inputElement,
-      this._cleanerElement,
-      this._indicatorElement,
-      this._togglerElement
-    ]) {
-      if (element) {
-        EventHandler.off(element, EVENT_KEY)
-        element.remove()
-      }
-    }
+    restoreHost(this._element, {
+      classNames: [CLASS_NAME_SHOW, ...this._addedClassNames],
+      eventKey: EVENT_KEY,
+      nodes: [
+        this._optionsElement,
+        this._inputHintElement,
+        this._inputElement,
+        this._cleanerElement,
+        this._indicatorElement,
+        this._menu,
+        this._togglerElement
+      ]
+    })
 
-    this._element.classList.remove(CLASS_NAME_SHOW, ...this._addedClassNames)
     this._addedClassNames = []
   }
 
   _createAutocomplete() {
-    this._addedClassNames = [
+    this._addedClassNames = addHostClassNames(this._element, [
       CLASS_NAME_AUTOCOMPLETE,
       this._config.invalid && CLASS_NAME_IS_INVALID,
       this._config.valid && CLASS_NAME_IS_VALID,
       this._config.disabled && CLASS_NAME_DISABLED
-    ].filter(className => className && !this._element.classList.contains(className))
+    ])
 
-    this._element.classList.add(CLASS_NAME_AUTOCOMPLETE)
     this._element.classList.toggle(CLASS_NAME_IS_INVALID, this._config.invalid)
     this._element.classList.toggle(CLASS_NAME_IS_VALID, this._config.valid)
-
-    if (this._config.disabled) {
-      this._element.classList.add(CLASS_NAME_DISABLED)
-    }
 
     for (const className of this._getClassNames()) {
       this._element.classList.add(className)

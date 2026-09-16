@@ -14,6 +14,7 @@ import {
   defineJQueryPlugin, getElement, getNextActiveElement, isRTL
 } from './util/index.js'
 import FocusTrap from './util/focustrap.js'
+import { addHostClassNames, restoreHost } from './util/host.js'
 import {
   convert12hTo24h,
   convert24hTo12h,
@@ -52,7 +53,7 @@ const EVENT_INPUT = `input${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 const EVENT_SHOW = `show${EVENT_KEY}`
 const EVENT_SHOWN = `shown${EVENT_KEY}`
-const EVENT_SUBMIT = 'submit'
+const EVENT_SUBMIT = `submit${EVENT_KEY}`
 const EVENT_TIME_CHANGE = `timeChange${EVENT_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_KEYUP_DATA_API = `keyup${EVENT_KEY}${DATA_API_KEY}`
@@ -164,6 +165,7 @@ class TimePicker extends BaseComponent {
       'am'
     this._popper = null
 
+    this._addedClassNames = []
     this._indicatorElement = null
     this._input = null
     this._menu = null
@@ -244,6 +246,10 @@ class TimePicker extends BaseComponent {
   }
 
   dispose() {
+    if (!this._element) {
+      return
+    }
+
     if (this._popper) {
       this._popper.destroy()
     }
@@ -253,6 +259,28 @@ class TimePicker extends BaseComponent {
     }
 
     this._focustrap.deactivate()
+
+    const form = this._input?.form
+
+    restoreHost(this._element, {
+      classNames: [CLASS_NAME_SHOW, ...this._addedClassNames],
+      eventKey: EVENT_KEY,
+      nodes: [
+        this._indicatorElement,
+        this._input,
+        this._togglerElement,
+        this._timePickerBody,
+        this._menu
+      ]
+    })
+
+    this._addedClassNames = []
+    this._element.removeAttribute('aria-expanded')
+    Manipulator.removeDataAttribute(this._element, 'meridiem')
+
+    if (form) {
+      EventHandler.off(form, EVENT_KEY)
+    }
 
     super.dispose()
   }
@@ -476,7 +504,13 @@ class TimePicker extends BaseComponent {
   }
 
   _createTimePicker() {
-    this._element.classList.add(CLASS_NAME_TIME_PICKER)
+    this._addedClassNames = addHostClassNames(this._element, [
+      CLASS_NAME_TIME_PICKER,
+      this._config.size && `time-picker-${this._config.size}`,
+      this._config.disabled && CLASS_NAME_DISABLED,
+      this._config.invalid && CLASS_NAME_IS_INVALID,
+      this._config.valid && CLASS_NAME_IS_VALID
+    ])
 
     Manipulator.setDataAttribute(
       this._element,
@@ -484,15 +518,7 @@ class TimePicker extends BaseComponent {
       CLASS_NAME_TIME_PICKER
     )
 
-    if (this._config.size) {
-      this._element.classList.add(`time-picker-${this._config.size}`)
-    }
-
     this._element.classList.toggle(CLASS_NAME_IS_VALID, this._config.valid)
-    if (this._config.disabled) {
-      this._element.classList.add(CLASS_NAME_DISABLED)
-    }
-
     this._element.classList.toggle(CLASS_NAME_IS_INVALID, this._config.invalid)
 
     if (this._config.type === 'dropdown') {
@@ -1014,19 +1040,15 @@ class TimePicker extends BaseComponent {
   _configAfterMerge(config) {
     if (config.container === 'dropdown' || config.container === 'inline') {
       config.type = config.container
+      config.container = false
     }
 
     if (config.container === true) {
       config.container = document.body
     }
 
-    if (
-      typeof config.container === 'object' ||
-      (typeof config.container === 'string' &&
-        config.container === 'dropdown' &&
-        config.container === 'inline')
-    ) {
-      config.container = getElement(config.container)
+    if (typeof config.container === 'object' || typeof config.container === 'string') {
+      config.container = getElement(config.container) || false
     }
 
     return config
