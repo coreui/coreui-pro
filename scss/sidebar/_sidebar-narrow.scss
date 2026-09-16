@@ -7,10 +7,8 @@
 
 // scss-docs-start sidebar-narrow-variables
 $sidebar-narrow-width:                     4rem !default;
-$sidebar-narrow-padding-x:                 .5rem !default;
 $sidebar-narrow-nav-link-padding-y:        .75rem !default;
 $sidebar-narrow-nav-link-padding-x:        .5rem !default;
-$sidebar-narrow-unfoldable-box-shadow:     var(--#{$prefix}box-shadow) !default;
 // scss-docs-end sidebar-narrow-variables
 
 // stylelint-disable scss/dollar-variable-default
@@ -20,7 +18,7 @@ $sidebar-narrow-tokens: () !default;
 $sidebar-narrow-tokens: defaults(
   (
     --#{$prefix}sidebar-narrow-width: #{$sidebar-narrow-width},
-    --#{$prefix}sidebar-padding-x: #{$sidebar-narrow-padding-x},
+    --#{$prefix}sidebar-padding-x: .5rem,
   ),
   $sidebar-narrow-tokens
 );
@@ -30,7 +28,7 @@ $sidebar-narrow-tokens: defaults(
 $sidebar-narrow-unfoldable-tokens: () !default;
 $sidebar-narrow-unfoldable-tokens: defaults(
   (
-    --#{$prefix}sidebar-narrow-unfoldable-box-shadow: #{$sidebar-narrow-unfoldable-box-shadow},
+    --#{$prefix}sidebar-narrow-unfoldable-box-shadow: var(--#{$prefix}box-shadow),
   ),
   $sidebar-narrow-unfoldable-tokens
 );

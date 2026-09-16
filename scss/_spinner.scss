@@ -6,11 +6,8 @@
 
 // scss-docs-start spinner-variables
 $spinner-width:                            1em !default;
-$spinner-height:                           $spinner-width !default;
-$spinner-border-width:                     .125em !default;
 $spinner-animation-speed:                  1s !default;
 $spinner-animation-timing-function:        linear !default;
-$spinner-grow-animation-timing-function:   ease-in-out !default;
 
 $spinner-width-sm:                         .75em !default;
 $spinner-height-sm:                        $spinner-width-sm !default;
@@ -26,8 +23,8 @@ $spinner-border-tokens: () !default;
 $spinner-border-tokens: defaults(
   (
     --#{$prefix}spinner-width: #{$spinner-width},
-    --#{$prefix}spinner-height: #{$spinner-height},
-    --#{$prefix}spinner-border-width: #{$spinner-border-width},
+    --#{$prefix}spinner-height: #{$spinner-width},
+    --#{$prefix}spinner-border-width: .125em,
     --#{$prefix}spinner-animation-speed: #{$spinner-animation-speed},
     --#{$prefix}spinner-animation-timing-function: #{$spinner-animation-timing-function},
     --#{$prefix}spinner-animation-name: spinner-border,
@@ -46,9 +43,9 @@ $spinner-grow-tokens: () !default;
 $spinner-grow-tokens: defaults(
   (
     --#{$prefix}spinner-width: #{$spinner-width},
-    --#{$prefix}spinner-height: #{$spinner-height},
+    --#{$prefix}spinner-height: #{$spinner-width},
     --#{$prefix}spinner-animation-speed: #{$spinner-animation-speed},
-    --#{$prefix}spinner-animation-timing-function: #{$spinner-grow-animation-timing-function},
+    --#{$prefix}spinner-animation-timing-function: ease-in-out,
     --#{$prefix}spinner-animation-name: spinner-grow,
   ),
   $spinner-grow-tokens

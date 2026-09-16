@@ -2961,10 +2961,9 @@ Multi Select's option indicators moved with it — they render as a decorative
 
 v6 adopts the Bootstrap v6 SCSS architecture: CSS cascade layers, per-component
 design-token maps, one shared styling surface for every text control, and
-runtime color math in place of precompiled shades. Sass variables remain the
-primary customization API — every component knob still works through
-`@use ... with()` — but several things below are breaking and are called out
-as such.
+runtime color math in place of precompiled shades. The global Sass knobs stay
+the build-time customization API, while a component's own surface is its token
+map — several things below are breaking and are called out as such.
 
 #### A numeric radius scale replaces the one global radius
 
@@ -3778,8 +3777,20 @@ tintable and lets dark mode deepen every shadow at once.
   );
   ```
 
-  Classic per-variable overrides (`$alert-padding-y: 2rem`) keep working — the
-  map defaults are built from the same Sass variables.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **879 component Sass variables are gone, across 63 partials.** Every scalar
+  whose only job was carrying a value into its component's map now sits in the
+  map, so a value has one home instead of two. Set the token instead of the
+  variable — `$popover-tokens: (--cui-popover-bg: hotpink)` at build time, or
+  `--cui-popover-bg` on the element at runtime. The compiled CSS is unchanged
+  byte for byte, so this reaches you only if your build set one of the removed
+  variables, and Sass then names it: `This variable was not declared with
+  !default in the @used module.` Each component page says which variables it
+  still has: 31 lost their `### Sass variables` section entirely.
+- **The global knobs stay**, and so does every component variable a rule or a
+  mixin still reads. `$spacer`, `$border-width`, `$font-family-sans-serif`, the
+  breakpoint and container maps and the rest of `scss/_config.scss` and
+  `scss/_root.scss` are untouched.
 - **Component Sass variables moved from `_config.scss` into their component
   partials.** `@use ... with()` is unaffected — the entry point forwards every
   module — but if you imported `scss/_config.scss` directly for its

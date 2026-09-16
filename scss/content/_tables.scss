@@ -7,36 +7,11 @@
 @use "../theme" as *;
 
 // scss-docs-start table-variables
-$table-cell-padding-y:        .5rem !default;
-$table-cell-padding-x:        .5rem !default;
 $table-cell-padding-y-sm:     .25rem !default;
 $table-cell-padding-x-sm:     .25rem !default;
 
-$table-cell-vertical-align:   top !default;
-
-$table-color:                 var(--#{$prefix}fg-body) !default;
-$table-bg:                    var(--#{$prefix}bg-body) !default;
-$table-accent-bg:             transparent !default;
-
-$table-striped-color:         var(--#{$prefix}table-color) !default;
-$table-striped-bg-factor:     5% !default;
-$table-striped-bg:            color-mix(in oklch, var(--#{$prefix}table-color) var(--#{$prefix}table-striped-bg-factor), transparent) !default;
-
-$table-active-color:          var(--#{$prefix}table-color) !default;
-$table-active-bg-factor:      10% !default;
-$table-active-bg:             color-mix(in oklch, var(--#{$prefix}table-color) var(--#{$prefix}table-active-bg-factor), transparent) !default;
-
-$table-hover-color:           var(--#{$prefix}table-color) !default;
-$table-hover-bg-factor:       7.5% !default;
-$table-hover-bg:              color-mix(in oklch, var(--#{$prefix}table-color) var(--#{$prefix}table-hover-bg-factor), transparent) !default;
-
-$table-border-width:          var(--#{$prefix}border-width) !default;
-$table-border-color:          var(--#{$prefix}border-color) !default;
-
 $table-striped-order:         odd !default;
 $table-striped-columns-order: even !default;
-
-$table-group-separator-color: currentcolor !default;
 // scss-docs-end table-variables
 
 $table-tokens: () !default;
@@ -46,24 +21,24 @@ $table-tokens: () !default;
 // scss-docs-start table-css-vars
 $table-tokens: defaults(
   (
-    --#{$prefix}table-cell-padding-y: #{$table-cell-padding-y},
-    --#{$prefix}table-cell-padding-x: #{$table-cell-padding-x},
-    --#{$prefix}table-cell-vertical-align: #{$table-cell-vertical-align},
-    --#{$prefix}table-color: #{$table-color},
-    --#{$prefix}table-bg: #{$table-bg},
-    --#{$prefix}table-accent-bg: #{$table-accent-bg},
-    --#{$prefix}table-border-width: #{$table-border-width},
-    --#{$prefix}table-border-color: #{$table-border-color},
-    --#{$prefix}table-group-separator-color: #{$table-group-separator-color},
-    --#{$prefix}table-striped-color: #{$table-striped-color},
-    --#{$prefix}table-striped-bg-factor: #{$table-striped-bg-factor},
-    --#{$prefix}table-striped-bg: #{$table-striped-bg},
-    --#{$prefix}table-active-color: #{$table-active-color},
-    --#{$prefix}table-active-bg-factor: #{$table-active-bg-factor},
-    --#{$prefix}table-active-bg: #{$table-active-bg},
-    --#{$prefix}table-hover-color: #{$table-hover-color},
-    --#{$prefix}table-hover-bg-factor: #{$table-hover-bg-factor},
-    --#{$prefix}table-hover-bg: #{$table-hover-bg},
+    --#{$prefix}table-cell-padding-y: .5rem,
+    --#{$prefix}table-cell-padding-x: .5rem,
+    --#{$prefix}table-cell-vertical-align: top,
+    --#{$prefix}table-color: var(--#{$prefix}fg-body),
+    --#{$prefix}table-bg: var(--#{$prefix}bg-body),
+    --#{$prefix}table-accent-bg: transparent,
+    --#{$prefix}table-border-width: var(--#{$prefix}border-width),
+    --#{$prefix}table-border-color: var(--#{$prefix}border-color),
+    --#{$prefix}table-group-separator-color: currentcolor,
+    --#{$prefix}table-striped-color: var(--#{$prefix}table-color),
+    --#{$prefix}table-striped-bg-factor: 5%,
+    --#{$prefix}table-striped-bg: color-mix(in oklch, var(--#{$prefix}table-color) var(--#{$prefix}table-striped-bg-factor), transparent),
+    --#{$prefix}table-active-color: var(--#{$prefix}table-color),
+    --#{$prefix}table-active-bg-factor: 10%,
+    --#{$prefix}table-active-bg: color-mix(in oklch, var(--#{$prefix}table-color) var(--#{$prefix}table-active-bg-factor), transparent),
+    --#{$prefix}table-hover-color: var(--#{$prefix}table-color),
+    --#{$prefix}table-hover-bg-factor: 7.5%,
+    --#{$prefix}table-hover-bg: color-mix(in oklch, var(--#{$prefix}table-color) var(--#{$prefix}table-hover-bg-factor), transparent),
   ),
   $table-tokens
 );
@@ -146,7 +121,6 @@ $table-variants: map.keys($theme-colors) !default;
     caption-side: top;
   }
 
-
   //
   // Condensed table w/ half padding
   //
@@ -155,7 +129,6 @@ $table-variants: map.keys($theme-colors) !default;
     --#{$prefix}table-cell-padding-y: #{$table-cell-padding-y-sm};
     --#{$prefix}table-cell-padding-x: #{$table-cell-padding-x-sm};
   }
-
 
   // Border versions
   //
@@ -229,7 +202,6 @@ $table-variants: map.keys($theme-colors) !default;
       --#{$prefix}table-bg-state: var(--#{$prefix}table-hover-bg);
     }
   }
-
 
   // Table variants
   //

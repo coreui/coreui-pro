@@ -123,14 +123,6 @@ Switches read their own custom properties, so restyling one control does not tou
 
 <ScssDocs file="scss/mixins/_switch.scss" capture="switch-css-vars" />
 
-### Sass variables
-
-<DeprecatedIn version="6.0.0" />
-
-Sass variables set these defaults at build time and are removed in v7. The CSS variables above reach the same values without recompiling, and can be set on a single element.
-
-<ScssDocs file="scss/mixins/_switch.scss" capture="switch-variables" />
-
 ### Shared variables
 
 The checkbox, the radio and the switch share their size and their focus, active and disabled states. Those live on `:root` as `--cui-control-*`, so one declaration retunes all three at runtime; the Sass variables behind them set the defaults:

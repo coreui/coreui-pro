@@ -4,12 +4,6 @@
 @use "../config" as *;
 
 // scss-docs-start chip-input-variables
-$chip-input-padding-y:           .25rem !default;
-$chip-input-padding-x:           .75rem !default;
-$chip-input-border-color:        var(--#{$prefix}border-color) !default;
-$chip-input-border-radius:       var(--#{$prefix}radius-4) !default;
-$chip-input-gap:                 .375rem !default;
-
 $chip-input-padding-y-sm:        .125rem !default;
 $chip-input-padding-x-sm:        .5rem !default;
 $chip-input-border-radius-sm:    var(--#{$prefix}radius-3) !default;
@@ -50,11 +44,11 @@ $chip-input-sizes: defaults(
 $chip-input-tokens: () !default;
 $chip-input-tokens: defaults(
   (
-    --#{$prefix}control-padding-y: #{$chip-input-padding-y},
-    --#{$prefix}control-padding-x: #{$chip-input-padding-x},
-    --#{$prefix}control-border-color: #{$chip-input-border-color},
-    --#{$prefix}control-border-radius: #{$chip-input-border-radius},
-    --#{$prefix}control-group-gap: #{$chip-input-gap},
+    --#{$prefix}control-padding-y: .25rem,
+    --#{$prefix}control-padding-x: .75rem,
+    --#{$prefix}control-border-color: var(--#{$prefix}border-color),
+    --#{$prefix}control-border-radius: var(--#{$prefix}radius-4),
+    --#{$prefix}control-group-gap: .375rem,
   ),
   $chip-input-tokens
 );

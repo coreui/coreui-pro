@@ -6,34 +6,6 @@
 @use "mixins/transition" as *;
 @use "config" as *;
 
-// scss-docs-start popover-variables
-$popover-font-size:                 var(--#{$prefix}font-size-sm) !default;
-$popover-bg:                        var(--#{$prefix}bg-body) !default;
-$popover-max-width:                 276px !default;
-$popover-border-width:              var(--#{$prefix}border-width) !default;
-$popover-border-color:              var(--#{$prefix}border-color-translucent) !default;
-$popover-border-radius:             var(--#{$prefix}radius-7) !default;
-$popover-inner-border-radius:       calc(var(--#{$prefix}popover-border-radius) - var(--#{$prefix}popover-border-width)) !default;
-$popover-box-shadow:                var(--#{$prefix}box-shadow) !default;
-
-$popover-header-font-size:          var(--#{$prefix}body-font-size) !default;
-$popover-header-bg:                 var(--#{$prefix}bg-1) !default;
-$popover-header-color:              var(--#{$prefix}heading-color) !default;
-$popover-header-padding-y:          .5rem !default;
-$popover-header-padding-x:          var(--#{$prefix}spacer) !default;
-
-$popover-body-color:                var(--#{$prefix}fg-body) !default;
-$popover-body-padding-y:            var(--#{$prefix}spacer) !default;
-$popover-body-padding-x:            var(--#{$prefix}spacer) !default;
-
-$popover-arrow-width:               1rem !default;
-$popover-arrow-height:              .5rem !default;
-
-$popover-transition-property:       opacity !default;
-$popover-transition-duration:       .15s !default;
-$popover-transition-timing:         linear !default;
-// scss-docs-end popover-variables
-
 $popover-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
@@ -42,28 +14,28 @@ $popover-tokens: () !default;
 $popover-tokens: defaults(
   (
     --#{$prefix}popover-zindex: var(--#{$prefix}z-popover),
-    --#{$prefix}popover-max-width: #{$popover-max-width},
-    --#{$prefix}popover-font-size: #{$popover-font-size},
-    --#{$prefix}popover-bg: #{$popover-bg},
-    --#{$prefix}popover-border-width: #{$popover-border-width},
-    --#{$prefix}popover-border-color: #{$popover-border-color},
-    --#{$prefix}popover-border-radius: #{$popover-border-radius},
-    --#{$prefix}popover-inner-border-radius: #{$popover-inner-border-radius},
-    --#{$prefix}popover-box-shadow: #{$popover-box-shadow},
-    --#{$prefix}popover-header-padding-x: #{$popover-header-padding-x},
-    --#{$prefix}popover-header-padding-y: #{$popover-header-padding-y},
-    --#{$prefix}popover-header-font-size: #{$popover-header-font-size},
-    --#{$prefix}popover-header-color: #{$popover-header-color},
-    --#{$prefix}popover-header-bg: #{$popover-header-bg},
-    --#{$prefix}popover-body-padding-x: #{$popover-body-padding-x},
-    --#{$prefix}popover-body-padding-y: #{$popover-body-padding-y},
-    --#{$prefix}popover-body-color: #{$popover-body-color},
-    --#{$prefix}popover-arrow-width: #{$popover-arrow-width},
-    --#{$prefix}popover-arrow-height: #{$popover-arrow-height},
+    --#{$prefix}popover-max-width: 276px,
+    --#{$prefix}popover-font-size: var(--#{$prefix}font-size-sm),
+    --#{$prefix}popover-bg: var(--#{$prefix}bg-body),
+    --#{$prefix}popover-border-width: var(--#{$prefix}border-width),
+    --#{$prefix}popover-border-color: var(--#{$prefix}border-color-translucent),
+    --#{$prefix}popover-border-radius: var(--#{$prefix}radius-7),
+    --#{$prefix}popover-inner-border-radius: calc(var(--#{$prefix}popover-border-radius) - var(--#{$prefix}popover-border-width)),
+    --#{$prefix}popover-box-shadow: var(--#{$prefix}box-shadow),
+    --#{$prefix}popover-header-padding-x: var(--#{$prefix}spacer),
+    --#{$prefix}popover-header-padding-y: .5rem,
+    --#{$prefix}popover-header-font-size: var(--#{$prefix}body-font-size),
+    --#{$prefix}popover-header-color: var(--#{$prefix}heading-color),
+    --#{$prefix}popover-header-bg: var(--#{$prefix}bg-1),
+    --#{$prefix}popover-body-padding-x: var(--#{$prefix}spacer),
+    --#{$prefix}popover-body-padding-y: var(--#{$prefix}spacer),
+    --#{$prefix}popover-body-color: var(--#{$prefix}fg-body),
+    --#{$prefix}popover-arrow-width: 1rem,
+    --#{$prefix}popover-arrow-height: .5rem,
     --#{$prefix}popover-arrow-border: var(--#{$prefix}popover-border-color),
-    --#{$prefix}popover-transition-property: #{$popover-transition-property},
-    --#{$prefix}popover-transition-duration: #{$popover-transition-duration},
-    --#{$prefix}popover-transition-timing: #{$popover-transition-timing},
+    --#{$prefix}popover-transition-property: opacity,
+    --#{$prefix}popover-transition-duration: .15s,
+    --#{$prefix}popover-transition-timing: linear,
   ),
   $popover-tokens
 );

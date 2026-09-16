@@ -26,15 +26,6 @@ $code-font-size:              var(--#{$prefix}small-font-size) !default;
 $pre-color:                   inherit !default;
 // scss-docs-end reboot-type-variables
 
-// scss-docs-start kbd-variables
-$kbd-padding-y:               .1875rem !default;
-$kbd-padding-x:               .375rem !default;
-$kbd-font-size:               $code-font-size !default;
-$kbd-color:                   var(--#{$prefix}bg-body) !default;
-$kbd-bg:                      var(--#{$prefix}fg-2) !default;
-$kbd-border-radius:           var(--#{$prefix}radius-3) !default;
-// scss-docs-end kbd-variables
-
 $reboot-tokens: () !default;
 $reboot-kbd-tokens: () !default;
 
@@ -71,19 +62,18 @@ $reboot-tokens: defaults(
 // scss-docs-start kbd-css-vars
 $reboot-kbd-tokens: defaults(
   (
-    --#{$prefix}kbd-padding-y: #{$kbd-padding-y},
-    --#{$prefix}kbd-padding-x: #{$kbd-padding-x},
-    --#{$prefix}kbd-font-size: #{$kbd-font-size},
-    --#{$prefix}kbd-color: #{$kbd-color},
-    --#{$prefix}kbd-bg: #{$kbd-bg},
-    --#{$prefix}kbd-border-radius: #{$kbd-border-radius},
+    --#{$prefix}kbd-padding-y: .1875rem,
+    --#{$prefix}kbd-padding-x: .375rem,
+    --#{$prefix}kbd-font-size: #{$code-font-size},
+    --#{$prefix}kbd-color: var(--#{$prefix}bg-body),
+    --#{$prefix}kbd-bg: var(--#{$prefix}fg-2),
+    --#{$prefix}kbd-border-radius: var(--#{$prefix}radius-3),
   ),
   $reboot-kbd-tokens
 );
 // scss-docs-end kbd-css-vars
 
 // stylelint-enable scss/dollar-variable-default
-
 
 // scss-docs-start reboot-table-variables
 // Reboot styles the raw HTML elements, so it owns these rather than borrowing
@@ -97,14 +87,12 @@ $th-font-weight:       null !default;
 @layer reboot {
   // stylelint-disable declaration-no-important, selector-no-qualifying-type, property-no-vendor-prefix
 
-
   // Reboot
   //
   // Normalization of HTML elements, manually forked from Normalize.css to remove
   // styles targeting irrelevant browsers while applying new styles.
   //
   // Normalize is licensed MIT. https://github.com/necolas/normalize.css
-
 
   // Document
   //
@@ -115,7 +103,6 @@ $th-font-weight:       null !default;
   *::after {
     box-sizing: border-box;
   }
-
 
   // Root
   //
@@ -138,7 +125,6 @@ $th-font-weight:       null !default;
     }
   }
 
-
   // Body
   //
   // 1. Remove the margin in all browsers.
@@ -160,7 +146,6 @@ $th-font-weight:       null !default;
   }
   // scss-docs-end reboot-body-rules
 
-
   // Content grouping
   //
   // 1. Reset Firefox's gray color
@@ -172,7 +157,6 @@ $th-font-weight:       null !default;
     border-block-start: var(--#{$prefix}hr-border-width) solid var(--#{$prefix}hr-border-color);
     opacity: var(--#{$prefix}hr-opacity);
   }
-
 
   // Typography
   //
@@ -226,7 +210,6 @@ $th-font-weight:       null !default;
     font-size: var(--#{$prefix}font-size-md);
   }
 
-
   // Reset margins on paragraphs
   //
   // Similarly, the top margin on `<p>`s get reset. However, we also reset the
@@ -236,7 +219,6 @@ $th-font-weight:       null !default;
     margin-top: 0;
     margin-bottom: var(--#{$prefix}paragraph-margin-bottom);
   }
-
 
   // Abbreviations
   //
@@ -256,7 +238,6 @@ $th-font-weight:       null !default;
     text-transform: uppercase;
   }
 
-
   // Address
 
   address {
@@ -264,7 +245,6 @@ $th-font-weight:       null !default;
     font-style: normal;
     line-height: inherit;
   }
-
 
   // Lists
 
@@ -298,13 +278,11 @@ $th-font-weight:       null !default;
     margin-bottom: var(--#{$prefix}spacer-2);
   }
 
-
   // Blockquote
 
   blockquote {
     margin: 0 0 var(--#{$prefix}spacer);
   }
-
 
   // Strong
   //
@@ -315,7 +293,6 @@ $th-font-weight:       null !default;
     font-weight: var(--#{$prefix}font-weight-bolder);
   }
 
-
   // Small
   //
   // Add the correct font size in all browsers
@@ -325,7 +302,6 @@ $th-font-weight:       null !default;
     font-size: var(--#{$prefix}small-font-size);
   }
 
-
   // Mark
 
   mark,
@@ -334,7 +310,6 @@ $th-font-weight:       null !default;
     color: var(--#{$prefix}mark-color);
     background-color: var(--#{$prefix}mark-bg);
   }
-
 
   // Sub and Sup
   //
@@ -351,7 +326,6 @@ $th-font-weight:       null !default;
 
   sub { bottom: -.25em; }
   sup { top: -.5em; }
-
 
   // Links
 
@@ -378,7 +352,6 @@ $th-font-weight:       null !default;
       text-decoration: none;
     }
   }
-
 
   // Code
 
@@ -438,7 +411,6 @@ $th-font-weight:       null !default;
     }
   }
 
-
   // Figures
   //
   // Apply a consistent margin strategy (matches our type styles).
@@ -447,14 +419,12 @@ $th-font-weight:       null !default;
     margin: 0 0 var(--#{$prefix}spacer);
   }
 
-
   // Images and content
 
   img,
   svg {
     vertical-align: middle;
   }
-
 
   // Tables
   //
@@ -491,7 +461,6 @@ $th-font-weight:       null !default;
     border-style: solid;
     border-width: 0;
   }
-
 
   // Forms
   //
@@ -675,7 +644,6 @@ $th-font-weight:       null !default;
     direction: ltr;
   }
 
-
   // Remove the inner padding in Chrome and Safari on macOS.
 
   ::-webkit-search-decoration {
@@ -687,7 +655,6 @@ $th-font-weight:       null !default;
   ::-webkit-color-swatch-wrapper {
     padding: 0;
   }
-
 
   // 1. Inherit font family and line height for file input buttons
   // 2. Correct the inability to style clickable types in iOS and Safari.
@@ -723,7 +690,6 @@ $th-font-weight:       null !default;
     cursor: pointer;
   }
 
-
   // Progress
   //
   // Add the correct vertical alignment in Chrome, Firefox, and Opera.
@@ -731,7 +697,6 @@ $th-font-weight:       null !default;
   progress {
     vertical-align: baseline;
   }
-
 
   // Hidden attribute
   //

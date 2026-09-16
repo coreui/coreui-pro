@@ -5,21 +5,6 @@
 @use "../mixins/tokens" as *;
 @use "../config" as *;
 
-// scss-docs-start thumbnail-variables
-$thumbnail-padding:                 .25rem !default;
-$thumbnail-bg:                      var(--#{$prefix}bg-body) !default;
-$thumbnail-border-width:            var(--#{$prefix}border-width) !default;
-$thumbnail-border-color:            var(--#{$prefix}border-color) !default;
-$thumbnail-border-radius:           var(--#{$prefix}radius-5) !default;
-$thumbnail-box-shadow:              var(--#{$prefix}box-shadow-sm) !default;
-// scss-docs-end thumbnail-variables
-
-// scss-docs-start figure-variables
-$figure-gap:                        var(--#{$prefix}spacer-2) !default;
-$figure-caption-font-size:          var(--#{$prefix}small-font-size) !default;
-$figure-caption-color:              var(--#{$prefix}fg-3) !default;
-// scss-docs-end figure-variables
-
 $thumbnail-tokens: () !default;
 $figure-tokens: () !default;
 $figure-caption-tokens: () !default;
@@ -29,12 +14,12 @@ $figure-caption-tokens: () !default;
 // scss-docs-start thumbnail-css-vars
 $thumbnail-tokens: defaults(
   (
-    --#{$prefix}thumbnail-padding: #{$thumbnail-padding},
-    --#{$prefix}thumbnail-bg: #{$thumbnail-bg},
-    --#{$prefix}thumbnail-border-width: #{$thumbnail-border-width},
-    --#{$prefix}thumbnail-border-color: #{$thumbnail-border-color},
-    --#{$prefix}thumbnail-border-radius: #{$thumbnail-border-radius},
-    --#{$prefix}thumbnail-box-shadow: #{$thumbnail-box-shadow},
+    --#{$prefix}thumbnail-padding: .25rem,
+    --#{$prefix}thumbnail-bg: var(--#{$prefix}bg-body),
+    --#{$prefix}thumbnail-border-width: var(--#{$prefix}border-width),
+    --#{$prefix}thumbnail-border-color: var(--#{$prefix}border-color),
+    --#{$prefix}thumbnail-border-radius: var(--#{$prefix}radius-5),
+    --#{$prefix}thumbnail-box-shadow: var(--#{$prefix}box-shadow-sm),
   ),
   $thumbnail-tokens
 );
@@ -43,15 +28,15 @@ $thumbnail-tokens: defaults(
 // scss-docs-start figure-css-vars
 $figure-tokens: defaults(
   (
-    --#{$prefix}figure-gap: #{$figure-gap},
+    --#{$prefix}figure-gap: var(--#{$prefix}spacer-2),
   ),
   $figure-tokens
 );
 
 $figure-caption-tokens: defaults(
   (
-    --#{$prefix}figure-caption-font-size: #{$figure-caption-font-size},
-    --#{$prefix}figure-caption-color: #{$figure-caption-color},
+    --#{$prefix}figure-caption-font-size: var(--#{$prefix}small-font-size),
+    --#{$prefix}figure-caption-color: var(--#{$prefix}fg-3),
   ),
   $figure-caption-tokens
 );
@@ -70,7 +55,6 @@ $figure-caption-tokens: defaults(
   .img-fluid {
     @include img-fluid();
   }
-
 
   // Image thumbnails
   .img-thumbnail {

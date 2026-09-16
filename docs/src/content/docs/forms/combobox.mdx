@@ -557,13 +557,3 @@ The panel is the shared combobox surface, which only sizes itself:
 <ScssDocs file="scss/_combobox.scss" capture="combobox-css-vars" />
 
 Everything inside it — options, section labels and the checkbox indicator — is a [List box](/components/list-box/) and takes its `--cui-list-box-*` variables. Set them on `.combobox-popup` to restyle one Combobox, or on `:root` for all of them. The frame of the toggle is a [`.form-control`](/forms/form-control/) and takes the `--cui-control-*` properties.
-
-### Sass variables
-
-<DeprecatedIn version="6.0.0" />
-
-Sass variables set these defaults at build time and are removed in v7. The CSS variables above reach the same values without recompiling, and can be set on a single element.
-
-<ScssDocs file="scss/_combobox.scss" capture="combobox-toggle-variables" />
-
-<ScssDocs file="scss/_combobox.scss" capture="combobox-variables" />

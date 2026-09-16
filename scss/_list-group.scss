@@ -7,28 +7,9 @@
 
 // List group
 // scss-docs-start list-group-variables
-$list-group-color:                  var(--#{$prefix}fg-body) !default;
 $list-group-bg:                     var(--#{$prefix}bg-body) !default;
-$list-group-border-color:           var(--#{$prefix}border-color) !default;
-$list-group-border-width:           var(--#{$prefix}border-width) !default;
-$list-group-border-radius:          var(--#{$prefix}radius-5) !default;
 
-$list-group-item-padding-y:         var(--#{$prefix}spacer-2) !default;
-$list-group-item-padding-x:         var(--#{$prefix}spacer) !default;
-
-$list-group-hover-bg:               var(--#{$prefix}bg-1) !default;
-$list-group-active-color:           var(--#{$prefix}primary-contrast) !default;
 $list-group-active-bg:              var(--#{$prefix}primary-bg) !default;
-$list-group-active-border-color:    $list-group-active-bg !default;
-
-$list-group-disabled-color:         var(--#{$prefix}fg-3) !default;
-$list-group-disabled-bg:            $list-group-bg !default;
-
-$list-group-action-color:           var(--#{$prefix}fg-2) !default;
-$list-group-action-hover-color:     var(--#{$prefix}fg-1) !default;
-
-$list-group-action-active-color:    var(--#{$prefix}fg-body) !default;
-$list-group-action-active-bg:       var(--#{$prefix}bg-2) !default;
 // scss-docs-end list-group-variables
 
 $list-group-tokens: () !default;
@@ -38,23 +19,23 @@ $list-group-tokens: () !default;
 // scss-docs-start list-group-css-vars
 $list-group-tokens: defaults(
   (
-    --#{$prefix}list-group-color: #{$list-group-color},
+    --#{$prefix}list-group-color: var(--#{$prefix}fg-body),
     --#{$prefix}list-group-bg: #{$list-group-bg},
-    --#{$prefix}list-group-border-color: #{$list-group-border-color},
-    --#{$prefix}list-group-border-width: #{$list-group-border-width},
-    --#{$prefix}list-group-border-radius: #{$list-group-border-radius},
-    --#{$prefix}list-group-item-padding-x: #{$list-group-item-padding-x},
-    --#{$prefix}list-group-item-padding-y: #{$list-group-item-padding-y},
-    --#{$prefix}list-group-action-color: #{$list-group-action-color},
-    --#{$prefix}list-group-action-hover-color: #{$list-group-action-hover-color},
-    --#{$prefix}list-group-action-hover-bg: #{$list-group-hover-bg},
-    --#{$prefix}list-group-action-active-color: #{$list-group-action-active-color},
-    --#{$prefix}list-group-action-active-bg: #{$list-group-action-active-bg},
-    --#{$prefix}list-group-disabled-color: #{$list-group-disabled-color},
-    --#{$prefix}list-group-disabled-bg: #{$list-group-disabled-bg},
-    --#{$prefix}list-group-active-color: #{$list-group-active-color},
+    --#{$prefix}list-group-border-color: var(--#{$prefix}border-color),
+    --#{$prefix}list-group-border-width: var(--#{$prefix}border-width),
+    --#{$prefix}list-group-border-radius: var(--#{$prefix}radius-5),
+    --#{$prefix}list-group-item-padding-x: var(--#{$prefix}spacer),
+    --#{$prefix}list-group-item-padding-y: var(--#{$prefix}spacer-2),
+    --#{$prefix}list-group-action-color: var(--#{$prefix}fg-2),
+    --#{$prefix}list-group-action-hover-color: var(--#{$prefix}fg-1),
+    --#{$prefix}list-group-action-hover-bg: var(--#{$prefix}bg-1),
+    --#{$prefix}list-group-action-active-color: var(--#{$prefix}fg-body),
+    --#{$prefix}list-group-action-active-bg: var(--#{$prefix}bg-2),
+    --#{$prefix}list-group-disabled-color: var(--#{$prefix}fg-3),
+    --#{$prefix}list-group-disabled-bg: #{$list-group-bg},
+    --#{$prefix}list-group-active-color: var(--#{$prefix}primary-contrast),
     --#{$prefix}list-group-active-bg: #{$list-group-active-bg},
-    --#{$prefix}list-group-active-border-color: #{$list-group-active-border-color},
+    --#{$prefix}list-group-active-border-color: #{$list-group-active-bg},
   ),
   $list-group-tokens
 );
@@ -201,7 +182,6 @@ $list-group-tokens: defaults(
       }
     }
   }
-
 
   // Flush list items
   //

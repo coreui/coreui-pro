@@ -5,31 +5,20 @@
 @use "mixins/transition" as *;
 @use "config" as *;
 
-// scss-docs-start popup-variables
-$popup-zindex:              var(--#{$prefix}z-dropdown) !default;
-$popup-bg:                  var(--#{$prefix}bg-body) !default;
-$popup-border-width:        var(--#{$prefix}border-width) !default;
-$popup-border-color:        var(--#{$prefix}border-color) !default;
-$popup-border-radius:       var(--#{$prefix}radius-7) !default;
-$popup-box-shadow:          var(--#{$prefix}box-shadow) !default;
-$popup-transition-duration: .15s !default;
-$popup-transition-timing:   var(--#{$prefix}transition-timing-overlay) !default;
-// scss-docs-end popup-variables
-
 // stylelint-disable scss/dollar-variable-default
 
 // scss-docs-start popup-tokens
 $popup-tokens: () !default;
 $popup-tokens: defaults(
   (
-    --#{$prefix}popup-zindex: #{$popup-zindex},
-    --#{$prefix}popup-bg: #{$popup-bg},
-    --#{$prefix}popup-border-width: #{$popup-border-width},
-    --#{$prefix}popup-border-color: #{$popup-border-color},
-    --#{$prefix}popup-border-radius: #{$popup-border-radius},
-    --#{$prefix}popup-box-shadow: #{$popup-box-shadow},
-    --#{$prefix}popup-transition-duration: #{$popup-transition-duration},
-    --#{$prefix}popup-transition-timing: #{$popup-transition-timing},
+    --#{$prefix}popup-zindex: var(--#{$prefix}z-dropdown),
+    --#{$prefix}popup-bg: var(--#{$prefix}bg-body),
+    --#{$prefix}popup-border-width: var(--#{$prefix}border-width),
+    --#{$prefix}popup-border-color: var(--#{$prefix}border-color),
+    --#{$prefix}popup-border-radius: var(--#{$prefix}radius-7),
+    --#{$prefix}popup-box-shadow: var(--#{$prefix}box-shadow),
+    --#{$prefix}popup-transition-duration: .15s,
+    --#{$prefix}popup-transition-timing: var(--#{$prefix}transition-timing-overlay),
   ),
   $popup-tokens
 );

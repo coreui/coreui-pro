@@ -6,36 +6,10 @@
 @use "mixins/transition" as *;
 @use "config" as *;
 
-
 // scss-docs-start chip-variables
-$chip-font-size:             .875rem !default;
-$chip-font-weight:           var(--#{$prefix}font-weight-normal) !default;
-$chip-height:                1.75rem !default;
-$chip-padding-x:             .625rem !default;
 $chip-gap:                   .3125rem !default;
-$chip-border-radius:         var(--#{$prefix}radius-pill) !default;
-$chip-icon-size:             1rem !default;
-$chip-img-size:              1.25rem !default;
-$chip-img-border-radius:     50% !default;
-$chip-remove-size:           1rem !default;
-$chip-remove-opacity:        .65 !default;
-$chip-remove-hover-opacity:  1 !default;
-$chip-disabled-opacity:      .65 !default;
-$chip-active-opacity:        .9 !default;
-$chip-transition:            background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out, color .15s ease-in-out !default;
 
 $chip-color:                 var(--#{$prefix}fg-body) !default;
-$chip-bg:                    var(--#{$prefix}bg-2) !default;
-$chip-border-width:          var(--#{$prefix}border-width) !default;
-$chip-border-color:          transparent !default;
-
-$chip-active-color:          var(--#{$prefix}primary-contrast) !default;
-$chip-active-bg:             var(--#{$prefix}primary-base) !default;
-$chip-active-border-color:   transparent !default;
-
-$chip-hover-color:           $chip-color !default;
-$chip-hover-bg:              var(--#{$prefix}bg-3) !default;
-$chip-hover-border-color:    transparent !default;
 
 $chip-font-size-sm:          .75rem !default;
 $chip-height-sm:             1.5rem !default;
@@ -61,31 +35,31 @@ $chip-tokens: () !default;
 // scss-docs-start chip-css-vars
 $chip-tokens: defaults(
   (
-    --#{$prefix}chip-height: #{$chip-height},
-    --#{$prefix}chip-padding-x: #{$chip-padding-x},
+    --#{$prefix}chip-height: 1.75rem,
+    --#{$prefix}chip-padding-x: .625rem,
     --#{$prefix}chip-gap: #{$chip-gap},
-    --#{$prefix}chip-font-size: #{$chip-font-size},
-    --#{$prefix}chip-font-weight: #{$chip-font-weight},
-    --#{$prefix}chip-border-radius: #{$chip-border-radius},
-    --#{$prefix}chip-img-size: #{$chip-img-size},
-    --#{$prefix}chip-img-border-radius: #{$chip-img-border-radius},
-    --#{$prefix}chip-icon-size: #{$chip-icon-size},
-    --#{$prefix}chip-remove-size: #{$chip-remove-size},
-    --#{$prefix}chip-remove-opacity: #{$chip-remove-opacity},
-    --#{$prefix}chip-remove-hover-opacity: #{$chip-remove-hover-opacity},
-    --#{$prefix}chip-disabled-opacity: #{$chip-disabled-opacity},
-    --#{$prefix}chip-active-opacity: #{$chip-active-opacity},
-    --#{$prefix}chip-transition: #{$chip-transition},
+    --#{$prefix}chip-font-size: .875rem,
+    --#{$prefix}chip-font-weight: var(--#{$prefix}font-weight-normal),
+    --#{$prefix}chip-border-radius: var(--#{$prefix}radius-pill),
+    --#{$prefix}chip-img-size: 1.25rem,
+    --#{$prefix}chip-img-border-radius: 50%,
+    --#{$prefix}chip-icon-size: 1rem,
+    --#{$prefix}chip-remove-size: 1rem,
+    --#{$prefix}chip-remove-opacity: .65,
+    --#{$prefix}chip-remove-hover-opacity: 1,
+    --#{$prefix}chip-disabled-opacity: .65,
+    --#{$prefix}chip-active-opacity: .9,
+    --#{$prefix}chip-transition: #{background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out, color .15s ease-in-out},
     --#{$prefix}chip-color: var(--#{$prefix}theme-fg-emphasis, #{$chip-color}),
-    --#{$prefix}chip-bg: var(--#{$prefix}theme-bg-subtle, #{$chip-bg}),
-    --#{$prefix}chip-border-width: #{$chip-border-width},
-    --#{$prefix}chip-border-color: #{$chip-border-color},
-    --#{$prefix}chip-active-color: var(--#{$prefix}theme-contrast, #{$chip-active-color}),
-    --#{$prefix}chip-active-bg: var(--#{$prefix}theme-bg, #{$chip-active-bg}),
-    --#{$prefix}chip-active-border-color: #{$chip-active-border-color},
-    --#{$prefix}chip-hover-color: var(--#{$prefix}theme-fg-emphasis, #{$chip-hover-color}),
-    --#{$prefix}chip-hover-bg: var(--#{$prefix}theme-bg-muted, #{$chip-hover-bg}),
-    --#{$prefix}chip-hover-border-color: #{$chip-hover-border-color},
+    --#{$prefix}chip-bg: var(--#{$prefix}theme-bg-subtle, var(--#{$prefix}bg-2)),
+    --#{$prefix}chip-border-width: var(--#{$prefix}border-width),
+    --#{$prefix}chip-border-color: transparent,
+    --#{$prefix}chip-active-color: var(--#{$prefix}theme-contrast, var(--#{$prefix}primary-contrast)),
+    --#{$prefix}chip-active-bg: var(--#{$prefix}theme-bg, var(--#{$prefix}primary-base)),
+    --#{$prefix}chip-active-border-color: transparent,
+    --#{$prefix}chip-hover-color: var(--#{$prefix}theme-fg-emphasis, #{$chip-color}),
+    --#{$prefix}chip-hover-bg: var(--#{$prefix}theme-bg-muted, var(--#{$prefix}bg-3)),
+    --#{$prefix}chip-hover-border-color: transparent,
   ),
   $chip-tokens
 );
@@ -103,11 +77,11 @@ $chip-outline-tokens: defaults(
     --#{$prefix}chip-color: var(--#{$prefix}theme-fg, var(--#{$prefix}fg-body)),
     --#{$prefix}chip-bg: transparent,
     --#{$prefix}chip-border-color: var(--#{$prefix}theme-bg, var(--#{$prefix}border-color)),
-    --#{$prefix}chip-hover-bg: var(--#{$prefix}theme-bg-subtle, #{$chip-hover-bg}),
+    --#{$prefix}chip-hover-bg: var(--#{$prefix}theme-bg-subtle, var(--#{$prefix}bg-3)),
     --#{$prefix}chip-hover-color: var(--#{$prefix}theme-fg-emphasis, #{$chip-color}),
     --#{$prefix}chip-hover-border-color: var(--#{$prefix}theme-bg, var(--#{$prefix}border-color)),
-    --#{$prefix}chip-active-bg: var(--#{$prefix}theme-bg, #{$chip-active-bg}),
-    --#{$prefix}chip-active-color: var(--#{$prefix}theme-contrast, #{$chip-active-color}),
+    --#{$prefix}chip-active-bg: var(--#{$prefix}theme-bg, var(--#{$prefix}primary-base)),
+    --#{$prefix}chip-active-color: var(--#{$prefix}theme-contrast, var(--#{$prefix}primary-contrast)),
   ),
   $chip-outline-tokens
 );

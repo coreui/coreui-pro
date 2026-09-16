@@ -9,49 +9,10 @@
 // stylelint-disable custom-property-no-missing-var-function
 
 // scss-docs-start nav-variables
-$nav-gap:                           0 !default;
 $nav-link-padding-y:                .5rem !default;
-$nav-link-padding-x:                1rem !default;
-$nav-link-font-size:                null !default;
-$nav-link-gap:                      .5rem !default;
-$nav-link-align:                    center !default;
-$nav-link-justify:                  center !default;
-$nav-link-border-radius:            var(--#{$prefix}radius-5) !default;
-$nav-link-font-weight:              null !default;
-$nav-link-color:                    var(--#{$prefix}fg-2) !default;
-$nav-link-hover-color:              var(--#{$prefix}fg-1) !default;
-$nav-link-hover-bg:                 var(--#{$prefix}bg-1) !default;
-$nav-link-active-color:             var(--#{$prefix}fg-body) !default;
-$nav-link-active-bg:                var(--#{$prefix}bg-2) !default;
-$nav-link-transition-property:      color, background-color, border-color !default;
-$nav-link-transition-duration:      .15s !default;
-$nav-link-transition-timing:        ease-in-out !default;
-$nav-link-disabled-color:           var(--#{$prefix}fg-4) !default;
 
 $nav-tabs-border-color:             var(--#{$prefix}border-color) !default;
-$nav-tabs-border-width:             var(--#{$prefix}border-width) !default;
-$nav-tabs-border-radius:            var(--#{$prefix}radius-5) !default;
-$nav-tabs-link-hover-border-color:  var(--#{$prefix}border-subtle) var(--#{$prefix}border-subtle) $nav-tabs-border-color !default;
-$nav-tabs-link-active-color:        var(--#{$prefix}fg-body) !default;
 $nav-tabs-link-active-bg:           var(--#{$prefix}bg-body) !default;
-$nav-tabs-link-active-border-color: var(--#{$prefix}border-color) var(--#{$prefix}border-color) $nav-tabs-link-active-bg !default;
-
-$nav-pills-border-radius:           var(--#{$prefix}radius-9) !default;
-$nav-pills-link-active-color:       var(--#{$prefix}primary-contrast) !default;
-$nav-pills-link-active-bg:          var(--#{$prefix}primary-bg) !default;
-
-$nav-underline-gap:                 1rem !default;
-$nav-underline-border-width:        .125rem !default;
-$nav-underline-link-active-color:   var(--#{$prefix}fg-body) !default;
-
-$nav-underline-border-gap:                  .5rem !default;
-$nav-underline-border-border-color:         var(--#{$prefix}border-color) !default;
-$nav-underline-border-border-width:         .125rem !default;
-$nav-underline-border-link-padding-y:       .5rem !default;
-$nav-underline-border-link-padding-x:       .5rem !default;
-$nav-underline-border-link-color:           var(--#{$prefix}fg-2) !default;
-$nav-underline-border-link-active-color:    var(--#{$prefix}primary-base) !default;
-$nav-underline-border-link-disabled-color:  var(--#{$prefix}fg-3) !default;
 
 $nav-enclosed-padding:                   .125rem !default;
 $nav-enclosed-bg:                        var(--#{$prefix}bg-3) !default;
@@ -65,10 +26,6 @@ $nav-enclosed-link-active-bg:            var(--#{$prefix}bg-body) !default;
 $nav-enclosed-link-active-border-color:  var(--#{$prefix}border-color) !default;
 $nav-enclosed-link-hover-box-shadow:     var(--#{$prefix}box-shadow-sm) !default;
 $nav-enclosed-link-disabled-color:       var(--#{$prefix}fg-2) !default;
-
-$tab-pane-transition-property:           opacity !default;
-$tab-pane-transition-duration:           .15s !default;
-$tab-pane-transition-timing:             linear !default;
 // scss-docs-end nav-variables
 
 $nav-tokens: () !default;
@@ -78,24 +35,24 @@ $nav-tokens: () !default;
 // scss-docs-start nav-css-vars
 $nav-tokens: defaults(
   (
-    --#{$prefix}nav-gap: #{$nav-gap},
-    --#{$prefix}nav-link-gap: #{$nav-link-gap},
-    --#{$prefix}nav-link-align: #{$nav-link-align},
-    --#{$prefix}nav-link-justify: #{$nav-link-justify},
-    --#{$prefix}nav-link-border-radius: #{$nav-link-border-radius},
-    --#{$prefix}nav-link-padding-x: #{$nav-link-padding-x},
+    --#{$prefix}nav-gap: 0,
+    --#{$prefix}nav-link-gap: .5rem,
+    --#{$prefix}nav-link-align: center,
+    --#{$prefix}nav-link-justify: center,
+    --#{$prefix}nav-link-border-radius: var(--#{$prefix}radius-5),
+    --#{$prefix}nav-link-padding-x: 1rem,
     --#{$prefix}nav-link-padding-y: #{$nav-link-padding-y},
-    --#{$prefix}nav-link-font-size: #{$nav-link-font-size},
-    --#{$prefix}nav-link-font-weight: #{$nav-link-font-weight},
-    --#{$prefix}nav-link-color: #{$nav-link-color},
-    --#{$prefix}nav-link-hover-color: #{$nav-link-hover-color},
-    --#{$prefix}nav-link-hover-bg: #{$nav-link-hover-bg},
-    --#{$prefix}nav-link-active-color: #{$nav-link-active-color},
-    --#{$prefix}nav-link-active-bg: #{$nav-link-active-bg},
-    --#{$prefix}nav-link-disabled-color: #{$nav-link-disabled-color},
-    --#{$prefix}nav-link-transition-property: #{$nav-link-transition-property},
-    --#{$prefix}nav-link-transition-duration: #{$nav-link-transition-duration},
-    --#{$prefix}nav-link-transition-timing: #{$nav-link-transition-timing},
+    --#{$prefix}nav-link-font-size: #{null},
+    --#{$prefix}nav-link-font-weight: #{null},
+    --#{$prefix}nav-link-color: var(--#{$prefix}fg-2),
+    --#{$prefix}nav-link-hover-color: var(--#{$prefix}fg-1),
+    --#{$prefix}nav-link-hover-bg: var(--#{$prefix}bg-1),
+    --#{$prefix}nav-link-active-color: var(--#{$prefix}fg-body),
+    --#{$prefix}nav-link-active-bg: var(--#{$prefix}bg-2),
+    --#{$prefix}nav-link-disabled-color: var(--#{$prefix}fg-4),
+    --#{$prefix}nav-link-transition-property: #{color, background-color, border-color},
+    --#{$prefix}nav-link-transition-duration: .15s,
+    --#{$prefix}nav-link-transition-timing: ease-in-out,
   ),
   $nav-tokens
 );
@@ -110,13 +67,13 @@ $nav-tabs-tokens: () !default;
 // scss-docs-start nav-tabs-css-vars
 $nav-tabs-tokens: defaults(
   (
-    --#{$prefix}nav-tabs-border-width: #{$nav-tabs-border-width},
+    --#{$prefix}nav-tabs-border-width: var(--#{$prefix}border-width),
     --#{$prefix}nav-tabs-border-color: #{$nav-tabs-border-color},
-    --#{$prefix}nav-tabs-border-radius: #{$nav-tabs-border-radius},
-    --#{$prefix}nav-tabs-link-hover-border-color: #{$nav-tabs-link-hover-border-color},
-    --#{$prefix}nav-tabs-link-active-color: #{$nav-tabs-link-active-color},
+    --#{$prefix}nav-tabs-border-radius: var(--#{$prefix}radius-5),
+    --#{$prefix}nav-tabs-link-hover-border-color: #{var(--#{$prefix}border-subtle) var(--#{$prefix}border-subtle) $nav-tabs-border-color},
+    --#{$prefix}nav-tabs-link-active-color: var(--#{$prefix}fg-body),
     --#{$prefix}nav-tabs-link-active-bg: #{$nav-tabs-link-active-bg},
-    --#{$prefix}nav-tabs-link-active-border-color: #{$nav-tabs-link-active-border-color},
+    --#{$prefix}nav-tabs-link-active-border-color: #{var(--#{$prefix}border-color) var(--#{$prefix}border-color) $nav-tabs-link-active-bg},
   ),
   $nav-tabs-tokens
 );
@@ -131,9 +88,9 @@ $nav-pills-tokens: () !default;
 // scss-docs-start nav-pills-css-vars
 $nav-pills-tokens: defaults(
   (
-    --#{$prefix}nav-pills-border-radius: #{$nav-pills-border-radius},
-    --#{$prefix}nav-pills-link-active-color: #{$nav-pills-link-active-color},
-    --#{$prefix}nav-pills-link-active-bg: #{$nav-pills-link-active-bg},
+    --#{$prefix}nav-pills-border-radius: var(--#{$prefix}radius-9),
+    --#{$prefix}nav-pills-link-active-color: var(--#{$prefix}primary-contrast),
+    --#{$prefix}nav-pills-link-active-bg: var(--#{$prefix}primary-bg),
   ),
   $nav-pills-tokens
 );
@@ -148,9 +105,9 @@ $nav-underline-tokens: () !default;
 // scss-docs-start nav-underline-css-vars
 $nav-underline-tokens: defaults(
   (
-    --#{$prefix}nav-underline-gap: #{$nav-underline-gap},
-    --#{$prefix}nav-underline-border-width: #{$nav-underline-border-width},
-    --#{$prefix}nav-underline-link-active-color: #{$nav-underline-link-active-color},
+    --#{$prefix}nav-underline-gap: 1rem,
+    --#{$prefix}nav-underline-border-width: .125rem,
+    --#{$prefix}nav-underline-link-active-color: var(--#{$prefix}fg-body),
   ),
   $nav-underline-tokens
 );
@@ -165,14 +122,14 @@ $nav-underline-border-tokens: () !default;
 // scss-docs-start nav-underline-border-css-vars
 $nav-underline-border-tokens: defaults(
   (
-    --#{$prefix}nav-underline-border-gap: #{$nav-underline-border-gap},
-    --#{$prefix}nav-underline-border-border-color: #{$nav-underline-border-border-color},
-    --#{$prefix}nav-underline-border-border-width: #{$nav-underline-border-border-width},
-    --#{$prefix}nav-underline-border-link-padding-x: #{$nav-underline-border-link-padding-x},
-    --#{$prefix}nav-underline-border-link-padding-y: #{$nav-underline-border-link-padding-y},
-    --#{$prefix}nav-underline-border-link-color: #{$nav-underline-border-link-color},
-    --#{$prefix}nav-underline-border-link-active-color: #{$nav-underline-border-link-active-color},
-    --#{$prefix}nav-underline-border-link-disabled-color: #{$nav-underline-border-link-disabled-color},
+    --#{$prefix}nav-underline-border-gap: .5rem,
+    --#{$prefix}nav-underline-border-border-color: var(--#{$prefix}border-color),
+    --#{$prefix}nav-underline-border-border-width: .125rem,
+    --#{$prefix}nav-underline-border-link-padding-x: .5rem,
+    --#{$prefix}nav-underline-border-link-padding-y: .5rem,
+    --#{$prefix}nav-underline-border-link-color: var(--#{$prefix}fg-2),
+    --#{$prefix}nav-underline-border-link-active-color: var(--#{$prefix}primary-base),
+    --#{$prefix}nav-underline-border-link-disabled-color: var(--#{$prefix}fg-3),
   ),
   $nav-underline-border-tokens
 );
@@ -187,9 +144,9 @@ $tab-pane-tokens: () !default;
 // scss-docs-start tab-pane-css-vars
 $tab-pane-tokens: defaults(
   (
-    --#{$prefix}tab-pane-transition-property: #{$tab-pane-transition-property},
-    --#{$prefix}tab-pane-transition-duration: #{$tab-pane-transition-duration},
-    --#{$prefix}tab-pane-transition-timing: #{$tab-pane-transition-timing},
+    --#{$prefix}tab-pane-transition-property: opacity,
+    --#{$prefix}tab-pane-transition-duration: .15s,
+    --#{$prefix}tab-pane-transition-timing: linear,
   ),
   $tab-pane-tokens
 );
@@ -295,7 +252,6 @@ $tab-pane-tokens: defaults(
     }
   }
 
-
   //
   // Pills
   //
@@ -313,7 +269,6 @@ $tab-pane-tokens: defaults(
       @include gradient-bg(var(--#{$prefix}theme-bg, var(--#{$prefix}nav-pills-link-active-bg)));
     }
   }
-
 
   //
   // Underline
@@ -348,7 +303,6 @@ $tab-pane-tokens: defaults(
     }
   }
 
-
   .nav-underline-border {
     @include tokens($nav-underline-border-tokens);
 
@@ -381,7 +335,6 @@ $tab-pane-tokens: defaults(
       border-block-end-color: currentcolor;
     }
   }
-
 
   .nav-enclosed {
     --#{$prefix}nav-enclosed-padding: #{$nav-enclosed-padding};
@@ -432,7 +385,6 @@ $tab-pane-tokens: defaults(
     --#{$prefix}nav-enclosed-border-radius: var(--#{$prefix}radius-pill);
   }
 
-
   //
   // Justified variants
   //
@@ -460,7 +412,6 @@ $tab-pane-tokens: defaults(
       width: 100%; // Make sure button will grow
     }
   }
-
 
   // Tabbable tabs
   //

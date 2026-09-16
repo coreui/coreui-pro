@@ -3,11 +3,6 @@
 @use "mixins/transition" as *;
 @use "config" as *;
 
-// scss-docs-start fade-transition
-$transition-fade-duration:    .15s !default;
-$transition-fade-timing:      linear !default;
-// scss-docs-end fade-transition
-
 // scss-docs-start collapse-transition
 $transition-collapse-property: "block-size, display" !default;
 $transition-collapse-duration: .35s !default;
@@ -22,8 +17,8 @@ $collapse-tokens: () !default;
 // scss-docs-start fade-css-vars
 $fade-tokens: defaults(
   (
-    --#{$prefix}transition-fade-duration: #{$transition-fade-duration},
-    --#{$prefix}transition-fade-timing: #{$transition-fade-timing},
+    --#{$prefix}transition-fade-duration: .15s,
+    --#{$prefix}transition-fade-timing: linear,
   ),
   $fade-tokens
 );

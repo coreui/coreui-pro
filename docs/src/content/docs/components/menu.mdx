@@ -673,17 +673,3 @@ myMenu.addEventListener('show.coreui.menu', event => {
 ### CSS variables
 
 <ScssDocs file="scss/_menu.scss" capture="menu-css-vars" />
-
-### Sass variables
-
-<DeprecatedIn version="6.0.0" />
-
-Sass variables set these defaults at build time and are removed in v7. The CSS variables above reach the same values without recompiling, and can be set on a single element.
-
-<ScssDocs file="scss/_menu.scss" capture="menu-variables" />
-
-<Callout>
-Menu items include at least one variable that is not set on `.menu`. This allows you to provide a new value while CoreUI defaults to a fallback value.
-
-- `--cui-menu-item-border-radius`
-</Callout>

@@ -13,27 +13,10 @@
 $sidebar-width:                            16rem !default;
 $sidebar-padding-y:                        var(--#{$prefix}spacer) !default;
 $sidebar-padding-x:                        var(--#{$prefix}spacer) !default;
-$sidebar-color:                            var(--#{$prefix}fg-body) !default;
-$sidebar-bg:                               var(--#{$prefix}bg-body) !default;
-$sidebar-transition:                       margin-left .15s, margin-right .15s, box-shadow .075s, transform .15s, width .15s, z-index 0s ease .15s !default;
-$sidebar-brand-color:                      var(--#{$prefix}fg-body) !default;
-$sidebar-backdrop-bg:                      color-mix(in oklch, var(--#{$prefix}backdrop-color) var(--#{$prefix}backdrop-opacity), transparent) !default;
-$sidebar-backdrop-blur:                    var(--#{$prefix}backdrop-blur) !default;
-$sidebar-overlaid-box-shadow:              var(--#{$prefix}box-shadow) !default;
 // scss-docs-end sidebar-variables
 
 // scss-docs-start sidebar-toggler
-$sidebar-toggler-width:             .5rem !default;
-$sidebar-toggler-height:            .5rem !default;
-$sidebar-toggler-padding-x:         .25rem !default;
-$sidebar-toggler-padding-y:         .25rem !default;
-$sidebar-toggler-bg:                transparent !default;
-$sidebar-toggler-color:             var(--#{$prefix}fg-3) !default;
 $sidebar-toggler-icon:              url("data:image/svg+xml,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cg xmlns='http://www.w3.org/2000/svg' transform='matrix(-1 0 0 -1 512 512)'%3E%3Cpath fill='%23000' d='M472,16H40A24.028,24.028,0,0,0,16,40V200H48V48H464V464H48V304H16V472a24.028,24.028,0,0,0,24,24H472a24.028,24.028,0,0,0,24-24V40A24.028,24.028,0,0,0,472,16Z'/%3E%3Cpolygon fill='%23000' points='209.377 363.306 232.004 385.933 366.627 251.31 232.004 116.687 209.377 139.313 305.374 235.311 16 235.311 16 267.311 305.372 267.311 209.377 363.306'/%3E%3C/g%3E%3C/svg%3E") !default;
-$sidebar-toggler-hover-color:       var(--#{$prefix}fg-2) !default;
-$sidebar-toggler-focus-color:       var(--#{$prefix}fg-2) !default;
-$sidebar-toggler-border-radius:     var(--#{$prefix}radius-4) !default;
-$sidebar-toggler-transition:        transform .15s !default;
 // scss-docs-end sidebar-toggler
 
 // scss-docs-start sidebar-widths
@@ -52,13 +35,13 @@ $sidebar-tokens: defaults(
   (
     --#{$prefix}sidebar-zindex: var(--#{$prefix}z-sidebar),
     --#{$prefix}sidebar-width: #{$sidebar-width},
-    --#{$prefix}sidebar-bg: var(--#{$prefix}theme-bg, #{$sidebar-bg}),
+    --#{$prefix}sidebar-bg: var(--#{$prefix}theme-bg, var(--#{$prefix}bg-body)),
     --#{$prefix}sidebar-padding-x: #{$sidebar-padding-x},
     --#{$prefix}sidebar-padding-y: #{$sidebar-padding-y},
-    --#{$prefix}sidebar-color: var(--#{$prefix}theme-contrast, #{$sidebar-color}),
-    --#{$prefix}sidebar-brand-color: var(--#{$prefix}theme-contrast, #{$sidebar-brand-color}),
-    --#{$prefix}sidebar-transition: #{$sidebar-transition},
-    --#{$prefix}sidebar-toggler-height: #{$sidebar-toggler-height},
+    --#{$prefix}sidebar-color: var(--#{$prefix}theme-contrast, var(--#{$prefix}fg-body)),
+    --#{$prefix}sidebar-brand-color: var(--#{$prefix}theme-contrast, var(--#{$prefix}fg-body)),
+    --#{$prefix}sidebar-transition: #{margin-left .15s, margin-right .15s, box-shadow .075s, transform .15s, width .15s, z-index 0s ease .15s},
+    --#{$prefix}sidebar-toggler-height: .5rem,
   ),
   $sidebar-tokens
 );
@@ -68,7 +51,7 @@ $sidebar-tokens: defaults(
 $sidebar-overlaid-tokens: () !default;
 $sidebar-overlaid-tokens: defaults(
   (
-    --#{$prefix}sidebar-overlaid-box-shadow: #{$sidebar-overlaid-box-shadow},
+    --#{$prefix}sidebar-overlaid-box-shadow: var(--#{$prefix}box-shadow),
   ),
   $sidebar-overlaid-tokens
 );
@@ -78,16 +61,16 @@ $sidebar-overlaid-tokens: defaults(
 $sidebar-toggler-tokens: () !default;
 $sidebar-toggler-tokens: defaults(
   (
-    --#{$prefix}sidebar-toggler-width: #{$sidebar-toggler-width},
-    --#{$prefix}sidebar-toggler-padding-x: #{$sidebar-toggler-padding-x},
-    --#{$prefix}sidebar-toggler-padding-y: #{$sidebar-toggler-padding-y},
-    --#{$prefix}sidebar-toggler-bg: #{$sidebar-toggler-bg},
-    --#{$prefix}sidebar-toggler-color: var(--#{$prefix}theme-contrast, #{$sidebar-toggler-color}),
+    --#{$prefix}sidebar-toggler-width: .5rem,
+    --#{$prefix}sidebar-toggler-padding-x: .25rem,
+    --#{$prefix}sidebar-toggler-padding-y: .25rem,
+    --#{$prefix}sidebar-toggler-bg: transparent,
+    --#{$prefix}sidebar-toggler-color: var(--#{$prefix}theme-contrast, var(--#{$prefix}fg-3)),
     --#{$prefix}sidebar-toggler-icon: #{escape-svg($sidebar-toggler-icon)},
-    --#{$prefix}sidebar-toggler-hover-color: var(--#{$prefix}theme-contrast, #{$sidebar-toggler-hover-color}),
-    --#{$prefix}sidebar-toggler-focus-color: var(--#{$prefix}theme-contrast, #{$sidebar-toggler-focus-color}),
-    --#{$prefix}sidebar-toggler-border-radius: #{$sidebar-toggler-border-radius},
-    --#{$prefix}sidebar-toggler-transition: #{$sidebar-toggler-transition},
+    --#{$prefix}sidebar-toggler-hover-color: var(--#{$prefix}theme-contrast, var(--#{$prefix}fg-2)),
+    --#{$prefix}sidebar-toggler-focus-color: var(--#{$prefix}theme-contrast, var(--#{$prefix}fg-2)),
+    --#{$prefix}sidebar-toggler-border-radius: var(--#{$prefix}radius-4),
+    --#{$prefix}sidebar-toggler-transition: transform .15s,
   ),
   $sidebar-toggler-tokens
 );
@@ -98,8 +81,8 @@ $sidebar-backdrop-tokens: () !default;
 $sidebar-backdrop-tokens: defaults(
   (
     --#{$prefix}sidebar-backdrop-zindex: var(--#{$prefix}z-sidebar-backdrop),
-    --#{$prefix}sidebar-backdrop-bg: #{$sidebar-backdrop-bg},
-    --#{$prefix}sidebar-backdrop-blur: #{$sidebar-backdrop-blur},
+    --#{$prefix}sidebar-backdrop-bg: color-mix(in oklch, var(--#{$prefix}backdrop-color) var(--#{$prefix}backdrop-opacity), transparent),
+    --#{$prefix}sidebar-backdrop-blur: var(--#{$prefix}backdrop-blur),
   ),
   $sidebar-backdrop-tokens
 );

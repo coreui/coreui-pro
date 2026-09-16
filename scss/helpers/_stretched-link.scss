@@ -4,7 +4,6 @@
 
 // scss-docs-start stretched-link-variables
 $stretched-link-pseudo-element: after !default;
-$stretched-link-z-index:        1 !default;
 // scss-docs-end stretched-link-variables
 
 $stretched-link-tokens: () !default;
@@ -14,7 +13,7 @@ $stretched-link-tokens: () !default;
 // scss-docs-start stretched-link-css-vars
 $stretched-link-tokens: defaults(
   (
-    --#{$prefix}stretched-link-z-index: #{$stretched-link-z-index},
+    --#{$prefix}stretched-link-z-index: 1,
   ),
   $stretched-link-tokens
 );

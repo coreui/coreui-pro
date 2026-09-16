@@ -8,11 +8,6 @@
 @use "../config" as *;
 
 // scss-docs-start radio-variables
-$radio-size:              var(--#{$prefix}control-size) !default;
-$radio-bg:                var(--#{$prefix}btn-input-bg) !default;
-$radio-border:            var(--#{$prefix}border-width) solid var(--#{$prefix}border-color) !default;
-$radio-border-radius:     50% !default;
-$radio-mark-color:        var(--#{$prefix}primary-contrast) !default;
 $radio-mark:              url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='2' fill='black'/></svg>") !default;
 // scss-docs-end radio-variables
 
@@ -36,13 +31,13 @@ $radio-tokens: () !default;
 // scss-docs-start radio-css-vars
 $radio-tokens: defaults(
   (
-    --#{$prefix}radio-size: #{$radio-size},
-    --#{$prefix}radio-bg: #{$radio-bg},
-    --#{$prefix}radio-border: #{$radio-border},
-    --#{$prefix}radio-border-radius: #{$radio-border-radius},
+    --#{$prefix}radio-size: var(--#{$prefix}control-size),
+    --#{$prefix}radio-bg: var(--#{$prefix}btn-input-bg),
+    --#{$prefix}radio-border: var(--#{$prefix}border-width) solid var(--#{$prefix}border-color),
+    --#{$prefix}radio-border-radius: 50%,
     --#{$prefix}radio-checked-bg: var(--#{$prefix}theme-bg, var(--#{$prefix}control-checked-bg)),
     --#{$prefix}radio-checked-border-color: var(--#{$prefix}theme-bg, var(--#{$prefix}control-checked-border-color)),
-    --#{$prefix}radio-mark-color: #{$radio-mark-color},
+    --#{$prefix}radio-mark-color: var(--#{$prefix}primary-contrast),
     --#{$prefix}radio-mark: #{escape-svg($radio-mark)},
     --#{$prefix}radio-disabled-opacity: var(--#{$prefix}control-disabled-opacity),
     --#{$prefix}radio-margin-top: calc((var(--#{$prefix}body-line-height) * 1em - var(--#{$prefix}radio-size)) * .5),

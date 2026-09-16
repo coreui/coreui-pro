@@ -7,36 +7,8 @@
 @use "mixins/transition" as *;
 @use "config" as *;
 
-
 // scss-docs-start accordion-variables
-$accordion-padding-y:                     1rem !default;
-$accordion-padding-x:                     1.25rem !default;
-$accordion-font-size:                     var(--#{$prefix}body-font-size) !default;
-$accordion-color:                         var(--#{$prefix}fg-body) !default;
-$accordion-bg:                            var(--#{$prefix}bg-body) !default;
-$accordion-border-width:                  var(--#{$prefix}border-width) !default;
 $accordion-border-color:                  var(--#{$prefix}border-color) !default;
-$accordion-border-radius:                 var(--#{$prefix}radius-7) !default;
-$accordion-gap:                           var(--#{$prefix}spacer-2) !default;
-
-$accordion-header-color:                  var(--#{$prefix}fg-2) !default;
-$accordion-header-bg:                     var(--#{$prefix}accordion-bg) !default;
-$accordion-transition-property:           #{var(--#{$prefix}btn-input-action-transition-property), border-radius} !default;
-$accordion-transition-duration:           var(--#{$prefix}btn-input-transition-duration) !default;
-$accordion-transition-timing:             var(--#{$prefix}btn-input-transition-timing) !default;
-$accordion-header-active-bg:              var(--#{$prefix}bg-2) !default;
-$accordion-header-active-color:           var(--#{$prefix}fg-body) !default;
-$accordion-active-border-color:           $accordion-border-color !default;
-
-
-$accordion-content-duration:              .35s !default;
-$accordion-content-easing:                ease !default;
-
-$accordion-icon-width:                    1.25rem !default;
-$accordion-icon-color:                    currentcolor !default;
-$accordion-icon-active-color:             currentcolor !default;
-$accordion-icon-transition:               transform .2s ease-in-out !default;
-$accordion-icon-transform:                rotate(-180deg) !default;
 
 $accordion-header-icon:                   url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-linecap='round' stroke-linejoin='round'><path d='m2 5 6 6 6-6'/></svg>") !default;
 $accordion-header-active-icon:            var(--#{$prefix}accordion-header-icon) !default;
@@ -50,36 +22,36 @@ $accordion-tokens: () !default;
 // scss-docs-start accordion-css-vars
 $accordion-tokens: defaults(
   (
-    --#{$prefix}accordion-padding-x: #{$accordion-padding-x},
-    --#{$prefix}accordion-padding-y: #{$accordion-padding-y},
+    --#{$prefix}accordion-padding-x: 1.25rem,
+    --#{$prefix}accordion-padding-y: 1rem,
     --#{$prefix}accordion-header-padding-x: var(--#{$prefix}accordion-padding-x),
     --#{$prefix}accordion-header-padding-y: var(--#{$prefix}accordion-padding-y),
     --#{$prefix}accordion-body-padding-x: var(--#{$prefix}accordion-padding-x),
     --#{$prefix}accordion-body-padding-y: var(--#{$prefix}accordion-padding-y),
-    --#{$prefix}accordion-font-size: #{$accordion-font-size},
-    --#{$prefix}accordion-color: #{$accordion-color},
-    --#{$prefix}accordion-bg: #{$accordion-bg},
-    --#{$prefix}accordion-transition-property: #{$accordion-transition-property},
-    --#{$prefix}accordion-transition-duration: #{$accordion-transition-duration},
-    --#{$prefix}accordion-transition-timing: #{$accordion-transition-timing},
+    --#{$prefix}accordion-font-size: var(--#{$prefix}body-font-size),
+    --#{$prefix}accordion-color: var(--#{$prefix}fg-body),
+    --#{$prefix}accordion-bg: var(--#{$prefix}bg-body),
+    --#{$prefix}accordion-transition-property: #{#{var(--#{$prefix}btn-input-action-transition-property), border-radius}},
+    --#{$prefix}accordion-transition-duration: var(--#{$prefix}btn-input-transition-duration),
+    --#{$prefix}accordion-transition-timing: var(--#{$prefix}btn-input-transition-timing),
     --#{$prefix}accordion-border-color: #{$accordion-border-color},
-    --#{$prefix}accordion-border-width: #{$accordion-border-width},
-    --#{$prefix}accordion-border-radius: #{$accordion-border-radius},
-    --#{$prefix}accordion-gap: #{$accordion-gap},
-    --#{$prefix}accordion-header-color: #{$accordion-header-color},
-    --#{$prefix}accordion-header-bg: #{$accordion-header-bg},
+    --#{$prefix}accordion-border-width: var(--#{$prefix}border-width),
+    --#{$prefix}accordion-border-radius: var(--#{$prefix}radius-7),
+    --#{$prefix}accordion-gap: var(--#{$prefix}spacer-2),
+    --#{$prefix}accordion-header-color: var(--#{$prefix}fg-2),
+    --#{$prefix}accordion-header-bg: var(--#{$prefix}accordion-bg),
     --#{$prefix}accordion-header-icon: #{escape-svg($accordion-header-icon)},
     --#{$prefix}accordion-header-active-icon: #{escape-svg($accordion-header-active-icon)},
-    --#{$prefix}accordion-header-icon-width: #{$accordion-icon-width},
-    --#{$prefix}accordion-header-icon-color: #{$accordion-icon-color},
-    --#{$prefix}accordion-header-active-icon-color: #{$accordion-icon-active-color},
-    --#{$prefix}accordion-header-icon-transform: #{$accordion-icon-transform},
-    --#{$prefix}accordion-header-icon-transition: #{$accordion-icon-transition},
-    --#{$prefix}accordion-active-color: #{$accordion-header-active-color},
-    --#{$prefix}accordion-active-bg: #{$accordion-header-active-bg},
-    --#{$prefix}accordion-active-border-color: #{$accordion-active-border-color},
-    --#{$prefix}accordion-content-duration: #{$accordion-content-duration},
-    --#{$prefix}accordion-content-easing: #{$accordion-content-easing},
+    --#{$prefix}accordion-header-icon-width: 1.25rem,
+    --#{$prefix}accordion-header-icon-color: currentcolor,
+    --#{$prefix}accordion-header-active-icon-color: currentcolor,
+    --#{$prefix}accordion-header-icon-transform: rotate(-180deg),
+    --#{$prefix}accordion-header-icon-transition: transform .2s ease-in-out,
+    --#{$prefix}accordion-active-color: var(--#{$prefix}fg-body),
+    --#{$prefix}accordion-active-bg: var(--#{$prefix}bg-2),
+    --#{$prefix}accordion-active-border-color: #{$accordion-border-color},
+    --#{$prefix}accordion-content-duration: .35s,
+    --#{$prefix}accordion-content-easing: ease,
   ),
   $accordion-tokens
 );
@@ -268,7 +240,6 @@ $accordion-tokens: defaults(
     padding: var(--#{$prefix}accordion-body-padding-y) var(--#{$prefix}accordion-body-padding-x);
     font-size: var(--#{$prefix}accordion-font-size);
   }
-
 
   .accordion-sm {
     // scss-docs-start accordion-sm-css-vars

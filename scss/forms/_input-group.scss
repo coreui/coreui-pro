@@ -6,15 +6,6 @@
 @use "../mixins/tokens" as *;
 @use "../config" as *;
 
-// scss-docs-start input-group-variables
-$input-group-addon-padding-y:           var(--#{$prefix}btn-input-padding-y) !default;
-$input-group-addon-padding-x:           var(--#{$prefix}btn-input-padding-x) !default;
-$input-group-addon-font-weight:         var(--#{$prefix}btn-input-font-weight) !default;
-$input-group-addon-color:               var(--#{$prefix}btn-input-fg) !default;
-$input-group-addon-bg:                  var(--#{$prefix}bg-2) !default;
-$input-group-addon-border-color:        var(--#{$prefix}btn-input-border-color) !default;
-// scss-docs-end input-group-variables
-
 $input-group-sizes: () !default;
 
 // A button in the group sizes itself from `$button-sizes`, so it is not listed here.
@@ -32,16 +23,16 @@ $input-group-sizes: defaults(
 $input-group-tokens: () !default;
 $input-group-tokens: defaults(
   (
-    --#{$prefix}control-padding-y: #{$input-group-addon-padding-y},
-    --#{$prefix}control-padding-x: #{$input-group-addon-padding-x},
+    --#{$prefix}control-padding-y: var(--#{$prefix}btn-input-padding-y),
+    --#{$prefix}control-padding-x: var(--#{$prefix}btn-input-padding-x),
     --#{$prefix}control-font-size: var(--#{$prefix}btn-input-font-size),
     --#{$prefix}control-line-height: var(--#{$prefix}btn-input-line-height),
     --#{$prefix}control-border-width: var(--#{$prefix}btn-input-border-width),
     --#{$prefix}control-border-radius: var(--#{$prefix}btn-input-border-radius),
-    --#{$prefix}input-group-addon-font-weight: #{$input-group-addon-font-weight},
-    --#{$prefix}input-group-addon-color: #{$input-group-addon-color},
-    --#{$prefix}input-group-addon-bg: #{$input-group-addon-bg},
-    --#{$prefix}input-group-addon-border-color: #{$input-group-addon-border-color},
+    --#{$prefix}input-group-addon-font-weight: var(--#{$prefix}btn-input-font-weight),
+    --#{$prefix}input-group-addon-color: var(--#{$prefix}btn-input-fg),
+    --#{$prefix}input-group-addon-bg: var(--#{$prefix}bg-2),
+    --#{$prefix}input-group-addon-border-color: var(--#{$prefix}btn-input-border-color),
   ),
   $input-group-tokens
 );
@@ -90,7 +81,6 @@ $input-group-tokens: defaults(
     }
   }
 
-
   // Textual addons
   //
   // Serves as a catch-all element for any text or radio/checkbox input you wish
@@ -112,7 +102,6 @@ $input-group-tokens: defaults(
     border: var(--#{$prefix}control-border-width) solid var(--#{$prefix}input-group-addon-border-color);
     @include border-radius(var(--#{$prefix}control-border-radius));
   }
-
 
   // Sizing
   //

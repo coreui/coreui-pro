@@ -13,19 +13,12 @@
 // scss-docs-start modal-variables
 $modal-inner-padding:               var(--#{$prefix}spacer) !default;
 
-$modal-footer-margin-between:       .5rem !default;
-
-$modal-dialog-margin:               .5rem !default;
 $modal-dialog-margin-y-sm-up:       1.75rem !default;
 
 $modal-title-line-height:           var(--#{$prefix}body-line-height) !default;
 
-$modal-content-color:               var(--#{$prefix}fg-body) !default;
-$modal-content-bg:                  var(--#{$prefix}bg-body) !default;
 $modal-content-border-color:        var(--#{$prefix}border-color-translucent) !default;
 $modal-content-border-width:        var(--#{$prefix}border-width) !default;
-$modal-content-border-radius:       var(--#{$prefix}radius-5) !default;
-$modal-content-inner-border-radius: calc(var(--#{$prefix}modal-border-radius) - var(--#{$prefix}modal-border-width)) !default;
 $modal-content-box-shadow-xs:       var(--#{$prefix}box-shadow-sm) !default;
 $modal-content-box-shadow-sm-up:    var(--#{$prefix}box-shadow) !default;
 
@@ -36,21 +29,13 @@ $modal-header-border-color:         var(--#{$prefix}border-color) !default;
 $modal-header-border-width:         $modal-content-border-width !default;
 $modal-header-padding-y:            $modal-inner-padding !default;
 $modal-header-padding-x:            $modal-inner-padding !default;
-$modal-header-padding:              $modal-header-padding-y $modal-header-padding-x !default; // Keep this for backwards compatibility
-
-$modal-footer-bg:                   null !default;
-$modal-footer-border-color:         $modal-header-border-color !default;
-$modal-footer-border-width:         $modal-header-border-width !default;
 
 $modal-sm:                          300px !default;
-$modal-md:                          500px !default;
 $modal-lg:                          800px !default;
 $modal-xl:                          1140px !default;
 
 $modal-fade-transform:              translate(0, -50px) !default;
 $modal-scale-transform:             scale(1.02) !default;
-$modal-transition-duration:         .3s !default;
-$modal-transition-timing:           ease-out !default;
 // scss-docs-end modal-variables
 
 $modal-sizes: () !default;
@@ -75,30 +60,30 @@ $modal-tokens: () !default;
 $modal-tokens: defaults(
   (
     --#{$prefix}modal-zindex: var(--#{$prefix}z-modal),
-    --#{$prefix}modal-width: #{$modal-md},
+    --#{$prefix}modal-width: 500px,
     --#{$prefix}modal-padding: #{$modal-inner-padding},
-    --#{$prefix}modal-margin: #{$modal-dialog-margin},
-    --#{$prefix}modal-color: #{$modal-content-color},
-    --#{$prefix}modal-bg: #{$modal-content-bg},
+    --#{$prefix}modal-margin: .5rem,
+    --#{$prefix}modal-color: var(--#{$prefix}fg-body),
+    --#{$prefix}modal-bg: var(--#{$prefix}bg-body),
     --#{$prefix}modal-border-color: #{$modal-content-border-color},
     --#{$prefix}modal-border-width: #{$modal-content-border-width},
-    --#{$prefix}modal-border-radius: #{$modal-content-border-radius},
+    --#{$prefix}modal-border-radius: var(--#{$prefix}radius-5),
     --#{$prefix}modal-box-shadow: #{$modal-content-box-shadow-xs},
-    --#{$prefix}modal-inner-border-radius: #{$modal-content-inner-border-radius},
-    --#{$prefix}modal-transition-duration: #{$modal-transition-duration},
-    --#{$prefix}modal-transition-timing: #{$modal-transition-timing},
+    --#{$prefix}modal-inner-border-radius: calc(var(--#{$prefix}modal-border-radius) - var(--#{$prefix}modal-border-width)),
+    --#{$prefix}modal-transition-duration: .3s,
+    --#{$prefix}modal-transition-timing: ease-out,
     --#{$prefix}modal-backdrop-bg: #{$modal-backdrop-bg},
     --#{$prefix}modal-backdrop-opacity: #{$modal-backdrop-opacity},
     --#{$prefix}modal-header-padding-x: #{$modal-header-padding-x},
     --#{$prefix}modal-header-padding-y: #{$modal-header-padding-y},
-    --#{$prefix}modal-header-padding: #{$modal-header-padding},
+    --#{$prefix}modal-header-padding: #{$modal-header-padding-y $modal-header-padding-x},
     --#{$prefix}modal-header-border-color: #{$modal-header-border-color},
     --#{$prefix}modal-header-border-width: #{$modal-header-border-width},
     --#{$prefix}modal-title-line-height: #{$modal-title-line-height},
-    --#{$prefix}modal-footer-gap: #{$modal-footer-margin-between},
-    --#{$prefix}modal-footer-bg: #{$modal-footer-bg},
-    --#{$prefix}modal-footer-border-color: #{$modal-footer-border-color},
-    --#{$prefix}modal-footer-border-width: #{$modal-footer-border-width},
+    --#{$prefix}modal-footer-gap: .5rem,
+    --#{$prefix}modal-footer-bg: #{null},
+    --#{$prefix}modal-footer-border-color: #{$modal-header-border-color},
+    --#{$prefix}modal-footer-border-width: #{$modal-header-border-width},
   ),
   $modal-tokens
 );

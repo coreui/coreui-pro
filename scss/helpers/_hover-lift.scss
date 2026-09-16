@@ -4,13 +4,6 @@
 @use "../mixins/transition" as *;
 @use "../config" as *;
 
-// scss-docs-start hover-lift-variables
-$hover-lift-transition-duration: .2s !default;
-$hover-lift-transition-timing:   ease !default;
-$hover-lift-transform:           translateY(-.25rem) !default;
-$hover-lift-box-shadow:          var(--#{$prefix}box-shadow-lg) !default;
-// scss-docs-end hover-lift-variables
-
 $hover-lift-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
@@ -18,10 +11,10 @@ $hover-lift-tokens: () !default;
 // scss-docs-start hover-lift-css-vars
 $hover-lift-tokens: defaults(
   (
-    --#{$prefix}hover-lift-transition-duration: #{$hover-lift-transition-duration},
-    --#{$prefix}hover-lift-transition-timing: #{$hover-lift-transition-timing},
-    --#{$prefix}hover-lift-transform: #{$hover-lift-transform},
-    --#{$prefix}hover-lift-box-shadow: #{$hover-lift-box-shadow},
+    --#{$prefix}hover-lift-transition-duration: .2s,
+    --#{$prefix}hover-lift-transition-timing: ease,
+    --#{$prefix}hover-lift-transform: translateY(-.25rem),
+    --#{$prefix}hover-lift-box-shadow: var(--#{$prefix}box-shadow-lg),
   ),
   $hover-lift-tokens
 );

@@ -8,22 +8,6 @@
 // `.popup` around a ListBox instance, so everything inside it — options,
 // sections, indicators, select-all — is styled by `_list-box.scss`.
 
-// scss-docs-start combobox-variables
-
-$combobox-popup-min-width: 100% !default;
-
-// scss-docs-end combobox-variables
-
-// scss-docs-start combobox-toggle-variables
-$combobox-toggle-gap:                       .5rem !default;
-$combobox-toggle-show-bg:                   var(--#{$prefix}bg-1) !default;
-$combobox-toggle-placeholder-color:         var(--#{$prefix}control-placeholder-color) !default;
-$combobox-toggle-caret-color:               var(--#{$prefix}fg-3) !default;
-$combobox-toggle-caret-size:                .75em !default;
-$combobox-toggle-caret-transition-duration: .2s !default;
-$combobox-toggle-caret-transition-timing:   var(--#{$prefix}btn-input-transition-timing) !default;
-// scss-docs-end combobox-toggle-variables
-
 $combobox-tokens: () !default;
 $combobox-toggle-tokens: () !default;
 
@@ -32,7 +16,7 @@ $combobox-toggle-tokens: () !default;
 // scss-docs-start combobox-css-vars
 $combobox-tokens: defaults(
   (
-    --#{$prefix}combobox-popup-min-width: #{$combobox-popup-min-width},
+    --#{$prefix}combobox-popup-min-width: 100%,
   ),
   $combobox-tokens
 );
@@ -41,13 +25,13 @@ $combobox-tokens: defaults(
 // scss-docs-start combobox-toggle-css-vars
 $combobox-toggle-tokens: defaults(
   (
-    --#{$prefix}combobox-toggle-gap: #{$combobox-toggle-gap},
-    --#{$prefix}combobox-toggle-show-bg: #{$combobox-toggle-show-bg},
-    --#{$prefix}combobox-toggle-placeholder-color: #{$combobox-toggle-placeholder-color},
-    --#{$prefix}combobox-toggle-caret-color: #{$combobox-toggle-caret-color},
-    --#{$prefix}combobox-toggle-caret-size: #{$combobox-toggle-caret-size},
-    --#{$prefix}combobox-toggle-caret-transition-duration: #{$combobox-toggle-caret-transition-duration},
-    --#{$prefix}combobox-toggle-caret-transition-timing: #{$combobox-toggle-caret-transition-timing},
+    --#{$prefix}combobox-toggle-gap: .5rem,
+    --#{$prefix}combobox-toggle-show-bg: var(--#{$prefix}bg-1),
+    --#{$prefix}combobox-toggle-placeholder-color: var(--#{$prefix}control-placeholder-color),
+    --#{$prefix}combobox-toggle-caret-color: var(--#{$prefix}fg-3),
+    --#{$prefix}combobox-toggle-caret-size: .75em,
+    --#{$prefix}combobox-toggle-caret-transition-duration: .2s,
+    --#{$prefix}combobox-toggle-caret-transition-timing: var(--#{$prefix}btn-input-transition-timing),
   ),
   $combobox-toggle-tokens
 );

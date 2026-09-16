@@ -3,12 +3,6 @@
 @use "../mixins/tokens" as *;
 @use "../config" as *;
 
-// scss-docs-start form-multi-select-variables
-
-$form-multi-select-selection-tags-gap:        .25rem !default;
-$form-multi-select-selection-tags-padding-y:  .25rem !default;
-// scss-docs-end form-multi-select-variables
-
 $form-multi-select-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
@@ -16,8 +10,8 @@ $form-multi-select-tokens: () !default;
 // scss-docs-start form-multi-select-css-vars
 $form-multi-select-tokens: defaults(
   (
-    --#{$prefix}form-multi-select-selection-tags-gap: #{$form-multi-select-selection-tags-gap},
-    --#{$prefix}form-multi-select-selection-tags-padding-y: #{$form-multi-select-selection-tags-padding-y},
+    --#{$prefix}form-multi-select-selection-tags-gap: .25rem,
+    --#{$prefix}form-multi-select-selection-tags-padding-y: .25rem,
   ),
   $form-multi-select-tokens
 );

@@ -8,10 +8,6 @@
 @use "form-control" as *;
 
 // scss-docs-start form-otp-variables
-$form-otp-gap:                         .125rem !default;
-$form-otp-control-width:               2rem !default;
-$form-otp-control-padding-x:           0 !default;
-
 $form-otp-control-width-sm:            1.5rem !default;
 $form-otp-control-padding-y-sm:        var(--#{$prefix}btn-input-sm-padding-y) !default;
 $form-otp-control-padding-x-sm:        0 !default;
@@ -56,7 +52,7 @@ $form-otp-sizes: defaults(
 $form-otp-tokens: () !default;
 $form-otp-tokens: defaults(
   (
-    --#{$prefix}form-otp-gap: #{$form-otp-gap},
+    --#{$prefix}form-otp-gap: .125rem,
   ),
   $form-otp-tokens
 );
@@ -70,8 +66,8 @@ $form-otp-tokens: defaults(
 $form-otp-control-tokens: () !default;
 $form-otp-control-tokens: defaults(
   (
-    --#{$prefix}control-padding-x: #{$form-otp-control-padding-x},
-    --#{$prefix}form-otp-control-width: #{$form-otp-control-width},
+    --#{$prefix}control-padding-x: 0,
+    --#{$prefix}form-otp-control-width: 2rem,
   ),
   $form-otp-control-tokens
 );

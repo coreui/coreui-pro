@@ -10,18 +10,6 @@
 @use "theme" as *;
 
 // Range Slider
-// scss-docs-start range-slider-variables
-$range-slider-tick-label-padding-y:        0 !default;
-$range-slider-tick-label-padding-x:        0 !default;
-$range-slider-tick-label-font-size:        var(--#{$prefix}font-size-sm) !default;
-$range-slider-tick-label-color:            var(--#{$prefix}fg-body) !default;
-
-$range-slider-tooltip-margin-end:          .25rem !default;
-$range-slider-tooltip-margin-bottom:       .25rem !default;
-
-$range-slider-vertical-track-width:        .5rem !default;
-$range-slider-vertical-track-height:       10rem !default;
-// scss-docs-end range-slider-variables
 
 $range-slider-tokens: () !default;
 
@@ -30,12 +18,12 @@ $range-slider-tokens: () !default;
 // scss-docs-start range-slider-css-vars
 $range-slider-tokens: defaults(
   (
-    --#{$prefix}range-slider-tick-label-padding-y: #{$range-slider-tick-label-padding-y},
-    --#{$prefix}range-slider-tick-label-padding-x: #{$range-slider-tick-label-padding-x},
-    --#{$prefix}range-slider-tick-label-font-size: #{$range-slider-tick-label-font-size},
-    --#{$prefix}range-slider-tick-label-color: #{$range-slider-tick-label-color},
-    --#{$prefix}range-slider-tooltip-margin-end: #{$range-slider-tooltip-margin-end},
-    --#{$prefix}range-slider-tooltip-margin-bottom: #{$range-slider-tooltip-margin-bottom},
+    --#{$prefix}range-slider-tick-label-padding-y: 0,
+    --#{$prefix}range-slider-tick-label-padding-x: 0,
+    --#{$prefix}range-slider-tick-label-font-size: var(--#{$prefix}font-size-sm),
+    --#{$prefix}range-slider-tick-label-color: var(--#{$prefix}fg-body),
+    --#{$prefix}range-slider-tooltip-margin-end: .25rem,
+    --#{$prefix}range-slider-tooltip-margin-bottom: .25rem,
   ),
   $range-slider-tokens
 );
@@ -50,8 +38,8 @@ $range-slider-vertical-tokens: () !default;
 // scss-docs-start range-slider-vertical-css-vars
 $range-slider-vertical-tokens: defaults(
   (
-    --#{$prefix}range-slider-vertical-track-width: #{$range-slider-vertical-track-width},
-    --#{$prefix}range-slider-vertical-track-height: #{$range-slider-vertical-track-height},
+    --#{$prefix}range-slider-vertical-track-width: .5rem,
+    --#{$prefix}range-slider-vertical-track-height: 10rem,
   ),
   $range-slider-vertical-tokens
 );

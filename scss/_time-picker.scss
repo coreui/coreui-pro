@@ -4,31 +4,6 @@
 @use "mixins/tokens" as *;
 @use "config" as *;
 
-// scss-docs-start time-picker-variables
-$time-picker-body-padding:                  var(--#{$prefix}spacer-2) !default;
-
-$time-picker-footer-padding:                .5rem !default;
-$time-picker-footer-border-width:           1px !default;
-$time-picker-footer-border-color:           var(--#{$prefix}border-color) !default;
-
-$time-picker-roll-col-border-width:           var(--#{$prefix}border-width) !default;
-$time-picker-roll-col-border-color:           var(--#{$prefix}border-color) !default;
-$time-picker-roll-cell-width:                 3rem !default;
-$time-picker-roll-cell-height:                2rem !default;
-$time-picker-roll-cell-hover-color:           var(--#{$prefix}fg-body) !default;
-$time-picker-roll-cell-hover-bg:              var(--#{$prefix}bg-1) !default;
-$time-picker-roll-cell-selected-color:        var(--#{$prefix}primary-contrast) !default;
-$time-picker-roll-cell-selected-bg:           var(--#{$prefix}primary-base) !default;
-$time-picker-roll-cell-selected-hover-color:  var(--#{$prefix}primary-contrast) !default;
-$time-picker-roll-cell-selected-hover-bg:     oklch(from var(--#{$prefix}primary-base) calc(l * var(--#{$prefix}theme-hover-lightness)) calc(c * var(--#{$prefix}theme-hover-chroma)) h) !default;
-
-$time-picker-inline-select-font-size:       var(--#{$prefix}btn-input-sm-font-size) !default;
-$time-picker-inline-select-color:           var(--#{$prefix}btn-input-fg) !default;
-$time-picker-inline-select-padding-y:       var(--#{$prefix}btn-input-sm-padding-y) !default;
-$time-picker-inline-select-padding-x:       var(--#{$prefix}btn-input-sm-padding-x) !default;
-$time-picker-inline-select-disabled-color:  var(--#{$prefix}fg-body) !default;
-// scss-docs-end time-picker-variables
-
 // Time Picker
 $time-picker-tokens: () !default;
 
@@ -37,25 +12,25 @@ $time-picker-tokens: () !default;
 // scss-docs-start time-picker-css-vars
 $time-picker-tokens: defaults(
   (
-    --#{$prefix}time-picker-body-padding: #{$time-picker-body-padding},
-    --#{$prefix}time-picker-footer-border-width: #{$time-picker-footer-border-width},
-    --#{$prefix}time-picker-footer-border-color: #{$time-picker-footer-border-color},
-    --#{$prefix}time-picker-footer-padding: #{$time-picker-footer-padding},
-    --#{$prefix}time-picker-roll-col-border-width: #{$time-picker-roll-col-border-width},
-    --#{$prefix}time-picker-roll-col-border-color: #{$time-picker-roll-col-border-color},
-    --#{$prefix}time-picker-roll-cell-width: #{$time-picker-roll-cell-width},
-    --#{$prefix}time-picker-roll-cell-height: #{$time-picker-roll-cell-height},
-    --#{$prefix}time-picker-roll-cell-hover-color: #{$time-picker-roll-cell-hover-color},
-    --#{$prefix}time-picker-roll-cell-hover-bg: #{$time-picker-roll-cell-hover-bg},
-    --#{$prefix}time-picker-roll-cell-selected-color: #{$time-picker-roll-cell-selected-color},
-    --#{$prefix}time-picker-roll-cell-selected-bg: #{$time-picker-roll-cell-selected-bg},
-    --#{$prefix}time-picker-roll-cell-selected-hover-color: #{$time-picker-roll-cell-selected-hover-color},
-    --#{$prefix}time-picker-roll-cell-selected-hover-bg: #{$time-picker-roll-cell-selected-hover-bg},
-    --#{$prefix}time-picker-inline-select-font-size: #{$time-picker-inline-select-font-size},
-    --#{$prefix}time-picker-inline-select-color: #{$time-picker-inline-select-color},
-    --#{$prefix}time-picker-inline-select-padding-y: #{$time-picker-inline-select-padding-y},
-    --#{$prefix}time-picker-inline-select-padding-x: #{$time-picker-inline-select-padding-x},
-    --#{$prefix}time-picker-inline-select-disabled-color: #{$time-picker-inline-select-disabled-color},
+    --#{$prefix}time-picker-body-padding: var(--#{$prefix}spacer-2),
+    --#{$prefix}time-picker-footer-border-width: 1px,
+    --#{$prefix}time-picker-footer-border-color: var(--#{$prefix}border-color),
+    --#{$prefix}time-picker-footer-padding: .5rem,
+    --#{$prefix}time-picker-roll-col-border-width: var(--#{$prefix}border-width),
+    --#{$prefix}time-picker-roll-col-border-color: var(--#{$prefix}border-color),
+    --#{$prefix}time-picker-roll-cell-width: 3rem,
+    --#{$prefix}time-picker-roll-cell-height: 2rem,
+    --#{$prefix}time-picker-roll-cell-hover-color: var(--#{$prefix}fg-body),
+    --#{$prefix}time-picker-roll-cell-hover-bg: var(--#{$prefix}bg-1),
+    --#{$prefix}time-picker-roll-cell-selected-color: var(--#{$prefix}primary-contrast),
+    --#{$prefix}time-picker-roll-cell-selected-bg: var(--#{$prefix}primary-base),
+    --#{$prefix}time-picker-roll-cell-selected-hover-color: var(--#{$prefix}primary-contrast),
+    --#{$prefix}time-picker-roll-cell-selected-hover-bg: oklch(from var(--#{$prefix}primary-base) calc(l * var(--#{$prefix}theme-hover-lightness)) calc(c * var(--#{$prefix}theme-hover-chroma)) h),
+    --#{$prefix}time-picker-inline-select-font-size: var(--#{$prefix}btn-input-sm-font-size),
+    --#{$prefix}time-picker-inline-select-color: var(--#{$prefix}btn-input-fg),
+    --#{$prefix}time-picker-inline-select-padding-y: var(--#{$prefix}btn-input-sm-padding-y),
+    --#{$prefix}time-picker-inline-select-padding-x: var(--#{$prefix}btn-input-sm-padding-x),
+    --#{$prefix}time-picker-inline-select-disabled-color: var(--#{$prefix}fg-body),
   ),
   $time-picker-tokens
 );

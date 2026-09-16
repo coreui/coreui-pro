@@ -37,14 +37,6 @@ $input-height-inner:                    calc(var(--#{$prefix}btn-input-line-heig
 $input-height-inner-half:               calc(var(--#{$prefix}btn-input-line-height) * .5em + var(--#{$prefix}btn-input-padding-y)) !default;
 $input-height-inner-quarter:            calc(var(--#{$prefix}btn-input-line-height) * .25em + var(--#{$prefix}btn-input-padding-y) * .5) !default;
 
-// scss-docs-start tooltip-feedback-variables
-$form-feedback-tooltip-padding-y:     var(--#{$prefix}spacer-1) !default;
-$form-feedback-tooltip-padding-x:     var(--#{$prefix}spacer-2) !default;
-$form-feedback-tooltip-font-size:     var(--#{$prefix}font-size-sm) !default;
-$form-feedback-tooltip-line-height:   null !default;
-$form-feedback-tooltip-border-radius: var(--#{$prefix}radius-4) !default;
-// scss-docs-end tooltip-feedback-variables
-
 // stylelint-disable scss/dollar-variable-default
 
 // scss-docs-start form-feedback-tokens
@@ -54,11 +46,11 @@ $form-feedback-tokens: defaults(
     --#{$prefix}form-feedback-margin-top: #{$form-feedback-margin-top},
     --#{$prefix}form-feedback-font-size: #{$form-feedback-font-size},
     --#{$prefix}form-feedback-font-style: #{$form-feedback-font-style},
-    --#{$prefix}form-feedback-tooltip-padding-y: #{$form-feedback-tooltip-padding-y},
-    --#{$prefix}form-feedback-tooltip-padding-x: #{$form-feedback-tooltip-padding-x},
-    --#{$prefix}form-feedback-tooltip-font-size: #{$form-feedback-tooltip-font-size},
-    --#{$prefix}form-feedback-tooltip-line-height: #{$form-feedback-tooltip-line-height},
-    --#{$prefix}form-feedback-tooltip-border-radius: #{$form-feedback-tooltip-border-radius},
+    --#{$prefix}form-feedback-tooltip-padding-y: var(--#{$prefix}spacer-1),
+    --#{$prefix}form-feedback-tooltip-padding-x: var(--#{$prefix}spacer-2),
+    --#{$prefix}form-feedback-tooltip-font-size: var(--#{$prefix}font-size-sm),
+    --#{$prefix}form-feedback-tooltip-line-height: #{null},
+    --#{$prefix}form-feedback-tooltip-border-radius: var(--#{$prefix}radius-4),
   ),
   $form-feedback-tokens
 );

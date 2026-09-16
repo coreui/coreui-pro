@@ -2,11 +2,6 @@
 @use "../mixins/tokens" as *;
 @use "../config" as *;
 
-// scss-docs-start vr-variables
-$vr-border-width:             var(--#{$prefix}border-width) !default;
-$vr-color:                    var(--#{$prefix}border-color) !default;
-// scss-docs-end vr-variables
-
 $vr-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
@@ -14,8 +9,8 @@ $vr-tokens: () !default;
 // scss-docs-start vr-css-vars
 $vr-tokens: defaults(
   (
-    --#{$prefix}vr-border-width: #{$vr-border-width},
-    --#{$prefix}vr-color: #{$vr-color},
+    --#{$prefix}vr-border-width: var(--#{$prefix}border-width),
+    --#{$prefix}vr-color: var(--#{$prefix}border-color),
   ),
   $vr-tokens
 );

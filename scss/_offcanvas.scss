@@ -11,23 +11,6 @@
 
 // stylelint-disable custom-property-no-missing-var-function
 
-// scss-docs-start offcanvas-variables
-$offcanvas-padding-y:               $modal-inner-padding !default;
-$offcanvas-padding-x:               $modal-inner-padding !default;
-$offcanvas-horizontal-width:        400px !default;
-$offcanvas-vertical-height:         30vh !default;
-$offcanvas-transition-duration:     .3s !default;
-$offcanvas-transition-timing:       ease-in-out !default;
-$offcanvas-border-color:            $modal-content-border-color !default;
-$offcanvas-border-width:            $modal-content-border-width !default;
-$offcanvas-title-line-height:       $modal-title-line-height !default;
-$offcanvas-bg-color:                var(--#{$prefix}bg-body) !default;
-$offcanvas-color:                   var(--#{$prefix}fg-body) !default;
-$offcanvas-box-shadow:              $modal-content-box-shadow-xs !default;
-$offcanvas-backdrop-bg:             $modal-backdrop-bg !default;
-$offcanvas-backdrop-opacity:        $modal-backdrop-opacity !default;
-// scss-docs-end offcanvas-variables
-
 $offcanvas-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
@@ -36,20 +19,20 @@ $offcanvas-tokens: () !default;
 $offcanvas-tokens: defaults(
   (
     --#{$prefix}offcanvas-zindex: var(--#{$prefix}z-offcanvas),
-    --#{$prefix}offcanvas-width: #{$offcanvas-horizontal-width},
-    --#{$prefix}offcanvas-height: #{$offcanvas-vertical-height},
-    --#{$prefix}offcanvas-padding-x: #{$offcanvas-padding-x},
-    --#{$prefix}offcanvas-padding-y: #{$offcanvas-padding-y},
-    --#{$prefix}offcanvas-color: #{$offcanvas-color},
-    --#{$prefix}offcanvas-bg: #{$offcanvas-bg-color},
-    --#{$prefix}offcanvas-border-width: #{$offcanvas-border-width},
-    --#{$prefix}offcanvas-border-color: #{$offcanvas-border-color},
-    --#{$prefix}offcanvas-box-shadow: #{$offcanvas-box-shadow},
-    --#{$prefix}offcanvas-transition-duration: #{$offcanvas-transition-duration},
-    --#{$prefix}offcanvas-transition-timing: #{$offcanvas-transition-timing},
-    --#{$prefix}offcanvas-backdrop-bg: #{$offcanvas-backdrop-bg},
-    --#{$prefix}offcanvas-backdrop-opacity: #{$offcanvas-backdrop-opacity},
-    --#{$prefix}offcanvas-title-line-height: #{$offcanvas-title-line-height},
+    --#{$prefix}offcanvas-width: 400px,
+    --#{$prefix}offcanvas-height: 30vh,
+    --#{$prefix}offcanvas-padding-x: #{$modal-inner-padding},
+    --#{$prefix}offcanvas-padding-y: #{$modal-inner-padding},
+    --#{$prefix}offcanvas-color: var(--#{$prefix}fg-body),
+    --#{$prefix}offcanvas-bg: var(--#{$prefix}bg-body),
+    --#{$prefix}offcanvas-border-width: #{$modal-content-border-width},
+    --#{$prefix}offcanvas-border-color: #{$modal-content-border-color},
+    --#{$prefix}offcanvas-box-shadow: #{$modal-content-box-shadow-xs},
+    --#{$prefix}offcanvas-transition-duration: .3s,
+    --#{$prefix}offcanvas-transition-timing: ease-in-out,
+    --#{$prefix}offcanvas-backdrop-bg: #{$modal-backdrop-bg},
+    --#{$prefix}offcanvas-backdrop-opacity: #{$modal-backdrop-opacity},
+    --#{$prefix}offcanvas-title-line-height: #{$modal-title-line-height},
   ),
   $offcanvas-tokens
 );

@@ -7,32 +7,7 @@
 @use "config" as *;
 
 // scss-docs-start pagination-variables
-$pagination-min-height:             var(--#{$prefix}btn-input-min-height) !default;
-$pagination-padding-y:              var(--#{$prefix}btn-input-padding-y) !default;
-$pagination-padding-x:              var(--#{$prefix}btn-input-padding-x) !default;
-
-$pagination-font-size:              var(--#{$prefix}btn-input-font-size) !default;
-
-$pagination-color:                  var(--#{$prefix}link-color) !default;
-$pagination-bg:                     var(--#{$prefix}bg-body) !default;
-$pagination-border-radius:          var(--#{$prefix}btn-input-border-radius) !default;
-$pagination-border-width:           var(--#{$prefix}border-width) !default;
-$pagination-border-color:           var(--#{$prefix}border-color) !default;
-
-$pagination-focus-color:            var(--#{$prefix}link-hover-color) !default;
-$pagination-focus-bg:               var(--#{$prefix}bg-1) !default;
-
-$pagination-hover-color:            var(--#{$prefix}link-hover-color) !default;
-$pagination-hover-bg:               var(--#{$prefix}bg-1) !default;
-$pagination-hover-border-color:     var(--#{$prefix}border-color) !default;
-
-$pagination-active-color:           var(--#{$prefix}primary-contrast) !default;
 $pagination-active-bg:              var(--#{$prefix}primary-bg) !default;
-$pagination-active-border-color:    $pagination-active-bg !default;
-
-$pagination-disabled-color:         var(--#{$prefix}fg-3) !default;
-$pagination-disabled-bg:            var(--#{$prefix}bg-2) !default;
-$pagination-disabled-border-color:  var(--#{$prefix}border-color) !default;
 
 $pagination-transition:             color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out !default;
 // scss-docs-end pagination-variables
@@ -44,26 +19,26 @@ $pagination-tokens: () !default;
 // scss-docs-start pagination-css-vars
 $pagination-tokens: defaults(
   (
-    --#{$prefix}pagination-min-height: #{$pagination-min-height},
-    --#{$prefix}pagination-padding-x: #{$pagination-padding-x},
-    --#{$prefix}pagination-padding-y: #{$pagination-padding-y},
-    --#{$prefix}pagination-font-size: #{$pagination-font-size},
-    --#{$prefix}pagination-color: #{$pagination-color},
-    --#{$prefix}pagination-bg: #{$pagination-bg},
-    --#{$prefix}pagination-border-width: #{$pagination-border-width},
-    --#{$prefix}pagination-border-color: #{$pagination-border-color},
-    --#{$prefix}pagination-border-radius: #{$pagination-border-radius},
-    --#{$prefix}pagination-hover-color: #{$pagination-hover-color},
-    --#{$prefix}pagination-hover-bg: #{$pagination-hover-bg},
-    --#{$prefix}pagination-hover-border-color: #{$pagination-hover-border-color},
-    --#{$prefix}pagination-focus-color: #{$pagination-focus-color},
-    --#{$prefix}pagination-focus-bg: #{$pagination-focus-bg},
-    --#{$prefix}pagination-active-color: #{$pagination-active-color},
+    --#{$prefix}pagination-min-height: var(--#{$prefix}btn-input-min-height),
+    --#{$prefix}pagination-padding-x: var(--#{$prefix}btn-input-padding-x),
+    --#{$prefix}pagination-padding-y: var(--#{$prefix}btn-input-padding-y),
+    --#{$prefix}pagination-font-size: var(--#{$prefix}btn-input-font-size),
+    --#{$prefix}pagination-color: var(--#{$prefix}link-color),
+    --#{$prefix}pagination-bg: var(--#{$prefix}bg-body),
+    --#{$prefix}pagination-border-width: var(--#{$prefix}border-width),
+    --#{$prefix}pagination-border-color: var(--#{$prefix}border-color),
+    --#{$prefix}pagination-border-radius: var(--#{$prefix}btn-input-border-radius),
+    --#{$prefix}pagination-hover-color: var(--#{$prefix}link-hover-color),
+    --#{$prefix}pagination-hover-bg: var(--#{$prefix}bg-1),
+    --#{$prefix}pagination-hover-border-color: var(--#{$prefix}border-color),
+    --#{$prefix}pagination-focus-color: var(--#{$prefix}link-hover-color),
+    --#{$prefix}pagination-focus-bg: var(--#{$prefix}bg-1),
+    --#{$prefix}pagination-active-color: var(--#{$prefix}primary-contrast),
     --#{$prefix}pagination-active-bg: #{$pagination-active-bg},
-    --#{$prefix}pagination-active-border-color: #{$pagination-active-border-color},
-    --#{$prefix}pagination-disabled-color: #{$pagination-disabled-color},
-    --#{$prefix}pagination-disabled-bg: #{$pagination-disabled-bg},
-    --#{$prefix}pagination-disabled-border-color: #{$pagination-disabled-border-color},
+    --#{$prefix}pagination-active-border-color: #{$pagination-active-bg},
+    --#{$prefix}pagination-disabled-color: var(--#{$prefix}fg-3),
+    --#{$prefix}pagination-disabled-bg: var(--#{$prefix}bg-2),
+    --#{$prefix}pagination-disabled-border-color: var(--#{$prefix}border-color),
   ),
   $pagination-tokens
 );
@@ -147,7 +122,6 @@ $pagination-sizes: defaults(
       @include border-end-radius(var(--#{$prefix}pagination-border-radius));
     }
   }
-
 
   //
   // Sizing

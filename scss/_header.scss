@@ -10,40 +10,15 @@
 
 // Header
 // scss-docs-start header-variables
-$header-padding-y:              var(--#{$prefix}spacer-2) !default;
-$header-padding-x:              var(--#{$prefix}spacer-2) !default;
 $header-brand-font-size:        var(--#{$prefix}font-size-lg) !default;
-$header-color:                  color-mix(in oklch, var(--#{$prefix}emphasis-color) 65%, transparent) !default;
-$header-bg:                     var(--#{$prefix}bg-body) !default;
-$header-border-color:           var(--#{$prefix}border-color) !default;
-$header-border-width:           var(--#{$prefix}border-width) !default;
-$header-hover-color:            color-mix(in oklch, var(--#{$prefix}emphasis-color) 80%, transparent) !default;
-$header-active-color:           color-mix(in oklch, var(--#{$prefix}emphasis-color) 100%, transparent) !default;
-$header-disabled-color:         color-mix(in oklch, var(--#{$prefix}emphasis-color) 30%, transparent) !default;
-$header-transition:             box-shadow .15s ease-in-out !default;
 
 // Compute the header-brand padding-y so the header-brand will have the same height as header-text and nav-link
 $header-brand-height:           calc(#{$header-brand-font-size} * var(--#{$prefix}body-line-height)) !default;
-$header-brand-padding-y:        calc((#{$nav-link-height} - #{$header-brand-height}) * .5) !default;
 $header-brand-margin-end:       1rem !default;
-$header-brand-color:            var(--#{$prefix}fg-body) !default;
-$header-brand-hover-color:      var(--#{$prefix}fg-1) !default;
 
-$header-toggler-padding-y:      .25rem !default;
-$header-toggler-padding-x:      .75rem !default;
 $header-toggler-font-size:      var(--#{$prefix}font-size-lg) !default;
-$header-toggler-color:          color-mix(in oklch, var(--#{$prefix}emphasis-color) 65%, transparent) !default;
-$header-toggler-bg:             transparent !default;
-$header-toggler-border-radius:  var(--#{$prefix}radius-4) !default;
-$header-toggler-hover-color:    color-mix(in oklch, var(--#{$prefix}emphasis-color) 100%, transparent) !default;
 
 $header-toggler-icon-bg:        url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='black' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>") !default;
-
-$header-nav-link-padding-x:     .5rem !default;
-$header-nav-link-padding-y:     .5rem !default;
-
-$header-divider-border-width:   var(--#{$prefix}border-width) !default;
-$header-divider-border-color:   var(--#{$prefix}border-color) !default;
 // scss-docs-end header-variables
 
 $header-tokens: () !default;
@@ -53,30 +28,30 @@ $header-tokens: () !default;
 // scss-docs-start header-css-vars
 $header-tokens: defaults(
   (
-    --#{$prefix}header-padding-x: #{$header-padding-x},
-    --#{$prefix}header-padding-y: #{$header-padding-y},
-    --#{$prefix}header-bg: #{$header-bg},
-    --#{$prefix}header-color: #{$header-color},
-    --#{$prefix}header-border-color: #{$header-border-color},
-    --#{$prefix}header-border: #{$header-border-width} solid var(--#{$prefix}header-border-color),
-    --#{$prefix}header-hover-color: #{$header-hover-color},
-    --#{$prefix}header-disabled-color: #{$header-disabled-color},
-    --#{$prefix}header-active-color: #{$header-active-color},
-    --#{$prefix}header-transition: #{$header-transition},
-    --#{$prefix}header-brand-padding-y: #{$header-brand-padding-y},
-    --#{$prefix}header-brand-color: #{$header-brand-color},
-    --#{$prefix}header-brand-hover-color: #{$header-brand-hover-color},
-    --#{$prefix}header-toggler-padding-x: #{$header-toggler-padding-x},
-    --#{$prefix}header-toggler-padding-y: #{$header-toggler-padding-y},
-    --#{$prefix}header-toggler-bg: #{$header-toggler-bg},
-    --#{$prefix}header-toggler-color: #{$header-toggler-color},
-    --#{$prefix}header-toggler-border-radius: #{$header-toggler-border-radius},
-    --#{$prefix}header-toggler-hover-color: #{$header-toggler-hover-color},
+    --#{$prefix}header-padding-x: var(--#{$prefix}spacer-2),
+    --#{$prefix}header-padding-y: var(--#{$prefix}spacer-2),
+    --#{$prefix}header-bg: var(--#{$prefix}bg-body),
+    --#{$prefix}header-color: color-mix(in oklch, var(--#{$prefix}emphasis-color) 65%, transparent),
+    --#{$prefix}header-border-color: var(--#{$prefix}border-color),
+    --#{$prefix}header-border: var(--#{$prefix}border-width) solid var(--#{$prefix}header-border-color),
+    --#{$prefix}header-hover-color: color-mix(in oklch, var(--#{$prefix}emphasis-color) 80%, transparent),
+    --#{$prefix}header-disabled-color: color-mix(in oklch, var(--#{$prefix}emphasis-color) 30%, transparent),
+    --#{$prefix}header-active-color: color-mix(in oklch, var(--#{$prefix}emphasis-color) 100%, transparent),
+    --#{$prefix}header-transition: box-shadow .15s ease-in-out,
+    --#{$prefix}header-brand-padding-y: calc((#{$nav-link-height} - #{$header-brand-height}) * .5),
+    --#{$prefix}header-brand-color: var(--#{$prefix}fg-body),
+    --#{$prefix}header-brand-hover-color: var(--#{$prefix}fg-1),
+    --#{$prefix}header-toggler-padding-x: .75rem,
+    --#{$prefix}header-toggler-padding-y: .25rem,
+    --#{$prefix}header-toggler-bg: transparent,
+    --#{$prefix}header-toggler-color: color-mix(in oklch, var(--#{$prefix}emphasis-color) 65%, transparent),
+    --#{$prefix}header-toggler-border-radius: var(--#{$prefix}radius-4),
+    --#{$prefix}header-toggler-hover-color: color-mix(in oklch, var(--#{$prefix}emphasis-color) 100%, transparent),
     --#{$prefix}header-toggler-icon-bg: #{escape-svg($header-toggler-icon-bg)},
-    --#{$prefix}header-nav-link-padding-x: #{$header-nav-link-padding-x},
-    --#{$prefix}header-nav-link-padding-y: #{$header-nav-link-padding-y},
-    --#{$prefix}header-divider-border-color: #{$header-divider-border-color},
-    --#{$prefix}header-divider-border: #{$header-divider-border-width} solid var(--#{$prefix}header-divider-border-color),
+    --#{$prefix}header-nav-link-padding-x: .5rem,
+    --#{$prefix}header-nav-link-padding-y: .5rem,
+    --#{$prefix}header-divider-border-color: var(--#{$prefix}border-color),
+    --#{$prefix}header-divider-border: var(--#{$prefix}border-width) solid var(--#{$prefix}header-divider-border-color),
   ),
   $header-tokens
 );
@@ -179,7 +154,6 @@ $header-tokens: defaults(
       position: absolute;
     }
   }
-
 
   // Header text
   //

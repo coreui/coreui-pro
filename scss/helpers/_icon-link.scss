@@ -3,15 +3,6 @@
 @use "../mixins/transition" as *;
 @use "../config" as *;
 
-
-// scss-docs-start icon-link-variables
-$icon-link-gap:               .375rem !default;
-$icon-link-underline-offset:  .25em !default;
-$icon-link-icon-size:         1em !default;
-$icon-link-icon-transition:   .2s ease-in-out transform !default;
-$icon-link-icon-transform:    translate3d(.25em, 0, 0) !default;
-// scss-docs-end icon-link-variables
-
 $icon-link-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
@@ -19,11 +10,11 @@ $icon-link-tokens: () !default;
 // scss-docs-start icon-link-css-vars
 $icon-link-tokens: defaults(
   (
-    --#{$prefix}icon-link-gap: #{$icon-link-gap},
-    --#{$prefix}icon-link-underline-offset: #{$icon-link-underline-offset},
-    --#{$prefix}icon-link-icon-size: #{$icon-link-icon-size},
-    --#{$prefix}icon-link-icon-transition: #{$icon-link-icon-transition},
-    --#{$prefix}icon-link-icon-transform: #{$icon-link-icon-transform},
+    --#{$prefix}icon-link-gap: .375rem,
+    --#{$prefix}icon-link-underline-offset: .25em,
+    --#{$prefix}icon-link-icon-size: 1em,
+    --#{$prefix}icon-link-icon-transition: .2s ease-in-out transform,
+    --#{$prefix}icon-link-icon-transform: translate3d(.25em, 0, 0),
   ),
   $icon-link-tokens
 );
