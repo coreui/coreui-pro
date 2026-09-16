@@ -1674,6 +1674,11 @@ adornment in the library — so the button needs no icon markup at all:
 
 #### Range / Range Slider
 
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **A Range Slider handle with no name of its own is no longer submitted.** An
+  array of names shorter than the handle count gave the leftover handles the
+  literal name `undefined`, so a form carried an `undefined=` key. Those handles
+  are unnamed now, as they already were in the React and Vue editions.
 - **The filled track, value tooltip and tick marks come from a `Range` plugin.**
   Wrap the input in `<div class="form-range">` and give the input
   `.form-range-input`; the plugin writes `--cui-range-fill` (`0`–`1`) on the
