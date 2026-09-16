@@ -5,6 +5,7 @@
 
 $reboot-tokens: () !default;
 $reboot-kbd-tokens: () !default;
+$reboot-mark-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
@@ -27,7 +28,6 @@ $reboot-tokens: defaults(
     --#{$prefix}legend-font-weight: inherit,
     --#{$prefix}list-padding-x: 2rem,
     --#{$prefix}dt-font-weight: var(--#{$prefix}font-weight-bold),
-    --#{$prefix}mark-padding: .1875em,
     --#{$prefix}initialism-font-size: var(--#{$prefix}small-font-size),
     --#{$prefix}code-font-size: var(--#{$prefix}small-font-size),
     --#{$prefix}pre-color: inherit,
@@ -49,6 +49,17 @@ $reboot-kbd-tokens: defaults(
   $reboot-kbd-tokens
 );
 // scss-docs-end kbd-css-vars
+
+// scss-docs-start mark-css-vars
+$reboot-mark-tokens: defaults(
+  (
+    --#{$prefix}mark-padding: .1875em,
+    --#{$prefix}mark-color: var(--#{$prefix}fg-body),
+    --#{$prefix}mark-bg: light-dark(oklch(96.883% .03443 84.93deg), oklch(43.897% .08952 84.93deg)),
+  ),
+  $reboot-mark-tokens
+);
+// scss-docs-end mark-css-vars
 
 // stylelint-enable scss/dollar-variable-default
 
@@ -276,6 +287,8 @@ $reboot-kbd-tokens: defaults(
 
   mark,
   .mark {
+    @include tokens($reboot-mark-tokens);
+
     padding: var(--#{$prefix}mark-padding);
     color: var(--#{$prefix}mark-color);
     background-color: var(--#{$prefix}mark-bg);

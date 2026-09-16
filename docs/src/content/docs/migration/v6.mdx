@@ -3832,6 +3832,11 @@ tintable and lets dark mode deepen every shadow at once.
   token map. `<th>` keeps the browser's own weight rather than a knob that
   emitted nothing, `<caption>` reads `--cui-spacer-2` and `--cui-fg-3`, and
   `code` reads `--cui-font-mono`.
+- **`mark` carries its own tokens.** `--cui-mark-padding`, `--cui-mark-color`
+  and `--cui-mark-bg` were declared on `:root`, where nothing else read them.
+  They sit on `mark, .mark` now, in a `$reboot-mark-tokens` map you can override
+  like any other component surface. Setting them on `:root` no longer reaches
+  the element; set them on the element, or on the map when you compile.
 - **What stays in `scss/_config.scss` stays for a reason.** `$spacer`,
   `$border-width`, `$theme-colors`, the `$enable-*` switches, the breakpoint,
   container and spacer maps and the contrast helpers feed maps, mixins, loops

@@ -41,8 +41,6 @@ $root-token-defaults: (
   --#{$prefix}font-mono: meta.inspect((SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace)),
   // scss-docs-end root-font-stacks
   --#{$prefix}code-color: light-dark(oklch(59.56% .20859 355.48deg), oklch(75.736% .12515 355.48deg)),
-  --#{$prefix}mark-color: var(--#{$prefix}fg-body),
-  --#{$prefix}mark-bg: light-dark(oklch(96.883% .03443 84.93deg), oklch(43.897% .08952 84.93deg)),
   // scss-docs-start root-border-var
   --#{$prefix}border-width: 1px,
   --#{$prefix}border-style: solid,
