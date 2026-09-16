@@ -4762,7 +4762,7 @@ describe('MultiSelect', () => {
       const multiSelect = new MultiSelect(selectEl, { options: [], search: true })
       const input = multiSelect._searchElement
 
-      expect(input.getAttribute('aria-label')).toBe('Search')
+      expect(input.getAttribute('aria-label')).toBe('Search options')
       expect(input.getAttribute('aria-autocomplete')).toBe('list')
       expect(input.getAttribute('aria-controls')).toBe('test-select-listbox')
     })
@@ -4870,7 +4870,7 @@ describe('MultiSelect', () => {
       expect(labelEl.hasAttribute('id')).toBeFalse()
     })
 
-    it('should name the search input, which is what the user reaches', () => {
+    it('should leave the search input named after what it does', () => {
       fixtureEl.innerHTML = [
         '<label for="test-select">Frameworks</label>',
         '<select id="test-select"></select>'
@@ -4878,7 +4878,8 @@ describe('MultiSelect', () => {
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, { options: [], search: true })
 
-      expect(multiSelect._searchElement.getAttribute('aria-labelledby')).toEqual('test-select-label')
+      expect(multiSelect._searchElement.hasAttribute('aria-labelledby')).toBeFalse()
+      expect(multiSelect._searchElement.getAttribute('aria-label')).toEqual('Search options')
     })
 
     it('should not throw on a host that is not a select', () => {

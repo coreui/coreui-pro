@@ -104,7 +104,7 @@ const Default = {
   allowList: DefaultAllowlist,
   ariaCleanerLabel: 'Clear all selections',
   ariaIndicatorLabel: 'Toggle visibility of options menu',
-  ariaSearchLabel: 'Search',
+  ariaSearchLabel: 'Search options',
   ariaTagDeleteLabel: 'Remove',
   cleaner: true,
   clearSearchOnSelect: false,
@@ -735,17 +735,12 @@ class MultiSelect extends BaseComponent {
   }
 
   _applyControlName({ label, labelledBy }) {
-    for (const element of [this._togglerElement, this._searchElement]) {
-      if (!element) {
-        continue
-      }
-
-      if (labelledBy) {
-        element.setAttribute('aria-labelledby', labelledBy)
-      } else {
-        element.setAttribute('aria-label', label)
-      }
+    if (labelledBy) {
+      this._togglerElement.setAttribute('aria-labelledby', labelledBy)
+      return
     }
+
+    this._togglerElement.setAttribute('aria-label', label)
   }
 
   _destroySelect() {
@@ -779,7 +774,7 @@ class MultiSelect extends BaseComponent {
       this._wrapperElement.remove()
     }
 
-    if (this._generatedLabelId && this._markupLabel) {
+    if (this._markupLabel && this._markupLabel.id === this._generatedLabelId) {
       this._markupLabel.removeAttribute('id')
       this._generatedLabelId = null
     }
