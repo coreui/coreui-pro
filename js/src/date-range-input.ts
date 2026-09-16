@@ -227,8 +227,10 @@ class DateRangeInput extends BaseComponent {
   protected declare _separatorElement: HTMLElement
   protected declare _created: { end: boolean, separator: boolean, start: boolean }
   protected declare _hostClasses: HostClasses
-  protected declare _markupInvalid: boolean
-  protected declare _markupValid: boolean
+  protected declare _claimedEndDate: Date | null
+  protected declare _claimedInvalid: boolean
+  protected declare _claimedStartDate: Date | null
+  protected declare _claimedValid: boolean
   protected declare _addedStateClassNames: Set<string>
   protected declare _initialStartDate: any
   protected declare _initialEndDate: any
@@ -241,8 +243,8 @@ class DateRangeInput extends BaseComponent {
 
     this._created = { end: false, separator: false, start: false }
     this._hostClasses = captureHostClasses(this._element, [...this._managedClassNames(), CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID])
-    this._markupInvalid = this._element.classList.contains(CLASS_NAME_IS_INVALID)
-    this._markupValid = this._element.classList.contains(CLASS_NAME_IS_VALID)
+    this._claimedInvalid = this._element.classList.contains(CLASS_NAME_IS_INVALID)
+    this._claimedValid = this._element.classList.contains(CLASS_NAME_IS_VALID)
     this._addedStateClassNames = new Set()
     this._initialStartDate = config?.startDate ?? this._config.startDate
     this._initialEndDate = config?.endDate ?? this._config.endDate
@@ -251,6 +253,8 @@ class DateRangeInput extends BaseComponent {
     this._createDateRangeInput()
     this._startDate = this._startInput.getDate()
     this._endDate = this._endInput.getDate()
+    this._claimedStartDate = this._startDate
+    this._claimedEndDate = this._endDate
     this._applyOrder()
     this._addEventListeners()
   }
@@ -347,6 +351,10 @@ class DateRangeInput extends BaseComponent {
   }
 
   // Private
+  _markupClaimApplies(): boolean {
+    return isSameDateAs(this._startDate, this._claimedStartDate) && isSameDateAs(this._endDate, this._claimedEndDate)
+  }
+
   _toggleStateClassName(className: string, on: boolean): void {
     if (on && !this._hostClasses.classNames.includes(className)) {
       this._addedStateClassNames.add(className)
@@ -464,11 +472,6 @@ class DateRangeInput extends BaseComponent {
     this._startDate = start
     this._endDate = end
 
-    if (startChanged || endChanged) {
-      this._markupInvalid = false
-      this._markupValid = false
-    }
-
     this._applyOrder()
 
     if (startChanged) {
@@ -487,8 +490,9 @@ class DateRangeInput extends BaseComponent {
   // An end before the start is a state of the range, not of either field, so
   // it lands on the frame — the fields keep what was typed and stay editable.
   _applyOrder(): void {
-    const isInvalid = this._markupInvalid || this._config.invalid || !this.isRangeValid()
-    const isValid = (this._markupValid || this._config.valid) && !isInvalid
+    const claimed = this._markupClaimApplies()
+    const isInvalid = (claimed && this._claimedInvalid) || this._config.invalid || !this.isRangeValid()
+    const isValid = ((claimed && this._claimedValid) || this._config.valid) && !isInvalid
 
     this._toggleStateClassName(CLASS_NAME_IS_INVALID, isInvalid)
     this._toggleStateClassName(CLASS_NAME_IS_VALID, isValid)

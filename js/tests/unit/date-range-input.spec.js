@@ -266,6 +266,63 @@ describe('DateRangeInput', () => {
       expect(() => range.dispose()).not.toThrow()
     })
 
+    it('should hold the markup claim while the range it judged stands, and take it back when it returns', () => {
+      const range = build({}, '<div id="range" class="is-invalid"></div>')
+      const element = root()
+
+      range.setRange(new Date(2026, 0, 1), new Date(2026, 0, 5))
+
+      expect(element.classList.contains('is-invalid')).toBeFalse()
+
+      range.setRange(null, null)
+
+      expect(element.classList.contains('is-invalid')).toBeTrue()
+    })
+
+    it('should give back a valid claim on reset', () => {
+      const range = build({}, '<div id="range" class="is-valid"></div>')
+      const element = root()
+
+      range.setRange(new Date(2026, 0, 5), new Date(2026, 0, 1))
+
+      expect(element.classList.contains('is-valid')).toBeFalse()
+
+      range.reset()
+
+      expect(element.classList.contains('is-valid')).toBeTrue()
+    })
+
+    it('should give back the claim through a native form reset too', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = '<form><div id="range" class="is-invalid"></div></form>'
+        const range = new DateRangeInput(root(), { format: 'dd.MM.yyyy', locale: 'en-US' })
+        instances.push(range)
+        const element = root()
+
+        range.setRange(new Date(2026, 0, 1), new Date(2026, 0, 5))
+
+        expect(element.classList.contains('is-invalid')).toBeFalse()
+
+        fixtureEl.querySelector('form').reset()
+
+        setTimeout(() => {
+          expect(element.classList.contains('is-invalid')).toBeTrue()
+          resolve()
+        }, 20)
+      })
+    })
+
+    it('should not invent a claim the markup never made', () => {
+      const range = build({ startDate: new Date(2026, 0, 1), endDate: new Date(2026, 0, 5) })
+      const element = root()
+
+      range.setRange(new Date(2026, 1, 1), new Date(2026, 1, 5))
+      range.reset()
+
+      expect(element.classList.contains('is-invalid')).toBeFalse()
+      expect(element.classList.contains('is-valid')).toBeFalse()
+    })
+
     it('should put the invalid option on the frame, not only on the fields', () => {
       build({ invalid: true })
 

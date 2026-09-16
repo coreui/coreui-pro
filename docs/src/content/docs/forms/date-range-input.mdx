@@ -138,6 +138,7 @@ The field participates in the standard form validation styling. Four mechanisms 
 - **Order (automatic)** — an end before the start is a state of the range, not of either date, so `.is-invalid` lands on the frame and both fields stay editable. `isRangeValid()` reports it.
 - **Range validation (automatic)** — a completed date outside `minDate`/`maxDate`/`disabledDates` gets `.is-invalid` on its own field, which the frame picks up.
 - **The `valid`/`invalid` options** — force the state on both ends, e.g. after server-side validation.
+- **A state class in the markup** — `.is-invalid` or `.is-valid` written on the frame judges the range the markup rendered, so the component keeps it while that range stands, drops it as soon as either end moves, and brings it back if the range returns, whether through `reset()`, a native form reset, or the user typing its way back.
 - **Form submit** — each end renders a hidden input, which is excluded from native constraint validation, so the component applies the state itself when a form with the `data-coreui-validate` attribute is submitted: a `required` empty end becomes `.is-invalid`, and a filled one becomes `.is-valid` when the form opts into success styling with `data-coreui-validate="valid"`.
 
 Sibling `.valid-feedback`/`.invalid-feedback` elements work as with any other form control. The error shows when the frame is invalid and when a field inside it is, which is where the state of a single date lands; the success message waits until nothing is invalid.
@@ -309,7 +310,7 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | `getStartDate` | Return the start date, or `null` when that end is incomplete or invalid |
 | `isDateSelectable` | Whether a date passes the shared limits |
 | `isRangeValid` | `false` while the end is before the start |
-| `reset` | Restore the dates the component was created with, emitting the change events when a value moves. A native form reset does the same. |
+| `reset` | Restore the dates the component was created with, emitting the change events when a value moves. A state class the markup carried comes back with them, since it judged exactly that range. A native form reset does the same. |
 | `setRange` | Set both ends: `setRange(start, end)`. Each end validates its own date, so what the range keeps is what the fields kept. |
 
 ```javascript
