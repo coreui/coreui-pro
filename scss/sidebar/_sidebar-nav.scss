@@ -7,13 +7,7 @@
 @use "sidebar" as *;
 
 // scss-docs-start sidebar-nav-variables
-$sidebar-nav-link-color:                      var(--#{$prefix}fg-body) !default;
-
 $sidebar-compact-nav-link-padding-y:          .5625rem !default;
-
-$sidebar-nav-link-icon-height:                1.25rem !default;
-
-$sidebar-nav-link-hover-color:                        var(--#{$prefix}fg-body) !default;
 
 $sidebar-nav-group-indicator-icon:            url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708'/></svg>") !default;
 $sidebar-nav-group-indicator-hover-icon:      $sidebar-nav-group-indicator-icon !default;
@@ -37,7 +31,7 @@ $sidebar-nav-tokens: defaults(
     --#{$prefix}sidebar-nav-title-transition: #{height .15s, margin .15s},
     --#{$prefix}sidebar-nav-link-padding-x: 1rem,
     --#{$prefix}sidebar-nav-link-padding-y: .75rem,
-    --#{$prefix}sidebar-nav-link-color: #{$sidebar-nav-link-color},
+    --#{$prefix}sidebar-nav-link-color: var(--#{$prefix}fg-body),
     --#{$prefix}sidebar-nav-link-bg: transparent,
     --#{$prefix}sidebar-nav-link-border-color: transparent,
     --#{$prefix}sidebar-nav-link-border-radius: var(--#{$prefix}radius-4),
@@ -46,13 +40,13 @@ $sidebar-nav-tokens: defaults(
     --#{$prefix}sidebar-nav-link-active-color: var(--#{$prefix}fg-body),
     --#{$prefix}sidebar-nav-link-active-bg: color-mix(in oklch, var(--#{$prefix}fg-body) 10%, transparent),
     --#{$prefix}sidebar-nav-link-disabled-color: var(--#{$prefix}fg-3),
-    --#{$prefix}sidebar-nav-link-hover-color: #{$sidebar-nav-link-hover-color},
+    --#{$prefix}sidebar-nav-link-hover-color: var(--#{$prefix}fg-body),
     --#{$prefix}sidebar-nav-link-hover-bg: color-mix(in oklch, var(--#{$prefix}fg-body) 10%, transparent),
     --#{$prefix}sidebar-nav-link-icon-margin: .75rem,
     --#{$prefix}sidebar-nav-link-icon-color: var(--#{$prefix}fg-3),
     --#{$prefix}sidebar-nav-link-icon-width: 1.25rem,
-    --#{$prefix}sidebar-nav-link-icon-height: #{$sidebar-nav-link-icon-height},
-    --#{$prefix}sidebar-nav-link-icon-font-size: #{$sidebar-nav-link-icon-height},
+    --#{$prefix}sidebar-nav-link-icon-height: 1.25rem,
+    --#{$prefix}sidebar-nav-link-icon-font-size: 1.25rem,
     --#{$prefix}sidebar-nav-link-active-icon-color: var(--#{$prefix}fg-body),
     --#{$prefix}sidebar-nav-link-disabled-icon-color: var(--#{$prefix}fg-3),
     --#{$prefix}sidebar-nav-link-hover-icon-color: var(--#{$prefix}fg-body),
@@ -80,10 +74,10 @@ $sidebar-nav-tokens: defaults(
     --#{$prefix}sidebar-nav-group-indicator-size: 12px,
     --#{$prefix}sidebar-nav-group-indicator-color: var(--#{$prefix}fg-3),
     --#{$prefix}sidebar-nav-group-indicator-icon: #{escape-svg($sidebar-nav-group-indicator-icon)},
-    --#{$prefix}sidebar-nav-group-indicator-hover-color: #{$sidebar-nav-link-hover-color},
+    --#{$prefix}sidebar-nav-group-indicator-hover-color: var(--#{$prefix}fg-body),
     --#{$prefix}sidebar-nav-group-indicator-hover-icon: #{escape-svg($sidebar-nav-group-indicator-hover-icon)},
     --#{$prefix}sidebar-nav-group-indicator-transition: transform .15s,
-    --#{$prefix}sidebar-nav-group-toggle-show-color: #{$sidebar-nav-link-color},
+    --#{$prefix}sidebar-nav-group-toggle-show-color: var(--#{$prefix}fg-body),
   ),
   $sidebar-nav-tokens
 );

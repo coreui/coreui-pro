@@ -25,8 +25,6 @@ $modal-content-box-shadow-sm-up:    var(--#{$prefix}box-shadow) !default;
 $modal-backdrop-bg:                 var(--#{$prefix}black) !default;
 $modal-backdrop-opacity:            .5 !default;
 
-$modal-header-border-color:         var(--#{$prefix}border-color) !default;
-$modal-header-border-width:         $modal-content-border-width !default;
 $modal-header-padding-y:            $modal-inner-padding !default;
 $modal-header-padding-x:            $modal-inner-padding !default;
 
@@ -77,13 +75,13 @@ $modal-tokens: defaults(
     --#{$prefix}modal-header-padding-x: #{$modal-header-padding-x},
     --#{$prefix}modal-header-padding-y: #{$modal-header-padding-y},
     --#{$prefix}modal-header-padding: #{$modal-header-padding-y $modal-header-padding-x},
-    --#{$prefix}modal-header-border-color: #{$modal-header-border-color},
-    --#{$prefix}modal-header-border-width: #{$modal-header-border-width},
+    --#{$prefix}modal-header-border-color: var(--#{$prefix}border-color),
+    --#{$prefix}modal-header-border-width: #{$modal-content-border-width},
     --#{$prefix}modal-title-line-height: #{$modal-title-line-height},
     --#{$prefix}modal-footer-gap: .5rem,
     --#{$prefix}modal-footer-bg: #{null},
-    --#{$prefix}modal-footer-border-color: #{$modal-header-border-color},
-    --#{$prefix}modal-footer-border-width: #{$modal-header-border-width},
+    --#{$prefix}modal-footer-border-color: var(--#{$prefix}border-color),
+    --#{$prefix}modal-footer-border-width: #{$modal-content-border-width},
   ),
   $modal-tokens
 );

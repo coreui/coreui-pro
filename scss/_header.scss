@@ -13,7 +13,6 @@
 $header-brand-font-size:        var(--#{$prefix}font-size-lg) !default;
 
 // Compute the header-brand padding-y so the header-brand will have the same height as header-text and nav-link
-$header-brand-height:           calc(#{$header-brand-font-size} * var(--#{$prefix}body-line-height)) !default;
 $header-brand-margin-end:       1rem !default;
 
 $header-toggler-font-size:      var(--#{$prefix}font-size-lg) !default;
@@ -38,7 +37,7 @@ $header-tokens: defaults(
     --#{$prefix}header-disabled-color: color-mix(in oklch, var(--#{$prefix}emphasis-color) 30%, transparent),
     --#{$prefix}header-active-color: color-mix(in oklch, var(--#{$prefix}emphasis-color) 100%, transparent),
     --#{$prefix}header-transition: box-shadow .15s ease-in-out,
-    --#{$prefix}header-brand-padding-y: calc((#{$nav-link-height} - #{$header-brand-height}) * .5),
+    --#{$prefix}header-brand-padding-y: calc((#{$nav-link-height} - calc(#{$header-brand-font-size} * var(--#{$prefix}body-line-height))) * .5),
     --#{$prefix}header-brand-color: var(--#{$prefix}fg-body),
     --#{$prefix}header-brand-hover-color: var(--#{$prefix}fg-1),
     --#{$prefix}header-toggler-padding-x: .75rem,

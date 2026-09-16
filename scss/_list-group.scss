@@ -6,11 +6,6 @@
 @use "config" as *;
 
 // List group
-// scss-docs-start list-group-variables
-$list-group-bg:                     var(--#{$prefix}bg-body) !default;
-
-$list-group-active-bg:              var(--#{$prefix}primary-bg) !default;
-// scss-docs-end list-group-variables
 
 $list-group-tokens: () !default;
 
@@ -20,7 +15,7 @@ $list-group-tokens: () !default;
 $list-group-tokens: defaults(
   (
     --#{$prefix}list-group-color: var(--#{$prefix}fg-body),
-    --#{$prefix}list-group-bg: #{$list-group-bg},
+    --#{$prefix}list-group-bg: var(--#{$prefix}bg-body),
     --#{$prefix}list-group-border-color: var(--#{$prefix}border-color),
     --#{$prefix}list-group-border-width: var(--#{$prefix}border-width),
     --#{$prefix}list-group-border-radius: var(--#{$prefix}radius-5),
@@ -32,10 +27,10 @@ $list-group-tokens: defaults(
     --#{$prefix}list-group-action-active-color: var(--#{$prefix}fg-body),
     --#{$prefix}list-group-action-active-bg: var(--#{$prefix}bg-2),
     --#{$prefix}list-group-disabled-color: var(--#{$prefix}fg-3),
-    --#{$prefix}list-group-disabled-bg: #{$list-group-bg},
+    --#{$prefix}list-group-disabled-bg: var(--#{$prefix}bg-body),
     --#{$prefix}list-group-active-color: var(--#{$prefix}primary-contrast),
-    --#{$prefix}list-group-active-bg: #{$list-group-active-bg},
-    --#{$prefix}list-group-active-border-color: #{$list-group-active-bg},
+    --#{$prefix}list-group-active-bg: var(--#{$prefix}primary-bg),
+    --#{$prefix}list-group-active-border-color: var(--#{$prefix}primary-bg),
   ),
   $list-group-tokens
 );

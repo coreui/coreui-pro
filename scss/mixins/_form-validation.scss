@@ -7,10 +7,6 @@
 // See https://github.com/sass/sass/issues/1873#issuecomment-152293725 for more details
 
 // scss-docs-start form-feedback-variables
-$form-feedback-margin-top:          .25rem !default;
-$form-feedback-font-size:           var(--#{$prefix}small-font-size) !default;
-$form-feedback-font-style:          null !default;
-
 $form-feedback-icon-valid-color:    $success !default;
 $form-feedback-icon-valid:          url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'><path fill='#{$form-feedback-icon-valid-color}' d='M2.3 6.73.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1'/></svg>") !default;
 $form-feedback-icon-invalid-color:  $danger !default;
@@ -43,9 +39,9 @@ $input-height-inner-quarter:            calc(var(--#{$prefix}btn-input-line-heig
 $form-feedback-tokens: () !default;
 $form-feedback-tokens: defaults(
   (
-    --#{$prefix}form-feedback-margin-top: #{$form-feedback-margin-top},
-    --#{$prefix}form-feedback-font-size: #{$form-feedback-font-size},
-    --#{$prefix}form-feedback-font-style: #{$form-feedback-font-style},
+    --#{$prefix}form-feedback-margin-top: .25rem,
+    --#{$prefix}form-feedback-font-size: var(--#{$prefix}small-font-size),
+    --#{$prefix}form-feedback-font-style: #{null},
     --#{$prefix}form-feedback-tooltip-padding-y: var(--#{$prefix}spacer-1),
     --#{$prefix}form-feedback-tooltip-padding-x: var(--#{$prefix}spacer-2),
     --#{$prefix}form-feedback-tooltip-font-size: var(--#{$prefix}font-size-sm),

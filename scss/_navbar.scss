@@ -19,15 +19,9 @@ $navbar-padding-x:                  null !default;
 $navbar-brand-font-size:            var(--#{$prefix}font-size-lg) !default;
 // Compute the navbar-brand padding-y so the navbar-brand will have the same height as navbar-text and nav-link
 $nav-link-height:                   calc(var(--#{$prefix}body-font-size) * var(--#{$prefix}body-line-height) + #{$nav-link-padding-y} * 2) !default;
-$navbar-brand-height:               calc(#{$navbar-brand-font-size} * var(--#{$prefix}body-line-height)) !default;
 
-$navbar-light-active-color:         color-mix(in oklch, var(--#{$prefix}emphasis-color) 100%, transparent) !default;
 $navbar-toggler-icon:               url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='black' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>") !default;
 // scss-docs-end navbar-variables
-
-// scss-docs-start navbar-dark-variables
-$navbar-dark-active-color:          var(--#{$prefix}white) !default;
-// scss-docs-end navbar-dark-variables
 
 $navbar-tokens: () !default;
 
@@ -43,13 +37,13 @@ $navbar-tokens: defaults(
     --#{$prefix}navbar-color: color-mix(in oklch, var(--#{$prefix}emphasis-color) 65%, transparent),
     --#{$prefix}navbar-hover-color: color-mix(in oklch, var(--#{$prefix}emphasis-color) 80%, transparent),
     --#{$prefix}navbar-disabled-color: color-mix(in oklch, var(--#{$prefix}emphasis-color) 30%, transparent),
-    --#{$prefix}navbar-active-color: #{$navbar-light-active-color},
-    --#{$prefix}navbar-brand-padding-y: calc((#{$nav-link-height} - #{$navbar-brand-height}) * .5),
+    --#{$prefix}navbar-active-color: color-mix(in oklch, var(--#{$prefix}emphasis-color) 100%, transparent),
+    --#{$prefix}navbar-brand-padding-y: calc((#{$nav-link-height} - calc(#{$navbar-brand-font-size} * var(--#{$prefix}body-line-height))) * .5),
     --#{$prefix}navbar-brand-margin-end: 1rem,
     --#{$prefix}navbar-brand-font-size: #{$navbar-brand-font-size},
     --#{$prefix}navbar-brand-font-weight: var(--#{$prefix}font-weight-medium),
-    --#{$prefix}navbar-brand-color: #{$navbar-light-active-color},
-    --#{$prefix}navbar-brand-hover-color: #{$navbar-light-active-color},
+    --#{$prefix}navbar-brand-color: color-mix(in oklch, var(--#{$prefix}emphasis-color) 100%, transparent),
+    --#{$prefix}navbar-brand-hover-color: color-mix(in oklch, var(--#{$prefix}emphasis-color) 100%, transparent),
     --#{$prefix}navbar-nav-link-padding-x: .5rem,
     --#{$prefix}navbar-text-padding-y: #{$nav-link-padding-y},
     --#{$prefix}navbar-toggler-padding-y: .25rem,
@@ -104,9 +98,9 @@ $navbar-dark-tokens: defaults(
     --#{$prefix}navbar-color: #{rgba($white, .55)},
     --#{$prefix}navbar-hover-color: color-mix(in oklch, var(--#{$prefix}white) 75%, transparent),
     --#{$prefix}navbar-disabled-color: color-mix(in oklch, var(--#{$prefix}white) 25%, transparent),
-    --#{$prefix}navbar-active-color: #{$navbar-dark-active-color},
-    --#{$prefix}navbar-brand-color: #{$navbar-dark-active-color},
-    --#{$prefix}navbar-brand-hover-color: #{$navbar-dark-active-color},
+    --#{$prefix}navbar-active-color: var(--#{$prefix}white),
+    --#{$prefix}navbar-brand-color: var(--#{$prefix}white),
+    --#{$prefix}navbar-brand-hover-color: var(--#{$prefix}white),
     --#{$prefix}navbar-toggler-border-color: color-mix(in oklch, var(--#{$prefix}white) 10%, transparent),
   ),
   $navbar-dark-tokens

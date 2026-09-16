@@ -9,8 +9,6 @@
 // scss-docs-start chip-variables
 $chip-gap:                   .3125rem !default;
 
-$chip-color:                 var(--#{$prefix}fg-body) !default;
-
 $chip-font-size-sm:          .75rem !default;
 $chip-height-sm:             1.5rem !default;
 $chip-padding-x-sm:          .625rem !default;
@@ -50,14 +48,14 @@ $chip-tokens: defaults(
     --#{$prefix}chip-disabled-opacity: .65,
     --#{$prefix}chip-active-opacity: .9,
     --#{$prefix}chip-transition: #{background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out, color .15s ease-in-out},
-    --#{$prefix}chip-color: var(--#{$prefix}theme-fg-emphasis, #{$chip-color}),
+    --#{$prefix}chip-color: var(--#{$prefix}theme-fg-emphasis, var(--#{$prefix}fg-body)),
     --#{$prefix}chip-bg: var(--#{$prefix}theme-bg-subtle, var(--#{$prefix}bg-2)),
     --#{$prefix}chip-border-width: var(--#{$prefix}border-width),
     --#{$prefix}chip-border-color: transparent,
     --#{$prefix}chip-active-color: var(--#{$prefix}theme-contrast, var(--#{$prefix}primary-contrast)),
     --#{$prefix}chip-active-bg: var(--#{$prefix}theme-bg, var(--#{$prefix}primary-base)),
     --#{$prefix}chip-active-border-color: transparent,
-    --#{$prefix}chip-hover-color: var(--#{$prefix}theme-fg-emphasis, #{$chip-color}),
+    --#{$prefix}chip-hover-color: var(--#{$prefix}theme-fg-emphasis, var(--#{$prefix}fg-body)),
     --#{$prefix}chip-hover-bg: var(--#{$prefix}theme-bg-muted, var(--#{$prefix}bg-3)),
     --#{$prefix}chip-hover-border-color: transparent,
   ),
@@ -78,7 +76,7 @@ $chip-outline-tokens: defaults(
     --#{$prefix}chip-bg: transparent,
     --#{$prefix}chip-border-color: var(--#{$prefix}theme-bg, var(--#{$prefix}border-color)),
     --#{$prefix}chip-hover-bg: var(--#{$prefix}theme-bg-subtle, var(--#{$prefix}bg-3)),
-    --#{$prefix}chip-hover-color: var(--#{$prefix}theme-fg-emphasis, #{$chip-color}),
+    --#{$prefix}chip-hover-color: var(--#{$prefix}theme-fg-emphasis, var(--#{$prefix}fg-body)),
     --#{$prefix}chip-hover-border-color: var(--#{$prefix}theme-bg, var(--#{$prefix}border-color)),
     --#{$prefix}chip-active-bg: var(--#{$prefix}theme-bg, var(--#{$prefix}primary-base)),
     --#{$prefix}chip-active-color: var(--#{$prefix}theme-contrast, var(--#{$prefix}primary-contrast)),

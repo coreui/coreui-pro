@@ -4,9 +4,6 @@
 @use "config" as *;
 
 // Callouts
-// scss-docs-start callout-variables
-$callout-border-width:              var(--#{$prefix}border-width) !default;
-// scss-docs-end callout-variables
 
 $callout-tokens: () !default;
 
@@ -19,9 +16,9 @@ $callout-tokens: defaults(
     --#{$prefix}callout-padding-y: var(--#{$prefix}spacer),
     --#{$prefix}callout-margin-x: 0,
     --#{$prefix}callout-margin-y: var(--#{$prefix}spacer),
-    --#{$prefix}callout-border-width: #{$callout-border-width},
+    --#{$prefix}callout-border-width: var(--#{$prefix}border-width),
     --#{$prefix}callout-border-color: var(--#{$prefix}theme-border, var(--#{$prefix}border-color)),
-    --#{$prefix}callout-border-left-width: calc(#{$callout-border-width} * 4),
+    --#{$prefix}callout-border-left-width: calc(var(--#{$prefix}border-width) * 4),
     --#{$prefix}callout-border-left-color: var(--#{$prefix}theme-bg, var(--#{$prefix}callout-border-color)),
     --#{$prefix}callout-border-radius: var(--#{$prefix}radius-5),
   ),

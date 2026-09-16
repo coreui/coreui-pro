@@ -6,11 +6,6 @@
 @use "mixins/translucent" as *;
 @use "config" as *;
 
-// scss-docs-start card-variables
-$card-spacer-y:                     var(--#{$prefix}spacer) !default;
-$card-spacer-x:                     var(--#{$prefix}spacer) !default;
-// scss-docs-end card-variables
-
 // scss-docs-start card-translucent-variables
 $card-translucent-cap-bg-opacity:   60% !default;
 // scss-docs-end card-translucent-variables
@@ -22,9 +17,9 @@ $card-tokens: () !default;
 // scss-docs-start card-css-vars
 $card-tokens: defaults(
   (
-    --#{$prefix}card-spacer-y: #{$card-spacer-y},
-    --#{$prefix}card-spacer-x: #{$card-spacer-x},
-    --#{$prefix}card-body-gap: calc(#{$card-spacer-y} * .5),
+    --#{$prefix}card-spacer-y: var(--#{$prefix}spacer),
+    --#{$prefix}card-spacer-x: var(--#{$prefix}spacer),
+    --#{$prefix}card-body-gap: calc(var(--#{$prefix}spacer) * .5),
     --#{$prefix}card-title-color: inherit,
     --#{$prefix}card-subtitle-color: inherit,
     --#{$prefix}card-border-width: var(--#{$prefix}border-width),
@@ -32,8 +27,8 @@ $card-tokens: defaults(
     --#{$prefix}card-border-radius: var(--#{$prefix}radius-8),
     --#{$prefix}card-box-shadow: none,
     --#{$prefix}card-inner-border-radius: calc(var(--#{$prefix}card-border-radius) - var(--#{$prefix}card-border-width)),
-    --#{$prefix}card-cap-padding-y: calc(#{$card-spacer-y} * .5),
-    --#{$prefix}card-cap-padding-x: #{$card-spacer-x},
+    --#{$prefix}card-cap-padding-y: calc(var(--#{$prefix}spacer) * .5),
+    --#{$prefix}card-cap-padding-x: var(--#{$prefix}spacer),
     --#{$prefix}card-cap-bg: var(--#{$prefix}bg-1),
     --#{$prefix}card-cap-color: inherit,
     --#{$prefix}card-height: auto,

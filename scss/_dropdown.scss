@@ -8,21 +8,8 @@
 @use "config" as *;
 
 // scss-docs-start dropdown-variables
-$dropdown-padding-y:                .5rem !default;
 $dropdown-border-color:             var(--#{$prefix}border-color-translucent) !default;
-$dropdown-divider-bg:               $dropdown-border-color !default;
-
-$dropdown-link-color:               var(--#{$prefix}fg-body) !default;
-
-$dropdown-link-active-color:        var(--#{$prefix}primary-contrast) !default;
-$dropdown-link-active-bg:           var(--#{$prefix}primary-base) !default;
-
-$dropdown-item-padding-x:           var(--#{$prefix}spacer) !default;
 // scss-docs-end dropdown-variables
-
-// scss-docs-start dropdown-dark-variables
-$dropdown-dark-color:               var(--#{$prefix}gray-300) !default;
-// scss-docs-end dropdown-dark-variables
 
 $dropdown-tokens: () !default;
 
@@ -34,7 +21,7 @@ $dropdown-tokens: defaults(
     --#{$prefix}dropdown-zindex: var(--#{$prefix}z-dropdown),
     --#{$prefix}dropdown-min-width: 10rem,
     --#{$prefix}dropdown-padding-x: 0,
-    --#{$prefix}dropdown-padding-y: #{$dropdown-padding-y},
+    --#{$prefix}dropdown-padding-y: .5rem,
     --#{$prefix}dropdown-spacer: .125rem,
     --#{$prefix}dropdown-font-size: var(--#{$prefix}body-font-size),
     --#{$prefix}dropdown-color: var(--#{$prefix}fg-body),
@@ -42,21 +29,21 @@ $dropdown-tokens: defaults(
     --#{$prefix}dropdown-border-color: #{$dropdown-border-color},
     --#{$prefix}dropdown-border-radius: var(--#{$prefix}radius-7),
     --#{$prefix}dropdown-border-width: var(--#{$prefix}border-width),
-    --#{$prefix}dropdown-divider-bg: #{$dropdown-divider-bg},
+    --#{$prefix}dropdown-divider-bg: #{$dropdown-border-color},
     --#{$prefix}dropdown-divider-margin-y: var(--#{$prefix}spacer-2),
     --#{$prefix}dropdown-box-shadow: var(--#{$prefix}box-shadow),
-    --#{$prefix}dropdown-link-color: #{$dropdown-link-color},
-    --#{$prefix}dropdown-link-hover-color: #{$dropdown-link-color},
+    --#{$prefix}dropdown-link-color: var(--#{$prefix}fg-body),
+    --#{$prefix}dropdown-link-hover-color: var(--#{$prefix}fg-body),
     --#{$prefix}dropdown-link-hover-bg: var(--#{$prefix}bg-1),
-    --#{$prefix}dropdown-link-active-color: #{$dropdown-link-active-color},
-    --#{$prefix}dropdown-link-active-bg: #{$dropdown-link-active-bg},
+    --#{$prefix}dropdown-link-active-color: var(--#{$prefix}primary-contrast),
+    --#{$prefix}dropdown-link-active-bg: var(--#{$prefix}primary-base),
     --#{$prefix}dropdown-link-disabled-color: var(--#{$prefix}fg-3),
-    --#{$prefix}dropdown-item-padding-x: #{$dropdown-item-padding-x},
+    --#{$prefix}dropdown-item-padding-x: var(--#{$prefix}spacer),
     --#{$prefix}dropdown-item-border-radius: 0,
     --#{$prefix}dropdown-item-padding-y: var(--#{$prefix}spacer-1),
     --#{$prefix}dropdown-header-color: var(--#{$prefix}fg-3),
-    --#{$prefix}dropdown-header-padding-x: #{$dropdown-item-padding-x},
-    --#{$prefix}dropdown-header-padding-y: #{$dropdown-padding-y},
+    --#{$prefix}dropdown-header-padding-x: var(--#{$prefix}spacer),
+    --#{$prefix}dropdown-header-padding-y: .5rem,
   ),
   $dropdown-tokens
 );
@@ -71,16 +58,16 @@ $dropdown-dark-tokens: () !default;
 // scss-docs-start dropdown-dark-css-vars
 $dropdown-dark-tokens: defaults(
   (
-    --#{$prefix}dropdown-color: #{$dropdown-dark-color},
+    --#{$prefix}dropdown-color: var(--#{$prefix}gray-300),
     --#{$prefix}dropdown-bg: var(--#{$prefix}gray-800),
     --#{$prefix}dropdown-border-color: #{$dropdown-border-color},
     --#{$prefix}dropdown-box-shadow: #{null},
-    --#{$prefix}dropdown-link-color: #{$dropdown-dark-color},
+    --#{$prefix}dropdown-link-color: var(--#{$prefix}gray-300),
     --#{$prefix}dropdown-link-hover-color: var(--#{$prefix}white),
-    --#{$prefix}dropdown-divider-bg: #{$dropdown-divider-bg},
+    --#{$prefix}dropdown-divider-bg: #{$dropdown-border-color},
     --#{$prefix}dropdown-link-hover-bg: color-mix(in oklch, var(--#{$prefix}white) 15%, transparent),
-    --#{$prefix}dropdown-link-active-color: #{$dropdown-link-active-color},
-    --#{$prefix}dropdown-link-active-bg: #{$dropdown-link-active-bg},
+    --#{$prefix}dropdown-link-active-color: var(--#{$prefix}primary-contrast),
+    --#{$prefix}dropdown-link-active-bg: var(--#{$prefix}primary-base),
     --#{$prefix}dropdown-link-disabled-color: var(--#{$prefix}gray-500),
     --#{$prefix}dropdown-header-color: var(--#{$prefix}gray-500),
   ),

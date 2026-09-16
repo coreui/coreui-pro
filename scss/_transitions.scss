@@ -3,12 +3,6 @@
 @use "mixins/transition" as *;
 @use "config" as *;
 
-// scss-docs-start collapse-transition
-$transition-collapse-property: "block-size, display" !default;
-$transition-collapse-duration: .35s !default;
-$transition-collapse-timing:   ease !default;
-// scss-docs-end collapse-transition
-
 $fade-tokens: () !default;
 $collapse-tokens: () !default;
 
@@ -31,9 +25,9 @@ $fade-tokens: defaults(
 // scss-docs-start collapse-css-vars
 $collapse-tokens: defaults(
   (
-    --#{$prefix}transition-collapse-property: #{$transition-collapse-property},
-    --#{$prefix}transition-collapse-duration: #{$transition-collapse-duration},
-    --#{$prefix}transition-collapse-timing: #{$transition-collapse-timing},
+    --#{$prefix}transition-collapse-property: #{"block-size, display"},
+    --#{$prefix}transition-collapse-duration: .35s,
+    --#{$prefix}transition-collapse-timing: ease,
   ),
   $collapse-tokens
 );

@@ -3,29 +3,6 @@
 @use "../mixins/tokens" as *;
 @use "../config" as *;
 
-// scss-docs-start reboot-type-variables
-$paragraph-margin-bottom:     var(--#{$prefix}spacer) !default;
-$font-family-code:            var(--#{$prefix}font-mono) !default;
-$headings-margin-bottom:      var(--#{$prefix}spacer-2) !default;
-$headings-font-family:        inherit !default;
-$headings-font-style:         inherit !default;
-$headings-font-weight:        var(--#{$prefix}font-weight-medium) !default;
-$sub-sup-font-size:           .75em !default;
-$hr-margin-y:                 var(--#{$prefix}spacer) !default;
-$hr-color:                    inherit !default;
-$hr-border-width:             var(--#{$prefix}border-width) !default;
-$hr-opacity:                  .25 !default;
-$legend-margin-bottom:        var(--#{$prefix}spacer-2) !default;
-$legend-font-size:            clamp(1.275rem, 1.275rem + .3vw, 1.5rem) !default;
-$legend-font-weight:          inherit !default;
-$list-padding-x:              2rem !default;
-$dt-font-weight:              var(--#{$prefix}font-weight-bold) !default;
-$mark-padding:                .1875em !default;
-$initialism-font-size:        var(--#{$prefix}small-font-size) !default;
-$code-font-size:              var(--#{$prefix}small-font-size) !default;
-$pre-color:                   inherit !default;
-// scss-docs-end reboot-type-variables
-
 $reboot-tokens: () !default;
 $reboot-kbd-tokens: () !default;
 
@@ -34,26 +11,26 @@ $reboot-kbd-tokens: () !default;
 // scss-docs-start reboot-css-vars
 $reboot-tokens: defaults(
   (
-    --#{$prefix}paragraph-margin-bottom: #{$paragraph-margin-bottom},
-    --#{$prefix}heading-margin-bottom: #{$headings-margin-bottom},
-    --#{$prefix}heading-font-family: #{$headings-font-family},
-    --#{$prefix}heading-font-style: #{$headings-font-style},
-    --#{$prefix}heading-font-weight: #{$headings-font-weight},
+    --#{$prefix}paragraph-margin-bottom: var(--#{$prefix}spacer),
+    --#{$prefix}heading-margin-bottom: var(--#{$prefix}spacer-2),
+    --#{$prefix}heading-font-family: inherit,
+    --#{$prefix}heading-font-style: inherit,
+    --#{$prefix}heading-font-weight: var(--#{$prefix}font-weight-medium),
     --#{$prefix}heading-line-height: 1.2,
-    --#{$prefix}sub-sup-font-size: #{$sub-sup-font-size},
-    --#{$prefix}hr-margin-y: #{$hr-margin-y},
-    --#{$prefix}hr-color: #{$hr-color},
-    --#{$prefix}hr-border-width: #{$hr-border-width},
-    --#{$prefix}hr-opacity: #{$hr-opacity},
-    --#{$prefix}legend-margin-bottom: #{$legend-margin-bottom},
-    --#{$prefix}legend-font-size: #{$legend-font-size},
-    --#{$prefix}legend-font-weight: #{$legend-font-weight},
-    --#{$prefix}list-padding-x: #{$list-padding-x},
-    --#{$prefix}dt-font-weight: #{$dt-font-weight},
-    --#{$prefix}mark-padding: #{$mark-padding},
-    --#{$prefix}initialism-font-size: #{$initialism-font-size},
-    --#{$prefix}code-font-size: #{$code-font-size},
-    --#{$prefix}pre-color: #{$pre-color},
+    --#{$prefix}sub-sup-font-size: .75em,
+    --#{$prefix}hr-margin-y: var(--#{$prefix}spacer),
+    --#{$prefix}hr-color: inherit,
+    --#{$prefix}hr-border-width: var(--#{$prefix}border-width),
+    --#{$prefix}hr-opacity: .25,
+    --#{$prefix}legend-margin-bottom: var(--#{$prefix}spacer-2),
+    --#{$prefix}legend-font-size: clamp(1.275rem, 1.275rem + .3vw, 1.5rem),
+    --#{$prefix}legend-font-weight: inherit,
+    --#{$prefix}list-padding-x: 2rem,
+    --#{$prefix}dt-font-weight: var(--#{$prefix}font-weight-bold),
+    --#{$prefix}mark-padding: .1875em,
+    --#{$prefix}initialism-font-size: var(--#{$prefix}small-font-size),
+    --#{$prefix}code-font-size: var(--#{$prefix}small-font-size),
+    --#{$prefix}pre-color: inherit,
   ),
   $reboot-tokens
 );
@@ -64,7 +41,7 @@ $reboot-kbd-tokens: defaults(
   (
     --#{$prefix}kbd-padding-y: .1875rem,
     --#{$prefix}kbd-padding-x: .375rem,
-    --#{$prefix}kbd-font-size: #{$code-font-size},
+    --#{$prefix}kbd-font-size: var(--#{$prefix}small-font-size),
     --#{$prefix}kbd-color: var(--#{$prefix}bg-body),
     --#{$prefix}kbd-bg: var(--#{$prefix}fg-2),
     --#{$prefix}kbd-border-radius: var(--#{$prefix}radius-3),
@@ -79,9 +56,6 @@ $reboot-kbd-tokens: defaults(
 // Reboot styles the raw HTML elements, so it owns these rather than borrowing
 // from the .table component's variables — that coupling is what kept the table
 // block pinned in _variables.scss.
-$caption-padding-y:    .5rem !default;
-$caption-color:        var(--#{$prefix}fg-3) !default;
-$th-font-weight:       null !default;
 // scss-docs-end reboot-table-variables
 
 @layer reboot {
@@ -355,7 +329,7 @@ $th-font-weight:       null !default;
   code,
   kbd,
   samp {
-    font-family: $font-family-code;
+    font-family: var(--#{$prefix}font-mono);
     font-size: 1em; // Correct the odd `em` font sizing in all browsers.
   }
 
@@ -432,19 +406,17 @@ $th-font-weight:       null !default;
   }
 
   caption {
-    padding-block: $caption-padding-y;
-    color: $caption-color;
+    padding-block: var(--#{$prefix}spacer-2);
+    color: var(--#{$prefix}fg-3);
     text-align: start;
   }
 
-  // 1. Removes font-weight bold by inheriting
-  // 2. Matches default `<td>` alignment by inheriting `text-align`.
-  // 3. Fix alignment for Safari
+  // 1. Matches default `<td>` alignment by inheriting `text-align`.
+  // 2. Fix alignment for Safari
 
   th {
-    font-weight: $th-font-weight; // 1
-    text-align: inherit; // 2
-    text-align: -webkit-match-parent; // 3
+    text-align: inherit; // 1
+    text-align: -webkit-match-parent; // 2
   }
 
   thead,

@@ -2,14 +2,6 @@
 @use "../mixins/tokens" as *;
 @use "../config" as *;
 
-// scss-docs-start form-label-variables
-$form-label-margin-bottom:              .5rem !default;
-$form-label-font-size:                  null !default;
-$form-label-font-style:                 null !default;
-$form-label-font-weight:                var(--#{$prefix}font-weight-medium) !default;
-$form-label-color:                      var(--#{$prefix}fg-body) !default;
-// scss-docs-end form-label-variables
-
 $form-label-tokens: () !default;
 
 // stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
@@ -17,11 +9,11 @@ $form-label-tokens: () !default;
 // scss-docs-start form-label-tokens
 $form-label-tokens: defaults(
   (
-    --#{$prefix}label-margin-bottom: $form-label-margin-bottom,
-    --#{$prefix}label-font-size: $form-label-font-size,
-    --#{$prefix}label-font-style: $form-label-font-style,
-    --#{$prefix}label-font-weight: $form-label-font-weight,
-    --#{$prefix}label-color: $form-label-color,
+    --#{$prefix}label-margin-bottom: .5rem,
+    --#{$prefix}label-font-size: null,
+    --#{$prefix}label-font-style: null,
+    --#{$prefix}label-font-weight: var(--#{$prefix}font-weight-medium),
+    --#{$prefix}label-color: var(--#{$prefix}fg-body),
   ),
   $form-label-tokens
 );

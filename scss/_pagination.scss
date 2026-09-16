@@ -7,8 +7,6 @@
 @use "config" as *;
 
 // scss-docs-start pagination-variables
-$pagination-active-bg:              var(--#{$prefix}primary-bg) !default;
-
 $pagination-transition:             color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out !default;
 // scss-docs-end pagination-variables
 
@@ -34,8 +32,8 @@ $pagination-tokens: defaults(
     --#{$prefix}pagination-focus-color: var(--#{$prefix}link-hover-color),
     --#{$prefix}pagination-focus-bg: var(--#{$prefix}bg-1),
     --#{$prefix}pagination-active-color: var(--#{$prefix}primary-contrast),
-    --#{$prefix}pagination-active-bg: #{$pagination-active-bg},
-    --#{$prefix}pagination-active-border-color: #{$pagination-active-bg},
+    --#{$prefix}pagination-active-bg: var(--#{$prefix}primary-bg),
+    --#{$prefix}pagination-active-border-color: var(--#{$prefix}primary-bg),
     --#{$prefix}pagination-disabled-color: var(--#{$prefix}fg-3),
     --#{$prefix}pagination-disabled-bg: var(--#{$prefix}bg-2),
     --#{$prefix}pagination-disabled-border-color: var(--#{$prefix}border-color),

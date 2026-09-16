@@ -7,8 +7,6 @@
 @use "../theme" as *;
 
 // scss-docs-start btn-variables
-$btn-white-space:             nowrap !default; // Set to `normal` to let button text wrap
-
 $btn-color:                   var(--#{$prefix}fg-body) !default;
 $btn-bg:                      var(--#{$prefix}bg-2) !default;
 $btn-hover-bg:                var(--#{$prefix}bg-3) !default;
@@ -41,7 +39,7 @@ $button-tokens: defaults(
     --#{$prefix}btn-font-size: var(--#{$prefix}btn-input-font-size),
     --#{$prefix}btn-font-weight: var(--#{$prefix}font-weight-normal),
     --#{$prefix}btn-line-height: var(--#{$prefix}btn-input-line-height),
-    --#{$prefix}btn-white-space: $btn-white-space,
+    --#{$prefix}btn-white-space: nowrap,
     --#{$prefix}btn-color: #{$btn-color},
     --#{$prefix}btn-bg: #{$btn-bg},
     --#{$prefix}btn-border-width: var(--#{$prefix}btn-input-border-width),

@@ -2246,10 +2246,8 @@ has moved leaves the sheet out and carries no `.form-check*` selector at all.
 The v5 spelling — `.btn-check` on the `<input>`, with a sibling `<label
 class="btn">` — is in `coreui-legacy.css` alongside the rest.
 
-The variables that shape the wrapper moved with it, into `scss/_legacy.scss`,
-and go when it does:
-
-<ScssDocs file="scss/_legacy.scss" capture="form-check-wrapper-variables" />
+The wrapper it draws is styled from `scss/_legacy.scss` and goes when the
+layer does.
 
 **Five Sass variables shaped the old artwork and cannot be honoured any more**,
 because the compatibility layer draws through the new engine:
@@ -3826,6 +3824,14 @@ tintable and lets dark mode deepen every shadow at once.
   same way, to `--cui-border-width` and `--cui-border-color`; the width scale and the `.border-{key}` classes
   read the token, not the variable. `$blue` and `$pink` are finally gone from
   the source, which is what the palette entry above already said.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The reboot declares no variables of its own**, and 89 more scalars go with
+  the same rule across the content partials, the legacy layer, the form label,
+  text and file blocks, the callout, card, list group, dropdown and navbar dark
+  blocks and the password strength meter. Each was a value on its way into a
+  token map. `<th>` keeps the browser's own weight rather than a knob that
+  emitted nothing, `<caption>` reads `--cui-spacer-2` and `--cui-fg-3`, and
+  `code` reads `--cui-font-mono`.
 - **What stays in `scss/_config.scss` stays for a reason.** `$spacer`,
   `$border-width`, `$theme-colors`, the `$enable-*` switches, the breakpoint,
   container and spacer maps and the contrast helpers feed maps, mixins, loops

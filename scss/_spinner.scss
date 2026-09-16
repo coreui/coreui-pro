@@ -5,7 +5,6 @@
 // stylelint-disable custom-property-no-missing-var-function
 
 // scss-docs-start spinner-variables
-$spinner-width:                            1em !default;
 $spinner-animation-speed:                  1s !default;
 $spinner-animation-timing-function:        linear !default;
 
@@ -22,8 +21,8 @@ $spinner-border-tokens: () !default;
 // scss-docs-start spinner-border-css-vars
 $spinner-border-tokens: defaults(
   (
-    --#{$prefix}spinner-width: #{$spinner-width},
-    --#{$prefix}spinner-height: #{$spinner-width},
+    --#{$prefix}spinner-width: 1em,
+    --#{$prefix}spinner-height: 1em,
     --#{$prefix}spinner-border-width: .125em,
     --#{$prefix}spinner-animation-speed: #{$spinner-animation-speed},
     --#{$prefix}spinner-animation-timing-function: #{$spinner-animation-timing-function},
@@ -42,8 +41,8 @@ $spinner-grow-tokens: () !default;
 // scss-docs-start spinner-grow-css-vars
 $spinner-grow-tokens: defaults(
   (
-    --#{$prefix}spinner-width: #{$spinner-width},
-    --#{$prefix}spinner-height: #{$spinner-width},
+    --#{$prefix}spinner-width: 1em,
+    --#{$prefix}spinner-height: 1em,
     --#{$prefix}spinner-animation-speed: #{$spinner-animation-speed},
     --#{$prefix}spinner-animation-timing-function: ease-in-out,
     --#{$prefix}spinner-animation-name: spinner-grow,
