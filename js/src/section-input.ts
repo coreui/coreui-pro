@@ -52,6 +52,16 @@ const CLASS_NAME_SECTION = 'form-date-time-section'
 const CLASS_NAME_SECTION_EMPTY = 'form-date-time-section-empty'
 const CLASS_NAME_SEPARATOR = 'form-date-time-separator'
 
+const HOST_CLASS_NAMES = new Set([
+  CLASS_NAME_ALL_SELECTED,
+  CLASS_NAME_DISABLED,
+  CLASS_NAME_FILLED,
+  CLASS_NAME_FORM_CONTROL,
+  CLASS_NAME_IS_INVALID,
+  CLASS_NAME_IS_VALID,
+  CLASS_NAME_SECTION_INPUT
+])
+
 const SELECTOR_FORM_VALIDATE = '[data-coreui-validate]'
 const SELECTOR_FORM_VALIDATE_VALID = '[data-coreui-validate~="valid"]'
 const SELECTOR_SECTION = '.form-date-time-section'
@@ -194,6 +204,10 @@ class SectionInput extends BaseComponent {
   protected declare _draft: any
   protected declare _allSelected: any
   protected declare _error: any
+  protected declare _hostAriaLabel: string | null
+  protected declare _hostClass: string | null
+  protected declare _hostNodes: ChildNode[]
+  protected declare _hostRole: string | null
   protected declare _inputElement: any
   protected declare _monthFormatter: any
   protected declare _form: HTMLFormElement | null
@@ -218,11 +232,19 @@ class SectionInput extends BaseComponent {
     this._monthFormatter = new Intl.DateTimeFormat(this._config.locale, { month: 'long' })
     this._form = null
     this._resetHandler = () => {
-      setTimeout(() => this.reset())
+      setTimeout(() => {
+        if (this._element) {
+          this.reset()
+        }
+      })
     }
 
     this._submitHandler = () => this._onFormSubmit()
     this._submitValid = false
+    this._hostAriaLabel = this._element.getAttribute('aria-label')
+    this._hostClass = this._element.getAttribute('class')
+    this._hostNodes = [...this._element.childNodes]
+    this._hostRole = this._element.getAttribute('role')
 
     this._createSectionInput()
     this._date = this._applyValidationState()
@@ -303,9 +325,24 @@ class SectionInput extends BaseComponent {
   }
 
   override dispose(): void {
+    if (!this._element) {
+      return
+    }
+
     EventHandler.off(this._form, this.constructor.eventName('reset'), this._resetHandler)
     EventHandler.off(this._form, this.constructor.eventName('submit'), this._submitHandler)
-    this._inputElement?.remove()
+    const hostClassNames = new Set((this._hostClass ?? '').split(/\s+/).filter(Boolean))
+    const otherClassNames = [...this._element.classList].filter(className => !HOST_CLASS_NAMES.has(className) && !hostClassNames.has(className))
+
+    this._restoreAttribute('class', this._hostClass)
+
+    if (otherClassNames.length > 0) {
+      this._element.classList.add(...otherClassNames)
+    }
+
+    this._restoreAttribute('aria-label', this._hostAriaLabel)
+    this._restoreAttribute('role', this._hostRole)
+    this._element.replaceChildren(...this._hostNodes)
     super.dispose()
   }
 
@@ -439,7 +476,7 @@ class SectionInput extends BaseComponent {
     // during the same submit is taken into account regardless of
     // listener order.
     queueMicrotask(() => {
-      if (!form.matches(SELECTOR_FORM_VALIDATE)) {
+      if (!this._element || !form.matches(SELECTOR_FORM_VALIDATE)) {
         return
       }
 
@@ -722,6 +759,15 @@ class SectionInput extends BaseComponent {
     }
 
     return date.getTime() === date2.getTime()
+  }
+
+  _restoreAttribute(name: string, value: string | null): void {
+    if (value === null) {
+      this._element.removeAttribute(name)
+      return
+    }
+
+    this._element.setAttribute(name, value)
   }
 
   _createSectionInput(): void {
