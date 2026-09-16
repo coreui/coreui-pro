@@ -297,7 +297,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `indicator` | boolean | `false` | Enables the selection indicator button. |
 | `invalid` | boolean | `false` | Applies invalid styling to the component. |
 | `name` | string, null | `null` | Sets the name attribute for the input element. Without it the field is not submitted with the form. |
-| `options` | array, string, null | `[]` | Array of options or option objects to populate the dropdown. An option object takes `label`, `value`, `disabled` and `selected`, and a group takes `label` plus a nested `options` array. A string is read as a comma-separated list of labels, which is what `data-coreui-options="Angular, React, Vue.js"` relies on. |
+| `options` | array, string, null | `[]` | Array of options or option objects to populate the dropdown. An option object takes `label`, `value`, `disabled` and `selected`, and a group takes `label`, `disabled` and a nested `options` array; a disabled group disables everything inside it. A string is read as a comma-separated list of labels, which is what `data-coreui-options="Angular, React, Vue.js"` relies on. |
 | `optionsGroupsTemplate` | function, null | `null` | Custom template function for rendering option group labels. Receives the group object as parameter. |
 | `optionsMaxHeight` | number, string | `'auto'` | Sets the maximum height of the options dropdown. |
 | `optionsTemplate` | function, null | `null` | Custom template function for rendering individual options. Receives the option object as parameter. |
