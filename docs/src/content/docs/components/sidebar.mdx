@@ -322,7 +322,20 @@ The default width is `--cui-sidebar-width`. Add `.sidebar-sm`, `.sidebar-lg` or 
 
 Use `.sidebar-nav` as the main navigation container inside a sidebar. It supports plain links, section titles, nested groups, tree navigation, and custom group indicators.
 
-Add `data-coreui-navigation` when you want CoreUI to handle expandable groups automatically.
+Add `data-coreui-navigation` when you want CoreUI to handle expandable groups automatically. It marks the link matching the current address as active, opens every group that holds it, and closes the other groups as one is opened.
+
+### Navigation options
+
+The plugin takes its options from data attributes on the same element, converting the name from "_camelCase_" to "_kebab-case_": `data-coreui-active-links-exact="false"`.
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `activeLinksExact` | boolean | `true` | Mark a link active only when its `href` is the whole current address. The address is read without its query string and hash, so `/settings?tab=2` still matches `href="/settings"`; the `href` itself is compared as written, so one carrying a query string of its own never matches. Set it to `false` to mark a link active on its sub-routes too, which is a prefix match: `href="/settings"` then stays active on `/settings/profile`. |
+| `groupsAutoCollapse` | boolean | `true` | Close the other groups when one opens. Only the literal `true` does so: any other value, including a string, leaves the open ones open. |
+
+```html
+<ul class="sidebar-nav" data-coreui-navigation data-coreui-active-links-exact="false">
+```
 
 ### Basic navigation
 
