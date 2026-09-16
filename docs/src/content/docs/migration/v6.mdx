@@ -3778,19 +3778,38 @@ tintable and lets dark mode deepen every shadow at once.
   ```
 
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
-  **879 component Sass variables are gone, across 63 partials.** Every scalar
-  whose only job was carrying a value into its component's map now sits in the
-  map, so a value has one home instead of two. Set the token instead of the
-  variable — `$popover-tokens: (--cui-popover-bg: hotpink)` at build time, or
+  **941 Sass variables are gone, across 64 partials.** Every scalar whose only
+  job was carrying a value into a token map now sits in the map, so a value has
+  one home instead of two. Set the token instead of the variable —
+  `$popover-tokens: (--cui-popover-bg: hotpink)` at build time, or
   `--cui-popover-bg` on the element at runtime. The compiled CSS is unchanged
   byte for byte, so this reaches you only if your build set one of the removed
   variables, and Sass then names it: `This variable was not declared with
   !default in the @used module.` Each component page says which variables it
   still has: 31 lost their `### Sass variables` section entirely.
-- **The global knobs stay**, and so does every component variable a rule or a
-  mixin still reads. `$spacer`, `$border-width`, `$font-family-sans-serif`, the
-  breakpoint and container maps and the rest of `scss/_config.scss` and
-  `scss/_root.scss` are untouched.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`scss/_root.scss` declares no variables of its own any more** — 62 went,
+  leaving only `$root-tokens` for overriding the map. The page-wide knobs that
+  lived there are now the tokens they always emitted: `$input-btn-*` →
+  `--cui-btn-input-*`, `$control-*` → `--cui-control-*`, `$focus-ring-*` →
+  `--cui-focus-ring-*`, `$backdrop-*` → `--cui-backdrop-*`,
+  `$font-family-sans-serif` → `--cui-font-sans-serif`, `$line-height-base` →
+  `--cui-body-line-height`. Override them through `$root-tokens` when you
+  compile, or on `:root` at runtime:
+
+  ```scss
+  @use "@coreui/coreui-pro/scss/coreui" with (
+    $root-tokens: (
+      --cui-body-line-height: 1.6,
+      --cui-btn-input-padding-y: .5rem,
+    )
+  );
+  ```
+- **`scss/_config.scss` is untouched.** `$spacer`, `$border-width`,
+  `$theme-colors`, the breakpoint, container and spacer maps and everything
+  else there feed maps, mixins and loops across the library rather than a single
+  token, so they stay Sass. So does every component variable a rule or a mixin
+  still reads.
 - **Component Sass variables moved from `_config.scss` into their component
   partials.** `@use ... with()` is unaffected — the entry point forwards every
   module — but if you imported `scss/_config.scss` directly for its

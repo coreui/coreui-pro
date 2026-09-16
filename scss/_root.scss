@@ -8,109 +8,6 @@
 @use "layers";
 @use "theme" as *;
 
-// scss-docs-start control-state-variables
-$control-size:                                  1em !default;
-$control-checked-bg:                            var(--#{$prefix}primary-base) !default;
-$control-checked-border-color:                  $control-checked-bg !default;
-$control-indeterminate-bg:                      var(--#{$prefix}primary-base) !default;
-$control-indeterminate-border-color:            $control-indeterminate-bg !default;
-$control-focus-border:                          var(--#{$prefix}btn-input-focus-border-color) !default;
-$control-active-filter:                         brightness(90%) !default;
-$control-disabled-opacity:                      .5 !default;
-$control-label-disabled-opacity:                $control-disabled-opacity !default;
-// scss-docs-end control-state-variables
-
-$body-emphasis-color: light-dark($black, $white) !default;
-$link-hover-color:    color-mix(in oklch, var(--#{$prefix}link-color) 90%, var(--#{$prefix}black)) !default;
-
-// scss-docs-start border-variables
-$border-color-translucent: color-mix(in oklch, var(--#{$prefix}fg-body) 15%, transparent) !default;
-// scss-docs-end border-variables
-
-// scss-docs-start box-shadow-variables
-$shadow-color:         #000 !default;
-$shadow-strength:      1 !default;
-$shadow-strength-dark: 2.4 !default;
-// scss-docs-end box-shadow-variables
-
-// scss-docs-start transition-variables
-$transition-timing-overlay: cubic-bezier(.22, 1, .36, 1) !default;
-// scss-docs-end transition-variables
-
-// scss-docs-start focus-ring-variables
-$focus-ring-width:            .25rem !default;
-$focus-ring-opacity:          .25 !default;
-$focus-ring-color:            var(--#{$prefix}primary-focus-ring) !default;
-$focus-ring-offset:           0 !default;
-// scss-docs-end focus-ring-variables
-
-// scss-docs-start backdrop-variables
-$backdrop-color:              var(--#{$prefix}black) !default;
-$backdrop-opacity:            50% !default;
-$backdrop-opacity-dark:       65% !default;
-$backdrop-blur:               8px !default;
-// scss-docs-end backdrop-variables
-
-// scss-docs-start translucent-variables
-$translucent-opacity:         80% !default;
-$translucent-backdrop-filter: blur(5px) saturate(180%) !default;
-// scss-docs-end translucent-variables
-// scss-docs-start focus-ring-variables
-// scss-docs-end focus-ring-variables
-
-// scss-docs-start font-variables
-// stylelint-disable value-keyword-case
-$font-family-sans-serif: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !default;
-$font-family-monospace:  SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !default;
-// stylelint-enable value-keyword-case
-// scss-docs-end font-variables
-
-// scss-docs-start type-variables
-$mark-color: var(--#{$prefix}fg-body) !default;
-$mark-bg:    light-dark(oklch(96.883% .03443 84.93deg), oklch(43.897% .08952 84.93deg)) !default;
-// scss-docs-end type-variables
-
-$icon-size-base: 1rem !default;
-
-$hr-border-color:             var(--#{$prefix}border-color) !default;
-$line-height-base:            1.5 !default;
-$small-font-size:             .875em !default;
-$font-weight-base:            var(--#{$prefix}font-weight-normal) !default;
-
-// scss-docs-start input-btn-variables
-$input-btn-gap:                        .375rem !default;
-$input-btn-padding-y:                  .375rem !default;
-$input-btn-padding-x:                  .75rem !default;
-$input-btn-font-size:                  var(--#{$prefix}body-font-size) !default;
-$input-btn-line-height:                var(--#{$prefix}body-line-height) !default;
-$input-btn-border-width:               var(--#{$prefix}border-width) !default;
-$input-btn-transition-duration:        .15s !default;
-$input-btn-transition-timing:          ease-in-out !default;
-$input-btn-transition-property:        "border-color, box-shadow" !default;
-$input-btn-action-transition-property: "color, background-color, border-color, box-shadow" !default;
-$input-btn-disabled-opacity:           .65 !default;
-
-$input-btn-gap-xs:            .25rem !default;
-$input-btn-padding-y-xs:      .125rem !default;
-$input-btn-padding-x-xs:      .5rem !default;
-$input-btn-font-size-xs:      var(--#{$prefix}font-size-xs) !default;
-$input-btn-line-height-xs:    1.125 !default;
-
-$input-btn-gap-sm:            .375rem !default;
-$input-btn-padding-y-sm:      .25rem !default;
-$input-btn-padding-x-sm:      .5rem !default;
-$input-btn-font-size-sm:      var(--#{$prefix}font-size-sm) !default;
-$input-btn-line-height-sm:    var(--#{$prefix}line-height-sm) !default;
-
-$input-btn-gap-lg:            .375rem !default;
-$input-btn-padding-y-lg:      .5rem !default;
-$input-btn-padding-x-lg:      1rem !default;
-$input-btn-font-size-lg:      var(--#{$prefix}font-size-lg) !default;
-$input-btn-line-height-lg:    var(--#{$prefix}line-height-md) !default;
-// scss-docs-end input-btn-variables
-
-$code-color: light-dark(oklch(59.56% .20859 355.48deg), oklch(75.736% .12515 355.48deg)) !default;
-
 // `config` is reserved and empty, matching upstream's declaration: a slot below
 // `root` for a configuration sheet of your own. `custom` is the same idea
 // between components and helpers.
@@ -184,18 +81,18 @@ $root-token-defaults: map.merge(
   (
     --#{$prefix}black: $black,
     --#{$prefix}white: $white,
-    --#{$prefix}font-sans-serif: meta.inspect($font-family-sans-serif),
-    --#{$prefix}font-mono: meta.inspect($font-family-monospace),
+    --#{$prefix}font-sans-serif: meta.inspect((system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji")),
+    --#{$prefix}font-mono: meta.inspect((SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace)),
     --#{$prefix}gradient: $gradient,
     // scss-docs-start root-body-variables
     --#{$prefix}root-font-size: $font-size-root,
     --#{$prefix}body-font-family: meta.inspect($font-family-base),
     --#{$prefix}body-font-size: $font-size-base,
-    --#{$prefix}small-font-size: $small-font-size,
-    --#{$prefix}hr-border-color: $hr-border-color,
-    --#{$prefix}icon-size-base: $icon-size-base,
-    --#{$prefix}body-font-weight: $font-weight-base,
-    --#{$prefix}body-line-height: $line-height-base,
+    --#{$prefix}small-font-size: .875em,
+    --#{$prefix}hr-border-color: var(--#{$prefix}border-color),
+    --#{$prefix}icon-size-base: 1rem,
+    --#{$prefix}body-font-weight: var(--#{$prefix}font-weight-normal),
+    --#{$prefix}body-line-height: 1.5,
     // Deprecated in v6.0.0 aliases of the ladder above; removed in v7, when the
     // secondary/tertiary namespace goes back to the theme colors alone.
     --#{$prefix}body-color: var(--#{$prefix}fg-body),
@@ -203,35 +100,35 @@ $root-token-defaults: map.merge(
     --#{$prefix}secondary-color: var(--#{$prefix}fg-2),
     --#{$prefix}tertiary-color: var(--#{$prefix}fg-3),
     --#{$prefix}tertiary-bg: var(--#{$prefix}bg-2),
-    --#{$prefix}emphasis-color: $body-emphasis-color,
+    --#{$prefix}emphasis-color: light-dark($black, $white),
     // scss-docs-end root-body-variables
     --#{$prefix}heading-color: $headings-color,
     --#{$prefix}link-color: $link-color,
     --#{$prefix}link-decoration: underline,
     --#{$prefix}link-underline-offset: .2em,
-    --#{$prefix}link-hover-color: $link-hover-color,
-    --#{$prefix}code-color: $code-color,
-    --#{$prefix}mark-color: $mark-color,
-    --#{$prefix}mark-bg: $mark-bg,
+    --#{$prefix}link-hover-color: color-mix(in oklch, var(--#{$prefix}link-color) 90%, var(--#{$prefix}black)),
+    --#{$prefix}code-color: light-dark(oklch(59.56% .20859 355.48deg), oklch(75.736% .12515 355.48deg)),
+    --#{$prefix}mark-color: var(--#{$prefix}fg-body),
+    --#{$prefix}mark-bg: light-dark(oklch(96.883% .03443 84.93deg), oklch(43.897% .08952 84.93deg)),
     // scss-docs-start root-border-var
     --#{$prefix}border-width: $border-width,
     --#{$prefix}border-style: $border-style,
     --#{$prefix}border-color: $border-color,
-    --#{$prefix}border-color-translucent: $border-color-translucent,
+    --#{$prefix}border-color-translucent: color-mix(in oklch, var(--#{$prefix}fg-body) 15%, transparent),
     // scss-docs-end root-border-var
-    --#{$prefix}shadow-color: $shadow-color,
-    --#{$prefix}shadow-strength: $shadow-strength,
+    --#{$prefix}shadow-color: #000,
+    --#{$prefix}shadow-strength: 1,
     // scss-docs-start root-transition-variables
     // Easing shared by the components that float above the page — dialog,
     // drawer, menu and popup. One override restyles all four.
-    --#{$prefix}transition-timing-overlay: $transition-timing-overlay,
+    --#{$prefix}transition-timing-overlay: cubic-bezier(.22, 1, .36, 1),
     // scss-docs-end root-transition-variables
     // Focus styles
     // scss-docs-start root-focus-variables
-    --#{$prefix}focus-ring-width: $focus-ring-width,
-    --#{$prefix}focus-ring-opacity: $focus-ring-opacity,
-    --#{$prefix}focus-ring-color: $focus-ring-color,
-    --#{$prefix}focus-ring-offset: $focus-ring-offset,
+    --#{$prefix}focus-ring-width: .25rem,
+    --#{$prefix}focus-ring-opacity: .25,
+    --#{$prefix}focus-ring-color: var(--#{$prefix}primary-focus-ring),
+    --#{$prefix}focus-ring-offset: 0,
     --#{$prefix}focus-ring: var(--#{$prefix}focus-ring-width) solid var(--#{$prefix}focus-ring-color),
     // scss-docs-end root-focus-variables
     // scss-docs-start root-theme-state-variables
@@ -241,28 +138,28 @@ $root-token-defaults: map.merge(
     --#{$prefix}theme-active-chroma: $theme-active-chroma,
     // scss-docs-end root-theme-state-variables
     // scss-docs-start root-backdrop-variables
-    --#{$prefix}backdrop-color: $backdrop-color,
-    --#{$prefix}backdrop-opacity: $backdrop-opacity,
-    --#{$prefix}backdrop-blur: $backdrop-blur,
+    --#{$prefix}backdrop-color: var(--#{$prefix}black),
+    --#{$prefix}backdrop-opacity: 50%,
+    --#{$prefix}backdrop-blur: 8px,
     // scss-docs-end root-backdrop-variables
     // scss-docs-start root-translucent-variables
-    --#{$prefix}translucent-opacity: $translucent-opacity,
-    --#{$prefix}translucent-backdrop-filter: $translucent-backdrop-filter,
+    --#{$prefix}translucent-opacity: 80%,
+    --#{$prefix}translucent-backdrop-filter: blur(5px) saturate(180%),
     // scss-docs-end root-translucent-variables
     // scss-docs-start root-btn-input-variables
     // Sizing shared by buttons and form controls, so neither has to reach for
     // the other's Sass variables to line up.
-    --#{$prefix}btn-input-gap: $input-btn-gap,
-    --#{$prefix}btn-input-padding-y: $input-btn-padding-y,
-    --#{$prefix}btn-input-padding-x: $input-btn-padding-x,
-    --#{$prefix}btn-input-font-size: $input-btn-font-size,
-    --#{$prefix}btn-input-line-height: $input-btn-line-height,
-    --#{$prefix}btn-input-border-width: $input-btn-border-width,
-    --#{$prefix}btn-input-transition-duration: $input-btn-transition-duration,
-    --#{$prefix}btn-input-transition-timing: $input-btn-transition-timing,
-    --#{$prefix}btn-input-transition-property: $input-btn-transition-property,
-    --#{$prefix}btn-input-action-transition-property: $input-btn-action-transition-property,
-    --#{$prefix}btn-input-disabled-opacity: $input-btn-disabled-opacity,
+    --#{$prefix}btn-input-gap: .375rem,
+    --#{$prefix}btn-input-padding-y: .375rem,
+    --#{$prefix}btn-input-padding-x: .75rem,
+    --#{$prefix}btn-input-font-size: var(--#{$prefix}body-font-size),
+    --#{$prefix}btn-input-line-height: var(--#{$prefix}body-line-height),
+    --#{$prefix}btn-input-border-width: var(--#{$prefix}border-width),
+    --#{$prefix}btn-input-transition-duration: .15s,
+    --#{$prefix}btn-input-transition-timing: ease-in-out,
+    --#{$prefix}btn-input-transition-property: "border-color, box-shadow",
+    --#{$prefix}btn-input-action-transition-property: "color, background-color, border-color, box-shadow",
+    --#{$prefix}btn-input-disabled-opacity: .65,
     --#{$prefix}btn-input-fg: var(--#{$prefix}fg-body),
     --#{$prefix}btn-input-bg: var(--#{$prefix}bg-body),
     --#{$prefix}btn-input-font-weight: var(--#{$prefix}body-font-weight),
@@ -273,25 +170,25 @@ $root-token-defaults: map.merge(
     --#{$prefix}btn-input-focus-bg: var(--#{$prefix}btn-input-bg),
     --#{$prefix}btn-input-focus-border-color: color-mix(in oklch, var(--#{$prefix}primary-base) 50%, var(--#{$prefix}bg-body)),
     --#{$prefix}btn-input-min-height: calc(var(--#{$prefix}btn-input-line-height) * 1em + var(--#{$prefix}btn-input-padding-y) * 2 + var(--#{$prefix}btn-input-border-width) * 2),
-    --#{$prefix}btn-input-xs-gap: $input-btn-gap-xs,
-    --#{$prefix}btn-input-xs-padding-y: $input-btn-padding-y-xs,
-    --#{$prefix}btn-input-xs-padding-x: $input-btn-padding-x-xs,
-    --#{$prefix}btn-input-xs-font-size: $input-btn-font-size-xs,
-    --#{$prefix}btn-input-xs-line-height: $input-btn-line-height-xs,
+    --#{$prefix}btn-input-xs-gap: .25rem,
+    --#{$prefix}btn-input-xs-padding-y: .125rem,
+    --#{$prefix}btn-input-xs-padding-x: .5rem,
+    --#{$prefix}btn-input-xs-font-size: var(--#{$prefix}font-size-xs),
+    --#{$prefix}btn-input-xs-line-height: 1.125,
     --#{$prefix}btn-input-xs-border-radius: var(--#{$prefix}radius-5),
     --#{$prefix}btn-input-xs-min-height: calc(var(--#{$prefix}btn-input-xs-line-height) * 1em + var(--#{$prefix}btn-input-xs-padding-y) * 2 + var(--#{$prefix}btn-input-border-width) * 2),
-    --#{$prefix}btn-input-sm-gap: $input-btn-gap-sm,
-    --#{$prefix}btn-input-sm-padding-y: $input-btn-padding-y-sm,
-    --#{$prefix}btn-input-sm-padding-x: $input-btn-padding-x-sm,
-    --#{$prefix}btn-input-sm-font-size: $input-btn-font-size-sm,
-    --#{$prefix}btn-input-sm-line-height: $input-btn-line-height-sm,
+    --#{$prefix}btn-input-sm-gap: .375rem,
+    --#{$prefix}btn-input-sm-padding-y: .25rem,
+    --#{$prefix}btn-input-sm-padding-x: .5rem,
+    --#{$prefix}btn-input-sm-font-size: var(--#{$prefix}font-size-sm),
+    --#{$prefix}btn-input-sm-line-height: var(--#{$prefix}line-height-sm),
     --#{$prefix}btn-input-sm-border-radius: var(--#{$prefix}radius-5),
     --#{$prefix}btn-input-sm-min-height: calc(var(--#{$prefix}btn-input-sm-line-height) * 1em + var(--#{$prefix}btn-input-sm-padding-y) * 2 + var(--#{$prefix}btn-input-border-width) * 2),
-    --#{$prefix}btn-input-lg-gap: $input-btn-gap-lg,
-    --#{$prefix}btn-input-lg-padding-y: $input-btn-padding-y-lg,
-    --#{$prefix}btn-input-lg-padding-x: $input-btn-padding-x-lg,
-    --#{$prefix}btn-input-lg-font-size: $input-btn-font-size-lg,
-    --#{$prefix}btn-input-lg-line-height: $input-btn-line-height-lg,
+    --#{$prefix}btn-input-lg-gap: .375rem,
+    --#{$prefix}btn-input-lg-padding-y: .5rem,
+    --#{$prefix}btn-input-lg-padding-x: 1rem,
+    --#{$prefix}btn-input-lg-font-size: var(--#{$prefix}font-size-lg),
+    --#{$prefix}btn-input-lg-line-height: var(--#{$prefix}line-height-md),
     --#{$prefix}btn-input-lg-border-radius: var(--#{$prefix}radius-7),
     --#{$prefix}btn-input-lg-min-height: calc(var(--#{$prefix}btn-input-lg-line-height) * 1em + var(--#{$prefix}btn-input-lg-padding-y) * 2 + var(--#{$prefix}btn-input-border-width) * 2),
     // scss-docs-end root-btn-input-variables
@@ -299,16 +196,16 @@ $root-token-defaults: map.merge(
     // State colors shared by every control that can be checked or selected —
     // checkboxes, radios, switches, and the option indicators the autocomplete
     // and multi select draw. Restyle them here once.
-    --#{$prefix}control-checked-bg: $control-checked-bg,
-    --#{$prefix}control-checked-border-color: $control-checked-border-color,
-    --#{$prefix}control-indeterminate-bg: $control-indeterminate-bg,
-    --#{$prefix}control-indeterminate-border-color: $control-indeterminate-border-color,
+    --#{$prefix}control-checked-bg: var(--#{$prefix}primary-base),
+    --#{$prefix}control-checked-border-color: var(--#{$prefix}primary-base),
+    --#{$prefix}control-indeterminate-bg: var(--#{$prefix}primary-base),
+    --#{$prefix}control-indeterminate-border-color: var(--#{$prefix}primary-base),
     --#{$prefix}control-disabled-bg: var(--#{$prefix}bg-3),
-    --#{$prefix}control-disabled-opacity: $control-disabled-opacity,
-    --#{$prefix}control-label-disabled-opacity: $control-label-disabled-opacity,
-    --#{$prefix}control-focus-border-color: $control-focus-border,
-    --#{$prefix}control-active-filter: $control-active-filter,
-    --#{$prefix}control-size: $control-size,
+    --#{$prefix}control-disabled-opacity: .5,
+    --#{$prefix}control-label-disabled-opacity: .5,
+    --#{$prefix}control-focus-border-color: var(--#{$prefix}btn-input-focus-border-color),
+    --#{$prefix}control-active-filter: brightness(90%),
+    --#{$prefix}control-size: 1em,
     // Shared motion for the checkbox, radio and switch; the overshoot easing
     // makes the mark pop as it settles.
     --#{$prefix}control-transition-duration: .15s,
@@ -360,8 +257,8 @@ $root-tokens: defaults($root-token-defaults, $root-tokens);
       // A shadow reads as depth against the surface behind it, and a dark
       // surface swallows the same alpha, so the strength rises instead of the
       // colour changing.
-      --#{$prefix}shadow-strength: #{$shadow-strength-dark};
-      --#{$prefix}backdrop-opacity: #{$backdrop-opacity-dark};
+      --#{$prefix}shadow-strength: 2.4;
+      --#{$prefix}backdrop-opacity: 65%;
       // scss-docs-end root-dark-mode-vars
 
       color-scheme: dark;

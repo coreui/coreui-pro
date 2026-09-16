@@ -178,9 +178,7 @@ Two tokens are declared by the class that uses them rather than on every control
 
 ### Sass variables
 
-The frame every field draws is configured once, in `_root.scss`. `$input-btn-*` sets it for buttons and controls together, and each value is emitted as a `--cui-btn-input-*` token that the components read:
-
-<ScssDocs file="scss/_root.scss" capture="input-btn-variables" />
+The frame every field draws is configured once, as the [`--cui-btn-input-*` tokens](/forms/overview/#css-variables) buttons and controls share.
 
 The colour picker keeps a width of its own, since it is not as wide as it is tall:
 

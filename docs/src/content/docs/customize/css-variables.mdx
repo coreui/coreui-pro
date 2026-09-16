@@ -68,11 +68,7 @@ a {
 
 CoreUI provides custom `:focus` styles using a combination of Sass and CSS variables that can be optionally added to specific components and elements. We do not yet globally override all `:focus` styles.
 
-In our Sass, we set default values that can be customized before compiling.
-
-<ScssDocs file="scss/_root.scss" capture="focus-ring-variables" />
-
-Those variables are then reassigned to `:root` level CSS variables that can be customized in real-time, including with options for `x` and `y` offsets (which default to their fallback value of `0`).
+The defaults are declared on `:root` and can be customized in real-time, including options for `x` and `y` offsets, which default to their fallback value of `0`.
 
 <ScssDocs file="scss/_root.scss" capture="root-focus-variables" />
 
