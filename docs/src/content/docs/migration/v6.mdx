@@ -3816,8 +3816,10 @@ tintable and lets dark mode deepen every shadow at once.
   `--cui-border-style`, `--cui-body-font-family`, `--cui-heading-color` and
   `--cui-link-color`. Five of the seven `$font-weight-*` scalars are folded
   into `$font-weights`, which stays the way to add or drop a weight;
-  `$font-weight-semibold` and `$font-weight-bold` stay because a rule still
-  reads them. `$blue` and `$pink` are finally gone from the source, which is
+  `$font-weight-semibold` is the only one left, and only because the docs engine
+  reads it and is shared with the v5 line. `dt` and the headings read
+  `--cui-font-weight-bold` and `--cui-font-weight-medium` instead of a number
+  frozen at build time, so retuning a weight on `:root` now moves them too. `$blue` and `$pink` are finally gone from the source, which is
   what the palette entry above already said.
 - **What stays in `scss/_config.scss` stays for a reason.** `$spacer`,
   `$border-width`, `$theme-colors`, the `$enable-*` switches, the breakpoint,
