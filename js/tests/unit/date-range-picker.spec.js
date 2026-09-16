@@ -1,6 +1,7 @@
 /* eslint-env jasmine */
 
 import DateRangePicker from '../../src/date-range-picker.js'
+import EventHandler from '../../src/dom/event-handler.js'
 import {
   getFixture, clearFixture, createEvent, jQueryMock
 } from '../helpers/fixture.js'
@@ -607,6 +608,34 @@ describe('DateRangePicker', () => {
       expect(div.innerHTML).toEqual('')
       expect(div.className).toEqual('')
       expect(div.dataset.coreuiToggle).toBeUndefined()
+    })
+
+    it('should stop reacting to the window once disposed', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const div = fixtureEl.querySelector('#host')
+      const dateRangePicker = new DateRangePicker(div)
+
+      dateRangePicker.update({ range: false })
+      dateRangePicker.dispose()
+      dateRangePicker._mobile = 'untouched'
+
+      window.dispatchEvent(new Event('resize'))
+
+      expect(dateRangePicker._mobile).toEqual('untouched')
+    })
+
+    it('should take the form listener down whatever update left behind', () => {
+      fixtureEl.innerHTML = '<form><div id="host"></div></form>'
+      const div = fixtureEl.querySelector('#host')
+      const form = fixtureEl.querySelector('form')
+      const dateRangePicker = new DateRangePicker(div)
+
+      dateRangePicker.update({ range: false })
+      dateRangePicker.dispose()
+
+      expect(() => {
+        EventHandler.trigger(form, 'submit')
+      }).not.toThrow()
     })
 
     it('should not stack controls over a second construction', () => {

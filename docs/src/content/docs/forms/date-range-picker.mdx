@@ -495,7 +495,7 @@ Note that for security reasons the `sanitize`, `sanitizeFn`, and `allowList` opt
 | `clear` | Clear selection of the date range picker. |
 | `reset` | Reset selection of the date range picker to the initial value. |
 | `update` | Updates the configuration of the date range picker. |
-| `dispose` | Destroys a component. (Removes stored data on the DOM element) |
+| `dispose` | Destroys a component: removes the controls it built, the classes it added and its window listener, and clears the data stored on the DOM element. |
 | `getInstance` | Static method which allows you to get the date range picker instance associated to a DOM element, you can use it like this: `coreui.DateRangePicker.getInstance(element)` |
 | `getOrCreateInstance` | Static method which returns a date range picker instance associated to a DOM element or create a new one in case it wasn't initialized. You can use it like this: `coreui.DateRangePicker.getOrCreateInstance(element)` |
 
