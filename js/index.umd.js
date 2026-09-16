@@ -21,7 +21,7 @@ import LoadingButton from './src/loading-button.js'
 import Modal from './src/modal.js'
 import MultiSelect from './src/multi-select.js'
 import Navigation from './src/navigation.js'
-import OffCanvas from './src/offcanvas.js'
+import Offcanvas from './src/offcanvas.js'
 import OTPInput from './src/otp-input.js'
 import PasswordInput from './src/password-input.js'
 import Popover from './src/popover.js'
@@ -53,7 +53,8 @@ export default {
   Modal,
   MultiSelect,
   Navigation,
-  OffCanvas,
+  Offcanvas,
+  OffCanvas: Offcanvas,
   OTPInput,
   PasswordInput,
   Popover,
