@@ -203,7 +203,7 @@ Sibling `.valid-feedback`/`.invalid-feedback` elements work as with any other fo
 
 ```html
 <form data-coreui-validate novalidate>
-  <div class="form-control form-date-time" data-coreui-date-input data-coreui-required="true"></div>
+  <div class="form-control form-date-time" data-coreui-date-input data-coreui-name="delivery" data-coreui-required="true"></div>
   <div class="invalid-feedback">Please provide a delivery date.</div>
   <button type="submit">Submit</button>
 </form>
@@ -287,7 +287,7 @@ The date input implements the [spinbutton pattern](https://www.w3.org/WAI/ARIA/a
 
 ### Via data attributes
 
-Add `data-coreui-date-input` to an empty `div`. The component renders the sections, separators, and a hidden input for form submission. Include the `form-control form-date-time` classes in the markup — the component adds them on initialization anyway, but having them from the start keeps the field styled and full-height before the JavaScript runs (no flash of an unstyled element on load).
+Add `data-coreui-date-input` to an empty `div`. The component renders the sections, separators, and a hidden input, which is submitted with the form once you give it a `name`. Include the `form-control form-date-time` classes in the markup — the component adds them on initialization anyway, but having them from the start keeps the field styled and full-height before the JavaScript runs (no flash of an unstyled element on load).
 
 ```html
 <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="dd.MM.yyyy" data-coreui-name="date"></div>
@@ -327,7 +327,7 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | `minDate` | date, number, string, null | `null` | Earliest selectable date |
 | `monthNames` | array, null | `null` | Twelve custom month names for text month sections (`MMM`/`MMMM`), overriding the locale-derived, date-context grammatical form |
 | `monthPlaceholder` | string, null | `null` | Replaces the `MM` the month section shows while it is empty. |
-| `name` | string, null | `null` | Name attribute of the hidden input |
+| `name` | string, null | `null` | Name of the hidden input the value is submitted under. Without it the field is not submitted with the form. |
 | `quarterPlaceholder` | string, null | `null` | Replaces the `Q` the quarter section shows while it is empty. |
 | `readonly` | boolean | `false` | Make the field focusable but non-editable |
 | `required` | boolean | `false` | Required attribute of the hidden input |

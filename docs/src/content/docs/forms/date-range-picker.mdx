@@ -302,7 +302,7 @@ attributes work on the picker element too.
 | `disabled` | boolean | `false` | Disables the fields and the popup. |
 | `endDate` | date, string, null | `null` | Initial end of the range. |
 | `endFloatingLabel` | string, null | `null` | Renders a floating label over the end field, which also becomes that field's accessible name. |
-| `endName` | string, null | `null` | Name of the end hidden input. |
+| `endName` | string, null | `null` | Name of the end hidden input. Without it the end date is not submitted with the form. |
 | `inputOptions` | object | `{}` | Programmatic escape hatch for date input options. |
 | `locale` | string | browser locale | Drives section order, separators, and calendar labels. |
 | `maxDate` | date, string, null | `null` | Upper bound, enforced by both layers. |
@@ -315,7 +315,7 @@ attributes work on the picker element too.
 | `size` | string, null | `null` | `'sm'` or `'lg'`. |
 | `startDate` | date, string, null | `null` | Initial start of the range. |
 | `startFloatingLabel` | string, null | `null` | Renders a floating label over the start field, which also becomes that field's accessible name. |
-| `startName` | string, null | `null` | Name of the start hidden input. |
+| `startName` | string, null | `null` | Name of the start hidden input. Without it the start date is not submitted with the form. |
 
 ### Methods
 

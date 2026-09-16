@@ -303,6 +303,7 @@ class SectionInput extends BaseComponent {
   override dispose(): void {
     EventHandler.off(this._form, this.constructor.eventName('reset'), this._resetHandler)
     EventHandler.off(this._form, this.constructor.eventName('submit'), this._submitHandler)
+    this._inputElement?.remove()
     super.dispose()
   }
 
@@ -774,8 +775,8 @@ class SectionInput extends BaseComponent {
     hiddenInput.disabled = this._config.disabled
     hiddenInput.required = this._config.required
 
-    if (this._config.name || this._element.id) {
-      hiddenInput.name = this._config.name || `${this.constructor.NAME}-${this._element.id}`
+    if (this._config.name) {
+      hiddenInput.name = this._config.name
     }
 
     this._element.append(hiddenInput)

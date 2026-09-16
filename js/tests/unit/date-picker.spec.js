@@ -163,6 +163,23 @@ describe('DatePicker', () => {
     })
   })
 
+  describe('form payload', () => {
+    it('should not submit a floating-label picker the page did not name', () => {
+      buildPicker({ date: new Date(2026, 0, 15), floatingLabel: 'Pick a date', format: 'dd.MM.yyyy' }, '<form id="form"><div id="picker"></div></form>')
+
+      expect([...new FormData(fixtureEl.querySelector('#form')).keys()]).toEqual([])
+    })
+
+    it('should submit under the configured name', () => {
+      buildPicker({
+        date: new Date(2026, 0, 15), floatingLabel: 'Pick a date', format: 'dd.MM.yyyy', name: 'when'
+      }, '<form id="form"><div id="picker"></div></form>')
+
+      expect([...new FormData(fixtureEl.querySelector('#form')).entries()])
+        .toEqual([['when', '15.01.2026']])
+    })
+  })
+
   describe('show/hide', () => {
     it('should toggle on indicator click and fire lifecycle events', () => {
       const picker = buildPicker()

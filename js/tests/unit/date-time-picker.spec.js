@@ -54,6 +54,23 @@ describe('DateTimePicker', () => {
     })
   })
 
+  describe('form payload', () => {
+    it('should not submit a floating-label picker the page did not name', () => {
+      buildPicker({ date: new Date(2026, 0, 15, 10, 30), floatingLabel: 'When', format: 'dd.MM.yyyy HH:mm' }, '<form id="form"><div id="picker"></div></form>')
+
+      expect([...new FormData(fixtureEl.querySelector('#form')).keys()]).toEqual([])
+    })
+
+    it('should submit under the configured name', () => {
+      buildPicker({
+        date: new Date(2026, 0, 15, 10, 30), floatingLabel: 'When', format: 'dd.MM.yyyy HH:mm', name: 'when'
+      }, '<form id="form"><div id="picker"></div></form>')
+
+      expect([...new FormData(fixtureEl.querySelector('#form')).entries()])
+        .toEqual([['when', '15.01.2026 10:30']])
+    })
+  })
+
   describe('composition of the two halves', () => {
     it('should keep the time when a calendar day is selected', () => {
       const picker = buildPicker({ date: new Date(2026, 5, 15, 14, 30, 0) })

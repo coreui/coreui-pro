@@ -25,6 +25,37 @@ describe('DateTimeInput', () => {
     clearFixture()
   })
 
+  describe('form payload', () => {
+    it('should not submit a field the page only gave an id', () => {
+      fixtureEl.innerHTML = '<form id="form"><div class="date-time-input" id="start"></div></form>'
+      const element = fixtureEl.querySelector('.date-time-input')
+      // eslint-disable-next-line no-new
+      new DateTimeInput(element, { date: new Date(2026, 0, 15, 10, 30), format: 'dd.MM.yyyy HH:mm' })
+
+      expect([...new FormData(fixtureEl.querySelector('#form')).keys()]).toEqual([])
+    })
+
+    it('should submit under the configured name', () => {
+      fixtureEl.innerHTML = '<form id="form"><div class="date-time-input" id="start"></div></form>'
+      const element = fixtureEl.querySelector('.date-time-input')
+      // eslint-disable-next-line no-new
+      new DateTimeInput(element, { date: new Date(2026, 0, 15, 10, 30), format: 'dd.MM.yyyy HH:mm', name: 'when' })
+
+      expect([...new FormData(fixtureEl.querySelector('#form')).entries()])
+        .toEqual([['when', '15.01.2026 10:30']])
+    })
+
+    it('should stop submitting once disposed', () => {
+      fixtureEl.innerHTML = '<form id="form"><div class="date-time-input"></div></form>'
+      const element = fixtureEl.querySelector('.date-time-input')
+      const instance = new DateTimeInput(element, { date: new Date(2026, 0, 15, 10, 30), format: 'dd.MM.yyyy HH:mm', name: 'when' })
+
+      instance.dispose()
+
+      expect([...new FormData(fixtureEl.querySelector('#form')).keys()]).toEqual([])
+    })
+  })
+
   describe('DATA_KEY', () => {
     it('should return plugin data key', () => {
       expect(DateTimeInput.DATA_KEY).toEqual('coreui.date-time-input')

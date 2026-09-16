@@ -25,6 +25,37 @@ describe('TimeInput', () => {
     clearFixture()
   })
 
+  describe('form payload', () => {
+    it('should not submit a field the page only gave an id', () => {
+      fixtureEl.innerHTML = '<form id="form"><div class="time-input" id="start"></div></form>'
+      const element = fixtureEl.querySelector('.time-input')
+      // eslint-disable-next-line no-new
+      new TimeInput(element, { date: '10:30:00', format: 'HH:mm' })
+
+      expect([...new FormData(fixtureEl.querySelector('#form')).keys()]).toEqual([])
+    })
+
+    it('should submit under the configured name', () => {
+      fixtureEl.innerHTML = '<form id="form"><div class="time-input" id="start"></div></form>'
+      const element = fixtureEl.querySelector('.time-input')
+      // eslint-disable-next-line no-new
+      new TimeInput(element, { date: '10:30:00', format: 'HH:mm', name: 'at' })
+
+      expect([...new FormData(fixtureEl.querySelector('#form')).entries()])
+        .toEqual([['at', '10:30']])
+    })
+
+    it('should stop submitting once disposed', () => {
+      fixtureEl.innerHTML = '<form id="form"><div class="time-input"></div></form>'
+      const element = fixtureEl.querySelector('.time-input')
+      const instance = new TimeInput(element, { date: '10:30:00', format: 'HH:mm', name: 'at' })
+
+      instance.dispose()
+
+      expect([...new FormData(fixtureEl.querySelector('#form')).keys()]).toEqual([])
+    })
+  })
+
   describe('DATA_KEY', () => {
     it('should return plugin data key', () => {
       expect(TimeInput.DATA_KEY).toEqual('coreui.time-input')

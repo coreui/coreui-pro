@@ -409,7 +409,7 @@ attributes work on the picker element too.
 | `locale` | string | browser locale | Drives section order, separators, and calendar labels. |
 | `maxDate` | date, string, null | `null` | Upper bound, enforced by both layers. |
 | `minDate` | date, string, null | `null` | Lower bound, enforced by both layers. |
-| `name` | string, null | `null` | Name of the generated hidden input. |
+| `name` | string, null | `null` | Name of the generated hidden input. Without it the field is not submitted with the form. |
 | `pickerIcon` | string | calendar SVG | Inline SVG of the generated toggle (sanitized). Not used for a `data-coreui-picker-toggle` you wrote. |
 | `sanitize` | boolean | `true` | Sanitize the icon markup. |
 | `sanitizeFn` | function, null | `null` | Custom sanitizer. |
