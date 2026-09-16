@@ -251,7 +251,7 @@ An option is the list box's, so it takes a `.list-box-option-label` and a `.list
 
 ## Disabled items
 
-`.disabled` with `aria-disabled="true"` takes an option out of the keyboard order and out of every selection method, so it never moves. `data-coreui-disabled="true"` on the transfer does the same for all of it: both lists go quiet and both buttons are disabled.
+`.disabled` with `aria-disabled="true"` takes an option out of the keyboard order and out of every selection method, so it never moves. Starting checked is a selection method too: `selected: true` next to `disabled: true` is ignored, so no move button ever picks the option up. `data-coreui-disabled="true"` on the transfer does the same for all of it: both lists go quiet and both buttons are disabled.
 
 <Example code={`<div class="transfer" data-coreui-transfer>
     <div class="list-box transfer-list" data-coreui-transfer-list="source">
@@ -360,7 +360,7 @@ const transfer = new coreui.Transfer('#myTransfer', {
 | `disabled` | boolean | `false` | Turns the whole transfer off: both list boxes, both move buttons and both search fields. |
 | `html` | boolean | `false` | Parse the labels and descriptions of `items` as markup instead of text. Passed to both list boxes. |
 | `indicator` | string | `'checkbox'` | Passed to both list boxes. `'none'` drops the checkbox in front of every option. |
-| `items` | array | `[]` | The options of both lists, rendered instead of the markup: `{ value, label, description, disabled, selected }`, or `{ label, items }` for a section. `value` decides which of them start in the target list, `selected` which start checked — on the first render only. |
+| `items` | array | `[]` | The options of both lists, rendered instead of the markup: `{ value, label, description, disabled, selected }`, or `{ label, items }` for a section. `value` decides which of them start in the target list, `selected` which start checked — on the first render only, and never a disabled item. |
 | `loading` | boolean | `false` | Marks both lists as busy: `aria-busy="true"` on the options element and `.loading` on the list, which dims it and stops it responding. Release it with `setLoading(false)`, or scope it per list with `setLoading(value, list)`. |
 | `moveAllToSourceIcon` | string | `cil-chevron-double-left-alt` | Icon of the button that moves everything back. Inline SVG, put in the button only when the markup left it empty. |
 | `moveAllToTargetIcon` | string | `cil-chevron-double-right-alt` | Icon of the button that moves everything across. |

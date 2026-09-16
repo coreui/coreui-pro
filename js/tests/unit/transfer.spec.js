@@ -276,6 +276,47 @@ describe('Transfer', () => {
       expect(transfer.getSource()).toEqual(['one', 'two', 'three'])
     })
 
+    it('should leave a disabled option in the target list alone', () => {
+      const el = setMarkup()
+      option(el, 'target', 'four').classList.add('disabled')
+      const transfer = new Transfer(el)
+
+      transfer.moveToSource(['four'])
+      transfer.moveAllToSource()
+
+      expect(transfer.getTarget()).toEqual(['four'])
+      expect(transfer.getSource()).toEqual(['one', 'two', 'three'])
+    })
+
+    it('should turn the move button off when the selected option is disabled', () => {
+      const el = setMarkup()
+      const transfer = new Transfer(el)
+
+      transfer._sides.source.listBox.select('two')
+
+      expect(moveButton(el, 'target').disabled).toBeFalse()
+
+      option(el, 'source', 'two').classList.add('disabled')
+      transfer.update()
+
+      expect(moveButton(el, 'target').disabled).toBeTrue()
+
+      click(moveButton(el, 'target'))
+
+      expect(transfer.getTarget()).toEqual(['four'])
+    })
+
+    it('should leave a disabled option behind', () => {
+      const el = setMarkup()
+      option(el, 'source', 'two').classList.add('disabled')
+      const transfer = new Transfer(el)
+
+      transfer.moveToTarget(['two'])
+
+      expect(transfer.getSource()).toEqual(['one', 'two', 'three'])
+      expect(transfer.getTarget()).toEqual(['four'])
+    })
+
     it('should return several values to their original places at once', () => {
       const el = setMarkup()
       const transfer = new Transfer(el)
@@ -541,6 +582,23 @@ describe('Transfer', () => {
       expect(transfer.getSource()).toEqual(['bob'])
       expect(transfer.getTarget()).toEqual(['cleo', 'ada'])
       expect(option(el, 'source', 'bob').textContent).toEqual('Bob')
+    })
+
+    it('should not offer a disabled item for moving', () => {
+      const el = setMarkup('', [], [])
+      const transfer = new Transfer(el, {
+        items: [{
+          value: 'billing', label: 'Billing', disabled: true, selected: true
+        }, ...users]
+      })
+
+      expect(transfer.getSelectedValues('source')).toEqual([])
+      expect(option(el, 'source', 'billing').getAttribute('aria-selected')).toEqual('false')
+      expect(moveButton(el, 'target').disabled).toBeTrue()
+
+      transfer.moveToTarget(['billing'])
+
+      expect(transfer.getTarget()).toEqual([])
     })
 
     it('should return the configured items', () => {

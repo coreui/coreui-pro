@@ -212,9 +212,12 @@ class ListBox extends BaseComponent {
     this._searchField = this._resolveSearch()
     this._searchTimeout = null
     this._selectAll = SelectorEngine.findOne(SELECTOR_SELECT_ALL, this._element) as HTMLButtonElement | null
-    this._selected = new Set(this._initialSelection())
+    this._selected = new Set()
 
     this._render()
+
+    this._selected = new Set(this._initialSelection())
+
     this._addEventListeners()
     this.update()
   }
@@ -309,7 +312,7 @@ class ListBox extends BaseComponent {
     const next = [...new Set([...kept, ...marked])]
 
     this._anchor = null
-    this._selected = new Set(this._selectionFor(next))
+    this._selected = new Set(this._selectable(this._selectionFor(next)))
     this.update()
 
     if (previous.length !== this._selected.size || previous.some(value => !this._selected.has(value))) {
@@ -577,7 +580,13 @@ class ListBox extends BaseComponent {
     const configured = selected === null ? [] : (Array.isArray(selected) ? selected : [selected])
     const marked = this._flatItems().filter(item => item.selected).map(item => item.value)
 
-    return this._selectionFor([...new Set([...configured, ...marked])])
+    return this._selectable(this._selectionFor([...new Set([...configured, ...marked])]))
+  }
+
+  _selectable(values: string[]): string[] {
+    const disabled = new Set(this._allOptions().filter(option => this._isDisabled(option)).map(option => this._optionValue(option)))
+
+    return values.filter(value => !disabled.has(value))
   }
 
   _selectionFor(values: string[]): string[] {

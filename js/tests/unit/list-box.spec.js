@@ -231,6 +231,21 @@ describe('ListBox', () => {
       expect(listBox.getSelectedValues()).toEqual([])
     })
 
+    it('should take nothing when the first value of a single selection is disabled', () => {
+      const listBox = new ListBox(setMarkup(), { selected: ['ham', 'tomato'] })
+
+      expect(listBox.getSelectedValues()).toEqual([])
+    })
+
+    it('should not take a disabled option from the selected config', () => {
+      const el = setMarkup()
+      const listBox = new ListBox(el, { selectionMode: 'multiple', selected: ['ham', 'tomato'] })
+
+      expect(listBox.getSelectedValues()).toEqual(['tomato'])
+      expect(item(el, 'ham')).not.toHaveClass('selected')
+      expect(item(el, 'ham').getAttribute('aria-selected')).toEqual('false')
+    })
+
     it('should toggle, deselect and clear', () => {
       const listBox = new ListBox(setMarkup(), { selectionMode: 'multiple' })
 
@@ -1017,6 +1032,21 @@ describe('ListBox', () => {
       expect(item(el, 'lettuce').getAttribute('aria-selected')).toEqual('true')
     })
 
+    it('should not take a disabled item into the initial selection', () => {
+      const el = setEmptyMarkup(' data-coreui-selection-mode="multiple"')
+      const listBox = new ListBox(el, {
+        items: [
+          { value: 'lettuce', label: 'Lettuce', selected: true },
+          {
+            value: 'ham', label: 'Ham', disabled: true, selected: true
+          }
+        ]
+      })
+
+      expect(listBox.getSelectedValues()).toEqual(['lettuce'])
+      expect(item(el, 'ham')).not.toHaveClass('selected')
+    })
+
     it('should replace the markup already present in the options', () => {
       const el = setMarkup()
       const listBox = new ListBox(el, {
@@ -1097,6 +1127,20 @@ describe('ListBox', () => {
       expect(listBox.getSelectedValues()).toEqual(['tomato'])
       expect(changed).toEqual([['tomato']])
       expect(item(el, 'tomato').classList.contains('selected')).toBeTrue()
+    })
+
+    it('should not take a disabled item into the selection on setItems', () => {
+      const el = setEmptyMarkup(' data-coreui-selection-mode="multiple"')
+      const listBox = new ListBox(el, { items: [{ value: 'lettuce', label: 'Lettuce' }] })
+
+      listBox.setItems([
+        { value: 'lettuce', label: 'Lettuce', selected: true },
+        {
+          value: 'ham', label: 'Ham', disabled: true, selected: true
+        }
+      ])
+
+      expect(listBox.getSelectedValues()).toEqual(['lettuce'])
     })
 
     it('should not fire change when the selection survived the rebuild', () => {
