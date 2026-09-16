@@ -198,6 +198,8 @@ class MultiSelect extends BaseComponent {
 
     this._uniqueId = this._config.id || this._element.id || getUID(`${this.constructor.NAME}`)
     this._markupName = this._element.getAttribute('name')
+    this._markupLabel = this._element.labels?.[0] ?? null
+    this._generatedLabelId = null
     this._configureNativeSelect()
     this._indicatorElement = null
     this._selectAllElement = null
@@ -704,6 +706,48 @@ class MultiSelect extends BaseComponent {
     this._element.tabIndex = '-1'
   }
 
+  _nameControls() {
+    const labelledBy = this._element.getAttribute('aria-labelledby')
+
+    if (labelledBy) {
+      this._applyControlName({ labelledBy })
+      return
+    }
+
+    const label = this._element.getAttribute('aria-label')
+
+    if (label) {
+      this._applyControlName({ label })
+      return
+    }
+
+    if (!this._markupLabel || this._markupLabel.contains(this._togglerElement)) {
+      return
+    }
+
+    if (!this._markupLabel.id) {
+      const id = `${this._uniqueId}-label`
+      this._generatedLabelId = document.getElementById(id) ? getUID(`${this._uniqueId}-label`) : id
+      this._markupLabel.id = this._generatedLabelId
+    }
+
+    this._applyControlName({ labelledBy: this._markupLabel.id })
+  }
+
+  _applyControlName({ label, labelledBy }) {
+    for (const element of [this._togglerElement, this._searchElement]) {
+      if (!element) {
+        continue
+      }
+
+      if (labelledBy) {
+        element.setAttribute('aria-labelledby', labelledBy)
+      } else {
+        element.setAttribute('aria-label', label)
+      }
+    }
+  }
+
   _destroySelect() {
     if (this._popper) {
       this._popper.destroy()
@@ -733,6 +777,11 @@ class MultiSelect extends BaseComponent {
     if (this._wrapperElement) {
       this._wrapperElement.before(this._element)
       this._wrapperElement.remove()
+    }
+
+    if (this._generatedLabelId && this._markupLabel) {
+      this._markupLabel.removeAttribute('id')
+      this._generatedLabelId = null
     }
   }
 
@@ -776,6 +825,7 @@ class MultiSelect extends BaseComponent {
 
     this._createOptionsContainer()
     this._hideNativeSelect()
+    this._nameControls()
     this._selectInitialOptions()
   }
 

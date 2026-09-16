@@ -553,6 +553,17 @@ myMutliSelect.addEventListener('changed.coreui.multi-select', event => {
 
 ## Accessibility
 
+### Naming the control
+
+The plugin replaces the `<select>` with its own combobox and keeps the original as an invisible overlay, which is what native `required` validation focuses and anchors to. The combobox takes its name from whatever the page already gave the `<select>`: a `<label for>` pointing at it, an `aria-labelledby`, or an `aria-label`. With `search` enabled the search field takes the same name, since that is the control the user tabs to. Give the `<select>` one of those, or neither has a name.
+
+```html
+<label for="frameworks">Frameworks</label>
+<select id="frameworks" data-coreui-multi-select multiple>
+  <option value="0">Angular</option>
+</select>
+```
+
 ### Keyboard shortcuts
 
 | Key | Action |

@@ -4799,6 +4799,104 @@ describe('MultiSelect', () => {
       expect(multiSelect._togglerElement.getAttribute('aria-disabled')).toBeNull()
     })
 
+    it('should leave the element validation focuses in the accessibility tree', () => {
+      fixtureEl.innerHTML = '<form><select multiple></select></form>'
+      const selectEl = fixtureEl.querySelector('select')
+      // eslint-disable-next-line no-new
+      new MultiSelect(selectEl, { options: [{ value: '1', text: 'One' }], required: true })
+
+      fixtureEl.querySelector('form').reportValidity()
+
+      expect(document.activeElement).toBe(selectEl)
+      expect(selectEl.hasAttribute('aria-hidden')).toBeFalse()
+    })
+
+    it('should name the toggler after the label that points at the select', () => {
+      fixtureEl.innerHTML = [
+        '<label for="test-select">Frameworks</label>',
+        '<select id="test-select"></select>'
+      ].join('')
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [] })
+      const labelEl = fixtureEl.querySelector('label')
+
+      expect(labelEl.id).toEqual('test-select-label')
+      expect(multiSelect._togglerElement.getAttribute('aria-labelledby')).toEqual('test-select-label')
+    })
+
+    it('should keep an id the label already had', () => {
+      fixtureEl.innerHTML = [
+        '<label id="mine" for="test-select">Frameworks</label>',
+        '<select id="test-select"></select>'
+      ].join('')
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [] })
+
+      expect(multiSelect._togglerElement.getAttribute('aria-labelledby')).toEqual('mine')
+    })
+
+    it('should move an aria-label from the select to the toggler', () => {
+      fixtureEl.innerHTML = '<select aria-label="Frameworks"></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [] })
+
+      expect(multiSelect._togglerElement.getAttribute('aria-label')).toEqual('Frameworks')
+    })
+
+    it('should never name the toggler by a label that wraps it', () => {
+      fixtureEl.innerHTML = '<label>Frameworks<select id="test-select"></select></label>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [] })
+      const labelEl = fixtureEl.querySelector('label')
+
+      expect(labelEl.contains(multiSelect._togglerElement)).toBeTrue()
+      expect(labelEl.hasAttribute('id')).toBeFalse()
+      expect(multiSelect._togglerElement.hasAttribute('aria-labelledby')).toBeFalse()
+    })
+
+    it('should take the generated id off the label on dispose', () => {
+      fixtureEl.innerHTML = [
+        '<label for="test-select">Frameworks</label>',
+        '<select id="test-select"></select>'
+      ].join('')
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [] })
+      const labelEl = fixtureEl.querySelector('label')
+
+      expect(labelEl.id).toEqual('test-select-label')
+
+      multiSelect.dispose()
+
+      expect(labelEl.hasAttribute('id')).toBeFalse()
+    })
+
+    it('should name the search input, which is what the user reaches', () => {
+      fixtureEl.innerHTML = [
+        '<label for="test-select">Frameworks</label>',
+        '<select id="test-select"></select>'
+      ].join('')
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [], search: true })
+
+      expect(multiSelect._searchElement.getAttribute('aria-labelledby')).toEqual('test-select-label')
+    })
+
+    it('should not throw on a host that is not a select', () => {
+      fixtureEl.innerHTML = '<div data-coreui-multi-select></div>'
+      const divEl = fixtureEl.querySelector('div')
+
+      expect(() => new MultiSelect(divEl, { options: [] })).not.toThrow()
+    })
+
+    it('should leave the toggler unnamed when the page named nothing', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [] })
+
+      expect(multiSelect._togglerElement.hasAttribute('aria-label')).toBeFalse()
+      expect(multiSelect._togglerElement.hasAttribute('aria-labelledby')).toBeFalse()
+    })
+
     it('should set aria-controls referencing listbox id', () => {
       fixtureEl.innerHTML = '<select id="test-select"></select>'
       const selectEl = fixtureEl.querySelector('select')
