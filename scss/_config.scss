@@ -158,10 +158,6 @@ $gutters:                     null !default;
 
 $container-padding-x: $grid-gutter-x !default;
 
-// scss-docs-start variable-gradient
-$gradient: linear-gradient(180deg, color-mix(in oklch, var(--#{$prefix}white) 15%, transparent), color-mix(in oklch, var(--#{$prefix}white) 0%, transparent)) !default;
-// scss-docs-end variable-gradient
-
 // scss-docs-start position-map
 $position-values: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
@@ -179,7 +175,6 @@ $position-values: defaults(
 
 // scss-docs-start border-variables
 $border-width:                1px !default;
-$border-style:                solid !default;
 $border-color:                light-dark(var(--#{$prefix}gray-200), var(--#{$prefix}gray-700)) !default;
 // scss-docs-end border-variables
 
@@ -261,33 +256,27 @@ $shadows: (
 // Font, line-height, and color for body text, headings, and more.
 
 // scss-docs-start font-variables
-$font-family-base:            var(--#{$prefix}font-sans-serif) !default;
 
 // $font-size-root affects the value of `rem`, which is used for as well font sizes, paddings, and margins
 // $font-size-base affects the font size of the body text
 $font-size-root:              null !default;
 $font-size-base:              1rem !default; // Assumes the browser default, typically `16px`
 
-$font-weight-lighter:         lighter !default;
-$font-weight-light:           300 !default;
-$font-weight-normal:          400 !default;
-$font-weight-medium:          500 !default;
 $font-weight-semibold:        600 !default;
 $font-weight-bold:            700 !default;
-$font-weight-bolder:          bolder !default;
 
 // scss-docs-start font-weights
 $font-weights: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
 $font-weights: defaults(
   (
-    lighter: $font-weight-lighter,
-    light: $font-weight-light,
-    normal: $font-weight-normal,
-    medium: $font-weight-medium,
+    lighter: lighter,
+    light: 300,
+    normal: 400,
+    medium: 500,
     semibold: $font-weight-semibold,
     bold: $font-weight-bold,
-    bolder: $font-weight-bolder
+    bolder: bolder
   ),
   $font-weights
 );
@@ -296,12 +285,7 @@ $font-weights: defaults(
 
 // scss-docs-start headings-variables
 $headings-line-height:        1.2 !default;
-$headings-color:              inherit !default;
 // scss-docs-end headings-variables
-
-// scss-docs-start link-variables
-$link-color:                  light-dark(var(--#{$prefix}primary-base), var(--#{$prefix}primary-fg)) !default;
-// scss-docs-end link-variables
 
 // The type scale
 //

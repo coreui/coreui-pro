@@ -294,13 +294,6 @@ $util-opacity: defaults(
 );
 // scss-docs-end util-opacity-map
 
-// scss-docs-start theme-interaction-variables
-$theme-hover-lightness:   .85 !default;
-$theme-hover-chroma:      1.1 !default;
-$theme-active-lightness:  .8 !default;
-$theme-active-chroma:     1.15 !default;
-// scss-docs-end theme-interaction-variables
-
 // The neutral pair steps along the gray scale instead of shifting lightness: its
 // fill swaps ends between schemes, so one multiplier would darken a dark fill in
 // one scheme and wash out a light one in the other.

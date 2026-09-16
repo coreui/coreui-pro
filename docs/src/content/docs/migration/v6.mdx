@@ -3805,10 +3805,24 @@ tintable and lets dark mode deepen every shadow at once.
     )
   );
   ```
-- **`scss/_config.scss` is untouched.** `$spacer`, `$border-width`,
-  `$theme-colors`, the breakpoint, container and spacer maps and everything
-  else there feed maps, mixins and loops across the library rather than a single
-  token, so they stay Sass. So does every component variable a rule or a mixin
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **Sixteen more page-wide knobs are gone.** `scss/_theme.scss` declares no
+  variables at all now: the four that set how far a hover or active shade
+  travels are the tokens they fed, `--cui-theme-hover-lightness`,
+  `--cui-theme-hover-chroma`, `--cui-theme-active-lightness` and
+  `--cui-theme-active-chroma`, and the theme page documents them. From
+  `scss/_config.scss`, `$gradient`, `$border-style`, `$font-family-base`,
+  `$headings-color` and `$link-color` go the same way, to `--cui-gradient`,
+  `--cui-border-style`, `--cui-body-font-family`, `--cui-heading-color` and
+  `--cui-link-color`. Five of the seven `$font-weight-*` scalars are folded
+  into `$font-weights`, which stays the way to add or drop a weight;
+  `$font-weight-semibold` and `$font-weight-bold` stay because a rule still
+  reads them. `$blue` and `$pink` are finally gone from the source, which is
+  what the palette entry above already said.
+- **What stays in `scss/_config.scss` stays for a reason.** `$spacer`,
+  `$border-width`, `$theme-colors`, the `$enable-*` switches, the breakpoint,
+  container and spacer maps and the contrast helpers feed maps, mixins, loops
+  and build-time decisions rather than one token, so they stay Sass. So does every component variable a rule or a mixin
   still reads.
 - **Component Sass variables moved from `_config.scss` into their component
   partials.** `@use ... with()` is unaffected — the entry point forwards every

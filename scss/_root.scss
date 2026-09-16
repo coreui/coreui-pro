@@ -15,11 +15,11 @@ $root-tokens: () !default;
 $root-token-defaults: (
   --#{$prefix}black: $black,
   --#{$prefix}white: $white,
-  --#{$prefix}gradient: $gradient,
+  --#{$prefix}gradient: linear-gradient(180deg, color-mix(in oklch, var(--#{$prefix}white) 15%, transparent), color-mix(in oklch, var(--#{$prefix}white) 0%, transparent)),
   --#{$prefix}font-sans-serif: meta.inspect((system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji")),
   // scss-docs-start root-body-variables
   --#{$prefix}root-font-size: $font-size-root,
-  --#{$prefix}body-font-family: meta.inspect($font-family-base),
+  --#{$prefix}body-font-family: meta.inspect(var(--#{$prefix}font-sans-serif)),
   --#{$prefix}body-font-size: $font-size-base,
   --#{$prefix}small-font-size: .875em,
   --#{$prefix}body-font-weight: var(--#{$prefix}font-weight-normal),
@@ -33,8 +33,8 @@ $root-token-defaults: (
   --#{$prefix}hr-border-color: var(--#{$prefix}border-color),
   --#{$prefix}icon-size-base: 1rem,
   // scss-docs-end root-body-variables
-  --#{$prefix}heading-color: $headings-color,
-  --#{$prefix}link-color: $link-color,
+  --#{$prefix}heading-color: inherit,
+  --#{$prefix}link-color: light-dark(var(--#{$prefix}primary-base), var(--#{$prefix}primary-fg)),
   --#{$prefix}link-decoration: underline,
   --#{$prefix}link-underline-offset: .2em,
   --#{$prefix}link-hover-color: color-mix(in oklch, var(--#{$prefix}link-color) 90%, var(--#{$prefix}black)),
@@ -44,7 +44,7 @@ $root-token-defaults: (
   --#{$prefix}mark-bg: light-dark(oklch(96.883% .03443 84.93deg), oklch(43.897% .08952 84.93deg)),
   // scss-docs-start root-border-var
   --#{$prefix}border-width: $border-width,
-  --#{$prefix}border-style: $border-style,
+  --#{$prefix}border-style: solid,
   --#{$prefix}border-color: $border-color,
   --#{$prefix}border-color-translucent: color-mix(in oklch, var(--#{$prefix}fg-body) 15%, transparent),
   // scss-docs-end root-border-var
@@ -61,10 +61,10 @@ $root-token-defaults: (
   --#{$prefix}focus-ring: var(--#{$prefix}focus-ring-width) solid var(--#{$prefix}focus-ring-color),
   // scss-docs-end root-focus-variables
   // scss-docs-start root-theme-state-variables
-  --#{$prefix}theme-hover-lightness: $theme-hover-lightness,
-  --#{$prefix}theme-hover-chroma: $theme-hover-chroma,
-  --#{$prefix}theme-active-lightness: $theme-active-lightness,
-  --#{$prefix}theme-active-chroma: $theme-active-chroma,
+  --#{$prefix}theme-hover-lightness: .85,
+  --#{$prefix}theme-hover-chroma: 1.1,
+  --#{$prefix}theme-active-lightness: .8,
+  --#{$prefix}theme-active-chroma: 1.15,
   // scss-docs-end root-theme-state-variables
   // scss-docs-start root-backdrop-variables
   --#{$prefix}backdrop-color: var(--#{$prefix}black),
