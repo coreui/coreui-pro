@@ -2090,6 +2090,61 @@ describe('MultiSelect', () => {
     })
   })
 
+  describe('generated name', () => {
+    it('should not name a select the page left unnamed', () => {
+      fixtureEl.innerHTML = '<form><select multiple><option value="1" selected>One</option></select></form>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl)
+
+      expect(selectEl.hasAttribute('name')).toBeFalse()
+      expect([...new FormData(fixtureEl.querySelector('form')).keys()]).toEqual([])
+
+      multiSelect.dispose()
+    })
+
+    it('should keep the name the page wrote', () => {
+      fixtureEl.innerHTML = '<form><select name="tech" multiple><option value="1" selected>One</option></select></form>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl)
+
+      expect([...new FormData(fixtureEl.querySelector('form')).keys()]).toEqual(['tech'])
+
+      multiSelect.dispose()
+
+      expect(selectEl.getAttribute('name')).toEqual('tech')
+    })
+
+    it('should put back the name the config overwrote', () => {
+      fixtureEl.innerHTML = '<select name="tech" multiple></select>'
+      const selectEl = fixtureEl.querySelector('select')
+
+      new MultiSelect(selectEl, { name: 'other' }).dispose()
+
+      expect(selectEl.getAttribute('name')).toEqual('tech')
+    })
+
+    it('should name the select from update', () => {
+      fixtureEl.innerHTML = '<form><select multiple><option value="1" selected>One</option></select></form>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl)
+
+      multiSelect.update({ name: 'tech' })
+
+      expect([...new FormData(fixtureEl.querySelector('form')).keys()]).toEqual(['tech'])
+
+      multiSelect.dispose()
+    })
+
+    it('should not leave a name behind after dispose', () => {
+      fixtureEl.innerHTML = '<select multiple><option value="1">One</option></select>'
+      const selectEl = fixtureEl.querySelector('select')
+
+      new MultiSelect(selectEl, { name: 'tech' }).dispose()
+
+      expect(selectEl.hasAttribute('name')).toBeFalse()
+    })
+  })
+
   describe('search functionality', () => {
     it('should keep the search text out of the form data', () => {
       fixtureEl.innerHTML = [
