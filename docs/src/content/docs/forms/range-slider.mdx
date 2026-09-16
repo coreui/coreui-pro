@@ -42,7 +42,7 @@ Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label 
 
 <Example pro code={`<div class="form-field">
     <span class="form-label">Budget</span>
-    <div data-coreui-range-slider data-coreui-value="25, 75" data-coreui-aria-labels='["Minimum budget", "Maximum budget"]'></div>
+    <div data-coreui-range-slider data-coreui-name="budgetMin, budgetMax" data-coreui-value="25, 75" data-coreui-aria-labels='["Minimum budget", "Maximum budget"]'></div>
     <div class="form-text">Monthly spend, in thousands.</div>
   </div>`} />
 
@@ -175,7 +175,7 @@ The theme class on the slider colours the track and the handles; the tooltip kee
 Add `data-coreui-range-slider` to a `div` element.
 
 ```html
-<div data-coreui-range-slider data-coreui-value="50">
+<div data-coreui-range-slider data-coreui-name="budgetMin, budgetMax" data-coreui-value="25, 75">
 </div>
 ```
 
@@ -190,6 +190,7 @@ Call the Range Slider component via JavaScript:
 ```js
 const rangeSliderElement = document.getElementById('myRangeSlider')
 const rangeSlider = new RangeSlider(rangeSliderElement, {
+  name: ['budgetMin', 'budgetMax'],
   min: 0,
   max: 100,
   step: 1,

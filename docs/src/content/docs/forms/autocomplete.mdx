@@ -43,6 +43,7 @@ Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label 
     <div
       data-coreui-autocomplete
       data-coreui-id="autocompleteField"
+      data-coreui-name="framework"
       data-coreui-options="Angular, Bootstrap, React.js, Vue.js"
       data-coreui-placeholder="Search frameworks..."
     ></div>
@@ -265,7 +266,7 @@ We use the following JavaScript to set up our autocomplete:
 Add the `data-coreui-autocomplete` attribute to a container element:
 
 ```html
-<div data-coreui-autocomplete data-coreui-options="JavaScript, TypeScript, React, Vue.js, Angular" data-coreui-search="global"></div>
+<div data-coreui-autocomplete data-coreui-name="framework" data-coreui-options="JavaScript, TypeScript, React, Vue.js, Angular" data-coreui-search="global"></div>
 ```
 
 ### Via JavaScript
@@ -273,22 +274,21 @@ Add the `data-coreui-autocomplete` attribute to a container element:
 Initialize the autocomplete component via JavaScript:
 
 ```html
-<div data-coreui-autocomplete></div>
+<div id="myAutocomplete"></div>
 ```
 
 ```js
-const autoCompleteElementList = Array.prototype.slice.call(document.querySelectorAll('.autocomplete'))
-const autoCompleteList = autoCompleteElementList.map(autoCompleteEl => {
-  return new coreui.Autocomplete(autoCompleteEl, {
-    options: [
-      'JavaScript',
-      'TypeScript',
-      'React',
-      'Vue.js',
-      'Angular'
-    ],
-    search: 'global'
-  })
+const autoCompleteElement = document.getElementById('myAutocomplete')
+const autoComplete = new coreui.Autocomplete(autoCompleteElement, {
+  name: 'framework',
+  options: [
+    'JavaScript',
+    'TypeScript',
+    'React',
+    'Vue.js',
+    'Angular'
+  ],
+  search: 'global'
 })
 ```
 
@@ -311,7 +311,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `highlightOptionsOnSearch` | boolean | `false` | Highlights matching text in options during search. |
 | `id` | string, null | `null` | Sets a custom ID for the component. If not provided, a unique ID is auto-generated. |
 | `invalid` | boolean | `false` | Applies invalid styling to the component. |
-| `name` | string, null | `null` | Sets the name attribute for the input element. |
+| `name` | string, null | `null` | Name of the text input the form posts. That input holds what the user sees — the selected option's label, or their own text when `allowOnlyDefinedOptions` is off — so `{ value: 'ng', label: 'Angular' }` posts `Angular`, not `ng`. Without a name the autocomplete is not submitted with the form. |
 | `options` | array, string, null | `[]` | Array of options or option objects to populate the dropdown. |
 | `optionsGroupsTemplate` | function, null | `null` | Custom template function for rendering option group labels. Receives the group object as parameter. |
 | `optionsMaxHeight` | number, string | `'auto'` | Sets the maximum height of the options dropdown. |
