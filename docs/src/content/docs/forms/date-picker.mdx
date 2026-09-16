@@ -165,7 +165,7 @@ The picker is built from other components — the [date input](/forms/date-input
 | Role | Element | What the picker does with it |
 | --- | --- | --- |
 | `data-coreui-picker-field` | a `div` | Hosts the date input's sections. Without it the field is generated (and wrapped in `.form-floating` when `floatingLabel` is set). |
-| `data-coreui-picker-toggle` | a `button` or any element | Opens and closes the calendar. Gets `aria-expanded`, `aria-controls` and `aria-haspopup`, and `ariaPickerLabel` as its name unless it has one. |
+| `data-coreui-picker-toggle` | a `button` or any element | Opens and closes the calendar. Gets `aria-expanded` and `aria-haspopup`, and `aria-controls` while the calendar is open, and `ariaPickerLabel` as its name unless it has one. |
 | `data-coreui-picker-cleaner` | a `button` | Clears the value. Gets `ariaCleanerLabel` as its name unless it has one. |
 
 A decorative `<svg>` inside an adopted button is marked `aria-hidden` for you. So a trigger can be a regular button with its own text and icon, the way a combobox has one:

@@ -319,7 +319,6 @@ class TimePicker extends BaseComponent {
     this._menu = document.createElement('div')
     this._menu.id = getUID(`${this.constructor.NAME}-popup-`)
     this._menu.classList.add(CLASS_NAME_POPUP, CLASS_NAME_DROPDOWN)
-    this._indicatorElement.setAttribute('aria-controls', this._menu.id)
     this._indicatorElement.setAttribute('aria-expanded', 'false')
     this._indicatorElement.setAttribute('aria-haspopup', 'dialog')
 
@@ -379,11 +378,13 @@ class TimePicker extends BaseComponent {
       onBeforeShow: () => !EventHandler.trigger(this._element, EVENT_SHOW)?.defaultPrevented,
       onHidden: () => EventHandler.trigger(this._element, EVENT_HIDDEN),
       onHide: () => {
+        this._indicatorElement.removeAttribute('aria-controls')
         this._menu.classList.remove(CLASS_NAME_SHOW)
         this._element.classList.remove(CLASS_NAME_SHOW)
         this._indicatorElement.setAttribute('aria-expanded', 'false')
       },
       onShow: () => {
+        this._indicatorElement.setAttribute('aria-controls', this._menu.id)
         // the classes come first: the selection body scrolls the selected cell
         // into view, which needs the dropdown to have layout
         this._menu.classList.add(CLASS_NAME_SHOW)

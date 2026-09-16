@@ -276,16 +276,24 @@ describe('DatePicker', () => {
 
       expect(toggle.getAttribute('aria-label')).toEqual('Toggle the calendar')
       expect(toggle.getAttribute('aria-haspopup')).toEqual('dialog')
-      expect(toggle.getAttribute('aria-controls')).toEqual(picker._menu.id)
       expect(toggle.getAttribute('aria-expanded')).toEqual('false')
+      expect(toggle.hasAttribute('aria-controls')).toBeFalse()
+
+      picker.show()
+
+      expect(toggle.getAttribute('aria-controls')).toEqual(picker._menu.id)
       expect(el.querySelector('[data-coreui-picker-cleaner]').getAttribute('aria-label')).toEqual('Clear the value')
 
       for (const svg of el.querySelectorAll('svg')) {
         expect(svg.getAttribute('aria-hidden')).toEqual('true')
       }
 
-      picker.show()
       expect(toggle.getAttribute('aria-expanded')).toEqual('true')
+
+      picker.hide()
+
+      expect(toggle.hasAttribute('aria-controls')).toBeFalse()
+      expect(toggle.getAttribute('aria-expanded')).toEqual('false')
     })
 
     it('should keep the name the author gave the toggle', () => {
@@ -799,6 +807,8 @@ describe('DatePicker', () => {
         <button data-coreui-picker-toggle><svg viewBox="0 0 16 16"></svg></button>
       </div>`)
       const toggle = fixtureEl.querySelector('[data-coreui-picker-toggle]')
+
+      picker.show()
 
       expect(toggle.getAttribute('aria-controls')).not.toBeNull()
 

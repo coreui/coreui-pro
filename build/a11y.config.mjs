@@ -193,7 +193,7 @@ export const a11yComponents = [
       {
         criterion: '4.1.2',
         status: 'built-in',
-        note: 'The toggle carries aria-haspopup=dialog, aria-controls pointing at the panel and aria-expanded tracking it, and the panel answers that promise with role=dialog and aria-modal; the calendar inside is audited open.'
+        note: 'The toggle carries aria-haspopup=dialog and aria-expanded, plus aria-controls while the panel is open, and the panel answers that promise with role=dialog and aria-modal; the calendar inside is audited open.'
       },
       {
         criterion: '1.3.1',
@@ -222,7 +222,7 @@ export const a11yComponents = [
       {
         criterion: '4.1.2',
         status: 'built-in',
-        note: 'Both calendars open under one toggle that carries aria-haspopup=dialog, aria-controls and aria-expanded; the range fields and the separator carry their own roles.'
+        note: 'Both calendars open under one toggle that carries aria-haspopup=dialog and aria-expanded, plus aria-controls while the panel is open; the range fields and the separator carry their own roles.'
       },
       {
         criterion: '1.3.1',
@@ -246,7 +246,7 @@ export const a11yComponents = [
       {
         criterion: '4.1.2',
         status: 'built-in',
-        note: 'The toggle owns the popup state — aria-haspopup=dialog, aria-controls and aria-expanded — instead of the surrounding div, which has no role to support it.'
+        note: 'The toggle owns the popup state — aria-haspopup=dialog and aria-expanded, plus aria-controls while the panel is open — instead of the surrounding div, which has no role to support it.'
       },
       {
         criterion: '1.3.1',
@@ -270,7 +270,7 @@ export const a11yComponents = [
       {
         criterion: '4.1.2',
         status: 'built-in',
-        note: 'The toggle owns the popup state — aria-haspopup=dialog, aria-controls and aria-expanded — instead of the surrounding div, which has no role to support it.'
+        note: 'The toggle owns the popup state — aria-haspopup=dialog and aria-expanded, plus aria-controls while the panel is open — instead of the surrounding div, which has no role to support it.'
       },
       {
         criterion: '1.3.1',
