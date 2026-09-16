@@ -236,7 +236,7 @@ class PasswordStrength extends BaseComponent {
 
     if (typeof this._config.scorer !== 'function') {
       this._setBusy(false)
-      this._apply(this._builtInScore(password, userInputs), password)
+      this._apply(this._normalize(this._builtInScore(password, userInputs)), password)
       return
     }
 
@@ -284,6 +284,25 @@ class PasswordStrength extends BaseComponent {
     const values = typeof userInputs === 'function' ? userInputs() : userInputs
 
     return Array.isArray(values) ? values.filter(Boolean).map(String) : []
+  }
+
+  override _configAfterMerge(config: any): any {
+    if (config.weights && typeof config.weights === 'object' && !Array.isArray(config.weights)) {
+      config.weights = Object.fromEntries(
+        Object.entries(Default.weights).map(([rule, weight]) => [
+          rule,
+          Number.isFinite(config.weights[rule]) ? config.weights[rule] : weight
+        ])
+      )
+    }
+
+    if (Array.isArray(config.thresholds)) {
+      config.thresholds = Default.thresholds.map((threshold: number, index: number) =>
+        Number.isFinite(config.thresholds[index]) ? config.thresholds[index] : threshold
+      )
+    }
+
+    return config
   }
 
   _normalize(result: unknown): { score: number, warning?: string, suggestions?: string[] } | null {
