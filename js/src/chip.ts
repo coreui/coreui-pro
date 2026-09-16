@@ -375,7 +375,7 @@ class Chip extends BaseComponent {
   }
 
   // Static
-  static chipInterface(element: string | Element | null, config?: any): void {
+  static chipInterface(element: string | Element | null, config?: any, ...args: any[]): void {
     const data: any = Chip.getOrCreateInstance(element, config)
 
     if (typeof config === 'string') {
@@ -383,7 +383,7 @@ class Chip extends BaseComponent {
         throw new TypeError(`No method named "${config}"`)
       }
 
-      data[config as string]()
+      data[config as string](...args)
     }
   }
 

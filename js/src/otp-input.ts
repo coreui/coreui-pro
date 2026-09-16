@@ -504,7 +504,7 @@ class OTPInput extends BaseComponent {
   }
 
   // Static
-  static otpInputInterface(element: string | Element | null, config?: any): void {
+  static otpInputInterface(element: string | Element | null, config?: any, ...args: any[]): void {
     const data: any = OTPInput.getOrCreateInstance(element, config)
 
     if (typeof config === 'string') {
@@ -512,12 +512,12 @@ class OTPInput extends BaseComponent {
         throw new TypeError(`No method named "${config}"`)
       }
 
-      data[config as string]()
+      data[config as string](...args)
     }
   }
 
-  static jQueryInterface(this: any, config: any): void {
-    return jQueryDispatch(this, OTPInput, config)
+  static jQueryInterface(this: any, config: any, ...args: any[]): void {
+    return jQueryDispatch(this, OTPInput, config, args)
   }
 }
 

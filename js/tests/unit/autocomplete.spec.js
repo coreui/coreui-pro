@@ -3266,6 +3266,20 @@ describe('Autocomplete', () => {
         expect(Autocomplete.getInstance(autocompleteEl)).not.toBeNull()
       })
 
+      it('should pass the arguments to the method', () => {
+        fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+        const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+        const autocomplete = new Autocomplete(autocompleteEl, { options: [] })
+        const spy = spyOn(autocomplete, 'search')
+
+        jQueryMock.fn.autocomplete = Autocomplete.jQueryInterface
+        jQueryMock.elements = [autocompleteEl]
+        jQueryMock.fn.autocomplete.call(jQueryMock, 'search', 'ab')
+
+        expect(spy).toHaveBeenCalledWith('ab')
+        autocomplete.dispose()
+      })
+
       it('should not re-create autocomplete', () => {
         fixtureEl.innerHTML = '<div class="autocomplete"></div>'
         const autocompleteEl = fixtureEl.querySelector('.autocomplete')

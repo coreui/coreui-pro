@@ -1180,6 +1180,22 @@ describe('Rating', () => {
       expect(Rating.getInstance(div)).not.toBeNull()
     })
 
+    it('should pass the arguments to the method', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+
+      jQueryMock.fn.rating = Rating.jQueryInterface
+      jQueryMock.elements = [div]
+
+      const instance = Rating.getOrCreateInstance(div)
+      const spy = spyOn(instance, 'reset')
+
+      jQueryMock.fn.rating.call(jQueryMock, 'reset', 3)
+
+      expect(spy).toHaveBeenCalledWith(3)
+      instance.dispose()
+    })
+
     it('should throw error on undefined method', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
@@ -1246,6 +1262,18 @@ describe('Rating', () => {
   })
 
   describe('ratingInterface', () => {
+    it('should pass the arguments to the method', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div, { itemCount: 3 })
+      const spy = spyOn(rating, 'setConfig')
+
+      Rating.ratingInterface(div, 'setConfig', { value: 2 })
+
+      expect(spy).toHaveBeenCalledWith({ value: 2 })
+      rating.dispose()
+    })
+
     it('should create instance via ratingInterface', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')

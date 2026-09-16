@@ -667,6 +667,31 @@ describe('ChipSet', () => {
       expect(ChipSet.getInstance(el)).not.toBeNull()
     })
 
+    it('should leave the chip set in the document when the method takes no arguments', () => {
+      const el = setMarkup(['First'])
+
+      jQueryMock.fn.chipSet = ChipSet.jQueryInterface
+      jQueryMock.elements = [el]
+
+      expect(() => jQueryMock.fn.chipSet.call(jQueryMock, 'remove')).toThrowError(TypeError)
+      expect(el.isConnected).toBeTrue()
+    })
+
+    it('should pass the arguments to the method', () => {
+      const el = setMarkup(['First'])
+
+      jQueryMock.fn.chipSet = ChipSet.jQueryInterface
+      jQueryMock.elements = [el]
+
+      const instance = ChipSet.getOrCreateInstance(el)
+      const spy = spyOn(instance, 'remove')
+
+      jQueryMock.fn.chipSet.call(jQueryMock, 'remove', 'First')
+
+      expect(spy).toHaveBeenCalledWith('First')
+      instance.dispose()
+    })
+
     it('should call a method via jQueryInterface', () => {
       const el = setMarkup(['First'])
       const chipSet = new ChipSet(el, { selectable: true })

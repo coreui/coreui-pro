@@ -520,8 +520,8 @@ class DateRangePicker extends BaseComponent {
   }
 
   // Static
-  static jQueryInterface(this: any, config: any): void {
-    return jQueryDispatch(this, DateRangePicker, config)
+  static jQueryInterface(this: any, config: any, ...args: any[]): void {
+    return jQueryDispatch(this, DateRangePicker, config, args)
   }
 }
 

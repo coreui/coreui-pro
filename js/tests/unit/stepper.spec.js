@@ -2025,6 +2025,31 @@ describe('Stepper', () => {
       expect(Stepper.getInstance(stepperEl)).not.toBeNull()
     })
 
+    it('should pass the arguments to the method', () => {
+      fixtureEl.innerHTML = `
+        <div class="stepper" data-coreui-stepper>
+          <ol class="stepper-steps">
+            <li class="stepper-step">
+              <button type="button" class="stepper-step-button active">Step 1</button>
+            </li>
+          </ol>
+        </div>
+      `
+
+      const stepperEl = fixtureEl.querySelector('.stepper')
+
+      jQueryMock.fn.stepper = Stepper.jQueryInterface
+      jQueryMock.elements = [stepperEl]
+
+      const instance = Stepper.getOrCreateInstance(stepperEl)
+      const spy = spyOn(instance, 'showStep')
+
+      jQueryMock.fn.stepper.call(jQueryMock, 'showStep', 2)
+
+      expect(spy).toHaveBeenCalledWith(2)
+      instance.dispose()
+    })
+
     it('should call a stepper method via jQueryInterface', () => {
       fixtureEl.innerHTML = `
         <div class="stepper" data-coreui-stepper>

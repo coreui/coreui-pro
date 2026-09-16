@@ -1437,7 +1437,7 @@ class MultiSelect extends ComboboxBase {
 
   // Static
 
-  static multiSelectInterface(element: string | Element | null, config?: any): void {
+  static multiSelectInterface(element: string | Element | null, config?: any, ...args: any[]): void {
     const data: any = MultiSelect.getOrCreateInstance(element, config)
 
     if (typeof config === 'string') {
@@ -1445,12 +1445,12 @@ class MultiSelect extends ComboboxBase {
         throw new TypeError(`No method named "${config}"`)
       }
 
-      data[config]()
+      data[config](...args)
     }
   }
 
-  static jQueryInterface(this: any, config: any): any {
-    return jQueryDispatch(this, MultiSelect, config)
+  static jQueryInterface(this: any, config: any, ...args: any[]): any {
+    return jQueryDispatch(this, MultiSelect, config, args)
   }
 
   static clearMenus(event: any): void {

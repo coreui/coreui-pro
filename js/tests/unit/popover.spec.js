@@ -524,6 +524,22 @@ describe('Popover', () => {
 
       expect(Popover.getInstance(popoverEl)).not.toBeNull()
     })
+    it('should pass the arguments to the method', () => {
+      fixtureEl.innerHTML = '<a href="#" title="Popover" data-coreui-content="content">BS X</a>'
+
+      const popoverEl = fixtureEl.querySelector('a')
+
+      jQueryMock.fn.popover = Popover.jQueryInterface
+      jQueryMock.elements = [popoverEl]
+
+      const instance = Popover.getOrCreateInstance(popoverEl)
+      const spy = spyOn(instance, 'setContent')
+
+      jQueryMock.fn.popover.call(jQueryMock, 'setContent', { '.popover-body': 'x' })
+
+      expect(spy).toHaveBeenCalledWith({ '.popover-body': 'x' })
+      instance.dispose()
+    })
 
     it('should create a popover with a config object', () => {
       fixtureEl.innerHTML = '<a href="#" title="Popover">BS X</a>'

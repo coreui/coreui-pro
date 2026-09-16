@@ -1242,7 +1242,7 @@ class Calendar extends BaseComponent {
 
   // Static
 
-  static calendarInterface(element: string | Element | null, config?: any): void {
+  static calendarInterface(element: string | Element | null, config?: any, ...args: any[]): void {
     const data: any = Calendar.getOrCreateInstance(element, config)
 
     if (typeof config === 'string') {
@@ -1250,12 +1250,12 @@ class Calendar extends BaseComponent {
         throw new TypeError(`No method named "${config}"`)
       }
 
-      data[config]()
+      data[config](...args)
     }
   }
 
-  static jQueryInterface(this: any, config: any): any {
-    return jQueryDispatch(this, Calendar, config)
+  static jQueryInterface(this: any, config: any, ...args: any[]): any {
+    return jQueryDispatch(this, Calendar, config, args)
   }
 }
 

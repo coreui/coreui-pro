@@ -176,7 +176,7 @@ class LoadingButton extends BaseComponent {
 
   // Static
 
-  static loadingButtonInterface(element: string | Element | null, config: any): any {
+  static loadingButtonInterface(element: string | Element | null, config: any, ...args: any[]): any {
     const data: any = LoadingButton.getOrCreateInstance(element, config)
 
     if (typeof config === 'string') {
@@ -184,7 +184,7 @@ class LoadingButton extends BaseComponent {
         throw new TypeError(`No method named "${config}"`)
       }
 
-      data[config as string]()
+      data[config as string](...args)
     }
   }
 

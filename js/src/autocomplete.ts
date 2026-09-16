@@ -758,7 +758,7 @@ class Autocomplete extends ComboboxBase {
 
   // Static
 
-  static autocompleteInterface(element: string | Element | null, config?: any): void {
+  static autocompleteInterface(element: string | Element | null, config?: any, ...args: any[]): void {
     const data: any = Autocomplete.getOrCreateInstance(element, config)
 
     if (typeof config === 'string') {
@@ -766,12 +766,12 @@ class Autocomplete extends ComboboxBase {
         throw new TypeError(`No method named "${config}"`)
       }
 
-      data[config]()
+      data[config](...args)
     }
   }
 
-  static jQueryInterface(this: any, config: any): any {
-    return jQueryDispatch(this, Autocomplete, config)
+  static jQueryInterface(this: any, config: any, ...args: any[]): any {
+    return jQueryDispatch(this, Autocomplete, config, args)
   }
 
   static clearMenus(event: any): void {

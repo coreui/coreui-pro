@@ -670,7 +670,7 @@ class ChipSet extends BaseComponent {
   }
 
   // Static
-  static chipSetInterface(element: string | Element | null, config?: any): void {
+  static chipSetInterface(element: string | Element | null, config?: any, ...args: any[]): void {
     const data: any = ChipSet.getOrCreateInstance(element, config)
 
     if (typeof config === 'string') {
@@ -678,12 +678,12 @@ class ChipSet extends BaseComponent {
         throw new TypeError(`No method named "${config}"`)
       }
 
-      data[config as string]()
+      data[config as string](...args)
     }
   }
 
-  static jQueryInterface(this: any, config: any): void {
-    return jQueryDispatch(this, ChipSet, config, element => [element])
+  static jQueryInterface(this: any, config: any, ...args: any[]): void {
+    return jQueryDispatch(this, ChipSet, config, args)
   }
 }
 

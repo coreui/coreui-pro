@@ -933,8 +933,8 @@ class Tooltip extends BaseComponent {
     }
   }
 
-  static jQueryInterface(this: any, config: any): void {
-    return jQueryDispatch(this, Tooltip, config)
+  static jQueryInterface(this: any, config: any, ...args: any[]): void {
+    return jQueryDispatch(this, Tooltip, config, args)
   }
 }
 
