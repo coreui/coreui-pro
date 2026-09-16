@@ -47,7 +47,7 @@ Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label 
 
 <Example pro code={`<div class="form-field">
     <label for="multiSelectField" class="form-label">Technologies</label>
-    <select id="multiSelectField" data-coreui-multi-select multiple>
+    <select id="multiSelectField" name="stack" data-coreui-multi-select multiple>
       <option value="0">Angular</option>
       <option value="1">Bootstrap</option>
       <option value="2">React.js</option>
@@ -472,7 +472,7 @@ The frame carries the size. Add `.form-control-sm` or `.form-control-lg` to the 
 Add the `data-coreui-multi-select` attribute to a `select` element.
 
 ```html
-<select id="ms1" data-coreui-multi-select multiple data-coreui-search="true">
+<select id="ms1" name="stack" multiple data-coreui-multi-select data-coreui-search="true">
   <option value="0">Angular</option>
   <option value="1">Bootstrap</option>
   <option value="2">React.js</option>
@@ -526,7 +526,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `indicator` | string | `'checkbox'` | Sets the marker used by the options, the selectable group labels and the select all button: `'checkbox'` or `'none'`. |
 | `invalid` | boolean | `false` | Toggle the invalid state for the component. |
 | `multiple` | boolean | `true` | It specifies that multiple options can be selected at once. |
-| `name` | string, null | `null` | Set the name attribute for the native select element. |
+| `name` | string, null | `null` | Name of the native select the selection is submitted under. A `name` written on the `<select>` itself is honoured too, and this option wins over it. With neither the selection is not submitted with the form. |
 | `options` | boolean, array | `false` | List of option elements. |
 | `optionsGroupsSelectable` | boolean | `false` | When enabled (with `multiple`), each option group label becomes a tri-state button: clicking it toggles the group's visible options, and it reflects `none` / `all` / `indeterminate` based on the group's selected options. |
 | `optionsGroupsTemplate` | function, null | `null` | Custom template function for rendering option group labels. Receives the group object as parameter. |

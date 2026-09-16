@@ -352,7 +352,7 @@ The one-time password input component provides comprehensive keyboard navigation
 The simplest way to use the one-time password input is through data attributes. Add `data-coreui-otp` to a container with `.form-otp` class containing `.form-otp-control` inputs.
 
 ```html
-<div class="form-otp" data-coreui-otp>
+<div class="form-otp" data-coreui-otp data-coreui-name="code">
   <input class="form-otp-control">
   <input class="form-otp-control">
   <input class="form-otp-control">
@@ -369,6 +369,7 @@ Create one-time password inputs programmatically with JavaScript:
 ```javascript
 const otpElement = document.querySelector('.form-otp')
 const otp = new coreui.OTPInput(otpElement, {
+  name: 'code',
   type: 'number',
   autoSubmit: true,
   linear: true,
@@ -388,7 +389,7 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | `id` | string, null | `null` | ID attribute for the hidden input field |
 | `linear` | boolean | `true` | Enforce sequential input (users must fill fields in order) |
 | `masked` | boolean | `false` | Show input as password (masked characters) |
-| `name` | string, null | `null` | Name attribute for the hidden input field |
+| `name` | string, null | `null` | Name of the hidden input the code is submitted under. Without it the code is not submitted with the form. |
 | `placeholder` | string, null | `null` | Placeholder text for input fields. Single character applies to all fields, longer strings apply character-by-character |
 | `readonly` | boolean | `false` | Make OTP input read-only |
 | `required` | boolean | `false` | Makes the input field required for form validation. |

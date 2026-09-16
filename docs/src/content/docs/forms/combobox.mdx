@@ -480,7 +480,7 @@ const combobox = new coreui.Combobox('#myCombobox', {
 | `indicator` | string | `'none'` | `'checkbox'` puts a decorative checkbox in front of every option. |
 | `items` | array | `[]` | The options to render: `{ value, label, description, disabled, selected }`, or `{ label, items }` for a section. Replaces whatever the panel already holds. |
 | `multiple` | boolean | `false` | Toggles options instead of replacing the selection, and keeps the panel open. |
-| `name` | string, null | `null` | `name` of the hidden input inserted before the toggle. Without it nothing is submitted. |
+| `name` | string, null | `null` | Name of the hidden input the value is submitted under, inserted right before the toggle. With `multiple` all values go into that one input joined by commas, so three selections post one `tags=a,b,c`. Without a name the combobox is not submitted with the form. |
 | `placeholder` | string | `''` | Text shown in the toggle while nothing is selected. |
 | `sanitize` | boolean | `true` | Enables the sanitization of the labels rendered from `items` with `html`. |
 | `sanitizeFn` | null, function | `null` | Sanitization function of your own, used instead of the built-in one. |

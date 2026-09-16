@@ -24,7 +24,7 @@ Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label 
 
 <Example pro code={`<div class="form-field">
     <span class="form-label" id="ratingFieldLabel">Overall rating</span>
-    <div data-coreui-rating data-coreui-value="3" aria-labelledby="ratingFieldLabel"></div>
+    <div data-coreui-rating data-coreui-name="score" data-coreui-value="3" aria-labelledby="ratingFieldLabel"></div>
     <div class="form-text">Tell us how the delivery went.</div>
   </div>`} />
 
@@ -138,7 +138,7 @@ The Bootstrap Rating component integrates interactive star ratings with dynamic 
 Add `data-coreui-rating` to a `div` element.
 
 ```html
-<div data-coreui-rating></div>
+<div data-coreui-rating data-coreui-name="score"></div>
 ```
 
 ### Via JavaScript
@@ -146,13 +146,13 @@ Add `data-coreui-rating` to a `div` element.
 Call the rating component via JavaScript:
 
 ```html
-<div class="rating"></div>
+<div id="myRating"></div>
 ```
 
 ```js
-const ratingElementList = Array.prototype.slice.call(document.querySelectorAll('.rating'))
-const ratingList = ratingElementList.map(ratingEl => {
-  return new coreui.Rating(ratingEl)
+const ratingElement = document.getElementById('myRating')
+const rating = new coreui.Rating(ratingElement, {
+  name: 'score'
 })
 ```
 
@@ -176,7 +176,7 @@ Note that for security reasons the `sanitize`, `sanitizeFn`, and `allowList` opt
 | `highlightOnlySelected` | boolean | `false` | If enabled, only the currently selected icon will be visibly highlighted. |
 | `icon` | object, string, null | `null` | The default icon to display when the item is not selected. |
 | `itemCount` | number | `5` | The maximum value the user can select. |
-| `name` | string | `null` | The name attribute of the radio input elements. |
+| `name` | string, null | `null` | Name shared by the radio inputs. Radios need one name to work as a single group, so the component generates one when you leave it out — the value then reaches the form under a key like `rating-name-439199`, which is different on every page load. Name it to decide that key yourself, and give each rating on the page its own name: two ratings sharing one become a single group, so picking a star in one clears the other and the form carries a single value. A rating with nothing selected submits nothing either way. |
 | `precision` | number | `1` | Minimum increment value change allowed. |
 | `readonly` | boolean | `false` | Toggle the readonly state for the component. |
 | `sanitize` | boolean | `true` |  Enable or disable the sanitization. If activated `activeIcon`, and `icon` options will be sanitized. |
