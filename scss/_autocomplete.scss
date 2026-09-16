@@ -331,6 +331,10 @@
   font-weight: var(--#{$prefix}autocomplete-optgroup-label-font-weight);
   color: var(--#{$prefix}autocomplete-optgroup-label-color);
   text-transform: var(--#{$prefix}autocomplete-optgroup-label-text-transform);
+
+  &.disabled {
+    color: var(--#{$prefix}autocomplete-option-disabled-color);
+  }
 }
 
 .autocomplete-options-empty {

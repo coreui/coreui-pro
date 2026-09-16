@@ -177,6 +177,71 @@ describe('MultiSelect', () => {
       expect(multiSelect._options[1].options.length).toBe(1)
     })
 
+    it('should disable every option of a disabled optgroup', () => {
+      fixtureEl.innerHTML = [
+        '<select multiple>',
+        '  <optgroup label="Group A" disabled>',
+        '    <option value="a1">A1</option>',
+        '    <option value="a2">A2</option>',
+        '  </optgroup>',
+        '  <option value="b1">B1</option>',
+        '</select>'
+      ].join('')
+
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl)
+
+      expect(multiSelect._options[0].disabled).toBe(true)
+      expect(multiSelect._options[0].options.every(option => option.disabled)).toBe(true)
+      expect(multiSelect._options[1].disabled).toBe(false)
+
+      const optgroup = multiSelect._optionsElement.querySelector('.form-multi-select-optgroup')
+      expect(optgroup.querySelector('.form-multi-select-optgroup-label').classList.contains('disabled')).toBe(true)
+
+      for (const optionEl of optgroup.querySelectorAll('.form-multi-select-option')) {
+        expect(optionEl.classList.contains('disabled')).toBe(true)
+        expect(optionEl.getAttribute('aria-disabled')).toBe('true')
+        expect(optionEl.tabIndex).toBe(-1)
+      }
+    })
+
+    it('should disable every option of a disabled group given through options', () => {
+      fixtureEl.innerHTML = '<select multiple></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [
+          {
+            label: 'Group A',
+            disabled: true,
+            options: [{ value: 'a1', text: 'A1' }]
+          },
+          { value: 'b1', text: 'B1' }
+        ]
+      })
+
+      expect(multiSelect._options[0].options[0].disabled).toBe(true)
+      expect(multiSelect._element.querySelector('optgroup').disabled).toBe(true)
+      expect(multiSelect._element.querySelector('option[value="a1"]').disabled).toBe(true)
+    })
+
+    it('should leave the options of a disabled optgroup out of select all', () => {
+      fixtureEl.innerHTML = [
+        '<select multiple>',
+        '  <optgroup label="Group A" disabled>',
+        '    <option value="a1">A1</option>',
+        '  </optgroup>',
+        '  <option value="b1">B1</option>',
+        '</select>'
+      ].join('')
+
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl)
+
+      multiSelect.selectAll()
+
+      expect(multiSelect._selected.map(option => option.value)).toEqual(['b1'])
+    })
+
     it('should set multiple attribute on native select when multiple is true', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')

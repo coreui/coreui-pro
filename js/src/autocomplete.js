@@ -556,7 +556,7 @@ class Autocomplete extends BaseComponent {
     this._inputElement.removeAttribute('name')
   }
 
-  _getOptionsFromConfig(options = this._config.options) {
+  _getOptionsFromConfig(options = this._config.options, disabled = false) {
     if (!options || !Array.isArray(options)) {
       return []
     }
@@ -565,14 +565,17 @@ class Autocomplete extends BaseComponent {
     for (const option of options) {
       if (option.options && Array.isArray(option.options)) {
         const customGroupProperties = { ...option }
+        const groupDisabled = disabled || Boolean(option.disabled)
 
+        delete customGroupProperties.disabled
         delete customGroupProperties.label
         delete customGroupProperties.options
 
         _options.push({
           ...customGroupProperties,
           label: option.label,
-          options: this._getOptionsFromConfig(option.options)
+          ...groupDisabled && { disabled: true },
+          options: this._getOptionsFromConfig(option.options, groupDisabled)
         })
 
         continue
@@ -594,7 +597,7 @@ class Autocomplete extends BaseComponent {
         label,
         value: String(value),
         ...isSelected && { selected: true },
-        ...option.disabled && { disabled: true }
+        ...(disabled || option.disabled) && { disabled: true }
       })
 
       if (isSelected) {
@@ -808,6 +811,11 @@ class Autocomplete extends BaseComponent {
         }
 
         optgrouplabel.classList.add(CLASS_NAME_OPTGROUP_LABEL)
+
+        if (option.disabled) {
+          optgrouplabel.classList.add(CLASS_NAME_DISABLED)
+        }
+
         optgroup.append(optgrouplabel)
 
         this._createOptions(optgroup, option.options)

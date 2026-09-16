@@ -469,6 +469,10 @@ select.form-multi-select,
   text-transform: var(--#{$prefix}form-multi-select-optgroup-label-text-transform);
   @include border-radius(var(--#{$prefix}form-multi-select-optgroup-label-border-radius), 0);
 
+  &.disabled {
+    color: var(--#{$prefix}form-multi-select-option-disabled-color);
+  }
+
   &.form-multi-select-optgroup-label-with-checkbox {
     // The group label uses a reduced font-size, so keep the indicator sized
     // against the base options font-size to match the option checkboxes.

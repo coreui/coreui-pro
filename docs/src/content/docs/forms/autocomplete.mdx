@@ -82,6 +82,8 @@ Set `disabled: true` on an option object to keep it in the list but out of reach
 
 <Code code={autocompleteDisabledOptions} lang="js" />
 
+`disabled: true` on a group object does the same to every option inside it, and greys out the group label with them.
+
 A disabled option that the configuration also marks `selected` (or that `value` points at) is still shown as the current value — the restriction is on what the user can choose, not on what the page can set.
 
 ### External data
