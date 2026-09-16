@@ -777,6 +777,68 @@ describe('DatePicker', () => {
   })
 
   describe('dispose', () => {
+    it('should give the host back the way the page wrote it', () => {
+      fixtureEl.innerHTML = '<div class="form-control-group my-own" id="picker"></div>'
+      const element = fixtureEl.querySelector('#picker')
+      const instance = new DatePicker(fixtureEl.querySelector('#picker'), { size: 'sm' })
+
+      instance.show()
+      instance.dispose()
+
+      expect(element.outerHTML).toEqual('<div class="form-control-group my-own" id="picker"></div>')
+    })
+
+    it('should leave a class the page removed while it lived removed', () => {
+      fixtureEl.innerHTML = '<div class="border-danger mb-3" id="picker"></div>'
+      const element = fixtureEl.querySelector('#picker')
+      const picker = new DatePicker(element)
+
+      element.classList.remove('border-danger')
+      picker.dispose()
+
+      expect(element.outerHTML).toEqual('<div class="mb-3" id="picker"></div>')
+    })
+
+    it('should keep classes the page added while it lived, its own names included', () => {
+      fixtureEl.innerHTML = '<div id="picker"></div>'
+      const element = fixtureEl.querySelector('#picker')
+      const picker = new DatePicker(element)
+
+      element.classList.add('form-control-lg', 'shadow')
+      picker.dispose()
+
+      expect(element.outerHTML).toEqual('<div id="picker" class="form-control-lg shadow"></div>')
+    })
+
+    it('should clean a size class whatever the size is called', () => {
+      fixtureEl.innerHTML = '<div id="picker"></div>'
+      const element = fixtureEl.querySelector('#picker')
+      const picker = new DatePicker(element, { size: 'xl' })
+
+      picker.dispose()
+
+      expect(element.outerHTML).toEqual('<div id="picker"></div>')
+    })
+
+    it('should tolerate a second dispose', () => {
+      fixtureEl.innerHTML = '<div id="picker"></div>'
+      const picker = new DatePicker(fixtureEl.querySelector('#picker'))
+
+      picker.dispose()
+
+      expect(() => picker.dispose()).not.toThrow()
+    })
+
+    it('should not leave a class attribute on a host that had none', () => {
+      fixtureEl.innerHTML = '<div id="picker"></div>'
+      const element = fixtureEl.querySelector('#picker')
+      const instance = new DatePicker(fixtureEl.querySelector('#picker'), { size: 'sm' })
+
+      instance.dispose()
+
+      expect(element.outerHTML).toEqual('<div id="picker"></div>')
+    })
+
     it('should drop the listeners on the controls it built', () => {
       fixtureEl.innerHTML = '<div id="picker"></div>'
       const picker = new DatePicker(fixtureEl.querySelector('#picker'))

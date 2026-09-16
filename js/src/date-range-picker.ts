@@ -17,7 +17,9 @@ import DateRangeInput from './date-range-input.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import Popup from './util/popup.js'
-import { createControlGroupAction } from './util/form-control-group.js'
+import {
+  captureHostClasses, createControlGroupAction, type HostClasses, restoreHostClasses
+} from './util/form-control-group.js'
 import { getDateBySelectionType } from './util/calendar.js'
 import type { ComponentConfig } from './util/config.js'
 import { getWeekSectionsFromLocale } from './util/date-sections.js'
@@ -173,6 +175,7 @@ class DateRangePicker extends BaseComponent {
   protected declare _calendarElement: any
   protected declare _menu: any
   protected declare _popup: any
+  protected declare _hostClasses: HostClasses
   protected declare _selectEndDate: any
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
@@ -189,6 +192,7 @@ class DateRangePicker extends BaseComponent {
     this._popup = null
     this._selectEndDate = false
 
+    this._hostClasses = captureHostClasses(this._element, this._managedClassNames())
     this._createDateRangePicker()
     this._createPopup()
     this._addEventListeners()
@@ -265,6 +269,10 @@ class DateRangePicker extends BaseComponent {
   }
 
   override dispose(): void {
+    if (!this._element) {
+      return
+    }
+
     for (const element of [this._menu, this._indicatorElement, this._cleanerElement, this._frameElement]) {
       EventHandler.off(element, EVENT_KEY)
     }
@@ -273,12 +281,20 @@ class DateRangePicker extends BaseComponent {
     this._rangeInput.dispose()
     this._calendar?.dispose()
     this._frameElement.remove()
-    this._element.classList.remove(CLASS_NAME_DATE_PICKER, CLASS_NAME_DATE_RANGE_PICKER, CLASS_NAME_PICKER)
+    restoreHostClasses(this._element, this._managedClassNames(), this._hostClasses)
 
     super.dispose()
   }
 
   // Private
+  _managedClassNames(): string[] {
+    return [
+      CLASS_NAME_DATE_PICKER,
+      CLASS_NAME_DATE_RANGE_PICKER,
+      CLASS_NAME_PICKER
+    ].filter(Boolean) as string[]
+  }
+
   // See DatePicker._forwardConfig — options the inner primitives know about
   // are forwarded by name so data attributes reach them.
   _forwardConfig(Component: any, overrides: Record<string, any> = {}, extra: Record<string, any> = {}): Record<string, any> {

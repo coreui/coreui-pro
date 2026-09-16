@@ -16,6 +16,38 @@ const CLASS_NAME_GROUP = 'form-control-group'
 const CLASS_NAME_FORM_CONTROL = 'form-control'
 const CLASS_NAME_STAYS_ON_CONTROL = /^(?:is|was|js)-/
 
+export type HostClasses = { classNames: string[], hadAttribute: boolean }
+
+/**
+ * Records which of the classes a component is about to manage the host already
+ * carried, so teardown can tell its own additions from the page's markup.
+ * @param {HTMLElement} element The host the component builds on.
+ * @param {string[]} managed Every class this component may put on the host.
+ * @returns {HostClasses} What the host carried before the component ran.
+ */
+export const captureHostClasses = (element: HTMLElement, managed: string[]): HostClasses => ({
+  classNames: managed.filter(className => element.classList.contains(className)),
+  hadAttribute: element.hasAttribute('class')
+})
+
+/**
+ * Puts the managed classes back the way the page had them: the ones it wrote
+ * stay, the ones the component added go. Classes outside `managed` are never
+ * touched, so anything the page added or removed in the meantime survives.
+ * @param {HTMLElement} element The host to give back.
+ * @param {string[]} managed Every class this component may have put on the host.
+ * @param {HostClasses} host What `captureHostClasses` recorded.
+ */
+export const restoreHostClasses = (element: HTMLElement, managed: string[], host: HostClasses): void => {
+  for (const className of managed) {
+    element.classList.toggle(className, host.classNames.includes(className))
+  }
+
+  if (!host.hadAttribute && element.classList.length === 0) {
+    element.removeAttribute('class')
+  }
+}
+
 /**
  * Turns an element the author wrote into the frame. The frame transitions its
  * border colour, and an element that was not one a moment ago still carries the

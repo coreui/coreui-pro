@@ -16,7 +16,13 @@ import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { isSameDateAs } from './util/calendar.js'
 import type { ComponentConfig } from './util/config.js'
-import { appendControlGroupField, applyControlGroupClasses } from './util/form-control-group.js'
+import {
+  appendControlGroupField,
+  applyControlGroupClasses,
+  captureHostClasses,
+  type HostClasses,
+  restoreHostClasses
+} from './util/form-control-group.js'
 import { SEPARATOR_ICON, SEPARATOR_ICON_RTL } from './util/icons.js'
 import { defineJQueryPlugin, isRTL, jQueryDispatch } from './util/index.js'
 import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
@@ -220,7 +226,7 @@ class DateRangeInput extends BaseComponent {
   protected declare _endFieldElement: HTMLElement
   protected declare _separatorElement: HTMLElement
   protected declare _created: { end: boolean, separator: boolean, start: boolean }
-  protected declare _addedGroupClass: boolean
+  protected declare _hostClasses: HostClasses
   protected declare _markupInvalid: boolean
   protected declare _markupValid: boolean
   protected declare _addedValidClass: boolean
@@ -234,6 +240,7 @@ class DateRangeInput extends BaseComponent {
     super(element, config)
 
     this._created = { end: false, separator: false, start: false }
+    this._hostClasses = captureHostClasses(this._element, this._managedClassNames())
     this._markupInvalid = this._element.classList.contains(CLASS_NAME_IS_INVALID)
     this._markupValid = this._element.classList.contains(CLASS_NAME_IS_VALID)
     this._addedValidClass = false
@@ -322,8 +329,6 @@ class DateRangeInput extends BaseComponent {
       this._endFieldElement.remove()
     }
 
-    this._element.classList.remove(CLASS_NAME_DATE_RANGE)
-
     if (!this._markupInvalid) {
       this._element.classList.remove(CLASS_NAME_IS_INVALID)
     }
@@ -332,17 +337,22 @@ class DateRangeInput extends BaseComponent {
       this._element.classList.remove(CLASS_NAME_IS_VALID)
     }
 
-    if (this._addedGroupClass) {
-      this._element.classList.remove(CLASS_NAME_INPUT_GROUP)
-    }
+    restoreHostClasses(this._element, this._managedClassNames(), this._hostClasses)
 
     super.dispose()
   }
 
   // Private
+  _managedClassNames(): string[] {
+    return [
+      CLASS_NAME_DATE_RANGE,
+      CLASS_NAME_INPUT_GROUP,
+      this._config.size && `${CLASS_NAME_FORM_CONTROL}-${this._config.size}`
+    ].filter(Boolean) as string[]
+  }
+
   _createDateRangeInput(): void {
     const group = this._element
-    this._addedGroupClass = !group.classList.contains(CLASS_NAME_INPUT_GROUP)
     applyControlGroupClasses(group, CLASS_NAME_INPUT_GROUP, CLASS_NAME_DATE_RANGE)
 
     if (this._config.size) {

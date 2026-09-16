@@ -26,6 +26,7 @@ import {
 } from './util/date-sections.js'
 import type { ComponentConfig } from './util/config.js'
 import type { DateSection } from './util/date-sections.js'
+import { captureHostClasses, type HostClasses, restoreHostClasses } from './util/form-control-group.js'
 import { getNextActiveElement, isRTL } from './util/index.js'
 
 /**
@@ -52,7 +53,7 @@ const CLASS_NAME_SECTION = 'form-date-time-section'
 const CLASS_NAME_SECTION_EMPTY = 'form-date-time-section-empty'
 const CLASS_NAME_SEPARATOR = 'form-date-time-separator'
 
-const HOST_CLASS_NAMES = new Set([
+const HOST_CLASS_NAMES = [
   CLASS_NAME_ALL_SELECTED,
   CLASS_NAME_DISABLED,
   CLASS_NAME_FILLED,
@@ -60,7 +61,7 @@ const HOST_CLASS_NAMES = new Set([
   CLASS_NAME_IS_INVALID,
   CLASS_NAME_IS_VALID,
   CLASS_NAME_SECTION_INPUT
-])
+]
 
 const SELECTOR_FORM_VALIDATE = '[data-coreui-validate]'
 const SELECTOR_FORM_VALIDATE_VALID = '[data-coreui-validate~="valid"]'
@@ -205,7 +206,7 @@ class SectionInput extends BaseComponent {
   protected declare _allSelected: any
   protected declare _error: any
   protected declare _hostAriaLabel: string | null
-  protected declare _hostClass: string | null
+  protected declare _hostClasses: HostClasses
   protected declare _hostNodes: ChildNode[]
   protected declare _hostRole: string | null
   protected declare _inputElement: any
@@ -242,7 +243,7 @@ class SectionInput extends BaseComponent {
     this._submitHandler = () => this._onFormSubmit()
     this._submitValid = false
     this._hostAriaLabel = this._element.getAttribute('aria-label')
-    this._hostClass = this._element.getAttribute('class')
+    this._hostClasses = captureHostClasses(this._element, HOST_CLASS_NAMES)
     this._hostNodes = [...this._element.childNodes]
     this._hostRole = this._element.getAttribute('role')
 
@@ -331,15 +332,7 @@ class SectionInput extends BaseComponent {
 
     EventHandler.off(this._form, this.constructor.eventName('reset'), this._resetHandler)
     EventHandler.off(this._form, this.constructor.eventName('submit'), this._submitHandler)
-    const hostClassNames = new Set((this._hostClass ?? '').split(/\s+/).filter(Boolean))
-    const otherClassNames = [...this._element.classList].filter(className => !HOST_CLASS_NAMES.has(className) && !hostClassNames.has(className))
-
-    this._restoreAttribute('class', this._hostClass)
-
-    if (otherClassNames.length > 0) {
-      this._element.classList.add(...otherClassNames)
-    }
-
+    restoreHostClasses(this._element, HOST_CLASS_NAMES, this._hostClasses)
     this._restoreAttribute('aria-label', this._hostAriaLabel)
     this._restoreAttribute('role', this._hostRole)
     this._element.replaceChildren(...this._hostNodes)
