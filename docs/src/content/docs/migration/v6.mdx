@@ -3819,7 +3819,7 @@ tintable and lets dark mode deepen every shadow at once.
   `$font-weight-semibold` is the only one left, and only because the docs engine
   reads it and is shared with the v5 line. `dt` and the headings read
   `--cui-font-weight-bold` and `--cui-font-weight-medium` instead of a number
-  frozen at build time, so retuning a weight on `:root` now moves them too. `$font-size-base` goes to `--cui-body-font-size`, and `$font-size-root`
+  frozen at build time, so retuning a weight on `:root` now moves them too. `$headings-line-height` goes to `--cui-heading-line-height`, `$font-size-base` to `--cui-body-font-size`, and `$font-size-root`
   goes entirely: it gated a `font-size` on the root element at build time and
   defaulted to `null`, so it emitted nothing. Set `font-size` on `html` in your
   own CSS to scale `rem` instead. `$border-width` and `$border-color` go the

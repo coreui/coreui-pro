@@ -39,7 +39,7 @@ $reboot-tokens: defaults(
     --#{$prefix}heading-font-family: #{$headings-font-family},
     --#{$prefix}heading-font-style: #{$headings-font-style},
     --#{$prefix}heading-font-weight: #{$headings-font-weight},
-    --#{$prefix}heading-line-height: #{$headings-line-height},
+    --#{$prefix}heading-line-height: 1.2,
     --#{$prefix}sub-sup-font-size: #{$sub-sup-font-size},
     --#{$prefix}hr-margin-y: #{$hr-margin-y},
     --#{$prefix}hr-color: #{$hr-color},

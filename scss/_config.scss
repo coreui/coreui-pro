@@ -140,9 +140,9 @@ $container-max-widths: defaults(
 // Set the number of columns and specify the width of the gutters.
 
 $grid-columns:                12 !default;
-$grid-row-columns:            6 !default;
 $grid-gutter-x:               1.5rem !default;
 $grid-gutter-y:               0 !default;
+$grid-row-columns:            6 !default;
 // fusv-disable
 $grid-gutter-width:           $grid-gutter-x !default; // Deprecated in v6.0.0, removed in v7
 // fusv-enable
@@ -271,10 +271,6 @@ $font-weights: defaults(
 );
 // scss-docs-end font-weights
 // scss-docs-end font-variables
-
-// scss-docs-start headings-variables
-$headings-line-height:        1.2 !default;
-// scss-docs-end headings-variables
 
 // The type scale
 //
