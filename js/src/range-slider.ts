@@ -138,7 +138,7 @@ class RangeSlider extends BaseComponent {
 
     this._config = this._getConfig(config)
 
-    this._currentValue = [...this._config.value]
+    this._currentValue = this._config.value
     this._dragIndex = 0
     this._inputs = []
     this._isDragging = false
@@ -176,7 +176,7 @@ class RangeSlider extends BaseComponent {
   // Public
   setConfig(config: any): void {
     this._config = this._getConfig({ ...this._config, ...config })
-    this._currentValue = [...this._config.value]
+    this._currentValue = this._config.value
     this._element.innerHTML = ''
     this._initializeRangeSlider()
   }
@@ -664,9 +664,7 @@ class RangeSlider extends BaseComponent {
 
     if (typeof config.value === 'string') {
       config.value = config.value.split(/,\s*/).map(Number)
-    }
-
-    if (Array.isArray(config.value)) {
+    } else if (Array.isArray(config.value)) {
       config.value = [...config.value]
     }
 
