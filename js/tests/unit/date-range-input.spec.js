@@ -221,6 +221,51 @@ describe('DateRangeInput', () => {
       expect(element.classList.contains('is-invalid')).toBeTrue()
     })
 
+    it('should give back an invalid class the markup carried even after the range went valid', () => {
+      const range = build({}, '<div id="range" class="is-invalid"></div>')
+      const element = root()
+
+      range.setRange(new Date(2026, 0, 1), new Date(2026, 0, 5))
+
+      expect(element.classList.contains('is-invalid')).toBeFalse()
+
+      range.dispose()
+      instances.length = 0
+
+      expect(element.outerHTML).toEqual('<div id="range" class="is-invalid"></div>')
+    })
+
+    it('should give back a valid class the markup carried after the range changed', () => {
+      const range = build({}, '<div id="range" class="is-valid"></div>')
+      const element = root()
+
+      range.setRange(new Date(2026, 0, 1), new Date(2026, 0, 5))
+      range.dispose()
+      instances.length = 0
+
+      expect(element.outerHTML).toEqual('<div id="range" class="is-valid"></div>')
+    })
+
+    it('should keep a state class the page put on while it lived', () => {
+      const range = build({}, '<div id="range" class="mine"></div>')
+      const element = root()
+
+      element.classList.add('is-valid')
+      range.dispose()
+      instances.length = 0
+
+      expect(element.outerHTML).toEqual('<div id="range" class="mine is-valid"></div>')
+    })
+
+    it('should tolerate a second dispose', () => {
+      const range = build()
+
+      range.dispose()
+      instances.length = 0
+
+      expect(() => range.dispose()).not.toThrow()
+    })
+
     it('should put the invalid option on the frame, not only on the fields', () => {
       build({ invalid: true })
 

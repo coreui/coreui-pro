@@ -229,7 +229,7 @@ class DateRangeInput extends BaseComponent {
   protected declare _hostClasses: HostClasses
   protected declare _markupInvalid: boolean
   protected declare _markupValid: boolean
-  protected declare _addedValidClass: boolean
+  protected declare _addedStateClassNames: Set<string>
   protected declare _initialStartDate: any
   protected declare _initialEndDate: any
   protected declare _startDate: Date | null
@@ -240,10 +240,10 @@ class DateRangeInput extends BaseComponent {
     super(element, config)
 
     this._created = { end: false, separator: false, start: false }
-    this._hostClasses = captureHostClasses(this._element, this._managedClassNames())
+    this._hostClasses = captureHostClasses(this._element, [...this._managedClassNames(), CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID])
     this._markupInvalid = this._element.classList.contains(CLASS_NAME_IS_INVALID)
     this._markupValid = this._element.classList.contains(CLASS_NAME_IS_VALID)
-    this._addedValidClass = false
+    this._addedStateClassNames = new Set()
     this._initialStartDate = config?.startDate ?? this._config.startDate
     this._initialEndDate = config?.endDate ?? this._config.endDate
     this._applying = false
@@ -310,6 +310,10 @@ class DateRangeInput extends BaseComponent {
   }
 
   override dispose(): void {
+    if (!this._element) {
+      return
+    }
+
     for (const element of [this._startElement, this._endElement]) {
       EventHandler.off(element, EVENT_KEY)
     }
@@ -329,12 +333,12 @@ class DateRangeInput extends BaseComponent {
       this._endFieldElement.remove()
     }
 
-    if (!this._markupInvalid) {
-      this._element.classList.remove(CLASS_NAME_IS_INVALID)
-    }
+    this._element.classList.remove(...this._addedStateClassNames)
 
-    if (this._addedValidClass) {
-      this._element.classList.remove(CLASS_NAME_IS_VALID)
+    for (const className of [CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID]) {
+      if (this._hostClasses.classNames.includes(className)) {
+        this._element.classList.add(className)
+      }
     }
 
     restoreHostClasses(this._element, this._managedClassNames(), this._hostClasses)
@@ -343,6 +347,14 @@ class DateRangeInput extends BaseComponent {
   }
 
   // Private
+  _toggleStateClassName(className: string, on: boolean): void {
+    if (on && !this._hostClasses.classNames.includes(className)) {
+      this._addedStateClassNames.add(className)
+    }
+
+    this._element.classList.toggle(className, on)
+  }
+
   _managedClassNames(): string[] {
     return [
       CLASS_NAME_DATE_RANGE,
@@ -478,9 +490,8 @@ class DateRangeInput extends BaseComponent {
     const isInvalid = this._markupInvalid || this._config.invalid || !this.isRangeValid()
     const isValid = (this._markupValid || this._config.valid) && !isInvalid
 
-    this._element.classList.toggle(CLASS_NAME_IS_INVALID, isInvalid)
-    this._element.classList.toggle(CLASS_NAME_IS_VALID, isValid)
-    this._addedValidClass = this._addedValidClass || (isValid && !this._markupValid)
+    this._toggleStateClassName(CLASS_NAME_IS_INVALID, isInvalid)
+    this._toggleStateClassName(CLASS_NAME_IS_VALID, isValid)
   }
 
   _addEventListeners(): void {
