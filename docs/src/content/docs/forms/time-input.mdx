@@ -168,7 +168,7 @@ The [keyboard support table](/forms/date-input/#keyboard-support) applies unchan
 
 ### Via data attributes
 
-Add `data-coreui-time-input` to an empty `div`. The component renders the sections, separators, and a hidden input for form submission. Include the `form-control form-date-time` classes in the markup — the component adds them on initialization anyway, but having them from the start keeps the field styled and full-height before the JavaScript runs (no flash of an unstyled element on load).
+Add `data-coreui-time-input` to an empty `div`. The component renders the sections, separators, and a hidden input, which is submitted with the form once you give it a `name`. Include the `form-control form-date-time` classes in the markup — the component adds them on initialization anyway, but having them from the start keeps the field styled and full-height before the JavaScript runs (no flash of an unstyled element on load).
 
 ```html
 <div class="form-control form-date-time" data-coreui-time-input data-coreui-format="HH:mm" data-coreui-name="time"></div>
@@ -207,7 +207,7 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | `meridiemPlaceholder` | string, null | `null` | Replaces the `AM` the meridiem section shows while it is empty. |
 | `minDate` | date, number, string, null | `null` | Earliest selectable time |
 | `minutePlaceholder` | string, null | `null` | Replaces the `mm` the minute section shows while it is empty. |
-| `name` | string, null | `null` | Name attribute of the hidden input |
+| `name` | string, null | `null` | Name of the hidden input the value is submitted under. Without it the field is not submitted with the form. |
 | `readonly` | boolean | `false` | Make the field focusable but non-editable |
 | `required` | boolean | `false` | Required attribute of the hidden input |
 | `secondPlaceholder` | string, null | `null` | Replaces the `ss` the second section shows while it is empty. |

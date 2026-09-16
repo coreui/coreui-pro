@@ -27,6 +27,58 @@ describe('DateInput', () => {
     clearFixture()
   })
 
+  describe('form payload', () => {
+    it('should not submit a field the page only gave an id', () => {
+      fixtureEl.innerHTML = '<form id="form"><div class="date-input" id="start"></div></form>'
+      const dateInputEl = fixtureEl.querySelector('.date-input')
+      // eslint-disable-next-line no-new
+      new DateInput(dateInputEl, { date: new Date(2026, 0, 15), format: 'dd.MM.yyyy' })
+
+      expect([...new FormData(fixtureEl.querySelector('#form')).keys()]).toEqual([])
+    })
+
+    it('should submit under the configured name', () => {
+      fixtureEl.innerHTML = '<form id="form"><div class="date-input" id="start"></div></form>'
+      const dateInputEl = fixtureEl.querySelector('.date-input')
+      // eslint-disable-next-line no-new
+      new DateInput(dateInputEl, { date: new Date(2026, 0, 15), format: 'dd.MM.yyyy', name: 'from' })
+
+      expect([...new FormData(fixtureEl.querySelector('#form')).entries()])
+        .toEqual([['from', '15.01.2026']])
+    })
+
+    it('should submit under a name given as a data attribute', () => {
+      fixtureEl.innerHTML = '<form id="form"><div class="date-input" id="start" data-coreui-name="from"></div></form>'
+      const dateInputEl = fixtureEl.querySelector('.date-input')
+      // eslint-disable-next-line no-new
+      new DateInput(dateInputEl, { date: new Date(2026, 0, 15), format: 'dd.MM.yyyy' })
+
+      expect([...new FormData(fixtureEl.querySelector('#form')).entries()])
+        .toEqual([['from', '15.01.2026']])
+    })
+
+    it('should submit under a name given by setConfig', () => {
+      fixtureEl.innerHTML = '<form id="form"><div class="date-input" id="start"></div></form>'
+      const dateInputEl = fixtureEl.querySelector('.date-input')
+      const dateInput = new DateInput(dateInputEl, { date: new Date(2026, 0, 15), format: 'dd.MM.yyyy' })
+
+      dateInput.setConfig({ name: 'later' })
+
+      expect([...new FormData(fixtureEl.querySelector('#form')).entries()])
+        .toEqual([['later', '15.01.2026']])
+    })
+
+    it('should stop submitting once disposed', () => {
+      fixtureEl.innerHTML = '<form id="form"><div class="date-input"></div></form>'
+      const dateInputEl = fixtureEl.querySelector('.date-input')
+      const dateInput = new DateInput(dateInputEl, { date: new Date(2026, 0, 15), format: 'dd.MM.yyyy', name: 'ghost' })
+
+      dateInput.dispose()
+
+      expect([...new FormData(fixtureEl.querySelector('#form')).keys()]).toEqual([])
+    })
+  })
+
   describe('VERSION', () => {
     it('should return plugin version', () => {
       expect(DateInput.VERSION).toEqual(jasmine.any(String))

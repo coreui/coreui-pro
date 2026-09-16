@@ -1672,6 +1672,21 @@ adornment in the library — so the button needs no icon markup at all:
   that declares `dir` answers for it, `dir="auto"` included, and the document
   after that, but placement first is the reliable path).
 
+#### Date and time fields are submitted only once you name them
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+Date Input, Time Input and Date Time Input took an `id` written on the host as
+permission to submit, naming their hidden input `<component>-<id>` when no
+`name` was configured, so `<div data-coreui-date-input id="delivery">` posted
+`date-input-delivery` — a key the page never asked for, from an attribute a
+`<label for>` needs anyway. Date Picker, Time Picker and Date Time Picker
+inherit the rule through the field they embed, and with `floatingLabel` that
+field is given a generated id, so they posted a key that changed on every load
+(`date-input-date-picker-190423`). The hidden input is named from `name` alone
+now, and a field without one stays out of the form. `dispose()` removes that
+input as well, where it used to leave it behind and keep submitting.
+
 #### Range / Range Slider
 
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>

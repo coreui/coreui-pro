@@ -56,6 +56,21 @@ describe('TimePicker', () => {
     })
   })
 
+  describe('form payload', () => {
+    it('should not submit a floating-label picker the page did not name', () => {
+      buildPicker({ floatingLabel: 'Pick a time', time: '10:30:00' }, '<form id="form"><div id="picker"></div></form>')
+
+      expect([...new FormData(fixtureEl.querySelector('#form')).keys()]).toEqual([])
+    })
+
+    it('should submit under the configured name', () => {
+      buildPicker({ floatingLabel: 'Pick a time', name: 'at', time: '10:30:00' }, '<form id="form"><div id="picker"></div></form>')
+
+      expect([...new FormData(fixtureEl.querySelector('#form')).entries()])
+        .toEqual([['at', '10:30 AM']])
+    })
+  })
+
   describe('field-to-panel sync', () => {
     it('should reflect a time entered in the field in the selection body', () => {
       const picker = buildPicker({ locale: 'en-GB', time: '10:15:00' })
