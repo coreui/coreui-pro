@@ -328,7 +328,7 @@ An option that is an `<a>` with an `href` navigates on click and on <kbd>Enter</
 
 ## Disabled items
 
-`.disabled` (with `aria-disabled="true"` for assistive technology) takes an option out of the keyboard order and out of every selection method. `data-coreui-disabled="true"` on the list box does the same for all of it: `aria-disabled` lands on the options element and the select-all button is disabled.
+`.disabled` (with `aria-disabled="true"` for assistive technology) takes an option out of the keyboard order and out of every selection method. The initial selection is one of them: a disabled value passed in `selected`, or an item carrying both `disabled` and `selected`, is dropped. `data-coreui-disabled="true"` on the list box does the same for all of it: `aria-disabled` lands on the options element and the select-all button is disabled.
 
 <Example code={`<div class="list-box" data-coreui-list-box style="max-width: 20rem">
     <div class="list-box-options" role="listbox" aria-label="Sandwich">
@@ -440,7 +440,7 @@ const listBox = new coreui.ListBox('#myListBox', {
 | `search` | boolean, string | `false` | Builds a search field above the options. `true` filters the list itself; `'external'` filters nothing and fires `search.coreui.list-box` instead. An input the markup already carries is used either way. |
 | `searchPlaceholder` | string | `'Search'` | Placeholder of the built search field. |
 | `sectionsSelectable` | boolean | `false` | Turns every section label into a tri-state button (`aria-pressed`) that toggles the section's visible, enabled options, and puts it in the arrow-key order. `multiple` mode only. |
-| `selected` | null, string, array | `null` | Initially selected values. In `single` mode only the first one is taken. |
+| `selected` | null, string, array | `null` | Initially selected values. In `single` mode only the first one is taken, and a disabled value is never taken. |
 | `selectedLabel` | string, function | `` (count, total) => `${count}/${total} selected` `` | The header's count text. A function `(count, total) => string`, or a string in which `{count}` and `{total}` are replaced. |
 | `selectionLimit` | null, number | `null` | How many options can be selected at once in `multiple` mode. Further selections are refused and reported through `selectionLimit.coreui.list-box`; nothing is disabled and deselecting always works. |
 | `selectionMode` | string | `'single'` | `'none'`, `'single'` or `'multiple'`. |

@@ -544,8 +544,20 @@ class Transfer extends BaseComponent {
 
   _movableValues(side: TransferSide): string[] {
     return this._visibleOptions(side)
-      .filter(option => !option.classList.contains(CLASS_NAME_DISABLED) && option.getAttribute('aria-disabled') !== 'true')
+      .filter(option => !this._isDisabled(option))
       .map(option => this._optionValue(option))
+  }
+
+  _movableSelection(side: TransferSide): string[] {
+    const selected = side.listBox.getSelectedValues()
+
+    return this._options(side)
+      .filter(option => selected.includes(this._optionValue(option)) && !this._isDisabled(option))
+      .map(option => this._optionValue(option))
+  }
+
+  _isDisabled(option: HTMLElement): boolean {
+    return option.classList.contains(CLASS_NAME_DISABLED) || option.getAttribute('aria-disabled') === 'true'
   }
 
   _values(side: TransferSide): string[] {
@@ -585,7 +597,7 @@ class Transfer extends BaseComponent {
       const side = this._moveSide(kind)
       const from = this._sides[side === SIDE_TARGET ? SIDE_SOURCE : SIDE_TARGET]
       const blocked = this._config.disabled || (side === SIDE_SOURCE && this._config.oneWay)
-      const movable = this._movesAll(kind) ? this._movableValues(from).length : from.listBox.getSelectedValues().length
+      const movable = this._movesAll(kind) ? this._movableValues(from).length : this._movableSelection(from).length
 
       button.disabled = blocked || movable === 0
     }
@@ -599,7 +611,7 @@ class Transfer extends BaseComponent {
     const to = this._sides[side]
     const from = this._sides[side === SIDE_TARGET ? SIDE_SOURCE : SIDE_TARGET]
     const wanted = values ?? from.listBox.getSelectedValues()
-    const options = this._options(from).filter(option => wanted.includes(this._optionValue(option)))
+    const options = this._options(from).filter(option => wanted.includes(this._optionValue(option)) && !this._isDisabled(option))
 
     if (options.length === 0) {
       return
