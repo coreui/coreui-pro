@@ -26,6 +26,21 @@ describe('DateRangePicker', () => {
   }
 
   describe('constructor', () => {
+    it('should point aria-controls at the panel only while it exists', () => {
+      const picker = buildPicker()
+      const indicator = fixtureEl.querySelector('.form-control-action')
+
+      expect(indicator.hasAttribute('aria-controls')).toBeFalse()
+
+      picker.show()
+
+      expect(indicator.getAttribute('aria-controls')).toEqual(picker._menu.id)
+
+      picker.hide()
+
+      expect(indicator.hasAttribute('aria-controls')).toBeFalse()
+    })
+
     it('should compose two section fields, a separator, and one multi-month calendar', () => {
       const picker = buildPicker()
 

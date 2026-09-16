@@ -383,7 +383,6 @@ class DateRangePicker extends BaseComponent {
     this._menu = document.createElement('div')
     this._menu.id = getUID(`${this.constructor.NAME}-popup-`)
     this._menu.classList.add(CLASS_NAME_POPUP, CLASS_NAME_DROPDOWN)
-    indicator.setAttribute('aria-controls', this._menu.id)
     indicator.setAttribute('aria-expanded', 'false')
     indicator.setAttribute('aria-haspopup', 'dialog')
 
@@ -469,11 +468,13 @@ class DateRangePicker extends BaseComponent {
       onBeforeShow: () => !EventHandler.trigger(this._element, EVENT_SHOW)?.defaultPrevented,
       onHidden: () => EventHandler.trigger(this._element, EVENT_HIDDEN),
       onHide: () => {
+        this._indicatorElement.removeAttribute('aria-controls')
         this._menu.classList.remove(CLASS_NAME_SHOW)
         this._element.classList.remove(CLASS_NAME_SHOW)
         this._indicatorElement.setAttribute('aria-expanded', 'false')
       },
       onShow: () => {
+        this._indicatorElement.setAttribute('aria-controls', this._menu.id)
         this._ensureCalendar()
         this._menu.classList.add(CLASS_NAME_SHOW)
         this._element.classList.add(CLASS_NAME_SHOW)

@@ -392,13 +392,8 @@ class DatePicker extends BaseComponent {
     this._menu = document.createElement('div')
     this._menu.id = getUID(`${this.constructor.NAME}-popup-`)
     this._menu.classList.add(CLASS_NAME_POPUP, CLASS_NAME_DROPDOWN)
-    const writeOnToggle = this._created.toggle ?
-      (name: string, value: string) => this._toggleElement.setAttribute(name, value) :
-      (name: string, value: string) => this._writeAdoptedAttribute(this._toggleElement, name, value)
-
-    writeOnToggle('aria-controls', this._menu.id)
-    writeOnToggle('aria-expanded', 'false')
-    writeOnToggle('aria-haspopup', 'dialog')
+    this._writeToggleAttribute('aria-expanded', 'false')
+    this._writeToggleAttribute('aria-haspopup', 'dialog')
 
     const body = document.createElement('div')
     body.classList.add(CLASS_NAME_BODY)
@@ -506,6 +501,15 @@ class DatePicker extends BaseComponent {
     return element
   }
 
+  _writeToggleAttribute(name: string, value: string): void {
+    if (this._created.toggle) {
+      this._toggleElement.setAttribute(name, value)
+      return
+    }
+
+    this._writeAdoptedAttribute(this._toggleElement, name, value)
+  }
+
   _writeAdoptedAttribute(element: Element, name: string, value: string): void {
     if (!this._adoptedAttributes.some(([recorded, recordedName]) => recorded === element && recordedName === name)) {
       this._adoptedAttributes.push([element, name, element.getAttribute(name), value])
@@ -525,12 +529,14 @@ class DatePicker extends BaseComponent {
       onHide: () => {
         this._menu.classList.remove(CLASS_NAME_SHOW)
         this._element.classList.remove(CLASS_NAME_SHOW)
+        this._toggleElement.removeAttribute('aria-controls')
         this._toggleElement.setAttribute('aria-expanded', 'false')
       },
       onShow: () => {
         this._ensureCalendar()
         this._menu.classList.add(CLASS_NAME_SHOW)
         this._element.classList.add(CLASS_NAME_SHOW)
+        this._writeToggleAttribute('aria-controls', this._menu.id)
         this._toggleElement.setAttribute('aria-expanded', 'true')
       },
       onShown: () => EventHandler.trigger(this._element, EVENT_SHOWN)
