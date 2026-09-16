@@ -101,6 +101,7 @@
   // The state has to reach the group: a custom property set on the control
   // inside it only inherits downwards, never back up to the frame.
   .form-control-group.is-#{$state},
+  .is-#{$state} > .form-control-group,
   .form-control-group:has(> .form-control.is-#{$state}),
   .form-control-group:has(> .form-floating > .form-control.is-#{$state}) {
     @include form-control-group-validation-state($color, $border-color, $focus-ring-color);

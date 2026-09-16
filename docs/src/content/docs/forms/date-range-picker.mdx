@@ -162,6 +162,30 @@ Each field carries its own [floating label](/forms/floating-labels/): set `start
 
 <Code code={dateRangePickerDisabledDates} lang="js" />
 
+## Validation
+
+Write `.is-invalid` or `.is-valid` on the picker element and it lands on the frame the picker builds, which is where the stylesheet looks for it. The class judges the range the markup rendered, so it drops as soon as either end moves and comes back when the range returns, through `reset()` or a native form reset. An end before the start is invalid on its own; `isRangeValid()` reports it.
+
+<Example pro code={`<div class="row">
+    <div class="col-lg-7">
+      <div class="is-invalid" data-coreui-date-range-picker data-coreui-locale="en-US" data-coreui-start-date="2026-07-20" data-coreui-end-date="2026-07-14"></div>
+      <div class="invalid-feedback d-block">Check-out has to be on or after check-in.</div>
+    </div>
+  </div>`} />
+
+## Validation
+
+The frame the picker builds takes the standard validation styling, and a state class written on the picker element reaches it: `.is-invalid` or `.is-valid` on the element you author styles the frame underneath it. That is the server-side route, so the class stays until the page changes it, and a sibling `.invalid-feedback` or `.valid-feedback` reads from the same element.
+
+<Example pro code={`<div class="row">
+    <div class="col-lg-7">
+      <div class="is-invalid" data-coreui-date-range-picker data-coreui-locale="en-US" data-coreui-start-date="2026-07-14" data-coreui-end-date="2026-07-20"></div>
+      <div class="invalid-feedback">Those dates are already booked.</div>
+    </div>
+  </div>`} />
+
+The component sets the state itself as well: an end before the start makes the frame invalid while it stands, and the `invalid` and `valid` options force it whatever the range is.
+
 ## Custom ranges
 
 There is no `ranges` option. Project a `<template data-coreui-template="ranges">`
@@ -304,6 +328,7 @@ attributes work on the picker element too.
 | `endFloatingLabel` | string, null | `null` | Renders a floating label over the end field, which also becomes that field's accessible name. |
 | `endName` | string, null | `null` | Name of the end hidden input. Without it the end date is not submitted with the form. |
 | `inputOptions` | object | `{}` | Programmatic escape hatch for date input options. |
+| `invalid` | boolean | `false` | Force the invalid state (`.is-invalid`) on the frame. |
 | `locale` | string | browser locale | Drives section order, separators, and calendar labels. |
 | `maxDate` | date, string, null | `null` | Upper bound, enforced by both layers. |
 | `minDate` | date, string, null | `null` | Lower bound, enforced by both layers. |
@@ -316,6 +341,7 @@ attributes work on the picker element too.
 | `startDate` | date, string, null | `null` | Initial start of the range. |
 | `startFloatingLabel` | string, null | `null` | Renders a floating label over the start field, which also becomes that field's accessible name. |
 | `startName` | string, null | `null` | Name of the start hidden input. Without it the start date is not submitted with the form. |
+| `valid` | boolean | `false` | Force the valid state (`.is-valid`) on the frame. |
 
 ### Methods
 

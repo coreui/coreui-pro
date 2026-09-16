@@ -31,6 +31,7 @@ const mount = (markup, config = {}) => {
 }
 
 const displayOf = selector => getComputedStyle(container.querySelector(selector)).display
+const borderOf = selector => getComputedStyle(container.querySelector(selector)).borderTopColor
 const fields = () => [...container.querySelectorAll('.form-date-time')]
 
 describe('validation feedback next to a frame', () => {
@@ -94,6 +95,13 @@ describe('validation feedback next to a frame', () => {
     mount('<div class="form-field"><div class="picker"><div class="form-control-group"><input class="form-control is-invalid"></div></div><div class="invalid-feedback">Pick both dates.</div></div>')
 
     expect(displayOf('.invalid-feedback')).toBe('block')
+  })
+
+  it('styles a frame the author wrote the state around', () => {
+    mount('<div id="wrapped" class="is-invalid"><div class="form-control-group"><input class="form-control"></div></div><div class="invalid-feedback">Pick both dates.</div><div id="plain"><div class="form-control-group"><input class="form-control"></div></div>')
+
+    expect(borderOf('#wrapped .form-control-group')).not.toEqual(borderOf('#plain .form-control-group'))
+    expect(displayOf('.invalid-feedback')).toEqual('block')
   })
 
   it('leaves a control deeper than the frame alone, the way the border does', () => {
