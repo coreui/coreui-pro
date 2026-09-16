@@ -58,6 +58,58 @@ describe('RangeSlider', () => {
     })
   })
 
+  describe('value ownership', () => {
+    const move = (element, index, value) => {
+      const input = element.querySelectorAll('.range-slider-input')[index]
+      input.value = String(value)
+      input.dispatchEvent(new Event('input', { bubbles: true }))
+    }
+
+    it('should leave the array the page passed alone', () => {
+      fixtureEl.innerHTML = '<div id="slider"></div>'
+      const element = fixtureEl.querySelector('#slider')
+      const value = [10, 40]
+      // eslint-disable-next-line no-new
+      new RangeSlider(element, { value })
+
+      move(element, 0, 30)
+
+      expect(value).toEqual([10, 40])
+    })
+
+    it('should keep two sliders built from one array apart', () => {
+      fixtureEl.innerHTML = '<div id="first"></div><div id="second"></div>'
+      const first = fixtureEl.querySelector('#first')
+      const second = fixtureEl.querySelector('#second')
+      const value = [10, 40]
+      // eslint-disable-next-line no-new
+      new RangeSlider(first, { value })
+      const other = new RangeSlider(second, { value })
+
+      move(first, 0, 30)
+      other.setConfig({ disabled: false })
+
+      expect([...second.querySelectorAll('.range-slider-input')].map(input => input.value)).toEqual(['10', '40'])
+    })
+
+    it('should hand the listener a copy of the value', () => {
+      fixtureEl.innerHTML = '<div id="slider"></div>'
+      const element = fixtureEl.querySelector('#slider')
+      const rangeSlider = new RangeSlider(element, { value: [10, 40] })
+      let payload = null
+
+      element.addEventListener('change.coreui.range-slider', event => {
+        payload = event.value
+      })
+
+      move(element, 0, 30)
+      element.querySelectorAll('.range-slider-input')[0].dispatchEvent(new Event('change', { bubbles: true }))
+      payload[0] = 99
+
+      expect(rangeSlider._currentValue[0]).toBe(30)
+    })
+  })
+
   describe('constructor', () => {
     it('should initialize with default configuration', () => {
       fixtureEl.innerHTML = '<div data-coreui-range-slider></div>'
