@@ -1936,4 +1936,92 @@ describe('RangeSlider', () => {
       rangeSlider.dispose()
     })
   })
+
+  describe('dispose', () => {
+    it('should return the host to its original markup', () => {
+      fixtureEl.innerHTML = '<div id="host" class="mine"></div>'
+      const div = fixtureEl.querySelector('#host')
+      const rangeSlider = new RangeSlider(div, { labels: ['a', 'b'], value: [10, 40] })
+
+      expect(div.children.length).toBeGreaterThan(0)
+
+      rangeSlider.dispose()
+
+      expect(div.innerHTML).toEqual('')
+      expect(div.className).toEqual('mine')
+    })
+
+    it('should stop reacting to the window once disposed', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const div = fixtureEl.querySelector('#host')
+      const rangeSlider = new RangeSlider(div, { labels: ['a', 'b'] })
+      const spy = spyOn(rangeSlider, '_updateLabelsContainerSize')
+
+      window.dispatchEvent(new Event('resize'))
+      expect(spy).toHaveBeenCalledTimes(1)
+
+      rangeSlider.dispose()
+      window.dispatchEvent(new Event('resize'))
+
+      expect(spy).toHaveBeenCalledTimes(1)
+    })
+
+    it('should not leave a second window listener behind after update', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const div = fixtureEl.querySelector('#host')
+      const rangeSlider = new RangeSlider(div, { labels: ['a', 'b'] })
+
+      rangeSlider.update({ labels: ['a', 'b'], value: 20 })
+
+      const spy = spyOn(rangeSlider, '_updateLabelsContainerSize')
+
+      window.dispatchEvent(new Event('resize'))
+      expect(spy).toHaveBeenCalledTimes(1)
+
+      rangeSlider.dispose()
+      window.dispatchEvent(new Event('resize'))
+
+      expect(spy).toHaveBeenCalledTimes(1)
+    })
+
+    it('should not stack document listeners over an update', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const div = fixtureEl.querySelector('#host')
+      const rangeSlider = new RangeSlider(div)
+
+      rangeSlider.update({ value: 20 })
+
+      const spy = spyOn(rangeSlider, '_calculateMoveValue').and.returnValue(20)
+      rangeSlider._isDragging = true
+
+      document.documentElement.dispatchEvent(new MouseEvent('mousemove', { bubbles: true }))
+
+      expect(spy).toHaveBeenCalledTimes(1)
+    })
+
+    it('should take every class it added back off, even after update', () => {
+      fixtureEl.innerHTML = '<div id="host" class="mine"></div>'
+      const div = fixtureEl.querySelector('#host')
+      const rangeSlider = new RangeSlider(div, { vertical: true })
+
+      rangeSlider.update({ vertical: true, value: 30 })
+      rangeSlider.dispose()
+
+      expect(div.className).toEqual('mine')
+    })
+
+    it('should not stack controls over a second construction', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const div = fixtureEl.querySelector('#host')
+
+      const first = new RangeSlider(div, { labels: ['a', 'b'] })
+      const second = new RangeSlider(div, { labels: ['a', 'b'] })
+
+      expect(div.querySelectorAll('.range-slider-inputs-container').length).toEqual(1)
+      expect(div.querySelectorAll('.range-slider-labels-container').length).toEqual(1)
+
+      second.dispose()
+      first.dispose()
+    })
+  })
 })

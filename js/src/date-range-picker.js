@@ -41,7 +41,7 @@ const EVENT_HIDE = `hide${EVENT_KEY}`
 const EVENT_HIDDEN = `hidden${EVENT_KEY}`
 const EVENT_INPUT = `input${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
-const EVENT_RESIZE = 'resize'
+const EVENT_RESIZE = `resize${EVENT_KEY}`
 const EVENT_SHOW = `show${EVENT_KEY}`
 const EVENT_SHOWN = `shown${EVENT_KEY}`
 const EVENT_SUBMIT = 'submit'
@@ -89,9 +89,9 @@ const Default = {
   calendars: 2,
   cancelButton: 'Cancel',
   cancelButtonClasses: ['btn', 'btn-sm', 'btn-ghost-primary'],
+  cleaner: true,
   confirmButton: 'OK',
   confirmButtonClasses: ['btn', 'btn-sm', 'btn-primary'],
-  cleaner: true,
   container: false,
   date: null,
   dayFormat: 'numeric',
@@ -102,12 +102,12 @@ const Default = {
   firstDayOfWeek: 1,
   footer: false,
   hours: null,
+  indicator: true,
   inputDateFormat: null,
   inputDateParse: null,
   inputOnChangeDelay: 750,
   inputReadOnly: false,
   invalid: false,
-  indicator: true,
   locale: 'default',
   maxDate: null,
   minDate: null,
@@ -127,15 +127,15 @@ const Default = {
   sanitize: true,
   sanitizeFn: null,
   seconds: true,
-  separator: true,
-  size: null,
-  startDate: null,
-  startName: null,
   selectAdjacementDays: false,
   selectEndDate: false,
   selectionType: 'day',
+  separator: true,
   showAdjacementDays: true,
   showWeekNumber: false,
+  size: null,
+  startDate: null,
+  startName: null,
   timepicker: false,
   todayButton: 'Today',
   todayButtonClasses: ['btn', 'btn-sm', 'btn-primary', 'me-auto'],
@@ -161,8 +161,8 @@ const DefaultType = {
   container: '(string|element|boolean)',
   date: '(date|number|string|null)',
   dayFormat: 'string',
-  disabledDates: '(array|date|function|null)',
   disabled: 'boolean',
+  disabledDates: '(array|date|function|null)',
   endDate: '(date|number|string|null)',
   endName: '(string|null)',
   firstDayOfWeek: 'number',
@@ -193,15 +193,15 @@ const DefaultType = {
   sanitize: 'boolean',
   sanitizeFn: '(null|function)',
   seconds: '(array|boolean|function)',
-  separator: 'boolean',
-  size: '(string|null)',
-  startDate: '(date|number|string|null)',
-  startName: '(string|null)',
   selectAdjacementDays: 'boolean',
   selectEndDate: 'boolean',
   selectionType: 'string',
+  separator: 'boolean',
   showAdjacementDays: 'boolean',
   showWeekNumber: 'boolean',
+  size: '(string|null)',
+  startDate: '(date|number|string|null)',
+  startName: '(string|null)',
   timepicker: 'boolean',
   todayButton: '(boolean|string)',
   todayButtonClasses: '(array|string)',
@@ -233,6 +233,7 @@ class DateRangePicker extends BaseComponent {
     this._calendar = null
     this._hadToggleAttribute = false
     this._onFormSubmit = null
+    this._onWindowResize = null
     this._ownTimePickers = []
     this._calendars = null
     this._endInput = null
@@ -366,9 +367,7 @@ class DateRangePicker extends BaseComponent {
       Manipulator.removeDataAttribute(this._element, 'toggle')
     }
 
-    if (form && this._onFormSubmit) {
-      EventHandler.off(form, EVENT_SUBMIT, this._onFormSubmit)
-    }
+    this._removeGlobalEventListeners(form)
 
     super.dispose()
   }
@@ -424,7 +423,22 @@ class DateRangePicker extends BaseComponent {
     })
   }
 
+  _removeGlobalEventListeners(form = this._startInput?.form) {
+    if (form && this._onFormSubmit) {
+      EventHandler.off(form, EVENT_SUBMIT, this._onFormSubmit)
+    }
+
+    if (this._onWindowResize) {
+      EventHandler.off(window, EVENT_RESIZE, this._onWindowResize)
+    }
+
+    this._onFormSubmit = null
+    this._onWindowResize = null
+  }
+
   _addEventListeners() {
+    this._removeGlobalEventListeners()
+
     EventHandler.on(this._indicatorElement, EVENT_CLICK, () => {
       if (!this._config.disabled) {
         this.toggle()
@@ -555,9 +569,11 @@ class DateRangePicker extends BaseComponent {
       }, this._config.inputOnChangeDelay)
     })
 
-    EventHandler.on(window, EVENT_RESIZE, () => {
+    this._onWindowResize = () => {
       this._mobile = window.innerWidth < 768
-    })
+    }
+
+    EventHandler.on(window, EVENT_RESIZE, this._onWindowResize)
   }
 
   _addCalendarEventListeners() {

@@ -9,6 +9,7 @@ import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
+import { addHostClassNames, restoreHost } from './util/host.js'
 import { defineJQueryPlugin, isRTL } from './util/index.js'
 import { DefaultAllowlist, sanitizeHtml } from './util/sanitizer.js'
 
@@ -99,10 +100,16 @@ class RangeSlider extends BaseComponent {
 
     this._config = this._getConfig(config)
 
+    this._addedClassNames = []
     this._currentValue = this._config.value
     this._dragIndex = 0
     this._inputs = []
+    this._inputsContainer = null
     this._isDragging = false
+    this._labelsContainer = null
+    this._onDocumentMouseMove = null
+    this._onDocumentMouseUp = null
+    this._onWindowResize = null
     this._sliderTrack = null
     this._thumbSize = null
     this._tooltips = []
@@ -124,15 +131,50 @@ class RangeSlider extends BaseComponent {
   }
 
   // Public
+  dispose() {
+    if (!this._element) {
+      return
+    }
+
+    this._removeGlobalEventListeners()
+
+    restoreHost(this._element, {
+      classNames: this._addedClassNames,
+      eventKey: EVENT_KEY,
+      nodes: [this._inputsContainer, this._labelsContainer]
+    })
+
+    super.dispose()
+  }
+
   update(config) {
     this._config = this._getConfig(config)
     this._currentValue = this._config.value
     this._element.innerHTML = ''
+    this._tooltips = []
     this._initializeRangeSlider()
   }
 
   // Private
+  _removeGlobalEventListeners() {
+    for (const [element, event, handler] of [
+      [document.documentElement, EVENT_MOUSEUP, this._onDocumentMouseUp],
+      [document.documentElement, EVENT_MOUSEMOVE, this._onDocumentMouseMove],
+      [window, EVENT_RESIZE, this._onWindowResize]
+    ]) {
+      if (handler) {
+        EventHandler.off(element, event, handler)
+      }
+    }
+
+    this._onDocumentMouseMove = null
+    this._onDocumentMouseUp = null
+    this._onWindowResize = null
+  }
+
   _addEventListeners() {
+    this._removeGlobalEventListeners()
+
     if (this._config.disabled) {
       return
     }
@@ -177,11 +219,11 @@ class RangeSlider extends BaseComponent {
       EventHandler.trigger(this._element, EVENT_INPUT, { value: this._currentValue })
     })
 
-    EventHandler.on(document.documentElement, EVENT_MOUSEUP, () => {
+    this._onDocumentMouseUp = () => {
       this._isDragging = false
-    })
+    }
 
-    EventHandler.on(document.documentElement, EVENT_MOUSEMOVE, event => {
+    this._onDocumentMouseMove = event => {
       if (!this._isDragging) {
         return
       }
@@ -189,23 +231,23 @@ class RangeSlider extends BaseComponent {
       const moveValue = this._calculateMoveValue(event)
 
       this._updateValue(moveValue, this._dragIndex)
-    })
+    }
 
-    EventHandler.on(window, EVENT_RESIZE, () => {
+    this._onWindowResize = () => {
       this._updateLabelsContainerSize()
-    })
+    }
+
+    EventHandler.on(document.documentElement, EVENT_MOUSEUP, this._onDocumentMouseUp)
+    EventHandler.on(document.documentElement, EVENT_MOUSEMOVE, this._onDocumentMouseMove)
+    EventHandler.on(window, EVENT_RESIZE, this._onWindowResize)
   }
 
   _initializeRangeSlider() {
-    this._element.classList.add(CLASS_NAME_RANGE_SLIDER)
-
-    if (this._config.vertical) {
-      this._element.classList.add(CLASS_NAME_RANGE_SLIDER_VERTICAL)
-    }
-
-    if (this._config.disabled) {
-      this._element.classList.add(CLASS_NAME_DISABLED)
-    }
+    this._addedClassNames.push(...addHostClassNames(this._element, [
+      CLASS_NAME_RANGE_SLIDER,
+      this._config.vertical && CLASS_NAME_RANGE_SLIDER_VERTICAL,
+      this._config.disabled && CLASS_NAME_DISABLED
+    ]))
 
     this._sliderTrack = this._createSliderTrack()
     this._createInputs()
@@ -234,6 +276,7 @@ class RangeSlider extends BaseComponent {
 
     container.append(this._sliderTrack)
     this._element.append(container)
+    this._inputsContainer = container
   }
 
   _createInput(index, value) {
@@ -337,6 +380,7 @@ class RangeSlider extends BaseComponent {
     }
 
     this._element.append(labelsContainer)
+    this._labelsContainer = labelsContainer
   }
 
   _calculateLabelPosition(label, index) {
