@@ -1,4 +1,5 @@
 import Autocomplete from '../../src/autocomplete.js'
+import EventHandler from '../../src/dom/event-handler.js'
 import {
   clearFixture, createEvent, getFixture, jQueryMock
 } from '../helpers/fixture.js'
@@ -2994,6 +2995,100 @@ describe('Autocomplete', () => {
 
       optionEl.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
       optionEl.click()
+
+      expect(autocomplete._selected).toEqual([])
+    })
+
+    it('should not select a disabled option typed in full and confirmed with Enter', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        options: [
+          { label: 'Option 1', value: '1', disabled: true },
+          { label: 'Option 2', value: '2' }
+        ]
+      })
+
+      autocomplete._inputElement.value = 'Option 1'
+      autocomplete._inputElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
+
+      expect(autocomplete._selected).toEqual([])
+    })
+
+    it('should not select a disabled option typed in full when the input loses focus', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        allowOnlyDefinedOptions: true,
+        options: [
+          { label: 'Option 1', value: '1', disabled: true },
+          { label: 'Option 2', value: '2' }
+        ]
+      })
+
+      autocomplete._inputElement.value = 'Option 1'
+      autocomplete._inputElement.dispatchEvent(new Event('blur', { bubbles: true }))
+
+      expect(autocomplete._selected).toEqual([])
+      expect(autocomplete._inputElement.value).toEqual('')
+    })
+
+    it('should keep a disabled option that the configuration preselects', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        cleaner: true,
+        options: [
+          {
+            label: 'Option 1', value: '1', disabled: true, selected: true
+          },
+          { label: 'Option 2', value: '2' }
+        ]
+      })
+
+      const optionEl = autocomplete._optionsElement.querySelector('[data-value="1"]')
+
+      expect(autocomplete._inputElement.value).toEqual('Option 1')
+      expect(optionEl.classList.contains('selected')).toBe(true)
+    })
+
+    it('should treat a disabled exact match as text that matches nothing', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        options: [
+          { label: 'Option 1', value: '1', disabled: true },
+          { label: 'Option 2', value: '2' }
+        ]
+      })
+      const changed = []
+
+      EventHandler.on(autocompleteEl, 'changed.coreui.autocomplete', event => changed.push(event.value))
+
+      autocomplete._inputElement.value = 'Option 1'
+      autocomplete._inputElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
+
+      expect(autocomplete._selected).toEqual([])
+      expect(changed).toEqual(['Option 1'])
+    })
+
+    it('should not hint or complete a disabled option', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        options: [
+          { label: 'Option 1', value: '1', disabled: true },
+          { label: 'Other', value: '2' }
+        ],
+        showHints: true
+      })
+
+      autocomplete._inputElement.value = 'Opt'
+      autocomplete._inputElement.dispatchEvent(new KeyboardEvent('keyup', { key: 'p', bubbles: true }))
+
+      expect(autocomplete._inputHintElement.value).toEqual('')
+
+      autocomplete._inputElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }))
 
       expect(autocomplete._selected).toEqual([])
     })

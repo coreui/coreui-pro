@@ -325,6 +325,10 @@ class Autocomplete extends BaseComponent {
     return flat
   }
 
+  _selectableOptions() {
+    return this._flattenOptions().filter(option => !option.disabled)
+  }
+
   _getClassNames() {
     return this._element.classList.value.split(' ')
   }
@@ -416,7 +420,7 @@ class Autocomplete extends BaseComponent {
       }
 
       const inputValueLower = inputValue.toLowerCase()
-      const exactMatches = this._flattenOptions().filter(option => option.label.toLowerCase() === inputValueLower)
+      const exactMatches = this._selectableOptions().filter(option => option.label.toLowerCase() === inputValueLower)
 
       if (exactMatches.length === 1) {
         this._selectOption(exactMatches[0])
@@ -447,7 +451,7 @@ class Autocomplete extends BaseComponent {
           event.stopPropagation()
         }
 
-        const options = this._flattenOptions().filter(option => option.label.toLowerCase().startsWith(this._inputElement.value.toLowerCase()))
+        const options = this._selectableOptions().filter(option => option.label.toLowerCase().startsWith(this._inputElement.value.toLowerCase()))
 
         if (options.length > 0) {
           this._selectOption(options[0])
@@ -462,7 +466,7 @@ class Autocomplete extends BaseComponent {
           return
         }
 
-        const options = this._flattenOptions().filter(option => option.label.toLowerCase() === this._inputElement.value.toLowerCase())
+        const options = this._selectableOptions().filter(option => option.label.toLowerCase() === this._inputElement.value.toLowerCase())
 
         if (options.length > 0) {
           this._selectOption(options[0])
@@ -486,7 +490,7 @@ class Autocomplete extends BaseComponent {
         this.search(value)
         if (this._config.showHints) {
           const options = value ?
-            this._flattenOptions().filter(option => option.label.toLowerCase().startsWith(value.toLowerCase())) :
+            this._selectableOptions().filter(option => option.label.toLowerCase().startsWith(value.toLowerCase())) :
             []
           this._inputHintElement.value = options.length > 0 ? `${value}${options[0].label.slice(value.length)}` : ''
         }

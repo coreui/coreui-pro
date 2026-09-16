@@ -10,6 +10,7 @@ otherFrameworks:
 import autocompleteArrayData from './snippets/autocomplete-array-data.js?raw'
 import autocompleteGroupedData from './snippets/autocomplete-grouped-data.js?raw'
 import autocompleteOptionValues from './snippets/autocomplete-option-values.js?raw'
+import autocompleteDisabledOptions from './snippets/autocomplete-disabled-options.js?raw'
 import autocompleteExternalData from './snippets/autocomplete-external-data.js?raw'
 import autocompleteCustomOptions from './snippets/autocomplete-custom-options.js?raw'
 
@@ -72,6 +73,16 @@ For example:
 - Internal storage: `{ label: 'Product A', value: '42' }`
 - Event output: `event.value.value === '42'` (string)
 </Callout>
+
+### Disabled options
+
+Set `disabled: true` on an option object to keep it in the list but out of reach. The option is rendered greyed out and skipped by the mouse, by the arrow keys, by the hint completion, and by typing its label in full — so a label the user cannot pick from the list cannot be picked by typing it either.
+
+<Example pro code={`<div id="myAutoCompleteDisabled"></div>`} sandboxJs={autocompleteDisabledOptions} />
+
+<Code code={autocompleteDisabledOptions} lang="js" />
+
+A disabled option that the configuration also marks `selected` (or that `value` points at) is still shown as the current value — the restriction is on what the user can choose, not on what the page can set.
 
 ### External data
 
@@ -284,7 +295,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `indicator` | boolean | `false` | Enables the selection indicator button. |
 | `invalid` | boolean | `false` | Applies invalid styling to the component. |
 | `name` | string, null | `null` | Sets the name attribute for the input element. Without it the field is not submitted with the form. |
-| `options` | array, string, null | `[]` | Array of options or option objects to populate the dropdown. A string is read as a comma-separated list of labels, which is what `data-coreui-options="Angular, React, Vue.js"` relies on. |
+| `options` | array, string, null | `[]` | Array of options or option objects to populate the dropdown. An option object takes `label`, `value`, `disabled` and `selected`, and a group takes `label` plus a nested `options` array. A string is read as a comma-separated list of labels, which is what `data-coreui-options="Angular, React, Vue.js"` relies on. |
 | `optionsGroupsTemplate` | function, null | `null` | Custom template function for rendering option group labels. Receives the group object as parameter. |
 | `optionsMaxHeight` | number, string | `'auto'` | Sets the maximum height of the options dropdown. |
 | `optionsTemplate` | function, null | `null` | Custom template function for rendering individual options. Receives the option object as parameter. |
