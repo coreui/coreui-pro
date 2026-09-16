@@ -58,7 +58,7 @@ const SELECTOR_SELECTION = '.form-multi-select-selection'
 const SELECTOR_TAG = '.form-multi-select-tag'
 const SELECTOR_TAG_DELETE = '.form-multi-select-tag-delete'
 const SELECTOR_VISIBLE_ITEMS = '.form-multi-select-options .form-multi-select-option:not(.disabled):not(:disabled)'
-const SELECTOR_NAVIGABLE_ITEMS = `.form-multi-select-all:not(.disabled):not(:disabled), ${SELECTOR_VISIBLE_ITEMS}, .form-multi-select-options .form-multi-select-optgroup-label-with-checkbox`
+const SELECTOR_NAVIGABLE_ITEMS = `.form-multi-select-all:not(.disabled):not(:disabled), ${SELECTOR_VISIBLE_ITEMS}, .form-multi-select-options .form-multi-select-optgroup-label-with-checkbox:not(.disabled)`
 
 const EVENT_CHANGED = `changed${EVENT_KEY}`
 const EVENT_CLICK = `click${EVENT_KEY}`
@@ -135,10 +135,10 @@ const Default = {
   selectAllLabel: 'Select all',
   selectAllMode: 'all',
   selectAllStyle: 'checkbox',
+  selectFilteredLabel: 'Select filtered',
   selectionLimit: null,
   selectionType: 'tags',
   selectionTypeCounterText: 'item(s) selected',
-  selectFilteredLabel: 'Select filtered',
   valid: false,
   value: null
 }
@@ -175,13 +175,13 @@ const DefaultType = {
   search: '(boolean|string)',
   searchNoResultsLabel: 'string',
   selectAll: 'boolean',
-  selectAllStyle: 'string',
   selectAllLabel: 'string',
   selectAllMode: 'string',
+  selectAllStyle: 'string',
+  selectFilteredLabel: 'string',
   selectionLimit: '(number|null)',
   selectionType: 'string',
   selectionTypeCounterText: 'string',
-  selectFilteredLabel: 'string',
   valid: 'boolean',
   value: '(string|array|null)'
 }
@@ -217,7 +217,7 @@ class MultiSelect extends BaseComponent {
     this._search = ''
 
     if (this._config.options.length > 0) {
-      this._createNativeOptions(this._element, this._config.options)
+      this._createNativeOptions(this._element, this._options)
     }
 
     this._createSelect()
@@ -563,19 +563,22 @@ class MultiSelect extends BaseComponent {
     return this._getOptionsFromElement()
   }
 
-  _getOptionsFromConfig(options = this._config.options) {
+  _getOptionsFromConfig(options = this._config.options, disabled = false) {
     const _options = []
     for (const option of options) {
       if (this._isOptionGroup(option)) {
         const customGroupProperties = { ...option }
+        const groupDisabled = disabled || Boolean(option.disabled)
 
+        delete customGroupProperties.disabled
         delete customGroupProperties.label
         delete customGroupProperties.options
 
         _options.push({
           ...customGroupProperties,
           label: option.label,
-          options: this._getOptionsFromConfig(option.options)
+          ...groupDisabled && { disabled: true },
+          options: this._getOptionsFromConfig(option.options, groupDisabled)
         })
 
         continue
@@ -584,6 +587,7 @@ class MultiSelect extends BaseComponent {
       const value = String(option.value)
       const isSelected = option.selected || (this._config.value && this._config.value.includes(value))
       const shouldSelect = isSelected && !this._isSelectionLimitReached()
+      const isDisabled = disabled || Boolean(option.disabled)
 
       const customProperties = typeof option === 'object' ? { ...option } : {}
 
@@ -595,13 +599,14 @@ class MultiSelect extends BaseComponent {
         ...customProperties,
         value,
         ...shouldSelect && { selected: true },
-        ...option.disabled && { disabled: true }
+        ...isDisabled && { disabled: true }
       })
 
       if (shouldSelect) {
         this._selected.push({
           value: String(option.value),
-          text: option.text
+          text: option.text,
+          ...isDisabled && { disabled: true }
         })
       }
     }
@@ -609,7 +614,7 @@ class MultiSelect extends BaseComponent {
     return _options
   }
 
-  _getOptionsFromElement(node = this._element) {
+  _getOptionsFromElement(node = this._element, disabled = false) {
     const nodes = Array.from(node.childNodes).filter(element => element.nodeName === 'OPTION' || element.nodeName === 'OPTGROUP')
     const options = []
 
@@ -619,11 +624,12 @@ class MultiSelect extends BaseComponent {
         const text = node.textContent
         const isSelected = node.selected || (this._config.value && this._config.value.includes(node.value))
         const shouldSelect = isSelected && !this._isSelectionLimitReached()
+        const isDisabled = disabled || node.disabled
         options.push({
           value,
           text,
           selected: shouldSelect,
-          disabled: node.disabled
+          disabled: isDisabled
         })
 
         node.selected = shouldSelect
@@ -632,15 +638,18 @@ class MultiSelect extends BaseComponent {
           this._selected.push({
             value,
             text: node.textContent,
-            ...node.disabled && { disabled: true }
+            ...isDisabled && { disabled: true }
           })
         }
       }
 
       if (node.nodeName === 'OPTGROUP') {
+        const groupDisabled = disabled || node.disabled
+
         options.push({
           label: node.label,
-          options: this._getOptionsFromElement(node)
+          ...groupDisabled && { disabled: true },
+          options: this._getOptionsFromElement(node, groupDisabled)
         })
       }
     }
@@ -670,6 +679,7 @@ class MultiSelect extends BaseComponent {
       if (this._isOptionGroup(option)) {
         const optgroup = document.createElement('optgroup')
         optgroup.label = option.label
+        optgroup.disabled = option.disabled === true
         this._createNativeOptions(optgroup, option.options)
         parentElement.append(optgroup)
       } else {
@@ -989,8 +999,15 @@ class MultiSelect extends BaseComponent {
 
         if (this._config.optionsGroupsSelectable && this._config.optionsGroupsStyle === 'checkbox' && this._config.multiple) {
           optgrouplabel.classList.add(CLASS_NAME_OPTGROUP_LABEL_WITH_CHECKBOX)
-          optgrouplabel.tabIndex = 0
-          optgrouplabel.setAttribute('role', 'button')
+
+          if (!option.disabled) {
+            optgrouplabel.tabIndex = 0
+            optgrouplabel.setAttribute('role', 'button')
+          }
+        }
+
+        if (option.disabled) {
+          optgrouplabel.classList.add(CLASS_NAME_DISABLED)
         }
 
         optgroup.append(optgrouplabel)
@@ -1055,7 +1072,7 @@ class MultiSelect extends BaseComponent {
   _onOptionsClick(element) {
     if (this._config.optionsGroupsSelectable) {
       const groupLabel = element.closest(`.${CLASS_NAME_OPTGROUP_LABEL_WITH_CHECKBOX}`)
-      if (groupLabel) {
+      if (groupLabel && !groupLabel.classList.contains(CLASS_NAME_DISABLED)) {
         this._toggleGroup(groupLabel.closest(SELECTOR_OPTGROUP))
         return
       }
@@ -1515,7 +1532,7 @@ class MultiSelect extends BaseComponent {
 
     for (const optgroup of SelectorEngine.find(`.${CLASS_NAME_OPTGROUP}`, this._menu)) {
       const label = SelectorEngine.findOne(`.${CLASS_NAME_OPTGROUP_LABEL_WITH_CHECKBOX}`, optgroup)
-      if (!label) {
+      if (!label || label.classList.contains(CLASS_NAME_DISABLED)) {
         continue
       }
 

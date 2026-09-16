@@ -61,6 +61,19 @@ If you want to create a multi-select dropdown with predefined options, use the `
     </optgroup>
   </select>`} />
 
+### Disabled options and groups
+
+Put `disabled` on an `<option>` to keep it in the list but out of reach, and on an `<optgroup>` to do the same to everything inside it. Disabled options are greyed out, skipped by the mouse and the arrow keys, and left out of select all; the group label is greyed out with them. The array form takes `disabled: true` on an option object or on a group object.
+
+<Example pro code={`<select data-coreui-multi-select multiple>
+    <option value="0">Angular</option>
+    <option value="1" disabled>Bootstrap</option>
+    <optgroup label="backend" disabled>
+      <option value="2">Django</option>
+      <option value="3">Laravel</option>
+    </optgroup>
+  </select>`} />
+
 ### Array data
 
 To dynamically populate a multi-select dropdown with options from an array, start with an empty `<select>` element. Use JavaScript to add options programmatically. This allows for more flexible and dynamic content management.
@@ -478,7 +491,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `invalid` | boolean | `false` | Toggle the invalid state for the component. |
 | `multiple` | boolean | `true` | It specifies that multiple options can be selected at once. |
 | `name` | string, null | `null` | Set the name attribute for the native select element. Without it, and without a `name` in your own markup, the select is not submitted with the form. |
-| `options` | boolean, array | `false` | List of option elements. |
+| `options` | boolean, array | `false` | List of option elements. An option object takes `value`, `text`, `disabled` and `selected`, and a group takes `label`, `disabled` and a nested `options` array; a disabled group disables everything inside it. |
 | `optionsGroupsSelectable` | boolean | `false` | When enabled (with `optionsGroupsStyle: 'checkbox'` and `multiple`), each option group label becomes a tri-state checkbox: clicking it toggles the whole group, and it reflects `none` / `all` / `indeterminate` based on the group's selected options. |
 | `optionsGroupsStyle` | string | `'checkbox'` | Sets the option group label style: `'checkbox'` or `'text'`. Controls the checkbox appearance used by `optionsGroupsSelectable`. |
 | `optionsGroupsTemplate` | function, null | `null` | Custom template function for rendering option group labels. Receives the group object as parameter. |

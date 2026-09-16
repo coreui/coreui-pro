@@ -2943,6 +2943,60 @@ describe('Autocomplete', () => {
       expect(firstGroupOptions.length).toBe(2)
     })
 
+    it('should mark every option of a disabled group as disabled', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        options: [
+          {
+            label: 'Fruits',
+            disabled: true,
+            options: [
+              { label: 'Apple', value: 'apple' },
+              { label: 'Banana', value: 'banana' }
+            ]
+          },
+          { label: 'Carrot', value: 'carrot' }
+        ]
+      })
+
+      const optgroup = autocomplete._optionsElement.querySelector('.autocomplete-optgroup')
+      const groupOptions = optgroup.querySelectorAll('.autocomplete-option')
+
+      expect(optgroup.querySelector('.autocomplete-optgroup-label').classList.contains('disabled')).toBe(true)
+
+      for (const optionEl of groupOptions) {
+        expect(optionEl.classList.contains('disabled')).toBe(true)
+        expect(optionEl.getAttribute('aria-disabled')).toBe('true')
+        expect(optionEl.tabIndex).toBe(-1)
+      }
+
+      expect(autocomplete._selectableOptions()).toEqual([{ label: 'Carrot', value: 'carrot' }])
+    })
+
+    it('should not select an option of a disabled group typed in full', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        allowOnlyDefinedOptions: true,
+        options: [
+          {
+            label: 'Fruits',
+            disabled: true,
+            options: [
+              { label: 'Apple', value: 'apple' }
+            ]
+          }
+        ]
+      })
+
+      autocomplete._inputElement.value = 'Apple'
+      autocomplete._inputElement.dispatchEvent(new Event('blur', { bubbles: true }))
+
+      expect(autocomplete._selected).toEqual([])
+      expect(autocomplete._inputElement.value).toEqual('')
+    })
+
     it('should preserve custom group properties', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
