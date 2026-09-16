@@ -298,6 +298,31 @@ describe('ListBox', () => {
       expect(selectAll).not.toHaveClass('indeterminate')
     })
 
+    it('should clear only the visible options when the switch is clicked again', () => {
+      const el = setMarkup(' data-coreui-selection-mode="multiple"', [
+        '<div class="list-box-option" data-coreui-value="lettuce">Lettuce</div>',
+        '<div class="list-box-option" data-coreui-value="tomato">Tomato</div>'
+      ], selectAllMarkup)
+      const listBox = new ListBox(el)
+      const selectAll = el.querySelector('[data-coreui-select-all]')
+
+      listBox.select('lettuce')
+      listBox.filter('tom')
+
+      click(selectAll)
+
+      expect(listBox.getSelectedValues()).toEqual(['lettuce', 'tomato'])
+
+      click(selectAll)
+
+      expect(listBox.getSelectedValues()).toEqual(['lettuce'])
+      expect(selectAll.getAttribute('aria-pressed')).toEqual('false')
+
+      listBox.clear()
+
+      expect(listBox.getSelectedValues()).toEqual([])
+    })
+
     it('should not select all outside of multiple mode', () => {
       const listBox = new ListBox(setMarkup())
 

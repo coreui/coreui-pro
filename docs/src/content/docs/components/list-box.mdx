@@ -80,7 +80,7 @@ With `none` nothing is ever selected and no `aria-selected` is written; activati
 
 ### Select all
 
-A `.list-box-select-all` button marked `data-coreui-select-all`, anywhere in the container, switches the whole list. It is not an option — it never takes an `option` role, never appears in `getSelectedValues()` and is reached with <kbd>Tab</kbd> rather than with the arrows. The plugin keeps its `aria-pressed` in step with the list (`true`, `false` or `mixed`) and points its `aria-controls` at the options element; clicking it selects everything or, when everything is already selected, clears the selection. Its own text is its name, so it needs no label.
+A `.list-box-select-all` button marked `data-coreui-select-all`, anywhere in the container, switches the whole list. It is not an option — it never takes an `option` role, never appears in `getSelectedValues()` and is reached with <kbd>Tab</kbd> rather than with the arrows. The plugin keeps its `aria-pressed` in step with the list (`true`, `false` or `mixed`) and points its `aria-controls` at the options element; clicking it selects everything or, when everything visible is already selected, drops that same set. Its own text is its name, so it needs no label.
 
 `.list-box-header` is the strip above the options it usually sits in: a plain `<div>`, a flex row that takes whatever content belongs there — a title (`.list-box-title`), a counter (`.list-box-subtitle`), a button of your own — next to or instead of the switch.
 
@@ -96,7 +96,7 @@ A `.list-box-select-all` button marked `data-coreui-select-all`, anywhere in the
     </div>
   </div>`} />
 
-"Everything" means the options the user can actually reach — `selectAll()`, <kbd>Ctrl</kbd> + <kbd>A</kbd> and the button take the visible, enabled options and leave anything `hidden` or `disabled` alone, and the same set decides whether the button reads as pressed, mixed or unpressed. Pass an explicit list to `selectAll(values)` to select beyond the filter.
+"Everything" means the options the user can actually reach — `selectAll()`, <kbd>Ctrl</kbd> + <kbd>A</kbd> and the button take the visible, enabled options and leave anything `hidden` or `disabled` alone, and the same set decides which values a second click drops, so a value the filter hid stays selected. The button reads as pressed once that set is selected, or once `selectionLimit` is reached within it. Pass an explicit list to `selectAll(values)` to select beyond the filter, and call `clear()` to empty the selection whatever the filter shows.
 
 ### Selection limit
 
@@ -111,7 +111,7 @@ A `.list-box-select-all` button marked `data-coreui-select-all`, anywhere in the
     </div>
   </div>`} />
 
-With a limit, the select-all button counts as pressed at `min(limit, visible enabled options)` — `mixed` below it — and clicking it there clears the selection.
+With a limit, the select-all button counts as pressed at `min(limit, visible enabled options)` — `mixed` below it — and clicking it there drops the visible, enabled options it had selected.
 
 ## Items from configuration
 

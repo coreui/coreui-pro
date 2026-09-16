@@ -925,11 +925,23 @@ class ListBox extends BaseComponent {
 
   _toggleSelectAll(): void {
     if (this._allSelected()) {
-      this.clear()
+      this._deselectAll()
       return
     }
 
     this.selectAll()
+  }
+
+  _deselectAll(): void {
+    let changed = false
+
+    for (const option of this._navigableOptions()) {
+      changed = this._deselectValue(this._optionValue(option)) || changed
+    }
+
+    if (changed) {
+      this._triggerChange()
+    }
   }
 
   _selectValue(value: string): boolean {
