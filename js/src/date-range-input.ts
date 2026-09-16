@@ -19,8 +19,10 @@ import type { ComponentConfig } from './util/config.js'
 import {
   appendControlGroupField,
   applyControlGroupClasses,
+  applyControlGroupSize,
   captureHostClasses,
   type HostClasses,
+  managedSizeClassNames,
   restoreHostClasses
 } from './util/form-control-group.js'
 import { SEPARATOR_ICON, SEPARATOR_ICON_RTL } from './util/icons.js'
@@ -46,7 +48,6 @@ const ARROW_LEFT_KEY = 'ArrowLeft'
 const ARROW_RIGHT_KEY = 'ArrowRight'
 
 const CLASS_NAME_DATE_RANGE = 'form-date-range'
-const CLASS_NAME_FORM_CONTROL = 'form-control'
 const CLASS_NAME_INPUT_GROUP = 'form-control-group'
 const CLASS_NAME_IS_INVALID = 'is-invalid'
 const CLASS_NAME_IS_VALID = 'is-valid'
@@ -226,6 +227,7 @@ class DateRangeInput extends BaseComponent {
   protected declare _endFieldElement: HTMLElement
   protected declare _separatorElement: HTMLElement
   protected declare _created: { end: boolean, separator: boolean, start: boolean }
+  protected declare _hiddenFromAssistiveTech: Element[]
   protected declare _hostClasses: HostClasses
   protected declare _claimedEndDate: Date | null
   protected declare _claimedInvalid: boolean
@@ -242,6 +244,7 @@ class DateRangeInput extends BaseComponent {
     super(element, config)
 
     this._created = { end: false, separator: false, start: false }
+    this._hiddenFromAssistiveTech = []
     this._hostClasses = captureHostClasses(this._element, [...this._managedClassNames(), CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID])
     this._claimedInvalid = this._element.classList.contains(CLASS_NAME_IS_INVALID)
     this._claimedValid = this._element.classList.contains(CLASS_NAME_IS_VALID)
@@ -345,6 +348,10 @@ class DateRangeInput extends BaseComponent {
       }
     }
 
+    for (const element of this._hiddenFromAssistiveTech) {
+      element.removeAttribute('aria-hidden')
+    }
+
     restoreHostClasses(this._element, this._managedClassNames(), this._hostClasses)
 
     super.dispose()
@@ -363,11 +370,20 @@ class DateRangeInput extends BaseComponent {
     this._element.classList.toggle(className, on)
   }
 
+  _hideFromAssistiveTech(element: Element): void {
+    if (element.hasAttribute('aria-hidden')) {
+      return
+    }
+
+    element.setAttribute('aria-hidden', 'true')
+    this._hiddenFromAssistiveTech.push(element)
+  }
+
   _managedClassNames(): string[] {
     return [
       CLASS_NAME_DATE_RANGE,
       CLASS_NAME_INPUT_GROUP,
-      this._config.size && `${CLASS_NAME_FORM_CONTROL}-${this._config.size}`
+      ...managedSizeClassNames(this._config.size)
     ].filter(Boolean) as string[]
   }
 
@@ -375,23 +391,27 @@ class DateRangeInput extends BaseComponent {
     const group = this._element
     applyControlGroupClasses(group, CLASS_NAME_INPUT_GROUP, CLASS_NAME_DATE_RANGE)
 
-    if (this._config.size) {
-      group.classList.add(`${CLASS_NAME_FORM_CONTROL}-${this._config.size}`)
-    }
+    applyControlGroupSize(group, this._config.size)
 
     // Markup first: a part the author wrote is adopted, a missing one is built,
     // in document order — start, separator, end.
     const ownStart = SelectorEngine.findOne(SELECTOR_ROLE_START, group)
     this._startElement = ownStart ?? document.createElement('div')
     this._created.start = !ownStart
-    this._startElement.setAttribute(ATTRIBUTE_ROLE_START, '')
+    if (!ownStart) {
+      this._startElement.setAttribute(ATTRIBUTE_ROLE_START, '')
+    }
+
     this._startFieldElement = ownStart ?? appendControlGroupField(group, this._startElement, this._config.startFloatingLabel, `${NAME}-`)
 
     const ownSeparator = SelectorEngine.findOne(SELECTOR_ROLE_SEPARATOR, group)
     this._separatorElement = ownSeparator ?? this._createSeparator()
     this._created.separator = !ownSeparator
-    this._separatorElement.setAttribute(ATTRIBUTE_ROLE_SEPARATOR, '')
-    this._separatorElement.setAttribute('aria-hidden', 'true')
+    if (!ownSeparator) {
+      this._separatorElement.setAttribute(ATTRIBUTE_ROLE_SEPARATOR, '')
+    }
+
+    this._hideFromAssistiveTech(this._separatorElement)
 
     if (!ownSeparator) {
       group.append(this._separatorElement)
@@ -400,7 +420,10 @@ class DateRangeInput extends BaseComponent {
     const ownEnd = SelectorEngine.findOne(SELECTOR_ROLE_END, group)
     this._endElement = ownEnd ?? document.createElement('div')
     this._created.end = !ownEnd
-    this._endElement.setAttribute(ATTRIBUTE_ROLE_END, '')
+    if (!ownEnd) {
+      this._endElement.setAttribute(ATTRIBUTE_ROLE_END, '')
+    }
+
     this._endFieldElement = ownEnd ?? appendControlGroupField(group, this._endElement, this._config.endFloatingLabel, `${NAME}-`)
 
     this._startInput = this._createInput(this._startElement, {
@@ -507,8 +530,10 @@ class DateRangeInput extends BaseComponent {
       this._applyRange(this._startDate, event.date, { fields: false })
     })
 
-    for (const svg of SelectorEngine.find(SELECTOR_SVG, this._separatorElement)) {
-      svg.setAttribute('aria-hidden', 'true')
+    if (this._separatorElement.getAttribute('aria-hidden') !== 'true') {
+      for (const svg of SelectorEngine.find(SELECTOR_SVG, this._separatorElement)) {
+        this._hideFromAssistiveTech(svg)
+      }
     }
 
     // Each field walks its own sections with the arrows and stops at its

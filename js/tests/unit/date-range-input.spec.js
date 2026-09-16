@@ -163,6 +163,32 @@ describe('DateRangeInput', () => {
     })
   })
 
+  describe('sizing', () => {
+    it('should replace a size the markup carried and give it back on dispose', () => {
+      const range = build({ size: 'sm' }, '<div id="range" class="form-control-lg"></div>')
+      const element = root()
+
+      expect(element.classList.contains('form-control-lg')).toBeFalse()
+      expect(element.classList.contains('form-control-sm')).toBeTrue()
+
+      range.dispose()
+      instances.length = 0
+
+      expect(element.outerHTML).toEqual('<div id="range" class="form-control-lg"></div>')
+    })
+
+    it('should leave a size class alone when it was given none', () => {
+      const range = build({}, '<div id="range"></div>')
+      const element = root()
+
+      element.classList.add('form-control-lg')
+      range.dispose()
+      instances.length = 0
+
+      expect(element.classList.contains('form-control-lg')).toBeTrue()
+    })
+  })
+
   describe('validation state', () => {
     it('should keep an invalid class the markup carried while the range it judged stands', () => {
       const range = build({}, '<div id="range" class="is-invalid" data-coreui-start-date="2026-07-14" data-coreui-end-date="2026-07-20"></div>')
@@ -395,7 +421,7 @@ describe('DateRangeInput', () => {
       expect(root().querySelector('[data-coreui-range-start] .form-date-time-section')).not.toBeNull()
       expect(root().querySelector('[data-coreui-range-end] .form-date-time-section')).not.toBeNull()
       expect(root().querySelector('[data-coreui-range-separator]').getAttribute('aria-hidden')).toEqual('true')
-      expect(root().querySelector('[data-coreui-range-separator] svg').getAttribute('aria-hidden')).toEqual('true')
+      expect(root().querySelector('[data-coreui-range-separator] svg').hasAttribute('aria-hidden')).toBeFalse()
       expect(range.getStartDate()).toEqual(new Date(2026, 6, 14))
     })
 
@@ -421,6 +447,31 @@ describe('DateRangeInput', () => {
   })
 
   describe('dispose', () => {
+    it('should give the separator the author wrote back untouched', () => {
+      const range = build({}, '<div id="range"><span data-coreui-range-separator="to"><svg viewBox="0 0 1 1"></svg>to</span></div>')
+      const separator = fixtureEl.querySelector('[data-coreui-range-separator]')
+
+      expect(separator.getAttribute('aria-hidden')).toEqual('true')
+
+      range.dispose()
+      instances.length = 0
+
+      expect(separator.hasAttribute('aria-hidden')).toBeFalse()
+      expect(separator.querySelector('svg').hasAttribute('aria-hidden')).toBeFalse()
+      expect(separator.getAttribute('data-coreui-range-separator')).toEqual('to')
+    })
+
+    it('should leave an aria-hidden the author wrote on the separator alone', () => {
+      const range = build({}, '<div id="range"><span data-coreui-range-separator aria-hidden="false"><svg viewBox="0 0 1 1"></svg>to</span></div>')
+      const separator = fixtureEl.querySelector('[data-coreui-range-separator]')
+
+      range.dispose()
+      instances.length = 0
+
+      expect(separator.getAttribute('aria-hidden')).toEqual('false')
+      expect(separator.querySelector('svg').hasAttribute('aria-hidden')).toBeFalse()
+    })
+
     it('should give the host back the way the page wrote it', () => {
       fixtureEl.innerHTML = '<div class="mb-3" id="range"></div>'
       const element = fixtureEl.querySelector('#range')
