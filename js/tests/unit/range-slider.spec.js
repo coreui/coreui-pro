@@ -69,12 +69,26 @@ describe('RangeSlider', () => {
       fixtureEl.innerHTML = '<div id="slider"></div>'
       const element = fixtureEl.querySelector('#slider')
       const value = [10, 40]
-      // eslint-disable-next-line no-new
-      new RangeSlider(element, { value })
+      const rangeSlider = new RangeSlider(element, { value })
 
       move(element, 0, 30)
 
       expect(value).toEqual([10, 40])
+
+      rangeSlider.dispose()
+    })
+
+    it('should keep the value a user picked across setConfig', () => {
+      fixtureEl.innerHTML = '<div id="slider"></div>'
+      const element = fixtureEl.querySelector('#slider')
+      const rangeSlider = new RangeSlider(element, { value: [10, 40] })
+
+      move(element, 0, 30)
+      rangeSlider.setConfig({ disabled: false })
+
+      expect([...element.querySelectorAll('.range-slider-input')].map(input => input.value)).toEqual(['30', '40'])
+
+      rangeSlider.dispose()
     })
 
     it('should keep two sliders built from one array apart', () => {
@@ -82,14 +96,16 @@ describe('RangeSlider', () => {
       const first = fixtureEl.querySelector('#first')
       const second = fixtureEl.querySelector('#second')
       const value = [10, 40]
-      // eslint-disable-next-line no-new
-      new RangeSlider(first, { value })
+      const one = new RangeSlider(first, { value })
       const other = new RangeSlider(second, { value })
 
       move(first, 0, 30)
       other.setConfig({ disabled: false })
 
       expect([...second.querySelectorAll('.range-slider-input')].map(input => input.value)).toEqual(['10', '40'])
+
+      one.dispose()
+      other.dispose()
     })
 
     it('should hand the listener a copy of the value', () => {
@@ -104,9 +120,14 @@ describe('RangeSlider', () => {
 
       move(element, 0, 30)
       element.querySelectorAll('.range-slider-input')[0].dispatchEvent(new Event('change', { bubbles: true }))
+
+      expect(payload).not.toBeNull()
+
       payload[0] = 99
 
       expect(rangeSlider._currentValue[0]).toBe(30)
+
+      rangeSlider.dispose()
     })
   })
 
