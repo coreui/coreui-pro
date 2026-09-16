@@ -43,6 +43,7 @@ const CLASS_NAME_DATE_RANGE = 'form-date-range'
 const CLASS_NAME_FORM_CONTROL = 'form-control'
 const CLASS_NAME_INPUT_GROUP = 'form-control-group'
 const CLASS_NAME_IS_INVALID = 'is-invalid'
+const CLASS_NAME_IS_VALID = 'is-valid'
 const CLASS_NAME_SEPARATOR = 'form-control-icon'
 
 const ATTRIBUTE_ROLE_END = 'data-coreui-range-end'
@@ -220,6 +221,9 @@ class DateRangeInput extends BaseComponent {
   protected declare _separatorElement: HTMLElement
   protected declare _created: { end: boolean, separator: boolean, start: boolean }
   protected declare _addedGroupClass: boolean
+  protected declare _markupInvalid: boolean
+  protected declare _markupValid: boolean
+  protected declare _addedValidClass: boolean
   protected declare _initialStartDate: any
   protected declare _initialEndDate: any
   protected declare _startDate: Date | null
@@ -230,6 +234,9 @@ class DateRangeInput extends BaseComponent {
     super(element, config)
 
     this._created = { end: false, separator: false, start: false }
+    this._markupInvalid = this._element.classList.contains(CLASS_NAME_IS_INVALID)
+    this._markupValid = this._element.classList.contains(CLASS_NAME_IS_VALID)
+    this._addedValidClass = false
     this._initialStartDate = config?.startDate ?? this._config.startDate
     this._initialEndDate = config?.endDate ?? this._config.endDate
     this._applying = false
@@ -315,7 +322,15 @@ class DateRangeInput extends BaseComponent {
       this._endFieldElement.remove()
     }
 
-    this._element.classList.remove(CLASS_NAME_DATE_RANGE, CLASS_NAME_IS_INVALID)
+    this._element.classList.remove(CLASS_NAME_DATE_RANGE)
+
+    if (!this._markupInvalid) {
+      this._element.classList.remove(CLASS_NAME_IS_INVALID)
+    }
+
+    if (this._addedValidClass) {
+      this._element.classList.remove(CLASS_NAME_IS_VALID)
+    }
 
     if (this._addedGroupClass) {
       this._element.classList.remove(CLASS_NAME_INPUT_GROUP)
@@ -426,6 +441,12 @@ class DateRangeInput extends BaseComponent {
     const endChanged = !isSameDateAs(end, this._endDate)
     this._startDate = start
     this._endDate = end
+
+    if (startChanged || endChanged) {
+      this._markupInvalid = false
+      this._markupValid = false
+    }
+
     this._applyOrder()
 
     if (startChanged) {
@@ -444,7 +465,12 @@ class DateRangeInput extends BaseComponent {
   // An end before the start is a state of the range, not of either field, so
   // it lands on the frame — the fields keep what was typed and stay editable.
   _applyOrder(): void {
-    this._element.classList.toggle(CLASS_NAME_IS_INVALID, !this.isRangeValid())
+    const isInvalid = this._markupInvalid || this._config.invalid || !this.isRangeValid()
+    const isValid = (this._markupValid || this._config.valid) && !isInvalid
+
+    this._element.classList.toggle(CLASS_NAME_IS_INVALID, isInvalid)
+    this._element.classList.toggle(CLASS_NAME_IS_VALID, isValid)
+    this._addedValidClass = this._addedValidClass || (isValid && !this._markupValid)
   }
 
   _addEventListeners(): void {
