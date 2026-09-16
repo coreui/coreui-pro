@@ -58,7 +58,7 @@ const SELECTOR_SELECTION = '.form-multi-select-selection'
 const SELECTOR_TAG = '.form-multi-select-tag'
 const SELECTOR_TAG_DELETE = '.form-multi-select-tag-delete'
 const SELECTOR_VISIBLE_ITEMS = '.form-multi-select-options .form-multi-select-option:not(.disabled):not(:disabled)'
-const SELECTOR_NAVIGABLE_ITEMS = `.form-multi-select-all:not(.disabled):not(:disabled), ${SELECTOR_VISIBLE_ITEMS}, .form-multi-select-options .form-multi-select-optgroup-label-with-checkbox`
+const SELECTOR_NAVIGABLE_ITEMS = `.form-multi-select-all:not(.disabled):not(:disabled), ${SELECTOR_VISIBLE_ITEMS}, .form-multi-select-options .form-multi-select-optgroup-label-with-checkbox:not(.disabled)`
 
 const EVENT_CHANGED = `changed${EVENT_KEY}`
 const EVENT_CLICK = `click${EVENT_KEY}`
@@ -605,7 +605,8 @@ class MultiSelect extends BaseComponent {
       if (shouldSelect) {
         this._selected.push({
           value: String(option.value),
-          text: option.text
+          text: option.text,
+          ...isDisabled && { disabled: true }
         })
       }
     }
@@ -996,12 +997,17 @@ class MultiSelect extends BaseComponent {
 
         optgrouplabel.classList.add(CLASS_NAME_OPTGROUP_LABEL)
 
+        if (this._config.optionsGroupsSelectable && this._config.optionsGroupsStyle === 'checkbox' && this._config.multiple) {
+          optgrouplabel.classList.add(CLASS_NAME_OPTGROUP_LABEL_WITH_CHECKBOX)
+
+          if (!option.disabled) {
+            optgrouplabel.tabIndex = 0
+            optgrouplabel.setAttribute('role', 'button')
+          }
+        }
+
         if (option.disabled) {
           optgrouplabel.classList.add(CLASS_NAME_DISABLED)
-        } else if (this._config.optionsGroupsSelectable && this._config.optionsGroupsStyle === 'checkbox' && this._config.multiple) {
-          optgrouplabel.classList.add(CLASS_NAME_OPTGROUP_LABEL_WITH_CHECKBOX)
-          optgrouplabel.tabIndex = 0
-          optgrouplabel.setAttribute('role', 'button')
         }
 
         optgroup.append(optgrouplabel)
@@ -1066,7 +1072,7 @@ class MultiSelect extends BaseComponent {
   _onOptionsClick(element) {
     if (this._config.optionsGroupsSelectable) {
       const groupLabel = element.closest(`.${CLASS_NAME_OPTGROUP_LABEL_WITH_CHECKBOX}`)
-      if (groupLabel) {
+      if (groupLabel && !groupLabel.classList.contains(CLASS_NAME_DISABLED)) {
         this._toggleGroup(groupLabel.closest(SELECTOR_OPTGROUP))
         return
       }
@@ -1526,7 +1532,7 @@ class MultiSelect extends BaseComponent {
 
     for (const optgroup of SelectorEngine.find(`.${CLASS_NAME_OPTGROUP}`, this._menu)) {
       const label = SelectorEngine.findOne(`.${CLASS_NAME_OPTGROUP_LABEL_WITH_CHECKBOX}`, optgroup)
-      if (!label) {
+      if (!label || label.classList.contains(CLASS_NAME_DISABLED)) {
         continue
       }
 

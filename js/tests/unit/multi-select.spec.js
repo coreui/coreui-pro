@@ -240,6 +240,40 @@ describe('MultiSelect', () => {
       multiSelect.selectAll()
 
       expect(multiSelect._selected.map(option => option.value)).toEqual(['b1'])
+      expect(multiSelect._options[0].options[0].disabled).toBe(true)
+    })
+
+    it('should keep a group disabled through the options config as well', () => {
+      fixtureEl.innerHTML = '<select multiple></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [
+          {
+            label: 'Group A',
+            disabled: true,
+            options: [{ value: 'a1', text: 'A1', selected: true }]
+          }
+        ]
+      })
+
+      expect(multiSelect._selected).toEqual([{ value: 'a1', text: 'A1', disabled: true }])
+      expect(multiSelect._selectionElement.querySelector('.form-multi-select-tag')).not.toBeNull()
+      expect(multiSelect._selectionElement.querySelector('.form-multi-select-tag-delete')).toBeNull()
+    })
+
+    it('should keep the native select in step with the selection limit', () => {
+      fixtureEl.innerHTML = '<select multiple></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [
+          { value: 'a', text: 'A', selected: true },
+          { value: 'b', text: 'B', selected: true }
+        ],
+        selectionLimit: 1
+      })
+
+      expect(multiSelect._selected.map(option => option.value)).toEqual(['a'])
+      expect([...selectEl.selectedOptions].map(option => option.value)).toEqual(['a'])
     })
 
     it('should set multiple attribute on native select when multiple is true', () => {
