@@ -777,6 +777,19 @@ describe('DatePicker', () => {
   })
 
   describe('dispose', () => {
+    it('should replace a size the markup carried and give it back', () => {
+      const picker = buildPicker({ size: 'sm' }, '<div class="form-control-lg" id="picker"></div>')
+      const element = fixtureEl.querySelector('#picker')
+
+      expect(element.classList.contains('form-control-lg')).toBeFalse()
+      expect(element.classList.contains('form-control-sm')).toBeTrue()
+
+      picker.dispose()
+      pickers.length = 0
+
+      expect(element.outerHTML).toEqual('<div class="form-control-lg" id="picker"></div>')
+    })
+
     it('should give the host back the way the page wrote it', () => {
       fixtureEl.innerHTML = '<div class="form-control-group my-own" id="picker"></div>'
       const element = fixtureEl.querySelector('#picker')

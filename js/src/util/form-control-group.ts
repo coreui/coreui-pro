@@ -16,6 +16,32 @@ const CLASS_NAME_GROUP = 'form-control-group'
 const CLASS_NAME_FORM_CONTROL = 'form-control'
 const CLASS_NAME_STAYS_ON_CONTROL = /^(?:is|was|js)-/
 
+export const SIZE_CLASS_NAMES: string[] = [`${CLASS_NAME_FORM_CONTROL}-lg`, `${CLASS_NAME_FORM_CONTROL}-sm`]
+
+/**
+ * Puts the configured size on the frame in place of one the markup carried, so
+ * the two cannot both apply and leave the winner to stylesheet order.
+ * @param {HTMLElement} element The frame.
+ * @param {string | null} size The configured size, or null to leave sizes alone.
+ */
+export const applyControlGroupSize = (element: HTMLElement, size: string | null): void => {
+  if (!size) {
+    return
+  }
+
+  element.classList.remove(...SIZE_CLASS_NAMES)
+  element.classList.add(`${CLASS_NAME_FORM_CONTROL}-${size}`)
+}
+
+/**
+ * The size classes a component owns: none until it is given a size, and then
+ * the pair it may have replaced plus the one it applied.
+ * @param {string | null} size The configured size.
+ * @returns {string[]} The owned size classes, without duplicates.
+ */
+export const managedSizeClassNames = (size: string | null): string[] =>
+  size ? [...new Set([...SIZE_CLASS_NAMES, `${CLASS_NAME_FORM_CONTROL}-${size}`])] : []
+
 export type HostClasses = { classNames: string[], hadAttribute: boolean }
 
 /**
@@ -33,7 +59,9 @@ export const captureHostClasses = (element: HTMLElement, managed: string[]): Hos
 /**
  * Puts the managed classes back the way the page had them: the ones it wrote
  * stay, the ones the component added go. Classes outside `managed` are never
- * touched, so anything the page added or removed in the meantime survives.
+ * touched, so anything the page added or removed in the meantime survives —
+ * which is why a component owns the size classes only while it has a size of
+ * its own to apply.
  * @param {HTMLElement} element The host to give back.
  * @param {string[]} managed Every class this component may have put on the host.
  * @param {HostClasses} host What `captureHostClasses` recorded.

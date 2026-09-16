@@ -19,7 +19,14 @@ import TimeSelection from './util/time-selection.js'
 import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 import type { ComponentConfig } from './util/config.js'
 import {
-  appendControlGroupField, applyControlGroupClasses, captureHostClasses, createControlGroupAction, type HostClasses, restoreHostClasses
+  appendControlGroupField,
+  applyControlGroupClasses,
+  applyControlGroupSize,
+  captureHostClasses,
+  createControlGroupAction,
+  type HostClasses,
+  managedSizeClassNames,
+  restoreHostClasses
 } from './util/form-control-group.js'
 import { CALENDAR_ICON, CLEANER_ICON } from './util/icons.js'
 import { defineJQueryPlugin, getUID, jQueryDispatch } from './util/index.js'
@@ -50,7 +57,6 @@ const CLASS_NAME_DROPDOWN = 'date-picker-popup'
 const CLASS_NAME_FOOTER = 'date-picker-footer'
 const CLASS_NAME_CLEANER = 'form-control-cleaner'
 const CLASS_NAME_INDICATOR = 'form-control-action'
-const CLASS_NAME_FORM_CONTROL = 'form-control'
 const CLASS_NAME_INPUT_GROUP = 'form-control-group'
 const CLASS_NAME_PICKER = 'picker'
 const CLASS_NAME_POPUP = 'popup'
@@ -273,7 +279,7 @@ class DateTimePicker extends BaseComponent {
       CLASS_NAME_DATE_TIME_PICKER,
       CLASS_NAME_PICKER,
       CLASS_NAME_INPUT_GROUP,
-      this._config.size && `${CLASS_NAME_FORM_CONTROL}-${this._config.size}`
+      ...managedSizeClassNames(this._config.size)
     ].filter(Boolean) as string[]
   }
 
@@ -300,9 +306,7 @@ class DateTimePicker extends BaseComponent {
     applyControlGroupClasses(inputGroup, CLASS_NAME_INPUT_GROUP)
 
     // Sizing rides the standard control classes on the frame itself
-    if (this._config.size) {
-      inputGroup.classList.add(`${CLASS_NAME_FORM_CONTROL}-${this._config.size}`)
-    }
+    applyControlGroupSize(inputGroup, this._config.size)
 
     const inputEl = document.createElement('div')
     this._fieldElement = appendControlGroupField(inputGroup, inputEl, this._config.floatingLabel, `${this.constructor.NAME}-`)
