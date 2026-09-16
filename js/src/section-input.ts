@@ -200,6 +200,7 @@ class SectionInput extends BaseComponent {
   protected declare _initialDate: Date | null
   protected declare _resetHandler: () => void
   protected declare _submitHandler: () => void
+  protected declare _submitValid: boolean
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
@@ -221,6 +222,7 @@ class SectionInput extends BaseComponent {
     }
 
     this._submitHandler = () => this._onFormSubmit()
+    this._submitValid = false
 
     this._createSectionInput()
     this._date = this._applyValidationState()
@@ -446,8 +448,9 @@ class SectionInput extends BaseComponent {
       const isInvalid = this._element.classList.contains(CLASS_NAME_IS_INVALID) ||
         (this._config.required && this._date === null)
 
+      this._submitValid = !isInvalid && form.matches(SELECTOR_FORM_VALIDATE_VALID)
       this._element.classList.toggle(CLASS_NAME_IS_INVALID, isInvalid)
-      this._element.classList.toggle(CLASS_NAME_IS_VALID, !isInvalid && form.matches(SELECTOR_FORM_VALIDATE_VALID))
+      this._element.classList.toggle(CLASS_NAME_IS_VALID, this._submitValid)
     })
   }
 
@@ -676,6 +679,10 @@ class SectionInput extends BaseComponent {
 
     this._element.classList.toggle(CLASS_NAME_FILLED, isFilled)
     this._element.classList.toggle(CLASS_NAME_IS_INVALID, isDisabled || this._config.invalid)
+    this._element.classList.toggle(
+      CLASS_NAME_IS_VALID,
+      this._config.valid || (this._submitValid && isFilled && !isDisabled)
+    )
     this._setHiddenInputValue()
 
     if (error !== this._error) {

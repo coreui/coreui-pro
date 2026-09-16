@@ -163,6 +163,82 @@ describe('DateRangeInput', () => {
     })
   })
 
+  describe('validation state', () => {
+    it('should keep an invalid class the markup carried while the range it judged stands', () => {
+      const range = build({}, '<div id="range" class="is-invalid" data-coreui-start-date="2026-07-14" data-coreui-end-date="2026-07-20"></div>')
+
+      expect(root().classList.contains('is-invalid')).toBeTrue()
+
+      range.setRange(new Date(2026, 6, 14), new Date(2026, 6, 20))
+
+      expect(root().classList.contains('is-invalid')).toBeTrue()
+    })
+
+    it('should drop the markup class when only one end moves', () => {
+      const range = build({}, '<div id="range" class="is-invalid" data-coreui-start-date="2026-07-14" data-coreui-end-date="2026-07-20"></div>')
+
+      range.setRange(new Date(2026, 6, 14), new Date(2026, 6, 21))
+
+      expect(root().classList.contains('is-invalid')).toBeFalse()
+    })
+
+    it('should keep a valid class the markup carried and drop it when the order breaks', () => {
+      const range = build({}, '<div id="range" class="is-valid"></div>')
+
+      expect(root().classList.contains('is-valid')).toBeTrue()
+
+      range.setRange(new Date(2026, 6, 20), new Date(2026, 6, 14))
+
+      expect(root().classList.contains('is-valid')).toBeFalse()
+      expect(root().classList.contains('is-invalid')).toBeTrue()
+    })
+
+    it('should leave a valid class the markup carried on dispose and remove the one it added', () => {
+      const markup = build({}, '<div id="range" class="is-valid"></div>')
+      const marked = root()
+
+      markup.dispose()
+      instances.length = 0
+
+      expect(marked.classList.contains('is-valid')).toBeTrue()
+
+      const configured = build({ valid: true })
+      const element = root()
+
+      configured.dispose()
+      instances.length = 0
+
+      expect(element.classList.contains('is-valid')).toBeFalse()
+    })
+
+    it('should leave an invalid class the markup carried on dispose', () => {
+      const range = build({}, '<div id="range" class="is-invalid"></div>')
+      const element = root()
+
+      range.dispose()
+      instances.length = 0
+
+      expect(element.classList.contains('is-invalid')).toBeTrue()
+    })
+
+    it('should put the invalid option on the frame, not only on the fields', () => {
+      build({ invalid: true })
+
+      expect(root().classList.contains('is-invalid')).toBeTrue()
+    })
+
+    it('should put the valid option on the frame while the range holds', () => {
+      const range = build({ valid: true })
+
+      expect(root().classList.contains('is-valid')).toBeTrue()
+
+      range.setRange(new Date(2026, 6, 20), new Date(2026, 6, 14))
+
+      expect(root().classList.contains('is-valid')).toBeFalse()
+      expect(root().classList.contains('is-invalid')).toBeTrue()
+    })
+  })
+
   describe('keyboard', () => {
     const sections = element => [...element.querySelectorAll('.form-date-time-section')]
     const press = (target, key) => target.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }))

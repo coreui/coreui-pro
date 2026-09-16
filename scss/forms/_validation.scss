@@ -195,21 +195,45 @@
     ~ .#{$state}-tooltip { display: block; }
   }
 
-  @include form-validation-controls(
-    ".check, .radio, .switch",
-    $state,
-    $theme,
-    $color: $color,
-    $focus-ring-color: $focus-ring-color,
-    $border-color: $border-color
-  );
+  .form-control-group.is-#{$state},
+  .form-control-group:has(> .is-#{$state}),
+  .form-control-group:has(> .form-floating > .is-#{$state}) {
+    ~ .#{$state}-feedback,
+    ~ .#{$state}-tooltip { display: block; }
+  }
 
-  // Input group — feedback lives outside the input-group in the parent
-  // .form-field, so we use :has() to toggle display.
-  .form-field:has(.input-group .is-#{$state}) {
+  .form-field:has(.form-control-group.is-#{$state}),
+  .form-field:has(.form-control-group > .is-#{$state}),
+  .form-field:has(.form-control-group > .form-floating > .is-#{$state}) {
     .#{$state}-feedback,
-    .#{$state}-tooltip {
-      display: block;
+    .#{$state}-tooltip { display: block; }
+  }
+
+  @if $state == "invalid" {
+    [data-coreui-validate] {
+      .form-control-group:has(> :user-invalid),
+      .form-control-group:has(> .form-floating > :user-invalid) {
+        ~ .invalid-feedback,
+        ~ .invalid-tooltip { display: block; }
+      }
+
+      .form-field:has(.form-control-group > :user-invalid),
+      .form-field:has(.form-control-group > .form-floating > :user-invalid) {
+        .invalid-feedback,
+        .invalid-tooltip { display: block; }
+      }
+    }
+  } @else if $state == "valid" {
+    .form-control-group.is-invalid,
+    .form-control-group:has(.is-invalid) {
+      ~ .valid-feedback,
+      ~ .valid-tooltip { display: none; }
+    }
+
+    .form-field:has(.form-control-group.is-invalid),
+    .form-field:has(.form-control-group .is-invalid) {
+      .valid-feedback,
+      .valid-tooltip { display: none; }
     }
   }
 

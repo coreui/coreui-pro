@@ -634,6 +634,28 @@ describe('DateInput', () => {
       expect(dateInput._element.classList.contains('is-invalid')).toBeFalse()
     })
 
+    it('should keep the valid state while the value it judged holds', async () => {
+      const dateInput = createInForm({ required: true, date: new Date(2026, 6, 14) }, 'data-coreui-validate="valid"')
+
+      fixtureEl.querySelector('form').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
+      await Promise.resolve()
+
+      dateInput.setConfig({ date: new Date(2026, 6, 15) })
+
+      expect(dateInput._element.classList.contains('is-valid')).toBeTrue()
+    })
+
+    it('should drop the valid state once the field is emptied', async () => {
+      const dateInput = createInForm({ required: true, date: new Date(2026, 6, 14) }, 'data-coreui-validate="valid"')
+
+      fixtureEl.querySelector('form').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
+      await Promise.resolve()
+
+      dateInput.clear()
+
+      expect(dateInput._element.classList.contains('is-valid')).toBeFalse()
+    })
+
     it('should not mark a filled field as valid when the form does not opt into valid styling', async () => {
       const dateInput = createInForm({ required: true, date: new Date(2026, 6, 14) })
 
