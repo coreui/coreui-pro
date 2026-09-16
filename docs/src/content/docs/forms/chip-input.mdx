@@ -178,10 +178,14 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
+| `ariaAddedAnnouncement` | string | `'added'` | Wording appended to a chip's value when its addition is announced in the status live region. |
+| `ariaRemoveLabel` | string | `'Remove'` | Accessible label applied to each chip's remove button. |
+| `ariaRemovedAnnouncement` | string | `'removed'` | Wording appended to a chip's value when its removal is announced in the status live region. |
 | `chipClassName` | string \| function \| null | `null` | Adds classes to chips. Use a string for all chips or a function `(value) => className` for per-chip styling. |
 | `create` | boolean | `true` | Turns typed text into chips. Set to `false` for the controlled mode: chips come only from `add()` — a host component's selection, say — typing never creates one, and no hidden form input is rendered (the host owns the value). |
 | `createOnBlur` | boolean | `true` | Create a chip from the input value when the input loses focus. |
 | `disabled` | boolean | `false` | Disables the input and marks managed chips as non-interactive. |
+| `filter` | boolean | `false` | Turns the chips into filter chips: a check icon is shown on the selected ones. Implies `selectable`. |
 | `id` | string \| null | auto-generated | Custom id for the generated hidden input. |
 | `maxChips` | number \| null | `null` | Maximum number of chips allowed. `null` for unlimited. |
 | `name` | string \| null | `null` | Name for the generated hidden input, which is what carries the chips into a form submission. Without a name that input is not submitted. |
@@ -190,7 +194,11 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `removable` | boolean | `true` | Add remove buttons to created chips. |
 | `removeIcon` | string | SVG | HTML string for the remove button icon. |
 | `selectable` | boolean | `false` | Enables selection behavior for chips managed by Chip Input. |
+| `selectedIcon` | string | SVG | HTML string used as the check icon on selected filter chips. |
+| `selectionMode` | string | `'multiple'` | Selection behavior: `'multiple'` allows several active chips, `'single'` keeps at most one. |
 | `separator` | string \| null | `','` | Character that triggers chip creation when typed. Set to `null` to disable. |
+| `typeahead` | boolean | `true` | Moves focus to the chip whose value starts with the typed characters. |
+| `unique` | boolean | `true` | Refuses a chip whose value the field already holds. A Chip Input turns this on, where a bare [Chip Set](/components/chip-set/) leaves it off. |
 
 ### Methods
 
