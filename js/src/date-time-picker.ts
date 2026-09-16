@@ -18,7 +18,9 @@ import Popup from './util/popup.js'
 import TimeSelection from './util/time-selection.js'
 import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 import type { ComponentConfig } from './util/config.js'
-import { appendControlGroupField, applyControlGroupClasses, createControlGroupAction } from './util/form-control-group.js'
+import {
+  appendControlGroupField, applyControlGroupClasses, captureHostClasses, createControlGroupAction, type HostClasses, restoreHostClasses
+} from './util/form-control-group.js'
 import { CALENDAR_ICON, CLEANER_ICON } from './util/icons.js'
 import { defineJQueryPlugin, getUID, jQueryDispatch } from './util/index.js'
 
@@ -152,7 +154,7 @@ class DateTimePicker extends BaseComponent {
   protected declare _selectionElement: any
   protected declare _menu: any
   protected declare _syncingFromPanel: boolean
-  protected declare _addedGroupClass: boolean
+  protected declare _hostClasses: HostClasses
   protected declare _popup: any
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
@@ -171,6 +173,7 @@ class DateTimePicker extends BaseComponent {
     this._menu = null
     this._popup = null
 
+    this._hostClasses = captureHostClasses(this._element, this._managedClassNames())
     this._createDateTimePicker()
     this._createPopup()
     this._addEventListeners()
@@ -242,6 +245,10 @@ class DateTimePicker extends BaseComponent {
   }
 
   override dispose(): void {
+    if (!this._element) {
+      return
+    }
+
     for (const element of [this._menu, this._indicatorElement, this._cleanerElement]) {
       EventHandler.off(element, EVENT_KEY)
     }
@@ -254,14 +261,22 @@ class DateTimePicker extends BaseComponent {
     this._cleanerElement?.remove()
     this._indicatorElement.remove()
 
-    if (this._addedGroupClass) {
-      this._element.classList.remove(CLASS_NAME_INPUT_GROUP)
-    }
+    restoreHostClasses(this._element, this._managedClassNames(), this._hostClasses)
 
     super.dispose()
   }
 
   // Private
+  _managedClassNames(): string[] {
+    return [
+      CLASS_NAME_DATE_PICKER,
+      CLASS_NAME_DATE_TIME_PICKER,
+      CLASS_NAME_PICKER,
+      CLASS_NAME_INPUT_GROUP,
+      this._config.size && `${CLASS_NAME_FORM_CONTROL}-${this._config.size}`
+    ].filter(Boolean) as string[]
+  }
+
   _forwardConfig(Component: any, overrides: Record<string, any> = {}, extra: Record<string, any> = {}): Record<string, any> {
     const forwarded: Record<string, any> = {}
 
@@ -282,7 +297,6 @@ class DateTimePicker extends BaseComponent {
     // The root is the frame: a field component has nothing to wrap, so it
     // carries `.form-control-group` itself instead of nesting one.
     const inputGroup = this._element
-    this._addedGroupClass = !inputGroup.classList.contains(CLASS_NAME_INPUT_GROUP)
     applyControlGroupClasses(inputGroup, CLASS_NAME_INPUT_GROUP)
 
     // Sizing rides the standard control classes on the frame itself

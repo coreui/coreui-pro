@@ -319,6 +319,28 @@ describe('DateRangeInput', () => {
   })
 
   describe('dispose', () => {
+    it('should give the host back the way the page wrote it', () => {
+      fixtureEl.innerHTML = '<div class="mb-3" id="range"></div>'
+      const element = fixtureEl.querySelector('#range')
+      const range = new DateRangeInput(element, { locale: 'en-US', size: 'lg' })
+
+      range.dispose()
+      instances.length = 0
+
+      expect(element.outerHTML).toEqual('<div class="mb-3" id="range"></div>')
+    })
+
+    it('should not leave a class attribute on a host that had none', () => {
+      fixtureEl.innerHTML = '<div id="range"></div>'
+      const element = fixtureEl.querySelector('#range')
+      const range = new DateRangeInput(element, { locale: 'en-US' })
+
+      range.dispose()
+      instances.length = 0
+
+      expect(element.outerHTML).toEqual('<div id="range"></div>')
+    })
+
     it('should remove what it built and release the frame', () => {
       const range = build()
 

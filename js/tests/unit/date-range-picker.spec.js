@@ -330,6 +330,27 @@ describe('DateRangePicker', () => {
   })
 
   describe('dispose', () => {
+    it('should give the host back the way the page wrote it', () => {
+      fixtureEl.innerHTML = '<div class="form-control-group my-own" id="picker"></div>'
+      const element = fixtureEl.querySelector('#picker')
+      const instance = new DateRangePicker(fixtureEl.querySelector('#picker'))
+
+      instance.show()
+      instance.dispose()
+
+      expect(element.outerHTML).toEqual('<div class="form-control-group my-own" id="picker"></div>')
+    })
+
+    it('should not leave a class attribute on a host that had none', () => {
+      fixtureEl.innerHTML = '<div id="picker"></div>'
+      const element = fixtureEl.querySelector('#picker')
+      const instance = new DateRangePicker(fixtureEl.querySelector('#picker'))
+
+      instance.dispose()
+
+      expect(element.outerHTML).toEqual('<div id="picker"></div>')
+    })
+
     it('should drop the listeners on the controls it built', () => {
       fixtureEl.innerHTML = '<div id="picker"></div>'
       const picker = new DateRangePicker(fixtureEl.querySelector('#picker'))

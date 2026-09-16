@@ -98,8 +98,9 @@ describe('DateInput', () => {
 
       dateInput.dispose()
 
-      expect(dateInputEl.outerHTML)
-        .toEqual('<div class="form-date-time is-invalid my-own" id="start" aria-label="Start date"></div>')
+      expect([...dateInputEl.classList].toSorted()).toEqual(['form-date-time', 'is-invalid', 'my-own'])
+      expect(dateInputEl.getAttribute('aria-label')).toEqual('Start date')
+      expect(dateInputEl.children).toHaveLength(0)
     })
 
     it('should keep a class put on the host while it lived', () => {

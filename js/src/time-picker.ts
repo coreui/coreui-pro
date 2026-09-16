@@ -16,7 +16,9 @@ import Popup from './util/popup.js'
 import TimeSelection from './util/time-selection.js'
 import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 import type { ComponentConfig } from './util/config.js'
-import { appendControlGroupField, applyControlGroupClasses, createControlGroupAction } from './util/form-control-group.js'
+import {
+  appendControlGroupField, applyControlGroupClasses, captureHostClasses, createControlGroupAction, type HostClasses, restoreHostClasses
+} from './util/form-control-group.js'
 import { CLEANER_ICON, CLOCK_ICON } from './util/icons.js'
 import { defineJQueryPlugin, getUID, jQueryDispatch } from './util/index.js'
 
@@ -134,7 +136,7 @@ class TimePicker extends BaseComponent {
   protected declare _selectionElement: any
   protected declare _menu: any
   protected declare _syncingFromPanel: boolean
-  protected declare _addedGroupClass: boolean
+  protected declare _hostClasses: HostClasses
   protected declare _popup: any
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
@@ -151,6 +153,7 @@ class TimePicker extends BaseComponent {
     this._menu = null
     this._popup = null
 
+    this._hostClasses = captureHostClasses(this._element, this._managedClassNames())
     this._createTimePicker()
     this._createPopup()
     this._addEventListeners()
@@ -221,6 +224,10 @@ class TimePicker extends BaseComponent {
   }
 
   override dispose(): void {
+    if (!this._element) {
+      return
+    }
+
     for (const element of [this._menu, this._indicatorElement, this._cleanerElement]) {
       EventHandler.off(element, EVENT_KEY)
     }
@@ -232,14 +239,21 @@ class TimePicker extends BaseComponent {
     this._cleanerElement?.remove()
     this._indicatorElement.remove()
 
-    if (this._addedGroupClass) {
-      this._element.classList.remove(CLASS_NAME_INPUT_GROUP)
-    }
+    restoreHostClasses(this._element, this._managedClassNames(), this._hostClasses)
 
     super.dispose()
   }
 
   // Private
+  _managedClassNames(): string[] {
+    return [
+      CLASS_NAME_TIME_PICKER,
+      CLASS_NAME_PICKER,
+      CLASS_NAME_INPUT_GROUP,
+      this._config.size && `${CLASS_NAME_FORM_CONTROL}-${this._config.size}`
+    ].filter(Boolean) as string[]
+  }
+
   // Options the inner primitives know about are forwarded by name, so their
   // data attributes work on the picker element.
   _forwardConfig(Component: any, overrides: Record<string, any> = {}, extra: Record<string, any> = {}): Record<string, any> {
@@ -260,7 +274,6 @@ class TimePicker extends BaseComponent {
     // The root is the frame: a field component has nothing to wrap, so it
     // carries `.form-control-group` itself instead of nesting one.
     const inputGroup = this._element
-    this._addedGroupClass = !inputGroup.classList.contains(CLASS_NAME_INPUT_GROUP)
     applyControlGroupClasses(inputGroup, CLASS_NAME_INPUT_GROUP)
 
     // Sizing rides the standard control classes on the frame itself
