@@ -468,7 +468,7 @@ class Rating extends BaseComponent {
   }
 
   // Static
-  static ratingInterface(element: string | Element | null, config?: any): void {
+  static ratingInterface(element: string | Element | null, config?: any, ...args: any[]): void {
     const data: any = Rating.getOrCreateInstance(element, config)
 
     if (typeof config === 'string') {
@@ -476,12 +476,12 @@ class Rating extends BaseComponent {
         throw new TypeError(`No method named "${config}"`)
       }
 
-      data[config as string]()
+      data[config as string](...args)
     }
   }
 
-  static jQueryInterface(this: any, config: any): void {
-    return jQueryDispatch(this, Rating, config, element => [element])
+  static jQueryInterface(this: any, config: any, ...args: any[]): void {
+    return jQueryDispatch(this, Rating, config, args)
   }
 }
 

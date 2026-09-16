@@ -1827,6 +1827,23 @@ describe('Tooltip', () => {
       expect(Tooltip.getInstance(div)).not.toBeNull()
     })
 
+    it('should pass the arguments to the method', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+
+      jQueryMock.fn.tooltip = Tooltip.jQueryInterface
+      jQueryMock.elements = [div]
+
+      const instance = Tooltip.getOrCreateInstance(div)
+      const spy = spyOn(instance, 'setContent')
+
+      jQueryMock.fn.tooltip.call(jQueryMock, 'setContent', { '.tooltip-inner': 'x' })
+
+      expect(spy).toHaveBeenCalledWith({ '.tooltip-inner': 'x' })
+      instance.dispose()
+    })
+
     it('should not re create a tooltip', () => {
       fixtureEl.innerHTML = '<div></div>'
 

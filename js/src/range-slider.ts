@@ -672,7 +672,7 @@ class RangeSlider extends BaseComponent {
   }
 
   // Static
-  static rangeSliderInterface(element: string | Element | null, config?: any): void {
+  static rangeSliderInterface(element: string | Element | null, config?: any, ...args: any[]): void {
     const data: any = RangeSlider.getOrCreateInstance(element, config)
 
     if (typeof config === 'string') {
@@ -680,12 +680,12 @@ class RangeSlider extends BaseComponent {
         throw new TypeError(`No method named "${config}"`)
       }
 
-      data[config]()
+      data[config](...args)
     }
   }
 
-  static jQueryInterface(this: any, config: any): any {
-    return jQueryDispatch(this, RangeSlider, config, element => [element])
+  static jQueryInterface(this: any, config: any, ...args: any[]): any {
+    return jQueryDispatch(this, RangeSlider, config, args)
   }
 }
 

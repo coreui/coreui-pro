@@ -284,6 +284,22 @@ describe('DateRangePicker', () => {
       DateRangePicker.getInstance(el).dispose()
     })
 
+    it('should pass the arguments to the method', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const el = fixtureEl.querySelector('#host')
+
+      jQueryMock.fn.dateRangePicker = DateRangePicker.jQueryInterface
+      jQueryMock.elements = [el]
+
+      const instance = DateRangePicker.getOrCreateInstance(el)
+      const spy = spyOn(instance, 'setRange')
+
+      jQueryMock.fn.dateRangePicker.call(jQueryMock, 'setRange', new Date(2027, 0, 15), new Date(2027, 0, 20))
+
+      expect(spy).toHaveBeenCalledWith(new Date(2027, 0, 15), new Date(2027, 0, 20))
+      instance.dispose()
+    })
+
     it('should not re-create date-range-picker', () => {
       fixtureEl.innerHTML = '<div id="host"></div>'
       const el = fixtureEl.querySelector('#host')

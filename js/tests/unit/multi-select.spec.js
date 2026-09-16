@@ -4438,6 +4438,20 @@ describe('MultiSelect', () => {
         expect(MultiSelect.getInstance(selectEl)).not.toBeNull()
       })
 
+      it('should pass the arguments to the method', () => {
+        fixtureEl.innerHTML = '<select></select>'
+        const selectEl = fixtureEl.querySelector('select')
+        const multiSelect = new MultiSelect(selectEl, { options: [] })
+        const spy = spyOn(multiSelect, 'search')
+
+        jQueryMock.fn.multiSelect = MultiSelect.jQueryInterface
+        jQueryMock.elements = [selectEl]
+        jQueryMock.fn.multiSelect.call(jQueryMock, 'search', 'ab')
+
+        expect(spy).toHaveBeenCalledWith('ab')
+        multiSelect.dispose()
+      })
+
       it('should not re-create multi select', () => {
         fixtureEl.innerHTML = '<select></select>'
         const selectEl = fixtureEl.querySelector('select')

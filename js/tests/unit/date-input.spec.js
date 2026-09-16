@@ -1064,5 +1064,21 @@ describe('DateInput', () => {
 
       expect(DateInput.getInstance(div)).not.toBeNull()
     })
+    it('should pass the arguments to the method', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+
+      jQueryMock.fn.dateInput = DateInput.jQueryInterface
+      jQueryMock.elements = [div]
+
+      const instance = DateInput.getOrCreateInstance(div)
+      const spy = spyOn(instance, 'setConfig')
+
+      jQueryMock.fn.dateInput.call(jQueryMock, 'setConfig', { disabled: true })
+
+      expect(spy).toHaveBeenCalledWith({ disabled: true })
+      instance.dispose()
+    })
   })
 })

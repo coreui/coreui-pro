@@ -535,8 +535,8 @@ class DatePicker extends BaseComponent {
   }
 
   // Static
-  static jQueryInterface(this: any, config: any): void {
-    return jQueryDispatch(this, DatePicker, config)
+  static jQueryInterface(this: any, config: any, ...args: any[]): void {
+    return jQueryDispatch(this, DatePicker, config, args)
   }
 }
 

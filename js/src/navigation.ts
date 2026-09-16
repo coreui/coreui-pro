@@ -170,7 +170,7 @@ class Navigation extends BaseComponent {
 
   // Static
 
-  static navigationInterface(element: string | Element | null, config?: any): void {
+  static navigationInterface(element: string | Element | null, config?: any, ...args: any[]): void {
     const data: any = Navigation.getOrCreateInstance(element, config)
 
     if (typeof config === 'string') {
@@ -178,7 +178,7 @@ class Navigation extends BaseComponent {
         throw new TypeError(`No method named "${config}"`)
       }
 
-      data[config as string]()
+      data[config as string](...args)
     }
   }
 

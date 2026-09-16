@@ -93,8 +93,8 @@ class Popover extends Tooltip {
   }
 
   // Static
-  static jQueryInterface(this: any, config: any): void {
-    return jQueryDispatch(this, Popover, config)
+  static jQueryInterface(this: any, config: any, ...args: any[]): void {
+    return jQueryDispatch(this, Popover, config, args)
   }
 }
 

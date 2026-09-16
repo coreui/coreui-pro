@@ -383,6 +383,22 @@ describe('TimePicker', () => {
       TimePicker.getInstance(el).dispose()
     })
 
+    it('should pass the arguments to the method', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const el = fixtureEl.querySelector('#host')
+
+      jQueryMock.fn.timePicker = TimePicker.jQueryInterface
+      jQueryMock.elements = [el]
+
+      const instance = TimePicker.getOrCreateInstance(el)
+      const spy = spyOn(instance, 'setTime')
+
+      jQueryMock.fn.timePicker.call(jQueryMock, 'setTime', '10:30:00')
+
+      expect(spy).toHaveBeenCalledWith('10:30:00')
+      instance.dispose()
+    })
+
     it('should not re-create time-picker', () => {
       fixtureEl.innerHTML = '<div id="host"></div>'
       const el = fixtureEl.querySelector('#host')

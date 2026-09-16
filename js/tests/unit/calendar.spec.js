@@ -2781,6 +2781,22 @@ describe('Calendar', () => {
       expect(Calendar.getInstance(element)).not.toBeNull()
     })
 
+    it('should pass the arguments to the method', () => {
+      fixtureEl.innerHTML = '<div data-coreui-calendar></div>'
+      const element = fixtureEl.querySelector('[data-coreui-calendar]')
+
+      jQueryMock.fn.calendar = Calendar.jQueryInterface
+      jQueryMock.elements = [element]
+
+      const instance = Calendar.getOrCreateInstance(element)
+      const spy = spyOn(instance, 'setConfig')
+
+      jQueryMock.fn.calendar.call(jQueryMock, 'setConfig', { locale: 'en-US' })
+
+      expect(spy).toHaveBeenCalledWith({ locale: 'en-US' })
+      instance.dispose()
+    })
+
     it('should throw error on undefined method', () => {
       fixtureEl.innerHTML = '<div data-coreui-calendar></div>'
       const element = fixtureEl.querySelector('[data-coreui-calendar]')

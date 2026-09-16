@@ -84,8 +84,8 @@ class TimeInput extends SectionInput {
   }
 
   // Static
-  static jQueryInterface(this: any, config: any): any {
-    return jQueryDispatch(this, TimeInput, config)
+  static jQueryInterface(this: any, config: any, ...args: any[]): any {
+    return jQueryDispatch(this, TimeInput, config, args)
   }
 }
 

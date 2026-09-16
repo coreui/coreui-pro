@@ -774,8 +774,8 @@ class Toaster extends BaseComponent {
   }
 
   // Static
-  static jQueryInterface(this: any, config: any): void {
-    return jQueryDispatch(this, Toaster, config, element => [element])
+  static jQueryInterface(this: any, config: any, ...args: any[]): void {
+    return jQueryDispatch(this, Toaster, config, args)
   }
 }
 

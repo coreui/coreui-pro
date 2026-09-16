@@ -1290,6 +1290,24 @@ describe('OTPInput', () => {
         expect(OTPInput.getInstance(otpContainer)).toBeInstanceOf(OTPInput)
       })
 
+      it('should pass the arguments to the method', () => {
+        fixtureEl.innerHTML = `
+          <div class="form-otp">
+            <input type="text" class="form-otp-control">
+          </div>
+        `
+        const otpContainer = fixtureEl.querySelector('.form-otp')
+        const otpInput = new OTPInput(otpContainer)
+        const spy = spyOn(otpInput, 'setConfig')
+
+        jQueryMock.fn.otpInput = OTPInput.jQueryInterface
+        jQueryMock.elements = [otpContainer]
+        jQueryMock.fn.otpInput.call(jQueryMock, 'setConfig', { disabled: true })
+
+        expect(spy).toHaveBeenCalledWith({ disabled: true })
+        otpInput.dispose()
+      })
+
       it('should not re-create otp input', () => {
         fixtureEl.innerHTML = `
           <div class="form-otp">

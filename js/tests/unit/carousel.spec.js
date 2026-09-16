@@ -1578,6 +1578,23 @@ describe('Carousel', () => {
       expect(Carousel.getInstance(div)).not.toBeNull()
     })
 
+    it('should pass the arguments to the method', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+
+      jQueryMock.fn.carousel = Carousel.jQueryInterface
+      jQueryMock.elements = [div]
+
+      const instance = Carousel.getOrCreateInstance(div)
+      const spy = spyOn(instance, 'to')
+
+      jQueryMock.fn.carousel.call(jQueryMock, 'to', 1)
+
+      expect(spy).toHaveBeenCalledWith(1)
+      instance.dispose()
+    })
+
     it('should not re create a carousel', () => {
       fixtureEl.innerHTML = '<div></div>'
 

@@ -518,6 +518,21 @@ describe('DateRangeInput', () => {
       DateRangeInput.getInstance(root()).dispose()
     })
 
+    it('should pass the arguments to the method', () => {
+      fixtureEl.innerHTML = '<div id="range"></div>'
+
+      jQueryMock.fn.dateRangeInput = DateRangeInput.jQueryInterface
+      jQueryMock.elements = [root()]
+
+      const instance = DateRangeInput.getOrCreateInstance(root())
+      const spy = spyOn(instance, 'setRange')
+
+      jQueryMock.fn.dateRangeInput.call(jQueryMock, 'setRange', new Date(2027, 0, 15), new Date(2027, 0, 20))
+
+      expect(spy).toHaveBeenCalledWith(new Date(2027, 0, 15), new Date(2027, 0, 20))
+      instance.dispose()
+    })
+
     it('should throw error on undefined method', () => {
       const range = build()
 

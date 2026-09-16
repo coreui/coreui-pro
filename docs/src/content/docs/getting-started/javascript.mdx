@@ -436,6 +436,13 @@ $('[data-coreui-toggle="tooltip"]').tooltip({
 
 // to trigger the `show` method
 $('#myTooltip').tooltip('show')
+
+// to call a method that takes arguments
+$('#myTooltip').tooltip('setContent', { '.tooltip-inner': 'Another title' })
+
+// a plugin is registered under the component's own name, so a two-word one
+// is reached with brackets rather than a dot
+$('#myPicker')['date-picker']('setDate', new Date(2027, 0, 15))
 ```
 
 The same goes for our other components.

@@ -289,8 +289,8 @@ class ContextMenu extends Menu {
     instance._show(undefined, { relatedTarget: this })
   }
 
-  static jQueryInterface(this: any, config: any): void {
-    return jQueryDispatch(this, ContextMenu, config)
+  static jQueryInterface(this: any, config: any, ...args: any[]): void {
+    return jQueryDispatch(this, ContextMenu, config, args)
   }
 }
 

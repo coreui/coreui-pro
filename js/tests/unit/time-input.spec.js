@@ -244,5 +244,21 @@ describe('TimeInput', () => {
 
       expect(TimeInput.getInstance(div)).not.toBeNull()
     })
+    it('should pass the arguments to the method', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+
+      jQueryMock.fn.timeInput = TimeInput.jQueryInterface
+      jQueryMock.elements = [div]
+
+      const instance = TimeInput.getOrCreateInstance(div)
+      const spy = spyOn(instance, 'setConfig')
+
+      jQueryMock.fn.timeInput.call(jQueryMock, 'setConfig', { disabled: true })
+
+      expect(spy).toHaveBeenCalledWith({ disabled: true })
+      instance.dispose()
+    })
   })
 })

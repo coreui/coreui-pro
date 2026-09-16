@@ -1,5 +1,5 @@
 import Toaster from '../../src/toaster.js'
-import { clearFixture, getFixture } from '../helpers/fixture.js'
+import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
 
 describe('Toaster', () => {
   let fixtureEl
@@ -587,6 +587,36 @@ describe('Toaster', () => {
   describe('jQueryInterface', () => {
     it('should register the plugin', () => {
       expect(Toaster.jQueryInterface).toEqual(jasmine.any(Function))
+    })
+
+    it('should close every toast when the method takes no arguments', () => {
+      fixtureEl.innerHTML = '<div class="toast-container"></div>'
+      const containerEl = fixtureEl.querySelector('.toast-container')
+      const toaster = new Toaster(containerEl)
+
+      toaster.add({ content: 'one' })
+      toaster.add({ content: 'two' })
+
+      jQueryMock.fn.toaster = Toaster.jQueryInterface
+      jQueryMock.elements = [containerEl]
+      jQueryMock.fn.toaster.call(jQueryMock, 'close')
+
+      expect(toaster.getToasts().every(toast => !toast.element.classList.contains('show'))).toBeTrue()
+      toaster.dispose()
+    })
+
+    it('should pass the arguments to the method', () => {
+      fixtureEl.innerHTML = '<div class="toast-container"></div>'
+      const containerEl = fixtureEl.querySelector('.toast-container')
+      const toaster = new Toaster(containerEl)
+      const spy = spyOn(toaster, 'close')
+
+      jQueryMock.fn.toaster = Toaster.jQueryInterface
+      jQueryMock.elements = [containerEl]
+      jQueryMock.fn.toaster.call(jQueryMock, 'close', 'toast-1')
+
+      expect(spy).toHaveBeenCalledWith('toast-1')
+      toaster.dispose()
     })
   })
 })

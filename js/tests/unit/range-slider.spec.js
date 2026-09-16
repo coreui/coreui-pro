@@ -1938,6 +1938,23 @@ describe('RangeSlider', () => {
       expect(RangeSlider.getInstance(element)).not.toBeNull()
     })
 
+    it('should pass the arguments to the method', () => {
+      fixtureEl.innerHTML = '<div data-coreui-range-slider></div>'
+
+      const element = fixtureEl.querySelector('[data-coreui-range-slider]')
+
+      jQueryMock.fn.rangeSlider = RangeSlider.jQueryInterface
+      jQueryMock.elements = [element]
+
+      const instance = RangeSlider.getOrCreateInstance(element)
+      const spy = spyOn(instance, 'setConfig')
+
+      jQueryMock.fn.rangeSlider.call(jQueryMock, 'setConfig', { disabled: true })
+
+      expect(spy).toHaveBeenCalledWith({ disabled: true })
+      instance.dispose()
+    })
+
     it('should not recreate range slider if already exists via jQuery interface', () => {
       fixtureEl.innerHTML = '<div data-coreui-range-slider></div>'
 

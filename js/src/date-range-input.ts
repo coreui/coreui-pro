@@ -556,8 +556,8 @@ class DateRangeInput extends BaseComponent {
   }
 
   // Static
-  static jQueryInterface(this: any, config: any): void {
-    return jQueryDispatch(this, DateRangeInput, config)
+  static jQueryInterface(this: any, config: any, ...args: any[]): void {
+    return jQueryDispatch(this, DateRangeInput, config, args)
   }
 }
 

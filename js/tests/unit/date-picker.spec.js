@@ -731,6 +731,22 @@ describe('DatePicker', () => {
       DatePicker.getInstance(el).dispose()
     })
 
+    it('should pass the arguments to the method', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const el = fixtureEl.querySelector('#host')
+
+      jQueryMock.fn.datePicker = DatePicker.jQueryInterface
+      jQueryMock.elements = [el]
+
+      const instance = DatePicker.getOrCreateInstance(el)
+      const spy = spyOn(instance, 'setDate')
+
+      jQueryMock.fn.datePicker.call(jQueryMock, 'setDate', new Date(2027, 0, 15))
+
+      expect(spy).toHaveBeenCalledWith(new Date(2027, 0, 15))
+      instance.dispose()
+    })
+
     it('should not re-create date-picker', () => {
       fixtureEl.innerHTML = '<div id="host"></div>'
       const el = fixtureEl.querySelector('#host')

@@ -309,14 +309,14 @@ class Carousel extends BaseComponent {
   }
 
   // Static
-  static jQueryInterface(this: any, config: any): void {
+  static jQueryInterface(this: any, config: any, ...args: any[]): void {
     if (typeof config === 'number') {
       return this.each(function (this: HTMLElement) {
         Carousel.getOrCreateInstance(this).to(config)
       })
     }
 
-    return jQueryDispatch(this, Carousel, config)
+    return jQueryDispatch(this, Carousel, config, args)
   }
 
   // Private

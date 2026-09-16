@@ -936,6 +936,21 @@ describe('ContextMenu', () => {
 
       expect(ContextMenu.getInstance(area)).not.toBeNull()
     })
+    it('should pass the arguments to the method', () => {
+      fixtureEl.innerHTML = markup()
+
+      const area = fixtureEl.querySelector('.area')
+      const instance = ContextMenu.getOrCreateInstance(area)
+      const spy = spyOn(instance, 'show')
+
+      jQueryMock.fn['context-menu'] = ContextMenu.jQueryInterface
+      jQueryMock.elements = [area]
+
+      jQueryMock.fn['context-menu'].call(jQueryMock, 'show', { x: 10, y: 20 })
+
+      expect(spy).toHaveBeenCalledWith({ x: 10, y: 20 })
+      instance.dispose()
+    })
 
     it('should not re create a context menu', () => {
       fixtureEl.innerHTML = markup()

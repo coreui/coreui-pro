@@ -945,7 +945,7 @@ class SectionInput extends BaseComponent {
   }
 
   // Static
-  static componentInterface(element: string | Element | null, config?: any): void {
+  static componentInterface(element: string | Element | null, config?: any, ...args: any[]): void {
     const data: any = this.getOrCreateInstance(element, config)
 
     if (typeof config === 'string') {
@@ -953,7 +953,7 @@ class SectionInput extends BaseComponent {
         throw new TypeError(`No method named "${config}"`)
       }
 
-      data[config]()
+      data[config](...args)
     }
   }
 }

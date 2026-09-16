@@ -313,8 +313,8 @@ Configuration replacement now has its own name on every component:
   silence; the same call now throws the `TypeError` the constructor throws, and
   the configuration is left untouched.
 - **It is reachable the same way everywhere**, including through the static and
-  jQuery dispatchers, which pass a method name and no arguments:
-  `coreui.Rating.ratingInterface(el, 'setConfig')`.
+  jQuery dispatchers, which pass the method name and whatever follows it:
+  `coreui.Rating.ratingInterface(el, 'setConfig', { value: 2 })`.
 
 `Toaster.update(id, options)` is unchanged — it rewrites one toast in the store
 rather than reconfiguring the component.
