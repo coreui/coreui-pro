@@ -146,6 +146,7 @@ class Combobox extends ComboboxBase {
   protected declare _hiddenInput: HTMLInputElement | null
   protected declare _searchElement: HTMLInputElement | null
   protected declare _valueElement: HTMLElement
+  protected declare _valueFromMarkup: boolean
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
@@ -239,10 +240,16 @@ class Combobox extends ComboboxBase {
   }
 
   // Private
+  override _getConfig(config?: any): any {
+    this._valueFromMarkup = !(config !== null && typeof config === 'object' && 'value' in config)
+
+    return super._getConfig(config)
+  }
+
   override _configAfterMerge(config: any): any {
     config = this._normalizeContainerConfig(config)
 
-    if (typeof config.value === 'string' && config.value.includes(',')) {
+    if (config.multiple && this._valueFromMarkup && typeof config.value === 'string') {
       config.value = config.value.split(/,\s*/)
     }
 

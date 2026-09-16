@@ -351,6 +351,45 @@ describe('Combobox', () => {
       expect(combobox.getValue()).toEqual(['us', 'uk'])
     })
 
+    it('should keep a comma inside a value passed as configuration', () => {
+      const toggle = setMarkup('', [
+        '<div class="list-box-option" data-coreui-value="New York, NY">NYC metro</div>',
+        '<div class="list-box-option" data-coreui-value="Austin, TX">Austin</div>'
+      ])
+      const combobox = new Combobox(toggle, { value: 'New York, NY' })
+
+      expect(combobox.getValue()).toEqual('New York, NY')
+      expect(value(toggle)).toEqual('NYC metro')
+    })
+
+    it('should keep a comma in a configured value the markup also carries', () => {
+      const toggle = setMarkup(' data-coreui-multiple="true" data-coreui-value="New York, NY"', [
+        '<div class="list-box-option" data-coreui-value="New York, NY">NYC metro</div>',
+        '<div class="list-box-option" data-coreui-value="Austin, TX">Austin</div>'
+      ])
+      const combobox = new Combobox(toggle, { value: 'New York, NY' })
+
+      expect(combobox.getValue()).toEqual(['New York, NY'])
+    })
+
+    it('should split a comma separated value from data-coreui-config', () => {
+      const toggle = setMarkup(' data-coreui-config=\'{"multiple":true,"value":"us,ca"}\'')
+      const combobox = new Combobox(toggle)
+
+      expect(combobox.getValue()).toEqual(['us', 'ca'])
+    })
+
+    it('should keep a comma in a value attribute outside multiple mode', () => {
+      const toggle = setMarkup(' data-coreui-value="New York, NY"', [
+        '<div class="list-box-option" data-coreui-value="New York, NY">NYC metro</div>',
+        '<div class="list-box-option" data-coreui-value="Austin, TX">Austin</div>'
+      ])
+      const combobox = new Combobox(toggle)
+
+      expect(combobox.getValue()).toEqual('New York, NY')
+      expect(value(toggle)).toEqual('NYC metro')
+    })
+
     it('should split a comma separated value attribute', () => {
       const toggle = setMarkup(' data-coreui-multiple="true" data-coreui-value="us,ca"')
       const combobox = new Combobox(toggle)

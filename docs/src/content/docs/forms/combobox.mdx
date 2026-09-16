@@ -426,8 +426,9 @@ Add `data-coreui-toggle="combobox"` to the toggle and the plugin initializes it 
 | Attribute | Description |
 | --- | --- |
 | `data-coreui-toggle="combobox"` | Initializes the combobox on the toggle button. |
-| `data-coreui-value` | On a `.list-box-option`, the value the option stands for. Defaults to the option's text. |
-| `data-coreui-name` | `name` of the hidden input the plugin inserts for form submission. |
+| `data-coreui-value` (on an option) | The value the option stands for. Defaults to the option's text. |
+| `data-coreui-value` (on the toggle) | The values that start selected. In `multiple` mode a comma separated list, since markup has no other way to name several, which also means a value of its own cannot contain a comma there; everywhere else one value, commas included. Configuration takes an array instead. |
+| `data-coreui-name` | `name` of the hidden input the plugin inserts for form submission. In `multiple` mode it submits the values joined with a comma, so a value carrying one cannot be told apart on the server. |
 | `data-coreui-placeholder` | Text shown in the toggle while nothing is selected. |
 | `data-coreui-multiple="true"` | Toggles options instead of replacing the selection, and keeps the panel open. |
 | `data-coreui-search="true"` | Builds the search field at the top of the panel. |
@@ -490,7 +491,7 @@ const combobox = new coreui.Combobox('#myCombobox', {
 | `selectedLabel` | string, function | `` (count) => `${count} selected` `` | What the toggle shows past one selected option in `multiple` mode. A function `(count, total) => string`, or a string in which `{count}` and `{total}` are replaced. |
 | `selectionLimit` | null, number | `null` | How many options can be selected at once in `multiple` mode. |
 | `typeahead` | boolean | `true` | Move the highlight to the option matching what the user types. The buffer resets after 500 ms. |
-| `value` | string, array, null | `null` | Initially selected values, merged with the options marked `.selected` in the markup. |
+| `value` | string, array, null | `null` | Initially selected values, merged with the options marked `.selected` in the markup. A string is one value, commas included; pass an array for several. |
 
 ### Methods
 
