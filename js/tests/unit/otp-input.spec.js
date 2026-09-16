@@ -525,6 +525,113 @@ describe('OTPInput', () => {
   })
 
   describe('setConfig', () => {
+    const MARKUP = `
+      <div class="form-otp">
+        <input type="text" class="form-otp-control">
+        <input type="text" class="form-otp-control">
+        <input type="text" class="form-otp-control">
+      </div>
+    `
+
+    const slots = () => [...fixtureEl.querySelectorAll('.form-otp-control')].map(input => input.value)
+
+    it('should leave what the user typed alone when the call carries no value', () => {
+      fixtureEl.innerHTML = MARKUP
+      const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'), { value: '12' })
+      const inputs = fixtureEl.querySelectorAll('.form-otp-control')
+
+      for (const [index, digit] of ['9', '8', '7'].entries()) {
+        inputs[index].value = digit
+        inputs[index].dispatchEvent(createEvent('input', { bubbles: true }))
+      }
+
+      otpInput.setConfig({ masked: true })
+
+      expect(slots()).toEqual(['9', '8', '7'])
+      expect(fixtureEl.querySelector('input[type="hidden"]').value).toEqual('987')
+    })
+
+    it('should repaint the slots when the call carries a value', () => {
+      fixtureEl.innerHTML = MARKUP
+      const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'), { value: '123' })
+
+      otpInput.setConfig({ value: '98' })
+
+      expect(slots()).toEqual(['9', '8', ''])
+      expect(fixtureEl.querySelector('input[type="hidden"]').value).toEqual('98')
+    })
+
+    it('should not repaint when the call carries the same value it already had', () => {
+      fixtureEl.innerHTML = MARKUP
+      const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'), { value: '12' })
+      const inputs = fixtureEl.querySelectorAll('.form-otp-control')
+
+      for (const [index, digit] of ['9', '8', '7'].entries()) {
+        inputs[index].value = digit
+        inputs[index].dispatchEvent(createEvent('input', { bubbles: true }))
+      }
+
+      otpInput.setConfig({ ...otpInput._config, masked: true })
+
+      expect(slots()).toEqual(['9', '8', '7'])
+    })
+
+    it('should clear the field when the call carries an empty value', () => {
+      fixtureEl.innerHTML = MARKUP
+      const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'), { value: '123' })
+
+      otpInput.setConfig({ value: null })
+
+      expect(slots()).toEqual(['', '', ''])
+      expect(fixtureEl.querySelector('input[type="hidden"]').value).toEqual('')
+    })
+
+    it('should report a value it repainted', () => {
+      fixtureEl.innerHTML = MARKUP
+      const otpElement = fixtureEl.querySelector('.form-otp')
+      const otpInput = new OTPInput(otpElement, { value: '12' })
+      const values = []
+
+      otpElement.addEventListener('change.coreui.otp-input', event => {
+        values.push(event.value)
+      })
+
+      otpInput.setConfig({ value: '987' })
+
+      expect(values).toEqual(['987'])
+    })
+
+    it('should take a null config as a no-op', () => {
+      fixtureEl.innerHTML = MARKUP
+      const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'), { value: '12' })
+
+      expect(() => otpInput.setConfig(null)).not.toThrow()
+      expect(slots()).toEqual(['1', '2', ''])
+    })
+
+    it('should drop characters the type does not accept', () => {
+      fixtureEl.innerHTML = MARKUP
+      // eslint-disable-next-line no-new
+      new OTPInput(fixtureEl.querySelector('.form-otp'), { type: 'number', value: 'ab' })
+
+      expect(slots()).toEqual(['', '', ''])
+    })
+
+    it('should keep values the markup carried when no value is configured', () => {
+      fixtureEl.innerHTML = `
+        <div class="form-otp">
+          <input type="text" class="form-otp-control" value="5">
+          <input type="text" class="form-otp-control" value="5">
+          <input type="text" class="form-otp-control">
+        </div>
+      `
+      const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'))
+
+      otpInput.setConfig({ masked: true })
+
+      expect(slots()).toEqual(['5', '5', ''])
+    })
+
     it('should update config', () => {
       fixtureEl.innerHTML = `
         <div class="form-otp">

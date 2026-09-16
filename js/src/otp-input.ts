@@ -101,6 +101,7 @@ class OTPInput extends BaseComponent {
 
     this._setRoleAttribute()
     this._setInputsAttributes()
+    this._seedSlots()
     this._createHiddenInput()
     this._setInputsTabIndexes()
     this._addEventListeners()
@@ -138,29 +139,33 @@ class OTPInput extends BaseComponent {
   }
 
   reset(): void {
-    const inputs = this._getInputs()
-    for (const [index, input] of inputs.entries()) {
-      const valueString = String(this._config.value ?? '')
-
-      input.value = valueString && valueString[index] ? valueString[index] : ''
-    }
-
+    this._seedSlots({ clearWhenEmpty: true })
     this._setHiddenInputValue(this._readSlots() || null)
-    this._syncFirstInputMaxLength()
     this._setInputsTabIndexes()
   }
 
   setConfig(config: any): void {
-    if (typeof config !== 'object') {
+    if (typeof config !== 'object' || config === null) {
       return
     }
 
+    const previousValue = this._config.value
     this._config = this._getConfig({ ...this._config, ...config })
+    const repaint = this._config.value !== previousValue
 
     this._setInputsAttributes()
+
+    if (repaint) {
+      this._seedSlots({ clearWhenEmpty: true })
+    }
+
     this._setInputsTabIndexes()
     this._inputElement!.remove()
     this._createHiddenInput()
+
+    if (repaint) {
+      this._setHiddenInputValue(this._readSlots() || null)
+    }
   }
 
   // Private
@@ -410,8 +415,22 @@ class OTPInput extends BaseComponent {
     }
   }
 
+  _seedSlots({ clearWhenEmpty = false }: { clearWhenEmpty?: boolean } = {}): void {
+    const value = this._extractValidChars(String(this._config.value ?? ''))
+
+    if (!value && !clearWhenEmpty) {
+      return
+    }
+
+    for (const [index, input] of this._getInputs().entries()) {
+      input.value = value[index] ?? ''
+    }
+
+    this._syncFirstInputMaxLength()
+  }
+
   _setInputsAttributes(): void {
-    const inputs = SelectorEngine.find<HTMLInputElement>(SELECTOR_FORM_OTP_CONTROL, this._element)
+    const inputs = this._getInputs()
     for (const [index, input] of inputs.entries()) {
       input.type = this._config.masked ? 'password' : 'text'
 
@@ -454,12 +473,6 @@ class OTPInput extends BaseComponent {
 
       if (this._config.readonly) {
         input.readOnly = true
-      }
-
-      const valueString = String(this._config.value ?? '')
-
-      if (valueString && valueString[index]) {
-        input.value = valueString[index]
       }
 
       if (typeof this._config.ariaLabel === 'function') {
