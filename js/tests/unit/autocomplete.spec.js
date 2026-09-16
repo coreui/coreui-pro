@@ -179,7 +179,7 @@ describe('Autocomplete', () => {
         options: []
       })
 
-      expect(autocomplete._cleanerElement).toBeUndefined()
+      expect(autocomplete._cleanerElement).toBeNull()
     })
 
     it('should set indicator tabIndex to -1 when disabled', () => {
@@ -2184,7 +2184,7 @@ describe('Autocomplete', () => {
 
       // Should not throw
       autocomplete._updateCleaner()
-      expect(autocomplete._cleanerElement).toBeUndefined()
+      expect(autocomplete._cleanerElement).toBeNull()
     })
   })
 
@@ -2266,6 +2266,83 @@ describe('Autocomplete', () => {
       autocomplete.dispose()
 
       expect(autocomplete._element).toBeNull()
+    })
+
+    it('should return the host to its original markup', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const autocompleteEl = fixtureEl.querySelector('#host')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        cleaner: true,
+        indicator: true,
+        options: ['Angular', 'React.js']
+      })
+
+      expect(autocompleteEl.children.length).toBeGreaterThan(0)
+
+      autocomplete.dispose()
+
+      expect(autocompleteEl.innerHTML).toEqual('')
+      expect(autocompleteEl.className).toEqual('')
+    })
+
+    it('should keep a class name the page wrote itself', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete disabled"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, { disabled: true, options: [] })
+
+      autocomplete.dispose()
+
+      expect(autocompleteEl.className).toEqual('autocomplete disabled')
+    })
+
+    it('should build a cleaner-less disabled component without throwing', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const autocompleteEl = fixtureEl.querySelector('#host')
+
+      expect(() => new Autocomplete(autocompleteEl, {
+        cleaner: true,
+        disabled: true,
+        options: ['Angular']
+      })).not.toThrow()
+    })
+
+    it('should not stack controls over a dispose and init cycle', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const autocompleteEl = fixtureEl.querySelector('#host')
+      const config = { cleaner: true, indicator: true, options: ['Angular'] }
+
+      new Autocomplete(autocompleteEl, config).dispose()
+      const autocomplete = new Autocomplete(autocompleteEl, config)
+
+      expect(autocompleteEl.querySelectorAll('.autocomplete-input-group').length).toEqual(1)
+      expect(autocompleteEl.querySelectorAll('.autocomplete-dropdown').length).toEqual(1)
+
+      autocomplete.dispose()
+    })
+
+    it('should remove the menu from a container after dispose', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const autocompleteEl = fixtureEl.querySelector('#host')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        container: 'body',
+        options: ['Angular']
+      })
+
+      expect(document.body.querySelectorAll('.autocomplete-dropdown').length).toEqual(1)
+
+      autocomplete.dispose()
+
+      expect(document.body.querySelectorAll('.autocomplete-dropdown').length).toEqual(0)
+    })
+
+    it('should be safe to dispose twice', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const autocompleteEl = fixtureEl.querySelector('#host')
+      const autocomplete = new Autocomplete(autocompleteEl, { options: [] })
+
+      autocomplete.dispose()
+
+      expect(() => autocomplete.dispose()).not.toThrow()
     })
 
     it('should stop reacting to its child elements after dispose', () => {
