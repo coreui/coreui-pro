@@ -43,9 +43,9 @@ $root-token-defaults: (
   --#{$prefix}mark-color: var(--#{$prefix}fg-body),
   --#{$prefix}mark-bg: light-dark(oklch(96.883% .03443 84.93deg), oklch(43.897% .08952 84.93deg)),
   // scss-docs-start root-border-var
-  --#{$prefix}border-width: $border-width,
+  --#{$prefix}border-width: 1px,
   --#{$prefix}border-style: solid,
-  --#{$prefix}border-color: $border-color,
+  --#{$prefix}border-color: light-dark(var(--#{$prefix}gray-200), var(--#{$prefix}gray-700)),
   --#{$prefix}border-color-translucent: color-mix(in oklch, var(--#{$prefix}fg-body) 15%, transparent),
   // scss-docs-end root-border-var
   --#{$prefix}shadow-color: #000,
