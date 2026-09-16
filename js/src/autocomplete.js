@@ -278,6 +278,7 @@ class Autocomplete extends BaseComponent {
     }
 
     this._config = { ...this._config, ...this._configAfterMerge(config) }
+    this._syncInputName()
     this._options = this._getOptionsFromConfig()
     this._optionsElement.innerHTML = ''
     this._createOptions(this._optionsElement, this._options)
@@ -542,6 +543,15 @@ class Autocomplete extends BaseComponent {
     })
   }
 
+  _syncInputName() {
+    if (this._config.name) {
+      this._inputElement.setAttribute('name', this._config.name.toString())
+      return
+    }
+
+    this._inputElement.removeAttribute('name')
+  }
+
   _getOptionsFromConfig(options = this._config.options) {
     if (!options || !Array.isArray(options)) {
       return []
@@ -661,7 +671,6 @@ class Autocomplete extends BaseComponent {
     const inputEl = document.createElement('input')
     inputEl.classList.add(CLASS_NAME_INPUT)
     inputEl.id = this._uniqueId
-    inputEl.setAttribute('name', (this._config.name || this._uniqueId).toString())
     inputEl.autocomplete = 'off'
     inputEl.placeholder = this._config.placeholder ?? ''
     inputEl.role = 'combobox'
@@ -681,6 +690,7 @@ class Autocomplete extends BaseComponent {
 
     togglerEl.append(inputEl)
     this._inputElement = inputEl
+    this._syncInputName()
 
     this._element.append(togglerEl)
   }

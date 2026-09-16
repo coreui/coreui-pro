@@ -477,7 +477,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `hideSelectAllOnSearchNoResults` | boolean | `true` | Hides the dropdown header with the built-in select all button when a search filter leaves no matching options. Set to `false` to keep the select all button visible even when there are no results. |
 | `invalid` | boolean | `false` | Toggle the invalid state for the component. |
 | `multiple` | boolean | `true` | It specifies that multiple options can be selected at once. |
-| `name` | string, null | `null` | Set the name attribute for the native select element. |
+| `name` | string, null | `null` | Set the name attribute for the native select element. Without it, and without a `name` in your own markup, the select is not submitted with the form. |
 | `options` | boolean, array | `false` | List of option elements. |
 | `optionsGroupsSelectable` | boolean | `false` | When enabled (with `optionsGroupsStyle: 'checkbox'` and `multiple`), each option group label becomes a tri-state checkbox: clicking it toggles the whole group, and it reflects `none` / `all` / `indeterminate` based on the group's selected options. |
 | `optionsGroupsStyle` | string | `'checkbox'` | Sets the option group label style: `'checkbox'` or `'text'`. Controls the checkbox appearance used by `optionsGroupsSelectable`. |

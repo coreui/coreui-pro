@@ -197,7 +197,7 @@ class MultiSelect extends BaseComponent {
     super(element, config)
 
     this._uniqueId = this._config.id || this._element.id || getUID(`${this.constructor.NAME}`)
-    this._uniqueName = this._config.name || this._element.name || this._uniqueId
+    this._markupName = this._element.getAttribute('name')
     this._configureNativeSelect()
     this._indicatorElement = null
     this._selectAllElement = null
@@ -302,6 +302,12 @@ class MultiSelect extends BaseComponent {
   dispose() {
     this._destroySelect()
     this._element.removeAttribute('tabindex')
+
+    if (this._markupName === null) {
+      this._element.removeAttribute('name')
+    } else {
+      this._element.setAttribute('name', this._markupName)
+    }
 
     super.dispose()
   }
@@ -721,6 +727,9 @@ class MultiSelect extends BaseComponent {
   }
 
   _createSelect() {
+    this._uniqueId = this._config.id || this._element.id || this._uniqueId
+    this._uniqueName = this._config.name || this._markupName
+
     const wrapper = document.createElement('div')
     wrapper.classList.add(CLASS_NAME_SELECT)
     wrapper.classList.toggle('is-invalid', this._config.invalid)
@@ -748,7 +757,12 @@ class MultiSelect extends BaseComponent {
     }
 
     this._element.setAttribute('id', this._uniqueId)
-    this._element.setAttribute('name', this._uniqueName)
+
+    if (this._uniqueName) {
+      this._element.setAttribute('name', this._uniqueName)
+    } else {
+      this._element.removeAttribute('name')
+    }
 
     this._createOptionsContainer()
     this._hideNativeSelect()

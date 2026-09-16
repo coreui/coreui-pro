@@ -283,7 +283,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `id` | string, null | `null` | Sets a custom ID for the component. If not provided, a unique ID is auto-generated. |
 | `indicator` | boolean | `false` | Enables the selection indicator button. |
 | `invalid` | boolean | `false` | Applies invalid styling to the component. |
-| `name` | string, null | `null` | Sets the name attribute for the input element. |
+| `name` | string, null | `null` | Sets the name attribute for the input element. Without it the field is not submitted with the form. |
 | `options` | array, string, null | `[]` | Array of options or option objects to populate the dropdown. A string is read as a comma-separated list of labels, which is what `data-coreui-options="Angular, React, Vue.js"` relies on. |
 | `optionsGroupsTemplate` | function, null | `null` | Custom template function for rendering option group labels. Receives the group object as parameter. |
 | `optionsMaxHeight` | number, string | `'auto'` | Sets the maximum height of the options dropdown. |

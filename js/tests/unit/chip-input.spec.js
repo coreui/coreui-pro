@@ -1082,4 +1082,44 @@ describe('ChipInput', () => {
       document.documentElement.dir = ''
     })
   })
+  describe('generated name', () => {
+    it('should not name the hidden input when no name is configured', () => {
+      fixtureEl.innerHTML = '<form><div id="host"></div></form>'
+      const div = fixtureEl.querySelector('#host')
+      const chipInput = new ChipInput(div)
+
+      chipInput.add('one')
+
+      expect([...new FormData(fixtureEl.querySelector('form')).keys()]).toEqual([])
+
+      chipInput.dispose()
+    })
+
+    it('should leave no hidden input behind when disposed', () => {
+      fixtureEl.innerHTML = '<form><div id="host"></div></form>'
+      const div = fixtureEl.querySelector('#host')
+
+      new ChipInput(div, { name: 'tags' }).dispose()
+
+      const chipInput = new ChipInput(div, { name: 'tags' })
+
+      chipInput.add('one')
+
+      expect([...new FormData(fixtureEl.querySelector('form')).entries()]).toEqual([['tags', 'one']])
+
+      chipInput.dispose()
+    })
+
+    it('should name the hidden input when the page asked for one', () => {
+      fixtureEl.innerHTML = '<form><div id="host"></div></form>'
+      const div = fixtureEl.querySelector('#host')
+      const chipInput = new ChipInput(div, { name: 'tags' })
+
+      chipInput.add('one')
+
+      expect([...new FormData(fixtureEl.querySelector('form')).entries()]).toEqual([['tags', 'one']])
+
+      chipInput.dispose()
+    })
+  })
 })

@@ -116,6 +116,8 @@ class ChipInput extends ChipSet {
   }
 
   dispose() {
+    this._hiddenInput?.remove()
+
     EventHandler.off(this._input, EVENT_KEY)
 
     super.dispose()
@@ -236,7 +238,9 @@ class ChipInput extends ChipSet {
     const hiddenInput = document.createElement('input')
     hiddenInput.type = 'hidden'
     hiddenInput.id = this._uniqueId
-    hiddenInput.name = this._config.name || this._uniqueId
+    if (this._config.name) {
+      hiddenInput.name = this._config.name
+    }
 
     this._element.append(hiddenInput)
     this._hiddenInput = hiddenInput

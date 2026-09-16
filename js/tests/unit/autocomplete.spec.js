@@ -411,7 +411,18 @@ describe('Autocomplete', () => {
       expect(data.get('tech')).toEqual('Angular')
     })
 
-    it('should not add a hint key to a form when no name is configured', () => {
+    it('should submit under a name given by update', () => {
+      fixtureEl.innerHTML = '<form><div class="autocomplete"></div></form>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, { options: ['Angular'] })
+
+      autocomplete.update({ name: 'tech' })
+      autocomplete._inputElement.value = 'Angular'
+
+      expect([...new FormData(fixtureEl.querySelector('form')).entries()]).toEqual([['tech', 'Angular']])
+    })
+
+    it('should stay out of the form when no name is configured', () => {
       fixtureEl.innerHTML = '<form><div class="autocomplete"></div></form>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
       const autocomplete = new Autocomplete(autocompleteEl, {
@@ -421,7 +432,8 @@ describe('Autocomplete', () => {
 
       const data = new FormData(fixtureEl.querySelector('form'))
 
-      expect([...data.keys()]).toEqual([autocomplete._uniqueId])
+      expect([...data.keys()]).toEqual([])
+      expect(autocomplete._inputElement.hasAttribute('name')).toBeFalse()
     })
 
     it('should set togglerElement tabIndex to -1 when search is falsy and not disabled', () => {

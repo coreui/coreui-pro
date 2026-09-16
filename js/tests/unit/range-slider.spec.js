@@ -1900,4 +1900,40 @@ describe('RangeSlider', () => {
       expect(input.value).toBe('60')
     })
   })
+  describe('generated name', () => {
+    it('should not name a handle the array has no entry for', () => {
+      fixtureEl.innerHTML = '<form><div id="host"></div></form>'
+      const div = fixtureEl.querySelector('#host')
+      const rangeSlider = new RangeSlider(div, { name: ['min'], value: [10, 20] })
+
+      const names = [...div.querySelectorAll('input')].map(input => input.getAttribute('name'))
+
+      expect(names).toEqual(['min', null])
+      expect([...new FormData(fixtureEl.querySelector('form')).keys()]).toEqual(['min'])
+
+      rangeSlider.dispose()
+    })
+
+    it('should keep a zero in the array as a name', () => {
+      fixtureEl.innerHTML = '<form><div id="host"></div></form>'
+      const div = fixtureEl.querySelector('#host')
+      const rangeSlider = new RangeSlider(div, { name: [0, 'max'], value: [25, 75] })
+
+      expect([...new FormData(fixtureEl.querySelector('form')).entries()]).toEqual([['0', '25'], ['max', '75']])
+
+      rangeSlider.dispose()
+    })
+
+    it('should suffix a string name per handle', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const div = fixtureEl.querySelector('#host')
+      const rangeSlider = new RangeSlider(div, { name: 'price', value: [10, 20] })
+
+      const names = [...div.querySelectorAll('input')].map(input => input.getAttribute('name'))
+
+      expect(names).toEqual(['price-0', 'price-1'])
+
+      rangeSlider.dispose()
+    })
+  })
 })
