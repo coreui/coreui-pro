@@ -3,7 +3,7 @@
 import DatePicker from '../../src/date-picker.js'
 import EventHandler from '../../src/dom/event-handler.js'
 import {
-  getFixture, clearFixture, jQueryMock
+  getFixture, clearFixture, createEvent, jQueryMock
 } from '../helpers/fixture.js'
 
 describe('DatePicker', () => {
@@ -1679,6 +1679,31 @@ describe('DatePicker', () => {
   })
 
   describe('dispose', () => {
+    it('should not leave its own listeners on the host', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const div = fixtureEl.querySelector('#host')
+
+      new DatePicker(div).dispose()
+
+      const onError = jasmine.createSpy()
+      window.addEventListener('error', onError)
+      div.dispatchEvent(createEvent('keydown', { bubbles: true }))
+      window.removeEventListener('error', onError)
+
+      expect(onError).not.toHaveBeenCalled()
+    })
+
+    it('should return the host to its original markup', () => {
+      fixtureEl.innerHTML = '<div id="host"></div>'
+      const div = fixtureEl.querySelector('#host')
+      const datePicker = new DatePicker(div)
+
+      datePicker.dispose()
+
+      expect(div.innerHTML).toEqual('')
+      expect(div.className).toEqual('')
+    })
+
     it('should dispose DatePicker instance', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
