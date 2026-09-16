@@ -793,6 +793,96 @@ describe('DatePicker', () => {
   })
 
   describe('dispose', () => {
+    it('should take back what it wrote on the parts the author supplied', () => {
+      const picker = buildPicker({}, `<div id="picker">
+        <div data-coreui-picker-field></div>
+        <button data-coreui-picker-toggle><svg viewBox="0 0 16 16"></svg></button>
+      </div>`)
+      const toggle = fixtureEl.querySelector('[data-coreui-picker-toggle]')
+
+      expect(toggle.getAttribute('aria-controls')).not.toBeNull()
+
+      picker.dispose()
+      pickers.length = 0
+
+      expect(toggle.outerHTML).toEqual('<button data-coreui-picker-toggle=""><svg viewBox="0 0 16 16"></svg></button>')
+    })
+
+    it('should take back what it wrote even when the picker was open', () => {
+      const picker = buildPicker({}, `<div id="picker">
+        <div data-coreui-picker-field></div>
+        <button data-coreui-picker-toggle>Pick</button>
+      </div>`)
+      const toggle = fixtureEl.querySelector('[data-coreui-picker-toggle]')
+
+      picker.show()
+      picker.dispose()
+      pickers.length = 0
+
+      expect(toggle.outerHTML).toEqual('<button data-coreui-picker-toggle="">Pick</button>')
+    })
+
+    it('should keep a value the page changed while the picker lived', () => {
+      const picker = buildPicker({}, `<div id="picker">
+        <div data-coreui-picker-field></div>
+        <button data-coreui-picker-toggle>Pick</button>
+      </div>`)
+      const toggle = fixtureEl.querySelector('[data-coreui-picker-toggle]')
+
+      toggle.setAttribute('aria-label', 'Wybierz datę')
+      picker.dispose()
+      pickers.length = 0
+
+      expect(toggle.getAttribute('aria-label')).toEqual('Wybierz datę')
+    })
+
+    it('should give back a cleaner the author supplied too', () => {
+      const picker = buildPicker({}, `<div id="picker">
+        <div data-coreui-picker-field></div>
+        <button data-coreui-picker-cleaner>Clear</button>
+        <button data-coreui-picker-toggle>Pick</button>
+      </div>`)
+      const cleaner = fixtureEl.querySelector('[data-coreui-picker-cleaner]')
+
+      expect(cleaner.getAttribute('aria-label')).not.toBeNull()
+
+      picker.dispose()
+      pickers.length = 0
+
+      expect(cleaner.outerHTML).toEqual('<button data-coreui-picker-cleaner="">Clear</button>')
+    })
+
+    it('should give back an attribute the author wrote rather than dropping it', () => {
+      const picker = buildPicker({}, `<div id="picker">
+        <div data-coreui-picker-field></div>
+        <button data-coreui-picker-toggle aria-label="Open the calendar" aria-haspopup="menu"></button>
+      </div>`)
+      const toggle = fixtureEl.querySelector('[data-coreui-picker-toggle]')
+
+      expect(toggle.getAttribute('aria-haspopup')).toEqual('dialog')
+
+      picker.dispose()
+      pickers.length = 0
+
+      expect(toggle.getAttribute('aria-label')).toEqual('Open the calendar')
+      expect(toggle.getAttribute('aria-haspopup')).toEqual('menu')
+    })
+
+    it('should let the author button work again after a disabled picker is gone', () => {
+      const picker = buildPicker({ disabled: true }, `<div id="picker">
+        <div data-coreui-picker-field></div>
+        <button data-coreui-picker-toggle>Pick</button>
+      </div>`)
+      const toggle = fixtureEl.querySelector('[data-coreui-picker-toggle]')
+
+      expect(toggle.disabled).toBeTrue()
+
+      picker.dispose()
+      pickers.length = 0
+
+      expect(toggle.disabled).toBeFalse()
+    })
+
     it('should replace a size the markup carried and give it back', () => {
       const picker = buildPicker({ size: 'sm' }, '<div class="form-control-lg" id="picker"></div>')
       const element = fixtureEl.querySelector('#picker')

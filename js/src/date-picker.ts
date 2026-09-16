@@ -153,6 +153,7 @@ class DatePicker extends BaseComponent {
   protected declare _cleanerElement: HTMLElement | null
   protected declare _toggleElement: HTMLElement
   protected declare _fieldElement: HTMLElement
+  protected declare _adoptedAttributes: [Element, string, string | null, string][]
   protected declare _created: { cleaner: boolean, field: boolean, toggle: boolean }
   protected declare _initialDate: any
   protected declare _date: Date | null
@@ -170,6 +171,7 @@ class DatePicker extends BaseComponent {
     this._footerTemplate = SelectorEngine.findOne(SELECTOR_TEMPLATE_FOOTER, this._element)
     this._initialDate = config?.date ?? this._config.date
     this._cleanerElement = null
+    this._adoptedAttributes = []
     this._created = { cleaner: false, field: false, toggle: false }
     this._input = null
     this._calendar = null
@@ -275,6 +277,18 @@ class DatePicker extends BaseComponent {
       this._toggleElement.remove()
     }
 
+    for (const [element, name, previous, written] of this._adoptedAttributes) {
+      if (element.getAttribute(name) !== written) {
+        continue
+      }
+
+      if (previous === null) {
+        element.removeAttribute(name)
+      } else {
+        element.setAttribute(name, previous)
+      }
+    }
+
     restoreHostClasses(this._element, this._managedClassNames(), this._hostClasses)
 
     super.dispose()
@@ -378,9 +392,13 @@ class DatePicker extends BaseComponent {
     this._menu = document.createElement('div')
     this._menu.id = getUID(`${this.constructor.NAME}-popup-`)
     this._menu.classList.add(CLASS_NAME_POPUP, CLASS_NAME_DROPDOWN)
-    this._toggleElement.setAttribute('aria-controls', this._menu.id)
-    this._toggleElement.setAttribute('aria-expanded', 'false')
-    this._toggleElement.setAttribute('aria-haspopup', 'dialog')
+    const writeOnToggle = this._created.toggle ?
+      (name: string, value: string) => this._toggleElement.setAttribute(name, value) :
+      (name: string, value: string) => this._writeAdoptedAttribute(this._toggleElement, name, value)
+
+    writeOnToggle('aria-controls', this._menu.id)
+    writeOnToggle('aria-expanded', 'false')
+    writeOnToggle('aria-haspopup', 'dialog')
 
     const body = document.createElement('div')
     body.classList.add(CLASS_NAME_BODY)
@@ -471,20 +489,29 @@ class DatePicker extends BaseComponent {
   // have given its own: a name when it has none, hidden decoration.
   _adoptAction(element: HTMLElement, label: string): HTMLElement {
     if (!element.hasAttribute('aria-label') && !element.hasAttribute('aria-labelledby')) {
-      element.setAttribute('aria-label', label)
+      this._writeAdoptedAttribute(element, 'aria-label', label)
     }
 
     for (const svg of SelectorEngine.find(SELECTOR_SVG, element)) {
       if (!svg.hasAttribute('aria-hidden')) {
-        svg.setAttribute('aria-hidden', 'true')
+        this._writeAdoptedAttribute(svg, 'aria-hidden', 'true')
       }
     }
 
     if (this._config.disabled && 'disabled' in element) {
+      this._writeAdoptedAttribute(element, 'disabled', '');
       (element as HTMLButtonElement).disabled = true
     }
 
     return element
+  }
+
+  _writeAdoptedAttribute(element: Element, name: string, value: string): void {
+    if (!this._adoptedAttributes.some(([recorded, recordedName]) => recorded === element && recordedName === name)) {
+      this._adoptedAttributes.push([element, name, element.getAttribute(name), value])
+    }
+
+    element.setAttribute(name, value)
   }
 
   _createPopup(): void {
