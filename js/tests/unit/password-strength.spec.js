@@ -93,6 +93,59 @@ describe('PasswordStrength', () => {
       expect(instance.getScore()).toBe(0)
     })
 
+    it('should pin the documented defaults to a score', () => {
+      const { input, instance } = setup()
+
+      for (const [password, score] of [
+        ['abc', 1],
+        ['abcdefgh', 1],
+        ['abcdefghijkl', 2],
+        ['Abcdefghijkl1', 3],
+        ['Str0ng!&Passphrase99', 4]
+      ]) {
+        type(input, password)
+        expect(instance.getScore()).toBe(score)
+      }
+    })
+
+    it('should keep the defaults for the weights the config leaves out', () => {
+      const { input, instance } = setup({ weights: { special: 0, multipleSpecial: 0 } })
+
+      type(input, 'Str0ng!&Passphrase99')
+
+      expect(instance.getScore()).toBe(3)
+    })
+
+    it('should ignore a weight that is not a number', () => {
+      const { input, instance } = setup({ weights: { special: undefined, uppercase: Number.NaN } })
+
+      type(input, 'Abcdefgh!')
+
+      expect(instance.getScore()).toBe(2)
+    })
+
+    it('should keep the defaults for the thresholds the config leaves out', () => {
+      const { input, instance } = setup({ thresholds: [3] })
+
+      type(input, 'abcdefghijkl')
+
+      expect(instance.getScore()).toBe(1)
+    })
+
+    it('should still reject an option of the wrong type', () => {
+      expect(() => setup({ thresholds: '2,4,6' })).toThrowError(TypeError)
+      expect(() => setup({ weights: null })).toThrowError(TypeError)
+    })
+
+    it('should stay inside a shorter levels array', () => {
+      const { element, input, instance } = setup({ levels: ['Weak', 'Fair', 'Strong'] })
+
+      type(input, 'Str0ng!&Passphrase99')
+
+      expect(instance.getScore()).toBe(2)
+      expect(element.querySelector('.password-strength-text').textContent).toBe('Strong')
+    })
+
     it('should read user inputs from a function on every evaluation', () => {
       let current = ['nothing']
       const { input, instance } = setup({ userInputs: () => current })
