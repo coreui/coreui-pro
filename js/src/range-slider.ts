@@ -138,7 +138,7 @@ class RangeSlider extends BaseComponent {
 
     this._config = this._getConfig(config)
 
-    this._currentValue = this._config.value
+    this._currentValue = [...this._config.value]
     this._dragIndex = 0
     this._inputs = []
     this._isDragging = false
@@ -176,7 +176,7 @@ class RangeSlider extends BaseComponent {
   // Public
   setConfig(config: any): void {
     this._config = this._getConfig({ ...this._config, ...config })
-    this._currentValue = this._config.value
+    this._currentValue = [...this._config.value]
     this._element.innerHTML = ''
     this._initializeRangeSlider()
   }
@@ -200,11 +200,11 @@ class RangeSlider extends BaseComponent {
       const children = SelectorEngine.children(target.parentElement, SELECTOR_RANGE_SLIDER_INPUT)
       const index = Array.from(children).indexOf(target)
       this._updateValue(target.value, index)
-      EventHandler.trigger(this._element, EVENT_INPUT, { value: this._currentValue })
+      EventHandler.trigger(this._element, EVENT_INPUT, { value: [...this._currentValue] })
     })
 
     EventHandler.on(this._element, EVENT_CHANGE, SELECTOR_RANGE_SLIDER_INPUT, () => {
-      EventHandler.trigger(this._element, EVENT_CHANGE, { value: this._currentValue })
+      EventHandler.trigger(this._element, EVENT_CHANGE, { value: [...this._currentValue] })
     })
 
     EventHandler.on(this._element, EVENT_MOUSEDOWN, SELECTOR_RANGE_SLIDER_TICK, (event: any) => {
@@ -230,8 +230,8 @@ class RangeSlider extends BaseComponent {
       this._dragIndex = this._getNearestValueIndex(clickValue)
       this._updateNearestValue(clickValue)
 
-      EventHandler.trigger(this._element, EVENT_CHANGE, { value: this._currentValue })
-      EventHandler.trigger(this._element, EVENT_INPUT, { value: this._currentValue })
+      EventHandler.trigger(this._element, EVENT_CHANGE, { value: [...this._currentValue] })
+      EventHandler.trigger(this._element, EVENT_INPUT, { value: [...this._currentValue] })
     })
 
     EventHandler.on(document.documentElement, EVENT_MOUSEUP, this._onDocumentMouseUp)
@@ -664,6 +664,10 @@ class RangeSlider extends BaseComponent {
 
     if (typeof config.value === 'string') {
       config.value = config.value.split(/,\s*/).map(Number)
+    }
+
+    if (Array.isArray(config.value)) {
+      config.value = [...config.value]
     }
 
     return config
