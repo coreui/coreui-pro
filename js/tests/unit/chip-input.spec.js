@@ -4,6 +4,61 @@ import ChipSet from '../../src/chip-set.js'
 import { clearFixture, getFixture } from '../helpers/fixture.js'
 
 describe('ChipInput', () => {
+  describe('form payload', () => {
+    it('should not submit a field the page did not name', () => {
+      fixtureEl.innerHTML = '<form id="form"><div class="chip-input"></div></form>'
+      const chipInputEl = fixtureEl.querySelector('.chip-input')
+      const chipInput = new ChipInput(chipInputEl)
+
+      chipInput.add('one')
+
+      expect(chipInput._hiddenInput.hasAttribute('name')).toBeFalse()
+      expect([...new FormData(fixtureEl.querySelector('#form')).keys()]).toEqual([])
+    })
+
+    it('should take back the field it built when disposed', () => {
+      fixtureEl.innerHTML = '<div class="chip-input"><label class="chip-input-label">Skills</label></div>'
+      const chipInputEl = fixtureEl.querySelector('.chip-input')
+      const label = chipInputEl.querySelector('.chip-input-label')
+
+      new ChipInput(chipInputEl, { name: 'tags' }).dispose()
+
+      expect(chipInputEl.querySelector('.chip-input-field')).toBeNull()
+      expect(label.hasAttribute('for')).toBeFalse()
+    })
+
+    it('should keep a field the page wrote', () => {
+      fixtureEl.innerHTML = '<div class="chip-input"><input type="text" class="chip-input-field"></div>'
+      const chipInputEl = fixtureEl.querySelector('.chip-input')
+
+      new ChipInput(chipInputEl).dispose()
+
+      expect(chipInputEl.querySelector('.chip-input-field')).not.toBeNull()
+    })
+
+    it('should leave no hidden input behind when disposed', () => {
+      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      const chipInputEl = fixtureEl.querySelector('.chip-input')
+
+      new ChipInput(chipInputEl, { id: 'tags-field' }).dispose()
+      // eslint-disable-next-line no-new
+      new ChipInput(chipInputEl, { id: 'tags-field' })
+
+      expect(chipInputEl.querySelectorAll('#tags-field').length).toEqual(1)
+    })
+
+    it('should submit the values under the configured name', () => {
+      fixtureEl.innerHTML = '<form id="form"><div class="chip-input"></div></form>'
+      const chipInputEl = fixtureEl.querySelector('.chip-input')
+      const chipInput = new ChipInput(chipInputEl, { name: 'tags' })
+
+      chipInput.add('one')
+      chipInput.add('two')
+
+      expect([...new FormData(fixtureEl.querySelector('#form')).entries()]).toEqual([['tags', 'one,two']])
+    })
+  })
+
   describe('the frame', () => {
     it('should take the frame class itself', () => {
       fixtureEl.innerHTML = '<div class="chip-input"></div>'

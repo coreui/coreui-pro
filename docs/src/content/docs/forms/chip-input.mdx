@@ -41,16 +41,16 @@ Wrap chips and add `data-coreui-chip-input` to enable behavior.
   </div>`} />
 
 <Callout color="info">
-**Note:** The `<input class="chip-input-field" />` is created automatically by the component when initialized. You can also add it manually in the markup if preferred. Additionally, a hidden input is generated automatically to submit chip values with the form. The `name` attribute of this hidden input is taken from the `data-coreui-name` attribute (e.g., `data-coreui-name="chipInputBasicExample"`).
+**Note:** The `<input class="chip-input-field" />` is created automatically by the component when initialized. You can also add it manually in the markup if preferred. A hidden input is generated alongside it to carry the chip values, and it takes its name from `data-coreui-name` (e.g. `data-coreui-name="chipInputBasicExample"`). Without that attribute the hidden input has no name, so the chips are not submitted with the form.
 </Callout>
 
 ```html
-<div class="chip-input" data-coreui-chip-input data-coreui-placeholder="Add a skill...">
+<div class="chip-input" data-coreui-chip-input data-coreui-name="chipInputBasicExample" data-coreui-placeholder="Add a skill...">
   <label class="chip-input-label" for="skillsInputBasic">Skills:</label>
   <span class="chip">JavaScript</span>
   <span class="chip">TypeScript</span>
   <span class="chip">Accessibility</span>
-  <input type="text" class="chip-input-field" name="skillsInputBasic" placeholder="Add a skill...">
+  <input type="text" id="skillsInputBasic" class="chip-input-field" placeholder="Add a skill...">
 </div>
 ```
 
@@ -147,7 +147,7 @@ In this example, `select.coreui.chip-input` updates a live list of selected valu
 
 ## Usage
 
-Initialize the Bootstrap Chip Input component via data attributes or JavaScript. The chip input component automatically creates a hidden form input to submit all chip values with the form.
+Initialize the Bootstrap Chip Input component via data attributes or JavaScript. The component creates a hidden input for the chip values; give it a `name` and the chips are submitted with the form.
 
 ### Via data attributes
 
@@ -157,8 +157,8 @@ Add `data-coreui-chip-input` to initialize the chip input component. Options can
 <div class="chip-input" data-coreui-chip-input data-coreui-name="skills" data-coreui-placeholder="Add tags..." data-coreui-separator=","></div>
 ```
 
-When initialized, Chip Input creates a hidden input to submit values with the form.  
-Use `name` (or `data-coreui-name`) to control the submitted field name.
+When initialized, Chip Input creates a hidden input for the chip values. It is submitted only
+once you give it a name through `name` (or `data-coreui-name`).
 
 ### Via JavaScript
 
@@ -184,7 +184,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `disabled` | boolean | `false` | Disables the input and marks managed chips as non-interactive. |
 | `id` | string \| null | auto-generated | Custom id for the generated hidden input. |
 | `maxChips` | number \| null | `null` | Maximum number of chips allowed. `null` for unlimited. |
-| `name` | string \| null | auto-generated | Name for the generated hidden input used in form submission. |
+| `name` | string \| null | `null` | Name for the generated hidden input, which is what carries the chips into a form submission. Without a name that input is not submitted. |
 | `placeholder` | string | `''` | Placeholder text for dynamically created inputs. |
 | `readonly` | boolean | `false` | Prevents adding and removing chips while keeping input focus behavior. |
 | `removable` | boolean | `true` | Add remove buttons to created chips. |
