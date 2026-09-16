@@ -478,7 +478,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | --- | --- | --- | --- |
 | `allowList` | object | `DefaultAllowlist` | Object containing allowed tags and attributes for HTML sanitization when using custom templates. |
 | `ariaCleanerLabel`| string | `Clear all selections` | A string that provides an accessible label for the cleaner button. This label is read by screen readers to describe the action associated with the button. |
-| `ariaSearchLabel`| string | `Search` | Accessible label for the search input (when `search` is enabled). |
+| `ariaSearchLabel`| string | `Search options` | Accessible label for the search input (when `search` is enabled). |
 | `ariaTagDeleteLabel`| string | `Remove` | Accessible label prefix for a tag's delete button (selection type `tags`). The selected option's text is appended, so screen readers announce e.g. "Remove Angular". |
 | `cleaner`| boolean | `true` | Enables selection cleaner element. |
 | `clearSearchOnSelect`| boolean | `false` | Clear current search on selecting an item. |
@@ -555,7 +555,16 @@ myMutliSelect.addEventListener('changed.coreui.multi-select', event => {
 
 ### Naming the control
 
-The plugin replaces the `<select>` with its own combobox and keeps the original as an invisible overlay, which is what native `required` validation focuses and anchors to. The combobox takes its name from whatever the page already gave the `<select>`: a `<label for>` pointing at it, an `aria-labelledby`, or an `aria-label`. With `search` enabled the search field takes the same name, since that is the control the user tabs to. Give the `<select>` one of those, or neither has a name.
+The plugin replaces the `<select>` with its own combobox and keeps the original as an invisible overlay, which is what native `required` validation focuses and anchors to. The combobox takes its name from whatever the page already gave the `<select>`: a `<label for>` pointing at it, an `aria-labelledby`, or an `aria-label`. Give the `<select>` one of those, or it has no name.
+
+With `search` enabled the field the user tabs to is the search input, not the combobox, and it keeps a name of its own because what it holds is a filter rather than the value. That name is `ariaSearchLabel`, `Search options` by default. **Set it per control on a page with more than one multi select**, or every one of them announces the same thing:
+
+```html
+<label for="frameworks">Frameworks</label>
+<select id="frameworks" data-coreui-multi-select multiple
+        data-coreui-search="true"
+        data-coreui-aria-search-label="Search frameworks"></select>
+```
 
 ```html
 <label for="frameworks">Frameworks</label>
