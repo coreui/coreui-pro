@@ -135,10 +135,10 @@ const Default = {
   selectAllLabel: 'Select all',
   selectAllMode: 'all',
   selectAllStyle: 'checkbox',
+  selectFilteredLabel: 'Select filtered',
   selectionLimit: null,
   selectionType: 'tags',
   selectionTypeCounterText: 'item(s) selected',
-  selectFilteredLabel: 'Select filtered',
   valid: false,
   value: null
 }
@@ -175,13 +175,13 @@ const DefaultType = {
   search: '(boolean|string)',
   searchNoResultsLabel: 'string',
   selectAll: 'boolean',
-  selectAllStyle: 'string',
   selectAllLabel: 'string',
   selectAllMode: 'string',
+  selectAllStyle: 'string',
+  selectFilteredLabel: 'string',
   selectionLimit: '(number|null)',
   selectionType: 'string',
   selectionTypeCounterText: 'string',
-  selectFilteredLabel: 'string',
   valid: 'boolean',
   value: '(string|array|null)'
 }
