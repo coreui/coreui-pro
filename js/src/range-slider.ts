@@ -284,10 +284,12 @@ class RangeSlider extends BaseComponent {
     inputElement.max = this._config.max
     inputElement.step = this._config.step
     inputElement.value = value
-    if (this._config.name) {
-      inputElement.name = Array.isArray(this._config.name) ?
-        `${this._config.name[index]}` :
-        `${this._config.name}-${index}`
+    const name = Array.isArray(this._config.name) ?
+      this._config.name[index] :
+      this._config.name && `${this._config.name}-${index}`
+
+    if (name !== undefined && name !== null && name !== '' && name !== false) {
+      inputElement.name = String(name)
     }
 
     inputElement.disabled = this._config.disabled

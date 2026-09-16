@@ -237,6 +237,66 @@ describe('RangeSlider', () => {
     })
   })
 
+  describe('form payload', () => {
+    it('should suffix a string name with the handle index', () => {
+      fixtureEl.innerHTML = '<form id="form"><div class="range-slider"></div></form>'
+      const rangeSliderEl = fixtureEl.querySelector('.range-slider')
+      // eslint-disable-next-line no-new
+      new RangeSlider(rangeSliderEl, { value: [25, 75], name: 'price' })
+
+      expect([...new FormData(fixtureEl.querySelector('#form')).entries()])
+        .toEqual([['price-0', '25'], ['price-1', '75']])
+    })
+
+    it('should map an array of names one to one', () => {
+      fixtureEl.innerHTML = '<form id="form"><div class="range-slider"></div></form>'
+      const rangeSliderEl = fixtureEl.querySelector('.range-slider')
+      // eslint-disable-next-line no-new
+      new RangeSlider(rangeSliderEl, { value: [25, 75], name: ['min', 'max'] })
+
+      expect([...new FormData(fixtureEl.querySelector('#form')).entries()])
+        .toEqual([['min', '25'], ['max', '75']])
+    })
+
+    it('should leave a handle unnamed when the array is shorter', () => {
+      fixtureEl.innerHTML = '<form id="form"><div class="range-slider"></div></form>'
+      const rangeSliderEl = fixtureEl.querySelector('.range-slider')
+      // eslint-disable-next-line no-new
+      new RangeSlider(rangeSliderEl, { value: [25, 75], name: ['min'] })
+
+      expect([...new FormData(fixtureEl.querySelector('#form')).entries()]).toEqual([['min', '25']])
+    })
+
+    it('should split a comma-separated name into one per handle', () => {
+      fixtureEl.innerHTML = '<form id="form"><div class="range-slider" data-coreui-name="min, max"></div></form>'
+      const rangeSliderEl = fixtureEl.querySelector('.range-slider')
+      // eslint-disable-next-line no-new
+      new RangeSlider(rangeSliderEl, { value: [25, 75] })
+
+      expect([...new FormData(fixtureEl.querySelector('#form')).entries()])
+        .toEqual([['min', '25'], ['max', '75']])
+    })
+
+    it('should keep a zero in the array as a name', () => {
+      fixtureEl.innerHTML = '<form id="form"><div class="range-slider"></div></form>'
+      const rangeSliderEl = fixtureEl.querySelector('.range-slider')
+      // eslint-disable-next-line no-new
+      new RangeSlider(rangeSliderEl, { value: [25, 75], name: [0, 'max'] })
+
+      expect([...new FormData(fixtureEl.querySelector('#form')).entries()])
+        .toEqual([['0', '25'], ['max', '75']])
+    })
+
+    it('should not submit a slider the page did not name', () => {
+      fixtureEl.innerHTML = '<form id="form"><div class="range-slider"></div></form>'
+      const rangeSliderEl = fixtureEl.querySelector('.range-slider')
+      // eslint-disable-next-line no-new
+      new RangeSlider(rangeSliderEl, { value: [25, 75] })
+
+      expect([...new FormData(fixtureEl.querySelector('#form')).keys()]).toEqual([])
+    })
+  })
+
   describe('Accessibility labels', () => {
     it('should not set aria-label on a single-thumb slider', () => {
       fixtureEl.innerHTML = '<div id="slider"></div>'
