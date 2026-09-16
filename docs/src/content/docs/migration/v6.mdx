@@ -994,6 +994,11 @@ check, radio, carousel and toggler icons already work:
   nobody chose. The attribute is written only when there is a name, from the
   option or from the element. `dispose()` also takes back the `id` and the
   `name` the component added, where it used to leave both behind.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **An unnamed Autocomplete stays out of the form too.** Its input took a
+  generated `name` when the option was not set, so a form carried a key nobody
+  chose. It does not now, and a name given later through `setConfig()` reaches
+  the input, which it never did. The generated `id` is unaffected.
 
 #### Menu (new) and Dropdown
 
@@ -1514,6 +1519,15 @@ radius it sets for itself and showed rounded corners against the field. If your
 own stylesheet re-squared those corners as a workaround, the override is no
 longer needed. A rule of yours that relied on the group losing to a component
 now loses to the group instead; give it a layer of its own if you need it back.
+
+#### Chip Input is submitted only once you name it
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+The hidden input that carries the chips took a generated `name` when the option
+was not set, so a form carried a key nobody chose. It is named only when you
+ask for one, and the option table no longer lists the name as auto-generated.
+`dispose()` also removes that input, where it used to leave it in the page.
 
 #### Chip Input takes the frame class itself
 

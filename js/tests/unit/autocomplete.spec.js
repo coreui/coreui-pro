@@ -371,6 +371,32 @@ describe('Autocomplete', () => {
       expect(autocomplete._inputHintElement.hasAttribute('name')).toBeFalse()
     })
 
+    it('should not submit a field the page did not name', () => {
+      fixtureEl.innerHTML = '<form id="form"><div class="autocomplete"></div></form>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, { options: ['Angular'] })
+
+      autocomplete._inputElement.value = 'Angular'
+
+      expect(autocomplete._inputElement.hasAttribute('name')).toBeFalse()
+      expect([...new FormData(fixtureEl.querySelector('#form')).keys()]).toEqual([])
+    })
+
+    it('should submit under a name given by setConfig', () => {
+      fixtureEl.innerHTML = '<form id="form"><div class="autocomplete"></div></form>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, { options: ['Angular'] })
+
+      autocomplete.setConfig({ name: 'tech' })
+      autocomplete._inputElement.value = 'Angular'
+
+      expect([...new FormData(fixtureEl.querySelector('#form')).entries()]).toEqual([['tech', 'Angular']])
+
+      autocomplete.setConfig({ name: null })
+
+      expect(autocomplete._inputElement.hasAttribute('name')).toBeFalse()
+    })
+
     it('should submit the configured name once when showHints is true', () => {
       fixtureEl.innerHTML = '<form id="form"><div class="autocomplete"></div></form>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
@@ -399,7 +425,7 @@ describe('Autocomplete', () => {
       const keys = [...new FormData(fixtureEl.querySelector('#form')).keys()]
 
       expect(autocomplete._inputHintElement).not.toBeNull()
-      expect(keys).toEqual([autocomplete._inputElement.name])
+      expect(keys).toEqual([])
     })
 
     it('should set togglerElement tabIndex to -1 when search is falsy and not disabled', () => {

@@ -254,6 +254,7 @@ class Autocomplete extends ComboboxBase {
     this._config = this._getConfig({ ...this._config, ...config })
     this._options = this._getOptionsFromConfig()
     this._setListBoxItems()
+    this._syncInputName()
   }
 
   deselectAll(options: any[] = this._selected): void {
@@ -466,6 +467,15 @@ class Autocomplete extends ComboboxBase {
     })
   }
 
+  _syncInputName(): void {
+    if (this._config.name) {
+      this._inputElement.setAttribute('name', this._config.name.toString())
+      return
+    }
+
+    this._inputElement.removeAttribute('name')
+  }
+
   _getOptionsFromConfig(options: any = this._config.options): any[] {
     if (!options || !Array.isArray(options)) {
       return []
@@ -574,7 +584,6 @@ class Autocomplete extends ComboboxBase {
     const inputEl = document.createElement('input')
     inputEl.classList.add(CLASS_NAME_INPUT)
     inputEl.id = this._uniqueId
-    inputEl.setAttribute('name', (this._config.name || this._uniqueId).toString())
     inputEl.autocomplete = 'off'
     inputEl.placeholder = this._config.placeholder ?? ''
     inputEl.role = 'combobox'
@@ -594,6 +603,7 @@ class Autocomplete extends ComboboxBase {
 
     togglerEl.append(inputEl)
     this._inputElement = inputEl
+    this._syncInputName()
   }
 
   _createButtons(): void {

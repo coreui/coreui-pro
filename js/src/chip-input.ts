@@ -85,6 +85,8 @@ class ChipInput extends ChipSet {
   protected declare _hiddenInput: HTMLInputElement | null
   protected declare _input: HTMLInputElement
   private _addedGroupClass = false
+  private _createdInput = false
+  private _labelledFor: Element | null = null
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
@@ -151,6 +153,12 @@ class ChipInput extends ChipSet {
     }
 
     EventHandler.off(this._input, EVENT_KEY)
+    this._hiddenInput?.remove()
+
+    if (this._createdInput) {
+      this._input.remove()
+      this._labelledFor?.removeAttribute('for')
+    }
 
     super.dispose()
   }
@@ -256,6 +264,9 @@ class ChipInput extends ChipSet {
     const labelFor = label?.getAttribute('for')
     const generatedInputId = labelFor || getUID(`${NAME}-input`)
 
+    this._createdInput = true
+    this._labelledFor = label && !labelFor ? label : null
+
     input.type = 'text'
     input.className = CLASS_NAME_CHIP_INPUT_FIELD
     input.id = generatedInputId
@@ -276,7 +287,10 @@ class ChipInput extends ChipSet {
     const hiddenInput = document.createElement('input')
     hiddenInput.type = 'hidden'
     hiddenInput.id = this._uniqueId
-    hiddenInput.name = this._config.name || this._uniqueId
+
+    if (this._config.name) {
+      hiddenInput.name = this._config.name
+    }
 
     this._element.append(hiddenInput)
     this._hiddenInput = hiddenInput
