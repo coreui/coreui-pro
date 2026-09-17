@@ -3853,6 +3853,15 @@ tintable and lets dark mode deepen every shadow at once.
   `--cui-check-mark-checked`, `--cui-radio-mark`, `--cui-rating-item-icon`,
   `--cui-control-select-bg-img`, `--cui-navbar-toggler-icon-bg`,
   `--cui-header-toggler-icon-bg`, `--cui-sidebar-toggler-icon`.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The validation icon inside the field is gone**, and with it
+  `$enable-validation-icons`, the two glyphs and their colours, the geometry
+  that made room for them and the select's second background layer. A valid or
+  invalid field still says so through its border, its focus ring and its
+  feedback text. The glyph was a `background-image` on the input itself with the
+  colour baked into the SVG, so it could never follow a token: an input renders
+  no pseudo-element to hang a mask on, and masking the input erases its own
+  background. It comes back when the field has a wrapper to draw it in.
 - **What stays in `scss/_config.scss` stays for a reason.** `$spacer`,
   `$border-width`, `$theme-colors`, the `$enable-*` switches, the breakpoint,
   container and spacer maps and the contrast helpers feed maps, mixins, loops

@@ -20,7 +20,6 @@ $enable-grid-classes:         true !default;
 $enable-container-classes:    true !default;
 $enable-cssgrid:              true !default;
 $enable-button-pointers:      true !default;
-$enable-validation-icons:     true !default;
 $enable-deprecation-messages: true !default;
 // Utilities live in the last cascade layer, so they already win against every
 // component without it. Kept as a switch back to the v5 behavior for a codebase

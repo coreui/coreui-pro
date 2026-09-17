@@ -26,7 +26,6 @@
 @mixin form-validation-state(
   $state,
   $theme,
-  $icon,
   $color: var(--#{$prefix}#{$theme}-fg),
   $tooltip-color: var(--#{$prefix}#{$theme}-contrast),
   $focus-ring-color: var(--#{$prefix}#{$theme}-focus-ring),
@@ -76,14 +75,6 @@
       --#{$prefix}control-focus-border-color: #{$border-color};
       --#{$prefix}control-focus-ring: #{$focus-ring-color};
 
-      @if $enable-validation-icons {
-        padding-inline-end: $input-height-inner;
-        background-image: escape-svg($icon);
-        background-repeat: no-repeat;
-        @include ltr-rtl-value-only("background-position", right $input-height-inner-quarter center, left $input-height-inner-quarter center);
-        background-size: $input-height-inner-half $input-height-inner-half;
-      }
-
     }
   }
 
@@ -121,25 +112,6 @@
     }
   }
 
-  @if $enable-validation-icons {
-    .form-control-group > .form-control,
-    .form-control-group > .form-floating > .form-control {
-      @include form-validation-state-selector($state) {
-        background-image: none;
-      }
-    }
-  }
-
-  // stylelint-disable-next-line selector-no-qualifying-type
-  textarea.form-control {
-    @include form-validation-state-selector($state) {
-      @if $enable-validation-icons {
-        padding-inline-end: $input-height-inner;
-        @include ltr-rtl-value-only("background-position", top $input-height-inner-quarter right $input-height-inner-quarter, top $input-height-inner-quarter left $input-height-inner-quarter);
-      }
-    }
-  }
-
   // stylelint-disable selector-no-qualifying-type
   select.form-control,
   .form-control-caret,
@@ -148,27 +120,9 @@
       --#{$prefix}control-border-color: #{$border-color};
       --#{$prefix}control-focus-border-color: #{$border-color};
       --#{$prefix}control-focus-ring: #{$focus-ring-color};
-
-      @if $enable-validation-icons {
-        &:not([multiple], [size]),
-        &:not([multiple])[size="1"] {
-          --#{$prefix}control-select-bg-icon: #{escape-svg($icon)};
-          padding-inline-end: var(--#{$prefix}control-select-feedback-icon-padding-end);
-          background-position: var(--#{$prefix}control-select-validation-bg-position);
-          background-size: var(--#{$prefix}control-select-feedback-icon-size);
-        }
-      }
     }
   }
   // stylelint-enable selector-no-qualifying-type
-
-  .form-control-color {
-    @include form-validation-state-selector($state) {
-      @if $enable-validation-icons {
-        width: calc(var(--#{$prefix}control-color-width) + #{$input-height-inner});
-      }
-    }
-  }
 
   // Range — the validation class lives on .form-range-input, while feedback sits outside
   // the .form-range wrapper, so we use :has() to toggle it.
