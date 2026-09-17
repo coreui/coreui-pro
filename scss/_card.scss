@@ -6,10 +6,6 @@
 @use "mixins/translucent" as *;
 @use "config" as *;
 
-// scss-docs-start card-translucent-variables
-$card-translucent-cap-bg-opacity:   60% !default;
-// scss-docs-end card-translucent-variables
-
 $card-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
@@ -156,7 +152,7 @@ $card-tokens: defaults(
   }
 
   .card-translucent {
-    --#{$prefix}card-translucent-cap-bg-opacity: #{$card-translucent-cap-bg-opacity};
+    --#{$prefix}card-translucent-cap-bg-opacity: #{60%};
     @include translucent(var(--#{$prefix}card-bg));
 
     .card-header,

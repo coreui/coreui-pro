@@ -7,7 +7,6 @@
 @use "sidebar" as *;
 
 // scss-docs-start sidebar-nav-variables
-$sidebar-compact-nav-link-padding-y:          .5625rem !default;
 
 $sidebar-nav-group-indicator-icon:            url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708'/></svg>") !default;
 $sidebar-nav-group-indicator-hover-icon:      $sidebar-nav-group-indicator-icon !default;
@@ -341,7 +340,7 @@ $sidebar-nav-tree-tokens: defaults(
     &.compact,
     .compact {
       .nav-link {
-        --#{$prefix}sidebar-nav-link-padding-y: #{$sidebar-compact-nav-link-padding-y};
+        --#{$prefix}sidebar-nav-link-padding-y: #{.5625rem};
       }
     }
 

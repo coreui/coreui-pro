@@ -6,7 +6,6 @@
 @use "../config" as *;
 
 // scss-docs-start form-floating-variables
-$form-floating-label-transform-rtl:     scale(.85) translateY(-.5rem) translateX(-.15rem) !default;
 // The label is a sibling of the control, so it cannot inherit the control's own
 // background — the textarea mask has to be told the same colour a second time.
 // scss-docs-end form-floating-variables
@@ -55,7 +54,7 @@ $form-floating-tokens: defaults(
     position: relative;
 
     @include rtl() {
-      --#{$prefix}form-floating-label-transform: #{$form-floating-label-transform-rtl};
+      --#{$prefix}form-floating-label-transform: #{scale(.85) translateY(-.5rem) translateX(-.15rem)};
     }
 
     > .form-control,

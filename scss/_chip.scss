@@ -9,21 +9,6 @@
 // scss-docs-start chip-variables
 $chip-gap:                   .3125rem !default;
 
-$chip-font-size-sm:          .75rem !default;
-$chip-height-sm:             1.5rem !default;
-$chip-padding-x-sm:          .625rem !default;
-$chip-gap-sm:                .25rem !default;
-$chip-icon-size-sm:          .875rem !default;
-$chip-img-size-sm:           1rem !default;
-$chip-remove-size-sm:        .875rem !default;
-
-$chip-font-size-lg:          1rem !default;
-$chip-height-lg:             2rem !default;
-$chip-padding-x-lg:          .75rem !default;
-$chip-gap-lg:                .375rem !default;
-$chip-icon-size-lg:          1.25rem !default;
-$chip-img-size-lg:           1.5rem !default;
-$chip-remove-size-lg:        1.25rem !default;
 // scss-docs-end chip-variables
 
 $chip-tokens: () !default;
@@ -234,13 +219,13 @@ $chip-outline-tokens: defaults(
   .chip-input-lg .chip,
   .form-control-group.form-control-lg .chip {
     @include chip-size(
-      $chip-height-lg,
-      $chip-padding-x-lg,
-      $chip-gap-lg,
-      $chip-font-size-lg,
-      $chip-img-size-lg,
-      $chip-icon-size-lg,
-      $chip-remove-size-lg
+      2rem,
+      .75rem,
+      .375rem,
+      1rem,
+      1.5rem,
+      1.25rem,
+      1.25rem
     );
   }
 
@@ -248,13 +233,13 @@ $chip-outline-tokens: defaults(
   .chip-input-sm .chip,
   .form-control-group.form-control-sm .chip {
     @include chip-size(
-      $chip-height-sm,
-      $chip-padding-x-sm,
-      $chip-gap-sm,
-      $chip-font-size-sm,
-      $chip-img-size-sm,
-      $chip-icon-size-sm,
-      $chip-remove-size-sm
+      1.5rem,
+      .625rem,
+      .25rem,
+      .75rem,
+      1rem,
+      .875rem,
+      .875rem
     );
   }
 }

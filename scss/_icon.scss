@@ -6,7 +6,6 @@ $icon-size-lg:    calc(var(--#{$prefix}icon-size-base) * 1.25) !default;
 $icon-size-xl:    calc(var(--#{$prefix}icon-size-base) * 1.5) !default;
 $icon-size-xxl:   calc(var(--#{$prefix}icon-size-base) * 2) !default;
 
-
 @layer components {
   .icon {
     display: inline-block;

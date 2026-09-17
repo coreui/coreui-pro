@@ -8,8 +8,7 @@
 $spinner-animation-speed:                  1s !default;
 $spinner-animation-timing-function:        linear !default;
 
-$spinner-width-sm:                         .75em !default;
-$spinner-height-sm:                        $spinner-width-sm !default;
+$spinner-height-sm:                        .75em !default;
 
 $spinner-reduced-motion-animation-speed:   1.5s !default;
 // scss-docs-end spinner-variables
@@ -80,7 +79,7 @@ $spinner-grow-tokens: defaults(
 
   .spinner-sm {
     // scss-docs-start spinner-sm-css-vars
-    --#{$prefix}spinner-width: #{$spinner-width-sm};
+    --#{$prefix}spinner-width: #{.75em};
     --#{$prefix}spinner-height: #{$spinner-height-sm};
     // scss-docs-end spinner-sm-css-vars
   }

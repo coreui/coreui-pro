@@ -13,24 +13,17 @@
 // scss-docs-start modal-variables
 $modal-inner-padding:               var(--#{$prefix}spacer) !default;
 
-$modal-dialog-margin-y-sm-up:       1.75rem !default;
-
 $modal-title-line-height:           var(--#{$prefix}body-line-height) !default;
 
 $modal-content-border-color:        var(--#{$prefix}border-color-translucent) !default;
 $modal-content-border-width:        var(--#{$prefix}border-width) !default;
 $modal-content-box-shadow-xs:       var(--#{$prefix}box-shadow-sm) !default;
-$modal-content-box-shadow-sm-up:    var(--#{$prefix}box-shadow) !default;
 
 $modal-backdrop-bg:                 var(--#{$prefix}black) !default;
 $modal-backdrop-opacity:            .5 !default;
 
 $modal-header-padding-y:            $modal-inner-padding !default;
 $modal-header-padding-x:            $modal-inner-padding !default;
-
-$modal-sm:                          300px !default;
-$modal-lg:                          800px !default;
-$modal-xl:                          1140px !default;
 
 $modal-fade-transform:              translate(0, -50px) !default;
 $modal-scale-transform:             scale(1.02) !default;
@@ -42,9 +35,9 @@ $modal-sizes: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
 $modal-sizes: defaults(
   (
-    sm: $modal-sm,
-    lg: $modal-lg,
-    xl: $modal-xl,
+    sm: 300px,
+    lg: 800px,
+    xl: 1140px,
   ),
   $modal-sizes
 );
@@ -218,8 +211,8 @@ $modal-tokens: defaults(
 
   @include media-breakpoint-up(sm) {
     .modal {
-      --#{$prefix}modal-margin: #{$modal-dialog-margin-y-sm-up};
-      --#{$prefix}modal-box-shadow: #{$modal-content-box-shadow-sm-up};
+      --#{$prefix}modal-margin: #{1.75rem};
+      --#{$prefix}modal-box-shadow: #{var(--#{$prefix}box-shadow)};
     }
   }
 

@@ -3,18 +3,6 @@
 @use "../mixins/tokens" as *;
 @use "../config" as *;
 
-// scss-docs-start chip-input-variables
-$chip-input-padding-y-sm:        .125rem !default;
-$chip-input-padding-x-sm:        .5rem !default;
-$chip-input-border-radius-sm:    var(--#{$prefix}radius-3) !default;
-$chip-input-gap-sm:              .125rem !default;
-
-$chip-input-padding-y-lg:        .375rem !default;
-$chip-input-padding-x-lg:        1rem !default;
-$chip-input-border-radius-lg:    var(--#{$prefix}radius-5) !default;
-$chip-input-gap-lg:              .5rem !default;
-// scss-docs-end chip-input-variables
-
 $chip-input-sizes: () !default;
 
 // scss-docs-start chip-input-sizes
@@ -22,16 +10,16 @@ $chip-input-sizes: () !default;
 $chip-input-sizes: defaults(
   (
     "sm": (
-      padding-y:     $chip-input-padding-y-sm,
-      padding-x:     $chip-input-padding-x-sm,
-      border-radius: $chip-input-border-radius-sm,
-      gap:           $chip-input-gap-sm,
+      padding-y:     .125rem,
+      padding-x:     .5rem,
+      border-radius: var(--#{$prefix}radius-3),
+      gap:           .125rem,
     ),
     "lg": (
-      padding-y:     $chip-input-padding-y-lg,
-      padding-x:     $chip-input-padding-x-lg,
-      border-radius: $chip-input-border-radius-lg,
-      gap:           $chip-input-gap-lg,
+      padding-y:     .375rem,
+      padding-x:     1rem,
+      border-radius: var(--#{$prefix}radius-5),
+      gap:           .5rem,
     ),
   ),
   $chip-input-sizes

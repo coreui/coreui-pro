@@ -5,12 +5,11 @@
 @use "../layout/breakpoints" as *;
 @use "../config" as *;
 
-
 // Grid system
 //
 // Generate semantic grid columns with these mixins.
 
-@mixin make-row($gutter-x: $grid-gutter-x, $gutter-y: $grid-gutter-y) {
+@mixin make-row($gutter-x: $grid-gutter-x, $gutter-y: 0) {
   --#{$prefix}gutter-x: #{$gutter-x};
   --#{$prefix}gutter-y: #{$gutter-y};
   display: flex;

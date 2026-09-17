@@ -141,7 +141,6 @@ $container-max-widths: defaults(
 
 $grid-columns:                12 !default;
 $grid-gutter-x:               1.5rem !default;
-$grid-gutter-y:               0 !default;
 $grid-row-columns:            6 !default;
 // fusv-disable
 $grid-gutter-width:           $grid-gutter-x !default; // Deprecated in v6.0.0, removed in v7

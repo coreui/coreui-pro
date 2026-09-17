@@ -7,8 +7,6 @@
 @use "../theme" as *;
 
 // scss-docs-start table-variables
-$table-cell-padding-y-sm:     .25rem !default;
-$table-cell-padding-x-sm:     .25rem !default;
 
 $table-striped-order:         odd !default;
 $table-striped-columns-order: even !default;
@@ -126,8 +124,8 @@ $table-variants: map.keys($theme-colors) !default;
   //
 
   .table-sm {
-    --#{$prefix}table-cell-padding-y: #{$table-cell-padding-y-sm};
-    --#{$prefix}table-cell-padding-x: #{$table-cell-padding-x-sm};
+    --#{$prefix}table-cell-padding-y: #{.25rem};
+    --#{$prefix}table-cell-padding-x: #{.25rem};
   }
 
   // Border versions

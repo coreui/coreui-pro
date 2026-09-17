@@ -9,13 +9,8 @@
 // stylelint-disable custom-property-no-missing-var-function
 
 // scss-docs-start toast-variables
-$toast-max-width:                   350px !default;
 $toast-background-color:            var(--#{$prefix}bg-body) !default;
 $toast-border-color:                var(--#{$prefix}border-color-translucent) !default;
-$toast-spacing:                     $container-padding-x !default;
-$toast-container-inset:             var(--#{$prefix}spacer-4) !default;
-$toast-transition-duration:         .3s !default;
-$toast-transition-timing:           ease-out !default;
 // scss-docs-end toast-variables
 
 $toast-tokens: () !default;
@@ -28,8 +23,8 @@ $toast-tokens: defaults(
     --#{$prefix}toast-zindex: var(--#{$prefix}z-toast),
     --#{$prefix}toast-padding-x: .75rem,
     --#{$prefix}toast-padding-y: .5rem,
-    --#{$prefix}toast-spacing: #{$toast-spacing},
-    --#{$prefix}toast-max-width: #{$toast-max-width},
+    --#{$prefix}toast-spacing: #{$container-padding-x},
+    --#{$prefix}toast-max-width: #{350px},
     --#{$prefix}toast-color: var(--#{$prefix}fg-body),
     --#{$prefix}toast-bg: #{$toast-background-color},
     --#{$prefix}toast-border-width: var(--#{$prefix}border-width),
@@ -42,8 +37,8 @@ $toast-tokens: defaults(
     --#{$prefix}toast-font-size: .875rem,
     --#{$prefix}toast-slide: .5rem,
     --#{$prefix}toast-transition-property: #{"opacity, translate, display"},
-    --#{$prefix}toast-transition-duration: #{$toast-transition-duration},
-    --#{$prefix}toast-transition-timing: #{$toast-transition-timing},
+    --#{$prefix}toast-transition-duration: #{.3s},
+    --#{$prefix}toast-transition-timing: #{ease-out},
   ),
   $toast-tokens
 );
@@ -99,12 +94,12 @@ $toast-tokens: defaults(
   .toast-container {
     // scss-docs-start toast-container-css-vars
     --#{$prefix}toast-zindex: var(--#{$prefix}z-toast);
-    --#{$prefix}toast-container-inset: #{$toast-container-inset};
+    --#{$prefix}toast-container-inset: #{var(--#{$prefix}spacer-4)};
     --#{$prefix}toast-inline-sign: 1;
-    --#{$prefix}toast-max-width: #{$toast-max-width};
-    --#{$prefix}toast-spacing: #{$toast-spacing};
-    --#{$prefix}toast-transition-duration: #{$toast-transition-duration};
-    --#{$prefix}toast-transition-timing: #{$toast-transition-timing};
+    --#{$prefix}toast-max-width: #{350px};
+    --#{$prefix}toast-spacing: #{$container-padding-x};
+    --#{$prefix}toast-transition-duration: #{.3s};
+    --#{$prefix}toast-transition-timing: #{ease-out};
     // scss-docs-end toast-container-css-vars
 
     position: absolute;

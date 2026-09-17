@@ -11,10 +11,6 @@
 @use "../colors" as *;
 @use "../config" as *;
 
-// scss-docs-start form-color-variables
-$form-color-width:                3rem !default;
-// scss-docs-end form-color-variables
-
 // stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
 $form-control-sizes: () !default;
@@ -310,7 +306,7 @@ $form-control-select-tokens: defaults(
   // stylelint-enable selector-no-qualifying-type
 
   .form-control-color {
-    --#{$prefix}control-color-width: #{$form-color-width};
+    --#{$prefix}control-color-width: #{3rem};
 
     width: var(--#{$prefix}control-color-width);
     height: var(--#{$prefix}control-min-height);

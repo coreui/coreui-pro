@@ -3837,6 +3837,12 @@ tintable and lets dark mode deepen every shadow at once.
   They sit on `mark, .mark` now, in a `$reboot-mark-tokens` map you can override
   like any other component surface. Setting them on `:root` no longer reaches
   the element; set them on the element, or on the map when you compile.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **76 more component scalars are gone**, the ones whose value reached exactly
+  one custom property and nothing else: the chip and chip input size variants,
+  the nav enclosed set, the OTP input sizes, the badge and rating sizes, the
+  modal widths and margins, the toast surface, the form control group icon
+  sizes and the colour picker width. Each is the token it fed.
 - **What stays in `scss/_config.scss` stays for a reason.** `$spacer`,
   `$border-width`, `$theme-colors`, the `$enable-*` switches, the breakpoint,
   container and spacer maps and the contrast helpers feed maps, mixins, loops

@@ -8,14 +8,8 @@
 // scss-docs-start badge-variables
 $badge-font-size-floor:             12px !default;
 
-$badge-min-height-sm:               1.125rem !default;
-$badge-padding-y-sm:                .2em !default;
-$badge-padding-x-sm:                .5em !default;
 $badge-font-size-sm:                .65em !default;
 
-$badge-min-height-lg:               1.75rem !default;
-$badge-padding-y-lg:                .375em !default;
-$badge-padding-x-lg:                .875em !default;
 $badge-font-size-lg:                .875em !default;
 // scss-docs-end badge-variables
 
@@ -25,8 +19,8 @@ $badge-sizes: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
 $badge-sizes: defaults(
   (
-    "sm": (min-height: $badge-min-height-sm, padding-y: $badge-padding-y-sm, padding-x: $badge-padding-x-sm, font-size: $badge-font-size-sm),
-    "lg": (min-height: $badge-min-height-lg, padding-y: $badge-padding-y-lg, padding-x: $badge-padding-x-lg, font-size: $badge-font-size-lg),
+    "sm": (min-height: 1.125rem, padding-y: .2em, padding-x: .5em, font-size: $badge-font-size-sm),
+    "lg": (min-height: 1.75rem, padding-y: .375em, padding-x: .875em, font-size: $badge-font-size-lg),
   ),
   $badge-sizes
 );

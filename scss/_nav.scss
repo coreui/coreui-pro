@@ -14,18 +14,6 @@ $nav-link-padding-y:                .5rem !default;
 $nav-tabs-border-color:             var(--#{$prefix}border-color) !default;
 $nav-tabs-link-active-bg:           var(--#{$prefix}bg-body) !default;
 
-$nav-enclosed-padding:                   .125rem !default;
-$nav-enclosed-bg:                        var(--#{$prefix}bg-3) !default;
-$nav-enclosed-border-radius:             var(--#{$prefix}radius-5) !default;
-$nav-enclosed-link-padding-y:            .375rem !default;
-$nav-enclosed-link-padding-x:            .875rem !default;
-$nav-enclosed-link-color:                var(--#{$prefix}fg-body) !default;
-$nav-enclosed-link-border-width:         1px !default;
-$nav-enclosed-link-active-color:         var(--#{$prefix}fg-body) !default;
-$nav-enclosed-link-active-bg:            var(--#{$prefix}bg-body) !default;
-$nav-enclosed-link-active-border-color:  var(--#{$prefix}border-color) !default;
-$nav-enclosed-link-hover-box-shadow:     var(--#{$prefix}box-shadow-sm) !default;
-$nav-enclosed-link-disabled-color:       var(--#{$prefix}fg-2) !default;
 // scss-docs-end nav-variables
 
 $nav-tokens: () !default;
@@ -337,18 +325,18 @@ $tab-pane-tokens: defaults(
   }
 
   .nav-enclosed {
-    --#{$prefix}nav-enclosed-padding: #{$nav-enclosed-padding};
-    --#{$prefix}nav-enclosed-bg: #{$nav-enclosed-bg};
-    --#{$prefix}nav-enclosed-border-radius: #{$nav-enclosed-border-radius};
-    --#{$prefix}nav-enclosed-link-padding-x: #{$nav-enclosed-link-padding-x};
-    --#{$prefix}nav-enclosed-link-padding-y: #{$nav-enclosed-link-padding-y};
-    --#{$prefix}nav-enclosed-link-color: #{$nav-enclosed-link-color};
-    --#{$prefix}nav-enclosed-link-border-width: #{$nav-enclosed-link-border-width};
-    --#{$prefix}nav-enclosed-link-active-color: #{$nav-enclosed-link-active-color};
-    --#{$prefix}nav-enclosed-link-active-bg: #{$nav-enclosed-link-active-bg};
-    --#{$prefix}nav-enclosed-link-active-border-color: #{$nav-enclosed-link-active-border-color};
-    --#{$prefix}nav-enclosed-link-hover-box-shadow: #{$nav-enclosed-link-hover-box-shadow};
-    --#{$prefix}nav-enclosed-link-disabled-color: #{$nav-enclosed-link-disabled-color};
+    --#{$prefix}nav-enclosed-padding: #{.125rem};
+    --#{$prefix}nav-enclosed-bg: #{var(--#{$prefix}bg-3)};
+    --#{$prefix}nav-enclosed-border-radius: #{var(--#{$prefix}radius-5)};
+    --#{$prefix}nav-enclosed-link-padding-x: #{.875rem};
+    --#{$prefix}nav-enclosed-link-padding-y: #{.375rem};
+    --#{$prefix}nav-enclosed-link-color: #{var(--#{$prefix}fg-body)};
+    --#{$prefix}nav-enclosed-link-border-width: #{1px};
+    --#{$prefix}nav-enclosed-link-active-color: #{var(--#{$prefix}fg-body)};
+    --#{$prefix}nav-enclosed-link-active-bg: #{var(--#{$prefix}bg-body)};
+    --#{$prefix}nav-enclosed-link-active-border-color: #{var(--#{$prefix}border-color)};
+    --#{$prefix}nav-enclosed-link-hover-box-shadow: #{var(--#{$prefix}box-shadow-sm)};
+    --#{$prefix}nav-enclosed-link-disabled-color: #{var(--#{$prefix}fg-2)};
 
     display: inline-flex;
     padding: var(--#{$prefix}nav-enclosed-padding);

@@ -7,8 +7,6 @@
 
 // scss-docs-start sidebar-narrow-variables
 $sidebar-narrow-width:                     4rem !default;
-$sidebar-narrow-nav-link-padding-y:        .75rem !default;
-$sidebar-narrow-nav-link-padding-x:        .5rem !default;
 // scss-docs-end sidebar-narrow-variables
 
 // stylelint-disable scss/dollar-variable-default
@@ -52,8 +50,8 @@ $sidebar-narrow-unfoldable-tokens: defaults(
       }
 
       .sidebar-nav {
-        --#{$prefix}sidebar-nav-link-padding-x: #{$sidebar-narrow-nav-link-padding-x};
-        --#{$prefix}sidebar-nav-link-padding-y: #{$sidebar-narrow-nav-link-padding-y};
+        --#{$prefix}sidebar-nav-link-padding-x: #{.5rem};
+        --#{$prefix}sidebar-nav-link-padding-y: #{.75rem};
       }
 
       .nav-link {

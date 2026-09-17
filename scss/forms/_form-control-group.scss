@@ -8,21 +8,14 @@
 @use "../config" as *;
 @use "form-control" as *;
 
-// scss-docs-start form-control-group-variables
-$form-control-group-icon-size-sm:       .875rem !default;
-$form-control-group-icon-size-lg:       1.25rem !default;
-$form-control-group-action-size-sm:     1.25rem !default;
-$form-control-group-action-size-lg:     1.75rem !default;
-// scss-docs-end form-control-group-variables
-
 $form-control-group-sizes: () !default;
 
 // scss-docs-start form-control-group-sizes
 // stylelint-disable-next-line scss/dollar-variable-default
 $form-control-group-sizes: defaults(
   (
-    "sm": (icon-size: $form-control-group-icon-size-sm, action-size: $form-control-group-action-size-sm),
-    "lg": (icon-size: $form-control-group-icon-size-lg, action-size: $form-control-group-action-size-lg),
+    "sm": (icon-size: .875rem, action-size: 1.25rem),
+    "lg": (icon-size: 1.25rem, action-size: 1.75rem),
   ),
   $form-control-group-sizes
 );
