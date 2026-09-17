@@ -141,9 +141,6 @@ $container-max-widths: defaults(
 $grid-columns:                12 !default;
 $grid-gutter-x:               1.5rem !default;
 $grid-row-columns:            6 !default;
-// fusv-disable
-$grid-gutter-width:           $grid-gutter-x !default; // Deprecated in v6.0.0, removed in v7
-// fusv-enable
 $gutters:                     null !default;
 @if $gutters == null {
   $gutters: ();
@@ -246,8 +243,6 @@ $shadows: (
 
 // scss-docs-start font-variables
 
-$font-weight-semibold:        600 !default;
-
 // fusv-disable
 // Read by the shared docs engine, which also serves v5, so it cannot move to
 // the token yet.
@@ -263,7 +258,7 @@ $font-weights: defaults(
     light: 300,
     normal: 400,
     medium: 500,
-    semibold: $font-weight-semibold,
+    semibold: 600,
     bold: 700,
     bolder: bolder
   ),

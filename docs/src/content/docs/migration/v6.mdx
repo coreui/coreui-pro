@@ -3866,6 +3866,10 @@ tintable and lets dark mode deepen every shadow at once.
   **`$radius` and `$chip-gap` are gone**, to `--cui-radius` and
   `--cui-chip-gap`. The radius scale still multiplies one value, but that value
   is the token: set `--cui-radius` and every stop follows at runtime.
+- **`$font-weight-semibold` and `$grid-gutter-width` are gone too.** Both were
+  kept only because the shared docs engine read them; it reads
+  `--cui-font-weight-semibold` and `$grid-gutter-x` now. The weight lives in
+  `$font-weights`, and `$grid-gutter-x` is the gutter.
 - **What stays in `scss/_config.scss` stays for a reason.** `$spacer`,
   `$border-width`, `$theme-colors`, the `$enable-*` switches, the breakpoint,
   container and spacer maps and the contrast helpers feed maps, mixins, loops
