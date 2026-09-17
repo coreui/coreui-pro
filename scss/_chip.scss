@@ -7,7 +7,6 @@
 @use "config" as *;
 
 // scss-docs-start chip-variables
-$chip-gap:                   .3125rem !default;
 
 // scss-docs-end chip-variables
 
@@ -20,7 +19,7 @@ $chip-tokens: defaults(
   (
     --#{$prefix}chip-height: 1.75rem,
     --#{$prefix}chip-padding-x: .625rem,
-    --#{$prefix}chip-gap: #{$chip-gap},
+    --#{$prefix}chip-gap: .3125rem,
     --#{$prefix}chip-font-size: .875rem,
     --#{$prefix}chip-font-weight: var(--#{$prefix}font-weight-normal),
     --#{$prefix}chip-border-radius: var(--#{$prefix}radius-pill),

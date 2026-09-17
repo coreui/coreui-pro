@@ -8,7 +8,6 @@
 
 // scss-docs-start sidebar-nav-variables
 
-$sidebar-nav-group-indicator-hover-icon:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708'/></svg>") !default;
 // scss-docs-end sidebar-nav-variables
 
 // stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
@@ -73,7 +72,7 @@ $sidebar-nav-tokens: defaults(
     --#{$prefix}sidebar-nav-group-indicator-color: var(--#{$prefix}fg-3),
     --#{$prefix}sidebar-nav-group-indicator-icon: #{escape-svg(url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708'/></svg>"))},
     --#{$prefix}sidebar-nav-group-indicator-hover-color: var(--#{$prefix}fg-body),
-    --#{$prefix}sidebar-nav-group-indicator-hover-icon: #{escape-svg($sidebar-nav-group-indicator-hover-icon)},
+    --#{$prefix}sidebar-nav-group-indicator-hover-icon: #{escape-svg(url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708'/></svg>"))},
     --#{$prefix}sidebar-nav-group-indicator-transition: transform .15s,
     --#{$prefix}sidebar-nav-group-toggle-show-color: var(--#{$prefix}fg-body),
   ),

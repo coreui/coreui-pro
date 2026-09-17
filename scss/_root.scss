@@ -165,7 +165,7 @@ $root-token-defaults: map.merge($root-token-defaults, theme-color-tokens());
 // scss-docs-end root-theme-tokens
 
 // scss-docs-start root-radius-loop
-$root-token-defaults: map.set($root-token-defaults, --#{$prefix}radius, $radius);
+$root-token-defaults: map.set($root-token-defaults, --#{$prefix}radius, .5rem);
 @each $key, $value in $radii {
   $root-token-defaults: map.set($root-token-defaults, --#{$prefix}radius-#{$key}, $value);
 }

@@ -3862,6 +3862,10 @@ tintable and lets dark mode deepen every shadow at once.
   colour baked into the SVG, so it could never follow a token: an input renders
   no pseudo-element to hang a mask on, and masking the input erases its own
   background. It comes back when the field has a wrapper to draw it in.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`$radius` and `$chip-gap` are gone**, to `--cui-radius` and
+  `--cui-chip-gap`. The radius scale still multiplies one value, but that value
+  is the token: set `--cui-radius` and every stop follows at runtime.
 - **What stays in `scss/_config.scss` stays for a reason.** `$spacer`,
   `$border-width`, `$theme-colors`, the `$enable-*` switches, the breakpoint,
   container and spacer maps and the contrast helpers feed maps, mixins, loops
