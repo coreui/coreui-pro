@@ -24,7 +24,7 @@ $accordion-tokens: defaults(
     --#{$prefix}accordion-font-size: var(--#{$prefix}body-font-size),
     --#{$prefix}accordion-color: var(--#{$prefix}fg-body),
     --#{$prefix}accordion-bg: var(--#{$prefix}bg-body),
-    --#{$prefix}accordion-transition-property: #{#{var(--#{$prefix}btn-input-action-transition-property), border-radius}},
+    --#{$prefix}accordion-transition-property: #{var(--#{$prefix}btn-input-action-transition-property), border-radius},
     --#{$prefix}accordion-transition-duration: var(--#{$prefix}btn-input-transition-duration),
     --#{$prefix}accordion-transition-timing: var(--#{$prefix}btn-input-transition-timing),
     --#{$prefix}accordion-border-color: var(--#{$prefix}border-color),
