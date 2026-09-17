@@ -3812,10 +3812,8 @@ tintable and lets dark mode deepen every shadow at once.
   `scss/_config.scss`, `$gradient`, `$border-style`, `$font-family-base`,
   `$headings-color` and `$link-color` go the same way, to `--cui-gradient`,
   `--cui-border-style`, `--cui-body-font-family`, `--cui-heading-color` and
-  `--cui-link-color`. Five of the seven `$font-weight-*` scalars are folded
-  into `$font-weights`, which stays the way to add or drop a weight;
-  `$font-weight-semibold` is the only one left, and only because the docs engine
-  reads it and is shared with the v5 line. `dt` and the headings read
+  `--cui-link-color`. All seven `$font-weight-*` scalars are folded
+  into `$font-weights`, which stays the way to add or drop a weight. `dt` and the headings read
   `--cui-font-weight-bold` and `--cui-font-weight-medium` instead of a number
   frozen at build time, so retuning a weight on `:root` now moves them too. `$headings-line-height` goes to `--cui-heading-line-height`, `$font-size-base` to `--cui-body-font-size`, and `$font-size-root`
   goes entirely: it gated a `font-size` on the root element at build time and
