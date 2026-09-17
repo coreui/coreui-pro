@@ -64,7 +64,6 @@ $form-control-tokens: defaults(
 
 // scss-docs-start form-control-select-variables
 $form-control-select-indicator-color:           $gray-800 !default;
-$form-control-select-bg-position:               right var(--#{$prefix}control-padding-x) center !default;
 // scss-docs-end form-control-select-variables
 
 // scss-docs-start form-control-select-dark-variables
@@ -258,7 +257,7 @@ $form-control-select-tokens: defaults(
     padding-inline-end: var(--#{$prefix}control-select-padding-end);
     background-image: var(--#{$prefix}control-select-bg-img);
     background-repeat: no-repeat;
-    @include ltr-rtl-value-only("--#{$prefix}control-select-bg-position", $form-control-select-bg-position);
+    @include ltr-rtl-value-only("--#{$prefix}control-select-bg-position", right var(--#{$prefix}control-padding-x) center);
     background-position: var(--#{$prefix}control-select-bg-position);
     background-size: var(--#{$prefix}control-select-bg-size);
 
