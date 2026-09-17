@@ -1409,6 +1409,17 @@ declaration.
   `--cui-control-select-bg-img`, `-bg-position`, `-bg-size`,
   `-indicator-padding` → `--cui-control-select-padding-end`, and the
   `-feedback-icon-*` pair.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The chevron is translucent, and its color is no longer a Sass variable.**
+  `$form-control-select-indicator-color` and its dark counterpart are gone; the
+  SVG carries `#00000080` and `#ffffff80`, and the control declares both images
+  as `--cui-control-select-bg-img` and `--cui-control-select-bg-img-dark`, dark
+  mode switching which one the `background-image` reads. A color inside a data
+  URI cannot read a token, so making it translucent is what lets the chevron sit
+  correctly on a field of any color instead of on the two we picked. Measured on
+  the default field, the stroke goes from `rgb(44, 49, 60)` to `rgb(127, 127,
+  127)` in light mode and from `rgb(223, 223, 223)` to `rgb(132, 133, 135)` in
+  dark. Override the token with your own data URI to get a solid one back.
 - **Two differences a select inherits from `.form-control`,** neither of which
   changed a rendered box in any case measured. It paints its background with
   `background-clip: padding-box`, the value `.form-control` has always used to
