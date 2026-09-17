@@ -24,7 +24,7 @@ $switch-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start switch-css-vars
+// scss-docs-start switch-tokens
 $switch-tokens: defaults(
   (
     --#{$prefix}switch-width: calc(var(--#{$prefix}switch-height) * 1.75),
@@ -52,7 +52,7 @@ $switch-tokens: defaults(
   ),
   $switch-tokens
 );
-// scss-docs-end switch-css-vars
+// scss-docs-end switch-tokens
 
 // stylelint-enable scss/dollar-variable-default
 

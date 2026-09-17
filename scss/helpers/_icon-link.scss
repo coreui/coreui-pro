@@ -7,7 +7,7 @@ $icon-link-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start icon-link-css-vars
+// scss-docs-start icon-link-tokens
 $icon-link-tokens: defaults(
   (
     --#{$prefix}icon-link-gap: .375rem,
@@ -18,7 +18,7 @@ $icon-link-tokens: defaults(
   ),
   $icon-link-tokens
 );
-// scss-docs-end icon-link-css-vars
+// scss-docs-end icon-link-tokens
 
 // stylelint-enable scss/dollar-variable-default
 

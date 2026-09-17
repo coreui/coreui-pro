@@ -21,7 +21,7 @@ $drawer-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start drawer-css-vars
+// scss-docs-start drawer-tokens
 $drawer-tokens: defaults(
   (
     --#{$prefix}drawer-inset: var(--#{$prefix}spacer),
@@ -48,7 +48,7 @@ $drawer-tokens: defaults(
   ),
   $drawer-tokens
 );
-// scss-docs-end drawer-css-vars
+// scss-docs-end drawer-tokens
 
 // stylelint-enable scss/dollar-variable-default
 @layer components {

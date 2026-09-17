@@ -15,7 +15,7 @@ $dropdown-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start dropdown-css-vars
+// scss-docs-start dropdown-tokens
 $dropdown-tokens: defaults(
   (
     --#{$prefix}dropdown-zindex: var(--#{$prefix}z-dropdown),
@@ -47,7 +47,7 @@ $dropdown-tokens: defaults(
   ),
   $dropdown-tokens
 );
-// scss-docs-end dropdown-css-vars
+// scss-docs-end dropdown-tokens
 
 // stylelint-enable scss/dollar-variable-default
 
@@ -55,7 +55,7 @@ $dropdown-dark-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start dropdown-dark-css-vars
+// scss-docs-start dropdown-dark-tokens
 $dropdown-dark-tokens: defaults(
   (
     --#{$prefix}dropdown-color: var(--#{$prefix}gray-300),
@@ -73,7 +73,7 @@ $dropdown-dark-tokens: defaults(
   ),
   $dropdown-dark-tokens
 );
-// scss-docs-end dropdown-dark-css-vars
+// scss-docs-end dropdown-dark-tokens
 
 // stylelint-enable scss/dollar-variable-default
 @layer components {

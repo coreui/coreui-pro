@@ -25,7 +25,7 @@ $sidebar-widths: (
 
 // stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
-// scss-docs-start sidebar-css-vars
+// scss-docs-start sidebar-tokens
 $sidebar-tokens: () !default;
 $sidebar-tokens: defaults(
   (
@@ -41,9 +41,9 @@ $sidebar-tokens: defaults(
   ),
   $sidebar-tokens
 );
-// scss-docs-end sidebar-css-vars
+// scss-docs-end sidebar-tokens
 
-// scss-docs-start sidebar-overlaid-css-vars
+// scss-docs-start sidebar-overlaid-tokens
 $sidebar-overlaid-tokens: () !default;
 $sidebar-overlaid-tokens: defaults(
   (
@@ -51,9 +51,9 @@ $sidebar-overlaid-tokens: defaults(
   ),
   $sidebar-overlaid-tokens
 );
-// scss-docs-end sidebar-overlaid-css-vars
+// scss-docs-end sidebar-overlaid-tokens
 
-// scss-docs-start sidebar-toggler-css-vars
+// scss-docs-start sidebar-toggler-tokens
 $sidebar-toggler-tokens: () !default;
 $sidebar-toggler-tokens: defaults(
   (
@@ -70,9 +70,9 @@ $sidebar-toggler-tokens: defaults(
   ),
   $sidebar-toggler-tokens
 );
-// scss-docs-end sidebar-toggler-css-vars
+// scss-docs-end sidebar-toggler-tokens
 
-// scss-docs-start sidebar-backdrop-css-vars
+// scss-docs-start sidebar-backdrop-tokens
 $sidebar-backdrop-tokens: () !default;
 $sidebar-backdrop-tokens: defaults(
   (
@@ -82,7 +82,7 @@ $sidebar-backdrop-tokens: defaults(
   ),
   $sidebar-backdrop-tokens
 );
-// scss-docs-end sidebar-backdrop-css-vars
+// scss-docs-end sidebar-backdrop-tokens
 
 // stylelint-enable custom-property-no-missing-var-function, scss/dollar-variable-default
 

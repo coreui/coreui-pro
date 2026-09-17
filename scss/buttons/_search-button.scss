@@ -10,7 +10,7 @@ $search-button-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start search-button-css-vars
+// scss-docs-start search-button-tokens
 $search-button-tokens: defaults(
   (
     --#{$prefix}search-button-height: var(--#{$prefix}btn-input-min-height),
@@ -42,7 +42,7 @@ $search-button-tokens: defaults(
   ),
   $search-button-tokens
 );
-// scss-docs-end search-button-css-vars
+// scss-docs-end search-button-tokens
 
 // stylelint-enable scss/dollar-variable-default
 @layer components {

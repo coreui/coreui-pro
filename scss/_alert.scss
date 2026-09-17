@@ -12,7 +12,7 @@ $alert-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start alert-css-vars
+// scss-docs-start alert-tokens
 $alert-tokens: defaults(
   (
     --#{$prefix}alert-bg: var(--#{$prefix}theme-bg-subtle, var(--#{$prefix}bg-1)),
@@ -33,7 +33,7 @@ $alert-tokens: defaults(
   ),
   $alert-tokens
 );
-// scss-docs-end alert-css-vars
+// scss-docs-end alert-tokens
 
 // stylelint-enable scss/dollar-variable-default
 

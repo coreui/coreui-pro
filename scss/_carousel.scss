@@ -12,7 +12,7 @@ $carousel-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start carousel-css-vars
+// scss-docs-start carousel-tokens
 $carousel-tokens: defaults(
   (
     --#{$prefix}carousel-items: 1,
@@ -50,7 +50,7 @@ $carousel-tokens: defaults(
   ),
   $carousel-tokens
 );
-// scss-docs-end carousel-css-vars
+// scss-docs-end carousel-tokens
 
 // stylelint-enable scss/dollar-variable-default
 

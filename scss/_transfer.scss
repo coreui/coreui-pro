@@ -7,7 +7,7 @@ $transfer-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start transfer-css-vars
+// scss-docs-start transfer-tokens
 $transfer-tokens: defaults(
   (
     --#{$prefix}transfer-gap: 1rem,
@@ -18,7 +18,7 @@ $transfer-tokens: defaults(
   ),
   $transfer-tokens
 );
-// scss-docs-end transfer-css-vars
+// scss-docs-end transfer-tokens
 
 // stylelint-enable scss/dollar-variable-default
 

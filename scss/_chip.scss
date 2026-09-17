@@ -14,7 +14,7 @@ $chip-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start chip-css-vars
+// scss-docs-start chip-tokens
 $chip-tokens: defaults(
   (
     --#{$prefix}chip-height: 1.75rem,
@@ -45,7 +45,7 @@ $chip-tokens: defaults(
   ),
   $chip-tokens
 );
-// scss-docs-end chip-css-vars
+// scss-docs-end chip-tokens
 
 // stylelint-enable scss/dollar-variable-default
 
@@ -53,7 +53,7 @@ $chip-outline-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start chip-outline-css-vars
+// scss-docs-start chip-outline-tokens
 $chip-outline-tokens: defaults(
   (
     --#{$prefix}chip-color: var(--#{$prefix}theme-fg, var(--#{$prefix}fg-body)),
@@ -67,7 +67,7 @@ $chip-outline-tokens: defaults(
   ),
   $chip-outline-tokens
 );
-// scss-docs-end chip-outline-css-vars
+// scss-docs-end chip-outline-tokens
 
 // stylelint-enable scss/dollar-variable-default
 @layer components {

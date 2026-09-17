@@ -25,7 +25,7 @@ $check-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start check-css-vars
+// scss-docs-start check-tokens
 $check-tokens: defaults(
   (
     --#{$prefix}check-size: var(--#{$prefix}control-size),
@@ -46,7 +46,7 @@ $check-tokens: defaults(
   ),
   $check-tokens
 );
-// scss-docs-end check-css-vars
+// scss-docs-end check-tokens
 
 // stylelint-enable scss/dollar-variable-default
 

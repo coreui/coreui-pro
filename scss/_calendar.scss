@@ -13,7 +13,7 @@ $calendar-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start calendar-css-vars
+// scss-docs-start calendar-tokens
 $calendar-tokens: defaults(
   (
     --#{$prefix}calendar-table-margin: .5rem,
@@ -54,7 +54,7 @@ $calendar-tokens: defaults(
   ),
   $calendar-tokens
 );
-// scss-docs-end calendar-css-vars
+// scss-docs-end calendar-tokens
 
 // stylelint-enable scss/dollar-variable-default
 @layer components {

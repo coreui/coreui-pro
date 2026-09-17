@@ -26,7 +26,7 @@ $navbar-tokens: () !default;
 
 // stylelint-disable scss/at-function-named-arguments, scss/dollar-variable-default
 
-// scss-docs-start navbar-css-vars
+// scss-docs-start navbar-tokens
 $navbar-tokens: defaults(
   (
     --#{$prefix}navbar-padding-x: #{if(sass($navbar-padding-x == null): 0; else: $navbar-padding-x)},
@@ -57,7 +57,7 @@ $navbar-tokens: defaults(
   ),
   $navbar-tokens
 );
-// scss-docs-end navbar-css-vars
+// scss-docs-end navbar-tokens
 
 // stylelint-enable scss/dollar-variable-default, scss/at-function-named-arguments
 
@@ -65,7 +65,7 @@ $navbar-nav-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start navbar-nav-css-vars
+// scss-docs-start navbar-nav-tokens
 $navbar-nav-tokens: defaults(
   map.merge(
     $nav-tokens,
@@ -83,7 +83,7 @@ $navbar-nav-tokens: defaults(
   ),
   $navbar-nav-tokens
 );
-// scss-docs-end navbar-nav-css-vars
+// scss-docs-end navbar-nav-tokens
 
 // stylelint-enable scss/dollar-variable-default
 
@@ -91,7 +91,7 @@ $navbar-dark-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start navbar-dark-css-vars
+// scss-docs-start navbar-dark-tokens
 $navbar-dark-tokens: defaults(
   (
     --#{$prefix}navbar-color: #{rgba($white, .55)},
@@ -104,7 +104,7 @@ $navbar-dark-tokens: defaults(
   ),
   $navbar-dark-tokens
 );
-// scss-docs-end navbar-dark-css-vars
+// scss-docs-end navbar-dark-tokens
 
 // stylelint-enable scss/dollar-variable-default
 // The expanded rules are read from inside the navbar's own query container, so

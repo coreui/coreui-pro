@@ -258,18 +258,18 @@ The same sizes are on `:root` as `--cui-font-size-*` tokens, one per stop of the
 
 Headings, paragraphs, lists and the rest of the type Reboot styles read their spacing and weight from `:root`, so a subtree can be retyped without touching a single class:
 
-<ScssDocs file="scss/content/_reboot.scss" capture="reboot-css-vars" />
+<ScssDocs file="scss/content/_reboot.scss" capture="reboot-tokens" />
 
 Blockquotes carry their spacing, size and source colour as CSS variables, on the quote and on its footer separately — the footer is a sibling of the quote, not a child, so it cannot read anything declared on it.
 
-<ScssDocs file="scss/content/_blockquote.scss" capture="blockquote-css-vars" />
+<ScssDocs file="scss/content/_blockquote.scss" capture="blockquote-tokens" />
 
-<ScssDocs file="scss/content/_blockquote.scss" capture="blockquote-footer-css-vars" />
+<ScssDocs file="scss/content/_blockquote.scss" capture="blockquote-footer-tokens" />
 
 An inline list carries the gap between its items, declared on the list so one
 value spaces the whole row:
 
-<ScssDocs file="scss/content/_lists.scss" capture="list-inline-css-vars" />
+<ScssDocs file="scss/content/_lists.scss" capture="list-inline-tokens" />
 
 ### Sass mixins
 

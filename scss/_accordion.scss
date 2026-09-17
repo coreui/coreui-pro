@@ -12,7 +12,7 @@ $accordion-tokens: () !default;
 // stylelint-disable scss/dollar-variable-default
 // stylelint-disable custom-property-no-missing-var-function
 
-// scss-docs-start accordion-css-vars
+// scss-docs-start accordion-tokens
 $accordion-tokens: defaults(
   (
     --#{$prefix}accordion-padding-x: 1.25rem,
@@ -48,7 +48,7 @@ $accordion-tokens: defaults(
   ),
   $accordion-tokens
 );
-// scss-docs-end accordion-css-vars
+// scss-docs-end accordion-tokens
 
 // stylelint-enable scss/dollar-variable-default
 // stylelint-enable custom-property-no-missing-var-function

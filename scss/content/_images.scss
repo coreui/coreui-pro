@@ -11,7 +11,7 @@ $figure-caption-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start thumbnail-css-vars
+// scss-docs-start thumbnail-tokens
 $thumbnail-tokens: defaults(
   (
     --#{$prefix}thumbnail-padding: .25rem,
@@ -23,9 +23,9 @@ $thumbnail-tokens: defaults(
   ),
   $thumbnail-tokens
 );
-// scss-docs-end thumbnail-css-vars
+// scss-docs-end thumbnail-tokens
 
-// scss-docs-start figure-css-vars
+// scss-docs-start figure-tokens
 $figure-tokens: defaults(
   (
     --#{$prefix}figure-gap: var(--#{$prefix}spacer-2),
@@ -40,7 +40,7 @@ $figure-caption-tokens: defaults(
   ),
   $figure-caption-tokens
 );
-// scss-docs-end figure-css-vars
+// scss-docs-end figure-tokens
 
 // stylelint-enable scss/dollar-variable-default
 

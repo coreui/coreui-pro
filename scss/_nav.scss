@@ -20,7 +20,7 @@ $nav-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start nav-css-vars
+// scss-docs-start nav-tokens
 $nav-tokens: defaults(
   (
     --#{$prefix}nav-gap: 0,
@@ -44,7 +44,7 @@ $nav-tokens: defaults(
   ),
   $nav-tokens
 );
-// scss-docs-end nav-css-vars
+// scss-docs-end nav-tokens
 
 // stylelint-enable scss/dollar-variable-default
 
@@ -52,7 +52,7 @@ $nav-tabs-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start nav-tabs-css-vars
+// scss-docs-start nav-tabs-tokens
 $nav-tabs-tokens: defaults(
   (
     --#{$prefix}nav-tabs-border-width: var(--#{$prefix}border-width),
@@ -65,7 +65,7 @@ $nav-tabs-tokens: defaults(
   ),
   $nav-tabs-tokens
 );
-// scss-docs-end nav-tabs-css-vars
+// scss-docs-end nav-tabs-tokens
 
 // stylelint-enable scss/dollar-variable-default
 
@@ -73,7 +73,7 @@ $nav-pills-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start nav-pills-css-vars
+// scss-docs-start nav-pills-tokens
 $nav-pills-tokens: defaults(
   (
     --#{$prefix}nav-pills-border-radius: var(--#{$prefix}radius-9),
@@ -82,7 +82,7 @@ $nav-pills-tokens: defaults(
   ),
   $nav-pills-tokens
 );
-// scss-docs-end nav-pills-css-vars
+// scss-docs-end nav-pills-tokens
 
 // stylelint-enable scss/dollar-variable-default
 
@@ -90,7 +90,7 @@ $nav-underline-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start nav-underline-css-vars
+// scss-docs-start nav-underline-tokens
 $nav-underline-tokens: defaults(
   (
     --#{$prefix}nav-underline-gap: 1rem,
@@ -99,7 +99,7 @@ $nav-underline-tokens: defaults(
   ),
   $nav-underline-tokens
 );
-// scss-docs-end nav-underline-css-vars
+// scss-docs-end nav-underline-tokens
 
 // stylelint-enable scss/dollar-variable-default
 
@@ -107,7 +107,7 @@ $nav-underline-border-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start nav-underline-border-css-vars
+// scss-docs-start nav-underline-border-tokens
 $nav-underline-border-tokens: defaults(
   (
     --#{$prefix}nav-underline-border-gap: .5rem,
@@ -121,7 +121,7 @@ $nav-underline-border-tokens: defaults(
   ),
   $nav-underline-border-tokens
 );
-// scss-docs-end nav-underline-border-css-vars
+// scss-docs-end nav-underline-border-tokens
 
 // stylelint-enable scss/dollar-variable-default
 
@@ -129,7 +129,7 @@ $tab-pane-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start tab-pane-css-vars
+// scss-docs-start tab-pane-tokens
 $tab-pane-tokens: defaults(
   (
     --#{$prefix}tab-pane-transition-property: opacity,
@@ -138,7 +138,7 @@ $tab-pane-tokens: defaults(
   ),
   $tab-pane-tokens
 );
-// scss-docs-end tab-pane-css-vars
+// scss-docs-end tab-pane-tokens
 
 // stylelint-enable scss/dollar-variable-default
 @layer components {

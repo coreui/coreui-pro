@@ -9,7 +9,7 @@ $reboot-mark-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start reboot-css-vars
+// scss-docs-start reboot-tokens
 $reboot-tokens: defaults(
   (
     --#{$prefix}paragraph-margin-bottom: var(--#{$prefix}spacer),
@@ -34,9 +34,9 @@ $reboot-tokens: defaults(
   ),
   $reboot-tokens
 );
-// scss-docs-end reboot-css-vars
+// scss-docs-end reboot-tokens
 
-// scss-docs-start kbd-css-vars
+// scss-docs-start kbd-tokens
 $reboot-kbd-tokens: defaults(
   (
     --#{$prefix}kbd-padding-y: .1875rem,
@@ -48,9 +48,9 @@ $reboot-kbd-tokens: defaults(
   ),
   $reboot-kbd-tokens
 );
-// scss-docs-end kbd-css-vars
+// scss-docs-end kbd-tokens
 
-// scss-docs-start mark-css-vars
+// scss-docs-start mark-tokens
 $reboot-mark-tokens: defaults(
   (
     --#{$prefix}mark-padding: .1875em,
@@ -59,7 +59,7 @@ $reboot-mark-tokens: defaults(
   ),
   $reboot-mark-tokens
 );
-// scss-docs-end mark-css-vars
+// scss-docs-end mark-tokens
 
 // stylelint-enable scss/dollar-variable-default
 

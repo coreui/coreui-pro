@@ -10,7 +10,7 @@ $card-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start card-css-vars
+// scss-docs-start card-tokens
 $card-tokens: defaults(
   (
     --#{$prefix}card-spacer-y: var(--#{$prefix}spacer),
@@ -35,7 +35,7 @@ $card-tokens: defaults(
   ),
   $card-tokens
 );
-// scss-docs-end card-css-vars
+// scss-docs-end card-tokens
 
 // stylelint-enable scss/dollar-variable-default
 @layer components {

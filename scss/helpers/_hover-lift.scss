@@ -8,7 +8,7 @@ $hover-lift-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start hover-lift-css-vars
+// scss-docs-start hover-lift-tokens
 $hover-lift-tokens: defaults(
   (
     --#{$prefix}hover-lift-transition-duration: .2s,
@@ -18,7 +18,7 @@ $hover-lift-tokens: defaults(
   ),
   $hover-lift-tokens
 );
-// scss-docs-end hover-lift-css-vars
+// scss-docs-end hover-lift-tokens
 
 // stylelint-enable scss/dollar-variable-default
 

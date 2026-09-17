@@ -15,7 +15,7 @@ $spinner-border-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start spinner-border-css-vars
+// scss-docs-start spinner-border-tokens
 $spinner-border-tokens: defaults(
   (
     --#{$prefix}spinner-width: 1em,
@@ -27,7 +27,7 @@ $spinner-border-tokens: defaults(
   ),
   $spinner-border-tokens
 );
-// scss-docs-end spinner-border-css-vars
+// scss-docs-end spinner-border-tokens
 
 // stylelint-enable scss/dollar-variable-default
 
@@ -35,7 +35,7 @@ $spinner-grow-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start spinner-grow-css-vars
+// scss-docs-start spinner-grow-tokens
 $spinner-grow-tokens: defaults(
   (
     --#{$prefix}spinner-width: 1em,
@@ -46,7 +46,7 @@ $spinner-grow-tokens: defaults(
   ),
   $spinner-grow-tokens
 );
-// scss-docs-end spinner-grow-css-vars
+// scss-docs-end spinner-grow-tokens
 
 // stylelint-enable scss/dollar-variable-default
 @layer components {

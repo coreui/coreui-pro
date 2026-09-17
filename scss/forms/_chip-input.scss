@@ -28,7 +28,7 @@ $chip-input-sizes: defaults(
 
 // stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
-// scss-docs-start chip-input-css-vars
+// scss-docs-start chip-input-tokens
 $chip-input-tokens: () !default;
 $chip-input-tokens: defaults(
   (
@@ -40,7 +40,7 @@ $chip-input-tokens: defaults(
   ),
   $chip-input-tokens
 );
-// scss-docs-end chip-input-css-vars
+// scss-docs-end chip-input-tokens
 
 // stylelint-enable scss/dollar-variable-default, custom-property-no-missing-var-function
 

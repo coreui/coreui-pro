@@ -10,7 +10,7 @@ $popover-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start popover-css-vars
+// scss-docs-start popover-tokens
 $popover-tokens: defaults(
   (
     --#{$prefix}popover-zindex: var(--#{$prefix}z-popover),
@@ -39,7 +39,7 @@ $popover-tokens: defaults(
   ),
   $popover-tokens
 );
-// scss-docs-end popover-css-vars
+// scss-docs-end popover-tokens
 
 // stylelint-enable scss/dollar-variable-default
 @layer components {

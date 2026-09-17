@@ -13,7 +13,7 @@ $stepper-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start stepper-css-vars
+// scss-docs-start stepper-tokens
 $stepper-tokens: defaults(
   (
     --#{$prefix}stepper-steps-gap: .5rem,
@@ -51,7 +51,7 @@ $stepper-tokens: defaults(
   ),
   $stepper-tokens
 );
-// scss-docs-end stepper-css-vars
+// scss-docs-end stepper-tokens
 
 // stylelint-enable scss/dollar-variable-default
 @layer components {

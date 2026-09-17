@@ -12,7 +12,7 @@
 
 // stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
-// scss-docs-start sidebar-nav-css-vars
+// scss-docs-start sidebar-nav-tokens
 $sidebar-nav-tokens: () !default;
 $sidebar-nav-tokens: defaults(
   (
@@ -78,9 +78,9 @@ $sidebar-nav-tokens: defaults(
   ),
   $sidebar-nav-tokens
 );
-// scss-docs-end sidebar-nav-css-vars
+// scss-docs-end sidebar-nav-tokens
 
-// scss-docs-start sidebar-nav-tree-css-vars
+// scss-docs-start sidebar-nav-tree-tokens
 $sidebar-nav-tree-tokens: () !default;
 $sidebar-nav-tree-tokens: defaults(
   (
@@ -91,7 +91,7 @@ $sidebar-nav-tree-tokens: defaults(
   ),
   $sidebar-nav-tree-tokens
 );
-// scss-docs-end sidebar-nav-tree-css-vars
+// scss-docs-end sidebar-nav-tree-tokens
 
 // stylelint-enable custom-property-no-missing-var-function, scss/dollar-variable-default
 

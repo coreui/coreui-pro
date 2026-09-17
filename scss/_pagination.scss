@@ -14,7 +14,7 @@ $pagination-tokens: () !default;
 
 // stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
-// scss-docs-start pagination-css-vars
+// scss-docs-start pagination-tokens
 $pagination-tokens: defaults(
   (
     --#{$prefix}pagination-min-height: var(--#{$prefix}btn-input-min-height),
@@ -40,7 +40,7 @@ $pagination-tokens: defaults(
   ),
   $pagination-tokens
 );
-// scss-docs-end pagination-css-vars
+// scss-docs-end pagination-tokens
 
 $pagination-sizes: () !default;
 

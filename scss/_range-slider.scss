@@ -15,7 +15,7 @@ $range-slider-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start range-slider-css-vars
+// scss-docs-start range-slider-tokens
 $range-slider-tokens: defaults(
   (
     --#{$prefix}range-slider-tick-label-padding-y: 0,
@@ -27,7 +27,7 @@ $range-slider-tokens: defaults(
   ),
   $range-slider-tokens
 );
-// scss-docs-end range-slider-css-vars
+// scss-docs-end range-slider-tokens
 
 // stylelint-enable scss/dollar-variable-default
 
@@ -35,7 +35,7 @@ $range-slider-vertical-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start range-slider-vertical-css-vars
+// scss-docs-start range-slider-vertical-tokens
 $range-slider-vertical-tokens: defaults(
   (
     --#{$prefix}range-slider-vertical-track-width: .5rem,
@@ -43,7 +43,7 @@ $range-slider-vertical-tokens: defaults(
   ),
   $range-slider-vertical-tokens
 );
-// scss-docs-end range-slider-vertical-css-vars
+// scss-docs-end range-slider-vertical-tokens
 
 // stylelint-enable scss/dollar-variable-default
 @layer components {

@@ -16,7 +16,7 @@ $progress-tokens: () !default;
 
 // stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
-// scss-docs-start progress-css-vars
+// scss-docs-start progress-tokens
 $progress-tokens: defaults(
   (
     --#{$prefix}progress-height: 1rem,
@@ -34,11 +34,11 @@ $progress-tokens: defaults(
   ),
   $progress-tokens
 );
-// scss-docs-end progress-css-vars
+// scss-docs-end progress-tokens
 
 $progress-segmented-tokens: () !default;
 
-// scss-docs-start progress-segmented-css-vars
+// scss-docs-start progress-segmented-tokens
 $progress-segmented-tokens: defaults(
   (
     --#{$prefix}progress-segment-gap: .25rem,
@@ -52,7 +52,7 @@ $progress-segmented-tokens: defaults(
 @if $progress-segments != null {
   $progress-segmented-tokens: map.set($progress-segmented-tokens, --#{$prefix}progress-segments, $progress-segments);
 }
-// scss-docs-end progress-segmented-css-vars
+// scss-docs-end progress-segmented-tokens
 
 // stylelint-enable custom-property-no-missing-var-function, scss/dollar-variable-default
 @layer components {

@@ -13,7 +13,7 @@ $tooltip-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start tooltip-css-vars
+// scss-docs-start tooltip-tokens
 $tooltip-tokens: defaults(
   (
     --#{$prefix}tooltip-zindex: var(--#{$prefix}z-tooltip),
@@ -33,7 +33,7 @@ $tooltip-tokens: defaults(
   ),
   $tooltip-tokens
 );
-// scss-docs-end tooltip-css-vars
+// scss-docs-end tooltip-tokens
 
 // stylelint-enable scss/dollar-variable-default
 @layer components {

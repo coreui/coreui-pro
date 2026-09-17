@@ -9,7 +9,7 @@ $time-picker-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start time-picker-css-vars
+// scss-docs-start time-picker-tokens
 $time-picker-tokens: defaults(
   (
     --#{$prefix}time-picker-body-padding: var(--#{$prefix}spacer-2),
@@ -34,7 +34,7 @@ $time-picker-tokens: defaults(
   ),
   $time-picker-tokens
 );
-// scss-docs-end time-picker-css-vars
+// scss-docs-end time-picker-tokens
 
 // stylelint-enable scss/dollar-variable-default
 @layer components {

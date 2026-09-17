@@ -11,7 +11,7 @@ $sidebar-narrow-width:                     4rem !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start sidebar-narrow-css-vars
+// scss-docs-start sidebar-narrow-tokens
 $sidebar-narrow-tokens: () !default;
 $sidebar-narrow-tokens: defaults(
   (
@@ -20,9 +20,9 @@ $sidebar-narrow-tokens: defaults(
   ),
   $sidebar-narrow-tokens
 );
-// scss-docs-end sidebar-narrow-css-vars
+// scss-docs-end sidebar-narrow-tokens
 
-// scss-docs-start sidebar-narrow-unfoldable-css-vars
+// scss-docs-start sidebar-narrow-unfoldable-tokens
 $sidebar-narrow-unfoldable-tokens: () !default;
 $sidebar-narrow-unfoldable-tokens: defaults(
   (
@@ -30,7 +30,7 @@ $sidebar-narrow-unfoldable-tokens: defaults(
   ),
   $sidebar-narrow-unfoldable-tokens
 );
-// scss-docs-end sidebar-narrow-unfoldable-css-vars
+// scss-docs-end sidebar-narrow-unfoldable-tokens
 
 // stylelint-enable scss/dollar-variable-default
 

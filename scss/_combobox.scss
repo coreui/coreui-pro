@@ -13,16 +13,16 @@ $combobox-toggle-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start combobox-css-vars
+// scss-docs-start combobox-tokens
 $combobox-tokens: defaults(
   (
     --#{$prefix}combobox-popup-min-width: 100%,
   ),
   $combobox-tokens
 );
-// scss-docs-end combobox-css-vars
+// scss-docs-end combobox-tokens
 
-// scss-docs-start combobox-toggle-css-vars
+// scss-docs-start combobox-toggle-tokens
 $combobox-toggle-tokens: defaults(
   (
     --#{$prefix}combobox-toggle-gap: .5rem,
@@ -35,7 +35,7 @@ $combobox-toggle-tokens: defaults(
   ),
   $combobox-toggle-tokens
 );
-// scss-docs-end combobox-toggle-css-vars
+// scss-docs-end combobox-toggle-tokens
 
 // stylelint-enable scss/dollar-variable-default
 

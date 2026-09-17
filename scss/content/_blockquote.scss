@@ -7,7 +7,7 @@ $blockquote-footer-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start blockquote-css-vars
+// scss-docs-start blockquote-tokens
 $blockquote-tokens: defaults(
   (
     --#{$prefix}blockquote-margin-y: var(--#{$prefix}spacer),
@@ -16,9 +16,9 @@ $blockquote-tokens: defaults(
   ),
   $blockquote-tokens
 );
-// scss-docs-end blockquote-css-vars
+// scss-docs-end blockquote-tokens
 
-// scss-docs-start blockquote-footer-css-vars
+// scss-docs-start blockquote-footer-tokens
 $blockquote-footer-tokens: defaults(
   (
     --#{$prefix}blockquote-footer-margin-y: var(--#{$prefix}spacer),
@@ -27,7 +27,7 @@ $blockquote-footer-tokens: defaults(
   ),
   $blockquote-footer-tokens
 );
-// scss-docs-end blockquote-footer-css-vars
+// scss-docs-end blockquote-footer-tokens
 
 // stylelint-enable scss/dollar-variable-default
 

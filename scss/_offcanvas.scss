@@ -15,7 +15,7 @@ $offcanvas-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start offcanvas-css-vars
+// scss-docs-start offcanvas-tokens
 $offcanvas-tokens: defaults(
   (
     --#{$prefix}offcanvas-zindex: var(--#{$prefix}z-offcanvas),
@@ -36,7 +36,7 @@ $offcanvas-tokens: defaults(
   ),
   $offcanvas-tokens
 );
-// scss-docs-end offcanvas-css-vars
+// scss-docs-end offcanvas-tokens
 
 // stylelint-enable scss/dollar-variable-default
 @layer components {

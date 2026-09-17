@@ -26,7 +26,7 @@ $rating-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start rating-css-vars
+// scss-docs-start rating-tokens
 $rating-tokens: defaults(
   (
     --#{$prefix}rating-gap: .0625rem,
@@ -39,7 +39,7 @@ $rating-tokens: defaults(
   ),
   $rating-tokens
 );
-// scss-docs-end rating-css-vars
+// scss-docs-end rating-tokens
 
 // stylelint-enable scss/dollar-variable-default
 @layer components {

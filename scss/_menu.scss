@@ -15,7 +15,7 @@ $menu-tokens: () !default;
 
 // stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
-// scss-docs-start menu-css-vars
+// scss-docs-start menu-tokens
 $menu-tokens: defaults(
   (
     --#{$prefix}menu-zindex: var(--#{$prefix}z-menu),
@@ -58,7 +58,7 @@ $menu-tokens: defaults(
   ),
   $menu-tokens
 );
-// scss-docs-end menu-css-vars
+// scss-docs-end menu-tokens
 
 // stylelint-enable scss/dollar-variable-default, custom-property-no-missing-var-function
 

@@ -16,7 +16,7 @@ $table-tokens: () !default;
 
 // stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
-// scss-docs-start table-css-vars
+// scss-docs-start table-tokens
 $table-tokens: defaults(
   (
     --#{$prefix}table-cell-padding-y: .5rem,
@@ -40,7 +40,7 @@ $table-tokens: defaults(
   ),
   $table-tokens
 );
-// scss-docs-end table-css-vars
+// scss-docs-end table-tokens
 
 // stylelint-enable custom-property-no-missing-var-function, scss/dollar-variable-default
 

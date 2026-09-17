@@ -24,7 +24,7 @@ $radio-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start radio-css-vars
+// scss-docs-start radio-tokens
 $radio-tokens: defaults(
   (
     --#{$prefix}radio-size: var(--#{$prefix}control-size),
@@ -42,7 +42,7 @@ $radio-tokens: defaults(
   ),
   $radio-tokens
 );
-// scss-docs-end radio-css-vars
+// scss-docs-end radio-tokens
 
 // stylelint-enable scss/dollar-variable-default
 

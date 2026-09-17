@@ -9,7 +9,7 @@ $list-box-tokens: () !default;
 
 // stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
-// scss-docs-start list-box-css-vars
+// scss-docs-start list-box-tokens
 $list-box-tokens: defaults(
   (
     --#{$prefix}list-box-padding-y: .375rem,
@@ -51,7 +51,7 @@ $list-box-tokens: defaults(
   ),
   $list-box-tokens
 );
-// scss-docs-end list-box-css-vars
+// scss-docs-end list-box-tokens
 
 // stylelint-enable scss/dollar-variable-default, custom-property-no-missing-var-function
 

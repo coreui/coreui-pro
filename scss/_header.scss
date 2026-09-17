@@ -23,7 +23,7 @@ $header-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start header-css-vars
+// scss-docs-start header-tokens
 $header-tokens: defaults(
   (
     --#{$prefix}header-padding-x: var(--#{$prefix}spacer-2),
@@ -53,7 +53,7 @@ $header-tokens: defaults(
   ),
   $header-tokens
 );
-// scss-docs-end header-css-vars
+// scss-docs-end header-tokens
 
 // stylelint-enable scss/dollar-variable-default
 @layer components {

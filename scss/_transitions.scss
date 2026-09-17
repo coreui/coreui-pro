@@ -8,7 +8,7 @@ $collapse-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start fade-css-vars
+// scss-docs-start fade-tokens
 $fade-tokens: defaults(
   (
     --#{$prefix}transition-fade-duration: .15s,
@@ -16,13 +16,13 @@ $fade-tokens: defaults(
   ),
   $fade-tokens
 );
-// scss-docs-end fade-css-vars
+// scss-docs-end fade-tokens
 
 // stylelint-enable scss/dollar-variable-default
 
 // stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
-// scss-docs-start collapse-css-vars
+// scss-docs-start collapse-tokens
 $collapse-tokens: defaults(
   (
     --#{$prefix}transition-collapse-property: #{"block-size, display"},
@@ -31,7 +31,7 @@ $collapse-tokens: defaults(
   ),
   $collapse-tokens
 );
-// scss-docs-end collapse-css-vars
+// scss-docs-end collapse-tokens
 
 // stylelint-enable custom-property-no-missing-var-function, scss/dollar-variable-default
 

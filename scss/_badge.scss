@@ -30,7 +30,7 @@ $badge-tokens: () !default;
 
 // stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
-// scss-docs-start badge-css-vars
+// scss-docs-start badge-tokens
 $badge-tokens: defaults(
   (
     --#{$prefix}badge-gap: .375em,
@@ -47,7 +47,7 @@ $badge-tokens: defaults(
   ),
   $badge-tokens
 );
-// scss-docs-end badge-css-vars
+// scss-docs-end badge-tokens
 
 $badge-variants: () !default;
 

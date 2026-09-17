@@ -17,7 +17,7 @@ $toast-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start toast-css-vars
+// scss-docs-start toast-tokens
 $toast-tokens: defaults(
   (
     --#{$prefix}toast-zindex: var(--#{$prefix}z-toast),
@@ -42,7 +42,7 @@ $toast-tokens: defaults(
   ),
   $toast-tokens
 );
-// scss-docs-end toast-css-vars
+// scss-docs-end toast-tokens
 
 // stylelint-enable scss/dollar-variable-default
 @layer components {

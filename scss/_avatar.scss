@@ -35,7 +35,7 @@ $avatar-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start avatar-css-vars
+// scss-docs-start avatar-tokens
 $avatar-tokens: defaults(
   (
     --#{$prefix}avatar-size: 2rem,
@@ -51,11 +51,11 @@ $avatar-tokens: defaults(
   ),
   $avatar-tokens
 );
-// scss-docs-end avatar-css-vars
+// scss-docs-end avatar-tokens
 
 $avatar-stack-tokens: () !default;
 
-// scss-docs-start avatar-stack-css-vars
+// scss-docs-start avatar-stack-tokens
 $avatar-stack-tokens: defaults(
   (
     --#{$prefix}avatar-stack-spacing: -.4,
@@ -64,7 +64,7 @@ $avatar-stack-tokens: defaults(
   ),
   $avatar-stack-tokens
 );
-// scss-docs-end avatar-stack-css-vars
+// scss-docs-end avatar-stack-tokens
 
 // stylelint-enable scss/dollar-variable-default
 

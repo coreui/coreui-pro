@@ -7,7 +7,7 @@ $form-multi-select-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start form-multi-select-css-vars
+// scss-docs-start form-multi-select-tokens
 $form-multi-select-tokens: defaults(
   (
     --#{$prefix}form-multi-select-selection-tags-gap: .25rem,
@@ -15,7 +15,7 @@ $form-multi-select-tokens: defaults(
   ),
   $form-multi-select-tokens
 );
-// scss-docs-end form-multi-select-css-vars
+// scss-docs-end form-multi-select-tokens
 
 // stylelint-enable scss/dollar-variable-default
 

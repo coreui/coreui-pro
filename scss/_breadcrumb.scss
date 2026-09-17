@@ -11,7 +11,7 @@ $breadcrumb-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start breadcrumb-css-vars
+// scss-docs-start breadcrumb-tokens
 $breadcrumb-tokens: defaults(
   (
     --#{$prefix}breadcrumb-padding-x: 0,
@@ -33,7 +33,7 @@ $breadcrumb-tokens: defaults(
   ),
   $breadcrumb-tokens
 );
-// scss-docs-end breadcrumb-css-vars
+// scss-docs-end breadcrumb-tokens
 
 // stylelint-enable scss/dollar-variable-default
 @layer components {
