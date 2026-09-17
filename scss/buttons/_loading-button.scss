@@ -11,7 +11,7 @@
   }
 
   .btn-loading-spinner {
-    margin-inline: calc(-1 * (var(--#{$prefix}spinner-width) + #{$spacer})) $spacer;
+    margin-inline: calc(-1 * (var(--#{$prefix}spinner-width) + var(--#{$prefix}spacer))) var(--#{$prefix}spacer);
     opacity: 0;
     @include transition(margin .15s, opacity .15s, border .15s);
   }
