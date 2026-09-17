@@ -63,12 +63,6 @@ $reboot-mark-tokens: defaults(
 
 // stylelint-enable scss/dollar-variable-default
 
-// scss-docs-start reboot-table-variables
-// Reboot styles the raw HTML elements, so it owns these rather than borrowing
-// from the .table component's variables — that coupling is what kept the table
-// block pinned in _variables.scss.
-// scss-docs-end reboot-table-variables
-
 @layer reboot {
   // stylelint-disable declaration-no-important, selector-no-qualifying-type, property-no-vendor-prefix
 
@@ -106,6 +100,16 @@ $reboot-mark-tokens: defaults(
     }
   }
 
+  // Reset iframe color-scheme
+  //
+  // If the color scheme of an iframe differs from the parent document, the
+  // iframe gets an opaque canvas background of its own (a white background on
+  // a page in dark mode). Remove its border while we are here.
+
+  iframe {
+    color-scheme: light dark;
+    border: 0;
+  }
   // Body
   //
   // 1. Remove the margin in all browsers.
@@ -649,17 +653,6 @@ $reboot-mark-tokens: defaults(
 
   output {
     display: inline-block;
-  }
-
-  // Reset iframe color-scheme
-  //
-  // If the color scheme of an iframe differs from the parent document, the
-  // iframe gets an opaque canvas background of its own (a white background on
-  // a page in dark mode). Remove its border while we are here.
-
-  iframe {
-    color-scheme: light dark;
-    border: 0;
   }
 
   // Summary
