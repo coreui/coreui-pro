@@ -7,11 +7,6 @@
 @use "mixins/tokens" as *;
 @use "config" as *;
 
-// scss-docs-start breadcrumb-variables
-$breadcrumb-divider:                string.quote("/") !default;
-$breadcrumb-divider-flipped:        var(--#{$prefix}breadcrumb-divider) !default;
-// scss-docs-end breadcrumb-variables
-
 $breadcrumb-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
@@ -23,9 +18,9 @@ $breadcrumb-tokens: defaults(
     --#{$prefix}breadcrumb-padding-y: 0,
     --#{$prefix}breadcrumb-bg: transparent,
     --#{$prefix}breadcrumb-border-radius: var(--#{$prefix}radius-5),
-    --#{$prefix}breadcrumb-divider: #{meta.inspect(escape-svg($breadcrumb-divider))},
+    --#{$prefix}breadcrumb-divider: #{meta.inspect(escape-svg(string.quote("/")))},
     --#{$prefix}breadcrumb-divider-color: var(--#{$prefix}fg-4),
-    --#{$prefix}breadcrumb-divider-flipped: #{meta.inspect(escape-svg($breadcrumb-divider-flipped))},
+    --#{$prefix}breadcrumb-divider-flipped: #{meta.inspect(escape-svg(var(--#{$prefix}breadcrumb-divider)))},
     --#{$prefix}breadcrumb-item-padding-x: .5rem,
     --#{$prefix}breadcrumb-item-active-color: var(--#{$prefix}fg-1),
     --#{$prefix}breadcrumb-link-padding-x: .5rem,

@@ -9,7 +9,6 @@
 // scss-docs-start close-variables
 // The icon plus this padding on both sides is the pointer target. At the
 // default font size that is 24px, the WCAG 2.2 minimum.
-$btn-close-icon:             url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='black'><path d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414'/></svg>") !default;
 // scss-docs-end close-variables
 
 $close-tokens: () !default;
@@ -22,7 +21,7 @@ $close-tokens: defaults(
     --#{$prefix}btn-close-icon-size: 1em,
     --#{$prefix}btn-close-padding: .25em,
     --#{$prefix}btn-close-color: inherit,
-    --#{$prefix}btn-close-icon: #{ escape-svg($btn-close-icon) },
+    --#{$prefix}btn-close-icon: #{ escape-svg(url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='black'><path d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414'/></svg>")) },
     --#{$prefix}btn-close-opacity: .5,
     --#{$prefix}btn-close-hover-opacity: .75,
     --#{$prefix}btn-close-focus-opacity: 1,

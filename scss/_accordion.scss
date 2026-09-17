@@ -7,11 +7,6 @@
 @use "mixins/transition" as *;
 @use "config" as *;
 
-// scss-docs-start accordion-variables
-$accordion-header-icon:                   url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-linecap='round' stroke-linejoin='round'><path d='m2 5 6 6 6-6'/></svg>") !default;
-$accordion-header-active-icon:            var(--#{$prefix}accordion-header-icon) !default;
-// scss-docs-end accordion-variables
-
 $accordion-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
@@ -38,8 +33,8 @@ $accordion-tokens: defaults(
     --#{$prefix}accordion-gap: var(--#{$prefix}spacer-2),
     --#{$prefix}accordion-header-color: var(--#{$prefix}fg-2),
     --#{$prefix}accordion-header-bg: var(--#{$prefix}accordion-bg),
-    --#{$prefix}accordion-header-icon: #{escape-svg($accordion-header-icon)},
-    --#{$prefix}accordion-header-active-icon: #{escape-svg($accordion-header-active-icon)},
+    --#{$prefix}accordion-header-icon: #{escape-svg(url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-linecap='round' stroke-linejoin='round'><path d='m2 5 6 6 6-6'/></svg>"))},
+    --#{$prefix}accordion-header-active-icon: #{escape-svg(var(--#{$prefix}accordion-header-icon))},
     --#{$prefix}accordion-header-icon-width: 1.25rem,
     --#{$prefix}accordion-header-icon-color: currentcolor,
     --#{$prefix}accordion-header-active-icon-color: currentcolor,

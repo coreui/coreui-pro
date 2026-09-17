@@ -64,14 +64,12 @@ $form-control-tokens: defaults(
 
 // scss-docs-start form-control-select-variables
 $form-control-select-indicator-color:           $gray-800 !default;
-$form-control-select-indicator:                 url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='#{$form-control-select-indicator-color}' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/></svg>") !default;
 $form-control-select-bg-position:               right var(--#{$prefix}control-padding-x) center !default;
 $form-control-select-feedback-icon-position:    center right var(--#{$prefix}control-select-padding-end) !default;
 // scss-docs-end form-control-select-variables
 
 // scss-docs-start form-control-select-dark-variables
 $form-control-select-indicator-color-dark: rgba($white, .87) !default;
-$form-control-select-indicator-dark:       url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='#{$form-control-select-indicator-color-dark}' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/></svg>") !default;
 // scss-docs-end form-control-select-dark-variables
 
 $form-control-select-tokens: () !default;
@@ -80,7 +78,7 @@ $form-control-select-tokens: () !default;
 // scss-docs-start form-control-select-tokens
 $form-control-select-tokens: defaults(
   (
-    --#{$prefix}control-select-bg-img: #{escape-svg($form-control-select-indicator)},
+    --#{$prefix}control-select-bg-img: #{escape-svg(url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='#{$form-control-select-indicator-color}' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/></svg>"))},
     --#{$prefix}control-select-bg-size: 16px 12px,
     --#{$prefix}control-select-padding-end: calc(var(--#{$prefix}control-padding-x) * 3),
     --#{$prefix}control-select-feedback-icon-padding-end: calc(var(--#{$prefix}control-padding-x) * 2.5 + var(--#{$prefix}control-select-padding-end)),
@@ -289,7 +287,7 @@ $form-control-select-tokens: defaults(
       select.form-control,
       .form-control-caret,
       .form-select {
-        --#{$prefix}control-select-bg-img: #{escape-svg($form-control-select-indicator-dark)};
+        --#{$prefix}control-select-bg-img: #{escape-svg(url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='#{$form-control-select-indicator-color-dark}' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/></svg>"))};
       }
     }
   }

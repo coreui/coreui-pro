@@ -17,7 +17,6 @@ $header-brand-margin-end:       1rem !default;
 
 $header-toggler-font-size:      var(--#{$prefix}font-size-lg) !default;
 
-$header-toggler-icon-bg:        url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='black' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>") !default;
 // scss-docs-end header-variables
 
 $header-tokens: () !default;
@@ -46,7 +45,7 @@ $header-tokens: defaults(
     --#{$prefix}header-toggler-color: color-mix(in oklch, var(--#{$prefix}emphasis-color) 65%, transparent),
     --#{$prefix}header-toggler-border-radius: var(--#{$prefix}radius-4),
     --#{$prefix}header-toggler-hover-color: color-mix(in oklch, var(--#{$prefix}emphasis-color) 100%, transparent),
-    --#{$prefix}header-toggler-icon-bg: #{escape-svg($header-toggler-icon-bg)},
+    --#{$prefix}header-toggler-icon-bg: #{escape-svg(url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='black' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>"))},
     --#{$prefix}header-nav-link-padding-x: .5rem,
     --#{$prefix}header-nav-link-padding-y: .5rem,
     --#{$prefix}header-divider-border-color: var(--#{$prefix}border-color),

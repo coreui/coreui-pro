@@ -8,11 +8,6 @@
 @use "../mixins/transition" as *;
 @use "../config" as *;
 
-// scss-docs-start check-variables
-$check-mark-checked:         url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path fill='none' stroke='black' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/></svg>") !default;
-$check-mark-indeterminate:   url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path fill='none' stroke='black' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10h8'/></svg>") !default;
-// scss-docs-end check-variables
-
 $check-sizes: () !default;
 
 // scss-docs-start check-sizes
@@ -38,8 +33,8 @@ $check-tokens: defaults(
     --#{$prefix}check-border: var(--#{$prefix}border-width) solid var(--#{$prefix}border-color),
     --#{$prefix}check-border-radius: .25em,
     --#{$prefix}check-mark-color: var(--#{$prefix}primary-contrast),
-    --#{$prefix}check-mark-checked: #{escape-svg($check-mark-checked)},
-    --#{$prefix}check-mark-indeterminate: #{escape-svg($check-mark-indeterminate)},
+    --#{$prefix}check-mark-checked: #{escape-svg(url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path fill='none' stroke='black' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/></svg>"))},
+    --#{$prefix}check-mark-indeterminate: #{escape-svg(url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path fill='none' stroke='black' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10h8'/></svg>"))},
     --#{$prefix}check-checked-bg: var(--#{$prefix}theme-bg, var(--#{$prefix}control-checked-bg)),
     --#{$prefix}check-checked-border-color: var(--#{$prefix}theme-bg, var(--#{$prefix}control-checked-border-color)),
     --#{$prefix}check-indeterminate-bg: var(--#{$prefix}control-indeterminate-bg),

@@ -20,7 +20,6 @@ $navbar-brand-font-size:            var(--#{$prefix}font-size-lg) !default;
 // Compute the navbar-brand padding-y so the navbar-brand will have the same height as navbar-text and nav-link
 $nav-link-height:                   calc(var(--#{$prefix}body-font-size) * var(--#{$prefix}body-line-height) + #{$nav-link-padding-y} * 2) !default;
 
-$navbar-toggler-icon:               url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='black' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>") !default;
 // scss-docs-end navbar-variables
 
 $navbar-tokens: () !default;
@@ -50,7 +49,7 @@ $navbar-tokens: defaults(
     --#{$prefix}navbar-toggler-padding-x: .75rem,
     --#{$prefix}navbar-toggler-font-size: var(--#{$prefix}font-size-lg),
     --#{$prefix}navbar-toggler-icon-size: 1.5em,
-    --#{$prefix}navbar-toggler-icon-bg: #{escape-svg($navbar-toggler-icon)},
+    --#{$prefix}navbar-toggler-icon-bg: #{escape-svg(url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='black' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>"))},
     --#{$prefix}navbar-toggler-border-color: color-mix(in oklch, var(--#{$prefix}emphasis-color) 15%, transparent),
     --#{$prefix}navbar-toggler-border-radius: var(--#{$prefix}radius-5),
     --#{$prefix}navbar-toggler-focus-width: var(--#{$prefix}focus-ring-width),

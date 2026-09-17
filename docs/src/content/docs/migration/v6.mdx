@@ -3843,6 +3843,16 @@ tintable and lets dark mode deepen every shadow at once.
   the nav enclosed set, the OTP input sizes, the badge and rating sizes, the
   modal widths and margins, the toast surface, the form control group icon
   sizes and the colour picker width. Each is the token it fed.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The artwork variables are gone too.** The accordion chevron, the breadcrumb
+  divider, the four carousel controls, the close button glyph, the check and
+  radio marks, the rating star, the select indicator and the navbar, header and
+  sidebar togglers were each a Sass variable feeding one custom property. Set
+  the property: `--cui-accordion-header-icon`, `--cui-breadcrumb-divider`,
+  `--cui-carousel-control-prev-icon`, `--cui-btn-close-icon`,
+  `--cui-check-mark-checked`, `--cui-radio-mark`, `--cui-rating-item-icon`,
+  `--cui-control-select-bg-img`, `--cui-navbar-toggler-icon-bg`,
+  `--cui-header-toggler-icon-bg`, `--cui-sidebar-toggler-icon`.
 - **What stays in `scss/_config.scss` stays for a reason.** `$spacer`,
   `$border-width`, `$theme-colors`, the `$enable-*` switches, the breakpoint,
   container and spacer maps and the contrast helpers feed maps, mixins, loops

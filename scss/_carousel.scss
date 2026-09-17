@@ -8,13 +8,6 @@
 @use "mixins/transition" as *;
 @use "config" as *;
 
-// scss-docs-start carousel-variables
-$carousel-control-prev-icon-bg:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0'/></svg>") !default;
-$carousel-control-next-icon-bg:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708'/></svg>") !default;
-$carousel-control-pause-icon-bg:     url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M5.5 3.5A1.5 1.5 0 0 1 7 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5m5 0A1.5 1.5 0 0 1 12 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5'/></svg>") !default;
-$carousel-control-play-icon-bg:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z'/></svg>") !default;
-// scss-docs-end carousel-variables
-
 $carousel-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
@@ -33,10 +26,10 @@ $carousel-tokens: defaults(
     --#{$prefix}carousel-control-hover-opacity: .9,
     --#{$prefix}carousel-control-transition: opacity .15s ease,
     --#{$prefix}carousel-control-icon-width: 2rem,
-    --#{$prefix}carousel-control-prev-icon: #{escape-svg($carousel-control-prev-icon-bg)},
-    --#{$prefix}carousel-control-next-icon: #{escape-svg($carousel-control-next-icon-bg)},
-    --#{$prefix}carousel-control-pause-icon: #{escape-svg($carousel-control-pause-icon-bg)},
-    --#{$prefix}carousel-control-play-icon: #{escape-svg($carousel-control-play-icon-bg)},
+    --#{$prefix}carousel-control-prev-icon: #{escape-svg(url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0'/></svg>"))},
+    --#{$prefix}carousel-control-next-icon: #{escape-svg(url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708'/></svg>"))},
+    --#{$prefix}carousel-control-pause-icon: #{escape-svg(url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M5.5 3.5A1.5 1.5 0 0 1 7 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5m5 0A1.5 1.5 0 0 1 12 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5'/></svg>"))},
+    --#{$prefix}carousel-control-play-icon: #{escape-svg(url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z'/></svg>"))},
     --#{$prefix}carousel-play-pause-size: 2.5rem,
     --#{$prefix}carousel-play-pause-icon-width: 1rem,
     --#{$prefix}carousel-play-pause-bg: color-mix(in oklch, var(--#{$prefix}black) 25%, transparent),
