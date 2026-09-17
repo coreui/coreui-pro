@@ -10,48 +10,59 @@
 
 $root-tokens: () !default;
 
-// stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
+// stylelint-disable @stylistic/value-list-max-empty-lines, custom-property-no-missing-var-function, scss/dollar-variable-default
 
 $root-token-defaults: (
   --#{$prefix}black: $black,
   --#{$prefix}white: $white,
+
   --#{$prefix}gradient: linear-gradient(180deg, color-mix(in oklch, var(--#{$prefix}white) 15%, transparent), color-mix(in oklch, var(--#{$prefix}white) 0%, transparent)),
+
   // scss-docs-start root-body-variables
   --#{$prefix}body-font-family: meta.inspect(var(--#{$prefix}font-sans-serif)),
   --#{$prefix}body-font-size: 1rem,
-  --#{$prefix}small-font-size: .875em,
   --#{$prefix}body-font-weight: var(--#{$prefix}font-weight-normal),
   --#{$prefix}body-line-height: 1.5,
+  // scss-docs-end root-body-variables
+
+  --#{$prefix}small-font-size: .875em,
   --#{$prefix}body-color: var(--#{$prefix}fg-body),
   --#{$prefix}body-bg: var(--#{$prefix}bg-body),
   --#{$prefix}secondary-color: var(--#{$prefix}fg-2),
   --#{$prefix}tertiary-color: var(--#{$prefix}fg-3),
   --#{$prefix}tertiary-bg: var(--#{$prefix}bg-2),
   --#{$prefix}emphasis-color: light-dark($black, $white),
-  --#{$prefix}hr-border-color: var(--#{$prefix}border-color),
   --#{$prefix}icon-size-base: 1rem,
-  // scss-docs-end root-body-variables
+
   --#{$prefix}heading-color: inherit,
+
+  --#{$prefix}hr-border-color: var(--#{$prefix}border-color),
+
   --#{$prefix}link-color: light-dark(var(--#{$prefix}primary-base), var(--#{$prefix}primary-fg)),
   --#{$prefix}link-decoration: underline,
   --#{$prefix}link-underline-offset: .2em,
   --#{$prefix}link-hover-color: color-mix(in oklch, var(--#{$prefix}link-color) 90%, var(--#{$prefix}black)),
+
   // scss-docs-start root-font-stacks
   --#{$prefix}font-sans-serif: meta.inspect((system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji")),
   --#{$prefix}font-mono: meta.inspect((SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace)),
   // scss-docs-end root-font-stacks
   --#{$prefix}code-color: light-dark(oklch(59.56% .20859 355.48deg), oklch(75.736% .12515 355.48deg)),
+
   // scss-docs-start root-border-var
   --#{$prefix}border-width: 1px,
   --#{$prefix}border-style: solid,
   --#{$prefix}border-color: light-dark(var(--#{$prefix}gray-200), var(--#{$prefix}gray-700)),
   --#{$prefix}border-color-translucent: color-mix(in oklch, var(--#{$prefix}fg-body) 15%, transparent),
   // scss-docs-end root-border-var
+
   --#{$prefix}shadow-color: #000,
   --#{$prefix}shadow-strength: 1,
+
   // scss-docs-start root-transition-variables
   --#{$prefix}transition-timing-overlay: cubic-bezier(.22, 1, .36, 1),
   // scss-docs-end root-transition-variables
+
   // scss-docs-start root-focus-variables
   --#{$prefix}focus-ring-width: .25rem,
   --#{$prefix}focus-ring-opacity: .25,
@@ -59,21 +70,25 @@ $root-token-defaults: (
   --#{$prefix}focus-ring-color: var(--#{$prefix}primary-focus-ring),
   --#{$prefix}focus-ring: var(--#{$prefix}focus-ring-width) solid var(--#{$prefix}focus-ring-color),
   // scss-docs-end root-focus-variables
+
   // scss-docs-start root-theme-state-variables
   --#{$prefix}theme-hover-lightness: .85,
   --#{$prefix}theme-hover-chroma: 1.1,
   --#{$prefix}theme-active-lightness: .8,
   --#{$prefix}theme-active-chroma: 1.15,
   // scss-docs-end root-theme-state-variables
+
   // scss-docs-start root-backdrop-variables
   --#{$prefix}backdrop-color: var(--#{$prefix}black),
   --#{$prefix}backdrop-opacity: 50%,
   --#{$prefix}backdrop-blur: 8px,
   // scss-docs-end root-backdrop-variables
+
   // scss-docs-start root-translucent-variables
   --#{$prefix}translucent-opacity: 80%,
   --#{$prefix}translucent-backdrop-filter: blur(5px) saturate(180%),
   // scss-docs-end root-translucent-variables
+
   // scss-docs-start root-control-variables
   --#{$prefix}control-size: 1em,
   --#{$prefix}control-checked-bg: var(--#{$prefix}primary-base),
@@ -88,10 +103,12 @@ $root-token-defaults: (
   --#{$prefix}control-transition-duration: .15s,
   --#{$prefix}control-transition-timing: cubic-bezier(.34, 1.56, .64, 1),
   // scss-docs-end root-control-variables
+
   // scss-docs-start root-btn-input-variables
   --#{$prefix}btn-input-fg: var(--#{$prefix}fg-body),
   --#{$prefix}btn-input-bg: var(--#{$prefix}bg-body),
   --#{$prefix}btn-input-font-weight: var(--#{$prefix}body-font-weight),
+
   --#{$prefix}btn-input-gap: .375rem,
   --#{$prefix}btn-input-min-height: calc(var(--#{$prefix}btn-input-line-height) * 1em + var(--#{$prefix}btn-input-padding-y) * 2 + var(--#{$prefix}btn-input-border-width) * 2),
   --#{$prefix}btn-input-padding-y: .375rem,
@@ -110,6 +127,7 @@ $root-token-defaults: (
   --#{$prefix}btn-input-transition-duration: .15s,
   --#{$prefix}btn-input-transition-timing: ease-in-out,
   --#{$prefix}btn-input-disabled-opacity: .65,
+
   --#{$prefix}btn-input-xs-gap: .25rem,
   --#{$prefix}btn-input-xs-min-height: calc(var(--#{$prefix}btn-input-xs-line-height) * 1em + var(--#{$prefix}btn-input-xs-padding-y) * 2 + var(--#{$prefix}btn-input-border-width) * 2),
   --#{$prefix}btn-input-xs-padding-y: .125rem,
@@ -117,6 +135,7 @@ $root-token-defaults: (
   --#{$prefix}btn-input-xs-font-size: var(--#{$prefix}font-size-xs),
   --#{$prefix}btn-input-xs-line-height: 1.125,
   --#{$prefix}btn-input-xs-border-radius: var(--#{$prefix}radius-5),
+
   --#{$prefix}btn-input-sm-gap: .375rem,
   --#{$prefix}btn-input-sm-min-height: calc(var(--#{$prefix}btn-input-sm-line-height) * 1em + var(--#{$prefix}btn-input-sm-padding-y) * 2 + var(--#{$prefix}btn-input-border-width) * 2),
   --#{$prefix}btn-input-sm-padding-y: .25rem,
@@ -124,6 +143,7 @@ $root-token-defaults: (
   --#{$prefix}btn-input-sm-font-size: var(--#{$prefix}font-size-sm),
   --#{$prefix}btn-input-sm-line-height: var(--#{$prefix}line-height-sm),
   --#{$prefix}btn-input-sm-border-radius: var(--#{$prefix}radius-5),
+
   --#{$prefix}btn-input-lg-gap: .375rem,
   --#{$prefix}btn-input-lg-min-height: calc(var(--#{$prefix}btn-input-lg-line-height) * 1em + var(--#{$prefix}btn-input-lg-padding-y) * 2 + var(--#{$prefix}btn-input-border-width) * 2),
   --#{$prefix}btn-input-lg-padding-y: .5rem,
@@ -196,7 +216,7 @@ $root-token-defaults: map.set($root-token-defaults, --#{$prefix}radius-pill, 50r
 $root-tokens: defaults($root-token-defaults, $root-tokens);
 // scss-docs-end root-tokens
 
-// stylelint-enable custom-property-no-missing-var-function, scss/dollar-variable-default
+// stylelint-enable @stylistic/value-list-max-empty-lines, custom-property-no-missing-var-function, scss/dollar-variable-default
 
 @layer colors {
   :root,
