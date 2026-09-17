@@ -97,13 +97,6 @@ $color-shades: defaults(
   @return $gray;
 }
 
-// fusv-disable
-// No reader in the library: the published docs engine names these two stops, and
-// they go at the next engine pin.
-$gray-500: gray("500") !default;
-$gray-600: gray("600") !default;
-// fusv-enable
-
 // scss-docs-start gray-colors-map
 $grays: () !default;
 
