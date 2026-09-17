@@ -13,8 +13,8 @@ $root-tokens: () !default;
 // stylelint-disable @stylistic/value-list-max-empty-lines, custom-property-no-missing-var-function, scss/dollar-variable-default
 
 $root-token-defaults: (
-  --#{$prefix}black: $black,
-  --#{$prefix}white: $white,
+  --#{$prefix}black: #{$black},
+  --#{$prefix}white: #{$white},
 
   --#{$prefix}gradient: linear-gradient(180deg, color-mix(in oklch, var(--#{$prefix}white) 15%, transparent), color-mix(in oklch, var(--#{$prefix}white) 0%, transparent)),
 
@@ -31,7 +31,7 @@ $root-token-defaults: (
   --#{$prefix}secondary-color: var(--#{$prefix}fg-2),
   --#{$prefix}tertiary-color: var(--#{$prefix}fg-3),
   --#{$prefix}tertiary-bg: var(--#{$prefix}bg-2),
-  --#{$prefix}emphasis-color: light-dark($black, $white),
+  --#{$prefix}emphasis-color: #{light-dark($black, $white)},
   --#{$prefix}icon-size-base: 1rem,
 
   --#{$prefix}heading-color: inherit,
