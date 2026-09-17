@@ -98,23 +98,11 @@ $color-shades: defaults(
 }
 
 // fusv-disable
-// The ramp as Sass values, for what cannot read a token: channel algebra, colors
-// baked into an SVG, and the docs engine.
-// scss-docs-start gray-color-variables
-$gray-025: gray("025") !default;
-$gray-050: gray("050") !default;
-$gray-100: gray("100") !default;
-$gray-200: gray("200") !default;
-$gray-300: gray("300") !default;
-$gray-400: gray("400") !default;
-$gray-500: $gray !default;
+// No reader in the library: the published docs engine names these two stops, and
+// they go at the next engine pin.
+$gray-500: gray("500") !default;
 $gray-600: gray("600") !default;
-$gray-700: gray("700") !default;
-$gray-800: gray("800") !default;
-$gray-900: gray("900") !default;
-$gray-950: gray("950") !default;
-$gray-975: gray("975") !default;
-// scss-docs-end gray-color-variables
+// fusv-enable
 
 // scss-docs-start gray-colors-map
 $grays: () !default;
@@ -122,24 +110,23 @@ $grays: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
 $grays: defaults(
   (
-    "025": $gray-025,
-    "050": $gray-050,
-    "100": $gray-100,
-    "200": $gray-200,
-    "300": $gray-300,
-    "400": $gray-400,
-    "500": $gray-500,
-    "600": $gray-600,
-    "700": $gray-700,
-    "800": $gray-800,
-    "900": $gray-900,
-    "950": $gray-950,
-    "975": $gray-975
+    "025": gray("025"),
+    "050": gray("050"),
+    "100": gray("100"),
+    "200": gray("200"),
+    "300": gray("300"),
+    "400": gray("400"),
+    "500": gray("500"),
+    "600": gray("600"),
+    "700": gray("700"),
+    "800": gray("800"),
+    "900": gray("900"),
+    "950": gray("950"),
+    "975": gray("975")
   ),
   $grays
 );
 // scss-docs-end gray-colors-map
-// fusv-enable
 
 @function color-scale-tokens($color, $value) {
   $anchor: --#{$prefix}#{$color}-500;
