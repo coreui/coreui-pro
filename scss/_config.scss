@@ -252,6 +252,12 @@ $shadows: (
 
 $font-weight-semibold:        600 !default;
 
+// fusv-disable
+// Read by the shared docs engine, which also serves v5, so it cannot move to
+// the token yet.
+$link-color:                  light-dark(var(--#{$prefix}primary-base), var(--#{$prefix}primary-fg)) !default;
+// fusv-enable
+
 // scss-docs-start font-weights
 $font-weights: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default

@@ -26,6 +26,13 @@ $gray:    oklch(60% 0.03948 265.02) !default;
 // from them, and it serves v5 as well, so it cannot be adapted to their removal.
 // fusv-enable
 
+// fusv-disable
+// No token and no rule reads these: the shared docs engine derives its chrome
+// from them, and it serves v5 as well, so it cannot be adapted to their removal.
+$blue: oklch(57.82% 0.22821 260.03) !default;
+$pink: oklch(59.56% 0.20859 355.48) !default;
+// fusv-enable
+
 // scss-docs-start colors-map
 $colors: () !default;
 
