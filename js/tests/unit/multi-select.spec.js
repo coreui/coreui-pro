@@ -4886,6 +4886,15 @@ describe('MultiSelect', () => {
       expect(multiSelect._togglerElement.getAttribute('aria-haspopup')).toBe('listbox')
     })
 
+    it('should name the toggle after what it opens', () => {
+      fixtureEl.innerHTML = '<select id="test-select"></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      // eslint-disable-next-line no-new
+      new MultiSelect(selectEl, { options: [] })
+
+      expect(selectEl.parentNode.querySelector('.form-control-action').getAttribute('aria-label')).toBe('Toggle options list')
+    })
+
     it('should give the search input an accessible label and combobox-supporting attributes', () => {
       fixtureEl.innerHTML = '<select id="test-select"></select>'
       const selectEl = fixtureEl.querySelector('select')

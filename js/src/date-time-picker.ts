@@ -88,7 +88,7 @@ type DateTimePickerConfig = {
 const Default: DateTimePickerConfig = {
   allowList: SVGAllowlist,
   ariaCleanerLabel: 'Clear date and time',
-  ariaPickerLabel: 'Toggle the calendar',
+  ariaPickerLabel: 'Toggle calendar and time selection',
   calendarOptions: {},
   cleaner: true,
   cleanerIcon: CLEANER_ICON,

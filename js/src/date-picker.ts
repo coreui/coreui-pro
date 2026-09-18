@@ -91,7 +91,7 @@ type DatePickerConfig = {
 const Default: DatePickerConfig = {
   allowList: SVGAllowlist,
   ariaCleanerLabel: 'Clear date',
-  ariaPickerLabel: 'Toggle the calendar',
+  ariaPickerLabel: 'Toggle calendar',
   calendarOptions: {},
   cleaner: true,
   cleanerIcon: CLEANER_ICON,

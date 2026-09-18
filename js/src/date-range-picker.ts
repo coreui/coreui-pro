@@ -91,7 +91,7 @@ const Default: DateRangePickerConfig = {
   allowList: SVGAllowlist,
   ariaCleanerLabel: 'Clear date range',
   ariaEndLabel: 'End date',
-  ariaPickerLabel: 'Toggle the calendar',
+  ariaPickerLabel: 'Toggle calendar',
   ariaStartLabel: 'Start date',
   calendarOptions: {},
   calendars: 2,

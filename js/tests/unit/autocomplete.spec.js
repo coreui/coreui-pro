@@ -2173,6 +2173,20 @@ describe('Autocomplete', () => {
     })
   })
 
+  describe('picker toggle', () => {
+    it('should name the toggle after what it opens', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      // eslint-disable-next-line no-new
+      new Autocomplete(autocompleteEl, {
+        options: [{ label: 'Option 1', value: '1' }],
+        pickerIcon: true
+      })
+
+      expect(autocompleteEl.querySelector('.form-control-action').getAttribute('aria-label')).toEqual('Toggle options list')
+    })
+  })
+
   describe('cleaner functionality', () => {
     it('should clear selection when cleaner button is clicked', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
