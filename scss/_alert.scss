@@ -6,7 +6,7 @@
 
 $alert-tokens: () !default;
 
-// stylelint-disable scss/dollar-variable-default
+// stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
 // scss-docs-start alert-tokens
 $alert-tokens: defaults(
@@ -32,7 +32,7 @@ $alert-tokens: defaults(
 );
 // scss-docs-end alert-tokens
 
-// stylelint-enable scss/dollar-variable-default
+// stylelint-enable custom-property-no-missing-var-function, scss/dollar-variable-default
 
 $alert-variants: () !default;
 
@@ -75,12 +75,21 @@ $alert-variants: defaults(
       @include transition-props(
         var(--#{$prefix}alert-transition-property),
         var(--#{$prefix}alert-transition-duration),
-        var(--#{$prefix}alert-transition-timing)
+        var(--#{$prefix}alert-transition-timing),
+        allow-discrete
       );
     }
 
     &.hiding {
       opacity: 0;
+    }
+
+    &.size {
+      --#{$prefix}alert-transition-property: var(--#{$prefix}transition-size-property, opacity);
+    }
+
+    &.alert-instant.size {
+      --#{$prefix}transition-size-duration: 0s;
     }
     // scss-docs-end alert-transition
   }

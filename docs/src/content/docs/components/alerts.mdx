@@ -169,6 +169,13 @@ Using the JavaScript plugin, you can remove any alert.
 - On the close button, include the `data-coreui-dismiss="alert"` attribute, which triggers the JavaScript functionality. You must use the `<button>` element with it for proper behavior across all devices.
 - Every alert fades out when dismissed — the JavaScript marks it with `.hiding` for the length of the transition, then removes it. Add `.alert-instant` to an alert that should go at once, or retime the fade with `--cui-alert-transition-duration` and `--cui-alert-transition-timing`.
 - Add `.fade` and `.show` to an alert you insert into the page at runtime, and it fades **in** as well. An alert that is already in the markup does not need them.
+- Add [`.size`](/customize/transitions/#size-animations) and the alert animates its box, not only its opacity: it collapses as it is dismissed, so the content below rises into its place instead of jumping, and it grows from nothing when you insert it with `.fade` and `.show`. The class needs `interpolate-size`, so in a browser without it the alert fades in place as before, and it clips the alert's content for as long as it is on.
+
+<Example code={`<div class="alert theme-info size" role="alert">
+    Dismiss this one and the paragraph below rises into its place.
+    <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
+  </div>
+  <p class="mb-0">Content below the alert.</p>`} />
 
 You can observe this in action with a live demonstration:
 

@@ -119,7 +119,7 @@ These sit above at least one of our floors, so v6 cannot rely on them without a 
 | Scrollbar styling (`scrollbar-color`) | Chrome 121, Firefox 64, Safari 26.2 |
 | `text-box-trim` | Chrome 133, Firefox 154, Safari 18.2 |
 
-One of these the library already touches, carefully: `interpolate-size` sits behind `@supports`, so accordions and collapses animate to their intrinsic height where it exists and jump without it. Unprefixed `backdrop-filter`, `content-visibility` and relative color syntax with number channel values landed in Safari 18 and are inside the floor now. Anchor positioning is the one most worth waiting for — it would let Menu, Tooltip, Popover and Combobox drop their [Floating UI](https://floating-ui.com/) dependency. Re-check these before you assume one has landed.
+One of these the library already touches, carefully: `interpolate-size` sits behind `@supports`, so accordions and collapses animate to their intrinsic height where it exists and jump without it, and the opt-in `.size` class does nothing at all without it. Unprefixed `backdrop-filter`, `content-visibility` and relative color syntax with number channel values landed in Safari 18 and are inside the floor now. Anchor positioning is the one most worth waiting for — it would let Menu, Tooltip, Popover and Combobox drop their [Floating UI](https://floating-ui.com/) dependency. Re-check these before you assume one has landed.
 
 ## JavaScript
 
