@@ -223,6 +223,14 @@ describe('DateTimePicker', () => {
     })
   })
 
+  describe('picker toggle', () => {
+    it('should name the toggle after what it opens', () => {
+      buildPicker({ date: new Date(2026, 5, 15, 10, 0) })
+
+      expect(fixtureEl.querySelector('.form-control-action').getAttribute('aria-label')).toEqual('Toggle calendar and time selection')
+    })
+  })
+
   describe('cleaner', () => {
     it('should name the cleaner after the value it clears', () => {
       buildPicker({ date: new Date(2026, 5, 15, 10, 0) })

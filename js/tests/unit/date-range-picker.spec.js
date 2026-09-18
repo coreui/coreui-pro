@@ -253,6 +253,14 @@ describe('DateRangePicker', () => {
     })
   })
 
+  describe('picker toggle', () => {
+    it('should name the toggle after what it opens', () => {
+      buildPicker({ startDate: new Date(2026, 5, 1) })
+
+      expect(fixtureEl.querySelector('.form-control-action').getAttribute('aria-label')).toEqual('Toggle calendar')
+    })
+  })
+
   describe('cleaner', () => {
     it('should name the cleaner after the value it clears', () => {
       buildPicker({ startDate: new Date(2026, 5, 1), endDate: new Date(2026, 5, 15) })

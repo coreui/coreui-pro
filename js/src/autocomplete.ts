@@ -65,7 +65,7 @@ const Default = {
   allowList: DefaultAllowlist as SanitizerAllowList,
   allowOnlyDefinedOptions: false,
   ariaCleanerLabel: 'Clear selection',
-  ariaPickerLabel: 'Toggle visibility of options menu',
+  ariaPickerLabel: 'Toggle options list',
   cleaner: false,
   clearSearchOnSelect: true,
   container: false,

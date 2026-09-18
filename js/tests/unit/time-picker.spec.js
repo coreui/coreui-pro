@@ -252,6 +252,14 @@ describe('TimePicker', () => {
     })
   })
 
+  describe('picker toggle', () => {
+    it('should name the toggle after what it opens', () => {
+      buildPicker({ time: new Date(2026, 0, 1, 14, 30) })
+
+      expect(fixtureEl.querySelector('.form-control-action').getAttribute('aria-label')).toEqual('Toggle time selection')
+    })
+  })
+
   describe('cleaner', () => {
     it('should name the cleaner after the value it clears', () => {
       buildPicker({ time: new Date(2026, 0, 1, 14, 30) })

@@ -122,7 +122,7 @@ describe('DatePicker', () => {
       const svg = indicator.querySelector('svg')
       expect(svg).not.toBeNull()
       expect(svg.getAttribute('fill')).toEqual('currentColor')
-      expect(indicator.getAttribute('aria-label')).toEqual('Toggle the calendar')
+      expect(indicator.getAttribute('aria-label')).toEqual('Toggle calendar')
     })
 
     it('should accept a custom indicator icon and sanitize it', () => {
@@ -274,7 +274,7 @@ describe('DatePicker', () => {
       const el = fixtureEl.querySelector('#picker')
       const toggle = el.querySelector('[data-coreui-picker-toggle]')
 
-      expect(toggle.getAttribute('aria-label')).toEqual('Toggle the calendar')
+      expect(toggle.getAttribute('aria-label')).toEqual('Toggle calendar')
       expect(toggle.getAttribute('aria-haspopup')).toEqual('dialog')
       expect(toggle.getAttribute('aria-expanded')).toEqual('false')
       expect(toggle.hasAttribute('aria-controls')).toBeFalse()

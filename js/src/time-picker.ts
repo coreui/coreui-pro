@@ -78,7 +78,7 @@ type TimePickerConfig = {
 const Default: TimePickerConfig = {
   allowList: SVGAllowlist,
   ariaCleanerLabel: 'Clear time',
-  ariaPickerLabel: 'Toggle the time selection',
+  ariaPickerLabel: 'Toggle time selection',
   cleaner: true,
   cleanerIcon: CLEANER_ICON,
   container: false,

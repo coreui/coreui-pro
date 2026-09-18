@@ -81,7 +81,7 @@ const CLASS_NAME_SHOW = 'show'
 const Default = {
   allowList: DefaultAllowlist as SanitizerAllowList,
   ariaCleanerLabel: 'Clear all selections',
-  ariaPickerLabel: 'Toggle visibility of options menu',
+  ariaPickerLabel: 'Toggle options list',
   ariaSearchLabel: 'Search',
   ariaTagDeleteLabel: 'Remove',
   cleaner: true,
