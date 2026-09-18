@@ -79,6 +79,7 @@ type DateTimePickerConfig = {
   pickerIcon: string,
   sanitize: boolean,
   sanitizeFn: ((unsafeHtml: string) => string) | null,
+  seconds: boolean | number[] | ((second: number) => boolean),
   selectionOptions: Record<string, any>,
   size: string | null,
   variant: string
@@ -103,6 +104,7 @@ const Default: DateTimePickerConfig = {
   pickerIcon: CALENDAR_ICON,
   sanitize: true,
   sanitizeFn: null,
+  seconds: true,
   selectionOptions: {},
   size: null,
   variant: 'roll'
@@ -127,6 +129,7 @@ const DefaultType: Record<string, string> = {
   pickerIcon: 'string',
   sanitize: 'boolean',
   sanitizeFn: '(function|null)',
+  seconds: '(array|boolean|function)',
   selectionOptions: 'object',
   size: '(string|null)',
   variant: 'string'
@@ -263,6 +266,7 @@ class DateTimePicker extends PickerBase {
       disabled: this._config.disabled,
       locale: this._config.locale,
       name: this._config.name,
+      seconds: Boolean(this._config.seconds),
       type: 'datetime'
     }, { ...(this._config.floatingLabel ? { ariaLabel: this._config.floatingLabel } : {}), ...this._config.inputOptions }))
 

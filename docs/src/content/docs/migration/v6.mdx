@@ -1324,6 +1324,13 @@ validation and the arrow between them. Two consequences:
 
 #### Time Picker / Date Time Picker (new)
 
+- **`seconds` governs the field as well as the panel, and both are on by
+  default, as they were in v5.** v5 formatted its value with seconds, so
+  `10:30:00 AM` is what both majors submit. `seconds="false"` takes the panel
+  column and the field's seconds section away together; with the section present
+  the value is complete only once the seconds are typed, the same as every other
+  section of the field.
+
 - The time selection body is now a shared primitive used by both pickers, so the
   `roll` and `select` variants, the `hours`/`minutes`/`seconds` filters and the
   12/24-hour locale split behave identically in each. See

@@ -68,6 +68,7 @@ type TimePickerConfig = {
   pickerIcon: string,
   sanitize: boolean,
   sanitizeFn: ((unsafeHtml: string) => string) | null,
+  seconds: boolean | number[] | ((second: number) => boolean),
   selectionOptions: Record<string, any>,
   size: string | null,
   time: Date | string | null,
@@ -89,6 +90,7 @@ const Default: TimePickerConfig = {
   pickerIcon: CLOCK_ICON,
   sanitize: true,
   sanitizeFn: null,
+  seconds: true,
   selectionOptions: {},
   size: null,
   time: null,
@@ -110,6 +112,7 @@ const DefaultType: Record<string, string> = {
   pickerIcon: 'string',
   sanitize: 'boolean',
   sanitizeFn: '(function|null)',
+  seconds: '(array|boolean|function)',
   selectionOptions: 'object',
   size: '(string|null)',
   time: '(date|string|null)',
@@ -237,7 +240,8 @@ class TimePicker extends PickerBase {
       date: this._config.time,
       disabled: this._config.disabled,
       locale: this._config.locale,
-      name: this._config.name
+      name: this._config.name,
+      seconds: Boolean(this._config.seconds)
     }, { ...(this._config.floatingLabel ? { ariaLabel: this._config.floatingLabel } : {}), ...this._config.inputOptions }))
 
     // See DatePicker — the bridge from a typed value back to the panel
