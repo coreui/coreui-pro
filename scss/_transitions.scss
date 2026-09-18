@@ -4,6 +4,7 @@
 @use "config" as *;
 
 $fade-tokens: () !default;
+$size-tokens: () !default;
 $collapse-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
@@ -21,6 +22,17 @@ $fade-tokens: defaults(
 // stylelint-enable scss/dollar-variable-default
 
 // stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
+
+// scss-docs-start size-tokens
+$size-tokens: defaults(
+  (
+    --#{$prefix}transition-size-property: #{"opacity, block-size, margin-block, padding-block, border-block-width, display"},
+    --#{$prefix}transition-size-duration: .15s,
+    --#{$prefix}transition-size-timing: linear,
+  ),
+  $size-tokens
+);
+// scss-docs-end size-tokens
 
 // scss-docs-start collapse-tokens
 $collapse-tokens: defaults(
@@ -44,6 +56,23 @@ $collapse-tokens: defaults(
       opacity: 0;
     }
   }
+
+  // scss-docs-start size-classes
+  @supports (interpolate-size: allow-keywords) {
+    .size {
+      @include tokens($size-tokens);
+
+      interpolate-size: allow-keywords;
+      overflow: hidden;
+      @include transition-props(
+        var(--#{$prefix}transition-size-property),
+        var(--#{$prefix}transition-size-duration),
+        var(--#{$prefix}transition-size-timing),
+        allow-discrete
+      );
+    }
+  }
+  // scss-docs-end size-classes
 
   // scss-docs-start collapse-classes
   // Both classes carry the tokens: `.collapsing` marks a running transition on
@@ -159,3 +188,29 @@ $collapse-tokens: defaults(
     }
   }
 }
+
+// scss-docs-start size-hidden
+@layer utilities {
+  @supports (interpolate-size: allow-keywords) {
+    .size.hiding,
+    .fade.size:not(.show) {
+      display: none;
+      block-size: 0;
+      padding-block: 0;
+      margin-block: 0;
+      border-block-width: 0;
+      opacity: 0;
+    }
+
+    @starting-style {
+      .fade.size.show {
+        block-size: 0;
+        padding-block: 0;
+        margin-block: 0;
+        border-block-width: 0;
+        opacity: 0;
+      }
+    }
+  }
+}
+// scss-docs-end size-hidden
