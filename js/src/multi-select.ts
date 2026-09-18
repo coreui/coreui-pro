@@ -781,19 +781,24 @@ class MultiSelect extends ComboboxBase {
   // The group lays its adornments out itself — they are its children, not a
   // wrapper's.
   _createButtons(): void {
-    const indicator = document.createElement('button')
-    indicator.type = 'button'
-    indicator.classList.add('form-control-action')
-    indicator.disabled = this._config.disabled
-    indicator.setAttribute('aria-label', this._config.ariaPickerLabel)
-    indicator.innerHTML = sanitizeByConfig(
-      this._config.pickerIcon === true ? PICKER_ICON : this._config.pickerIcon,
-      { ...this._config, allowList: SVGAllowlist }
-    )
+    this._indicatorElement = null
 
-    this._togglerElement.append(indicator)
+    if (this._config.pickerIcon) {
+      const indicator = document.createElement('button')
+      indicator.type = 'button'
+      indicator.classList.add('form-control-action')
+      indicator.disabled = this._config.disabled
+      indicator.setAttribute('aria-label', this._config.ariaPickerLabel)
+      indicator.innerHTML = sanitizeByConfig(
+        this._config.pickerIcon === true ? PICKER_ICON : this._config.pickerIcon,
+        { ...this._config, allowList: SVGAllowlist }
+      )
 
-    this._indicatorElement = indicator
+      this._togglerElement.append(indicator)
+
+      this._indicatorElement = indicator
+    }
+
     this._updateSelectionCleaner()
   }
 
@@ -1193,7 +1198,12 @@ class MultiSelect extends ComboboxBase {
     if (this._selected.length > 0 && this._selectionCleanerElement === null) {
       const selectionCleaner = this._createSelectionCleaner()
 
-      this._indicatorElement.before(selectionCleaner)
+      if (this._indicatorElement) {
+        this._indicatorElement.before(selectionCleaner)
+      } else {
+        this._togglerElement.append(selectionCleaner)
+      }
+
       this._selectionCleanerElement = selectionCleaner
       return
     }
