@@ -76,7 +76,7 @@ type DateRangePickerConfig = {
   locale: string,
   maxDate: Date | string | null,
   minDate: Date | string | null,
-  pickerIcon: string,
+  pickerIcon: string | boolean,
   sanitize: boolean,
   sanitizeFn: ((unsafeHtml: string) => string) | null,
   separatorIcon: string,
@@ -106,7 +106,7 @@ const Default: DateRangePickerConfig = {
   locale: navigator.language,
   maxDate: null,
   minDate: null,
-  pickerIcon: CALENDAR_ICON,
+  pickerIcon: true,
   sanitize: true,
   sanitizeFn: null,
   separatorIcon: SEPARATOR_ICON,
@@ -136,7 +136,7 @@ const DefaultType: Record<string, string> = {
   locale: 'string',
   maxDate: '(date|string|null)',
   minDate: '(date|string|null)',
-  pickerIcon: 'string',
+  pickerIcon: '(string|boolean)',
   sanitize: 'boolean',
   sanitizeFn: '(function|null)',
   separatorIcon: 'string',
@@ -313,15 +313,19 @@ class DateRangePicker extends PickerBase {
       inputGroup.append(this._cleanerElement)
     }
 
-    const indicator = action(CLASS_NAME_INDICATOR, this._config.pickerIcon, this._config.ariaPickerLabel)
-    inputGroup.append(indicator)
-    this._toggleElement = indicator
+    this._toggleElement = null
+
+    if (this._config.pickerIcon) {
+      const indicator = action(CLASS_NAME_INDICATOR, this._config.pickerIcon === true ? CALENDAR_ICON : this._config.pickerIcon, this._config.ariaPickerLabel)
+      inputGroup.append(indicator)
+      this._toggleElement = indicator
+    }
 
     this._menu = document.createElement('div')
     this._menu.id = getUID(`${this.constructor.NAME}-popup-`)
     this._menu.classList.add(CLASS_NAME_POPUP, CLASS_NAME_DROPDOWN)
-    indicator.setAttribute('aria-expanded', 'false')
-    indicator.setAttribute('aria-haspopup', 'dialog')
+    this._writeToggleAttribute('aria-expanded', 'false')
+    this._writeToggleAttribute('aria-haspopup', 'dialog')
 
     const body = document.createElement('div')
     body.classList.add(CLASS_NAME_BODY)

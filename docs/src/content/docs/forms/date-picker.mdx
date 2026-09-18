@@ -410,7 +410,7 @@ attributes work on the picker element too.
 | `maxDate` | date, string, null | `null` | Upper bound, enforced by both layers. |
 | `minDate` | date, string, null | `null` | Lower bound, enforced by both layers. |
 | `name` | string, null | `null` | Name of the generated hidden input. Without it the field is not submitted with the form. |
-| `pickerIcon` | string | calendar SVG | Inline SVG of the generated toggle (sanitized). Not used for a `data-coreui-picker-toggle` you wrote. |
+| `pickerIcon` | string, boolean | `true` | The button that opens the calendar: `true` for the built-in icon, an inline SVG string for your own (sanitized), `false` for no button. Not used for a `data-coreui-picker-toggle` you wrote. Without either the popup opens only through `show()`, and nothing carries `aria-expanded`. |
 | `sanitize` | boolean | `true` | Sanitize the icon markup. |
 | `sanitizeFn` | function, null | `null` | Custom sanitizer. |
 | `size` | string, null | `null` | `'sm'` or `'lg'`. |

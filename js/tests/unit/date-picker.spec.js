@@ -526,6 +526,20 @@ describe('DatePicker', () => {
 
       expect(picker._popup.isShown).toBeFalse()
       expect(picker.getDate().getDate()).toEqual(13)
+  describe('picker toggle', () => {
+    it('should not render the toggle when pickerIcon is off', () => {
+      buildPicker({ date: new Date(2026, 6, 14), pickerIcon: false })
+
+      expect(fixtureEl.querySelector('.form-control-action')).toBeNull()
+    })
+
+    it('should open and close without a toggle', () => {
+      const picker = buildPicker({ date: new Date(2026, 6, 14), pickerIcon: false })
+
+      picker.show()
+      picker.hide()
+
+      expect(fixtureEl.querySelector('.form-control-action')).toBeNull()
     })
   })
 

@@ -254,6 +254,21 @@ describe('DateRangePicker', () => {
   })
 
   describe('picker toggle', () => {
+    it('should not render the toggle when pickerIcon is off', () => {
+      buildPicker({ startDate: new Date(2026, 5, 1), pickerIcon: false })
+
+      expect(fixtureEl.querySelector('.form-control-action')).toBeNull()
+    })
+
+    it('should open and close without a toggle', () => {
+      const picker = buildPicker({ startDate: new Date(2026, 5, 1), pickerIcon: false })
+
+      picker.show()
+      picker.hide()
+
+      expect(fixtureEl.querySelector('.form-control-action')).toBeNull()
+    })
+
     it('should name the toggle after what it opens', () => {
       buildPicker({ startDate: new Date(2026, 5, 1) })
 
