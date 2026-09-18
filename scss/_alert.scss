@@ -84,11 +84,11 @@ $alert-variants: defaults(
       opacity: 0;
     }
 
-    &.size {
+    &.transition-size {
       --#{$prefix}alert-transition-property: var(--#{$prefix}transition-size-property, opacity);
     }
 
-    &.alert-instant.size {
+    &.alert-instant.transition-size {
       --#{$prefix}transition-size-duration: 0s;
     }
     // scss-docs-end alert-transition

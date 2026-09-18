@@ -4,7 +4,7 @@
 @use "config" as *;
 
 $fade-tokens: () !default;
-$size-tokens: () !default;
+$transition-size-tokens: () !default;
 $collapse-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
@@ -23,16 +23,16 @@ $fade-tokens: defaults(
 
 // stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
-// scss-docs-start size-tokens
-$size-tokens: defaults(
+// scss-docs-start transition-size-tokens
+$transition-size-tokens: defaults(
   (
     --#{$prefix}transition-size-property: #{"opacity, block-size, margin-block, padding-block, border-block-width, display"},
     --#{$prefix}transition-size-duration: .15s,
     --#{$prefix}transition-size-timing: linear,
   ),
-  $size-tokens
+  $transition-size-tokens
 );
-// scss-docs-end size-tokens
+// scss-docs-end transition-size-tokens
 
 // scss-docs-start collapse-tokens
 $collapse-tokens: defaults(
@@ -57,10 +57,10 @@ $collapse-tokens: defaults(
     }
   }
 
-  // scss-docs-start size-classes
+  // scss-docs-start transition-size-classes
   @supports (interpolate-size: allow-keywords) {
-    .size {
-      @include tokens($size-tokens);
+    .transition-size {
+      @include tokens($transition-size-tokens);
 
       interpolate-size: allow-keywords;
       overflow: hidden;
@@ -72,7 +72,7 @@ $collapse-tokens: defaults(
       );
     }
   }
-  // scss-docs-end size-classes
+  // scss-docs-end transition-size-classes
 
   // scss-docs-start collapse-classes
   // Both classes carry the tokens: `.collapsing` marks a running transition on
@@ -189,11 +189,11 @@ $collapse-tokens: defaults(
   }
 }
 
-// scss-docs-start size-hidden
+// scss-docs-start transition-size-hidden
 @layer utilities {
   @supports (interpolate-size: allow-keywords) {
-    .size.hiding,
-    .fade.size:not(.show) {
+    .transition-size.hiding,
+    .fade.transition-size:not(.show) {
       display: none;
       block-size: 0;
       padding-block: 0;
@@ -203,7 +203,7 @@ $collapse-tokens: defaults(
     }
 
     @starting-style {
-      .fade.size.show {
+      .fade.transition-size.show {
         block-size: 0;
         padding-block: 0;
         margin-block: 0;
@@ -213,4 +213,4 @@ $collapse-tokens: defaults(
     }
   }
 }
-// scss-docs-end size-hidden
+// scss-docs-end transition-size-hidden

@@ -1,5 +1,5 @@
 /*!
- * The `.size` helper animates the box of an element that comes and goes, which
+ * The `.transition-size` helper animates the box of an element that comes and goes, which
  * takes both a stylesheet and a browser that can interpolate `auto`. The unit
  * suite loads no CSS, so nothing there sees any of it. The alert is the vehicle
  * here because its JavaScript is what marks the exit.
@@ -58,9 +58,9 @@ afterEach(() => {
   host = null
 })
 
-describe('Size helper', () => {
+describe('Transition size helper', () => {
   it('collapses the box of an alert on its way out', () => {
-    const alertEl = mount('alert size')
+    const alertEl = mount('alert transition-size')
     const { height } = alertEl.getBoundingClientRect()
 
     new Alert(alertEl).close()
@@ -80,7 +80,7 @@ describe('Size helper', () => {
 
   it('grows the box of an alert inserted with the class on', () => {
     const reference = settle(mount('alert fade show'))
-    const alertEl = mount('alert fade size show')
+    const alertEl = mount('alert fade transition-size show')
 
     seek(alertEl, 75)
 
@@ -94,7 +94,7 @@ describe('Size helper', () => {
 
   it('zeroes the box under the utilities it has to outrank', () => {
     const reference = mount('alert py-5 mb-5')
-    const alertEl = mount('alert size py-5 mb-5 opacity-100')
+    const alertEl = mount('alert transition-size py-5 mb-5 opacity-100')
     const { height } = alertEl.getBoundingClientRect()
 
     new Alert(alertEl).close()
@@ -111,7 +111,7 @@ describe('Size helper', () => {
   })
 
   it('fades markup of its own in as the box grows', () => {
-    const element = mount('fade size show')
+    const element = mount('fade transition-size show')
 
     seek(element, 1)
 
@@ -122,14 +122,14 @@ describe('Size helper', () => {
   })
 
   it('leaves the timing to the alert', () => {
-    const alertEl = mount('alert size')
+    const alertEl = mount('alert transition-size')
     alertEl.style.setProperty('--cui-alert-transition-duration', '.6s')
 
     expect(getTransitionDurationFromElement(alertEl)).toBe(600)
   })
 
   it('moves nothing for an alert that goes at once', () => {
-    const alertEl = mount('alert alert-instant size')
+    const alertEl = mount('alert alert-instant transition-size')
 
     new Alert(alertEl).close()
 
@@ -138,7 +138,7 @@ describe('Size helper', () => {
   })
 
   it('takes a hidden element out of the layout and the tab order', () => {
-    const alertEl = mount('alert fade size')
+    const alertEl = mount('alert fade transition-size')
     const dismissEl = alertEl.querySelector('.btn-close')
 
     settle(alertEl)
@@ -151,7 +151,7 @@ describe('Size helper', () => {
   })
 
   it('holds a leaving alert on screen until its box reaches zero', () => {
-    const alertEl = mount('alert size')
+    const alertEl = mount('alert transition-size')
     // The rect is what commits the state the exit starts from.
     alertEl.getBoundingClientRect()
 
