@@ -14,7 +14,7 @@ import BaseComponent from './base-component.js'
 import DateInput from './date-input.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
-import { isSameDateAs } from './util/calendar.js'
+import { isSameInstantAs } from './util/calendar.js'
 import type { ComponentConfig } from './util/config.js'
 import {
   appendControlGroupField,
@@ -102,12 +102,14 @@ type DateRangeInputConfig = {
   sanitize: boolean
   sanitizeFn: ((unsafeHtml: string) => string) | null
   secondPlaceholder: string | null
+  seconds: boolean
   separatorIcon: string
   separatorIconRtl: string
   size: string | null
   startDate: Date | string | null
   startFloatingLabel: string | null
   startName: string | null
+  type: string
   valid: boolean
   weekPlaceholder: string | null
   yearPlaceholder: string | null
@@ -152,12 +154,14 @@ const Default: DateRangeInputConfig = {
   sanitize: true,
   sanitizeFn: null,
   secondPlaceholder: null,
+  seconds: false,
   separatorIcon: SEPARATOR_ICON,
   separatorIconRtl: SEPARATOR_ICON_RTL,
   size: null,
   startDate: null,
   startFloatingLabel: null,
   startName: null,
+  type: 'date',
   valid: false,
   weekPlaceholder: null,
   yearPlaceholder: null
@@ -202,12 +206,14 @@ const DefaultType: Record<string, string> = {
   sanitize: 'boolean',
   sanitizeFn: '(function|null)',
   secondPlaceholder: '(string|null)',
+  seconds: 'boolean',
   separatorIcon: 'string',
   separatorIconRtl: 'string',
   size: '(string|null)',
   startDate: '(date|string|null)',
   startFloatingLabel: '(string|null)',
   startName: '(string|null)',
+  type: 'string',
   valid: 'boolean',
   weekPlaceholder: '(string|null)',
   yearPlaceholder: '(string|null)'
@@ -359,7 +365,7 @@ class DateRangeInput extends BaseComponent {
 
   // Private
   _markupClaimApplies(): boolean {
-    return isSameDateAs(this._startDate, this._claimedStartDate) && isSameDateAs(this._endDate, this._claimedEndDate)
+    return isSameInstantAs(this._startDate, this._claimedStartDate) && isSameInstantAs(this._endDate, this._claimedEndDate)
   }
 
   _toggleStateClassName(className: string, on: boolean): void {
@@ -490,8 +496,8 @@ class DateRangeInput extends BaseComponent {
     const end = fields ? this._endInput.getDate() : endDate
     this._applying = false
 
-    const startChanged = !isSameDateAs(start, this._startDate)
-    const endChanged = !isSameDateAs(end, this._endDate)
+    const startChanged = !isSameInstantAs(start, this._startDate)
+    const endChanged = !isSameInstantAs(end, this._endDate)
     this._startDate = start
     this._endDate = end
 

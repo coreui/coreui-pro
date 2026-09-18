@@ -558,4 +558,38 @@ describe('DateRangeInput', () => {
       DateRangeInput.getInstance(root()).dispose()
     })
   })
+
+  describe("datetime type", () => {
+    it("should carry the time through to both fields", () => {
+      const instance = build({ format: "dd.MM.yyyy HH:mm", type: "datetime" })
+
+      for (const field of fields()) {
+        expect([...field.querySelectorAll(".form-date-time-section")].map(section => section.dataset.coreuiSection))
+          .toEqual(["day", "month", "year", "hour", "minute"])
+      }
+
+      instance.dispose()
+    })
+
+    it("should emit rangeChange when only the time moves", () => {
+      const instance = build({
+        endDate: new Date(2026, 6, 20, 10, 0),
+        format: "dd.MM.yyyy HH:mm",
+        startDate: new Date(2026, 6, 14, 10, 0),
+        type: "datetime"
+      })
+      const spy = jasmine.createSpy("rangeChange")
+      root().addEventListener("rangeChange.coreui.date-range-input", spy)
+
+      const hour = fields()[0].querySelectorAll(".form-date-time-section")[3]
+      hour.focus()
+      hour.dispatchEvent(new KeyboardEvent("keydown", { key: "1", bubbles: true, cancelable: true }))
+      hour.dispatchEvent(new KeyboardEvent("keydown", { key: "1", bubbles: true, cancelable: true }))
+
+      expect(instance.getStartDate()).toEqual(new Date(2026, 6, 14, 11, 0))
+      expect(spy).toHaveBeenCalled()
+
+      instance.dispose()
+    })
+  })
 })

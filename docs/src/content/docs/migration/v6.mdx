@@ -1195,10 +1195,10 @@ behaviour, v5 is the reference. Mapping:
 - **Removed — obsolete with section fields.** `inputDateFormat`,
   `inputOnChangeDelay`, `inputReadOnly`, `placeholder` — the masked field is
   always a valid partial date; there is no free-text parsing to debounce.
-  Section placeholders come from the input triad's own per-section options —
+  Section placeholders come from the section fields' own per-section options —
   `dayPlaceholder`, `monthPlaceholder`, `yearPlaceholder` and the rest.
 - **Changed.** `timepicker: true` is replaced by the standalone
-  [date time picker](/forms/date-time-picker/) — a DateTimeInput field with a
+  [date time picker](/forms/date-time-picker/) — a date input in datetime mode with a
   calendar and the time selection body side by side. Because the two halves own
   different parts of one value, that picker does not auto-close: picking a day
   keeps the time and picking a time keeps the day.
@@ -1311,7 +1311,7 @@ validation and the arrow between them. Two consequences:
   matching `shown` / `hidden` does not fire. `hide` on a panel that is not
   shown no longer emits anything.
 
-#### Date Input / Time Input / Date Time Input
+#### Date Input / Time Input
 
 - **`reset()` restores the date the field was created with**, not the last one
   passed to `update()`, and emits `dateChange` when the value moves. A native
@@ -1687,7 +1687,7 @@ adornment in the library — so the button needs no icon markup at all:
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
 
-Date Input, Time Input and Date Time Input took an `id` written on the host as
+Date Input and Time Input took an `id` written on the host as
 permission to submit, naming their hidden input `<component>-<id>` when no
 `name` was configured, so `<div data-coreui-date-input id="delivery">` posted
 `date-input-delivery` — a key the page never asked for, from an attribute a

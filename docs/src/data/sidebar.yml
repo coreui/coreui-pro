@@ -147,14 +147,6 @@
       badge:
         color: danger
         text: PRO
-    - title: Date Time Input
-      to: /forms/date-time-input/
-      badge:
-        - color: success
-          text: NEW
-        - color: danger
-          text: PRO
-          className: ms-1
     - title: Date Time Picker
       to: /forms/date-time-picker/
       badge:

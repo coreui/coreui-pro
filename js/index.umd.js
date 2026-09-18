@@ -22,7 +22,6 @@ import DatePicker from './src/date-picker.js'
 import DateRangeInput from './src/date-range-input.js'
 import DateRangePicker from './src/date-range-picker.js'
 import DateTimePicker from './src/date-time-picker.js'
-import DateTimeInput from './src/date-time-input.js'
 import Dialog from './src/dialog.js'
 import Drawer from './src/drawer.js'
 import Dropdown from './src/dropdown.js'
@@ -72,7 +71,6 @@ export default {
   DateRangeInput,
   DateRangePicker,
   DateTimePicker,
-  DateTimeInput,
   Dialog,
   Drawer,
   Dropdown,

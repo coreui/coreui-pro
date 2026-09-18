@@ -8,7 +8,8 @@
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import SectionInput, { type SectionInputConfig } from './section-input.js'
-import { type DateSection, getSectionsFromLocale } from './util/date-sections.js'
+import { convertToDateObject } from './util/calendar.js'
+import { type DateSection, getDateTimeSectionsFromLocale, getSectionsFromLocale } from './util/date-sections.js'
 import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
 
 /**
@@ -24,9 +25,20 @@ const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
 const SELECTOR_DATA_DATE_INPUT = '[data-coreui-date-input]'
 
-const Default: SectionInputConfig = {
+const ARIA_LABEL_DATE = 'Date input'
+const ARIA_LABEL_DATE_TIME = 'Date and time input'
+
+const Default: SectionInputConfig & { seconds: boolean, type: string } = {
   ...SectionInput.Default,
-  ariaLabel: 'Date input'
+  ariaLabel: ARIA_LABEL_DATE,
+  seconds: false,
+  type: 'date'
+}
+
+const DefaultType: Record<string, string> = {
+  ...SectionInput.DefaultType,
+  seconds: 'boolean',
+  type: 'string'
 }
 
 /**
@@ -39,13 +51,37 @@ class DateInput extends SectionInput {
     return Default
   }
 
+  static override get DefaultType(): typeof DefaultType {
+    return DefaultType
+  }
+
   static override get NAME(): string {
     return NAME
   }
 
   // Private
+  override _getAriaLabel(): string {
+    return this._config.ariaLabel === ARIA_LABEL_DATE && this._config.type === 'datetime' ?
+      ARIA_LABEL_DATE_TIME :
+      this._config.ariaLabel
+  }
+
+  override _convertDate(value: any): Date | null {
+    if (this._config.type === 'datetime') {
+      const withTime = convertToDateObject(value, 'day', this._config.locale, true)
+
+      if (withTime) {
+        return withTime
+      }
+    }
+
+    return super._convertDate(value)
+  }
+
   override _getDefaultSections(locale: string): DateSection[] {
-    return getSectionsFromLocale(locale)
+    return this._config.type === 'datetime' ?
+      getDateTimeSectionsFromLocale(locale, this._config.seconds) :
+      getSectionsFromLocale(locale)
   }
 
   // Static

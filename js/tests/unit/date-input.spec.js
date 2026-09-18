@@ -1081,4 +1081,135 @@ describe('DateInput', () => {
       instance.dispose()
     })
   })
+
+  describe("datetime type", () => {
+    const createDateTimeInput = (config = {}) => {
+      fixtureEl.innerHTML = "<div id=\"mydatetimeinput\"></div>"
+      return new DateInput(fixtureEl.querySelector("div"), { format: "dd.MM.yyyy HH:mm", type: "datetime", ...config })
+    }
+
+    it("should create date and time sections from the format", () => {
+      const sections = getSections(createDateTimeInput()._element)
+
+      expect(sections).toHaveSize(5)
+      expect([...sections].map(section => section.dataset.coreuiSection))
+        .toEqual(["day", "month", "year", "hour", "minute"])
+    })
+
+    it("should derive date and time sections from the locale", () => {
+      fixtureEl.innerHTML = "<div></div>"
+      const dateInput = new DateInput(fixtureEl.querySelector("div"), { locale: "pl-PL", type: "datetime" })
+
+      expect([...getSections(dateInput._element)].map(section => section.dataset.coreuiSection))
+        .toEqual(["day", "month", "year", "hour", "minute"])
+    })
+
+    it("should add a seconds section when asked", () => {
+      fixtureEl.innerHTML = "<div></div>"
+      const dateInput = new DateInput(fixtureEl.querySelector("div"), { locale: "pl-PL", seconds: true, type: "datetime" })
+
+      expect([...getSections(dateInput._element)].map(section => section.dataset.coreuiSection))
+        .toEqual(["day", "month", "year", "hour", "minute", "second"])
+    })
+
+    it("should keep the date-only sections on the default type", () => {
+      fixtureEl.innerHTML = "<div></div>"
+      const dateInput = new DateInput(fixtureEl.querySelector("div"), { locale: "pl-PL" })
+
+      expect([...getSections(dateInput._element)].map(section => section.dataset.coreuiSection))
+        .toEqual(["day", "month", "year"])
+    })
+
+    it("should name itself for screen readers", () => {
+      expect(createDateTimeInput()._element.getAttribute("aria-label")).toEqual("Date and time input")
+      expect(createDateInput()._element.getAttribute("aria-label")).toEqual("Date input")
+    })
+
+    it("should fill sections and the hidden input from the initial date", () => {
+      const dateInput = createDateTimeInput({ date: new Date(2026, 6, 14, 14, 30) })
+
+      expect(dateInput._element.querySelector("input[type=\"hidden\"]").value).toEqual("14.07.2026 14:30")
+    })
+
+    it("should keep the time part of an initial date string", () => {
+      expect(createDateTimeInput({ date: "2026-07-14 14:30" }).getDate()).toEqual(new Date(2026, 6, 14, 14, 30))
+    })
+
+    it("should keep midnight on a date-only string", () => {
+      expect(createDateTimeInput({ date: "2026-07-14" }).getDate()).toEqual(new Date(2026, 6, 14, 0, 0))
+    })
+
+    it("should emit dateChange with the full date and time when complete", () => {
+      const dateInput = createDateTimeInput()
+      const element = dateInput._element
+      const spy = jasmine.createSpy("dateChange")
+      element.addEventListener("dateChange.coreui.date-input", spy)
+
+      const [day, month, year, hour, minute] = getSections(element)
+
+      day.focus()
+      pressKey(day, "4")
+      pressKey(month, "7")
+      for (const digit of "2026") {
+        pressKey(year, digit)
+      }
+
+      pressKey(hour, "1")
+      pressKey(hour, "4")
+      pressKey(minute, "3")
+      pressKey(minute, "0")
+
+      expect(spy).toHaveBeenCalled()
+      expect(spy.calls.mostRecent().args[0].date).toEqual(new Date(2026, 6, 4, 14, 30))
+      expect(dateInput.getDate()).toEqual(new Date(2026, 6, 4, 14, 30))
+    })
+
+    it("should clamp the day when the month changes", () => {
+      const dateInput = createDateTimeInput({ date: new Date(2026, 0, 31, 12, 0) })
+      const [day, month] = getSections(dateInput._element)
+
+      month.focus()
+      pressKey(month, "2")
+
+      expect(day.textContent).toEqual("28")
+      expect(dateInput.getDate()).toEqual(new Date(2026, 1, 28, 12, 0))
+    })
+
+    it("should fill all sections from a pasted date and time", () => {
+      const dateInput = createDateTimeInput()
+      const event = new Event("paste", { bubbles: true, cancelable: true })
+      event.clipboardData = { getData: () => "14.07.2026 14:30" }
+      getSections(dateInput._element)[0].dispatchEvent(event)
+
+      expect(dateInput.getDate()).toEqual(new Date(2026, 6, 14, 14, 30))
+    })
+
+    it("should parse a value in the locale's own date-time format", () => {
+      fixtureEl.innerHTML = "<div></div>"
+      const dateInput = new DateInput(fixtureEl.querySelector("div"), {
+        date: "14/07/2026, 14:30:00",
+        format: "dd.MM.yyyy HH:mm",
+        locale: "en-GB",
+        type: "datetime"
+      })
+
+      expect(dateInput.getDate()).toEqual(new Date(2026, 6, 14, 14, 30))
+    })
+
+    it("should give the label back when the type goes back to date", () => {
+      const dateInput = createDateTimeInput()
+
+      expect(dateInput._element.getAttribute("aria-label")).toEqual("Date and time input")
+
+      dateInput.setConfig({ type: "date" })
+
+      expect(dateInput._element.getAttribute("aria-label")).toEqual("Date input")
+    })
+
+    it("should keep a label the page wrote", () => {
+      const dateInput = createDateTimeInput({ ariaLabel: "Appointment" })
+
+      expect(dateInput._element.getAttribute("aria-label")).toEqual("Appointment")
+    })
+  })
 })

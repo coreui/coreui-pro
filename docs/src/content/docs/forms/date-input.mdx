@@ -28,6 +28,20 @@ By default, the section order and separators are derived from the user's locale,
 <Example pro code={`<label class="form-label" id="basicDateInputLabel">Delivery date</label>
   <div class="form-control form-date-time" data-coreui-date-input data-coreui-name="delivery-date"></div>`} />
 
+## Date and time
+
+Set `data-coreui-type="datetime"` and the field carries the time as well. The hour cycle follows the locale, so a 12-hour locale gets an AM/PM section and a 24-hour one does not. Everything else on this page applies unchanged: the same typing, the same arrow keys, the same events.
+
+<Example pro code={`<label class="form-label">Appointment</label>
+  <div class="form-control form-date-time" data-coreui-date-input data-coreui-type="datetime" data-coreui-name="appointment"></div>`} />
+
+Add `data-coreui-seconds="true"` for a seconds section:
+
+<Example pro code={`<label class="form-label">Timestamp</label>
+  <div class="form-control form-date-time" data-coreui-date-input data-coreui-type="datetime" data-coreui-seconds="true"></div>`} />
+
+A `format` overrides the type, because it names the sections itself. [Date range input](/forms/date-range-input/) takes both options too, so a range with time is the same two attributes on the range container.
+
 ## With form field
 
 Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label and description, and to get validation feedback in the right place.
@@ -309,9 +323,13 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
 | `ariaDayLabel` | string | `'Day'` | The `aria-label` of the day section. |
-| `ariaLabel` | string | `'Date input'` | The `aria-label` of the `role="group"` container |
+| `ariaHourLabel` | string | `'Hour'` | The `aria-label` of the hour section. |
+| `ariaLabel` | string | `'Date input'` | The `aria-label` of the `role="group"` container. On `type="datetime"` the default becomes `'Date and time input'`. |
+| `ariaMeridiemLabel` | string | `'AM/PM'` | The `aria-label` of the meridiem section. |
+| `ariaMinuteLabel` | string | `'Minute'` | The `aria-label` of the minute section. |
 | `ariaMonthLabel` | string | `'Month'` | The `aria-label` of the month section. |
 | `ariaQuarterLabel` | string | `'Quarter'` | The `aria-label` of the quarter section. |
+| `ariaSecondLabel` | string | `'Second'` | The `aria-label` of the second section. |
 | `ariaWeekLabel` | string | `'Week'` | The `aria-label` of the week section. |
 | `ariaYearLabel` | string | `'Year'` | The `aria-label` of the year section. |
 | `autofocus` | boolean | `false` | Focus the first section right after initialization |
@@ -320,17 +338,23 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | `disabled` | boolean | `false` | Disable the component |
 | `disabledDates` | array, date, function, null | `null` | Dates (or a matcher function) that can't be selected |
 | `format` | function, string, null | `null` | Mask layout: `null` derives it from the locale, a string is parsed as format tokens, a function receives the locale and returns the section layout |
+| `hourPlaceholder` | string, null | `null` | Replaces the `HH` the hour section shows while it is empty. |
 | `inputDateParse` | function, null | `null` | Custom parser used for pasted text, e.g. a date library |
 | `invalid` | boolean | `false` | Force the invalid state (`.is-invalid`) |
 | `locale` | string | `'default'` | Locale used to derive the mask layout and month names |
 | `maxDate` | date, number, string, null | `null` | Latest selectable date |
+| `meridiemPlaceholder` | string, null | `null` | Replaces the `AM` the meridiem section shows while it is empty. |
 | `minDate` | date, number, string, null | `null` | Earliest selectable date |
+| `minutePlaceholder` | string, null | `null` | Replaces the `mm` the minute section shows while it is empty. |
 | `monthNames` | array, null | `null` | Twelve custom month names for text month sections (`MMM`/`MMMM`), overriding the locale-derived, date-context grammatical form |
 | `monthPlaceholder` | string, null | `null` | Replaces the `MM` the month section shows while it is empty. |
 | `name` | string, null | `null` | Name of the hidden input the value is submitted under. Without it the field is not submitted with the form. |
 | `quarterPlaceholder` | string, null | `null` | Replaces the `Q` the quarter section shows while it is empty. |
 | `readonly` | boolean | `false` | Make the field focusable but non-editable |
 | `required` | boolean | `false` | Required attribute of the hidden input |
+| `secondPlaceholder` | string, null | `null` | Replaces the `ss` the second section shows while it is empty. |
+| `seconds` | boolean | `false` | Include a seconds section in the locale-derived layout of `type="datetime"` |
+| `type` | string | `'date'` | Which sections the locale-derived layout carries: `'date'` or `'datetime'`. A `format` names the sections itself and overrides this. |
 | `valid` | boolean | `false` | Force the valid state (`.is-valid`) |
 | `weekPlaceholder` | string, null | `null` | Replaces the `WW` the week section shows while it is empty. |
 | `yearPlaceholder` | string, null | `null` | Replaces the `YYYY` the year section shows while it is empty. |
