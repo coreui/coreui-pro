@@ -33,6 +33,7 @@ $offcanvas-tokens: defaults(
     --#{$prefix}offcanvas-backdrop-bg: #{$modal-backdrop-bg},
     --#{$prefix}offcanvas-backdrop-opacity: #{$modal-backdrop-opacity},
     --#{$prefix}offcanvas-title-line-height: #{$modal-title-line-height},
+    --#{$prefix}offcanvas-scale-transform: scale(1.02),
   ),
   $offcanvas-tokens
 );
@@ -137,7 +138,7 @@ $offcanvas-tokens: defaults(
           }
 
           &[open].offcanvas-static:not(.hiding) {
-            transform: $modal-scale-transform;
+            transform: var(--#{$prefix}offcanvas-scale-transform);
           }
 
           &::backdrop {

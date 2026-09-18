@@ -9,10 +9,6 @@
 @use "../config" as *;
 @use "../theme" as *;
 
-// scss-docs-start form-range-variables
-$form-range-thumb-focus-ring-width:        var(--#{$prefix}focus-ring-width) !default; // For focus box shadow issue in Edge
-// scss-docs-end form-range-variables
-
 $form-range-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
@@ -46,6 +42,7 @@ $form-range-tokens: defaults(
     --#{$prefix}range-tick-label-margin-top: .125rem,
     --#{$prefix}range-tick-label-font-size: var(--#{$prefix}font-size-sm),
     --#{$prefix}range-tick-label-color: var(--#{$prefix}fg-2),
+    --#{$prefix}range-thumb-focus-ring-width: var(--#{$prefix}focus-ring-width),
   ),
   $form-range-tokens
 );
@@ -114,7 +111,7 @@ $form-range-tokens: defaults(
   input.form-range {
     display: block;
     width: 100%;
-    height: calc(var(--#{$prefix}range-thumb-height) + #{$form-range-thumb-focus-ring-width} * 2);
+    height: calc(var(--#{$prefix}range-thumb-height) + var(--#{$prefix}range-thumb-focus-ring-width) * 2);
     padding: 0; // Need to reset padding
     appearance: none;
     background-color: transparent;

@@ -78,6 +78,24 @@ It is also possible to link to an external SVG containing the definitions:
 
 Referencing an external SVG has the advantage that your icons get cached, with one HTTP request. But the external SVG and the HTML should be served from the same domain. This approach works fine in modern browsers except for IE 9+. In order to support IE 9+, You should use `/js/svgxuse.js` or `/js/svgxuse.min.js`. This polyfill detects if the icons are loaded properly; if they aren't, it sends one HTTP request to fetch and cache symbol definitions.
 
+## Sizing
+
+Add `.icon-sm`, `.icon-lg`, `.icon-xl` or `.icon-xxl` to scale an icon against the base size, and `.icon-3xl` through `.icon-9xl` for whole multiples of it.
+
+```html
+<svg class="icon icon-sm"><use xlink:href="path/to/coreui-icons.svg#cil-apple"></use></svg>
+<svg class="icon"><use xlink:href="path/to/coreui-icons.svg#cil-apple"></use></svg>
+<svg class="icon icon-xxl"><use xlink:href="path/to/coreui-icons.svg#cil-apple"></use></svg>
+```
+
 ## CoreUI Icons PRO
 
 If our free icon set is insufficient you can buy [CoreUI Icons Pro](https://coreui.io/icons/#pricing-new) with more than 4000 icons, and more styles - Solid, Duo-Tone and Linear.
+
+## Customizing
+
+### CSS variables
+
+Icons use local CSS variables on `.icon` for enhanced real-time customization. Each step is a multiple of `--cui-icon-size-base`, which is set on `:root`, so retuning the base moves every size with it.
+
+<ScssDocs file="scss/_icon.scss" capture="icon-tokens" />

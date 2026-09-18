@@ -1,13 +1,30 @@
+@use "functions/defaults" as *;
 @use "mixins/icon" as *;
+@use "mixins/tokens" as *;
 @use "config" as *;
 
-$icon-size-sm:    calc(var(--#{$prefix}icon-size-base) * .875) !default;
-$icon-size-lg:    calc(var(--#{$prefix}icon-size-base) * 1.25) !default;
-$icon-size-xl:    calc(var(--#{$prefix}icon-size-base) * 1.5) !default;
-$icon-size-xxl:   calc(var(--#{$prefix}icon-size-base) * 2) !default;
+$icon-tokens: () !default;
+
+// stylelint-disable scss/dollar-variable-default
+
+// scss-docs-start icon-tokens
+$icon-tokens: defaults(
+  (
+    --#{$prefix}icon-size-sm: calc(var(--#{$prefix}icon-size-base) * .875),
+    --#{$prefix}icon-size-lg: calc(var(--#{$prefix}icon-size-base) * 1.25),
+    --#{$prefix}icon-size-xl: calc(var(--#{$prefix}icon-size-base) * 1.5),
+    --#{$prefix}icon-size-xxl: calc(var(--#{$prefix}icon-size-base) * 2),
+  ),
+  $icon-tokens
+);
+// scss-docs-end icon-tokens
+
+// stylelint-enable scss/dollar-variable-default
 
 @layer components {
   .icon {
+    @include tokens($icon-tokens);
+
     display: inline-block;
     color: inherit;
     text-align: center;
@@ -17,19 +34,19 @@ $icon-size-xxl:   calc(var(--#{$prefix}icon-size-base) * 2) !default;
       @include icon-size(var(--#{$prefix}icon-size-base));
 
       &.icon-xxl {
-        @include icon-size($icon-size-xxl);
+        @include icon-size(var(--#{$prefix}icon-size-xxl));
       }
 
       &.icon-xl {
-        @include icon-size($icon-size-xl);
+        @include icon-size(var(--#{$prefix}icon-size-xl));
       }
 
       &.icon-lg {
-        @include icon-size($icon-size-lg);
+        @include icon-size(var(--#{$prefix}icon-size-lg));
       }
 
       &.icon-sm {
-        @include icon-size($icon-size-sm);
+        @include icon-size(var(--#{$prefix}icon-size-sm));
       }
 
       @for $i from 3 through 9 {

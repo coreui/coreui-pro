@@ -4,10 +4,6 @@
 @use "mixins/transition" as *;
 @use "config" as *;
 
-// scss-docs-start alert-variables
-$alert-link-font-weight:        var(--#{$prefix}font-weight-bold) !default;
-// scss-docs-end alert-variables
-
 $alert-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
@@ -30,6 +26,7 @@ $alert-tokens: defaults(
     --#{$prefix}alert-transition-duration: .15s,
     --#{$prefix}alert-transition-timing: linear,
     --#{$prefix}hr-border-color: var(--#{$prefix}theme-border, var(--#{$prefix}border-color)),
+    --#{$prefix}alert-link-font-weight: var(--#{$prefix}font-weight-bold),
   ),
   $alert-tokens
 );
@@ -103,7 +100,7 @@ $alert-variants: defaults(
   }
 
   .alert-link {
-    font-weight: $alert-link-font-weight;
+    font-weight: var(--#{$prefix}alert-link-font-weight);
     color: var(--#{$prefix}alert-link-color);
   }
 

@@ -56,7 +56,6 @@ Add `.alert-solid` for a high-contrast alert. The background takes the theme col
     Here's a straightforward example of solid ${c.name} alert—take a look!
   </div>`)} />
 
-
 ## Live example
 
 Click the button below to show an alert (initially hidden with inline styles), then dismiss (and destroy) it using the built-in close button.
@@ -277,14 +276,6 @@ See the [v6 migration guide](/migration/v6/) for the full picture.
 Our Bootstrap alerts utilize local CSS variables on `.alert` for improved real-time customization. The values for the CSS variables are set using Sass, ensuring that Sass customization remains supported as well.
 
 <ScssDocs file="scss/_alert.scss" capture="alert-tokens" />
-
-### Sass variables
-
-<DeprecatedIn version="6.0.0" />
-
-Sass variables set these defaults at build time and are removed in v7. The CSS variables above reach the same values without recompiling, and can be set on a single element.
-
-<ScssDocs file="scss/_alert.scss" capture="alert-variables" />
 
 ### Sass maps
 

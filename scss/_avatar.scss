@@ -8,11 +8,6 @@
 // stylelint-disable custom-property-no-missing-var-function
 
 // Avatars
-// scss-docs-start avatar-variables
-// The label scales with the frame, so a size only has to be given once.
-$avatar-stack-hover-transform: translateY(-2px) !default;
-$avatar-transition:            transform .15s ease-in-out !default;
-// scss-docs-end avatar-variables
 
 $avatar-sizes: () !default;
 
@@ -48,6 +43,7 @@ $avatar-tokens: defaults(
     --#{$prefix}avatar-status-border-radius: 50em,
     --#{$prefix}avatar-status-border-width: 1px,
     --#{$prefix}avatar-status-border-color: var(--#{$prefix}bg-body),
+    --#{$prefix}avatar-transition: #{"transform .15s ease-in-out"},
   ),
   $avatar-tokens
 );
@@ -61,6 +57,7 @@ $avatar-stack-tokens: defaults(
     --#{$prefix}avatar-stack-spacing: -.4,
     --#{$prefix}avatar-stack-ring-width: 2px,
     --#{$prefix}avatar-stack-ring-color: var(--#{$prefix}bg-body),
+    --#{$prefix}avatar-stack-hover-transform: translateY(-2px),
   ),
   $avatar-stack-tokens
 );
@@ -101,7 +98,7 @@ $avatar-variants: defaults(
     vertical-align: middle;
     background-color: var(--#{$prefix}avatar-bg);
     @include border-radius(var(--#{$prefix}avatar-border-radius));
-    @include transition($avatar-transition);
+    @include transition(var(--#{$prefix}avatar-transition));
   }
 
   // scss-docs-start avatar-modifiers
@@ -164,7 +161,7 @@ $avatar-variants: defaults(
       // avatar after this one.
       &:hover {
         z-index: 1;
-        transform: #{$avatar-stack-hover-transform};
+        transform: var(--#{$prefix}avatar-stack-hover-transform);
       }
     }
   }

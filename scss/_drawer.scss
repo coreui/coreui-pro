@@ -13,10 +13,6 @@
 
 // stylelint-disable custom-property-no-missing-var-function
 
-// scss-docs-start drawer-variables
-$drawer-scale-transform:            scale(1.02) !default;
-// scss-docs-end drawer-variables
-
 $drawer-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
@@ -45,6 +41,7 @@ $drawer-tokens: defaults(
     --#{$prefix}backdrop-opacity: 25%,
     --#{$prefix}drawer-backdrop-bg: color-mix(in oklch, var(--#{$prefix}backdrop-color) var(--#{$prefix}backdrop-opacity), transparent),
     --#{$prefix}drawer-backdrop-blur: var(--#{$prefix}backdrop-blur),
+    --#{$prefix}drawer-scale-transform: scale(1.02),
   ),
   $drawer-tokens
 );
@@ -165,7 +162,7 @@ $drawer-tokens: defaults(
           }
 
           &[open].drawer-static:not(.hiding) {
-            transform: $drawer-scale-transform;
+            transform: var(--#{$prefix}drawer-scale-transform);
           }
 
           &::backdrop {

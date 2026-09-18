@@ -11,11 +11,6 @@
 
 // stylelint-disable custom-property-no-missing-var-function
 
-// scss-docs-start dialog-variables
-$dialog-slide-distance:             3rem !default;
-$dialog-scale-transform:            scale(1.02) !default;
-// scss-docs-end dialog-variables
-
 // stylelint-disable scss/dollar-variable-default
 
 // scss-docs-start dialog-sizes
@@ -62,6 +57,8 @@ $dialog-tokens: defaults(
     --#{$prefix}dialog-footer-border-color: var(--#{$prefix}border-color-translucent),
     --#{$prefix}dialog-footer-border-width: var(--#{$prefix}border-width),
     --#{$prefix}dialog-footer-gap: .5rem,
+    --#{$prefix}dialog-slide-distance: 3rem,
+    --#{$prefix}dialog-scale-transform: scale(1.02),
   ),
   $dialog-tokens
 );
@@ -106,11 +103,11 @@ $dialog-tokens: defaults(
       );
 
       &.dialog-slide-down {
-        transform: translateY(-$dialog-slide-distance);
+        transform: translateY(calc(var(--#{$prefix}dialog-slide-distance) * -1));
       }
 
       &.dialog-slide-up {
-        transform: translateY($dialog-slide-distance);
+        transform: translateY(var(--#{$prefix}dialog-slide-distance));
       }
 
       &[open]:not(.hiding) {
@@ -120,7 +117,7 @@ $dialog-tokens: defaults(
       }
 
       &[open].dialog-static:not(.hiding) {
-        transform: $dialog-scale-transform;
+        transform: var(--#{$prefix}dialog-scale-transform);
       }
 
       &::backdrop {

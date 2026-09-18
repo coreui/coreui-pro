@@ -13,9 +13,7 @@
 $header-brand-font-size:        var(--#{$prefix}font-size-lg) !default;
 
 // Compute the header-brand padding-y so the header-brand will have the same height as header-text and nav-link
-$header-brand-margin-end:       1rem !default;
 
-$header-toggler-font-size:      var(--#{$prefix}font-size-lg) !default;
 
 // scss-docs-end header-variables
 
@@ -50,6 +48,8 @@ $header-tokens: defaults(
     --#{$prefix}header-nav-link-padding-y: .5rem,
     --#{$prefix}header-divider-border-color: var(--#{$prefix}border-color),
     --#{$prefix}header-divider-border: var(--#{$prefix}border-width) solid var(--#{$prefix}header-divider-border-color),
+    --#{$prefix}header-brand-margin-end: 1rem,
+    --#{$prefix}header-toggler-font-size: var(--#{$prefix}font-size-lg),
   ),
   $header-tokens
 );
@@ -106,7 +106,7 @@ $header-tokens: defaults(
   .header-brand {
     padding-top: var(--#{$prefix}header-brand-padding-y);
     padding-bottom: var(--#{$prefix}header-brand-padding-y);
-    margin-inline-end: $header-brand-margin-end;
+    margin-inline-end: var(--#{$prefix}header-brand-margin-end);
     font-size: $header-brand-font-size;
     color: var(--#{$prefix}header-brand-color);
     text-decoration: none;
@@ -174,7 +174,7 @@ $header-tokens: defaults(
 
   .header-toggler {
     padding: var(--#{$prefix}header-toggler-padding-y) var(--#{$prefix}header-toggler-padding-x);
-    font-size: $header-toggler-font-size;
+    font-size: var(--#{$prefix}header-toggler-font-size);
     color: var(--#{$prefix}header-toggler-color);
     background-color: var(--#{$prefix}header-toggler-bg);
     border: 0; // remove default button style
@@ -193,7 +193,7 @@ $header-tokens: defaults(
 
   .header-toggler-icon {
     display: block;
-    height: calc(#{$header-toggler-font-size} * 1.25);
+    height: calc(var(--#{$prefix}header-toggler-font-size) * 1.25);
     background-color: currentcolor;
     @include mask-icon(var(--#{$prefix}header-toggler-icon-bg), 100% 100%);
   }

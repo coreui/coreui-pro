@@ -25,8 +25,6 @@ $modal-backdrop-opacity:            .5 !default;
 $modal-header-padding-y:            $modal-inner-padding !default;
 $modal-header-padding-x:            $modal-inner-padding !default;
 
-$modal-fade-transform:              translate(0, -50px) !default;
-$modal-scale-transform:             scale(1.02) !default;
 // scss-docs-end modal-variables
 
 $modal-sizes: () !default;
@@ -75,6 +73,8 @@ $modal-tokens: defaults(
     --#{$prefix}modal-footer-bg: #{null},
     --#{$prefix}modal-footer-border-color: var(--#{$prefix}border-color),
     --#{$prefix}modal-footer-border-width: #{$modal-content-border-width},
+    --#{$prefix}modal-fade-transform: translate(0, -50px),
+    --#{$prefix}modal-scale-transform: scale(1.02),
   ),
   $modal-tokens
 );
@@ -110,7 +110,7 @@ $modal-tokens: defaults(
 
     &:not(.modal-instant) {
       opacity: 0;
-      transform: $modal-fade-transform;
+      transform: var(--#{$prefix}modal-fade-transform);
       @include transition(
         opacity var(--#{$prefix}modal-transition-duration) var(--#{$prefix}modal-transition-timing),
         transform var(--#{$prefix}modal-transition-duration) var(--#{$prefix}modal-transition-timing),
@@ -129,7 +129,7 @@ $modal-tokens: defaults(
       }
 
       &[open].modal-static:not(.hiding) {
-        transform: $modal-scale-transform;
+        transform: var(--#{$prefix}modal-scale-transform);
       }
 
       &::backdrop {

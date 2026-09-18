@@ -6,10 +6,6 @@
 @use "mixins/transition" as *;
 @use "config" as *;
 
-// scss-docs-start pagination-variables
-$pagination-transition:             color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out !default;
-// scss-docs-end pagination-variables
-
 $pagination-tokens: () !default;
 
 // stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
@@ -37,6 +33,7 @@ $pagination-tokens: defaults(
     --#{$prefix}pagination-disabled-color: var(--#{$prefix}fg-3),
     --#{$prefix}pagination-disabled-bg: var(--#{$prefix}bg-2),
     --#{$prefix}pagination-disabled-border-color: var(--#{$prefix}border-color),
+    --#{$prefix}pagination-transition: #{"color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out"},
   ),
   $pagination-tokens
 );
@@ -72,7 +69,7 @@ $pagination-sizes: defaults(
     text-decoration: none;
     background-color: var(--#{$prefix}pagination-bg);
     border: var(--#{$prefix}pagination-border-width) solid var(--#{$prefix}pagination-border-color);
-    @include transition($pagination-transition);
+    @include transition(var(--#{$prefix}pagination-transition));
 
     &:hover {
       z-index: 2;
