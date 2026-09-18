@@ -114,9 +114,8 @@ Put `.is-invalid` or `.is-valid` on the group. The state also reaches the frame
 from the control inside it, so a component that validates its own field lights
 the frame up without any extra wiring. A sibling `.invalid-feedback` follows the
 `.is-invalid` class wherever it sits, on the group or on the control inside it,
-and a `.valid-feedback` waits until nothing is invalid, the frame included. The validation icon is suppressed inside
-a group — an action usually occupies that corner — and the actions carry the
-state colour instead.
+and a `.valid-feedback` waits until nothing is invalid, the frame included.
+The actions inside the group carry the state colour too.
 
 <Example code={`<div class="form-control-group is-invalid">
     <input type="text" class="form-control" value="Not quite" aria-label="Invalid example">

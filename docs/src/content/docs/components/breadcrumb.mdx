@@ -95,9 +95,9 @@ Put an inline SVG inside the element. Nothing has to be URL escaped, and `curren
 
 ### Changing every divider
 
-The separators a breadcrumb writes for itself come from [`::before`](https://developer.mozilla.org/en-US/docs/Web/CSS/::before) and [`content`](https://developer.mozilla.org/en-US/docs/Web/CSS/content). Change them all at once with the `--cui-breadcrumb-divider` custom property, or with the `$breadcrumb-divider` Sass variable. The Sass variable sets the token's default, so a global divider can still be overridden on a single breadcrumb without recompiling. Set the property on the `<ol class="breadcrumb">` itself — the token is declared there, so a value put on a wrapping element is overridden rather than inherited.
+The separators a breadcrumb writes for itself come from [`::before`](https://developer.mozilla.org/en-US/docs/Web/CSS/::before) and [`content`](https://developer.mozilla.org/en-US/docs/Web/CSS/content). Change them all at once with the `--cui-breadcrumb-divider` custom property. Set it on the `<ol class="breadcrumb">` itself — the token is declared there, so a value put on a wrapping element is overridden rather than inherited.
 
-A right-to-left breadcrumb follows the same divider unless you give it its own. Reach for `--cui-breadcrumb-divider-flipped` (or `$breadcrumb-divider-flipped`) when the separator points somewhere — `>` should become `<`, `→` should become `←` — and leave it alone for a symmetric one like `/`.
+A right-to-left breadcrumb follows the same divider unless you give it its own. Reach for `--cui-breadcrumb-divider-flipped` when the separator points somewhere — `>` should become `<`, `→` should become `←` — and leave it alone for a symmetric one like `/`.
 
 <Example code={`<nav aria-label="breadcrumb">
     <ol class="breadcrumb" style="--cui-breadcrumb-divider: '>';">
@@ -106,10 +106,12 @@ A right-to-left breadcrumb follows the same divider unless you give it its own. 
     </ol>
   </nav>`} />
 
-When modifying via Sass, the [quote](https://sass-lang.com/documentation/modules/string#quote) function is required to generate the quotes around a string. For example, using `>` as the divider, you can use this:
+The value is `content`, so a text divider has to be quoted. Using `>` as the divider:
 
-```scss
-$breadcrumb-divider: quote(">");
+```css
+.breadcrumb {
+  --cui-breadcrumb-divider: ">";
+}
 ```
 
 ### Embedded SVG
@@ -119,7 +121,7 @@ It's also possible to use an **embedded SVG icon**. Apply it via our CSS custom 
 <Callout color="info">
 ##### Using embedded SVG
 
-Inlining SVG as data URI requires to URL escape a few characters, most notably `<`, `>` and `#`. That's why the `$breadcrumb-divider` variable is passed through our [`escape-svg()` Sass function](/customize/sass/#escape-svg). When using the CSS custom property, you need to URL escape your SVG on your own. Read [Kevin Weber's explanations on CodePen](https://codepen.io/kevinweber/pen/dXWoRw ) for detailed information on what to escape.
+Inlining SVG as data URI requires to URL escape a few characters, most notably `<`, `>` and `#`. You need to URL escape your SVG yourself. Read [Kevin Weber's explanations on CodePen](https://codepen.io/kevinweber/pen/dXWoRw ) for detailed information on what to escape.
 </Callout>
 
 <Example code={`<nav aria-label="breadcrumb">
@@ -129,11 +131,13 @@ Inlining SVG as data URI requires to URL escape a few characters, most notably `
     </ol>
   </nav>`} />
 
-```scss
-$breadcrumb-divider: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='8'><path d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='#{$breadcrumb-divider-color}'/></svg>");
+```css
+.breadcrumb {
+  --cui-breadcrumb-divider: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='%236c757d'/%3E%3C/svg%3E");
+}
 ```
 
-You can also remove the divider setting `--cui-breadcrumb-divider: '';` (empty strings in CSS custom properties counts as a value), or setting the Sass variable to `$breadcrumb-divider: none;`.
+You can also remove the divider by setting `--cui-breadcrumb-divider: '';` — an empty string counts as a value in a custom property.
 
 <Example code={`<nav aria-label="breadcrumb">
     <ol class="breadcrumb" style="--cui-breadcrumb-divider: '';">

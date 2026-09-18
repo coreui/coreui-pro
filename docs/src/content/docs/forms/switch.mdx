@@ -65,7 +65,7 @@ Any other size is that one property:
 <input class="switch" type="checkbox" role="switch" style="--cui-switch-height: 2rem">
 ```
 
-The proportion is a Sass variable, `$switch-aspect-ratio`, so a squarer or longer track is set once for every size.
+`--cui-switch-width` defaults to `calc(var(--cui-switch-height) * 1.75)`, so redefining it against the height changes the proportion of every size at once.
 ## Custom width
 
 The switch reads its size from two tokens, so a wider switch with a larger thumb is two declarations — no new class.

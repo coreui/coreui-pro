@@ -114,7 +114,7 @@ A wider gap, or none at all:
   </select>`} />
 
 <Callout color="info">
-The chevron is a background image, so its color is baked into the SVG and cannot follow a `currentColor` or a theme token. That is also why dark mode swaps the whole image rather than a color — see `$form-control-select-indicator-dark` below.
+The chevron is a background image, so its color is baked into the SVG and cannot follow a `currentColor` or a theme token. That is also why dark mode swaps the whole image rather than a color: the control carries `--cui-control-select-bg-img` and `--cui-control-select-bg-img-dark` side by side, and dark mode points the first at the second.
 </Callout>
 
 ## The chevron on something that is not a select

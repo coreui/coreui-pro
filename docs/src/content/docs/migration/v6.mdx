@@ -3358,9 +3358,9 @@ them. A state names a theme colour now, and every value is a slot of it.
 -     "color": var(--cui-form-valid-color),
 -     "border-color": var(--cui-form-valid-border-color),
 -     "tooltip-bg-color": var(--cui-success),
+-     "icon": …,
 -     …
 +     "theme": "success",
-      "icon": …,
     ),
   )
 ```
@@ -3791,9 +3791,9 @@ tintable and lets dark mode deepen every shadow at once.
   job was carrying a value into a token map now sits in the map, so a value has
   one home instead of two. Set the token instead of the variable —
   `$popover-tokens: (--cui-popover-bg: hotpink)` at build time, or
-  `--cui-popover-bg` on the element at runtime. The compiled CSS is unchanged
-  byte for byte, so this reaches you only if your build set one of the removed
-  variables, and Sass then names it: `This variable was not declared with
+  `--cui-popover-bg` on the element at runtime. Moving a value out of a variable
+  and into the map does not change what compiles out, so this reaches you only
+  if your build set one of the removed variables, and Sass then names it: `This variable was not declared with
   !default in the @used module.` Each component page says which variables it
   still has: 31 lost their `### Sass variables` section entirely.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
@@ -3879,10 +3879,11 @@ tintable and lets dark mode deepen every shadow at once.
   kept only because the shared docs engine read them; it reads
   `--cui-font-weight-semibold` and `$grid-gutter-x` now. The weight lives in
   `$font-weights`, and `$grid-gutter-x` is the gutter.
-- **What stays in `scss/_config.scss` stays for a reason.** `$spacer`,
-  `$border-width`, `$theme-colors`, the `$enable-*` switches, the breakpoint,
-  container and spacer maps and the contrast helpers feed maps, mixins, loops
-  and build-time decisions rather than one token, so they stay Sass. So does every component variable a rule or a mixin
+- **What stays in `scss/_config.scss` stays for a reason.** `$spacer`, the
+  `$enable-*` switches, the breakpoint, container, spacer and border-width maps
+  and the contrast helpers feed maps, mixins, loops and build-time decisions
+  rather than one token, so they stay Sass. `$theme-colors` stays for the same
+  reason, in `scss/_theme.scss`. So does every component variable a rule or a mixin
   still reads.
 - **Component Sass variables moved from `_config.scss` into their component
   partials.** `@use ... with()` is unaffected — the entry point forwards every
