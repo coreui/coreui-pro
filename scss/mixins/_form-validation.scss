@@ -25,11 +25,11 @@ $form-feedback-tokens: defaults(
   (
     --#{$prefix}form-feedback-margin-top: .25rem,
     --#{$prefix}form-feedback-font-size: var(--#{$prefix}small-font-size),
-    --#{$prefix}form-feedback-font-style: #{null},
+    --#{$prefix}form-feedback-font-style: inherit,
     --#{$prefix}form-feedback-tooltip-padding-y: var(--#{$prefix}spacer-1),
     --#{$prefix}form-feedback-tooltip-padding-x: var(--#{$prefix}spacer-2),
     --#{$prefix}form-feedback-tooltip-font-size: var(--#{$prefix}font-size-sm),
-    --#{$prefix}form-feedback-tooltip-line-height: #{null},
+    --#{$prefix}form-feedback-tooltip-line-height: inherit,
     --#{$prefix}form-feedback-tooltip-border-radius: var(--#{$prefix}radius-4),
   ),
   $form-feedback-tokens
