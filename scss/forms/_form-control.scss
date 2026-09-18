@@ -62,7 +62,7 @@ $form-control-tokens: defaults(
 // stylelint-enable scss/dollar-variable-default, custom-property-no-missing-var-function
 
 $form-control-select-tokens: () !default;
-// stylelint-disable scss/dollar-variable-default
+// stylelint-disable scss/dollar-variable-default, custom-property-no-missing-var-function
 
 // scss-docs-start form-control-select-tokens
 $form-control-select-tokens: defaults(
@@ -76,7 +76,7 @@ $form-control-select-tokens: defaults(
 );
 // scss-docs-end form-control-select-tokens
 
-// stylelint-enable scss/dollar-variable-default
+// stylelint-enable scss/dollar-variable-default, custom-property-no-missing-var-function
 
 @layer forms {
   .form-control,
@@ -271,7 +271,7 @@ $form-control-select-tokens: defaults(
       select.form-control,
       .form-control-caret,
       .form-select {
-        background-image: var(--#{$prefix}control-select-bg-img-dark);
+        --#{$prefix}control-select-bg-img: var(--#{$prefix}control-select-bg-img-dark);
       }
     }
   }
