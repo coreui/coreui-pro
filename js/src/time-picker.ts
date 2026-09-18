@@ -8,11 +8,10 @@
  * --------------------------------------------------------------------------
  */
 
-import BaseComponent from './base-component.js'
+import PickerBase from './picker-base.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import TimeInput from './time-input.js'
-import Popup from './util/popup.js'
 import TimeSelection from './util/time-selection.js'
 import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 import type { ComponentConfig } from './util/config.js'
@@ -22,9 +21,7 @@ import {
   applyControlGroupSize,
   captureHostClasses,
   createControlGroupAction,
-  type HostClasses,
-  managedSizeClassNames,
-  restoreHostClasses
+  managedSizeClassNames
 } from './util/form-control-group.js'
 import { CLEANER_ICON, CLOCK_ICON } from './util/icons.js'
 import { defineJQueryPlugin, getUID, jQueryDispatch } from './util/index.js'
@@ -38,12 +35,7 @@ const DATA_KEY = 'coreui.time-picker'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
-const EVENT_CLICK = `click${EVENT_KEY}`
-const EVENT_HIDDEN = `hidden${EVENT_KEY}`
-const EVENT_HIDE = `hide${EVENT_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
-const EVENT_SHOW = `show${EVENT_KEY}`
-const EVENT_SHOWN = `shown${EVENT_KEY}`
 const EVENT_TIME_CHANGE = `timeChange${EVENT_KEY}`
 
 const CLASS_NAME_BODY = 'time-picker-body'
@@ -54,13 +46,10 @@ const CLASS_NAME_INDICATOR = 'form-control-action'
 const CLASS_NAME_INPUT_GROUP = 'form-control-group'
 const CLASS_NAME_PICKER = 'picker'
 const CLASS_NAME_POPUP = 'popup'
-const CLASS_NAME_SHOW = 'show'
 const CLASS_NAME_TIME_PICKER = 'time-picker'
 
-const SELECTOR_ACTION = '[data-coreui-picker-action]'
 const SELECTOR_ACTION_NOW = '[data-coreui-picker-action="now"]'
 const SELECTOR_DATA_TIME_PICKER = '[data-coreui-time-picker]'
-const SELECTOR_TEMPLATE_FOOTER = 'template[data-coreui-template="footer"]'
 
 // Icons live in JavaScript, not in CSS masks — the chips pattern.
 
@@ -131,33 +120,22 @@ const DefaultType: Record<string, string> = {
  * Class definition
  */
 
-class TimePicker extends BaseComponent {
-  protected declare _footerTemplate: any
-  protected declare _cleanerElement: HTMLElement | null
-  protected declare _indicatorElement: HTMLElement
-  protected declare _fieldElement: HTMLElement
+class TimePicker extends PickerBase {
   protected declare _initialTime: any
   protected declare _input: any
   protected declare _selection: any
   protected declare _selectionElement: any
-  protected declare _menu: any
   protected declare _syncingFromPanel: boolean
-  protected declare _hostClasses: HostClasses
-  protected declare _popup: any
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
 
-    this._footerTemplate = SelectorEngine.findOne(SELECTOR_TEMPLATE_FOOTER, this._element)
     // see DatePicker — the shell owns the initial value for reset()
     this._initialTime = config?.time ?? this._config.time
-    this._cleanerElement = null
     this._input = null
     this._selection = null
     this._syncingFromPanel = false
     this._selectionElement = null
-    this._menu = null
-    this._popup = null
 
     this._hostClasses = captureHostClasses(this._element, this._managedClassNames())
     this._createTimePicker()
@@ -179,22 +157,6 @@ class TimePicker extends BaseComponent {
   }
 
   // Public
-  show(): void {
-    if (this._config.disabled) {
-      return
-    }
-
-    this._popup.show()
-  }
-
-  hide(): void {
-    this._popup.hide()
-  }
-
-  toggle(): void {
-    return this._popup.isShown ? this.hide() : this.show()
-  }
-
   getTime(): Date | null {
     return this._input.getDate()
   }
@@ -216,62 +178,32 @@ class TimePicker extends BaseComponent {
     this.setTime(this._initialTime)
   }
 
-  getContext(): Record<string, any> {
+  override getContext(): Record<string, any> {
     return {
-      clear: () => this.clear(),
-      close: () => this.hide(),
-      disabled: this._config.disabled,
+      ...this._baseContext(),
       isTimeSelectable: (time: Date | null) => this._input.isDateSelectable(time),
       now: () => this.now(),
-      reset: () => this.reset(),
       setTime: (time: Date | null) => this.setTime(time),
       time: this.getTime()
     }
   }
 
-  override dispose(): void {
-    if (!this._element) {
-      return
-    }
-
-    for (const element of [this._menu, this._indicatorElement, this._cleanerElement]) {
-      EventHandler.off(element, EVENT_KEY)
-    }
-
-    this._popup.dispose()
+  override _disposeParts(): void {
     this._input.dispose()
     this._selection?.dispose()
     this._fieldElement.remove()
     this._cleanerElement?.remove()
-    this._indicatorElement.remove()
-
-    restoreHostClasses(this._element, this._managedClassNames(), this._hostClasses)
-
-    super.dispose()
+    this._toggleElement.remove()
   }
 
   // Private
-  _managedClassNames(): string[] {
+  override _managedClassNames(): string[] {
     return [
       CLASS_NAME_TIME_PICKER,
       CLASS_NAME_PICKER,
       CLASS_NAME_INPUT_GROUP,
       ...managedSizeClassNames(this._config.size)
     ].filter(Boolean) as string[]
-  }
-
-  // Options the inner primitives know about are forwarded by name, so their
-  // data attributes work on the picker element.
-  _forwardConfig(Component: any, overrides: Record<string, any> = {}, extra: Record<string, any> = {}): Record<string, any> {
-    const forwarded: Record<string, any> = {}
-
-    for (const key of Object.keys(Component.Default)) {
-      if (key in this._config && this._config[key] !== (Default as Record<string, any>)[key]) {
-        forwarded[key] = this._config[key]
-      }
-    }
-
-    return { ...forwarded, ...overrides, ...extra }
   }
 
   _createTimePicker(): void {
@@ -299,7 +231,7 @@ class TimePicker extends BaseComponent {
 
     const indicator = action(CLASS_NAME_INDICATOR, this._config.pickerIcon, this._config.ariaPickerLabel)
     inputGroup.append(indicator)
-    this._indicatorElement = indicator
+    this._toggleElement = indicator
 
     this._input = new TimeInput(inputEl, this._forwardConfig(TimeInput, {
       date: this._config.time,
@@ -319,8 +251,8 @@ class TimePicker extends BaseComponent {
     this._menu = document.createElement('div')
     this._menu.id = getUID(`${this.constructor.NAME}-popup-`)
     this._menu.classList.add(CLASS_NAME_POPUP, CLASS_NAME_DROPDOWN)
-    this._indicatorElement.setAttribute('aria-expanded', 'false')
-    this._indicatorElement.setAttribute('aria-haspopup', 'dialog')
+    this._toggleElement.setAttribute('aria-expanded', 'false')
+    this._toggleElement.setAttribute('aria-haspopup', 'dialog')
 
     this._selectionElement = document.createElement('div')
     this._selectionElement.classList.add(CLASS_NAME_BODY)
@@ -330,7 +262,7 @@ class TimePicker extends BaseComponent {
       const footer = document.createElement('div')
       footer.classList.add(CLASS_NAME_FOOTER)
       footer.append(this._footerTemplate.content.cloneNode(true))
-      this._disableUnselectableActions(footer)
+      this._disableUnselectableActions(SELECTOR_ACTION_NOW, footer)
       this._menu.append(footer)
     }
   }
@@ -338,16 +270,8 @@ class TimePicker extends BaseComponent {
   // See DatePicker._disableUnselectableActions — a button opting into the
   // `now` action is disabled (never re-enabled) when the current time cannot
   // be selected.
-  _disableUnselectableActions(container: HTMLElement): void {
-    if (this._input.isDateSelectable(new Date())) {
-      return
-    }
-
-    for (const button of SelectorEngine.find(SELECTOR_ACTION_NOW, container)) {
-      if ('disabled' in button) {
-        (button as any).disabled = true
-      }
-    }
+  override _isNowSelectable(): boolean {
+    return this._input.isDateSelectable(new Date())
   }
 
   // The selection body is built on first open, like the pickers' calendar.
@@ -369,55 +293,8 @@ class TimePicker extends BaseComponent {
     }, this._config.selectionOptions))
   }
 
-  _createPopup(): void {
-    this._popup = new Popup({
-      anchor: this._element,
-      container: this._config.container,
-      content: this._menu,
-      onBeforeHide: () => !EventHandler.trigger(this._element, EVENT_HIDE)?.defaultPrevented,
-      onBeforeShow: () => !EventHandler.trigger(this._element, EVENT_SHOW)?.defaultPrevented,
-      onHidden: () => EventHandler.trigger(this._element, EVENT_HIDDEN),
-      onHide: () => {
-        this._indicatorElement.removeAttribute('aria-controls')
-        this._menu.classList.remove(CLASS_NAME_SHOW)
-        this._element.classList.remove(CLASS_NAME_SHOW)
-        this._indicatorElement.setAttribute('aria-expanded', 'false')
-      },
-      onShow: () => {
-        this._indicatorElement.setAttribute('aria-controls', this._menu.id)
-        // the classes come first: the selection body scrolls the selected cell
-        // into view, which needs the dropdown to have layout
-        this._menu.classList.add(CLASS_NAME_SHOW)
-        this._element.classList.add(CLASS_NAME_SHOW)
-        this._ensureSelection()
-        this._indicatorElement.setAttribute('aria-expanded', 'true')
-      },
-      onShown: () => EventHandler.trigger(this._element, EVENT_SHOWN)
-    })
-  }
-
-  _addEventListeners(): void {
-    if (this._cleanerElement) {
-      EventHandler.on(this._cleanerElement, EVENT_CLICK, (event: any) => {
-        event.stopPropagation()
-        this.clear()
-      })
-    }
-
-    EventHandler.on(this._indicatorElement, EVENT_CLICK, () => {
-      if (!this._config.disabled) {
-        this.toggle()
-      }
-    })
-
-    EventHandler.on(this._menu, EVENT_CLICK, SELECTOR_ACTION, (event: any) => {
-      const action = event.target.closest(SELECTOR_ACTION).dataset.coreuiPickerAction
-      const context = this.getContext()
-
-      if (typeof context[action] === 'function') {
-        context[action]()
-      }
-    })
+  override _onPopupShow(): void {
+    this._ensureSelection()
   }
 
   // Static

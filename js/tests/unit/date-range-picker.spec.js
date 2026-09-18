@@ -201,6 +201,26 @@ describe('DateRangePicker', () => {
       expect(picker._popup.isShown).toBeFalse()
     })
 
+    it('should aim the calendar at the end date when the end field was focused', () => {
+      const picker = buildPicker()
+      const sections = fixtureEl.querySelectorAll('#picker .form-date-time-section')
+
+      sections[sections.length - 1].dispatchEvent(new FocusEvent('focusin', { bubbles: true }))
+
+      expect(picker._selectEndDate).toBeTrue()
+
+      sections[0].dispatchEvent(new FocusEvent('focusin', { bubbles: true }))
+
+      expect(picker._selectEndDate).toBeFalse()
+    })
+
+    it('should keep the panel inside the picker', () => {
+      const picker = buildPicker()
+      picker.show()
+
+      expect(fixtureEl.querySelector('#picker').contains(fixtureEl.querySelector('.date-picker-popup'))).toBeTrue()
+    })
+
     it('should select a full range after the start field was focused', () => {
       const picker = buildPicker()
       const el = fixtureEl.querySelector('#picker')
