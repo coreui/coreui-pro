@@ -4886,6 +4886,36 @@ describe('MultiSelect', () => {
       expect(multiSelect._togglerElement.getAttribute('aria-haspopup')).toBe('listbox')
     })
 
+    it('should not render the picker button when pickerIcon is off', () => {
+      fixtureEl.innerHTML = '<select id="test-select"></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      // eslint-disable-next-line no-new
+      new MultiSelect(selectEl, { options: [], pickerIcon: false })
+
+      expect(selectEl.parentNode.querySelector('.form-control-action')).toBeNull()
+    })
+
+    it('should place the selection cleaner without a picker button', () => {
+      fixtureEl.innerHTML = '<select id="test-select" multiple><option value="1" selected>a</option></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      // eslint-disable-next-line no-new
+      new MultiSelect(selectEl, { cleaner: true, pickerIcon: false })
+
+      expect(selectEl.parentNode.querySelector('.form-control-action')).toBeNull()
+      expect(selectEl.parentNode.querySelector('.form-control-cleaner')).not.toBeNull()
+    })
+
+    it('should keep the cleaner in the live control after setConfig turns the picker off', () => {
+      fixtureEl.innerHTML = '<select id="test-select" multiple></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { cleaner: true, options: [{ value: '1', text: 'a' }] })
+
+      multiSelect.setConfig({ pickerIcon: false })
+      multiSelect.selectAll()
+
+      expect(fixtureEl.querySelector('.form-control-cleaner')).not.toBeNull()
+    })
+
     it('should name the toggle after what it opens', () => {
       fixtureEl.innerHTML = '<select id="test-select"></select>'
       const selectEl = fixtureEl.querySelector('select')
