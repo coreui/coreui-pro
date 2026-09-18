@@ -37,6 +37,8 @@ $header-tokens: defaults(
     --#{$prefix}header-brand-padding-y: calc((#{$nav-link-height} - calc(#{$header-brand-font-size} * var(--#{$prefix}body-line-height))) * .5),
     --#{$prefix}header-brand-color: var(--#{$prefix}fg-body),
     --#{$prefix}header-brand-hover-color: var(--#{$prefix}fg-1),
+    --#{$prefix}header-brand-margin-end: 1rem,
+    --#{$prefix}header-toggler-font-size: var(--#{$prefix}font-size-lg),
     --#{$prefix}header-toggler-padding-x: .75rem,
     --#{$prefix}header-toggler-padding-y: .25rem,
     --#{$prefix}header-toggler-bg: transparent,
@@ -48,8 +50,6 @@ $header-tokens: defaults(
     --#{$prefix}header-nav-link-padding-y: .5rem,
     --#{$prefix}header-divider-border-color: var(--#{$prefix}border-color),
     --#{$prefix}header-divider-border: var(--#{$prefix}border-width) solid var(--#{$prefix}header-divider-border-color),
-    --#{$prefix}header-brand-margin-end: 1rem,
-    --#{$prefix}header-toggler-font-size: var(--#{$prefix}font-size-lg),
   ),
   $header-tokens
 );

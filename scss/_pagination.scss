@@ -22,6 +22,7 @@ $pagination-tokens: defaults(
     --#{$prefix}pagination-border-width: var(--#{$prefix}border-width),
     --#{$prefix}pagination-border-color: var(--#{$prefix}border-color),
     --#{$prefix}pagination-border-radius: var(--#{$prefix}btn-input-border-radius),
+    --#{$prefix}pagination-transition: #{"color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out"},
     --#{$prefix}pagination-hover-color: var(--#{$prefix}link-hover-color),
     --#{$prefix}pagination-hover-bg: var(--#{$prefix}bg-1),
     --#{$prefix}pagination-hover-border-color: var(--#{$prefix}border-color),
@@ -33,7 +34,6 @@ $pagination-tokens: defaults(
     --#{$prefix}pagination-disabled-color: var(--#{$prefix}fg-3),
     --#{$prefix}pagination-disabled-bg: var(--#{$prefix}bg-2),
     --#{$prefix}pagination-disabled-border-color: var(--#{$prefix}border-color),
-    --#{$prefix}pagination-transition: #{"color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out"},
   ),
   $pagination-tokens
 );

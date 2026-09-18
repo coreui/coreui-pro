@@ -22,11 +22,11 @@ $alert-tokens: defaults(
     --#{$prefix}alert-border: var(--#{$prefix}alert-border-width) solid var(--#{$prefix}alert-border-color),
     --#{$prefix}alert-border-radius: var(--#{$prefix}radius-5),
     --#{$prefix}alert-link-color: inherit,
+    --#{$prefix}alert-link-font-weight: var(--#{$prefix}font-weight-bold),
     --#{$prefix}alert-transition-property: opacity,
     --#{$prefix}alert-transition-duration: .15s,
     --#{$prefix}alert-transition-timing: linear,
     --#{$prefix}hr-border-color: var(--#{$prefix}theme-border, var(--#{$prefix}border-color)),
-    --#{$prefix}alert-link-font-weight: var(--#{$prefix}font-weight-bold),
   ),
   $alert-tokens
 );

@@ -35,6 +35,7 @@ $form-range-tokens: defaults(
     --#{$prefix}range-thumb-transition-property: #{"background-color, border-color, box-shadow"},
     --#{$prefix}range-thumb-transition-duration: .15s,
     --#{$prefix}range-thumb-transition-timing: ease-in-out,
+    --#{$prefix}range-thumb-focus-ring-width: var(--#{$prefix}focus-ring-width),
     --#{$prefix}range-tick-width: var(--#{$prefix}border-width),
     --#{$prefix}range-tick-height: .5rem,
     --#{$prefix}range-tick-minor-height: calc(var(--#{$prefix}range-tick-height) * .75),
@@ -42,7 +43,6 @@ $form-range-tokens: defaults(
     --#{$prefix}range-tick-label-margin-top: .125rem,
     --#{$prefix}range-tick-label-font-size: var(--#{$prefix}font-size-sm),
     --#{$prefix}range-tick-label-color: var(--#{$prefix}fg-2),
-    --#{$prefix}range-thumb-focus-ring-width: var(--#{$prefix}focus-ring-width),
   ),
   $form-range-tokens
 );
