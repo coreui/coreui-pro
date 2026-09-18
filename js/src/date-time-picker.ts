@@ -3,7 +3,7 @@
  * CoreUI PRO date-time-picker.js
  * License (https://coreui.io/pro/license/)
  *
- * A DateTimeInput section field plus a popup holding a Calendar and the
+ * A DateInput section field in datetime mode plus a popup holding a Calendar and the
  * TimeSelection body — the date and the time halves are independent primitives,
  * composed here.
  * --------------------------------------------------------------------------
@@ -11,7 +11,7 @@
 
 import BaseComponent from './base-component.js'
 import Calendar from './calendar.js'
-import DateTimeInput from './date-time-input.js'
+import DateInput from './date-input.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import Popup from './util/popup.js'
@@ -324,15 +324,16 @@ class DateTimePicker extends BaseComponent {
     inputGroup.append(indicator)
     this._indicatorElement = indicator
 
-    this._input = new DateTimeInput(inputEl, this._forwardConfig(DateTimeInput, {
+    this._input = new DateInput(inputEl, this._forwardConfig(DateInput, {
       date: this._config.date,
       disabled: this._config.disabled,
       locale: this._config.locale,
-      name: this._config.name
+      name: this._config.name,
+      type: 'datetime'
     }, { ...(this._config.floatingLabel ? { ariaLabel: this._config.floatingLabel } : {}), ...this._config.inputOptions }))
 
     // See DatePicker — the bridge from a typed value back to both panel halves
-    EventHandler.on(inputEl, DateTimeInput.eventName(DateTimeInput.CHANGE_EVENT_NAME), (event: any) => {
+    EventHandler.on(inputEl, DateInput.eventName(DateInput.CHANGE_EVENT_NAME), (event: any) => {
       if (!this._syncingFromPanel) {
         this._calendar?.setConfig({ startDate: event.date })
         this._selection?.setConfig({ time: event.date })

@@ -8,7 +8,9 @@
 import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
-import { convertToDateObject, getLocalDateFromString, isDateDisabled } from './util/calendar.js'
+import {
+  convertToDateObject, getLocalDateFromString, isDateDisabled, isSameInstantAs
+} from './util/calendar.js'
 import {
   applyDigitToSection,
   applyLetterToSection,
@@ -345,6 +347,10 @@ class SectionInput extends BaseComponent {
   _getDefaultSections(locale?: string): DateSection[]
   _getDefaultSections(): DateSection[] {
     throw new Error('Method "_getDefaultSections" must be implemented.')
+  }
+
+  _getAriaLabel(): string {
+    return this._config.ariaLabel
   }
 
   _convertDate(value: any): Date | null {
@@ -747,11 +753,7 @@ class SectionInput extends BaseComponent {
   }
 
   _isSameDate(date: Date | null, date2: Date | null): boolean {
-    if (date === null || date2 === null) {
-      return date === date2
-    }
-
-    return date.getTime() === date2.getTime()
+    return isSameInstantAs(date, date2)
   }
 
   _restoreAttribute(name: string, value: string | null): void {
@@ -769,7 +771,7 @@ class SectionInput extends BaseComponent {
     this._element.classList.toggle(CLASS_NAME_IS_INVALID, this._config.invalid)
     this._element.classList.toggle(CLASS_NAME_IS_VALID, this._config.valid)
     this._element.setAttribute('role', 'group')
-    this._element.setAttribute('aria-label', this._config.ariaLabel)
+    this._element.setAttribute('aria-label', this._getAriaLabel())
     this._element.innerHTML = ''
 
     for (const section of this._sections) {

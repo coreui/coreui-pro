@@ -1182,6 +1182,14 @@ export const isQuarterInRange = (date: Date, start: Date | null, end: Date | nul
  * @param date2 - Second date.
  * @returns True if both dates are the same, false otherwise.
  */
+export const isSameInstantAs = (date: Date | null, date2: Date | null) : boolean => {
+  if (date === null || date2 === null) {
+    return date === date2
+  }
+
+  return date.getTime() === date2.getTime()
+}
+
 export const isSameDateAs = (date: Date | null, date2: Date | null) : boolean => {
   if (date instanceof Date && date2 instanceof Date) {
     return (
