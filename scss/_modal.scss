@@ -10,23 +10,6 @@
 
 // stylelint-disable custom-property-no-missing-var-function
 
-// scss-docs-start modal-variables
-$modal-inner-padding:               var(--#{$prefix}spacer) !default;
-
-$modal-title-line-height:           var(--#{$prefix}body-line-height) !default;
-
-$modal-content-border-color:        var(--#{$prefix}border-color-translucent) !default;
-$modal-content-border-width:        var(--#{$prefix}border-width) !default;
-$modal-content-box-shadow-xs:       var(--#{$prefix}box-shadow-sm) !default;
-
-$modal-backdrop-bg:                 var(--#{$prefix}black) !default;
-$modal-backdrop-opacity:            .5 !default;
-
-$modal-header-padding-y:            $modal-inner-padding !default;
-$modal-header-padding-x:            $modal-inner-padding !default;
-
-// scss-docs-end modal-variables
-
 $modal-sizes: () !default;
 
 // scss-docs-start modal-sizes
@@ -50,29 +33,29 @@ $modal-tokens: defaults(
   (
     --#{$prefix}modal-zindex: var(--#{$prefix}z-modal),
     --#{$prefix}modal-width: 500px,
-    --#{$prefix}modal-padding: #{$modal-inner-padding},
+    --#{$prefix}modal-padding: var(--#{$prefix}spacer),
     --#{$prefix}modal-margin: .5rem,
     --#{$prefix}modal-color: var(--#{$prefix}fg-body),
     --#{$prefix}modal-bg: var(--#{$prefix}bg-body),
-    --#{$prefix}modal-border-color: #{$modal-content-border-color},
-    --#{$prefix}modal-border-width: #{$modal-content-border-width},
+    --#{$prefix}modal-border-color: var(--#{$prefix}border-color-translucent),
+    --#{$prefix}modal-border-width: var(--#{$prefix}border-width),
     --#{$prefix}modal-border-radius: var(--#{$prefix}radius-5),
-    --#{$prefix}modal-box-shadow: #{$modal-content-box-shadow-xs},
+    --#{$prefix}modal-box-shadow: var(--#{$prefix}box-shadow-sm),
     --#{$prefix}modal-inner-border-radius: calc(var(--#{$prefix}modal-border-radius) - var(--#{$prefix}modal-border-width)),
     --#{$prefix}modal-transition-duration: .3s,
     --#{$prefix}modal-transition-timing: ease-out,
-    --#{$prefix}modal-backdrop-bg: #{$modal-backdrop-bg},
-    --#{$prefix}modal-backdrop-opacity: #{$modal-backdrop-opacity},
-    --#{$prefix}modal-header-padding-x: #{$modal-header-padding-x},
-    --#{$prefix}modal-header-padding-y: #{$modal-header-padding-y},
-    --#{$prefix}modal-header-padding: #{$modal-header-padding-y $modal-header-padding-x},
+    --#{$prefix}modal-backdrop-bg: var(--#{$prefix}black),
+    --#{$prefix}modal-backdrop-opacity: .5,
+    --#{$prefix}modal-header-padding-x: var(--#{$prefix}modal-padding),
+    --#{$prefix}modal-header-padding-y: var(--#{$prefix}modal-padding),
+    --#{$prefix}modal-header-padding: var(--#{$prefix}modal-header-padding-y) var(--#{$prefix}modal-header-padding-x),
     --#{$prefix}modal-header-border-color: var(--#{$prefix}border-color),
-    --#{$prefix}modal-header-border-width: #{$modal-content-border-width},
-    --#{$prefix}modal-title-line-height: #{$modal-title-line-height},
+    --#{$prefix}modal-header-border-width: var(--#{$prefix}modal-border-width),
+    --#{$prefix}modal-title-line-height: var(--#{$prefix}body-line-height),
     --#{$prefix}modal-footer-gap: .5rem,
     --#{$prefix}modal-footer-bg: #{null},
     --#{$prefix}modal-footer-border-color: var(--#{$prefix}border-color),
-    --#{$prefix}modal-footer-border-width: #{$modal-content-border-width},
+    --#{$prefix}modal-footer-border-width: var(--#{$prefix}modal-border-width),
     --#{$prefix}modal-fade-transform: translate(0, -50px),
     --#{$prefix}modal-scale-transform: scale(1.02),
   ),
