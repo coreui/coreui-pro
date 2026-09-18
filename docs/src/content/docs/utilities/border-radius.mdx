@@ -60,14 +60,6 @@ The radius scale is emitted on `:root` as `--cui-radius`, the base, and `--cui-r
 
 <ScssDocs file="scss/_root.scss" capture="root-radius-loop" />
 
-### Sass variables
-
-`$radius` sets the default of `--cui-radius`; the stops are computed from that token in the browser, not from `$radius` at build time.
-
-<ScssDocs file="scss/_config.scss" capture="radius-variables" />
-
-
-
 ### Sass maps
 
 Each entry is one `--cui-radius-{step}` token as a `calc()` multiple of `--cui-radius` — override the map to add or retune a step:

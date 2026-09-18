@@ -2,30 +2,22 @@
 @use "../mixins/tokens" as *;
 @use "../config" as *;
 
-// scss-docs-start form-text-variables
-$form-text-margin-top:                  .25rem !default;
-$form-text-font-size:                   var(--#{$prefix}small-font-size) !default;
-$form-text-font-style:                  null !default;
-$form-text-font-weight:                 null !default;
-$form-text-color:                       var(--#{$prefix}fg-2) !default;
-// scss-docs-end form-text-variables
-
 $form-text-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start form-text-css-vars
+// scss-docs-start form-text-tokens
 $form-text-tokens: defaults(
   (
-    --#{$prefix}form-text-margin-top: $form-text-margin-top,
-    --#{$prefix}form-text-font-size: $form-text-font-size,
-    --#{$prefix}form-text-font-style: $form-text-font-style,
-    --#{$prefix}form-text-font-weight: $form-text-font-weight,
-    --#{$prefix}form-text-color: $form-text-color,
+    --#{$prefix}form-text-margin-top: .25rem,
+    --#{$prefix}form-text-font-size: var(--#{$prefix}small-font-size),
+    --#{$prefix}form-text-font-style: null,
+    --#{$prefix}form-text-font-weight: null,
+    --#{$prefix}form-text-color: var(--#{$prefix}fg-2),
   ),
   $form-text-tokens
 );
-// scss-docs-end form-text-css-vars
+// scss-docs-end form-text-tokens
 
 // stylelint-enable scss/dollar-variable-default
 

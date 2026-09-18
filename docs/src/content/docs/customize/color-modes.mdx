@@ -279,9 +279,7 @@ Each theme color gets a 100–900 scale of `color-mix()` tokens in `:root`, mixe
 
 <ScssDocs file="scss/_colors.scss" capture="color-scale-variables" />
 
-The one value that cannot be a `light-dark()` pair — the color baked into the select chevron SVG — keeps a dark counterpart next to the component it belongs to (the switch thumb, once the other case, is a plain color token now):
-
-<ScssDocs file="scss/forms/_form-control.scss" capture="form-control-select-dark-variables" />
+The one value that cannot be a `light-dark()` pair is a color baked into an SVG, because a data URI cannot read a custom property. The select chevron is the only one left: it carries `--cui-control-select-bg-img` and `--cui-control-select-bg-img-dark` side by side on the control, and dark mode switches which one the `background-image` reads. Both are translucent black and white, so the chevron tints itself against whatever the field sits on.
 
 ### Sass maps
 

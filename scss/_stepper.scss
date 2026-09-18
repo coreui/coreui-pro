@@ -8,86 +8,50 @@
 // stylelint-disable custom-property-no-missing-var-function
 
 // Stepper
-// scss-docs-start stepper-variables
-$stepper-steps-gap:                             .5rem !default;
-$stepper-step-gap:                              .5rem !default;
-$stepper-step-button-width:                     8rem !default;
-$stepper-step-button-color:                     var(--#{$prefix}fg-2) !default;
-$stepper-step-button-active-color:              var(--#{$prefix}fg-2) !default;
-$stepper-step-button-complete-color:            var(--#{$prefix}fg-2) !default;
-$stepper-step-button-disabled-color:            var(--#{$prefix}fg-2) !default;
-$stepper-step-indicator-width:                  2rem !default;
-$stepper-step-indicator-height:                 2rem !default;
-$stepper-step-indicator-color:                  var(--#{$prefix}fg-3) !default;
-$stepper-step-indicator-bg:                     transparent !default;
-$stepper-step-indicator-border-width:           var(--#{$prefix}border-width) !default;
-$stepper-step-indicator-border-color:           var(--#{$prefix}border-color) !default;
-$stepper-step-indicator-transition:             color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out !default;
-$stepper-step-indicator-active-color:           var(--#{$prefix}primary-base) !default;
-$stepper-step-indicator-active-bg:              color-mix(in oklch, var(--#{$prefix}theme-bg, var(--#{$prefix}stepper-step-indicator-active-color)) 5%, transparent) !default;
-$stepper-step-indicator-active-border-color:    var(--#{$prefix}primary-base) !default;
-$stepper-step-indicator-complete-color:         var(--#{$prefix}primary-contrast) !default;
-$stepper-step-indicator-complete-bg:            var(--#{$prefix}primary-base) !default;
-$stepper-step-indicator-complete-border-color:  var(--#{$prefix}primary-base) !default;
-$stepper-step-indicator-disabled-color:         var(--#{$prefix}fg-3) !default;
-$stepper-step-indicator-disabled-bg:            transparent !default;
-$stepper-step-indicator-disabled-border-color:  var(--#{$prefix}border-color) !default;
-$stepper-step-indicator-icon:                   url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpolygon fill='var(--ci-primary-color, currentColor)' points='200.359 382.269 61.057 251.673 82.943 228.327 199.641 337.731 428.686 108.687 451.314 131.313 200.359 382.269' class='ci-primary'/%3E%3C/svg%3E") !default;
-$stepper-step-indicator-icon-color:             var(--#{$prefix}primary-contrast) !default;
-$stepper-step-indicator-icon-size:              1rem !default;
-
-$stepper-step-connector-height:                 .125rem !default;
-$stepper-step-connector-gap:                    1rem !default;
-$stepper-step-connector-bg:                     var(--#{$prefix}bg-4) !default;
-$stepper-step-connector-complete-bg:            var(--#{$prefix}primary-base) !default;
-$stepper-step-connector-transition:             background-color .15s ease-in-out !default;
-
-$stepper-step-content-transition:               height .3s ease-in-out !default;
-// scss-docs-end stepper-variables
 
 $stepper-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start stepper-css-vars
+// scss-docs-start stepper-tokens
 $stepper-tokens: defaults(
   (
-    --#{$prefix}stepper-steps-gap: #{$stepper-steps-gap},
-    --#{$prefix}stepper-step-gap: #{$stepper-step-gap},
-    --#{$prefix}stepper-step-button-width: #{$stepper-step-button-width},
-    --#{$prefix}stepper-step-button-color: #{$stepper-step-button-color},
-    --#{$prefix}stepper-step-button-active-color: #{$stepper-step-button-active-color},
-    --#{$prefix}stepper-step-button-complete-color: #{$stepper-step-button-complete-color},
-    --#{$prefix}stepper-step-button-disabled-color: #{$stepper-step-button-disabled-color},
-    --#{$prefix}stepper-step-indicator-width: #{$stepper-step-indicator-width},
-    --#{$prefix}stepper-step-indicator-height: #{$stepper-step-indicator-height},
-    --#{$prefix}stepper-step-indicator-bg: #{$stepper-step-indicator-bg},
-    --#{$prefix}stepper-step-indicator-color: #{$stepper-step-indicator-color},
-    --#{$prefix}stepper-step-indicator-border-width: #{$stepper-step-indicator-border-width},
-    --#{$prefix}stepper-step-indicator-border-color: #{$stepper-step-indicator-border-color},
-    --#{$prefix}stepper-step-indicator-transition: #{$stepper-step-indicator-transition},
-    --#{$prefix}stepper-step-indicator-active-color: #{$stepper-step-indicator-active-color},
-    --#{$prefix}stepper-step-indicator-active-bg: #{$stepper-step-indicator-active-bg},
-    --#{$prefix}stepper-step-indicator-active-border-color: #{$stepper-step-indicator-active-border-color},
-    --#{$prefix}stepper-step-indicator-complete-color: #{$stepper-step-indicator-complete-color},
-    --#{$prefix}stepper-step-indicator-complete-bg: #{$stepper-step-indicator-complete-bg},
-    --#{$prefix}stepper-step-indicator-complete-border-color: #{$stepper-step-indicator-complete-border-color},
-    --#{$prefix}stepper-step-indicator-disabled-color: #{$stepper-step-indicator-disabled-color},
-    --#{$prefix}stepper-step-indicator-disabled-bg: #{$stepper-step-indicator-disabled-bg},
-    --#{$prefix}stepper-step-indicator-disabled-border-color: #{$stepper-step-indicator-disabled-border-color},
-    --#{$prefix}stepper-step-indicator-icon: #{$stepper-step-indicator-icon},
-    --#{$prefix}stepper-step-indicator-icon-color: #{$stepper-step-indicator-icon-color},
-    --#{$prefix}stepper-step-indicator-icon-size: #{$stepper-step-indicator-icon-size},
-    --#{$prefix}stepper-step-connector-height: #{$stepper-step-connector-height},
-    --#{$prefix}stepper-step-connector-gap: #{$stepper-step-connector-gap},
-    --#{$prefix}stepper-step-connector-bg: #{$stepper-step-connector-bg},
-    --#{$prefix}stepper-step-connector-complete-bg: #{$stepper-step-connector-complete-bg},
-    --#{$prefix}stepper-step-connector-transition: #{$stepper-step-connector-transition},
-    --#{$prefix}stepper-step-content-transition: #{$stepper-step-content-transition},
+    --#{$prefix}stepper-steps-gap: .5rem,
+    --#{$prefix}stepper-step-gap: .5rem,
+    --#{$prefix}stepper-step-button-width: 8rem,
+    --#{$prefix}stepper-step-button-color: var(--#{$prefix}fg-2),
+    --#{$prefix}stepper-step-button-active-color: var(--#{$prefix}fg-2),
+    --#{$prefix}stepper-step-button-complete-color: var(--#{$prefix}fg-2),
+    --#{$prefix}stepper-step-button-disabled-color: var(--#{$prefix}fg-2),
+    --#{$prefix}stepper-step-indicator-width: 2rem,
+    --#{$prefix}stepper-step-indicator-height: 2rem,
+    --#{$prefix}stepper-step-indicator-bg: transparent,
+    --#{$prefix}stepper-step-indicator-color: var(--#{$prefix}fg-3),
+    --#{$prefix}stepper-step-indicator-border-width: var(--#{$prefix}border-width),
+    --#{$prefix}stepper-step-indicator-border-color: var(--#{$prefix}border-color),
+    --#{$prefix}stepper-step-indicator-transition: #{color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out},
+    --#{$prefix}stepper-step-indicator-active-color: var(--#{$prefix}primary-base),
+    --#{$prefix}stepper-step-indicator-active-bg: color-mix(in oklch, var(--#{$prefix}theme-bg, var(--#{$prefix}stepper-step-indicator-active-color)) 5%, transparent),
+    --#{$prefix}stepper-step-indicator-active-border-color: var(--#{$prefix}primary-base),
+    --#{$prefix}stepper-step-indicator-complete-color: var(--#{$prefix}primary-contrast),
+    --#{$prefix}stepper-step-indicator-complete-bg: var(--#{$prefix}primary-base),
+    --#{$prefix}stepper-step-indicator-complete-border-color: var(--#{$prefix}primary-base),
+    --#{$prefix}stepper-step-indicator-disabled-color: var(--#{$prefix}fg-3),
+    --#{$prefix}stepper-step-indicator-disabled-bg: transparent,
+    --#{$prefix}stepper-step-indicator-disabled-border-color: var(--#{$prefix}border-color),
+    --#{$prefix}stepper-step-indicator-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpolygon fill='var(--ci-primary-color, currentColor)' points='200.359 382.269 61.057 251.673 82.943 228.327 199.641 337.731 428.686 108.687 451.314 131.313 200.359 382.269' class='ci-primary'/%3E%3C/svg%3E"),
+    --#{$prefix}stepper-step-indicator-icon-color: var(--#{$prefix}primary-contrast),
+    --#{$prefix}stepper-step-indicator-icon-size: 1rem,
+    --#{$prefix}stepper-step-connector-height: .125rem,
+    --#{$prefix}stepper-step-connector-gap: 1rem,
+    --#{$prefix}stepper-step-connector-bg: var(--#{$prefix}bg-4),
+    --#{$prefix}stepper-step-connector-complete-bg: var(--#{$prefix}primary-base),
+    --#{$prefix}stepper-step-connector-transition: background-color .15s ease-in-out,
+    --#{$prefix}stepper-step-content-transition: height .3s ease-in-out,
   ),
   $stepper-tokens
 );
-// scss-docs-end stepper-css-vars
+// scss-docs-end stepper-tokens
 
 // stylelint-enable scss/dollar-variable-default
 @layer components {

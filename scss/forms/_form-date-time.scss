@@ -4,12 +4,6 @@
 @use "../mixins/tokens" as *;
 @use "../config" as *;
 
-// scss-docs-start form-date-time-variables
-$form-date-time-placeholder-color:       var(--#{$prefix}fg-3) !default;
-$form-date-time-section-border-radius:   .25rem !default;
-$form-date-time-section-focus-bg:        color-mix(in oklch, var(--#{$prefix}theme-bg, var(--#{$prefix}primary-base)) 25%, transparent) !default;
-// scss-docs-end form-date-time-variables
-
 // stylelint-disable scss/dollar-variable-default
 
 // scss-docs-start form-date-time-tokens
@@ -18,9 +12,9 @@ $form-date-time-section-focus-bg:        color-mix(in oklch, var(--#{$prefix}the
 $form-date-time-tokens: () !default;
 $form-date-time-tokens: defaults(
   (
-    --#{$prefix}form-date-time-placeholder-color: #{$form-date-time-placeholder-color},
-    --#{$prefix}form-date-time-section-border-radius: #{$form-date-time-section-border-radius},
-    --#{$prefix}form-date-time-section-focus-bg: #{$form-date-time-section-focus-bg},
+    --#{$prefix}form-date-time-placeholder-color: var(--#{$prefix}fg-3),
+    --#{$prefix}form-date-time-section-border-radius: .25rem,
+    --#{$prefix}form-date-time-section-focus-bg: color-mix(in oklch, var(--#{$prefix}theme-bg, var(--#{$prefix}primary-base)) 25%, transparent),
   ),
   $form-date-time-tokens
 );

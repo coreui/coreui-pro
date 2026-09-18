@@ -3,30 +3,22 @@
 @use "mixins/tokens" as *;
 @use "config" as *;
 
-// scss-docs-start transfer-variables
-$transfer-gap:              1rem !default;
-$transfer-actions-gap:      .5rem !default;
-$transfer-icon-size:        1rem !default;
-$transfer-list-min-height:  8rem !default;
-$transfer-list-max-height:  16rem !default;
-// scss-docs-end transfer-variables
-
 $transfer-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start transfer-css-vars
+// scss-docs-start transfer-tokens
 $transfer-tokens: defaults(
   (
-    --#{$prefix}transfer-gap: #{$transfer-gap},
-    --#{$prefix}transfer-actions-gap: #{$transfer-actions-gap},
-    --#{$prefix}transfer-icon-size: #{$transfer-icon-size},
-    --#{$prefix}transfer-list-min-height: #{$transfer-list-min-height},
-    --#{$prefix}transfer-list-max-height: #{$transfer-list-max-height},
+    --#{$prefix}transfer-gap: 1rem,
+    --#{$prefix}transfer-actions-gap: .5rem,
+    --#{$prefix}transfer-icon-size: 1rem,
+    --#{$prefix}transfer-list-min-height: 8rem,
+    --#{$prefix}transfer-list-max-height: 16rem,
   ),
   $transfer-tokens
 );
-// scss-docs-end transfer-css-vars
+// scss-docs-end transfer-tokens
 
 // stylelint-enable scss/dollar-variable-default
 

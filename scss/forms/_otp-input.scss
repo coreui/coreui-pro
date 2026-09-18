@@ -7,24 +7,6 @@
 @use "../config" as *;
 @use "form-control" as *;
 
-// scss-docs-start form-otp-variables
-$form-otp-gap:                         .125rem !default;
-$form-otp-control-width:               2rem !default;
-$form-otp-control-padding-x:           0 !default;
-
-$form-otp-control-width-sm:            1.5rem !default;
-$form-otp-control-padding-y-sm:        var(--#{$prefix}btn-input-sm-padding-y) !default;
-$form-otp-control-padding-x-sm:        0 !default;
-$form-otp-control-font-size-sm:        var(--#{$prefix}btn-input-sm-font-size) !default;
-$form-otp-control-border-radius-sm:    var(--#{$prefix}btn-input-sm-border-radius) !default;
-
-$form-otp-control-width-lg:            2.5rem !default;
-$form-otp-control-padding-y-lg:        var(--#{$prefix}btn-input-lg-padding-y) !default;
-$form-otp-control-padding-x-lg:        0 !default;
-$form-otp-control-font-size-lg:        var(--#{$prefix}btn-input-lg-font-size) !default;
-$form-otp-control-border-radius-lg:    var(--#{$prefix}btn-input-lg-border-radius) !default;
-// scss-docs-end form-otp-variables
-
 $form-otp-sizes: () !default;
 
 // scss-docs-start form-otp-sizes
@@ -32,18 +14,18 @@ $form-otp-sizes: () !default;
 $form-otp-sizes: defaults(
   (
     "sm": (
-      width:         $form-otp-control-width-sm,
-      padding-y:     $form-otp-control-padding-y-sm,
-      padding-x:     $form-otp-control-padding-x-sm,
-      font-size:     $form-otp-control-font-size-sm,
-      border-radius: $form-otp-control-border-radius-sm,
+      width:         1.5rem,
+      padding-y:     var(--#{$prefix}btn-input-sm-padding-y),
+      padding-x:     0,
+      font-size:     var(--#{$prefix}btn-input-sm-font-size),
+      border-radius: var(--#{$prefix}btn-input-sm-border-radius),
     ),
     "lg": (
-      width:         $form-otp-control-width-lg,
-      padding-y:     $form-otp-control-padding-y-lg,
-      padding-x:     $form-otp-control-padding-x-lg,
-      font-size:     $form-otp-control-font-size-lg,
-      border-radius: $form-otp-control-border-radius-lg,
+      width:         2.5rem,
+      padding-y:     var(--#{$prefix}btn-input-lg-padding-y),
+      padding-x:     0,
+      font-size:     var(--#{$prefix}btn-input-lg-font-size),
+      border-radius: var(--#{$prefix}btn-input-lg-border-radius),
     ),
   ),
   $form-otp-sizes
@@ -56,7 +38,7 @@ $form-otp-sizes: defaults(
 $form-otp-tokens: () !default;
 $form-otp-tokens: defaults(
   (
-    --#{$prefix}form-otp-gap: #{$form-otp-gap},
+    --#{$prefix}form-otp-gap: .125rem,
   ),
   $form-otp-tokens
 );
@@ -70,8 +52,8 @@ $form-otp-tokens: defaults(
 $form-otp-control-tokens: () !default;
 $form-otp-control-tokens: defaults(
   (
-    --#{$prefix}control-padding-x: #{$form-otp-control-padding-x},
-    --#{$prefix}form-otp-control-width: #{$form-otp-control-width},
+    --#{$prefix}control-padding-x: 0,
+    --#{$prefix}form-otp-control-width: 2rem,
   ),
   $form-otp-control-tokens
 );

@@ -6,27 +6,10 @@
 @use "config" as *;
 
 // scss-docs-start badge-variables
-$badge-gap:                         .375em !default;
-$badge-min-height:                  1.375rem !default;
-$badge-padding-y:                   .25em !default;
-$badge-padding-x:                   .625em !default;
-$badge-font-size:                   .75em !default;
 $badge-font-size-floor:             12px !default;
-$badge-font-weight:                 var(--#{$prefix}font-weight-semibold) !default;
-$badge-color:                       inherit !default;
-$badge-bg:                          var(--#{$prefix}bg-2) !default;
-$badge-border-width:                var(--#{$prefix}border-width) !default;
-$badge-border-color:                transparent !default;
-$badge-border-radius:               var(--#{$prefix}radius-7) !default;
 
-$badge-min-height-sm:               1.125rem !default;
-$badge-padding-y-sm:                .2em !default;
-$badge-padding-x-sm:                .5em !default;
 $badge-font-size-sm:                .65em !default;
 
-$badge-min-height-lg:               1.75rem !default;
-$badge-padding-y-lg:                .375em !default;
-$badge-padding-x-lg:                .875em !default;
 $badge-font-size-lg:                .875em !default;
 // scss-docs-end badge-variables
 
@@ -36,8 +19,8 @@ $badge-sizes: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
 $badge-sizes: defaults(
   (
-    "sm": (min-height: $badge-min-height-sm, padding-y: $badge-padding-y-sm, padding-x: $badge-padding-x-sm, font-size: $badge-font-size-sm),
-    "lg": (min-height: $badge-min-height-lg, padding-y: $badge-padding-y-lg, padding-x: $badge-padding-x-lg, font-size: $badge-font-size-lg),
+    "sm": (min-height: 1.125rem, padding-y: .2em, padding-x: .5em, font-size: $badge-font-size-sm),
+    "lg": (min-height: 1.75rem, padding-y: .375em, padding-x: .875em, font-size: $badge-font-size-lg),
   ),
   $badge-sizes
 );
@@ -47,24 +30,24 @@ $badge-tokens: () !default;
 
 // stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
-// scss-docs-start badge-css-vars
+// scss-docs-start badge-tokens
 $badge-tokens: defaults(
   (
-    --#{$prefix}badge-gap: #{$badge-gap},
-    --#{$prefix}badge-min-height: #{$badge-min-height},
-    --#{$prefix}badge-padding-x: #{$badge-padding-x},
-    --#{$prefix}badge-padding-y: #{$badge-padding-y},
-    --#{$prefix}badge-font-size: clamp(#{$badge-font-size-floor}, #{$badge-font-size}, #{$badge-font-size}),
-    --#{$prefix}badge-font-weight: #{$badge-font-weight},
-    --#{$prefix}badge-color: var(--#{$prefix}theme-contrast, #{$badge-color}),
-    --#{$prefix}badge-bg: var(--#{$prefix}theme-bg, #{$badge-bg}),
-    --#{$prefix}badge-border-width: #{$badge-border-width},
-    --#{$prefix}badge-border-color: #{$badge-border-color},
-    --#{$prefix}badge-border-radius: #{$badge-border-radius},
+    --#{$prefix}badge-gap: .375em,
+    --#{$prefix}badge-min-height: 1.375rem,
+    --#{$prefix}badge-padding-x: .625em,
+    --#{$prefix}badge-padding-y: .25em,
+    --#{$prefix}badge-font-size: clamp(#{$badge-font-size-floor}, .75em, .75em),
+    --#{$prefix}badge-font-weight: var(--#{$prefix}font-weight-semibold),
+    --#{$prefix}badge-color: var(--#{$prefix}theme-contrast, inherit),
+    --#{$prefix}badge-bg: var(--#{$prefix}theme-bg, var(--#{$prefix}bg-2)),
+    --#{$prefix}badge-border-width: var(--#{$prefix}border-width),
+    --#{$prefix}badge-border-color: transparent,
+    --#{$prefix}badge-border-radius: var(--#{$prefix}radius-7),
   ),
   $badge-tokens
 );
-// scss-docs-end badge-css-vars
+// scss-docs-end badge-tokens
 
 $badge-variants: () !default;
 

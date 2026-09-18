@@ -7,23 +7,7 @@
 @use "config" as *;
 
 // scss-docs-start progress-variables
-$progress-height:                      1rem !default;
-$progress-font-size:                   var(--#{$prefix}font-size-sm) !default;
-$progress-bg:                          var(--#{$prefix}bg-2) !default;
-$progress-border-radius:               var(--#{$prefix}radius-5) !default;
-$progress-box-shadow:                  var(--#{$prefix}box-shadow-inset) !default;
-$progress-bar-color:                   var(--#{$prefix}primary-contrast) !default;
-$progress-bar-bg:                      var(--#{$prefix}primary-bg) !default;
-$progress-bar-bg-image:                none !default;
-$progress-bar-stripes:                 linear-gradient(45deg, var(--#{$prefix}progress-bar-stripe-color) 25%, transparent 25%, transparent 50%, var(--#{$prefix}progress-bar-stripe-color) 50%, var(--#{$prefix}progress-bar-stripe-color) 75%, transparent 75%, transparent) !default;
-$progress-bar-stripe-color:            color-mix(in oklch, var(--#{$prefix}white) 15%, transparent) !default;
-$progress-bar-transition:              width .6s ease !default;
-$progress-bar-animation:               progress-bar-stripes 1s linear infinite !default;
-
 $progress-segments:                    null !default;
-$progress-segment-gap:                 .25rem !default;
-$progress-segment-min-width:           .25rem !default;
-$progress-segment-border-radius:       var(--#{$prefix}radius-2) !default;
 
 $progress-contrast-track-opacity:      20% !default;
 // scss-docs-end progress-variables
@@ -32,34 +16,34 @@ $progress-tokens: () !default;
 
 // stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
-// scss-docs-start progress-css-vars
+// scss-docs-start progress-tokens
 $progress-tokens: defaults(
   (
-    --#{$prefix}progress-height: #{$progress-height},
-    --#{$prefix}progress-font-size: #{$progress-font-size},
-    --#{$prefix}progress-bg: #{$progress-bg},
-    --#{$prefix}progress-border-radius: #{$progress-border-radius},
-    --#{$prefix}progress-box-shadow: #{$progress-box-shadow},
-    --#{$prefix}progress-bar-color: #{$progress-bar-color},
-    --#{$prefix}progress-bar-bg: #{$progress-bar-bg},
-    --#{$prefix}progress-bar-bg-image: #{$progress-bar-bg-image},
-    --#{$prefix}progress-bar-stripes: #{$progress-bar-stripes},
-    --#{$prefix}progress-bar-stripe-color: #{$progress-bar-stripe-color},
-    --#{$prefix}progress-bar-transition: #{$progress-bar-transition},
-    --#{$prefix}progress-bar-animation: #{$progress-bar-animation},
+    --#{$prefix}progress-height: 1rem,
+    --#{$prefix}progress-font-size: var(--#{$prefix}font-size-sm),
+    --#{$prefix}progress-bg: var(--#{$prefix}bg-2),
+    --#{$prefix}progress-border-radius: var(--#{$prefix}radius-5),
+    --#{$prefix}progress-box-shadow: var(--#{$prefix}box-shadow-inset),
+    --#{$prefix}progress-bar-color: var(--#{$prefix}primary-contrast),
+    --#{$prefix}progress-bar-bg: var(--#{$prefix}primary-bg),
+    --#{$prefix}progress-bar-bg-image: none,
+    --#{$prefix}progress-bar-stripes: linear-gradient(45deg, var(--#{$prefix}progress-bar-stripe-color) 25%, transparent 25%, transparent 50%, var(--#{$prefix}progress-bar-stripe-color) 50%, var(--#{$prefix}progress-bar-stripe-color) 75%, transparent 75%, transparent),
+    --#{$prefix}progress-bar-stripe-color: color-mix(in oklch, var(--#{$prefix}white) 15%, transparent),
+    --#{$prefix}progress-bar-transition: width .6s ease,
+    --#{$prefix}progress-bar-animation: progress-bar-stripes 1s linear infinite,
   ),
   $progress-tokens
 );
-// scss-docs-end progress-css-vars
+// scss-docs-end progress-tokens
 
 $progress-segmented-tokens: () !default;
 
-// scss-docs-start progress-segmented-css-vars
+// scss-docs-start progress-segmented-tokens
 $progress-segmented-tokens: defaults(
   (
-    --#{$prefix}progress-segment-gap: #{$progress-segment-gap},
-    --#{$prefix}progress-segment-min-width: #{$progress-segment-min-width},
-    --#{$prefix}progress-segment-border-radius: #{$progress-segment-border-radius},
+    --#{$prefix}progress-segment-gap: .25rem,
+    --#{$prefix}progress-segment-min-width: .25rem,
+    --#{$prefix}progress-segment-border-radius: var(--#{$prefix}radius-2),
   ),
   $progress-segmented-tokens
 );
@@ -68,7 +52,7 @@ $progress-segmented-tokens: defaults(
 @if $progress-segments != null {
   $progress-segmented-tokens: map.set($progress-segmented-tokens, --#{$prefix}progress-segments, $progress-segments);
 }
-// scss-docs-end progress-segmented-css-vars
+// scss-docs-end progress-segmented-tokens
 
 // stylelint-enable custom-property-no-missing-var-function, scss/dollar-variable-default
 @layer components {

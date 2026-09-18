@@ -4,37 +4,27 @@
 @use "config" as *;
 
 // Callouts
-// scss-docs-start callout-variables
-$callout-padding-y:                 var(--#{$prefix}spacer) !default;
-$callout-padding-x:                 var(--#{$prefix}spacer) !default;
-$callout-margin-y:                  var(--#{$prefix}spacer) !default;
-$callout-margin-x:                  0 !default;
-$callout-border-radius:             var(--#{$prefix}radius-5) !default;
-$callout-border-width:              var(--#{$prefix}border-width) !default;
-$callout-border-color:              var(--#{$prefix}border-color) !default;
-$callout-border-left-width:         calc(#{$callout-border-width} * 4) !default;
-// scss-docs-end callout-variables
 
 $callout-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start callout-css-vars
+// scss-docs-start callout-tokens
 $callout-tokens: defaults(
   (
-    --#{$prefix}callout-padding-x: #{$callout-padding-x},
-    --#{$prefix}callout-padding-y: #{$callout-padding-y},
-    --#{$prefix}callout-margin-x: #{$callout-margin-x},
-    --#{$prefix}callout-margin-y: #{$callout-margin-y},
-    --#{$prefix}callout-border-width: #{$callout-border-width},
-    --#{$prefix}callout-border-color: var(--#{$prefix}theme-border, #{$callout-border-color}),
-    --#{$prefix}callout-border-left-width: #{$callout-border-left-width},
+    --#{$prefix}callout-padding-x: var(--#{$prefix}spacer),
+    --#{$prefix}callout-padding-y: var(--#{$prefix}spacer),
+    --#{$prefix}callout-margin-x: 0,
+    --#{$prefix}callout-margin-y: var(--#{$prefix}spacer),
+    --#{$prefix}callout-border-width: var(--#{$prefix}border-width),
+    --#{$prefix}callout-border-color: var(--#{$prefix}theme-border, var(--#{$prefix}border-color)),
+    --#{$prefix}callout-border-left-width: calc(var(--#{$prefix}border-width) * 4),
     --#{$prefix}callout-border-left-color: var(--#{$prefix}theme-bg, var(--#{$prefix}callout-border-color)),
-    --#{$prefix}callout-border-radius: #{$callout-border-radius},
+    --#{$prefix}callout-border-radius: var(--#{$prefix}radius-5),
   ),
   $callout-tokens
 );
-// scss-docs-end callout-css-vars
+// scss-docs-end callout-tokens
 
 // stylelint-enable scss/dollar-variable-default
 @layer components {

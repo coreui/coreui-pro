@@ -7,34 +7,30 @@
 
 // scss-docs-start sidebar-narrow-variables
 $sidebar-narrow-width:                     4rem !default;
-$sidebar-narrow-padding-x:                 .5rem !default;
-$sidebar-narrow-nav-link-padding-y:        .75rem !default;
-$sidebar-narrow-nav-link-padding-x:        .5rem !default;
-$sidebar-narrow-unfoldable-box-shadow:     var(--#{$prefix}box-shadow) !default;
 // scss-docs-end sidebar-narrow-variables
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start sidebar-narrow-css-vars
+// scss-docs-start sidebar-narrow-tokens
 $sidebar-narrow-tokens: () !default;
 $sidebar-narrow-tokens: defaults(
   (
     --#{$prefix}sidebar-narrow-width: #{$sidebar-narrow-width},
-    --#{$prefix}sidebar-padding-x: #{$sidebar-narrow-padding-x},
+    --#{$prefix}sidebar-padding-x: .5rem,
   ),
   $sidebar-narrow-tokens
 );
-// scss-docs-end sidebar-narrow-css-vars
+// scss-docs-end sidebar-narrow-tokens
 
-// scss-docs-start sidebar-narrow-unfoldable-css-vars
+// scss-docs-start sidebar-narrow-unfoldable-tokens
 $sidebar-narrow-unfoldable-tokens: () !default;
 $sidebar-narrow-unfoldable-tokens: defaults(
   (
-    --#{$prefix}sidebar-narrow-unfoldable-box-shadow: #{$sidebar-narrow-unfoldable-box-shadow},
+    --#{$prefix}sidebar-narrow-unfoldable-box-shadow: var(--#{$prefix}box-shadow),
   ),
   $sidebar-narrow-unfoldable-tokens
 );
-// scss-docs-end sidebar-narrow-unfoldable-css-vars
+// scss-docs-end sidebar-narrow-unfoldable-tokens
 
 // stylelint-enable scss/dollar-variable-default
 
@@ -54,8 +50,8 @@ $sidebar-narrow-unfoldable-tokens: defaults(
       }
 
       .sidebar-nav {
-        --#{$prefix}sidebar-nav-link-padding-x: #{$sidebar-narrow-nav-link-padding-x};
-        --#{$prefix}sidebar-nav-link-padding-y: #{$sidebar-narrow-nav-link-padding-y};
+        --#{$prefix}sidebar-nav-link-padding-x: #{.5rem};
+        --#{$prefix}sidebar-nav-link-padding-y: #{.75rem};
       }
 
       .nav-link {

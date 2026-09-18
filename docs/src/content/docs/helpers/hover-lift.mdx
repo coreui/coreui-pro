@@ -31,7 +31,7 @@ Because it only touches those two properties, it works just as well on a control
 
 CoreUI for Bootstrap's hover lift uses local CSS variables on `.hover-lift` for enhanced real-time customization.
 
-<ScssDocs file="scss/helpers/_hover-lift.scss" capture="hover-lift-css-vars" />
+<ScssDocs file="scss/helpers/_hover-lift.scss" capture="hover-lift-tokens" />
 
 Override them to tune the distance, the shadow or the timing — a larger rise with a snappier transition:
 
@@ -41,11 +41,3 @@ Override them to tune the distance, the shadow or the timing — a larger rise w
       <p class="card-text mb-0">Customized transform and duration.</p>
     </div>
   </a>`} />
-
-### Sass variables
-
-<DeprecatedIn version="6.0.0" />
-
-Sass variables set these defaults at build time and are removed in v7. The CSS variables above reach the same values without recompiling, and can be set on a single element.
-
-<ScssDocs file="scss/helpers/_hover-lift.scss" capture="hover-lift-variables" />

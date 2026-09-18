@@ -11,94 +11,54 @@
 // and classes — Menu is the new-generation surface the JS implementation is
 // built around (see js/src/menu.ts).
 
-// scss-docs-start menu-variables
-$menu-zindex:                   var(--#{$prefix}z-menu) !default;
-$menu-gap:                      .125rem !default;
-$menu-min-width:                10rem !default;
-$menu-max-height:               none !default;
-$menu-overflow-y:               visible !default;
-$menu-padding-x:                .25rem !default;
-$menu-padding-y:                .25rem !default;
-$menu-font-size:                var(--#{$prefix}font-size-sm) !default;
-$menu-color:                    var(--#{$prefix}fg-body) !default;
-$menu-bg:                       var(--#{$prefix}bg-body) !default;
-$menu-border-color:             var(--#{$prefix}border-color-translucent) !default;
-$menu-border-radius:            var(--#{$prefix}radius-7) !default;
-$menu-border-width:             var(--#{$prefix}border-width) !default;
-$menu-box-shadow:               var(--#{$prefix}box-shadow-lg) !default;
-$menu-divider-bg:               var(--#{$prefix}border-color-translucent) !default;
-$menu-divider-margin-y:         .125rem !default;
-$menu-divider-margin-x:         .25rem !default;
-$menu-item-color:               var(--#{$prefix}menu-color, var(--#{$prefix}fg-body)) !default;
-$menu-item-hover-color:         var(--#{$prefix}menu-color, var(--#{$prefix}fg-body)) !default;
-$menu-item-hover-bg:            var(--#{$prefix}bg-1) !default;
-$menu-item-active-color:        var(--#{$prefix}primary-contrast) !default;
-$menu-item-active-bg:           var(--#{$prefix}primary-bg) !default;
-$menu-item-disabled-color:      var(--#{$prefix}fg-3) !default;
-$menu-item-font-weight:         var(--#{$prefix}font-weight-normal) !default;
-$menu-item-gap:                 .5rem !default;
-$menu-item-padding-x:           .75rem !default;
-$menu-item-padding-y:           .25rem !default;
-$menu-item-border-radius:       var(--#{$prefix}radius-5) !default;
-$menu-icon-size:                1rem !default;
-$menu-description-font-size:    calc(var(--#{$prefix}body-font-size) * .75) !default;
-$menu-check-color:              currentcolor !default;
-$menu-header-color:             var(--#{$prefix}fg-3) !default;
-$menu-header-padding-x:         .75rem !default;
-$menu-header-padding-y:         .25rem !default;
-$menu-transition-property:      "opacity, transform, display" !default;
-$menu-transition-duration:      .15s !default;
-$menu-transition-timing:        var(--#{$prefix}transition-timing-overlay) !default;
-// scss-docs-end menu-variables
-
 $menu-tokens: () !default;
 
 // stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
-// scss-docs-start menu-css-vars
+// scss-docs-start menu-tokens
 $menu-tokens: defaults(
   (
-    --#{$prefix}menu-zindex: #{$menu-zindex},
-    --#{$prefix}menu-gap: #{$menu-gap},
-    --#{$prefix}menu-min-width: #{$menu-min-width},
-    --#{$prefix}menu-max-height: #{$menu-max-height},
-    --#{$prefix}menu-overflow-y: #{$menu-overflow-y},
-    --#{$prefix}menu-padding-x: #{$menu-padding-x},
-    --#{$prefix}menu-padding-y: #{$menu-padding-y},
-    --#{$prefix}menu-font-size: #{$menu-font-size},
-    --#{$prefix}menu-color: #{$menu-color},
-    --#{$prefix}menu-bg: #{$menu-bg},
-    --#{$prefix}menu-border-color: #{$menu-border-color},
-    --#{$prefix}menu-border-radius: #{$menu-border-radius},
-    --#{$prefix}menu-border-width: #{$menu-border-width},
-    --#{$prefix}menu-box-shadow: #{$menu-box-shadow},
-    --#{$prefix}menu-divider-bg: #{$menu-divider-bg},
-    --#{$prefix}menu-divider-margin-y: #{$menu-divider-margin-y},
-    --#{$prefix}menu-divider-margin-x: #{$menu-divider-margin-x},
-    --#{$prefix}menu-item-color: #{$menu-item-color},
-    --#{$prefix}menu-item-hover-color: #{$menu-item-hover-color},
-    --#{$prefix}menu-item-hover-bg: #{$menu-item-hover-bg},
-    --#{$prefix}menu-item-active-color: #{$menu-item-active-color},
-    --#{$prefix}menu-item-active-bg: #{$menu-item-active-bg},
-    --#{$prefix}menu-item-disabled-color: #{$menu-item-disabled-color},
-    --#{$prefix}menu-item-font-weight: #{$menu-item-font-weight},
-    --#{$prefix}menu-item-gap: #{$menu-item-gap},
-    --#{$prefix}menu-item-padding-x: #{$menu-item-padding-x},
-    --#{$prefix}menu-item-padding-y: #{$menu-item-padding-y},
-    --#{$prefix}menu-item-border-radius: #{$menu-item-border-radius},
-    --#{$prefix}menu-icon-size: #{$menu-icon-size},
-    --#{$prefix}menu-description-font-size: #{$menu-description-font-size},
-    --#{$prefix}menu-check-color: #{$menu-check-color},
-    --#{$prefix}menu-header-color: #{$menu-header-color},
-    --#{$prefix}menu-header-padding-x: #{$menu-header-padding-x},
-    --#{$prefix}menu-header-padding-y: #{$menu-header-padding-y},
-    --#{$prefix}menu-transition-property: #{$menu-transition-property},
-    --#{$prefix}menu-transition-duration: #{$menu-transition-duration},
-    --#{$prefix}menu-transition-timing: #{$menu-transition-timing},
+    --#{$prefix}menu-zindex: var(--#{$prefix}z-menu),
+    --#{$prefix}menu-gap: .125rem,
+    --#{$prefix}menu-min-width: 10rem,
+    --#{$prefix}menu-max-height: none,
+    --#{$prefix}menu-overflow-y: visible,
+    --#{$prefix}menu-padding-x: .25rem,
+    --#{$prefix}menu-padding-y: .25rem,
+    --#{$prefix}menu-font-size: var(--#{$prefix}font-size-sm),
+    --#{$prefix}menu-color: var(--#{$prefix}fg-body),
+    --#{$prefix}menu-bg: var(--#{$prefix}bg-body),
+    --#{$prefix}menu-border-color: var(--#{$prefix}border-color-translucent),
+    --#{$prefix}menu-border-radius: var(--#{$prefix}radius-7),
+    --#{$prefix}menu-border-width: var(--#{$prefix}border-width),
+    --#{$prefix}menu-box-shadow: var(--#{$prefix}box-shadow-lg),
+    --#{$prefix}menu-divider-bg: var(--#{$prefix}border-color-translucent),
+    --#{$prefix}menu-divider-margin-y: .125rem,
+    --#{$prefix}menu-divider-margin-x: .25rem,
+    --#{$prefix}menu-item-color: var(--#{$prefix}menu-color, var(--#{$prefix}fg-body)),
+    --#{$prefix}menu-item-hover-color: var(--#{$prefix}menu-color, var(--#{$prefix}fg-body)),
+    --#{$prefix}menu-item-hover-bg: var(--#{$prefix}bg-1),
+    --#{$prefix}menu-item-active-color: var(--#{$prefix}primary-contrast),
+    --#{$prefix}menu-item-active-bg: var(--#{$prefix}primary-bg),
+    --#{$prefix}menu-item-disabled-color: var(--#{$prefix}fg-3),
+    --#{$prefix}menu-item-font-weight: var(--#{$prefix}font-weight-normal),
+    --#{$prefix}menu-item-gap: .5rem,
+    --#{$prefix}menu-item-padding-x: .75rem,
+    --#{$prefix}menu-item-padding-y: .25rem,
+    --#{$prefix}menu-item-border-radius: var(--#{$prefix}radius-5),
+    --#{$prefix}menu-icon-size: 1rem,
+    --#{$prefix}menu-description-font-size: calc(var(--#{$prefix}body-font-size) * .75),
+    --#{$prefix}menu-check-color: currentcolor,
+    --#{$prefix}menu-header-color: var(--#{$prefix}fg-3),
+    --#{$prefix}menu-header-padding-x: .75rem,
+    --#{$prefix}menu-header-padding-y: .25rem,
+    --#{$prefix}menu-transition-property: #{"opacity, transform, display"},
+    --#{$prefix}menu-transition-duration: .15s,
+    --#{$prefix}menu-transition-timing: var(--#{$prefix}transition-timing-overlay),
   ),
   $menu-tokens
 );
-// scss-docs-end menu-css-vars
+// scss-docs-end menu-tokens
 
 // stylelint-enable scss/dollar-variable-default, custom-property-no-missing-var-function
 

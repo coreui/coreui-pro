@@ -7,52 +7,33 @@
 @use "mixins/tokens" as *;
 @use "config" as *;
 
-// scss-docs-start breadcrumb-variables
-$breadcrumb-font-size:              inherit !default;
-$breadcrumb-padding-y:              0 !default;
-$breadcrumb-padding-x:              0 !default;
-$breadcrumb-item-padding-x:         .5rem !default;
-$breadcrumb-bg:                     transparent !default;
-$breadcrumb-divider-color:          var(--#{$prefix}fg-4) !default;
-$breadcrumb-active-color:           var(--#{$prefix}fg-1) !default;
-$breadcrumb-link-padding-y:         .25rem !default;
-$breadcrumb-link-padding-x:         .5rem !default;
-$breadcrumb-link-color:             var(--#{$prefix}fg-3) !default;
-$breadcrumb-link-hover-color:       var(--#{$prefix}fg-2) !default;
-$breadcrumb-link-hover-bg:          var(--#{$prefix}bg-1) !default;
-$breadcrumb-link-border-radius:     var(--#{$prefix}radius-7) !default;
-$breadcrumb-divider:                string.quote("/") !default;
-$breadcrumb-divider-flipped:        var(--#{$prefix}breadcrumb-divider) !default;
-$breadcrumb-border-radius:          var(--#{$prefix}radius-5) !default;
-// scss-docs-end breadcrumb-variables
-
 $breadcrumb-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start breadcrumb-css-vars
+// scss-docs-start breadcrumb-tokens
 $breadcrumb-tokens: defaults(
   (
-    --#{$prefix}breadcrumb-padding-x: #{$breadcrumb-padding-x},
-    --#{$prefix}breadcrumb-padding-y: #{$breadcrumb-padding-y},
-    --#{$prefix}breadcrumb-bg: #{$breadcrumb-bg},
-    --#{$prefix}breadcrumb-border-radius: #{$breadcrumb-border-radius},
-    --#{$prefix}breadcrumb-divider: #{meta.inspect(escape-svg($breadcrumb-divider))},
-    --#{$prefix}breadcrumb-divider-color: #{$breadcrumb-divider-color},
-    --#{$prefix}breadcrumb-divider-flipped: #{meta.inspect(escape-svg($breadcrumb-divider-flipped))},
-    --#{$prefix}breadcrumb-item-padding-x: #{$breadcrumb-item-padding-x},
-    --#{$prefix}breadcrumb-item-active-color: #{$breadcrumb-active-color},
-    --#{$prefix}breadcrumb-link-padding-x: #{$breadcrumb-link-padding-x},
-    --#{$prefix}breadcrumb-link-padding-y: #{$breadcrumb-link-padding-y},
-    --#{$prefix}breadcrumb-link-color: #{$breadcrumb-link-color},
-    --#{$prefix}breadcrumb-link-hover-color: #{$breadcrumb-link-hover-color},
-    --#{$prefix}breadcrumb-link-hover-bg: #{$breadcrumb-link-hover-bg},
-    --#{$prefix}breadcrumb-link-border-radius: #{$breadcrumb-link-border-radius},
-    --#{$prefix}breadcrumb-font-size: #{$breadcrumb-font-size},
+    --#{$prefix}breadcrumb-padding-x: 0,
+    --#{$prefix}breadcrumb-padding-y: 0,
+    --#{$prefix}breadcrumb-bg: transparent,
+    --#{$prefix}breadcrumb-border-radius: var(--#{$prefix}radius-5),
+    --#{$prefix}breadcrumb-divider: #{meta.inspect(escape-svg(string.quote("/")))},
+    --#{$prefix}breadcrumb-divider-color: var(--#{$prefix}fg-4),
+    --#{$prefix}breadcrumb-divider-flipped: #{meta.inspect(escape-svg(var(--#{$prefix}breadcrumb-divider)))},
+    --#{$prefix}breadcrumb-item-padding-x: .5rem,
+    --#{$prefix}breadcrumb-item-active-color: var(--#{$prefix}fg-1),
+    --#{$prefix}breadcrumb-link-padding-x: .5rem,
+    --#{$prefix}breadcrumb-link-padding-y: .25rem,
+    --#{$prefix}breadcrumb-link-color: var(--#{$prefix}fg-3),
+    --#{$prefix}breadcrumb-link-hover-color: var(--#{$prefix}fg-2),
+    --#{$prefix}breadcrumb-link-hover-bg: var(--#{$prefix}bg-1),
+    --#{$prefix}breadcrumb-link-border-radius: var(--#{$prefix}radius-7),
+    --#{$prefix}breadcrumb-font-size: inherit,
   ),
   $breadcrumb-tokens
 );
-// scss-docs-end breadcrumb-css-vars
+// scss-docs-end breadcrumb-tokens
 
 // stylelint-enable scss/dollar-variable-default
 @layer components {

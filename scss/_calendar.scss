@@ -8,102 +8,53 @@
 // stylelint-disable selector-max-class
 
 // Calendar
-// scss-docs-start calendar-variables
-$calendar-table-margin:                      .5rem !default;
-$calendar-table-cell-size:                   2.75rem !default;
-
-$calendar-nav-padding:                       .5rem !default;
-$calendar-nav-border-width:                  1px !default;
-$calendar-nav-border-color:                  var(--#{$prefix}border-color) !default;
-
-$calendar-nav-btn-padding-y:                 .25rem !default;
-$calendar-nav-btn-padding-x:                 .5rem !default;
-$calendar-nav-btn-font-size:                 var(--#{$prefix}font-size-sm) !default;
-$calendar-nav-btn-bg:                        transparent !default;
-$calendar-nav-btn-border-width:              1px !default;
-$calendar-nav-btn-border-color:              transparent !default;
-$calendar-nav-btn-border-radius:             var(--#{$prefix}radius-4) !default;
-
-$calendar-nav-btn-hover-bg:                  transparent !default;
-$calendar-nav-btn-hover-border-color:        transparent !default;
-
-$calendar-nav-btn-focus-border-color:        transparent !default;
-
-$calendar-nav-date-font-weight:              600 !default;
-$calendar-nav-date-color:                    var(--#{$prefix}fg-body) !default;
-$calendar-nav-date-hover-color:              var(--#{$prefix}primary-base) !default;
-
-$calendar-nav-icon-width:                    1rem !default;
-$calendar-nav-icon-height:                   1rem !default;
-$calendar-nav-icon-color:                    var(--#{$prefix}fg-3) !default;
-$calendar-nav-icon-hover-color:              var(--#{$prefix}fg-body) !default;
-
-$calendar-cell-header-inner-font-weight:     600 !default;
-$calendar-cell-header-inner-color:           var(--#{$prefix}fg-3) !default;
-
-$calendar-cell-border-radius:                var(--#{$prefix}radius-4) !default;
-$calendar-cell-hover-color:                  var(--#{$prefix}fg-body) !default;
-$calendar-cell-hover-bg:                     var(--#{$prefix}bg-1) !default;
-$calendar-cell-disabled-color:               var(--#{$prefix}fg-4) !default;
-
-$calendar-cell-selected-color:               var(--#{$prefix}primary-contrast) !default;
-$calendar-cell-selected-bg:                  var(--#{$prefix}primary-base) !default;
-
-$calendar-cell-range-bg:                     color-mix(in oklch, var(--#{$prefix}theme-bg, var(--#{$prefix}primary-base)) 12.5%, transparent) !default;
-$calendar-cell-range-hover-border-color:     var(--#{$prefix}primary-base) !default;
-
-$calendar-cell-today-color:                  var(--#{$prefix}danger-base) !default;
-
-$calendar-cell-week-number-font-weight:      600 !default;
-$calendar-cell-week-number-color:            var(--#{$prefix}fg-2) !default;
-// scss-docs-end calendar-variables
 
 $calendar-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start calendar-css-vars
+// scss-docs-start calendar-tokens
 $calendar-tokens: defaults(
   (
-    --#{$prefix}calendar-table-margin: #{$calendar-table-margin},
-    --#{$prefix}calendar-table-cell-size: #{$calendar-table-cell-size},
-    --#{$prefix}calendar-nav-padding: #{$calendar-nav-padding},
-    --#{$prefix}calendar-nav-border-color: #{$calendar-nav-border-color},
-    --#{$prefix}calendar-nav-border: #{$calendar-nav-border-width} solid var(--#{$prefix}calendar-nav-border-color),
-    --#{$prefix}calendar-nav-btn-padding-x: #{$calendar-nav-btn-padding-x},
-    --#{$prefix}calendar-nav-btn-padding-y: #{$calendar-nav-btn-padding-y},
-    --#{$prefix}calendar-nav-btn-font-size: #{$calendar-nav-btn-font-size},
-    --#{$prefix}calendar-nav-btn-bg: #{$calendar-nav-btn-bg},
-    --#{$prefix}calendar-nav-btn-border-width: #{$calendar-nav-btn-border-width},
-    --#{$prefix}calendar-nav-btn-border-color: #{$calendar-nav-btn-border-color},
-    --#{$prefix}calendar-nav-btn-border-radius: #{$calendar-nav-btn-border-radius},
-    --#{$prefix}calendar-cell-border-radius: #{$calendar-cell-border-radius},
-    --#{$prefix}calendar-nav-btn-hover-bg: #{$calendar-nav-btn-hover-bg},
-    --#{$prefix}calendar-nav-btn-hover-border-color: #{$calendar-nav-btn-hover-border-color},
-    --#{$prefix}calendar-nav-btn-focus-border-color: #{$calendar-nav-btn-focus-border-color},
-    --#{$prefix}calendar-nav-date-font-weight: #{$calendar-nav-date-font-weight},
-    --#{$prefix}calendar-nav-date-color: #{$calendar-nav-date-color},
-    --#{$prefix}calendar-nav-date-hover-color: #{$calendar-nav-date-hover-color},
-    --#{$prefix}calendar-nav-icon-width: #{$calendar-nav-icon-width},
-    --#{$prefix}calendar-nav-icon-height: #{$calendar-nav-icon-height},
-    --#{$prefix}calendar-nav-icon-color: #{$calendar-nav-icon-color},
-    --#{$prefix}calendar-nav-icon-hover-color: #{$calendar-nav-icon-hover-color},
-    --#{$prefix}calendar-cell-header-inner-font-weight: #{$calendar-cell-header-inner-font-weight},
-    --#{$prefix}calendar-cell-header-inner-color: #{$calendar-cell-header-inner-color},
-    --#{$prefix}calendar-cell-week-number-font-weight: #{$calendar-cell-week-number-font-weight},
-    --#{$prefix}calendar-cell-week-number-color: #{$calendar-cell-week-number-color},
-    --#{$prefix}calendar-cell-hover-color: #{$calendar-cell-hover-color},
-    --#{$prefix}calendar-cell-hover-bg: #{$calendar-cell-hover-bg},
-    --#{$prefix}calendar-cell-disabled-color: #{$calendar-cell-disabled-color},
-    --#{$prefix}calendar-cell-selected-color: #{$calendar-cell-selected-color},
-    --#{$prefix}calendar-cell-selected-bg: #{$calendar-cell-selected-bg},
-    --#{$prefix}calendar-cell-range-bg: #{$calendar-cell-range-bg},
-    --#{$prefix}calendar-cell-range-hover-border-color: #{$calendar-cell-range-hover-border-color},
-    --#{$prefix}calendar-cell-today-color: #{$calendar-cell-today-color},
+    --#{$prefix}calendar-table-margin: .5rem,
+    --#{$prefix}calendar-table-cell-size: 2.75rem,
+    --#{$prefix}calendar-nav-padding: .5rem,
+    --#{$prefix}calendar-nav-border-color: var(--#{$prefix}border-color),
+    --#{$prefix}calendar-nav-border: 1px solid var(--#{$prefix}calendar-nav-border-color),
+    --#{$prefix}calendar-nav-btn-padding-x: .5rem,
+    --#{$prefix}calendar-nav-btn-padding-y: .25rem,
+    --#{$prefix}calendar-nav-btn-font-size: var(--#{$prefix}font-size-sm),
+    --#{$prefix}calendar-nav-btn-bg: transparent,
+    --#{$prefix}calendar-nav-btn-border-width: 1px,
+    --#{$prefix}calendar-nav-btn-border-color: transparent,
+    --#{$prefix}calendar-nav-btn-border-radius: var(--#{$prefix}radius-4),
+    --#{$prefix}calendar-cell-border-radius: var(--#{$prefix}radius-4),
+    --#{$prefix}calendar-nav-btn-hover-bg: transparent,
+    --#{$prefix}calendar-nav-btn-hover-border-color: transparent,
+    --#{$prefix}calendar-nav-btn-focus-border-color: transparent,
+    --#{$prefix}calendar-nav-date-font-weight: 600,
+    --#{$prefix}calendar-nav-date-color: var(--#{$prefix}fg-body),
+    --#{$prefix}calendar-nav-date-hover-color: var(--#{$prefix}primary-base),
+    --#{$prefix}calendar-nav-icon-width: 1rem,
+    --#{$prefix}calendar-nav-icon-height: 1rem,
+    --#{$prefix}calendar-nav-icon-color: var(--#{$prefix}fg-3),
+    --#{$prefix}calendar-nav-icon-hover-color: var(--#{$prefix}fg-body),
+    --#{$prefix}calendar-cell-header-inner-font-weight: 600,
+    --#{$prefix}calendar-cell-header-inner-color: var(--#{$prefix}fg-3),
+    --#{$prefix}calendar-cell-week-number-font-weight: 600,
+    --#{$prefix}calendar-cell-week-number-color: var(--#{$prefix}fg-2),
+    --#{$prefix}calendar-cell-hover-color: var(--#{$prefix}fg-body),
+    --#{$prefix}calendar-cell-hover-bg: var(--#{$prefix}bg-1),
+    --#{$prefix}calendar-cell-disabled-color: var(--#{$prefix}fg-4),
+    --#{$prefix}calendar-cell-selected-color: var(--#{$prefix}primary-contrast),
+    --#{$prefix}calendar-cell-selected-bg: var(--#{$prefix}primary-base),
+    --#{$prefix}calendar-cell-range-bg: color-mix(in oklch, var(--#{$prefix}theme-bg, var(--#{$prefix}primary-base)) 12.5%, transparent),
+    --#{$prefix}calendar-cell-range-hover-border-color: var(--#{$prefix}primary-base),
+    --#{$prefix}calendar-cell-today-color: var(--#{$prefix}danger-base),
   ),
   $calendar-tokens
 );
-// scss-docs-end calendar-css-vars
+// scss-docs-end calendar-tokens
 
 // stylelint-enable scss/dollar-variable-default
 @layer components {

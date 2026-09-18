@@ -5,26 +5,20 @@
 @use "config" as *;
 @use "time-picker" as *;
 
-// scss-docs-start date-picker-variables
-$date-picker-footer-padding:           .5rem !default;
-$date-picker-footer-border-width:      1px !default;
-$date-picker-footer-border-color:      var(--#{$prefix}border-color) !default;
-// scss-docs-end date-picker-variables
-
 $date-picker-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start date-picker-css-vars
+// scss-docs-start date-picker-tokens
 $date-picker-tokens: defaults(
   (
-    --#{$prefix}date-picker-footer-padding: #{$date-picker-footer-padding},
-    --#{$prefix}date-picker-footer-border-width: #{$date-picker-footer-border-width},
-    --#{$prefix}date-picker-footer-border-color: #{$date-picker-footer-border-color},
+    --#{$prefix}date-picker-footer-padding: .5rem,
+    --#{$prefix}date-picker-footer-border-width: 1px,
+    --#{$prefix}date-picker-footer-border-color: var(--#{$prefix}border-color),
   ),
   $date-picker-tokens
 );
-// scss-docs-end date-picker-css-vars
+// scss-docs-end date-picker-tokens
 
 // stylelint-enable scss/dollar-variable-default
 @layer components {

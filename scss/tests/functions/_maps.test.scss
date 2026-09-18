@@ -9,7 +9,6 @@
     @include assert-equal(map-get-multiple(("a": 1, "b": 2, "c": 3), ("c", "a")), ("a": 1, "c": 3));
   }
 
-
   @include it("map-merge-multiple merges left to right") {
     @include assert-equal(map-merge-multiple(("a": 1), ("a": 2, "b": 2), ("c": 3)), ("a": 2, "b": 2, "c": 3));
   }

@@ -8,18 +8,7 @@
 @use "../mixins/ltr-rtl" as *;
 @use "../mixins/tokens" as *;
 @use "../mixins/transition" as *;
-@use "../colors" as *;
 @use "../config" as *;
-
-// scss-docs-start form-color-variables
-$form-color-width:                3rem !default;
-// scss-docs-end form-color-variables
-
-// scss-docs-start form-file-variables
-$form-file-button-color:          var(--#{$prefix}btn-input-fg) !default;
-$form-file-button-bg:             var(--#{$prefix}bg-1) !default;
-$form-file-button-hover-bg:       var(--#{$prefix}bg-2) !default;
-// scss-docs-end form-file-variables
 
 // stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
@@ -59,9 +48,9 @@ $form-control-tokens: defaults(
     --#{$prefix}control-disabled-color: var(--#{$prefix}control-fg),
     --#{$prefix}control-disabled-bg: var(--#{$prefix}bg-2),
     --#{$prefix}control-disabled-border-color: var(--#{$prefix}control-border-color),
-    --#{$prefix}control-action-color: #{$form-file-button-color},
-    --#{$prefix}control-action-bg: #{$form-file-button-bg},
-    --#{$prefix}control-action-hover-bg: #{$form-file-button-hover-bg},
+    --#{$prefix}control-action-color: var(--#{$prefix}btn-input-fg),
+    --#{$prefix}control-action-bg: var(--#{$prefix}bg-1),
+    --#{$prefix}control-action-hover-bg: var(--#{$prefix}bg-2),
     --#{$prefix}control-action-transition-property: var(--#{$prefix}btn-input-action-transition-property),
     --#{$prefix}control-action-transition-duration: var(--#{$prefix}btn-input-transition-duration),
     --#{$prefix}control-action-transition-timing: var(--#{$prefix}btn-input-transition-timing),
@@ -72,33 +61,16 @@ $form-control-tokens: defaults(
 
 // stylelint-enable scss/dollar-variable-default, custom-property-no-missing-var-function
 
-// scss-docs-start form-control-select-variables
-$form-control-select-indicator-color:           $gray-800 !default;
-$form-control-select-indicator:                 url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='#{$form-control-select-indicator-color}' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/></svg>") !default;
-$form-control-select-bg-position:               right var(--#{$prefix}control-padding-x) center !default;
-$form-control-select-bg-size:                   16px 12px !default; // In pixels because image dimensions
-$form-control-select-padding-end:               calc(var(--#{$prefix}control-padding-x) * 3) !default;
-$form-control-select-feedback-icon-padding-end: calc(var(--#{$prefix}control-padding-x) * 2.5 + var(--#{$prefix}control-select-padding-end)) !default;
-$form-control-select-feedback-icon-position:    center right var(--#{$prefix}control-select-padding-end) !default;
-$form-control-select-feedback-icon-size:        $input-height-inner-half $input-height-inner-half !default;
-// scss-docs-end form-control-select-variables
-
-// scss-docs-start form-control-select-dark-variables
-$form-control-select-indicator-color-dark: rgba($white, .87) !default;
-$form-control-select-indicator-dark:       url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='#{$form-control-select-indicator-color-dark}' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/></svg>") !default;
-// scss-docs-end form-control-select-dark-variables
-
 $form-control-select-tokens: () !default;
-// stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
+// stylelint-disable scss/dollar-variable-default, custom-property-no-missing-var-function
 
 // scss-docs-start form-control-select-tokens
 $form-control-select-tokens: defaults(
   (
-    --#{$prefix}control-select-bg-img: #{escape-svg($form-control-select-indicator)},
-    --#{$prefix}control-select-bg-size: #{$form-control-select-bg-size},
-    --#{$prefix}control-select-padding-end: #{$form-control-select-padding-end},
-    --#{$prefix}control-select-feedback-icon-padding-end: #{$form-control-select-feedback-icon-padding-end},
-    --#{$prefix}control-select-feedback-icon-size: "#{$form-control-select-bg-size}, #{$form-control-select-feedback-icon-size}",
+    --#{$prefix}control-select-bg-img: #{escape-svg(url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='#00000080' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/></svg>"))},
+    --#{$prefix}control-select-bg-img-dark: #{escape-svg(url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='#ffffff80' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/></svg>"))},
+    --#{$prefix}control-select-bg-size: 16px 12px,
+    --#{$prefix}control-select-padding-end: calc(var(--#{$prefix}control-padding-x) * 3),
   ),
   $form-control-select-tokens
 );
@@ -275,15 +247,11 @@ $form-control-select-tokens: defaults(
     @include tokens($form-control-select-tokens);
 
     padding-inline-end: var(--#{$prefix}control-select-padding-end);
-    background-image: var(--#{$prefix}control-select-bg-img), var(--#{$prefix}control-select-bg-icon, none);
+    background-image: var(--#{$prefix}control-select-bg-img);
     background-repeat: no-repeat;
-    @include ltr-rtl-value-only("--#{$prefix}control-select-bg-position", $form-control-select-bg-position);
+    @include ltr-rtl-value-only("--#{$prefix}control-select-bg-position", right var(--#{$prefix}control-padding-x) center);
     background-position: var(--#{$prefix}control-select-bg-position);
     background-size: var(--#{$prefix}control-select-bg-size);
-
-    @if $enable-validation-icons {
-      @include ltr-rtl-value-only("--#{$prefix}control-select-validation-bg-position", #{$form-control-select-bg-position, $form-control-select-feedback-icon-position});
-    }
 
     &[multiple],
     &[size]:not([size="1"]) {
@@ -303,7 +271,7 @@ $form-control-select-tokens: defaults(
       select.form-control,
       .form-control-caret,
       .form-select {
-        --#{$prefix}control-select-bg-img: #{escape-svg($form-control-select-indicator-dark)};
+        --#{$prefix}control-select-bg-img: var(--#{$prefix}control-select-bg-img-dark);
       }
     }
   }
@@ -320,7 +288,7 @@ $form-control-select-tokens: defaults(
   // stylelint-enable selector-no-qualifying-type
 
   .form-control-color {
-    --#{$prefix}control-color-width: #{$form-color-width};
+    --#{$prefix}control-color-width: #{3rem};
 
     width: var(--#{$prefix}control-color-width);
     height: var(--#{$prefix}control-min-height);

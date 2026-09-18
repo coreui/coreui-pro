@@ -46,7 +46,7 @@ Modify the styling of an icon link with our link CSS variables, Sass variables, 
 
 Modify the `--cui-link-*` and `--cui-icon-link-*` CSS variables as needed to change the default appearance.
 
-<ScssDocs file="scss/helpers/_icon-link.scss" capture="icon-link-css-vars" />
+<ScssDocs file="scss/helpers/_icon-link.scss" capture="icon-link-tokens" />
 
 Customize the hover `transform` by overriding the `--cui-icon-link-transform` CSS variable:
 
@@ -66,16 +66,6 @@ Customize the color by overriding the `--cui-link-*` CSS variable:
       <path d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
     </svg>
   </a>`} />
-
-### Sass variables
-
-<DeprecatedIn version="6.0.0" />
-
-Sass variables set these defaults at build time and are removed in v7. The CSS variables above reach the same values without recompiling, and can be set on a single element.
-
-Customize the icon link Sass variables to modify all icon link styles across your CoreUI-powered project.
-
-<ScssDocs file="scss/helpers/_icon-link.scss" capture="icon-link-variables" />
 
 ### Sass utilities API
 

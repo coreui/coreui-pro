@@ -3,100 +3,68 @@
 @use "../mixins/tokens" as *;
 @use "../config" as *;
 
-// scss-docs-start reboot-type-variables
-$paragraph-margin-bottom:     var(--#{$prefix}spacer) !default;
-$font-family-code:            var(--#{$prefix}font-mono) !default;
-$headings-margin-bottom:      var(--#{$prefix}spacer-2) !default;
-$headings-font-family:        inherit !default;
-$headings-font-style:         inherit !default;
-$headings-font-weight:        500 !default;
-$sub-sup-font-size:           .75em !default;
-$hr-margin-y:                 var(--#{$prefix}spacer) !default;
-$hr-color:                    inherit !default;
-$hr-border-width:             var(--#{$prefix}border-width) !default;
-$hr-opacity:                  .25 !default;
-$legend-margin-bottom:        var(--#{$prefix}spacer-2) !default;
-$legend-font-size:            clamp(1.275rem, 1.275rem + .3vw, 1.5rem) !default;
-$legend-font-weight:          inherit !default;
-$list-padding-x:              2rem !default;
-$dt-font-weight:              $font-weight-bold !default;
-$mark-padding:                .1875em !default;
-$initialism-font-size:        var(--#{$prefix}small-font-size) !default;
-$code-font-size:              var(--#{$prefix}small-font-size) !default;
-$pre-color:                   inherit !default;
-// scss-docs-end reboot-type-variables
-
-// scss-docs-start kbd-variables
-$kbd-padding-y:               .1875rem !default;
-$kbd-padding-x:               .375rem !default;
-$kbd-font-size:               $code-font-size !default;
-$kbd-color:                   var(--#{$prefix}bg-body) !default;
-$kbd-bg:                      var(--#{$prefix}fg-2) !default;
-$kbd-border-radius:           var(--#{$prefix}radius-3) !default;
-// scss-docs-end kbd-variables
-
 $reboot-tokens: () !default;
 $reboot-kbd-tokens: () !default;
+$reboot-mark-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start reboot-css-vars
+// scss-docs-start reboot-tokens
 $reboot-tokens: defaults(
   (
-    --#{$prefix}paragraph-margin-bottom: #{$paragraph-margin-bottom},
-    --#{$prefix}heading-margin-bottom: #{$headings-margin-bottom},
-    --#{$prefix}heading-font-family: #{$headings-font-family},
-    --#{$prefix}heading-font-style: #{$headings-font-style},
-    --#{$prefix}heading-font-weight: #{$headings-font-weight},
-    --#{$prefix}heading-line-height: #{$headings-line-height},
-    --#{$prefix}sub-sup-font-size: #{$sub-sup-font-size},
-    --#{$prefix}hr-margin-y: #{$hr-margin-y},
-    --#{$prefix}hr-color: #{$hr-color},
-    --#{$prefix}hr-border-width: #{$hr-border-width},
-    --#{$prefix}hr-opacity: #{$hr-opacity},
-    --#{$prefix}legend-margin-bottom: #{$legend-margin-bottom},
-    --#{$prefix}legend-font-size: #{$legend-font-size},
-    --#{$prefix}legend-font-weight: #{$legend-font-weight},
-    --#{$prefix}list-padding-x: #{$list-padding-x},
-    --#{$prefix}dt-font-weight: #{$dt-font-weight},
-    --#{$prefix}mark-padding: #{$mark-padding},
-    --#{$prefix}initialism-font-size: #{$initialism-font-size},
-    --#{$prefix}code-font-size: #{$code-font-size},
-    --#{$prefix}pre-color: #{$pre-color},
+    --#{$prefix}paragraph-margin-bottom: var(--#{$prefix}spacer),
+    --#{$prefix}heading-margin-bottom: var(--#{$prefix}spacer-2),
+    --#{$prefix}heading-font-family: inherit,
+    --#{$prefix}heading-font-style: inherit,
+    --#{$prefix}heading-font-weight: var(--#{$prefix}font-weight-medium),
+    --#{$prefix}heading-line-height: 1.2,
+    --#{$prefix}sub-sup-font-size: .75em,
+    --#{$prefix}hr-margin-y: var(--#{$prefix}spacer),
+    --#{$prefix}hr-color: inherit,
+    --#{$prefix}hr-border-width: var(--#{$prefix}border-width),
+    --#{$prefix}hr-opacity: .25,
+    --#{$prefix}legend-margin-bottom: var(--#{$prefix}spacer-2),
+    --#{$prefix}legend-font-size: clamp(1.275rem, 1.275rem + .3vw, 1.5rem),
+    --#{$prefix}legend-font-weight: inherit,
+    --#{$prefix}list-padding-x: 2rem,
+    --#{$prefix}dt-font-weight: var(--#{$prefix}font-weight-bold),
+    --#{$prefix}initialism-font-size: var(--#{$prefix}small-font-size),
+    --#{$prefix}code-font-size: var(--#{$prefix}small-font-size),
+    --#{$prefix}pre-color: inherit,
   ),
   $reboot-tokens
 );
-// scss-docs-end reboot-css-vars
+// scss-docs-end reboot-tokens
 
-// scss-docs-start kbd-css-vars
+// scss-docs-start kbd-tokens
 $reboot-kbd-tokens: defaults(
   (
-    --#{$prefix}kbd-padding-y: #{$kbd-padding-y},
-    --#{$prefix}kbd-padding-x: #{$kbd-padding-x},
-    --#{$prefix}kbd-font-size: #{$kbd-font-size},
-    --#{$prefix}kbd-color: #{$kbd-color},
-    --#{$prefix}kbd-bg: #{$kbd-bg},
-    --#{$prefix}kbd-border-radius: #{$kbd-border-radius},
+    --#{$prefix}kbd-padding-y: .1875rem,
+    --#{$prefix}kbd-padding-x: .375rem,
+    --#{$prefix}kbd-font-size: var(--#{$prefix}small-font-size),
+    --#{$prefix}kbd-color: var(--#{$prefix}bg-body),
+    --#{$prefix}kbd-bg: var(--#{$prefix}fg-2),
+    --#{$prefix}kbd-border-radius: var(--#{$prefix}radius-3),
   ),
   $reboot-kbd-tokens
 );
-// scss-docs-end kbd-css-vars
+// scss-docs-end kbd-tokens
+
+// scss-docs-start mark-tokens
+$reboot-mark-tokens: defaults(
+  (
+    --#{$prefix}mark-padding: .1875em,
+    --#{$prefix}mark-color: var(--#{$prefix}fg-body),
+    --#{$prefix}mark-bg: light-dark(oklch(96.883% .03443 84.93deg), oklch(43.897% .08952 84.93deg)),
+  ),
+  $reboot-mark-tokens
+);
+// scss-docs-end mark-tokens
 
 // stylelint-enable scss/dollar-variable-default
 
-
-// scss-docs-start reboot-table-variables
-// Reboot styles the raw HTML elements, so it owns these rather than borrowing
-// from the .table component's variables — that coupling is what kept the table
-// block pinned in _variables.scss.
-$caption-padding-y:    .5rem !default;
-$caption-color:        var(--#{$prefix}fg-3) !default;
-$th-font-weight:       null !default;
-// scss-docs-end reboot-table-variables
-
 @layer reboot {
   // stylelint-disable declaration-no-important, selector-no-qualifying-type, property-no-vendor-prefix
-
 
   // Reboot
   //
@@ -104,7 +72,6 @@ $th-font-weight:       null !default;
   // styles targeting irrelevant browsers while applying new styles.
   //
   // Normalize is licensed MIT. https://github.com/necolas/normalize.css
-
 
   // Document
   //
@@ -116,7 +83,6 @@ $th-font-weight:       null !default;
     box-sizing: border-box;
   }
 
-
   // Root
   //
   // Ability to the value of the root font sizes, affecting the value of `rem`.
@@ -127,10 +93,6 @@ $th-font-weight:       null !default;
 
     accent-color: var(--#{$prefix}primary-base);
 
-    @if $font-size-root != null {
-      font-size: var(--#{$prefix}root-font-size);
-    }
-
     @if $enable-smooth-scroll {
       @media (prefers-reduced-motion: no-preference) {
         scroll-behavior: smooth;
@@ -138,7 +100,16 @@ $th-font-weight:       null !default;
     }
   }
 
+  // Reset iframe color-scheme
+  //
+  // If the color scheme of an iframe differs from the parent document, the
+  // iframe gets an opaque canvas background of its own (a white background on
+  // a page in dark mode). Remove its border while we are here.
 
+  iframe {
+    color-scheme: light dark;
+    border: 0;
+  }
   // Body
   //
   // 1. Remove the margin in all browsers.
@@ -160,7 +131,6 @@ $th-font-weight:       null !default;
   }
   // scss-docs-end reboot-body-rules
 
-
   // Content grouping
   //
   // 1. Reset Firefox's gray color
@@ -172,7 +142,6 @@ $th-font-weight:       null !default;
     border-block-start: var(--#{$prefix}hr-border-width) solid var(--#{$prefix}hr-border-color);
     opacity: var(--#{$prefix}hr-opacity);
   }
-
 
   // Typography
   //
@@ -226,7 +195,6 @@ $th-font-weight:       null !default;
     font-size: var(--#{$prefix}font-size-md);
   }
 
-
   // Reset margins on paragraphs
   //
   // Similarly, the top margin on `<p>`s get reset. However, we also reset the
@@ -236,7 +204,6 @@ $th-font-weight:       null !default;
     margin-top: 0;
     margin-bottom: var(--#{$prefix}paragraph-margin-bottom);
   }
-
 
   // Abbreviations
   //
@@ -256,7 +223,6 @@ $th-font-weight:       null !default;
     text-transform: uppercase;
   }
 
-
   // Address
 
   address {
@@ -264,7 +230,6 @@ $th-font-weight:       null !default;
     font-style: normal;
     line-height: inherit;
   }
-
 
   // Lists
 
@@ -298,13 +263,11 @@ $th-font-weight:       null !default;
     margin-bottom: var(--#{$prefix}spacer-2);
   }
 
-
   // Blockquote
 
   blockquote {
     margin: 0 0 var(--#{$prefix}spacer);
   }
-
 
   // Strong
   //
@@ -315,7 +278,6 @@ $th-font-weight:       null !default;
     font-weight: var(--#{$prefix}font-weight-bolder);
   }
 
-
   // Small
   //
   // Add the correct font size in all browsers
@@ -325,16 +287,16 @@ $th-font-weight:       null !default;
     font-size: var(--#{$prefix}small-font-size);
   }
 
-
   // Mark
 
   mark,
   .mark {
+    @include tokens($reboot-mark-tokens);
+
     padding: var(--#{$prefix}mark-padding);
     color: var(--#{$prefix}mark-color);
     background-color: var(--#{$prefix}mark-bg);
   }
-
 
   // Sub and Sup
   //
@@ -351,7 +313,6 @@ $th-font-weight:       null !default;
 
   sub { bottom: -.25em; }
   sup { top: -.5em; }
-
 
   // Links
 
@@ -379,14 +340,13 @@ $th-font-weight:       null !default;
     }
   }
 
-
   // Code
 
   pre,
   code,
   kbd,
   samp {
-    font-family: $font-family-code;
+    font-family: var(--#{$prefix}font-mono);
     font-size: 1em; // Correct the odd `em` font sizing in all browsers.
   }
 
@@ -438,7 +398,6 @@ $th-font-weight:       null !default;
     }
   }
 
-
   // Figures
   //
   // Apply a consistent margin strategy (matches our type styles).
@@ -447,14 +406,12 @@ $th-font-weight:       null !default;
     margin: 0 0 var(--#{$prefix}spacer);
   }
 
-
   // Images and content
 
   img,
   svg {
     vertical-align: middle;
   }
-
 
   // Tables
   //
@@ -466,19 +423,17 @@ $th-font-weight:       null !default;
   }
 
   caption {
-    padding-block: $caption-padding-y;
-    color: $caption-color;
+    padding-block: var(--#{$prefix}spacer-2);
+    color: var(--#{$prefix}fg-3);
     text-align: start;
   }
 
-  // 1. Removes font-weight bold by inheriting
-  // 2. Matches default `<td>` alignment by inheriting `text-align`.
-  // 3. Fix alignment for Safari
+  // 1. Matches default `<td>` alignment by inheriting `text-align`.
+  // 2. Fix alignment for Safari
 
   th {
-    font-weight: $th-font-weight; // 1
-    text-align: inherit; // 2
-    text-align: -webkit-match-parent; // 3
+    text-align: inherit; // 1
+    text-align: -webkit-match-parent; // 2
   }
 
   thead,
@@ -491,7 +446,6 @@ $th-font-weight:       null !default;
     border-style: solid;
     border-width: 0;
   }
-
 
   // Forms
   //
@@ -675,7 +629,6 @@ $th-font-weight:       null !default;
     direction: ltr;
   }
 
-
   // Remove the inner padding in Chrome and Safari on macOS.
 
   ::-webkit-search-decoration {
@@ -687,7 +640,6 @@ $th-font-weight:       null !default;
   ::-webkit-color-swatch-wrapper {
     padding: 0;
   }
-
 
   // 1. Inherit font family and line height for file input buttons
   // 2. Correct the inability to style clickable types in iOS and Safari.
@@ -703,17 +655,6 @@ $th-font-weight:       null !default;
     display: inline-block;
   }
 
-  // Reset iframe color-scheme
-  //
-  // If the color scheme of an iframe differs from the parent document, the
-  // iframe gets an opaque canvas background of its own (a white background on
-  // a page in dark mode). Remove its border while we are here.
-
-  iframe {
-    color-scheme: light dark;
-    border: 0;
-  }
-
   // Summary
   //
   // 1. Add the correct display in all browsers
@@ -723,7 +664,6 @@ $th-font-weight:       null !default;
     cursor: pointer;
   }
 
-
   // Progress
   //
   // Add the correct vertical alignment in Chrome, Firefox, and Opera.
@@ -731,7 +671,6 @@ $th-font-weight:       null !default;
   progress {
     vertical-align: baseline;
   }
-
 
   // Hidden attribute
   //

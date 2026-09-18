@@ -14,87 +14,50 @@
 @use "nav" as *;
 
 // scss-docs-start navbar-variables
-$navbar-padding-y:                  var(--#{$prefix}spacer-2) !default;
 $navbar-padding-x:                  null !default;
-$navbar-min-height:                 3.5rem !default;
-$navbar-bg:                         var(--#{$prefix}bg-body) !default;
-
-$navbar-nav-gap:                    var(--#{$prefix}spacer-1) !default;
-$navbar-nav-link-padding-x:         .5rem !default;
-$navbar-text-padding-y:             $nav-link-padding-y !default;
 
 $navbar-brand-font-size:            var(--#{$prefix}font-size-lg) !default;
-$navbar-brand-font-weight:          var(--#{$prefix}font-weight-medium) !default;
 // Compute the navbar-brand padding-y so the navbar-brand will have the same height as navbar-text and nav-link
 $nav-link-height:                   calc(var(--#{$prefix}body-font-size) * var(--#{$prefix}body-line-height) + #{$nav-link-padding-y} * 2) !default;
-$navbar-brand-height:               calc(#{$navbar-brand-font-size} * var(--#{$prefix}body-line-height)) !default;
-$navbar-brand-padding-y:            calc((#{$nav-link-height} - #{$navbar-brand-height}) * .5) !default;
-$navbar-brand-margin-end:           1rem !default;
 
-$navbar-toggler-padding-y:          .25rem !default;
-$navbar-toggler-padding-x:          .75rem !default;
-$navbar-toggler-font-size:          var(--#{$prefix}font-size-lg) !default;
-$navbar-toggler-icon-size:          1.5em !default;
-$navbar-toggler-border-radius:      var(--#{$prefix}radius-5) !default;
-$navbar-toggler-focus-width:        var(--#{$prefix}focus-ring-width) !default;
-$navbar-toggler-transition:         box-shadow .15s ease-in-out !default;
-
-$navbar-light-color:                color-mix(in oklch, var(--#{$prefix}emphasis-color) 65%, transparent) !default;
-$navbar-light-hover-color:          color-mix(in oklch, var(--#{$prefix}emphasis-color) 80%, transparent) !default;
-$navbar-light-active-color:         color-mix(in oklch, var(--#{$prefix}emphasis-color) 100%, transparent) !default;
-$navbar-light-disabled-color:       color-mix(in oklch, var(--#{$prefix}emphasis-color) 30%, transparent) !default;
-$navbar-toggler-icon:               url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='black' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>") !default;
-$navbar-light-toggler-border-color: color-mix(in oklch, var(--#{$prefix}emphasis-color) 15%, transparent) !default;
-$navbar-light-brand-color:          $navbar-light-active-color !default;
-$navbar-light-brand-hover-color:    $navbar-light-active-color !default;
 // scss-docs-end navbar-variables
-
-// scss-docs-start navbar-dark-variables
-$navbar-dark-color:                 rgba($white, .55) !default;
-$navbar-dark-hover-color:           color-mix(in oklch, var(--#{$prefix}white) 75%, transparent) !default;
-$navbar-dark-active-color:          var(--#{$prefix}white) !default;
-$navbar-dark-disabled-color:        color-mix(in oklch, var(--#{$prefix}white) 25%, transparent) !default;
-$navbar-dark-toggler-border-color:  color-mix(in oklch, var(--#{$prefix}white) 10%, transparent) !default;
-$navbar-dark-brand-color:           $navbar-dark-active-color !default;
-$navbar-dark-brand-hover-color:     $navbar-dark-active-color !default;
-// scss-docs-end navbar-dark-variables
 
 $navbar-tokens: () !default;
 
 // stylelint-disable scss/at-function-named-arguments, scss/dollar-variable-default
 
-// scss-docs-start navbar-css-vars
+// scss-docs-start navbar-tokens
 $navbar-tokens: defaults(
   (
     --#{$prefix}navbar-padding-x: #{if(sass($navbar-padding-x == null): 0; else: $navbar-padding-x)},
-    --#{$prefix}navbar-padding-y: #{$navbar-padding-y},
-    --#{$prefix}navbar-min-height: #{$navbar-min-height},
-    --#{$prefix}navbar-bg: #{$navbar-bg},
-    --#{$prefix}navbar-color: #{$navbar-light-color},
-    --#{$prefix}navbar-hover-color: #{$navbar-light-hover-color},
-    --#{$prefix}navbar-disabled-color: #{$navbar-light-disabled-color},
-    --#{$prefix}navbar-active-color: #{$navbar-light-active-color},
-    --#{$prefix}navbar-brand-padding-y: #{$navbar-brand-padding-y},
-    --#{$prefix}navbar-brand-margin-end: #{$navbar-brand-margin-end},
+    --#{$prefix}navbar-padding-y: var(--#{$prefix}spacer-2),
+    --#{$prefix}navbar-min-height: 3.5rem,
+    --#{$prefix}navbar-bg: var(--#{$prefix}bg-body),
+    --#{$prefix}navbar-color: color-mix(in oklch, var(--#{$prefix}emphasis-color) 65%, transparent),
+    --#{$prefix}navbar-hover-color: color-mix(in oklch, var(--#{$prefix}emphasis-color) 80%, transparent),
+    --#{$prefix}navbar-disabled-color: color-mix(in oklch, var(--#{$prefix}emphasis-color) 30%, transparent),
+    --#{$prefix}navbar-active-color: color-mix(in oklch, var(--#{$prefix}emphasis-color) 100%, transparent),
+    --#{$prefix}navbar-brand-padding-y: calc((#{$nav-link-height} - calc(#{$navbar-brand-font-size} * var(--#{$prefix}body-line-height))) * .5),
+    --#{$prefix}navbar-brand-margin-end: 1rem,
     --#{$prefix}navbar-brand-font-size: #{$navbar-brand-font-size},
-    --#{$prefix}navbar-brand-font-weight: #{$navbar-brand-font-weight},
-    --#{$prefix}navbar-brand-color: #{$navbar-light-brand-color},
-    --#{$prefix}navbar-brand-hover-color: #{$navbar-light-brand-hover-color},
-    --#{$prefix}navbar-nav-link-padding-x: #{$navbar-nav-link-padding-x},
-    --#{$prefix}navbar-text-padding-y: #{$navbar-text-padding-y},
-    --#{$prefix}navbar-toggler-padding-y: #{$navbar-toggler-padding-y},
-    --#{$prefix}navbar-toggler-padding-x: #{$navbar-toggler-padding-x},
-    --#{$prefix}navbar-toggler-font-size: #{$navbar-toggler-font-size},
-    --#{$prefix}navbar-toggler-icon-size: #{$navbar-toggler-icon-size},
-    --#{$prefix}navbar-toggler-icon-bg: #{escape-svg($navbar-toggler-icon)},
-    --#{$prefix}navbar-toggler-border-color: #{$navbar-light-toggler-border-color},
-    --#{$prefix}navbar-toggler-border-radius: #{$navbar-toggler-border-radius},
-    --#{$prefix}navbar-toggler-focus-width: #{$navbar-toggler-focus-width},
-    --#{$prefix}navbar-toggler-transition: #{$navbar-toggler-transition},
+    --#{$prefix}navbar-brand-font-weight: var(--#{$prefix}font-weight-medium),
+    --#{$prefix}navbar-brand-color: color-mix(in oklch, var(--#{$prefix}emphasis-color) 100%, transparent),
+    --#{$prefix}navbar-brand-hover-color: color-mix(in oklch, var(--#{$prefix}emphasis-color) 100%, transparent),
+    --#{$prefix}navbar-nav-link-padding-x: .5rem,
+    --#{$prefix}navbar-text-padding-y: #{$nav-link-padding-y},
+    --#{$prefix}navbar-toggler-padding-y: .25rem,
+    --#{$prefix}navbar-toggler-padding-x: .75rem,
+    --#{$prefix}navbar-toggler-font-size: var(--#{$prefix}font-size-lg),
+    --#{$prefix}navbar-toggler-icon-size: 1.5em,
+    --#{$prefix}navbar-toggler-icon-bg: #{escape-svg(url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='black' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>"))},
+    --#{$prefix}navbar-toggler-border-color: color-mix(in oklch, var(--#{$prefix}emphasis-color) 15%, transparent),
+    --#{$prefix}navbar-toggler-border-radius: var(--#{$prefix}radius-5),
+    --#{$prefix}navbar-toggler-focus-width: var(--#{$prefix}focus-ring-width),
+    --#{$prefix}navbar-toggler-transition: box-shadow .15s ease-in-out,
   ),
   $navbar-tokens
 );
-// scss-docs-end navbar-css-vars
+// scss-docs-end navbar-tokens
 
 // stylelint-enable scss/dollar-variable-default, scss/at-function-named-arguments
 
@@ -102,12 +65,12 @@ $navbar-nav-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start navbar-nav-css-vars
+// scss-docs-start navbar-nav-tokens
 $navbar-nav-tokens: defaults(
   map.merge(
     $nav-tokens,
     (
-      --#{$prefix}nav-gap: #{$navbar-nav-gap},
+      --#{$prefix}nav-gap: var(--#{$prefix}spacer-1),
       --#{$prefix}nav-link-padding-x: 0,
       --#{$prefix}nav-link-justify: flex-start,
       --#{$prefix}nav-link-color: var(--#{$prefix}navbar-color),
@@ -120,7 +83,7 @@ $navbar-nav-tokens: defaults(
   ),
   $navbar-nav-tokens
 );
-// scss-docs-end navbar-nav-css-vars
+// scss-docs-end navbar-nav-tokens
 
 // stylelint-enable scss/dollar-variable-default
 
@@ -128,20 +91,20 @@ $navbar-dark-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start navbar-dark-css-vars
+// scss-docs-start navbar-dark-tokens
 $navbar-dark-tokens: defaults(
   (
-    --#{$prefix}navbar-color: #{$navbar-dark-color},
-    --#{$prefix}navbar-hover-color: #{$navbar-dark-hover-color},
-    --#{$prefix}navbar-disabled-color: #{$navbar-dark-disabled-color},
-    --#{$prefix}navbar-active-color: #{$navbar-dark-active-color},
-    --#{$prefix}navbar-brand-color: #{$navbar-dark-brand-color},
-    --#{$prefix}navbar-brand-hover-color: #{$navbar-dark-brand-hover-color},
-    --#{$prefix}navbar-toggler-border-color: #{$navbar-dark-toggler-border-color},
+    --#{$prefix}navbar-color: #{rgba($white, .55)},
+    --#{$prefix}navbar-hover-color: color-mix(in oklch, var(--#{$prefix}white) 75%, transparent),
+    --#{$prefix}navbar-disabled-color: color-mix(in oklch, var(--#{$prefix}white) 25%, transparent),
+    --#{$prefix}navbar-active-color: var(--#{$prefix}white),
+    --#{$prefix}navbar-brand-color: var(--#{$prefix}white),
+    --#{$prefix}navbar-brand-hover-color: var(--#{$prefix}white),
+    --#{$prefix}navbar-toggler-border-color: color-mix(in oklch, var(--#{$prefix}white) 10%, transparent),
   ),
   $navbar-dark-tokens
 );
-// scss-docs-end navbar-dark-css-vars
+// scss-docs-end navbar-dark-tokens
 
 // stylelint-enable scss/dollar-variable-default
 // The expanded rules are read from inside the navbar's own query container, so
@@ -198,7 +161,6 @@ $navbar-dark-tokens: defaults(
     }
   }
 
-
   // Navbar brand
   //
   // Used for brand, project, or site names.
@@ -218,7 +180,6 @@ $navbar-dark-tokens: defaults(
       color: var(--#{$prefix}theme-fg-emphasis, var(--#{$prefix}navbar-brand-hover-color));
     }
   }
-
 
   // Navbar nav
   //
@@ -250,7 +211,6 @@ $navbar-dark-tokens: defaults(
     }
   }
 
-
   // Navbar text
   //
   // For adding text or inline elements to the navbar
@@ -266,7 +226,6 @@ $navbar-dark-tokens: defaults(
       color: var(--#{$prefix}theme-fg, var(--#{$prefix}navbar-active-color));
     }
   }
-
 
   // Responsive navbar
   //

@@ -4,21 +4,20 @@
 
 // scss-docs-start stretched-link-variables
 $stretched-link-pseudo-element: after !default;
-$stretched-link-z-index:        1 !default;
 // scss-docs-end stretched-link-variables
 
 $stretched-link-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start stretched-link-css-vars
+// scss-docs-start stretched-link-tokens
 $stretched-link-tokens: defaults(
   (
-    --#{$prefix}stretched-link-z-index: #{$stretched-link-z-index},
+    --#{$prefix}stretched-link-z-index: 1,
   ),
   $stretched-link-tokens
 );
-// scss-docs-end stretched-link-css-vars
+// scss-docs-end stretched-link-tokens
 
 // stylelint-enable scss/dollar-variable-default
 

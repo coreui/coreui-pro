@@ -8,25 +8,6 @@
 // stylelint-disable custom-property-no-missing-var-function
 
 // Avatars
-// scss-docs-start avatar-variables
-$avatar-size:                  2rem !default;
-// The label scales with the frame, so a size only has to be given once.
-$avatar-font-size-ratio:       .4 !default;
-$avatar-color:                 inherit !default;
-$avatar-bg:                    var(--#{$prefix}bg-2) !default;
-$avatar-border-radius:         50em !default;
-$avatar-status-size:           .5rem !default;
-$avatar-status-bg:             var(--#{$prefix}fg-4) !default;
-$avatar-status-border-radius:  50em !default;
-$avatar-status-border-width:   1px !default;
-$avatar-status-border-color:   var(--#{$prefix}bg-body) !default;
-$avatar-stack-spacing:         -.4 !default;
-$avatar-stack-ring-width:      2px !default;
-$avatar-stack-ring-color:      var(--#{$prefix}bg-body) !default;
-$avatar-stack-hover-transform: translateY(-2px) !default;
-$avatar-transition:            transform .15s ease-in-out !default;
-
-// scss-docs-end avatar-variables
 
 $avatar-sizes: () !default;
 
@@ -49,36 +30,38 @@ $avatar-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start avatar-css-vars
+// scss-docs-start avatar-tokens
 $avatar-tokens: defaults(
   (
-    --#{$prefix}avatar-size: #{$avatar-size},
-    --#{$prefix}avatar-font-size: calc(var(--#{$prefix}avatar-size) * #{$avatar-font-size-ratio}),
-    --#{$prefix}avatar-color: var(--#{$prefix}theme-contrast, #{$avatar-color}),
-    --#{$prefix}avatar-bg: var(--#{$prefix}theme-bg, #{$avatar-bg}),
-    --#{$prefix}avatar-border-radius: #{$avatar-border-radius},
-    --#{$prefix}avatar-status-size: #{$avatar-status-size},
-    --#{$prefix}avatar-status-bg: #{$avatar-status-bg},
-    --#{$prefix}avatar-status-border-radius: #{$avatar-status-border-radius},
-    --#{$prefix}avatar-status-border-width: #{$avatar-status-border-width},
-    --#{$prefix}avatar-status-border-color: #{$avatar-status-border-color},
+    --#{$prefix}avatar-size: 2rem,
+    --#{$prefix}avatar-font-size: calc(var(--#{$prefix}avatar-size) * .4),
+    --#{$prefix}avatar-color: var(--#{$prefix}theme-contrast, inherit),
+    --#{$prefix}avatar-bg: var(--#{$prefix}theme-bg, var(--#{$prefix}bg-2)),
+    --#{$prefix}avatar-border-radius: 50em,
+    --#{$prefix}avatar-status-size: .5rem,
+    --#{$prefix}avatar-status-bg: var(--#{$prefix}fg-4),
+    --#{$prefix}avatar-status-border-radius: 50em,
+    --#{$prefix}avatar-status-border-width: 1px,
+    --#{$prefix}avatar-status-border-color: var(--#{$prefix}bg-body),
+    --#{$prefix}avatar-transition: #{"transform .15s ease-in-out"},
   ),
   $avatar-tokens
 );
-// scss-docs-end avatar-css-vars
+// scss-docs-end avatar-tokens
 
 $avatar-stack-tokens: () !default;
 
-// scss-docs-start avatar-stack-css-vars
+// scss-docs-start avatar-stack-tokens
 $avatar-stack-tokens: defaults(
   (
-    --#{$prefix}avatar-stack-spacing: #{$avatar-stack-spacing},
-    --#{$prefix}avatar-stack-ring-width: #{$avatar-stack-ring-width},
-    --#{$prefix}avatar-stack-ring-color: #{$avatar-stack-ring-color},
+    --#{$prefix}avatar-stack-spacing: -.4,
+    --#{$prefix}avatar-stack-ring-width: 2px,
+    --#{$prefix}avatar-stack-ring-color: var(--#{$prefix}bg-body),
+    --#{$prefix}avatar-stack-hover-transform: translateY(-2px),
   ),
   $avatar-stack-tokens
 );
-// scss-docs-end avatar-stack-css-vars
+// scss-docs-end avatar-stack-tokens
 
 // stylelint-enable scss/dollar-variable-default
 
@@ -115,7 +98,7 @@ $avatar-variants: defaults(
     vertical-align: middle;
     background-color: var(--#{$prefix}avatar-bg);
     @include border-radius(var(--#{$prefix}avatar-border-radius));
-    @include transition($avatar-transition);
+    @include transition(var(--#{$prefix}avatar-transition));
   }
 
   // scss-docs-start avatar-modifiers
@@ -178,7 +161,7 @@ $avatar-variants: defaults(
       // avatar after this one.
       &:hover {
         z-index: 1;
-        transform: #{$avatar-stack-hover-transform};
+        transform: var(--#{$prefix}avatar-stack-hover-transform);
       }
     }
   }

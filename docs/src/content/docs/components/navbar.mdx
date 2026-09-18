@@ -700,11 +700,15 @@ When using offcanvas in a dark navbar, be aware that you may need to have a dark
 
 Navbars use local CSS variables on `.navbar` for enhanced real-time customization.
 
-<ScssDocs file="scss/_navbar.scss" capture="navbar-css-vars" />
+<ScssDocs file="scss/_navbar.scss" capture="navbar-tokens" />
 
 Some additional CSS variables are also present on `.navbar-nav`:
 
-<ScssDocs file="scss/_navbar.scss" capture="navbar-nav-css-vars" />
+<ScssDocs file="scss/_navbar.scss" capture="navbar-nav-tokens" />
+
+`.navbar-dark` adds no rules of its own — it redeclares the colors a navbar already reads, so the dark variant is the same surface with different values:
+
+<ScssDocs file="scss/_navbar.scss" capture="navbar-dark-tokens" />
 
 ### Sass variables
 
@@ -715,10 +719,6 @@ Sass variables set these defaults at build time and are removed in v7. The CSS v
 Variables for all navbars:
 
 <ScssDocs file="scss/_navbar.scss" capture="navbar-variables" />
-
-Variables for the [dark navbar](#color-schemes):
-
-<ScssDocs file="scss/_navbar.scss" capture="navbar-dark-variables" />
 
 ### Sass loops
 

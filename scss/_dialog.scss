@@ -11,33 +11,6 @@
 
 // stylelint-disable custom-property-no-missing-var-function
 
-// scss-docs-start dialog-variables
-$dialog-padding:                    var(--#{$prefix}spacer) !default;
-$dialog-width:                      500px !default;
-$dialog-margin:                     1.75rem !default;
-$dialog-color:                      var(--#{$prefix}fg-body) !default;
-$dialog-bg:                         var(--#{$prefix}bg-body) !default;
-$dialog-border-color:               var(--#{$prefix}border-color-translucent) !default;
-$dialog-border-width:               var(--#{$prefix}border-width) !default;
-$dialog-border-radius:              var(--#{$prefix}radius-7) !default;
-$dialog-box-shadow:                 var(--#{$prefix}box-shadow-lg) !default;
-$dialog-transition-property:        "opacity, transform, visibility" !default;
-$dialog-transition-duration:        .3s !default;
-$dialog-transition-timing:          var(--#{$prefix}transition-timing-overlay) !default;
-$dialog-slide-distance:             3rem !default;
-$dialog-scale-transform:            scale(1.02) !default;
-$dialog-backdrop-bg:                color-mix(in oklch, var(--#{$prefix}backdrop-color) var(--#{$prefix}backdrop-opacity), transparent) !default;
-$dialog-backdrop-blur:              var(--#{$prefix}backdrop-blur) !default;
-$dialog-header-padding:             var(--#{$prefix}spacer) !default;
-$dialog-header-border-color:        var(--#{$prefix}border-color-translucent) !default;
-$dialog-header-border-width:        var(--#{$prefix}border-width) !default;
-$dialog-title-line-height:          var(--#{$prefix}body-line-height) !default;
-$dialog-footer-padding:             var(--#{$prefix}spacer) !default;
-$dialog-footer-border-color:        var(--#{$prefix}border-color-translucent) !default;
-$dialog-footer-border-width:        var(--#{$prefix}border-width) !default;
-$dialog-footer-gap:                 .5rem !default;
-// scss-docs-end dialog-variables
-
 // stylelint-disable scss/dollar-variable-default
 
 // scss-docs-start dialog-sizes
@@ -58,36 +31,38 @@ $dialog-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start dialog-css-vars
+// scss-docs-start dialog-tokens
 $dialog-tokens: defaults(
   (
     --#{$prefix}dialog-zindex: var(--#{$prefix}z-dialog),
-    --#{$prefix}dialog-padding: #{$dialog-padding},
-    --#{$prefix}dialog-width: #{$dialog-width},
-    --#{$prefix}dialog-margin: #{$dialog-margin},
-    --#{$prefix}dialog-color: #{$dialog-color},
-    --#{$prefix}dialog-bg: #{$dialog-bg},
-    --#{$prefix}dialog-border-color: #{$dialog-border-color},
-    --#{$prefix}dialog-border-width: #{$dialog-border-width},
-    --#{$prefix}dialog-border-radius: #{$dialog-border-radius},
-    --#{$prefix}dialog-box-shadow: #{$dialog-box-shadow},
-    --#{$prefix}dialog-transition-property: #{$dialog-transition-property},
-    --#{$prefix}dialog-transition-duration: #{$dialog-transition-duration},
-    --#{$prefix}dialog-transition-timing: #{$dialog-transition-timing},
-    --#{$prefix}dialog-backdrop-bg: #{$dialog-backdrop-bg},
-    --#{$prefix}dialog-backdrop-blur: #{$dialog-backdrop-blur},
-    --#{$prefix}dialog-header-padding: #{$dialog-header-padding},
-    --#{$prefix}dialog-header-border-color: #{$dialog-header-border-color},
-    --#{$prefix}dialog-header-border-width: #{$dialog-header-border-width},
-    --#{$prefix}dialog-title-line-height: #{$dialog-title-line-height},
-    --#{$prefix}dialog-footer-padding: #{$dialog-footer-padding},
-    --#{$prefix}dialog-footer-border-color: #{$dialog-footer-border-color},
-    --#{$prefix}dialog-footer-border-width: #{$dialog-footer-border-width},
-    --#{$prefix}dialog-footer-gap: #{$dialog-footer-gap},
+    --#{$prefix}dialog-padding: var(--#{$prefix}spacer),
+    --#{$prefix}dialog-width: 500px,
+    --#{$prefix}dialog-margin: 1.75rem,
+    --#{$prefix}dialog-color: var(--#{$prefix}fg-body),
+    --#{$prefix}dialog-bg: var(--#{$prefix}bg-body),
+    --#{$prefix}dialog-border-color: var(--#{$prefix}border-color-translucent),
+    --#{$prefix}dialog-border-width: var(--#{$prefix}border-width),
+    --#{$prefix}dialog-border-radius: var(--#{$prefix}radius-7),
+    --#{$prefix}dialog-box-shadow: var(--#{$prefix}box-shadow-lg),
+    --#{$prefix}dialog-transition-property: #{"opacity, transform, visibility"},
+    --#{$prefix}dialog-transition-duration: .3s,
+    --#{$prefix}dialog-transition-timing: var(--#{$prefix}transition-timing-overlay),
+    --#{$prefix}dialog-backdrop-bg: color-mix(in oklch, var(--#{$prefix}backdrop-color) var(--#{$prefix}backdrop-opacity), transparent),
+    --#{$prefix}dialog-backdrop-blur: var(--#{$prefix}backdrop-blur),
+    --#{$prefix}dialog-header-padding: var(--#{$prefix}spacer),
+    --#{$prefix}dialog-header-border-color: var(--#{$prefix}border-color-translucent),
+    --#{$prefix}dialog-header-border-width: var(--#{$prefix}border-width),
+    --#{$prefix}dialog-title-line-height: var(--#{$prefix}body-line-height),
+    --#{$prefix}dialog-footer-padding: var(--#{$prefix}spacer),
+    --#{$prefix}dialog-footer-border-color: var(--#{$prefix}border-color-translucent),
+    --#{$prefix}dialog-footer-border-width: var(--#{$prefix}border-width),
+    --#{$prefix}dialog-footer-gap: .5rem,
+    --#{$prefix}dialog-slide-distance: 3rem,
+    --#{$prefix}dialog-scale-transform: scale(1.02),
   ),
   $dialog-tokens
 );
-// scss-docs-end dialog-css-vars
+// scss-docs-end dialog-tokens
 
 // stylelint-enable scss/dollar-variable-default
 
@@ -128,11 +103,11 @@ $dialog-tokens: defaults(
       );
 
       &.dialog-slide-down {
-        transform: translateY(-$dialog-slide-distance);
+        transform: translateY(calc(var(--#{$prefix}dialog-slide-distance) * -1));
       }
 
       &.dialog-slide-up {
-        transform: translateY($dialog-slide-distance);
+        transform: translateY(var(--#{$prefix}dialog-slide-distance));
       }
 
       &[open]:not(.hiding) {
@@ -142,7 +117,7 @@ $dialog-tokens: defaults(
       }
 
       &[open].dialog-static:not(.hiding) {
-        transform: $dialog-scale-transform;
+        transform: var(--#{$prefix}dialog-scale-transform);
       }
 
       &::backdrop {

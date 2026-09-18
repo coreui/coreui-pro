@@ -2,41 +2,32 @@
 @use "../mixins/tokens" as *;
 @use "../config" as *;
 
-// scss-docs-start blockquote-variables
-$blockquote-margin-y:            var(--#{$prefix}spacer) !default;
-$blockquote-gap:                 var(--#{$prefix}spacer) !default;
-$blockquote-font-size:           calc(var(--#{$prefix}body-font-size) * 1.25) !default;
-$blockquote-footer-margin-y:     var(--#{$prefix}spacer) !default;
-$blockquote-footer-color:        var(--#{$prefix}fg-3) !default;
-$blockquote-footer-font-size:    var(--#{$prefix}small-font-size) !default;
-// scss-docs-end blockquote-variables
-
 $blockquote-tokens: () !default;
 $blockquote-footer-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start blockquote-css-vars
+// scss-docs-start blockquote-tokens
 $blockquote-tokens: defaults(
   (
-    --#{$prefix}blockquote-margin-y: #{$blockquote-margin-y},
-    --#{$prefix}blockquote-gap: #{$blockquote-gap},
-    --#{$prefix}blockquote-font-size: #{$blockquote-font-size},
+    --#{$prefix}blockquote-margin-y: var(--#{$prefix}spacer),
+    --#{$prefix}blockquote-gap: var(--#{$prefix}spacer),
+    --#{$prefix}blockquote-font-size: calc(var(--#{$prefix}body-font-size) * 1.25),
   ),
   $blockquote-tokens
 );
-// scss-docs-end blockquote-css-vars
+// scss-docs-end blockquote-tokens
 
-// scss-docs-start blockquote-footer-css-vars
+// scss-docs-start blockquote-footer-tokens
 $blockquote-footer-tokens: defaults(
   (
-    --#{$prefix}blockquote-footer-margin-y: #{$blockquote-footer-margin-y},
-    --#{$prefix}blockquote-footer-color: #{$blockquote-footer-color},
-    --#{$prefix}blockquote-footer-font-size: #{$blockquote-footer-font-size},
+    --#{$prefix}blockquote-footer-margin-y: var(--#{$prefix}spacer),
+    --#{$prefix}blockquote-footer-color: var(--#{$prefix}fg-3),
+    --#{$prefix}blockquote-footer-font-size: var(--#{$prefix}small-font-size),
   ),
   $blockquote-footer-tokens
 );
-// scss-docs-end blockquote-footer-css-vars
+// scss-docs-end blockquote-footer-tokens
 
 // stylelint-enable scss/dollar-variable-default
 

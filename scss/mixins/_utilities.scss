@@ -179,7 +179,6 @@
     // stylelint-disable-next-line scss/at-function-named-arguments
     $property-class: if(sass($property-class == null): ""; else: $property-class);
 
-
     // State params to generate pseudo-classes
     // stylelint-disable-next-line scss/at-function-named-arguments, @stylistic/function-whitespace-after
     $state: if(sass(map.has-key($utility, state)): map.get($utility, state); else: ());

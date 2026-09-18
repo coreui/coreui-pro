@@ -5,15 +5,8 @@
 // stylelint-disable custom-property-no-missing-var-function
 
 // scss-docs-start spinner-variables
-$spinner-width:                            1em !default;
-$spinner-height:                           $spinner-width !default;
-$spinner-border-width:                     .125em !default;
 $spinner-animation-speed:                  1s !default;
 $spinner-animation-timing-function:        linear !default;
-$spinner-grow-animation-timing-function:   ease-in-out !default;
-
-$spinner-width-sm:                         .75em !default;
-$spinner-height-sm:                        $spinner-width-sm !default;
 
 $spinner-reduced-motion-animation-speed:   1.5s !default;
 // scss-docs-end spinner-variables
@@ -22,19 +15,19 @@ $spinner-border-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start spinner-border-css-vars
+// scss-docs-start spinner-border-tokens
 $spinner-border-tokens: defaults(
   (
-    --#{$prefix}spinner-width: #{$spinner-width},
-    --#{$prefix}spinner-height: #{$spinner-height},
-    --#{$prefix}spinner-border-width: #{$spinner-border-width},
+    --#{$prefix}spinner-width: 1em,
+    --#{$prefix}spinner-height: 1em,
+    --#{$prefix}spinner-border-width: .125em,
     --#{$prefix}spinner-animation-speed: #{$spinner-animation-speed},
     --#{$prefix}spinner-animation-timing-function: #{$spinner-animation-timing-function},
     --#{$prefix}spinner-animation-name: spinner-border,
   ),
   $spinner-border-tokens
 );
-// scss-docs-end spinner-border-css-vars
+// scss-docs-end spinner-border-tokens
 
 // stylelint-enable scss/dollar-variable-default
 
@@ -42,18 +35,18 @@ $spinner-grow-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start spinner-grow-css-vars
+// scss-docs-start spinner-grow-tokens
 $spinner-grow-tokens: defaults(
   (
-    --#{$prefix}spinner-width: #{$spinner-width},
-    --#{$prefix}spinner-height: #{$spinner-height},
+    --#{$prefix}spinner-width: 1em,
+    --#{$prefix}spinner-height: 1em,
     --#{$prefix}spinner-animation-speed: #{$spinner-animation-speed},
-    --#{$prefix}spinner-animation-timing-function: #{$spinner-grow-animation-timing-function},
+    --#{$prefix}spinner-animation-timing-function: ease-in-out,
     --#{$prefix}spinner-animation-name: spinner-grow,
   ),
   $spinner-grow-tokens
 );
-// scss-docs-end spinner-grow-css-vars
+// scss-docs-end spinner-grow-tokens
 
 // stylelint-enable scss/dollar-variable-default
 @layer components {
@@ -84,8 +77,8 @@ $spinner-grow-tokens: defaults(
 
   .spinner-sm {
     // scss-docs-start spinner-sm-css-vars
-    --#{$prefix}spinner-width: #{$spinner-width-sm};
-    --#{$prefix}spinner-height: #{$spinner-height-sm};
+    --#{$prefix}spinner-width: #{.75em};
+    --#{$prefix}spinner-height: #{.75em};
     // scss-docs-end spinner-sm-css-vars
   }
 

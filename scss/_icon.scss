@@ -1,43 +1,65 @@
+@use "sass:map";
+@use "functions/defaults" as *;
 @use "mixins/icon" as *;
+@use "mixins/tokens" as *;
 @use "config" as *;
 
-$icon-size-sm:    calc(var(--#{$prefix}icon-size-base) * .875) !default;
-$icon-size-lg:    calc(var(--#{$prefix}icon-size-base) * 1.25) !default;
-$icon-size-xl:    calc(var(--#{$prefix}icon-size-base) * 1.5) !default;
-$icon-size-xxl:   calc(var(--#{$prefix}icon-size-base) * 2) !default;
+$icon-sizes: () !default;
 
+// scss-docs-start icon-sizes
+// stylelint-disable-next-line scss/dollar-variable-default
+$icon-sizes: defaults(
+  (
+    sm:  .875,
+    lg:  1.25,
+    xl:  1.5,
+    xxl: 2,
+    3xl: 3,
+    4xl: 4,
+    5xl: 5,
+    6xl: 6,
+    7xl: 7,
+    8xl: 8,
+    9xl: 9,
+  ),
+  $icon-sizes
+);
+// scss-docs-end icon-sizes
+
+$icon-tokens: () !default;
+
+// stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
+
+// scss-docs-start icon-tokens
+$icon-tokens: defaults(
+  (
+    --#{$prefix}icon-size: var(--#{$prefix}icon-size-base),
+  ),
+  $icon-tokens
+);
+// scss-docs-end icon-tokens
+
+// stylelint-enable custom-property-no-missing-var-function, scss/dollar-variable-default
 
 @layer components {
   .icon {
+    @include tokens($icon-tokens);
+
     display: inline-block;
     color: inherit;
     text-align: center;
     vertical-align: -.125rem; // Fix the position of icon
     fill: currentcolor;
     &:not(.icon-c-s, .icon-custom-size) {
-      @include icon-size(var(--#{$prefix}icon-size-base));
+      @include icon-size(var(--#{$prefix}icon-size));
 
-      &.icon-xxl {
-        @include icon-size($icon-size-xxl);
-      }
-
-      &.icon-xl {
-        @include icon-size($icon-size-xl);
-      }
-
-      &.icon-lg {
-        @include icon-size($icon-size-lg);
-      }
-
-      &.icon-sm {
-        @include icon-size($icon-size-sm);
-      }
-
-      @for $i from 3 through 9 {
-        &.icon-#{$i}xl {
-          @include icon-size(calc(#{$i} * var(--#{$prefix}icon-size-base)));
+      // scss-docs-start icon-sizes-loop
+      @each $size, $multiplier in $icon-sizes {
+        &.icon-#{$size} {
+          --#{$prefix}icon-size: calc(var(--#{$prefix}icon-size-base) * #{$multiplier});
         }
       }
+      // scss-docs-end icon-sizes-loop
     }
   }
 }

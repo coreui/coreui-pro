@@ -3,46 +3,35 @@
 @use "mixins/transition" as *;
 @use "config" as *;
 
-// scss-docs-start fade-transition
-$transition-fade-duration:    .15s !default;
-$transition-fade-timing:      linear !default;
-// scss-docs-end fade-transition
-
-// scss-docs-start collapse-transition
-$transition-collapse-property: "block-size, display" !default;
-$transition-collapse-duration: .35s !default;
-$transition-collapse-timing:   ease !default;
-// scss-docs-end collapse-transition
-
 $fade-tokens: () !default;
 $collapse-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start fade-css-vars
+// scss-docs-start fade-tokens
 $fade-tokens: defaults(
   (
-    --#{$prefix}transition-fade-duration: #{$transition-fade-duration},
-    --#{$prefix}transition-fade-timing: #{$transition-fade-timing},
+    --#{$prefix}transition-fade-duration: .15s,
+    --#{$prefix}transition-fade-timing: linear,
   ),
   $fade-tokens
 );
-// scss-docs-end fade-css-vars
+// scss-docs-end fade-tokens
 
 // stylelint-enable scss/dollar-variable-default
 
 // stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
-// scss-docs-start collapse-css-vars
+// scss-docs-start collapse-tokens
 $collapse-tokens: defaults(
   (
-    --#{$prefix}transition-collapse-property: #{$transition-collapse-property},
-    --#{$prefix}transition-collapse-duration: #{$transition-collapse-duration},
-    --#{$prefix}transition-collapse-timing: #{$transition-collapse-timing},
+    --#{$prefix}transition-collapse-property: #{"block-size, display"},
+    --#{$prefix}transition-collapse-duration: .35s,
+    --#{$prefix}transition-collapse-timing: ease,
   ),
   $collapse-tokens
 );
-// scss-docs-end collapse-css-vars
+// scss-docs-end collapse-tokens
 
 // stylelint-enable custom-property-no-missing-var-function, scss/dollar-variable-default
 

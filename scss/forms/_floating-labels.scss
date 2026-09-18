@@ -5,29 +5,6 @@
 @use "../mixins/transition" as *;
 @use "../config" as *;
 
-
-// scss-docs-start form-floating-variables
-$form-floating-height:                  calc(3.5rem + var(--#{$prefix}btn-input-border-width) * 2) !default;
-$form-floating-line-height:             1.25 !default;
-$form-floating-padding-x:               var(--#{$prefix}btn-input-padding-x) !default;
-$form-floating-padding-y:               1rem !default;
-$form-floating-input-padding-t:         1.625rem !default;
-$form-floating-input-padding-b:         .625rem !default;
-$form-floating-label-height:            1.5em !default;
-$form-floating-label-opacity:           .65 !default;
-$form-floating-label-transform:         scale(.85) translateY(-.5rem) translateX(.15rem) !default;
-$form-floating-label-transform-rtl:     scale(.85) translateY(-.5rem) translateX(-.15rem) !default;
-$form-floating-label-disabled-color:    var(--#{$prefix}fg-3) !default;
-// The label is a sibling of the control, so it cannot inherit the control's own
-// background — the textarea mask has to be told the same colour a second time.
-$form-floating-label-bg:                var(--#{$prefix}btn-input-bg) !default;
-$form-floating-label-disabled-bg:       var(--#{$prefix}bg-2) !default;
-$form-floating-label-border-radius:     var(--#{$prefix}btn-input-border-radius) !default;
-$form-floating-transition-property:     "opacity, transform" !default;
-$form-floating-transition-duration:     .1s !default;
-$form-floating-transition-timing:       ease-in-out !default;
-// scss-docs-end form-floating-variables
-
 // stylelint-disable scss/dollar-variable-default
 
 // stylelint-disable custom-property-no-missing-var-function
@@ -36,22 +13,23 @@ $form-floating-transition-timing:       ease-in-out !default;
 $form-floating-tokens: () !default;
 $form-floating-tokens: defaults(
   (
-    --#{$prefix}form-floating-height: #{$form-floating-height},
-    --#{$prefix}form-floating-line-height: #{$form-floating-line-height},
-    --#{$prefix}form-floating-padding-x: #{$form-floating-padding-x},
-    --#{$prefix}form-floating-padding-y: #{$form-floating-padding-y},
-    --#{$prefix}form-floating-input-padding-t: #{$form-floating-input-padding-t},
-    --#{$prefix}form-floating-input-padding-b: #{$form-floating-input-padding-b},
-    --#{$prefix}form-floating-label-height: #{$form-floating-label-height},
-    --#{$prefix}form-floating-label-opacity: #{$form-floating-label-opacity},
-    --#{$prefix}form-floating-label-transform: #{$form-floating-label-transform},
-    --#{$prefix}form-floating-label-disabled-color: #{$form-floating-label-disabled-color},
-    --#{$prefix}form-floating-label-bg: #{$form-floating-label-bg},
-    --#{$prefix}form-floating-label-disabled-bg: #{$form-floating-label-disabled-bg},
-    --#{$prefix}form-floating-label-border-radius: #{$form-floating-label-border-radius},
-    --#{$prefix}form-floating-transition-property: #{$form-floating-transition-property},
-    --#{$prefix}form-floating-transition-duration: #{$form-floating-transition-duration},
-    --#{$prefix}form-floating-transition-timing: #{$form-floating-transition-timing},
+    --#{$prefix}form-floating-height: calc(3.5rem + var(--#{$prefix}btn-input-border-width) * 2),
+    --#{$prefix}form-floating-line-height: 1.25,
+    --#{$prefix}form-floating-padding-x: var(--#{$prefix}btn-input-padding-x),
+    --#{$prefix}form-floating-padding-y: 1rem,
+    --#{$prefix}form-floating-input-padding-t: 1.625rem,
+    --#{$prefix}form-floating-input-padding-b: .625rem,
+    --#{$prefix}form-floating-label-height: 1.5em,
+    --#{$prefix}form-floating-label-opacity: .65,
+    --#{$prefix}form-floating-label-transform: scale(.85) translateY(-.5rem) translateX(.15rem),
+    --#{$prefix}form-floating-label-disabled-color: var(--#{$prefix}fg-3),
+    // The label is a sibling of the control, so it cannot inherit its background.
+    --#{$prefix}form-floating-label-bg: var(--#{$prefix}btn-input-bg),
+    --#{$prefix}form-floating-label-disabled-bg: var(--#{$prefix}bg-2),
+    --#{$prefix}form-floating-label-border-radius: var(--#{$prefix}btn-input-border-radius),
+    --#{$prefix}form-floating-transition-property: #{"opacity, transform"},
+    --#{$prefix}form-floating-transition-duration: .1s,
+    --#{$prefix}form-floating-transition-timing: ease-in-out,
   ),
   $form-floating-tokens
 );
@@ -72,7 +50,7 @@ $form-floating-tokens: defaults(
     position: relative;
 
     @include rtl() {
-      --#{$prefix}form-floating-label-transform: #{$form-floating-label-transform-rtl};
+      --#{$prefix}form-floating-label-transform: #{scale(.85) translateY(-.5rem) translateX(-.15rem)};
     }
 
     > .form-control,

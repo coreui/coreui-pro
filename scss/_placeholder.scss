@@ -2,24 +2,19 @@
 @use "mixins/tokens" as *;
 @use "config" as *;
 
-// scss-docs-start placeholders
-$placeholder-opacity-max:           .5 !default;
-$placeholder-opacity-min:           .2 !default;
-// scss-docs-end placeholders
-
 $placeholder-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start placeholder-css-vars
+// scss-docs-start placeholder-tokens
 $placeholder-tokens: defaults(
   (
-    --#{$prefix}placeholder-opacity-max: #{$placeholder-opacity-max},
-    --#{$prefix}placeholder-opacity-min: #{$placeholder-opacity-min},
+    --#{$prefix}placeholder-opacity-max: .5,
+    --#{$prefix}placeholder-opacity-min: .2,
   ),
   $placeholder-tokens
 );
-// scss-docs-end placeholder-css-vars
+// scss-docs-end placeholder-tokens
 
 // stylelint-enable scss/dollar-variable-default
 @layer components {

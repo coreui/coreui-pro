@@ -1409,6 +1409,17 @@ declaration.
   `--cui-control-select-bg-img`, `-bg-position`, `-bg-size`,
   `-indicator-padding` → `--cui-control-select-padding-end`, and the
   `-feedback-icon-*` pair.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The chevron is translucent, and its color is no longer a Sass variable.**
+  `$form-control-select-indicator-color` and its dark counterpart are gone; the
+  SVG carries `#00000080` and `#ffffff80`, and the control declares both images
+  as `--cui-control-select-bg-img` and `--cui-control-select-bg-img-dark`, dark
+  mode switching which one the `background-image` reads. A color inside a data
+  URI cannot read a token, so making it translucent is what lets the chevron sit
+  correctly on a field of any color instead of on the two we picked. Measured on
+  the default field, the stroke goes from `rgb(44, 49, 60)` to `rgb(127, 127,
+  127)` in light mode and from `rgb(223, 223, 223)` to `rgb(132, 133, 135)` in
+  dark. Override the token with your own data URI to get a solid one back.
 - **Two differences a select inherits from `.form-control`,** neither of which
   changed a rendered box in any case measured. It paints its background with
   `background-clip: padding-box`, the value `.form-control` has always used to
@@ -2246,10 +2257,8 @@ has moved leaves the sheet out and carries no `.form-check*` selector at all.
 The v5 spelling — `.btn-check` on the `<input>`, with a sibling `<label
 class="btn">` — is in `coreui-legacy.css` alongside the rest.
 
-The variables that shape the wrapper moved with it, into `scss/_legacy.scss`,
-and go when it does:
-
-<ScssDocs file="scss/_legacy.scss" capture="form-check-wrapper-variables" />
+The wrapper it draws is styled from `scss/_legacy.scss` and goes when the
+layer does.
 
 **Five Sass variables shaped the old artwork and cannot be honoured any more**,
 because the compatibility layer draws through the new engine:
@@ -2961,10 +2970,9 @@ Multi Select's option indicators moved with it — they render as a decorative
 
 v6 adopts the Bootstrap v6 SCSS architecture: CSS cascade layers, per-component
 design-token maps, one shared styling surface for every text control, and
-runtime color math in place of precompiled shades. Sass variables remain the
-primary customization API — every component knob still works through
-`@use ... with()` — but several things below are breaking and are called out
-as such.
+runtime color math in place of precompiled shades. The global Sass knobs stay
+the build-time customization API, while a component's own surface is its token
+map — several things below are breaking and are called out as such.
 
 #### A numeric radius scale replaces the one global radius
 
@@ -3350,9 +3358,9 @@ them. A state names a theme colour now, and every value is a slot of it.
 -     "color": var(--cui-form-valid-color),
 -     "border-color": var(--cui-form-valid-border-color),
 -     "tooltip-bg-color": var(--cui-success),
+-     "icon": …,
 -     …
 +     "theme": "success",
-      "icon": …,
     ),
   )
 ```
@@ -3778,8 +3786,105 @@ tintable and lets dark mode deepen every shadow at once.
   );
   ```
 
-  Classic per-variable overrides (`$alert-padding-y: 2rem`) keep working — the
-  map defaults are built from the same Sass variables.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **941 Sass variables are gone, across 64 partials.** Every scalar whose only
+  job was carrying a value into a token map now sits in the map, so a value has
+  one home instead of two. Set the token instead of the variable —
+  `$popover-tokens: (--cui-popover-bg: hotpink)` at build time, or
+  `--cui-popover-bg` on the element at runtime. Moving a value out of a variable
+  and into the map does not change what compiles out, so this reaches you only
+  if your build set one of the removed variables, and Sass then names it: `This variable was not declared with
+  !default in the @used module.` Each component page says which variables it
+  still has: 31 lost their `### Sass variables` section entirely.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`scss/_root.scss` declares no variables of its own any more** — 62 went,
+  leaving only `$root-tokens` for overriding the map. The page-wide knobs that
+  lived there are now the tokens they always emitted: `$input-btn-*` →
+  `--cui-btn-input-*`, `$control-*` → `--cui-control-*`, `$focus-ring-*` →
+  `--cui-focus-ring-*`, `$backdrop-*` → `--cui-backdrop-*`,
+  `$font-family-sans-serif` → `--cui-font-sans-serif`, `$line-height-base` →
+  `--cui-body-line-height`. Override them through `$root-tokens` when you
+  compile, or on `:root` at runtime:
+
+  ```scss
+  @use "@coreui/coreui-pro/scss/coreui" with (
+    $root-tokens: (
+      --cui-body-line-height: 1.6,
+      --cui-btn-input-padding-y: .5rem,
+    )
+  );
+  ```
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **Sixteen more page-wide knobs are gone.** `scss/_theme.scss` declares no
+  variables at all now: the four that set how far a hover or active shade
+  travels are the tokens they fed, `--cui-theme-hover-lightness`,
+  `--cui-theme-hover-chroma`, `--cui-theme-active-lightness` and
+  `--cui-theme-active-chroma`, and the theme page documents them. From
+  `scss/_config.scss`, `$gradient`, `$border-style`, `$font-family-base`,
+  `$headings-color` and `$link-color` go the same way, to `--cui-gradient`,
+  `--cui-border-style`, `--cui-body-font-family`, `--cui-heading-color` and
+  `--cui-link-color`. All seven `$font-weight-*` scalars are folded
+  into `$font-weights`, which stays the way to add or drop a weight. `dt` and the headings read
+  `--cui-font-weight-bold` and `--cui-font-weight-medium` instead of a number
+  frozen at build time, so retuning a weight on `:root` now moves them too. `$headings-line-height` goes to `--cui-heading-line-height`, `$font-size-base` to `--cui-body-font-size`, and `$font-size-root`
+  goes entirely: it gated a `font-size` on the root element at build time and
+  defaulted to `null`, so it emitted nothing. Set `font-size` on `html` in your
+  own CSS to scale `rem` instead. `$border-width` and `$border-color` go the
+  same way, to `--cui-border-width` and `--cui-border-color`; the width scale and the `.border-{key}` classes
+  read the token, not the variable. `$blue` and `$pink` are finally gone from
+  the source, which is what the palette entry above already said.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The reboot declares no variables of its own**, and 89 more scalars go with
+  the same rule across the content partials, the legacy layer, the form label,
+  text and file blocks, the callout, card, list group, dropdown and navbar dark
+  blocks and the password strength meter. Each was a value on its way into a
+  token map. `<th>` keeps the browser's own weight rather than a knob that
+  emitted nothing, `<caption>` reads `--cui-spacer-2` and `--cui-fg-3`, and
+  `code` reads `--cui-font-mono`.
+- **`mark` carries its own tokens.** `--cui-mark-padding`, `--cui-mark-color`
+  and `--cui-mark-bg` were declared on `:root`, where nothing else read them.
+  They sit on `mark, .mark` now, in a `$reboot-mark-tokens` map you can override
+  like any other component surface. Setting them on `:root` no longer reaches
+  the element; set them on the element, or on the map when you compile.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **76 more component scalars are gone**, the ones whose value reached exactly
+  one custom property and nothing else: the chip and chip input size variants,
+  the nav enclosed set, the OTP input sizes, the badge and rating sizes, the
+  modal widths and margins, the toast surface, the form control group icon
+  sizes and the colour picker width. Each is the token it fed.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The artwork variables are gone too.** The accordion chevron, the breadcrumb
+  divider, the four carousel controls, the close button glyph, the check and
+  radio marks, the rating star, the select indicator and the navbar, header and
+  sidebar togglers were each a Sass variable feeding one custom property. Set
+  the property: `--cui-accordion-header-icon`, `--cui-breadcrumb-divider`,
+  `--cui-carousel-control-prev-icon`, `--cui-btn-close-icon`,
+  `--cui-check-mark-checked`, `--cui-radio-mark`, `--cui-rating-item-icon`,
+  `--cui-control-select-bg-img`, `--cui-navbar-toggler-icon-bg`,
+  `--cui-header-toggler-icon-bg`, `--cui-sidebar-toggler-icon`.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The validation icon inside the field is gone**, and with it
+  `$enable-validation-icons`, the two glyphs and their colours, the geometry
+  that made room for them and the select's second background layer. A valid or
+  invalid field still says so through its border, its focus ring and its
+  feedback text. The glyph was a `background-image` on the input itself with the
+  colour baked into the SVG, so it could never follow a token: an input renders
+  no pseudo-element to hang a mask on, and masking the input erases its own
+  background. It comes back when the field has a wrapper to draw it in.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`$radius` and `$chip-gap` are gone**, to `--cui-radius` and
+  `--cui-chip-gap`. The radius scale still multiplies one value, but that value
+  is the token: set `--cui-radius` and every stop follows at runtime.
+- **`$font-weight-semibold` and `$grid-gutter-width` are gone too.** Both were
+  kept only because the shared docs engine read them; it reads
+  `--cui-font-weight-semibold` and `$grid-gutter-x` now. The weight lives in
+  `$font-weights`, and `$grid-gutter-x` is the gutter.
+- **What stays in `scss/_config.scss` stays for a reason.** `$spacer`, the
+  `$enable-*` switches, the breakpoint, container, spacer and border-width maps
+  and the contrast helpers feed maps, mixins, loops and build-time decisions
+  rather than one token, so they stay Sass. `$theme-colors` stays for the same
+  reason, in `scss/_theme.scss`. So does every component variable a rule or a mixin
+  still reads.
 - **Component Sass variables moved from `_config.scss` into their component
   partials.** `@use ... with()` is unaffected — the entry point forwards every
   module — but if you imported `scss/_config.scss` directly for its

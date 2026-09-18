@@ -23,11 +23,15 @@ With v4.1.0, we standardized our required `@import`s across all our CSS bundles 
 
 Reboot styles bare HTML, so its variables live on `:root` rather than on a class — set any of them there, or on a subtree, to restyle the elements underneath:
 
-<ScssDocs file="scss/content/_reboot.scss" capture="reboot-css-vars" />
+<ScssDocs file="scss/content/_reboot.scss" capture="reboot-tokens" />
 
 `<kbd>` carries its own, on the element:
 
-<ScssDocs file="scss/content/_reboot.scss" capture="kbd-css-vars" />
+<ScssDocs file="scss/content/_reboot.scss" capture="kbd-tokens" />
+
+`<mark>` and `.mark` do the same, so a highlight is retinted where it sits:
+
+<ScssDocs file="scss/content/_reboot.scss" capture="mark-tokens" />
 
 The `<body>` rules show how a variable is consumed:
 
@@ -46,7 +50,7 @@ Which means the page can be restyled from the markup, with no recompile:
 The `<html>` and `<body>` elements are updated to provide better page-wide defaults. More specifically:
 
 - The `box-sizing` is globally set on every element—including `*::before` and `*::after`, to `border-box`. This ensures that the declared width of element is never exceeded due to padding or border.
-  - No base `font-size` is declared on the `<html>`, but `16px` is assumed (the browser default). `font-size: 1rem` is applied on the `<body>` for easy responsive type-scaling via media queries while respecting user preferences and ensuring a more accessible approach. This browser default can be overridden by modifying the `$font-size-root` variable.
+  - No base `font-size` is declared on the `<html>`, but `16px` is assumed (the browser default). `font-size: 1rem` is applied on the `<body>` for easy responsive type-scaling via media queries while respecting user preferences and ensuring a more accessible approach.
 - The `<body>` also sets a global `font-family`, `font-weight`, `line-height`, and `color`. This is inherited later by some form elements to prevent font inconsistencies.
 - For safety, the `<body>` has a declared `background-color`, defaulting to `#fff`.
 - `accent-color` is set to `--cui-primary` on the root, so native controls that we do not restyle — a bare checkbox, radio, range or `<progress>` — are drawn in your brand color instead of the browser's blue.
@@ -64,32 +68,11 @@ Placeholder links — an `<a>` with neither `href` nor a class — keep the surr
 
 CoreUI for Bootstrap utilizes a "native font stack" or "system font stack" for optimum text rendering on every device and OS. These system fonts have been designed specifically with today's devices in mind, with improved rendering on screens, variable font support, and more. Read more about [native font stacks in this *Smashing Magazine* article](https://www.smashingmagazine.com/2015/11/using-system-ui-fonts-practical-guide/).
 
-```scss
-$font-family-sans-serif:
-  // Cross-platform generic font family (default user interface font)
-  system-ui,
-  // Safari for macOS and iOS (San Francisco)
-  -apple-system,
-  // Windows
-  "Segoe UI",
-  // Android
-  Roboto,
-  // older macOS and iOS
-  "Helvetica Neue"
-  // Linux
-  "Noto Sans",
-  "Liberation Sans",
-  // Basic web fallback
-  Arial,
-  // Sans serif fallback
-  sans-serif,
-  // Emoji fonts
-  "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !default;
-```
+<ScssDocs file="scss/_root.scss" capture="root-font-stacks" />
 
 Note that because the font stack includes emoji fonts, many common symbol/dingbat unicode characters will be rendered as multi-colored pictographs. Their appearance will vary, depending on the style used in the browser/platform's native emoji font, and they won't be affected by any CSS `color` styles.
 
-This `font-family` is applied to the `<body>` and automatically inherited globally throughout Bootstrap. To switch the global `font-family`, update `$font-family-base` and recompile Bootstrap.
+This `font-family` is applied to the `<body>` and automatically inherited globally throughout Bootstrap. To switch the global `font-family`, set `--cui-body-font-family`.
 
 ## Headings and paragraphs
 

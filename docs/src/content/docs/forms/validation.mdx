@@ -24,7 +24,7 @@ With that in mind, consider the following demos for our custom form validation s
 
 For custom CoreUI for Bootstrap form validation messages, add `data-coreui-validate` and the `novalidate` boolean attribute to your `<form>`. The examples on this page use `data-coreui-validate="valid"`, so the fields that pass show their success message too. The `data-coreui-validate` attribute opts in to the `:user-invalid` styling, while `novalidate` disables the browser default feedback tooltips but still provides access to the form validation APIs in JavaScript. Try to submit the form below; our JavaScript will intercept the submit button and relay feedback to you.
 
-Custom feedback styles apply custom colors, borders, focus styles, and background icons to better communicate feedback.
+Custom feedback styles apply custom colors, borders and focus styles to communicate feedback.
 
 <Example code={`<form class="row g-3" data-coreui-validate="valid" novalidate>
     <div class="col-md-4">
@@ -340,11 +340,7 @@ If your form layout allows it, you can swap the `.{valid|invalid}-feedback` clas
 
 ## Customizing
 
-Validation states can be customized via Sass with the `$form-validation-states` map. Located in our `scss/mixins/_form-validation.scss` file, this Sass map is how we generate the default `valid`/`invalid` validation states. Included is a nested map for customizing each state's color, icon, tooltip color, and focus shadow. While no other states are supported by browsers, those using custom styles can easily add more complex form feedback.
-
-### Sass variables
-
-<ScssDocs file="scss/mixins/_form-validation.scss" capture="form-feedback-variables" />
+Validation states can be customized via Sass with the `$form-validation-states` map. Located in our `scss/mixins/_form-validation.scss` file, this Sass map is how we generate the default `valid`/`invalid` validation states. Included is a nested map for customizing each state's color, tooltip color, and focus shadow. While no other states are supported by browsers, those using custom styles can easily add more complex form feedback.
 
 ### Sass maps
 

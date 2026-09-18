@@ -3,24 +3,6 @@
 @use "../mixins/tokens" as *;
 @use "../config" as *;
 
-// scss-docs-start chip-input-variables
-$chip-input-padding-y:           .25rem !default;
-$chip-input-padding-x:           .75rem !default;
-$chip-input-border-color:        var(--#{$prefix}border-color) !default;
-$chip-input-border-radius:       var(--#{$prefix}radius-4) !default;
-$chip-input-gap:                 .375rem !default;
-
-$chip-input-padding-y-sm:        .125rem !default;
-$chip-input-padding-x-sm:        .5rem !default;
-$chip-input-border-radius-sm:    var(--#{$prefix}radius-3) !default;
-$chip-input-gap-sm:              .125rem !default;
-
-$chip-input-padding-y-lg:        .375rem !default;
-$chip-input-padding-x-lg:        1rem !default;
-$chip-input-border-radius-lg:    var(--#{$prefix}radius-5) !default;
-$chip-input-gap-lg:              .5rem !default;
-// scss-docs-end chip-input-variables
-
 $chip-input-sizes: () !default;
 
 // scss-docs-start chip-input-sizes
@@ -28,16 +10,16 @@ $chip-input-sizes: () !default;
 $chip-input-sizes: defaults(
   (
     "sm": (
-      padding-y:     $chip-input-padding-y-sm,
-      padding-x:     $chip-input-padding-x-sm,
-      border-radius: $chip-input-border-radius-sm,
-      gap:           $chip-input-gap-sm,
+      padding-y:     .125rem,
+      padding-x:     .5rem,
+      border-radius: var(--#{$prefix}radius-3),
+      gap:           .125rem,
     ),
     "lg": (
-      padding-y:     $chip-input-padding-y-lg,
-      padding-x:     $chip-input-padding-x-lg,
-      border-radius: $chip-input-border-radius-lg,
-      gap:           $chip-input-gap-lg,
+      padding-y:     .375rem,
+      padding-x:     1rem,
+      border-radius: var(--#{$prefix}radius-5),
+      gap:           .5rem,
     ),
   ),
   $chip-input-sizes
@@ -46,19 +28,19 @@ $chip-input-sizes: defaults(
 
 // stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
-// scss-docs-start chip-input-css-vars
+// scss-docs-start chip-input-tokens
 $chip-input-tokens: () !default;
 $chip-input-tokens: defaults(
   (
-    --#{$prefix}control-padding-y: #{$chip-input-padding-y},
-    --#{$prefix}control-padding-x: #{$chip-input-padding-x},
-    --#{$prefix}control-border-color: #{$chip-input-border-color},
-    --#{$prefix}control-border-radius: #{$chip-input-border-radius},
-    --#{$prefix}control-group-gap: #{$chip-input-gap},
+    --#{$prefix}control-padding-y: .25rem,
+    --#{$prefix}control-padding-x: .75rem,
+    --#{$prefix}control-border-color: var(--#{$prefix}border-color),
+    --#{$prefix}control-border-radius: var(--#{$prefix}radius-4),
+    --#{$prefix}control-group-gap: .375rem,
   ),
   $chip-input-tokens
 );
-// scss-docs-end chip-input-css-vars
+// scss-docs-end chip-input-tokens
 
 // stylelint-enable scss/dollar-variable-default, custom-property-no-missing-var-function
 

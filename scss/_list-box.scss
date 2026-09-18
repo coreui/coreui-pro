@@ -5,98 +5,53 @@
 @use "mixins/translucent" as *;
 @use "config" as *;
 
-// scss-docs-start list-box-variables
-$list-box-padding-y:                    .375rem !default;
-$list-box-padding-x:                    .375rem !default;
-$list-box-gap:                          .125rem !default;
-$list-box-color:                        var(--#{$prefix}fg-body) !default;
-$list-box-bg:                           var(--#{$prefix}bg-body) !default;
-$list-box-font-size:                    var(--#{$prefix}body-font-size) !default;
-$list-box-border-width:                 var(--#{$prefix}border-width) !default;
-$list-box-border-color:                 var(--#{$prefix}border-color) !default;
-$list-box-border-radius:                var(--#{$prefix}radius-7) !default;
-$list-box-focus-ring-color:             var(--#{$prefix}focus-ring-color) !default;
-$list-box-loading-opacity:              .65 !default;
-
-$list-box-header-border-width:          var(--#{$prefix}border-width) !default;
-$list-box-header-border-color:          var(--#{$prefix}border-color) !default;
-
-$list-box-title-font-size:              var(--#{$prefix}body-font-size) !default;
-$list-box-title-font-weight:            var(--#{$prefix}font-weight-semibold) !default;
-$list-box-title-color:                  var(--#{$prefix}fg-body) !default;
-
-$list-box-subtitle-font-size:           calc(var(--#{$prefix}body-font-size) * .875) !default;
-$list-box-subtitle-color:               var(--#{$prefix}fg-3) !default;
-
-$list-box-search-margin:                1rem 1rem 0 !default;
-
-$list-box-option-padding-y:             .5rem !default;
-$list-box-option-padding-x:             .75rem !default;
-$list-box-option-gap:                   .5rem !default;
-$list-box-option-border-radius:         var(--#{$prefix}radius-5) !default;
-$list-box-option-hover-color:           var(--#{$prefix}fg-body) !default;
-$list-box-option-hover-bg:              var(--#{$prefix}bg-1) !default;
-$list-box-option-active-color:          var(--#{$prefix}fg-body) !default;
-$list-box-option-active-bg:             var(--#{$prefix}bg-1) !default;
-$list-box-option-selected-color:        var(--#{$prefix}fg-body) !default;
-$list-box-option-selected-bg:           var(--#{$prefix}bg-2) !default;
-$list-box-option-disabled-color:        var(--#{$prefix}fg-3) !default;
-$list-box-option-description-color:     var(--#{$prefix}fg-3) !default;
-$list-box-option-description-font-size: calc(var(--#{$prefix}body-font-size) * .875) !default;
-$list-box-option-indicator-width:       var(--#{$prefix}check-size, var(--#{$prefix}control-size)) !default;
-
-$list-box-section-label-color:          var(--#{$prefix}fg-3) !default;
-$list-box-section-label-font-size:      80% !default;
-$list-box-section-label-padding:        .5rem .625rem !default;
-// scss-docs-end list-box-variables
-
 $list-box-tokens: () !default;
 
 // stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
-// scss-docs-start list-box-css-vars
+// scss-docs-start list-box-tokens
 $list-box-tokens: defaults(
   (
-    --#{$prefix}list-box-padding-y: #{$list-box-padding-y},
-    --#{$prefix}list-box-padding-x: #{$list-box-padding-x},
-    --#{$prefix}list-box-gap: #{$list-box-gap},
-    --#{$prefix}list-box-color: #{$list-box-color},
-    --#{$prefix}list-box-bg: #{$list-box-bg},
-    --#{$prefix}list-box-font-size: #{$list-box-font-size},
-    --#{$prefix}list-box-border-width: #{$list-box-border-width},
-    --#{$prefix}list-box-border-color: #{$list-box-border-color},
-    --#{$prefix}list-box-border-radius: #{$list-box-border-radius},
-    --#{$prefix}list-box-focus-ring-color: #{$list-box-focus-ring-color},
-    --#{$prefix}list-box-loading-opacity: #{$list-box-loading-opacity},
-    --#{$prefix}list-box-header-border-width: #{$list-box-header-border-width},
-    --#{$prefix}list-box-header-border-color: #{$list-box-header-border-color},
-    --#{$prefix}list-box-title-font-size: #{$list-box-title-font-size},
-    --#{$prefix}list-box-title-font-weight: #{$list-box-title-font-weight},
-    --#{$prefix}list-box-title-color: #{$list-box-title-color},
-    --#{$prefix}list-box-subtitle-font-size: #{$list-box-subtitle-font-size},
-    --#{$prefix}list-box-subtitle-color: #{$list-box-subtitle-color},
-    --#{$prefix}list-box-search-margin: #{$list-box-search-margin},
-    --#{$prefix}list-box-option-padding-y: #{$list-box-option-padding-y},
-    --#{$prefix}list-box-option-padding-x: #{$list-box-option-padding-x},
-    --#{$prefix}list-box-option-gap: #{$list-box-option-gap},
-    --#{$prefix}list-box-option-border-radius: #{$list-box-option-border-radius},
-    --#{$prefix}list-box-option-hover-color: #{$list-box-option-hover-color},
-    --#{$prefix}list-box-option-hover-bg: #{$list-box-option-hover-bg},
-    --#{$prefix}list-box-option-active-color: #{$list-box-option-active-color},
-    --#{$prefix}list-box-option-active-bg: #{$list-box-option-active-bg},
-    --#{$prefix}list-box-option-selected-color: #{$list-box-option-selected-color},
-    --#{$prefix}list-box-option-selected-bg: #{$list-box-option-selected-bg},
-    --#{$prefix}list-box-option-disabled-color: #{$list-box-option-disabled-color},
-    --#{$prefix}list-box-option-description-color: #{$list-box-option-description-color},
-    --#{$prefix}list-box-option-description-font-size: #{$list-box-option-description-font-size},
-    --#{$prefix}list-box-option-indicator-width: #{$list-box-option-indicator-width},
-    --#{$prefix}list-box-section-label-color: #{$list-box-section-label-color},
-    --#{$prefix}list-box-section-label-font-size: #{$list-box-section-label-font-size},
-    --#{$prefix}list-box-section-label-padding: #{$list-box-section-label-padding},
+    --#{$prefix}list-box-padding-y: .375rem,
+    --#{$prefix}list-box-padding-x: .375rem,
+    --#{$prefix}list-box-gap: .125rem,
+    --#{$prefix}list-box-color: var(--#{$prefix}fg-body),
+    --#{$prefix}list-box-bg: var(--#{$prefix}bg-body),
+    --#{$prefix}list-box-font-size: var(--#{$prefix}body-font-size),
+    --#{$prefix}list-box-border-width: var(--#{$prefix}border-width),
+    --#{$prefix}list-box-border-color: var(--#{$prefix}border-color),
+    --#{$prefix}list-box-border-radius: var(--#{$prefix}radius-7),
+    --#{$prefix}list-box-focus-ring-color: var(--#{$prefix}focus-ring-color),
+    --#{$prefix}list-box-loading-opacity: .65,
+    --#{$prefix}list-box-header-border-width: var(--#{$prefix}border-width),
+    --#{$prefix}list-box-header-border-color: var(--#{$prefix}border-color),
+    --#{$prefix}list-box-title-font-size: var(--#{$prefix}body-font-size),
+    --#{$prefix}list-box-title-font-weight: var(--#{$prefix}font-weight-semibold),
+    --#{$prefix}list-box-title-color: var(--#{$prefix}fg-body),
+    --#{$prefix}list-box-subtitle-font-size: calc(var(--#{$prefix}body-font-size) * .875),
+    --#{$prefix}list-box-subtitle-color: var(--#{$prefix}fg-3),
+    --#{$prefix}list-box-search-margin: 1rem 1rem 0,
+    --#{$prefix}list-box-option-padding-y: .5rem,
+    --#{$prefix}list-box-option-padding-x: .75rem,
+    --#{$prefix}list-box-option-gap: .5rem,
+    --#{$prefix}list-box-option-border-radius: var(--#{$prefix}radius-5),
+    --#{$prefix}list-box-option-hover-color: var(--#{$prefix}fg-body),
+    --#{$prefix}list-box-option-hover-bg: var(--#{$prefix}bg-1),
+    --#{$prefix}list-box-option-active-color: var(--#{$prefix}fg-body),
+    --#{$prefix}list-box-option-active-bg: var(--#{$prefix}bg-1),
+    --#{$prefix}list-box-option-selected-color: var(--#{$prefix}fg-body),
+    --#{$prefix}list-box-option-selected-bg: var(--#{$prefix}bg-2),
+    --#{$prefix}list-box-option-disabled-color: var(--#{$prefix}fg-3),
+    --#{$prefix}list-box-option-description-color: var(--#{$prefix}fg-3),
+    --#{$prefix}list-box-option-description-font-size: calc(var(--#{$prefix}body-font-size) * .875),
+    --#{$prefix}list-box-option-indicator-width: var(--#{$prefix}check-size, var(--#{$prefix}control-size)),
+    --#{$prefix}list-box-section-label-color: var(--#{$prefix}fg-3),
+    --#{$prefix}list-box-section-label-font-size: 80%,
+    --#{$prefix}list-box-section-label-padding: .5rem .625rem,
   ),
   $list-box-tokens
 );
-// scss-docs-end list-box-css-vars
+// scss-docs-end list-box-tokens
 
 // stylelint-enable scss/dollar-variable-default, custom-property-no-missing-var-function
 

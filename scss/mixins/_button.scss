@@ -7,16 +7,9 @@
 @use "../theme" as *;
 
 // scss-docs-start btn-variables
-$btn-white-space:             nowrap !default; // Set to `normal` to let button text wrap
-
 $btn-color:                   var(--#{$prefix}fg-body) !default;
 $btn-bg:                      var(--#{$prefix}bg-2) !default;
 $btn-hover-bg:                var(--#{$prefix}bg-3) !default;
-$btn-active-box-shadow:       inset 0 3px 5px color-mix(in oklch, var(--#{$prefix}black) 12.5%, transparent) !default;
-
-$btn-link-color:              var(--#{$prefix}link-color) !default;
-$btn-link-hover-color:        var(--#{$prefix}link-hover-color) !default;
-$btn-link-disabled-color:     var(--#{$prefix}fg-3) !default;
 
 $btn-outline-color:           var(--#{$prefix}fg-2) !default;
 $btn-outline-border-color:    var(--#{$prefix}border-color) !default;
@@ -46,7 +39,7 @@ $button-tokens: defaults(
     --#{$prefix}btn-font-size: var(--#{$prefix}btn-input-font-size),
     --#{$prefix}btn-font-weight: var(--#{$prefix}font-weight-normal),
     --#{$prefix}btn-line-height: var(--#{$prefix}btn-input-line-height),
-    --#{$prefix}btn-white-space: $btn-white-space,
+    --#{$prefix}btn-white-space: nowrap,
     --#{$prefix}btn-color: #{$btn-color},
     --#{$prefix}btn-bg: #{$btn-bg},
     --#{$prefix}btn-border-width: var(--#{$prefix}btn-input-border-width),
@@ -61,7 +54,7 @@ $button-tokens: defaults(
     --#{$prefix}btn-disabled-color: #{$btn-color},
     --#{$prefix}btn-disabled-bg: #{$btn-bg},
     --#{$prefix}btn-disabled-border-color: transparent,
-    --#{$prefix}btn-active-shadow: #{$btn-active-box-shadow},
+    --#{$prefix}btn-active-shadow: inset 0 3px 5px color-mix(in oklch, var(--#{$prefix}black) 12.5%, transparent),
     --#{$prefix}btn-disabled-opacity: var(--#{$prefix}btn-input-disabled-opacity),
     --#{$prefix}btn-transition-property: var(--#{$prefix}btn-input-action-transition-property),
     --#{$prefix}btn-transition-duration: var(--#{$prefix}btn-input-transition-duration),
@@ -158,16 +151,16 @@ $button-link-tokens: () !default;
 $button-link-tokens: defaults(
   (
     --#{$prefix}btn-font-weight: var(--#{$prefix}font-weight-normal),
-    --#{$prefix}btn-color: #{$btn-link-color},
+    --#{$prefix}btn-color: var(--#{$prefix}link-color),
     --#{$prefix}btn-bg: transparent,
     --#{$prefix}btn-border-color: transparent,
-    --#{$prefix}btn-hover-color: #{$btn-link-hover-color},
+    --#{$prefix}btn-hover-color: var(--#{$prefix}link-hover-color),
     --#{$prefix}btn-hover-bg: transparent,
     --#{$prefix}btn-hover-border-color: transparent,
-    --#{$prefix}btn-active-color: #{$btn-link-hover-color},
+    --#{$prefix}btn-active-color: var(--#{$prefix}link-hover-color),
     --#{$prefix}btn-active-bg: transparent,
     --#{$prefix}btn-active-border-color: transparent,
-    --#{$prefix}btn-disabled-color: #{$btn-link-disabled-color},
+    --#{$prefix}btn-disabled-color: var(--#{$prefix}fg-3),
     --#{$prefix}btn-disabled-bg: transparent,
     --#{$prefix}btn-disabled-border-color: transparent
   ),

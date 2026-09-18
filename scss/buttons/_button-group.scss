@@ -112,7 +112,6 @@ $group-toggle-input: "input.btn-check" !default;
     padding-inline: calc(var(--#{$prefix}btn-padding-x) * .75);
   }
 
-
   // The clickable button for toggling the menu
   // Set the same inset shadow as the :active state
   .btn-group.show .dropdown-toggle {
@@ -123,7 +122,6 @@ $group-toggle-input: "input.btn-check" !default;
       @include box-shadow(none);
     }
   }
-
 
   //
   // Vertical button groups

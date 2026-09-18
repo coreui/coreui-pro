@@ -371,9 +371,9 @@ Set the `modal` option to `false` to show the dialog without the top layer — n
 
 ### Change animation
 
-The `$modal-fade-transform` variable determines the transform state of the modal before its fade-in animation and at the end of its fade-out animation.
+The `--cui-modal-fade-transform` token holds the transform the modal starts from when it fades in, and ends at when it fades out.
 
-If you want for example a zoom-in animation, you can set `$modal-fade-transform: scale(.8)`.
+For a zoom-in animation, set `--cui-modal-fade-transform: scale(.8)` on the modal.
 
 ### Remove animation
 
@@ -648,15 +648,7 @@ myModalEl.addEventListener('hidden.coreui.modal', event => {
 
 Modals use local CSS variables on `.modal` for enhanced real-time customization.
 
-<ScssDocs file="scss/_modal.scss" capture="modal-css-vars" />
-
-### Sass variables
-
-<DeprecatedIn version="6.0.0" />
-
-Sass variables set these defaults at build time and are removed in v7. The CSS variables above reach the same values without recompiling, and can be set on a single element.
-
-<ScssDocs file="scss/_modal.scss" capture="modal-variables" />
+<ScssDocs file="scss/_modal.scss" capture="modal-tokens" />
 
 ### Sass maps
 

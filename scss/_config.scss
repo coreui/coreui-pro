@@ -7,6 +7,10 @@
 
 $prefix:                      cui- !default;
 
+// Prefix for data attributes
+
+$data-infix:                  -coreui- !default;
+
 // Quickly modify global styling by enabling or disabling optional features.
 
 $enable-caret:                true !default;
@@ -14,13 +18,12 @@ $enable-rounded:              true !default;
 $enable-shadows:              false !default;
 $enable-gradients:            false !default;
 $enable-transitions:          true !default;
-$enable-smooth-scroll:        true !default;
 $enable-reduced-motion:       true !default;
+$enable-smooth-scroll:        true !default;
 $enable-grid-classes:         true !default;
 $enable-container-classes:    true !default;
 $enable-cssgrid:              true !default;
 $enable-button-pointers:      true !default;
-$enable-validation-icons:     true !default;
 $enable-deprecation-messages: true !default;
 // Utilities live in the last cascade layer, so they already win against every
 // component without it. Kept as a switch back to the v5 behavior for a codebase
@@ -32,14 +35,6 @@ $color-mode-type:             data !default; // `data` or `media-query`
 $color-contrast-dark:         #000 !default;
 $color-contrast-light:        #fff !default;
 $min-contrast-ratio:          4.5 !default;
-
-// Prefix for data attributes
-
-$data-infix:                  -coreui- !default;
-
-// Set mobile breakpoint
-
-$mobile-breakpoint:           lg !default;
 
 // You can add more entries to the $spacers map, should you need more variation.
 
@@ -101,6 +96,26 @@ $sizes: defaults(
 );
 // scss-docs-end sizes-map
 
+// scss-docs-start radii-map
+$radii: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$radii: defaults(
+  (
+    0: 0,
+    1: calc(var(--#{$prefix}radius) * .25),
+    2: calc(var(--#{$prefix}radius) * .375),
+    3: calc(var(--#{$prefix}radius) * .5),
+    4: calc(var(--#{$prefix}radius) * .75),
+    5: var(--#{$prefix}radius),
+    6: calc(var(--#{$prefix}radius) * 1.25),
+    7: calc(var(--#{$prefix}radius) * 1.5),
+    8: calc(var(--#{$prefix}radius) * 2),
+    9: calc(var(--#{$prefix}radius) * 3),
+  ),
+  $radii
+);
+// scss-docs-end radii-map
+
 // Define the minimum dimensions at which your layout will change,
 // adapting to different screen sizes, for use in media queries.
 
@@ -117,6 +132,23 @@ $breakpoints: (
 
 @include assert-ascending($breakpoints, "$breakpoints");
 @include assert-starts-at-zero($breakpoints, "$breakpoints");
+
+// Set mobile breakpoint
+
+$mobile-breakpoint:           lg !default;
+
+// Set the number of columns and specify the width of the gutters.
+
+$grid-columns:                12 !default;
+$grid-gutter-x:               1.5rem !default;
+$grid-row-columns:            6 !default;
+$gutters:                     null !default;
+@if $gutters == null {
+  $gutters: ();
+  @each $key in map.keys($spacers) {
+    $gutters: map.set($gutters, $key, var(--#{$prefix}spacer-#{$key}));
+  }
+}
 
 // Define the maximum width of `.container` for different screen sizes.
 
@@ -137,30 +169,9 @@ $container-max-widths: defaults(
 
 @include assert-ascending($container-max-widths, "$container-max-widths");
 
-// Set the number of columns and specify the width of the gutters.
-
-$grid-columns:                12 !default;
-$grid-row-columns:            6 !default;
-$grid-gutter-x:               1.5rem !default;
-$grid-gutter-y:               0 !default;
-// fusv-disable
-$grid-gutter-width:           $grid-gutter-x !default; // Deprecated in v6.0.0, removed in v7
-// fusv-enable
-$gutters:                     null !default;
-@if $gutters == null {
-  $gutters: ();
-  @each $key in map.keys($spacers) {
-    $gutters: map.set($gutters, $key, var(--#{$prefix}spacer-#{$key}));
-  }
-}
-
 // Container padding
 
 $container-padding-x: $grid-gutter-x !default;
-
-// scss-docs-start variable-gradient
-$gradient: linear-gradient(180deg, color-mix(in oklch, var(--#{$prefix}white) 15%, transparent), color-mix(in oklch, var(--#{$prefix}white) 0%, transparent)) !default;
-// scss-docs-end variable-gradient
 
 // scss-docs-start position-map
 $position-values: () !default;
@@ -177,12 +188,6 @@ $position-values: defaults(
 
 // Define common padding and border radius sizes and more.
 
-// scss-docs-start border-variables
-$border-width:                1px !default;
-$border-style:                solid !default;
-$border-color:                light-dark(var(--#{$prefix}gray-200), var(--#{$prefix}gray-700)) !default;
-// scss-docs-end border-variables
-
 // scss-docs-start border-widths-map
 $border-widths: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
@@ -198,30 +203,6 @@ $border-widths: defaults(
   $border-widths
 );
 // scss-docs-end border-widths-map
-
-// scss-docs-start radius-variables
-$radius:                      .5rem !default;
-// scss-docs-end radius-variables
-
-// scss-docs-start radii-map
-$radii: () !default;
-// stylelint-disable-next-line scss/dollar-variable-default
-$radii: defaults(
-  (
-    0: 0,
-    1: calc(var(--#{$prefix}radius) * .25),
-    2: calc(var(--#{$prefix}radius) * .375),
-    3: calc(var(--#{$prefix}radius) * .5),
-    4: calc(var(--#{$prefix}radius) * .75),
-    5: var(--#{$prefix}radius),
-    6: calc(var(--#{$prefix}radius) * 1.25),
-    7: calc(var(--#{$prefix}radius) * 1.5),
-    8: calc(var(--#{$prefix}radius) * 2),
-    9: calc(var(--#{$prefix}radius) * 3),
-  ),
-  $radii
-);
-// scss-docs-end radii-map
 
 // Every layer's alpha is base * strength * opacity, so the tint, the depth and
 // the per-element dimming are three separate knobs at runtime.
@@ -258,50 +239,37 @@ $shadows: (
 ) !default;
 // scss-docs-end box-shadow-variables
 
-// Font, line-height, and color for body text, headings, and more.
-
-// scss-docs-start font-variables
-$font-family-base:            var(--#{$prefix}font-sans-serif) !default;
-
-// $font-size-root affects the value of `rem`, which is used for as well font sizes, paddings, and margins
-// $font-size-base affects the font size of the body text
-$font-size-root:              null !default;
-$font-size-base:              1rem !default; // Assumes the browser default, typically `16px`
-
-$font-weight-lighter:         lighter !default;
-$font-weight-light:           300 !default;
-$font-weight-normal:          400 !default;
-$font-weight-medium:          500 !default;
-$font-weight-semibold:        600 !default;
-$font-weight-bold:            700 !default;
-$font-weight-bolder:          bolder !default;
+// scss-docs-start aspect-ratios
+$aspect-ratios: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$aspect-ratios: defaults(
+  (
+    "auto":  auto,
+    "1x1":   #{"1 / 1"},
+    "4x3":   #{"4 / 3"},
+    "16x9":  #{"16 / 9"},
+    "21x9":  #{"21 / 9"}
+  ),
+  $aspect-ratios
+);
+// scss-docs-end aspect-ratios
 
 // scss-docs-start font-weights
 $font-weights: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
 $font-weights: defaults(
   (
-    lighter: $font-weight-lighter,
-    light: $font-weight-light,
-    normal: $font-weight-normal,
-    medium: $font-weight-medium,
-    semibold: $font-weight-semibold,
-    bold: $font-weight-bold,
-    bolder: $font-weight-bolder
+    lighter: lighter,
+    light: 300,
+    normal: 400,
+    medium: 500,
+    semibold: 600,
+    bold: 700,
+    bolder: bolder
   ),
   $font-weights
 );
 // scss-docs-end font-weights
-// scss-docs-end font-variables
-
-// scss-docs-start headings-variables
-$headings-line-height:        1.2 !default;
-$headings-color:              inherit !default;
-// scss-docs-end headings-variables
-
-// scss-docs-start link-variables
-$link-color:                  light-dark(var(--#{$prefix}primary-base), var(--#{$prefix}primary-fg)) !default;
-// scss-docs-end link-variables
 
 // The type scale
 //
@@ -363,21 +331,3 @@ $zindex-levels: defaults(
   $zindex-levels
 );
 // scss-docs-end zindex-levels-map
-
-// scss-docs-start aspect-ratios
-$aspect-ratios: () !default;
-// stylelint-disable-next-line scss/dollar-variable-default
-$aspect-ratios: defaults(
-  (
-    "auto":  auto,
-    "1x1":   #{"1 / 1"},
-    "4x3":   #{"4 / 3"},
-    "16x9":  #{"16 / 9"},
-    "21x9":  #{"21 / 9"}
-  ),
-  $aspect-ratios
-);
-// scss-docs-end aspect-ratios
-
-// Code
-

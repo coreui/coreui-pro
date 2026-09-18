@@ -606,20 +606,10 @@ The focus never enters the options list: it stays on the toggler, or on the sear
 
 MultiSelects use local CSS variables on `.form-multi-select` for enhanced real-time customization.
 
-<ScssDocs file="scss/forms/_form-multi-select.scss" capture="form-multi-select-css-vars" />
+<ScssDocs file="scss/forms/_form-multi-select.scss" capture="form-multi-select-tokens" />
 
 The options panel is the shared combobox surface, which only sizes itself:
 
-<ScssDocs file="scss/_combobox.scss" capture="combobox-css-vars" />
+<ScssDocs file="scss/_combobox.scss" capture="combobox-tokens" />
 
 Everything inside it — options, section labels, checkbox indicators and the select all button — is a [List box](/components/list-box/) and takes its `--cui-list-box-*` variables. Set them on `.combobox-popup` to restyle one Multi Select, or on `:root` for all of them.
-
-### Sass variables
-
-<DeprecatedIn version="6.0.0" />
-
-Sass variables set these defaults at build time and are removed in v7. The CSS variables above reach the same values without recompiling, and can be set on a single element.
-
-<ScssDocs file="scss/forms/_form-multi-select.scss" capture="form-multi-select-variables" />
-
-<ScssDocs file="scss/_combobox.scss" capture="combobox-variables" />

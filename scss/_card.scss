@@ -6,62 +6,36 @@
 @use "mixins/translucent" as *;
 @use "config" as *;
 
-// scss-docs-start card-variables
-$card-spacer-y:                     var(--#{$prefix}spacer) !default;
-$card-spacer-x:                     var(--#{$prefix}spacer) !default;
-$card-body-gap:                     calc(#{$card-spacer-y} * .5) !default;
-$card-title-color:                  inherit !default;
-$card-subtitle-color:               inherit !default;
-$card-border-width:                 var(--#{$prefix}border-width) !default;
-$card-border-color:                 var(--#{$prefix}border-color-translucent) !default;
-$card-border-radius:                var(--#{$prefix}radius-8) !default;
-$card-box-shadow:                   none !default;
-$card-inner-border-radius:          calc(var(--#{$prefix}card-border-radius) - var(--#{$prefix}card-border-width)) !default;
-$card-cap-padding-y:                calc(#{$card-spacer-y} * .5) !default;
-$card-cap-padding-x:                $card-spacer-x !default;
-$card-cap-bg:                       var(--#{$prefix}bg-1) !default;
-$card-cap-color:                    inherit !default;
-$card-height:                       auto !default;
-$card-color:                        inherit !default;
-$card-bg:                           var(--#{$prefix}bg-body) !default;
-$card-img-overlay-padding:          var(--#{$prefix}spacer) !default;
-$card-group-margin:                 $grid-gutter-x * .5 !default;
-// scss-docs-end card-variables
-
-// scss-docs-start card-translucent-variables
-$card-translucent-cap-bg-opacity:   60% !default;
-// scss-docs-end card-translucent-variables
-
 $card-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start card-css-vars
+// scss-docs-start card-tokens
 $card-tokens: defaults(
   (
-    --#{$prefix}card-spacer-y: #{$card-spacer-y},
-    --#{$prefix}card-spacer-x: #{$card-spacer-x},
-    --#{$prefix}card-body-gap: #{$card-body-gap},
-    --#{$prefix}card-title-color: #{$card-title-color},
-    --#{$prefix}card-subtitle-color: #{$card-subtitle-color},
-    --#{$prefix}card-border-width: #{$card-border-width},
-    --#{$prefix}card-border-color: #{$card-border-color},
-    --#{$prefix}card-border-radius: #{$card-border-radius},
-    --#{$prefix}card-box-shadow: #{$card-box-shadow},
-    --#{$prefix}card-inner-border-radius: #{$card-inner-border-radius},
-    --#{$prefix}card-cap-padding-y: #{$card-cap-padding-y},
-    --#{$prefix}card-cap-padding-x: #{$card-cap-padding-x},
-    --#{$prefix}card-cap-bg: #{$card-cap-bg},
-    --#{$prefix}card-cap-color: #{$card-cap-color},
-    --#{$prefix}card-height: #{$card-height},
-    --#{$prefix}card-color: #{$card-color},
-    --#{$prefix}card-bg: #{$card-bg},
-    --#{$prefix}card-img-overlay-padding: #{$card-img-overlay-padding},
-    --#{$prefix}card-group-margin: #{$card-group-margin},
+    --#{$prefix}card-spacer-y: var(--#{$prefix}spacer),
+    --#{$prefix}card-spacer-x: var(--#{$prefix}spacer),
+    --#{$prefix}card-body-gap: calc(var(--#{$prefix}spacer) * .5),
+    --#{$prefix}card-title-color: inherit,
+    --#{$prefix}card-subtitle-color: inherit,
+    --#{$prefix}card-border-width: var(--#{$prefix}border-width),
+    --#{$prefix}card-border-color: var(--#{$prefix}border-color-translucent),
+    --#{$prefix}card-border-radius: var(--#{$prefix}radius-8),
+    --#{$prefix}card-box-shadow: none,
+    --#{$prefix}card-inner-border-radius: calc(var(--#{$prefix}card-border-radius) - var(--#{$prefix}card-border-width)),
+    --#{$prefix}card-cap-padding-y: calc(var(--#{$prefix}spacer) * .5),
+    --#{$prefix}card-cap-padding-x: var(--#{$prefix}spacer),
+    --#{$prefix}card-cap-bg: var(--#{$prefix}bg-1),
+    --#{$prefix}card-cap-color: inherit,
+    --#{$prefix}card-height: auto,
+    --#{$prefix}card-color: inherit,
+    --#{$prefix}card-bg: var(--#{$prefix}bg-body),
+    --#{$prefix}card-img-overlay-padding: var(--#{$prefix}spacer),
+    --#{$prefix}card-group-margin: #{$grid-gutter-x * .5},
   ),
   $card-tokens
 );
-// scss-docs-end card-css-vars
+// scss-docs-end card-tokens
 
 // stylelint-enable scss/dollar-variable-default
 @layer components {
@@ -162,7 +136,6 @@ $card-tokens: defaults(
     }
   }
 
-
   //
   // Variants
   //
@@ -179,7 +152,7 @@ $card-tokens: defaults(
   }
 
   .card-translucent {
-    --#{$prefix}card-translucent-cap-bg-opacity: #{$card-translucent-cap-bg-opacity};
+    --#{$prefix}card-translucent-cap-bg-opacity: #{60%};
     @include translucent(var(--#{$prefix}card-bg));
 
     .card-header,
@@ -187,7 +160,6 @@ $card-tokens: defaults(
       background-color: color-mix(in oklch, var(--#{$prefix}card-cap-bg) var(--#{$prefix}card-translucent-cap-bg-opacity), transparent);
     }
   }
-
 
   //
   // Header navs
@@ -237,7 +209,6 @@ $card-tokens: defaults(
     @include border-end-radius(var(--#{$prefix}card-inner-border-radius));
   }
 
-
   //
   // Horizontal cards
   //
@@ -267,7 +238,6 @@ $card-tokens: defaults(
       }
     }
   }
-
 
   //
   // Card groups

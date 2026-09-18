@@ -440,16 +440,6 @@ Each cell is an input, so it carries the shared `--cui-control-*` tokens on `.fo
 
 <ScssDocs file="scss/forms/_otp-input.scss" capture="form-otp-tokens" />
 
-### Sass variables
-
-<DeprecatedIn version="6.0.0" />
-
-Sass variables set these defaults at build time and are removed in v7. The CSS variables above reach the same values without recompiling, and can be set on a single element.
-
-The cell takes the shared `.form-control` frame, so only the cell width, the gap and the zero horizontal padding are set here; restyling the text controls reaches the OTP input without touching these. Override one when the cell should differ from the rest of the family:
-
-<ScssDocs file="scss/forms/_otp-input.scss" capture="form-otp-variables" />
-
 ### Sass maps
 
 Each size is one entry, and the map merges with your overrides — add a key to define a size, or set one to `null` to drop it:

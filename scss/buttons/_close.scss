@@ -7,37 +7,29 @@
 @use "../config" as *;
 
 // scss-docs-start close-variables
-$btn-close-icon-size:        1em !default;
 // The icon plus this padding on both sides is the pointer target. At the
 // default font size that is 24px, the WCAG 2.2 minimum.
-$btn-close-padding:          .25em !default;
-$btn-close-color:            inherit !default;
-$btn-close-icon:             url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='black'><path d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414'/></svg>") !default;
-$btn-close-opacity:          .5 !default;
-$btn-close-hover-opacity:    .75 !default;
-$btn-close-focus-opacity:    1 !default;
-$btn-close-disabled-opacity: .25 !default;
 // scss-docs-end close-variables
 
 $close-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start close-css-vars
+// scss-docs-start close-tokens
 $close-tokens: defaults(
   (
-    --#{$prefix}btn-close-icon-size: #{$btn-close-icon-size},
-    --#{$prefix}btn-close-padding: #{$btn-close-padding},
-    --#{$prefix}btn-close-color: #{$btn-close-color},
-    --#{$prefix}btn-close-icon: #{ escape-svg($btn-close-icon) },
-    --#{$prefix}btn-close-opacity: #{$btn-close-opacity},
-    --#{$prefix}btn-close-hover-opacity: #{$btn-close-hover-opacity},
-    --#{$prefix}btn-close-focus-opacity: #{$btn-close-focus-opacity},
-    --#{$prefix}btn-close-disabled-opacity: #{$btn-close-disabled-opacity},
+    --#{$prefix}btn-close-icon-size: 1em,
+    --#{$prefix}btn-close-padding: .25em,
+    --#{$prefix}btn-close-color: inherit,
+    --#{$prefix}btn-close-icon: #{ escape-svg(url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='black'><path d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414'/></svg>")) },
+    --#{$prefix}btn-close-opacity: .5,
+    --#{$prefix}btn-close-hover-opacity: .75,
+    --#{$prefix}btn-close-focus-opacity: 1,
+    --#{$prefix}btn-close-disabled-opacity: .25,
   ),
   $close-tokens
 );
-// scss-docs-end close-css-vars
+// scss-docs-end close-tokens
 
 // stylelint-enable scss/dollar-variable-default
 @layer components {

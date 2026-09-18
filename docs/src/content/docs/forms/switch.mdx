@@ -65,7 +65,7 @@ Any other size is that one property:
 <input class="switch" type="checkbox" role="switch" style="--cui-switch-height: 2rem">
 ```
 
-The proportion is a Sass variable, `$switch-aspect-ratio`, so a squarer or longer track is set once for every size.
+`--cui-switch-width` defaults to `calc(var(--cui-switch-height) * 1.75)`, so redefining it against the height changes the proportion of every size at once.
 ## Custom width
 
 The switch reads its size from two tokens, so a wider switch with a larger thumb is two declarations — no new class.
@@ -121,21 +121,13 @@ Modify the appearance of checked switches by adding a [`.theme-{color}` class](/
 
 Switches read their own custom properties, so restyling one control does not touch the other two. Set them on the control itself — an ancestor cannot override a token the element declares for itself.
 
-<ScssDocs file="scss/mixins/_switch.scss" capture="switch-css-vars" />
-
-### Sass variables
-
-<DeprecatedIn version="6.0.0" />
-
-Sass variables set these defaults at build time and are removed in v7. The CSS variables above reach the same values without recompiling, and can be set on a single element.
-
-<ScssDocs file="scss/mixins/_switch.scss" capture="switch-variables" />
+<ScssDocs file="scss/mixins/_switch.scss" capture="switch-tokens" />
 
 ### Shared variables
 
-The checkbox, the radio and the switch share their size and their focus, active and disabled states. Those live on `:root` as `--cui-control-*`, so one declaration retunes all three at runtime; the Sass variables behind them set the defaults:
+The checkbox, the radio and the switch share their size and their focus, active and disabled states. Those live on `:root` as `--cui-control-*`, so one declaration retunes all three at runtime:
 
-<ScssDocs file="scss/_root.scss" capture="control-state-variables" />
+<ScssDocs file="scss/_root.scss" capture="root-control-variables" />
 
 ### Sass maps
 

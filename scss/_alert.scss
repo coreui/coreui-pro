@@ -4,46 +4,33 @@
 @use "mixins/transition" as *;
 @use "config" as *;
 
-// scss-docs-start alert-variables
-$alert-padding-y:               var(--#{$prefix}spacer) !default;
-$alert-padding-x:               var(--#{$prefix}spacer) !default;
-$alert-gap:                     var(--#{$prefix}spacer-2) !default;
-$alert-margin-bottom:           1rem !default;
-$alert-border-radius:           var(--#{$prefix}radius-5) !default;
-$alert-link-font-weight:        var(--#{$prefix}font-weight-bold) !default;
-$alert-border-width:            var(--#{$prefix}border-width) !default;
-
-$alert-transition-property:     opacity !default;
-$alert-transition-duration:     .15s !default;
-$alert-transition-timing:       linear !default;
-// scss-docs-end alert-variables
-
 $alert-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
 
-// scss-docs-start alert-css-vars
+// scss-docs-start alert-tokens
 $alert-tokens: defaults(
   (
     --#{$prefix}alert-bg: var(--#{$prefix}theme-bg-subtle, var(--#{$prefix}bg-1)),
-    --#{$prefix}alert-padding-x: #{$alert-padding-x},
-    --#{$prefix}alert-padding-y: #{$alert-padding-y},
-    --#{$prefix}alert-gap: #{$alert-gap},
-    --#{$prefix}alert-margin-bottom: #{$alert-margin-bottom},
+    --#{$prefix}alert-padding-x: var(--#{$prefix}spacer),
+    --#{$prefix}alert-padding-y: var(--#{$prefix}spacer),
+    --#{$prefix}alert-gap: var(--#{$prefix}spacer-2),
+    --#{$prefix}alert-margin-bottom: 1rem,
     --#{$prefix}alert-color: var(--#{$prefix}theme-fg-emphasis, inherit),
     --#{$prefix}alert-border-color: var(--#{$prefix}theme-border, var(--#{$prefix}border-color)),
-    --#{$prefix}alert-border-width: #{$alert-border-width},
+    --#{$prefix}alert-border-width: var(--#{$prefix}border-width),
     --#{$prefix}alert-border: var(--#{$prefix}alert-border-width) solid var(--#{$prefix}alert-border-color),
-    --#{$prefix}alert-border-radius: #{$alert-border-radius},
+    --#{$prefix}alert-border-radius: var(--#{$prefix}radius-5),
     --#{$prefix}alert-link-color: inherit,
-    --#{$prefix}alert-transition-property: #{$alert-transition-property},
-    --#{$prefix}alert-transition-duration: #{$alert-transition-duration},
-    --#{$prefix}alert-transition-timing: #{$alert-transition-timing},
+    --#{$prefix}alert-link-font-weight: var(--#{$prefix}font-weight-bold),
+    --#{$prefix}alert-transition-property: opacity,
+    --#{$prefix}alert-transition-duration: .15s,
+    --#{$prefix}alert-transition-timing: linear,
     --#{$prefix}hr-border-color: var(--#{$prefix}theme-border, var(--#{$prefix}border-color)),
   ),
   $alert-tokens
 );
-// scss-docs-end alert-css-vars
+// scss-docs-end alert-tokens
 
 // stylelint-enable scss/dollar-variable-default
 
@@ -113,14 +100,13 @@ $alert-variants: defaults(
   }
 
   .alert-link {
-    font-weight: $alert-link-font-weight;
+    font-weight: var(--#{$prefix}alert-link-font-weight);
     color: var(--#{$prefix}alert-link-color);
   }
 
   .alert > .btn-close {
     margin-inline-start: auto;
   }
-
 
   // scss-docs-start alert-variant-loop
   @each $variant, $properties in $alert-variants {
