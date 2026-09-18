@@ -88,6 +88,12 @@ $dropdown-dark-tokens: defaults(
   }
 
   .dropdown-toggle {
+    // scss-docs-start caret-css-vars
+    --#{$prefix}caret-width: .3em;
+    --#{$prefix}caret-spacing: calc(var(--#{$prefix}caret-width) * .85);
+    --#{$prefix}caret-vertical-align: calc(var(--#{$prefix}caret-width) * .85);
+    // scss-docs-end caret-css-vars
+
     white-space: nowrap;
 
     // Generate the caret automatically

@@ -803,6 +803,10 @@ Dropdowns use local CSS variables on `.dropdown-menu` for enhanced real-time cus
 
 <ScssDocs file="scss/_dropdown.scss" capture="dropdown-tokens" />
 
+The caret that indicates a dropdown's interactivity sizes itself from one token on `.dropdown-toggle`; the gap before it and its vertical alignment are computed from that width, so retuning it moves all three.
+
+<ScssDocs file="scss/_dropdown.scss" capture="caret-css-vars" />
+
 Customization through CSS variables can be seen on the `.dropdown-menu-dark` class where we override specific values without adding duplicate CSS selectors.
 
 <ScssDocs file="scss/_dropdown.scss" capture="dropdown-dark-tokens" />
@@ -816,10 +820,6 @@ Sass variables set these defaults at build time and are removed in v7. The CSS v
 Variables for all dropdowns:
 
 <ScssDocs file="scss/_dropdown.scss" capture="dropdown-variables" />
-
-Variables for the CSS-based carets that indicate a dropdown's interactivity:
-
-<ScssDocs file="scss/mixins/_caret.scss" capture="caret-variables" />
 
 ### Sass mixins
 
