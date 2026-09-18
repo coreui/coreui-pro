@@ -61,7 +61,6 @@ $dropdown-dark-tokens: defaults(
     --#{$prefix}dropdown-color: var(--#{$prefix}gray-300),
     --#{$prefix}dropdown-bg: var(--#{$prefix}gray-800),
     --#{$prefix}dropdown-border-color: #{$dropdown-border-color},
-    --#{$prefix}dropdown-box-shadow: #{null},
     --#{$prefix}dropdown-link-color: var(--#{$prefix}gray-300),
     --#{$prefix}dropdown-link-hover-color: var(--#{$prefix}white),
     --#{$prefix}dropdown-divider-bg: #{$dropdown-border-color},
@@ -88,11 +87,7 @@ $dropdown-dark-tokens: defaults(
   }
 
   .dropdown-toggle {
-    // scss-docs-start caret-css-vars
-    --#{$prefix}caret-width: .3em;
-    --#{$prefix}caret-spacing: calc(var(--#{$prefix}caret-width) * .85);
-    --#{$prefix}caret-vertical-align: calc(var(--#{$prefix}caret-width) * .85);
-    // scss-docs-end caret-css-vars
+    @include tokens($caret-tokens);
 
     white-space: nowrap;
 

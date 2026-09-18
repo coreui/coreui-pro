@@ -1,28 +1,46 @@
+@use "../functions/defaults" as *;
 @use "../config" as *;
 
+$caret-tokens: () !default;
+
+// stylelint-disable scss/dollar-variable-default
+
+// scss-docs-start caret-tokens
+$caret-tokens: defaults(
+  (
+    --#{$prefix}caret-width: .3em,
+    --#{$prefix}caret-spacing: calc(var(--#{$prefix}caret-width) * .85),
+    --#{$prefix}caret-vertical-align: calc(var(--#{$prefix}caret-width) * .85),
+  ),
+  $caret-tokens
+);
+// scss-docs-end caret-tokens
+
+// stylelint-enable scss/dollar-variable-default
+
 // scss-docs-start caret-mixins
-@mixin caret-down($width: var(--#{$prefix}caret-width)) {
+@mixin caret-down($width: var(--#{$prefix}caret-width, .3em)) {
   border-block-start: $width solid;
   border-block-end: 0;
   border-inline-start: $width solid transparent;
   border-inline-end: $width solid transparent;
 }
 
-@mixin caret-up($width: var(--#{$prefix}caret-width)) {
+@mixin caret-up($width: var(--#{$prefix}caret-width, .3em)) {
   border-block-start: 0;
   border-block-end: $width solid;
   border-inline-start: $width solid transparent;
   border-inline-end: $width solid transparent;
 }
 
-@mixin caret-end($width: var(--#{$prefix}caret-width)) {
+@mixin caret-end($width: var(--#{$prefix}caret-width, .3em)) {
   border-block-start: $width solid transparent;
   border-block-end: $width solid transparent;
   border-inline-start: $width solid;
   border-inline-end: 0;
 }
 
-@mixin caret-start($width: var(--#{$prefix}caret-width)) {
+@mixin caret-start($width: var(--#{$prefix}caret-width, .3em)) {
   border-block-start: $width solid transparent;
   border-block-end: $width solid transparent;
   border-inline-end: $width solid;
@@ -30,9 +48,9 @@
 
 @mixin caret(
   $direction: down,
-  $width: var(--#{$prefix}caret-width),
-  $spacing: var(--#{$prefix}caret-spacing),
-  $vertical-align: var(--#{$prefix}caret-vertical-align)
+  $width: var(--#{$prefix}caret-width, .3em),
+  $spacing: var(--#{$prefix}caret-spacing, calc(var(--#{$prefix}caret-width, .3em) * .85)),
+  $vertical-align: var(--#{$prefix}caret-vertical-align, calc(var(--#{$prefix}caret-width, .3em) * .85))
 ) {
   @if $enable-caret {
     &::after {
