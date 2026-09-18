@@ -589,9 +589,10 @@ The striped, active and hover backgrounds are mixed from `--cui-table-color`, so
 
 ### Sass variables
 
-<DeprecatedIn version="6.0.0" />
-
-Sass variables set these defaults at build time and are removed in v7. The CSS variables above reach the same values without recompiling, and can be set on a single element.
+These two pick which rows and which columns are striped. They are written into a
+`:nth-of-type()` and a `:nth-child()` selector, and a selector cannot read a
+custom property, so unlike the rest of the table's customization these stay Sass
+and have no CSS variable counterpart.
 
 <ScssDocs file="scss/content/_tables.scss" capture="table-variables" />
 

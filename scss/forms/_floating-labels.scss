@@ -5,11 +5,6 @@
 @use "../mixins/transition" as *;
 @use "../config" as *;
 
-// scss-docs-start form-floating-variables
-// The label is a sibling of the control, so it cannot inherit the control's own
-// background — the textarea mask has to be told the same colour a second time.
-// scss-docs-end form-floating-variables
-
 // stylelint-disable scss/dollar-variable-default
 
 // stylelint-disable custom-property-no-missing-var-function
@@ -28,6 +23,7 @@ $form-floating-tokens: defaults(
     --#{$prefix}form-floating-label-opacity: .65,
     --#{$prefix}form-floating-label-transform: scale(.85) translateY(-.5rem) translateX(.15rem),
     --#{$prefix}form-floating-label-disabled-color: var(--#{$prefix}fg-3),
+    // The label is a sibling of the control, so it cannot inherit its background.
     --#{$prefix}form-floating-label-bg: var(--#{$prefix}btn-input-bg),
     --#{$prefix}form-floating-label-disabled-bg: var(--#{$prefix}bg-2),
     --#{$prefix}form-floating-label-border-radius: var(--#{$prefix}btn-input-border-radius),

@@ -6,10 +6,6 @@
 @use "mixins/transition" as *;
 @use "config" as *;
 
-// scss-docs-start chip-variables
-
-// scss-docs-end chip-variables
-
 $chip-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
