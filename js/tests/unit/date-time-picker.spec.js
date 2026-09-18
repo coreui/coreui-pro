@@ -408,4 +408,22 @@ describe('DateTimePicker', () => {
       expect(el.querySelectorAll('.form-control-action')).toHaveLength(1)
     })
   })
+
+  describe("seconds", () => {
+    it("should give the field and the panel a seconds part by default", () => {
+      const picker = buildPicker({ locale: "en-US" })
+      picker.show()
+
+      expect([...picker._element.querySelectorAll("[data-coreui-section]")].map(section => section.dataset.coreuiSection)).toEqual(["month", "day", "year", "hour", "minute", "second", "meridiem"])
+      expect([...document.querySelectorAll("[aria-label^=\"Select\"]")].length).toEqual(4)
+    })
+
+    it("should take both away together", () => {
+      const picker = buildPicker({ locale: "en-US", seconds: false })
+      picker.show()
+
+      expect([...picker._element.querySelectorAll("[data-coreui-section]")].map(section => section.dataset.coreuiSection)).toEqual(["month", "day", "year", "hour", "minute", "meridiem"])
+      expect([...document.querySelectorAll("[aria-label^=\"Select\"]")].length).toEqual(3)
+    })
+  })
 })
