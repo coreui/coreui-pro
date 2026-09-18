@@ -282,7 +282,7 @@ describe('DatePicker', () => {
       picker.show()
 
       expect(toggle.getAttribute('aria-controls')).toEqual(picker._menu.id)
-      expect(el.querySelector('[data-coreui-picker-cleaner]').getAttribute('aria-label')).toEqual('Clear the value')
+      expect(el.querySelector('[data-coreui-picker-cleaner]').getAttribute('aria-label')).toEqual('Clear date')
 
       for (const svg of el.querySelectorAll('svg')) {
         expect(svg.getAttribute('aria-hidden')).toEqual('true')
@@ -502,6 +502,12 @@ describe('DatePicker', () => {
   })
 
   describe('cleaner', () => {
+    it('should name the cleaner after the value it clears', () => {
+      buildPicker({ date: new Date(2026, 6, 14) })
+
+      expect(fixtureEl.querySelector('.form-control-cleaner').getAttribute('aria-label')).toEqual('Clear date')
+    })
+
     it('should clear the value when the cleaner is clicked', () => {
       const picker = buildPicker({ date: new Date(2026, 6, 14) })
 

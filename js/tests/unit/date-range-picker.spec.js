@@ -254,6 +254,12 @@ describe('DateRangePicker', () => {
   })
 
   describe('cleaner', () => {
+    it('should name the cleaner after the value it clears', () => {
+      buildPicker({ startDate: new Date(2026, 5, 1), endDate: new Date(2026, 5, 15) })
+
+      expect(fixtureEl.querySelector('.form-control-cleaner').getAttribute('aria-label')).toEqual('Clear date range')
+    })
+
     it('should clear both dates when the cleaner is clicked', () => {
       const picker = buildPicker({ startDate: new Date(2026, 5, 1), endDate: new Date(2026, 5, 15) })
 

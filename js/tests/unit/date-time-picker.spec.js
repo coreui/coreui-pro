@@ -224,6 +224,12 @@ describe('DateTimePicker', () => {
   })
 
   describe('cleaner', () => {
+    it('should name the cleaner after the value it clears', () => {
+      buildPicker({ date: new Date(2026, 5, 15, 10, 0) })
+
+      expect(fixtureEl.querySelector('.form-control-cleaner').getAttribute('aria-label')).toEqual('Clear date and time')
+    })
+
     it('should clear the value when the cleaner is clicked', () => {
       const picker = buildPicker({ date: new Date(2026, 5, 15, 10, 0) })
 

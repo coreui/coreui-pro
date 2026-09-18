@@ -89,7 +89,7 @@ type DateRangePickerConfig = {
 
 const Default: DateRangePickerConfig = {
   allowList: SVGAllowlist,
-  ariaCleanerLabel: 'Clear the value',
+  ariaCleanerLabel: 'Clear date range',
   ariaEndLabel: 'End date',
   ariaPickerLabel: 'Toggle the calendar',
   ariaStartLabel: 'Start date',
