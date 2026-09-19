@@ -501,6 +501,34 @@ describe('DatePicker', () => {
     })
   })
 
+  describe('picker shortcut', () => {
+    it('should open the calendar without moving the focused section', () => {
+      const picker = buildPicker({ date: new Date(2026, 6, 14) })
+      const section = fixtureEl.querySelectorAll('.form-date-time-section')[1]
+
+      section.focus()
+      section.dispatchEvent(new KeyboardEvent('keydown', {
+        key: 'ArrowDown', altKey: true, bubbles: true, cancelable: true
+      }))
+
+      expect(picker._popup.isShown).toBeTrue()
+      expect(picker.getDate().getDate()).toEqual(14)
+    })
+
+    it('should still step the section when the arrow carries no modifier', () => {
+      const picker = buildPicker({ date: new Date(2026, 6, 14) })
+      const section = fixtureEl.querySelectorAll('.form-date-time-section')[1]
+
+      section.focus()
+      section.dispatchEvent(new KeyboardEvent('keydown', {
+        key: 'ArrowDown', bubbles: true, cancelable: true
+      }))
+
+      expect(picker._popup.isShown).toBeFalse()
+      expect(picker.getDate().getDate()).toEqual(13)
+    })
+  })
+
   describe('cleaner', () => {
     it('should name the cleaner after the value it clears', () => {
       buildPicker({ date: new Date(2026, 6, 14) })

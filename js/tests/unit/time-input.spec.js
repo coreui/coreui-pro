@@ -13,8 +13,10 @@ describe('TimeInput', () => {
 
   const getSections = element => element.querySelectorAll('.form-date-time-section')
 
-  const pressKey = (target, key) => {
-    target.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }))
+  const pressKey = (target, key, init = {}) => {
+    target.dispatchEvent(new KeyboardEvent('keydown', {
+      key, bubbles: true, cancelable: true, ...init
+    }))
   }
 
   beforeAll(() => {
@@ -125,6 +127,16 @@ describe('TimeInput', () => {
       const timeInput = createTimeInput({ format: 'HH:mm:ss', date: '09:30:15' })
 
       expect(timeInput.getDate()).toEqual(new Date(1970, 0, 1, 9, 30, 15))
+    })
+
+    it('should leave the value alone when the arrow carries the picker modifier', () => {
+      const timeInput = createTimeInput({ date: '09:30' })
+      const [hour] = getSections(timeInput._element)
+
+      hour.focus()
+      pressKey(hour, 'ArrowDown', { altKey: true })
+
+      expect(hour.textContent).toEqual('09')
     })
 
     it('should accept time strings as min and max', () => {

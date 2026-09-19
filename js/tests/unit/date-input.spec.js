@@ -512,6 +512,16 @@ describe('DateInput', () => {
       expect(day.textContent).toEqual('13')
     })
 
+    it('should leave the value alone when the arrow carries the picker modifier', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 6, 14) })
+      const [day] = getSections(dateInput._element)
+
+      day.focus()
+      pressKey(day, 'ArrowDown', { altKey: true })
+
+      expect(day.textContent).toEqual('14')
+    })
+
     it('should start empty sections at the boundary, except year at the current year', () => {
       const dateInput = createDateInput()
       const [day, month, year] = getSections(dateInput._element)

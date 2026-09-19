@@ -521,7 +521,7 @@ class SectionInput extends BaseComponent {
       return
     }
 
-    if (key === ARROW_UP_KEY || key === ARROW_DOWN_KEY) {
+    if ((key === ARROW_UP_KEY || key === ARROW_DOWN_KEY) && !(event.altKey && key === ARROW_DOWN_KEY)) {
       event.preventDefault()
       const section = this._getSection(this._getSectionIndex(target))
       section.value = getIncrementedSectionValue(section, key === ARROW_UP_KEY ? 1 : -1, this._getSectionMax(section))
