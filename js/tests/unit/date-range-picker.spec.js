@@ -264,8 +264,12 @@ describe('DateRangePicker', () => {
       const picker = buildPicker({ startDate: new Date(2026, 5, 1), pickerIcon: false })
 
       picker.show()
+
+      expect(picker._popup.isShown).toBeTrue()
+
       picker.hide()
 
+      expect(picker._popup.isShown).toBeFalse()
       expect(fixtureEl.querySelector('.form-control-action')).toBeNull()
     })
 

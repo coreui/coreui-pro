@@ -242,7 +242,7 @@ forwarded by name, so their data attributes work on the picker element too.
 | `locale` | string | browser locale | Drives the mask and the 12/24-hour split. |
 | `minutes` | array, boolean, function | `true` | Allowed minutes, or `false` to drop the column. |
 | `name` | string, null | `null` | Name of the generated hidden input. Without it the field is not submitted with the form. |
-| `pickerIcon` | string, boolean | `true` | The button that opens the time selection: `true` for the built-in icon, an inline SVG string for your own (sanitized), `false` for no button. Without it the popup opens only through `show()`, and nothing carries `aria-expanded`. |
+| `pickerIcon` | string, boolean | `true` | The button that opens the time selection: `true` for the built-in icon, an inline SVG string for your own (sanitized), `false` for no button. Without it the popup has no pointer opener and nothing reports the expanded state, though the field keeps the keyboard openers below. |
 | `seconds` | array, boolean, function | `true` | `false` drops the column and the field's seconds section together. A list or a filter narrows the panel; the field still accepts any second. |
 | `selectionOptions` | object | `{}` | Programmatic escape hatch for the selection body. |
 | `size` | string, null | `null` | `'sm'` or `'lg'`. |

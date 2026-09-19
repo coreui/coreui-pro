@@ -263,8 +263,12 @@ describe('TimePicker', () => {
       const picker = buildPicker({ time: new Date(2026, 0, 1, 14, 30), pickerIcon: false })
 
       picker.show()
+
+      expect(picker._popup.isShown).toBeTrue()
+
       picker.hide()
 
+      expect(picker._popup.isShown).toBeFalse()
       expect(fixtureEl.querySelector('.form-control-action')).toBeNull()
     })
 
