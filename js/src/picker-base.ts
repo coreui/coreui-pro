@@ -42,7 +42,7 @@ class PickerBase extends BaseComponent {
   protected declare _hostClasses: HostClasses
   protected declare _menu: HTMLElement
   protected declare _popup: Popup
-  protected declare _toggleElement: HTMLElement
+  protected declare _toggleElement: HTMLElement | null
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
@@ -104,14 +104,14 @@ class PickerBase extends BaseComponent {
         this._clearToggleAttribute('aria-controls')
         this._menu.classList.remove(CLASS_NAME_SHOW)
         this._element.classList.remove(CLASS_NAME_SHOW)
-        this._toggleElement.setAttribute('aria-expanded', 'false')
+        this._writeToggleAttribute('aria-expanded', 'false')
       },
       onShow: () => {
         this._writeToggleAttribute('aria-controls', this._menu.id)
         this._menu.classList.add(CLASS_NAME_SHOW)
         this._element.classList.add(CLASS_NAME_SHOW)
         this._onPopupShow()
-        this._toggleElement.setAttribute('aria-expanded', 'true')
+        this._writeToggleAttribute('aria-expanded', 'true')
       },
       onShown: () => EventHandler.trigger(this._element, this.constructor.eventName('shown'))
     })
@@ -230,12 +230,16 @@ class PickerBase extends BaseComponent {
   }
 
   _writeToggleAttribute(name: string, value: string): void {
-    this._toggleElement.setAttribute(name, value)
+    this._toggleElement?.setAttribute(name, value)
   }
 
   // The picker owns the attribute only while the popup is open; whatever the
   // author had there comes back when it closes.
   _clearToggleAttribute(name: string): void {
+    if (!this._toggleElement) {
+      return
+    }
+
     const recorded = this._adoptedAttributes.find(([element, recordedName]) => element === this._toggleElement && recordedName === name)
 
     if (recorded?.[2] === null || recorded === undefined) {

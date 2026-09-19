@@ -76,7 +76,7 @@ type DateTimePickerConfig = {
   maxDate: Date | string | null,
   minDate: Date | string | null,
   name: string | null,
-  pickerIcon: string,
+  pickerIcon: string | boolean,
   sanitize: boolean,
   sanitizeFn: ((unsafeHtml: string) => string) | null,
   seconds: boolean | number[] | ((second: number) => boolean),
@@ -101,7 +101,7 @@ const Default: DateTimePickerConfig = {
   maxDate: null,
   minDate: null,
   name: null,
-  pickerIcon: CALENDAR_ICON,
+  pickerIcon: true,
   sanitize: true,
   sanitizeFn: null,
   seconds: true,
@@ -126,7 +126,7 @@ const DefaultType: Record<string, string> = {
   maxDate: '(date|string|null)',
   minDate: '(date|string|null)',
   name: '(string|null)',
-  pickerIcon: 'string',
+  pickerIcon: '(string|boolean)',
   sanitize: 'boolean',
   sanitizeFn: '(function|null)',
   seconds: '(array|boolean|function)',
@@ -218,7 +218,7 @@ class DateTimePicker extends PickerBase {
     this._selection?.dispose()
     this._fieldElement.remove()
     this._cleanerElement?.remove()
-    this._toggleElement.remove()
+    this._toggleElement?.remove()
   }
 
   // Private
@@ -257,9 +257,13 @@ class DateTimePicker extends PickerBase {
       inputGroup.append(this._cleanerElement)
     }
 
-    const indicator = action(CLASS_NAME_INDICATOR, this._config.pickerIcon, this._config.ariaPickerLabel)
-    inputGroup.append(indicator)
-    this._toggleElement = indicator
+    this._toggleElement = null
+
+    if (this._config.pickerIcon) {
+      const indicator = action(CLASS_NAME_INDICATOR, this._config.pickerIcon === true ? CALENDAR_ICON : this._config.pickerIcon, this._config.ariaPickerLabel)
+      inputGroup.append(indicator)
+      this._toggleElement = indicator
+    }
 
     this._input = new DateInput(inputEl, this._forwardConfig(DateInput, {
       date: this._config.date,
@@ -282,8 +286,8 @@ class DateTimePicker extends PickerBase {
     this._menu = document.createElement('div')
     this._menu.id = getUID(`${this.constructor.NAME}-popup-`)
     this._menu.classList.add(CLASS_NAME_POPUP, CLASS_NAME_DROPDOWN)
-    this._toggleElement.setAttribute('aria-expanded', 'false')
-    this._toggleElement.setAttribute('aria-haspopup', 'dialog')
+    this._writeToggleAttribute('aria-expanded', 'false')
+    this._writeToggleAttribute('aria-haspopup', 'dialog')
 
     const body = document.createElement('div')
     body.classList.add(CLASS_NAME_BODY)

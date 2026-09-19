@@ -82,7 +82,7 @@ type DatePickerConfig = {
   maxDate: Date | string | null,
   minDate: Date | string | null,
   name: string | null,
-  pickerIcon: string,
+  pickerIcon: string | boolean,
   sanitize: boolean,
   sanitizeFn: ((unsafeHtml: string) => string) | null,
   size: string | null
@@ -104,7 +104,7 @@ const Default: DatePickerConfig = {
   maxDate: null,
   minDate: null,
   name: null,
-  pickerIcon: CALENDAR_ICON,
+  pickerIcon: true,
   sanitize: true,
   sanitizeFn: null,
   size: null
@@ -126,7 +126,7 @@ const DefaultType: Record<string, string> = {
   maxDate: '(date|string|null)',
   minDate: '(date|string|null)',
   name: '(string|null)',
-  pickerIcon: 'string',
+  pickerIcon: '(string|boolean)',
   sanitize: 'boolean',
   sanitizeFn: '(function|null)',
   size: '(string|null)'
@@ -222,7 +222,7 @@ class DatePicker extends PickerBase {
     }
 
     if (this._created.toggle) {
-      this._toggleElement.remove()
+      this._toggleElement?.remove()
     }
   }
 
@@ -285,10 +285,12 @@ class DatePicker extends PickerBase {
 
     const ownToggle = SelectorEngine.findOne(SELECTOR_ROLE_TOGGLE, inputGroup)
 
+    this._toggleElement = null
+
     if (ownToggle) {
       this._toggleElement = this._adoptAction(ownToggle, this._config.ariaPickerLabel)
-    } else {
-      this._toggleElement = action(CLASS_NAME_INDICATOR, this._config.pickerIcon, this._config.ariaPickerLabel)
+    } else if (this._config.pickerIcon) {
+      this._toggleElement = action(CLASS_NAME_INDICATOR, this._config.pickerIcon === true ? CALENDAR_ICON : this._config.pickerIcon, this._config.ariaPickerLabel)
       this._created.toggle = true
       inputGroup.append(this._toggleElement)
     }
@@ -389,6 +391,10 @@ class DatePicker extends PickerBase {
   }
 
   override _writeToggleAttribute(name: string, value: string): void {
+    if (!this._toggleElement) {
+      return
+    }
+
     if (this._created.toggle) {
       this._toggleElement.setAttribute(name, value)
       return

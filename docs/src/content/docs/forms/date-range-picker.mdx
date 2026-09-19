@@ -332,7 +332,7 @@ attributes work on the picker element too.
 | `locale` | string | browser locale | Drives section order, separators, and calendar labels. |
 | `maxDate` | date, string, null | `null` | Upper bound, enforced by both layers. |
 | `minDate` | date, string, null | `null` | Lower bound, enforced by both layers. |
-| `pickerIcon` | string | calendar SVG | Inline SVG rendered by the component (sanitized). |
+| `pickerIcon` | string, boolean | `true` | The button that opens the calendar: `true` for the built-in icon, an inline SVG string for your own (sanitized), `false` for no button. Without it the popup has no pointer opener and nothing reports the expanded state, though the field keeps the keyboard openers below. |
 | `sanitize` | boolean | `true` | Sanitize the icon markup. |
 | `sanitizeFn` | function, null | `null` | Custom sanitizer. |
 | `separatorIcon` | string | arrow SVG | Inline SVG between the two fields (LTR). |

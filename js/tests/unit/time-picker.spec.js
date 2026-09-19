@@ -253,6 +253,25 @@ describe('TimePicker', () => {
   })
 
   describe('picker toggle', () => {
+    it('should not render the toggle when pickerIcon is off', () => {
+      buildPicker({ time: new Date(2026, 0, 1, 14, 30), pickerIcon: false })
+
+      expect(fixtureEl.querySelector('.form-control-action')).toBeNull()
+    })
+
+    it('should open and close without a toggle', () => {
+      const picker = buildPicker({ time: new Date(2026, 0, 1, 14, 30), pickerIcon: false })
+
+      picker.show()
+
+      expect(picker._popup.isShown).toBeTrue()
+
+      picker.hide()
+
+      expect(picker._popup.isShown).toBeFalse()
+      expect(fixtureEl.querySelector('.form-control-action')).toBeNull()
+    })
+
     it('should name the toggle after what it opens', () => {
       buildPicker({ time: new Date(2026, 0, 1, 14, 30) })
 

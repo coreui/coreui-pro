@@ -251,6 +251,19 @@ describe('DatePicker', () => {
         <button type="button" class="btn btn-subtle btn-sm" data-coreui-picker-toggle>Pick a date <svg viewBox="0 0 16 16"><path d="M0 0h16"/></svg></button>
       </div>`
 
+    it('should keep an adopted toggle when pickerIcon is off', () => {
+      const picker = buildPicker({ date: new Date(2026, 6, 14), pickerIcon: false }, OWN_MARKUP)
+      const el = fixtureEl.querySelector('#picker')
+      const toggle = el.querySelector('[data-coreui-picker-toggle]')
+
+      expect(toggle).not.toBeNull()
+      expect(toggle.getAttribute('aria-label')).toEqual('Toggle calendar')
+
+      picker.show()
+
+      expect(toggle.getAttribute('aria-expanded')).toEqual('true')
+    })
+
     it('should adopt the field, toggle and cleaner the author wrote instead of building its own', () => {
       const picker = buildPicker({ date: new Date(2026, 6, 14) }, OWN_MARKUP)
       const el = fixtureEl.querySelector('#picker')
@@ -526,6 +539,27 @@ describe('DatePicker', () => {
 
       expect(picker._popup.isShown).toBeFalse()
       expect(picker.getDate().getDate()).toEqual(13)
+    })
+  })
+
+  describe('picker toggle', () => {
+    it('should not render the toggle when pickerIcon is off', () => {
+      buildPicker({ date: new Date(2026, 6, 14), pickerIcon: false })
+
+      expect(fixtureEl.querySelector('.form-control-action')).toBeNull()
+    })
+
+    it('should open and close without a toggle', () => {
+      const picker = buildPicker({ date: new Date(2026, 6, 14), pickerIcon: false })
+
+      picker.show()
+
+      expect(picker._popup.isShown).toBeTrue()
+
+      picker.hide()
+
+      expect(picker._popup.isShown).toBeFalse()
+      expect(fixtureEl.querySelector('.form-control-action')).toBeNull()
     })
   })
 
