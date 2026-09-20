@@ -12,6 +12,7 @@ import Data from './dom/data.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import type { ComponentConfig } from './util/config.js'
+import FocusTrap from './util/focustrap.js'
 import { CLEANER_ICON, PICKER_ICON } from './util/icons.js'
 import {
   DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList, SVGAllowlist
@@ -32,10 +33,12 @@ const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
 const ARROW_DOWN_KEY = 'ArrowDown'
+const ARROW_UP_KEY = 'ArrowUp'
 const BACKSPACE_KEY = 'Backspace'
 const DELETE_KEY = 'Delete'
 const ENTER_KEY = 'Enter'
 const ESCAPE_KEY = 'Escape'
+const SPACE_KEY = ' '
 const TAB_KEY = 'Tab'
 const RIGHT_MOUSE_BUTTON = 2 // MouseEvent.button value for the secondary button, usually the right button
 
@@ -44,6 +47,7 @@ const SELECTOR_CLEANER = '.form-control-cleaner'
 const SELECTOR_OPTION = '.list-box-option'
 const SELECTOR_SEARCH = '.form-multi-select-search'
 const SELECTOR_SELECT_ALL = '[data-coreui-select-all]'
+const SELECTOR_TEXT_ENTRY = 'input, textarea, select, [contenteditable=""], [contenteditable="true"]'
 const SELECTOR_DATA_MULTI_SELECT = '[data-coreui-multi-select]'
 // The class-based selector stays alongside the data attribute: pages relying
 // on class-only auto-init keep working (the v6 bet).
@@ -90,6 +94,7 @@ const Default = {
   deselectAllLabel: 'Deselect all',
   deselectFilteredLabel: 'Deselect filtered',
   disabled: false,
+  globalSearch: true,
   headerTemplate: null,
   hideSelectAllOnSearchNoResults: true,
   id: null,
@@ -132,6 +137,7 @@ const DefaultType: Record<string, string> = {
   deselectAllLabel: 'string',
   deselectFilteredLabel: 'string',
   disabled: 'boolean',
+  globalSearch: 'boolean',
   headerTemplate: '(function|null)',
   hideSelectAllOnSearchNoResults: 'boolean',
   id: '(string|null)',
@@ -149,7 +155,7 @@ const DefaultType: Record<string, string> = {
   required: 'boolean',
   sanitize: 'boolean',
   sanitizeFn: '(null|function)',
-  search: '(boolean|string)',
+  search: 'boolean',
   searchNoResultsLabel: 'string',
   selectAll: 'boolean',
   selectAllLabel: 'string',
@@ -191,6 +197,8 @@ class MultiSelect extends ComboboxBase {
   protected declare _selectionCleanerElement: any
   protected declare _searchElement: any
   protected declare _wrapperElement: any
+  protected declare _focustrap: any
+  protected declare _pointerDownListener: any
   protected declare _refocusOnHide: boolean
   protected declare _nativeKeydownHandler: any
 
@@ -253,14 +261,83 @@ class MultiSelect extends ComboboxBase {
   }
 
   override _afterShow(): void {
+    if (!this._isShown()) {
+      return
+    }
+
+    this._focustrap = new FocusTrap({
+      additionalElement: this._config.search ? this._searchElement : null,
+      autofocus: false,
+      trapElement: this._menu
+    })
+    this._focustrap.activate()
+
+    // A press outside fires focusin before the click that closes the panel.
+    this._pointerDownListener = (event: any) => {
+      if (this._wrapperElement.contains(event.target) || this._menu.contains(event.target)) {
+        return
+      }
+
+      this._focustrap?.deactivate()
+
+      // A right click or a scrollbar drag closes nothing, so the trap comes back.
+      const rearm = () => {
+        document.removeEventListener('pointerup', rearm, true)
+
+        if (this._isShown()) {
+          this._focustrap?.activate()
+        }
+      }
+
+      document.addEventListener('pointerup', rearm, true)
+    }
+
+    document.addEventListener('pointerdown', this._pointerDownListener, true)
+
     if (this._config.search) {
-      SelectorEngine.findOne(SELECTOR_SEARCH, this._wrapperElement)!.focus()
+      this._searchElement.focus()
+      return
+    }
+
+    this._focusListBox()
+  }
+
+  _focusListBox(): void {
+    if (!this._listBox) {
+      return
+    }
+
+    // A query puts its first match first; only an empty one restores the selection.
+    if (this._listBox.getActive() === null && !this._searchElement?.value) {
+      const selected = SelectorEngine.findOne(`${SELECTOR_OPTION}.${CLASS_NAME_SELECTED}:not([hidden])`, this._menu)
+
+      if (selected?.dataset.coreuiValue) {
+        this._listBox.setActive(selected.dataset.coreuiValue)
+      }
+    }
+
+    this._listBox.focusActive()
+
+    if (!this._menu.contains(document.activeElement)) {
+      this._menu.focus()
     }
   }
 
+  _releaseFocus(): void {
+    if (this._pointerDownListener) {
+      document.removeEventListener('pointerdown', this._pointerDownListener, true)
+      this._pointerDownListener = null
+    }
+
+    this._focustrap?.deactivate()
+    this._focustrap = null
+  }
+
   override _onHideStart(): void {
-    this._refocusOnHide = this._wrapperElement.contains(document.activeElement) ||
-      this._menu.contains(document.activeElement)
+    this._releaseFocus()
+
+    this._refocusOnHide =
+      this._wrapperElement.contains(document.activeElement) || this._menu.contains(document.activeElement)
   }
 
   override _afterHideDispose(): void {
@@ -374,6 +451,7 @@ class MultiSelect extends ComboboxBase {
   // Private
 
   _destroySelect(): void {
+    this._releaseFocus()
     this._disposeFloating()
     this._disposeListBox()
     this._disposeSelection()
@@ -441,13 +519,45 @@ class MultiSelect extends ComboboxBase {
         return
       }
 
-      if (this._config.search === 'global' && (event.key.length === 1 || event.key === BACKSPACE_KEY || event.key === DELETE_KEY)) {
+      if (this._isShown() && event.target === this._searchElement) {
+        if (event.key === ARROW_DOWN_KEY || event.key === ARROW_UP_KEY) {
+          event.preventDefault()
+
+          if (event.key === ARROW_UP_KEY && this._listBox?.getActive() === null) {
+            this._listBox.last()
+            return
+          }
+
+          this._focusListBox()
+          return
+        }
+
+        if (event.key === ENTER_KEY) {
+          const stop = SelectorEngine.findOne(`${SELECTOR_OPTION}[tabindex="0"]`, this._menu)
+
+          if (stop?.dataset.coreuiValue) {
+            event.preventDefault()
+            this._listBox?.toggle(stop.dataset.coreuiValue)
+          }
+
+          return
+        }
+      }
+
+      if (
+        this._routesTypingToSearch() &&
+        (this._isTyping(event) || event.key === BACKSPACE_KEY || event.key === DELETE_KEY)
+      ) {
         this._searchElement.focus()
       }
     })
 
     EventHandler.on(this._menu, EVENT_KEYDOWN, (event: any) => {
-      if (this._config.search === 'global' && (event.key.length === 1 || event.key === BACKSPACE_KEY || event.key === DELETE_KEY)) {
+      if (
+        this._routesTypingToSearch() &&
+        (this._isTyping(event) || event.key === BACKSPACE_KEY || event.key === DELETE_KEY) &&
+        !(event.target as HTMLElement).closest(SELECTOR_TEXT_ENTRY)
+      ) {
         this._searchElement.focus()
       }
     })
@@ -717,6 +827,9 @@ class MultiSelect extends ComboboxBase {
     // as an invisible overlay so native `required` validation anchors over the control.
     this._element.parentNode!.insertBefore(wrapper, this._element)
     wrapper.prepend(this._element)
+
+    this._uniqueId = this._config.id || this._hostAttributes.get('id') || getUID(`${this.constructor.NAME}`)
+
     this._createSelection()
     this._createButtons()
 
@@ -725,7 +838,6 @@ class MultiSelect extends ComboboxBase {
       this._updateSearch()
     }
 
-    this._uniqueId = this._config.id || this._hostAttributes.get('id') || getUID(`${this.constructor.NAME}`)
     this._uniqueName = this._config.name || this._hostAttributes.get('name')
     this._element.setAttribute('id', this._uniqueId)
 
@@ -748,7 +860,7 @@ class MultiSelect extends ComboboxBase {
     togglerEl.classList.add(CLASS_NAME_INPUT_GROUP)
     togglerEl.setAttribute('role', 'combobox')
     togglerEl.setAttribute('aria-expanded', 'false')
-    togglerEl.setAttribute('aria-haspopup', 'listbox')
+    togglerEl.setAttribute('aria-haspopup', 'dialog')
     togglerEl.setAttribute('aria-controls', `${this._uniqueId}-listbox`)
     this._togglerElement = togglerEl
 
@@ -823,7 +935,6 @@ class MultiSelect extends ComboboxBase {
     input.setAttribute('id', `search-${this._uniqueId}`)
     input.autocomplete = 'off'
     input.setAttribute('aria-label', this._config.ariaSearchLabel)
-    input.setAttribute('aria-autocomplete', 'list')
     input.setAttribute('aria-controls', `${this._uniqueId}-listbox`)
 
     this._searchElement = input
@@ -872,8 +983,45 @@ class MultiSelect extends ComboboxBase {
   }
 
   override _afterMenuCreated(): void {
+    this._menu.setAttribute('role', 'dialog')
+    this._menu.setAttribute('tabindex', '-1')
+    this._nameMenu()
+
+    if (!this._config.search) {
+      this._menu.setAttribute('aria-modal', 'true')
+    }
+
     this._updateHeader()
     this._updateMasterCheckbox()
+  }
+
+  _nameMenu(): void {
+    const labelledBy = this._togglerElement.getAttribute('aria-labelledby')
+
+    if (labelledBy) {
+      this._menu.setAttribute('aria-labelledby', labelledBy)
+      return
+    }
+
+    const label = this._togglerElement.getAttribute('aria-label')
+
+    if (label) {
+      this._menu.setAttribute('aria-label', label)
+      return
+    }
+
+    this._togglerElement.id ||= getUID(`${this.constructor.NAME}-toggler-`)
+    this._menu.setAttribute('aria-labelledby', this._togglerElement.id)
+  }
+
+  // The space bar belongs to whatever is under the focus, and a chord is a
+  // command rather than a character.
+  _isTyping(event: KeyboardEvent): boolean {
+    return event.key.length === 1 && event.key !== SPACE_KEY && !event.ctrlKey && !event.metaKey
+  }
+
+  _routesTypingToSearch(): boolean {
+    return Boolean(this._config.search && this._config.globalSearch)
   }
 
   override _getListBoxConfig(): any {
@@ -882,12 +1030,14 @@ class MultiSelect extends ComboboxBase {
       indicator: this._config.indicator,
       sectionsSelectable: this._config.optionsGroupsSelectable,
       selectionLimit: this._config.selectionLimit,
-      selectionMode: this._config.multiple ? 'multiple' : 'single'
+      selectionMode: this._config.multiple ? 'multiple' : 'single',
+      typeahead: !this._routesTypingToSearch()
     }
   }
 
-  override _getActiveDescendantField(): HTMLElement {
-    return this._config.search ? this._searchElement : this._togglerElement
+  // A dialog carries no aria-activedescendant: the options take the focus.
+  override _getActiveDescendantField(): null {
+    return null
   }
 
   override _optionText(option: any): string {

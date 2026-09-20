@@ -268,8 +268,10 @@ class ComboboxBase extends BaseComponent {
       if (event.key === ESCAPE_KEY) {
         event.preventDefault()
         event.stopPropagation()
-        this._escapeFocusTarget()?.focus()
+
+        // Closing first releases whatever holds the focus, so the handover lands.
         this.hide()
+        this._escapeFocusTarget()?.focus()
       }
     })
   }
@@ -296,7 +298,7 @@ class ComboboxBase extends BaseComponent {
   }
 
   // The field that keeps the focus while the list moves its active option.
-  _getActiveDescendantField(): HTMLElement {
+  _getActiveDescendantField(): HTMLElement | null {
     return this._togglerElement
   }
 

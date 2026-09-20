@@ -17,7 +17,7 @@ import multiSelectSelectionLimit from './snippets/multi-select-selection-limit.j
 
 A straightforward demonstration of how to implement a basic Bootstrap Multi Select dropdown, highlighting essential attributes and configurations.
 
-<Example pro code={`<select id="ms1" data-coreui-multi-select multiple data-coreui-search="global">
+<Example pro code={`<select id="ms1" data-coreui-multi-select multiple data-coreui-search="true">
     <option value="0">Angular</option>
     <option value="1">Bootstrap</option>
     <option value="2">React.js</option>
@@ -118,13 +118,25 @@ To enable the default search input element with standard behavior, please add `d
     </optgroup>
   </select>`} />
 
-### Global search
+### Where typing goes
 
-<AddedIn version="5.6.0" />
+Typing reaches the search box from anywhere in the component — the control, the options panel, the select all button — so it never depends on where the focus happens to be. That is how `data-coreui-search="true"` behaves on its own.
 
-To enable the global search functionality within the Multi Select component, please add `data-coreui-search="global"`. When `data-coreui-search` is set to `'global'`, the user can perform searches across the entire component, regardless of where their focus is within the component. This allows for a more flexible and intuitive search experience, ensuring the search input is recognized from any point within the component.
+<Example pro code={`<select data-coreui-multi-select multiple data-coreui-search="true">
+    <option value="0">Angular</option>
+    <option value="1">Bootstrap</option>
+    <option value="2">React.js</option>
+    <option value="3">Vue.js</option>
+    <optgroup label="backend">
+      <option value="4">Django</option>
+      <option value="5">Laravel</option>
+      <option value="6">Node.js</option>
+    </optgroup>
+  </select>`} />
 
-<Example pro code={`<select data-coreui-multi-select multiple data-coreui-search="global">
+Add `data-coreui-global-search="false"` to keep typing local. The search box then filters only while it has the focus, and a keystroke over the options list jumps to the first option starting with it.
+
+<Example pro code={`<select data-coreui-multi-select multiple data-coreui-search="true" data-coreui-global-search="false">
     <option value="0">Angular</option>
     <option value="1">Bootstrap</option>
     <option value="2">React.js</option>
@@ -521,6 +533,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `deselectAllLabel` | string | `'Deselect all'` | Sets the select all button label shown once everything is selected. See `selectAllLabel`. |
 | `deselectFilteredLabel` | string | `'Deselect filtered'` | Label shown instead of `deselectAllLabel` when `selectAllMode: 'filtered'` and a search filter narrows the list. See `selectFilteredLabel`. |
 | `disabled` | boolean | `false` | Toggle the disabled state for the component. |
+| `globalSearch` | boolean | `true` | Routes typing to the search box from anywhere in the component, so a keystroke never depends on where the focus sits. Set to `false` to keep it local: the search box then filters only while it has the focus, and typing over the options list jumps to the first option that starts with what was typed. Needs `search`. |
 | `headerTemplate` | function, null | `null` | Custom template function for rendering the dropdown header (the area above the options list). Replaces the built-in select all button and renders independently of `selectAll`. Receives a `state` object (`{ selected, total, filtered, filteredSelected }`) and an `actions` object (`{ selectAll, deselectAll, selectFiltered, deselectFiltered }`) with bound component methods. Return an `HTMLElement` (wire your own listeners using `actions`, supports multiple controls) or an HTML string (sanitized, no actions wired). Re-renders on every selection change and search filter. |
 | `hideSelectAllOnSearchNoResults` | boolean | `true` | Hides the dropdown header with the built-in select all button when a search filter leaves no matching options. Set to `false` to keep the select all button visible even when there are no results. |
 | `indicator` | string | `'checkbox'` | Sets the marker used by the options, the selectable group labels and the select all button: `'checkbox'` or `'none'`. |
@@ -537,7 +550,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `required` | boolean | `false` | Makes the input field required for form validation. |
 | `sanitize` | boolean | `true` | Enables HTML sanitization for custom templates to prevent XSS attacks. |
 | `sanitizeFn` | function, null | `null` | Custom sanitization function. If provided, it will be used instead of the built-in sanitizer. |
-| `search` | boolean, string | `false` | Enables search input element. When set to `'global'`, the user can perform searches across the entire component, regardless of where their focus is within the component. |
+| `search` | boolean | `false` | Renders a search box in the control and filters the options as the user types. It takes the focus when the panel opens, and typing anywhere in the component reaches it unless `globalSearch` is off. |
 | `searchNoResultsLabel` | string | `'No results found'` | Sets the label for no results when filtering.	|
 | `selectAll` | boolean | `true` | Enables select all button.|
 | `selectAllLabel` | string | `'Select all'` | Sets the select all button label shown until everything is selected. The button is a toggle: it shows `selectAllLabel` (and selects all) until everything is selected, then shows `deselectAllLabel` (and deselects all). |
@@ -587,19 +600,20 @@ myMutliSelect.addEventListener('change.coreui.multi-select', event => {
 
 ## Accessibility
 
-The focus never enters the options list: it stays on the toggler, or on the search input when `search` is on, and `aria-activedescendant` points at the highlighted option. The select all button sits in the panel header outside the list, so <kbd>Tab</kbd> reaches it.
+The options panel is a dialog named by the control. Opening it moves the focus inside — onto the search box when `search` is on, otherwise onto the option the list points at, which is the selection the user left or the first option. The options are focusable one at a time: the arrows move the focus itself rather than a highlight read through `aria-activedescendant`. <kbd>Tab</kbd> cycles through what the panel offers and the search box in the control, and reaches nothing outside them until the panel closes, which <kbd>Escape</kbd> does, returning the focus to the control.
 
 ### Keyboard shortcuts
 
 | Key | Action |
 | --- | --- |
-| <kbd>Tab</kbd> | Navigate to/from the component, and to the select all button |
-| <kbd>Enter</kbd>/<kbd>Space</kbd> | Open dropdown or select the highlighted option |
-| <kbd>Arrow Up</kbd>/<kbd>Arrow Down</kbd> | Move the highlight through the options (and the selectable group labels) |
-| <kbd>Home</kbd> | Highlight the first option (not while typing in the search input) |
-| <kbd>End</kbd> | Highlight the last option (not while typing in the search input) |
-| <kbd>Escape</kbd> | Close the dropdown |
-| <kbd>Backspace</kbd>/<kbd>Delete</kbd> | Remove last selected item (when search is empty) |
+| <kbd>Tab</kbd> | Move between the search box, the select all button and the options list; the focus stays in the open panel |
+| <kbd>Enter</kbd>/<kbd>Space</kbd> | Open the panel from the control, or select the focused option; <kbd>Enter</kbd> in the search box takes the option the list points at |
+| <kbd>Arrow Up</kbd>/<kbd>Arrow Down</kbd> | Move through the options (and the selectable group labels), or enter the list from the search box |
+| <kbd>Shift</kbd> + <kbd>Arrow Up</kbd>/<kbd>Arrow Down</kbd> | Extend the selection while moving (multiple selection) |
+| <kbd>Home</kbd>/<kbd>End</kbd> | Focus the first/last option (not while typing in the search box) |
+| <kbd>Ctrl</kbd>/<kbd>Cmd</kbd> + <kbd>A</kbd> | Select every option the list shows, from the options list (multiple selection) |
+| <kbd>Escape</kbd> | Close the panel and return the focus to the control |
+| <kbd>Backspace</kbd>/<kbd>Delete</kbd> | Remove the last selected item (when the search box is empty) |
 
 ## Customizing
 

@@ -943,6 +943,47 @@ describe('ListBox', () => {
     })
   })
 
+  describe('focusActive', () => {
+    it('should focus the highlighted option', () => {
+      const el = setMarkup()
+      const listBox = new ListBox(el)
+
+      listBox.setActive('onion')
+      listBox.focusActive()
+
+      expect(document.activeElement).toEqual(item(el, 'onion'))
+    })
+
+    it('should focus the first navigable option when nothing is highlighted', () => {
+      const el = setMarkup()
+      const listBox = new ListBox(el)
+
+      listBox.focusActive()
+
+      expect(listBox.getActive()).toEqual('lettuce')
+      expect(document.activeElement).toEqual(item(el, 'lettuce'))
+    })
+
+    it('should leave the focus alone when the list drives a field', () => {
+      fixtureEl.innerHTML = [
+        '<input type="text" id="field">',
+        '<div class="list-box">',
+        '<div class="list-box-option" data-coreui-value="lettuce">Lettuce</div>',
+        '</div>'
+      ].join('')
+
+      const field = fixtureEl.querySelector('#field')
+      const listBox = new ListBox(fixtureEl.querySelector('.list-box'), { activeDescendant: '#field' })
+
+      field.focus()
+      listBox.focusActive()
+
+      expect(document.activeElement).toEqual(field)
+      expect(listBox.getActive()).toBeNull()
+      expect(field.hasAttribute('aria-activedescendant')).toBeFalse()
+    })
+  })
+
   describe('dispose', () => {
     it('should stop reacting and clean the field up', () => {
       fixtureEl.innerHTML = [
@@ -1538,6 +1579,14 @@ describe('ListBox', () => {
       listBox.select('tomato')
       expect(label(el, 0).getAttribute('aria-pressed')).toEqual('true')
       expect(label(el, 0).classList.contains('selected')).toBeTrue()
+    })
+
+    it('should take the tab stop when it comes first', () => {
+      const el = setSections()
+      new ListBox(el, { selectionMode: 'multiple', sectionsSelectable: true }) // eslint-disable-line no-new
+
+      expect(label(el, 0).getAttribute('tabindex')).toEqual('0')
+      expect(item(el, 'lettuce').getAttribute('tabindex')).toEqual('-1')
     })
 
     it('should toggle the visible options of its own section', () => {

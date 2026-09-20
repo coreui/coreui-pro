@@ -186,6 +186,39 @@ describe('FocusTrap', () => {
     })
   })
 
+  describe('tabbing inside a trap of its own', () => {
+    it('should wrap the tab order without waiting for a focusin', () => {
+      fixtureEl.innerHTML = [
+        '<button id="outside" type="button">outside</button>',
+        '<div id="trap"><button id="first">first</button><button id="last">last</button></div>'
+      ].join('')
+
+      const first = fixtureEl.querySelector('#first')
+      const last = fixtureEl.querySelector('#last')
+      const focustrap = new FocusTrap({ trapElement: fixtureEl.querySelector('#trap') })
+
+      focustrap.activate()
+      last.focus()
+
+      const forward = createEvent('keydown', { bubbles: true, cancelable: true })
+      forward.key = 'Tab'
+      last.dispatchEvent(forward)
+
+      expect(forward.defaultPrevented).toBeTrue()
+      expect(document.activeElement).toEqual(first)
+
+      const back = createEvent('keydown', { bubbles: true, cancelable: true })
+      back.key = 'Tab'
+      back.shiftKey = true
+      first.dispatchEvent(back)
+
+      expect(back.defaultPrevented).toBeTrue()
+      expect(document.activeElement).toEqual(last)
+
+      focustrap.deactivate()
+    })
+  })
+
   describe('deactivate', () => {
     it('should flag itself as no longer active', () => {
       const focustrap = new FocusTrap({ trapElement: fixtureEl })
@@ -240,6 +273,64 @@ describe('FocusTrap', () => {
       middle.dispatchEvent(event)
 
       expect(event.defaultPrevented).toBeFalse()
+
+      focustrap.deactivate()
+    })
+
+    it('should take a focusable additional element as a stop of its own', () => {
+      fixtureEl.innerHTML = [
+        '<div id="trap"><button id="only">only</button></div>',
+        '<input id="field" type="text">'
+      ].join('')
+
+      const field = fixtureEl.querySelector('#field')
+      const only = fixtureEl.querySelector('#only')
+      const focustrap = new FocusTrap({
+        additionalElement: field,
+        trapElement: fixtureEl.querySelector('#trap')
+      })
+
+      focustrap.activate()
+      only.focus()
+
+      const forward = createEvent('keydown', { bubbles: true, cancelable: true })
+      forward.key = 'Tab'
+      only.dispatchEvent(forward)
+
+      expect(forward.defaultPrevented).toBeTrue()
+      expect(document.activeElement).toEqual(field)
+
+      const back = createEvent('keydown', { bubbles: true, cancelable: true })
+      back.key = 'Tab'
+      field.dispatchEvent(back)
+
+      expect(back.defaultPrevented).toBeTrue()
+      expect(document.activeElement).toEqual(only)
+
+      focustrap.deactivate()
+    })
+
+    it('should wrap the tab inside the trap when the additional element cannot take the focus', () => {
+      fixtureEl.innerHTML = [
+        '<div id="trap"><button id="t1">t1</button><button id="t2">t2</button></div>',
+        '<input id="field" type="text" disabled>'
+      ].join('')
+
+      const last = fixtureEl.querySelector('#t2')
+      const focustrap = new FocusTrap({
+        additionalElement: fixtureEl.querySelector('#field'),
+        trapElement: fixtureEl.querySelector('#trap')
+      })
+
+      focustrap.activate()
+      last.focus()
+
+      const event = createEvent('keydown', { bubbles: true, cancelable: true })
+      event.key = 'Tab'
+      last.dispatchEvent(event)
+
+      expect(event.defaultPrevented).toBeTrue()
+      expect(document.activeElement).toEqual(fixtureEl.querySelector('#t1'))
 
       focustrap.deactivate()
     })
