@@ -1,1000 +1,363 @@
 /*!
-  * CoreUI date-range-picker.js v5.27.0 (https://coreui.io)
-  * Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
-  * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-  */
-(function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('@popperjs/core'), require('./base-component.js'), require('./calendar.js'), require('./time-picker.js'), require('./dom/event-handler.js'), require('./dom/manipulator.js'), require('./dom/selector-engine.js'), require('./util/sanitizer.js'), require('./util/index.js'), require('./util/calendar.js'), require('./util/focustrap.js')) :
-  typeof define === 'function' && define.amd ? define(['@popperjs/core', './base-component', './calendar', './time-picker', './dom/event-handler', './dom/manipulator', './dom/selector-engine', './util/sanitizer', './util/index', './util/calendar', './util/focustrap'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.DateRangePicker = factory(global["@popperjs/core"], global.BaseComponent, global.Calendar, global.TimePicker, global.EventHandler, global.Manipulator, global.SelectorEngine, global.Sanitizer, global.Index, global.Calendar, global.Focustrap));
-})(this, (function (Popper, BaseComponent, Calendar, TimePicker, EventHandler, Manipulator, SelectorEngine, sanitizer_js, index_js, calendar_js, FocusTrap) { 'use strict';
+* CoreUI PRO date-range-picker.ts v5.27.0 (https://coreui.io)
+* Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
+* License (https://coreui.io/pro/license/)
+*/
+(function(global, factory) {
+	typeof exports === "object" && typeof module !== "undefined" ? module.exports = factory(require("./picker-base.js"), require("./calendar.js"), require("./date-range-input.js"), require("./dom/event-handler.js"), require("./dom/selector-engine.js"), require("./util/form-control-group.js"), require("./util/calendar.js"), require("./util/date-sections.js"), require("./util/icons.js"), require("./util/index.js"), require("./util/sanitizer.js")) : typeof define === "function" && define.amd ? define([
+		"./picker-base.js",
+		"./calendar.js",
+		"./date-range-input.js",
+		"./dom/event-handler.js",
+		"./dom/selector-engine.js",
+		"./util/form-control-group.js",
+		"./util/calendar.js",
+		"./util/date-sections.js",
+		"./util/icons.js",
+		"./util/index.js",
+		"./util/sanitizer.js"
+	], factory) : (global = typeof globalThis !== "undefined" ? globalThis : global || self, global.DateRangePicker = factory(global.PickerBase, global.Calendar, global.DateRangeInput, global.EventHandler, global.SelectorEngine, global.FormControlGroup, global.Calendar, global.DateSections, global.Icons, global.Index, global.Sanitizer));
+})(this, function(js_src_picker_base_js, js_src_calendar_js, js_src_date_range_input_js, js_src_dom_event_handler_js, js_src_dom_selector_engine_js, js_src_util_form_control_group_js, js_src_util_calendar_js, js_src_util_date_sections_js, js_src_util_icons_js, js_src_util_index_js, js_src_util_sanitizer_js) {
+	//#region \0rolldown/runtime.js
+	var __create = Object.create;
+	var __defProp = Object.defineProperty;
+	var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+	var __getOwnPropNames = Object.getOwnPropertyNames;
+	var __getProtoOf = Object.getPrototypeOf;
+	var __hasOwnProp = Object.prototype.hasOwnProperty;
+	var __copyProps = (to, from, except, desc) => {
+		if (from && typeof from === "object" || typeof from === "function") for (var keys = __getOwnPropNames(from), i = 0, n = keys.length, key; i < n; i++) {
+			key = keys[i];
+			if (!__hasOwnProp.call(to, key) && key !== except) __defProp(to, key, {
+				get: ((k) => from[k]).bind(null, key),
+				enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
+			});
+		}
+		return to;
+	};
+	var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(isNodeMode || !mod || !mod.__esModule || !__hasOwnProp.call(mod, "default") ? __defProp(target, "default", {
+		value: mod,
+		enumerable: true
+	}) : target, mod));
+	//#endregion
+	js_src_picker_base_js = __toESM(js_src_picker_base_js);
+	js_src_calendar_js = __toESM(js_src_calendar_js);
+	js_src_date_range_input_js = __toESM(js_src_date_range_input_js);
+	js_src_dom_event_handler_js = __toESM(js_src_dom_event_handler_js);
+	js_src_dom_selector_engine_js = __toESM(js_src_dom_selector_engine_js);
+	//#region js/src/date-range-picker.ts
+	/**
+	* --------------------------------------------------------------------------
+	* CoreUI PRO date-range-picker.js
+	* License (https://coreui.io/pro/license/)
+	*
+	* Composed from a DateRangeInput field and one multi-month Calendar in a
+	* Popup. The field owns the range — both dates and their validation — the
+	* calendar owns the range mechanics (start/end, auto-advance), and the picker
+	* joins them and projects the footer/ranges regions. The element is the
+	* picker, not the frame: the frame is the field inside it.
+	* --------------------------------------------------------------------------
+	*/
+	/**
+	* Constants
+	*/
+	const NAME = "date-range-picker";
+	const EVENT_KEY = `.coreui.date-range-picker`;
+	const DATA_API_KEY = ".data-api";
+	const EVENT_END_DATE_CHANGE = `endDateChange${EVENT_KEY}`;
+	const EVENT_START_DATE_CHANGE = `startDateChange${EVENT_KEY}`;
+	const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`;
+	const CLASS_NAME_BODY = "date-picker-body";
+	const CLASS_NAME_CALENDAR = "date-picker-calendar";
+	const CLASS_NAME_CALENDARS = "date-picker-calendars";
+	const CLASS_NAME_DATE_PICKER = "date-picker";
+	const CLASS_NAME_DATE_RANGE_PICKER = "date-range-picker";
+	const CLASS_NAME_DROPDOWN = "date-picker-popup";
+	const CLASS_NAME_FOOTER = "date-picker-footer";
+	const CLASS_NAME_CLEANER = "form-control-cleaner";
+	const CLASS_NAME_INDICATOR = "form-control-action";
+	const CLASS_NAME_PICKER = "picker";
+	const CLASS_NAME_POPUP = "popup";
+	const CLASS_NAME_RANGES = "date-picker-ranges";
+	const SELECTOR_DATA_DATE_RANGE_PICKER = "[data-coreui-date-range-picker]";
+	const SELECTOR_TEMPLATE_RANGES = "template[data-coreui-template=\"ranges\"]";
+	const Default = {
+		allowList: js_src_util_sanitizer_js.SVGAllowlist,
+		ariaCleanerLabel: "Clear date range",
+		ariaEndLabel: "End date",
+		ariaPickerLabel: "Toggle calendar",
+		ariaStartLabel: "Start date",
+		calendarOptions: {},
+		calendars: 2,
+		cleaner: true,
+		cleanerIcon: js_src_util_icons_js.CLEANER_ICON,
+		container: false,
+		disabled: false,
+		endDate: null,
+		endFloatingLabel: null,
+		endName: null,
+		inputOptions: {},
+		locale: navigator.language,
+		maxDate: null,
+		minDate: null,
+		pickerIcon: true,
+		sanitize: true,
+		sanitizeFn: null,
+		separatorIcon: js_src_util_icons_js.SEPARATOR_ICON,
+		separatorIconRtl: js_src_util_icons_js.SEPARATOR_ICON_RTL,
+		size: null,
+		startDate: null,
+		startFloatingLabel: null,
+		startName: null
+	};
+	const DefaultType = {
+		allowList: "object",
+		ariaCleanerLabel: "string",
+		ariaEndLabel: "string",
+		ariaPickerLabel: "string",
+		ariaStartLabel: "string",
+		calendarOptions: "object",
+		calendars: "number",
+		cleaner: "boolean",
+		cleanerIcon: "string",
+		container: "(string|element|boolean)",
+		disabled: "boolean",
+		endDate: "(date|string|null)",
+		endFloatingLabel: "(string|null)",
+		endName: "(string|null)",
+		inputOptions: "object",
+		locale: "string",
+		maxDate: "(date|string|null)",
+		minDate: "(date|string|null)",
+		pickerIcon: "(string|boolean)",
+		sanitize: "boolean",
+		sanitizeFn: "(function|null)",
+		separatorIcon: "string",
+		separatorIconRtl: "string",
+		size: "(string|null)",
+		startDate: "(date|string|null)",
+		startFloatingLabel: "(string|null)",
+		startName: "(string|null)"
+	};
+	/**
+	* Class definition
+	*/
+	var DateRangePicker = class DateRangePicker extends js_src_picker_base_js.default {
+		constructor(element, config) {
+			super(element, config);
+			this._rangesTemplate = js_src_dom_selector_engine_js.default.findOne(SELECTOR_TEMPLATE_RANGES, this._element);
+			this._rangeInput = null;
+			this._calendar = null;
+			this._syncingFromPanel = false;
+			this._calendarElement = null;
+			this._selectEndDate = false;
+			this._hostClasses = (0, js_src_util_form_control_group_js.captureHostClasses)(this._element, this._managedClassNames());
+			this._createDateRangePicker();
+			this._createPopup();
+			this._addEventListeners();
+		}
+		static get Default() {
+			return Default;
+		}
+		static get DefaultType() {
+			return DefaultType;
+		}
+		static get NAME() {
+			return NAME;
+		}
+		getStartDate() {
+			return this._rangeInput.getStartDate();
+		}
+		getEndDate() {
+			return this._rangeInput.getEndDate();
+		}
+		setRange(startDate, endDate) {
+			this._rangeInput.setRange(startDate, endDate);
+			this._setSelectEndDate(false);
+		}
+		clear() {
+			this._rangeInput.clear();
+			this._setSelectEndDate(false);
+		}
+		reset() {
+			this._rangeInput.reset();
+			this._setSelectEndDate(false);
+		}
+		getContext() {
+			return {
+				...this._baseContext(),
+				endDate: this.getEndDate(),
+				isDateSelectable: (date) => this._rangeInput.isDateSelectable(date),
+				setRange: (startDate, endDate) => this.setRange(startDate, endDate),
+				startDate: this.getStartDate()
+			};
+		}
+		_listeningElements() {
+			return [...super._listeningElements(), this._frameElement];
+		}
+		_disposeParts() {
+			this._rangeInput.dispose();
+			this._calendar?.dispose();
+			this._frameElement.remove();
+		}
+		_managedClassNames() {
+			return [
+				CLASS_NAME_DATE_PICKER,
+				CLASS_NAME_DATE_RANGE_PICKER,
+				CLASS_NAME_PICKER
+			].filter(Boolean);
+		}
+		_resolveFormat() {
+			if (this._config.format) return this._config.format;
+			return {
+				month: "MM/yyyy",
+				quarter: "QQQ yyyy",
+				week: js_src_util_date_sections_js.getWeekSectionsFromLocale,
+				year: "yyyy"
+			}[this._config.selectionType] ?? null;
+		}
+		_setSelectEndDate(value) {
+			if (this._selectEndDate === value) return;
+			this._selectEndDate = value;
+			this._calendar?.setConfig({ selectEndDate: value });
+		}
+		_createDateRangePicker() {
+			this._element.classList.add(CLASS_NAME_DATE_PICKER, CLASS_NAME_DATE_RANGE_PICKER, CLASS_NAME_PICKER);
+			const inputGroup = document.createElement("div");
+			this._element.append(inputGroup);
+			this._frameElement = inputGroup;
+			this._rangeInput = new js_src_date_range_input_js.default(inputGroup, this._forwardConfig(js_src_date_range_input_js.default, {
+				disabled: this._config.disabled,
+				endDate: this._config.endDate,
+				locale: this._config.locale,
+				size: this._config.size,
+				startDate: this._config.startDate,
+				...this._resolveFormat() ? { format: this._resolveFormat() } : {}
+			}, { inputOptions: this._config.inputOptions }));
+			js_src_dom_event_handler_js.default.on(inputGroup, js_src_date_range_input_js.default.eventName("startDateChange"), (event) => {
+				if (!this._syncingFromPanel) {
+					this._calendar?.setConfig({ startDate: event.date });
+					this._triggerDateChange(EVENT_START_DATE_CHANGE, event.date);
+				}
+			});
+			js_src_dom_event_handler_js.default.on(inputGroup, js_src_date_range_input_js.default.eventName("endDateChange"), (event) => {
+				if (!this._syncingFromPanel) {
+					this._calendar?.setConfig({ endDate: event.date });
+					this._triggerDateChange(EVENT_END_DATE_CHANGE, event.date);
+				}
+			});
+			const action = (className, icon, label) => (0, js_src_util_form_control_group_js.createControlGroupAction)({
+				className,
+				disabled: this._config.disabled,
+				icon,
+				label,
+				sanitizeIcon: (value) => (0, js_src_util_sanitizer_js.sanitizeByConfig)(value, this._config)
+			});
+			if (this._config.cleaner) {
+				this._cleanerElement = action(CLASS_NAME_CLEANER, this._config.cleanerIcon, this._config.ariaCleanerLabel);
+				inputGroup.append(this._cleanerElement);
+			}
+			this._toggleElement = null;
+			if (this._config.pickerIcon) {
+				const indicator = action(CLASS_NAME_INDICATOR, this._config.pickerIcon === true ? js_src_util_icons_js.CALENDAR_ICON : this._config.pickerIcon, this._config.ariaPickerLabel);
+				inputGroup.append(indicator);
+				this._toggleElement = indicator;
+			}
+			this._menu = document.createElement("div");
+			this._menu.id = (0, js_src_util_index_js.getUID)(`${this.constructor.NAME}-popup-`);
+			this._menu.classList.add(CLASS_NAME_POPUP, CLASS_NAME_DROPDOWN);
+			this._writeToggleAttribute("aria-expanded", "false");
+			this._writeToggleAttribute("aria-haspopup", "dialog");
+			const body = document.createElement("div");
+			body.classList.add(CLASS_NAME_BODY);
+			if (this._rangesTemplate) {
+				const ranges = document.createElement("div");
+				ranges.classList.add(CLASS_NAME_RANGES);
+				ranges.append(this._rangesTemplate.content.cloneNode(true));
+				body.append(ranges);
+			}
+			const calendars = document.createElement("div");
+			calendars.classList.add(CLASS_NAME_CALENDARS);
+			this._calendarElement = document.createElement("div");
+			this._calendarElement.classList.add(CLASS_NAME_CALENDAR);
+			calendars.append(this._calendarElement);
+			body.append(calendars);
+			this._menu.append(body);
+			if (this._footerTemplate) {
+				const footer = document.createElement("div");
+				footer.classList.add(CLASS_NAME_FOOTER);
+				footer.append(this._footerTemplate.content.cloneNode(true));
+				this._menu.append(footer);
+			}
+		}
+		_ensureCalendar() {
+			if (this._calendar) return;
+			this._calendar = new js_src_calendar_js.default(this._calendarElement, this._forwardConfig(js_src_calendar_js.default, {
+				calendars: this._config.calendars,
+				endDate: this.getEndDate(),
+				locale: this._config.locale,
+				range: true,
+				selectEndDate: this._selectEndDate,
+				startDate: this.getStartDate()
+			}, this._config.calendarOptions));
+			js_src_dom_event_handler_js.default.on(this._calendar._element, "selectEndChange.coreui.calendar", (event) => {
+				this._selectEndDate = event.value;
+			});
+			js_src_dom_event_handler_js.default.on(this._calendar._element, "startDateChange.coreui.calendar", (event) => {
+				this._syncingFromPanel = true;
+				this._rangeInput.setRange(event.dateObject, this.getEndDate());
+				this._syncingFromPanel = false;
+				this._triggerDateChange(EVENT_START_DATE_CHANGE, this.getStartDate());
+			});
+			js_src_dom_event_handler_js.default.on(this._calendar._element, "endDateChange.coreui.calendar", (event) => {
+				this._syncingFromPanel = true;
+				this._rangeInput.setRange(this.getStartDate(), event.dateObject);
+				this._syncingFromPanel = false;
+				this._triggerDateChange(EVENT_END_DATE_CHANGE, this.getEndDate());
+				if (this.getEndDate() && this.getStartDate() && !this._footerTemplate) this.hide();
+			});
+		}
+		_triggerDateChange(eventName, date) {
+			js_src_dom_event_handler_js.default.trigger(this._element, eventName, {
+				date,
+				formattedDate: (0, js_src_util_calendar_js.getDateBySelectionType)(date, this._config.selectionType)
+			});
+		}
+		_addEventListeners() {
+			super._addEventListeners();
+			const eventName = this.constructor.eventName("focusin");
+			js_src_dom_event_handler_js.default.on(this._rangeInput.getStartElement(), eventName, () => {
+				this._setSelectEndDate(false);
+			});
+			js_src_dom_event_handler_js.default.on(this._rangeInput.getEndElement(), eventName, () => {
+				this._setSelectEndDate(true);
+			});
+		}
+		_onPopupShow() {
+			this._ensureCalendar();
+		}
+		_popupAnchor() {
+			return this._frameElement;
+		}
+		_isNowSelectable() {
+			return this._rangeInput.isDateSelectable(/* @__PURE__ */ new Date());
+		}
+		static jQueryInterface(config, ...args) {
+			return (0, js_src_util_index_js.jQueryDispatch)(this, DateRangePicker, config, args);
+		}
+	};
+	/**
+	* Data API implementation
+	*/
+	js_src_dom_event_handler_js.default.on(window, EVENT_LOAD_DATA_API, () => {
+		for (const element of js_src_dom_selector_engine_js.default.find(SELECTOR_DATA_DATE_RANGE_PICKER)) DateRangePicker.getOrCreateInstance(element);
+	});
+	/**
+	* jQuery
+	*/
+	(0, js_src_util_index_js.defineJQueryPlugin)(DateRangePicker);
+	//#endregion
+	return DateRangePicker;
+});
 
-  function _interopNamespaceDefault(e) {
-    const n = Object.create(null, { [Symbol.toStringTag]: { value: 'Module' } });
-    if (e) {
-      for (const k in e) {
-        if (k !== 'default') {
-          const d = Object.getOwnPropertyDescriptor(e, k);
-          Object.defineProperty(n, k, d.get ? d : {
-            enumerable: true,
-            get: () => e[k]
-          });
-        }
-      }
-    }
-    n.default = e;
-    return Object.freeze(n);
-  }
-
-  const Popper__namespace = /*#__PURE__*/_interopNamespaceDefault(Popper);
-
-  /**
-   * --------------------------------------------------------------------------
-   * CoreUI PRO date-range-picker.js
-   * License (https://coreui.io/pro/license/)
-   * --------------------------------------------------------------------------
-   */
-
-
-  /**
-   * Constants
-   */
-
-  const NAME = 'date-range-picker';
-  const DATA_KEY = 'coreui.date-range-picker';
-  const EVENT_KEY = `.${DATA_KEY}`;
-  const DATA_API_KEY = '.data-api';
-  const DISALLOWED_ATTRIBUTES = new Set(['sanitize', 'allowList', 'sanitizeFn']);
-  const ENTER_KEY = 'Enter';
-  const ESCAPE_KEY = 'Escape';
-  const TAB_KEY = 'Tab';
-  const RIGHT_MOUSE_BUTTON = 2;
-  const EVENT_CLICK = `click${EVENT_KEY}`;
-  const EVENT_END_DATE_CHANGE = `endDateChange${EVENT_KEY}`;
-  const EVENT_HIDE = `hide${EVENT_KEY}`;
-  const EVENT_HIDDEN = `hidden${EVENT_KEY}`;
-  const EVENT_INPUT = `input${EVENT_KEY}`;
-  const EVENT_KEYDOWN = `keydown${EVENT_KEY}`;
-  const EVENT_RESIZE = 'resize';
-  const EVENT_SHOW = `show${EVENT_KEY}`;
-  const EVENT_SHOWN = `shown${EVENT_KEY}`;
-  const EVENT_SUBMIT = 'submit';
-  const EVENT_START_DATE_CHANGE = `startDateChange${EVENT_KEY}`;
-  const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`;
-  const EVENT_KEYUP_DATA_API = `keyup${EVENT_KEY}${DATA_API_KEY}`;
-  const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`;
-  const CLASS_NAME_BODY = 'date-picker-body';
-  const CLASS_NAME_CALENDAR = 'date-picker-calendar';
-  const CLASS_NAME_CALENDARS = 'date-picker-calendars';
-  const CLASS_NAME_CLEANER = 'date-picker-cleaner';
-  const CLASS_NAME_DATE_PICKER = 'date-picker';
-  const CLASS_NAME_DATE_RANGE_PICKER = 'date-range-picker';
-  const CLASS_NAME_DISABLED = 'disabled';
-  const CLASS_NAME_DROPDOWN = 'date-picker-dropdown';
-  const CLASS_NAME_INDICATOR = 'date-picker-indicator';
-  const CLASS_NAME_INPUT = 'date-picker-input';
-  const CLASS_NAME_INPUT_GROUP = 'date-picker-input-group';
-  const CLASS_NAME_INPUT_PREVIEW = 'date-picker-input-preview';
-  const CLASS_NAME_INPUT_WRAPPER = 'date-picker-input-wrapper';
-  const CLASS_NAME_IS_INVALID = 'is-invalid';
-  const CLASS_NAME_IS_VALID = 'is-valid';
-  const CLASS_NAME_FOOTER = 'date-picker-footer';
-  const CLASS_NAME_RANGES = 'date-picker-ranges';
-  const CLASS_NAME_SEPARATOR = 'date-picker-separator';
-  const CLASS_NAME_SHOW = 'show';
-  const CLASS_NAME_TIME_PICKER = 'time-picker';
-  const CLASS_NAME_TIME_PICKERS = 'date-picker-timepickers';
-  const CLASS_NAME_WAS_VALIDATED = 'was-validated';
-  const SELECTOR_CALENDAR = '.calendars';
-  const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="date-range-picker"]:not(.disabled):not(:disabled)';
-  const SELECTOR_DATA_TOGGLE_SHOWN = `${SELECTOR_DATA_TOGGLE}.${CLASS_NAME_SHOW}`;
-  const SELECTOR_INPUT = '.date-picker-input';
-  const SELECTOR_WAS_VALIDATED = 'form.was-validated';
-  const Default = {
-    allowList: sanitizer_js.DefaultAllowlist,
-    ariaNavNextMonthLabel: 'Next month',
-    ariaNavNextYearLabel: 'Next year',
-    ariaNavPrevMonthLabel: 'Previous month',
-    ariaNavPrevYearLabel: 'Previous year',
-    calendarDate: null,
-    calendars: 2,
-    cancelButton: 'Cancel',
-    cancelButtonClasses: ['btn', 'btn-sm', 'btn-ghost-primary'],
-    confirmButton: 'OK',
-    confirmButtonClasses: ['btn', 'btn-sm', 'btn-primary'],
-    cleaner: true,
-    container: false,
-    date: null,
-    dayFormat: 'numeric',
-    disabled: false,
-    disabledDates: null,
-    endDate: null,
-    endName: null,
-    firstDayOfWeek: 1,
-    footer: false,
-    inputDateFormat: null,
-    inputDateParse: null,
-    inputOnChangeDelay: 750,
-    inputReadOnly: false,
-    invalid: false,
-    indicator: true,
-    locale: 'default',
-    maxDate: null,
-    minDate: null,
-    monthFormat: 'short',
-    name: null,
-    placeholder: ['Start date', 'End date'],
-    previewDateOnHover: true,
-    range: true,
-    ranges: {},
-    rangesButtonsClasses: ['btn', 'btn-ghost-secondary'],
-    renderDayCell: null,
-    renderMonthCell: null,
-    renderQuarterCell: null,
-    renderYearCell: null,
-    required: true,
-    sanitize: true,
-    sanitizeFn: null,
-    separator: true,
-    size: null,
-    startDate: null,
-    startName: null,
-    selectAdjacementDays: false,
-    selectEndDate: false,
-    selectionType: 'day',
-    showAdjacementDays: true,
-    showWeekNumber: false,
-    timepicker: false,
-    todayButton: 'Today',
-    todayButtonClasses: ['btn', 'btn-sm', 'btn-primary', 'me-auto'],
-    valid: false,
-    weekdayFormat: 2,
-    weekNumbersLabel: null,
-    yearFormat: 'numeric'
-  };
-  const DefaultType = {
-    allowList: 'object',
-    ariaNavNextMonthLabel: 'string',
-    ariaNavNextYearLabel: 'string',
-    ariaNavPrevMonthLabel: 'string',
-    ariaNavPrevYearLabel: 'string',
-    calendarDate: '(date|number|string|null)',
-    calendars: 'number',
-    cancelButton: '(boolean|string)',
-    cancelButtonClasses: '(array|string)',
-    cleaner: 'boolean',
-    confirmButton: '(boolean|string)',
-    confirmButtonClasses: '(array|string)',
-    container: '(string|element|boolean)',
-    date: '(date|number|string|null)',
-    dayFormat: 'string',
-    disabledDates: '(array|date|function|null)',
-    disabled: 'boolean',
-    endDate: '(date|number|string|null)',
-    endName: '(string|null)',
-    firstDayOfWeek: 'number',
-    footer: 'boolean',
-    indicator: 'boolean',
-    inputDateFormat: '(function|null)',
-    inputDateParse: '(function|null)',
-    inputOnChangeDelay: 'number',
-    inputReadOnly: 'boolean',
-    invalid: 'boolean',
-    locale: 'string',
-    maxDate: '(date|number|string|null)',
-    minDate: '(date|number|string|null)',
-    monthFormat: 'string',
-    name: '(string|null)',
-    placeholder: '(array|string)',
-    previewDateOnHover: 'boolean',
-    range: 'boolean',
-    ranges: 'object',
-    rangesButtonsClasses: '(array|string)',
-    renderDayCell: '(function|null)',
-    renderMonthCell: '(function|null)',
-    renderQuarterCell: '(function|null)',
-    renderYearCell: '(function|null)',
-    required: 'boolean',
-    sanitize: 'boolean',
-    sanitizeFn: '(null|function)',
-    separator: 'boolean',
-    size: '(string|null)',
-    startDate: '(date|number|string|null)',
-    startName: '(string|null)',
-    selectAdjacementDays: 'boolean',
-    selectEndDate: 'boolean',
-    selectionType: 'string',
-    showAdjacementDays: 'boolean',
-    showWeekNumber: 'boolean',
-    timepicker: 'boolean',
-    todayButton: '(boolean|string)',
-    todayButtonClasses: '(array|string)',
-    valid: 'boolean',
-    weekdayFormat: '(number|string)',
-    weekNumbersLabel: '(string|null)',
-    yearFormat: 'string'
-  };
-
-  /**
-   * Class definition
-   */
-
-  class DateRangePicker extends BaseComponent {
-    constructor(element, config) {
-      super(element);
-      this._config = this._getConfig(config);
-      this._calendarDate = this._config.calendarDate;
-      this._startDate = this._config.date || this._config.startDate;
-      this._endDate = this._config.endDate;
-      this._initialStartDate = null;
-      this._initialEndDate = null;
-      this._mobile = window.innerWidth < 768;
-      this._popper = null;
-      this._selectEndDate = this._config.selectEndDate;
-      this._calendar = null;
-      this._calendars = null;
-      this._endInput = null;
-      this._endInputTimeout = null;
-      this._endPreviewInput = null;
-      this._indicatorElement = null;
-      this._menu = null;
-      this._startInput = null;
-      this._startInputTimeout = null;
-      this._startPreviewInput = null;
-      this._timepickers = null;
-      this._timePickerEnd = null;
-      this._timePickerStart = null;
-      this._togglerElement = null;
-      this._createDateRangePicker();
-      this._createDateRangePickerCalendars();
-      this._addEventListeners();
-      this._addCalendarEventListeners();
-      this._focustrap = this._initializeFocusTrap();
-    }
-
-    // Getters
-    static get Default() {
-      return Default;
-    }
-    static get DefaultType() {
-      return DefaultType;
-    }
-    static get NAME() {
-      return NAME;
-    }
-
-    // Public
-    toggle() {
-      return this._isShown() ? this.hide() : this.show();
-    }
-    show() {
-      if (this._config.disabled || this._isShown()) {
-        return;
-      }
-      this._initialStartDate = this._startDate ? new Date(this._startDate) : null;
-      this._initialEndDate = this._endDate ? new Date(this._endDate) : null;
-      EventHandler.trigger(this._element, EVENT_SHOW);
-      this._element.classList.add(CLASS_NAME_SHOW);
-      this._element.setAttribute('aria-expanded', true);
-      if (this._config.container) {
-        this._menu.classList.add(CLASS_NAME_SHOW);
-      }
-      this._focustrap.activate();
-      EventHandler.trigger(this._element, EVENT_SHOWN);
-      this._createPopper();
-    }
-    hide() {
-      EventHandler.trigger(this._element, EVENT_HIDE);
-      if (this._popper) {
-        this._popper.destroy();
-      }
-      this._element.classList.remove(CLASS_NAME_SHOW);
-      this._element.setAttribute('aria-expanded', 'false');
-      if (this._config.container) {
-        this._menu.classList.remove(CLASS_NAME_SHOW);
-      }
-      this._focustrap.deactivate();
-      EventHandler.trigger(this._element, EVENT_HIDDEN);
-    }
-    dispose() {
-      if (this._popper) {
-        this._popper.destroy();
-      }
-      if (this._startInputTimeout) {
-        clearTimeout(this._startInputTimeout);
-      }
-      if (this._endInputTimeout) {
-        clearTimeout(this._endInputTimeout);
-      }
-      this._focustrap.deactivate();
-      super.dispose();
-    }
-    cancel() {
-      this.hide();
-      if (this._initialStartDate) {
-        this._changeStartDate(this._initialStartDate);
-      }
-      if (this._config.range && this._initialEndDate) {
-        this._changeEndDate(this._initialEndDate);
-      }
-      if (this._initialStartDate || this._initialEndDate) {
-        this._calendar.update(this._getCalendarConfig);
-      }
-    }
-    clear() {
-      this._changeStartDate(null);
-      this._changeEndDate(null);
-      this._calendar.update(this._getCalendarConfig());
-    }
-    reset() {
-      this._changeStartDate(this._config.startDate);
-      this._changeEndDate(this._config.endDate);
-      this._calendar.update(this._getCalendarConfig());
-    }
-    update(config) {
-      this._config = this._getConfig(config);
-      this._calendarDate = this._config.calendarDate;
-      this._startDate = this._config.date || this._config.startDate;
-      this._endDate = this._config.endDate;
-      this._selectEndDate = this._config.selectEndDate;
-      this._element.innerHTML = '';
-      this._createDateRangePicker();
-      this._createDateRangePickerCalendars();
-      this._addEventListeners();
-      this._addCalendarEventListeners();
-    }
-
-    // Private
-    _initializeFocusTrap() {
-      return new FocusTrap({
-        additionalElement: this._config.container ? this._menu : null,
-        trapElement: this._element
-      });
-    }
-    _addEventListeners() {
-      EventHandler.on(this._indicatorElement, EVENT_CLICK, () => {
-        if (!this._config.disabled) {
-          this.toggle();
-        }
-      });
-      EventHandler.on(this._indicatorElement, EVENT_KEYDOWN, event => {
-        if (!this._config.disabled && event.key === ENTER_KEY) {
-          this.toggle();
-        }
-      });
-      EventHandler.on(this._togglerElement, EVENT_CLICK, event => {
-        if (!this._config.disabled && event.target !== this._indicatorElement) {
-          this.show();
-        }
-      });
-      EventHandler.on(this._element, EVENT_KEYDOWN, event => {
-        if (event.key === ESCAPE_KEY) {
-          this.hide();
-          this._startInput.focus();
-        }
-      });
-      EventHandler.on(this._startInput, EVENT_CLICK, () => {
-        this._selectEndDate = false;
-        this._calendar.update(this._getCalendarConfig());
-      });
-      EventHandler.on(this._startInput, EVENT_INPUT, event => {
-        if (this._startInputTimeout) {
-          clearTimeout(this._startInputTimeout);
-        }
-        this._startInputTimeout = setTimeout(() => {
-          const date = this._parseDate(event.target.value);
-          let formatedDate = date;
-          if (date instanceof Date && date.getTime()) {
-            if (calendar_js.isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
-              return; // Don't update if date is disabled
-            }
-            if (this._config.selectionType !== 'day') {
-              formatedDate = calendar_js.getDateBySelectionType(date, this._config.selectionType);
-            }
-            this._calendarDate = formatedDate;
-            this._startInput.value = this._setInputValue(formatedDate);
-          }
-          this._startDate = formatedDate;
-          this._calendar.update(this._getCalendarConfig());
-          if (this._timePickerStart) {
-            this._timePickerStart.update(this._getTimePickerConfig(true));
-          }
-          EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, {
-            date: formatedDate
-          });
-        }, this._config.inputOnChangeDelay);
-      });
-      EventHandler.on(this._startInput.form, EVENT_SUBMIT, () => {
-        if (this._startInput.form.classList.contains(CLASS_NAME_WAS_VALIDATED)) {
-          if (this._config.range && (Number.isNaN(Date.parse(this._startInput.value)) || Number.isNaN(Date.parse(this._endInput.value)))) {
-            return this._element.classList.add(CLASS_NAME_IS_INVALID);
-          }
-          if (this._config.range && this._startDate instanceof Date && this._endDate instanceof Date) {
-            return this._element.classList.add(CLASS_NAME_IS_VALID);
-          }
-          if (!this._config.range && Number.isNaN(Date.parse(this._startInput.value))) {
-            return this._element.classList.add(CLASS_NAME_IS_INVALID);
-          }
-          if (!this._config.range && this._startDate instanceof Date) {
-            return this._element.classList.add(CLASS_NAME_IS_VALID);
-          }
-          this._element.classList.add(CLASS_NAME_IS_INVALID);
-        }
-      });
-      EventHandler.on(this._endInput, EVENT_CLICK, () => {
-        this._selectEndDate = true;
-        this._calendar.update(this._getCalendarConfig());
-      });
-      EventHandler.on(this._endInput, EVENT_INPUT, event => {
-        if (this._endInputTimeout) {
-          clearTimeout(this._endInputTimeout);
-        }
-        this._endInputTimeout = setTimeout(() => {
-          const date = this._parseDate(event.target.value);
-          let formatedDate = date;
-          if (date instanceof Date && date.getTime()) {
-            if (date && calendar_js.isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
-              return; // Don't update if date is disabled
-            }
-            if (this._config.selectionType !== 'day') {
-              formatedDate = calendar_js.getDateBySelectionType(date, this._config.selectionType);
-            }
-            this._calendarDate = formatedDate;
-            this._endInput.value = this._setInputValue(formatedDate);
-          }
-          this._endDate = formatedDate;
-          this._calendar.update(this._getCalendarConfig());
-          if (this._timePickerEnd) {
-            this._timePickerEnd.update(this._getTimePickerConfig(false));
-          }
-          EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, {
-            date: formatedDate
-          });
-        }, this._config.inputOnChangeDelay);
-      });
-      EventHandler.on(window, EVENT_RESIZE, () => {
-        this._mobile = window.innerWidth < 768;
-      });
-    }
-    _addCalendarEventListeners() {
-      for (const calendar of SelectorEngine.find(SELECTOR_CALENDAR, this._menu)) {
-        EventHandler.on(calendar, 'startDateChange.coreui.calendar', event => {
-          this._changeStartDate(event.date);
-          if (!this._config.range && !this._config.footer && !this._config.timepicker) {
-            this.hide();
-          }
-        });
-        EventHandler.on(calendar, 'endDateChange.coreui.calendar', event => {
-          this._changeEndDate(event.date);
-          if (this._startDate && !this._config.footer && !this._config.timepicker) {
-            this.hide();
-          }
-        });
-        if (this._config.previewDateOnHover && !this._config.disabled) {
-          EventHandler.on(calendar, 'cellHover.coreui.calendar', event => {
-            if (this._selectEndDate) {
-              const previewValue = event.date ? this._setInputValue(event.date) : this._setInputValue(this._endDate);
-              this._updatePreviewInputVisibility(this._endPreviewInput, event.date ? previewValue : '');
-              return;
-            }
-            const previewValue = event.date ? this._setInputValue(event.date) : this._setInputValue(this._startDate);
-            this._updatePreviewInputVisibility(this._startPreviewInput, event.date ? previewValue : '');
-          });
-        }
-        EventHandler.on(calendar, 'selectEndChange.coreui.calendar', event => {
-          this._selectEndDate = event.value;
-        });
-      }
-    }
-    _changeStartDate(value, skipTimePickerUpdate = false) {
-      this._startDate = value;
-      this._startInput.value = this._setInputValue(value);
-      this._startInput.dispatchEvent(new Event('change'));
-      EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, {
-        date: value
-      });
-      if (this._timePickerStart && !skipTimePickerUpdate) {
-        this._timePickerStart.update(this._getTimePickerConfig(true));
-      }
-    }
-    _changeEndDate(value, skipTimePickerUpdate = false) {
-      this._endDate = value;
-      this._endInput.value = this._setInputValue(value);
-      this._endInput.dispatchEvent(new Event('change'));
-      EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, {
-        date: value
-      });
-      if (this._timePickerEnd && !skipTimePickerUpdate) {
-        this._timePickerEnd.update(this._getTimePickerConfig(false));
-      }
-    }
-    _getCalendarConfig() {
-      return {
-        allowList: this._config.allowList,
-        ariaNavNextMonthLabel: this._config.ariaNavNextMonthLabel,
-        ariaNavNextYearLabel: this._config.ariaNavNextYearLabel,
-        ariaNavPrevMonthLabel: this._config.ariaNavPrevMonthLabel,
-        ariaNavPrevYearLabel: this._config.ariaNavPrevYearLabel,
-        calendarDate: this._calendarDate,
-        calendars: this._mobile ? 1 : this._config.calendars,
-        dayFormat: this._config.dayFormat,
-        disabledDates: this._config.disabledDates,
-        endDate: this._endDate,
-        firstDayOfWeek: this._config.firstDayOfWeek,
-        locale: this._config.locale,
-        maxDate: this._config.maxDate,
-        minDate: this._config.minDate,
-        monthFormat: this._config.monthFormat,
-        range: this._config.range,
-        renderDayCell: this._config.renderDayCell,
-        renderMonthCell: this._config.renderMonthCell,
-        renderQuarterCell: this._config.renderQuarterCell,
-        renderYearCell: this._config.renderYearCell,
-        sanitize: this._config.sanitize,
-        sanitizeFn: this._config.sanitizeFn,
-        selectAdjacementDays: this._config.selectAdjacementDays,
-        selectEndDate: this._selectEndDate,
-        selectionType: this._config.selectionType,
-        showAdjacementDays: this._config.showAdjacementDays,
-        showWeekNumber: this._config.showWeekNumber,
-        startDate: this._startDate,
-        weekdayFormat: this._config.weekdayFormat,
-        weekNumbersLabel: this._config.weekNumbersLabel,
-        yearFormat: this._config.yearFormat
-      };
-    }
-    _getTimePickerConfig(start) {
-      return {
-        disabled: start ? !this._startDate : !this._endDate,
-        locale: this._config.locale,
-        time: start ? this._startDate && new Date(this._startDate) : this._endDate && new Date(this._endDate),
-        type: 'inline',
-        variant: 'select'
-      };
-    }
-    _createDateRangePicker() {
-      this._element.classList.add(CLASS_NAME_DATE_PICKER);
-      Manipulator.setDataAttribute(this._element, 'toggle', this._config.range ? CLASS_NAME_DATE_RANGE_PICKER : CLASS_NAME_DATE_PICKER);
-      if (this._config.size) {
-        this._element.classList.add(`date-picker-${this._config.size}`);
-      }
-      if (this._config.disabled) {
-        this._element.classList.add(CLASS_NAME_DISABLED);
-      }
-      this._element.classList.toggle(CLASS_NAME_IS_INVALID, this._config.invalid);
-      this._element.classList.toggle(CLASS_NAME_IS_VALID, this._config.valid);
-      this._element.append(this._createDateRangePickerInputGroup());
-      const dropdownEl = document.createElement('div');
-      dropdownEl.classList.add(CLASS_NAME_DROPDOWN);
-      dropdownEl.append(this._createDateRangePickerBody());
-      if (this._config.footer || this._config.timepicker) {
-        dropdownEl.append(this._createDateRangeFooter());
-      }
-      const {
-        container
-      } = this._config;
-      if (container) {
-        container.append(dropdownEl);
-      } else {
-        this._element.append(dropdownEl);
-      }
-      this._menu = dropdownEl;
-    }
-    _updatePreviewInputVisibility(previewInput, value) {
-      if (!previewInput) {
-        return;
-      }
-      if (value && value.trim() !== '') {
-        previewInput.style.display = 'block';
-        previewInput.value = value;
-      } else {
-        previewInput.style.display = 'none';
-        previewInput.value = '';
-      }
-    }
-    _createInputWrapper(inputEl, isStart = true) {
-      if (!this._config.previewDateOnHover || this._config.disabled) {
-        return inputEl;
-      }
-      const wrapperEl = document.createElement('div');
-      wrapperEl.classList.add(CLASS_NAME_INPUT_WRAPPER);
-      wrapperEl.append(inputEl);
-      const previewInputEl = document.createElement('input');
-      previewInputEl.classList.add(CLASS_NAME_INPUT, CLASS_NAME_INPUT_PREVIEW);
-      previewInputEl.type = 'text';
-      previewInputEl.readOnly = true;
-      previewInputEl.tabIndex = -1;
-      previewInputEl.style.display = 'none';
-      if (isStart) {
-        this._startPreviewInput = previewInputEl;
-      } else {
-        this._endPreviewInput = previewInputEl;
-      }
-      wrapperEl.append(previewInputEl);
-      return wrapperEl;
-    }
-    _createDateRangePickerInputGroup() {
-      const inputGroupEl = document.createElement('div');
-      inputGroupEl.classList.add(CLASS_NAME_INPUT_GROUP);
-      let startInputName = null;
-      if (this._config.name || this._config.startName || this._element.id) {
-        startInputName = this._config.name || this._config.startName || (this._config.range ? `date-range-picker-start-date-${this._element.id}` : `date-picker-${this._element.id}`);
-      }
-      const startInputEl = this._createInput(startInputName, this._getPlaceholder()[0], this._setInputValue(this._startDate));
-      let endInputName = null;
-      if (this._config.endName || this._element.id) {
-        endInputName = this._config.endName || `date-range-picker-end-date-${this._element.id}`;
-      }
-      const endInputEl = this._createInput(endInputName, this._getPlaceholder()[1], this._setInputValue(this._endDate));
-      const inputGroupTextSeparatorEl = document.createElement('div');
-      inputGroupTextSeparatorEl.classList.add(CLASS_NAME_SEPARATOR);
-      this._startInput = startInputEl;
-      this._endInput = endInputEl;
-      const startInputWrapper = this._createInputWrapper(startInputEl, true);
-      inputGroupEl.append(startInputWrapper);
-      if (this._config.separator) {
-        inputGroupEl.append(inputGroupTextSeparatorEl);
-      }
-      if (this._config.range) {
-        const endInputWrapper = this._createInputWrapper(endInputEl, false);
-        inputGroupEl.append(endInputWrapper);
-      }
-      if (this._config.indicator) {
-        const inputGroupIndicatorEl = document.createElement('div');
-        inputGroupIndicatorEl.classList.add(CLASS_NAME_INDICATOR);
-        if (!this._config.disabled) {
-          inputGroupIndicatorEl.tabIndex = 0;
-        }
-        inputGroupEl.append(inputGroupIndicatorEl);
-        this._indicatorElement = inputGroupIndicatorEl;
-      }
-      if (this._config.cleaner) {
-        const inputGroupCleanerEl = document.createElement('div');
-        inputGroupCleanerEl.classList.add(CLASS_NAME_CLEANER);
-        inputGroupCleanerEl.addEventListener('click', event => {
-          event.stopPropagation();
-          this.clear();
-        });
-        inputGroupEl.append(inputGroupCleanerEl);
-      }
-      this._togglerElement = inputGroupEl;
-      return inputGroupEl;
-    }
-    _createDateRangePickerBody() {
-      const dateRangePickerBodyEl = document.createElement('div');
-      dateRangePickerBodyEl.classList.add(CLASS_NAME_BODY);
-      if (Object.keys(this._config.ranges).length) {
-        const dateRangePickerRangesEl = document.createElement('div');
-        dateRangePickerRangesEl.classList.add(CLASS_NAME_RANGES);
-        for (const key of Object.keys(this._config.ranges)) {
-          const buttonEl = document.createElement('button');
-          buttonEl.classList.add(...this._getButtonClasses(this._config.rangesButtonsClasses));
-          buttonEl.type = 'button';
-          buttonEl.addEventListener('click', () => {
-            this._changeStartDate(this._config.ranges[key][0]);
-            this._changeEndDate(this._config.ranges[key][1]);
-            this._calendar.update(this._getCalendarConfig());
-          });
-          buttonEl.textContent = key;
-          dateRangePickerRangesEl.append(buttonEl);
-        }
-        dateRangePickerBodyEl.append(dateRangePickerRangesEl);
-      }
-      const calendarsEl = document.createElement('div');
-      calendarsEl.classList.add(CLASS_NAME_CALENDARS);
-      this._calendars = calendarsEl;
-      dateRangePickerBodyEl.append(calendarsEl);
-      if (this._config.timepicker) {
-        const timepickersEl = document.createElement('div');
-        timepickersEl.classList.add(CLASS_NAME_TIME_PICKERS);
-        this._timepickers = timepickersEl;
-        dateRangePickerBodyEl.append(timepickersEl);
-      }
-      return dateRangePickerBodyEl;
-    }
-    _createDateRangePickerCalendars() {
-      const calendarEl = document.createElement('div');
-      calendarEl.classList.add(CLASS_NAME_CALENDAR);
-      this._calendars.append(calendarEl);
-      this._calendar = new Calendar(calendarEl, this._getCalendarConfig());
-      EventHandler.on(calendarEl, 'calendarDateChange.coreui.calendar', event => {
-        this._calendarDate = event.date;
-      });
-      EventHandler.on(calendarEl, 'calendarMouseleave.coreui.calendar', () => {
-        this._updatePreviewInputVisibility(this._startPreviewInput, '');
-        this._updatePreviewInputVisibility(this._endPreviewInput, '');
-      });
-      if (this._config.timepicker) {
-        if (this._mobile && this._config.range || this._config.range && this._config.calendars === 1) {
-          const timePickerStartEl = document.createElement('div');
-          timePickerStartEl.classList.add(CLASS_NAME_TIME_PICKER);
-          this._timePickerStart = new TimePicker(timePickerStartEl, this._getTimePickerConfig(true));
-          this._timepickers.append(timePickerStartEl);
-          EventHandler.on(timePickerStartEl, 'timeChange.coreui.time-picker', event => {
-            this._changeStartDate(event.date, true);
-            this._calendar.update(this._getCalendarConfig());
-          });
-          const timePickerEndEl = document.createElement('div');
-          timePickerEndEl.classList.add(CLASS_NAME_TIME_PICKER);
-          this._timePickerEnd = new TimePicker(timePickerEndEl, this._getTimePickerConfig(false));
-          this._timepickers.append(timePickerEndEl);
-          EventHandler.on(timePickerEndEl, 'timeChange.coreui.time-picker', event => {
-            this._changeEndDate(event.date, true);
-            this._calendar.update(this._getCalendarConfig());
-          });
-        } else {
-          for (const [index, _] of Array.from({
-            length: this._config.calendars
-          }).entries()) {
-            const timePickerEl = document.createElement('div');
-            timePickerEl.classList.add(CLASS_NAME_TIME_PICKER);
-            const _timepicker = new TimePicker(timePickerEl, this._getTimePickerConfig(index === 0));
-            if (index === 0) {
-              this._timePickerStart = _timepicker;
-            } else {
-              this._timePickerEnd = _timepicker;
-            }
-            this._timepickers.append(timePickerEl);
-            EventHandler.on(timePickerEl, 'timeChange.coreui.time-picker', event => {
-              if (index === 0) {
-                this._changeStartDate(event.date, true);
-              } else {
-                this._changeEndDate(event.date, true);
-              }
-              this._calendar.update(this._getCalendarConfig());
-            });
-          }
-        }
-      }
-    }
-    _createDateRangeFooter() {
-      const footerEl = document.createElement('div');
-      footerEl.classList.add(CLASS_NAME_FOOTER);
-      if (this._config.todayButton) {
-        const todayButtonEl = document.createElement('button');
-        todayButtonEl.classList.add(...this._getButtonClasses(this._config.todayButtonClasses));
-        todayButtonEl.type = 'button';
-        todayButtonEl.textContent = this._config.todayButton;
-        if (calendar_js.isDateDisabled(new Date(), this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
-          todayButtonEl.disabled = true;
-        }
-        todayButtonEl.addEventListener('click', () => {
-          const date = new Date();
-          this._calendarDate = date;
-          this._changeStartDate(date);
-          if (this._config.range) {
-            this._changeEndDate(date);
-          }
-          this._calendar.update(this._getCalendarConfig());
-        });
-        footerEl.append(todayButtonEl);
-      }
-      if (this._config.cancelButton) {
-        const cancelButtonEl = document.createElement('button');
-        cancelButtonEl.classList.add(...this._getButtonClasses(this._config.cancelButtonClasses));
-        cancelButtonEl.type = 'button';
-        cancelButtonEl.textContent = this._config.cancelButton;
-        cancelButtonEl.addEventListener('click', () => {
-          this.cancel();
-        });
-        footerEl.append(cancelButtonEl);
-      }
-      if (this._config.confirmButton) {
-        const confirmButtonEl = document.createElement('button');
-        confirmButtonEl.classList.add(...this._getButtonClasses(this._config.confirmButtonClasses));
-        confirmButtonEl.type = 'button';
-        confirmButtonEl.textContent = this._config.confirmButton;
-        confirmButtonEl.addEventListener('click', () => {
-          this.hide();
-        });
-        footerEl.append(confirmButtonEl);
-      }
-      return footerEl;
-    }
-    _createInput(name, placeholder, value) {
-      const inputEl = document.createElement('input');
-      inputEl.classList.add(CLASS_NAME_INPUT);
-      inputEl.autocomplete = 'off';
-      inputEl.disabled = this._config.disabled;
-      inputEl.placeholder = placeholder;
-      inputEl.readOnly = this._config.inputReadOnly;
-      inputEl.required = this._config.required;
-      inputEl.type = 'text';
-      inputEl.value = value;
-      if (name) {
-        inputEl.name = name;
-      }
-      const events = ['change', 'keyup', 'paste'];
-      for (const event of events) {
-        inputEl.addEventListener(event, ({
-          target
-        }) => {
-          if (target.closest(SELECTOR_WAS_VALIDATED)) {
-            const inputs = SelectorEngine.find(SELECTOR_INPUT, this._element);
-            for (const input of inputs) {
-              if (Number.isNaN(Date.parse(input.value))) {
-                this._element.classList.add(CLASS_NAME_IS_INVALID);
-                this._element.classList.remove(CLASS_NAME_IS_VALID);
-                return;
-              }
-            }
-            if (this._config.range && this._startDate instanceof Date && this._endDate instanceof Date) {
-              this._element.classList.add(CLASS_NAME_IS_VALID);
-              this._element.classList.remove(CLASS_NAME_IS_INVALID);
-              return;
-            }
-            if (!this._config.range && this._startDate instanceof Date) {
-              this._element.classList.add(CLASS_NAME_IS_VALID);
-              this._element.classList.remove(CLASS_NAME_IS_INVALID);
-              return;
-            }
-            this._element.classList.add(CLASS_NAME_IS_INVALID);
-            this._element.classList.remove(CLASS_NAME_IS_VALID);
-          }
-        });
-      }
-      return inputEl;
-    }
-    _createPopper() {
-      if (typeof Popper__namespace === 'undefined') {
-        throw new TypeError('CoreUI\'s date picker require Popper (https://popper.js.org)');
-      }
-      const popperConfig = {
-        modifiers: [{
-          name: 'preventOverflow',
-          options: {
-            boundary: 'clippingParents'
-          }
-        }, {
-          name: 'offset',
-          options: {
-            offset: [0, 2]
-          }
-        }],
-        placement: index_js.isRTL() ? 'bottom-end' : 'bottom-start'
-      };
-      this._popper = Popper__namespace.createPopper(this._togglerElement, this._menu, popperConfig);
-    }
-    _parseDate(str) {
-      if (!str) {
-        return null;
-      }
-      if (this._config.inputDateParse) {
-        return this._config.inputDateParse(str);
-      }
-      if (this._config.selectionType === 'day') {
-        return calendar_js.getLocalDateFromString(str, this._config.locale, this._config.timepicker);
-      }
-      return calendar_js.convertToDateObject(str, this._config.selectionType);
-    }
-    _formatDate(date) {
-      if (!date) {
-        return '';
-      }
-      if (this._config.inputDateFormat) {
-        return this._config.inputDateFormat(date instanceof Date ? new Date(date) : calendar_js.convertToDateObject(date, this._config.selectionType));
-      }
-      if (this._config.selectionType !== 'day') {
-        return date;
-      }
-      const _date = new Date(date);
-      return this._config.timepicker ? _date.toLocaleString(this._config.locale) : _date.toLocaleDateString(this._config.locale);
-    }
-    _getButtonClasses(classes) {
-      if (typeof classes === 'string') {
-        return classes.split(' ');
-      }
-      return classes;
-    }
-    _getPlaceholder() {
-      const {
-        placeholder
-      } = this._config;
-      if (typeof placeholder === 'string') {
-        return placeholder.split(',');
-      }
-      return placeholder;
-    }
-    _isShown() {
-      return this._element.classList.contains(CLASS_NAME_SHOW);
-    }
-    _setInputValue(date) {
-      if (date) {
-        return this._formatDate(date);
-      }
-      return '';
-    }
-    _getConfig(config) {
-      const dataAttributes = Manipulator.getDataAttributes(this._element);
-      for (const dataAttribute of Object.keys(dataAttributes)) {
-        if (DISALLOWED_ATTRIBUTES.has(dataAttribute)) {
-          delete dataAttributes[dataAttribute];
-        }
-      }
-      config = {
-        ...dataAttributes,
-        ...(typeof config === 'object' && config ? config : {})
-      };
-      config = this._mergeConfigObj(config);
-      config = this._configAfterMerge(config);
-      this._typeCheckConfig(config);
-      return config;
-    }
-    _configAfterMerge(config) {
-      if (config.container === true) {
-        config.container = document.body;
-      }
-      if (typeof config.container === 'object' || typeof config.container === 'string') {
-        config.container = index_js.getElement(config.container);
-      }
-      return config;
-    }
-
-    // Static
-    static dateRangePickerInterface(element, config) {
-      const data = DateRangePicker.getOrCreateInstance(element, config);
-      if (typeof config === 'string') {
-        if (typeof data[config] === 'undefined') {
-          throw new TypeError(`No method named "${config}"`);
-        }
-        data[config]();
-      }
-    }
-    static jQueryInterface(config) {
-      return this.each(function () {
-        const data = DateRangePicker.getOrCreateInstance(this, config);
-        if (typeof config !== 'string') {
-          return;
-        }
-        if (data[config] === undefined || config.startsWith('_') || config === 'constructor') {
-          throw new TypeError(`No method named "${config}"`);
-        }
-        data[config](this);
-      });
-    }
-    static clearMenus(event) {
-      if (event.button === RIGHT_MOUSE_BUTTON || event.type === 'keyup' && event.key !== TAB_KEY) {
-        return;
-      }
-      const openToggles = SelectorEngine.find(SELECTOR_DATA_TOGGLE_SHOWN);
-      for (const toggle of openToggles) {
-        const context = DateRangePicker.getInstance(toggle);
-        if (!context) {
-          continue;
-        }
-        const composedPath = event.composedPath();
-        if (composedPath.includes(context._element) || composedPath.includes(context._menu)) {
-          continue;
-        }
-        ({
-          relatedTarget: context._element
-        });
-        if (event.type === 'click') ;
-        context.hide();
-      }
-    }
-  }
-
-  /**
-   * Data API implementation
-   */
-
-  EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
-    const dateRangePickers = SelectorEngine.find(SELECTOR_DATA_TOGGLE);
-    for (let i = 0, len = dateRangePickers.length; i < len; i++) {
-      DateRangePicker.dateRangePickerInterface(dateRangePickers[i]);
-    }
-  });
-  EventHandler.on(document, EVENT_CLICK_DATA_API, DateRangePicker.clearMenus);
-  EventHandler.on(document, EVENT_KEYUP_DATA_API, DateRangePicker.clearMenus);
-
-  /**
-   * jQuery
-   */
-
-  index_js.defineJQueryPlugin(DateRangePicker);
-
-  return DateRangePicker;
-
-}));
 //# sourceMappingURL=date-range-picker.js.map

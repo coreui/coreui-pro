@@ -1,878 +1,275 @@
 /*!
-  * CoreUI time-picker.js v5.27.0 (https://coreui.io)
-  * Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
-  * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-  */
-(function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('@popperjs/core'), require('./base-component.js'), require('./dom/event-handler.js'), require('./dom/manipulator.js'), require('./dom/selector-engine.js'), require('./util/index.js'), require('./util/focustrap.js'), require('./util/time.js')) :
-  typeof define === 'function' && define.amd ? define(['@popperjs/core', './base-component', './dom/event-handler', './dom/manipulator', './dom/selector-engine', './util/index', './util/focustrap', './util/time'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.TimePicker = factory(global["@popperjs/core"], global.BaseComponent, global.EventHandler, global.Manipulator, global.SelectorEngine, global.Index, global.Focustrap, global.Time));
-})(this, (function (Popper, BaseComponent, EventHandler, Manipulator, SelectorEngine, index_js, FocusTrap, time_js) { 'use strict';
+* CoreUI PRO time-picker.ts v5.27.0 (https://coreui.io)
+* Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
+* License (https://coreui.io/pro/license/)
+*/
+(function(global, factory) {
+	typeof exports === "object" && typeof module !== "undefined" ? module.exports = factory(require("./picker-base.js"), require("./dom/event-handler.js"), require("./dom/selector-engine.js"), require("./time-input.js"), require("./util/time-selection.js"), require("./util/sanitizer.js"), require("./util/form-control-group.js"), require("./util/icons.js"), require("./util/index.js")) : typeof define === "function" && define.amd ? define([
+		"./picker-base.js",
+		"./dom/event-handler.js",
+		"./dom/selector-engine.js",
+		"./time-input.js",
+		"./util/time-selection.js",
+		"./util/sanitizer.js",
+		"./util/form-control-group.js",
+		"./util/icons.js",
+		"./util/index.js"
+	], factory) : (global = typeof globalThis !== "undefined" ? globalThis : global || self, global.TimePicker = factory(global.PickerBase, global.EventHandler, global.SelectorEngine, global.TimeInput, global.TimeSelection, global.Sanitizer, global.FormControlGroup, global.Icons, global.Index));
+})(this, function(js_src_picker_base_js, js_src_dom_event_handler_js, js_src_dom_selector_engine_js, js_src_time_input_js, js_src_util_time_selection_js, js_src_util_sanitizer_js, js_src_util_form_control_group_js, js_src_util_icons_js, js_src_util_index_js) {
+	//#region \0rolldown/runtime.js
+	var __create = Object.create;
+	var __defProp = Object.defineProperty;
+	var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+	var __getOwnPropNames = Object.getOwnPropertyNames;
+	var __getProtoOf = Object.getPrototypeOf;
+	var __hasOwnProp = Object.prototype.hasOwnProperty;
+	var __copyProps = (to, from, except, desc) => {
+		if (from && typeof from === "object" || typeof from === "function") for (var keys = __getOwnPropNames(from), i = 0, n = keys.length, key; i < n; i++) {
+			key = keys[i];
+			if (!__hasOwnProp.call(to, key) && key !== except) __defProp(to, key, {
+				get: ((k) => from[k]).bind(null, key),
+				enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
+			});
+		}
+		return to;
+	};
+	var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(isNodeMode || !mod || !mod.__esModule || !__hasOwnProp.call(mod, "default") ? __defProp(target, "default", {
+		value: mod,
+		enumerable: true
+	}) : target, mod));
+	//#endregion
+	js_src_picker_base_js = __toESM(js_src_picker_base_js);
+	js_src_dom_event_handler_js = __toESM(js_src_dom_event_handler_js);
+	js_src_dom_selector_engine_js = __toESM(js_src_dom_selector_engine_js);
+	js_src_time_input_js = __toESM(js_src_time_input_js);
+	js_src_util_time_selection_js = __toESM(js_src_util_time_selection_js);
+	//#region js/src/time-picker.ts
+	/**
+	* --------------------------------------------------------------------------
+	* CoreUI PRO time-picker.js
+	* License (https://coreui.io/pro/license/)
+	*
+	* Composed from a TimeInput section field, the TimeSelection popup body and the
+	* Popup primitive.
+	* --------------------------------------------------------------------------
+	*/
+	/**
+	* Constants
+	*/
+	const NAME = "time-picker";
+	const EVENT_KEY = `.coreui.time-picker`;
+	const EVENT_LOAD_DATA_API = `load${EVENT_KEY}.data-api`;
+	const EVENT_TIME_CHANGE = `timeChange${EVENT_KEY}`;
+	const CLASS_NAME_BODY = "time-picker-body";
+	const CLASS_NAME_DROPDOWN = "time-picker-popup";
+	const CLASS_NAME_FOOTER = "time-picker-footer";
+	const CLASS_NAME_CLEANER = "form-control-cleaner";
+	const CLASS_NAME_INDICATOR = "form-control-action";
+	const CLASS_NAME_INPUT_GROUP = "form-control-group";
+	const CLASS_NAME_PICKER = "picker";
+	const CLASS_NAME_POPUP = "popup";
+	const CLASS_NAME_TIME_PICKER = "time-picker";
+	const SELECTOR_ACTION_NOW = "[data-coreui-picker-action=\"now\"]";
+	const SELECTOR_DATA_TIME_PICKER = "[data-coreui-time-picker]";
+	const Default = {
+		allowList: js_src_util_sanitizer_js.SVGAllowlist,
+		ariaCleanerLabel: "Clear time",
+		ariaPickerLabel: "Toggle time selection",
+		cleaner: true,
+		cleanerIcon: js_src_util_icons_js.CLEANER_ICON,
+		container: false,
+		disabled: false,
+		floatingLabel: null,
+		inputOptions: {},
+		locale: navigator.language,
+		name: null,
+		pickerIcon: true,
+		sanitize: true,
+		sanitizeFn: null,
+		seconds: true,
+		selectionOptions: {},
+		size: null,
+		time: null,
+		variant: "roll"
+	};
+	const DefaultType = {
+		allowList: "object",
+		ariaCleanerLabel: "string",
+		ariaPickerLabel: "string",
+		cleaner: "boolean",
+		cleanerIcon: "string",
+		container: "(string|element|boolean)",
+		disabled: "boolean",
+		floatingLabel: "(string|null)",
+		inputOptions: "object",
+		locale: "string",
+		name: "(string|null)",
+		pickerIcon: "(string|boolean)",
+		sanitize: "boolean",
+		sanitizeFn: "(function|null)",
+		seconds: "(array|boolean|function)",
+		selectionOptions: "object",
+		size: "(string|null)",
+		time: "(date|string|null)",
+		variant: "string"
+	};
+	/**
+	* Class definition
+	*/
+	var TimePicker = class TimePicker extends js_src_picker_base_js.default {
+		constructor(element, config) {
+			super(element, config);
+			this._initialTime = config?.time ?? this._config.time;
+			this._input = null;
+			this._selection = null;
+			this._syncingFromPanel = false;
+			this._selectionElement = null;
+			this._hostClasses = (0, js_src_util_form_control_group_js.captureHostClasses)(this._element, this._managedClassNames());
+			this._createTimePicker();
+			this._createPopup();
+			this._addEventListeners();
+		}
+		static get Default() {
+			return Default;
+		}
+		static get DefaultType() {
+			return DefaultType;
+		}
+		static get NAME() {
+			return NAME;
+		}
+		getTime() {
+			return this._input.getDate();
+		}
+		setTime(time) {
+			this._input.setConfig({ date: time });
+			js_src_dom_event_handler_js.default.trigger(this._element, EVENT_TIME_CHANGE, { time });
+		}
+		now() {
+			this.setTime(/* @__PURE__ */ new Date());
+		}
+		clear() {
+			this._input.clear();
+		}
+		reset() {
+			this.setTime(this._initialTime);
+		}
+		getContext() {
+			return {
+				...this._baseContext(),
+				isTimeSelectable: (time) => this._input.isDateSelectable(time),
+				now: () => this.now(),
+				setTime: (time) => this.setTime(time),
+				time: this.getTime()
+			};
+		}
+		_disposeParts() {
+			this._input.dispose();
+			this._selection?.dispose();
+			this._fieldElement.remove();
+			this._cleanerElement?.remove();
+			this._toggleElement?.remove();
+		}
+		_managedClassNames() {
+			return [
+				CLASS_NAME_TIME_PICKER,
+				CLASS_NAME_PICKER,
+				CLASS_NAME_INPUT_GROUP,
+				...(0, js_src_util_form_control_group_js.managedSizeClassNames)(this._config.size)
+			].filter(Boolean);
+		}
+		_createTimePicker() {
+			this._element.classList.add(CLASS_NAME_TIME_PICKER, CLASS_NAME_PICKER);
+			const inputGroup = this._element;
+			(0, js_src_util_form_control_group_js.applyControlGroupClasses)(inputGroup, CLASS_NAME_INPUT_GROUP);
+			(0, js_src_util_form_control_group_js.applyControlGroupSize)(inputGroup, this._config.size);
+			const inputEl = document.createElement("div");
+			this._fieldElement = (0, js_src_util_form_control_group_js.appendControlGroupField)(inputGroup, inputEl, this._config.floatingLabel, `${this.constructor.NAME}-`);
+			const action = (className, icon, label) => (0, js_src_util_form_control_group_js.createControlGroupAction)({
+				className,
+				disabled: this._config.disabled,
+				icon,
+				label,
+				sanitizeIcon: (value) => (0, js_src_util_sanitizer_js.sanitizeByConfig)(value, this._config)
+			});
+			if (this._config.cleaner) {
+				this._cleanerElement = action(CLASS_NAME_CLEANER, this._config.cleanerIcon, this._config.ariaCleanerLabel);
+				inputGroup.append(this._cleanerElement);
+			}
+			this._toggleElement = null;
+			if (this._config.pickerIcon) {
+				const indicator = action(CLASS_NAME_INDICATOR, this._config.pickerIcon === true ? js_src_util_icons_js.CLOCK_ICON : this._config.pickerIcon, this._config.ariaPickerLabel);
+				inputGroup.append(indicator);
+				this._toggleElement = indicator;
+			}
+			this._input = new js_src_time_input_js.default(inputEl, this._forwardConfig(js_src_time_input_js.default, {
+				date: this._config.time,
+				disabled: this._config.disabled,
+				locale: this._config.locale,
+				name: this._config.name,
+				seconds: Boolean(this._config.seconds)
+			}, {
+				...this._config.floatingLabel ? { ariaLabel: this._config.floatingLabel } : {},
+				...this._config.inputOptions
+			}));
+			js_src_dom_event_handler_js.default.on(inputEl, js_src_time_input_js.default.eventName(js_src_time_input_js.default.CHANGE_EVENT_NAME), (event) => {
+				if (!this._syncingFromPanel) {
+					this._selection?.setConfig({ time: event.date });
+					js_src_dom_event_handler_js.default.trigger(this._element, EVENT_TIME_CHANGE, { time: event.date });
+				}
+			});
+			this._menu = document.createElement("div");
+			this._menu.id = (0, js_src_util_index_js.getUID)(`${this.constructor.NAME}-popup-`);
+			this._menu.classList.add(CLASS_NAME_POPUP, CLASS_NAME_DROPDOWN);
+			this._writeToggleAttribute("aria-expanded", "false");
+			this._writeToggleAttribute("aria-haspopup", "dialog");
+			this._selectionElement = document.createElement("div");
+			this._selectionElement.classList.add(CLASS_NAME_BODY);
+			this._menu.append(this._selectionElement);
+			if (this._footerTemplate) {
+				const footer = document.createElement("div");
+				footer.classList.add(CLASS_NAME_FOOTER);
+				footer.append(this._footerTemplate.content.cloneNode(true));
+				this._disableUnselectableActions(SELECTOR_ACTION_NOW, footer);
+				this._menu.append(footer);
+			}
+		}
+		_isNowSelectable() {
+			return this._input.isDateSelectable(/* @__PURE__ */ new Date());
+		}
+		_ensureSelection() {
+			if (this._selection) return;
+			this._selection = new js_src_util_time_selection_js.default(this._selectionElement, this._forwardConfig(js_src_util_time_selection_js.default, {
+				locale: this._config.locale,
+				onChange: (time) => {
+					this._syncingFromPanel = true;
+					this._input.setConfig({ date: time });
+					this._syncingFromPanel = false;
+					js_src_dom_event_handler_js.default.trigger(this._element, EVENT_TIME_CHANGE, { time });
+				},
+				time: this.getTime(),
+				variant: this._config.variant
+			}, this._config.selectionOptions));
+		}
+		_onPopupShow() {
+			this._ensureSelection();
+		}
+		static jQueryInterface(config, ...args) {
+			return (0, js_src_util_index_js.jQueryDispatch)(this, TimePicker, config, args);
+		}
+	};
+	/**
+	* Data API implementation
+	*/
+	js_src_dom_event_handler_js.default.on(window, EVENT_LOAD_DATA_API, () => {
+		for (const element of js_src_dom_selector_engine_js.default.find(SELECTOR_DATA_TIME_PICKER)) TimePicker.getOrCreateInstance(element);
+	});
+	/**
+	* jQuery
+	*/
+	(0, js_src_util_index_js.defineJQueryPlugin)(TimePicker);
+	//#endregion
+	return TimePicker;
+});
 
-  function _interopNamespaceDefault(e) {
-    const n = Object.create(null, { [Symbol.toStringTag]: { value: 'Module' } });
-    if (e) {
-      for (const k in e) {
-        if (k !== 'default') {
-          const d = Object.getOwnPropertyDescriptor(e, k);
-          Object.defineProperty(n, k, d.get ? d : {
-            enumerable: true,
-            get: () => e[k]
-          });
-        }
-      }
-    }
-    n.default = e;
-    return Object.freeze(n);
-  }
-
-  const Popper__namespace = /*#__PURE__*/_interopNamespaceDefault(Popper);
-
-  /**
-   * --------------------------------------------------------------------------
-   * CoreUI PRO time-picker.js
-   * License (https://coreui.io/pro/license/)
-   * --------------------------------------------------------------------------
-   */
-
-
-  /**
-   * Constants
-   */
-
-  const NAME = 'time-picker';
-  const DATA_KEY = 'coreui.time-picker';
-  const EVENT_KEY = `.${DATA_KEY}`;
-  const DATA_API_KEY = '.data-api';
-  const END_KEY = 'End';
-  const ENTER_KEY = 'Enter';
-  const ESCAPE_KEY = 'Escape';
-  const HOME_KEY = 'Home';
-  const SPACE_KEY = 'Space';
-  const TAB_KEY = 'Tab';
-  const ARROW_UP_KEY = 'ArrowUp';
-  const ARROW_DOWN_KEY = 'ArrowDown';
-  const ARROW_LEFT_KEY = 'ArrowLeft';
-  const ARROW_RIGHT_KEY = 'ArrowRight';
-  const RIGHT_MOUSE_BUTTON = 2;
-  const EVENT_CLICK = `click${EVENT_KEY}`;
-  const EVENT_FOCUSOUT = `focusout${EVENT_KEY}`;
-  const EVENT_HIDE = `hide${EVENT_KEY}`;
-  const EVENT_HIDDEN = `hidden${EVENT_KEY}`;
-  const EVENT_INPUT = `input${EVENT_KEY}`;
-  const EVENT_KEYDOWN = `keydown${EVENT_KEY}`;
-  const EVENT_SHOW = `show${EVENT_KEY}`;
-  const EVENT_SHOWN = `shown${EVENT_KEY}`;
-  const EVENT_SUBMIT = 'submit';
-  const EVENT_TIME_CHANGE = `timeChange${EVENT_KEY}`;
-  const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`;
-  const EVENT_KEYUP_DATA_API = `keyup${EVENT_KEY}${DATA_API_KEY}`;
-  const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`;
-  const CLASS_NAME_BODY = 'time-picker-body';
-  const CLASS_NAME_CLEANER = 'time-picker-cleaner';
-  const CLASS_NAME_DISABLED = 'disabled';
-  const CLASS_NAME_DROPDOWN = 'time-picker-dropdown';
-  const CLASS_NAME_FOOTER = 'time-picker-footer';
-  const CLASS_NAME_INDICATOR = 'time-picker-indicator';
-  const CLASS_NAME_INLINE_ICON = 'time-picker-inline-icon';
-  const CLASS_NAME_INLINE_SELECT = 'time-picker-inline-select';
-  const CLASS_NAME_INPUT = 'time-picker-input';
-  const CLASS_NAME_INPUT_GROUP = 'time-picker-input-group';
-  const CLASS_NAME_IS_INVALID = 'is-invalid';
-  const CLASS_NAME_IS_VALID = 'is-valid';
-  const CLASS_NAME_ROLL = 'time-picker-roll';
-  const CLASS_NAME_ROLL_COL = 'time-picker-roll-col';
-  const CLASS_NAME_ROLL_CELL = 'time-picker-roll-cell';
-  const CLASS_NAME_SELECTED = 'selected';
-  const CLASS_NAME_SHOW = 'show';
-  const CLASS_NAME_TIME_PICKER = 'time-picker';
-  const CLASS_NAME_WAS_VALIDATED = 'was-validated';
-  const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="time-picker"]:not(.disabled):not(:disabled)';
-  const SELECTOR_DATA_TOGGLE_SHOWN = `${SELECTOR_DATA_TOGGLE}.${CLASS_NAME_SHOW}`;
-  const SELECTOR_ROLL_CELL = '.time-picker-roll-cell';
-  const SELECTOR_ROLL_CELL_FOCUSABLE = '.time-picker-roll-cell[tabindex="0"]';
-  const SELECTOR_ROLL_COL = '.time-picker-roll-col';
-  const SELECTOR_WAS_VALIDATED = 'form.was-validated';
-  const Default = {
-    ariaSelectHoursLabel: 'Select hours',
-    ariaSelectMeridiemLabel: 'Select AM/PM',
-    ariaSelectMinutesLabel: 'Select minutes',
-    ariaSelectSecondsLabel: 'Select seconds',
-    cancelButton: 'Cancel',
-    cancelButtonClasses: ['btn', 'btn-sm', 'btn-ghost-primary'],
-    cleaner: true,
-    confirmButton: 'OK',
-    confirmButtonClasses: ['btn', 'btn-sm', 'btn-primary'],
-    container: false,
-    disabled: false,
-    footer: true,
-    hours: null,
-    indicator: true,
-    inputOnChangeDelay: 750,
-    inputReadOnly: false,
-    invalid: false,
-    locale: 'default',
-    minutes: true,
-    name: null,
-    placeholder: 'Select time',
-    required: true,
-    seconds: true,
-    size: null,
-    time: null,
-    type: 'dropdown',
-    valid: false,
-    variant: 'roll'
-  };
-  const DefaultType = {
-    ariaSelectHoursLabel: 'string',
-    ariaSelectMeridiemLabel: 'string',
-    ariaSelectMinutesLabel: 'string',
-    ariaSelectSecondsLabel: 'string',
-    cancelButton: '(boolean|string)',
-    cancelButtonClasses: '(array|string)',
-    cleaner: 'boolean',
-    confirmButton: '(boolean|string)',
-    confirmButtonClasses: '(array|string)',
-    container: '(string|element|boolean)',
-    disabled: 'boolean',
-    footer: 'boolean',
-    hours: '(array|function|null)',
-    indicator: 'boolean',
-    inputOnChangeDelay: 'number',
-    inputReadOnly: 'boolean',
-    invalid: 'boolean',
-    locale: 'string',
-    minutes: '(array|boolean|function)',
-    name: '(string|null)',
-    placeholder: 'string',
-    required: 'boolean',
-    seconds: '(array|boolean|function)',
-    size: '(string|null)',
-    time: '(date|string|null)',
-    type: 'string',
-    valid: 'boolean',
-    variant: 'string'
-  };
-
-  /**
-   * Class definition
-   */
-
-  class TimePicker extends BaseComponent {
-    constructor(element, config) {
-      super(element);
-      this._handleTimeChange = (set, value) => {
-        const _date = this._date || new Date('1970-01-01');
-        if (set === 'meridiem') {
-          const currentHours = _date.getHours();
-          if (value === 'am') {
-            this._ampm = 'am';
-            // Convert PM hours (12-23) to AM hours (0-11)
-            if (currentHours >= 12) {
-              _date.setHours(currentHours - 12);
-            }
-          }
-          if (value === 'pm') {
-            this._ampm = 'pm';
-            // Convert AM hours (0-11) to PM hours (12-23)
-            if (currentHours < 12) {
-              _date.setHours(currentHours + 12);
-            }
-          }
-        }
-        if (set === 'hours') {
-          if (time_js.isAmPm(this._config.locale)) {
-            _date.setHours(time_js.convert12hTo24h(this._ampm, Number.parseInt(value, 10)));
-          } else {
-            _date.setHours(Number.parseInt(value, 10));
-          }
-        }
-        if (set === 'minutes') {
-          _date.setMinutes(Number.parseInt(value, 10));
-        }
-        if (set === 'seconds') {
-          _date.setSeconds(Number.parseInt(value, 10));
-        }
-        this._date = new Date(_date);
-        if (this._input) {
-          this._setInputValue(_date);
-          this._input.dispatchEvent(new Event('change'));
-        }
-        EventHandler.trigger(this._element, EVENT_TIME_CHANGE, {
-          timeString: _date.toTimeString(),
-          localeTimeString: _date.toLocaleTimeString(),
-          date: _date
-        });
-      };
-      this._config = this._getConfig(config);
-      this._date = this._convertStringToDate(this._config.time);
-      this._initialDate = null;
-      this._ampm = this._date ? time_js.getAmPm(new Date(this._date), this._config.locale) : 'am';
-      this._popper = null;
-      this._indicatorElement = null;
-      this._input = null;
-      this._menu = null;
-      this._timePickerBody = null;
-      this._inputTimeout = null;
-      this._localizedTimePartials = time_js.getLocalizedTimePartials(this._config.locale, this.ampm, this._config.hours, this._config.minutes, this._config.seconds);
-      this._createTimePicker();
-      this._createTimePickerSelection();
-      this._addEventListeners();
-      this._setUpSelects();
-      this._focustrap = this._initializeFocusTrap();
-    }
-
-    // Getters
-    static get Default() {
-      return Default;
-    }
-    static get DefaultType() {
-      return DefaultType;
-    }
-    static get NAME() {
-      return NAME;
-    }
-
-    // Public
-    toggle() {
-      return this._isShown() ? this.hide() : this.show();
-    }
-    show() {
-      if (this._config.disabled || this._isShown()) {
-        return;
-      }
-      this._initialDate = new Date(this._date);
-      EventHandler.trigger(this._element, EVENT_SHOW);
-      this._element.classList.add(CLASS_NAME_SHOW);
-      this._element.setAttribute('aria-expanded', true);
-      if (this._config.container) {
-        this._menu.classList.add(CLASS_NAME_SHOW);
-      }
-      this._focustrap.activate();
-      EventHandler.trigger(this._element, EVENT_SHOWN);
-      this._createPopper();
-    }
-    hide() {
-      EventHandler.trigger(this._element, EVENT_HIDE);
-      if (this._popper) {
-        this._popper.destroy();
-      }
-      this._element.classList.remove(CLASS_NAME_SHOW);
-      this._element.setAttribute('aria-expanded', 'false');
-      if (this._config.container) {
-        this._menu.classList.remove(CLASS_NAME_SHOW);
-      }
-      this._focustrap.deactivate();
-      EventHandler.trigger(this._element, EVENT_HIDDEN);
-    }
-    dispose() {
-      if (this._popper) {
-        this._popper.destroy();
-      }
-      if (this._inputTimeout) {
-        clearTimeout(this._inputTimeout);
-      }
-      this._focustrap.deactivate();
-      super.dispose();
-    }
-    cancel() {
-      this._date = this._initialDate;
-      this._setInputValue(this._initialDate || '');
-      this._timePickerBody.innerHTML = '';
-      this.hide();
-      this._createTimePickerSelection();
-      this._emitChangeEvent(this._date);
-    }
-    clear() {
-      this._date = null;
-      this._setInputValue('');
-      this._timePickerBody.innerHTML = '';
-      this._createTimePickerSelection();
-      this._emitChangeEvent(this._date);
-    }
-    reset() {
-      this._date = this._convertStringToDate(this._config.time);
-      this._setInputValue(this._config.time);
-      this._timePickerBody.innerHTML = '';
-      this._createTimePickerSelection();
-      this._emitChangeEvent(this._date);
-    }
-    update(config) {
-      this._config = this._getConfig(config);
-      this._date = this._convertStringToDate(this._config.time);
-      this._ampm = this._date ? time_js.getAmPm(new Date(this._date), this._config.locale) : 'am';
-      this._timePickerBody.innerHTML = '';
-      this._createTimePickerSelection();
-      this._setUpSelects();
-    }
-
-    // Private
-    _initializeFocusTrap() {
-      return new FocusTrap({
-        additionalElement: this._config.container ? this._menu : null,
-        trapElement: this._element
-      });
-    }
-    _moveFocusToNextColumn(event) {
-      if (!this._timePickerBody) {
-        return;
-      }
-      const {
-        target
-      } = event;
-      const columnElement = target.parentElement;
-      const columns = SelectorEngine.find(SELECTOR_ROLL_COL, this._timePickerBody);
-      const currentColumnIndex = columns.indexOf(columnElement);
-      if (currentColumnIndex < columns.length - 1) {
-        const firstFocusableCell = SelectorEngine.findOne(SELECTOR_ROLL_CELL_FOCUSABLE, columns[currentColumnIndex + 1]);
-        firstFocusableCell.focus();
-      }
-    }
-    _moveFocusToPreviousColumn(event) {
-      if (!this._timePickerBody) {
-        return;
-      }
-      const {
-        target
-      } = event;
-      const columnElement = target.parentElement;
-      const columns = SelectorEngine.find(SELECTOR_ROLL_COL, this._timePickerBody);
-      const currentColumnIndex = columns.indexOf(columnElement);
-      if (currentColumnIndex > 0) {
-        const firstFocusableCell = SelectorEngine.findOne(SELECTOR_ROLL_CELL_FOCUSABLE, columns[currentColumnIndex - 1]);
-        firstFocusableCell.focus();
-      }
-    }
-    _addEventListeners() {
-      EventHandler.on(this._indicatorElement, EVENT_CLICK, () => {
-        if (!this._config.disabled) {
-          this.toggle();
-        }
-      });
-      EventHandler.on(this._indicatorElement, EVENT_KEYDOWN, event => {
-        if (!this._config.disabled && event.key === ENTER_KEY) {
-          this.toggle();
-        }
-      });
-      EventHandler.on(this._togglerElement, EVENT_CLICK, event => {
-        if (!this._config.disabled && event.target !== this._indicatorElement) {
-          this.show();
-          if (this._config.variant === 'roll') {
-            this._setUpRolls(true);
-          }
-          if (this._config.variant === 'select') {
-            this._setUpSelects();
-          }
-        }
-      });
-      if (this._config.variant === 'roll') {
-        EventHandler.on(this._timePickerBody, EVENT_FOCUSOUT, SELECTOR_ROLL_COL, event => {
-          if (!event.delegateTarget.contains(event.relatedTarget)) {
-            this._setUpRolls(false);
-          }
-        });
-        EventHandler.on(this._timePickerBody, EVENT_KEYDOWN, SELECTOR_ROLL_CELL, event => {
-          if (event.key === ARROW_DOWN_KEY || event.key === ARROW_UP_KEY) {
-            event.preventDefault();
-            const {
-              key,
-              target
-            } = event;
-            const items = SelectorEngine.find(SELECTOR_ROLL_CELL, target.parentElement);
-            if (!items.length) {
-              return;
-            }
-            const nextElement = index_js.getNextActiveElement(items, target, key === ARROW_DOWN_KEY, !items.includes(target));
-            if (nextElement) {
-              nextElement.focus();
-            }
-            return;
-          }
-          if (event.key === HOME_KEY || event.key === END_KEY) {
-            event.preventDefault();
-            const {
-              key,
-              target
-            } = event;
-            const items = SelectorEngine.find(SELECTOR_ROLL_CELL, target.parentElement);
-            if (!items.length) {
-              return;
-            }
-            const index = key === HOME_KEY ? 0 : items.length - 1;
-            items[index].focus();
-            return;
-          }
-          if (event.key === ARROW_LEFT_KEY || event.key === ARROW_RIGHT_KEY) {
-            event.preventDefault();
-            const {
-              key
-            } = event;
-            const isRtl = index_js.isRTL();
-            const shouldGoLeft = key === ARROW_LEFT_KEY && !isRtl || key === ARROW_RIGHT_KEY && isRtl;
-            if (shouldGoLeft) {
-              this._moveFocusToPreviousColumn(event);
-            } else {
-              this._moveFocusToNextColumn(event);
-            }
-          }
-        });
-      }
-      EventHandler.on(this._element, EVENT_KEYDOWN, event => {
-        if (event.key === ESCAPE_KEY) {
-          this.hide();
-        }
-      });
-      EventHandler.on(this._element, 'timeChange.coreui.time-picker', () => {
-        if (this._config.variant === 'roll') {
-          this._setUpRolls();
-        }
-        if (this._config.variant === 'select') {
-          this._setUpSelects();
-        }
-      });
-      EventHandler.on(this._element, 'onCancelClick.coreui.picker', () => {
-        this.cancel();
-      });
-      EventHandler.on(this._input, EVENT_INPUT, event => {
-        if (this._inputTimeout) {
-          clearTimeout(this._inputTimeout);
-        }
-        this._inputTimeout = setTimeout(() => {
-          if (time_js.isValidTime(event.target.value)) {
-            this._date = this._convertStringToDate(event.target.value);
-            EventHandler.trigger(this._element, EVENT_TIME_CHANGE, {
-              timeString: this._date ? this._date.toTimeString() : null,
-              localeTimeString: this._date ? this._date.toLocaleTimeString() : null,
-              date: this._date
-            });
-          }
-        }, this._config.inputOnChangeDelay);
-      });
-      if (this._config.type === 'dropdown') {
-        EventHandler.on(this._input.form, EVENT_SUBMIT, () => {
-          if (this._input.form.classList.contains(CLASS_NAME_WAS_VALIDATED)) {
-            if (Number.isNaN(Date.parse(`1970-01-01 ${this._input.value}`))) {
-              return this._element.classList.add(CLASS_NAME_IS_INVALID);
-            }
-            if (this._date instanceof Date) {
-              return this._element.classList.add(CLASS_NAME_IS_VALID);
-            }
-            this._element.classList.add(CLASS_NAME_IS_INVALID);
-          }
-        });
-      }
-    }
-    _createTimePicker() {
-      this._element.classList.add(CLASS_NAME_TIME_PICKER);
-      Manipulator.setDataAttribute(this._element, 'meridiem', CLASS_NAME_TIME_PICKER);
-      if (this._config.size) {
-        this._element.classList.add(`time-picker-${this._config.size}`);
-      }
-      this._element.classList.toggle(CLASS_NAME_IS_VALID, this._config.valid);
-      if (this._config.disabled) {
-        this._element.classList.add(CLASS_NAME_DISABLED);
-      }
-      this._element.classList.toggle(CLASS_NAME_IS_INVALID, this._config.invalid);
-      if (this._config.type === 'dropdown') {
-        this._element.append(this._createTimePickerInputGroup());
-        const dropdownEl = document.createElement('div');
-        dropdownEl.classList.add(CLASS_NAME_DROPDOWN);
-        dropdownEl.append(this._createTimePickerBody());
-        if (this._config.footer || this._config.timepicker) {
-          dropdownEl.append(this._createTimePickerFooter());
-        }
-        const {
-          container
-        } = this._config;
-        if (container) {
-          container.append(dropdownEl);
-        } else {
-          this._element.append(dropdownEl);
-        }
-        this._menu = dropdownEl;
-      }
-      if (this._config.type === 'inline') {
-        this._element.append(this._createTimePickerBody());
-      }
-    }
-    _createTimePickerInputGroup() {
-      const inputGroupEl = document.createElement('div');
-      inputGroupEl.classList.add(CLASS_NAME_INPUT_GROUP);
-      const inputEl = document.createElement('input');
-      inputEl.classList.add(CLASS_NAME_INPUT);
-      inputEl.autocomplete = 'off';
-      inputEl.disabled = this._config.disabled;
-      inputEl.placeholder = this._config.placeholder;
-      inputEl.readOnly = this._config.inputReadOnly;
-      inputEl.required = this._config.required;
-      inputEl.type = 'text';
-      this._setInputValue(this._date || '', inputEl);
-      if (this._config.name || this._element.id) {
-        inputEl.name = this._config.name || `time-picker-${this._element.id}`;
-      }
-      const events = ['change', 'keyup', 'paste'];
-      for (const event of events) {
-        inputEl.addEventListener(event, ({
-          target
-        }) => {
-          if (target.closest(SELECTOR_WAS_VALIDATED)) {
-            if (Number.isNaN(Date.parse(`1970-01-01 ${target.value}`))) {
-              this._element.classList.add(CLASS_NAME_IS_INVALID);
-              this._element.classList.remove(CLASS_NAME_IS_VALID);
-              return;
-            }
-            if (this._date instanceof Date) {
-              this._element.classList.add(CLASS_NAME_IS_VALID);
-              this._element.classList.remove(CLASS_NAME_IS_INVALID);
-              return;
-            }
-            this._element.classList.add(CLASS_NAME_IS_INVALID);
-            this._element.classList.remove(CLASS_NAME_IS_VALID);
-          }
-        });
-      }
-      inputGroupEl.append(inputEl);
-      if (this._config.indicator) {
-        const inputGroupIndicatorEl = document.createElement('div');
-        inputGroupIndicatorEl.classList.add(CLASS_NAME_INDICATOR);
-        if (!this._config.disabled) {
-          inputGroupIndicatorEl.tabIndex = 0;
-        }
-        inputGroupEl.append(inputGroupIndicatorEl);
-        this._indicatorElement = inputGroupIndicatorEl;
-      }
-      if (this._config.cleaner) {
-        const inputGroupCleanerEl = document.createElement('div');
-        inputGroupCleanerEl.classList.add(CLASS_NAME_CLEANER);
-        inputGroupCleanerEl.addEventListener('click', event => {
-          event.stopPropagation();
-          this.clear();
-        });
-        inputGroupEl.append(inputGroupCleanerEl);
-      }
-      this._input = inputEl;
-      this._togglerElement = inputGroupEl;
-      return inputGroupEl;
-    }
-    _createTimePickerSelection() {
-      if (this._config.variant === 'roll') {
-        this._createTimePickerRoll();
-      }
-      if (this._config.variant === 'select') {
-        this._createTimePickerInlineSelects();
-      }
-    }
-    _createTimePickerBody() {
-      const timePickerBodyEl = document.createElement('div');
-      timePickerBodyEl.classList.add(CLASS_NAME_BODY);
-      if (this._config.variant === 'roll') {
-        timePickerBodyEl.classList.add(CLASS_NAME_ROLL);
-        timePickerBodyEl.setAttribute('role', 'group');
-      }
-      this._timePickerBody = timePickerBodyEl;
-      return timePickerBodyEl;
-    }
-    _createTimePickerInlineSelect(className, options, ariaLabel) {
-      const selectEl = document.createElement('select');
-      selectEl.classList.add(CLASS_NAME_INLINE_SELECT, className);
-      selectEl.disabled = this._config.disabled;
-      selectEl.setAttribute('aria-label', ariaLabel);
-      selectEl.addEventListener('change', event => this._handleTimeChange(className, event.target.value));
-      for (const option of options) {
-        const optionEl = document.createElement('option');
-        optionEl.value = option.value;
-        optionEl.innerHTML = option.label;
-        selectEl.append(optionEl);
-      }
-      return selectEl;
-    }
-    _createTimePickerInlineSelects() {
-      const timeSeparatorEl = document.createElement('div');
-      timeSeparatorEl.innerHTML = ':';
-      this._timePickerBody.innerHTML = `<span class="${CLASS_NAME_INLINE_ICON}"></span>`;
-      this._timePickerBody.append(this._createTimePickerInlineSelect('hours', this._localizedTimePartials.listOfHours, this._config.ariaSelectHoursLabel));
-      if (this._config.minutes) {
-        this._timePickerBody.append(timeSeparatorEl.cloneNode(true), this._createTimePickerInlineSelect('minutes', this._localizedTimePartials.listOfMinutes, this._config.ariaSelectMinutesLabel));
-      }
-      if (this._config.seconds) {
-        this._timePickerBody.append(timeSeparatorEl, this._createTimePickerInlineSelect('seconds', this._localizedTimePartials.listOfSeconds, this._config.ariaSelectSecondsLabel));
-      }
-      if (this._localizedTimePartials.hour12) {
-        this._timePickerBody.append(this._createTimePickerInlineSelect('meridiem', [{
-          value: 'am',
-          label: 'AM'
-        }, {
-          value: 'pm',
-          label: 'PM'
-        }], this._config.ariaSelectMeridiemLabel));
-      }
-    }
-    _createTimePickerRoll() {
-      this._timePickerBody.append(this._createTimePickerRollCol(this._localizedTimePartials.listOfHours, 'hours', this._config.ariaSelectHoursLabel));
-      if (this._config.minutes) {
-        this._timePickerBody.append(this._createTimePickerRollCol(this._localizedTimePartials.listOfMinutes, 'minutes', this._config.ariaSelectMinutesLabel));
-      }
-      if (this._config.seconds) {
-        this._timePickerBody.append(this._createTimePickerRollCol(this._localizedTimePartials.listOfSeconds, 'seconds', this._config.ariaSelectSecondsLabel));
-      }
-      if (this._localizedTimePartials.hour12) {
-        this._timePickerBody.append(this._createTimePickerRollCol([{
-          value: 'am',
-          label: 'AM'
-        }, {
-          value: 'pm',
-          label: 'PM'
-        }], 'meridiem', this._config.ariaSelectMeridiemLabel));
-      }
-    }
-    _createTimePickerRollCol(options, part, ariaLabel) {
-      const timePickerRollColEl = document.createElement('div');
-      timePickerRollColEl.classList.add(CLASS_NAME_ROLL_COL);
-      timePickerRollColEl.setAttribute('role', 'listbox');
-      timePickerRollColEl.setAttribute('aria-label', ariaLabel);
-      for (const [index, option] of options.entries()) {
-        const timePickerRollCellEl = document.createElement('div');
-        timePickerRollCellEl.classList.add(CLASS_NAME_ROLL_CELL);
-        timePickerRollCellEl.setAttribute('role', 'option');
-        timePickerRollCellEl.tabIndex = index === 0 ? 0 : -1;
-        timePickerRollCellEl.setAttribute('aria-label', option.label.toString());
-        timePickerRollCellEl.setAttribute('aria-selected', 'false');
-        timePickerRollCellEl.innerHTML = option.label;
-        timePickerRollCellEl.addEventListener('click', () => {
-          this._handleTimeChange(part, option.value);
-        });
-        timePickerRollCellEl.addEventListener('keydown', event => {
-          if (event.code === SPACE_KEY || event.key === ENTER_KEY) {
-            event.preventDefault();
-            this._handleTimeChange(part, option.value);
-            this._moveFocusToNextColumn(event);
-          }
-        });
-        Manipulator.setDataAttribute(timePickerRollCellEl, part, option.value);
-        timePickerRollColEl.append(timePickerRollCellEl);
-      }
-      return timePickerRollColEl;
-    }
-    _createTimePickerFooter() {
-      const footerEl = document.createElement('div');
-      footerEl.classList.add(CLASS_NAME_FOOTER);
-      if (this._config.cancelButton) {
-        const cancelButtonEl = document.createElement('button');
-        cancelButtonEl.classList.add(...this._getButtonClasses(this._config.cancelButtonClasses));
-        cancelButtonEl.type = 'button';
-        cancelButtonEl.textContent = this._config.cancelButton;
-        cancelButtonEl.addEventListener('click', () => {
-          this.cancel();
-        });
-        footerEl.append(cancelButtonEl);
-      }
-      if (this._config.confirmButton) {
-        const confirmButtonEl = document.createElement('button');
-        confirmButtonEl.classList.add(...this._getButtonClasses(this._config.confirmButtonClasses));
-        confirmButtonEl.type = 'button';
-        confirmButtonEl.textContent = this._config.confirmButton;
-        confirmButtonEl.addEventListener('click', () => {
-          this.hide();
-        });
-        footerEl.append(confirmButtonEl);
-      }
-      return footerEl;
-    }
-    _emitChangeEvent(date) {
-      this._input.dispatchEvent(new Event('change'));
-      EventHandler.trigger(this._element, EVENT_TIME_CHANGE, {
-        timeString: date === null ? null : date.toTimeString(),
-        localeTimeString: date === null ? null : date.toLocaleTimeString(),
-        date
-      });
-    }
-    _setUpRolls(initial = false) {
-      const parts = ['hours', 'minutes', 'seconds', 'meridiem'];
-      for (const part of parts) {
-        const partValue = this._getPartOfTime(part);
-        if (partValue === null) {
-          continue;
-        }
-        const elements = SelectorEngine.find(`[data-coreui-${part}]`, this._element);
-        const selectedElement = elements.find(element => partValue === Manipulator.getDataAttribute(element, part));
-        if (selectedElement) {
-          this._selectRollElement(selectedElement, initial);
-        }
-      }
-    }
-    _selectRollElement(element, initial = false) {
-      const {
-        parentElement
-      } = element;
-      const currentSelected = SelectorEngine.findOne(SELECTOR_ROLL_CELL_FOCUSABLE, parentElement);
-      if (currentSelected && currentSelected !== element) {
-        currentSelected.classList.remove(CLASS_NAME_SELECTED);
-        currentSelected.tabIndex = -1;
-        currentSelected.setAttribute('aria-selected', 'false');
-      }
-      element.classList.add(CLASS_NAME_SELECTED);
-      element.tabIndex = 0;
-      element.setAttribute('aria-selected', 'true');
-      this._scrollTo(parentElement, element, initial);
-    }
-    _setInputValue(date, input = this._input) {
-      input.value = date instanceof Date ? date.toLocaleTimeString(this._config.locale, {
-        hour12: this._localizedTimePartials.hour12,
-        hour: 'numeric',
-        ...(this._config.minutes && {
-          minute: 'numeric'
-        }),
-        ...(this._config.seconds && {
-          second: 'numeric'
-        })
-      }) : date;
-    }
-    _setUpSelects() {
-      for (const part of Array.from(['hours', 'minutes', 'seconds', 'meridiem'])) {
-        for (const element of SelectorEngine.find(`select.${part}`, this._element)) {
-          if (this._getPartOfTime(part)) {
-            element.value = this._getPartOfTime(part);
-          }
-        }
-      }
-    }
-    _updateTimePicker() {
-      this._element.innerHTML = '';
-      this._createTimePicker();
-    }
-    _convertStringToDate(date) {
-      return date ? date instanceof Date ? date : new Date(`1970-01-01 ${date}`) : null;
-    }
-    _createPopper() {
-      if (typeof Popper__namespace === 'undefined') {
-        throw new TypeError('CoreUI\'s time picker require Popper (https://popper.js.org)');
-      }
-      const popperConfig = {
-        modifiers: [{
-          name: 'preventOverflow',
-          options: {
-            boundary: 'clippingParents'
-          }
-        }, {
-          name: 'offset',
-          options: {
-            offset: [0, 2]
-          }
-        }],
-        placement: index_js.isRTL() ? 'bottom-end' : 'bottom-start'
-      };
-      this._popper = Popper__namespace.createPopper(this._togglerElement, this._menu, popperConfig);
-    }
-    _getButtonClasses(classes) {
-      if (typeof classes === 'string') {
-        return classes.split(' ');
-      }
-      return classes;
-    }
-    _getPartOfTime(part) {
-      if (this._date === null) {
-        return null;
-      }
-      if (part === 'hours') {
-        return time_js.isAmPm(this._config.locale) ? time_js.convert24hTo12h(this._date.getHours()) : this._date.getHours();
-      }
-      if (part === 'minutes') {
-        return this._date.getMinutes();
-      }
-      if (part === 'seconds') {
-        return this._date.getSeconds();
-      }
-      if (part === 'meridiem') {
-        return time_js.getAmPm(new Date(this._date), this._config.locale);
-      }
-    }
-    _isShown() {
-      return this._element.classList.contains(CLASS_NAME_SHOW);
-    }
-    _scrollTo(parent, children, initial = false) {
-      parent.scrollTo({
-        top: children.offsetTop,
-        behavior: initial ? 'instant' : 'smooth'
-      });
-    }
-    _configAfterMerge(config) {
-      if (config.container === 'dropdown' || config.container === 'inline') {
-        config.type = config.container;
-      }
-      if (config.container === true) {
-        config.container = document.body;
-      }
-      if (typeof config.container === 'object' || typeof config.container === 'string' && config.container === 'dropdown' && config.container === 'inline') {
-        config.container = index_js.getElement(config.container);
-      }
-      return config;
-    }
-
-    // Static
-    static timePickerInterface(element, config) {
-      const data = TimePicker.getOrCreateInstance(element, config);
-      if (typeof config === 'string') {
-        if (typeof data[config] === 'undefined') {
-          throw new TypeError(`No method named "${config}"`);
-        }
-        data[config]();
-      }
-    }
-    static jQueryInterface(config) {
-      return this.each(function () {
-        const data = TimePicker.getOrCreateInstance(this, config);
-        if (typeof config !== 'string') {
-          return;
-        }
-        if (data[config] === undefined || config.startsWith('_') || config === 'constructor') {
-          throw new TypeError(`No method named "${config}"`);
-        }
-        data[config](this);
-      });
-    }
-    static clearMenus(event) {
-      if (event.button === RIGHT_MOUSE_BUTTON || event.type === 'keyup' && event.key !== TAB_KEY) {
-        return;
-      }
-      const openToggles = SelectorEngine.find(SELECTOR_DATA_TOGGLE_SHOWN);
-      for (const toggle of openToggles) {
-        const context = TimePicker.getInstance(toggle);
-        if (!context) {
-          continue;
-        }
-        const composedPath = event.composedPath();
-        if (composedPath.includes(context._element)) {
-          continue;
-        }
-        ({
-          relatedTarget: context._element
-        });
-        if (event.type === 'click') ;
-        context.hide();
-      }
-    }
-  }
-
-  /**
-   * Data API implementation
-   */
-
-  EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
-    const timePickers = SelectorEngine.find(SELECTOR_DATA_TOGGLE);
-    for (let i = 0, len = timePickers.length; i < len; i++) {
-      TimePicker.timePickerInterface(timePickers[i]);
-    }
-  });
-  EventHandler.on(document, EVENT_CLICK_DATA_API, TimePicker.clearMenus);
-  EventHandler.on(document, EVENT_KEYUP_DATA_API, TimePicker.clearMenus);
-
-  /**
-   * jQuery
-   */
-
-  index_js.defineJQueryPlugin(TimePicker);
-
-  return TimePicker;
-
-}));
 //# sourceMappingURL=time-picker.js.map
