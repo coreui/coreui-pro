@@ -59,9 +59,8 @@ describe('Dropdown', () => {
       expect(dropdownByElement._element).toEqual(btnDropdown)
     })
 
-    it('should work on invalid markup', () => {
+    it('should work when built on the menu instead of the toggle', () => {
       return new Promise(resolve => {
-        // TODO: REMOVE in v6
         fixtureEl.innerHTML = [
           '<div class="dropdown">',
           '  <div class="dropdown-menu">',
