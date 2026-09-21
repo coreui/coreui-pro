@@ -230,10 +230,12 @@ class Calendar extends BaseComponent {
   protected declare _hoverDate: Date | null
   protected declare _selectEndDate: boolean
   protected declare _view: string
+  protected declare _formatters: Map<string, Intl.DateTimeFormat>
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element)
 
+    this._formatters = new Map()
     this._config = this._getConfig(config)
     this._initializeDates()
     this._initializeView()
@@ -783,10 +785,10 @@ class Calendar extends BaseComponent {
       </div>
       <div class="calendar-nav-date" aria-live="polite">
         ${this._view === 'days' ? `<button type="button" class="calendar-nav-btn btn-sm btn-month">
-          ${calendarDate.toLocaleDateString(this._config.locale, { month: 'long' })}
+          ${this._formatDate(calendarDate, { month: 'long' })}
         </button>` : ''}
         <button type="button" class="calendar-nav-btn btn-year">
-          ${calendarDate.toLocaleDateString(this._config.locale, { year: 'numeric' })}
+          ${this._formatDate(calendarDate, { year: 'numeric' })}
         </button>
       </div>
       <div class="calendar-nav-next">
@@ -818,12 +820,11 @@ class Calendar extends BaseComponent {
             </th>` : ''
           }
           ${weekDays.map(({ date }) => (
-            `<th class="${CLASS_NAME_CALENDAR_CELL}" abbr="${date.toLocaleDateString(this._config.locale, { weekday: 'long' })}">
+            `<th class="${CLASS_NAME_CALENDAR_CELL}" abbr="${this._formatDate(date, { weekday: 'long' })}">
               <div class="calendar-header-cell-inner">
               ${typeof this._config.weekdayFormat === 'string' ?
-                date.toLocaleDateString(this._config.locale, { weekday: this._config.weekdayFormat as 'long' }) :
-                date
-                  .toLocaleDateString(this._config.locale, { weekday: 'long' })
+                this._formatDate(date, { weekday: this._config.weekdayFormat as 'long' }) :
+                this._formatDate(date, { weekday: 'long' })
                   .slice(0, this._config.weekdayFormat)}
               </div>
             </th>`
@@ -856,7 +857,7 @@ class Calendar extends BaseComponent {
                     data-coreui-date="${date}"
                   >
                     <div class="${CLASS_NAME_CALENDAR_CELL_INNER} day">
-                      ${this._config.renderDayCell ? sanitizeByConfig(this._config.renderDayCell(date, cellAttributes.meta), this._config) : date.toLocaleDateString(this._config.locale, { day: this._config.dayFormat })}
+                      ${this._config.renderDayCell ? sanitizeByConfig(this._config.renderDayCell(date, cellAttributes.meta), this._config) : this._formatDate(date, { day: this._config.dayFormat })}
                     </div>
                   </td>` :
                   '<td role="gridcell"></td>'
@@ -919,7 +920,7 @@ class Calendar extends BaseComponent {
                   data-coreui-date="${date.toDateString()}"
                 >
                   <div class="${CLASS_NAME_CALENDAR_CELL_INNER} year">
-                    ${this._config.renderYearCell ? sanitizeByConfig(this._config.renderYearCell(date, cellAttributes.meta), this._config) : date.toLocaleDateString(this._config.locale, { year: this._config.yearFormat })}
+                    ${this._config.renderYearCell ? sanitizeByConfig(this._config.renderYearCell(date, cellAttributes.meta), this._config) : this._formatDate(date, { year: this._config.yearFormat })}
                   </div>
                 </td>`
               )
@@ -1066,7 +1067,7 @@ class Calendar extends BaseComponent {
         }),
         tabIndex: -1,
         ariaSelected: false,
-        ariaLabel: date.toLocaleDateString(this._config.locale),
+        ariaLabel: this._formatDate(date),
         ariaCurrent: isTodayDate
       }
     }
@@ -1093,7 +1094,7 @@ class Calendar extends BaseComponent {
       className: classNames,
       tabIndex: (isCurrentMonth || this._config.selectAdjacentDays) && !isDisabled ? 0 : -1,
       ariaSelected: isSelected,
-      ariaLabel: date.toLocaleDateString(this._config.locale),
+      ariaLabel: this._formatDate(date),
       ariaCurrent: isTodayDate,
       meta: {
         isDisabled,
@@ -1238,6 +1239,22 @@ class Calendar extends BaseComponent {
     }
 
     return sanitizeByConfig(this._config[isRTL(this._element) ? (mirrored as Record<string, string>)[name] : name], this._config)
+  }
+
+  _formatDate(date: Date, options?: Intl.DateTimeFormatOptions): string {
+    if (Number.isNaN(date.getTime())) {
+      return date.toLocaleDateString(this._config.locale, options)
+    }
+
+    const key = `${this._config.locale}|${options ? JSON.stringify(options) : ''}`
+    let formatter = this._formatters.get(key)
+
+    if (!formatter) {
+      formatter = new Intl.DateTimeFormat(this._config.locale, options)
+      this._formatters.set(key, formatter)
+    }
+
+    return formatter.format(date)
   }
 
   // Static
