@@ -301,8 +301,10 @@ class RangeSlider extends BaseComponent {
     inputElement.setAttribute('aria-valuenow', value)
     inputElement.setAttribute('aria-orientation', this._config.vertical ? 'vertical' : 'horizontal')
 
-    if (this._currentValue.length > 1) {
-      inputElement.setAttribute('aria-label', this._getAriaLabel(index))
+    const ariaLabel = this._getAriaLabel(index)
+
+    if (ariaLabel !== null) {
+      inputElement.setAttribute('aria-label', ariaLabel)
     }
 
     const valueText = this._getValueText(value)
@@ -313,9 +315,13 @@ class RangeSlider extends BaseComponent {
     return inputElement
   }
 
-  _getAriaLabel(index: number): string {
+  _getAriaLabel(index: number): string | null {
     if (Array.isArray(this._config.ariaLabels) && this._config.ariaLabels[index]) {
       return this._config.ariaLabels[index]
+    }
+
+    if (this._currentValue.length === 1) {
+      return null
     }
 
     if (this._currentValue.length === 2) {

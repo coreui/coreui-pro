@@ -216,7 +216,7 @@ Please note that for security reasons, the `sanitize`, `sanitizeFn`, and `allowL
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
 | `allowList` | object | [Default value](/getting-started/javascript#sanitizer) |  Defines the set of permitted HTML tags and attributes that can safely appear in the tooltip content when HTML content is passedd. This helps maintain control over the output and prevent injection of malicious code. |
-| `ariaLabels` | array, null | `null` | Accessible name of each handle, in order. Handles are otherwise indistinguishable to a screen reader, so a slider with more than one wants this. A shorter array leaves the remaining handles on their generated names, such as `Maximum value`. |
+| `ariaLabels` | array, null | `null` | Accessible name of each handle, in order. Handles are otherwise indistinguishable to a screen reader, so a slider with more than one wants this. A shorter array leaves the remaining handles on their generated names, such as `Maximum value`. A single handle gets no generated name, and the generated input carries no `id` for a `<label for>` to reach, so this is the only way to name it. |
 | `clickableTicks` | boolean | `true` | Enables or disables the ability to click on ticks to set slider values. |
 | `disabled` | boolean | `false` | Disables the slider, making it non-interactive and grayed out. |
 | `distance` | number | `0` | Sets the minimum distance between multiple slider handles. |
