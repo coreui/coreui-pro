@@ -177,6 +177,54 @@ describe('Calendar', () => {
       expect(div.classList).toContain('select-week')
     })
 
+    it('should build one formatter per options shape, not one per cell', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const NativeDateTimeFormat = Intl.DateTimeFormat
+      let built = 0
+
+      Intl.DateTimeFormat = function (...args) {
+        built++
+        return new NativeDateTimeFormat(...args)
+      }
+
+      try {
+        // eslint-disable-next-line no-new
+        new Calendar(div, { calendars: 2, locale: 'en-US' })
+      } finally {
+        Intl.DateTimeFormat = NativeDateTimeFormat
+      }
+
+      expect(div.querySelectorAll('td.calendar-cell[aria-label]').length).toBeGreaterThan(50)
+      expect(built).toBeGreaterThan(0)
+      expect(built).toBeLessThan(10)
+    })
+
+    it('should re-read the locale when setConfig changes it', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, { locale: 'en-US', calendarDate: new Date(2023, 0, 1) })
+
+      expect(div.querySelector('.btn-month').textContent.trim()).toEqual('January')
+
+      calendar.setConfig({ locale: 'de' })
+      expect(div.querySelector('.btn-month').textContent.trim()).toEqual('Januar')
+    })
+
+    it('should render a calendar whose date cannot be parsed', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+
+      expect(() => {
+        new Calendar(div, { selectionType: 'week', calendarDate: 'next week' }) // eslint-disable-line no-new
+      }).not.toThrow()
+
+      expect(div.querySelector('.calendar table')).not.toBeNull()
+    })
+
     it('should survive focusing a row when weeks are the unit', () => {
       fixtureEl.innerHTML = '<div></div>'
 
