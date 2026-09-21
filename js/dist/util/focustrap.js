@@ -1,15 +1,16 @@
 /*!
-* CoreUI PRO focustrap.ts v5.27.0 (https://coreui.io)
+* CoreUI PRO focustrap.ts v6.0.0-alpha.0 (https://coreui.io)
 * Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
 * License (https://coreui.io/pro/license/)
 */
 (function(global, factory) {
-	typeof exports === "object" && typeof module !== "undefined" ? module.exports = factory(require("../dom/event-handler.js"), require("../dom/selector-engine.js"), require("./config.js")) : typeof define === "function" && define.amd ? define([
+	typeof exports === "object" && typeof module !== "undefined" ? module.exports = factory(require("../dom/event-handler.js"), require("../dom/selector-engine.js"), require("./config.js"), require("./index.js")) : typeof define === "function" && define.amd ? define([
 		"../dom/event-handler.js",
 		"../dom/selector-engine.js",
-		"./config.js"
-	], factory) : (global = typeof globalThis !== "undefined" ? globalThis : global || self, global.Focustrap = factory(global.EventHandler, global.SelectorEngine, global.Config));
-})(this, function(js_src_dom_event_handler_js, js_src_dom_selector_engine_js, js_src_util_config_js) {
+		"./config.js",
+		"./index.js"
+	], factory) : (global = typeof globalThis !== "undefined" ? globalThis : global || self, global.Focustrap = factory(global.EventHandler, global.SelectorEngine, global.Config, global.Index));
+})(this, function(js_src_dom_event_handler_js, js_src_dom_selector_engine_js, js_src_util_config_js, js_src_util_index_js) {
 	//#region \0rolldown/runtime.js
 	var __create = Object.create;
 	var __defProp = Object.defineProperty;
@@ -114,14 +115,28 @@
 			else if (this._lastTabNavDirection === TAB_NAV_BACKWARD) elements[elements.length - 1].focus();
 			else elements[0].focus();
 		}
+		_focusables(element) {
+			const children = js_src_dom_selector_engine_js.default.focusableChildren(element);
+			return element.tabIndex >= 0 && !(0, js_src_util_index_js.isDisabled)(element) && (0, js_src_util_index_js.isVisible)(element) ? [element, ...children] : children;
+		}
 		_handleKeydown(event) {
 			if (!this._isTopmost() || event.key !== TAB_KEY) return;
 			this._lastTabNavDirection = event.shiftKey ? TAB_NAV_BACKWARD : TAB_NAV_FORWARD;
 			const { additionalElement, trapElement } = this._config;
-			if (!additionalElement) return;
 			const trapElements = js_src_dom_selector_engine_js.default.focusableChildren(trapElement);
-			const additionalElements = js_src_dom_selector_engine_js.default.focusableChildren(additionalElement);
-			if (trapElements.length === 0 || additionalElements.length === 0) return;
+			const additionalElements = additionalElement ? this._focusables(additionalElement) : [];
+			if (trapElements.length === 0) return;
+			if (additionalElements.length === 0) {
+				const index = trapElements.indexOf(event.target);
+				if (index === trapElements.length - 1 && !event.shiftKey) {
+					event.preventDefault();
+					trapElements[0].focus();
+				} else if (index === 0 && event.shiftKey) {
+					event.preventDefault();
+					trapElements[trapElements.length - 1].focus();
+				}
+				return;
+			}
 			const target = event.target;
 			const trapIndex = trapElements.indexOf(target);
 			const additionalIndex = additionalElements.indexOf(target);

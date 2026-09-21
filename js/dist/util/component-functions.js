@@ -1,5 +1,5 @@
 /*!
-* CoreUI PRO component-functions.ts v5.27.0 (https://coreui.io)
+* CoreUI PRO component-functions.ts v6.0.0-alpha.0 (https://coreui.io)
 * Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
 * License (https://coreui.io/pro/license/)
 */

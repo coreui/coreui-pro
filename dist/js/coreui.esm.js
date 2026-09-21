@@ -1,5 +1,5 @@
 /*!
-* CoreUI PRO v5.27.0 (https://coreui.io)
+* CoreUI PRO v6.0.0-alpha.0 (https://coreui.io)
 * Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
 * License (https://coreui.io/pro/license/)
 */
@@ -569,7 +569,7 @@ var Config = class {
 /**
 * Constants
 */
-const VERSION = "5.27.0";
+const VERSION = "6.0.0-alpha.0";
 /**
 * Class definition
 */
@@ -1312,12 +1312,12 @@ function sanitizeByConfig(unsafeHtml, config) {
 const NAME$49 = "list-box";
 const EVENT_KEY$41 = `.coreui.list-box`;
 const DATA_API_KEY$34 = ".data-api";
-const ARROW_UP_KEY$7 = "ArrowUp";
+const ARROW_UP_KEY$8 = "ArrowUp";
 const ARROW_DOWN_KEY$11 = "ArrowDown";
 const HOME_KEY$7 = "Home";
 const END_KEY$7 = "End";
 const ENTER_KEY$7 = "Enter";
-const SPACE_KEY$5 = " ";
+const SPACE_KEY$6 = " ";
 const A_KEY$1 = "a";
 const TYPEAHEAD_TIMEOUT$1 = 500;
 const EVENT_ACTION = "action";
@@ -1528,6 +1528,14 @@ var ListBox = class ListBox extends BaseComponent {
 	last() {
 		this._moveToEdge(-1);
 	}
+	focusActive() {
+		if (this._field) return;
+		const option = this._activeOption() ?? this._navigable()[0];
+		if (option) {
+			this._setActive(this._optionValue(option), false);
+			option.focus();
+		}
+	}
 	update() {
 		this._list.setAttribute("role", "listbox");
 		this._decorateSearch();
@@ -1568,7 +1576,7 @@ var ListBox = class ListBox extends BaseComponent {
 	}
 	_updateOptions() {
 		const navigable = this._navigableOptions();
-		const roving = this._active === null && !this._field ? navigable[0] : null;
+		const roving = this._rovingStop();
 		for (const option of this._allOptions()) {
 			option.setAttribute("role", "option");
 			if (this._field && !option.id) option.id = getUID(`${NAME$49}-option-`);
@@ -1733,6 +1741,9 @@ var ListBox = class ListBox extends BaseComponent {
 	_allOptions() {
 		return SelectorEngine.find(SELECTOR_OPTION$4, this._list);
 	}
+	_rovingStop() {
+		return this._active === null && !this._field ? this._navigable()[0] ?? null : null;
+	}
 	_navigableOptions() {
 		return this._allOptions().filter((option) => !this._isHidden(option) && !this._isDisabled(option));
 	}
@@ -1760,6 +1771,7 @@ var ListBox = class ListBox extends BaseComponent {
 	}
 	_updateSections() {
 		if (!this._sectionsSelectable()) return;
+		const roving = this._rovingStop();
 		for (const label of SelectorEngine.find(SELECTOR_SECTION_TOGGLE, this._list)) {
 			const options = this._sectionOptions(label.closest(SELECTOR_SECTION$2));
 			const selected = options.filter((option) => this._selected.has(this._optionValue(option))).length;
@@ -1773,7 +1785,7 @@ var ListBox = class ListBox extends BaseComponent {
 				label.removeAttribute("tabindex");
 				continue;
 			}
-			label.setAttribute("tabindex", this._optionValue(label) === this._active ? "0" : "-1");
+			label.setAttribute("tabindex", this._optionValue(label) === this._active || label === roving ? "0" : "-1");
 		}
 	}
 	_toggleSection(section) {
@@ -1968,7 +1980,7 @@ var ListBox = class ListBox extends BaseComponent {
 		if (this._config.selectionMode === SELECTION_MODE_SINGLE$1) this.select(value);
 	}
 	_typeahead(key) {
-		if (!this._config.typeahead || key.length !== 1 || key === SPACE_KEY$5) return;
+		if (!this._config.typeahead || key.length !== 1 || key === SPACE_KEY$6) return;
 		if (this._searchTimeout) clearTimeout(this._searchTimeout);
 		this._search += key.toLowerCase();
 		this._searchTimeout = setTimeout(() => {
@@ -2047,7 +2059,7 @@ var ListBox = class ListBox extends BaseComponent {
 			}
 			return;
 		}
-		if (key === ARROW_UP_KEY$7 || key === ARROW_DOWN_KEY$11) {
+		if (key === ARROW_UP_KEY$8 || key === ARROW_DOWN_KEY$11) {
 			event.preventDefault();
 			this._handleArrowKey(key === ARROW_DOWN_KEY$11, event.shiftKey);
 			return;
@@ -2058,8 +2070,8 @@ var ListBox = class ListBox extends BaseComponent {
 			this._handleEdgeKey(key === HOME_KEY$7 ? 0 : -1, event.shiftKey);
 			return;
 		}
-		if (key === SPACE_KEY$5 || key === ENTER_KEY$7) {
-			if (key === SPACE_KEY$5 && this._fieldTakesText()) return;
+		if (key === SPACE_KEY$6 || key === ENTER_KEY$7) {
+			if (key === SPACE_KEY$6 && this._fieldTakesText()) return;
 			this._handleActivationKey(event, key === ENTER_KEY$7);
 			return;
 		}
@@ -2322,14 +2334,28 @@ var FocusTrap = class extends Config {
 		else if (this._lastTabNavDirection === TAB_NAV_BACKWARD) elements[elements.length - 1].focus();
 		else elements[0].focus();
 	}
+	_focusables(element) {
+		const children = SelectorEngine.focusableChildren(element);
+		return element.tabIndex >= 0 && !isDisabled(element) && isVisible(element) ? [element, ...children] : children;
+	}
 	_handleKeydown(event) {
 		if (!this._isTopmost() || event.key !== TAB_KEY$4) return;
 		this._lastTabNavDirection = event.shiftKey ? TAB_NAV_BACKWARD : TAB_NAV_FORWARD;
 		const { additionalElement, trapElement } = this._config;
-		if (!additionalElement) return;
 		const trapElements = SelectorEngine.focusableChildren(trapElement);
-		const additionalElements = SelectorEngine.focusableChildren(additionalElement);
-		if (trapElements.length === 0 || additionalElements.length === 0) return;
+		const additionalElements = additionalElement ? this._focusables(additionalElement) : [];
+		if (trapElements.length === 0) return;
+		if (additionalElements.length === 0) {
+			const index = trapElements.indexOf(event.target);
+			if (index === trapElements.length - 1 && !event.shiftKey) {
+				event.preventDefault();
+				trapElements[0].focus();
+			} else if (index === 0 && event.shiftKey) {
+				event.preventDefault();
+				trapElements[trapElements.length - 1].focus();
+			}
+			return;
+		}
 		const target = event.target;
 		const trapIndex = trapElements.indexOf(target);
 		const additionalIndex = additionalElements.indexOf(target);
@@ -2755,8 +2781,8 @@ var ComboboxBase = class extends BaseComponent {
 			if (event.key === ESCAPE_KEY$5) {
 				event.preventDefault();
 				event.stopPropagation();
-				this._escapeFocusTarget()?.focus();
 				this.hide();
+				this._escapeFocusTarget()?.focus();
 			}
 		});
 	}
@@ -4535,12 +4561,12 @@ const createDateFromYear = (groups) => {
 const NAME$44 = "calendar";
 const EVENT_KEY$36 = `.coreui.calendar`;
 const DATA_API_KEY$31 = ".data-api";
-const ARROW_UP_KEY$6 = "ArrowUp";
+const ARROW_UP_KEY$7 = "ArrowUp";
 const ARROW_RIGHT_KEY$9 = "ArrowRight";
 const ARROW_DOWN_KEY$8 = "ArrowDown";
 const ARROW_LEFT_KEY$9 = "ArrowLeft";
 const ENTER_KEY$4 = "Enter";
-const SPACE_KEY$4 = "Space";
+const SPACE_KEY$5 = "Space";
 const HOME_KEY$6 = "Home";
 const END_KEY$6 = "End";
 const PAGE_UP_KEY = "PageUp";
@@ -4744,7 +4770,7 @@ var Calendar = class Calendar extends BaseComponent {
 	}
 	_handleCalendarKeydown(event) {
 		const date = this._getDate(event.target);
-		if (event.code === SPACE_KEY$4 || event.key === ENTER_KEY$4) {
+		if (event.code === SPACE_KEY$5 || event.key === ENTER_KEY$4) {
 			event.preventDefault();
 			this._handleCalendarClick(event);
 		}
@@ -4772,10 +4798,10 @@ var Calendar = class Calendar extends BaseComponent {
 			this._modifyCalendarDate(0, monthsDelta, () => this._focusOnDate(target));
 			return;
 		}
-		if (event.key === ARROW_RIGHT_KEY$9 || event.key === ARROW_LEFT_KEY$9 || event.key === ARROW_UP_KEY$6 || event.key === ARROW_DOWN_KEY$8) {
+		if (event.key === ARROW_RIGHT_KEY$9 || event.key === ARROW_LEFT_KEY$9 || event.key === ARROW_UP_KEY$7 || event.key === ARROW_DOWN_KEY$8) {
 			event.preventDefault();
 			if (this._maxDate && date >= convertToDateObject(this._maxDate, this._config.selectionType) && (event.key === ARROW_RIGHT_KEY$9 || event.key === ARROW_DOWN_KEY$8)) return;
-			if (this._minDate && date <= convertToDateObject(this._minDate, this._config.selectionType) && (event.key === ARROW_LEFT_KEY$9 || event.key === ARROW_UP_KEY$6)) return;
+			if (this._minDate && date <= convertToDateObject(this._minDate, this._config.selectionType) && (event.key === ARROW_LEFT_KEY$9 || event.key === ARROW_UP_KEY$7)) return;
 			let element = event.target;
 			if (this._config.selectionType === "week" && element.tabIndex === -1) element = element.closest(SELECTOR_CALENDAR_ROW_CLICKABLE);
 			const list = SelectorEngine.find(this._config.selectionType === "week" ? SELECTOR_CALENDAR_ROW_CLICKABLE : SELECTOR_CALENDAR_CELL_CLICKABLE, this._element);
@@ -4792,13 +4818,13 @@ var Calendar = class Calendar extends BaseComponent {
 				ArrowUp: this._config.selectionType === "week" && this._view === "days" ? -1 : this._view === "days" ? -7 : -3,
 				ArrowDown: this._config.selectionType === "week" && this._view === "days" ? 1 : this._view === "days" ? 7 : 3
 			};
-			if (event.key === ARROW_RIGHT_KEY$9 && last || event.key === ARROW_DOWN_KEY$8 && toBoundary.end < gap.ArrowDown || event.key === ARROW_LEFT_KEY$9 && first || event.key === ARROW_UP_KEY$6 && toBoundary.start < Math.abs(gap.ArrowUp)) {
+			if (event.key === ARROW_RIGHT_KEY$9 && last || event.key === ARROW_DOWN_KEY$8 && toBoundary.end < gap.ArrowDown || event.key === ARROW_LEFT_KEY$9 && first || event.key === ARROW_UP_KEY$7 && toBoundary.start < Math.abs(gap.ArrowUp)) {
 				const callback = (key) => {
 					const _list = SelectorEngine.find(`${SELECTOR_CALENDAR_CELL_CLICKABLE}, ${SELECTOR_CALENDAR_ROW_CLICKABLE}`, this._element);
 					if (_list.length && key === ARROW_RIGHT_KEY$9) _list[0].focus();
 					if (_list.length && key === ARROW_LEFT_KEY$9) _list[_list.length - 1].focus();
 					if (_list.length && key === ARROW_DOWN_KEY$8) _list[gap.ArrowDown - (list.length - index)].focus();
-					if (_list.length && key === ARROW_UP_KEY$6) _list[_list.length - (Math.abs(gap.ArrowUp) + 1 - (index + 1))].focus();
+					if (_list.length && key === ARROW_UP_KEY$7) _list[_list.length - (Math.abs(gap.ArrowUp) + 1 - (index + 1))].focus();
 				};
 				if (this._view === "days") this._modifyCalendarDate(0, event.key === ARROW_RIGHT_KEY$9 || event.key === ARROW_DOWN_KEY$8 ? 1 : -1, callback.bind(this, event.key));
 				if (this._view === "months" || this._view === "quarters") this._modifyCalendarDate(event.key === ARROW_RIGHT_KEY$9 || event.key === ARROW_DOWN_KEY$8 ? 1 : -1, 0, callback.bind(this, event.key));
@@ -6129,7 +6155,7 @@ const ARROW_LEFT_KEY$7 = "ArrowLeft";
 const ARROW_RIGHT_KEY$7 = "ArrowRight";
 const END_KEY$5 = "End";
 const HOME_KEY$5 = "Home";
-const SPACE_KEY$3 = " ";
+const SPACE_KEY$4 = " ";
 const TYPEAHEAD_TIMEOUT = 500;
 const EVENT_CHIP_SELECTED = "selected.coreui.chip";
 const EVENT_CHIP_DESELECTED = "deselected.coreui.chip";
@@ -6445,7 +6471,7 @@ var ChipSet = class ChipSet extends BaseComponent {
 		for (const chip of chips.slice(first, last + 1)) Chip.getInstance(chip)?.select();
 	}
 	_typeahead(key) {
-		if (!this._config.typeahead || key.length !== 1 || key === SPACE_KEY$3) return;
+		if (!this._config.typeahead || key.length !== 1 || key === SPACE_KEY$4) return;
 		if (this._searchTimeout) clearTimeout(this._searchTimeout);
 		this._search += key.toLowerCase();
 		this._searchTimeout = setTimeout(() => {
@@ -6993,11 +7019,11 @@ const NAME$38 = "combobox";
 const DATA_KEY$1 = "coreui.combobox";
 const EVENT_KEY$30 = `.${DATA_KEY$1}`;
 const DATA_API_KEY$25 = ".data-api";
-const ARROW_UP_KEY$5 = "ArrowUp";
+const ARROW_UP_KEY$6 = "ArrowUp";
 const ARROW_DOWN_KEY$7 = "ArrowDown";
 const ENTER_KEY$3 = "Enter";
 const ESCAPE_KEY$3 = "Escape";
-const SPACE_KEY$2 = " ";
+const SPACE_KEY$3 = " ";
 const TAB_KEY$2 = "Tab";
 const RIGHT_MOUSE_BUTTON$2 = 2;
 const EVENT_CHANGE$8 = `change${EVENT_KEY$30}`;
@@ -7333,12 +7359,12 @@ var Combobox = class Combobox extends ComboboxBase {
 			}
 			return;
 		}
-		if (key === ARROW_DOWN_KEY$7 || key === ARROW_UP_KEY$5) {
+		if (key === ARROW_DOWN_KEY$7 || key === ARROW_UP_KEY$6) {
 			event.preventDefault();
 			this.show();
 			return;
 		}
-		if ((key === ENTER_KEY$3 || key === SPACE_KEY$2) && !event.defaultPrevented) {
+		if ((key === ENTER_KEY$3 || key === SPACE_KEY$3) && !event.defaultPrevented) {
 			event.preventDefault();
 			this.show();
 		}
@@ -7396,14 +7422,14 @@ const EVENT_KEY$29 = `.coreui.menu`;
 const DATA_API_KEY$24 = ".data-api";
 const ESCAPE_KEY$2 = "Escape";
 const TAB_KEY$1 = "Tab";
-const ARROW_UP_KEY$4 = "ArrowUp";
+const ARROW_UP_KEY$5 = "ArrowUp";
 const ARROW_DOWN_KEY$6 = "ArrowDown";
 const ARROW_LEFT_KEY$6 = "ArrowLeft";
 const ARROW_RIGHT_KEY$6 = "ArrowRight";
 const HOME_KEY$4 = "Home";
 const END_KEY$4 = "End";
 const ENTER_KEY$2 = "Enter";
-const SPACE_KEY$1 = " ";
+const SPACE_KEY$2 = " ";
 const RIGHT_MOUSE_BUTTON$1 = 2;
 const SUBMENU_CLOSE_DELAY = 100;
 const EVENT_CLICK_DATA_API$12 = `click${EVENT_KEY$29}${DATA_API_KEY$24}`;
@@ -7967,7 +7993,7 @@ var Menu = class Menu extends BaseComponent {
 		const exitKey = isRtl ? ARROW_RIGHT_KEY$6 : ARROW_LEFT_KEY$6;
 		const submenuWrapper = target.closest(this.constructor.SELECTOR_SUBMENU);
 		const isSubmenuToggle = target.matches(this.constructor.SELECTOR_SUBMENU_TOGGLE);
-		if ((key === ENTER_KEY$2 || key === SPACE_KEY$1) && submenuWrapper && isSubmenuToggle) {
+		if ((key === ENTER_KEY$2 || key === SPACE_KEY$2) && submenuWrapper && isSubmenuToggle) {
 			event.preventDefault();
 			event.stopPropagation();
 			const submenu = SelectorEngine.findOne(this.constructor.SELECTOR_MENU, submenuWrapper);
@@ -8040,10 +8066,10 @@ var Menu = class Menu extends BaseComponent {
 		const delegateTarget = event.delegateTarget;
 		const isInput = /input|textarea/i.test(event.target.tagName) || event.target.isContentEditable;
 		const isEscapeEvent = event.key === ESCAPE_KEY$2;
-		const isUpOrDownEvent = [ARROW_UP_KEY$4, ARROW_DOWN_KEY$6].includes(event.key);
+		const isUpOrDownEvent = [ARROW_UP_KEY$5, ARROW_DOWN_KEY$6].includes(event.key);
 		const isLeftOrRightEvent = [ARROW_LEFT_KEY$6, ARROW_RIGHT_KEY$6].includes(event.key);
 		const isHomeOrEndEvent = [HOME_KEY$4, END_KEY$4].includes(event.key);
-		const isEnterOrSpaceEvent = [ENTER_KEY$2, SPACE_KEY$1].includes(event.key);
+		const isEnterOrSpaceEvent = [ENTER_KEY$2, SPACE_KEY$2].includes(event.key);
 		const isSubmenuTrigger = event.target.matches(this.SELECTOR_SUBMENU_TOGGLE);
 		if (!isUpOrDownEvent && !isEscapeEvent && !isLeftOrRightEvent && !isHomeOrEndEvent && !(isEnterOrSpaceEvent && isSubmenuTrigger)) return;
 		if (isInput && !isEscapeEvent) return;
@@ -9003,7 +9029,7 @@ const getSectionsFromString = (text, sections) => {
 const ARROW_DOWN_KEY$5 = "ArrowDown";
 const ARROW_LEFT_KEY$5 = "ArrowLeft";
 const ARROW_RIGHT_KEY$5 = "ArrowRight";
-const ARROW_UP_KEY$3 = "ArrowUp";
+const ARROW_UP_KEY$4 = "ArrowUp";
 const BACKSPACE_KEY$2 = "Backspace";
 const DELETE_KEY$1 = "Delete";
 const END_KEY$3 = "End";
@@ -9316,10 +9342,10 @@ var SectionInput = class extends BaseComponent {
 			return;
 		}
 		if (this._allSelected && this._onKeydownAllSelected(event)) return;
-		if ((key === ARROW_UP_KEY$3 || key === ARROW_DOWN_KEY$5) && !(event.altKey && key === ARROW_DOWN_KEY$5)) {
+		if ((key === ARROW_UP_KEY$4 || key === ARROW_DOWN_KEY$5) && !(event.altKey && key === ARROW_DOWN_KEY$5)) {
 			event.preventDefault();
 			const section = this._getSection(this._getSectionIndex(target));
-			section.value = getIncrementedSectionValue(section, key === ARROW_UP_KEY$3 ? 1 : -1, this._getSectionMax(section));
+			section.value = getIncrementedSectionValue(section, key === ARROW_UP_KEY$4 ? 1 : -1, this._getSectionMax(section));
 			this._draft = "";
 			this._syncSections();
 			this._updateDate();
@@ -10812,11 +10838,11 @@ const CLASS_NAME_SELECTED$1 = "selected";
 const ARROW_DOWN_KEY$4 = "ArrowDown";
 const ARROW_LEFT_KEY$3 = "ArrowLeft";
 const ARROW_RIGHT_KEY$3 = "ArrowRight";
-const ARROW_UP_KEY$2 = "ArrowUp";
+const ARROW_UP_KEY$3 = "ArrowUp";
 const END_KEY$2 = "End";
 const ENTER_KEY$1 = "Enter";
 const HOME_KEY$2 = "Home";
-const SPACE_KEY = "Space";
+const SPACE_KEY$1 = "Space";
 const EVENT_KEYDOWN$5 = `keydown.coreui.time-selection`;
 const SELECTOR_ROLL_CELL = `.${CLASS_NAME_ROLL_CELL}`;
 const SELECTOR_ROLL_CELL_FOCUSABLE = `.${CLASS_NAME_ROLL_CELL}[tabindex="0"]`;
@@ -10949,7 +10975,7 @@ var TimeSelection = class extends Config {
 				Manipulator.setDataAttribute(cell, part.name, option.value);
 				cell.addEventListener("click", () => this._change(part.name, option.value));
 				cell.addEventListener("keydown", (event) => {
-					if (event.code === SPACE_KEY || event.key === ENTER_KEY$1) {
+					if (event.code === SPACE_KEY$1 || event.key === ENTER_KEY$1) {
 						event.preventDefault();
 						this._change(part.name, option.value);
 						this._moveFocusToColumn(cell, 1);
@@ -10964,7 +10990,7 @@ var TimeSelection = class extends Config {
 		EventHandler.off(this._element, EVENT_KEYDOWN$5);
 		EventHandler.on(this._element, EVENT_KEYDOWN$5, SELECTOR_ROLL_CELL, (event) => {
 			const target = event.target;
-			if (event.key === ARROW_DOWN_KEY$4 || event.key === ARROW_UP_KEY$2) {
+			if (event.key === ARROW_DOWN_KEY$4 || event.key === ARROW_UP_KEY$3) {
 				event.preventDefault();
 				const items = SelectorEngine.find(SELECTOR_ROLL_CELL, target.parentElement);
 				if (items.length === 0) return;
@@ -12192,10 +12218,12 @@ const DATA_KEY = "coreui.multi-select";
 const EVENT_KEY$18 = `.${DATA_KEY}`;
 const DATA_API_KEY$13 = ".data-api";
 const ARROW_DOWN_KEY$2 = "ArrowDown";
+const ARROW_UP_KEY$2 = "ArrowUp";
 const BACKSPACE_KEY$1 = "Backspace";
 const DELETE_KEY = "Delete";
 const ENTER_KEY = "Enter";
 const ESCAPE_KEY$1 = "Escape";
+const SPACE_KEY = " ";
 const TAB_KEY = "Tab";
 const RIGHT_MOUSE_BUTTON = 2;
 const SELECTOR_CHIP = ".chip";
@@ -12203,6 +12231,7 @@ const SELECTOR_CLEANER = ".form-control-cleaner";
 const SELECTOR_OPTION$1 = ".list-box-option";
 const SELECTOR_SEARCH$1 = ".form-multi-select-search";
 const SELECTOR_SELECT_ALL$1 = "[data-coreui-select-all]";
+const SELECTOR_TEXT_ENTRY = "input, textarea, select, [contenteditable=\"\"], [contenteditable=\"true\"]";
 const SELECTOR_DATA_MULTI_SELECT = "[data-coreui-multi-select]";
 const SELECTOR_SELECT = "select.form-multi-select";
 const SELECTOR_SELECTION = ".form-multi-select-selection";
@@ -12251,6 +12280,7 @@ const Default$22 = {
 	deselectAllLabel: "Deselect all",
 	deselectFilteredLabel: "Deselect filtered",
 	disabled: false,
+	globalSearch: true,
 	headerTemplate: null,
 	hideSelectAllOnSearchNoResults: true,
 	id: null,
@@ -12292,6 +12322,7 @@ const DefaultType$22 = {
 	deselectAllLabel: "string",
 	deselectFilteredLabel: "string",
 	disabled: "boolean",
+	globalSearch: "boolean",
 	headerTemplate: "(function|null)",
 	hideSelectAllOnSearchNoResults: "boolean",
 	id: "(string|null)",
@@ -12309,7 +12340,7 @@ const DefaultType$22 = {
 	required: "boolean",
 	sanitize: "boolean",
 	sanitizeFn: "(null|function)",
-	search: "(boolean|string)",
+	search: "boolean",
 	searchNoResultsLabel: "string",
 	selectAll: "boolean",
 	selectAllLabel: "string",
@@ -12373,9 +12404,48 @@ var MultiSelect = class MultiSelect extends ComboboxBase {
 		return this._wrapperElement;
 	}
 	_afterShow() {
-		if (this._config.search) SelectorEngine.findOne(SELECTOR_SEARCH$1, this._wrapperElement).focus();
+		if (!this._isShown()) return;
+		this._focustrap = new FocusTrap({
+			additionalElement: this._config.search ? this._searchElement : null,
+			autofocus: false,
+			trapElement: this._menu
+		});
+		this._focustrap.activate();
+		this._pointerDownListener = (event) => {
+			if (this._wrapperElement.contains(event.target) || this._menu.contains(event.target)) return;
+			this._focustrap?.deactivate();
+			const rearm = () => {
+				document.removeEventListener("pointerup", rearm, true);
+				if (this._isShown()) this._focustrap?.activate();
+			};
+			document.addEventListener("pointerup", rearm, true);
+		};
+		document.addEventListener("pointerdown", this._pointerDownListener, true);
+		if (this._config.search) {
+			this._searchElement.focus();
+			return;
+		}
+		this._focusListBox();
+	}
+	_focusListBox() {
+		if (!this._listBox) return;
+		if (this._listBox.getActive() === null && !this._searchElement?.value) {
+			const selected = SelectorEngine.findOne(`${SELECTOR_OPTION$1}.${CLASS_NAME_SELECTED}:not([hidden])`, this._menu);
+			if (selected?.dataset.coreuiValue) this._listBox.setActive(selected.dataset.coreuiValue);
+		}
+		this._listBox.focusActive();
+		if (!this._menu.contains(document.activeElement)) this._menu.focus();
+	}
+	_releaseFocus() {
+		if (this._pointerDownListener) {
+			document.removeEventListener("pointerdown", this._pointerDownListener, true);
+			this._pointerDownListener = null;
+		}
+		this._focustrap?.deactivate();
+		this._focustrap = null;
 	}
 	_onHideStart() {
+		this._releaseFocus();
 		this._refocusOnHide = this._wrapperElement.contains(document.activeElement) || this._menu.contains(document.activeElement);
 	}
 	_afterHideDispose() {
@@ -12450,6 +12520,7 @@ var MultiSelect = class MultiSelect extends ComboboxBase {
 		return this._selected;
 	}
 	_destroySelect() {
+		this._releaseFocus();
 		this._disposeFloating();
 		this._disposeListBox();
 		this._disposeSelection();
@@ -12495,10 +12566,29 @@ var MultiSelect = class MultiSelect extends ComboboxBase {
 				this.hide();
 				return;
 			}
-			if (this._config.search === "global" && (event.key.length === 1 || event.key === BACKSPACE_KEY$1 || event.key === DELETE_KEY)) this._searchElement.focus();
+			if (this._isShown() && event.target === this._searchElement) {
+				if (event.key === ARROW_DOWN_KEY$2 || event.key === ARROW_UP_KEY$2) {
+					event.preventDefault();
+					if (event.key === ARROW_UP_KEY$2 && this._listBox?.getActive() === null) {
+						this._listBox.last();
+						return;
+					}
+					this._focusListBox();
+					return;
+				}
+				if (event.key === ENTER_KEY) {
+					const stop = SelectorEngine.findOne(`${SELECTOR_OPTION$1}[tabindex="0"]`, this._menu);
+					if (stop?.dataset.coreuiValue) {
+						event.preventDefault();
+						this._listBox?.toggle(stop.dataset.coreuiValue);
+					}
+					return;
+				}
+			}
+			if (this._routesTypingToSearch() && (this._isTyping(event) || event.key === BACKSPACE_KEY$1 || event.key === DELETE_KEY)) this._searchElement.focus();
 		});
 		EventHandler.on(this._menu, EVENT_KEYDOWN$4, (event) => {
-			if (this._config.search === "global" && (event.key.length === 1 || event.key === BACKSPACE_KEY$1 || event.key === DELETE_KEY)) this._searchElement.focus();
+			if (this._routesTypingToSearch() && (this._isTyping(event) || event.key === BACKSPACE_KEY$1 || event.key === DELETE_KEY) && !event.target.closest(SELECTOR_TEXT_ENTRY)) this._searchElement.focus();
 		});
 		this._addTogglerKeydownListeners();
 		if (this._nativeKeydownHandler) EventHandler.off(this._element, EVENT_KEYDOWN$4, this._nativeKeydownHandler);
@@ -12653,13 +12743,13 @@ var MultiSelect = class MultiSelect extends ComboboxBase {
 		this._wrapperElement = wrapper;
 		this._element.parentNode.insertBefore(wrapper, this._element);
 		wrapper.prepend(this._element);
+		this._uniqueId = this._config.id || this._hostAttributes.get("id") || getUID(`${this.constructor.NAME}`);
 		this._createSelection();
 		this._createButtons();
 		if (this._config.search) {
 			this._createSearchInput();
 			this._updateSearch();
 		}
-		this._uniqueId = this._config.id || this._hostAttributes.get("id") || getUID(`${this.constructor.NAME}`);
 		this._uniqueName = this._config.name || this._hostAttributes.get("name");
 		this._element.setAttribute("id", this._uniqueId);
 		if (this._uniqueName) this._element.setAttribute("name", this._uniqueName);
@@ -12673,7 +12763,7 @@ var MultiSelect = class MultiSelect extends ComboboxBase {
 		togglerEl.classList.add(CLASS_NAME_INPUT_GROUP$1);
 		togglerEl.setAttribute("role", "combobox");
 		togglerEl.setAttribute("aria-expanded", "false");
-		togglerEl.setAttribute("aria-haspopup", "listbox");
+		togglerEl.setAttribute("aria-haspopup", "dialog");
 		togglerEl.setAttribute("aria-controls", `${this._uniqueId}-listbox`);
 		this._togglerElement = togglerEl;
 		if (this._config.disabled) {
@@ -12721,7 +12811,6 @@ var MultiSelect = class MultiSelect extends ComboboxBase {
 		input.setAttribute("id", `search-${this._uniqueId}`);
 		input.autocomplete = "off";
 		input.setAttribute("aria-label", this._config.ariaSearchLabel);
-		input.setAttribute("aria-autocomplete", "list");
 		input.setAttribute("aria-controls", `${this._uniqueId}-listbox`);
 		this._searchElement = input;
 		this._updateSearchSize();
@@ -12755,8 +12844,32 @@ var MultiSelect = class MultiSelect extends ComboboxBase {
 		listBoxDiv.append(header);
 	}
 	_afterMenuCreated() {
+		this._menu.setAttribute("role", "dialog");
+		this._menu.setAttribute("tabindex", "-1");
+		this._nameMenu();
+		if (!this._config.search) this._menu.setAttribute("aria-modal", "true");
 		this._updateHeader();
 		this._updateMasterCheckbox();
+	}
+	_nameMenu() {
+		const labelledBy = this._togglerElement.getAttribute("aria-labelledby");
+		if (labelledBy) {
+			this._menu.setAttribute("aria-labelledby", labelledBy);
+			return;
+		}
+		const label = this._togglerElement.getAttribute("aria-label");
+		if (label) {
+			this._menu.setAttribute("aria-label", label);
+			return;
+		}
+		this._togglerElement.id ||= getUID(`${this.constructor.NAME}-toggler-`);
+		this._menu.setAttribute("aria-labelledby", this._togglerElement.id);
+	}
+	_isTyping(event) {
+		return event.key.length === 1 && event.key !== SPACE_KEY && !event.ctrlKey && !event.metaKey;
+	}
+	_routesTypingToSearch() {
+		return Boolean(this._config.search && this._config.globalSearch);
 	}
 	_getListBoxConfig() {
 		return {
@@ -12764,11 +12877,12 @@ var MultiSelect = class MultiSelect extends ComboboxBase {
 			indicator: this._config.indicator,
 			sectionsSelectable: this._config.optionsGroupsSelectable,
 			selectionLimit: this._config.selectionLimit,
-			selectionMode: this._config.multiple ? "multiple" : "single"
+			selectionMode: this._config.multiple ? "multiple" : "single",
+			typeahead: !this._routesTypingToSearch()
 		};
 	}
 	_getActiveDescendantField() {
-		return this._config.search ? this._searchElement : this._togglerElement;
+		return null;
 	}
 	_optionText(option) {
 		return option.text;

@@ -1,21 +1,22 @@
 /*!
-* CoreUI PRO multi-select.ts v5.27.0 (https://coreui.io)
+* CoreUI PRO multi-select.ts v6.0.0-alpha.0 (https://coreui.io)
 * Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
 * License (https://coreui.io/pro/license/)
 */
 (function(global, factory) {
-	typeof exports === "object" && typeof module !== "undefined" ? module.exports = factory(require("./chip.js"), require("./chip-set.js"), require("./combobox-base.js"), require("./dom/data.js"), require("./dom/event-handler.js"), require("./dom/selector-engine.js"), require("./util/icons.js"), require("./util/sanitizer.js"), require("./util/index.js")) : typeof define === "function" && define.amd ? define([
+	typeof exports === "object" && typeof module !== "undefined" ? module.exports = factory(require("./chip.js"), require("./chip-set.js"), require("./combobox-base.js"), require("./dom/data.js"), require("./dom/event-handler.js"), require("./dom/selector-engine.js"), require("./util/focustrap.js"), require("./util/icons.js"), require("./util/sanitizer.js"), require("./util/index.js")) : typeof define === "function" && define.amd ? define([
 		"./chip.js",
 		"./chip-set.js",
 		"./combobox-base.js",
 		"./dom/data.js",
 		"./dom/event-handler.js",
 		"./dom/selector-engine.js",
+		"./util/focustrap.js",
 		"./util/icons.js",
 		"./util/sanitizer.js",
 		"./util/index.js"
-	], factory) : (global = typeof globalThis !== "undefined" ? globalThis : global || self, global.MultiSelect = factory(global.Chip, global.ChipSet, global.ComboboxBase, global.Data, global.EventHandler, global.SelectorEngine, global.Icons, global.Sanitizer, global.Index));
-})(this, function(js_src_chip_js, js_src_chip_set_js, js_src_combobox_base_js, js_src_dom_data_js, js_src_dom_event_handler_js, js_src_dom_selector_engine_js, js_src_util_icons_js, js_src_util_sanitizer_js, js_src_util_index_js) {
+	], factory) : (global = typeof globalThis !== "undefined" ? globalThis : global || self, global.MultiSelect = factory(global.Chip, global.ChipSet, global.ComboboxBase, global.Data, global.EventHandler, global.SelectorEngine, global.Focustrap, global.Icons, global.Sanitizer, global.Index));
+})(this, function(js_src_chip_js, js_src_chip_set_js, js_src_combobox_base_js, js_src_dom_data_js, js_src_dom_event_handler_js, js_src_dom_selector_engine_js, js_src_util_focustrap_js, js_src_util_icons_js, js_src_util_sanitizer_js, js_src_util_index_js) {
 	//#region \0rolldown/runtime.js
 	var __create = Object.create;
 	var __defProp = Object.defineProperty;
@@ -44,6 +45,7 @@
 	js_src_dom_data_js = __toESM(js_src_dom_data_js);
 	js_src_dom_event_handler_js = __toESM(js_src_dom_event_handler_js);
 	js_src_dom_selector_engine_js = __toESM(js_src_dom_selector_engine_js);
+	js_src_util_focustrap_js = __toESM(js_src_util_focustrap_js);
 	//#region js/src/multi-select.ts
 	/**
 	* --------------------------------------------------------------------------
@@ -61,10 +63,12 @@
 	const EVENT_KEY = `.${DATA_KEY}`;
 	const DATA_API_KEY = ".data-api";
 	const ARROW_DOWN_KEY = "ArrowDown";
+	const ARROW_UP_KEY = "ArrowUp";
 	const BACKSPACE_KEY = "Backspace";
 	const DELETE_KEY = "Delete";
 	const ENTER_KEY = "Enter";
 	const ESCAPE_KEY = "Escape";
+	const SPACE_KEY = " ";
 	const TAB_KEY = "Tab";
 	const RIGHT_MOUSE_BUTTON = 2;
 	const SELECTOR_CHIP = ".chip";
@@ -72,6 +76,7 @@
 	const SELECTOR_OPTION = ".list-box-option";
 	const SELECTOR_SEARCH = ".form-multi-select-search";
 	const SELECTOR_SELECT_ALL = "[data-coreui-select-all]";
+	const SELECTOR_TEXT_ENTRY = "input, textarea, select, [contenteditable=\"\"], [contenteditable=\"true\"]";
 	const SELECTOR_DATA_MULTI_SELECT = "[data-coreui-multi-select]";
 	const SELECTOR_SELECT = "select.form-multi-select";
 	const SELECTOR_SELECTION = ".form-multi-select-selection";
@@ -120,6 +125,7 @@
 		deselectAllLabel: "Deselect all",
 		deselectFilteredLabel: "Deselect filtered",
 		disabled: false,
+		globalSearch: true,
 		headerTemplate: null,
 		hideSelectAllOnSearchNoResults: true,
 		id: null,
@@ -161,6 +167,7 @@
 		deselectAllLabel: "string",
 		deselectFilteredLabel: "string",
 		disabled: "boolean",
+		globalSearch: "boolean",
 		headerTemplate: "(function|null)",
 		hideSelectAllOnSearchNoResults: "boolean",
 		id: "(string|null)",
@@ -178,7 +185,7 @@
 		required: "boolean",
 		sanitize: "boolean",
 		sanitizeFn: "(null|function)",
-		search: "(boolean|string)",
+		search: "boolean",
 		searchNoResultsLabel: "string",
 		selectAll: "boolean",
 		selectAllLabel: "string",
@@ -242,9 +249,48 @@
 			return this._wrapperElement;
 		}
 		_afterShow() {
-			if (this._config.search) js_src_dom_selector_engine_js.default.findOne(SELECTOR_SEARCH, this._wrapperElement).focus();
+			if (!this._isShown()) return;
+			this._focustrap = new js_src_util_focustrap_js.default({
+				additionalElement: this._config.search ? this._searchElement : null,
+				autofocus: false,
+				trapElement: this._menu
+			});
+			this._focustrap.activate();
+			this._pointerDownListener = (event) => {
+				if (this._wrapperElement.contains(event.target) || this._menu.contains(event.target)) return;
+				this._focustrap?.deactivate();
+				const rearm = () => {
+					document.removeEventListener("pointerup", rearm, true);
+					if (this._isShown()) this._focustrap?.activate();
+				};
+				document.addEventListener("pointerup", rearm, true);
+			};
+			document.addEventListener("pointerdown", this._pointerDownListener, true);
+			if (this._config.search) {
+				this._searchElement.focus();
+				return;
+			}
+			this._focusListBox();
+		}
+		_focusListBox() {
+			if (!this._listBox) return;
+			if (this._listBox.getActive() === null && !this._searchElement?.value) {
+				const selected = js_src_dom_selector_engine_js.default.findOne(`${SELECTOR_OPTION}.${CLASS_NAME_SELECTED}:not([hidden])`, this._menu);
+				if (selected?.dataset.coreuiValue) this._listBox.setActive(selected.dataset.coreuiValue);
+			}
+			this._listBox.focusActive();
+			if (!this._menu.contains(document.activeElement)) this._menu.focus();
+		}
+		_releaseFocus() {
+			if (this._pointerDownListener) {
+				document.removeEventListener("pointerdown", this._pointerDownListener, true);
+				this._pointerDownListener = null;
+			}
+			this._focustrap?.deactivate();
+			this._focustrap = null;
 		}
 		_onHideStart() {
+			this._releaseFocus();
 			this._refocusOnHide = this._wrapperElement.contains(document.activeElement) || this._menu.contains(document.activeElement);
 		}
 		_afterHideDispose() {
@@ -319,6 +365,7 @@
 			return this._selected;
 		}
 		_destroySelect() {
+			this._releaseFocus();
 			this._disposeFloating();
 			this._disposeListBox();
 			this._disposeSelection();
@@ -364,10 +411,29 @@
 					this.hide();
 					return;
 				}
-				if (this._config.search === "global" && (event.key.length === 1 || event.key === BACKSPACE_KEY || event.key === DELETE_KEY)) this._searchElement.focus();
+				if (this._isShown() && event.target === this._searchElement) {
+					if (event.key === ARROW_DOWN_KEY || event.key === ARROW_UP_KEY) {
+						event.preventDefault();
+						if (event.key === ARROW_UP_KEY && this._listBox?.getActive() === null) {
+							this._listBox.last();
+							return;
+						}
+						this._focusListBox();
+						return;
+					}
+					if (event.key === ENTER_KEY) {
+						const stop = js_src_dom_selector_engine_js.default.findOne(`${SELECTOR_OPTION}[tabindex="0"]`, this._menu);
+						if (stop?.dataset.coreuiValue) {
+							event.preventDefault();
+							this._listBox?.toggle(stop.dataset.coreuiValue);
+						}
+						return;
+					}
+				}
+				if (this._routesTypingToSearch() && (this._isTyping(event) || event.key === BACKSPACE_KEY || event.key === DELETE_KEY)) this._searchElement.focus();
 			});
 			js_src_dom_event_handler_js.default.on(this._menu, EVENT_KEYDOWN, (event) => {
-				if (this._config.search === "global" && (event.key.length === 1 || event.key === BACKSPACE_KEY || event.key === DELETE_KEY)) this._searchElement.focus();
+				if (this._routesTypingToSearch() && (this._isTyping(event) || event.key === BACKSPACE_KEY || event.key === DELETE_KEY) && !event.target.closest(SELECTOR_TEXT_ENTRY)) this._searchElement.focus();
 			});
 			this._addTogglerKeydownListeners();
 			if (this._nativeKeydownHandler) js_src_dom_event_handler_js.default.off(this._element, EVENT_KEYDOWN, this._nativeKeydownHandler);
@@ -522,13 +588,13 @@
 			this._wrapperElement = wrapper;
 			this._element.parentNode.insertBefore(wrapper, this._element);
 			wrapper.prepend(this._element);
+			this._uniqueId = this._config.id || this._hostAttributes.get("id") || (0, js_src_util_index_js.getUID)(`${this.constructor.NAME}`);
 			this._createSelection();
 			this._createButtons();
 			if (this._config.search) {
 				this._createSearchInput();
 				this._updateSearch();
 			}
-			this._uniqueId = this._config.id || this._hostAttributes.get("id") || (0, js_src_util_index_js.getUID)(`${this.constructor.NAME}`);
 			this._uniqueName = this._config.name || this._hostAttributes.get("name");
 			this._element.setAttribute("id", this._uniqueId);
 			if (this._uniqueName) this._element.setAttribute("name", this._uniqueName);
@@ -542,7 +608,7 @@
 			togglerEl.classList.add(CLASS_NAME_INPUT_GROUP);
 			togglerEl.setAttribute("role", "combobox");
 			togglerEl.setAttribute("aria-expanded", "false");
-			togglerEl.setAttribute("aria-haspopup", "listbox");
+			togglerEl.setAttribute("aria-haspopup", "dialog");
 			togglerEl.setAttribute("aria-controls", `${this._uniqueId}-listbox`);
 			this._togglerElement = togglerEl;
 			if (this._config.disabled) {
@@ -590,7 +656,6 @@
 			input.setAttribute("id", `search-${this._uniqueId}`);
 			input.autocomplete = "off";
 			input.setAttribute("aria-label", this._config.ariaSearchLabel);
-			input.setAttribute("aria-autocomplete", "list");
 			input.setAttribute("aria-controls", `${this._uniqueId}-listbox`);
 			this._searchElement = input;
 			this._updateSearchSize();
@@ -624,8 +689,32 @@
 			listBoxDiv.append(header);
 		}
 		_afterMenuCreated() {
+			this._menu.setAttribute("role", "dialog");
+			this._menu.setAttribute("tabindex", "-1");
+			this._nameMenu();
+			if (!this._config.search) this._menu.setAttribute("aria-modal", "true");
 			this._updateHeader();
 			this._updateMasterCheckbox();
+		}
+		_nameMenu() {
+			const labelledBy = this._togglerElement.getAttribute("aria-labelledby");
+			if (labelledBy) {
+				this._menu.setAttribute("aria-labelledby", labelledBy);
+				return;
+			}
+			const label = this._togglerElement.getAttribute("aria-label");
+			if (label) {
+				this._menu.setAttribute("aria-label", label);
+				return;
+			}
+			this._togglerElement.id ||= (0, js_src_util_index_js.getUID)(`${this.constructor.NAME}-toggler-`);
+			this._menu.setAttribute("aria-labelledby", this._togglerElement.id);
+		}
+		_isTyping(event) {
+			return event.key.length === 1 && event.key !== SPACE_KEY && !event.ctrlKey && !event.metaKey;
+		}
+		_routesTypingToSearch() {
+			return Boolean(this._config.search && this._config.globalSearch);
 		}
 		_getListBoxConfig() {
 			return {
@@ -633,11 +722,12 @@
 				indicator: this._config.indicator,
 				sectionsSelectable: this._config.optionsGroupsSelectable,
 				selectionLimit: this._config.selectionLimit,
-				selectionMode: this._config.multiple ? "multiple" : "single"
+				selectionMode: this._config.multiple ? "multiple" : "single",
+				typeahead: !this._routesTypingToSearch()
 			};
 		}
 		_getActiveDescendantField() {
-			return this._config.search ? this._searchElement : this._togglerElement;
+			return null;
 		}
 		_optionText(option) {
 			return option.text;
