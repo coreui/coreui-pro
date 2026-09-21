@@ -1,249 +1,132 @@
 /*!
-  * CoreUI offcanvas.js v5.27.0 (https://coreui.io)
-  * Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
-  * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-  */
-(function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('./base-component.js'), require('./dom/event-handler.js'), require('./dom/selector-engine.js'), require('./util/backdrop.js'), require('./util/component-functions.js'), require('./util/focustrap.js'), require('./util/index.js'), require('./util/scrollbar.js')) :
-  typeof define === 'function' && define.amd ? define(['./base-component', './dom/event-handler', './dom/selector-engine', './util/backdrop', './util/component-functions', './util/focustrap', './util/index', './util/scrollbar'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.Offcanvas = factory(global.BaseComponent, global.EventHandler, global.SelectorEngine, global.Backdrop, global.ComponentFunctions, global.Focustrap, global.Index, global.Scrollbar));
-})(this, (function (BaseComponent, EventHandler, SelectorEngine, Backdrop, componentFunctions_js, FocusTrap, index_js, ScrollBarHelper) { 'use strict';
+* CoreUI PRO offcanvas.ts v5.27.0 (https://coreui.io)
+* Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
+* License (https://coreui.io/pro/license/)
+*/
+(function(global, factory) {
+	typeof exports === "object" && typeof module !== "undefined" ? module.exports = factory(require("./dialog-base.js"), require("./dom/event-handler.js"), require("./dom/selector-engine.js"), require("./util/component-functions.js"), require("./util/index.js"), require("./util/legacy-markup.js")) : typeof define === "function" && define.amd ? define([
+		"./dialog-base.js",
+		"./dom/event-handler.js",
+		"./dom/selector-engine.js",
+		"./util/component-functions.js",
+		"./util/index.js",
+		"./util/legacy-markup.js"
+	], factory) : (global = typeof globalThis !== "undefined" ? globalThis : global || self, global.Offcanvas = factory(global.DialogBase, global.EventHandler, global.SelectorEngine, global.ComponentFunctions, global.Index, global.LegacyMarkup));
+})(this, function(js_src_dialog_base_js, js_src_dom_event_handler_js, js_src_dom_selector_engine_js, js_src_util_component_functions_js, js_src_util_index_js, js_src_util_legacy_markup_js) {
+	//#region \0rolldown/runtime.js
+	var __create = Object.create;
+	var __defProp = Object.defineProperty;
+	var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+	var __getOwnPropNames = Object.getOwnPropertyNames;
+	var __getProtoOf = Object.getPrototypeOf;
+	var __hasOwnProp = Object.prototype.hasOwnProperty;
+	var __copyProps = (to, from, except, desc) => {
+		if (from && typeof from === "object" || typeof from === "function") for (var keys = __getOwnPropNames(from), i = 0, n = keys.length, key; i < n; i++) {
+			key = keys[i];
+			if (!__hasOwnProp.call(to, key) && key !== except) __defProp(to, key, {
+				get: ((k) => from[k]).bind(null, key),
+				enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
+			});
+		}
+		return to;
+	};
+	var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(isNodeMode || !mod || !mod.__esModule || !__hasOwnProp.call(mod, "default") ? __defProp(target, "default", {
+		value: mod,
+		enumerable: true
+	}) : target, mod));
+	//#endregion
+	js_src_dialog_base_js = __toESM(js_src_dialog_base_js);
+	js_src_dom_event_handler_js = __toESM(js_src_dom_event_handler_js);
+	js_src_dom_selector_engine_js = __toESM(js_src_dom_selector_engine_js);
+	//#region js/src/offcanvas.ts
+	/**
+	* --------------------------------------------------------------------------
+	* CoreUI offcanvas.ts
+	* Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
+	*
+	* This component is a modified version of the Bootstrap's drawer.ts
+	* Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+	* --------------------------------------------------------------------------
+	*/
+	/**
+	* Constants
+	*/
+	const NAME = "offcanvas";
+	const EVENT_KEY = `.coreui.offcanvas`;
+	const DATA_API_KEY = ".data-api";
+	const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`;
+	const EVENT_HIDDEN = `hidden${EVENT_KEY}`;
+	const EVENT_RESIZE = `resize${EVENT_KEY}`;
+	const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`;
+	const OPEN_SELECTOR = "dialog[open][class*=\"offcanvas\"]";
+	const SELECTOR_DATA_TOGGLE = "[data-coreui-toggle=\"offcanvas\"]";
+	const SELECTOR_DISMISS_SCOPE = ".offcanvas, .offcanvas-sm, .offcanvas-md, .offcanvas-lg, .offcanvas-xl, .offcanvas-2xl";
+	const Default = {
+		backdrop: true,
+		keyboard: true,
+		scroll: false
+	};
+	const DefaultType = {
+		backdrop: "(boolean|string)",
+		keyboard: "boolean",
+		scroll: "boolean"
+	};
+	/**
+	* Class definition
+	*/
+	var Offcanvas = class Offcanvas extends js_src_dialog_base_js.default {
+		constructor(element, config) {
+			super((0, js_src_util_legacy_markup_js.resolveDialogElement)(element, NAME), config);
+		}
+		static get Default() {
+			return Default;
+		}
+		static get DefaultType() {
+			return DefaultType;
+		}
+		static get NAME() {
+			return NAME;
+		}
+		_getShowOptions() {
+			return {
+				modal: Boolean(this._config.backdrop) || !this._config.scroll,
+				preventBodyScroll: !this._config.scroll
+			};
+		}
+		_shouldDeferClose() {
+			return this._isAnimated();
+		}
+		static jQueryInterface(config) {
+			return (0, js_src_util_index_js.jQueryDispatch)(this, Offcanvas, config, (element) => [element]);
+		}
+	};
+	/**
+	* Data API implementation
+	*/
+	js_src_dom_event_handler_js.default.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, function(event) {
+		const target = (0, js_src_util_legacy_markup_js.resolveDialogElement)(js_src_dom_selector_engine_js.default.getElementFromSelector(this), NAME);
+		if (["A", "AREA"].includes(this.tagName)) event.preventDefault();
+		if ((0, js_src_util_index_js.isDisabled)(this)) return;
+		js_src_dom_event_handler_js.default.one(target, EVENT_HIDDEN, () => {
+			if ((0, js_src_util_index_js.isVisible)(this)) this.focus({ preventScroll: true });
+		});
+		const alreadyOpen = js_src_dom_selector_engine_js.default.findOne(OPEN_SELECTOR);
+		if (alreadyOpen && alreadyOpen !== target) Offcanvas.getInstance(alreadyOpen)?.hide();
+		Offcanvas.getOrCreateInstance(target).toggle(this);
+	});
+	js_src_dom_event_handler_js.default.on(window, EVENT_LOAD_DATA_API, () => {
+		for (const selector of js_src_dom_selector_engine_js.default.find(OPEN_SELECTOR)) Offcanvas.getOrCreateInstance(selector).show();
+	});
+	js_src_dom_event_handler_js.default.on(window, EVENT_RESIZE, () => {
+		for (const element of js_src_dom_selector_engine_js.default.find(OPEN_SELECTOR)) if (getComputedStyle(element).position !== "fixed") Offcanvas.getOrCreateInstance(element).hide();
+	});
+	(0, js_src_util_component_functions_js.enableDismissTrigger)(Offcanvas, "hide", SELECTOR_DISMISS_SCOPE);
+	/**
+	* jQuery
+	*/
+	(0, js_src_util_index_js.defineJQueryPlugin)(Offcanvas);
+	//#endregion
+	return Offcanvas;
+});
 
-  /**
-   * --------------------------------------------------------------------------
-   * CoreUI offcanvas.js
-   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-   *
-   * This component is a modified version of the Bootstrap's offcanvas.js
-   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
-   * --------------------------------------------------------------------------
-   */
-
-
-  /**
-   * Constants
-   */
-
-  const NAME = 'offcanvas';
-  const DATA_KEY = 'coreui.offcanvas';
-  const EVENT_KEY = `.${DATA_KEY}`;
-  const DATA_API_KEY = '.data-api';
-  const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`;
-  const ESCAPE_KEY = 'Escape';
-  const CLASS_NAME_SHOW = 'show';
-  const CLASS_NAME_SHOWING = 'showing';
-  const CLASS_NAME_HIDING = 'hiding';
-  const CLASS_NAME_BACKDROP = 'offcanvas-backdrop';
-  const OPEN_SELECTOR = '.offcanvas.show';
-  const EVENT_SHOW = `show${EVENT_KEY}`;
-  const EVENT_SHOWN = `shown${EVENT_KEY}`;
-  const EVENT_HIDE = `hide${EVENT_KEY}`;
-  const EVENT_HIDE_PREVENTED = `hidePrevented${EVENT_KEY}`;
-  const EVENT_HIDDEN = `hidden${EVENT_KEY}`;
-  const EVENT_RESIZE = `resize${EVENT_KEY}`;
-  const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`;
-  const EVENT_KEYDOWN_DISMISS = `keydown.dismiss${EVENT_KEY}`;
-  const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="offcanvas"]';
-  const Default = {
-    backdrop: true,
-    keyboard: true,
-    scroll: false
-  };
-  const DefaultType = {
-    backdrop: '(boolean|string)',
-    keyboard: 'boolean',
-    scroll: 'boolean'
-  };
-
-  /**
-   * Class definition
-   */
-
-  class Offcanvas extends BaseComponent {
-    constructor(element, config) {
-      super(element, config);
-      this._isShown = false;
-      this._backdrop = this._initializeBackDrop();
-      this._focustrap = this._initializeFocusTrap();
-      this._addEventListeners();
-    }
-
-    // Getters
-    static get Default() {
-      return Default;
-    }
-    static get DefaultType() {
-      return DefaultType;
-    }
-    static get NAME() {
-      return NAME;
-    }
-
-    // Public
-    toggle(relatedTarget) {
-      return this._isShown ? this.hide() : this.show(relatedTarget);
-    }
-    show(relatedTarget) {
-      if (this._isShown) {
-        return;
-      }
-      const showEvent = EventHandler.trigger(this._element, EVENT_SHOW, {
-        relatedTarget
-      });
-      if (showEvent.defaultPrevented) {
-        return;
-      }
-      this._isShown = true;
-      this._backdrop.show();
-      if (!this._config.scroll) {
-        new ScrollBarHelper().hide();
-      }
-      this._element.setAttribute('aria-modal', true);
-      this._element.setAttribute('role', 'dialog');
-      this._element.classList.add(CLASS_NAME_SHOWING);
-      const completeCallBack = () => {
-        if (!this._config.scroll || this._config.backdrop) {
-          this._focustrap.activate();
-        }
-        this._element.classList.add(CLASS_NAME_SHOW);
-        this._element.classList.remove(CLASS_NAME_SHOWING);
-        EventHandler.trigger(this._element, EVENT_SHOWN, {
-          relatedTarget
-        });
-      };
-      this._queueCallback(completeCallBack, this._element, true);
-    }
-    hide() {
-      if (!this._isShown) {
-        return;
-      }
-      const hideEvent = EventHandler.trigger(this._element, EVENT_HIDE);
-      if (hideEvent.defaultPrevented) {
-        return;
-      }
-      this._focustrap.deactivate();
-      this._element.blur();
-      this._isShown = false;
-      this._element.classList.add(CLASS_NAME_HIDING);
-      this._backdrop.hide();
-      const completeCallback = () => {
-        this._element.classList.remove(CLASS_NAME_SHOW, CLASS_NAME_HIDING);
-        this._element.removeAttribute('aria-modal');
-        this._element.removeAttribute('role');
-        if (!this._config.scroll) {
-          new ScrollBarHelper().reset();
-        }
-        EventHandler.trigger(this._element, EVENT_HIDDEN);
-      };
-      this._queueCallback(completeCallback, this._element, true);
-    }
-    dispose() {
-      this._backdrop.dispose();
-      this._focustrap.deactivate();
-      super.dispose();
-    }
-
-    // Private
-    _initializeBackDrop() {
-      const clickCallback = () => {
-        if (this._config.backdrop === 'static') {
-          EventHandler.trigger(this._element, EVENT_HIDE_PREVENTED);
-          return;
-        }
-        this.hide();
-      };
-
-      // 'static' option will be translated to true, and booleans will keep their value
-      const isVisible = Boolean(this._config.backdrop);
-      return new Backdrop({
-        className: CLASS_NAME_BACKDROP,
-        isVisible,
-        isAnimated: true,
-        rootElement: this._element.parentNode,
-        clickCallback: isVisible ? clickCallback : null
-      });
-    }
-    _initializeFocusTrap() {
-      return new FocusTrap({
-        trapElement: this._element
-      });
-    }
-    _addEventListeners() {
-      EventHandler.on(this._element, EVENT_KEYDOWN_DISMISS, event => {
-        if (event.key !== ESCAPE_KEY) {
-          return;
-        }
-        if (this._config.keyboard) {
-          this.hide();
-          return;
-        }
-        EventHandler.trigger(this._element, EVENT_HIDE_PREVENTED);
-      });
-    }
-
-    // Static
-    static jQueryInterface(config) {
-      return this.each(function () {
-        const data = Offcanvas.getOrCreateInstance(this, config);
-        if (typeof config !== 'string') {
-          return;
-        }
-        if (data[config] === undefined || config.startsWith('_') || config === 'constructor') {
-          throw new TypeError(`No method named "${config}"`);
-        }
-        data[config](this);
-      });
-    }
-  }
-
-  /**
-   * Data API implementation
-   */
-
-  EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, function (event) {
-    const target = SelectorEngine.getElementFromSelector(this);
-    if (['A', 'AREA'].includes(this.tagName)) {
-      event.preventDefault();
-    }
-    if (index_js.isDisabled(this)) {
-      return;
-    }
-    EventHandler.one(target, EVENT_HIDDEN, () => {
-      // focus on trigger when it is closed
-      if (index_js.isVisible(this)) {
-        this.focus();
-      }
-    });
-
-    // avoid conflict when clicking a toggler of an offcanvas, while another is open
-    const alreadyOpen = SelectorEngine.findOne(OPEN_SELECTOR);
-    if (alreadyOpen && alreadyOpen !== target) {
-      Offcanvas.getInstance(alreadyOpen).hide();
-    }
-    const data = Offcanvas.getOrCreateInstance(target);
-    data.toggle(this);
-  });
-  EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
-    for (const selector of SelectorEngine.find(OPEN_SELECTOR)) {
-      Offcanvas.getOrCreateInstance(selector).show();
-    }
-  });
-  EventHandler.on(window, EVENT_RESIZE, () => {
-    for (const element of SelectorEngine.find('[aria-modal][class*=show][class*=offcanvas-]')) {
-      if (getComputedStyle(element).position !== 'fixed') {
-        Offcanvas.getOrCreateInstance(element).hide();
-      }
-    }
-  });
-  componentFunctions_js.enableDismissTrigger(Offcanvas);
-
-  /**
-   * jQuery
-   */
-
-  index_js.defineJQueryPlugin(Offcanvas);
-
-  return Offcanvas;
-
-}));
 //# sourceMappingURL=offcanvas.js.map
