@@ -380,6 +380,15 @@ describe('RangeSlider', () => {
       expect(input.getAttribute('aria-label')).toBeNull()
     })
 
+    it('should apply ariaLabels on a single-thumb slider', () => {
+      fixtureEl.innerHTML = '<div id="slider"></div>'
+      const element = fixtureEl.querySelector('#slider')
+      new RangeSlider(element, { value: 30, ariaLabels: ['Volume'] }) // eslint-disable-line no-new
+
+      const input = element.querySelector('.range-slider-input')
+      expect(input.getAttribute('aria-label')).toBe('Volume')
+    })
+
     it('should label a two-thumb slider with Minimum/Maximum value by default', () => {
       fixtureEl.innerHTML = '<div id="slider"></div>'
       const element = fixtureEl.querySelector('#slider')

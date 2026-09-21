@@ -39,6 +39,7 @@ const CLASS_NAME_SHOW = 'show'
 const CLASS_NAME_STEPPER_STEP_CONNECTOR = 'stepper-step-connector'
 const CLASS_NAME_STEPPER_STEP_INDICATOR_ICON = 'stepper-step-indicator-icon'
 const CLASS_NAME_STEPPER_STEP_INDICATOR_TEXT = 'stepper-step-indicator-text'
+const CLASS_NAME_STEPPER_VERTICAL = 'stepper-vertical'
 
 const SELECTOR_DATA_STEPPER = '[data-coreui-stepper]'
 const SELECTOR_FORM_VALIDATE_VALID = '[data-coreui-validate~="valid"]'
@@ -79,11 +80,13 @@ class Stepper extends BaseComponent {
   protected declare _initialStepButton: HTMLButtonElement
   protected declare _isFinished: boolean
   protected declare _validatedForms: Set<HTMLFormElement>
+  protected declare _tabPattern: boolean
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
 
     this._stepButtons = this._getStepButtons()
+    this._tabPattern = !SelectorEngine.findOne(SELECTOR_STEPPER_STEP_CONTENT, this._element)
     this._activeStepButton = this._getActiveElem()
     this._initialStepButton = this._activeStepButton
     this._isFinished = false
@@ -376,7 +379,7 @@ class Stepper extends BaseComponent {
     }
 
     element.classList.add(CLASS_NAME_ACTIVE)
-    element.setAttribute('aria-selected', 'true')
+    element.setAttribute(this._tabPattern ? 'aria-selected' : 'aria-expanded', 'true')
     element.setAttribute('tabIndex', '0')
 
     const pane = this._getTargetPane(element)
@@ -399,7 +402,7 @@ class Stepper extends BaseComponent {
       return
     }
 
-    element.setAttribute('aria-selected', 'false')
+    element.setAttribute(this._tabPattern ? 'aria-selected' : 'aria-expanded', 'false')
     element.setAttribute('tabIndex', '-1')
 
     const stepContentElement = SelectorEngine.findOne(SELECTOR_STEPPER_STEP_CONTENT, element.parentNode)
@@ -578,13 +581,22 @@ class Stepper extends BaseComponent {
 
   _setupAccessibilityAttributes(): void {
     const uId = getUID(this.constructor.NAME).toString()
+    const stepList = SelectorEngine.findOne(SELECTOR_STEPPER_STEPS, this._element)
+
+    if (stepList && this._tabPattern) {
+      stepList.setAttribute('role', 'tablist')
+      stepList.setAttribute('aria-orientation', this._element.classList.contains(CLASS_NAME_STEPPER_VERTICAL) ? 'vertical' : 'horizontal')
+    }
+
     for (const [index, stepButton] of this._stepButtons.entries()) {
       const parentStepItem = stepButton.closest(SELECTOR_STEPPER_STEP)
-      if (parentStepItem) {
+      if (parentStepItem && this._tabPattern) {
         parentStepItem.setAttribute('role', 'presentation')
       }
 
-      stepButton.setAttribute('role', 'tab')
+      if (this._tabPattern) {
+        stepButton.setAttribute('role', 'tab')
+      }
 
       if (!stepButton.id) {
         stepButton.id = `${uId}${index + 1}`
@@ -594,17 +606,21 @@ class Stepper extends BaseComponent {
 
       if (pane) {
         stepButton.setAttribute('aria-controls', pane.id)
-        pane.setAttribute('role', 'tabpanel')
+
+        if (this._tabPattern) {
+          pane.setAttribute('role', 'tabpanel')
+        }
+
         pane.setAttribute('aria-labelledby', stepButton.id)
         pane.setAttribute('aria-live', 'polite')
         pane.setAttribute('aria-hidden', !this._elemIsActive(stepButton) as any)
       }
 
       if (this._elemIsActive(stepButton)) {
-        stepButton.setAttribute('aria-selected', 'true')
+        stepButton.setAttribute(this._tabPattern ? 'aria-selected' : 'aria-expanded', 'true')
         stepButton.setAttribute('tabIndex', '0')
       } else {
-        stepButton.setAttribute('aria-selected', 'false')
+        stepButton.setAttribute(this._tabPattern ? 'aria-selected' : 'aria-expanded', 'false')
         stepButton.setAttribute('tabIndex', '-1')
       }
     }
