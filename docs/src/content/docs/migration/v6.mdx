@@ -960,16 +960,31 @@ check, radio, carousel and toggler icons already work:
   `selectAllStyle: 'text'` / `optionsGroupsStyle: 'text'` with
   `indicator: 'none'` when you want the whole list without checkboxes.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
-  **The focus stays in the field while the options list is open.** Options no
-  longer take a `tabindex` and are never focused; the field — Autocomplete's
-  input, Multi Select's search input, otherwise Multi Select's toggler —
-  carries `aria-activedescendant`, and the arrows, <kbd>Enter</kbd> and
-  <kbd>Space</kbd> are handled there. Two consequences: <kbd>Home</kbd>,
-  <kbd>End</kbd> and the space bar keep working as text keys inside a search
-  input, and Multi Select's select all button left the arrow order — it is in
-  the panel header, reachable with <kbd>Tab</kbd>, and carries
-  `aria-pressed` (`true`/`false`/`mixed`). Selectable group labels are in the
-  arrow order in their place.
+  **Autocomplete keeps the focus in its input while the options list is
+  open.** Options take no `tabindex` and are never focused; the input carries
+  `aria-activedescendant`, and the arrows, <kbd>Enter</kbd> and
+  <kbd>Space</kbd> are handled there, so <kbd>Home</kbd>, <kbd>End</kbd> and
+  the space bar keep working as text keys.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **Multi Select opens a dialog instead.** The panel is
+  `role="dialog"` named by the control, and the focus moves into it: onto the
+  search box when `search` is on, otherwise onto the option the list points
+  at. Options take a roving `tabindex` and the arrows move the focus itself,
+  so there is no `aria-activedescendant` to read any more.
+  <kbd>Tab</kbd> cycles through the panel and the search box without leaving
+  them, and <kbd>Escape</kbd> closes the panel and hands the focus back to the
+  control. The select all button left the arrow order — it sits in the panel
+  header, reachable with <kbd>Tab</kbd>, and carries `aria-pressed`
+  (`true`/`false`/`mixed`); selectable group labels are in the arrow order in
+  its place.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **Multi Select's `search` is a boolean, and `search: 'global'` is gone.**
+  Typing reaches the search box from anywhere in the component by default,
+  which is what `'global'` used to turn on, so `data-coreui-search="global"`
+  becomes `data-coreui-search="true"`. Set `globalSearch: false` to keep
+  typing local: the search box then filters only while it has the focus, and
+  a keystroke over the options list jumps to the first option starting with
+  it.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **Autocomplete's typeahead hint no longer reaches the server.** With
   `showHints` on, the hint input behind the field carried a `name` and, being

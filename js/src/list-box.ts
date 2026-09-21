@@ -365,6 +365,19 @@ class ListBox extends BaseComponent {
     this._moveToEdge(-1)
   }
 
+  focusActive(): void {
+    if (this._field) {
+      return
+    }
+
+    const option = this._activeOption() ?? this._navigable()[0]
+
+    if (option) {
+      this._setActive(this._optionValue(option), false)
+      option.focus()
+    }
+  }
+
   update(): void {
     this._list.setAttribute('role', 'listbox')
 
@@ -439,7 +452,7 @@ class ListBox extends BaseComponent {
 
   _updateOptions(): void {
     const navigable = this._navigableOptions()
-    const roving = this._active === null && !this._field ? navigable[0] : null
+    const roving = this._rovingStop()
 
     for (const option of this._allOptions()) {
       option.setAttribute('role', 'option')
@@ -726,6 +739,10 @@ class ListBox extends BaseComponent {
     return SelectorEngine.find(SELECTOR_OPTION, this._list)
   }
 
+  _rovingStop(): HTMLElement | null {
+    return this._active === null && !this._field ? (this._navigable()[0] ?? null) : null
+  }
+
   _navigableOptions(): HTMLElement[] {
     return this._allOptions().filter(option => !this._isHidden(option) && !this._isDisabled(option))
   }
@@ -773,6 +790,8 @@ class ListBox extends BaseComponent {
       return
     }
 
+    const roving = this._rovingStop()
+
     for (const label of SelectorEngine.find(SELECTOR_SECTION_TOGGLE, this._list)) {
       const options = this._sectionOptions(label.closest(SELECTOR_SECTION) as HTMLElement)
       const selected = options.filter(option => this._selected.has(this._optionValue(option))).length
@@ -789,7 +808,7 @@ class ListBox extends BaseComponent {
         continue
       }
 
-      label.setAttribute('tabindex', this._optionValue(label) === this._active ? '0' : '-1')
+      label.setAttribute('tabindex', this._optionValue(label) === this._active || label === roving ? '0' : '-1')
     }
   }
 

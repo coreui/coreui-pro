@@ -266,7 +266,7 @@ describe('MultiSelect', () => {
 
       expect(event.defaultPrevented).toBe(true)
       expect(multiSelect._wrapperElement.classList.contains('show')).toBe(true)
-      expect(document.activeElement).toBe(multiSelect._togglerElement)
+      expect(multiSelect._menu.contains(document.activeElement)).toBe(true)
     })
 
     it('should hand a keystroke on the native select to the control once after update()', () => {
@@ -541,7 +541,7 @@ describe('MultiSelect', () => {
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, {
         options: [],
-        search: 'global'
+        search: true
       })
 
       expect(multiSelect._searchElement).not.toBeNull()
@@ -2143,9 +2143,12 @@ describe('MultiSelect', () => {
       multiSelect.show()
 
       const groupLabel = multiSelect._menu.querySelector('.list-box-section-label')
+      expect(multiSelect._listBox.getActive()).toBe(groupLabel.id)
+      expect(groupLabel.getAttribute('tabindex')).toBe('0')
+
       multiSelect._listBox.next()
 
-      expect(multiSelect._listBox.getActive()).toBe(groupLabel.id)
+      expect(multiSelect._listBox.getActive()).toBe('1')
     })
 
     it('should skip group labels during navigation when not selectable', () => {
@@ -2154,9 +2157,14 @@ describe('MultiSelect', () => {
       const multiSelect = new MultiSelect(selectEl, { options: groupedOptions })
 
       multiSelect.show()
-      multiSelect._listBox.next()
 
       expect(multiSelect._listBox.getActive()).toBe('1')
+
+      multiSelect._listBox.next()
+      expect(multiSelect._listBox.getActive()).toBe('2')
+
+      multiSelect._listBox.next()
+      expect(multiSelect._listBox.getActive()).toBe('3')
     })
   })
 
@@ -2617,10 +2625,13 @@ describe('MultiSelect', () => {
 
       expect(option.tabIndex).toBe(-1)
 
-      option.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
       option.click()
 
       expect(multiSelect._selected.length).toBe(0)
+
+      multiSelect._listBox.last()
+
+      expect(multiSelect._listBox.getActive()).toBe('1')
     })
 
     it('should deselect option when clicking selected option in multiple mode', () => {
@@ -3115,12 +3126,162 @@ describe('MultiSelect', () => {
 
       multiSelect.show()
 
-      multiSelect._togglerElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true, cancelable: true }))
+      document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true, cancelable: true }))
       expect(multiSelect._listBox.getActive()).toBe('3')
 
-      multiSelect._togglerElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true, cancelable: true }))
+      document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true, cancelable: true }))
       expect(multiSelect._listBox.getActive()).toBe('1')
       expect(document.activeElement).not.toBe(multiSelect._optionsElement)
+    })
+
+    it('should move focus into the options list on arrow keys in the search input', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [
+          { value: '1', text: 'Option 1' },
+          { value: '2', text: 'Option 2' },
+          { value: '3', text: 'Option 3' }
+        ],
+        search: true
+      })
+
+      multiSelect.show()
+
+      expect(document.activeElement).toBe(multiSelect._searchElement)
+
+      multiSelect._searchElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true }))
+
+      expect(multiSelect._listBox.getActive()).toBe('1')
+      expect(document.activeElement.dataset.coreuiValue).toBe('1')
+    })
+
+    it('should enter the options list at the last option on arrow up', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [
+          { value: '1', text: 'Option 1' },
+          { value: '2', text: 'Option 2' },
+          { value: '3', text: 'Option 3' }
+        ],
+        search: true
+      })
+
+      multiSelect.show()
+      multiSelect._searchElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true, cancelable: true }))
+
+      expect(multiSelect._listBox.getActive()).toBe('3')
+      expect(document.activeElement.dataset.coreuiValue).toBe('3')
+    })
+
+    it('should pass over the filtered out options when focus enters the list', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [
+          { value: '1', text: 'Option 1', selected: true },
+          { value: '2', text: 'Option 2' },
+          { value: '3', text: 'Third' }
+        ],
+        search: true
+      })
+
+      multiSelect.show()
+      multiSelect._searchElement.value = 'third'
+      multiSelect._onSearchChange(multiSelect._searchElement)
+      multiSelect._searchElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true }))
+
+      expect(multiSelect._listBox.getActive()).toBe('3')
+      expect(document.activeElement.dataset.coreuiValue).toBe('3')
+    })
+
+    it('should take the option the list points at on Enter in the search input', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [
+          { value: '1', text: 'Angular' },
+          { value: '2', text: 'React' }
+        ],
+        search: true
+      })
+
+      multiSelect.show()
+      multiSelect._searchElement.value = 'rea'
+      multiSelect._onSearchChange(multiSelect._searchElement)
+
+      const event = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true })
+      multiSelect._searchElement.dispatchEvent(event)
+
+      expect(event.defaultPrevented).toBe(true)
+      expect(multiSelect._selected.map(option => option.value)).toEqual(['2'])
+    })
+
+    it('should leave the space bar to the option under the focus', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [
+          { value: '1', text: 'Option 1' },
+          { value: '2', text: 'Option 2' }
+        ],
+        search: true
+      })
+
+      multiSelect.show()
+      multiSelect._searchElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true }))
+
+      const option = document.activeElement
+
+      option.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true, cancelable: true }))
+
+      expect(multiSelect._selected.map(item => item.value)).toEqual(['1'])
+      expect(document.activeElement).toBe(option)
+    })
+
+    it('should leave a chord to the options list rather than the search input', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [
+          { value: '1', text: 'Option 1' },
+          { value: '2', text: 'Option 2' }
+        ],
+        search: true
+      })
+
+      multiSelect.show()
+      multiSelect._searchElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true }))
+
+      const option = document.activeElement
+
+      option.dispatchEvent(new KeyboardEvent('keydown', {
+        key: 'a', ctrlKey: true, bubbles: true, cancelable: true
+      }))
+
+      expect(multiSelect._selected.length).toBe(2)
+      expect(document.activeElement).toBe(option)
+    })
+
+    it('should enter the list on the first match once a query narrows it', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [
+          { value: '1', text: 'Beta' },
+          { value: '2', text: 'Bamma', selected: true },
+          { value: '3', text: 'Bravo' }
+        ],
+        search: true
+      })
+
+      multiSelect.show()
+      multiSelect._searchElement.value = 'b'
+      multiSelect._onSearchChange(multiSelect._searchElement)
+      multiSelect._searchElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true }))
+
+      expect(multiSelect._listBox.getActive()).toBe('1')
     })
 
     it('should keep the select all button out of the arrow navigation', () => {
@@ -3181,8 +3342,8 @@ describe('MultiSelect', () => {
       })
 
       multiSelect.show()
-      multiSelect._togglerElement.focus()
-      expect(multiSelect._wrapperElement.contains(document.activeElement)).toBe(true)
+
+      expect(multiSelect._menu.contains(document.activeElement)).toBe(true)
 
       multiSelect.hide()
 
@@ -3205,6 +3366,56 @@ describe('MultiSelect', () => {
       expect(document.activeElement).toBe(multiSelect._searchElement)
     })
 
+    it('should focus the search input whenever the component carries one', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        globalSearch: false,
+        options: [{ value: '1', text: 'Option 1' }],
+        search: true
+      })
+
+      multiSelect.show()
+
+      expect(document.activeElement).toBe(multiSelect._searchElement)
+    })
+
+    it('should hold the focus in the panel when there is no option to take it', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [], selectAll: false })
+
+      multiSelect.show()
+
+      expect(multiSelect._menu.contains(document.activeElement)).toBe(true)
+    })
+
+    it('should keep holding the focus when an outside press does not close the panel', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }] })
+
+      multiSelect.show()
+
+      // A right click closes nothing, so the dialog takes its focus back.
+      document.body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, button: 2 }))
+      document.body.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, button: 2 }))
+
+      expect(multiSelect._isShown()).toBeTrue()
+      expect(multiSelect._focustrap._isActive).toBe(true)
+    })
+
+    it('should leave no focus trap behind when a shown listener closes the panel', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }] })
+
+      selectEl.addEventListener('shown.coreui.multi-select', () => multiSelect.hide())
+      multiSelect.show()
+
+      expect(multiSelect._focustrap).toBeNull()
+    })
+
     it('should not move focus when closed from outside the component', () => {
       fixtureEl.innerHTML = '<select></select><button id="multiSelectOutsideBtn">Outside</button>'
       const selectEl = fixtureEl.querySelector('select')
@@ -3214,11 +3425,13 @@ describe('MultiSelect', () => {
       })
 
       multiSelect.show()
+
+      // The dialog holds focus, so the only way out is the pointer.
+      outside.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }))
       outside.focus()
-      expect(document.activeElement).toBe(outside)
+      outside.dispatchEvent(new MouseEvent('click', { bubbles: true }))
 
-      multiSelect.hide()
-
+      expect(multiSelect._isShown()).toBeFalse()
       expect(document.activeElement).toBe(outside)
     })
 
@@ -3236,7 +3449,7 @@ describe('MultiSelect', () => {
 
       multiSelect._listBox.setActive('1')
       const enterEvent = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true })
-      multiSelect._togglerElement.dispatchEvent(enterEvent)
+      multiSelect._optionsElement.querySelector('.list-box-option').dispatchEvent(enterEvent)
 
       expect(multiSelect._selected.length).toBe(1)
       expect(multiSelect._selected[0].value).toBe('1')
@@ -3256,7 +3469,7 @@ describe('MultiSelect', () => {
 
       multiSelect._listBox.setActive('1')
       const spaceEvent = new KeyboardEvent('keydown', { key: ' ', bubbles: true, cancelable: true })
-      multiSelect._togglerElement.dispatchEvent(spaceEvent)
+      multiSelect._optionsElement.querySelector('.list-box-option').dispatchEvent(spaceEvent)
 
       expect(spaceEvent.defaultPrevented).toBe(true)
       expect(multiSelect._selected.length).toBe(1)
@@ -3430,7 +3643,7 @@ describe('MultiSelect', () => {
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, {
         options: [{ value: '1', text: 'Option 1' }],
-        search: 'global'
+        search: true
       })
 
       multiSelect.show()
@@ -3447,7 +3660,7 @@ describe('MultiSelect', () => {
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, {
         options: [{ value: '1', text: 'Option 1' }],
-        search: 'global'
+        search: true
       })
 
       multiSelect.show()
@@ -3463,7 +3676,7 @@ describe('MultiSelect', () => {
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, {
         options: [{ value: '1', text: 'Option 1' }],
-        search: 'global'
+        search: true
       })
 
       multiSelect.show()
@@ -3479,7 +3692,7 @@ describe('MultiSelect', () => {
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, {
         options: [{ value: '1', text: 'Option 1' }],
-        search: 'global'
+        search: true
       })
 
       multiSelect.show()
@@ -3872,7 +4085,7 @@ describe('MultiSelect', () => {
       const options = [{ value: '1', text: 'Option 1', selected: true }]
       const multiSelect = new MultiSelect(selectEl, {
         options,
-        search: 'global',
+        search: true,
         selectionType: 'tags'
       })
 
@@ -4878,12 +5091,12 @@ describe('MultiSelect', () => {
       expect(multiSelect._togglerElement.getAttribute('role')).toBe('combobox')
     })
 
-    it('should set aria-haspopup to listbox', () => {
+    it('should set aria-haspopup to dialog', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, { options: [] })
 
-      expect(multiSelect._togglerElement.getAttribute('aria-haspopup')).toBe('listbox')
+      expect(multiSelect._togglerElement.getAttribute('aria-haspopup')).toBe('dialog')
     })
 
     it('should not render the picker button when pickerIcon is off', () => {
@@ -4925,15 +5138,18 @@ describe('MultiSelect', () => {
       expect(selectEl.parentNode.querySelector('.form-control-action').getAttribute('aria-label')).toBe('Toggle options list')
     })
 
-    it('should give the search input an accessible label and combobox-supporting attributes', () => {
+    it('should give the search input an accessible label and point it at the list', () => {
       fixtureEl.innerHTML = '<select id="test-select"></select>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, { options: [], search: true })
       const input = multiSelect._searchElement
 
       expect(input.getAttribute('aria-label')).toBe('Search')
-      expect(input.getAttribute('aria-autocomplete')).toBe('list')
       expect(input.getAttribute('aria-controls')).toBe('test-select-listbox')
+
+      // It filters the list, it does not complete the value: the options take
+      // the focus themselves, so nothing writes aria-activedescendant on it.
+      expect(input.getAttribute('aria-autocomplete')).toBeNull()
     })
 
     it('should use a custom ariaSearchLabel', () => {

@@ -16,7 +16,7 @@ import listBoxRemote from './snippets/list-box-remote.js?raw'
 
 <AddedIn version="6.0.0" />
 
-A list box presents a set of values and lets the user pick from them. `.list-box` is the container and the plugin's root; the list of choices lives in a `.list-box-options` child, which is what carries `role="listbox"` and the accessible name. The plugin owns the roles, the selection state and the keyboard: it writes `role="option"` on every `.list-box-option`, keeps `aria-selected` in step with the selection, moves a roving `tabindex` as the highlight moves, and scrolls the highlighted option into view.
+A list box presents a set of values and lets the user pick from them. `.list-box` is the container and the plugin's root; the list of choices lives in a `.list-box-options` child, which is what carries `role="listbox"` and the accessible name. The plugin owns the roles, the selection state and the keyboard: it writes `role="option"` on every `.list-box-option`, keeps `aria-selected` in step with the selection, moves a roving `tabindex` as the highlight moves, and scrolls the highlighted option into view. Before the highlight has moved that `tabindex` sits on the first navigable entry, which is a selectable section label when one comes first, so <kbd>Tab</kbd> enters the list where the arrows would.
 
 <Example code={`<div class="list-box" data-coreui-list-box style="max-width: 20rem">
     <div class="list-box-options" role="listbox" aria-label="Sandwich">
@@ -455,6 +455,7 @@ const listBox = new coreui.ListBox('#myListBox', {
 | `dispose` | Destroys the list box and releases the field. |
 | `filter(query)` | Hides the options that do not contain `query`, and a section left without a match with them. `null` clears the filter. The selection is untouched. |
 | `first` / `last` | Moves the highlight to the first/last option. |
+| `focusActive()` | Moves the focus onto the highlighted option, or onto the first navigable one when nothing is highlighted, and makes that one the highlight. Does nothing while the list drives a field, where the focus belongs to that field. |
 | `getActive()` | The highlighted value, or `null`. |
 | `getInstance` | Static method which allows you to get the list box instance associated to a DOM element, you can use it like this: `coreui.ListBox.getInstance(element)`. |
 | `getItems()` | The normalized `items` array. |

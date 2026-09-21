@@ -11,6 +11,7 @@
 import EventHandler, { type CoreUIEvent } from '../dom/event-handler.js'
 import SelectorEngine from '../dom/selector-engine.js'
 import Config from './config.js'
+import { isDisabled, isVisible } from './index.js'
 
 /**
  * Constants
@@ -140,6 +141,14 @@ class FocusTrap extends Config {
     }
   }
 
+  // The additional element can be a container of focusables, or one itself.
+  _focusables(element: HTMLElement): HTMLElement[] {
+    const children = SelectorEngine.focusableChildren(element)
+    const itself = element.tabIndex >= 0 && !isDisabled(element) && isVisible(element)
+
+    return itself ? [element, ...children] : children
+  }
+
   _handleKeydown(event: CoreUIEvent): void {
     if (!this._isTopmost() || event.key !== TAB_KEY) {
       return
@@ -148,15 +157,25 @@ class FocusTrap extends Config {
     this._lastTabNavDirection = event.shiftKey ? TAB_NAV_BACKWARD : TAB_NAV_FORWARD
 
     const { additionalElement, trapElement } = this._config
+    const trapElements = SelectorEngine.focusableChildren(trapElement!)
+    const additionalElements = additionalElement ? this._focusables(additionalElement) : []
 
-    if (!additionalElement) {
+    if (trapElements.length === 0) {
       return
     }
 
-    const trapElements = SelectorEngine.focusableChildren(trapElement!)
-    const additionalElements = SelectorEngine.focusableChildren(additionalElement)
+    if (additionalElements.length === 0) {
+      // Tabbing off the last focusable of a trailing trap fires no focusin.
+      const index = trapElements.indexOf(event.target as HTMLElement)
 
-    if (trapElements.length === 0 || additionalElements.length === 0) {
+      if (index === trapElements.length - 1 && !event.shiftKey) {
+        event.preventDefault()
+        trapElements[0].focus()
+      } else if (index === 0 && event.shiftKey) {
+        event.preventDefault()
+        trapElements[trapElements.length - 1].focus()
+      }
+
       return
     }
 

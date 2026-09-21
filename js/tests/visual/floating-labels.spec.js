@@ -140,14 +140,14 @@ describe('floating labels', () => {
   // JS-managed filled class, and the resting label must also silence the search
   // input's own placeholder text.
   it('rests the label over an empty searchable Multi Select and hides its placeholder', () => {
-    const root = build(HOST_DIV, MultiSelect, { options: OPTIONS, search: 'global' })
+    const root = build(HOST_DIV, MultiSelect, { options: OPTIONS, search: true })
     expect(labelFloats(root)).toBeFalse()
     const search = root.querySelector('.form-multi-select-search')
     expect(getComputedStyle(search, '::placeholder').color).toBe('rgba(0, 0, 0, 0)')
   })
 
   it('floats the label once a searchable single Multi Select has a selection', () => {
-    const root = build(HOST_DIV, MultiSelect, { multiple: false, options: SELECTED, search: 'global' })
+    const root = build(HOST_DIV, MultiSelect, { multiple: false, options: SELECTED, search: true })
     expect(labelFloats(root)).toBeTrue()
   })
 
