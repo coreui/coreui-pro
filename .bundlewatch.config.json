@@ -83,7 +83,8 @@
   ],
   "ci": {
     "trackBranches": [
-      "main"
+      "main",
+      "v6-dev"
     ]
   }
 }
