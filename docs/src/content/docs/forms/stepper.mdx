@@ -536,7 +536,9 @@ Validation is fully automatic, no extra JavaScript is needed.
 
 The CoreUI Stepper Component is built with accessibility in mind:
 
-- Each step button is assigned proper ARIA roles (`role="tab"`) and attributes like `aria-selected`, `aria-controls`, and `tabindex`.
+- **When the panes sit outside the step list, the stepper is a tab set.** `stepper-steps` becomes the `role="tablist"` the step buttons belong to, with `aria-orientation` taken from `.stepper-vertical`, so a screen reader announces how many steps there are and which one the user is on.
+- **When the steps hold their own `.stepper-step-content`, the stepper is a list of expandable steps instead.** A tablist cannot own the form controls of the open step, so none of the tab roles are written: the list stays a list, each step stays a list item, and the buttons carry `aria-expanded` rather than `aria-selected`.
+- In the tab set, each step button is assigned `role="tab"` and attributes like `aria-selected`, `aria-controls` and `tabindex`, and its `.stepper-step` wrapper is marked `role="presentation"` so the tabs stay direct children of the list in the accessibility tree.
 - Step contents (`stepper-pane`) use `role="tabpanel"` and are properly linked to their trigger buttons.
 - Live updates are announced to screen readers with `aria-live="polite"`.
 - Keyboard navigation is fully supported

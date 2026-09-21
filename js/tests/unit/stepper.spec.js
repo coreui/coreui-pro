@@ -220,6 +220,11 @@ describe('Stepper', () => {
 
       const buttons = fixtureEl.querySelectorAll('.stepper-step-button')
       const steps = fixtureEl.querySelectorAll('.stepper-step')
+      const stepList = fixtureEl.querySelector('.stepper-steps')
+
+      // Step list
+      expect(stepList.getAttribute('role')).toBe('tablist')
+      expect(stepList.getAttribute('aria-orientation')).toBe('horizontal')
 
       // First step (active)
       expect(steps[0].getAttribute('role')).toBe('presentation')
@@ -237,6 +242,38 @@ describe('Stepper', () => {
       expect(panes[0].getAttribute('role')).toBe('tabpanel')
       expect(panes[0].getAttribute('aria-labelledby')).toBe(buttons[0].id)
       expect(panes[0].getAttribute('aria-live')).toBe('polite')
+    })
+
+    it('should drop the tab pattern when the steps own their content', () => {
+      fixtureEl.innerHTML = getStepContentFixture()
+      const stepperElement = fixtureEl.querySelector('.stepper')
+
+      // eslint-disable-next-line no-new
+      new Stepper(stepperElement)
+
+      const stepList = fixtureEl.querySelector('.stepper-steps')
+      const step = fixtureEl.querySelector('.stepper-step')
+      const button = fixtureEl.querySelector('.stepper-step-button')
+
+      expect(stepList.hasAttribute('role')).toBeFalse()
+      expect(step.hasAttribute('role')).toBeFalse()
+      expect(button.hasAttribute('role')).toBeFalse()
+      expect(button.hasAttribute('aria-selected')).toBeFalse()
+      expect(button.getAttribute('aria-expanded')).toBe('true')
+    })
+
+    it('should read the tablist orientation from the layout', () => {
+      fixtureEl.innerHTML = getThreeStepFixture()
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      stepperElement.classList.add('stepper-vertical')
+
+      // eslint-disable-next-line no-new
+      new Stepper(stepperElement)
+
+      const stepList = fixtureEl.querySelector('.stepper-steps')
+
+      expect(stepList.getAttribute('role')).toBe('tablist')
+      expect(stepList.getAttribute('aria-orientation')).toBe('vertical')
     })
 
     it('should set button id if not present', () => {
