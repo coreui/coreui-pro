@@ -114,7 +114,7 @@
       to: /forms/autocomplete/
       badge:
         color: danger
-        text: PRO
+        text: Pro
     - title: Checkbox
       to: /forms/checkbox/
     - title: Chip input
@@ -124,42 +124,33 @@
     - title: Date Input
       to: /forms/date-input/
       badge:
-        - color: success
-          text: NEW
-        - color: danger
-          text: PRO
-          className: ms-1
+        color: danger
+        text: Pro
     - title: Date Picker
       to: /forms/date-picker/
       badge:
         color: danger
-        text: PRO
+        text: Pro
     - title: Date Range Input
       to: /forms/date-range-input/
       badge:
-        - color: success
-          text: NEW
-        - color: danger
-          text: PRO
-          className: ms-1
+        color: danger
+        text: Pro
     - title: Date Range Picker
       to: /forms/date-range-picker/
       badge:
         color: danger
-        text: PRO
+        text: Pro
     - title: Date Time Picker
       to: /forms/date-time-picker/
       badge:
-        - color: success
-          text: NEW
-        - color: danger
-          text: PRO
-          className: ms-1
+        color: danger
+        text: Pro
     - title: Field
       to: /forms/field/
       badge:
         color: success
-        text: NEW
+        text: New
     - title: Floating labels
       to: /forms/floating-labels/
     - title: Form control
@@ -168,19 +159,19 @@
       to: /forms/form-control-group/
       badge:
         color: success
-        text: NEW
+        text: New
     - title: Input group
       to: /forms/input-group/
     - title: Multi Select
       to: /forms/multi-select/
       badge:
         color: danger
-        text: PRO
+        text: Pro
     - title: Number Input
       to: /forms/number-input/
       badge:
         color: success
-        text: NEW
+        text: New
     - title: OTP Input
       to: /forms/otp-input/
     - title: Password Input
@@ -189,7 +180,7 @@
       to: /forms/password-strength/
       badge:
         color: success
-        text: NEW
+        text: New
     - title: Radio
       to: /forms/radio/
     - title: Range
@@ -198,19 +189,19 @@
       to: /forms/range-slider/
       badge:
         color: danger
-        text: PRO
+        text: Pro
     - title: Rating
       to: /forms/rating/
       badge:
         color: danger
-        text: PRO
+        text: Pro
     - title: Select
       to: /forms/select/
     - title: Stepper
       to: /forms/stepper/
       badge:
         color: danger
-        text: PRO
+        text: Pro
     - title: Switch
       to: /forms/switch/
     - title: Textarea
@@ -218,16 +209,13 @@
     - title: Time Input
       to: /forms/time-input/
       badge:
-        - color: success
-          text: NEW
-        - color: danger
-          text: PRO
-          className: ms-1
+        color: danger
+        text: Pro
     - title: Time Picker
       to: /forms/time-picker/
       badge:
         color: danger
-        text: PRO
+        text: Pro
     - title: Layout
       to: /forms/layout/
     - title: Validation
@@ -253,7 +241,7 @@
       to: /components/calendar/
       badge:
         color: danger
-        text: PRO
+        text: Pro
     - title: Callout
       to: /components/callout/
     - title: Card
@@ -272,17 +260,17 @@
       to: /components/context-menu/
       badge:
         color: danger
-        text: PRO
+        text: Pro
     - title: Dialog
       to: /components/dialog/
       badge:
         color: success
-        text: NEW
+        text: New
     - title: Drawer
       to: /components/drawer/
       badge:
         color: success
-        text: NEW
+        text: New
     - title: Dropdown
       to: /components/dropdowns/
     - title: Footer
@@ -295,19 +283,19 @@
       to: /components/list-box/
       badge:
         color: danger
-        text: PRO
+        text: Pro
     - title: List group
       to: /components/list-group/
     - title: Loading button
       to: /components/loading-buttons/
       badge:
         color: danger
-        text: PRO
+        text: Pro
     - title: Menu
       to: /components/menu/
       badge:
         color: success
-        text: NEW
+        text: New
     - title: Modal
       to: /components/modal/
     - title: Nav
