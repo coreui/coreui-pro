@@ -46,7 +46,7 @@ describe('control frame takeover', () => {
     ['Date Range Input', DateRangeInput, {}],
     ['Date Picker', DatePicker, {}],
     ['Time Picker', TimePicker, {}],
-    ['Date Time Picker', DatePicker, {}],
+    ['Date Time Picker', DatePicker, { timepicker: true }],
     ['Date Range Picker', DateRangePicker, {}]
   ]
 

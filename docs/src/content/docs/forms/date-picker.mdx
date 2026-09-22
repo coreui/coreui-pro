@@ -161,8 +161,11 @@ value, so the interaction is not over until the user says so.
     </div>
   </div>`} />
 
-`seconds` narrows what the time half offers, and is ignored without
-`timepicker`.
+`hours`, `minutes` and `seconds` narrow what the time half offers, and are
+ignored without `timepicker`. The four `ariaSelect*Label` options name its
+selects, and with the flag on the field actions call themselves "Clear date and
+time" and "Toggle calendar and time selection" unless the page passed its own
+label.
 
 ## With form field
 
@@ -371,7 +374,7 @@ The field is a [date input](/forms/date-input/#accessibility) — a group of spi
 | <kbd>Home</kbd> / <kbd>End</kbd> | Move focus to the first / last selectable day of the current week |
 | <kbd>Page Down</kbd> / <kbd>Page Up</kbd> | Move focus to the same day of the next / previous month, keeping the day number when the target month is long enough |
 | <kbd>Shift</kbd> + <kbd>Page Down</kbd> / <kbd>Shift</kbd> + <kbd>Page Up</kbd> | Move focus to the same day of the next / previous year |
-| <kbd>Enter</kbd> / <kbd>Space</kbd> | Select the focused date and close the popup |
+| <kbd>Enter</kbd> / <kbd>Space</kbd> | Select the focused date, and close the popup unless `timepicker` is on, where the time half still has to be set |
 
 ## Usage
 

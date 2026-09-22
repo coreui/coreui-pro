@@ -13,8 +13,7 @@ import {
   getLocalizedTimePartials,
   getSelectedHour,
   getSelectedMinutes,
-  getSelectedSeconds,
-  isAmPm
+  getSelectedSeconds
 } from '../util/time.js'
 import { execute } from '../util/index.js'
 
@@ -24,8 +23,6 @@ import { execute } from '../util/index.js'
 
 const NAME = 'time-selection'
 
-const CLASS_NAME_SELECTED = 'selected'
-
 const EVENT_KEY = '.coreui.time-selection'
 const EVENT_FOCUSIN = `focusin${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
@@ -34,7 +31,9 @@ const Default = {
   ariaSelectHoursLabel: 'Select hours',
   ariaSelectMeridiemLabel: 'Select AM/PM',
   ariaSelectMinutesLabel: 'Select minutes',
+  ariaLabel: 'Time',
   ariaSelectSecondsLabel: 'Select seconds',
+  hourCycle: null,
   hours: null,
   locale: 'default',
   minutes: true,
@@ -47,7 +46,9 @@ const DefaultType = {
   ariaSelectHoursLabel: 'string',
   ariaSelectMeridiemLabel: 'string',
   ariaSelectMinutesLabel: 'string',
+  ariaLabel: 'string',
   ariaSelectSecondsLabel: 'string',
+  hourCycle: '(string|null)',
   hours: '(array|function|null)',
   locale: 'string',
   minutes: '(array|boolean|function)',
@@ -116,9 +117,12 @@ class TimeSelection extends Config {
 
   // Private
   _render(): void {
+    this._element!.setAttribute('role', 'group')
+    this._element!.setAttribute('aria-label', this._config.ariaLabel as string)
+
     this._partials = getLocalizedTimePartials(
       this._config.locale,
-      'auto',
+      this._config.hourCycle === null ? 'auto' : this._config.hourCycle === 'h12',
       this._config.hours as any,
       this._config.minutes as any,
       this._config.seconds as any
@@ -161,14 +165,16 @@ class TimeSelection extends Config {
     return parts
   }
 
-  // Each rendering builds its own body and names its own tab stops; the body is
-  // one composite either way, which is the contract the section field keeps.
   _renderBody(): void {
     throw new Error('TimeSelection is abstract — use TimeRoll or TimeSelects.')
   }
 
   _stops(): HTMLElement[] {
     return []
+  }
+
+  _entryStop(list: HTMLElement[]): HTMLElement | null {
+    return list[0] ?? null
   }
 
   _markPart(_part: string, _value: string, _instant: boolean): void {
@@ -183,7 +189,7 @@ class TimeSelection extends Config {
     }
 
     const active = (preferred && list.includes(preferred) ? preferred : null) ??
-      list.find(element => element.classList.contains(CLASS_NAME_SELECTED)) ??
+      this._entryStop(list) ??
       list[0]
 
     for (const element of list) {
@@ -208,7 +214,7 @@ class TimeSelection extends Config {
     }
 
     if (part === 'hours') {
-      date.setHours(isAmPm(this._config.locale) ?
+      date.setHours(this._partials.hour12 ?
         convert12hTo24h(this._ampm, Number.parseInt(value, 10)) :
         Number.parseInt(value, 10))
     }
@@ -230,7 +236,7 @@ class TimeSelection extends Config {
   _markSelected(instant = false): void {
     const selected = {
       hours: getSelectedHour(this._date, this._config.locale),
-      meridiem: this._ampm,
+      meridiem: this._date ? this._ampm : '',
       minutes: getSelectedMinutes(this._date),
       seconds: getSelectedSeconds(this._date)
     }

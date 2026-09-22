@@ -110,8 +110,8 @@ describe('floating labels', () => {
       () => build(HOST_DIV, TimePicker, { locale: 'en-US' }),
       () => build(HOST_DIV, TimePicker, { locale: 'en-US', time: new Date(2026, 0, 1, 14, 30) })],
     ['Date Time Picker',
-      () => build(HOST_DIV, DatePicker, { locale: 'en-US' }),
-      () => build(HOST_DIV, DatePicker, { locale: 'en-US', date: DATE })],
+      () => build(HOST_DIV, DatePicker, { locale: 'en-US', timepicker: true }),
+      () => build(HOST_DIV, DatePicker, { locale: 'en-US', date: DATE, timepicker: true })],
     ['Date Range Picker',
       () => build(HOST_DIV, DateRangePicker, { locale: 'en-US' }),
       () => build(HOST_DIV, DateRangePicker, { locale: 'en-US', startDate: DATE, endDate: new Date(2026, 6, 20) })]

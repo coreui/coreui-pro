@@ -19,9 +19,9 @@ import DateInput from './date-input.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import TimeSelects from './time-selection/selects.js'
-import { getDateBySelectionType, isSameDateAs } from './util/calendar.js'
+import { convertToDateObject, getDateBySelectionType, isSameDateAs } from './util/calendar.js'
 import type { ComponentConfig } from './util/config.js'
-import { getWeekSectionsFromLocale } from './util/date-sections.js'
+import { getDateSections, getDateTimeSectionsFromLocale, getWeekSectionsFromLocale } from './util/date-sections.js'
 import {
   appendControlGroupField,
   applyControlGroupClasses,
@@ -296,7 +296,7 @@ class DatePicker extends PickerBase {
     const ownCleaner = SelectorEngine.findOne(SELECTOR_ROLE_CLEANER, inputGroup)
 
     if (ownCleaner) {
-      this._cleanerElement = this._adoptAction(ownCleaner, this._config.ariaCleanerLabel)
+      this._cleanerElement = this._adoptAction(ownCleaner, withTime(this._config.ariaCleanerLabel, 'ariaCleanerLabel', 'Clear date and time'))
     } else if (this._config.cleaner) {
       this._cleanerElement = action(CLASS_NAME_CLEANER, this._config.cleanerIcon, withTime(this._config.ariaCleanerLabel, 'ariaCleanerLabel', 'Clear date and time'))
       this._created.cleaner = true
@@ -308,7 +308,7 @@ class DatePicker extends PickerBase {
     this._toggleElement = null
 
     if (ownToggle) {
-      this._toggleElement = this._adoptAction(ownToggle, this._config.ariaPickerLabel)
+      this._toggleElement = this._adoptAction(ownToggle, withTime(this._config.ariaPickerLabel, 'ariaPickerLabel', 'Toggle calendar and time selection'))
     } else if (this._config.pickerIcon) {
       this._toggleElement = action(CLASS_NAME_INDICATOR, this._config.pickerIcon === true ? CALENDAR_ICON : this._config.pickerIcon, withTime(this._config.ariaPickerLabel, 'ariaPickerLabel', 'Toggle calendar and time selection'))
       this._created.toggle = true
@@ -320,9 +320,9 @@ class DatePicker extends PickerBase {
       disabled: this._config.disabled,
       locale: this._config.locale,
       name: this._config.name,
-      ...(this._config.timepicker ?
-        { seconds: Boolean(this._config.seconds), type: 'datetime' } :
-        {}),
+      seconds: Boolean(this._config.seconds),
+      ...(this._config.timepicker ? { type: 'datetime' } : {}),
+      ...(this._config.timepicker ? this._dayBounds() : {}),
       ...(this._resolveFormat() ? { format: this._resolveFormat() } : {})
     }, { ...(this._config.floatingLabel ? { ariaLabel: this._config.floatingLabel } : {}), ...this._config.inputOptions }))
 
@@ -400,10 +400,36 @@ class DatePicker extends PickerBase {
     }
 
     this._selection = new TimeSelects(this._selectionElement, this._forwardConfig(TimeSelects, {
+      hourCycle: this._hourCycle(),
       locale: this._config.locale,
       onChange: (time: Date | null) => this._applyTime(time),
       time: this.getDate()
     }, this._config.selectionOptions))
+  }
+
+  _hourCycle(): string | null {
+    const format = this._resolveFormat()
+    const sections = format ?
+      getDateSections(format, this._config.locale, this._config.monthNames) :
+      getDateTimeSectionsFromLocale(this._config.locale, Boolean(this._config.seconds))
+
+    return (sections.find((section: any) => section.type === 'hour') as any)?.cycle ?? null
+  }
+
+  _dayBounds(): { maxDate?: Date, minDate?: Date } {
+    const bounds: { maxDate?: Date, minDate?: Date } = {}
+    const min = convertToDateObject(this._config.minDate, this._config.selectionType)
+    const max = convertToDateObject(this._config.maxDate, this._config.selectionType)
+
+    if (min) {
+      bounds.minDate = new Date(new Date(min).setHours(0, 0, 0, 0))
+    }
+
+    if (max) {
+      bounds.maxDate = new Date(new Date(max).setHours(23, 59, 59, 999))
+    }
+
+    return bounds
   }
 
   _withCurrentTime(date: Date | null): Date | null {
@@ -425,14 +451,14 @@ class DatePicker extends PickerBase {
     const merged = current ? new Date(current) : new Date()
     merged.setHours(time.getHours(), time.getMinutes(), time.getSeconds())
 
-    this._applyDate(merged)
+    this._applyDate(merged, { selection: false })
   }
 
   // The one place the date changes. The field validates it, so what the
   // picker keeps and announces is what the field holds — a selection the
   // field refused (min/max) becomes null, not the day that was clicked. The
   // side that reported the change is not written back to.
-  _applyDate(date: Date | null, { calendar = true, field = true }: { calendar?: boolean, field?: boolean } = {}): void {
+  _applyDate(date: Date | null, { calendar = true, field = true, selection = true }: { calendar?: boolean, field?: boolean, selection?: boolean } = {}): void {
     if (this._applying) {
       return
     }
@@ -446,8 +472,6 @@ class DatePicker extends PickerBase {
     const applied = field ? this._input.getDate() : date
     this._applying = false
 
-    // isSameDateAs only looks at the day, so with a time half a changed minute
-    // would read as no change at all.
     const changed = this._config.timepicker ?
       (applied ? applied.getTime() : null) !== (this._date ? this._date.getTime() : null) :
       !isSameDateAs(applied, this._date)
@@ -457,7 +481,9 @@ class DatePicker extends PickerBase {
       this._calendar?.setConfig({ startDate: applied })
     }
 
-    this._selection?.setConfig({ time: applied })
+    if (selection) {
+      this._selection?.setConfig({ time: applied })
+    }
 
     if (changed) {
       EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date: applied, formattedDate: getDateBySelectionType(applied, this._config.selectionType) })

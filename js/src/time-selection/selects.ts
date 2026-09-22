@@ -61,6 +61,7 @@ class TimeSelects extends TimeSelection {
     for (const [index, part] of this._parts().entries()) {
       if (index > 0 && part.name !== 'meridiem') {
         const separator = document.createElement('span')
+        separator.setAttribute('aria-hidden', 'true')
         separator.textContent = ':'
         this._element!.append(separator)
       }

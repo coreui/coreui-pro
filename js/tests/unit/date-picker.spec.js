@@ -1190,6 +1190,96 @@ describe('DatePicker', () => {
       expect(picker._popup.isShown).toBeTrue()
     })
 
+    it('should keep the focused select alive when its own value changes', () => {
+      const picker = buildPicker({ timepicker: true, locale: 'en-US', date: new Date(2026, 8, 22, 14, 30) })
+      picker.show()
+
+      const minutes = fixtureEl.querySelector('select.date-picker-time-select.minutes')
+      minutes.focus()
+      minutes.value = '45'
+      minutes.dispatchEvent(new Event('change'))
+
+      expect(minutes.isConnected).toBeTrue()
+      expect(document.activeElement).toEqual(minutes)
+      expect(picker.getDate().getMinutes()).toEqual(45)
+    })
+
+    it('should bound min and max by the day, not by the instant', () => {
+      const picker = buildPicker({
+        timepicker: true, locale: 'en-US', maxDate: '2026-09-22', date: '2026-09-22 10:00'
+      })
+
+      expect(picker.getDate()).not.toBeNull()
+
+      picker.show()
+      pickMinutes(45)
+
+      expect(picker.getDate().getMinutes()).toEqual(45)
+    })
+
+    it('should accept a narrowed seconds list while the time half is off', () => {
+      expect(() => buildPicker({ locale: 'en-US', seconds: [0, 30] })).not.toThrow()
+    })
+
+    it('should render one select per part, and drop the seconds when they are off', () => {
+      const picker = buildPicker({ timepicker: true, locale: 'en-US' })
+      picker.show()
+
+      const classes = () => [...fixtureEl.querySelectorAll('select.date-picker-time-select')]
+        .map(select => [...select.classList].find(name => name !== 'date-picker-time-select'))
+
+      expect(classes()).toEqual(['hours', 'minutes', 'seconds', 'meridiem'])
+
+      picker.dispose()
+      const withoutSeconds = buildPicker({ timepicker: true, locale: 'en-US', seconds: false })
+      withoutSeconds.show()
+
+      expect(classes()).toEqual(['hours', 'minutes', 'meridiem'])
+    })
+
+    it('should take the hour cycle from the mask, not from the locale', () => {
+      const picker = buildPicker({ timepicker: true, locale: 'en-US', format: 'MM/dd/yyyy HH:mm:ss' })
+      picker.show()
+
+      expect(fixtureEl.querySelectorAll('select.date-picker-time-select.hours option').length).toEqual(24)
+      expect(fixtureEl.querySelector('select.date-picker-time-select.meridiem')).toBeNull()
+    })
+
+    it('should emit dateChange for a time-only change', () => {
+      const picker = buildPicker({ timepicker: true, locale: 'en-US', date: new Date(2026, 5, 15, 10, 0, 0) })
+      const el = fixtureEl.querySelector('#picker')
+      const emitted = []
+      el.addEventListener('dateChange.coreui.date-picker', event => emitted.push(event.date))
+
+      picker.show()
+      pickMinutes(15)
+
+      expect(emitted).toEqual([new Date(2026, 5, 15, 10, 15, 0)])
+    })
+
+    it('should mask the field as a date and a time', () => {
+      const picker = buildPicker({ timepicker: true, locale: 'en-US', date: new Date(2026, 5, 15, 14, 30, 0) })
+
+      expect(fixtureEl.querySelector('#picker input[type="hidden"]').value).toEqual('06/15/2026, 02:30:00 PM')
+      expect(picker.getDate()).not.toBeNull()
+    })
+
+    it('should name the field actions after the date and the time', () => {
+      buildPicker({ timepicker: true, locale: 'en-US' })
+
+      expect(fixtureEl.querySelector('.form-control-action').getAttribute('aria-label'))
+        .toEqual('Toggle calendar and time selection')
+      expect(fixtureEl.querySelector('.form-control-cleaner').getAttribute('aria-label'))
+        .toEqual('Clear date and time')
+    })
+
+    it('should give an adopted toggle the same wording as a generated one', () => {
+      buildPicker({ timepicker: true, locale: 'en-US' }, '<div id="picker"><button data-coreui-picker-toggle></button></div>')
+
+      expect(fixtureEl.querySelector('[data-coreui-picker-toggle]').getAttribute('aria-label'))
+        .toEqual('Toggle calendar and time selection')
+    })
+
     it('should keep the value when the time half reports without a date set', () => {
       const picker = buildPicker({ timepicker: true })
 

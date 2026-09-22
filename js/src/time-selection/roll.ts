@@ -57,6 +57,12 @@ class TimeRoll extends TimeSelection {
     return SelectorEngine.find(SELECTOR_CELL, this._element as HTMLElement)
   }
 
+  override _entryStop(list: HTMLElement[]): HTMLElement | null {
+    const [column] = SelectorEngine.find(SELECTOR_COL, this._element as HTMLElement)
+
+    return column ? this._entryCell(column) : (list[0] ?? null)
+  }
+
   override _markPart(part: string, value: string, instant: boolean): void {
     for (const cell of SelectorEngine.find(`[data-coreui-${part}]`, this._element as ParentNode)) {
       const isSelected = String(Manipulator.getDataAttribute(cell, part)) === String(value)
