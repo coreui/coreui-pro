@@ -12,9 +12,11 @@ $time-picker-tokens: () !default;
 // scss-docs-start time-picker-tokens
 $time-picker-tokens: defaults(
   (
-    --#{$prefix}time-picker-footer-border-width: 1px,
+    --#{$prefix}time-picker-footer-border-width: var(--#{$prefix}border-width),
     --#{$prefix}time-picker-footer-border-color: var(--#{$prefix}border-color),
-    --#{$prefix}time-picker-footer-padding: .5rem,
+    --#{$prefix}time-picker-footer-padding-y: .5rem,
+    --#{$prefix}time-picker-footer-padding-x: .5rem,
+    --#{$prefix}time-picker-footer-gap: .5rem,
     --#{$prefix}time-picker-col-border-width: var(--#{$prefix}border-width),
     --#{$prefix}time-picker-col-border-color: var(--#{$prefix}border-color),
     --#{$prefix}time-picker-cell-width: 3rem,
@@ -53,13 +55,10 @@ $time-picker-tokens: defaults(
 
   .time-picker-footer {
     display: flex;
+    gap: var(--#{$prefix}time-picker-footer-gap);
     justify-content: flex-end;
-    padding: var(--#{$prefix}time-picker-footer-padding);
+    padding: var(--#{$prefix}time-picker-footer-padding-y) var(--#{$prefix}time-picker-footer-padding-x);
     border-block-start: var(--#{$prefix}time-picker-footer-border-width) solid var(--#{$prefix}time-picker-footer-border-color);
-
-    .btn + .btn {
-      margin-inline-start: .5rem;
-    }
   }
 
   .time-picker-col {

@@ -18,9 +18,10 @@ $calendar-tokens: defaults(
   (
     --#{$prefix}calendar-table-margin: .5rem,
     --#{$prefix}calendar-table-cell-size: 2.75rem,
-    --#{$prefix}calendar-nav-padding: .5rem,
+    --#{$prefix}calendar-nav-padding-y: .5rem,
+    --#{$prefix}calendar-nav-padding-x: .5rem,
     --#{$prefix}calendar-nav-border-color: var(--#{$prefix}border-color),
-    --#{$prefix}calendar-nav-border: 1px solid var(--#{$prefix}calendar-nav-border-color),
+    --#{$prefix}calendar-nav-border: var(--#{$prefix}border-width) solid var(--#{$prefix}calendar-nav-border-color),
     --#{$prefix}calendar-nav-btn-padding-x: .5rem,
     --#{$prefix}calendar-nav-btn-padding-y: .25rem,
     --#{$prefix}calendar-nav-btn-font-size: var(--#{$prefix}font-size-sm),
@@ -101,7 +102,7 @@ $calendar-tokens: defaults(
   .calendar-nav {
     display: flex;
     align-items: baseline;
-    padding: var(--#{$prefix}calendar-nav-padding);
+    padding: var(--#{$prefix}calendar-nav-padding-y) var(--#{$prefix}calendar-nav-padding-x);
     border-block-end: var(--#{$prefix}calendar-nav-border);
   }
 

@@ -37,6 +37,8 @@ $drawer-tokens: defaults(
     --#{$prefix}drawer-transition-duration: .3s,
     --#{$prefix}drawer-transition-timing: var(--#{$prefix}transition-timing-overlay),
     --#{$prefix}drawer-title-line-height: var(--#{$prefix}body-line-height),
+    --#{$prefix}drawer-body-gap: var(--#{$prefix}drawer-padding-y),
+    --#{$prefix}drawer-footer-gap: .5rem,
     --#{$prefix}backdrop-color: var(--#{$prefix}bg-body),
     --#{$prefix}backdrop-opacity: 25%,
     --#{$prefix}drawer-backdrop-bg: color-mix(in oklch, var(--#{$prefix}backdrop-color) var(--#{$prefix}backdrop-opacity), transparent),
@@ -289,13 +291,13 @@ $drawer-tokens: defaults(
     position: relative;
     display: flex;
     flex-direction: column;
-    gap: var(--#{$prefix}drawer-padding-y);
+    gap: var(--#{$prefix}drawer-body-gap);
     @include dialog-body(var(--#{$prefix}drawer-padding-y) var(--#{$prefix}drawer-padding-x));
     min-height: 0; // allow the body to shrink for inner scrolling
     overflow-y: auto;
   }
 
   .drawer-footer {
-    @include dialog-footer(var(--#{$prefix}drawer-padding-y) var(--#{$prefix}drawer-padding-x), .5rem, var(--#{$prefix}drawer-border-width), var(--#{$prefix}drawer-border-color));
+    @include dialog-footer(var(--#{$prefix}drawer-padding-y) var(--#{$prefix}drawer-padding-x), var(--#{$prefix}drawer-footer-gap), var(--#{$prefix}drawer-border-width), var(--#{$prefix}drawer-border-color));
   }
 }

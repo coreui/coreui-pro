@@ -812,12 +812,11 @@ check, radio, carousel and toggler icons already work:
   wrong: a `data-coreui-theme="light"` section inside a dark page inherited the
   forced white and drew a white icon on white.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
-  **The size surface is two variables instead of five.**
-  `--cui-btn-close-width`, `-height`, `-padding-x` and `-padding-y` collapse
-  into `--cui-btn-close-icon-size` and `--cui-btn-close-padding`, matching the
-  Sass variables of the same names. Nothing changes on screen: the glyph is
-  still `1em` inside `.25em` of padding, so the pointer target stays 24px at
-  the default font size — the WCAG 2.2 minimum.
+  **`--cui-btn-close-width` and `-height` become `--cui-btn-close-icon-size`.**
+  The glyph is square, so one variable sizes it; the padding keeps both axes
+  (`--cui-btn-close-padding-y`, `-padding-x`). Nothing changes on screen: the
+  glyph is still `1em` inside `.25em` of padding, so the pointer target stays
+  24px at the default font size — the WCAG 2.2 minimum.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **`--cui-btn-close-bg` is `--cui-btn-close-icon`** (`$btn-close-bg` →
   `$btn-close-icon`). It stopped being a background when the glyph moved to a
@@ -3266,6 +3265,36 @@ map — several things below are breaking and are called out as such.
   reads `--cui-spacer` (`1rem`) instead of `--cui-spacer-3`, so cards,
   alerts, modals, drawers, popovers, callouts, list groups, the sidebar and
   the reboot margins keep their size.
+
+#### Padding tokens carry both axes
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **A token that sets `padding` names an axis.** `--cui-modal-padding`,
+  `--cui-calendar-nav-padding`, `--cui-nav-enclosed-padding`,
+  `--cui-date-picker-footer-padding` and `--cui-time-picker-footer-padding`
+  are `-padding-y` and `-padding-x`; the same goes for the tokens added in
+  v6 (`--cui-btn-close-padding`, `--cui-form-field-card-padding`,
+  `--cui-list-box-section-label-padding`,
+  `--cui-date-picker-time-body-padding`). Defaults are unchanged, so set
+  both to the old value to keep the same box. A single-value token could not
+  be overridden per axis, and one of them was already a two-value shorthand
+  (`--cui-list-box-section-label-padding: .5rem .625rem`), which made the
+  horizontal padding unreachable without restating the vertical one.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`--cui-modal-header-padding` is gone.** It only restated
+  `--cui-modal-header-padding-y --cui-modal-header-padding-x`, and setting it
+  had no effect on the close button, which reads the two axes. The footer no
+  longer reads the modal's body padding either: it has
+  `--cui-modal-footer-padding-y` and `-padding-x`, defaulting to
+  `--cui-modal-padding-y` / `-padding-x`.
+- **A distance between children is a `-gap` token.** `--cui-date-picker-ranges-gap`,
+  `--cui-date-picker-footer-gap`, `--cui-time-picker-footer-gap`,
+  `--cui-drawer-body-gap` and `--cui-drawer-footer-gap` are new; the time
+  picker's footer used to space its buttons with a `.btn + .btn` margin,
+  which only worked for buttons and could not be set from outside. The date
+  picker's ranges column and its time row also stopped borrowing the footer's
+  padding and border: they read `--cui-date-picker-ranges-*` and
+  `--cui-date-picker-timepickers-*`.
 
 #### Link decoration is a token, not a Sass knob
 

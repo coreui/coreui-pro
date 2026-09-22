@@ -33,7 +33,8 @@ $modal-tokens: defaults(
   (
     --#{$prefix}modal-zindex: var(--#{$prefix}z-modal),
     --#{$prefix}modal-width: 500px,
-    --#{$prefix}modal-padding: var(--#{$prefix}spacer),
+    --#{$prefix}modal-padding-y: var(--#{$prefix}spacer),
+    --#{$prefix}modal-padding-x: var(--#{$prefix}spacer),
     --#{$prefix}modal-margin: .5rem,
     --#{$prefix}modal-color: var(--#{$prefix}fg-body),
     --#{$prefix}modal-bg: var(--#{$prefix}bg-body),
@@ -46,12 +47,13 @@ $modal-tokens: defaults(
     --#{$prefix}modal-transition-timing: ease-out,
     --#{$prefix}modal-backdrop-bg: var(--#{$prefix}black),
     --#{$prefix}modal-backdrop-opacity: .5,
-    --#{$prefix}modal-header-padding-x: var(--#{$prefix}modal-padding),
-    --#{$prefix}modal-header-padding-y: var(--#{$prefix}modal-padding),
-    --#{$prefix}modal-header-padding: var(--#{$prefix}modal-header-padding-y) var(--#{$prefix}modal-header-padding-x),
+    --#{$prefix}modal-header-padding-y: var(--#{$prefix}modal-padding-y),
+    --#{$prefix}modal-header-padding-x: var(--#{$prefix}modal-padding-x),
     --#{$prefix}modal-header-border-color: var(--#{$prefix}border-color),
     --#{$prefix}modal-header-border-width: var(--#{$prefix}border-width),
     --#{$prefix}modal-title-line-height: var(--#{$prefix}body-line-height),
+    --#{$prefix}modal-footer-padding-y: var(--#{$prefix}modal-padding-y),
+    --#{$prefix}modal-footer-padding-x: var(--#{$prefix}modal-padding-x),
     --#{$prefix}modal-footer-gap: .5rem,
     --#{$prefix}modal-footer-bg: transparent,
     --#{$prefix}modal-footer-border-color: var(--#{$prefix}border-color),
@@ -164,7 +166,7 @@ $modal-tokens: defaults(
   }
 
   .modal-header {
-    @include dialog-header(var(--#{$prefix}modal-header-padding));
+    @include dialog-header(var(--#{$prefix}modal-header-padding-y) var(--#{$prefix}modal-header-padding-x));
     border-block-end: var(--#{$prefix}modal-header-border-width) solid var(--#{$prefix}modal-header-border-color);
     @include border-top-radius(var(--#{$prefix}modal-inner-border-radius));
 
@@ -183,11 +185,11 @@ $modal-tokens: defaults(
 
   .modal-body {
     position: relative;
-    @include dialog-body(var(--#{$prefix}modal-padding));
+    @include dialog-body(var(--#{$prefix}modal-padding-y) var(--#{$prefix}modal-padding-x));
   }
 
   .modal-footer {
-    @include dialog-footer(var(--#{$prefix}modal-padding), var(--#{$prefix}modal-footer-gap), var(--#{$prefix}modal-footer-border-width), var(--#{$prefix}modal-footer-border-color));
+    @include dialog-footer(var(--#{$prefix}modal-footer-padding-y) var(--#{$prefix}modal-footer-padding-x), var(--#{$prefix}modal-footer-gap), var(--#{$prefix}modal-footer-border-width), var(--#{$prefix}modal-footer-border-color));
     background-color: var(--#{$prefix}modal-footer-bg, transparent);
     @include border-bottom-radius(var(--#{$prefix}modal-inner-border-radius));
   }

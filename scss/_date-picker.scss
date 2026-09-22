@@ -13,8 +13,17 @@ $date-picker-tokens: () !default;
 // scss-docs-start date-picker-tokens
 $date-picker-tokens: defaults(
   (
-    --#{$prefix}date-picker-footer-padding: .5rem,
-    --#{$prefix}date-picker-footer-border-width: 1px,
+    --#{$prefix}date-picker-ranges-padding-y: .5rem,
+    --#{$prefix}date-picker-ranges-padding-x: .5rem,
+    --#{$prefix}date-picker-ranges-gap: .25rem,
+    --#{$prefix}date-picker-ranges-border-width: var(--#{$prefix}border-width),
+    --#{$prefix}date-picker-ranges-border-color: var(--#{$prefix}border-color),
+    --#{$prefix}date-picker-timepickers-border-width: var(--#{$prefix}border-width),
+    --#{$prefix}date-picker-timepickers-border-color: var(--#{$prefix}border-color),
+    --#{$prefix}date-picker-footer-padding-y: .5rem,
+    --#{$prefix}date-picker-footer-padding-x: .5rem,
+    --#{$prefix}date-picker-footer-gap: .5rem,
+    --#{$prefix}date-picker-footer-border-width: var(--#{$prefix}border-width),
     --#{$prefix}date-picker-footer-border-color: var(--#{$prefix}border-color),
   ),
   $date-picker-tokens
@@ -26,7 +35,8 @@ $date-picker-time-tokens: () !default;
 // scss-docs-start date-picker-time-tokens
 $date-picker-time-tokens: defaults(
   (
-    --#{$prefix}date-picker-time-body-padding: var(--#{$prefix}spacer-2),
+    --#{$prefix}date-picker-time-body-padding-y: var(--#{$prefix}spacer-2),
+    --#{$prefix}date-picker-time-body-padding-x: var(--#{$prefix}spacer-2),
     --#{$prefix}date-picker-time-icon-width: 2.5rem,
     --#{$prefix}date-picker-time-icon-size: 1rem,
     --#{$prefix}date-picker-time-icon-color: var(--#{$prefix}fg-3),
@@ -62,14 +72,14 @@ $date-picker-time-tokens: defaults(
       display: flex;
       grid-area: timepickers;
       justify-content: space-between;
-      border-block-start: var(--#{$prefix}date-picker-footer-border-width) solid var(--#{$prefix}date-picker-footer-border-color);
+      border-block-start: var(--#{$prefix}date-picker-timepickers-border-width) solid var(--#{$prefix}date-picker-timepickers-border-color);
     }
 
     .date-picker-time-body {
       @include tokens($date-picker-time-tokens);
       display: flex;
       align-items: center;
-      padding: var(--#{$prefix}date-picker-time-body-padding);
+      padding: var(--#{$prefix}date-picker-time-body-padding-y) var(--#{$prefix}date-picker-time-body-padding-x);
     }
 
     .date-picker-time-icon {
@@ -129,10 +139,10 @@ $date-picker-time-tokens: defaults(
     display: flex;
     flex-direction: column;
     grid-area: ranges;
-    gap: .25rem;
+    gap: var(--#{$prefix}date-picker-ranges-gap);
     align-items: flex-start;
-    padding: var(--#{$prefix}date-picker-footer-padding);
-    border-inline-end: var(--#{$prefix}date-picker-footer-border-width) solid var(--#{$prefix}date-picker-footer-border-color);
+    padding: var(--#{$prefix}date-picker-ranges-padding-y) var(--#{$prefix}date-picker-ranges-padding-x);
+    border-inline-end: var(--#{$prefix}date-picker-ranges-border-width) solid var(--#{$prefix}date-picker-ranges-border-color);
   }
 
   .date-picker-calendars {
@@ -150,9 +160,9 @@ $date-picker-time-tokens: defaults(
 
   .date-picker-footer {
     display: flex;
-    gap: .5rem;
+    gap: var(--#{$prefix}date-picker-footer-gap);
     justify-content: flex-end;
-    padding: var(--#{$prefix}date-picker-footer-padding);
+    padding: var(--#{$prefix}date-picker-footer-padding-y) var(--#{$prefix}date-picker-footer-padding-x);
     border-block-start: var(--#{$prefix}date-picker-footer-border-width) solid var(--#{$prefix}date-picker-footer-border-color);
   }
 

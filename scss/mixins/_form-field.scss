@@ -21,7 +21,8 @@ $form-field-card-tokens: () !default;
 // scss-docs-start form-field-card-tokens
 $form-field-card-tokens: defaults(
   (
-    --#{$prefix}form-field-card-padding: calc(var(--#{$prefix}spacer) * .75),
+    --#{$prefix}form-field-card-padding-y: calc(var(--#{$prefix}spacer) * .75),
+    --#{$prefix}form-field-card-padding-x: calc(var(--#{$prefix}spacer) * .75),
     --#{$prefix}form-field-card-radius: var(--#{$prefix}radius-7),
     --#{$prefix}form-field-card-hover-bg: var(--#{$prefix}bg-1),
     --#{$prefix}form-field-card-checked-bg: var(--#{$prefix}bg-1),
