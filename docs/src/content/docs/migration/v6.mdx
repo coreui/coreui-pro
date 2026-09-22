@@ -1366,6 +1366,13 @@ validation and the arrow between them. Two consequences:
   belongs to. `.time-picker-inline-icon` survives the v1 shell cleanup below
   because of this, now rendered as an inline SVG that takes its colour from
   `--cui-time-picker-inline-icon-color`.
+- **The time selection is one tab stop, and the arrows move between its parts.**
+  v6.0.0-alpha gave a tab stop to every column of the roll, so Tab walked the
+  hour, minute, second and AM/PM lists one by one. The body is a composite now,
+  like the section field it mirrors: <kbd>Tab</kbd> reaches it once,
+  <kbd>Arrow Left</kbd> and <kbd>Arrow Right</kbd> move between the parts and
+  stop at the ends, and <kbd>Arrow Up</kbd> / <kbd>Arrow Down</kbd> still change
+  the focused value. The selects of the date time picker answer the same keys.
 - **Each picker has one time rendering, and the `variant` option is gone.** The
   time picker shows the roll; the date time picker shows the selects, which is
   what v5 rendered inside a date picker with time. The shared primitive still

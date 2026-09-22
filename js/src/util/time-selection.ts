@@ -43,10 +43,12 @@ const HOME_KEY = 'Home'
 const SPACE_KEY = 'Space'
 
 const EVENT_KEY = '.coreui.time-selection'
+const EVENT_FOCUSIN = `focusin${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 
+const SELECTOR_INLINE_SELECT = `select.${CLASS_NAME_INLINE_SELECT}`
 const SELECTOR_ROLL_CELL = `.${CLASS_NAME_ROLL_CELL}`
-const SELECTOR_ROLL_CELL_FOCUSABLE = `.${CLASS_NAME_ROLL_CELL}[tabindex="0"]`
+const SELECTOR_ROLL_CELL_SELECTED = `.${CLASS_NAME_ROLL_CELL}.${CLASS_NAME_SELECTED}`
 const SELECTOR_ROLL_COL = `.${CLASS_NAME_ROLL_COL}`
 
 const Default = {
@@ -129,6 +131,7 @@ class TimeSelection extends Config {
   }
 
   dispose(): void {
+    EventHandler.off(this._element, EVENT_FOCUSIN)
     EventHandler.off(this._element, EVENT_KEYDOWN)
     this._element!.innerHTML = ''
     this._element = null
@@ -155,7 +158,13 @@ class TimeSelection extends Config {
       this._addRollKeyboardNavigation()
     }
 
+    EventHandler.off(this._element, EVENT_FOCUSIN)
+    EventHandler.on(this._element, EVENT_FOCUSIN, (event: any) => {
+      this._updateRovingTabIndex(event.target as HTMLElement)
+    })
+
     this._markSelected(true)
+    this._updateRovingTabIndex()
   }
 
   _parts(): { ariaLabel: string, name: string, options: any[] }[] {
@@ -189,13 +198,13 @@ class TimeSelection extends Config {
       column.setAttribute('role', 'listbox')
       column.setAttribute('aria-label', part.ariaLabel)
 
-      for (const [index, option] of part.options.entries()) {
+      for (const option of part.options) {
         const cell = document.createElement('div')
         cell.classList.add(CLASS_NAME_ROLL_CELL)
         cell.setAttribute('role', 'option')
         cell.setAttribute('aria-label', option.label.toString())
         cell.setAttribute('aria-selected', 'false')
-        cell.tabIndex = index === 0 ? 0 : -1
+        cell.tabIndex = -1
         cell.textContent = option.label
         Manipulator.setDataAttribute(cell, part.name, (option as HTMLSelectElement).value)
 
@@ -258,6 +267,36 @@ class TimeSelection extends Config {
     })
   }
 
+  _entryCell(column: HTMLElement): HTMLElement | null {
+    return SelectorEngine.findOne(SELECTOR_ROLL_CELL_SELECTED, column) ??
+      SelectorEngine.findOne(SELECTOR_ROLL_CELL, column)
+  }
+
+  // The body is one composite whichever way it renders: Tab reaches it once and
+  // the arrows move between the parts, the same contract the section field keeps.
+  _stops(): HTMLElement[] {
+    const cells = SelectorEngine.find(SELECTOR_ROLL_CELL, this._element as HTMLElement)
+    return cells.length > 0 ?
+      cells :
+      SelectorEngine.find(SELECTOR_INLINE_SELECT, this._element as HTMLElement)
+  }
+
+  _updateRovingTabIndex(preferred?: HTMLElement): void {
+    const list = this._stops()
+
+    if (list.length === 0) {
+      return
+    }
+
+    const active = (preferred && list.includes(preferred) ? preferred : null) ??
+      list.find(element => element.classList.contains(CLASS_NAME_SELECTED)) ??
+      list[0]
+
+    for (const element of list) {
+      element.tabIndex = element === active ? 0 : -1
+    }
+  }
+
   _moveFocusToColumn(cell: HTMLElement, offset: number): void {
     const columns = SelectorEngine.find(SELECTOR_ROLL_COL, this._element as HTMLElement)
     const index = columns.indexOf(cell.parentElement as HTMLElement) + offset
@@ -266,7 +305,7 @@ class TimeSelection extends Config {
       return
     }
 
-    SelectorEngine.findOne(SELECTOR_ROLL_CELL_FOCUSABLE, columns[index])?.focus()
+    this._entryCell(columns[index])?.focus()
   }
 
   _renderSelects(): void {
@@ -287,6 +326,23 @@ class TimeSelection extends Config {
       select.classList.add(CLASS_NAME_INLINE_SELECT, part.name)
       select.setAttribute('aria-label', part.ariaLabel)
       select.addEventListener('change', event => this._change(part.name, (event.target as HTMLSelectElement).value))
+      select.addEventListener('keydown', event => {
+        if (event.key !== ARROW_LEFT_KEY && event.key !== ARROW_RIGHT_KEY) {
+          return
+        }
+
+        event.preventDefault()
+        const rtl = isRTL(select)
+        const goLeft = (event.key === ARROW_LEFT_KEY && !rtl) || (event.key === ARROW_RIGHT_KEY && rtl)
+        const list = SelectorEngine.find(SELECTOR_INLINE_SELECT, this._element as HTMLElement)
+        const index = list.indexOf(select) + (goLeft ? -1 : 1)
+
+        if (index < 0 || index > list.length - 1) {
+          return
+        }
+
+        list[index].focus()
+      })
 
       for (const option of part.options) {
         const optionEl = document.createElement('option')
@@ -368,13 +424,16 @@ class TimeSelection extends Config {
         const isSelected = String(Manipulator.getDataAttribute(cell, part)) === String(value)
         cell.classList.toggle(CLASS_NAME_SELECTED, isSelected)
         cell.setAttribute('aria-selected', isSelected ? 'true' : 'false')
-        cell.tabIndex = isSelected ? 0 : -1
 
         if (isSelected && cell.parentElement) {
           this._scrollToSelected(cell.parentElement, cell, instant)
         }
       }
     }
+
+    this._updateRovingTabIndex(
+      SelectorEngine.findOne(':focus', this._element as ParentNode) as HTMLElement
+    )
   }
 }
 

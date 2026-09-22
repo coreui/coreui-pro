@@ -121,6 +121,36 @@ describe('TimePicker', () => {
       expect(popup.querySelectorAll('.time-picker-roll-col').length).toBeGreaterThan(0)
     })
 
+    it('should keep the roll to a single tab stop and move between columns with the arrows', () => {
+      const picker = buildPicker()
+      picker.show()
+
+      const body = fixtureEl.querySelector('.time-picker-body')
+      expect(body.querySelectorAll('.time-picker-roll-cell').length).toBeGreaterThan(4)
+      expect(body.querySelectorAll('[tabindex="0"]').length).toEqual(1)
+
+      const first = body.querySelector('.time-picker-roll-col .time-picker-roll-cell')
+      first.focus()
+      first.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }))
+
+      const columns = [...body.querySelectorAll('.time-picker-roll-col')]
+      expect(columns.indexOf(document.activeElement.closest('.time-picker-roll-col'))).toEqual(1)
+      expect(body.querySelectorAll('[tabindex="0"]').length).toEqual(1)
+    })
+
+    it('should stop at the last column', () => {
+      const picker = buildPicker()
+      picker.show()
+
+      const body = fixtureEl.querySelector('.time-picker-body')
+      const columns = [...body.querySelectorAll('.time-picker-roll-col')]
+      const last = columns[columns.length - 1].querySelector('.time-picker-roll-cell')
+      last.focus()
+      last.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }))
+
+      expect(document.activeElement.closest('.time-picker-roll-col')).toEqual(columns[columns.length - 1])
+    })
+
     it('should drop the seconds column when seconds are disabled', () => {
       const picker = buildPicker({ seconds: false })
       picker.show()

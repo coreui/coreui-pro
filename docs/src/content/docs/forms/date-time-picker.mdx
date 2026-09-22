@@ -120,6 +120,8 @@ The date time picker supports [floating labels](/forms/floating-labels/): set `f
 
 The field and the popup answer to the [same keys as the date picker](/forms/date-picker/#keyboard-support): <kbd>Alt</kbd> (<kbd>Option</kbd> on macOS) + <kbd>Arrow Down</kbd> or <kbd>F4</kbd> opens the panel, <kbd>Escape</kbd> closes it and returns focus, and arrows, <kbd>Home</kbd> / <kbd>End</kbd>, and <kbd>Page Down</kbd> / <kbd>Page Up</kbd> (with <kbd>Shift</kbd> for years) move the focused date.
 
+The two halves of the panel are each one tab stop, so <kbd>Tab</kbd> takes three presses to cross it: the navigation, the calendar, the time. Inside the time half, <kbd>Arrow Left</kbd> and <kbd>Arrow Right</kbd> move between the hour, minute, second and AM/PM parts, the same way they move between the sections of the field.
+
 The toggle button carries the panel's state — `aria-haspopup="dialog"`, `aria-controls` pointing at the popup while it is open, and `aria-expanded` tracking whether it is open — so a screen reader announces what the button does and whether the panel is showing. The panel itself is a `dialog` with `aria-modal`, so focus moves into it on open, stays there while it is open, and returns to the field when it closes.
 
 ## Usage

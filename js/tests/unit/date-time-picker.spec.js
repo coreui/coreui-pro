@@ -67,6 +67,26 @@ describe('DateTimePicker', () => {
       expect(popup.querySelector('.time-picker-roll-col')).toBeNull()
     })
 
+    it('should keep the time selects to a single tab stop and move between them with the arrows', () => {
+      const picker = buildPicker()
+      picker.show()
+
+      const body = fixtureEl.querySelector('.date-picker-popup .time-picker-body')
+      const selects = [...body.querySelectorAll('select.time-picker-inline-select')]
+      expect(selects.length).toBeGreaterThan(1)
+      expect(body.querySelectorAll('[tabindex="0"]').length).toEqual(1)
+
+      selects[0].focus()
+      selects[0].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }))
+      expect(document.activeElement).toEqual(selects[1])
+      expect(body.querySelectorAll('[tabindex="0"]').length).toEqual(1)
+
+      const last = selects[selects.length - 1]
+      last.focus()
+      last.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }))
+      expect(document.activeElement).toEqual(last)
+    })
+
     it('should initialize the field with the configured date and time', () => {
       const picker = buildPicker({ date: new Date(2026, 5, 15, 14, 30) })
 

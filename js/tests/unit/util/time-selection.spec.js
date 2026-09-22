@@ -179,10 +179,12 @@ describe('TimeSelection', () => {
       )
     })
 
-    it('should make the selected cell the tabbable one', () => {
+    it('should keep one tab stop for the whole body, on the first selected cell', () => {
       build({ time: new Date(2026, 0, 1, 2, 30, 0) })
 
-      expect(fixtureEl.querySelector('[data-coreui-minutes="30"]').tabIndex).toBe(0)
+      expect(fixtureEl.querySelectorAll('.time-picker-roll-cell[tabindex="0"]').length).toBe(1)
+      expect(fixtureEl.querySelector('[data-coreui-hours="2"]').tabIndex).toBe(0)
+      expect(fixtureEl.querySelector('[data-coreui-minutes="30"]').tabIndex).toBe(-1)
       expect(fixtureEl.querySelector('[data-coreui-minutes="31"]').tabIndex).toBe(-1)
     })
 
