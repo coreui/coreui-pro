@@ -25,6 +25,7 @@ $date-picker-time-tokens: () !default;
 $date-picker-time-tokens: defaults(
   (
     --#{$prefix}time-picker-body-padding: var(--#{$prefix}spacer-2),
+    --#{$prefix}time-picker-inline-icon-width: 2.5rem,
     --#{$prefix}time-picker-inline-icon-size: 1rem,
     --#{$prefix}time-picker-inline-icon-color: var(--#{$prefix}fg-3),
     --#{$prefix}time-picker-inline-select-font-size: var(--#{$prefix}btn-input-sm-font-size),
@@ -70,7 +71,10 @@ $date-picker-time-tokens: defaults(
 
     .time-picker-inline-icon {
       display: flex;
+      flex: 0 0 auto;
       align-items: center;
+      justify-content: center;
+      width: var(--#{$prefix}time-picker-inline-icon-width);
       color: var(--#{$prefix}time-picker-inline-icon-color);
 
       > svg {
