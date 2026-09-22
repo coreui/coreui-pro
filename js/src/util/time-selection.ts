@@ -17,6 +17,7 @@ import {
   getSelectedSeconds,
   isAmPm
 } from './time.js'
+import { CLOCK_ICON } from './icons.js'
 import { execute, getNextActiveElement, isRTL } from './index.js'
 
 /**
@@ -25,6 +26,7 @@ import { execute, getNextActiveElement, isRTL } from './index.js'
 
 const NAME = 'time-selection'
 
+const CLASS_NAME_INLINE_ICON = 'time-picker-inline-icon'
 const CLASS_NAME_INLINE_SELECT = 'time-picker-inline-select'
 const CLASS_NAME_ROLL = 'time-picker-roll'
 const CLASS_NAME_ROLL_CELL = 'time-picker-roll-cell'
@@ -268,6 +270,12 @@ class TimeSelection extends Config {
   }
 
   _renderSelects(): void {
+    const icon = document.createElement('span')
+    icon.classList.add(CLASS_NAME_INLINE_ICON)
+    icon.setAttribute('aria-hidden', 'true')
+    icon.innerHTML = CLOCK_ICON
+    this._element!.append(icon)
+
     for (const [index, part] of this._parts().entries()) {
       if (index > 0 && part.name !== 'meridiem') {
         const separator = document.createElement('span')

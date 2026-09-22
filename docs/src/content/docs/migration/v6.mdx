@@ -1360,6 +1360,12 @@ validation and the arrow between them. Two consequences:
   [time picker](/forms/time-picker/) and the new
   [date time picker](/forms/date-time-picker/), which replaces v1's
   `timepicker: true` flag on the date picker.
+- **The time row sits under the calendars again, with its clock icon.** v6.0.0-alpha
+  put it beside them in a column of its own; `.date-picker-body` is a grid with
+  the v5 areas once more, so `.date-picker-timepickers` spans the calendars it
+  belongs to. `.time-picker-inline-icon` survives the v1 shell cleanup below
+  because of this, now rendered as an inline SVG that takes its colour from
+  `--cui-time-picker-inline-icon-color`.
 - **Each picker has one time rendering, and the `variant` option is gone.** The
   time picker shows the roll; the date time picker shows the selects, which is
   what v5 rendered inside a date picker with time. The shared primitive still
@@ -1385,8 +1391,8 @@ The rewritten pickers style the field through
 `forms/_form-date-time.scss` and render their icons as inline SVG, so the v1
 shell's own elements no longer exist: `.date-picker-input`,
 `.date-picker-input-wrapper`, `.date-picker-input-preview`,
-`.date-picker-cleaner`, `.time-picker-input`, `.time-picker-cleaner` and
-`.time-picker-inline-icon`. Custom CSS targeting those needs rewriting against
+`.date-picker-cleaner`, `.time-picker-input` and `.time-picker-cleaner`.
+Custom CSS targeting those needs rewriting against
 the new structure; everything else (`.date-picker`, `.date-picker-popup`,
 `.date-picker-body`, `.date-picker-footer`, the `-sm`/`-lg` size modifiers, the
 `.time-picker-roll*` bodies) keeps its name.

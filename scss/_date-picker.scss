@@ -25,6 +25,8 @@ $date-picker-time-tokens: () !default;
 $date-picker-time-tokens: defaults(
   (
     --#{$prefix}time-picker-body-padding: var(--#{$prefix}spacer-2),
+    --#{$prefix}time-picker-inline-icon-size: 1rem,
+    --#{$prefix}time-picker-inline-icon-color: var(--#{$prefix}fg-3),
     --#{$prefix}time-picker-inline-select-font-size: var(--#{$prefix}btn-input-sm-font-size),
     --#{$prefix}time-picker-inline-select-color: var(--#{$prefix}btn-input-fg),
     --#{$prefix}time-picker-inline-select-padding-y: var(--#{$prefix}btn-input-sm-padding-y),
@@ -54,7 +56,9 @@ $date-picker-time-tokens: defaults(
 
     .date-picker-timepickers {
       display: flex;
-      border-inline-start: var(--#{$prefix}date-picker-footer-border-width) solid var(--#{$prefix}date-picker-footer-border-color);
+      grid-area: timepickers;
+      justify-content: space-between;
+      border-block-start: var(--#{$prefix}date-picker-footer-border-width) solid var(--#{$prefix}date-picker-footer-border-color);
     }
 
     .time-picker-body {
@@ -62,6 +66,17 @@ $date-picker-time-tokens: defaults(
       display: flex;
       align-items: center;
       padding: var(--#{$prefix}time-picker-body-padding);
+    }
+
+    .time-picker-inline-icon {
+      display: flex;
+      align-items: center;
+      color: var(--#{$prefix}time-picker-inline-icon-color);
+
+      > svg {
+        width: var(--#{$prefix}time-picker-inline-icon-size);
+        height: var(--#{$prefix}time-picker-inline-icon-size);
+      }
     }
 
     .time-picker-inline-select {
@@ -91,12 +106,17 @@ $date-picker-time-tokens: defaults(
   }
 
   .date-picker-body {
-    display: flex;
+    display: grid;
+    grid-template-areas:
+      "ranges calendars"
+      "ranges timepickers";
+    grid-template-columns: auto auto;
   }
 
   .date-picker-ranges {
     display: flex;
     flex-direction: column;
+    grid-area: ranges;
     gap: .25rem;
     align-items: flex-start;
     padding: var(--#{$prefix}date-picker-footer-padding);
@@ -105,6 +125,7 @@ $date-picker-time-tokens: defaults(
 
   .date-picker-calendars {
     display: flex;
+    grid-area: calendars;
 
     .date-picker-calendar:not(:last-child) .calendar-navigation-next {
       visibility: hidden;
