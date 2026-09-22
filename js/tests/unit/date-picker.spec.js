@@ -27,6 +27,12 @@ describe('DatePicker', () => {
     return picker
   }
 
+  const pickMinutes = (value, scope = fixtureEl) => {
+    const select = scope.querySelector('select.time-picker-inline-select.minutes')
+    select.value = String(value)
+    select.dispatchEvent(new Event('change'))
+  }
+
   // The native <input type="date"> entry contract: opening puts focus on the
   // selected date; without one, on today; and when a max date has pushed both
   // out of reach, on the last date still selectable.
@@ -1093,6 +1099,104 @@ describe('DatePicker', () => {
       expect(el.querySelectorAll('.form-date-time')).toHaveLength(1)
       expect(el.querySelectorAll('.form-control-cleaner')).toHaveLength(1)
       expect(el.querySelectorAll('.form-control-action')).toHaveLength(1)
+    })
+  })
+
+  describe('timepicker', () => {
+    it('should compose a date-time field with a calendar and a time body', () => {
+      const picker = buildPicker({ timepicker: true })
+      const el = fixtureEl.querySelector('#picker')
+
+      expect(el.classList.contains('date-picker')).toBeTrue()
+
+      // both bodies are built on first open
+      expect(picker._calendar).toBeNull()
+      expect(picker._selection).toBeNull()
+
+      picker.show()
+
+      const popup = fixtureEl.querySelector('.date-picker-popup')
+      expect(popup.querySelector('.date-picker-calendar')).not.toBeNull()
+      expect(popup.querySelector('.date-picker-timepickers .time-picker-body')).not.toBeNull()
+      expect(popup.querySelector('.calendar')).not.toBeNull()
+      expect(popup.querySelectorAll('select.time-picker-inline-select').length).toBeGreaterThan(0)
+      expect(popup.querySelector('.time-picker-roll-col')).toBeNull()
+    })
+
+    it('should keep the time selects to a single tab stop and move between them with the arrows', () => {
+      const picker = buildPicker({ timepicker: true })
+      picker.show()
+
+      const body = fixtureEl.querySelector('.date-picker-popup .time-picker-body')
+      const selects = [...body.querySelectorAll('select.time-picker-inline-select')]
+      expect(selects.length).toBeGreaterThan(1)
+      expect(body.querySelectorAll('[tabindex="0"]').length).toEqual(1)
+
+      selects[0].focus()
+      selects[0].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }))
+      expect(document.activeElement).toEqual(selects[1])
+      expect(body.querySelectorAll('[tabindex="0"]').length).toEqual(1)
+
+      const last = selects[selects.length - 1]
+      last.focus()
+      last.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }))
+      expect(document.activeElement).toEqual(last)
+    })
+
+    it('should keep the time when a calendar day is selected', () => {
+      const picker = buildPicker({ timepicker: true, date: new Date(2026, 5, 15, 14, 30, 0) })
+
+      picker.show()
+      fixtureEl.querySelectorAll('.date-picker-popup .calendar-cell[tabindex="0"]')[0].click()
+
+      const value = picker.getDate()
+      expect(value.getHours()).toEqual(14)
+      expect(value.getMinutes()).toEqual(30)
+    })
+
+    it('should keep the date when a time cell is selected', () => {
+      const picker = buildPicker({ timepicker: true, date: new Date(2026, 5, 15, 10, 0, 0) })
+
+      picker.show()
+      pickMinutes(45)
+
+      const value = picker.getDate()
+      expect(value.getFullYear()).toEqual(2026)
+      expect(value.getMonth()).toEqual(5)
+      expect(value.getDate()).toEqual(15)
+      expect(value.getMinutes()).toEqual(45)
+    })
+
+    it('should emit dateChange from both halves', () => {
+      const picker = buildPicker({ timepicker: true, date: new Date(2026, 5, 15, 10, 0, 0) })
+      const el = fixtureEl.querySelector('#picker')
+      const emitted = []
+      el.addEventListener('dateChange.coreui.date-picker', event => emitted.push(event.date))
+
+      picker.show()
+      const popup = fixtureEl.querySelector('.date-picker-popup')
+      popup.querySelectorAll('.calendar-cell[tabindex="0"]')[0].click()
+      pickMinutes(15, popup)
+
+      expect(emitted.length).toBeGreaterThanOrEqual(2)
+    })
+
+    it('should not auto-close — a date-time value needs both halves', () => {
+      const picker = buildPicker({ timepicker: true })
+
+      picker.show()
+      fixtureEl.querySelectorAll('.calendar-cell[tabindex="0"]')[0].click()
+
+      expect(picker._popup.isShown).toBeTrue()
+    })
+
+    it('should keep the value when the time half reports without a date set', () => {
+      const picker = buildPicker({ timepicker: true })
+
+      picker.show()
+      pickMinutes(10)
+
+      expect(picker.getDate().getMinutes()).toEqual(10)
     })
   })
 })

@@ -5,7 +5,6 @@ import Carousel from '../../src/carousel.js'
 import Collapse from '../../src/collapse.js'
 import DatePicker from '../../src/date-picker.js'
 import DateRangePicker from '../../src/date-range-picker.js'
-import DateTimePicker from '../../src/date-time-picker.js'
 import Dropdown from '../../src/dropdown.js'
 import Modal from '../../src/modal.js'
 import Offcanvas from '../../src/offcanvas.js'
@@ -35,7 +34,6 @@ describe('jQuery', () => {
     expect(Collapse.jQueryInterface).toEqual(jQuery.fn.collapse)
     expect(DatePicker.jQueryInterface).toEqual(jQuery.fn['date-picker'])
     expect(DateRangePicker.jQueryInterface).toEqual(jQuery.fn['date-range-picker'])
-    expect(DateTimePicker.jQueryInterface).toEqual(jQuery.fn['date-time-picker'])
     expect(Dropdown.jQueryInterface).toEqual(jQuery.fn.dropdown)
     expect(Modal.jQueryInterface).toEqual(jQuery.fn.modal)
     expect(Offcanvas.jQueryInterface).toEqual(jQuery.fn.offcanvas)

@@ -85,7 +85,7 @@ const DefaultType = {
  * The popup body of the time pickers — the counterpart of Calendar for the time
  * half. Owns the roll/select rendering and the hour/minute/second/meridiem
  * arithmetic; reports a Date through `onChange` and holds no popup, field, or
- * event-name concerns. Shared by TimePicker and DateTimePicker.
+ * event-name concerns. Shared by the time picker and the date picker's time half.
  */
 
 class TimeSelection extends Config {

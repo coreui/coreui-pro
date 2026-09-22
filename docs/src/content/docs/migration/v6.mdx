@@ -238,7 +238,6 @@ masked date and time fields already used. Renamed:
 | `data-coreui-toggle="calendar"` | `data-coreui-calendar` |
 | `data-coreui-toggle="date-picker"` | `data-coreui-date-picker` |
 | `data-coreui-toggle="date-range-picker"` | `data-coreui-date-range-picker` |
-| `data-coreui-toggle="date-time-picker"` | `data-coreui-date-time-picker` |
 | `data-coreui-toggle="list-box"` | `data-coreui-list-box` |
 | `data-coreui-toggle="number-input"` | `data-coreui-number-input` |
 | `data-coreui-toggle="otp"` | `data-coreui-otp` |
@@ -1220,11 +1219,12 @@ behaviour, v5 is the reference. Mapping:
   always a valid partial date; there is no free-text parsing to debounce.
   Section placeholders come from the section fields' own per-section options —
   `dayPlaceholder`, `monthPlaceholder`, `yearPlaceholder` and the rest.
-- **Changed.** `timepicker: true` is replaced by the standalone
-  [date time picker](/forms/date-time-picker/) — a date input in datetime mode with a
-  calendar and the time selection body side by side. Because the two halves own
-  different parts of one value, that picker does not auto-close: picking a day
-  keeps the time and picking a time keeps the day.
+- **Kept.** `timepicker: true` still adds the time half to the date picker, now
+  as a row of time selects under the calendar rather than a second panel beside
+  it. Because the two halves own different parts of one value, a picker with
+  time does not auto-close: picking a day keeps the time and picking a time
+  keeps the day. `seconds` narrows what the time half offers and
+  `selectionOptions` is its escape hatch.
 - **Kept.** Calendar passthrough (`locale`, `minDate`/`maxDate`,
   `disabledDates`, `selectionType`, `showWeekNumber`, custom cell renderers, …),
   `container`, `startDate`/`endDate`/`date`, `startName`/`endName`/`name`,
@@ -1345,7 +1345,7 @@ validation and the arrow between them. Two consequences:
   instead of `document.documentElement.dir`, so a `dir="rtl"` ancestor works
   and not only a document-level direction.
 
-#### Time Picker / Date Time Picker (new)
+#### Time Picker
 
 - **`seconds` governs the field as well as the panel, and both are on by
   default, as they were in v5.** v5 formatted its value with seconds, so
@@ -1357,9 +1357,8 @@ validation and the arrow between them. Two consequences:
 - The time selection body is now a shared primitive used by both pickers, so the
   `hours`/`minutes`/`seconds` filters and the 12/24-hour locale split behave
   identically in each. See
-  [time picker](/forms/time-picker/) and the new
-  [date time picker](/forms/date-time-picker/), which replaces v1's
-  `timepicker: true` flag on the date picker.
+  [time picker](/forms/time-picker/) and the date picker's own
+  [time half](/forms/date-picker/#with-time).
 - **The time row sits under the calendars again, with its clock icon.** v6.0.0-alpha
   put it beside them in a column of its own; `.date-picker-body` is a grid with
   the v5 areas once more, so `.date-picker-timepickers` spans the calendars it

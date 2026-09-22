@@ -18,6 +18,7 @@ import Calendar from './calendar.js'
 import DateInput from './date-input.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
+import TimeSelection from './util/time-selection.js'
 import { getDateBySelectionType, isSameDateAs } from './util/calendar.js'
 import type { ComponentConfig } from './util/config.js'
 import { getWeekSectionsFromLocale } from './util/date-sections.js'
@@ -56,6 +57,8 @@ const CLASS_NAME_INDICATOR = 'form-control-action'
 const CLASS_NAME_INPUT_GROUP = 'form-control-group'
 const CLASS_NAME_PICKER = 'picker'
 const CLASS_NAME_POPUP = 'popup'
+const CLASS_NAME_TIME_BODY = 'time-picker-body'
+const CLASS_NAME_TIME_PICKERS = 'date-picker-timepickers'
 
 const SELECTOR_DATA_DATE_PICKER = '[data-coreui-date-picker]'
 const SELECTOR_ROLE_CLEANER = '[data-coreui-picker-cleaner]'
@@ -85,7 +88,10 @@ type DatePickerConfig = {
   pickerIcon: string | boolean,
   sanitize: boolean,
   sanitizeFn: ((unsafeHtml: string) => string) | null,
-  size: string | null
+  seconds: boolean | number[] | ((second: number) => boolean),
+  selectionOptions: Record<string, any>,
+  size: string | null,
+  timepicker: boolean
 }
 
 const Default: DatePickerConfig = {
@@ -107,7 +113,10 @@ const Default: DatePickerConfig = {
   pickerIcon: true,
   sanitize: true,
   sanitizeFn: null,
-  size: null
+  seconds: true,
+  selectionOptions: {},
+  size: null,
+  timepicker: false
 }
 
 const DefaultType: Record<string, string> = {
@@ -129,7 +138,10 @@ const DefaultType: Record<string, string> = {
   pickerIcon: '(string|boolean)',
   sanitize: 'boolean',
   sanitizeFn: '(function|null)',
-  size: '(string|null)'
+  seconds: '(array|boolean|function)',
+  selectionOptions: 'object',
+  size: '(string|null)',
+  timepicker: 'boolean'
 }
 
 /**
@@ -143,6 +155,8 @@ class DatePicker extends PickerBase {
   protected declare _input: any
   protected declare _calendar: any
   protected declare _calendarElement: any
+  protected declare _selection: any
+  protected declare _selectionElement: any
   protected declare _applying: boolean
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
@@ -154,6 +168,8 @@ class DatePicker extends PickerBase {
     this._calendar = null
     this._applying = false
     this._calendarElement = null
+    this._selection = null
+    this._selectionElement = null
 
     this._hostClasses = captureHostClasses(this._element, this._managedClassNames())
     this._createDatePicker()
@@ -212,6 +228,7 @@ class DatePicker extends PickerBase {
   override _disposeParts(): void {
     this._input.dispose()
     this._calendar?.dispose()
+    this._selection?.dispose()
 
     if (this._created.field) {
       this._fieldElement.remove()
@@ -269,6 +286,11 @@ class DatePicker extends PickerBase {
     this._created.field = !ownField
     this._fieldElement = ownField ?? appendControlGroupField(inputGroup, inputEl, this._config.floatingLabel, `${this.constructor.NAME}-`)
 
+    // The default wording names the time half when it is there; a label the page
+    // set survives either way.
+    const withTime = (value: string, key: 'ariaCleanerLabel' | 'ariaPickerLabel', timed: string) =>
+      this._config.timepicker && value === Default[key] ? timed : value
+
     const action = (className: string, icon: string, label: string) => createControlGroupAction({
       className, disabled: this._config.disabled, icon, label, sanitizeIcon: (value: string) => sanitizeByConfig(value, this._config)
     })
@@ -278,7 +300,7 @@ class DatePicker extends PickerBase {
     if (ownCleaner) {
       this._cleanerElement = this._adoptAction(ownCleaner, this._config.ariaCleanerLabel)
     } else if (this._config.cleaner) {
-      this._cleanerElement = action(CLASS_NAME_CLEANER, this._config.cleanerIcon, this._config.ariaCleanerLabel)
+      this._cleanerElement = action(CLASS_NAME_CLEANER, this._config.cleanerIcon, withTime(this._config.ariaCleanerLabel, 'ariaCleanerLabel', 'Clear date and time'))
       this._created.cleaner = true
       inputGroup.append(this._cleanerElement)
     }
@@ -290,7 +312,7 @@ class DatePicker extends PickerBase {
     if (ownToggle) {
       this._toggleElement = this._adoptAction(ownToggle, this._config.ariaPickerLabel)
     } else if (this._config.pickerIcon) {
-      this._toggleElement = action(CLASS_NAME_INDICATOR, this._config.pickerIcon === true ? CALENDAR_ICON : this._config.pickerIcon, this._config.ariaPickerLabel)
+      this._toggleElement = action(CLASS_NAME_INDICATOR, this._config.pickerIcon === true ? CALENDAR_ICON : this._config.pickerIcon, withTime(this._config.ariaPickerLabel, 'ariaPickerLabel', 'Toggle calendar and time selection'))
       this._created.toggle = true
       inputGroup.append(this._toggleElement)
     }
@@ -300,6 +322,9 @@ class DatePicker extends PickerBase {
       disabled: this._config.disabled,
       locale: this._config.locale,
       name: this._config.name,
+      ...(this._config.timepicker ?
+        { seconds: Boolean(this._config.seconds), type: 'datetime' } :
+        {}),
       ...(this._resolveFormat() ? { format: this._resolveFormat() } : {})
     }, { ...(this._config.floatingLabel ? { ariaLabel: this._config.floatingLabel } : {}), ...this._config.inputOptions }))
 
@@ -323,6 +348,16 @@ class DatePicker extends PickerBase {
     this._calendarElement.classList.add(CLASS_NAME_CALENDAR)
     calendars.append(this._calendarElement)
     body.append(calendars)
+
+    if (this._config.timepicker) {
+      const timePickers = document.createElement('div')
+      timePickers.classList.add(CLASS_NAME_TIME_PICKERS)
+      this._selectionElement = document.createElement('div')
+      this._selectionElement.classList.add(CLASS_NAME_TIME_BODY)
+      timePickers.append(this._selectionElement)
+      body.append(timePickers)
+    }
+
     this._menu.append(body)
 
     if (this._footerTemplate) {
@@ -355,9 +390,49 @@ class DatePicker extends PickerBase {
     }, this._config.calendarOptions))
 
     EventHandler.on(this._calendar._element, 'startDateChange.coreui.calendar', event => {
-      this._applyDate(event.dateObject, { calendar: false })
-      this.hide()
+      this._applyDate(this._withCurrentTime(event.dateObject), { calendar: false })
+
+      // With a time half the two parts own different pieces of one value, so
+      // picking a day is not the end of the interaction.
+      if (!this._config.timepicker) {
+        this.hide()
+      }
     })
+
+    if (!this._config.timepicker) {
+      return
+    }
+
+    this._selection = new TimeSelection(this._selectionElement, this._forwardConfig(TimeSelection, {
+      locale: this._config.locale,
+      onChange: (time: Date | null) => this._applyTime(time),
+      time: this.getDate(),
+      variant: 'select'
+    }, this._config.selectionOptions))
+  }
+
+  // A calendar cell carries midnight, so a day picked while the time half is
+  // there has to take the time already chosen with it.
+  _withCurrentTime(date: Date | null): Date | null {
+    if (!date || !this._config.timepicker || !this._date) {
+      return date
+    }
+
+    const merged = new Date(date)
+    merged.setHours(this._date.getHours(), this._date.getMinutes(), this._date.getSeconds())
+    return merged
+  }
+
+  _applyTime(time: Date | null): void {
+    if (!time) {
+      return
+    }
+
+    const current = this.getDate()
+    const merged = current ? new Date(current) : new Date()
+    merged.setHours(time.getHours(), time.getMinutes(), time.getSeconds())
+
+    this._applyDate(merged)
   }
 
   // The one place the date changes. The field validates it, so what the
@@ -378,12 +453,18 @@ class DatePicker extends PickerBase {
     const applied = field ? this._input.getDate() : date
     this._applying = false
 
-    const changed = !isSameDateAs(applied, this._date)
+    // isSameDateAs only looks at the day, so with a time half a changed minute
+    // would read as no change at all.
+    const changed = this._config.timepicker ?
+      (applied ? applied.getTime() : null) !== (this._date ? this._date.getTime() : null) :
+      !isSameDateAs(applied, this._date)
     this._date = applied
 
     if (calendar) {
       this._calendar?.setConfig({ startDate: applied })
     }
+
+    this._selection?.setConfig({ time: applied })
 
     if (changed) {
       EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date: applied, formattedDate: getDateBySelectionType(applied, this._config.selectionType) })

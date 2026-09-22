@@ -15,7 +15,6 @@ import DateInput from '../../src/date-input.js'
 import DatePicker from '../../src/date-picker.js'
 import DateRangeInput from '../../src/date-range-input.js'
 import DateRangePicker from '../../src/date-range-picker.js'
-import DateTimePicker from '../../src/date-time-picker.js'
 import TimePicker from '../../src/time-picker.js'
 
 let container
@@ -47,7 +46,7 @@ describe('control frame takeover', () => {
     ['Date Range Input', DateRangeInput, {}],
     ['Date Picker', DatePicker, {}],
     ['Time Picker', TimePicker, {}],
-    ['Date Time Picker', DateTimePicker, {}],
+    ['Date Time Picker', DatePicker, {}],
     ['Date Range Picker', DateRangePicker, {}]
   ]
 

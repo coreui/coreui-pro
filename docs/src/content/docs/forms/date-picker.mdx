@@ -148,6 +148,22 @@ to the year automatically.
     </div>
   </div>`} />
 
+## With time
+
+Set `timepicker` to add the time half. The field switches to a date and time
+mask, the panel grows a row of time selects under the calendar, and picking a
+day no longer closes the panel — the two halves own different parts of one
+value, so the interaction is not over until the user says so.
+
+<Example pro code={`<div class="row">
+    <div class="col-lg-5">
+      <div data-coreui-locale="en-US" data-coreui-timepicker="true" data-coreui-date-picker></div>
+    </div>
+  </div>`} />
+
+`seconds` narrows what the time half offers, and is ignored without
+`timepicker`.
+
 ## With form field
 
 Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label and description, and to get validation feedback in the right place.
@@ -413,7 +429,10 @@ attributes work on the picker element too.
 | `pickerIcon` | string, boolean | `true` | The button that opens the calendar: `true` for the built-in icon, an inline SVG string for your own (sanitized), `false` for no button. Not used for a `data-coreui-picker-toggle` you wrote. Without either the popup has no pointer opener and nothing reports the expanded state, though the field keeps the keyboard openers below. |
 | `sanitize` | boolean | `true` | Sanitize the icon markup. |
 | `sanitizeFn` | function, null | `null` | Custom sanitizer. |
+| `seconds` | array, boolean, function | `true` | Seconds offered by the time half. Ignored without `timepicker`. |
+| `selectionOptions` | object | `{}` | Programmatic escape hatch for the time half. |
 | `size` | string, null | `null` | `'sm'` or `'lg'`. |
+| `timepicker` | boolean | `false` | Add a time half to the panel and switch the field to a date and time mask. |
 
 ### Methods
 

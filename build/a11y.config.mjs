@@ -237,30 +237,6 @@ export const a11yComponents = [
     ]
   },
   {
-    component: 'forms/date-time-picker',
-    interactions: [
-      { click: '.picker .form-control-action' },
-      { wait: 200 }
-    ],
-    criteria: [
-      {
-        criterion: '4.1.2',
-        status: 'built-in',
-        note: 'The toggle owns the popup state — aria-haspopup=dialog and aria-expanded, plus aria-controls while the panel is open — instead of the surrounding div, which has no role to support it.'
-      },
-      {
-        criterion: '1.3.1',
-        status: 'built-in',
-        note: 'The open panel holds a calendar grid next to the time selection lists.'
-      },
-      {
-        criterion: '2.1.1',
-        status: 'partial',
-        note: 'Alt+ArrowDown opens the panel, Esc closes it, and Tab moves between the calendar and the time lists; verify manually for full conformance.'
-      }
-    ]
-  },
-  {
     component: 'forms/time-picker',
     interactions: [
       { click: '.picker .form-control-action' },
