@@ -26,16 +26,16 @@ $date-picker-time-tokens: () !default;
 // scss-docs-start date-picker-time-tokens
 $date-picker-time-tokens: defaults(
   (
-    --#{$prefix}time-picker-body-padding: var(--#{$prefix}spacer-2),
-    --#{$prefix}time-picker-inline-icon-width: 2.5rem,
-    --#{$prefix}time-picker-inline-icon-size: 1rem,
-    --#{$prefix}time-picker-inline-icon-color: var(--#{$prefix}fg-3),
-    --#{$prefix}time-picker-inline-select-border-radius: var(--#{$prefix}radius-4),
-    --#{$prefix}time-picker-inline-select-font-size: var(--#{$prefix}btn-input-sm-font-size),
-    --#{$prefix}time-picker-inline-select-color: var(--#{$prefix}btn-input-fg),
-    --#{$prefix}time-picker-inline-select-padding-y: var(--#{$prefix}btn-input-sm-padding-y),
-    --#{$prefix}time-picker-inline-select-padding-x: var(--#{$prefix}btn-input-sm-padding-x),
-    --#{$prefix}time-picker-inline-select-disabled-color: var(--#{$prefix}fg-body),
+    --#{$prefix}date-picker-time-body-padding: var(--#{$prefix}spacer-2),
+    --#{$prefix}date-picker-time-icon-width: 2.5rem,
+    --#{$prefix}date-picker-time-icon-size: 1rem,
+    --#{$prefix}date-picker-time-icon-color: var(--#{$prefix}fg-3),
+    --#{$prefix}date-picker-time-select-border-radius: var(--#{$prefix}radius-4),
+    --#{$prefix}date-picker-time-select-font-size: var(--#{$prefix}btn-input-sm-font-size),
+    --#{$prefix}date-picker-time-select-color: var(--#{$prefix}btn-input-fg),
+    --#{$prefix}date-picker-time-select-padding-y: var(--#{$prefix}btn-input-sm-padding-y),
+    --#{$prefix}date-picker-time-select-padding-x: var(--#{$prefix}btn-input-sm-padding-x),
+    --#{$prefix}date-picker-time-select-disabled-color: var(--#{$prefix}fg-body),
   ),
   $date-picker-time-tokens
 );
@@ -69,27 +69,27 @@ $date-picker-time-tokens: defaults(
       @include tokens($date-picker-time-tokens);
       display: flex;
       align-items: center;
-      padding: var(--#{$prefix}time-picker-body-padding);
+      padding: var(--#{$prefix}date-picker-time-body-padding);
     }
 
-    .time-picker-inline-icon {
+    .date-picker-time-icon {
       display: flex;
       flex: 0 0 auto;
       align-items: center;
       justify-content: center;
-      width: var(--#{$prefix}time-picker-inline-icon-width);
-      color: var(--#{$prefix}time-picker-inline-icon-color);
+      width: var(--#{$prefix}date-picker-time-icon-width);
+      color: var(--#{$prefix}date-picker-time-icon-color);
 
       > svg {
-        width: var(--#{$prefix}time-picker-inline-icon-size);
-        height: var(--#{$prefix}time-picker-inline-icon-size);
+        width: var(--#{$prefix}date-picker-time-icon-size);
+        height: var(--#{$prefix}date-picker-time-icon-size);
       }
     }
 
-    .time-picker-inline-select {
-      padding: var(--#{$prefix}time-picker-inline-select-padding-y) var(--#{$prefix}time-picker-inline-select-padding-x);
-      font-size: var(--#{$prefix}time-picker-inline-select-font-size);
-      color: var(--#{$prefix}time-picker-inline-select-color);
+    .date-picker-time-select {
+      padding: var(--#{$prefix}date-picker-time-select-padding-y) var(--#{$prefix}date-picker-time-select-padding-x);
+      font-size: var(--#{$prefix}date-picker-time-select-font-size);
+      color: var(--#{$prefix}date-picker-time-select-color);
       text-align: end;
       appearance: none;
       scrollbar-width: none;
@@ -98,7 +98,7 @@ $date-picker-time-tokens: defaults(
 
       &:focus-visible {
         @include focus-ring(true);
-        @include border-radius(var(--#{$prefix}time-picker-inline-select-border-radius));
+        @include border-radius(var(--#{$prefix}date-picker-time-select-border-radius));
       }
 
       &::-webkit-scrollbar {
@@ -108,11 +108,11 @@ $date-picker-time-tokens: defaults(
       // Remove outline from select box in FF
       &:-moz-focusring {
         color: transparent;
-        text-shadow: 0 0 0 var(--#{$prefix}time-picker-inline-select-color);
+        text-shadow: 0 0 0 var(--#{$prefix}date-picker-time-select-color);
       }
 
       &:disabled {
-        color: var(--#{$prefix}time-picker-inline-select-disabled-color);
+        color: var(--#{$prefix}date-picker-time-select-disabled-color);
       }
     }
   }

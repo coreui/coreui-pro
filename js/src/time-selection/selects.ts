@@ -18,13 +18,13 @@ import TimeSelection from './base.js'
 
 const NAME = 'time-selects'
 
-const CLASS_NAME_INLINE_ICON = 'time-picker-inline-icon'
-const CLASS_NAME_INLINE_SELECT = 'time-picker-inline-select'
+const CLASS_NAME_TIME_ICON = 'date-picker-time-icon'
+const CLASS_NAME_TIME_SELECT = 'date-picker-time-select'
 
 const ARROW_LEFT_KEY = 'ArrowLeft'
 const ARROW_RIGHT_KEY = 'ArrowRight'
 
-const SELECTOR_INLINE_SELECT = `select.${CLASS_NAME_INLINE_SELECT}`
+const SELECTOR_TIME_SELECT = `select.${CLASS_NAME_TIME_SELECT}`
 
 /**
  * Class definition
@@ -40,7 +40,7 @@ class TimeSelects extends TimeSelection {
   }
 
   override _stops(): HTMLElement[] {
-    return SelectorEngine.find(SELECTOR_INLINE_SELECT, this._element as HTMLElement)
+    return SelectorEngine.find(SELECTOR_TIME_SELECT, this._element as HTMLElement)
   }
 
   override _markPart(part: string, value: string): void {
@@ -53,7 +53,7 @@ class TimeSelects extends TimeSelection {
 
   _renderSelects(): void {
     const icon = document.createElement('span')
-    icon.classList.add(CLASS_NAME_INLINE_ICON)
+    icon.classList.add(CLASS_NAME_TIME_ICON)
     icon.setAttribute('aria-hidden', 'true')
     icon.innerHTML = CLOCK_ICON
     this._element!.append(icon)
@@ -66,7 +66,7 @@ class TimeSelects extends TimeSelection {
       }
 
       const select = document.createElement('select')
-      select.classList.add(CLASS_NAME_INLINE_SELECT, part.name)
+      select.classList.add(CLASS_NAME_TIME_SELECT, part.name)
       select.setAttribute('aria-label', part.ariaLabel)
       select.addEventListener('change', event => this._change(part.name, (event.target as HTMLSelectElement).value))
       select.addEventListener('keydown', event => {
@@ -77,7 +77,7 @@ class TimeSelects extends TimeSelection {
         event.preventDefault()
         const rtl = isRTL(select)
         const goLeft = (event.key === ARROW_LEFT_KEY && !rtl) || (event.key === ARROW_RIGHT_KEY && rtl)
-        const list = SelectorEngine.find(SELECTOR_INLINE_SELECT, this._element as HTMLElement)
+        const list = SelectorEngine.find(SELECTOR_TIME_SELECT, this._element as HTMLElement)
         const index = list.indexOf(select) + (goLeft ? -1 : 1)
 
         if (index < 0 || index > list.length - 1) {

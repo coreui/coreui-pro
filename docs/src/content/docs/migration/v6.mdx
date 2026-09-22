@@ -1362,9 +1362,16 @@ validation and the arrow between them. Two consequences:
 - **The time row sits under the calendars again, with its clock icon.** v6.0.0-alpha
   put it beside them in a column of its own; `.date-picker-body` is a grid with
   the v5 areas once more, so `.date-picker-timepickers` spans the calendars it
-  belongs to. `.time-picker-inline-icon` survives the v1 shell cleanup below
-  because of this, now rendered as an inline SVG that takes its colour from
-  `--cui-time-picker-inline-icon-color`.
+  belongs to, with its clock icon back as an inline SVG that takes its colour
+  from `--cui-date-picker-time-icon-color`.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The date picker's time controls carry its own name.** `.time-picker-inline-icon`
+  and `.time-picker-inline-select` are `.date-picker-time-icon` and
+  `.date-picker-time-select`, with `--cui-date-picker-time-icon-*` and
+  `--cui-date-picker-time-select-*` in place of the `--cui-time-picker-inline-*`
+  tokens. They sit in the date picker's panel and are styled from its stylesheet,
+  so nothing about them belonged to the time picker but the name. The time
+  picker's own panel is untouched.
 - **The time selection is one tab stop, and the arrows move between its parts.**
   v6.0.0-alpha gave a tab stop to every column of the roll, so Tab walked the
   hour, minute, second and AM/PM lists one by one. The body is a composite now,
@@ -1376,7 +1383,7 @@ validation and the arrow between them. Two consequences:
   time picker shows the roll; the date time picker shows the selects, which is
   what v5 rendered inside a date picker with time. The shared primitive still
   implements both, and `selectionOptions` still reaches it, but neither picker
-  offers the choice as an option any more. `.time-picker-inline-select` moved
+  offers the choice as an option any more. The date picker's time selects moved
   with it: it now ships in the date picker stylesheet, so a page that only uses
   the time picker no longer downloads it.
 - Same removals as the date pickers: `footer`/`cancelButton`/`confirmButton` and

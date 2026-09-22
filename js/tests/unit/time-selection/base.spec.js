@@ -65,7 +65,7 @@ describe('TimeSelection', () => {
     it('should render selects instead of roll columns', () => {
       buildSelects()
 
-      expect(fixtureEl.querySelectorAll('select.time-picker-inline-select')).toHaveSize(3)
+      expect(fixtureEl.querySelectorAll('select.date-picker-time-select')).toHaveSize(3)
       expect(fixtureEl.querySelector('.time-picker-roll-col')).toBeNull()
     })
 
