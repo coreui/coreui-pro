@@ -1,0 +1,102 @@
+/**
+ * --------------------------------------------------------------------------
+ * CoreUI PRO util/time-selects.js
+ * License (https://coreui.io/pro/license/)
+ *
+ * The native-select rendering of the time selection body.
+ * --------------------------------------------------------------------------
+ */
+
+import SelectorEngine from '../dom/selector-engine.js'
+import TimeSelection from './time-selection.js'
+import { CLOCK_ICON } from './icons.js'
+import { isRTL } from './index.js'
+
+/**
+ * Constants
+ */
+
+const NAME = 'time-selects'
+
+const CLASS_NAME_INLINE_ICON = 'time-picker-inline-icon'
+const CLASS_NAME_INLINE_SELECT = 'time-picker-inline-select'
+
+const ARROW_LEFT_KEY = 'ArrowLeft'
+const ARROW_RIGHT_KEY = 'ArrowRight'
+
+const SELECTOR_INLINE_SELECT = `select.${CLASS_NAME_INLINE_SELECT}`
+
+/**
+ * Class definition
+ */
+
+class TimeSelects extends TimeSelection {
+  static override get NAME(): string {
+    return NAME
+  }
+
+  override _renderBody(): void {
+    this._renderSelects()
+  }
+
+  override _stops(): HTMLElement[] {
+    return SelectorEngine.find(SELECTOR_INLINE_SELECT, this._element as HTMLElement)
+  }
+
+  override _markPart(part: string, value: string): void {
+    const select = SelectorEngine.findOne(`select.${part}`, this._element as ParentNode)
+
+    if (select) {
+      (select as HTMLSelectElement).value = value
+    }
+  }
+
+  _renderSelects(): void {
+    const icon = document.createElement('span')
+    icon.classList.add(CLASS_NAME_INLINE_ICON)
+    icon.setAttribute('aria-hidden', 'true')
+    icon.innerHTML = CLOCK_ICON
+    this._element!.append(icon)
+
+    for (const [index, part] of this._parts().entries()) {
+      if (index > 0 && part.name !== 'meridiem') {
+        const separator = document.createElement('span')
+        separator.textContent = ':'
+        this._element!.append(separator)
+      }
+
+      const select = document.createElement('select')
+      select.classList.add(CLASS_NAME_INLINE_SELECT, part.name)
+      select.setAttribute('aria-label', part.ariaLabel)
+      select.addEventListener('change', event => this._change(part.name, (event.target as HTMLSelectElement).value))
+      select.addEventListener('keydown', event => {
+        if (event.key !== ARROW_LEFT_KEY && event.key !== ARROW_RIGHT_KEY) {
+          return
+        }
+
+        event.preventDefault()
+        const rtl = isRTL(select)
+        const goLeft = (event.key === ARROW_LEFT_KEY && !rtl) || (event.key === ARROW_RIGHT_KEY && rtl)
+        const list = SelectorEngine.find(SELECTOR_INLINE_SELECT, this._element as HTMLElement)
+        const index = list.indexOf(select) + (goLeft ? -1 : 1)
+
+        if (index < 0 || index > list.length - 1) {
+          return
+        }
+
+        list[index].focus()
+      })
+
+      for (const option of part.options) {
+        const optionEl = document.createElement('option')
+        optionEl.value = (option as HTMLSelectElement).value
+        optionEl.textContent = option.label
+        select.append(optionEl)
+      }
+
+      this._element!.append(select)
+    }
+  }
+}
+
+export default TimeSelects

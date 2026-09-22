@@ -1,4 +1,5 @@
-import TimeSelection from '../../../src/util/time-selection.js'
+import TimeRoll from '../../../src/util/time-roll.js'
+import TimeSelects from '../../../src/util/time-selects.js'
 import { clearFixture, getFixture } from '../../helpers/fixture.js'
 
 describe('TimeSelection', () => {
@@ -14,7 +15,12 @@ describe('TimeSelection', () => {
 
   const build = (config = {}) => {
     fixtureEl.innerHTML = '<div id="body"></div>'
-    return new TimeSelection(fixtureEl.querySelector('#body'), { locale: 'en-GB', ...config })
+    return new TimeRoll(fixtureEl.querySelector('#body'), { locale: 'en-GB', ...config })
+  }
+
+  const buildSelects = (config = {}) => {
+    fixtureEl.innerHTML = '<div id="body"></div>'
+    return new TimeSelects(fixtureEl.querySelector('#body'), { locale: 'en-GB', ...config })
   }
 
   const cells = part => fixtureEl.querySelectorAll(`[data-coreui-${part}]`)
@@ -55,9 +61,9 @@ describe('TimeSelection', () => {
     })
   })
 
-  describe('select variant', () => {
+  describe('selects rendering', () => {
     it('should render selects instead of roll columns', () => {
-      build({ variant: 'select' })
+      buildSelects()
 
       expect(fixtureEl.querySelectorAll('select.time-picker-inline-select')).toHaveSize(3)
       expect(fixtureEl.querySelector('.time-picker-roll-col')).toBeNull()
@@ -65,10 +71,10 @@ describe('TimeSelection', () => {
 
     it('should report a change from a select', () => {
       let reported = null
-      build({
+      buildSelects({
         onChange(time) {
           reported = time
-        }, variant: 'select'
+        }
       })
 
       const minutes = fixtureEl.querySelector('select.minutes')
@@ -79,7 +85,7 @@ describe('TimeSelection', () => {
     })
 
     it('should preselect the current value in the selects', () => {
-      build({ time: new Date(2026, 0, 1, 9, 45, 0), variant: 'select' })
+      buildSelects({ time: new Date(2026, 0, 1, 9, 45, 0) })
 
       expect(fixtureEl.querySelector('select.hours').value).toEqual('9')
       expect(fixtureEl.querySelector('select.minutes').value).toEqual('45')

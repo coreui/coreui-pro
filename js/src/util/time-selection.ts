@@ -6,7 +6,6 @@
  */
 
 import EventHandler from '../dom/event-handler.js'
-import Manipulator from '../dom/manipulator.js'
 import SelectorEngine from '../dom/selector-engine.js'
 import Config from './config.js'
 import {
@@ -17,8 +16,7 @@ import {
   getSelectedSeconds,
   isAmPm
 } from './time.js'
-import { CLOCK_ICON } from './icons.js'
-import { execute, getNextActiveElement, isRTL } from './index.js'
+import { execute } from './index.js'
 
 /**
  * Constants
@@ -26,30 +24,11 @@ import { execute, getNextActiveElement, isRTL } from './index.js'
 
 const NAME = 'time-selection'
 
-const CLASS_NAME_INLINE_ICON = 'time-picker-inline-icon'
-const CLASS_NAME_INLINE_SELECT = 'time-picker-inline-select'
-const CLASS_NAME_ROLL = 'time-picker-roll'
-const CLASS_NAME_ROLL_CELL = 'time-picker-roll-cell'
-const CLASS_NAME_ROLL_COL = 'time-picker-roll-col'
 const CLASS_NAME_SELECTED = 'selected'
-
-const ARROW_DOWN_KEY = 'ArrowDown'
-const ARROW_LEFT_KEY = 'ArrowLeft'
-const ARROW_RIGHT_KEY = 'ArrowRight'
-const ARROW_UP_KEY = 'ArrowUp'
-const END_KEY = 'End'
-const ENTER_KEY = 'Enter'
-const HOME_KEY = 'Home'
-const SPACE_KEY = 'Space'
 
 const EVENT_KEY = '.coreui.time-selection'
 const EVENT_FOCUSIN = `focusin${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
-
-const SELECTOR_INLINE_SELECT = `select.${CLASS_NAME_INLINE_SELECT}`
-const SELECTOR_ROLL_CELL = `.${CLASS_NAME_ROLL_CELL}`
-const SELECTOR_ROLL_CELL_SELECTED = `.${CLASS_NAME_ROLL_CELL}.${CLASS_NAME_SELECTED}`
-const SELECTOR_ROLL_COL = `.${CLASS_NAME_ROLL_COL}`
 
 const Default = {
   ariaSelectHoursLabel: 'Select hours',
@@ -61,8 +40,7 @@ const Default = {
   minutes: true,
   onChange: null,
   seconds: true,
-  time: null,
-  variant: 'roll'
+  time: null
 }
 
 const DefaultType = {
@@ -75,8 +53,7 @@ const DefaultType = {
   minutes: '(array|boolean|function)',
   onChange: '(function|null)',
   seconds: '(array|boolean|function)',
-  time: '(date|null)',
-  variant: 'string'
+  time: '(date|null)'
 }
 
 /**
@@ -148,15 +125,8 @@ class TimeSelection extends Config {
     )
 
     this._element!.innerHTML = ''
-    this._element!.classList.toggle(CLASS_NAME_ROLL, this._config.variant === 'roll')
-
-    if (this._config.variant === 'select') {
-      EventHandler.off(this._element, EVENT_KEYDOWN)
-      this._renderSelects()
-    } else {
-      this._renderRoll()
-      this._addRollKeyboardNavigation()
-    }
+    EventHandler.off(this._element, EVENT_KEYDOWN)
+    this._renderBody()
 
     EventHandler.off(this._element, EVENT_FOCUSIN)
     EventHandler.on(this._element, EVENT_FOCUSIN, (event: any) => {
@@ -191,94 +161,18 @@ class TimeSelection extends Config {
     return parts
   }
 
-  _renderRoll(): void {
-    for (const part of this._parts()) {
-      const column = document.createElement('div')
-      column.classList.add(CLASS_NAME_ROLL_COL)
-      column.setAttribute('role', 'listbox')
-      column.setAttribute('aria-label', part.ariaLabel)
-
-      for (const option of part.options) {
-        const cell = document.createElement('div')
-        cell.classList.add(CLASS_NAME_ROLL_CELL)
-        cell.setAttribute('role', 'option')
-        cell.setAttribute('aria-label', option.label.toString())
-        cell.setAttribute('aria-selected', 'false')
-        cell.tabIndex = -1
-        cell.textContent = option.label
-        Manipulator.setDataAttribute(cell, part.name, (option as HTMLSelectElement).value)
-
-        cell.addEventListener('click', () => this._change(part.name, (option as HTMLSelectElement).value))
-        cell.addEventListener('keydown', event => {
-          if (event.code === SPACE_KEY || event.key === ENTER_KEY) {
-            event.preventDefault()
-            this._change(part.name, (option as HTMLSelectElement).value)
-            this._moveFocusToColumn(cell, 1)
-          }
-        })
-
-        column.append(cell)
-      }
-
-      this._element!.append(column)
-    }
+  // Each rendering builds its own body and names its own tab stops; the body is
+  // one composite either way, which is the contract the section field keeps.
+  _renderBody(): void {
+    throw new Error('TimeSelection is abstract — use TimeRoll or TimeSelects.')
   }
 
-  // A roving tabindex reaches one cell per column with Tab; the rest of the
-  // options are only reachable with the arrows.
-  _addRollKeyboardNavigation(): void {
-    EventHandler.off(this._element, EVENT_KEYDOWN)
-    EventHandler.on(this._element, EVENT_KEYDOWN, SELECTOR_ROLL_CELL, (event: any) => {
-      const target = event.target as HTMLElement
-
-      if (event.key === ARROW_DOWN_KEY || event.key === ARROW_UP_KEY) {
-        event.preventDefault()
-        const items = SelectorEngine.find(SELECTOR_ROLL_CELL, target.parentElement as HTMLElement)
-
-        if (items.length === 0) {
-          return
-        }
-
-        const nextElement = getNextActiveElement(
-          items, target, event.key === ARROW_DOWN_KEY, !items.includes(target)
-        )
-        nextElement?.focus()
-        return
-      }
-
-      if (event.key === HOME_KEY || event.key === END_KEY) {
-        event.preventDefault()
-        const items = SelectorEngine.find(SELECTOR_ROLL_CELL, target.parentElement as HTMLElement)
-
-        if (items.length === 0) {
-          return
-        }
-
-        items[event.key === HOME_KEY ? 0 : items.length - 1].focus()
-        return
-      }
-
-      if (event.key === ARROW_LEFT_KEY || event.key === ARROW_RIGHT_KEY) {
-        event.preventDefault()
-        const rtl = isRTL(target)
-        const goLeft = (event.key === ARROW_LEFT_KEY && !rtl) || (event.key === ARROW_RIGHT_KEY && rtl)
-        this._moveFocusToColumn(target, goLeft ? -1 : 1)
-      }
-    })
-  }
-
-  _entryCell(column: HTMLElement): HTMLElement | null {
-    return SelectorEngine.findOne(SELECTOR_ROLL_CELL_SELECTED, column) ??
-      SelectorEngine.findOne(SELECTOR_ROLL_CELL, column)
-  }
-
-  // The body is one composite whichever way it renders: Tab reaches it once and
-  // the arrows move between the parts, the same contract the section field keeps.
   _stops(): HTMLElement[] {
-    const cells = SelectorEngine.find(SELECTOR_ROLL_CELL, this._element as HTMLElement)
-    return cells.length > 0 ?
-      cells :
-      SelectorEngine.find(SELECTOR_INLINE_SELECT, this._element as HTMLElement)
+    return []
+  }
+
+  _markPart(_part: string, _value: string, _instant: boolean): void {
+    // rendering-specific
   }
 
   _updateRovingTabIndex(preferred?: HTMLElement): void {
@@ -294,64 +188,6 @@ class TimeSelection extends Config {
 
     for (const element of list) {
       element.tabIndex = element === active ? 0 : -1
-    }
-  }
-
-  _moveFocusToColumn(cell: HTMLElement, offset: number): void {
-    const columns = SelectorEngine.find(SELECTOR_ROLL_COL, this._element as HTMLElement)
-    const index = columns.indexOf(cell.parentElement as HTMLElement) + offset
-
-    if (index < 0 || index > columns.length - 1) {
-      return
-    }
-
-    this._entryCell(columns[index])?.focus()
-  }
-
-  _renderSelects(): void {
-    const icon = document.createElement('span')
-    icon.classList.add(CLASS_NAME_INLINE_ICON)
-    icon.setAttribute('aria-hidden', 'true')
-    icon.innerHTML = CLOCK_ICON
-    this._element!.append(icon)
-
-    for (const [index, part] of this._parts().entries()) {
-      if (index > 0 && part.name !== 'meridiem') {
-        const separator = document.createElement('span')
-        separator.textContent = ':'
-        this._element!.append(separator)
-      }
-
-      const select = document.createElement('select')
-      select.classList.add(CLASS_NAME_INLINE_SELECT, part.name)
-      select.setAttribute('aria-label', part.ariaLabel)
-      select.addEventListener('change', event => this._change(part.name, (event.target as HTMLSelectElement).value))
-      select.addEventListener('keydown', event => {
-        if (event.key !== ARROW_LEFT_KEY && event.key !== ARROW_RIGHT_KEY) {
-          return
-        }
-
-        event.preventDefault()
-        const rtl = isRTL(select)
-        const goLeft = (event.key === ARROW_LEFT_KEY && !rtl) || (event.key === ARROW_RIGHT_KEY && rtl)
-        const list = SelectorEngine.find(SELECTOR_INLINE_SELECT, this._element as HTMLElement)
-        const index = list.indexOf(select) + (goLeft ? -1 : 1)
-
-        if (index < 0 || index > list.length - 1) {
-          return
-        }
-
-        list[index].focus()
-      })
-
-      for (const option of part.options) {
-        const optionEl = document.createElement('option')
-        optionEl.value = (option as HTMLSelectElement).value
-        optionEl.textContent = option.label
-        select.append(optionEl)
-      }
-
-      this._element!.append(select)
     }
   }
 
@@ -391,12 +227,6 @@ class TimeSelection extends Config {
     execute(this._config.onChange, [undefined, date])
   }
 
-  // v1 scrolls the selected cell into view — without it a value like 14:30 marks
-  // a minute cell that sits below the visible part of the column.
-  _scrollToSelected(column: any, cell: any, instant?: boolean): void {
-    column.scrollTo({ behavior: instant ? 'instant' : 'smooth', top: cell.offsetTop })
-  }
-
   _markSelected(instant = false): void {
     const selected = {
       hours: getSelectedHour(this._date, this._config.locale),
@@ -410,25 +240,7 @@ class TimeSelection extends Config {
         continue
       }
 
-      if (this._config.variant === 'select') {
-        const select = SelectorEngine.findOne(`select.${part}`, this._element as ParentNode)
-
-        if (select) {
-          (select as HTMLSelectElement).value = value as string
-        }
-
-        continue
-      }
-
-      for (const cell of SelectorEngine.find(`[data-coreui-${part}]`, this._element as ParentNode)) {
-        const isSelected = String(Manipulator.getDataAttribute(cell, part)) === String(value)
-        cell.classList.toggle(CLASS_NAME_SELECTED, isSelected)
-        cell.setAttribute('aria-selected', isSelected ? 'true' : 'false')
-
-        if (isSelected && cell.parentElement) {
-          this._scrollToSelected(cell.parentElement, cell, instant)
-        }
-      }
+      this._markPart(part, value as string, instant)
     }
 
     this._updateRovingTabIndex(

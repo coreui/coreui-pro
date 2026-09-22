@@ -18,7 +18,7 @@ import Calendar from './calendar.js'
 import DateInput from './date-input.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
-import TimeSelection from './util/time-selection.js'
+import TimeSelects from './util/time-selects.js'
 import { getDateBySelectionType, isSameDateAs } from './util/calendar.js'
 import type { ComponentConfig } from './util/config.js'
 import { getWeekSectionsFromLocale } from './util/date-sections.js'
@@ -57,7 +57,7 @@ const CLASS_NAME_INDICATOR = 'form-control-action'
 const CLASS_NAME_INPUT_GROUP = 'form-control-group'
 const CLASS_NAME_PICKER = 'picker'
 const CLASS_NAME_POPUP = 'popup'
-const CLASS_NAME_TIME_BODY = 'time-picker-body'
+const CLASS_NAME_TIME_BODY = 'date-picker-time-body'
 const CLASS_NAME_TIME_PICKERS = 'date-picker-timepickers'
 
 const SELECTOR_DATA_DATE_PICKER = '[data-coreui-date-picker]'
@@ -403,11 +403,10 @@ class DatePicker extends PickerBase {
       return
     }
 
-    this._selection = new TimeSelection(this._selectionElement, this._forwardConfig(TimeSelection, {
+    this._selection = new TimeSelects(this._selectionElement, this._forwardConfig(TimeSelects, {
       locale: this._config.locale,
       onChange: (time: Date | null) => this._applyTime(time),
-      time: this.getDate(),
-      variant: 'select'
+      time: this.getDate()
     }, this._config.selectionOptions))
   }
 

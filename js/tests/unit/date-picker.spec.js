@@ -1117,7 +1117,7 @@ describe('DatePicker', () => {
 
       const popup = fixtureEl.querySelector('.date-picker-popup')
       expect(popup.querySelector('.date-picker-calendar')).not.toBeNull()
-      expect(popup.querySelector('.date-picker-timepickers .time-picker-body')).not.toBeNull()
+      expect(popup.querySelector('.date-picker-timepickers .date-picker-time-body')).not.toBeNull()
       expect(popup.querySelector('.calendar')).not.toBeNull()
       expect(popup.querySelectorAll('select.time-picker-inline-select').length).toBeGreaterThan(0)
       expect(popup.querySelector('.time-picker-roll-col')).toBeNull()
@@ -1127,7 +1127,7 @@ describe('DatePicker', () => {
       const picker = buildPicker({ timepicker: true })
       picker.show()
 
-      const body = fixtureEl.querySelector('.date-picker-popup .time-picker-body')
+      const body = fixtureEl.querySelector('.date-picker-popup .date-picker-time-body')
       const selects = [...body.querySelectorAll('select.time-picker-inline-select')]
       expect(selects.length).toBeGreaterThan(1)
       expect(body.querySelectorAll('[tabindex="0"]').length).toEqual(1)

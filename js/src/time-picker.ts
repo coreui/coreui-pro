@@ -12,7 +12,7 @@ import PickerBase from './picker-base.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import TimeInput from './time-input.js'
-import TimeSelection from './util/time-selection.js'
+import TimeRoll from './util/time-roll.js'
 import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 import type { ComponentConfig } from './util/config.js'
 import {
@@ -285,7 +285,7 @@ class TimePicker extends PickerBase {
       return
     }
 
-    this._selection = new TimeSelection(this._selectionElement, this._forwardConfig(TimeSelection, {
+    this._selection = new TimeRoll(this._selectionElement, this._forwardConfig(TimeRoll, {
       locale: this._config.locale,
       onChange: (time: Date | null) => {
         this._syncingFromPanel = true
@@ -293,8 +293,7 @@ class TimePicker extends PickerBase {
         this._syncingFromPanel = false
         EventHandler.trigger(this._element, EVENT_TIME_CHANGE, { time })
       },
-      time: this.getTime(),
-      variant: 'roll'
+      time: this.getTime()
     }, this._config.selectionOptions))
   }
 

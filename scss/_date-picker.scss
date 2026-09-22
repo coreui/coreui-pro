@@ -65,7 +65,7 @@ $date-picker-time-tokens: defaults(
       border-block-start: var(--#{$prefix}date-picker-footer-border-width) solid var(--#{$prefix}date-picker-footer-border-color);
     }
 
-    .time-picker-body {
+    .date-picker-time-body {
       @include tokens($date-picker-time-tokens);
       display: flex;
       align-items: center;
