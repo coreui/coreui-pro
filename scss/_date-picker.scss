@@ -1,4 +1,6 @@
 @use "functions/defaults" as *;
+@use "mixins/border-radius" as *;
+@use "mixins/focus-ring" as *;
 @use "mixins/form-control" as *;
 @use "mixins/tokens" as *;
 @use "calendar" as *;
@@ -28,6 +30,7 @@ $date-picker-time-tokens: defaults(
     --#{$prefix}time-picker-inline-icon-width: 2.5rem,
     --#{$prefix}time-picker-inline-icon-size: 1rem,
     --#{$prefix}time-picker-inline-icon-color: var(--#{$prefix}fg-3),
+    --#{$prefix}time-picker-inline-select-border-radius: var(--#{$prefix}radius-4),
     --#{$prefix}time-picker-inline-select-font-size: var(--#{$prefix}btn-input-sm-font-size),
     --#{$prefix}time-picker-inline-select-color: var(--#{$prefix}btn-input-fg),
     --#{$prefix}time-picker-inline-select-padding-y: var(--#{$prefix}btn-input-sm-padding-y),
@@ -92,6 +95,11 @@ $date-picker-time-tokens: defaults(
       scrollbar-width: none;
       background-color: transparent;
       border: 0;
+
+      &:focus-visible {
+        @include focus-ring(true);
+        @include border-radius(var(--#{$prefix}time-picker-inline-select-border-radius));
+      }
 
       &::-webkit-scrollbar {
         width: 10px;
