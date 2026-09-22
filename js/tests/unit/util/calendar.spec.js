@@ -260,9 +260,9 @@ describe('Calendar Utilities', () => {
     it('should return all elements that match the default selector inside an element', () => {
       const container = document.createElement('tr')
       container.innerHTML = `
-        <td tabindex="0"></td>
-        <td tabindex="0"></td>
-        <td tabindex="-1"></td>
+        <td data-coreui-selectable></td>
+        <td data-coreui-selectable></td>
+        <td></td>
       `
       const result = getSelectableDates(container)
       expect(result).toHaveSize(2)

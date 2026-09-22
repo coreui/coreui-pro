@@ -91,7 +91,7 @@ describe('DateTimePicker', () => {
       const picker = buildPicker({ date: new Date(2026, 5, 15, 14, 30, 0) })
 
       picker.show()
-      fixtureEl.querySelectorAll('.date-picker-popup .calendar-cell[tabindex="0"]')[0].click()
+      fixtureEl.querySelectorAll('.date-picker-popup .calendar-cell[data-coreui-selectable]')[0].click()
 
       const value = picker.getDate()
       expect(value.getHours()).toEqual(14)
@@ -119,7 +119,7 @@ describe('DateTimePicker', () => {
 
       picker.show()
       const popup = fixtureEl.querySelector('.date-picker-popup')
-      popup.querySelectorAll('.calendar-cell[tabindex="0"]')[0].click()
+      popup.querySelectorAll('.calendar-cell[data-coreui-selectable]')[0].click()
       popup.querySelectorAll('[data-coreui-minutes]')[15].click()
 
       expect(emitted.length).toBeGreaterThanOrEqual(2)
@@ -129,7 +129,7 @@ describe('DateTimePicker', () => {
       const picker = buildPicker()
 
       picker.show()
-      fixtureEl.querySelectorAll('.calendar-cell[tabindex="0"]')[0].click()
+      fixtureEl.querySelectorAll('.calendar-cell[data-coreui-selectable]')[0].click()
 
       expect(picker._popup.isShown).toBeTrue()
     })

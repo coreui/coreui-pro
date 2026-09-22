@@ -218,9 +218,8 @@ describe('Popup', () => {
     })
 
     it('should start from the selected value, not from the first tab stop', () => {
-      // The calendar gives tabindex="0" to every selectable cell, so the entry
-      // has to be picked by the ARIA markers — first match would be the first
-      // day of the grid.
+      // A panel can hold several stops — one per grid, plus its own controls —
+      // so the entry is picked by the ARIA markers rather than by position.
       fixtureEl.innerHTML = [
         '<div id="anchor"><button id="inside">field</button></div>',
         '<div id="content">',
@@ -244,7 +243,7 @@ describe('Popup', () => {
       expect(document.activeElement.id).toEqual('d10')
     })
 
-    it('should fall back to today, and then to the last available stop', () => {
+    it('should fall back to today, and then to the stop the grid parked', () => {
       fixtureEl.innerHTML = [
         '<div id="anchor"><button id="inside">field</button></div>',
         '<div id="content">',
@@ -269,14 +268,14 @@ describe('Popup', () => {
 
       popup.hide()
 
-      // Today gone from the stops — a max date pushed it out of reach — the
-      // native control lands on the last date still available.
+      // Today gone from the stops — a max date pushed it out of reach — and
+      // the entry is then the stop the grid itself is holding.
       fixtureEl.querySelector('#today').removeAttribute('aria-current')
       fixtureEl.querySelector('#today').tabIndex = -1
 
       popup.show()
 
-      expect(document.activeElement.id).toEqual('d31')
+      expect(document.activeElement.id).toEqual('d1')
     })
 
     it('should move focus into the panel however it was opened', () => {

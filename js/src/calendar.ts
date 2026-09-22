@@ -93,9 +93,9 @@ const SELECTOR_BTN_PREV = '.btn-prev'
 const SELECTOR_BTN_YEAR = '.btn-year'
 const SELECTOR_CALENDAR = '.calendar'
 const SELECTOR_CALENDAR_CELL = '.calendar-cell'
-const SELECTOR_CALENDAR_CELL_CLICKABLE = `${SELECTOR_CALENDAR_CELL}[tabindex="0"]`
+const SELECTOR_CALENDAR_CELL_CLICKABLE = `${SELECTOR_CALENDAR_CELL}[data-coreui-selectable]`
 const SELECTOR_CALENDAR_ROW = '.calendar-row'
-const SELECTOR_CALENDAR_ROW_CLICKABLE = `${SELECTOR_CALENDAR_ROW}[tabindex="0"]`
+const SELECTOR_CALENDAR_ROW_CLICKABLE = `${SELECTOR_CALENDAR_ROW}[data-coreui-selectable]`
 const SELECTOR_DATA_CALENDAR = '[data-coreui-calendar]'
 
 // Navigation icons live in JavaScript, not in CSS masks — the chips pattern:
@@ -291,17 +291,19 @@ class Calendar extends BaseComponent {
 
   // Closest by date, not exact match: the requested date may sit on a cell
   // disabled by disabledDates or clamped away by min/max
-  _focusOnDate(date: Date): void {
+  _closestSelectable(date: Date, scope?: HTMLElement): HTMLElement | null {
     const focusables = (SelectorEngine.find(
-      this._config.selectionType === 'week' ? SELECTOR_CALENDAR_ROW_CLICKABLE : SELECTOR_CALENDAR_CELL_CLICKABLE,
-      this._element as ParentNode
+      this._rovingSelector(),
+      (scope ?? this._element) as ParentNode
     ) as HTMLElement[]).filter(element => !element.classList.contains('previous') && !element.classList.contains('next'))
+
+    const target = this._startOfView(date)
 
     let closest = null
     let closestGap = Number.POSITIVE_INFINITY
 
     for (const element of focusables) {
-      const gap = Math.abs(this._getDate(element).getTime() - date.getTime())
+      const gap = Math.abs(this._getDate(element).getTime() - target.getTime())
 
       if (gap < closestGap) {
         closest = element
@@ -309,7 +311,30 @@ class Calendar extends BaseComponent {
       }
     }
 
-    closest?.focus()
+    return closest
+  }
+
+  _focusOnDate(date: Date): void {
+    this._closestSelectable(date)?.focus()
+  }
+
+  _startOfView(date: Date): Date {
+    const value = new Date(date)
+    value.setHours(0, 0, 0, 0)
+
+    if (this._view === 'months') {
+      value.setDate(1)
+    }
+
+    if (this._view === 'quarters') {
+      value.setMonth(Math.floor(value.getMonth() / 3) * 3, 1)
+    }
+
+    if (this._view === 'years') {
+      value.setMonth(0, 1)
+    }
+
+    return value
   }
 
   _getEventTarget(event: any): HTMLElement | null {
@@ -319,8 +344,12 @@ class Calendar extends BaseComponent {
       event.target.closest(SELECTOR_CALENDAR_ROW)
   }
 
+  _rowsAreTargets(): boolean {
+    return this._config.selectionType === 'week' && this._view === 'days'
+  }
+
   _getDate(target: HTMLElement): Date {
-    if (this._config.selectionType === 'week') {
+    if (this._rowsAreTargets()) {
       const firstCell = SelectorEngine.findOne(SELECTOR_CALENDAR_CELL, target.closest(SELECTOR_CALENDAR_ROW) as ParentNode)
       return new Date(Manipulator.getDataAttribute(firstCell as HTMLElement, 'date') as string)
     }
@@ -450,14 +479,11 @@ class Calendar extends BaseComponent {
 
       let element = event.target
 
-      if (this._config.selectionType === 'week' && element.tabIndex === -1) {
+      if (this._rowsAreTargets() && !element.matches(SELECTOR_CALENDAR_ROW_CLICKABLE)) {
         element = element.closest(SELECTOR_CALENDAR_ROW_CLICKABLE)
       }
 
-      const list = SelectorEngine.find(
-        this._config.selectionType === 'week' ? SELECTOR_CALENDAR_ROW_CLICKABLE : SELECTOR_CALENDAR_CELL_CLICKABLE,
-        this._element
-      )
+      const list = SelectorEngine.find(this._rovingSelector(), this._element)
 
       const index = list.indexOf(element)
       const first = index === 0
@@ -471,8 +497,8 @@ class Calendar extends BaseComponent {
       const gap = {
         ArrowRight: 1,
         ArrowLeft: -1,
-        ArrowUp: this._config.selectionType === 'week' && this._view === 'days' ? -1 : (this._view === 'days' ? -7 : -3),
-        ArrowDown: this._config.selectionType === 'week' && this._view === 'days' ? 1 : (this._view === 'days' ? 7 : 3)
+        ArrowUp: this._rowsAreTargets() ? -1 : (this._view === 'days' ? -7 : -3),
+        ArrowDown: this._rowsAreTargets() ? 1 : (this._view === 'days' ? 7 : 3)
       }
 
       if (
@@ -516,17 +542,7 @@ class Calendar extends BaseComponent {
         return
       }
 
-      if (list[index + (gap as Record<string, number>)[event.key]].tabIndex === 0) {
-        list[index + (gap as Record<string, number>)[event.key]].focus()
-        return
-      }
-
-      for (let i = index; i < list.length; event.key === ARROW_RIGHT_KEY || event.key === ARROW_DOWN_KEY ? i++ : i--) {
-        if (list[i + (gap as Record<string, number>)[event.key]].tabIndex === 0) {
-          list[i + (gap as Record<string, number>)[event.key]].focus()
-          break
-        }
-      }
+      list[index + (gap as Record<string, number>)[event.key]]?.focus()
     }
   }
 
@@ -580,6 +596,7 @@ class Calendar extends BaseComponent {
     })
 
     EventHandler.on(this._element, EVENT_FOCUS, SELECTOR_CALENDAR_CELL_CLICKABLE, event => {
+      this._updateRovingTabIndex(this._getEventTarget(event) as HTMLElement)
       this._handleCalendarMouseEnter(event)
     })
 
@@ -604,6 +621,7 @@ class Calendar extends BaseComponent {
     })
 
     EventHandler.on(this._element, EVENT_FOCUS, SELECTOR_CALENDAR_ROW_CLICKABLE, event => {
+      this._updateRovingTabIndex(this._getEventTarget(event) as HTMLElement)
       this._handleCalendarMouseEnter(event)
     })
 
@@ -838,7 +856,8 @@ class Calendar extends BaseComponent {
           return (
             `<tr 
               class="${rowAttributes.className}"
-              tabindex="${rowAttributes.tabIndex}"
+              tabindex="-1"
+              ${rowAttributes.selectable ? 'data-coreui-selectable' : ''}
               ${rowAttributes.ariaSelected ? 'aria-selected="true"' : ''}
             >
               ${this._config.showWeekNumber ?
@@ -850,7 +869,8 @@ class Calendar extends BaseComponent {
                   `<td
                     class="${cellAttributes.className}"
                     role="gridcell"
-                    tabindex="${cellAttributes.tabIndex}"
+                    tabindex="-1"
+                    ${cellAttributes.selectable ? 'data-coreui-selectable' : ''}
                     ${cellAttributes.ariaSelected ? 'aria-selected="true"' : ''}
                     ${cellAttributes.ariaCurrent ? 'aria-current="date"' : ''}
                     aria-label="${escapeHtml(cellAttributes.ariaLabel)}"
@@ -874,7 +894,8 @@ class Calendar extends BaseComponent {
                 `<td
                   class="${cellAttributes.className}"
                   role="gridcell"
-                  tabindex="${cellAttributes.tabIndex}"
+                  tabindex="-1"
+                  ${cellAttributes.selectable ? 'data-coreui-selectable' : ''}
                   ${cellAttributes.ariaSelected ? 'aria-selected="true"' : ''}
                   data-coreui-date="${date.toDateString()}"
                 >
@@ -895,7 +916,8 @@ class Calendar extends BaseComponent {
                 `<td
                   class="${cellAttributes.className}"
                   role="gridcell"
-                  tabindex="${cellAttributes.tabIndex}"
+                  tabindex="-1"
+                  ${cellAttributes.selectable ? 'data-coreui-selectable' : ''}
                   ${cellAttributes.ariaSelected ? 'aria-selected="true"' : ''}
                   data-coreui-date="${date.toDateString()}"
                 >
@@ -915,7 +937,8 @@ class Calendar extends BaseComponent {
                 `<td
                   class="${cellAttributes.className}"
                   role="gridcell"
-                  tabindex="${cellAttributes.tabIndex}"
+                  tabindex="-1"
+                  ${cellAttributes.selectable ? 'data-coreui-selectable' : ''}
                   ${cellAttributes.ariaSelected ? 'aria-selected="true"' : ''}
                   data-coreui-date="${date.toDateString()}"
                 >
@@ -934,6 +957,33 @@ class Calendar extends BaseComponent {
     return calendarPanelEl
   }
 
+  _updateRovingTabIndex(preferred?: HTMLElement): void {
+    for (const panel of SelectorEngine.find(SELECTOR_CALENDAR, this._element as ParentNode)) {
+      this._updatePanelRovingTabIndex(panel as HTMLElement, preferred)
+    }
+  }
+
+  _updatePanelRovingTabIndex(panel: HTMLElement, preferred?: HTMLElement): void {
+    const list = SelectorEngine.find(this._rovingSelector(), panel) as HTMLElement[]
+
+    if (list.length === 0) {
+      return
+    }
+
+    const active = (preferred && list.includes(preferred) ? preferred : null) ??
+      list.find(element => element.classList.contains('selected')) ??
+      this._closestSelectable(this._calendarDate as Date, panel) ??
+      list[0]
+
+    for (const element of list) {
+      element.tabIndex = element === active ? 0 : -1
+    }
+  }
+
+  _rovingSelector(): string {
+    return this._rowsAreTargets() ? SELECTOR_CALENDAR_ROW_CLICKABLE : SELECTOR_CALENDAR_CELL_CLICKABLE
+  }
+
   _createCalendar(): void {
     if (this._config.selectionType && this._view === 'days') {
       this._element.classList.add(`select-${this._config.selectionType}`)
@@ -948,6 +998,7 @@ class Calendar extends BaseComponent {
     }
 
     this._element.classList.add(CLASS_NAME_CALENDARS)
+    this._updateRovingTabIndex()
   }
 
   _initializeDates(): void {
@@ -985,7 +1036,7 @@ class Calendar extends BaseComponent {
   }
 
   _updateClassNamesAndAriaLabels(): void {
-    if (this._config.selectionType === 'week') {
+    if (this._rowsAreTargets()) {
       const rows = SelectorEngine.find(SELECTOR_CALENDAR_ROW, this._element as ParentNode)
 
       for (const row of rows) {
@@ -994,7 +1045,7 @@ class Calendar extends BaseComponent {
         const rowAttributes = this._rowWeekAttributes(date)
 
         row.className = rowAttributes.className
-        row.tabIndex = rowAttributes.tabIndex
+        row.toggleAttribute('data-coreui-selectable', rowAttributes.selectable)
 
         if (rowAttributes.ariaSelected) {
           row.setAttribute('aria-selected', true as any)
@@ -1003,6 +1054,7 @@ class Calendar extends BaseComponent {
         }
       }
 
+      this._updateRovingTabIndex(SelectorEngine.findOne(':focus', this._element as ParentNode) as HTMLElement)
       return
     }
 
@@ -1034,7 +1086,7 @@ class Calendar extends BaseComponent {
       }
 
       cell.className = cellAttributes.className
-      cell.tabIndex = cellAttributes.tabIndex
+      cell.toggleAttribute('data-coreui-selectable', cellAttributes.selectable)
 
       if (cellAttributes.ariaSelected) {
         cell.setAttribute('aria-selected', true as any)
@@ -1042,6 +1094,8 @@ class Calendar extends BaseComponent {
         cell.removeAttribute('aria-selected')
       }
     }
+
+    this._updateRovingTabIndex(SelectorEngine.findOne(':focus', this._element as ParentNode) as HTMLElement)
   }
 
   _classNames(classNames: any): string {
@@ -1065,7 +1119,7 @@ class Calendar extends BaseComponent {
           today: isTodayDate,
           [month]: true
         }),
-        tabIndex: -1,
+        selectable: false,
         ariaSelected: false,
         ariaLabel: this._formatDate(date),
         ariaCurrent: isTodayDate
@@ -1092,7 +1146,7 @@ class Calendar extends BaseComponent {
 
     return {
       className: classNames,
-      tabIndex: (isCurrentMonth || this._config.selectAdjacentDays) && !isDisabled ? 0 : -1,
+      selectable: (isCurrentMonth || this._config.selectAdjacentDays) && !isDisabled,
       ariaSelected: isSelected,
       ariaLabel: this._formatDate(date),
       ariaCurrent: isTodayDate,
@@ -1126,7 +1180,7 @@ class Calendar extends BaseComponent {
 
     return {
       className: classNames,
-      tabIndex: isDisabled ? -1 : 0,
+      selectable: !isDisabled,
       ariaSelected: isSelected,
       meta: {
         isDisabled,
@@ -1156,7 +1210,7 @@ class Calendar extends BaseComponent {
 
     return {
       className: classNames,
-      tabIndex: isDisabled ? -1 : 0,
+      selectable: !isDisabled,
       ariaSelected: isSelected,
       meta: {
         isDisabled,
@@ -1186,7 +1240,7 @@ class Calendar extends BaseComponent {
 
     return {
       className: classNames,
-      tabIndex: isDisabled ? -1 : 0,
+      selectable: !isDisabled,
       ariaSelected: isSelected,
       meta: {
         isDisabled,
@@ -1200,7 +1254,7 @@ class Calendar extends BaseComponent {
     if (this._config.selectionType !== 'week') {
       return {
         className: this._classNames({ [CLASS_NAME_CALENDAR_ROW]: true }),
-        tabIndex: -1,
+        selectable: false,
         ariaSelected: false
       }
     }
@@ -1225,7 +1279,7 @@ class Calendar extends BaseComponent {
 
     return {
       className: classNames,
-      tabIndex: isDisabled ? -1 : 0,
+      selectable: !isDisabled,
       ariaSelected: isSelected
     }
   }

@@ -1180,6 +1180,14 @@ removed in favour of `$translucent-opacity` and
   so a partial call like `calendar.setConfig({ selectEndDate: true })` no longer
   resets every other option (`range`, `calendars`, `locale`, …). See
   [Replacing options is `setConfig()`, not `update()`](#replacing-options-is-setconfig-not-update).
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **Each grid is one tab stop, and `tabindex` no longer marks a selectable cell.**
+  The arrows, `Home`, `End` and the page keys move within a calendar and Tab
+  leaves it, which is what `role="grid"` promises; a selectable day, month,
+  quarter, year or week row carries `data-coreui-selectable`, and `tabindex="0"`
+  sits on one of them per grid, so a two-month range picker keeps a stop in each
+  month. Custom CSS or scripts that reached for `.calendar-cell[tabindex="0"]`
+  need `.calendar-cell[data-coreui-selectable]`.
 - **Additive:** `startDateChange` and `endDateChange` now carry a `dateObject`
   property with the underlying `Date`, alongside the existing `date` property.
   `date` remains formatted per `selectionType` — a `Date` for day selection, but
