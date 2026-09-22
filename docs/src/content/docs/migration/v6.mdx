@@ -1347,6 +1347,17 @@ validation and the arrow between them. Two consequences:
 
 #### Time Picker
 
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The `roll` infix is gone from the class and token names.** It marked which
+  of two renderings a body used, and the time picker has one now, so
+  `.time-picker-roll-col` and `.time-picker-roll-cell` are `.time-picker-col`
+  and `.time-picker-cell`, with `--cui-time-picker-col-*` and
+  `--cui-time-picker-cell-*` in place of their `-roll-` spellings.
+  `.time-picker-roll` itself was always present on `.time-picker-body` and its
+  declarations moved there, so the modifier is gone rather than renamed;
+  `--cui-time-picker-body-padding` went with it, since the modifier zeroed the
+  padding it set.
+
 - **`seconds` governs the field as well as the panel, and both are on by
   default, as they were in v5.** v5 formatted its value with seconds, so
   `10:30:00 AM` is what both majors submit. `seconds="false"` takes the panel
@@ -1408,7 +1419,7 @@ shell's own elements no longer exist: `.date-picker-input`,
 Custom CSS targeting those needs rewriting against
 the new structure; everything else (`.date-picker`, `.date-picker-popup`,
 `.date-picker-body`, `.date-picker-footer`, the `-sm`/`-lg` size modifiers, the
-`.time-picker-roll*` bodies) keeps its name.
+`.time-picker-*` bodies) keeps its name.
 
 #### The picker panel is `.date-picker-popup` / `.time-picker-popup`
 

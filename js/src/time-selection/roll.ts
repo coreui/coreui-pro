@@ -19,9 +19,8 @@ import TimeSelection from './base.js'
 
 const NAME = 'time-roll'
 
-const CLASS_NAME_ROLL = 'time-picker-roll'
-const CLASS_NAME_ROLL_CELL = 'time-picker-roll-cell'
-const CLASS_NAME_ROLL_COL = 'time-picker-roll-col'
+const CLASS_NAME_CELL = 'time-picker-cell'
+const CLASS_NAME_COL = 'time-picker-col'
 const CLASS_NAME_SELECTED = 'selected'
 
 const ARROW_DOWN_KEY = 'ArrowDown'
@@ -36,9 +35,9 @@ const SPACE_KEY = 'Space'
 const EVENT_KEY = '.coreui.time-selection'
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 
-const SELECTOR_ROLL_CELL = `.${CLASS_NAME_ROLL_CELL}`
-const SELECTOR_ROLL_CELL_SELECTED = `.${CLASS_NAME_ROLL_CELL}.${CLASS_NAME_SELECTED}`
-const SELECTOR_ROLL_COL = `.${CLASS_NAME_ROLL_COL}`
+const SELECTOR_CELL = `.${CLASS_NAME_CELL}`
+const SELECTOR_CELL_SELECTED = `.${CLASS_NAME_CELL}.${CLASS_NAME_SELECTED}`
+const SELECTOR_COL = `.${CLASS_NAME_COL}`
 
 /**
  * Class definition
@@ -50,13 +49,12 @@ class TimeRoll extends TimeSelection {
   }
 
   override _renderBody(): void {
-    this._element!.classList.add(CLASS_NAME_ROLL)
-    this._renderRoll()
-    this._addRollKeyboardNavigation()
+    this._renderColumns()
+    this._addKeyboardNavigation()
   }
 
   override _stops(): HTMLElement[] {
-    return SelectorEngine.find(SELECTOR_ROLL_CELL, this._element as HTMLElement)
+    return SelectorEngine.find(SELECTOR_CELL, this._element as HTMLElement)
   }
 
   override _markPart(part: string, value: string, instant: boolean): void {
@@ -71,16 +69,16 @@ class TimeRoll extends TimeSelection {
     }
   }
 
-  _renderRoll(): void {
+  _renderColumns(): void {
     for (const part of this._parts()) {
       const column = document.createElement('div')
-      column.classList.add(CLASS_NAME_ROLL_COL)
+      column.classList.add(CLASS_NAME_COL)
       column.setAttribute('role', 'listbox')
       column.setAttribute('aria-label', part.ariaLabel)
 
       for (const option of part.options) {
         const cell = document.createElement('div')
-        cell.classList.add(CLASS_NAME_ROLL_CELL)
+        cell.classList.add(CLASS_NAME_CELL)
         cell.setAttribute('role', 'option')
         cell.setAttribute('aria-label', option.label.toString())
         cell.setAttribute('aria-selected', 'false')
@@ -106,14 +104,14 @@ class TimeRoll extends TimeSelection {
 
   // A roving tabindex reaches one cell per column with Tab; the rest of the
   // options are only reachable with the arrows.
-  _addRollKeyboardNavigation(): void {
+  _addKeyboardNavigation(): void {
     EventHandler.off(this._element, EVENT_KEYDOWN)
-    EventHandler.on(this._element, EVENT_KEYDOWN, SELECTOR_ROLL_CELL, (event: any) => {
+    EventHandler.on(this._element, EVENT_KEYDOWN, SELECTOR_CELL, (event: any) => {
       const target = event.target as HTMLElement
 
       if (event.key === ARROW_DOWN_KEY || event.key === ARROW_UP_KEY) {
         event.preventDefault()
-        const items = SelectorEngine.find(SELECTOR_ROLL_CELL, target.parentElement as HTMLElement)
+        const items = SelectorEngine.find(SELECTOR_CELL, target.parentElement as HTMLElement)
 
         if (items.length === 0) {
           return
@@ -128,7 +126,7 @@ class TimeRoll extends TimeSelection {
 
       if (event.key === HOME_KEY || event.key === END_KEY) {
         event.preventDefault()
-        const items = SelectorEngine.find(SELECTOR_ROLL_CELL, target.parentElement as HTMLElement)
+        const items = SelectorEngine.find(SELECTOR_CELL, target.parentElement as HTMLElement)
 
         if (items.length === 0) {
           return
@@ -148,7 +146,7 @@ class TimeRoll extends TimeSelection {
   }
 
   _moveFocusToColumn(cell: HTMLElement, offset: number): void {
-    const columns = SelectorEngine.find(SELECTOR_ROLL_COL, this._element as HTMLElement)
+    const columns = SelectorEngine.find(SELECTOR_COL, this._element as HTMLElement)
     const index = columns.indexOf(cell.parentElement as HTMLElement) + offset
 
     if (index < 0 || index > columns.length - 1) {
@@ -159,8 +157,8 @@ class TimeRoll extends TimeSelection {
   }
 
   _entryCell(column: HTMLElement): HTMLElement | null {
-    return SelectorEngine.findOne(SELECTOR_ROLL_CELL_SELECTED, column) ??
-      SelectorEngine.findOne(SELECTOR_ROLL_CELL, column)
+    return SelectorEngine.findOne(SELECTOR_CELL_SELECTED, column) ??
+      SelectorEngine.findOne(SELECTOR_CELL, column)
   }
 
   // v1 scrolls the selected cell into view — without it a value like 14:30 marks

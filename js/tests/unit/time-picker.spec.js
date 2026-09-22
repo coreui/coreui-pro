@@ -55,12 +55,12 @@ describe('TimePicker', () => {
 
       expect(picker._selection).toBeNull()
       expect(fixtureEl.querySelector('.time-picker-popup')).toBeNull()
-      expect(fixtureEl.querySelector('.time-picker-roll-col')).toBeNull()
+      expect(fixtureEl.querySelector('.time-picker-col')).toBeNull()
 
       picker.show()
 
       expect(picker._selection).not.toBeNull()
-      expect(fixtureEl.querySelector('.time-picker-popup').querySelectorAll('.time-picker-roll-col').length).toBeGreaterThan(0)
+      expect(fixtureEl.querySelector('.time-picker-popup').querySelectorAll('.time-picker-col').length).toBeGreaterThan(0)
     })
 
     it('should initialize the field with the configured time', () => {
@@ -108,7 +108,7 @@ describe('TimePicker', () => {
       picker.show()
 
       const popup = fixtureEl.querySelector('.time-picker-popup')
-      expect(popup.querySelector('.time-picker-body').classList.contains('time-picker-roll')).toBeTrue()
+      expect(popup.querySelector('.time-picker-body')).not.toBeNull()
       expect(popup.querySelector('select')).toBeNull()
     })
 
@@ -118,7 +118,7 @@ describe('TimePicker', () => {
 
       const popup = fixtureEl.querySelector('.time-picker-popup')
       expect(popup.querySelector('select')).toBeNull()
-      expect(popup.querySelectorAll('.time-picker-roll-col').length).toBeGreaterThan(0)
+      expect(popup.querySelectorAll('.time-picker-col').length).toBeGreaterThan(0)
     })
 
     it('should keep the roll to a single tab stop and move between columns with the arrows', () => {
@@ -126,15 +126,15 @@ describe('TimePicker', () => {
       picker.show()
 
       const body = fixtureEl.querySelector('.time-picker-body')
-      expect(body.querySelectorAll('.time-picker-roll-cell').length).toBeGreaterThan(4)
+      expect(body.querySelectorAll('.time-picker-cell').length).toBeGreaterThan(4)
       expect(body.querySelectorAll('[tabindex="0"]').length).toEqual(1)
 
-      const first = body.querySelector('.time-picker-roll-col .time-picker-roll-cell')
+      const first = body.querySelector('.time-picker-col .time-picker-cell')
       first.focus()
       first.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }))
 
-      const columns = [...body.querySelectorAll('.time-picker-roll-col')]
-      expect(columns.indexOf(document.activeElement.closest('.time-picker-roll-col'))).toEqual(1)
+      const columns = [...body.querySelectorAll('.time-picker-col')]
+      expect(columns.indexOf(document.activeElement.closest('.time-picker-col'))).toEqual(1)
       expect(body.querySelectorAll('[tabindex="0"]').length).toEqual(1)
     })
 
@@ -143,12 +143,12 @@ describe('TimePicker', () => {
       picker.show()
 
       const body = fixtureEl.querySelector('.time-picker-body')
-      const columns = [...body.querySelectorAll('.time-picker-roll-col')]
-      const last = columns[columns.length - 1].querySelector('.time-picker-roll-cell')
+      const columns = [...body.querySelectorAll('.time-picker-col')]
+      const last = columns[columns.length - 1].querySelector('.time-picker-cell')
       last.focus()
       last.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }))
 
-      expect(document.activeElement.closest('.time-picker-roll-col')).toEqual(columns[columns.length - 1])
+      expect(document.activeElement.closest('.time-picker-col')).toEqual(columns[columns.length - 1])
     })
 
     it('should drop the seconds column when seconds are disabled', () => {
@@ -380,14 +380,14 @@ describe('TimePicker', () => {
     const openRoll = () => {
       const picker = buildPicker({ seconds: false })
       picker.show()
-      return fixtureEl.querySelector('.time-picker-roll')
+      return fixtureEl.querySelector('.time-picker-body')
     }
 
-    const cellsOf = column => Array.from(column.querySelectorAll('.time-picker-roll-cell'))
+    const cellsOf = column => Array.from(column.querySelectorAll('.time-picker-cell'))
 
     it('should move down and up within a column', () => {
       const roll = openRoll()
-      const [hours] = roll.querySelectorAll('.time-picker-roll-col')
+      const [hours] = roll.querySelectorAll('.time-picker-col')
       const cells = cellsOf(hours)
 
       cells[0].focus()
@@ -400,7 +400,7 @@ describe('TimePicker', () => {
 
     it('should jump to the first and the last option', () => {
       const roll = openRoll()
-      const [hours] = roll.querySelectorAll('.time-picker-roll-col')
+      const [hours] = roll.querySelectorAll('.time-picker-col')
       const cells = cellsOf(hours)
 
       cells[0].focus()
@@ -413,7 +413,7 @@ describe('TimePicker', () => {
 
     it('should move between columns', () => {
       const roll = openRoll()
-      const [hours, minutes] = roll.querySelectorAll('.time-picker-roll-col')
+      const [hours, minutes] = roll.querySelectorAll('.time-picker-col')
 
       cellsOf(hours)[0].focus()
       document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }))
@@ -427,8 +427,8 @@ describe('TimePicker', () => {
       const picker = buildPicker({ seconds: false }, '<div dir="rtl"><div id="picker"></div></div>')
       picker.show()
 
-      const roll = fixtureEl.querySelector('.time-picker-roll')
-      const [hours, minutes] = roll.querySelectorAll('.time-picker-roll-col')
+      const roll = fixtureEl.querySelector('.time-picker-body')
+      const [hours, minutes] = roll.querySelectorAll('.time-picker-col')
 
       cellsOf(hours)[0].focus()
       document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }))
@@ -438,7 +438,7 @@ describe('TimePicker', () => {
 
     it('should stay in the first column on ArrowLeft', () => {
       const roll = openRoll()
-      const [hours] = roll.querySelectorAll('.time-picker-roll-col')
+      const [hours] = roll.querySelectorAll('.time-picker-col')
       const first = cellsOf(hours)[0]
 
       first.focus()

@@ -1120,7 +1120,7 @@ describe('DatePicker', () => {
       expect(popup.querySelector('.date-picker-timepickers .date-picker-time-body')).not.toBeNull()
       expect(popup.querySelector('.calendar')).not.toBeNull()
       expect(popup.querySelectorAll('select.date-picker-time-select').length).toBeGreaterThan(0)
-      expect(popup.querySelector('.time-picker-roll-col')).toBeNull()
+      expect(popup.querySelector('.time-picker-col')).toBeNull()
     })
 
     it('should keep the time selects to a single tab stop and move between them with the arrows', () => {

@@ -66,7 +66,7 @@ describe('TimeSelection', () => {
       buildSelects()
 
       expect(fixtureEl.querySelectorAll('select.date-picker-time-select')).toHaveSize(3)
-      expect(fixtureEl.querySelector('.time-picker-roll-col')).toBeNull()
+      expect(fixtureEl.querySelector('.time-picker-col')).toBeNull()
     })
 
     it('should report a change from a select', () => {
@@ -188,7 +188,7 @@ describe('TimeSelection', () => {
     it('should keep one tab stop for the whole body, on the first selected cell', () => {
       build({ time: new Date(2026, 0, 1, 2, 30, 0) })
 
-      expect(fixtureEl.querySelectorAll('.time-picker-roll-cell[tabindex="0"]').length).toBe(1)
+      expect(fixtureEl.querySelectorAll('.time-picker-cell[tabindex="0"]').length).toBe(1)
       expect(fixtureEl.querySelector('[data-coreui-hours="2"]').tabIndex).toBe(0)
       expect(fixtureEl.querySelector('[data-coreui-minutes="30"]').tabIndex).toBe(-1)
       expect(fixtureEl.querySelector('[data-coreui-minutes="31"]').tabIndex).toBe(-1)
