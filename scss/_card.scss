@@ -30,7 +30,8 @@ $card-tokens: defaults(
     --#{$prefix}card-height: auto,
     --#{$prefix}card-color: inherit,
     --#{$prefix}card-bg: var(--#{$prefix}bg-body),
-    --#{$prefix}card-img-overlay-padding: var(--#{$prefix}spacer),
+    --#{$prefix}card-img-overlay-padding-y: var(--#{$prefix}spacer),
+    --#{$prefix}card-img-overlay-padding-x: var(--#{$prefix}spacer),
     --#{$prefix}card-group-margin: #{$grid-gutter-x * .5},
   ),
   $card-tokens
@@ -181,7 +182,7 @@ $card-tokens: defaults(
   .card-img-overlay {
     position: absolute;
     inset: 0;
-    padding: var(--#{$prefix}card-img-overlay-padding);
+    padding: var(--#{$prefix}card-img-overlay-padding-y) var(--#{$prefix}card-img-overlay-padding-x);
     @include border-radius(var(--#{$prefix}card-inner-border-radius));
   }
 

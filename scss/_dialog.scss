@@ -35,7 +35,8 @@ $dialog-tokens: () !default;
 $dialog-tokens: defaults(
   (
     --#{$prefix}dialog-zindex: var(--#{$prefix}z-dialog),
-    --#{$prefix}dialog-padding: var(--#{$prefix}spacer),
+    --#{$prefix}dialog-padding-y: var(--#{$prefix}spacer),
+    --#{$prefix}dialog-padding-x: var(--#{$prefix}spacer),
     --#{$prefix}dialog-width: 500px,
     --#{$prefix}dialog-margin: 1.75rem,
     --#{$prefix}dialog-color: var(--#{$prefix}fg-body),
@@ -49,11 +50,13 @@ $dialog-tokens: defaults(
     --#{$prefix}dialog-transition-timing: var(--#{$prefix}transition-timing-overlay),
     --#{$prefix}dialog-backdrop-bg: color-mix(in oklch, var(--#{$prefix}backdrop-color) var(--#{$prefix}backdrop-opacity), transparent),
     --#{$prefix}dialog-backdrop-blur: var(--#{$prefix}backdrop-blur),
-    --#{$prefix}dialog-header-padding: var(--#{$prefix}spacer),
+    --#{$prefix}dialog-header-padding-y: var(--#{$prefix}spacer),
+    --#{$prefix}dialog-header-padding-x: var(--#{$prefix}spacer),
     --#{$prefix}dialog-header-border-color: var(--#{$prefix}border-color-translucent),
     --#{$prefix}dialog-header-border-width: var(--#{$prefix}border-width),
     --#{$prefix}dialog-title-line-height: var(--#{$prefix}body-line-height),
-    --#{$prefix}dialog-footer-padding: var(--#{$prefix}spacer),
+    --#{$prefix}dialog-footer-padding-y: var(--#{$prefix}spacer),
+    --#{$prefix}dialog-footer-padding-x: var(--#{$prefix}spacer),
     --#{$prefix}dialog-footer-border-color: var(--#{$prefix}border-color-translucent),
     --#{$prefix}dialog-footer-border-width: var(--#{$prefix}border-width),
     --#{$prefix}dialog-footer-gap: .5rem,
@@ -217,7 +220,7 @@ $dialog-tokens: defaults(
 
   // Dialog header
   .dialog-header {
-    @include dialog-header(var(--#{$prefix}dialog-header-padding));
+    @include dialog-header(var(--#{$prefix}dialog-header-padding-y) var(--#{$prefix}dialog-header-padding-x));
     border-block-end: var(--#{$prefix}dialog-header-border-width) solid var(--#{$prefix}dialog-header-border-color);
 
     .btn-close {
@@ -233,11 +236,11 @@ $dialog-tokens: defaults(
   // Dialog body
   .dialog-body {
     position: relative;
-    @include dialog-body(var(--#{$prefix}dialog-padding));
+    @include dialog-body(var(--#{$prefix}dialog-padding-y) var(--#{$prefix}dialog-padding-x));
   }
 
   // Dialog footer
   .dialog-footer {
-    @include dialog-footer(var(--#{$prefix}dialog-footer-padding), var(--#{$prefix}dialog-footer-gap), var(--#{$prefix}dialog-footer-border-width), var(--#{$prefix}dialog-footer-border-color));
+    @include dialog-footer(var(--#{$prefix}dialog-footer-padding-y) var(--#{$prefix}dialog-footer-padding-x), var(--#{$prefix}dialog-footer-gap), var(--#{$prefix}dialog-footer-border-width), var(--#{$prefix}dialog-footer-border-color));
   }
 }

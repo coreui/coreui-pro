@@ -3270,17 +3270,28 @@ map — several things below are breaking and are called out as such.
 #### Padding tokens carry both axes
 
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
-  **A token that sets `padding` names an axis.** `--cui-modal-padding`,
+  **A token that sets `padding` names an axis.** The six that v5 also had as
+  custom properties are `-padding-y` and `-padding-x` now:
+  `--cui-modal-padding`, `--cui-modal-header-padding`,
   `--cui-calendar-nav-padding`, `--cui-nav-enclosed-padding`,
-  `--cui-date-picker-footer-padding` and `--cui-time-picker-footer-padding`
-  are `-padding-y` and `-padding-x`; the same goes for the tokens added in
-  v6 (`--cui-btn-close-padding`, `--cui-form-field-card-padding`,
-  `--cui-list-box-section-label-padding`,
+  `--cui-date-picker-footer-padding`, `--cui-time-picker-footer-padding` and
+  `--cui-card-img-overlay-padding`. The same goes for the ones v6 introduced,
+  whether they are new or were Sass variables before
+  (`--cui-btn-close-padding`, `--cui-dialog-padding`,
+  `--cui-dialog-header-padding`, `--cui-dialog-footer-padding`,
+  `--cui-form-field-card-padding`, `--cui-list-box-section-label-padding`,
+  `--cui-mark-padding`, `--cui-thumbnail-padding`,
   `--cui-date-picker-time-body-padding`). Defaults are unchanged, so set
   both to the old value to keep the same box. A single-value token could not
   be overridden per axis, and one of them was already a two-value shorthand
   (`--cui-list-box-section-label-padding: .5rem .625rem`), which made the
   horizontal padding unreachable without restating the vertical one.
+- **Two tokens keep one value, because neither sets a `padding`.**
+  `--cui-switch-padding` is the inset between the track and the thumb: the
+  thumb's size subtracts it on both axes and only the inline offset reads it
+  directly, so a vertical half would be a knob with nothing to set.
+  `--cui-list-inline-padding` is the space between `.list-inline-item`s and
+  sets a margin.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **`--cui-modal-header-padding` is gone.** It only restated
   `--cui-modal-header-padding-y --cui-modal-header-padding-x`, and setting it
@@ -3939,8 +3950,9 @@ tintable and lets dark mode deepen every shadow at once.
   token map. `<th>` keeps the browser's own weight rather than a knob that
   emitted nothing, `<caption>` reads `--cui-spacer-2` and `--cui-fg-3`, and
   `code` reads `--cui-font-mono`.
-- **`mark` carries its own tokens.** `--cui-mark-padding`, `--cui-mark-color`
-  and `--cui-mark-bg` were declared on `:root`, where nothing else read them.
+- **`mark` carries its own tokens.** `--cui-mark-padding-y`/`-padding-x`,
+  `--cui-mark-color` and `--cui-mark-bg` were declared on `:root`, where
+  nothing else read them.
   They sit on `mark, .mark` now, in a `$reboot-mark-tokens` map you can override
   like any other component surface. Setting them on `:root` no longer reaches
   the element; set them on the element, or on the map when you compile.

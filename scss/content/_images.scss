@@ -14,7 +14,8 @@ $figure-caption-tokens: () !default;
 // scss-docs-start thumbnail-tokens
 $thumbnail-tokens: defaults(
   (
-    --#{$prefix}thumbnail-padding: .25rem,
+    --#{$prefix}thumbnail-padding-y: .25rem,
+    --#{$prefix}thumbnail-padding-x: .25rem,
     --#{$prefix}thumbnail-bg: var(--#{$prefix}bg-body),
     --#{$prefix}thumbnail-border-width: var(--#{$prefix}border-width),
     --#{$prefix}thumbnail-border-color: var(--#{$prefix}border-color),
@@ -60,7 +61,7 @@ $figure-caption-tokens: defaults(
   .img-thumbnail {
     @include tokens($thumbnail-tokens);
 
-    padding: var(--#{$prefix}thumbnail-padding);
+    padding: var(--#{$prefix}thumbnail-padding-y) var(--#{$prefix}thumbnail-padding-x);
     background-color: var(--#{$prefix}thumbnail-bg);
     border: var(--#{$prefix}thumbnail-border-width) solid var(--#{$prefix}thumbnail-border-color);
     @include border-radius(var(--#{$prefix}thumbnail-border-radius));
