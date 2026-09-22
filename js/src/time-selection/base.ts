@@ -1,13 +1,13 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI PRO util/time-selection.js
+ * CoreUI PRO time-selection/base.js
  * License (https://coreui.io/pro/license/)
  * --------------------------------------------------------------------------
  */
 
 import EventHandler from '../dom/event-handler.js'
 import SelectorEngine from '../dom/selector-engine.js'
-import Config from './config.js'
+import Config from '../util/config.js'
 import {
   convert12hTo24h,
   getLocalizedTimePartials,
@@ -15,8 +15,8 @@ import {
   getSelectedMinutes,
   getSelectedSeconds,
   isAmPm
-} from './time.js'
-import { execute } from './index.js'
+} from '../util/time.js'
+import { execute } from '../util/index.js'
 
 /**
  * Constants

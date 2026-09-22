@@ -1,5 +1,5 @@
-import TimeRoll from '../../../src/util/time-roll.js'
-import TimeSelects from '../../../src/util/time-selects.js'
+import TimeRoll from '../../../src/time-selection/roll.js'
+import TimeSelects from '../../../src/time-selection/selects.js'
 import { clearFixture, getFixture } from '../../helpers/fixture.js'
 
 describe('TimeSelection', () => {

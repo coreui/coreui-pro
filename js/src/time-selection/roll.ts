@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI PRO util/time-roll.js
+ * CoreUI PRO time-selection/roll.js
  * License (https://coreui.io/pro/license/)
  *
  * The scrolling-column rendering of the time selection body.
@@ -10,8 +10,8 @@
 import EventHandler from '../dom/event-handler.js'
 import Manipulator from '../dom/manipulator.js'
 import SelectorEngine from '../dom/selector-engine.js'
-import TimeSelection from './time-selection.js'
-import { getNextActiveElement, isRTL } from './index.js'
+import { getNextActiveElement, isRTL } from '../util/index.js'
+import TimeSelection from './base.js'
 
 /**
  * Constants

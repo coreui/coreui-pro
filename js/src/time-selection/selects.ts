@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI PRO util/time-selects.js
+ * CoreUI PRO time-selection/selects.js
  * License (https://coreui.io/pro/license/)
  *
  * The native-select rendering of the time selection body.
@@ -8,9 +8,9 @@
  */
 
 import SelectorEngine from '../dom/selector-engine.js'
-import TimeSelection from './time-selection.js'
-import { CLOCK_ICON } from './icons.js'
-import { isRTL } from './index.js'
+import { CLOCK_ICON } from '../util/icons.js'
+import { isRTL } from '../util/index.js'
+import TimeSelection from './base.js'
 
 /**
  * Constants

@@ -12,7 +12,7 @@ import PickerBase from './picker-base.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import TimeInput from './time-input.js'
-import TimeRoll from './util/time-roll.js'
+import TimeRoll from './time-selection/roll.js'
 import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 import type { ComponentConfig } from './util/config.js'
 import {
