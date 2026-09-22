@@ -3,7 +3,6 @@
 @use "mixins/tokens" as *;
 @use "calendar" as *;
 @use "config" as *;
-@use "time-picker" as *;
 
 $date-picker-tokens: () !default;
 
@@ -19,6 +18,22 @@ $date-picker-tokens: defaults(
   $date-picker-tokens
 );
 // scss-docs-end date-picker-tokens
+
+$date-picker-time-tokens: () !default;
+
+// scss-docs-start date-picker-time-tokens
+$date-picker-time-tokens: defaults(
+  (
+    --#{$prefix}time-picker-body-padding: var(--#{$prefix}spacer-2),
+    --#{$prefix}time-picker-inline-select-font-size: var(--#{$prefix}btn-input-sm-font-size),
+    --#{$prefix}time-picker-inline-select-color: var(--#{$prefix}btn-input-fg),
+    --#{$prefix}time-picker-inline-select-padding-y: var(--#{$prefix}btn-input-sm-padding-y),
+    --#{$prefix}time-picker-inline-select-padding-x: var(--#{$prefix}btn-input-sm-padding-x),
+    --#{$prefix}time-picker-inline-select-disabled-color: var(--#{$prefix}fg-body),
+  ),
+  $date-picker-time-tokens
+);
+// scss-docs-end date-picker-time-tokens
 
 // stylelint-enable scss/dollar-variable-default
 @layer components {
@@ -43,7 +58,35 @@ $date-picker-tokens: defaults(
     }
 
     .time-picker-body {
-      @include tokens($time-picker-tokens);
+      @include tokens($date-picker-time-tokens);
+      display: flex;
+      align-items: center;
+      padding: var(--#{$prefix}time-picker-body-padding);
+    }
+
+    .time-picker-inline-select {
+      padding: var(--#{$prefix}time-picker-inline-select-padding-y) var(--#{$prefix}time-picker-inline-select-padding-x);
+      font-size: var(--#{$prefix}time-picker-inline-select-font-size);
+      color: var(--#{$prefix}time-picker-inline-select-color);
+      text-align: end;
+      appearance: none;
+      scrollbar-width: none;
+      background-color: transparent;
+      border: 0;
+
+      &::-webkit-scrollbar {
+        width: 10px;
+      }
+
+      // Remove outline from select box in FF
+      &:-moz-focusring {
+        color: transparent;
+        text-shadow: 0 0 0 var(--#{$prefix}time-picker-inline-select-color);
+      }
+
+      &:disabled {
+        color: var(--#{$prefix}time-picker-inline-select-disabled-color);
+      }
     }
   }
 

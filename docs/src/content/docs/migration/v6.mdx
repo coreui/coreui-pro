@@ -1355,11 +1355,18 @@ validation and the arrow between them. Two consequences:
   section of the field.
 
 - The time selection body is now a shared primitive used by both pickers, so the
-  `roll` and `select` variants, the `hours`/`minutes`/`seconds` filters and the
-  12/24-hour locale split behave identically in each. See
+  `hours`/`minutes`/`seconds` filters and the 12/24-hour locale split behave
+  identically in each. See
   [time picker](/forms/time-picker/) and the new
   [date time picker](/forms/date-time-picker/), which replaces v1's
   `timepicker: true` flag on the date picker.
+- **Each picker has one time rendering, and the `variant` option is gone.** The
+  time picker shows the roll; the date time picker shows the selects, which is
+  what v5 rendered inside a date picker with time. The shared primitive still
+  implements both, and `selectionOptions` still reaches it, but neither picker
+  offers the choice as an option any more. `.time-picker-inline-select` moved
+  with it: it now ships in the date picker stylesheet, so a page that only uses
+  the time picker no longer downloads it.
 - Same removals as the date pickers: `footer`/`cancelButton`/`confirmButton` and
   their class options give way to a projected
   `<template data-coreui-template="footer">` with

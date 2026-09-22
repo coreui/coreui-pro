@@ -25,6 +25,12 @@ describe('DateTimePicker', () => {
     return picker
   }
 
+  const pickMinutes = (value, scope = fixtureEl) => {
+    const select = scope.querySelector('select.time-picker-inline-select.minutes')
+    select.value = String(value)
+    select.dispatchEvent(new Event('change'))
+  }
+
   describe('constructor', () => {
     it('should point aria-controls at the panel only while it exists', () => {
       const picker = buildPicker()
@@ -57,7 +63,8 @@ describe('DateTimePicker', () => {
       expect(popup.querySelector('.date-picker-calendar')).not.toBeNull()
       expect(popup.querySelector('.date-picker-timepickers .time-picker-body')).not.toBeNull()
       expect(popup.querySelector('.calendar')).not.toBeNull()
-      expect(popup.querySelectorAll('.time-picker-roll-col').length).toBeGreaterThan(0)
+      expect(popup.querySelectorAll('select.time-picker-inline-select').length).toBeGreaterThan(0)
+      expect(popup.querySelector('.time-picker-roll-col')).toBeNull()
     })
 
     it('should initialize the field with the configured date and time', () => {
@@ -102,7 +109,7 @@ describe('DateTimePicker', () => {
       const picker = buildPicker({ date: new Date(2026, 5, 15, 10, 0, 0) })
 
       picker.show()
-      fixtureEl.querySelectorAll('.date-picker-popup [data-coreui-minutes]')[45].click()
+      pickMinutes(45)
 
       const value = picker.getDate()
       expect(value.getFullYear()).toEqual(2026)
@@ -120,7 +127,7 @@ describe('DateTimePicker', () => {
       picker.show()
       const popup = fixtureEl.querySelector('.date-picker-popup')
       popup.querySelectorAll('.calendar-cell[data-coreui-selectable]')[0].click()
-      popup.querySelectorAll('[data-coreui-minutes]')[15].click()
+      pickMinutes(15, popup)
 
       expect(emitted.length).toBeGreaterThanOrEqual(2)
     })
@@ -217,7 +224,7 @@ describe('DateTimePicker', () => {
       const picker = buildPicker()
 
       picker.show()
-      fixtureEl.querySelectorAll('[data-coreui-minutes]')[10].click()
+      pickMinutes(10)
 
       expect(picker.getDate().getMinutes()).toEqual(10)
     })

@@ -71,8 +71,7 @@ type TimePickerConfig = {
   seconds: boolean | number[] | ((second: number) => boolean),
   selectionOptions: Record<string, any>,
   size: string | null,
-  time: Date | string | null,
-  variant: string
+  time: Date | string | null
 }
 
 const Default: TimePickerConfig = {
@@ -93,8 +92,7 @@ const Default: TimePickerConfig = {
   seconds: true,
   selectionOptions: {},
   size: null,
-  time: null,
-  variant: 'roll'
+  time: null
 }
 
 const DefaultType: Record<string, string> = {
@@ -115,8 +113,7 @@ const DefaultType: Record<string, string> = {
   seconds: '(array|boolean|function)',
   selectionOptions: 'object',
   size: '(string|null)',
-  time: '(date|string|null)',
-  variant: 'string'
+  time: '(date|string|null)'
 }
 
 /**
@@ -297,7 +294,7 @@ class TimePicker extends PickerBase {
         EventHandler.trigger(this._element, EVENT_TIME_CHANGE, { time })
       },
       time: this.getTime(),
-      variant: this._config.variant
+      variant: 'roll'
     }, this._config.selectionOptions))
   }
 

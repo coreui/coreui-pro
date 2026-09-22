@@ -112,13 +112,13 @@ describe('TimePicker', () => {
       expect(popup.querySelector('select')).toBeNull()
     })
 
-    it('should render selects for the select variant', () => {
+    it('should ignore a variant passed through the config', () => {
       const picker = buildPicker({ variant: 'select' })
       picker.show()
 
       const popup = fixtureEl.querySelector('.time-picker-popup')
-      expect(popup.querySelectorAll('select.time-picker-inline-select').length).toBeGreaterThan(0)
-      expect(popup.querySelector('.time-picker-roll-col')).toBeNull()
+      expect(popup.querySelector('select')).toBeNull()
+      expect(popup.querySelectorAll('.time-picker-roll-col').length).toBeGreaterThan(0)
     })
 
     it('should drop the seconds column when seconds are disabled', () => {

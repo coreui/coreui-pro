@@ -81,8 +81,7 @@ type DateTimePickerConfig = {
   sanitizeFn: ((unsafeHtml: string) => string) | null,
   seconds: boolean | number[] | ((second: number) => boolean),
   selectionOptions: Record<string, any>,
-  size: string | null,
-  variant: string
+  size: string | null
 }
 
 const Default: DateTimePickerConfig = {
@@ -106,8 +105,7 @@ const Default: DateTimePickerConfig = {
   sanitizeFn: null,
   seconds: true,
   selectionOptions: {},
-  size: null,
-  variant: 'roll'
+  size: null
 }
 
 const DefaultType: Record<string, string> = {
@@ -131,8 +129,7 @@ const DefaultType: Record<string, string> = {
   sanitizeFn: '(function|null)',
   seconds: '(array|boolean|function)',
   selectionOptions: 'object',
-  size: '(string|null)',
-  variant: 'string'
+  size: '(string|null)'
 }
 
 /**
@@ -339,7 +336,7 @@ class DateTimePicker extends PickerBase {
       locale: this._config.locale,
       onChange: (time: Date | null) => this._applyTime(time),
       time: this.getDate(),
-      variant: this._config.variant
+      variant: 'select'
     }, this._config.selectionOptions))
 
     EventHandler.on(this._calendar._element, 'startDateChange.coreui.calendar', (event: any) => {
