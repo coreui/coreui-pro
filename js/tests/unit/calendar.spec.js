@@ -367,7 +367,7 @@ describe('Calendar', () => {
         showWeekNumber: true
       })
 
-      const row = div.querySelectorAll('.calendar-row[tabindex="0"]')[1]
+      const row = div.querySelectorAll('.calendar-row[data-coreui-selectable]')[1]
       row.querySelector('.calendar-cell-week-number').click()
 
       expect(calendar._startDate).toEqual(new Date(row.querySelector('.calendar-cell').dataset.coreuiDate))
@@ -384,6 +384,110 @@ describe('Calendar', () => {
       const labelledCells = div.querySelectorAll('td.calendar-cell[aria-label]')
       expect(labelledCells.length).toBeGreaterThan(0)
       expect(div.querySelector('[aria-current="date"]')).not.toBeNull()
+    })
+
+    it('should keep the grid to a single tab stop', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { locale: 'en-US' }) // eslint-disable-line no-new
+
+      expect(div.querySelectorAll('.calendar-cell[data-coreui-selectable]').length).toBeGreaterThan(1)
+      expect(div.querySelectorAll('.calendar-cell[tabindex="0"]').length).toEqual(1)
+      expect(div.querySelector('.calendar-cell[tabindex="0"]').classList.contains('today')).toBeTrue()
+    })
+
+    it('should park the stop on the day the calendar opens on, whatever the time of day', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { locale: 'en-US', calendarDate: new Date(2026, 8, 22, 15, 30) }) // eslint-disable-line no-new
+
+      const stop = div.querySelector('[tabindex="0"]')
+      expect(new Date(stop.dataset.coreuiDate).getDate()).toEqual(22)
+    })
+
+    it('should prefer the selected date over the day the calendar opens on', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { // eslint-disable-line no-new
+        locale: 'en-US', calendarDate: new Date(2026, 8, 22), startDate: new Date(2026, 8, 5)
+      })
+
+      const stop = div.querySelector('[tabindex="0"]')
+      expect(new Date(stop.dataset.coreuiDate).getDate()).toEqual(5)
+    })
+
+    it('should keep a stop in every panel, one per grid', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { locale: 'en-US', calendars: 2 }) // eslint-disable-line no-new
+
+      expect(div.querySelectorAll('table[role="grid"]').length).toEqual(2)
+      expect(div.querySelectorAll('[tabindex="0"]').length).toEqual(2)
+    })
+
+    it('should park the stop on the period the view is showing, not on the nearest day', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendarDate = new Date(2026, 8, 22)
+
+      for (const [selectionType, expected] of [
+        ['month', new Date(2026, 8, 1)],
+        ['quarter', new Date(2026, 6, 1)],
+        ['year', new Date(2026, 0, 1)]
+      ]) {
+        div.innerHTML = ''
+        new Calendar(div, { locale: 'en-US', selectionType, calendarDate }) // eslint-disable-line no-new
+
+        const stop = div.querySelector('[tabindex="0"]')
+        expect(stop).not.toBeNull()
+        expect(new Date(stop.dataset.coreuiDate).getTime()).toEqual(expected.getTime())
+      }
+    })
+
+    it('should keep a stop in the month and year views of a week picker', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { locale: 'en-US', selectionType: 'week', calendarDate: new Date(2026, 8, 22) }) // eslint-disable-line no-new
+
+      expect(div.querySelectorAll('[tabindex="0"]').length).toEqual(1)
+
+      for (const button of ['.btn-year', '.btn-month']) {
+        div.innerHTML = ''
+        new Calendar(div, { locale: 'en-US', selectionType: 'week', calendarDate: new Date(2026, 8, 22) }) // eslint-disable-line no-new
+
+        div.querySelector(button).click()
+        expect(div.querySelectorAll('[tabindex="0"]').length).toEqual(1)
+      }
+    })
+
+    it('should move the tab stop to the cell that takes focus', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { locale: 'en-US' }) // eslint-disable-line no-new
+
+      const cells = div.querySelectorAll('.calendar-cell[data-coreui-selectable]')
+      const target = cells[cells.length - 1]
+      target.focus()
+
+      expect(div.querySelectorAll('.calendar-cell[tabindex="0"]').length).toEqual(1)
+      expect(target.tabIndex).toEqual(0)
+    })
+
+    it('should keep one tab stop per row when weeks are the unit', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { locale: 'en-US', selectionType: 'week' }) // eslint-disable-line no-new
+
+      expect(div.querySelectorAll('.calendar-row[data-coreui-selectable]').length).toBeGreaterThan(1)
+      expect(div.querySelectorAll('.calendar-row[tabindex="0"]').length).toEqual(1)
     })
   })
 
@@ -917,7 +1021,7 @@ describe('Calendar', () => {
         const showSpy = spyOn(calendar, '_handleCalendarClick').and.callThrough()
 
         setTimeout(() => {
-          const dayCell = div.querySelector('.calendar-cell[tabindex="0"]')
+          const dayCell = div.querySelector('.calendar-cell[data-coreui-selectable]')
           expect(dayCell).not.toBeNull()
 
           const keydownEvent = createEvent('keydown')
@@ -938,7 +1042,7 @@ describe('Calendar', () => {
         const clickSpy = spyOn(calendar, '_handleCalendarClick').and.callThrough()
 
         setTimeout(() => {
-          const dayCell = div.querySelector('.calendar-cell[tabindex="0"]')
+          const dayCell = div.querySelector('.calendar-cell[data-coreui-selectable]')
           expect(dayCell).not.toBeNull()
 
           const keydownEvent = createEvent('keydown')
@@ -959,7 +1063,7 @@ describe('Calendar', () => {
         new Calendar(div, { calendarDate: new Date(2023, 5, 1) }) // eslint-disable-line no-new
 
         setTimeout(() => {
-          const cells = div.querySelectorAll('.calendar-cell[tabindex="0"]')
+          const cells = div.querySelectorAll('.calendar-cell[data-coreui-selectable]')
           expect(cells.length).toBeGreaterThan(1)
 
           const firstCell = cells[0]
@@ -982,7 +1086,7 @@ describe('Calendar', () => {
         new Calendar(div, { calendarDate: new Date(2023, 5, 1) }) // eslint-disable-line no-new
 
         setTimeout(() => {
-          const cells = div.querySelectorAll('.calendar-cell[tabindex="0"]')
+          const cells = div.querySelectorAll('.calendar-cell[data-coreui-selectable]')
           expect(cells.length).toBeGreaterThan(1)
 
           const lastCell = cells[cells.length - 1]
@@ -1004,7 +1108,7 @@ describe('Calendar', () => {
         new Calendar(div, { calendarDate: new Date(2023, 5, 1) }) // eslint-disable-line no-new
 
         setTimeout(() => {
-          const cells = div.querySelectorAll('.calendar-cell[tabindex="0"]')
+          const cells = div.querySelectorAll('.calendar-cell[data-coreui-selectable]')
           expect(cells.length).toBeGreaterThan(7)
 
           const firstCell = cells[0]
@@ -1026,7 +1130,7 @@ describe('Calendar', () => {
         new Calendar(div, { calendarDate: new Date(2023, 5, 1) }) // eslint-disable-line no-new
 
         setTimeout(() => {
-          const cells = div.querySelectorAll('.calendar-cell[tabindex="0"]')
+          const cells = div.querySelectorAll('.calendar-cell[data-coreui-selectable]')
           expect(cells.length).toBeGreaterThan(7)
 
           const cell = cells[10]
@@ -1042,7 +1146,7 @@ describe('Calendar', () => {
     })
 
     const findDayCell = (div, year, month, day) =>
-      [...div.querySelectorAll('.calendar-cell[tabindex="0"]')].find(cell => {
+      [...div.querySelectorAll('.calendar-cell[data-coreui-selectable]')].find(cell => {
         const date = new Date(cell.dataset.coreuiDate)
         return date.getFullYear() === year && date.getMonth() === month && date.getDate() === day
       })
@@ -1233,7 +1337,7 @@ describe('Calendar', () => {
         new Calendar(div, { calendarDate: new Date(2023, 5, 1), maxDate }) // eslint-disable-line no-new
 
         setTimeout(() => {
-          const cells = div.querySelectorAll('.calendar-cell[tabindex="0"]')
+          const cells = div.querySelectorAll('.calendar-cell[data-coreui-selectable]')
           if (cells.length > 0) {
             const lastEnabledCell = cells[cells.length - 1]
             lastEnabledCell.focus()
@@ -1256,7 +1360,7 @@ describe('Calendar', () => {
         new Calendar(div, { calendarDate: new Date(2023, 5, 1), minDate }) // eslint-disable-line no-new
 
         setTimeout(() => {
-          const cells = div.querySelectorAll('.calendar-cell[tabindex="0"]')
+          const cells = div.querySelectorAll('.calendar-cell[data-coreui-selectable]')
           if (cells.length > 0) {
             const firstEnabledCell = cells[0]
             firstEnabledCell.focus()
@@ -1279,7 +1383,7 @@ describe('Calendar', () => {
         new Calendar(div, { calendarDate: new Date(2023, 5, 1), maxDate }) // eslint-disable-line no-new
 
         setTimeout(() => {
-          const cells = div.querySelectorAll('.calendar-cell[tabindex="0"]')
+          const cells = div.querySelectorAll('.calendar-cell[data-coreui-selectable]')
           if (cells.length > 0) {
             const lastEnabledCell = cells[cells.length - 1]
             lastEnabledCell.focus()
@@ -1302,7 +1406,7 @@ describe('Calendar', () => {
         new Calendar(div, { calendarDate: new Date(2023, 5, 1), minDate }) // eslint-disable-line no-new
 
         setTimeout(() => {
-          const cells = div.querySelectorAll('.calendar-cell[tabindex="0"]')
+          const cells = div.querySelectorAll('.calendar-cell[data-coreui-selectable]')
           if (cells.length > 0) {
             const firstEnabledCell = cells[0]
             firstEnabledCell.focus()
@@ -1325,7 +1429,7 @@ describe('Calendar', () => {
         const modifySpy = spyOn(calendar, '_modifyCalendarDate').and.callThrough()
 
         setTimeout(() => {
-          const cells = div.querySelectorAll('.calendar-cell[tabindex="0"]')
+          const cells = div.querySelectorAll('.calendar-cell[data-coreui-selectable]')
           if (cells.length > 0) {
             const lastCell = cells[cells.length - 1]
             lastCell.focus()
@@ -1350,7 +1454,7 @@ describe('Calendar', () => {
         const modifySpy = spyOn(calendar, '_modifyCalendarDate').and.callThrough()
 
         setTimeout(() => {
-          const cells = div.querySelectorAll('.calendar-cell[tabindex="0"]')
+          const cells = div.querySelectorAll('.calendar-cell[data-coreui-selectable]')
           if (cells.length > 0) {
             const firstCell = cells[0]
             firstCell.focus()
@@ -1375,7 +1479,7 @@ describe('Calendar', () => {
         const modifySpy = spyOn(calendar, '_modifyCalendarDate').and.callThrough()
 
         setTimeout(() => {
-          const cells = div.querySelectorAll('.calendar-cell[tabindex="0"]')
+          const cells = div.querySelectorAll('.calendar-cell[data-coreui-selectable]')
           if (cells.length > 0) {
             // Focus on a cell near the end (less than 7 from end)
             const nearEndCell = cells[cells.length - 3]
@@ -1401,7 +1505,7 @@ describe('Calendar', () => {
         const modifySpy = spyOn(calendar, '_modifyCalendarDate').and.callThrough()
 
         setTimeout(() => {
-          const cells = div.querySelectorAll('.calendar-cell[tabindex="0"]')
+          const cells = div.querySelectorAll('.calendar-cell[data-coreui-selectable]')
           if (cells.length > 0) {
             // Focus on a cell near the start (less than 7 from start)
             const nearStartCell = cells[3]
@@ -1430,7 +1534,7 @@ describe('Calendar', () => {
         const modifySpy = spyOn(calendar, '_modifyCalendarDate').and.callThrough()
 
         setTimeout(() => {
-          const cells = div.querySelectorAll('.calendar-cell[tabindex="0"]')
+          const cells = div.querySelectorAll('.calendar-cell[data-coreui-selectable]')
           if (cells.length > 0) {
             const lastCell = cells[cells.length - 1]
             lastCell.focus()
@@ -1458,7 +1562,7 @@ describe('Calendar', () => {
         const modifySpy = spyOn(calendar, '_modifyCalendarDate').and.callThrough()
 
         setTimeout(() => {
-          const cells = div.querySelectorAll('.calendar-cell[tabindex="0"]')
+          const cells = div.querySelectorAll('.calendar-cell[data-coreui-selectable]')
           if (cells.length > 0) {
             const lastCell = cells[cells.length - 1]
             lastCell.focus()
@@ -1484,7 +1588,7 @@ describe('Calendar', () => {
         calendarDate: new Date(2023, 5, 1)
       })
 
-      const rows = div.querySelectorAll('.calendar-row[tabindex="0"]')
+      const rows = div.querySelectorAll('.calendar-row[data-coreui-selectable]')
       expect(rows.length).toBeGreaterThan(0)
 
       const secondRow = rows[1]
@@ -1503,7 +1607,7 @@ describe('Calendar', () => {
         calendarDate: new Date(2023, 5, 1)
       })
 
-      const row = div.querySelectorAll('.calendar-row[tabindex="0"]')[1]
+      const row = div.querySelectorAll('.calendar-row[data-coreui-selectable]')[1]
       const keydownEvent = createEvent('keydown')
       keydownEvent.key = 'Enter'
       row.dispatchEvent(keydownEvent)
@@ -1656,7 +1760,7 @@ describe('Calendar', () => {
 
         setTimeout(() => {
           // Click a month cell
-          const monthCell = div.querySelector('.calendar-cell[tabindex="0"]')
+          const monthCell = div.querySelector('.calendar-cell[data-coreui-selectable]')
           if (monthCell) {
             monthCell.click()
           }
@@ -1682,7 +1786,7 @@ describe('Calendar', () => {
 
         setTimeout(() => {
           // Click a year cell
-          const yearCell = div.querySelector('.calendar-cell[tabindex="0"]')
+          const yearCell = div.querySelector('.calendar-cell[data-coreui-selectable]')
           if (yearCell) {
             yearCell.click()
           }
@@ -1710,7 +1814,7 @@ describe('Calendar', () => {
         expect(calendar._view).toEqual('years')
 
         setTimeout(() => {
-          const yearCell = div.querySelector('.calendar-cell[tabindex="0"]')
+          const yearCell = div.querySelector('.calendar-cell[data-coreui-selectable]')
           if (yearCell) {
             yearCell.click()
           }
@@ -1735,7 +1839,7 @@ describe('Calendar', () => {
         })
 
         setTimeout(() => {
-          const cell = div.querySelector('.calendar-cell[tabindex="0"]')
+          const cell = div.querySelector('.calendar-cell[data-coreui-selectable]')
           if (cell) {
             calendar._handleCalendarMouseEnter({ target: cell })
             expect(calendar._hoverDate).not.toBeNull()
@@ -1756,7 +1860,7 @@ describe('Calendar', () => {
         })
 
         setTimeout(() => {
-          const cell = div.querySelector('.calendar-cell[tabindex="0"]')
+          const cell = div.querySelector('.calendar-cell[data-coreui-selectable]')
           if (cell) {
             // First hover - call handler directly
             calendar._handleCalendarMouseEnter({ target: cell })
@@ -1807,7 +1911,7 @@ describe('Calendar', () => {
         div.addEventListener('cellHover.coreui.calendar', listener)
 
         setTimeout(() => {
-          const cell = div.querySelector('.calendar-cell[tabindex="0"]')
+          const cell = div.querySelector('.calendar-cell[data-coreui-selectable]')
           if (cell) {
             calendar._handleCalendarMouseEnter({ target: cell })
             expect(listener).toHaveBeenCalled()
@@ -1830,7 +1934,7 @@ describe('Calendar', () => {
         div.addEventListener('cellHover.coreui.calendar', listener)
 
         setTimeout(() => {
-          const cell = div.querySelector('.calendar-cell[tabindex="0"]')
+          const cell = div.querySelector('.calendar-cell[data-coreui-selectable]')
           if (cell) {
             calendar._handleCalendarMouseLeave()
             expect(listener).toHaveBeenCalled()
@@ -2090,7 +2194,7 @@ describe('Calendar', () => {
       expect(attrs.className).toContain('today')
     })
 
-    it('should return tabIndex -1 for non-day selectionType in days view', () => {
+    it('should not mark as selectable non-day selectionType in days view', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
@@ -2098,10 +2202,10 @@ describe('Calendar', () => {
       const date = new Date(2023, 5, 15)
       const attrs = calendar._cellDayAttributes(date, 'current')
 
-      expect(attrs.tabIndex).toEqual(-1)
+      expect(attrs.selectable).toBeFalse()
     })
 
-    it('should return tabIndex 0 for clickable day in current month', () => {
+    it('should mark as selectable clickable day in current month', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
@@ -2112,10 +2216,10 @@ describe('Calendar', () => {
       const date = new Date(2023, 5, 15)
       const attrs = calendar._cellDayAttributes(date, 'current')
 
-      expect(attrs.tabIndex).toEqual(0)
+      expect(attrs.selectable).toBeTrue()
     })
 
-    it('should return tabIndex -1 for disabled dates', () => {
+    it('should not mark as selectable disabled dates', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
@@ -2127,11 +2231,11 @@ describe('Calendar', () => {
       const date = new Date(2023, 5, 15)
       const attrs = calendar._cellDayAttributes(date, 'current')
 
-      expect(attrs.tabIndex).toEqual(-1)
+      expect(attrs.selectable).toBeFalse()
       expect(attrs.className).toContain('disabled')
     })
 
-    it('should return tabIndex 0 for adjacent days when selectAdjacentDays is true', () => {
+    it('should mark as selectable adjacent days when selectAdjacentDays is true', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
@@ -2143,10 +2247,10 @@ describe('Calendar', () => {
       const date = new Date(2023, 4, 31) // previous month
       const attrs = calendar._cellDayAttributes(date, 'previous')
 
-      expect(attrs.tabIndex).toEqual(0)
+      expect(attrs.selectable).toBeTrue()
     })
 
-    it('should return tabIndex -1 for adjacent days when selectAdjacentDays is false', () => {
+    it('should not mark as selectable adjacent days when selectAdjacentDays is false', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
@@ -2158,7 +2262,7 @@ describe('Calendar', () => {
       const date = new Date(2023, 4, 31) // previous month
       const attrs = calendar._cellDayAttributes(date, 'previous')
 
-      expect(attrs.tabIndex).toEqual(-1)
+      expect(attrs.selectable).toBeFalse()
     })
 
     it('should include meta information', () => {
@@ -2180,7 +2284,7 @@ describe('Calendar', () => {
   })
 
   describe('_cellMonthAttributes', () => {
-    it('should return tabIndex 0 for enabled months', () => {
+    it('should mark as selectable enabled months', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
@@ -2188,10 +2292,10 @@ describe('Calendar', () => {
       const date = new Date(2023, 5, 1)
       const attrs = calendar._cellMonthAttributes(date)
 
-      expect(attrs.tabIndex).toEqual(0)
+      expect(attrs.selectable).toBeTrue()
     })
 
-    it('should return tabIndex -1 for disabled months', () => {
+    it('should not mark as selectable disabled months', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
@@ -2202,7 +2306,7 @@ describe('Calendar', () => {
       const date = new Date(2023, 3, 1)
       const attrs = calendar._cellMonthAttributes(date)
 
-      expect(attrs.tabIndex).toEqual(-1)
+      expect(attrs.selectable).toBeFalse()
       expect(attrs.className).toContain('disabled')
     })
 
@@ -2254,7 +2358,7 @@ describe('Calendar', () => {
   })
 
   describe('_cellQuarterAttributes', () => {
-    it('should return tabIndex 0 for enabled quarters', () => {
+    it('should mark as selectable enabled quarters', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
@@ -2262,10 +2366,10 @@ describe('Calendar', () => {
       const date = new Date(2023, 0, 1)
       const attrs = calendar._cellQuarterAttributes(date)
 
-      expect(attrs.tabIndex).toEqual(0)
+      expect(attrs.selectable).toBeTrue()
     })
 
-    it('should return tabIndex -1 for disabled quarters', () => {
+    it('should not mark as selectable disabled quarters', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
@@ -2276,7 +2380,7 @@ describe('Calendar', () => {
       const date = new Date(2023, 0, 1)
       const attrs = calendar._cellQuarterAttributes(date)
 
-      expect(attrs.tabIndex).toEqual(-1)
+      expect(attrs.selectable).toBeFalse()
       expect(attrs.className).toContain('disabled')
     })
 
@@ -2328,7 +2432,7 @@ describe('Calendar', () => {
   })
 
   describe('_cellYearAttributes', () => {
-    it('should return tabIndex 0 for enabled years', () => {
+    it('should mark as selectable enabled years', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
@@ -2336,10 +2440,10 @@ describe('Calendar', () => {
       const date = new Date(2023, 0, 1)
       const attrs = calendar._cellYearAttributes(date)
 
-      expect(attrs.tabIndex).toEqual(0)
+      expect(attrs.selectable).toBeTrue()
     })
 
-    it('should return tabIndex -1 for disabled years', () => {
+    it('should not mark as selectable disabled years', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
@@ -2350,7 +2454,7 @@ describe('Calendar', () => {
       const date = new Date(2023, 0, 1)
       const attrs = calendar._cellYearAttributes(date)
 
-      expect(attrs.tabIndex).toEqual(-1)
+      expect(attrs.selectable).toBeFalse()
       expect(attrs.className).toContain('disabled')
     })
 
@@ -2402,7 +2506,7 @@ describe('Calendar', () => {
   })
 
   describe('_rowWeekAttributes', () => {
-    it('should return tabIndex -1 when selectionType is not week', () => {
+    it('should not mark a row as selectable when selectionType is not week', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
@@ -2410,11 +2514,11 @@ describe('Calendar', () => {
       const date = new Date(2023, 5, 5)
       const attrs = calendar._rowWeekAttributes(date)
 
-      expect(attrs.tabIndex).toEqual(-1)
+      expect(attrs.selectable).toBeFalse()
       expect(attrs.ariaSelected).toBeFalse()
     })
 
-    it('should return tabIndex 0 for enabled weeks when selectionType is week', () => {
+    it('should mark as selectable enabled weeks when selectionType is week', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
@@ -2422,10 +2526,10 @@ describe('Calendar', () => {
       const date = new Date(2023, 5, 5)
       const attrs = calendar._rowWeekAttributes(date)
 
-      expect(attrs.tabIndex).toEqual(0)
+      expect(attrs.selectable).toBeTrue()
     })
 
-    it('should return tabIndex -1 for disabled weeks', () => {
+    it('should not mark as selectable disabled weeks', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
@@ -2436,7 +2540,7 @@ describe('Calendar', () => {
       const date = new Date(2023, 5, 1)
       const attrs = calendar._rowWeekAttributes(date)
 
-      expect(attrs.tabIndex).toEqual(-1)
+      expect(attrs.selectable).toBeFalse()
       expect(attrs.className).toContain('disabled')
     })
 
@@ -2650,7 +2754,7 @@ describe('Calendar', () => {
         })
 
         setTimeout(() => {
-          const cell = div.querySelector('.calendar-cell[tabindex="0"]')
+          const cell = div.querySelector('.calendar-cell[data-coreui-selectable]')
           if (cell) {
             cell.click()
             expect(calendar._startDate).not.toBeNull()
@@ -2669,7 +2773,7 @@ describe('Calendar', () => {
       const div = fixtureEl.querySelector('div')
       const calendar = new Calendar(div, { calendarDate: new Date(2023, 5, 1) })
 
-      const cell = div.querySelector('.calendar-cell[tabindex="0"]')
+      const cell = div.querySelector('.calendar-cell[data-coreui-selectable]')
       if (cell) {
         const date = calendar._getDate(cell)
         expect(date).toBeInstanceOf(Date)
@@ -2685,7 +2789,7 @@ describe('Calendar', () => {
         calendarDate: new Date(2023, 5, 1)
       })
 
-      const row = div.querySelector('.calendar-row[tabindex="0"]')
+      const row = div.querySelector('.calendar-row[data-coreui-selectable]')
       if (row) {
         const firstCell = row.querySelector('.calendar-cell')
         if (firstCell) {
@@ -2776,10 +2880,10 @@ describe('Calendar', () => {
       const calendar = new Calendar(div, { calendarDate: new Date(2023, 5, 1) })
 
       div.querySelector('.btn-month').click()
-      div.querySelector('.calendar-cell[tabindex="0"]').click()
+      div.querySelector('.calendar-cell[data-coreui-selectable]').click()
 
       expect(calendar._view).toEqual('days')
-      expect(document.activeElement).toEqual(div.querySelector('.calendar-cell[tabindex="0"]'))
+      expect(document.activeElement).toEqual(div.querySelector('.calendar-cell[data-coreui-selectable]'))
     })
   })
 
@@ -3055,7 +3159,7 @@ describe('Calendar', () => {
         setTimeout(() => {
           const panels = div.querySelectorAll('.calendar')
           if (panels.length >= 2) {
-            const secondPanelCell = panels[1].querySelector('.calendar-cell[tabindex="0"]')
+            const secondPanelCell = panels[1].querySelector('.calendar-cell[data-coreui-selectable]')
             if (secondPanelCell) {
               secondPanelCell.click()
               expect(calendar._startDate).not.toBeNull()

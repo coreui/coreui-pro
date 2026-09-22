@@ -167,9 +167,9 @@ describe('DateRangePicker', () => {
 
       picker.show()
       const popup = fixtureEl.querySelector('.date-picker-popup')
-      const cells = popup.querySelectorAll('.calendar-cell[tabindex="0"]')
+      const cells = popup.querySelectorAll('.calendar-cell[data-coreui-selectable]')
       cells[0].click()
-      const remaining = popup.querySelectorAll('.calendar-cell[tabindex="0"]')
+      const remaining = popup.querySelectorAll('.calendar-cell[data-coreui-selectable]')
       remaining[5].click()
 
       expect(picker.getStartDate()).not.toBeNull()
@@ -190,9 +190,9 @@ describe('DateRangePicker', () => {
 
       picker.show()
       const popup = fixtureEl.querySelector('.date-picker-popup')
-      const cells = popup.querySelectorAll('.calendar-cell[tabindex="0"]')
+      const cells = popup.querySelectorAll('.calendar-cell[data-coreui-selectable]')
       cells[0].click()
-      popup.querySelectorAll('.calendar-cell[tabindex="0"]')[5].click()
+      popup.querySelectorAll('.calendar-cell[data-coreui-selectable]')[5].click()
 
       expect(picker.getEndDate()).not.toBeNull()
       expect(picker._popup.isShown).toBeTrue()
@@ -233,9 +233,9 @@ describe('DateRangePicker', () => {
       const popup = fixtureEl.querySelector('.date-picker-popup')
       expect(popup.querySelectorAll('.calendar-nav')).toHaveSize(2)
 
-      const cells = popup.querySelectorAll('.calendar-cell[tabindex="0"]')
+      const cells = popup.querySelectorAll('.calendar-cell[data-coreui-selectable]')
       cells[0].click()
-      popup.querySelectorAll('.calendar-cell[tabindex="0"]')[5].click()
+      popup.querySelectorAll('.calendar-cell[data-coreui-selectable]')[5].click()
 
       expect(picker.getStartDate()).not.toBeNull()
       expect(picker.getEndDate()).not.toBeNull()

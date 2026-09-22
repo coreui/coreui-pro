@@ -762,10 +762,10 @@ export const getMonthsNames = (locale: string, format: 'long' | 'narrow' | 'shor
 /**
  * Retrieves an array of selectable dates from the given element.
  * @param element - The HTML element to search for selectable dates.
- * @param selector - The CSS selector used to identify selectable dates. Defaults to 'tr[tabindex="0"], td[tabindex="0"]'.
+ * @param selector - The CSS selector used to identify selectable dates. Defaults to 'tr[data-coreui-selectable], td[data-coreui-selectable]'.
  * @returns An array of HTMLElements representing the selectable dates.
  */
-export const getSelectableDates = (element: HTMLElement, selector: string = 'tr[tabindex="0"], td[tabindex="0"]'): Element[] => {
+export const getSelectableDates = (element: HTMLElement, selector: string = 'tr[data-coreui-selectable], td[data-coreui-selectable]'): Element[] => {
   return [...Element.prototype.querySelectorAll.call(element, selector)]
 }
 

@@ -404,7 +404,7 @@ describe('DatePicker', () => {
       el.addEventListener('dateChange.coreui.date-picker', event => emitted.push(event))
 
       picker.show()
-      fixtureEl.querySelector('.date-picker-popup .calendar-cell[tabindex="0"]').click()
+      fixtureEl.querySelector('.date-picker-popup .calendar-cell[data-coreui-selectable]').click()
       picker.setDate(new Date(2026, 6, 20))
 
       expect(emitted.length).toBe(2)
@@ -444,7 +444,7 @@ describe('DatePicker', () => {
       })
 
       picker.show()
-      const dayCell = fixtureEl.querySelector('.date-picker-popup .calendar-cell[tabindex="0"]')
+      const dayCell = fixtureEl.querySelector('.date-picker-popup .calendar-cell[data-coreui-selectable]')
       dayCell.click()
 
       expect(emitted).not.toBeNull()
@@ -482,7 +482,7 @@ describe('DatePicker', () => {
       })
 
       picker.show()
-      fixtureEl.querySelector('.date-picker-popup .calendar-row[tabindex="0"] .calendar-cell').click()
+      fixtureEl.querySelector('.date-picker-popup .calendar-row[data-coreui-selectable] .calendar-cell').click()
 
       expect(emitted.date).toBeInstanceOf(Date)
       expect(emitted.formattedDate).toMatch(/^\d{4}W\d{2}$/)
@@ -508,7 +508,7 @@ describe('DatePicker', () => {
       const el = fixtureEl.querySelector('#picker')
 
       picker.show()
-      fixtureEl.querySelector('.date-picker-popup .calendar-cell[tabindex="0"]').click()
+      fixtureEl.querySelector('.date-picker-popup .calendar-cell[data-coreui-selectable]').click()
 
       expect(el.querySelector('input[type="hidden"]').value).toMatch(/^Q[1-4] \d{4}$/)
     })

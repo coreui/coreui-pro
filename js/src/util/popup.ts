@@ -415,27 +415,17 @@ class Popup extends Config {
     EventHandler.on(this._anchor, EVENT_KEYDOWN, this._anchorKeydownListener)
   }
 
-  // The native date control's entry contract: the selected value, else today,
-  // else the last date still available. Resolved over the panel's tab stops by
-  // their ARIA markers, not by component classes — the calendar carries
-  // aria-selected/aria-current on cells (and rows, in week selection), the
-  // time roll marks its chosen cells the same way. tabindex="0" alone cannot
-  // pick the entry: the calendar gives it to every selectable cell, so the
-  // first match is just the first day in the grid.
   _focusPanel(): void {
     if (!this._content) {
       return
     }
 
-    const stops = SelectorEngine.find('[tabindex="0"]', this._content) as HTMLElement[]
+    const current = SelectorEngine.findOne('[aria-current="date"]', this._content) as HTMLElement | null
 
     const entry =
-      stops.find(element => element.getAttribute('aria-selected') === 'true') ??
-      stops.find(element => element.getAttribute('aria-current') === 'date' || Boolean(element.querySelector('[aria-current="date"]'))) ??
-      // No selection and today unavailable happens when a max date pushed the
-      // whole tail of the view out of reach — the last stop is then the last
-      // date still selectable, which is where the native control lands.
-      stops[stops.length - 1] ??
+      SelectorEngine.findOne('[aria-selected="true"]', this._content) as HTMLElement | null ??
+      (current?.closest('[tabindex]') as HTMLElement | null) ??
+      SelectorEngine.findOne('[tabindex="0"]', this._content) as HTMLElement | null ??
       SelectorEngine.focusableChildren(this._content)[0]
 
     entry?.focus()
