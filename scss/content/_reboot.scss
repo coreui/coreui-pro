@@ -53,7 +53,8 @@ $reboot-kbd-tokens: defaults(
 // scss-docs-start mark-tokens
 $reboot-mark-tokens: defaults(
   (
-    --#{$prefix}mark-padding: .1875em,
+    --#{$prefix}mark-padding-y: .1875em,
+    --#{$prefix}mark-padding-x: .1875em,
     --#{$prefix}mark-color: var(--#{$prefix}fg-body),
     --#{$prefix}mark-bg: light-dark(oklch(96.883% .03443 84.93deg), oklch(43.897% .08952 84.93deg)),
   ),
@@ -293,7 +294,7 @@ $reboot-mark-tokens: defaults(
   .mark {
     @include tokens($reboot-mark-tokens);
 
-    padding: var(--#{$prefix}mark-padding);
+    padding: var(--#{$prefix}mark-padding-y) var(--#{$prefix}mark-padding-x);
     color: var(--#{$prefix}mark-color);
     background-color: var(--#{$prefix}mark-bg);
   }
