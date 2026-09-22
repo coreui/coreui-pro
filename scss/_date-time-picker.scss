@@ -1,0 +1,19 @@
+@use "mixins/tokens" as *;
+@use "config" as *;
+@use "time-picker" as *;
+
+@layer components {
+
+  .date-picker-popup {
+
+    .date-picker-timepickers {
+      display: flex;
+      border-inline-start: var(--#{$prefix}date-picker-footer-border-width) solid var(--#{$prefix}date-picker-footer-border-color);
+    }
+
+    .time-picker-body {
+      @include tokens($time-picker-tokens);
+    }
+  }
+
+}

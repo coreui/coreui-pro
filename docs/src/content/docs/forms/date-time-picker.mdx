@@ -200,7 +200,7 @@ Options belonging to the inner [calendar](/components/calendar/#options) or
 
 ### CSS variables
 
-The date half and the time half keep their own tokens, each declared on its own popup.
+The date half declares its tokens on `.date-picker-popup`. The time half has no popup of its own here, so its tokens are declared on the `.time-picker-body` inside that one.
 
 <ScssDocs file="scss/_date-picker.scss" capture="date-picker-tokens" />
 

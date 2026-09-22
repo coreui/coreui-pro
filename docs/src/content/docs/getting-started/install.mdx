@@ -386,11 +386,11 @@ needs alongside it:
 
 ```json
 {
-  "card": { "file": "components/card.css", "order": 37, "requires": [] },
-  "date-picker": {
-    "file": "components/date-picker.css",
+  "card": { "file": "components/card.css", "order": 36, "requires": [] },
+  "date-time-picker": {
+    "file": "components/date-time-picker.css",
     "order": 42,
-    "requires": ["calendar", "forms/floating-labels", "forms/form-control", "forms/form-control-group", "forms/form-date-time", "popup", "time-picker"]
+    "requires": ["calendar", "date-picker", "forms/floating-labels", "forms/form-control", "forms/form-control-group", "forms/form-date-time", "popup", "time-picker"]
   }
 }
 ```
@@ -398,8 +398,9 @@ needs alongside it:
 `requires` is the full closure, so nothing else has to be resolved: load the
 listed files and the component's own, and the component renders exactly as it
 does from the full bundle. The list covers markup the JavaScript renders as
-well as the Sass a component builds on — the date picker draws a calendar and a
-time picker inside a form control group, which is why it asks for all three.
+well as the Sass a component builds on — the date time picker draws a calendar
+and a time picker inside a form control group, which is why it asks for all
+three.
 
 `css/components/classes.json` maps a class name to the entry that owns it, so
 you can go from the markup you write to the files you need — look up each class,

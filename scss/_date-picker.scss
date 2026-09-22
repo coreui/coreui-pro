@@ -3,7 +3,6 @@
 @use "mixins/tokens" as *;
 @use "calendar" as *;
 @use "config" as *;
-@use "time-picker" as *;
 
 $date-picker-tokens: () !default;
 
@@ -36,15 +35,6 @@ $date-picker-tokens: defaults(
 
   .date-picker-popup {
     @include tokens($date-picker-tokens);
-
-    .date-picker-timepickers {
-      display: flex;
-      border-inline-start: var(--#{$prefix}date-picker-footer-border-width) solid var(--#{$prefix}date-picker-footer-border-color);
-    }
-
-    .time-picker-body {
-      @include tokens($time-picker-tokens);
-    }
   }
 
   .date-picker-body {
