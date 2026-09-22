@@ -148,6 +148,25 @@ to the year automatically.
     </div>
   </div>`} />
 
+## With time
+
+Set `timepicker` to add the time half. The field switches to a date and time
+mask, the panel grows a row of time selects under the calendar, and picking a
+day no longer closes the panel — the two halves own different parts of one
+value, so the interaction is not over until the user says so.
+
+<Example pro code={`<div class="row">
+    <div class="col-lg-5">
+      <div data-coreui-locale="en-US" data-coreui-timepicker="true" data-coreui-date-picker></div>
+    </div>
+  </div>`} />
+
+`hours`, `minutes` and `seconds` narrow what the time half offers, and are
+ignored without `timepicker`. The four `ariaSelect*Label` options name its
+selects, and with the flag on the field actions call themselves "Clear date and
+time" and "Toggle calendar and time selection" unless the page passed its own
+label.
+
 ## With form field
 
 Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label and description, and to get validation feedback in the right place.
@@ -355,7 +374,7 @@ The field is a [date input](/forms/date-input/#accessibility) — a group of spi
 | <kbd>Home</kbd> / <kbd>End</kbd> | Move focus to the first / last selectable day of the current week |
 | <kbd>Page Down</kbd> / <kbd>Page Up</kbd> | Move focus to the same day of the next / previous month, keeping the day number when the target month is long enough |
 | <kbd>Shift</kbd> + <kbd>Page Down</kbd> / <kbd>Shift</kbd> + <kbd>Page Up</kbd> | Move focus to the same day of the next / previous year |
-| <kbd>Enter</kbd> / <kbd>Space</kbd> | Select the focused date and close the popup |
+| <kbd>Enter</kbd> / <kbd>Space</kbd> | Select the focused date, and close the popup unless `timepicker` is on, where the time half still has to be set |
 
 ## Usage
 
@@ -413,7 +432,10 @@ attributes work on the picker element too.
 | `pickerIcon` | string, boolean | `true` | The button that opens the calendar: `true` for the built-in icon, an inline SVG string for your own (sanitized), `false` for no button. Not used for a `data-coreui-picker-toggle` you wrote. Without either the popup has no pointer opener and nothing reports the expanded state, though the field keeps the keyboard openers below. |
 | `sanitize` | boolean | `true` | Sanitize the icon markup. |
 | `sanitizeFn` | function, null | `null` | Custom sanitizer. |
+| `seconds` | array, boolean, function | `true` | Seconds offered by the time half. Ignored without `timepicker`. |
+| `selectionOptions` | object | `{}` | Programmatic escape hatch for the time half. |
 | `size` | string, null | `null` | `'sm'` or `'lg'`. |
+| `timepicker` | boolean | `false` | Add a time half to the panel and switch the field to a date and time mask. |
 
 ### Methods
 
@@ -479,5 +501,10 @@ The shell uses local CSS variables on `.date-picker` for real-time
 customization. Values are set via Sass, so Sass customization is supported too.
 
 <ScssDocs file="scss/_date-picker.scss" capture="date-picker-tokens" />
+
+The time half declares its own on `.date-picker-time-body`, so it can be
+restyled without touching the panel around it.
+
+<ScssDocs file="scss/_date-picker.scss" capture="date-picker-time-tokens" />
 
 <ScssDocs file="scss/_calendar.scss" capture="calendar-tokens" />

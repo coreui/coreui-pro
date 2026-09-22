@@ -47,7 +47,8 @@ $list-box-tokens: defaults(
     --#{$prefix}list-box-option-indicator-width: var(--#{$prefix}check-size, var(--#{$prefix}control-size)),
     --#{$prefix}list-box-section-label-color: var(--#{$prefix}fg-3),
     --#{$prefix}list-box-section-label-font-size: 80%,
-    --#{$prefix}list-box-section-label-padding: .5rem .625rem,
+    --#{$prefix}list-box-section-label-padding-y: .5rem,
+    --#{$prefix}list-box-section-label-padding-x: .625rem,
   ),
   $list-box-tokens
 );
@@ -130,7 +131,7 @@ $list-box-tokens: defaults(
   }
 
   .list-box-section-label {
-    padding: var(--#{$prefix}list-box-section-label-padding);
+    padding: var(--#{$prefix}list-box-section-label-padding-y) var(--#{$prefix}list-box-section-label-padding-x);
     font-size: var(--#{$prefix}list-box-section-label-font-size);
     font-weight: var(--#{$prefix}font-weight-bold);
     color: var(--#{$prefix}list-box-section-label-color);

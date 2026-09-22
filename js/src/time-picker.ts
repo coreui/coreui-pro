@@ -12,7 +12,7 @@ import PickerBase from './picker-base.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import TimeInput from './time-input.js'
-import TimeSelection from './util/time-selection.js'
+import TimeRoll from './time-selection/roll.js'
 import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 import type { ComponentConfig } from './util/config.js'
 import {
@@ -71,8 +71,7 @@ type TimePickerConfig = {
   seconds: boolean | number[] | ((second: number) => boolean),
   selectionOptions: Record<string, any>,
   size: string | null,
-  time: Date | string | null,
-  variant: string
+  time: Date | string | null
 }
 
 const Default: TimePickerConfig = {
@@ -93,8 +92,7 @@ const Default: TimePickerConfig = {
   seconds: true,
   selectionOptions: {},
   size: null,
-  time: null,
-  variant: 'roll'
+  time: null
 }
 
 const DefaultType: Record<string, string> = {
@@ -115,8 +113,7 @@ const DefaultType: Record<string, string> = {
   seconds: '(array|boolean|function)',
   selectionOptions: 'object',
   size: '(string|null)',
-  time: '(date|string|null)',
-  variant: 'string'
+  time: '(date|string|null)'
 }
 
 /**
@@ -288,7 +285,7 @@ class TimePicker extends PickerBase {
       return
     }
 
-    this._selection = new TimeSelection(this._selectionElement, this._forwardConfig(TimeSelection, {
+    this._selection = new TimeRoll(this._selectionElement, this._forwardConfig(TimeRoll, {
       locale: this._config.locale,
       onChange: (time: Date | null) => {
         this._syncingFromPanel = true
@@ -296,8 +293,7 @@ class TimePicker extends PickerBase {
         this._syncingFromPanel = false
         EventHandler.trigger(this._element, EVENT_TIME_CHANGE, { time })
       },
-      time: this.getTime(),
-      variant: this._config.variant
+      time: this.getTime()
     }, this._config.selectionOptions))
   }
 

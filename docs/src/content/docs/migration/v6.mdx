@@ -238,7 +238,6 @@ masked date and time fields already used. Renamed:
 | `data-coreui-toggle="calendar"` | `data-coreui-calendar` |
 | `data-coreui-toggle="date-picker"` | `data-coreui-date-picker` |
 | `data-coreui-toggle="date-range-picker"` | `data-coreui-date-range-picker` |
-| `data-coreui-toggle="date-time-picker"` | `data-coreui-date-time-picker` |
 | `data-coreui-toggle="list-box"` | `data-coreui-list-box` |
 | `data-coreui-toggle="number-input"` | `data-coreui-number-input` |
 | `data-coreui-toggle="otp"` | `data-coreui-otp` |
@@ -813,12 +812,11 @@ check, radio, carousel and toggler icons already work:
   wrong: a `data-coreui-theme="light"` section inside a dark page inherited the
   forced white and drew a white icon on white.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
-  **The size surface is two variables instead of five.**
-  `--cui-btn-close-width`, `-height`, `-padding-x` and `-padding-y` collapse
-  into `--cui-btn-close-icon-size` and `--cui-btn-close-padding`, matching the
-  Sass variables of the same names. Nothing changes on screen: the glyph is
-  still `1em` inside `.25em` of padding, so the pointer target stays 24px at
-  the default font size — the WCAG 2.2 minimum.
+  **`--cui-btn-close-width` and `-height` become `--cui-btn-close-icon-size`.**
+  The glyph is square, so one variable sizes it; the padding keeps both axes
+  (`--cui-btn-close-padding-y`, `-padding-x`). Nothing changes on screen: the
+  glyph is still `1em` inside `.25em` of padding, so the pointer target stays
+  24px at the default font size — the WCAG 2.2 minimum.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **`--cui-btn-close-bg` is `--cui-btn-close-icon`** (`$btn-close-bg` →
   `$btn-close-icon`). It stopped being a background when the glyph moved to a
@@ -1220,11 +1218,12 @@ behaviour, v5 is the reference. Mapping:
   always a valid partial date; there is no free-text parsing to debounce.
   Section placeholders come from the section fields' own per-section options —
   `dayPlaceholder`, `monthPlaceholder`, `yearPlaceholder` and the rest.
-- **Changed.** `timepicker: true` is replaced by the standalone
-  [date time picker](/forms/date-time-picker/) — a date input in datetime mode with a
-  calendar and the time selection body side by side. Because the two halves own
-  different parts of one value, that picker does not auto-close: picking a day
-  keeps the time and picking a time keeps the day.
+- **Kept.** `timepicker: true` still adds the time half to the date picker, now
+  as a row of time selects under the calendar rather than a second panel beside
+  it. Because the two halves own different parts of one value, a picker with
+  time does not auto-close: picking a day keeps the time and picking a time
+  keeps the day. `seconds` narrows what the time half offers and
+  `selectionOptions` is its escape hatch.
 - **Kept.** Calendar passthrough (`locale`, `minDate`/`maxDate`,
   `disabledDates`, `selectionType`, `showWeekNumber`, custom cell renderers, …),
   `container`, `startDate`/`endDate`/`date`, `startName`/`endName`/`name`,
@@ -1328,7 +1327,7 @@ validation and the arrow between them. Two consequences:
   ```
 
 - **`show` and `hide` can be cancelled** on the Autocomplete, Multi Select,
-  Date Picker, Date Range Picker, Date Time Picker and Time Picker, the way
+  Date Picker, Date Range Picker and Time Picker, the way
   they already could on Modal and Dialog: `event.preventDefault()` in a `show`
   listener keeps the panel closed, in a `hide` listener keeps it open, and the
   matching `shown` / `hidden` does not fire. `hide` on a panel that is not
@@ -1345,7 +1344,18 @@ validation and the arrow between them. Two consequences:
   instead of `document.documentElement.dir`, so a `dir="rtl"` ancestor works
   and not only a document-level direction.
 
-#### Time Picker / Date Time Picker (new)
+#### Time Picker
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The `roll` infix is gone from the class and token names.** It marked which
+  of two renderings a body used, and the time picker has one now, so
+  `.time-picker-roll-col` and `.time-picker-roll-cell` are `.time-picker-col`
+  and `.time-picker-cell`, with `--cui-time-picker-col-*` and
+  `--cui-time-picker-cell-*` in place of their `-roll-` spellings.
+  `.time-picker-roll` itself was always present on `.time-picker-body` and its
+  declarations moved there, so the modifier is gone rather than renamed;
+  `--cui-time-picker-body-padding` went with it, since the modifier zeroed the
+  padding it set.
 
 - **`seconds` governs the field as well as the panel, and both are on by
   default, as they were in v5.** v5 formatted its value with seconds, so
@@ -1355,11 +1365,38 @@ validation and the arrow between them. Two consequences:
   section of the field.
 
 - The time selection body is now a shared primitive used by both pickers, so the
-  `roll` and `select` variants, the `hours`/`minutes`/`seconds` filters and the
-  12/24-hour locale split behave identically in each. See
-  [time picker](/forms/time-picker/) and the new
-  [date time picker](/forms/date-time-picker/), which replaces v1's
-  `timepicker: true` flag on the date picker.
+  `hours`/`minutes`/`seconds` filters and the 12/24-hour locale split behave
+  identically in each. See
+  [time picker](/forms/time-picker/) and the date picker's own
+  [time half](/forms/date-picker/#with-time).
+- **The time row sits under the calendars again, with its clock icon.** v6.0.0-alpha
+  put it beside them in a column of its own; `.date-picker-body` is a grid with
+  the v5 areas once more, so `.date-picker-timepickers` spans the calendars it
+  belongs to, with its clock icon back as an inline SVG that takes its colour
+  from `--cui-date-picker-time-icon-color`.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The date picker's time controls carry its own name.** `.time-picker-inline-icon`
+  and `.time-picker-inline-select` are `.date-picker-time-icon` and
+  `.date-picker-time-select`, with `--cui-date-picker-time-icon-*` and
+  `--cui-date-picker-time-select-*` in place of the `--cui-time-picker-inline-*`
+  tokens. They sit in the date picker's panel and are styled from its stylesheet,
+  so nothing about them belonged to the time picker but the name. The time
+  picker's own panel is untouched.
+- **The time selection is one tab stop, and the arrows move between its parts.**
+  v6.0.0-alpha gave a tab stop to every column of the roll, so Tab walked the
+  hour, minute, second and AM/PM lists one by one. The body is a composite now,
+  like the section field it mirrors: <kbd>Tab</kbd> reaches it once,
+  <kbd>Arrow Left</kbd> and <kbd>Arrow Right</kbd> move between the parts and
+  stop at the ends, and <kbd>Arrow Up</kbd> / <kbd>Arrow Down</kbd> still change
+  the focused value. The date picker's time selects answer the same keys.
+- **Each picker has one time rendering, and the `variant` option is gone.** The
+  time picker shows the roll; the date picker's time half shows the selects,
+  which is what v5 rendered inside a date picker with time. Each picker builds
+  its own rendering, so the choice is no longer an option anywhere;
+  `selectionOptions` still reaches the body a picker built, for the hour and
+  minute filters and the labels. The date picker's time selects moved
+  with it: it now ships in the date picker stylesheet, so a page that only uses
+  the time picker no longer downloads it.
 - Same removals as the date pickers: `footer`/`cancelButton`/`confirmButton` and
   their class options give way to a projected
   `<template data-coreui-template="footer">` with
@@ -1378,11 +1415,11 @@ The rewritten pickers style the field through
 `forms/_form-date-time.scss` and render their icons as inline SVG, so the v1
 shell's own elements no longer exist: `.date-picker-input`,
 `.date-picker-input-wrapper`, `.date-picker-input-preview`,
-`.date-picker-cleaner`, `.time-picker-input`, `.time-picker-cleaner` and
-`.time-picker-inline-icon`. Custom CSS targeting those needs rewriting against
+`.date-picker-cleaner`, `.time-picker-input` and `.time-picker-cleaner`.
+Custom CSS targeting those needs rewriting against
 the new structure; everything else (`.date-picker`, `.date-picker-popup`,
 `.date-picker-body`, `.date-picker-footer`, the `-sm`/`-lg` size modifiers, the
-`.time-picker-roll*` bodies) keeps its name.
+`.time-picker-*` bodies) keeps its name.
 
 #### The picker panel is `.date-picker-popup` / `.time-picker-popup`
 
@@ -1721,7 +1758,7 @@ Date Input and Time Input took an `id` written on the host as
 permission to submit, naming their hidden input `<component>-<id>` when no
 `name` was configured, so `<div data-coreui-date-input id="delivery">` posted
 `date-input-delivery` — a key the page never asked for, from an attribute a
-`<label for>` needs anyway. Date Picker, Time Picker and Date Time Picker
+`<label for>` needs anyway. Date Picker and Time Picker
 inherit the rule through the field they embed, and with `floatingLabel` that
 field is given a generated id, so they posted a key that changed on every load
 (`date-input-date-picker-190423`). The hidden input is named from `name` alone
@@ -3229,6 +3266,36 @@ map — several things below are breaking and are called out as such.
   reads `--cui-spacer` (`1rem`) instead of `--cui-spacer-3`, so cards,
   alerts, modals, drawers, popovers, callouts, list groups, the sidebar and
   the reboot margins keep their size.
+
+#### Padding tokens carry both axes
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **A token that sets `padding` names an axis.** `--cui-modal-padding`,
+  `--cui-calendar-nav-padding`, `--cui-nav-enclosed-padding`,
+  `--cui-date-picker-footer-padding` and `--cui-time-picker-footer-padding`
+  are `-padding-y` and `-padding-x`; the same goes for the tokens added in
+  v6 (`--cui-btn-close-padding`, `--cui-form-field-card-padding`,
+  `--cui-list-box-section-label-padding`,
+  `--cui-date-picker-time-body-padding`). Defaults are unchanged, so set
+  both to the old value to keep the same box. A single-value token could not
+  be overridden per axis, and one of them was already a two-value shorthand
+  (`--cui-list-box-section-label-padding: .5rem .625rem`), which made the
+  horizontal padding unreachable without restating the vertical one.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`--cui-modal-header-padding` is gone.** It only restated
+  `--cui-modal-header-padding-y --cui-modal-header-padding-x`, and setting it
+  had no effect on the close button, which reads the two axes. The footer no
+  longer reads the modal's body padding either: it has
+  `--cui-modal-footer-padding-y` and `-padding-x`, defaulting to
+  `--cui-modal-padding-y` / `-padding-x`.
+- **A distance between children is a `-gap` token.** `--cui-date-picker-ranges-gap`,
+  `--cui-date-picker-footer-gap`, `--cui-time-picker-footer-gap`,
+  `--cui-drawer-body-gap` and `--cui-drawer-footer-gap` are new; the time
+  picker's footer used to space its buttons with a `.btn + .btn` margin,
+  which only worked for buttons and could not be set from outside. The date
+  picker's ranges column and its time row also stopped borrowing the footer's
+  padding and border: they read `--cui-date-picker-ranges-*` and
+  `--cui-date-picker-timepickers-*`.
 
 #### Link decoration is a token, not a Sass knob
 

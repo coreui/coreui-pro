@@ -19,7 +19,8 @@ $close-tokens: () !default;
 $close-tokens: defaults(
   (
     --#{$prefix}btn-close-icon-size: 1em,
-    --#{$prefix}btn-close-padding: .25em,
+    --#{$prefix}btn-close-padding-y: .25em,
+    --#{$prefix}btn-close-padding-x: .25em,
     --#{$prefix}btn-close-color: inherit,
     --#{$prefix}btn-close-icon: #{ escape-svg(url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='black'><path d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414'/></svg>")) },
     --#{$prefix}btn-close-opacity: .5,
@@ -46,7 +47,7 @@ $close-tokens: defaults(
     // and a flex container would otherwise shrink it below its icon.
     min-width: var(--#{$prefix}btn-close-icon-size);
     min-height: var(--#{$prefix}btn-close-icon-size);
-    padding: var(--#{$prefix}btn-close-padding);
+    padding: var(--#{$prefix}btn-close-padding-y) var(--#{$prefix}btn-close-padding-x);
     color: var(--#{$prefix}btn-close-color);
     background-color: currentcolor;
     @include mask-icon(var(--#{$prefix}btn-close-icon), var(--#{$prefix}btn-close-icon-size));

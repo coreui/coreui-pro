@@ -23,7 +23,6 @@ import ChipInput from '../../src/chip-input.js'
 import DatePicker from '../../src/date-picker.js'
 import DateRangeInput from '../../src/date-range-input.js'
 import DateRangePicker from '../../src/date-range-picker.js'
-import DateTimePicker from '../../src/date-time-picker.js'
 import MultiSelect from '../../src/multi-select.js'
 import NumberInput from '../../src/number-input.js'
 import PasswordInput from '../../src/password-input.js'
@@ -212,7 +211,7 @@ describe('date range picker', () => {
 
 describe('date time picker', () => {
   it('filled', async () => {
-    const dtp = new DateTimePicker(mount(), { locale: 'en-US', date: DATE })
+    const dtp = new DatePicker(mount(), { timepicker: true, locale: 'en-US', date: DATE })
     await shoot(frame(), 'date-time-picker-filled')
     dtp.dispose()
   })

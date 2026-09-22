@@ -14,7 +14,6 @@ import Autocomplete from '../../src/autocomplete.js'
 import DateInput from '../../src/date-input.js'
 import DatePicker from '../../src/date-picker.js'
 import DateRangePicker from '../../src/date-range-picker.js'
-import DateTimePicker from '../../src/date-time-picker.js'
 import MultiSelect from '../../src/multi-select.js'
 import NumberInput from '../../src/number-input.js'
 import PasswordInput from '../../src/password-input.js'
@@ -111,8 +110,8 @@ describe('floating labels', () => {
       () => build(HOST_DIV, TimePicker, { locale: 'en-US' }),
       () => build(HOST_DIV, TimePicker, { locale: 'en-US', time: new Date(2026, 0, 1, 14, 30) })],
     ['Date Time Picker',
-      () => build(HOST_DIV, DateTimePicker, { locale: 'en-US' }),
-      () => build(HOST_DIV, DateTimePicker, { locale: 'en-US', date: DATE })],
+      () => build(HOST_DIV, DatePicker, { locale: 'en-US', timepicker: true }),
+      () => build(HOST_DIV, DatePicker, { locale: 'en-US', date: DATE, timepicker: true })],
     ['Date Range Picker',
       () => build(HOST_DIV, DateRangePicker, { locale: 'en-US' }),
       () => build(HOST_DIV, DateRangePicker, { locale: 'en-US', startDate: DATE, endDate: new Date(2026, 6, 20) })]

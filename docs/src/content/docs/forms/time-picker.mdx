@@ -27,17 +27,6 @@ value, so typing and picking stay in sync.
     </div>
   </div>`} />
 
-### Variants
-
-The default `roll` variant shows scrollable columns. Set
-`data-coreui-variant="select"` for native dropdowns.
-
-<Example pro code={`<div class="row">
-    <div class="col-lg-4">
-      <div data-coreui-locale="en-US" data-coreui-variant="select" data-coreui-time-picker></div>
-    </div>
-  </div>`} />
-
 ### Theme variants
 
 A [`.theme-*` class](/customize/components/#theme-variants) on the picker colours the selected cell of every roll.
@@ -198,8 +187,10 @@ The toggle button carries the panel's state — `aria-haspopup="dialog"`, `aria-
 | --- | --- |
 | <kbd>Alt</kbd> (<kbd>Option</kbd> on macOS) + <kbd>Arrow Down</kbd> / <kbd>F4</kbd> | Open the time popup and move focus into it |
 | <kbd>Escape</kbd> | Close the popup and return focus to the field |
-| <kbd>Tab</kbd> / <kbd>Shift</kbd> + <kbd>Tab</kbd> | Move within the open panel; the field is outside the dialog and stays out of the cycle |
+| <kbd>Tab</kbd> / <kbd>Shift</kbd> + <kbd>Tab</kbd> | Move within the open panel; the time selection is one stop, so Tab steps over it rather than through it |
 | <kbd>Arrow Up</kbd> / <kbd>Arrow Down</kbd> | Move through the focused hour, minute or second list |
+| <kbd>Arrow Left</kbd> / <kbd>Arrow Right</kbd> | Move between the hour, minute, second and AM/PM parts |
+| <kbd>Home</kbd> / <kbd>End</kbd> | First or last option of the focused list |
 
 ## Usage
 
@@ -229,10 +220,10 @@ forwarded by name, so their data attributes work on the picker element too.
 | `ariaCleanerLabel` | string | `'Clear time'` | Accessible label of the cleaner button. |
 | `ariaLabel` | string | `'Time input'` | Accessible name of the field. It lands on the `role="group"` container the sections sit in, so it names the whole control rather than one part of it. |
 | `ariaPickerLabel` | string | `'Toggle time selection'` | Accessible label of the picker button. |
-| `ariaSelectHoursLabel` | string | `'Select hours'` | Accessible name of the hours select in the panel. |
-| `ariaSelectMeridiemLabel` | string | `'Select AM/PM'` | Accessible name of the AM/PM select in the panel. |
-| `ariaSelectMinutesLabel` | string | `'Select minutes'` | Accessible name of the minutes select in the panel. |
-| `ariaSelectSecondsLabel` | string | `'Select seconds'` | Accessible name of the seconds select in the panel. |
+| `ariaSelectHoursLabel` | string | `'Select hours'` | Accessible name of the hours column of the roll. |
+| `ariaSelectMeridiemLabel` | string | `'Select AM/PM'` | Accessible name of the AM/PM column of the roll. |
+| `ariaSelectMinutesLabel` | string | `'Select minutes'` | Accessible name of the minutes column of the roll. |
+| `ariaSelectSecondsLabel` | string | `'Select seconds'` | Accessible name of the seconds column of the roll. |
 | `cleaner` | boolean | `true` | Renders a button that clears the value. It appears only once the field holds one. |
 | `cleanerIcon` | string | cross SVG | Inline SVG rendered by the component (sanitized). |
 | `container` | string, element, false | `false` | Teleport target for the dropdown. |
@@ -247,7 +238,6 @@ forwarded by name, so their data attributes work on the picker element too.
 | `selectionOptions` | object | `{}` | Programmatic escape hatch for the selection body. |
 | `size` | string, null | `null` | `'sm'` or `'lg'`. |
 | `time` | date, string, null | `null` | Initial value. |
-| `variant` | string | `'roll'` | `'roll'` or `'select'`. |
 
 ### Methods
 

@@ -141,11 +141,6 @@
       badge:
         color: danger
         text: Pro
-    - title: Date Time Picker
-      to: /forms/date-time-picker/
-      badge:
-        color: danger
-        text: Pro
     - title: Field
       to: /forms/field/
       badge:

@@ -1,4 +1,5 @@
-import TimeSelection from '../../../src/util/time-selection.js'
+import TimeRoll from '../../../src/time-selection/roll.js'
+import TimeSelects from '../../../src/time-selection/selects.js'
 import { clearFixture, getFixture } from '../../helpers/fixture.js'
 
 describe('TimeSelection', () => {
@@ -14,7 +15,12 @@ describe('TimeSelection', () => {
 
   const build = (config = {}) => {
     fixtureEl.innerHTML = '<div id="body"></div>'
-    return new TimeSelection(fixtureEl.querySelector('#body'), { locale: 'en-GB', ...config })
+    return new TimeRoll(fixtureEl.querySelector('#body'), { locale: 'en-GB', ...config })
+  }
+
+  const buildSelects = (config = {}) => {
+    fixtureEl.innerHTML = '<div id="body"></div>'
+    return new TimeSelects(fixtureEl.querySelector('#body'), { locale: 'en-GB', ...config })
   }
 
   const cells = part => fixtureEl.querySelectorAll(`[data-coreui-${part}]`)
@@ -55,20 +61,20 @@ describe('TimeSelection', () => {
     })
   })
 
-  describe('select variant', () => {
+  describe('selects rendering', () => {
     it('should render selects instead of roll columns', () => {
-      build({ variant: 'select' })
+      buildSelects()
 
-      expect(fixtureEl.querySelectorAll('select.time-picker-inline-select')).toHaveSize(3)
-      expect(fixtureEl.querySelector('.time-picker-roll-col')).toBeNull()
+      expect(fixtureEl.querySelectorAll('select.date-picker-time-select')).toHaveSize(3)
+      expect(fixtureEl.querySelector('.time-picker-col')).toBeNull()
     })
 
     it('should report a change from a select', () => {
       let reported = null
-      build({
+      buildSelects({
         onChange(time) {
           reported = time
-        }, variant: 'select'
+        }
       })
 
       const minutes = fixtureEl.querySelector('select.minutes')
@@ -79,7 +85,7 @@ describe('TimeSelection', () => {
     })
 
     it('should preselect the current value in the selects', () => {
-      build({ time: new Date(2026, 0, 1, 9, 45, 0), variant: 'select' })
+      buildSelects({ time: new Date(2026, 0, 1, 9, 45, 0) })
 
       expect(fixtureEl.querySelector('select.hours').value).toEqual('9')
       expect(fixtureEl.querySelector('select.minutes').value).toEqual('45')
@@ -179,10 +185,12 @@ describe('TimeSelection', () => {
       )
     })
 
-    it('should make the selected cell the tabbable one', () => {
+    it('should keep one tab stop for the whole body, on the first selected cell', () => {
       build({ time: new Date(2026, 0, 1, 2, 30, 0) })
 
-      expect(fixtureEl.querySelector('[data-coreui-minutes="30"]').tabIndex).toBe(0)
+      expect(fixtureEl.querySelectorAll('.time-picker-cell[tabindex="0"]').length).toBe(1)
+      expect(fixtureEl.querySelector('[data-coreui-hours="2"]').tabIndex).toBe(0)
+      expect(fixtureEl.querySelector('[data-coreui-minutes="30"]').tabIndex).toBe(-1)
       expect(fixtureEl.querySelector('[data-coreui-minutes="31"]').tabIndex).toBe(-1)
     })
 
