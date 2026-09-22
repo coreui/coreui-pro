@@ -286,8 +286,6 @@ class DatePicker extends PickerBase {
     this._created.field = !ownField
     this._fieldElement = ownField ?? appendControlGroupField(inputGroup, inputEl, this._config.floatingLabel, `${this.constructor.NAME}-`)
 
-    // The default wording names the time half when it is there; a label the page
-    // set survives either way.
     const withTime = (value: string, key: 'ariaCleanerLabel' | 'ariaPickerLabel', timed: string) =>
       this._config.timepicker && value === Default[key] ? timed : value
 
@@ -392,8 +390,6 @@ class DatePicker extends PickerBase {
     EventHandler.on(this._calendar._element, 'startDateChange.coreui.calendar', event => {
       this._applyDate(this._withCurrentTime(event.dateObject), { calendar: false })
 
-      // With a time half the two parts own different pieces of one value, so
-      // picking a day is not the end of the interaction.
       if (!this._config.timepicker) {
         this.hide()
       }
@@ -410,8 +406,6 @@ class DatePicker extends PickerBase {
     }, this._config.selectionOptions))
   }
 
-  // A calendar cell carries midnight, so a day picked while the time half is
-  // there has to take the time already chosen with it.
   _withCurrentTime(date: Date | null): Date | null {
     if (!date || !this._config.timepicker || !this._date) {
       return date
