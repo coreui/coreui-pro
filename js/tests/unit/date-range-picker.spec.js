@@ -227,6 +227,44 @@ describe('DateRangePicker', () => {
       expect(popup.querySelectorAll('.calendar-cell.selected').length).toEqual(2)
     })
 
+    it('should stay silent when the calendar picks the start it already holds', () => {
+      const picker = buildPicker({ locale: 'en-US', startDate: new Date(2026, 6, 14), endDate: new Date(2026, 6, 20) }, [
+        '<div id="picker">',
+        '  <template data-coreui-template="footer">',
+        '    <button type="button" data-coreui-picker-action="close">OK</button>',
+        '  </template>',
+        '</div>'
+      ].join(''))
+      const el = fixtureEl.querySelector('#picker')
+      const events = []
+      el.addEventListener('startDateChange.coreui.date-range-picker', event => events.push(['start', event.date]))
+      el.addEventListener('endDateChange.coreui.date-range-picker', event => events.push(['end', event.date]))
+
+      picker.show()
+      fixtureEl.querySelector('#picker .form-date-time-section').dispatchEvent(new FocusEvent('focusin', { bubbles: true }))
+      fixtureEl.querySelector('.date-picker-popup .calendar-cell[data-coreui-date^="Tue Jul 14 2026"]').click()
+
+      expect(events).toEqual([])
+      expect(picker.getStartDate()).toEqual(new Date(2026, 6, 14))
+    })
+
+    it('should stay silent when the field refuses a pick for a date that was already empty', () => {
+      const picker = buildPicker({
+        locale: 'en-US',
+        calendarOptions: { calendarDate: new Date(2026, 6, 1) },
+        inputOptions: { minDate: new Date(2026, 6, 20) }
+      })
+      const el = fixtureEl.querySelector('#picker')
+      const events = []
+      el.addEventListener('startDateChange.coreui.date-range-picker', event => events.push(['start', event.date]))
+
+      picker.show()
+      fixtureEl.querySelector('.date-picker-popup .calendar-cell[data-coreui-date^="Fri Jul 10 2026"]').click()
+
+      expect(events).toEqual([])
+      expect(picker.getStartDate()).toBeNull()
+    })
+
     it('should aim the calendar at the end date when the end field was focused', () => {
       const picker = buildPicker()
       const sections = fixtureEl.querySelectorAll('#picker .form-date-time-section')

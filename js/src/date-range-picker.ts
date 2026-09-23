@@ -18,7 +18,7 @@ import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import type { SectionInputConfig } from './section-input.js'
 import { captureHostClasses, createControlGroupAction } from './util/form-control-group.js'
-import { getDateBySelectionType, type SelectionTypes } from './util/calendar.js'
+import { getDateBySelectionType, isSameInstantAs, type SelectionTypes } from './util/calendar.js'
 import type { ComponentConfig } from './util/config.js'
 import { getPickerFormat } from './util/date-sections.js'
 import {
@@ -370,17 +370,25 @@ class DateRangePicker extends PickerBase {
     })
 
     EventHandler.on(this._calendar._element, 'startDateChange.coreui.calendar', event => {
+      const previous = this.getStartDate()
       this._syncingFromPanel = true
       this._rangeInput.setRange(event.dateObject, this.getEndDate())
       this._syncingFromPanel = false
-      this._triggerDateChange(EVENT_START_DATE_CHANGE, this.getStartDate())
+
+      if (!isSameInstantAs(previous, this.getStartDate())) {
+        this._triggerDateChange(EVENT_START_DATE_CHANGE, this.getStartDate())
+      }
     })
 
     EventHandler.on(this._calendar._element, 'endDateChange.coreui.calendar', event => {
+      const previous = this.getEndDate()
       this._syncingFromPanel = true
       this._rangeInput.setRange(this.getStartDate(), event.dateObject)
       this._syncingFromPanel = false
-      this._triggerDateChange(EVENT_END_DATE_CHANGE, this.getEndDate())
+
+      if (!isSameInstantAs(previous, this.getEndDate())) {
+        this._triggerDateChange(EVENT_END_DATE_CHANGE, this.getEndDate())
+      }
 
       if (this.getEndDate() && this.getStartDate() && !this._footerTemplate) {
         this.hide()
