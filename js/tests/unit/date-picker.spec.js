@@ -1267,6 +1267,17 @@ describe('DatePicker', () => {
       expect(fixtureEl.querySelector('select.date-picker-time-select.meridiem')).toBeNull()
     })
 
+    it('should take the hour cycle of the locale field when there is no mask', () => {
+      for (const locale of ['ko-KR', 'en-CA']) {
+        const picker = buildPicker({ timepicker: true, locale })
+        picker.show()
+
+        expect(fixtureEl.querySelectorAll('select.date-picker-time-select.hours option').length).toEqual(12)
+        expect(fixtureEl.querySelector('select.date-picker-time-select.meridiem')).not.toBeNull()
+        picker.dispose()
+      }
+    })
+
     it('should emit dateChange for a time-only change', () => {
       const picker = buildPicker({ timepicker: true, locale: 'en-US', date: new Date(2026, 5, 15, 10, 0, 0) })
       const el = fixtureEl.querySelector('#picker')

@@ -6,14 +6,15 @@ import {
   formatSectionValue,
   getDateFromSections,
   getDateOfISOWeek,
-  getDateSections,
   getDateTimeSectionsFromLocale,
   getDaysInMonth,
   getDaySectionMax,
   getFullYearFromSection,
   getIncrementedSectionValue,
   getISOWeeksInYear,
+  getPickerFormat,
   getSectionBounds,
+  getSectionLayout,
   getSectionsFromFormat,
   getSectionsFromLocale,
   getSectionsFromString,
@@ -265,22 +266,47 @@ describe('Date Sections Utilities', () => {
     })
   })
 
-  describe('getDateSections', () => {
+  describe('getPickerFormat', () => {
+    it('should keep an explicit format', () => {
+      expect(getPickerFormat('dd.MM.yyyy', 'month')).toEqual('dd.MM.yyyy')
+    })
+
+    it('should treat an empty format as none', () => {
+      expect(getPickerFormat('', 'month')).toEqual('MM/yyyy')
+    })
+
+    it('should give every selection type but day a mask of its own granularity', () => {
+      expect(getPickerFormat(null, 'day')).toBeNull()
+      expect(getPickerFormat(null, 'month')).toEqual('MM/yyyy')
+      expect(getPickerFormat(null, 'quarter')).toEqual('QQQ yyyy')
+      expect(getPickerFormat(null, 'year')).toEqual('yyyy')
+      expect(getPickerFormat(null, 'week')).toEqual(getWeekSectionsFromLocale)
+    })
+  })
+
+  describe('getSectionLayout', () => {
     it('should call a format function with the locale', () => {
       const format = jasmine.createSpy('format').and.returnValue([])
 
-      expect(getDateSections(format, 'en-US')).toEqual([])
+      expect(getSectionLayout(format, 'en-US')).toEqual([])
       expect(format).toHaveBeenCalledWith('en-US')
     })
 
     it('should parse a format string', () => {
-      expect(getDateSections('dd.MM.yyyy', 'en-US').map(section => section.type))
+      expect(getSectionLayout('dd.MM.yyyy', 'en-US').map(section => section.type))
         .toEqual(['day', 'literal', 'month', 'literal', 'year'])
     })
 
     it('should fall back to the locale', () => {
-      expect(getDateSections(null, 'en-US').map(section => section.type))
+      expect(getSectionLayout(null, 'en-US').map(section => section.type))
         .toEqual(['month', 'literal', 'day', 'literal', 'year'])
+    })
+
+    it('should fall back to the locale date and time when the time is included', () => {
+      const types = layout => layout.filter(section => section.type !== 'literal').map(section => section.type)
+
+      expect(types(getSectionLayout(null, 'en-GB', null, true))).toEqual(['day', 'month', 'year', 'hour', 'minute', 'second'])
+      expect(types(getSectionLayout(null, 'en-GB', null, { seconds: false }))).toEqual(['day', 'month', 'year', 'hour', 'minute'])
     })
   })
 

@@ -194,6 +194,12 @@ They are no longer part of the published package. Use the built bundle instead:
 or, if you are already resolving the package by name, `import { Tooltip } from
 '@coreui/coreui-pro'` — `module` points at the same ESM bundle.
 
+#### Unused date helpers are gone from `js/dist/util`
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+The `util` modules are internal, but the package exports every file under `js/dist`, so a deep import could reach them. These helpers are no longer exported: `js/dist/util/date-range-picker.js` as a whole, `getFirstAvailableDateInRange`, `getSelectableDates`, `createDateFromMonth`, `createDateFromWeek` and `createDateFromYear` from `util/calendar.js`, `getDateSections` from `util/date-sections.js` (now `getSectionLayout`), and `convertTimeToDate`, `formatTimePartials`, `getAmPm`, `isValidTime` and `shouldUseTwoDigitHour` from `util/time.js`. Most had no reader in the library and are gone; `createDateFromYear`, `formatTimePartials` and `shouldUseTwoDigitHour` stay as module internals. Pass dates to the components in the formats their options take (`startDate: '2026W03'` with `selectionType: 'week'`), or keep a copy of the helper in your code.
+
 #### `coreui.Offcanvas` in the UMD bundle
 
 The UMD bundle exposed the offcanvas plugin as `coreui.OffCanvas`, while the
