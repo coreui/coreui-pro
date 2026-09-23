@@ -77,6 +77,14 @@ describe('DatePicker', () => {
 
       expect(new Date(document.activeElement.dataset.coreuiDate).getDate()).toEqual(10)
     })
+
+    it('should pass over today when today cannot be picked', () => {
+      const picker = buildPicker({ disabledDates: [new Date()] })
+      picker.show()
+
+      expect(document.activeElement.getAttribute('aria-current')).toBeNull()
+      expect(document.activeElement.hasAttribute('data-coreui-selectable')).toBeTrue()
+    })
   })
 
   describe('constructor', () => {

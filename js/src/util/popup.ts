@@ -477,10 +477,11 @@ class Popup extends Config {
     }
 
     const current = SelectorEngine.findOne('[aria-current="date"]', this._content) as HTMLElement | null
+    const today = current?.closest('[aria-disabled="true"]') ? null : current
 
     const entry =
       SelectorEngine.findOne('[aria-selected="true"]', this._content) as HTMLElement | null ??
-      (current?.closest('[tabindex]') as HTMLElement | null) ??
+      (today?.closest('[tabindex]') as HTMLElement | null) ??
       SelectorEngine.findOne('[tabindex="0"]', this._content) as HTMLElement | null ??
       SelectorEngine.focusableChildren(this._content)[0]
 
