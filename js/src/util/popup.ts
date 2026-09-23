@@ -150,6 +150,7 @@ class Popup extends Config {
   protected declare _contentKeydownListener: any
   protected declare _anchorKeydownListener: any
   protected declare _focustrap: FocusTrap | null
+  protected declare _revealPending: boolean
   protected declare _config: PopupConfig
 
   constructor(config?: Partial<PopupConfig> | null) {
@@ -165,6 +166,7 @@ class Popup extends Config {
     this._keydownListener = null
     this._contentKeydownListener = null
     this._anchorKeydownListener = null
+    this._revealPending = false
     // The panel is the dialog, so it is what the trap holds: Tab cycles inside
     // the calendar and the field, which sits outside it, stays out of the cycle.
     // `_focusPanel` picks the entry point, so the trap must not also focus one.
@@ -232,6 +234,10 @@ class Popup extends Config {
     // else today, else the nearest selectable one) by carrying tabindex="0".
     this._focusPanel()
 
+    if (this.isMobile) {
+      this._revealEntry()
+    }
+
     execute(this._config.onShown)
   }
 
@@ -248,6 +254,7 @@ class Popup extends Config {
   _hide(): void {
     execute(this._config.onHide)
     this._isShown = false
+    this._revealPending = false
     this._stopPositioning()
     this._removeDismissListeners()
 
@@ -388,6 +395,8 @@ class Popup extends Config {
         position: 'absolute',
         top: `${y}px`
       })
+
+      this._revealEntry()
     })
   }
 
@@ -428,7 +437,21 @@ class Popup extends Config {
       SelectorEngine.findOne('[tabindex="0"]', this._content) as HTMLElement | null ??
       SelectorEngine.focusableChildren(this._content)[0]
 
-    entry?.focus()
+    entry?.focus({ preventScroll: true })
+    this._revealPending = Boolean(entry)
+  }
+
+  _revealEntry(): void {
+    if (!this._revealPending) {
+      return
+    }
+
+    this._revealPending = false
+    const active = document.activeElement
+
+    if (active instanceof HTMLElement && this._content?.contains(active)) {
+      active.scrollIntoView({ block: 'nearest', inline: 'nearest' })
+    }
   }
 
   _addDismissListeners(): void {

@@ -50,6 +50,22 @@ describe('Popup', () => {
       expect(calls).toEqual(['show', 'shown'])
     })
 
+    it('should not scroll the page when the panel mounts away from the anchor', () => {
+      const popup = buildPopup({ container: document.body, mobileBreakpoint: 0 })
+      const spacer = document.createElement('div')
+      spacer.style.height = '300vh'
+      document.body.append(spacer)
+      window.scrollTo(0, 0)
+
+      popup.show()
+
+      const { scrollY } = window
+      spacer.remove()
+
+      expect(document.activeElement).toBe(document.querySelector('#option'))
+      expect(scrollY).toBe(0)
+    })
+
     it('should stay hidden when onBeforeShow returns false', () => {
       const onShow = jasmine.createSpy('onShow')
       const popup = buildPopup({ onBeforeShow: () => false, onShow })
