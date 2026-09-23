@@ -37,16 +37,26 @@ describe('Popup', () => {
   }
 
   describe('show', () => {
-    it('should set isShown and fire onShow/onShown in order', () => {
+    it('should set isShown, fire onShow at once and onShown after the transition', async () => {
       const calls = []
+      let resolveShown
+      const shown = new Promise(resolve => {
+        resolveShown = resolve
+      })
       const popup = buildPopup({
         onShow: () => calls.push('show'),
-        onShown: () => calls.push('shown')
+        onShown() {
+          calls.push('shown')
+          resolveShown()
+        }
       })
 
       popup.show()
 
       expect(popup.isShown).toBeTrue()
+      expect(calls).toEqual(['show'])
+
+      await shown
       expect(calls).toEqual(['show', 'shown'])
     })
 
@@ -64,6 +74,30 @@ describe('Popup', () => {
 
       expect(document.activeElement).toBe(document.querySelector('#option'))
       expect(scrollY).toBe(0)
+    })
+
+    it('should skip onShown when the popup is hidden before the transition ends', async () => {
+      const calls = []
+      let resolveHidden
+      const hidden = new Promise(resolve => {
+        resolveHidden = resolve
+      })
+      const popup = buildPopup({
+        onShown: () => calls.push('shown'),
+        onHidden() {
+          calls.push('hidden')
+          resolveHidden()
+        }
+      })
+
+      popup.show()
+      popup.hide()
+      await hidden
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect(calls).toEqual(['hidden'])
     })
 
     it('should stay hidden when onBeforeShow returns false', () => {
@@ -111,7 +145,31 @@ describe('Popup', () => {
       expect(onHide).not.toHaveBeenCalled()
     })
 
-    it('should clear isShown and fire onHide/onHidden in order', () => {
+    it('should clear isShown, fire onHide at once and onHidden once the panel is gone', async () => {
+      const calls = []
+      let resolveHidden
+      const hidden = new Promise(resolve => {
+        resolveHidden = resolve
+      })
+      const popup = buildPopup({
+        onHide: () => calls.push('hide'),
+        onHidden() {
+          calls.push(`hidden, connected: ${popup._content.isConnected}`)
+          resolveHidden()
+        }
+      })
+
+      popup.show()
+      popup.hide()
+
+      expect(popup.isShown).toBeFalse()
+      expect(calls).toEqual(['hide'])
+
+      await hidden
+      expect(calls).toEqual(['hide', 'hidden, connected: false'])
+    })
+
+    it('should fire onHide and onHidden at once when disposed while shown', async () => {
       const calls = []
       const popup = buildPopup({
         onHide: () => calls.push('hide'),
@@ -119,9 +177,13 @@ describe('Popup', () => {
       })
 
       popup.show()
-      popup.hide()
+      popup.dispose()
 
-      expect(popup.isShown).toBeFalse()
+      expect(calls).toEqual(['hide', 'hidden'])
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
       expect(calls).toEqual(['hide', 'hidden'])
     })
 
@@ -620,6 +682,41 @@ describe('Popup', () => {
 
       expect(popup.isMobile).toBeTrue()
       expect(fixtureEl.querySelector('#content').style.position).toEqual('')
+    })
+
+    it('should drop a position left from a desktop open when it opens in mobile mode', async () => {
+      const popup = buildPopup({ mobileBreakpoint: 0 })
+      const content = fixtureEl.querySelector('#content')
+      popup.show()
+
+      await new Promise((resolve, reject) => {
+        const deadline = Date.now() + 2000
+        const waitForPosition = () => {
+          if (content.style.position === 'absolute') {
+            resolve()
+            return
+          }
+
+          if (Date.now() > deadline) {
+            reject(new Error('content was never positioned'))
+            return
+          }
+
+          setTimeout(waitForPosition, 25)
+        }
+
+        waitForPosition()
+      })
+
+      expect(content.style.left).not.toEqual('')
+      popup.hide()
+
+      popup._config.mobileBreakpoint = 100000
+      popup.show()
+
+      expect(content.style.left).toEqual('')
+      expect(content.style.top).toEqual('')
+      expect(content.style.position).toEqual('')
     })
 
     it('should position with physical offsets only, so RTL gets no competing inline-start', () => {

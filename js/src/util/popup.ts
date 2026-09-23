@@ -144,6 +144,7 @@ class Popup extends Config {
   protected declare _container: HTMLElement | null
   protected declare _cleanupAutoUpdate: (() => void) | null
   protected declare _isShown: boolean
+  protected declare _transition: number
   protected declare _previouslyFocused: HTMLElement | null
   protected declare _pointerdownListener: any
   protected declare _keydownListener: any
@@ -161,6 +162,7 @@ class Popup extends Config {
     this._container = this._config.container ? getElement(this._config.container) : null
     this._cleanupAutoUpdate = null
     this._isShown = false
+    this._transition = 0
     this._previouslyFocused = null
     this._pointerdownListener = null
     this._keydownListener = null
@@ -219,7 +221,9 @@ class Popup extends Config {
 
     execute(this._config.onShow)
 
-    if (!this.isMobile) {
+    if (this.isMobile) {
+      Object.assign(this._content!.style, { left: '', position: '', top: '' })
+    } else {
       this._startPositioning()
     }
 
@@ -238,7 +242,7 @@ class Popup extends Config {
       this._revealEntry()
     }
 
-    execute(this._config.onShown)
+    this._afterTransition(() => execute(this._config.onShown))
   }
 
   hide(): void {
@@ -270,10 +274,11 @@ class Popup extends Config {
 
     this._previouslyFocused = null
 
-    execute(this._config.onHidden)
-
     // The exit transition needs the element to stay put while it plays.
-    executeAfterTransition(() => this._unmount(), this._content!)
+    this._afterTransition(() => {
+      this._unmount()
+      execute(this._config.onHidden)
+    })
   }
 
   toggle(): void {
@@ -287,11 +292,18 @@ class Popup extends Config {
   }
 
   dispose(): void {
-    if (this._isShown) {
+    const wasShown = this._isShown
+
+    if (wasShown) {
       this._hide()
     }
 
+    this._transition++
     this._unmount()
+
+    if (wasShown) {
+      execute(this._config.onHidden)
+    }
 
     if (this._anchorKeydownListener) {
       EventHandler.off(this._anchor!, EVENT_KEYDOWN, this._anchorKeydownListener)
@@ -349,6 +361,16 @@ class Popup extends Config {
     }
 
     return this._anchor ? SelectorEngine.focusableChildren(this._anchor)[0] ?? null : null
+  }
+
+  _afterTransition(callback: () => void): void {
+    const transition = ++this._transition
+
+    executeAfterTransition(() => {
+      if (transition === this._transition) {
+        callback()
+      }
+    }, this._content!)
   }
 
   _unmount(): void {
