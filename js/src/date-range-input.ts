@@ -489,14 +489,17 @@ class DateRangeInput extends BaseComponent {
 
     this._applying = true
 
-    if (fields) {
-      this._startInput.setConfig({ date: startDate })
-      this._endInput.setConfig({ date: endDate })
+    try {
+      if (fields) {
+        this._startInput.setConfig({ date: startDate })
+        this._endInput.setConfig({ date: endDate })
+      }
+    } finally {
+      this._applying = false
     }
 
     const start = fields ? this._startInput.getDate() : startDate
     const end = fields ? this._endInput.getDate() : endDate
-    this._applying = false
 
     const startChanged = !isSameInstantAs(start, this._startDate)
     const endChanged = !isSameInstantAs(end, this._endDate)

@@ -136,6 +136,20 @@ describe('DateRangeInput', () => {
       ])
     })
 
+    it('should keep working after a date the field cannot read', () => {
+      const range = build()
+      const frame = document.createElement('iframe')
+      fixtureEl.append(frame)
+      const foreignDate = new frame.contentWindow.Date(2026, 6, 14)
+
+      expect(() => range.setRange(foreignDate, null)).toThrowError(TypeError)
+
+      range.setRange(new Date(2026, 6, 20), new Date(2026, 6, 25))
+
+      expect(range.getStartDate()).toEqual(new Date(2026, 6, 20))
+      expect(range.getEndDate()).toEqual(new Date(2026, 6, 25))
+    })
+
     it('should reject a setRange with a bad end before writing either field', () => {
       const range = build()
       const seen = []

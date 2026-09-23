@@ -1334,10 +1334,11 @@ validation and the arrow between them. Two consequences:
 
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **The pickers emit their change events only when the value changes.** A
-  calendar pick of the date already selected, a `setDate()`, `setRange()` or
-  `setTime()` with the current value, and a pick the field refuses while the
-  value is already empty no longer fire `dateChange`, `startDateChange`,
-  `endDateChange` or `timeChange`. v5 fired them on every pick and every call.
+  pick of the value already selected, and `clear()` or `reset()` when the
+  picker already holds that value, no longer fire `dateChange`,
+  `startDateChange`, `endDateChange` or `timeChange`; v5 fired them on every
+  pick and on every `clear()` and `reset()`. The new `setDate()`,
+  `setRange()` and `setTime()` follow the same rule.
 
 - **`show` and `hide` can be cancelled** on the Autocomplete, Multi Select,
   Date Picker, Date Range Picker and Time Picker, the way
