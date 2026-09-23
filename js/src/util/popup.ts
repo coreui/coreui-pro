@@ -428,7 +428,7 @@ class Popup extends Config {
       SelectorEngine.findOne('[tabindex="0"]', this._content) as HTMLElement | null ??
       SelectorEngine.focusableChildren(this._content)[0]
 
-    entry?.focus()
+    entry?.focus({ preventScroll: true })
   }
 
   _addDismissListeners(): void {
