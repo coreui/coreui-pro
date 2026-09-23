@@ -201,6 +201,26 @@ describe('DateRangePicker', () => {
       expect(picker._popup.isShown).toBeFalse()
     })
 
+    it('should keep the picked range in the calendar when the end field is focused', () => {
+      const picker = buildPicker({}, [
+        '<div id="picker">',
+        '  <template data-coreui-template="footer">',
+        '    <button type="button" data-coreui-picker-action="close">OK</button>',
+        '  </template>',
+        '</div>'
+      ].join(''))
+
+      picker.show()
+      const popup = fixtureEl.querySelector('.date-picker-popup')
+      popup.querySelectorAll('.calendar-cell[data-coreui-selectable]')[3].click()
+      popup.querySelectorAll('.calendar-cell[data-coreui-selectable]')[8].click()
+
+      const sections = fixtureEl.querySelectorAll('#picker .form-date-time-section')
+      sections[sections.length - 1].dispatchEvent(new FocusEvent('focusin', { bubbles: true }))
+
+      expect(popup.querySelectorAll('.calendar-cell.selected').length).toEqual(2)
+    })
+
     it('should aim the calendar at the end date when the end field was focused', () => {
       const picker = buildPicker()
       const sections = fixtureEl.querySelectorAll('#picker .form-date-time-section')

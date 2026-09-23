@@ -259,8 +259,11 @@ class Calendar extends BaseComponent {
   // Public
   setConfig(config: any): void {
     this._config = this._getConfig({ ...this._config, ...config })
-    this._initializeDates()
-    this._initializeView()
+    this._initializeDates(Object.keys(config ?? {}))
+
+    if (!config || 'selectionType' in config) {
+      this._initializeView()
+    }
 
     // Clear the current calendar content
     this._element.innerHTML = ''
@@ -396,8 +399,8 @@ class Calendar extends BaseComponent {
     const cloneDate = new Date(date)
     const index = Manipulator.getDataAttribute(target.closest(SELECTOR_CALENDAR) as HTMLElement, 'calendar-index') as number
 
-    if (this._view === 'days') {
-      this._setCalendarDate(index ? new Date(cloneDate.setMonth(cloneDate.getMonth() - index)) : date)
+    if (this._view === 'days' && !this._rowsAreTargets()) {
+      this._setCalendarDate(index ? new Date(date.getFullYear(), date.getMonth() - index, 1) : date)
     }
 
     if (this._view === 'months' && this._config.selectionType !== 'month') {
@@ -1121,17 +1124,38 @@ class Calendar extends BaseComponent {
     this._updateRovingTabIndex()
   }
 
-  _initializeDates(): void {
-    // Convert dates to date objects based on the selection type
-    this._calendarDate = convertToDateObject(
-      this._config.calendarDate || this._config.startDate || this._config.endDate, this._config.selectionType
-    ) || new Date()
-    this._startDate = convertToDateObject(this._config.startDate, this._config.selectionType)
-    this._endDate = convertToDateObject(this._config.endDate, this._config.selectionType)
-    this._minDate = convertToDateObject(this._config.minDate, this._config.selectionType)
-    this._maxDate = convertToDateObject(this._config.maxDate, this._config.selectionType)
+  _initializeDates(keys?: string[]): void {
+    const changed = (...names: string[]) => !keys || keys.includes('selectionType') || names.some(name => keys.includes(name))
+
+    if (changed('calendarDate', 'startDate', 'endDate')) {
+      const source = !keys || keys.includes('selectionType') ?
+        this._config.calendarDate || this._config.startDate || this._config.endDate :
+        ['calendarDate', 'startDate', 'endDate'].filter(name => keys.includes(name)).map(name => this._config[name]).find(Boolean) ?? null
+
+      this._calendarDate = convertToDateObject(source, this._config.selectionType) || this._calendarDate || new Date()
+    }
+
+    if (changed('startDate')) {
+      this._startDate = convertToDateObject(this._config.startDate, this._config.selectionType)
+    }
+
+    if (changed('endDate')) {
+      this._endDate = convertToDateObject(this._config.endDate, this._config.selectionType)
+    }
+
+    if (changed('minDate')) {
+      this._minDate = convertToDateObject(this._config.minDate, this._config.selectionType)
+    }
+
+    if (changed('maxDate')) {
+      this._maxDate = convertToDateObject(this._config.maxDate, this._config.selectionType)
+    }
+
+    if (changed('selectEndDate')) {
+      this._selectEndDate = this._config.selectEndDate
+    }
+
     this._hoverDate = null
-    this._selectEndDate = this._config.selectEndDate
   }
 
   _initializeView(): void {

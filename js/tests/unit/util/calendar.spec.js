@@ -72,6 +72,10 @@ describe('Calendar Utilities', () => {
       expect(result).toEqual(originalDate)
     })
 
+    it('should return null instead of an Invalid Date for a week string it cannot read', () => {
+      expect(convertToDateObject('not a date', 'week')).toBeNull()
+    })
+
     it('should return null for invalid Date object', () => {
       const invalidDate = new Date('invalid')
       const result = convertToDateObject(invalidDate, 'day')

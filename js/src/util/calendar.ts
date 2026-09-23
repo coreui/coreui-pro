@@ -591,30 +591,16 @@ export const convertToDateObject = (date: Date | string, selectionType?: Selecti
     return Number.isNaN(date.getTime()) ? null : date
   }
 
-  const dateString = date
-
-  switch (selectionType) {
-    case "week": {
-      return parseWeekString(dateString)
-    }
-
-    case "month": {
-      return parseMonthString(dateString)
-    }
-
-    case "quarter": {
-      return parseQuarterString(dateString)
-    }
-
-    case "year": {
-      return parseYearString(dateString)
-    }
-
-    default: {
-      // Enhanced day parsing with locale support
-      return parseDayString(dateString, locale, includeTime)
-    }
+  const parsers: Record<string, (value: string) => Date | null> = {
+    week: parseWeekString,
+    month: parseMonthString,
+    quarter: parseQuarterString,
+    year: parseYearString
   }
+  const parse = selectionType ? parsers[selectionType] : undefined
+  const parsed = parse ? parse(date) : parseDayString(date, locale, includeTime)
+
+  return parsed && !Number.isNaN(parsed.getTime()) ? parsed : null
 }
 
 /**
