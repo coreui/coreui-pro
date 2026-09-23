@@ -258,6 +258,13 @@ describe('Calendar Utilities', () => {
       expect(result).toHaveSize(12)
       expect(result[0]).toBeDefined()
     })
+
+    it('should name every month the way the locale does', () => {
+      for (const [locale, format] of [['en-US', 'short'], ['pl-PL', 'long'], ['ar-EG', 'long'], ['ja-JP', 'numeric']]) {
+        const expected = Array.from({ length: 12 }, (_, i) => new Date(2000, i, 1).toLocaleString(locale, { month: format }))
+        expect(getMonthsNames(locale, format)).toEqual(expected)
+      }
+    })
   })
 
   describe('getSelectableDates', () => {
