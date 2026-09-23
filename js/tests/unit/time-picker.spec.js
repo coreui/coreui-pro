@@ -178,6 +178,141 @@ describe('TimePicker', () => {
       expect(picker.getTime().getMinutes()).toEqual(15)
     })
 
+    const listen = () => {
+      const emitted = []
+      fixtureEl.querySelector('#picker').addEventListener('timeChange.coreui.time-picker', event => {
+        emitted.push(event.time)
+      })
+      return emitted
+    }
+
+    const cell = (type, value) => fixtureEl.querySelector(`.time-picker-popup [data-coreui-${type}="${value}"]`)
+
+    it('should emit timeChange once per change, carrying what getTime returns', () => {
+      const picker = buildPicker({ time: '09:15', seconds: false })
+      const emitted = listen()
+
+      picker.setTime(new Date(2026, 0, 1, 18, 30, 45))
+      expect(emitted.length).toEqual(1)
+      expect(emitted[0]).toEqual(picker.getTime())
+      expect(emitted[0].getSeconds()).toEqual(0)
+
+      picker.reset()
+      expect(emitted.length).toEqual(2)
+      expect(emitted[1]).toBeInstanceOf(Date)
+      expect(emitted[1]).toEqual(picker.getTime())
+
+      picker.show()
+      cell('minutes', 40).click()
+      expect(emitted.length).toEqual(3)
+      expect(emitted[2]).toEqual(picker.getTime())
+
+      picker.getContext().now()
+      expect(emitted.length).toEqual(4)
+      expect(emitted[3]).toEqual(picker.getTime())
+      expect(emitted[3].getSeconds()).toEqual(0)
+    })
+
+    it('should stay silent when the value does not change', () => {
+      const picker = buildPicker({ time: '09:15', seconds: false })
+      const emitted = listen()
+
+      picker.setTime(new Date(1970, 0, 1, 9, 15, 59))
+      picker.show()
+      cell('minutes', 15).click()
+
+      expect(emitted.length).toEqual(0)
+    })
+
+    it('should report null when the field refuses a panel pick, and let the next pick build on the panel', () => {
+      const picker = buildPicker({ time: '09:15', seconds: false, inputOptions: { maxDate: '12:00' } })
+      const emitted = listen()
+
+      picker.show()
+      cell('meridiem', 'pm').click()
+
+      expect(picker.getTime()).toBeNull()
+      expect(emitted).toEqual([null])
+
+      cell('meridiem', 'am').click()
+
+      expect(picker.getTime()).toEqual(new Date(1970, 0, 1, 9, 15))
+    })
+
+    it('should empty the panel when a refused pick is cleared', () => {
+      const picker = buildPicker({ time: '09:15', seconds: false, inputOptions: { maxDate: '12:00' } })
+
+      picker.show()
+      cell('meridiem', 'pm').click()
+      picker.clear()
+
+      expect(fixtureEl.querySelector('.time-picker-popup [data-coreui-hours].selected')).toBeNull()
+    })
+
+    it('should leave the open panel alone when setTime keeps the value', () => {
+      const picker = buildPicker({ time: '10:20', seconds: false })
+
+      picker.show()
+      const minute = cell('minutes', 20)
+      minute.focus()
+      picker.setTime(picker.getTime())
+
+      expect(document.activeElement).toBe(minute)
+    })
+
+    it('should keep working after setTime throws on a bad argument', () => {
+      const picker = buildPicker({ time: '10:00', seconds: false })
+
+      expect(() => picker.setTime(undefined)).toThrowError(TypeError)
+      picker.setTime(new Date(1970, 0, 1, 11, 30))
+
+      expect(picker.getTime()).toEqual(new Date(1970, 0, 1, 11, 30))
+
+      const emitted = listen()
+      picker._input.setConfig({ date: '14:45' })
+
+      expect(emitted.length).toEqual(1)
+    })
+
+    it('should let an errorChange listener clear the field it refused', () => {
+      const picker = buildPicker({ time: '10:00', seconds: false, inputOptions: { maxDate: '12:00' } })
+      fixtureEl.querySelector('#picker').addEventListener('errorChange.coreui.time-input', event => {
+        if (event.error === 'maxDate') {
+          picker.clear()
+        }
+      })
+
+      picker.setTime(new Date(1970, 0, 1, 14, 0))
+
+      expect(picker.getTime()).toBeNull()
+      expect(fixtureEl.querySelector('#picker .is-invalid')).toBeNull()
+    })
+
+    it('should keep focus in the field when it is cleared', () => {
+      const picker = buildPicker({ time: '10:20', seconds: false })
+      const section = fixtureEl.querySelector('#picker [data-coreui-section="minute"]')
+
+      section.focus()
+      picker.clear()
+
+      expect(document.activeElement).toBe(section)
+    })
+
+    it('should keep the panel on the value a timeChange listener sets', () => {
+      const picker = buildPicker({ time: '10:00', seconds: false })
+      fixtureEl.querySelector('#picker').addEventListener('timeChange.coreui.time-picker', event => {
+        if (event.time && event.time.getMinutes() % 15) {
+          picker.setTime(new Date(1970, 0, 1, event.time.getHours(), event.time.getMinutes() - (event.time.getMinutes() % 15)))
+        }
+      })
+
+      picker.show()
+      cell('minutes', 7).click()
+
+      expect(picker.getTime().getMinutes()).toEqual(0)
+      expect(fixtureEl.querySelector('.time-picker-popup [data-coreui-minutes].selected').dataset.coreuiMinutes).toEqual('0')
+    })
+
     it('should mark the selected cell', () => {
       const picker = buildPicker({ time: new Date(2026, 0, 1, 10, 20, 0) })
       picker.show()

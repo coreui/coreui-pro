@@ -249,7 +249,7 @@ forwarded by name, so their data attributes work on the picker element too.
 | `getTime` | Returns the current value (`Date` or `null`). |
 | `now` | Sets the current time. |
 | `reset` | Restores the initial value. |
-| `setTime` | Sets the value and emits `timeChange`. |
+| `setTime` | Sets the value. Emits `timeChange` when the value changes. |
 | `show` / `hide` / `toggle` | Popup control. |
 
 #### Slot context
@@ -271,7 +271,7 @@ context.disabled         // disabled state
 | Event | Description |
 | --- | --- |
 | `show/shown/hide/hidden.coreui.time-picker` | Popup lifecycle. |
-| `timeChange.coreui.time-picker` | Fired when the value changes. `event.time` carries the new value. |
+| `timeChange.coreui.time-picker` | Fired once when the value changes, whether from the field, the panel or a method. `event.time` is the value the field accepted, the same as `getTime()`, or `null` when it refused the time. |
 
 ## Customizing
 

@@ -125,7 +125,8 @@ class TimePicker extends PickerBase {
   protected declare _input: any
   protected declare _selection: any
   protected declare _selectionElement: any
-  protected declare _syncingFromPanel: boolean
+  protected declare _applying: number
+  protected declare _time: Date | null
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
@@ -134,7 +135,8 @@ class TimePicker extends PickerBase {
     this._initialTime = config?.time ?? this._config.time
     this._input = null
     this._selection = null
-    this._syncingFromPanel = false
+    this._applying = 0
+    this._time = null
     this._selectionElement = null
 
     this._hostClasses = captureHostClasses(this._element, this._managedClassNames())
@@ -162,8 +164,7 @@ class TimePicker extends PickerBase {
   }
 
   setTime(time: Date | null): void {
-    this._input.setConfig({ date: time })
-    EventHandler.trigger(this._element, EVENT_TIME_CHANGE, { time })
+    this._applyTime(time)
   }
 
   now(): void {
@@ -172,6 +173,7 @@ class TimePicker extends PickerBase {
 
   clear(): void {
     this._input.clear()
+    this._applyTime(null, { field: false })
   }
 
   reset(): void {
@@ -245,11 +247,12 @@ class TimePicker extends PickerBase {
       seconds: Boolean(this._config.seconds)
     }, { ...(this._config.floatingLabel ? { ariaLabel: this._config.floatingLabel } : {}), ...this._config.inputOptions }))
 
+    this._time = this._input.getDate()
+
     // See DatePicker — the bridge from a typed value back to the panel
     EventHandler.on(inputEl, TimeInput.eventName(TimeInput.CHANGE_EVENT_NAME), (event: any) => {
-      if (!this._syncingFromPanel) {
-        this._selection?.setConfig({ time: event.date })
-        EventHandler.trigger(this._element, EVENT_TIME_CHANGE, { time: event.date })
+      if (!this._applying) {
+        this._applyTime(event.date, { field: false })
       }
     })
 
@@ -287,14 +290,34 @@ class TimePicker extends PickerBase {
 
     this._selection = new TimeRoll(this._selectionElement, this._forwardConfig(TimeRoll, {
       locale: this._config.locale,
-      onChange: (time: Date | null) => {
-        this._syncingFromPanel = true
-        this._input.setConfig({ date: time })
-        this._syncingFromPanel = false
-        EventHandler.trigger(this._element, EVENT_TIME_CHANGE, { time })
-      },
+      onChange: (time: Date | null) => this._applyTime(time, { selection: false }),
       time: this.getTime()
     }, this._config.selectionOptions))
+  }
+
+  _applyTime(time: Date | null, { field = true, selection = true }: { field?: boolean, selection?: boolean } = {}): void {
+    if (field) {
+      this._applying++
+
+      try {
+        this._input.setConfig({ date: time })
+      } finally {
+        this._applying--
+      }
+    }
+
+    const applied = field ? this._input.getDate() : time
+    const stamp = (date: Date | null) => (date ? date.getTime() : null)
+    const changed = stamp(applied) !== stamp(this._time)
+    this._time = applied
+
+    if (selection && this._selection && stamp(this._selection.getTime()) !== stamp(applied)) {
+      this._selection.setConfig({ time: applied })
+    }
+
+    if (changed) {
+      EventHandler.trigger(this._element, EVENT_TIME_CHANGE, { time: applied })
+    }
   }
 
   override _onPopupShow(): void {
