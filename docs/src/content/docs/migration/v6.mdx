@@ -1341,10 +1341,10 @@ validation and the arrow between them. Two consequences:
   `setRange()` and `setTime()` follow the same rule.
 
 - **`shown` and `hidden` on the pickers wait for the popup's transition**, like
-  the other components' lifecycle events: `shown` fires once the panel has
-  finished opening (and not at all when it closes first), `hidden` once it
-  has finished closing and left the page. v5 fired both as soon as `show()` or
-  `hide()` ran.
+  the modal, dialog, toast and collapse events: `shown` fires once the panel
+  has finished opening (and not at all when it closes first), `hidden` once it
+  has finished closing and left the page (and not at all when it reopens
+  first). v5 fired both as soon as `show()` or `hide()` ran.
 
 - **`show` and `hide` can be cancelled** on the Autocomplete, Multi Select,
   Date Picker, Date Range Picker and Time Picker, the way

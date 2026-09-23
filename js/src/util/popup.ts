@@ -13,7 +13,7 @@ import SelectorEngine from '../dom/selector-engine.js'
 import Config from './config.js'
 import FocusTrap from './focustrap.js'
 import {
-  execute, executeAfterTransition, getElement
+  execute, getElement, getTransitionDurationFromElement
 } from './index.js'
 
 /**
@@ -145,6 +145,7 @@ class Popup extends Config {
   protected declare _cleanupAutoUpdate: (() => void) | null
   protected declare _isShown: boolean
   protected declare _transition: number
+  protected declare _hiding: boolean
   protected declare _previouslyFocused: HTMLElement | null
   protected declare _pointerdownListener: any
   protected declare _keydownListener: any
@@ -163,6 +164,7 @@ class Popup extends Config {
     this._cleanupAutoUpdate = null
     this._isShown = false
     this._transition = 0
+    this._hiding = false
     this._previouslyFocused = null
     this._pointerdownListener = null
     this._keydownListener = null
@@ -210,6 +212,8 @@ class Popup extends Config {
     }
 
     this._isShown = true
+    this._hiding = false
+    const transition = ++this._transition
     this._previouslyFocused = document.activeElement as HTMLElement | null
 
     // Mount before the callback: consumers use it to scroll the selection into
@@ -242,7 +246,7 @@ class Popup extends Config {
       this._revealEntry()
     }
 
-    this._afterTransition(() => execute(this._config.onShown))
+    this._afterTransition(transition, () => execute(this._config.onShown))
   }
 
   hide(): void {
@@ -259,6 +263,8 @@ class Popup extends Config {
     execute(this._config.onHide)
     this._isShown = false
     this._revealPending = false
+    this._hiding = true
+    const transition = ++this._transition
     this._stopPositioning()
     this._removeDismissListeners()
 
@@ -275,7 +281,8 @@ class Popup extends Config {
     this._previouslyFocused = null
 
     // The exit transition needs the element to stay put while it plays.
-    this._afterTransition(() => {
+    this._afterTransition(transition, () => {
+      this._hiding = false
       this._unmount()
       execute(this._config.onHidden)
     })
@@ -292,16 +299,17 @@ class Popup extends Config {
   }
 
   dispose(): void {
-    const wasShown = this._isShown
+    const owesHidden = this._isShown || this._hiding
 
-    if (wasShown) {
+    if (this._isShown) {
       this._hide()
     }
 
     this._transition++
+    this._hiding = false
     this._unmount()
 
-    if (wasShown) {
+    if (owesHidden) {
       execute(this._config.onHidden)
     }
 
@@ -363,14 +371,31 @@ class Popup extends Config {
     return this._anchor ? SelectorEngine.focusableChildren(this._anchor)[0] ?? null : null
   }
 
-  _afterTransition(callback: () => void): void {
-    const transition = ++this._transition
+  _afterTransition(transition: number, callback: () => void): void {
+    const content = this._content!
+    let settled = false
 
-    executeAfterTransition(() => {
+    const settle = () => {
+      if (settled) {
+        return
+      }
+
+      settled = true
+      content.removeEventListener('transitionend', onTransitionEnd)
+
       if (transition === this._transition) {
         callback()
       }
-    }, this._content!)
+    }
+
+    const onTransitionEnd = (event: TransitionEvent) => {
+      if (event.target === content && event.propertyName === 'opacity') {
+        settle()
+      }
+    }
+
+    content.addEventListener('transitionend', onTransitionEnd)
+    setTimeout(settle, getTransitionDurationFromElement(content) + 5)
   }
 
   _unmount(): void {

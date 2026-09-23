@@ -169,6 +169,68 @@ describe('Popup', () => {
       expect(calls).toEqual(['hide', 'hidden, connected: false'])
     })
 
+    it('should let a hide from the focus change of show win over it', async () => {
+      const calls = []
+      let resolveHidden
+      const hidden = new Promise(resolve => {
+        resolveHidden = resolve
+      })
+      const popup = buildPopup({
+        onShown: () => calls.push('shown'),
+        onHidden() {
+          calls.push('hidden')
+          resolveHidden()
+        }
+      })
+      const content = fixtureEl.querySelector('#content')
+      const inside = fixtureEl.querySelector('#inside')
+      inside.focus()
+      inside.addEventListener('blur', () => popup.hide(), { once: true })
+
+      popup.show()
+      await hidden
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect(calls).toEqual(['hidden'])
+      expect(content.isConnected).toBeFalse()
+    })
+
+    it('should still fire onHidden when disposed during the exit transition', async () => {
+      const onHidden = jasmine.createSpy('onHidden')
+      const popup = buildPopup({ onHidden })
+
+      popup.show()
+      popup.hide()
+      popup.dispose()
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect(onHidden).toHaveBeenCalledTimes(1)
+    })
+
+    it('should skip onHidden when the popup reopens during the exit transition', async () => {
+      const calls = []
+      const popup = buildPopup({
+        onShown: () => calls.push('shown'),
+        onHidden: () => calls.push('hidden')
+      })
+
+      const content = fixtureEl.querySelector('#content')
+
+      popup.show()
+      popup.hide()
+      popup.show()
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect(calls).toEqual(['shown'])
+      expect(content.isConnected).toBeTrue()
+    })
+
     it('should fire onHide and onHidden at once when disposed while shown', async () => {
       const calls = []
       const popup = buildPopup({

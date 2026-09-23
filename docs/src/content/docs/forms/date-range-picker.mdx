@@ -382,7 +382,7 @@ context.disabled               // disabled state
 | Event | Description |
 | --- | --- |
 | `endDateChange.coreui.date-range-picker` | Fired when the end changes, with the same payload shape. |
-| `hidden.coreui.date-range-picker` | Fired once the popup has finished its exit transition and left the page. |
+| `hidden.coreui.date-range-picker` | Fired once the popup has finished its exit transition and left the page. Skipped when the popup reopens first. |
 | `hide.coreui.date-range-picker` | Fired immediately when `hide` is called. |
 | `show.coreui.date-range-picker` | Fired immediately when `show` is called. Call `event.preventDefault()` to keep the popup closed. |
 | `shown.coreui.date-range-picker` | Fired once the popup has finished its entry transition. Skipped when the popup closes first. |
