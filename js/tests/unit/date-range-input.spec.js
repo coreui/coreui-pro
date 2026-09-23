@@ -36,6 +36,20 @@ describe('DateRangeInput', () => {
   })
 
   describe('constructor', () => {
+    it('should pass a global default of its own to both fields', () => {
+      const { readonly } = DateRangeInput.Default
+      DateRangeInput.Default.readonly = true
+
+      try {
+        const range = build()
+
+        expect(range._startInput._config.readonly).toBeTrue()
+        expect(range._endInput._config.readonly).toBeTrue()
+      } finally {
+        DateRangeInput.Default.readonly = readonly
+      }
+    })
+
     it('should build two date fields and a separator inside the frame', () => {
       build()
 

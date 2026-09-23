@@ -131,6 +131,20 @@ describe('TimePicker', () => {
       expect(fixtureEl.querySelector('.time-picker-popup [data-coreui-hours][aria-selected="true"]').dataset.coreuiHours).toEqual('14')
     })
 
+    it('should carry a global picker default to the roll', () => {
+      const { seconds } = TimePicker.Default
+      TimePicker.Default.seconds = false
+
+      try {
+        const picker = buildPicker({ locale: 'en-GB' })
+        picker.show()
+
+        expect(fixtureEl.querySelectorAll('.time-picker-body .time-picker-col').length).toEqual(2)
+      } finally {
+        TimePicker.Default.seconds = seconds
+      }
+    })
+
     it('should ignore a variant passed through the config', () => {
       const picker = buildPicker({ variant: 'select' })
       picker.show()

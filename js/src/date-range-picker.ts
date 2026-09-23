@@ -122,6 +122,8 @@ const Default: DateRangePickerConfig = {
   startName: null
 }
 
+const ORIGINAL_DEFAULT: DateRangePickerConfig = { ...Default }
+
 const DefaultType: Record<string, string> = {
   allowList: 'object',
   ariaCleanerLabel: 'string',
@@ -245,6 +247,10 @@ class DateRangePicker extends PickerBase {
   }
 
   // Private
+  override _originalDefault(): Record<string, any> {
+    return ORIGINAL_DEFAULT
+  }
+
   override _managedClassNames(): string[] {
     return [
       CLASS_NAME_DATE_PICKER,
