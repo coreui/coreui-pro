@@ -1,6 +1,10 @@
+import ContextMenu from '../../src/context-menu.js'
+import DatePicker from '../../src/date-picker.js'
 import Data from '../../src/dom/data.js'
 import EventHandler from '../../src/dom/event-handler.js'
 import Dialog from '../../src/dialog.js'
+import Dropdown from '../../src/dropdown.js'
+import MultiSelect from '../../src/multi-select.js'
 import {
   clearBodyAndDocument, clearFixture, createEvent, getFixture, jQueryMock
 } from '../helpers/fixture.js'
@@ -1211,6 +1215,54 @@ describe('Dialog', () => {
         dialogEl.addEventListener('hidden.coreui.dialog', () => {
           expect(fakeToast.hide).toHaveBeenCalled()
           Data.remove(toastEl, 'coreui.toast')
+          resolve()
+        })
+
+        dialog.show()
+      })
+    })
+
+    it('should hide open pickers, dropdowns, context menus and multi selects inside dialog when dialog closes', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<dialog class="dialog">',
+          '  <div id="picker"></div>',
+          '  <div class="dropdown">',
+          '    <button class="btn" data-coreui-toggle="dropdown">Menu</button>',
+          '    <ul class="dropdown-menu"><li><a class="dropdown-item" href="#">Item</a></li></ul>',
+          '  </div>',
+          '  <div id="area" data-coreui-target="#context">Area</div>',
+          '  <ul class="menu" id="context"><li><button class="menu-item" type="button">Copy</button></li></ul>',
+          '  <select id="select" multiple><option value="1">One</option></select>',
+          '</dialog>'
+        ].join('')
+
+        const dialogEl = fixtureEl.querySelector('.dialog')
+        const dialog = new Dialog(dialogEl)
+        const children = [
+          new DatePicker(fixtureEl.querySelector('#picker')),
+          new Dropdown(fixtureEl.querySelector('[data-coreui-toggle="dropdown"]')),
+          new ContextMenu(fixtureEl.querySelector('#area')),
+          new MultiSelect(fixtureEl.querySelector('#select'))
+        ]
+
+        dialogEl.addEventListener('shown.coreui.dialog', () => {
+          for (const child of children) {
+            child.show()
+          }
+
+          dialog.hide()
+        })
+
+        dialogEl.addEventListener('hidden.coreui.dialog', () => {
+          const [picker, dropdown, contextMenu, multiSelect] = children
+          const open = [picker._popup.isShown, dropdown._isShown(), contextMenu._isShown(), multiSelect._isShown()]
+
+          for (const child of children) {
+            child.dispose()
+          }
+
+          expect(open).toEqual([false, false, false, false])
           resolve()
         })
 
