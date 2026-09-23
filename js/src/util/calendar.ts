@@ -4,6 +4,8 @@ export type SelectionTypes = 'day' | 'week' | 'month' | 'quarter' | 'year'
 
 export type ViewTypes = 'days' | 'months' | 'quarters' | 'years'
 
+export type PeriodViewTypes = Exclude<ViewTypes, 'days'>
+
 export type BaseGroups = {
   year: string
   month: string
@@ -68,55 +70,15 @@ const getMondayOfISOWeek = (year: number, week: number) : Date => {
   return weekStart
 }
 
-/**
- * Helper function to convert a date to a month number for comparison.
- * @param date - The date to convert.
- * @returns A number representing year*12 + month for easy comparison.
- */
-const dateToMonthNumber = (date: Date) : number => {
-  // prettier-ignore
-  return (date.getFullYear() * 12) + date.getMonth()
+const MONTHS_IN_PERIOD: Record<PeriodViewTypes, number> = {
+  months: 1,
+  quarters: 3,
+  years: 12
 }
 
-/**
- * Helper function to convert a date to a quarter number for comparison.
- * @param date - The date to convert.
- * @returns A number representing year*4 + quarter for easy comparison.
- */
-const dateToQuarterNumber = (date: Date) : number => {
-  const quarter = Math.floor(date.getMonth() / 3)
-  return (date.getFullYear() * 4) + quarter
-}
+const getPeriod = (date: Date, view: PeriodViewTypes) : number => Math.floor(((date.getFullYear() * 12) + date.getMonth()) / MONTHS_IN_PERIOD[view])
 
-/**
- * Helper function to check if a value is within min/max range.
- * @param value - The value to check.
- * @param min - Minimum allowed value (null means no minimum).
- * @param max - Maximum allowed value (null means no maximum).
- * @returns True if the value is outside the range, false if within range.
- */
-const isOutsideRange = (value: number, min: number | null, max: number | null) : boolean => {
-  if (min !== null && value < min) {
-    return true
-  }
-
-  if (max !== null && value > max) {
-    return true
-  }
-
-  return false
-}
-
-/**
- * Helper function to check if every day of a period is disabled.
- * @param start - First day of the period.
- * @param end - Last day of the period.
- * @param min - Minimum allowed date.
- * @param max - Maximum allowed date.
- * @param disabledDates - Criteria for disabled dates.
- * @returns True if no day between start and end (clamped to min/max) is selectable.
- */
-const isPeriodDisabled = (start: Date, end: Date, min: Date | null | undefined, max: Date | null | undefined, disabledDates: DisabledDate | DisabledDate[]) : boolean => {
+const isEveryDayDisabled = (start: Date, end: Date, min: Date | null | undefined, max: Date | null | undefined, disabledDates: DisabledDate | DisabledDate[]) : boolean => {
   const startTime = min ? Math.max(start.getTime(), min.getTime()) : start.getTime()
   const endTime = max ? Math.min(end.getTime(), max.getTime()) : end.getTime()
 
@@ -976,20 +938,10 @@ export const isDisableDateInRange = (startDate?: Date | null, endDate?: Date | n
   return false
 }
 
-/**
- * Checks if a month is disabled based on the 'month' period type.
- * @param date - The date representing the month to check.
- * @param min - Minimum allowed date.
- * @param max - Maximum allowed date.
- * @param disabledDates - Criteria for disabled dates.
- * @returns True if the month is disabled, false otherwise.
- */
-export const isMonthDisabled = (date: Date, min?: Date | null, max?: Date | null, disabledDates?: DisabledDate | DisabledDate[]): boolean => {
-  const current = dateToMonthNumber(date)
-  const _min = min ? dateToMonthNumber(min) : null
-  const _max = max ? dateToMonthNumber(max) : null
+export const isPeriodDisabled = (date: Date, view: PeriodViewTypes, min?: Date | null, max?: Date | null, disabledDates?: DisabledDate | DisabledDate[]) : boolean => {
+  const period = getPeriod(date, view)
 
-  if (isOutsideRange(current, _min, _max)) {
+  if ((min && period < getPeriod(min, view)) || (max && period > getPeriod(max, view))) {
     return true
   }
 
@@ -997,124 +949,24 @@ export const isMonthDisabled = (date: Date, min?: Date | null, max?: Date | null
     return false
   }
 
+  const months = MONTHS_IN_PERIOD[view]
   const year = date.getFullYear()
-  const month = date.getMonth()
+  const month = Math.floor(date.getMonth() / months) * months
 
-  return isPeriodDisabled(new Date(year, month, 1), new Date(year, month + 1, 0), min, max, disabledDates)
+  return isEveryDayDisabled(new Date(year, month, 1), new Date(year, month + months, 0), min, max, disabledDates)
 }
 
-/**
- * Checks if a month is selected based on start and end dates.
- * @param date - The date representing the month.
- * @param start - Start date.
- * @param end - End date.
- * @returns True if the month is selected, false otherwise.
- */
-export const isMonthSelected = (date: Date, start: Date | null, end: Date | null) : boolean => {
-  const year = date.getFullYear()
-  const month = date.getMonth()
-
-  if (
-    start !== null &&
-    year === start.getFullYear() &&
-    month === start.getMonth()
-  ) {
-    return true
-  }
-
-  if (end !== null && year === end.getFullYear() && month === end.getMonth()) {
-    return true
-  }
-
-  return false
-}
-
-/**
- * Checks if a month is within a specified range.
- * @param date - The date representing the month.
- * @param start - Start date.
- * @param end - End date.
- * @returns True if the month is within the range, false otherwise.
- */
-export const isMonthInRange = (date: Date, start: Date | null, end: Date | null) : boolean => {
-  const _start = start ? dateToMonthNumber(start) : null
-  const _end = end ? dateToMonthNumber(end) : null
-  const _date = dateToMonthNumber(date)
-
-  return Boolean(_start && _end && _start <= _date && _date <= _end)
-}
-
-/**
- * Checks if a quarter is disabled based on the 'quarter' period type.
- * @param date - The date representing the quarter to check.
- * @param min - Minimum allowed date.
- * @param max - Maximum allowed date.
- * @param disabledDates - Criteria for disabled dates.
- * @returns True if the quarter is disabled, false otherwise.
- */
-export const isQuarterDisabled = (date: Date, min?: Date | null, max?: Date | null, disabledDates?: DisabledDate | DisabledDate[]): boolean => {
-  const current = dateToQuarterNumber(date)
-  const _min = min ? dateToQuarterNumber(min) : null
-  const _max = max ? dateToQuarterNumber(max) : null
-
-  if (isOutsideRange(current, _min, _max)) {
-    return true
-  }
-
-  if (disabledDates === undefined) {
+export const isPeriodInRange = (date: Date, view: PeriodViewTypes, start: Date | null, end: Date | null) : boolean => {
+  if (!start || !end) {
     return false
   }
 
-  const year = date.getFullYear()
-  const quarterStartMonth = Math.floor(date.getMonth() / 3) * 3
-
-  return isPeriodDisabled(new Date(year, quarterStartMonth, 1), new Date(year, quarterStartMonth + 3, 0), min, max, disabledDates)
+  const period = getPeriod(date, view)
+  return getPeriod(start, view) <= period && period <= getPeriod(end, view)
 }
 
-/**
- * Checks if a quarter is selected based on start and end dates.
- * @param date - The date representing the quarter.
- * @param start - Start date.
- * @param end - End date.
- * @returns True if the quarter is selected, false otherwise.
- */
-export const isQuarterSelected = (date: Date, start: Date | null, end: Date | null) : boolean => {
-  const year = date.getFullYear()
-  const quarter = Math.floor(date.getMonth() / 3)
-
-  if (start !== null) {
-    const startYear = start.getFullYear()
-    const startQuarter = Math.floor(start.getMonth() / 3)
-    if (year === startYear && quarter === startQuarter) {
-      return true
-    }
-  }
-
-  if (end !== null) {
-    const endYear = end.getFullYear()
-    const endQuarter = Math.floor(end.getMonth() / 3)
-    if (year === endYear && quarter === endQuarter) {
-      return true
-    }
-  }
-
-  return false
-}
-
-/**
- * Checks if a quarter is within a specified range.
- * @param date - The date representing the quarter.
- * @param start - Start date.
- * @param end - End date.
- * @returns True if the quarter is within the range, false otherwise.
- */
-export const isQuarterInRange = (date: Date, start: Date | null, end: Date | null) : boolean => {
-  const _start = start ? dateToQuarterNumber(start) : null
-  const _end = end ? dateToQuarterNumber(end) : null
-  const _date = dateToQuarterNumber(date)
-
-  return Boolean(_start && _end && _start <= _date && _date <= _end)
-}
+export const isPeriodSelected = (date: Date, view: PeriodViewTypes, start: Date | null, end: Date | null) : boolean =>
+  [start, end].some(value => value !== null && getPeriod(value, view) === getPeriod(date, view))
 
 /**
  * Checks if two dates are the same calendar date.
@@ -1154,66 +1006,6 @@ export const isSameDateAs = (date: Date | null, date2: Date | null) : boolean =>
 export const isToday = (date: Date) : boolean => {
   const today = new Date()
   return isSameDateAs(date, today)
-}
-
-/**
- * Checks if a year is disabled based on the 'year' period type.
- * @param date - The date representing the year to check.
- * @param min - Minimum allowed date.
- * @param max - Maximum allowed date.
- * @param disabledDates - Criteria for disabled dates.
- * @returns True if the year is disabled, false otherwise.
- */
-export const isYearDisabled = (date: Date, min?: Date | null, max?: Date | null, disabledDates?: DisabledDate | DisabledDate[]): boolean => {
-  const year = date.getFullYear()
-  const minYear = min ? min.getFullYear() : null
-  const maxYear = max ? max.getFullYear() : null
-
-  if (isOutsideRange(year, minYear, maxYear)) {
-    return true
-  }
-
-  if (disabledDates === undefined) {
-    return false
-  }
-
-  return isPeriodDisabled(new Date(year, 0, 1), new Date(year, 11, 31), min, max, disabledDates)
-}
-
-/**
- * Checks if a year is selected based on start and end dates.
- * @param date - The date representing the year.
- * @param start - Start date.
- * @param end - End date.
- * @returns True if the year matches the start's or end's year, false otherwise.
- */
-export const isYearSelected = (date: Date, start: Date | null, end: Date | null) : boolean => {
-  const year = date.getFullYear()
-
-  if (start !== null && year === start.getFullYear()) {
-    return true
-  }
-
-  if (end !== null && year === end.getFullYear()) {
-    return true
-  }
-
-  return false
-}
-
-/**
- * Checks if a year is within a specified range.
- * @param date - The date representing the year.
- * @param start - Start date.
- * @param end - End date.
- * @returns True if the year's value lies between start's year and end's year, false otherwise.
- */
-export const isYearInRange = (date: Date, start: Date | null, end: Date | null) : boolean => {
-  const year = date.getFullYear()
-  const _start = start ? start.getFullYear() : null
-  const _end = end ? end.getFullYear() : null
-
-  return Boolean(_start && _end && _start <= year && year <= _end)
 }
 
 /**
