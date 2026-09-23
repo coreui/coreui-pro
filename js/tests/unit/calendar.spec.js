@@ -2273,6 +2273,98 @@ describe('Calendar', () => {
       expect(ariaSelectedCells.length).toEqual(1)
     })
 
+    it('should keep the view when a day 29-31 in the second panel is clicked', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      // eslint-disable-next-line no-new
+      new Calendar(div, {
+        calendarDate: new Date(2026, 3, 1), calendars: 2, locale: 'en-US', range: true
+      })
+      const second = div.querySelectorAll('.calendar')[1]
+      const may31 = [...second.querySelectorAll('.calendar-cell[data-coreui-selectable]')]
+        .find(cell => new Date(cell.dataset.coreuiDate).toDateString() === new Date(2026, 4, 31).toDateString())
+
+      may31.click()
+      div.querySelector('.btn-next').click()
+
+      expect(div.querySelector('table').getAttribute('aria-label')).toEqual('May 2026')
+    })
+
+    it('should keep a picked range when setConfig changes only selectEndDate', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, { calendarDate: new Date(2026, 8, 1), locale: 'en-US', range: true })
+      const pick = day => [...div.querySelectorAll('.calendar-cell[data-coreui-selectable]')]
+        .find(cell => new Date(cell.dataset.coreuiDate).toDateString() === new Date(2026, 8, day).toDateString())
+        .click()
+
+      pick(11)
+      pick(16)
+      calendar.setConfig({ selectEndDate: true })
+
+      expect(calendar._startDate).toEqual(new Date(2026, 8, 11))
+      expect(calendar._endDate).toEqual(new Date(2026, 8, 16))
+      expect(calendar._selectEndDate).toBeTrue()
+      expect(div.querySelectorAll('.calendar-cell.selected').length).toEqual(2)
+    })
+
+    it('should keep the month and the view when setConfig changes only selectEndDate', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, { calendarDate: new Date(2026, 8, 1), locale: 'en-US', range: true })
+
+      div.querySelector('.btn-next').click()
+      div.querySelector('.btn-next').click()
+      calendar.setConfig({ selectEndDate: true })
+      expect(div.querySelector('table').getAttribute('aria-label')).toEqual('November 2026')
+
+      div.querySelector('.btn-month').click()
+      calendar.setConfig({ selectEndDate: false })
+      expect(div.querySelector('table').getAttribute('aria-label')).toEqual('2026')
+    })
+
+    it('should keep the month when setConfig clears the start date', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, { locale: 'en-US', startDate: new Date(2026, 8, 12) })
+
+      div.querySelector('.btn-next').click()
+      calendar.setConfig({ startDate: null })
+
+      expect(calendar._startDate).toBeNull()
+      expect(div.querySelector('table').getAttribute('aria-label')).toEqual('October 2026')
+    })
+
+    it('should show the month of the date setConfig names, not of a stale configured one', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, { locale: 'en-US', range: true, startDate: new Date(2026, 0, 10) })
+
+      calendar.setConfig({ endDate: new Date(2026, 8, 18) })
+
+      expect(div.querySelector('table').getAttribute('aria-label')).toEqual('September 2026')
+    })
+
+    it('should keep the view when the first week row is picked', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      // eslint-disable-next-line no-new
+      new Calendar(div, {
+        calendarDate: new Date(2026, 8, 1), locale: 'en-US', selectionType: 'week', showAdjacentDays: false
+      })
+
+      div.querySelector('.calendar-row[data-coreui-selectable]').click()
+      div.querySelector('.btn-next').click()
+
+      expect(div.querySelector('table').getAttribute('aria-label')).toEqual('October 2026')
+    })
+
     it('should mark a date that cannot be picked with aria-disabled', () => {
       fixtureEl.innerHTML = '<div></div>'
 
