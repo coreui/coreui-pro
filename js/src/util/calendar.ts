@@ -740,9 +740,8 @@ export const getFirstAvailableDateInRange = (startDate: Date, endDate: Date, min
  * @returns An array of month names.
  */
 export const getMonthsNames = (locale: string, format: 'long' | 'narrow' | 'short' | 'numeric' | '2-digit' = 'short') : string[] => {
-  return Array.from({ length: 12 }, (_, i) => {
-    return new Date(2000, i, 1).toLocaleString(locale, { month: format })
-  })
+  const formatter = new Intl.DateTimeFormat(locale, { month: format })
+  return Array.from({ length: 12 }, (_, i) => formatter.format(new Date(2000, i, 1)))
 }
 
 /**

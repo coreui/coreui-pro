@@ -201,6 +201,32 @@ describe('Calendar', () => {
       expect(built).toBeLessThan(10)
     })
 
+    it('should build the month names only in the months view, with one formatter per panel', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const NativeDateTimeFormat = Intl.DateTimeFormat
+      const built = []
+
+      Intl.DateTimeFormat = function (locale, options) {
+        if (options?.month === 'narrow') {
+          built.push(options)
+        }
+
+        return new NativeDateTimeFormat(locale, options)
+      }
+
+      try {
+        new Calendar(div, { calendars: 2, locale: 'en-US', monthFormat: 'narrow' }) // eslint-disable-line no-new
+        expect(built.length).toEqual(0)
+
+        div.querySelector('.btn-month').click()
+        expect(built.length).toEqual(2)
+      } finally {
+        Intl.DateTimeFormat = NativeDateTimeFormat
+      }
+    })
+
     it('should re-read the locale when setConfig changes it', () => {
       fixtureEl.innerHTML = '<div></div>'
 
@@ -478,6 +504,58 @@ describe('Calendar', () => {
 
       expect(div.querySelectorAll('.calendar-cell[tabindex="0"]').length).toEqual(1)
       expect(target.tabIndex).toEqual(0)
+    })
+
+    it('should move the tab stop to a date picked without focus', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { locale: 'en-US', calendarDate: new Date(2026, 8, 1) }) // eslint-disable-line no-new
+
+      const target = div.querySelector(`[data-coreui-date="${new Date(2026, 8, 17)}"]`)
+      target.click()
+
+      expect(div.querySelectorAll('.calendar-cell[tabindex="0"]').length).toEqual(1)
+      expect(target.tabIndex).toEqual(0)
+    })
+
+    it('should return the tab stop to the selected date when focus leaves the grid', () => {
+      for (const config of [{}, { range: true, selectEndDate: true }]) {
+        fixtureEl.innerHTML = '<div></div><button type="button"></button>'
+
+        const div = fixtureEl.querySelector('div')
+        new Calendar(div, { // eslint-disable-line no-new
+          locale: 'en-US',
+          calendarDate: new Date(2026, 8, 1),
+          startDate: new Date(2026, 8, 5),
+          ...config
+        })
+
+        div.querySelector(`[data-coreui-date="${new Date(2026, 8, 17)}"]`).focus()
+        fixtureEl.querySelector('button').focus()
+
+        expect(div.querySelectorAll('.calendar-cell[tabindex="0"]').length).toEqual(1)
+        expect(div.querySelector('.calendar-cell[tabindex="0"]').dataset.coreuiDate).toEqual(String(new Date(2026, 8, 5)))
+      }
+    })
+
+    it('should return the tab stop to the selected week when focus leaves a week row', () => {
+      fixtureEl.innerHTML = '<div></div><button type="button"></button>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { // eslint-disable-line no-new
+        locale: 'en-US',
+        selectionType: 'week',
+        calendarDate: new Date(2026, 8, 1),
+        startDate: '2026W38'
+      })
+
+      const rows = div.querySelectorAll('.calendar-row[data-coreui-selectable]')
+      rows[rows.length - 1].focus()
+      fixtureEl.querySelector('button').focus()
+
+      expect(div.querySelectorAll('.calendar-row[tabindex="0"]').length).toEqual(1)
+      expect(div.querySelector('.calendar-row[tabindex="0"]').getAttribute('aria-selected')).toEqual('true')
     })
 
     it('should keep one tab stop per row when weeks are the unit', () => {
@@ -2163,6 +2241,79 @@ describe('Calendar', () => {
           resolve()
         }, 10)
       })
+    })
+
+    it('should not rewrite the grid when hovering without a range to preview', async () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { calendarDate: new Date(2023, 5, 1), calendars: 2 }) // eslint-disable-line no-new
+      const records = []
+      const observer = new MutationObserver(list => records.push(...list))
+      observer.observe(div, { attributes: true, subtree: true })
+
+      const cells = div.querySelectorAll('.calendar-cell[data-coreui-selectable]')
+      cells[3].dispatchEvent(new MouseEvent('mouseover', { bubbles: true, relatedTarget: cells[2] }))
+      cells[3].dispatchEvent(new MouseEvent('mouseout', { bubbles: true, relatedTarget: cells[4] }))
+      await Promise.resolve()
+      observer.disconnect()
+
+      expect(records.length).toEqual(0)
+    })
+
+    it('should not rewrite the grid when hovering a single-date calendar with a picked date', async () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { calendarDate: new Date(2023, 5, 1), startDate: new Date(2023, 5, 10) }) // eslint-disable-line no-new
+      const records = []
+      const observer = new MutationObserver(list => records.push(...list))
+      observer.observe(div, { attributes: true, subtree: true })
+
+      const cell = div.querySelector(`[data-coreui-date="${new Date(2023, 5, 20)}"]`)
+      cell.dispatchEvent(new MouseEvent('mouseover', { bubbles: true, relatedTarget: div }))
+      await Promise.resolve()
+      observer.disconnect()
+
+      expect(records.length).toEqual(0)
+    })
+
+    it('should preview the range back to the end date while the start is picked again', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { // eslint-disable-line no-new
+        calendarDate: new Date(2023, 5, 1),
+        range: true,
+        startDate: new Date(2023, 5, 10),
+        endDate: new Date(2023, 5, 25)
+      })
+
+      const cell = div.querySelector(`[data-coreui-date="${new Date(2023, 5, 5)}"]`)
+      cell.dispatchEvent(new MouseEvent('mouseover', { bubbles: true, relatedTarget: div }))
+
+      expect(div.querySelectorAll('.calendar-cell.range-hover').length).toEqual(21)
+    })
+
+    it('should preview the range on hover without moving the tab stop', async () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { // eslint-disable-line no-new
+        calendarDate: new Date(2023, 5, 1),
+        calendars: 2,
+        range: true,
+        startDate: new Date(2023, 5, 10),
+        selectEndDate: true
+      })
+      const records = []
+      const observer = new MutationObserver(list => records.push(...list))
+      observer.observe(div, { attributeFilter: ['tabindex'], subtree: true })
+
+      const cell = div.querySelector(`[data-coreui-date="${new Date(2023, 5, 20)}"]`)
+      cell.dispatchEvent(new MouseEvent('mouseover', { bubbles: true, relatedTarget: div }))
+      await Promise.resolve()
+      observer.disconnect()
+
+      expect(div.querySelectorAll('.calendar-cell.range-hover').length).toEqual(11)
+      expect(records.length).toEqual(0)
+      expect(div.querySelector('.calendar-cell[tabindex="0"]').dataset.coreuiDate).toEqual(String(new Date(2023, 5, 10)))
     })
   })
 

@@ -425,6 +425,7 @@ class Calendar extends BaseComponent {
     this._hoverDate = null
     this._selectDate(date)
     this._updateClassNamesAndAriaLabels()
+    this._updateRovingTabIndex(SelectorEngine.findOne(':focus', this._element as ParentNode) as HTMLElement)
   }
 
   _handleCalendarKeydown(event: any): void {
@@ -657,7 +658,7 @@ class Calendar extends BaseComponent {
       date: getDateBySelectionType(this._hoverDate, this._config.selectionType)
     })
 
-    this._updateClassNamesAndAriaLabels()
+    this._updateRangeHover()
   }
 
   _handleCalendarMouseLeave(): void {
@@ -667,7 +668,13 @@ class Calendar extends BaseComponent {
       date: null
     })
 
-    this._updateClassNamesAndAriaLabels()
+    this._updateRangeHover()
+  }
+
+  _updateRangeHover(): void {
+    if (this._selectEndDate ? this._startDate : this._endDate) {
+      this._updateClassNamesAndAriaLabels()
+    }
   }
 
   _addEventListeners(): void {
@@ -694,6 +701,7 @@ class Calendar extends BaseComponent {
 
     EventHandler.on(this._element, EVENT_BLUR, SELECTOR_CALENDAR_CELL_CLICKABLE, () => {
       this._handleCalendarMouseLeave()
+      this._updateRovingTabIndex()
     })
 
     EventHandler.on(this._element, EVENT_CLICK_DATA_API, SELECTOR_CALENDAR_ROW_CLICKABLE, event => {
@@ -723,6 +731,7 @@ class Calendar extends BaseComponent {
 
     EventHandler.on(this._element, EVENT_BLUR, SELECTOR_CALENDAR_ROW_CLICKABLE, () => {
       this._handleCalendarMouseLeave()
+      this._updateRovingTabIndex()
     })
 
     // Navigation
@@ -915,10 +924,9 @@ class Calendar extends BaseComponent {
       </div>
     `
 
-    const monthDetails = getMonthDetails(year, month, this._config.firstDayOfWeek)
-    const listOfMonths = createGroupsInArray(getMonthsNames(this._config.locale, this._config.monthFormat), 4)
-    const listOfYears = createGroupsInArray(getYears(calendarDate.getFullYear()), 4)
-    const weekDays = monthDetails[0].days
+    const monthDetails = this._view === 'days' ? getMonthDetails(year, month, this._config.firstDayOfWeek) : []
+    const listOfMonths = this._view === 'months' ? createGroupsInArray(getMonthsNames(this._config.locale, this._config.monthFormat), 4) : []
+    const listOfYears = this._view === 'years' ? createGroupsInArray(getYears(calendarDate.getFullYear()), 4) : []
 
     const calendarTable = document.createElement('table')
     calendarTable.setAttribute('role', 'grid')
@@ -934,7 +942,7 @@ class Calendar extends BaseComponent {
               </div>
             </th>` : ''
           }
-          ${weekDays.map(({ date }) => (
+          ${monthDetails[0].days.map(({ date }) => (
             `<th class="${CLASS_NAME_CALENDAR_CELL}" abbr="${this._formatDate(date, { weekday: 'long' })}">
               <div class="calendar-header-cell-inner">
               ${typeof this._config.weekdayFormat === 'string' ?
@@ -1209,7 +1217,6 @@ class Calendar extends BaseComponent {
         }
       }
 
-      this._updateRovingTabIndex(SelectorEngine.findOne(':focus', this._element as ParentNode) as HTMLElement)
       return
     }
 
@@ -1255,8 +1262,6 @@ class Calendar extends BaseComponent {
         cell.removeAttribute('aria-disabled')
       }
     }
-
-    this._updateRovingTabIndex(SelectorEngine.findOne(':focus', this._element as ParentNode) as HTMLElement)
   }
 
   _classNames(classNames: any): string {
