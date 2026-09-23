@@ -248,6 +248,28 @@ describe('DateRangePicker', () => {
       expect(picker.getStartDate()).toEqual(new Date(2026, 6, 14))
     })
 
+    it('should stay silent when the calendar picks the end it already holds', () => {
+      const picker = buildPicker({ locale: 'en-US', startDate: new Date(2026, 6, 14), endDate: new Date(2026, 6, 20) }, [
+        '<div id="picker">',
+        '  <template data-coreui-template="footer">',
+        '    <button type="button" data-coreui-picker-action="close">OK</button>',
+        '  </template>',
+        '</div>'
+      ].join(''))
+      const el = fixtureEl.querySelector('#picker')
+      const events = []
+      el.addEventListener('startDateChange.coreui.date-range-picker', event => events.push(['start', event.date]))
+      el.addEventListener('endDateChange.coreui.date-range-picker', event => events.push(['end', event.date]))
+
+      picker.show()
+      const sections = fixtureEl.querySelectorAll('#picker .form-date-time-section')
+      sections[sections.length - 1].dispatchEvent(new FocusEvent('focusin', { bubbles: true }))
+      fixtureEl.querySelector('.date-picker-popup .calendar-cell[data-coreui-date^="Mon Jul 20 2026"]').click()
+
+      expect(events).toEqual([])
+      expect(picker.getEndDate()).toEqual(new Date(2026, 6, 20))
+    })
+
     it('should stay silent when the field refuses a pick for a date that was already empty', () => {
       const picker = buildPicker({
         locale: 'en-US',

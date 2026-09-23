@@ -1332,6 +1332,13 @@ validation and the arrow between them. Two consequences:
   + const date = event.date
   ```
 
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The pickers emit their change events only when the value changes.** A
+  calendar pick of the date already selected, a `setDate()`, `setRange()` or
+  `setTime()` with the current value, and a pick the field refuses while the
+  value is already empty no longer fire `dateChange`, `startDateChange`,
+  `endDateChange` or `timeChange`. v5 fired them on every pick and every call.
+
 - **`show` and `hide` can be cancelled** on the Autocomplete, Multi Select,
   Date Picker, Date Range Picker and Time Picker, the way
   they already could on Modal and Dialog: `event.preventDefault()` in a `show`

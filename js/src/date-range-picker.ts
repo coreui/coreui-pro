@@ -397,8 +397,8 @@ class DateRangePicker extends PickerBase {
   }
 
   // The field validates the date, so the event reports what the field holds —
-  // a selection the field refused (min/max) is announced as null, not as the
-  // day that was clicked.
+  // a selection the field refused (min/max) is announced as null when it
+  // replaces a date, not as the day that was clicked.
   _triggerDateChange(eventName: string, date: Date | null): void {
     EventHandler.trigger(this._element, eventName, { date, formattedDate: getDateBySelectionType(date, this._config.selectionType) })
   }

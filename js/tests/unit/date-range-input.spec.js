@@ -136,6 +136,20 @@ describe('DateRangeInput', () => {
       ])
     })
 
+    it('should reject a setRange with a bad end before writing either field', () => {
+      const range = build()
+      const seen = []
+      root().addEventListener('rangeChange.coreui.date-range-input', event => seen.push([event.startDate, event.endDate]))
+
+      expect(() => range.setRange(new Date(2026, 6, 14))).toThrowError(TypeError)
+      expect(hiddenInputs().map(input => input.value)).toEqual(['', ''])
+
+      range._endInput.setConfig({ date: new Date(2026, 6, 20) })
+
+      expect(range.getStartDate()).toBeNull()
+      expect(seen).toEqual([[null, new Date(2026, 6, 20)]])
+    })
+
     it('should flag an end before the start on the frame and lift it once fixed', () => {
       const range = build()
 
