@@ -27,7 +27,7 @@ import {
   type SelectionTypes
 } from './util/calendar.js'
 import type { ComponentConfig } from './util/config.js'
-import { getPickerFormat, getSectionLayout } from './util/date-sections.js'
+import { getPickerFormat } from './util/date-sections.js'
 import {
   appendControlGroupField,
   applyControlGroupClasses,
@@ -409,10 +409,7 @@ class DatePicker extends PickerBase {
   }
 
   _hourCycle(): string | null {
-    const format = getPickerFormat(this._config.format, this._config.selectionType)
-    const sections = getSectionLayout(format, this._config.locale, this._config.monthNames, { seconds: Boolean(this._config.seconds) })
-
-    return (sections.find((section: any) => section.type === 'hour') as any)?.cycle ?? null
+    return (this._input._sections.find((section: any) => section.type === 'hour') as any)?.cycle ?? null
   }
 
   _dayBounds(): { maxDate?: Date, minDate?: Date } {

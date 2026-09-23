@@ -112,6 +112,25 @@ describe('TimePicker', () => {
       expect(popup.querySelector('select')).toBeNull()
     })
 
+    it('should give the roll the hour cycle of the field', () => {
+      for (const locale of ['ko-KR', 'en-CA']) {
+        const picker = buildPicker({ locale })
+        picker.show()
+
+        const columns = fixtureEl.querySelectorAll('.time-picker-body .time-picker-col')
+        expect(columns[0].querySelectorAll('.time-picker-cell').length).toEqual(12)
+        expect(columns.length).toEqual(4)
+        picker.dispose()
+      }
+    })
+
+    it('should mark the hour in the cycle the field uses', () => {
+      const picker = buildPicker({ locale: 'en-US', inputOptions: { format: 'HH:mm' }, time: '14:30:00' })
+      picker.show()
+
+      expect(fixtureEl.querySelector('.time-picker-popup [data-coreui-hours][aria-selected="true"]').dataset.coreuiHours).toEqual('14')
+    })
+
     it('should ignore a variant passed through the config', () => {
       const picker = buildPicker({ variant: 'select' })
       picker.show()

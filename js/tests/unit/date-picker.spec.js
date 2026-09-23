@@ -1318,6 +1318,14 @@ describe('DatePicker', () => {
       expect(fixtureEl.querySelector('select.date-picker-time-select.meridiem')).toBeNull()
     })
 
+    it('should take the hour cycle from a mask given to the field', () => {
+      const picker = buildPicker({ timepicker: true, locale: 'en-US', inputOptions: { format: 'MM/dd/yyyy HH:mm' } })
+      picker.show()
+
+      expect(fixtureEl.querySelectorAll('select.date-picker-time-select.hours option').length).toEqual(24)
+      expect(fixtureEl.querySelector('select.date-picker-time-select.meridiem')).toBeNull()
+    })
+
     it('should take the hour cycle of the locale field when there is no mask', () => {
       for (const locale of ['ko-KR', 'en-CA']) {
         const picker = buildPicker({ timepicker: true, locale })
