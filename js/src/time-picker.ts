@@ -11,7 +11,7 @@
 import PickerBase from './picker-base.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
-import TimeInput from './time-input.js'
+import TimeInput, { type TimeInputConfig } from './time-input.js'
 import TimeRoll from './time-selection/roll.js'
 import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 import type { ComponentConfig } from './util/config.js'
@@ -62,7 +62,7 @@ type TimePickerConfig = {
   container: Element | boolean | string,
   disabled: boolean,
   floatingLabel: string | null,
-  inputOptions: Record<string, any>,
+  inputOptions: Partial<TimeInputConfig>,
   locale: string,
   name: string | null,
   pickerIcon: string | boolean,
@@ -324,3 +324,4 @@ EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
 defineJQueryPlugin(TimePicker)
 
 export default TimePicker
+export type { TimePickerConfig }

@@ -28,7 +28,12 @@ const SELECTOR_DATA_DATE_INPUT = '[data-coreui-date-input]'
 const ARIA_LABEL_DATE = 'Date input'
 const ARIA_LABEL_DATE_TIME = 'Date and time input'
 
-const Default: SectionInputConfig & { seconds: boolean, type: string } = {
+type DateInputConfig = SectionInputConfig & {
+  seconds: boolean
+  type: 'date' | 'datetime'
+}
+
+const Default: DateInputConfig = {
   ...SectionInput.Default,
   ariaLabel: ARIA_LABEL_DATE,
   seconds: false,
@@ -105,3 +110,4 @@ EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
 defineJQueryPlugin(DateInput)
 
 export default DateInput
+export type { DateInputConfig }

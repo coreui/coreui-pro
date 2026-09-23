@@ -14,8 +14,9 @@ import BaseComponent from './base-component.js'
 import DateInput from './date-input.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
-import { isSameInstantAs } from './util/calendar.js'
+import { type DisabledDate, isSameInstantAs } from './util/calendar.js'
 import type { ComponentConfig } from './util/config.js'
+import type { SectionFormat } from './util/date-sections.js'
 import {
   appendControlGroupField,
   applyControlGroupClasses,
@@ -80,11 +81,11 @@ type DateRangeInputConfig = {
   autofocus: boolean
   dayPlaceholder: string | null
   disabled: boolean
-  disabledDates: any
+  disabledDates: DisabledDate | DisabledDate[] | null
   endDate: Date | string | null
   endFloatingLabel: string | null
   endName: string | null
-  format: any
+  format: SectionFormat
   hourPlaceholder: string | null
   inputDateParse: ((value: string) => Date | null) | null
   inputOptions: Record<string, any>
@@ -109,7 +110,7 @@ type DateRangeInputConfig = {
   startDate: Date | string | null
   startFloatingLabel: string | null
   startName: string | null
-  type: string
+  type: 'date' | 'datetime'
   valid: boolean
   weekPlaceholder: string | null
   yearPlaceholder: string | null
@@ -584,3 +585,4 @@ EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
 defineJQueryPlugin(DateRangeInput)
 
 export default DateRangeInput
+export type { DateRangeInputConfig }

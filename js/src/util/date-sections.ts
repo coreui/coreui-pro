@@ -349,6 +349,8 @@ export const getDateTimeSectionsFromLocale = (locale: string, seconds = false): 
 
 export type SectionFormat = ((locale: string) => DateSection[]) | string | null
 
+export type SectionEntry = { draft: string, value: number, completed: boolean }
+
 const FORMAT_BY_SELECTION_TYPE: Record<string, SectionFormat> = {
   month: 'MM/yyyy',
   quarter: 'QQQ yyyy',
@@ -397,7 +399,7 @@ export const getSectionLayout = (format: SectionFormat, locale: string, monthNam
  * @param {number} [max] The upper bound, e.g. the day count of the selected month.
  * @returns {{draft: string, value: number, completed: boolean}} The next draft, numeric value and whether the section is complete.
  */
-export const applyDigitToSection = (section: DateSection, draft: string, digit: string, max: number = getSectionBounds(section).max): { draft: string, value: number, completed: boolean } => {
+export const applyDigitToSection = (section: DateSection, draft: string, digit: string, max: number = getSectionBounds(section).max): SectionEntry => {
   const length = (section.type === 'year' ? section.length : 2) as number
   let next = `${draft || ''}${digit}`.slice(-length)
 
@@ -425,7 +427,7 @@ export const applyDigitToSection = (section: DateSection, draft: string, digit: 
  * @param {string} letter The newly typed letter.
  * @returns {{draft: string, value: number, completed: boolean} | null} The next draft, section value and completion state, or null when nothing matches.
  */
-export const applyLetterToSection = (section: DateSection, draft: string, letter: string): any => {
+export const applyLetterToSection = (section: DateSection, draft: string, letter: string): SectionEntry | null => {
   if (!section.names) {
     return null
   }

@@ -9,7 +9,7 @@ import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import {
-  convertToDateObject, getLocalDateFromString, isDateDisabled, isSameInstantAs
+  convertToDateObject, type DisabledDate, getLocalDateFromString, isDateDisabled, isSameInstantAs
 } from './util/calendar.js'
 import {
   applyDigitToSection,
@@ -27,7 +27,7 @@ import {
   setSectionsFromDate
 } from './util/date-sections.js'
 import type { ComponentConfig } from './util/config.js'
-import type { DateSection, SectionFormat } from './util/date-sections.js'
+import type { DateSection, SectionEntry, SectionFormat } from './util/date-sections.js'
 import { captureHostClasses, type HostClasses, restoreHostClasses } from './util/form-control-group.js'
 import { getNextActiveElement, isRTL } from './util/index.js'
 
@@ -84,7 +84,7 @@ export type SectionInputConfig = {
   date: Date | number | string | null
   dayPlaceholder: string | null
   disabled: boolean
-  disabledDates: any
+  disabledDates: DisabledDate | DisabledDate[] | null
   format: SectionFormat
   hourPlaceholder: string | null
   inputDateParse: ((value: string) => Date | null) | null
@@ -200,19 +200,19 @@ const DefaultPlaceholders = {
 
 class SectionInput extends BaseComponent {
   declare ['constructor']: typeof SectionInput
-  protected declare _date: any
-  protected declare _minDate: any
-  protected declare _maxDate: any
+  protected declare _date: Date | null
+  protected declare _minDate: Date | null
+  protected declare _maxDate: Date | null
   protected declare _sections: DateSection[]
-  protected declare _draft: any
-  protected declare _allSelected: any
-  protected declare _error: any
+  protected declare _draft: string
+  protected declare _allSelected: boolean
+  protected declare _error: string | null
   protected declare _hostAriaLabel: string | null
   protected declare _hostClasses: HostClasses
   protected declare _hostNodes: ChildNode[]
   protected declare _hostRole: string | null
-  protected declare _inputElement: any
-  protected declare _monthFormatter: any
+  protected declare _inputElement: HTMLInputElement | null
+  protected declare _monthFormatter: Intl.DateTimeFormat
   protected declare _form: HTMLFormElement | null
   protected declare _initialDate: Date | null
   protected declare _resetHandler: () => void
@@ -305,7 +305,7 @@ class SectionInput extends BaseComponent {
     return normalized !== null && this._getValidationError(normalized, true) === null
   }
 
-  setConfig(config: any): void {
+  setConfig(config: ComponentConfig | null): void {
     if (typeof config !== 'object') {
       return
     }
@@ -482,8 +482,9 @@ class SectionInput extends BaseComponent {
     })
   }
 
-  _onKeydown(event: any): void {
-    const { key, target } = event
+  _onKeydown(event: KeyboardEvent): void {
+    const { key } = event
+    const target = event.target as HTMLElement
 
     if (key === 'Tab') {
       return
@@ -551,7 +552,7 @@ class SectionInput extends BaseComponent {
     }
   }
 
-  _onKeydownAllSelected(event: any): boolean {
+  _onKeydownAllSelected(event: KeyboardEvent): boolean {
     const { key } = event
 
     if (key === BACKSPACE_KEY || key === DELETE_KEY) {
@@ -604,7 +605,7 @@ class SectionInput extends BaseComponent {
     this._applySectionInput(sectionElement, section, applyLetterToSection(section, this._draft, letter))
   }
 
-  _applySectionInput(sectionElement: HTMLElement, section: DateSection, result: any): void {
+  _applySectionInput(sectionElement: HTMLElement, section: DateSection, result: SectionEntry | null): void {
     if (!result) {
       return
     }
@@ -784,8 +785,8 @@ class SectionInput extends BaseComponent {
       sectionElement.setAttribute('autocorrect', 'off')
       sectionElement.setAttribute('spellcheck', 'false')
       sectionElement.setAttribute('aria-label', this._sectionLabel(section.type))
-      sectionElement.setAttribute('aria-valuemin', min as any)
-      sectionElement.setAttribute('aria-valuemax', max as any)
+      sectionElement.setAttribute('aria-valuemin', String(min))
+      sectionElement.setAttribute('aria-valuemax', String(max))
       sectionElement.dataset.coreuiSection = section.type
 
       if (!this._config.disabled) {
@@ -831,11 +832,11 @@ class SectionInput extends BaseComponent {
   }
 
   _sectionLabel(type: string): string {
-    return (this._config as any)[`aria${type[0].toUpperCase()}${type.slice(1)}Label`]
+    return this._config[`aria${type[0].toUpperCase()}${type.slice(1)}Label`]
   }
 
   _sectionPlaceholder(type: string): string | null {
-    return (this._config as any)[`${type}Placeholder`]
+    return this._config[`${type}Placeholder`]
   }
 
   _syncSections(): void {
@@ -850,7 +851,7 @@ class SectionInput extends BaseComponent {
       sectionElement.classList.toggle(CLASS_NAME_SECTION_EMPTY, section.value === null)
 
       if (section.type === 'day') {
-        sectionElement.setAttribute('aria-valuemax', this._getSectionMax(section) as any)
+        sectionElement.setAttribute('aria-valuemax', String(this._getSectionMax(section)))
       }
 
       if (section.value === null) {
@@ -865,7 +866,7 @@ class SectionInput extends BaseComponent {
     }
   }
 
-  _getSectionValueText(section: DateSection, value: any): string {
+  _getSectionValueText(section: DateSection, value: number): string {
     if (section.names) {
       return section.names[section.value - 1]
     }

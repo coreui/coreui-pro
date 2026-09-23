@@ -26,7 +26,11 @@ const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
 const SELECTOR_DATA_TIME_INPUT = '[data-coreui-time-input]'
 
-const Default: SectionInputConfig & { seconds: boolean } = {
+type TimeInputConfig = SectionInputConfig & {
+  seconds: boolean
+}
+
+const Default: TimeInputConfig = {
   ...SectionInput.Default,
   ariaLabel: 'Time input',
   seconds: false
@@ -106,3 +110,4 @@ EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
 defineJQueryPlugin(TimeInput)
 
 export default TimeInput
+export type { TimeInputConfig }
