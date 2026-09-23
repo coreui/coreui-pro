@@ -124,6 +124,13 @@ describe('TimePicker', () => {
       }
     })
 
+    it('should mark the hour in the cycle the field uses', () => {
+      const picker = buildPicker({ locale: 'en-US', inputOptions: { format: 'HH:mm' }, time: '14:30:00' })
+      picker.show()
+
+      expect(fixtureEl.querySelector('.time-picker-popup [data-coreui-hours][aria-selected="true"]').dataset.coreuiHours).toEqual('14')
+    })
+
     it('should ignore a variant passed through the config', () => {
       const picker = buildPicker({ variant: 'select' })
       picker.show()

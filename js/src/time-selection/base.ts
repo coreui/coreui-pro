@@ -116,13 +116,17 @@ class TimeSelection extends Config {
   }
 
   // Private
+  _ampmOption(): 'auto' | boolean {
+    return this._config.hourCycle === null ? 'auto' : this._config.hourCycle === 'h12'
+  }
+
   _render(): void {
     this._element!.setAttribute('role', 'group')
     this._element!.setAttribute('aria-label', this._config.ariaLabel as string)
 
     this._partials = getLocalizedTimePartials(
       this._config.locale,
-      this._config.hourCycle === null ? 'auto' : this._config.hourCycle === 'h12',
+      this._ampmOption(),
       this._config.hours as any,
       this._config.minutes as any,
       this._config.seconds as any
@@ -235,7 +239,7 @@ class TimeSelection extends Config {
 
   _markSelected(instant = false): void {
     const selected = {
-      hours: getSelectedHour(this._date, this._config.locale),
+      hours: getSelectedHour(this._date, this._config.locale, this._ampmOption()),
       meridiem: this._date ? this._ampm : '',
       minutes: getSelectedMinutes(this._date),
       seconds: getSelectedSeconds(this._date)
