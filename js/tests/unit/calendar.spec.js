@@ -2273,6 +2273,111 @@ describe('Calendar', () => {
       expect(ariaSelectedCells.length).toEqual(1)
     })
 
+    it('should mark a date that cannot be picked with aria-disabled', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, {
+        calendarDate: new Date(2026, 7, 1),
+        disabledDates: [new Date(2026, 7, 14)]
+      })
+      const cellFor = date => [...div.querySelectorAll('.calendar-cell')]
+        .find(cell => new Date(cell.dataset.coreuiDate).toDateString() === date.toDateString())
+
+      expect(cellFor(new Date(2026, 7, 14)).getAttribute('aria-disabled')).toEqual('true')
+      expect(cellFor(new Date(2026, 7, 13)).hasAttribute('aria-disabled')).toBeFalse()
+      expect(cellFor(new Date(2026, 6, 31)).hasAttribute('aria-disabled')).toBeFalse()
+
+      calendar._updateClassNamesAndAriaLabels()
+
+      expect(cellFor(new Date(2026, 7, 14)).getAttribute('aria-disabled')).toEqual('true')
+      expect(cellFor(new Date(2026, 7, 13)).hasAttribute('aria-disabled')).toBeFalse()
+      expect(cellFor(new Date(2026, 7, 13)).hasAttribute('aria-selected')).toBeFalse()
+    })
+
+    it('should mark a week row that cannot be picked with aria-disabled, and leave its days alone', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { // eslint-disable-line no-new
+        calendarDate: new Date(2026, 7, 1),
+        minDate: new Date(2026, 7, 10),
+        selectionType: 'week'
+      })
+      const rows = [...div.querySelectorAll('.calendar-row')]
+
+      expect(rows[0].getAttribute('aria-disabled')).toEqual('true')
+      expect(rows[2].hasAttribute('aria-disabled')).toBeFalse()
+      expect(div.querySelectorAll('.calendar-cell[aria-disabled]').length).toEqual(0)
+    })
+
+    it('should mark a quarter and a year outside minDate with aria-disabled', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { // eslint-disable-line no-new
+        calendarDate: new Date(2026, 0, 1),
+        minDate: new Date(2026, 5, 15),
+        selectionType: 'quarter'
+      })
+
+      expect(div.querySelector(`[data-coreui-date="${new Date(2026, 0, 1).toDateString()}"]`).getAttribute('aria-disabled')).toEqual('true')
+      expect(div.querySelector(`[data-coreui-date="${new Date(2026, 3, 1).toDateString()}"]`).hasAttribute('aria-disabled')).toBeFalse()
+
+      fixtureEl.innerHTML = '<div></div>'
+      const years = fixtureEl.querySelector('div')
+      new Calendar(years, { // eslint-disable-line no-new
+        calendarDate: new Date(2026, 0, 1),
+        minDate: new Date(2024, 5, 15),
+        selectionType: 'year'
+      })
+
+      expect(years.querySelector(`[data-coreui-date="${new Date(2023, 0, 1).toDateString()}"]`).getAttribute('aria-disabled')).toEqual('true')
+      expect(years.querySelector(`[data-coreui-date="${new Date(2024, 0, 1).toDateString()}"]`).hasAttribute('aria-disabled')).toBeFalse()
+    })
+
+    it('should leave the month alone when a disabled adjacent day is clicked', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { // eslint-disable-line no-new
+        calendarDate: new Date(2026, 7, 1),
+        disabledDates: [new Date(2026, 8, 3)],
+        locale: 'en-US',
+        selectAdjacentDays: true
+      })
+      const trailing = [...div.querySelectorAll('.calendar-cell.next')]
+        .find(cell => new Date(cell.dataset.coreuiDate).toDateString() === new Date(2026, 8, 3).toDateString())
+
+      trailing.click()
+
+      expect(div.querySelector('table').getAttribute('aria-label')).toEqual('August 2026')
+    })
+
+    it('should park the tab stop on the week row that holds the date the calendar opens on', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { calendarDate: new Date(2026, 7, 14), selectionType: 'week' }) // eslint-disable-line no-new
+      const row = div.querySelector('.calendar-row[tabindex="0"]')
+
+      expect(new Date(row.querySelector('.calendar-cell').dataset.coreuiDate)).toEqual(new Date(2026, 7, 10))
+    })
+
+    it('should mark a month outside minDate with aria-disabled in the months view', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { // eslint-disable-line no-new
+        calendarDate: new Date(2026, 0, 1),
+        minDate: new Date(2026, 2, 15),
+        selectionType: 'month'
+      })
+
+      expect(div.querySelector(`[data-coreui-date="${new Date(2026, 0, 1).toDateString()}"]`).getAttribute('aria-disabled')).toEqual('true')
+      expect(div.querySelector(`[data-coreui-date="${new Date(2026, 2, 1).toDateString()}"]`).hasAttribute('aria-disabled')).toBeFalse()
+    })
+
     it('should apply range class for dates in range', () => {
       fixtureEl.innerHTML = '<div></div>'
 

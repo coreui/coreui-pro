@@ -303,7 +303,9 @@ class Calendar extends BaseComponent {
     let closestGap = Number.POSITIVE_INFINITY
 
     for (const element of focusables) {
-      const gap = Math.abs(this._getDate(element).getTime() - target.getTime())
+      const start = this._getDate(element).getTime()
+      const end = start + (this._rowsAreTargets() ? 6 * 864e5 : 0)
+      const gap = target.getTime() < start ? start - target.getTime() : Math.max(0, target.getTime() - end)
 
       if (gap < closestGap) {
         closest = element
@@ -951,6 +953,7 @@ class Calendar extends BaseComponent {
               tabindex="-1"
               ${rowAttributes.selectable ? 'data-coreui-selectable' : ''}
               ${rowAttributes.ariaSelected ? 'aria-selected="true"' : ''}
+              ${rowAttributes.ariaDisabled ? 'aria-disabled="true"' : ''}
             >
               ${this._config.showWeekNumber ?
                 `<th class="calendar-cell-week-number">${week.number}</td>` : ''
@@ -964,6 +967,7 @@ class Calendar extends BaseComponent {
                     tabindex="-1"
                     ${cellAttributes.selectable ? 'data-coreui-selectable' : ''}
                     ${cellAttributes.ariaSelected ? 'aria-selected="true"' : ''}
+                    ${cellAttributes.ariaDisabled ? 'aria-disabled="true"' : ''}
                     ${cellAttributes.ariaCurrent ? 'aria-current="date"' : ''}
                     aria-label="${escapeHtml(cellAttributes.ariaLabel)}"
                     data-coreui-date="${date}"
@@ -989,6 +993,7 @@ class Calendar extends BaseComponent {
                   tabindex="-1"
                   ${cellAttributes.selectable ? 'data-coreui-selectable' : ''}
                   ${cellAttributes.ariaSelected ? 'aria-selected="true"' : ''}
+                  ${cellAttributes.ariaDisabled ? 'aria-disabled="true"' : ''}
                   data-coreui-date="${date.toDateString()}"
                 >
                   <div class="${CLASS_NAME_CALENDAR_CELL_INNER} month">
@@ -1011,6 +1016,7 @@ class Calendar extends BaseComponent {
                   tabindex="-1"
                   ${cellAttributes.selectable ? 'data-coreui-selectable' : ''}
                   ${cellAttributes.ariaSelected ? 'aria-selected="true"' : ''}
+                  ${cellAttributes.ariaDisabled ? 'aria-disabled="true"' : ''}
                   data-coreui-date="${date.toDateString()}"
                 >
                   <div class="${CLASS_NAME_CALENDAR_CELL_INNER} quarter">
@@ -1032,6 +1038,7 @@ class Calendar extends BaseComponent {
                   tabindex="-1"
                   ${cellAttributes.selectable ? 'data-coreui-selectable' : ''}
                   ${cellAttributes.ariaSelected ? 'aria-selected="true"' : ''}
+                  ${cellAttributes.ariaDisabled ? 'aria-disabled="true"' : ''}
                   data-coreui-date="${date.toDateString()}"
                 >
                   <div class="${CLASS_NAME_CALENDAR_CELL_INNER} year">
@@ -1170,6 +1177,12 @@ class Calendar extends BaseComponent {
         } else {
           row.removeAttribute('aria-selected')
         }
+
+        if (rowAttributes.ariaDisabled) {
+          row.setAttribute('aria-disabled', 'true')
+        } else {
+          row.removeAttribute('aria-disabled')
+        }
       }
 
       this._updateRovingTabIndex(SelectorEngine.findOne(':focus', this._element as ParentNode) as HTMLElement)
@@ -1210,6 +1223,12 @@ class Calendar extends BaseComponent {
         cell.setAttribute('aria-selected', true as any)
       } else {
         cell.removeAttribute('aria-selected')
+      }
+
+      if (cellAttributes.ariaDisabled) {
+        cell.setAttribute('aria-disabled', 'true')
+      } else {
+        cell.removeAttribute('aria-disabled')
       }
     }
 
@@ -1265,6 +1284,7 @@ class Calendar extends BaseComponent {
     return {
       className: classNames,
       selectable: (isCurrentMonth || this._config.selectAdjacentDays) && !isDisabled,
+      ariaDisabled: isDisabled,
       ariaSelected: isSelected,
       ariaLabel: this._formatDate(date),
       ariaCurrent: isTodayDate,
@@ -1299,6 +1319,7 @@ class Calendar extends BaseComponent {
     return {
       className: classNames,
       selectable: !isDisabled,
+      ariaDisabled: isDisabled,
       ariaSelected: isSelected,
       meta: {
         isDisabled,
@@ -1329,6 +1350,7 @@ class Calendar extends BaseComponent {
     return {
       className: classNames,
       selectable: !isDisabled,
+      ariaDisabled: isDisabled,
       ariaSelected: isSelected,
       meta: {
         isDisabled,
@@ -1359,6 +1381,7 @@ class Calendar extends BaseComponent {
     return {
       className: classNames,
       selectable: !isDisabled,
+      ariaDisabled: isDisabled,
       ariaSelected: isSelected,
       meta: {
         isDisabled,
@@ -1398,6 +1421,7 @@ class Calendar extends BaseComponent {
     return {
       className: classNames,
       selectable: !isDisabled,
+      ariaDisabled: isDisabled,
       ariaSelected: isSelected
     }
   }
