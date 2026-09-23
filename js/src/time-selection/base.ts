@@ -59,11 +59,6 @@ const DefaultType = {
 
 /**
  * Class definition
- *
- * The popup body of the time pickers — the counterpart of Calendar for the time
- * half. Owns the roll/select rendering and the hour/minute/second/meridiem
- * arithmetic; reports a Date through `onChange` and holds no popup, field, or
- * event-name concerns. Shared by the time picker and the date picker's time half.
  */
 
 class TimeSelection extends Config {
@@ -181,9 +176,7 @@ class TimeSelection extends Config {
     return list[0] ?? null
   }
 
-  _markPart(_part: string, _value: string, _instant: boolean): void {
-    // rendering-specific
-  }
+  _markPart(_part: string, _value: string, _instant: boolean): void {}
 
   _updateRovingTabIndex(preferred?: HTMLElement): void {
     const list = this._stops()
@@ -233,7 +226,6 @@ class TimeSelection extends Config {
 
     this._date = date
     this._markSelected()
-    // execute() maps args[0] onto `this`, so the real argument comes second
     execute(this._config.onChange, [undefined, date])
   }
 

@@ -66,8 +66,6 @@ class TimeInput extends SectionInput {
   // Private
   override _convertDate(value: any): Date | null {
     if (typeof value === 'string') {
-      // Parse time strings without relying on `Date.parse`, whose support for
-      // non-ISO strings differs between engines (e.g. Safari).
       const match = /^(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?(?:\s*(am|pm))?$/i.exec(value.trim())
 
       if (match) {

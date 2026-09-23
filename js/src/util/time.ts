@@ -1,9 +1,3 @@
-/**
- * Converts a 12-hour time format to a 24-hour time format.
- * @param {('am' | 'pm')} abbr The abbreviation indicating AM or PM.
- * @param {number} hour The hour to be converted.
- * @returns {number} The hour in 24-hour format.
- */
 type LocalizedTimePartials = {
   listOfHours: Array<{ label: string, value: number }>
   listOfMinutes: Array<{ label: string, value: number }>
@@ -27,27 +21,12 @@ export const convert12hTo24h = (abbr: string, hour: number): number => {
   return hour + 12
 }
 
-/**
- * Converts a 24-hour time format to a 12-hour format.
- * @param {number} hour The hour to be converted.
- * @returns {number} The hour in 12-hour format.
- */
 export const convert24hTo12h = (hour: number): number => hour % 12 || 12
 
-/**
- * Formats an array of time values (hours, minutes, or seconds) according to the specified locale and partial.
- * @param {number[]} values An array of time values to format.
- * @param {string} locale The locale to use for formatting.
- * @param {('hour' | 'minute' | 'second')} partial The type of time value to format.
- * @param {boolean} [hour12] Whether the hour labels should use the 12-hour cycle. When omitted the formatter falls back to the locale's default cycle.
- * @returns {Array} An array of objects with the original value and its localized label.
- */
 const formatTimePartials = (values: number[], locale: string, partial: string, hour12?: boolean): Array<{ label: string, value: number }> => {
   const date = new Date(2020, 0, 1)
 
   const forceTwoDigit = shouldUseTwoDigitHour(locale)
-  // `hour12: false` lets ICU pick either h23 (00–23) or h24 (01–24), so older
-  // engines label midnight as "24"; pin the cycle explicitly to stay stable.
   const hourCycle = hour12 === undefined ? undefined : (hour12 ? 'h12' : 'h23')
   const formatter = new Intl.DateTimeFormat(locale, {
     hour: forceTwoDigit ? '2-digit' : 'numeric',
@@ -78,15 +57,6 @@ const formatTimePartials = (values: number[], locale: string, partial: string, h
   })
 }
 
-/**
- * Generates localized time partials (hours, minutes, seconds) based on the given parameters.
- * @param {string} locale The locale to use for generating localized time partials.
- * @param {'auto' | boolean} ampm Determines whether to use 12-hour or 24-hour format. 'auto' decides based on locale.
- * @param {boolean | number[] | Function} hours An array of hours, a boolean, or a function to generate hours.
- * @param {boolean | number[] | Function} minutes An array of minutes, a boolean, or a function to generate minutes.
- * @param {boolean | number[] | Function} seconds An array of seconds, a boolean, or a function to generate seconds.
- * @returns {LocalizedTimePartials} An object containing arrays of localized time partials and a boolean indicating if 12-hour format is used.
- */
 export const getLocalizedTimePartials = (
   locale: string,
   ampm: 'auto' | boolean = 'auto',
@@ -131,13 +101,6 @@ export const getLocalizedTimePartials = (
   }
 }
 
-/**
- * Gets the selected hour from a date object in either 12-hour or 24-hour format based on locale and preference.
- * @param {Date | null} date The date object from which to extract the hour. If null, the function returns an empty string.
- * @param {string} locale The locale to use when determining whether to return in 12-hour or 24-hour format.
- * @param {'auto' | boolean} ampm Determines the format of the hour returned. 'auto' decides based on locale, true forces 12-hour format, and false forces 24-hour format.
- * @returns {string | number} The hour in the specified format or an empty string if the date is null.
- */
 export const getSelectedHour = (date: Date | null, locale: string, ampm: 'auto' | boolean = 'auto'): number | string =>
   date ?
     ((ampm === 'auto' && isAmPm(locale)) || ampm === true ?
@@ -145,42 +108,18 @@ export const getSelectedHour = (date: Date | null, locale: string, ampm: 'auto' 
       date.getHours()) :
     ''
 
-/**
- * Gets the selected minutes from a date object.
- * @param {Date | null} date The date object from which to extract the minutes. If null, the function returns an empty string.
- * @returns {string | number} The minutes from the date or an empty string if the date is null.
- */
 export const getSelectedMinutes = (date: Date | null): number | string => (date ? date.getMinutes() : '')
 
-/**
- * Gets the selected seconds from a date object.
- * @param {Date | null} date The date object from which to extract the seconds. If null, the function returns an empty string.
- * @returns {string | number} The seconds from the date or an empty string if the date is null.
- */
 export const getSelectedSeconds = (date: Date | null): number | string => (date ? date.getSeconds() : '')
 
-/**
- * Determines if the given locale uses AM/PM format.
- * @param {string} locale The locale to check.
- * @returns {boolean} True if the locale uses AM/PM format, otherwise false.
- */
 export const isAmPm = (locale: string): boolean =>
   ['am', 'AM', 'pm', 'PM'].some(el =>
     new Date().toLocaleString(locale).includes(el)
   )
 
-/**
- * Checks whether the given locale formats the hour "9" with a leading zero ("09")
- * when using `hour: 'numeric'` in `toLocaleTimeString`.
- *
- * This helps determine if you should force `hour: '2-digit'` for consistent formatting.
- *
- * @param {string} locale - The locale code (e.g., "en-US", "pl-PL").
- * @returns {boolean} `true` if the formatted hour starts with a leading zero, otherwise `false`.
- */
 const shouldUseTwoDigitHour = (locale: string): boolean => {
-  const d = new Date(2020, 0, 1, 7, 5, 7) // 7:05:07
+  const d = new Date(2020, 0, 1, 7, 5, 7)
   const formatted = d.toLocaleTimeString(locale)
 
-  return formatted.startsWith('0') // check if the hour starts with "0"
+  return formatted.startsWith('0')
 }

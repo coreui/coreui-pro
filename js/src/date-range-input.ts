@@ -2,11 +2,6 @@
  * --------------------------------------------------------------------------
  * CoreUI PRO date-range-input.js
  * License (https://coreui.io/pro/license/)
- *
- * Two DateInput fields and a separator inside one frame, joined by the range
- * the component owns. The markup is the composition surface: a start host, an
- * end host and a separator the author wrote (by role attribute) are adopted;
- * whatever is missing is generated.
  * --------------------------------------------------------------------------
  */
 
@@ -293,8 +288,6 @@ class DateRangeInput extends BaseComponent {
     return this._endDate
   }
 
-  // The fields validate the dates against min/max — what the component keeps
-  // and announces is what the fields hold, not the arguments.
   setRange(startDate: Date | null, endDate: Date | null): void {
     this._typeCheckConfig({ endDate, startDate }, { endDate: DefaultType.endDate, startDate: DefaultType.startDate })
     this._applyRange(startDate, endDate)
@@ -312,8 +305,6 @@ class DateRangeInput extends BaseComponent {
     return this._startInput.isDateSelectable(date)
   }
 
-  // The two ends as elements, for a component that composes this one and has
-  // to tell them apart — which end has the focus, where to put an adornment.
   getStartElement(): HTMLElement {
     return this._startElement
   }
@@ -403,8 +394,6 @@ class DateRangeInput extends BaseComponent {
 
     applyControlGroupSize(group, this._config.size)
 
-    // Markup first: a part the author wrote is adopted, a missing one is built,
-    // in document order — start, separator, end.
     const ownStart = SelectorEngine.findOne(SELECTOR_ROLE_START, group)
     this._startElement = ownStart ?? document.createElement('div')
     this._created.start = !ownStart
@@ -453,10 +442,6 @@ class DateRangeInput extends BaseComponent {
     }
   }
 
-  // Options DateInput knows about are forwarded by name, so
-  // `data-coreui-month-names`, `data-coreui-readonly`, … reach both fields
-  // without this component restating the whole field surface. `inputOptions`
-  // stays as the programmatic escape hatch.
   _createInput(element: HTMLElement, overrides: Record<string, any>): any {
     const forwarded: Record<string, any> = {}
 
@@ -471,7 +456,6 @@ class DateRangeInput extends BaseComponent {
     })
   }
 
-  // The separator is a directional arrow, so it has an RTL counterpart.
   _createSeparator(): HTMLElement {
     const separator = document.createElement('span')
     separator.classList.add(CLASS_NAME_SEPARATOR)
@@ -481,9 +465,6 @@ class DateRangeInput extends BaseComponent {
     return separator
   }
 
-  // The one place the range changes. Each field validates its own date, so
-  // what the component keeps and announces is what the fields hold. The side
-  // that reported a change is not written back to.
   _applyRange(startDate: Date | null, endDate: Date | null, { fields = true }: { fields?: boolean } = {}): void {
     if (this._applying) {
       return
@@ -523,8 +504,6 @@ class DateRangeInput extends BaseComponent {
     }
   }
 
-  // An end before the start is a state of the range, not of either field, so
-  // it lands on the frame — the fields keep what was typed and stay editable.
   _applyOrder(): void {
     const claimed = this._markupClaimApplies()
     const isInvalid = (claimed && this._claimedInvalid) || this._config.invalid || !this.isRangeValid()
@@ -549,8 +528,6 @@ class DateRangeInput extends BaseComponent {
       }
     }
 
-    // Each field walks its own sections with the arrows and stops at its
-    // edge; the range carries the same press across the separator.
     EventHandler.on(this._element, EVENT_KEYDOWN, (event: any) => {
       if (event.key !== ARROW_LEFT_KEY && event.key !== ARROW_RIGHT_KEY) {
         return

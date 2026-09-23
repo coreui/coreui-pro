@@ -2,9 +2,6 @@
  * --------------------------------------------------------------------------
  * CoreUI PRO time-picker.js
  * License (https://coreui.io/pro/license/)
- *
- * Composed from a TimeInput section field, the TimeSelection popup body and the
- * Popup primitive.
  * --------------------------------------------------------------------------
  */
 
@@ -50,8 +47,6 @@ const CLASS_NAME_TIME_PICKER = 'time-picker'
 
 const SELECTOR_ACTION_NOW = '[data-coreui-picker-action="now"]'
 const SELECTOR_DATA_TIME_PICKER = '[data-coreui-time-picker]'
-
-// Icons live in JavaScript, not in CSS masks — the chips pattern.
 
 type TimePickerConfig = {
   allowList: SanitizerAllowList,
@@ -133,7 +128,6 @@ class TimePicker extends PickerBase {
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
 
-    // see DatePicker — the shell owns the initial value for reset()
     this._initialTime = config?.time ?? this._config.time
     this._input = null
     this._selection = null
@@ -217,12 +211,9 @@ class TimePicker extends PickerBase {
   _createTimePicker(): void {
     this._element.classList.add(CLASS_NAME_TIME_PICKER, CLASS_NAME_PICKER)
 
-    // The root is the frame: a field component has nothing to wrap, so it
-    // carries `.form-control-group` itself instead of nesting one.
     const inputGroup = this._element
     applyControlGroupClasses(inputGroup, CLASS_NAME_INPUT_GROUP)
 
-    // Sizing rides the standard control classes on the frame itself
     applyControlGroupSize(inputGroup, this._config.size)
 
     const inputEl = document.createElement('div')
@@ -255,7 +246,6 @@ class TimePicker extends PickerBase {
 
     this._time = this._input.getDate()
 
-    // See DatePicker — the bridge from a typed value back to the panel
     EventHandler.on(inputEl, TimeInput.eventName(TimeInput.CHANGE_EVENT_NAME), (event: any) => {
       if (!this._applying) {
         this._applyTime(event.date, { field: false })
@@ -281,14 +271,10 @@ class TimePicker extends PickerBase {
     }
   }
 
-  // See DatePicker._disableUnselectableActions — a button opting into the
-  // `now` action is disabled (never re-enabled) when the current time cannot
-  // be selected.
   override _isNowSelectable(): boolean {
     return this._input.isDateSelectable(new Date())
   }
 
-  // The selection body is built on first open, like the pickers' calendar.
   _ensureSelection(): void {
     if (this._selection) {
       return

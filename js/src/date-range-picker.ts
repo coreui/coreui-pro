@@ -2,12 +2,6 @@
  * --------------------------------------------------------------------------
  * CoreUI PRO date-range-picker.js
  * License (https://coreui.io/pro/license/)
- *
- * Composed from a DateRangeInput field and one multi-month Calendar in a
- * Popup. The field owns the range — both dates and their validation — the
- * calendar owns the range mechanics (start/end, auto-advance), and the picker
- * joins them and projects the footer/ranges regions. The element is the
- * picker, not the frame: the frame is the field inside it.
  * --------------------------------------------------------------------------
  */
 
@@ -55,8 +49,6 @@ const CLASS_NAME_RANGES = 'date-picker-ranges'
 
 const SELECTOR_DATA_DATE_RANGE_PICKER = '[data-coreui-date-range-picker]'
 const SELECTOR_TEMPLATE_RANGES = 'template[data-coreui-template="ranges"]'
-
-// Icons live in JavaScript only as the fallback for the generated buttons.
 
 type DateRangePickerConfig = {
   allowList: SanitizerAllowList,
@@ -207,10 +199,6 @@ class DateRangePicker extends PickerBase {
     return this._rangeInput.getEndDate()
   }
 
-  // The field validates both dates, so the emitted values and the calendar
-  // selection follow its outcome, not the arguments. Its change events carry
-  // each date into the calendar; only the selection phase is this method's own
-  // business.
   setRange(startDate: Date | null, endDate: Date | null): void {
     this._rangeInput.setRange(startDate, endDate)
     this._setSelectEndDate(false)
@@ -271,9 +259,6 @@ class DateRangePicker extends PickerBase {
   _createDateRangePicker(): void {
     this._element.classList.add(CLASS_NAME_DATE_PICKER, CLASS_NAME_DATE_RANGE_PICKER, CLASS_NAME_PICKER)
 
-    // Only one component can own an element, and the range field owns the
-    // frame — so the picker's element wraps it rather than being it. The
-    // adornments still go inside the frame, where the layout expects them.
     const inputGroup = document.createElement('div')
     this._element.append(inputGroup)
     this._frameElement = inputGroup
@@ -289,8 +274,6 @@ class DateRangePicker extends PickerBase {
       ...(format ? { format } : {})
     }, { inputOptions: this._config.inputOptions }))
 
-    // The bridge from typed values back to the calendar. The guard stops the
-    // echo of the panel's own updates.
     EventHandler.on(inputGroup, DateRangeInput.eventName('startDateChange'), (event: any) => {
       if (!this._syncingFromPanel) {
         this._calendar?.setConfig({ startDate: event.date })
@@ -355,8 +338,6 @@ class DateRangePicker extends PickerBase {
     }
   }
 
-  // See DatePicker._ensureCalendar — the calendar is built on first show,
-  // seeded from the shell's own state (the fields plus _selectEndDate).
   _ensureCalendar(): void {
     if (this._calendar) {
       return
@@ -402,15 +383,10 @@ class DateRangePicker extends PickerBase {
     })
   }
 
-  // The field validates the date, so the event reports what the field holds —
-  // a selection the field refused (min/max) is announced as null when it
-  // replaces a date, not as the day that was clicked.
   _triggerDateChange(eventName: string, date: Date | null): void {
     EventHandler.trigger(this._element, eventName, { date, formattedDate: getDateBySelectionType(date, this._config.selectionType) })
   }
 
-  // Focusing a field steers which end of the range the calendar selects, the
-  // v1 behavior of clicking the start/end input, on section fields.
   override _addEventListeners(): void {
     super._addEventListeners()
 
@@ -429,7 +405,6 @@ class DateRangePicker extends PickerBase {
     this._ensureCalendar()
   }
 
-  // The panel hangs off the frame, not the host, so it stays inside the picker.
   override _popupAnchor(): HTMLElement {
     return this._frameElement
   }

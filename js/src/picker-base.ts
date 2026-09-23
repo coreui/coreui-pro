@@ -2,14 +2,6 @@
  * --------------------------------------------------------------------------
  * CoreUI PRO picker-base.js
  * License (https://coreui.io/pro/license/)
- *
- * Shared shell for the four pickers. Each of them is the same product with a
- * different filling: a section field, one or two bodies and a popup, joined by
- * the value the picker owns. What lives here is the part that does not depend
- * on that value — the popup and its events, the toggle and cleaner wiring, the
- * projected footer, the attributes adopted from markup the author wrote, and
- * teardown. The value model stays in the picker: what `reset()` restores, what
- * `getContext()` hands to a footer button, which bodies the popup gets.
  * --------------------------------------------------------------------------
  */
 
@@ -90,8 +82,6 @@ class PickerBase extends BaseComponent {
   }
 
   // Private
-  // The classes go on before the body: a time selection scrolls the selected
-  // cell into view, which needs the dropdown to have layout.
   _createPopup(): void {
     this._popup = new Popup({
       anchor: this._popupAnchor(),
@@ -147,8 +137,6 @@ class PickerBase extends BaseComponent {
     return this.constructor.Default
   }
 
-  // Options the inner component knows about are forwarded by name, so the
-  // picker does not restate the whole surface of the thing it composes.
   _forwardConfig(Component: any, overrides: Record<string, any> = {}, extra: Record<string, any> = {}): Record<string, any> {
     const forwarded: Record<string, any> = {}
     const original = this._originalDefault()
@@ -183,8 +171,6 @@ class PickerBase extends BaseComponent {
     }
   }
 
-  // An attribute written onto markup the author wrote is put back on dispose,
-  // so the picker leaves the page as it found it.
   _writeAdoptedAttribute(element: Element, name: string, value: string): void {
     if (!this._adoptedAttributes.some(([recorded, recordedName]) => recorded === element && recordedName === name)) {
       this._adoptedAttributes.push([element, name, element.getAttribute(name), value])
@@ -238,8 +224,6 @@ class PickerBase extends BaseComponent {
     this._toggleElement?.setAttribute(name, value)
   }
 
-  // The picker owns the attribute only while the popup is open; whatever the
-  // author had there comes back when it closes.
   _clearToggleAttribute(name: string): void {
     if (!this._toggleElement) {
       return
@@ -255,7 +239,6 @@ class PickerBase extends BaseComponent {
     this._toggleElement.setAttribute(name, recorded[2] as string)
   }
 
-  // Implemented by the picker
   _onPopupShow(): void {
     throw new Error('Method "_onPopupShow" must be implemented.')
   }

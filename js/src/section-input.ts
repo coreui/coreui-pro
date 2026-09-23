@@ -291,10 +291,6 @@ class SectionInput extends BaseComponent {
     return this._date
   }
 
-  // Answers whether a date, expressed in this field's mask, would pass
-  // validation. The granularity follows the mask: a day mask checks the
-  // midnight date (so "now" passes with a maxDate of today), a week mask the
-  // week's Monday, a date-time mask the exact time.
   isDateSelectable(date: Date | null): boolean {
     if (!(date instanceof Date) || Number.isNaN(date.getTime())) {
       return false
@@ -321,8 +317,6 @@ class SectionInput extends BaseComponent {
     this._monthFormatter = new Intl.DateTimeFormat(this._config.locale, { month: 'long' })
 
     this._createSectionInput()
-    // validate like any other value change — a programmatic date outside
-    // min/max must end up in the same state as a typed one
     this._date = previousDate
     this._updateDate()
   }
@@ -342,8 +336,6 @@ class SectionInput extends BaseComponent {
   }
 
   // Private
-  // The stub takes no parameter at runtime; subclasses read the locale. The
-  // overload keeps both shapes typed without changing the emitted arity.
   _getDefaultSections(locale?: string): DateSection[]
   _getDefaultSections(): DateSection[] {
     throw new Error('Method "_getDefaultSections" must be implemented.')
@@ -463,16 +455,11 @@ class SectionInput extends BaseComponent {
   _onFormSubmit(): void {
     const form = this._form!
 
-    // Defer to a microtask so a page handler adding `data-coreui-validate`
-    // during the same submit is taken into account regardless of
-    // listener order.
     queueMicrotask(() => {
       if (!this._element || !form.matches(SELECTOR_FORM_VALIDATE)) {
         return
       }
 
-      // Keep a live out-of-range invalid state; otherwise the field is
-      // invalid only when required and empty.
       const isInvalid = this._element.classList.contains(CLASS_NAME_IS_INVALID) ||
         (this._config.required && this._date === null)
 
@@ -688,12 +675,7 @@ class SectionInput extends BaseComponent {
     })
   }
 
-  // Applies the validation outcome to the field (validity class, hidden input,
-  // `errorChange`) and returns the effective date — null when the value is
-  // invalid. Runs on every value change, whether typed or programmatic.
   _applyValidationState(): Date | null {
-    // Sections whose bounds depend on other sections (the day on the month and
-    // year, the week on the year) are clamped when those sections change.
     for (const section of this._sections) {
       if ((section.type === 'day' || section.type === 'week') && section.value !== null && section.value > this._getSectionMax(section)) {
         section.value = this._getSectionMax(section)

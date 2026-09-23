@@ -2,8 +2,6 @@
  * --------------------------------------------------------------------------
  * CoreUI PRO time-selection/roll.js
  * License (https://coreui.io/pro/license/)
- *
- * The scrolling-column rendering of the time selection body.
  * --------------------------------------------------------------------------
  */
 
@@ -108,8 +106,6 @@ class TimeRoll extends TimeSelection {
     }
   }
 
-  // A roving tabindex reaches one cell per column with Tab; the rest of the
-  // options are only reachable with the arrows.
   _addKeyboardNavigation(): void {
     EventHandler.off(this._element, EVENT_KEYDOWN)
     EventHandler.on(this._element, EVENT_KEYDOWN, SELECTOR_CELL, (event: any) => {
@@ -167,8 +163,6 @@ class TimeRoll extends TimeSelection {
       SelectorEngine.findOne(SELECTOR_CELL, column)
   }
 
-  // v1 scrolls the selected cell into view — without it a value like 14:30 marks
-  // a minute cell that sits below the visible part of the column.
   _scrollToSelected(column: any, cell: any, instant?: boolean): void {
     column.scrollTo({ behavior: instant ? 'instant' : 'smooth', top: cell.offsetTop })
   }
