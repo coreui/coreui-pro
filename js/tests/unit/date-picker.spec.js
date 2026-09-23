@@ -1365,6 +1365,21 @@ describe('DatePicker', () => {
         .toEqual('Clear date and time')
     })
 
+    it('should carry a global picker default to the calendar', () => {
+      const { selectionType } = DatePicker.Default
+      DatePicker.Default.selectionType = 'month'
+
+      try {
+        const picker = buildPicker({ locale: 'en-US', date: new Date(2026, 6, 14) })
+        picker.show()
+
+        expect(fixtureEl.querySelector('#picker input[type="hidden"]').value).toEqual('07/2026')
+        expect(picker._calendar._config.selectionType).toEqual('month')
+      } finally {
+        DatePicker.Default.selectionType = selectionType
+      }
+    })
+
     it('should keep a globally localised action label when the time is on', () => {
       const { ariaCleanerLabel } = DatePicker.Default
       DatePicker.Default.ariaCleanerLabel = 'Wyczyść'

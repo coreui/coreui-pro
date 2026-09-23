@@ -143,12 +143,12 @@ class PickerBase extends BaseComponent {
     })
   }
 
-  // Options the inner component knows about are forwarded by name, so the
-  // picker does not restate the whole surface of the thing it composes.
   _originalDefault(): Record<string, any> {
     return this.constructor.Default
   }
 
+  // Options the inner component knows about are forwarded by name, so the
+  // picker does not restate the whole surface of the thing it composes.
   _forwardConfig(Component: any, overrides: Record<string, any> = {}, extra: Record<string, any> = {}): Record<string, any> {
     const forwarded: Record<string, any> = {}
     const original = this._originalDefault()

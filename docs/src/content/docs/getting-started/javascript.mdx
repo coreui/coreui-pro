@@ -299,11 +299,10 @@ You can change the default settings for a plugin by modifying the plugin's `Cons
 coreui.Modal.Default.keyboard = false
 ```
 
-The pickers build their field and calendar from other plugins. A default changed on a picker reaches its field and calendar, and wins over a default changed on the field or calendar plugin for the same option; a default changed only on the field or calendar plugin applies inside the pickers too.
+The pickers build their field and calendar from other plugins. A default changed on a picker reaches its field and calendar, and wins over a default changed on the field or calendar plugin for the same option, so set the defaults on the picker.
 
 ```js
 coreui.DatePicker.Default.selectionType = 'month' // the field and the calendar both pick months
-coreui.DateRangeInput.Default.ariaStartLabel = 'Początek' // also names the start field of every DateRangePicker
 ```
 
 ## Methods and properties
