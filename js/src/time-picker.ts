@@ -289,6 +289,7 @@ class TimePicker extends PickerBase {
     }
 
     this._selection = new TimeRoll(this._selectionElement, this._forwardConfig(TimeRoll, {
+      hourCycle: (this._input._sections.find((section: any) => section.type === 'hour') as any)?.cycle ?? null,
       locale: this._config.locale,
       onChange: (time: Date | null) => this._applyTime(time, { selection: false }),
       time: this.getTime()

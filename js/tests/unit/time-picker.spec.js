@@ -112,6 +112,18 @@ describe('TimePicker', () => {
       expect(popup.querySelector('select')).toBeNull()
     })
 
+    it('should give the roll the hour cycle of the field', () => {
+      for (const locale of ['ko-KR', 'en-CA']) {
+        const picker = buildPicker({ locale })
+        picker.show()
+
+        const columns = fixtureEl.querySelectorAll('.time-picker-body .time-picker-col')
+        expect(columns[0].querySelectorAll('.time-picker-cell').length).toEqual(12)
+        expect(columns.length).toEqual(4)
+        picker.dispose()
+      }
+    })
+
     it('should ignore a variant passed through the config', () => {
       const picker = buildPicker({ variant: 'select' })
       picker.show()
