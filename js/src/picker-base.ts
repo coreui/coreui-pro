@@ -149,7 +149,7 @@ class PickerBase extends BaseComponent {
     const forwarded: Record<string, any> = {}
 
     for (const key of Object.keys(Component.Default)) {
-      if (key in this._config && this._config[key] !== (this.constructor.Default as Record<string, any>)[key]) {
+      if (key in this._config && this._config[key] !== Component.Default[key]) {
         forwarded[key] = this._config[key]
       }
     }
