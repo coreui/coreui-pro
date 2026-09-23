@@ -725,6 +725,21 @@ describe('Calendar', () => {
       const customDays = div.querySelectorAll('.custom-day')
       expect(customDays.length).toBeGreaterThan(0)
     })
+
+    it('should call renderDayCell with the config as this', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { // eslint-disable-line no-new
+        locale: 'en-US',
+        calendarDate: new Date(2026, 8, 1),
+        renderDayCell(date) {
+          return `${this.locale}:${date.getDate()}`
+        }
+      })
+
+      expect(div.querySelector('.calendar-cell-inner.day').textContent).toMatch(/^en-US:\d+$/)
+    })
   })
 
   describe('renderMonthCell', () => {
@@ -740,6 +755,21 @@ describe('Calendar', () => {
 
       const customMonths = div.querySelectorAll('.custom-month')
       expect(customMonths.length).toBeGreaterThan(0)
+    })
+
+    it('should pass the cell meta to renderMonthCell', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const renderMonthCell = jasmine.createSpy('renderMonthCell').and.returnValue('x')
+      new Calendar(div, { // eslint-disable-line no-new
+        selectionType: 'month',
+        calendarDate: new Date(2023, 0, 1),
+        startDate: new Date(2023, 5, 1),
+        renderMonthCell
+      })
+
+      expect(renderMonthCell).toHaveBeenCalledWith(new Date(2023, 5, 1), jasmine.objectContaining({ isDisabled: false, isSelected: true }))
     })
   })
 
@@ -2023,6 +2053,19 @@ describe('Calendar', () => {
       expect(calendar._calendarDate.getFullYear()).toEqual(initialYear - 10)
     })
 
+    it('should keep a year below 100 when paging back ten years', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendarDate = new Date(2000, 5, 1)
+      calendarDate.setFullYear(105)
+      const calendar = new Calendar(div, { selectionType: 'year', calendarDate })
+
+      div.querySelector('.btn-double-prev').click()
+
+      expect(calendar._calendarDate.getFullYear()).toEqual(95)
+    })
+
     it('should not show btn-prev and btn-next in months view', () => {
       fixtureEl.innerHTML = '<div></div>'
 
@@ -2688,6 +2731,24 @@ describe('Calendar', () => {
       calendar._updateClassNamesAndAriaLabels()
       const rangeHoverCells = div.querySelectorAll('.calendar-cell.range-hover')
       expect(rangeHoverCells.length).toBeGreaterThan(0)
+    })
+
+    it('should not preview a day range on the month cells', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { // eslint-disable-line no-new
+        calendarDate: new Date(2023, 0, 1),
+        range: true,
+        startDate: new Date(2023, 0, 10),
+        selectEndDate: true
+      })
+
+      div.querySelector('.btn-month').click()
+      div.querySelector(`[data-coreui-date="${new Date(2023, 5, 1).toDateString()}"]`)
+        .dispatchEvent(new MouseEvent('mouseover', { bubbles: true, relatedTarget: div }))
+
+      expect(div.querySelectorAll('.calendar-cell.range-hover').length).toEqual(0)
     })
 
     it('should apply range-hover class for year selection with hover', () => {

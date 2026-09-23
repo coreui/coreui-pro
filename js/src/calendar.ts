@@ -758,7 +758,11 @@ class Calendar extends BaseComponent {
   }
 
   _modifyCalendarDate(years: number, months = 0, callback?: () => void): void {
-    this._setCalendarDate(new Date(this._calendarDate.getFullYear() + years, this._calendarDate.getMonth() + months, 1))
+    const date = new Date(this._calendarDate)
+    date.setHours(0, 0, 0, 0)
+    date.setFullYear(date.getFullYear() + years, date.getMonth() + months, 1)
+
+    this._setCalendarDate(date)
     this._updateCalendar(callback)
   }
 
@@ -900,8 +904,8 @@ class Calendar extends BaseComponent {
   }
 
   _cellHtml(date: Date, attributes: Record<string, any>, label: string): string {
-    const render = this._config[CELL_RENDERERS[this._view]] as ((date: Date, meta?: CalendarCellMeta) => string) | null
-    const content = render ? sanitizeByConfig(render(date, attributes.meta), this._config) : label
+    const renderer = CELL_RENDERERS[this._view]
+    const content = this._config[renderer] ? sanitizeByConfig(this._config[renderer](date, attributes.meta), this._config) : label
     const ariaLabel = attributes.ariaLabel ? ` aria-label="${escapeHtml(attributes.ariaLabel)}"` : ''
     const ariaCurrent = attributes.ariaCurrent ? ' aria-current="date"' : ''
 

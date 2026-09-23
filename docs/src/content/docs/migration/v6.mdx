@@ -198,7 +198,7 @@ or, if you are already resolving the package by name, `import { Tooltip } from
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
 
-The `util` modules are internal, but the package exports every file under `js/dist`, so a deep import could reach them. These helpers are no longer exported: `js/dist/util/date-range-picker.js` as a whole, `getFirstAvailableDateInRange`, `getSelectableDates`, `createDateFromMonth`, `createDateFromWeek` and `createDateFromYear` from `util/calendar.js`, `getDateSections` from `util/date-sections.js` (now `getSectionLayout`), and `convertTimeToDate`, `formatTimePartials`, `getAmPm`, `isValidTime` and `shouldUseTwoDigitHour` from `util/time.js`. Most had no reader in the library and are gone; `createDateFromYear`, `formatTimePartials` and `shouldUseTwoDigitHour` stay as module internals. Pass dates to the components in the formats their options take (`startDate: '2026W03'` with `selectionType: 'week'`), or keep a copy of the helper in your code.
+The `util` modules are internal, but the package exports every file under `js/dist`, so a deep import could reach them. These helpers are no longer exported: `js/dist/util/date-range-picker.js` as a whole, `getFirstAvailableDateInRange`, `getSelectableDates`, `createDateFromMonth`, `createDateFromWeek` and `createDateFromYear` from `util/calendar.js`, `getDateSections` from `util/date-sections.js` (now `getSectionLayout`), and `convertTimeToDate`, `formatTimePartials`, `getAmPm`, `isValidTime` and `shouldUseTwoDigitHour` from `util/time.js`. Most had no reader in the library and are gone; `createDateFromYear`, `formatTimePartials` and `shouldUseTwoDigitHour` stay as module internals. Pass dates to the components in the formats their options take (`startDate: '2026W03'` with `selectionType: 'week'`), or keep a copy of the helper in your code. The nine per-unit comparisons of `util/calendar.js`, `isMonthDisabled`, `isMonthInRange`, `isMonthSelected` and their `isQuarter…` and `isYear…` counterparts, are three functions that take the calendar view as the second argument: `isPeriodDisabled(date, 'months', min, max, disabledDates)`, `isPeriodInRange(date, 'quarters', start, end)` and `isPeriodSelected(date, 'years', start, end)`.
 
 #### `coreui.Offcanvas` in the UMD bundle
 
@@ -1192,6 +1192,11 @@ removed in favour of `$translucent-opacity` and
   sits on one of them per grid, so a two-month range picker keeps a stop in each
   month. Custom CSS or scripts that reached for `.calendar-cell[tabindex="0"]`
   need `.calendar-cell[data-coreui-selectable]`.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **Day cells write `data-coreui-date` in the `toDateString()` form**
+  (`"Thu Sep 17 2026"`), like the month, quarter and year cells, instead of the
+  full `Date#toString()` value. A script that selected a day cell with
+  `[data-coreui-date="${date}"]` needs `[data-coreui-date="${date.toDateString()}"]`.
 - **Additive:** `startDateChange` and `endDateChange` now carry a `dateObject`
   property with the underlying `Date`, alongside the existing `date` property.
   `date` remains formatted per `selectionType` — a `Date` for day selection, but
