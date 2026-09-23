@@ -22,6 +22,18 @@ import { unwrapLegacyShell } from './util/legacy-markup.js'
 const CLASS_NAME_OPEN = 'dialog-open'
 const CLASS_NAME_HIDING = 'hiding'
 
+const POPUP_DATA_KEYS = [
+  'coreui.autocomplete',
+  'coreui.combobox',
+  'coreui.context-menu',
+  'coreui.date-picker',
+  'coreui.date-range-picker',
+  'coreui.dropdown',
+  'coreui.menu',
+  'coreui.multi-select',
+  'coreui.time-picker'
+]
+
 /**
  * Class definition
  *
@@ -233,6 +245,15 @@ class DialogBase extends BaseComponent {
       const instance = Data.get(element, 'coreui.tooltip') ?? Data.get(element, 'coreui.popover')
       if (instance && typeof instance.hide === 'function') {
         instance.hide()
+      }
+    }
+
+    for (const element of SelectorEngine.find('.show', this._element)) {
+      for (const key of POPUP_DATA_KEYS) {
+        const instance = Data.get(element, key)
+        if (instance && typeof instance.hide === 'function') {
+          instance.hide()
+        }
       }
     }
 

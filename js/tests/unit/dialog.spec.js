@@ -1,6 +1,8 @@
+import DatePicker from '../../src/date-picker.js'
 import Data from '../../src/dom/data.js'
 import EventHandler from '../../src/dom/event-handler.js'
 import Dialog from '../../src/dialog.js'
+import Dropdown from '../../src/dropdown.js'
 import {
   clearBodyAndDocument, clearFixture, createEvent, getFixture, jQueryMock
 } from '../helpers/fixture.js'
@@ -1211,6 +1213,42 @@ describe('Dialog', () => {
         dialogEl.addEventListener('hidden.coreui.dialog', () => {
           expect(fakeToast.hide).toHaveBeenCalled()
           Data.remove(toastEl, 'coreui.toast')
+          resolve()
+        })
+
+        dialog.show()
+      })
+    })
+
+    it('should hide an open date picker and dropdown inside dialog when dialog closes', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<dialog class="dialog">',
+          '  <div id="picker"></div>',
+          '  <div class="dropdown">',
+          '    <button class="btn" data-coreui-toggle="dropdown">Menu</button>',
+          '    <ul class="dropdown-menu"><li><a class="dropdown-item" href="#">Item</a></li></ul>',
+          '  </div>',
+          '</dialog>'
+        ].join('')
+
+        const dialogEl = fixtureEl.querySelector('.dialog')
+        const dialog = new Dialog(dialogEl)
+        const picker = new DatePicker(fixtureEl.querySelector('#picker'))
+        const dropdown = new Dropdown(fixtureEl.querySelector('[data-coreui-toggle="dropdown"]'))
+
+        dialogEl.addEventListener('shown.coreui.dialog', () => {
+          picker.show()
+          dropdown.show()
+          dialog.hide()
+        })
+
+        dialogEl.addEventListener('hidden.coreui.dialog', () => {
+          expect(picker._popup.isShown).toBeFalse()
+          expect(fixtureEl.querySelector('#picker').classList.contains('show')).toBeFalse()
+          expect(fixtureEl.querySelector('[data-coreui-toggle="dropdown"]').getAttribute('aria-expanded')).toEqual('false')
+          picker.dispose()
+          dropdown.dispose()
           resolve()
         })
 
