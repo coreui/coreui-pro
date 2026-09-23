@@ -16,8 +16,9 @@ import Calendar from './calendar.js'
 import DateRangeInput from './date-range-input.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
+import type { SectionInputConfig } from './section-input.js'
 import { captureHostClasses, createControlGroupAction } from './util/form-control-group.js'
-import { getDateBySelectionType } from './util/calendar.js'
+import { getDateBySelectionType, type SelectionTypes } from './util/calendar.js'
 import type { ComponentConfig } from './util/config.js'
 import { getWeekSectionsFromLocale } from './util/date-sections.js'
 import {
@@ -72,6 +73,7 @@ type DateRangePickerConfig = {
   endDate: Date | string | null,
   endFloatingLabel: string | null,
   endName: string | null,
+  format: SectionInputConfig['format'],
   inputOptions: Record<string, any>,
   locale: string,
   maxDate: Date | string | null,
@@ -79,6 +81,7 @@ type DateRangePickerConfig = {
   pickerIcon: string | boolean,
   sanitize: boolean,
   sanitizeFn: ((unsafeHtml: string) => string) | null,
+  selectionType: SelectionTypes,
   separatorIcon: string,
   separatorIconRtl: string,
   size: string | null,
@@ -102,6 +105,7 @@ const Default: DateRangePickerConfig = {
   endDate: null,
   endFloatingLabel: null,
   endName: null,
+  format: null,
   inputOptions: {},
   locale: navigator.language,
   maxDate: null,
@@ -109,6 +113,7 @@ const Default: DateRangePickerConfig = {
   pickerIcon: true,
   sanitize: true,
   sanitizeFn: null,
+  selectionType: 'day',
   separatorIcon: SEPARATOR_ICON,
   separatorIconRtl: SEPARATOR_ICON_RTL,
   size: null,
@@ -132,6 +137,7 @@ const DefaultType: Record<string, string> = {
   endDate: '(date|string|null)',
   endFloatingLabel: '(string|null)',
   endName: '(string|null)',
+  format: '(function|string|null)',
   inputOptions: 'object',
   locale: 'string',
   maxDate: '(date|string|null)',
@@ -139,6 +145,7 @@ const DefaultType: Record<string, string> = {
   pickerIcon: '(string|boolean)',
   sanitize: 'boolean',
   sanitizeFn: '(function|null)',
+  selectionType: 'string',
   separatorIcon: 'string',
   separatorIconRtl: 'string',
   size: '(string|null)',
