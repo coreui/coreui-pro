@@ -315,7 +315,33 @@ class Calendar extends BaseComponent {
   }
 
   _focusOnDate(date: Date): void {
-    this._closestSelectable(date)?.focus()
+    const target = this._closestSelectable(date) ?? SelectorEngine.findOne('table[tabindex="0"]', this._element as ParentNode)
+
+    if (target) {
+      target.focus()
+    }
+  }
+
+  _focusOnCell(date: Date): void {
+    const matches = (SelectorEngine.find(this._rovingSelector(), this._element as ParentNode) as HTMLElement[])
+      .filter(element => this._getDate(element).toDateString() === date.toDateString())
+
+    const inMonth = matches.find(element => {
+      const cell = this._rowsAreTargets() ? SelectorEngine.findOne(SELECTOR_CALENDAR_CELL, element) : element
+      return !cell?.classList.contains('previous') && !cell?.classList.contains('next')
+    })
+
+    const cell = inMonth ?? matches[0]
+
+    if (cell) {
+      cell.focus()
+    }
+  }
+
+  _startOfWeek(date: Date): Date {
+    const value = new Date(date)
+    value.setDate(value.getDate() - ((value.getDay() - this._config.firstDayOfWeek + 7) % 7))
+    return value
   }
 
   _startOfView(date: Date): Date {
@@ -351,7 +377,7 @@ class Calendar extends BaseComponent {
   _getDate(target: HTMLElement): Date {
     if (this._rowsAreTargets()) {
       const firstCell = SelectorEngine.findOne(SELECTOR_CALENDAR_CELL, target.closest(SELECTOR_CALENDAR_ROW) as ParentNode)
-      return new Date(Manipulator.getDataAttribute(firstCell as HTMLElement, 'date') as string)
+      return this._startOfWeek(new Date(Manipulator.getDataAttribute(firstCell as HTMLElement, 'date') as string))
     }
 
     return new Date(Manipulator.getDataAttribute(target, 'date') as string)
@@ -461,89 +487,150 @@ class Calendar extends BaseComponent {
     ) {
       event.preventDefault()
 
-      if (
-        this._maxDate &&
-        date >= (convertToDateObject(this._maxDate, this._config.selectionType) as Date) &&
-        (event.key === ARROW_RIGHT_KEY || event.key === ARROW_DOWN_KEY)
-      ) {
-        return
+      const target = this._getArrowTarget(date, this._isForwardKey(event.key), event.key === ARROW_UP_KEY || event.key === ARROW_DOWN_KEY)
+
+      if (target) {
+        this._revealDate(target, () => this._focusOnCell(target))
       }
-
-      if (
-        this._minDate &&
-        date <= (convertToDateObject(this._minDate, this._config.selectionType) as Date) &&
-        (event.key === ARROW_LEFT_KEY || event.key === ARROW_UP_KEY)
-      ) {
-        return
-      }
-
-      let element = event.target
-
-      if (this._rowsAreTargets() && !element.matches(SELECTOR_CALENDAR_ROW_CLICKABLE)) {
-        element = element.closest(SELECTOR_CALENDAR_ROW_CLICKABLE)
-      }
-
-      const list = SelectorEngine.find(this._rovingSelector(), this._element)
-
-      const index = list.indexOf(element)
-      const first = index === 0
-      const last = index === list.length - 1
-
-      const toBoundary = {
-        start: index,
-        end: list.length - (index + 1)
-      }
-
-      const gap = {
-        ArrowRight: 1,
-        ArrowLeft: -1,
-        ArrowUp: this._rowsAreTargets() ? -1 : (this._view === 'days' ? -7 : -3),
-        ArrowDown: this._rowsAreTargets() ? 1 : (this._view === 'days' ? 7 : 3)
-      }
-
-      if (
-        (event.key === ARROW_RIGHT_KEY && last) ||
-        (event.key === ARROW_DOWN_KEY && toBoundary.end < gap.ArrowDown) ||
-        (event.key === ARROW_LEFT_KEY && first) ||
-        (event.key === ARROW_UP_KEY && toBoundary.start < Math.abs(gap.ArrowUp))
-      ) {
-        const callback = (key: string) => {
-          const _list = SelectorEngine.find(`${SELECTOR_CALENDAR_CELL_CLICKABLE}, ${SELECTOR_CALENDAR_ROW_CLICKABLE}`, this._element as ParentNode)
-
-          if (_list.length && key === ARROW_RIGHT_KEY) {
-            _list[0].focus()
-          }
-
-          if (_list.length && key === ARROW_LEFT_KEY) {
-            _list[_list.length - 1].focus()
-          }
-
-          if (_list.length && key === ARROW_DOWN_KEY) {
-            _list[gap.ArrowDown - (list.length - index)].focus()
-          }
-
-          if (_list.length && key === ARROW_UP_KEY) {
-            _list[_list.length - (Math.abs(gap.ArrowUp) + 1 - (index + 1))].focus()
-          }
-        }
-
-        if (this._view === 'days') {
-          this._modifyCalendarDate(0, event.key === ARROW_RIGHT_KEY || event.key === ARROW_DOWN_KEY ? 1 : -1, callback.bind(this, event.key))
-        }
-
-        if (this._view === 'months' || this._view === 'quarters') {
-          this._modifyCalendarDate(event.key === ARROW_RIGHT_KEY || event.key === ARROW_DOWN_KEY ? 1 : -1, 0, callback.bind(this, event.key))
-        }
-
-        if (this._view === 'years') {
-          this._modifyCalendarDate(event.key === ARROW_RIGHT_KEY || event.key === ARROW_DOWN_KEY ? 10 : -10, 0, callback.bind(this, event.key))
-        }
-
-        return
-      }
-
-      list[index + (gap as Record<string, number>)[event.key]]?.focus()
     }
+  }
+
+  _handleGridKeydown(event: any): void {
+    if (!event.target.matches('table')) {
+      return
+    }
+
+    if (event.key === HOME_KEY || event.key === END_KEY) {
+      event.preventDefault()
+      return
+    }
+
+    if ([ARROW_UP_KEY, ARROW_RIGHT_KEY, ARROW_DOWN_KEY, ARROW_LEFT_KEY].includes(event.key)) {
+      event.preventDefault()
+
+      const forward = this._isForwardKey(event.key)
+      const target = this._getArrowTarget(this._getViewEdge(forward), forward, false)
+
+      if (target) {
+        this._revealDate(target, () => this._focusOnCell(target))
+      }
+
+      return
+    }
+
+    if (event.key !== PAGE_UP_KEY && event.key !== PAGE_DOWN_KEY) {
+      return
+    }
+
+    event.preventDefault()
+
+    const direction = event.key === PAGE_DOWN_KEY ? 1 : -1
+    const panels = SelectorEngine.find(SELECTOR_CALENDAR, this._element as ParentNode)
+    const index = panels.indexOf(event.target.closest(SELECTOR_CALENDAR))
+    const refocus = () => {
+      const panel = SelectorEngine.find(SELECTOR_CALENDAR, this._element as ParentNode)[index]
+      const stop = (SelectorEngine.findOne('[tabindex="0"]', panel as ParentNode) ??
+        SelectorEngine.findOne('[tabindex="0"]', this._element as ParentNode)) as HTMLElement | null
+
+      if (stop) {
+        stop.focus()
+      }
+    }
+
+    if (this._view === 'days' && !event.shiftKey) {
+      this._modifyCalendarDate(0, direction, refocus)
+      return
+    }
+
+    this._modifyCalendarDate(direction * (this._view === 'years' ? 10 : 1), 0, refocus)
+  }
+
+  _isForwardKey(key: string): boolean {
+    return key === ARROW_DOWN_KEY || key === (isRTL(this._element) ? ARROW_LEFT_KEY : ARROW_RIGHT_KEY)
+  }
+
+  _getViewEdge(forward: boolean): Date {
+    const year = this._calendarDate.getFullYear()
+    const month = this._calendarDate.getMonth()
+    const last = this._config.calendars - 1
+
+    if (this._view === 'days') {
+      return forward ? new Date(year, month + last + 1, 0) : new Date(year, month, 1)
+    }
+
+    if (this._view === 'years') {
+      return new Date(forward ? year + 5 + (12 * last) : year - 6, 0, 1)
+    }
+
+    return forward ? new Date(year + last, this._view === 'quarters' ? 9 : 11, 1) : new Date(year, 0, 1)
+  }
+
+  _getArrowTarget(date: Date, forward: boolean, vertical: boolean): Date | null {
+    const steps: Record<string, [number, number]> = {
+      days: vertical || this._rowsAreTargets() ? [7, 0] : [1, 0],
+      months: vertical ? [0, 3] : [0, 1],
+      quarters: vertical ? [0, 12] : [0, 3],
+      years: vertical ? [0, 36] : [0, 12]
+    }
+    const [days, months] = steps[this._view]
+    const sign = forward ? 1 : -1
+    const bound = forward ? this._maxDate : this._minDate
+    const edge = bound ? this._startOfView(bound) : null
+    const target = this._rowsAreTargets() ? this._startOfWeek(date) : new Date(date)
+
+    while (Math.abs(target.getFullYear() - date.getFullYear()) <= 10) {
+      target.setMonth(target.getMonth() + (sign * months), target.getDate() + (sign * days))
+
+      const start = this._startOfView(target)
+
+      if (edge && (forward ? start > edge : start < edge)) {
+        return null
+      }
+
+      if (this._isSelectableDate(target)) {
+        return target
+      }
+    }
+
+    return null
+  }
+
+  _isSelectableDate(date: Date): boolean {
+    const isDisabled = {
+      days: isDateDisabled,
+      months: isMonthDisabled,
+      quarters: isQuarterDisabled,
+      years: isYearDisabled
+    }[this._view as ViewTypes]
+
+    return !isDisabled(date, this._minDate, this._maxDate, this._config.disabledDates)
+  }
+
+  _revealDate(date: Date, callback: () => void): void {
+    const pages = this._config.calendars
+    const first = this._calendarDate as Date
+    let years = 0
+    let months = 0
+
+    if (this._view === 'days') {
+      const end = new Date(date)
+      end.setDate(end.getDate() + (this._rowsAreTargets() ? 6 : 0))
+      const monthsFrom = (value: Date) => ((value.getFullYear() - first.getFullYear()) * 12) + value.getMonth() - first.getMonth()
+      months = monthsFrom(end) < 0 ? monthsFrom(end) : Math.max(0, monthsFrom(date) - pages + 1)
+    } else if (this._view === 'years') {
+      const page = Math.floor((date.getFullYear() - first.getFullYear() + 6) / 12)
+      years = 12 * (page < 0 ? page : Math.max(0, page - pages + 1))
+    } else {
+      const delta = date.getFullYear() - first.getFullYear()
+      years = delta < 0 ? delta : Math.max(0, delta - pages + 1)
+    }
+
+    if (years || months) {
+      this._modifyCalendarDate(years, months, callback)
+      return
+    }
+
+    callback()
   }
 
   _handleCalendarMouseEnter(event: any): void {
@@ -610,6 +697,10 @@ class Calendar extends BaseComponent {
 
     EventHandler.on(this._element, EVENT_KEYDOWN, SELECTOR_CALENDAR_ROW_CLICKABLE, event => {
       this._handleCalendarKeydown(event)
+    })
+
+    EventHandler.on(this._element, EVENT_KEYDOWN, 'table[tabindex]', event => {
+      this._handleGridKeydown(event)
     })
 
     EventHandler.on(this._element, EVENT_MOUSEENTER, SELECTOR_CALENDAR_ROW_CLICKABLE, event => {
@@ -826,6 +917,7 @@ class Calendar extends BaseComponent {
 
     const calendarTable = document.createElement('table')
     calendarTable.setAttribute('role', 'grid')
+    calendarTable.setAttribute('aria-label', this._gridLabel(calendarDate))
     calendarTable.innerHTML = `
     ${this._view === 'days' ? `
       <thead>
@@ -852,7 +944,7 @@ class Calendar extends BaseComponent {
       <tbody>
         ${this._view === 'days' ? monthDetails.map(({ week, days }) => {
           const { date } = days[0]
-          const rowAttributes = this._rowWeekAttributes(date)
+          const rowAttributes = this._rowWeekAttributes(date, this._config.showAdjacentDays || days.some(({ month }) => month === 'current'))
           return (
             `<tr 
               class="${rowAttributes.className}"
@@ -958,7 +1050,15 @@ class Calendar extends BaseComponent {
   }
 
   _updateRovingTabIndex(preferred?: HTMLElement): void {
+    const empty = !SelectorEngine.findOne(this._rovingSelector(), this._element as ParentNode)
+
     for (const panel of SelectorEngine.find(SELECTOR_CALENDAR, this._element as ParentNode)) {
+      SelectorEngine.findOne('table', panel)?.toggleAttribute('tabindex', false)
+
+      if (empty) {
+        SelectorEngine.findOne('table', panel)?.setAttribute('tabindex', '0')
+      }
+
       this._updatePanelRovingTabIndex(panel as HTMLElement, preferred)
     }
   }
@@ -978,6 +1078,19 @@ class Calendar extends BaseComponent {
     for (const element of list) {
       element.tabIndex = element === active ? 0 : -1
     }
+  }
+
+  _gridLabel(date: Date): string {
+    if (this._view === 'days') {
+      return this._formatDate(date, { month: 'long', year: 'numeric' })
+    }
+
+    if (this._view === 'years') {
+      const years = getYears(date.getFullYear())
+      return `${years[0]} – ${years.at(-1)}`
+    }
+
+    return this._formatDate(date, { year: 'numeric' })
   }
 
   _rovingSelector(): string {
@@ -1041,7 +1154,12 @@ class Calendar extends BaseComponent {
 
       for (const row of rows) {
         const firstCell = SelectorEngine.findOne(SELECTOR_CALENDAR_CELL, row)
-        const date = new Date(Manipulator.getDataAttribute(firstCell as HTMLElement, 'date') as string)
+
+        if (!firstCell) {
+          continue
+        }
+
+        const date = this._startOfWeek(new Date(Manipulator.getDataAttribute(firstCell, 'date') as string))
         const rowAttributes = this._rowWeekAttributes(date)
 
         row.className = rowAttributes.className
@@ -1066,7 +1184,7 @@ class Calendar extends BaseComponent {
 
       switch (this._view) {
       case 'days': {
-        cellAttributes = this._cellDayAttributes(date, 'current')
+        cellAttributes = this._cellDayAttributes(date, ['previous', 'next'].find(month => cell.classList.contains(month)) ?? 'current')
         break
       }
 
@@ -1250,8 +1368,8 @@ class Calendar extends BaseComponent {
     }
   }
 
-  _rowWeekAttributes(date: Date): Record<string, any> {
-    if (this._config.selectionType !== 'week') {
+  _rowWeekAttributes(date: Date, visible = true): Record<string, any> {
+    if (this._config.selectionType !== 'week' || !visible) {
       return {
         className: this._classNames({ [CLASS_NAME_CALENDAR_ROW]: true }),
         selectable: false,

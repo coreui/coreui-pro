@@ -1056,95 +1056,6 @@ describe('Calendar', () => {
       })
     })
 
-    it('should navigate with ArrowRight in days view', () => {
-      return new Promise(resolve => {
-        fixtureEl.innerHTML = '<div></div>'
-        const div = fixtureEl.querySelector('div')
-        new Calendar(div, { calendarDate: new Date(2023, 5, 1) }) // eslint-disable-line no-new
-
-        setTimeout(() => {
-          const cells = div.querySelectorAll('.calendar-cell[data-coreui-selectable]')
-          expect(cells.length).toBeGreaterThan(1)
-
-          const firstCell = cells[0]
-          firstCell.focus()
-
-          const keydownEvent = createEvent('keydown')
-          keydownEvent.key = 'ArrowRight'
-          firstCell.dispatchEvent(keydownEvent)
-
-          // The test verifies the event is handled without error
-          resolve()
-        }, 10)
-      })
-    })
-
-    it('should navigate with ArrowLeft in days view', () => {
-      return new Promise(resolve => {
-        fixtureEl.innerHTML = '<div></div>'
-        const div = fixtureEl.querySelector('div')
-        new Calendar(div, { calendarDate: new Date(2023, 5, 1) }) // eslint-disable-line no-new
-
-        setTimeout(() => {
-          const cells = div.querySelectorAll('.calendar-cell[data-coreui-selectable]')
-          expect(cells.length).toBeGreaterThan(1)
-
-          const lastCell = cells[cells.length - 1]
-          lastCell.focus()
-
-          const keydownEvent = createEvent('keydown')
-          keydownEvent.key = 'ArrowLeft'
-          lastCell.dispatchEvent(keydownEvent)
-
-          resolve()
-        }, 10)
-      })
-    })
-
-    it('should navigate with ArrowDown in days view (moves 7 days)', () => {
-      return new Promise(resolve => {
-        fixtureEl.innerHTML = '<div></div>'
-        const div = fixtureEl.querySelector('div')
-        new Calendar(div, { calendarDate: new Date(2023, 5, 1) }) // eslint-disable-line no-new
-
-        setTimeout(() => {
-          const cells = div.querySelectorAll('.calendar-cell[data-coreui-selectable]')
-          expect(cells.length).toBeGreaterThan(7)
-
-          const firstCell = cells[0]
-          firstCell.focus()
-
-          const keydownEvent = createEvent('keydown')
-          keydownEvent.key = 'ArrowDown'
-          firstCell.dispatchEvent(keydownEvent)
-
-          resolve()
-        }, 10)
-      })
-    })
-
-    it('should navigate with ArrowUp in days view (moves -7 days)', () => {
-      return new Promise(resolve => {
-        fixtureEl.innerHTML = '<div></div>'
-        const div = fixtureEl.querySelector('div')
-        new Calendar(div, { calendarDate: new Date(2023, 5, 1) }) // eslint-disable-line no-new
-
-        setTimeout(() => {
-          const cells = div.querySelectorAll('.calendar-cell[data-coreui-selectable]')
-          expect(cells.length).toBeGreaterThan(7)
-
-          const cell = cells[10]
-          cell.focus()
-
-          const keydownEvent = createEvent('keydown')
-          keydownEvent.key = 'ArrowUp'
-          cell.dispatchEvent(keydownEvent)
-
-          resolve()
-        }, 10)
-      })
-    })
-
     const findDayCell = (div, year, month, day) =>
       [...div.querySelectorAll('.calendar-cell[data-coreui-selectable]')].find(cell => {
         const date = new Date(cell.dataset.coreuiDate)
@@ -1159,6 +1070,408 @@ describe('Calendar', () => {
     }
 
     const activeDate = () => new Date(document.activeElement.dataset.coreuiDate)
+
+    const renderCalendar = (config, markup = '<div></div>') => {
+      fixtureEl.innerHTML = markup
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { calendarDate: new Date(2026, 7, 1), locale: 'en-US', ...config }) // eslint-disable-line no-new
+      return div
+    }
+
+    const focusDay = (div, year, month, day) => {
+      const cell = findDayCell(div, year, month, day)
+      cell.focus()
+      return cell
+    }
+
+    it('should move focus one day with ArrowRight and ArrowLeft', () => {
+      const div = renderCalendar()
+
+      pressKey(focusDay(div, 2026, 7, 12), 'ArrowRight')
+      expect(activeDate()).toEqual(new Date(2026, 7, 13))
+
+      pressKey(document.activeElement, 'ArrowLeft')
+      expect(activeDate()).toEqual(new Date(2026, 7, 12))
+    })
+
+    it('should move focus one week with ArrowDown and ArrowUp', () => {
+      const div = renderCalendar()
+
+      pressKey(focusDay(div, 2026, 7, 12), 'ArrowDown')
+      expect(activeDate()).toEqual(new Date(2026, 7, 19))
+
+      pressKey(document.activeElement, 'ArrowUp')
+      expect(activeDate()).toEqual(new Date(2026, 7, 12))
+    })
+
+    it('should keep the weekday with ArrowDown when weekends are disabled', () => {
+      const div = renderCalendar({ disabledDates: date => date.getDay() === 0 || date.getDay() === 6 })
+
+      pressKey(focusDay(div, 2026, 7, 12), 'ArrowDown')
+
+      expect(activeDate()).toEqual(new Date(2026, 7, 19))
+    })
+
+    it('should step over a disabled day in the direction of the arrow', () => {
+      const div = renderCalendar({ disabledDates: [new Date(2026, 7, 13), new Date(2026, 7, 19)] })
+
+      pressKey(focusDay(div, 2026, 7, 12), 'ArrowRight')
+      expect(activeDate()).toEqual(new Date(2026, 7, 14))
+
+      pressKey(focusDay(div, 2026, 7, 12), 'ArrowDown')
+      expect(activeDate()).toEqual(new Date(2026, 7, 26))
+    })
+
+    it('should move into the next month when ArrowRight leaves the last day of the view', () => {
+      const div = renderCalendar()
+
+      pressKey(focusDay(div, 2026, 7, 31), 'ArrowRight')
+
+      expect(activeDate()).toEqual(new Date(2026, 8, 1))
+      expect(document.activeElement.classList).not.toContain('next')
+    })
+
+    it('should cross two panels without visiting the shared days twice', () => {
+      const div = renderCalendar({ calendars: 2, selectAdjacentDays: true })
+      const [first, second] = div.querySelectorAll('.calendar')
+      const trailing = [...first.querySelectorAll('.calendar-cell[data-coreui-selectable]')]
+        .find(cell => new Date(cell.dataset.coreuiDate).getTime() === new Date(2026, 8, 6).getTime())
+
+      trailing.focus()
+      pressKey(trailing, 'ArrowRight')
+      expect(activeDate()).toEqual(new Date(2026, 8, 7))
+      expect(second.contains(document.activeElement)).toBeTrue()
+
+      pressKey(focusDay(div, 2026, 7, 27), 'ArrowDown')
+      expect(activeDate()).toEqual(new Date(2026, 8, 3))
+      expect(second.contains(document.activeElement)).toBeTrue()
+    })
+
+    it('should keep selectable adjacent days marked as adjacent after a hover', () => {
+      const div = renderCalendar({ selectAdjacentDays: true })
+      const trailing = [...div.querySelectorAll('.calendar-cell.next')]
+
+      focusDay(div, 2026, 7, 12)
+
+      expect(trailing.length).toBeGreaterThan(0)
+      expect(trailing.every(cell => cell.classList.contains('next'))).toBeTrue()
+    })
+
+    it('should move to the next week row across two panels without repeating the shared week', () => {
+      const div = renderCalendar({ calendars: 2, selectionType: 'week' })
+      const rowDate = row => new Date(row.querySelector('.calendar-cell').dataset.coreuiDate)
+      const rows = [...div.querySelectorAll('.calendar')[0].querySelectorAll('.calendar-row[data-coreui-selectable]')]
+      const last = rows.find(row => rowDate(row).getTime() === new Date(2026, 7, 31).getTime())
+
+      last.focus()
+      pressKey(last, 'ArrowDown')
+
+      expect(rowDate(document.activeElement)).toEqual(new Date(2026, 8, 7))
+    })
+
+    it('should reach the first week row with ArrowUp without paging when that week starts in the previous month', () => {
+      const div = renderCalendar({ calendarDate: new Date(2026, 8, 1), selectionType: 'week' })
+      const rows = [...div.querySelectorAll('.calendar-row[data-coreui-selectable]')]
+
+      rows[1].focus()
+      pressKey(rows[1], 'ArrowUp')
+
+      expect(document.activeElement).toBe(rows[0])
+    })
+
+    it('should move from the first week row with ArrowDown when adjacent days are hidden', () => {
+      const div = renderCalendar({ calendarDate: new Date(2026, 8, 1), selectionType: 'week', showAdjacentDays: false })
+      const rows = [...div.querySelectorAll('.calendar-row[data-coreui-selectable]')]
+
+      rows[0].focus()
+      pressKey(rows[0], 'ArrowDown')
+      expect(document.activeElement).toBe(rows[1])
+
+      pressKey(rows[1], 'ArrowUp')
+      expect(document.activeElement).toBe(rows[0])
+    })
+
+    it('should not offer a week row with no visible day when adjacent days are hidden', () => {
+      const div = renderCalendar({ calendarDate: new Date(2026, 8, 1), selectionType: 'week', showAdjacentDays: false })
+      const rows = [...div.querySelectorAll('.calendar-row')]
+
+      expect(rows.at(-1).querySelector('.calendar-cell')).toBeNull()
+      expect(rows.at(-1).hasAttribute('data-coreui-selectable')).toBeFalse()
+    })
+
+    it('should move three months with ArrowDown in the months view', () => {
+      const div = renderCalendar({ calendarDate: new Date(2026, 0, 1), selectionType: 'month' })
+      const january = div.querySelector(`[data-coreui-date="${new Date(2026, 0, 1).toDateString()}"]`)
+
+      january.focus()
+      pressKey(january, 'ArrowDown')
+
+      expect(activeDate()).toEqual(new Date(2026, 3, 1))
+    })
+
+    it('should move a quarter with ArrowRight and a year with ArrowDown in the quarters view', () => {
+      const div = renderCalendar({ calendarDate: new Date(2026, 0, 1), selectionType: 'quarter' })
+      const first = div.querySelector(`[data-coreui-date="${new Date(2026, 0, 1).toDateString()}"]`)
+
+      first.focus()
+      pressKey(first, 'ArrowRight')
+      expect(activeDate()).toEqual(new Date(2026, 3, 1))
+
+      pressKey(document.activeElement, 'ArrowDown')
+      expect(activeDate()).toEqual(new Date(2027, 3, 1))
+    })
+
+    it('should move three years with ArrowDown in the years view', () => {
+      const div = renderCalendar({ calendarDate: new Date(2026, 0, 1), selectionType: 'year' })
+      const year = div.querySelector(`[data-coreui-date="${new Date(2026, 0, 1).toDateString()}"]`)
+
+      year.focus()
+      pressKey(year, 'ArrowDown')
+
+      expect(activeDate()).toEqual(new Date(2029, 0, 1))
+    })
+
+    it('should keep a week row in its own panel when two panels show it', () => {
+      const div = renderCalendar({ calendarDate: new Date(2026, 1, 1), calendars: 2, selectionType: 'week' })
+      const second = div.querySelectorAll('.calendar')[1]
+      const row = [...second.querySelectorAll('.calendar-row[data-coreui-selectable]')]
+        .find(element => new Date(element.querySelector('.calendar-cell').dataset.coreuiDate).getTime() === new Date(2026, 2, 9).getTime())
+
+      row.focus()
+      pressKey(row, 'ArrowUp')
+
+      expect(second.contains(document.activeElement)).toBeTrue()
+    })
+
+    it('should move into the previous month when ArrowLeft leaves the first day of the view', () => {
+      const div = renderCalendar()
+
+      pressKey(focusDay(div, 2026, 7, 1), 'ArrowLeft')
+
+      expect(activeDate()).toEqual(new Date(2026, 6, 31))
+      expect(document.activeElement.classList).not.toContain('previous')
+    })
+
+    it('should move a month with ArrowRight in the months view and page into the next year', () => {
+      const div = renderCalendar({ calendarDate: new Date(2026, 10, 1), selectionType: 'month' })
+      const november = div.querySelector(`[data-coreui-date="${new Date(2026, 10, 1).toDateString()}"]`)
+
+      november.focus()
+      pressKey(november, 'ArrowRight')
+      expect(activeDate()).toEqual(new Date(2026, 11, 1))
+
+      pressKey(document.activeElement, 'ArrowRight')
+      expect(activeDate()).toEqual(new Date(2027, 0, 1))
+    })
+
+    it('should move a year with ArrowRight and page back with ArrowLeft in the years view', () => {
+      const div = renderCalendar({ calendarDate: new Date(2026, 0, 1), selectionType: 'year' })
+      const year = div.querySelector(`[data-coreui-date="${new Date(2026, 0, 1).toDateString()}"]`)
+
+      year.focus()
+      pressKey(year, 'ArrowRight')
+      expect(activeDate()).toEqual(new Date(2027, 0, 1))
+
+      const first = div.querySelector(`[data-coreui-date="${new Date(2020, 0, 1).toDateString()}"]`)
+      first.focus()
+      pressKey(first, 'ArrowLeft')
+      expect(activeDate()).toEqual(new Date(2019, 0, 1))
+    })
+
+    it('should reach a month partly inside minDate and stop before it in the months view', () => {
+      const div = renderCalendar({ calendarDate: new Date(2026, 0, 1), minDate: new Date(2026, 2, 15), selectionType: 'month' })
+      const april = div.querySelector(`[data-coreui-date="${new Date(2026, 3, 1).toDateString()}"]`)
+
+      april.focus()
+      pressKey(april, 'ArrowLeft')
+      expect(activeDate()).toEqual(new Date(2026, 2, 1))
+
+      pressKey(document.activeElement, 'ArrowLeft')
+      expect(activeDate()).toEqual(new Date(2026, 2, 1))
+    })
+
+    it('should give up within ten years when everything ahead is disabled', () => {
+      let calls = 0
+      const disabledDates = date => {
+        calls++
+        return date.getFullYear() > 2030
+      }
+
+      const div = renderCalendar({ calendarDate: new Date(2030, 0, 1), selectionType: 'year', disabledDates })
+      const year = div.querySelector(`[data-coreui-date="${new Date(2030, 0, 1).toDateString()}"]`)
+
+      year.focus()
+      calls = 0
+      pressKey(year, 'ArrowRight')
+
+      expect(calls).toBeLessThan(20_000)
+      expect(activeDate()).toEqual(new Date(2030, 0, 1))
+    })
+
+    it('should match the target cell by day, whatever the time of day', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, { calendarDate: new Date(2026, 7, 1), locale: 'en-US' })
+
+      calendar._focusOnCell(new Date(2026, 7, 13, 1))
+
+      expect(activeDate()).toEqual(new Date(2026, 7, 13))
+    })
+
+    it('should keep the first week row selected after a refresh when adjacent days are hidden', () => {
+      const div = renderCalendar({ selectionType: 'week', showAdjacentDays: false, startDate: new Date(2026, 6, 27) })
+      const rows = [...div.querySelectorAll('.calendar-row[data-coreui-selectable]')]
+
+      expect(rows[0].classList).toContain('selected')
+
+      rows[1].focus()
+
+      expect(rows[0].classList).toContain('selected')
+    })
+
+    it('should mirror ArrowLeft and ArrowRight in a right-to-left layout', () => {
+      const div = renderCalendar({}, '<div dir="rtl"></div>')
+
+      pressKey(focusDay(div, 2026, 7, 12), 'ArrowLeft')
+      expect(activeDate()).toEqual(new Date(2026, 7, 13))
+
+      pressKey(document.activeElement, 'ArrowRight')
+      expect(activeDate()).toEqual(new Date(2026, 7, 12))
+    })
+
+    it('should not move focus past maxDate or before minDate', () => {
+      const div = renderCalendar({ minDate: new Date(2026, 7, 10), maxDate: new Date(2026, 7, 15) })
+
+      pressKey(focusDay(div, 2026, 7, 15), 'ArrowRight')
+      expect(activeDate()).toEqual(new Date(2026, 7, 15))
+
+      pressKey(document.activeElement, 'ArrowDown')
+      expect(activeDate()).toEqual(new Date(2026, 7, 15))
+
+      pressKey(focusDay(div, 2026, 7, 10), 'ArrowLeft')
+      expect(activeDate()).toEqual(new Date(2026, 7, 10))
+
+      pressKey(document.activeElement, 'ArrowUp')
+      expect(activeDate()).toEqual(new Date(2026, 7, 10))
+    })
+
+    it('should make the grid the tab stop when nothing in the view is selectable', () => {
+      const div = renderCalendar({ minDate: new Date(2026, 8, 1) })
+      const grid = div.querySelector('table')
+
+      expect(grid.getAttribute('tabindex')).toEqual('0')
+
+      grid.focus()
+      pressKey(grid, 'PageDown')
+
+      expect(activeDate()).toEqual(new Date(2026, 8, 1))
+      expect(div.querySelector('table').hasAttribute('tabindex')).toBeFalse()
+    })
+
+    it('should page the empty grid back with PageUp and by a year with Shift+PageDown', () => {
+      const div = renderCalendar({ maxDate: new Date(2026, 6, 31) })
+
+      div.querySelector('table').focus()
+      pressKey(div.querySelector('table'), 'PageUp')
+      expect(activeDate()).toEqual(new Date(2026, 6, 1))
+
+      const grid = renderCalendar({ calendarDate: new Date(2026, 8, 1), maxDate: new Date(2026, 6, 31) }).querySelector('table')
+      grid.focus()
+      pressKey(grid, 'PageDown', true)
+      expect(document.activeElement.matches('table')).toBeTrue()
+      expect(document.activeElement.getAttribute('aria-label')).toEqual('September 2027')
+    })
+
+    it('should cross two blocked months with ArrowRight and come back with ArrowLeft', () => {
+      const div = renderCalendar({ disabledDates: date => date.getMonth() === 8 || date.getMonth() === 9 })
+
+      pressKey(focusDay(div, 2026, 7, 31), 'ArrowRight')
+      expect(activeDate()).toEqual(new Date(2026, 10, 1))
+
+      pressKey(document.activeElement, 'ArrowLeft')
+      expect(activeDate()).toEqual(new Date(2026, 7, 31))
+    })
+
+    it('should leave the empty grid for the nearest selectable date with the arrows', () => {
+      const blocked = { disabledDates: date => date.getMonth() === 8 || date.getMonth() === 9 }
+      let div = renderCalendar(blocked)
+
+      pressKey(focusDay(div, 2026, 7, 12), 'PageDown')
+      expect(document.activeElement.matches('table')).toBeTrue()
+
+      pressKey(document.activeElement, 'ArrowRight')
+      expect(activeDate()).toEqual(new Date(2026, 10, 1))
+
+      div = renderCalendar(blocked)
+      pressKey(focusDay(div, 2026, 7, 12), 'PageDown')
+      pressKey(document.activeElement, 'ArrowUp')
+      expect(activeDate()).toEqual(new Date(2026, 7, 31))
+    })
+
+    it('should keep focus in the calendar when paging from an empty grid shows a date in another panel', () => {
+      const div = renderCalendar({ calendars: 2, disabledDates: date => date.getMonth() === 8 || date.getMonth() === 9 })
+
+      pressKey(focusDay(div, 2026, 7, 12), 'PageDown')
+      expect(document.activeElement.matches('table')).toBeTrue()
+
+      pressKey(document.activeElement, 'PageDown')
+
+      expect(activeDate()).toEqual(new Date(2026, 10, 1))
+      expect(div.querySelectorAll('.calendar')[1].contains(document.activeElement)).toBeTrue()
+    })
+
+    it('should keep arrows and Home/End on the empty grid from scrolling the page', () => {
+      const grid = renderCalendar({ minDate: new Date(2026, 8, 1) }).querySelector('table')
+      const event = createEvent('keydown', { cancelable: true })
+      event.key = 'ArrowRight'
+
+      grid.focus()
+      grid.dispatchEvent(event)
+
+      expect(event.defaultPrevented).toBeTrue()
+    })
+
+    it('should land on the empty grid when PageDown leads into a month with nothing selectable', () => {
+      const div = renderCalendar({ disabledDates: date => date.getMonth() === 8 })
+
+      pressKey(focusDay(div, 2026, 7, 12), 'PageDown')
+
+      expect(document.activeElement).toBe(div.querySelector('table'))
+    })
+
+    it('should not make a grid the tab stop while another panel has a selectable date', () => {
+      const div = renderCalendar({ calendars: 2, minDate: new Date(2026, 8, 10) })
+      const [first, second] = div.querySelectorAll('.calendar table')
+
+      expect(first.hasAttribute('tabindex')).toBeFalse()
+      expect(second.hasAttribute('tabindex')).toBeFalse()
+      expect(second.querySelector('[tabindex="0"]')).not.toBeNull()
+    })
+
+    it('should keep one tab stop after the next-month button leads into an empty month', () => {
+      const div = renderCalendar({ calendarDate: new Date(2026, 8, 1), maxDate: new Date(2026, 8, 30) })
+
+      div.querySelector('.btn-next').click()
+
+      expect(div.querySelectorAll('[tabindex="0"]').length).toEqual(1)
+      expect(div.querySelector('table').getAttribute('tabindex')).toEqual('0')
+    })
+
+    it('should keep one tab stop after a week row stops being selectable', () => {
+      const div = renderCalendar({ selectionType: 'week', showAdjacentDays: false })
+      const last = [...div.querySelectorAll('.calendar-row[data-coreui-selectable]')].at(-1)
+
+      last.focus()
+      pressKey(last, 'ArrowDown')
+
+      expect(div.querySelectorAll('.calendar-row[tabindex="0"]').length).toEqual(1)
+    })
+
+    it('should name each grid after the period it shows', () => {
+      expect(renderCalendar().querySelector('table').getAttribute('aria-label')).toEqual('August 2026')
+      expect(renderCalendar({ selectionType: 'month' }).querySelector('table').getAttribute('aria-label')).toEqual('2026')
+      expect(renderCalendar({ selectionType: 'year' }).querySelector('table').getAttribute('aria-label')).toEqual('2020 – 2031')
+    })
 
     it('should move focus to the first day of the week on Home', () => {
       return new Promise(resolve => {
@@ -1329,98 +1642,6 @@ describe('Calendar', () => {
       })
     })
 
-    it('should not navigate past maxDate with ArrowRight', () => {
-      return new Promise(resolve => {
-        fixtureEl.innerHTML = '<div></div>'
-        const div = fixtureEl.querySelector('div')
-        const maxDate = new Date(2023, 5, 15)
-        new Calendar(div, { calendarDate: new Date(2023, 5, 1), maxDate }) // eslint-disable-line no-new
-
-        setTimeout(() => {
-          const cells = div.querySelectorAll('.calendar-cell[data-coreui-selectable]')
-          if (cells.length > 0) {
-            const lastEnabledCell = cells[cells.length - 1]
-            lastEnabledCell.focus()
-
-            const keydownEvent = createEvent('keydown')
-            keydownEvent.key = 'ArrowRight'
-            lastEnabledCell.dispatchEvent(keydownEvent)
-          }
-
-          resolve()
-        }, 10)
-      })
-    })
-
-    it('should not navigate before minDate with ArrowLeft', () => {
-      return new Promise(resolve => {
-        fixtureEl.innerHTML = '<div></div>'
-        const div = fixtureEl.querySelector('div')
-        const minDate = new Date(2023, 5, 10)
-        new Calendar(div, { calendarDate: new Date(2023, 5, 1), minDate }) // eslint-disable-line no-new
-
-        setTimeout(() => {
-          const cells = div.querySelectorAll('.calendar-cell[data-coreui-selectable]')
-          if (cells.length > 0) {
-            const firstEnabledCell = cells[0]
-            firstEnabledCell.focus()
-
-            const keydownEvent = createEvent('keydown')
-            keydownEvent.key = 'ArrowLeft'
-            firstEnabledCell.dispatchEvent(keydownEvent)
-          }
-
-          resolve()
-        }, 10)
-      })
-    })
-
-    it('should not navigate past maxDate with ArrowDown', () => {
-      return new Promise(resolve => {
-        fixtureEl.innerHTML = '<div></div>'
-        const div = fixtureEl.querySelector('div')
-        const maxDate = new Date(2023, 5, 15)
-        new Calendar(div, { calendarDate: new Date(2023, 5, 1), maxDate }) // eslint-disable-line no-new
-
-        setTimeout(() => {
-          const cells = div.querySelectorAll('.calendar-cell[data-coreui-selectable]')
-          if (cells.length > 0) {
-            const lastEnabledCell = cells[cells.length - 1]
-            lastEnabledCell.focus()
-
-            const keydownEvent = createEvent('keydown')
-            keydownEvent.key = 'ArrowDown'
-            lastEnabledCell.dispatchEvent(keydownEvent)
-          }
-
-          resolve()
-        }, 10)
-      })
-    })
-
-    it('should not navigate before minDate with ArrowUp', () => {
-      return new Promise(resolve => {
-        fixtureEl.innerHTML = '<div></div>'
-        const div = fixtureEl.querySelector('div')
-        const minDate = new Date(2023, 5, 10)
-        new Calendar(div, { calendarDate: new Date(2023, 5, 1), minDate }) // eslint-disable-line no-new
-
-        setTimeout(() => {
-          const cells = div.querySelectorAll('.calendar-cell[data-coreui-selectable]')
-          if (cells.length > 0) {
-            const firstEnabledCell = cells[0]
-            firstEnabledCell.focus()
-
-            const keydownEvent = createEvent('keydown')
-            keydownEvent.key = 'ArrowUp'
-            firstEnabledCell.dispatchEvent(keydownEvent)
-          }
-
-          resolve()
-        }, 10)
-      })
-    })
-
     it('should navigate at boundary and change month when ArrowRight at last cell', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = '<div></div>'
@@ -1571,7 +1792,6 @@ describe('Calendar', () => {
             keydownEvent.key = 'ArrowRight'
             lastCell.dispatchEvent(keydownEvent)
 
-            // Years view should modify by 10 years
             expect(modifySpy).toHaveBeenCalled()
           }
 
