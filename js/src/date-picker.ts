@@ -131,6 +131,8 @@ const Default: DatePickerConfig = {
   timepicker: false
 }
 
+const ORIGINAL_DEFAULT: DatePickerConfig = { ...Default }
+
 const DefaultType: Record<string, string> = {
   allowList: 'object',
   ariaCleanerLabel: 'string',
@@ -259,6 +261,10 @@ class DatePicker extends PickerBase {
   }
 
   // Private
+  override _originalDefault(): Record<string, any> {
+    return ORIGINAL_DEFAULT
+  }
+
   override _managedClassNames(): string[] {
     return [
       CLASS_NAME_DATE_PICKER,
@@ -286,7 +292,7 @@ class DatePicker extends PickerBase {
     this._fieldElement = ownField ?? appendControlGroupField(inputGroup, inputEl, this._config.floatingLabel, `${this.constructor.NAME}-`)
 
     const withTime = (value: string, key: 'ariaCleanerLabel' | 'ariaPickerLabel', timed: string) =>
-      this._config.timepicker && value === Default[key] ? timed : value
+      this._config.timepicker && value === ORIGINAL_DEFAULT[key] ? timed : value
 
     const action = (className: string, icon: string, label: string) => createControlGroupAction({
       className, disabled: this._config.disabled, icon, label, sanitizeIcon: (value: string) => sanitizeByConfig(value, this._config)

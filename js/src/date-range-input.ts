@@ -169,6 +169,8 @@ const Default: DateRangeInputConfig = {
 
 }
 
+const ORIGINAL_DEFAULT: DateRangeInputConfig = { ...Default }
+
 const DefaultType: Record<string, string> = {
   allowList: 'object',
   ariaDayLabel: 'string',
@@ -459,7 +461,7 @@ class DateRangeInput extends BaseComponent {
     const forwarded: Record<string, any> = {}
 
     for (const key of Object.keys(DateInput.Default)) {
-      if (key in this._config && this._config[key] !== (Default as Record<string, any>)[key]) {
+      if (key in this._config && this._config[key] !== (ORIGINAL_DEFAULT as Record<string, any>)[key]) {
         forwarded[key] = this._config[key]
       }
     }

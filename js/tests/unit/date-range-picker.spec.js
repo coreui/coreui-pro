@@ -1,3 +1,4 @@
+import DateRangeInput from '../../src/date-range-input.js'
 import DateRangePicker from '../../src/date-range-picker.js'
 import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
 
@@ -26,6 +27,40 @@ describe('DateRangePicker', () => {
   }
 
   describe('constructor', () => {
+    it('should let a global picker default reach the calendar and win over a global field default', () => {
+      const pickerSelection = DateRangePicker.Default.selectionType
+      const pickerLabel = DateRangePicker.Default.ariaStartLabel
+      const fieldLabel = DateRangeInput.Default.ariaStartLabel
+      DateRangePicker.Default.selectionType = 'month'
+      DateRangePicker.Default.ariaStartLabel = 'Od'
+      DateRangeInput.Default.ariaStartLabel = 'Początek'
+
+      try {
+        const picker = buildPicker({ locale: 'en-US' })
+        picker.show()
+
+        expect(picker._calendar._config.selectionType).toEqual('month')
+        expect(fixtureEl.querySelector('#picker .form-date-time').getAttribute('aria-label')).toEqual('Od')
+      } finally {
+        DateRangePicker.Default.selectionType = pickerSelection
+        DateRangePicker.Default.ariaStartLabel = pickerLabel
+        DateRangeInput.Default.ariaStartLabel = fieldLabel
+      }
+    })
+
+    it('should keep a global field default the picker leaves alone', () => {
+      const fieldLabel = DateRangeInput.Default.ariaStartLabel
+      DateRangeInput.Default.ariaStartLabel = 'Początek'
+
+      try {
+        buildPicker({ locale: 'en-US' })
+
+        expect(fixtureEl.querySelector('#picker .form-date-time').getAttribute('aria-label')).toEqual('Początek')
+      } finally {
+        DateRangeInput.Default.ariaStartLabel = fieldLabel
+      }
+    })
+
     it('should check the options it reads under its own name', () => {
       for (const [option, value] of [['format', 42], ['selectionType', 7]]) {
         expect(() => buildPicker({ [option]: value })).toThrowError(new RegExp(`^DATE-RANGE-PICKER: Option "${option}"`))

@@ -1365,6 +1365,19 @@ describe('DatePicker', () => {
         .toEqual('Clear date and time')
     })
 
+    it('should keep a globally localised action label when the time is on', () => {
+      const { ariaCleanerLabel } = DatePicker.Default
+      DatePicker.Default.ariaCleanerLabel = 'Wyczyść'
+
+      try {
+        buildPicker({ timepicker: true, locale: 'en-US' })
+
+        expect(fixtureEl.querySelector('.form-control-cleaner').getAttribute('aria-label')).toEqual('Wyczyść')
+      } finally {
+        DatePicker.Default.ariaCleanerLabel = ariaCleanerLabel
+      }
+    })
+
     it('should give an adopted toggle the same wording as a generated one', () => {
       buildPicker({ timepicker: true, locale: 'en-US' }, '<div id="picker"><button data-coreui-picker-toggle></button></div>')
 
