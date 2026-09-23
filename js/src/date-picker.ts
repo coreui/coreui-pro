@@ -23,7 +23,7 @@ import TimeSelects from './time-selection/selects.js'
 import {
   convertToDateObject,
   getDateBySelectionType,
-  isSameDateAs,
+  isSameInstantAs,
   type SelectionTypes
 } from './util/calendar.js'
 import type { ComponentConfig } from './util/config.js'
@@ -464,16 +464,16 @@ class DatePicker extends PickerBase {
 
     this._applying = true
 
-    if (field) {
-      this._input.setConfig({ date })
+    try {
+      if (field) {
+        this._input.setConfig({ date })
+      }
+    } finally {
+      this._applying = false
     }
 
     const applied = field ? this._input.getDate() : date
-    this._applying = false
-
-    const changed = this._config.timepicker ?
-      (applied ? applied.getTime() : null) !== (this._date ? this._date.getTime() : null) :
-      !isSameDateAs(applied, this._date)
+    const changed = !isSameInstantAs(applied, this._date)
     this._date = applied
 
     if (calendar) {

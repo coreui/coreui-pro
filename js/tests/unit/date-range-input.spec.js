@@ -120,6 +120,50 @@ describe('DateRangeInput', () => {
       expect(range.getEndDate()).toBeNull()
     })
 
+    it('should keep working after setRange throws on a bad argument', () => {
+      const range = build()
+      const seen = []
+      root().addEventListener('rangeChange.coreui.date-range-input', event => seen.push([event.startDate, event.endDate]))
+
+      expect(() => range.setRange(undefined, null)).toThrowError(TypeError)
+
+      range.setRange(new Date(2026, 6, 14), new Date(2026, 6, 20))
+      range._endInput.setConfig({ date: new Date(2026, 6, 21) })
+
+      expect(seen).toEqual([
+        [new Date(2026, 6, 14), new Date(2026, 6, 20)],
+        [new Date(2026, 6, 14), new Date(2026, 6, 21)]
+      ])
+    })
+
+    it('should keep working after a date the field cannot read', () => {
+      const range = build()
+      const frame = document.createElement('iframe')
+      fixtureEl.append(frame)
+      const foreignDate = new frame.contentWindow.Date(2026, 6, 14)
+
+      expect(() => range.setRange(foreignDate, null)).toThrowError(TypeError)
+
+      range.setRange(new Date(2026, 6, 20), new Date(2026, 6, 25))
+
+      expect(range.getStartDate()).toEqual(new Date(2026, 6, 20))
+      expect(range.getEndDate()).toEqual(new Date(2026, 6, 25))
+    })
+
+    it('should reject a setRange with a bad end before writing either field', () => {
+      const range = build()
+      const seen = []
+      root().addEventListener('rangeChange.coreui.date-range-input', event => seen.push([event.startDate, event.endDate]))
+
+      expect(() => range.setRange(new Date(2026, 6, 14))).toThrowError(TypeError)
+      expect(hiddenInputs().map(input => input.value)).toEqual(['', ''])
+
+      range._endInput.setConfig({ date: new Date(2026, 6, 20) })
+
+      expect(range.getStartDate()).toBeNull()
+      expect(seen).toEqual([[null, new Date(2026, 6, 20)]])
+    })
+
     it('should flag an end before the start on the frame and lift it once fixed', () => {
       const range = build()
 

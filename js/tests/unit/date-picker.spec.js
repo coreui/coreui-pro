@@ -460,6 +460,32 @@ describe('DatePicker', () => {
       expect(emitted.date).toBeNull()
       expect(picker.getDate()).toBeNull()
     })
+
+    it('should keep working after setDate throws on a bad argument', () => {
+      const picker = buildPicker({ locale: 'en-US' })
+      const el = fixtureEl.querySelector('#picker')
+      const emitted = []
+      el.addEventListener('dateChange.coreui.date-picker', event => emitted.push(event.date))
+
+      expect(() => picker.setDate(undefined)).toThrowError(TypeError)
+
+      picker.setDate(new Date(2026, 6, 20))
+      picker._input.setConfig({ date: new Date(2026, 6, 21) })
+
+      expect(emitted).toEqual([new Date(2026, 6, 20), new Date(2026, 6, 21)])
+      expect(picker.getDate()).toEqual(new Date(2026, 6, 21))
+    })
+
+    it('should report a change of the time a time-bearing format holds', () => {
+      const picker = buildPicker({ locale: 'en-US', format: 'MM/dd/yyyy HH:mm', date: new Date(2026, 6, 14, 9, 0) })
+      const el = fixtureEl.querySelector('#picker')
+      const emitted = []
+      el.addEventListener('dateChange.coreui.date-picker', event => emitted.push(event.date))
+
+      picker.setDate(new Date(2026, 6, 14, 10, 30))
+
+      expect(emitted).toEqual([new Date(2026, 6, 14, 10, 30)])
+    })
   })
 
   describe('date selection', () => {
