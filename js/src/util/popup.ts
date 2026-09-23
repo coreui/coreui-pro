@@ -44,7 +44,7 @@ type PopupConfig = {
   onHide: (() => void) | null
   onShow: (() => void) | null
   onShown: (() => void) | null
-  placement: string
+  placement: Placement
   returnFocus: boolean
 }
 
@@ -149,7 +149,7 @@ class Popup extends Config {
   protected declare _keydownListener: any
   protected declare _contentKeydownListener: any
   protected declare _anchorKeydownListener: any
-  protected declare _focustrap: any
+  protected declare _focustrap: FocusTrap | null
   protected declare _config: PopupConfig
 
   constructor(config?: Partial<PopupConfig> | null) {
@@ -191,11 +191,11 @@ class Popup extends Config {
     return NAME
   }
 
-  get isShown(): any {
+  get isShown(): boolean {
     return this._isShown
   }
 
-  get isMobile(): any {
+  get isMobile(): boolean {
     return window.matchMedia(`(max-width: ${this._config.mobileBreakpoint - 1}px)`).matches
   }
 
@@ -235,7 +235,7 @@ class Popup extends Config {
     execute(this._config.onShown)
   }
 
-  hide(): any {
+  hide(): void {
     if (!this._isShown || execute(this._config.onBeforeHide) === false) {
       return
     }
@@ -269,7 +269,7 @@ class Popup extends Config {
     executeAfterTransition(() => this._unmount(), this._content!)
   }
 
-  toggle(): any {
+  toggle(): void {
     return this._isShown ? this.hide() : this.show()
   }
 
@@ -365,7 +365,7 @@ class Popup extends Config {
     }
   }
 
-  _updatePosition(): any {
+  _updatePosition(): void {
     const [skidding, distance] = this._config.offset
     const middleware = [
       offset({ crossAxis: skidding, mainAxis: distance }),
@@ -375,7 +375,7 @@ class Popup extends Config {
 
     computePosition(this._anchor!, this._content!, {
       middleware,
-      placement: this._config.placement as any,
+      placement: this._config.placement,
       strategy: 'absolute'
     }).then(({ x, y }) => {
       // dispose() can null the content while computePosition is in flight

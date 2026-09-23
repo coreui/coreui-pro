@@ -7,7 +7,6 @@
  */
 
 import BaseComponent from './base-component.js'
-import type { ComponentConfig } from './util/config.js'
 import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
@@ -21,6 +20,7 @@ import { defineJQueryPlugin, isRTL, jQueryDispatch } from './util/index.js'
 import {
   convertToDateObject,
   createGroupsInArray,
+  type DisabledDate,
   getCalendarDate,
   getDateBySelectionType,
   getMonthDetails,
@@ -40,6 +40,7 @@ import {
   isYearDisabled,
   isYearInRange,
   isYearSelected,
+  type SelectionTypes,
   setTimeFromDate,
   type ViewTypes
 } from './util/calendar.js'
@@ -98,6 +99,17 @@ const SELECTOR_CALENDAR_ROW = '.calendar-row'
 const SELECTOR_CALENDAR_ROW_CLICKABLE = `${SELECTOR_CALENDAR_ROW}[data-coreui-selectable]`
 const SELECTOR_DATA_CALENDAR = '[data-coreui-calendar]'
 
+type CalendarCellMeta = {
+  isDisabled: boolean
+  isInRange: boolean
+  isSelected: boolean
+}
+
+type CalendarDayCellMeta = CalendarCellMeta & {
+  isInCurrentMonth: boolean
+  isToday: boolean
+}
+
 // Navigation icons live in JavaScript, not in CSS masks — the chips pattern:
 // inline SVG on currentColor, swappable through an option, sanitized like any
 // user-provided markup.
@@ -110,34 +122,34 @@ type CalendarConfig = {
   ariaNavPrevYearLabel: string
   calendarDate: Date | number | string | null
   calendars: number
-  dayFormat: ((date: Date) => string) | string
-  disabledDates: any
+  dayFormat: 'numeric' | '2-digit'
+  disabledDates: DisabledDate | DisabledDate[] | null
   endDate: Date | number | string | null
   firstDayOfWeek: number
   locale: string
   maxDate: Date | number | string | null
   minDate: Date | number | string | null
-  monthFormat: ((date: Date) => string) | string
+  monthFormat: 'long' | 'narrow' | 'short' | 'numeric' | '2-digit'
   navIconDoubleNext: string
   navIconDoublePrev: string
   navIconNext: string
   navIconPrev: string
   range: boolean
-  renderDayCell: ((date: Date) => string) | null
-  renderMonthCell: ((date: Date) => string) | null
-  renderQuarterCell: ((date: Date) => string) | null
-  renderYearCell: ((date: Date) => string) | null
+  renderDayCell: ((date: Date, meta?: CalendarDayCellMeta) => string) | null
+  renderMonthCell: ((date: Date, meta: CalendarCellMeta) => string) | null
+  renderQuarterCell: ((date: Date, meta: CalendarCellMeta) => string) | null
+  renderYearCell: ((date: Date, meta: CalendarCellMeta) => string) | null
   sanitize: boolean
   sanitizeFn: ((unsafeHtml: string) => string) | null
   selectAdjacentDays: boolean
   selectEndDate: boolean
-  selectionType: string
+  selectionType: SelectionTypes
   showAdjacentDays: boolean
   showWeekNumber: boolean
   startDate: Date | number | string | null
-  weekdayFormat: number | string
+  weekdayFormat: number | 'long' | 'narrow' | 'short'
   weekNumbersLabel: string | null
-  yearFormat: ((date: Date) => string) | string
+  yearFormat: 'numeric' | '2-digit'
 }
 
 const Default: CalendarConfig = {
@@ -229,10 +241,10 @@ class Calendar extends BaseComponent {
   protected declare _maxDate: Date | null
   protected declare _hoverDate: Date | null
   protected declare _selectEndDate: boolean
-  protected declare _view: string
+  protected declare _view: ViewTypes
   protected declare _formatters: Map<string, Intl.DateTimeFormat>
 
-  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
+  constructor(element?: string | Element | null, config?: Partial<CalendarConfig> | null) {
     super(element)
 
     this._formatters = new Map()
@@ -257,7 +269,7 @@ class Calendar extends BaseComponent {
   }
 
   // Public
-  setConfig(config: any): void {
+  setConfig(config?: Partial<CalendarConfig> | null): void {
     this._config = this._getConfig({ ...this._config, ...config })
     this._initializeDates(Object.keys(config ?? {}))
 
@@ -607,7 +619,7 @@ class Calendar extends BaseComponent {
       months: isMonthDisabled,
       quarters: isQuarterDisabled,
       years: isYearDisabled
-    }[this._view as ViewTypes]
+    }[this._view]
 
     return !isDisabled(date, this._minDate, this._maxDate, this._config.disabledDates)
   }
@@ -783,7 +795,7 @@ class Calendar extends BaseComponent {
     })
   }
 
-  _setCalendarView(view: string, source?: string): void {
+  _setCalendarView(view: ViewTypes, source?: string): void {
     this._view = view
 
     EventHandler.trigger(this._element, EVENT_CALENDAR_VIEW_CHANGE, {
@@ -885,7 +897,7 @@ class Calendar extends BaseComponent {
   }
 
   _createCalendarPanel(order: number): HTMLElement {
-    const calendarDate = getCalendarDate(this._calendarDate, order, this._view as ViewTypes)
+    const calendarDate = getCalendarDate(this._calendarDate, order, this._view)
     const year = calendarDate.getFullYear()
     const month = calendarDate.getMonth()
 
@@ -1167,7 +1179,7 @@ class Calendar extends BaseComponent {
   }
 
   _initializeView(): void {
-    const viewMap = {
+    const viewMap: Record<string, ViewTypes> = {
       day: 'days',
       week: 'days',
       month: 'months',
@@ -1175,7 +1187,7 @@ class Calendar extends BaseComponent {
       year: 'years'
     }
 
-    this._view = (viewMap as Record<string, string>)[this._config.selectionType] || 'days'
+    this._view = viewMap[this._config.selectionType] || 'days'
   }
 
   _updateCalendar(callback?: () => void): void {
@@ -1205,7 +1217,7 @@ class Calendar extends BaseComponent {
         row.toggleAttribute('data-coreui-selectable', rowAttributes.selectable)
 
         if (rowAttributes.ariaSelected) {
-          row.setAttribute('aria-selected', true as any)
+          row.setAttribute('aria-selected', 'true')
         } else {
           row.removeAttribute('aria-selected')
         }
@@ -1251,7 +1263,7 @@ class Calendar extends BaseComponent {
       cell.toggleAttribute('data-coreui-selectable', cellAttributes.selectable)
 
       if (cellAttributes.ariaSelected) {
-        cell.setAttribute('aria-selected', true as any)
+        cell.setAttribute('aria-selected', 'true')
       } else {
         cell.removeAttribute('aria-selected')
       }
@@ -1518,3 +1530,4 @@ EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
 defineJQueryPlugin(Calendar)
 
 export default Calendar
+export type { CalendarCellMeta, CalendarConfig, CalendarDayCellMeta }

@@ -14,8 +14,8 @@
  */
 
 import PickerBase from './picker-base.js'
-import Calendar from './calendar.js'
-import DateInput from './date-input.js'
+import Calendar, { type CalendarConfig } from './calendar.js'
+import DateInput, { type DateInputConfig } from './date-input.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import type { SectionInputConfig } from './section-input.js'
@@ -79,7 +79,7 @@ type DatePickerConfig = {
   allowList: SanitizerAllowList,
   ariaCleanerLabel: string,
   ariaPickerLabel: string,
-  calendarOptions: Record<string, any>,
+  calendarOptions: Partial<CalendarConfig>,
   cleaner: boolean,
   cleanerIcon: string,
   container: Element | boolean | string,
@@ -87,7 +87,7 @@ type DatePickerConfig = {
   disabled: boolean,
   floatingLabel: string | null,
   format: SectionInputConfig['format'],
-  inputOptions: Record<string, any>,
+  inputOptions: Partial<DateInputConfig>,
   locale: string,
   maxDate: Date | string | null,
   minDate: Date | string | null,
@@ -529,3 +529,4 @@ EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
 defineJQueryPlugin(DatePicker)
 
 export default DatePicker
+export type { DatePickerConfig }

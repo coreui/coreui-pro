@@ -12,8 +12,8 @@
  */
 
 import PickerBase from './picker-base.js'
-import Calendar from './calendar.js'
-import DateRangeInput from './date-range-input.js'
+import Calendar, { type CalendarConfig } from './calendar.js'
+import DateRangeInput, { type DateRangeInputConfig } from './date-range-input.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import type { SectionInputConfig } from './section-input.js'
@@ -64,7 +64,7 @@ type DateRangePickerConfig = {
   ariaEndLabel: string,
   ariaPickerLabel: string,
   ariaStartLabel: string,
-  calendarOptions: Record<string, any>,
+  calendarOptions: Partial<CalendarConfig>,
   calendars: number,
   cleaner: boolean,
   cleanerIcon: string,
@@ -74,7 +74,7 @@ type DateRangePickerConfig = {
   endFloatingLabel: string | null,
   endName: string | null,
   format: SectionInputConfig['format'],
-  inputOptions: Record<string, any>,
+  inputOptions: Partial<DateRangeInputConfig>,
   locale: string,
   maxDate: Date | string | null,
   minDate: Date | string | null,
@@ -447,3 +447,4 @@ EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
 defineJQueryPlugin(DateRangePicker)
 
 export default DateRangePicker
+export type { DateRangePickerConfig }
