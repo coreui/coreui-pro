@@ -2,10 +2,6 @@
  * --------------------------------------------------------------------------
  * CoreUI PRO util/form-control-group.js
  * License (https://coreui.io/pro/license/)
- *
- * The JavaScript side of the `.form-control-group` primitive: components that
- * assemble a control out of parts build their adornments the same way, so the
- * markup contract lives in one place rather than in each shell.
  * --------------------------------------------------------------------------
  */
 
@@ -18,12 +14,6 @@ const CLASS_NAME_STAYS_ON_CONTROL = /^(?:is|was|js)-/
 
 export const SIZE_CLASS_NAMES: string[] = [`${CLASS_NAME_FORM_CONTROL}-lg`, `${CLASS_NAME_FORM_CONTROL}-sm`]
 
-/**
- * Puts the configured size on the frame in place of one the markup carried, so
- * the two cannot both apply and leave the winner to stylesheet order.
- * @param {HTMLElement} element The frame.
- * @param {string | null} size The configured size, or null to leave sizes alone.
- */
 export const applyControlGroupSize = (element: HTMLElement, size: string | null): void => {
   if (!size) {
     return
@@ -33,39 +23,16 @@ export const applyControlGroupSize = (element: HTMLElement, size: string | null)
   element.classList.add(`${CLASS_NAME_FORM_CONTROL}-${size}`)
 }
 
-/**
- * The size classes a component owns: none until it is given a size, and then
- * the pair it may have replaced plus the one it applied.
- * @param {string | null} size The configured size.
- * @returns {string[]} The owned size classes, without duplicates.
- */
 export const managedSizeClassNames = (size: string | null): string[] =>
   size ? [...new Set([...SIZE_CLASS_NAMES, `${CLASS_NAME_FORM_CONTROL}-${size}`])] : []
 
 export type HostClasses = { classNames: string[], hadAttribute: boolean }
 
-/**
- * Records which of the classes a component is about to manage the host already
- * carried, so teardown can tell its own additions from the page's markup.
- * @param {HTMLElement} element The host the component builds on.
- * @param {string[]} managed Every class this component may put on the host.
- * @returns {HostClasses} What the host carried before the component ran.
- */
 export const captureHostClasses = (element: HTMLElement, managed: string[]): HostClasses => ({
   classNames: managed.filter(className => element.classList.contains(className)),
   hadAttribute: element.hasAttribute('class')
 })
 
-/**
- * Puts the managed classes back the way the page had them: the ones it wrote
- * stay, the ones the component added go. Classes outside `managed` are never
- * touched, so anything the page added or removed in the meantime survives —
- * which is why a component owns the size classes only while it has a size of
- * its own to apply.
- * @param {HTMLElement} element The host to give back.
- * @param {string[]} managed Every class this component may have put on the host.
- * @param {HostClasses} host What `captureHostClasses` recorded.
- */
 export const restoreHostClasses = (element: HTMLElement, managed: string[], host: HostClasses): void => {
   for (const className of managed) {
     element.classList.toggle(className, host.classNames.includes(className))
@@ -76,16 +43,6 @@ export const restoreHostClasses = (element: HTMLElement, managed: string[], host
   }
 }
 
-/**
- * Turns an element the author wrote into the frame. The frame transitions its
- * border colour, and an element that was not one a moment ago still carries the
- * initial `currentColor` — so without silencing the transition for that one
- * frame the takeover animates from the text colour to the border colour, a
- * black-to-grey flash on load. An element that is already a frame just gets
- * the extra classes.
- * @param {HTMLElement} element The element to turn into a frame.
- * @param {...string} classNames The frame class plus any component classes.
- */
 export const applyControlGroupClasses = (element: HTMLElement, ...classNames: string[]): void => {
   if (element.classList.contains(CLASS_NAME_GROUP)) {
     element.classList.add(...classNames)
@@ -110,20 +67,6 @@ export type ControlGroup = {
   movedClassNames: string[]
 }
 
-/**
- * Returns the group a control sits in, building one around it when there is
- * none. A component that supplies its own adornments can supply the frame that
- * lays them out too, so its markup is a plain form control.
- *
- * Everything the author wrote on that control except `.form-control` moves to
- * the group: a class on the control describes the field, and once it is
- * wrapped the field is the frame — a margin left behind would sit inside the
- * border. State classes (`is-*`, `was-*`) and `js-*` hooks stay: the control
- * is the source of truth the frame reads through `:has()`, and application
- * code keeps finding the control it wrote them on.
- * @param {HTMLElement} element The control.
- * @returns {ControlGroup} The group, whether it was created, and the classes moved onto it.
- */
 export const ensureControlGroup = (element: HTMLElement): ControlGroup => {
   const existing = element.closest<HTMLElement>(`.${CLASS_NAME_GROUP}`)
 
@@ -144,13 +87,6 @@ export const ensureControlGroup = (element: HTMLElement): ControlGroup => {
   return { created: true, element: group, movedClassNames }
 }
 
-/**
- * Undoes ensureControlGroup: the classes go back on the control, and a group
- * this library created is removed. One the author wrote stays — it is theirs,
- * and may hold more than this control.
- * @param {HTMLElement} element The control.
- * @param {ControlGroup} group The group returned by ensureControlGroup.
- */
 export const releaseControlGroup = (element: HTMLElement, group: ControlGroup): void => {
   element.classList.add(...group.movedClassNames)
   group.element.classList.remove(...group.movedClassNames)
@@ -169,23 +105,6 @@ type ActionOptions = {
   sanitizeIcon: (icon: string) => string
 }
 
-/**
- * Builds an adornment button for a form control group.
- * @param {object} options The button's class, icon, accessible label, disabled state and the icon sanitizer.
- * @returns {HTMLButtonElement} The button.
- */
-/**
- * Appends a field to the group — wrapped in its own `.form-floating` with a
- * rendered `<label>` when `floatingLabel` is set, so a generated frame can
- * carry a floating label without any wrapper markup from the author. The
- * label text is the visible half; passing it on as the field's accessible
- * name is the caller's job, so the two stay one thing.
- * @param {HTMLElement} group The `.form-control-group` frame.
- * @param {HTMLElement} field The control to append.
- * @param {string | null} floatingLabel The label text, or null to append bare.
- * @param {string} uidPrefix Prefix for the generated id the label points at.
- * @returns {HTMLElement} The node appended to the group — the field, or its `.form-floating` wrapper.
- */
 export const appendControlGroupField = (group: HTMLElement, field: HTMLElement, floatingLabel: string | null, uidPrefix: string): HTMLElement => {
   if (!floatingLabel) {
     group.append(field)
@@ -198,7 +117,6 @@ export const appendControlGroupField = (group: HTMLElement, field: HTMLElement, 
   const label = document.createElement('label')
   label.htmlFor = field.id
   label.textContent = floatingLabel
-  // Label first — a screen reader announces it before the field's value.
   wrapper.append(label, field)
   group.append(wrapper)
 

@@ -2,14 +2,6 @@
  * --------------------------------------------------------------------------
  * CoreUI PRO date-picker.js
  * License (https://coreui.io/pro/license/)
- *
- * Composed from existing components — DateInput (section field), Calendar and
- * the Popup — joined by one piece of state, the date, that the picker owns.
- * The markup is the composition surface: a field, a toggle and a cleaner the
- * author wrote (by role attribute) are adopted; whatever is missing is
- * generated, so a bare `<div data-coreui-date-picker>` keeps working.
- * Projected regions (footer) come from a <template> child and act through the
- * slot context, not through configuration props.
  * --------------------------------------------------------------------------
  */
 
@@ -71,9 +63,6 @@ const SELECTOR_ROLE_CLEANER = '[data-coreui-picker-cleaner]'
 const SELECTOR_ROLE_FIELD = '[data-coreui-picker-field]'
 const SELECTOR_ROLE_TOGGLE = '[data-coreui-picker-toggle]'
 const SELECTOR_ACTION_TODAY = '[data-coreui-picker-action="today"]'
-
-// Icons live in JavaScript only as the fallback for the minimal markup: an
-// author who writes the toggle or the cleaner puts the SVG in the HTML.
 
 type DatePickerConfig = {
   allowList: SanitizerAllowList,
@@ -213,8 +202,6 @@ class DatePicker extends PickerBase {
     return this._date
   }
 
-  // The field validates the date against min/max — the emitted value and the
-  // calendar selection follow the validation outcome, not the argument.
   setDate(date: Date | null): void {
     this._applyDate(date)
   }
@@ -241,7 +228,6 @@ class DatePicker extends PickerBase {
     }
   }
 
-  // Markup the author wrote stays; only what the picker generated is removed.
   override _disposeParts(): void {
     this._input.dispose()
     this._calendar?.dispose()
@@ -277,15 +263,11 @@ class DatePicker extends PickerBase {
   _createDatePicker(): void {
     this._element.classList.add(CLASS_NAME_DATE_PICKER, CLASS_NAME_PICKER)
 
-    // The root is the frame: a field component has nothing to wrap, so it
-    // carries `.form-control-group` itself instead of nesting one.
     const inputGroup = this._element
     applyControlGroupClasses(inputGroup, CLASS_NAME_INPUT_GROUP)
 
-    // Sizing rides the standard control classes on the frame itself
     applyControlGroupSize(inputGroup, this._config.size)
 
-    // Markup first: a part the author wrote is adopted, a missing one is built.
     const ownField = SelectorEngine.findOne(SELECTOR_ROLE_FIELD, inputGroup)
     const inputEl = ownField ?? document.createElement('div')
     this._created.field = !ownField
@@ -374,16 +356,10 @@ class DatePicker extends PickerBase {
     }
   }
 
-  // A button opting into the `today` action opts into its state too: it is
-  // disabled when today cannot be selected. One-way only — the picker never
-  // re-enables a projected button, so a `disabled` set in the template stays.
   override _isNowSelectable(): boolean {
     return this._input.isDateSelectable(new Date())
   }
 
-  // The calendar is ~83% of the picker's DOM and construction cost, and it is
-  // not observable before the popup opens — so it is built on first show, in
-  // its final DOM position (which is also where it can resolve its direction).
   _ensureCalendar(): void {
     if (this._calendar) {
       return
@@ -456,10 +432,6 @@ class DatePicker extends PickerBase {
     this._applyDate(merged, { selection: false })
   }
 
-  // The one place the date changes. The field validates it, so what the
-  // picker keeps and announces is what the field holds — a selection the
-  // field refused (min/max) becomes null, not the day that was clicked. The
-  // side that reported the change is not written back to.
   _applyDate(date: Date | null, { calendar = true, field = true, selection = true }: { calendar?: boolean, field?: boolean, selection?: boolean } = {}): void {
     if (this._applying) {
       return

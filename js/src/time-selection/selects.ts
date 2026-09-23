@@ -2,8 +2,6 @@
  * --------------------------------------------------------------------------
  * CoreUI PRO time-selection/selects.js
  * License (https://coreui.io/pro/license/)
- *
- * The native-select rendering of the time selection body.
  * --------------------------------------------------------------------------
  */
 
