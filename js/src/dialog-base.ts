@@ -248,7 +248,7 @@ class DialogBase extends BaseComponent {
       }
     }
 
-    for (const element of SelectorEngine.find('.show', this._element)) {
+    for (const element of SelectorEngine.find('*', this._element)) {
       for (const key of POPUP_DATA_KEYS) {
         const instance = Data.get(element, key)
         if (instance && typeof instance.hide === 'function') {
