@@ -460,6 +460,21 @@ describe('DatePicker', () => {
       expect(emitted.date).toBeNull()
       expect(picker.getDate()).toBeNull()
     })
+
+    it('should keep working after setDate throws on a bad argument', () => {
+      const picker = buildPicker({ locale: 'en-US' })
+      const el = fixtureEl.querySelector('#picker')
+      const emitted = []
+      el.addEventListener('dateChange.coreui.date-picker', event => emitted.push(event.date))
+
+      expect(() => picker.setDate(undefined)).toThrowError(TypeError)
+
+      picker.setDate(new Date(2026, 6, 20))
+      picker._input.setConfig({ date: new Date(2026, 6, 21) })
+
+      expect(emitted).toEqual([new Date(2026, 6, 20), new Date(2026, 6, 21)])
+      expect(picker.getDate()).toEqual(new Date(2026, 6, 21))
+    })
   })
 
   describe('date selection', () => {

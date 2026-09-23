@@ -120,6 +120,22 @@ describe('DateRangeInput', () => {
       expect(range.getEndDate()).toBeNull()
     })
 
+    it('should keep working after setRange throws on a bad argument', () => {
+      const range = build()
+      const seen = []
+      root().addEventListener('rangeChange.coreui.date-range-input', event => seen.push([event.startDate, event.endDate]))
+
+      expect(() => range.setRange(undefined, null)).toThrowError(TypeError)
+
+      range.setRange(new Date(2026, 6, 14), new Date(2026, 6, 20))
+      range._endInput.setConfig({ date: new Date(2026, 6, 21) })
+
+      expect(seen).toEqual([
+        [new Date(2026, 6, 14), new Date(2026, 6, 20)],
+        [new Date(2026, 6, 14), new Date(2026, 6, 21)]
+      ])
+    })
+
     it('should flag an end before the start on the frame and lift it once fixed', () => {
       const range = build()
 
