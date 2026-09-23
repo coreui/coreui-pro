@@ -699,41 +699,6 @@ export const getDateBySelectionType = (date: Date | null, selectionType: Selecti
 }
 
 /**
- * Retrieves the first available date within a range that is not disabled.
- * @param startDate - Start date of the range.
- * @param endDate - End date of the range.
- * @param min - Minimum allowed date.
- * @param max - Maximum allowed date.
- * @param disabledDates - Criteria for disabled dates.
- * @returns The first available Date object or null if none found.
- */
-export const getFirstAvailableDateInRange = (startDate: Date, endDate: Date, min?: Date | null, max?: Date | null, disabledDates?: DisabledDate | DisabledDate[]) : Date | null => {
-  const _min = min ?
-    new Date(Math.max(startDate.getTime(), min.getTime())) :
-    startDate
-  const _max = max ?
-    new Date(Math.min(endDate.getTime(), max.getTime())) :
-    endDate
-
-  if (disabledDates === undefined) {
-    return _min
-  }
-
-  for (
-    const currentDate = new Date(_min);
-    // eslint-disable-next-line no-unmodified-loop-condition
-    currentDate <= _max;
-    currentDate.setDate(currentDate.getDate() + 1)
-  ) {
-    if (!isDateDisabled(currentDate, min, max, disabledDates)) {
-      return currentDate
-    }
-  }
-
-  return null
-}
-
-/**
  * Retrieves an array of month names based on locale and format.
  * @param locale - The locale string (e.g., 'en-US').
  * @param format - The format of the month names ('short' or 'long').
@@ -742,16 +707,6 @@ export const getFirstAvailableDateInRange = (startDate: Date, endDate: Date, min
 export const getMonthsNames = (locale: string, format: 'long' | 'narrow' | 'short' | 'numeric' | '2-digit' = 'short') : string[] => {
   const formatter = new Intl.DateTimeFormat(locale, { month: format })
   return Array.from({ length: 12 }, (_, i) => formatter.format(new Date(2000, i, 1)))
-}
-
-/**
- * Retrieves an array of selectable dates from the given element.
- * @param element - The HTML element to search for selectable dates.
- * @param selector - The CSS selector used to identify selectable dates. Defaults to 'tr[data-coreui-selectable], td[data-coreui-selectable]'.
- * @returns An array of HTMLElements representing the selectable dates.
- */
-export const getSelectableDates = (element: HTMLElement, selector: string = 'tr[data-coreui-selectable], td[data-coreui-selectable]'): Element[] => {
-  return [...Element.prototype.querySelectorAll.call(element, selector)]
 }
 
 /**
@@ -1329,34 +1284,8 @@ export const parseYearSmart = (yearString: string) : number => {
  * @param groups - The year groups containing year string.
  * @returns A Date object for January 1st of the year.
  */
-export const createDateFromYear = (groups: YearGroups) : Date => {
+const createDateFromYear = (groups: YearGroups) : Date => {
   const { year } = groups
   const parsedYear = parseYearSmart(year)
   return new Date(parsedYear, 0, 1)
-}
-
-/**
- * Creates a date from month groups.
- * @param groups - The month groups containing year and month strings.
- * @returns A Date object for the first day of the month.
- */
-export const createDateFromMonth = (groups: MonthGroups) : Date => {
-  const { year, month } = groups
-  const parsedYear = parseYearSmart(year)
-  const parsedMonth = Number.parseInt(month, 10) - 1
-  return new Date(parsedYear, parsedMonth, 1)
-}
-
-/**
- * Creates a date from week groups.
- * @param groups - The week groups containing year and week strings.
- * @returns A Date object for the Monday of the specified week.
- */
-export const createDateFromWeek = (groups: WeekGroups) : Date => {
-  const { year, week } = groups
-  const parsedYear = parseYearSmart(year)
-  const parsedWeek = Number.parseInt(week, 10)
-
-  // Create date from ISO week using helper function
-  return getMondayOfISOWeek(parsedYear, parsedWeek)
 }

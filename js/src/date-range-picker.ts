@@ -20,7 +20,7 @@ import type { SectionInputConfig } from './section-input.js'
 import { captureHostClasses, createControlGroupAction } from './util/form-control-group.js'
 import { getDateBySelectionType, type SelectionTypes } from './util/calendar.js'
 import type { ComponentConfig } from './util/config.js'
-import { getWeekSectionsFromLocale } from './util/date-sections.js'
+import { getPickerFormat } from './util/date-sections.js'
 import {
   CALENDAR_ICON, CLEANER_ICON, SEPARATOR_ICON, SEPARATOR_ICON_RTL
 } from './util/icons.js'
@@ -253,20 +253,6 @@ class DateRangePicker extends PickerBase {
     ].filter(Boolean) as string[]
   }
 
-  // See DatePicker._resolveFormat — a date mask can only express the sections
-  // it has, so every non-day selection type gets a matching default mask.
-  _resolveFormat(): any {
-    if (this._config.format) {
-      return this._config.format
-    }
-
-    const byType = {
-      month: 'MM/yyyy', quarter: 'QQQ yyyy', week: getWeekSectionsFromLocale, year: 'yyyy'
-    }
-
-    return (byType as Record<string, any>)[this._config.selectionType] ?? null
-  }
-
   _setSelectEndDate(value: boolean): void {
     if (this._selectEndDate === value) {
       return
@@ -286,13 +272,15 @@ class DateRangePicker extends PickerBase {
     this._element.append(inputGroup)
     this._frameElement = inputGroup
 
+    const format = getPickerFormat(this._config.format, this._config.selectionType)
+
     this._rangeInput = new DateRangeInput(inputGroup, this._forwardConfig(DateRangeInput, {
       disabled: this._config.disabled,
       endDate: this._config.endDate,
       locale: this._config.locale,
       size: this._config.size,
       startDate: this._config.startDate,
-      ...(this._resolveFormat() ? { format: this._resolveFormat() } : {})
+      ...(format ? { format } : {})
     }, { inputOptions: this._config.inputOptions }))
 
     // The bridge from typed values back to the calendar. The guard stops the

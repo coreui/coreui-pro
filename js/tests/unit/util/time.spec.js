@@ -2,15 +2,11 @@
 import {
   convert12hTo24h,
   convert24hTo12h,
-  convertTimeToDate,
-  getAmPm,
-  formatTimePartials,
   getLocalizedTimePartials,
   getSelectedHour,
   getSelectedMinutes,
   getSelectedSeconds,
-  isAmPm,
-  isValidTime
+  isAmPm
 } from '../../../src/util/time.js'
 
 describe('Time Utilities', () => {
@@ -49,71 +45,15 @@ describe('Time Utilities', () => {
     })
   })
 
-  describe('convertTimeToDate', () => {
-    it('should return null for falsy values', () => {
-      expect(convertTimeToDate(null)).toBeNull()
-      expect(convertTimeToDate(undefined)).toBeNull()
-    })
-
-    it('should return the same Date if input is already a Date', () => {
-      const date = new Date('1970-01-01T05:00:00')
-      const result = convertTimeToDate(date)
-      expect(result).toBe(date)
-    })
-
-    it('should parse string times into a Date object for 1970-01-01', () => {
-      const result = convertTimeToDate('02:30:00')
-      expect(result).toBeInstanceOf(Date)
-      // We can't guarantee the time zone, but let's check hours & minutes
-      expect(result.getHours()).toBe(2)
-      expect(result.getMinutes()).toBe(30)
-    })
-  })
-
-  describe('getAmPm', () => {
-    it('should return "am" for morning times', () => {
-      const date = new Date('2023-01-01T08:00:00') // 8:00 AM
-      // Use 'en-US' for example
-      expect(getAmPm(date, 'en-US')).toBe('am')
-    })
-
-    it('should return "pm" for afternoon/evening times', () => {
-      const date = new Date('2023-01-01T15:00:00') // 3:00 PM
-      expect(getAmPm(date, 'en-US')).toBe('pm')
-    })
-
-    it('should default to hours >= 12 => pm, <12 => am if "AM"/"PM" is not found in locale time string', () => {
-      // E.g., a locale that might not include the "AM"/"PM" substring
-      const dateMorning = new Date('2023-01-01T03:00:00')
-      const dateAfternoon = new Date('2023-01-01T13:00:00')
-      // We'll pretend 'en-GB' doesn't include "AM"/"PM" (some do, but let's test logic anyway)
-      expect(getAmPm(dateMorning, 'en-GB')).toBe('am')
-      expect(getAmPm(dateAfternoon, 'en-GB')).toBe('pm')
-    })
-  })
-
-  describe('formatTimePartials', () => {
-    it('should return an array of formatted objects', () => {
-      const values = [0, 1, 2]
-      const result = formatTimePartials(values, 'en-US', 'hour')
-      expect(result).toHaveSize(3)
-
-      // Each item is { value, label: ... }
-      expect(result[0].value).toBe(0)
-      expect(result[0].label).toBeTruthy() // "12" in 12-hour or "0" in 24-hour for hour partial
-    })
-
-    it('should respect the partial type (hour, minute, second)', () => {
-      const hours = [0, 1, 23]
-      const formattedHours = formatTimePartials(hours, 'en-US', 'hour')
-      // The 'label' should reflect the hours part from the formatted date/time
-      expect(formattedHours[0].value).toBe(0)
-      expect(formattedHours[1].value).toBe(1)
-      expect(formattedHours[2].value).toBe(23)
-    })
-  })
-
   describe('getLocalizedTimePartials', () => {
+    it('should label every entry with the locale digits of its unit', () => {
+      const { listOfHours, listOfMinutes, listOfSeconds } = getLocalizedTimePartials('en-US', false, [0, 13], [0, 5], [7])
+
+      expect(listOfHours).toEqual([{ value: 0, label: '00' }, { value: 13, label: '13' }])
+      expect(listOfMinutes).toEqual([{ value: 0, label: '00' }, { value: 5, label: '05' }])
+      expect(listOfSeconds).toEqual([{ value: 7, label: '07' }])
+    })
+
     it('should generate the correct hours array for 12-hour format', () => {
       const { listOfHours, hour12 } = getLocalizedTimePartials('en-US', true)
       expect(hour12).toBeTrue()
@@ -223,19 +163,6 @@ describe('Time Utilities', () => {
       // Usually "en-GB" might or might not show 12 or 24 hour format
       // We'll just check the logic—this could be false in many environment setups
       expect(typeof result).toBe('boolean')
-    })
-  })
-
-  describe('isValidTime', () => {
-    it('should return true for a valid time string', () => {
-      expect(isValidTime('02:30:00')).toBeTrue()
-      expect(isValidTime('14:59:59')).toBeTrue()
-    })
-
-    it('should return false for invalid strings', () => {
-      expect(isValidTime('abc')).toBeFalse()
-      expect(isValidTime('25:00:00')).toBeFalse() // 25 is not a valid hour
-      expect(isValidTime('-01:00:00')).toBeFalse()
     })
   })
 })

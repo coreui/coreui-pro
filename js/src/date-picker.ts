@@ -27,7 +27,7 @@ import {
   type SelectionTypes
 } from './util/calendar.js'
 import type { ComponentConfig } from './util/config.js'
-import { getDateSections, getDateTimeSectionsFromLocale, getWeekSectionsFromLocale } from './util/date-sections.js'
+import { getPickerFormat, getSectionLayout } from './util/date-sections.js'
 import {
   appendControlGroupField,
   applyControlGroupClasses,
@@ -268,22 +268,6 @@ class DatePicker extends PickerBase {
     ].filter(Boolean) as string[]
   }
 
-  // A date mask can only express the sections it has: every non-day selection
-  // type gets a default mask matching its granularity (week mirrors the
-  // native week input's presentation, "Week 29, 2026") and day keeps the
-  // locale mask. An explicit `format` always wins.
-  _resolveFormat(): any {
-    if (this._config.format) {
-      return this._config.format
-    }
-
-    const byType = {
-      month: 'MM/yyyy', quarter: 'QQQ yyyy', week: getWeekSectionsFromLocale, year: 'yyyy'
-    }
-
-    return (byType as Record<string, any>)[this._config.selectionType] ?? null
-  }
-
   _createDatePicker(): void {
     this._element.classList.add(CLASS_NAME_DATE_PICKER, CLASS_NAME_PICKER)
 
@@ -330,6 +314,8 @@ class DatePicker extends PickerBase {
       inputGroup.append(this._toggleElement)
     }
 
+    const format = getPickerFormat(this._config.format, this._config.selectionType)
+
     this._input = new DateInput(inputEl, this._forwardConfig(DateInput, {
       date: this._config.date,
       disabled: this._config.disabled,
@@ -338,7 +324,7 @@ class DatePicker extends PickerBase {
       seconds: Boolean(this._config.seconds),
       ...(this._config.timepicker ? { type: 'datetime' } : {}),
       ...(this._config.timepicker ? this._dayBounds() : {}),
-      ...(this._resolveFormat() ? { format: this._resolveFormat() } : {})
+      ...(format ? { format } : {})
     }, { ...(this._config.floatingLabel ? { ariaLabel: this._config.floatingLabel } : {}), ...this._config.inputOptions }))
 
     EventHandler.on(inputEl, DateInput.eventName(DateInput.CHANGE_EVENT_NAME), (event: any) => {
@@ -423,10 +409,8 @@ class DatePicker extends PickerBase {
   }
 
   _hourCycle(): string | null {
-    const format = this._resolveFormat()
-    const sections = format ?
-      getDateSections(format, this._config.locale, this._config.monthNames) :
-      getDateTimeSectionsFromLocale(this._config.locale, Boolean(this._config.seconds))
+    const format = getPickerFormat(this._config.format, this._config.selectionType)
+    const sections = getSectionLayout(format, this._config.locale, this._config.monthNames, { seconds: Boolean(this._config.seconds) })
 
     return (sections.find((section: any) => section.type === 'hour') as any)?.cycle ?? null
   }

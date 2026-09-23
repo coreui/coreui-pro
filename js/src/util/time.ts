@@ -35,32 +35,6 @@ export const convert12hTo24h = (abbr: string, hour: number): number => {
 export const convert24hTo12h = (hour: number): number => hour % 12 || 12
 
 /**
- * Converts a time input into a Date object.
- * @param {Date | string | null | undefined} time The time input to be converted.
- * @returns {Date | null} The converted Date object or null if the input is falsy.
- */
-export const convertTimeToDate = (time: string | Date | null): Date | null =>
-  time ? (time instanceof Date ? time : new Date(`1970-01-01 ${time}`)) : null
-
-/**
- * Retrieves the AM/PM part of the specified date according to the given locale.
- * @param {Date} date The date from which to extract the AM/PM part.
- * @param {string} locale The locale to use for formatting.
- * @returns {string} 'am' or 'pm' based on the given date and locale.
- */
-export const getAmPm = (date: Date, locale: string): string => {
-  if (date.toLocaleTimeString(locale).includes('AM')) {
-    return 'am'
-  }
-
-  if (date.toLocaleTimeString(locale).includes('PM')) {
-    return 'pm'
-  }
-
-  return date.getHours() >= 12 ? 'pm' : 'am'
-}
-
-/**
  * Formats an array of time values (hours, minutes, or seconds) according to the specified locale and partial.
  * @param {number[]} values An array of time values to format.
  * @param {string} locale The locale to use for formatting.
@@ -68,8 +42,8 @@ export const getAmPm = (date: Date, locale: string): string => {
  * @param {boolean} [hour12] Whether the hour labels should use the 12-hour cycle. When omitted the formatter falls back to the locale's default cycle.
  * @returns {Array} An array of objects with the original value and its localized label.
  */
-export const formatTimePartials = (values: number[], locale: string, partial: string, hour12?: boolean): Array<{ label: string, value: number }> => {
-  const date = new Date()
+const formatTimePartials = (values: number[], locale: string, partial: string, hour12?: boolean): Array<{ label: string, value: number }> => {
+  const date = new Date(2020, 0, 1)
 
   const forceTwoDigit = shouldUseTwoDigitHour(locale)
   // `hour12: false` lets ICU pick either h23 (00–23) or h24 (01–24), so older
@@ -196,16 +170,6 @@ export const isAmPm = (locale: string): boolean =>
   )
 
 /**
- * Validates if the given string represents a valid time.
- * @param {string} time The time string to validate.
- * @returns {boolean} True if the string is a valid time, otherwise false.
- */
-export const isValidTime = (time: string): boolean => {
-  const d = new Date(`1970-01-01 ${time}`)
-  return d instanceof Date && !Number.isNaN(d.getTime())
-}
-
-/**
  * Checks whether the given locale formats the hour "9" with a leading zero ("09")
  * when using `hour: 'numeric'` in `toLocaleTimeString`.
  *
@@ -214,7 +178,7 @@ export const isValidTime = (time: string): boolean => {
  * @param {string} locale - The locale code (e.g., "en-US", "pl-PL").
  * @returns {boolean} `true` if the formatted hour starts with a leading zero, otherwise `false`.
  */
-export const shouldUseTwoDigitHour = (locale: string): boolean => {
+const shouldUseTwoDigitHour = (locale: string): boolean => {
   const d = new Date(2020, 0, 1, 7, 5, 7) // 7:05:07
   const formatted = d.toLocaleTimeString(locale)
 

@@ -2,17 +2,12 @@
 import {
   convertIsoWeekToDate,
   convertToDateObject,
-  createDateFromMonth,
-  createDateFromWeek,
-  createDateFromYear,
   createGroupsInArray,
   getCalendarDate,
   getDateBySelectionType,
-  getFirstAvailableDateInRange,
   getISOWeekNumberAndYear,
   getLocalDateFromString,
   getMonthsNames,
-  getSelectableDates,
   getYears,
   getMonthDetails,
   isDateDisabled,
@@ -214,38 +209,6 @@ describe('Calendar Utilities', () => {
     })
   })
 
-  describe('getFirstAvailableDateInRange', () => {
-    it('should return the start date if there are no disabled dates', () => {
-      const start = new Date(2023, 0, 1)
-      const end = new Date(2023, 0, 5)
-      const result = getFirstAvailableDateInRange(start, end, null, null, undefined)
-      expect(result).toEqual(start)
-    })
-
-    it('should return the first not-disabled date in the range', () => {
-      const start = new Date(2023, 0, 1)
-      const end = new Date(2023, 0, 5)
-      const disabledDates = [
-        new Date(2023, 0, 1),
-        new Date(2023, 0, 2)
-      ]
-      const result = getFirstAvailableDateInRange(start, end, null, null, disabledDates)
-      // The first available is Jan 3
-      expect(result).toEqual(new Date(2023, 0, 3))
-    })
-
-    it('should return null if all dates in the range are disabled', () => {
-      const start = new Date(2023, 0, 1)
-      const end = new Date(2023, 0, 2)
-      const disabledDates = [
-        new Date(2023, 0, 1),
-        new Date(2023, 0, 2)
-      ]
-      const result = getFirstAvailableDateInRange(start, end, null, null, disabledDates)
-      expect(result).toBeNull()
-    })
-  })
-
   describe('getMonthsNames', () => {
     it('should return an array of 12 month names (short)', () => {
       const result = getMonthsNames('en-US', 'short')
@@ -264,29 +227,6 @@ describe('Calendar Utilities', () => {
         const expected = Array.from({ length: 12 }, (_, i) => new Date(2000, i, 1).toLocaleString(locale, { month: format }))
         expect(getMonthsNames(locale, format)).toEqual(expected)
       }
-    })
-  })
-
-  describe('getSelectableDates', () => {
-    it('should return all elements that match the default selector inside an element', () => {
-      const container = document.createElement('tr')
-      container.innerHTML = `
-        <td data-coreui-selectable></td>
-        <td data-coreui-selectable></td>
-        <td></td>
-      `
-      const result = getSelectableDates(container)
-      expect(result).toHaveSize(2)
-    })
-
-    it('should allow a custom selector', () => {
-      const container = document.createElement('div')
-      container.innerHTML = `
-          <div class="date selectable"></div>
-          <div class="date selectable"></div>
-      `
-      const result = getSelectableDates(container, '.date.selectable')
-      expect(result).toHaveSize(2)
     })
   })
 
@@ -712,36 +652,6 @@ describe('Calendar Utilities', () => {
       } else {
         expect(result2).toBe(currentCentury + 90)
       }
-    })
-  })
-
-  describe('createDateFromYear', () => {
-    it('should create a date for January 1st of the given year', () => {
-      const result = createDateFromYear({ year: '2023' })
-      expect(result).toBeInstanceOf(Date)
-      expect(result.getFullYear()).toBe(2023)
-      expect(result.getMonth()).toBe(0) // January
-      expect(result.getDate()).toBe(1)
-    })
-  })
-
-  describe('createDateFromMonth', () => {
-    it('should create a date for the first day of the given month', () => {
-      const result = createDateFromMonth({ year: '2023', month: '6' })
-      expect(result).toBeInstanceOf(Date)
-      expect(result.getFullYear()).toBe(2023)
-      expect(result.getMonth()).toBe(5) // June (0-indexed)
-      expect(result.getDate()).toBe(1)
-    })
-  })
-
-  describe('createDateFromWeek', () => {
-    it('should create a date for the Monday of the given ISO week', () => {
-      const result = createDateFromWeek({ year: '2023', week: '12' })
-      expect(result).toBeInstanceOf(Date)
-      expect(result.getFullYear()).toBe(2023)
-      expect(result.getMonth()).toBe(2) // March
-      expect(result.getDate()).toBe(20) // Monday of week 12
     })
   })
 

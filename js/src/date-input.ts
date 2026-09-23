@@ -9,7 +9,7 @@ import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import SectionInput, { type SectionInputConfig } from './section-input.js'
 import { convertToDateObject } from './util/calendar.js'
-import { type DateSection, getDateTimeSectionsFromLocale, getSectionsFromLocale } from './util/date-sections.js'
+import { type DateSection, getSectionLayout } from './util/date-sections.js'
 import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
 
 /**
@@ -79,9 +79,7 @@ class DateInput extends SectionInput {
   }
 
   override _getDefaultSections(locale: string): DateSection[] {
-    return this._config.type === 'datetime' ?
-      getDateTimeSectionsFromLocale(locale, this._config.seconds) :
-      getSectionsFromLocale(locale)
+    return getSectionLayout(null, locale, null, this._config.type === 'datetime' && { seconds: this._config.seconds })
   }
 
   // Static

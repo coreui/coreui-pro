@@ -21,13 +21,13 @@ import {
   getFullYearFromSection,
   getIncrementedSectionValue,
   getSectionBounds,
-  getSectionsFromFormat,
+  getSectionLayout,
   getSectionsFromString,
   getWeekSectionMax,
   setSectionsFromDate
 } from './util/date-sections.js'
 import type { ComponentConfig } from './util/config.js'
-import type { DateSection } from './util/date-sections.js'
+import type { DateSection, SectionFormat } from './util/date-sections.js'
 import { captureHostClasses, type HostClasses, restoreHostClasses } from './util/form-control-group.js'
 import { getNextActiveElement, isRTL } from './util/index.js'
 
@@ -85,7 +85,7 @@ export type SectionInputConfig = {
   dayPlaceholder: string | null
   disabled: boolean
   disabledDates: any
-  format: ((locale: string) => DateSection[]) | string | null
+  format: SectionFormat
   hourPlaceholder: string | null
   inputDateParse: ((value: string) => Date | null) | null
   invalid: boolean
@@ -360,15 +360,7 @@ class SectionInput extends BaseComponent {
   _resolveSections(): DateSection[] {
     const { format, locale, monthNames } = this._config
 
-    if (typeof format === 'function') {
-      return format(locale)
-    }
-
-    if (typeof format === 'string' && format.length > 0) {
-      return getSectionsFromFormat(format, locale, monthNames)
-    }
-
-    return this._getDefaultSections(locale)
+    return format ? getSectionLayout(format, locale, monthNames) : this._getDefaultSections(locale)
   }
 
   _addEventListeners(): void {

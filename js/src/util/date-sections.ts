@@ -5,7 +5,7 @@
  * --------------------------------------------------------------------------
  */
 
-import { getISOWeekNumberAndYear, parseYearSmart } from './calendar.js'
+import { getISOWeekNumberAndYear, parseYearSmart, type SelectionTypes } from './calendar.js'
 import { convert12hTo24h, convert24hTo12h } from './time.js'
 
 export type DateSection = {
@@ -347,23 +347,45 @@ export const getDateTimeSectionsFromLocale = (locale: string, seconds = false): 
     second: seconds ? '2-digit' : undefined
   }), locale)
 
+export type SectionFormat = ((locale: string) => DateSection[]) | string | null
+
+const FORMAT_BY_SELECTION_TYPE: Record<string, SectionFormat> = {
+  month: 'MM/yyyy',
+  quarter: 'QQQ yyyy',
+  week: getWeekSectionsFromLocale,
+  year: 'yyyy'
+}
+
+/**
+ * Resolves the field format of a picker: an explicit format wins, otherwise
+ * every selection type but `day` gets a mask of its own granularity.
+ * @param {string | Function | null} format The `format` option.
+ * @param {string} selectionType The `selectionType` option.
+ * @returns {string | Function | null} The format, or null for the locale-derived day mask.
+ */
+export const getPickerFormat = (format: SectionFormat, selectionType: SelectionTypes = 'day'): SectionFormat =>
+  format || FORMAT_BY_SELECTION_TYPE[selectionType] || null
+
 /**
  * Resolves the section layout from the `format` config option.
  * @param {string | Function | null} format A token string, a function returning sections, or null for locale-derived sections.
  * @param {string} locale The locale to use when `format` is null or a function.
  * @param {string[] | null} [monthNames] Custom month names for text month sections.
+ * @param {boolean | object} [includeTime] Derive a date and time layout from the locale when `format` is empty; `{ seconds }` sets whether it has seconds.
  * @returns {Array} The ordered list of section and literal descriptors.
  */
-export const getDateSections = (format: string | ((locale: string) => DateSection[]) | null, locale: string, monthNames: string[] | null = null): DateSection[] => {
+export const getSectionLayout = (format: SectionFormat, locale: string, monthNames: string[] | null = null, includeTime: boolean | { seconds: boolean } = false): DateSection[] => {
   if (typeof format === 'function') {
     return format(locale)
   }
 
-  if (typeof format === 'string' && format.length > 0) {
+  if (format) {
     return getSectionsFromFormat(format, locale, monthNames)
   }
 
-  return getSectionsFromLocale(locale)
+  return includeTime ?
+    getDateTimeSectionsFromLocale(locale, typeof includeTime === 'object' ? includeTime.seconds : true) :
+    getSectionsFromLocale(locale)
 }
 
 /**
