@@ -512,7 +512,7 @@ describe('Calendar', () => {
       const div = fixtureEl.querySelector('div')
       new Calendar(div, { locale: 'en-US', calendarDate: new Date(2026, 8, 1) }) // eslint-disable-line no-new
 
-      const target = div.querySelector(`[data-coreui-date="${new Date(2026, 8, 17)}"]`)
+      const target = div.querySelector(`[data-coreui-date="${new Date(2026, 8, 17).toDateString()}"]`)
       target.click()
 
       expect(div.querySelectorAll('.calendar-cell[tabindex="0"]').length).toEqual(1)
@@ -531,11 +531,11 @@ describe('Calendar', () => {
           ...config
         })
 
-        div.querySelector(`[data-coreui-date="${new Date(2026, 8, 17)}"]`).focus()
+        div.querySelector(`[data-coreui-date="${new Date(2026, 8, 17).toDateString()}"]`).focus()
         fixtureEl.querySelector('button').focus()
 
         expect(div.querySelectorAll('.calendar-cell[tabindex="0"]').length).toEqual(1)
-        expect(div.querySelector('.calendar-cell[tabindex="0"]').dataset.coreuiDate).toEqual(String(new Date(2026, 8, 5)))
+        expect(div.querySelector('.calendar-cell[tabindex="0"]').dataset.coreuiDate).toEqual(new Date(2026, 8, 5).toDateString())
       }
     })
 
@@ -725,6 +725,21 @@ describe('Calendar', () => {
       const customDays = div.querySelectorAll('.custom-day')
       expect(customDays.length).toBeGreaterThan(0)
     })
+
+    it('should call renderDayCell with the config as this', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { // eslint-disable-line no-new
+        locale: 'en-US',
+        calendarDate: new Date(2026, 8, 1),
+        renderDayCell(date) {
+          return `${this.locale}:${date.getDate()}`
+        }
+      })
+
+      expect(div.querySelector('.calendar-cell-inner.day').textContent).toMatch(/^en-US:\d+$/)
+    })
   })
 
   describe('renderMonthCell', () => {
@@ -740,6 +755,21 @@ describe('Calendar', () => {
 
       const customMonths = div.querySelectorAll('.custom-month')
       expect(customMonths.length).toBeGreaterThan(0)
+    })
+
+    it('should pass the cell meta to renderMonthCell', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const renderMonthCell = jasmine.createSpy('renderMonthCell').and.returnValue('x')
+      new Calendar(div, { // eslint-disable-line no-new
+        selectionType: 'month',
+        calendarDate: new Date(2023, 0, 1),
+        startDate: new Date(2023, 5, 1),
+        renderMonthCell
+      })
+
+      expect(renderMonthCell).toHaveBeenCalledWith(new Date(2023, 5, 1), jasmine.objectContaining({ isDisabled: false, isSelected: true }))
     })
   })
 
@@ -2023,6 +2053,19 @@ describe('Calendar', () => {
       expect(calendar._calendarDate.getFullYear()).toEqual(initialYear - 10)
     })
 
+    it('should keep a year below 100 when paging back ten years', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendarDate = new Date(2000, 5, 1)
+      calendarDate.setFullYear(105)
+      const calendar = new Calendar(div, { selectionType: 'year', calendarDate })
+
+      div.querySelector('.btn-double-prev').click()
+
+      expect(calendar._calendarDate.getFullYear()).toEqual(95)
+    })
+
     it('should not show btn-prev and btn-next in months view', () => {
       fixtureEl.innerHTML = '<div></div>'
 
@@ -2268,7 +2311,7 @@ describe('Calendar', () => {
       const observer = new MutationObserver(list => records.push(...list))
       observer.observe(div, { attributes: true, subtree: true })
 
-      const cell = div.querySelector(`[data-coreui-date="${new Date(2023, 5, 20)}"]`)
+      const cell = div.querySelector(`[data-coreui-date="${new Date(2023, 5, 20).toDateString()}"]`)
       cell.dispatchEvent(new MouseEvent('mouseover', { bubbles: true, relatedTarget: div }))
       await Promise.resolve()
       observer.disconnect()
@@ -2286,7 +2329,7 @@ describe('Calendar', () => {
         endDate: new Date(2023, 5, 25)
       })
 
-      const cell = div.querySelector(`[data-coreui-date="${new Date(2023, 5, 5)}"]`)
+      const cell = div.querySelector(`[data-coreui-date="${new Date(2023, 5, 5).toDateString()}"]`)
       cell.dispatchEvent(new MouseEvent('mouseover', { bubbles: true, relatedTarget: div }))
 
       expect(div.querySelectorAll('.calendar-cell.range-hover').length).toEqual(21)
@@ -2306,14 +2349,14 @@ describe('Calendar', () => {
       const observer = new MutationObserver(list => records.push(...list))
       observer.observe(div, { attributeFilter: ['tabindex'], subtree: true })
 
-      const cell = div.querySelector(`[data-coreui-date="${new Date(2023, 5, 20)}"]`)
+      const cell = div.querySelector(`[data-coreui-date="${new Date(2023, 5, 20).toDateString()}"]`)
       cell.dispatchEvent(new MouseEvent('mouseover', { bubbles: true, relatedTarget: div }))
       await Promise.resolve()
       observer.disconnect()
 
       expect(div.querySelectorAll('.calendar-cell.range-hover').length).toEqual(11)
       expect(records.length).toEqual(0)
-      expect(div.querySelector('.calendar-cell[tabindex="0"]').dataset.coreuiDate).toEqual(String(new Date(2023, 5, 10)))
+      expect(div.querySelector('.calendar-cell[tabindex="0"]').dataset.coreuiDate).toEqual(new Date(2023, 5, 10).toDateString())
     })
   })
 
@@ -2690,6 +2733,24 @@ describe('Calendar', () => {
       expect(rangeHoverCells.length).toBeGreaterThan(0)
     })
 
+    it('should not preview a day range on the month cells', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { // eslint-disable-line no-new
+        calendarDate: new Date(2023, 0, 1),
+        range: true,
+        startDate: new Date(2023, 0, 10),
+        selectEndDate: true
+      })
+
+      div.querySelector('.btn-month').click()
+      div.querySelector(`[data-coreui-date="${new Date(2023, 5, 1).toDateString()}"]`)
+        .dispatchEvent(new MouseEvent('mouseover', { bubbles: true, relatedTarget: div }))
+
+      expect(div.querySelectorAll('.calendar-cell.range-hover').length).toEqual(0)
+    })
+
     it('should apply range-hover class for year selection with hover', () => {
       fixtureEl.innerHTML = '<div></div>'
 
@@ -2851,14 +2912,14 @@ describe('Calendar', () => {
     })
   })
 
-  describe('_cellMonthAttributes', () => {
+  describe('_cellPeriodAttributes with months', () => {
     it('should mark as selectable enabled months', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
       const calendar = new Calendar(div, { selectionType: 'month' })
       const date = new Date(2023, 5, 1)
-      const attrs = calendar._cellMonthAttributes(date)
+      const attrs = calendar._cellPeriodAttributes(date)
 
       expect(attrs.selectable).toBeTrue()
     })
@@ -2872,7 +2933,7 @@ describe('Calendar', () => {
         minDate: new Date(2023, 6, 1)
       })
       const date = new Date(2023, 3, 1)
-      const attrs = calendar._cellMonthAttributes(date)
+      const attrs = calendar._cellPeriodAttributes(date)
 
       expect(attrs.selectable).toBeFalse()
       expect(attrs.className).toContain('disabled')
@@ -2887,7 +2948,7 @@ describe('Calendar', () => {
         startDate: new Date(2023, 5, 1)
       })
       const date = new Date(2023, 5, 1)
-      const attrs = calendar._cellMonthAttributes(date)
+      const attrs = calendar._cellPeriodAttributes(date)
 
       expect(attrs.ariaSelected).toBeTrue()
       expect(attrs.className).toContain('selected')
@@ -2904,7 +2965,7 @@ describe('Calendar', () => {
         endDate: new Date(2023, 8, 1)
       })
       const date = new Date(2023, 5, 1)
-      const attrs = calendar._cellMonthAttributes(date)
+      const attrs = calendar._cellPeriodAttributes(date)
 
       expect(attrs.className).toContain('range')
     })
@@ -2918,21 +2979,21 @@ describe('Calendar', () => {
         startDate: new Date(2023, 5, 1)
       })
       const date = new Date(2023, 5, 1)
-      const attrs = calendar._cellMonthAttributes(date)
+      const attrs = calendar._cellPeriodAttributes(date)
 
       expect(attrs.meta).toBeDefined()
       expect(attrs.meta.isSelected).toBeTrue()
     })
   })
 
-  describe('_cellQuarterAttributes', () => {
+  describe('_cellPeriodAttributes with quarters', () => {
     it('should mark as selectable enabled quarters', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
       const calendar = new Calendar(div, { selectionType: 'quarter' })
       const date = new Date(2023, 0, 1)
-      const attrs = calendar._cellQuarterAttributes(date)
+      const attrs = calendar._cellPeriodAttributes(date)
 
       expect(attrs.selectable).toBeTrue()
     })
@@ -2946,7 +3007,7 @@ describe('Calendar', () => {
         minDate: new Date(2023, 6, 1)
       })
       const date = new Date(2023, 0, 1)
-      const attrs = calendar._cellQuarterAttributes(date)
+      const attrs = calendar._cellPeriodAttributes(date)
 
       expect(attrs.selectable).toBeFalse()
       expect(attrs.className).toContain('disabled')
@@ -2961,7 +3022,7 @@ describe('Calendar', () => {
         startDate: new Date(2023, 3, 1)
       })
       const date = new Date(2023, 3, 1)
-      const attrs = calendar._cellQuarterAttributes(date)
+      const attrs = calendar._cellPeriodAttributes(date)
 
       expect(attrs.ariaSelected).toBeTrue()
       expect(attrs.className).toContain('selected')
@@ -2978,7 +3039,7 @@ describe('Calendar', () => {
         endDate: new Date(2023, 9, 1)
       })
       const date = new Date(2023, 3, 1)
-      const attrs = calendar._cellQuarterAttributes(date)
+      const attrs = calendar._cellPeriodAttributes(date)
 
       expect(attrs.className).toContain('range')
     })
@@ -2992,21 +3053,21 @@ describe('Calendar', () => {
         startDate: new Date(2023, 3, 1)
       })
       const date = new Date(2023, 3, 1)
-      const attrs = calendar._cellQuarterAttributes(date)
+      const attrs = calendar._cellPeriodAttributes(date)
 
       expect(attrs.meta).toBeDefined()
       expect(attrs.meta.isSelected).toBeTrue()
     })
   })
 
-  describe('_cellYearAttributes', () => {
+  describe('_cellPeriodAttributes with years', () => {
     it('should mark as selectable enabled years', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
       const calendar = new Calendar(div, { selectionType: 'year' })
       const date = new Date(2023, 0, 1)
-      const attrs = calendar._cellYearAttributes(date)
+      const attrs = calendar._cellPeriodAttributes(date)
 
       expect(attrs.selectable).toBeTrue()
     })
@@ -3020,7 +3081,7 @@ describe('Calendar', () => {
         minDate: new Date(2025, 0, 1)
       })
       const date = new Date(2023, 0, 1)
-      const attrs = calendar._cellYearAttributes(date)
+      const attrs = calendar._cellPeriodAttributes(date)
 
       expect(attrs.selectable).toBeFalse()
       expect(attrs.className).toContain('disabled')
@@ -3035,7 +3096,7 @@ describe('Calendar', () => {
         startDate: new Date(2023, 0, 1)
       })
       const date = new Date(2023, 0, 1)
-      const attrs = calendar._cellYearAttributes(date)
+      const attrs = calendar._cellPeriodAttributes(date)
 
       expect(attrs.ariaSelected).toBeTrue()
       expect(attrs.className).toContain('selected')
@@ -3052,7 +3113,7 @@ describe('Calendar', () => {
         endDate: new Date(2025, 0, 1)
       })
       const date = new Date(2023, 0, 1)
-      const attrs = calendar._cellYearAttributes(date)
+      const attrs = calendar._cellPeriodAttributes(date)
 
       expect(attrs.className).toContain('range')
     })
@@ -3066,7 +3127,7 @@ describe('Calendar', () => {
         startDate: new Date(2023, 0, 1)
       })
       const date = new Date(2023, 0, 1)
-      const attrs = calendar._cellYearAttributes(date)
+      const attrs = calendar._cellPeriodAttributes(date)
 
       expect(attrs.meta).toBeDefined()
       expect(attrs.meta.isSelected).toBeTrue()
