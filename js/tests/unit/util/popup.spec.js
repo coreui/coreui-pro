@@ -51,7 +51,7 @@ describe('Popup', () => {
     })
 
     it('should not scroll the page when the panel mounts away from the anchor', () => {
-      const popup = buildPopup({ container: document.body })
+      const popup = buildPopup({ container: document.body, mobileBreakpoint: 0 })
       const spacer = document.createElement('div')
       spacer.style.height = '300vh'
       document.body.append(spacer)
