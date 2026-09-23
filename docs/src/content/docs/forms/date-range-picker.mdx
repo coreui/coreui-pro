@@ -327,6 +327,7 @@ attributes work on the picker element too.
 | `endDate` | date, string, null | `null` | Initial end of the range. |
 | `endFloatingLabel` | string, null | `null` | Renders a floating label over the end field, which also becomes that field's accessible name. |
 | `endName` | string, null | `null` | Name of the end hidden input. Without it the end date is not submitted with the form. |
+| `format` | function, string, null | `null` | Mask layout of both fields: `null` derives it from the locale (or, for week, month, quarter and year selection, uses the matching default mask), a string is parsed as format tokens, a function receives the locale and returns the section layout. |
 | `inputOptions` | object | `{}` | Programmatic escape hatch for date input options. |
 | `invalid` | boolean | `false` | Force the invalid state (`.is-invalid`) on the frame. |
 | `locale` | string | browser locale | Drives section order, separators, and calendar labels. |
@@ -335,6 +336,7 @@ attributes work on the picker element too.
 | `pickerIcon` | string, boolean | `true` | The button that opens the calendar: `true` for the built-in icon, an inline SVG string for your own (sanitized), `false` for no button. Without it the popup has no pointer opener and nothing reports the expanded state, though the field keeps the keyboard openers below. |
 | `sanitize` | boolean | `true` | Sanitize the icon markup. |
 | `sanitizeFn` | function, null | `null` | Custom sanitizer. |
+| `selectionType` | string | `'day'` | What the picker selects: `'day'`, `'week'`, `'month'`, `'quarter'` or `'year'`. The calendar and the field masks follow it. |
 | `separatorIcon` | string | arrow SVG | Inline SVG between the two fields (LTR). |
 | `separatorIconRtl` | string | mirrored arrow SVG | Inline SVG used when the picker renders in an RTL context. |
 | `size` | string, null | `null` | `'sm'` or `'lg'`. |

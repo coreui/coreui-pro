@@ -26,6 +26,12 @@ describe('DateRangePicker', () => {
   }
 
   describe('constructor', () => {
+    it('should check the options it reads under its own name', () => {
+      for (const [option, value] of [['format', 42], ['selectionType', 7]]) {
+        expect(() => buildPicker({ [option]: value })).toThrowError(new RegExp(`^DATE-RANGE-PICKER: Option "${option}"`))
+      }
+    })
+
     it('should point aria-controls at the panel only while it exists', () => {
       const picker = buildPicker()
       const indicator = fixtureEl.querySelector('.form-control-action')

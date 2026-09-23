@@ -93,6 +93,28 @@ describe('DatePicker', () => {
       expect(fixtureEl.querySelector('.date-picker-popup .date-picker-calendar')).not.toBeNull()
     })
 
+    it('should check the options it reads under its own name', () => {
+      for (const [option, value] of [['format', 42], ['monthNames', 'Jan'], ['selectionType', 7]]) {
+        expect(() => buildPicker({ [option]: value })).toThrowError(new RegExp(`^DATE-PICKER: Option "${option}"`))
+      }
+    })
+
+    it('should pass a format function and custom month names to the field', () => {
+      const monthNames = ['Sty', 'Lut', 'Mar', 'Kwi', 'Maj', 'Cze', 'Lip', 'Sie', 'Wrz', 'Paź', 'Lis', 'Gru']
+      buildPicker({
+        locale: 'en-US',
+        format: 'MMMM yyyy',
+        monthNames,
+        date: new Date(2026, 0, 15)
+      })
+
+      expect(fixtureEl.querySelector('#picker input[type="hidden"]').value).toEqual('Sty 2026')
+
+      buildPicker({ locale: 'en-US', format: () => [{ type: 'year', length: 4 }], date: new Date(2026, 0, 15) })
+
+      expect(fixtureEl.querySelector('#picker input[type="hidden"]').value).toEqual('2026')
+    })
+
     it('should not build the calendar until the popup opens', () => {
       const picker = buildPicker()
 

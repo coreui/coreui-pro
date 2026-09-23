@@ -18,8 +18,14 @@ import Calendar from './calendar.js'
 import DateInput from './date-input.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
+import type { SectionInputConfig } from './section-input.js'
 import TimeSelects from './time-selection/selects.js'
-import { convertToDateObject, getDateBySelectionType, isSameDateAs } from './util/calendar.js'
+import {
+  convertToDateObject,
+  getDateBySelectionType,
+  isSameDateAs,
+  type SelectionTypes
+} from './util/calendar.js'
 import type { ComponentConfig } from './util/config.js'
 import { getDateSections, getDateTimeSectionsFromLocale, getWeekSectionsFromLocale } from './util/date-sections.js'
 import {
@@ -80,16 +86,19 @@ type DatePickerConfig = {
   date: Date | string | null,
   disabled: boolean,
   floatingLabel: string | null,
+  format: SectionInputConfig['format'],
   inputOptions: Record<string, any>,
   locale: string,
   maxDate: Date | string | null,
   minDate: Date | string | null,
+  monthNames: SectionInputConfig['monthNames'],
   name: string | null,
   pickerIcon: string | boolean,
   sanitize: boolean,
   sanitizeFn: ((unsafeHtml: string) => string) | null,
   seconds: boolean | number[] | ((second: number) => boolean),
   selectionOptions: Record<string, any>,
+  selectionType: SelectionTypes,
   size: string | null,
   timepicker: boolean
 }
@@ -105,16 +114,19 @@ const Default: DatePickerConfig = {
   date: null,
   disabled: false,
   floatingLabel: null,
+  format: null,
   inputOptions: {},
   locale: navigator.language,
   maxDate: null,
   minDate: null,
+  monthNames: null,
   name: null,
   pickerIcon: true,
   sanitize: true,
   sanitizeFn: null,
   seconds: true,
   selectionOptions: {},
+  selectionType: 'day',
   size: null,
   timepicker: false
 }
@@ -130,16 +142,19 @@ const DefaultType: Record<string, string> = {
   date: '(date|string|null)',
   disabled: 'boolean',
   floatingLabel: '(string|null)',
+  format: '(function|string|null)',
   inputOptions: 'object',
   locale: 'string',
   maxDate: '(date|string|null)',
   minDate: '(date|string|null)',
+  monthNames: '(array|null)',
   name: '(string|null)',
   pickerIcon: '(string|boolean)',
   sanitize: 'boolean',
   sanitizeFn: '(function|null)',
   seconds: '(array|boolean|function)',
   selectionOptions: 'object',
+  selectionType: 'string',
   size: '(string|null)',
   timepicker: 'boolean'
 }

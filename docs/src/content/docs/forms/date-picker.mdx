@@ -424,16 +424,20 @@ attributes work on the picker element too.
 | `container` | string, element, false | `false` | Teleport target for the dropdown. |
 | `date` | date, string, null | `null` | Initial value. |
 | `disabled` | boolean | `false` | Disables the field and the popup. |
+| `floatingLabel` | string, null | `null` | Renders a floating label over the field, which also becomes its accessible name. Not rendered for a `data-coreui-picker-field` you wrote, which only takes the name. |
+| `format` | function, string, null | `null` | Mask layout of the field: `null` derives it from the locale (or, for week, month, quarter and year selection, uses the matching default mask), a string is parsed as format tokens, a function receives the locale and returns the section layout. |
 | `inputOptions` | object | `{}` | Programmatic escape hatch for date input options. |
 | `locale` | string | browser locale | Drives section order, separators, and calendar labels. |
 | `maxDate` | date, string, null | `null` | Upper bound, enforced by both layers. |
 | `minDate` | date, string, null | `null` | Lower bound, enforced by both layers. |
+| `monthNames` | array, null | `null` | Twelve custom month names for text month sections (`MMM`/`MMMM`). |
 | `name` | string, null | `null` | Name of the generated hidden input. Without it the field is not submitted with the form. |
 | `pickerIcon` | string, boolean | `true` | The button that opens the calendar: `true` for the built-in icon, an inline SVG string for your own (sanitized), `false` for no button. Not used for a `data-coreui-picker-toggle` you wrote. Without either the popup has no pointer opener and nothing reports the expanded state, though the field keeps the keyboard openers below. |
 | `sanitize` | boolean | `true` | Sanitize the icon markup. |
 | `sanitizeFn` | function, null | `null` | Custom sanitizer. |
 | `seconds` | array, boolean, function | `true` | Seconds offered by the time half. Ignored without `timepicker`. |
 | `selectionOptions` | object | `{}` | Programmatic escape hatch for the time half. |
+| `selectionType` | string | `'day'` | What the picker selects: `'day'`, `'week'`, `'month'`, `'quarter'` or `'year'`. The calendar and the field mask follow it. |
 | `size` | string, null | `null` | `'sm'` or `'lg'`. |
 | `timepicker` | boolean | `false` | Add a time half to the panel and switch the field to a date and time mask. |
 
