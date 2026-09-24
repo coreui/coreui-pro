@@ -97,7 +97,7 @@ class TimeInput extends SectionInput {
 
 EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
   for (const timeInput of SelectorEngine.find(SELECTOR_DATA_TIME_INPUT)) {
-    TimeInput.componentInterface(timeInput)
+    TimeInput.getOrCreateInstance(timeInput)
   }
 })
 

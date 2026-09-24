@@ -243,6 +243,18 @@ describe('TimeInput', () => {
     })
   })
 
+  describe('data-api', () => {
+    it('should initialise elements carrying the attribute on load', () => {
+      fixtureEl.innerHTML = '<div data-coreui-time-input></div>'
+      const element = fixtureEl.querySelector('div')
+
+      window.dispatchEvent(new Event('load'))
+
+      expect(TimeInput.getInstance(element)).toBeInstanceOf(TimeInput)
+      TimeInput.getInstance(element).dispose()
+    })
+  })
+
   describe('jQueryInterface', () => {
     it('should create a time input', () => {
       fixtureEl.innerHTML = '<div></div>'

@@ -99,7 +99,7 @@ class DateInput extends SectionInput {
 
 EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
   for (const dateInput of SelectorEngine.find(SELECTOR_DATA_DATE_INPUT)) {
-    DateInput.componentInterface(dateInput)
+    DateInput.getOrCreateInstance(dateInput)
   }
 })
 
