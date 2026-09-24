@@ -1,4 +1,6 @@
 
+import { onTestFinished } from 'vitest'
+import { cdp } from 'vitest/browser'
 import Calendar from '../../src/calendar.js'
 import {
   getFixture, clearFixture, createEvent, jQueryMock
@@ -2058,12 +2060,35 @@ describe('Calendar', () => {
 
       const div = fixtureEl.querySelector('div')
       const calendarDate = new Date(2000, 5, 1)
-      calendarDate.setFullYear(105)
+      calendarDate.setFullYear(95)
       const calendar = new Calendar(div, { selectionType: 'year', calendarDate })
 
       div.querySelector('.btn-double-prev').click()
 
-      expect(calendar._calendarDate.getFullYear()).toEqual(95)
+      expect(calendar._calendarDate.getFullYear()).toEqual(85)
+    })
+
+    it.each([
+      ['America/Santiago', [2026, 8, 6], [2026, 9, 1]],
+      ['Europe/Paris', [1919, 1, 15, 23, 30], [1919, 2, 1]],
+      ['America/Santiago', [42, 6, 15], [42, 7, 1]]
+    ])('should page to midnight of the 1st in %s from %j', async (timezoneId, from, to) => {
+      await cdp().send('Emulation.setTimezoneOverride', { timezoneId })
+      onTestFinished(() => cdp().send('Emulation.setTimezoneOverride', { timezoneId: '' }))
+      const localDate = ([year, ...rest]) => {
+        const date = new Date(2000, ...rest)
+        date.setFullYear(year)
+        return date
+      }
+
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, { calendarDate: localDate(from) })
+
+      div.querySelector('.btn-next').click()
+
+      expect(calendar._calendarDate).toEqual(localDate(to))
     })
 
     it('should not show btn-prev and btn-next in months view', () => {

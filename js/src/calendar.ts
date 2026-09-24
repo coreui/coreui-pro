@@ -758,9 +758,11 @@ class Calendar extends BaseComponent {
   }
 
   _modifyCalendarDate(years: number, months = 0, callback?: () => void): void {
-    const date = new Date(this._calendarDate)
+    const year = this._calendarDate.getFullYear() + years
+    const month = this._calendarDate.getMonth() + months
+    const date = new Date(year, month, 1)
+    date.setFullYear(year, month, 1)
     date.setHours(0, 0, 0, 0)
-    date.setFullYear(date.getFullYear() + years, date.getMonth() + months, 1)
 
     this._setCalendarDate(date)
     this._updateCalendar(callback)
