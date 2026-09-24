@@ -569,6 +569,18 @@ describe('Calendar', () => {
       expect(div.querySelectorAll('.calendar-row[data-coreui-selectable]').length).toBeGreaterThan(1)
       expect(div.querySelectorAll('.calendar-row[tabindex="0"]').length).toEqual(1)
     })
+
+    it('should give the tab stop to the row of its own month when two rows are as close to the calendar date', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      // eslint-disable-next-line no-new
+      new Calendar(div, {
+        calendarDate: new Date(2026, 6, 9), disabledDates: [new Date(2026, 6, 6)], locale: 'en-US', selectionType: 'week'
+      })
+
+      expect(new Date(div.querySelector('.calendar-row[tabindex="0"] .calendar-cell').dataset.coreuiDate)).toEqual(new Date(2026, 6, 13))
+    })
   })
 
   describe('showAdjacentDays', () => {
@@ -1188,6 +1200,9 @@ describe('Calendar', () => {
       return div
     }
 
+    const weekRow = (panel, date) => [...panel.querySelectorAll('.calendar-row[data-coreui-selectable]')]
+      .find(element => new Date(element.querySelector('[data-coreui-date]').dataset.coreuiDate).getTime() === date.getTime())
+
     const focusDay = (div, year, month, day) => {
       const cell = findDayCell(div, year, month, day)
       cell.focus()
@@ -1351,6 +1366,28 @@ describe('Calendar', () => {
       pressKey(row, 'ArrowUp')
 
       expect(second.contains(document.activeElement)).toBeTrue()
+    })
+
+    it('should page a week row into the panel of its own month when two panels show it', () => {
+      const div = renderCalendar({ calendarDate: new Date(2026, 5, 1), calendars: 2, selectionType: 'week' })
+      const row = weekRow(div.querySelectorAll('.calendar')[1], new Date(2026, 6, 6))
+
+      row.focus()
+      pressKey(row, 'PageDown')
+
+      expect(weekRow(div.querySelectorAll('.calendar')[1], new Date(2026, 7, 3))).toBe(document.activeElement)
+    })
+
+    it('should page a week row into the panel that shows the day when adjacent days are hidden', () => {
+      const div = renderCalendar({
+        calendarDate: new Date(2026, 1, 1), calendars: 2, selectionType: 'week', showAdjacentDays: false
+      })
+      const row = weekRow(div.querySelectorAll('.calendar')[1], new Date(2026, 2, 2))
+
+      row.focus()
+      pressKey(row, 'PageDown')
+
+      expect(weekRow(div.querySelectorAll('.calendar')[1], new Date(2026, 3, 1))).toBe(document.activeElement)
     })
 
     it('should move into the previous month when ArrowLeft leaves the first day of the view', () => {
