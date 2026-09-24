@@ -8,8 +8,7 @@
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import SectionInput, { type SectionInputConfig } from './section-input.js'
-import { convertToDateObject } from './util/calendar.js'
-import { type DateSection, getSectionLayout } from './util/date-sections.js'
+import { convertValue, type DateSection, getSectionLayout } from './util/date-sections.js'
 import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
 
 /**
@@ -72,15 +71,7 @@ class DateInput extends SectionInput {
   }
 
   override _convertDate(value: any): Date | null {
-    if (this._config.type === 'datetime') {
-      const withTime = convertToDateObject(value, 'day', this._config.locale, true)
-
-      if (withTime) {
-        return withTime
-      }
-    }
-
-    return super._convertDate(value)
+    return convertValue(value, this._config.type, this._config.locale)
   }
 
   override _getDefaultSections(locale: string): DateSection[] {

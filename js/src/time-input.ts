@@ -8,9 +8,7 @@
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import SectionInput, { type SectionInputConfig } from './section-input.js'
-import { convertToDateObject } from './util/calendar.js'
-import { type DateSection, getTimeSectionsFromLocale } from './util/date-sections.js'
-import { convert12hTo24h } from './util/time.js'
+import { convertValue, type DateSection, getTimeSectionsFromLocale } from './util/date-sections.js'
 import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
 
 /**
@@ -65,20 +63,7 @@ class TimeInput extends SectionInput {
 
   // Private
   override _convertDate(value: any): Date | null {
-    if (typeof value === 'string') {
-      const match = /^(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?(?:\s*(am|pm))?$/i.exec(value.trim())
-
-      if (match) {
-        const [, hour, minute, second, meridiem] = match
-        const hours = meridiem ?
-          convert12hTo24h(meridiem.toLowerCase(), Number.parseInt(hour, 10)) :
-          Number.parseInt(hour, 10)
-
-        return new Date(1970, 0, 1, hours, Number.parseInt(minute, 10), second ? Number.parseInt(second, 10) : 0)
-      }
-    }
-
-    return convertToDateObject(value, 'day', this._config.locale, true)
+    return convertValue(value, 'time', this._config.locale)
   }
 
   override _getDefaultSections(locale: string): DateSection[] {

@@ -2,6 +2,8 @@
 import {
   convert12hTo24h,
   convert24hTo12h,
+  convertTimeToDate,
+  getAmPm,
   getLocalizedTimePartials,
   getSelectedHour,
   getSelectedMinutes,
@@ -100,6 +102,46 @@ describe('Time Utilities', () => {
       const { listOfMinutes, listOfSeconds } = getLocalizedTimePartials('en-US', false)
       expect(listOfMinutes).toHaveSize(60)
       expect(listOfSeconds).toHaveSize(60)
+    })
+
+    it('should filter minutes and seconds if functions are passed', () => {
+      const { listOfMinutes, listOfSeconds } = getLocalizedTimePartials('en-US', false, [], minute => minute % 15 === 0, second => second < 3)
+
+      expect(listOfMinutes.map(({ value }) => value)).toEqual([0, 15, 30, 45])
+      expect(listOfSeconds.map(({ value }) => value)).toEqual([0, 1, 2])
+    })
+  })
+
+  describe('convertTimeToDate', () => {
+    it('should copy a date', () => {
+      const time = new Date(2026, 6, 14, 9, 30)
+      const result = convertTimeToDate(time)
+
+      expect(result).toEqual(time)
+      expect(result).not.toBe(time)
+    })
+
+    it('should read a time string on 1 January 1970', () => {
+      expect(convertTimeToDate('14:30')).toEqual(new Date(1970, 0, 1, 14, 30))
+      expect(convertTimeToDate('2:30:15 PM')).toEqual(new Date(1970, 0, 1, 14, 30, 15))
+    })
+
+    it('should return null for an empty value', () => {
+      expect(convertTimeToDate(null)).toBeNull()
+      expect(convertTimeToDate(undefined)).toBeNull()
+      expect(convertTimeToDate('')).toBeNull()
+    })
+  })
+
+  describe('getAmPm', () => {
+    it('should read the day period a locale shows', () => {
+      expect(getAmPm(new Date(2026, 6, 14, 9), 'en-US')).toBe('am')
+      expect(getAmPm(new Date(2026, 6, 14, 21), 'en-US')).toBe('pm')
+    })
+
+    it('should fall back to the hour for a locale without a day period marker', () => {
+      expect(getAmPm(new Date(2026, 6, 14, 9), 'de-DE')).toBe('am')
+      expect(getAmPm(new Date(2026, 6, 14, 12), 'de-DE')).toBe('pm')
     })
   })
 

@@ -2,14 +2,18 @@
 import {
   applyDigitToSection,
   applyLetterToSection,
+  convertValue,
+  formatDateWithin,
   formatSections,
   formatSectionValue,
   getDateFromSections,
   getDateOfISOWeek,
   getDateTimeSectionsFromLocale,
   getDaysInMonth,
+  getDateWithin,
   getDaySectionMax,
   getFullYearFromSection,
+  getHourCycle,
   getIncrementedSectionValue,
   getISOWeeksInYear,
   getPickerFormat,
@@ -22,10 +26,21 @@ import {
   getWeekLabel,
   getWeekSectionMax,
   getWeekSectionsFromLocale,
+  isDateSelectableWithin,
+  isEditableSection,
   setSectionsFromDate
 } from '../../../src/util/date-sections.js'
 
 describe('Date Sections Utilities', () => {
+  describe('isEditableSection', () => {
+    it('should tell an editable section from a literal', () => {
+      const [day, literal] = getSectionsFromFormat('dd.MM.yyyy', 'en-US')
+
+      expect(isEditableSection(day)).toBe(true)
+      expect(isEditableSection(literal)).toBe(false)
+    })
+  })
+
   describe('getSectionBounds', () => {
     it('should return bounds for day', () => {
       expect(getSectionBounds({ type: 'day' })).toEqual({ min: 1, max: 31 })
@@ -307,6 +322,18 @@ describe('Date Sections Utilities', () => {
 
       expect(types(getSectionLayout(null, 'en-GB', null, true))).toEqual(['day', 'month', 'year', 'hour', 'minute', 'second'])
       expect(types(getSectionLayout(null, 'en-GB', null, { seconds: false }))).toEqual(['day', 'month', 'year', 'hour', 'minute'])
+    })
+  })
+
+  describe('getHourCycle', () => {
+    it('should read the hour cycle of a layout', () => {
+      expect(getHourCycle(getSectionsFromFormat('hh:mm a', 'en-US'))).toBe('h12')
+      expect(getHourCycle(getSectionsFromFormat('HH:mm', 'en-US'))).toBe('h23')
+      expect(getHourCycle(getSectionsFromFormat('dd.MM.yyyy hh:mm a', 'en-US'))).toBe('h12')
+    })
+
+    it('should return undefined for a layout without hours', () => {
+      expect(getHourCycle(getSectionsFromFormat('dd.MM.yyyy', 'en-US'))).toBeUndefined()
     })
   })
 
@@ -674,6 +701,93 @@ describe('Date Sections Utilities', () => {
       const sections = getSectionsFromString('Q4 2026', getSectionsFromFormat('QQQ yyyy'))
 
       expect(sections.filter(section => section.type !== 'literal').map(section => section.value)).toEqual([4, 2026])
+    })
+  })
+
+  describe('convertValue', () => {
+    it('should return null for an empty value', () => {
+      expect(convertValue(null, 'date', 'en-US')).toBeNull()
+      expect(convertValue(undefined, 'time', 'en-US')).toBeNull()
+    })
+
+    it('should keep a valid date and drop an invalid one', () => {
+      const date = new Date(2026, 6, 14, 9, 30)
+
+      expect(convertValue(date, 'datetime', 'en-US')).toBe(date)
+      expect(convertValue(new Date(Number.NaN), 'date', 'en-US')).toBeNull()
+    })
+
+    it('should read a date string without its time in a date field', () => {
+      expect(convertValue('2026-07-14', 'date', 'en-US')).toEqual(new Date(2026, 6, 14))
+      expect(convertValue('7/14/2026', 'date', 'en-US')).toEqual(new Date(2026, 6, 14))
+    })
+
+    it('should read the time with the date in a date and time field', () => {
+      expect(convertValue('7/14/2026, 2:30:45 PM', 'datetime', 'en-US')).toEqual(new Date(2026, 6, 14, 14, 30, 45))
+      expect(convertValue('14/07/2026, 14:30:45', 'datetime', 'en-GB')).toEqual(new Date(2026, 6, 14, 14, 30, 45))
+      expect(convertValue('2026-07-14', 'datetime', 'en-US')).toEqual(new Date(2026, 6, 14))
+    })
+
+    it('should read a time-only string on 1 January 1970 in a time field only', () => {
+      expect(convertValue('14:30', 'time', 'en-US')).toEqual(new Date(1970, 0, 1, 14, 30))
+      expect(convertValue('2:05:09 pm', 'time', 'en-US')).toEqual(new Date(1970, 0, 1, 14, 5, 9))
+      expect(convertValue('12:15 AM', 'time', 'en-US')).toEqual(new Date(1970, 0, 1, 0, 15))
+      expect(convertValue('14:30', 'datetime', 'en-US')).toBeNull()
+      expect(convertValue('14:30', 'date', 'en-US')).toBeNull()
+    })
+
+    it('should return null for a string no field can read', () => {
+      expect(convertValue('garbage', 'date', 'en-US')).toBeNull()
+      expect(convertValue('garbage', 'time', 'en-US')).toBeNull()
+    })
+  })
+
+  describe('getDateWithin', () => {
+    it('should drop the parts the layout has no section for', () => {
+      expect(getDateWithin(getSectionsFromFormat('dd.MM.yyyy', 'en-US'), new Date(2026, 6, 14, 18, 5))).toEqual(new Date(2026, 6, 14))
+      expect(getDateWithin(getSectionsFromFormat('MM/yyyy', 'en-US'), new Date(2026, 6, 14))).toEqual(new Date(2026, 6, 1))
+      expect(getDateWithin(getSectionsFromFormat('dd.MM.yyyy HH:mm', 'en-US'), new Date(2026, 6, 14, 18, 5, 30))).toEqual(new Date(2026, 6, 14, 18, 5))
+    })
+
+    it('should return null for no date or an invalid one', () => {
+      const layout = getSectionsFromFormat('dd.MM.yyyy', 'en-US')
+
+      expect(getDateWithin(layout, null)).toBeNull()
+      expect(getDateWithin(layout, new Date(Number.NaN))).toBeNull()
+    })
+  })
+
+  describe('formatDateWithin', () => {
+    it('should write a date the way the layout shows it', () => {
+      expect(formatDateWithin(getSectionsFromFormat('dd.MM.yyyy', 'en-US'), new Date(2026, 6, 4))).toBe('04.07.2026')
+      expect(formatDateWithin(getSectionsFromFormat('MMM yyyy', 'en-US'), new Date(2026, 6, 4))).toBe('Jul 2026')
+    })
+
+    it('should return an empty string without a date', () => {
+      expect(formatDateWithin(getSectionsFromFormat('dd.MM.yyyy', 'en-US'), null)).toBe('')
+    })
+  })
+
+  describe('isDateSelectableWithin', () => {
+    const layout = getSectionsFromFormat('dd.MM.yyyy', 'en-US')
+
+    it('should accept no date at all', () => {
+      expect(isDateSelectableWithin(layout, null, new Date(2026, 6, 10), new Date(2026, 6, 20))).toBe(true)
+    })
+
+    it('should check the date against the bounds after dropping its time', () => {
+      expect(isDateSelectableWithin(layout, new Date(2026, 6, 20, 18), null, new Date(2026, 6, 20))).toBe(true)
+      expect(isDateSelectableWithin(layout, new Date(2026, 6, 21), null, new Date(2026, 6, 20))).toBe(false)
+      expect(isDateSelectableWithin(layout, new Date(2026, 6, 9), new Date(2026, 6, 10), null)).toBe(false)
+    })
+
+    it('should reject a disabled date', () => {
+      expect(isDateSelectableWithin(layout, new Date(2026, 6, 15), null, null, [new Date(2026, 6, 15)])).toBe(false)
+      expect(isDateSelectableWithin(layout, new Date(2026, 6, 16), null, null, [new Date(2026, 6, 15)])).toBe(true)
+    })
+
+    it('should reject a date the layout cannot hold', () => {
+      expect(isDateSelectableWithin(layout, new Date(Number.NaN), null, null)).toBe(false)
     })
   })
 })

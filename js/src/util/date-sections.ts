@@ -5,20 +5,41 @@
  * --------------------------------------------------------------------------
  */
 
-import { getISOWeekNumberAndYear, parseYearSmart, type SelectionTypes } from './calendar.js'
+import {
+  convertToDateObject, type DisabledDate, getISOWeekNumberAndYear, isDateDisabled, parseYearSmart, type SelectionTypes
+} from './calendar.js'
 import { convert12hTo24h, convert24hTo12h } from './time.js'
 
-export type DateSection = {
-  type: string
-  value: any
-  length?: number
-  padded?: boolean
-  cycle?: string
+export type EditableSectionType = 'day' | 'week' | 'month' | 'quarter' | 'year' | 'hour' | 'minute' | 'second' | 'meridiem'
+
+export type EditableSection = {
+  type: EditableSectionType
+  length: number
+  padded: boolean
+  value: number | null
+  cycle?: 'h12' | 'h23'
   names?: string[]
   placeholder?: string
 }
 
-const TOKEN_TYPES: Record<string, string> = {
+export type LiteralSection = {
+  type: 'literal'
+  value: string
+}
+
+export type DateSection = EditableSection | LiteralSection
+
+export type SectionInputType = 'date' | 'datetime' | 'time'
+
+/**
+ * Tells an editable section from a literal.
+ *
+ * @param section - The section to check
+ * @returns `true` for an editable section, `false` for a literal
+ */
+export const isEditableSection = (section: DateSection): section is EditableSection => section.type !== 'literal'
+
+const TOKEN_TYPES: Record<string, EditableSectionType> = {
   d: 'day',
   D: 'day',
   w: 'week',
@@ -37,6 +58,14 @@ const TOKEN_TYPES: Record<string, string> = {
 
 const QUARTER_NAMES = ['Q1', 'Q2', 'Q3', 'Q4']
 
+/**
+ * Lists a locale's month names in the grammatical form used inside a full
+ * date (Polish genitive "lipca", not the standalone "lipiec").
+ *
+ * @param locale - The locale to use
+ * @param width - The width of the names
+ * @returns The twelve month names
+ */
 export const getFormatMonthNames = (locale: string, width: 'long' | 'short'): string[] => {
   const formatter = new Intl.DateTimeFormat(locale, { year: 'numeric', month: width, day: 'numeric' })
 
@@ -44,6 +73,12 @@ export const getFormatMonthNames = (locale: string, width: 'long' | 'short'): st
     formatter.formatToParts(new Date(2000, index, 15)).find(part => part.type === 'month')!.value)
 }
 
+/**
+ * Lists a locale's day period names, such as `['AM', 'PM']`.
+ *
+ * @param locale - The locale to use
+ * @returns The morning and the evening name
+ */
 export const getDayPeriodNames = (locale: string): string[] => {
   const formatter = new Intl.DateTimeFormat(locale, { hour: 'numeric', hour12: true })
 
@@ -53,7 +88,16 @@ export const getDayPeriodNames = (locale: string): string[] => {
   })
 }
 
-const createSection = (char: string, tokenLength: number, locale = 'default', monthNames: string[] | null = null): DateSection => {
+/**
+ * Creates an empty editable section for a format token.
+ *
+ * @param char - The token character, such as `d`, `M`, `H` or `a`
+ * @param tokenLength - How many times the character repeats, such as 2 for `dd` or 4 for `yyyy`
+ * @param locale - The locale that names months and day periods
+ * @param monthNames - Month names to use instead of the locale's
+ * @returns The section
+ */
+const createSection = (char: string, tokenLength: number, locale = 'default', monthNames: string[] | null = null): EditableSection => {
   const type = TOKEN_TYPES[char]
 
   if (type === 'year') {
@@ -105,7 +149,13 @@ const createSection = (char: string, tokenLength: number, locale = 'default', mo
   }
 }
 
-export const getSectionBounds = (section: DateSection): { min: number, max: number } => {
+/**
+ * Gives the range of values a section accepts.
+ *
+ * @param section - The section, or an object with its `type` and, for hours, its `cycle`
+ * @returns The inclusive bounds
+ */
+export const getSectionBounds = (section: Pick<EditableSection, 'type' | 'cycle'>): { min: number, max: number } => {
   switch (section.type) {
     case 'day': {
       return { min: 1, max: 31 }
@@ -142,8 +192,22 @@ export const getSectionBounds = (section: DateSection): { min: number, max: numb
   }
 }
 
+/**
+ * Parses a format string into sections and literals. Both dayjs/moment
+ * tokens (`DD.MM.YYYY`) and date-fns/Unicode tokens (`dd.MM.yyyy`) work,
+ * including text months (`MMM`, `MMMM`) and time tokens (`HH`/`H` for the
+ * 24-hour clock, `hh`/`h` for the 12-hour clock, `mm`, `ss`, `A`/`a`); any other
+ * character is a literal. Text in single quotes is always a literal, even token
+ * letters (`'Week' ww` renders "Week 29"), and a doubled quote (`''`) writes the
+ * quote itself.
+ *
+ * @param format - The format string
+ * @param locale - The locale that names months and day periods
+ * @param monthNames - Month names to use instead of the locale's
+ * @returns The sections and literals, in order
+ */
 export const getSectionsFromFormat = (format: string, locale = 'default', monthNames: string[] | null = null): DateSection[] => {
-  const sections = []
+  const sections: DateSection[] = []
   let literal = ''
   let index = 0
 
@@ -208,10 +272,17 @@ const PART_TOKENS: Record<string, string> = {
   dayPeriod: 'A'
 }
 
+/**
+ * Maps the parts of a formatted reference date to sections and literals.
+ *
+ * @param formatter - The formatter whose parts are read
+ * @param locale - The locale that names months and day periods
+ * @returns The sections and literals, in order
+ */
 const getSectionsFromParts = (formatter: Intl.DateTimeFormat, locale: string): DateSection[] => {
   const { hourCycle } = formatter.resolvedOptions()
   const hourChar = hourCycle === 'h11' || hourCycle === 'h12' ? 'h' : 'H'
-  const sections = []
+  const sections: DateSection[] = []
 
   for (const part of formatter.formatToParts(new Date(2018, 11, 24, 15, 45, 35))) {
     const char = part.type === 'hour' ? hourChar : PART_TOKENS[part.type]
@@ -233,6 +304,12 @@ const getSectionsFromParts = (formatter: Intl.DateTimeFormat, locale: string): D
   return sections
 }
 
+/**
+ * Derives the sections of a locale's numeric date format.
+ *
+ * @param locale - The locale to use
+ * @returns The sections and literals, in order
+ */
 export const getSectionsFromLocale = (locale: string): DateSection[] =>
   getSectionsFromParts(new Intl.DateTimeFormat(locale, {
     year: 'numeric',
@@ -240,6 +317,14 @@ export const getSectionsFromLocale = (locale: string): DateSection[] =>
     day: '2-digit'
   }), locale)
 
+/**
+ * Gives a locale's week-of-year label, capitalized the way the native week
+ * input shows it ("Week", "Tydzień", "Woche"), or "Week" where
+ * `Intl.DisplayNames` has no data.
+ *
+ * @param locale - The locale to use
+ * @returns The label
+ */
 export const getWeekLabel = (locale: string): string => {
   try {
     const label = new Intl.DisplayNames(locale, { type: 'dateTimeField' }).of('weekOfYear')
@@ -249,9 +334,24 @@ export const getWeekLabel = (locale: string): string => {
   }
 }
 
+/**
+ * Derives the week mask of a locale the way the native week input shows it
+ * ("Week 29, 2026"): the localized label, the ISO week number and the ISO
+ * week-numbering year.
+ *
+ * @param locale - The locale to use
+ * @returns The sections and literals, in order
+ */
 export const getWeekSectionsFromLocale = (locale: string): DateSection[] =>
   getSectionsFromFormat(`'${getWeekLabel(locale).replaceAll('\'', '\'\'')}' ww, yyyy`, locale)
 
+/**
+ * Derives the sections of a locale's time format.
+ *
+ * @param locale - The locale to use
+ * @param seconds - Whether the time has a seconds section
+ * @returns The sections and literals, in order
+ */
 export const getTimeSectionsFromLocale = (locale: string, seconds = false): DateSection[] =>
   getSectionsFromParts(new Intl.DateTimeFormat(locale, {
     hour: '2-digit',
@@ -259,6 +359,13 @@ export const getTimeSectionsFromLocale = (locale: string, seconds = false): Date
     second: seconds ? '2-digit' : undefined
   }), locale)
 
+/**
+ * Derives the sections of a locale's date and time format.
+ *
+ * @param locale - The locale to use
+ * @param seconds - Whether the time has a seconds section
+ * @returns The sections and literals, in order
+ */
 export const getDateTimeSectionsFromLocale = (locale: string, seconds = false): DateSection[] =>
   getSectionsFromParts(new Intl.DateTimeFormat(locale, {
     year: 'numeric',
@@ -280,9 +387,26 @@ const FORMAT_BY_SELECTION_TYPE: Record<string, SectionFormat> = {
   year: 'yyyy'
 }
 
+/**
+ * Resolves the field format of a picker: an explicit format wins, and every
+ * selection type other than `day` gets a mask of its own unit.
+ *
+ * @param format - The `format` option
+ * @param selectionType - The `selectionType` option
+ * @returns The format, or `null` for the locale's day mask
+ */
 export const getPickerFormat = (format: SectionFormat, selectionType: SelectionTypes = 'day'): SectionFormat =>
   format || FORMAT_BY_SELECTION_TYPE[selectionType] || null
 
+/**
+ * Resolves the sections of the `format` option.
+ *
+ * @param format - A token string, a function returning sections, or `null` for the locale's layout
+ * @param locale - The locale that names months and day periods and derives the layout without a format
+ * @param monthNames - Month names to use instead of the locale's
+ * @param includeTime - Whether the locale's layout carries the time; `{ seconds }` also decides the seconds section
+ * @returns The sections and literals, in order
+ */
 export const getSectionLayout = (format: SectionFormat, locale: string, monthNames: string[] | null = null, includeTime: boolean | { seconds: boolean } = false): DateSection[] => {
   if (typeof format === 'function') {
     return format(locale)
@@ -297,8 +421,27 @@ export const getSectionLayout = (format: SectionFormat, locale: string, monthNam
     getSectionsFromLocale(locale)
 }
 
-export const applyDigitToSection = (section: DateSection, draft: string, digit: string, max: number = getSectionBounds(section).max): SectionEntry => {
-  const length = (section.type === 'year' ? section.length : 2) as number
+/**
+ * Reads the hour cycle of a layout.
+ *
+ * @param layout - The sections and literals of a field
+ * @returns `'h12'` or `'h23'`, or `undefined` for a layout without hours
+ */
+export const getHourCycle = (layout: DateSection[]): EditableSection['cycle'] =>
+  layout.find((section): section is EditableSection => section.type === 'hour')?.cycle
+
+/**
+ * Applies a typed digit to a section: digits add up while the value is still
+ * ambiguous and start over when it would exceed the bounds.
+ *
+ * @param section - The section being typed into
+ * @param draft - The digits typed into the section so far
+ * @param digit - The digit just typed
+ * @param max - The upper bound, such as the day count of the selected month
+ * @returns The next draft, the value, and whether the section is complete
+ */
+export const applyDigitToSection = (section: EditableSection, draft: string, digit: string, max: number = getSectionBounds(section).max): SectionEntry => {
+  const length = section.type === 'year' ? section.length : 2
   let next = `${draft || ''}${digit}`.slice(-length)
 
   if (Number.parseInt(next, 10) > max) {
@@ -314,7 +457,18 @@ export const applyDigitToSection = (section: DateSection, draft: string, digit: 
   }
 }
 
-export const applyLetterToSection = (section: DateSection, draft: string, letter: string): SectionEntry | null => {
+/**
+ * Applies a typed letter to a text section (month names, day periods) by
+ * matching the start of its names: "m" picks March, and "may" then switches to
+ * May; the section is complete when a single name is left. A letter that
+ * matches no name starts the draft over.
+ *
+ * @param section - The text section being typed into
+ * @param draft - The letters typed into the section so far
+ * @param letter - The letter just typed
+ * @returns The next draft, the value and whether the section is complete, or `null` when no name matches
+ */
+export const applyLetterToSection = (section: EditableSection, draft: string, letter: string): SectionEntry | null => {
   if (!section.names) {
     return null
   }
@@ -339,7 +493,18 @@ export const applyLetterToSection = (section: DateSection, draft: string, letter
   }
 }
 
-export const getIncrementedSectionValue = (section: DateSection, delta: number, max: number = getSectionBounds(section).max): number => {
+/**
+ * Steps a section value up or down, wrapping around within its bounds;
+ * the year clamps instead. An empty section starts at its minimum when stepping
+ * up and at its maximum when stepping down, and an empty year starts at the
+ * current year.
+ *
+ * @param section - The section to step
+ * @param delta - The signed step
+ * @param max - The upper bound, such as the day count of the selected month
+ * @returns The next value
+ */
+export const getIncrementedSectionValue = (section: EditableSection, delta: number, max: number = getSectionBounds(section).max): number => {
   const { min } = getSectionBounds(section)
 
   if (section.value === null) {
@@ -358,18 +523,38 @@ export const getIncrementedSectionValue = (section: DateSection, delta: number, 
   return ((((section.value - min + delta) % range) + range) % range) + min
 }
 
+/**
+ * Counts the days of a month in any year, including years below 100.
+ *
+ * @param year - The full year
+ * @param month - The month, 1 to 12
+ * @returns The number of days
+ */
 export const getDaysInMonth = (year: number, month: number): number => {
   const date = new Date(2000, 0, 1)
   date.setFullYear(year, month, 0)
   return date.getDate()
 }
 
+/**
+ * Counts the ISO weeks of a week-numbering year.
+ *
+ * @param year - The full week-numbering year
+ * @returns 52 or 53
+ */
 export const getISOWeeksInYear = (year: number): number => {
   const date = new Date(2000, 0, 1)
   date.setFullYear(year, 11, 28)
   return getISOWeekNumberAndYear(date).weekNumber
 }
 
+/**
+ * Finds the Monday that starts an ISO week.
+ *
+ * @param year - The full week-numbering year
+ * @param week - The ISO week number, starting at 1
+ * @returns The Monday of the week
+ */
 export const getDateOfISOWeek = (year: number, week: number): Date => {
   const date = new Date(2000, 0, 1)
   date.setFullYear(year, 0, 4)
@@ -377,20 +562,35 @@ export const getDateOfISOWeek = (year: number, week: number): Date => {
   return date
 }
 
+/**
+ * Gives the highest week the week section accepts for the selected year, and
+ * 53 while the year is unknown, since it can still turn out to be a long one.
+ *
+ * @param sections - The sections and literals of a field
+ * @returns The number of weeks in the selected year
+ */
 export const getWeekSectionMax = (sections: DateSection[]): number => {
   const yearSection = sections.find(section => section.type === 'year')
-  const year = yearSection ? getFullYearFromSection(yearSection) : null
+  const year = yearSection && isEditableSection(yearSection) ? getFullYearFromSection(yearSection) : null
 
   if (year === null) {
-    return getSectionBounds({ type: 'week' } as DateSection).max
+    return getSectionBounds({ type: 'week' }).max
   }
 
   return getISOWeeksInYear(year)
 }
 
+/**
+ * Gives the highest day the day section accepts for the selected month and
+ * year: 31 while the month is unknown, and a leap year while the year is
+ * unknown, since February can still turn out to have 29 days.
+ *
+ * @param sections - The sections and literals of a field
+ * @returns The number of days in the selected month
+ */
 export const getDaySectionMax = (sections: DateSection[]): number => {
-  let month = null
-  let year = null
+  let month: number | null = null
+  let year: number | null = null
 
   for (const section of sections) {
     if (section.type === 'month') {
@@ -403,13 +603,20 @@ export const getDaySectionMax = (sections: DateSection[]): number => {
   }
 
   if (month === null) {
-    return getSectionBounds({ type: 'day' } as DateSection).max
+    return getSectionBounds({ type: 'day' }).max
   }
 
   return getDaysInMonth(year === null ? 2000 : year, month)
 }
 
-export const getFullYearFromSection = (section: DateSection): number | null => {
+/**
+ * Reads the full year of a year section, expanding a two-digit value to the
+ * nearest fitting century.
+ *
+ * @param section - The year section
+ * @returns The full year, or `null` for an empty section
+ */
+export const getFullYearFromSection = (section: EditableSection): number | null => {
   if (section.value === null) {
     return null
   }
@@ -421,6 +628,16 @@ export const getFullYearFromSection = (section: DateSection): number | null => {
   return section.value
 }
 
+/**
+ * Builds a date from filled sections, cutting the day to the length of the
+ * month. A week section gives the Monday of the ISO week (the year section then
+ * holds the ISO week-numbering year), and a quarter section the first day of
+ * the quarter. A layout without a date part gets 1 January 1970, and one
+ * without a time part gets midnight.
+ *
+ * @param sections - The sections and literals of a field
+ * @returns The date, or `null` while any section is empty
+ */
 export const getDateFromSections = (sections: DateSection[]): Date | null => {
   const values: Record<string, any> = {}
   let hourCycle = null
@@ -462,6 +679,15 @@ export const getDateFromSections = (sections: DateSection[]): Date | null => {
   return date
 }
 
+/**
+ * Fills a copy of the sections with the values of a date. In a layout with a
+ * week section the year section takes the ISO week-numbering year, which can
+ * differ from the calendar year around 1 January.
+ *
+ * @param sections - The sections and literals of a field
+ * @param date - The date to read, or `null` to empty the sections
+ * @returns The filled sections
+ */
 export const setSectionsFromDate = (sections: DateSection[], date: Date | null): DateSection[] => {
   const weekInfo = date && sections.some(section => section.type === 'week') ? getISOWeekNumberAndYear(date) : null
 
@@ -514,7 +740,16 @@ export const setSectionsFromDate = (sections: DateSection[], date: Date | null):
   })
 }
 
-export const formatSectionValue = (section: DateSection, placeholder = ''): string => {
+/**
+ * Writes a section value for display: padded with zeros when the section is
+ * padded, cut to two digits for a two-digit year, and as its name in a text
+ * section.
+ *
+ * @param section - The section to write
+ * @param placeholder - What an empty section shows
+ * @returns The text of the section
+ */
+export const formatSectionValue = (section: EditableSection, placeholder = ''): string => {
   if (section.value === null) {
     return placeholder
   }
@@ -525,17 +760,31 @@ export const formatSectionValue = (section: DateSection, placeholder = ''): stri
 
   const value = section.type === 'year' && section.length === 2 ? section.value % 100 : section.value
 
-  return section.padded === false ? String(value) : String(value).padStart(section.length as number, '0')
+  return section.padded === false ? String(value) : String(value).padStart(section.length, '0')
 }
 
+/**
+ * Writes the sections and literals as the masked text of a field.
+ *
+ * @param sections - The sections and literals of a field
+ * @returns The masked text
+ */
 export const formatSections = (sections: DateSection[]): string =>
   sections.map(section => (section.type === 'literal' ? section.value : formatSectionValue(section))).join('')
 
+/**
+ * Reads pasted text into a copy of the sections by matching names (months,
+ * day periods) and then groups of digits to the editable sections in order.
+ *
+ * @param text - The pasted text
+ * @param sections - The sections and literals of a field
+ * @returns The filled sections, or `null` when the text does not fit the layout
+ */
 export const getSectionsFromString = (text: string, sections: DateSection[]): DateSection[] | null => {
   let normalizedText = text
 
   for (const section of sections) {
-    if (!section.names) {
+    if (!isEditableSection(section) || !section.names) {
       continue
     }
 
@@ -558,7 +807,7 @@ export const getSectionsFromString = (text: string, sections: DateSection[]): Da
   }
 
   let groupIndex = 0
-  const next = []
+  const next: DateSection[] = []
 
   for (const section of sections) {
     if (section.type === 'literal') {
@@ -577,4 +826,91 @@ export const getSectionsFromString = (text: string, sections: DateSection[]): Da
   }
 
   return next
+}
+
+/**
+ * Converts the value a date or time field is given to a `Date`. A time field
+ * also reads time-only strings such as `'14:30'` or `'2:05 pm'` on 1 January
+ * 1970, without checking the range, so `'24:00'` rolls over into 2 January;
+ * a date and time field reads the time with the date before trying the date
+ * alone.
+ *
+ * @param value - The value as a `Date` or a string
+ * @param type - The kind of field
+ * @param locale - The locale that reads localized date strings
+ * @returns The date, or `null` for an empty or unreadable value
+ */
+export const convertValue = (value: Date | string | null | undefined, type: SectionInputType, locale: string): Date | null => {
+  if (value === null || value === undefined) {
+    return null
+  }
+
+  if (type === 'time' && typeof value === 'string') {
+    const match = /^(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?(?:\s*(am|pm))?$/i.exec(value.trim())
+
+    if (match) {
+      const [, hour, minute, second, meridiem] = match
+      const hours = meridiem ?
+        convert12hTo24h(meridiem.toLowerCase(), Number.parseInt(hour, 10)) :
+        Number.parseInt(hour, 10)
+
+      return new Date(1970, 0, 1, hours, Number.parseInt(minute, 10), second ? Number.parseInt(second, 10) : 0)
+    }
+  }
+
+  if (type === 'datetime') {
+    const withTime = convertToDateObject(value, 'day', locale, true)
+
+    if (withTime) {
+      return withTime
+    }
+  }
+
+  return convertToDateObject(value, 'day', locale, type === 'time')
+}
+
+/**
+ * Brings a date to what a field with the given layout holds: the parts the
+ * layout has no section for are dropped, such as the time in a date-only field
+ * or the day in a month field.
+ *
+ * @param layout - The sections and literals of the field
+ * @param date - The date to bring into the layout
+ * @returns The date the field holds, or `null` for an empty or invalid date
+ */
+export const getDateWithin = (layout: DateSection[], date: Date | null): Date | null =>
+  date && !Number.isNaN(date.getTime()) ?
+    getDateFromSections(setSectionsFromDate(layout, date)) :
+    null
+
+/**
+ * Writes a date the way a field with the given layout shows it.
+ *
+ * @param layout - The sections and literals of the field
+ * @param date - The date to write
+ * @returns The masked text, or an empty string without a date
+ */
+export const formatDateWithin = (layout: DateSection[], date: Date | null): string =>
+  date ? formatSections(setSectionsFromDate(layout, date)) : ''
+
+/**
+ * Tells whether a field with the given layout can hold a date: the date is
+ * first brought into the layout and then checked against the bounds and the
+ * disabled dates.
+ *
+ * @param layout - The sections and literals of the field
+ * @param date - The date to check
+ * @param minDate - The earliest date allowed
+ * @param maxDate - The latest date allowed
+ * @param disabledDates - The dates that cannot be picked
+ * @returns `true` for a selectable date and for no date at all, `false` for an invalid date
+ */
+export const isDateSelectableWithin = (layout: DateSection[], date: Date | null, minDate: Date | null, maxDate: Date | null, disabledDates?: DisabledDate | DisabledDate[]): boolean => {
+  if (date === null) {
+    return true
+  }
+
+  const normalized = getDateWithin(layout, date)
+
+  return normalized !== null && !isDateDisabled(normalized, minDate, maxDate, disabledDates)
 }

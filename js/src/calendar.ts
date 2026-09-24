@@ -18,6 +18,7 @@ import {
 import { defineJQueryPlugin, isRTL, jQueryDispatch } from './util/index.js'
 import {
   convertToDateObject,
+  createDateFormatter,
   createGroupsInArray,
   type DisabledDate,
   getCalendarDate,
@@ -247,12 +248,12 @@ class Calendar extends BaseComponent {
   protected declare _hoverDate: Date | null
   protected declare _selectEndDate: boolean
   protected declare _view: ViewTypes
-  protected declare _formatters: Map<string, Intl.DateTimeFormat>
+  protected declare _formatter: ReturnType<typeof createDateFormatter>
 
   constructor(element?: string | Element | null, config?: Partial<CalendarConfig> | null) {
     super(element)
 
-    this._formatters = new Map()
+    this._formatter = createDateFormatter()
     this._config = this._getConfig(config)
     this._initializeDates()
     this._initializeView()
@@ -1206,19 +1207,7 @@ class Calendar extends BaseComponent {
   }
 
   _formatDate(date: Date, options?: Intl.DateTimeFormatOptions): string {
-    if (Number.isNaN(date.getTime())) {
-      return date.toLocaleDateString(this._config.locale, options)
-    }
-
-    const key = `${this._config.locale}|${options ? JSON.stringify(options) : ''}`
-    let formatter = this._formatters.get(key)
-
-    if (!formatter) {
-      formatter = new Intl.DateTimeFormat(this._config.locale, options)
-      this._formatters.set(key, formatter)
-    }
-
-    return formatter.format(date)
+    return this._formatter(date, this._config.locale, options)
   }
 
   // Static

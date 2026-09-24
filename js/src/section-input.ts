@@ -9,14 +9,16 @@ import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import {
-  convertToDateObject, type DisabledDate, getLocalDateFromString, isDateDisabled, isSameInstantAs
+  type DisabledDate, getLocalDateFromString, isDateDisabled, isSameInstantAs
 } from './util/calendar.js'
 import {
   applyDigitToSection,
   applyLetterToSection,
+  convertValue,
   formatSections,
   formatSectionValue,
   getDateFromSections,
+  getDateWithin,
   getDaySectionMax,
   getFullYearFromSection,
   getIncrementedSectionValue,
@@ -24,10 +26,11 @@ import {
   getSectionLayout,
   getSectionsFromString,
   getWeekSectionMax,
+  isEditableSection,
   setSectionsFromDate
 } from './util/date-sections.js'
 import type { ComponentConfig } from './util/config.js'
-import type { DateSection, SectionFormat } from './util/date-sections.js'
+import type { DateSection, EditableSection, SectionFormat } from './util/date-sections.js'
 import { captureHostClasses, type HostClasses, restoreHostClasses } from './util/form-control-group.js'
 import { getNextActiveElement, isRTL } from './util/index.js'
 
@@ -280,11 +283,7 @@ abstract class SectionInput extends BaseComponent {
   }
 
   isDateSelectable(date: Date | null): boolean {
-    if (!(date instanceof Date) || Number.isNaN(date.getTime())) {
-      return false
-    }
-
-    const normalized = getDateFromSections(setSectionsFromDate(this._sections, date))
+    const normalized = date instanceof Date ? getDateWithin(this._sections, date) : null
 
     return normalized !== null && this._getValidationError(normalized, true) === null
   }
@@ -320,7 +319,7 @@ abstract class SectionInput extends BaseComponent {
   }
 
   _convertDate(value: any): Date | null {
-    return convertToDateObject(value, 'day', this._config.locale)
+    return convertValue(value, 'date', this._config.locale)
   }
 
   _applyConfig(): void {
@@ -747,19 +746,19 @@ abstract class SectionInput extends BaseComponent {
         continue
       }
 
-      const value = section.type === 'year' ? getFullYearFromSection(section) : section.value
-      sectionElement.setAttribute('aria-valuenow', value)
+      const value = section.type === 'year' ? getFullYearFromSection(section)! : section.value
+      sectionElement.setAttribute('aria-valuenow', String(value))
       sectionElement.setAttribute('aria-valuetext', this._getSectionValueText(section, value))
     }
   }
 
-  _getSectionValueText(section: DateSection, value: number): string {
+  _getSectionValueText(section: EditableSection, value: number): string {
     if (section.names) {
-      return section.names[section.value - 1]
+      return section.names[value - 1]
     }
 
     if (section.type === 'month') {
-      return this._monthFormatter.format(new Date(2000, section.value - 1, 1))
+      return this._monthFormatter.format(new Date(2000, value - 1, 1))
     }
 
     return String(value)
@@ -797,7 +796,7 @@ abstract class SectionInput extends BaseComponent {
     }
   }
 
-  _getSectionMax(section: DateSection): number {
+  _getSectionMax(section: EditableSection): number {
     if (section.type === 'day') {
       return getDaySectionMax(this._sections)
     }
@@ -813,8 +812,8 @@ abstract class SectionInput extends BaseComponent {
     return !this._config.disabled && !this._config.readonly
   }
 
-  _getSection(index: number): DateSection {
-    return this._sections.filter(section => section.type !== 'literal')[index]
+  _getSection(index: number): EditableSection {
+    return this._sections.filter(isEditableSection)[index]
   }
 
   _getSectionIndex(sectionElement: HTMLElement): number {
