@@ -54,9 +54,7 @@ const ATTRIBUTE_ROLE_SEPARATOR = 'data-coreui-range-separator'
 const ATTRIBUTE_ROLE_START = 'data-coreui-range-start'
 
 const SELECTOR_DATA_DATE_RANGE_INPUT = '[data-coreui-date-range-input]'
-const SELECTOR_ROLE_END = `[${ATTRIBUTE_ROLE_END}]`
 const SELECTOR_ROLE_SEPARATOR = `[${ATTRIBUTE_ROLE_SEPARATOR}]`
-const SELECTOR_ROLE_START = `[${ATTRIBUTE_ROLE_START}]`
 const SELECTOR_SECTION = '.form-date-time-section'
 const SELECTOR_SVG = 'svg'
 
@@ -109,7 +107,6 @@ type DateRangeInputConfig = {
   valid: boolean
   weekPlaceholder: string | null
   yearPlaceholder: string | null
-
 }
 
 const Default: DateRangeInputConfig = {
@@ -161,7 +158,6 @@ const Default: DateRangeInputConfig = {
   valid: false,
   weekPlaceholder: null,
   yearPlaceholder: null
-
 }
 
 const ORIGINAL_DEFAULT: DateRangeInputConfig = { ...Default }
@@ -215,7 +211,6 @@ const DefaultType: Record<string, string> = {
   valid: 'boolean',
   weekPlaceholder: '(string|null)',
   yearPlaceholder: '(string|null)'
-
 }
 
 /**
@@ -227,10 +222,8 @@ class DateRangeInput extends BaseComponent {
   protected declare _endInput: any
   protected declare _startElement: HTMLElement
   protected declare _endElement: HTMLElement
-  protected declare _startFieldElement: HTMLElement
-  protected declare _endFieldElement: HTMLElement
   protected declare _separatorElement: HTMLElement
-  protected declare _created: { end: boolean, separator: boolean, start: boolean }
+  protected declare _createdElements: HTMLElement[]
   protected declare _hiddenFromAssistiveTech: Element[]
   protected declare _hostClasses: HostClasses
   protected declare _claimedEndDate: Date | null
@@ -247,7 +240,7 @@ class DateRangeInput extends BaseComponent {
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
 
-    this._created = { end: false, separator: false, start: false }
+    this._createdElements = []
     this._hiddenFromAssistiveTech = []
     this._hostClasses = captureHostClasses(this._element, [...this._managedClassNames(), CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID])
     this._claimedInvalid = this._element.classList.contains(CLASS_NAME_IS_INVALID)
@@ -329,16 +322,8 @@ class DateRangeInput extends BaseComponent {
     this._startInput.dispose()
     this._endInput.dispose()
 
-    if (this._created.start) {
-      this._startFieldElement.remove()
-    }
-
-    if (this._created.separator) {
-      this._separatorElement.remove()
-    }
-
-    if (this._created.end) {
-      this._endFieldElement.remove()
+    for (const element of this._createdElements) {
+      element.remove()
     }
 
     this._element.classList.remove(...this._addedStateClassNames)
@@ -389,41 +374,13 @@ class DateRangeInput extends BaseComponent {
   }
 
   _createDateRangeInput(): void {
-    const group = this._element
-    applyControlGroupClasses(group, CLASS_NAME_INPUT_GROUP, CLASS_NAME_DATE_RANGE)
+    applyControlGroupClasses(this._element, CLASS_NAME_INPUT_GROUP, CLASS_NAME_DATE_RANGE)
+    applyControlGroupSize(this._element, this._config.size)
 
-    applyControlGroupSize(group, this._config.size)
-
-    const ownStart = SelectorEngine.findOne(SELECTOR_ROLE_START, group)
-    this._startElement = ownStart ?? document.createElement('div')
-    this._created.start = !ownStart
-    if (!ownStart) {
-      this._startElement.setAttribute(ATTRIBUTE_ROLE_START, '')
-    }
-
-    this._startFieldElement = ownStart ?? appendControlGroupField(group, this._startElement, this._config.startFloatingLabel, `${NAME}-`)
-
-    const ownSeparator = SelectorEngine.findOne(SELECTOR_ROLE_SEPARATOR, group)
-    this._separatorElement = ownSeparator ?? this._createSeparator()
-    this._created.separator = !ownSeparator
-    if (!ownSeparator) {
-      this._separatorElement.setAttribute(ATTRIBUTE_ROLE_SEPARATOR, '')
-    }
-
+    this._startElement = this._createField(ATTRIBUTE_ROLE_START, this._config.startFloatingLabel)
+    this._separatorElement = SelectorEngine.findOne(SELECTOR_ROLE_SEPARATOR, this._element) ?? this._createSeparator()
     this._hideFromAssistiveTech(this._separatorElement)
-
-    if (!ownSeparator) {
-      group.append(this._separatorElement)
-    }
-
-    const ownEnd = SelectorEngine.findOne(SELECTOR_ROLE_END, group)
-    this._endElement = ownEnd ?? document.createElement('div')
-    this._created.end = !ownEnd
-    if (!ownEnd) {
-      this._endElement.setAttribute(ATTRIBUTE_ROLE_END, '')
-    }
-
-    this._endFieldElement = ownEnd ?? appendControlGroupField(group, this._endElement, this._config.endFloatingLabel, `${NAME}-`)
+    this._endElement = this._createField(ATTRIBUTE_ROLE_END, this._config.endFloatingLabel)
 
     this._startInput = this._createInput(this._startElement, {
       ariaLabel: this._config.startFloatingLabel ?? this._config.ariaStartLabel,
@@ -456,11 +413,28 @@ class DateRangeInput extends BaseComponent {
     })
   }
 
+  _createField(attribute: string, floatingLabel: string | null): HTMLElement {
+    const ownElement = SelectorEngine.findOne(`[${attribute}]`, this._element)
+
+    if (ownElement) {
+      return ownElement
+    }
+
+    const element = document.createElement('div')
+    element.setAttribute(attribute, '')
+    this._createdElements.push(appendControlGroupField(this._element, element, floatingLabel, `${NAME}-`))
+
+    return element
+  }
+
   _createSeparator(): HTMLElement {
     const separator = document.createElement('span')
     separator.classList.add(CLASS_NAME_SEPARATOR)
+    separator.setAttribute(ATTRIBUTE_ROLE_SEPARATOR, '')
     const icon = isRTL(this._element) ? this._config.separatorIconRtl : this._config.separatorIcon
     separator.innerHTML = sanitizeByConfig(icon, this._config)
+    this._element.append(separator)
+    this._createdElements.push(separator)
 
     return separator
   }

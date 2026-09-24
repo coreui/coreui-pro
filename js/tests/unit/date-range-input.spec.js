@@ -84,6 +84,15 @@ describe('DateRangeInput', () => {
       expect(fields()[0].getAttribute('aria-label')).toEqual('Check-in')
     })
 
+    it('should remove the floating-label fields it built on dispose', () => {
+      const range = build({ startFloatingLabel: 'Check-in', endFloatingLabel: 'Check-out' })
+
+      range.dispose()
+      instances.length = 0
+
+      expect(root().children).toHaveSize(0)
+    })
+
     it('should size the frame and disable both fields', () => {
       build({ disabled: true, size: 'lg' })
 
