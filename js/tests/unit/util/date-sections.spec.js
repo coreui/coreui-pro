@@ -286,8 +286,10 @@ describe('Date Sections Utilities', () => {
       expect(getPickerFormat('dd.MM.yyyy', 'month')).toEqual('dd.MM.yyyy')
     })
 
-    it('should treat an empty format as none', () => {
+    it('should treat an empty or unset format as none', () => {
       expect(getPickerFormat('', 'month')).toEqual('MM/yyyy')
+      expect(getPickerFormat(undefined, 'month')).toEqual('MM/yyyy')
+      expect(getPickerFormat(undefined)).toBeNull()
     })
 
     it('should give every selection type but day a mask of its own granularity', () => {
@@ -315,6 +317,7 @@ describe('Date Sections Utilities', () => {
     it('should fall back to the locale', () => {
       expect(getSectionLayout(null, 'en-US').map(section => section.type))
         .toEqual(['month', 'literal', 'day', 'literal', 'year'])
+      expect(getSectionLayout(undefined, 'en-US')).toEqual(getSectionLayout(null, 'en-US'))
     })
 
     it('should fall back to the locale date and time when the time is included', () => {
@@ -469,6 +472,12 @@ describe('Date Sections Utilities', () => {
       expect(getDateOfISOWeek(2026, 1)).toEqual(new Date(2025, 11, 29))
       expect(getDateOfISOWeek(2026, 53)).toEqual(new Date(2026, 11, 28))
       expect(getDateOfISOWeek(2030, 20)).toEqual(new Date(2030, 4, 13))
+    })
+
+    it('should keep a year below 100', () => {
+      const monday = new Date(2000, 0, 1)
+      monday.setFullYear(99, 0, 12)
+      expect(getDateOfISOWeek(99, 3)).toEqual(monday)
     })
   })
 

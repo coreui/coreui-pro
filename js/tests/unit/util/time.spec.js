@@ -1,4 +1,5 @@
-
+import { onTestFinished, vi } from 'vitest'
+import { cdp } from 'vitest/browser'
 import {
   convert12hTo24h,
   convert24hTo12h,
@@ -63,6 +64,28 @@ describe('Time Utilities', () => {
       expect(listOfHours).toHaveSize(12)
       expect(listOfHours[0].value).toBe(1)
       expect(listOfHours[11].value).toBe(12)
+    })
+
+    it('should label a 12-hour picker with the hours 1 to 12', () => {
+      const labels = getLocalizedTimePartials('en-US', true).listOfHours.map(hour => hour.label)
+      expect(labels).toEqual(Array.from({ length: 12 }, (_, index) => String(index + 1)))
+    })
+
+    it.each([
+      ['America/Santiago', [2026, 8, 6], 0, '00'],
+      ['Europe/Warsaw', [2026, 2, 29], 2, '02']
+    ])('should label the hour a daylight saving day skips in %s', async (timezoneId, [year, month, day], hour, label) => {
+      await cdp().send('Emulation.setTimezoneOverride', { timezoneId })
+      onTestFinished(() => cdp().send('Emulation.setTimezoneOverride', { timezoneId: '' }))
+      vi.useFakeTimers({ toFake: ['Date'] })
+      onTestFinished(() => vi.useRealTimers())
+      vi.setSystemTime(new Date(year, month, day, 12))
+
+      const skipped = new Date()
+      skipped.setHours(hour)
+      expect(skipped.getHours()).not.toBe(hour)
+
+      expect(getLocalizedTimePartials('en-GB', false, [hour]).listOfHours.map(item => item.label)).toEqual([label])
     })
 
     it('should generate the correct hours array for 24-hour format', () => {

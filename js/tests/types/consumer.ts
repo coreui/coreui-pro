@@ -20,6 +20,8 @@ import type { DateRangeInputConfig } from '../../dist/date-range-input.js'
 import type { DateRangePickerConfig } from '../../dist/date-range-picker.js'
 import type { TimeInputConfig } from '../../dist/time-input.js'
 import type { TimePickerConfig } from '../../dist/time-picker.js'
+import { getPickerFormat, getSectionLayout } from '../../dist/util/date-sections.js'
+import type { DateSection, SectionFormat } from '../../dist/util/date-sections.js'
 import type Popup from '../../dist/util/popup.js'
 
 const element = document.querySelector('.example') as HTMLElement
@@ -110,14 +112,21 @@ const popupShown: boolean = popup.isShown
 // @ts-expect-error — isShown is a boolean
 const popupShownText: string = popup.isShown
 
+// The format helpers take an unset format the way React and Vue hold it.
+const unsetFormat: SectionFormat = getPickerFormat(undefined, 'month')
+const localeLayout: DateSection[] = getSectionLayout(undefined, 'en-US')
+// @ts-expect-error — a format is a token string, a function or nothing
+const formatTypo: SectionFormat = getPickerFormat(42)
+
 const chipSet = new ChipSet(element, { removable: true })
 const values: string[] = chipSet.getValues()
 const chip: Chip | null = Chip.getInstance(element)
 
 export {
-  alert, calendarConfig, chip, chipSet, closing, datePicker, dayFormatFunction, disabledDatesString, inputConfigs,
-  inputTypeTypo, instance, modalHiding, nestedTypo, modalShowing, modalToggling, monthFormatTypo, multiSelect, name, orCreated,
+  alert, calendarConfig, chip, chipSet, closing, datePicker, dayFormatFunction, disabledDatesString, formatTypo,
+  inputConfigs, inputTypeTypo, instance, localeLayout, modalHiding, nestedTypo, modalShowing, modalToggling,
+  monthFormatTypo, multiSelect, name, orCreated,
   pickerConfig, popoverShowing, popupShown, popupShownText, rangeInputTypeTypo, rangePickerConfig, selection,
-  timePickerConfig, toast, toastShowing, tooltipToggling, typoCalendar, typoConfig, values, version, weekdayFormatTypo,
-  wrongResolution
+  timePickerConfig, toast, toastShowing, tooltipToggling, typoCalendar, typoConfig, unsetFormat, values, version,
+  weekdayFormatTypo, wrongResolution
 }
