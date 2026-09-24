@@ -567,14 +567,14 @@ const parseLocalDateString = (dateString: string) : Date | null => {
  * else as a day by `parseDayString`. A day past the end of its month rolls over
  * into the next month.
  *
- * @param date - The value as a `Date` or a string
+ * @param date - The value as a `Date` or a string; `null`, `undefined` or an empty string means no date
  * @param selectionType - The unit the string names
  * @param locale - The locale whose format reads a day
  * @param includeTime - Whether a day is read with its time
- * @returns The date, or `null` for an invalid or unreadable value
+ * @returns The date, or `null` for no value or an invalid or unreadable one
  */
-export const convertToDateObject = (date: Date | string, selectionType?: SelectionTypes, locale: string = 'en-US', includeTime: boolean = false) : Date | null => {
-  if (date === null) {
+export const convertToDateObject = (date: Date | string | null | undefined, selectionType?: SelectionTypes, locale: string = 'en-US', includeTime: boolean = false) : Date | null => {
+  if (!date) {
     return null
   }
 

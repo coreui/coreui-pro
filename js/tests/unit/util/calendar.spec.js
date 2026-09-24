@@ -69,9 +69,9 @@ describe('Calendar Utilities', () => {
   })
 
   describe('convertToDateObject', () => {
-    it('should return null if date is null', () => {
-      const result = convertToDateObject(null, 'day')
-      expect(result).toBeNull()
+    it.each([null, undefined])('should return null for %s', value => {
+      expect(convertToDateObject(value, 'day')).toBeNull()
+      expect(convertToDateObject(value, 'week')).toBeNull()
     })
 
     it('should return the same Date object if date is already a Date', () => {
