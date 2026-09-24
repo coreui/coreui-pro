@@ -27,7 +27,7 @@ import {
   setSectionsFromDate
 } from './util/date-sections.js'
 import type { ComponentConfig } from './util/config.js'
-import type { DateSection, SectionEntry, SectionFormat } from './util/date-sections.js'
+import type { DateSection, SectionFormat } from './util/date-sections.js'
 import { captureHostClasses, type HostClasses, restoreHostClasses } from './util/form-control-group.js'
 import { getNextActiveElement, isRTL } from './util/index.js'
 
@@ -104,7 +104,6 @@ export type SectionInputConfig = {
   valid: boolean
   weekPlaceholder: string | null
   yearPlaceholder: string | null
-
 }
 
 const Default: SectionInputConfig = {
@@ -142,7 +141,6 @@ const Default: SectionInputConfig = {
   valid: false,
   weekPlaceholder: null,
   yearPlaceholder: null
-
 }
 
 const DefaultType: Record<string, string> = {
@@ -198,8 +196,8 @@ const DefaultPlaceholders = {
  * Class definition
  */
 
-class SectionInput extends BaseComponent {
-  declare ['constructor']: typeof SectionInput
+abstract class SectionInput extends BaseComponent {
+  declare ['constructor']: typeof SectionInput & typeof BaseComponent
   protected declare _date: Date | null
   protected declare _minDate: Date | null
   protected declare _maxDate: Date | null
@@ -222,17 +220,11 @@ class SectionInput extends BaseComponent {
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
 
-    this._config = this._getConfig(config)
-    this._date = this._config.date ? this._convertDate(this._config.date) : null
-    this._minDate = this._convertDate(this._config.minDate)
-    this._maxDate = this._convertDate(this._config.maxDate)
-    this._sections = setSectionsFromDate(this._resolveSections(), this._date)
+    this._applyConfig()
     this._date = getDateFromSections(this._sections)
-    this._draft = ''
     this._allSelected = false
     this._error = null
     this._inputElement = null
-    this._monthFormatter = new Intl.DateTimeFormat(this._config.locale, { month: 'long' })
     this._form = null
     this._resetHandler = () => {
       setTimeout(() => {
@@ -274,17 +266,13 @@ class SectionInput extends BaseComponent {
 
   // Public
   clear(): void {
-    this._sections = setSectionsFromDate(this._sections, null)
     this._draft = ''
-    this._syncSections()
-    this._updateDate()
+    this._commitSections(setSectionsFromDate(this._sections, null))
   }
 
   reset(): void {
-    this._sections = setSectionsFromDate(this._sections, this._initialDate)
     this._draft = ''
-    this._syncSections()
-    this._updateDate()
+    this._commitSections(setSectionsFromDate(this._sections, this._initialDate))
   }
 
   getDate(): Date | null {
@@ -307,18 +295,9 @@ class SectionInput extends BaseComponent {
     }
 
     this._config = this._getConfig({ ...this._config, ...config })
-
-    const previousDate = this._date
-    this._date = this._config.date ? this._convertDate(this._config.date) : null
-    this._minDate = this._convertDate(this._config.minDate)
-    this._maxDate = this._convertDate(this._config.maxDate)
-    this._sections = setSectionsFromDate(this._resolveSections(), this._date)
-    this._draft = ''
-    this._monthFormatter = new Intl.DateTimeFormat(this._config.locale, { month: 'long' })
-
+    this._applyConfig()
     this._createSectionInput()
-    this._date = previousDate
-    this._updateDate()
+    this._commitSections()
   }
 
   override dispose(): void {
@@ -336,11 +315,6 @@ class SectionInput extends BaseComponent {
   }
 
   // Private
-  _getDefaultSections(locale?: string): DateSection[]
-  _getDefaultSections(): DateSection[] {
-    throw new Error('Method "_getDefaultSections" must be implemented.')
-  }
-
   _getAriaLabel(): string {
     return this._config.ariaLabel
   }
@@ -349,10 +323,15 @@ class SectionInput extends BaseComponent {
     return convertToDateObject(value, 'day', this._config.locale)
   }
 
-  _resolveSections(): DateSection[] {
-    const { format, locale, monthNames } = this._config
+  _applyConfig(): void {
+    const { date, format, locale, maxDate, minDate, monthNames } = this._config
+    const sections = format ? getSectionLayout(format, locale, monthNames) : this._getDefaultSections(locale)
 
-    return format ? getSectionLayout(format, locale, monthNames) : this._getDefaultSections(locale)
+    this._minDate = this._convertDate(minDate)
+    this._maxDate = this._convertDate(maxDate)
+    this._sections = setSectionsFromDate(sections, date ? this._convertDate(date) : null)
+    this._draft = ''
+    this._monthFormatter = new Intl.DateTimeFormat(locale, { month: 'long' })
   }
 
   _addEventListeners(): void {
@@ -365,17 +344,8 @@ class SectionInput extends BaseComponent {
     EventHandler.on(this._element, eventName('beforeinput'), SELECTOR_SECTION, (event: any) => {
       event.preventDefault()
 
-      if (!this._isEditable() || event.inputType !== 'insertText' || !event.data) {
-        return
-      }
-
-      if (/^\d$/.test(event.data)) {
-        this._applyDigit(event.target, event.data)
-        return
-      }
-
-      if (event.data.length === 1) {
-        this._applyLetter(event.target, event.data)
+      if (this._isEditable() && event.inputType === 'insertText' && event.data?.length === 1) {
+        this._applyCharacter(event.target, event.data)
       }
     })
 
@@ -397,8 +367,7 @@ class SectionInput extends BaseComponent {
 
     EventHandler.on(this._element, eventName('focusout'), (event: any) => {
       if (!this._element.contains(event.relatedTarget)) {
-        this._allSelected = false
-        this._element.classList.remove(CLASS_NAME_ALL_SELECTED)
+        this._setAllSelected(false)
         this._normalizeSections()
       }
     })
@@ -411,24 +380,20 @@ class SectionInput extends BaseComponent {
       }
     })
 
-    EventHandler.on(this._element, eventName('copy'), (event: any) => {
-      if (this._allSelected) {
-        event.preventDefault()
-        event.clipboardData.setData('text/plain', formatSections(this._sections))
-      }
-    })
-
-    EventHandler.on(this._element, eventName('cut'), (event: any) => {
-      if (this._allSelected) {
-        event.preventDefault()
-        event.clipboardData.setData('text/plain', formatSections(this._sections))
-
-        if (this._isEditable()) {
-          this.clear()
-          this._getSectionElements()[0].focus()
+    for (const type of ['copy', 'cut']) {
+      EventHandler.on(this._element, eventName(type), (event: any) => {
+        if (!this._allSelected) {
+          return
         }
-      }
-    })
+
+        event.preventDefault()
+        event.clipboardData.setData('text/plain', formatSections(this._sections))
+
+        if (type === 'cut' && this._isEditable()) {
+          this._clearAndFocus()
+        }
+      })
+    }
 
     this._form = this._element.closest('form')
 
@@ -443,12 +408,9 @@ class SectionInput extends BaseComponent {
       }
 
       const sections = this._getSectionElements()
-      const firstEmpty = sections.find((sectionElement, index) => this._getSection(index).value === null)
-      const target = firstEmpty || sections[0]
+      const target = sections.find((sectionElement, index) => this._getSection(index).value === null) || sections[0]
 
-      if (target) {
-        target.focus()
-      }
+      target?.focus()
     })
   }
 
@@ -473,13 +435,9 @@ class SectionInput extends BaseComponent {
     const { key } = event
     const target = event.target as HTMLElement
 
-    if (key === 'Tab') {
-      return
-    }
-
     if ((event.ctrlKey || event.metaKey) && key.toLowerCase() === 'a') {
       event.preventDefault()
-      this._selectAllSections()
+      this._setAllSelected(true)
       return
     }
 
@@ -501,19 +459,18 @@ class SectionInput extends BaseComponent {
       return
     }
 
+    const section = this._getSection(this._getSectionIndex(target))
+
     if ((key === ARROW_UP_KEY || key === ARROW_DOWN_KEY) && !(event.altKey && key === ARROW_DOWN_KEY)) {
       event.preventDefault()
-      const section = this._getSection(this._getSectionIndex(target))
       section.value = getIncrementedSectionValue(section, key === ARROW_UP_KEY ? 1 : -1, this._getSectionMax(section))
       this._draft = ''
-      this._syncSections()
-      this._updateDate()
+      this._commitSections()
       return
     }
 
     if (key === BACKSPACE_KEY || key === DELETE_KEY) {
       event.preventDefault()
-      const section = this._getSection(this._getSectionIndex(target))
 
       if (key === BACKSPACE_KEY && section.value === null) {
         this._focusSibling(target, false)
@@ -522,49 +479,32 @@ class SectionInput extends BaseComponent {
 
       section.value = null
       this._draft = ''
-      this._syncSections()
-      this._updateDate()
+      this._commitSections()
       return
     }
 
-    if (/^\d$/.test(key)) {
+    if (/^\d$/.test(key) || (key.length === 1 && !event.ctrlKey && !event.metaKey)) {
       event.preventDefault()
-      this._applyDigit(target, key)
-      return
-    }
-
-    if (key.length === 1 && !event.ctrlKey && !event.metaKey) {
-      event.preventDefault()
-      this._applyLetter(target, key)
+      this._applyCharacter(target, key)
     }
   }
 
   _onKeydownAllSelected(event: KeyboardEvent): boolean {
     const { key } = event
+    const isCharacter = key.length === 1 && !event.ctrlKey && !event.metaKey
 
-    if (key === BACKSPACE_KEY || key === DELETE_KEY) {
-      event.preventDefault()
-      this.clear()
-      this._getSectionElements()[0].focus()
-      return true
+    if (!isCharacter && key !== BACKSPACE_KEY && key !== DELETE_KEY) {
+      return false
     }
 
-    if (key.length === 1 && !event.ctrlKey && !event.metaKey) {
-      event.preventDefault()
-      this.clear()
-      const firstSection = this._getSectionElements()[0]
-      firstSection.focus()
+    event.preventDefault()
+    const firstSection = this._clearAndFocus()
 
-      if (/^\d$/.test(key)) {
-        this._applyDigit(firstSection, key)
-      } else {
-        this._applyLetter(firstSection, key)
-      }
-
-      return true
+    if (isCharacter) {
+      this._applyCharacter(firstSection, key)
     }
 
-    return false
+    return true
   }
 
   _focusSectionByKey(sectionElement: HTMLElement, key: string): void {
@@ -582,33 +522,32 @@ class SectionInput extends BaseComponent {
     this._focusSibling(sectionElement, shouldMoveNext)
   }
 
-  _applyDigit(sectionElement: HTMLElement, digit: string): void {
+  _applyCharacter(sectionElement: HTMLElement, character: string): void {
     const section = this._getSection(this._getSectionIndex(sectionElement))
-    this._applySectionInput(sectionElement, section, applyDigitToSection(section, this._draft, digit, this._getSectionMax(section)))
-  }
+    const result = /^\d$/.test(character) ?
+      applyDigitToSection(section, this._draft, character, this._getSectionMax(section)) :
+      applyLetterToSection(section, this._draft, character)
 
-  _applyLetter(sectionElement: HTMLElement, letter: string): void {
-    const section = this._getSection(this._getSectionIndex(sectionElement))
-    this._applySectionInput(sectionElement, section, applyLetterToSection(section, this._draft, letter))
-  }
-
-  _applySectionInput(sectionElement: HTMLElement, section: DateSection, result: SectionEntry | null): void {
     if (!result) {
       return
     }
 
-    const { draft, value, completed } = result
+    this._draft = result.completed ? '' : result.draft
+    section.value = result.value
+    this._commitSections()
 
-    this._draft = completed ? '' : draft
-    section.value = value
-    this._syncSections()
-    this._updateDate()
-
-    if (completed) {
+    if (result.completed) {
       this._focusSibling(sectionElement, true)
     } else {
       this._selectSectionContent(sectionElement)
     }
+  }
+
+  _clearAndFocus(): HTMLElement {
+    this.clear()
+    const [firstSection] = this._getSectionElements()
+    firstSection.focus()
+    return firstSection
   }
 
   _handlePaste(text: string): void {
@@ -616,33 +555,19 @@ class SectionInput extends BaseComponent {
       return
     }
 
-    if (this._config.inputDateParse) {
-      const date = this._config.inputDateParse(text)
-
-      if (date instanceof Date && !Number.isNaN(date.getTime())) {
-        this._sections = setSectionsFromDate(this._sections, date)
-        this._syncSections()
-        this._updateDate()
-      }
-
-      return
-    }
-
-    const sections = getSectionsFromString(text, this._sections)
+    const sections = this._config.inputDateParse ? null : getSectionsFromString(text, this._sections)
 
     if (sections) {
-      this._sections = sections
-      this._syncSections()
-      this._updateDate()
+      this._commitSections(sections)
       return
     }
 
-    const date = getLocalDateFromString(text, this._config.locale)
+    const date = this._config.inputDateParse ?
+      this._config.inputDateParse(text) :
+      getLocalDateFromString(text, this._config.locale)
 
     if (date instanceof Date && !Number.isNaN(date.getTime())) {
-      this._sections = setSectionsFromDate(this._sections, date)
-      this._syncSections()
-      this._updateDate()
+      this._commitSections(setSectionsFromDate(this._sections, date))
     }
   }
 
@@ -657,21 +582,23 @@ class SectionInput extends BaseComponent {
     }
 
     this._draft = ''
-    this._syncSections()
-    this._updateDate()
+    this._commitSections()
   }
 
-  _updateDate(): void {
-    const nextDate = this._applyValidationState()
+  _commitSections(sections: DateSection[] = this._sections): void {
+    this._sections = sections
+    this._syncSections()
 
-    if (this._isSameDate(nextDate, this._date)) {
+    const date = this._applyValidationState()
+
+    if (isSameInstantAs(date, this._date)) {
       return
     }
 
-    this._date = nextDate
+    this._date = date
 
     EventHandler.trigger(this._element, this.constructor.eventName(this.constructor.CHANGE_EVENT_NAME), {
-      date: nextDate
+      date
     })
   }
 
@@ -694,7 +621,7 @@ class SectionInput extends BaseComponent {
       CLASS_NAME_IS_VALID,
       this._config.valid || (this._submitValid && isFilled && !isDisabled)
     )
-    this._setHiddenInputValue()
+    this._inputElement!.value = date ? formatSections(this._sections) : ''
 
     if (error !== this._error) {
       this._error = error
@@ -727,10 +654,6 @@ class SectionInput extends BaseComponent {
     return null
   }
 
-  _isSameDate(date: Date | null, date2: Date | null): boolean {
-    return isSameInstantAs(date, date2)
-  }
-
   _restoreAttribute(name: string, value: string | null): void {
     if (value === null) {
       this._element.removeAttribute(name)
@@ -741,93 +664,75 @@ class SectionInput extends BaseComponent {
   }
 
   _createSectionInput(): void {
+    const { disabled, name, readonly, required } = this._config
+
     this._element.classList.add(CLASS_NAME_FORM_CONTROL, CLASS_NAME_SECTION_INPUT)
-    this._element.classList.toggle(CLASS_NAME_DISABLED, this._config.disabled)
-    this._element.classList.toggle(CLASS_NAME_IS_INVALID, this._config.invalid)
-    this._element.classList.toggle(CLASS_NAME_IS_VALID, this._config.valid)
+    this._element.classList.toggle(CLASS_NAME_DISABLED, disabled)
     this._element.setAttribute('role', 'group')
     this._element.setAttribute('aria-label', this._getAriaLabel())
     this._element.innerHTML = ''
 
     for (const section of this._sections) {
+      const element = document.createElement('span')
+
       if (section.type === 'literal') {
-        const separatorElement = document.createElement('span')
-        separatorElement.classList.add(CLASS_NAME_SEPARATOR)
-        separatorElement.setAttribute('aria-hidden', 'true')
-        separatorElement.textContent = section.value
-        this._element.append(separatorElement)
+        element.className = CLASS_NAME_SEPARATOR
+        element.setAttribute('aria-hidden', 'true')
+        element.textContent = section.value
+        this._element.append(element)
         continue
       }
 
       const { min, max } = getSectionBounds(section)
-      const sectionElement = document.createElement('span')
-      sectionElement.classList.add(CLASS_NAME_SECTION)
-      sectionElement.setAttribute('role', 'spinbutton')
-      sectionElement.setAttribute('inputmode', section.names ? 'text' : 'numeric')
-      sectionElement.setAttribute('autocorrect', 'off')
-      sectionElement.setAttribute('spellcheck', 'false')
-      sectionElement.setAttribute('aria-label', this._sectionLabel(section.type))
-      sectionElement.setAttribute('aria-valuemin', String(min))
-      sectionElement.setAttribute('aria-valuemax', String(max))
-      sectionElement.dataset.coreuiSection = section.type
-
-      if (!this._config.disabled) {
-        sectionElement.contentEditable = 'true'
+      const attributes: Record<string, string> = {
+        role: 'spinbutton',
+        inputmode: section.names ? 'text' : 'numeric',
+        autocorrect: 'off',
+        spellcheck: 'false',
+        'aria-label': this._config[`aria${section.type[0].toUpperCase()}${section.type.slice(1)}Label`],
+        'aria-valuemin': String(min),
+        'aria-valuemax': String(max),
+        'data-coreui-section': section.type
       }
 
-      if (this._config.disabled) {
-        sectionElement.setAttribute('aria-disabled', 'true')
+      if (disabled) {
+        attributes['aria-disabled'] = 'true'
+      } else {
+        attributes.contenteditable = 'true'
       }
 
-      if (this._config.readonly) {
-        sectionElement.setAttribute('aria-readonly', 'true')
+      if (readonly) {
+        attributes['aria-readonly'] = 'true'
       }
 
-      this._element.append(sectionElement)
+      element.className = CLASS_NAME_SECTION
+
+      for (const [attribute, value] of Object.entries(attributes)) {
+        element.setAttribute(attribute, value)
+      }
+
+      this._element.append(element)
     }
 
-    this._createHiddenInput()
+    this._inputElement = document.createElement('input')
+    this._inputElement.type = 'hidden'
+    this._inputElement.disabled = disabled
+    this._inputElement.required = required
+
+    if (name) {
+      this._inputElement.name = name
+    }
+
+    this._element.append(this._inputElement)
     this._syncSections()
     this._setTabIndexes()
-    this._element.classList.toggle(CLASS_NAME_FILLED, this._sections.some(section => section.type !== 'literal' && section.value !== null))
-  }
-
-  _createHiddenInput(): void {
-    const hiddenInput = document.createElement('input')
-    hiddenInput.type = 'hidden'
-    hiddenInput.disabled = this._config.disabled
-    hiddenInput.required = this._config.required
-
-    if (this._config.name) {
-      hiddenInput.name = this._config.name
-    }
-
-    this._element.append(hiddenInput)
-    this._inputElement = hiddenInput
-    this._setHiddenInputValue()
-  }
-
-  _setHiddenInputValue(): void {
-    if (this._inputElement) {
-      this._inputElement.value = getDateFromSections(this._sections) ? formatSections(this._sections) : ''
-    }
-  }
-
-  _sectionLabel(type: string): string {
-    return this._config[`aria${type[0].toUpperCase()}${type.slice(1)}Label`]
-  }
-
-  _sectionPlaceholder(type: string): string | null {
-    return this._config[`${type}Placeholder`]
   }
 
   _syncSections(): void {
-    const sectionElements = this._getSectionElements()
-
-    for (const [index, sectionElement] of sectionElements.entries()) {
+    for (const [index, sectionElement] of this._getSectionElements().entries()) {
       const section = this._getSection(index)
-      const configuredPlaceholder = this._sectionPlaceholder(section.type)
-      const placeholder = configuredPlaceholder || section.placeholder || (DefaultPlaceholders as Record<string, string>)[section.type].slice(0, section.length)
+      const placeholder = this._config[`${section.type}Placeholder`] || section.placeholder ||
+        (DefaultPlaceholders as Record<string, string>)[section.type].slice(0, section.length)
 
       sectionElement.textContent = formatSectionValue(section, placeholder)
       sectionElement.classList.toggle(CLASS_NAME_SECTION_EMPTY, section.value === null)
@@ -870,8 +775,7 @@ class SectionInput extends BaseComponent {
   }
 
   _selectSectionContent(sectionElement: HTMLElement): void {
-    this._allSelected = false
-    this._element.classList.remove(CLASS_NAME_ALL_SELECTED)
+    this._setAllSelected(false)
     const selection = window.getSelection()
     const range = document.createRange()
     range.selectNodeContents(sectionElement)
@@ -879,9 +783,9 @@ class SectionInput extends BaseComponent {
     selection!.addRange(range)
   }
 
-  _selectAllSections(): void {
-    this._allSelected = true
-    this._element.classList.add(CLASS_NAME_ALL_SELECTED)
+  _setAllSelected(allSelected: boolean): void {
+    this._allSelected = allSelected
+    this._element.classList.toggle(CLASS_NAME_ALL_SELECTED, allSelected)
   }
 
   _focusSibling(sectionElement: HTMLElement, shouldMoveNext: boolean): void {
@@ -921,18 +825,7 @@ class SectionInput extends BaseComponent {
     return SelectorEngine.find(SELECTOR_SECTION, this._element)
   }
 
-  // Static
-  static componentInterface(element: string | Element | null, config?: any, ...args: any[]): void {
-    const data: any = this.getOrCreateInstance(element, config)
-
-    if (typeof config === 'string') {
-      if (typeof data[config] === 'undefined') {
-        throw new TypeError(`No method named "${config}"`)
-      }
-
-      data[config](...args)
-    }
-  }
+  abstract _getDefaultSections(locale: string): DateSection[]
 }
 
 export default SectionInput

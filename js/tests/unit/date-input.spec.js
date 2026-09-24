@@ -1,4 +1,4 @@
-
+import { vi } from 'vitest'
 import DateInput from '../../src/date-input.js'
 import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
 
@@ -238,6 +238,15 @@ describe('DateInput', () => {
       expect(day.getAttribute('aria-valuemin')).toEqual('1')
       expect(day.getAttribute('aria-valuemax')).toEqual('31')
       expect(day.getAttribute('aria-valuetext')).toEqual('Empty')
+      expect(day.getAttribute('autocorrect')).toEqual('off')
+      expect(day.getAttribute('spellcheck')).toEqual('false')
+      expect(dateInput._element.querySelector('.form-date-time-separator').getAttribute('aria-hidden')).toEqual('true')
+    })
+
+    it('should show a configured placeholder', () => {
+      const dateInput = createDateInput({ dayPlaceholder: 'jj' })
+
+      expect(getSections(dateInput._element)[0].textContent).toEqual('jj')
     })
 
     it('should fill sections and the hidden input from the initial date', () => {
@@ -345,6 +354,43 @@ describe('DateInput', () => {
 
       expect(day.textContent).toEqual('DD')
     })
+
+    it('should type the character a beforeinput event inserts', () => {
+      const dateInput = createDateInput()
+      const [day, month] = getSections(dateInput._element)
+      const event = new InputEvent('beforeinput', {
+        inputType: 'insertText', data: '4', bubbles: true, cancelable: true
+      })
+
+      day.focus()
+      day.dispatchEvent(event)
+
+      expect(event.defaultPrevented).toBeTrue()
+      expect(day.textContent).toEqual('04')
+      expect(document.activeElement).toEqual(month)
+    })
+
+    it('should focus the first section when a filled field is clicked outside the sections', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 6, 14) })
+      const [day, , year] = getSections(dateInput._element)
+
+      year.focus()
+      dateInput._element.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+
+      expect(document.activeElement).toEqual(day)
+    })
+
+    it('should focus the first empty section when the field is clicked outside the sections', () => {
+      const dateInput = createDateInput()
+      const [day, month, year] = getSections(dateInput._element)
+
+      day.focus()
+      pressKey(day, '4')
+      year.focus()
+      dateInput._element.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+
+      expect(document.activeElement).toEqual(month)
+    })
   })
 
   describe('partial masks', () => {
@@ -448,6 +494,18 @@ describe('DateInput', () => {
   })
 
   describe('keyboard navigation', () => {
+    it('should clamp a section to its minimum when the focus leaves', () => {
+      const dateInput = createDateInput()
+      const [day] = getSections(dateInput._element)
+
+      day.focus()
+      pressKey(day, '0')
+      day.blur()
+
+      expect(day.textContent).toEqual('01')
+      expect(day.getAttribute('aria-valuenow')).toEqual('1')
+    })
+
     it('should move between sections with arrow keys', () => {
       const dateInput = createDateInput()
       const [day, month] = getSections(dateInput._element)
@@ -620,6 +678,7 @@ describe('DateInput', () => {
 
       expect(event.defaultPrevented).toBeTrue()
       expect(clipboard['text/plain']).toEqual('14.07.2026')
+      expect(dateInput.getDate()).toEqual(new Date(2026, 6, 14))
     })
 
     it('should copy and clear all sections with Ctrl+X', () => {
@@ -656,6 +715,78 @@ describe('DateInput', () => {
       expect(year.textContent).toEqual('YYYY')
       expect(dateInput.getDate()).toBeNull()
       expect(document.activeElement).toEqual(day)
+    })
+
+    it('should drop the selection of all sections when the focus leaves the field', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 6, 14) })
+      const [day] = getSections(dateInput._element)
+
+      day.focus()
+      pressKey(day, 'a', { ctrlKey: true })
+      day.blur()
+
+      expect(dateInput._element.classList.contains('form-date-time-all-selected')).toBeFalse()
+    })
+
+    it('should copy a readonly value on cut without clearing it', () => {
+      const dateInput = createDateInput({ readonly: true, date: new Date(2026, 6, 14) })
+      const [day] = getSections(dateInput._element)
+      const clipboard = {}
+      const event = new Event('cut', { bubbles: true, cancelable: true })
+      event.clipboardData = {
+        setData(type, value) {
+          clipboard[type] = value
+        }
+      }
+
+      day.focus()
+      pressKey(day, 'a', { ctrlKey: true })
+      day.dispatchEvent(event)
+
+      expect(clipboard['text/plain']).toEqual('14.07.2026')
+      expect(dateInput.getDate()).toEqual(new Date(2026, 6, 14))
+    })
+
+    it('should clear all sections with Delete after select all', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 6, 14) })
+      const [day, month, year] = getSections(dateInput._element)
+
+      day.focus()
+      pressKey(day, 'a', { ctrlKey: true })
+      pressKey(day, 'Delete')
+
+      expect([day.textContent, month.textContent, year.textContent]).toEqual(['DD', 'MM', 'YYYY'])
+      expect(dateInput.getDate()).toBeNull()
+    })
+
+    it('should leave Ctrl+C and Tab alone after select all', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 6, 14) })
+      const [day] = getSections(dateInput._element)
+      const copy = new KeyboardEvent('keydown', {
+        key: 'c', ctrlKey: true, bubbles: true, cancelable: true
+      })
+      const tab = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true })
+
+      day.focus()
+      pressKey(day, 'a', { ctrlKey: true })
+      day.dispatchEvent(copy)
+      day.dispatchEvent(tab)
+
+      expect(copy.defaultPrevented).toBeFalse()
+      expect(tab.defaultPrevented).toBeFalse()
+      expect(dateInput.getDate()).toEqual(new Date(2026, 6, 14))
+    })
+
+    it('should type the second key after select all into the same section', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 6, 14) })
+      const [day] = getSections(dateInput._element)
+
+      day.focus()
+      pressKey(day, 'a', { ctrlKey: true })
+      pressKey(day, '2')
+      pressKey(day, '5')
+
+      expect(day.textContent).toEqual('25')
     })
 
     it('should restart typing from the first section after select all', () => {
@@ -695,6 +826,32 @@ describe('DateInput', () => {
       paste(day, 'anything')
 
       expect(dateInput.getDate()).toEqual(new Date(2026, 0, 2))
+    })
+
+    it('should call inputDateParse on the config', () => {
+      const inputDateParse = vi.fn(() => new Date(2026, 0, 2))
+      const dateInput = createDateInput({ inputDateParse })
+
+      paste(getSections(dateInput._element)[0], 'anything')
+
+      expect(inputDateParse.mock.contexts[0]).toBe(dateInput._config)
+      expect(dateInput.getDate()).toEqual(new Date(2026, 0, 2))
+    })
+
+    it('should prefer inputDateParse over text the mask reads', () => {
+      const dateInput = createDateInput({ inputDateParse: () => new Date(2026, 0, 2) })
+
+      paste(getSections(dateInput._element)[0], '14.07.2026')
+
+      expect(dateInput.getDate()).toEqual(new Date(2026, 0, 2))
+    })
+
+    it('should not fall back when inputDateParse finds nothing', () => {
+      const dateInput = createDateInput({ inputDateParse: () => null })
+
+      paste(getSections(dateInput._element)[0], '14.07.2026')
+
+      expect(dateInput.getDate()).toBeNull()
     })
 
     it('should ignore unparsable text', () => {
@@ -957,6 +1114,29 @@ describe('DateInput', () => {
       expect(dateInput._element.querySelector('input[type="hidden"]').disabled).toBeTrue()
     })
 
+    it('should mark readonly sections read-only and keep them focusable', () => {
+      const dateInput = createDateInput({ readonly: true })
+      const [day] = getSections(dateInput._element)
+
+      expect(day.isContentEditable).toBeTrue()
+      expect(day.tabIndex).toBe(0)
+      expect(day.getAttribute('aria-readonly')).toEqual('true')
+      expect(day.hasAttribute('aria-disabled')).toBeFalse()
+    })
+
+    it('should ignore beforeinput typing when readonly', () => {
+      const dateInput = createDateInput({ readonly: true })
+      const [day] = getSections(dateInput._element)
+      const event = new InputEvent('beforeinput', {
+        inputType: 'insertText', data: '4', bubbles: true, cancelable: true
+      })
+
+      day.dispatchEvent(event)
+
+      expect(event.defaultPrevented).toBeTrue()
+      expect(day.textContent).toEqual('DD')
+    })
+
     it('should ignore keyboard edits when readonly', () => {
       const dateInput = createDateInput({ readonly: true })
       const [day] = getSections(dateInput._element)
@@ -1058,6 +1238,18 @@ describe('DateInput', () => {
       const [year] = getSections(dateInput._element)
       expect(year.getAttribute('aria-label')).toEqual('Year')
       expect(dateInput._element.querySelector('input[type="hidden"]').value).toEqual('2026-07-14')
+    })
+  })
+
+  describe('data-api', () => {
+    it('should initialise elements carrying the attribute on load', () => {
+      fixtureEl.innerHTML = '<div data-coreui-date-input></div>'
+      const element = fixtureEl.querySelector('div')
+
+      window.dispatchEvent(new Event('load'))
+
+      expect(DateInput.getInstance(element)).toBeInstanceOf(DateInput)
+      DateInput.getInstance(element).dispose()
     })
   })
 
