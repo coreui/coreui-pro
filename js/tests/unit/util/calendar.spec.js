@@ -1,13 +1,18 @@
 
+import { onTestFinished } from 'vitest'
+import { cdp } from 'vitest/browser'
 import {
   convertIsoWeekToDate,
   convertToDateObject,
+  createDateFormatter,
   createGroupsInArray,
   getCalendarDate,
   getDateBySelectionType,
   getISOWeekNumberAndYear,
   getLocalDateFromString,
   getMonthsNames,
+  getSelectableDates,
+  getTabStop,
   getYears,
   getMonthDetails,
   isDateDisabled,
@@ -17,14 +22,26 @@ import {
   isPeriodDisabled,
   isPeriodInRange,
   isPeriodSelected,
+  isSameInstantAs,
   isSameDateAs,
   isToday,
   parseYearSmart,
   removeTimeFromDate,
   setTimeFromDate
 } from '../../../src/util/calendar.js'
+import { clearFixture, getFixture } from '../../helpers/fixture.js'
 
 describe('Calendar Utilities', () => {
+  let fixtureEl
+
+  beforeAll(() => {
+    fixtureEl = getFixture()
+  })
+
+  afterEach(() => {
+    clearFixture()
+  })
+
   describe('convertIsoWeekToDate', () => {
     it('should convert a valid ISO week string to the corresponding Monday', () => {
       const result = convertIsoWeekToDate('2023W05')
@@ -127,6 +144,52 @@ describe('Calendar Utilities', () => {
     })
   })
 
+  describe('convertToDateObject with day strings', () => {
+    it.each([
+      ['2/16/2022', 'en-US', [2022, 1, 16]],
+      ['02/16/2022', 'en-US', [2022, 1, 16]],
+      ['5/3/2022', 'en-US', [2022, 4, 3]],
+      ['2/29/2024', 'en-US', [2024, 1, 29]],
+      ['12/31/2022', 'en-US', [2022, 11, 31]],
+      ['1/31/2022', 'en-US', [2022, 0, 31]],
+      ['1/1/1900', 'en-US', [1900, 0, 1]],
+      ['12/31/2099', 'en-US', [2099, 11, 31]],
+      ['16/2/2022', 'en-GB', [2022, 1, 16]],
+      ['2/16/2022', 'en_US', [2022, 1, 16]]
+    ])('should read %s in %s as local midnight', (value, locale, [year, month, day]) => {
+      expect(convertToDateObject(value, 'day', locale)).toEqual(new Date(year, month, day))
+    })
+
+    it.each(['', '   ', 'not-a-date', '2/16', '2/32/2022', '13/16/2022'])('should return null for %j', value => {
+      expect(convertToDateObject(value, 'day', 'en-US')).toBeNull()
+    })
+
+    it('should keep the day when daylight saving time starts at midnight', async () => {
+      await cdp().send('Emulation.setTimezoneOverride', { timezoneId: 'America/Santiago' })
+      onTestFinished(() => cdp().send('Emulation.setTimezoneOverride', { timezoneId: '' }))
+
+      const result = convertToDateObject('9/6/2026', 'day', 'en-US')
+
+      expect([result.getFullYear(), result.getMonth(), result.getDate()]).toEqual([2026, 8, 6])
+    })
+
+    it.each(['2026-Q3', '2026Q3', '2026 Q3'])('should read the quarter string %s as the first day of the quarter', value => {
+      expect(convertToDateObject(value, 'quarter')).toEqual(new Date(2026, 6, 1))
+    })
+
+    it.each(['2026Q5', 'q3 2026'])('should return null for the quarter string %s', value => {
+      expect(convertToDateObject(value, 'quarter')).toBeNull()
+    })
+
+    it('should read an ISO week with a dash as the Monday of the week', () => {
+      expect(convertToDateObject('2022-W07', 'week')).toEqual(new Date(2022, 1, 14))
+    })
+
+    it('should read the last month of the year as its first day', () => {
+      expect(convertToDateObject('2022-12', 'month')).toEqual(new Date(2022, 11, 1))
+    })
+  })
+
   describe('createGroupsInArray', () => {
     it('should create groups of arrays', () => {
       const arr = [1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -226,6 +289,45 @@ describe('Calendar Utilities', () => {
     })
   })
 
+  describe('createDateFormatter', () => {
+    it('should write a date the way Intl.DateTimeFormat does', () => {
+      const format = createDateFormatter()
+      const date = new Date(2026, 6, 14)
+
+      expect(format(date, 'en-US', { month: 'long', year: 'numeric' })).toBe(new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(date))
+      expect(format(date, 'de-DE')).toBe(new Intl.DateTimeFormat('de-DE').format(date))
+    })
+
+    it('should build one formatter per locale and options', () => {
+      const NativeDateTimeFormat = Intl.DateTimeFormat
+      const format = createDateFormatter()
+      let built = 0
+
+      Intl.DateTimeFormat = function (...args) {
+        built++
+        return new NativeDateTimeFormat(...args)
+      }
+
+      try {
+        for (let day = 1; day <= 28; day++) {
+          format(new Date(2026, 1, day), 'en-US', { day: 'numeric' })
+          format(new Date(2026, 1, day), 'en-US', { weekday: 'long' })
+          format(new Date(2026, 1, day), 'pl-PL', { day: 'numeric' })
+        }
+      } finally {
+        Intl.DateTimeFormat = NativeDateTimeFormat
+      }
+
+      expect(built).toBe(3)
+    })
+
+    it('should write an invalid date the way toLocaleDateString does', () => {
+      const invalid = new Date(Number.NaN)
+
+      expect(createDateFormatter()(invalid, 'en-US')).toBe(invalid.toLocaleDateString('en-US'))
+    })
+  })
+
   describe('getYears', () => {
     it('should generate years around a given center year', () => {
       const result = getYears(2020, 2)
@@ -243,6 +345,75 @@ describe('Calendar Utilities', () => {
       // Each element in the array is { weekNumber, days: [ ... ] }
       expect(result[0].days).toBeInstanceOf(Array)
       // Each day is { date: ..., month: 'previous'|'current'|'next' }
+    })
+  })
+
+  describe('getTabStop', () => {
+    const target = (date, { adjacent = false, end = date, selected = false } = {}) => ({
+      adjacent, date, end, position: date, selected
+    })
+
+    it('should take the selected target', () => {
+      const targets = [target(new Date(2026, 6, 1)), target(new Date(2026, 6, 20), { selected: true })]
+
+      expect(getTabStop(targets, new Date(2026, 6, 2), false)).toBe(new Date(2026, 6, 20).getTime())
+    })
+
+    it('should take the target closest to the anchor and skip days of adjacent months', () => {
+      const targets = [
+        target(new Date(2026, 5, 30), { adjacent: true }),
+        target(new Date(2026, 6, 3)),
+        target(new Date(2026, 6, 10))
+      ]
+
+      expect(getTabStop(targets, new Date(2026, 5, 29), false)).toBe(new Date(2026, 6, 3).getTime())
+      expect(getTabStop(targets, new Date(2026, 6, 8), false)).toBe(new Date(2026, 6, 10).getTime())
+    })
+
+    it('should measure a row from its first to its last day', () => {
+      const targets = [
+        target(new Date(2026, 5, 29), { adjacent: true, end: new Date(2026, 6, 5) }),
+        target(new Date(2026, 6, 6), { end: new Date(2026, 6, 12) })
+      ]
+
+      expect(getTabStop(targets, new Date(2026, 6, 4), true)).toBe(new Date(2026, 5, 29).getTime())
+    })
+
+    it('should let a row of the panel\'s own month win a tie', () => {
+      const adjacent = target(new Date(2026, 5, 30), { adjacent: true })
+      const own = target(new Date(2026, 6, 2))
+
+      expect(getTabStop([adjacent, own], new Date(2026, 6, 1), true)).toBe(own.date.getTime())
+      expect(getTabStop([own, adjacent], new Date(2026, 6, 1), true)).toBe(own.date.getTime())
+    })
+
+    it('should take the first target without an anchor', () => {
+      const targets = [target(new Date(2026, 6, 3)), target(new Date(2026, 6, 10))]
+
+      expect(getTabStop(targets, null, false)).toBe(new Date(2026, 6, 3).getTime())
+    })
+
+    it('should return undefined without targets', () => {
+      expect(getTabStop([], new Date(2026, 6, 1), false)).toBeUndefined()
+    })
+  })
+
+  describe('getSelectableDates', () => {
+    it('should find the selectable rows and cells in document order', () => {
+      fixtureEl.innerHTML = [
+        '<table><tbody>',
+        '<tr><td data-coreui-selectable>1</td><td>2</td></tr>',
+        '<tr data-coreui-selectable><td>3</td><td data-coreui-selectable>4</td></tr>',
+        '</tbody></table>'
+      ].join('')
+
+      expect(getSelectableDates(fixtureEl).map(element => element.tagName + (element.textContent || ''))).toEqual(['TD1', 'TR34', 'TD4'])
+    })
+
+    it('should use the given selector', () => {
+      fixtureEl.innerHTML = '<table><tbody><tr><td class="a">1</td><td>2</td><td class="a">3</td></tr></tbody></table>'
+
+      expect(getSelectableDates(fixtureEl, 'td.a').map(element => element.textContent)).toEqual(['1', '3'])
     })
   })
 
@@ -471,6 +642,22 @@ describe('Calendar Utilities', () => {
       const onlyJune15 = date => !(date.getMonth() === 5 && date.getDate() === 15)
       expect(isPeriodDisabled(new Date(2023, 3, 1), 'quarters', new Date(2023, 5, 1), null, onlyJune15)).toBeFalse()
       expect(isPeriodDisabled(new Date(2023, 3, 1), 'quarters', null, new Date(2023, 4, 31), onlyJune15)).toBeTrue()
+    })
+  })
+
+  describe('isSameInstantAs', () => {
+    it('should return true for the same moment', () => {
+      expect(isSameInstantAs(new Date(2026, 6, 14, 9, 30), new Date(2026, 6, 14, 9, 30))).toBe(true)
+    })
+
+    it('should return false for the same day at another time', () => {
+      expect(isSameInstantAs(new Date(2026, 6, 14, 9, 30), new Date(2026, 6, 14, 9, 30, 0, 1))).toBe(false)
+    })
+
+    it('should return true when both are null and false when one is', () => {
+      expect(isSameInstantAs(null, null)).toBe(true)
+      expect(isSameInstantAs(new Date(2026, 6, 14), null)).toBe(false)
+      expect(isSameInstantAs(null, new Date(2026, 6, 14))).toBe(false)
     })
   })
 

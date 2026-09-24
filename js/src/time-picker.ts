@@ -12,6 +12,7 @@ import TimeInput, { type TimeInputConfig } from './time-input.js'
 import TimeRoll from './time-selection/roll.js'
 import { type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 import type { ComponentConfig } from './util/config.js'
+import { getHourCycle } from './util/date-sections.js'
 import {
   appendControlGroupField,
   applyControlGroupClasses,
@@ -258,7 +259,7 @@ class TimePicker extends PickerBase {
     }
 
     this._selection = new TimeRoll(this._selectionElement, this._forwardConfig(TimeRoll, {
-      hourCycle: (this._input._sections.find((section: any) => section.type === 'hour') as any)?.cycle ?? null,
+      hourCycle: getHourCycle(this._input._sections) ?? null,
       locale: this._config.locale,
       onChange: (time: Date | null) => this._applyTime(time, { selection: false }),
       time: this.getTime()
