@@ -10,18 +10,17 @@ import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import TimeInput, { type TimeInputConfig } from './time-input.js'
 import TimeRoll from './time-selection/roll.js'
-import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
+import { type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 import type { ComponentConfig } from './util/config.js'
 import {
   appendControlGroupField,
   applyControlGroupClasses,
   applyControlGroupSize,
   captureHostClasses,
-  createControlGroupAction,
   managedSizeClassNames
 } from './util/form-control-group.js'
 import { CLEANER_ICON, CLOCK_ICON } from './util/icons.js'
-import { defineJQueryPlugin, getUID, jQueryDispatch } from './util/index.js'
+import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
 
 /**
  * Constants
@@ -36,13 +35,10 @@ const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_TIME_CHANGE = `timeChange${EVENT_KEY}`
 
 const CLASS_NAME_BODY = 'time-picker-body'
-const CLASS_NAME_DROPDOWN = 'time-picker-popup'
-const CLASS_NAME_FOOTER = 'time-picker-footer'
 const CLASS_NAME_CLEANER = 'form-control-cleaner'
 const CLASS_NAME_INDICATOR = 'form-control-action'
 const CLASS_NAME_INPUT_GROUP = 'form-control-group'
 const CLASS_NAME_PICKER = 'picker'
-const CLASS_NAME_POPUP = 'popup'
 const CLASS_NAME_TIME_PICKER = 'time-picker'
 
 const SELECTOR_ACTION_NOW = '[data-coreui-picker-action="now"]'
@@ -219,21 +215,16 @@ class TimePicker extends PickerBase {
     const inputEl = document.createElement('div')
     this._fieldElement = appendControlGroupField(inputGroup, inputEl, this._config.floatingLabel, `${this.constructor.NAME}-`)
 
-    const action = (className: string, icon: string, label: string) => createControlGroupAction({
-      className, disabled: this._config.disabled, icon, label, sanitizeIcon: (value: string) => sanitizeByConfig(value, this._config)
-    })
-
     if (this._config.cleaner) {
-      this._cleanerElement = action(CLASS_NAME_CLEANER, this._config.cleanerIcon, this._config.ariaCleanerLabel)
+      this._cleanerElement = this._createAction(CLASS_NAME_CLEANER, this._config.cleanerIcon, this._config.ariaCleanerLabel)
       inputGroup.append(this._cleanerElement)
     }
 
     this._toggleElement = null
 
     if (this._config.pickerIcon) {
-      const indicator = action(CLASS_NAME_INDICATOR, this._config.pickerIcon === true ? CLOCK_ICON : this._config.pickerIcon, this._config.ariaPickerLabel)
-      inputGroup.append(indicator)
-      this._toggleElement = indicator
+      this._toggleElement = this._createAction(CLASS_NAME_INDICATOR, this._config.pickerIcon === true ? CLOCK_ICON : this._config.pickerIcon, this._config.ariaPickerLabel)
+      inputGroup.append(this._toggleElement)
     }
 
     this._input = new TimeInput(inputEl, this._forwardConfig(TimeInput, {
@@ -252,23 +243,9 @@ class TimePicker extends PickerBase {
       }
     })
 
-    this._menu = document.createElement('div')
-    this._menu.id = getUID(`${this.constructor.NAME}-popup-`)
-    this._menu.classList.add(CLASS_NAME_POPUP, CLASS_NAME_DROPDOWN)
-    this._writeToggleAttribute('aria-expanded', 'false')
-    this._writeToggleAttribute('aria-haspopup', 'dialog')
-
     this._selectionElement = document.createElement('div')
     this._selectionElement.classList.add(CLASS_NAME_BODY)
-    this._menu.append(this._selectionElement)
-
-    if (this._footerTemplate) {
-      const footer = document.createElement('div')
-      footer.classList.add(CLASS_NAME_FOOTER)
-      footer.append(this._footerTemplate.content.cloneNode(true))
-      this._disableUnselectableActions(SELECTOR_ACTION_NOW, footer)
-      this._menu.append(footer)
-    }
+    this._createMenu(CLASS_NAME_TIME_PICKER, this._selectionElement, SELECTOR_ACTION_NOW)
   }
 
   override _isNowSelectable(): boolean {

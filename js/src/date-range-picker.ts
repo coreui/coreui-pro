@@ -11,15 +11,15 @@ import DateRangeInput, { type DateRangeInputConfig } from './date-range-input.js
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import type { SectionInputConfig } from './section-input.js'
-import { captureHostClasses, createControlGroupAction } from './util/form-control-group.js'
+import { captureHostClasses } from './util/form-control-group.js'
 import { getDateBySelectionType, isSameInstantAs, type SelectionTypes } from './util/calendar.js'
 import type { ComponentConfig } from './util/config.js'
 import { getPickerFormat } from './util/date-sections.js'
 import {
   CALENDAR_ICON, CLEANER_ICON, SEPARATOR_ICON, SEPARATOR_ICON_RTL
 } from './util/icons.js'
-import { defineJQueryPlugin, getUID, jQueryDispatch } from './util/index.js'
-import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
+import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
+import { type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 
 /**
  * Constants
@@ -39,12 +39,9 @@ const CLASS_NAME_CALENDAR = 'date-picker-calendar'
 const CLASS_NAME_CALENDARS = 'date-picker-calendars'
 const CLASS_NAME_DATE_PICKER = 'date-picker'
 const CLASS_NAME_DATE_RANGE_PICKER = 'date-range-picker'
-const CLASS_NAME_DROPDOWN = 'date-picker-popup'
-const CLASS_NAME_FOOTER = 'date-picker-footer'
 const CLASS_NAME_CLEANER = 'form-control-cleaner'
 const CLASS_NAME_INDICATOR = 'form-control-action'
 const CLASS_NAME_PICKER = 'picker'
-const CLASS_NAME_POPUP = 'popup'
 const CLASS_NAME_RANGES = 'date-picker-ranges'
 
 const SELECTOR_DATA_DATE_RANGE_PICKER = '[data-coreui-date-range-picker]'
@@ -288,28 +285,17 @@ class DateRangePicker extends PickerBase {
       }
     })
 
-    const action = (className: string, icon: string, label: string) => createControlGroupAction({
-      className, disabled: this._config.disabled, icon, label, sanitizeIcon: (value: string) => sanitizeByConfig(value, this._config)
-    })
-
     if (this._config.cleaner) {
-      this._cleanerElement = action(CLASS_NAME_CLEANER, this._config.cleanerIcon, this._config.ariaCleanerLabel)
+      this._cleanerElement = this._createAction(CLASS_NAME_CLEANER, this._config.cleanerIcon, this._config.ariaCleanerLabel)
       inputGroup.append(this._cleanerElement)
     }
 
     this._toggleElement = null
 
     if (this._config.pickerIcon) {
-      const indicator = action(CLASS_NAME_INDICATOR, this._config.pickerIcon === true ? CALENDAR_ICON : this._config.pickerIcon, this._config.ariaPickerLabel)
-      inputGroup.append(indicator)
-      this._toggleElement = indicator
+      this._toggleElement = this._createAction(CLASS_NAME_INDICATOR, this._config.pickerIcon === true ? CALENDAR_ICON : this._config.pickerIcon, this._config.ariaPickerLabel)
+      inputGroup.append(this._toggleElement)
     }
-
-    this._menu = document.createElement('div')
-    this._menu.id = getUID(`${this.constructor.NAME}-popup-`)
-    this._menu.classList.add(CLASS_NAME_POPUP, CLASS_NAME_DROPDOWN)
-    this._writeToggleAttribute('aria-expanded', 'false')
-    this._writeToggleAttribute('aria-haspopup', 'dialog')
 
     const body = document.createElement('div')
     body.classList.add(CLASS_NAME_BODY)
@@ -328,14 +314,7 @@ class DateRangePicker extends PickerBase {
     this._calendarElement.classList.add(CLASS_NAME_CALENDAR)
     calendars.append(this._calendarElement)
     body.append(calendars)
-    this._menu.append(body)
-
-    if (this._footerTemplate) {
-      const footer = document.createElement('div')
-      footer.classList.add(CLASS_NAME_FOOTER)
-      footer.append(this._footerTemplate.content.cloneNode(true))
-      this._menu.append(footer)
-    }
+    this._createMenu(CLASS_NAME_DATE_PICKER, body)
   }
 
   _ensureCalendar(): void {
