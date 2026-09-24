@@ -40,6 +40,7 @@
     "js-compile-bundle": "rolldown --environment BUNDLE:true --config build/rolldown.config.mjs --sourcemap",
     "js-compile-bundle-bootstrap": "rolldown --environment BOOTSTRAP:true,BUNDLE:true --config build/rolldown.config.mjs --sourcemap",
     "js-compile-plugins": "node build/build-plugins.mjs",
+    "js-compile-utils": "node build/build-utils.mjs",
     "js-typecheck": "tsc --noEmit",
     "js-typecheck-dist": "tsc --project js/tests/types/tsconfig.json",
     "js-emit-types": "tsc --project build/tsconfig.dts.json",
@@ -80,6 +81,13 @@
     "watch-js-main": "nodemon --watch js/src/ --ext ts --exec \"npm-run-all js-lint js-compile\""
   },
   "types": "./js/dist/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "utils/*": [
+        "js/dist/util/*.d.ts"
+      ]
+    }
+  },
   "exports": {
     ".": {
       "types": "./js/dist/index.d.ts",
@@ -97,6 +105,21 @@
     "./css/components/*": "./dist/css/components/*",
     "./css/*": "./dist/css/*",
     "./scss/*": "./scss/*",
+    "./utils/calendar": {
+      "types": "./js/dist/util/calendar.d.ts",
+      "import": "./js/dist/util/calendar.mjs",
+      "require": "./js/dist/util/calendar.js"
+    },
+    "./utils/date-sections": {
+      "types": "./js/dist/util/date-sections.d.ts",
+      "import": "./js/dist/util/date-sections.mjs",
+      "require": "./js/dist/util/date-sections.js"
+    },
+    "./utils/time": {
+      "types": "./js/dist/util/time.d.ts",
+      "import": "./js/dist/util/time.mjs",
+      "require": "./js/dist/util/time.js"
+    },
     "./package.json": "./package.json"
   },
   "sideEffects": [
@@ -174,7 +197,7 @@
     "dist/{css,js}/**/*.{css,js,map}",
     "dist/css/components/classes.json",
     "dist/css/components/manifest.json",
-    "js/dist/**/*.{js,map,d.ts}",
+    "js/dist/**/*.{js,mjs,map,d.ts}",
     "js/src/**/*.ts",
     "scss/**/*.scss",
     "!scss/tests/**",
