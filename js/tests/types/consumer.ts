@@ -20,6 +20,7 @@ import type { DateRangeInputConfig } from '../../dist/date-range-input.js'
 import type { DateRangePickerConfig } from '../../dist/date-range-picker.js'
 import type { TimeInputConfig } from '../../dist/time-input.js'
 import type { TimePickerConfig } from '../../dist/time-picker.js'
+import { convertToDateObject } from '../../dist/util/calendar.js'
 import { getPickerFormat, getSectionLayout } from '../../dist/util/date-sections.js'
 import type { DateSection, SectionFormat } from '../../dist/util/date-sections.js'
 import type Popup from '../../dist/util/popup.js'
@@ -112,7 +113,9 @@ const popupShown: boolean = popup.isShown
 // @ts-expect-error — isShown is a boolean
 const popupShownText: string = popup.isShown
 
-// The format helpers take an unset format the way React and Vue hold it.
+// The date and format helpers take unset values the way React and Vue hold them.
+const unsetDate: Date | null = convertToDateObject(undefined, 'day')
+const nullDate: Date | null = convertToDateObject(null, 'day')
 const unsetFormat: SectionFormat = getPickerFormat(undefined, 'month')
 const localeLayout: DateSection[] = getSectionLayout(undefined, 'en-US')
 // @ts-expect-error — a format is a token string, a function or nothing
@@ -125,8 +128,8 @@ const chip: Chip | null = Chip.getInstance(element)
 export {
   alert, calendarConfig, chip, chipSet, closing, datePicker, dayFormatFunction, disabledDatesString, formatTypo,
   inputConfigs, inputTypeTypo, instance, localeLayout, modalHiding, nestedTypo, modalShowing, modalToggling,
-  monthFormatTypo, multiSelect, name, orCreated,
+  monthFormatTypo, multiSelect, name, nullDate, orCreated,
   pickerConfig, popoverShowing, popupShown, popupShownText, rangeInputTypeTypo, rangePickerConfig, selection,
-  timePickerConfig, toast, toastShowing, tooltipToggling, typoCalendar, typoConfig, unsetFormat, values, version,
+  timePickerConfig, toast, toastShowing, tooltipToggling, typoCalendar, typoConfig, unsetDate, unsetFormat, values, version,
   weekdayFormatTypo, wrongResolution
 }
