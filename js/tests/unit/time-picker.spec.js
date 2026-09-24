@@ -41,6 +41,24 @@ describe('TimePicker', () => {
       expect(indicator.hasAttribute('aria-controls')).toBeFalse()
     })
 
+    it('should name the popup the indicator controls', () => {
+      const picker = buildPicker()
+      const indicator = fixtureEl.querySelector('.form-control-action')
+
+      picker.show()
+
+      expect(indicator.getAttribute('aria-controls')).toMatch(/^time-picker-popup-\d+$/)
+      expect(document.getElementById(indicator.getAttribute('aria-controls'))).toEqual(document.querySelector('.time-picker-popup'))
+    })
+
+    it('should announce the popup on the indicator from the start', () => {
+      buildPicker()
+      const indicator = fixtureEl.querySelector('.form-control-action')
+
+      expect(indicator.getAttribute('aria-haspopup')).toEqual('dialog')
+      expect(indicator.getAttribute('aria-expanded')).toEqual('false')
+    })
+
     it('should compose a section field and an indicator with an inline SVG icon', () => {
       buildPicker()
 
@@ -396,6 +414,26 @@ describe('TimePicker', () => {
       buildPicker({ pickerIcon: '<svg xmlns="http://www.w3.org/2000/svg"><circle r="3" /></svg>', sanitize: false })
 
       expect(fixtureEl.querySelector('.form-control-action circle')).not.toBeNull()
+    })
+
+    it('should keep an icon element outside the allow list when sanitize is false', () => {
+      buildPicker({ pickerIcon: '<svg xmlns="http://www.w3.org/2000/svg"><custom-mark></custom-mark></svg>', sanitize: false })
+
+      expect(fixtureEl.querySelector('.form-control-action custom-mark')).not.toBeNull()
+    })
+
+    it('should render a projected footer in the time picker footer', () => {
+      const picker = buildPicker({}, [
+        '<div id="picker">',
+        '  <template data-coreui-template="footer">',
+        '    <button type="button" data-coreui-picker-action="clear">Clear</button>',
+        '  </template>',
+        '</div>'
+      ].join(''))
+
+      picker.show()
+
+      expect(document.querySelector('.time-picker-popup > .time-picker-footer [data-coreui-picker-action="clear"]')).not.toBeNull()
     })
 
     it('should set the time to now through the context', () => {

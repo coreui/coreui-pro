@@ -760,6 +760,24 @@ describe('DatePicker', () => {
       expect(fixtureEl.querySelector('.date-picker-popup [data-coreui-picker-action="today"]').disabled).toBeTrue()
     })
 
+    it('should leave the other footer actions enabled when today is not selectable', () => {
+      const yesterday = new Date()
+      yesterday.setDate(yesterday.getDate() - 1)
+      const picker = buildPicker({ maxDate: yesterday }, [
+        '<div id="picker">',
+        '  <template data-coreui-template="footer">',
+        '    <button type="button" data-coreui-picker-action="today">Today</button>',
+        '    <button type="button" data-coreui-picker-action="clear">Clear</button>',
+        '  </template>',
+        '</div>'
+      ].join(''))
+
+      picker.show()
+
+      expect(fixtureEl.querySelector('.date-picker-popup [data-coreui-picker-action="today"]').disabled).toBeTrue()
+      expect(fixtureEl.querySelector('.date-picker-popup [data-coreui-picker-action="clear"]').disabled).toBeFalse()
+    })
+
     it('should keep a projected today action enabled when today is selectable', () => {
       const picker = buildPicker({}, [
         '<div id="picker">',

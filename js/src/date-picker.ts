@@ -25,12 +25,11 @@ import {
   applyControlGroupClasses,
   applyControlGroupSize,
   captureHostClasses,
-  createControlGroupAction,
   managedSizeClassNames
 } from './util/form-control-group.js'
 import { CALENDAR_ICON, CLEANER_ICON } from './util/icons.js'
-import { defineJQueryPlugin, getUID, jQueryDispatch } from './util/index.js'
-import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
+import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
+import { type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 
 /**
  * Constants
@@ -48,13 +47,10 @@ const CLASS_NAME_BODY = 'date-picker-body'
 const CLASS_NAME_CALENDAR = 'date-picker-calendar'
 const CLASS_NAME_CALENDARS = 'date-picker-calendars'
 const CLASS_NAME_DATE_PICKER = 'date-picker'
-const CLASS_NAME_DROPDOWN = 'date-picker-popup'
-const CLASS_NAME_FOOTER = 'date-picker-footer'
 const CLASS_NAME_CLEANER = 'form-control-cleaner'
 const CLASS_NAME_INDICATOR = 'form-control-action'
 const CLASS_NAME_INPUT_GROUP = 'form-control-group'
 const CLASS_NAME_PICKER = 'picker'
-const CLASS_NAME_POPUP = 'popup'
 const CLASS_NAME_TIME_BODY = 'date-picker-time-body'
 const CLASS_NAME_TIME_PICKERS = 'date-picker-timepickers'
 
@@ -273,19 +269,17 @@ class DatePicker extends PickerBase {
     this._created.field = !ownField
     this._fieldElement = ownField ?? appendControlGroupField(inputGroup, inputEl, this._config.floatingLabel, `${this.constructor.NAME}-`)
 
-    const withTime = (value: string, key: 'ariaCleanerLabel' | 'ariaPickerLabel', timed: string) =>
-      this._config.timepicker && value === ORIGINAL_DEFAULT[key] ? timed : value
-
-    const action = (className: string, icon: string, label: string) => createControlGroupAction({
-      className, disabled: this._config.disabled, icon, label, sanitizeIcon: (value: string) => sanitizeByConfig(value, this._config)
-    })
+    const withTime = (key: 'ariaCleanerLabel' | 'ariaPickerLabel', timed: string) =>
+      this._config.timepicker && this._config[key] === ORIGINAL_DEFAULT[key] ? timed : this._config[key]
+    const cleanerLabel = withTime('ariaCleanerLabel', 'Clear date and time')
+    const pickerLabel = withTime('ariaPickerLabel', 'Toggle calendar and time selection')
 
     const ownCleaner = SelectorEngine.findOne(SELECTOR_ROLE_CLEANER, inputGroup)
 
     if (ownCleaner) {
-      this._cleanerElement = this._adoptAction(ownCleaner, withTime(this._config.ariaCleanerLabel, 'ariaCleanerLabel', 'Clear date and time'))
+      this._cleanerElement = this._adoptAction(ownCleaner, cleanerLabel)
     } else if (this._config.cleaner) {
-      this._cleanerElement = action(CLASS_NAME_CLEANER, this._config.cleanerIcon, withTime(this._config.ariaCleanerLabel, 'ariaCleanerLabel', 'Clear date and time'))
+      this._cleanerElement = this._createAction(CLASS_NAME_CLEANER, this._config.cleanerIcon, cleanerLabel)
       this._created.cleaner = true
       inputGroup.append(this._cleanerElement)
     }
@@ -295,9 +289,9 @@ class DatePicker extends PickerBase {
     this._toggleElement = null
 
     if (ownToggle) {
-      this._toggleElement = this._adoptAction(ownToggle, withTime(this._config.ariaPickerLabel, 'ariaPickerLabel', 'Toggle calendar and time selection'))
+      this._toggleElement = this._adoptAction(ownToggle, pickerLabel)
     } else if (this._config.pickerIcon) {
-      this._toggleElement = action(CLASS_NAME_INDICATOR, this._config.pickerIcon === true ? CALENDAR_ICON : this._config.pickerIcon, withTime(this._config.ariaPickerLabel, 'ariaPickerLabel', 'Toggle calendar and time selection'))
+      this._toggleElement = this._createAction(CLASS_NAME_INDICATOR, this._config.pickerIcon === true ? CALENDAR_ICON : this._config.pickerIcon, pickerLabel)
       this._created.toggle = true
       inputGroup.append(this._toggleElement)
     }
@@ -319,12 +313,6 @@ class DatePicker extends PickerBase {
       this._applyDate(event.date, { field: false })
     })
 
-    this._menu = document.createElement('div')
-    this._menu.id = getUID(`${this.constructor.NAME}-popup-`)
-    this._menu.classList.add(CLASS_NAME_POPUP, CLASS_NAME_DROPDOWN)
-    this._writeToggleAttribute('aria-expanded', 'false')
-    this._writeToggleAttribute('aria-haspopup', 'dialog')
-
     const body = document.createElement('div')
     body.classList.add(CLASS_NAME_BODY)
 
@@ -345,15 +333,7 @@ class DatePicker extends PickerBase {
       body.append(timePickers)
     }
 
-    this._menu.append(body)
-
-    if (this._footerTemplate) {
-      const footer = document.createElement('div')
-      footer.classList.add(CLASS_NAME_FOOTER)
-      footer.append(this._footerTemplate.content.cloneNode(true))
-      this._disableUnselectableActions(SELECTOR_ACTION_TODAY, footer)
-      this._menu.append(footer)
-    }
+    this._createMenu(CLASS_NAME_DATE_PICKER, body, SELECTOR_ACTION_TODAY)
   }
 
   override _isNowSelectable(): boolean {

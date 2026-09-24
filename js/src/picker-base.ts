@@ -10,12 +10,15 @@ import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import Popup from './util/popup.js'
 import type { ComponentConfig } from './util/config.js'
-import { type HostClasses, restoreHostClasses } from './util/form-control-group.js'
+import { createControlGroupAction, type HostClasses, restoreHostClasses } from './util/form-control-group.js'
+import { getUID } from './util/index.js'
+import { sanitizeByConfig } from './util/sanitizer.js'
 
 /**
  * Constants
  */
 
+const CLASS_NAME_POPUP = 'popup'
 const CLASS_NAME_SHOW = 'show'
 
 const SELECTOR_ACTION = '[data-coreui-picker-action]'
@@ -26,7 +29,7 @@ const SELECTOR_TEMPLATE_FOOTER = 'template[data-coreui-template="footer"]'
  * Class definition
  */
 
-class PickerBase extends BaseComponent {
+abstract class PickerBase extends BaseComponent {
   protected declare _adoptedAttributes: [Element, string, string | null, string][]
   protected declare _cleanerElement: HTMLElement | null
   protected declare _fieldElement: HTMLElement
@@ -133,6 +136,39 @@ class PickerBase extends BaseComponent {
     })
   }
 
+  _createAction(className: string, icon: string, label: string): HTMLElement {
+    return createControlGroupAction({
+      className, disabled: this._config.disabled, icon, label, sanitizeIcon: (value: string) => sanitizeByConfig(value, this._config)
+    })
+  }
+
+  _createMenu(prefix: string, body: HTMLElement, nowAction?: string): void {
+    this._menu = document.createElement('div')
+    this._menu.id = getUID(`${this.constructor.NAME}-popup-`)
+    this._menu.classList.add(CLASS_NAME_POPUP, `${prefix}-popup`)
+    this._menu.append(body)
+    this._writeToggleAttribute('aria-expanded', 'false')
+    this._writeToggleAttribute('aria-haspopup', 'dialog')
+
+    if (!this._footerTemplate) {
+      return
+    }
+
+    const footer = document.createElement('div')
+    footer.classList.add(`${prefix}-footer`)
+    footer.append(this._footerTemplate.content.cloneNode(true))
+
+    if (nowAction && !this._isNowSelectable()) {
+      for (const button of SelectorEngine.find(nowAction, footer)) {
+        if ('disabled' in button) {
+          (button as HTMLButtonElement).disabled = true
+        }
+      }
+    }
+
+    this._menu.append(footer)
+  }
+
   _originalDefault(): Record<string, any> {
     return this.constructor.Default
   }
@@ -156,18 +192,6 @@ class PickerBase extends BaseComponent {
       close: () => this.hide(),
       disabled: this._config.disabled,
       reset: () => this.reset()
-    }
-  }
-
-  _disableUnselectableActions(selector: string, container: HTMLElement): void {
-    if (this._isNowSelectable()) {
-      return
-    }
-
-    for (const button of SelectorEngine.find(selector, container)) {
-      if ('disabled' in button) {
-        (button as any).disabled = true
-      }
     }
   }
 
@@ -239,33 +263,19 @@ class PickerBase extends BaseComponent {
     this._toggleElement.setAttribute(name, recorded[2] as string)
   }
 
-  _onPopupShow(): void {
-    throw new Error('Method "_onPopupShow" must be implemented.')
-  }
+  abstract _onPopupShow(): void
 
-  _disposeParts(): void {
-    throw new Error('Method "_disposeParts" must be implemented.')
-  }
+  abstract _disposeParts(): void
 
-  _managedClassNames(): string[] {
-    throw new Error('Method "_managedClassNames" must be implemented.')
-  }
+  abstract _managedClassNames(): string[]
 
-  _isNowSelectable(): boolean {
-    throw new Error('Method "_isNowSelectable" must be implemented.')
-  }
+  abstract _isNowSelectable(): boolean
 
-  getContext(): Record<string, any> {
-    throw new Error('Method "getContext" must be implemented.')
-  }
+  abstract getContext(): Record<string, any>
 
-  clear(): void {
-    throw new Error('Method "clear" must be implemented.')
-  }
+  abstract clear(): void
 
-  reset(): void {
-    throw new Error('Method "reset" must be implemented.')
-  }
+  abstract reset(): void
 }
 
 export default PickerBase
