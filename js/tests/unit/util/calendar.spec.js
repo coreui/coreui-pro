@@ -77,7 +77,7 @@ describe('Calendar Utilities', () => {
     it('should return the same Date object if date is already a Date', () => {
       const originalDate = new Date(2023, 0, 1)
       const result = convertToDateObject(originalDate, 'day')
-      expect(result).toEqual(originalDate)
+      expect(result).toBe(originalDate)
     })
 
     it('should return null instead of an Invalid Date for a week string it cannot read', () => {
@@ -437,11 +437,10 @@ describe('Calendar Utilities', () => {
     it('should handle years below 100 without the 19xx date mapping', () => {
       const date = new Date(2000, 0, 1)
       date.setFullYear(22, 5, 15)
+      expect(getISOWeekNumberAndYear(date)).toEqual({ weekNumber: 24, year: 22 })
 
-      const week = getISOWeekNumberAndYear(date)
-      expect(week.weekNumber).toBeGreaterThanOrEqual(1)
-      expect(week.weekNumber).toBeLessThanOrEqual(53)
-      expect(week.year).toBe(22)
+      date.setFullYear(99, 0, 15)
+      expect(getISOWeekNumberAndYear(date)).toEqual({ weekNumber: 3, year: 99 })
     })
   })
 
@@ -877,6 +876,10 @@ describe('Calendar Utilities', () => {
       expect(result.getHours()).toBe(14)
       expect(result.getMinutes()).toBe(30)
       expect(result.getSeconds()).toBe(45)
+    })
+
+    it('should return null for a date and time without the separator the locale writes', () => {
+      expect(getLocalDateFromString('2/16/2022 14:30', 'en-US', true)).toBeNull()
     })
 
     it('should handle different selection types', () => {

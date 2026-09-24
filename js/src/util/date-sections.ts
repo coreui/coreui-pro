@@ -391,23 +391,23 @@ const FORMAT_BY_SELECTION_TYPE: Record<string, SectionFormat> = {
  * Resolves the field format of a picker: an explicit format wins, and every
  * selection type other than `day` gets a mask of its own unit.
  *
- * @param format - The `format` option
+ * @param format - The `format` option, `null` or `undefined` when it is not set
  * @param selectionType - The `selectionType` option
  * @returns The format, or `null` for the locale's day mask
  */
-export const getPickerFormat = (format: SectionFormat, selectionType: SelectionTypes = 'day'): SectionFormat =>
+export const getPickerFormat = (format: SectionFormat | undefined, selectionType: SelectionTypes = 'day'): SectionFormat =>
   format || FORMAT_BY_SELECTION_TYPE[selectionType] || null
 
 /**
  * Resolves the sections of the `format` option.
  *
- * @param format - A token string, a function returning sections, or `null` for the locale's layout
+ * @param format - A token string, a function returning sections, or `null` or `undefined` for the locale's layout
  * @param locale - The locale that names months and day periods and derives the layout without a format
  * @param monthNames - Month names to use instead of the locale's
  * @param includeTime - Whether the locale's layout carries the time; `{ seconds }` also decides the seconds section
  * @returns The sections and literals, in order
  */
-export const getSectionLayout = (format: SectionFormat, locale: string, monthNames: string[] | null = null, includeTime: boolean | { seconds: boolean } = false): DateSection[] => {
+export const getSectionLayout = (format: SectionFormat | undefined, locale: string, monthNames: string[] | null = null, includeTime: boolean | { seconds: boolean } = false): DateSection[] => {
   if (typeof format === 'function') {
     return format(locale)
   }
