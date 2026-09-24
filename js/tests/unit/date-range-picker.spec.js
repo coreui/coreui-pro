@@ -242,6 +242,23 @@ describe('DateRangePicker', () => {
       expect(picker._popup.isShown).toBeFalse()
     })
 
+    it('should render a projected footer in the date picker footer and name the popup the indicator controls', () => {
+      const picker = buildPicker({}, [
+        '<div id="picker">',
+        '  <template data-coreui-template="footer">',
+        '    <button type="button" data-coreui-picker-action="close">OK</button>',
+        '  </template>',
+        '</div>'
+      ].join(''))
+      const indicator = fixtureEl.querySelector('.form-control-action')
+
+      picker.show()
+
+      expect(document.querySelector('.date-picker-popup > .date-picker-footer [data-coreui-picker-action="close"]')).not.toBeNull()
+      expect(indicator.getAttribute('aria-controls')).toMatch(/^date-range-picker-popup-\d+$/)
+      expect(document.getElementById(indicator.getAttribute('aria-controls'))).toEqual(document.querySelector('.date-picker-popup'))
+    })
+
     it('should keep the picked range in the calendar when the end field is focused', () => {
       const picker = buildPicker({}, [
         '<div id="picker">',
