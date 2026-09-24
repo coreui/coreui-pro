@@ -22,6 +22,7 @@ import {
   createGroupsInArray,
   type DisabledDate,
   getCalendarDate,
+  getClosestSelectable,
   getDateBySelectionType,
   getMonthDetails,
   getMonthsNames,
@@ -36,6 +37,7 @@ import {
   isToday,
   type PeriodViewTypes,
   type SelectionTypes,
+  setRovingTabIndex,
   setTimeFromDate,
   type ViewTypes
 } from './util/calendar.js'
@@ -306,33 +308,10 @@ class Calendar extends BaseComponent {
     }
   }
 
-  _closestSelectable(date: Date, scope?: HTMLElement): HTMLElement | null {
-    const focusables = (SelectorEngine.find(
-      this._rovingSelector(),
-      (scope ?? this._element) as ParentNode
-    ) as HTMLElement[]).filter(element => !element.classList.contains('previous') && !element.classList.contains('next'))
-
-    const target = this._startOfView(date)
-
-    let closest = null
-    let closestGap = Number.POSITIVE_INFINITY
-
-    for (const element of focusables) {
-      const start = this._getDate(element).getTime()
-      const end = start + (this._rowsAreTargets() ? 6 * 864e5 : 0)
-      const gap = target.getTime() < start ? start - target.getTime() : Math.max(0, target.getTime() - end)
-
-      if (gap < closestGap) {
-        closest = element
-        closestGap = gap
-      }
-    }
-
-    return closest
-  }
-
   _focusOnDate(date: Date): void {
-    const target = this._closestSelectable(date) ?? SelectorEngine.findOne('table[tabindex="0"]', this._element as ParentNode)
+    const targets = SelectorEngine.find(this._rovingSelector(), this._element as ParentNode) as HTMLElement[]
+    const target = getClosestSelectable(targets, this._startOfView(date), this._rowsAreTargets()) ??
+      SelectorEngine.findOne('table[tabindex="0"]', this._element as ParentNode)
 
     if (target) {
       target.focus()
@@ -920,34 +899,7 @@ class Calendar extends BaseComponent {
   }
 
   _updateRovingTabIndex(preferred?: HTMLElement): void {
-    const empty = !SelectorEngine.findOne(this._rovingSelector(), this._element as ParentNode)
-
-    for (const panel of SelectorEngine.find(SELECTOR_CALENDAR, this._element as ParentNode)) {
-      SelectorEngine.findOne('table', panel)?.toggleAttribute('tabindex', false)
-
-      if (empty) {
-        SelectorEngine.findOne('table', panel)?.setAttribute('tabindex', '0')
-      }
-
-      this._updatePanelRovingTabIndex(panel as HTMLElement, preferred)
-    }
-  }
-
-  _updatePanelRovingTabIndex(panel: HTMLElement, preferred?: HTMLElement): void {
-    const list = SelectorEngine.find(this._rovingSelector(), panel) as HTMLElement[]
-
-    if (list.length === 0) {
-      return
-    }
-
-    const active = (preferred && list.includes(preferred) ? preferred : null) ??
-      list.find(element => element.classList.contains('selected')) ??
-      this._closestSelectable(this._calendarDate as Date, panel) ??
-      list[0]
-
-    for (const element of list) {
-      element.tabIndex = element === active ? 0 : -1
-    }
+    setRovingTabIndex(this._element as HTMLElement, this._rovingSelector(), this._startOfView(this._calendarDate as Date), this._rowsAreTargets(), preferred)
   }
 
   _gridLabel(date: Date): string {

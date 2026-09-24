@@ -7,6 +7,7 @@ import {
   createDateFormatter,
   createGroupsInArray,
   getCalendarDate,
+  getClosestSelectable,
   getDateBySelectionType,
   getISOWeekNumberAndYear,
   getLocalDateFromString,
@@ -27,6 +28,7 @@ import {
   isToday,
   parseYearSmart,
   removeTimeFromDate,
+  setRovingTabIndex,
   setTimeFromDate
 } from '../../../src/util/calendar.js'
 import { clearFixture, getFixture } from '../../helpers/fixture.js'
@@ -414,6 +416,104 @@ describe('Calendar Utilities', () => {
       fixtureEl.innerHTML = '<table><tbody><tr><td class="a">1</td><td>2</td><td class="a">3</td></tr></tbody></table>'
 
       expect(getSelectableDates(fixtureEl, 'td.a').map(element => element.textContent)).toEqual(['1', '3'])
+    })
+  })
+
+  describe('getClosestSelectable', () => {
+    const cell = (date, className = '') => `<td data-coreui-selectable class="${className}" data-coreui-date="${date.toDateString()}"></td>`
+
+    it('should pick the cell closest to the anchor and skip days of adjacent months', () => {
+      fixtureEl.innerHTML = `<table><tbody><tr>${cell(new Date(2026, 5, 30), 'previous')}${cell(new Date(2026, 6, 3))}${cell(new Date(2026, 6, 10))}</tr></tbody></table>`
+      const cells = getSelectableDates(fixtureEl)
+
+      expect(getClosestSelectable(cells, new Date(2026, 5, 29), false)).toBe(cells[1])
+      expect(getClosestSelectable(cells, new Date(2026, 6, 8), false)).toBe(cells[2])
+    })
+
+    it('should measure a week row by the days its cells carry and let a row of the panel\'s own month win a tie', () => {
+      const week = className => `<tr data-coreui-selectable>${cell(new Date(2026, 6, 27), className)}${cell(new Date(2026, 7, 2))}</tr>`
+      fixtureEl.innerHTML = `<table><tbody>${week('previous')}${week('')}</tbody></table>`
+      const rows = getSelectableDates(fixtureEl, 'tr[data-coreui-selectable]')
+
+      expect(getClosestSelectable(rows, new Date(2026, 6, 30), true)).toBe(rows[1])
+    })
+
+    it('should end a week row at its last shown day', () => {
+      const row = (first, last) => `<tr data-coreui-selectable>${cell(first)}${cell(last)}</tr>`
+      fixtureEl.innerHTML = `<table><tbody>${row(new Date(2026, 2, 30), new Date(2026, 2, 31))}${row(new Date(2026, 3, 1), new Date(2026, 3, 5))}</tbody></table>`
+      const rows = getSelectableDates(fixtureEl, 'tr[data-coreui-selectable]')
+
+      expect(getClosestSelectable(rows, new Date(2026, 3, 2), true)).toBe(rows[1])
+    })
+
+    it('should return undefined without a cell that carries a date', () => {
+      fixtureEl.innerHTML = '<table><tbody><tr><td data-coreui-selectable></td></tr></tbody></table>'
+
+      expect(getClosestSelectable(getSelectableDates(fixtureEl), new Date(2026, 6, 1), false)).toBeUndefined()
+      expect(getClosestSelectable([], new Date(2026, 6, 1), false)).toBeUndefined()
+
+      fixtureEl.innerHTML = '<table><tbody><tr data-coreui-selectable><td></td></tr></tbody></table>'
+      expect(getClosestSelectable(getSelectableDates(fixtureEl), new Date(2026, 6, 1), true)).toBeUndefined()
+    })
+  })
+
+  describe('setRovingTabIndex', () => {
+    const selector = 'td[data-coreui-selectable]'
+    const panel = cells => `<div class="calendar"><table><tbody><tr>${cells}</tr></tbody></table></div>`
+    const cell = (date, attributes = '') => `<td data-coreui-selectable data-coreui-date="${date.toDateString()}" ${attributes}></td>`
+    const stops = () => [...fixtureEl.querySelectorAll('[tabindex="0"]')]
+
+    it('should give the stop to the preferred target, else the selected one, else the closest, else the first', () => {
+      fixtureEl.innerHTML = panel(cell(new Date(2026, 6, 1)) + cell(new Date(2026, 6, 10)) + cell(new Date(2026, 6, 20), 'aria-selected="true"'))
+      const [first, tenth, selected] = getSelectableDates(fixtureEl, selector)
+
+      setRovingTabIndex(fixtureEl, selector, new Date(2026, 6, 9), false, tenth)
+      expect(stops()).toEqual([tenth])
+      expect([first.tabIndex, selected.tabIndex]).toEqual([-1, -1])
+
+      setRovingTabIndex(fixtureEl, selector, new Date(2026, 6, 9), false)
+      expect(stops()).toEqual([selected])
+
+      selected.removeAttribute('aria-selected')
+      setRovingTabIndex(fixtureEl, selector, new Date(2026, 6, 9), false)
+      expect(stops()).toEqual([tenth])
+
+      setRovingTabIndex(fixtureEl, selector, null, false)
+      expect(stops()).toEqual([first])
+    })
+
+    it('should keep one stop per panel', () => {
+      fixtureEl.innerHTML = panel(cell(new Date(2026, 6, 1))) + panel(cell(new Date(2026, 7, 1)))
+
+      setRovingTabIndex(fixtureEl, selector, new Date(2026, 6, 1), false)
+      expect(stops()).toEqual(getSelectableDates(fixtureEl, selector))
+    })
+
+    it('should leave the other panels their own stop when the preferred target sits in one', () => {
+      fixtureEl.innerHTML = panel(cell(new Date(2026, 6, 1))) + panel(cell(new Date(2026, 7, 1)) + cell(new Date(2026, 7, 2)))
+      const [july, , second] = getSelectableDates(fixtureEl, selector)
+
+      setRovingTabIndex(fixtureEl, selector, new Date(2026, 6, 1), false, second)
+      expect(stops()).toEqual([july, second])
+    })
+
+    it('should give the grids the stop while no panel has a target and take it back once one has', () => {
+      fixtureEl.innerHTML = panel('<td></td>') + panel('<td></td>')
+      setRovingTabIndex(fixtureEl, selector, new Date(2026, 6, 1), false)
+      expect(stops().map(element => element.tagName)).toEqual(['TABLE', 'TABLE'])
+
+      fixtureEl.querySelector('td').outerHTML = cell(new Date(2026, 6, 1))
+      setRovingTabIndex(fixtureEl, selector, new Date(2026, 6, 1), false)
+      expect(stops().map(element => element.tagName)).toEqual(['TD'])
+    })
+
+    it('should take the stop away from an element that is no longer a target', () => {
+      fixtureEl.innerHTML = panel(`<td tabindex="0"></td>${cell(new Date(2026, 6, 1))}`)
+      const [stale] = fixtureEl.querySelectorAll('td')
+
+      setRovingTabIndex(fixtureEl, selector, new Date(2026, 6, 1), false)
+      expect(stale.tabIndex).toBe(-1)
+      expect(stops()).toEqual(getSelectableDates(fixtureEl, selector))
     })
   })
 

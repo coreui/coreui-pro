@@ -892,28 +892,21 @@ export const getMonthDetails = (year: number, month: number, firstDayOfWeek: num
 }
 
 /**
- * Picks the one cell or row of a calendar grid that takes the keyboard tab
- * stop: the selected target; else, with an anchor date, the target closest to
- * it, skipping days of adjacent months and letting a row of the panel's own
- * month win a tie; else the first target.
+ * Finds the target closest to a date: the one whose range holds it, else the
+ * nearest. Days of adjacent months are skipped, and a row of the panel's own
+ * month wins a tie.
  *
  * @param targets - The selectable cells or rows of the grid
- * @param anchor - The date the grid is anchored to, usually the calendar date
+ * @param anchor - The date to measure from
  * @param rows - Whether the targets are week rows, which may start in an adjacent month
- * @returns The time of the target's date, or `undefined` without targets
+ * @returns The closest target, or `undefined` when none qualifies
  */
-export const getTabStop = (targets: TabStopTarget[], anchor: Date | null, rows: boolean) : number | undefined => {
-  const selected = targets.find(target => target.selected)
-
-  if (selected) {
-    return selected.date.getTime()
-  }
-
-  let closest: TabStopTarget | undefined
+const getClosestTarget = <T extends TabStopTarget>(targets: T[], anchor: Date, rows: boolean) : T | undefined => {
+  let closest: T | undefined
   let closestGap = Number.POSITIVE_INFINITY
 
   for (const target of targets) {
-    if (!anchor || (!rows && target.adjacent)) {
+    if (!rows && target.adjacent) {
       continue
     }
 
@@ -928,8 +921,24 @@ export const getTabStop = (targets: TabStopTarget[], anchor: Date | null, rows: 
     }
   }
 
-  return (closest ?? targets[0])?.date.getTime()
+  return closest
 }
+
+/**
+ * Picks the one cell or row of a calendar grid that takes the keyboard tab
+ * stop: the selected target; else, with an anchor date, the target closest to
+ * it, skipping days of adjacent months and letting a row of the panel's own
+ * month win a tie; else the first target.
+ *
+ * @param targets - The selectable cells or rows of the grid
+ * @param anchor - The date the grid is anchored to, usually the calendar date
+ * @param rows - Whether the targets are week rows, which may start in an adjacent month
+ * @returns The time of the target's date, or `undefined` without targets
+ */
+export const getTabStop = (targets: TabStopTarget[], anchor: Date | null, rows: boolean) : number | undefined =>
+  (targets.find(target => target.selected) ??
+    (anchor ? getClosestTarget(targets, anchor, rows) : undefined) ??
+    targets[0])?.date.getTime()
 
 /**
  * Finds the selectable cells and rows of a calendar grid.
@@ -940,6 +949,91 @@ export const getTabStop = (targets: TabStopTarget[], anchor: Date | null, rows: 
  */
 export const getSelectableDates = (element: HTMLElement, selector: string = 'tr[data-coreui-selectable], td[data-coreui-selectable]') : HTMLElement[] =>
   [...Element.prototype.querySelectorAll.call(element, selector)] as HTMLElement[]
+
+/**
+ * Picks the selectable cell or week row of a rendered grid closest to a date,
+ * by the dates its cells carry in `data-coreui-date`: the one whose shown days
+ * hold the date, else the nearest. Days of adjacent months are skipped, a row
+ * of the panel's own month wins a tie, and the selection plays no part.
+ *
+ * @param elements - The selectable cells or rows
+ * @param anchor - The date to measure from
+ * @param rows - Whether the elements are week rows
+ * @returns The closest element, or `undefined` without one
+ */
+export const getClosestSelectable = (elements: HTMLElement[], anchor: Date, rows: boolean) : HTMLElement | undefined => {
+  const targets = []
+
+  for (const element of elements) {
+    const cells = rows ? [...element.querySelectorAll<HTMLElement>('td[data-coreui-date]')] : [element]
+    const first = cells[0]?.dataset.coreuiDate
+    const last = cells.at(-1)?.dataset.coreuiDate
+
+    if (first && last) {
+      const position = new Date(first)
+      targets.push({
+        adjacent: cells[0].matches('.previous, .next'),
+        date: position,
+        element,
+        end: new Date(last),
+        position,
+        selected: element.getAttribute('aria-selected') === 'true'
+      })
+    }
+  }
+
+  return getClosestTarget(targets, anchor, rows)?.element
+}
+
+/**
+ * Moves the roving tab stop in each `.calendar` panel of a calendar: to
+ * `preferred` when the panel holds it, else to the selected target, else to
+ * the target closest to `anchor`, else to the first. When no panel has a
+ * target, the grids themselves take the stop.
+ *
+ * @param element - The calendar holding the panels
+ * @param selector - The selector of a selectable cell or row
+ * @param anchor - The date the stop falls back to, usually the calendar date cut to the unit the view shows
+ * @param rows - Whether the targets are week rows
+ * @param preferred - The target that should keep the stop, usually the focused one
+ */
+export const setRovingTabIndex = (element: HTMLElement, selector: string, anchor: Date | null, rows: boolean, preferred?: HTMLElement | null) : void => {
+  const empty = !element.querySelector(selector)
+
+  for (const panel of element.querySelectorAll<HTMLElement>('.calendar')) {
+    const targets = getSelectableDates(panel, selector)
+    const grid = panel.querySelector('table')
+
+    if (empty) {
+      grid?.setAttribute('tabindex', '0')
+    } else {
+      grid?.removeAttribute('tabindex')
+    }
+
+    for (const stale of panel.querySelectorAll<HTMLElement>('td[tabindex="0"], tr[tabindex="0"]')) {
+      if (!targets.includes(stale)) {
+        stale.tabIndex = -1
+      }
+    }
+
+    if (targets.length === 0) {
+      continue
+    }
+
+    const active = (preferred && targets.includes(preferred) ? preferred : undefined) ??
+      targets.find(target => target.getAttribute('aria-selected') === 'true') ??
+      (anchor ? getClosestSelectable(targets, anchor, rows) : undefined) ??
+      targets[0]
+
+    for (const target of targets) {
+      const tabIndex = target === active ? 0 : -1
+
+      if (target.tabIndex !== tabIndex) {
+        target.tabIndex = tabIndex
+      }
+    }
+  }
+}
 
 /**
  * Tells whether a day cannot be picked: it lies before `min` or after
