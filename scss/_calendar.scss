@@ -49,6 +49,7 @@ $calendar-tokens: defaults(
     --#{$prefix}calendar-cell-disabled-color: var(--#{$prefix}fg-4),
     --#{$prefix}calendar-cell-selected-color: var(--#{$prefix}primary-contrast),
     --#{$prefix}calendar-cell-selected-bg: var(--#{$prefix}primary-base),
+    --#{$prefix}calendar-cell-selected-adjacent-color: var(--#{$prefix}primary-fg),
     --#{$prefix}calendar-cell-range-bg: color-mix(in oklch, var(--#{$prefix}theme-bg, var(--#{$prefix}primary-base)) 12.5%, transparent),
     --#{$prefix}calendar-cell-range-hover-border-color: var(--#{$prefix}primary-base),
     --#{$prefix}calendar-cell-today-color: var(--#{$prefix}danger-base),
@@ -230,6 +231,11 @@ $calendar-tokens: defaults(
     &.selected:not(th, .next, .previous) .calendar-cell-inner {
       color: var(--#{$prefix}theme-contrast, var(--#{$prefix}calendar-cell-selected-color));
       background-color: var(--#{$prefix}theme-bg, var(--#{$prefix}calendar-cell-selected-bg));
+    }
+
+    &.selected.clickable:is(.next, .previous) .calendar-cell-inner {
+      color: var(--#{$prefix}theme-fg, var(--#{$prefix}calendar-cell-selected-adjacent-color));
+      border: var(--#{$prefix}border-width) solid currentcolor;
     }
 
     &.today .calendar-cell-inner {

@@ -1197,6 +1197,13 @@ removed in favour of `$translucent-opacity` and
   (`"Thu Sep 17 2026"`), like the month, quarter and year cells, instead of the
   full `Date#toString()` value. A script that selected a day cell with
   `[data-coreui-date="${date}"]` needs `[data-coreui-date="${date.toDateString()}"]`.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **Picking a date no longer fires `calendarDateChange` and keeps the month on
+  screen.** A picked day of an adjacent month (`selectAdjacentDays`) used to
+  become the calendar date while the grid stayed put, so the next-month button
+  then skipped a month; it now stays where it was and shows as selected with an
+  outline instead of a fill (`--cui-calendar-cell-selected-adjacent-color`).
+  Listen to `startDateChange` / `endDateChange` for the picked date.
 - **Additive:** `startDateChange` and `endDateChange` now carry a `dateObject`
   property with the underlying `Date`, alongside the existing `date` property.
   `date` remains formatted per `selectionType` — a `Date` for day selection, but
