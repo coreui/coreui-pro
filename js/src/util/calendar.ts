@@ -14,6 +14,24 @@ export type TabStopTarget = {
   selected: boolean
 }
 
+export type CalendarKeyAction =
+  | { type: 'activate' }
+  | { date: Date; months: number; type: 'move'; years: number }
+  | { date?: Date; months: number; type: 'page'; years: number }
+  | { type: 'stay' }
+
+export type CalendarKeyContext = {
+  calendarDate: Date
+  calendars: number
+  disabledDates?: DisabledDate | DisabledDate[]
+  firstDayOfWeek: number
+  maxDate?: Date | null
+  minDate?: Date | null
+  rows: boolean
+  rtl: boolean
+  view: ViewTypes
+}
+
 export type BaseGroups = {
   year: string
   month: string
@@ -1033,6 +1051,251 @@ export const setRovingTabIndex = (element: HTMLElement, selector: string, anchor
       }
     }
   }
+}
+
+/**
+ * Moves a date to the start of the period a calendar view shows it in: its
+ * day in the days view, its month, quarter or year in the others.
+ *
+ * @param date - The date to move
+ * @param view - The view of the calendar
+ * @returns A new date at midnight on the first day of that period
+ */
+export const getStartOfView = (date: Date, view: ViewTypes) : Date => {
+  const value = new Date(date)
+  value.setHours(0, 0, 0, 0)
+
+  if (view === 'months') {
+    value.setDate(1)
+  }
+
+  if (view === 'quarters') {
+    value.setMonth(Math.floor(value.getMonth() / 3) * 3, 1)
+  }
+
+  if (view === 'years') {
+    value.setMonth(0, 1)
+  }
+
+  return value
+}
+
+/**
+ * Moves a date back to the first day of its week.
+ *
+ * @param date - The date to move
+ * @param firstDayOfWeek - The day a week starts on, `0` for Sunday to `6` for Saturday
+ * @returns A new date on the first day of the week, at the same time of day
+ */
+export const getStartOfWeek = (date: Date, firstDayOfWeek: number) : Date => {
+  const value = new Date(date)
+  value.setDate(value.getDate() - ((value.getDay() - firstDayOfWeek + 7) % 7))
+  return value
+}
+
+/**
+ * Finds the first or the last day, month, quarter or year the panels of a
+ * calendar show.
+ *
+ * @param forward - Whether to take the last one
+ * @param context - The state of the calendar
+ * @returns The date at that edge of the view
+ */
+const getViewEdge = (forward: boolean, { calendarDate, calendars, view }: CalendarKeyContext) : Date => {
+  const year = calendarDate.getFullYear()
+  const month = calendarDate.getMonth()
+  const last = calendars - 1
+
+  if (view === 'days') {
+    return forward ? new Date(year, month + last + 1, 0) : new Date(year, month, 1)
+  }
+
+  if (view === 'years') {
+    return new Date(forward ? year + 5 + (12 * last) : year - 6, 0, 1)
+  }
+
+  return forward ? new Date(year + last, view === 'quarters' ? 9 : 11, 1) : new Date(year, 0, 1)
+}
+
+/**
+ * Finds where an arrow key takes the focus: the nearest selectable day, week,
+ * month, quarter or year in the direction of the key, a whole row away for the
+ * vertical keys. The search stops at `minDate` / `maxDate`, and gives up after
+ * the first step that lands more than ten calendar years from the date.
+ *
+ * @param date - The date the focus leaves
+ * @param forward - Whether the key points forward in time
+ * @param vertical - Whether the key moves by a row instead of a cell
+ * @param context - The state of the calendar
+ * @returns The date to focus, or `null` when there is none
+ */
+const getArrowTarget = (date: Date, forward: boolean, vertical: boolean, context: CalendarKeyContext) : Date | null => {
+  const { disabledDates, firstDayOfWeek, maxDate, minDate, rows, view } = context
+  const steps: Record<ViewTypes, [number, number]> = {
+    days: vertical || rows ? [7, 0] : [1, 0],
+    months: vertical ? [0, 3] : [0, 1],
+    quarters: vertical ? [0, 12] : [0, 3],
+    years: vertical ? [0, 36] : [0, 12]
+  }
+  const [days, months] = steps[view]
+  const sign = forward ? 1 : -1
+  const bound = forward ? maxDate : minDate
+  const edge = bound ? getStartOfView(bound, view) : null
+  const target = rows ? getStartOfWeek(date, firstDayOfWeek) : new Date(date)
+
+  while (Math.abs(target.getFullYear() - date.getFullYear()) <= 10) {
+    target.setMonth(target.getMonth() + (sign * months), target.getDate() + (sign * days))
+
+    const start = getStartOfView(target, view)
+
+    if (edge && (forward ? start > edge : start < edge)) {
+      return null
+    }
+
+    const disabled = view === 'days' ?
+      isDateDisabled(target, minDate, maxDate, disabledDates) :
+      isPeriodDisabled(target, view, minDate, maxDate, disabledDates)
+
+    if (!disabled) {
+      return target
+    }
+  }
+
+  return null
+}
+
+/**
+ * Works out how far a calendar has to page for a date to fall in the months or
+ * years its panels show: nothing when it already does, else the smallest move.
+ * A week counts as shown while any of its days is.
+ *
+ * @param date - The date to show
+ * @param context - The state of the calendar
+ * @returns The years and months to page by
+ */
+const getRevealOffset = (date: Date, { calendarDate, calendars, rows, view }: CalendarKeyContext) : { months: number; years: number } => {
+  if (view === 'days') {
+    const end = new Date(date)
+    end.setDate(end.getDate() + (rows ? 6 : 0))
+    const monthsFrom = (value: Date) : number => ((value.getFullYear() - calendarDate.getFullYear()) * 12) + value.getMonth() - calendarDate.getMonth()
+
+    return {
+      months: monthsFrom(end) < 0 ? monthsFrom(end) : Math.max(0, monthsFrom(date) - calendars + 1),
+      years: 0
+    }
+  }
+
+  if (view === 'years') {
+    const page = Math.floor((date.getFullYear() - calendarDate.getFullYear() + 6) / 12)
+    return { months: 0, years: 12 * (page < 0 ? page : Math.max(0, page - calendars + 1)) }
+  }
+
+  const delta = date.getFullYear() - calendarDate.getFullYear()
+  return { months: 0, years: delta < 0 ? delta : Math.max(0, delta - calendars + 1) }
+}
+
+/**
+ * Finds where Page Up / Page Down takes the focus: the same day a month away,
+ * or a year away with Shift, cut to the length of the target month; a year
+ * away in the months and quarters views and a decade away in the years view.
+ * The result is kept within `minDate` / `maxDate`.
+ *
+ * @param date - The date the focus leaves
+ * @param direction - `1` for Page Down, `-1` for Page Up
+ * @param shiftKey - Whether Shift is held
+ * @param context - The state of the calendar
+ * @returns The date to focus
+ */
+const getPageTarget = (date: Date, direction: number, shiftKey: boolean, { maxDate, minDate, view }: CalendarKeyContext) : Date => {
+  const target = new Date(date)
+
+  if (view === 'days') {
+    const day = target.getDate()
+    target.setDate(1)
+
+    if (shiftKey) {
+      target.setFullYear(target.getFullYear() + direction)
+    } else {
+      target.setMonth(target.getMonth() + direction)
+    }
+
+    target.setDate(Math.min(day, new Date(target.getFullYear(), target.getMonth() + 1, 0).getDate()))
+  } else {
+    target.setFullYear(target.getFullYear() + ((view === 'years' ? 10 : 1) * direction))
+  }
+
+  if (maxDate && target > maxDate) {
+    target.setTime(maxDate.getTime())
+  }
+
+  if (minDate && target < minDate) {
+    target.setTime(minDate.getTime())
+  }
+
+  return target
+}
+
+/**
+ * Decides what a key does in a calendar grid. On a cell or a week row, Space
+ * and Enter pick its date, the arrows move to the nearest selectable cell or
+ * row, and Page Up / Page Down turn the calendar a month (a year with Shift) in
+ * the days view, a year in the months and quarters views and ten years in the
+ * years view, and move to the same day there. On a grid with nothing to focus,
+ * the arrows move to the nearest selectable date beyond the edge of the view,
+ * Page Up / Page Down turn the calendar the same way, and Home / End do nothing.
+ * Home and End on a cell are left to the calendar.
+ *
+ * @param event - The key and its modifiers
+ * @param event.code - The physical key
+ * @param event.key - The key value
+ * @param event.shiftKey - Whether Shift is held
+ * @param date - The date of the focused cell or week row, `null` when the grid itself has the focus
+ * @param context - The state of the calendar
+ * @returns `activate` to pick the focused date, `move` to focus `date` after paging by `years` and `months` when either is not zero, `page` to page the calendar by `years` and `months` and then focus `date` (on a grid without one, its panel's tab stop), `stay` when the key is handled and the focus stays, or `null` for a key the grid leaves alone
+ */
+export const getCalendarKeyAction = ({ code, key, shiftKey }: { code: string; key: string; shiftKey: boolean }, date: Date | null, context: CalendarKeyContext) : CalendarKeyAction | null => {
+  const direction = key === 'PageDown' ? 1 : -1
+  const forward = key === 'ArrowDown' || key === (context.rtl ? 'ArrowLeft' : 'ArrowRight')
+  const paging = key === 'PageDown' || key === 'PageUp'
+
+  if (['ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowUp'].includes(key)) {
+    const target = date ?
+      getArrowTarget(date, forward, key === 'ArrowDown' || key === 'ArrowUp', context) :
+      getArrowTarget(getViewEdge(forward, context), forward, false, context)
+
+    return target ? { date: target, ...getRevealOffset(target, context), type: 'move' } : { type: 'stay' }
+  }
+
+  if (!date) {
+    if (paging) {
+      return context.view === 'days' && !shiftKey ?
+        { months: direction, type: 'page', years: 0 } :
+        { months: 0, type: 'page', years: direction * (context.view === 'years' ? 10 : 1) }
+    }
+
+    return key === 'End' || key === 'Home' ? { type: 'stay' } : null
+  }
+
+  if (code === 'Space' || key === 'Enter') {
+    return { type: 'activate' }
+  }
+
+  if (paging) {
+    const target = getPageTarget(date, direction, shiftKey, context)
+
+    if (target.getTime() === date.getTime()) {
+      return { type: 'stay' }
+    }
+
+    return {
+      date: target,
+      months: ((target.getFullYear() - date.getFullYear()) * 12) + target.getMonth() - date.getMonth(),
+      type: 'page',
+      years: 0
+    }
+  }
+
+  return null
 }
 
 /**

@@ -17,15 +17,20 @@ import {
 } from './util/icons.js'
 import { defineJQueryPlugin, isRTL, jQueryDispatch } from './util/index.js'
 import {
+  type CalendarKeyAction,
+  type CalendarKeyContext,
   convertToDateObject,
   createDateFormatter,
   createGroupsInArray,
   type DisabledDate,
   getCalendarDate,
+  getCalendarKeyAction,
   getClosestSelectable,
   getDateBySelectionType,
   getMonthDetails,
   getMonthsNames,
+  getStartOfView,
+  getStartOfWeek,
   getYears,
   isDateDisabled,
   isDateInRange,
@@ -51,16 +56,8 @@ const DATA_KEY = 'coreui.calendar'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
-const ARROW_UP_KEY = 'ArrowUp'
-const ARROW_RIGHT_KEY = 'ArrowRight'
-const ARROW_DOWN_KEY = 'ArrowDown'
-const ARROW_LEFT_KEY = 'ArrowLeft'
-const ENTER_KEY = 'Enter'
-const SPACE_KEY = 'Space'
 const HOME_KEY = 'Home'
 const END_KEY = 'End'
-const PAGE_UP_KEY = 'PageUp'
-const PAGE_DOWN_KEY = 'PageDown'
 
 const EVENT_BLUR = `blur${EVENT_KEY}`
 const EVENT_CALENDAR_DATE_CHANGE = `calendarDateChange${EVENT_KEY}`
@@ -310,7 +307,7 @@ class Calendar extends BaseComponent {
 
   _focusOnDate(date: Date): void {
     const targets = SelectorEngine.find(this._rovingSelector(), this._element as ParentNode) as HTMLElement[]
-    const target = getClosestSelectable(targets, this._startOfView(date), this._rowsAreTargets()) ??
+    const target = getClosestSelectable(targets, getStartOfView(date, this._view), this._rowsAreTargets()) ??
       SelectorEngine.findOne('table[tabindex="0"]', this._element as ParentNode)
 
     if (target) {
@@ -334,31 +331,6 @@ class Calendar extends BaseComponent {
     }
   }
 
-  _startOfWeek(date: Date): Date {
-    const value = new Date(date)
-    value.setDate(value.getDate() - ((value.getDay() - this._config.firstDayOfWeek + 7) % 7))
-    return value
-  }
-
-  _startOfView(date: Date): Date {
-    const value = new Date(date)
-    value.setHours(0, 0, 0, 0)
-
-    if (this._view === 'months') {
-      value.setDate(1)
-    }
-
-    if (this._view === 'quarters') {
-      value.setMonth(Math.floor(value.getMonth() / 3) * 3, 1)
-    }
-
-    if (this._view === 'years') {
-      value.setMonth(0, 1)
-    }
-
-    return value
-  }
-
   _getEventTarget(event: any): HTMLElement | null {
     return event.target.closest(SELECTOR_CALENDAR_CELL) ??
       event.target.closest(SELECTOR_CALENDAR_ROW)
@@ -371,7 +343,7 @@ class Calendar extends BaseComponent {
   _getDate(target: HTMLElement): Date {
     if (this._rowsAreTargets()) {
       const firstCell = SelectorEngine.findOne(SELECTOR_CALENDAR_CELL, target.closest(SELECTOR_CALENDAR_ROW) as ParentNode)
-      return this._startOfWeek(new Date(Manipulator.getDataAttribute(firstCell as HTMLElement, 'date') as string))
+      return getStartOfWeek(new Date(Manipulator.getDataAttribute(firstCell as HTMLElement, 'date') as string), this._config.firstDayOfWeek)
     }
 
     return new Date(Manipulator.getDataAttribute(target, 'date') as string)
@@ -417,13 +389,6 @@ class Calendar extends BaseComponent {
   }
 
   _handleCalendarKeydown(event: any): void {
-    const date = this._getDate(event.target)
-
-    if (event.code === SPACE_KEY || event.key === ENTER_KEY) {
-      event.preventDefault()
-      this._handleCalendarClick(event)
-    }
-
     if ([HOME_KEY, END_KEY].includes(event.key)) {
       event.preventDefault()
 
@@ -433,53 +398,26 @@ class Calendar extends BaseComponent {
       return
     }
 
-    if (event.key === PAGE_UP_KEY || event.key === PAGE_DOWN_KEY) {
-      event.preventDefault()
+    const action = getCalendarKeyAction(event, this._getDate(event.target), this._getKeyContext())
 
-      const direction = event.key === PAGE_DOWN_KEY ? 1 : -1
-      const target = new Date(date)
-
-      if (this._view === 'days') {
-        const day = target.getDate()
-        target.setDate(1)
-
-        if (event.shiftKey) {
-          target.setFullYear(target.getFullYear() + direction)
-        } else {
-          target.setMonth(target.getMonth() + direction)
-        }
-
-        target.setDate(Math.min(day, new Date(target.getFullYear(), target.getMonth() + 1, 0).getDate()))
-      } else {
-        target.setFullYear(target.getFullYear() + ((this._view === 'years' ? 10 : 1) * direction))
-      }
-
-      if (this._maxDate && target > this._maxDate) {
-        target.setTime(this._maxDate.getTime())
-      }
-
-      if (this._minDate && target < this._minDate) {
-        target.setTime(this._minDate.getTime())
-      }
-
-      if (target.getTime() === date.getTime()) {
-        return
-      }
-
-      const monthsDelta = ((target.getFullYear() - date.getFullYear()) * 12) + (target.getMonth() - date.getMonth())
-      this._modifyCalendarDate(0, monthsDelta, () => this._focusOnDate(target))
+    if (!action) {
       return
     }
 
-    if ([ARROW_UP_KEY, ARROW_RIGHT_KEY, ARROW_DOWN_KEY, ARROW_LEFT_KEY].includes(event.key)) {
-      event.preventDefault()
+    event.preventDefault()
 
-      const target = this._getArrowTarget(date, this._isForwardKey(event.key), [ARROW_UP_KEY, ARROW_DOWN_KEY].includes(event.key))
-
-      if (target) {
-        this._revealDate(target, () => this._focusOnCell(target))
-      }
+    if (action.type === 'activate') {
+      this._handleCalendarClick(event)
+      return
     }
+
+    if (action.type === 'page' && action.date) {
+      const target = action.date
+      this._modifyCalendarDate(action.years, action.months, () => this._focusOnDate(target))
+      return
+    }
+
+    this._moveFocus(action)
   }
 
   _handleGridKeydown(event: any): void {
@@ -487,34 +425,23 @@ class Calendar extends BaseComponent {
       return
     }
 
-    if (event.key === HOME_KEY || event.key === END_KEY) {
-      event.preventDefault()
-      return
-    }
+    const action = getCalendarKeyAction(event, null, this._getKeyContext())
 
-    if ([ARROW_UP_KEY, ARROW_RIGHT_KEY, ARROW_DOWN_KEY, ARROW_LEFT_KEY].includes(event.key)) {
-      event.preventDefault()
-
-      const forward = this._isForwardKey(event.key)
-      const target = this._getArrowTarget(this._getViewEdge(forward), forward, false)
-
-      if (target) {
-        this._revealDate(target, () => this._focusOnCell(target))
-      }
-
-      return
-    }
-
-    if (event.key !== PAGE_UP_KEY && event.key !== PAGE_DOWN_KEY) {
+    if (!action) {
       return
     }
 
     event.preventDefault()
 
-    const direction = event.key === PAGE_DOWN_KEY ? 1 : -1
+    if (action.type !== 'page') {
+      this._moveFocus(action)
+      return
+    }
+
     const panels = SelectorEngine.find(SELECTOR_CALENDAR, this._element as ParentNode)
     const index = panels.indexOf(event.target.closest(SELECTOR_CALENDAR))
-    const refocus = () => {
+
+    this._modifyCalendarDate(action.years, action.months, () => {
       const panel = SelectorEngine.find(SELECTOR_CALENDAR, this._element as ParentNode)[index]
       const stop = (SelectorEngine.findOne('[tabindex="0"]', panel as ParentNode) ??
         SelectorEngine.findOne('[tabindex="0"]', this._element as ParentNode)) as HTMLElement | null
@@ -522,97 +449,34 @@ class Calendar extends BaseComponent {
       if (stop) {
         stop.focus()
       }
-    }
+    })
+  }
 
-    if (this._view === 'days' && !event.shiftKey) {
-      this._modifyCalendarDate(0, direction, refocus)
+  _getKeyContext(): CalendarKeyContext {
+    return {
+      calendarDate: this._calendarDate,
+      calendars: this._config.calendars,
+      disabledDates: this._config.disabledDates,
+      firstDayOfWeek: this._config.firstDayOfWeek,
+      maxDate: this._maxDate,
+      minDate: this._minDate,
+      rows: this._rowsAreTargets(),
+      rtl: isRTL(this._element),
+      view: this._view
+    }
+  }
+
+  _moveFocus(action: CalendarKeyAction): void {
+    if (action.type !== 'move') {
       return
     }
 
-    this._modifyCalendarDate(direction * (this._view === 'years' ? 10 : 1), 0, refocus)
-  }
-
-  _isForwardKey(key: string): boolean {
-    return key === ARROW_DOWN_KEY || key === (isRTL(this._element) ? ARROW_LEFT_KEY : ARROW_RIGHT_KEY)
-  }
-
-  _getViewEdge(forward: boolean): Date {
-    const year = this._calendarDate.getFullYear()
-    const month = this._calendarDate.getMonth()
-    const last = this._config.calendars - 1
-
-    if (this._view === 'days') {
-      return forward ? new Date(year, month + last + 1, 0) : new Date(year, month, 1)
-    }
-
-    if (this._view === 'years') {
-      return new Date(forward ? year + 5 + (12 * last) : year - 6, 0, 1)
-    }
-
-    return forward ? new Date(year + last, this._view === 'quarters' ? 9 : 11, 1) : new Date(year, 0, 1)
-  }
-
-  _getArrowTarget(date: Date, forward: boolean, vertical: boolean): Date | null {
-    const steps: Record<string, [number, number]> = {
-      days: vertical || this._rowsAreTargets() ? [7, 0] : [1, 0],
-      months: vertical ? [0, 3] : [0, 1],
-      quarters: vertical ? [0, 12] : [0, 3],
-      years: vertical ? [0, 36] : [0, 12]
-    }
-    const [days, months] = steps[this._view]
-    const sign = forward ? 1 : -1
-    const bound = forward ? this._maxDate : this._minDate
-    const edge = bound ? this._startOfView(bound) : null
-    const target = this._rowsAreTargets() ? this._startOfWeek(date) : new Date(date)
-
-    while (Math.abs(target.getFullYear() - date.getFullYear()) <= 10) {
-      target.setMonth(target.getMonth() + (sign * months), target.getDate() + (sign * days))
-
-      const start = this._startOfView(target)
-
-      if (edge && (forward ? start > edge : start < edge)) {
-        return null
-      }
-
-      if (this._isSelectableDate(target)) {
-        return target
-      }
-    }
-
-    return null
-  }
-
-  _isSelectableDate(date: Date): boolean {
-    return this._view === 'days' ?
-      !isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates) :
-      !isPeriodDisabled(date, this._view, this._minDate, this._maxDate, this._config.disabledDates)
-  }
-
-  _revealDate(date: Date, callback: () => void): void {
-    const pages = this._config.calendars
-    const first = this._calendarDate as Date
-    let years = 0
-    let months = 0
-
-    if (this._view === 'days') {
-      const end = new Date(date)
-      end.setDate(end.getDate() + (this._rowsAreTargets() ? 6 : 0))
-      const monthsFrom = (value: Date) => ((value.getFullYear() - first.getFullYear()) * 12) + value.getMonth() - first.getMonth()
-      months = monthsFrom(end) < 0 ? monthsFrom(end) : Math.max(0, monthsFrom(date) - pages + 1)
-    } else if (this._view === 'years') {
-      const page = Math.floor((date.getFullYear() - first.getFullYear() + 6) / 12)
-      years = 12 * (page < 0 ? page : Math.max(0, page - pages + 1))
-    } else {
-      const delta = date.getFullYear() - first.getFullYear()
-      years = delta < 0 ? delta : Math.max(0, delta - pages + 1)
-    }
-
-    if (years || months) {
-      this._modifyCalendarDate(years, months, callback)
+    if (action.years || action.months) {
+      this._modifyCalendarDate(action.years, action.months, () => this._focusOnCell(action.date))
       return
     }
 
-    callback()
+    this._focusOnCell(action.date)
   }
 
   _handleCalendarMouseEnter(event: any): void {
@@ -899,7 +763,7 @@ class Calendar extends BaseComponent {
   }
 
   _updateRovingTabIndex(preferred?: HTMLElement): void {
-    setRovingTabIndex(this._element as HTMLElement, this._rovingSelector(), this._startOfView(this._calendarDate as Date), this._rowsAreTargets(), preferred)
+    setRovingTabIndex(this._element as HTMLElement, this._rovingSelector(), getStartOfView(this._calendarDate as Date, this._view), this._rowsAreTargets(), preferred)
   }
 
   _gridLabel(date: Date): string {

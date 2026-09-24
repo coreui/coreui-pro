@@ -1769,6 +1769,30 @@ describe('Calendar', () => {
       })
     })
 
+    it('should keep moving through the next month with the arrows after a day of it is picked from the grid', () => {
+      const div = renderCalendar({ selectAdjacentDays: true })
+      const picked = [...div.querySelectorAll('.calendar-cell.next[data-coreui-selectable]')]
+        .find(cell => new Date(cell.dataset.coreuiDate).getTime() === new Date(2026, 8, 1).getTime())
+
+      picked.focus()
+      picked.click()
+      pressKey(picked, 'ArrowRight')
+
+      expect(activeDate()).toEqual(new Date(2026, 8, 2))
+    })
+
+    it('should show the month of the target when PageDown stops at maxDate after a day of the next month is picked', () => {
+      const div = renderCalendar({ maxDate: new Date(2026, 8, 20), selectAdjacentDays: true })
+      const picked = [...div.querySelectorAll('.calendar-cell.next[data-coreui-selectable]')]
+        .find(cell => new Date(cell.dataset.coreuiDate).getTime() === new Date(2026, 8, 1).getTime())
+
+      picked.focus()
+      picked.click()
+      pressKey(picked, 'PageDown')
+
+      expect(activeDate()).toEqual(new Date(2026, 8, 20))
+    })
+
     it('should move focus to the same month of the next year on PageDown in months view', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = '<div></div>'
