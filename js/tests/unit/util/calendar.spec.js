@@ -553,6 +553,7 @@ describe('Calendar Utilities', () => {
       calendarDate: new Date(2026, 6, 1),
       calendars: 1,
       firstDayOfWeek: 1,
+      panel: 0,
       rows: false,
       rtl: false,
       view: 'days',
@@ -571,16 +572,99 @@ describe('Calendar Utilities', () => {
       type: 'page',
       years: 0
     })
+    const rowMove = (date, panel = 0) => ({
+      date,
+      months: 0,
+      panel,
+      type: 'move',
+      years: 0
+    })
 
     it('should activate the focused date on Space and Enter', () => {
       expect(getCalendarKeyAction(press(' '), new Date(2026, 6, 15), context())).toEqual({ type: 'activate' })
       expect(getCalendarKeyAction(press('Enter'), new Date(2026, 6, 15), context())).toEqual({ type: 'activate' })
     })
 
-    it('should leave Home, End and other keys on a cell to the calendar', () => {
-      for (const key of ['Home', 'End', 'Tab', 'Escape', 'a']) {
+    it('should leave other keys on a cell alone', () => {
+      for (const key of ['Tab', 'Escape', 'a']) {
         expect(getCalendarKeyAction(press(key), new Date(2026, 6, 15), context())).toBeNull()
       }
+    })
+
+    it('should move to the first and last day of the week with Home and End', () => {
+      const date = new Date(2026, 6, 15)
+
+      expect(getCalendarKeyAction(press('Home'), date, context())).toEqual(move(new Date(2026, 6, 13)))
+      expect(getCalendarKeyAction(press('End'), date, context())).toEqual(move(new Date(2026, 6, 19)))
+      expect(getCalendarKeyAction(press('Home'), date, context({ firstDayOfWeek: 0 }))).toEqual(move(new Date(2026, 6, 12)))
+      expect(getCalendarKeyAction(press('End'), date, context({ firstDayOfWeek: 0, rtl: true }))).toEqual(move(new Date(2026, 6, 18)))
+    })
+
+    it('should cross into the adjacent month with Home and End, paging only when it is out of view', () => {
+      expect(getCalendarKeyAction(press('Home'), new Date(2026, 6, 2), context())).toEqual(move(new Date(2026, 5, 29), -1))
+      expect(getCalendarKeyAction(press('End'), new Date(2026, 6, 30), context())).toEqual(move(new Date(2026, 7, 2), 1))
+      expect(getCalendarKeyAction(press('Home'), new Date(2026, 6, 2), context({ calendarDate: new Date(2026, 5, 1), calendars: 2 })))
+        .toEqual(move(new Date(2026, 5, 29)))
+    })
+
+    it('should stay on the edge of the week, and stop at the nearest selectable day toward the focus', () => {
+      expect(getCalendarKeyAction(press('Home'), new Date(2026, 6, 13), context())).toEqual({ type: 'stay' })
+      expect(getCalendarKeyAction(press('End'), new Date(2026, 6, 19), context())).toEqual({ type: 'stay' })
+      expect(getCalendarKeyAction(press('Home'), new Date(2026, 6, 2), context({ minDate: new Date(2026, 6, 1) }))).toEqual(move(new Date(2026, 6, 1)))
+      expect(getCalendarKeyAction(press('End'), new Date(2026, 6, 15), context({ disabledDates: [new Date(2026, 6, 18), new Date(2026, 6, 19)] })))
+        .toEqual(move(new Date(2026, 6, 17)))
+      expect(getCalendarKeyAction(press('Home'), new Date(2026, 6, 15), context({ disabledDates: [new Date(2026, 6, 13), new Date(2026, 6, 14)] })))
+        .toEqual({ type: 'stay' })
+      expect(getCalendarKeyAction(press('Home'), new Date(2026, 6, 15), context({ disabledDates: [[new Date(2026, 6, 13), new Date(2026, 6, 15)]] })))
+        .toEqual({ type: 'stay' })
+      expect(getCalendarKeyAction(press('End'), new Date(2026, 6, 15), context({ disabledDates: () => true }))).toEqual({ type: 'stay' })
+    })
+
+    it('should move week rows to the first and last week of the month the panel shows, in that panel', () => {
+      const july = context({ rows: true })
+      const juneAndJuly = context({ calendarDate: new Date(2026, 5, 1), calendars: 2, rows: true })
+
+      expect(getCalendarKeyAction(press('Home'), new Date(2026, 6, 13), july)).toEqual(rowMove(new Date(2026, 5, 29)))
+      expect(getCalendarKeyAction(press('End'), new Date(2026, 6, 13), july)).toEqual(rowMove(new Date(2026, 6, 27)))
+      expect(getCalendarKeyAction(press('Home'), new Date(2026, 6, 13), { ...juneAndJuly, panel: 1 })).toEqual(rowMove(new Date(2026, 5, 29), 1))
+      expect(getCalendarKeyAction(press('Home'), new Date(2026, 5, 15), juneAndJuly)).toEqual(rowMove(new Date(2026, 5, 1)))
+      expect(getCalendarKeyAction(press('End'), new Date(2026, 5, 15), juneAndJuly)).toEqual(rowMove(new Date(2026, 5, 29)))
+      expect(getCalendarKeyAction(press('Home'), new Date(2026, 6, 13), { ...july, disabledDates: [new Date(2026, 5, 29)] })).toEqual(rowMove(new Date(2026, 6, 6)))
+    })
+
+    it('should take the month of a week row from the panel that shows it', () => {
+      const juneAndJuly = context({ calendarDate: new Date(2026, 5, 1), calendars: 2, rows: true })
+
+      expect(getCalendarKeyAction(press('End'), new Date(2026, 5, 29), { ...juneAndJuly, panel: 1 })).toEqual(rowMove(new Date(2026, 6, 27), 1))
+      expect(getCalendarKeyAction(press('End'), new Date(2026, 5, 29), juneAndJuly)).toEqual({ type: 'stay' })
+      expect(getCalendarKeyAction(press('Home'), new Date(2026, 5, 29), juneAndJuly)).toEqual(rowMove(new Date(2026, 5, 1)))
+      expect(getCalendarKeyAction(press('Home'), new Date(2026, 5, 29), { ...juneAndJuly, panel: 1 })).toEqual({ type: 'stay' })
+    })
+
+    it('should keep a week row that lies beyond the last week of the month where it is', () => {
+      expect(getCalendarKeyAction(press('End'), new Date(2026, 7, 3), context({ rows: true }))).toEqual({ type: 'stay' })
+      expect(getCalendarKeyAction(press('End'), new Date(2026, 7, 3), context({ disabledDates: [new Date(2026, 6, 27)], rows: true }))).toEqual({ type: 'stay' })
+      expect(getCalendarKeyAction(press('End'), new Date(2026, 6, 6), context({ calendarDate: new Date(2026, 5, 1), rows: true }))).toEqual({ type: 'stay' })
+    })
+
+    it('should move to the first and last month or year of the row and quarter of the year', () => {
+      const months = context({ calendarDate: new Date(2026, 0, 1), view: 'months' })
+      const quarters = context({ calendarDate: new Date(2026, 0, 1), view: 'quarters' })
+      const years = context({ calendarDate: new Date(2026, 0, 1), view: 'years' })
+
+      expect(getCalendarKeyAction(press('Home'), new Date(2026, 4, 1), months)).toEqual(move(new Date(2026, 3, 1)))
+      expect(getCalendarKeyAction(press('End'), new Date(2026, 4, 1), months)).toEqual(move(new Date(2026, 5, 1)))
+      expect(getCalendarKeyAction(press('Home'), new Date(2026, 4, 1), { ...months, disabledDates: [[new Date(2026, 3, 1), new Date(2026, 3, 30)]] }))
+        .toEqual({ type: 'stay' })
+      expect(getCalendarKeyAction(press('Home'), new Date(2026, 3, 1), quarters)).toEqual(move(new Date(2026, 0, 1)))
+      expect(getCalendarKeyAction(press('End'), new Date(2026, 3, 1), quarters)).toEqual(move(new Date(2026, 9, 1)))
+      expect(getCalendarKeyAction(press('Home'), new Date(2027, 0, 1), years)).toEqual(move(new Date(2026, 0, 1)))
+      expect(getCalendarKeyAction(press('End'), new Date(2027, 0, 1), years)).toEqual(move(new Date(2028, 0, 1)))
+      expect(getCalendarKeyAction(press('Home'), new Date(2031, 0, 1), years)).toEqual(move(new Date(2029, 0, 1)))
+      expect(getCalendarKeyAction(press('Home'), new Date(2025, 0, 1), years)).toEqual(move(new Date(2023, 0, 1)))
+      expect(getCalendarKeyAction(press('End'), new Date(2020, 0, 1), years)).toEqual(move(new Date(2022, 0, 1)))
+      expect(getCalendarKeyAction(press('Home'), new Date(2033, 0, 1), { ...years, calendars: 2 })).toEqual(move(new Date(2032, 0, 1)))
+      expect(getCalendarKeyAction(press('End'), new Date(2033, 0, 1), { ...years, calendars: 2 })).toEqual(move(new Date(2034, 0, 1)))
     })
 
     it('should move by a day with ArrowRight and ArrowLeft, mirrored in a right-to-left layout', () => {

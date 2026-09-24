@@ -1654,6 +1654,64 @@ describe('Calendar', () => {
       })
     })
 
+    it('should move into the previous month with Home when the week starts there', () => {
+      const div = renderCalendar({ calendarDate: new Date(2026, 6, 1) })
+
+      pressKey(focusDay(div, 2026, 6, 2), 'Home')
+
+      expect(activeDate()).toEqual(new Date(2026, 5, 29))
+      expect(div.querySelector('table').getAttribute('aria-label')).toEqual('June 2026')
+    })
+
+    it('should move into the next month with End when the week ends there', () => {
+      const div = renderCalendar({ calendarDate: new Date(2026, 6, 1) })
+
+      pressKey(focusDay(div, 2026, 6, 30), 'End')
+
+      expect(activeDate()).toEqual(new Date(2026, 7, 2))
+      expect(div.querySelector('table').getAttribute('aria-label')).toEqual('August 2026')
+    })
+
+    it('should move a week row to the first and last week of the month with Home and End', () => {
+      const div = renderCalendar({ calendarDate: new Date(2026, 6, 1), selectionType: 'week' })
+      const row = weekRow(div, new Date(2026, 6, 13))
+      const firstCell = () => new Date(document.activeElement.querySelector('[data-coreui-date]').dataset.coreuiDate)
+
+      row.focus()
+      pressKey(row, 'Home')
+      expect(firstCell()).toEqual(new Date(2026, 5, 29))
+
+      pressKey(document.activeElement, 'End')
+      expect(firstCell()).toEqual(new Date(2026, 6, 27))
+    })
+
+    it('should keep Home and End on week rows in the panel that has the focus', () => {
+      const div = renderCalendar({ calendarDate: new Date(2026, 5, 1), calendars: 2, selectionType: 'week' })
+      const july = div.querySelectorAll('.calendar')[1]
+      const row = weekRow(july, new Date(2026, 6, 13))
+
+      row.focus()
+      pressKey(row, 'Home')
+      expect(document.activeElement).toBe(weekRow(july, new Date(2026, 5, 29)))
+
+      pressKey(document.activeElement, 'End')
+      expect(document.activeElement).toBe(weekRow(july, new Date(2026, 6, 27)))
+    })
+
+    it('should take Home and End from the day cell when a link inside it has the focus', () => {
+      const div = renderCalendar({
+        calendarDate: new Date(2026, 6, 1),
+        renderDayCell: date => (date.getMonth() === 6 && date.getDate() === 15 ? '<a href="#day">15</a>' : String(date.getDate()))
+      })
+      const link = div.querySelector('.calendar-cell a')
+
+      link.focus()
+      pressKey(link, 'Home')
+
+      expect(activeDate()).toEqual(new Date(2026, 6, 13))
+      expect(div.querySelector('table').getAttribute('aria-label')).toEqual('July 2026')
+    })
+
     it('should move focus to the same day of the previous month on PageUp', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = '<div></div>'

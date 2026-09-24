@@ -56,9 +56,6 @@ const DATA_KEY = 'coreui.calendar'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
-const HOME_KEY = 'Home'
-const END_KEY = 'End'
-
 const EVENT_BLUR = `blur${EVENT_KEY}`
 const EVENT_CALENDAR_DATE_CHANGE = `calendarDateChange${EVENT_KEY}`
 const EVENT_CALENDAR_MOUSE_LEAVE = `calendarMouseleave${EVENT_KEY}`
@@ -315,8 +312,9 @@ class Calendar extends BaseComponent {
     }
   }
 
-  _focusOnCell(date: Date): void {
-    const matches = (SelectorEngine.find(this._rovingSelector(), this._element as ParentNode) as HTMLElement[])
+  _focusOnCell(date: Date, panel?: number): void {
+    const scope = panel === undefined ? this._element : SelectorEngine.find(SELECTOR_CALENDAR, this._element as ParentNode)[panel]
+    const matches = (SelectorEngine.find(this._rovingSelector(), scope as ParentNode) as HTMLElement[])
       .filter(element => this._getDate(element).toDateString() === date.toDateString())
 
     const inMonth = matches.find(element => {
@@ -389,16 +387,8 @@ class Calendar extends BaseComponent {
   }
 
   _handleCalendarKeydown(event: any): void {
-    if ([HOME_KEY, END_KEY].includes(event.key)) {
-      event.preventDefault()
-
-      const cells = SelectorEngine.find(SELECTOR_CALENDAR_CELL_CLICKABLE, event.target.closest('tr') as ParentNode)
-      const cell = event.key === HOME_KEY ? cells[0] : cells[cells.length - 1]
-      cell?.focus()
-      return
-    }
-
-    const action = getCalendarKeyAction(event, this._getDate(event.target), this._getKeyContext())
+    const target = this._getEventTarget(event) as HTMLElement
+    const action = getCalendarKeyAction(event, this._getDate(target), this._getKeyContext(target))
 
     if (!action) {
       return
@@ -425,7 +415,8 @@ class Calendar extends BaseComponent {
       return
     }
 
-    const action = getCalendarKeyAction(event, null, this._getKeyContext())
+    const context = this._getKeyContext(event.target)
+    const action = getCalendarKeyAction(event, null, context)
 
     if (!action) {
       return
@@ -438,11 +429,8 @@ class Calendar extends BaseComponent {
       return
     }
 
-    const panels = SelectorEngine.find(SELECTOR_CALENDAR, this._element as ParentNode)
-    const index = panels.indexOf(event.target.closest(SELECTOR_CALENDAR))
-
     this._modifyCalendarDate(action.years, action.months, () => {
-      const panel = SelectorEngine.find(SELECTOR_CALENDAR, this._element as ParentNode)[index]
+      const panel = SelectorEngine.find(SELECTOR_CALENDAR, this._element as ParentNode)[context.panel]
       const stop = (SelectorEngine.findOne('[tabindex="0"]', panel as ParentNode) ??
         SelectorEngine.findOne('[tabindex="0"]', this._element as ParentNode)) as HTMLElement | null
 
@@ -452,7 +440,7 @@ class Calendar extends BaseComponent {
     })
   }
 
-  _getKeyContext(): CalendarKeyContext {
+  _getKeyContext(target: HTMLElement): CalendarKeyContext {
     return {
       calendarDate: this._calendarDate,
       calendars: this._config.calendars,
@@ -460,6 +448,7 @@ class Calendar extends BaseComponent {
       firstDayOfWeek: this._config.firstDayOfWeek,
       maxDate: this._maxDate,
       minDate: this._minDate,
+      panel: SelectorEngine.find(SELECTOR_CALENDAR, this._element as ParentNode).indexOf(target.closest(SELECTOR_CALENDAR) as HTMLElement),
       rows: this._rowsAreTargets(),
       rtl: isRTL(this._element),
       view: this._view
@@ -476,7 +465,7 @@ class Calendar extends BaseComponent {
       return
     }
 
-    this._focusOnCell(action.date)
+    this._focusOnCell(action.date, action.panel)
   }
 
   _handleCalendarMouseEnter(event: any): void {
