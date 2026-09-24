@@ -1202,8 +1202,16 @@ removed in favour of `$translucent-opacity` and
   screen.** A picked day of an adjacent month (`selectAdjacentDays`) used to
   become the calendar date while the grid stayed put, so the next-month button
   then skipped a month; it now stays where it was and shows as selected with an
-  outline instead of a fill (`--cui-calendar-cell-selected-adjacent-color`).
+  outline on a subtle background instead of the solid fill
+  (`--cui-calendar-cell-selected-adjacent-color`,
+  `--cui-calendar-cell-selected-adjacent-bg`,
+  `--cui-calendar-cell-selected-adjacent-hover-color`,
+  `--cui-calendar-cell-selected-adjacent-hover-bg`).
   Listen to `startDateChange` / `endDateChange` for the picked date.
+- A selected day or week keeps its colour under the pointer, a shade darker
+  (`--cui-calendar-cell-selected-hover-bg`,
+  `--cui-calendar-cell-selected-hover-color`); it used to take the hover colour
+  until the pointer left.
 - **Additive:** `startDateChange` and `endDateChange` now carry a `dateObject`
   property with the underlying `Date`, alongside the existing `date` property.
   `date` remains formatted per `selectionType` — a `Date` for day selection, but
