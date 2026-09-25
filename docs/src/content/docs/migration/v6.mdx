@@ -1219,6 +1219,12 @@ removed in favour of `$translucent-opacity` and
 - In the years view the double arrows and `Page Down` / `Page Up` turn the
   calendar by the twelve years a page shows instead of ten, so a turn no longer
   repeats two years of the previous page.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The years view names its double arrows with new `ariaNavNextYearsLabel` /
+  `ariaNavPrevYearsLabel` options** (`'Next 12 years'` / `'Previous 12 years'`)
+  instead of the year labels, which stay on the days, months and quarters
+  views. A page that translates `ariaNavNextYearLabel` / `ariaNavPrevYearLabel`
+  needs to translate these two as well.
 - **Additive:** `startDateChange` and `endDateChange` now carry a `dateObject`
   property with the underlying `Date`, alongside the existing `date` property.
   `date` remains formatted per `selectionType` — a `Date` for day selection, but

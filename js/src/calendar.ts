@@ -122,8 +122,10 @@ type CalendarConfig = {
   allowList: SanitizerAllowList
   ariaNavNextMonthLabel: string
   ariaNavNextYearLabel: string
+  ariaNavNextYearsLabel: string
   ariaNavPrevMonthLabel: string
   ariaNavPrevYearLabel: string
+  ariaNavPrevYearsLabel: string
   calendarDate: Date | number | string | null
   calendars: number
   dayFormat: 'numeric' | '2-digit'
@@ -160,8 +162,10 @@ const Default: CalendarConfig = {
   allowList: SVGAllowlist,
   ariaNavNextMonthLabel: 'Next month',
   ariaNavNextYearLabel: 'Next year',
+  ariaNavNextYearsLabel: 'Next 12 years',
   ariaNavPrevMonthLabel: 'Previous month',
   ariaNavPrevYearLabel: 'Previous year',
+  ariaNavPrevYearsLabel: 'Previous 12 years',
   calendarDate: null,
   calendars: 1,
   dayFormat: 'numeric',
@@ -198,8 +202,10 @@ const DefaultType: Record<string, string> = {
   allowList: 'object',
   ariaNavNextMonthLabel: 'string',
   ariaNavNextYearLabel: 'string',
+  ariaNavNextYearsLabel: 'string',
   ariaNavPrevMonthLabel: 'string',
   ariaNavPrevYearLabel: 'string',
+  ariaNavPrevYearsLabel: 'string',
   calendarDate: '(date|number|string|null)',
   calendars: 'number',
   dayFormat: 'string',
@@ -696,18 +702,19 @@ class Calendar extends BaseComponent {
   _renderCalendarPanel(panel: HTMLElement, order: number): void {
     const calendarDate = getCalendarDate(this._calendarDate, order, this._view)
     const days = this._view === 'days'
+    const years = this._view === 'years'
     const [navigation, calendarTable] = panel.children
     const [prev, region, next] = navigation.children
     const monthLabel = days ? this._formatDate(calendarDate, { month: 'long' }) : ''
-    const yearLabel = this._view === 'years' ? formatYearsRange(calendarDate.getFullYear(), this._config.locale) : this._formatDate(calendarDate, { year: 'numeric' })
+    const yearLabel = years ? formatYearsRange(calendarDate.getFullYear(), this._config.locale) : this._formatDate(calendarDate, { year: 'numeric' })
 
-    prev.innerHTML = `${this._navButton('btn-double-prev', 'navIconDoublePrev', this._config.ariaNavPrevYearLabel)} ${days ? this._navButton('btn-prev', 'navIconPrev', this._config.ariaNavPrevMonthLabel) : ''}`
+    prev.innerHTML = `${this._navButton('btn-double-prev', 'navIconDoublePrev', years ? this._config.ariaNavPrevYearsLabel : this._config.ariaNavPrevYearLabel)} ${days ? this._navButton('btn-prev', 'navIconPrev', this._config.ariaNavPrevMonthLabel) : ''}`
 
     if (region.textContent !== `${monthLabel} ${yearLabel}`) {
       region.innerHTML = `${days ? `<button type="button" class="calendar-nav-btn btn-sm btn-month">${monthLabel}</button>` : ''} <button type="button" class="calendar-nav-btn btn-year">${yearLabel}</button>`
     }
 
-    next.innerHTML = `${days ? this._navButton('btn-next', 'navIconNext', this._config.ariaNavNextMonthLabel) : ''} ${this._navButton('btn-double-next', 'navIconDoubleNext', this._config.ariaNavNextYearLabel)}`
+    next.innerHTML = `${days ? this._navButton('btn-next', 'navIconNext', this._config.ariaNavNextMonthLabel) : ''} ${this._navButton('btn-double-next', 'navIconDoubleNext', years ? this._config.ariaNavNextYearsLabel : this._config.ariaNavNextYearLabel)}`
     calendarTable.setAttribute('aria-label', this._gridLabel(calendarDate))
     calendarTable.innerHTML = days ? this._daysHtml(calendarDate) : this._periodsHtml(calendarDate)
   }
