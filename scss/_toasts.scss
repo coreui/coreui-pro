@@ -28,7 +28,7 @@ $toast-tokens: defaults(
     --#{$prefix}toast-color: var(--#{$prefix}fg-body),
     --#{$prefix}toast-bg: #{$toast-background-color},
     --#{$prefix}toast-border-width: var(--#{$prefix}border-width),
-    --#{$prefix}toast-border-color: #{$toast-border-color},
+    --#{$prefix}toast-border-color: var(--#{$prefix}theme-border, #{$toast-border-color}),
     --#{$prefix}toast-border-radius: var(--#{$prefix}radius-7),
     --#{$prefix}toast-box-shadow: var(--#{$prefix}box-shadow),
     --#{$prefix}toast-header-color: var(--#{$prefix}fg-3),
@@ -57,7 +57,7 @@ $toast-tokens: defaults(
     pointer-events: auto;
     background-color: var(--#{$prefix}toast-bg);
     background-clip: padding-box;
-    border: var(--#{$prefix}toast-border-width) solid var(--#{$prefix}theme-border, var(--#{$prefix}toast-border-color));
+    border: var(--#{$prefix}toast-border-width) solid var(--#{$prefix}toast-border-color);
     box-shadow: var(--#{$prefix}toast-box-shadow);
     @include border-radius(var(--#{$prefix}toast-border-radius));
 

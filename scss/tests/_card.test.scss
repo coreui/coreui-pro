@@ -1,0 +1,8 @@
+@use "sass:map";
+@use "../card" as *;
+
+@include describe("card") {
+  @include it("carries the theme slot in the border token, not in the rule that reads it") {
+    @include assert-equal(map.get($card-tokens, --cui-card-border-color), var(--cui-theme-bg, var(--cui-border-color-translucent)));
+  }
+}

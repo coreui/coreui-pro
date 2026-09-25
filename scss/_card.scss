@@ -8,7 +8,7 @@
 
 $card-tokens: () !default;
 
-// stylelint-disable scss/dollar-variable-default
+// stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
 // scss-docs-start card-tokens
 $card-tokens: defaults(
@@ -19,7 +19,7 @@ $card-tokens: defaults(
     --#{$prefix}card-title-color: inherit,
     --#{$prefix}card-subtitle-color: inherit,
     --#{$prefix}card-border-width: var(--#{$prefix}border-width),
-    --#{$prefix}card-border-color: var(--#{$prefix}border-color-translucent),
+    --#{$prefix}card-border-color: var(--#{$prefix}theme-bg, var(--#{$prefix}border-color-translucent)),
     --#{$prefix}card-border-radius: var(--#{$prefix}radius-8),
     --#{$prefix}card-box-shadow: none,
     --#{$prefix}card-inner-border-radius: calc(var(--#{$prefix}card-border-radius) - var(--#{$prefix}card-border-width)),
@@ -38,7 +38,7 @@ $card-tokens: defaults(
 );
 // scss-docs-end card-tokens
 
-// stylelint-enable scss/dollar-variable-default
+// stylelint-enable custom-property-no-missing-var-function, scss/dollar-variable-default
 @layer components {
   .card {
     @include tokens($card-tokens);
@@ -52,7 +52,7 @@ $card-tokens: defaults(
     word-wrap: break-word;
     background-color: var(--#{$prefix}card-bg);
     background-clip: border-box;
-    border: var(--#{$prefix}card-border-width) solid var(--#{$prefix}theme-bg, var(--#{$prefix}card-border-color));
+    border: var(--#{$prefix}card-border-width) solid var(--#{$prefix}card-border-color);
     @include border-radius(var(--#{$prefix}card-border-radius));
     @include box-shadow(var(--#{$prefix}card-box-shadow));
 
@@ -142,7 +142,7 @@ $card-tokens: defaults(
   //
 
   .card-subtle {
-    border-color: var(--#{$prefix}theme-border, var(--#{$prefix}card-border-color));
+    --#{$prefix}card-border-color: var(--#{$prefix}theme-border, var(--#{$prefix}border-color-translucent));
 
     .card-header,
     .card-footer {
