@@ -207,7 +207,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `add(value)` | Adds a chip with the given value. Returns the chip element or `null` if rejected. |
 | `clear()` | Removes all chips. |
 | `clearSelection()` | Deselects all chips without removing them. |
-| `dispose()` | Destroys the component instance. |
+| `dispose()` | Destroys the component instance and the chip instances it created, and removes the field and hidden input it built. The chips stay in the document. |
 | `focus()` | Focuses the ghost input. |
 | `getSelectedValues()` | Returns an array of selected chip values. |
 | `getValues()` | Returns an array of all chip values. |

@@ -137,7 +137,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `clear` | Removes every chip from the set. |
 | `clearSelection` | Deselects all chips and emits a selection change. |
 | `deselectAll` | Deselects every selected chip in the set. |
-| `dispose` | Destroys a chip set instance. (Removes stored data on the DOM element) |
+| `dispose` | Destroys a chip set instance and the chip instances it created, and takes back the roles and ARIA attributes it set on the set and its chips. The chips stay in the document. (Removes stored data on the DOM element) |
 | `getInstance` | Static method to get the chip set instance: `coreui.ChipSet.getInstance(element)`. |
 | `getOrCreateInstance` | Static method to get or create a chip set instance: `coreui.ChipSet.getOrCreateInstance(element)`. |
 | `getSelectedValues` | Returns the values of the selected chips. |

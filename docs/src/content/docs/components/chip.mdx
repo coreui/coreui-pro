@@ -295,7 +295,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | Method | Description |
 | --- | --- |
 | `deselect` | Deselects a selectable chip. |
-| `dispose` | Destroys a chip instance. (Removes stored data on the DOM element) |
+| `dispose` | Destroys a chip instance and takes back what it added to the chip: the remove button, the check icon, and the classes, role, `tabindex` and ARIA attributes it set. What the markup already had stays. (Removes stored data on the DOM element) |
 | `getInstance` | Static method to get the chip instance: `coreui.Chip.getInstance(element)`. |
 | `getOrCreateInstance` | Static method to get or create a chip instance: `coreui.Chip.getOrCreateInstance(element)`. |
 | `remove` | Removes the chip (fires `remove` and `removed` events). |

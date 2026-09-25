@@ -41,6 +41,9 @@ const CLASS_NAME_CHIP_REMOVE = 'chip-remove'
 const CLASS_NAME_ACTIVE = 'active'
 const CLASS_NAME_DISABLED = 'disabled'
 
+const HOST_ATTRIBUTES = ['aria-disabled', 'aria-pressed', 'aria-selected', 'role', 'tabindex']
+const HOST_CLASS_NAMES = [CLASS_NAME_CHIP_CLICKABLE, CLASS_NAME_DISABLED]
+
 type ChipConfig = {
   allowList: SanitizerAllowList
   ariaRemoveLabel: string
@@ -88,13 +91,21 @@ const DefaultType = {
  */
 
 class Chip extends BaseComponent {
+  protected declare _addedAttributes: string[]
+  protected declare _addedClassNames: string[]
+  protected declare _checkIcon: HTMLElement | null
   protected declare _disabled: any
+  protected declare _removeControl: HTMLElement | null
   protected declare _selected: any
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
 
+    this._addedAttributes = HOST_ATTRIBUTES.filter(name => !this._element.hasAttribute(name))
+    this._addedClassNames = HOST_CLASS_NAMES.filter(name => !this._element.classList.contains(name))
+    this._checkIcon = null
     this._disabled = this._config.disabled || this._element.classList.contains(CLASS_NAME_DISABLED)
+    this._removeControl = null
     this._selected = this._config.selected || this._element.classList.contains(CLASS_NAME_ACTIVE)
 
     this._applyRole()
@@ -185,6 +196,23 @@ class Chip extends BaseComponent {
     EventHandler.trigger(this._element, EVENT_DESELECTED)
   }
 
+  override dispose(): void {
+    if (!this._element) {
+      return
+    }
+
+    this._checkIcon?.remove()
+    this._removeControl?.remove()
+
+    for (const name of this._addedAttributes) {
+      this._element.removeAttribute(name)
+    }
+
+    this._element.classList.remove(...this._addedClassNames)
+
+    super.dispose()
+  }
+
   // Private
   _configAfterMerge(config: any): any {
     // A filter chip is selectable by definition.
@@ -216,7 +244,10 @@ class Chip extends BaseComponent {
 
     EventHandler.on(this._element, EVENT_CLICK, SELECTOR_CHIP_REMOVE, event => {
       event.stopPropagation()
-      this.remove()
+
+      if (this._config.removable && !this._disabled) {
+        this.remove()
+      }
     })
   }
 
@@ -294,6 +325,7 @@ class Chip extends BaseComponent {
     check.setAttribute('aria-hidden', 'true')
     check.innerHTML = sanitizeByConfig(this._config.selectedIcon, this._config)
     this._element.prepend(check)
+    this._checkIcon = check
   }
 
   _createRemoveControl(): HTMLElement {
@@ -324,7 +356,8 @@ class Chip extends BaseComponent {
       return
     }
 
-    this._element.append(this._createRemoveControl())
+    this._removeControl = this._createRemoveControl()
+    this._element.append(this._removeControl)
   }
 
   _makeFocusable(): void {

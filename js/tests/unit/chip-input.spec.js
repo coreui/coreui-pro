@@ -1075,6 +1075,25 @@ describe('ChipInput', () => {
       expect(ChipInput.getInstance(el)).toBeNull()
     })
 
+    it('should dispose the chips it created and keep them in the document', () => {
+      fixtureEl.innerHTML = '<div class="chip-input"><span class="chip">First</span></div>'
+
+      const el = fixtureEl.querySelector('.chip-input')
+      const chipInput = new ChipInput(el)
+      chipInput.add('Second')
+
+      chipInput.dispose()
+
+      const chips = el.querySelectorAll('.chip')
+
+      expect(chips.length).toEqual(2)
+
+      for (const chip of chips) {
+        expect(Chip.getInstance(chip)).toBeNull()
+        expect(chip.querySelector('.chip-remove')).toBeNull()
+      }
+    })
+
     it('should stop reacting to the text input after dispose', () => {
       fixtureEl.innerHTML = '<div class="chip-input"></div>'
 

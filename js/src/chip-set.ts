@@ -55,6 +55,8 @@ const SELECTOR_FOCUSABLE_ITEMS = '.chip:not(.disabled)'
 const CLASS_NAME_CHIP = 'chip'
 const CLASS_NAME_DISABLED = 'disabled'
 
+const HOST_ATTRIBUTES = ['aria-multiselectable', 'aria-orientation', 'role']
+
 const SELECTION_MODE_SINGLE = 'single'
 
 export type ChipSetConfig = {
@@ -113,9 +115,12 @@ const DefaultType: Record<string, string> = {
  */
 
 class ChipSet extends BaseComponent {
+  protected declare _addedAttributes: string[]
   protected declare _disabled: boolean
   protected declare _pendingFocus: HTMLElement | null
   protected declare _chips: string[]
+  protected declare _optionChips: Set<HTMLElement>
+  protected declare _ownedChips: Map<HTMLElement, Chip>
   protected declare _input: HTMLElement | null
   protected declare _liveRegion: HTMLElement | null
   protected declare _anchor: HTMLElement | null
@@ -125,9 +130,12 @@ class ChipSet extends BaseComponent {
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
 
+    this._addedAttributes = HOST_ATTRIBUTES.filter(name => !this._element.hasAttribute(name))
     this._disabled = this._config.disabled || this._element.classList.contains(CLASS_NAME_DISABLED)
     this._pendingFocus = null
     this._chips = []
+    this._optionChips = new Set()
+    this._ownedChips = new Map()
     this._liveRegion = null
     this._anchor = null
     this._search = ''
@@ -288,7 +296,27 @@ class ChipSet extends BaseComponent {
   }
 
   override dispose(): void {
+    if (!this._element) {
+      return
+    }
+
     EventHandler.off(this._element, Chip.EVENT_KEY)
+
+    for (const [chip, instance] of this._ownedChips) {
+      if (Chip.getInstance(chip) === instance && this._element.contains(chip)) {
+        instance.dispose()
+      }
+    }
+
+    for (const chip of this._optionChips) {
+      if (this._element.contains(chip)) {
+        chip.removeAttribute('role')
+      }
+    }
+
+    for (const name of this._addedAttributes) {
+      this._element.removeAttribute(name)
+    }
 
     if (this._searchTimeout) {
       clearTimeout(this._searchTimeout)
@@ -400,9 +428,12 @@ class ChipSet extends BaseComponent {
   _setupChip(chip: HTMLElement): void {
     if (this._element.getAttribute('role') === 'listbox' && !chip.hasAttribute('role')) {
       chip.setAttribute('role', 'option')
+      this._optionChips.add(chip)
     }
 
-    Chip.getOrCreateInstance(chip, this._getChipConfig(chip))
+    if (!Chip.getInstance(chip)) {
+      this._ownedChips.set(chip, new Chip(chip, this._getChipConfig(chip)))
+    }
   }
 
   _getChipConfig(chip: HTMLElement): Record<string, any> {
@@ -654,6 +685,9 @@ class ChipSet extends BaseComponent {
   }
 
   _handleChipRemoval(chip: HTMLElement, value: string): void {
+    this._optionChips.delete(chip)
+    this._ownedChips.delete(chip)
+
     const index = this._chips.indexOf(value)
     if (index !== -1) {
       this._chips.splice(index, 1)
