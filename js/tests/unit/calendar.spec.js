@@ -1873,7 +1873,48 @@ describe('Calendar', () => {
     it('should name each grid after the period it shows', () => {
       expect(renderCalendar().querySelector('table').getAttribute('aria-label')).toEqual('August 2026')
       expect(renderCalendar({ selectionType: 'month' }).querySelector('table').getAttribute('aria-label')).toEqual('2026')
-      expect(renderCalendar({ selectionType: 'year' }).querySelector('table').getAttribute('aria-label')).toEqual('2020 – 2031')
+      expect(renderCalendar({ selectionType: 'year' }).querySelector('table').getAttribute('aria-label')).toMatch(/^2020\s–\s2031$/)
+    })
+
+    it('should name the years page in the navigation the way the grid does', () => {
+      const div = renderCalendar({ locale: 'pl-PL', selectionType: 'year' })
+      const region = div.querySelector('.calendar-nav-date')
+
+      expect(region.getAttribute('aria-live')).toEqual('polite')
+      expect(region.textContent.trim()).toEqual('2020–2031')
+      expect(div.querySelector('table').getAttribute('aria-label')).toEqual('2020–2031')
+
+      div.querySelector('.btn-double-next').click()
+
+      expect(region.textContent.trim()).toEqual('2030–2041')
+      expect(div.querySelector('table').getAttribute('aria-label')).toEqual('2030–2041')
+    })
+
+    it('should name the years page after the year button', () => {
+      const div = renderCalendar({ locale: 'ar-EG' })
+
+      div.querySelector('.btn-year').click()
+
+      expect(div.querySelector('.calendar-nav-date').textContent.trim()).toEqual('٢٠٢٠–٢٠٣١')
+      expect(div.querySelector('table').getAttribute('aria-label')).toEqual('٢٠٢٠–٢٠٣١')
+    })
+
+    it('should keep one year in the navigation of the months and quarters views', () => {
+      expect(renderCalendar({ locale: 'pl-PL', selectionType: 'month' }).querySelector('.calendar-nav-date').textContent.trim()).toEqual('2026')
+      expect(renderCalendar({ locale: 'pl-PL', selectionType: 'quarter' }).querySelector('.calendar-nav-date').textContent.trim()).toEqual('2026')
+    })
+
+    it('should keep a right-to-left years range in reading order in a left-to-right calendar', () => {
+      const text = renderCalendar({ locale: 'fa-IR', selectionType: 'year' }).querySelector('.btn-year').firstChild
+      const left = token => {
+        const range = document.createRange()
+        range.setStart(text, text.data.indexOf(token))
+        range.setEnd(text, text.data.indexOf(token) + token.length)
+        return range.getBoundingClientRect().left
+      }
+
+      expect(left('۱۴۰۹')).toBeLessThan(left('تا'))
+      expect(left('تا')).toBeLessThan(left('۱۳۹۸'))
     })
 
     it('should move focus to the first day of the week on Home', () => {
