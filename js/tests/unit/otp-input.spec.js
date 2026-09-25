@@ -703,6 +703,66 @@ describe('OTPInput', () => {
         otpInput.setConfig('string')
       }).not.toThrow()
     })
+
+    it('should enable the slots again when disabled is turned off', () => {
+      fixtureEl.innerHTML = MARKUP
+      const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'), { disabled: true })
+
+      otpInput.setConfig({ disabled: false })
+
+      for (const input of fixtureEl.querySelectorAll('.form-otp-control')) {
+        expect(input.disabled).toBeFalse()
+      }
+
+      expect(fixtureEl.querySelector('input[type="hidden"]').disabled).toBeFalse()
+    })
+
+    it('should make the slots editable again when readonly is turned off', () => {
+      fixtureEl.innerHTML = MARKUP
+      const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'), { readonly: true })
+
+      otpInput.setConfig({ readonly: false })
+
+      for (const input of fixtureEl.querySelectorAll('.form-otp-control')) {
+        expect(input.readOnly).toBeFalse()
+      }
+    })
+
+    it('should drop the placeholder when it is turned off', () => {
+      fixtureEl.innerHTML = MARKUP
+      const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'), { placeholder: '•' })
+
+      otpInput.setConfig({ placeholder: null })
+
+      for (const input of fixtureEl.querySelectorAll('.form-otp-control')) {
+        expect(input.hasAttribute('placeholder')).toBeFalse()
+      }
+    })
+
+    it('should keep what a slot carried in its markup when the options are turned off', () => {
+      fixtureEl.innerHTML = `
+        <div class="form-otp">
+          <input type="text" class="form-otp-control" disabled readonly placeholder="a">
+          <input type="text" class="form-otp-control">
+        </div>
+      `
+      const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'), {
+        disabled: true,
+        placeholder: '•',
+        readonly: true
+      })
+
+      otpInput.setConfig({ disabled: false, placeholder: null, readonly: false })
+
+      const [first, second] = fixtureEl.querySelectorAll('.form-otp-control')
+
+      expect(first.disabled).toBeTrue()
+      expect(first.readOnly).toBeTrue()
+      expect(first.getAttribute('placeholder')).toEqual('a')
+      expect(second.disabled).toBeFalse()
+      expect(second.readOnly).toBeFalse()
+      expect(second.hasAttribute('placeholder')).toBeFalse()
+    })
   })
 
   describe('input behavior', () => {

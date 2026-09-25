@@ -92,12 +92,18 @@ const DefaultType = {
 
 class OTPInput extends BaseComponent {
   protected declare _inputElement: HTMLInputElement | null
+  protected declare _markupStates: Map<HTMLInputElement, { disabled: boolean, placeholder: string | null, readOnly: boolean }>
 
   constructor(element?: string | Element | null, config?: Partial<OtpInputConfig> | null) {
     super(element, config)
 
     this._config = this._getConfig(config)
     this._inputElement = null
+    this._markupStates = new Map(this._getInputs().map(input => [input, {
+      disabled: input.disabled,
+      placeholder: input.getAttribute('placeholder'),
+      readOnly: input.readOnly
+    }]))
 
     this._setRoleAttribute()
     this._setInputsAttributes()
@@ -443,9 +449,15 @@ class OTPInput extends BaseComponent {
       input.spellcheck = false
       input.enterKeyHint = index === inputs.length - 1 ? 'done' : 'next'
 
+      const markup = this._markupStates.get(input)
+
       if (this._config.placeholder !== null) {
         const placeholder = String(this._config.placeholder)
         input.placeholder = placeholder.length > 1 ? placeholder[index] || '' : placeholder
+      } else if (typeof markup?.placeholder === 'string') {
+        input.placeholder = markup.placeholder
+      } else {
+        input.removeAttribute('placeholder')
       }
 
       input.required = this._config.required
@@ -463,17 +475,13 @@ class OTPInput extends BaseComponent {
         }
       }
 
-      if (this._config.disabled) {
-        input.disabled = true
-      }
+      input.disabled = this._config.disabled || Boolean(markup?.disabled)
 
       if (this._config.id && !input.id) {
         input.id = `${this._config.id}-${index}`
       }
 
-      if (this._config.readonly) {
-        input.readOnly = true
-      }
+      input.readOnly = this._config.readonly || Boolean(markup?.readOnly)
 
       if (typeof this._config.ariaLabel === 'function') {
         const ariaLabel = this._config.ariaLabel(index, inputs.length)
