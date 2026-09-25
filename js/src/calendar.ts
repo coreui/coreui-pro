@@ -836,6 +836,8 @@ class Calendar extends BaseComponent {
   }
 
   _updateCalendar(callback?: () => void): void {
+    const focused = this._element.contains(document.activeElement) ? document.activeElement as HTMLElement : null
+    const restoreFocus = focused && this._focusRestorer(focused)
     const panels = SelectorEngine.find(SELECTOR_CALENDAR, this._element as ParentNode)
 
     if (panels.length === this._config.calendars) {
@@ -853,6 +855,28 @@ class Calendar extends BaseComponent {
 
     if (callback) {
       callback()
+    }
+
+    if (restoreFocus && (!document.activeElement || document.activeElement === document.body)) {
+      restoreFocus()
+    }
+  }
+
+  _focusRestorer(focused: HTMLElement): () => void {
+    const index = SelectorEngine.find(SELECTOR_CALENDAR, this._element as ParentNode).indexOf(focused.closest(SELECTOR_CALENDAR) as HTMLElement)
+    const cell = focused.matches(SELECTOR_CALENDAR_ROW) ? SelectorEngine.findOne(SELECTOR_CALENDAR_CELL, focused) : focused.closest(SELECTOR_CALENDAR_CELL)
+    const shown = getCalendarDate(this._calendarDate, index, 'days')
+    const date = cell?.getAttribute('data-coreui-date') ?? (focused.matches(SELECTOR_BTN_MONTH) ? new Date(shown.getFullYear(), shown.getMonth(), 1).toDateString() : null)
+    const { className } = focused
+
+    return () => {
+      const panel = SelectorEngine.find(SELECTOR_CALENDAR, this._element as ParentNode)[index] ?? this._element
+      const matches = SelectorEngine.find(this._rovingSelector(), this._element as ParentNode).filter(target =>
+        (target.matches(SELECTOR_CALENDAR_ROW) ? SelectorEngine.findOne(SELECTOR_CALENDAR_CELL, target) : target)?.getAttribute('data-coreui-date') === date)
+      const target = ((date ? matches.find(target => !target.matches('.next, .previous')) ?? matches[0] : panel.getElementsByClassName(className)[0]) ??
+        SelectorEngine.findOne('[tabindex="0"]', panel) ?? SelectorEngine.findOne('[tabindex="0"]', this._element)) as HTMLElement | null
+
+      target?.focus({ preventScroll: true })
     }
   }
 

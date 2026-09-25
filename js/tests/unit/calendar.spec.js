@@ -1049,6 +1049,18 @@ describe('Calendar', () => {
       expect([...div.querySelectorAll('.calendar table')].map(table => table.getAttribute('aria-label'))).toEqual(['September 2026'])
     })
 
+    it('should keep focus on the same date when setConfig() renders the calendar again', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, { calendarDate: new Date(2026, 8, 1), locale: 'en-US' })
+
+      div.querySelector('[data-coreui-date="Tue Sep 15 2026"]').focus()
+      calendar.setConfig({ selectEndDate: true })
+
+      expect(document.activeElement.getAttribute('data-coreui-date')).toBe('Tue Sep 15 2026')
+    })
+
     it('should reinitialize dates on update', () => {
       fixtureEl.innerHTML = '<div></div>'
 
@@ -1092,6 +1104,105 @@ describe('Calendar', () => {
       expect(div.querySelector('.calendar')).not.toBeNull()
       expect(div.querySelector('.calendar-nav')).not.toBeNull()
       expect(div.querySelector('.calendar-cell')).not.toBeNull()
+    })
+
+    it('should keep focus on the same date when refresh() renders the grid again', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, { calendarDate: new Date(2026, 8, 1), locale: 'en-US' })
+
+      div.querySelector('[data-coreui-date="Tue Sep 15 2026"]').focus()
+      calendar.refresh()
+
+      expect(document.activeElement.getAttribute('data-coreui-date')).toBe('Tue Sep 15 2026')
+    })
+
+    it('should keep focus on the navigation button when refresh() follows a page turn', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, { calendarDate: new Date(2026, 8, 1), locale: 'en-US' })
+
+      div.querySelector('.btn-next').focus()
+      div.querySelector('.btn-next').click()
+      calendar.refresh()
+
+      expect(document.activeElement).toBe(div.querySelector('.btn-next'))
+    })
+
+    it('should keep focus on the same date when a control inside a cell had focus', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, {
+        calendarDate: new Date(2026, 8, 1),
+        locale: 'en-US',
+        renderDayCell: date => `<a class="day-link" href="#">${date.getDate()}</a>`
+      })
+
+      div.querySelector('[data-coreui-date="Tue Sep 15 2026"] .day-link').focus()
+      calendar.refresh()
+
+      expect(document.activeElement.closest('[data-coreui-date]').getAttribute('data-coreui-date')).toBe('Tue Sep 15 2026')
+    })
+
+    it('should keep focus on the navigation button of the same panel on refresh()', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, { calendarDate: new Date(2026, 8, 1), calendars: 2, locale: 'en-US' })
+
+      div.querySelectorAll('.btn-next')[1].focus()
+      calendar.refresh()
+
+      expect(document.activeElement).toBe(div.querySelectorAll('.btn-next')[1])
+    })
+
+    it('should prefer the in-month cell when the focused date moves to another panel', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, {
+        calendarDate: new Date(2026, 8, 1),
+        calendars: 2,
+        locale: 'en-US',
+        selectAdjacentDays: true
+      })
+
+      div.querySelectorAll('.calendar')[1].querySelector('[data-coreui-date="Tue Oct 27 2026"]').focus()
+      calendar.setConfig({ calendarDate: new Date(2026, 9, 1) })
+
+      expect(document.activeElement.getAttribute('data-coreui-date')).toBe('Tue Oct 27 2026')
+      expect(document.activeElement.closest('.calendar')).toBe(div.querySelectorAll('.calendar')[0])
+    })
+
+    it('should not scroll the page when refresh() restores focus', () => {
+      fixtureEl.innerHTML = '<div></div><div style="height: 3000px"></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, { calendarDate: new Date(2026, 8, 1), locale: 'en-US' })
+
+      div.querySelector('[data-coreui-date="Tue Sep 15 2026"]').focus()
+      document.scrollingElement.scrollTop = 2000
+      const { scrollTop } = document.scrollingElement
+      calendar.refresh()
+
+      expect(document.scrollingElement.scrollTop).toBe(scrollTop)
+      document.scrollingElement.scrollTop = 0
+    })
+
+    it('should leave focus outside the calendar where it is on refresh()', () => {
+      fixtureEl.innerHTML = '<div></div><button id="outside" type="button">Outside</button>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, { calendarDate: new Date(2026, 8, 1), locale: 'en-US' })
+      const outside = fixtureEl.querySelector('#outside')
+
+      outside.focus()
+      calendar.refresh()
+
+      expect(document.activeElement).toBe(outside)
     })
   })
 
@@ -2211,6 +2322,38 @@ describe('Calendar', () => {
   })
 
   describe('navigation buttons', () => {
+    it('should move focus to the month the panel showed when its btn-month is activated', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, {
+        calendarDate: new Date(2026, 8, 1),
+        calendars: 2,
+        locale: 'en-US',
+        startDate: new Date(2026, 2, 10)
+      })
+
+      div.querySelectorAll('.btn-month')[1].focus()
+      div.querySelectorAll('.btn-month')[1].click()
+
+      expect(calendar._view).toBe('months')
+      expect(document.activeElement.getAttribute('data-coreui-date')).toBe('Thu Oct 01 2026')
+    })
+
+    it('should move focus into the months grid when btn-month is activated', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, { calendarDate: new Date(2026, 8, 1), locale: 'en-US' })
+
+      div.querySelector('.btn-month').focus()
+      div.querySelector('.btn-month').click()
+
+      expect(calendar._view).toBe('months')
+      expect(document.activeElement.getAttribute('data-coreui-date')).toBe('Tue Sep 01 2026')
+      expect(document.activeElement.getAttribute('tabindex')).toBe('0')
+    })
+
     it('should keep the announced month region when btn-next is clicked', () => {
       fixtureEl.innerHTML = '<div></div>'
 
