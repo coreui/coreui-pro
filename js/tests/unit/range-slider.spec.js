@@ -1119,6 +1119,78 @@ describe('RangeSlider', () => {
       const inputs = element.querySelectorAll('.range-slider-input')
       expect(inputs.length).toBe(1)
     })
+
+    it('should emit one input event per native input after several setConfig calls', () => {
+      fixtureEl.innerHTML = '<div id="slider"></div>'
+      const element = fixtureEl.querySelector('#slider')
+      const rangeSlider = new RangeSlider(element, { value: 30 })
+      let calls = 0
+
+      rangeSlider.setConfig({ value: 40 })
+      rangeSlider.setConfig({ value: 50 })
+      element.addEventListener('input.coreui.range-slider', () => {
+        calls++
+      })
+
+      const input = element.querySelector('.range-slider-input')
+      input.value = 60
+      input.dispatchEvent(new Event('input', { bubbles: true }))
+
+      expect(calls).toBe(1)
+    })
+
+    it('should stop and start responding when disabled is switched with setConfig', () => {
+      fixtureEl.innerHTML = '<div id="slider"></div>'
+      const element = fixtureEl.querySelector('#slider')
+      const rangeSlider = new RangeSlider(element, { value: 30 })
+      let calls = 0
+
+      element.addEventListener('input.coreui.range-slider', () => {
+        calls++
+      })
+
+      const move = () => {
+        const input = element.querySelector('.range-slider-input')
+        input.value = 60
+        input.dispatchEvent(new Event('input', { bubbles: true }))
+      }
+
+      rangeSlider.setConfig({ disabled: true })
+      move()
+
+      expect(calls).toBe(0)
+      expect(element).toHaveClass('disabled')
+
+      rangeSlider.setConfig({ disabled: false })
+      move()
+
+      expect(calls).toBe(1)
+      expect(element).not.toHaveClass('disabled')
+    })
+
+    it('should drop the vertical class when vertical is switched off', () => {
+      fixtureEl.innerHTML = '<div id="slider"></div>'
+      const element = fixtureEl.querySelector('#slider')
+      const rangeSlider = new RangeSlider(element, { value: 30, vertical: true })
+
+      rangeSlider.setConfig({ vertical: false })
+
+      expect(element).not.toHaveClass('range-slider-vertical')
+    })
+
+    it('should write the value into the tooltip of the rebuilt slider', () => {
+      fixtureEl.innerHTML = '<div id="slider"></div>'
+      const element = fixtureEl.querySelector('#slider')
+      const rangeSlider = new RangeSlider(element, { tooltips: true, value: 30 })
+
+      rangeSlider.setConfig({ value: 40 })
+
+      const input = element.querySelector('.range-slider-input')
+      input.value = 70
+      input.dispatchEvent(new Event('input', { bubbles: true }))
+
+      expect(element.querySelector('.range-slider-tooltip .tooltip-inner').textContent).toBe('70')
+    })
   })
 
   describe('_roundToStep', () => {
