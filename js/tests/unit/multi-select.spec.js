@@ -841,6 +841,23 @@ describe('MultiSelect', () => {
       multiSelect._menu.remove()
     })
 
+    it('should put the panel in an open modal dialog instead of the body container', () => {
+      fixtureEl.innerHTML = '<dialog id="host"><div><select></select></div></dialog>'
+      const dialog = fixtureEl.querySelector('#host')
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), {
+        options: [{ value: '1', text: 'Opt 1' }],
+        container: 'body'
+      })
+
+      dialog.showModal()
+      multiSelect.show()
+
+      expect(multiSelect._menu.parentElement).toBe(dialog)
+
+      multiSelect.hide()
+      dialog.close()
+    })
+
     it('should create disabled option elements', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')

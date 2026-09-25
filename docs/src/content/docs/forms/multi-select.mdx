@@ -529,7 +529,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `ariaTagDeleteLabel`| string | `Remove` | Accessible label prefix for a tag's delete button (selection type `tags`). The selected option's text is appended, so screen readers announce e.g. "Remove Angular". |
 | `cleaner`| boolean | `true` | Enables selection cleaner element. |
 | `clearSearchOnSelect`| boolean | `false` | Clear current search on selecting an item. |
-| `container` | string, element, false | `false` | Appends the dropdown to a specific element. Example: `container: 'body'`. |
+| `container` | string, element, false | `false` | Appends the dropdown to a specific element. Example: `container: 'body'`. Inside a modal dialog it goes into the dialog instead, because the rest of the page is inert. |
 | `deselectAllLabel` | string | `'Deselect all'` | Sets the select all button label shown once everything is selected. See `selectAllLabel`. |
 | `deselectFilteredLabel` | string | `'Deselect filtered'` | Label shown instead of `deselectAllLabel` when `selectAllMode: 'filtered'` and a search filter narrows the list. See `selectFilteredLabel`. |
 | `disabled` | boolean | `false` | Toggle the disabled state for the component. |

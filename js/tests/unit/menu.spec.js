@@ -884,6 +884,94 @@ describe('Menu', () => {
       })
     })
 
+    it('should move the menu into a modal dialog instead of the body', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<dialog id="host">',
+          '  <div>',
+          '    <button class="btn" data-coreui-toggle="menu">Menu</button>',
+          '    <div class="menu">',
+          '      <a class="menu-item" href="#">Link</a>',
+          '    </div>',
+          '  </div>',
+          '</dialog>'
+        ].join('')
+
+        const dialog = fixtureEl.querySelector('#host')
+        const btnMenu = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+        const menuEl = fixtureEl.querySelector('.menu')
+        const menu = new Menu(btnMenu, {
+          container: 'body'
+        })
+
+        dialog.showModal()
+
+        btnMenu.addEventListener('shown.coreui.menu', () => {
+          expect(menuEl.parentNode).toEqual(dialog)
+          dialog.close()
+          resolve()
+        })
+
+        menu.show()
+      })
+    })
+
+    it('should move the menu to the body from a dialog that is not modal', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<dialog id="host">',
+          '  <button class="btn" data-coreui-toggle="menu">Menu</button>',
+          '  <div class="menu">',
+          '    <a class="menu-item" href="#">Link</a>',
+          '  </div>',
+          '</dialog>'
+        ].join('')
+
+        const dialog = fixtureEl.querySelector('#host')
+        const btnMenu = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+        const menuEl = fixtureEl.querySelector('.menu')
+        const menu = new Menu(btnMenu, {
+          container: 'body'
+        })
+
+        dialog.show()
+
+        btnMenu.addEventListener('shown.coreui.menu', () => {
+          expect(menuEl.parentNode).toEqual(document.body)
+          dialog.close()
+          resolve()
+        })
+
+        menu.show()
+      })
+    })
+
+    it('should keep the menu in place when the container selector matches nothing', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<div id="wrapper" style="overflow: hidden;">',
+          '  <button class="btn" data-coreui-toggle="menu">Menu</button>',
+          '  <div class="menu">',
+          '    <a class="menu-item" href="#">Link</a>',
+          '  </div>',
+          '</div>'
+        ].join('')
+
+        const btnMenu = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+        const menuEl = fixtureEl.querySelector('.menu')
+        const menu = new Menu(btnMenu, {
+          container: '#missing'
+        })
+
+        btnMenu.addEventListener('shown.coreui.menu', () => {
+          expect(menuEl.parentNode).toEqual(fixtureEl.querySelector('#wrapper'))
+          resolve()
+        })
+
+        menu.show()
+      })
+    })
+
     it('should restore menu to original parent when hidden', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = [
