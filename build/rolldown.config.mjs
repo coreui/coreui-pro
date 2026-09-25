@@ -52,7 +52,7 @@ const rolldownConfig = {
     file: path.resolve(__dirname, `../dist/js/${destinationFile}.js`),
     format: ESM ? 'esm' : 'umd',
     globals,
-    generatedCode: { preset: 'es2015' }
+    generatedCode: { preset: 'es2015', symbols: false }
   },
   external,
   plugins

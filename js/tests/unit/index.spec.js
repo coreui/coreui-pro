@@ -7,11 +7,11 @@ const INTERNAL_MODULES = new Set(['base-component', 'combobox-base', 'dialog-bas
 
 describe('index', () => {
   it('should export every component module', () => {
-    const modules = import.meta.glob(['../../src/*.ts', '!../../src/index.ts'], { eager: true, import: 'default' })
+    const modules = import.meta.glob(['../../src/*.ts', '!../../src/index.ts'], { eager: true })
     const exported = new Set(Object.values(esm))
     const missing = Object.entries(modules)
       .filter(([path]) => !INTERNAL_MODULES.has(path.replace('../../src/', '').replace('.ts', '')))
-      .filter(([, plugin]) => !exported.has(plugin))
+      .filter(([, module]) => !exported.has(module.default))
       .map(([path]) => path)
 
     expect(missing).toEqual([])
