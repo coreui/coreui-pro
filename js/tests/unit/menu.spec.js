@@ -1198,6 +1198,98 @@ describe('Menu', () => {
       expect(menu._menu).toBeNull()
       expect(menu._element).toBeNull()
     })
+
+    it('should stop handling submenu events after dispose', () => {
+      fixtureEl.innerHTML = [
+        '<div>',
+        '  <button class="btn" data-coreui-toggle="menu">Menu</button>',
+        '  <ul class="menu">',
+        '    <li class="submenu">',
+        '      <button class="menu-item" type="button">More options</button>',
+        '      <ul class="menu">',
+        '        <li><a class="menu-item" href="#">Sub-action</a></li>',
+        '      </ul>',
+        '    </li>',
+        '  </ul>',
+        '</div>'
+      ].join('')
+
+      const btnMenu = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+      const submenuTrigger = fixtureEl.querySelector('.submenu > .menu-item')
+      const enterSpy = spyOn(Menu.prototype, '_onSubmenuTriggerEnter')
+      const leaveSpy = spyOn(Menu.prototype, '_onSubmenuLeave')
+      const moveSpy = spyOn(Menu.prototype, '_trackMousePosition')
+      const clickSpy = spyOn(Menu.prototype, '_onSubmenuTriggerClick')
+
+      new Menu(btnMenu, { submenuTrigger: 'both' }).dispose()
+
+      submenuTrigger.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+      submenuTrigger.dispatchEvent(new MouseEvent('mouseout', { bubbles: true }))
+      submenuTrigger.dispatchEvent(new MouseEvent('mousemove', { bubbles: true }))
+      submenuTrigger.click()
+
+      expect(enterSpy).not.toHaveBeenCalled()
+      expect(leaveSpy).not.toHaveBeenCalled()
+      expect(moveSpy).not.toHaveBeenCalled()
+      expect(clickSpy).not.toHaveBeenCalled()
+    })
+
+    it('should handle a submenu event once after a re-initialization', () => {
+      fixtureEl.innerHTML = [
+        '<div>',
+        '  <button class="btn" data-coreui-toggle="menu">Menu</button>',
+        '  <ul class="menu">',
+        '    <li class="submenu">',
+        '      <button class="menu-item" type="button">More options</button>',
+        '      <ul class="menu">',
+        '        <li><a class="menu-item" href="#">Sub-action</a></li>',
+        '      </ul>',
+        '    </li>',
+        '  </ul>',
+        '</div>'
+      ].join('')
+
+      const btnMenu = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+      const submenuTrigger = fixtureEl.querySelector('.submenu > .menu-item')
+      const clickSpy = spyOn(Menu.prototype, '_onSubmenuTriggerClick')
+
+      new Menu(btnMenu, { submenuTrigger: 'click' }).dispose()
+      // eslint-disable-next-line no-new
+      new Menu(btnMenu, { submenuTrigger: 'click' })
+
+      submenuTrigger.click()
+
+      expect(clickSpy).toHaveBeenCalledTimes(1)
+    })
+
+    it('should keep the submenu listeners of another instance sharing the menu', () => {
+      fixtureEl.innerHTML = [
+        '<div>',
+        '  <button class="btn" id="first">First</button>',
+        '  <button class="btn" id="second">Second</button>',
+        '  <ul class="menu">',
+        '    <li class="submenu">',
+        '      <button class="menu-item" type="button">More options</button>',
+        '      <ul class="menu">',
+        '        <li><a class="menu-item" href="#">Sub-action</a></li>',
+        '      </ul>',
+        '    </li>',
+        '  </ul>',
+        '</div>'
+      ].join('')
+
+      const menuEl = fixtureEl.querySelector('.menu')
+      const submenuTrigger = fixtureEl.querySelector('.submenu > .menu-item')
+      const clickSpy = spyOn(Menu.prototype, '_onSubmenuTriggerClick')
+      const first = new Menu('#first', { menu: menuEl, submenuTrigger: 'click' })
+      // eslint-disable-next-line no-new
+      new Menu('#second', { menu: menuEl, submenuTrigger: 'click' })
+
+      first.dispose()
+      submenuTrigger.click()
+
+      expect(clickSpy).toHaveBeenCalledTimes(1)
+    })
   })
 
   describe('update', () => {
@@ -2866,6 +2958,86 @@ describe('Menu', () => {
         })
 
         menu.show()
+      })
+    })
+
+    it('should keep a mouseenter listener registered by other code when a submenu closes', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<div>',
+          '  <button class="btn" data-coreui-toggle="menu">Menu</button>',
+          '  <ul class="menu">',
+          '    <li class="submenu">',
+          '      <button class="menu-item" type="button">More options</button>',
+          '      <ul class="menu">',
+          '        <li><a class="menu-item" href="#">Sub-action</a></li>',
+          '      </ul>',
+          '    </li>',
+          '  </ul>',
+          '</div>'
+        ].join('')
+
+        const btnMenu = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+        const submenuTrigger = fixtureEl.querySelector('.submenu > .menu-item')
+        const submenuWrapper = fixtureEl.querySelector('.submenu')
+        const submenu = submenuWrapper.querySelector('.menu')
+        const menu = new Menu(btnMenu)
+        let calls = 0
+
+        EventHandler.on(submenu, 'mouseenter.menu', () => {
+          calls++
+        })
+
+        btnMenu.addEventListener('shown.coreui.menu', () => {
+          menu._openSubmenu(submenuTrigger, submenu, submenuWrapper)
+          menu._closeSubmenu(submenu, submenuWrapper)
+
+          submenu.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+
+          expect(calls).toEqual(1)
+          EventHandler.off(submenu, '.menu')
+          resolve()
+        })
+
+        menu.show()
+      })
+    })
+
+    it('should keep an open submenu listening after a menu instance on that submenu is disposed', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<div>',
+          '  <button class="btn" data-coreui-toggle="menu">Menu</button>',
+          '  <ul class="menu">',
+          '    <li class="submenu">',
+          '      <button class="menu-item" type="button">More options</button>',
+          '      <ul class="menu">',
+          '        <li><a class="menu-item" href="#">Sub-action</a></li>',
+          '      </ul>',
+          '    </li>',
+          '  </ul>',
+          '</div>'
+        ].join('')
+
+        const btnMenu = fixtureEl.querySelector('[data-coreui-toggle="menu"]')
+        const submenuTrigger = fixtureEl.querySelector('.submenu > .menu-item')
+        const submenuWrapper = fixtureEl.querySelector('.submenu')
+        const submenu = submenuWrapper.querySelector('.menu')
+        const outer = new Menu(btnMenu)
+        const inner = new Menu(submenuTrigger)
+
+        btnMenu.addEventListener('shown.coreui.menu', () => {
+          outer._openSubmenu(submenuTrigger, submenu, submenuWrapper)
+          inner.dispose()
+
+          const cancelSpy = spyOn(outer, '_cancelSubmenuCloseTimeout')
+          submenu.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+
+          expect(cancelSpy).toHaveBeenCalledWith(submenu)
+          resolve()
+        })
+
+        outer.show()
       })
     })
 

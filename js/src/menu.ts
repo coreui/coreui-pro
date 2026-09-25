@@ -26,7 +26,7 @@ import {
   type Strategy
 } from '@floating-ui/dom'
 import BaseComponent from './base-component.js'
-import EventHandler, { type CoreUIEvent } from './dom/event-handler.js'
+import EventHandler, { type CoreUIEvent, type EventCallable } from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
 import type { ComponentConfig } from './util/config.js'
@@ -143,6 +143,7 @@ class Menu extends BaseComponent {
   protected declare _parent: HTMLElement
   protected declare _openSubmenus: Map<HTMLElement, () => void>
   protected declare _submenuCloseTimeouts: Map<HTMLElement, number>
+  protected declare _submenuListeners: Array<[string, string | null, EventCallable]>
   protected declare _hoverIntentData: { x: number, y: number, timestamp: number } | null
   protected declare _menu: HTMLElement
   protected declare _isSubmenu: boolean
@@ -162,6 +163,7 @@ class Menu extends BaseComponent {
     this._parent = this._element.parentNode as HTMLElement // menu wrapper
     this._openSubmenus = new Map()
     this._submenuCloseTimeouts = new Map()
+    this._submenuListeners = []
     this._hoverIntentData = null
 
     this._menu = (this._config.menu || this._findMenu()) as HTMLElement
@@ -281,6 +283,15 @@ class Menu extends BaseComponent {
     this._closeAllSubmenus()
     this._clearAllSubmenuTimeouts()
     Menu._openInstances.delete(this)
+
+    for (const [type, selector, handler] of this._submenuListeners) {
+      if (selector) {
+        EventHandler.off(this._menu, type, selector, handler)
+      } else {
+        EventHandler.off(this._menu, type, handler)
+      }
+    }
+
     super.dispose()
   }
 
@@ -614,24 +625,34 @@ class Menu extends BaseComponent {
 
   protected _setupSubmenuListeners(): void {
     if (this._config.submenuTrigger === 'hover' || this._config.submenuTrigger === 'both') {
-      EventHandler.on(this._menu, 'mouseenter', this.constructor.SELECTOR_SUBMENU_TOGGLE, event => {
+      this._listenOnMenu('mouseenter', this.constructor.SELECTOR_SUBMENU_TOGGLE, event => {
         this._onSubmenuTriggerEnter(event)
       })
 
-      EventHandler.on(this._menu, 'mouseleave', this.constructor.SELECTOR_SUBMENU, event => {
+      this._listenOnMenu('mouseleave', this.constructor.SELECTOR_SUBMENU, event => {
         this._onSubmenuLeave(event)
       })
 
-      EventHandler.on(this._menu, 'mousemove', event => {
+      this._listenOnMenu('mousemove', null, event => {
         this._trackMousePosition(event)
       })
     }
 
     if (this._config.submenuTrigger === 'click' || this._config.submenuTrigger === 'both') {
-      EventHandler.on(this._menu, 'click', this.constructor.SELECTOR_SUBMENU_TOGGLE, event => {
+      this._listenOnMenu('click', this.constructor.SELECTOR_SUBMENU_TOGGLE, event => {
         this._onSubmenuTriggerClick(event)
       })
     }
+  }
+
+  protected _listenOnMenu(type: string, selector: string | null, handler: EventCallable): void {
+    if (selector) {
+      EventHandler.on(this._menu, type, selector, handler)
+    } else {
+      EventHandler.on(this._menu, type, handler)
+    }
+
+    this._submenuListeners.push([type, selector, handler])
   }
 
   protected _onSubmenuTriggerEnter(event: CoreUIEvent): void {
@@ -705,11 +726,16 @@ class Menu extends BaseComponent {
     submenuWrapper.classList.add(CLASS_NAME_SHOW)
 
     const cleanup = this._createSubmenuFloating(trigger, submenu, submenuWrapper)
-    this._openSubmenus.set(submenu, cleanup)
-
-    EventHandler.on(submenu, 'mouseenter', () => {
+    const cancelClose = (): void => {
       this._cancelSubmenuCloseTimeout(submenu)
+    }
+
+    this._openSubmenus.set(submenu, () => {
+      cleanup()
+      EventHandler.off(submenu, 'mouseenter', cancelClose)
     })
+
+    EventHandler.on(submenu, 'mouseenter', cancelClose)
   }
 
   protected _closeSubmenu(submenu: HTMLElement, submenuWrapper: Element): void {
@@ -731,7 +757,6 @@ class Menu extends BaseComponent {
     }
 
     this._openSubmenus.delete(submenu)
-    EventHandler.off(submenu, 'mouseenter')
 
     if (trigger) {
       trigger.setAttribute('aria-expanded', 'false')

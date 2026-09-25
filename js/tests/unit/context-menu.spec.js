@@ -921,6 +921,32 @@ describe('ContextMenu', () => {
       contextMenu.show({ x: 5, y: 5 })
       return done
     })
+
+    it('should keep the submenu listeners of another area sharing the menu', () => {
+      fixtureEl.innerHTML = [
+        '<div class="area" id="first" tabindex="0" data-coreui-toggle="context-menu" data-coreui-target="#shared">First</div>',
+        '<div class="area" id="second" tabindex="0" data-coreui-toggle="context-menu" data-coreui-target="#shared">Second</div>',
+        '<div class="menu" id="shared">',
+        '  <div class="submenu">',
+        '    <button class="menu-item" type="button">More options</button>',
+        '    <div class="menu">',
+        '      <a class="menu-item" href="#">Sub-action</a>',
+        '    </div>',
+        '  </div>',
+        '</div>'
+      ].join('')
+
+      const submenuTrigger = fixtureEl.querySelector('.submenu > .menu-item')
+      const clickSpy = spyOn(ContextMenu.prototype, '_onSubmenuTriggerClick')
+      const first = new ContextMenu('#first', { submenuTrigger: 'click' })
+      // eslint-disable-next-line no-new
+      new ContextMenu('#second', { submenuTrigger: 'click' })
+
+      first.dispose()
+      submenuTrigger.click()
+
+      expect(clickSpy).toHaveBeenCalledTimes(1)
+    })
   })
 
   describe('jQueryInterface', () => {
