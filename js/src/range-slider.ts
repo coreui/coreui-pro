@@ -128,8 +128,12 @@ class RangeSlider extends BaseComponent {
   protected declare _dragIndex: number
   protected declare _inputs: HTMLInputElement[]
   protected declare _isDragging: boolean
+  protected declare _onChange: () => void
   protected declare _onDocumentMouseMove: (event: any) => void
   protected declare _onDocumentMouseUp: () => void
+  protected declare _onInput: (event: any) => void
+  protected declare _onTickMouseDown: (event: any) => void
+  protected declare _onTrackMouseDown: (event: any) => void
   protected declare _sliderTrack: any
   protected declare _tooltips: HTMLElement[]
 
@@ -157,6 +161,46 @@ class RangeSlider extends BaseComponent {
       this._isDragging = false
     }
 
+    this._onInput = event => {
+      const { target } = event
+      this._isDragging = false
+      const children = SelectorEngine.children(target.parentElement, SELECTOR_RANGE_SLIDER_INPUT)
+      const index = Array.from(children).indexOf(target)
+      this._updateValue(target.value, index)
+      EventHandler.trigger(this._element, EVENT_INPUT, { value: [...this._currentValue] })
+    }
+
+    this._onChange = () => {
+      EventHandler.trigger(this._element, EVENT_CHANGE, { value: [...this._currentValue] })
+    }
+
+    this._onTickMouseDown = event => {
+      if (!this._config.clickableTicks || event.button !== 0) {
+        return
+      }
+
+      const value = Manipulator.getDataAttribute(event.target, 'value')
+      this._updateNearestValue(value as number)
+    }
+
+    this._onTrackMouseDown = event => {
+      if (event.button !== 0) {
+        return
+      }
+
+      if (!(event.target instanceof HTMLInputElement) && !event.target.className.includes(CLASS_NAME_RANGE_SLIDER_TRACK)) {
+        return
+      }
+
+      this._isDragging = true
+      const clickValue = this._calculateClickValue(event)
+      this._dragIndex = this._getNearestValueIndex(clickValue)
+      this._updateNearestValue(clickValue)
+
+      EventHandler.trigger(this._element, EVENT_CHANGE, { value: [...this._currentValue] })
+      EventHandler.trigger(this._element, EVENT_INPUT, { value: [...this._currentValue] })
+    }
+
     this._initializeRangeSlider()
   }
 
@@ -175,9 +219,22 @@ class RangeSlider extends BaseComponent {
 
   // Public
   setConfig(config: any): void {
+    const previous = this._config
     this._config = this._getConfig({ ...this._config, ...config })
     this._currentValue = this._config.value
+
+    if (previous.disabled && !this._config.disabled) {
+      this._element.classList.remove(CLASS_NAME_DISABLED)
+    }
+
+    if (previous.vertical && !this._config.vertical) {
+      this._element.classList.remove(CLASS_NAME_RANGE_SLIDER_VERTICAL)
+    }
+
     this._element.innerHTML = ''
+    this._inputs = []
+    this._isDragging = false
+    this._tooltips = []
     this._initializeRangeSlider()
   }
 
@@ -191,49 +248,17 @@ class RangeSlider extends BaseComponent {
   // Private
   _addEventListeners(): void {
     if (this._config.disabled) {
+      EventHandler.off(this._element, EVENT_INPUT, SELECTOR_RANGE_SLIDER_INPUT, this._onInput)
+      EventHandler.off(this._element, EVENT_CHANGE, SELECTOR_RANGE_SLIDER_INPUT, this._onChange)
+      EventHandler.off(this._element, EVENT_MOUSEDOWN, SELECTOR_RANGE_SLIDER_TICK, this._onTickMouseDown)
+      EventHandler.off(this._element, EVENT_MOUSEDOWN, SELECTOR_RANGE_SLIDER_INPUTS_CONTAINER, this._onTrackMouseDown)
       return
     }
 
-    EventHandler.on(this._element, EVENT_INPUT, SELECTOR_RANGE_SLIDER_INPUT, (event: any) => {
-      const { target } = event
-      this._isDragging = false
-      const children = SelectorEngine.children(target.parentElement, SELECTOR_RANGE_SLIDER_INPUT)
-      const index = Array.from(children).indexOf(target)
-      this._updateValue(target.value, index)
-      EventHandler.trigger(this._element, EVENT_INPUT, { value: [...this._currentValue] })
-    })
-
-    EventHandler.on(this._element, EVENT_CHANGE, SELECTOR_RANGE_SLIDER_INPUT, () => {
-      EventHandler.trigger(this._element, EVENT_CHANGE, { value: [...this._currentValue] })
-    })
-
-    EventHandler.on(this._element, EVENT_MOUSEDOWN, SELECTOR_RANGE_SLIDER_TICK, (event: any) => {
-      if (!this._config.clickableTicks || event.button !== 0) {
-        return
-      }
-
-      const value = Manipulator.getDataAttribute(event.target, 'value')
-      this._updateNearestValue(value as number)
-    })
-
-    EventHandler.on(this._element, EVENT_MOUSEDOWN, SELECTOR_RANGE_SLIDER_INPUTS_CONTAINER, (event: any) => {
-      if (event.button !== 0) {
-        return
-      }
-
-      if (!(event.target instanceof HTMLInputElement) && !event.target.className.includes(CLASS_NAME_RANGE_SLIDER_TRACK)) {
-        return
-      }
-
-      this._isDragging = true
-      const clickValue = this._calculateClickValue(event)
-      this._dragIndex = this._getNearestValueIndex(clickValue)
-      this._updateNearestValue(clickValue)
-
-      EventHandler.trigger(this._element, EVENT_CHANGE, { value: [...this._currentValue] })
-      EventHandler.trigger(this._element, EVENT_INPUT, { value: [...this._currentValue] })
-    })
-
+    EventHandler.on(this._element, EVENT_INPUT, SELECTOR_RANGE_SLIDER_INPUT, this._onInput)
+    EventHandler.on(this._element, EVENT_CHANGE, SELECTOR_RANGE_SLIDER_INPUT, this._onChange)
+    EventHandler.on(this._element, EVENT_MOUSEDOWN, SELECTOR_RANGE_SLIDER_TICK, this._onTickMouseDown)
+    EventHandler.on(this._element, EVENT_MOUSEDOWN, SELECTOR_RANGE_SLIDER_INPUTS_CONTAINER, this._onTrackMouseDown)
     EventHandler.on(document.documentElement, EVENT_MOUSEUP, this._onDocumentMouseUp)
     EventHandler.on(document.documentElement, EVENT_MOUSEMOVE, this._onDocumentMouseMove)
   }

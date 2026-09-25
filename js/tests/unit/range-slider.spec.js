@@ -1119,6 +1119,130 @@ describe('RangeSlider', () => {
       const inputs = element.querySelectorAll('.range-slider-input')
       expect(inputs.length).toBe(1)
     })
+
+    it('should emit one input event per native input after several setConfig calls', () => {
+      fixtureEl.innerHTML = '<div id="slider"></div>'
+      const element = fixtureEl.querySelector('#slider')
+      const rangeSlider = new RangeSlider(element, { value: 30 })
+      let calls = 0
+
+      rangeSlider.setConfig({ value: 40 })
+      rangeSlider.setConfig({ value: 50 })
+      element.addEventListener('input.coreui.range-slider', () => {
+        calls++
+      })
+
+      const input = element.querySelector('.range-slider-input')
+      input.value = 60
+      input.dispatchEvent(new Event('input', { bubbles: true }))
+
+      expect(calls).toBe(1)
+    })
+
+    it('should handle a change, a track press and a tick press once after several setConfig calls', () => {
+      fixtureEl.innerHTML = '<div id="slider"></div>'
+      const element = fixtureEl.querySelector('#slider')
+      const rangeSlider = new RangeSlider(element, { value: 30, ticks: ['A', 'B'], clickableTicks: true })
+      let changes = 0
+
+      rangeSlider.setConfig({ value: 40 })
+      rangeSlider.setConfig({ value: 50 })
+      element.addEventListener('change.coreui.range-slider', () => {
+        changes++
+      })
+      element.querySelector('.range-slider-input').dispatchEvent(new Event('change', { bubbles: true }))
+
+      expect(changes).toBe(1)
+
+      const spy = spyOn(rangeSlider, '_updateNearestValue')
+      const track = element.querySelector('.range-slider-track')
+      track.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0 }))
+      element.querySelector('.range-slider-tick').dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0 }))
+
+      expect(spy).toHaveBeenCalledTimes(2)
+    })
+
+    it('should ignore the track and the ticks once disabled with setConfig', () => {
+      fixtureEl.innerHTML = '<div id="slider"></div>'
+      const element = fixtureEl.querySelector('#slider')
+      const rangeSlider = new RangeSlider(element, { value: 30, ticks: ['A', 'B'], clickableTicks: true })
+
+      rangeSlider.setConfig({ disabled: true })
+
+      const spy = spyOn(rangeSlider, '_updateNearestValue')
+      element.querySelector('.range-slider-track').dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0 }))
+      element.querySelector('.range-slider-tick').dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0 }))
+
+      expect(spy).not.toHaveBeenCalled()
+    })
+
+    it('should end a drag when setConfig rebuilds the slider', () => {
+      fixtureEl.innerHTML = '<div id="slider"></div>'
+      const element = fixtureEl.querySelector('#slider')
+      const rangeSlider = new RangeSlider(element, { value: [10, 90], tooltips: false })
+
+      rangeSlider._isDragging = true
+      rangeSlider._dragIndex = 1
+      rangeSlider.setConfig({ value: 50 })
+
+      const spy = spyOn(rangeSlider, '_updateValue')
+      rangeSlider._onDocumentMouseMove({ clientX: 0, clientY: 0 })
+
+      expect(spy).not.toHaveBeenCalled()
+    })
+
+    it('should stop and start responding when disabled is switched with setConfig', () => {
+      fixtureEl.innerHTML = '<div id="slider"></div>'
+      const element = fixtureEl.querySelector('#slider')
+      const rangeSlider = new RangeSlider(element, { value: 30 })
+      let calls = 0
+
+      element.addEventListener('input.coreui.range-slider', () => {
+        calls++
+      })
+
+      const move = () => {
+        const input = element.querySelector('.range-slider-input')
+        input.value = 60
+        input.dispatchEvent(new Event('input', { bubbles: true }))
+      }
+
+      rangeSlider.setConfig({ disabled: true })
+      move()
+
+      expect(calls).toBe(0)
+      expect(element).toHaveClass('disabled')
+
+      rangeSlider.setConfig({ disabled: false })
+      move()
+
+      expect(calls).toBe(1)
+      expect(element).not.toHaveClass('disabled')
+    })
+
+    it('should drop the vertical class when vertical is switched off', () => {
+      fixtureEl.innerHTML = '<div id="slider"></div>'
+      const element = fixtureEl.querySelector('#slider')
+      const rangeSlider = new RangeSlider(element, { value: 30, vertical: true })
+
+      rangeSlider.setConfig({ vertical: false })
+
+      expect(element).not.toHaveClass('range-slider-vertical')
+    })
+
+    it('should write the value into the tooltip of the rebuilt slider', () => {
+      fixtureEl.innerHTML = '<div id="slider"></div>'
+      const element = fixtureEl.querySelector('#slider')
+      const rangeSlider = new RangeSlider(element, { tooltips: true, value: 30 })
+
+      rangeSlider.setConfig({ value: 40 })
+
+      const input = element.querySelector('.range-slider-input')
+      input.value = 70
+      input.dispatchEvent(new Event('input', { bubbles: true }))
+
+      expect(element.querySelector('.range-slider-tooltip .tooltip-inner').textContent).toBe('70')
+    })
   })
 
   describe('_roundToStep', () => {
