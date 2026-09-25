@@ -1,4 +1,5 @@
 import { userEvent } from '@vitest/browser/context'
+import { vi } from 'vitest'
 import DatePicker from '../../src/date-picker.js'
 import Dialog from '../../src/dialog.js'
 import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
@@ -887,6 +888,56 @@ describe('DatePicker', () => {
       expect(date.getFullYear()).toEqual(today.getFullYear())
       expect(date.getMonth()).toEqual(today.getMonth())
       expect(date.getDate()).toEqual(today.getDate())
+    })
+
+    it('should show the date in the calendar when the context sets it again after browsing', () => {
+      const picker = buildPicker({ date: new Date(2026, 8, 25), locale: 'en-US' })
+
+      picker.show()
+      fixtureEl.querySelector('.date-picker-popup .btn-next').click()
+      fixtureEl.querySelector('.date-picker-popup .btn-next').click()
+      picker.getContext().setDate(new Date(2026, 8, 25))
+
+      expect(fixtureEl.querySelector('.date-picker-popup table').getAttribute('aria-label')).toBe('September 2026')
+    })
+
+    it('should show the initial date in the calendar when the context resets it after browsing', () => {
+      const picker = buildPicker({ date: new Date(2026, 8, 25), locale: 'en-US' })
+
+      picker.show()
+      fixtureEl.querySelector('.date-picker-popup .btn-next').click()
+      fixtureEl.querySelector('.date-picker-popup .btn-next').click()
+      picker.getContext().reset()
+
+      expect(fixtureEl.querySelector('.date-picker-popup table').getAttribute('aria-label')).toBe('September 2026')
+    })
+
+    it('should leave the calendar where it is when the context sets an invalid date', () => {
+      const picker = buildPicker({ date: new Date(2026, 6, 10), locale: 'en-US' })
+
+      picker.show()
+      fixtureEl.querySelector('.date-picker-popup .btn-next').click()
+      picker.getContext().setDate(new Date(Number.NaN))
+
+      expect(fixtureEl.querySelector('.date-picker-popup table').getAttribute('aria-label')).toBe('August 2026')
+    })
+
+    it('should show today in the calendar when the context sets it again after browsing', () => {
+      vi.useFakeTimers({ toFake: ['Date'] })
+      vi.setSystemTime(new Date(2026, 8, 25, 9, 41, 27))
+
+      try {
+        const picker = buildPicker({ date: new Date(2026, 8, 25), locale: 'en-US' })
+
+        picker.show()
+        fixtureEl.querySelector('.date-picker-popup .btn-next').click()
+        fixtureEl.querySelector('.date-picker-popup .btn-next').click()
+        picker.getContext().today()
+
+        expect(fixtureEl.querySelector('.date-picker-popup table').getAttribute('aria-label')).toBe('September 2026')
+      } finally {
+        vi.useRealTimers()
+      }
     })
   })
 

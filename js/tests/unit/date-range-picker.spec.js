@@ -474,6 +474,111 @@ describe('DateRangePicker', () => {
       expect(picker.getStartDate()).toBeNull()
       expect(picker.getEndDate()).toBeNull()
     })
+
+    it('should show the range in the calendar when the context sets it again after browsing', () => {
+      const picker = buildPicker({ calendars: 1, locale: 'en-US' })
+
+      picker.show()
+      picker.getContext().setRange(new Date(2026, 8, 10), new Date(2026, 8, 20))
+      fixtureEl.querySelector('.date-picker-popup .btn-next').click()
+      fixtureEl.querySelector('.date-picker-popup .btn-next').click()
+      picker.getContext().setRange(new Date(2026, 8, 10), new Date(2026, 8, 20))
+
+      expect(fixtureEl.querySelector('.date-picker-popup table').getAttribute('aria-label')).toBe('September 2026')
+    })
+
+    it('should show the start date when the context sets both ends of a range', () => {
+      const picker = buildPicker({ calendars: 1, locale: 'en-US' })
+
+      picker.show()
+      picker.getContext().setRange(new Date(2026, 7, 26), new Date(2026, 8, 25))
+
+      expect(fixtureEl.querySelector('.date-picker-popup table').getAttribute('aria-label')).toBe('August 2026')
+    })
+
+    it('should show the initial range in the calendar when the context resets it after browsing', () => {
+      const picker = buildPicker({
+        calendars: 1,
+        endDate: new Date(2026, 8, 20),
+        locale: 'en-US',
+        startDate: new Date(2026, 8, 10)
+      })
+
+      picker.show()
+      fixtureEl.querySelector('.date-picker-popup .btn-next').click()
+      fixtureEl.querySelector('.date-picker-popup .btn-next').click()
+      picker.getContext().reset()
+
+      expect(fixtureEl.querySelector('.date-picker-popup table').getAttribute('aria-label')).toBe('September 2026')
+    })
+
+    it('should show the start date over the calendarDate option', () => {
+      const picker = buildPicker({ calendarDate: new Date(2026, 6, 1), calendars: 1, locale: 'en-US' })
+
+      picker.show()
+      picker.getContext().setRange(new Date(2026, 8, 10), new Date(2026, 8, 20))
+
+      expect(fixtureEl.querySelector('.date-picker-popup table').getAttribute('aria-label')).toBe('September 2026')
+    })
+
+    it('should show the end date when the context sets only the end', () => {
+      const picker = buildPicker({ calendarDate: new Date(2026, 8, 1), calendars: 1, locale: 'en-US' })
+
+      picker.show()
+      picker.getContext().setRange(null, new Date(2027, 0, 15))
+
+      expect(fixtureEl.querySelector('.date-picker-popup table').getAttribute('aria-label')).toBe('January 2027')
+    })
+
+    it('should show the end date when the context sets only the end again after browsing', () => {
+      const picker = buildPicker({ calendars: 1, locale: 'en-US' })
+
+      picker.show()
+      picker.getContext().setRange(null, new Date(2027, 0, 15))
+      fixtureEl.querySelector('.date-picker-popup .btn-next').click()
+      fixtureEl.querySelector('.date-picker-popup .btn-next').click()
+      picker.getContext().setRange(null, new Date(2027, 0, 15))
+
+      expect(fixtureEl.querySelector('.date-picker-popup table').getAttribute('aria-label')).toBe('January 2027')
+    })
+
+    it('should show the end date when the context sets a start the picker rejects', () => {
+      const picker = buildPicker({ calendars: 1, locale: 'en-US', minDate: new Date(2026, 8, 1) })
+
+      picker.show()
+      picker.getContext().setRange(new Date(2026, 7, 26), new Date(2026, 8, 25))
+      fixtureEl.querySelector('.date-picker-popup .btn-next').click()
+      fixtureEl.querySelector('.date-picker-popup .btn-next').click()
+      picker.getContext().setRange(new Date(2026, 7, 26), new Date(2026, 8, 25))
+
+      expect(fixtureEl.querySelector('.date-picker-popup table').getAttribute('aria-label')).toBe('September 2026')
+    })
+
+    it('should keep the months view when the context sets a range', () => {
+      const picker = buildPicker({ calendarDate: new Date(2026, 8, 1), calendars: 1, locale: 'en-US' })
+
+      picker.show()
+      fixtureEl.querySelector('.date-picker-popup .btn-month').click()
+      picker.getContext().setRange(new Date(2027, 0, 10), new Date(2027, 0, 20))
+
+      expect(fixtureEl.querySelector('.date-picker-popup table').getAttribute('aria-label')).toBe('2027')
+    })
+
+    it('should leave the calendar where it is when the context clears the range', () => {
+      const picker = buildPicker({
+        calendars: 1,
+        endDate: new Date(2026, 8, 20),
+        locale: 'en-US',
+        startDate: new Date(2026, 8, 10)
+      })
+
+      picker.show()
+      fixtureEl.querySelector('.date-picker-popup .btn-next').click()
+      fixtureEl.querySelector('.date-picker-popup .btn-next').click()
+      picker.getContext().clear()
+
+      expect(fixtureEl.querySelector('.date-picker-popup table').getAttribute('aria-label')).toBe('November 2026')
+    })
   })
 
   describe('jQueryInterface', () => {

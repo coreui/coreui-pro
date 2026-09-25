@@ -1295,6 +1295,13 @@ behaviour, v5 is the reference. Mapping:
   and **6060 → 740** nodes. The first open costs a few milliseconds more (the
   calendar is built then); later opens are unchanged. Code reaching into the
   private `picker._calendar` before the first open now finds `null`.
+- **`setRange()` and `reset()` on the Date Range Picker show the range in the
+  calendar**, on the month of its start date (of its end date when there is no
+  start), in whatever view the calendar is in and also when the range does not
+  change, so a preset clicked again after browsing brings its range back. The
+  calendar used to move only when a field changed, and went to the month of
+  the end date when both changed. `clear()` leaves it where it is; `setDate()`,
+  `today()` and `reset()` on the Date Picker already showed their date.
 
 #### The date picker adopts the markup you write
 
