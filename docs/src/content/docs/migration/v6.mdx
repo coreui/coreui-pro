@@ -212,6 +212,15 @@ alias of the same class, so existing scripts keep working:
 + const offcanvas = new coreui.Offcanvas('#offcanvasExample')
 ```
 
+#### The UMD bundle keeps what companion packages put on `window.coreui`
+
+`coreui.js` and `coreui.bundle.js` used to replace `window.coreui` with a
+fresh object, so `coreui.Utils`, `coreui.ChartJS`, `coreui.DataGrid` or
+`coreui.Scheduler` loaded before the library were gone once it loaded. The
+library now copies the entries of an existing plain `window.coreui` into its
+own object, so the order of the script tags no longer matters. Anything else
+under that name, such as an element with `id="coreui"`, is still replaced.
+
 #### One jQuery dispatcher for every plugin
 
 Every `$(el).plugin('method')` call now goes through the same dispatcher:

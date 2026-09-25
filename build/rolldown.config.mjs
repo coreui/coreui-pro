@@ -22,7 +22,21 @@ const plugins = [
     '-coreui': '-bs',
     'coreui=': 'bs=', // [data-coreui="navigation"] => [data-bs="navigation"] (workaround for `preventAssignment` being true),
     '--cui-': '--bs-'
-  })
+  }),
+  !ESM && !BOOTSTRAP && {
+    name: 'adopt-coreui-global',
+    generateBundle(options, bundle) {
+      const assignment = 'factory(global.coreui = {}'
+
+      for (const chunk of Object.values(bundle).filter(file => file.type === 'chunk')) {
+        if (!chunk.code.includes(assignment)) {
+          this.error(`${chunk.fileName}: the UMD wrapper no longer assigns \`${assignment}\``)
+        }
+
+        chunk.code = chunk.code.replace(assignment, 'factory(global.coreui = Object.assign({}, global.coreui && Object.getPrototypeOf(global.coreui) === Object.prototype ? global.coreui : {})')
+      }
+    }
+  }
 ]
 const globals = {
   '@floating-ui/core': 'FloatingUICore',
