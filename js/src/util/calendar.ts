@@ -1423,7 +1423,7 @@ const getGridKeyAction = ({ key, shiftKey }: { key: string; shiftKey: boolean },
 
 /**
  * Decides what a key does on a cell or a week row: Space and Enter pick its
- * date, the arrows move to the nearest selectable cell or row, Home and End to
+ * date unless the key repeats while held, the arrows move to the nearest selectable cell or row, Home and End to
  * the edge of the week or row, and Page Up / Page Down turn the calendar and
  * move to the same day there, or to the last selectable date before `minDate` /
  * `maxDate`.
@@ -1432,17 +1432,18 @@ const getGridKeyAction = ({ key, shiftKey }: { key: string; shiftKey: boolean },
  * @param event.code - The physical key
  * @param event.key - The key value
  * @param event.shiftKey - Whether Shift is held
+ * @param event.repeat - Whether the key repeats while held
  * @param date - The date of the focused cell or week row
  * @param context - The state of the calendar
  * @returns The action, or `null` for a key the grid leaves alone
  */
-const getCellKeyAction = ({ code, key, shiftKey }: { code: string; key: string; shiftKey: boolean }, date: Date, context: CalendarKeyContext) : CalendarKeyAction | null => {
+const getCellKeyAction = ({ code, key, repeat, shiftKey }: { code: string; key: string; repeat?: boolean; shiftKey: boolean }, date: Date, context: CalendarKeyContext) : CalendarKeyAction | null => {
   if (ARROW_KEYS.has(key)) {
     return moveTo(getArrowTarget(date, isForwardKey(key, context.rtl), key === 'ArrowDown' || key === 'ArrowUp', context), context)
   }
 
   if (code === 'Space' || key === 'Enter') {
-    return { type: 'activate' }
+    return repeat ? { type: 'stay' } : { type: 'activate' }
   }
 
   if (key === 'End' || key === 'Home') {
@@ -1491,11 +1492,12 @@ const getCellKeyAction = ({ code, key, shiftKey }: { code: string; key: string; 
  * @param event.code - The physical key
  * @param event.key - The key value
  * @param event.shiftKey - Whether Shift is held
+ * @param event.repeat - Whether the key repeats while held
  * @param date - The date of the focused cell or week row, `null` when the grid itself has the focus
  * @param context - The state of the calendar
  * @returns `activate` to pick the focused date, `move` to focus `date` after paging by `years` and `months` when either is not zero (inside `panel` when it is set, for week rows), `page` to page the calendar by `years` and `months` and then focus `date` (on a grid without one, its panel's tab stop), `stay` when the key is handled and the focus stays, or `null` for a key the grid leaves alone
  */
-export const getCalendarKeyAction = (event: { code: string; key: string; shiftKey: boolean }, date: Date | null, context: CalendarKeyContext) : CalendarKeyAction | null =>
+export const getCalendarKeyAction = (event: { code: string; key: string; repeat?: boolean; shiftKey: boolean }, date: Date | null, context: CalendarKeyContext) : CalendarKeyAction | null =>
   date ? getCellKeyAction(event, date, context) : getGridKeyAction(event, context)
 
 /**
