@@ -1197,6 +1197,21 @@ removed in favour of `$translucent-opacity` and
   (`"Thu Sep 17 2026"`), like the month, quarter and year cells, instead of the
   full `Date#toString()` value. A script that selected a day cell with
   `[data-coreui-date="${date}"]` needs `[data-coreui-date="${date.toDateString()}"]`.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **Picking a date no longer fires `calendarDateChange` and keeps the month on
+  screen.** A picked day of an adjacent month (`selectAdjacentDays`) used to
+  become the calendar date while the grid stayed put, so the next-month button
+  then skipped a month; it now stays where it was and shows as selected with an
+  outline on a subtle background instead of the solid fill
+  (`--cui-calendar-cell-selected-adjacent-color`,
+  `--cui-calendar-cell-selected-adjacent-bg`,
+  `--cui-calendar-cell-selected-adjacent-hover-color`,
+  `--cui-calendar-cell-selected-adjacent-hover-bg`).
+  Listen to `startDateChange` / `endDateChange` for the picked date.
+- A selected day or week keeps its colour under the pointer, a shade darker
+  (`--cui-calendar-cell-selected-hover-bg`,
+  `--cui-calendar-cell-selected-hover-color`); it used to take the hover colour
+  until the pointer left.
 - **Additive:** `startDateChange` and `endDateChange` now carry a `dateObject`
   property with the underlying `Date`, alongside the existing `date` property.
   `date` remains formatted per `selectionType` — a `Date` for day selection, but
@@ -3123,8 +3138,10 @@ map — several things below are breaking and are called out as such.
   left a group of components on the old surfaces; they now read the rungs
   their neighbours read. Hover surfaces on `--cui-bg-1`: the dropdown link,
   combobox options and the select-all row (Autocomplete, Multi Select), the
-  calendar cell, the time-picker roll cell, the control-group action button
-  and pagination focus (was `--cui-bg-4`, three rungs above its own hover).
+  control-group action button and pagination focus (was `--cui-bg-4`, three
+  rungs above its own hover). The calendar cell and the time-picker roll cell,
+  which share the date-time picker's panel, hover one rung higher on
+  `--cui-bg-2`.
   Rest and selected surfaces on `--cui-bg-2`: the active nav link and nav
   tab (was `--cui-bg-4`), the selected combobox option, the neutral chip
   (hovering on `--cui-bg-3` instead of a mix with the foreground), the

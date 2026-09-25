@@ -624,6 +624,43 @@ describe('Calendar', () => {
       const clickableCells = div.querySelectorAll('.calendar-cell.clickable')
       expect(clickableCells.length).toBeGreaterThan(0)
     })
+
+    it('should keep the view when an adjacent day is picked', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { calendarDate: new Date(2026, 7, 1), locale: 'en-US', selectAdjacentDays: true }) // eslint-disable-line no-new
+      const adjacent = date => [...div.querySelectorAll('.calendar-cell.next')]
+        .find(cell => new Date(cell.dataset.coreuiDate).getTime() === date.getTime())
+
+      adjacent(new Date(2026, 8, 3)).click()
+
+      expect(div.querySelector('table').getAttribute('aria-label')).toEqual('August 2026')
+      expect(adjacent(new Date(2026, 8, 3)).classList).toContain('selected')
+      expect(adjacent(new Date(2026, 8, 3)).classList).toContain('clickable')
+
+      div.querySelector('.btn-next').click()
+
+      expect(div.querySelector('table').getAttribute('aria-label')).toEqual('September 2026')
+    })
+
+    it('should move into the next month with an arrow from a picked adjacent day', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { calendarDate: new Date(2026, 7, 1), locale: 'en-US', selectAdjacentDays: true }) // eslint-disable-line no-new
+      const cell = [...div.querySelectorAll('.calendar-cell.next')]
+        .find(element => new Date(element.dataset.coreuiDate).getTime() === new Date(2026, 8, 3).getTime())
+      const keydown = createEvent('keydown')
+      keydown.key = 'ArrowRight'
+
+      cell.click()
+      cell.focus()
+      cell.dispatchEvent(keydown)
+
+      expect(new Date(document.activeElement.dataset.coreuiDate)).toEqual(new Date(2026, 8, 4))
+      expect(div.querySelector('table').getAttribute('aria-label')).toEqual('September 2026')
+    })
   })
 
   describe('disabledDates', () => {
@@ -1584,6 +1621,62 @@ describe('Calendar', () => {
       pressKey(focusDay(div, 2026, 7, 12), 'PageDown')
 
       expect(document.activeElement).toBe(div.querySelector('table'))
+    })
+
+    it('should stop PageDown on maxDate in the shown month without turning the calendar', () => {
+      const div = renderCalendar({ maxDate: new Date(2026, 7, 20) })
+      const listener = jasmine.createSpy('listener')
+
+      div.addEventListener('calendarDateChange.coreui.calendar', listener)
+      pressKey(focusDay(div, 2026, 7, 12), 'PageDown')
+
+      expect(activeDate()).toEqual(new Date(2026, 7, 20))
+      expect(listener).not.toHaveBeenCalled()
+
+      pressKey(document.activeElement, 'PageDown')
+
+      expect(activeDate()).toEqual(new Date(2026, 7, 20))
+      expect(listener).not.toHaveBeenCalled()
+    })
+
+    it('should move PageDown from an adjacent day to the same day of the next month', () => {
+      const div = renderCalendar({ selectAdjacentDays: true })
+
+      pressKey(focusDay(div, 2026, 8, 1), 'PageDown')
+
+      expect(activeDate()).toEqual(new Date(2026, 9, 1))
+      expect(div.querySelector('table').getAttribute('aria-label')).toEqual('October 2026')
+    })
+
+    it('should move PageDown from an adjacent day to maxDate in the next month', () => {
+      const div = renderCalendar({ maxDate: new Date(2026, 8, 15), selectAdjacentDays: true })
+
+      pressKey(focusDay(div, 2026, 8, 1), 'PageDown')
+
+      expect(activeDate()).toEqual(new Date(2026, 8, 15))
+      expect(div.querySelector('table').getAttribute('aria-label')).toEqual('September 2026')
+    })
+
+    it('should keep a week row that starts in the previous month when maxDate cuts PageDown in the shown month', () => {
+      const div = renderCalendar({ calendarDate: new Date(2026, 6, 1), maxDate: new Date(2026, 6, 3), selectionType: 'week' })
+      const row = weekRow(div, new Date(2026, 5, 29))
+
+      row.focus()
+      pressKey(row, 'PageDown')
+
+      expect(document.activeElement).toBe(row)
+      expect(div.querySelector('table').getAttribute('aria-label')).toEqual('July 2026')
+    })
+
+    it('should page a week row back to the first selectable week after minDate', () => {
+      const div = renderCalendar({ calendarDate: new Date(2026, 6, 1), minDate: new Date(2026, 5, 10), selectionType: 'week' })
+      const row = weekRow(div, new Date(2026, 5, 29))
+
+      row.focus()
+      pressKey(row, 'PageUp')
+
+      expect(document.activeElement).toBe(weekRow(div, new Date(2026, 5, 15)))
+      expect(div.querySelector('table').getAttribute('aria-label')).toEqual('June 2026')
     })
 
     it('should not make a grid the tab stop while another panel has a selectable date', () => {
@@ -3379,6 +3472,27 @@ describe('Calendar', () => {
       calendar._modifyCalendarDate(0, 1)
 
       expect(listener).toHaveBeenCalled()
+    })
+
+    it('should not emit `calendarDateChange.coreui.calendar` when a date is picked', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { calendarDate: new Date(2026, 7, 1), calendars: 2 }) // eslint-disable-line no-new
+      const listener = jasmine.createSpy('listener')
+      const [first, second] = div.querySelectorAll('.calendar')
+      const enter = createEvent('keydown')
+      enter.key = 'Enter'
+      const space = createEvent('keydown')
+      space.key = ' '
+      Object.defineProperty(space, 'code', { value: 'Space' })
+
+      div.addEventListener('calendarDateChange.coreui.calendar', listener)
+      first.querySelector('.calendar-cell[data-coreui-selectable]').click()
+      second.querySelector('.calendar-cell[data-coreui-selectable]').click()
+      div.querySelector('.calendar-cell[data-coreui-selectable]').dispatchEvent(enter)
+      div.querySelector('.calendar-cell[data-coreui-selectable]').dispatchEvent(space)
+
+      expect(listener).not.toHaveBeenCalled()
     })
 
     it('should emit `startDateChange.coreui.calendar` when the start date is set', () => {

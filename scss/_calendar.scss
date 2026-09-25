@@ -29,7 +29,6 @@ $calendar-tokens: defaults(
     --#{$prefix}calendar-nav-btn-border-width: 1px,
     --#{$prefix}calendar-nav-btn-border-color: transparent,
     --#{$prefix}calendar-nav-btn-border-radius: var(--#{$prefix}radius-4),
-    --#{$prefix}calendar-cell-border-radius: var(--#{$prefix}radius-4),
     --#{$prefix}calendar-nav-btn-hover-bg: transparent,
     --#{$prefix}calendar-nav-btn-hover-border-color: transparent,
     --#{$prefix}calendar-nav-btn-focus-border-color: transparent,
@@ -44,11 +43,18 @@ $calendar-tokens: defaults(
     --#{$prefix}calendar-cell-header-inner-color: var(--#{$prefix}fg-3),
     --#{$prefix}calendar-cell-week-number-font-weight: 600,
     --#{$prefix}calendar-cell-week-number-color: var(--#{$prefix}fg-2),
+    --#{$prefix}calendar-cell-border-radius: var(--#{$prefix}radius-4),
     --#{$prefix}calendar-cell-hover-color: var(--#{$prefix}fg-body),
-    --#{$prefix}calendar-cell-hover-bg: var(--#{$prefix}bg-1),
+    --#{$prefix}calendar-cell-hover-bg: var(--#{$prefix}bg-2),
     --#{$prefix}calendar-cell-disabled-color: var(--#{$prefix}fg-4),
     --#{$prefix}calendar-cell-selected-color: var(--#{$prefix}primary-contrast),
     --#{$prefix}calendar-cell-selected-bg: var(--#{$prefix}primary-base),
+    --#{$prefix}calendar-cell-selected-hover-color: var(--#{$prefix}calendar-cell-selected-color),
+    --#{$prefix}calendar-cell-selected-hover-bg: oklch(from var(--#{$prefix}calendar-cell-selected-bg) calc(l * var(--#{$prefix}theme-hover-lightness)) calc(c * var(--#{$prefix}theme-hover-chroma)) h),
+    --#{$prefix}calendar-cell-selected-adjacent-color: var(--#{$prefix}primary-fg-emphasis),
+    --#{$prefix}calendar-cell-selected-adjacent-bg: var(--#{$prefix}primary-bg-subtle),
+    --#{$prefix}calendar-cell-selected-adjacent-hover-color: var(--#{$prefix}calendar-cell-selected-adjacent-color),
+    --#{$prefix}calendar-cell-selected-adjacent-hover-bg: var(--#{$prefix}primary-bg-muted),
     --#{$prefix}calendar-cell-range-bg: color-mix(in oklch, var(--#{$prefix}theme-bg, var(--#{$prefix}primary-base)) 12.5%, transparent),
     --#{$prefix}calendar-cell-range-hover-border-color: var(--#{$prefix}primary-base),
     --#{$prefix}calendar-cell-today-color: var(--#{$prefix}danger-base),
@@ -232,6 +238,12 @@ $calendar-tokens: defaults(
       background-color: var(--#{$prefix}theme-bg, var(--#{$prefix}calendar-cell-selected-bg));
     }
 
+    &.selected.clickable:is(.next, .previous) .calendar-cell-inner {
+      color: var(--#{$prefix}theme-fg-emphasis, var(--#{$prefix}calendar-cell-selected-adjacent-color));
+      background-color: var(--#{$prefix}theme-bg-subtle, var(--#{$prefix}calendar-cell-selected-adjacent-bg));
+      border: var(--#{$prefix}border-width) solid currentcolor;
+    }
+
     &.today .calendar-cell-inner {
       color: var(--#{$prefix}calendar-cell-today-color);
     }
@@ -248,6 +260,16 @@ $calendar-tokens: defaults(
         background-color: var(--#{$prefix}calendar-cell-hover-bg);
         @include border-radius(var(--#{$prefix}calendar-cell-border-radius));
       }
+    }
+
+    .calendars:not(.select-week) &.selected:not(.disabled, .next, .previous):hover .calendar-cell-inner {
+      color: var(--#{$prefix}theme-contrast, var(--#{$prefix}calendar-cell-selected-hover-color));
+      background-color: var(--#{$prefix}theme-hover, var(--#{$prefix}calendar-cell-selected-hover-bg));
+    }
+
+    .calendars:not(.select-week) &.selected.clickable:is(.next, .previous):not(.disabled):hover .calendar-cell-inner {
+      color: var(--#{$prefix}theme-fg-emphasis, var(--#{$prefix}calendar-cell-selected-adjacent-hover-color));
+      background-color: var(--#{$prefix}theme-bg-muted, var(--#{$prefix}calendar-cell-selected-adjacent-hover-bg));
     }
 
     .calendars:not(.select-week) &.range:not(.range ~ *) .calendar-cell-inner::after {
@@ -295,6 +317,11 @@ $calendar-tokens: defaults(
         cursor: pointer;
         background-color: var(--#{$prefix}calendar-cell-hover-bg);
       }
+    }
+
+    .calendars.select-week &.selected:not(.disabled):hover .calendar-cell-inner {
+      color: var(--#{$prefix}theme-contrast, var(--#{$prefix}calendar-cell-selected-hover-color));
+      background-color: var(--#{$prefix}theme-hover, var(--#{$prefix}calendar-cell-selected-hover-bg));
     }
 
     .selected:not(th) .calendar-cell-inner {

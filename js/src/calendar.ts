@@ -358,10 +358,6 @@ class Calendar extends BaseComponent {
     const cloneDate = new Date(date)
     const index = Manipulator.getDataAttribute(target.closest(SELECTOR_CALENDAR) as HTMLElement, 'calendar-index') as number
 
-    if (this._view === 'days' && !this._rowsAreTargets()) {
-      this._setCalendarDate(index ? new Date(date.getFullYear(), date.getMonth() - index, 1) : date)
-    }
-
     if (this._view === 'months' && this._config.selectionType !== 'month') {
       this._setCalendarDate(index ? new Date(cloneDate.setMonth(cloneDate.getMonth() - index)) : date, 'days')
       this._setCalendarView('days', 'cellClick')

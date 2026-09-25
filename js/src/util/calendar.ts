@@ -1121,6 +1121,55 @@ const getViewEdge = (forward: boolean, { calendarDate, calendars, view }: Calend
 }
 
 /**
+ * Finds the first and the last day of the month a panel of the days view
+ * shows.
+ *
+ * @param context - The state of the calendar
+ * @returns The first and the last day of the month
+ */
+const getPanelMonth = ({ calendarDate, panel }: CalendarKeyContext) : [Date, Date] => [
+  new Date(calendarDate.getFullYear(), calendarDate.getMonth() + panel, 1),
+  new Date(calendarDate.getFullYear(), calendarDate.getMonth() + panel + 1, 0)
+]
+
+/**
+ * Tells whether the day, month, quarter or year a cell of the view stands for
+ * cannot be picked; a week row goes by its first day.
+ *
+ * @param date - The date of the cell or week row
+ * @param context - The state of the calendar
+ * @returns `true` for a date that cannot be picked
+ */
+const isDisabledInView = (date: Date, { disabledDates, maxDate, minDate, view }: CalendarKeyContext) : boolean => view === 'days' ?
+  isDateDisabled(date, minDate, maxDate, disabledDates) :
+  isPeriodDisabled(date, view, minDate, maxDate, disabledDates)
+
+/**
+ * Walks from a date toward the focused one, a cell or a week row at a time,
+ * past the ones that cannot be picked.
+ *
+ * @param start - The date to walk from; it is moved in place
+ * @param date - The date of the focused cell or week row
+ * @param context - The state of the calendar
+ * @returns The first selectable date on the way, or the focused date when there is none before it
+ */
+const walkToSelectable = (start: Date, date: Date, context: CalendarKeyContext) : Date => {
+  const { rows, view } = context
+  const sign = start > date ? -1 : 1
+  const isShort = (value: Date) : boolean => sign * (date.getTime() - value.getTime()) > 0
+
+  while (isDisabledInView(start, context) && isShort(start)) {
+    if (view === 'days') {
+      start.setDate(start.getDate() + (sign * (rows ? 7 : 1)))
+    } else {
+      start.setMonth(start.getMonth() + (sign * MONTHS_IN_PERIOD[view]))
+    }
+  }
+
+  return start
+}
+
+/**
  * Finds where an arrow key takes the focus: the nearest selectable day, week,
  * month, quarter or year in the direction of the key, a whole row away for the
  * vertical keys. The search stops at `minDate` / `maxDate`, and gives up after
@@ -1133,7 +1182,7 @@ const getViewEdge = (forward: boolean, { calendarDate, calendars, view }: Calend
  * @returns The date to focus, or `null` when there is none
  */
 const getArrowTarget = (date: Date, forward: boolean, vertical: boolean, context: CalendarKeyContext) : Date | null => {
-  const { disabledDates, firstDayOfWeek, maxDate, minDate, rows, view } = context
+  const { firstDayOfWeek, maxDate, minDate, rows, view } = context
   const steps: Record<ViewTypes, [number, number]> = {
     days: vertical || rows ? [7, 0] : [1, 0],
     months: vertical ? [0, 3] : [0, 1],
@@ -1155,11 +1204,7 @@ const getArrowTarget = (date: Date, forward: boolean, vertical: boolean, context
       return null
     }
 
-    const disabled = view === 'days' ?
-      isDateDisabled(target, minDate, maxDate, disabledDates) :
-      isPeriodDisabled(target, view, minDate, maxDate, disabledDates)
-
-    if (!disabled) {
+    if (!isDisabledInView(target, context)) {
       return target
     }
   }
@@ -1198,47 +1243,6 @@ const getRevealOffset = (date: Date, { calendarDate, calendars, rows, view }: Ca
 }
 
 /**
- * Finds where Page Up / Page Down takes the focus: the same day a month away,
- * or a year away with Shift, cut to the length of the target month; a year
- * away in the months and quarters views and a decade away in the years view.
- * The result is kept within `minDate` / `maxDate`.
- *
- * @param date - The date the focus leaves
- * @param direction - `1` for Page Down, `-1` for Page Up
- * @param shiftKey - Whether Shift is held
- * @param context - The state of the calendar
- * @returns The date to focus
- */
-const getPageTarget = (date: Date, direction: number, shiftKey: boolean, { maxDate, minDate, view }: CalendarKeyContext) : Date => {
-  const target = new Date(date)
-
-  if (view === 'days') {
-    const day = target.getDate()
-    target.setDate(1)
-
-    if (shiftKey) {
-      target.setFullYear(target.getFullYear() + direction)
-    } else {
-      target.setMonth(target.getMonth() + direction)
-    }
-
-    target.setDate(Math.min(day, new Date(target.getFullYear(), target.getMonth() + 1, 0).getDate()))
-  } else {
-    target.setFullYear(target.getFullYear() + ((view === 'years' ? 10 : 1) * direction))
-  }
-
-  if (maxDate && target > maxDate) {
-    target.setTime(maxDate.getTime())
-  }
-
-  if (minDate && target < minDate) {
-    target.setTime(minDate.getTime())
-  }
-
-  return target
-}
-
-/**
  * Finds where Home or End takes the focus: the first or the last day of the
  * week, week of the month, month or year of the row, or quarter of the year.
  * A disabled one gives way to the nearest selectable one toward the focused
@@ -1252,37 +1256,30 @@ const getPageTarget = (date: Date, direction: number, shiftKey: boolean, { maxDa
  * @returns The date to focus
  */
 const getRowEdge = (date: Date, last: boolean, context: CalendarKeyContext) : Date => {
-  const { calendarDate, disabledDates, firstDayOfWeek, maxDate, minDate, panel, rows, view } = context
+  const { calendarDate, firstDayOfWeek, rows, view } = context
   const year = date.getFullYear()
   const month = date.getMonth()
   let edge: Date
-  let days = 0
-  let months = 0
 
   if (view === 'days' && rows) {
-    const shown = new Date(calendarDate.getFullYear(), calendarDate.getMonth() + panel + (last ? 1 : 0), last ? 0 : 1)
-    edge = getStartOfWeek(shown, firstDayOfWeek)
-    days = 7
+    edge = getStartOfWeek(getPanelMonth(context)[last ? 1 : 0], firstDayOfWeek)
   } else {
     switch (view) {
       case 'days': {
         edge = getStartOfWeek(new Date(year, month, date.getDate()), firstDayOfWeek)
         edge.setDate(edge.getDate() + (last ? 6 : 0))
-        days = 1
 
         break
       }
 
       case 'months': {
         edge = new Date(year, month - (month % 3) + (last ? 2 : 0), 1)
-        months = 1
 
         break
       }
 
       case 'quarters': {
         edge = new Date(year, last ? 9 : 0, 1)
-        months = 3
 
         break
       }
@@ -1290,26 +1287,15 @@ const getRowEdge = (date: Date, last: boolean, context: CalendarKeyContext) : Da
       default: {
         const offset = year - calendarDate.getFullYear() + 6
         edge = new Date(year - (offset % 3) + (last ? 2 : 0), 0, 1)
-        months = 12
       }
     }
   }
 
-  const sign = last ? -1 : 1
-  const isDisabled = (value: Date) : boolean => view === 'days' ?
-    isDateDisabled(value, minDate, maxDate, disabledDates) :
-    isPeriodDisabled(value, view, minDate, maxDate, disabledDates)
-  const isShort = (value: Date) : boolean => sign * (date.getTime() - value.getTime()) > 0
-
-  if (sign * (date.getTime() - edge.getTime()) < 0) {
+  if ((last ? -1 : 1) * (date.getTime() - edge.getTime()) < 0) {
     return new Date(date)
   }
 
-  while (isDisabled(edge) && isShort(edge)) {
-    edge.setMonth(edge.getMonth() + (sign * months), edge.getDate() + (sign * days))
-  }
-
-  return edge
+  return walkToSelectable(edge, date, context)
 }
 
 /**
@@ -1322,6 +1308,60 @@ const getRowEdge = (date: Date, last: boolean, context: CalendarKeyContext) : Da
  */
 const moveTo = (target: Date | null, context: CalendarKeyContext) : CalendarKeyAction =>
   target ? { date: target, ...getRevealOffset(target, context), type: 'move' } : { type: 'stay' }
+
+/**
+ * Gives how far Page Up / Page Down turns a calendar: a month, or a year with
+ * Shift, in the days view, a year in the months and quarters views, and ten
+ * years in the years view.
+ *
+ * @param direction - `1` for Page Down, `-1` for Page Up
+ * @param shiftKey - Whether Shift is held
+ * @param view - The view of the calendar
+ * @returns The years and months to page by
+ */
+const getPageOffset = (direction: number, shiftKey: boolean, view: ViewTypes) : { months: number; years: number } => view === 'days' && !shiftKey ?
+  { months: direction, years: 0 } :
+  { months: 0, years: direction * (view === 'years' ? 10 : 1) }
+
+/**
+ * Decides what Page Up / Page Down does on a cell or a week row: the calendar
+ * turns by `getPageOffset` and the focus moves to the same day there, cut to
+ * the length of the month. From a day of an adjacent month the calendar turns
+ * only as far as that day takes. A date past `minDate` / `maxDate` gives way to
+ * the last selectable date before the bound, and the calendar turns only when
+ * that date lies outside the months the panels show. On the way to either, a
+ * disabled date gives way to the nearest selectable one toward the focus.
+ *
+ * @param date - The date of the focused cell or week row
+ * @param direction - `1` for Page Down, `-1` for Page Up
+ * @param shiftKey - Whether Shift is held
+ * @param context - The state of the calendar
+ * @returns A `page` action, a `move` to the date the focus stops on, or `stay` when that is the focused date
+ */
+const getPageAction = (date: Date, direction: number, shiftKey: boolean, context: CalendarKeyContext) : CalendarKeyAction => {
+  const { firstDayOfWeek, maxDate, minDate, rows, view } = context
+  const offset = getPageOffset(direction, shiftKey, view)
+  const target = new Date(date)
+  target.setFullYear(date.getFullYear() + offset.years, date.getMonth() + offset.months, 1)
+  target.setDate(Math.min(date.getDate(), new Date(target.getFullYear(), target.getMonth() + 1, 0).getDate()))
+
+  const bound = direction > 0 ? maxDate : minDate
+  const [first, last] = getPanelMonth(context)
+  let start: Date
+
+  if (bound && isDisabledInView(rows ? getStartOfWeek(target, firstDayOfWeek) : target, { ...context, disabledDates: undefined })) {
+    const edge = getStartOfView(bound, view)
+    start = rows ? getStartOfWeek(edge, firstDayOfWeek) : edge
+  } else if (view === 'days' && !rows && (date < first || date > last)) {
+    start = target
+  } else {
+    return { date: target, ...offset, type: 'page' }
+  }
+
+  const stop = walkToSelectable(start, date, context)
+
+  return stop.getTime() === date.getTime() ? { type: 'stay' } : moveTo(stop, context)
+}
 
 /**
  * Tells whether an arrow key points forward in time: down, and right, or left
@@ -1351,11 +1391,7 @@ const getGridKeyAction = ({ key, shiftKey }: { key: string; shiftKey: boolean },
   }
 
   if (key === 'PageDown' || key === 'PageUp') {
-    const direction = key === 'PageDown' ? 1 : -1
-
-    return context.view === 'days' && !shiftKey ?
-      { months: direction, type: 'page', years: 0 } :
-      { months: 0, type: 'page', years: direction * (context.view === 'years' ? 10 : 1) }
+    return { ...getPageOffset(key === 'PageDown' ? 1 : -1, shiftKey, context.view), type: 'page' }
   }
 
   return key === 'End' || key === 'Home' ? { type: 'stay' } : null
@@ -1365,7 +1401,8 @@ const getGridKeyAction = ({ key, shiftKey }: { key: string; shiftKey: boolean },
  * Decides what a key does on a cell or a week row: Space and Enter pick its
  * date, the arrows move to the nearest selectable cell or row, Home and End to
  * the edge of the week or row, and Page Up / Page Down turn the calendar and
- * move to the same day there.
+ * move to the same day there, or to the last selectable date before `minDate` /
+ * `maxDate`.
  *
  * @param event - The key and its modifiers
  * @param event.code - The physical key
@@ -1404,22 +1441,9 @@ const getCellKeyAction = ({ code, key, shiftKey }: { code: string; key: string; 
     }
   }
 
-  if (key !== 'PageDown' && key !== 'PageUp') {
-    return null
-  }
-
-  const target = getPageTarget(date, key === 'PageDown' ? 1 : -1, shiftKey, context)
-
-  if (target.getTime() === date.getTime()) {
-    return { type: 'stay' }
-  }
-
-  return {
-    date: target,
-    months: ((target.getFullYear() - date.getFullYear()) * 12) + target.getMonth() - date.getMonth(),
-    type: 'page',
-    years: 0
-  }
+  return key === 'PageDown' || key === 'PageUp' ?
+    getPageAction(date, key === 'PageDown' ? 1 : -1, shiftKey, context) :
+    null
 }
 
 /**
@@ -1427,14 +1451,17 @@ const getCellKeyAction = ({ code, key, shiftKey }: { code: string; key: string; 
  * and Enter pick its date, the arrows move to the nearest selectable cell or
  * row, and Page Up / Page Down turn the calendar a month (a year with Shift) in
  * the days view, a year in the months and quarters views and ten years in the
- * years view, and move to the same day there. Home and End move to the first
- * and last selectable day of the week, into the adjacent month when the week
- * starts or ends there; with week rows, to the first and last week of the
- * month the panel shows, in that panel; to the first and last month or year of
- * the row; and to the first and last quarter of the year. On a grid with
- * nothing to focus, the
- * arrows move to the nearest selectable date beyond the edge of the view, Page
- * Up / Page Down turn the calendar the same way, and Home / End do nothing.
+ * years view, and move to the same day there; from a day of an adjacent month
+ * the calendar turns only as far as that day takes, and past `minDate` /
+ * `maxDate` they stop on the last selectable date before the bound, turning the
+ * calendar only when that date lies outside the months the panels show. Home
+ * and End move to the first and last selectable day of the week, into the
+ * adjacent month when the week starts or ends there; with week rows, to the
+ * first and last week of the month the panel shows, in that panel; to the first
+ * and last month or year of the row; and to the first and last quarter of the
+ * year. On a grid with nothing to focus, the arrows move to the nearest
+ * selectable date beyond the edge of the view, Page Up / Page Down turn the
+ * calendar the same way, and Home / End do nothing.
  *
  * @param event - The key and its modifiers
  * @param event.code - The physical key
