@@ -45,7 +45,8 @@ import {
   type SelectionTypes,
   setRovingTabIndex,
   setTimeFromDate,
-  type ViewTypes
+  type ViewTypes,
+  YEARS_PER_PAGE
 } from './util/calendar.js'
 
 /**
@@ -546,9 +547,9 @@ class Calendar extends BaseComponent {
   _addNavigationEventListeners(): void {
     const navigationSelectors = {
       [SELECTOR_BTN_PREV]: () => this._modifyCalendarDate(0, -1),
-      [SELECTOR_BTN_DOUBLE_PREV]: () => this._modifyCalendarDate(this._view === 'years' ? -10 : -1),
+      [SELECTOR_BTN_DOUBLE_PREV]: () => this._modifyCalendarDate(this._view === 'years' ? -YEARS_PER_PAGE : -1),
       [SELECTOR_BTN_NEXT]: () => this._modifyCalendarDate(0, 1),
-      [SELECTOR_BTN_DOUBLE_NEXT]: () => this._modifyCalendarDate(this._view === 'years' ? 10 : 1),
+      [SELECTOR_BTN_DOUBLE_NEXT]: () => this._modifyCalendarDate(this._view === 'years' ? YEARS_PER_PAGE : 1),
       [SELECTOR_BTN_MONTH]: () => {
         this._setCalendarView('months', 'navigation')
         this._updateCalendar()

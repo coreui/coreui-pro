@@ -102,6 +102,12 @@ const MONTHS_IN_PERIOD: Record<PeriodViewTypes, number> = {
 }
 
 /**
+ * How many years one page of the years view shows, and how far its navigation
+ * and Page Up / Page Down turn it.
+ */
+export const YEARS_PER_PAGE = 12
+
+/**
  * Numbers the month, quarter or year a date falls in, counting from year 0,
  * so that two dates share a period exactly when the numbers match.
  *
@@ -678,7 +684,7 @@ export const getCalendarDate = (calendarDate: Date, order: number, view: ViewTyp
   }
 
   if (order !== 0 && view === "years") {
-    return new Date(calendarDate.getFullYear() + (12 * order), calendarDate.getMonth(), 1)
+    return new Date(calendarDate.getFullYear() + (YEARS_PER_PAGE * order), calendarDate.getMonth(), 1)
   }
 
   return calendarDate
@@ -765,7 +771,7 @@ export const createDateFormatter = (): ((date: Date, locale?: string, options?: 
  * @param range - How many years sit before it
  * @returns The years, in order
  */
-export const getYears = (year: number, range: number = 6) : number[] => {
+export const getYears = (year: number, range: number = YEARS_PER_PAGE / 2) : number[] => {
   return Array.from({ length: range * 2 }, (_, i) => year - range + i)
 }
 
@@ -1132,7 +1138,7 @@ const getViewEdge = (forward: boolean, { calendarDate, calendars, view }: Calend
   }
 
   if (view === 'years') {
-    return new Date(forward ? year + 5 + (12 * last) : year - 6, 0, 1)
+    return new Date(forward ? year + (YEARS_PER_PAGE / 2) - 1 + (YEARS_PER_PAGE * last) : year - (YEARS_PER_PAGE / 2), 0, 1)
   }
 
   return forward ? new Date(year + last, view === 'quarters' ? 9 : 11, 1) : new Date(year, 0, 1)
@@ -1252,8 +1258,8 @@ const getRevealOffset = (date: Date, { calendarDate, calendars, rows, view }: Ca
   }
 
   if (view === 'years') {
-    const page = Math.floor((date.getFullYear() - calendarDate.getFullYear() + 6) / 12)
-    return { months: 0, years: 12 * (page < 0 ? page : Math.max(0, page - calendars + 1)) }
+    const page = Math.floor((date.getFullYear() - calendarDate.getFullYear() + (YEARS_PER_PAGE / 2)) / YEARS_PER_PAGE)
+    return { months: 0, years: YEARS_PER_PAGE * (page < 0 ? page : Math.max(0, page - calendars + 1)) }
   }
 
   const delta = date.getFullYear() - calendarDate.getFullYear()
@@ -1303,7 +1309,7 @@ const getRowEdge = (date: Date, last: boolean, context: CalendarKeyContext) : Da
       }
 
       default: {
-        const offset = year - calendarDate.getFullYear() + 6
+        const offset = year - calendarDate.getFullYear() + (YEARS_PER_PAGE / 2)
         edge = new Date(year - (offset % 3) + (last ? 2 : 0), 0, 1)
       }
     }
@@ -1329,8 +1335,8 @@ const moveTo = (target: Date | null, context: CalendarKeyContext) : CalendarKeyA
 
 /**
  * Gives how far Page Up / Page Down turns a calendar: a month, or a year with
- * Shift, in the days view, a year in the months and quarters views, and ten
- * years in the years view.
+ * Shift, in the days view, a year in the months and quarters views, and a page
+ * of `YEARS_PER_PAGE` years in the years view.
  *
  * @param direction - `1` for Page Down, `-1` for Page Up
  * @param shiftKey - Whether Shift is held
@@ -1339,7 +1345,7 @@ const moveTo = (target: Date | null, context: CalendarKeyContext) : CalendarKeyA
  */
 const getPageOffset = (direction: number, shiftKey: boolean, view: ViewTypes) : { months: number; years: number } => view === 'days' && !shiftKey ?
   { months: direction, years: 0 } :
-  { months: 0, years: direction * (view === 'years' ? 10 : 1) }
+  { months: 0, years: direction * (view === 'years' ? YEARS_PER_PAGE : 1) }
 
 /**
  * Decides what Page Up / Page Down does on a cell or a week row: the calendar
@@ -1468,8 +1474,8 @@ const getCellKeyAction = ({ code, key, shiftKey }: { code: string; key: string; 
  * Decides what a key does in a calendar grid. On a cell or a week row, Space
  * and Enter pick its date, the arrows move to the nearest selectable cell or
  * row, and Page Up / Page Down turn the calendar a month (a year with Shift) in
- * the days view, a year in the months and quarters views and ten years in the
- * years view, and move to the same day there; from a day of an adjacent month
+ * the days view, a year in the months and quarters views and a page of
+ * `YEARS_PER_PAGE` years in the years view, and move to the same day there; from a day of an adjacent month
  * the calendar turns only as far as that day takes, and past `minDate` /
  * `maxDate` they stop on the last selectable date before the bound, turning the
  * calendar only when that date lies outside the months the panels show. Home

@@ -33,7 +33,8 @@ import {
   parseYearSmart,
   removeTimeFromDate,
   setRovingTabIndex,
-  setTimeFromDate
+  setTimeFromDate,
+  YEARS_PER_PAGE
 } from '../../../src/util/calendar.js'
 import { clearFixture, getFixture } from '../../helpers/fixture.js'
 
@@ -339,6 +340,11 @@ describe('Calendar Utilities', () => {
       const result = getYears(2020, 2)
       // range=2 => 4 total => 2020-2 => 2018, 2019, 2020, 2021
       expect(result).toEqual([2018, 2019, 2020, 2021])
+    })
+
+    it('should give a page of YEARS_PER_PAGE years by default', () => {
+      expect(YEARS_PER_PAGE).toBe(12)
+      expect(getYears(2026)).toEqual([2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030, 2031])
     })
   })
 
@@ -784,12 +790,12 @@ describe('Calendar Utilities', () => {
       expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 0, 31), context({ calendarDate: new Date(2026, 0, 1) }))).toEqual(page(new Date(2026, 1, 28), 1))
     })
 
-    it('should turn the calendar a year with Shift, a year in the months and quarters views, and ten years in the years view', () => {
+    it('should turn the calendar a year with Shift, a year in the months and quarters views, and a page of years in the years view', () => {
       expect(getCalendarKeyAction(press('PageDown', true), new Date(2028, 1, 29), context({ calendarDate: new Date(2028, 1, 1) }))).toEqual(page(new Date(2029, 1, 28), 0, 1))
       expect(getCalendarKeyAction(press('PageUp', true), new Date(2026, 6, 15), context())).toEqual(page(new Date(2025, 6, 15), 0, -1))
       expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 4, 1), context({ view: 'months' }))).toEqual(page(new Date(2027, 4, 1), 0, 1))
       expect(getCalendarKeyAction(press('PageUp'), new Date(2026, 3, 1), context({ view: 'quarters' }))).toEqual(page(new Date(2025, 3, 1), 0, -1))
-      expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 0, 1), context({ view: 'years' }))).toEqual(page(new Date(2036, 0, 1), 0, 10))
+      expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 0, 1), context({ view: 'years' }))).toEqual(page(new Date(2038, 0, 1), 0, 12))
     })
 
     it('should stop PageDown and PageUp on the last selectable date before maxDate and minDate, paging only when it is out of view', () => {
@@ -886,7 +892,8 @@ describe('Calendar Utilities', () => {
       expect(getCalendarKeyAction(press('PageUp'), null, context())).toEqual({ months: -1, type: 'page', years: 0 })
       expect(getCalendarKeyAction(press('PageDown', true), null, context())).toEqual({ months: 0, type: 'page', years: 1 })
       expect(getCalendarKeyAction(press('PageUp'), null, context({ view: 'months' }))).toEqual({ months: 0, type: 'page', years: -1 })
-      expect(getCalendarKeyAction(press('PageDown'), null, context({ view: 'years' }))).toEqual({ months: 0, type: 'page', years: 10 })
+      expect(getCalendarKeyAction(press('PageDown'), null, context({ view: 'years' }))).toEqual({ months: 0, type: 'page', years: 12 })
+      expect(getCalendarKeyAction(press('PageUp'), null, context({ view: 'years' }))).toEqual({ months: 0, type: 'page', years: -12 })
       expect(getCalendarKeyAction(press('Home'), null, context())).toEqual({ type: 'stay' })
       expect(getCalendarKeyAction(press('End'), null, context())).toEqual({ type: 'stay' })
       expect(getCalendarKeyAction(press('Enter'), null, context())).toBeNull()
