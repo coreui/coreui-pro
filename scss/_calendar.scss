@@ -51,9 +51,9 @@ $calendar-tokens: defaults(
     --#{$prefix}calendar-cell-selected-bg: var(--#{$prefix}primary-base),
     --#{$prefix}calendar-cell-selected-hover-color: var(--#{$prefix}calendar-cell-selected-color),
     --#{$prefix}calendar-cell-selected-hover-bg: oklch(from var(--#{$prefix}calendar-cell-selected-bg) calc(l * var(--#{$prefix}theme-hover-lightness)) calc(c * var(--#{$prefix}theme-hover-chroma)) h),
-    --#{$prefix}calendar-cell-selected-adjacent-color: var(--#{$prefix}primary-fg),
+    --#{$prefix}calendar-cell-selected-adjacent-color: var(--#{$prefix}primary-fg-emphasis),
     --#{$prefix}calendar-cell-selected-adjacent-bg: var(--#{$prefix}primary-bg-subtle),
-    --#{$prefix}calendar-cell-selected-adjacent-hover-color: var(--#{$prefix}primary-fg-emphasis),
+    --#{$prefix}calendar-cell-selected-adjacent-hover-color: var(--#{$prefix}calendar-cell-selected-adjacent-color),
     --#{$prefix}calendar-cell-selected-adjacent-hover-bg: var(--#{$prefix}primary-bg-muted),
     --#{$prefix}calendar-cell-range-bg: color-mix(in oklch, var(--#{$prefix}theme-bg, var(--#{$prefix}primary-base)) 12.5%, transparent),
     --#{$prefix}calendar-cell-range-hover-border-color: var(--#{$prefix}primary-base),
@@ -239,7 +239,7 @@ $calendar-tokens: defaults(
     }
 
     &.selected.clickable:is(.next, .previous) .calendar-cell-inner {
-      color: var(--#{$prefix}theme-fg, var(--#{$prefix}calendar-cell-selected-adjacent-color));
+      color: var(--#{$prefix}theme-fg-emphasis, var(--#{$prefix}calendar-cell-selected-adjacent-color));
       background-color: var(--#{$prefix}theme-bg-subtle, var(--#{$prefix}calendar-cell-selected-adjacent-bg));
       border: var(--#{$prefix}border-width) solid currentcolor;
     }
@@ -267,7 +267,7 @@ $calendar-tokens: defaults(
       background-color: var(--#{$prefix}theme-hover, var(--#{$prefix}calendar-cell-selected-hover-bg));
     }
 
-    .calendars:not(.select-week) &.selected.clickable:is(.next, .previous):hover .calendar-cell-inner {
+    .calendars:not(.select-week) &.selected.clickable:is(.next, .previous):not(.disabled):hover .calendar-cell-inner {
       color: var(--#{$prefix}theme-fg-emphasis, var(--#{$prefix}calendar-cell-selected-adjacent-hover-color));
       background-color: var(--#{$prefix}theme-bg-muted, var(--#{$prefix}calendar-cell-selected-adjacent-hover-bg));
     }
