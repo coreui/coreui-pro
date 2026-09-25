@@ -550,22 +550,18 @@ class Calendar extends BaseComponent {
       [SELECTOR_BTN_DOUBLE_PREV]: () => this._modifyCalendarDate(this._view === 'years' ? -YEARS_PER_PAGE : -1),
       [SELECTOR_BTN_NEXT]: () => this._modifyCalendarDate(0, 1),
       [SELECTOR_BTN_DOUBLE_NEXT]: () => this._modifyCalendarDate(this._view === 'years' ? YEARS_PER_PAGE : 1),
-      [SELECTOR_BTN_MONTH]: () => {
-        this._setCalendarView('months', 'navigation')
-        this._updateCalendar()
-      },
-      [SELECTOR_BTN_YEAR]: () => {
-        this._setCalendarView('years', 'navigation')
-        this._updateCalendar()
-      }
+      [SELECTOR_BTN_MONTH]: (index: number) => this._showPeriodView('months', index),
+      [SELECTOR_BTN_YEAR]: (index: number) => this._showPeriodView('years', index)
     }
 
     for (const [selector, handler] of Object.entries(navigationSelectors)) {
       EventHandler.on(this._element, EVENT_CLICK_DATA_API, selector, (event: any) => {
         event.preventDefault()
         const index = SelectorEngine.find(selector, this._element).indexOf(event.target.closest(selector))
-        handler()
-        SelectorEngine.find(selector, this._element)[index]?.focus()
+
+        if (!handler(index)) {
+          SelectorEngine.find(selector, this._element)[index]?.focus()
+        }
       })
     }
   }
@@ -586,6 +582,23 @@ class Calendar extends BaseComponent {
       view,
       source
     })
+  }
+
+  _showPeriodView(view: 'months' | 'years', index: number): boolean {
+    const shown = getCalendarDate(this._calendarDate, index, this._view)
+    const start = new Date(shown.getFullYear(), view === 'months' ? shown.getMonth() : 0, 1).toDateString()
+    const focus = view !== this._view && this._element.contains(document.activeElement)
+
+    this._setCalendarView(view, 'navigation')
+    this._updateCalendar(() => {
+      if (focus) {
+        const panel = SelectorEngine.find(SELECTOR_CALENDAR, this._element as ParentNode)[index]
+        const target = SelectorEngine.findOne(`[data-coreui-selectable][data-coreui-date="${start}"]`, this._element) ?? SelectorEngine.findOne('[tabindex="0"]', panel)
+        target?.focus()
+      }
+    })
+
+    return focus
   }
 
   _modifyCalendarDate(years: number, months = 0, callback?: () => void): void {
@@ -866,8 +879,7 @@ class Calendar extends BaseComponent {
   _focusRestorer(focused: HTMLElement): () => void {
     const index = SelectorEngine.find(SELECTOR_CALENDAR, this._element as ParentNode).indexOf(focused.closest(SELECTOR_CALENDAR) as HTMLElement)
     const cell = focused.matches(SELECTOR_CALENDAR_ROW) ? SelectorEngine.findOne(SELECTOR_CALENDAR_CELL, focused) : focused.closest(SELECTOR_CALENDAR_CELL)
-    const shown = getCalendarDate(this._calendarDate, index, 'days')
-    const date = cell?.getAttribute('data-coreui-date') ?? (focused.matches(SELECTOR_BTN_MONTH) ? new Date(shown.getFullYear(), shown.getMonth(), 1).toDateString() : null)
+    const date = cell?.getAttribute('data-coreui-date')
     const { className } = focused
 
     return () => {

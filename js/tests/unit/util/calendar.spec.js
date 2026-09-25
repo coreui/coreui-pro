@@ -615,6 +615,12 @@ describe('Calendar Utilities', () => {
       expect(getCalendarKeyAction(press('Enter'), new Date(2026, 6, 15), context())).toEqual({ type: 'activate' })
     })
 
+    it('should not activate the focused date while Space or Enter repeats', () => {
+      expect(getCalendarKeyAction({ ...press(' '), repeat: true }, new Date(2026, 6, 15), context())).toEqual({ type: 'stay' })
+      expect(getCalendarKeyAction({ ...press('Enter'), repeat: true }, new Date(2026, 6, 15), context())).toEqual({ type: 'stay' })
+      expect(getCalendarKeyAction({ ...press('ArrowRight'), repeat: true }, new Date(2026, 6, 15), context())).toEqual(move(new Date(2026, 6, 16)))
+    })
+
     it('should leave other keys on a cell alone', () => {
       for (const key of ['Tab', 'Escape', 'a']) {
         expect(getCalendarKeyAction(press(key), new Date(2026, 6, 15), context())).toBeNull()

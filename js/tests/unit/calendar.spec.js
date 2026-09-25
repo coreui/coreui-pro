@@ -2411,6 +2411,112 @@ describe('Calendar', () => {
       expect(document.activeElement.getAttribute('tabindex')).toBe('0')
     })
 
+    it('should move focus into the years grid when btn-year is activated', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, { calendarDate: new Date(2026, 8, 1), locale: 'en-US' })
+
+      div.querySelector('.btn-year').focus()
+      div.querySelector('.btn-year').click()
+
+      expect(calendar._view).toBe('years')
+      expect(document.activeElement.getAttribute('data-coreui-date')).toBe(new Date(2026, 0, 1).toDateString())
+      expect(document.activeElement.getAttribute('tabindex')).toBe('0')
+    })
+
+    it('should move focus to the year a panel showed when its btn-year is activated', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, { calendarDate: new Date(2026, 11, 1), calendars: 2, locale: 'en-US' })
+      const button = div.querySelectorAll('.btn-year')[1]
+
+      button.focus()
+      button.click()
+
+      expect(calendar._view).toBe('years')
+      expect(document.activeElement.getAttribute('data-coreui-date')).toBe(new Date(2027, 0, 1).toDateString())
+    })
+
+    it('should move focus into the years grid from the months view', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, { calendarDate: new Date(2026, 8, 1), locale: 'en-US', selectionType: 'month' })
+
+      div.querySelector('.btn-year').focus()
+      div.querySelector('.btn-year').click()
+
+      expect(calendar._view).toBe('years')
+      expect(document.activeElement.getAttribute('data-coreui-date')).toBe(new Date(2026, 0, 1).toDateString())
+    })
+
+    it('should keep focus on btn-year in the years view', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, { calendarDate: new Date(2026, 8, 1), locale: 'en-US', selectionType: 'year' })
+      const button = div.querySelector('.btn-year')
+
+      button.focus()
+      button.click()
+
+      expect(calendar._view).toBe('years')
+      expect(document.activeElement).toBe(button)
+    })
+
+    it('should stay in the years view while Enter repeats after btn-year', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, { calendarDate: new Date(2026, 8, 1), locale: 'en-US' })
+
+      div.querySelector('.btn-year').focus()
+      div.querySelector('.btn-year').click()
+      document.activeElement.dispatchEvent(new KeyboardEvent('keydown', {
+        bubbles: true, cancelable: true, code: 'Enter', key: 'Enter', repeat: true
+      }))
+
+      expect(calendar._view).toBe('years')
+      expect(document.activeElement.getAttribute('data-coreui-date')).toBe(new Date(2026, 0, 1).toDateString())
+    })
+
+    it('should move focus to the tab stop of the panel whose btn-month is activated when its month cannot be picked', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, {
+        calendarDate: new Date(2026, 11, 1),
+        calendars: 2,
+        disabledDates: [[new Date(2027, 0, 1), new Date(2027, 0, 31)]],
+        locale: 'en-US'
+      })
+      const button = div.querySelectorAll('.btn-month')[1]
+
+      button.focus()
+      button.click()
+
+      expect(calendar._view).toBe('months')
+      expect(document.activeElement.closest('.calendar')).toBe(div.querySelectorAll('.calendar')[1])
+      expect(document.activeElement.getAttribute('tabindex')).toBe('0')
+    })
+
+    it('should keep focus on btn-next when the focused button carries a class of its own', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, { calendarDate: new Date(2026, 8, 1), locale: 'en-US' })
+      const next = div.querySelector('.btn-next')
+
+      next.focus()
+      next.classList.add('focus-visible')
+      next.click()
+
+      expect(calendar._calendarDate.getMonth()).toBe(9)
+      expect(document.activeElement).toBe(div.querySelector('.btn-next'))
+    })
+
     it('should keep the announced month region when btn-next is clicked', () => {
       fixtureEl.innerHTML = '<div></div>'
 
