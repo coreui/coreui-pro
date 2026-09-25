@@ -6,6 +6,7 @@ import {
   convertToDateObject,
   createDateFormatter,
   createGroupsInArray,
+  formatYearsRange,
   getCalendarDate,
   getCalendarKeyAction,
   getClosestSelectable,
@@ -338,6 +339,29 @@ describe('Calendar Utilities', () => {
       const result = getYears(2020, 2)
       // range=2 => 4 total => 2020-2 => 2018, 2019, 2020, 2021
       expect(result).toEqual([2018, 2019, 2020, 2021])
+    })
+  })
+
+  describe('formatYearsRange', () => {
+    it('should name the twelve years of the page as one range', () => {
+      expect(formatYearsRange(2026, 'pl-PL')).toBe('2020–2031')
+      expect(formatYearsRange(2036, 'pl-PL')).toBe('2030–2041')
+    })
+
+    it('should write the range in the locale digits and calendar', () => {
+      expect(formatYearsRange(2026, 'ar-EG')).toBe('٢٠٢٠–٢٠٣١')
+      expect(formatYearsRange(2026, 'fa-IR')).toBe('\u2067۱۳۹۸ تا ۱۴۰۹\u2069')
+    })
+
+    it('should isolate only a range whose connective is written right to left', () => {
+      expect(formatYearsRange(2026, 'he-IL')).not.toContain('\u2067')
+      expect(formatYearsRange(2026, 'ar-EG')).not.toContain('\u2067')
+      expect(formatYearsRange(2026, 'fa-IR').startsWith('\u2067')).toBeTrue()
+    })
+
+    it('should keep years below 100 as they are', () => {
+      expect(formatYearsRange(96, 'pl-PL')).toBe('90–101')
+      expect(formatYearsRange(50, 'pl-PL')).toBe('44–55')
     })
   })
 

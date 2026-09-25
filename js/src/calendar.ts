@@ -23,6 +23,7 @@ import {
   createDateFormatter,
   createGroupsInArray,
   type DisabledDate,
+  formatYearsRange,
   getCalendarDate,
   getCalendarKeyAction,
   getClosestSelectable,
@@ -684,7 +685,7 @@ class Calendar extends BaseComponent {
     const [navigation, calendarTable] = panel.children
     const [prev, region, next] = navigation.children
     const monthLabel = days ? this._formatDate(calendarDate, { month: 'long' }) : ''
-    const yearLabel = this._formatDate(calendarDate, { year: 'numeric' })
+    const yearLabel = this._view === 'years' ? formatYearsRange(calendarDate.getFullYear(), this._config.locale) : this._formatDate(calendarDate, { year: 'numeric' })
 
     prev.innerHTML = `${this._navButton('btn-double-prev', 'navIconDoublePrev', this._config.ariaNavPrevYearLabel)} ${days ? this._navButton('btn-prev', 'navIconPrev', this._config.ariaNavPrevMonthLabel) : ''}`
 
@@ -764,8 +765,7 @@ class Calendar extends BaseComponent {
     }
 
     if (this._view === 'years') {
-      const years = getYears(date.getFullYear())
-      return `${years[0]} – ${years.at(-1)}`
+      return formatYearsRange(date.getFullYear(), this._config.locale)
     }
 
     return this._formatDate(date, { year: 'numeric' })

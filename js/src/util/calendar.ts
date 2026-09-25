@@ -770,6 +770,24 @@ export const getYears = (year: number, range: number = 6) : number[] => {
 }
 
 /**
+ * Names the page of a years view as one range, written in the locale's own
+ * digits and calendar. A range whose connective is written in a right-to-left
+ * script is wrapped in a right-to-left isolate, so it reads in order inside a
+ * left-to-right calendar too.
+ *
+ * @param year - The year the page is built around
+ * @param locale - The locale to write the range in
+ * @returns The first and the last year of the page, e.g. `2020 – 2031`
+ */
+export const formatYearsRange = (year: number, locale?: string) : string => {
+  const years = getYears(year)
+  const [start, end] = [years[0], years.at(-1) as number].map(value => new Date(new Date(2000, 0, 1).setFullYear(value)))
+  const range = new Intl.DateTimeFormat(locale, { year: 'numeric' }).formatRange(start, end)
+
+  return /(?!\p{Nd})[\u0590-\u08FF]/u.test(range) ? `\u2067${range}\u2069` : range
+}
+
+/**
  * Lists the days of the previous month that fill the first week row of a
  * month.
  *

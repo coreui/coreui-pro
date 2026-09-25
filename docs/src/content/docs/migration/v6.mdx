@@ -1212,6 +1212,10 @@ removed in favour of `$translucent-opacity` and
   (`--cui-calendar-cell-selected-hover-bg`,
   `--cui-calendar-cell-selected-hover-color`); it used to take the hover colour
   until the pointer left.
+- In the years view the navigation names the page it shows, `2020 – 2031`,
+  instead of the one year the page is built around, so paging by a decade is
+  announced as the new range. The grid label and the navigation write the range
+  in the locale's own digits and calendar.
 - **Additive:** `startDateChange` and `endDateChange` now carry a `dateObject`
   property with the underlying `Date`, alongside the existing `date` property.
   `date` remains formatted per `selectionType` — a `Date` for day selection, but
