@@ -198,6 +198,7 @@ class DateRangePicker extends PickerBase {
 
   setRange(startDate: Date | null, endDate: Date | null): void {
     this._rangeInput.setRange(startDate, endDate)
+    this._showRange()
     this._setSelectEndDate(false)
   }
 
@@ -208,6 +209,7 @@ class DateRangePicker extends PickerBase {
 
   reset(): void {
     this._rangeInput.reset()
+    this._showRange()
     this._setSelectEndDate(false)
   }
 
@@ -251,6 +253,10 @@ class DateRangePicker extends PickerBase {
 
     this._selectEndDate = value
     this._calendar?.setConfig({ selectEndDate: value })
+  }
+
+  _showRange(): void {
+    this._calendar?.setConfig({ endDate: this.getEndDate(), startDate: this.getStartDate() })
   }
 
   _createDateRangePicker(): void {
