@@ -322,7 +322,7 @@ attributes work on the picker element too.
 | `calendars` | number | `2` | Months shown side by side. |
 | `cleaner` | boolean | `true` | Renders a button that clears the value. It appears only once the field holds one. |
 | `cleanerIcon` | string | cross SVG | Inline SVG rendered by the component (sanitized). |
-| `container` | string, element, false | `false` | Teleport target for the dropdown. |
+| `container` | string, element, false | `false` | Teleport target for the dropdown. Inside an open dialog it goes into the dialog instead, because the rest of the page is inert while a modal dialog is open. |
 | `disabled` | boolean | `false` | Disables the fields and the popup. |
 | `endDate` | date, string, null | `null` | Initial end of the range. |
 | `endFloatingLabel` | string, null | `null` | Renders a floating label over the end field, which also becomes that field's accessible name. |

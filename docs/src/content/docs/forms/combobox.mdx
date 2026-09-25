@@ -475,7 +475,7 @@ const combobox = new coreui.Combobox('#myCombobox', {
 | `allowList` | object | [Default value](/getting-started/javascript/#sanitizer) | Object which contains allowed attributes and tags for the labels rendered from `items`. |
 | `ariaSearchLabel` | string | `'Search options'` | Accessible name of the search field. An input with its own `aria-label` keeps it. |
 | `caretIcon` | string | `'<svg …>'` | The caret drawn at the end of the toggle, as inline SVG. Empty string, or a `.combobox-caret` already in the markup, and the plugin draws none. |
-| `container` | string, element, boolean | `false` | Where the panel is mounted while open. `true` means `<body>`; leave it alone and the panel goes next to the toggle unless an ancestor would clip it. |
+| `container` | string, element, boolean | `false` | Where the panel is mounted while open. `true` means `<body>`; leave it alone and the panel goes next to the toggle unless an ancestor would clip it. Inside an open dialog it goes into the dialog instead, because the rest of the page is inert while a modal dialog is open. |
 | `disabled` | boolean | `false` | Turns the control off: the panel never opens and the list box is disabled. The `disabled` attribute on the toggle sets it too. |
 | `html` | boolean | `false` | Parses the labels rendered from `items` as HTML instead of inserting them as text. |
 | `indicator` | string | `'none'` | `'checkbox'` puts a decorative checkbox in front of every option. |

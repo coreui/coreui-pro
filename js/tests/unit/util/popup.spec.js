@@ -1,4 +1,4 @@
-import Popup from '../../../src/util/popup.js'
+import Popup, { resolvePopupContainer } from '../../../src/util/popup.js'
 import { clearFixture, getFixture } from '../../helpers/fixture.js'
 
 describe('Popup', () => {
@@ -561,6 +561,24 @@ describe('Popup', () => {
       expect(fixtureEl.querySelector('#target').firstElementChild.id).toEqual('content')
     })
 
+    it('should move the panel into an open dialog when the explicit container is outside it', () => {
+      const popup = buildIn([
+        '<dialog id="host">',
+        '  <div id="anchor"><button id="inside">toggle</button></div>',
+        '</dialog>',
+        '<div id="content">panel</div>'
+      ].join(''), { container: document.body })
+
+      const dialog = fixtureEl.querySelector('#host')
+      dialog.show()
+
+      popup.show()
+
+      expect(fixtureEl.querySelector('#content').parentElement).toEqual(dialog)
+
+      dialog.close()
+    })
+
     it('should return focus before it detaches the panel', () => {
       const popup = buildIn(PLAIN, { returnFocus: true })
       const trigger = fixtureEl.querySelector('#inside')
@@ -834,6 +852,45 @@ describe('Popup', () => {
 
         waitForPosition(Date.now() + 2000)
       })
+    })
+  })
+
+  describe('resolvePopupContainer', () => {
+    it('should keep the panel in place when nothing clips it and no container is given', () => {
+      fixtureEl.innerHTML = '<div id="anchor"></div>'
+
+      expect(resolvePopupContainer(fixtureEl.querySelector('#anchor'))).toBeNull()
+    })
+
+    it('should return the explicit container outside a dialog', () => {
+      fixtureEl.innerHTML = '<div id="target"></div><div id="anchor"></div>'
+
+      const target = fixtureEl.querySelector('#target')
+
+      expect(resolvePopupContainer(fixtureEl.querySelector('#anchor'), target)).toEqual(target)
+    })
+
+    it('should return the open dialog instead of an explicit container outside it', () => {
+      fixtureEl.innerHTML = '<dialog id="host"><div id="anchor"></div></dialog>'
+
+      const dialog = fixtureEl.querySelector('#host')
+      dialog.show()
+
+      expect(resolvePopupContainer(fixtureEl.querySelector('#anchor'), document.body)).toEqual(dialog)
+
+      dialog.close()
+    })
+
+    it('should keep an explicit container that is inside the open dialog', () => {
+      fixtureEl.innerHTML = '<dialog id="host"><div id="target"></div><div id="anchor"></div></dialog>'
+
+      const dialog = fixtureEl.querySelector('#host')
+      const target = fixtureEl.querySelector('#target')
+      dialog.show()
+
+      expect(resolvePopupContainer(fixtureEl.querySelector('#anchor'), target)).toEqual(target)
+
+      dialog.close()
     })
   })
 })

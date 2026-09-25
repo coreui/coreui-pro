@@ -44,6 +44,7 @@ import {
   type FloatingOffsetOption,
   type FloatingConfigOption
 } from './util/floating-ui.js'
+import { resolvePopupContainer } from './util/popup.js'
 
 /**
  * Constants
@@ -557,7 +558,8 @@ class Menu extends BaseComponent {
       return null
     }
 
-    return container === true ? document.body : getElement(container)
+    const target = container === true ? document.body : getElement(container)
+    return target ? resolvePopupContainer(this._element, target) : null
   }
 
   protected _moveMenuToContainer(): void {
