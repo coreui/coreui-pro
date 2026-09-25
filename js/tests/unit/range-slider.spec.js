@@ -1139,6 +1139,58 @@ describe('RangeSlider', () => {
       expect(calls).toBe(1)
     })
 
+    it('should handle a change, a track press and a tick press once after several setConfig calls', () => {
+      fixtureEl.innerHTML = '<div id="slider"></div>'
+      const element = fixtureEl.querySelector('#slider')
+      const rangeSlider = new RangeSlider(element, { value: 30, ticks: ['A', 'B'], clickableTicks: true })
+      let changes = 0
+
+      rangeSlider.setConfig({ value: 40 })
+      rangeSlider.setConfig({ value: 50 })
+      element.addEventListener('change.coreui.range-slider', () => {
+        changes++
+      })
+      element.querySelector('.range-slider-input').dispatchEvent(new Event('change', { bubbles: true }))
+
+      expect(changes).toBe(1)
+
+      const spy = spyOn(rangeSlider, '_updateNearestValue')
+      const track = element.querySelector('.range-slider-track')
+      track.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0 }))
+      element.querySelector('.range-slider-tick').dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0 }))
+
+      expect(spy).toHaveBeenCalledTimes(2)
+    })
+
+    it('should ignore the track and the ticks once disabled with setConfig', () => {
+      fixtureEl.innerHTML = '<div id="slider"></div>'
+      const element = fixtureEl.querySelector('#slider')
+      const rangeSlider = new RangeSlider(element, { value: 30, ticks: ['A', 'B'], clickableTicks: true })
+
+      rangeSlider.setConfig({ disabled: true })
+
+      const spy = spyOn(rangeSlider, '_updateNearestValue')
+      element.querySelector('.range-slider-track').dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0 }))
+      element.querySelector('.range-slider-tick').dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0 }))
+
+      expect(spy).not.toHaveBeenCalled()
+    })
+
+    it('should end a drag when setConfig rebuilds the slider', () => {
+      fixtureEl.innerHTML = '<div id="slider"></div>'
+      const element = fixtureEl.querySelector('#slider')
+      const rangeSlider = new RangeSlider(element, { value: [10, 90], tooltips: false })
+
+      rangeSlider._isDragging = true
+      rangeSlider._dragIndex = 1
+      rangeSlider.setConfig({ value: 50 })
+
+      const spy = spyOn(rangeSlider, '_updateValue')
+      rangeSlider._onDocumentMouseMove({ clientX: 0, clientY: 0 })
+
+      expect(spy).not.toHaveBeenCalled()
+    })
+
     it('should stop and start responding when disabled is switched with setConfig', () => {
       fixtureEl.innerHTML = '<div id="slider"></div>'
       const element = fixtureEl.querySelector('#slider')

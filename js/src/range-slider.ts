@@ -233,6 +233,7 @@ class RangeSlider extends BaseComponent {
 
     this._element.innerHTML = ''
     this._inputs = []
+    this._isDragging = false
     this._tooltips = []
     this._initializeRangeSlider()
   }
