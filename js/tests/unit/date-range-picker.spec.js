@@ -554,6 +554,17 @@ describe('DateRangePicker', () => {
       expect(fixtureEl.querySelector('.date-picker-popup table').getAttribute('aria-label')).toBe('September 2026')
     })
 
+    it('should keep the announced month region when the context turns the calendar', () => {
+      const picker = buildPicker({ calendarDate: new Date(2026, 8, 1), calendars: 1, locale: 'en-US' })
+
+      picker.show()
+      const region = fixtureEl.querySelector('.date-picker-popup .calendar-nav-date')
+      picker.getContext().setRange(new Date(2027, 0, 10), new Date(2027, 0, 20))
+
+      expect(fixtureEl.querySelector('.date-picker-popup .calendar-nav-date')).toBe(region)
+      expect(region.textContent).toContain('January')
+    })
+
     it('should keep the months view when the context sets a range', () => {
       const picker = buildPicker({ calendarDate: new Date(2026, 8, 1), calendars: 1, locale: 'en-US' })
 

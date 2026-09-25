@@ -667,27 +667,34 @@ class Calendar extends BaseComponent {
   }
 
   _createCalendarPanel(order: number): HTMLElement {
-    const calendarDate = getCalendarDate(this._calendarDate, order, this._view)
-
     const calendarPanelEl = document.createElement('div')
     calendarPanelEl.classList.add('calendar')
 
     Manipulator.setDataAttribute(calendarPanelEl, 'calendar-index', order)
 
-    const days = this._view === 'days'
-    const navigationElement = document.createElement('div')
-    navigationElement.classList.add('calendar-nav')
-    navigationElement.innerHTML = `<div class="calendar-nav-prev">${this._navButton('btn-double-prev', 'navIconDoublePrev', this._config.ariaNavPrevYearLabel)} ${days ? this._navButton('btn-prev', 'navIconPrev', this._config.ariaNavPrevMonthLabel) : ''}</div>` +
-      `<div class="calendar-nav-date" aria-live="polite">${days ? `<button type="button" class="calendar-nav-btn btn-sm btn-month">${this._formatDate(calendarDate, { month: 'long' })}</button>` : ''} <button type="button" class="calendar-nav-btn btn-year">${this._formatDate(calendarDate, { year: 'numeric' })}</button></div>` +
-      `<div class="calendar-nav-next">${days ? this._navButton('btn-next', 'navIconNext', this._config.ariaNavNextMonthLabel) : ''} ${this._navButton('btn-double-next', 'navIconDoubleNext', this._config.ariaNavNextYearLabel)}</div>`
-
-    const calendarTable = document.createElement('table')
-    calendarTable.setAttribute('role', 'grid')
-    calendarTable.setAttribute('aria-label', this._gridLabel(calendarDate))
-    calendarTable.innerHTML = days ? this._daysHtml(calendarDate) : this._periodsHtml(calendarDate)
-    calendarPanelEl.append(navigationElement, calendarTable)
+    calendarPanelEl.innerHTML = '<div class="calendar-nav"><div class="calendar-nav-prev"></div><div class="calendar-nav-date" aria-live="polite"></div><div class="calendar-nav-next"></div></div><table role="grid"></table>'
+    this._renderCalendarPanel(calendarPanelEl, order)
 
     return calendarPanelEl
+  }
+
+  _renderCalendarPanel(panel: HTMLElement, order: number): void {
+    const calendarDate = getCalendarDate(this._calendarDate, order, this._view)
+    const days = this._view === 'days'
+    const [navigation, calendarTable] = panel.children
+    const [prev, region, next] = navigation.children
+    const monthLabel = days ? this._formatDate(calendarDate, { month: 'long' }) : ''
+    const yearLabel = this._formatDate(calendarDate, { year: 'numeric' })
+
+    prev.innerHTML = `${this._navButton('btn-double-prev', 'navIconDoublePrev', this._config.ariaNavPrevYearLabel)} ${days ? this._navButton('btn-prev', 'navIconPrev', this._config.ariaNavPrevMonthLabel) : ''}`
+
+    if (region.textContent !== `${monthLabel} ${yearLabel}`) {
+      region.innerHTML = `${days ? `<button type="button" class="calendar-nav-btn btn-sm btn-month">${monthLabel}</button>` : ''} <button type="button" class="calendar-nav-btn btn-year">${yearLabel}</button>`
+    }
+
+    next.innerHTML = `${days ? this._navButton('btn-next', 'navIconNext', this._config.ariaNavNextMonthLabel) : ''} ${this._navButton('btn-double-next', 'navIconDoubleNext', this._config.ariaNavNextYearLabel)}`
+    calendarTable.setAttribute('aria-label', this._gridLabel(calendarDate))
+    calendarTable.innerHTML = days ? this._daysHtml(calendarDate) : this._periodsHtml(calendarDate)
   }
 
   _daysHtml(calendarDate: Date): string {
@@ -769,6 +776,16 @@ class Calendar extends BaseComponent {
   }
 
   _createCalendar(): void {
+    this._setCalendarClasses()
+
+    for (const [index, _] of Array.from({ length: this._config.calendars }).entries()) {
+      this._element.append(this._createCalendarPanel(index))
+    }
+
+    this._updateRovingTabIndex()
+  }
+
+  _setCalendarClasses(): void {
     if (this._config.selectionType && this._view === 'days') {
       this._element.classList.add(`select-${this._config.selectionType}`)
     }
@@ -777,12 +794,7 @@ class Calendar extends BaseComponent {
       this._element.classList.add(CLASS_NAME_SHOW_WEEK_NUMBERS)
     }
 
-    for (const [index, _] of Array.from({ length: this._config.calendars }).entries()) {
-      this._element.append(this._createCalendarPanel(index))
-    }
-
     this._element.classList.add(CLASS_NAME_CALENDARS)
-    this._updateRovingTabIndex()
   }
 
   _initializeDates(keys?: string[]): void {
@@ -824,8 +836,20 @@ class Calendar extends BaseComponent {
   }
 
   _updateCalendar(callback?: () => void): void {
-    this._element.innerHTML = ''
-    this._createCalendar()
+    const panels = SelectorEngine.find(SELECTOR_CALENDAR, this._element as ParentNode)
+
+    if (panels.length === this._config.calendars) {
+      this._setCalendarClasses()
+
+      for (const [index, panel] of panels.entries()) {
+        this._renderCalendarPanel(panel as HTMLElement, index)
+      }
+
+      this._updateRovingTabIndex()
+    } else {
+      this._element.innerHTML = ''
+      this._createCalendar()
+    }
 
     if (callback) {
       callback()

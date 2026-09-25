@@ -966,7 +966,7 @@ describe('Calendar', () => {
       expect(div.querySelectorAll('.calendar-nav')).toHaveSize(2)
     })
 
-    it('should clear the calendar HTML and create a new one', () => {
+    it('should render the view of a new selection type', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
@@ -996,6 +996,57 @@ describe('Calendar', () => {
 
       expect(calendar._config.showWeekNumber).toBeTrue()
       expect(div.classList).toContain('show-week-numbers')
+    })
+
+    it('should keep the announced month region when the dates change', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, { calendarDate: new Date(2026, 8, 1), calendars: 2, locale: 'en-US' })
+      const regions = [...div.querySelectorAll('.calendar-nav-date')]
+
+      calendar.setConfig({ startDate: new Date(2027, 0, 10) })
+
+      for (const [index, region] of div.querySelectorAll('.calendar-nav-date').entries()) {
+        expect(region).toBe(regions[index])
+      }
+
+      expect(regions.map(region => region.textContent.trim())).toEqual(['January 2027', 'February 2027'])
+    })
+
+    it('should leave the announced month region alone when the month does not change', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, {
+        calendarDate: new Date(2026, 8, 1), calendars: 2, locale: 'en-US', range: true
+      })
+      const observer = new MutationObserver(() => {})
+
+      for (const region of div.querySelectorAll('.calendar-nav-date')) {
+        observer.observe(region, { characterData: true, childList: true, subtree: true })
+      }
+
+      calendar.refresh()
+      calendar.setConfig({ selectEndDate: true })
+
+      expect(observer.takeRecords()).toHaveSize(0)
+      observer.disconnect()
+    })
+
+    it('should rebuild the panels when the number of calendars changes', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, { calendarDate: new Date(2026, 8, 1), locale: 'en-US' })
+
+      calendar.setConfig({ calendars: 3 })
+
+      expect([...div.querySelectorAll('.calendar table')].map(table => table.getAttribute('aria-label'))).toEqual(['September 2026', 'October 2026', 'November 2026'])
+
+      calendar.setConfig({ calendars: 1 })
+
+      expect([...div.querySelectorAll('.calendar table')].map(table => table.getAttribute('aria-label'))).toEqual(['September 2026'])
     })
 
     it('should reinitialize dates on update', () => {
@@ -1029,17 +1080,18 @@ describe('Calendar', () => {
       expect(div.querySelector('.calendar')).not.toBeNull()
     })
 
-    it('should recreate calendar markup on refresh', () => {
+    it('should render the calendar again on refresh', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
       const calendar = new Calendar(div)
 
-      // Manually clear and verify refresh rebuilds
+      div.querySelector('table').innerHTML = ''
       calendar.refresh()
 
       expect(div.querySelector('.calendar')).not.toBeNull()
       expect(div.querySelector('.calendar-nav')).not.toBeNull()
+      expect(div.querySelector('.calendar-cell')).not.toBeNull()
     })
   })
 
@@ -2159,6 +2211,20 @@ describe('Calendar', () => {
   })
 
   describe('navigation buttons', () => {
+    it('should keep the announced month region when btn-next is clicked', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, { calendarDate: new Date(2026, 8, 1), locale: 'en-US' })
+      const region = div.querySelector('.calendar-nav-date')
+
+      div.querySelector('.btn-next').click()
+
+      expect(div.querySelector('.calendar-nav-date')).toBe(region)
+      expect(region.textContent).toContain('October')
+      expect(calendar._calendarDate.getMonth()).toEqual(9)
+    })
+
     it('should go to next month when btn-next is clicked', () => {
       fixtureEl.innerHTML = '<div></div>'
 
@@ -3761,7 +3827,7 @@ describe('Calendar', () => {
   })
 
   describe('_updateCalendar', () => {
-    it('should run the callback once the panels are rebuilt, before returning', () => {
+    it('should run the callback once the panels are rendered, before returning', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
       const calendar = new Calendar(div, { calendarDate: new Date(2023, 5, 1) })
