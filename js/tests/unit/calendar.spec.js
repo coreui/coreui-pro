@@ -1916,6 +1916,25 @@ describe('Calendar', () => {
       expect(div.querySelector('.btn-double-next').getAttribute('aria-label')).toEqual('Next 12 years')
     })
 
+    it('should write the full year in the navigation and yearFormat in the year cells', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, {
+        calendarDate: new Date(2026, 8, 1), locale: 'en-US', selectionType: 'month', yearFormat: '2-digit'
+      })
+
+      expect(div.querySelector('.btn-year').textContent.trim()).toEqual('2026')
+
+      calendar.setConfig({ selectionType: 'day' })
+
+      expect(div.querySelector('.btn-year').textContent.trim()).toEqual('2026')
+
+      calendar.setConfig({ selectionType: 'year' })
+
+      expect(div.querySelector('.calendar-cell').textContent.trim()).toEqual('20')
+    })
+
     it('should keep one year in the navigation of the months and quarters views', () => {
       expect(renderCalendar({ locale: 'pl-PL', selectionType: 'month' }).querySelector('.calendar-nav-date').textContent.trim()).toEqual('2026')
       expect(renderCalendar({ locale: 'pl-PL', selectionType: 'quarter' }).querySelector('.calendar-nav-date').textContent.trim()).toEqual('2026')

@@ -267,10 +267,10 @@ In addition to custom rendering, you can control the display format of calendar 
 
 - `dayFormat` - Controls how day numbers are displayed (`'numeric'` or `'2-digit'`)
 - `monthFormat` - Controls how month names are displayed (`'long'`, `'narrow'`, `'short'`, `'numeric'`, or `'2-digit'`)
-- `yearFormat` - Controls how year numbers are displayed (`'numeric'` or `'2-digit'`)
+- `yearFormat` - Controls how the year cells of the years view are displayed (`'numeric'` or `'2-digit'`)
 - `weekdayFormat` - Controls how weekday names are displayed (number for character length, or `'long'`, `'narrow'`, `'short'`)
 
-These format options use the JavaScript `Intl.DateTimeFormat` API and respect the `locale` setting.
+These format options use the JavaScript `Intl.DateTimeFormat` API and respect the `locale` setting. They apply to the cells of the grid, not to the navigation above it, which writes months and years in full.
 
 ### Security considerations
 
@@ -380,7 +380,7 @@ Note that for security reasons the `sanitize`, `sanitizeFn`, and `allowList` opt
 | `startDate` | date, number, string, null | `null` | Initial selected date. |
 | `weekdayFormat` | number, `'long'`, `'narrow'`, `'short'` | `2` | Set length or format of day name. |
 | `weekNumbersLabel` | string | `null` | Label displayed over week numbers in the calendar. |
-| `yearFormat` | `'numeric'`, `'2-digit'` | `'numeric'` | Sets the format for years. Accepts built-in formats (`'numeric'` or `'2-digit'`) |
+| `yearFormat` | `'numeric'`, `'2-digit'` | `'numeric'` | Sets how the year cells of the years view write the year: `'numeric'` (2026) or `'2-digit'` (26). The navigation always writes the full year. |
 
 ### Methods
 
