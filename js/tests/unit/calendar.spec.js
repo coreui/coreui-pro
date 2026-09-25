@@ -1913,6 +1913,7 @@ describe('Calendar', () => {
 
       expect(div.querySelector('.calendar-nav-date').textContent.trim()).toEqual('٢٠٢٠–٢٠٣١')
       expect(div.querySelector('table').getAttribute('aria-label')).toEqual('٢٠٢٠–٢٠٣١')
+      expect(div.querySelector('.btn-double-next').getAttribute('aria-label')).toEqual('Next 12 years')
     })
 
     it('should keep one year in the navigation of the months and quarters views', () => {
@@ -4455,6 +4456,41 @@ describe('Calendar', () => {
       expect(btnPrev.getAttribute('aria-label')).toEqual('Go to previous month')
       expect(btnDoubleNext.getAttribute('aria-label')).toEqual('Go to next year')
       expect(btnDoublePrev.getAttribute('aria-label')).toEqual('Go to previous year')
+    })
+
+    it('should name the double arrows of the years view after a page of years', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, { calendarDate: new Date(2026, 8, 1), selectionType: 'year' })
+
+      expect(div.querySelector('.btn-double-next').getAttribute('aria-label')).toEqual('Next 12 years')
+      expect(div.querySelector('.btn-double-prev').getAttribute('aria-label')).toEqual('Previous 12 years')
+
+      calendar.setConfig({ ariaNavNextYearsLabel: 'Następne 12 lat', ariaNavPrevYearsLabel: 'Poprzednie 12 lat' })
+
+      expect(div.querySelector('.btn-double-next').getAttribute('aria-label')).toEqual('Następne 12 lat')
+      expect(div.querySelector('.btn-double-prev').getAttribute('aria-label')).toEqual('Poprzednie 12 lat')
+    })
+
+    it('should keep the year labels on the double arrows of the days, months and quarters views', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, { calendarDate: new Date(2026, 8, 1), selectionType: 'month' })
+
+      expect(calendar._view).toBe('months')
+      expect(div.querySelector('.btn-double-next').getAttribute('aria-label')).toEqual('Next year')
+      expect(div.querySelector('.btn-double-prev').getAttribute('aria-label')).toEqual('Previous year')
+
+      calendar.setConfig({ selectionType: 'quarter' })
+
+      expect(calendar._view).toBe('quarters')
+      expect(div.querySelector('.btn-double-next').getAttribute('aria-label')).toEqual('Next year')
+
+      calendar.setConfig({ selectionType: 'day' })
+
+      expect(div.querySelector('.btn-double-next').getAttribute('aria-label')).toEqual('Next year')
     })
 
     it('should escape aria labels so they cannot break out of the attribute', () => {

@@ -26,6 +26,18 @@ describe('DateRangePicker', () => {
     return picker
   }
 
+  describe('calendar options', () => {
+    it('should pass the years-view arrow labels to the calendar', () => {
+      const picker = buildPicker({
+        ariaNavNextYearsLabel: 'Następne 12 lat', ariaNavPrevYearsLabel: 'Poprzednie 12 lat', locale: 'en-US', selectionType: 'year'
+      })
+      picker.show()
+
+      expect(fixtureEl.querySelector('.date-picker-popup .btn-double-next').getAttribute('aria-label')).toEqual('Następne 12 lat')
+      expect(fixtureEl.querySelector('.date-picker-popup .btn-double-prev').getAttribute('aria-label')).toEqual('Poprzednie 12 lat')
+    })
+  })
+
   describe('constructor', () => {
     it('should let a global picker default reach the calendar and win over a global field default', () => {
       const pickerSelection = DateRangePicker.Default.selectionType

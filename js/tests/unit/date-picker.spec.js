@@ -34,6 +34,18 @@ describe('DatePicker', () => {
     select.dispatchEvent(new Event('change'))
   }
 
+  describe('calendar options', () => {
+    it('should pass the years-view arrow labels to the calendar', () => {
+      const picker = buildPicker({
+        ariaNavNextYearsLabel: 'Następne 12 lat', ariaNavPrevYearsLabel: 'Poprzednie 12 lat', date: '2026-08-10', selectionType: 'year'
+      })
+      picker.show()
+
+      expect(fixtureEl.querySelector('.date-picker-popup .btn-double-next').getAttribute('aria-label')).toEqual('Następne 12 lat')
+      expect(fixtureEl.querySelector('.date-picker-popup .btn-double-prev').getAttribute('aria-label')).toEqual('Poprzednie 12 lat')
+    })
+  })
+
   // The native <input type="date"> entry contract: opening puts focus on the
   // selected date; without one, on today; and when a max date has pushed both
   // out of reach, on the last date still selectable.
