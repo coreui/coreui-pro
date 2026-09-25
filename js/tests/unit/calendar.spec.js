@@ -1886,8 +1886,24 @@ describe('Calendar', () => {
 
       div.querySelector('.btn-double-next').click()
 
-      expect(region.textContent.trim()).toEqual('2030–2041')
-      expect(div.querySelector('table').getAttribute('aria-label')).toEqual('2030–2041')
+      expect(region.textContent.trim()).toEqual('2032–2043')
+      expect(div.querySelector('table').getAttribute('aria-label')).toEqual('2032–2043')
+    })
+
+    it('should move focus to the same place of the next years page on PageDown and back on PageUp', () => {
+      const div = renderCalendar({ locale: 'pl-PL', selectionType: 'year' })
+      const cell = div.querySelector(`[data-coreui-date="${new Date(2021, 0, 1).toDateString()}"]`)
+
+      cell.focus()
+      pressKey(cell, 'PageDown')
+
+      expect(document.activeElement.dataset.coreuiDate).toEqual(new Date(2033, 0, 1).toDateString())
+      expect(div.querySelector('.calendar-nav-date').textContent.trim()).toEqual('2032–2043')
+
+      pressKey(document.activeElement, 'PageUp')
+
+      expect(document.activeElement.dataset.coreuiDate).toEqual(new Date(2021, 0, 1).toDateString())
+      expect(div.querySelector('.calendar-nav-date').textContent.trim()).toEqual('2020–2031')
     })
 
     it('should name the years page after the year button', () => {
@@ -2485,7 +2501,7 @@ describe('Calendar', () => {
       expect(calendar._view).toEqual('years')
     })
 
-    it('should advance by 10 years when btn-double-next is clicked in years view', () => {
+    it('should advance by the twelve years of a page when btn-double-next is clicked in years view', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
@@ -2498,10 +2514,11 @@ describe('Calendar', () => {
       const btnDoubleNext = div.querySelector('.btn-double-next')
       btnDoubleNext.click()
 
-      expect(calendar._calendarDate.getFullYear()).toEqual(initialYear + 10)
+      expect(calendar._calendarDate.getFullYear()).toEqual(initialYear + 12)
+      expect(div.querySelector('.calendar-nav-date').textContent.trim()).toMatch(/^2029\s–\s2040$/)
     })
 
-    it('should go back by 10 years when btn-double-prev is clicked in years view', () => {
+    it('should go back by the twelve years of a page when btn-double-prev is clicked in years view', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
@@ -2514,10 +2531,11 @@ describe('Calendar', () => {
       const btnDoublePrev = div.querySelector('.btn-double-prev')
       btnDoublePrev.click()
 
-      expect(calendar._calendarDate.getFullYear()).toEqual(initialYear - 10)
+      expect(calendar._calendarDate.getFullYear()).toEqual(initialYear - 12)
+      expect(div.querySelector('.calendar-nav-date').textContent.trim()).toMatch(/^2005\s–\s2016$/)
     })
 
-    it('should keep a year below 100 when paging back ten years', () => {
+    it('should keep a year below 100 when paging back a page of years', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
@@ -2527,7 +2545,8 @@ describe('Calendar', () => {
 
       div.querySelector('.btn-double-prev').click()
 
-      expect(calendar._calendarDate.getFullYear()).toEqual(85)
+      expect(calendar._calendarDate.getFullYear()).toEqual(83)
+      expect(div.querySelector('.calendar-nav-date').textContent.trim()).toMatch(/^77\s–\s88$/)
     })
 
     it.each([
