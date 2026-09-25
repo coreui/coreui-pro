@@ -648,10 +648,138 @@ describe('ChipSet', () => {
       expect(ChipSet.getInstance(el)).toBeNull()
 
       const chips = el.querySelectorAll('.chip')
+      chips[1].tabIndex = 0
       chips[1].focus()
       chips[1].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }))
 
       expect(document.activeElement).toEqual(chips[1])
+    })
+
+    it('should dispose the chips it set up', () => {
+      const el = setMarkup(['First', 'Second'])
+      const chipSet = new ChipSet(el, { removable: true })
+
+      chipSet.dispose()
+
+      for (const chip of el.querySelectorAll('.chip')) {
+        expect(Chip.getInstance(chip)).toBeNull()
+        expect(chip.querySelector('.chip-remove')).toBeNull()
+      }
+    })
+
+    it('should leave a chip the page initialized itself', () => {
+      const el = setMarkup(['First', 'Second'])
+      const [first] = el.querySelectorAll('.chip')
+      const ownChip = new Chip(first, { removable: true })
+      const chipSet = new ChipSet(el, { removable: true })
+
+      chipSet.dispose()
+
+      expect(Chip.getInstance(first)).toEqual(ownChip)
+      expect(first.querySelector('.chip-remove')).not.toBeNull()
+    })
+
+    it('should keep the chips added with add() in the document', () => {
+      const el = setMarkup(['First'])
+      const chipSet = new ChipSet(el, { removable: true })
+      const added = chipSet.add('Second')
+
+      chipSet.dispose()
+
+      expect(added.isConnected).toBeTrue()
+      expect(Chip.getInstance(added)).toBeNull()
+    })
+
+    it('should apply the new configuration to its chips after a re-initialization', () => {
+      const el = setMarkup(['First', 'Second'])
+
+      new ChipSet(el, { removable: true }).dispose()
+      ChipSet.getOrCreateInstance(el, { removable: false })
+
+      const [first] = el.querySelectorAll('.chip')
+      first.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Delete' }))
+
+      expect(el.querySelector('.chip-remove')).toBeNull()
+      expect(first.isConnected).toBeTrue()
+    })
+
+    it('should leave a chip instance the page created again after the set', () => {
+      const el = setMarkup(['First', 'Second'])
+      const chipSet = new ChipSet(el, { removable: true })
+      const [first] = el.querySelectorAll('.chip')
+      const ownChip = new Chip(first, { removable: true })
+
+      chipSet.dispose()
+
+      expect(Chip.getInstance(first)).toEqual(ownChip)
+      expect(first.querySelector('.chip-remove')).not.toBeNull()
+    })
+
+    it('should leave a chip that moved to another set', () => {
+      fixtureEl.innerHTML = [
+        '<div class="chip-set" id="source"><span class="chip">First</span></div>',
+        '<div class="chip-set" id="target"></div>'
+      ].join('')
+
+      const source = new ChipSet('#source', { removable: true })
+      const target = new ChipSet('#target', { removable: true })
+      const chip = fixtureEl.querySelector('.chip')
+
+      target.add(chip)
+      source.dispose()
+
+      expect(Chip.getInstance(chip)).not.toBeNull()
+      expect(chip.querySelector('.chip-remove')).not.toBeNull()
+    })
+
+    it('should forget a chip once it is removed', () => {
+      const el = setMarkup(['First', 'Second'])
+      const chipSet = new ChipSet(el, { removable: true })
+      const [first] = el.querySelectorAll('.chip')
+
+      chipSet.remove(first)
+
+      expect(chipSet._ownedChips.has(first)).toBeFalse()
+    })
+
+    it('should give back the roles it added', () => {
+      const el = setMarkup(['First', 'Second'])
+
+      new ChipSet(el, { selectable: true }).dispose()
+
+      expect(el.hasAttribute('role')).toBeFalse()
+      expect(el.hasAttribute('aria-multiselectable')).toBeFalse()
+      expect(el.hasAttribute('aria-orientation')).toBeFalse()
+
+      for (const chip of el.querySelectorAll('.chip')) {
+        expect(chip.hasAttribute('role')).toBeFalse()
+        expect(chip.hasAttribute('aria-selected')).toBeFalse()
+        expect(chip.hasAttribute('tabindex')).toBeFalse()
+      }
+
+      ChipSet.getOrCreateInstance(el, { selectable: false })
+
+      expect(el.getAttribute('role')).toEqual('group')
+      expect(el.querySelector('.chip').hasAttribute('role')).toBeFalse()
+    })
+
+    it('should keep the roles written in the markup', () => {
+      fixtureEl.innerHTML = '<div class="chip-set" role="listbox"><span class="chip" role="option">First</span></div>'
+
+      const el = fixtureEl.querySelector('.chip-set')
+      new ChipSet(el, { selectable: true }).dispose()
+
+      expect(el.getAttribute('role')).toEqual('listbox')
+      expect(el.querySelector('.chip').getAttribute('role')).toEqual('option')
+    })
+
+    it('should do nothing on a second dispose', () => {
+      const el = setMarkup(['First'])
+      const chipSet = new ChipSet(el, { removable: true })
+
+      chipSet.dispose()
+
+      expect(() => chipSet.dispose()).not.toThrow()
     })
   })
 

@@ -287,6 +287,30 @@ describe('Chip', () => {
         chipEl.querySelector('.chip-remove').click()
       })
     })
+
+    it('should not remove the chip through a remove button in the markup when it is not removable', () => {
+      fixtureEl.innerHTML = '<span class="chip">Tag<button type="button" class="chip-remove"></button></span>'
+
+      const chipEl = fixtureEl.querySelector('.chip')
+      // eslint-disable-next-line no-new
+      new Chip(chipEl, { removable: false })
+
+      chipEl.querySelector('.chip-remove').click()
+
+      expect(chipEl.isConnected).toBeTrue()
+    })
+
+    it('should not remove a disabled chip through a remove button in the markup', () => {
+      fixtureEl.innerHTML = '<span class="chip">Tag<button type="button" class="chip-remove"></button></span>'
+
+      const chipEl = fixtureEl.querySelector('.chip')
+      // eslint-disable-next-line no-new
+      new Chip(chipEl, { removable: true, disabled: true })
+
+      chipEl.querySelector('.chip-remove').click()
+
+      expect(chipEl.isConnected).toBeTrue()
+    })
   })
 
   describe('filter', () => {
@@ -871,7 +895,7 @@ describe('Chip', () => {
     })
 
     it('should remove its listeners on dispose', () => {
-      fixtureEl.innerHTML = '<span class="chip">Tag</span>'
+      fixtureEl.innerHTML = '<span class="chip">Tag<button type="button" class="chip-remove"></button></span>'
 
       const chipEl = fixtureEl.querySelector('.chip')
       const chip = new Chip(chipEl, { removable: true, selectable: true })
@@ -890,6 +914,77 @@ describe('Chip', () => {
       expect(removeSpy).not.toHaveBeenCalled()
       expect(keydownSpy).not.toHaveBeenCalled()
       expect(chipEl.isConnected).toBeTrue()
+    })
+
+    it('should remove the remove button it added on dispose', () => {
+      fixtureEl.innerHTML = '<span class="chip">Tag</span>'
+
+      const chipEl = fixtureEl.querySelector('.chip')
+      const chip = new Chip(chipEl, { removable: true })
+
+      chip.dispose()
+
+      expect(chipEl.querySelector('.chip-remove')).toBeNull()
+    })
+
+    it('should keep a remove button from the markup on dispose', () => {
+      fixtureEl.innerHTML = '<span class="chip">Tag<button type="button" class="chip-remove"></button></span>'
+
+      const chipEl = fixtureEl.querySelector('.chip')
+      const chip = new Chip(chipEl, { removable: true })
+
+      chip.dispose()
+
+      expect(chipEl.querySelector('.chip-remove')).not.toBeNull()
+    })
+
+    it('should remove the check icon it added on dispose', () => {
+      fixtureEl.innerHTML = '<span class="chip">Tag</span>'
+
+      const chipEl = fixtureEl.querySelector('.chip')
+      const chip = new Chip(chipEl, { filter: true })
+      chip.select()
+
+      chip.dispose()
+
+      expect(chipEl.querySelector('.chip-check')).toBeNull()
+    })
+
+    it('should give back the attributes and classes it added on dispose', () => {
+      fixtureEl.innerHTML = '<span class="chip">Tag</span>'
+
+      const chipEl = fixtureEl.querySelector('.chip')
+      new Chip(chipEl, { selectable: true }).dispose()
+
+      expect(chipEl.hasAttribute('role')).toBeFalse()
+      expect(chipEl.hasAttribute('tabindex')).toBeFalse()
+      expect(chipEl.hasAttribute('aria-pressed')).toBeFalse()
+      expect(chipEl.classList.contains('chip-clickable')).toBeFalse()
+
+      new Chip(chipEl, { disabled: true }).dispose()
+
+      expect(chipEl.classList.contains('disabled')).toBeFalse()
+    })
+
+    it('should keep the attributes and classes from the markup on dispose', () => {
+      fixtureEl.innerHTML = '<span class="chip chip-clickable" role="button" tabindex="-1" aria-pressed="false">Tag</span>'
+
+      const chipEl = fixtureEl.querySelector('.chip')
+      new Chip(chipEl, { selectable: true }).dispose()
+
+      expect(chipEl.getAttribute('role')).toEqual('button')
+      expect(chipEl.getAttribute('tabindex')).toEqual('-1')
+      expect(chipEl.getAttribute('aria-pressed')).toEqual('false')
+      expect(chipEl.classList.contains('chip-clickable')).toBeTrue()
+    })
+
+    it('should do nothing on a second dispose', () => {
+      fixtureEl.innerHTML = '<span class="chip">Tag</span>'
+
+      const chip = new Chip(fixtureEl.querySelector('.chip'), { removable: true })
+      chip.dispose()
+
+      expect(() => chip.dispose()).not.toThrow()
     })
   })
 
