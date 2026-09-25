@@ -385,6 +385,7 @@ Note that for security reasons the `sanitize`, `sanitizeFn`, and `allowList` opt
 | `dispose` | Destroys a component. (Removes stored data on the DOM element) |
 | `getInstance` | Static method which allows you to get the calendar instance associated to a DOM element, you can use it like this: `coreui.Calendar.getInstance(element)` |
 | `getOrCreateInstance` | Static method which returns a calendar instance associated to a DOM element or create a new one in case it wasn't initialized. You can use it like this: `coreui.Calendar.getOrCreateInstance(element)` |
+| `refresh` | Renders the calendar again with its current configuration, for example once the data a `renderDayCell` callback reads has loaded. Focus inside the calendar returns to the same date or button, or to the calendar's focusable date when that one is gone. |
 | `setConfig` | Merges the given options over the current configuration and re-renders the calendar. Options you leave out keep their current value. |
 
 ### Events
