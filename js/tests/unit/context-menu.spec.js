@@ -899,6 +899,24 @@ describe('ContextMenu', () => {
       rightClick(area)
       return done
     })
+
+    it('should put the menu in a modal dialog when its container is the body', () => {
+      fixtureEl.innerHTML = `<dialog id="host">${markup('data-coreui-container="body"')}</dialog>`
+
+      const dialog = fixtureEl.querySelector('#host')
+      const area = fixtureEl.querySelector('.area')
+      const menu = fixtureEl.querySelector('.menu')
+
+      dialog.showModal()
+
+      const done = whenShown(area, () => {
+        expect(menu.parentNode).toEqual(dialog)
+        dialog.close()
+      })
+
+      rightClick(area)
+      return done
+    })
   })
 
   describe('dispose', () => {

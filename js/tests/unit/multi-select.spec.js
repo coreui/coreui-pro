@@ -842,7 +842,7 @@ describe('MultiSelect', () => {
     })
 
     it('should put the panel in an open modal dialog instead of the body container', () => {
-      fixtureEl.innerHTML = '<dialog id="host"><select></select></dialog>'
+      fixtureEl.innerHTML = '<dialog id="host"><div><select></select></div></dialog>'
       const dialog = fixtureEl.querySelector('#host')
       const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), {
         options: [{ value: '1', text: 'Opt 1' }],

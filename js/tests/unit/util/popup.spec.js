@@ -561,16 +561,16 @@ describe('Popup', () => {
       expect(fixtureEl.querySelector('#target').firstElementChild.id).toEqual('content')
     })
 
-    it('should move the panel into an open dialog when the explicit container is outside it', () => {
+    it('should move the panel into a modal dialog when the explicit container is outside it', () => {
       const popup = buildIn([
         '<dialog id="host">',
-        '  <div id="anchor"><button id="inside">toggle</button></div>',
+        '  <div><div id="anchor"><button id="inside">toggle</button></div></div>',
         '</dialog>',
         '<div id="content">panel</div>'
       ].join(''), { container: document.body })
 
       const dialog = fixtureEl.querySelector('#host')
-      dialog.show()
+      dialog.showModal()
 
       popup.show()
 
@@ -870,13 +870,24 @@ describe('Popup', () => {
       expect(resolvePopupContainer(fixtureEl.querySelector('#anchor'), target)).toEqual(target)
     })
 
-    it('should return the open dialog instead of an explicit container outside it', () => {
+    it('should return a modal dialog instead of an explicit container outside it', () => {
+      fixtureEl.innerHTML = '<dialog id="host"><div id="anchor"></div></dialog>'
+
+      const dialog = fixtureEl.querySelector('#host')
+      dialog.showModal()
+
+      expect(resolvePopupContainer(fixtureEl.querySelector('#anchor'), document.body)).toEqual(dialog)
+
+      dialog.close()
+    })
+
+    it('should keep an explicit container outside a dialog that is not modal', () => {
       fixtureEl.innerHTML = '<dialog id="host"><div id="anchor"></div></dialog>'
 
       const dialog = fixtureEl.querySelector('#host')
       dialog.show()
 
-      expect(resolvePopupContainer(fixtureEl.querySelector('#anchor'), document.body)).toEqual(dialog)
+      expect(resolvePopupContainer(fixtureEl.querySelector('#anchor'), document.body)).toEqual(document.body)
 
       dialog.close()
     })
@@ -886,7 +897,7 @@ describe('Popup', () => {
 
       const dialog = fixtureEl.querySelector('#host')
       const target = fixtureEl.querySelector('#target')
-      dialog.show()
+      dialog.showModal()
 
       expect(resolvePopupContainer(fixtureEl.querySelector('#anchor'), target)).toEqual(target)
 

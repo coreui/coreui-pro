@@ -421,7 +421,7 @@ attributes work on the picker element too.
 | `calendarOptions` | object | `{}` | Programmatic escape hatch for calendar options. |
 | `cleaner` | boolean | `true` | Renders a button that clears the value. It appears only once the field holds one. |
 | `cleanerIcon` | string | cross SVG | Inline SVG of the generated cleaner (sanitized). Not used for a `data-coreui-picker-cleaner` you wrote. |
-| `container` | string, element, false | `false` | Teleport target for the dropdown. Inside an open dialog it goes into the dialog instead, because the rest of the page is inert while a modal dialog is open. |
+| `container` | string, element, false | `false` | Teleport target for the dropdown. Inside a modal dialog it goes into the dialog instead, because the rest of the page is inert. |
 | `date` | date, string, null | `null` | Initial value. |
 | `disabled` | boolean | `false` | Disables the field and the popup. |
 | `floatingLabel` | string, null | `null` | Renders a floating label over the field, which also becomes its accessible name. Not rendered for a `data-coreui-picker-field` you wrote, which only takes the name. |

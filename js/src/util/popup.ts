@@ -108,7 +108,7 @@ const hasConstrainingAncestor = (anchor: HTMLElement | null, boundary: HTMLEleme
 }
 
 /**
- * Picks where a panel opens, never outside an open dialog, which is modal.
+ * Picks where a panel opens; a modal dialog keeps it, since outside is inert.
  *
  * @param anchor - The element the panel opens from
  * @param explicitContainer - The configured container
@@ -118,7 +118,7 @@ const resolvePopupContainer = (anchor: HTMLElement | null, explicitContainer: HT
   const dialog = anchor?.closest('dialog[open]') as HTMLElement | null
 
   if (explicitContainer) {
-    return dialog && !dialog.contains(explicitContainer) ? dialog : explicitContainer
+    return dialog?.matches(':modal') && !dialog.contains(explicitContainer) ? dialog : explicitContainer
   }
 
   if (dialog) {

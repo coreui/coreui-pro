@@ -868,6 +868,36 @@ describe('Dropdown', () => {
       })
     })
 
+    it('should put the menu in a modal dialog when its container is the body', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<dialog id="host">',
+          '  <div class="dropdown">',
+          '    <button class="btn dropdown-toggle" data-coreui-toggle="dropdown" data-coreui-container="body">Dropdown</button>',
+          '    <div class="dropdown-menu">',
+          '      <a class="dropdown-item" href="#">Secondary link</a>',
+          '    </div>',
+          '  </div>',
+          '</dialog>'
+        ].join('')
+
+        const dialog = fixtureEl.querySelector('#host')
+        const btnDropdown = fixtureEl.querySelector('[data-coreui-toggle="dropdown"]')
+        const menuEl = fixtureEl.querySelector('.dropdown-menu')
+        const dropdown = new Dropdown(btnDropdown)
+
+        dialog.showModal()
+
+        btnDropdown.addEventListener('shown.coreui.dropdown', () => {
+          expect(menuEl.parentNode).toEqual(dialog)
+          dialog.close()
+          resolve()
+        })
+
+        dropdown.show()
+      })
+    })
+
     it('should not show a dropdown if the element is disabled', () => {
       return new Promise((resolve, reject) => {
         fixtureEl.innerHTML = [
