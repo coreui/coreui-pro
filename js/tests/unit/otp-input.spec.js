@@ -763,6 +763,95 @@ describe('OTPInput', () => {
       expect(second.readOnly).toBeFalse()
       expect(second.hasAttribute('placeholder')).toBeFalse()
     })
+
+    it('should leave what the page changed on a slot after init alone on an unrelated call', () => {
+      fixtureEl.innerHTML = `
+        <div class="form-otp">
+          <input type="text" class="form-otp-control" disabled>
+          <input type="text" class="form-otp-control">
+        </div>
+      `
+      const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'))
+      const [first, second] = fixtureEl.querySelectorAll('.form-otp-control')
+
+      first.disabled = false
+      second.disabled = true
+      second.placeholder = 'x'
+      otpInput.setConfig({ masked: true })
+
+      expect(first.disabled).toBeFalse()
+      expect(second.disabled).toBeTrue()
+      expect(second.getAttribute('placeholder')).toEqual('x')
+    })
+
+    it('should keep the markup of a slot added after init', () => {
+      fixtureEl.innerHTML = `
+        <div class="form-otp">
+          <input type="text" class="form-otp-control">
+        </div>
+      `
+      const otpElement = fixtureEl.querySelector('.form-otp')
+      const otpInput = new OTPInput(otpElement)
+
+      otpElement.insertAdjacentHTML('afterbegin', '<input type="text" class="form-otp-control" placeholder="0" readonly>')
+      otpInput.setConfig({})
+
+      const added = otpElement.querySelector('.form-otp-control')
+
+      expect(added.getAttribute('placeholder')).toEqual('0')
+      expect(added.readOnly).toBeTrue()
+    })
+  })
+
+  describe('dispose', () => {
+    const MARKUP_FOR_DISPOSE = `
+      <div class="form-otp">
+        <input type="text" class="form-otp-control">
+        <input type="text" class="form-otp-control">
+      </div>
+    `
+
+    it('should give back what the options set on the slots', () => {
+      fixtureEl.innerHTML = `
+        <div class="form-otp">
+          <input type="text" class="form-otp-control" placeholder="a">
+          <input type="text" class="form-otp-control">
+        </div>
+      `
+      const otpElement = fixtureEl.querySelector('.form-otp')
+
+      new OTPInput(otpElement, { disabled: true, placeholder: '•', readonly: true }).dispose()
+
+      const [first, second] = fixtureEl.querySelectorAll('.form-otp-control')
+
+      expect(first.disabled).toBeFalse()
+      expect(first.readOnly).toBeFalse()
+      expect(first.getAttribute('placeholder')).toEqual('a')
+      expect(second.hasAttribute('placeholder')).toBeFalse()
+    })
+
+    it('should let a new instance turn the options off after the previous one', () => {
+      fixtureEl.innerHTML = MARKUP_FOR_DISPOSE
+      const otpElement = fixtureEl.querySelector('.form-otp')
+
+      // eslint-disable-next-line no-new
+      new OTPInput(otpElement, { disabled: true })
+      const otpInput = new OTPInput(otpElement)
+      otpInput.setConfig({ disabled: false })
+
+      for (const input of fixtureEl.querySelectorAll('.form-otp-control')) {
+        expect(input.disabled).toBeFalse()
+      }
+    })
+
+    it('should do nothing on a second dispose', () => {
+      fixtureEl.innerHTML = MARKUP_FOR_DISPOSE
+      const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'), { disabled: true })
+
+      otpInput.dispose()
+
+      expect(() => otpInput.dispose()).not.toThrow()
+    })
   })
 
   describe('input behavior', () => {

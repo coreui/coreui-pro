@@ -91,19 +91,19 @@ const DefaultType = {
  */
 
 class OTPInput extends BaseComponent {
+  protected declare _disabledSlots: Set<HTMLInputElement>
   protected declare _inputElement: HTMLInputElement | null
-  protected declare _markupStates: Map<HTMLInputElement, { disabled: boolean, placeholder: string | null, readOnly: boolean }>
+  protected declare _placeholders: Map<HTMLInputElement, string | null>
+  protected declare _readOnlySlots: Set<HTMLInputElement>
 
   constructor(element?: string | Element | null, config?: Partial<OtpInputConfig> | null) {
     super(element, config)
 
     this._config = this._getConfig(config)
+    this._disabledSlots = new Set()
     this._inputElement = null
-    this._markupStates = new Map(this._getInputs().map(input => [input, {
-      disabled: input.disabled,
-      placeholder: input.getAttribute('placeholder'),
-      readOnly: input.readOnly
-    }]))
+    this._placeholders = new Map()
+    this._readOnlySlots = new Set()
 
     this._setRoleAttribute()
     this._setInputsAttributes()
@@ -139,7 +139,23 @@ class OTPInput extends BaseComponent {
   }
 
   override dispose(): void {
+    if (!this._element) {
+      return
+    }
+
     this._inputElement?.remove()
+
+    for (const input of this._disabledSlots) {
+      input.disabled = false
+    }
+
+    for (const input of this._readOnlySlots) {
+      input.readOnly = false
+    }
+
+    for (const input of this._placeholders.keys()) {
+      this._restorePlaceholder(input)
+    }
 
     super.dispose()
   }
@@ -449,15 +465,15 @@ class OTPInput extends BaseComponent {
       input.spellcheck = false
       input.enterKeyHint = index === inputs.length - 1 ? 'done' : 'next'
 
-      const markup = this._markupStates.get(input)
-
       if (this._config.placeholder !== null) {
+        if (!this._placeholders.has(input)) {
+          this._placeholders.set(input, input.getAttribute('placeholder'))
+        }
+
         const placeholder = String(this._config.placeholder)
         input.placeholder = placeholder.length > 1 ? placeholder[index] || '' : placeholder
-      } else if (typeof markup?.placeholder === 'string') {
-        input.placeholder = markup.placeholder
-      } else {
-        input.removeAttribute('placeholder')
+      } else if (this._placeholders.has(input)) {
+        this._restorePlaceholder(input)
       }
 
       input.required = this._config.required
@@ -475,13 +491,13 @@ class OTPInput extends BaseComponent {
         }
       }
 
-      input.disabled = this._config.disabled || Boolean(markup?.disabled)
+      this._setSlotFlag(input, 'disabled', this._config.disabled, this._disabledSlots)
 
       if (this._config.id && !input.id) {
         input.id = `${this._config.id}-${index}`
       }
 
-      input.readOnly = this._config.readonly || Boolean(markup?.readOnly)
+      this._setSlotFlag(input, 'readOnly', this._config.readonly, this._readOnlySlots)
 
       if (typeof this._config.ariaLabel === 'function') {
         const ariaLabel = this._config.ariaLabel(index, inputs.length)
@@ -490,6 +506,27 @@ class OTPInput extends BaseComponent {
     }
 
     this._syncFirstInputMaxLength()
+  }
+
+  _setSlotFlag(input: HTMLInputElement, flag: 'disabled' | 'readOnly', on: boolean, slots: Set<HTMLInputElement>): void {
+    if (on && !input[flag]) {
+      input[flag] = true
+      slots.add(input)
+    } else if (!on && slots.delete(input)) {
+      input[flag] = false
+    }
+  }
+
+  _restorePlaceholder(input: HTMLInputElement): void {
+    const placeholder = this._placeholders.get(input)
+
+    if (typeof placeholder === 'string') {
+      input.placeholder = placeholder
+    } else {
+      input.removeAttribute('placeholder')
+    }
+
+    this._placeholders.delete(input)
   }
 
   _setInputsTabIndexes(): void {
