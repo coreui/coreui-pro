@@ -12,6 +12,7 @@ import {
   getDaysInMonth,
   getDateWithin,
   getDaySectionMax,
+  getFormatMonthNames,
   getFullYearFromSection,
   getHourCycle,
   getIncrementedSectionValue,
@@ -232,11 +233,27 @@ describe('Date Sections Utilities', () => {
     })
   })
 
+  describe('getFormatMonthNames', () => {
+    it('should list the month names in the form used inside a date', () => {
+      expect(getFormatMonthNames('pl-PL', 'long')[6]).toBe('lipca')
+    })
+
+    it('should list Gregorian month names for a calendar without Gregorian months', () => {
+      expect(getFormatMonthNames('fa-IR', 'long')[0]).toMatch(/^ژانویه/)
+    })
+  })
+
   describe('getSectionsFromLocale', () => {
     it('should derive month-first sections for en-US', () => {
       const sections = getSectionsFromLocale('en-US')
 
       expect(sections.map(section => section.type)).toEqual(['month', 'literal', 'day', 'literal', 'year'])
+    })
+
+    it('should lay out the Gregorian fields for a calendar with other months or eras', () => {
+      expect(getSectionsFromLocale('zh-CN-u-ca-chinese').map(section => section.type)).toEqual(['year', 'literal', 'month', 'literal', 'day'])
+      expect(formatSections(setSectionsFromDate(getSectionsFromLocale('ja-JP-u-ca-japanese'), new Date(2026, 8, 1)))).toBe('2026/09/01')
+      expect(formatSections(setSectionsFromDate(getSectionsFromLocale('zh-TW-u-ca-roc'), new Date(2026, 8, 1)))).toBe('2026/09/01')
     })
 
     it('should derive day-first sections for pl-PL', () => {

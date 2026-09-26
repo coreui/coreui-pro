@@ -469,6 +469,13 @@ describe('DateInput', () => {
       expect(month.textContent).toEqual('April')
     })
 
+    it('should name the month of a Persian-locale date in the Gregorian calendar', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 8, 1), locale: 'fa-IR' })
+      const month = dateInput._element.querySelector('[data-coreui-section="month"]')
+
+      expect(month.getAttribute('aria-valuetext')).toEqual('سپتامبر')
+    })
+
     it('should display and match custom month names', () => {
       const monthNames = ['styczeń', 'luty', 'marzec', 'kwiecień', 'maj', 'czerwiec', 'lipiec', 'sierpień', 'wrzesień', 'październik', 'listopad', 'grudzień']
       const dateInput = createDateInput({ format: 'DD MMMM YYYY', locale: 'pl-PL', monthNames })

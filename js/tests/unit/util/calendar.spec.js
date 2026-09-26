@@ -5,6 +5,7 @@ import {
   convertIsoWeekToDate,
   convertToDateObject,
   createDateFormatter,
+  createDateTimeFormat,
   createGroupsInArray,
   formatYearsRange,
   getCalendarDate,
@@ -79,6 +80,10 @@ describe('Calendar Utilities', () => {
     it.each([null, undefined])('should return null for %s', value => {
       expect(convertToDateObject(value, 'day')).toBeNull()
       expect(convertToDateObject(value, 'week')).toBeNull()
+    })
+
+    it('should read a date in Gregorian numbers for a locale whose calendar has other months', () => {
+      expect(convertToDateObject('01.09.2026', 'day', 'he-IL-u-ca-hebrew').toDateString()).toBe(new Date(2026, 8, 1).toDateString())
     })
 
     it('should return the same Date object if date is already a Date', () => {
@@ -296,6 +301,28 @@ describe('Calendar Utilities', () => {
     })
   })
 
+  describe('createDateTimeFormat', () => {
+    it('should write a calendar without Gregorian months in the Gregorian calendar', () => {
+      for (const locale of ['fa-IR', 'ar-SA-u-ca-islamic-umalqura', 'he-IL-u-ca-hebrew', 'zh-CN-u-ca-chinese']) {
+        expect(createDateTimeFormat(locale, { day: 'numeric' }).resolvedOptions().calendar).toBe('gregory')
+      }
+
+      expect(createDateTimeFormat('fa-IR', { day: 'numeric' }).format(new Date(2026, 8, 1))).toBe('۱')
+      expect(getMonthsNames('fa-IR', 'long')[0]).toBe('ژانویه')
+      expect(createDateFormatter()(new Date(2026, 8, 1), 'fa-IR', { day: 'numeric' })).toBe('۱')
+    })
+
+    it('should keep a calendar that shares the Gregorian months', () => {
+      expect(createDateTimeFormat('th-TH').resolvedOptions().calendar).toBe('buddhist')
+      expect(createDateTimeFormat('ja-JP-u-ca-japanese').resolvedOptions().calendar).toBe('japanese')
+      expect(createDateTimeFormat('en-US').resolvedOptions().calendar).toBe('gregory')
+    })
+
+    it('should keep an explicit calendar option', () => {
+      expect(createDateTimeFormat('en-US', { calendar: 'hebrew' }).resolvedOptions().calendar).toBe('hebrew')
+    })
+  })
+
   describe('createDateFormatter', () => {
     it('should write a date the way Intl.DateTimeFormat does', () => {
       const format = createDateFormatter()
@@ -354,9 +381,9 @@ describe('Calendar Utilities', () => {
       expect(formatYearsRange(2036, 'pl-PL')).toBe('2030–2041')
     })
 
-    it('should write the range in the locale digits and calendar', () => {
+    it('should write the range in the locale digits', () => {
       expect(formatYearsRange(2026, 'ar-EG')).toBe('٢٠٢٠–٢٠٣١')
-      expect(formatYearsRange(2026, 'fa-IR')).toBe('\u2067۱۳۹۸ تا ۱۴۰۹\u2069')
+      expect(formatYearsRange(2026, 'fa-IR')).toBe('\u2067۲۰۲۰ تا ۲۰۳۱\u2069')
     })
 
     it('should isolate only a range whose connective is written right to left', () => {

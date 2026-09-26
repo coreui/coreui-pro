@@ -1224,7 +1224,7 @@ removed in favour of `$translucent-opacity` and
 - In the years view the navigation names the page it shows, `2020 – 2031`,
   instead of the one year the page is built around, so turning a page is
   announced as the new range. The grid label and the navigation write the range
-  in the locale's own digits and calendar.
+  in the locale's own digits.
 - In the years view the double arrows and `Page Down` / `Page Up` turn the
   calendar by the twelve years a page shows instead of ten, so a turn no longer
   repeats two years of the previous page.
@@ -1234,6 +1234,14 @@ removed in favour of `$translucent-opacity` and
   instead of the year labels, which stay on the days, months and quarters
   views. A page that translates `ariaNavNextYearLabel` / `ariaNavPrevYearLabel`
   needs to translate these two as well.
+- A locale whose own calendar has different months (Persian by default in
+  `fa-IR`, or an Islamic, Hebrew or Chinese calendar asked for with `-u-ca-`)
+  now shows the calendar in the Gregorian calendar, in its own language and
+  digits. The grid was always Gregorian, so `fa-IR` used to show September 1,
+  2026 as the 10th of Shahrivar 1405 and name the January cell Dey. Calendars
+  that share the Gregorian months, such as Thai Buddhist or Japanese, keep
+  their year numbering in the calendar. The date field lays out and reads
+  Gregorian numbers for every locale, without the locale's era.
 - **Additive:** `startDateChange` and `endDateChange` now carry a `dateObject`
   property with the underlying `Date`, alongside the existing `date` property.
   `date` remains formatted per `selectionType` — a `Date` for day selection, but

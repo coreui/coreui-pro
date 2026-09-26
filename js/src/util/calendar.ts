@@ -95,6 +95,8 @@ const getMondayOfISOWeek = (year: number, week: number) : Date => {
 
 const ARROW_KEYS = new Set(['ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowUp'])
 
+const GREGORIAN_MONTH_CALENDARS = new Set(['buddhist', 'gregory', 'iso8601', 'japanese', 'roc'])
+
 const MONTHS_IN_PERIOD: Record<PeriodViewTypes, number> = {
   months: 1,
   quarters: 3,
@@ -311,8 +313,8 @@ const generateDatePatterns = (locale: string, includeTime: boolean) : string[] =
 
   try {
     const standardFormat = includeTime ?
-      referenceDate.toLocaleString(locale) :
-      referenceDate.toLocaleDateString(locale)
+      referenceDate.toLocaleString(locale, { calendar: 'gregory' }) :
+      referenceDate.toLocaleDateString(locale, { calendar: 'gregory' })
 
     patterns.push(standardFormat)
   } catch {
@@ -726,6 +728,23 @@ export const getDateBySelectionType = (date: Date | null, selectionType: Selecti
 }
 
 /**
+ * Builds an `Intl.DateTimeFormat` in the locale's calendar when that calendar
+ * shares the Gregorian months, and in the Gregorian calendar, still in the
+ * locale's language and digits, when it does not (Persian, Islamic, Hebrew,
+ * Chinese), because the calendar grid is Gregorian. An explicit `calendar`
+ * option is kept.
+ *
+ * @param locale - The locale to write in
+ * @param options - The formatting options
+ * @returns The formatter
+ */
+export const createDateTimeFormat = (locale?: string, options?: Intl.DateTimeFormatOptions) : Intl.DateTimeFormat => {
+  const formatter = new Intl.DateTimeFormat(locale, options)
+
+  return options?.calendar || GREGORIAN_MONTH_CALENDARS.has(formatter.resolvedOptions().calendar) ? formatter : new Intl.DateTimeFormat(locale, { ...options, calendar: 'gregory' })
+}
+
+/**
  * Lists a locale's month names.
  *
  * @param locale - The locale to use
@@ -733,7 +752,7 @@ export const getDateBySelectionType = (date: Date | null, selectionType: Selecti
  * @returns The twelve month names
  */
 export const getMonthsNames = (locale: string, format: 'long' | 'narrow' | 'short' | 'numeric' | '2-digit' = 'short') : string[] => {
-  const formatter = new Intl.DateTimeFormat(locale, { month: format })
+  const formatter = createDateTimeFormat(locale, { month: format })
   return Array.from({ length: 12 }, (_, i) => formatter.format(new Date(2000, i, 1)))
 }
 
@@ -755,7 +774,7 @@ export const createDateFormatter = (): ((date: Date, locale?: string, options?: 
     let formatter = formatters.get(key)
 
     if (!formatter) {
-      formatter = new Intl.DateTimeFormat(locale, options)
+      formatter = createDateTimeFormat(locale, options)
       formatters.set(key, formatter)
     }
 
@@ -776,10 +795,10 @@ export const getYears = (year: number, range: number = YEARS_PER_PAGE / 2) : num
 }
 
 /**
- * Names the page of a years view as one range, written in the locale's own
- * digits and calendar. A range whose connective is written in a right-to-left
- * script is wrapped in a right-to-left isolate, so it reads in order inside a
- * left-to-right calendar too.
+ * Names the page of a years view as one range, written like the calendar's
+ * other dates (see `createDateTimeFormat`). A range whose connective is
+ * written in a right-to-left script is wrapped in a right-to-left isolate, so
+ * it reads in order inside a left-to-right calendar too.
  *
  * @param year - The year the page is built around
  * @param locale - The locale to write the range in
@@ -788,7 +807,7 @@ export const getYears = (year: number, range: number = YEARS_PER_PAGE / 2) : num
 export const formatYearsRange = (year: number, locale?: string) : string => {
   const years = getYears(year)
   const [start, end] = [years[0], years.at(-1) as number].map(value => new Date(new Date(2000, 0, 1).setFullYear(value)))
-  const range = new Intl.DateTimeFormat(locale, { year: 'numeric' }).formatRange(start, end)
+  const range = createDateTimeFormat(locale, { year: 'numeric' }).formatRange(start, end)
 
   return /(?!\p{Nd})[\u0590-\u08FF]/u.test(range) ? `\u2067${range}\u2069` : range
 }
