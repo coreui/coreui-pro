@@ -469,6 +469,21 @@ describe('DateRangePicker', () => {
       expect(el.classList.contains('show')).toBeTrue()
       expect(hidden).not.toHaveBeenCalled()
     })
+
+    it('should disable the indicator button when the picker is disabled', () => {
+      buildPicker({ disabled: true })
+
+      const indicator = fixtureEl.querySelector('.form-control-action')
+      expect(indicator.disabled).toBeTrue()
+    })
+
+    it('should not open when disabled', () => {
+      const picker = buildPicker({ disabled: true })
+
+      picker.show()
+
+      expect(picker._popup.isShown).toBeFalse()
+    })
   })
 
   describe('picker toggle', () => {
