@@ -91,6 +91,14 @@ describe('DatePicker', () => {
       expect(new Date(document.activeElement.dataset.coreuiDate).getDate()).toEqual(10)
     })
 
+    it('should land on the row of today in week selection', () => {
+      const picker = buildPicker({ selectionType: 'week' })
+      picker.show()
+
+      expect(document.activeElement.tagName).toEqual('TR')
+      expect(document.activeElement.querySelector('[aria-current="date"]')).not.toBeNull()
+    })
+
     it('should pass over today when today cannot be picked', () => {
       const picker = buildPicker({ disabledDates: [new Date()] })
       picker.show()
