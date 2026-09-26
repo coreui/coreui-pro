@@ -186,6 +186,14 @@ describe('DateRangePicker', () => {
   })
 
   describe('selection types', () => {
+    it('should open a week range on the row of today', () => {
+      const picker = buildPicker({ selectionType: 'week' })
+      picker.show()
+
+      expect(document.activeElement.tagName).toEqual('TR')
+      expect(document.activeElement.querySelector('[aria-current="date"]')).not.toBeNull()
+    })
+
     it('should mask a week range like the native week input', () => {
       buildPicker({
         locale: 'en-US',

@@ -441,6 +441,7 @@ class Popup extends Config {
 
     const entry =
       SelectorEngine.findOne('[aria-selected="true"]', this._content) as HTMLElement | null ??
+      (today?.closest('[data-coreui-selectable]') as HTMLElement | null) ??
       (today?.closest('[tabindex]') as HTMLElement | null) ??
       SelectorEngine.findOne('[tabindex="0"]', this._content) as HTMLElement | null ??
       SelectorEngine.focusableChildren(this._content)[0]
