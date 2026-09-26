@@ -348,7 +348,11 @@ abstract class SectionInput extends BaseComponent {
     })
 
     EventHandler.on(this._element, eventName('focusin'), SELECTOR_SECTION, (event: any) => {
-      this._draft = ''
+      if (this._draft) {
+        this._draft = ''
+        this._commitSections()
+      }
+
       this._setTabIndexes(event.target)
       this._selectSectionContent(event.target)
     })
@@ -553,6 +557,8 @@ abstract class SectionInput extends BaseComponent {
       return
     }
 
+    this._draft = ''
+
     const sections = this._config.inputDateParse ? null : getSectionsFromString(text, this._sections)
 
     if (sections) {
@@ -602,7 +608,7 @@ abstract class SectionInput extends BaseComponent {
 
   _applyValidationState(): Date | null {
     for (const section of this._sections) {
-      if ((section.type === 'day' || section.type === 'week') && section.value !== null && section.value > this._getSectionMax(section)) {
+      if (!this._draft && (section.type === 'day' || section.type === 'week') && section.value !== null && section.value > this._getSectionMax(section)) {
         section.value = this._getSectionMax(section)
         this._syncSections()
       }

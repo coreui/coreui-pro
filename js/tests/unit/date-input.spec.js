@@ -683,6 +683,62 @@ describe('DateInput', () => {
       expect(dateInput.getDate()).toEqual(new Date(2026, 1, 28))
     })
 
+    it('should keep the 29th of February while the year is typed digit by digit', () => {
+      const dateInput = createDateInput({ date: new Date(2024, 1, 29) })
+      const [day, , year] = getSections(dateInput._element)
+
+      year.focus()
+
+      for (const digit of '2024') {
+        pressKey(year, digit)
+      }
+
+      expect(day.textContent).toEqual('29')
+      expect(dateInput.getDate()).toEqual(new Date(2024, 1, 29))
+    })
+
+    it('should keep week 53 while the year is typed digit by digit', () => {
+      const dateInput = createDateInput({ format: "'Week' ww, yyyy" })
+      const [week, year] = getSections(dateInput._element)
+
+      week.focus()
+      pressKey(week, '5')
+      pressKey(week, '3')
+
+      for (const digit of '2026') {
+        pressKey(year, digit)
+      }
+
+      expect(week.textContent).toEqual('53')
+      expect(dateInput.getDate()).toEqual(new Date(2026, 11, 28))
+    })
+
+    it('should cut the day to a year left unfinished when focus moves on', () => {
+      const dateInput = createDateInput({ date: new Date(2024, 1, 29) })
+      const [day, , year] = getSections(dateInput._element)
+
+      year.focus()
+      pressKey(year, '2')
+      pressKey(year, '0')
+      pressKey(year, '2')
+      day.focus()
+
+      expect(day.textContent).toEqual('28')
+    })
+
+    it('should cut the day to a year left unfinished when focus leaves the field', () => {
+      const dateInput = createDateInput({ date: new Date(2024, 1, 29) })
+      const [day, , year] = getSections(dateInput._element)
+
+      year.focus()
+      pressKey(year, '2')
+      pressKey(year, '0')
+      pressKey(year, '2')
+      year.blur()
+
+      expect(day.textContent).toEqual('28')
+    })
+
     it('should clear the section with Delete', () => {
       const dateInput = createDateInput({ date: new Date(2026, 6, 14) })
       const [day] = getSections(dateInput._element)
@@ -838,6 +894,18 @@ describe('DateInput', () => {
       expect(month.textContent).toEqual('MM')
       expect(year.textContent).toEqual('YYYY')
     })
+
+    it('should type a two-digit day after select all from another section', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 6, 14) })
+      const [day, , year] = getSections(dateInput._element)
+
+      year.focus()
+      pressKey(year, 'a', { ctrlKey: true })
+      pressKey(year, '2')
+      pressKey(day, '5')
+
+      expect(day.textContent).toEqual('25')
+    })
   })
 
   describe('paste', () => {
@@ -854,6 +922,17 @@ describe('DateInput', () => {
       paste(day, '14.07.2026')
 
       expect(dateInput.getDate()).toEqual(new Date(2026, 6, 14))
+    })
+
+    it('should cut the day of a pasted date while the year is being typed', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 6, 14) })
+      const [day, , year] = getSections(dateInput._element)
+
+      year.focus()
+      pressKey(year, '2')
+      paste(year, '31.02.2026')
+
+      expect(day.textContent).toEqual('28')
     })
 
     it('should use inputDateParse when provided', () => {
