@@ -1,5 +1,5 @@
 
-import { onTestFinished } from 'vitest'
+import { onTestFinished, vi } from 'vitest'
 import { cdp } from 'vitest/browser'
 import Calendar from '../../src/calendar.js'
 import {
@@ -3528,6 +3528,52 @@ describe('Calendar', () => {
 
       expect(attrs.className).toContain('today')
     })
+
+    it('should mark today only in its own month, for the renderer as well', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div)
+      const attrs = calendar._cellDayAttributes(new Date(), 'next')
+
+      expect(attrs.className).not.toContain('today')
+      expect(attrs.ariaCurrent).toBeFalse()
+      expect(attrs.meta.isToday).toBeFalse()
+    })
+
+    for (const selectionType of ['day', 'week']) {
+      it(`should mark one cell as today when today also fills the next calendar in ${selectionType} selection`, () => {
+        vi.useFakeTimers({ toFake: ['Date'] })
+        vi.setSystemTime(new Date(2026, 8, 30))
+        onTestFinished(() => vi.useRealTimers())
+        fixtureEl.innerHTML = '<div></div>'
+
+        const div = fixtureEl.querySelector('div')
+        const metas = []
+        const calendar = new Calendar(div, {
+          calendarDate: new Date(2026, 8, 1),
+          calendars: 2,
+          firstDayOfWeek: 1,
+          renderDayCell(date, meta) {
+            if (date.toDateString() === new Date(2026, 8, 30).toDateString()) {
+              metas.push(meta)
+            }
+
+            return String(date.getDate())
+          },
+          selectionType
+        })
+
+        expect(calendar._view).toBe('days')
+        expect(metas.map(({ isInCurrentMonth, isToday }) => ({ isInCurrentMonth, isToday }))).toEqual([
+          { isInCurrentMonth: true, isToday: true },
+          { isInCurrentMonth: false, isToday: false }
+        ])
+        expect(metas[1]).toEqual(jasmine.objectContaining({ isDisabled: false, isInRange: false, isSelected: false }))
+        expect(div.querySelectorAll('[aria-current="date"]')).toHaveSize(1)
+        expect(div.querySelectorAll('.calendar-cell.today')).toHaveSize(1)
+      })
+    }
 
     it('should not mark as selectable non-day selectionType in days view', () => {
       fixtureEl.innerHTML = '<div></div>'
