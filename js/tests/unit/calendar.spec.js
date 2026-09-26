@@ -791,6 +791,62 @@ describe('Calendar', () => {
 
       expect(div.querySelector('.calendar-cell-inner.day').textContent).toMatch(/^en-US:\d+$/)
     })
+
+    it('should name a day cell with its full date', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, { calendarDate: new Date(2026, 7, 1), locale: 'en-US' })
+      const cell = div.querySelector(`[data-coreui-date="${new Date(2026, 7, 12).toDateString()}"]`)
+
+      expect(calendar._view).toBe('days')
+      expect(cell.getAttribute('aria-label')).toEqual('Wednesday, August 12, 2026')
+    })
+
+    it('should name a week row by the days it spans in week selection', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, {
+        calendarDate: new Date(2026, 7, 1), firstDayOfWeek: 1, locale: 'en-US', selectionType: 'week', showWeekNumber: true
+      })
+      const cell = div.querySelector(`[data-coreui-date="${new Date(2026, 7, 12).toDateString()}"]`)
+
+      expect(calendar._view).toBe('days')
+      expect(cell.closest('tr').getAttribute('aria-label')).toMatch(/^August 10\s–\s16, 2026$/)
+      expect(cell.getAttribute('aria-label')).toEqual('Wednesday, August 12, 2026')
+    })
+
+    it('should not name the rows when days are selected', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, { calendarDate: new Date(2026, 7, 1), locale: 'en-US' })
+
+      expect(calendar._view).toBe('days')
+      expect(div.querySelectorAll('tbody tr[aria-label]')).toHaveSize(0)
+    })
+
+    it('should leave a cell drawn by a render callback to its content and pass the full name as meta.label', () => {
+      fixtureEl.innerHTML = '<div><div id="days"></div><div id="months"></div></div>'
+
+      const days = fixtureEl.querySelector('#days')
+      const months = fixtureEl.querySelector('#months')
+      const renderDayCell = (date, meta) => `${date.getDate()}<span class="visually-hidden">${meta.label}</span>`
+      const calendar = new Calendar(days, { calendarDate: new Date(2026, 7, 1), locale: 'en-US', renderDayCell })
+      const cell = days.querySelector(`[data-coreui-date="${new Date(2026, 7, 12).toDateString()}"]`)
+
+      expect(calendar._view).toBe('days')
+      expect(cell.hasAttribute('aria-label')).toBeFalse()
+      expect(cell.querySelector('.visually-hidden').textContent).toEqual('Wednesday, August 12, 2026')
+
+      const monthCalendar = new Calendar(months, {
+        calendarDate: new Date(2026, 7, 1), locale: 'en-US', renderMonthCell: (date, meta) => meta.label, selectionType: 'month'
+      })
+
+      expect(monthCalendar._view).toBe('months')
+      expect(months.querySelector('.calendar-cell').textContent).toEqual('January 2026')
+    })
   })
 
   describe('renderMonthCell', () => {
