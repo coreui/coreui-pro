@@ -3575,6 +3575,39 @@ describe('Calendar', () => {
       })
     }
 
+    for (const [selectionType, adjacentInRange] of [['day', false], ['week', true]]) {
+      it(`should give a renderer isInRange where the range is drawn in ${selectionType} selection`, () => {
+        fixtureEl.innerHTML = '<div></div>'
+
+        const div = fixtureEl.querySelector('div')
+        const metas = []
+        const calendar = new Calendar(div, {
+          calendarDate: new Date(2026, 8, 1),
+          calendars: 2,
+          endDate: new Date(2026, 9, 12),
+          firstDayOfWeek: 1,
+          range: true,
+          renderDayCell(date, meta) {
+            if (date.toDateString() === new Date(2026, 9, 1).toDateString()) {
+              metas.push(meta)
+            }
+
+            return String(date.getDate())
+          },
+          selectionType,
+          startDate: new Date(2026, 8, 21)
+        })
+        const adjacent = div.querySelector(`td.next[data-coreui-date="${new Date(2026, 9, 1).toDateString()}"]`)
+
+        expect(calendar._view).toBe('days')
+        expect(metas.map(({ isInCurrentMonth, isInRange }) => ({ isInCurrentMonth, isInRange }))).toEqual([
+          { isInCurrentMonth: false, isInRange: adjacentInRange },
+          { isInCurrentMonth: true, isInRange: true }
+        ])
+        expect(adjacent.classList.contains('range') || adjacent.closest('tr').classList.contains('range')).toBe(adjacentInRange)
+      })
+    }
+
     it('should not mark as selectable non-day selectionType in days view', () => {
       fixtureEl.innerHTML = '<div></div>'
 
