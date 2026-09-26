@@ -735,7 +735,7 @@ abstract class SectionInput extends BaseComponent {
       sectionElement.textContent = formatSectionValue(section, placeholder)
       sectionElement.classList.toggle(CLASS_NAME_SECTION_EMPTY, section.value === null)
 
-      if (section.type === 'day') {
+      if (section.type === 'day' || section.type === 'week') {
         sectionElement.setAttribute('aria-valuemax', String(this._getSectionMax(section)))
       }
 
