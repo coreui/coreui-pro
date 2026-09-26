@@ -642,6 +642,36 @@ describe('DateInput', () => {
       expect(day.getAttribute('aria-valuemax')).toEqual('28')
     })
 
+    it('should bound the week section by the ISO weeks of the year', () => {
+      const dateInput = createDateInput({ date: new Date(2025, 6, 4), format: 'yyyy-Www' })
+      const [year, week] = getSections(dateInput._element)
+
+      expect(week.getAttribute('aria-valuemax')).toEqual('52')
+
+      year.focus()
+      pressKey(year, 'ArrowUp')
+      expect(week.getAttribute('aria-valuemax')).toEqual('53')
+
+      pressKey(year, 'Backspace')
+      expect(week.getAttribute('aria-valuemax')).toEqual('53')
+    })
+
+    it('should keep a typed week within the ISO weeks of the year', () => {
+      const dateInput = createDateInput({ date: new Date(2025, 6, 4), format: 'yyyy-Www' })
+      const [, week] = getSections(dateInput._element)
+
+      week.focus()
+      pressKey(week, '5')
+      pressKey(week, '3')
+      expect(week.textContent).toEqual('03')
+
+      const lastWeek = getSections(createDateInput({ date: new Date(2025, 11, 22), format: 'yyyy-Www' })._element)[1]
+
+      lastWeek.focus()
+      pressKey(lastWeek, 'ArrowUp')
+      expect(lastWeek.textContent).toEqual('01')
+    })
+
     it('should clamp the day when the month changes', () => {
       const dateInput = createDateInput({ date: new Date(2026, 0, 31) })
       const [day, month] = getSections(dateInput._element)
