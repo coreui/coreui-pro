@@ -768,6 +768,31 @@ export const formatSectionValue = (section: EditableSection, placeholder = ''): 
 }
 
 /**
+ * Writes what a section announces as its value: `Empty` without a value, the
+ * name of the value in a text section, the Gregorian month name for a numeric
+ * month, the full year for a year, else the number.
+ *
+ * @param section - The section to announce
+ * @param locale - The locale the field is written in
+ * @returns The value text, e.g. `Empty`, `September`, `PM` or `2026`
+ */
+export const getSectionValueText = (section: EditableSection, locale?: string): string => {
+  if (section.value === null) {
+    return 'Empty'
+  }
+
+  if (section.names) {
+    return section.names[section.value - 1]
+  }
+
+  if (section.type === 'month' && section.value > 0) {
+    return new Intl.DateTimeFormat(locale, { calendar: 'gregory', month: 'long' }).format(new Date(2000, section.value - 1, 15))
+  }
+
+  return String(section.type === 'year' ? getFullYearFromSection(section) : section.value)
+}
+
+/**
  * Writes the sections and literals as the masked text of a field.
  *
  * @param sections - The sections and literals of a field

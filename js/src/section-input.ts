@@ -25,6 +25,7 @@ import {
   getSectionBounds,
   getSectionLayout,
   getSectionsFromString,
+  getSectionValueText,
   getWeekSectionMax,
   isEditableSection,
   setSectionsFromDate
@@ -213,7 +214,6 @@ abstract class SectionInput extends BaseComponent {
   protected declare _hostNodes: ChildNode[]
   protected declare _hostRole: string | null
   protected declare _inputElement: HTMLInputElement | null
-  protected declare _monthFormatter: Intl.DateTimeFormat
   protected declare _form: HTMLFormElement | null
   protected declare _initialDate: Date | null
   protected declare _resetHandler: () => void
@@ -330,7 +330,6 @@ abstract class SectionInput extends BaseComponent {
     this._maxDate = this._convertDate(maxDate)
     this._sections = setSectionsFromDate(sections, date ? this._convertDate(date) : null)
     this._draft = ''
-    this._monthFormatter = new Intl.DateTimeFormat(locale, { calendar: 'gregory', month: 'long' })
   }
 
   _addEventListeners(): void {
@@ -740,28 +739,14 @@ abstract class SectionInput extends BaseComponent {
         sectionElement.setAttribute('aria-valuemax', String(this._getSectionMax(section)))
       }
 
+      sectionElement.setAttribute('aria-valuetext', getSectionValueText(section, this._config.locale))
+
       if (section.value === null) {
         sectionElement.removeAttribute('aria-valuenow')
-        sectionElement.setAttribute('aria-valuetext', 'Empty')
-        continue
+      } else {
+        sectionElement.setAttribute('aria-valuenow', String(section.type === 'year' ? getFullYearFromSection(section) : section.value))
       }
-
-      const value = section.type === 'year' ? getFullYearFromSection(section)! : section.value
-      sectionElement.setAttribute('aria-valuenow', String(value))
-      sectionElement.setAttribute('aria-valuetext', this._getSectionValueText(section, value))
     }
-  }
-
-  _getSectionValueText(section: EditableSection, value: number): string {
-    if (section.names) {
-      return section.names[value - 1]
-    }
-
-    if (section.type === 'month') {
-      return this._monthFormatter.format(new Date(2000, value - 1, 1))
-    }
-
-    return String(value)
   }
 
   _setTabIndexes(activeElement: HTMLElement | null = null): void {

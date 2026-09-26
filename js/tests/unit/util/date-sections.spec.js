@@ -23,6 +23,7 @@ import {
   getSectionsFromFormat,
   getSectionsFromLocale,
   getSectionsFromString,
+  getSectionValueText,
   getTimeSectionsFromLocale,
   getWeekLabel,
   getWeekSectionMax,
@@ -644,6 +645,43 @@ describe('Date Sections Utilities', () => {
       const section = getSectionsFromFormat('MMMM', 'en-US')[0]
 
       expect(formatSectionValue({ ...section, value: 7 })).toBe('July')
+    })
+  })
+
+  describe('getSectionValueText', () => {
+    it('should announce an empty section as Empty', () => {
+      expect(getSectionValueText({
+        type: 'day', length: 2, padded: true, value: null
+      }, 'en-US')).toBe('Empty')
+    })
+
+    it('should announce a numeric month by its name in the locale', () => {
+      const [month] = getSectionsFromFormat('MM', 'en-US')
+
+      expect(getSectionValueText({ ...month, value: 9 }, 'en-US')).toBe('September')
+      expect(getSectionValueText({ ...month, value: 7 }, 'pl-PL')).toBe('lipiec')
+      expect(getSectionValueText({ ...month, value: 9 }, 'fa-IR')).toBe('سپتامبر')
+    })
+
+    it('should announce the leading zero of a month being typed as a number', () => {
+      const [month] = getSectionsFromFormat('MM', 'en-US')
+
+      expect(getSectionValueText({ ...month, value: 0 }, 'en-US')).toBe('0')
+    })
+
+    it('should announce a text section by the name of its value', () => {
+      const [meridiem] = getSectionsFromFormat('a', 'en-US')
+
+      expect(getSectionValueText({ ...meridiem, value: 2 }, 'en-US')).toBe('PM')
+    })
+
+    it('should announce a year in full and any other section by its number', () => {
+      expect(getSectionValueText({
+        type: 'year', length: 2, padded: true, value: 26
+      }, 'en-US')).toBe('2026')
+      expect(getSectionValueText({
+        type: 'day', length: 2, padded: true, value: 4
+      }, 'en-US')).toBe('4')
     })
   })
 
