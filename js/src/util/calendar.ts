@@ -97,6 +97,14 @@ const ARROW_KEYS = new Set(['ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowUp'])
 
 const GREGORIAN_MONTH_CALENDARS = new Set(['buddhist', 'gregory', 'iso8601', 'japanese', 'roc'])
 
+const CELL_NAME_FORMATS: Record<Exclude<ViewTypes, 'quarters'>, Intl.DateTimeFormatOptions> = {
+  days: {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+  },
+  months: { month: 'long', year: 'numeric' },
+  years: { year: 'numeric' }
+}
+
 const MONTHS_IN_PERIOD: Record<PeriodViewTypes, number> = {
   months: 1,
   quarters: 3,
@@ -811,6 +819,29 @@ export const formatYearsRange = (year: number, locale?: string) : string => {
 
   return /(?!\p{Nd})[\u0590-\u08FF]/u.test(range) ? `\u2067${range}\u2069` : range
 }
+
+/**
+ * Names a calendar cell in full: the date with its weekday in the days view,
+ * then the month and year, the quarter and year, or the year.
+ *
+ * @param date - The first day the cell stands for
+ * @param view - The view the cell belongs to
+ * @param format - Writes a date with the given `Intl.DateTimeFormat` options in the calendar's locale
+ * @returns The name, e.g. `Wednesday, August 12, 2026`, `August 2026`, `Q3 2026` or `2026`
+ */
+export const formatCellName = (date: Date, view: ViewTypes, format: (date: Date, options: Intl.DateTimeFormatOptions) => string) : string =>
+  view === 'quarters' ? `Q${Math.floor(date.getMonth() / 3) + 1} ${format(date, { year: 'numeric' })}` : format(date, CELL_NAME_FORMATS[view])
+
+/**
+ * Names a week row of the days view by the days it spans, written like the
+ * calendar's other dates (see `createDateTimeFormat`).
+ *
+ * @param days - The days of the row, as `getMonthDetails` lists them
+ * @param locale - The locale to write the range in
+ * @returns The first and the last day of the week, e.g. `July 27 – August 2, 2026`
+ */
+export const formatWeekName = (days: { date: Date }[], locale?: string) : string =>
+  createDateTimeFormat(locale, { day: 'numeric', month: 'long', year: 'numeric' }).formatRange(days[0].date, (days.at(-1) as { date: Date }).date)
 
 /**
  * Lists the days of the previous month that fill the first week row of a

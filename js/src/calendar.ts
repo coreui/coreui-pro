@@ -23,6 +23,8 @@ import {
   createDateFormatter,
   createGroupsInArray,
   type DisabledDate,
+  formatCellName,
+  formatWeekName,
   formatYearsRange,
   getCalendarDate,
   getCalendarKeyAction,
@@ -111,6 +113,7 @@ type CalendarCellMeta = {
   isDisabled: boolean
   isInRange: boolean
   isSelected: boolean
+  label: string
 }
 
 type CalendarDayCellMeta = CalendarCellMeta & {
@@ -730,12 +733,14 @@ class Calendar extends BaseComponent {
     })
 
     const rows = weeks.map(({ week, days }) => {
-      const attributes = this._rowWeekAttributes(days[0].date, showAdjacentDays || days.some(({ month }) => month === 'current'))
+      const visible = showAdjacentDays || days.some(({ month }) => month === 'current')
+      const attributes = this._rowWeekAttributes(days[0].date, visible)
       const cells = days.map(({ date, month }) => month === 'current' || showAdjacentDays ?
         this._cellHtml(date, this._cellDayAttributes(date, month), this._formatDate(date, { day: this._config.dayFormat })) :
         '<td role="gridcell"></td>')
+      const ariaLabel = this._config.selectionType === 'week' && visible ? ` aria-label="${escapeHtml(formatWeekName(days, this._config.locale))}"` : ''
 
-      return `<tr class="${attributes.className}" tabindex="-1"${this._stateHtml(attributes)}>${showWeekNumber ? `<th class="calendar-cell-week-number">${week.number}</th>` : ''}${cells.join('')}</tr>`
+      return `<tr class="${attributes.className}" tabindex="-1"${this._stateHtml(attributes)}${ariaLabel}>${showWeekNumber ? `<th class="calendar-cell-week-number">${week.number}</th>` : ''}${cells.join('')}</tr>`
     })
 
     return `<thead><tr>${showWeekNumber ? headerCell(weekNumbersLabel ? escapeHtml(weekNumbersLabel) : '') : ''}${weekdays.join('')}</tr></thead><tbody>${rows.join('')}</tbody>`
@@ -765,8 +770,8 @@ class Calendar extends BaseComponent {
 
   _cellHtml(date: Date, attributes: Record<string, any>, label: string): string {
     const renderer = CELL_RENDERERS[this._view]
-    const content = this._config[renderer] ? sanitizeByConfig(this._config[renderer](date, attributes.meta), this._config) : label
-    const ariaLabel = attributes.ariaLabel ? ` aria-label="${escapeHtml(attributes.ariaLabel)}"` : ''
+    const content = this._config[renderer] ? sanitizeByConfig(this._config[renderer](date, { ...attributes.meta, label: this._cellName(date) }), this._config) : label
+    const ariaLabel = attributes.ariaLabel && !this._config[renderer] ? ` aria-label="${escapeHtml(attributes.ariaLabel)}"` : ''
     const ariaCurrent = attributes.ariaCurrent ? ' aria-current="date"' : ''
 
     return `<td class="${attributes.className}" role="gridcell" tabindex="-1"${this._stateHtml(attributes)}${ariaCurrent}${ariaLabel} data-coreui-date="${date.toDateString()}"><div class="${CLASS_NAME_CALENDAR_CELL_INNER} ${this._view.slice(0, -1)}">${content}</div></td>`
@@ -966,7 +971,7 @@ class Calendar extends BaseComponent {
         }),
         selectable: false,
         ariaSelected: false,
-        ariaLabel: this._formatDate(date),
+        ariaLabel: this._cellName(date),
         ariaCurrent: isTodayDate
       }
     }
@@ -990,7 +995,7 @@ class Calendar extends BaseComponent {
       selectable: (isCurrentMonth || this._config.selectAdjacentDays) && !isDisabled,
       ariaDisabled: isDisabled,
       ariaSelected: isSelected,
-      ariaLabel: this._formatDate(date),
+      ariaLabel: this._cellName(date),
       ariaCurrent: isTodayDate,
       meta: {
         isDisabled,
@@ -1077,6 +1082,10 @@ class Calendar extends BaseComponent {
 
   _formatDate(date: Date, options?: Intl.DateTimeFormatOptions): string {
     return this._formatter(date, this._config.locale, options)
+  }
+
+  _cellName(date: Date): string {
+    return formatCellName(date, this._view, (value, options) => this._formatDate(value, options))
   }
 
   // Static

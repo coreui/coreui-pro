@@ -7,6 +7,8 @@ import {
   createDateFormatter,
   createDateTimeFormat,
   createGroupsInArray,
+  formatCellName,
+  formatWeekName,
   formatYearsRange,
   getCalendarDate,
   getCalendarKeyAction,
@@ -372,6 +374,33 @@ describe('Calendar Utilities', () => {
     it('should give a page of YEARS_PER_PAGE years by default', () => {
       expect(YEARS_PER_PAGE).toBe(12)
       expect(getYears(2026)).toEqual([2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030, 2031])
+    })
+  })
+
+  describe('formatCellName', () => {
+    const format = (date, options) => new Intl.DateTimeFormat('en-US', options).format(date)
+
+    it('should name a day, a month, a quarter and a year in full', () => {
+      expect(formatCellName(new Date(2026, 7, 12), 'days', format)).toBe('Wednesday, August 12, 2026')
+      expect(formatCellName(new Date(2026, 7, 1), 'months', format)).toBe('August 2026')
+      expect(formatCellName(new Date(2026, 6, 1), 'quarters', format)).toBe('Q3 2026')
+      expect(formatCellName(new Date(2026, 0, 1), 'years', format)).toBe('2026')
+    })
+
+    it('should write the name through the given formatter', () => {
+      const pl = (date, options) => new Intl.DateTimeFormat('pl-PL', options).format(date)
+
+      expect(formatCellName(new Date(2026, 7, 12), 'days', pl)).toBe('środa, 12 sierpnia 2026')
+    })
+  })
+
+  describe('formatWeekName', () => {
+    const week = start => Array.from({ length: 7 }, (_, i) => ({ date: new Date(start.getFullYear(), start.getMonth(), start.getDate() + i) }))
+
+    it('should name a week by its first and last day', () => {
+      expect(formatWeekName(week(new Date(2026, 6, 27)), 'en-US')).toMatch(/^July 27\s–\sAugust 2, 2026$/)
+      expect(formatWeekName(week(new Date(2026, 11, 28)), 'en-US')).toMatch(/^December 28, 2026\s–\sJanuary 3, 2027$/)
+      expect(formatWeekName(week(new Date(2026, 7, 10)), 'pl-PL')).toBe('10–16 sierpnia 2026')
     })
   })
 

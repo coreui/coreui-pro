@@ -1242,6 +1242,16 @@ removed in favour of `$translucent-opacity` and
   that share the Gregorian months, such as Thai Buddhist or Japanese, keep
   their year numbering in the calendar. The date field lays out and reads
   Gregorian numbers for every locale, without the locale's era.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **A cell drawn by `renderDayCell` no longer gets an `aria-label`**, so its
+  content is what a screen reader reads. Every render function receives the
+  cell's full name as `meta.label` (`Wednesday, August 12, 2026`,
+  `August 2026`, `Q3 2026`, `2026`); put it in the cell, for example in a
+  `visually-hidden` span next to a short visible label marked
+  `aria-hidden="true"`. Day cells the calendar draws itself announce the full
+  date with the weekday instead of the short numeric date (`8/12/2026`), and
+  in week selection the row that takes focus is named by the days it spans
+  (`August 10 – 16, 2026`) instead of reading out all seven.
 - **Additive:** `startDateChange` and `endDateChange` now carry a `dateObject`
   property with the underlying `Date`, alongside the existing `date` property.
   `date` remains formatted per `selectionType` — a `Date` for day selection, but

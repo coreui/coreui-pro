@@ -108,7 +108,8 @@ const initCalendar = async () => {
       const price = pricingData[dateKey]
 
       return `<div class="py-1">
-        <div>${date.toLocaleDateString('en-US', { day: '2-digit' })}</div>
+        <div aria-hidden="true">${date.toLocaleDateString('en-US', { day: 'numeric' })}</div>
+        <span class="visually-hidden">${meta.label}</span>
         <div class="${meta.isSelected ? 'fg-reset' : `fg-3${meta.isInCurrentMonth ? '' : ' opacity-75'}`}" style="font-size: 0.75rem;">${price ? `$${price}` : '-'}</div>
       </div>`
     },
@@ -116,7 +117,8 @@ const initCalendar = async () => {
       const priceRange = getMonthPriceRange(date.getFullYear(), date.getMonth())
 
       return `<div class="py-1">
-        <div>${date.toLocaleDateString('en-US', { month: 'short' })}</div>
+        <div aria-hidden="true">${date.toLocaleDateString('en-US', { month: 'short' })}</div>
+        <span class="visually-hidden">${meta.label}</span>
         <div class="${meta.isSelected ? 'fg-reset' : 'fg-3'}" style="font-size: 0.75rem;">${priceRange ? `$${priceRange.min}-$${priceRange.max}` : '-'}</div>
       </div>`
     },
@@ -124,7 +126,8 @@ const initCalendar = async () => {
       const priceRange = getYearPriceRange(date.getFullYear())
 
       return `<div class="py-1">
-        <div>${date.getFullYear()}</div>
+        <div aria-hidden="true">${date.getFullYear()}</div>
+        <span class="visually-hidden">${meta.label}</span>
         <div class="${meta.isSelected ? 'fg-reset' : 'fg-3'}" style="font-size: 0.75rem;">${priceRange ? `$${priceRange.min}-$${priceRange.max}` : '-'}</div>
       </div>`
     }

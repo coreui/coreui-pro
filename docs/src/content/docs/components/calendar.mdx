@@ -255,11 +255,14 @@ Each render function receives two parameters:
    - `isDisabled` - Whether the cell is disabled
    - `isInRange` - Whether the cell is within a selected range (range selection only)
    - `isSelected` - Whether the cell is selected
+   - `label` - The cell's full name (`Wednesday, August 12, 2026`, `August 2026`, `Q3 2026`, `2026`)
    - For `renderDayCell` only:
      - `isInCurrentMonth` - Whether the day belongs to the current month
      - `isToday` - Whether the day is today
 
 The render functions should return an HTML string that will be displayed inside the cell. The returned HTML is automatically sanitized to prevent XSS attacks.
+
+A cell drawn by a render function gets no `aria-label` from the calendar, so its content is what a screen reader reads. Put `meta.label` in it, for example in a `visually-hidden` span next to the short visible text marked `aria-hidden="true"`, as the pricing example below does.
 
 ### Format options
 
@@ -294,7 +297,7 @@ This example demonstrates advanced usage of custom cell rendering to display pri
 
 ## Accessibility
 
-Keyboard navigation in the grid follows the [date picker dialog pattern](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/examples/datepicker-dialog/). The table is a `grid` of `gridcell` cells, which is what lets a cell report itself as selected: selected cells carry `aria-selected`, today carries `aria-current="date"`, and every cell announces its full localized date. Each grid is a composite with a single tab stop: <kbd>Tab</kbd> enters it once and leaves it, the keys below move inside it, and `tabindex="0"` sits on the selected date, else on the cell closest to the date the grid opens on, else wherever focus went last. Selectable cells and week rows are marked with `data-coreui-selectable`, which is the hook to use in your own CSS or scripts. The months, quarters, and years views answer to the same keys, with arrows moving by cell and row and <kbd>Home</kbd> / <kbd>End</kbd> to the first / last cell of the row, and no jump ever lands outside `minDate` / `maxDate` — focus stops on the closest date still selectable.
+Keyboard navigation in the grid follows the [date picker dialog pattern](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/examples/datepicker-dialog/). The table is a `grid` of `gridcell` cells, which is what lets a cell report itself as selected: selected cells carry `aria-selected`, today carries `aria-current="date"`, every day cell announces its full date with the weekday (`Wednesday, August 12, 2026`), and month, quarter and year cells are named by their text. A cell drawn by a render function is named by its content; see [Render functions](#render-functions). In week selection the row that takes focus is named by the days it spans (`August 10 – 16, 2026`). Each grid is a composite with a single tab stop: <kbd>Tab</kbd> enters it once and leaves it, the keys below move inside it, and `tabindex="0"` sits on the selected date, else on the cell closest to the date the grid opens on, else wherever focus went last. Selectable cells and week rows are marked with `data-coreui-selectable`, which is the hook to use in your own CSS or scripts. The months, quarters, and years views answer to the same keys, with arrows moving by cell and row and <kbd>Home</kbd> / <kbd>End</kbd> to the first / last cell of the row, and no jump ever lands outside `minDate` / `maxDate` — focus stops on the closest date still selectable.
 
 The month and year between the navigation arrows sit in a polite live region, so turning a page announces where it landed. In the years view that is the range of years the page shows, the same text as the grid's label. Activating the month or year button while it has focus opens the months or years view and moves focus to the month or year that panel showed, or to the panel's focusable date when that one cannot be picked; holding <kbd>Enter</kbd> does not go on to pick it.
 
@@ -367,10 +370,10 @@ Note that for security reasons the `sanitize`, `sanitizeFn`, and `allowList` opt
 | `minDate` | date, number, string, null | `null` | Min selectable date. |
 | `monthFormat` | `'long'`, `'narrow'`, `'short'`, `'numeric'`, `'2-digit'` | `'short'` | Sets the format for month names. Accepts built-in formats (`'long'`, `'narrow'`, `'short'`, `'numeric'`, `'2-digit'`). |
 | `range` | boolean | `false` | Allow range selection |
-| `renderDayCell` | function, null | `null` | Custom function to render day cells. Receives `date` and `meta` object (with `isDisabled`, `isInCurrentMonth`, `isInRange`, `isSelected`, `isToday`) as parameters and should return HTML string. |
-| `renderMonthCell` | function, null | `null` | Custom function to render month cells. Receives `date` and `meta` object (with `isDisabled`, `isInRange`, `isSelected`) as parameters and should return HTML string. |
-| `renderQuarterCell` | function, null | `null` | Custom function to render quarter cells. Receives `date` and `meta` object (with `isDisabled`, `isInRange`, `isSelected`) as parameters and should return HTML string. |
-| `renderYearCell` | function, null | `null` | Custom function to render year cells. Receives `date` and `meta` object (with `isDisabled`, `isInRange`, `isSelected`) as parameters and should return HTML string. |
+| `renderDayCell` | function, null | `null` | Custom function to render day cells. Receives `date` and `meta` object (with `isDisabled`, `isInCurrentMonth`, `isInRange`, `isSelected`, `isToday`, `label`) as parameters and should return HTML string. |
+| `renderMonthCell` | function, null | `null` | Custom function to render month cells. Receives `date` and `meta` object (with `isDisabled`, `isInRange`, `isSelected`, `label`) as parameters and should return HTML string. |
+| `renderQuarterCell` | function, null | `null` | Custom function to render quarter cells. Receives `date` and `meta` object (with `isDisabled`, `isInRange`, `isSelected`, `label`) as parameters and should return HTML string. |
+| `renderYearCell` | function, null | `null` | Custom function to render year cells. Receives `date` and `meta` object (with `isDisabled`, `isInRange`, `isSelected`, `label`) as parameters and should return HTML string. |
 | `sanitize` | boolean | `true` | Enable or disable the sanitization. If activated `renderDayCell`, `renderMonthCell`, `renderQuarterCell`, and `renderYearCell` options will be sanitized. |
 | `sanitizeFn` | null, function | `null` | Here you can supply your own sanitize function. This can be useful if you prefer to use a dedicated library to perform sanitization. |
 | `selectAdjacentDays` | boolean | `false` | Set whether days in adjacent months shown before or after the current month are selectable. This only applies if the `showAdjacentDays` option is set to true. A picked day of an adjacent month keeps the month on screen and shows as selected with an outline on a subtle background instead of the solid fill. |
