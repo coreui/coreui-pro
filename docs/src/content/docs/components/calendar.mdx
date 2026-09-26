@@ -253,7 +253,7 @@ Each render function receives two parameters:
 1. `date` - A JavaScript Date object representing the cell's date
 2. `meta` - An object containing cell state information:
    - `isDisabled` - Whether the cell is disabled
-   - `isInRange` - Whether the cell is within a selected range (range selection only)
+   - `isInRange` - Whether the cell is within a selected range (range selection only; a day among an adjacent month's days never is)
    - `isSelected` - Whether the cell is selected
    - `label` - The cell's full name (`Wednesday, August 12, 2026`, `August 2026`, `Q3 2026`, `2026`)
    - For `renderDayCell` only:
