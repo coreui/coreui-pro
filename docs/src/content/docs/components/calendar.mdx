@@ -259,6 +259,7 @@ Each render function receives two parameters:
    - For `renderDayCell` only:
      - `isInCurrentMonth` - Whether the day belongs to the current month
      - `isToday` - Whether the day is today, in its own month (the copy of today among an adjacent month's days is not)
+     - In day selection, `isInRange` is `false` for a day among an adjacent month's days, which the range is not drawn on
 
 The render functions should return an HTML string that will be displayed inside the cell. The returned HTML is automatically sanitized to prevent XSS attacks.
 

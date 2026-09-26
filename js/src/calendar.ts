@@ -961,7 +961,7 @@ class Calendar extends BaseComponent {
     const isDisabled = isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates)
     const isSelected = isDateSelected(date, this._startDate, this._endDate)
     const isTodayDate = isCurrentMonth && isToday(date)
-    const isInRange = isCurrentMonth && isDateInRange(date, this._startDate, this._endDate)
+    const isInRange = (this._config.selectionType !== 'day' || isCurrentMonth) && isDateInRange(date, this._startDate, this._endDate)
     const meta = {
       isDisabled,
       isInCurrentMonth: isCurrentMonth,
