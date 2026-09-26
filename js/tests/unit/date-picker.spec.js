@@ -253,6 +253,7 @@ describe('DatePicker', () => {
       const hidden = next('hidden')
       el.querySelector('.form-control-action').click()
       expect(el.classList.contains('show')).toBeFalse()
+      expect(el.querySelector('.form-control-action').getAttribute('aria-expanded')).toEqual('false')
       expect(calls).toEqual(['show', 'shown', 'hide'])
       await hidden
 
@@ -291,6 +292,7 @@ describe('DatePicker', () => {
       })
 
       expect(picker._popup.isShown).toBeTrue()
+      expect(el.classList.contains('show')).toBeTrue()
       expect(hidden).not.toHaveBeenCalled()
     })
 

@@ -403,6 +403,74 @@ describe('DateRangePicker', () => {
     })
   })
 
+  describe('show/hide', () => {
+    it('should toggle on indicator click and fire lifecycle events', async () => {
+      const picker = buildPicker()
+      const el = fixtureEl.querySelector('#picker')
+      const calls = []
+      for (const name of ['show', 'shown', 'hide', 'hidden']) {
+        el.addEventListener(`${name}.coreui.date-range-picker`, () => calls.push(name))
+      }
+
+      const next = name => new Promise(resolve => {
+        el.addEventListener(`${name}.coreui.date-range-picker`, resolve, { once: true })
+      })
+
+      const shown = next('shown')
+      el.querySelector('.form-control-action').click()
+      expect(el.classList.contains('show')).toBeTrue()
+      expect(el.querySelector('.form-control-action').getAttribute('aria-expanded')).toEqual('true')
+      expect(el.querySelector('.form-control-action').getAttribute('aria-controls')).toEqual(picker._menu.id)
+      expect(calls).toEqual(['show'])
+      await shown
+
+      const hidden = next('hidden')
+      el.querySelector('.form-control-action').click()
+      expect(el.classList.contains('show')).toBeFalse()
+      expect(el.querySelector('.form-control-action').getAttribute('aria-expanded')).toEqual('false')
+      expect(calls).toEqual(['show', 'shown', 'hide'])
+      await hidden
+
+      expect(calls).toEqual(['show', 'shown', 'hide', 'hidden'])
+      expect(picker._popup.isShown).toBeFalse()
+    })
+
+    it('should not open when show is prevented', async () => {
+      const picker = buildPicker()
+      const el = fixtureEl.querySelector('#picker')
+      const shown = jasmine.createSpy('shown')
+      el.addEventListener('show.coreui.date-range-picker', event => event.preventDefault())
+      el.addEventListener('shown.coreui.date-range-picker', shown)
+
+      picker.show()
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect(picker._popup.isShown).toBeFalse()
+      expect(el.classList.contains('show')).toBeFalse()
+      expect(shown).not.toHaveBeenCalled()
+    })
+
+    it('should stay open when hide is prevented', async () => {
+      const picker = buildPicker()
+      const el = fixtureEl.querySelector('#picker')
+      const hidden = jasmine.createSpy('hidden')
+      el.addEventListener('hide.coreui.date-range-picker', event => event.preventDefault())
+      el.addEventListener('hidden.coreui.date-range-picker', hidden)
+
+      picker.show()
+      picker.hide()
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect(picker._popup.isShown).toBeTrue()
+      expect(el.classList.contains('show')).toBeTrue()
+      expect(hidden).not.toHaveBeenCalled()
+    })
+  })
+
   describe('picker toggle', () => {
     it('should not render the toggle when pickerIcon is off', () => {
       buildPicker({ startDate: new Date(2026, 5, 1), pickerIcon: false })
