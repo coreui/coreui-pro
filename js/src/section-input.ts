@@ -330,7 +330,7 @@ abstract class SectionInput extends BaseComponent {
     this._maxDate = this._convertDate(maxDate)
     this._sections = setSectionsFromDate(sections, date ? this._convertDate(date) : null)
     this._draft = ''
-    this._monthFormatter = new Intl.DateTimeFormat(locale, { month: 'long' })
+    this._monthFormatter = new Intl.DateTimeFormat(locale, { calendar: 'gregory', month: 'long' })
   }
 
   _addEventListeners(): void {

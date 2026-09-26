@@ -1876,6 +1876,24 @@ describe('Calendar', () => {
       expect(renderCalendar({ selectionType: 'year' }).querySelector('table').getAttribute('aria-label')).toMatch(/^2020\s–\s2031$/)
     })
 
+    it('should write a calendar without Gregorian months in the Gregorian calendar', () => {
+      const days = renderCalendar({ calendarDate: new Date(2026, 8, 1), locale: 'fa-IR' })
+
+      expect(days.querySelector('.calendar-cell:not(.previous) .calendar-cell-inner').textContent.trim()).toEqual('۱')
+      expect(days.querySelector('.btn-month').textContent.trim()).toEqual('سپتامبر')
+      expect(days.querySelector('.btn-year').textContent.trim()).toEqual('۲۰۲۶')
+
+      const months = renderCalendar({ calendarDate: new Date(2026, 8, 1), locale: 'fa-IR', selectionType: 'month' })
+
+      expect(months.querySelector('.calendar-cell').textContent.trim()).toEqual('ژانویه')
+    })
+
+    it('should keep a calendar that shares the Gregorian months', () => {
+      const years = renderCalendar({ calendarDate: new Date(2026, 8, 1), locale: 'th-TH', selectionType: 'month' })
+
+      expect(years.querySelector('.btn-year').textContent.trim()).toContain('2569')
+    })
+
     it('should name the years page in the navigation the way the grid does', () => {
       const div = renderCalendar({ locale: 'pl-PL', selectionType: 'year' })
       const region = div.querySelector('.calendar-nav-date')
@@ -1949,8 +1967,8 @@ describe('Calendar', () => {
         return range.getBoundingClientRect().left
       }
 
-      expect(left('۱۴۰۹')).toBeLessThan(left('تا'))
-      expect(left('تا')).toBeLessThan(left('۱۳۹۸'))
+      expect(left('۲۰۳۱')).toBeLessThan(left('تا'))
+      expect(left('تا')).toBeLessThan(left('۲۰۲۰'))
     })
 
     it('should move focus to the first day of the week on Home', () => {

@@ -67,7 +67,9 @@ const QUARTER_NAMES = ['Q1', 'Q2', 'Q3', 'Q4']
  * @returns The twelve month names
  */
 export const getFormatMonthNames = (locale: string, width: 'long' | 'short'): string[] => {
-  const formatter = new Intl.DateTimeFormat(locale, { year: 'numeric', month: width, day: 'numeric' })
+  const formatter = new Intl.DateTimeFormat(locale, {
+    calendar: 'gregory', year: 'numeric', month: width, day: 'numeric'
+  })
 
   return Array.from({ length: 12 }, (_, index) =>
     formatter.formatToParts(new Date(2000, index, 15)).find(part => part.type === 'month')!.value)
@@ -312,6 +314,7 @@ const getSectionsFromParts = (formatter: Intl.DateTimeFormat, locale: string): D
  */
 export const getSectionsFromLocale = (locale: string): DateSection[] =>
   getSectionsFromParts(new Intl.DateTimeFormat(locale, {
+    calendar: 'gregory',
     year: 'numeric',
     month: '2-digit',
     day: '2-digit'
@@ -368,6 +371,7 @@ export const getTimeSectionsFromLocale = (locale: string, seconds = false): Date
  */
 export const getDateTimeSectionsFromLocale = (locale: string, seconds = false): DateSection[] =>
   getSectionsFromParts(new Intl.DateTimeFormat(locale, {
+    calendar: 'gregory',
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
