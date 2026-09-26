@@ -960,7 +960,15 @@ class Calendar extends BaseComponent {
 
     const isDisabled = isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates)
     const isSelected = isDateSelected(date, this._startDate, this._endDate)
-    const isTodayDate = isToday(date)
+    const isTodayDate = isCurrentMonth && isToday(date)
+    const isInRange = isCurrentMonth && isDateInRange(date, this._startDate, this._endDate)
+    const meta = {
+      isDisabled,
+      isInCurrentMonth: isCurrentMonth,
+      isInRange,
+      isSelected,
+      isToday: isTodayDate
+    }
 
     if (this._config.selectionType !== 'day' || this._view !== 'days') {
       return {
@@ -972,11 +980,11 @@ class Calendar extends BaseComponent {
         selectable: false,
         ariaSelected: false,
         ariaLabel: this._cellName(date),
-        ariaCurrent: isTodayDate
+        ariaCurrent: isTodayDate,
+        meta
       }
     }
 
-    const isInRange = isCurrentMonth && isDateInRange(date, this._startDate, this._endDate)
     const isRangeHover = isCurrentMonth && this._isRangeHover((start, end) => isDateInRange(date, start, end))
 
     const classNames = this._classNames({
@@ -997,13 +1005,7 @@ class Calendar extends BaseComponent {
       ariaSelected: isSelected,
       ariaLabel: this._cellName(date),
       ariaCurrent: isTodayDate,
-      meta: {
-        isDisabled,
-        isInCurrentMonth: isCurrentMonth,
-        isInRange,
-        isSelected,
-        isToday: isTodayDate
-      }
+      meta
     }
   }
 
