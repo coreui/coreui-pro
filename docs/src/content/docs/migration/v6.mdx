@@ -1257,6 +1257,13 @@ removed in favour of `$translucent-opacity` and
   calendar marks one current date and a date picker opens on today only when
   its own month is shown. `renderDayCell` receives the full `meta` in week
   selection too, not only `label`.
+- A cell that cannot be picked carries `aria-disabled="true"`: a day outside
+  `minDate` / `maxDate` or in `disabledDates`, a week row, month, quarter or
+  year outside the range, and in day selection a day among an adjacent
+  month's days unless `selectAdjacentDays` is on. Such an adjacent day is no
+  longer `aria-selected` either, and `renderDayCell` gets `isDisabled: true`
+  and `isSelected: false` for it, so the copy of a picked date that fills the
+  next panel reads as unavailable filler.
 - **Additive:** `startDateChange` and `endDateChange` now carry a `dateObject`
   property with the underlying `Date`, alongside the existing `date` property.
   `date` remains formatted per `selectionType` — a `Date` for day selection, but
