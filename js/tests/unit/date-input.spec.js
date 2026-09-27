@@ -345,6 +345,71 @@ describe('DateInput', () => {
       expect(element.querySelector('input[type="hidden"]').value).toEqual('04.07.2026')
     })
 
+    it('should report no date while a section holds a leading 0', () => {
+      const dateInput = createDateInput()
+      const spy = jasmine.createSpy('dateChange')
+      dateInput._element.addEventListener('dateChange.coreui.date-input', spy)
+      const [day, month, year] = getSections(dateInput._element)
+
+      month.focus()
+      pressKey(month, '0')
+      pressKey(month, '6')
+      for (const digit of '2026') {
+        pressKey(year, digit)
+      }
+
+      day.focus()
+      pressKey(day, '0')
+
+      expect(dateInput.getDate()).toBeNull()
+
+      pressKey(day, '5')
+
+      expect(spy.calls.allArgs().map(([event]) => event.date)).toEqual([new Date(2026, 5, 5)])
+    })
+
+    it('should report no date while a four-digit year reads 0000, and year 1 once it loses focus', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 5, 15) })
+      const errors = []
+      dateInput._element.addEventListener('errorChange.coreui.date-input', event => errors.push(event.error))
+      const year = getSections(dateInput._element)[2]
+
+      year.focus()
+      for (const digit of '0000') {
+        pressKey(year, digit)
+      }
+
+      expect(dateInput.getDate()).toBeNull()
+      expect(errors).toEqual(['incomplete'])
+
+      year.blur()
+
+      expect(dateInput.getDate().getFullYear()).toBe(1)
+    })
+
+    it('should keep the year a two-digit field was given when it loses focus', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 5, 15), format: 'dd.MM.yy' })
+      const year = getSections(dateInput._element)[2]
+
+      year.focus()
+      year.blur()
+
+      expect(dateInput.getDate()).toEqual(new Date(2026, 5, 15))
+    })
+
+    it('should keep a two-digit year of 00 as 2000 when the field loses focus', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 5, 15), format: 'dd.MM.yy' })
+      const year = getSections(dateInput._element)[2]
+
+      year.focus()
+      pressKey(year, '0')
+      pressKey(year, '0')
+      year.blur()
+
+      expect(year.textContent).toEqual('00')
+      expect(dateInput.getDate()).toEqual(new Date(2000, 5, 15))
+    })
+
     it('should ignore non-digit keys', () => {
       const dateInput = createDateInput()
       const [day] = getSections(dateInput._element)

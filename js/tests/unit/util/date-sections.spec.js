@@ -54,6 +54,11 @@ describe('Date Sections Utilities', () => {
 
     it('should return bounds for year', () => {
       expect(getSectionBounds({ type: 'year' })).toEqual({ min: 1, max: 9999 })
+      expect(getSectionBounds({ type: 'year', length: 4 })).toEqual({ min: 1, max: 9999 })
+    })
+
+    it('should let a two-digit year be 0', () => {
+      expect(getSectionBounds({ type: 'year', length: 2 })).toEqual({ min: 0, max: 9999 })
     })
 
     it('should return cycle-dependent bounds for hour', () => {
@@ -542,6 +547,31 @@ describe('Date Sections Utilities', () => {
       expect(getDateFromSections(partial)).toBeNull()
     })
 
+    it('should return null while a day, month or four-digit year is below its minimum', () => {
+      for (const type of ['day', 'month', 'year']) {
+        const below = sections(new Date(2026, 5, 15)).map(section => (section.type === type ? { ...section, value: 0 } : section))
+
+        expect(getDateFromSections(below)).toBeNull()
+      }
+    })
+
+    it('should return null while the hour of a 12-hour clock, a week or a quarter is 0, but not a 24-hour hour', () => {
+      const zero = (format, type) => setSectionsFromDate(getSectionsFromFormat(format, 'en-US'), new Date(2026, 5, 15, 9, 5))
+        .map(section => (section.type === type ? { ...section, value: 0 } : section))
+
+      expect(getDateFromSections(zero('hh:mm A', 'hour'))).toBeNull()
+      expect(getDateFromSections(zero('yyyy-Www', 'week'))).toBeNull()
+      expect(getDateFromSections(zero('q yyyy', 'quarter'))).toBeNull()
+      expect(getDateFromSections(zero('HH:mm', 'hour'))).toEqual(new Date(1970, 0, 1, 0, 5))
+    })
+
+    it('should read a two-digit year of 00 as 2000', () => {
+      const twoDigit = setSectionsFromDate(getSectionsFromFormat('dd.MM.yy'), new Date(2026, 5, 15))
+        .map(section => (section.type === 'year' ? { ...section, value: 0 } : section))
+
+      expect(getDateFromSections(twoDigit)).toEqual(new Date(2000, 5, 15))
+    })
+
     it('should clamp the day to the length of the month', () => {
       const overflowing = sections(new Date(2026, 0, 31)).map(section => (section.type === 'month' ? { ...section, value: 2 } : section))
 
@@ -712,6 +742,12 @@ describe('Date Sections Utilities', () => {
       const sections = getSectionsFromString('14.07.2026', layout)
 
       expect(sections.filter(section => section.type !== 'literal').map(section => section.value)).toEqual([14, 7, 2026])
+    })
+
+    it('should read a two-digit year of 00', () => {
+      const sections = getSectionsFromString('15.06.00', getSectionsFromFormat('dd.MM.yy'))
+
+      expect(getDateFromSections(sections)).toEqual(new Date(2000, 5, 15))
     })
 
     it('should accept any separators', () => {

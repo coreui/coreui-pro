@@ -152,12 +152,12 @@ const createSection = (char: string, tokenLength: number, locale = 'default', mo
 }
 
 /**
- * Gives the range of values a section accepts.
+ * Gives the range of values a section accepts; a two-digit year can be 0.
  *
- * @param section - The section, or an object with its `type` and, for hours, its `cycle`
+ * @param section - The section, or an object with its `type` and, for hours, its `cycle`, for years, its `length`
  * @returns The inclusive bounds
  */
-export const getSectionBounds = (section: Pick<EditableSection, 'type' | 'cycle'>): { min: number, max: number } => {
+export const getSectionBounds = (section: Pick<EditableSection, 'type' | 'cycle'> & { length?: number }): { min: number, max: number } => {
   switch (section.type) {
     case 'day': {
       return { min: 1, max: 31 }
@@ -189,7 +189,7 @@ export const getSectionBounds = (section: Pick<EditableSection, 'type' | 'cycle'
     }
 
     default: {
-      return { min: 1, max: 9999 }
+      return { min: section.length === 2 ? 0 : 1, max: 9999 }
     }
   }
 }
@@ -635,7 +635,7 @@ export const getFullYearFromSection = (section: EditableSection): number | null 
  * without a time part gets midnight.
  *
  * @param sections - The sections and literals of a field
- * @returns The date, or `null` while any section is empty
+ * @returns The date, or `null` while any section is empty or below its minimum, such as a day of `0` before its second digit
  */
 export const getDateFromSections = (sections: DateSection[]): Date | null => {
   const values: Record<string, any> = {}
@@ -646,7 +646,7 @@ export const getDateFromSections = (sections: DateSection[]): Date | null => {
       continue
     }
 
-    if (section.value === null) {
+    if (section.value === null || section.value < getSectionBounds(section).min) {
       return null
     }
 
