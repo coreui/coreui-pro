@@ -719,8 +719,9 @@ export const getCalendarDate = (calendarDate: Date, order: number, view: ViewTyp
 }
 
 /**
- * Writes a date as the value of a selection type: `2026W05` for a week,
- * `2026-07` for a month, `2026Q3` for a quarter and `2026` for a year.
+ * Writes a date from year 1 on as the value of a selection type, the year in
+ * four digits or more: `2026W05` for a week, `2026-07` for a month, `2026Q3`
+ * for a quarter and `2026` for a year.
  *
  * @param date - The date to write
  * @param selectionType - The unit to write
@@ -733,21 +734,23 @@ export const getDateBySelectionType = (date: Date | null, selectionType: Selecti
 
   if (selectionType === "week") {
     const { year, weekNumber } = getISOWeekNumberAndYear(date)
-    return `${year}W${weekNumber.toString().padStart(2, "0")}`
+    return `${String(year).padStart(4, "0")}W${weekNumber.toString().padStart(2, "0")}`
   }
+
+  const year = String(date.getFullYear()).padStart(4, "0")
 
   if (selectionType === "month") {
     const monthNumber = `0${date.getMonth() + 1}`.slice(-2)
-    return `${date.getFullYear()}-${monthNumber}`
+    return `${year}-${monthNumber}`
   }
 
   if (selectionType === "quarter") {
     const quarter = Math.floor(date.getMonth() / 3) + 1
-    return `${date.getFullYear()}Q${quarter}`
+    return `${year}Q${quarter}`
   }
 
   if (selectionType === "year") {
-    return `${date.getFullYear()}`
+    return year
   }
 
   return date
@@ -1840,9 +1843,9 @@ export const setTimeFromDate = (target: Date | null, source: Date | null) : Date
 }
 
 /**
- * Reads a year, expanding a value below 100, however many digits it is
- * written with, to the century that puts it no more than 50 years ahead of the
- * current year.
+ * Reads a year, expanding one written with one or two digits to the century
+ * that puts it no more than 50 years ahead of the current year; `0026` stays
+ * the year 26.
  *
  * @param yearString - The year as written
  * @returns The full year
@@ -1850,7 +1853,7 @@ export const setTimeFromDate = (target: Date | null, source: Date | null) : Date
 export const parseYearSmart = (yearString: string) : number => {
   let parsedYear = Number.parseInt(yearString, 10)
 
-  if (parsedYear < 100) {
+  if (/^\s*\d{1,2}\D*$/.test(yearString)) {
     const currentYear = new Date().getFullYear()
     const currentCentury = Math.floor(currentYear / 100) * 100
     parsedYear = currentCentury + parsedYear

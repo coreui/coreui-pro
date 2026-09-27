@@ -237,6 +237,18 @@ describe('Calendar Utilities', () => {
     it('should read the last month of the year as its first day', () => {
       expect(convertToDateObject('2022-12', 'month')).toEqual(new Date(2022, 11, 1))
     })
+
+    it.each([
+      ['12/31/0099', 'day', [99, 11, 31]],
+      ['0026-W05', 'week', [26, 0, 26]],
+      ['0026W05', 'week', [26, 0, 26]],
+      ['0099-12', 'month', [99, 11, 1]],
+      ['12/0099', 'month', [99, 11, 1]],
+      ['0026Q2', 'quarter', [26, 3, 1]],
+      ['0026', 'year', [26, 0, 1]]
+    ])('should keep the year of %s written in four digits', (value, selectionType, [year, month, day]) => {
+      expect(convertToDateObject(value, selectionType, 'en-US')).toEqual(createDate(year, month, day))
+    })
   })
 
   describe('createGroupsInArray', () => {
@@ -321,6 +333,20 @@ describe('Calendar Utilities', () => {
       const date = new Date(2025, 10, 20)
       const result = getDateBySelectionType(date, 'day')
       expect(result).toBe(date)
+    })
+
+    it('should write a year below 1000 in four digits', () => {
+      const date = createDate(26, 4, 15)
+
+      expect(['week', 'month', 'quarter', 'year'].map(type => getDateBySelectionType(date, type))).toEqual(['0026W20', '0026-05', '0026Q2', '0026'])
+    })
+
+    it.each(['week', 'month', 'quarter', 'year'])('should write a %s that convertToDateObject reads back in the same year', selectionType => {
+      for (const year of [26, 99, 2026]) {
+        const date = createDate(year, 4, 15)
+
+        expect(convertToDateObject(getDateBySelectionType(date, selectionType), selectionType).getFullYear()).toBe(year)
+      }
     })
   })
 
@@ -1501,6 +1527,21 @@ describe('Calendar Utilities', () => {
     it('should parse 4-digit years as-is', () => {
       expect(parseYearSmart('2023')).toBe(2023)
       expect(parseYearSmart('1999')).toBe(1999)
+    })
+
+    it('should keep a year below 100 written with three or more digits', () => {
+      expect(parseYearSmart('0026')).toBe(26)
+      expect(parseYearSmart('026')).toBe(26)
+      expect(parseYearSmart('0099')).toBe(99)
+      expect(parseYearSmart('0001')).toBe(1)
+    })
+
+    it('should expand a year of two digits given with spaces, as a number or before a dash in a week', () => {
+      expect(parseYearSmart('26')).toBeGreaterThan(1900)
+      expect(parseYearSmart(' 26 ')).toBe(parseYearSmart('26'))
+      expect(parseYearSmart(26)).toBe(parseYearSmart('26'))
+      expect(convertToDateObject('26-W05', 'week')).toEqual(convertToDateObject('26W05', 'week'))
+      expect(convertToDateObject('26 W05', 'week').getFullYear()).toBe(parseYearSmart('26'))
     })
 
     it('should handle 2-digit years with smart century assignment', () => {

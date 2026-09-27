@@ -598,6 +598,21 @@ describe('DatePicker', () => {
       expect(picker.getDate()).toEqual(new Date(2026, 11, 28))
     })
 
+    it('should report a month below year 1000 with the year in four digits', () => {
+      const calendarDate = new Date(2000, 0, 1)
+      calendarDate.setFullYear(26)
+      const picker = buildPicker({ calendarDate, locale: 'en-US', selectionType: 'month' })
+      let emitted = null
+      fixtureEl.querySelector('#picker').addEventListener('dateChange.coreui.date-picker', event => {
+        emitted = event
+      })
+
+      picker.show()
+      fixtureEl.querySelector('.date-picker-popup [data-coreui-date$=" May 01 0026"]').click()
+
+      expect(emitted.formattedDate).toBe('0026-05')
+    })
+
     it('should mask quarter selection with the quarter name', () => {
       const picker = buildPicker({ selectionType: 'quarter', date: new Date(2026, 10, 15) })
 
