@@ -719,6 +719,13 @@ class Calendar extends BaseComponent {
 
     next.innerHTML = `${days ? this._navButton('btn-next', 'navIconNext', this._config.ariaNavNextMonthLabel) : ''} ${this._navButton('btn-double-next', 'navIconDoubleNext', years ? this._config.ariaNavNextYearsLabel : this._config.ariaNavNextYearLabel)}`
     calendarTable.setAttribute('aria-label', this._gridLabel(calendarDate))
+
+    if (this._picksRange()) {
+      calendarTable.setAttribute('aria-multiselectable', 'true')
+    } else {
+      calendarTable.removeAttribute('aria-multiselectable')
+    }
+
     calendarTable.innerHTML = days ? this._daysHtml(calendarDate) : this._periodsHtml(calendarDate)
   }
 
@@ -859,6 +866,10 @@ class Calendar extends BaseComponent {
 
   _initializeView(): void {
     this._view = VIEW_BY_SELECTION_TYPE[this._config.selectionType] || 'days'
+  }
+
+  _picksRange(): boolean {
+    return this._config.range && (VIEW_BY_SELECTION_TYPE[this._config.selectionType] || 'days') === this._view
   }
 
   _updateCalendar(callback?: () => void): void {
@@ -1003,7 +1014,7 @@ class Calendar extends BaseComponent {
       className: classNames,
       selectable: !isDisabled && !isFiller,
       ariaDisabled: isDisabled || isFiller,
-      ariaSelected: isSelected && !isFiller,
+      ariaSelected: !isFiller && (isSelected || (this._picksRange() && !isDisabled && isDateInRange(date, this._startDate, this._endDate))),
       ariaLabel: this._cellName(date),
       ariaCurrent: isTodayDate,
       meta
@@ -1028,7 +1039,7 @@ class Calendar extends BaseComponent {
       }),
       selectable: !isDisabled,
       ariaDisabled: isDisabled,
-      ariaSelected: isSelected,
+      ariaSelected: isSelected || (this._picksRange() && isInRange && !isDisabled),
       meta: {
         isDisabled,
         isInRange,
@@ -1047,7 +1058,8 @@ class Calendar extends BaseComponent {
     }
 
     const isDisabled = isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates)
-    const isSelected = isDateSelected(date, this._startDate, this._endDate)
+    const isSelected = Array.from({ length: 7 }, (_, day) => new Date(date.getFullYear(), date.getMonth(), date.getDate() + day))
+      .some(day => isDateSelected(day, this._startDate, this._endDate))
     const isInRange = isDateInRange(date, this._startDate, this._endDate)
 
     const isRangeHover = this._isRangeHover((start, end) => isDateInRange(date, start, end))
@@ -1064,7 +1076,7 @@ class Calendar extends BaseComponent {
       className: classNames,
       selectable: !isDisabled,
       ariaDisabled: isDisabled,
-      ariaSelected: isSelected
+      ariaSelected: isSelected || (this._picksRange() && isInRange && !isDisabled)
     }
   }
 

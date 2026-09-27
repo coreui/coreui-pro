@@ -440,7 +440,7 @@ class Popup extends Config {
     const today = current?.closest('[aria-disabled="true"]') ? null : current
 
     const entry =
-      SelectorEngine.findOne('[aria-selected="true"]', this._content) as HTMLElement | null ??
+      SelectorEngine.findOne('.selected[aria-selected="true"], [aria-selected="true"]:not(.calendar-cell):not(.calendar-row)', this._content) as HTMLElement | null ??
       (today?.closest('[data-coreui-selectable]') as HTMLElement | null) ??
       (today?.closest('[tabindex]') as HTMLElement | null) ??
       SelectorEngine.findOne('[tabindex="0"]', this._content) as HTMLElement | null ??

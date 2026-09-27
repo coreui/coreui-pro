@@ -1264,6 +1264,12 @@ removed in favour of `$translucent-opacity` and
   longer `aria-selected` either, and `renderDayCell` gets `isDisabled: true`
   and `isSelected: false` for it, so the copy of a picked date that fills the
   next panel reads as unavailable filler.
+- With `range`, the grid of the view that picks the range is
+  `aria-multiselectable`, and every day, week row, month, quarter or year of
+  the selected range that can be picked carries `aria-selected="true"`, not
+  only its two ends, so a screen reader announces the ones in between as
+  selected. The months and years views of a day range only navigate and keep
+  it on the ends, and `meta.isSelected` still marks only the ends.
 - **Additive:** `startDateChange` and `endDateChange` now carry a `dateObject`
   property with the underlying `Date`, alongside the existing `date` property.
   `date` remains formatted per `selectionType` — a `Date` for day selection, but

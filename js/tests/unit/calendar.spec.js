@@ -10,6 +10,9 @@ import EventHandler from '../../src/dom/event-handler.js'
 describe('Calendar', () => {
   let fixtureEl
 
+  const selectedDays = selector => [...fixtureEl.querySelectorAll(`${selector}[aria-selected="true"]`)]
+    .map(cell => new Date(cell.dataset.coreuiDate).getDate())
+
   beforeAll(() => {
     fixtureEl = getFixture()
   })
@@ -445,6 +448,23 @@ describe('Calendar', () => {
 
       const stop = div.querySelector('[tabindex="0"]')
       expect(new Date(stop.dataset.coreuiDate).getDate()).toEqual(5)
+    })
+
+    it('should keep the stop of each panel on an end of the range, not on the days between them', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { // eslint-disable-line no-new
+        calendarDate: new Date(2026, 7, 1),
+        calendars: 2,
+        endDate: new Date(2026, 8, 5),
+        locale: 'en-US',
+        range: true,
+        startDate: new Date(2026, 7, 10)
+      })
+
+      expect([...div.querySelectorAll('[tabindex="0"]')].map(stop => stop.dataset.coreuiDate))
+        .toEqual([new Date(2026, 7, 10).toDateString(), new Date(2026, 8, 5).toDateString()])
     })
 
     it('should keep a stop in every panel, one per grid', () => {
@@ -3666,6 +3686,140 @@ describe('Calendar', () => {
       expect(calendar._view).toBe('days')
       expect(empty.length).toBeGreaterThan(0)
       expect([...empty].filter(cell => cell.hasAttribute('aria-disabled'))).toHaveSize(0)
+    })
+
+    it('should mark every pickable day of a range as selected and the grid as multiselectable', () => {
+      fixtureEl.innerHTML = '<div id="range"></div><div id="single"></div>'
+      const ends = new Set()
+
+      new Calendar(fixtureEl.querySelector('#range'), { // eslint-disable-line no-new
+        calendarDate: new Date(2026, 7, 1),
+        disabledDates: [new Date(2026, 7, 12)],
+        endDate: new Date(2026, 7, 14),
+        range: true,
+        renderDayCell(date, { isSelected }) {
+          if (isSelected) {
+            ends.add(date.getDate())
+          }
+
+          return String(date.getDate())
+        },
+        startDate: new Date(2026, 7, 10)
+      })
+      new Calendar(fixtureEl.querySelector('#single'), { // eslint-disable-line no-new
+        calendarDate: new Date(2026, 7, 1),
+        endDate: new Date(2026, 7, 14),
+        startDate: new Date(2026, 7, 10)
+      })
+
+      expect(fixtureEl.querySelector('#range table').getAttribute('aria-multiselectable')).toEqual('true')
+      expect(fixtureEl.querySelector('#single table').hasAttribute('aria-multiselectable')).toBeFalse()
+      expect(selectedDays('#range td')).toEqual([10, 11, 13, 14])
+      expect(selectedDays('#single td')).toEqual([10, 14])
+      expect([...ends]).toEqual([10, 14])
+    })
+
+    it('should mark the pickable days of adjacent months inside a range as selected', () => {
+      fixtureEl.innerHTML = '<div id="pickable"></div><div id="filler"></div>'
+      const config = {
+        calendarDate: new Date(2026, 7, 1),
+        endDate: new Date(2026, 8, 3),
+        firstDayOfWeek: 1,
+        range: true,
+        startDate: new Date(2026, 7, 28)
+      }
+
+      new Calendar(fixtureEl.querySelector('#pickable'), { ...config, selectAdjacentDays: true }) // eslint-disable-line no-new
+      new Calendar(fixtureEl.querySelector('#filler'), config) // eslint-disable-line no-new
+
+      expect(selectedDays('#pickable td')).toEqual([28, 29, 30, 31, 1, 2, 3])
+      expect(selectedDays('#filler td')).toEqual([28, 29, 30, 31])
+    })
+
+    it('should keep the preview of a range visual', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const calendar = new Calendar(fixtureEl.querySelector('div'), {
+        calendarDate: new Date(2026, 7, 1),
+        range: true,
+        selectEndDate: true,
+        startDate: new Date(2026, 7, 10)
+      })
+
+      calendar._hoverDate = new Date(2026, 7, 14)
+      calendar._updateClassNamesAndAriaLabels()
+
+      expect(fixtureEl.querySelectorAll('.calendar-cell.range-hover')).toHaveSize(5)
+      expect(selectedDays('td')).toEqual([10])
+    })
+
+    it('should mark only the ends of a range in a view that navigates', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const calendar = new Calendar(fixtureEl.querySelector('div'), {
+        calendarDate: new Date(2024, 1, 1),
+        endDate: new Date(2026, 5, 5),
+        range: true,
+        startDate: new Date(2024, 1, 10)
+      })
+      const selected = () => [...fixtureEl.querySelectorAll('td[aria-selected="true"]')].map(cell => new Date(cell.dataset.coreuiDate))
+
+      fixtureEl.querySelector('.btn-month').click()
+
+      expect(calendar._view).toEqual('months')
+      expect(fixtureEl.querySelector('table').hasAttribute('aria-multiselectable')).toBeFalse()
+      expect(selected().map(date => date.getMonth())).toEqual([1])
+
+      fixtureEl.querySelector('.btn-year').click()
+
+      expect(calendar._view).toEqual('years')
+      expect(fixtureEl.querySelector('table').hasAttribute('aria-multiselectable')).toBeFalse()
+      expect(selected().map(date => date.getFullYear())).toEqual([2024, 2026])
+    })
+
+    it('should mark every week row and period of a range as selected, except the ones that cannot be picked', () => {
+      fixtureEl.innerHTML = '<div id="weeks"></div><div id="months"></div><div id="quarters"></div><div id="years"></div>'
+      const periods = id => [...fixtureEl.querySelectorAll(`${id} td[aria-selected="true"]`)].map(cell => new Date(cell.dataset.coreuiDate))
+
+      new Calendar(fixtureEl.querySelector('#weeks'), { // eslint-disable-line no-new
+        calendarDate: new Date(2026, 7, 1),
+        disabledDates: [new Date(2026, 7, 17)],
+        endDate: new Date(2026, 7, 26),
+        firstDayOfWeek: 1,
+        range: true,
+        selectionType: 'week',
+        startDate: new Date(2026, 7, 5)
+      })
+      new Calendar(fixtureEl.querySelector('#months'), { // eslint-disable-line no-new
+        calendarDate: new Date(2026, 0, 1),
+        disabledDates: date => date.getMonth() === 3,
+        endDate: new Date(2026, 5, 1),
+        range: true,
+        selectionType: 'month',
+        startDate: new Date(2026, 1, 1)
+      })
+      new Calendar(fixtureEl.querySelector('#quarters'), { // eslint-disable-line no-new
+        calendarDate: new Date(2026, 0, 1),
+        disabledDates: date => date.getMonth() > 2 && date.getMonth() < 6,
+        endDate: new Date(2026, 9, 1),
+        range: true,
+        selectionType: 'quarter',
+        startDate: new Date(2026, 0, 1)
+      })
+      new Calendar(fixtureEl.querySelector('#years'), { // eslint-disable-line no-new
+        calendarDate: new Date(2026, 0, 1),
+        disabledDates: date => date.getFullYear() === 2025,
+        endDate: new Date(2027, 0, 1),
+        range: true,
+        selectionType: 'year',
+        startDate: new Date(2024, 0, 1)
+      })
+
+      expect([...fixtureEl.querySelectorAll('#weeks tr[aria-selected="true"]')]
+        .map(row => new Date(row.querySelector('td').dataset.coreuiDate).getDate())).toEqual([3, 10, 24])
+      expect(periods('#months').map(date => date.getMonth())).toEqual([1, 2, 4, 5])
+      expect(periods('#quarters').map(date => date.getMonth())).toEqual([0, 6, 9])
+      expect(periods('#years').map(date => date.getFullYear())).toEqual([2024, 2026, 2027])
     })
 
     it('should not mark as selectable non-day selectionType in days view', () => {

@@ -383,6 +383,36 @@ describe('Popup', () => {
       expect(document.activeElement.id).toEqual('d10')
     })
 
+    it('should start a range from its end, and from today while no end is visible', () => {
+      fixtureEl.innerHTML = [
+        '<div id="anchor"><button id="inside">field</button></div>',
+        '<div id="content"><table aria-multiselectable="true" role="grid"><tbody><tr>',
+        '  <td id="d1" class="calendar-cell range" tabindex="0" aria-selected="true">1</td>',
+        '  <td id="today" class="calendar-cell range" tabindex="-1" aria-selected="true" aria-current="date">15</td>',
+        '  <td id="end" class="calendar-cell range selected" tabindex="-1" aria-selected="true">20</td>',
+        '</tr></tbody></table></div>'
+      ].join('')
+
+      const popup = new Popup({
+        anchor: fixtureEl.querySelector('#anchor'),
+        content: fixtureEl.querySelector('#content'),
+        focusTrap: false,
+        mobileBreakpoint: 0,
+        returnFocus: false
+      })
+
+      popups.push(popup)
+      popup.show()
+
+      expect(document.activeElement.id).toEqual('end')
+
+      popup.hide()
+      fixtureEl.querySelector('#end').remove()
+      popup.show()
+
+      expect(document.activeElement.id).toEqual('today')
+    })
+
     it('should fall back to today, and then to the stop the grid parked', () => {
       fixtureEl.innerHTML = [
         '<div id="anchor"><button id="inside">field</button></div>',
