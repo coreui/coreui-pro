@@ -1183,6 +1183,15 @@ removed in favour of `$translucent-opacity` and
 #### Calendar
 
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`cellHover` is gone.** It reported the date under the pointer or the focus
+  for the hover preview in the date picker's field, which v6 no longer draws.
+  To follow the pointer or the focus over a calendar, listen for `mouseover`
+  or `focusin` on its element: each day, month, quarter and year cell the
+  calendar shows carries its date in `data-coreui-date`, in the
+  `toDateString()` form, and a week row carries it on the day cells it shows.
+  Unlike the event, the listeners also see cells that cannot be picked, and
+  only `mouseout` or `focusout` tells that the pointer or the focus left.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **`selectAdjacementDays` and `showAdjacementDays` are spelled `selectAdjacentDays`
   and `showAdjacentDays`** — the option keys, the `data-coreui-select-adjacent-days`
   / `data-coreui-show-adjacent-days` attributes and the picker passthrough alike. The
