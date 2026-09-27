@@ -66,7 +66,6 @@ const EVENT_BLUR = `blur${EVENT_KEY}`
 const EVENT_CALENDAR_DATE_CHANGE = `calendarDateChange${EVENT_KEY}`
 const EVENT_CALENDAR_MOUSE_LEAVE = `calendarMouseleave${EVENT_KEY}`
 const EVENT_CALENDAR_VIEW_CHANGE = `calendarViewChange${EVENT_KEY}`
-const EVENT_CELL_HOVER = `cellHover${EVENT_KEY}`
 const EVENT_END_DATE_CHANGE = `endDateChange${EVENT_KEY}`
 const EVENT_FOCUS = `focus${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
@@ -495,21 +494,11 @@ class Calendar extends BaseComponent {
     }
 
     this._hoverDate = setTimeFromDate(date, this._selectEndDate ? this._endDate : this._startDate)
-
-    EventHandler.trigger(this._element, EVENT_CELL_HOVER, {
-      date: getDateBySelectionType(this._hoverDate, this._config.selectionType)
-    })
-
     this._updateRangeHover()
   }
 
   _handleCalendarMouseLeave(): void {
     this._hoverDate = null
-
-    EventHandler.trigger(this._element, EVENT_CELL_HOVER, {
-      date: null
-    })
-
     this._updateRangeHover()
   }
 

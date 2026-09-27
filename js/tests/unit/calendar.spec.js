@@ -3310,50 +3310,21 @@ describe('Calendar', () => {
       })
     })
 
-    it('should emit cellHover event on mouseenter', () => {
-      return new Promise(resolve => {
-        fixtureEl.innerHTML = '<div></div>'
-        const div = fixtureEl.querySelector('div')
-        const calendar = new Calendar(div, {
-          range: true,
-          calendarDate: new Date(2023, 5, 1)
-        })
-        const listener = jasmine.createSpy('cellHoverListener')
-        div.addEventListener('cellHover.coreui.calendar', listener)
+    it('should let mouseover and focusin listeners on the calendar read the date of a cell or a week row', () => {
+      fixtureEl.innerHTML = '<div></div>'
 
-        setTimeout(() => {
-          const cell = div.querySelector('.calendar-cell[data-coreui-selectable]')
-          if (cell) {
-            calendar._handleCalendarMouseEnter({ target: cell })
-            expect(listener).toHaveBeenCalled()
-          }
+      const div = fixtureEl.querySelector('div')
+      const seen = []
+      const read = event => seen.push((event.target.closest('td[data-coreui-date]') ?? event.target.querySelector('td[data-coreui-date]')).dataset.coreuiDate)
+      new Calendar(div, { calendarDate: new Date(2023, 5, 1), selectionType: 'week' }) // eslint-disable-line no-new
+      div.addEventListener('mouseover', read)
+      div.addEventListener('focusin', read)
 
-          resolve()
-        }, 10)
-      })
-    })
+      const cell = div.querySelector(`[data-coreui-date="${new Date(2023, 5, 20).toDateString()}"]`)
+      cell.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+      cell.closest('tr').focus()
 
-    it('should emit cellHover event with null on mouseleave', () => {
-      return new Promise(resolve => {
-        fixtureEl.innerHTML = '<div></div>'
-        const div = fixtureEl.querySelector('div')
-        const calendar = new Calendar(div, {
-          range: true,
-          calendarDate: new Date(2023, 5, 1)
-        })
-        const listener = jasmine.createSpy('cellHoverListener')
-        div.addEventListener('cellHover.coreui.calendar', listener)
-
-        setTimeout(() => {
-          const cell = div.querySelector('.calendar-cell[data-coreui-selectable]')
-          if (cell) {
-            calendar._handleCalendarMouseLeave()
-            expect(listener).toHaveBeenCalled()
-          }
-
-          resolve()
-        }, 10)
-      })
+      expect(seen).toEqual([new Date(2023, 5, 20).toDateString(), new Date(2023, 5, 19).toDateString()])
     })
 
     it('should not rewrite the grid when hovering without a range to preview', async () => {
