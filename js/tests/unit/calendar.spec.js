@@ -867,6 +867,77 @@ describe('Calendar', () => {
       expect(monthCalendar._view).toBe('months')
       expect(months.querySelector('.calendar-cell').textContent).toEqual('January 2026')
     })
+
+    it('should draw the cells again with the new state after a pick, keeping focus, and not on hover', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      let calls = 0
+      new Calendar(div, { // eslint-disable-line no-new
+        calendarDate: new Date(2026, 7, 1),
+        calendars: 2,
+        range: true,
+        renderDayCell(date, { isInRange, isSelected }) {
+          calls++
+          return `<span>${date.getDate()}${isSelected ? '*' : ''}${isInRange ? '~' : ''}</span>`
+        }
+      })
+      const cell = (month, day) => div.querySelector(`td.current[data-coreui-date="${new Date(2026, month, day).toDateString()}"]`)
+      const untouched = cell(7, 20).querySelector('span')
+
+      cell(7, 10).focus()
+      cell(7, 10).dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Enter' }))
+
+      expect(cell(7, 10).textContent).toEqual('10*')
+      expect(document.activeElement).toBe(cell(7, 10))
+      expect(untouched.isConnected).toBeTrue()
+
+      const drawn = calls
+      cell(7, 12).dispatchEvent(new MouseEvent('mouseover', { bubbles: true, relatedTarget: div }))
+
+      expect(cell(7, 12).classList.contains('range-hover')).toBeTrue()
+      expect(calls).toEqual(drawn)
+
+      cell(8, 3).click()
+
+      expect([cell(7, 10), cell(7, 31), cell(8, 2), cell(8, 3), cell(8, 4)].map(day => day.textContent)).toEqual(['10*~', '31~', '2~', '3*~', '4'])
+    })
+
+    it('should give the focus back to the picked date when a control drawn in the cell had it', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { // eslint-disable-line no-new
+        calendarDate: new Date(2026, 8, 1),
+        range: true,
+        renderDayCell: (date, { isSelected }) => `<a href="#d${date.getDate()}">${date.getDate()}</a>${isSelected ? '*' : ''}`
+      })
+      const cell = div.querySelector(`td.current[data-coreui-date="${new Date(2026, 8, 15).toDateString()}"]`)
+      const link = cell.querySelector('a')
+
+      link.focus()
+      link.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Enter' }))
+
+      expect(cell.textContent).toEqual('15*')
+      expect(document.activeElement).toBe(cell)
+    })
+
+    it('should draw the days of a picked week again with the state of its row', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { // eslint-disable-line no-new
+        calendarDate: new Date(2026, 8, 1),
+        firstDayOfWeek: 1,
+        renderDayCell: (date, { isSelected }) => `${date.getDate()}${isSelected ? '*' : ''}`,
+        selectionType: 'week'
+      })
+      const row = div.querySelector(`td.previous[data-coreui-date="${new Date(2026, 7, 31).toDateString()}"]`).closest('tr')
+
+      row.querySelector('td').click()
+
+      expect([...row.querySelectorAll('td')].map(cell => cell.textContent)).toEqual(['31*', '1*', '2*', '3*', '4*', '5*', '6*'])
+    })
   })
 
   describe('renderMonthCell', () => {
@@ -898,6 +969,21 @@ describe('Calendar', () => {
 
       expect(renderMonthCell).toHaveBeenCalledWith(new Date(2023, 5, 1), jasmine.objectContaining({ isDisabled: false, isSelected: true }))
     })
+
+    it('should draw the months again with the new state after a pick', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { // eslint-disable-line no-new
+        calendarDate: new Date(2026, 0, 1),
+        renderMonthCell: (date, { isSelected }) => `${date.getMonth() + 1}${isSelected ? '*' : ''}`,
+        selectionType: 'month'
+      })
+
+      div.querySelector(`[data-coreui-date="${new Date(2026, 2, 1).toDateString()}"]`).click()
+
+      expect([...div.querySelectorAll('td')].slice(0, 4).map(cell => cell.textContent)).toEqual(['1', '2', '3*', '4'])
+    })
   })
 
   describe('renderQuarterCell', () => {
@@ -914,6 +1000,21 @@ describe('Calendar', () => {
       const customQuarters = div.querySelectorAll('.custom-quarter')
       expect(customQuarters.length).toBeGreaterThan(0)
     })
+
+    it('should draw the quarters again with the new state after a pick', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { // eslint-disable-line no-new
+        calendarDate: new Date(2026, 0, 1),
+        renderQuarterCell: (date, { isSelected }) => `${(date.getMonth() / 3) + 1}${isSelected ? '*' : ''}`,
+        selectionType: 'quarter'
+      })
+
+      div.querySelector(`[data-coreui-date="${new Date(2026, 3, 1).toDateString()}"]`).click()
+
+      expect([...div.querySelectorAll('td')].map(cell => cell.textContent)).toEqual(['1', '2*', '3', '4'])
+    })
   })
 
   describe('renderYearCell', () => {
@@ -929,6 +1030,22 @@ describe('Calendar', () => {
 
       const customYears = div.querySelectorAll('.custom-year')
       expect(customYears.length).toBeGreaterThan(0)
+    })
+
+    it('should draw the years again with the new state after a pick', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { // eslint-disable-line no-new
+        calendarDate: new Date(2026, 0, 1),
+        renderYearCell: (date, { isSelected }) => `${date.getFullYear()}${isSelected ? '*' : ''}`,
+        selectionType: 'year'
+      })
+      const year = () => div.querySelector(`[data-coreui-date="${new Date(2027, 0, 1).toDateString()}"]`)
+
+      year().click()
+
+      expect(year().textContent).toEqual('2027*')
     })
   })
 

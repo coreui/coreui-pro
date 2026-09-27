@@ -390,6 +390,7 @@ class Calendar extends BaseComponent {
     this._hoverDate = null
     this._selectDate(date)
     this._updateClassNamesAndAriaLabels()
+    this._updateCellContent()
     this._updateRovingTabIndex(SelectorEngine.findOne(':focus', this._element as ParentNode) as HTMLElement)
   }
 
@@ -777,11 +778,15 @@ class Calendar extends BaseComponent {
 
   _cellHtml(date: Date, attributes: Record<string, any>, label: string): string {
     const renderer = CELL_RENDERERS[this._view]
-    const content = this._config[renderer] ? sanitizeByConfig(this._config[renderer](date, { ...attributes.meta, label: this._cellName(date) }), this._config) : label
+    const content = this._config[renderer] ? this._cellContent(date, attributes.meta) : label
     const ariaLabel = attributes.ariaLabel && !this._config[renderer] ? ` aria-label="${escapeHtml(attributes.ariaLabel)}"` : ''
     const ariaCurrent = attributes.ariaCurrent ? ' aria-current="date"' : ''
 
     return `<td class="${attributes.className}" role="gridcell" tabindex="-1"${this._stateHtml(attributes)}${ariaCurrent}${ariaLabel} data-coreui-date="${date.toDateString()}"><div class="${CLASS_NAME_CALENDAR_CELL_INNER} ${this._view.slice(0, -1)}">${content}</div></td>`
+  }
+
+  _cellContent(date: Date, meta: Record<string, boolean>): string {
+    return sanitizeByConfig(this._config[CELL_RENDERERS[this._view]](date, { ...meta, label: this._cellName(date) }), this._config)
   }
 
   _stateHtml({ ariaDisabled, ariaSelected, selectable }: Record<string, any>): string {
@@ -935,6 +940,32 @@ class Calendar extends BaseComponent {
       this._applyState(cell, this._view === 'days' ?
         this._cellDayAttributes(date, ['previous', 'next'].find(month => cell.classList.contains(month)) ?? 'current') :
         this._cellPeriodAttributes(date))
+    }
+  }
+
+  _updateCellContent(): void {
+    if (!this._config[CELL_RENDERERS[this._view]]) {
+      return
+    }
+
+    const focused = this._element.contains(document.activeElement) ? document.activeElement as HTMLElement : null
+    const restoreFocus = focused && this._focusRestorer(focused)
+
+    for (const cell of SelectorEngine.find(`${SELECTOR_CALENDAR_CELL}[data-coreui-date]`, this._element as ParentNode)) {
+      const date = new Date(Manipulator.getDataAttribute(cell, 'date') as string)
+      const attributes = this._view === 'days' ?
+        this._cellDayAttributes(date, ['previous', 'next'].find(month => cell.classList.contains(month)) ?? 'current', this._rowWeekAttributes(this._getDate(cell)).meta) :
+        this._cellPeriodAttributes(date)
+      const inner = SelectorEngine.findOne(`.${CLASS_NAME_CALENDAR_CELL_INNER}`, cell) as HTMLElement
+      const content = this._cellContent(date, attributes.meta)
+
+      if (inner.innerHTML !== content) {
+        inner.innerHTML = content
+      }
+    }
+
+    if (restoreFocus && (!document.activeElement || document.activeElement === document.body)) {
+      restoreFocus()
     }
   }
 
