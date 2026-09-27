@@ -305,11 +305,14 @@ class Calendar extends BaseComponent {
   }
 
   // Private
-  _focusOnFirstAvailableCell(): void {
-    const cell = SelectorEngine.findOne(SELECTOR_CALENDAR_CELL_CLICKABLE, this._element as ParentNode)
+  _focusOnFirstAvailableCell(index: number): void {
+    const panel = SelectorEngine.find(SELECTOR_CALENDAR, this._element as ParentNode)[index] as ParentNode
+    const target = (SelectorEngine.findOne(this._rovingSelector(), panel) ??
+      SelectorEngine.findOne('[tabindex="0"]', panel) ??
+      SelectorEngine.findOne('[tabindex="0"]', this._element as ParentNode)) as HTMLElement | null
 
-    if (cell) {
-      cell.focus()
+    if (target) {
+      target.focus()
     }
   }
 
@@ -372,14 +375,14 @@ class Calendar extends BaseComponent {
     if (this._view === 'months' && this._config.selectionType !== 'month') {
       this._setCalendarDate(index ? new Date(cloneDate.setMonth(cloneDate.getMonth() - index)) : date, 'days')
       this._setCalendarView('days', 'cellClick')
-      this._updateCalendar(this._focusOnFirstAvailableCell.bind(this))
+      this._updateCalendar(() => this._focusOnFirstAvailableCell(index))
       return
     }
 
     if (this._view === 'years' && this._config.selectionType !== 'year') {
       this._setCalendarDate(index ? new Date(cloneDate.setFullYear(cloneDate.getFullYear() - index)) : date, 'months')
       this._setCalendarView(this._config.selectionType === 'quarter' ? 'quarters' : 'months', 'cellClick')
-      this._updateCalendar(this._focusOnFirstAvailableCell.bind(this))
+      this._updateCalendar(() => this._focusOnFirstAvailableCell(index))
       return
     }
 

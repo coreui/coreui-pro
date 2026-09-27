@@ -467,6 +467,90 @@ describe('Calendar', () => {
         .toEqual([new Date(2026, 7, 10).toDateString(), new Date(2026, 8, 5).toDateString()])
     })
 
+    it('should move focus to the grid of the panel whose month was picked when its view has nothing to pick', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { // eslint-disable-line no-new
+        calendarDate: new Date(2026, 11, 1),
+        calendars: 2,
+        disabledDates: date => date.getDay() === 1,
+        firstDayOfWeek: 1,
+        locale: 'en-US',
+        selectionType: 'week'
+      })
+
+      div.querySelector('.btn-month').click()
+
+      const january = div.querySelector(`[data-coreui-date="${new Date(2027, 0, 1).toDateString()}"]`)
+
+      january.focus()
+      january.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Enter' }))
+
+      const grids = [...div.querySelectorAll('table')]
+
+      expect(grids.map(grid => grid.getAttribute('aria-label'))).toEqual(['December 2026', 'January 2027'])
+      expect(div.querySelector('[data-coreui-selectable]')).toBeNull()
+      expect(document.activeElement).toBe(grids[1])
+    })
+
+    it('should move focus to the first week of the panel whose month was picked', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { // eslint-disable-line no-new
+        calendarDate: new Date(2026, 11, 1),
+        calendars: 2,
+        firstDayOfWeek: 1,
+        locale: 'en-US',
+        selectionType: 'week'
+      })
+
+      div.querySelector('.btn-month').click()
+
+      const january = div.querySelector(`[data-coreui-date="${new Date(2027, 0, 1).toDateString()}"]`)
+
+      january.focus()
+      january.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Enter' }))
+
+      expect(document.activeElement.closest('.calendar')).toBe(div.querySelectorAll('.calendar')[1])
+      expect(document.activeElement.querySelector('td').dataset.coreuiDate).toEqual(new Date(2026, 11, 28).toDateString())
+    })
+
+    it('should move focus to the first date after a click on a month, as after Enter', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { calendarDate: new Date(2026, 11, 1), calendars: 2, locale: 'en-US' }) // eslint-disable-line no-new
+
+      div.querySelector('.btn-month').click()
+
+      const january = div.querySelector(`[data-coreui-date="${new Date(2027, 0, 1).toDateString()}"]`)
+
+      january.focus()
+      january.click()
+
+      expect(document.activeElement.closest('.calendar')).toBe(div.querySelectorAll('.calendar')[1])
+      expect(document.activeElement.dataset.coreuiDate).toEqual(new Date(2027, 0, 1).toDateString())
+    })
+
+    it('should move focus to the first month after a year is picked', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { calendarDate: new Date(2026, 8, 1), locale: 'en-US' }) // eslint-disable-line no-new
+
+      div.querySelector('.btn-year').click()
+
+      const year = div.querySelector(`[data-coreui-date="${new Date(2027, 0, 1).toDateString()}"]`)
+
+      year.focus()
+      year.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Enter' }))
+
+      expect(div.querySelector('table').getAttribute('aria-label')).toEqual('2027')
+      expect(document.activeElement.dataset.coreuiDate).toEqual(new Date(2027, 0, 1).toDateString())
+    })
+
     it('should keep a stop in every panel, one per grid', () => {
       fixtureEl.innerHTML = '<div></div>'
 
