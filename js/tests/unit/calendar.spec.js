@@ -3822,6 +3822,64 @@ describe('Calendar', () => {
       expect(periods('#years').map(date => date.getFullYear())).toEqual([2024, 2026, 2027])
     })
 
+    it('should describe the week row in the meta of its days in week selection', () => {
+      vi.useFakeTimers({ toFake: ['Date'] })
+      vi.setSystemTime(new Date(2026, 8, 30))
+      onTestFinished(() => vi.useRealTimers())
+      fixtureEl.innerHTML = '<div></div>'
+      const metas = new Map()
+
+      new Calendar(fixtureEl.querySelector('div'), { // eslint-disable-line no-new
+        calendarDate: new Date(2026, 8, 1),
+        disabledDates: [new Date(2026, 8, 16), new Date(2026, 8, 21)],
+        endDate: new Date(2026, 9, 5),
+        firstDayOfWeek: 1,
+        range: true,
+        renderDayCell(date, meta) {
+          metas.set(date.toDateString(), meta)
+          return String(date.getDate())
+        },
+        selectionType: 'week',
+        startDate: new Date(2026, 8, 9)
+      })
+
+      const rows = [...fixtureEl.querySelectorAll('tbody tr')].map(row => {
+        const days = [...row.querySelectorAll('td')].map(cell => metas.get(cell.dataset.coreuiDate))
+        return ['isSelected', 'isInRange', 'isDisabled'].map(key => days.map(meta => Number(meta[key])).join('')).join(' ')
+      })
+
+      expect(rows).toEqual([
+        '0000000 0000000 0000000',
+        '1111111 1111111 0000000',
+        '0000000 1111111 0000000',
+        '0000000 1111111 1111111',
+        '0000000 1111111 0000000',
+        '1111111 1111111 0000000'
+      ])
+      expect(metas.get(new Date(2026, 9, 1).toDateString())).toEqual(jasmine.objectContaining({ isInCurrentMonth: false, isInRange: true }))
+      expect([...metas].filter(([, meta]) => meta.isToday).map(([date]) => date)).toEqual([new Date(2026, 8, 30).toDateString()])
+    })
+
+    it('should leave a week row with no day of the month plain', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      new Calendar(fixtureEl.querySelector('div'), { // eslint-disable-line no-new
+        calendarDate: new Date(2026, 8, 1),
+        endDate: new Date(2026, 9, 5),
+        firstDayOfWeek: 1,
+        range: true,
+        selectionType: 'week',
+        showAdjacentDays: false,
+        startDate: new Date(2026, 7, 31)
+      })
+
+      const last = [...fixtureEl.querySelectorAll('tbody tr')].at(-1)
+
+      expect(last.querySelectorAll('td[data-coreui-date]')).toHaveSize(0)
+      expect(last.className).toEqual('calendar-row')
+      expect(last.hasAttribute('aria-selected')).toBeFalse()
+    })
+
     it('should not mark as selectable non-day selectionType in days view', () => {
       fixtureEl.innerHTML = '<div></div>'
 

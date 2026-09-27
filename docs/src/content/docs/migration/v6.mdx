@@ -1270,6 +1270,12 @@ removed in favour of `$translucent-opacity` and
   only its two ends, so a screen reader announces the ones in between as
   selected. The months and years views of a day range only navigate and keep
   it on the ends, and `meta.isSelected` still marks only the ends.
+- In week selection, `renderDayCell` gets the `isDisabled`, `isInRange` and
+  `isSelected` of the day's week row, the way the calendar draws it: every day
+  of a selected week is `isSelected`, every day of a week in the range is
+  `isInRange`, and a day is `isDisabled` only when its row cannot be picked.
+  Before, each field described the day alone, so a selected week reported
+  only the day holding its start or end date as selected.
 - **Additive:** `startDateChange` and `endDateChange` now carry a `dateObject`
   property with the underlying `Date`, alongside the existing `date` property.
   `date` remains formatted per `selectionType` — a `Date` for day selection, but
