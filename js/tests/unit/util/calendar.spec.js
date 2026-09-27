@@ -6,6 +6,7 @@ import {
   convertToDateObject,
   createDateFormatter,
   createDateTimeFormat,
+  createDate,
   createGroupsInArray,
   formatCellName,
   formatWeekName,
@@ -33,6 +34,7 @@ import {
   isSameInstantAs,
   isSameDateAs,
   isToday,
+  parseToDateString,
   parseYearSmart,
   removeTimeFromDate,
   setRovingTabIndex,
@@ -50,6 +52,39 @@ describe('Calendar Utilities', () => {
 
   afterEach(() => {
     clearFixture()
+  })
+
+  describe('createDate', () => {
+    it('should keep a year below 100 as written, at midnight', () => {
+      for (const year of [1, 26, 99]) {
+        const date = createDate(year, 5, 15)
+
+        expect([date.getFullYear(), date.getMonth(), date.getDate(), date.getHours()]).toEqual([year, 5, 15, 0])
+      }
+    })
+
+    it('should roll a month or a day out of range over as the Date constructor does', () => {
+      const lastOfFebruary = createDate(26, 2, 0)
+      const turnOfYear = createDate(99, 11, 32)
+
+      expect([lastOfFebruary.getFullYear(), lastOfFebruary.getMonth(), lastOfFebruary.getDate()]).toEqual([26, 1, 28])
+      expect([turnOfYear.getFullYear(), turnOfYear.getMonth(), turnOfYear.getDate()]).toEqual([100, 0, 1])
+      expect(createDate(2026, 12)).toEqual(new Date(2027, 0, 1))
+    })
+  })
+
+  describe('parseToDateString', () => {
+    it('should read a date written by toDateString, keeping a year below 100', () => {
+      for (const date of [createDate(99, 11, 31), createDate(26, 5, 15), createDate(1, 0, 1), createDate(-5, 11, 31), new Date(2026, 8, 30)]) {
+        expect(parseToDateString(date.toDateString())).toEqual(date)
+      }
+    })
+
+    it('should give an invalid date for any other string', () => {
+      for (const value of ['Thu Foo 31 2026', 'Thu dec 31 2026', ' Thu Dec 31 2026', 'Thu Dec 31 2026 23:00:00 GMT-0500', '']) {
+        expect(parseToDateString(value).getTime()).toBeNaN()
+      }
+    })
   })
 
   describe('convertIsoWeekToDate', () => {
@@ -249,6 +284,13 @@ describe('Calendar Utilities', () => {
       const result = getCalendarDate(baseDate, 0, 'days')
       expect(result).toBe(baseDate)
     })
+
+    it('should keep a year below 100 on the next panel of every view', () => {
+      expect(getCalendarDate(createDate(99, 11), 1, 'days')).toEqual(createDate(100, 0))
+      expect(getCalendarDate(createDate(26), 1, 'months')).toEqual(createDate(27))
+      expect(getCalendarDate(createDate(26), 1, 'quarters')).toEqual(createDate(27))
+      expect(getCalendarDate(createDate(26), 1, 'years')).toEqual(createDate(38))
+    })
   })
 
   describe('getDateBySelectionType', () => {
@@ -437,6 +479,28 @@ describe('Calendar Utilities', () => {
       expect(result[0].days).toBeInstanceOf(Array)
       // Each day is { date: ..., month: 'previous'|'current'|'next' }
     })
+
+    it('should build the weeks of a month below year 100 in that year', () => {
+      const years = new Set(getMonthDetails(26, 0, 1).flatMap(({ days }) => days).map(({ date }) => date.getFullYear()))
+
+      expect([...years]).toEqual([25, 26])
+    })
+
+    it('should put each day of a month below year 100 under its weekday', () => {
+      const weeks = getMonthDetails(99, 11, 1)
+
+      expect(weeks[0].days[1].date).toEqual(createDate(99, 11, 1))
+
+      for (const { days } of weeks) {
+        expect(days.map(({ date }) => (date.getDay() + 6) % 7)).toEqual([0, 1, 2, 3, 4, 5, 6])
+      }
+    })
+
+    it('should give February of year 0 its leap day', () => {
+      const days = getMonthDetails(0, 1, 1).flatMap(({ days }) => days).filter(({ month }) => month === 'current')
+
+      expect(days.at(-1).date).toEqual(createDate(0, 1, 29))
+    })
   })
 
   describe('getTabStop', () => {
@@ -533,6 +597,19 @@ describe('Calendar Utilities', () => {
       const rows = getSelectableDates(fixtureEl, 'tr[data-coreui-selectable]')
 
       expect(getClosestSelectable(rows, new Date(2026, 3, 2), true)).toBe(rows[1])
+    })
+
+    it('should read the dates of cells and week rows below year 100', () => {
+      fixtureEl.innerHTML = `<table><tbody><tr>${cell(createDate(99, 11, 1))}${cell(createDate(99, 11, 15))}</tr></tbody></table>`
+      const cells = getSelectableDates(fixtureEl)
+
+      expect(getClosestSelectable(cells, createDate(99, 11, 15), false)).toBe(cells[1])
+
+      const row = (first, last) => `<tr data-coreui-selectable>${cell(first)}${cell(last)}</tr>`
+      fixtureEl.innerHTML = `<table><tbody>${row(createDate(99, 10, 30), createDate(99, 11, 6))}${row(createDate(99, 11, 14), createDate(99, 11, 20))}</tbody></table>`
+      const rows = getSelectableDates(fixtureEl, 'tr[data-coreui-selectable]')
+
+      expect(getClosestSelectable(rows, createDate(99, 11, 15), true)).toBe(rows[1])
     })
 
     it('should return undefined without a cell that carries a date', () => {
@@ -957,6 +1034,37 @@ describe('Calendar Utilities', () => {
       expect(getCalendarKeyAction(press('ArrowRight'), null, context({ maxDate: new Date(2026, 6, 31) }))).toEqual({ type: 'stay' })
     })
 
+    it('should keep a year below 100 on Home and End in every view', () => {
+      const december = context({ calendarDate: createDate(99, 11) })
+
+      expect(getCalendarKeyAction(press('Home'), createDate(99, 11, 16), december)).toEqual(move(createDate(99, 11, 14)))
+      expect(getCalendarKeyAction(press('End'), createDate(99, 11, 16), december)).toEqual(move(createDate(99, 11, 20)))
+      expect(getCalendarKeyAction(press('End'), createDate(99, 10, 30), context({ calendarDate: createDate(99, 11), rows: true }))).toEqual(rowMove(createDate(99, 11, 28)))
+      expect(getCalendarKeyAction(press('Home'), createDate(26, 7), context({ calendarDate: createDate(26), view: 'months' }))).toEqual(move(createDate(26, 6)))
+      expect(getCalendarKeyAction(press('End'), createDate(26), context({ calendarDate: createDate(26), view: 'quarters' }))).toEqual(move(createDate(26, 9)))
+      expect(getCalendarKeyAction(press('Home'), createDate(27), context({ calendarDate: createDate(26), view: 'years' }))).toEqual(move(createDate(26)))
+    })
+
+    it('should keep a year below 100 when the arrows leave the edge of the view from the grid', () => {
+      expect(getCalendarKeyAction(press('ArrowRight'), null, context({ calendarDate: createDate(99, 11), minDate: createDate(100, 0, 20) }))).toEqual(move(createDate(100, 0, 20), 1))
+      expect(getCalendarKeyAction(press('ArrowRight'), null, context({ calendarDate: createDate(26), view: 'months' }))).toEqual(move(createDate(27), 0, 1))
+      expect(getCalendarKeyAction(press('ArrowRight'), null, context({ calendarDate: createDate(26), view: 'years' }))).toEqual(move(createDate(32), 0, 12))
+    })
+
+    it('should not move before year 1, whatever minDate says', () => {
+      const january = context({ calendarDate: createDate(1) })
+
+      for (const minDate of [undefined, createDate(-10)]) {
+        expect(getCalendarKeyAction(press('ArrowLeft'), createDate(1), { ...january, minDate })).toEqual({ type: 'stay' })
+        expect(getCalendarKeyAction(press('ArrowUp'), createDate(1, 0, 5), { ...january, minDate })).toEqual({ type: 'stay' })
+        expect(getCalendarKeyAction(press('PageUp'), createDate(1, 0, 15), { ...january, minDate })).toEqual(move(createDate(1)))
+      }
+
+      expect(getCalendarKeyAction(press('ArrowLeft'), createDate(1), context({ calendarDate: createDate(1), view: 'months' }))).toEqual({ type: 'stay' })
+      expect(getCalendarKeyAction(press('ArrowLeft'), createDate(1), context({ calendarDate: createDate(1), view: 'years' }))).toEqual({ type: 'stay' })
+      expect(getCalendarKeyAction(press('PageUp'), createDate(5), context({ calendarDate: createDate(5), view: 'years' }))).toEqual(move(createDate(1)))
+    })
+
     it('should page the calendar with PageDown and PageUp and stay on Home and End when the grid has the focus', () => {
       expect(getCalendarKeyAction(press('PageDown'), null, context())).toEqual({ months: 1, type: 'page', years: 0 })
       expect(getCalendarKeyAction(press('PageUp'), null, context())).toEqual({ months: -1, type: 'page', years: 0 })
@@ -1003,6 +1111,13 @@ describe('Calendar Utilities', () => {
       const date = new Date(2023, 0, 1)
       const min = new Date(2023, 0, 2)
       expect(isDateDisabled(date, min, null, undefined)).toBeTrue()
+    })
+
+    it('should return true before year 1, whatever min says', () => {
+      expect(isDateDisabled(createDate(0, 11, 31), null, null, undefined)).toBeTrue()
+      expect(isDateDisabled(createDate(-5, 5, 1), createDate(-10), null, undefined)).toBeTrue()
+      expect(isDateDisabled(createDate(1), null, null, undefined)).toBeFalse()
+      expect(isDateDisabled(createDate(1), createDate(-10), null, undefined)).toBeFalse()
     })
 
     it('should return true if date > max', () => {
@@ -1128,6 +1243,21 @@ describe('Calendar Utilities', () => {
       const onlyMarch20 = date => date.getDate() !== 20
       expect(isPeriodDisabled(new Date(2023, 2, 1), 'months', new Date(2023, 2, 15), null, onlyMarch20)).toBeFalse()
       expect(isPeriodDisabled(new Date(2023, 2, 1), 'months', null, new Date(2023, 2, 10), onlyMarch20)).toBeTrue()
+    })
+
+    it('should check the days of a month below year 100 in that year', () => {
+      const march = [[createDate(26, 2, 1), createDate(26, 2, 31)]]
+
+      expect(isPeriodDisabled(createDate(26, 2), 'months', null, null, march)).toBeTrue()
+      expect(isPeriodDisabled(createDate(26, 3), 'months', null, null, march)).toBeFalse()
+    })
+
+    it('should return true for a month, quarter or year before year 1, whatever min says', () => {
+      for (const view of ['months', 'quarters', 'years']) {
+        expect(isPeriodDisabled(createDate(0, 11), view, null, null, undefined)).toBeTrue()
+        expect(isPeriodDisabled(createDate(0, 11), view, createDate(-10), null, undefined)).toBeTrue()
+        expect(isPeriodDisabled(createDate(1), view, null, null, undefined)).toBeFalse()
+      }
     })
   })
 

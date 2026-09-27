@@ -1276,6 +1276,12 @@ removed in favour of `$translucent-opacity` and
   `isInRange`, and a day is `isDisabled` only when its row cannot be picked.
   Before, each field described the day alone, so a selected week reported
   only the day holding its start or end date as selected.
+- A year below 100 stays as written: a calendar on December of year 99 draws
+  the days of year 99, where it drew 1999, and its next panel shows January of
+  year 100, where it showed January 2000. The month, quarter and year views,
+  the arrow keys and paging keep the year the same way. Years before 1 cannot
+  be picked, as dates before `minDate` cannot: their cells are disabled, and
+  the arrow keys and paging stop at 1 January of year 1.
 - **Additive:** `startDateChange` and `endDateChange` now carry a `dateObject`
   property with the underlying `Date`, alongside the existing `date` property.
   `date` remains formatted per `selectionType` — a `Date` for day selection, but

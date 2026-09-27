@@ -2970,6 +2970,149 @@ describe('Calendar', () => {
       expect(div.querySelector('.calendar-nav-date').textContent.trim()).toMatch(/^77\s–\s88$/)
     })
 
+    it('should draw the days of both panels below year 100 in the years they show', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendarDate = new Date(2000, 11, 1)
+      calendarDate.setFullYear(99)
+      new Calendar(div, { calendarDate, calendars: 2 }) // eslint-disable-line no-new
+
+      const [december, january] = div.querySelectorAll('.calendar')
+      const years = (panel, selector) => [...new Set([...panel.querySelectorAll(selector)].map(cell => cell.dataset.coreuiDate.slice(-4)))]
+
+      expect(years(december, 'td.current')).toEqual(['0099'])
+      expect(years(december, 'td.next')).toEqual(['0100'])
+      expect(years(january, 'td.current')).toEqual(['0100'])
+    })
+
+    it.each([
+      ['month', ['0026']],
+      ['quarter', ['0026']]
+    ])('should draw the %s cells below year 100 in the year the page shows', (selectionType, expected) => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendarDate = new Date(2000, 0, 1)
+      calendarDate.setFullYear(26)
+      new Calendar(div, { calendarDate, selectionType }) // eslint-disable-line no-new
+
+      expect([...new Set([...div.querySelectorAll('td[data-coreui-date]')].map(cell => cell.dataset.coreuiDate.slice(-4)))]).toEqual(expected)
+    })
+
+    it('should give each year cell below 100 the year it shows', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendarDate = new Date(2000, 0, 1)
+      calendarDate.setFullYear(26)
+      new Calendar(div, { calendarDate, locale: 'en-US', selectionType: 'year' }) // eslint-disable-line no-new
+
+      const cells = [...div.querySelectorAll('td[data-coreui-date]')]
+      const years = cells.map(cell => Number(cell.dataset.coreuiDate.slice(-4)))
+
+      expect(years).toContain(26)
+      expect(Math.max(...years)).toBeLessThan(100)
+      expect(years).toEqual(cells.map(cell => Number(cell.textContent)))
+    })
+
+    it('should move with the arrow keys from year 99 into year 100', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendarDate = new Date(2000, 11, 1)
+      calendarDate.setFullYear(99)
+      new Calendar(div, { calendarDate }) // eslint-disable-line no-new
+
+      const last = [...div.querySelectorAll('td.current[data-coreui-date]')].at(-1)
+
+      last.focus()
+      last.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'ArrowRight' }))
+
+      expect(document.activeElement.dataset.coreuiDate).toMatch(/^\w{3} Jan 01 0100$/)
+    })
+
+    it('should pick a week below year 100 and mark the row that holds the start date', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendarDate = new Date(2000, 11, 1)
+      calendarDate.setFullYear(99)
+      const startDate = new Date(2000, 11, 8)
+      startDate.setFullYear(99)
+      new Calendar(div, { calendarDate, selectionType: 'week', startDate }) // eslint-disable-line no-new
+
+      const selected = div.querySelector('.calendar-row.selected')
+
+      expect([...selected.querySelectorAll('td[data-coreui-date]')].map(cell => cell.dataset.coreuiDate)).toContain(startDate.toDateString())
+
+      const picked = []
+      div.addEventListener('startDateChange.coreui.calendar', event => picked.push(event.dateObject))
+      div.querySelectorAll('.calendar-row[data-coreui-selectable]')[3].querySelector('td').click()
+
+      expect(picked.map(date => date.getFullYear())).toEqual([99])
+    })
+
+    it('should hand renderDayCell the days below year 100 after a pick', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendarDate = new Date(2000, 11, 1)
+      calendarDate.setFullYear(99)
+      const day = new Date(2000, 11, 10)
+      day.setFullYear(99)
+      const years = new Set()
+      new Calendar(div, { // eslint-disable-line no-new
+        calendarDate,
+        renderDayCell(date) {
+          years.add(date.getFullYear())
+          return `${date.getDate()}`
+        }
+      })
+
+      years.clear()
+      div.querySelector(`[data-coreui-date="${day.toDateString()}"]`).click()
+
+      expect([...years].toSorted((a, b) => a - b)).toEqual([99, 100])
+    })
+
+    it('should focus the month the calendar shows below year 100 after the month button', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendarDate = new Date(2000, 11, 1)
+      calendarDate.setFullYear(99)
+      const startDate = new Date(2000, 2, 5)
+      startDate.setFullYear(99)
+      new Calendar(div, { calendarDate, startDate }) // eslint-disable-line no-new
+
+      div.querySelector('td.current[data-coreui-date]').focus()
+      div.querySelector('.btn-month').click()
+
+      expect(document.activeElement.dataset.coreuiDate).toMatch(/^\w{3} Dec 01 0099$/)
+    })
+
+    it('should disable the years before 1 and keep the arrow keys from reaching them', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendarDate = new Date(2000, 0, 1)
+      calendarDate.setFullYear(1)
+      new Calendar(div, { calendarDate, selectionType: 'year' }) // eslint-disable-line no-new
+
+      const cells = [...div.querySelectorAll('td[data-coreui-date]')]
+      const year = cell => Number(cell.dataset.coreuiDate.split(' ').at(-1))
+      const first = cells.find(cell => year(cell) === 1)
+
+      expect(cells.map(cell => cell.getAttribute('aria-disabled') === 'true')).toEqual(cells.map(cell => year(cell) < 1))
+      expect(cells.filter(cell => year(cell) < 1)).toHaveSize(6)
+
+      first.focus()
+      first.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'ArrowLeft' }))
+
+      expect(document.activeElement).toBe(first)
+    })
+
     it.each([
       ['America/Santiago', [2026, 8, 6], [2026, 9, 1]],
       ['Europe/Paris', [1919, 1, 15, 23, 30], [1919, 2, 1]],
