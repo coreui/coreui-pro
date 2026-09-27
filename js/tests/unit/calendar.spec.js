@@ -3278,7 +3278,7 @@ describe('Calendar', () => {
 
       expect(cellFor(new Date(2026, 7, 14)).getAttribute('aria-disabled')).toEqual('true')
       expect(cellFor(new Date(2026, 7, 13)).hasAttribute('aria-disabled')).toBeFalse()
-      expect(cellFor(new Date(2026, 6, 31)).hasAttribute('aria-disabled')).toBeFalse()
+      expect(cellFor(new Date(2026, 6, 31)).getAttribute('aria-disabled')).toEqual('true')
 
       calendar._updateClassNamesAndAriaLabels()
 
@@ -3569,7 +3569,7 @@ describe('Calendar', () => {
           { isInCurrentMonth: true, isToday: true },
           { isInCurrentMonth: false, isToday: false }
         ])
-        expect(metas[1]).toEqual(jasmine.objectContaining({ isDisabled: false, isInRange: false, isSelected: false }))
+        expect(metas[1]).toEqual(jasmine.objectContaining({ isDisabled: selectionType === 'day', isInRange: false, isSelected: false }))
         expect(div.querySelectorAll('[aria-current="date"]')).toHaveSize(1)
         expect(div.querySelectorAll('.calendar-cell.today')).toHaveSize(1)
       })
@@ -3607,6 +3607,66 @@ describe('Calendar', () => {
         expect(adjacent.classList.contains('range') || adjacent.closest('tr').classList.contains('range')).toBe(adjacentInRange)
       })
     }
+
+    it('should mark the days of an adjacent month as disabled only when they cannot be picked', () => {
+      fixtureEl.innerHTML = '<div id="day"></div><div id="adjacent"></div><div id="week"></div>'
+
+      const adjacentDay = id => fixtureEl.querySelector(`#${id} td.next`)
+      const calendars = [
+        new Calendar(fixtureEl.querySelector('#day'), { calendarDate: new Date(2026, 8, 1) }),
+        new Calendar(fixtureEl.querySelector('#adjacent'), { calendarDate: new Date(2026, 8, 1), selectAdjacentDays: true }),
+        new Calendar(fixtureEl.querySelector('#week'), { calendarDate: new Date(2026, 8, 1), selectionType: 'week' })
+      ]
+
+      expect(calendars.map(calendar => calendar._view)).toEqual(['days', 'days', 'days'])
+      expect(adjacentDay('day').getAttribute('aria-disabled')).toEqual('true')
+      expect(adjacentDay('adjacent').hasAttribute('aria-disabled')).toBeFalse()
+      expect(adjacentDay('week').hasAttribute('aria-disabled')).toBeFalse()
+    })
+
+    it('should treat the adjacent copy of a date as disabled filler and keep the date pickable in its own panel', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const metas = new Map()
+      const calendar = new Calendar(div, {
+        calendarDate: new Date(2026, 8, 1),
+        calendars: 2,
+        endDate: new Date(2026, 9, 3),
+        range: true,
+        renderDayCell(date, { isDisabled, isInCurrentMonth, isSelected }) {
+          if (date.toDateString() === new Date(2026, 9, 1).toDateString()) {
+            metas.set(isInCurrentMonth, { isDisabled, isSelected })
+          }
+
+          return String(date.getDate())
+        },
+        startDate: new Date(2026, 9, 1)
+      })
+      const [filler, own] = div.querySelectorAll(`[data-coreui-date="${new Date(2026, 9, 1).toDateString()}"]`)
+
+      expect(calendar._view).toBe('days')
+      expect(filler.classList.contains('next')).toBeTrue()
+      expect(filler.getAttribute('aria-disabled')).toEqual('true')
+      expect(filler.hasAttribute('aria-selected')).toBeFalse()
+      expect(own.hasAttribute('aria-disabled')).toBeFalse()
+      expect(own.getAttribute('aria-selected')).toEqual('true')
+      expect(own.hasAttribute('data-coreui-selectable')).toBeTrue()
+      expect(metas.get(false)).toEqual({ isDisabled: true, isSelected: false })
+      expect(metas.get(true)).toEqual({ isDisabled: false, isSelected: true })
+    })
+
+    it('should leave the empty cells of hidden adjacent days without aria-disabled', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, { calendarDate: new Date(2026, 8, 1), showAdjacentDays: false })
+      const empty = div.querySelectorAll('td[role="gridcell"]:not([data-coreui-date])')
+
+      expect(calendar._view).toBe('days')
+      expect(empty.length).toBeGreaterThan(0)
+      expect([...empty].filter(cell => cell.hasAttribute('aria-disabled'))).toHaveSize(0)
+    })
 
     it('should not mark as selectable non-day selectionType in days view', () => {
       fixtureEl.innerHTML = '<div></div>'

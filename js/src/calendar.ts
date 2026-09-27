@@ -958,15 +958,16 @@ class Calendar extends BaseComponent {
   _cellDayAttributes(date: Date, month: string): Record<string, any> {
     const isCurrentMonth = month === 'current'
 
+    const isFiller = this._config.selectionType === 'day' && !isCurrentMonth && !this._config.selectAdjacentDays
     const isDisabled = isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates)
     const isSelected = isDateSelected(date, this._startDate, this._endDate)
     const isTodayDate = isCurrentMonth && isToday(date)
     const isInRange = (this._config.selectionType !== 'day' || isCurrentMonth) && isDateInRange(date, this._startDate, this._endDate)
     const meta = {
-      isDisabled,
+      isDisabled: isDisabled || isFiller,
       isInCurrentMonth: isCurrentMonth,
       isInRange,
-      isSelected,
+      isSelected: isSelected && !isFiller,
       isToday: isTodayDate
     }
 
@@ -1000,9 +1001,9 @@ class Calendar extends BaseComponent {
 
     return {
       className: classNames,
-      selectable: (isCurrentMonth || this._config.selectAdjacentDays) && !isDisabled,
-      ariaDisabled: isDisabled,
-      ariaSelected: isSelected,
+      selectable: !isDisabled && !isFiller,
+      ariaDisabled: isDisabled || isFiller,
+      ariaSelected: isSelected && !isFiller,
       ariaLabel: this._cellName(date),
       ariaCurrent: isTodayDate,
       meta
