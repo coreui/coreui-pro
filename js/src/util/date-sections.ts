@@ -6,7 +6,7 @@
  */
 
 import {
-  convertToDateObject, type DisabledDate, getISOWeekNumberAndYear, isDateDisabled, parseYearSmart, type SelectionTypes
+  convertToDateObject, createDate, type DisabledDate, getISOWeekNumberAndYear, isDateDisabled, parseYearSmart, type SelectionTypes
 } from './calendar.js'
 import { convert12hTo24h, convert24hTo12h } from './time.js'
 
@@ -535,9 +535,7 @@ export const getIncrementedSectionValue = (section: EditableSection, delta: numb
  * @returns The number of days
  */
 export const getDaysInMonth = (year: number, month: number): number => {
-  const date = new Date(2000, 0, 1)
-  date.setFullYear(year, month, 0)
-  return date.getDate()
+  return createDate(year, month, 0).getDate()
 }
 
 /**
@@ -547,9 +545,7 @@ export const getDaysInMonth = (year: number, month: number): number => {
  * @returns 52 or 53
  */
 export const getISOWeeksInYear = (year: number): number => {
-  const date = new Date(2000, 0, 1)
-  date.setFullYear(year, 11, 28)
-  return getISOWeekNumberAndYear(date).weekNumber
+  return getISOWeekNumberAndYear(createDate(year, 11, 28)).weekNumber
 }
 
 /**
@@ -560,8 +556,7 @@ export const getISOWeeksInYear = (year: number): number => {
  * @returns The Monday of the week
  */
 export const getDateOfISOWeek = (year: number, week: number): Date => {
-  const date = new Date(2000, 0, 1)
-  date.setFullYear(year, 0, 4)
+  const date = createDate(year, 0, 4)
   date.setDate(date.getDate() - ((date.getDay() + 6) % 7) + ((week - 1) * 7))
   return date
 }
@@ -673,11 +668,9 @@ export const getDateFromSections = (sections: DateSection[]): Date | null => {
     hour = convert12hTo24h(values.meridiem === 2 ? 'pm' : 'am', hour)
   }
 
-  const date = values.week === undefined ? new Date(2000, 0, 1) : getDateOfISOWeek(year, Math.min(values.week, getISOWeeksInYear(year)))
-
-  if (values.week === undefined) {
-    date.setFullYear(year, month - 1, Math.min(day, getDaysInMonth(year, month)))
-  }
+  const date = values.week === undefined ?
+    createDate(year, month - 1, Math.min(day, getDaysInMonth(year, month))) :
+    getDateOfISOWeek(year, Math.min(values.week, getISOWeeksInYear(year)))
 
   date.setHours(hour, values.minute === undefined ? 0 : values.minute, values.second === undefined ? 0 : values.second, 0)
   return date

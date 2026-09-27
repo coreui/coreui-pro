@@ -20,6 +20,7 @@ import {
   type CalendarKeyAction,
   type CalendarKeyContext,
   convertToDateObject,
+  createDate,
   createDateFormatter,
   createGroupsInArray,
   type DisabledDate,
@@ -43,6 +44,7 @@ import {
   isPeriodInRange,
   isPeriodSelected,
   isToday,
+  parseToDateString,
   type PeriodViewTypes,
   type SelectionTypes,
   setRovingTabIndex,
@@ -355,10 +357,10 @@ class Calendar extends BaseComponent {
   _getDate(target: HTMLElement): Date {
     if (this._rowsAreTargets()) {
       const firstCell = SelectorEngine.findOne(SELECTOR_CALENDAR_CELL, target.closest(SELECTOR_CALENDAR_ROW) as ParentNode)
-      return getStartOfWeek(new Date(Manipulator.getDataAttribute(firstCell as HTMLElement, 'date') as string), this._config.firstDayOfWeek)
+      return getStartOfWeek(parseToDateString(Manipulator.getDataAttribute(firstCell as HTMLElement, 'date') as string), this._config.firstDayOfWeek)
     }
 
-    return new Date(Manipulator.getDataAttribute(target, 'date') as string)
+    return parseToDateString(Manipulator.getDataAttribute(target, 'date') as string)
   }
 
   _handleCalendarClick(event: any): void {
@@ -599,7 +601,7 @@ class Calendar extends BaseComponent {
 
   _showPeriodView(view: 'months' | 'years', index: number): boolean {
     const shown = getCalendarDate(this._calendarDate, index, this._view)
-    const start = new Date(shown.getFullYear(), view === 'months' ? shown.getMonth() : 0, 1).toDateString()
+    const start = createDate(shown.getFullYear(), view === 'months' ? shown.getMonth() : 0, 1).toDateString()
     const focus = view !== this._view && this._element.contains(document.activeElement)
 
     this._setCalendarView(view, 'navigation')
@@ -617,11 +619,7 @@ class Calendar extends BaseComponent {
   _modifyCalendarDate(years: number, months = 0, callback?: () => void): void {
     const year = this._calendarDate.getFullYear() + years
     const month = this._calendarDate.getMonth() + months
-    const date = new Date(year, month, 1)
-    date.setFullYear(year, month, 1)
-    date.setHours(0, 0, 0, 0)
-
-    this._setCalendarDate(date)
+    this._setCalendarDate(createDate(year, month, 1))
     this._updateCalendar(callback)
   }
 
@@ -762,8 +760,8 @@ class Calendar extends BaseComponent {
     const year = calendarDate.getFullYear()
     const monthNames = view === 'months' ? getMonthsNames(this._config.locale, this._config.monthFormat) : []
     const dates = view === 'years' ?
-      getYears(year).map(value => new Date(value, 0, 1)) :
-      Array.from({ length: view === 'months' ? 12 : 4 }, (_, index) => new Date(year, index * (view === 'months' ? 1 : 3), 1))
+      getYears(year).map(value => createDate(value)) :
+      Array.from({ length: view === 'months' ? 12 : 4 }, (_, index) => createDate(year, index * (view === 'months' ? 1 : 3), 1))
 
     const label = (date: Date) => {
       if (view === 'months') {
@@ -955,7 +953,7 @@ class Calendar extends BaseComponent {
     const restoreFocus = focused && this._focusRestorer(focused)
 
     for (const cell of SelectorEngine.find(`${SELECTOR_CALENDAR_CELL}[data-coreui-date]`, this._element as ParentNode)) {
-      const date = new Date(Manipulator.getDataAttribute(cell, 'date') as string)
+      const date = parseToDateString(Manipulator.getDataAttribute(cell, 'date') as string)
       const attributes = this._view === 'days' ?
         this._cellDayAttributes(date, ['previous', 'next'].find(month => cell.classList.contains(month)) ?? 'current', this._rowWeekAttributes(this._getDate(cell)).meta) :
         this._cellPeriodAttributes(date)
@@ -1092,7 +1090,7 @@ class Calendar extends BaseComponent {
       }
     }
 
-    const days = Array.from({ length: 7 }, (_, day) => new Date(date.getFullYear(), date.getMonth(), date.getDate() + day))
+    const days = Array.from({ length: 7 }, (_, day) => createDate(date.getFullYear(), date.getMonth(), date.getDate() + day))
     const isDisabled = isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates)
     const isSelected = days.some(day => isDateSelected(day, this._startDate, this._endDate))
     const isInRange = days.some(day => isDateInRange(day, this._startDate, this._endDate))

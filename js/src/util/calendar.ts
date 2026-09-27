@@ -65,13 +65,44 @@ type DateTimeGroups = BaseGroups & TimeGroups
 type AnyGroups = DateOnlyGroups | DateTimeGroups | WeekGroups | MonthGroups | YearGroups
 
 /**
+ * Builds the start of a day from a year, a month and a day, keeping a year
+ * below 100 as written where the `Date` constructor would move it to
+ * 1900–1999. A month or day out of range rolls over as in the constructor.
+ *
+ * @param year - The full year
+ * @param month - The month, 0 for January
+ * @param day - The day of the month
+ * @returns The date
+ */
+export const createDate = (year: number, month = 0, day = 1) : Date => {
+  const date = new Date(year, month, day)
+  date.setFullYear(year, month, day)
+  date.setHours(0, 0, 0, 0)
+  return date
+}
+
+/**
+ * Reads a date written by `Date#toDateString`, the form calendar cells carry
+ * in `data-coreui-date`, keeping a year below 100 that the `Date` parser would
+ * read as 19xx or 20xx. Any other string gives an invalid date.
+ *
+ * @param value - The date as written, such as `Thu Dec 31 0099`
+ * @returns The start of that day
+ */
+export const parseToDateString = (value: string) : Date => {
+  const [, month, day, year] = /^\w{3} (\w{3}) (\d{2}) (-?\d{4,})$/.exec(value) ?? []
+  const monthIndex = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].indexOf(month)
+  return monthIndex === -1 ? new Date(Number.NaN) : createDate(Number(year), monthIndex, Number(day))
+}
+
+/**
  * Finds the Monday that starts ISO week 1 of a year, the week holding 4 January.
  *
  * @param year - The full week-numbering year
  * @returns The Monday of week 1
  */
 const getMondayOfISOWeek1 = (year: number) : Date => {
-  const jan4 = new Date(year, 0, 4)
+  const jan4 = createDate(year, 0, 4)
   const jan4DayOfWeek = jan4.getDay()
   const daysFromMonday = jan4DayOfWeek === 0 ? 6 : jan4DayOfWeek - 1
   const mondayOfWeek1 = new Date(jan4)
@@ -221,7 +252,7 @@ const parseQuarterString = (dateString: string) : Date | null => {
 
       if (parsedQuarter >= 1 && parsedQuarter <= 4) {
         const monthIndex = (parsedQuarter - 1) * 3
-        return new Date(parsedYear, monthIndex, 1)
+        return createDate(parsedYear, monthIndex, 1)
       }
     }
   }
@@ -278,7 +309,7 @@ const parseMonthString = (dateString: string) : Date | null => {
       }
 
       if (parsedMonth >= 0 && parsedMonth <= 11) {
-        return new Date(parsedYear, parsedMonth, 1)
+        return createDate(parsedYear, parsedMonth, 1)
       }
     }
   }
@@ -493,14 +524,9 @@ const createDateWithTime = (groups: DateTimeGroups) : Date | null => {
     return null
   }
 
-  return new Date(
-    parsedYear,
-    parsedMonth,
-    parsedDay,
-    parsedHour,
-    parsedMinute,
-    parsedSecond
-  )
+  const date = createDate(parsedYear, parsedMonth, parsedDay)
+  date.setHours(parsedHour, parsedMinute, parsedSecond)
+  return date
 }
 
 /**
@@ -520,7 +546,7 @@ const createDateOnly = (groups: DateOnlyGroups) : Date | null => {
   const parsedMonth = Number.parseInt(month, 10) - 1
   const parsedDay = Number.parseInt(day, 10)
 
-  return new Date(parsedYear, parsedMonth, parsedDay)
+  return createDate(parsedYear, parsedMonth, parsedDay)
 }
 
 /**
@@ -678,23 +704,15 @@ export const createGroupsInArray = <T>(arr: T[], numberOfGroups: number) : T[][]
  */
 export const getCalendarDate = (calendarDate: Date, order: number, view: ViewTypes) : Date => {
   if (order !== 0 && view === "days") {
-    return new Date(
-      calendarDate.getFullYear(),
-      calendarDate.getMonth() + order,
-      1
-    )
+    return createDate(calendarDate.getFullYear(), calendarDate.getMonth() + order, 1)
   }
 
   if (order !== 0 && (view === "months" || view === "quarters")) {
-    return new Date(
-      calendarDate.getFullYear() + order,
-      calendarDate.getMonth(),
-      1
-    )
+    return createDate(calendarDate.getFullYear() + order, calendarDate.getMonth(), 1)
   }
 
   if (order !== 0 && view === "years") {
-    return new Date(calendarDate.getFullYear() + (YEARS_PER_PAGE * order), calendarDate.getMonth(), 1)
+    return createDate(calendarDate.getFullYear() + (YEARS_PER_PAGE * order), calendarDate.getMonth(), 1)
   }
 
   return calendarDate
@@ -814,7 +832,7 @@ export const getYears = (year: number, range: number = YEARS_PER_PAGE / 2) : num
  */
 export const formatYearsRange = (year: number, locale?: string) : string => {
   const years = getYears(year)
-  const [start, end] = [years[0], years.at(-1) as number].map(value => new Date(new Date(2000, 0, 1).setFullYear(value)))
+  const [start, end] = [years[0], years.at(-1) as number].map(value => createDate(value))
   const range = createDateTimeFormat(locale, { year: 'numeric' }).formatRange(start, end)
 
   return /(?!\p{Nd})[\u0590-\u08FF]/u.test(range) ? `\u2067${range}\u2069` : range
@@ -854,10 +872,10 @@ export const formatWeekName = (days: { date: Date }[], locale?: string) : string
  */
 const getLeadingDays = (year: number, month: number, firstDayOfWeek: number) : { date: Date; month: string }[] => {
   const dates = []
-  const d = new Date(year, month)
+  const d = createDate(year, month)
   const y = d.getFullYear()
   const m = d.getMonth()
-  const firstWeekday = new Date(y, m, 1).getDay()
+  const firstWeekday = createDate(y, m, 1).getDay()
   let leadingDays = 6 - (6 - firstWeekday) - firstDayOfWeek
 
   if (firstDayOfWeek) {
@@ -866,7 +884,7 @@ const getLeadingDays = (year: number, month: number, firstDayOfWeek: number) : {
 
   for (let i = leadingDays * -1; i < 0; i++) {
     dates.push({
-      date: new Date(y, m, i + 1),
+      date: createDate(y, m, i + 1),
       month: "previous"
     })
   }
@@ -883,10 +901,10 @@ const getLeadingDays = (year: number, month: number, firstDayOfWeek: number) : {
  */
 const getMonthDays = (year: number, month: number) : { date: Date; month: string }[] => {
   const dates = []
-  const lastDay = new Date(year, month + 1, 0).getDate()
+  const lastDay = createDate(year, month + 1, 0).getDate()
   for (let i = 1; i <= lastDay; i++) {
     dates.push({
-      date: new Date(year, month, i),
+      date: createDate(year, month, i),
       month: "current"
     })
   }
@@ -908,7 +926,7 @@ const getTrailingDays = (year: number, month: number, leadingDays: { date: Date;
   const days = 42 - (leadingDays.length + monthDays.length)
   for (let i = 1; i <= days; i++) {
     dates.push({
-      date: new Date(year, month + 1, i),
+      date: createDate(year, month + 1, i),
       month: "next"
     })
   }
@@ -1065,12 +1083,12 @@ export const getClosestSelectable = (elements: HTMLElement[], anchor: Date, rows
     const last = cells.at(-1)?.dataset.coreuiDate
 
     if (first && last) {
-      const position = new Date(first)
+      const position = parseToDateString(first)
       targets.push({
         adjacent: cells[0].matches('.previous, .next'),
         date: position,
         element,
-        end: new Date(last),
+        end: parseToDateString(last),
         position,
         selected: element.classList.contains('selected')
       })
@@ -1185,14 +1203,14 @@ const getViewEdge = (forward: boolean, { calendarDate, calendars, view }: Calend
   const last = calendars - 1
 
   if (view === 'days') {
-    return forward ? new Date(year, month + last + 1, 0) : new Date(year, month, 1)
+    return forward ? createDate(year, month + last + 1, 0) : createDate(year, month, 1)
   }
 
   if (view === 'years') {
-    return new Date(forward ? year + (YEARS_PER_PAGE / 2) - 1 + (YEARS_PER_PAGE * last) : year - (YEARS_PER_PAGE / 2), 0, 1)
+    return createDate(forward ? year + (YEARS_PER_PAGE / 2) - 1 + (YEARS_PER_PAGE * last) : year - (YEARS_PER_PAGE / 2), 0, 1)
   }
 
-  return forward ? new Date(year + last, view === 'quarters' ? 9 : 11, 1) : new Date(year, 0, 1)
+  return forward ? createDate(year + last, view === 'quarters' ? 9 : 11, 1) : createDate(year, 0, 1)
 }
 
 /**
@@ -1203,8 +1221,8 @@ const getViewEdge = (forward: boolean, { calendarDate, calendars, view }: Calend
  * @returns The first and the last day of the month
  */
 const getPanelMonth = ({ calendarDate, panel }: CalendarKeyContext) : [Date, Date] => [
-  new Date(calendarDate.getFullYear(), calendarDate.getMonth() + panel, 1),
-  new Date(calendarDate.getFullYear(), calendarDate.getMonth() + panel + 1, 0)
+  createDate(calendarDate.getFullYear(), calendarDate.getMonth() + panel, 1),
+  createDate(calendarDate.getFullYear(), calendarDate.getMonth() + panel + 1, 0)
 ]
 
 /**
@@ -1341,27 +1359,27 @@ const getRowEdge = (date: Date, last: boolean, context: CalendarKeyContext) : Da
   } else {
     switch (view) {
       case 'days': {
-        edge = getStartOfWeek(new Date(year, month, date.getDate()), firstDayOfWeek)
+        edge = getStartOfWeek(createDate(year, month, date.getDate()), firstDayOfWeek)
         edge.setDate(edge.getDate() + (last ? 6 : 0))
 
         break
       }
 
       case 'months': {
-        edge = new Date(year, month - (month % 3) + (last ? 2 : 0), 1)
+        edge = createDate(year, month - (month % 3) + (last ? 2 : 0), 1)
 
         break
       }
 
       case 'quarters': {
-        edge = new Date(year, last ? 9 : 0, 1)
+        edge = createDate(year, last ? 9 : 0, 1)
 
         break
       }
 
       default: {
         const offset = year - calendarDate.getFullYear() + (YEARS_PER_PAGE / 2)
-        edge = new Date(year - (offset % 3) + (last ? 2 : 0), 0, 1)
+        edge = createDate(year - (offset % 3) + (last ? 2 : 0), 0, 1)
       }
     }
   }
@@ -1418,9 +1436,9 @@ const getPageAction = (date: Date, direction: number, shiftKey: boolean, context
   const offset = getPageOffset(direction, shiftKey, view)
   const target = new Date(date)
   target.setFullYear(date.getFullYear() + offset.years, date.getMonth() + offset.months, 1)
-  target.setDate(Math.min(date.getDate(), new Date(target.getFullYear(), target.getMonth() + 1, 0).getDate()))
+  target.setDate(Math.min(date.getDate(), createDate(target.getFullYear(), target.getMonth() + 1, 0).getDate()))
 
-  const bound = direction > 0 ? maxDate : minDate
+  const bound = direction > 0 ? maxDate : minDate ?? createDate(1)
   const [first, last] = getPanelMonth(context)
   let start: Date
 
@@ -1552,7 +1570,7 @@ export const getCalendarKeyAction = (event: { code: string; key: string; repeat?
   date ? getCellKeyAction(event, date, context) : getGridKeyAction(event, context)
 
 /**
- * Tells whether a day cannot be picked: it lies before `min` or after
+ * Tells whether a day cannot be picked: it lies before `min` or year 1, or after
  * `max`, or it matches the disabled dates, which can be a function, a date, or
  * an array mixing functions, dates and `[start, end]` ranges.
  *
@@ -1563,7 +1581,7 @@ export const getCalendarKeyAction = (event: { code: string; key: string; repeat?
  * @returns `true` for a day that cannot be picked
  */
 export const isDateDisabled = (date: Date, min?: Date | null, max?: Date | null, disabledDates?: DisabledDate | DisabledDate[]) : boolean => {
-  if (min && date < min) {
+  if ((min && date < min) || date.getFullYear() < 1) {
     return true
   }
 
@@ -1673,8 +1691,8 @@ export const isDisableDateInRange = (startDate?: Date | null, endDate?: Date | n
 
 /**
  * Tells whether a month, quarter or year cannot be picked: it lies wholly
- * before `min` or after `max`, or `isEveryDayDisabled` finds every day of it
- * disabled.
+ * before `min` or year 1, or after `max`, or `isEveryDayDisabled` finds every
+ * day of it disabled.
  *
  * @param date - A date in the period
  * @param view - The unit of the period
@@ -1686,7 +1704,7 @@ export const isDisableDateInRange = (startDate?: Date | null, endDate?: Date | n
 export const isPeriodDisabled = (date: Date, view: PeriodViewTypes, min?: Date | null, max?: Date | null, disabledDates?: DisabledDate | DisabledDate[]) : boolean => {
   const period = getPeriod(date, view)
 
-  if ((min && period < getPeriod(min, view)) || (max && period > getPeriod(max, view))) {
+  if ((min && period < getPeriod(min, view)) || (max && period > getPeriod(max, view)) || date.getFullYear() < 1) {
     return true
   }
 
@@ -1698,7 +1716,7 @@ export const isPeriodDisabled = (date: Date, view: PeriodViewTypes, min?: Date |
   const year = date.getFullYear()
   const month = Math.floor(date.getMonth() / months) * months
 
-  return isEveryDayDisabled(new Date(year, month, 1), new Date(year, month + months, 0), min, max, disabledDates)
+  return isEveryDayDisabled(createDate(year, month, 1), createDate(year, month + months, 0), min, max, disabledDates)
 }
 
 /**
@@ -1854,5 +1872,5 @@ export const parseYearSmart = (yearString: string) : number => {
 const createDateFromYear = (groups: YearGroups) : Date => {
   const { year } = groups
   const parsedYear = parseYearSmart(year)
-  return new Date(parsedYear, 0, 1)
+  return createDate(parsedYear, 0, 1)
 }
