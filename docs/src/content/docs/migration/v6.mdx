@@ -1282,6 +1282,12 @@ removed in favour of `$translucent-opacity` and
   the arrow keys and paging keep the year the same way. Years before 1 cannot
   be picked, as dates before `minDate` cannot: their cells are disabled, and
   the arrow keys and paging stop at 1 January of year 1.
+- A year string written in four digits keeps its year: `0026-05`, `0026W05`,
+  `0026Q2`, `0026` and `12/31/0099` given to the calendar stand for the years
+  26 and 99, where they became 2026 and 1999. Two digits still expand to the
+  century within 50 years of today. The value reported for week, month,
+  quarter and year selection writes the year in at least four digits
+  (`0026-05`, where it was `26-05`), so it reads back as the same year.
 - **Additive:** `startDateChange` and `endDateChange` now carry a `dateObject`
   property with the underlying `Date`, alongside the existing `date` property.
   `date` remains formatted per `selectionType` — a `Date` for day selection, but
