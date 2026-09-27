@@ -345,6 +345,29 @@ describe('DateInput', () => {
       expect(element.querySelector('input[type="hidden"]').value).toEqual('04.07.2026')
     })
 
+    it.each(['q yyyy', 'QQQ yyyy'])('should ignore a quarter digit above 4 in %s', format => {
+      const dateInput = createDateInput({ date: new Date(2026, 5, 15), format })
+      const [quarter] = getSections(dateInput._element)
+
+      quarter.focus()
+      pressKey(quarter, '5')
+
+      expect(quarter.getAttribute('aria-valuenow')).toEqual('2')
+      expect(dateInput.getDate()).toEqual(new Date(2026, 3, 1))
+    })
+
+    it('should take a quarter digit typed after its letter', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 0, 15), format: 'QQQ yyyy' })
+      const [quarter] = getSections(dateInput._element)
+
+      quarter.focus()
+      pressKey(quarter, 'q')
+      pressKey(quarter, '3')
+
+      expect(quarter.textContent).toEqual('Q3')
+      expect(dateInput.getDate()).toEqual(new Date(2026, 6, 1))
+    })
+
     it('should report no date while a section holds a leading 0', () => {
       const dateInput = createDateInput()
       const spy = jasmine.createSpy('dateChange')

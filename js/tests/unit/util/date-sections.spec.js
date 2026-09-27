@@ -404,6 +404,28 @@ describe('Date Sections Utilities', () => {
 
       expect(applyDigitToSection({ type: 'year', length: 4 }, '20', '2').completed).toBeFalse()
     })
+
+    it('should ignore a digit that cannot start a value', () => {
+      const meridiem = { type: 'meridiem', length: 2 }
+      const quarter = { type: 'quarter', length: 1 }
+
+      expect(applyDigitToSection(meridiem, '', '3')).toBeNull()
+      expect(applyDigitToSection(meridiem, '', '0')).toBeNull()
+      expect(applyDigitToSection(meridiem, '', '2')).toEqual({ draft: '2', value: 2, completed: true })
+      expect(applyDigitToSection(quarter, '', '5')).toBeNull()
+      expect(applyDigitToSection(quarter, '', '0')).toBeNull()
+      expect(applyDigitToSection(quarter, '', '4')).toEqual({ draft: '4', value: 4, completed: true })
+    })
+
+    it('should start the value over when a digit follows typed letters', () => {
+      expect(applyDigitToSection({ type: 'quarter', length: 1 }, 'q', '2')).toEqual({ draft: '2', value: 2, completed: true })
+      expect(applyDigitToSection({ type: 'month', length: 2 }, 'j', '1')).toEqual({ draft: '1', value: 1, completed: false })
+    })
+
+    it('should keep a leading 0 where a second digit can follow', () => {
+      expect(applyDigitToSection({ type: 'hour', length: 2, cycle: 'h12' }, '', '0')).toEqual({ draft: '0', value: 0, completed: false })
+      expect(applyDigitToSection({ type: 'day', length: 2 }, '', '0')).toEqual({ draft: '0', value: 0, completed: false })
+    })
   })
 
   describe('getIncrementedSectionValue', () => {
