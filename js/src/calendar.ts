@@ -743,7 +743,7 @@ class Calendar extends BaseComponent {
       const visible = showAdjacentDays || days.some(({ month }) => month === 'current')
       const attributes = this._rowWeekAttributes(days[0].date, visible)
       const cells = days.map(({ date, month }) => month === 'current' || showAdjacentDays ?
-        this._cellHtml(date, this._cellDayAttributes(date, month), this._formatDate(date, { day: this._config.dayFormat })) :
+        this._cellHtml(date, this._cellDayAttributes(date, month, attributes.meta), this._formatDate(date, { day: this._config.dayFormat })) :
         '<td role="gridcell"></td>')
       const ariaLabel = this._config.selectionType === 'week' && visible ? ` aria-label="${escapeHtml(formatWeekName(days, this._config.locale))}"` : ''
 
@@ -966,20 +966,21 @@ class Calendar extends BaseComponent {
       .join(' ')
   }
 
-  _cellDayAttributes(date: Date, month: string): Record<string, any> {
+  _cellDayAttributes(date: Date, month: string, row?: Record<string, boolean>): Record<string, any> {
     const isCurrentMonth = month === 'current'
 
     const isFiller = this._config.selectionType === 'day' && !isCurrentMonth && !this._config.selectAdjacentDays
     const isDisabled = isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates)
     const isSelected = isDateSelected(date, this._startDate, this._endDate)
     const isTodayDate = isCurrentMonth && isToday(date)
-    const isInRange = (this._config.selectionType !== 'day' || isCurrentMonth) && isDateInRange(date, this._startDate, this._endDate)
+    const isInRange = isCurrentMonth && isDateInRange(date, this._startDate, this._endDate)
     const meta = {
       isDisabled: isDisabled || isFiller,
       isInCurrentMonth: isCurrentMonth,
       isInRange,
       isSelected: isSelected && !isFiller,
-      isToday: isTodayDate
+      isToday: isTodayDate,
+      ...row
     }
 
     if (this._config.selectionType !== 'day' || this._view !== 'days') {
@@ -1057,10 +1058,10 @@ class Calendar extends BaseComponent {
       }
     }
 
+    const days = Array.from({ length: 7 }, (_, day) => new Date(date.getFullYear(), date.getMonth(), date.getDate() + day))
     const isDisabled = isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates)
-    const isSelected = Array.from({ length: 7 }, (_, day) => new Date(date.getFullYear(), date.getMonth(), date.getDate() + day))
-      .some(day => isDateSelected(day, this._startDate, this._endDate))
-    const isInRange = isDateInRange(date, this._startDate, this._endDate)
+    const isSelected = days.some(day => isDateSelected(day, this._startDate, this._endDate))
+    const isInRange = days.some(day => isDateInRange(day, this._startDate, this._endDate))
 
     const isRangeHover = this._isRangeHover((start, end) => isDateInRange(date, start, end))
 
@@ -1076,7 +1077,12 @@ class Calendar extends BaseComponent {
       className: classNames,
       selectable: !isDisabled,
       ariaDisabled: isDisabled,
-      ariaSelected: isSelected || (this._picksRange() && isInRange && !isDisabled)
+      ariaSelected: isSelected || (this._picksRange() && isInRange && !isDisabled),
+      meta: {
+        isDisabled,
+        isInRange,
+        isSelected
+      }
     }
   }
 
