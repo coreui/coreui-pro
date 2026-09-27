@@ -553,7 +553,7 @@ describe('Calendar Utilities', () => {
     const stops = () => [...fixtureEl.querySelectorAll('[tabindex="0"]')]
 
     it('should give the stop to the preferred target, else the selected one, else the closest, else the first', () => {
-      fixtureEl.innerHTML = panel(cell(new Date(2026, 6, 1)) + cell(new Date(2026, 6, 10)) + cell(new Date(2026, 6, 20), 'aria-selected="true"'))
+      fixtureEl.innerHTML = panel(cell(new Date(2026, 6, 1)) + cell(new Date(2026, 6, 10)) + cell(new Date(2026, 6, 20), 'class="selected"'))
       const [first, tenth, selected] = getSelectableDates(fixtureEl, selector)
 
       setRovingTabIndex(fixtureEl, selector, new Date(2026, 6, 9), false, tenth)
@@ -563,12 +563,20 @@ describe('Calendar Utilities', () => {
       setRovingTabIndex(fixtureEl, selector, new Date(2026, 6, 9), false)
       expect(stops()).toEqual([selected])
 
-      selected.removeAttribute('aria-selected')
+      selected.classList.remove('selected')
       setRovingTabIndex(fixtureEl, selector, new Date(2026, 6, 9), false)
       expect(stops()).toEqual([tenth])
 
       setRovingTabIndex(fixtureEl, selector, null, false)
       expect(stops()).toEqual([first])
+    })
+
+    it('should give the stop to an end of a range, not to a day between the ends', () => {
+      fixtureEl.innerHTML = panel(cell(new Date(2026, 6, 1), 'aria-selected="true"') + cell(new Date(2026, 6, 10), 'class="selected" aria-selected="true"'))
+      const [, end] = getSelectableDates(fixtureEl, selector)
+
+      setRovingTabIndex(fixtureEl, selector, new Date(2026, 6, 1), false)
+      expect(stops()).toEqual([end])
     })
 
     it('should keep one stop per panel', () => {

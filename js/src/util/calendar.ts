@@ -1072,7 +1072,7 @@ export const getClosestSelectable = (elements: HTMLElement[], anchor: Date, rows
         element,
         end: new Date(last),
         position,
-        selected: element.getAttribute('aria-selected') === 'true'
+        selected: element.classList.contains('selected')
       })
     }
   }
@@ -1082,9 +1082,10 @@ export const getClosestSelectable = (elements: HTMLElement[], anchor: Date, rows
 
 /**
  * Moves the roving tab stop in each `.calendar` panel of a calendar: to
- * `preferred` when the panel holds it, else to the selected target, else to
- * the target closest to `anchor`, else to the first. When no panel has a
- * target, the grids themselves take the stop.
+ * `preferred` when the panel holds it, else to the selected target (the one
+ * with the `selected` class, which in a range marks its ends, not the days
+ * between them), else to the target closest to `anchor`, else to the first.
+ * When no panel has a target, the grids themselves take the stop.
  *
  * @param element - The calendar holding the panels
  * @param selector - The selector of a selectable cell or row
@@ -1116,7 +1117,7 @@ export const setRovingTabIndex = (element: HTMLElement, selector: string, anchor
     }
 
     const active = (preferred && targets.includes(preferred) ? preferred : undefined) ??
-      targets.find(target => target.getAttribute('aria-selected') === 'true') ??
+      targets.find(target => target.classList.contains('selected')) ??
       (anchor ? getClosestSelectable(targets, anchor, rows) : undefined) ??
       targets[0]
 
