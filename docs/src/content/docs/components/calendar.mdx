@@ -263,7 +263,7 @@ Each render function receives two parameters:
      - In day selection without `selectAdjacentDays`, a day among an adjacent month's days only fills the grid, so `isDisabled` is `true` and `isSelected` is `false` for it
      - In week selection, `isDisabled`, `isInRange` and `isSelected` describe the week row the day sits in, since the row is what the calendar picks and draws; `isInCurrentMonth` and `isToday` still describe the day
 
-The render functions should return an HTML string that will be displayed inside the cell. The returned HTML is automatically sanitized to prevent XSS attacks.
+The render functions should return an HTML string that will be displayed inside the cell. The returned HTML is automatically sanitized to prevent XSS attacks. When a click or a key picks a date, the calendar calls the render function again for every cell, so content drawn from `meta` follows the new selection.
 
 A cell drawn by a render function gets no `aria-label` from the calendar, so its content is what a screen reader reads. Put `meta.label` in it, for example in a `visually-hidden` span next to the short visible text marked `aria-hidden="true"`, as the pricing example below does.
 

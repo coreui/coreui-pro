@@ -74,11 +74,11 @@
     },
     {
       "path": "./dist/js/coreui.js",
-      "maxSize": "147.5KB"
+      "maxSize": "147.75KB"
     },
     {
       "path": "./dist/js/coreui.min.js",
-      "maxSize": "96.75KB"
+      "maxSize": "97KB"
     }
   ],
   "ci": {
