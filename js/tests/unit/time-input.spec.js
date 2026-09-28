@@ -220,6 +220,19 @@ describe('TimeInput', () => {
       expect(timeInput.getDate()).toEqual(new Date(1970, 0, 1, 21, 30))
     })
 
+    it('should ignore a digit the day period has no name for', () => {
+      const timeInput = createTimeInput({ format: 'hh:mm A', locale: 'en-US', date: new Date(2026, 6, 14, 9, 30) })
+      const meridiem = getSections(timeInput._element)[2]
+
+      meridiem.focus()
+      pressKey(meridiem, '3')
+      pressKey(meridiem, '0')
+
+      expect(meridiem.textContent).toEqual('AM')
+      expect(meridiem.getAttribute('aria-valuetext')).toEqual('AM')
+      expect(timeInput.getDate()).toEqual(new Date(1970, 0, 1, 9, 30))
+    })
+
     it('should toggle the day period with arrow keys', () => {
       const timeInput = createTimeInput({ format: 'hh:mm A', locale: 'en-US', date: new Date(2026, 6, 14, 9, 30) })
       const sections = getSections(timeInput._element)

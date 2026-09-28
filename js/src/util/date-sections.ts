@@ -436,17 +436,26 @@ export const getHourCycle = (layout: DateSection[]): EditableSection['cycle'] =>
 
 /**
  * Applies a typed digit to a section: digits add up while the value is still
- * ambiguous and start over when it would exceed the bounds.
+ * ambiguous and start over when it would exceed the bounds or follow typed
+ * letters. A digit that
+ * cannot start a value is ignored: one above the upper bound, or, in a
+ * section whose values all have one digit, one below its minimum.
  *
  * @param section - The section being typed into
  * @param draft - The digits typed into the section so far
  * @param digit - The digit just typed
  * @param max - The upper bound, such as the day count of the selected month
- * @returns The next draft, the value, and whether the section is complete
+ * @returns The next draft, the value, and whether the section is complete, or `null` for a digit the section ignores
  */
-export const applyDigitToSection = (section: EditableSection, draft: string, digit: string, max: number = getSectionBounds(section).max): SectionEntry => {
+export const applyDigitToSection = (section: EditableSection, draft: string, digit: string, max: number = getSectionBounds(section).max): SectionEntry | null => {
+  const typed = Number.parseInt(digit, 10)
+
+  if (typed > max || (max < 10 && typed < getSectionBounds(section).min)) {
+    return null
+  }
+
   const length = section.type === 'year' ? section.length : 2
-  let next = `${draft || ''}${digit}`.slice(-length)
+  let next = `${/^\d+$/.test(draft) ? draft : ''}${digit}`.slice(-length)
 
   if (Number.parseInt(next, 10) > max) {
     next = digit
