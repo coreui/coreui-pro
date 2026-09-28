@@ -1179,6 +1179,10 @@ class MultiSelect extends ComboboxBase {
     return Array.isArray(option.options)
   }
 
+  _getSelectableOptionsCount(): number {
+    return this._flattenOptions().filter((option: any) => !option.disabled).length
+  }
+
   _selectOption(value: any, text: string, { refresh = true }: { refresh?: boolean } = {}): void {
     if (!this._config.multiple) {
       this.deselectAll()
@@ -1281,7 +1285,7 @@ class MultiSelect extends ComboboxBase {
     }
 
     if (this._config.multiple && this._config.selectionType === 'counter' && !this._config.search) {
-      selection.textContent = resolveCountLabel(this._config.selectedLabel, this._selected.length, this._options.length)
+      selection.textContent = resolveCountLabel(this._config.selectedLabel, this._selected.length, this._getSelectableOptionsCount())
     }
 
     // `tags` and `chips` were the same idea built twice; both render the Chip
@@ -1394,7 +1398,7 @@ class MultiSelect extends ComboboxBase {
     }
 
     if (this._config.multiple && this._config.selectionType === 'counter') {
-      this._searchElement.placeholder = resolveCountLabel(this._config.selectedLabel, this._selected.length, this._options.length)
+      this._searchElement.placeholder = resolveCountLabel(this._config.selectedLabel, this._selected.length, this._getSelectableOptionsCount())
     }
   }
 

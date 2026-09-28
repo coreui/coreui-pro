@@ -889,6 +889,55 @@ describe('MultiSelect', () => {
       expect(selection.textContent).toContain('items selected')
     })
 
+    it('should count the selectable options inside groups toward {total} of the counter', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [
+          {
+            label: 'Group',
+            options: [
+              { value: '1', text: 'Opt 1', selected: true },
+              { value: '2', text: 'Opt 2' },
+              { value: '3', text: 'Opt 3', disabled: true }
+            ]
+          },
+          { value: '4', text: 'Opt 4' },
+          { value: '5', text: 'Opt 5' }
+        ],
+        headerTemplate: state => String(state.total),
+        selectionType: 'counter',
+        selectedLabel: '{count} of {total}'
+      })
+
+      const selection = multiSelect._wrapperElement.querySelector('.form-multi-select-selection')
+      expect(selection.textContent).toBe('1 of 4')
+      expect(multiSelect._headerElement.textContent).toBe('4')
+    })
+
+    it('should give the search placeholder the same {total} as the counter', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [
+          {
+            label: 'Group',
+            options: [
+              { value: '1', text: 'Opt 1', selected: true },
+              { value: '2', text: 'Opt 2' },
+              { value: '3', text: 'Opt 3', disabled: true }
+            ]
+          },
+          { value: '4', text: 'Opt 4' }
+        ],
+        search: true,
+        selectionType: 'counter',
+        selectedLabel: '{count} of {total}'
+      })
+
+      expect(multiSelect._searchElement.placeholder).toBe('1 of 3')
+    })
+
     it('should handle selectionType text', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
