@@ -31,6 +31,8 @@
   $focus-ring-color: var(--#{$prefix}#{$theme}-focus-ring),
   $border-color: var(--#{$prefix}#{$theme}-fg)
 ) {
+  $without-error: ":not(.is-invalid, :has(.is-invalid, > :user-invalid, > .form-floating > :user-invalid))";
+
   .#{$state}-feedback {
     @include tokens($form-feedback-tokens);
 
@@ -105,9 +107,9 @@
       @include form-control-group-validation-state($color, $border-color, $focus-ring-color);
     }
   } @else if $state == "valid" {
-    [data-coreui-validate~="valid"] .form-control-group:has(> .form-control:user-valid),
-    [data-coreui-validate~="valid"] .form-control-group:has(> .form-floating > .form-control:user-valid),
-    [data-coreui-validate~="valid"] .form-control-group:has(> select:user-valid) {
+    [data-coreui-validate~="valid"] .form-control-group#{$without-error}:has(> .form-control:user-valid),
+    [data-coreui-validate~="valid"] .form-control-group#{$without-error}:has(> .form-floating > .form-control:user-valid),
+    [data-coreui-validate~="valid"] .form-control-group#{$without-error}:has(> select:user-valid) {
       @include form-control-group-validation-state($color, $border-color, $focus-ring-color);
     }
   }
@@ -179,6 +181,22 @@
       }
     }
   } @else if $state == "valid" {
+    [data-coreui-validate~="valid"] {
+      .form-control-group#{$without-error}:has(> .form-control:user-valid),
+      .form-control-group#{$without-error}:has(> .form-floating > .form-control:user-valid),
+      .form-control-group#{$without-error}:has(> select:user-valid) {
+        ~ .valid-feedback,
+        ~ .valid-tooltip { display: block; }
+      }
+
+      .form-field:not(:has(.is-invalid, :user-invalid)):has(.form-control-group > .form-control:user-valid),
+      .form-field:not(:has(.is-invalid, :user-invalid)):has(.form-control-group > .form-floating > .form-control:user-valid),
+      .form-field:not(:has(.is-invalid, :user-invalid)):has(.form-control-group > select:user-valid) {
+        .valid-feedback,
+        .valid-tooltip { display: block; }
+      }
+    }
+
     .form-control-group.is-invalid,
     .form-control-group:has(.is-invalid) {
       ~ .valid-feedback,

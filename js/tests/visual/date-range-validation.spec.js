@@ -121,4 +121,64 @@ describe('validation feedback next to a frame', () => {
 
     expect(displayOf('.valid-feedback')).toBe('none')
   })
+
+  it('shows the success message for a control the browser marks valid', () => {
+    mount('<form data-coreui-validate="valid" novalidate><div class="form-control-group"><input class="form-control" value="secret" required></div><div class="valid-feedback">Looks good!</div></form>')
+    const form = container.querySelector('form')
+
+    form.addEventListener('submit', event => event.preventDefault())
+
+    expect(displayOf('.valid-feedback')).toBe('none')
+
+    form.requestSubmit()
+
+    expect(container.querySelector('input').matches(':user-valid')).toBeTrue()
+    expect(displayOf('.valid-feedback')).toBe('block')
+  })
+
+  it('shows the success message inside the field for a control the browser marks valid', () => {
+    mount('<form data-coreui-validate="valid" novalidate><div class="form-field"><div class="form-control-group"><input class="form-control" value="secret" required></div><div><div class="valid-feedback">Looks good!</div></div></div></form>')
+    const form = container.querySelector('form')
+
+    form.addEventListener('submit', event => event.preventDefault())
+    form.requestSubmit()
+
+    expect(displayOf('.valid-feedback')).toBe('block')
+  })
+
+  it('keeps the success message and the success border away while a valid control sits in an invalid frame', () => {
+    mount('<form data-coreui-validate="valid" novalidate><div id="frame" class="form-control-group is-invalid"><input class="form-control" value="taken"></div><div class="invalid-feedback">Taken.</div><div class="valid-feedback">Looks good!</div></form><div id="reference" class="form-control-group is-invalid"><input class="form-control"></div>')
+    const form = container.querySelector('form')
+
+    form.addEventListener('submit', event => event.preventDefault())
+    form.requestSubmit()
+
+    expect(container.querySelector('#frame input').matches(':user-valid')).toBeTrue()
+    expect(displayOf('.invalid-feedback')).toBe('block')
+    expect(displayOf('.valid-feedback')).toBe('none')
+    expect(borderOf('#frame')).toBe(borderOf('#reference'))
+  })
+
+  it('keeps the success message away while another control of the frame is invalid', () => {
+    mount('<form data-coreui-validate="valid" novalidate><div class="form-control-group"><input class="form-control" required><select class="form-select"><option>kg</option></select></div><div class="invalid-feedback">Required.</div><div class="valid-feedback">Looks good!</div></form>')
+    const form = container.querySelector('form')
+
+    form.addEventListener('submit', event => event.preventDefault())
+    form.requestSubmit()
+
+    expect(container.querySelector('select').matches(':user-valid')).toBeTrue()
+    expect(displayOf('.invalid-feedback')).toBe('block')
+    expect(displayOf('.valid-feedback')).toBe('none')
+  })
+
+  it('keeps the success message away for a helper field that validates nothing', () => {
+    mount('<form data-coreui-validate="valid" novalidate><div class="form-control-group"><input value="tag"></div><div class="valid-feedback">Looks good!</div></form>')
+    const form = container.querySelector('form')
+
+    form.addEventListener('submit', event => event.preventDefault())
+    form.requestSubmit()
+
+    expect(container.querySelector('input').matches(':user-valid')).toBeTrue()
+    expect(displayOf('.valid-feedback')).toBe('none')
+  })
 })
