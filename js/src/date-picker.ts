@@ -268,6 +268,7 @@ class DatePicker extends PickerBase {
     const inputEl = ownField ?? document.createElement('div')
     this._created.field = !ownField
     this._fieldElement = ownField ?? appendControlGroupField(inputGroup, inputEl, this._config.floatingLabel, `${this.constructor.NAME}-`)
+    this._forwardLabelledBy(inputEl)
 
     const withTime = (key: 'ariaCleanerLabel' | 'ariaPickerLabel', timed: string) =>
       this._config.timepicker && this._config[key] === ORIGINAL_DEFAULT[key] ? timed : this._config[key]

@@ -262,7 +262,12 @@ class DateRangePicker extends PickerBase {
   _createDateRangePicker(): void {
     this._element.classList.add(CLASS_NAME_DATE_PICKER, CLASS_NAME_DATE_RANGE_PICKER, CLASS_NAME_PICKER)
 
+    if (!this._element.hasAttribute('role')) {
+      this._writeAdoptedAttribute(this._element, 'role', 'group')
+    }
+
     const inputGroup = document.createElement('div')
+    inputGroup.setAttribute('role', 'none')
     this._element.append(inputGroup)
     this._frameElement = inputGroup
 

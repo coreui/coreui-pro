@@ -226,6 +226,7 @@ class DateRangeInput extends BaseComponent {
   protected declare _createdElements: HTMLElement[]
   protected declare _hiddenFromAssistiveTech: Element[]
   protected declare _hostClasses: HostClasses
+  protected declare _hostRole: string | null
   protected declare _claimedEndDate: Date | null
   protected declare _claimedInvalid: boolean
   protected declare _claimedStartDate: Date | null
@@ -243,6 +244,7 @@ class DateRangeInput extends BaseComponent {
     this._createdElements = []
     this._hiddenFromAssistiveTech = []
     this._hostClasses = captureHostClasses(this._element, [...this._managedClassNames(), CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID])
+    this._hostRole = this._element.getAttribute('role')
     this._claimedInvalid = this._element.classList.contains(CLASS_NAME_IS_INVALID)
     this._claimedValid = this._element.classList.contains(CLASS_NAME_IS_VALID)
     this._addedStateClassNames = new Set()
@@ -338,6 +340,10 @@ class DateRangeInput extends BaseComponent {
       element.removeAttribute('aria-hidden')
     }
 
+    if (this._hostRole === null) {
+      this._element.removeAttribute('role')
+    }
+
     restoreHostClasses(this._element, this._managedClassNames(), this._hostClasses)
 
     super.dispose()
@@ -376,6 +382,10 @@ class DateRangeInput extends BaseComponent {
   _createDateRangeInput(): void {
     applyControlGroupClasses(this._element, CLASS_NAME_INPUT_GROUP, CLASS_NAME_DATE_RANGE)
     applyControlGroupSize(this._element, this._config.size)
+
+    if (this._hostRole === null) {
+      this._element.setAttribute('role', 'group')
+    }
 
     this._startElement = this._createField(ATTRIBUTE_ROLE_START, this._config.startFloatingLabel)
     this._separatorElement = SelectorEngine.findOne(SELECTOR_ROLE_SEPARATOR, this._element) ?? this._createSeparator()

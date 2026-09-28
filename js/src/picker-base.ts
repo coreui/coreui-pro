@@ -222,6 +222,17 @@ abstract class PickerBase extends BaseComponent {
     return element
   }
 
+  _forwardLabelledBy(element: Element): void {
+    const labelledBy = this._element.getAttribute('aria-labelledby')
+    const isNamed = element.hasAttribute('aria-label') || element.hasAttribute('aria-labelledby')
+
+    if (!labelledBy || isNamed || this._element.hasAttribute('role') || this._config.floatingLabel || this._config.inputOptions?.ariaLabel) {
+      return
+    }
+
+    this._writeAdoptedAttribute(element, 'aria-labelledby', labelledBy)
+  }
+
   _restoreAdoptedAttributes(): void {
     for (const [element, name, previous, written] of this._adoptedAttributes) {
       if (element.getAttribute(name) !== written) {

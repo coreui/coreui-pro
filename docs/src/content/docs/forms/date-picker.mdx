@@ -172,8 +172,8 @@ label.
 Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label and description, and to get validation feedback in the right place.
 
 <Example pro code={`<div class="form-field">
-    <span class="form-label">Delivery date</span>
-    <div data-coreui-locale="en-US" data-coreui-date-picker></div>
+    <span class="form-label" id="datePickerDeliveryDateLabel">Delivery date</span>
+    <div data-coreui-locale="en-US" data-coreui-date-picker aria-labelledby="datePickerDeliveryDateLabel"></div>
     <div class="form-text">We deliver on working days only.</div>
   </div>`} />
 
@@ -342,12 +342,12 @@ field forwards from the shell. The parser accepts both dayjs/moment-style tokens
 
 <Example pro code={`<div class="row">
     <div class="col-sm-6 col-lg-5 mb-3 mb-sm-0">
-      <label class="form-label">dd.MM.yyyy</label>
-      <div data-coreui-format="dd.MM.yyyy" data-coreui-locale="en-US" data-coreui-date-picker></div>
+      <label class="form-label" id="datePickerDdMMYyyyLabel">dd.MM.yyyy</label>
+      <div data-coreui-format="dd.MM.yyyy" data-coreui-locale="en-US" data-coreui-date-picker aria-labelledby="datePickerDdMMYyyyLabel"></div>
     </div>
     <div class="col-sm-6 col-lg-5">
-      <label class="form-label">YYYY-MM-DD</label>
-      <div data-coreui-format="YYYY-MM-DD" data-coreui-locale="en-US" data-coreui-date-picker></div>
+      <label class="form-label" id="datePickerYYYYMMDDLabel">YYYY-MM-DD</label>
+      <div data-coreui-format="YYYY-MM-DD" data-coreui-locale="en-US" data-coreui-date-picker aria-labelledby="datePickerYYYYMMDDLabel"></div>
     </div>
   </div>`} />
 
@@ -363,6 +363,8 @@ the first day of the month.
 ## Accessibility
 
 The field is a [date input](/forms/date-input/#accessibility) — a group of spinbutton sections — so its own arrow keys belong to the value, and the popup opens on the native control's dropdown keys. Focus enters the calendar on the selected date, on today when nothing is selected, or on the last selectable date when today is out of range. In week selection it enters on the row of that week.
+
+An `aria-labelledby` on the picker element, pointing at the visible label as the examples on this page do, is passed on to the field, so a screen reader announces the label when focus enters it. A field that already has a name keeps it: one named by `floatingLabel` or by an `ariaLabel` in `inputOptions`, and a `data-coreui-picker-field` you wrote with an `aria-label` or `aria-labelledby` of its own. A picker element that carries a role of its own is named directly and passes nothing on.
 
 ### Keyboard support
 

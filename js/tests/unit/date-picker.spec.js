@@ -391,6 +391,39 @@ describe('DatePicker', () => {
       expect(fixtureEl.querySelector('[data-coreui-picker-field]').getAttribute('aria-label')).toEqual('Arrival date')
     })
 
+    it('should pass the aria-labelledby of the picker to its field', () => {
+      buildPicker({}, '<span id="delivery-label">Delivery date</span><div id="picker" aria-labelledby="delivery-label"></div>')
+
+      expect(fixtureEl.querySelector('.form-date-time').getAttribute('aria-labelledby')).toEqual('delivery-label')
+    })
+
+    it('should keep an aria-labelledby the author wrote on the field, and take a forwarded one back on dispose', () => {
+      const own = buildPicker({}, '<div id="picker" aria-labelledby="delivery-label"><div data-coreui-picker-field aria-labelledby="own-label"></div></div>')
+
+      expect(fixtureEl.querySelector('[data-coreui-picker-field]').getAttribute('aria-labelledby')).toEqual('own-label')
+
+      own.dispose()
+      const forwarded = buildPicker({}, '<div id="picker" aria-labelledby="delivery-label"><div data-coreui-picker-field></div></div>')
+      const field = fixtureEl.querySelector('[data-coreui-picker-field]')
+
+      expect(field.getAttribute('aria-labelledby')).toEqual('delivery-label')
+
+      forwarded.dispose()
+
+      expect(field.hasAttribute('aria-labelledby')).toBeFalse()
+    })
+
+    it.each([
+      ['a field the author named', {}, '<div id="picker" aria-labelledby="delivery-label"><div data-coreui-picker-field aria-label="Arrival date"></div></div>'],
+      ['a floating label', { floatingLabel: 'Pick a date' }, '<div id="picker" aria-labelledby="delivery-label"></div>'],
+      ['an ariaLabel in inputOptions', { inputOptions: { ariaLabel: 'Arrival date' } }, '<div id="picker" aria-labelledby="delivery-label"></div>'],
+      ['a picker the page made a group', {}, '<div id="picker" role="group" aria-labelledby="delivery-label"></div>']
+    ])('should not pass the aria-labelledby of the picker over %s', (_, config, html) => {
+      buildPicker(config, html)
+
+      expect(fixtureEl.querySelector('.form-date-time').hasAttribute('aria-labelledby')).toBeFalse()
+    })
+
     it('should put back an aria-controls the author wrote', () => {
       const picker = buildPicker({}, '<div id="picker"><div data-coreui-picker-field></div><button type="button" aria-controls="help" data-coreui-picker-toggle></button></div>')
       const toggle = fixtureEl.querySelector('[data-coreui-picker-toggle]')
