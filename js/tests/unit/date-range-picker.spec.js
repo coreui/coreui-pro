@@ -538,6 +538,21 @@ describe('DateRangePicker', () => {
 
       expect(fixtureEl.querySelector('#picker').getAttribute('role')).toEqual('region')
     })
+
+    it('should move the aria-describedby of the picker to both fields and give it back on dispose', () => {
+      const picker = buildPicker({}, '<div id="picker" aria-describedby="period-help"></div>')
+      const element = fixtureEl.querySelector('#picker')
+
+      for (const field of element.querySelectorAll('.form-date-time')) {
+        expect(field.getAttribute('aria-describedby')).toEqual('period-help')
+      }
+
+      expect(element.hasAttribute('aria-describedby')).toBeFalse()
+
+      picker.dispose()
+
+      expect(element.getAttribute('aria-describedby')).toEqual('period-help')
+    })
   })
 
   describe('cleaner', () => {

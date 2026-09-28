@@ -266,8 +266,15 @@ class DateRangePicker extends PickerBase {
       this._writeAdoptedAttribute(this._element, 'role', 'group')
     }
 
+    const describedBy = this._element.getAttribute('aria-describedby')
     const inputGroup = document.createElement('div')
     inputGroup.setAttribute('role', 'none')
+
+    if (describedBy !== null) {
+      inputGroup.setAttribute('aria-describedby', describedBy)
+      this._writeAdoptedAttribute(this._element, 'aria-describedby', null)
+    }
+
     this._element.append(inputGroup)
     this._frameElement = inputGroup
 

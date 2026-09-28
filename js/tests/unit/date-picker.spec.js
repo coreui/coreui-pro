@@ -397,6 +397,38 @@ describe('DatePicker', () => {
       expect(fixtureEl.querySelector('.form-date-time').getAttribute('aria-labelledby')).toEqual('delivery-label')
     })
 
+    it('should move the aria-label, aria-labelledby and aria-describedby of the picker to its field, and give them back on dispose', () => {
+      const picker = buildPicker({}, '<span id="delivery-help">Weekdays only</span><div id="picker" aria-label="Delivery date" aria-describedby="delivery-help"></div>')
+      const element = fixtureEl.querySelector('#picker')
+      const field = element.querySelector('.form-date-time')
+
+      expect(field.getAttribute('aria-label')).toEqual('Delivery date')
+      expect(field.getAttribute('aria-describedby')).toEqual('delivery-help')
+      expect(field.querySelector('.form-date-time-section').getAttribute('aria-describedby')).toEqual('delivery-help')
+      expect(element.hasAttribute('aria-label')).toBeFalse()
+      expect(element.hasAttribute('aria-describedby')).toBeFalse()
+
+      picker.dispose()
+
+      expect(element.getAttribute('aria-label')).toEqual('Delivery date')
+      expect(element.getAttribute('aria-describedby')).toEqual('delivery-help')
+    })
+
+    it('should take the aria-labelledby off the picker once its field carries it', () => {
+      buildPicker({}, '<div id="picker" aria-labelledby="delivery-label"></div>')
+
+      expect(fixtureEl.querySelector('#picker').hasAttribute('aria-labelledby')).toBeFalse()
+    })
+
+    it('should move both an aria-label and an aria-labelledby of the picker, so the browser picks the name', () => {
+      buildPicker({}, '<div id="picker" aria-label="Arrival" aria-labelledby="delivery-label"></div>')
+      const field = fixtureEl.querySelector('.form-date-time')
+
+      expect(field.getAttribute('aria-label')).toEqual('Arrival')
+      expect(field.getAttribute('aria-labelledby')).toEqual('delivery-label')
+      expect(fixtureEl.querySelector('#picker').hasAttribute('aria-labelledby')).toBeFalse()
+    })
+
     it('should keep an aria-labelledby the author wrote on the field, and take a forwarded one back on dispose', () => {
       const own = buildPicker({}, '<div id="picker" aria-labelledby="delivery-label"><div data-coreui-picker-field aria-labelledby="own-label"></div></div>')
 
@@ -414,14 +446,37 @@ describe('DatePicker', () => {
     })
 
     it.each([
-      ['a field the author named', {}, '<div id="picker" aria-labelledby="delivery-label"><div data-coreui-picker-field aria-label="Arrival date"></div></div>'],
       ['a floating label', { floatingLabel: 'Pick a date' }, '<div id="picker" aria-labelledby="delivery-label"></div>'],
       ['an ariaLabel in inputOptions', { inputOptions: { ariaLabel: 'Arrival date' } }, '<div id="picker" aria-labelledby="delivery-label"></div>'],
-      ['a picker the page made a group', {}, '<div id="picker" role="group" aria-labelledby="delivery-label"></div>']
-    ])('should not pass the aria-labelledby of the picker over %s', (_, config, html) => {
+      ['a role on the picker', {}, '<div id="picker" role="group" aria-labelledby="delivery-label"></div>']
+    ])('should move the aria-labelledby of the picker to its field over %s', (_, config, html) => {
       buildPicker(config, html)
 
-      expect(fixtureEl.querySelector('.form-date-time').hasAttribute('aria-labelledby')).toBeFalse()
+      expect(fixtureEl.querySelector('.form-date-time').getAttribute('aria-labelledby')).toEqual('delivery-label')
+      expect(fixtureEl.querySelector('#picker').hasAttribute('aria-labelledby')).toBeFalse()
+    })
+
+    it('should leave the name of the picker on it when the field the author wrote has its own', () => {
+      buildPicker({}, '<div id="picker" aria-label="Delivery" aria-labelledby="delivery-label"><div data-coreui-picker-field aria-label="Arrival date"></div></div>')
+      const field = fixtureEl.querySelector('[data-coreui-picker-field]')
+      const element = fixtureEl.querySelector('#picker')
+
+      expect(field.getAttribute('aria-label')).toEqual('Arrival date')
+      expect(field.hasAttribute('aria-labelledby')).toBeFalse()
+      expect(element.getAttribute('aria-label')).toEqual('Delivery')
+      expect(element.getAttribute('aria-labelledby')).toEqual('delivery-label')
+    })
+
+    it('should add the description of the picker after one the field the author wrote carries', () => {
+      const picker = buildPicker({}, '<div id="picker" aria-describedby="delivery-help"><div data-coreui-picker-field aria-describedby="own-help"></div></div>')
+      const field = fixtureEl.querySelector('[data-coreui-picker-field]')
+
+      expect(field.getAttribute('aria-describedby')).toEqual('own-help delivery-help')
+
+      picker.dispose()
+
+      expect(field.getAttribute('aria-describedby')).toEqual('own-help')
+      expect(fixtureEl.querySelector('#picker').getAttribute('aria-describedby')).toEqual('delivery-help')
     })
 
     it('should put back an aria-controls the author wrote', () => {

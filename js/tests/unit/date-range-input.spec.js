@@ -552,6 +552,33 @@ describe('DateRangeInput', () => {
       expect(root().getAttribute('role')).toEqual('radiogroup')
     })
 
+    it('should move the aria-describedby of the host to both fields and give it back on dispose', () => {
+      const range = build({}, '<div id="range" aria-describedby="stay-help"><div data-coreui-range-start></div><div data-coreui-range-end aria-describedby="end-help"></div></div>')
+      const [start, end] = [root().querySelector('[data-coreui-range-start]'), root().querySelector('[data-coreui-range-end]')]
+
+      expect(start.getAttribute('aria-describedby')).toEqual('stay-help')
+      expect(end.getAttribute('aria-describedby')).toEqual('end-help stay-help')
+      expect(root().hasAttribute('aria-describedby')).toBeFalse()
+
+      range.dispose()
+
+      expect(root().getAttribute('aria-describedby')).toEqual('stay-help')
+      expect(start.hasAttribute('aria-describedby')).toBeFalse()
+      expect(end.getAttribute('aria-describedby')).toEqual('end-help')
+    })
+
+    it('should leave a description the page changed after init on dispose', () => {
+      const range = build({}, '<div id="range" aria-describedby="stay-help"><div data-coreui-range-start></div><div data-coreui-range-end></div></div>')
+      const start = root().querySelector('[data-coreui-range-start]')
+
+      start.setAttribute('aria-describedby', 'stay-help stay-error')
+      root().setAttribute('aria-describedby', 'new-help')
+      range.dispose()
+
+      expect(start.getAttribute('aria-describedby')).toEqual('stay-help stay-error')
+      expect(root().getAttribute('aria-describedby')).toEqual('new-help')
+    })
+
     it('should mark the parts it builds with the same roles', () => {
       build({})
 
