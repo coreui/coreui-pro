@@ -181,7 +181,7 @@ const picker = new coreui.TimePicker(element, {
 
 The toggle button carries the panel's state — `aria-haspopup="dialog"`, `aria-controls` pointing at the popup while it is open, and `aria-expanded` tracking whether it is open — so a screen reader announces what the button does and whether the panel is showing. The panel itself is a `dialog` with `aria-modal`, so focus moves into it on open, stays there while it is open, and returns to the field when it closes. The field itself is a [time input](/forms/time-input/#accessibility), a group of spinbutton sections, so its arrow keys belong to the value and the popup opens on the native dropdown keys.
 
-An `aria-labelledby` on the picker element, pointing at the visible label as the examples on this page do, is passed on to the field, so a screen reader announces the label when focus enters it, unless `floatingLabel` or an `ariaLabel` in `inputOptions` already names the field, or the picker element carries a role of its own.
+An `aria-label`, `aria-labelledby` or `aria-describedby` on the picker element moves to the field, so a screen reader announces the name and the description when focus enters it, and the picker element gets them back on dispose. Point `aria-labelledby` at the visible label, as the examples on this page do; it names the field over `floatingLabel` and an `ariaLabel` in `inputOptions`, the way the browser ranks names.
 
 ### Keyboard support
 

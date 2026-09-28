@@ -215,7 +215,7 @@ class TimePicker extends PickerBase {
 
     const inputEl = document.createElement('div')
     this._fieldElement = appendControlGroupField(inputGroup, inputEl, this._config.floatingLabel, `${this.constructor.NAME}-`)
-    this._forwardLabelledBy(inputEl)
+    this._moveAriaToField(inputEl)
 
     if (this._config.cleaner) {
       this._cleanerElement = this._createAction(CLASS_NAME_CLEANER, this._config.cleanerIcon, this._config.ariaCleanerLabel)

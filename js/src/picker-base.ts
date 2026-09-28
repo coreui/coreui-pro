@@ -30,7 +30,7 @@ const SELECTOR_TEMPLATE_FOOTER = 'template[data-coreui-template="footer"]'
  */
 
 abstract class PickerBase extends BaseComponent {
-  protected declare _adoptedAttributes: [Element, string, string | null, string][]
+  protected declare _adoptedAttributes: [Element, string, string | null, string | null][]
   protected declare _cleanerElement: HTMLElement | null
   protected declare _fieldElement: HTMLElement
   protected declare _footerTemplate: HTMLTemplateElement | null
@@ -195,12 +195,16 @@ abstract class PickerBase extends BaseComponent {
     }
   }
 
-  _writeAdoptedAttribute(element: Element, name: string, value: string): void {
+  _writeAdoptedAttribute(element: Element, name: string, value: string | null): void {
     if (!this._adoptedAttributes.some(([recorded, recordedName]) => recorded === element && recordedName === name)) {
       this._adoptedAttributes.push([element, name, element.getAttribute(name), value])
     }
 
-    element.setAttribute(name, value)
+    if (value === null) {
+      element.removeAttribute(name)
+    } else {
+      element.setAttribute(name, value)
+    }
   }
 
   _adoptAction(element: HTMLElement, label: string): HTMLElement {
@@ -222,15 +226,20 @@ abstract class PickerBase extends BaseComponent {
     return element
   }
 
-  _forwardLabelledBy(element: Element): void {
-    const labelledBy = this._element.getAttribute('aria-labelledby')
+  _moveAriaToField(element: Element): void {
     const isNamed = element.hasAttribute('aria-label') || element.hasAttribute('aria-labelledby')
 
-    if (!labelledBy || isNamed || this._element.hasAttribute('role') || this._config.floatingLabel || this._config.inputOptions?.ariaLabel) {
-      return
-    }
+    for (const name of ['aria-describedby', 'aria-label', 'aria-labelledby']) {
+      const value = this._element.getAttribute(name)
+      const own = element.getAttribute(name)
 
-    this._writeAdoptedAttribute(element, 'aria-labelledby', labelledBy)
+      if (value === null || (name !== 'aria-describedby' && isNamed)) {
+        continue
+      }
+
+      this._writeAdoptedAttribute(element, name, own ? `${own} ${value}` : value)
+      this._writeAdoptedAttribute(this._element, name, null)
+    }
   }
 
   _restoreAdoptedAttributes(): void {

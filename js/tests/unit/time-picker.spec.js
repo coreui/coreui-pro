@@ -588,12 +588,21 @@ describe('TimePicker', () => {
       expect(fixtureEl.querySelector('.form-date-time').getAttribute('aria-labelledby')).toEqual('opening-label')
     })
 
-    it('should leave the name of a floating label to the field', () => {
+    it('should move the aria-labelledby of the picker to its field over a floating label', () => {
       buildPicker({ floatingLabel: 'Pick a time' }, '<div id="picker" aria-labelledby="opening-label"></div>')
       const field = fixtureEl.querySelector('.form-date-time')
 
-      expect(field.hasAttribute('aria-labelledby')).toBeFalse()
+      expect(field.getAttribute('aria-labelledby')).toEqual('opening-label')
       expect(field.getAttribute('aria-label')).toEqual('Pick a time')
+    })
+
+    it('should move the aria-label and aria-describedby of the picker to its field', () => {
+      buildPicker({}, '<div id="picker" aria-label="Opening time" aria-describedby="opening-help"></div>')
+      const field = fixtureEl.querySelector('.form-date-time')
+
+      expect(field.getAttribute('aria-label')).toEqual('Opening time')
+      expect(field.getAttribute('aria-describedby')).toEqual('opening-help')
+      expect(fixtureEl.querySelector('#picker').hasAttribute('aria-describedby')).toBeFalse()
     })
   })
 

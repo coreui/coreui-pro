@@ -227,6 +227,8 @@ class DateRangeInput extends BaseComponent {
   protected declare _hiddenFromAssistiveTech: Element[]
   protected declare _hostClasses: HostClasses
   protected declare _hostRole: string | null
+  protected declare _hostDescribedBy: string | null
+  protected declare _describedFields: [HTMLElement, string | null, string][]
   protected declare _claimedEndDate: Date | null
   protected declare _claimedInvalid: boolean
   protected declare _claimedStartDate: Date | null
@@ -245,6 +247,8 @@ class DateRangeInput extends BaseComponent {
     this._hiddenFromAssistiveTech = []
     this._hostClasses = captureHostClasses(this._element, [...this._managedClassNames(), CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID])
     this._hostRole = this._element.getAttribute('role')
+    this._hostDescribedBy = this._element.getAttribute('aria-describedby')
+    this._describedFields = []
     this._claimedInvalid = this._element.classList.contains(CLASS_NAME_IS_INVALID)
     this._claimedValid = this._element.classList.contains(CLASS_NAME_IS_VALID)
     this._addedStateClassNames = new Set()
@@ -344,6 +348,22 @@ class DateRangeInput extends BaseComponent {
       this._element.removeAttribute('role')
     }
 
+    for (const [element, own, written] of this._describedFields) {
+      if (element.getAttribute('aria-describedby') !== written) {
+        continue
+      }
+
+      if (own === null) {
+        element.removeAttribute('aria-describedby')
+      } else {
+        element.setAttribute('aria-describedby', own)
+      }
+    }
+
+    if (this._hostDescribedBy !== null && !this._element.hasAttribute('aria-describedby')) {
+      this._element.setAttribute('aria-describedby', this._hostDescribedBy)
+    }
+
     restoreHostClasses(this._element, this._managedClassNames(), this._hostClasses)
 
     super.dispose()
@@ -391,6 +411,7 @@ class DateRangeInput extends BaseComponent {
     this._separatorElement = SelectorEngine.findOne(SELECTOR_ROLE_SEPARATOR, this._element) ?? this._createSeparator()
     this._hideFromAssistiveTech(this._separatorElement)
     this._endElement = this._createField(ATTRIBUTE_ROLE_END, this._config.endFloatingLabel)
+    this._moveDescriptionToFields()
 
     this._startInput = this._createInput(this._startElement, {
       ariaLabel: this._config.startFloatingLabel ?? this._config.ariaStartLabel,
@@ -421,6 +442,22 @@ class DateRangeInput extends BaseComponent {
     return new DateInput(element, {
       ...forwarded, ...overrides, autofocus: false, ...this._config.inputOptions
     })
+  }
+
+  _moveDescriptionToFields(): void {
+    if (this._hostDescribedBy === null) {
+      return
+    }
+
+    this._element.removeAttribute('aria-describedby')
+
+    for (const element of [this._startElement, this._endElement]) {
+      const own = element.getAttribute('aria-describedby')
+      const written = own ? `${own} ${this._hostDescribedBy}` : this._hostDescribedBy
+
+      element.setAttribute('aria-describedby', written)
+      this._describedFields.push([element, own, written])
+    }
   }
 
   _createField(attribute: string, floatingLabel: string | null): HTMLElement {
