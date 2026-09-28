@@ -281,6 +281,7 @@ The date input implements the [spinbutton pattern](https://www.w3.org/WAI/ARIA/a
 - **Roving tabindex**: the whole field is a single tab stop; arrow keys move between sections.
 - **Labels**: sections receive `aria-label`s (`Day`, `Month`, `Year`), each replaceable on its own — `ariaDayLabel`, `ariaMonthLabel`, `ariaYearLabel` — for localization.
 - **Validity**: while the field is invalid (a date outside `minDate` / `maxDate` or in `disabledDates`, the `invalid` option, or a required field still empty after a validated form is submitted), the group and every section carry `aria-invalid="true"`; otherwise they carry the `aria-invalid` the page wrote on the element, if any. A disabled or read-only field is never reported as missing. With `required`, every section carries `aria-required="true"`.
+- **Description**: the `aria-describedby` of the field, pointing at its help text or feedback message, reaches the first section, and every section while the field is invalid, so the reason for an error is read wherever the focus sits without the help text repeating on each section.
 - **Mobile input**: sections use `inputmode="numeric"`, so touch devices show the numeric keyboard.
 
 ### Keyboard support
