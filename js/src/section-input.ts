@@ -204,6 +204,7 @@ abstract class SectionInput extends BaseComponent {
   declare ['constructor']: typeof SectionInput & typeof BaseComponent
   protected declare _date: Date | null
   protected declare _minDate: Date | null
+  protected declare _ownerInvalid: boolean
   protected declare _maxDate: Date | null
   protected declare _sections: DateSection[]
   protected declare _draft: string
@@ -242,6 +243,7 @@ abstract class SectionInput extends BaseComponent {
     this._submitHandler = () => this._onFormSubmit()
     this._submitValid = false
     this._submitted = false
+    this._ownerInvalid = false
     this._hostAriaInvalid = this._element.getAttribute('aria-invalid')
     this._hostAriaLabel = this._element.getAttribute('aria-label')
     this._hostClasses = captureHostClasses(this._element, HOST_CLASS_NAMES)
@@ -647,8 +649,13 @@ abstract class SectionInput extends BaseComponent {
     return this._config.required && !this._config.disabled && !this._config.readonly && date === null
   }
 
+  _setOwnerInvalid(isInvalid: boolean): void {
+    this._ownerInvalid = isInvalid
+    this._setInvalid(this._element.classList.contains(CLASS_NAME_IS_INVALID))
+  }
+
   _setInvalid(isInvalid: boolean): void {
-    const ariaInvalid = isInvalid ? 'true' : this._hostAriaInvalid
+    const ariaInvalid = isInvalid || this._ownerInvalid ? 'true' : this._hostAriaInvalid
     this._element.classList.toggle(CLASS_NAME_IS_INVALID, isInvalid)
 
     for (const element of [this._element, ...this._getSectionElements()]) {
