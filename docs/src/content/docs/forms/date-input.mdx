@@ -26,19 +26,19 @@ Use an empty container with `data-coreui-date-input` to create a masked date fie
 By default, the section order and separators are derived from the user's locale, so `12/31/2026` in `en-US` becomes `31.12.2026` in `de-DE` without any configuration.
 
 <Example pro code={`<label class="form-label" id="basicDateInputLabel">Delivery date</label>
-  <div class="form-control form-date-time" data-coreui-date-input data-coreui-name="delivery-date"></div>`} />
+  <div class="form-control form-date-time" data-coreui-date-input data-coreui-name="delivery-date" aria-labelledby="basicDateInputLabel"></div>`} />
 
 ## Date and time
 
 Set `data-coreui-type="datetime"` and the field carries the time as well. The hour cycle follows the locale, so a 12-hour locale gets an AM/PM section and a 24-hour one does not. Everything else on this page applies unchanged: the same typing, the same arrow keys, the same events.
 
-<Example pro code={`<label class="form-label">Appointment</label>
-  <div class="form-control form-date-time" data-coreui-date-input data-coreui-type="datetime" data-coreui-name="appointment"></div>`} />
+<Example pro code={`<label class="form-label" id="dateInputAppointmentLabel">Appointment</label>
+  <div class="form-control form-date-time" data-coreui-date-input data-coreui-type="datetime" data-coreui-name="appointment" aria-labelledby="dateInputAppointmentLabel"></div>`} />
 
 Add `data-coreui-seconds="true"` for a seconds section:
 
-<Example pro code={`<label class="form-label">Timestamp</label>
-  <div class="form-control form-date-time" data-coreui-date-input data-coreui-type="datetime" data-coreui-seconds="true"></div>`} />
+<Example pro code={`<label class="form-label" id="dateInputTimestampLabel">Timestamp</label>
+  <div class="form-control form-date-time" data-coreui-date-input data-coreui-type="datetime" data-coreui-seconds="true" aria-labelledby="dateInputTimestampLabel"></div>`} />
 
 A `format` overrides the type, because it names the sections itself. [Date range input](/forms/date-range-input/) takes both options too, so a range with time is the same two attributes on the range container.
 
@@ -47,8 +47,8 @@ A `format` overrides the type, because it names the sections itself. [Date range
 Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label and description, and to get validation feedback in the right place.
 
 <Example pro code={`<div class="form-field">
-    <span class="form-label">Delivery date</span>
-    <div class="form-control form-date-time" data-coreui-date-input data-coreui-name="delivery-date"></div>
+    <span class="form-label" id="dateInputDeliveryDateLabel">Delivery date</span>
+    <div class="form-control form-date-time" data-coreui-date-input data-coreui-name="delivery-date" aria-labelledby="dateInputDeliveryDateLabel"></div>
     <div class="form-text">We deliver on working days only.</div>
   </div>`} />
 
@@ -57,16 +57,16 @@ Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label 
 Set an explicit format with the `data-coreui-format` attribute. The parser accepts both dayjs/moment-style tokens (`DD`, `MM`, `YYYY`, `YY`) and date-fns/Unicode-style tokens (`dd`, `MM`, `yyyy`, `yy`), plus `ww` for ISO week numbers and `q` (numeric) or `QQQ` (`Q1`–`Q4`) for quarters, so you can reuse the format strings from the date library you already use. Any other character becomes a literal separator — a fixed, non-editable part of the mask — and text wrapped in single quotes is always a literal, even when it contains token letters (`'Week' ww` renders `Week 29`; escape a quote by doubling it, `''`).
 
 <Example pro code={`<div class="mb-3">
-    <label class="form-label">dd.MM.yyyy</label>
-    <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="dd.MM.yyyy"></div>
+    <label class="form-label" id="dateInputDdMMYyyyLabel">dd.MM.yyyy</label>
+    <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="dd.MM.yyyy" aria-labelledby="dateInputDdMMYyyyLabel"></div>
   </div>
   <div class="mb-3">
-    <label class="form-label">YYYY-MM-DD</label>
-    <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="YYYY-MM-DD"></div>
+    <label class="form-label" id="dateInputYYYYMMDDLabel">YYYY-MM-DD</label>
+    <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="YYYY-MM-DD" aria-labelledby="dateInputYYYYMMDDLabel"></div>
   </div>
   <div>
-    <label class="form-label">MM/DD/YY</label>
-    <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="MM/DD/YY"></div>
+    <label class="form-label" id="dateInputMMDDYYLabel">MM/DD/YY</label>
+    <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="MM/DD/YY" aria-labelledby="dateInputMMDDYYLabel"></div>
   </div>`} />
 
 Two-digit year sections expand with smart century assignment — values up to 50 years in the future resolve to the current century, older ones to the previous century.
@@ -74,27 +74,27 @@ Two-digit year sections expand with smart century assignment — values up to 50
 The format doesn't have to include every section — a month-and-year mask works like the native `month` input and reports the first day of the month:
 
 <Example pro code={`<div class="mb-3">
-    <label class="form-label">MM.yyyy</label>
-    <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="MM.yyyy"></div>
+    <label class="form-label" id="dateInputMMYyyyLabel">MM.yyyy</label>
+    <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="MM.yyyy" aria-labelledby="dateInputMMYyyyLabel"></div>
   </div>
   <div>
-    <label class="form-label">MMMM yyyy</label>
-    <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="MMMM yyyy" data-coreui-locale="en-US"></div>
+    <label class="form-label" id="dateInputMMMMYyyyLabel">MMMM yyyy</label>
+    <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="MMMM yyyy" data-coreui-locale="en-US" aria-labelledby="dateInputMMMMYyyyLabel"></div>
   </div>`} />
 
 Week and quarter masks work the same way. A week mask edits the ISO week directly and reports the Monday of that week; its year section holds the ISO week-numbering year, which can differ from the calendar year around January 1st. Combine a quoted label with the `ww` token for the native week input's presentation, or use `yyyy-Www` (the uppercase `W` is a literal) for the ISO wire format. A quarter mask reports the first day of the quarter:
 
 <Example pro code={`<div class="mb-3">
-    <label class="form-label">'Week' ww, yyyy</label>
-    <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="'Week' ww, yyyy"></div>
+    <label class="form-label" id="dateInputWeekWwYyyyLabel">'Week' ww, yyyy</label>
+    <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="'Week' ww, yyyy" aria-labelledby="dateInputWeekWwYyyyLabel"></div>
   </div>
   <div class="mb-3">
-    <label class="form-label">yyyy-Www</label>
-    <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="yyyy-Www"></div>
+    <label class="form-label" id="dateInputYyyyWwwLabel">yyyy-Www</label>
+    <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="yyyy-Www" aria-labelledby="dateInputYyyyWwwLabel"></div>
   </div>
   <div>
-    <label class="form-label">QQQ yyyy</label>
-    <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="QQQ yyyy"></div>
+    <label class="form-label" id="dateInputQQQYyyyLabel">QQQ yyyy</label>
+    <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="QQQ yyyy" aria-labelledby="dateInputQQQYyyyLabel"></div>
   </div>`} />
 
 ## Month names
@@ -102,50 +102,50 @@ Week and quarter masks work the same way. A week mask edits the ISO week directl
 Use the `MMM` or `MMMM` tokens for text month sections with localized short or full month names. Type letters to match a month by prefix — `m` selects <strong>M</strong>arch, continuing with `may` switches to <strong>May</strong> — and the caret moves on as soon as the prefix is unambiguous. Digits and arrow keys keep working too.
 
 <Example pro code={`<div class="mb-3">
-    <label class="form-label">DD MMMM YYYY</label>
-    <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="DD MMMM YYYY" data-coreui-locale="en-US"></div>
+    <label class="form-label" id="dateInputDDMMMMYYYYLabel">DD MMMM YYYY</label>
+    <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="DD MMMM YYYY" data-coreui-locale="en-US" aria-labelledby="dateInputDDMMMMYYYYLabel"></div>
   </div>
   <div>
-    <label class="form-label">MMM D, YYYY</label>
-    <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="MMM D, YYYY" data-coreui-locale="en-US"></div>
+    <label class="form-label" id="dateInputMMMDYYYYLabel">MMM D, YYYY</label>
+    <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="MMM D, YYYY" data-coreui-locale="en-US" aria-labelledby="dateInputMMMDYYYYLabel"></div>
   </div>`} />
 
 Month names default to the grammatical form used inside a full date — e.g. Polish shows the genitive `14 lipca 2026`, not the standalone `lipiec`. To use a different form (or your own localization), pass all twelve names through the `monthNames` option; they are used for display, letter matching, and paste alike.
 
-<Example pro code={`<label class="form-label">Standalone Polish month names</label>
+<Example pro code={`<label class="form-label" id="dateInputStandalonePolishMonthNamesLabel">Standalone Polish month names</label>
   <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="DD MMMM YYYY" data-coreui-locale="pl-PL"
-       data-coreui-month-names='["styczeń", "luty", "marzec", "kwiecień", "maj", "czerwiec", "lipiec", "sierpień", "wrzesień", "październik", "listopad", "grudzień"]'></div>`} />
+       data-coreui-month-names='["styczeń", "luty", "marzec", "kwiecień", "maj", "czerwiec", "lipiec", "sierpień", "wrzesień", "październik", "listopad", "grudzień"]' aria-labelledby="dateInputStandalonePolishMonthNamesLabel"></div>`} />
 
 ## Locale
 
 Without an explicit format, the mask follows the locale set via `data-coreui-locale`.
 
 <Example pro code={`<div class="mb-3">
-    <label class="form-label">en-US</label>
-    <div class="form-control form-date-time" data-coreui-date-input data-coreui-locale="en-US"></div>
+    <label class="form-label" id="dateInputEnUSLabel">en-US</label>
+    <div class="form-control form-date-time" data-coreui-date-input data-coreui-locale="en-US" aria-labelledby="dateInputEnUSLabel"></div>
   </div>
   <div class="mb-3">
-    <label class="form-label">pl-PL</label>
-    <div class="form-control form-date-time" data-coreui-date-input data-coreui-locale="pl-PL" data-coreui-day-placeholder="DD" data-coreui-month-placeholder="MM" data-coreui-year-placeholder="RRRR"></div>
+    <label class="form-label" id="dateInputPlPLLabel">pl-PL</label>
+    <div class="form-control form-date-time" data-coreui-date-input data-coreui-locale="pl-PL" data-coreui-day-placeholder="DD" data-coreui-month-placeholder="MM" data-coreui-year-placeholder="RRRR" aria-labelledby="dateInputPlPLLabel"></div>
   </div>
   <div>
-    <label class="form-label">ja-JP</label>
-    <div class="form-control form-date-time" data-coreui-date-input data-coreui-locale="ja-JP"></div>
+    <label class="form-label" id="dateInputJaJPLabel">ja-JP</label>
+    <div class="form-control form-date-time" data-coreui-date-input data-coreui-locale="ja-JP" aria-labelledby="dateInputJaJPLabel"></div>
   </div>`} />
 
 ## Initial value
 
 Set the initial date with the `data-coreui-date` attribute.
 
-<Example pro code={`<label class="form-label">Date of birth</label>
-  <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="dd.MM.yyyy" data-coreui-date="2000-01-15"></div>`} />
+<Example pro code={`<label class="form-label" id="dateInputDateOfBirthLabel">Date of birth</label>
+  <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="dd.MM.yyyy" data-coreui-date="2000-01-15" aria-labelledby="dateInputDateOfBirthLabel"></div>`} />
 
 ## Min and max dates
 
 Constrain the selectable range with `minDate` and `maxDate`. A completed date outside the range gets the `.is-invalid` class and the component reports `null` until the value is corrected.
 
-<Example pro code={`<label class="form-label">Date in July 2026</label>
-  <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="dd.MM.yyyy" data-coreui-min-date="2026-07-01" data-coreui-max-date="2026-07-31"></div>`} />
+<Example pro code={`<label class="form-label" id="dateInputDateInJuly2026Label">Date in July 2026</label>
+  <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="dd.MM.yyyy" data-coreui-min-date="2026-07-01" data-coreui-max-date="2026-07-31" aria-labelledby="dateInputDateInJuly2026Label"></div>`} />
 
 ## Disabled dates
 
@@ -153,8 +153,8 @@ Beyond a simple range, the `disabledDates` option excludes specific dates — si
 
 In this example July 4–7 and July 16 can't be entered — try typing one of them:
 
-<Example pro code={`<label class="form-label">Delivery date</label>
-  <div class="form-control form-date-time" id="myDateInputDisabledDates"></div>`} sandboxJs={dateInputDisabledDates} />
+<Example pro code={`<label class="form-label" id="dateInputDeliveryDateLabel2">Delivery date</label>
+  <div class="form-control form-date-time" id="myDateInputDisabledDates" aria-labelledby="dateInputDeliveryDateLabel2"></div>`} sandboxJs={dateInputDisabledDates} />
 
 <Code code={dateInputDisabledDates} lang="js" />
 
@@ -162,8 +162,8 @@ In this example July 4–7 and July 16 can't be entered — try typing one of th
 
 Pass a function to disable dates by rule — here Saturdays and Sundays:
 
-<Example pro code={`<label class="form-label">Business day</label>
-  <div class="form-control form-date-time" id="myDateInputDisabledDates2"></div>`} sandboxJs={dateInputDisabledDates2} />
+<Example pro code={`<label class="form-label" id="dateInputBusinessDayLabel">Business day</label>
+  <div class="form-control form-date-time" id="myDateInputDisabledDates2" aria-labelledby="dateInputBusinessDayLabel"></div>`} sandboxJs={dateInputDisabledDates2} />
 
 <Code code={dateInputDisabledDates2} lang="js" />
 
@@ -173,8 +173,8 @@ The built-in token parser covers dayjs, moment, date-fns, and luxon format strin
 
 In this example the mask uses the dayjs format `MMMM DD, YYYY`, and dayjs (with the `customParseFormat` plugin) parses pasted strings:
 
-<Example pro code={`<label class="form-label">dayjs format</label>
-  <div class="form-control form-date-time" id="myDateInputCustomFormats1"></div>`} sandboxJs={dateInputCustomFormats1} />
+<Example pro code={`<label class="form-label" id="dateInputDayjsFormatLabel">dayjs format</label>
+  <div class="form-control form-date-time" id="myDateInputCustomFormats1" aria-labelledby="dateInputDayjsFormatLabel"></div>`} sandboxJs={dateInputCustomFormats1} />
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
@@ -185,8 +185,8 @@ In this example the mask uses the dayjs format `MMMM DD, YYYY`, and dayjs (with 
 
 Localized formats work the same way — the section names come from the component's `locale` (or the `monthNames` option), while the dayjs locale file handles parsing pasted text, here in Spanish:
 
-<Example pro code={`<label class="form-label">Localized dayjs format</label>
-  <div class="form-control form-date-time" id="myDateInputCustomFormats2"></div>`} sandboxJs={dateInputCustomFormats2} />
+<Example pro code={`<label class="form-label" id="dateInputLocalizedDayjsFormatLabel">Localized dayjs format</label>
+  <div class="form-control form-date-time" id="myDateInputCustomFormats2" aria-labelledby="dateInputLocalizedDayjsFormatLabel"></div>`} sandboxJs={dateInputCustomFormats2} />
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
@@ -248,16 +248,16 @@ The date input supports [floating labels](/forms/floating-labels/). When the fie
 The field renders as a `.form-control`, so the standard sizing classes work — add `.form-control-sm` or `.form-control-lg` to the container. Validation states (`.is-invalid` set automatically for out-of-range dates, or your own `.is-valid`) and input groups work the same way.
 
 <Example pro code={`<div class="mb-3">
-    <label class="form-label">Large</label>
-    <div class="form-control form-date-time form-control-lg" data-coreui-date-input data-coreui-format="dd.MM.yyyy"></div>
+    <label class="form-label" id="dateInputLargeLabel">Large</label>
+    <div class="form-control form-date-time form-control-lg" data-coreui-date-input data-coreui-format="dd.MM.yyyy" aria-labelledby="dateInputLargeLabel"></div>
   </div>
   <div class="mb-3">
-    <label class="form-label">Default</label>
-    <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="dd.MM.yyyy"></div>
+    <label class="form-label" id="dateInputDefaultLabel">Default</label>
+    <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="dd.MM.yyyy" aria-labelledby="dateInputDefaultLabel"></div>
   </div>
   <div>
-    <label class="form-label">Small</label>
-    <div class="form-control form-date-time form-control-sm" data-coreui-date-input data-coreui-format="dd.MM.yyyy"></div>
+    <label class="form-label" id="dateInputSmallLabel">Small</label>
+    <div class="form-control form-date-time form-control-sm" data-coreui-date-input data-coreui-format="dd.MM.yyyy" aria-labelledby="dateInputSmallLabel"></div>
   </div>`} />
 
 ## Disabled and readonly
@@ -265,12 +265,12 @@ The field renders as a `.form-control`, so the standard sizing classes work — 
 Add `data-coreui-disabled="true"` to disable the field, or `data-coreui-readonly="true"` to make it focusable but non-editable.
 
 <Example pro code={`<div class="mb-3">
-    <label class="form-label">Disabled</label>
-    <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="dd.MM.yyyy" data-coreui-date="2026-07-14" data-coreui-disabled="true"></div>
+    <label class="form-label" id="dateInputDisabledLabel">Disabled</label>
+    <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="dd.MM.yyyy" data-coreui-date="2026-07-14" data-coreui-disabled="true" aria-labelledby="dateInputDisabledLabel"></div>
   </div>
   <div>
-    <label class="form-label">Readonly</label>
-    <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="dd.MM.yyyy" data-coreui-date="2026-07-14" data-coreui-readonly="true"></div>
+    <label class="form-label" id="dateInputReadonlyLabel">Readonly</label>
+    <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="dd.MM.yyyy" data-coreui-date="2026-07-14" data-coreui-readonly="true" aria-labelledby="dateInputReadonlyLabel"></div>
   </div>`} />
 
 ## Accessibility
@@ -279,7 +279,7 @@ The date input implements the [spinbutton pattern](https://www.w3.org/WAI/ARIA/a
 
 - **Role attributes**: the container has `role="group"`, every section is a `role="spinbutton"` with `aria-valuemin`, `aria-valuemax`, `aria-valuenow`, and `aria-valuetext` (month sections announce the localized month name).
 - **Roving tabindex**: the whole field is a single tab stop; arrow keys move between sections.
-- **Labels**: sections receive `aria-label`s (`Day`, `Month`, `Year`), each replaceable on its own — `ariaDayLabel`, `ariaMonthLabel`, `ariaYearLabel` — for localization.
+- **Labels**: point `aria-labelledby` at the visible label, as the examples on this page do, because a `<label for>` does not name a group. An `aria-label` written on the element stays as it is, and the `ariaLabel` option fills it in only when the element has none. Sections receive `aria-label`s (`Day`, `Month`, `Year`), each replaceable on its own — `ariaDayLabel`, `ariaMonthLabel`, `ariaYearLabel` — for localization.
 - **Validity**: while the field is invalid (a date outside `minDate` / `maxDate` or in `disabledDates`, the `invalid` option, or a required field still empty after a validated form is submitted), the group and every section carry `aria-invalid="true"`; otherwise they carry the `aria-invalid` the page wrote on the element, if any. A disabled or read-only field is never reported as missing. With `required`, every section carries `aria-required="true"`.
 - **Description**: the `aria-describedby` of the field, pointing at its help text or feedback message, reaches the first section, and every section while the field is invalid, so the reason for an error is read wherever the focus sits without the help text repeating on each section.
 - **Mobile input**: sections use `inputmode="numeric"`, so touch devices show the numeric keyboard.
@@ -326,7 +326,7 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | --- | --- | --- | --- |
 | `ariaDayLabel` | string | `'Day'` | The `aria-label` of the day section. |
 | `ariaHourLabel` | string | `'Hour'` | The `aria-label` of the hour section. |
-| `ariaLabel` | string | `'Date input'` | The `aria-label` of the `role="group"` container. On `type="datetime"` the default becomes `'Date and time input'`. |
+| `ariaLabel` | string | `'Date input'` | The `aria-label` of the `role="group"` container when the element carries no `aria-label` of its own. On `type="datetime"` the default becomes `'Date and time input'`. |
 | `ariaMeridiemLabel` | string | `'AM/PM'` | The `aria-label` of the meridiem section. |
 | `ariaMinuteLabel` | string | `'Minute'` | The `aria-label` of the minute section. |
 | `ariaMonthLabel` | string | `'Month'` | The `aria-label` of the month section. |

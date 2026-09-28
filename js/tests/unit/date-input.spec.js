@@ -288,6 +288,58 @@ describe('DateInput', () => {
       expect(sections[1].tabIndex).toBe(-1)
       expect(sections[2].tabIndex).toBe(-1)
     })
+
+    it('should keep the aria-label the page wrote over the ariaLabel option', () => {
+      fixtureEl.innerHTML = '<div aria-label="Birth date"></div>'
+      const dateInput = new DateInput(fixtureEl.querySelector('div'), { ariaLabel: 'Appointment', format: 'dd.MM.yyyy' })
+
+      expect(dateInput._element.getAttribute('aria-label')).toEqual('Birth date')
+
+      dateInput.setConfig({ ariaLabel: 'Meeting' })
+
+      expect(dateInput._element.getAttribute('aria-label')).toEqual('Birth date')
+    })
+
+    it('should leave a label the page rewrites after init, also once disposed', () => {
+      fixtureEl.innerHTML = '<div aria-label="Birth date"></div>'
+      const element = fixtureEl.querySelector('div')
+      const dateInput = new DateInput(element, { format: 'dd.MM.yyyy' })
+
+      element.setAttribute('aria-label', 'Geburtsdatum')
+      dateInput.setConfig({ date: new Date(2026, 6, 14) })
+
+      expect(element.getAttribute('aria-label')).toEqual('Geburtsdatum')
+
+      dateInput.dispose()
+
+      expect(element.getAttribute('aria-label')).toEqual('Geburtsdatum')
+    })
+
+    it('should name a field with an empty aria-label from the ariaLabel option', () => {
+      fixtureEl.innerHTML = '<div aria-label=""></div>'
+      const element = fixtureEl.querySelector('div')
+      const dateInput = new DateInput(element, { format: 'dd.MM.yyyy' })
+
+      expect(element.getAttribute('aria-label')).toEqual('Date input')
+
+      dateInput.dispose()
+
+      expect(element.getAttribute('aria-label')).toEqual('')
+    })
+
+    it('should keep the aria-labelledby the page wrote', () => {
+      fixtureEl.innerHTML = '<span id="birth-label">Birth date</span><div aria-labelledby="birth-label"></div>'
+      const element = fixtureEl.querySelector('div')
+      const dateInput = new DateInput(element, { format: 'dd.MM.yyyy' })
+
+      dateInput.setConfig({ date: new Date(2026, 6, 14) })
+
+      expect(element.getAttribute('aria-labelledby')).toEqual('birth-label')
+
+      dateInput.dispose()
+
+      expect(element.getAttribute('aria-labelledby')).toEqual('birth-label')
+    })
   })
 
   describe('typing', () => {
@@ -1754,6 +1806,17 @@ describe('DateInput', () => {
 
     it("should keep a label the page wrote", () => {
       const dateInput = createDateTimeInput({ ariaLabel: "Appointment" })
+
+      expect(dateInput._element.getAttribute("aria-label")).toEqual("Appointment")
+    })
+
+    it("should keep the aria-label the page wrote on the element when the type changes", () => {
+      fixtureEl.innerHTML = "<div aria-label=\"Appointment\"></div>"
+      const dateInput = new DateInput(fixtureEl.querySelector("div"), { format: "dd.MM.yyyy HH:mm", type: "datetime" })
+
+      expect(dateInput._element.getAttribute("aria-label")).toEqual("Appointment")
+
+      dateInput.setConfig({ type: "date" })
 
       expect(dateInput._element.getAttribute("aria-label")).toEqual("Appointment")
     })

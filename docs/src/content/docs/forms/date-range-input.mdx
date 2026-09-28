@@ -224,7 +224,7 @@ The component adopts the parts you write inside its element and generates the re
 Each end is a [date input](/forms/date-input/#accessibility) with the spinbutton pattern per section, so the range is two labelled groups rather than one opaque control:
 
 - **Role attributes**: each end has `role="group"`, every section is a `role="spinbutton"` with its value attributes.
-- **Names**: the start and end are named separately — `ariaStartLabel` and `ariaEndLabel` by default, or the floating label text when one is set.
+- **Names**: the start and end are named separately — `ariaStartLabel` and `ariaEndLabel` by default, or the floating label text when one is set. An end you wrote with an `aria-label` of its own keeps it.
 - **Separator**: hidden from assistive technology, as is any `<svg>` inside it.
 - **Roving tabindex**: each end is a single tab stop; <kbd>Tab</kbd> moves from the start to the end.
 
@@ -271,10 +271,10 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | --- | --- | --- | --- |
 | `allowList` | object | SVG allow list | Allowed tags and attributes for the generated separator icon |
 | `ariaDayLabel` | string | `'Day'` | The `aria-label` of the day section. |
-| `ariaEndLabel` | string | `'End date'` | Accessible name of the end field when it has no floating label |
+| `ariaEndLabel` | string | `'End date'` | Accessible name of the end field when it has no floating label and no `aria-label` of its own |
 | `ariaMonthLabel` | string | `'Month'` | The `aria-label` of the month section. |
 | `ariaQuarterLabel` | string | `'Quarter'` | The `aria-label` of the quarter section. |
-| `ariaStartLabel` | string | `'Start date'` | Accessible name of the start field when it has no floating label |
+| `ariaStartLabel` | string | `'Start date'` | Accessible name of the start field when it has no floating label and no `aria-label` of its own |
 | `ariaWeekLabel` | string | `'Week'` | The `aria-label` of the week section. |
 | `ariaYearLabel` | string | `'Year'` | The `aria-label` of the year section. |
 | `autofocus` | boolean | `false` | Focus the first section of the start date right after initialization |

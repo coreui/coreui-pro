@@ -19,16 +19,16 @@ import timeInputCustomFormats1 from './snippets/time-input-custom-formats1.js?ra
 
 Use an empty container with `data-coreui-time-input` to create a masked time field. The mask is split into hour, minute, and — depending on the locale — AM/PM sections. Click or focus a section and type, use arrow keys to adjust values, and the caret moves to the next section automatically.
 
-<Example pro code={`<label class="form-label">Meeting time</label>
-  <div class="form-control form-date-time" data-coreui-time-input data-coreui-name="meeting-time"></div>`} />
+<Example pro code={`<label class="form-label" id="timeInputMeetingTimeLabel">Meeting time</label>
+  <div class="form-control form-date-time" data-coreui-time-input data-coreui-name="meeting-time" aria-labelledby="timeInputMeetingTimeLabel"></div>`} />
 
 ## With form field
 
 Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label and description, and to get validation feedback in the right place.
 
 <Example pro code={`<div class="form-field">
-    <span class="form-label">Meeting time</span>
-    <div class="form-control form-date-time" data-coreui-time-input data-coreui-name="meeting-time"></div>
+    <span class="form-label" id="timeInputMeetingTimeLabel2">Meeting time</span>
+    <div class="form-control form-date-time" data-coreui-time-input data-coreui-name="meeting-time" aria-labelledby="timeInputMeetingTimeLabel2"></div>
     <div class="form-text">Local time, in your own time zone.</div>
   </div>`} />
 
@@ -37,16 +37,16 @@ Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label 
 Set an explicit format with the `data-coreui-format` attribute: `HH`/`H` for the 23-hour cycle, `hh`/`h` for the 12-hour cycle, `mm` for minutes, `ss` for seconds, and `A`/`a` for the day period. Type `a` or `p` in the AM/PM section to switch it, or use the arrow keys.
 
 <Example pro code={`<div class="mb-3">
-    <label class="form-label">HH:mm</label>
-    <div class="form-control form-date-time" data-coreui-time-input data-coreui-format="HH:mm"></div>
+    <label class="form-label" id="timeInputHHMmLabel">HH:mm</label>
+    <div class="form-control form-date-time" data-coreui-time-input data-coreui-format="HH:mm" aria-labelledby="timeInputHHMmLabel"></div>
   </div>
   <div class="mb-3">
-    <label class="form-label">HH:mm:ss</label>
-    <div class="form-control form-date-time" data-coreui-time-input data-coreui-format="HH:mm:ss"></div>
+    <label class="form-label" id="timeInputHHMmSsLabel">HH:mm:ss</label>
+    <div class="form-control form-date-time" data-coreui-time-input data-coreui-format="HH:mm:ss" aria-labelledby="timeInputHHMmSsLabel"></div>
   </div>
   <div>
-    <label class="form-label">hh:mm A</label>
-    <div class="form-control form-date-time" data-coreui-time-input data-coreui-format="hh:mm A" data-coreui-locale="en-US"></div>
+    <label class="form-label" id="timeInputHhMmALabel">hh:mm A</label>
+    <div class="form-control form-date-time" data-coreui-time-input data-coreui-format="hh:mm A" data-coreui-locale="en-US" aria-labelledby="timeInputHhMmALabel"></div>
   </div>`} />
 
 ## Locale
@@ -54,46 +54,46 @@ Set an explicit format with the `data-coreui-format` attribute: `HH`/`H` for the
 Without an explicit format, the hour cycle and layout follow the locale set via `data-coreui-locale` — `en-US` gets a 12-hour clock with an AM/PM section, `pl-PL` or `de-DE` a 24-hour one.
 
 <Example pro code={`<div class="mb-3">
-    <label class="form-label">en-US</label>
-    <div class="form-control form-date-time" data-coreui-time-input data-coreui-locale="en-US"></div>
+    <label class="form-label" id="timeInputEnUSLabel">en-US</label>
+    <div class="form-control form-date-time" data-coreui-time-input data-coreui-locale="en-US" aria-labelledby="timeInputEnUSLabel"></div>
   </div>
   <div class="mb-3">
-    <label class="form-label">pl-PL</label>
-    <div class="form-control form-date-time" data-coreui-time-input data-coreui-locale="pl-PL"></div>
+    <label class="form-label" id="timeInputPlPLLabel">pl-PL</label>
+    <div class="form-control form-date-time" data-coreui-time-input data-coreui-locale="pl-PL" aria-labelledby="timeInputPlPLLabel"></div>
   </div>
   <div>
-    <label class="form-label">de-DE</label>
-    <div class="form-control form-date-time" data-coreui-time-input data-coreui-locale="de-DE"></div>
+    <label class="form-label" id="timeInputDeDELabel">de-DE</label>
+    <div class="form-control form-date-time" data-coreui-time-input data-coreui-locale="de-DE" aria-labelledby="timeInputDeDELabel"></div>
   </div>`} />
 
 ## Seconds
 
 Without an explicit format, enable the seconds section with `data-coreui-seconds="true"`.
 
-<Example pro code={`<label class="form-label">Time with seconds</label>
-  <div class="form-control form-date-time" data-coreui-time-input data-coreui-seconds="true"></div>`} />
+<Example pro code={`<label class="form-label" id="timeInputTimeWithSecondsLabel">Time with seconds</label>
+  <div class="form-control form-date-time" data-coreui-time-input data-coreui-seconds="true" aria-labelledby="timeInputTimeWithSecondsLabel"></div>`} />
 
 ## Initial value
 
 Set the initial time with the `data-coreui-date` attribute — a time string like `09:30` or a `Date` object via JavaScript.
 
-<Example pro code={`<label class="form-label">Opening time</label>
-  <div class="form-control form-date-time" data-coreui-time-input data-coreui-format="HH:mm" data-coreui-date="09:30"></div>`} />
+<Example pro code={`<label class="form-label" id="timeInputOpeningTimeLabel">Opening time</label>
+  <div class="form-control form-date-time" data-coreui-time-input data-coreui-format="HH:mm" data-coreui-date="09:30" aria-labelledby="timeInputOpeningTimeLabel"></div>`} />
 
 ## Min and max times
 
 Constrain the selectable range with `minDate` and `maxDate` — time strings work here too. A completed time outside the range gets the `.is-invalid` class and the component reports `null` until the value is corrected.
 
-<Example pro code={`<label class="form-label">Business hours (09:00–17:00)</label>
+<Example pro code={`<label class="form-label" id="timeInputBusinessHours09001700Label">Business hours (09:00–17:00)</label>
   <div class="form-control form-date-time" data-coreui-time-input data-coreui-format="HH:mm" data-coreui-date="09:30"
-       data-coreui-min-date="09:00" data-coreui-max-date="17:00"></div>`} />
+       data-coreui-min-date="09:00" data-coreui-max-date="17:00" aria-labelledby="timeInputBusinessHours09001700Label"></div>`} />
 
 ## Custom formats
 
 The built-in token parser covers dayjs, moment, date-fns, and luxon format strings for time masks, so you can reuse the format string from the date library you already work with — the library itself isn't required to render or edit the mask. Pair it with `inputDateParse` when you want that library to also parse text pasted into the field.
 
-<Example pro code={`<label class="form-label">dayjs format</label>
-  <div class="form-control form-date-time" id="myTimeInputCustomFormats1"></div>`} sandboxJs={timeInputCustomFormats1} />
+<Example pro code={`<label class="form-label" id="timeInputDayjsFormatLabel">dayjs format</label>
+  <div class="form-control form-date-time" id="myTimeInputCustomFormats1" aria-labelledby="timeInputDayjsFormatLabel"></div>`} sandboxJs={timeInputCustomFormats1} />
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
@@ -129,16 +129,16 @@ The time input supports [floating labels](/forms/floating-labels/). When the fie
 The field renders as a `.form-control`, so the standard sizing classes work — add `.form-control-sm` or `.form-control-lg` to the container.
 
 <Example pro code={`<div class="mb-3">
-    <label class="form-label">Large</label>
-    <div class="form-control form-date-time form-control-lg" data-coreui-time-input data-coreui-format="HH:mm"></div>
+    <label class="form-label" id="timeInputLargeLabel">Large</label>
+    <div class="form-control form-date-time form-control-lg" data-coreui-time-input data-coreui-format="HH:mm" aria-labelledby="timeInputLargeLabel"></div>
   </div>
   <div class="mb-3">
-    <label class="form-label">Default</label>
-    <div class="form-control form-date-time" data-coreui-time-input data-coreui-format="HH:mm"></div>
+    <label class="form-label" id="timeInputDefaultLabel">Default</label>
+    <div class="form-control form-date-time" data-coreui-time-input data-coreui-format="HH:mm" aria-labelledby="timeInputDefaultLabel"></div>
   </div>
   <div>
-    <label class="form-label">Small</label>
-    <div class="form-control form-date-time form-control-sm" data-coreui-time-input data-coreui-format="HH:mm"></div>
+    <label class="form-label" id="timeInputSmallLabel">Small</label>
+    <div class="form-control form-date-time form-control-sm" data-coreui-time-input data-coreui-format="HH:mm" aria-labelledby="timeInputSmallLabel"></div>
   </div>`} />
 
 ## Disabled and readonly
@@ -146,12 +146,12 @@ The field renders as a `.form-control`, so the standard sizing classes work — 
 Add `data-coreui-disabled="true"` to disable the field, or `data-coreui-readonly="true"` to make it focusable but non-editable.
 
 <Example pro code={`<div class="mb-3">
-    <label class="form-label">Disabled</label>
-    <div class="form-control form-date-time" data-coreui-time-input data-coreui-format="HH:mm" data-coreui-date="14:30" data-coreui-disabled="true"></div>
+    <label class="form-label" id="timeInputDisabledLabel">Disabled</label>
+    <div class="form-control form-date-time" data-coreui-time-input data-coreui-format="HH:mm" data-coreui-date="14:30" data-coreui-disabled="true" aria-labelledby="timeInputDisabledLabel"></div>
   </div>
   <div>
-    <label class="form-label">Readonly</label>
-    <div class="form-control form-date-time" data-coreui-time-input data-coreui-format="HH:mm" data-coreui-date="14:30" data-coreui-readonly="true"></div>
+    <label class="form-label" id="timeInputReadonlyLabel">Readonly</label>
+    <div class="form-control form-date-time" data-coreui-time-input data-coreui-format="HH:mm" data-coreui-date="14:30" data-coreui-readonly="true" aria-labelledby="timeInputReadonlyLabel"></div>
   </div>`} />
 
 ## Value semantics
@@ -190,7 +190,7 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
 | `ariaHourLabel` | string | `'Hour'` | The `aria-label` of the hour section. |
-| `ariaLabel` | string | `'Time input'` | The `aria-label` of the `role="group"` container |
+| `ariaLabel` | string | `'Time input'` | The `aria-label` of the `role="group"` container when the element carries no `aria-label` of its own. |
 | `ariaMeridiemLabel` | string | `'AM/PM'` | The `aria-label` of the meridiem section. |
 | `ariaMinuteLabel` | string | `'Minute'` | The `aria-label` of the minute section. |
 | `ariaSecondLabel` | string | `'Second'` | The `aria-label` of the second section. |
