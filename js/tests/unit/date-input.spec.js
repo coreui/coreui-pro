@@ -1091,6 +1091,99 @@ describe('DateInput', () => {
       expect(dateInput._element.classList.contains('is-invalid')).toBeTrue()
     })
 
+    it('should expose the invalid state on the field and every section, and drop it once the date is valid', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 6, 20), maxDate: new Date(2026, 6, 14) })
+      const invalid = () => [dateInput._element, ...getSections(dateInput._element)].map(element => element.getAttribute('aria-invalid'))
+
+      expect(invalid()).toEqual(['true', 'true', 'true', 'true'])
+
+      dateInput.setConfig({ date: new Date(2026, 6, 10) })
+
+      expect(invalid()).toEqual([null, null, null, null])
+    })
+
+    it('should expose the invalid state of a required empty field on submit of a validated form', async () => {
+      const dateInput = createInForm({ required: true })
+
+      fixtureEl.querySelector('form').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
+      await Promise.resolve()
+
+      expect([...getSections(dateInput._element)].map(section => section.getAttribute('aria-invalid'))).toEqual(['true', 'true', 'true'])
+    })
+
+    it('should keep the aria-invalid the page set, override it while the date is invalid and give it back on dispose', () => {
+      fixtureEl.innerHTML = '<div aria-invalid="grammar"></div>'
+      const dateInput = new DateInput(fixtureEl.querySelector('div'), { date: new Date(2026, 6, 10), format: 'dd.MM.yyyy', maxDate: new Date(2026, 6, 14) })
+      const element = dateInput._element
+      const invalid = () => [element, ...getSections(element)].map(item => item.getAttribute('aria-invalid'))
+
+      expect(invalid()).toEqual(['grammar', 'grammar', 'grammar', 'grammar'])
+
+      dateInput.setConfig({ date: new Date(2026, 6, 20) })
+
+      expect(invalid()).toEqual(['true', 'true', 'true', 'true'])
+
+      dateInput.dispose()
+
+      expect(element.getAttribute('aria-invalid')).toEqual('grammar')
+    })
+
+    it('should leave no aria-invalid of its own on the element after dispose', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 6, 20), maxDate: new Date(2026, 6, 14) })
+      const element = dateInput._element
+
+      dateInput.dispose()
+
+      expect(element.hasAttribute('aria-invalid')).toBeFalse()
+    })
+
+    it.each([{ disabled: true }, { readonly: true }])('should not flag an empty required field as missing on submit when %o', async config => {
+      const dateInput = createInForm({ required: true, ...config })
+
+      fixtureEl.querySelector('form').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
+      await Promise.resolve()
+
+      expect(dateInput._element.classList.contains('is-invalid')).toBeFalse()
+      expect([...getSections(dateInput._element)].map(section => section.getAttribute('aria-invalid'))).toEqual([null, null, null])
+    })
+
+    it('should keep a required empty field invalid after submit until it holds a date', async () => {
+      const dateInput = createInForm({ required: true })
+      const [day, month, year] = getSections(dateInput._element)
+      const invalid = () => [dateInput._element, ...getSections(dateInput._element)].map(item => item.getAttribute('aria-invalid'))
+
+      fixtureEl.querySelector('form').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
+      await Promise.resolve()
+      day.focus()
+      day.blur()
+
+      expect(dateInput._element.classList.contains('is-invalid')).toBeTrue()
+      expect(invalid()).toEqual(['true', 'true', 'true', 'true'])
+
+      day.focus()
+      pressKey(day, '1')
+      pressKey(day, '4')
+      pressKey(month, '0')
+      pressKey(month, '7')
+      for (const digit of '2026') {
+        pressKey(year, digit)
+      }
+
+      expect(dateInput._element.classList.contains('is-invalid')).toBeFalse()
+      expect(invalid()).toEqual([null, null, null, null])
+    })
+
+    it('should mark each section as required, not the group', () => {
+      const dateInput = createDateInput({ required: true })
+
+      expect([...getSections(dateInput._element)].map(section => section.getAttribute('aria-required'))).toEqual(['true', 'true', 'true'])
+      expect(dateInput._element.hasAttribute('aria-required')).toBeFalse()
+
+      dateInput.setConfig({ required: false })
+
+      expect([...getSections(dateInput._element)].map(section => section.getAttribute('aria-required'))).toEqual([null, null, null])
+    })
+
     it('should mark a filled field as valid on submit of a form opted into valid styling', async () => {
       const dateInput = createInForm({ required: true, date: new Date(2026, 6, 14) }, 'data-coreui-validate="valid"')
 
