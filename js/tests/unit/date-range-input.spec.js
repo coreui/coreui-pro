@@ -531,6 +531,27 @@ describe('DateRangeInput', () => {
       expect(root().querySelector('[data-coreui-range-end]').getAttribute('aria-label')).toEqual('End date')
     })
 
+    it('should make the host a group the page can name, and take the role back on dispose', () => {
+      const range = build({}, '<span id="stay-label">Stay</span><div id="range" aria-labelledby="stay-label"></div>')
+
+      expect(root().getAttribute('role')).toEqual('group')
+      expect(root().getAttribute('aria-labelledby')).toEqual('stay-label')
+
+      range.dispose()
+
+      expect(root().hasAttribute('role')).toBeFalse()
+    })
+
+    it('should keep a role the page wrote on the host', () => {
+      const range = build({}, '<div id="range" role="radiogroup"></div>')
+
+      expect(root().getAttribute('role')).toEqual('radiogroup')
+
+      range.dispose()
+
+      expect(root().getAttribute('role')).toEqual('radiogroup')
+    })
+
     it('should mark the parts it builds with the same roles', () => {
       build({})
 

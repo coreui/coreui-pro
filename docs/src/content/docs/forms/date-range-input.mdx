@@ -21,23 +21,23 @@ import dateRangeInputDisabledDates2 from './snippets/date-range-input-disabled-d
 
 Use an empty container with `data-coreui-date-range-input` to create a range field. It is two [date inputs](/forms/date-input/) — start and end — and a separator in one frame, held together by the range the component owns: both ends share the mask and the limits, and an end before the start marks the whole field invalid.
 
-<Example pro code={`<label class="form-label">Stay</label>
-  <div data-coreui-date-range-input data-coreui-locale="en-US" data-coreui-start-name="check-in" data-coreui-end-name="check-out"></div>`} />
+<Example pro code={`<label class="form-label" id="dateRangeInputStayLabel">Stay</label>
+  <div data-coreui-date-range-input data-coreui-locale="en-US" data-coreui-start-name="check-in" data-coreui-end-name="check-out" aria-labelledby="dateRangeInputStayLabel"></div>`} />
 
 ## Date and time
 
 `data-coreui-type="datetime"` puts the time on both ends, and `data-coreui-seconds="true"` adds a seconds section. The range compares the two ends by instant, so an end earlier in the day than the start on the same date marks the field invalid.
 
-<Example pro code={`<label class="form-label">Shift</label>
-  <div data-coreui-date-range-input data-coreui-type="datetime" data-coreui-locale="en-US" data-coreui-start-name="shift-start" data-coreui-end-name="shift-end"></div>`} />
+<Example pro code={`<label class="form-label" id="dateRangeInputShiftLabel">Shift</label>
+  <div data-coreui-date-range-input data-coreui-type="datetime" data-coreui-locale="en-US" data-coreui-start-name="shift-start" data-coreui-end-name="shift-end" aria-labelledby="dateRangeInputShiftLabel"></div>`} />
 
 ## With form field
 
 Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label and description, and to get validation feedback in the right place.
 
 <Example pro code={`<div class="form-field">
-    <span class="form-label">Stay</span>
-    <div data-coreui-date-range-input data-coreui-locale="en-US" data-coreui-start-name="check-in" data-coreui-end-name="check-out"></div>
+    <span class="form-label" id="dateRangeInputStayLabel2">Stay</span>
+    <div data-coreui-date-range-input data-coreui-locale="en-US" data-coreui-start-name="check-in" data-coreui-end-name="check-out" aria-labelledby="dateRangeInputStayLabel2"></div>
     <div class="form-text">Check-out has to be on or after check-in.</div>
   </div>`} />
 
@@ -46,31 +46,31 @@ Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label 
 Set an explicit mask for both ends with the `data-coreui-format` attribute. The parser is the [date input's](/forms/date-input/#formats), so dayjs/moment tokens (`DD`, `MM`, `YYYY`) and date-fns/Unicode tokens (`dd`, `MM`, `yyyy`) both work, and any other character becomes a literal separator.
 
 <Example pro code={`<div class="mb-3">
-    <label class="form-label">dd.MM.yyyy</label>
-    <div data-coreui-date-range-input data-coreui-locale="en-US" data-coreui-format="dd.MM.yyyy"></div>
+    <label class="form-label" id="dateRangeInputDdMMYyyyLabel">dd.MM.yyyy</label>
+    <div data-coreui-date-range-input data-coreui-locale="en-US" data-coreui-format="dd.MM.yyyy" aria-labelledby="dateRangeInputDdMMYyyyLabel"></div>
   </div>
   <div>
-    <label class="form-label">YYYY-MM-DD</label>
-    <div data-coreui-date-range-input data-coreui-locale="en-US" data-coreui-format="YYYY-MM-DD"></div>
+    <label class="form-label" id="dateRangeInputYYYYMMDDLabel">YYYY-MM-DD</label>
+    <div data-coreui-date-range-input data-coreui-locale="en-US" data-coreui-format="YYYY-MM-DD" aria-labelledby="dateRangeInputYYYYMMDDLabel"></div>
   </div>`} />
 
 A mask that leaves out sections works here too — a month-and-year range reports the first day of each month:
 
-<Example pro code={`<label class="form-label">Reporting period</label>
-  <div data-coreui-date-range-input data-coreui-locale="en-US" data-coreui-format="MM.yyyy"></div>`} />
+<Example pro code={`<label class="form-label" id="dateRangeInputReportingPeriodLabel">Reporting period</label>
+  <div data-coreui-date-range-input data-coreui-locale="en-US" data-coreui-format="MM.yyyy" aria-labelledby="dateRangeInputReportingPeriodLabel"></div>`} />
 
 ## Month names
 
 Use the `MMM` or `MMMM` tokens for text month sections in both ends; typing letters matches a month by prefix. Pass all twelve names through `monthNames` to override the locale-derived, date-context grammatical form.
 
 <Example pro code={`<div class="mb-3">
-    <label class="form-label">DD MMMM YYYY</label>
-    <div data-coreui-date-range-input data-coreui-locale="en-US" data-coreui-format="DD MMMM YYYY"></div>
+    <label class="form-label" id="dateRangeInputDDMMMMYYYYLabel">DD MMMM YYYY</label>
+    <div data-coreui-date-range-input data-coreui-locale="en-US" data-coreui-format="DD MMMM YYYY" aria-labelledby="dateRangeInputDDMMMMYYYYLabel"></div>
   </div>
   <div>
-    <label class="form-label">Standalone Polish month names</label>
+    <label class="form-label" id="dateRangeInputStandalonePolishMonthNamesLabel">Standalone Polish month names</label>
     <div data-coreui-date-range-input data-coreui-locale="pl-PL" data-coreui-format="DD MMMM YYYY"
-         data-coreui-month-names='["styczeń", "luty", "marzec", "kwiecień", "maj", "czerwiec", "lipiec", "sierpień", "wrzesień", "październik", "listopad", "grudzień"]'></div>
+         data-coreui-month-names='["styczeń", "luty", "marzec", "kwiecień", "maj", "czerwiec", "lipiec", "sierpień", "wrzesień", "październik", "listopad", "grudzień"]' aria-labelledby="dateRangeInputStandalonePolishMonthNamesLabel"></div>
   </div>`} />
 
 ## Locale
@@ -78,31 +78,31 @@ Use the `MMM` or `MMMM` tokens for text month sections in both ends; typing lett
 Without an explicit format, both masks follow the locale set via `data-coreui-locale`.
 
 <Example pro code={`<div class="mb-3">
-    <label class="form-label">en-US</label>
-    <div data-coreui-date-range-input data-coreui-locale="en-US"></div>
+    <label class="form-label" id="dateRangeInputEnUSLabel">en-US</label>
+    <div data-coreui-date-range-input data-coreui-locale="en-US" aria-labelledby="dateRangeInputEnUSLabel"></div>
   </div>
   <div class="mb-3">
-    <label class="form-label">pl-PL</label>
-    <div data-coreui-date-range-input data-coreui-locale="pl-PL" data-coreui-day-placeholder="DD" data-coreui-month-placeholder="MM" data-coreui-year-placeholder="RRRR"></div>
+    <label class="form-label" id="dateRangeInputPlPLLabel">pl-PL</label>
+    <div data-coreui-date-range-input data-coreui-locale="pl-PL" data-coreui-day-placeholder="DD" data-coreui-month-placeholder="MM" data-coreui-year-placeholder="RRRR" aria-labelledby="dateRangeInputPlPLLabel"></div>
   </div>
   <div>
-    <label class="form-label">ja-JP</label>
-    <div data-coreui-date-range-input data-coreui-locale="ja-JP"></div>
+    <label class="form-label" id="dateRangeInputJaJPLabel">ja-JP</label>
+    <div data-coreui-date-range-input data-coreui-locale="ja-JP" aria-labelledby="dateRangeInputJaJPLabel"></div>
   </div>`} />
 
 ## Initial value
 
 Seed either end with `data-coreui-start-date` and `data-coreui-end-date`; a string is parsed like a typed value.
 
-<Example pro code={`<label class="form-label">Stay</label>
-  <div data-coreui-date-range-input data-coreui-locale="en-US" data-coreui-start-date="2026-07-14" data-coreui-end-date="2026-07-20"></div>`} />
+<Example pro code={`<label class="form-label" id="dateRangeInputStayLabel3">Stay</label>
+  <div data-coreui-date-range-input data-coreui-locale="en-US" data-coreui-start-date="2026-07-14" data-coreui-end-date="2026-07-20" aria-labelledby="dateRangeInputStayLabel3"></div>`} />
 
 ## Min and max dates
 
 `minDate` and `maxDate` constrain both ends. A completed date outside the range gets the `.is-invalid` class on its own field and that end reports `null` until the value is corrected.
 
-<Example pro code={`<label class="form-label">Dates in July 2026</label>
-  <div data-coreui-date-range-input data-coreui-locale="en-US" data-coreui-format="dd.MM.yyyy" data-coreui-min-date="2026-07-01" data-coreui-max-date="2026-07-31"></div>`} />
+<Example pro code={`<label class="form-label" id="dateRangeInputDatesInJuly2026Label">Dates in July 2026</label>
+  <div data-coreui-date-range-input data-coreui-locale="en-US" data-coreui-format="dd.MM.yyyy" data-coreui-min-date="2026-07-01" data-coreui-max-date="2026-07-31" aria-labelledby="dateRangeInputDatesInJuly2026Label"></div>`} />
 
 ## Disabled dates
 
@@ -110,8 +110,8 @@ Beyond a simple range, `disabledDates` excludes specific dates from both ends �
 
 In this example July 4–7 and July 16 can't be entered — try typing one of them:
 
-<Example pro code={`<label class="form-label">Stay</label>
-  <div id="myDateRangeInputDisabledDates"></div>`} sandboxJs={dateRangeInputDisabledDates} />
+<Example pro code={`<label class="form-label" id="dateRangeInputStayLabel4">Stay</label>
+  <div id="myDateRangeInputDisabledDates" aria-labelledby="dateRangeInputStayLabel4"></div>`} sandboxJs={dateRangeInputDisabledDates} />
 
 <Code code={dateRangeInputDisabledDates} lang="js" />
 
@@ -119,8 +119,8 @@ In this example July 4–7 and July 16 can't be entered — try typing one of th
 
 Pass a function to disable dates by rule — here Saturdays and Sundays, on both ends:
 
-<Example pro code={`<label class="form-label">Business days</label>
-  <div id="myDateRangeInputDisabledDates2"></div>`} sandboxJs={dateRangeInputDisabledDates2} />
+<Example pro code={`<label class="form-label" id="dateRangeInputBusinessDaysLabel">Business days</label>
+  <div id="myDateRangeInputDisabledDates2" aria-labelledby="dateRangeInputBusinessDaysLabel"></div>`} sandboxJs={dateRangeInputDisabledDates2} />
 
 <Code code={dateRangeInputDisabledDates2} lang="js" />
 
@@ -128,8 +128,8 @@ Pass a function to disable dates by rule — here Saturdays and Sundays, on both
 
 The token parser covers dayjs, moment, date-fns, and luxon format strings, so you can reuse the format string from the date library you already work with — the library itself isn't required to render or edit the masks. Pair it with `inputDateParse` when you want that library to also parse text pasted into either end.
 
-<Example pro code={`<label class="form-label">Stay</label>
-  <div id="myDateRangeInputCustomFormats"></div>`} sandboxJs={dateRangeInputCustomFormats} />
+<Example pro code={`<label class="form-label" id="dateRangeInputStayLabel5">Stay</label>
+  <div id="myDateRangeInputCustomFormats" aria-labelledby="dateRangeInputStayLabel5"></div>`} sandboxJs={dateRangeInputCustomFormats} />
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
@@ -178,16 +178,16 @@ Each end can carry its own [floating label](/forms/floating-labels/); the text i
 The frame is a `.form-control-group`, so the standard sizing classes work — set `data-coreui-size="lg"` or `data-coreui-size="sm"` and both ends follow.
 
 <Example pro code={`<div class="mb-3">
-    <label class="form-label">Large</label>
-    <div data-coreui-date-range-input data-coreui-locale="en-US" data-coreui-size="lg"></div>
+    <label class="form-label" id="dateRangeInputLargeLabel">Large</label>
+    <div data-coreui-date-range-input data-coreui-locale="en-US" data-coreui-size="lg" aria-labelledby="dateRangeInputLargeLabel"></div>
   </div>
   <div class="mb-3">
-    <label class="form-label">Default</label>
-    <div data-coreui-date-range-input data-coreui-locale="en-US"></div>
+    <label class="form-label" id="dateRangeInputDefaultLabel">Default</label>
+    <div data-coreui-date-range-input data-coreui-locale="en-US" aria-labelledby="dateRangeInputDefaultLabel"></div>
   </div>
   <div>
-    <label class="form-label">Small</label>
-    <div data-coreui-date-range-input data-coreui-locale="en-US" data-coreui-size="sm"></div>
+    <label class="form-label" id="dateRangeInputSmallLabel">Small</label>
+    <div data-coreui-date-range-input data-coreui-locale="en-US" data-coreui-size="sm" aria-labelledby="dateRangeInputSmallLabel"></div>
   </div>`} />
 
 ## Disabled and readonly
@@ -195,12 +195,12 @@ The frame is a `.form-control-group`, so the standard sizing classes work — se
 Add `data-coreui-disabled="true"` to disable both ends, or `data-coreui-readonly="true"` to make them focusable but non-editable.
 
 <Example pro code={`<div class="mb-3">
-    <label class="form-label">Disabled</label>
-    <div data-coreui-date-range-input data-coreui-locale="en-US" data-coreui-start-date="2026-07-14" data-coreui-end-date="2026-07-20" data-coreui-disabled="true"></div>
+    <label class="form-label" id="dateRangeInputDisabledLabel">Disabled</label>
+    <div data-coreui-date-range-input data-coreui-locale="en-US" data-coreui-start-date="2026-07-14" data-coreui-end-date="2026-07-20" data-coreui-disabled="true" aria-labelledby="dateRangeInputDisabledLabel"></div>
   </div>
   <div>
-    <label class="form-label">Readonly</label>
-    <div data-coreui-date-range-input data-coreui-locale="en-US" data-coreui-start-date="2026-07-14" data-coreui-end-date="2026-07-20" data-coreui-readonly="true"></div>
+    <label class="form-label" id="dateRangeInputReadonlyLabel">Readonly</label>
+    <div data-coreui-date-range-input data-coreui-locale="en-US" data-coreui-start-date="2026-07-14" data-coreui-end-date="2026-07-20" data-coreui-readonly="true" aria-labelledby="dateRangeInputReadonlyLabel"></div>
   </div>`} />
 
 ## Composing the markup
@@ -223,8 +223,8 @@ The component adopts the parts you write inside its element and generates the re
 
 Each end is a [date input](/forms/date-input/#accessibility) with the spinbutton pattern per section, so the range is two labelled groups rather than one opaque control:
 
-- **Role attributes**: each end has `role="group"`, every section is a `role="spinbutton"` with its value attributes.
-- **Names**: the start and end are named separately — `ariaStartLabel` and `ariaEndLabel` by default, or the floating label text when one is set. An end you wrote with an `aria-label` of its own keeps it.
+- **Role attributes**: the element itself is a `role="group"` unless it carries a role of its own, each end has `role="group"`, every section is a `role="spinbutton"` with its value attributes.
+- **Names**: the start and end are named separately — `ariaStartLabel` and `ariaEndLabel` by default, or the floating label text when one is set. An end you wrote with an `aria-label` of its own keeps it. An `aria-labelledby` on the element, pointing at the visible label as the examples on this page do, names the pair.
 - **Separator**: hidden from assistive technology, as is any `<svg>` inside it.
 - **Roving tabindex**: each end is a single tab stop; <kbd>Tab</kbd> moves from the start to the end.
 

@@ -519,6 +519,25 @@ describe('DateRangePicker', () => {
 
       expect(fixtureEl.querySelector('.form-control-action').getAttribute('aria-label')).toEqual('Toggle calendar')
     })
+
+    it('should make the picker a group the page can name, and take the role back on dispose', () => {
+      const picker = buildPicker({}, '<span id="period-label">Reporting period</span><div id="picker" aria-labelledby="period-label"></div>')
+      const element = fixtureEl.querySelector('#picker')
+
+      expect(element.getAttribute('role')).toEqual('group')
+      expect(element.querySelector('.form-date-range').getAttribute('role')).toEqual('none')
+      expect(element.querySelector('.form-date-range').hasAttribute('aria-labelledby')).toBeFalse()
+
+      picker.dispose()
+
+      expect(element.hasAttribute('role')).toBeFalse()
+    })
+
+    it('should keep a role the page wrote on the picker', () => {
+      buildPicker({}, '<div id="picker" role="region" aria-label="Reporting period"></div>')
+
+      expect(fixtureEl.querySelector('#picker').getAttribute('role')).toEqual('region')
+    })
   })
 
   describe('cleaner', () => {

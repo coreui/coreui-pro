@@ -581,6 +581,20 @@ describe('TimePicker', () => {
 
       expect(fixtureEl.querySelector('.form-control-action').getAttribute('aria-label')).toEqual('Toggle time selection')
     })
+
+    it('should pass the aria-labelledby of the picker to its field', () => {
+      buildPicker({}, '<span id="opening-label">Opening time</span><div id="picker" aria-labelledby="opening-label"></div>')
+
+      expect(fixtureEl.querySelector('.form-date-time').getAttribute('aria-labelledby')).toEqual('opening-label')
+    })
+
+    it('should leave the name of a floating label to the field', () => {
+      buildPicker({ floatingLabel: 'Pick a time' }, '<div id="picker" aria-labelledby="opening-label"></div>')
+      const field = fixtureEl.querySelector('.form-date-time')
+
+      expect(field.hasAttribute('aria-labelledby')).toBeFalse()
+      expect(field.getAttribute('aria-label')).toEqual('Pick a time')
+    })
   })
 
   describe('cleaner', () => {

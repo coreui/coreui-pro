@@ -115,8 +115,8 @@ The field masks narrow to quarter and year sections (`Q1 2026`).
 Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label and description, and to get validation feedback in the right place.
 
 <Example pro code={`<div class="form-field">
-    <span class="form-label">Reporting period</span>
-    <div data-coreui-locale="en-US" data-coreui-date-range-picker></div>
+    <span class="form-label" id="dateRangePickerReportingPeriodLabel">Reporting period</span>
+    <div data-coreui-locale="en-US" data-coreui-date-range-picker aria-labelledby="dateRangePickerReportingPeriodLabel"></div>
     <div class="form-text">Both dates are included in the report.</div>
   </div>`} />
 
@@ -283,6 +283,8 @@ format. Set it with `data-coreui-format`, forwarded to both fields.
 ## Accessibility
 
 The fields and the popup answer to the [same keys as the date picker](/forms/date-picker/#keyboard-support): <kbd>Alt</kbd> (<kbd>Option</kbd> on macOS) + <kbd>Arrow Down</kbd> or <kbd>F4</kbd> opens the calendars, <kbd>Escape</kbd> closes them and returns focus, and arrows, <kbd>Home</kbd> / <kbd>End</kbd>, and <kbd>Page Down</kbd> / <kbd>Page Up</kbd> (with <kbd>Shift</kbd> for years) move the focused date.
+
+The picker element is a `role="group"` unless it carries a role of its own, so an `aria-labelledby` on it, pointing at the visible label as the example on this page does, names the pair of fields.
 
 ## Usage
 

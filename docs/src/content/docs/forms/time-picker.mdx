@@ -60,8 +60,8 @@ child. Buttons act through `data-coreui-picker-action` (`now`, `clear`, `reset`,
 Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label and description, and to get validation feedback in the right place.
 
 <Example pro code={`<div class="form-field">
-    <span class="form-label">Meeting time</span>
-    <div data-coreui-locale="en-US" data-coreui-time-picker></div>
+    <span class="form-label" id="timePickerMeetingTimeLabel">Meeting time</span>
+    <div data-coreui-locale="en-US" data-coreui-time-picker aria-labelledby="timePickerMeetingTimeLabel"></div>
     <div class="form-text">Local time, in your own time zone.</div>
   </div>`} />
 
@@ -103,12 +103,12 @@ The time picker supports [floating labels](/forms/floating-labels/): set `floati
 
 <Example pro code={`<div class="row">
     <div class="col-sm-6 col-lg-4 mb-3 mb-sm-0">
-      <label class="form-label">Without seconds</label>
-      <div data-coreui-locale="en-US" data-coreui-seconds="false" data-coreui-time-picker></div>
+      <label class="form-label" id="timePickerWithoutSecondsLabel">Without seconds</label>
+      <div data-coreui-locale="en-US" data-coreui-seconds="false" data-coreui-time-picker aria-labelledby="timePickerWithoutSecondsLabel"></div>
     </div>
     <div class="col-sm-6 col-lg-4">
-      <label class="form-label">Hours only</label>
-      <div data-coreui-locale="en-US" data-coreui-minutes="false" data-coreui-seconds="false" data-coreui-time-picker></div>
+      <label class="form-label" id="timePickerHoursOnlyLabel">Hours only</label>
+      <div data-coreui-locale="en-US" data-coreui-minutes="false" data-coreui-seconds="false" data-coreui-time-picker aria-labelledby="timePickerHoursOnlyLabel"></div>
     </div>
   </div>`} />
 
@@ -180,6 +180,8 @@ const picker = new coreui.TimePicker(element, {
 ## Accessibility
 
 The toggle button carries the panel's state — `aria-haspopup="dialog"`, `aria-controls` pointing at the popup while it is open, and `aria-expanded` tracking whether it is open — so a screen reader announces what the button does and whether the panel is showing. The panel itself is a `dialog` with `aria-modal`, so focus moves into it on open, stays there while it is open, and returns to the field when it closes. The field itself is a [time input](/forms/time-input/#accessibility), a group of spinbutton sections, so its arrow keys belong to the value and the popup opens on the native dropdown keys.
+
+An `aria-labelledby` on the picker element, pointing at the visible label as the examples on this page do, is passed on to the field, so a screen reader announces the label when focus enters it, unless `floatingLabel` or an `ariaLabel` in `inputOptions` already names the field, or the picker element carries a role of its own.
 
 ### Keyboard support
 
