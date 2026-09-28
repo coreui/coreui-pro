@@ -640,6 +640,7 @@ abstract class SectionInput extends BaseComponent {
       EventHandler.trigger(this._element, this.constructor.eventName('errorChange'), {
         error
       })
+      this._syncDescription()
     }
 
     return isDisabled ? null : date
@@ -663,6 +664,21 @@ abstract class SectionInput extends BaseComponent {
         element.removeAttribute('aria-invalid')
       } else {
         element.setAttribute('aria-invalid', ariaInvalid)
+      }
+    }
+
+    this._syncDescription()
+  }
+
+  _syncDescription(): void {
+    const describedBy = this._element.getAttribute('aria-describedby')
+    const isAnnouncedInvalid = this._element.getAttribute('aria-invalid') === 'true'
+
+    for (const [index, element] of this._getSectionElements().entries()) {
+      if (describedBy && (index === 0 || isAnnouncedInvalid)) {
+        element.setAttribute('aria-describedby', describedBy)
+      } else {
+        element.removeAttribute('aria-describedby')
       }
     }
   }

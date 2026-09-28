@@ -1173,6 +1173,53 @@ describe('DateInput', () => {
       expect(invalid()).toEqual([null, null, null, null])
     })
 
+    it('should describe the first section with the field description, and every section while the field is invalid', () => {
+      fixtureEl.innerHTML = '<div aria-describedby="help"></div><div id="help">Pick a date before 15.07.2026</div>'
+      const dateInput = new DateInput(fixtureEl.querySelector('div'), { date: new Date(2026, 6, 10), format: 'dd.MM.yyyy', maxDate: new Date(2026, 6, 14) })
+      const describedBy = () => [...getSections(dateInput._element)].map(section => section.getAttribute('aria-describedby'))
+
+      expect(describedBy()).toEqual(['help', null, null])
+
+      dateInput.setConfig({ date: new Date(2026, 6, 20) })
+
+      expect(describedBy()).toEqual(['help', 'help', 'help'])
+
+      dateInput.setConfig({ date: new Date(2026, 6, 10) })
+
+      expect(describedBy()).toEqual(['help', null, null])
+    })
+
+    it('should describe the sections with an error the page attaches on errorChange', () => {
+      fixtureEl.innerHTML = '<div aria-describedby="help"></div><div id="help">Pick a date</div><div id="error">Too late</div>'
+      const element = fixtureEl.querySelector('div')
+      const dateInput = new DateInput(element, { date: new Date(2026, 6, 10), format: 'dd.MM.yyyy', maxDate: new Date(2026, 6, 14) })
+      const describedBy = () => [...getSections(element)].map(section => section.getAttribute('aria-describedby'))
+
+      element.addEventListener('errorChange.coreui.date-input', event => {
+        element.setAttribute('aria-describedby', event.error ? 'help error' : 'help')
+      })
+      dateInput.setConfig({ date: new Date(2026, 6, 20) })
+
+      expect(describedBy()).toEqual(['help error', 'help error', 'help error'])
+
+      dateInput.setConfig({ date: new Date(2026, 6, 10) })
+
+      expect(describedBy()).toEqual(['help', null, null])
+    })
+
+    it('should describe every section of a field the page marks invalid', () => {
+      fixtureEl.innerHTML = '<div aria-describedby="help" aria-invalid="true"></div><div id="help">Pick a date</div>'
+      const dateInput = new DateInput(fixtureEl.querySelector('div'), { format: 'dd.MM.yyyy' })
+
+      expect([...getSections(dateInput._element)].map(section => section.getAttribute('aria-describedby'))).toEqual(['help', 'help', 'help'])
+    })
+
+    it('should not describe the sections of a field without a description', () => {
+      const dateInput = createDateInput({ invalid: true })
+
+      expect([...getSections(dateInput._element)].map(section => section.hasAttribute('aria-describedby'))).toEqual([false, false, false])
+    })
+
     it('should mark each section as required, not the group', () => {
       const dateInput = createDateInput({ required: true })
 
