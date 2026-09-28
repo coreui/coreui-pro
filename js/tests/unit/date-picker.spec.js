@@ -385,6 +385,12 @@ describe('DatePicker', () => {
       expect(toggle.getAttribute('aria-expanded')).toEqual('false')
     })
 
+    it('should keep the aria-label of a field the author wrote over floatingLabel', () => {
+      buildPicker({ floatingLabel: 'When' }, '<div id="picker"><div data-coreui-picker-field aria-label="Arrival date"></div></div>')
+
+      expect(fixtureEl.querySelector('[data-coreui-picker-field]').getAttribute('aria-label')).toEqual('Arrival date')
+    })
+
     it('should put back an aria-controls the author wrote', () => {
       const picker = buildPicker({}, '<div id="picker"><div data-coreui-picker-field></div><button type="button" aria-controls="help" data-coreui-picker-toggle></button></div>')
       const toggle = fixtureEl.querySelector('[data-coreui-picker-toggle]')

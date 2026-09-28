@@ -84,6 +84,13 @@ describe('TimeInput', () => {
       expect(hour.getAttribute('aria-valuemax')).toEqual('23')
     })
 
+    it('should keep the aria-label the page wrote on the element', () => {
+      fixtureEl.innerHTML = '<div aria-label="Opening time"></div>'
+      const timeInput = new TimeInput(fixtureEl.querySelector('div'))
+
+      expect(timeInput._element.getAttribute('aria-label')).toEqual('Opening time')
+    })
+
     it('should derive a meridiem section from a 12-hour locale', () => {
       fixtureEl.innerHTML = '<div></div>'
       const timeInput = new TimeInput(fixtureEl.querySelector('div'), { locale: 'en-US' })

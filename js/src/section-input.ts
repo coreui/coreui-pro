@@ -314,7 +314,11 @@ abstract class SectionInput extends BaseComponent {
     EventHandler.off(this._form, this.constructor.eventName('submit'), this._submitHandler)
     restoreHostClasses(this._element, HOST_CLASS_NAMES, this._hostClasses)
     this._restoreAttribute('aria-invalid', this._hostAriaInvalid)
-    this._restoreAttribute('aria-label', this._hostAriaLabel)
+
+    if (!this._hostAriaLabel) {
+      this._restoreAttribute('aria-label', this._hostAriaLabel)
+    }
+
     this._restoreAttribute('role', this._hostRole)
     this._element.replaceChildren(...this._hostNodes)
     super.dispose()
@@ -718,7 +722,11 @@ abstract class SectionInput extends BaseComponent {
     this._element.classList.add(CLASS_NAME_FORM_CONTROL, CLASS_NAME_SECTION_INPUT)
     this._element.classList.toggle(CLASS_NAME_DISABLED, disabled)
     this._element.setAttribute('role', 'group')
-    this._element.setAttribute('aria-label', this._getAriaLabel())
+
+    if (!this._hostAriaLabel) {
+      this._element.setAttribute('aria-label', this._getAriaLabel())
+    }
+
     this._element.innerHTML = ''
 
     for (const section of this._sections) {

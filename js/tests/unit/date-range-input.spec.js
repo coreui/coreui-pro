@@ -524,6 +524,13 @@ describe('DateRangeInput', () => {
       expect(range.getStartDate()).toEqual(new Date(2026, 6, 14))
     })
 
+    it('should keep the aria-label of an end the author wrote', () => {
+      build({ ariaStartLabel: 'Arrival' }, '<div id="range"><div data-coreui-range-start aria-label="Check-in"></div><div data-coreui-range-end></div></div>')
+
+      expect(root().querySelector('[data-coreui-range-start]').getAttribute('aria-label')).toEqual('Check-in')
+      expect(root().querySelector('[data-coreui-range-end]').getAttribute('aria-label')).toEqual('End date')
+    })
+
     it('should mark the parts it builds with the same roles', () => {
       build({})
 
