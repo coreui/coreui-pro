@@ -209,6 +209,7 @@ abstract class SectionInput extends BaseComponent {
   protected declare _draft: string
   protected declare _allSelected: boolean
   protected declare _error: string | null
+  protected declare _hostAriaInvalid: string | null
   protected declare _hostAriaLabel: string | null
   protected declare _hostClasses: HostClasses
   protected declare _hostNodes: ChildNode[]
@@ -219,6 +220,7 @@ abstract class SectionInput extends BaseComponent {
   protected declare _resetHandler: () => void
   protected declare _submitHandler: () => void
   protected declare _submitValid: boolean
+  protected declare _submitted: boolean
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
@@ -239,6 +241,8 @@ abstract class SectionInput extends BaseComponent {
 
     this._submitHandler = () => this._onFormSubmit()
     this._submitValid = false
+    this._submitted = false
+    this._hostAriaInvalid = this._element.getAttribute('aria-invalid')
     this._hostAriaLabel = this._element.getAttribute('aria-label')
     this._hostClasses = captureHostClasses(this._element, HOST_CLASS_NAMES)
     this._hostNodes = [...this._element.childNodes]
@@ -307,6 +311,7 @@ abstract class SectionInput extends BaseComponent {
     EventHandler.off(this._form, this.constructor.eventName('reset'), this._resetHandler)
     EventHandler.off(this._form, this.constructor.eventName('submit'), this._submitHandler)
     restoreHostClasses(this._element, HOST_CLASS_NAMES, this._hostClasses)
+    this._restoreAttribute('aria-invalid', this._hostAriaInvalid)
     this._restoreAttribute('aria-label', this._hostAriaLabel)
     this._restoreAttribute('role', this._hostRole)
     this._element.replaceChildren(...this._hostNodes)
@@ -424,11 +429,11 @@ abstract class SectionInput extends BaseComponent {
         return
       }
 
-      const isInvalid = this._element.classList.contains(CLASS_NAME_IS_INVALID) ||
-        (this._config.required && this._date === null)
+      this._submitted = true
+      const isInvalid = this._element.classList.contains(CLASS_NAME_IS_INVALID) || this._isMissing(this._date)
 
       this._submitValid = !isInvalid && form.matches(SELECTOR_FORM_VALIDATE_VALID)
-      this._element.classList.toggle(CLASS_NAME_IS_INVALID, isInvalid)
+      this._setInvalid(isInvalid)
       this._element.classList.toggle(CLASS_NAME_IS_VALID, this._submitValid)
     })
   }
@@ -620,7 +625,7 @@ abstract class SectionInput extends BaseComponent {
     const isDisabled = error !== null && error !== 'incomplete'
 
     this._element.classList.toggle(CLASS_NAME_FILLED, isFilled)
-    this._element.classList.toggle(CLASS_NAME_IS_INVALID, isDisabled || this._config.invalid)
+    this._setInvalid(isDisabled || this._config.invalid || (this._submitted && this._isMissing(date)))
     this._element.classList.toggle(
       CLASS_NAME_IS_VALID,
       this._config.valid || (this._submitValid && isFilled && !isDisabled)
@@ -636,6 +641,23 @@ abstract class SectionInput extends BaseComponent {
     }
 
     return isDisabled ? null : date
+  }
+
+  _isMissing(date: Date | null): boolean {
+    return this._config.required && !this._config.disabled && !this._config.readonly && date === null
+  }
+
+  _setInvalid(isInvalid: boolean): void {
+    const ariaInvalid = isInvalid ? 'true' : this._hostAriaInvalid
+    this._element.classList.toggle(CLASS_NAME_IS_INVALID, isInvalid)
+
+    for (const element of [this._element, ...this._getSectionElements()]) {
+      if (ariaInvalid === null) {
+        element.removeAttribute('aria-invalid')
+      } else {
+        element.setAttribute('aria-invalid', ariaInvalid)
+      }
+    }
   }
 
   _getValidationError(date: Date | null, isFilled: boolean): string | null {
@@ -707,6 +729,10 @@ abstract class SectionInput extends BaseComponent {
 
       if (readonly) {
         attributes['aria-readonly'] = 'true'
+      }
+
+      if (required) {
+        attributes['aria-required'] = 'true'
       }
 
       element.className = CLASS_NAME_SECTION
