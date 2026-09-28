@@ -190,14 +190,46 @@ describe('DateRangeInput', () => {
     it('should flag an end before the start on the frame and lift it once fixed', () => {
       const range = build()
 
+      const invalid = () => fields().flatMap(field => [field, ...field.querySelectorAll('.form-date-time-section')]).map(element => element.getAttribute('aria-invalid'))
+
       range.setRange(new Date(2026, 6, 20), new Date(2026, 6, 14))
       expect(range.isRangeValid()).toBeFalse()
       expect(root().classList.contains('is-invalid')).toBeTrue()
       expect(fields().some(field => field.classList.contains('is-invalid'))).toBeFalse()
+      expect(invalid()).toEqual(Array.from({ length: 8 }, () => 'true'))
 
       range.setRange(new Date(2026, 6, 20), new Date(2026, 6, 21))
       expect(range.isRangeValid()).toBeTrue()
       expect(root().classList.contains('is-invalid')).toBeFalse()
+      expect(invalid()).toEqual(Array.from({ length: 8 }, () => null))
+    })
+
+    it('should keep the fields announced as invalid while a typed end stays before the start', () => {
+      const range = build({ startDate: new Date(2026, 6, 20), endDate: new Date(2026, 6, 21) })
+      const [, end] = fields()
+      const [day] = end.querySelectorAll('.form-date-time-section')
+
+      day.focus()
+      day.dispatchEvent(new KeyboardEvent('keydown', { key: '1', bubbles: true, cancelable: true }))
+      day.dispatchEvent(new KeyboardEvent('keydown', { key: '4', bubbles: true, cancelable: true }))
+
+      expect(range.isRangeValid()).toBeFalse()
+      expect(document.activeElement.closest('[data-coreui-range-end]')).toBe(end)
+      expect(end.getAttribute('aria-invalid')).toEqual('true')
+
+      const focusouts = []
+      end.addEventListener('focusout', event => focusouts.push(event))
+      document.activeElement.blur()
+
+      expect(focusouts).toHaveSize(1)
+      expect([end, ...end.querySelectorAll('.form-date-time-section')].map(element => element.getAttribute('aria-invalid'))).toEqual(['true', 'true', 'true', 'true'])
+    })
+
+    it('should announce a claim of invalid written on the frame on both fields', () => {
+      build({ endDate: new Date(2026, 6, 20), startDate: new Date(2026, 6, 14) }, '<div id="range" class="is-invalid"></div>')
+
+      expect(root().classList.contains('is-invalid')).toBeTrue()
+      expect(fields().flatMap(field => [field, ...field.querySelectorAll('.form-date-time-section')]).map(element => element.getAttribute('aria-invalid'))).toEqual(Array.from({ length: 8 }, () => 'true'))
     })
 
     it('should clear and reset', () => {

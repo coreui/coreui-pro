@@ -485,6 +485,9 @@ class DateRangeInput extends BaseComponent {
 
     this._toggleStateClassName(CLASS_NAME_IS_INVALID, isInvalid)
     this._toggleStateClassName(CLASS_NAME_IS_VALID, isValid)
+    const isOwnerInvalid = (claimed && this._claimedInvalid) || !this.isRangeValid()
+    this._startInput._setOwnerInvalid(isOwnerInvalid)
+    this._endInput._setOwnerInvalid(isOwnerInvalid)
   }
 
   _addEventListeners(): void {
