@@ -334,13 +334,15 @@ dateRangeInput.clear()
 | Event | Description |
 | --- | --- |
 | `endDateChange.coreui.date-range-input` | Fired when the end changes; `event.date` is a `Date`, or `null` when that end is incomplete or invalid |
-| `rangeChange.coreui.date-range-input` | Fired once after either end changed; `event.startDate` and `event.endDate` carry the current range |
 | `startDateChange.coreui.date-range-input` | Fired when the start changes, with the same payload shape as the end |
 
+Both ends are already current when either event fires, so a listener reads the whole range from the instance:
+
 ```javascript
-document.addEventListener('rangeChange.coreui.date-range-input', event => {
+document.addEventListener('endDateChange.coreui.date-range-input', event => {
+  const dateRangeInput = coreui.DateRangeInput.getInstance(event.target)
   // eslint-disable-next-line no-console
-  console.log('Range changed:', event.startDate, event.endDate)
+  console.log('Range changed:', dateRangeInput.getStartDate(), dateRangeInput.getEndDate())
 })
 ```
 
