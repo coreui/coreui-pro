@@ -124,7 +124,7 @@ describe('DateRangeInput', () => {
       expect(seen.slice(2).map(([name]) => name)).toEqual(['endDateChange'])
     })
 
-    it('should hold both new dates by the time either change event fires', () => {
+    it('should hold both new dates by the time either change event of setRange fires', () => {
       const range = build()
       const seen = []
       for (const name of ['startDateChange', 'endDateChange']) {
