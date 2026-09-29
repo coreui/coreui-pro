@@ -102,6 +102,26 @@ describe('TimePicker', () => {
       expect([...new FormData(fixtureEl.querySelector('#form')).entries()])
         .toEqual([['at', '10:30:00 AM']])
     })
+
+    it('should return to its initial time and drop the submit verdict on a native form reset', async () => {
+      const picker = buildPicker({ name: 'at', time: '10:30:00' }, '<form id="form" data-coreui-validate="valid"><div id="picker"></div></form>')
+      const form = fixtureEl.querySelector('#form')
+      const field = fixtureEl.querySelector('.form-date-time')
+
+      form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
+      await Promise.resolve()
+      picker.setTime('11:45:00')
+
+      expect(field.classList.contains('is-valid')).toBeTrue()
+
+      form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect([...new FormData(form).entries()]).toEqual([['at', '10:30:00 AM']])
+      expect(field.classList.contains('is-valid')).toBeFalse()
+    })
   })
 
   describe('field-to-panel sync', () => {
