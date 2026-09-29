@@ -235,6 +235,8 @@ abstract class SectionInput extends BaseComponent {
     this._resetHandler = () => {
       setTimeout(() => {
         if (this._element) {
+          this._submitted = false
+          this._submitValid = false
           this.reset()
         }
       })

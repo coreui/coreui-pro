@@ -1608,6 +1608,44 @@ describe('DateInput', () => {
       })
     })
 
+    it('should drop the invalid verdict of a submit on a native form reset', async () => {
+      fixtureEl.innerHTML = '<form data-coreui-validate><div id="mydateinput"></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const dateInput = new DateInput(fixtureEl.querySelector('div'), { format: 'dd.MM.yyyy', required: true })
+      const invalid = () => [dateInput._element, ...getSections(dateInput._element)].map(item => item.getAttribute('aria-invalid'))
+
+      form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
+      await Promise.resolve()
+
+      expect(dateInput._element.classList.contains('is-invalid')).toBeTrue()
+
+      form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(dateInput._element.classList.contains('is-invalid')).toBeFalse()
+      expect(invalid()).toEqual([null, null, null, null])
+    })
+
+    it('should drop the valid verdict of a submit on a native form reset', async () => {
+      fixtureEl.innerHTML = '<form data-coreui-validate="valid"><div id="mydateinput"></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const dateInput = new DateInput(fixtureEl.querySelector('div'), { format: 'dd.MM.yyyy', date: new Date(2026, 6, 14) })
+
+      form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
+      await Promise.resolve()
+
+      expect(dateInput._element.classList.contains('is-valid')).toBeTrue()
+
+      form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(dateInput._element.classList.contains('is-valid')).toBeFalse()
+    })
+
     it('should drop the form listener on dispose', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = '<form><div id="mydateinput"></div></form>'
