@@ -1681,6 +1681,51 @@ describe('DateInput', () => {
 
       expect(dateInput._element.classList.contains('is-invalid')).toBeTrue()
     })
+    it('should judge the restored date for a submit that follows the reset in the same task', async () => {
+      fixtureEl.innerHTML = '<form data-coreui-validate="valid"><div id="mydateinput"></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const dateInput = new DateInput(fixtureEl.querySelector('div'), { format: 'dd.MM.yyyy', date: new Date(2026, 6, 14), maxDate: new Date(2026, 6, 31) })
+
+      dateInput.setConfig({ date: new Date(2026, 7, 20) })
+
+      expect(dateInput._element.classList.contains('is-invalid')).toBeTrue()
+
+      form.reset()
+      form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+      await Promise.resolve()
+
+      expect(dateInput._element.classList.contains('is-valid')).toBeTrue()
+    })
+
+    it('should drop the verdict when the page resets the form in its own submit listener', async () => {
+      fixtureEl.innerHTML = '<form data-coreui-validate><div id="mydateinput"></div></form>'
+      const form = fixtureEl.querySelector('form')
+
+      form.addEventListener('submit', event => {
+        event.preventDefault()
+        form.reset()
+      })
+
+      const dateInput = new DateInput(fixtureEl.querySelector('div'), { format: 'dd.MM.yyyy', required: true })
+      const [day] = getSections(dateInput._element)
+
+      day.focus()
+
+      for (const digit of '14072026') {
+        pressKey(document.activeElement, digit)
+      }
+
+      form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+      await Promise.resolve()
+
+      expect(dateInput._element.classList.contains('is-invalid')).toBeFalse()
+    })
 
     it('should restore a date its limits reject, the way the field was created', async () => {
       fixtureEl.innerHTML = '<form><div id="mydateinput"></div></form>'

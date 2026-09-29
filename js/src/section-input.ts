@@ -219,6 +219,7 @@ abstract class SectionInput extends BaseComponent {
   protected declare _form: HTMLFormElement | null
   protected declare _initialDate: Date | null
   protected declare _resetHandler: (event: Event) => void
+  protected declare _submitCaptureHandler: () => void
   protected declare _submitHandler: () => void
   protected declare _submitValid: boolean
   protected declare _submitted: boolean
@@ -240,19 +241,26 @@ abstract class SectionInput extends BaseComponent {
           return
         }
 
-        if (!this._submittedSinceReset) {
+        const submitted = this._submittedSinceReset
+
+        if (!submitted) {
           this._submitted = false
           this._submitValid = false
         }
 
         this.reset()
+
+        if (submitted) {
+          this._onFormSubmit()
+        }
       })
     }
 
-    this._submitHandler = () => {
+    this._submitCaptureHandler = () => {
       this._submittedSinceReset = true
-      this._onFormSubmit()
     }
+
+    this._submitHandler = () => this._onFormSubmit()
 
     this._submitValid = false
     this._submitted = false
@@ -327,6 +335,7 @@ abstract class SectionInput extends BaseComponent {
 
     EventHandler.off(this._form, this.constructor.eventName('reset'), this._resetHandler)
     EventHandler.off(this._form, this.constructor.eventName('submit'), this._submitHandler)
+    this._form?.removeEventListener('submit', this._submitCaptureHandler, true)
     restoreHostClasses(this._element, HOST_CLASS_NAMES, this._hostClasses)
     this._restoreAttribute('aria-invalid', this._hostAriaInvalid)
 
@@ -428,6 +437,7 @@ abstract class SectionInput extends BaseComponent {
     if (this._form) {
       EventHandler.on(this._form, eventName('reset'), this._resetHandler)
       EventHandler.on(this._form, eventName('submit'), this._submitHandler)
+      this._form.addEventListener('submit', this._submitCaptureHandler, true)
     }
 
     EventHandler.on(this._element, eventName('click'), (event: any) => {

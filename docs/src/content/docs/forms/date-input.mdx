@@ -202,7 +202,7 @@ The field participates in the standard form validation styling. Three mechanisms
 
 - **Range validation (automatic)** — a completed date outside `minDate`/`maxDate`/`disabledDates` gets `.is-invalid` until corrected.
 - **The `valid`/`invalid` options** — force the state, e.g. after server-side validation.
-- **Form submit** — the date input renders a hidden input, which is excluded from native constraint validation, so the component applies the state itself when a form with the `data-coreui-validate` attribute is submitted: a `required` empty field becomes `.is-invalid`, and a filled one becomes `.is-valid` when the form opts into success styling with `data-coreui-validate="valid"`. A native form reset returns the field to the date it was created with and drops that state, unless a `reset` listener calls `preventDefault()`.
+- **Form submit** — the date input renders a hidden input, which is excluded from native constraint validation, so the component applies the state itself when a form with the `data-coreui-validate` attribute is submitted: a `required` empty field becomes `.is-invalid`, and a filled one becomes `.is-valid` when the form opts into success styling with `data-coreui-validate="valid"`. A native form reset returns the field to the date it was created with and drops that state; a submit that follows the reset in the same task judges the restored date again, and a `reset` listener that calls `preventDefault()` cancels the whole reset.
 
 Sibling `.valid-feedback`/`.invalid-feedback` elements work as with any other form control.
 
