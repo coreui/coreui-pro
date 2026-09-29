@@ -218,10 +218,11 @@ abstract class SectionInput extends BaseComponent {
   protected declare _inputElement: HTMLInputElement | null
   protected declare _form: HTMLFormElement | null
   protected declare _initialDate: Date | null
-  protected declare _resetHandler: () => void
+  protected declare _resetHandler: (event: Event) => void
   protected declare _submitHandler: () => void
   protected declare _submitValid: boolean
   protected declare _submitted: boolean
+  protected declare _submittedSinceReset: boolean
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
@@ -232,19 +233,30 @@ abstract class SectionInput extends BaseComponent {
     this._error = null
     this._inputElement = null
     this._form = null
-    this._resetHandler = () => {
+    this._resetHandler = (event: Event) => {
+      this._submittedSinceReset = false
       setTimeout(() => {
-        if (this._element) {
+        if (!this._element || event.defaultPrevented) {
+          return
+        }
+
+        if (!this._submittedSinceReset) {
           this._submitted = false
           this._submitValid = false
-          this.reset()
         }
+
+        this.reset()
       })
     }
 
-    this._submitHandler = () => this._onFormSubmit()
+    this._submitHandler = () => {
+      this._submittedSinceReset = true
+      this._onFormSubmit()
+    }
+
     this._submitValid = false
     this._submitted = false
+    this._submittedSinceReset = false
     this._ownerInvalid = false
     this._hostAriaInvalid = this._element.getAttribute('aria-invalid')
     this._hostAriaLabel = this._element.getAttribute('aria-label')
@@ -253,8 +265,8 @@ abstract class SectionInput extends BaseComponent {
     this._hostRole = this._element.getAttribute('role')
 
     this._createSectionInput()
+    this._initialDate = getDateFromSections(this._sections)
     this._date = this._applyValidationState()
-    this._initialDate = this._date
     this._addEventListeners()
 
     if (this._config.autofocus && !this._config.disabled) {
@@ -283,6 +295,7 @@ abstract class SectionInput extends BaseComponent {
 
   reset(): void {
     this._draft = ''
+    this._setAllSelected(false)
     this._commitSections(setSectionsFromDate(this._sections, this._initialDate))
   }
 

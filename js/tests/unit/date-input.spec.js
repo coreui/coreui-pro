@@ -1646,6 +1646,71 @@ describe('DateInput', () => {
       expect(dateInput._element.classList.contains('is-valid')).toBeFalse()
     })
 
+    it('should keep the date and the verdict when a listener cancels the form reset', async () => {
+      fixtureEl.innerHTML = '<form data-coreui-validate><div id="mydateinput"></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const dateInput = new DateInput(fixtureEl.querySelector('div'), { format: 'dd.MM.yyyy', required: true })
+      const [day] = getSections(dateInput._element)
+
+      form.addEventListener('reset', event => event.preventDefault())
+      form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
+      await Promise.resolve()
+      day.focus()
+      pressKey(day, '1')
+      pressKey(day, '4')
+
+      form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(day.textContent).toEqual('14')
+      expect(dateInput._element.classList.contains('is-invalid')).toBeTrue()
+    })
+
+    it('should keep the verdict of a submit that follows the reset in the same task', async () => {
+      fixtureEl.innerHTML = '<form data-coreui-validate><div id="mydateinput"></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const dateInput = new DateInput(fixtureEl.querySelector('div'), { format: 'dd.MM.yyyy', required: true })
+
+      form.reset()
+      form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(dateInput._element.classList.contains('is-invalid')).toBeTrue()
+    })
+
+    it('should restore a date its limits reject, the way the field was created', async () => {
+      fixtureEl.innerHTML = '<form><div id="mydateinput"></div></form>'
+      const dateInput = new DateInput(fixtureEl.querySelector('div'), { format: 'dd.MM.yyyy', date: new Date(2026, 6, 20), maxDate: new Date(2026, 6, 14) })
+
+      dateInput.clear()
+      fixtureEl.querySelector('form').reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect([...getSections(dateInput._element)].map(section => section.textContent)).toEqual(['20', '07', '2026'])
+      expect(dateInput._element.classList.contains('is-invalid')).toBeTrue()
+      expect(dateInput.getDate()).toBeNull()
+    })
+
+    it('should drop select all', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 6, 14) })
+      const [day] = getSections(dateInput._element)
+
+      day.focus()
+      pressKey(day, 'a', { ctrlKey: true })
+
+      expect(dateInput._element.classList.contains('form-date-time-all-selected')).toBeTrue()
+
+      dateInput.reset()
+
+      expect(dateInput._element.classList.contains('form-date-time-all-selected')).toBeFalse()
+    })
+
     it('should drop the form listener on dispose', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = '<form><div id="mydateinput"></div></form>'
