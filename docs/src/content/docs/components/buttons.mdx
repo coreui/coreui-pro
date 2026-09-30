@@ -356,7 +356,7 @@ The variables below are the neutral fallbacks — what a variant renders as when
 
 ### Sass maps
 
-`$button-sizes` lists the sizes that get a class. Each name generates `.btn-{size}` — plus the matching `.btn-group-{size}` and `.input-group-{size}` selectors — pointing the button's variables at the shared `--cui-btn-input-{size}-*` scale, so adding a name is enough once that scale defines it.
+`$button-sizes` lists the sizes that get a class. Each name generates `.btn-{size}` — plus the matching `.btn-group-{size}` selector — pointing the button's variables at the shared `--cui-btn-input-{size}-*` scale, so adding a name is enough once that scale defines it. Buttons inside an input group follow the group's own sizes, `$input-group-sizes`.
 
 <ScssDocs file="scss/mixins/_button.scss" capture="btn-sizes" />
 

@@ -160,8 +160,7 @@
   // scss-docs-start btn-sizes-loop
   @each $size, $_ in $button-sizes {
     .btn-#{$size},
-    .btn-group-#{$size} > :is(#{$btn-variant-selectors}),
-    .input-group-#{$size} > :is(#{$btn-variant-selectors}) {
+    .btn-group-#{$size} > :is(#{$btn-variant-selectors}) {
       --#{$prefix}btn-gap: var(--#{$prefix}btn-input-#{$size}-gap);
       --#{$prefix}btn-min-height: var(--#{$prefix}btn-input-#{$size}-min-height);
       --#{$prefix}btn-padding-y: var(--#{$prefix}btn-input-#{$size}-padding-y);

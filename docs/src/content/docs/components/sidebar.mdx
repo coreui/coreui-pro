@@ -634,8 +634,9 @@ By default placement for sidebar components is on the left of the viewport, but 
 
 You can create a sidebar instance with the sidebar constructor, for example:
 
-var mySidebar = document.querySelector('#mySidebar')
-var sidebar = new coreui.Sidebar(mySidebar)
+```js
+const sidebar = new coreui.Sidebar('#mySidebar')
+```
 
 | Method | Description |
 | --- | --- |
@@ -650,9 +651,10 @@ var sidebar = new coreui.Sidebar(mySidebar)
 | `toggleUnfoldable()` | Toggles the narrow-unfoldable variant on desktop. |
 | `unfoldable()` | Switches the sidebar to the narrow-unfoldable variant on desktop. |
 
-var sidebarNode = document.querySelector('#mySidebar')
-var sidebar = coreui.Sidebar.getOrCreateInstance(sidebarNode)
+```js
+const sidebar = coreui.Sidebar.getOrCreateInstance('#mySidebar')
 sidebar.toggle()
+```
 
 ### Events
 
@@ -665,10 +667,12 @@ CoreUI for Bootstrap's sidebar plugin exposes a few events for hooking into side
 | `show.coreui.sidebar` | Fired immediately when the `show()` instance method is called. |
 | `shown.coreui.sidebar` | Fired when the sidebar has been made visible to the user and CSS transitions have completed. |
 
-var mySidebar = document.getElementById('mySidebar')
-mySidebar.addEventListener('hidden.coreui.sidebar', function () {
-  // do something…
+```js
+const mySidebar = document.getElementById('mySidebar')
+mySidebar.addEventListener('hidden.coreui.sidebar', event => {
+  // do something...
 })
+```
 
 ## Customizing
 

@@ -381,7 +381,7 @@ Add menus with a little extra HTML and the [menu JavaScript plugin](/components/
 
 ### CSS variables
 
-Navs use local CSS variables on `.nav`, `.nav-tabs`, `.nav-pills`, `.nav-underline` and `.nav-underline-border` for enhanced real-time customization.
+Navs use local CSS variables on `.nav`, `.nav-tabs`, `.nav-pills`, `.nav-underline`, `.nav-underline-border` and `.nav-enclosed` for enhanced real-time customization.
 
 On the `.nav` base class:
 
@@ -406,6 +406,10 @@ On the `.nav-underline` modifier class:
 On the `.nav-underline-border` modifier class:
 
 <ScssDocs file="scss/_nav.scss" capture="nav-underline-border-tokens" />
+
+On the `.nav-enclosed` modifier class, where `.nav-enclosed-pills` changes only `--cui-nav-enclosed-border-radius`:
+
+<ScssDocs file="scss/_nav.scss" capture="nav-enclosed-tokens" />
 
 Tab pane variables:
 
