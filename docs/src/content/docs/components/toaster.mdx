@@ -59,7 +59,7 @@ Strings are written as text. Set `html: true` on the toaster to render markup; i
 
 ## Updating a toast
 
-Passing an `id` that already exists updates that toast instead of adding a second one, and bumps its `updateKey`, so a "Draft saved" toast clicked twice stays a single toast. `update()` does the same for a toast whose id you kept, and accepts a function of the current toast when the change depends on it: `toaster.update(id, previous => ({ description: previous.data.step + 1 }))`.
+Passing an `id` that already exists updates that toast instead of adding a second one, and bumps its `updateKey`, so a "Draft saved" toast clicked twice stays a single toast. A toast that is already closing is not reused: the same `id` then shows a new toast while the old one finishes leaving. `update()` does the same for a toast whose id you kept, and accepts a function of the current toast when the change depends on it: `toaster.update(id, previous => ({ description: previous.data.step + 1 }))`.
 
 <Example code={`<div class="hstack gap-2 flex-wrap mb-3">
     <button type="button" class="btn-solid theme-primary" id="toasterDraftBtn">Save draft</button>
@@ -177,7 +177,7 @@ const inline = new coreui.Toaster('#notifications')
 
 ## Accessibility
 
-The container is a `region` landmark named by `ariaLabel` (`Notifications` by default), so screen-reader users can jump to it through landmark navigation. It holds two visually hidden live regions that exist before any toast does — a `role="status"` one that is polite and a `role="alert"` one that is assertive — and every added or updated toast writes its `title` and `description` into the one its `priority` selects. Only that text is announced, never the close button or the action, and the toast element itself carries no live role. `low`, the default, waits until the user is idle; keep `high` for the few messages that should interrupt, such as a failed save (WCAG 4.1.3 Status Messages).
+The container is a `region` landmark named by `ariaLabel` (`Notifications` by default), so screen-reader users can jump to it through landmark navigation. It holds two visually hidden live regions that exist before any toast does — a `role="status"` one that is polite and a `role="alert"` one that is assertive — and every toast adds its own message with its `title` and `description` to the one its `priority` selects, so toasts raised together are each announced instead of the last one overwriting the others. Updating a toast replaces its message, and the message goes when the toast does. Only that text is announced, never the close button or the action, and the toast element itself carries no live role. The close button is named by `ariaCloseLabel` (`Close` by default); set it once for the whole toaster in a translated interface. `low`, the default, waits until the user is idle; keep `high` for the few messages that should interrupt, such as a failed save (WCAG 4.1.3 Status Messages).
 
 Auto-hiding is a time limit on reading, which WCAG 2.2.1 Timing Adjustable asks you to let the user turn off, adjust or extend. Timers stop while the pointer or focus is inside the container (`pauseOnHover`), so a spread stack or a toast being read does not disappear mid-way, and the default `timeout` is the toaster's to set for the whole page. A toast with an action, or one the user must act on, should not hide on its own: give it `timeout: 0`, so keyboard and screen-reader users can reach the button. Toasts never take focus.
 
@@ -190,17 +190,12 @@ const toaster = new coreui.Toaster(null, { placement: 'bottom-end', limit: 3 })
 const id = toaster.add({ title: 'Saved', description: 'Your changes are live.', theme: 'success' })
 ```
 
-
-```js
-const toaster = new coreui.Toaster(null, { placement: 'bottom-end', limit: 3 })
-const id = toaster.add({ title: 'Saved', description: 'Your changes are live.', theme: 'success' })
-```
-
 ### Options
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
 | `allowList` | object | [Default value](/getting-started/javascript#sanitizer) | Tags and attributes allowed in toast content when `html` is `true`. |
+| `ariaCloseLabel` | string | `'Close'` | Accessible name of every toast's close button. |
 | `ariaLabel` | string | `'Notifications'` | Accessible name of the container's `region` landmark. |
 | `container` | string, element | `'body'` | Where the toaster appends the container it creates. Ignored when the toaster is given an existing element. |
 | `enter` | string | `'auto'` | Edge a toast slides in from: `'start'`, `'end'`, `'top'` or `'bottom'`. `'start'` and `'end'` are logical and follow the direction the container sits in. `'auto'` follows the placement — the side in the `start` and `end` columns, above in `top-center`, below in `bottom-center`, and no slide at all in `middle-center`. |
@@ -223,7 +218,7 @@ const id = toaster.add({ title: 'Saved', description: 'Your changes are live.', 
 | `data` | object | — | Anything you want to read back from the toast object later, e.g. in `update(id, previous => …)`. |
 | `description` | string, element, function | — | Body of the toast. |
 | `dismissible` | boolean | `true` | Render the close button. |
-| `id` | string | generated | Stable id; adding with an existing id updates that toast in place. |
+| `id` | string | generated | Stable id; adding with an existing id updates that toast in place, unless it is already closing, in which case a new toast is shown. |
 | `instant` | boolean | `false` | Skip the fade (`.toast-instant`). |
 | `onClose` | function | — | Called when the toast starts hiding, with the toast object. |
 | `onRemove` | function | — | Called after the toast left the DOM, with the toast object. |
@@ -237,7 +232,7 @@ const id = toaster.add({ title: 'Saved', description: 'Your changes are live.', 
 
 | Method | Description |
 | --- | --- |
-| `add(options)` | Renders and shows a toast. Returns its id. With an `id` that already exists it behaves like `update`. |
+| `add(options)` | Renders and shows a toast. Returns its id. With an `id` that already exists it behaves like `update`, unless that toast is already closing. |
 | `close(id?)` | Hides the toast, which removes it from the DOM and the store once the fade ends. Without an id, hides every toast. |
 | `dispose` | Removes every toast, and the container if the toaster created it. |
 | `getInstance` | *Static* method that returns the toaster bound to a container element. |

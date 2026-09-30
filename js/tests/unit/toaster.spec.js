@@ -141,6 +141,17 @@ describe('Toaster', () => {
       expect(fixtureEl.querySelector('.btn-close')).toBeNull()
     })
 
+    it('should name the close buttons with ariaCloseLabel', () => {
+      toaster = new Toaster(null, { container: fixtureEl, ariaCloseLabel: 'Zamknij' })
+
+      toaster.add({ title: 'Zapisano', description: 'Gotowe', instant: true })
+      toaster.add({ description: 'Skopiowano', instant: true })
+
+      const closeButtons = fixtureEl.querySelectorAll('.btn-close')
+      expect(closeButtons).toHaveSize(2)
+      expect([...closeButtons].map(button => button.getAttribute('aria-label'))).toEqual(['Zamknij', 'Zamknij'])
+    })
+
     it('should announce the title and description through a live region by priority', async () => {
       toaster = new Toaster(null, { container: fixtureEl })
       const status = fixtureEl.querySelector('.toast-announcer[role="status"]')
@@ -159,6 +170,42 @@ describe('Toaster', () => {
       expect(fixtureEl.querySelector('.toast').hasAttribute('role')).toBeFalse()
     })
 
+    it('should announce every toast added in the same frame', async () => {
+      toaster = new Toaster(null, { container: fixtureEl, limit: 0 })
+      const status = fixtureEl.querySelector('.toast-announcer[role="status"]')
+
+      toaster.add({ description: 'Row 1 saved', instant: true })
+      toaster.add({ description: 'Row 2 saved', instant: true })
+      toaster.add({ description: 'Row 3 saved', instant: true })
+      await new Promise(resolve => {
+        requestAnimationFrame(() => requestAnimationFrame(resolve))
+      })
+
+      expect([...status.children].map(message => message.textContent)).toEqual(['Row 1 saved', 'Row 2 saved', 'Row 3 saved'])
+      expect(status.getAttribute('aria-atomic')).not.toEqual('true')
+    })
+
+    it('should replace the announcement of an updated toast and drop it once the toast is gone', async () => {
+      toaster = new Toaster(null, { container: fixtureEl })
+      const status = fixtureEl.querySelector('.toast-announcer[role="status"]')
+      const frames = () => new Promise(resolve => {
+        requestAnimationFrame(() => requestAnimationFrame(resolve))
+      })
+
+      const id = toaster.add({ description: 'Uploading', instant: true })
+      await frames()
+      toaster.update(id, { description: 'Uploaded' })
+      await frames()
+
+      expect([...status.children].map(message => message.textContent)).toEqual(['Uploaded'])
+
+      const removed = hidden(fixtureEl.querySelector('.toast'))
+      toaster.close(id)
+      await removed
+
+      expect(status.children).toHaveSize(0)
+    })
+
     it('should add the theme, translucent and custom classes', () => {
       toaster = new Toaster(null, { container: fixtureEl })
 
@@ -169,6 +216,16 @@ describe('Toaster', () => {
 
       expect(toastEl).toHaveClass('theme-success')
       expect(toastEl).toHaveClass('toast-translucent')
+      expect(toastEl).toHaveClass('my-toast')
+      expect(toastEl).toHaveClass('wide')
+    })
+
+    it('should ignore extra whitespace in the class option', () => {
+      toaster = new Toaster(null, { container: fixtureEl })
+
+      expect(() => toaster.add({ description: 'Done', class: ' my-toast  wide ', instant: true })).not.toThrow()
+
+      const toastEl = fixtureEl.querySelector('.toast')
       expect(toastEl).toHaveClass('my-toast')
       expect(toastEl).toHaveClass('wide')
     })
@@ -216,6 +273,27 @@ describe('Toaster', () => {
       expect(toasts[0].querySelector('.toast-description').textContent).toEqual('Saved')
       expect(toasts[0].getAttribute('data-coreui-update-key')).toEqual('1')
       expect(toaster.getToasts()[0].updateKey).toEqual(1)
+    })
+
+    it('should show a new toast when the id belongs to a toast that is leaving', async () => {
+      toaster = new Toaster(null, { container: fixtureEl })
+
+      toaster.add({ id: 'draft', description: 'Draft saved', action: { label: 'Undo' } })
+      const leavingEl = fixtureEl.querySelector('.toast')
+      leavingEl.style.transitionDuration = '20ms'
+      const removed = hidden(leavingEl)
+      toaster.close('draft')
+
+      toaster.add({ id: 'draft', description: 'Draft saved again', instant: true })
+      await removed
+
+      const toasts = fixtureEl.querySelectorAll('.toast')
+      expect(toasts).toHaveSize(1)
+      expect(toasts[0]).not.toBe(leavingEl)
+      expect(toasts[0].querySelector('.toast-description').textContent).toEqual('Draft saved again')
+      expect(toasts[0].querySelector('.toast-action')).toBeNull()
+      expect(toaster.getToasts().map(toast => toast.id)).toEqual(['draft'])
+      expect(toaster.getToasts()[0].element).toBe(toasts[0])
     })
 
     it('should render an action button and call its handler', () => {
@@ -308,6 +386,41 @@ describe('Toaster', () => {
       expect(firstEl.inert).toBeFalse()
     })
 
+    it('should keep limited toasts hidden while every toast closes', async () => {
+      toaster = new Toaster(null, { container: fixtureEl, limit: 1 })
+
+      toaster.add({ description: 'first' })
+      toaster.add({ description: 'second' })
+      toaster.add({ description: 'third' })
+      for (const element of fixtureEl.querySelectorAll('.toast')) {
+        element.style.transitionDuration = '20ms'
+      }
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 40)
+      })
+
+      const limited = [...fixtureEl.querySelectorAll('[data-coreui-limited]')]
+      expect(limited).toHaveSize(2)
+      expect(limited.every(element => element.style.display === 'none')).toBeTrue()
+
+      const shown = []
+      const observer = new MutationObserver(() => {
+        shown.push(...limited.filter(element => element.style.display !== 'none'))
+      })
+      for (const element of limited) {
+        observer.observe(element, { attributes: true, attributeFilter: ['style'] })
+      }
+
+      const removals = [...fixtureEl.querySelectorAll('.toast')].map(element => hidden(element))
+      toaster.close()
+      await Promise.all(removals)
+      observer.disconnect()
+
+      expect(shown).toHaveSize(0)
+      expect(fixtureEl.querySelectorAll('.toast')).toHaveSize(0)
+    })
+
     it('should not limit anything when limit is 0', () => {
       toaster = new Toaster(null, { container: fixtureEl, limit: 0 })
 
@@ -370,6 +483,22 @@ describe('Toaster', () => {
 
       expect(fixtureEl.querySelector('.toast')).toBeNull()
       expect(toaster.getToasts().some(toast => toast.id === id)).toBeFalse()
+    })
+
+    it('should stop listening on a toast once it is removed', async () => {
+      toaster = new Toaster(null, { container: fixtureEl })
+      const onClick = jasmine.createSpy('onClick')
+
+      const id = toaster.add({ description: 'Deleted', action: { label: 'Undo', onClick }, instant: true })
+      const toastEl = fixtureEl.querySelector('.toast')
+      const actionEl = toastEl.querySelector('.toast-action')
+      const removed = hidden(toastEl)
+      toaster.close(id)
+      await removed
+
+      actionEl.click()
+
+      expect(onClick).not.toHaveBeenCalled()
     })
   })
 
@@ -554,6 +683,37 @@ describe('Toaster', () => {
       expect(toastEl.querySelector('.toast-title').textContent).toEqual('Failed')
       expect(toastEl.querySelector('.toast-description').textContent).toEqual('boom')
       expect(toastEl).toHaveClass('theme-danger')
+    })
+
+    it('should leave a disposed toaster alone when the promise settles', async () => {
+      toaster = new Toaster(null, { container: fixtureEl })
+      const rejections = []
+      const onRejection = event => {
+        rejections.push(event.reason)
+        event.preventDefault()
+      }
+
+      window.addEventListener('unhandledrejection', onRejection)
+      let resolve
+      let reject
+      const resolving = new Promise(resolver => {
+        resolve = resolver
+      })
+      const rejecting = new Promise((resolver, rejecter) => {
+        reject = rejecter
+      })
+      toaster.promise(resolving, { loading: 'Loading…', success: 'Done', error: 'Failed' })
+      toaster.promise(rejecting, { loading: 'Loading…', success: 'Done', error: 'Failed' }).catch(() => {})
+
+      toaster.dispose()
+      resolve('value')
+      reject(new Error('boom'))
+      await new Promise(resolver => {
+        setTimeout(resolver, 20)
+      })
+      window.removeEventListener('unhandledrejection', onRejection)
+
+      expect(rejections).toEqual([])
     })
   })
 
