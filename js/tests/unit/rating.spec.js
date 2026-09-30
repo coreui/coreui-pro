@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 
 import Rating from '../../src/rating.js'
 import EventHandler from '../../src/dom/event-handler.js'
@@ -1556,6 +1557,156 @@ describe('Rating', () => {
       expect(rating2).toEqual(rating)
       // config should still show itemCount as 3
       expect(rating2._config.itemCount).toEqual(3)
+    })
+  })
+
+  describe('form reset', () => {
+    const wait = () => new Promise(resolve => {
+      setTimeout(resolve)
+    })
+
+    it('should mark the star of the initial value as the default', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      // eslint-disable-next-line no-new
+      new Rating(div, { value: 2 })
+
+      const defaults = [...div.querySelectorAll('.rating-item-input')].filter(input => input.defaultChecked)
+
+      expect(defaults.map(input => input.value)).toEqual(['2'])
+    })
+
+    it('should go back to its initial value when the form resets', async () => {
+      fixtureEl.innerHTML = '<form><div></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const div = fixtureEl.querySelector('div')
+      const changeSpy = jasmine.createSpy('change')
+      // eslint-disable-next-line no-new
+      new Rating(div, { name: 'score', value: 2 })
+      const input = div.querySelectorAll('.rating-item-input')[3]
+
+      input.checked = true
+      input.dispatchEvent(createEvent('change', { bubbles: true }))
+      div.addEventListener('change.coreui.rating', changeSpy)
+      form.reset()
+      await wait()
+
+      expect(new FormData(form).get('score')).toEqual('2')
+      expect(div.querySelectorAll('.rating-item-label.active')).toHaveSize(2)
+      expect(changeSpy).toHaveBeenCalledTimes(1)
+      expect(changeSpy.calls.mostRecent().args[0].value).toEqual('2')
+    })
+
+    it('should keep the rating when a listener cancels the form reset', async () => {
+      fixtureEl.innerHTML = '<form><div></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const div = fixtureEl.querySelector('div')
+      const changeSpy = jasmine.createSpy('change')
+      // eslint-disable-next-line no-new
+      new Rating(div, { name: 'score', value: 2 })
+      const input = div.querySelectorAll('.rating-item-input')[3]
+
+      input.checked = true
+      input.dispatchEvent(createEvent('change', { bubbles: true }))
+      form.addEventListener('reset', event => event.preventDefault())
+      div.addEventListener('change.coreui.rating', changeSpy)
+      form.reset()
+      await wait()
+
+      expect(new FormData(form).get('score')).toEqual('4')
+      expect(div.querySelectorAll('.rating-item-label.active')).toHaveSize(4)
+      expect(changeSpy).not.toHaveBeenCalled()
+    })
+
+    it('should keep focus on the star when the form resets', async () => {
+      fixtureEl.innerHTML = '<form><div></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const div = fixtureEl.querySelector('div')
+      // eslint-disable-next-line no-new
+      new Rating(div, { value: 2 })
+      const input = div.querySelectorAll('.rating-item-input')[3]
+
+      input.focus()
+      input.checked = true
+      input.dispatchEvent(createEvent('change', { bubbles: true }))
+      form.reset()
+      await wait()
+
+      expect(document.activeElement).toBe(input)
+    })
+
+    it('should not fire a change for a value it cannot show', async () => {
+      fixtureEl.innerHTML = '<form><div></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const div = fixtureEl.querySelector('div')
+      const changeSpy = jasmine.createSpy('change')
+      // eslint-disable-next-line no-new
+      new Rating(div, { value: 2.5 })
+
+      div.addEventListener('change.coreui.rating', changeSpy)
+      form.reset()
+      await wait()
+
+      expect(changeSpy).not.toHaveBeenCalled()
+    })
+
+    it('should clear a rating without an initial value when the form resets', async () => {
+      fixtureEl.innerHTML = '<form><div></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const div = fixtureEl.querySelector('div')
+      // eslint-disable-next-line no-new
+      new Rating(div, { name: 'score' })
+      const input = div.querySelectorAll('.rating-item-input')[3]
+
+      input.checked = true
+      input.dispatchEvent(createEvent('change', { bubbles: true }))
+      form.reset()
+      await wait()
+
+      expect(new FormData(form).has('score')).toBeFalse()
+      expect(div.querySelector('.rating-item-label.active')).toBeNull()
+    })
+
+    it('should not fire a change when the form resets to the value it already has', async () => {
+      fixtureEl.innerHTML = '<form><div></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const div = fixtureEl.querySelector('div')
+      const changeSpy = jasmine.createSpy('change')
+      // eslint-disable-next-line no-new
+      new Rating(div, { value: 2 })
+
+      div.addEventListener('change.coreui.rating', changeSpy)
+      form.reset()
+      await wait()
+
+      expect(changeSpy).not.toHaveBeenCalled()
+    })
+
+    it('should stop following the form once disposed, and leave the other ratings listening', async () => {
+      fixtureEl.innerHTML = '<form><div id="first"></div><div id="second"></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const first = new Rating(fixtureEl.querySelector('#first'), { value: 1 })
+      const secondEl = fixtureEl.querySelector('#second')
+      // eslint-disable-next-line no-new
+      new Rating(secondEl, { value: 2 })
+      const input = secondEl.querySelectorAll('.rating-item-input')[3]
+      const changeSpy = jasmine.createSpy('change')
+
+      const offSpy = vi.spyOn(EventHandler, 'off')
+
+      first.dispose()
+
+      expect(offSpy).toHaveBeenCalledWith(form, 'reset.coreui.rating', expect.any(Function))
+
+      input.checked = true
+      input.dispatchEvent(createEvent('change', { bubbles: true }))
+      secondEl.addEventListener('change.coreui.rating', changeSpy)
+      form.reset()
+      await wait()
+
+      expect(changeSpy).toHaveBeenCalledTimes(1)
+      expect(secondEl.querySelectorAll('.rating-item-label.active')).toHaveSize(2)
+      offSpy.mockRestore()
     })
   })
 

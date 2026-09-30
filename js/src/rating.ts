@@ -32,6 +32,7 @@ const EVENT_HOVER = `hover${EVENT_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_MOUSEENTER = `mouseenter${EVENT_KEY}`
 const EVENT_MOUSELEAVE = `mouseleave${EVENT_KEY}`
+const EVENT_RESET = `reset${EVENT_KEY}`
 
 const CLASS_NAME_ACTIVE = 'active'
 const CLASS_NAME_DISABLED = 'disabled'
@@ -114,10 +115,12 @@ const DefaultType = {
 
 class Rating extends BaseComponent {
   protected declare _currentValue: number | string | null
+  protected declare _form: HTMLFormElement | null
   protected declare _hostClasses: HostClasses
   protected declare _hostRole: string | null
   protected declare _items: HTMLElement[]
   protected declare _name: string
+  protected declare _resetHandler: (event: Event) => void
   protected declare _sizeClassName: string | null
   protected declare _sizeClassNames: Set<string>
   protected declare _tooltip: any
@@ -133,6 +136,30 @@ class Rating extends BaseComponent {
     ])
     this._hostRole = this._element.getAttribute('role')
     this._items = []
+    this._form = this._element.closest('form')
+    this._resetHandler = (event: Event) => {
+      setTimeout(() => {
+        if (!this._element || event.defaultPrevented) {
+          return
+        }
+
+        const checkedInput = SelectorEngine.findOne<HTMLInputElement>(`${SELECTOR_RATING_ITEM_INPUT}:checked`, this._element as ParentNode)
+        const value = checkedInput?.value ?? null
+
+        // eslint-disable-next-line eqeqeq
+        if (value == this._currentValue) {
+          return
+        }
+
+        this._currentValue = value
+        this._highlightLabels(checkedInput)
+
+        EventHandler.trigger(this._element, EVENT_CHANGE, {
+          value
+        })
+      })
+    }
+
     this._sizeClassName = null
     this._sizeClassNames = new Set()
     this._config = this._getConfig(config)
@@ -184,6 +211,7 @@ class Rating extends BaseComponent {
       return
     }
 
+    EventHandler.off(this._form, EVENT_RESET, this._resetHandler)
     this._removeRating()
     restoreHostClasses(this._element, this._managedClassNames(), this._hostClasses)
 
@@ -221,6 +249,10 @@ class Rating extends BaseComponent {
   }
 
   _addEventListeners(): void {
+    if (this._form) {
+      EventHandler.on(this._form, EVENT_RESET, this._resetHandler)
+    }
+
     EventHandler.on(this._element, EVENT_CLICK, SELECTOR_RATING_ITEM_INPUT, ({ target }: any) => {
       if (this._config.disabled || this._config.readonly) {
         return
@@ -249,28 +281,8 @@ class Rating extends BaseComponent {
         value: target.value
       })
 
-      if (!target.isConnected) {
-        return
-      }
-
-      const inputs = SelectorEngine.find(SELECTOR_RATING_ITEM_INPUT, this._element as ParentNode)
-      this._resetLabels()
-
-      if (this._config.highlightOnlySelected) {
-        const label = SelectorEngine.findOne(SELECTOR_RATING_ITEM_LABEL, target.parentElement as ParentNode)
-        label!.classList.add(CLASS_NAME_ACTIVE)
-
-        return
-      }
-
-      for (const input of inputs) {
-        const label = SelectorEngine.findOne(SELECTOR_RATING_ITEM_LABEL, input.parentElement as ParentNode)
-
-        label!.classList.add(CLASS_NAME_ACTIVE)
-
-        if (input === target) {
-          break
-        }
+      if (target.isConnected) {
+        this._highlightLabels(target)
       }
     })
 
@@ -321,26 +333,7 @@ class Rating extends BaseComponent {
         value: null
       })
 
-      if (checkedInput && this._config.highlightOnlySelected) {
-        const label = SelectorEngine.findOne(SELECTOR_RATING_ITEM_LABEL, checkedInput.parentElement as ParentNode)
-        label!.classList.add(CLASS_NAME_ACTIVE)
-
-        return
-      }
-
-      if (checkedInput) {
-        const inputs = SelectorEngine.find(SELECTOR_RATING_ITEM_INPUT, this._element as ParentNode)
-        this._resetLabels()
-
-        for (const input of inputs) {
-          const label = SelectorEngine.findOne(SELECTOR_RATING_ITEM_LABEL, input.parentElement as ParentNode)
-          label!.classList.add(CLASS_NAME_ACTIVE)
-
-          if (input === checkedInput) {
-            break
-          }
-        }
-      }
+      this._highlightLabels(checkedInput)
     })
 
     EventHandler.on(this._element, EVENT_FOCUSIN, SELECTOR_RATING_ITEM_INPUT, ({ target }: any) => {
@@ -403,6 +396,30 @@ class Rating extends BaseComponent {
 
     for (const label of labels) {
       label.classList.remove(CLASS_NAME_ACTIVE)
+    }
+  }
+
+  _highlightLabels(checkedInput: Element | null): void {
+    this._resetLabels()
+
+    if (!checkedInput) {
+      return
+    }
+
+    if (this._config.highlightOnlySelected) {
+      const label = SelectorEngine.findOne(SELECTOR_RATING_ITEM_LABEL, checkedInput.parentElement as ParentNode)
+      label!.classList.add(CLASS_NAME_ACTIVE)
+
+      return
+    }
+
+    for (const input of SelectorEngine.find(SELECTOR_RATING_ITEM_INPUT, this._element as ParentNode)) {
+      const label = SelectorEngine.findOne(SELECTOR_RATING_ITEM_LABEL, input.parentElement as ParentNode)
+      label!.classList.add(CLASS_NAME_ACTIVE)
+
+      if (input === checkedInput) {
+        break
+      }
     }
   }
 
@@ -515,9 +532,9 @@ class Rating extends BaseComponent {
       }
 
       // eslint-disable-next-line eqeqeq
-      if (this._currentValue == value) {
-        ratingItemInputElement.checked = true
-      }
+      ratingItemInputElement.defaultChecked = this._config.value == value
+      // eslint-disable-next-line eqeqeq
+      ratingItemInputElement.checked = this._currentValue == value
 
       // Append elements
 
