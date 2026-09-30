@@ -2286,7 +2286,7 @@ describe('Calendar', () => {
       expect(panels[0].querySelector('table').hasAttribute('aria-describedby')).toBeFalse()
       expect(described.hidden).toBeTrue()
       expect(panels[1].contains(described)).toBeTrue()
-      expect(new Set(panels.map(panel => panel.querySelector('span[hidden]').id)).size).toEqual(2)
+      expect(new Set(panels.map(panel => panel.querySelector('.calendar > span[hidden]').id)).size).toEqual(2)
     })
 
     it('should word the description with ariaNothingToPickLabel, and leave the grid undescribed without it', () => {
@@ -2295,6 +2295,12 @@ describe('Calendar', () => {
       expect(document.getElementById(labelled.getAttribute('aria-describedby')).textContent).toEqual('Brak dat do wyboru')
       expect(renderCalendar({ ariaNothingToPickLabel: '', minDate: new Date(2026, 8, 1) }).querySelector('table').hasAttribute('aria-describedby')).toBeFalse()
       expect(renderCalendar({ minDate: new Date(2026, 8, 1) }, '<div data-coreui-aria-nothing-to-pick-label=""></div>').querySelector('table').hasAttribute('aria-describedby')).toBeFalse()
+
+      const div = renderCalendar({ minDate: new Date(2026, 8, 1) })
+
+      Calendar.getInstance(div).setConfig({ ariaNothingToPickLabel: 'Brak dat do wyboru' })
+
+      expect(div.querySelector('.calendar-nav-date .visually-hidden').textContent).toEqual('Brak dat do wyboru')
     })
 
     it('should describe a grid again when a pick leaves nothing on it to pick', () => {
@@ -2312,6 +2318,83 @@ describe('Calendar', () => {
 
       expect(panels[0].querySelector('table').hasAttribute('aria-describedby')).toBeFalse()
       expect(panels[1].querySelector('table').hasAttribute('aria-describedby')).toBeTrue()
+      expect(panels[0].querySelector('.calendar-nav-date .visually-hidden')).toBeNull()
+      expect(panels[1].querySelector('.calendar-nav-date .visually-hidden').textContent).toEqual('Nothing on this page can be picked')
+    })
+
+    it('should announce every page with nothing to pick the calendar turns to, with its name', () => {
+      const div = renderCalendar({ disabledDates: date => date.getMonth() > 7 })
+      const region = div.querySelector('.calendar-nav-date')
+      const observer = new MutationObserver(() => {})
+
+      expect(region.getAttribute('aria-live')).toEqual('polite')
+      expect(region.getAttribute('aria-atomic')).toEqual('true')
+      expect(region.querySelector('.visually-hidden')).toBeNull()
+
+      observer.observe(region, { childList: true, subtree: true })
+      div.querySelector('.btn-next').click()
+
+      expect(region.textContent).toMatch(/^September 2026\s*Nothing on this page can be picked$/)
+      expect(observer.takeRecords().length).toBeGreaterThan(0)
+
+      div.querySelector('.btn-next').click()
+
+      expect(region.textContent).toMatch(/^October 2026\s*Nothing on this page can be picked$/)
+      expect(observer.takeRecords().length).toBeGreaterThan(0)
+
+      div.querySelector('.btn-prev').click()
+      div.querySelector('.btn-prev').click()
+
+      expect(region.querySelector('.visually-hidden')).toBeNull()
+      observer.disconnect()
+    })
+
+    it('should not announce a page with nothing to pick again while it stays on screen', () => {
+      const div = renderCalendar({ calendars: 2, disabledDates: date => date.getMonth() === 8 })
+      const [first, second] = [...div.querySelectorAll('.calendar')]
+      const region = second.querySelector('.calendar-nav-date')
+      const observer = new MutationObserver(() => {})
+
+      observer.observe(region, { childList: true, subtree: true, characterData: true })
+      first.querySelector(`[data-coreui-date="${new Date(2026, 7, 12).toDateString()}"]`).click()
+      Calendar.getInstance(div).refresh()
+      Calendar.getInstance(div).setConfig({ locale: 'en-US' })
+
+      expect(region.querySelector('.visually-hidden').textContent).toEqual('Nothing on this page can be picked')
+      expect(observer.takeRecords()).toHaveSize(0)
+      observer.disconnect()
+    })
+
+    it('should announce every page with nothing to pick the keys turn to', () => {
+      const div = renderCalendar({ disabledDates: date => date.getMonth() > 7 })
+      const region = div.querySelector('.calendar-nav-date')
+      const observer = new MutationObserver(() => {})
+
+      observer.observe(region, { childList: true, subtree: true })
+      pressKey(focusDay(div, 2026, 7, 12), 'PageDown')
+
+      expect(region.textContent).toMatch(/^September 2026\s*Nothing on this page can be picked$/)
+      expect(observer.takeRecords().length).toBeGreaterThan(0)
+
+      pressKey(document.activeElement, 'PageDown')
+
+      expect(region.textContent).toMatch(/^October 2026\s*Nothing on this page can be picked$/)
+      expect(observer.takeRecords().length).toBeGreaterThan(0)
+      observer.disconnect()
+    })
+
+    it('should drop the announcement when a page gets something to pick without turning', () => {
+      let blocked = true
+      const div = renderCalendar({ calendars: 2, disabledDates: date => blocked && date.getMonth() === 8 })
+      const [first, second] = [...div.querySelectorAll('.calendar')]
+
+      expect(second.querySelector('.calendar-nav-date .visually-hidden')).not.toBeNull()
+
+      blocked = false
+      first.querySelector(`[data-coreui-date="${new Date(2026, 7, 12).toDateString()}"]`).click()
+
+      expect(second.querySelector('.calendar-nav-date .visually-hidden')).toBeNull()
+      expect(second.querySelector('table').hasAttribute('aria-describedby')).toBeFalse()
     })
 
     it('should describe the grid again when the calendar turns to a page with nothing to pick', () => {
