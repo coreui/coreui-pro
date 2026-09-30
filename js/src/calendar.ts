@@ -15,7 +15,9 @@ import {
 import {
   CHEVRON_DOUBLE_LEFT_ICON, CHEVRON_DOUBLE_RIGHT_ICON, CHEVRON_LEFT_ICON, CHEVRON_RIGHT_ICON
 } from './util/icons.js'
-import { defineJQueryPlugin, isRTL, jQueryDispatch } from './util/index.js'
+import {
+  defineJQueryPlugin, getUID, isRTL, jQueryDispatch
+} from './util/index.js'
 import {
   type CalendarKeyAction,
   type CalendarKeyContext,
@@ -135,6 +137,7 @@ type CalendarConfig = {
   ariaNavPrevMonthLabel: string
   ariaNavPrevYearLabel: string
   ariaNavPrevYearsLabel: string
+  ariaNothingToPickLabel: string | null
   calendarDate: Date | number | string | null
   calendars: number
   dayFormat: 'numeric' | '2-digit'
@@ -175,6 +178,7 @@ const Default: CalendarConfig = {
   ariaNavPrevMonthLabel: 'Previous month',
   ariaNavPrevYearLabel: 'Previous year',
   ariaNavPrevYearsLabel: 'Previous 12 years',
+  ariaNothingToPickLabel: 'Nothing on this page can be picked',
   calendarDate: null,
   calendars: 1,
   dayFormat: 'numeric',
@@ -215,6 +219,7 @@ const DefaultType: Record<string, string> = {
   ariaNavPrevMonthLabel: 'string',
   ariaNavPrevYearLabel: 'string',
   ariaNavPrevYearsLabel: 'string',
+  ariaNothingToPickLabel: '(string|null)',
   calendarDate: '(date|number|string|null)',
   calendars: 'number',
   dayFormat: 'string',
@@ -700,7 +705,7 @@ class Calendar extends BaseComponent {
 
     Manipulator.setDataAttribute(calendarPanelEl, 'calendar-index', order)
 
-    calendarPanelEl.innerHTML = '<div class="calendar-nav"><div class="calendar-nav-prev"></div><div class="calendar-nav-date" aria-live="polite"></div><div class="calendar-nav-next"></div></div><table role="grid"></table>'
+    calendarPanelEl.innerHTML = `<div class="calendar-nav"><div class="calendar-nav-prev"></div><div class="calendar-nav-date" aria-live="polite"></div><div class="calendar-nav-next"></div></div><table role="grid"></table><span id="${getUID('calendar-description')}" hidden></span>`
     this._renderCalendarPanel(calendarPanelEl, order)
 
     return calendarPanelEl
@@ -710,7 +715,7 @@ class Calendar extends BaseComponent {
     const calendarDate = getCalendarDate(this._calendarDate, order, this._view)
     const days = this._view === 'days'
     const years = this._view === 'years'
-    const [navigation, calendarTable] = panel.children
+    const [navigation, calendarTable, description] = panel.children
     const [prev, region, next] = navigation.children
     const monthLabel = days ? this._formatDate(calendarDate, { month: 'long' }) : ''
     const yearLabel = years ? formatYearsRange(calendarDate.getFullYear(), this._config.locale) : this._formatDate(calendarDate, { year: 'numeric' })
@@ -731,6 +736,18 @@ class Calendar extends BaseComponent {
     }
 
     calendarTable.innerHTML = days ? this._daysHtml(calendarDate) : this._periodsHtml(calendarDate)
+    description.textContent = this._config.ariaNothingToPickLabel
+    this._describeGrid(panel)
+  }
+
+  _describeGrid(panel: Element): void {
+    const [, grid, description] = panel.children
+
+    if (this._config.ariaNothingToPickLabel && !SelectorEngine.findOne('[data-coreui-selectable]', grid)) {
+      grid.setAttribute('aria-describedby', description.id)
+    } else {
+      grid.removeAttribute('aria-describedby')
+    }
   }
 
   _daysHtml(calendarDate: Date): string {
@@ -933,16 +950,18 @@ class Calendar extends BaseComponent {
           this._applyState(row, this._rowWeekAttributes(this._getDate(firstCell)))
         }
       }
+    } else {
+      for (const cell of SelectorEngine.find(`${SELECTOR_CALENDAR_CELL}[data-coreui-date]`, this._element as ParentNode)) {
+        const date = this._getDate(cell)
 
-      return
+        this._applyState(cell, this._view === 'days' ?
+          this._cellDayAttributes(date, ['previous', 'next'].find(month => cell.classList.contains(month)) ?? 'current') :
+          this._cellPeriodAttributes(date))
+      }
     }
 
-    for (const cell of SelectorEngine.find(`${SELECTOR_CALENDAR_CELL}[data-coreui-date]`, this._element as ParentNode)) {
-      const date = this._getDate(cell)
-
-      this._applyState(cell, this._view === 'days' ?
-        this._cellDayAttributes(date, ['previous', 'next'].find(month => cell.classList.contains(month)) ?? 'current') :
-        this._cellPeriodAttributes(date))
+    for (const panel of SelectorEngine.find(SELECTOR_CALENDAR, this._element as ParentNode)) {
+      this._describeGrid(panel)
     }
   }
 
