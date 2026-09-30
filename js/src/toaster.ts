@@ -657,6 +657,7 @@ class Toaster extends BaseComponent {
     announcer.className = CLASS_NAME_ANNOUNCER
     announcer.setAttribute('role', role)
     announcer.setAttribute('aria-live', live)
+    announcer.setAttribute('aria-atomic', 'false')
     this._element.append(announcer)
     return announcer
   }

@@ -182,7 +182,7 @@ describe('Toaster', () => {
       })
 
       expect([...status.children].map(message => message.textContent)).toEqual(['Row 1 saved', 'Row 2 saved', 'Row 3 saved'])
-      expect(status.getAttribute('aria-atomic')).not.toEqual('true')
+      expect(status.getAttribute('aria-atomic')).toEqual('false')
     })
 
     it('should replace the announcement of an updated toast and drop it on removal', async () => {
