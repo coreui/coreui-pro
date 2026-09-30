@@ -1403,7 +1403,7 @@ describe('Autocomplete', () => {
       expect(autocomplete._isShown()).toBeFalse()
     })
 
-    it('should submit its form on Enter, with the hint shown and no submit button', async () => {
+    it('should submit its form on Enter, with hints on and no submit button', async () => {
       fixtureEl.innerHTML = '<form><div class="autocomplete"></div></form>'
       const form = fixtureEl.querySelector('form')
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
@@ -1427,30 +1427,54 @@ describe('Autocomplete', () => {
       expect(submitted).toBe(1)
     })
 
-    it('should clear text outside the options before Enter submits the form', async () => {
+    it('should keep text outside the options and not submit the form on Enter', async () => {
       fixtureEl.innerHTML = '<form><div class="autocomplete"></div></form>'
       const form = fixtureEl.querySelector('form')
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
       const autocomplete = new Autocomplete(autocompleteEl, {
         allowOnlyDefinedOptions: true,
         name: 'framework',
-        options: [{ label: 'Vue.js', value: 'vue' }]
+        options: [{ label: 'Angular', value: 'ng', disabled: true }, { label: 'Vue.js', value: 'vue' }]
       })
-      const submitted = []
+      let submitted = 0
       const changes = []
 
       form.addEventListener('submit', event => {
         event.preventDefault()
-        submitted.push(new FormData(form).get('framework'))
+        submitted++
       })
       autocompleteEl.addEventListener('change.coreui.autocomplete', event => changes.push(event.value))
       autocomplete._inputElement.focus()
       await userEvent.keyboard('xyz')
       autocomplete.hide()
       await userEvent.keyboard('{Enter}')
+      await userEvent.clear(autocomplete._inputElement)
+      await userEvent.keyboard('Angular')
+      autocomplete.hide()
+      await userEvent.keyboard('{Enter}')
 
-      expect(autocomplete._inputElement.value).toBe('')
-      expect(submitted).toEqual([''])
+      expect(autocomplete._inputElement.value).toBe('Angular')
+      expect(submitted).toBe(0)
+      expect(changes).toEqual([])
+    })
+
+    it('should leave Enter that confirms a composition to the input method', () => {
+      fixtureEl.innerHTML = '<form><div class="autocomplete"></div></form>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        options: [{ label: 'Option 1', value: '1' }]
+      })
+      const changes = []
+      const event = new KeyboardEvent('keydown', {
+        key: 'Enter', isComposing: true, bubbles: true, cancelable: true
+      })
+
+      autocompleteEl.addEventListener('change.coreui.autocomplete', event => changes.push(event.value))
+      autocomplete._inputElement.value = 'とう'
+      autocomplete._inputElement.dispatchEvent(event)
+
+      expect(event.defaultPrevented).toBeFalse()
+      expect(autocomplete._inputElement.value).toBe('とう')
       expect(changes).toEqual([])
     })
 
@@ -2608,6 +2632,110 @@ describe('Autocomplete', () => {
       expect(autocomplete._selected).toEqual([])
       expect(autocomplete._inputElement.value).toBe('')
       expect(autocomplete._cleanerElement.style.display).toBe('none')
+    })
+
+    it('should not report a reset that leaves the selection as it was', async () => {
+      fixtureEl.innerHTML = '<form><div class="autocomplete"></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      new Autocomplete(autocompleteEl, { // eslint-disable-line no-new
+        options: [{ label: 'Option 1', value: '1' }],
+        value: '1'
+      })
+      const changes = []
+
+      autocompleteEl.addEventListener('change.coreui.autocomplete', event => changes.push(event.value))
+      form.reset()
+      await settle()
+
+      expect(changes).toEqual([])
+    })
+
+    it('should go back to the option marked selected', async () => {
+      fixtureEl.innerHTML = '<form><div class="autocomplete"></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        options: [{ label: 'Option 1', value: '1' }, { label: 'Option 2', value: '2', selected: true }]
+      })
+      const changes = []
+
+      autocomplete._onOptionSelected('1')
+      autocompleteEl.addEventListener('change.coreui.autocomplete', event => changes.push(event.value?.value ?? null))
+      form.reset()
+      await settle()
+
+      expect(autocomplete._inputElement.value).toBe('Option 2')
+      expect(changes).toEqual(['2'])
+    })
+
+    it('should go back to the value it was created with', async () => {
+      fixtureEl.innerHTML = '<form><div class="autocomplete"></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        options: [{ label: 'A', value: 'a' }, { label: 'B', value: 'b' }, { label: 'C', value: 'c' }],
+        value: 'a'
+      })
+
+      autocomplete.setConfig({ value: 'b' })
+      autocomplete._onOptionSelected('c')
+      form.reset()
+      await settle()
+
+      expect(autocomplete._selected.map(option => option.value)).toEqual(['a'])
+    })
+
+    it('should report the restored option over typed text equal to its value', async () => {
+      fixtureEl.innerHTML = '<form><div class="autocomplete"></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        options: [{ label: 'Poland', value: 'PL' }],
+        value: 'PL'
+      })
+      const changes = []
+
+      autocomplete._inputElement.focus()
+      await userEvent.clear(autocomplete._inputElement)
+      await userEvent.keyboard('PL')
+      autocompleteEl.addEventListener('change.coreui.autocomplete', event => changes.push(event.value?.value ?? null))
+      form.reset()
+      await settle()
+
+      expect(changes).toEqual(['PL'])
+    })
+
+    it('should report the initial value once external results bring it back', async () => {
+      fixtureEl.innerHTML = '<form><div class="autocomplete"></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const react = { label: 'React.js', value: 'react' }
+      const vue = { label: 'Vue.js', value: 'vue' }
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        options: [react, vue],
+        search: 'external',
+        value: 'react'
+      })
+      const changes = []
+
+      autocompleteEl.addEventListener('input.coreui.autocomplete', event => {
+        setTimeout(() => autocomplete.setConfig({ options: event.value ? [vue] : [react, vue] }), 10)
+      })
+      autocomplete._inputElement.focus()
+      await userEvent.clear(autocomplete._inputElement)
+      await userEvent.keyboard('vu')
+      await new Promise(resolve => {
+        setTimeout(resolve, 20)
+      })
+      autocompleteEl.addEventListener('change.coreui.autocomplete', event => changes.push(event.value?.value ?? null))
+      form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve, 40)
+      })
+
+      expect(autocomplete._selected.map(option => option.value)).toEqual(['react'])
+      expect(changes.at(-1)).toBe('react')
     })
 
     it('should report the clear of a typed value and restart the search', async () => {

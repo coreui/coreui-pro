@@ -134,6 +134,8 @@ class Autocomplete extends ComboboxBase {
   protected declare _addedClassNames: string[]
   protected declare _previousTabIndex: string | null
   protected declare _form: HTMLFormElement | null
+  protected declare _initialValue: any
+  protected declare _reportSeed: boolean
   protected declare _resetHandler: (event: Event) => void
   protected declare _seenOptionValues: Set<string>
   protected declare _valueApplied: boolean
@@ -158,6 +160,8 @@ class Autocomplete extends ComboboxBase {
     this._search = ''
     this._seenOptionValues = new Set()
     this._valueApplied = false
+    this._initialValue = this._config.value
+    this._reportSeed = false
     this._form = this._element.closest('form')
     this._resetHandler = (event: Event) => {
       const text = this._inputElement.value
@@ -485,9 +489,11 @@ class Autocomplete extends ComboboxBase {
   }
 
   _handleEnterKey(event: KeyboardEvent): void {
-    const shown = this._isShown()
+    if (event.isComposing || event.keyCode === 229) {
+      return
+    }
 
-    if (shown) {
+    if (this._isShown()) {
       event.preventDefault()
       event.stopPropagation()
     }
@@ -496,7 +502,7 @@ class Autocomplete extends ComboboxBase {
       return
     }
 
-    const options = this._flattenOptions().filter(option => option.label.toLowerCase() === this._inputElement.value.toLowerCase())
+    const options = this._flattenOptions().filter(option => !option.disabled && option.label.toLowerCase() === this._inputElement.value.toLowerCase())
 
     if (options.length > 0) {
       if (this._selected.some((option: any) => option.value === options[0].value)) {
@@ -509,11 +515,7 @@ class Autocomplete extends ComboboxBase {
     }
 
     if (this._config.allowOnlyDefinedOptions) {
-      if (!shown) {
-        this.search('')
-        this._inputElement.value = this._selected[0]?.label ?? ''
-      }
-
+      event.preventDefault()
       return
     }
 
@@ -772,8 +774,9 @@ class Autocomplete extends ComboboxBase {
   }
 
   _restoreInitialSelection(text: string): void {
-    const previous = this._selected[0]?.value ?? (text || null)
+    const previous = this._selected[0]?.value
 
+    this._reportSeed = false
     this.deselectAll()
     this._inputElement.value = ''
 
@@ -785,15 +788,18 @@ class Autocomplete extends ComboboxBase {
       this.search('')
     }
 
+    this._config.value = this._initialValue
     this._valueApplied = false
     this._seenOptionValues.clear()
     this._seedSelection()
 
-    const current = this._selected[0] ?? null
+    const current = this._selected[0]
 
-    if ((current?.value ?? null) !== previous) {
-      this._triggerChangeEvent(current)
+    if (current ? current.value !== previous : previous !== undefined || text !== '') {
+      this._triggerChangeEvent(current ?? null)
     }
+
+    this._reportSeed = !current
   }
 
   _seedSelection(): void {
@@ -816,6 +822,11 @@ class Autocomplete extends ComboboxBase {
 
     if (seed && !this._selected.some((option: any) => option.value === seed.value)) {
       this._applySelection(seed)
+
+      if (this._reportSeed && this._selected.includes(seed)) {
+        this._reportSeed = false
+        this._triggerChangeEvent(seed)
+      }
     }
   }
 
