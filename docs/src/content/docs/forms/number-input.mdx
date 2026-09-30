@@ -67,12 +67,15 @@ and a validator that toggles the class keeps working.
 <Example pro code={`<input type="number" class="form-control form-control-sm mb-3" value="3" aria-label="Quantity" data-coreui-number-input>
   <input type="number" class="form-control form-control-lg" value="3" aria-label="Quantity" data-coreui-number-input>`} />
 
-## Disabled
+## Disabled and read-only
 
 <Example pro code={`<input type="number" class="form-control" value="3" aria-label="Quantity" disabled data-coreui-number-input>`} />
 
+<Example pro code={`<input type="number" class="form-control" value="3" aria-label="Quantity" readonly data-coreui-number-input>`} />
+
 Both buttons are disabled while the field is `disabled` or `readonly`, and they
-follow either attribute when a script changes it later.
+follow either attribute, and `min`, `max` and `step`, when a script changes it
+later.
 
 ## Inside your own group
 
@@ -100,9 +103,9 @@ The number input supports [floating labels](/forms/floating-labels/). Wrap the c
 The buttons carry labels (`Increase` / `Decrease` by default, both
 configurable) but are **kept out of the tab order**: a number field already
 steps with <kbd>↑</kbd> and <kbd>↓</kbd>, so putting them in would add two tab
-stops per field for something the keyboard already reaches. Pressing a button
-leaves the focus where it was, so typing and the arrow keys carry on in the
-field. Give the input an `aria-label` or a `<label>` as you would any other
+stops per field for something the keyboard already reaches. A mouse press on a
+button, enabled or not, puts the focus in the field rather than on the button,
+so typing and the arrow keys act on the field you just stepped. Give the input an `aria-label` or a `<label>` as you would any other
 field.
 
 ## Usage

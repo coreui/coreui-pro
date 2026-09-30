@@ -24,6 +24,10 @@ describe('NumberInput', () => {
 
   const buttons = () => fixtureEl.querySelectorAll('.form-control-action')
 
+  const settle = () => new Promise(resolve => {
+    setTimeout(resolve)
+  })
+
   describe('VERSION', () => {
     it('should return plugin version', () => {
       expect(NumberInput.VERSION).toEqual(expect.any(String))
@@ -46,22 +50,6 @@ describe('NumberInput', () => {
       for (const button of buttons()) {
         expect(button.tabIndex).toBe(-1)
       }
-    })
-
-    it('should keep a pressed button from taking the focus', async () => {
-      const host = document.createElement('div')
-      host.innerHTML = '<input type="number" class="form-control" value="1">'
-      document.body.append(host)
-      const input = host.querySelector('input')
-      const numberInput = new NumberInput(input)
-
-      input.focus()
-      await userEvent.click(host.querySelectorAll('.form-control-action')[1])
-
-      expect(document.activeElement).toBe(input)
-      expect(input.value).toBe('2')
-      numberInput.dispose()
-      host.remove()
     })
   })
 
@@ -162,6 +150,16 @@ describe('NumberInput', () => {
       expect(input.value).toBe('1')
     })
 
+    it('should not step an input disabled by its fieldset', () => {
+      fixtureEl.innerHTML = '<fieldset disabled><input type="number" class="form-control" value="1"></fieldset>'
+      const input = fixtureEl.querySelector('input')
+      const numberInput = new NumberInput(input)
+
+      numberInput.increment()
+
+      expect(input.value).toBe('1')
+    })
+
     it('should step by one when step is any', () => {
       const input = markup('value="1.5" step="any" max="2"')
       const numberInput = new NumberInput(input)
@@ -245,13 +243,10 @@ describe('NumberInput', () => {
       expect(buttons()[1].disabled).toBe(false)
     })
 
-    it('should disable both buttons while the input is disabled or readonly, and follow later changes', async () => {
+    it('should disable both buttons while the field is disabled or read-only, and follow later changes', async () => {
       const input = markup('value="5" readonly')
       const numberInput = new NumberInput(input) // eslint-disable-line no-unused-vars
       const states = () => [...buttons()].map(button => button.disabled)
-      const settle = () => new Promise(resolve => {
-        setTimeout(resolve)
-      })
 
       expect(states()).toEqual([true, true])
 
@@ -262,6 +257,16 @@ describe('NumberInput', () => {
       input.disabled = true
       await settle()
       expect(states()).toEqual([true, true])
+    })
+
+    it('should follow min, max and step changed by a script', async () => {
+      const input = markup('value="5" max="10"')
+      const numberInput = new NumberInput(input) // eslint-disable-line no-unused-vars
+
+      input.max = '5'
+      await settle()
+
+      expect(buttons()[1].disabled).toBe(true)
     })
 
     it('should follow a form reset', () => {
@@ -346,6 +351,18 @@ describe('NumberInput', () => {
       expect(input.value).toBe('0')
     })
 
+    it('should stop repeating when the field turns read-only during a hold', () => {
+      const input = markup('value="0"')
+      const numberInput = new NumberInput(input) // eslint-disable-line no-unused-vars
+
+      press(buttons()[1])
+      vi.advanceTimersByTime(400 + 60)
+      input.readOnly = true
+      vi.advanceTimersByTime(60 * 3)
+
+      expect(input.value).toBe('1')
+    })
+
     it('should step on a short click and on a click no pointer made, even after a hold', () => {
       const input = markup('value="0"')
       const numberInput = new NumberInput(input) // eslint-disable-line no-unused-vars
@@ -362,6 +379,50 @@ describe('NumberInput', () => {
       buttons()[1].click()
 
       expect(input.value).toBe('3')
+    })
+  })
+
+  describe('focus', () => {
+    let host
+
+    const visible = attributes => {
+      host = document.createElement('div')
+      host.innerHTML = `<style>.form-control-action:disabled { pointer-events: none; }</style>
+        <input type="text" aria-label="Other">
+        <input type="number" class="form-control" ${attributes}>`
+      document.body.append(host)
+      return host.querySelector('input[type="number"]')
+    }
+
+    afterEach(() => {
+      NumberInput.getInstance(host.querySelector('input[type="number"]'))?.dispose()
+      host.remove()
+    })
+
+    it('should keep the focus in the field when a button is pressed with the mouse, enabled or not', async () => {
+      const input = visible('value="1" max="2"')
+      const numberInput = new NumberInput(input) // eslint-disable-line no-unused-vars
+      const increment = host.querySelectorAll('.form-control-action')[1]
+
+      input.focus()
+      await userEvent.click(increment)
+
+      expect(input.value).toBe('2')
+      expect(document.activeElement).toBe(input)
+
+      await userEvent.click(increment, { force: true })
+
+      expect(document.activeElement).toBe(input)
+    })
+
+    it('should move the focus to the field when a button is pressed with the mouse', async () => {
+      const input = visible('value="1"')
+      const numberInput = new NumberInput(input) // eslint-disable-line no-unused-vars
+
+      host.querySelector('input[type="text"]').focus()
+      await userEvent.click(host.querySelectorAll('.form-control-action')[1])
+
+      expect(document.activeElement).toBe(input)
     })
   })
 
@@ -481,14 +542,20 @@ describe('NumberInput', () => {
   })
 
   describe('dispose', () => {
-    it('should stop watching the input', () => {
-      const disconnect = vi.spyOn(MutationObserver.prototype, 'disconnect')
-      const numberInput = new NumberInput(markup('value="1"'))
+    it('should stop watching the input', async () => {
+      const input = markup('value="1"')
+      const numberInput = new NumberInput(input)
+      const update = vi.spyOn(NumberInput.prototype, '_updateButtonState')
 
-      numberInput.dispose()
+      try {
+        numberInput.dispose()
+        input.disabled = true
+        await settle()
 
-      expect(disconnect).toHaveBeenCalled()
-      disconnect.mockRestore()
+        expect(update).not.toHaveBeenCalled()
+      } finally {
+        update.mockRestore()
+      }
     })
 
     it('should take its buttons and class with it', () => {

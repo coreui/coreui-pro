@@ -140,6 +140,7 @@ class NumberInput extends BaseComponent {
     }
 
     if (this._group) {
+      EventHandler.off(this._group.element, EVENT_POINTERDOWN)
       this._group.element.classList.remove(CLASS_NAME_NUMBER_INPUT)
       releaseControlGroup(this._element, this._group)
     }
@@ -241,13 +242,19 @@ class NumberInput extends BaseComponent {
         }
       })
 
-      EventHandler.on(button, EVENT_POINTERDOWN, (event: any) => {
-        event.preventDefault()
+      if (this._config.repeat) {
+        EventHandler.on(button, EVENT_POINTERDOWN, (event: any) => {
+          if (event.button !== 0) {
+            return
+          }
 
-        if (this._config.repeat && event.button === 0) {
           this._startRepeating(direction)
-        }
-      })
+        })
+      }
+    }
+
+    if (this._group) {
+      EventHandler.on(this._group.element, EVENT_POINTERDOWN, (event: any) => this._handleFramePointerDown(event))
     }
 
     // The value can change without the buttons — typing, a form reset — and the
@@ -259,10 +266,25 @@ class NumberInput extends BaseComponent {
     }
 
     this._observer = new MutationObserver(() => this._updateButtonState())
-    this._observer.observe(this._element, { attributeFilter: ['disabled', 'readonly'] })
+    this._observer.observe(this._element, { attributeFilter: ['disabled', 'max', 'min', 'readonly', 'step'] })
 
     for (const event of EVENTS_STOP_REPEAT) {
       EventHandler.on(document, event, this._stopRepeatingHandler)
+    }
+  }
+
+  _handleFramePointerDown(event: PointerEvent): void {
+    const target = event.target as Element
+
+    // A disabled button lets the press through to the frame.
+    if (event.pointerType !== 'mouse' || (target !== this._group?.element && ![this._decrementElement, this._incrementElement].includes(target.closest('button')))) {
+      return
+    }
+
+    event.preventDefault()
+
+    if (document.activeElement !== this._element) {
+      this._element.focus({ preventScroll: true })
     }
   }
 
@@ -307,7 +329,7 @@ class NumberInput extends BaseComponent {
   }
 
   _canStep(direction: 'up' | 'down'): boolean {
-    if (this._element.disabled || this._element.readOnly) {
+    if (this._element.matches(':disabled') || this._element.readOnly) {
       return false
     }
 
