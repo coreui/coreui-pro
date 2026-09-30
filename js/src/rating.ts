@@ -116,6 +116,7 @@ const DefaultType = {
 class Rating extends BaseComponent {
   protected declare _currentValue: number | string | null
   protected declare _form: HTMLFormElement | null
+  protected declare _hostAriaReadonly: string | null
   protected declare _hostClasses: HostClasses
   protected declare _hostRole: string | null
   protected declare _items: HTMLElement[]
@@ -134,6 +135,7 @@ class Rating extends BaseComponent {
       CLASS_NAME_READONLY,
       ...[...this._element.classList].filter(className => className.startsWith(`${CLASS_NAME_RATING}-`))
     ])
+    this._hostAriaReadonly = this._element.getAttribute('aria-readonly')
     this._hostRole = this._element.getAttribute('role')
     this._items = []
     this._form = this._element.closest('form')
@@ -219,6 +221,12 @@ class Rating extends BaseComponent {
       this._element.removeAttribute('role')
     }
 
+    if (this._hostAriaReadonly === null) {
+      this._element.removeAttribute('aria-readonly')
+    } else {
+      this._element.setAttribute('aria-readonly', this._hostAriaReadonly)
+    }
+
     super.dispose()
   }
 
@@ -253,8 +261,15 @@ class Rating extends BaseComponent {
       EventHandler.on(this._form, EVENT_RESET, this._resetHandler)
     }
 
-    EventHandler.on(this._element, EVENT_CLICK, SELECTOR_RATING_ITEM_INPUT, ({ target }: any) => {
-      if (this._config.disabled || this._config.readonly) {
+    EventHandler.on(this._element, EVENT_CLICK, SELECTOR_RATING_ITEM_INPUT, (event: any) => {
+      const { target } = event
+
+      if (this._config.readonly) {
+        event.preventDefault()
+        return
+      }
+
+      if (this._config.disabled) {
         return
       }
 
@@ -448,6 +463,12 @@ class Rating extends BaseComponent {
       this._element.setAttribute('role', 'radiogroup')
     }
 
+    if (this._config.readonly) {
+      this._element.setAttribute('aria-readonly', 'true')
+    } else {
+      this._element.removeAttribute('aria-readonly')
+    }
+
     this._items = Array.from({ length: this._config.itemCount }, (_, index) => this._createRatingItem(index))
 
     for (const item of this._items) {
@@ -527,7 +548,7 @@ class Rating extends BaseComponent {
         ratingItemInputElement.setAttribute('aria-label', this._config.ariaLabel(value, this._config.itemCount))
       }
 
-      if (this._config.disabled || this._config.readonly) {
+      if (this._config.disabled) {
         ratingItemInputElement.setAttribute('disabled', true as any)
       }
 

@@ -49,7 +49,7 @@ Our Bootstrap Rating component allows users to assign and reset a star rating wi
 
 ## Readonly
 
-Set the Rating component to read-only by adding `data-coreui-readonly="true"`. This disables interaction, preventing users from changing the displayed rating value.
+Set the Rating component to read-only by adding `data-coreui-readonly="true"`. The value cannot be changed by clicking or with the arrow keys, but the stars stay focusable, the group carries `aria-readonly="true"`, and the value is submitted with the form, like a native read-only field.
 
 <Example pro code={`<div data-coreui-readonly="true" data-coreui-rating data-coreui-value="3"></div>`} />
 
@@ -180,7 +180,7 @@ Note that for security reasons the `sanitize`, `sanitizeFn`, and `allowList` opt
 | `itemCount` | number | `5` | The maximum value the user can select. |
 | `name` | string, null | `null` | Name shared by the radio inputs. Radios need one name to work as a single group, so the component generates one when you leave it out — the value then reaches the form under a key like `rating-name-439199`, which is different on every page load. Name it to decide that key yourself, and give each rating on the page its own name: two ratings sharing one become a single group, so picking a star in one clears the other and the form carries a single value. A rating with nothing selected submits nothing either way. |
 | `precision` | number | `1` | Minimum increment value change allowed. |
-| `readonly` | boolean | `false` | Toggle the readonly state for the component. |
+| `readonly` | boolean | `false` | Makes the rating read-only: the value cannot be changed but stays focusable and is submitted with the form. |
 | `sanitize` | boolean | `true` |  Enable or disable the sanitization. If activated `activeIcon`, and `icon` options will be sanitized. |
 | `sanitizeFn` | null, function | `null` |  Here you can supply your own sanitize function. This can be useful if you prefer to use a dedicated library to perform sanitization. |
 | `size` | `'sm'`, `'lg'` | `null` | Size the component small or large. |
