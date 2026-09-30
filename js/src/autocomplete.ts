@@ -40,7 +40,6 @@ const EVENT_CHANGE = `change${EVENT_KEY}`
 const EVENT_CLICK = `click${EVENT_KEY}`
 const EVENT_INPUT = `input${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
-const EVENT_KEYUP = `keyup${EVENT_KEY}`
 const EVENT_MOUSEDOWN = `mousedown${EVENT_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_KEYUP_DATA_API = `keyup${EVENT_KEY}${DATA_API_KEY}`
@@ -132,6 +131,8 @@ class Autocomplete extends ComboboxBase {
   protected declare _inputHintElement: any
   protected declare _addedClassNames: string[]
   protected declare _previousTabIndex: string | null
+  protected declare _seenOptionValues: Set<string>
+  protected declare _valueApplied: boolean
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
@@ -151,6 +152,8 @@ class Autocomplete extends ComboboxBase {
     this._floatingCleanup = null
     this._anchoredPosition = null
     this._search = ''
+    this._seenOptionValues = new Set()
+    this._valueApplied = false
 
     this._createAutocomplete()
     this._addEventListeners()
@@ -247,14 +250,22 @@ class Autocomplete extends ComboboxBase {
   }
 
   setConfig(config: any): void {
-    if (config?.value) {
-      this.deselectAll()
-    }
-
     this._config = this._getConfig({ ...this._config, ...config })
     this._options = this._getOptionsFromConfig()
     this._setListBoxItems()
     this._syncInputName()
+
+    for (const option of this._selected) {
+      this._syncOptionElementState(option.value, true)
+    }
+
+    if (config?.value !== undefined) {
+      this._valueApplied = false
+      this.deselectAll()
+      this._inputElement.value = ''
+    }
+
+    this._seedSelection()
   }
 
   deselectAll(options: any[] = this._selected): void {
@@ -335,6 +346,11 @@ class Autocomplete extends ComboboxBase {
 
       if (this._isGlobalSearch() && (event.key.length === 1 || event.key === BACKSPACE_KEY || event.key === DELETE_KEY)) {
         this._inputElement.focus()
+      }
+
+      if (event.target === this._inputElement && (event.key === BACKSPACE_KEY || event.key === DELETE_KEY) && this._selected.length > 0) {
+        this.deselectAll()
+        this._triggerChangeEvent(null)
       }
     })
 
@@ -426,21 +442,24 @@ class Autocomplete extends ComboboxBase {
       }
     })
 
-    EventHandler.on(this._inputElement, EVENT_KEYUP, (event: any) => {
-      if (event.key.length === 1 || event.key === BACKSPACE_KEY || event.key === DELETE_KEY) {
-        const { value } = event.target
-        this.search(value)
-        if (this._config.showHints) {
-          const options = value ?
-            this._flattenOptions().filter(option => option.label.toLowerCase().startsWith(value.toLowerCase())) :
-            []
-          this._inputHintElement.value = options.length > 0 ? `${value}${options[0].label.slice(value.length)}` : ''
-        }
+    EventHandler.on(this._inputElement, EVENT_INPUT, () => {
+      const { value } = this._inputElement
 
-        if (this._selected.length > 0) {
-          this.deselectAll()
-          this._triggerChangeEvent(null)
-        }
+      if (this._selected.length > 0) {
+        this.deselectAll()
+        this._triggerChangeEvent(null)
+      }
+
+      this.search(value)
+      if (this._config.showHints) {
+        const options = value ?
+          this._flattenOptions().filter(option => option.label.toLowerCase().startsWith(value.toLowerCase())) :
+          []
+        this._inputHintElement.value = options.length > 0 ? `${value}${options[0].label.slice(value.length)}` : ''
+      }
+
+      if (value && !this._isShown()) {
+        this.show()
       }
     })
 
@@ -516,13 +535,6 @@ class Autocomplete extends ComboboxBase {
         ...isSelected && { selected: true },
         ...option.disabled && { disabled: true }
       })
-
-      if (isSelected) {
-        this._selected.push({
-          label: option.label,
-          value: String(value)
-        })
-      }
     }
 
     return _options
@@ -549,7 +561,7 @@ class Autocomplete extends ComboboxBase {
     this._createInputGroup()
     this._createButtons()
     this._createOptionsContainer()
-    this._updateOptionsList()
+    this._seedSelection()
   }
 
   _createInputGroup(): void {
@@ -669,17 +681,8 @@ class Autocomplete extends ComboboxBase {
   }
 
   _selectOption(option: any): void {
-    this.deselectAll()
-
-    if (this._selected.filter((selectedOption: any) => selectedOption.value === option.value).length === 0) {
-      this._selected.push(option)
-    }
-
-    this._syncOptionElementState(option.value, true)
-
+    this._applySelection(option)
     this._triggerChangeEvent(option)
-
-    this._inputElement.value = option.label
 
     if (this._config.showHints) {
       this._inputHintElement.value = ''
@@ -690,7 +693,17 @@ class Autocomplete extends ComboboxBase {
     if (this._config.clearSearchOnSelect) {
       this.search('')
     }
+  }
 
+  _applySelection(option: any): void {
+    if (option.disabled) {
+      return
+    }
+
+    this.deselectAll()
+    this._selected.push(option)
+    this._syncOptionElementState(option.value, true)
+    this._inputElement.value = option.label
     this._updateCleaner()
   }
 
@@ -713,16 +726,26 @@ class Autocomplete extends ComboboxBase {
     this._cleanerElement.style.display = 'none'
   }
 
-  _updateOptionsList(options: any[] = this._options): void {
-    for (const option of options) {
-      if (Array.isArray(option.options)) {
-        this._updateOptionsList(option.options)
-        continue
-      }
+  _seedSelection(): void {
+    const options = this._flattenOptions()
+    const { value } = this._config
+    let seed
 
-      if (option.selected) {
-        this._selectOption(option)
+    if (value !== null && value !== undefined && value !== '') {
+      if (!this._valueApplied) {
+        seed = options.find(option => option.value === String(value))
+        this._valueApplied = Boolean(seed)
       }
+    } else {
+      seed = options.find(option => option.selected && !this._seenOptionValues.has(option.value))
+    }
+
+    for (const option of options) {
+      this._seenOptionValues.add(option.value)
+    }
+
+    if (seed && !this._selected.some((option: any) => option.value === seed.value)) {
+      this._applySelection(seed)
     }
   }
 
@@ -794,12 +817,6 @@ class Autocomplete extends ComboboxBase {
       // is very much inside
       if (composedPath.includes(context._element) || composedPath.includes(context._menu)) {
         continue
-      }
-
-      const relatedTarget: any = { relatedTarget: context._element }
-
-      if (event.type === 'click') {
-        relatedTarget.clickEvent = event
       }
 
       context.hide()

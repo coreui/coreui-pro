@@ -312,7 +312,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `id` | string, null | `null` | Sets a custom ID for the component. If not provided, a unique ID is auto-generated. |
 | `invalid` | boolean | `false` | Applies invalid styling to the component. |
 | `name` | string, null | `null` | Name of the text input the form posts. That input holds what the user sees — the selected option's label, or their own text when `allowOnlyDefinedOptions` is off — so `{ value: 'ng', label: 'Angular' }` posts `Angular`, not `ng`. Without a name the autocomplete is not submitted with the form. |
-| `options` | array, string, null | `[]` | Array of options or option objects to populate the dropdown. |
+| `options` | array, string, null | `[]` | Array of options or option objects to populate the dropdown. An option marked `selected: true` is applied the first time it appears, and new options never replace a selection the user made. |
 | `optionsGroupsTemplate` | function, null | `null` | Custom template function for rendering option group labels. Receives the group object as parameter. |
 | `optionsMaxHeight` | number, string | `'auto'` | Sets the maximum height of the options dropdown. |
 | `optionsTemplate` | function, null | `null` | Custom template function for rendering individual options. Receives the option object as parameter. |
@@ -325,7 +325,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `searchNoResultsLabel` | boolean, string | `false` | Text displayed when no search results are found. |
 | `showHints` | boolean | `false` | Shows completion hints as users type. |
 | `valid` | boolean | `false` | Applies valid styling to the component. |
-| `value` | number, string, null | `null` | Sets the initial value of the component. |
+| `value` | number, string, null | `null` | Sets the initial value of the component. It is applied once, as soon as the options contain it; pass it to `setConfig()` to select another option, or `null` to clear the field. |
 
 ### Methods
 
@@ -346,7 +346,7 @@ The Autocomplete component exposes several events for integrating with applicati
 
 | Event | Description |
 | --- | --- |
-| `change.coreui.autocomplete` | Fires when an option is selected or the input value changes. |
+| `change.coreui.autocomplete` | Fires when the user selects an option, types over a selection or clears it. The initial `value`, a preselected option and a `setConfig()` call do not fire it. |
 | `hidden.coreui.autocomplete` | Fired when the dropdown has been hidden and CSS transitions completed. |
 | `hide.coreui.autocomplete` | Event fires immediately when the hide method is called. Call `event.preventDefault()` to keep the menu open. |
 | `input.coreui.autocomplete` | Fires when the search input value changes. |
