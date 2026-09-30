@@ -37,6 +37,7 @@ import {
   getStartOfView,
   getStartOfWeek,
   getYears,
+  isCellDisabled,
   isDateDisabled,
   isDateInRange,
   isDateSelected,
@@ -388,7 +389,7 @@ class Calendar extends BaseComponent {
       return
     }
 
-    if (isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates)) {
+    if (isCellDisabled(date, this._view, this._minDate, this._maxDate, this._config.disabledDates)) {
       return
     }
 
@@ -490,7 +491,7 @@ class Calendar extends BaseComponent {
 
     const date = this._getDate(target)
 
-    if (isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates)) {
+    if (isCellDisabled(date, this._view, this._minDate, this._maxDate, this._config.disabledDates)) {
       return
     }
 
@@ -637,7 +638,7 @@ class Calendar extends BaseComponent {
   }
 
   _selectDate(date: any): void {
-    if (isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates)) {
+    if (isCellDisabled(date, this._view, this._minDate, this._maxDate, this._config.disabledDates)) {
       return
     }
 
@@ -651,7 +652,7 @@ class Calendar extends BaseComponent {
 
         this._setSelectEndDate(false)
 
-        if (isDisableDateInRange(this._startDate, date, this._config.disabledDates)) {
+        if (isDisableDateInRange(this._startDate, date, this._config.disabledDates, this._view)) {
           this._setStartDate(null)
           this._setEndDate(null)
           return
@@ -668,7 +669,7 @@ class Calendar extends BaseComponent {
         return
       }
 
-      if (isDisableDateInRange(date, this._endDate, this._config.disabledDates)) {
+      if (isDisableDateInRange(date, this._endDate, this._config.disabledDates, this._view)) {
         this._setStartDate(null)
         this._setEndDate(null)
         return

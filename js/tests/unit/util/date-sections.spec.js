@@ -17,6 +17,7 @@ import {
   getHourCycle,
   getIncrementedSectionValue,
   getISOWeeksInYear,
+  getLayoutPeriod,
   getPickerFormat,
   getSectionBounds,
   getSectionLayout,
@@ -890,6 +891,17 @@ describe('Date Sections Utilities', () => {
     })
   })
 
+  describe('getLayoutPeriod', () => {
+    it('should name the period of a field without a day or a week', () => {
+      expect(getLayoutPeriod(getSectionsFromFormat('MM/yyyy', 'en-US'))).toBe('months')
+      expect(getLayoutPeriod(getSectionsFromFormat('QQQ yyyy', 'en-US'))).toBe('quarters')
+      expect(getLayoutPeriod(getSectionsFromFormat('yyyy', 'en-US'))).toBe('years')
+      expect(getLayoutPeriod(getSectionsFromFormat('dd.MM.yyyy', 'en-US'))).toBeNull()
+      expect(getLayoutPeriod(getSectionsFromFormat('ww, yyyy', 'en-US'))).toBeNull()
+      expect(getLayoutPeriod(getSectionsFromFormat('HH:mm', 'en-US'))).toBeNull()
+    })
+  })
+
   describe('isDateSelectableWithin', () => {
     const layout = getSectionsFromFormat('dd.MM.yyyy', 'en-US')
 
@@ -910,6 +922,17 @@ describe('Date Sections Utilities', () => {
 
     it('should reject a date the layout cannot hold', () => {
       expect(isDateSelectableWithin(layout, new Date(Number.NaN), null, null)).toBe(false)
+    })
+
+    it('should check a month field against the bounds and the disabled dates as a whole month', () => {
+      const months = getSectionsFromFormat('MM/yyyy', 'en-US')
+      const weekend = date => date.getDay() === 0 || date.getDay() === 6
+
+      expect(isDateSelectableWithin(months, new Date(2026, 9, 20), new Date(2026, 9, 15), null)).toBe(true)
+      expect(isDateSelectableWithin(months, new Date(2026, 8, 20), new Date(2026, 9, 15), null)).toBe(false)
+      expect(isDateSelectableWithin(months, new Date(2026, 10, 20), null, null, weekend)).toBe(true)
+      expect(isDateSelectableWithin(months, new Date(2026, 9, 20), new Date(2026, 9, 15), null, [[new Date(2026, 9, 15), new Date(2026, 9, 31)]])).toBe(false)
+      expect(isDateSelectableWithin(months, new Date(2026, 9, 20), null, null, () => true)).toBe(false)
     })
   })
 })

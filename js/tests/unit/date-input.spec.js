@@ -1421,6 +1421,22 @@ describe('DateInput', () => {
       expect(dateInput.isDateSelectable(new Date('invalid'))).toBeFalse()
     })
 
+    it('should check a month field against the bounds and the disabled dates as a whole month', () => {
+      const limited = createDateInput({ format: 'MM/yyyy', minDate: new Date(2026, 9, 15) })
+
+      expect(limited.isDateSelectable(new Date(2026, 9, 1))).toBeTrue()
+      expect(limited.isDateSelectable(new Date(2026, 8, 30))).toBeFalse()
+
+      const weekends = createDateInput({ disabledDates: date => date.getDay() === 0 || date.getDay() === 6, format: 'MM/yyyy' })
+
+      expect(weekends.isDateSelectable(new Date(2026, 10, 1))).toBeTrue()
+
+      const leftDisabled = createDateInput({ disabledDates: [[new Date(2026, 9, 15), new Date(2026, 9, 31)]], format: 'MM/yyyy', minDate: new Date(2026, 9, 15) })
+
+      expect(leftDisabled.isDateSelectable(new Date(2026, 9, 1))).toBeFalse()
+      expect(createDateInput({ disabledDates: () => true, format: 'MM/yyyy' }).isDateSelectable(new Date(2026, 9, 1))).toBeFalse()
+    })
+
     it('should normalize the checked date through the mask', () => {
       const dateInput = createDateInput({ maxDate: new Date(2026, 6, 14) })
 

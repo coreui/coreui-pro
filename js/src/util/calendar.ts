@@ -159,10 +159,9 @@ export const YEARS_PER_PAGE = 12
 const getPeriod = (date: Date, view: PeriodViewTypes) : number => Math.floor(((date.getFullYear() * 12) + date.getMonth()) / MONTHS_IN_PERIOD[view])
 
 /**
- * Tells whether every day it reaches is disabled, walking a day at a time
- * from the later of `start` and `min` to the earlier of `end` and `max`. The
- * walk keeps the time of day it starts at, so a `min` with a time can stop it
- * before the last day.
+ * Tells whether `disabledDates` disables every day it reaches, walking a day
+ * at a time from the day of the later of `start` and `min` to the day of the
+ * earlier of `end` and `max`, times of day aside.
  *
  * @param start - The first day to check
  * @param end - The last day to check
@@ -172,15 +171,15 @@ const getPeriod = (date: Date, view: PeriodViewTypes) : number => Math.floor(((d
  * @returns `true` when every day the walk reaches is disabled
  */
 const isEveryDayDisabled = (start: Date, end: Date, min: Date | null | undefined, max: Date | null | undefined, disabledDates: DisabledDate | DisabledDate[]) : boolean => {
-  const startTime = min ? Math.max(start.getTime(), min.getTime()) : start.getTime()
-  const endTime = max ? Math.min(end.getTime(), max.getTime()) : end.getTime()
+  const first = min && min > start ? createDate(min.getFullYear(), min.getMonth(), min.getDate()) : start
+  const last = max && max < end ? createDate(max.getFullYear(), max.getMonth(), max.getDate()) : end
 
   for (
-    const currentDate = new Date(startTime);
-    currentDate.getTime() <= endTime;
+    const currentDate = new Date(first);
+    currentDate.getTime() <= last.getTime();
     currentDate.setDate(currentDate.getDate() + 1)
   ) {
-    if (!isDateDisabled(currentDate, min, max, disabledDates)) {
+    if (!isDateDisabled(currentDate, null, null, disabledDates)) {
       return false
     }
   }
@@ -1236,9 +1235,8 @@ const getPanelMonth = ({ calendarDate, panel }: CalendarKeyContext) : [Date, Dat
  * @param context - The state of the calendar
  * @returns `true` for a date that cannot be picked
  */
-const isDisabledInView = (date: Date, { disabledDates, maxDate, minDate, view }: CalendarKeyContext) : boolean => view === 'days' ?
-  isDateDisabled(date, minDate, maxDate, disabledDates) :
-  isPeriodDisabled(date, view, minDate, maxDate, disabledDates)
+const isDisabledInView = (date: Date, { disabledDates, maxDate, minDate, view }: CalendarKeyContext) : boolean =>
+  isCellDisabled(date, view, minDate, maxDate, disabledDates)
 
 /**
  * Walks from a date toward the focused one, a cell or a week row at a time,
@@ -1728,18 +1726,20 @@ export const isDateSelected = (date: Date, start: Date | null, end: Date | null)
 }
 
 /**
- * Tells whether a disabled day comes after the start of a range. The check
- * walks a day at a time from `startDate` while it is still before `endDate`,
- * keeping the start's time of day, so an end later in the day than the start
- * also checks the day after the end. `min` and `max` are not taken into
- * account.
+ * Tells whether a disabled day comes after the start of a range, where in the
+ * months, quarters and years views a day counts only when its whole period is
+ * disabled. The check walks a day at a time from `startDate` while it is
+ * still before `endDate`, keeping the start's time of day, so an end later in
+ * the day than the start also checks the day after the end. `min` and `max`
+ * are not taken into account.
  *
  * @param startDate - The first day of the range
  * @param endDate - The last day of the range
  * @param disabledDates - The dates that cannot be picked
+ * @param view - The view the range is picked in
  * @returns `true` when the walk reaches a disabled day
  */
-export const isDisableDateInRange = (startDate?: Date | null, endDate?: Date | null, disabledDates?: DisabledDate | DisabledDate[]) : boolean => {
+export const isDisableDateInRange = (startDate?: Date | null, endDate?: Date | null, disabledDates?: DisabledDate | DisabledDate[], view: ViewTypes = 'days') : boolean => {
   if (startDate && endDate) {
     const date = new Date(startDate)
     let disabled = false
@@ -1747,7 +1747,7 @@ export const isDisableDateInRange = (startDate?: Date | null, endDate?: Date | n
     // eslint-disable-next-line no-unmodified-loop-condition
     while (date < endDate) {
       date.setDate(date.getDate() + 1)
-      if (isDateDisabled(date, null, null, disabledDates)) {
+      if (isCellDisabled(date, view, null, null, disabledDates)) {
         disabled = true
         break
       }
@@ -1788,6 +1788,20 @@ export const isPeriodDisabled = (date: Date, view: PeriodViewTypes, min?: Date |
 
   return isEveryDayDisabled(createDate(year, month, 1), createDate(year, month + months, 0), min, max, disabledDates)
 }
+
+/**
+ * Tells whether a cell of a calendar view cannot be picked: a day by its own
+ * date, a month, quarter or year by the whole period.
+ *
+ * @param date - The date of the cell
+ * @param view - The view the cell belongs to
+ * @param min - The earliest date allowed
+ * @param max - The latest date allowed
+ * @param disabledDates - The dates that cannot be picked
+ * @returns `true` for a cell that cannot be picked
+ */
+export const isCellDisabled = (date: Date, view: ViewTypes, min?: Date | null, max?: Date | null, disabledDates?: DisabledDate | DisabledDate[]) : boolean =>
+  view === 'days' ? isDateDisabled(date, min, max, disabledDates) : isPeriodDisabled(date, view, min, max, disabledDates)
 
 /**
  * Tells whether a month, quarter or year lies between the periods of two
