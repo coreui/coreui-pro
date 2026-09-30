@@ -27,6 +27,7 @@ const renders = {
   'chip-set': ['chip', 'helpers/visually-hidden'],
   combobox: ['popup', 'list-box', 'forms/form-control'],
   'forms/form-multi-select': ['combobox', 'chip', 'chip-set', 'forms/form-control-group'],
+  'forms/form-range': ['tooltip'],
   'list-box': ['forms/check', 'forms/form-control'],
   'loading-button': ['buttons', 'spinner'],
   'date-picker': ['forms/floating-labels', 'forms/form-control', 'forms/form-control-group', 'forms/form-date-time', 'popup'],
