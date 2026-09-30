@@ -1146,6 +1146,7 @@ describe('Calendar Utilities', () => {
       const max = new Date(2026, 6, 14)
 
       expect(constrainDate(new Date(2026, 6, 1), min, max)).toEqual(min)
+      expect(constrainDate(new Date(2026, 6, 1), min, max)).not.toBe(min)
       expect(constrainDate(new Date(2026, 6, 20), min, max)).toEqual(max)
       expect(constrainDate(new Date(2026, 6, 20), min, max)).not.toBe(max)
     })
