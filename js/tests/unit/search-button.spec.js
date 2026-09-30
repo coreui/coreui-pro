@@ -240,11 +240,33 @@ describe('SearchButton', () => {
       })
     })
 
+    it('should not create an instance from a shortcut pressed before the toggle is initialized', () => {
+      fixtureEl.innerHTML = '<button type="button" data-coreui-search-button>Search</button>'
+
+      const buttonEl = fixtureEl.querySelector('button')
+      const clickSpy = jasmine.createSpy('click')
+
+      buttonEl.addEventListener('click', clickSpy)
+
+      document.dispatchEvent(new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        key: '/',
+        metaKey: true
+      }))
+
+      expect(clickSpy).not.toHaveBeenCalled()
+      expect(SearchButton.getInstance(buttonEl)).toBeNull()
+      expect(buttonEl.querySelector('.search-button-keys')).toBeNull()
+    })
+
     it('should trigger trigger event on meta shortcut and prevent default behavior', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = '<button type="button" data-coreui-search-button>Search</button>'
 
         const buttonEl = fixtureEl.querySelector('button')
+        // eslint-disable-next-line no-new
+        new SearchButton(buttonEl)
         const keyboardEvent = new KeyboardEvent('keydown', {
           bubbles: true,
           cancelable: true,
@@ -267,6 +289,8 @@ describe('SearchButton', () => {
       fixtureEl.innerHTML = '<button type="button" data-coreui-search-button>Search</button>'
 
       const buttonEl = fixtureEl.querySelector('button')
+      // eslint-disable-next-line no-new
+      new SearchButton(buttonEl)
       const clickSpy = jasmine.createSpy('click')
 
       buttonEl.addEventListener('click', clickSpy)
@@ -397,6 +421,8 @@ describe('SearchButton', () => {
         fixtureEl.innerHTML = '<button type="button" data-coreui-search-button>Search</button>'
 
         const buttonEl = fixtureEl.querySelector('button')
+        // eslint-disable-next-line no-new
+        new SearchButton(buttonEl)
         const keyboardEvent = new KeyboardEvent('keydown', {
           bubbles: true,
           cancelable: true,
@@ -446,6 +472,8 @@ describe('SearchButton', () => {
       fixtureEl.innerHTML = '<button type="button" data-coreui-search-button>Search</button>'
 
       const buttonEl = fixtureEl.querySelector('button')
+      // eslint-disable-next-line no-new
+      new SearchButton(buttonEl)
       const spy = jasmine.createSpy('trigger')
 
       buttonEl.addEventListener('trigger.coreui.search-button', spy)
@@ -518,6 +546,8 @@ describe('SearchButton', () => {
 
         const buttonEl = fixtureEl.querySelector('button')
         const inputEl = fixtureEl.querySelector('input')
+        // eslint-disable-next-line no-new
+        new SearchButton(buttonEl)
         const keyboardEvent = new KeyboardEvent('keydown', {
           bubbles: true,
           cancelable: true,
@@ -534,6 +564,164 @@ describe('SearchButton', () => {
 
         expect(keyboardEvent.defaultPrevented).toBeTrue()
       })
+    })
+  })
+
+  describe('dispose', () => {
+    it('should not bring the instance back on the next key press', () => {
+      fixtureEl.innerHTML = '<button type="button" data-coreui-search-button>Search</button>'
+
+      const buttonEl = fixtureEl.querySelector('button')
+      const clickSpy = jasmine.createSpy('click')
+      const searchButton = new SearchButton(buttonEl)
+
+      buttonEl.addEventListener('click', clickSpy)
+      searchButton.dispose()
+
+      const keyboardEvent = new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        key: '/',
+        metaKey: true
+      })
+
+      document.dispatchEvent(keyboardEvent)
+
+      expect(clickSpy).not.toHaveBeenCalled()
+      expect(keyboardEvent.defaultPrevented).toBeFalse()
+      expect(SearchButton.getInstance(buttonEl)).toBeNull()
+    })
+
+    it('should not bring the instance back on keyup or window blur', () => {
+      fixtureEl.innerHTML = '<button type="button" data-coreui-search-button>Search</button>'
+
+      const buttonEl = fixtureEl.querySelector('button')
+      new SearchButton(buttonEl).dispose()
+
+      document.dispatchEvent(new KeyboardEvent('keyup', {
+        bubbles: true,
+        key: '/',
+        metaKey: true
+      }))
+      window.dispatchEvent(new Event('blur'))
+
+      expect(SearchButton.getInstance(buttonEl)).toBeNull()
+      expect(buttonEl.querySelector('.search-button-keys')).toBeNull()
+    })
+
+    it('should remove the shortcut keys it rendered', () => {
+      fixtureEl.innerHTML = [
+        '<button type="button" data-coreui-search-button>',
+        '  <span class="search-button-placeholder">Search</span>',
+        '</button>'
+      ].join('')
+
+      const buttonEl = fixtureEl.querySelector('button')
+      const markup = buttonEl.outerHTML
+      const searchButton = new SearchButton(buttonEl)
+
+      searchButton.dispose()
+
+      expect(buttonEl.outerHTML).toEqual(markup)
+    })
+
+    it('should give a shortcut keys container that came with the page its own content back', () => {
+      fixtureEl.innerHTML = [
+        '<button type="button" data-coreui-search-button>',
+        '  <span class="search-button-placeholder">Search</span>',
+        '  <span class="search-button-keys" aria-hidden="true"><kbd>⌘</kbd><kbd>K</kbd></span>',
+        '</button>'
+      ].join('')
+
+      const buttonEl = fixtureEl.querySelector('button')
+      const shortcutKeys = buttonEl.querySelector('.search-button-keys')
+      const markup = buttonEl.outerHTML
+      const searchButton = new SearchButton(buttonEl)
+
+      searchButton.dispose()
+
+      expect(buttonEl.querySelector('.search-button-keys')).toBe(shortcutKeys)
+      expect(buttonEl.outerHTML).toEqual(markup)
+    })
+
+    it('should remove its own shortcut keys when the page has added a container since', () => {
+      fixtureEl.innerHTML = [
+        '<button type="button" data-coreui-search-button>',
+        '  <span class="search-button-placeholder">Search</span>',
+        '</button>'
+      ].join('')
+
+      const buttonEl = fixtureEl.querySelector('button')
+      const searchButton = new SearchButton(buttonEl)
+      const pageKeys = document.createElement('span')
+      pageKeys.className = 'search-button-keys'
+      buttonEl.prepend(pageKeys)
+
+      searchButton.dispose()
+
+      expect(pageKeys.isConnected).toBeTrue()
+      expect(buttonEl.querySelectorAll('.search-button-keys')).toHaveSize(1)
+      expect(buttonEl.querySelector('.search-button-key')).toBeNull()
+    })
+
+    it('should leave the markup alone when called again', () => {
+      fixtureEl.innerHTML = [
+        '<button type="button" data-coreui-search-button>',
+        '  <span class="search-button-placeholder">Search</span>',
+        '  <span class="search-button-keys" aria-hidden="true"><kbd>K</kbd></span>',
+        '</button>'
+      ].join('')
+
+      const buttonEl = fixtureEl.querySelector('button')
+      const searchButton = new SearchButton(buttonEl)
+
+      searchButton.dispose()
+      const markup = buttonEl.outerHTML
+
+      expect(() => searchButton.dispose()).not.toThrow()
+      expect(buttonEl.outerHTML).toEqual(markup)
+    })
+
+    it('should keep the shortcut of another search button working', () => {
+      fixtureEl.innerHTML = [
+        '<button type="button" id="first" data-coreui-search-button>Search</button>',
+        '<button type="button" id="second" data-coreui-search-button>Search</button>'
+      ].join('')
+
+      const firstEl = fixtureEl.querySelector('#first')
+      const secondEl = fixtureEl.querySelector('#second')
+      const clickSpy = jasmine.createSpy('click')
+
+      const firstButton = new SearchButton(firstEl)
+      // eslint-disable-next-line no-new
+      new SearchButton(secondEl)
+      secondEl.addEventListener('click', clickSpy)
+      firstButton.dispose()
+
+      document.dispatchEvent(new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        key: '/',
+        metaKey: true
+      }))
+
+      expect(clickSpy).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe('data-api', () => {
+    it('should initialize every search button on DOMContentLoaded', () => {
+      fixtureEl.innerHTML = [
+        '<button type="button" id="first" data-coreui-search-button>Search</button>',
+        '<button type="button" id="second" data-coreui-search-button>Search</button>'
+      ].join('')
+
+      document.dispatchEvent(new Event('DOMContentLoaded'))
+
+      for (const buttonEl of fixtureEl.querySelectorAll('button')) {
+        expect(SearchButton.getInstance(buttonEl)).not.toBeNull()
+        expect(buttonEl.querySelectorAll('.search-button-key')).toHaveSize(2)
+      }
     })
   })
 

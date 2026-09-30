@@ -77,6 +77,8 @@ const KEY_LABELS = {
  */
 
 class SearchButton extends BaseComponent {
+  protected declare _shortcutKeys: HTMLElement
+  protected declare _shortcutKeysContent: ChildNode[] | null
   protected declare _shortcutTriggered: boolean
   protected declare _shortcuts: ParsedShortcut[]
   protected declare _preferredShortcut: ParsedShortcut | null
@@ -106,6 +108,20 @@ class SearchButton extends BaseComponent {
   // Public
   trigger(): void {
     this._triggerEvent('api')
+  }
+
+  override dispose(): void {
+    if (!this._element) {
+      return
+    }
+
+    if (this._shortcutKeysContent) {
+      this._shortcutKeys.replaceChildren(...this._shortcutKeysContent)
+    } else {
+      this._shortcutKeys.remove()
+    }
+
+    super.dispose()
   }
 
   // Private
@@ -149,16 +165,20 @@ class SearchButton extends BaseComponent {
       (this._element as HTMLButtonElement).disabled
   }
 
-  _ensureShortcutKeys(): any {
-    const existingShortcutKeys = this._element.querySelector(SELECTOR_SHORTCUT_KEYS)
+  _ensureShortcutKeys(): HTMLElement {
+    const existingShortcutKeys = this._element.querySelector<HTMLElement>(SELECTOR_SHORTCUT_KEYS)
 
     if (existingShortcutKeys) {
+      this._shortcutKeys = existingShortcutKeys
+      this._shortcutKeysContent = [...existingShortcutKeys.childNodes]
       return existingShortcutKeys
     }
 
     const shortcutKeys = document.createElement('span')
     shortcutKeys.className = CLASS_NAME_SHORTCUT_KEYS
     shortcutKeys.setAttribute('aria-hidden', 'true')
+    this._shortcutKeys = shortcutKeys
+    this._shortcutKeysContent = null
     const placeholder = this._element.querySelector(SELECTOR_PLACEHOLDER)
 
     if (placeholder) {
@@ -363,7 +383,12 @@ class SearchButton extends BaseComponent {
 
   static _handleDataApiKeydown(event: any): void {
     for (const button of document.querySelectorAll(SELECTOR_DATA_TOGGLE)) {
-      const data: any = SearchButton.getOrCreateInstance(button)
+      const data = SearchButton.getInstance(button)
+
+      if (!data) {
+        continue
+      }
+
       data._syncActiveKeys(event)
 
       if (data._handleShortcut(event)) {
@@ -374,13 +399,13 @@ class SearchButton extends BaseComponent {
 
   static _handleDataApiKeyup(event: any): void {
     for (const button of document.querySelectorAll(SELECTOR_DATA_TOGGLE)) {
-      SearchButton.getOrCreateInstance(button)._syncActiveKeys(event)
+      SearchButton.getInstance(button)?._syncActiveKeys(event)
     }
   }
 
   static _handleDataApiBlur(): void {
     for (const button of document.querySelectorAll(SELECTOR_DATA_TOGGLE)) {
-      SearchButton.getOrCreateInstance(button)._clearActiveKeys()
+      SearchButton.getInstance(button)?._clearActiveKeys()
     }
   }
 }

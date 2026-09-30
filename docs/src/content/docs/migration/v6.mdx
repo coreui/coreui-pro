@@ -2178,6 +2178,21 @@ field behind that kept submitting.
   props stay `readOnly` — that is how those frameworks spell the native
   attribute.
 
+#### Search Button
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The shortcut handlers no longer create search button instances.** Every
+  keydown, keyup and window blur anywhere on the page used to initialise each
+  `[data-coreui-search-button]`, so `dispose()` lasted until the next key press.
+  Now the buttons in the document at `DOMContentLoaded` are initialised, and a
+  button added later, or one on a page whose script runs after
+  `DOMContentLoaded`, responds to its shortcut once you call
+  `coreui.SearchButton.getOrCreateInstance(element)`. Activating such a button
+  (a click, or Enter or Space on it) still initialises it.
+- **`dispose()` takes back the shortcut keys the component rendered.** A
+  `.search-button-keys` container written in the markup gets its own content
+  back.
+
 #### Alert
 
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
