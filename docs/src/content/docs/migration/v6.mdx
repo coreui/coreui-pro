@@ -1205,11 +1205,15 @@ removed in favour of `$translucent-opacity` and
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **Each grid is one tab stop, and `tabindex` no longer marks a selectable cell.**
   The arrows, `Home`, `End` and the page keys move within a calendar and Tab
-  leaves it, which is what `role="grid"` promises; a selectable day, month,
-  quarter, year or week row carries `data-coreui-selectable`, and `tabindex="0"`
-  sits on one of them per grid, so a two-month range picker keeps a stop in each
-  month. Custom CSS or scripts that reached for `.calendar-cell[tabindex="0"]`
-  need `.calendar-cell[data-coreui-selectable]`.
+  leaves it, which is what `role="grid"` promises. Every cell inside `minDate` /
+  `maxDate` can take the focus, also one that cannot be picked: the keys stop
+  on a date in `disabledDates` instead of skipping it, a screen reader
+  announces it as unavailable, and Enter and Space do nothing there, so a
+  month where nothing can be picked is explored like any other. A selectable
+  day, month, quarter, year or week row carries `data-coreui-selectable`, and
+  `tabindex="0"` sits on one cell per grid, so a two-month range picker keeps a
+  stop in each month that reaches into the limits. Custom CSS or scripts that reached for
+  `.calendar-cell[tabindex="0"]` need `.calendar-cell[data-coreui-selectable]`.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **Day cells write `data-coreui-date` in the `toDateString()` form**
   (`"Thu Sep 17 2026"`), like the month, quarter and year cells, instead of the

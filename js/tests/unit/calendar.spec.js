@@ -489,7 +489,7 @@ describe('Calendar', () => {
       expect(stop(after)).toEqual(new Date(2026, 11, 3))
     })
 
-    it('should open on the closest month with a day to pick when the limit month has none', () => {
+    it('should hold the stop on the limit today falls outside of, even when that day cannot be picked', () => {
       vi.useFakeTimers({ toFake: ['Date'] })
       vi.setSystemTime(new Date(2026, 8, 30))
       onTestFinished(() => vi.useRealTimers())
@@ -499,12 +499,15 @@ describe('Calendar', () => {
       new Calendar(after, { locale: 'en-US', minDate: new Date(2026, 9, 31, 9) }) // eslint-disable-line no-new
       new Calendar(before, { disabledDates: [[new Date(2026, 6, 1), new Date(2026, 6, 14)]], locale: 'en-US', maxDate: new Date(2026, 6, 14) }) // eslint-disable-line no-new
 
-      const stop = element => new Date(element.querySelector('.calendar-cell[tabindex="0"]').dataset.coreuiDate)
-      expect(stop(after)).toEqual(new Date(2026, 10, 1))
-      expect(stop(before)).toEqual(new Date(2026, 5, 30))
+      const stop = element => element.querySelector('.calendar-cell[tabindex="0"]')
+
+      expect(new Date(stop(after).dataset.coreuiDate)).toEqual(new Date(2026, 9, 31))
+      expect(stop(after).getAttribute('aria-disabled')).toEqual('true')
+      expect(new Date(stop(before).dataset.coreuiDate)).toEqual(new Date(2026, 6, 14))
+      expect(stop(before).getAttribute('aria-disabled')).toEqual('true')
     })
 
-    it('should stay on today\'s page in month selection and beside a second calendar with a day to pick', () => {
+    it('should stay on today\'s page in month selection, holding the stop on today\'s month, and beside a second calendar', () => {
       vi.useFakeTimers({ toFake: ['Date'] })
       vi.setSystemTime(new Date(2026, 11, 20))
       onTestFinished(() => vi.useRealTimers())
@@ -514,7 +517,10 @@ describe('Calendar', () => {
       new Calendar(months, { disabledDates: [[new Date(2026, 11, 1), new Date(2026, 11, 31)]], locale: 'en-US', selectionType: 'month' }) // eslint-disable-line no-new
       new Calendar(panels, { calendars: 2, disabledDates: [[new Date(2026, 11, 1), new Date(2026, 11, 31)]], locale: 'en-US' }) // eslint-disable-line no-new
 
-      expect(new Date(months.querySelector('.calendar-cell[tabindex="0"]').dataset.coreuiDate)).toEqual(new Date(2026, 10, 1))
+      const stop = months.querySelector('.calendar-cell[tabindex="0"]')
+
+      expect(new Date(stop.dataset.coreuiDate)).toEqual(new Date(2026, 11, 1))
+      expect(stop.getAttribute('aria-disabled')).toEqual('true')
       expect(panels.querySelector(`[data-coreui-date="${new Date(2026, 11, 15).toDateString()}"]`)).not.toBeNull()
     })
 
@@ -547,7 +553,7 @@ describe('Calendar', () => {
         .toEqual([new Date(2026, 7, 10).toDateString(), new Date(2026, 8, 5).toDateString()])
     })
 
-    it('should move focus to the grid of the panel whose month was picked when its view has nothing to pick', () => {
+    it('should move focus into the panel whose month was picked, even when its view has nothing to pick', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
@@ -571,7 +577,8 @@ describe('Calendar', () => {
 
       expect(grids.map(grid => grid.getAttribute('aria-label'))).toEqual(['December 2026', 'January 2027'])
       expect(div.querySelector('[data-coreui-selectable]')).toBeNull()
-      expect(document.activeElement).toBe(grids[1])
+      expect(document.activeElement.closest('table')).toBe(grids[1])
+      expect(document.activeElement.getAttribute('aria-disabled')).toEqual('true')
     })
 
     it('should move focus to the first week of the panel whose month was picked', () => {
@@ -583,7 +590,8 @@ describe('Calendar', () => {
         calendars: 2,
         firstDayOfWeek: 1,
         locale: 'en-US',
-        selectionType: 'week'
+        selectionType: 'week',
+        startDate: new Date(2027, 0, 13)
       })
 
       div.querySelector('.btn-month').click()
@@ -776,7 +784,7 @@ describe('Calendar', () => {
       expect(div.querySelectorAll('.calendar-row[tabindex="0"]').length).toEqual(1)
     })
 
-    it('should give the tab stop to the row of its own month when two rows are as close to the calendar date', () => {
+    it('should give the tab stop to the row holding the calendar date, even when that row cannot be picked', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
@@ -785,7 +793,10 @@ describe('Calendar', () => {
         calendarDate: new Date(2026, 6, 9), disabledDates: [new Date(2026, 6, 6)], locale: 'en-US', selectionType: 'week'
       })
 
-      expect(new Date(div.querySelector('.calendar-row[tabindex="0"] .calendar-cell').dataset.coreuiDate)).toEqual(new Date(2026, 6, 13))
+      const stop = div.querySelector('.calendar-row[tabindex="0"]')
+
+      expect(new Date(stop.querySelector('.calendar-cell').dataset.coreuiDate)).toEqual(new Date(2026, 6, 6))
+      expect(stop.getAttribute('aria-disabled')).toEqual('true')
     })
   })
 
@@ -1758,7 +1769,7 @@ describe('Calendar', () => {
     })
 
     const findDayCell = (div, year, month, day) =>
-      [...div.querySelectorAll('.calendar-cell[data-coreui-selectable]')].find(cell => {
+      [...div.querySelectorAll('.calendar-cell[tabindex]')].find(cell => {
         const date = new Date(cell.dataset.coreuiDate)
         return date.getFullYear() === year && date.getMonth() === month && date.getDate() === day
       })
@@ -1779,7 +1790,7 @@ describe('Calendar', () => {
       return div
     }
 
-    const weekRow = (panel, date) => [...panel.querySelectorAll('.calendar-row[data-coreui-selectable]')]
+    const weekRow = (panel, date) => [...panel.querySelectorAll('.calendar-row[tabindex]')]
       .find(element => new Date(element.querySelector('[data-coreui-date]').dataset.coreuiDate).getTime() === date.getTime())
 
     const focusDay = (div, year, month, day) => {
@@ -1816,14 +1827,15 @@ describe('Calendar', () => {
       expect(activeDate()).toEqual(new Date(2026, 7, 19))
     })
 
-    it('should step over a disabled day in the direction of the arrow', () => {
+    it('should move onto a disabled day in the direction of the arrow', () => {
       const div = renderCalendar({ disabledDates: [new Date(2026, 7, 13), new Date(2026, 7, 19)] })
 
       pressKey(focusDay(div, 2026, 7, 12), 'ArrowRight')
-      expect(activeDate()).toEqual(new Date(2026, 7, 14))
+      expect(activeDate()).toEqual(new Date(2026, 7, 13))
+      expect(document.activeElement.getAttribute('aria-disabled')).toEqual('true')
 
       pressKey(focusDay(div, 2026, 7, 12), 'ArrowDown')
-      expect(activeDate()).toEqual(new Date(2026, 7, 26))
+      expect(activeDate()).toEqual(new Date(2026, 7, 19))
     })
 
     it('should move into the next month when ArrowRight leaves the last day of the view', () => {
@@ -2016,22 +2028,15 @@ describe('Calendar', () => {
       expect(activeDate()).toEqual(new Date(2026, 2, 1))
     })
 
-    it('should give up within ten years when everything ahead is disabled', () => {
-      let calls = 0
-      const disabledDates = date => {
-        calls++
-        return date.getFullYear() > 2030
-      }
-
-      const div = renderCalendar({ calendarDate: new Date(2030, 0, 1), selectionType: 'year', disabledDates })
+    it('should move onto a disabled year with the arrows', () => {
+      const div = renderCalendar({ calendarDate: new Date(2030, 0, 1), selectionType: 'year', disabledDates: date => date.getFullYear() > 2030 })
       const year = div.querySelector(`[data-coreui-date="${new Date(2030, 0, 1).toDateString()}"]`)
 
       year.focus()
-      calls = 0
       pressKey(year, 'ArrowRight')
 
-      expect(calls).toBeLessThan(20_000)
-      expect(activeDate()).toEqual(new Date(2030, 0, 1))
+      expect(activeDate()).toEqual(new Date(2031, 0, 1))
+      expect(document.activeElement.getAttribute('aria-disabled')).toEqual('true')
     })
 
     it('should match the target cell by day, whatever the time of day', () => {
@@ -2081,7 +2086,7 @@ describe('Calendar', () => {
       expect(activeDate()).toEqual(new Date(2026, 7, 10))
     })
 
-    it('should make the grid the tab stop when nothing in the view is selectable', () => {
+    it('should make the grid the tab stop when the view lies wholly outside the limits', () => {
       const div = renderCalendar({ minDate: new Date(2026, 8, 1) })
       const grid = div.querySelector('table')
 
@@ -2094,7 +2099,7 @@ describe('Calendar', () => {
       expect(div.querySelector('table').hasAttribute('tabindex')).toBeFalse()
     })
 
-    it('should page the empty grid back with PageUp and by a year with Shift+PageDown', () => {
+    it('should page a grid shown outside the limits back with PageUp and by a year with Shift+PageDown', () => {
       const div = renderCalendar({ maxDate: new Date(2026, 6, 31) })
 
       div.querySelector('table').focus()
@@ -2108,45 +2113,43 @@ describe('Calendar', () => {
       expect(document.activeElement.getAttribute('aria-label')).toEqual('September 2027')
     })
 
-    it('should cross two blocked months with ArrowRight and come back with ArrowLeft', () => {
+    it('should move into a blocked month with ArrowRight and come back with ArrowLeft', () => {
       const div = renderCalendar({ disabledDates: date => date.getMonth() === 8 || date.getMonth() === 9 })
 
       pressKey(focusDay(div, 2026, 7, 31), 'ArrowRight')
-      expect(activeDate()).toEqual(new Date(2026, 10, 1))
+      expect(activeDate()).toEqual(new Date(2026, 8, 1))
 
       pressKey(document.activeElement, 'ArrowLeft')
       expect(activeDate()).toEqual(new Date(2026, 7, 31))
     })
 
-    it('should leave the empty grid for the nearest selectable date with the arrows', () => {
-      const blocked = { disabledDates: date => date.getMonth() === 8 || date.getMonth() === 9 }
-      let div = renderCalendar(blocked)
+    it('should leave a grid shown outside the limits for the limit the arrow points toward', () => {
+      const div = renderCalendar({ disabledDates: [new Date(2026, 9, 15)], minDate: new Date(2026, 9, 15) })
+      const grid = div.querySelector('table')
 
-      pressKey(focusDay(div, 2026, 7, 12), 'PageDown')
-      expect(document.activeElement.matches('table')).toBeTrue()
+      expect(grid.getAttribute('tabindex')).toEqual('0')
 
-      pressKey(document.activeElement, 'ArrowRight')
-      expect(activeDate()).toEqual(new Date(2026, 10, 1))
+      grid.focus()
+      pressKey(grid, 'ArrowLeft')
+      expect(document.activeElement).toBe(grid)
 
-      div = renderCalendar(blocked)
-      pressKey(focusDay(div, 2026, 7, 12), 'PageDown')
-      pressKey(document.activeElement, 'ArrowUp')
-      expect(activeDate()).toEqual(new Date(2026, 7, 31))
+      pressKey(grid, 'ArrowRight')
+      expect(activeDate()).toEqual(new Date(2026, 9, 15))
+      expect(document.activeElement.getAttribute('aria-disabled')).toEqual('true')
     })
 
-    it('should keep focus in the calendar when paging from an empty grid shows a date in another panel', () => {
-      const div = renderCalendar({ calendars: 2, disabledDates: date => date.getMonth() === 8 || date.getMonth() === 9 })
+    it('should keep focus in the calendar when paging from a grid outside the limits shows a date in another panel', () => {
+      const div = renderCalendar({ calendars: 2, minDate: new Date(2026, 9, 20) })
+      const grid = div.querySelector('table')
 
-      pressKey(focusDay(div, 2026, 7, 12), 'PageDown')
-      expect(document.activeElement.matches('table')).toBeTrue()
+      grid.focus()
+      pressKey(grid, 'PageDown')
 
-      pressKey(document.activeElement, 'PageDown')
-
-      expect(activeDate()).toEqual(new Date(2026, 10, 1))
+      expect(activeDate()).toEqual(new Date(2026, 9, 20))
       expect(div.querySelectorAll('.calendar')[1].contains(document.activeElement)).toBeTrue()
     })
 
-    it('should keep arrows and Home/End on the empty grid from scrolling the page', () => {
+    it('should keep arrows and Home/End on a grid shown outside the limits from scrolling the page', () => {
       const grid = renderCalendar({ minDate: new Date(2026, 8, 1) }).querySelector('table')
       const event = createEvent('keydown', { cancelable: true })
       event.key = 'ArrowRight'
@@ -2157,12 +2160,13 @@ describe('Calendar', () => {
       expect(event.defaultPrevented).toBeTrue()
     })
 
-    it('should land on the empty grid when PageDown leads into a month with nothing selectable', () => {
-      const div = renderCalendar({ disabledDates: date => date.getMonth() === 8 })
+    it('should land on the same day when PageDown leads into a month with nothing to pick', () => {
+      renderCalendar({ disabledDates: date => date.getMonth() === 8 })
 
-      pressKey(focusDay(div, 2026, 7, 12), 'PageDown')
+      pressKey(focusDay(fixtureEl.querySelector('div'), 2026, 7, 12), 'PageDown')
 
-      expect(document.activeElement).toBe(div.querySelector('table'))
+      expect(activeDate()).toEqual(new Date(2026, 8, 12))
+      expect(document.activeElement.getAttribute('aria-disabled')).toEqual('true')
     })
 
     it('should stop PageDown on maxDate in the shown month without turning the calendar', () => {
@@ -2210,18 +2214,18 @@ describe('Calendar', () => {
       expect(div.querySelector('table').getAttribute('aria-label')).toEqual('July 2026')
     })
 
-    it('should page a week row back to the first selectable week after minDate', () => {
+    it('should page a week row back to the week that reaches minDate', () => {
       const div = renderCalendar({ calendarDate: new Date(2026, 6, 1), minDate: new Date(2026, 5, 10), selectionType: 'week' })
       const row = weekRow(div, new Date(2026, 5, 29))
 
       row.focus()
       pressKey(row, 'PageUp')
 
-      expect(document.activeElement).toBe(weekRow(div, new Date(2026, 5, 15)))
+      expect(document.activeElement).toBe(weekRow(div, new Date(2026, 5, 8)))
       expect(div.querySelector('table').getAttribute('aria-label')).toEqual('June 2026')
     })
 
-    it('should not make a grid the tab stop while another panel has a selectable date', () => {
+    it('should not make a grid the tab stop while another panel has a date that can take the focus', () => {
       const div = renderCalendar({ calendars: 2, minDate: new Date(2026, 8, 10) })
       const [first, second] = div.querySelectorAll('.calendar table')
 
@@ -2239,7 +2243,7 @@ describe('Calendar', () => {
       expect(div.querySelector('table').getAttribute('tabindex')).toEqual('0')
     })
 
-    it('should keep one tab stop after a week row stops being selectable', () => {
+    it('should keep one tab stop after ArrowDown leaves the last week row', () => {
       const div = renderCalendar({ selectionType: 'week', showAdjacentDays: false })
       const last = [...div.querySelectorAll('.calendar-row[data-coreui-selectable]')].at(-1)
 
@@ -2899,7 +2903,7 @@ describe('Calendar', () => {
       expect(document.activeElement.getAttribute('data-coreui-date')).toBe(new Date(2026, 0, 1).toDateString())
     })
 
-    it('should move focus to the tab stop of the panel whose btn-month is activated when its month cannot be picked', () => {
+    it('should move focus to the month the panel showed when its btn-month is activated, even when that month cannot be picked', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
@@ -2916,6 +2920,8 @@ describe('Calendar', () => {
 
       expect(calendar._view).toBe('months')
       expect(document.activeElement.closest('.calendar')).toBe(div.querySelectorAll('.calendar')[1])
+      expect(document.activeElement.dataset.coreuiDate).toEqual(new Date(2027, 0, 1).toDateString())
+      expect(document.activeElement.getAttribute('aria-disabled')).toEqual('true')
       expect(document.activeElement.getAttribute('tabindex')).toBe('0')
     })
 
@@ -3284,6 +3290,30 @@ describe('Calendar', () => {
           }, 50)
         }, 10)
       })
+    })
+
+    it('should not open a month where nothing can be picked from the months view', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { // eslint-disable-line no-new
+        calendarDate: new Date(2026, 7, 1),
+        disabledDates: [[new Date(2026, 8, 1), new Date(2026, 8, 30)]],
+        locale: 'en-US'
+      })
+
+      div.querySelector('.btn-month').click()
+
+      const september = div.querySelector(`[data-coreui-date="${new Date(2026, 8, 1).toDateString()}"]`)
+
+      expect(september.getAttribute('aria-disabled')).toEqual('true')
+
+      september.click()
+      september.focus()
+      september.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Enter' }))
+
+      expect(div.querySelector('table').getAttribute('aria-label')).toEqual('2026')
+      expect(document.activeElement).toBe(september)
     })
 
     it('should switch from years view to months view when a year is clicked (selectionType day)', () => {
@@ -3724,6 +3754,27 @@ describe('Calendar', () => {
       expect(cellFor(new Date(2026, 7, 13)).hasAttribute('aria-selected')).toBeFalse()
     })
 
+    it('should clear the selection from a date that cannot be picked when another date is picked', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { // eslint-disable-line no-new
+        calendarDate: new Date(2026, 8, 1),
+        disabledDates: [new Date(2026, 8, 10)],
+        startDate: new Date(2026, 8, 10)
+      })
+      const cellFor = date => div.querySelector(`[data-coreui-date="${date.toDateString()}"]`)
+      const picked = cellFor(new Date(2026, 8, 12))
+
+      picked.focus()
+      picked.click()
+      picked.blur()
+
+      expect(cellFor(new Date(2026, 8, 10)).hasAttribute('aria-selected')).toBeFalse()
+      expect(cellFor(new Date(2026, 8, 10)).classList.contains('selected')).toBeFalse()
+      expect(div.querySelector('.calendar-cell[tabindex="0"]')).toBe(picked)
+    })
+
     it('should mark a week row that cannot be picked with aria-disabled, and leave its days alone', () => {
       fixtureEl.innerHTML = '<div></div>'
 
@@ -3805,6 +3856,47 @@ describe('Calendar', () => {
 
       expect(div.querySelector(`[data-coreui-date="${new Date(2026, 0, 1).toDateString()}"]`).getAttribute('aria-disabled')).toEqual('true')
       expect(div.querySelector(`[data-coreui-date="${new Date(2026, 2, 1).toDateString()}"]`).hasAttribute('aria-disabled')).toBeFalse()
+    })
+
+    it('should give a tabindex to every week row, month, quarter or year inside the limits, also one that cannot be picked', () => {
+      fixtureEl.innerHTML = '<div></div><div></div><div></div><div></div>'
+
+      const [weeks, months, quarters, years] = fixtureEl.querySelectorAll('div')
+      const cellFor = (element, date) => element.querySelector(`[data-coreui-date="${date.toDateString()}"]`)
+      const limits = { calendarDate: new Date(2026, 7, 1), maxDate: new Date(2026, 8, 5), minDate: new Date(2026, 7, 12) }
+
+      const august = [[new Date(2026, 7, 1), new Date(2026, 7, 31)]]
+      const thirdQuarter = [[new Date(2026, 6, 1), new Date(2026, 8, 30)]]
+
+      new Calendar(weeks, { // eslint-disable-line no-new
+        ...limits,
+        disabledDates: [new Date(2026, 7, 10)],
+        firstDayOfWeek: 1,
+        selectionType: 'week'
+      })
+      new Calendar(months, { ...limits, disabledDates: august, selectionType: 'month' }) // eslint-disable-line no-new
+      new Calendar(quarters, { ...limits, disabledDates: thirdQuarter, selectionType: 'quarter' }) // eslint-disable-line no-new
+      new Calendar(years, { // eslint-disable-line no-new
+        ...limits,
+        disabledDates: [new Date(2027, 0, 1)],
+        maxDate: new Date(2027, 0, 1),
+        selectionType: 'year'
+      })
+
+      expect(cellFor(weeks, new Date(2026, 7, 3)).closest('tr').hasAttribute('tabindex')).toBeFalse()
+      expect(cellFor(weeks, new Date(2026, 7, 10)).closest('tr').hasAttribute('tabindex')).toBeTrue()
+      expect(cellFor(weeks, new Date(2026, 7, 10)).closest('tr').getAttribute('aria-disabled')).toEqual('true')
+      expect(cellFor(months, new Date(2026, 6, 1)).hasAttribute('tabindex')).toBeFalse()
+      expect(cellFor(months, new Date(2026, 7, 1)).hasAttribute('tabindex')).toBeTrue()
+      expect(cellFor(months, new Date(2026, 7, 1)).getAttribute('aria-disabled')).toEqual('true')
+      expect(cellFor(months, new Date(2026, 9, 1)).hasAttribute('tabindex')).toBeFalse()
+      expect(cellFor(quarters, new Date(2026, 3, 1)).hasAttribute('tabindex')).toBeFalse()
+      expect(cellFor(quarters, new Date(2026, 6, 1)).hasAttribute('tabindex')).toBeTrue()
+      expect(cellFor(quarters, new Date(2026, 6, 1)).getAttribute('aria-disabled')).toEqual('true')
+      expect(cellFor(years, new Date(2025, 0, 1)).hasAttribute('tabindex')).toBeFalse()
+      expect(cellFor(years, new Date(2027, 0, 1)).hasAttribute('tabindex')).toBeTrue()
+      expect(cellFor(years, new Date(2027, 0, 1)).getAttribute('aria-disabled')).toEqual('true')
+      expect(cellFor(years, new Date(2028, 0, 1)).hasAttribute('tabindex')).toBeFalse()
     })
 
     it('should apply range class for dates in range', () => {
@@ -4934,27 +5026,27 @@ describe('Calendar', () => {
   })
 
   describe('_handleCalendarClick', () => {
-    it('should not select disabled dates', () => {
-      return new Promise(resolve => {
-        fixtureEl.innerHTML = '<div></div>'
-        const div = fixtureEl.querySelector('div')
-        const calendar = new Calendar(div, {
-          calendarDate: new Date(2023, 5, 1),
-          disabledDates: [new Date(2023, 5, 15)]
-        })
+    it('should not pick a date that cannot be picked when it is clicked or activated with Enter or Space', () => {
+      fixtureEl.innerHTML = '<div></div>'
 
-        setTimeout(() => {
-          const disabledCell = div.querySelector('.calendar-cell.disabled')
-          if (disabledCell) {
-            // The disabled cell is not clickable (tabindex=-1)
-            // But we can test _selectDate directly
-            calendar._selectDate(new Date(2023, 5, 15))
-            expect(calendar._startDate).toBeNull()
-          }
-
-          resolve()
-        }, 10)
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, {
+        calendarDate: new Date(2023, 5, 1),
+        disabledDates: [new Date(2023, 5, 15)]
       })
+      const picked = vi.fn()
+      const cell = div.querySelector(`[data-coreui-date="${new Date(2023, 5, 15).toDateString()}"]`)
+
+      div.addEventListener('startDateChange.coreui.calendar', picked)
+      cell.click()
+      cell.focus()
+      cell.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Enter' }))
+      cell.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, code: 'Space', key: ' ' }))
+
+      expect(picked).not.toHaveBeenCalled()
+      expect(calendar._startDate).toBeNull()
+      expect(cell.hasAttribute('aria-selected')).toBeFalse()
+      expect(document.activeElement).toBe(cell)
     })
 
     it('should update calendar date when clicking a day in days view', () => {

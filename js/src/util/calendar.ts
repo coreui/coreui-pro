@@ -23,7 +23,6 @@ export type CalendarKeyAction =
 export type CalendarKeyContext = {
   calendarDate: Date
   calendars: number
-  disabledDates?: DisabledDate | DisabledDate[]
   firstDayOfWeek: number
   maxDate?: Date | null
   minDate?: Date | null
@@ -1011,7 +1010,7 @@ export const getMonthDetails = (year: number, month: number, firstDayOfWeek: num
  * nearest. Days of adjacent months are skipped, and a row of the panel's own
  * month wins a tie.
  *
- * @param targets - The selectable cells or rows of the grid
+ * @param targets - The cells or rows of the grid that can take the focus
  * @param anchor - The date to measure from
  * @param rows - Whether the targets are week rows, which may start in an adjacent month
  * @returns The closest target, or `undefined` when none qualifies
@@ -1045,7 +1044,7 @@ const getClosestTarget = <T extends TabStopTarget>(targets: T[], anchor: Date, r
  * it, skipping days of adjacent months and letting a row of the panel's own
  * month win a tie; else the first target.
  *
- * @param targets - The selectable cells or rows of the grid
+ * @param targets - The cells or rows of the grid that can take the focus
  * @param anchor - The date the grid is anchored to, usually the calendar date
  * @param rows - Whether the targets are week rows, which may start in an adjacent month
  * @returns The time of the target's date, or `undefined` without targets
@@ -1056,22 +1055,23 @@ export const getTabStop = (targets: TabStopTarget[], anchor: Date | null, rows: 
     targets[0])?.date.getTime()
 
 /**
- * Finds the selectable cells and rows of a calendar grid.
+ * Finds the cells and rows of a calendar grid that can take the focus.
  *
  * @param element - The element holding the grid
- * @param selector - The selector of a selectable cell or row
+ * @param selector - The selector of a cell or row that can take the focus
  * @returns The matching elements, in document order
  */
-export const getSelectableDates = (element: HTMLElement, selector: string = 'tr[data-coreui-selectable], td[data-coreui-selectable]') : HTMLElement[] =>
+export const getSelectableDates = (element: HTMLElement, selector: string = 'tr[tabindex], td[tabindex]') : HTMLElement[] =>
   [...Element.prototype.querySelectorAll.call(element, selector)] as HTMLElement[]
 
 /**
- * Picks the selectable cell or week row of a rendered grid closest to a date,
- * by the dates its cells carry in `data-coreui-date`: the one whose shown days
- * hold the date, else the nearest. Days of adjacent months are skipped, a row
- * of the panel's own month wins a tie, and the selection plays no part.
+ * Picks the cell or week row of a rendered grid that can take the focus and
+ * lies closest to a date, by the dates its cells carry in `data-coreui-date`:
+ * the one whose shown days hold the date, else the nearest. Days of adjacent
+ * months are skipped, a row of the panel's own month wins a tie, and the
+ * selection plays no part.
  *
- * @param elements - The selectable cells or rows
+ * @param elements - The cells or rows that can take the focus
  * @param anchor - The date to measure from
  * @param rows - Whether the elements are week rows
  * @returns The closest element, or `undefined` without one
@@ -1108,7 +1108,7 @@ export const getClosestSelectable = (elements: HTMLElement[], anchor: Date, rows
  * When no panel has a target, the grids themselves take the stop.
  *
  * @param element - The calendar holding the panels
- * @param selector - The selector of a selectable cell or row
+ * @param selector - The selector of a cell or row that can take the focus
  * @param anchor - The date the stop falls back to, usually the calendar date cut to the unit the view shows
  * @param rows - Whether the targets are week rows
  * @param preferred - The target that should keep the stop, usually the focused one
@@ -1228,31 +1228,31 @@ const getPanelMonth = ({ calendarDate, panel }: CalendarKeyContext) : [Date, Dat
 ]
 
 /**
- * Tells whether the day, month, quarter or year a cell of the view stands for
- * cannot be picked; a week row goes by its first day.
+ * Tells whether the cell or week row of a date cannot take the focus because it
+ * lies wholly outside the limits.
  *
- * @param date - The date of the cell or week row
+ * @param date - The date of the cell, or the first day of the week row
  * @param context - The state of the calendar
- * @returns `true` for a date that cannot be picked
+ * @returns `true` for a cell or row outside the limits
  */
-const isDisabledInView = (date: Date, { disabledDates, maxDate, minDate, view }: CalendarKeyContext) : boolean =>
-  isCellDisabled(date, view, minDate, maxDate, disabledDates)
+const isUnfocusable = (date: Date, { maxDate, minDate, rows, view }: CalendarKeyContext) : boolean =>
+  isCellOutsideLimits(date, view, minDate, maxDate, rows)
 
 /**
  * Walks from a date toward the focused one, a cell or a week row at a time,
- * past the ones that cannot be picked.
+ * past the ones outside the limits.
  *
  * @param start - The date to walk from; it is moved in place
  * @param date - The date of the focused cell or week row
  * @param context - The state of the calendar
- * @returns The first selectable date on the way, or the focused date when there is none before it
+ * @returns The first date on the way that can take the focus, or the focused date when there is none before it
  */
-const walkToSelectable = (start: Date, date: Date, context: CalendarKeyContext) : Date => {
+const walkToFocusable = (start: Date, date: Date, context: CalendarKeyContext) : Date => {
   const { rows, view } = context
   const sign = start > date ? -1 : 1
   const isShort = (value: Date) : boolean => sign * (date.getTime() - value.getTime()) > 0
 
-  while (isDisabledInView(start, context) && isShort(start)) {
+  while (isUnfocusable(start, context) && isShort(start)) {
     if (view === 'days') {
       start.setDate(start.getDate() + (sign * (rows ? 7 : 1)))
     } else {
@@ -1264,19 +1264,18 @@ const walkToSelectable = (start: Date, date: Date, context: CalendarKeyContext) 
 }
 
 /**
- * Finds where an arrow key takes the focus: the nearest selectable day, week,
- * month, quarter or year in the direction of the key, a whole row away for the
- * vertical keys. The search stops at `minDate` / `maxDate`, and gives up after
- * the first step that lands more than ten calendar years from the date.
+ * Finds where an arrow key takes the focus: the next day, week, month, quarter
+ * or year in the direction of the key, a whole row away for the vertical keys,
+ * whether it can be picked or not. A step that leaves the limits goes nowhere.
  *
  * @param date - The date the focus leaves
  * @param forward - Whether the key points forward in time
  * @param vertical - Whether the key moves by a row instead of a cell
  * @param context - The state of the calendar
- * @returns The date to focus, or `null` when there is none
+ * @returns The date to focus, or `null` when the step leaves the limits
  */
 const getArrowTarget = (date: Date, forward: boolean, vertical: boolean, context: CalendarKeyContext) : Date | null => {
-  const { firstDayOfWeek, maxDate, minDate, rows, view } = context
+  const { firstDayOfWeek, rows, view } = context
   const steps: Record<ViewTypes, [number, number]> = {
     days: vertical || rows ? [7, 0] : [1, 0],
     months: vertical ? [0, 3] : [0, 1],
@@ -1285,25 +1284,37 @@ const getArrowTarget = (date: Date, forward: boolean, vertical: boolean, context
   }
   const [days, months] = steps[view]
   const sign = forward ? 1 : -1
-  const bound = forward ? maxDate : minDate
-  const edge = bound ? getStartOfView(bound, view) : null
   const target = rows ? getStartOfWeek(date, firstDayOfWeek) : new Date(date)
+  target.setMonth(target.getMonth() + (sign * months), target.getDate() + (sign * days))
 
-  while (Math.abs(target.getFullYear() - date.getFullYear()) <= 10) {
-    target.setMonth(target.getMonth() + (sign * months), target.getDate() + (sign * days))
+  return isUnfocusable(target, context) ? null : target
+}
 
-    const start = getStartOfView(target, view)
+/**
+ * Finds where an arrow key takes the focus from a grid with nothing to focus,
+ * which happens when the calendar shows a page wholly outside the limits: the
+ * day, week, month, quarter or year of the limit the key points toward.
+ *
+ * @param forward - Whether the key points forward in time
+ * @param context - The state of the calendar
+ * @returns The date to focus, or `null` when the key points away from the limits
+ */
+const getGridArrowTarget = (forward: boolean, context: CalendarKeyContext) : Date | null => {
+  const { firstDayOfWeek, maxDate, minDate, rows, view } = context
+  const limit = forward ? minDate ?? createDate(1) : maxDate
 
-    if (edge && (forward ? start > edge : start < edge)) {
-      return null
-    }
-
-    if (!isDisabledInView(target, context)) {
-      return target
-    }
+  if (!limit) {
+    return null
   }
 
-  return null
+  const target = getStartOfView(limit, view)
+  const edge = getViewEdge(forward, context)
+
+  if (forward ? edge >= target : edge <= target) {
+    return null
+  }
+
+  return rows ? getStartOfWeek(target, firstDayOfWeek) : target
 }
 
 /**
@@ -1339,10 +1350,10 @@ const getRevealOffset = (date: Date, { calendarDate, calendars, rows, view }: Ca
 /**
  * Finds where Home or End takes the focus: the first or the last day of the
  * week, week of the month, month or year of the row, or quarter of the year.
- * A disabled one gives way to the nearest selectable one toward the focused
- * date. The focus never moves back past itself: the focused date is kept when
- * nothing selectable is left, and when a week row already lies beyond the
- * first or last week of the month.
+ * One outside the limits gives way to the nearest one inside toward the
+ * focused date. The focus never moves back past itself: the focused date is
+ * kept when nothing inside the limits is left, and when a week row already
+ * lies beyond the first or last week of the month.
  *
  * @param date - The date of the focused cell or week row
  * @param last - Whether the key is End
@@ -1389,7 +1400,7 @@ const getRowEdge = (date: Date, last: boolean, context: CalendarKeyContext) : Da
     return new Date(date)
   }
 
-  return walkToSelectable(edge, date, context)
+  return walkToFocusable(edge, date, context)
 }
 
 /**
@@ -1422,9 +1433,8 @@ const getPageOffset = (direction: number, shiftKey: boolean, view: ViewTypes) : 
  * turns by `getPageOffset` and the focus moves to the same day there, cut to
  * the length of the month. From a day of an adjacent month the calendar turns
  * only as far as that day takes. A date past `minDate` / `maxDate` gives way to
- * the last selectable date before the bound, and the calendar turns only when
- * that date lies outside the months the panels show. On the way to either, a
- * disabled date gives way to the nearest selectable one toward the focus.
+ * the last date inside the limits, and the calendar turns only when that date
+ * lies outside the months the panels show.
  *
  * @param date - The date of the focused cell or week row
  * @param direction - `1` for Page Down, `-1` for Page Up
@@ -1443,7 +1453,7 @@ const getPageAction = (date: Date, direction: number, shiftKey: boolean, context
   const [first, last] = getPanelMonth(context)
   let start: Date
 
-  if (bound && isDisabledInView(rows ? getStartOfWeek(target, firstDayOfWeek) : target, { ...context, disabledDates: undefined })) {
+  if (bound && isUnfocusable(rows ? getStartOfWeek(target, firstDayOfWeek) : target, context)) {
     const edge = getStartOfView(bound, view)
     start = rows ? getStartOfWeek(edge, firstDayOfWeek) : edge
   } else if (view === 'days' && !rows && (date < first || date > last)) {
@@ -1452,7 +1462,7 @@ const getPageAction = (date: Date, direction: number, shiftKey: boolean, context
     return { date: target, ...offset, type: 'page' }
   }
 
-  const stop = walkToSelectable(start, date, context)
+  const stop = walkToFocusable(start, date, context)
 
   return stop.getTime() === date.getTime() ? { type: 'stay' } : moveTo(stop, context)
 }
@@ -1469,8 +1479,8 @@ const isForwardKey = (key: string, rtl: boolean) : boolean => key === 'ArrowDown
 
 /**
  * Decides what a key does on a grid with nothing to focus: the arrows move to
- * the nearest selectable date beyond the edge of the view, Page Up / Page Down
- * turn the calendar, and Home / End do nothing.
+ * the limit they point toward, Page Up / Page Down turn the calendar, and
+ * Home / End do nothing.
  *
  * @param event - The key and its modifiers
  * @param event.key - The key value
@@ -1480,8 +1490,7 @@ const isForwardKey = (key: string, rtl: boolean) : boolean => key === 'ArrowDown
  */
 const getGridKeyAction = ({ key, shiftKey }: { key: string; shiftKey: boolean }, context: CalendarKeyContext) : CalendarKeyAction | null => {
   if (ARROW_KEYS.has(key)) {
-    const forward = isForwardKey(key, context.rtl)
-    return moveTo(getArrowTarget(getViewEdge(forward, context), forward, false, context), context)
+    return moveTo(getGridArrowTarget(isForwardKey(key, context.rtl), context), context)
   }
 
   if (key === 'PageDown' || key === 'PageUp') {
@@ -1493,10 +1502,10 @@ const getGridKeyAction = ({ key, shiftKey }: { key: string; shiftKey: boolean },
 
 /**
  * Decides what a key does on a cell or a week row: Space and Enter pick its
- * date unless the key repeats while held, the arrows move to the nearest selectable cell or row, Home and End to
- * the edge of the week or row, and Page Up / Page Down turn the calendar and
- * move to the same day there, or to the last selectable date before `minDate` /
- * `maxDate`.
+ * date unless the key repeats while held, the arrows move to the next cell or
+ * row, Home and End to the edge of the week or row, and Page Up / Page Down
+ * turn the calendar and move to the same day there, or to the last date inside
+ * `minDate` / `maxDate`.
  *
  * @param event - The key and its modifiers
  * @param event.code - The physical key
@@ -1542,21 +1551,22 @@ const getCellKeyAction = ({ code, key, repeat, shiftKey }: { code: string; key: 
 }
 
 /**
- * Decides what a key does in a calendar grid. On a cell or a week row, Space
- * and Enter pick its date, the arrows move to the nearest selectable cell or
+ * Decides what a key does in a calendar grid. The focus moves over every cell
+ * inside `minDate` / `maxDate`, whether it can be picked or not. On a cell or a
+ * week row, Space and Enter pick its date, the arrows move to the next cell or
  * row, and Page Up / Page Down turn the calendar a month (a year with Shift) in
  * the days view, a year in the months and quarters views and a page of
- * `YEARS_PER_PAGE` years in the years view, and move to the same day there; from a day of an adjacent month
- * the calendar turns only as far as that day takes, and past `minDate` /
- * `maxDate` they stop on the last selectable date before the bound, turning the
- * calendar only when that date lies outside the months the panels show. Home
- * and End move to the first and last selectable day of the week, into the
- * adjacent month when the week starts or ends there; with week rows, to the
- * first and last week of the month the panel shows, in that panel; to the first
- * and last month or year of the row; and to the first and last quarter of the
- * year. On a grid with nothing to focus, the arrows move to the nearest
- * selectable date beyond the edge of the view, Page Up / Page Down turn the
- * calendar the same way, and Home / End do nothing.
+ * `YEARS_PER_PAGE` years in the years view, and move to the same day there;
+ * from a day of an adjacent month the calendar turns only as far as that day
+ * takes, and past `minDate` / `maxDate` they stop on the last date inside the
+ * limits, turning the calendar only when that date lies outside the months the
+ * panels show. Home and End move to the first and last day of the week inside
+ * the limits, into the adjacent month when the week starts or ends there; with
+ * week rows, to the first and last week of the month the panel shows, in that
+ * panel; to the first and last month or year of the row; and to the first and
+ * last quarter of the year. On a grid with nothing to focus, the arrows move to
+ * the limit they point toward, Page Up / Page Down turn the calendar the same
+ * way, and Home / End do nothing.
  *
  * @param event - The key and its modifiers
  * @param event.code - The physical key
@@ -1589,52 +1599,6 @@ export const constrainDate = (date: Date, min: Date | null, max: Date | null) : 
   }
 
   return date
-}
-
-/**
- * Picks the date a calendar with no date of its own opens on: today moved
- * between the limits or, in day and week selection when no month it shows
- * has a day to pick, the closest day that can be picked, up to a year
- * either way and the later one on a tie.
- *
- * @param min - The earliest date allowed, or `null` without one
- * @param max - The latest date allowed, or `null` without one
- * @param disabledDates - The dates that cannot be picked
- * @param selectionType - What the calendar picks
- * @param calendars - How many months the calendar shows
- * @returns Today or the limit it crossed, keeping its time, or the start of the closest day
- */
-export const getOpeningDate = (min: Date | null, max: Date | null, disabledDates?: DisabledDate | DisabledDate[], selectionType: SelectionTypes = 'day', calendars = 1) : Date => {
-  const today = constrainDate(new Date(), min, max)
-
-  if (selectionType !== 'day' && selectionType !== 'week') {
-    return today
-  }
-
-  const year = today.getFullYear()
-  const month = today.getMonth()
-  const day = today.getDate()
-  let closest: Date | null = null
-
-  for (let offset = 0; offset <= 366; offset++) {
-    for (const candidate of [createDate(year, month, day + offset), createDate(year, month, day - offset)]) {
-      if (!isDateDisabled(candidate, min, max, disabledDates)) {
-        const shown = ((candidate.getFullYear() - year) * 12) + candidate.getMonth() - month
-
-        if (shown >= 0 && shown < calendars) {
-          return today
-        }
-
-        closest ??= candidate
-      }
-    }
-
-    if (closest && offset >= 31 * calendars) {
-      return closest
-    }
-  }
-
-  return today
 }
 
 /**
@@ -1802,6 +1766,29 @@ export const isPeriodDisabled = (date: Date, view: PeriodViewTypes, min?: Date |
  */
 export const isCellDisabled = (date: Date, view: ViewTypes, min?: Date | null, max?: Date | null, disabledDates?: DisabledDate | DisabledDate[]) : boolean =>
   view === 'days' ? isDateDisabled(date, min, max, disabledDates) : isPeriodDisabled(date, view, min, max, disabledDates)
+
+/**
+ * Tells whether a cell of a calendar view lies wholly outside the limits: none
+ * of the days of its day, week row, month, quarter or year falls between the
+ * day of `min` and the day of `max`, times of day aside, or it ends before
+ * year 1. Such a cell cannot take the focus; any other cell can, whether it
+ * can be picked or not.
+ *
+ * @param date - The date of the cell, or the first day of the week row
+ * @param view - The view the cell belongs to
+ * @param min - The earliest date allowed
+ * @param max - The latest date allowed
+ * @param rows - Whether the cell is a week row of the days view
+ * @returns `true` for a cell outside the limits
+ */
+export const isCellOutsideLimits = (date: Date, view: ViewTypes, min?: Date | null, max?: Date | null, rows = false) : boolean => {
+  const start = getStartOfView(date, view)
+  const end = view === 'days' ?
+    createDate(start.getFullYear(), start.getMonth(), start.getDate() + (rows ? 6 : 0)) :
+    createDate(start.getFullYear(), start.getMonth() + MONTHS_IN_PERIOD[view], 0)
+
+  return end.getFullYear() < 1 || Boolean(min && end < getStartOfView(min, 'days')) || Boolean(max && start > getStartOfView(max, 'days'))
+}
 
 /**
  * Tells whether a month, quarter or year lies between the periods of two
