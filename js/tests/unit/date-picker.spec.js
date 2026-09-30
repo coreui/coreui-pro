@@ -44,6 +44,15 @@ describe('DatePicker', () => {
       expect(fixtureEl.querySelector('.date-picker-popup .btn-double-next').getAttribute('aria-label')).toEqual('Następne 12 lat')
       expect(fixtureEl.querySelector('.date-picker-popup .btn-double-prev').getAttribute('aria-label')).toEqual('Poprzednie 12 lat')
     })
+
+    it('should pass ariaNothingToPickLabel to the calendar', () => {
+      const picker = buildPicker({ ariaNothingToPickLabel: 'Brak dat do wyboru', disabledDates: () => true })
+      picker.show()
+
+      const grid = fixtureEl.querySelector('.date-picker-popup table')
+
+      expect(document.getElementById(grid.getAttribute('aria-describedby')).textContent).toEqual('Brak dat do wyboru')
+    })
   })
 
   // The native <input type="date"> entry contract: opening puts focus on the

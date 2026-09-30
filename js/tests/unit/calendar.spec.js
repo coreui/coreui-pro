@@ -2259,6 +2259,71 @@ describe('Calendar', () => {
       expect(renderCalendar({ selectionType: 'year' }).querySelector('table').getAttribute('aria-label')).toMatch(/^2020\s–\s2031$/)
     })
 
+    it('should describe a grid with nothing to pick, and only such a grid', () => {
+      const description = div => {
+        const grid = div.querySelector('table')
+        const id = grid.getAttribute('aria-describedby')
+
+        return id ? document.getElementById(id).textContent : null
+      }
+
+      expect(description(renderCalendar({ minDate: new Date(2026, 8, 1) }))).toEqual('Nothing on this page can be picked')
+      expect(description(renderCalendar({ disabledDates: date => date.getMonth() === 7 }))).toEqual('Nothing on this page can be picked')
+      expect(description(renderCalendar({ disabledDates: date => date.getFullYear() === 2026, selectionType: 'month' }))).toEqual('Nothing on this page can be picked')
+      expect(description(renderCalendar({ disabledDates: date => date.getFullYear() === 2026, selectionType: 'quarter' }))).toEqual('Nothing on this page can be picked')
+      expect(description(renderCalendar({ disabledDates: date => date.getFullYear() >= 2020 && date.getFullYear() <= 2031, selectionType: 'year' }))).toEqual('Nothing on this page can be picked')
+      expect(description(renderCalendar({ disabledDates: date => date.getDay() === 1, firstDayOfWeek: 1, selectionType: 'week' }))).toEqual('Nothing on this page can be picked')
+      expect(description(renderCalendar({ disabledDates: [new Date(2026, 7, 14)] }))).toBeNull()
+
+      for (const selectionType of ['week', 'month', 'quarter', 'year']) {
+        expect(description(renderCalendar({ selectionType }))).toBeNull()
+      }
+
+      const panels = [...renderCalendar({ calendars: 2, maxDate: new Date(2026, 7, 20) }).querySelectorAll('.calendar')]
+
+      const described = document.getElementById(panels[1].querySelector('table').getAttribute('aria-describedby'))
+
+      expect(panels[0].querySelector('table').hasAttribute('aria-describedby')).toBeFalse()
+      expect(described.hidden).toBeTrue()
+      expect(panels[1].contains(described)).toBeTrue()
+      expect(new Set(panels.map(panel => panel.querySelector('span[hidden]').id)).size).toEqual(2)
+    })
+
+    it('should word the description with ariaNothingToPickLabel, and leave the grid undescribed without it', () => {
+      const labelled = renderCalendar({ ariaNothingToPickLabel: 'Brak dat do wyboru', minDate: new Date(2026, 8, 1) }).querySelector('table')
+
+      expect(document.getElementById(labelled.getAttribute('aria-describedby')).textContent).toEqual('Brak dat do wyboru')
+      expect(renderCalendar({ ariaNothingToPickLabel: '', minDate: new Date(2026, 8, 1) }).querySelector('table').hasAttribute('aria-describedby')).toBeFalse()
+      expect(renderCalendar({ minDate: new Date(2026, 8, 1) }, '<div data-coreui-aria-nothing-to-pick-label=""></div>').querySelector('table').hasAttribute('aria-describedby')).toBeFalse()
+    })
+
+    it('should describe a grid again when a pick leaves nothing on it to pick', () => {
+      let start = null
+      const div = renderCalendar({ calendars: 2, disabledDates: date => start !== null && date - start > 7 * 86_400_000, range: true })
+      const panels = [...div.querySelectorAll('.calendar')]
+
+      div.addEventListener('startDateChange.coreui.calendar', event => {
+        start = event.dateObject
+      })
+
+      expect(panels[1].querySelector('table').hasAttribute('aria-describedby')).toBeFalse()
+
+      panels[0].querySelector(`[data-coreui-date="${new Date(2026, 7, 3).toDateString()}"]`).click()
+
+      expect(panels[0].querySelector('table').hasAttribute('aria-describedby')).toBeFalse()
+      expect(panels[1].querySelector('table').hasAttribute('aria-describedby')).toBeTrue()
+    })
+
+    it('should describe the grid again when the calendar turns to a page with nothing to pick', () => {
+      const div = renderCalendar({ disabledDates: date => date.getMonth() === 8 })
+
+      div.querySelector('.btn-next').click()
+      expect(div.querySelector('table').hasAttribute('aria-describedby')).toBeTrue()
+
+      div.querySelector('.btn-prev').click()
+      expect(div.querySelector('table').hasAttribute('aria-describedby')).toBeFalse()
+    })
+
     it('should write a calendar without Gregorian months in the Gregorian calendar', () => {
       const days = renderCalendar({ calendarDate: new Date(2026, 8, 1), locale: 'fa-IR' })
 
