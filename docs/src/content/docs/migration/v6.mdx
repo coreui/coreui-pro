@@ -2177,6 +2177,20 @@ field behind that kept submitting.
   `.readonly` class the component writes is unchanged, and the React and Vue
   props stay `readOnly` — that is how those frameworks spell the native
   attribute.
+- **`dispose()` takes back what the component rendered.** The stars and their
+  radios go away, so the form no longer submits the value, and so do the
+  classes and the `role` the component wrote. Classes, a role and content
+  written in the markup come back as they were. A rating left in the page after
+  `dispose()` used to keep working as a plain radio group.
+- **While the rating lives, its options decide `.disabled`, `.readonly` and the
+  size class.** A `.disabled` or `.readonly` written in the markup without the
+  matching option is removed at init, and `size` replaces a `rating-sm` or
+  `rating-lg` the markup wrote. `setConfig({ disabled: false })` used to leave
+  `.disabled` behind.
+- **`setConfig()` keeps the value the user picked** unless you pass `value`,
+  and `setConfig({ name })` renames the radios; a value the new options cannot
+  show is dropped. Any option change used to reset the rating to its initial
+  value and ignore `name`.
 
 #### Search Button
 

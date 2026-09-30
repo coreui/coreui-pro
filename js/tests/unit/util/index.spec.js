@@ -848,4 +848,67 @@ describe('Util', () => {
       expect(Util.getNextActiveElement(array, 'a', false, true)).toEqual('d')
     })
   })
+
+  describe('captureHostClasses', () => {
+    it('should record the managed classes the element has and whether it has a class attribute', () => {
+      fixtureEl.innerHTML = '<div class="rating custom"></div>'
+      const div = fixtureEl.querySelector('div')
+
+      expect(Util.captureHostClasses(div, ['rating', 'disabled'])).toEqual({ classNames: ['rating'], hadAttribute: true })
+    })
+
+    it('should record an element without a class attribute', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+
+      expect(Util.captureHostClasses(div, ['rating'])).toEqual({ classNames: [], hadAttribute: false })
+    })
+  })
+
+  describe('restoreHostClasses', () => {
+    it('should set every managed class back to the snapshot and leave other classes alone', () => {
+      fixtureEl.innerHTML = '<div class="rating custom"></div>'
+      const div = fixtureEl.querySelector('div')
+      const host = Util.captureHostClasses(div, ['rating', 'disabled'])
+
+      div.classList.remove('rating')
+      div.classList.add('disabled', 'added-later')
+      Util.restoreHostClasses(div, ['rating', 'disabled'], host)
+
+      expect(div.className).toEqual('custom added-later rating')
+    })
+
+    it('should drop a class attribute the element did not have once it is empty', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const host = Util.captureHostClasses(div, ['rating'])
+
+      div.classList.add('rating')
+      Util.restoreHostClasses(div, ['rating'], host)
+
+      expect(div.hasAttribute('class')).toBeFalse()
+    })
+
+    it('should keep a class attribute that still carries a class the component does not manage', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const host = Util.captureHostClasses(div, ['rating'])
+
+      div.classList.add('rating', 'custom')
+      Util.restoreHostClasses(div, ['rating'], host)
+
+      expect(div.getAttribute('class')).toEqual('custom')
+    })
+
+    it('should keep an empty class attribute the element had', () => {
+      fixtureEl.innerHTML = '<div class=""></div>'
+      const div = fixtureEl.querySelector('div')
+      const host = Util.captureHostClasses(div, ['rating'])
+
+      div.classList.add('rating')
+      Util.restoreHostClasses(div, ['rating'], host)
+
+      expect(div.getAttribute('class')).toEqual('')
+    })
+  })
 })

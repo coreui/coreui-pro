@@ -10,7 +10,9 @@ import type { ComponentConfig } from './util/config.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
-import { defineJQueryPlugin, getUID, jQueryDispatch } from './util/index.js'
+import {
+  captureHostClasses, defineJQueryPlugin, getUID, type HostClasses, jQueryDispatch, restoreHostClasses
+} from './util/index.js'
 import Tooltip from './tooltip.js'
 
 /**
@@ -41,6 +43,8 @@ const CLASS_NAME_RATING_ITEM_CUSTOM_ICON_ACTIVE = 'rating-item-custom-icon-activ
 const CLASS_NAME_RATING_ITEM_INPUT = 'rating-item-input'
 const CLASS_NAME_RATING_ITEM_LABEL = 'rating-item-label'
 const CLASS_NAME_READONLY = 'readonly'
+
+const SIZE_CLASS_NAMES = ['rating-lg', 'rating-sm']
 
 const SELECTOR_DATA_RATING = '[data-coreui-rating]'
 const SELECTOR_RATING_ITEM = '.rating-item'
@@ -110,12 +114,27 @@ const DefaultType = {
 
 class Rating extends BaseComponent {
   protected declare _currentValue: number | string | null
+  protected declare _hostClasses: HostClasses
+  protected declare _hostRole: string | null
+  protected declare _items: HTMLElement[]
   protected declare _name: string
+  protected declare _sizeClassName: string | null
+  protected declare _sizeClassNames: Set<string>
   protected declare _tooltip: any
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element)
 
+    this._hostClasses = captureHostClasses(this._element, [
+      CLASS_NAME_RATING,
+      CLASS_NAME_DISABLED,
+      CLASS_NAME_READONLY,
+      ...[...this._element.classList].filter(className => className.startsWith(`${CLASS_NAME_RATING}-`))
+    ])
+    this._hostRole = this._element.getAttribute('role')
+    this._items = []
+    this._sizeClassName = null
+    this._sizeClassNames = new Set()
     this._config = this._getConfig(config)
     this._currentValue = this._config.value
     this._name = this._config.name || getUID(`${this.constructor.NAME}-name-`).toString()
@@ -141,19 +160,19 @@ class Rating extends BaseComponent {
   // Public
   setConfig(config: any): void {
     this._config = this._getConfig({ ...this._config, ...config })
-    this._currentValue = this._config.value
+    this._name = this._config.name || this._name
 
-    this._disposeTooltips()
-    this._element.innerHTML = ''
-    this._createRating()
+    if (config?.value !== undefined) {
+      this._currentValue = this._config.value
+    }
+
+    this._createRating(this._removeRating())
   }
 
   reset(value: number | null = null): void {
     this._currentValue = value
 
-    this._disposeTooltips()
-    this._element.innerHTML = ''
-    this._createRating()
+    this._createRating(this._removeRating())
 
     EventHandler.trigger(this._element, EVENT_CHANGE, {
       value
@@ -161,14 +180,40 @@ class Rating extends BaseComponent {
   }
 
   override dispose(): void {
-    this._disposeTooltips()
+    if (!this._element) {
+      return
+    }
+
+    this._removeRating()
+    restoreHostClasses(this._element, this._managedClassNames(), this._hostClasses)
+
+    if (this._hostRole === null && this._element.getAttribute('role') === 'radiogroup') {
+      this._element.removeAttribute('role')
+    }
 
     super.dispose()
   }
 
   // Private
+  _managedClassNames(): string[] {
+    return [CLASS_NAME_RATING, CLASS_NAME_DISABLED, CLASS_NAME_READONLY, ...this._sizeClassNames]
+  }
+
+  _removeRating(): ChildNode | null {
+    this._disposeTooltips()
+
+    const anchor = this._items.at(-1)?.nextSibling ?? null
+
+    for (const item of this._items) {
+      item.remove()
+    }
+
+    this._items = []
+    return anchor
+  }
+
   _disposeTooltips(): void {
-    for (const item of SelectorEngine.find(SELECTOR_RATING_ITEM, this._element as ParentNode)) {
+    for (const item of SelectorEngine.find(`${SELECTOR_RATING_ITEM}, ${SELECTOR_RATING_ITEM} > div`, this._element as ParentNode)) {
       Tooltip.getInstance(item)?.dispose()
     }
 
@@ -203,6 +248,10 @@ class Rating extends BaseComponent {
       EventHandler.trigger(this._element, EVENT_CHANGE, {
         value: target.value
       })
+
+      if (!target.isConnected) {
+        return
+      }
 
       const inputs = SelectorEngine.find(SELECTOR_RATING_ITEM_INPUT, this._element as ParentNode)
       this._resetLabels()
@@ -357,26 +406,44 @@ class Rating extends BaseComponent {
     }
   }
 
-  _createRating(): void {
+  _createRating(anchor: ChildNode | null = null): void {
     this._element.classList.add(CLASS_NAME_RATING)
+    this._element.classList.toggle(CLASS_NAME_DISABLED, Boolean(this._config.disabled))
+    this._element.classList.toggle(CLASS_NAME_READONLY, Boolean(this._config.readonly))
+
+    if (this._sizeClassName) {
+      this._element.classList.remove(this._sizeClassName)
+      this._sizeClassName = null
+    }
 
     if (this._config.size) {
-      this._element.classList.add(`rating-${this._config.size}`)
+      const sizeClassName = `rating-${this._config.size}`
+      this._element.classList.remove(...SIZE_CLASS_NAMES)
+      this._element.classList.add(sizeClassName)
+      this._sizeClassName = sizeClassName
+
+      for (const className of [...SIZE_CLASS_NAMES, sizeClassName]) {
+        this._sizeClassNames.add(className)
+      }
     }
 
-    if (this._config.disabled) {
-      this._element.classList.add(CLASS_NAME_DISABLED)
+    if (!this._element.hasAttribute('role')) {
+      this._element.setAttribute('role', 'radiogroup')
     }
 
-    if (this._config.readonly) {
-      this._element.classList.add(CLASS_NAME_READONLY)
+    this._items = Array.from({ length: this._config.itemCount }, (_, index) => this._createRatingItem(index))
+
+    for (const item of this._items) {
+      this._element.insertBefore(item, anchor)
     }
 
-    this._element.setAttribute('role', 'radiogroup')
-    Array.from({ length: this._config.itemCount }, (_, index) => this._createRatingItem(index))
+    if (!this._items.some(item => item.querySelector(`${SELECTOR_RATING_ITEM_INPUT}:checked`))) {
+      this._currentValue = null
+      this._resetLabels()
+    }
   }
 
-  _createRatingItem(index: number): void {
+  _createRatingItem(index: number): HTMLElement {
     const ratingItemElement = document.createElement('div')
     ratingItemElement.classList.add(CLASS_NAME_RATING_ITEM)
 
@@ -447,7 +514,8 @@ class Rating extends BaseComponent {
         ratingItemInputElement.setAttribute('disabled', true as any)
       }
 
-      if (this._currentValue === value) {
+      // eslint-disable-next-line eqeqeq
+      if (this._currentValue == value) {
         ratingItemInputElement.checked = true
       }
 
@@ -464,7 +532,7 @@ class Rating extends BaseComponent {
       }
     })
 
-    this._element.append(ratingItemElement)
+    return ratingItemElement
   }
 
   // Static
