@@ -438,6 +438,21 @@ describe('Calendar', () => {
       expect(new Date(stop.dataset.coreuiDate).getDate()).toEqual(22)
     })
 
+    it('should open on the limit today falls outside of and park the stop there', () => {
+      vi.useFakeTimers({ toFake: ['Date'] })
+      vi.setSystemTime(new Date(2026, 8, 30))
+      onTestFinished(() => vi.useRealTimers())
+      fixtureEl.innerHTML = '<div></div><div></div>'
+
+      const [before, after] = fixtureEl.querySelectorAll('div')
+      new Calendar(before, { locale: 'en-US', maxDate: new Date(2026, 6, 14) }) // eslint-disable-line no-new
+      new Calendar(after, { locale: 'en-US', minDate: new Date(2026, 11, 3) }) // eslint-disable-line no-new
+
+      const stop = element => new Date(element.querySelector('.calendar-cell[tabindex="0"]').dataset.coreuiDate)
+      expect(stop(before)).toEqual(new Date(2026, 6, 14))
+      expect(stop(after)).toEqual(new Date(2026, 11, 3))
+    })
+
     it('should prefer the selected date over the day the calendar opens on', () => {
       fixtureEl.innerHTML = '<div></div>'
 

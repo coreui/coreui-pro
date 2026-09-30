@@ -19,6 +19,7 @@ import { defineJQueryPlugin, isRTL, jQueryDispatch } from './util/index.js'
 import {
   type CalendarKeyAction,
   type CalendarKeyContext,
+  constrainDate,
   convertToDateObject,
   createDate,
   createDateFormatter,
@@ -828,12 +829,20 @@ class Calendar extends BaseComponent {
   _initializeDates(keys?: string[]): void {
     const changed = (...names: string[]) => !keys || keys.includes('selectionType') || names.some(name => keys.includes(name))
 
+    if (changed('minDate')) {
+      this._minDate = convertToDateObject(this._config.minDate, this._config.selectionType)
+    }
+
+    if (changed('maxDate')) {
+      this._maxDate = convertToDateObject(this._config.maxDate, this._config.selectionType)
+    }
+
     if (changed('calendarDate', 'startDate', 'endDate')) {
       const source = !keys || keys.includes('selectionType') ?
         this._config.calendarDate || this._config.startDate || this._config.endDate :
         ['calendarDate', 'startDate', 'endDate'].filter(name => keys.includes(name)).map(name => this._config[name]).find(Boolean) ?? null
 
-      this._calendarDate = convertToDateObject(source, this._config.selectionType) || this._calendarDate || new Date()
+      this._calendarDate = convertToDateObject(source, this._config.selectionType) || this._calendarDate || constrainDate(new Date(), this._minDate, this._maxDate)
     }
 
     if (changed('startDate')) {
@@ -842,14 +851,6 @@ class Calendar extends BaseComponent {
 
     if (changed('endDate')) {
       this._endDate = convertToDateObject(this._config.endDate, this._config.selectionType)
-    }
-
-    if (changed('minDate')) {
-      this._minDate = convertToDateObject(this._config.minDate, this._config.selectionType)
-    }
-
-    if (changed('maxDate')) {
-      this._maxDate = convertToDateObject(this._config.maxDate, this._config.selectionType)
     }
 
     if (changed('selectEndDate')) {

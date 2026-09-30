@@ -2,6 +2,7 @@
 import { onTestFinished } from 'vitest'
 import { cdp } from 'vitest/browser'
 import {
+  constrainDate,
   convertIsoWeekToDate,
   convertToDateObject,
   createDateFormatter,
@@ -1129,6 +1130,24 @@ describe('Calendar Utilities', () => {
 
       date.setFullYear(99, 0, 15)
       expect(getISOWeekNumberAndYear(date)).toEqual({ weekNumber: 3, year: 99 })
+    })
+  })
+
+  describe('constrainDate', () => {
+    it('should keep a date the limits allow', () => {
+      const date = new Date(2026, 6, 10)
+
+      expect(constrainDate(date, new Date(2026, 6, 1), new Date(2026, 6, 31))).toBe(date)
+      expect(constrainDate(date, null, null)).toBe(date)
+    })
+
+    it('should move a date across a limit onto a copy of that limit', () => {
+      const min = new Date(2026, 6, 5)
+      const max = new Date(2026, 6, 14)
+
+      expect(constrainDate(new Date(2026, 6, 1), min, max)).toEqual(min)
+      expect(constrainDate(new Date(2026, 6, 20), min, max)).toEqual(max)
+      expect(constrainDate(new Date(2026, 6, 20), min, max)).not.toBe(max)
     })
   })
 

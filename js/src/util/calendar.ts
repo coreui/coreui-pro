@@ -1573,6 +1573,27 @@ export const getCalendarKeyAction = (event: { code: string; key: string; repeat?
   date ? getCellKeyAction(event, date, context) : getGridKeyAction(event, context)
 
 /**
+ * Moves a date between two limits: a date before the earliest one becomes
+ * that date, a date after the latest one becomes that date.
+ *
+ * @param date - The date to move
+ * @param min - The earliest date allowed, or `null` without one
+ * @param max - The latest date allowed, or `null` without one
+ * @returns The date itself when the limits allow it, else a copy of the limit it crossed
+ */
+export const constrainDate = (date: Date, min: Date | null, max: Date | null) : Date => {
+  if (min && date < min) {
+    return new Date(min)
+  }
+
+  if (max && date > max) {
+    return new Date(max)
+  }
+
+  return date
+}
+
+/**
  * Tells whether a day cannot be picked: it lies before `min` or year 1, or after
  * `max`, or it matches the disabled dates, which can be a function, a date, or
  * an array mixing functions, dates and `[start, end]` ranges.
