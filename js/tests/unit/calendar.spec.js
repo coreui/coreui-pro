@@ -291,6 +291,17 @@ describe('Calendar', () => {
       expect(calendar._calendarDate.getMonth()).toEqual(5)
     })
 
+    it('should initialize calendarDate from startDate if calendarDate is empty', () => {
+      fixtureEl.innerHTML = '<div></div><div></div>'
+
+      const divs = fixtureEl.querySelectorAll('div')
+
+      for (const [index, calendarDate] of ['', null].entries()) {
+        new Calendar(divs[index], { calendarDate, locale: 'en-US', startDate: new Date(2023, 0, 15) }) // eslint-disable-line no-new
+        expect(divs[index].querySelector('table').getAttribute('aria-label')).toEqual('January 2023')
+      }
+    })
+
     it('should initialize calendarDate from endDate if calendarDate and startDate are null', () => {
       fixtureEl.innerHTML = '<div></div>'
 
