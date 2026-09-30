@@ -87,6 +87,7 @@ class NumberInput extends BaseComponent {
   private _group: ControlGroup | null = null
   private _repeatTimeout: ReturnType<typeof setTimeout> | null = null
   private _repeatInterval: ReturnType<typeof setInterval> | null = null
+  private _repeated = false
   private _stopRepeatingHandler = (): void => this._stopRepeating()
   private _resetHandler = (): void => {
     setTimeout(() => this._updateButtonState())
@@ -145,52 +146,50 @@ class NumberInput extends BaseComponent {
   }
 
   // Private
-  // The native input owns min, max and step, so stepping is its own API. It
-  // throws when the value is not a valid number — which it is whenever the
-  // field is empty or holds something the browser refused — so an unusable
-  // value starts from the minimum, or from zero when there is none.
-  _step(direction: 'up' | 'down'): void {
-    if (this._element.disabled || this._element.readOnly) {
-      return
+  _step(direction: 'up' | 'down'): boolean {
+    if (this._element.disabled || this._element.readOnly || !this._canStep(direction)) {
+      return false
     }
 
-    const previousValue = this._element.value
+    this._stepValue(this._element, direction)
 
-    if (previousValue === '') {
-      this._element.value = this._element.min === '' ? '0' : this._element.min
-    } else if (this._element.step === 'any') {
-      this._stepByOne(direction)
-    } else if (direction === 'up') {
-      this._element.stepUp()
-    } else {
-      this._element.stepDown()
-    }
-
-    if (this._element.value === previousValue) {
-      return
-    }
-
-    this._updateButtonState()
     EventHandler.trigger(this._element, 'input', { bubbles: true })
     EventHandler.trigger(this._element, 'change', { bubbles: true })
     EventHandler.trigger(this._element, EVENT_CHANGE, { value: this._element.value })
+
+    return true
+  }
+
+  _stepValue(input: HTMLInputElement, direction: 'up' | 'down'): void {
+    if (input.step.toLowerCase() === 'any') {
+      this._stepByOne(input, direction)
+      return
+    }
+
+    input[direction === 'up' ? 'stepUp' : 'stepDown']()
+
+    // WebKit leaves an empty field empty when the range lies behind zero in the step's direction.
+    if (input.value === '') {
+      input[direction === 'up' ? 'stepDown' : 'stepUp']()
+    }
   }
 
   // stepUp()/stepDown() throw on step="any"; the native spinner moves such a
   // field by one, so the buttons do the same.
-  _stepByOne(direction: 'up' | 'down'): void {
-    const { max, min, value } = this._element
-    let next = Number(value) + (direction === 'up' ? 1 : -1)
+  _stepByOne(input: HTMLInputElement, direction: 'up' | 'down'): void {
+    const delta = direction === 'up' ? 1 : -1
+    const value = input.value === '' ? 0 : Number(input.value)
+    const next = this._clamp(Number((value + delta).toPrecision(15)))
 
-    if (min !== '') {
-      next = Math.max(next, Number(min))
+    if (input.value === '' || (next - value) * delta > 0) {
+      input.value = String(next)
     }
+  }
 
-    if (max !== '') {
-      next = Math.min(next, Number(max))
-    }
+  _clamp(value: number): number {
+    const { max, min } = this._element
 
-    this._element.value = String(next)
+    return Math.min(Math.max(value, min === '' ? -Infinity : Number(min)), max === '' ? Infinity : Number(max))
   }
 
   _createButtons(): void {
@@ -231,7 +230,14 @@ class NumberInput extends BaseComponent {
         continue
       }
 
-      EventHandler.on(button, EVENT_CLICK, () => this._step(direction))
+      EventHandler.on(button, EVENT_CLICK, (event: any) => {
+        const repeated = this._repeated
+        this._repeated = false
+
+        if (!repeated || event.detail === 0) {
+          this._step(direction)
+        }
+      })
 
       if (this._config.repeat) {
         EventHandler.on(button, EVENT_POINTERDOWN, (event: any) => {
@@ -259,9 +265,16 @@ class NumberInput extends BaseComponent {
 
   _startRepeating(direction: 'up' | 'down'): void {
     this._stopRepeating()
+    this._repeated = false
 
     this._repeatTimeout = setTimeout(() => {
-      this._repeatInterval = setInterval(() => this._step(direction), REPEAT_INTERVAL)
+      this._repeatInterval = setInterval(() => {
+        this._repeated = true
+
+        if (!this._step(direction)) {
+          this._stopRepeating()
+        }
+      }, REPEAT_INTERVAL)
     }, REPEAT_DELAY)
   }
 
@@ -281,15 +294,21 @@ class NumberInput extends BaseComponent {
   // silently inert, so it reads the same to a pointer, a screen reader and the
   // frame's disabled styling.
   _updateButtonState(): void {
-    const { max, min, value } = this._element
-
     if (this._decrementElement) {
-      this._decrementElement.disabled = min !== '' && value !== '' && Number(value) <= Number(min)
+      this._decrementElement.disabled = !this._canStep('down')
     }
 
     if (this._incrementElement) {
-      this._incrementElement.disabled = max !== '' && value !== '' && Number(value) >= Number(max)
+      this._incrementElement.disabled = !this._canStep('up')
     }
+  }
+
+  _canStep(direction: 'up' | 'down'): boolean {
+    const input = this._element.cloneNode() as HTMLInputElement
+    input.value = this._element.value
+    this._stepValue(input, direction)
+
+    return input.value !== '' && input.valueAsNumber !== this._element.valueAsNumber
   }
 
   // Static

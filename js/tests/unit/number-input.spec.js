@@ -1,3 +1,5 @@
+import { vi } from 'vitest'
+
 import NumberInput from '../../src/number-input.js'
 import { clearFixture, getFixture } from '../helpers/fixture.js'
 
@@ -58,22 +60,80 @@ describe('NumberInput', () => {
       expect(input.value).toBe('2')
     })
 
-    it('should start from the minimum when the value is empty', () => {
-      const input = markup('min="3"')
+    it('should step an empty field from zero and keep it within min, max and the step grid', () => {
+      const cases = [
+        ['', 'up', '1'],
+        ['', 'down', '-1'],
+        ['step="5"', 'up', '5'],
+        ['step="5"', 'down', '-5'],
+        ['min="-10" max="10"', 'up', '1'],
+        ['min="-10" max="10"', 'down', '-1'],
+        ['min="3"', 'up', '3'],
+        ['min="3"', 'down', '3'],
+        ['max="-5"', 'up', '-5'],
+        ['max="-5"', 'down', '-5'],
+        ['max="-5" step="3"', 'up', '-6'],
+        ['max="-5" step="3"', 'down', '-6'],
+        ['min="-10" max="-5" step="3"', 'up', '-7'],
+        ['step="any" min="-3"', 'up', '1'],
+        ['step="any" min="-3"', 'down', '-1']
+      ]
+
+      for (const [attributes, direction, expected] of cases) {
+        const input = markup(attributes)
+        const numberInput = new NumberInput(input)
+
+        if (direction === 'up') {
+          numberInput.increment()
+        } else {
+          numberInput.decrement()
+        }
+
+        expect(input.value, `${attributes} ${direction}`).toBe(expected)
+        numberInput.dispose()
+      }
+    })
+
+    it('should step an empty field the other way when the browser leaves it empty', () => {
+      const below = markup('max="-5" step="3"')
+      const belowInput = new NumberInput(below)
+
+      vi.spyOn(below, 'stepUp').mockImplementation(() => {})
+      belowInput.increment()
+
+      expect(below.value).toBe('-6')
+
+      const above = markup('min="3"')
+      const aboveInput = new NumberInput(above)
+
+      vi.spyOn(above, 'stepDown').mockImplementation(() => {})
+      aboveInput.decrement()
+
+      expect(above.value).toBe('3')
+    })
+
+    it('should leave an empty field alone when min is above max', () => {
+      const input = markup('min="10" max="5"')
       const numberInput = new NumberInput(input)
 
       numberInput.increment()
-
-      expect(input.value).toBe('3')
-    })
-
-    it('should start from zero when the value is empty and there is no minimum', () => {
-      const input = markup()
-      const numberInput = new NumberInput(input)
-
       numberInput.decrement()
 
-      expect(input.value).toBe('0')
+      expect(input.value).toBe('')
+      expect([...buttons()].map(button => button.disabled)).toEqual([true, true])
+    })
+
+    it('should compare values as numbers, not as the text in the field', () => {
+      const input = markup('value="10.0" min="0" max="10"')
+      const numberInput = new NumberInput(input)
+      const seen = []
+
+      input.addEventListener('input', () => seen.push('input'))
+      numberInput.increment()
+
+      expect(buttons()[1].disabled).toBe(true)
+      expect(input.value).toBe('10.0')
+      expect(seen).toEqual([])
     })
 
     it('should not step a disabled or readonly input', () => {
@@ -95,6 +155,25 @@ describe('NumberInput', () => {
       numberInput.decrement()
       numberInput.decrement()
       expect(input.value).toBe('0')
+    })
+
+    it('should step by one with step="any" without moving against the direction or drifting', () => {
+      const outside = markup('value="15" step="any" max="10"')
+      const outsideInput = new NumberInput(outside)
+
+      expect(buttons()[1].disabled).toBe(true)
+
+      outsideInput.increment()
+      expect(outside.value).toBe('15')
+
+      outsideInput.decrement()
+      expect(outside.value).toBe('10')
+
+      const fraction = markup('value="-0.9" step="ANY"')
+      const fractionInput = new NumberInput(fraction)
+
+      fractionInput.increment()
+      expect(fraction.value).toBe('0.1')
     })
 
     it('should not fire events when the value cannot move', () => {
@@ -138,6 +217,17 @@ describe('NumberInput', () => {
       expect(buttons()[1].disabled).toBe(true)
     })
 
+    it('should disable a button whose step would not move the value', () => {
+      const input = markup('value="9" min="0" max="10" step="3"')
+      const numberInput = new NumberInput(input)
+
+      expect(buttons()[1].disabled).toBe(true)
+
+      numberInput.decrement()
+
+      expect(buttons()[1].disabled).toBe(false)
+    })
+
     it('should follow a form reset', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = '<form><input type="number" class="form-control" value="1" max="2"></form>'
@@ -165,6 +255,77 @@ describe('NumberInput', () => {
       input.dispatchEvent(new Event('input'))
 
       expect(buttons()[1].disabled).toBe(true)
+    })
+  })
+
+  describe('repeat', () => {
+    const press = button => button.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, button: 0 }))
+    const release = () => document.dispatchEvent(new PointerEvent('pointerup', { bubbles: true }))
+    const pointerClick = button => button.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }))
+
+    beforeEach(() => {
+      vi.useFakeTimers()
+    })
+
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
+    it('should not step again on the click that ends a held button', () => {
+      const input = markup('value="0"')
+      const numberInput = new NumberInput(input) // eslint-disable-line no-unused-vars
+
+      press(buttons()[1])
+      vi.advanceTimersByTime(400 + (60 * 3))
+      release()
+      pointerClick(buttons()[1])
+
+      expect(input.value).toBe('3')
+    })
+
+    it('should step on the next pointer click after a hold', () => {
+      const input = markup('value="0"')
+      const numberInput = new NumberInput(input) // eslint-disable-line no-unused-vars
+
+      press(buttons()[1])
+      vi.advanceTimersByTime(400 + 60)
+      release()
+      pointerClick(buttons()[1])
+      press(buttons()[1])
+      release()
+      pointerClick(buttons()[1])
+
+      expect(input.value).toBe('2')
+    })
+
+    it('should stop repeating once the step no longer moves the value', () => {
+      const input = markup('value="0" max="2"')
+      const numberInput = new NumberInput(input) // eslint-disable-line no-unused-vars
+
+      press(buttons()[1])
+      vi.advanceTimersByTime(400 + (60 * 4))
+      input.value = '0'
+      vi.advanceTimersByTime(60 * 3)
+
+      expect(input.value).toBe('0')
+    })
+
+    it('should step on a short click and on a click no pointer made, even after a hold', () => {
+      const input = markup('value="0"')
+      const numberInput = new NumberInput(input) // eslint-disable-line no-unused-vars
+
+      press(buttons()[1])
+      release()
+      pointerClick(buttons()[1])
+
+      expect(input.value).toBe('1')
+
+      press(buttons()[1])
+      vi.advanceTimersByTime(400 + 60)
+      release()
+      buttons()[1].click()
+
+      expect(input.value).toBe('3')
     })
   })
 
