@@ -1,6 +1,7 @@
 @use "sass:map";
 @use "functions/defaults" as *;
 @use "functions/escape-svg" as *;
+@use "mixins/focus-ring" as *;
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
 @use "config" as *;
@@ -69,6 +70,10 @@ $rating-tokens: defaults(
     position: relative;
     line-height: 0;
     @include transition(var(--#{$prefix}rating-transition));
+
+    &:has(.rating-item-input:focus-visible) {
+      @include focus-ring(true);
+    }
   }
 
   .rating-item-input {

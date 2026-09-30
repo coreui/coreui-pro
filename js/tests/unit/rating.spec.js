@@ -1,3 +1,4 @@
+import { userEvent } from '@vitest/browser/context'
 import { vi } from 'vitest'
 
 import Rating from '../../src/rating.js'
@@ -197,15 +198,30 @@ describe('Rating', () => {
       }
     })
 
-    it('should disable all inputs when readonly is true', () => {
-      fixtureEl.innerHTML = '<div></div>'
+    it('should keep the inputs enabled when readonly is true, so the form submits the value', () => {
+      fixtureEl.innerHTML = '<form><div></div></form>'
+      const form = fixtureEl.querySelector('form')
       const div = fixtureEl.querySelector('div')
-      new Rating(div, { readonly: true }) // eslint-disable-line no-new
+      new Rating(div, { name: 'score', readonly: true, value: 3 }) // eslint-disable-line no-new
 
-      const inputs = div.querySelectorAll('.rating-item-input')
-      for (const input of inputs) {
-        expect(input.disabled).toBeTrue()
+      for (const input of div.querySelectorAll('.rating-item-input')) {
+        expect(input.disabled).toBeFalse()
       }
+
+      expect(new FormData(form).get('score')).toEqual('3')
+    })
+
+    it('should submit a readonly rating only under the name the page gives it', () => {
+      fixtureEl.innerHTML = '<form><div></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div, { readonly: true, value: 3 })
+
+      expect([...new FormData(form).keys()]).toEqual([])
+
+      rating.setConfig({ readonly: false })
+
+      expect([...new FormData(form).keys()]).toHaveSize(1)
     })
   })
 
@@ -1046,6 +1062,113 @@ describe('Rating', () => {
   })
 
   describe('readonly & disabled', () => {
+    it('should cancel a click on a readonly star and keep the value', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const changeSpy = jasmine.createSpy('change')
+      // eslint-disable-next-line no-new
+      new Rating(div, { readonly: true, value: 2 })
+      const inputs = div.querySelectorAll('.rating-item-input')
+      const click = new MouseEvent('click', { bubbles: true, cancelable: true })
+
+      div.addEventListener('change.coreui.rating', changeSpy)
+      inputs[3].dispatchEvent(click)
+      inputs[0].click()
+
+      expect(click.defaultPrevented).toBeTrue()
+      expect(div.querySelector('.rating-item-input:checked').value).toEqual('2')
+      expect(div.querySelectorAll('.rating-item-label.active')).toHaveSize(2)
+      expect(changeSpy).not.toHaveBeenCalled()
+    })
+
+    it('should keep the focus and the value on the checked star when an arrow key is pressed in a readonly rating', async () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const changeSpy = jasmine.createSpy('change')
+      // eslint-disable-next-line no-new
+      new Rating(div, { name: 'score', readonly: true, value: 2 })
+      const inputs = div.querySelectorAll('.rating-item-input')
+
+      div.addEventListener('change.coreui.rating', changeSpy)
+      inputs[1].focus()
+      await userEvent.keyboard('{ArrowRight}{ArrowDown}')
+
+      expect(document.activeElement).toBe(inputs[1])
+
+      await userEvent.keyboard('{ArrowLeft}{ArrowLeft}{ArrowUp}')
+
+      expect(document.activeElement).toBe(inputs[1])
+      expect(div.querySelector('.rating-item-input:checked').value).toEqual('2')
+      expect(changeSpy).not.toHaveBeenCalled()
+    })
+
+    it('should leave only the checked star of a readonly rating in the tab order', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div, { readonly: true, value: 2 })
+      const tabIndexes = () => [...div.querySelectorAll('.rating-item-input')].map(input => input.tabIndex)
+
+      expect(tabIndexes()).toEqual([-1, 0, -1, -1, -1])
+
+      rating.setConfig({ value: null })
+
+      expect(tabIndexes()).toEqual([-1, -1, -1, -1, -1])
+
+      rating.setConfig({ readonly: false })
+
+      expect(tabIndexes()).toEqual([0, 0, 0, 0, 0])
+    })
+
+    it('should not fire hover or build a tooltip when a readonly star gets focus', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const hoverSpy = jasmine.createSpy('hover')
+      // eslint-disable-next-line no-new
+      new Rating(div, { readonly: true, tooltips: true, value: 2 })
+      const input = div.querySelectorAll('.rating-item-input')[1]
+
+      div.addEventListener('hover.coreui.rating', hoverSpy)
+      input.dispatchEvent(createEvent('focusin', { bubbles: true }))
+      input.dispatchEvent(createEvent('focusout', { bubbles: true }))
+
+      expect(hoverSpy).not.toHaveBeenCalled()
+      expect(Tooltip.getInstance(input.parentElement)).toBeNull()
+    })
+
+    it('should mark a readonly rating with aria-readonly, drop it when readonly turns off, and give the markup back on dispose', () => {
+      fixtureEl.innerHTML = '<div data-coreui-rating></div>'
+      const div = fixtureEl.querySelector('div')
+      const markup = div.outerHTML
+      const rating = new Rating(div, { readonly: true })
+
+      expect(div.getAttribute('aria-readonly')).toEqual('true')
+
+      rating.setConfig({ readonly: false })
+
+      expect(div.hasAttribute('aria-readonly')).toBeFalse()
+
+      rating.setConfig({ readonly: true })
+      rating.dispose()
+
+      expect(div.outerHTML).toEqual(markup)
+    })
+
+    it('should leave an aria-readonly the markup already has', () => {
+      fixtureEl.innerHTML = '<div aria-readonly="false"></div>'
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div, { readonly: true })
+
+      expect(div.getAttribute('aria-readonly')).toEqual('false')
+
+      rating.setConfig({ readonly: false })
+
+      expect(div.getAttribute('aria-readonly')).toEqual('false')
+
+      rating.dispose()
+
+      expect(div.getAttribute('aria-readonly')).toEqual('false')
+    })
+
     it('should not change or hover if readonly is true', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')

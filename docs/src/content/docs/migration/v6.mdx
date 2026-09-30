@@ -2191,6 +2191,12 @@ field behind that kept submitting.
   matching option is removed at init, and `size` replaces a `rating-sm` or
   `rating-lg` the markup wrote. `setConfig({ disabled: false })` used to leave
   `.disabled` behind.
+- **A read-only rating submits its value under the `name` you give it.**
+  `readonly` used to disable the radios, so the form left the value out; now
+  they stay enabled, the mouse and the keyboard cannot change them, only the
+  checked star takes focus, and the group carries `aria-readonly="true"`. A
+  read-only rating without `name` still submits nothing.
+- **A star with keyboard focus shows the focus ring.**
 - **`setConfig()` keeps the value the user picked** unless you pass `value`,
   and `setConfig({ name })` renames the radios; a value the new options cannot
   show is dropped. Any option change used to reset the rating to its initial
