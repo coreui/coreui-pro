@@ -120,27 +120,99 @@ const sources = (entry, seen = new Set()) => {
   return [source, ...imports.flatMap(next => sources(next, seen))]
 }
 
-for (const name of Object.keys(manifest)) {
-  const entry = path.join(jsDir, `${name}.ts`)
+const plugins = {
+  button: 'buttons',
+  'chip-input': 'forms/chip-input',
+  collapse: 'transitions',
+  'context-menu': 'menu',
+  'date-input': 'forms/form-date-time',
+  'date-range-input': 'forms/form-date-time',
+  'date-range-picker': 'date-picker',
+  'multi-select': 'forms/form-multi-select',
+  navigation: 'sidebar',
+  'number-input': 'forms/number-input',
+  'otp-input': 'forms/otp-input',
+  'password-input': 'forms/form-control-group',
+  'password-strength': 'forms/password-strength',
+  range: 'forms/form-range',
+  scrollspy: null,
+  tab: 'nav',
+  'time-input': 'forms/form-date-time',
+  toast: 'toasts'
+}
 
-  if (!fs.existsSync(entry)) {
+const inert = {
+  calendar: { 'btn-sm': 'the navigation buttons read none of the tokens it sets' },
+  'forms/chip-input': { 'form-floating': 'only a field with a floating label renders it' },
+  'forms/form-control-group': { 'form-floating': 'only a field with a floating label renders it' },
+  'forms/number-input': { 'form-floating': 'only a field with a floating label renders it' }
+}
+
+const entryOf = plugin => Object.hasOwn(plugins, plugin) ? plugins[plugin] : (Object.hasOwn(manifest, plugin) ? plugin : undefined)
+
+const literalClasses = source => [
+  ...[...source.matchAll(/\.className = (['`])(.*?)\1/g)].map(match => match[2]),
+  ...[...source.matchAll(/classList\.(?:add|toggle)\(([^)]*)\)/g)].flatMap(match => [...match[1].matchAll(/(['`])(.*?)\1/g)].map(quoted => quoted[2])),
+  ...[...source.matchAll(/\bclass="([^"]*)"/g)].map(match => match[1])
+].flatMap(value => value.replaceAll(/\$\{[^}]*\}/g, ' ').split(/\s+/)).filter(token => /^[a-z][\w-]*$/.test(token))
+
+const instantiated = source => [...source.matchAll(/^import (\w+) from '\.\/([\w-]+)\.js'/gm)]
+  .filter(([, binding]) => new RegExp(`\\bnew ${binding}\\(|\\b${binding}\\.getOrCreateInstance\\(`).test(source))
+  .map(match => match[2])
+
+const pluginFiles = [...fs.readFileSync(path.join(jsDir, 'index.ts'), 'utf8').matchAll(/^export \{ default as \w+ \} from '\.\/([\w-]+)\.js'/gm)]
+  .map(match => match[1])
+
+const found = new Set()
+for (const plugin of pluginFiles) {
+  const name = entryOf(plugin)
+
+  if (name === null) {
     continue
   }
 
+  if (!name) {
+    found.add(`  js/src/${plugin}.ts has no manifest entry of that name and no entry in the plugins table`)
+    continue
+  }
+
+  const entry = path.join(jsDir, `${plugin}.ts`)
+  const label = name === plugin ? name : `${name} (${plugin}.ts)`
   const allowed = new Set([name, ...manifest[name].requires])
+  const rendered = []
 
   for (const source of sources(entry)) {
     for (const [, constant, className] of source.matchAll(/^const (CLASS_NAME_[A-Z0-9_]+) = '([^']+)'/gm)) {
       const uses = [...source.matchAll(new RegExp(`\\b${constant}\\b`, 'g'))].length
       const queries = [...source.matchAll(new RegExp(`^const SELECTOR_[A-Z0-9_]+ =.*\\b${constant}\\b`, 'gm'))].length
-      const declarer = declaring.get(className)
 
-      if (uses > 1 + queries && declarer && !allowed.has(declarer)) {
-        report.push(`  ${name} renders .${className}, which ${declarer}.css declares, but does not require it`)
+      if (uses > 1 + queries) {
+        rendered.push([className, ''])
       }
     }
   }
+
+  const pluginSource = fs.readFileSync(entry, 'utf8')
+  rendered.push(...literalClasses(pluginSource).map(className => [className, ' as a literal']))
+
+  for (const [className, how] of rendered) {
+    const declarer = declaring.get(className)
+
+    if (declarer && !allowed.has(declarer) && !inert[name]?.[className]) {
+      found.add(`  ${label} renders .${className}${how}, which ${declarer}.css declares, but does not require it`)
+    }
+  }
+
+  for (const created of instantiated(pluginSource)) {
+    const owner = entryOf(created)
+
+    if (owner && owner !== name && !allowed.has(owner)) {
+      found.add(`  ${label} creates a ${created} instance, which ${owner}.css styles, but does not require it`)
+    }
+  }
 }
+
+report.push(...found)
 
 if (report.length > 0) {
   console.error(`✗ base.css plus the component stylesheets do not reconstruct coreui.css:\n${report.slice(0, 20).join('\n')}`)
