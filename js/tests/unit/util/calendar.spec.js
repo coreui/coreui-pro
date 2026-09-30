@@ -1,5 +1,5 @@
 
-import { onTestFinished, vi } from 'vitest'
+import { onTestFinished } from 'vitest'
 import { cdp } from 'vitest/browser'
 import {
   constrainDate,
@@ -19,7 +19,6 @@ import {
   getISOWeekNumberAndYear,
   getLocalDateFromString,
   getMonthsNames,
-  getOpeningDate,
   getSelectableDates,
   getStartOfView,
   getStartOfWeek,
@@ -27,6 +26,7 @@ import {
   getYears,
   getMonthDetails,
   isCellDisabled,
+  isCellOutsideLimits,
   isDateDisabled,
   isDateInRange,
   isDateSelected,
@@ -583,11 +583,11 @@ describe('Calendar Utilities', () => {
   })
 
   describe('getSelectableDates', () => {
-    it('should find the selectable rows and cells in document order', () => {
+    it('should find the rows and cells that can take the focus, in document order', () => {
       fixtureEl.innerHTML = [
         '<table><tbody>',
-        '<tr><td data-coreui-selectable>1</td><td>2</td></tr>',
-        '<tr data-coreui-selectable><td>3</td><td data-coreui-selectable>4</td></tr>',
+        '<tr><td tabindex="-1">1</td><td>2</td></tr>',
+        '<tr tabindex="-1"><td>3</td><td tabindex="-1">4</td></tr>',
         '</tbody></table>'
       ].join('')
 
@@ -602,7 +602,7 @@ describe('Calendar Utilities', () => {
   })
 
   describe('getClosestSelectable', () => {
-    const cell = (date, className = '') => `<td data-coreui-selectable class="${className}" data-coreui-date="${date.toDateString()}"></td>`
+    const cell = (date, className = '') => `<td tabindex="-1" class="${className}" data-coreui-date="${date.toDateString()}"></td>`
 
     it('should pick the cell closest to the anchor and skip days of adjacent months', () => {
       fixtureEl.innerHTML = `<table><tbody><tr>${cell(new Date(2026, 5, 30), 'previous')}${cell(new Date(2026, 6, 3))}${cell(new Date(2026, 6, 10))}</tr></tbody></table>`
@@ -613,17 +613,17 @@ describe('Calendar Utilities', () => {
     })
 
     it('should measure a week row by the days its cells carry and let a row of the panel\'s own month win a tie', () => {
-      const week = className => `<tr data-coreui-selectable>${cell(new Date(2026, 6, 27), className)}${cell(new Date(2026, 7, 2))}</tr>`
+      const week = className => `<tr tabindex="-1">${cell(new Date(2026, 6, 27), className)}${cell(new Date(2026, 7, 2))}</tr>`
       fixtureEl.innerHTML = `<table><tbody>${week('previous')}${week('')}</tbody></table>`
-      const rows = getSelectableDates(fixtureEl, 'tr[data-coreui-selectable]')
+      const rows = getSelectableDates(fixtureEl, 'tr[tabindex]')
 
       expect(getClosestSelectable(rows, new Date(2026, 6, 30), true)).toBe(rows[1])
     })
 
     it('should end a week row at its last shown day', () => {
-      const row = (first, last) => `<tr data-coreui-selectable>${cell(first)}${cell(last)}</tr>`
+      const row = (first, last) => `<tr tabindex="-1">${cell(first)}${cell(last)}</tr>`
       fixtureEl.innerHTML = `<table><tbody>${row(new Date(2026, 2, 30), new Date(2026, 2, 31))}${row(new Date(2026, 3, 1), new Date(2026, 3, 5))}</tbody></table>`
-      const rows = getSelectableDates(fixtureEl, 'tr[data-coreui-selectable]')
+      const rows = getSelectableDates(fixtureEl, 'tr[tabindex]')
 
       expect(getClosestSelectable(rows, new Date(2026, 3, 2), true)).toBe(rows[1])
     })
@@ -634,20 +634,20 @@ describe('Calendar Utilities', () => {
 
       expect(getClosestSelectable(cells, createDate(99, 11, 15), false)).toBe(cells[1])
 
-      const row = (first, last) => `<tr data-coreui-selectable>${cell(first)}${cell(last)}</tr>`
+      const row = (first, last) => `<tr tabindex="-1">${cell(first)}${cell(last)}</tr>`
       fixtureEl.innerHTML = `<table><tbody>${row(createDate(99, 10, 30), createDate(99, 11, 6))}${row(createDate(99, 11, 14), createDate(99, 11, 20))}</tbody></table>`
-      const rows = getSelectableDates(fixtureEl, 'tr[data-coreui-selectable]')
+      const rows = getSelectableDates(fixtureEl, 'tr[tabindex]')
 
       expect(getClosestSelectable(rows, createDate(99, 11, 15), true)).toBe(rows[1])
     })
 
     it('should return undefined without a cell that carries a date', () => {
-      fixtureEl.innerHTML = '<table><tbody><tr><td data-coreui-selectable></td></tr></tbody></table>'
+      fixtureEl.innerHTML = '<table><tbody><tr><td tabindex="-1"></td></tr></tbody></table>'
 
       expect(getClosestSelectable(getSelectableDates(fixtureEl), new Date(2026, 6, 1), false)).toBeUndefined()
       expect(getClosestSelectable([], new Date(2026, 6, 1), false)).toBeUndefined()
 
-      fixtureEl.innerHTML = '<table><tbody><tr data-coreui-selectable><td></td></tr></tbody></table>'
+      fixtureEl.innerHTML = '<table><tbody><tr tabindex="-1"><td></td></tr></tbody></table>'
       expect(getClosestSelectable(getSelectableDates(fixtureEl), new Date(2026, 6, 1), true)).toBeUndefined()
     })
   })
@@ -813,17 +813,12 @@ describe('Calendar Utilities', () => {
         .toEqual(move(new Date(2026, 5, 29)))
     })
 
-    it('should stay on the edge of the week, and stop at the nearest selectable day toward the focus', () => {
+    it('should stay on the edge of the week, and stop at the limits toward the focus', () => {
       expect(getCalendarKeyAction(press('Home'), new Date(2026, 6, 13), context())).toEqual({ type: 'stay' })
       expect(getCalendarKeyAction(press('End'), new Date(2026, 6, 19), context())).toEqual({ type: 'stay' })
       expect(getCalendarKeyAction(press('Home'), new Date(2026, 6, 2), context({ minDate: new Date(2026, 6, 1) }))).toEqual(move(new Date(2026, 6, 1)))
-      expect(getCalendarKeyAction(press('End'), new Date(2026, 6, 15), context({ disabledDates: [new Date(2026, 6, 18), new Date(2026, 6, 19)] })))
-        .toEqual(move(new Date(2026, 6, 17)))
-      expect(getCalendarKeyAction(press('Home'), new Date(2026, 6, 15), context({ disabledDates: [new Date(2026, 6, 13), new Date(2026, 6, 14)] })))
-        .toEqual({ type: 'stay' })
-      expect(getCalendarKeyAction(press('Home'), new Date(2026, 6, 15), context({ disabledDates: [[new Date(2026, 6, 13), new Date(2026, 6, 15)]] })))
-        .toEqual({ type: 'stay' })
-      expect(getCalendarKeyAction(press('End'), new Date(2026, 6, 15), context({ disabledDates: () => true }))).toEqual({ type: 'stay' })
+      expect(getCalendarKeyAction(press('Home'), new Date(2026, 6, 15), context({ minDate: new Date(2026, 6, 14, 9) }))).toEqual(move(new Date(2026, 6, 14)))
+      expect(getCalendarKeyAction(press('End'), new Date(2026, 6, 15), context({ maxDate: new Date(2026, 6, 17) }))).toEqual(move(new Date(2026, 6, 17)))
     })
 
     it('should move week rows to the first and last week of the month the panel shows, in that panel', () => {
@@ -835,7 +830,8 @@ describe('Calendar Utilities', () => {
       expect(getCalendarKeyAction(press('Home'), new Date(2026, 6, 13), { ...juneAndJuly, panel: 1 })).toEqual(rowMove(new Date(2026, 5, 29), 1))
       expect(getCalendarKeyAction(press('Home'), new Date(2026, 5, 15), juneAndJuly)).toEqual(rowMove(new Date(2026, 5, 1)))
       expect(getCalendarKeyAction(press('End'), new Date(2026, 5, 15), juneAndJuly)).toEqual(rowMove(new Date(2026, 5, 29)))
-      expect(getCalendarKeyAction(press('Home'), new Date(2026, 6, 13), { ...july, disabledDates: [new Date(2026, 5, 29)] })).toEqual(rowMove(new Date(2026, 6, 6)))
+      expect(getCalendarKeyAction(press('Home'), new Date(2026, 6, 13), { ...july, minDate: new Date(2026, 6, 1) })).toEqual(rowMove(new Date(2026, 5, 29)))
+      expect(getCalendarKeyAction(press('Home'), new Date(2026, 6, 13), { ...july, minDate: new Date(2026, 6, 6) })).toEqual(rowMove(new Date(2026, 6, 6)))
       expect(getCalendarKeyAction(press('Home'), new Date(2026, 2, 16), context({ calendarDate: new Date(2026, 2, 1), rows: true }))).toEqual(rowMove(new Date(2026, 1, 23)))
     })
 
@@ -861,8 +857,8 @@ describe('Calendar Utilities', () => {
 
       expect(getCalendarKeyAction(press('Home'), new Date(2026, 4, 1), months)).toEqual(move(new Date(2026, 3, 1)))
       expect(getCalendarKeyAction(press('End'), new Date(2026, 4, 1), months)).toEqual(move(new Date(2026, 5, 1)))
-      expect(getCalendarKeyAction(press('Home'), new Date(2026, 4, 1), { ...months, disabledDates: [[new Date(2026, 3, 1), new Date(2026, 3, 30)]] }))
-        .toEqual({ type: 'stay' })
+      expect(getCalendarKeyAction(press('Home'), new Date(2026, 4, 1), { ...months, minDate: new Date(2026, 4, 15) })).toEqual({ type: 'stay' })
+      expect(getCalendarKeyAction(press('End'), new Date(2026, 4, 1), { ...months, maxDate: new Date(2026, 5, 2) })).toEqual(move(new Date(2026, 5, 1)))
       expect(getCalendarKeyAction(press('Home'), new Date(2026, 3, 1), quarters)).toEqual(move(new Date(2026, 0, 1)))
       expect(getCalendarKeyAction(press('End'), new Date(2026, 3, 1), quarters)).toEqual(move(new Date(2026, 9, 1)))
       expect(getCalendarKeyAction(press('Home'), new Date(2027, 0, 1), years)).toEqual(move(new Date(2026, 0, 1)))
@@ -890,25 +886,18 @@ describe('Calendar Utilities', () => {
       expect(getCalendarKeyAction(press('ArrowUp'), date, context({ rtl: true }))).toEqual(move(new Date(2026, 6, 8)))
     })
 
-    it('should skip disabled dates and stay when none is left before minDate, maxDate or ten years away', () => {
+    it('should move to the next day whether it can be picked or not, and stay at minDate or maxDate', () => {
       const date = new Date(2026, 6, 15)
 
-      expect(getCalendarKeyAction(press('ArrowRight'), date, context({ disabledDates: [new Date(2026, 6, 16), new Date(2026, 6, 17)] })))
-        .toEqual(move(new Date(2026, 6, 18)))
+      expect(getCalendarKeyAction(press('ArrowRight'), date, context())).toEqual(move(new Date(2026, 6, 16)))
       expect(getCalendarKeyAction(press('ArrowRight'), date, context({ maxDate: new Date(2026, 6, 16) }))).toEqual(move(new Date(2026, 6, 16)))
       expect(getCalendarKeyAction(press('ArrowRight'), date, context({ maxDate: new Date(2026, 6, 15, 12) }))).toEqual({ type: 'stay' })
       expect(getCalendarKeyAction(press('ArrowLeft'), date, context({ minDate: new Date(2026, 6, 15) }))).toEqual({ type: 'stay' })
-      expect(getCalendarKeyAction(press('ArrowRight'), date, context({ disabledDates: () => true }))).toEqual({ type: 'stay' })
+      expect(getCalendarKeyAction(press('ArrowLeft'), date, context({ minDate: new Date(2026, 6, 14, 12) }))).toEqual(move(new Date(2026, 6, 14)))
     })
 
-    it('should search across the new year and give up after the first step past ten years', () => {
-      const newYear = context({ calendarDate: new Date(2026, 11, 1), disabledDates: [[new Date(2026, 11, 31), new Date(2027, 0, 2)]] })
-
-      expect(getCalendarKeyAction(press('ArrowRight'), new Date(2026, 11, 30), newYear)).toEqual(move(new Date(2027, 0, 3), 1))
-      expect(getCalendarKeyAction(press('ArrowRight'), new Date(2026, 6, 15), context({ disabledDates: day => day < new Date(2037, 0, 1) })))
-        .toEqual(move(new Date(2037, 0, 1), 126))
-      expect(getCalendarKeyAction(press('ArrowRight'), new Date(2026, 6, 15), context({ disabledDates: day => day < new Date(2038, 0, 1) })))
-        .toEqual({ type: 'stay' })
+    it('should move across the new year, paging the calendar', () => {
+      expect(getCalendarKeyAction(press('ArrowRight'), new Date(2026, 11, 31), context({ calendarDate: new Date(2026, 11, 1) }))).toEqual(move(new Date(2027, 0, 1), 1))
     })
 
     it('should page the calendar only as far as it takes to show the target', () => {
@@ -926,7 +915,8 @@ describe('Calendar Utilities', () => {
       expect(getCalendarKeyAction(press('ArrowUp'), new Date(2026, 6, 27), rows)).toEqual(move(new Date(2026, 6, 20), -1))
       expect(getCalendarKeyAction(press('ArrowDown'), new Date(2026, 7, 31), rows)).toEqual(move(new Date(2026, 8, 7), 1))
       expect(getCalendarKeyAction(press('ArrowUp'), new Date(2026, 1, 2), { ...rows, calendarDate: new Date(2026, 1, 1) })).toEqual(move(new Date(2026, 0, 26)))
-      expect(getCalendarKeyAction(press('ArrowDown'), new Date(2026, 6, 6), { ...rows, disabledDates: () => true })).toEqual({ type: 'stay' })
+      expect(getCalendarKeyAction(press('ArrowDown'), new Date(2026, 7, 3), { ...rows, maxDate: new Date(2026, 7, 9) })).toEqual({ type: 'stay' })
+      expect(getCalendarKeyAction(press('ArrowUp'), new Date(2026, 7, 10), { ...rows, minDate: new Date(2026, 7, 5) })).toEqual(move(new Date(2026, 7, 3)))
     })
 
     it('should start week rows on the first day of the week', () => {
@@ -953,10 +943,12 @@ describe('Calendar Utilities', () => {
       expect(getCalendarKeyAction(press('ArrowRight'), new Date(2031, 0, 1), { ...years, calendars: 2 })).toEqual(move(new Date(2032, 0, 1)))
     })
 
-    it('should skip a disabled month in the months view', () => {
-      const months = context({ calendarDate: new Date(2026, 0, 1), disabledDates: [[new Date(2026, 5, 1), new Date(2026, 5, 30)]], view: 'months' })
+    it('should move to the next month in the months view, and stay past maxDate', () => {
+      const months = context({ calendarDate: new Date(2026, 0, 1), view: 'months' })
 
-      expect(getCalendarKeyAction(press('ArrowRight'), new Date(2026, 4, 1), months)).toEqual(move(new Date(2026, 6, 1)))
+      expect(getCalendarKeyAction(press('ArrowRight'), new Date(2026, 4, 1), months)).toEqual(move(new Date(2026, 5, 1)))
+      expect(getCalendarKeyAction(press('ArrowRight'), new Date(2026, 4, 1), { ...months, maxDate: new Date(2026, 5, 1) })).toEqual(move(new Date(2026, 5, 1)))
+      expect(getCalendarKeyAction(press('ArrowRight'), new Date(2026, 4, 1), { ...months, maxDate: new Date(2026, 4, 31) })).toEqual({ type: 'stay' })
     })
 
     it('should turn the calendar a month with PageDown and PageUp and move to the same day, cut to the length of the month', () => {
@@ -974,34 +966,29 @@ describe('Calendar Utilities', () => {
       expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 0, 1), context({ view: 'years' }))).toEqual(page(new Date(2038, 0, 1), 0, 12))
     })
 
-    it('should stop PageDown and PageUp on the last selectable date before maxDate and minDate, paging only when it is out of view', () => {
+    it('should stop PageDown and PageUp on the last date inside maxDate and minDate, paging only when it is out of view', () => {
       expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 6, 10), context({ maxDate: new Date(2026, 6, 20) }))).toEqual(move(new Date(2026, 6, 20)))
       expect(getCalendarKeyAction(press('PageUp'), new Date(2026, 6, 10), context({ minDate: new Date(2026, 5, 20) }))).toEqual(move(new Date(2026, 5, 20), -1))
       expect(getCalendarKeyAction(press('PageDown', true), new Date(2026, 6, 10), context({ maxDate: new Date(2026, 9, 5) }))).toEqual(move(new Date(2026, 9, 5), 3))
-      expect(getCalendarKeyAction(press('PageUp'), new Date(2026, 6, 25), context({ minDate: new Date(2026, 6, 20, 12) }))).toEqual(move(new Date(2026, 6, 21)))
+      expect(getCalendarKeyAction(press('PageUp'), new Date(2026, 6, 25), context({ minDate: new Date(2026, 6, 20, 12) }))).toEqual(move(new Date(2026, 6, 20)))
       expect(getCalendarKeyAction(press('PageUp'), new Date(2026, 7, 31), context({ calendarDate: new Date(2026, 7, 1), minDate: new Date(2026, 6, 31, 14) })))
-        .toEqual(move(new Date(2026, 7, 1)))
+        .toEqual(page(new Date(2026, 6, 31), -1))
       expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 5, 20), context({ calendarDate: new Date(2026, 5, 1), maxDate: new Date(2026, 6, 20) })))
         .toEqual(page(new Date(2026, 6, 20), 1))
-      expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 6, 10), context({ disabledDates: [new Date(2026, 7, 10)], maxDate: new Date(2026, 11, 31) })))
-        .toEqual(page(new Date(2026, 7, 10), 1))
+      expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 6, 10), context({ maxDate: new Date(2026, 11, 31) }))).toEqual(page(new Date(2026, 7, 10), 1))
     })
 
-    it('should stay on PageDown and PageUp when the focused date is the last selectable one before the bound', () => {
+    it('should stay on PageDown and PageUp when the focused date is the last one inside the bound', () => {
       expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 6, 20), context({ maxDate: new Date(2026, 6, 20) }))).toEqual({ type: 'stay' })
-      expect(getCalendarKeyAction(press('PageUp'), new Date(2026, 6, 21), context({ minDate: new Date(2026, 6, 20, 12) }))).toEqual({ type: 'stay' })
-      expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 6, 10), context({ disabledDates: [[new Date(2026, 6, 11), new Date(2026, 6, 31)]], maxDate: new Date(2026, 6, 20) })))
-        .toEqual({ type: 'stay' })
+      expect(getCalendarKeyAction(press('PageUp'), new Date(2026, 6, 20), context({ minDate: new Date(2026, 6, 20, 12) }))).toEqual({ type: 'stay' })
     })
 
-    it('should pass disabled dates on the way back from the bound', () => {
-      expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 6, 10), context({ disabledDates: [new Date(2026, 6, 19), new Date(2026, 6, 20)], maxDate: new Date(2026, 6, 20) })))
-        .toEqual(move(new Date(2026, 6, 18)))
-      expect(getCalendarKeyAction(press('PageUp'), new Date(2026, 6, 20), context({ disabledDates: [new Date(2026, 6, 5)], minDate: new Date(2026, 6, 5) })))
-        .toEqual(move(new Date(2026, 6, 6)))
+    it('should reach the day of a minDate or maxDate that carries a time', () => {
+      expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 6, 10), context({ maxDate: new Date(2026, 6, 20, 8) }))).toEqual(move(new Date(2026, 6, 20)))
+      expect(getCalendarKeyAction(press('PageUp'), new Date(2026, 6, 20), context({ minDate: new Date(2026, 6, 5, 18) }))).toEqual(move(new Date(2026, 6, 5)))
     })
 
-    it('should stop the months, quarters and years views on the last selectable period before the bound', () => {
+    it('should stop the months, quarters and years views on the last period inside the bound', () => {
       expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 2, 1), context({ calendarDate: new Date(2026, 0, 1), maxDate: new Date(2026, 7, 15), view: 'months' })))
         .toEqual(move(new Date(2026, 7, 1)))
       expect(getCalendarKeyAction(press('PageUp'), new Date(2027, 2, 1), context({ calendarDate: new Date(2027, 0, 1), minDate: new Date(2026, 2, 20), view: 'months' })))
@@ -1031,36 +1018,38 @@ describe('Calendar Utilities', () => {
         .toEqual(move(new Date(2026, 7, 1), 1))
       expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 6, 15), context({ calendarDate: new Date(2026, 5, 1), calendars: 2, panel: 1 })))
         .toEqual(page(new Date(2026, 7, 15), 1))
-      expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 7, 1), context({ disabledDates: [new Date(2026, 8, 1)] }))).toEqual(move(new Date(2026, 7, 31), 1))
-      expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 7, 1), context({ disabledDates: [[new Date(2026, 7, 2), new Date(2026, 8, 1)]] })))
-        .toEqual({ type: 'stay' })
     })
 
-    it('should stop week rows and adjacent days at the bound', () => {
+    it('should stop week rows and adjacent days at the bound, a row counting while any of its days is inside', () => {
       const rows = context({ rows: true })
 
       expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 5, 29), { ...rows, maxDate: new Date(2026, 6, 3) })).toEqual({ type: 'stay' })
-      expect(getCalendarKeyAction(press('PageUp'), new Date(2026, 5, 29), { ...rows, minDate: new Date(2026, 5, 10) })).toEqual(move(new Date(2026, 5, 15), -1))
-      expect(getCalendarKeyAction(press('PageUp'), new Date(2026, 6, 27), { ...rows, minDate: new Date(2026, 5, 26) })).toEqual(move(new Date(2026, 5, 29)))
+      expect(getCalendarKeyAction(press('PageUp'), new Date(2026, 5, 29), { ...rows, minDate: new Date(2026, 5, 10) })).toEqual(move(new Date(2026, 5, 8), -1))
+      expect(getCalendarKeyAction(press('PageUp'), new Date(2026, 6, 27), { ...rows, minDate: new Date(2026, 5, 26) })).toEqual(page(new Date(2026, 5, 27), -1))
       expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 6, 27), { ...rows, maxDate: new Date(2026, 7, 3) })).toEqual(move(new Date(2026, 7, 3), 1))
+      expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 6, 27), { ...rows, maxDate: new Date(2026, 7, 24) })).toEqual(page(new Date(2026, 7, 27), 1))
       expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 7, 1), context({ maxDate: new Date(2026, 7, 15) }))).toEqual(move(new Date(2026, 7, 15), 1))
       expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 7, 1), context({ maxDate: new Date(2026, 7, 1) }))).toEqual({ type: 'stay' })
     })
 
-    it('should move to the nearest selectable date beyond the edge of the view with the arrows when the grid has the focus', () => {
-      const empty = context({ disabledDates: [[new Date(2026, 6, 1), new Date(2026, 6, 31)]] })
+    it('should move to the limit the arrows point toward when the grid has the focus', () => {
+      const beforeMin = context({ minDate: new Date(2026, 8, 15) })
+      const afterMax = context({ maxDate: new Date(2026, 4, 10) })
 
-      expect(getCalendarKeyAction(press('ArrowRight'), null, empty)).toEqual(move(new Date(2026, 7, 1), 1))
-      expect(getCalendarKeyAction(press('ArrowDown'), null, empty)).toEqual(move(new Date(2026, 7, 1), 1))
-      expect(getCalendarKeyAction(press('ArrowLeft'), null, empty)).toEqual(move(new Date(2026, 5, 30), -1))
-      expect(getCalendarKeyAction(press('ArrowUp'), null, context({ calendars: 2, disabledDates: () => false }))).toEqual(move(new Date(2026, 5, 30), -1))
-      expect(getCalendarKeyAction(press('ArrowRight'), null, context({ calendars: 2 }))).toEqual(move(new Date(2026, 8, 1), 1))
-      expect(getCalendarKeyAction(press('ArrowRight'), null, context({ calendarDate: new Date(2026, 0, 1), view: 'years' }))).toEqual(move(new Date(2032, 0, 1), 0, 12))
-      expect(getCalendarKeyAction(press('ArrowLeft'), null, context({ calendarDate: new Date(2026, 0, 1), view: 'years' }))).toEqual(move(new Date(2019, 0, 1), 0, -12))
-      expect(getCalendarKeyAction(press('ArrowLeft'), null, context({ calendarDate: new Date(2026, 0, 1), view: 'months' }))).toEqual(move(new Date(2025, 11, 1), 0, -1))
-      expect(getCalendarKeyAction(press('ArrowRight'), null, context({ calendarDate: new Date(2026, 0, 1), view: 'months' }))).toEqual(move(new Date(2027, 0, 1), 0, 1))
-      expect(getCalendarKeyAction(press('ArrowRight'), null, context({ calendarDate: new Date(2026, 0, 1), view: 'quarters' }))).toEqual(move(new Date(2027, 0, 1), 0, 1))
-      expect(getCalendarKeyAction(press('ArrowRight'), null, context({ maxDate: new Date(2026, 6, 31) }))).toEqual({ type: 'stay' })
+      expect(getCalendarKeyAction(press('ArrowRight'), null, beforeMin)).toEqual(move(new Date(2026, 8, 15), 2))
+      expect(getCalendarKeyAction(press('ArrowDown'), null, beforeMin)).toEqual(move(new Date(2026, 8, 15), 2))
+      expect(getCalendarKeyAction(press('ArrowLeft'), null, beforeMin)).toEqual({ type: 'stay' })
+      expect(getCalendarKeyAction(press('ArrowLeft'), null, afterMax)).toEqual(move(new Date(2026, 4, 10), -2))
+      expect(getCalendarKeyAction(press('ArrowUp'), null, afterMax)).toEqual(move(new Date(2026, 4, 10), -2))
+      expect(getCalendarKeyAction(press('ArrowRight'), null, afterMax)).toEqual({ type: 'stay' })
+      expect(getCalendarKeyAction(press('ArrowRight'), null, context({ minDate: new Date(2026, 8, 16), rows: true }))).toEqual(move(new Date(2026, 8, 14), 2))
+      expect(getCalendarKeyAction(press('ArrowLeft'), null, context({ calendarDate: new Date(2026, 0, 1), maxDate: new Date(2010, 5, 1), view: 'years' })))
+        .toEqual(move(new Date(2010, 0, 1), 0, -12))
+      expect(getCalendarKeyAction(press('ArrowRight'), null, context({ calendarDate: new Date(2026, 0, 1), minDate: new Date(2027, 4, 20), view: 'months' })))
+        .toEqual(move(new Date(2027, 4, 1), 0, 1))
+      expect(getCalendarKeyAction(press('ArrowRight'), null, context({ maxDate: new Date(2026, 6, 10), minDate: new Date(2026, 6, 20) }))).toEqual({ type: 'stay' })
+      expect(getCalendarKeyAction(press('ArrowLeft'), null, context({ maxDate: new Date(2026, 6, 10), minDate: new Date(2026, 6, 20) }))).toEqual({ type: 'stay' })
+      expect(getCalendarKeyAction(press('ArrowRight'), null, context({ calendarDate: createDate(0, 11) }))).toEqual(move(createDate(1), 1))
     })
 
     it('should keep a year below 100 on Home and End in every view', () => {
@@ -1076,8 +1065,8 @@ describe('Calendar Utilities', () => {
 
     it('should keep a year below 100 when the arrows leave the edge of the view from the grid', () => {
       expect(getCalendarKeyAction(press('ArrowRight'), null, context({ calendarDate: createDate(99, 11), minDate: createDate(100, 0, 20) }))).toEqual(move(createDate(100, 0, 20), 1))
-      expect(getCalendarKeyAction(press('ArrowRight'), null, context({ calendarDate: createDate(26), view: 'months' }))).toEqual(move(createDate(27), 0, 1))
-      expect(getCalendarKeyAction(press('ArrowRight'), null, context({ calendarDate: createDate(26), view: 'years' }))).toEqual(move(createDate(32), 0, 12))
+      expect(getCalendarKeyAction(press('ArrowRight'), null, context({ calendarDate: createDate(26), minDate: createDate(27, 3), view: 'months' }))).toEqual(move(createDate(27, 3), 0, 1))
+      expect(getCalendarKeyAction(press('ArrowRight'), null, context({ calendarDate: createDate(26), minDate: createDate(40), view: 'years' }))).toEqual(move(createDate(40), 0, 12))
     })
 
     it('should not move before year 1, whatever minDate says', () => {
@@ -1151,90 +1140,6 @@ describe('Calendar Utilities', () => {
       expect(constrainDate(new Date(2026, 6, 1), min, max)).not.toBe(min)
       expect(constrainDate(new Date(2026, 6, 20), min, max)).toEqual(max)
       expect(constrainDate(new Date(2026, 6, 20), min, max)).not.toBe(max)
-    })
-  })
-
-  describe('getOpeningDate', () => {
-    const fakeToday = date => {
-      vi.useFakeTimers({ toFake: ['Date'] })
-      vi.setSystemTime(date)
-      onTestFinished(() => vi.useRealTimers())
-    }
-
-    it('should return today when a day of its month can be picked, even if today cannot', () => {
-      fakeToday(new Date(2026, 7, 1, 9))
-
-      const weekend = date => date.getDay() === 0 || date.getDay() === 6
-
-      expect(getOpeningDate(null, null, weekend)).toEqual(new Date(2026, 7, 1, 9))
-    })
-
-    it('should move today onto the limit it falls outside of', () => {
-      fakeToday(new Date(2026, 8, 30))
-
-      expect(getOpeningDate(null, new Date(2026, 6, 14))).toEqual(new Date(2026, 6, 14))
-    })
-
-    it('should move to the closest day that can be picked when no day of the limit month can', () => {
-      fakeToday(new Date(2026, 8, 30))
-
-      expect(getOpeningDate(new Date(2026, 9, 31, 9), null)).toEqual(new Date(2026, 10, 1))
-      expect(getOpeningDate(null, new Date(2026, 6, 14), [[new Date(2026, 6, 1), new Date(2026, 6, 14)]])).toEqual(new Date(2026, 5, 30))
-    })
-
-    it('should prefer the later day when two are as close', () => {
-      fakeToday(new Date(2026, 6, 16))
-
-      expect(getOpeningDate(null, null, [[new Date(2026, 6, 1), new Date(2026, 6, 31)]])).toEqual(new Date(2026, 7, 1))
-    })
-
-    it('should move to an earlier day when it is closer than any later one', () => {
-      fakeToday(new Date(2026, 6, 16))
-
-      expect(getOpeningDate(null, null, [[new Date(2026, 5, 25), new Date(2026, 7, 10)]])).toEqual(new Date(2026, 5, 24))
-    })
-
-    it('should keep today when a month shown beside it has a day to pick', () => {
-      fakeToday(new Date(2026, 8, 20))
-
-      const september = [[new Date(2026, 8, 1), new Date(2026, 8, 30)]]
-
-      expect(getOpeningDate(null, null, september, 'day', 2)).toEqual(new Date(2026, 8, 20))
-      expect(getOpeningDate(null, null, september, 'day', 1)).toEqual(new Date(2026, 9, 1))
-
-      vi.setSystemTime(new Date(2026, 8, 1))
-
-      const open = new Set([new Date(2026, 7, 31).getTime(), new Date(2026, 9, 31).getTime()])
-
-      expect(getOpeningDate(null, null, date => !open.has(date.getTime()), 'day', 2)).toEqual(new Date(2026, 8, 1))
-    })
-
-    it('should keep today moved between the limits in month, quarter and year selection', () => {
-      fakeToday(new Date(2026, 8, 30))
-
-      const min = new Date(2026, 9, 31, 9)
-
-      for (const selectionType of ['month', 'quarter', 'year']) {
-        expect(getOpeningDate(min, null, undefined, selectionType)).toEqual(min)
-      }
-
-      expect(getOpeningDate(min, null, undefined, 'week')).toEqual(new Date(2026, 10, 1))
-    })
-
-    it('should not take a day of the same month a year away for a day of this month', () => {
-      fakeToday(new Date(2026, 6, 16))
-
-      const nextJuly = new Date(2027, 6, 10)
-
-      expect(getOpeningDate(null, null, date => date.getTime() !== nextJuly.getTime())).toEqual(nextJuly)
-    })
-
-    it('should return today when no day within a year can be picked', () => {
-      fakeToday(new Date(2026, 6, 16, 9))
-
-      const farDay = new Date(2027, 7, 20)
-
-      expect(getOpeningDate(null, null, date => date.getTime() !== farDay.getTime())).toEqual(new Date(2026, 6, 16, 9))
     })
   })
 
@@ -1428,6 +1333,37 @@ describe('Calendar Utilities', () => {
       expect(isCellDisabled(new Date(2026, 0, 1), 'years', min, null, null)).toBeFalse()
       expect(isCellDisabled(new Date(2026, 9, 1), 'months', min, null, [[new Date(2026, 9, 15), new Date(2026, 9, 31)]])).toBeTrue()
       expect(isCellDisabled(new Date(2026, 9, 1), 'months', null, null, () => true)).toBeTrue()
+    })
+  })
+
+  describe('isCellOutsideLimits', () => {
+    it('should keep the day of a limit that carries a time inside', () => {
+      expect(isCellOutsideLimits(new Date(2026, 9, 14), 'days', new Date(2026, 9, 14, 9), null)).toBeFalse()
+      expect(isCellOutsideLimits(new Date(2026, 9, 13), 'days', new Date(2026, 9, 14, 9), null)).toBeTrue()
+      expect(isCellOutsideLimits(new Date(2026, 9, 20), 'days', null, new Date(2026, 9, 20, 8))).toBeFalse()
+      expect(isCellOutsideLimits(new Date(2026, 9, 21), 'days', null, new Date(2026, 9, 20, 8))).toBeTrue()
+    })
+
+    it('should keep a week row while any of its days is inside', () => {
+      expect(isCellOutsideLimits(new Date(2026, 9, 12), 'days', new Date(2026, 9, 18), null, true)).toBeFalse()
+      expect(isCellOutsideLimits(new Date(2026, 9, 12), 'days', new Date(2026, 9, 19), null, true)).toBeTrue()
+      expect(isCellOutsideLimits(new Date(2026, 9, 12), 'days', null, new Date(2026, 9, 12), true)).toBeFalse()
+      expect(isCellOutsideLimits(new Date(2026, 9, 12), 'days', null, new Date(2026, 9, 11), true)).toBeTrue()
+    })
+
+    it('should keep a month, quarter or year while any of its days is inside', () => {
+      const min = new Date(2026, 9, 31, 9)
+
+      expect(isCellOutsideLimits(new Date(2026, 9, 1), 'months', min, null)).toBeFalse()
+      expect(isCellOutsideLimits(new Date(2026, 8, 1), 'months', min, null)).toBeTrue()
+      expect(isCellOutsideLimits(new Date(2026, 9, 1), 'quarters', null, new Date(2026, 9, 1))).toBeFalse()
+      expect(isCellOutsideLimits(new Date(2027, 0, 1), 'years', null, new Date(2026, 11, 31))).toBeTrue()
+    })
+
+    it('should put everything before year 1 outside', () => {
+      expect(isCellOutsideLimits(createDate(0, 11, 31), 'days', null, null)).toBeTrue()
+      expect(isCellOutsideLimits(createDate(1), 'days', null, null)).toBeFalse()
+      expect(isCellOutsideLimits(createDate(0), 'years', null, null)).toBeTrue()
     })
   })
 

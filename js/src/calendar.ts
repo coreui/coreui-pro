@@ -19,6 +19,7 @@ import { defineJQueryPlugin, isRTL, jQueryDispatch } from './util/index.js'
 import {
   type CalendarKeyAction,
   type CalendarKeyContext,
+  constrainDate,
   convertToDateObject,
   createDate,
   createDateFormatter,
@@ -33,11 +34,11 @@ import {
   getDateBySelectionType,
   getMonthDetails,
   getMonthsNames,
-  getOpeningDate,
   getStartOfView,
   getStartOfWeek,
   getYears,
   isCellDisabled,
+  isCellOutsideLimits,
   isDateDisabled,
   isDateInRange,
   isDateSelected,
@@ -92,9 +93,11 @@ const SELECTOR_BTN_PREV = '.btn-prev'
 const SELECTOR_BTN_YEAR = '.btn-year'
 const SELECTOR_CALENDAR = '.calendar'
 const SELECTOR_CALENDAR_CELL = '.calendar-cell'
-const SELECTOR_CALENDAR_CELL_CLICKABLE = `${SELECTOR_CALENDAR_CELL}[data-coreui-selectable]`
+const SELECTOR_CALENDAR_CELL_FOCUSABLE = `${SELECTOR_CALENDAR_CELL}[tabindex]`
+const SELECTOR_CALENDAR_CELL_SELECTABLE = `${SELECTOR_CALENDAR_CELL}[data-coreui-selectable]`
 const SELECTOR_CALENDAR_ROW = '.calendar-row'
-const SELECTOR_CALENDAR_ROW_CLICKABLE = `${SELECTOR_CALENDAR_ROW}[data-coreui-selectable]`
+const SELECTOR_CALENDAR_ROW_FOCUSABLE = `${SELECTOR_CALENDAR_ROW}[tabindex]`
+const SELECTOR_CALENDAR_ROW_SELECTABLE = `${SELECTOR_CALENDAR_ROW}[data-coreui-selectable]`
 const SELECTOR_DATA_CALENDAR = '[data-coreui-calendar]'
 
 const CELL_RENDERERS: Record<ViewTypes, keyof CalendarConfig> = {
@@ -375,6 +378,10 @@ class Calendar extends BaseComponent {
     const cloneDate = new Date(date)
     const index = Manipulator.getDataAttribute(target.closest(SELECTOR_CALENDAR) as HTMLElement, 'calendar-index') as number
 
+    if (isCellDisabled(date, this._view, this._minDate, this._maxDate, this._config.disabledDates)) {
+      return
+    }
+
     if (this._view === 'months' && this._config.selectionType !== 'month') {
       this._setCalendarDate(index ? new Date(cloneDate.setMonth(cloneDate.getMonth() - index)) : date, 'days')
       this._setCalendarView('days', 'cellClick')
@@ -386,10 +393,6 @@ class Calendar extends BaseComponent {
       this._setCalendarDate(index ? new Date(cloneDate.setFullYear(cloneDate.getFullYear() - index)) : date, 'months')
       this._setCalendarView(this._config.selectionType === 'quarter' ? 'quarters' : 'months', 'cellClick')
       this._updateCalendar(() => this._focusOnFirstAvailableCell(index))
-      return
-    }
-
-    if (isCellDisabled(date, this._view, this._minDate, this._maxDate, this._config.disabledDates)) {
       return
     }
 
@@ -458,7 +461,6 @@ class Calendar extends BaseComponent {
     return {
       calendarDate: this._calendarDate,
       calendars: this._config.calendars,
-      disabledDates: this._config.disabledDates,
       firstDayOfWeek: this._config.firstDayOfWeek,
       maxDate: this._maxDate,
       minDate: this._minDate,
@@ -511,30 +513,31 @@ class Calendar extends BaseComponent {
   }
 
   _addEventListeners(): void {
-    const targets = `${SELECTOR_CALENDAR_CELL_CLICKABLE}, ${SELECTOR_CALENDAR_ROW_CLICKABLE}`
+    const focusable = `${SELECTOR_CALENDAR_CELL_FOCUSABLE}, ${SELECTOR_CALENDAR_ROW_FOCUSABLE}`
+    const selectable = `${SELECTOR_CALENDAR_CELL_SELECTABLE}, ${SELECTOR_CALENDAR_ROW_SELECTABLE}`
 
-    EventHandler.on(this._element, EVENT_CLICK_DATA_API, targets, event => {
+    EventHandler.on(this._element, EVENT_CLICK_DATA_API, focusable, event => {
       this._handleCalendarClick(event)
     })
 
-    EventHandler.on(this._element, EVENT_KEYDOWN, targets, event => {
+    EventHandler.on(this._element, EVENT_KEYDOWN, focusable, event => {
       this._handleCalendarKeydown(event)
     })
 
-    EventHandler.on(this._element, EVENT_MOUSEENTER, targets, event => {
+    EventHandler.on(this._element, EVENT_MOUSEENTER, selectable, event => {
       this._handleCalendarMouseEnter(event)
     })
 
-    EventHandler.on(this._element, EVENT_MOUSELEAVE, targets, () => {
+    EventHandler.on(this._element, EVENT_MOUSELEAVE, selectable, () => {
       this._handleCalendarMouseLeave()
     })
 
-    EventHandler.on(this._element, EVENT_FOCUS, targets, event => {
+    EventHandler.on(this._element, EVENT_FOCUS, focusable, event => {
       this._updateRovingTabIndex(this._getEventTarget(event) as HTMLElement)
       this._handleCalendarMouseEnter(event)
     })
 
-    EventHandler.on(this._element, EVENT_BLUR, targets, () => {
+    EventHandler.on(this._element, EVENT_BLUR, focusable, () => {
       this._handleCalendarMouseLeave()
       this._updateRovingTabIndex()
     })
@@ -599,7 +602,7 @@ class Calendar extends BaseComponent {
     this._updateCalendar(() => {
       if (focus) {
         const panel = SelectorEngine.find(SELECTOR_CALENDAR, this._element as ParentNode)[index]
-        const target = SelectorEngine.findOne(`[data-coreui-selectable][data-coreui-date="${start}"]`, this._element) ?? SelectorEngine.findOne('[tabindex="0"]', panel)
+        const target = SelectorEngine.findOne(`${SELECTOR_CALENDAR_CELL_FOCUSABLE}[data-coreui-date="${start}"]`, this._element) ?? SelectorEngine.findOne('[tabindex="0"]', panel)
         target?.focus()
       }
     })
@@ -748,7 +751,7 @@ class Calendar extends BaseComponent {
         '<td role="gridcell"></td>')
       const ariaLabel = this._config.selectionType === 'week' && visible ? ` aria-label="${escapeHtml(formatWeekName(days, this._config.locale))}"` : ''
 
-      return `<tr class="${attributes.className}" tabindex="-1"${this._stateHtml(attributes)}${ariaLabel}>${showWeekNumber ? `<th class="calendar-cell-week-number">${week.number}</th>` : ''}${cells.join('')}</tr>`
+      return `<tr class="${attributes.className}"${this._stateHtml(attributes)}${ariaLabel}>${showWeekNumber ? `<th class="calendar-cell-week-number">${week.number}</th>` : ''}${cells.join('')}</tr>`
     })
 
     return `<thead><tr>${showWeekNumber ? headerCell(weekNumbersLabel ? escapeHtml(weekNumbersLabel) : '') : ''}${weekdays.join('')}</tr></thead><tbody>${rows.join('')}</tbody>`
@@ -782,15 +785,15 @@ class Calendar extends BaseComponent {
     const ariaLabel = attributes.ariaLabel && !this._config[renderer] ? ` aria-label="${escapeHtml(attributes.ariaLabel)}"` : ''
     const ariaCurrent = attributes.ariaCurrent ? ' aria-current="date"' : ''
 
-    return `<td class="${attributes.className}" role="gridcell" tabindex="-1"${this._stateHtml(attributes)}${ariaCurrent}${ariaLabel} data-coreui-date="${date.toDateString()}"><div class="${CLASS_NAME_CALENDAR_CELL_INNER} ${this._view.slice(0, -1)}">${content}</div></td>`
+    return `<td class="${attributes.className}" role="gridcell"${this._stateHtml(attributes)}${ariaCurrent}${ariaLabel} data-coreui-date="${date.toDateString()}"><div class="${CLASS_NAME_CALENDAR_CELL_INNER} ${this._view.slice(0, -1)}">${content}</div></td>`
   }
 
   _cellContent(date: Date, meta: Record<string, boolean>): string {
     return sanitizeByConfig(this._config[CELL_RENDERERS[this._view]](date, { ...meta, label: this._cellName(date) }), this._config)
   }
 
-  _stateHtml({ ariaDisabled, ariaSelected, selectable }: Record<string, any>): string {
-    return `${selectable ? ' data-coreui-selectable' : ''}${ariaSelected ? ' aria-selected="true"' : ''}${ariaDisabled ? ' aria-disabled="true"' : ''}`
+  _stateHtml({ ariaDisabled, ariaSelected, focusable, selectable }: Record<string, any>): string {
+    return `${focusable ? ' tabindex="-1"' : ''}${selectable ? ' data-coreui-selectable' : ''}${ariaSelected ? ' aria-selected="true"' : ''}${ariaDisabled ? ' aria-disabled="true"' : ''}`
   }
 
   _updateRovingTabIndex(preferred?: HTMLElement): void {
@@ -810,7 +813,7 @@ class Calendar extends BaseComponent {
   }
 
   _rovingSelector(): string {
-    return this._rowsAreTargets() ? SELECTOR_CALENDAR_ROW_CLICKABLE : SELECTOR_CALENDAR_CELL_CLICKABLE
+    return this._rowsAreTargets() ? SELECTOR_CALENDAR_ROW_FOCUSABLE : SELECTOR_CALENDAR_CELL_FOCUSABLE
   }
 
   _createCalendar(): void {
@@ -851,7 +854,7 @@ class Calendar extends BaseComponent {
         this._config.calendarDate || this._config.startDate || this._config.endDate :
         ['calendarDate', 'startDate', 'endDate'].filter(name => keys.includes(name)).map(name => this._config[name]).find(Boolean) ?? null
 
-      this._calendarDate = convertToDateObject(source, this._config.selectionType) || this._calendarDate || getOpeningDate(this._minDate, this._maxDate, this._config.disabledDates ?? undefined, this._config.selectionType, this._config.calendars)
+      this._calendarDate = convertToDateObject(source, this._config.selectionType) || this._calendarDate || constrainDate(new Date(), this._minDate, this._maxDate)
     }
 
     if (changed('startDate')) {
@@ -934,7 +937,7 @@ class Calendar extends BaseComponent {
       return
     }
 
-    for (const cell of SelectorEngine.find(SELECTOR_CALENDAR_CELL_CLICKABLE, this._element as ParentNode)) {
+    for (const cell of SelectorEngine.find(`${SELECTOR_CALENDAR_CELL}[data-coreui-date]`, this._element as ParentNode)) {
       const date = this._getDate(cell)
 
       this._applyState(cell, this._view === 'days' ?
@@ -1021,6 +1024,7 @@ class Calendar extends BaseComponent {
           today: isTodayDate,
           [month]: true
         }),
+        focusable: false,
         selectable: false,
         ariaSelected: false,
         ariaLabel: this._cellName(date),
@@ -1044,6 +1048,7 @@ class Calendar extends BaseComponent {
 
     return {
       className: classNames,
+      focusable: !isFiller && !isCellOutsideLimits(date, 'days', this._minDate, this._maxDate),
       selectable: !isDisabled && !isFiller,
       ariaDisabled: isDisabled || isFiller,
       ariaSelected: !isFiller && (isSelected || (this._picksRange() && !isDisabled && isDateInRange(date, this._startDate, this._endDate))),
@@ -1069,6 +1074,7 @@ class Calendar extends BaseComponent {
         range: isInRange,
         selected: isSelected
       }),
+      focusable: !isCellOutsideLimits(date, view, this._minDate, this._maxDate),
       selectable: !isDisabled,
       ariaDisabled: isDisabled,
       ariaSelected: isSelected || (this._picksRange() && isInRange && !isDisabled),
@@ -1084,6 +1090,7 @@ class Calendar extends BaseComponent {
     if (this._config.selectionType !== 'week' || !visible) {
       return {
         className: this._classNames({ [CLASS_NAME_CALENDAR_ROW]: true }),
+        focusable: false,
         selectable: false,
         ariaSelected: false
       }
@@ -1106,6 +1113,7 @@ class Calendar extends BaseComponent {
 
     return {
       className: classNames,
+      focusable: !isCellOutsideLimits(date, 'days', this._minDate, this._maxDate, true),
       selectable: !isDisabled,
       ariaDisabled: isDisabled,
       ariaSelected: isSelected || (this._picksRange() && isInRange && !isDisabled),

@@ -82,7 +82,7 @@ describe('DatePicker', () => {
       expect(document.activeElement.getAttribute('aria-current')).toEqual('date')
     })
 
-    it('should land on the last selectable date when today is out of range', () => {
+    it('should land on the limit today falls outside of', () => {
       // A fixed past view keeps this deterministic: today is never in it, so
       // the only anchor left is the max date closing the range.
       const picker = buildPicker({ calendarDate: '2020-05-20', maxDate: '2020-05-10' })
@@ -99,12 +99,13 @@ describe('DatePicker', () => {
       expect(document.activeElement.querySelector('[aria-current="date"]')).not.toBeNull()
     })
 
-    it('should pass over today when today cannot be picked', () => {
+    it('should enter the calendar on today even when today cannot be picked', () => {
       const picker = buildPicker({ disabledDates: [new Date()] })
       picker.show()
 
-      expect(document.activeElement.getAttribute('aria-current')).toBeNull()
-      expect(document.activeElement.hasAttribute('data-coreui-selectable')).toBeTrue()
+      expect(document.activeElement.getAttribute('aria-current')).toEqual('date')
+      expect(document.activeElement.getAttribute('aria-disabled')).toEqual('true')
+      expect(document.activeElement.hasAttribute('data-coreui-selectable')).toBeFalse()
     })
   })
 
