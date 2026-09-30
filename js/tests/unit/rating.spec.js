@@ -1,5 +1,6 @@
 
 import Rating from '../../src/rating.js'
+import EventHandler from '../../src/dom/event-handler.js'
 import Tooltip from '../../src/tooltip.js'
 import {
   getFixture, clearFixture, createEvent, jQueryMock
@@ -35,6 +36,28 @@ describe('Rating', () => {
   })
 
   describe('constructor', () => {
+    it('should let the options decide a state class the markup wrote, and give it back on dispose', () => {
+      fixtureEl.innerHTML = '<div class="rating disabled"></div>'
+      const div = fixtureEl.querySelector('div')
+      const markup = div.outerHTML
+      const rating = new Rating(div)
+
+      expect(div).not.toHaveClass('disabled')
+
+      rating.dispose()
+
+      expect(div.outerHTML).toEqual(markup)
+    })
+
+    it('should be created again after an invalid config', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+
+      expect(() => new Rating(div, { size: 3 })).toThrow()
+      expect(() => new Rating(div, { size: 'lg' })).not.toThrow()
+      expect(div.querySelectorAll('.rating-item')).toHaveSize(5)
+    })
+
     it('should create a Rating instance with default config if no config is provided', () => {
       fixtureEl.innerHTML = '<div></div>'
 
@@ -563,6 +586,169 @@ describe('Rating', () => {
       expect(div.classList.contains('disabled')).toBeTrue()
     })
 
+    it('should drop the disabled state when it is turned off', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div, { disabled: true })
+
+      rating.setConfig({ disabled: false })
+
+      expect(div).not.toHaveClass('disabled')
+      for (const input of div.querySelectorAll('.rating-item-input')) {
+        expect(input.disabled).toBeFalse()
+      }
+    })
+
+    it('should drop the readonly state when it is turned off', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div, { readonly: true })
+
+      rating.setConfig({ readonly: false })
+
+      expect(div).not.toHaveClass('readonly')
+    })
+
+    it('should keep a single size class when the size changes', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div, { size: 'lg' })
+
+      rating.setConfig({ size: 'sm' })
+
+      expect(div).toHaveClass('rating-sm')
+      expect(div).not.toHaveClass('rating-lg')
+    })
+
+    it('should give the radios the new name', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div, { name: 'first' })
+
+      rating.setConfig({ name: 'score' })
+
+      for (const input of div.querySelectorAll('.rating-item-input')) {
+        expect(input.name).toEqual('score')
+      }
+    })
+
+    it('should keep content the page put in the element, where the page put it', () => {
+      fixtureEl.innerHTML = '<div><span class="rating-note">Before</span></div>'
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div)
+      const after = document.createElement('span')
+      div.append(after)
+
+      rating.setConfig({ itemCount: 3 })
+
+      expect(div.firstElementChild).toHaveClass('rating-note')
+      expect(div.lastElementChild).toBe(after)
+      expect(div.querySelectorAll('.rating-item')).toHaveSize(3)
+    })
+
+    it('should drop a state class the page wrote once the option turns it off', () => {
+      fixtureEl.innerHTML = '<div class="rating disabled"></div>'
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div, { disabled: true })
+
+      rating.setConfig({ disabled: false })
+
+      expect(div).not.toHaveClass('disabled')
+    })
+
+    it('should replace a size class the page wrote and give it back on dispose', () => {
+      fixtureEl.innerHTML = '<div class="rating rating-lg"></div>'
+      const div = fixtureEl.querySelector('div')
+      const markup = div.outerHTML
+      const rating = new Rating(div)
+
+      rating.setConfig({ size: 'sm' })
+
+      expect(div).toHaveClass('rating-sm')
+      expect(div).not.toHaveClass('rating-lg')
+
+      rating.dispose()
+
+      expect(div.outerHTML).toEqual(markup)
+    })
+
+    it('should leave a size class the page wrote alone while the size option is empty', () => {
+      fixtureEl.innerHTML = '<div class="rating-lg"></div>'
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div)
+
+      div.classList.remove('rating-lg')
+      rating.dispose()
+
+      expect(div).not.toHaveClass('rating-lg')
+    })
+
+    it('should drop a value the new options cannot show', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div)
+      const input = div.querySelectorAll('.rating-item-input')[4]
+
+      input.checked = true
+      input.dispatchEvent(createEvent('change', { bubbles: true }))
+      rating.setConfig({ itemCount: 3 })
+
+      expect(div.querySelector('.rating-item-input:checked')).toBeNull()
+      expect(div.querySelector('.rating-item-label.active')).toBeNull()
+    })
+
+    it('should recover from a size it cannot apply', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div)
+
+      expect(() => rating.setConfig({ size: 'x y' })).toThrow()
+
+      rating.setConfig({ size: 'lg' })
+
+      expect(div).toHaveClass('rating-lg')
+      expect(div.querySelectorAll('.rating-item')).toHaveSize(5)
+    })
+
+    it('should keep the generated name when other options change', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div)
+      const { name } = div.querySelector('.rating-item-input')
+
+      rating.setConfig({ itemCount: 3 })
+
+      for (const input of div.querySelectorAll('.rating-item-input')) {
+        expect(input.name).toEqual(name)
+      }
+    })
+
+    it('should keep the value the user picked when other options change', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div, { value: 2 })
+      const input = div.querySelectorAll('.rating-item-input')[3]
+
+      input.checked = true
+      input.dispatchEvent(createEvent('change', { bubbles: true }))
+      rating.setConfig({ size: 'lg' })
+
+      expect(div.querySelector('.rating-item-input:checked').value).toEqual('4')
+    })
+
+    it('should not light every star when a change listener calls setConfig', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div)
+      const input = div.querySelectorAll('.rating-item-input')[1]
+
+      div.addEventListener('change.coreui.rating', () => rating.setConfig({ readonly: true }))
+      input.checked = true
+      input.dispatchEvent(createEvent('change', { bubbles: true }))
+
+      expect(div.querySelectorAll('.rating-item-label.active')).toHaveSize(2)
+    })
+
     it('should re-attach event listeners after update', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = '<div></div>'
@@ -583,6 +769,21 @@ describe('Rating', () => {
   })
 
   describe('reset', () => {
+    it('should keep content the page put in the element and give the markup back on dispose', () => {
+      fixtureEl.innerHTML = '<div><span class="rating-note">12 reviews</span></div>'
+      const div = fixtureEl.querySelector('div')
+      const markup = div.outerHTML
+      const rating = new Rating(div, { size: 'lg' })
+
+      rating.reset(2)
+
+      expect(div.querySelector('.rating-note')).not.toBeNull()
+
+      rating.dispose()
+
+      expect(div.outerHTML).toEqual(markup)
+    })
+
     it('should reset the rating to the new given value', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
@@ -1359,6 +1560,147 @@ describe('Rating', () => {
   })
 
   describe('dispose', () => {
+    it('should take back the items and radios it rendered', () => {
+      fixtureEl.innerHTML = '<form><div data-coreui-rating></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div, { name: 'score', value: 3 })
+
+      rating.dispose()
+
+      expect(div.querySelector('.rating-item')).toBeNull()
+      expect(new FormData(form).has('score')).toBeFalse()
+    })
+
+    it('should give the element its markup back', () => {
+      fixtureEl.innerHTML = '<div data-coreui-rating data-coreui-value="3"><span class="rating-note">12 reviews</span></div>'
+      const div = fixtureEl.querySelector('div')
+      const markup = div.outerHTML
+      const rating = new Rating(div, { disabled: true, readonly: true, size: 'lg' })
+
+      rating.dispose()
+
+      expect(div.outerHTML).toEqual(markup)
+    })
+
+    it('should keep a role the page wrote, while alive and after dispose', () => {
+      fixtureEl.innerHTML = '<div role="group" data-coreui-rating></div>'
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div)
+
+      expect(div.getAttribute('role')).toEqual('group')
+
+      rating.dispose()
+
+      expect(div.getAttribute('role')).toEqual('group')
+    })
+
+    it('should keep a role the page set after init', () => {
+      fixtureEl.innerHTML = '<div data-coreui-rating></div>'
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div)
+
+      div.setAttribute('role', 'group')
+      rating.setConfig({ size: 'lg' })
+
+      expect(div.getAttribute('role')).toEqual('group')
+
+      rating.dispose()
+
+      expect(div.getAttribute('role')).toEqual('group')
+    })
+
+    it('should keep an empty class attribute the page wrote', () => {
+      fixtureEl.innerHTML = '<div class="" data-coreui-rating></div>'
+      const div = fixtureEl.querySelector('div')
+      const markup = div.outerHTML
+
+      new Rating(div).dispose()
+
+      expect(div.outerHTML).toEqual(markup)
+    })
+
+    it('should keep rating items the page wrote', () => {
+      fixtureEl.innerHTML = '<div data-coreui-rating><div class="rating-item">Fallback</div></div>'
+      const div = fixtureEl.querySelector('div')
+      const markup = div.outerHTML
+
+      new Rating(div).dispose()
+
+      expect(div.outerHTML).toEqual(markup)
+    })
+
+    it('should dispose the tooltips of half-star items', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div, { itemCount: 3, precision: 0.5, tooltips: true })
+      const label = div.querySelectorAll('.rating-item-label')[1]
+
+      label.dispatchEvent(createEvent('mouseover'))
+      const wrapper = label.parentElement
+      expect(Tooltip.getInstance(wrapper)).not.toBeNull()
+
+      rating.dispose()
+
+      expect(Tooltip.getInstance(wrapper)).toBeNull()
+    })
+
+    it('should not throw when a change listener disposes the rating', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div)
+      const input = div.querySelectorAll('.rating-item-input')[1]
+
+      const errors = []
+      const onError = event => {
+        errors.push(event.error)
+        event.preventDefault()
+      }
+
+      div.addEventListener('change.coreui.rating', () => rating.dispose())
+      window.addEventListener('error', onError)
+      input.checked = true
+      EventHandler.trigger(input, 'change')
+      window.removeEventListener('error', onError)
+
+      expect(errors).toEqual([])
+      expect(div.querySelector('.rating-item')).toBeNull()
+    })
+
+    it('should keep the classes and role the page wrote', () => {
+      fixtureEl.innerHTML = '<div class="rating rating-lg" role="radiogroup" data-coreui-rating></div>'
+      const div = fixtureEl.querySelector('div')
+      const markup = div.outerHTML
+      const rating = new Rating(div, { size: 'lg' })
+
+      rating.dispose()
+
+      expect(div.outerHTML).toEqual(markup)
+    })
+
+    it('should render a single set of items when initialized again', () => {
+      fixtureEl.innerHTML = '<div data-coreui-rating></div>'
+      const div = fixtureEl.querySelector('div')
+
+      new Rating(div, { itemCount: 5 }).dispose()
+      // eslint-disable-next-line no-new
+      new Rating(div, { itemCount: 5 })
+
+      expect(div.querySelectorAll('.rating-item')).toHaveSize(5)
+    })
+
+    it('should leave the markup alone when called again', () => {
+      fixtureEl.innerHTML = '<div data-coreui-rating></div>'
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div)
+
+      rating.dispose()
+      const markup = div.outerHTML
+
+      expect(() => rating.dispose()).not.toThrow()
+      expect(div.outerHTML).toEqual(markup)
+    })
+
     it('should remove the instance on dispose', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')

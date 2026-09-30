@@ -26,22 +26,7 @@ export const applyControlGroupSize = (element: HTMLElement, size: string | null)
 export const managedSizeClassNames = (size: string | null): string[] =>
   size ? [...new Set([...SIZE_CLASS_NAMES, `${CLASS_NAME_FORM_CONTROL}-${size}`])] : []
 
-export type HostClasses = { classNames: string[], hadAttribute: boolean }
-
-export const captureHostClasses = (element: HTMLElement, managed: string[]): HostClasses => ({
-  classNames: managed.filter(className => element.classList.contains(className)),
-  hadAttribute: element.hasAttribute('class')
-})
-
-export const restoreHostClasses = (element: HTMLElement, managed: string[], host: HostClasses): void => {
-  for (const className of managed) {
-    element.classList.toggle(className, host.classNames.includes(className))
-  }
-
-  if (!host.hadAttribute && element.classList.length === 0) {
-    element.removeAttribute('class')
-  }
-}
+export { captureHostClasses, type HostClasses, restoreHostClasses } from './index.js'
 
 export const applyControlGroupClasses = (element: HTMLElement, ...classNames: string[]): void => {
   if (element.classList.contains(CLASS_NAME_GROUP)) {

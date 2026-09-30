@@ -189,7 +189,7 @@ Note that for security reasons the `sanitize`, `sanitizeFn`, and `allowList` opt
 
 | Method | Description |
 | --- | --- |
-| `dispose` | Destroys a component. (Removes stored data on the DOM element) |
+| `dispose` | Destroys a rating instance and takes back what it rendered: the items with their radios, so the form no longer submits the value, and the classes and `role` it added. What the markup already had stays. (Removes stored data on the DOM element) |
 | `getInstance` | Static method which allows you to get the rating instance associated to a DOM element, you can use it like this: `coreui.Rating.getInstance(element)` |
 | `getOrCreateInstance` | Static method which returns a rating instance associated to a DOM element or create a new one in case it wasn't initialized. You can use it like this: `coreui.Rating.getOrCreateInstance(element)` |
 | `reset` | Reset the value to `null` or to provided value. |
