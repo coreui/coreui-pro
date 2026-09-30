@@ -26,14 +26,19 @@ const renders = {
   autocomplete: ['combobox', 'forms/floating-labels', 'forms/form-control', 'forms/form-control-group'],
   'chip-set': ['chip', 'helpers/visually-hidden'],
   combobox: ['popup', 'list-box', 'forms/form-control'],
+  'date-picker': ['forms/floating-labels', 'forms/form-control', 'forms/form-control-group', 'forms/form-date-time', 'popup'],
+  'forms/chip-input': ['chip', 'forms/form-control', 'forms/form-control-group'],
+  'forms/form-date-time': ['forms/floating-labels', 'forms/form-control', 'forms/form-control-group'],
   'forms/form-multi-select': ['combobox', 'chip', 'chip-set', 'forms/form-control-group'],
   'forms/form-range': ['tooltip'],
+  'forms/number-input': ['forms/form-control', 'forms/form-control-group'],
   'list-box': ['forms/check', 'forms/form-control'],
   'loading-button': ['buttons', 'spinner'],
-  'date-picker': ['forms/floating-labels', 'forms/form-control', 'forms/form-control-group', 'forms/form-date-time', 'popup'],
   'range-slider': ['tooltip'],
+  rating: ['tooltip'],
   sidebar: ['transitions'],
   'time-picker': ['forms/floating-labels', 'forms/form-control', 'forms/form-control-group', 'forms/form-date-time', 'popup'],
+  toaster: ['buttons', 'close'],
   transfer: ['list-box', 'buttons', 'helpers/visually-hidden', 'icon']
 }
 
