@@ -607,7 +607,6 @@ class Autocomplete extends ComboboxBase {
       inputHintEl.readOnly = true
       inputHintEl.tabIndex = -1
       inputHintEl.setAttribute('aria-hidden', true as any)
-      // No form owner: the hint is neither submitted nor counted against Enter submitting the form.
       inputHintEl.setAttribute('form', '')
 
       togglerEl.append(inputHintEl)
