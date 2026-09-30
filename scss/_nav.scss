@@ -125,6 +125,33 @@ $nav-underline-border-tokens: defaults(
 
 // stylelint-enable scss/dollar-variable-default
 
+$nav-enclosed-tokens: () !default;
+
+// stylelint-disable scss/dollar-variable-default
+
+// scss-docs-start nav-enclosed-tokens
+$nav-enclosed-tokens: defaults(
+  (
+    --#{$prefix}nav-enclosed-padding-y: .125rem,
+    --#{$prefix}nav-enclosed-padding-x: .125rem,
+    --#{$prefix}nav-enclosed-bg: var(--#{$prefix}bg-3),
+    --#{$prefix}nav-enclosed-border-radius: var(--#{$prefix}radius-5),
+    --#{$prefix}nav-enclosed-link-padding-x: .875rem,
+    --#{$prefix}nav-enclosed-link-padding-y: .375rem,
+    --#{$prefix}nav-enclosed-link-color: var(--#{$prefix}fg-body),
+    --#{$prefix}nav-enclosed-link-border-width: 1px,
+    --#{$prefix}nav-enclosed-link-active-color: var(--#{$prefix}fg-body),
+    --#{$prefix}nav-enclosed-link-active-bg: var(--#{$prefix}bg-body),
+    --#{$prefix}nav-enclosed-link-active-border-color: var(--#{$prefix}border-color),
+    --#{$prefix}nav-enclosed-link-hover-box-shadow: var(--#{$prefix}box-shadow-sm),
+    --#{$prefix}nav-enclosed-link-disabled-color: var(--#{$prefix}fg-2),
+  ),
+  $nav-enclosed-tokens
+);
+// scss-docs-end nav-enclosed-tokens
+
+// stylelint-enable scss/dollar-variable-default
+
 $tab-pane-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
@@ -325,19 +352,7 @@ $tab-pane-tokens: defaults(
   }
 
   .nav-enclosed {
-    --#{$prefix}nav-enclosed-padding-y: #{.125rem};
-    --#{$prefix}nav-enclosed-padding-x: #{.125rem};
-    --#{$prefix}nav-enclosed-bg: #{var(--#{$prefix}bg-3)};
-    --#{$prefix}nav-enclosed-border-radius: #{var(--#{$prefix}radius-5)};
-    --#{$prefix}nav-enclosed-link-padding-x: #{.875rem};
-    --#{$prefix}nav-enclosed-link-padding-y: #{.375rem};
-    --#{$prefix}nav-enclosed-link-color: #{var(--#{$prefix}fg-body)};
-    --#{$prefix}nav-enclosed-link-border-width: #{1px};
-    --#{$prefix}nav-enclosed-link-active-color: #{var(--#{$prefix}fg-body)};
-    --#{$prefix}nav-enclosed-link-active-bg: #{var(--#{$prefix}bg-body)};
-    --#{$prefix}nav-enclosed-link-active-border-color: #{var(--#{$prefix}border-color)};
-    --#{$prefix}nav-enclosed-link-hover-box-shadow: #{var(--#{$prefix}box-shadow-sm)};
-    --#{$prefix}nav-enclosed-link-disabled-color: #{var(--#{$prefix}fg-2)};
+    @include tokens($nav-enclosed-tokens);
 
     display: inline-flex;
     padding: var(--#{$prefix}nav-enclosed-padding-y) var(--#{$prefix}nav-enclosed-padding-x);
