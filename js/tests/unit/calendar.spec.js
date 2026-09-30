@@ -291,6 +291,17 @@ describe('Calendar', () => {
       expect(calendar._calendarDate.getMonth()).toEqual(5)
     })
 
+    it('should initialize calendarDate from startDate if calendarDate is empty', () => {
+      fixtureEl.innerHTML = '<div></div><div></div>'
+
+      const divs = fixtureEl.querySelectorAll('div')
+
+      for (const [index, calendarDate] of ['', null].entries()) {
+        new Calendar(divs[index], { calendarDate, locale: 'en-US', startDate: new Date(2023, 0, 15) }) // eslint-disable-line no-new
+        expect(divs[index].querySelector('table').getAttribute('aria-label')).toEqual('January 2023')
+      }
+    })
+
     it('should initialize calendarDate from endDate if calendarDate and startDate are null', () => {
       fixtureEl.innerHTML = '<div></div>'
 
@@ -311,6 +322,20 @@ describe('Calendar', () => {
 
       expect(calendar._calendarDate.getFullYear()).toEqual(now.getFullYear())
       expect(calendar._calendarDate.getMonth()).toEqual(now.getMonth())
+    })
+
+    it('should keep the navigated page when calendarDate becomes empty or null', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, { calendarDate: new Date(2022, 5, 15), locale: 'en-US' })
+
+      div.querySelector('[aria-label="Next month"]').click()
+
+      for (const calendarDate of ['', null]) {
+        calendar.setConfig({ calendarDate })
+        expect(div.querySelector('table').getAttribute('aria-label')).toEqual('July 2022')
+      }
     })
 
     it('should initialize minDate and maxDate', () => {
