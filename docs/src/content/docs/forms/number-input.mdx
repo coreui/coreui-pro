@@ -44,8 +44,8 @@ A fractional `step` works the same way:
 
 <Example pro code={`<input type="number" class="form-control" value="2" step="0.5" aria-label="Amount" data-coreui-number-input>`} />
 
-When the field is empty, the first step starts from `min` — or from zero if
-there is no minimum.
+When the field is empty, a button steps from zero the way <kbd>↑</kbd> and
+<kbd>↓</kbd> do, and the result stays within `min` and `max`.
 
 ## Sizing
 
@@ -102,8 +102,8 @@ stops per field for something the keyboard already reaches. Give the input an
 
 ## Usage
 
-Holding a button repeats after a short delay. Set `repeat: false` to require a
-click per step.
+Holding a button repeats after a short delay, and releasing it does not add a
+step. Set `repeat: false` to require a click per step.
 
 ```js
 const numberInput = new coreui.NumberInput('#myNumberInput', {
