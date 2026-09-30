@@ -29,6 +29,7 @@ const EVENT_CLICK = `click${EVENT_KEY}`
 const EVENT_FOCUSIN = `focusin${EVENT_KEY}`
 const EVENT_FOCUSOUT = `focusout${EVENT_KEY}`
 const EVENT_HOVER = `hover${EVENT_KEY}`
+const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_MOUSEENTER = `mouseenter${EVENT_KEY}`
 const EVENT_MOUSELEAVE = `mouseleave${EVENT_KEY}`
@@ -223,8 +224,6 @@ class Rating extends BaseComponent {
 
     if (this._hostAriaReadonly === null) {
       this._element.removeAttribute('aria-readonly')
-    } else {
-      this._element.setAttribute('aria-readonly', this._hostAriaReadonly)
     }
 
     super.dispose()
@@ -351,7 +350,17 @@ class Rating extends BaseComponent {
       this._highlightLabels(checkedInput)
     })
 
+    EventHandler.on(this._element, EVENT_KEYDOWN, SELECTOR_RATING_ITEM_INPUT, (event: any) => {
+      if (this._config.readonly && event.key.startsWith('Arrow')) {
+        event.preventDefault()
+      }
+    })
+
     EventHandler.on(this._element, EVENT_FOCUSIN, SELECTOR_RATING_ITEM_INPUT, ({ target }: any) => {
+      if (this._config.disabled || this._config.readonly) {
+        return
+      }
+
       EventHandler.trigger(this._element, EVENT_HOVER, {
         value: target.value
       })
@@ -360,6 +369,10 @@ class Rating extends BaseComponent {
     })
 
     EventHandler.on(this._element, EVENT_FOCUSOUT, SELECTOR_RATING_ITEM_INPUT, () => {
+      if (this._config.disabled || this._config.readonly) {
+        return
+      }
+
       EventHandler.trigger(this._element, EVENT_HOVER, {
         value: null
       })
@@ -463,10 +476,12 @@ class Rating extends BaseComponent {
       this._element.setAttribute('role', 'radiogroup')
     }
 
-    if (this._config.readonly) {
-      this._element.setAttribute('aria-readonly', 'true')
-    } else {
-      this._element.removeAttribute('aria-readonly')
+    if (this._hostAriaReadonly === null) {
+      if (this._config.readonly) {
+        this._element.setAttribute('aria-readonly', 'true')
+      } else {
+        this._element.removeAttribute('aria-readonly')
+      }
     }
 
     this._items = Array.from({ length: this._config.itemCount }, (_, index) => this._createRatingItem(index))
@@ -542,7 +557,12 @@ class Rating extends BaseComponent {
       ratingItemInputElement.id = ratingItemId
       ratingItemInputElement.type = 'radio'
       ratingItemInputElement.value = value as any
-      ratingItemInputElement.name = this._name
+
+      if (!this._config.readonly) {
+        ratingItemInputElement.name = this._name
+      } else if (this._config.name) {
+        ratingItemInputElement.name = this._config.name
+      }
 
       if (typeof this._config.ariaLabel === 'function') {
         ratingItemInputElement.setAttribute('aria-label', this._config.ariaLabel(value, this._config.itemCount))
@@ -556,6 +576,10 @@ class Rating extends BaseComponent {
       ratingItemInputElement.defaultChecked = this._config.value == value
       // eslint-disable-next-line eqeqeq
       ratingItemInputElement.checked = this._currentValue == value
+
+      if (this._config.readonly && !ratingItemInputElement.checked) {
+        ratingItemInputElement.tabIndex = -1
+      }
 
       // Append elements
 
