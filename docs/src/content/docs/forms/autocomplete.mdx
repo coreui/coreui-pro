@@ -50,6 +50,8 @@ Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label 
     <div class="form-text">Start typing to filter the list.</div>
   </div>`} />
 
+Inside a `<form>`, <kbd>Enter</kbd> with the list closed submits the form. A form reset brings the autocomplete back to the `value` it was created with, or to the first option marked `selected`, or to an empty field, and fires `change.coreui.autocomplete` when that differs from what the field held, typed text included. A reset that a listener cancels changes nothing.
+
 ## Data source
 
 Learn how to populate the autocomplete component with data from various sources, including arrays and objects, for dynamic content integration.
@@ -154,6 +156,8 @@ You can combine it with `'global'` (e.g. search: `['external', 'global']`) to al
 Restrict users to only select from predefined options by setting `data-coreui-allow-only-defined-options="true"`:
 
 <Example pro code={`<div data-coreui-autocomplete data-coreui-allow-only-defined-options="true" data-coreui-options="Angular, Bootstrap, React.js, Vue.js" data-coreui-placeholder="Only predefined options allowed..."></div>`} />
+
+Text that matches no option is cleared when the field loses focus, and <kbd>Enter</kbd> does not submit the form while the field holds it.
 
 ## Hints and completion
 
@@ -388,7 +392,7 @@ The Autocomplete component includes several accessibility features:
 | --- | --- |
 | <kbd>Arrow Down</kbd> | Highlight the next option or open dropdown |
 | <kbd>Arrow Up</kbd> | Highlight the previous option |
-| <kbd>Enter</kbd> | Select the highlighted option |
+| <kbd>Enter</kbd> | Select the highlighted option, or commit the typed text; with the list closed, also submit the form |
 | <kbd>Escape</kbd> | Close the dropdown and clear focus |
 | <kbd>Tab</kbd> | Accept hint completion (when hints are enabled) |
 | <kbd>Backspace</kbd>/<kbd>Delete</kbd> | Clear input and trigger search |
