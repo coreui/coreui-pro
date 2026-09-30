@@ -35,7 +35,6 @@ const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
 const EVENT_END_DATE_CHANGE = `endDateChange${EVENT_KEY}`
-const EVENT_RANGE_CHANGE = `rangeChange${EVENT_KEY}`
 const EVENT_START_DATE_CHANGE = `startDateChange${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
@@ -518,10 +517,6 @@ class DateRangeInput extends BaseComponent {
 
     if (endChanged) {
       EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, { date: end })
-    }
-
-    if (startChanged || endChanged) {
-      EventHandler.trigger(this._element, EVENT_RANGE_CHANGE, { endDate: end, startDate: start })
     }
   }
 

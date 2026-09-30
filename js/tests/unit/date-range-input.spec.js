@@ -105,33 +105,51 @@ describe('DateRangeInput', () => {
     it('should set both dates, update the fields and emit once per change', () => {
       const range = build()
       const seen = []
-      for (const name of ['startDateChange', 'endDateChange', 'rangeChange']) {
-        root().addEventListener(`${name}.coreui.date-range-input`, event => seen.push([name, event.date ?? [event.startDate, event.endDate]]))
+      for (const name of ['startDateChange', 'endDateChange']) {
+        root().addEventListener(`${name}.coreui.date-range-input`, event => seen.push([name, event.date]))
       }
 
       range.setRange(new Date(2026, 6, 14), new Date(2026, 6, 20))
 
       expect(hiddenInputs().map(input => input.value)).toEqual(['14.07.2026', '20.07.2026'])
-      expect(seen.map(([name]) => name)).toEqual(['startDateChange', 'endDateChange', 'rangeChange'])
-      expect(seen[2][1]).toEqual([new Date(2026, 6, 14), new Date(2026, 6, 20)])
+      expect(seen).toEqual([
+        ['startDateChange', new Date(2026, 6, 14)],
+        ['endDateChange', new Date(2026, 6, 20)]
+      ])
 
       range.setRange(new Date(2026, 6, 14), new Date(2026, 6, 20))
-      expect(seen).toHaveLength(3)
+      expect(seen).toHaveLength(2)
 
       range.setRange(new Date(2026, 6, 14), new Date(2026, 6, 21))
-      expect(seen.slice(3).map(([name]) => name)).toEqual(['endDateChange', 'rangeChange'])
+      expect(seen.slice(2).map(([name]) => name)).toEqual(['endDateChange'])
+    })
+
+    it('should hold both new dates by the time either change event of setRange fires', () => {
+      const range = build()
+      const seen = []
+      for (const name of ['startDateChange', 'endDateChange']) {
+        root().addEventListener(`${name}.coreui.date-range-input`, () => seen.push([range.getStartDate(), range.getEndDate()]))
+      }
+
+      range.setRange(new Date(2026, 6, 14), new Date(2026, 6, 20))
+
+      expect(seen).toEqual([
+        [new Date(2026, 6, 14), new Date(2026, 6, 20)],
+        [new Date(2026, 6, 14), new Date(2026, 6, 20)]
+      ])
     })
 
     it('should follow a date typed into a field', () => {
       const range = build({ startDate: new Date(2026, 6, 14) })
       const seen = []
-      root().addEventListener('rangeChange.coreui.date-range-input', event => seen.push(event))
+      root().addEventListener('endDateChange.coreui.date-range-input', event => seen.push(event))
 
       range._endInput.setConfig({ date: new Date(2026, 6, 20) })
 
       expect(range.getEndDate()).toEqual(new Date(2026, 6, 20))
+      expect(range.getStartDate()).toEqual(new Date(2026, 6, 14))
       expect(seen).toHaveLength(1)
-      expect(seen[0].startDate).toEqual(new Date(2026, 6, 14))
+      expect(seen[0].date).toEqual(new Date(2026, 6, 20))
     })
 
     it('should keep what the field kept when it refuses a date', () => {
@@ -146,7 +164,9 @@ describe('DateRangeInput', () => {
     it('should keep working after setRange throws on a bad argument', () => {
       const range = build()
       const seen = []
-      root().addEventListener('rangeChange.coreui.date-range-input', event => seen.push([event.startDate, event.endDate]))
+      for (const name of ['startDateChange', 'endDateChange']) {
+        root().addEventListener(`${name}.coreui.date-range-input`, event => seen.push([name, event.date]))
+      }
 
       expect(() => range.setRange(undefined, null)).toThrowError(TypeError)
 
@@ -154,8 +174,9 @@ describe('DateRangeInput', () => {
       range._endInput.setConfig({ date: new Date(2026, 6, 21) })
 
       expect(seen).toEqual([
-        [new Date(2026, 6, 14), new Date(2026, 6, 20)],
-        [new Date(2026, 6, 14), new Date(2026, 6, 21)]
+        ['startDateChange', new Date(2026, 6, 14)],
+        ['endDateChange', new Date(2026, 6, 20)],
+        ['endDateChange', new Date(2026, 6, 21)]
       ])
     })
 
@@ -176,7 +197,9 @@ describe('DateRangeInput', () => {
     it('should reject a setRange with a bad end before writing either field', () => {
       const range = build()
       const seen = []
-      root().addEventListener('rangeChange.coreui.date-range-input', event => seen.push([event.startDate, event.endDate]))
+      for (const name of ['startDateChange', 'endDateChange']) {
+        root().addEventListener(`${name}.coreui.date-range-input`, event => seen.push([name, event.date]))
+      }
 
       expect(() => range.setRange(new Date(2026, 6, 14))).toThrowError(TypeError)
       expect(hiddenInputs().map(input => input.value)).toEqual(['', ''])
@@ -184,7 +207,7 @@ describe('DateRangeInput', () => {
       range._endInput.setConfig({ date: new Date(2026, 6, 20) })
 
       expect(range.getStartDate()).toBeNull()
-      expect(seen).toEqual([[null, new Date(2026, 6, 20)]])
+      expect(seen).toEqual([['endDateChange', new Date(2026, 6, 20)]])
     })
 
     it('should flag an end before the start on the frame and lift it once fixed', () => {
@@ -725,15 +748,15 @@ describe('DateRangeInput', () => {
       instance.dispose()
     })
 
-    it("should emit rangeChange when only the time moves", () => {
+    it("should emit startDateChange when only the time moves", () => {
       const instance = build({
         endDate: new Date(2026, 6, 20, 10, 0),
         format: "dd.MM.yyyy HH:mm",
         startDate: new Date(2026, 6, 14, 10, 0),
         type: "datetime"
       })
-      const spy = jasmine.createSpy("rangeChange")
-      root().addEventListener("rangeChange.coreui.date-range-input", spy)
+      const spy = jasmine.createSpy("startDateChange")
+      root().addEventListener("startDateChange.coreui.date-range-input", spy)
 
       const hour = fields()[0].querySelectorAll(".form-date-time-section")[3]
       hour.focus()
