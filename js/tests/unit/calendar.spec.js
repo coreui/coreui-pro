@@ -338,6 +338,17 @@ describe('Calendar', () => {
       }
     })
 
+    it('should keep the page it showed when calendarDate cannot be read', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, { calendarDate: new Date(2022, 5, 15), locale: 'en-US' })
+
+      calendar.setConfig({ calendarDate: 'not a date' })
+
+      expect(div.querySelector('table').getAttribute('aria-label')).toEqual('June 2022')
+    })
+
     it('should initialize minDate and maxDate', () => {
       fixtureEl.innerHTML = '<div></div>'
 
