@@ -59,7 +59,7 @@ Strings are written as text. Set `html: true` on the toaster to render markup; i
 
 ## Updating a toast
 
-Passing an `id` that already exists updates that toast instead of adding a second one, and bumps its `updateKey`, so a "Draft saved" toast clicked twice stays a single toast. A toast that is already closing is not reused: the same `id` then shows a new toast while the old one finishes leaving. `update()` does the same for a toast whose id you kept, and accepts a function of the current toast when the change depends on it: `toaster.update(id, previous => ({ description: previous.data.step + 1 }))`.
+Passing an `id` that already exists updates that toast instead of adding a second one, and bumps its `updateKey`, so a "Draft saved" toast clicked twice stays a single toast. A toast that is already closing is not reused: adding its `id` again removes it at once and shows a new toast in its place. `update()` does the same for a toast whose id you kept, and accepts a function of the current toast when the change depends on it: `toaster.update(id, previous => ({ description: previous.data.step + 1 }))`.
 
 <Example code={`<div class="hstack gap-2 flex-wrap mb-3">
     <button type="button" class="btn-solid theme-primary" id="toasterDraftBtn">Save draft</button>
@@ -218,7 +218,7 @@ const id = toaster.add({ title: 'Saved', description: 'Your changes are live.', 
 | `data` | object | — | Anything you want to read back from the toast object later, e.g. in `update(id, previous => …)`. |
 | `description` | string, element, function | — | Body of the toast. |
 | `dismissible` | boolean | `true` | Render the close button. |
-| `id` | string | generated | Stable id; adding with an existing id updates that toast in place, unless it is already closing, in which case a new toast is shown. |
+| `id` | string | generated | Stable id; adding with an existing id updates that toast in place, unless it is already closing, in which case a new toast replaces it. |
 | `instant` | boolean | `false` | Skip the fade (`.toast-instant`). |
 | `onClose` | function | — | Called when the toast starts hiding, with the toast object. |
 | `onRemove` | function | — | Called after the toast left the DOM, with the toast object. |

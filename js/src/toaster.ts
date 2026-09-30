@@ -314,6 +314,10 @@ class Toaster extends BaseComponent {
       return existing.toast.id
     }
 
+    if (existing) {
+      this._remove(existing)
+    }
+
     const toast: ToastObject = {
       ...ToastDefault,
       ...options,
@@ -539,14 +543,11 @@ class Toaster extends BaseComponent {
   }
 
   _remove(entry: Entry): void {
-    if (!this._entries) {
+    if (!this._entries?.has(entry.toast.id)) {
       return
     }
 
-    if (this._entries.get(entry.toast.id) === entry) {
-      this._entries.delete(entry.toast.id)
-    }
-
+    this._entries.delete(entry.toast.id)
     EventHandler.off(entry.toast.element, EVENT_KEY)
     this._announcements.get(entry.toast.element)?.remove()
     this._announcements.delete(entry.toast.element)

@@ -275,21 +275,22 @@ describe('Toaster', () => {
       expect(toaster.getToasts()[0].updateKey).toEqual(1)
     })
 
-    it('should show a new toast when the id belongs to a toast that is leaving', async () => {
+    it('should replace a closing toast when its id is added again', () => {
       toaster = new Toaster(null, { container: fixtureEl })
+      const onRemove = jasmine.createSpy('onRemove')
 
-      toaster.add({ id: 'draft', description: 'Draft saved', action: { label: 'Undo' } })
+      toaster.add({
+        id: 'draft', description: 'Draft saved', action: { label: 'Undo' }, onRemove
+      })
       const leavingEl = fixtureEl.querySelector('.toast')
-      leavingEl.style.transitionDuration = '20ms'
-      const removed = hidden(leavingEl)
       toaster.close('draft')
 
       toaster.add({ id: 'draft', description: 'Draft saved again', instant: true })
-      await removed
 
       const toasts = fixtureEl.querySelectorAll('.toast')
+      expect(leavingEl.isConnected).toBeFalse()
+      expect(onRemove).toHaveBeenCalledTimes(1)
       expect(toasts).toHaveSize(1)
-      expect(toasts[0]).not.toBe(leavingEl)
       expect(toasts[0].querySelector('.toast-description').textContent).toEqual('Draft saved again')
       expect(toasts[0].querySelector('.toast-action')).toBeNull()
       expect(toaster.getToasts().map(toast => toast.id)).toEqual(['draft'])
