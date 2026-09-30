@@ -563,7 +563,7 @@ class Toaster extends BaseComponent {
   }
 
   _applyLimit(): void {
-    const entries = [...this._entries.values()].filter(entry => !entry.leaving)
+    const entries = [...this._entries.values()]
     const overflow = this._config.limit > 0 ? Math.max(0, entries.length - this._config.limit) : 0
     const layout = this._layout()
     let unlimited = false
@@ -571,7 +571,7 @@ class Toaster extends BaseComponent {
     for (const [index, entry] of entries.entries()) {
       const limited = index < overflow
 
-      if (limited === entry.toast.limited) {
+      if (entry.leaving || limited === entry.toast.limited) {
         continue
       }
 
