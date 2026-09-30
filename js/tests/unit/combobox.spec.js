@@ -1,6 +1,6 @@
 import Combobox from '../../src/combobox.js'
 import { CARET_ICON } from '../../src/util/icons.js'
-import { DefaultAllowlist } from '../../src/util/sanitizer.js'
+import { SVGAllowlist } from '../../src/util/sanitizer.js'
 import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
 
 describe('Combobox', () => {
@@ -78,7 +78,7 @@ describe('Combobox', () => {
   describe('Default', () => {
     it('should return default configuration', () => {
       expect(Combobox.Default).toEqual({
-        allowList: DefaultAllowlist,
+        allowList: SVGAllowlist,
         ariaSearchLabel: 'Search options',
         caretIcon: CARET_ICON,
         container: false,
@@ -139,6 +139,46 @@ describe('Combobox', () => {
 
       expect(toggle.querySelectorAll('.combobox-caret').length).toEqual(1)
       expect(toggle.querySelector('.combobox-caret').hasAttribute('data-mine')).toBeTrue()
+    })
+
+    it('should sanitize a caret icon given in the markup', () => {
+      const toggle = setMarkup()
+      toggle.setAttribute('data-coreui-caret-icon', '<img src="caret.svg" onerror="window.caretInjected = true">')
+      // eslint-disable-next-line no-new
+      new Combobox(toggle)
+
+      const caret = toggle.querySelector('.combobox-caret')
+
+      expect(caret.tagName).toEqual('IMG')
+      expect(caret.hasAttribute('onerror')).toBeFalse()
+    })
+
+    it('should draw a custom SVG caret', () => {
+      const toggle = setMarkup()
+      // eslint-disable-next-line no-new
+      new Combobox(toggle, { caretIcon: '<svg viewBox="0 0 16 16"><path d="M4 6l4 4 4-4"></path></svg>' })
+
+      const caret = toggle.querySelector('.combobox-caret')
+
+      expect(caret.tagName.toLowerCase()).toEqual('svg')
+      expect(caret.querySelector('path').getAttribute('d')).toEqual('M4 6l4 4 4-4')
+    })
+
+    it('should keep the caret icon as given when sanitize is false', () => {
+      const toggle = setMarkup()
+      // eslint-disable-next-line no-new
+      new Combobox(toggle, { caretIcon: '<i class="icon" data-icon="caret"></i>', sanitize: false })
+
+      expect(toggle.querySelector('.combobox-caret').getAttribute('data-icon')).toEqual('caret')
+    })
+
+    it('should draw no caret when nothing of the icon survives the sanitizer', () => {
+      const toggle = setMarkup()
+      // eslint-disable-next-line no-new
+      new Combobox(toggle, { caretIcon: '<script>window.caretInjected = true</script>' })
+
+      expect(toggle.querySelector('.combobox-caret')).toBeNull()
+      expect(toggle.querySelector('script')).toBeNull()
     })
 
     it('should build the value element when the markup has none', () => {

@@ -472,7 +472,7 @@ const combobox = new coreui.Combobox('#myCombobox', {
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
-| `allowList` | object | [Default value](/getting-started/javascript/#sanitizer) | Object which contains allowed attributes and tags for the labels rendered from `items`. |
+| `allowList` | object | `SVGAllowlist` | Allowlist the labels rendered from `items` and the `caretIcon` are sanitized against. |
 | `ariaSearchLabel` | string | `'Search options'` | Accessible name of the search field. An input with its own `aria-label` keeps it. |
 | `caretIcon` | string | `'<svg …>'` | The caret drawn at the end of the toggle, as inline SVG. Empty string, or a `.combobox-caret` already in the markup, and the plugin draws none. |
 | `container` | string, element, boolean | `false` | Where the panel is mounted while open. `true` means `<body>`; leave it alone and the panel goes next to the toggle unless an ancestor would clip it. Inside a modal dialog it goes into the dialog instead, because the rest of the page is inert. |
@@ -483,7 +483,7 @@ const combobox = new coreui.Combobox('#myCombobox', {
 | `multiple` | boolean | `false` | Toggles options instead of replacing the selection, and keeps the panel open. |
 | `name` | string, null | `null` | Name of the hidden input the value is submitted under, inserted right before the toggle. With `multiple` all values go into that one input joined by commas, so three selections post one `tags=a,b,c`. Without a name the combobox is not submitted with the form. |
 | `placeholder` | string | `''` | Text shown in the toggle while nothing is selected. |
-| `sanitize` | boolean | `true` | Enables the sanitization of the labels rendered from `items` with `html`. |
+| `sanitize` | boolean | `true` | Enables the sanitization of the labels rendered from `items` with `html`, and of the `caretIcon`. |
 | `sanitizeFn` | null, function | `null` | Sanitization function of your own, used instead of the built-in one. |
 | `search` | boolean, string | `false` | Builds a search field at the top of the panel. `true` filters the list itself; `'external'` filters nothing and fires `search.coreui.combobox` instead. |
 | `searchNormalize` | boolean | `false` | Compares both sides of the filter without their diacritics, so `zoe` matches `Zoë`. |
