@@ -60,7 +60,7 @@ describe('NumberInput', () => {
       expect(input.value).toBe('2')
     })
 
-    it('should step an empty field from zero, like the arrow keys, and keep it inside min and max', () => {
+    it('should step an empty field from zero and keep it within min, max and the step grid', () => {
       const cases = [
         ['', 'up', '1'],
         ['', 'down', '-1'],
@@ -72,6 +72,9 @@ describe('NumberInput', () => {
         ['min="3"', 'down', '3'],
         ['max="-5"', 'up', '-5'],
         ['max="-5"', 'down', '-5'],
+        ['max="-5" step="3"', 'up', '-6'],
+        ['max="-5" step="3"', 'down', '-6'],
+        ['min="-10" max="-5" step="3"', 'up', '-7'],
         ['step="any" min="-3"', 'up', '1'],
         ['step="any" min="-3"', 'down', '-1']
       ]
@@ -91,14 +94,46 @@ describe('NumberInput', () => {
       }
     })
 
-    it('should put an empty field inside min and max when the browser leaves it empty', () => {
-      const input = markup('max="-5"')
+    it('should step an empty field the other way when the browser leaves it empty', () => {
+      const below = markup('max="-5" step="3"')
+      const belowInput = new NumberInput(below)
+
+      vi.spyOn(below, 'stepUp').mockImplementation(() => {})
+      belowInput.increment()
+
+      expect(below.value).toBe('-6')
+
+      const above = markup('min="3"')
+      const aboveInput = new NumberInput(above)
+
+      vi.spyOn(above, 'stepDown').mockImplementation(() => {})
+      aboveInput.decrement()
+
+      expect(above.value).toBe('3')
+    })
+
+    it('should leave an empty field alone when min is above max', () => {
+      const input = markup('min="10" max="5"')
       const numberInput = new NumberInput(input)
 
-      vi.spyOn(input, 'stepUp').mockImplementation(() => {})
+      numberInput.increment()
+      numberInput.decrement()
+
+      expect(input.value).toBe('')
+      expect([...buttons()].map(button => button.disabled)).toEqual([true, true])
+    })
+
+    it('should compare values as numbers, not as the text in the field', () => {
+      const input = markup('value="10.0" min="0" max="10"')
+      const numberInput = new NumberInput(input)
+      const seen = []
+
+      input.addEventListener('input', () => seen.push('input'))
       numberInput.increment()
 
-      expect(input.value).toBe('-5')
+      expect(buttons()[1].disabled).toBe(true)
+      expect(input.value).toBe('10.0')
+      expect(seen).toEqual([])
     })
 
     it('should not step a disabled or readonly input', () => {
@@ -120,6 +155,25 @@ describe('NumberInput', () => {
       numberInput.decrement()
       numberInput.decrement()
       expect(input.value).toBe('0')
+    })
+
+    it('should step by one with step="any" without moving against the direction or drifting', () => {
+      const outside = markup('value="15" step="any" max="10"')
+      const outsideInput = new NumberInput(outside)
+
+      expect(buttons()[1].disabled).toBe(true)
+
+      outsideInput.increment()
+      expect(outside.value).toBe('15')
+
+      outsideInput.decrement()
+      expect(outside.value).toBe('10')
+
+      const fraction = markup('value="-0.9" step="ANY"')
+      const fractionInput = new NumberInput(fraction)
+
+      fractionInput.increment()
+      expect(fraction.value).toBe('0.1')
     })
 
     it('should not fire events when the value cannot move', () => {
@@ -227,6 +281,33 @@ describe('NumberInput', () => {
       pointerClick(buttons()[1])
 
       expect(input.value).toBe('3')
+    })
+
+    it('should step on the next pointer click after a hold', () => {
+      const input = markup('value="0"')
+      const numberInput = new NumberInput(input) // eslint-disable-line no-unused-vars
+
+      press(buttons()[1])
+      vi.advanceTimersByTime(400 + 60)
+      release()
+      pointerClick(buttons()[1])
+      press(buttons()[1])
+      release()
+      pointerClick(buttons()[1])
+
+      expect(input.value).toBe('2')
+    })
+
+    it('should stop repeating once the step no longer moves the value', () => {
+      const input = markup('value="0" max="2"')
+      const numberInput = new NumberInput(input) // eslint-disable-line no-unused-vars
+
+      press(buttons()[1])
+      vi.advanceTimersByTime(400 + (60 * 4))
+      input.value = '0'
+      vi.advanceTimersByTime(60 * 3)
+
+      expect(input.value).toBe('0')
     })
 
     it('should step on a short click and on a click no pointer made, even after a hold', () => {
