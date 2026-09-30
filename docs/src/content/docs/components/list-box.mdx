@@ -438,6 +438,7 @@ const listBox = new coreui.ListBox('#myListBox', {
 | `sanitize` | boolean | `true` | Enables the sanitization of the labels rendered from `items` with `html`. |
 | `sanitizeFn` | null, function | `null` | Sanitization function of your own, used instead of the built-in one. |
 | `search` | boolean, string | `false` | Builds a search field above the options. `true` filters the list itself; `'external'` filters nothing and fires `search.coreui.list-box` instead. An input the markup already carries is used either way. |
+| `searchNormalize` | boolean | `false` | Compares both sides of the filter without their diacritics, so `zoe` matches `Zoë`. |
 | `searchPlaceholder` | string | `'Search'` | Placeholder of the built search field. |
 | `sectionsSelectable` | boolean | `false` | Turns every section label into a tri-state button (`aria-pressed`) that toggles the section's visible, enabled options, and puts it in the arrow-key order. `multiple` mode only. |
 | `selected` | null, string, array | `null` | Initially selected values. In `single` mode only the first one is taken, and a disabled value is never taken. |
