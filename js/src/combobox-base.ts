@@ -206,11 +206,15 @@ class ComboboxBase extends BaseComponent {
         return
       }
 
-      if (!this._isShown() && (event.key === ENTER_KEY || event.key === ARROW_DOWN_KEY)) {
+      if (!this._isShown() && this._isOpenKey(event.key)) {
         event.preventDefault()
         this.show()
       }
     })
+  }
+
+  _isOpenKey(key: string): boolean {
+    return key === ENTER_KEY || key === ARROW_DOWN_KEY
   }
 
   // Options panel — one render path for every combobox surface

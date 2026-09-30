@@ -1370,23 +1370,42 @@ describe('Autocomplete', () => {
       })
     })
 
-    it('should open dropdown on Enter key', () => {
-      return new Promise(resolve => {
-        fixtureEl.innerHTML = '<div class="autocomplete"></div>'
-        const autocompleteEl = fixtureEl.querySelector('.autocomplete')
-        const autocomplete = new Autocomplete(autocompleteEl, {
-          options: [{ label: 'Option 1', value: '1' }]
-        })
-
-        autocompleteEl.addEventListener('shown.coreui.autocomplete', () => {
-          expect(autocomplete._isShown()).toBe(true)
-          resolve()
-        })
-
-        const keydownEvent = createEvent('keydown')
-        keydownEvent.key = 'Enter'
-        autocomplete._togglerElement.dispatchEvent(keydownEvent)
+    it('should let Enter through to the form while the panel is closed', () => {
+      fixtureEl.innerHTML = '<form><div class="autocomplete"></div></form>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        options: [{ label: 'Option 1', value: '1' }]
       })
+      const event = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true })
+
+      autocomplete._inputElement.dispatchEvent(event)
+
+      expect(event.defaultPrevented).toBeFalse()
+      expect(autocomplete._isShown()).toBeFalse()
+    })
+
+    it('should submit its form on Enter, with the hint shown and no submit button', async () => {
+      fixtureEl.innerHTML = '<form><div class="autocomplete"></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        name: 'framework',
+        showHints: true,
+        options: [{ label: 'Vue.js', value: 'vue' }]
+      })
+      let submitted = 0
+
+      form.addEventListener('submit', event => {
+        event.preventDefault()
+        submitted++
+      })
+      autocomplete._inputElement.focus()
+      await userEvent.keyboard('Vu')
+      autocomplete.hide()
+      await userEvent.keyboard('{Enter}')
+
+      expect(autocomplete._inputHintElement.form).toBeNull()
+      expect(submitted).toBe(1)
     })
 
     it('should close dropdown on Escape key', () => {
@@ -2478,6 +2497,56 @@ describe('Autocomplete', () => {
       autocompleteEl.dispatchEvent(clickEvent)
 
       expect(autocomplete._isShown()).toBe(false)
+    })
+  })
+
+  describe('form reset', () => {
+    const settle = () => new Promise(resolve => {
+      setTimeout(resolve)
+    })
+
+    it('should go back to its initial selection and report the change', async () => {
+      fixtureEl.innerHTML = '<form><div class="autocomplete"></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        options: [{ label: 'Option 1', value: '1' }, { label: 'Option 2', value: '2' }],
+        value: '1'
+      })
+      const changes = []
+
+      autocomplete._onOptionSelected('2')
+      autocompleteEl.addEventListener('change.coreui.autocomplete', event => changes.push(event.value?.value ?? null))
+      form.reset()
+      await settle()
+
+      expect(autocomplete._selected.map(option => option.value)).toEqual(['1'])
+      expect(autocomplete._inputElement.value).toBe('Option 1')
+      expect(changes).toEqual(['1'])
+    })
+
+    it('should clear a field that started empty, and leave a cancelled reset alone', async () => {
+      fixtureEl.innerHTML = '<form><div class="autocomplete"></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        cleaner: true,
+        options: [{ label: 'Option 1', value: '1' }]
+      })
+
+      autocomplete._onOptionSelected('1')
+      form.addEventListener('reset', event => event.preventDefault(), { once: true })
+      form.reset()
+      await settle()
+
+      expect(autocomplete._selected.map(option => option.value)).toEqual(['1'])
+
+      form.reset()
+      await settle()
+
+      expect(autocomplete._selected).toEqual([])
+      expect(autocomplete._inputElement.value).toBe('')
+      expect(autocomplete._cleanerElement.style.display).toBe('none')
     })
   })
 

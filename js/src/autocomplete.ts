@@ -28,6 +28,7 @@ const DATA_KEY = 'coreui.autocomplete'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
+const ARROW_DOWN_KEY = 'ArrowDown'
 const BACKSPACE_KEY = 'Backspace'
 const DELETE_KEY = 'Delete'
 const ENTER_KEY = 'Enter'
@@ -41,6 +42,7 @@ const EVENT_CLICK = `click${EVENT_KEY}`
 const EVENT_INPUT = `input${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 const EVENT_MOUSEDOWN = `mousedown${EVENT_KEY}`
+const EVENT_RESET = `reset${EVENT_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_KEYUP_DATA_API = `keyup${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
@@ -131,6 +133,8 @@ class Autocomplete extends ComboboxBase {
   protected declare _inputHintElement: any
   protected declare _addedClassNames: string[]
   protected declare _previousTabIndex: string | null
+  protected declare _form: HTMLFormElement | null
+  protected declare _resetHandler: (event: Event) => void
   protected declare _seenOptionValues: Set<string>
   protected declare _valueApplied: boolean
 
@@ -154,6 +158,14 @@ class Autocomplete extends ComboboxBase {
     this._search = ''
     this._seenOptionValues = new Set()
     this._valueApplied = false
+    this._form = this._element.closest('form')
+    this._resetHandler = (event: Event) => {
+      setTimeout(() => {
+        if (this._element && !event.defaultPrevented) {
+          this._restoreInitialSelection()
+        }
+      })
+    }
 
     this._createAutocomplete()
     this._addEventListeners()
@@ -203,6 +215,7 @@ class Autocomplete extends ComboboxBase {
 
     this._disposeFloating()
     this._disposeListBox()
+    EventHandler.off(this._form, EVENT_RESET, this._resetHandler)
 
     for (const element of [
       this._menu,
@@ -395,7 +408,7 @@ class Autocomplete extends ComboboxBase {
       // same press must not reopen it or match the value it just wrote.
       const handledByList = event.key === ENTER_KEY && event.defaultPrevented
 
-      if (!handledByList && !this._isShown() && event.key !== TAB_KEY && event.key !== ESCAPE_KEY) {
+      if (!handledByList && !this._isShown() && event.key !== TAB_KEY && event.key !== ESCAPE_KEY && event.key !== ENTER_KEY) {
         this.show()
       }
 
@@ -417,8 +430,10 @@ class Autocomplete extends ComboboxBase {
       }
 
       if (event.key === ENTER_KEY) {
-        event.preventDefault()
-        event.stopPropagation()
+        if (this._isShown()) {
+          event.preventDefault()
+          event.stopPropagation()
+        }
 
         if (this._inputElement.value.length === 0) {
           return
@@ -462,6 +477,10 @@ class Autocomplete extends ComboboxBase {
         this.show()
       }
     })
+
+    if (this._form) {
+      EventHandler.on(this._form, EVENT_RESET, this._resetHandler)
+    }
 
     EventHandler.on(this._optionsElement, EVENT_MOUSEDOWN, (event: any) => {
       // Keep focus on the input so its blur handler doesn't clear the search
@@ -588,6 +607,8 @@ class Autocomplete extends ComboboxBase {
       inputHintEl.readOnly = true
       inputHintEl.tabIndex = -1
       inputHintEl.setAttribute('aria-hidden', true as any)
+      // No form owner: the hint is neither submitted nor counted against Enter submitting the form.
+      inputHintEl.setAttribute('form', '')
 
       togglerEl.append(inputHintEl)
       this._inputHintElement = inputHintEl
@@ -724,6 +745,33 @@ class Autocomplete extends ComboboxBase {
     }
 
     this._cleanerElement.style.display = 'none'
+  }
+
+  override _isOpenKey(key: string): boolean {
+    return key === ARROW_DOWN_KEY
+  }
+
+  _restoreInitialSelection(): void {
+    const previous = this._selected[0]?.value ?? null
+
+    this.deselectAll()
+    this._inputElement.value = ''
+
+    if (this._inputHintElement) {
+      this._inputHintElement.value = ''
+    }
+
+    this._search = ''
+    this._filterOptionsList()
+    this._valueApplied = false
+    this._seenOptionValues.clear()
+    this._seedSelection()
+
+    const current = this._selected[0] ?? null
+
+    if ((current?.value ?? null) !== previous) {
+      this._triggerChangeEvent(current)
+    }
   }
 
   _seedSelection(): void {

@@ -50,6 +50,8 @@ Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label 
     <div class="form-text">Start typing to filter the list.</div>
   </div>`} />
 
+Inside a `<form>`, <kbd>Enter</kbd> with the list closed submits the form, and a form reset brings the autocomplete back to its initial `value`, or to an empty field, firing `change.coreui.autocomplete` when that differs from the current selection. A reset that a listener cancels changes nothing.
+
 ## Data source
 
 Learn how to populate the autocomplete component with data from various sources, including arrays and objects, for dynamic content integration.
@@ -388,7 +390,7 @@ The Autocomplete component includes several accessibility features:
 | --- | --- |
 | <kbd>Arrow Down</kbd> | Highlight the next option or open dropdown |
 | <kbd>Arrow Up</kbd> | Highlight the previous option |
-| <kbd>Enter</kbd> | Select the highlighted option |
+| <kbd>Enter</kbd> | Select the highlighted option; with the list closed, submit the form |
 | <kbd>Escape</kbd> | Close the dropdown and clear focus |
 | <kbd>Tab</kbd> | Accept hint completion (when hints are enabled) |
 | <kbd>Backspace</kbd>/<kbd>Delete</kbd> | Clear input and trigger search |
