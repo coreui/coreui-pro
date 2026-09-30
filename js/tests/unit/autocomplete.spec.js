@@ -41,6 +41,23 @@ describe('Autocomplete', () => {
   })
 
   describe('constructor', () => {
+    it('should apply a preselected option without firing change or input', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const seen = []
+
+      autocompleteEl.addEventListener('change.coreui.autocomplete', () => seen.push('change'))
+      autocompleteEl.addEventListener('input.coreui.autocomplete', () => seen.push('input'))
+
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        options: [{ label: 'Option 1', value: '1', selected: true }, { label: 'Option 2', value: '2' }]
+      })
+
+      expect(seen).toEqual([])
+      expect(autocomplete._inputElement.value).toBe('Option 1')
+      expect(autocomplete._selected.map(option => option.value)).toEqual(['1'])
+    })
+
     it('should take care of element either passed as a CSS selector or DOM element', () => {
       fixtureEl.innerHTML = [
         '<div class="autocomplete" data-coreui-autocomplete>',
@@ -927,6 +944,24 @@ describe('Autocomplete', () => {
       autocomplete._selected.push({ label: 'Option 1', value: '1' })
 
       autocomplete.setConfig({ value: '2' })
+
+      expect(autocomplete._selected).toEqual([])
+    })
+
+    it('should keep one selection across setConfig and drop a pick the new options lack', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        options: [{ label: 'Option 1', value: '1' }, { label: 'Option 2', value: '2' }],
+        value: '1'
+      })
+
+      autocomplete._onOptionSelected('2')
+      autocomplete.setConfig({ placeholder: 'Pick one' })
+
+      expect(autocomplete._selected.map(option => option.value)).toEqual(['2'])
+
+      autocomplete.setConfig({ options: [{ label: 'A', value: 'a' }] })
 
       expect(autocomplete._selected).toEqual([])
     })
@@ -2435,7 +2470,8 @@ describe('Autocomplete', () => {
 
       input.value = 'O'
       input.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'ArrowDown' }))
-      input.dispatchEvent(new KeyboardEvent('keyup', { bubbles: true, key: 'O' }))
+      input.value = 'O'
+      input.dispatchEvent(createEvent('input', { bubbles: true }))
       input.dispatchEvent(new Event('blur'))
       menu.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'O' }))
       indicator.click()
@@ -2724,8 +2760,8 @@ describe('Autocomplete', () => {
     })
   })
 
-  describe('input keyup', () => {
-    it('should update search on character key', () => {
+  describe('input', () => {
+    it('should update search on typed text', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
       const autocomplete = new Autocomplete(autocompleteEl, {
@@ -2734,18 +2770,12 @@ describe('Autocomplete', () => {
 
       autocomplete._inputElement.value = 'O'
 
-      const keyupEvent = createEvent('keyup')
-      keyupEvent.key = 'O'
-      Object.defineProperty(keyupEvent, 'target', {
-        value: autocomplete._inputElement,
-        enumerable: true
-      })
-      autocomplete._inputElement.dispatchEvent(keyupEvent)
+      autocomplete._inputElement.dispatchEvent(createEvent('input', { bubbles: true }))
 
       expect(autocomplete._search).toBe('o')
     })
 
-    it('should update search on Backspace key', () => {
+    it('should update search when text is deleted', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
       const autocomplete = new Autocomplete(autocompleteEl, {
@@ -2754,18 +2784,12 @@ describe('Autocomplete', () => {
 
       autocomplete._inputElement.value = 'Op'
 
-      const keyupEvent = createEvent('keyup')
-      keyupEvent.key = 'Backspace'
-      Object.defineProperty(keyupEvent, 'target', {
-        value: autocomplete._inputElement,
-        enumerable: true
-      })
-      autocomplete._inputElement.dispatchEvent(keyupEvent)
+      autocomplete._inputElement.dispatchEvent(createEvent('input', { bubbles: true }))
 
       expect(autocomplete._search).toBe('op')
     })
 
-    it('should update search on Delete key', () => {
+    it('should update search on text pasted or dropped without a key', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
       const autocomplete = new Autocomplete(autocompleteEl, {
@@ -2774,13 +2798,7 @@ describe('Autocomplete', () => {
 
       autocomplete._inputElement.value = 'Opt'
 
-      const keyupEvent = createEvent('keyup')
-      keyupEvent.key = 'Delete'
-      Object.defineProperty(keyupEvent, 'target', {
-        value: autocomplete._inputElement,
-        enumerable: true
-      })
-      autocomplete._inputElement.dispatchEvent(keyupEvent)
+      autocomplete._inputElement.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertFromPaste' }))
 
       expect(autocomplete._search).toBe('opt')
     })
@@ -2801,17 +2819,11 @@ describe('Autocomplete', () => {
           resolve()
         })
 
-        const keyupEvent = createEvent('keyup')
-        keyupEvent.key = 'O'
-        Object.defineProperty(keyupEvent, 'target', {
-          value: autocomplete._inputElement,
-          enumerable: true
-        })
-        autocomplete._inputElement.dispatchEvent(keyupEvent)
+        autocomplete._inputElement.dispatchEvent(createEvent('input', { bubbles: true }))
       })
     })
 
-    it('should not trigger for non-character keys like Arrow keys', () => {
+    it('should leave the search alone on a key that does not change the text', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
       const autocomplete = new Autocomplete(autocompleteEl, {
@@ -2844,13 +2856,7 @@ describe('Autocomplete', () => {
 
       autocomplete._inputElement.value = 'Opt'
 
-      const keyupEvent = createEvent('keyup')
-      keyupEvent.key = 'p'
-      Object.defineProperty(keyupEvent, 'target', {
-        value: autocomplete._inputElement,
-        enumerable: true
-      })
-      autocomplete._inputElement.dispatchEvent(keyupEvent)
+      autocomplete._inputElement.dispatchEvent(createEvent('input', { bubbles: true }))
 
       expect(autocomplete._inputHintElement.value).toBe('Option 1')
     })
@@ -2865,13 +2871,7 @@ describe('Autocomplete', () => {
 
       autocomplete._inputElement.value = 'xyz'
 
-      const keyupEvent = createEvent('keyup')
-      keyupEvent.key = 'z'
-      Object.defineProperty(keyupEvent, 'target', {
-        value: autocomplete._inputElement,
-        enumerable: true
-      })
-      autocomplete._inputElement.dispatchEvent(keyupEvent)
+      autocomplete._inputElement.dispatchEvent(createEvent('input', { bubbles: true }))
 
       expect(autocomplete._inputHintElement.value).toBe('')
     })
@@ -2886,13 +2886,7 @@ describe('Autocomplete', () => {
 
       autocomplete._inputElement.value = ''
 
-      const keyupEvent = createEvent('keyup')
-      keyupEvent.key = 'Backspace'
-      Object.defineProperty(keyupEvent, 'target', {
-        value: autocomplete._inputElement,
-        enumerable: true
-      })
-      autocomplete._inputElement.dispatchEvent(keyupEvent)
+      autocomplete._inputElement.dispatchEvent(createEvent('input', { bubbles: true }))
 
       expect(autocomplete._inputHintElement.value).toBe('')
     })

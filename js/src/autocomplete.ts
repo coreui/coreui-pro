@@ -40,7 +40,6 @@ const EVENT_CHANGE = `change${EVENT_KEY}`
 const EVENT_CLICK = `click${EVENT_KEY}`
 const EVENT_INPUT = `input${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
-const EVENT_KEYUP = `keyup${EVENT_KEY}`
 const EVENT_MOUSEDOWN = `mousedown${EVENT_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_KEYUP_DATA_API = `keyup${EVENT_KEY}${DATA_API_KEY}`
@@ -247,14 +246,20 @@ class Autocomplete extends ComboboxBase {
   }
 
   setConfig(config: any): void {
-    if (config?.value) {
-      this.deselectAll()
-    }
+    const picked = config?.value === undefined ? this._selected[0] : undefined
 
     this._config = this._getConfig({ ...this._config, ...config })
     this._options = this._getOptionsFromConfig()
     this._setListBoxItems()
     this._syncInputName()
+
+    const option = (picked && this._findOptionByValue(picked.value)) || this._flattenOptions().find(option => option.selected)
+
+    if (option) {
+      this._applySelection(option)
+    } else {
+      this.deselectAll()
+    }
   }
 
   deselectAll(options: any[] = this._selected): void {
@@ -426,21 +431,19 @@ class Autocomplete extends ComboboxBase {
       }
     })
 
-    EventHandler.on(this._inputElement, EVENT_KEYUP, (event: any) => {
-      if (event.key.length === 1 || event.key === BACKSPACE_KEY || event.key === DELETE_KEY) {
-        const { value } = event.target
-        this.search(value)
-        if (this._config.showHints) {
-          const options = value ?
-            this._flattenOptions().filter(option => option.label.toLowerCase().startsWith(value.toLowerCase())) :
-            []
-          this._inputHintElement.value = options.length > 0 ? `${value}${options[0].label.slice(value.length)}` : ''
-        }
+    EventHandler.on(this._inputElement, EVENT_INPUT, () => {
+      const { value } = this._inputElement
+      this.search(value)
+      if (this._config.showHints) {
+        const options = value ?
+          this._flattenOptions().filter(option => option.label.toLowerCase().startsWith(value.toLowerCase())) :
+          []
+        this._inputHintElement.value = options.length > 0 ? `${value}${options[0].label.slice(value.length)}` : ''
+      }
 
-        if (this._selected.length > 0) {
-          this.deselectAll()
-          this._triggerChangeEvent(null)
-        }
+      if (this._selected.length > 0) {
+        this.deselectAll()
+        this._triggerChangeEvent(null)
       }
     })
 
@@ -516,13 +519,6 @@ class Autocomplete extends ComboboxBase {
         ...isSelected && { selected: true },
         ...option.disabled && { disabled: true }
       })
-
-      if (isSelected) {
-        this._selected.push({
-          label: option.label,
-          value: String(value)
-        })
-      }
     }
 
     return _options
@@ -669,17 +665,8 @@ class Autocomplete extends ComboboxBase {
   }
 
   _selectOption(option: any): void {
-    this.deselectAll()
-
-    if (this._selected.filter((selectedOption: any) => selectedOption.value === option.value).length === 0) {
-      this._selected.push(option)
-    }
-
-    this._syncOptionElementState(option.value, true)
-
+    this._applySelection(option)
     this._triggerChangeEvent(option)
-
-    this._inputElement.value = option.label
 
     if (this._config.showHints) {
       this._inputHintElement.value = ''
@@ -690,7 +677,13 @@ class Autocomplete extends ComboboxBase {
     if (this._config.clearSearchOnSelect) {
       this.search('')
     }
+  }
 
+  _applySelection(option: any): void {
+    this.deselectAll()
+    this._selected.push(option)
+    this._syncOptionElementState(option.value, true)
+    this._inputElement.value = option.label
     this._updateCleaner()
   }
 
@@ -721,7 +714,7 @@ class Autocomplete extends ComboboxBase {
       }
 
       if (option.selected) {
-        this._selectOption(option)
+        this._applySelection(option)
       }
     }
   }
@@ -794,12 +787,6 @@ class Autocomplete extends ComboboxBase {
       // is very much inside
       if (composedPath.includes(context._element) || composedPath.includes(context._menu)) {
         continue
-      }
-
-      const relatedTarget: any = { relatedTarget: context._element }
-
-      if (event.type === 'click') {
-        relatedTarget.clickEvent = event
       }
 
       context.hide()
