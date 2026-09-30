@@ -489,6 +489,35 @@ describe('Calendar', () => {
       expect(stop(after)).toEqual(new Date(2026, 11, 3))
     })
 
+    it('should open on the closest month with a day to pick when the limit month has none', () => {
+      vi.useFakeTimers({ toFake: ['Date'] })
+      vi.setSystemTime(new Date(2026, 8, 30))
+      onTestFinished(() => vi.useRealTimers())
+      fixtureEl.innerHTML = '<div></div><div></div>'
+
+      const [after, before] = fixtureEl.querySelectorAll('div')
+      new Calendar(after, { locale: 'en-US', minDate: new Date(2026, 9, 31, 9) }) // eslint-disable-line no-new
+      new Calendar(before, { disabledDates: [[new Date(2026, 6, 1), new Date(2026, 6, 14)]], locale: 'en-US', maxDate: new Date(2026, 6, 14) }) // eslint-disable-line no-new
+
+      const stop = element => new Date(element.querySelector('.calendar-cell[tabindex="0"]').dataset.coreuiDate)
+      expect(stop(after)).toEqual(new Date(2026, 10, 1))
+      expect(stop(before)).toEqual(new Date(2026, 5, 30))
+    })
+
+    it('should stay on today\'s page in month selection and beside a second calendar with a day to pick', () => {
+      vi.useFakeTimers({ toFake: ['Date'] })
+      vi.setSystemTime(new Date(2026, 11, 20))
+      onTestFinished(() => vi.useRealTimers())
+      fixtureEl.innerHTML = '<div></div><div></div>'
+
+      const [months, panels] = fixtureEl.querySelectorAll('div')
+      new Calendar(months, { disabledDates: [[new Date(2026, 11, 1), new Date(2026, 11, 31)]], locale: 'en-US', selectionType: 'month' }) // eslint-disable-line no-new
+      new Calendar(panels, { calendars: 2, disabledDates: [[new Date(2026, 11, 1), new Date(2026, 11, 31)]], locale: 'en-US' }) // eslint-disable-line no-new
+
+      expect(new Date(months.querySelector('.calendar-cell[tabindex="0"]').dataset.coreuiDate)).toEqual(new Date(2026, 10, 1))
+      expect(panels.querySelector(`[data-coreui-date="${new Date(2026, 11, 15).toDateString()}"]`)).not.toBeNull()
+    })
+
     it('should prefer the selected date over the day the calendar opens on', () => {
       fixtureEl.innerHTML = '<div></div>'
 

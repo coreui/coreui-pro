@@ -362,7 +362,7 @@ the first day of the month.
 
 ## Accessibility
 
-The field is a [date input](/forms/date-input/#accessibility) — a group of spinbutton sections — so its own arrow keys belong to the value, and the popup opens on the native control's dropdown keys. Focus enters the calendar on the selected date, on today when nothing is selected, or on the last selectable date when today is out of range. In week selection it enters on the row of that week.
+The field is a [date input](/forms/date-input/#accessibility) — a group of spinbutton sections — so its own arrow keys belong to the value, and the popup opens on the native control's dropdown keys. Focus enters the calendar on the selected date, on today when nothing is selected, or on the closest date that can be picked when today cannot. In week selection it enters on the row of that week.
 
 An `aria-label`, `aria-labelledby` or `aria-describedby` on the picker element moves to the field, so a screen reader announces the name and the description when focus enters it, and the picker element gets them back on dispose. Point `aria-labelledby` at the visible label, as the examples on this page do; it names the field over `floatingLabel` and an `ariaLabel` in `inputOptions`, the way the browser ranks names. A `data-coreui-picker-field` you wrote that already has an `aria-label` or `aria-labelledby` keeps its own name, and its own `aria-describedby` comes first, followed by the one that moves.
 
