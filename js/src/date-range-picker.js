@@ -249,12 +249,7 @@ class DateRangePicker extends BaseComponent {
     this._timePickerStart = null
     this._togglerElement = null
 
-    this._createDateRangePicker()
-    this._createDateRangePickerCalendars()
-    this._addEventListeners()
-    this._addCalendarEventListeners()
-
-    this._focustrap = this._initializeFocusTrap()
+    this._build()
   }
 
   // Getters
@@ -311,7 +306,9 @@ class DateRangePicker extends BaseComponent {
       return
     }
 
-    this._teardown()
+    for (const part of this._teardown()) {
+      part.dispose()
+    }
 
     super.dispose()
   }
@@ -345,29 +342,46 @@ class DateRangePicker extends BaseComponent {
   }
 
   update(config) {
+    const nextConfig = this._getConfig(config)
     const shown = this._isShown()
 
-    this._teardown()
+    if (shown && nextConfig.disabled) {
+      this.hide()
+    }
 
-    this._config = this._getConfig(config)
+    const parts = this._teardown()
+
+    queueMicrotask(() => {
+      for (const part of parts) {
+        part.dispose()
+      }
+    })
+
+    this._config = nextConfig
     this._calendarDate = this._config.calendarDate
     this._startDate = this._config.date || this._config.startDate
     this._endDate = this._config.endDate
     this._selectEndDate = this._config.selectEndDate
 
+    this._build()
+
+    if (shown && !this._config.disabled) {
+      this._initialStartDate = this._startDate ? new Date(this._startDate) : null
+      this._initialEndDate = this._endDate ? new Date(this._endDate) : null
+      this._open()
+    }
+  }
+
+  // Private
+  _build() {
     this._createDateRangePicker()
     this._createDateRangePickerCalendars()
     this._addEventListeners()
     this._addCalendarEventListeners()
 
     this._focustrap = this._initializeFocusTrap()
-
-    if (shown && !this._config.disabled) {
-      this._open()
-    }
   }
 
-  // Private
   _open() {
     this._element.classList.add(CLASS_NAME_SHOW)
     this._element.setAttribute('aria-expanded', true)
@@ -398,11 +412,7 @@ class DateRangePicker extends BaseComponent {
 
     this._focustrap.deactivate()
 
-    for (const component of [this._calendar, ...this._ownTimePickers]) {
-      if (component) {
-        component.dispose()
-      }
-    }
+    const parts = [this._calendar, ...this._ownTimePickers].filter(Boolean)
 
     EventHandler.off(this._element, EVENT_KEY)
 
@@ -439,6 +449,8 @@ class DateRangePicker extends BaseComponent {
     }
 
     this._removeGlobalEventListeners(form)
+
+    return parts
   }
 
   _initializeFocusTrap() {

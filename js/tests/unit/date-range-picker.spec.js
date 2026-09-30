@@ -1,5 +1,6 @@
 /* eslint-env jasmine */
 
+import { onTestFinished } from 'vitest'
 import Calendar from '../../src/calendar.js'
 import DateRangePicker from '../../src/date-range-picker.js'
 import EventHandler from '../../src/dom/event-handler.js'
@@ -482,7 +483,10 @@ describe('DateRangePicker', () => {
       dateRangePicker.show()
       const { calendars, locale, range } = dateRangePicker._calendar._config
       const panels = div.querySelectorAll('.calendar').length
-      dateRangePicker._changeStartDate(new Date(2026, 7, 5))
+      div.querySelector(`[data-coreui-date="${new Date(2026, 7, 5)}"]`).click()
+
+      expect(dateRangePicker._calendar._startDate).toEqual(new Date(2026, 7, 5))
+
       dateRangePicker.cancel()
 
       const calendar = dateRangePicker._calendar
@@ -933,7 +937,7 @@ describe('DateRangePicker', () => {
       expect(dateRangePicker._selectEndDate).toBe(true)
     })
 
-    it('should dispose the calendar and time pickers it replaces', () => {
+    it('should dispose the calendar and time pickers it replaces', async () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
       const dateRangePicker = new DateRangePicker(div, { timepicker: true })
@@ -941,6 +945,7 @@ describe('DateRangePicker', () => {
       const timePickers = [...dateRangePicker._ownTimePickers]
 
       dateRangePicker.update({ timepicker: true })
+      await Promise.resolve()
 
       expect(Calendar.getInstance(calendar._element)).toBeNull()
       expect(timePickers.length).toBe(2)
@@ -954,14 +959,15 @@ describe('DateRangePicker', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
       const dateRangePicker = new DateRangePicker(div, { container: containerEl })
+      onTestFinished(() => {
+        dateRangePicker.dispose()
+        containerEl.remove()
+      })
 
       dateRangePicker.update({ container: containerEl })
 
       expect(containerEl.querySelectorAll('.date-picker-dropdown').length).toBe(1)
       expect(dateRangePicker._menu.parentElement).toBe(containerEl)
-
-      dateRangePicker.dispose()
-      containerEl.remove()
     })
 
     it('should drop host classes the new configuration no longer asks for', () => {
@@ -982,6 +988,10 @@ describe('DateRangePicker', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
       const dateRangePicker = new DateRangePicker(div, { container: containerEl })
+      onTestFinished(() => {
+        dateRangePicker.dispose()
+        containerEl.remove()
+      })
 
       dateRangePicker.show()
       dateRangePicker.update({ container: containerEl })
@@ -989,9 +999,6 @@ describe('DateRangePicker', () => {
       cell.focus()
 
       expect(document.activeElement).toBe(cell)
-
-      dateRangePicker.dispose()
-      containerEl.remove()
     })
 
     it('should leave no data-coreui-toggle behind when disposed after an update', () => {
@@ -1014,6 +1021,11 @@ describe('DateRangePicker', () => {
       const containedPicker = new DateRangePicker(contained, { container: containerEl })
       const showSpy = jasmine.createSpy('show')
       contained.addEventListener('show.coreui.date-range-picker', showSpy)
+      onTestFinished(() => {
+        inlinePicker.dispose()
+        containedPicker.dispose()
+        containerEl.remove()
+      })
 
       inlinePicker.show()
       containedPicker.show()
@@ -1024,9 +1036,68 @@ describe('DateRangePicker', () => {
       expect(contained.classList.contains('show')).toBe(true)
       expect(containedPicker._menu.classList.contains('show')).toBe(true)
       expect(showSpy).toHaveBeenCalledTimes(1)
+    })
 
-      containedPicker.dispose()
-      containerEl.remove()
+    it('should close through hide when the update disables an open picker', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const dateRangePicker = new DateRangePicker(div)
+      const hiddenSpy = jasmine.createSpy('hidden')
+      div.addEventListener('hidden.coreui.date-range-picker', hiddenSpy)
+
+      dateRangePicker.show()
+      dateRangePicker.update({ disabled: true })
+
+      expect(div.classList.contains('show')).toBe(false)
+      expect(hiddenSpy).toHaveBeenCalledTimes(1)
+    })
+
+    it('should cancel back to the dates an update set while open', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const dateRangePicker = new DateRangePicker(div, {
+        endDate: new Date(2026, 7, 5),
+        startDate: new Date(2026, 7, 1)
+      })
+
+      dateRangePicker.show()
+      dateRangePicker.update({ endDate: new Date(2026, 8, 15), startDate: new Date(2026, 8, 10) })
+      dateRangePicker.cancel()
+
+      expect(dateRangePicker._startDate).toEqual(new Date(2026, 8, 10))
+      expect(dateRangePicker._endDate).toEqual(new Date(2026, 8, 15))
+    })
+
+    it('should keep the picker when the new configuration is invalid', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const dateRangePicker = new DateRangePicker(div)
+      const markup = div.innerHTML
+
+      expect(() => dateRangePicker.update({ calendars: 'two' })).toThrowError(TypeError)
+      expect(div.innerHTML).toBe(markup)
+      expect(() => dateRangePicker.clear()).not.toThrow()
+    })
+
+    it('should let a listener of its own events call update()', async () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const dateRangePicker = new DateRangePicker(div, { calendarDate: new Date(2026, 7, 1) })
+      const errors = []
+      const onError = event => errors.push(event.message)
+      window.addEventListener('error', onError)
+      onTestFinished(() => window.removeEventListener('error', onError))
+      div.addEventListener('startDateChange.coreui.date-range-picker', event => {
+        dateRangePicker.update({ calendarDate: event.date, startDate: event.date })
+      })
+
+      dateRangePicker.show()
+      div.querySelector(`[data-coreui-date="${new Date(2026, 7, 12)}"]`).click()
+      await Promise.resolve()
+
+      expect(errors).toEqual([])
+      expect(dateRangePicker._startDate).toEqual(new Date(2026, 7, 12))
+      expect(dateRangePicker._startInput.value).not.toBe('')
     })
   })
 
