@@ -201,7 +201,7 @@ Initialize the CoreUI Search Button component via data attributes or JavaScript.
 
 ### Data attributes
 
-Use `data-coreui-search-button` to enable the plugin. Configure behavior with `data-coreui-*` options.
+Use `data-coreui-search-button` to enable the plugin. Configure behavior with `data-coreui-*` options. Search buttons in the document at `DOMContentLoaded` are initialized automatically. A search button added to the page later responds to its shortcut once you create its instance with `coreui.SearchButton.getOrCreateInstance(element)`.
 
 ```html
 <button
@@ -240,6 +240,9 @@ new coreui.SearchButton(searchButton, {
 
 | Method | Description |
 | --- | --- |
+| `dispose()` | Destroys a search button instance: its shortcut stops responding and the shortcut keys it rendered are removed, while a `.search-button-keys` container written in the markup gets its own content back. Activating a `data-coreui-search-button` element (a click, or Enter or Space on it) creates a new instance. (Removes stored data on the DOM element) |
+| `getInstance()` | Static method to get the search button instance: `coreui.SearchButton.getInstance(element)`. |
+| `getOrCreateInstance()` | Static method to get or create a search button instance: `coreui.SearchButton.getOrCreateInstance(element)`. |
 | `trigger()` | Triggers the `trigger.coreui.search-button` event manually. |
 
 ```js
