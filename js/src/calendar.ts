@@ -19,7 +19,6 @@ import { defineJQueryPlugin, isRTL, jQueryDispatch } from './util/index.js'
 import {
   type CalendarKeyAction,
   type CalendarKeyContext,
-  constrainDate,
   convertToDateObject,
   createDate,
   createDateFormatter,
@@ -34,6 +33,7 @@ import {
   getDateBySelectionType,
   getMonthDetails,
   getMonthsNames,
+  getOpeningDate,
   getStartOfView,
   getStartOfWeek,
   getYears,
@@ -842,7 +842,7 @@ class Calendar extends BaseComponent {
         this._config.calendarDate || this._config.startDate || this._config.endDate :
         ['calendarDate', 'startDate', 'endDate'].filter(name => keys.includes(name)).map(name => this._config[name]).find(Boolean) ?? null
 
-      this._calendarDate = convertToDateObject(source, this._config.selectionType) || this._calendarDate || constrainDate(new Date(), this._minDate, this._maxDate)
+      this._calendarDate = convertToDateObject(source, this._config.selectionType) || this._calendarDate || getOpeningDate(this._minDate, this._maxDate, this._config.disabledDates ?? undefined, this._config.selectionType, this._config.calendars)
     }
 
     if (changed('startDate')) {

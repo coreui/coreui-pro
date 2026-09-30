@@ -1,5 +1,5 @@
 
-import { onTestFinished } from 'vitest'
+import { onTestFinished, vi } from 'vitest'
 import { cdp } from 'vitest/browser'
 import {
   constrainDate,
@@ -19,6 +19,7 @@ import {
   getISOWeekNumberAndYear,
   getLocalDateFromString,
   getMonthsNames,
+  getOpeningDate,
   getSelectableDates,
   getStartOfView,
   getStartOfWeek,
@@ -1149,6 +1150,90 @@ describe('Calendar Utilities', () => {
       expect(constrainDate(new Date(2026, 6, 1), min, max)).not.toBe(min)
       expect(constrainDate(new Date(2026, 6, 20), min, max)).toEqual(max)
       expect(constrainDate(new Date(2026, 6, 20), min, max)).not.toBe(max)
+    })
+  })
+
+  describe('getOpeningDate', () => {
+    const fakeToday = date => {
+      vi.useFakeTimers({ toFake: ['Date'] })
+      vi.setSystemTime(date)
+      onTestFinished(() => vi.useRealTimers())
+    }
+
+    it('should return today when a day of its month can be picked, even if today cannot', () => {
+      fakeToday(new Date(2026, 7, 1, 9))
+
+      const weekend = date => date.getDay() === 0 || date.getDay() === 6
+
+      expect(getOpeningDate(null, null, weekend)).toEqual(new Date(2026, 7, 1, 9))
+    })
+
+    it('should move today onto the limit it falls outside of', () => {
+      fakeToday(new Date(2026, 8, 30))
+
+      expect(getOpeningDate(null, new Date(2026, 6, 14))).toEqual(new Date(2026, 6, 14))
+    })
+
+    it('should move to the closest day that can be picked when no day of the limit month can', () => {
+      fakeToday(new Date(2026, 8, 30))
+
+      expect(getOpeningDate(new Date(2026, 9, 31, 9), null)).toEqual(new Date(2026, 10, 1))
+      expect(getOpeningDate(null, new Date(2026, 6, 14), [[new Date(2026, 6, 1), new Date(2026, 6, 14)]])).toEqual(new Date(2026, 5, 30))
+    })
+
+    it('should prefer the later day when two are as close', () => {
+      fakeToday(new Date(2026, 6, 16))
+
+      expect(getOpeningDate(null, null, [[new Date(2026, 6, 1), new Date(2026, 6, 31)]])).toEqual(new Date(2026, 7, 1))
+    })
+
+    it('should move to an earlier day when it is closer than any later one', () => {
+      fakeToday(new Date(2026, 6, 16))
+
+      expect(getOpeningDate(null, null, [[new Date(2026, 5, 25), new Date(2026, 7, 10)]])).toEqual(new Date(2026, 5, 24))
+    })
+
+    it('should keep today when a month shown beside it has a day to pick', () => {
+      fakeToday(new Date(2026, 8, 20))
+
+      const september = [[new Date(2026, 8, 1), new Date(2026, 8, 30)]]
+
+      expect(getOpeningDate(null, null, september, 'day', 2)).toEqual(new Date(2026, 8, 20))
+      expect(getOpeningDate(null, null, september, 'day', 1)).toEqual(new Date(2026, 9, 1))
+
+      vi.setSystemTime(new Date(2026, 8, 1))
+
+      const open = new Set([new Date(2026, 7, 31).getTime(), new Date(2026, 9, 31).getTime()])
+
+      expect(getOpeningDate(null, null, date => !open.has(date.getTime()), 'day', 2)).toEqual(new Date(2026, 8, 1))
+    })
+
+    it('should keep today moved between the limits in month, quarter and year selection', () => {
+      fakeToday(new Date(2026, 8, 30))
+
+      const min = new Date(2026, 9, 31, 9)
+
+      for (const selectionType of ['month', 'quarter', 'year']) {
+        expect(getOpeningDate(min, null, undefined, selectionType)).toEqual(min)
+      }
+
+      expect(getOpeningDate(min, null, undefined, 'week')).toEqual(new Date(2026, 10, 1))
+    })
+
+    it('should not take a day of the same month a year away for a day of this month', () => {
+      fakeToday(new Date(2026, 6, 16))
+
+      const nextJuly = new Date(2027, 6, 10)
+
+      expect(getOpeningDate(null, null, date => date.getTime() !== nextJuly.getTime())).toEqual(nextJuly)
+    })
+
+    it('should return today when no day within a year can be picked', () => {
+      fakeToday(new Date(2026, 6, 16, 9))
+
+      const farDay = new Date(2027, 7, 20)
+
+      expect(getOpeningDate(null, null, date => date.getTime() !== farDay.getTime())).toEqual(new Date(2026, 6, 16, 9))
     })
   })
 

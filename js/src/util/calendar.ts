@@ -1594,6 +1594,52 @@ export const constrainDate = (date: Date, min: Date | null, max: Date | null) : 
 }
 
 /**
+ * Picks the date a calendar with no date of its own opens on: today moved
+ * between the limits or, in day and week selection when no month it shows
+ * has a day to pick, the closest day that can be picked, up to a year
+ * either way and the later one on a tie.
+ *
+ * @param min - The earliest date allowed, or `null` without one
+ * @param max - The latest date allowed, or `null` without one
+ * @param disabledDates - The dates that cannot be picked
+ * @param selectionType - What the calendar picks
+ * @param calendars - How many months the calendar shows
+ * @returns Today or the limit it crossed, keeping its time, or the start of the closest day
+ */
+export const getOpeningDate = (min: Date | null, max: Date | null, disabledDates?: DisabledDate | DisabledDate[], selectionType: SelectionTypes = 'day', calendars = 1) : Date => {
+  const today = constrainDate(new Date(), min, max)
+
+  if (selectionType !== 'day' && selectionType !== 'week') {
+    return today
+  }
+
+  const year = today.getFullYear()
+  const month = today.getMonth()
+  const day = today.getDate()
+  let closest: Date | null = null
+
+  for (let offset = 0; offset <= 366; offset++) {
+    for (const candidate of [createDate(year, month, day + offset), createDate(year, month, day - offset)]) {
+      if (!isDateDisabled(candidate, min, max, disabledDates)) {
+        const shown = ((candidate.getFullYear() - year) * 12) + candidate.getMonth() - month
+
+        if (shown >= 0 && shown < calendars) {
+          return today
+        }
+
+        closest ??= candidate
+      }
+    }
+
+    if (closest && offset >= 31 * calendars) {
+      return closest
+    }
+  }
+
+  return today
+}
+
+/**
  * Tells whether a day cannot be picked: it lies before `min` or year 1, or after
  * `max`, or it matches the disabled dates, which can be a function, a date, or
  * an array mixing functions, dates and `[start, end]` ranges.
