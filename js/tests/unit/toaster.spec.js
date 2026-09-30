@@ -262,6 +262,31 @@ describe('Toaster', () => {
       expect(toaster._entries.get(id).instance._config.autohide).toBeFalse()
     })
 
+    it('should replace a toast from its own onClose', async () => {
+      toaster = new Toaster(null, { container: fixtureEl })
+      const rejections = []
+      const onRejection = event => {
+        rejections.push(event.reason)
+        event.preventDefault()
+      }
+
+      window.addEventListener('unhandledrejection', onRejection)
+      toaster.add({
+        id: 'sync',
+        description: 'Syncing',
+        onClose: () => toaster.add({ id: 'sync', description: 'Synced', instant: true })
+      })
+      fixtureEl.querySelector('.btn-close').click()
+      await new Promise(resolve => {
+        setTimeout(resolve, 20)
+      })
+      window.removeEventListener('unhandledrejection', onRejection)
+
+      expect(rejections).toEqual([])
+      expect(fixtureEl.querySelectorAll('.toast')).toHaveSize(1)
+      expect(fixtureEl.querySelector('.toast-description').textContent).toEqual('Synced')
+    })
+
     it('should update in place when the id already exists', () => {
       toaster = new Toaster(null, { container: fixtureEl })
 
