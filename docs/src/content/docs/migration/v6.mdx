@@ -1317,6 +1317,11 @@ removed in favour of `$translucent-opacity` and
   been picked, and clearing a range across a disabled day before a start was
   picked fired `startDateChange` with `null`. A day picked again is still
   reported.
+- `.months` and `.years` are gone from the stylesheet. Their one rule hid a
+  `.time-picker` placed right after a `.calendar` panel in the months or years
+  view, where no picker renders one, so it matched nothing. The calendar names
+  the view it shows on the cell content: `.calendar-cell-inner.day`, `.month`,
+  `.quarter` and `.year`.
 
 #### Date Picker / Date Range Picker
 
