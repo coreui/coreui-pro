@@ -1370,6 +1370,25 @@ describe('Autocomplete', () => {
       })
     })
 
+    it('should open dropdown on Enter key', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+        const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+        const autocomplete = new Autocomplete(autocompleteEl, {
+          options: [{ label: 'Option 1', value: '1' }]
+        })
+
+        autocompleteEl.addEventListener('shown.coreui.autocomplete', () => {
+          expect(autocomplete._isShown()).toBe(true)
+          resolve()
+        })
+
+        const keydownEvent = createEvent('keydown')
+        keydownEvent.key = 'Enter'
+        autocomplete._togglerElement.dispatchEvent(keydownEvent)
+      })
+    })
+
     it('should let Enter through to the form while the panel is closed', () => {
       fixtureEl.innerHTML = '<form><div class="autocomplete"></div></form>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
@@ -1406,6 +1425,48 @@ describe('Autocomplete', () => {
 
       expect(autocomplete._inputHintElement.form).toBeNull()
       expect(submitted).toBe(1)
+    })
+
+    it('should clear text outside the options before Enter submits the form', async () => {
+      fixtureEl.innerHTML = '<form><div class="autocomplete"></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        allowOnlyDefinedOptions: true,
+        name: 'framework',
+        options: [{ label: 'Vue.js', value: 'vue' }]
+      })
+      const submitted = []
+      const changes = []
+
+      form.addEventListener('submit', event => {
+        event.preventDefault()
+        submitted.push(new FormData(form).get('framework'))
+      })
+      autocompleteEl.addEventListener('change.coreui.autocomplete', event => changes.push(event.value))
+      autocomplete._inputElement.focus()
+      await userEvent.keyboard('xyz')
+      autocomplete.hide()
+      await userEvent.keyboard('{Enter}')
+
+      expect(autocomplete._inputElement.value).toBe('')
+      expect(submitted).toEqual([''])
+      expect(changes).toEqual([])
+    })
+
+    it('should not report the current selection again on Enter', () => {
+      fixtureEl.innerHTML = '<form><div class="autocomplete"></div></form>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        options: [{ label: 'Option 1', value: '1' }],
+        value: '1'
+      })
+      const changes = []
+
+      autocompleteEl.addEventListener('change.coreui.autocomplete', event => changes.push(event.value))
+      autocomplete._inputElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }))
+
+      expect(changes).toEqual([])
     })
 
     it('should close dropdown on Escape key', () => {
@@ -2547,6 +2608,28 @@ describe('Autocomplete', () => {
       expect(autocomplete._selected).toEqual([])
       expect(autocomplete._inputElement.value).toBe('')
       expect(autocomplete._cleanerElement.style.display).toBe('none')
+    })
+
+    it('should report the clear of a typed value and restart the search', async () => {
+      fixtureEl.innerHTML = '<form><div class="autocomplete"></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        options: [{ label: 'Option 1', value: '1' }]
+      })
+      const changes = []
+      const searches = []
+
+      autocomplete._inputElement.focus()
+      await userEvent.keyboard('Custom')
+      autocomplete._inputElement.blur()
+      autocompleteEl.addEventListener('change.coreui.autocomplete', event => changes.push(event.value))
+      autocompleteEl.addEventListener('input.coreui.autocomplete', event => searches.push(event.value))
+      form.reset()
+      await settle()
+
+      expect(changes).toEqual([null])
+      expect(searches).toEqual([''])
     })
   })
 

@@ -160,9 +160,11 @@ class Autocomplete extends ComboboxBase {
     this._valueApplied = false
     this._form = this._element.closest('form')
     this._resetHandler = (event: Event) => {
+      const text = this._inputElement.value
+
       setTimeout(() => {
         if (this._element && !event.defaultPrevented) {
-          this._restoreInitialSelection()
+          this._restoreInitialSelection(text)
         }
       })
     }
@@ -430,30 +432,7 @@ class Autocomplete extends ComboboxBase {
       }
 
       if (event.key === ENTER_KEY) {
-        if (this._isShown()) {
-          event.preventDefault()
-          event.stopPropagation()
-        }
-
-        if (this._inputElement.value.length === 0) {
-          return
-        }
-
-        const options = this._flattenOptions().filter(option => option.label.toLowerCase() === this._inputElement.value.toLowerCase())
-
-        if (options.length > 0) {
-          this._selectOption(options[0])
-        }
-
-        if (options.length === 0 && !this._config.allowOnlyDefinedOptions) {
-          this._triggerChangeEvent(this._inputElement.value)
-
-          this.hide()
-
-          if (this._config.clearSearchOnSelect) {
-            this.search('')
-          }
-        }
+        this._handleEnterKey(event)
       }
     })
 
@@ -503,6 +482,48 @@ class Autocomplete extends ComboboxBase {
         this.clear()
       }
     })
+  }
+
+  _handleEnterKey(event: KeyboardEvent): void {
+    const shown = this._isShown()
+
+    if (shown) {
+      event.preventDefault()
+      event.stopPropagation()
+    }
+
+    if (this._inputElement.value.length === 0) {
+      return
+    }
+
+    const options = this._flattenOptions().filter(option => option.label.toLowerCase() === this._inputElement.value.toLowerCase())
+
+    if (options.length > 0) {
+      if (this._selected.some((option: any) => option.value === options[0].value)) {
+        this.hide()
+      } else {
+        this._selectOption(options[0])
+      }
+
+      return
+    }
+
+    if (this._config.allowOnlyDefinedOptions) {
+      if (!shown) {
+        this.search('')
+        this._inputElement.value = this._selected[0]?.label ?? ''
+      }
+
+      return
+    }
+
+    this._triggerChangeEvent(this._inputElement.value)
+
+    this.hide()
+
+    if (this._config.clearSearchOnSelect) {
+      this.search('')
+    }
   }
 
   _syncInputName(): void {
@@ -746,12 +767,12 @@ class Autocomplete extends ComboboxBase {
     this._cleanerElement.style.display = 'none'
   }
 
-  override _isOpenKey(key: string): boolean {
-    return key === ARROW_DOWN_KEY
+  override _isOpenKey(event: KeyboardEvent): boolean {
+    return event.key === ARROW_DOWN_KEY || (event.key === ENTER_KEY && event.target === this._togglerElement)
   }
 
-  _restoreInitialSelection(): void {
-    const previous = this._selected[0]?.value ?? null
+  _restoreInitialSelection(text: string): void {
+    const previous = this._selected[0]?.value ?? (text || null)
 
     this.deselectAll()
     this._inputElement.value = ''
@@ -760,8 +781,10 @@ class Autocomplete extends ComboboxBase {
       this._inputHintElement.value = ''
     }
 
-    this._search = ''
-    this._filterOptionsList()
+    if (this._search !== '') {
+      this.search('')
+    }
+
     this._valueApplied = false
     this._seenOptionValues.clear()
     this._seedSelection()
