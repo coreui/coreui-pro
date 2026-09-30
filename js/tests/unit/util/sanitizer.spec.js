@@ -21,6 +21,15 @@ describe('Sanitizer', () => {
       expect(SVGAllowlist.path).toContain('d')
       expect(SVGAllowlist.line).toContain('x1')
     })
+
+    it('should keep a sprite reference on use but not a javascript: one', () => {
+      const sprite = sanitizeHtml('<svg><use xlink:href="icons.svg#cil-caret-bottom"></use></svg>', SVGAllowlist, null)
+      const script = sanitizeHtml('<svg><use xlink:href="javascript:alert(1)"></use></svg>', SVGAllowlist, null)
+
+      expect(sprite).toContain('xlink:href="icons.svg#cil-caret-bottom"')
+      // eslint-disable-next-line no-script-url
+      expect(script).not.toContain('javascript:')
+    })
   })
 
   describe('sanitizeByConfig', () => {

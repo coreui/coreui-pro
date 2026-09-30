@@ -131,6 +131,31 @@ describe('Combobox', () => {
       expect(caret.getAttribute('aria-hidden')).toEqual('true')
     })
 
+    it('should draw the default caret with every attribute of the icon', () => {
+      const toggle = setMarkup()
+      // eslint-disable-next-line no-new
+      new Combobox(toggle)
+
+      const icon = document.createElement('template')
+      icon.innerHTML = CARET_ICON
+      const expected = icon.content.firstElementChild
+      const caret = toggle.querySelector('.combobox-caret')
+
+      for (const { name, value } of expected.attributes) {
+        expect(caret.getAttribute(name)).toEqual(value)
+      }
+
+      expect(caret.querySelector('path').getAttribute('d')).toEqual(expected.querySelector('path').getAttribute('d'))
+    })
+
+    it('should keep the caret when the labels use an allow list without SVG', () => {
+      const toggle = setMarkup()
+      // eslint-disable-next-line no-new
+      new Combobox(toggle, { allowList: { span: [] } })
+
+      expect(toggle.querySelector('.combobox-caret').tagName.toLowerCase()).toEqual('svg')
+    })
+
     it('should keep the caret the markup already carries', () => {
       const toggle = setMarkup()
       toggle.insertAdjacentHTML('beforeend', '<svg class="combobox-caret" data-mine></svg>')
@@ -139,6 +164,63 @@ describe('Combobox', () => {
 
       expect(toggle.querySelectorAll('.combobox-caret').length).toEqual(1)
       expect(toggle.querySelector('.combobox-caret').hasAttribute('data-mine')).toBeTrue()
+    })
+
+    it('should sanitize a caret icon given in the markup', () => {
+      const toggle = setMarkup()
+      toggle.setAttribute('data-coreui-caret-icon', '<img src="caret.svg" onerror="window.caretInjected = true">')
+      // eslint-disable-next-line no-new
+      new Combobox(toggle)
+
+      const caret = toggle.querySelector('.combobox-caret')
+
+      expect(caret.tagName).toEqual('IMG')
+      expect(caret.hasAttribute('onerror')).toBeFalse()
+    })
+
+    it('should draw a custom SVG caret', () => {
+      const toggle = setMarkup()
+      // eslint-disable-next-line no-new
+      new Combobox(toggle, { caretIcon: '<svg viewBox="0 0 16 16"><path d="M4 6l4 4 4-4"></path></svg>' })
+
+      const caret = toggle.querySelector('.combobox-caret')
+
+      expect(caret.tagName.toLowerCase()).toEqual('svg')
+      expect(caret.querySelector('path').getAttribute('d')).toEqual('M4 6l4 4 4-4')
+    })
+
+    it('should keep a sprite reference in the caret', () => {
+      const toggle = setMarkup()
+      // eslint-disable-next-line no-new
+      new Combobox(toggle, { caretIcon: '<svg class="icon"><use xlink:href="icons.svg#cil-caret-bottom"></use></svg>' })
+
+      expect(toggle.querySelector('.combobox-caret use').getAttribute('xlink:href')).toEqual('icons.svg#cil-caret-bottom')
+    })
+
+    it('should make the last element of the icon the caret', () => {
+      const toggle = setMarkup()
+      // eslint-disable-next-line no-new
+      new Combobox(toggle, { caretIcon: '<span class="visually-hidden">Open</span><svg viewBox="0 0 16 16"><path d="M4 6l4 4 4-4"></path></svg>' })
+
+      expect(toggle.querySelector('.combobox-caret').tagName.toLowerCase()).toEqual('svg')
+      expect(toggle.querySelector('.visually-hidden').classList.contains('combobox-caret')).toBeFalse()
+    })
+
+    it('should keep the caret icon as given when sanitize is false', () => {
+      const toggle = setMarkup()
+      // eslint-disable-next-line no-new
+      new Combobox(toggle, { caretIcon: '<i class="icon" data-icon="caret"></i>', sanitize: false })
+
+      expect(toggle.querySelector('.combobox-caret').getAttribute('data-icon')).toEqual('caret')
+    })
+
+    it('should draw no caret when nothing of the icon survives the sanitizer', () => {
+      const toggle = setMarkup()
+      // eslint-disable-next-line no-new
+      new Combobox(toggle, { caretIcon: '<script>window.caretInjected = true</script>' })
+
+      expect(toggle.querySelector('.combobox-caret')).toBeNull()
+      expect(toggle.querySelector('script')).toBeNull()
     })
 
     it('should build the value element when the markup has none', () => {

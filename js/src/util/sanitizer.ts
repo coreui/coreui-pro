@@ -67,7 +67,7 @@ export const SVGAllowlist: SanitizerAllowList = {
   tspan: ['id', 'class', 'x', 'y', 'dx', 'dy', 'text-anchor', 'font-family', 'font-size', 'font-weight', 'fill', 'fill-opacity', 'stroke', 'stroke-width', 'stroke-opacity'],
   defs: [],
   symbol: ['id', 'class', 'viewbox', 'preserveaspectratio'],
-  use: ['id', 'class', 'x', 'y', 'width', 'height', 'href'],
+  use: ['id', 'class', 'x', 'y', 'width', 'height', 'href', 'xlink:href'],
   image: ['id', 'class', 'x', 'y', 'width', 'height', 'href', 'preserveaspectratio', 'xlink:href'],
   pattern: ['id', 'class', 'x', 'y', 'width', 'height', 'patternunits', 'patterncontentunits', 'patterntransform', 'preserveaspectratio'],
   lineargradient: ['id', 'class', 'gradientunits', 'x1', 'y1', 'x2', 'y2', 'spreadmethod', 'gradienttransform'],
