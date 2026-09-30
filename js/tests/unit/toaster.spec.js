@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import Toaster from '../../src/toaster.js'
 import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
 
@@ -154,10 +155,12 @@ describe('Toaster', () => {
 
     it('should announce the title and description through a live region by priority', async () => {
       toaster = new Toaster(null, { container: fixtureEl })
-      const status = fixtureEl.querySelector('.toast-announcer[role="status"]')
-      const alert = fixtureEl.querySelector('.toast-announcer[role="alert"]')
-      expect(status.getAttribute('aria-live')).toEqual('polite')
-      expect(alert.getAttribute('aria-live')).toEqual('assertive')
+      const status = fixtureEl.querySelector('.toast-announcer[aria-live="polite"]')
+      const alert = fixtureEl.querySelector('.toast-announcer[aria-live="assertive"]')
+      for (const region of [status, alert]) {
+        expect(region.getAttribute('role')).toEqual('log')
+        expect(region.getAttribute('aria-relevant')).toEqual('additions')
+      }
 
       toaster.add({ title: 'Saved', description: 'Done', instant: true })
       toaster.add({ description: 'Failed', priority: 'high', instant: true })
@@ -172,7 +175,7 @@ describe('Toaster', () => {
 
     it('should announce every toast added at once', async () => {
       toaster = new Toaster(null, { container: fixtureEl, limit: 0 })
-      const status = fixtureEl.querySelector('.toast-announcer[role="status"]')
+      const status = fixtureEl.querySelector('.toast-announcer[aria-live="polite"]')
 
       toaster.add({ description: 'Row 1 saved', instant: true })
       toaster.add({ description: 'Row 2 saved', instant: true })
@@ -182,12 +185,11 @@ describe('Toaster', () => {
       })
 
       expect([...status.children].map(message => message.textContent)).toEqual(['Row 1 saved', 'Row 2 saved', 'Row 3 saved'])
-      expect(status.getAttribute('aria-atomic')).toEqual('false')
     })
 
     it('should replace the announcement of an updated toast and drop it on removal', async () => {
       toaster = new Toaster(null, { container: fixtureEl })
-      const status = fixtureEl.querySelector('.toast-announcer[role="status"]')
+      const status = fixtureEl.querySelector('.toast-announcer[aria-live="polite"]')
       const frames = () => new Promise(resolve => {
         requestAnimationFrame(() => requestAnimationFrame(resolve))
       })
@@ -204,6 +206,47 @@ describe('Toaster', () => {
       await removed
 
       expect(status.children).toHaveSize(0)
+    })
+
+    it('should announce an update as a new message so a repeat is read again', async () => {
+      toaster = new Toaster(null, { container: fixtureEl })
+      const status = fixtureEl.querySelector('.toast-announcer[aria-live="polite"]')
+      const frames = () => new Promise(resolve => {
+        requestAnimationFrame(() => requestAnimationFrame(resolve))
+      })
+
+      const id = toaster.add({ description: 'Uploading', instant: true })
+      await frames()
+      const first = status.firstElementChild
+      toaster.update(id, { description: 'Uploading' })
+      await frames()
+
+      expect(status.children).toHaveSize(1)
+      expect(status.firstElementChild).not.toBe(first)
+      expect(status.textContent).toEqual('Uploading')
+    })
+
+    it('should drop a message from the region seven seconds after it was announced', async () => {
+      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
+      toaster = new Toaster(null, { container: fixtureEl, timeout: 0 })
+      const status = fixtureEl.querySelector('.toast-announcer[aria-live="polite"]')
+
+      try {
+        toaster.add({ description: 'Saved', instant: true })
+        await new Promise(resolve => {
+          requestAnimationFrame(() => requestAnimationFrame(resolve))
+        })
+        expect(status.textContent).toEqual('Saved')
+
+        vi.advanceTimersByTime(6999)
+        expect(status.textContent).toEqual('Saved')
+
+        vi.advanceTimersByTime(1)
+        expect(status.children).toHaveSize(0)
+        expect(fixtureEl.querySelectorAll('.toast')).toHaveSize(1)
+      } finally {
+        vi.useRealTimers()
+      }
     })
 
     it('should add the theme, translucent and custom classes', () => {
@@ -285,6 +328,53 @@ describe('Toaster', () => {
       expect(rejections).toEqual([])
       expect(fixtureEl.querySelectorAll('.toast')).toHaveSize(1)
       expect(fixtureEl.querySelector('.toast-description').textContent).toEqual('Synced')
+    })
+
+    it('should replace an instant toast from its own onClose', async () => {
+      toaster = new Toaster(null, { container: fixtureEl })
+      const onRemove = jasmine.createSpy('onRemove')
+      const errors = []
+      const onError = event => {
+        errors.push(event.error ?? event.reason)
+        event.preventDefault()
+      }
+
+      window.addEventListener('error', onError)
+      window.addEventListener('unhandledrejection', onError)
+      toaster.add({
+        id: 'sync',
+        description: 'Syncing',
+        instant: true,
+        onRemove,
+        onClose: () => toaster.add({ id: 'sync', description: 'Synced', instant: true })
+      })
+      fixtureEl.querySelector('.btn-close').click()
+      await new Promise(resolve => {
+        setTimeout(resolve, 20)
+      })
+      window.removeEventListener('error', onError)
+      window.removeEventListener('unhandledrejection', onError)
+
+      expect(errors).toEqual([])
+      expect(onRemove).toHaveBeenCalledTimes(1)
+      expect(toaster.getToasts().map(toast => toast.id)).toEqual(['sync'])
+      expect(toaster.getToasts()[0].element).toBe(fixtureEl.querySelector('.toast'))
+    })
+
+    it('should keep one toast when the replaced toast adds its id again from onRemove', () => {
+      toaster = new Toaster(null, { container: fixtureEl })
+
+      toaster.add({
+        id: 'x',
+        description: 'one',
+        onRemove: () => toaster.add({ id: 'x', description: 'from onRemove', instant: true })
+      })
+      toaster.close('x')
+      toaster.add({ id: 'x', description: 'two', instant: true })
+
+      expect(fixtureEl.querySelectorAll('.toast')).toHaveSize(1)
+      expect(toaster.getToasts()).toHaveSize(1)
+      expect(fixtureEl.querySelector('.toast-description').textContent).toEqual('two')
     })
 
     it('should update in place when the id already exists', () => {
@@ -445,6 +535,46 @@ describe('Toaster', () => {
 
       expect(shown).toHaveSize(0)
       expect(fixtureEl.querySelectorAll('.toast')).toHaveSize(0)
+    })
+
+    it('should not release a closing limited toast when a sibling is removed', () => {
+      toaster = new Toaster(null, { container: fixtureEl, limit: 1 })
+      const first = toaster.add({ description: 'first' })
+      toaster.add({ description: 'second', instant: true })
+      const firstEl = fixtureEl.querySelector(`[data-coreui-toast-id="${first}"]`)
+
+      toaster.close()
+
+      expect(firstEl.hasAttribute('data-coreui-limited')).toBeTrue()
+      expect(firstEl.inert).toBeTrue()
+    })
+
+    it('should leave a limited toast hidden when a closing toast is replaced', async () => {
+      toaster = new Toaster(null, { container: fixtureEl, limit: 1 })
+
+      toaster.add({ description: 'first' })
+      toaster.add({ id: 'b', description: 'second' })
+      for (const element of fixtureEl.querySelectorAll('.toast')) {
+        element.style.transitionDuration = '20ms'
+      }
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 40)
+      })
+
+      const limited = fixtureEl.querySelector('[data-coreui-limited]')
+      const records = []
+      const observer = new MutationObserver(list => records.push(...list))
+      observer.observe(limited, { attributes: true, attributeFilter: ['data-coreui-limited'] })
+
+      toaster.close('b')
+      toaster.add({ id: 'b', description: 'second again', instant: true })
+      const { display } = limited.style
+      await Promise.resolve()
+      observer.disconnect()
+
+      expect(display).toEqual('none')
+      expect(records).toHaveSize(0)
     })
 
     it('should not limit anything when limit is 0', () => {

@@ -2712,12 +2712,12 @@ Multi Select's option indicators moved with it — they render as a decorative
 #### Toast
 
 - **New: `Toaster`** creates toasts from options and keeps them in a store keyed
-  by id — `add()` returns the id (an existing id updates in place), `update()`
+  by id — `add()` returns the id (an existing id updates in place, a closing one is replaced), `update()`
   rewrites a toast, `close()` hides one or all, `promise()` follows an
   asynchronous operation through loading, success and error. It creates its
   own `.toast-container` placed by `placement`, caps visible toasts with
   `limit` (the oldest stay in the DOM, `inert` and hidden), announces by
-  `priority` (`status`/`polite` or `alert`/`assertive`) and can render an
+  `priority` (a polite or an assertive log region) and can render an
   action button. Toasts slide in from beyond the container's edge and back
   out, toasts over the `limit` fade out instead of vanishing, and the toaster
   glides the remaining toasts into place when one leaves; `stack: true`

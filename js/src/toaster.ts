@@ -56,6 +56,7 @@ const ATTRIBUTE_UPDATE_KEY = 'data-coreui-update-key'
 const PROPERTY_STACK_INDEX = '--cui-toast-stack-index'
 const STACK_VISIBLE = 3
 const GLIDE_ID = 'coreui.toaster.glide'
+const MESSAGE_DURATION = 7000
 
 const PROPERTY_STACK_BEFORE = '--cui-toast-stack-before'
 const PROPERTY_STACK_COUNT = '--cui-toast-stack-count'
@@ -273,8 +274,8 @@ class Toaster extends BaseComponent {
 
     this._announcements = new Map()
     this._announcers = {
-      high: this._createAnnouncer('alert', 'assertive'),
-      low: this._createAnnouncer('status', 'polite')
+      high: this._createAnnouncer('assertive'),
+      low: this._createAnnouncer('polite')
     }
 
     if (this._config.pauseOnHover) {
@@ -315,7 +316,8 @@ class Toaster extends BaseComponent {
     }
 
     if (existing) {
-      this._remove(existing)
+      this._remove(existing, false)
+      return this.add(options)
     }
 
     const toast: ToastObject = {
@@ -542,8 +544,8 @@ class Toaster extends BaseComponent {
     target.textContent = resolved
   }
 
-  _remove(entry: Entry): void {
-    if (!this._entries?.has(entry.toast.id)) {
+  _remove(entry: Entry, release = true): void {
+    if (this._entries?.get(entry.toast.id) !== entry) {
       return
     }
 
@@ -559,7 +561,10 @@ class Toaster extends BaseComponent {
     this._settle(layout)
     this._layoutStack()
     execute(entry.toast.onRemove, [undefined, entry.toast])
-    this._applyLimit()
+    if (release) {
+      this._applyLimit()
+    }
+
     EventHandler.trigger(this._element, EVENT_REMOVE, { id: entry.toast.id })
   }
 
@@ -652,12 +657,12 @@ class Toaster extends BaseComponent {
     this._element.style.setProperty(PROPERTY_STACK_HEIGHTS, `${before}px`)
   }
 
-  _createAnnouncer(role: string, live: string): HTMLElement {
+  _createAnnouncer(live: string): HTMLElement {
     const announcer = document.createElement('div')
     announcer.className = CLASS_NAME_ANNOUNCER
-    announcer.setAttribute('role', role)
+    announcer.setAttribute('role', 'log')
     announcer.setAttribute('aria-live', live)
-    announcer.setAttribute('aria-atomic', 'false')
+    announcer.setAttribute('aria-relevant', 'additions')
     this._element.append(announcer)
     return announcer
   }
@@ -685,6 +690,12 @@ class Toaster extends BaseComponent {
         announcer.append(message)
       }
     })
+    setTimeout(() => {
+      message.remove()
+      if (this._announcements?.get(toast.element) === message) {
+        this._announcements.delete(toast.element)
+      }
+    }, MESSAGE_DURATION)
   }
 
   _onLeave(event: any): void {
