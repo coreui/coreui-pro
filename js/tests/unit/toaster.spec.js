@@ -170,7 +170,7 @@ describe('Toaster', () => {
       expect(fixtureEl.querySelector('.toast').hasAttribute('role')).toBeFalse()
     })
 
-    it('should announce every toast added in the same frame', async () => {
+    it('should announce every toast added at once', async () => {
       toaster = new Toaster(null, { container: fixtureEl, limit: 0 })
       const status = fixtureEl.querySelector('.toast-announcer[role="status"]')
 
@@ -185,7 +185,7 @@ describe('Toaster', () => {
       expect(status.getAttribute('aria-atomic')).not.toEqual('true')
     })
 
-    it('should replace the announcement of an updated toast and drop it once the toast is gone', async () => {
+    it('should replace the announcement of an updated toast and drop it on removal', async () => {
       toaster = new Toaster(null, { container: fixtureEl })
       const status = fixtureEl.querySelector('.toast-announcer[role="status"]')
       const frames = () => new Promise(resolve => {
