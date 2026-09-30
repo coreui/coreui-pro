@@ -737,7 +737,7 @@ class Calendar extends BaseComponent {
     calendarTable.innerHTML = days ? this._daysHtml(calendarDate) : this._periodsHtml(calendarDate)
 
     if (turned) {
-      region.innerHTML = `${days ? `<button type="button" class="calendar-nav-btn btn-sm btn-month">${monthLabel}</button>` : ''} <button type="button" class="calendar-nav-btn btn-year">${yearLabel}</button>`
+      region.innerHTML = `${days ? `<button type="button" class="calendar-nav-btn btn-month">${monthLabel}</button>` : ''} <button type="button" class="calendar-nav-btn btn-year">${yearLabel}</button>`
     }
 
     this._describeGrid(panel)

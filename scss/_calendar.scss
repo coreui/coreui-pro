@@ -80,11 +80,6 @@ $calendar-tokens: defaults(
       }
     }
 
-    &.months ~ .time-picker,
-    &.years ~ .time-picker {
-      display: none;
-    }
-
     @include media-breakpoint-down(sm) {
       &:not(:first-child) .calendar-nav {
         border-block-start: var(--#{$prefix}calendar-nav-border);

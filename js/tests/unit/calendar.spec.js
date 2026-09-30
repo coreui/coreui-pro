@@ -393,6 +393,67 @@ describe('Calendar', () => {
     })
   })
 
+  describe('markup', () => {
+    it.each(['day', 'month', 'quarter', 'year'])('should name the %s view on the cell content, not on the panel or the cell', selectionType => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { calendarDate: new Date(2026, 7, 1), locale: 'en-US', selectionType }) // eslint-disable-line no-new
+
+      expect(div.querySelector('.calendar').className).toEqual('calendar')
+
+      for (const cell of div.querySelectorAll('td.calendar-cell')) {
+        expect(cell.classList.contains(selectionType)).toBeFalse()
+        expect(cell.classList.contains(`${selectionType}s`)).toBeFalse()
+        expect(cell.querySelector('.calendar-cell-inner').classList.contains(selectionType)).toBeTrue()
+      }
+    })
+
+    it('should mark each navigation button with the class of its action', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { calendarDate: new Date(2026, 7, 1), locale: 'en-US' }) // eslint-disable-line no-new
+
+      expect([...div.querySelectorAll('.calendar-nav-btn')].map(button => button.className)).toEqual([
+        'calendar-nav-btn btn-double-prev',
+        'calendar-nav-btn btn-prev',
+        'calendar-nav-btn btn-month',
+        'calendar-nav-btn btn-year',
+        'calendar-nav-btn btn-next',
+        'calendar-nav-btn btn-double-next'
+      ])
+    })
+
+    it('should mark each panel with its index', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { calendarDate: new Date(2026, 7, 1), calendars: 2, locale: 'en-US' }) // eslint-disable-line no-new
+
+      expect([...div.querySelectorAll('.calendar')].map(panel => panel.dataset.coreuiCalendarIndex)).toEqual(['0', '1'])
+    })
+
+    it.each(['day', 'week', 'month', 'quarter', 'year'])('should mark what can be picked in %s selection with an empty data-coreui-selectable', selectionType => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { calendarDate: new Date(2026, 7, 1), locale: 'en-US', selectionType }) // eslint-disable-line no-new
+      const marked = div.querySelectorAll('[data-coreui-selectable]')
+
+      expect(marked.length).toBeGreaterThan(0)
+
+      for (const element of marked) {
+        expect(element.getAttribute('data-coreui-selectable')).toEqual('')
+      }
+    })
+
+    it('should leave the date of a week to its cells', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { calendarDate: new Date(2026, 7, 1), locale: 'en-US', selectionType: 'week' }) // eslint-disable-line no-new
+
+      expect(div.querySelectorAll('tr[data-coreui-date]').length).toEqual(0)
+      expect(div.querySelectorAll('td[data-coreui-date]').length).toEqual(42)
+    })
+  })
+
   describe('showWeekNumber', () => {
     it('should show week numbers when showWeekNumber is true', () => {
       fixtureEl.innerHTML = '<div></div>'
@@ -3678,6 +3739,89 @@ describe('Calendar', () => {
       expect(div.querySelectorAll('.calendar-cell.range-hover').length).toEqual(11)
       expect(records.length).toEqual(0)
       expect(div.querySelector('.calendar-cell[tabindex="0"]').dataset.coreuiDate).toEqual(new Date(2023, 5, 10).toDateString())
+    })
+
+    it('should clear the range preview once a date is picked', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { // eslint-disable-line no-new
+        calendarDate: new Date(2023, 5, 1),
+        range: true,
+        selectEndDate: true,
+        startDate: new Date(2023, 5, 10)
+      })
+      const cell = div.querySelector(`[data-coreui-date="${new Date(2023, 5, 20).toDateString()}"]`)
+
+      cell.dispatchEvent(new MouseEvent('mouseover', { bubbles: true, relatedTarget: div }))
+
+      expect(div.querySelectorAll('.calendar-cell.range-hover').length).toEqual(11)
+
+      div.querySelector(`[data-coreui-date="${new Date(2023, 5, 20).toDateString()}"]`).click()
+
+      expect(div.querySelectorAll('.range-hover').length).toEqual(0)
+    })
+
+    it('should clear the range preview once a start is picked while the end is set', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { // eslint-disable-line no-new
+        calendarDate: new Date(2023, 5, 1),
+        endDate: new Date(2023, 5, 25),
+        range: true,
+        startDate: new Date(2023, 5, 10)
+      })
+      const start = () => div.querySelector(`[data-coreui-date="${new Date(2023, 5, 5).toDateString()}"]`)
+
+      start().dispatchEvent(new MouseEvent('mouseover', { bubbles: true, relatedTarget: div }))
+
+      expect(div.querySelectorAll('.calendar-cell.range-hover').length).toEqual(21)
+
+      start().click()
+
+      expect(div.querySelectorAll('.range-hover').length).toEqual(0)
+    })
+
+    it('should clear the range preview once a date is picked with Enter', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { // eslint-disable-line no-new
+        calendarDate: new Date(2023, 5, 1),
+        range: true,
+        selectEndDate: true,
+        startDate: new Date(2023, 5, 10)
+      })
+      const end = () => div.querySelector(`[data-coreui-date="${new Date(2023, 5, 20).toDateString()}"]`)
+
+      end().focus()
+
+      expect(div.querySelectorAll('.calendar-cell.range-hover').length).toEqual(11)
+
+      end().dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Enter' }))
+
+      expect(div.querySelectorAll('.range-hover').length).toEqual(0)
+    })
+
+    it('should keep the week preview while the pointer moves onto a day of the adjacent month in the row', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { // eslint-disable-line no-new
+        calendarDate: new Date(2023, 5, 1),
+        range: true,
+        selectEndDate: true,
+        selectionType: 'week',
+        startDate: new Date(2023, 5, 5)
+      })
+      const current = div.querySelector(`td[data-coreui-date="${new Date(2023, 5, 30).toDateString()}"]`)
+      const adjacent = div.querySelector(`td[data-coreui-date="${new Date(2023, 6, 1).toDateString()}"]`)
+
+      current.dispatchEvent(new MouseEvent('mouseover', { bubbles: true, relatedTarget: div }))
+
+      expect(div.querySelectorAll('tr.range-hover').length).toEqual(4)
+
+      current.dispatchEvent(new MouseEvent('mouseout', { bubbles: true, relatedTarget: adjacent }))
+      adjacent.dispatchEvent(new MouseEvent('mouseover', { bubbles: true, relatedTarget: current }))
+
+      expect(div.querySelectorAll('tr.range-hover').length).toEqual(4)
     })
   })
 
