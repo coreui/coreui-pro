@@ -1,3 +1,4 @@
+import { userEvent } from '@vitest/browser/context'
 import { vi } from 'vitest'
 
 import NumberInput from '../../src/number-input.js'
@@ -45,6 +46,22 @@ describe('NumberInput', () => {
       for (const button of buttons()) {
         expect(button.tabIndex).toBe(-1)
       }
+    })
+
+    it('should keep a pressed button from taking the focus', async () => {
+      const host = document.createElement('div')
+      host.innerHTML = '<input type="number" class="form-control" value="1">'
+      document.body.append(host)
+      const input = host.querySelector('input')
+      const numberInput = new NumberInput(input)
+
+      input.focus()
+      await userEvent.click(host.querySelectorAll('.form-control-action')[1])
+
+      expect(document.activeElement).toBe(input)
+      expect(input.value).toBe('2')
+      numberInput.dispose()
+      host.remove()
     })
   })
 
@@ -226,6 +243,25 @@ describe('NumberInput', () => {
       numberInput.decrement()
 
       expect(buttons()[1].disabled).toBe(false)
+    })
+
+    it('should disable both buttons while the input is disabled or readonly, and follow later changes', async () => {
+      const input = markup('value="5" readonly')
+      const numberInput = new NumberInput(input) // eslint-disable-line no-unused-vars
+      const states = () => [...buttons()].map(button => button.disabled)
+      const settle = () => new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(states()).toEqual([true, true])
+
+      input.readOnly = false
+      await settle()
+      expect(states()).toEqual([false, false])
+
+      input.disabled = true
+      await settle()
+      expect(states()).toEqual([true, true])
     })
 
     it('should follow a form reset', () => {
@@ -445,6 +481,16 @@ describe('NumberInput', () => {
   })
 
   describe('dispose', () => {
+    it('should stop watching the input', () => {
+      const disconnect = vi.spyOn(MutationObserver.prototype, 'disconnect')
+      const numberInput = new NumberInput(markup('value="1"'))
+
+      numberInput.dispose()
+
+      expect(disconnect).toHaveBeenCalled()
+      disconnect.mockRestore()
+    })
+
     it('should take its buttons and class with it', () => {
       const input = markup('value="1"')
       const numberInput = new NumberInput(input)

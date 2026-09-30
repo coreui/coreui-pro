@@ -85,6 +85,7 @@ class NumberInput extends BaseComponent {
   private _decrementElement: HTMLButtonElement | null = null
   private _incrementElement: HTMLButtonElement | null = null
   private _group: ControlGroup | null = null
+  private _observer: MutationObserver | null = null
   private _repeatTimeout: ReturnType<typeof setTimeout> | null = null
   private _repeatInterval: ReturnType<typeof setInterval> | null = null
   private _repeated = false
@@ -131,6 +132,7 @@ class NumberInput extends BaseComponent {
     }
 
     EventHandler.off(this._element.form, EVENT_RESET, this._resetHandler)
+    this._observer?.disconnect()
 
     for (const button of [this._decrementElement, this._incrementElement]) {
       EventHandler.off(button, EVENT_KEY)
@@ -147,7 +149,7 @@ class NumberInput extends BaseComponent {
 
   // Private
   _step(direction: 'up' | 'down'): boolean {
-    if (this._element.disabled || this._element.readOnly || !this._canStep(direction)) {
+    if (!this._canStep(direction)) {
       return false
     }
 
@@ -239,15 +241,13 @@ class NumberInput extends BaseComponent {
         }
       })
 
-      if (this._config.repeat) {
-        EventHandler.on(button, EVENT_POINTERDOWN, (event: any) => {
-          if (event.button !== 0) {
-            return
-          }
+      EventHandler.on(button, EVENT_POINTERDOWN, (event: any) => {
+        event.preventDefault()
 
+        if (this._config.repeat && event.button === 0) {
           this._startRepeating(direction)
-        })
-      }
+        }
+      })
     }
 
     // The value can change without the buttons — typing, a form reset — and the
@@ -257,6 +257,9 @@ class NumberInput extends BaseComponent {
     if (this._element.form) {
       EventHandler.on(this._element.form, EVENT_RESET, this._resetHandler)
     }
+
+    this._observer = new MutationObserver(() => this._updateButtonState())
+    this._observer.observe(this._element, { attributeFilter: ['disabled', 'readonly'] })
 
     for (const event of EVENTS_STOP_REPEAT) {
       EventHandler.on(document, event, this._stopRepeatingHandler)
@@ -304,6 +307,10 @@ class NumberInput extends BaseComponent {
   }
 
   _canStep(direction: 'up' | 'down'): boolean {
+    if (this._element.disabled || this._element.readOnly) {
+      return false
+    }
+
     const input = this._element.cloneNode() as HTMLInputElement
     input.value = this._element.value
     this._stepValue(input, direction)
