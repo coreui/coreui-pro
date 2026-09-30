@@ -85,6 +85,7 @@ class NumberInput extends BaseComponent {
   private _decrementElement: HTMLButtonElement | null = null
   private _incrementElement: HTMLButtonElement | null = null
   private _group: ControlGroup | null = null
+  private _observer: MutationObserver | null = null
   private _repeatTimeout: ReturnType<typeof setTimeout> | null = null
   private _repeatInterval: ReturnType<typeof setInterval> | null = null
   private _repeated = false
@@ -131,6 +132,7 @@ class NumberInput extends BaseComponent {
     }
 
     EventHandler.off(this._element.form, EVENT_RESET, this._resetHandler)
+    this._observer?.disconnect()
 
     for (const button of [this._decrementElement, this._incrementElement]) {
       EventHandler.off(button, EVENT_KEY)
@@ -138,6 +140,7 @@ class NumberInput extends BaseComponent {
     }
 
     if (this._group) {
+      EventHandler.off(this._group.element, EVENT_POINTERDOWN)
       this._group.element.classList.remove(CLASS_NAME_NUMBER_INPUT)
       releaseControlGroup(this._element, this._group)
     }
@@ -147,7 +150,7 @@ class NumberInput extends BaseComponent {
 
   // Private
   _step(direction: 'up' | 'down'): boolean {
-    if (this._element.disabled || this._element.readOnly || !this._canStep(direction)) {
+    if (!this._canStep(direction)) {
       return false
     }
 
@@ -250,6 +253,10 @@ class NumberInput extends BaseComponent {
       }
     }
 
+    if (this._group) {
+      EventHandler.on(this._group.element, EVENT_POINTERDOWN, (event: any) => this._handleFramePointerDown(event))
+    }
+
     // The value can change without the buttons — typing, a form reset — and the
     // bounds have to follow it. The reset event precedes the reset itself.
     EventHandler.on(this._element, EVENT_INPUT, () => this._updateButtonState())
@@ -258,8 +265,26 @@ class NumberInput extends BaseComponent {
       EventHandler.on(this._element.form, EVENT_RESET, this._resetHandler)
     }
 
+    this._observer = new MutationObserver(() => this._updateButtonState())
+    this._observer.observe(this._element, { attributeFilter: ['disabled', 'max', 'min', 'readonly', 'step'] })
+
     for (const event of EVENTS_STOP_REPEAT) {
       EventHandler.on(document, event, this._stopRepeatingHandler)
+    }
+  }
+
+  _handleFramePointerDown(event: PointerEvent): void {
+    const target = event.target as Element
+
+    // A disabled button lets the press through to the frame.
+    if (event.pointerType !== 'mouse' || (target !== this._group?.element && ![this._decrementElement, this._incrementElement].includes(target.closest('button')))) {
+      return
+    }
+
+    event.preventDefault()
+
+    if (document.activeElement !== this._element) {
+      this._element.focus({ preventScroll: true })
     }
   }
 
@@ -304,6 +329,10 @@ class NumberInput extends BaseComponent {
   }
 
   _canStep(direction: 'up' | 'down'): boolean {
+    if (this._element.matches(':disabled') || this._element.readOnly) {
+      return false
+    }
+
     const input = this._element.cloneNode() as HTMLInputElement
     input.value = this._element.value
     this._stepValue(input, direction)
