@@ -498,7 +498,7 @@ const combobox = new coreui.Combobox('#myCombobox', {
 | Method | Description |
 | --- | --- |
 | `clear()` | Empties the selection. |
-| `dispose` | Destroys the combobox, removes the hidden input and puts the panel back after the toggle. |
+| `dispose` | Destroys the combobox and removes what it created: the hidden input, the caret, the value element, the search field and the panel, or the parts of the panel your markup lacked. A panel from your markup goes back after the toggle with its classes and inline style, and the toggle gets back the classes and attributes your markup gave it. |
 | `getInstance` | Static method which allows you to get the combobox instance associated to a DOM element, you can use it like this: `coreui.Combobox.getInstance(element)`. |
 | `getOrCreateInstance` | Static method which returns a combobox instance associated to a DOM element or creates a new one in case it wasn't initialized. You can use it like this: `coreui.Combobox.getOrCreateInstance(element)`. |
 | `getValue()` | The selected value — an array in `multiple` mode, a string or `null` otherwise. |

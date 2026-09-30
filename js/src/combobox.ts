@@ -59,6 +59,10 @@ const CLASS_NAME_SHOW = 'show'
 const CLASS_NAME_TOGGLE = 'combobox-toggle'
 const CLASS_NAME_VALUE = 'combobox-value'
 
+const HOST_ATTRIBUTES = ['aria-activedescendant', 'aria-controls', 'aria-expanded', 'aria-haspopup', 'type']
+const HOST_CLASS_NAMES = [CLASS_NAME_DISABLED, CLASS_NAME_TOGGLE]
+const MENU_STYLE_PROPERTIES = ['left', 'min-width', 'position', 'top']
+
 const SELECTOR_CARET = '.combobox-caret'
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="combobox"]'
 const SELECTOR_DATA_TOGGLE_SHOWN = `.${CLASS_NAME_TOGGLE}.${CLASS_NAME_SHOW}`
@@ -144,8 +148,15 @@ const DefaultType: Record<string, string> = {
  */
 
 class Combobox extends ComboboxBase {
-  protected declare _caretElement: HTMLElement | null
+  protected declare _addedClassNames: string[]
+  protected declare _addedDisabled: boolean
+  protected declare _addedMenuClassNames: string[]
+  protected declare _createdNodes: ChildNode[]
   protected declare _hiddenInput: HTMLInputElement | null
+  protected declare _hostAttributes: Map<string, string | null>
+  protected declare _hostMenuStyle: Map<string, string> | null
+  protected declare _hostOptionsId: string
+  protected declare _hostValue: { nodes: Node[], placeholder: boolean } | null
   protected declare _searchElement: HTMLInputElement | null
   protected declare _valueElement: HTMLElement
   protected declare _valueFromMarkup: boolean
@@ -155,7 +166,14 @@ class Combobox extends ComboboxBase {
 
     this._uniqueId = this._element.id || getUID(NAME)
     this._togglerElement = this._element
-    this._caretElement = null
+    this._addedClassNames = []
+    this._addedDisabled = false
+    this._addedMenuClassNames = []
+    this._createdNodes = []
+    this._hostAttributes = new Map(HOST_ATTRIBUTES.map(name => [name, this._element.getAttribute(name)]))
+    this._hostMenuStyle = null
+    this._hostOptionsId = ''
+    this._hostValue = null
     this._hiddenInput = null
     this._searchElement = null
     this._listBox = null
@@ -212,31 +230,62 @@ class Combobox extends ComboboxBase {
   }
 
   override dispose(): void {
+    if (!this._element) {
+      return
+    }
+
     this._disposeFloating()
     this._disposeListBox()
 
     this._hiddenInput?.remove()
 
-    if (this._caretElement) {
-      this._caretElement.classList.remove(CLASS_NAME_CARET)
-      this._caretElement.removeAttribute('aria-hidden')
+    if (this._menu) {
+      EventHandler.off(this._menu, EVENT_KEY)
     }
 
-    // The panel is markup the page owns, so it goes back where it came from
-    // rather than being destroyed with the instance.
-    if (this._menu) {
-      this._menu.classList.remove(CLASS_NAME_SHOW)
+    if (this._hostMenuStyle) {
       this._element.after(this._menu)
-      EventHandler.off(this._menu, EVENT_KEY)
+      this._menu.classList.remove(CLASS_NAME_SHOW, ...this._addedMenuClassNames)
+
+      for (const [property, value] of this._hostMenuStyle) {
+        this._menu.style.setProperty(property, value)
+      }
+
+      if (this._menu.getAttribute('style') === '') {
+        this._menu.removeAttribute('style')
+      }
+    }
+
+    if (this._optionsElement && !this._hostOptionsId) {
+      this._optionsElement.removeAttribute('id')
     }
 
     if (this._listBoxElement) {
       EventHandler.off(this._listBoxElement, EVENT_LIST_BOX)
     }
 
-    this._element.classList.remove(CLASS_NAME_SHOW)
-    this._element.removeAttribute('aria-expanded')
-    this._element.removeAttribute('aria-haspopup')
+    if (this._searchElement) {
+      EventHandler.off(this._searchElement, EVENT_KEY)
+    }
+
+    for (const node of this._createdNodes) {
+      node.remove()
+    }
+
+    if (this._hostValue) {
+      this._valueElement.replaceChildren(...this._hostValue.nodes)
+      this._valueElement.classList.toggle(CLASS_NAME_PLACEHOLDER, this._hostValue.placeholder)
+    }
+
+    if (this._addedDisabled) {
+      this._element.removeAttribute('disabled')
+    }
+
+    for (const [name, value] of this._hostAttributes) {
+      this._restoreAttribute(name, value)
+    }
+
+    this._element.classList.remove(CLASS_NAME_SHOW, ...this._addedClassNames)
 
     super.dispose()
   }
@@ -259,6 +308,9 @@ class Combobox extends ComboboxBase {
   }
 
   _createCombobox(): void {
+    const absentClassNames = HOST_CLASS_NAMES.filter(name => !this._element.classList.contains(name))
+    const hadDisabled = this._element.hasAttribute('disabled')
+
     this._element.classList.add(CLASS_NAME_TOGGLE)
     this._element.setAttribute('aria-haspopup', 'listbox')
     this._element.setAttribute('aria-expanded', 'false')
@@ -271,6 +323,8 @@ class Combobox extends ComboboxBase {
 
     this._config.disabled = this._config.disabled || this._element.classList.contains(CLASS_NAME_DISABLED)
     this._element.classList.toggle(CLASS_NAME_DISABLED, this._config.disabled)
+    this._addedClassNames = absentClassNames.filter(name => this._element.classList.contains(name))
+    this._addedDisabled = !hadDisabled && this._element.hasAttribute('disabled')
 
     this._createValueElement()
     this._createCaret()
@@ -289,6 +343,7 @@ class Combobox extends ComboboxBase {
     const existing = SelectorEngine.findOne(SELECTOR_VALUE, this._element) as HTMLElement | null
 
     if (existing) {
+      this._hostValue = { nodes: [...existing.childNodes], placeholder: existing.classList.contains(CLASS_NAME_PLACEHOLDER) }
       this._valueElement = existing
       return
     }
@@ -297,6 +352,7 @@ class Combobox extends ComboboxBase {
     value.classList.add(CLASS_NAME_VALUE)
     this._element.prepend(value)
 
+    this._createdNodes.push(value)
     this._valueElement = value
   }
 
@@ -304,7 +360,6 @@ class Combobox extends ComboboxBase {
     const existing = SelectorEngine.findOne(SELECTOR_CARET, this._element) as HTMLElement | null
 
     if (existing || !this._config.caretIcon) {
-      this._caretElement = existing
       return
     }
 
@@ -318,9 +373,8 @@ class Combobox extends ComboboxBase {
 
     caret.classList.add(CLASS_NAME_CARET)
     caret.setAttribute('aria-hidden', 'true')
+    this._createdNodes.push(...template.content.childNodes)
     this._element.append(template.content)
-
-    this._caretElement = caret
   }
 
   _createHiddenInput(): void {
@@ -341,7 +395,16 @@ class Combobox extends ComboboxBase {
   // open — a `.popup` is laid out absolutely, so it would otherwise sit in
   // the flow of whatever follows the toggle.
   _resolveMenu(): void {
-    const popup = (SelectorEngine.next(this._element, SELECTOR_POPUP)[0] ?? document.createElement('div')) as HTMLElement
+    const pagePopup = SelectorEngine.next(this._element, SELECTOR_POPUP)[0] as HTMLElement | undefined
+    const popup = pagePopup ?? document.createElement('div')
+
+    if (pagePopup) {
+      this._hostMenuStyle = new Map(MENU_STYLE_PROPERTIES.map(property => [property, pagePopup.style.getPropertyValue(property)]))
+    } else {
+      this._createdNodes.push(popup)
+    }
+
+    this._addedMenuClassNames = [CLASS_NAME_POPUP, CLASS_NAME_POPUP_COMBOBOX].filter(name => !popup.classList.contains(name))
     popup.classList.add(CLASS_NAME_POPUP, CLASS_NAME_POPUP_COMBOBOX)
 
     let listBox = SelectorEngine.findOne(SELECTOR_LIST_BOX, popup) as HTMLElement | null
@@ -350,6 +413,7 @@ class Combobox extends ComboboxBase {
       listBox = document.createElement('div')
       listBox.classList.add(CLASS_NAME_LIST_BOX)
       popup.append(listBox)
+      this._createdNodes.push(listBox)
     }
 
     let options = SelectorEngine.findOne(SELECTOR_OPTIONS, listBox) as HTMLElement | null
@@ -358,7 +422,10 @@ class Combobox extends ComboboxBase {
       options = document.createElement('div')
       options.classList.add(CLASS_NAME_OPTIONS)
       listBox.append(options)
+      this._createdNodes.push(options)
     }
+
+    this._hostOptionsId = options.id
 
     if (!options.id) {
       options.id = `${this._uniqueId}-listbox`
@@ -392,7 +459,17 @@ class Combobox extends ComboboxBase {
     search.setAttribute('data-coreui-list-box-search', '')
     this._optionsElement.before(search)
 
+    this._createdNodes.push(search)
     this._searchElement = search
+  }
+
+  _restoreAttribute(name: string, value: string | null): void {
+    if (value === null) {
+      this._element.removeAttribute(name)
+      return
+    }
+
+    this._element.setAttribute(name, value)
   }
 
   override _getListBoxConfig(): any {
