@@ -28,6 +28,8 @@ Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label 
     <div class="form-text">Tell us how the delivery went.</div>
   </div>`} />
 
+Inside a `<form>` (the one it sits in when it is initialized), the rating follows a form reset: it goes back to its `value`, or to no rating when it has none, and fires `change.coreui.rating` when that differs from the current value. A reset that a listener cancels changes nothing.
+
 ## Allow clear
 
 Enable users to clear their selected rating by clicking on the current rating again. This functionality is activated by setting `data-coreui-allow-clear="true"`.
