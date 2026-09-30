@@ -614,6 +614,28 @@ describe('Calendar', () => {
       expect(document.activeElement.dataset.coreuiDate).toEqual(new Date(2027, 0, 1).toDateString())
     })
 
+    it('should pick a month the limit falls within, or one that starts on a disabled day', () => {
+      fixtureEl.innerHTML = '<div></div><div></div>'
+
+      const [limited, weekends] = fixtureEl.querySelectorAll('div')
+      const picked = []
+      new Calendar(limited, { // eslint-disable-line no-new
+        calendarDate: new Date(2026, 9, 1), locale: 'en-US', minDate: new Date(2026, 9, 15), selectionType: 'month'
+      })
+      new Calendar(weekends, { // eslint-disable-line no-new
+        calendarDate: new Date(2026, 10, 1), disabledDates: date => date.getDay() === 0 || date.getDay() === 6, locale: 'en-US', selectionType: 'month'
+      })
+
+      for (const div of [limited, weekends]) {
+        div.addEventListener('startDateChange.coreui.calendar', event => picked.push(event.dateObject))
+      }
+
+      limited.querySelector(`[data-coreui-date="${new Date(2026, 9, 1).toDateString()}"]`).click()
+      weekends.querySelector(`[data-coreui-date="${new Date(2026, 10, 1).toDateString()}"]`).click()
+
+      expect(picked).toEqual([new Date(2026, 9, 1), new Date(2026, 10, 1)])
+    })
+
     it('should move focus to the first month after a year is picked', () => {
       fixtureEl.innerHTML = '<div></div>'
 
@@ -3852,6 +3874,52 @@ describe('Calendar', () => {
       calendar._updateClassNamesAndAriaLabels()
       const rangeHoverCells = div.querySelectorAll('.calendar-cell.range-hover')
       expect(rangeHoverCells.length).toBeGreaterThan(0)
+    })
+
+    it('should preview and pick a range up to a month that starts on a disabled day', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const picked = []
+      new Calendar(div, { // eslint-disable-line no-new
+        calendarDate: new Date(2026, 0, 1),
+        disabledDates: date => date.getDay() === 0 || date.getDay() === 6,
+        locale: 'en-US',
+        range: true,
+        selectEndDate: true,
+        selectionType: 'month',
+        startDate: new Date(2026, 8, 1)
+      })
+      div.addEventListener('endDateChange.coreui.calendar', event => picked.push(event.dateObject))
+
+      const november = div.querySelector(`[data-coreui-date="${new Date(2026, 10, 1).toDateString()}"]`)
+      november.dispatchEvent(new MouseEvent('mouseover', { bubbles: true, relatedTarget: div }))
+
+      expect(november.classList.contains('range-hover')).toBeTrue()
+
+      november.click()
+
+      expect(picked).toEqual([new Date(2026, 10, 1)])
+    })
+
+    it('should pick the start of a range of months that spans disabled days', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const picked = []
+      new Calendar(div, { // eslint-disable-line no-new
+        calendarDate: new Date(2026, 0, 1),
+        disabledDates: date => date.getDay() === 0 || date.getDay() === 6,
+        endDate: new Date(2026, 10, 1),
+        locale: 'en-US',
+        range: true,
+        selectionType: 'month'
+      })
+      div.addEventListener('startDateChange.coreui.calendar', event => picked.push(event.dateObject))
+
+      div.querySelector(`[data-coreui-date="${new Date(2026, 8, 1).toDateString()}"]`).click()
+
+      expect(picked).toEqual([new Date(2026, 8, 1)])
     })
 
     it('should not preview a day range on the month cells', () => {

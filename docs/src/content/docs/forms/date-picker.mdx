@@ -65,7 +65,8 @@ itself. The state of any other button is yours — the slot context exposes
 `isDateSelectable(date)`, which answers whether a date, expressed in the
 field's mask, passes the `minDate`/`maxDate`/`disabledDates` validation (a day
 mask checks the calendar day, so `new Date()` passes with a `maxDate` of
-today) — and every programmatic date still runs through the field's
+today, and a month, quarter or year mask checks the whole period) — and every
+programmatic date still runs through the field's
 validation: out of range, the field turns `is-invalid`, `errorChange` reports
 the reason, and `getDate()`/`dateChange` report `null`, the same outcome as
 typing that date.
@@ -248,6 +249,9 @@ The `disabledDates` option excludes specific dates — single `Date`s,
 `[start, end]` ranges, or a matcher function. The calendar grays them out and
 the field refuses them: a completed date that hits a disabled entry gets the
 `.is-invalid` class and the picker reports `null` until it is corrected.
+In month, quarter and year selection the calendar and the field judge the
+whole period: it is refused only when it lies wholly before `minDate` or after
+`maxDate`, or `disabledDates` covers every day of it that the limits leave.
 
 <Example pro code={`<div class="row">
     <div class="col-lg-5">

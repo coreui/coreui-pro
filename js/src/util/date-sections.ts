@@ -6,7 +6,7 @@
  */
 
 import {
-  convertToDateObject, createDate, type DisabledDate, getISOWeekNumberAndYear, isDateDisabled, parseYearSmart, type SelectionTypes
+  convertToDateObject, createDate, type DisabledDate, getISOWeekNumberAndYear, isCellDisabled, parseYearSmart, type PeriodViewTypes, type SelectionTypes
 } from './calendar.js'
 import { convert12hTo24h, convert24hTo12h } from './time.js'
 
@@ -925,9 +925,35 @@ export const formatDateWithin = (layout: DateSection[], date: Date | null): stri
   date ? formatSections(setSectionsFromDate(layout, date)) : ''
 
 /**
+ * Names the period a field picks when it has neither a day nor a week
+ * section: months, quarters or years.
+ *
+ * @param layout - The sections and literals of the field
+ * @returns The period, or `null` for a field that picks days, weeks or only a time
+ */
+export const getLayoutPeriod = (layout: DateSection[]): PeriodViewTypes | null => {
+  const types = new Set(layout.map(section => section.type))
+
+  if (types.has('day') || types.has('week')) {
+    return null
+  }
+
+  if (types.has('month')) {
+    return 'months'
+  }
+
+  if (types.has('quarter')) {
+    return 'quarters'
+  }
+
+  return types.has('year') ? 'years' : null
+}
+
+/**
  * Tells whether a field with the given layout can hold a date: the date is
  * first brought into the layout and then checked against the bounds and the
- * disabled dates.
+ * disabled dates, as a whole period when the field picks months, quarters or
+ * years.
  *
  * @param layout - The sections and literals of the field
  * @param date - The date to check
@@ -943,5 +969,5 @@ export const isDateSelectableWithin = (layout: DateSection[], date: Date | null,
 
   const normalized = getDateWithin(layout, date)
 
-  return normalized !== null && !isDateDisabled(normalized, minDate, maxDate, disabledDates)
+  return normalized !== null && !isCellDisabled(normalized, getLayoutPeriod(layout) ?? 'days', minDate, maxDate, disabledDates)
 }

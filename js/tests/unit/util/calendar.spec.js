@@ -26,6 +26,7 @@ import {
   getTabStop,
   getYears,
   getMonthDetails,
+  isCellDisabled,
   isDateDisabled,
   isDateInRange,
   isDateSelected,
@@ -1334,6 +1335,17 @@ describe('Calendar Utilities', () => {
       const disabledDates = [new Date(2023, 0, 3)]
       expect(isDisableDateInRange(start, end, disabledDates)).toBeTrue()
     })
+
+    it('should walk whole periods in the months, quarters and years views', () => {
+      const weekend = date => date.getDay() === 0 || date.getDay() === 6
+      const october = [[new Date(2026, 9, 1), new Date(2026, 9, 31)]]
+
+      expect(isDisableDateInRange(new Date(2026, 8, 1), new Date(2026, 10, 1), weekend)).toBeTrue()
+      expect(isDisableDateInRange(new Date(2026, 8, 1), new Date(2026, 10, 1), weekend, 'months')).toBeFalse()
+      expect(isDisableDateInRange(new Date(2026, 8, 1), new Date(2026, 10, 1), october, 'months')).toBeTrue()
+      expect(isDisableDateInRange(new Date(2026, 0, 1), new Date(2026, 9, 1), october, 'quarters')).toBeFalse()
+      expect(isDisableDateInRange(new Date(2025, 0, 1), new Date(2027, 0, 1), weekend, 'years')).toBeFalse()
+    })
   })
 
   describe('isPeriodDisabled with months', () => {
@@ -1376,6 +1388,18 @@ describe('Calendar Utilities', () => {
       expect(isPeriodDisabled(new Date(2023, 2, 1), 'months', null, new Date(2023, 2, 10), onlyMarch20)).toBeTrue()
     })
 
+    it('should check the days the limits leave, times of day aside', () => {
+      const min = new Date(2026, 9, 31, 9)
+      const weekend = date => date.getDay() === 0 || date.getDay() === 6
+
+      expect(isPeriodDisabled(new Date(2026, 9, 1), 'months', min, null, null)).toBeFalse()
+      expect(isPeriodDisabled(new Date(2026, 9, 1), 'months', min, null, [new Date(2026, 9, 31)])).toBeTrue()
+      expect(isPeriodDisabled(new Date(2026, 9, 1), 'quarters', new Date(2026, 11, 31, 9), null, [])).toBeFalse()
+      expect(isPeriodDisabled(new Date(2026, 0, 1), 'years', new Date(2026, 11, 31, 9), null, [])).toBeFalse()
+      expect(isPeriodDisabled(new Date(2026, 9, 1), 'months', new Date(2026, 9, 24, 14), new Date(2026, 9, 26), weekend)).toBeFalse()
+      expect(isPeriodDisabled(new Date(2026, 9, 1), 'months', new Date(2026, 9, 24, 14), new Date(2026, 9, 25, 23), weekend)).toBeTrue()
+    })
+
     it('should check the days of a month below year 100 in that year', () => {
       const march = [[createDate(26, 2, 1), createDate(26, 2, 31)]]
 
@@ -1389,6 +1413,21 @@ describe('Calendar Utilities', () => {
         expect(isPeriodDisabled(createDate(0, 11), view, createDate(-10), null, undefined)).toBeTrue()
         expect(isPeriodDisabled(createDate(1), view, null, null, undefined)).toBeFalse()
       }
+    })
+  })
+
+  describe('isCellDisabled', () => {
+    it('should check a day by its date and a month, quarter or year as a whole', () => {
+      const min = new Date(2026, 9, 15)
+
+      expect(isCellDisabled(new Date(2026, 9, 1), 'days', min, null, null)).toBeTrue()
+      expect(isCellDisabled(new Date(2026, 9, 15), 'days', min, null, null)).toBeFalse()
+      expect(isCellDisabled(new Date(2026, 9, 1), 'months', min, null, null)).toBeFalse()
+      expect(isCellDisabled(new Date(2026, 8, 1), 'months', min, null, null)).toBeTrue()
+      expect(isCellDisabled(new Date(2026, 9, 1), 'quarters', min, null, null)).toBeFalse()
+      expect(isCellDisabled(new Date(2026, 0, 1), 'years', min, null, null)).toBeFalse()
+      expect(isCellDisabled(new Date(2026, 9, 1), 'months', min, null, [[new Date(2026, 9, 15), new Date(2026, 9, 31)]])).toBeTrue()
+      expect(isCellDisabled(new Date(2026, 9, 1), 'months', null, null, () => true)).toBeTrue()
     })
   })
 

@@ -9,7 +9,7 @@ import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import {
-  type DisabledDate, getLocalDateFromString, isDateDisabled, isSameInstantAs
+  type DisabledDate, getLocalDateFromString, isCellDisabled, isSameInstantAs
 } from './util/calendar.js'
 import {
   applyDigitToSection,
@@ -22,6 +22,7 @@ import {
   getDaySectionMax,
   getFullYearFromSection,
   getIncrementedSectionValue,
+  getLayoutPeriod,
   getSectionBounds,
   getSectionLayout,
   getSectionsFromString,
@@ -717,7 +718,10 @@ abstract class SectionInput extends BaseComponent {
       return isFilled ? 'incomplete' : null
     }
 
-    if (this._minDate && date < this._minDate) {
+    const period = getLayoutPeriod(this._sections)
+    const min = period ? getDateWithin(this._sections, this._minDate) : this._minDate
+
+    if (min && date < min) {
       return 'minDate'
     }
 
@@ -725,7 +729,7 @@ abstract class SectionInput extends BaseComponent {
       return 'maxDate'
     }
 
-    if (isDateDisabled(date, null, null, this._config.disabledDates)) {
+    if (isCellDisabled(date, period ?? 'days', this._minDate, this._maxDate, this._config.disabledDates)) {
       return 'disabledDate'
     }
 

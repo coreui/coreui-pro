@@ -140,6 +140,8 @@ The Bootstrap Calendar component includes functionality to disable specific date
 - A function or an array of functions that take a `Date` object as an argument and return a boolean indicating whether the date should be disabled.
 - A mixed array of `Date` objects and functions.
 
+In month, quarter and year selection a period can be picked unless it lies wholly before `minDate` or after `maxDate`, or `disabledDates` covers every day of it that the limits leave, and a range of periods is cleared only when it spans a period that `disabledDates` covers wholly.
+
 Without a `calendarDate`, `startDate` or `endDate`, the calendar opens on today, or on the `minDate` or `maxDate` that today falls outside of; in day and week selection, when none of the months it shows has a day that can be picked, it opens on the month of the closest day that can.
 
 To disable certain dates, you can provide them in an array. For date ranges, use nested arrays, where each inner array indicates a start date and an end date for that range:
