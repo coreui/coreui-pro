@@ -12,7 +12,9 @@ import SelectorEngine from './dom/selector-engine.js'
 import ListBox, { type ListBoxEntry } from './list-box.js'
 import type { ComponentConfig } from './util/config.js'
 import { CARET_ICON } from './util/icons.js'
-import { SVGAllowlist, sanitizeByConfig, type SanitizerAllowList } from './util/sanitizer.js'
+import {
+  DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList, SVGAllowlist
+} from './util/sanitizer.js'
 import {
   type CountLabel, defineJQueryPlugin, getUID, jQueryDispatch, resolveCountLabel
 } from './util/index.js'
@@ -92,7 +94,7 @@ type ComboboxConfig = {
 }
 
 const Default: ComboboxConfig = {
-  allowList: SVGAllowlist,
+  allowList: DefaultAllowlist,
   ariaSearchLabel: 'Search options',
   caretIcon: CARET_ICON,
   container: false,
@@ -307,17 +309,16 @@ class Combobox extends ComboboxBase {
     }
 
     const template = document.createElement('template')
-    template.innerHTML = sanitizeByConfig(this._config.caretIcon, this._config)
-    const caret = template.content.firstElementChild as HTMLElement | null
+    template.innerHTML = sanitizeByConfig(this._config.caretIcon, { ...this._config, allowList: SVGAllowlist })
+    const caret = template.content.lastElementChild as HTMLElement | null
 
     if (!caret) {
-      this._caretElement = null
       return
     }
 
     caret.classList.add(CLASS_NAME_CARET)
     caret.setAttribute('aria-hidden', 'true')
-    this._element.append(caret)
+    this._element.append(template.content)
 
     this._caretElement = caret
   }

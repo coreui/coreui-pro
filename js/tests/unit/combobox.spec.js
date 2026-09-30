@@ -1,6 +1,6 @@
 import Combobox from '../../src/combobox.js'
 import { CARET_ICON } from '../../src/util/icons.js'
-import { SVGAllowlist } from '../../src/util/sanitizer.js'
+import { DefaultAllowlist } from '../../src/util/sanitizer.js'
 import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
 
 describe('Combobox', () => {
@@ -78,7 +78,7 @@ describe('Combobox', () => {
   describe('Default', () => {
     it('should return default configuration', () => {
       expect(Combobox.Default).toEqual({
-        allowList: SVGAllowlist,
+        allowList: DefaultAllowlist,
         ariaSearchLabel: 'Search options',
         caretIcon: CARET_ICON,
         container: false,
@@ -131,6 +131,31 @@ describe('Combobox', () => {
       expect(caret.getAttribute('aria-hidden')).toEqual('true')
     })
 
+    it('should draw the default caret with every attribute of the icon', () => {
+      const toggle = setMarkup()
+      // eslint-disable-next-line no-new
+      new Combobox(toggle)
+
+      const icon = document.createElement('template')
+      icon.innerHTML = CARET_ICON
+      const expected = icon.content.firstElementChild
+      const caret = toggle.querySelector('.combobox-caret')
+
+      for (const { name, value } of expected.attributes) {
+        expect(caret.getAttribute(name)).toEqual(value)
+      }
+
+      expect(caret.querySelector('path').getAttribute('d')).toEqual(expected.querySelector('path').getAttribute('d'))
+    })
+
+    it('should keep the caret when the labels use an allow list without SVG', () => {
+      const toggle = setMarkup()
+      // eslint-disable-next-line no-new
+      new Combobox(toggle, { allowList: { span: [] } })
+
+      expect(toggle.querySelector('.combobox-caret').tagName.toLowerCase()).toEqual('svg')
+    })
+
     it('should keep the caret the markup already carries', () => {
       const toggle = setMarkup()
       toggle.insertAdjacentHTML('beforeend', '<svg class="combobox-caret" data-mine></svg>')
@@ -162,6 +187,23 @@ describe('Combobox', () => {
 
       expect(caret.tagName.toLowerCase()).toEqual('svg')
       expect(caret.querySelector('path').getAttribute('d')).toEqual('M4 6l4 4 4-4')
+    })
+
+    it('should keep a sprite reference in the caret', () => {
+      const toggle = setMarkup()
+      // eslint-disable-next-line no-new
+      new Combobox(toggle, { caretIcon: '<svg class="icon"><use xlink:href="icons.svg#cil-caret-bottom"></use></svg>' })
+
+      expect(toggle.querySelector('.combobox-caret use').getAttribute('xlink:href')).toEqual('icons.svg#cil-caret-bottom')
+    })
+
+    it('should make the last element of the icon the caret', () => {
+      const toggle = setMarkup()
+      // eslint-disable-next-line no-new
+      new Combobox(toggle, { caretIcon: '<span class="visually-hidden">Open</span><svg viewBox="0 0 16 16"><path d="M4 6l4 4 4-4"></path></svg>' })
+
+      expect(toggle.querySelector('.combobox-caret').tagName.toLowerCase()).toEqual('svg')
+      expect(toggle.querySelector('.visually-hidden').classList.contains('combobox-caret')).toBeFalse()
     })
 
     it('should keep the caret icon as given when sanitize is false', () => {
