@@ -131,6 +131,8 @@ class Autocomplete extends ComboboxBase {
   protected declare _inputHintElement: any
   protected declare _addedClassNames: string[]
   protected declare _previousTabIndex: string | null
+  protected declare _seenOptionValues: Set<string>
+  protected declare _valueApplied: boolean
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
@@ -150,6 +152,8 @@ class Autocomplete extends ComboboxBase {
     this._floatingCleanup = null
     this._anchoredPosition = null
     this._search = ''
+    this._seenOptionValues = new Set()
+    this._valueApplied = false
 
     this._createAutocomplete()
     this._addEventListeners()
@@ -246,20 +250,22 @@ class Autocomplete extends ComboboxBase {
   }
 
   setConfig(config: any): void {
-    const picked = config?.value === undefined ? this._selected[0] : undefined
-
     this._config = this._getConfig({ ...this._config, ...config })
     this._options = this._getOptionsFromConfig()
     this._setListBoxItems()
     this._syncInputName()
 
-    const option = (picked && this._findOptionByValue(picked.value)) || this._flattenOptions().find(option => option.selected)
-
-    if (option) {
-      this._applySelection(option)
-    } else {
-      this.deselectAll()
+    for (const option of this._selected) {
+      this._syncOptionElementState(option.value, true)
     }
+
+    if (config?.value !== undefined) {
+      this._valueApplied = false
+      this.deselectAll()
+      this._inputElement.value = ''
+    }
+
+    this._seedSelection()
   }
 
   deselectAll(options: any[] = this._selected): void {
@@ -340,6 +346,11 @@ class Autocomplete extends ComboboxBase {
 
       if (this._isGlobalSearch() && (event.key.length === 1 || event.key === BACKSPACE_KEY || event.key === DELETE_KEY)) {
         this._inputElement.focus()
+      }
+
+      if (event.target === this._inputElement && (event.key === BACKSPACE_KEY || event.key === DELETE_KEY) && this._selected.length > 0) {
+        this.deselectAll()
+        this._triggerChangeEvent(null)
       }
     })
 
@@ -433,6 +444,12 @@ class Autocomplete extends ComboboxBase {
 
     EventHandler.on(this._inputElement, EVENT_INPUT, () => {
       const { value } = this._inputElement
+
+      if (this._selected.length > 0) {
+        this.deselectAll()
+        this._triggerChangeEvent(null)
+      }
+
       this.search(value)
       if (this._config.showHints) {
         const options = value ?
@@ -441,9 +458,8 @@ class Autocomplete extends ComboboxBase {
         this._inputHintElement.value = options.length > 0 ? `${value}${options[0].label.slice(value.length)}` : ''
       }
 
-      if (this._selected.length > 0) {
-        this.deselectAll()
-        this._triggerChangeEvent(null)
+      if (value && !this._isShown()) {
+        this.show()
       }
     })
 
@@ -545,7 +561,7 @@ class Autocomplete extends ComboboxBase {
     this._createInputGroup()
     this._createButtons()
     this._createOptionsContainer()
-    this._updateOptionsList()
+    this._seedSelection()
   }
 
   _createInputGroup(): void {
@@ -680,6 +696,10 @@ class Autocomplete extends ComboboxBase {
   }
 
   _applySelection(option: any): void {
+    if (option.disabled) {
+      return
+    }
+
     this.deselectAll()
     this._selected.push(option)
     this._syncOptionElementState(option.value, true)
@@ -706,16 +726,26 @@ class Autocomplete extends ComboboxBase {
     this._cleanerElement.style.display = 'none'
   }
 
-  _updateOptionsList(options: any[] = this._options): void {
-    for (const option of options) {
-      if (Array.isArray(option.options)) {
-        this._updateOptionsList(option.options)
-        continue
-      }
+  _seedSelection(): void {
+    const options = this._flattenOptions()
+    const { value } = this._config
+    let seed
 
-      if (option.selected) {
-        this._applySelection(option)
+    if (value !== null && value !== undefined && value !== '') {
+      if (!this._valueApplied) {
+        seed = options.find(option => option.value === String(value))
+        this._valueApplied = Boolean(seed)
       }
+    } else {
+      seed = options.find(option => option.selected && !this._seenOptionValues.has(option.value))
+    }
+
+    for (const option of options) {
+      this._seenOptionValues.add(option.value)
+    }
+
+    if (seed && !this._selected.some((option: any) => option.value === seed.value)) {
+      this._applySelection(seed)
     }
   }
 
