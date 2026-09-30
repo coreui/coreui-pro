@@ -615,6 +615,10 @@ class Calendar extends BaseComponent {
   }
 
   _setEndDate(date: Date | null): void {
+    if (date === this._endDate) {
+      return
+    }
+
     this._endDate = setTimeFromDate(date, this._endDate)
     EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, {
       date: getDateBySelectionType(this._endDate, this._config.selectionType),
@@ -623,6 +627,10 @@ class Calendar extends BaseComponent {
   }
 
   _setStartDate(date: Date | null): void {
+    if (date === this._startDate) {
+      return
+    }
+
     this._startDate = setTimeFromDate(date, this._startDate)
     EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, {
       date: getDateBySelectionType(this._startDate, this._config.selectionType),

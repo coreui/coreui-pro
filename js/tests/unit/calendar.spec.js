@@ -4802,6 +4802,48 @@ describe('Calendar', () => {
       expect(listener).toHaveBeenCalled()
     })
 
+    it('should not report a date that stays empty when a range starts over', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const events = []
+      new Calendar(div, { calendarDate: new Date(2026, 9, 1), range: true }) // eslint-disable-line no-new
+      div.addEventListener('startDateChange.coreui.calendar', event => events.push(['start', event.dateObject]))
+      div.addEventListener('endDateChange.coreui.calendar', event => events.push(['end', event.dateObject]))
+
+      const cell = day => div.querySelector(`td.current[data-coreui-date="${new Date(2026, 9, day).toDateString()}"]`)
+      cell(10).click()
+      cell(5).click()
+
+      expect(events).toEqual([['start', new Date(2026, 9, 10)], ['start', new Date(2026, 9, 5)]])
+    })
+
+    it('should not report a start that stays empty when a range across a disabled day is cleared', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const events = []
+      new Calendar(div, { // eslint-disable-line no-new
+        calendarDate: new Date(2026, 9, 1), disabledDates: [new Date(2026, 9, 15)], endDate: new Date(2026, 9, 20), range: true
+      })
+      div.addEventListener('startDateChange.coreui.calendar', event => events.push(['start', event.dateObject]))
+      div.addEventListener('endDateChange.coreui.calendar', event => events.push(['end', event.dateObject]))
+
+      div.querySelector(`td.current[data-coreui-date="${new Date(2026, 9, 10).toDateString()}"]`).click()
+
+      expect(events).toEqual([['end', null]])
+    })
+
+    it('should report a day picked again', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const picked = []
+      new Calendar(div, { calendarDate: new Date(2026, 9, 1), startDate: new Date(2026, 9, 10) }) // eslint-disable-line no-new
+      div.addEventListener('startDateChange.coreui.calendar', event => picked.push(event.dateObject))
+
+      div.querySelector(`td.current[data-coreui-date="${new Date(2026, 9, 10).toDateString()}"]`).click()
+
+      expect(picked).toEqual([new Date(2026, 9, 10)])
+    })
+
     it('should emit `calendarViewChange.coreui.calendar` when view changes', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')

@@ -409,9 +409,9 @@ Note that for security reasons the `sanitize`, `sanitizeFn`, and `allowList` opt
 | `calendarDateChange.coreui.calendar` | Fired when the calendar date changes. | `{ date: Date, view: 'days' \| 'months' \| 'quarters' \| 'years' }` |
 | `calendarMouseleave.coreui.calendar` | Fired when the cursor leaves the calendar. | — |
 | `calendarViewChange.coreui.calendar` | Fired when the calendar view changes. | `{ view: 'days' \| 'months' \| 'quarters' \| 'years', source: 'cellClick' \| 'navigation' }` |
-| `endDateChange.coreui.calendar` | Fired when the end date changes. | `{ date: Date \| null }` |
+| `endDateChange.coreui.calendar` | Fired when the end is picked, picked again or cleared. `date` is formatted per `selectionType`, `dateObject` is the `Date`. | `{ date: Date \| string \| null, dateObject: Date \| null }` |
 | `selectEndChange.coreui.calendar` | Fired when the selection mode changes. | `{ value: boolean }` |
-| `startDateChange.coreui.calendar` | Fired when the start date changes. | `{ date: Date \| null }` |
+| `startDateChange.coreui.calendar` | Fired when the start is picked, picked again or cleared. `date` is formatted per `selectionType`, `dateObject` is the `Date`. | `{ date: Date \| string \| null, dateObject: Date \| null }` |
 
 ```js
 const myCalendar = document.getElementById('myCalendar')

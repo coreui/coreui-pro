@@ -1302,6 +1302,13 @@ removed in favour of `$translucent-opacity` and
   `date` remains formatted per `selectionType` — a `Date` for day selection, but
   a string for week (`"2026W27"`), month (`"2026-01"`), quarter (`"2026Q1"`) and
   year (`"2026"`). Existing listeners are unaffected.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`startDateChange` and `endDateChange` no longer report a date that stays
+  empty.** Picking a day before the start of a range, or an end across a
+  disabled day, used to fire `endDateChange` with `null` although no end had
+  been picked, and clearing a range across a disabled day before a start was
+  picked fired `startDateChange` with `null`. A day picked again is still
+  reported.
 
 #### Date Picker / Date Range Picker
 
