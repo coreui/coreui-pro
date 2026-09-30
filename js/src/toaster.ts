@@ -24,6 +24,7 @@ const DATA_KEY = 'coreui.toaster'
 const EVENT_KEY = `.${DATA_KEY}`
 
 const EVENT_ADD = `add${EVENT_KEY}`
+const EVENT_CLICK = `click${EVENT_KEY}`
 const EVENT_MOUSEOVER = `mouseover${EVENT_KEY}`
 const EVENT_MOUSEOUT = `mouseout${EVENT_KEY}`
 const EVENT_FOCUSIN = `focusin${EVENT_KEY}`
@@ -55,6 +56,7 @@ const ATTRIBUTE_UPDATE_KEY = 'data-coreui-update-key'
 const PROPERTY_STACK_INDEX = '--cui-toast-stack-index'
 const STACK_VISIBLE = 3
 const GLIDE_ID = 'coreui.toaster.glide'
+const MESSAGE_DURATION = 7000
 
 const PROPERTY_STACK_BEFORE = '--cui-toast-stack-before'
 const PROPERTY_STACK_COUNT = '--cui-toast-stack-count'
@@ -87,18 +89,19 @@ const TEMPLATE = [
   '<div class="toast">',
   '  <div class="toast-header">',
   '    <strong class="toast-title"></strong>',
-  '    <button type="button" class="btn-close" data-coreui-dismiss="toast" aria-label="Close"></button>',
+  '    <button type="button" class="btn-close" data-coreui-dismiss="toast"></button>',
   '  </div>',
   '  <div class="toast-body">',
   '    <div class="toast-description"></div>',
   '    <button type="button" class="btn btn-sm toast-action"></button>',
-  '    <button type="button" class="btn-close" data-coreui-dismiss="toast" aria-label="Close"></button>',
+  '    <button type="button" class="btn-close" data-coreui-dismiss="toast"></button>',
   '  </div>',
   '</div>'
 ].join('')
 
 const Default: ToasterConfig = {
   allowList: DefaultAllowlist,
+  ariaCloseLabel: 'Close',
   ariaLabel: 'Notifications',
   container: 'body',
   enter: 'auto',
@@ -115,6 +118,7 @@ const Default: ToasterConfig = {
 
 const DefaultType = {
   allowList: 'object',
+  ariaCloseLabel: 'string',
   ariaLabel: 'string',
   container: '(string|element)',
   enter: 'string',
@@ -159,6 +163,7 @@ type Edge = 'auto' | 'bottom' | 'end' | 'start' | 'top'
 
 type ToasterConfig = {
   allowList: SanitizerAllowList
+  ariaCloseLabel: string
   ariaLabel: string
   container: string | Element
   enter: Edge
@@ -229,6 +234,7 @@ class Toaster extends BaseComponent {
   protected declare _resizeObserver: ResizeObserver | null
   protected declare _order: number
   protected declare _announcers: Record<'high' | 'low', HTMLElement>
+  protected declare _announcements: Map<HTMLElement, HTMLElement>
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     const ownsContainer = !getElement(element)
@@ -266,9 +272,10 @@ class Toaster extends BaseComponent {
       this._element.style.setProperty(PROPERTY_LEAVE_TRANSLATE, EDGES[leave])
     }
 
+    this._announcements = new Map()
     this._announcers = {
-      high: this._createAnnouncer('alert', 'assertive'),
-      low: this._createAnnouncer('status', 'polite')
+      high: this._createAnnouncer('assertive'),
+      low: this._createAnnouncer('polite')
     }
 
     if (this._config.pauseOnHover) {
@@ -303,9 +310,14 @@ class Toaster extends BaseComponent {
     this._typeCheckConfig({ ...ToastDefault, ...options }, ToastDefaultType)
 
     const existing = options.id ? this._entries.get(options.id) : null
-    if (existing) {
+    if (existing && !existing.leaving) {
       this.update(existing.toast.id, options)
       return existing.toast.id
+    }
+
+    if (existing) {
+      this._remove(existing, false)
+      return this.add(options)
     }
 
     const toast: ToastObject = {
@@ -328,12 +340,15 @@ class Toaster extends BaseComponent {
 
     EventHandler.one(toast.element, EVENT_HIDE_TOAST, () => {
       entry.leaving = true
-      this._collapse(toast.element)
+      if (!entry.toast.limited) {
+        this._collapse(toast.element)
+      }
+
       this._layoutStack()
       execute(entry.toast.onClose, [undefined, entry.toast])
     })
     EventHandler.one(toast.element, EVENT_HIDDEN_TOAST, () => this._remove(entry))
-    EventHandler.on(toast.element, 'click', SELECTOR_ACTION, event => {
+    EventHandler.on(toast.element, EVENT_CLICK, SELECTOR_ACTION, event => {
       execute(entry.toast.action?.onClick, [undefined, event, entry.toast])
     })
 
@@ -409,8 +424,8 @@ class Toaster extends BaseComponent {
     const id = this.add({ ...this._promiseState(options.loading), timeout: 0 })
 
     promise.then(
-      value => this.update(id, { theme: 'success', timeout: this._config.timeout, ...this._promiseState(options.success, value) }),
-      error => this.update(id, { theme: 'danger', timeout: this._config.timeout, ...this._promiseState(options.error, error) })
+      value => this._settlePromise(id, 'success', options.success, value),
+      error => this._settlePromise(id, 'danger', options.error, error)
     )
 
     return promise
@@ -441,6 +456,7 @@ class Toaster extends BaseComponent {
 
   override dispose(): void {
     for (const entry of this._entries.values()) {
+      EventHandler.off(entry.toast.element, EVENT_KEY)
       entry.instance.dispose()
       entry.toast.element.remove()
     }
@@ -475,8 +491,10 @@ class Toaster extends BaseComponent {
       header.remove()
     }
 
-    if (!toast.dismissible) {
-      for (const close of element.querySelectorAll(SELECTOR_CLOSE)) {
+    for (const close of element.querySelectorAll(SELECTOR_CLOSE)) {
+      if (toast.dismissible) {
+        close.setAttribute('aria-label', this._config.ariaCloseLabel)
+      } else {
         close.remove()
       }
     }
@@ -496,7 +514,7 @@ class Toaster extends BaseComponent {
     }
 
     if (toast.class) {
-      element.classList.add(...toast.class.split(' '))
+      element.classList.add(...toast.class.split(/\s+/).filter(Boolean))
     }
 
     element.setAttribute(ATTRIBUTE_UPDATE_KEY, String(toast.updateKey))
@@ -526,20 +544,27 @@ class Toaster extends BaseComponent {
     target.textContent = resolved
   }
 
-  _remove(entry: Entry): void {
-    if (!this._entries?.has(entry.toast.id)) {
+  _remove(entry: Entry, release = true): void {
+    if (this._entries?.get(entry.toast.id) !== entry) {
       return
     }
 
     this._entries.delete(entry.toast.id)
-    entry.instance.dispose()
+    EventHandler.off(entry.toast.element, EVENT_KEY)
+    this._announcements.get(entry.toast.element)?.remove()
+    this._announcements.delete(entry.toast.element)
+    // A toast replaced from its own onClose is still inside Toast#hide()
+    queueMicrotask(() => entry.instance.dispose())
     this._resizeObserver?.unobserve(entry.toast.element)
     const layout = this._layout()
     entry.toast.element.remove()
     this._settle(layout)
     this._layoutStack()
     execute(entry.toast.onRemove, [undefined, entry.toast])
-    this._applyLimit()
+    if (release) {
+      this._applyLimit()
+    }
+
     EventHandler.trigger(this._element, EVENT_REMOVE, { id: entry.toast.id })
   }
 
@@ -552,7 +577,7 @@ class Toaster extends BaseComponent {
     for (const [index, entry] of entries.entries()) {
       const limited = index < overflow
 
-      if (limited === entry.toast.limited) {
+      if (entry.leaving || limited === entry.toast.limited) {
         continue
       }
 
@@ -632,12 +657,12 @@ class Toaster extends BaseComponent {
     this._element.style.setProperty(PROPERTY_STACK_HEIGHTS, `${before}px`)
   }
 
-  _createAnnouncer(role: string, live: string): HTMLElement {
+  _createAnnouncer(live: string): HTMLElement {
     const announcer = document.createElement('div')
     announcer.className = CLASS_NAME_ANNOUNCER
-    announcer.setAttribute('role', role)
+    announcer.setAttribute('role', 'log')
     announcer.setAttribute('aria-live', live)
-    announcer.setAttribute('aria-atomic', 'true')
+    announcer.setAttribute('aria-relevant', 'additions')
     this._element.append(announcer)
     return announcer
   }
@@ -650,10 +675,27 @@ class Toaster extends BaseComponent {
       .filter(Boolean)
       .join('. ')
 
-    announcer.textContent = ''
+    this._announcements.get(toast.element)?.remove()
+    this._announcements.delete(toast.element)
+
+    if (!text) {
+      return
+    }
+
+    const message = document.createElement('div')
+    message.textContent = text
+    this._announcements.set(toast.element, message)
     requestAnimationFrame(() => {
-      announcer.textContent = text
+      if (this._announcements?.get(toast.element) === message) {
+        announcer.append(message)
+      }
     })
+    setTimeout(() => {
+      message.remove()
+      if (this._announcements?.get(toast.element) === message) {
+        this._announcements.delete(toast.element)
+      }
+    }, MESSAGE_DURATION)
   }
 
   _onLeave(event: any): void {
@@ -765,6 +807,14 @@ class Toaster extends BaseComponent {
 
   _prefersReducedMotion(): boolean {
     return typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  }
+
+  _settlePromise<Value>(id: string, theme: string, state: PromiseState<Value>, value: Value): void {
+    if (!this._element) {
+      return
+    }
+
+    this.update(id, { theme, timeout: this._config.timeout, ...this._promiseState(state, value) })
   }
 
   _promiseState<Value>(state: PromiseState<Value>, value?: Value): ToastOptions {
