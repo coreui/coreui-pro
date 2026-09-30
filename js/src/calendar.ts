@@ -86,6 +86,7 @@ const CLASS_NAME_CALENDAR_CELL_INNER = 'calendar-cell-inner'
 const CLASS_NAME_CALENDAR_ROW = 'calendar-row'
 const CLASS_NAME_CALENDARS = 'calendars'
 const CLASS_NAME_SHOW_WEEK_NUMBERS = 'show-week-numbers'
+const CLASS_NAME_VISUALLY_HIDDEN = 'visually-hidden'
 
 const SELECTOR_BTN_DOUBLE_NEXT = '.btn-double-next'
 const SELECTOR_BTN_DOUBLE_PREV = '.btn-double-prev'
@@ -705,7 +706,7 @@ class Calendar extends BaseComponent {
 
     Manipulator.setDataAttribute(calendarPanelEl, 'calendar-index', order)
 
-    calendarPanelEl.innerHTML = `<div class="calendar-nav"><div class="calendar-nav-prev"></div><div class="calendar-nav-date" aria-live="polite"></div><div class="calendar-nav-next"></div></div><table role="grid"></table><span id="${getUID('calendar-description')}" hidden></span>`
+    calendarPanelEl.innerHTML = `<div class="calendar-nav"><div class="calendar-nav-prev"></div><div class="calendar-nav-date" aria-live="polite" aria-atomic="true"></div><div class="calendar-nav-next"></div></div><table role="grid"></table><span id="${getUID('calendar-description')}" hidden></span>`
     this._renderCalendarPanel(calendarPanelEl, order)
 
     return calendarPanelEl
@@ -715,19 +716,17 @@ class Calendar extends BaseComponent {
     const calendarDate = getCalendarDate(this._calendarDate, order, this._view)
     const days = this._view === 'days'
     const years = this._view === 'years'
-    const [navigation, calendarTable, description] = panel.children
+    const [navigation, calendarTable] = panel.children
     const [prev, region, next] = navigation.children
     const monthLabel = days ? this._formatDate(calendarDate, { month: 'long' }) : ''
     const yearLabel = years ? formatYearsRange(calendarDate.getFullYear(), this._config.locale) : this._formatDate(calendarDate, { year: 'numeric' })
+    const gridLabel = this._gridLabel(calendarDate)
+    const turned = calendarTable.getAttribute('aria-label') !== gridLabel
 
     prev.innerHTML = `${this._navButton('btn-double-prev', 'navIconDoublePrev', years ? this._config.ariaNavPrevYearsLabel : this._config.ariaNavPrevYearLabel)} ${days ? this._navButton('btn-prev', 'navIconPrev', this._config.ariaNavPrevMonthLabel) : ''}`
 
-    if (region.textContent !== `${monthLabel} ${yearLabel}`) {
-      region.innerHTML = `${days ? `<button type="button" class="calendar-nav-btn btn-sm btn-month">${monthLabel}</button>` : ''} <button type="button" class="calendar-nav-btn btn-year">${yearLabel}</button>`
-    }
-
     next.innerHTML = `${days ? this._navButton('btn-next', 'navIconNext', this._config.ariaNavNextMonthLabel) : ''} ${this._navButton('btn-double-next', 'navIconDoubleNext', years ? this._config.ariaNavNextYearsLabel : this._config.ariaNavNextYearLabel)}`
-    calendarTable.setAttribute('aria-label', this._gridLabel(calendarDate))
+    calendarTable.setAttribute('aria-label', gridLabel)
 
     if (this._picksRange()) {
       calendarTable.setAttribute('aria-multiselectable', 'true')
@@ -736,17 +735,34 @@ class Calendar extends BaseComponent {
     }
 
     calendarTable.innerHTML = days ? this._daysHtml(calendarDate) : this._periodsHtml(calendarDate)
-    description.textContent = this._config.ariaNothingToPickLabel
+
+    if (turned) {
+      region.innerHTML = `${days ? `<button type="button" class="calendar-nav-btn btn-sm btn-month">${monthLabel}</button>` : ''} <button type="button" class="calendar-nav-btn btn-year">${yearLabel}</button>`
+    }
+
     this._describeGrid(panel)
   }
 
   _describeGrid(panel: Element): void {
-    const [, grid, description] = panel.children
+    const [navigation, grid, description] = panel.children
+    const region = navigation.children[1]
+    const label = this._config.ariaNothingToPickLabel
+    const note = SelectorEngine.findOne(`.${CLASS_NAME_VISUALLY_HIDDEN}`, region)
 
-    if (this._config.ariaNothingToPickLabel && !SelectorEngine.findOne('[data-coreui-selectable]', grid)) {
-      grid.setAttribute('aria-describedby', description.id)
-    } else {
+    description.textContent = label
+
+    if (!label || SelectorEngine.findOne('[data-coreui-selectable]', grid)) {
       grid.removeAttribute('aria-describedby')
+      note?.remove()
+      return
+    }
+
+    grid.setAttribute('aria-describedby', description.id)
+
+    if (!note) {
+      region.insertAdjacentHTML('beforeend', `<span class="${CLASS_NAME_VISUALLY_HIDDEN}">${escapeHtml(label)}</span>`)
+    } else if (note.textContent !== label) {
+      note.textContent = label
     }
   }
 
