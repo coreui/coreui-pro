@@ -51,6 +51,7 @@ class ComboboxBase extends BaseComponent {
   protected declare _optionsElement: any
   protected declare _listBox: ListBox | null
   protected declare _listBoxElement: any
+  protected declare _listBoxChangeHandler: (() => void) | null
   protected declare _menu: any
   protected declare _selected: any
   protected declare _options: any
@@ -359,6 +360,7 @@ class ComboboxBase extends BaseComponent {
   _afterOptionsRendered(): void {}
 
   _disposeListBox(): void {
+    this._listBoxElement?.removeEventListener(EVENT_LIST_BOX_CHANGE, this._listBoxChangeHandler)
     this._listBox?.dispose()
     this._listBox = null
   }
@@ -381,11 +383,13 @@ class ComboboxBase extends BaseComponent {
 
     // `change` is a native event name, so EventHandler registers the listener
     // under the bare type while the list dispatches the namespaced one.
-    this._listBoxElement.addEventListener(EVENT_LIST_BOX_CHANGE, () => {
+    this._listBoxChangeHandler = () => {
       if (!this._syncing) {
         this._onSelectionChange()
       }
-    })
+    }
+
+    this._listBoxElement.addEventListener(EVENT_LIST_BOX_CHANGE, this._listBoxChangeHandler)
 
     EventHandler.on(this._listBoxElement, EVENT_LIST_BOX_SELECTION_LIMIT, () => {
       if (!this._syncing) {
