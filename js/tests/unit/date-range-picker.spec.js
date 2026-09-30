@@ -1,7 +1,9 @@
 /* eslint-env jasmine */
 
+import Calendar from '../../src/calendar.js'
 import DateRangePicker from '../../src/date-range-picker.js'
 import EventHandler from '../../src/dom/event-handler.js'
+import TimePicker from '../../src/time-picker.js'
 import {
   getFixture, clearFixture, createEvent, jQueryMock
 } from '../helpers/fixture.js'
@@ -467,6 +469,33 @@ describe('DateRangePicker', () => {
       expect(dateRangePicker._startDate).toEqual(new Date(2023, 0, 1))
     })
 
+    it('should keep the calendar configuration when it reverts the dates', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const dateRangePicker = new DateRangePicker(div, {
+        calendarDate: new Date(2026, 7, 1),
+        endDate: new Date(2026, 7, 20),
+        locale: 'pl-PL',
+        startDate: new Date(2026, 7, 10)
+      })
+
+      dateRangePicker.show()
+      const { calendars, locale, range } = dateRangePicker._calendar._config
+      const panels = div.querySelectorAll('.calendar').length
+      dateRangePicker._changeStartDate(new Date(2026, 7, 5))
+      dateRangePicker.cancel()
+
+      const calendar = dateRangePicker._calendar
+      expect(calendar._config.calendars).toBe(calendars)
+      expect(calendar._config.locale).toBe(locale)
+      expect(calendar._config.range).toBe(range)
+      expect(locale).toBe('pl-PL')
+      expect(range).toBe(true)
+      expect(calendar._startDate).toEqual(new Date(2026, 7, 10))
+      expect(calendar._endDate).toEqual(new Date(2026, 7, 20))
+      expect(div.querySelectorAll('.calendar').length).toBe(panels)
+    })
+
     it('should not call calendar.update when no initial dates', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
@@ -902,6 +931,102 @@ describe('DateRangePicker', () => {
       dateRangePicker.update({ selectEndDate: true })
 
       expect(dateRangePicker._selectEndDate).toBe(true)
+    })
+
+    it('should dispose the calendar and time pickers it replaces', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const dateRangePicker = new DateRangePicker(div, { timepicker: true })
+      const calendar = dateRangePicker._calendar
+      const timePickers = [...dateRangePicker._ownTimePickers]
+
+      dateRangePicker.update({ timepicker: true })
+
+      expect(Calendar.getInstance(calendar._element)).toBeNull()
+      expect(timePickers.length).toBe(2)
+      expect(timePickers.map(timePicker => TimePicker.getInstance(timePicker._element))).toEqual([null, null])
+      expect(dateRangePicker._ownTimePickers.length).toBe(2)
+    })
+
+    it('should remove its old dropdown from a container', () => {
+      const containerEl = document.createElement('div')
+      document.body.append(containerEl)
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const dateRangePicker = new DateRangePicker(div, { container: containerEl })
+
+      dateRangePicker.update({ container: containerEl })
+
+      expect(containerEl.querySelectorAll('.date-picker-dropdown').length).toBe(1)
+      expect(dateRangePicker._menu.parentElement).toBe(containerEl)
+
+      dateRangePicker.dispose()
+      containerEl.remove()
+    })
+
+    it('should drop host classes the new configuration no longer asks for', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const dateRangePicker = new DateRangePicker(div, { disabled: true, size: 'lg' })
+
+      dateRangePicker.update({ disabled: false, size: 'sm' })
+
+      expect(div.classList.contains('disabled')).toBe(false)
+      expect(div.classList.contains('date-picker-lg')).toBe(false)
+      expect(div.classList.contains('date-picker-sm')).toBe(true)
+    })
+
+    it('should let focus into a container dropdown it rebuilt', () => {
+      const containerEl = document.createElement('div')
+      document.body.append(containerEl)
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const dateRangePicker = new DateRangePicker(div, { container: containerEl })
+
+      dateRangePicker.show()
+      dateRangePicker.update({ container: containerEl })
+      const cell = dateRangePicker._menu.querySelector('.calendar-cell[tabindex="0"]')
+      cell.focus()
+
+      expect(document.activeElement).toBe(cell)
+
+      dateRangePicker.dispose()
+      containerEl.remove()
+    })
+
+    it('should leave no data-coreui-toggle behind when disposed after an update', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const dateRangePicker = new DateRangePicker(div)
+
+      dateRangePicker.update({})
+      dateRangePicker.dispose()
+
+      expect(div.hasAttribute('data-coreui-toggle')).toBe(false)
+    })
+
+    it('should keep an open picker open, also in a container', () => {
+      const containerEl = document.createElement('div')
+      document.body.append(containerEl)
+      fixtureEl.innerHTML = '<div></div><div></div>'
+      const [inline, contained] = fixtureEl.querySelectorAll('div')
+      const inlinePicker = new DateRangePicker(inline)
+      const containedPicker = new DateRangePicker(contained, { container: containerEl })
+      const showSpy = jasmine.createSpy('show')
+      contained.addEventListener('show.coreui.date-range-picker', showSpy)
+
+      inlinePicker.show()
+      containedPicker.show()
+      inlinePicker.update({})
+      containedPicker.update({ container: containerEl })
+
+      expect(inline.classList.contains('show')).toBe(true)
+      expect(contained.classList.contains('show')).toBe(true)
+      expect(containedPicker._menu.classList.contains('show')).toBe(true)
+      expect(showSpy).toHaveBeenCalledTimes(1)
+
+      containedPicker.dispose()
+      containerEl.remove()
     })
   })
 

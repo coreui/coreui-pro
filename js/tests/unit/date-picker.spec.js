@@ -538,6 +538,21 @@ describe('DatePicker', () => {
 
       expect(div.classList.contains('date-picker-lg')).toBe(true)
     })
+
+    it('should fire dateChange once per pick after an update', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const datePicker = new DatePicker(div, { calendarDate: new Date(2026, 7, 1) })
+      const listener = jasmine.createSpy('dateChange')
+      div.addEventListener('dateChange.coreui.date-picker', listener)
+
+      datePicker.update({ calendarDate: new Date(2026, 7, 1) })
+      datePicker.update({ calendarDate: new Date(2026, 7, 1) })
+      datePicker.show()
+      div.querySelector(`[data-coreui-date="${new Date(2026, 7, 12)}"]`).click()
+
+      expect(listener).toHaveBeenCalledTimes(1)
+    })
   })
 
   describe('clear', () => {

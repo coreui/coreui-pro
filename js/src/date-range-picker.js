@@ -284,17 +284,8 @@ class DateRangePicker extends BaseComponent {
     this._initialEndDate = this._endDate ? new Date(this._endDate) : null
 
     EventHandler.trigger(this._element, EVENT_SHOW)
-    this._element.classList.add(CLASS_NAME_SHOW)
-    this._element.setAttribute('aria-expanded', true)
-
-    if (this._config.container) {
-      this._menu.classList.add(CLASS_NAME_SHOW)
-    }
-
-    this._focustrap.activate()
+    this._open()
     EventHandler.trigger(this._element, EVENT_SHOWN)
-
-    this._createPopper()
   }
 
   hide() {
@@ -320,16 +311,89 @@ class DateRangePicker extends BaseComponent {
       return
     }
 
+    this._teardown()
+
+    super.dispose()
+  }
+
+  cancel() {
+    this.hide()
+
+    if (this._initialStartDate) {
+      this._changeStartDate(this._initialStartDate)
+    }
+
+    if (this._config.range && this._initialEndDate) {
+      this._changeEndDate(this._initialEndDate)
+    }
+
+    if (this._initialStartDate || this._initialEndDate) {
+      this._calendar.update(this._getCalendarConfig())
+    }
+  }
+
+  clear() {
+    this._changeStartDate(null)
+    this._changeEndDate(null)
+    this._calendar.update(this._getCalendarConfig())
+  }
+
+  reset() {
+    this._changeStartDate(this._config.startDate)
+    this._changeEndDate(this._config.endDate)
+    this._calendar.update(this._getCalendarConfig())
+  }
+
+  update(config) {
+    const shown = this._isShown()
+
+    this._teardown()
+
+    this._config = this._getConfig(config)
+    this._calendarDate = this._config.calendarDate
+    this._startDate = this._config.date || this._config.startDate
+    this._endDate = this._config.endDate
+    this._selectEndDate = this._config.selectEndDate
+
+    this._createDateRangePicker()
+    this._createDateRangePickerCalendars()
+    this._addEventListeners()
+    this._addCalendarEventListeners()
+
+    this._focustrap = this._initializeFocusTrap()
+
+    if (shown && !this._config.disabled) {
+      this._open()
+    }
+  }
+
+  // Private
+  _open() {
+    this._element.classList.add(CLASS_NAME_SHOW)
+    this._element.setAttribute('aria-expanded', true)
+
+    if (this._config.container) {
+      this._menu.classList.add(CLASS_NAME_SHOW)
+    }
+
+    this._focustrap.activate()
+    this._createPopper()
+  }
+
+  _teardown() {
     if (this._popper) {
       this._popper.destroy()
+      this._popper = null
     }
 
     if (this._startInputTimeout) {
       clearTimeout(this._startInputTimeout)
+      this._startInputTimeout = null
     }
 
     if (this._endInputTimeout) {
       clearTimeout(this._endInputTimeout)
+      this._endInputTimeout = null
     }
 
     this._focustrap.deactivate()
@@ -360,6 +424,13 @@ class DateRangePicker extends BaseComponent {
     })
 
     this._addedClassNames = []
+    this._endPreviewInput = null
+    this._indicatorElement = null
+    this._ownTimePickers = []
+    this._startPreviewInput = null
+    this._timePickerEnd = null
+    this._timePickerStart = null
+    this._timepickers = null
 
     this._element.removeAttribute('aria-expanded')
 
@@ -368,53 +439,8 @@ class DateRangePicker extends BaseComponent {
     }
 
     this._removeGlobalEventListeners(form)
-
-    super.dispose()
   }
 
-  cancel() {
-    this.hide()
-
-    if (this._initialStartDate) {
-      this._changeStartDate(this._initialStartDate)
-    }
-
-    if (this._config.range && this._initialEndDate) {
-      this._changeEndDate(this._initialEndDate)
-    }
-
-    if (this._initialStartDate || this._initialEndDate) {
-      this._calendar.update(this._getCalendarConfig)
-    }
-  }
-
-  clear() {
-    this._changeStartDate(null)
-    this._changeEndDate(null)
-    this._calendar.update(this._getCalendarConfig())
-  }
-
-  reset() {
-    this._changeStartDate(this._config.startDate)
-    this._changeEndDate(this._config.endDate)
-    this._calendar.update(this._getCalendarConfig())
-  }
-
-  update(config) {
-    this._config = this._getConfig(config)
-    this._calendarDate = this._config.calendarDate
-    this._startDate = this._config.date || this._config.startDate
-    this._endDate = this._config.endDate
-    this._selectEndDate = this._config.selectEndDate
-
-    this._element.innerHTML = ''
-    this._createDateRangePicker()
-    this._createDateRangePickerCalendars()
-    this._addEventListeners()
-    this._addCalendarEventListeners()
-  }
-
-  // Private
   _initializeFocusTrap() {
     return new FocusTrap({
       additionalElement: this._config.container ? this._menu : null,
