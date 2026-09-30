@@ -2,6 +2,7 @@
 @use "sass:string";
 @use "../functions/defaults" as *;
 @use "../mixins/border-radius" as *;
+@use "../mixins/button" as *;
 @use "../mixins/form-validation" as *;
 @use "../mixins/tokens" as *;
 @use "../config" as *;
@@ -122,6 +123,16 @@ $input-group-tokens: defaults(
       padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
       font-size: var(--#{$prefix}control-font-size);
       @include border-radius(var(--#{$prefix}control-border-radius));
+    }
+
+    .input-group-#{$size} > :is(#{$btn-variant-selectors}) {
+      --#{$prefix}btn-gap: var(--#{$prefix}btn-input-#{$size}-gap);
+      --#{$prefix}btn-min-height: var(--#{$prefix}btn-input-#{$size}-min-height);
+      --#{$prefix}btn-padding-y: var(--#{$prefix}btn-input-#{$size}-padding-y);
+      --#{$prefix}btn-padding-x: var(--#{$prefix}btn-input-#{$size}-padding-x);
+      --#{$prefix}btn-font-size: var(--#{$prefix}btn-input-#{$size}-font-size);
+      --#{$prefix}btn-line-height: var(--#{$prefix}btn-input-#{$size}-line-height);
+      --#{$prefix}btn-border-radius: var(--#{$prefix}btn-input-#{$size}-border-radius);
     }
   }
 
