@@ -132,12 +132,12 @@ class Autocomplete extends ComboboxBase {
   protected declare _inputElement: any
   protected declare _inputHintElement: any
   protected declare _addedClassNames: string[]
-  protected declare _addedStateClassNames: Set<string>
   protected declare _claimedText: string
   protected declare _previousTabIndex: string | null
   protected declare _form: HTMLFormElement | null
   protected declare _hostStateClassNames: string[]
   protected declare _initialValue: any
+  protected declare _ownedStateClassNames: Set<string>
   protected declare _reportSeed: boolean
   protected declare _resetHandler: (event: Event) => void
   protected declare _seenOptionValues: Set<string>
@@ -152,8 +152,8 @@ class Autocomplete extends ComboboxBase {
     this._inputHintElement = null
     this._togglerElement = null
     this._addedClassNames = []
-    this._addedStateClassNames = new Set()
     this._hostStateClassNames = [CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID].filter(className => this._element.classList.contains(className))
+    this._ownedStateClassNames = new Set(this._hostStateClassNames)
     this._previousTabIndex = null
     this._optionsElement = null
 
@@ -244,8 +244,13 @@ class Autocomplete extends ComboboxBase {
       }
     }
 
-    this._element.classList.remove(CLASS_NAME_SHOW, ...this._addedClassNames, ...this._addedStateClassNames)
-    this._element.classList.add(...this._hostStateClassNames)
+    const claimed = this._markupClaimApplies()
+
+    this._element.classList.remove(CLASS_NAME_SHOW, ...this._addedClassNames, ...this._ownedStateClassNames)
+
+    if (claimed) {
+      this._element.classList.add(...this._hostStateClassNames)
+    }
 
     if (this._previousTabIndex === null) {
       this._element.removeAttribute('tabindex')
@@ -433,11 +438,9 @@ class Autocomplete extends ComboboxBase {
         return
       }
 
-      if (event.key === TAB_KEY && this._config.showHints && this._inputElement.value.length > 0) {
-        if (this._inputHintElement.value) {
-          event.preventDefault()
-          event.stopPropagation()
-        }
+      if (event.key === TAB_KEY && this._config.showHints && this._inputHintElement.value) {
+        event.preventDefault()
+        event.stopPropagation()
 
         const option = this._findHintOption(this._inputElement.value)
 
@@ -770,17 +773,19 @@ class Autocomplete extends ComboboxBase {
     return this._flattenOptions().find(option => !option.disabled && option.label.toLowerCase().startsWith(text.toLowerCase()))
   }
 
+  _markupClaimApplies(): boolean {
+    return this._inputElement.value === this._claimedText
+  }
+
   _updateValidationState(): void {
-    const text = this._inputElement.value
-    const hasInitialValue = this._initialValue !== null && this._initialValue !== undefined && this._initialValue !== ''
-    const claimed = text === this._claimedText || (hasInitialValue && text === this._findOptionByValue(this._initialValue)?.label)
+    const claimed = this._markupClaimApplies()
     const isInvalid = (claimed && this._hostStateClassNames.includes(CLASS_NAME_IS_INVALID)) || this._config.invalid
     const isValid = ((claimed && this._hostStateClassNames.includes(CLASS_NAME_IS_VALID)) || this._config.valid) && !isInvalid
 
     this._toggleStateClassName(CLASS_NAME_IS_INVALID, isInvalid)
     this._toggleStateClassName(CLASS_NAME_IS_VALID, isValid)
 
-    if (isInvalid) {
+    if (this._element.classList.contains(CLASS_NAME_IS_INVALID)) {
       this._inputElement.setAttribute('aria-invalid', 'true')
     } else {
       this._inputElement.removeAttribute('aria-invalid')
@@ -791,13 +796,13 @@ class Autocomplete extends ComboboxBase {
     if (on) {
       if (!this._element.classList.contains(className)) {
         this._element.classList.add(className)
-        this._addedStateClassNames.add(className)
+        this._ownedStateClassNames.add(className)
       }
 
       return
     }
 
-    if (this._addedStateClassNames.has(className) || this._hostStateClassNames.includes(className)) {
+    if (this._ownedStateClassNames.delete(className)) {
       this._element.classList.remove(className)
     }
   }
@@ -868,10 +873,17 @@ class Autocomplete extends ComboboxBase {
     }
 
     if (seed && !this._selected.some((option: any) => option.value === seed.value)) {
+      const claimsSeed = this._config.value === this._initialValue && this._inputElement.value === this._claimedText
+
       this._applySelection(seed)
+
+      if (claimsSeed && this._selected.includes(seed)) {
+        this._claimedText = seed.label
+      }
 
       if (this._reportSeed && this._selected.includes(seed)) {
         this._reportSeed = false
+        this._updateValidationState()
         this._triggerChangeEvent(seed)
       }
     }

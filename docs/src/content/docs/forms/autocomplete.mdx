@@ -183,7 +183,7 @@ Apply validation styling to indicate input validity.
 
 <Example pro code={`<div data-coreui-autocomplete data-coreui-options="Angular, Bootstrap, React.js, Vue.js" data-coreui-placeholder="Invalid autocomplete..." data-coreui-invalid="true"></div>`} />
 
-An `is-invalid` or `is-valid` class written in the markup, for example by a server that has already checked the value, stays while the field holds the text it started with or the option of its initial `value`. Once the text changes, only the `invalid` and `valid` options apply; a class the page adds later stays the page's to remove. An invalid autocomplete also sets `aria-invalid` on its input.
+An `is-invalid` or `is-valid` class written in the markup, for example by a server that has already checked the value, stays while the field holds the value it started with, including an initial `value` that arrives with later options. Once the text changes, only the `invalid` and `valid` options apply; a class the page adds later stays the page's to remove. The input carries `aria-invalid` whenever the autocomplete has `is-invalid`.
 
 ## Disabled
 

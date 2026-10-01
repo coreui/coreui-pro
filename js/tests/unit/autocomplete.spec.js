@@ -371,6 +371,117 @@ describe('Autocomplete', () => {
       expect(oldValues.every(oldValue => oldValue.split(' ').includes('is-valid'))).toBeTrue()
     })
 
+    it('should leave a validation class the page puts back after the autocomplete took its own off', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        invalid: true,
+        options: [{ label: 'Option 1', value: '1' }, { label: 'Option 2', value: '2' }]
+      })
+
+      autocomplete.setConfig({ invalid: false })
+      autocompleteEl.classList.add('is-invalid')
+      autocomplete._onOptionSelected('2')
+
+      expect(autocompleteEl.classList.contains('is-invalid')).toBeTrue()
+      expect(autocomplete._inputElement.getAttribute('aria-invalid')).toBe('true')
+
+      autocomplete.dispose()
+
+      expect(autocompleteEl.classList.contains('is-invalid')).toBeTrue()
+    })
+
+    it('should not hold a markup verdict for an emptied field after a late value', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete is-valid"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        options: [],
+        value: '3'
+      })
+
+      autocomplete.setConfig({ options: [{ label: 'Option 3', value: '3' }] })
+      autocomplete.clear()
+
+      expect(autocompleteEl.classList.contains('is-valid')).toBeFalse()
+    })
+
+    it('should not give back a markup verdict on dispose once the value changed', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete is-invalid"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        options: [{ label: 'Option 1', value: '1' }, { label: 'Option 2', value: '2' }],
+        value: '1'
+      })
+
+      autocomplete._onOptionSelected('2')
+      autocomplete.dispose()
+
+      expect(autocompleteEl.classList.contains('is-invalid')).toBeFalse()
+    })
+
+    it('should follow the markup verdict through the cleaner and a form reset', async () => {
+      fixtureEl.innerHTML = '<form><div class="autocomplete is-valid"></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        cleaner: true,
+        options: [{ label: 'Option 1', value: '1' }],
+        value: '1'
+      })
+
+      autocomplete.clear()
+
+      expect(autocompleteEl.classList.contains('is-valid')).toBeFalse()
+
+      form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(autocompleteEl.classList.contains('is-valid')).toBeTrue()
+    })
+
+    it('should bring a markup verdict back when Escape empties a field that started empty', async () => {
+      fixtureEl.innerHTML = '<div class="autocomplete is-valid"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        allowOnlyDefinedOptions: true,
+        options: [{ label: 'Option 1', value: '1' }]
+      })
+
+      autocomplete._inputElement.focus()
+      await userEvent.keyboard('x')
+
+      expect(autocompleteEl.classList.contains('is-valid')).toBeFalse()
+
+      await userEvent.keyboard('{Escape}')
+
+      expect(autocomplete._inputElement.value).toBe('')
+      expect(autocompleteEl.classList.contains('is-valid')).toBeTrue()
+    })
+
+    it('should settle its validation state before reporting a late seed', async () => {
+      fixtureEl.innerHTML = '<form><div class="autocomplete is-valid"></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const option = { label: 'Option 3', value: '3' }
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        options: [option],
+        value: '3'
+      })
+      const seen = []
+
+      autocomplete.setConfig({ options: [] })
+      form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+      autocompleteEl.addEventListener('change.coreui.autocomplete', () => seen.push(autocompleteEl.classList.contains('is-valid')))
+      autocomplete.setConfig({ options: [option] })
+
+      expect(seen).toEqual([true])
+    })
+
     it('should set optionsMaxHeight on the options container', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
@@ -3425,6 +3536,36 @@ describe('Autocomplete', () => {
       autocomplete._inputElement.dispatchEvent(createEvent('input', { bubbles: true }))
 
       expect(autocomplete._inputHintElement.value).toBe('Option 2')
+    })
+
+    it('should take the first enabled option on Tab', async () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        showHints: true,
+        options: [{ label: 'Option 1', value: '1', disabled: true }, { label: 'Option 2', value: '2' }]
+      })
+
+      autocomplete._inputElement.focus()
+      await userEvent.keyboard('Opt{Tab}')
+
+      expect(autocomplete._selected.map(option => option.value)).toEqual(['2'])
+      expect(autocomplete._inputElement.value).toBe('Option 2')
+    })
+
+    it('should leave Tab alone once the hint is dismissed', async () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        showHints: true,
+        options: [{ label: 'Apple', value: 'apple' }, { label: 'Banana', value: 'banana' }]
+      })
+
+      autocomplete._inputElement.focus()
+      await userEvent.keyboard('Ap{Escape}{Tab}')
+
+      expect(autocomplete._inputElement.value).toBe('Ap')
+      expect(autocomplete._selected).toEqual([])
     })
   })
 
