@@ -370,7 +370,7 @@ Note that for security reasons the `sanitize`, `sanitizeFn`, and `allowList` opt
 | `ariaNavPrevYearsLabel` | string | `'Previous 12 years'` | The accessible label of the button that turns the years view to the previous page of years. |
 | `ariaNothingToPickLabel` | string, null | `'Nothing on this page can be picked'` | The description of a grid in which nothing can be picked, such as a page wholly outside `minDate` / `maxDate` or one that `disabledDates` covers, also announced when the calendar turns to such a page. An empty string or `null` leaves the grid without a description. |
 | `calendarDate` | date, number, string, null | `null` | Default date of the component. |
-| `calendars` | number | `2` | The number of calendars that render on desktop devices. |
+| `calendars` | number | `1` | The number of calendars that render on desktop devices. |
 | `dayFormat` | `'numeric'`, `'2-digit'` | `'numeric'` | Sets the format for days. Accepts a built-in format (`'numeric'` or `'2-digit'`) |
 | `disabledDates` | array, function, null | `null` | Specify the list of dates that cannot be selected. |
 | `endDate` | date, number, string, null | `null` | Initial selected to date (range). |
@@ -391,6 +391,7 @@ Note that for security reasons the `sanitize`, `sanitizeFn`, and `allowList` opt
 | `sanitize` | boolean | `true` | Enable or disable the sanitization. If activated `navNextDoubleIcon`, `navNextIcon`, `navPrevDoubleIcon`, `navPrevIcon`, `renderDayCell`, `renderMonthCell`, `renderQuarterCell`, and `renderYearCell` options will be sanitized. |
 | `sanitizeFn` | null, function | `null` | Here you can supply your own sanitize function. This can be useful if you prefer to use a dedicated library to perform sanitization. |
 | `selectAdjacentDays` | boolean | `false` | Set whether days in adjacent months shown before or after the current month are selectable. This only applies if the `showAdjacentDays` option is set to true. A picked day of an adjacent month keeps the month on screen and shows as selected with an outline on a subtle background instead of the solid fill. |
+| `selectEndDate` | boolean | `false` | With `range`, makes the next pick set the end date instead of the start date. Picking the start date turns it on and picking the end date turns it off; each change fires `selectEndChange`. |
 | `selectionType` | `'day'`, `'week'`, `'month'`, `'quarter'`, `'year'` | `day` | Specify the type of date selection as day, week, month, quarter, or year. |
 | `showAdjacentDays` | boolean | `true` | Set whether to display dates in adjacent months (non-selectable) at the start and end of the current month. |
 | `showWeekNumber` | boolean | `false` | Set whether to display week numbers in the calendar. |
