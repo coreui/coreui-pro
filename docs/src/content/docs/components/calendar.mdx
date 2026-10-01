@@ -265,7 +265,7 @@ Each render function receives two parameters:
    - For `renderDayCell` only:
      - `isInCurrentMonth` - Whether the day belongs to the current month
      - `isToday` - Whether the day is today, in its own month (the copy of today among an adjacent month's days is not)
-     - In day selection, `isInRange` is `false` for a day among an adjacent month's days, which the range is not drawn on
+     - In day selection, `isInRange` is `false` for a day among an adjacent month's days that only fills the grid, which the range is not drawn on; with `selectAdjacentDays` those days carry the range like the month's own
      - In day selection without `selectAdjacentDays`, a day among an adjacent month's days only fills the grid, so `isDisabled` is `true` and `isSelected` is `false` for it
      - In week selection, `isDisabled`, `isInRange` and `isSelected` describe the week row the day sits in, since the row is what the calendar picks and draws; `isInCurrentMonth` and `isToday` still describe the day
 

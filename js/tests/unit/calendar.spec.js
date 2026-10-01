@@ -4640,6 +4640,32 @@ describe('Calendar', () => {
       expect(selectedDays('#filler td')).toEqual([28, 29, 30, 31])
     })
 
+    it('should paint the range and its preview on the pickable days of adjacent months', () => {
+      fixtureEl.innerHTML = '<div id="pickable"></div><div id="filler"></div>'
+      const config = {
+        calendarDate: new Date(2026, 7, 1),
+        firstDayOfWeek: 1,
+        range: true,
+        selectEndDate: true,
+        startDate: new Date(2026, 7, 28)
+      }
+      const days = selector => [...fixtureEl.querySelectorAll(selector)].map(cell => new Date(cell.dataset.coreuiDate).getDate())
+
+      new Calendar(fixtureEl.querySelector('#pickable'), { ...config, endDate: new Date(2026, 8, 3), selectAdjacentDays: true }) // eslint-disable-line no-new
+      new Calendar(fixtureEl.querySelector('#filler'), { ...config, endDate: new Date(2026, 8, 3) }) // eslint-disable-line no-new
+
+      expect(days('#pickable td.range')).toEqual([28, 29, 30, 31, 1, 2, 3])
+      expect(days('#filler td.range')).toEqual([28, 29, 30, 31])
+
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { ...config, selectAdjacentDays: true }) // eslint-disable-line no-new
+      div.querySelector(`td.next[data-coreui-date="${new Date(2026, 8, 2).toDateString()}"]`)
+        .dispatchEvent(new MouseEvent('mouseover', { bubbles: true, relatedTarget: div }))
+
+      expect(days('td.range-hover')).toEqual([28, 29, 30, 31, 1, 2])
+    })
+
     it('should keep the preview of a range visual', () => {
       fixtureEl.innerHTML = '<div></div>'
 
