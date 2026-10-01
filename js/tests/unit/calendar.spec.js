@@ -434,6 +434,18 @@ describe('Calendar', () => {
       ])
     })
 
+    it.each(['month', 'quarter', 'year'])('should show only the year button in %s selection', selectionType => {
+      for (const locale of ['en-US', 'ja-JP']) {
+        fixtureEl.innerHTML = '<div></div>'
+        const div = fixtureEl.querySelector('div')
+        new Calendar(div, { calendarDate: new Date(2026, 7, 1), locale, selectionType }) // eslint-disable-line no-new
+
+        expect([...div.querySelectorAll('.calendar-nav-date .calendar-nav-btn')].map(button => button.className)).toEqual([
+          'calendar-nav-btn btn-year'
+        ])
+      }
+    })
+
     it('should mark each panel with its index', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
@@ -1398,12 +1410,16 @@ describe('Calendar', () => {
       fixtureEl.innerHTML = '<div dir="rtl"><div></div></div>'
       const div = fixtureEl.querySelector('div > div')
       new Calendar(div, { // eslint-disable-line no-new
+        navNextDoubleIcon: '<svg><circle id="double-next"></circle></svg>',
         navNextIcon: '<svg><circle id="next"></circle></svg>',
+        navPrevDoubleIcon: '<svg><circle id="double-prev"></circle></svg>',
         navPrevIcon: '<svg><circle id="prev"></circle></svg>'
       })
 
+      expect(navIcon(div, '.btn-double-prev').querySelector('circle').id).toEqual('double-next')
       expect(navIcon(div, '.btn-prev').querySelector('circle').id).toEqual('next')
       expect(navIcon(div, '.btn-next').querySelector('circle').id).toEqual('prev')
+      expect(navIcon(div, '.btn-double-next').querySelector('circle').id).toEqual('double-prev')
     })
 
     it('should accept a custom navigation icon and sanitize it', () => {

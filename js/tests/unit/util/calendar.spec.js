@@ -1,5 +1,5 @@
 
-import { onTestFinished } from 'vitest'
+import { onTestFinished, vi } from 'vitest'
 import { cdp } from 'vitest/browser'
 import {
   constrainDate,
@@ -356,7 +356,7 @@ describe('Calendar Utilities', () => {
 
   describe('isYearBeforeMonth', () => {
     it('should put the year first where the locale writes it first', () => {
-      for (const locale of ['ja-JP', 'zh-CN', 'ko-KR', 'hu-HU']) {
+      for (const locale of ['ja-JP', 'zh-CN', 'ko-KR', 'hu-HU', 'lt-LT']) {
         expect(isYearBeforeMonth(locale)).toBeTrue()
       }
     })
@@ -365,6 +365,19 @@ describe('Calendar Utilities', () => {
       for (const locale of ['en-US', 'pl-PL', 'de-DE', 'ar-EG', 'fa-IR']) {
         expect(isYearBeforeMonth(locale)).toBeFalse()
       }
+    })
+
+    it('should read the order in the Gregorian calendar the navigation labels use', () => {
+      expect(isYearBeforeMonth('en-US-u-ca-chinese')).toBeFalse()
+    })
+
+    it('should not build a formatter for a locale it has already read', () => {
+      isYearBeforeMonth('ko-KR')
+      const spy = vi.spyOn(Intl, 'DateTimeFormat')
+
+      expect(isYearBeforeMonth('ko-KR')).toBeTrue()
+      expect(spy).not.toHaveBeenCalled()
+      spy.mockRestore()
     })
   })
 
