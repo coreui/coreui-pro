@@ -439,10 +439,10 @@ class Autocomplete extends ComboboxBase {
           event.stopPropagation()
         }
 
-        const options = this._flattenOptions().filter(option => !option.disabled && option.label.toLowerCase().startsWith(this._inputElement.value.toLowerCase()))
+        const option = this._findHintOption(this._inputElement.value)
 
-        if (options.length > 0) {
-          this._selectOption(options[0])
+        if (option) {
+          this._selectOption(option)
         }
       }
 
@@ -454,18 +454,17 @@ class Autocomplete extends ComboboxBase {
     EventHandler.on(this._inputElement, EVENT_INPUT, () => {
       const { value } = this._inputElement
 
+      this._updateValidationState()
+
       if (this._selected.length > 0) {
         this.deselectAll()
         this._triggerChangeEvent(null)
       }
 
       this.search(value)
-      this._updateValidationState()
       if (this._config.showHints) {
-        const options = value ?
-          this._flattenOptions().filter(option => !option.disabled && option.label.toLowerCase().startsWith(value.toLowerCase())) :
-          []
-        this._inputHintElement.value = options.length > 0 ? `${value}${options[0].label.slice(value.length)}` : ''
+        const option = value ? this._findHintOption(value) : undefined
+        this._inputHintElement.value = option ? `${value}${option.label.slice(value.length)}` : ''
       }
 
       if (value && !this._isShown()) {
@@ -735,6 +734,7 @@ class Autocomplete extends ComboboxBase {
 
   _selectOption(option: any): void {
     this._applySelection(option)
+    this._updateValidationState()
     this._triggerChangeEvent(option)
 
     if (this._config.showHints) {
@@ -758,7 +758,6 @@ class Autocomplete extends ComboboxBase {
     this._syncOptionElementState(option.value, true)
     this._inputElement.value = option.label
     this._updateCleaner()
-    this._updateValidationState()
   }
 
   _deselectOption(value: any): void {
@@ -767,8 +766,14 @@ class Autocomplete extends ComboboxBase {
     this._syncOptionElementState(value, false)
   }
 
+  _findHintOption(text: string): any {
+    return this._flattenOptions().find(option => !option.disabled && option.label.toLowerCase().startsWith(text.toLowerCase()))
+  }
+
   _updateValidationState(): void {
-    const claimed = this._inputElement.value === this._claimedText
+    const text = this._inputElement.value
+    const hasInitialValue = this._initialValue !== null && this._initialValue !== undefined && this._initialValue !== ''
+    const claimed = text === this._claimedText || (hasInitialValue && text === this._findOptionByValue(this._initialValue)?.label)
     const isInvalid = (claimed && this._hostStateClassNames.includes(CLASS_NAME_IS_INVALID)) || this._config.invalid
     const isValid = ((claimed && this._hostStateClassNames.includes(CLASS_NAME_IS_VALID)) || this._config.valid) && !isInvalid
 
@@ -783,11 +788,18 @@ class Autocomplete extends ComboboxBase {
   }
 
   _toggleStateClassName(className: string, on: boolean): void {
-    if (on && !this._hostStateClassNames.includes(className)) {
-      this._addedStateClassNames.add(className)
+    if (on) {
+      if (!this._element.classList.contains(className)) {
+        this._element.classList.add(className)
+        this._addedStateClassNames.add(className)
+      }
+
+      return
     }
 
-    this._element.classList.toggle(className, on)
+    if (this._addedStateClassNames.has(className) || this._hostStateClassNames.includes(className)) {
+      this._element.classList.remove(className)
+    }
   }
 
   _updateCleaner(): void {
@@ -890,6 +902,10 @@ class Autocomplete extends ComboboxBase {
 
     if (typeof config.search === 'string') {
       config.search = config.search.split(/,\s*/).map(String)
+    }
+
+    if (config.searchNoResultsLabel === true) {
+      config.searchNoResultsLabel = 'No results found'
     }
 
     return config

@@ -246,7 +246,7 @@ class ComboboxBase extends BaseComponent {
       empty.classList.add(CLASS_NAME_EMPTY)
       empty.setAttribute('role', 'status')
       empty.setAttribute('hidden', '')
-      empty.textContent = this._config.searchNoResultsLabel === true ? 'No results found' : this._config.searchNoResultsLabel
+      empty.textContent = this._config.searchNoResultsLabel
       optionsDiv.append(empty)
     }
 

@@ -311,6 +311,66 @@ describe('Autocomplete', () => {
       expect(autocompleteEl.classList.contains('is-valid')).toBeTrue()
     })
 
+    it('should keep a validation class from the markup when the value arrives with later options', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete is-invalid"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        options: [],
+        value: '3'
+      })
+
+      autocomplete.setConfig({ options: [{ label: 'Option 3', value: '3' }] })
+
+      expect(autocomplete._inputElement.value).toBe('Option 3')
+      expect(autocompleteEl.classList.contains('is-invalid')).toBeTrue()
+    })
+
+    it('should leave a validation class the page adds after construction', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        options: [{ label: 'Option 1', value: '1' }]
+      })
+
+      autocompleteEl.classList.add('is-invalid')
+      autocomplete.setConfig({ options: [{ label: 'Option 1', value: '1' }, { label: 'Option 2', value: '2' }] })
+      autocomplete._onOptionSelected('2')
+
+      expect(autocompleteEl.classList.contains('is-invalid')).toBeTrue()
+    })
+
+    it('should settle its validation state before reporting a change', async () => {
+      fixtureEl.innerHTML = '<div class="autocomplete is-valid"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        options: [{ label: 'Option 1', value: '1' }],
+        value: '1'
+      })
+      const seen = []
+
+      autocompleteEl.addEventListener('change.coreui.autocomplete', () => seen.push(autocompleteEl.classList.contains('is-valid')))
+      autocomplete._inputElement.focus()
+      await userEvent.keyboard('{End}x')
+
+      expect(seen).toEqual([false])
+    })
+
+    it('should not take a validation class from the markup off while it is created', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete is-valid"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const observer = new MutationObserver(() => {})
+
+      observer.observe(autocompleteEl, { attributeFilter: ['class'], attributeOldValue: true })
+      new Autocomplete(autocompleteEl, { // eslint-disable-line no-new
+        options: [{ label: 'Option 1', value: '1' }],
+        value: '1'
+      })
+      const oldValues = observer.takeRecords().map(record => record.oldValue)
+      observer.disconnect()
+
+      expect(oldValues.every(oldValue => oldValue.split(' ').includes('is-valid'))).toBeTrue()
+    })
+
     it('should set optionsMaxHeight on the options container', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
