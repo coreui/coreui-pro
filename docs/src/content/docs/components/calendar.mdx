@@ -187,6 +187,8 @@ In this example:
 
 The CoreUI Bootstrap Calendar allows users to display dates in non-English locales, making it suitable for international applications.
 
+The navigation writes the month and the year in the order the locale does: the year first where the locale writes it first, as in Japanese, Chinese, Korean, Hungarian or Lithuanian, the month first as in English or Polish.
+
 ### Auto
 
 By default, the Calendar component uses the browser's default locale. However, you can easily configure it to use a different locale supported by the JavaScript Internationalization API. This feature helps create inclusive and accessible applications for a diverse audience.
@@ -377,12 +379,16 @@ Note that for security reasons the `sanitize`, `sanitizeFn`, and `allowList` opt
 | `maxDate` | date, number, string, null | `null` | Max selectable date. |
 | `minDate` | date, number, string, null | `null` | Min selectable date. |
 | `monthFormat` | `'long'`, `'narrow'`, `'short'`, `'numeric'`, `'2-digit'` | `'short'` | Sets the format for month names. Accepts built-in formats (`'long'`, `'narrow'`, `'short'`, `'numeric'`, `'2-digit'`). |
+| `navNextDoubleIcon` | string | double chevron SVG | Inline SVG of the button that turns the calendar forward by a year, or by a page of years in the years view (sanitized). In right-to-left it shows on the backward button. |
+| `navNextIcon` | string | chevron SVG | Inline SVG of the button that turns the calendar forward by a month (sanitized). In right-to-left it shows on the backward button. |
+| `navPrevDoubleIcon` | string | double chevron SVG | Inline SVG of the button that turns the calendar back by a year, or by a page of years in the years view (sanitized). In right-to-left it shows on the forward button. |
+| `navPrevIcon` | string | chevron SVG | Inline SVG of the button that turns the calendar back by a month (sanitized). In right-to-left it shows on the forward button. |
 | `range` | boolean | `false` | Allow range selection |
 | `renderDayCell` | function, null | `null` | Custom function to render day cells. Receives `date` and `meta` object (with `isDisabled`, `isInCurrentMonth`, `isInRange`, `isSelected`, `isToday`, `label`) as parameters and should return HTML string. |
 | `renderMonthCell` | function, null | `null` | Custom function to render month cells. Receives `date` and `meta` object (with `isDisabled`, `isInRange`, `isSelected`, `label`) as parameters and should return HTML string. |
 | `renderQuarterCell` | function, null | `null` | Custom function to render quarter cells. Receives `date` and `meta` object (with `isDisabled`, `isInRange`, `isSelected`, `label`) as parameters and should return HTML string. |
 | `renderYearCell` | function, null | `null` | Custom function to render year cells. Receives `date` and `meta` object (with `isDisabled`, `isInRange`, `isSelected`, `label`) as parameters and should return HTML string. |
-| `sanitize` | boolean | `true` | Enable or disable the sanitization. If activated `renderDayCell`, `renderMonthCell`, `renderQuarterCell`, and `renderYearCell` options will be sanitized. |
+| `sanitize` | boolean | `true` | Enable or disable the sanitization. If activated `navNextDoubleIcon`, `navNextIcon`, `navPrevDoubleIcon`, `navPrevIcon`, `renderDayCell`, `renderMonthCell`, `renderQuarterCell`, and `renderYearCell` options will be sanitized. |
 | `sanitizeFn` | null, function | `null` | Here you can supply your own sanitize function. This can be useful if you prefer to use a dedicated library to perform sanitization. |
 | `selectAdjacentDays` | boolean | `false` | Set whether days in adjacent months shown before or after the current month are selectable. This only applies if the `showAdjacentDays` option is set to true. A picked day of an adjacent month keeps the month on screen and shows as selected with an outline on a subtle background instead of the solid fill. |
 | `selectionType` | `'day'`, `'week'`, `'month'`, `'quarter'`, `'year'` | `day` | Specify the type of date selection as day, week, month, quarter, or year. |

@@ -1322,6 +1322,9 @@ removed in favour of `$translucent-opacity` and
   among its siblings, where no picker renders one, so it matched nothing. The calendar names
   the view it shows on the cell content: `.calendar-cell-inner.day`, `.month`,
   `.quarter` and `.year`.
+- The navigation puts the year button before the month button in locales that
+  write the year first (for example Japanese, Chinese, Korean, Hungarian or
+  Lithuanian), the way the locale's own dates read.
 
 #### Date Picker / Date Range Picker
 
@@ -1882,8 +1885,8 @@ adornment in the library — so the button needs no icon markup at all:
 - **The calendar navigation icons moved to JavaScript too.** The four
   `$calendar-nav-icon-{prev,next,double-prev,double-next}` Sass variables are
   **removed**, along with the CSS custom properties and mask rules that painted
-  them. Customize them with the new `navIconPrev` / `navIconNext` /
-  `navIconDoublePrev` / `navIconDoubleNext` calendar options instead (inline SVG,
+  them. Customize them with the new `navPrevIcon` / `navNextIcon` /
+  `navPrevDoubleIcon` / `navNextDoubleIcon` calendar options instead (inline SVG,
   sanitized). `$calendar-nav-icon-width/-height/-color/-hover-color` stay — the
   icon inherits `color`, so recoloring is plain CSS.
 - **`Calendar`'s default `allowList` is now `SVGAllowlist`** (was

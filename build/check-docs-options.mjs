@@ -25,7 +25,7 @@ const pages = {
 
 const pending = {
   calendar: {
-    keys: ['navIconDoubleNext', 'navIconDoublePrev', 'navIconNext', 'navIconPrev', 'selectEndDate'],
+    keys: ['selectEndDate'],
     reason: 'date and time family docs, plans/v6-date-time-closeout.md K9'
   },
   'date-range-input': {

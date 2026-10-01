@@ -49,6 +49,7 @@ import {
   isPeriodInRange,
   isPeriodSelected,
   isToday,
+  isYearBeforeMonth,
   parseToDateString,
   type PeriodViewTypes,
   type SelectionTypes,
@@ -149,10 +150,10 @@ type CalendarConfig = {
   maxDate: Date | number | string | null
   minDate: Date | number | string | null
   monthFormat: 'long' | 'narrow' | 'short' | 'numeric' | '2-digit'
-  navIconDoubleNext: string
-  navIconDoublePrev: string
-  navIconNext: string
-  navIconPrev: string
+  navNextDoubleIcon: string
+  navNextIcon: string
+  navPrevDoubleIcon: string
+  navPrevIcon: string
   range: boolean
   renderDayCell: ((date: Date, meta?: CalendarDayCellMeta) => string) | null
   renderMonthCell: ((date: Date, meta: CalendarCellMeta) => string) | null
@@ -190,10 +191,10 @@ const Default: CalendarConfig = {
   maxDate: null,
   minDate: null,
   monthFormat: 'short',
-  navIconDoubleNext: CHEVRON_DOUBLE_RIGHT_ICON,
-  navIconDoublePrev: CHEVRON_DOUBLE_LEFT_ICON,
-  navIconNext: CHEVRON_RIGHT_ICON,
-  navIconPrev: CHEVRON_LEFT_ICON,
+  navNextDoubleIcon: CHEVRON_DOUBLE_RIGHT_ICON,
+  navNextIcon: CHEVRON_RIGHT_ICON,
+  navPrevDoubleIcon: CHEVRON_DOUBLE_LEFT_ICON,
+  navPrevIcon: CHEVRON_LEFT_ICON,
   range: false,
   renderDayCell: null,
   renderMonthCell: null,
@@ -231,10 +232,10 @@ const DefaultType: Record<string, string> = {
   maxDate: '(date|number|string|null)',
   minDate: '(date|number|string|null)',
   monthFormat: 'string',
-  navIconDoubleNext: 'string',
-  navIconDoublePrev: 'string',
-  navIconNext: 'string',
-  navIconPrev: 'string',
+  navNextDoubleIcon: 'string',
+  navNextIcon: 'string',
+  navPrevDoubleIcon: 'string',
+  navPrevIcon: 'string',
   range: 'boolean',
   renderDayCell: '(function|null)',
   renderMonthCell: '(function|null)',
@@ -723,9 +724,9 @@ class Calendar extends BaseComponent {
     const gridLabel = this._gridLabel(calendarDate)
     const turned = calendarTable.getAttribute('aria-label') !== gridLabel
 
-    prev.innerHTML = `${this._navButton('btn-double-prev', 'navIconDoublePrev', years ? this._config.ariaNavPrevYearsLabel : this._config.ariaNavPrevYearLabel)} ${days ? this._navButton('btn-prev', 'navIconPrev', this._config.ariaNavPrevMonthLabel) : ''}`
+    prev.innerHTML = `${this._navButton('btn-double-prev', 'navPrevDoubleIcon', years ? this._config.ariaNavPrevYearsLabel : this._config.ariaNavPrevYearLabel)} ${days ? this._navButton('btn-prev', 'navPrevIcon', this._config.ariaNavPrevMonthLabel) : ''}`
 
-    next.innerHTML = `${days ? this._navButton('btn-next', 'navIconNext', this._config.ariaNavNextMonthLabel) : ''} ${this._navButton('btn-double-next', 'navIconDoubleNext', years ? this._config.ariaNavNextYearsLabel : this._config.ariaNavNextYearLabel)}`
+    next.innerHTML = `${days ? this._navButton('btn-next', 'navNextIcon', this._config.ariaNavNextMonthLabel) : ''} ${this._navButton('btn-double-next', 'navNextDoubleIcon', years ? this._config.ariaNavNextYearsLabel : this._config.ariaNavNextYearLabel)}`
     calendarTable.setAttribute('aria-label', gridLabel)
 
     if (this._picksRange()) {
@@ -737,7 +738,9 @@ class Calendar extends BaseComponent {
     calendarTable.innerHTML = days ? this._daysHtml(calendarDate) : this._periodsHtml(calendarDate)
 
     if (turned) {
-      region.innerHTML = `${days ? `<button type="button" class="calendar-nav-btn btn-month">${monthLabel}</button>` : ''} <button type="button" class="calendar-nav-btn btn-year">${yearLabel}</button>`
+      const month = days ? `<button type="button" class="calendar-nav-btn btn-month">${monthLabel}</button>` : ''
+      const year = `<button type="button" class="calendar-nav-btn btn-year">${yearLabel}</button>`
+      region.innerHTML = isYearBeforeMonth(this._config.locale) ? `${year} ${month}` : `${month} ${year}`
     }
 
     this._describeGrid(panel)
@@ -1166,10 +1169,10 @@ class Calendar extends BaseComponent {
 
   _navIcon(name: string): string {
     const mirrored = {
-      navIconDoubleNext: 'navIconDoublePrev',
-      navIconDoublePrev: 'navIconDoubleNext',
-      navIconNext: 'navIconPrev',
-      navIconPrev: 'navIconNext'
+      navNextDoubleIcon: 'navPrevDoubleIcon',
+      navNextIcon: 'navPrevIcon',
+      navPrevDoubleIcon: 'navNextDoubleIcon',
+      navPrevIcon: 'navNextIcon'
     }
 
     return sanitizeByConfig(this._config[isRTL(this._element) ? (mirrored as Record<string, string>)[name] : name], this._config)

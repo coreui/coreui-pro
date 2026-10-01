@@ -423,6 +423,29 @@ describe('Calendar', () => {
       ])
     })
 
+    it('should put the year button before the month button where the locale writes the year first', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { calendarDate: new Date(2026, 7, 1), locale: 'ja-JP' }) // eslint-disable-line no-new
+
+      expect([...div.querySelectorAll('.calendar-nav-date .calendar-nav-btn')].map(button => button.className)).toEqual([
+        'calendar-nav-btn btn-year',
+        'calendar-nav-btn btn-month'
+      ])
+    })
+
+    it.each(['month', 'quarter', 'year'])('should show only the year button in %s selection', selectionType => {
+      for (const locale of ['en-US', 'ja-JP']) {
+        fixtureEl.innerHTML = '<div></div>'
+        const div = fixtureEl.querySelector('div')
+        new Calendar(div, { calendarDate: new Date(2026, 7, 1), locale, selectionType }) // eslint-disable-line no-new
+
+        expect([...div.querySelectorAll('.calendar-nav-date .calendar-nav-btn')].map(button => button.className)).toEqual([
+          'calendar-nav-btn btn-year'
+        ])
+      }
+    })
+
     it('should mark each panel with its index', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
@@ -1383,13 +1406,29 @@ describe('Calendar', () => {
       expect(rtlNext).not.toEqual(navIcon(ltrEl, '.btn-next').innerHTML)
     })
 
+    it('should swap the icons a page gives in a right-to-left layout', () => {
+      fixtureEl.innerHTML = '<div dir="rtl"><div></div></div>'
+      const div = fixtureEl.querySelector('div > div')
+      new Calendar(div, { // eslint-disable-line no-new
+        navNextDoubleIcon: '<svg><circle id="double-next"></circle></svg>',
+        navNextIcon: '<svg><circle id="next"></circle></svg>',
+        navPrevDoubleIcon: '<svg><circle id="double-prev"></circle></svg>',
+        navPrevIcon: '<svg><circle id="prev"></circle></svg>'
+      })
+
+      expect(navIcon(div, '.btn-double-prev').querySelector('circle').id).toEqual('double-next')
+      expect(navIcon(div, '.btn-prev').querySelector('circle').id).toEqual('next')
+      expect(navIcon(div, '.btn-next').querySelector('circle').id).toEqual('prev')
+      expect(navIcon(div, '.btn-double-next').querySelector('circle').id).toEqual('double-prev')
+    })
+
     it('should accept a custom navigation icon and sanitize it', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
       // eslint-disable-next-line no-new
       new Calendar(div, {
-        navIconNext: '<svg xmlns="http://www.w3.org/2000/svg"><script>window.calendarHacked = true</script><circle r="4" /></svg>'
+        navNextIcon: '<svg xmlns="http://www.w3.org/2000/svg"><script>window.calendarHacked = true</script><circle r="4" /></svg>'
       })
 
       expect(navIcon(div, '.btn-next').querySelector('circle')).not.toBeNull()
