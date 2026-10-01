@@ -202,7 +202,7 @@ The `util` modules are internal, but the package exports every file under `js/di
 
 #### `CalendarUtil` and `RangeUtil` in the per-file UMD builds
 
-Loaded with a plain `<script>`, `js/dist/util/calendar.js` and `js/dist/util/range.js` register as `CalendarUtil` and `RangeUtil`. They used the `Calendar` and `Range` globals of the components, so the component file and its util overwrote each other and `js/dist/calendar.js` read its helpers from itself. Load the util file before the component, as with the other `js/dist/util` files.
+Loaded with a plain `<script>`, `js/dist/util/calendar.js` registers as `CalendarUtil`, and the new `js/dist/util/range.js` as `RangeUtil`. The calendar util used the `Calendar` global of the component, so the two files overwrote each other and `js/dist/calendar.js` read its helpers from itself. Load the util file before the component, as with the other `js/dist/util` files.
 
 #### `coreui.Offcanvas` in the UMD bundle
 

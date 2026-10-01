@@ -1,3 +1,4 @@
+import { onTestFinished } from 'vitest'
 import {
   constrainInput,
   getNearestInput,
@@ -178,11 +179,10 @@ describe('Range utilities', () => {
       fixtureEl.innerHTML = '<div style="--cui-range-thumb-width: 1.5rem; font-size: 10px"></div>'
       const element = fixtureEl.firstElementChild
       document.documentElement.style.fontSize = '16px'
+      onTestFinished(() => document.documentElement.style.removeProperty('font-size'))
 
       expect(getThumbSize(element)).toBe(24)
       expect(element.children.length).toBe(0)
-
-      document.documentElement.style.removeProperty('font-size')
     })
   })
 
@@ -200,8 +200,7 @@ describe('Range utilities', () => {
       expect(getTickPositions(10, 20, ['Only'])).toEqual([{ index: 0, ratio: 0, value: 10 }])
       expect(getTickPositions(0, 10, [-5, 15, Number.NaN, Infinity])).toEqual([
         { index: 0, ratio: 0, value: -5 },
-        { index: 1, ratio: 1, value: 15 },
-        { index: 3, ratio: 1, value: Infinity }
+        { index: 1, ratio: 1, value: 15 }
       ])
     })
 
@@ -213,7 +212,7 @@ describe('Range utilities', () => {
     it('reads an object value as a number and places a null tick by its position', () => {
       expect(getTickPositions(0, 100, [{ value: '50', label: 'Half' }])).toEqual([{ index: 0, ratio: 0.5, value: 50 }])
       expect(getTickPositions(0, 100, [null, 100]).map(position => position.value)).toEqual([0, 100])
-      expect(getTickPositions(0, 100, [{ value: 'half' }, Infinity]).map(position => position.ratio)).toEqual([1])
+      expect(getTickPositions(0, 100, [{ value: 'half' }, { value: 'Infinity' }])).toEqual([])
     })
   })
 
@@ -233,7 +232,9 @@ describe('Range utilities', () => {
         [0.15, 0, 1, 0.1],
         [0.35, 0, 1, 0.1],
         [0.125, 0.05, 1, 0.025],
-        [5, 10, 0, 1]
+        [5, 10, 0, 1],
+        [33.3, 0, 100, 0],
+        [33.3, 0, 100, -2]
       ]
 
       for (const [value, min, max, step] of cases) {
@@ -243,7 +244,7 @@ describe('Range utilities', () => {
     })
 
     it('clamps without rounding for step any and takes the midpoint for a value that is not finite', () => {
-      expect(sanitizeValue(33.3, 0, 100, 0)).toBe(33.3)
+      expect(sanitizeValue(33.3, 0, 100, 'any')).toBe(33.3)
       expect(sanitizeValue(Number.NaN, 0, 10, 1)).toBe(5)
       expect(sanitizeValue(Infinity, 0, 100, 1)).toBe(50)
     })

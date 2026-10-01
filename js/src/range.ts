@@ -438,12 +438,13 @@ class Range extends BaseComponent {
     if (Array.isArray(ticks)) {
       for (const { index, ratio, value } of getTickPositions(min, max, ticks)) {
         const tick = ticks[index]
+        const options = typeof tick === 'object' && tick !== null ? tick : undefined
 
         points.push({
-          class: typeof tick === 'object' ? tick.class : undefined,
-          label: typeof tick === 'number' ? '' : (typeof tick === 'object' ? (tick.label ?? '') : tick),
+          class: options?.class,
+          label: typeof tick === 'string' ? tick : (options?.label ?? ''),
           ratio,
-          style: typeof tick === 'object' ? tick.style : undefined,
+          style: options?.style,
           value
         })
       }

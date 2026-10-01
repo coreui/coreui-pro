@@ -169,7 +169,7 @@ export const getThumbSize = (element: HTMLElement): number => {
  * Places tick marks on a track. A number is a tick at that value, an object with a `value` is a
  * tick at that value read as a number (so `'50'` from a JSON attribute works), and anything else is
  * placed by its position in the list, the first at `min` and the last at `max`. Ticks whose value
- * is not a number are left out.
+ * is not a finite number are left out.
  *
  * @param min - The lowest value of the track
  * @param max - The highest value of the track
@@ -190,35 +190,37 @@ export const getTickPositions = (min: number, max: number, ticks: unknown[]): Ra
 
       return { index, ratio: Math.min(Math.max((value - min) / span, 0), 1), value }
     })
-    .filter(position => !Number.isNaN(position.value))
+    .filter(position => Number.isFinite(position.value))
     .toSorted((a, b) => a.ratio - b.ratio)
 }
 
 /**
- * Applies the value sanitization of `<input type="range">` to a number: clamps it to the range,
- * rounds it to the nearest step from `min` (half way rounds up, counted in decimals like the
- * browser) and steps back when the rounded value passes `max`. A value that is not a finite number
- * becomes the midpoint, and a `max` below `min` counts as `min`.
+ * Applies the value sanitization of `<input type="range">` with a `min` attribute to a number:
+ * clamps it to the range, rounds it to the nearest step from `min` (half way rounds up, counted
+ * in decimals like the browser) and steps back when the rounded value passes `max`. A value that
+ * is not a finite number becomes the midpoint, a `max` below `min` counts as `min`, and a step
+ * that is not above 0 counts as 1.
  *
  * @param value - The value to sanitize
- * @param min - The lowest value
+ * @param min - The lowest value, which is also the step base
  * @param max - The highest value
- * @param step - The step, or `0` and below for `step="any"`
+ * @param step - The step, or `'any'` to leave the value unrounded
  * @returns The value the input would hold
  */
-export const sanitizeValue = (value: number, min: number, max: number, step: number): number => {
+export const sanitizeValue = (value: number, min: number, max: number, step: number | 'any'): number => {
   const top = Math.max(max, min)
   const clamped = Math.min(Math.max(Number.isFinite(value) ? value : min + ((top - min) / 2), min), top)
 
-  if (!(step > 0)) {
+  if (step === 'any') {
     return clamped
   }
 
-  const decimals = Math.max(getDecimals(step), getDecimals(min))
-  const steps = Math.round(Number(((clamped - min) / step).toFixed(9)))
-  const rounded = Number((min + (steps * step)).toFixed(decimals))
+  const size = step > 0 ? step : 1
+  const decimals = Math.max(getDecimals(size), getDecimals(min))
+  const steps = Math.round(Number(((clamped - min) / size).toFixed(9)))
+  const rounded = Number((min + (steps * size)).toFixed(decimals))
 
-  return rounded > top ? Number((rounded - step).toFixed(decimals)) : rounded
+  return rounded > top ? Number((rounded - size).toFixed(decimals)) : rounded
 }
 
 /**
