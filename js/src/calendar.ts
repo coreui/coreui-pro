@@ -40,6 +40,7 @@ import {
   getStartOfView,
   getStartOfWeek,
   getWeekLabel,
+  getWeekNumberName,
   getYears,
   isCellDisabled,
   isCellOutsideLimits,
@@ -143,6 +144,7 @@ type CalendarConfig = {
   ariaNavPrevYearLabel: string
   ariaNavPrevYearsLabel: string
   ariaNothingToPickLabel: string | null
+  ariaWeekNumberLabel: ((weekNumber: number) => string | undefined) | null
   calendarDate: Date | number | string | null
   calendars: number
   dayFormat: 'numeric' | '2-digit'
@@ -184,6 +186,7 @@ const Default: CalendarConfig = {
   ariaNavPrevYearLabel: 'Previous year',
   ariaNavPrevYearsLabel: 'Previous 12 years',
   ariaNothingToPickLabel: 'Nothing on this page can be picked',
+  ariaWeekNumberLabel: null,
   calendarDate: null,
   calendars: 1,
   dayFormat: 'numeric',
@@ -225,6 +228,7 @@ const DefaultType: Record<string, string> = {
   ariaNavPrevYearLabel: 'string',
   ariaNavPrevYearsLabel: 'string',
   ariaNothingToPickLabel: '(string|null)',
+  ariaWeekNumberLabel: '(function|null)',
   calendarDate: '(date|number|string|null)',
   calendars: 'number',
   dayFormat: 'string',
@@ -785,8 +789,9 @@ class Calendar extends BaseComponent {
   }
 
   _daysHtml(calendarDate: Date): string {
-    const { showAdjacentDays, showWeekNumber, weekdayFormat, weekNumbersLabel } = this._config
+    const { ariaWeekNumberLabel, showAdjacentDays, showWeekNumber, weekdayFormat, weekNumbersLabel } = this._config
     const weeks = getMonthDetails(calendarDate.getFullYear(), calendarDate.getMonth(), this._config.firstDayOfWeek)
+    const weekLabel = getWeekLabel(this._config.locale)
     const headerCell = (content: string, abbr = '') => `<th class="${CLASS_NAME_CALENDAR_CELL}"${abbr}><div class="calendar-header-cell-inner">${content}</div></th>`
 
     const weekdays = weeks[0].days.map(({ date }) => {
@@ -800,12 +805,14 @@ class Calendar extends BaseComponent {
       const cells = days.map(({ date, month }) => month === 'current' || showAdjacentDays ?
         this._cellHtml(date, this._cellDayAttributes(date, month, attributes.meta), this._formatDate(date, { day: this._config.dayFormat })) :
         '<td role="gridcell"></td>')
-      const ariaLabel = this._config.selectionType === 'week' && visible ? ` aria-label="${escapeHtml(formatWeekName(days, this._config.locale))}"` : ''
+      const weekNumberName = showWeekNumber ? getWeekNumberName(week.number, weekLabel, ariaWeekNumberLabel) : ''
+      const rowName = () => `${showWeekNumber ? `${weekNumberName}, ` : ''}${formatWeekName(days, this._config.locale)}`
+      const ariaLabel = this._config.selectionType === 'week' && visible ? ` aria-label="${escapeHtml(rowName())}"` : ''
 
-      return `<tr class="${attributes.className}"${this._stateHtml(attributes)}${ariaLabel}>${showWeekNumber ? `<th class="calendar-cell-week-number">${week.number}</th>` : ''}${cells.join('')}</tr>`
+      return `<tr class="${attributes.className}"${this._stateHtml(attributes)}${ariaLabel}>${showWeekNumber ? `<th class="calendar-cell-week-number" scope="row" aria-label="${escapeHtml(weekNumberName)}">${week.number}</th>` : ''}${cells.join('')}</tr>`
     })
 
-    const weekNumberHeader = weekNumbersLabel ? escapeHtml(weekNumbersLabel) : `<span class="${CLASS_NAME_VISUALLY_HIDDEN}">${escapeHtml(getWeekLabel(this._config.locale))}</span>`
+    const weekNumberHeader = weekNumbersLabel ? escapeHtml(weekNumbersLabel) : `<span class="${CLASS_NAME_VISUALLY_HIDDEN}">${escapeHtml(weekLabel)}</span>`
 
     return `<thead><tr>${showWeekNumber ? headerCell(weekNumberHeader) : ''}${weekdays.join('')}</tr></thead><tbody>${rows.join('')}</tbody>`
   }

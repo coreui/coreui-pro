@@ -119,6 +119,19 @@ export const getWeekLabel = (locale: string): string => {
 }
 
 /**
+ * Names a week number for screen readers: what `label` returns for it, or,
+ * without `label` or when it returns nothing, the week label followed by the
+ * number ("Week 36").
+ *
+ * @param weekNumber - The week number
+ * @param weekLabel - The locale's week label, as `getWeekLabel` gives it
+ * @param label - A function that names a week number, `null` without one
+ * @returns The name
+ */
+export const getWeekNumberName = (weekNumber: number, weekLabel: string, label?: ((weekNumber: number) => string | undefined) | null): string =>
+  label?.(weekNumber) || `${weekLabel} ${weekNumber}`
+
+/**
  * Finds the Monday that starts an ISO week.
  *
  * @param year - The full week-numbering year

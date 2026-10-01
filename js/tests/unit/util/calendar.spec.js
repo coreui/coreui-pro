@@ -25,6 +25,7 @@ import {
   getStartOfView,
   getStartOfWeek,
   getTabStop,
+  getWeekNumberName,
   getYears,
   getMonthDetails,
   isCellDisabled,
@@ -1175,6 +1176,19 @@ describe('Calendar Utilities', () => {
       expect(getCalendarKeyAction(press('End'), null, context())).toEqual({ type: 'stay' })
       expect(getCalendarKeyAction(press('Enter'), null, context())).toBeNull()
       expect(getCalendarKeyAction(press(' '), null, context())).toBeNull()
+    })
+  })
+
+  describe('getWeekNumberName', () => {
+    it('should name a week number with the week label, or with the label function', () => {
+      expect(getWeekNumberName(36, 'Week')).toBe('Week 36')
+      expect(getWeekNumberName(36, 'Tydzień', null)).toBe('Tydzień 36')
+      expect(getWeekNumberName(36, 'Week', weekNumber => `Wk ${weekNumber}`)).toBe('Wk 36')
+    })
+
+    it('should fall back to the week label when the label function returns nothing', () => {
+      expect(getWeekNumberName(53, 'Week', () => '')).toBe('Week 53')
+      expect(getWeekNumberName(53, 'Week', () => undefined)).toBe('Week 53')
     })
   })
 

@@ -53,6 +53,13 @@ describe('DatePicker', () => {
 
       expect(document.getElementById(grid.getAttribute('aria-describedby')).textContent).toEqual('Brak dat do wyboru')
     })
+
+    it('should pass ariaWeekNumberLabel to the calendar', () => {
+      const picker = buildPicker({ ariaWeekNumberLabel: weekNumber => `Tydz. ${weekNumber}`, date: '2026-09-10', showWeekNumber: true })
+      picker.show()
+
+      expect(fixtureEl.querySelector('.date-picker-popup tbody .calendar-cell-week-number').getAttribute('aria-label')).toEqual('Tydz. 36')
+    })
   })
 
   // The native <input type="date"> entry contract: opening puts focus on the

@@ -45,6 +45,13 @@ describe('DateRangePicker', () => {
 
       expect(document.getElementById(grid.getAttribute('aria-describedby')).textContent).toEqual('Brak dat do wyboru')
     })
+
+    it('should pass ariaWeekNumberLabel to the calendar', () => {
+      const picker = buildPicker({ ariaWeekNumberLabel: weekNumber => `Tydz. ${weekNumber}`, calendarDate: '2026-09-01', showWeekNumber: true })
+      picker.show()
+
+      expect(fixtureEl.querySelector('.date-picker-popup tbody .calendar-cell-week-number').getAttribute('aria-label')).toEqual('Tydz. 36')
+    })
   })
 
   describe('constructor', () => {
