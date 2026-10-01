@@ -65,6 +65,7 @@ type RangeConfig = {
   allowList: SanitizerAllowList
   clickableTicks: boolean
   distance: number
+  list: string | null
   sanitize: boolean
   sanitizeFn: ((unsafeHtml: string) => string) | null
   ticks: RangeTick[] | boolean | string
@@ -94,6 +95,7 @@ const Default: RangeConfig = {
   allowList: DefaultAllowlist,
   clickableTicks: false,
   distance: 0,
+  list: null,
   sanitize: true,
   sanitizeFn: null,
   ticks: false,
@@ -107,6 +109,7 @@ const DefaultType = {
   allowList: 'object',
   clickableTicks: 'boolean',
   distance: 'number',
+  list: '(string|null)',
   sanitize: 'boolean',
   sanitizeFn: '(null|function)',
   ticks: '(array|boolean|string)',
@@ -395,20 +398,22 @@ class Range extends BaseComponent {
 
   protected _valueText(input: HTMLInputElement): string | null {
     const value = this._value(input)
+    const half = this._step(input) / 2
+    const label = this._tickLabels.find(tick => Math.abs(tick.value - value) < half + TOLERANCE)?.label ?? null
 
-    if (typeof this._config.tooltipsFormat === 'function') {
-      const html = document.createElement('template')
-      html.innerHTML = sanitizeByConfig(this._format(value), this._config)
-
-      for (const lineBreak of html.content.querySelectorAll('br')) {
-        lineBreak.replaceWith(' ')
-      }
-
-      return (html.content.textContent ?? '').replaceAll(/\s+/g, ' ').trim()
+    if (typeof this._config.tooltipsFormat !== 'function') {
+      return label === null ? null : `${value}, ${label}`
     }
 
-    const half = this._step(input) / 2
-    return this._tickLabels.find(tick => Math.abs(tick.value - value) < half + TOLERANCE)?.label ?? null
+    const html = document.createElement('template')
+    html.innerHTML = sanitizeByConfig(this._format(value), this._config)
+
+    for (const lineBreak of html.content.querySelectorAll('br')) {
+      lineBreak.replaceWith(' ')
+    }
+
+    const text = (html.content.textContent ?? '').replaceAll(/\s+/g, ' ').trim()
+    return label === null || label === text ? text : `${text}, ${label}`
   }
 
   protected _updateValueText(index: number): void {
@@ -463,7 +468,7 @@ class Range extends BaseComponent {
       }
     }
 
-    const listId = input.getAttribute('list')
+    const listId = this._config.list ?? input.getAttribute('list')
     const datalist = listId ? document.getElementById(listId) : null
 
     if (datalist) {

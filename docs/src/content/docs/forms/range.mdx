@@ -83,7 +83,7 @@ Link a `<datalist>` to the input with the `list` attribute and the plugin render
     <option value="100" label="Hot"></option>
   </datalist>`} />
 
-The `ticks` option draws ticks without a datalist, and combines with one: a number is a tick without a label at that value; an object sets `value`, `label`, `class` and `style`; a string, or an object without `value`, is a label placed by its position in the array, the first at `min` and the last at `max`. A comma-separated `data-coreui-ticks` attribute is a list of labels. While a thumb sits on a labelled tick, the label is its `aria-valuetext`, so a screen reader announces "Medium" rather than "50"; a `tooltipsFormat` takes precedence.
+The `ticks` option draws ticks without a datalist, and combines with one: a number is a tick without a label at that value; an object sets `value`, `label`, `class` and `style`; a string, or an object without `value`, is a label placed by its position in the array, the first at `min` and the last at `max`. A comma-separated `data-coreui-ticks` attribute is a list of labels. While a thumb sits on a labelled tick, its `aria-valuetext` adds the label to the value, so a screen reader announces "50, Medium"; with `tooltipsFormat` the label follows the formatted text when the two differ.
 
 <Example code={`<label for="rangePriority" class="form-label">Priority</label>
   <div class="form-range" data-coreui-ticks="Low, Medium, High">
@@ -196,6 +196,7 @@ Options can be passed using data attributes or JavaScript. To do this, append an
 | `allowList` | object | [Default value](/getting-started/javascript#sanitizer) | Permitted tags and attributes in the HTML that `tooltipsFormat` returns. |
 | `clickableTicks` | boolean | `false` | Moves the nearest thumb to a tick's value when the tick is pressed. |
 | `distance` | number | `0` | Smallest gap, in value units, between neighbouring thumbs. |
+| `list` | string, null | `null` | `id` of a `<datalist>` whose options become tick marks, for an input that should not carry the `list` attribute itself (browsers snap a drag to the options of a linked datalist). |
 | `sanitize` | boolean | `true` | Sanitizes the HTML that `tooltipsFormat` returns. |
 | `sanitizeFn` | null, function | `null` | Replaces the built-in sanitizer. |
 | `ticks` | array, boolean, string | `false` | Tick marks in addition to a linked datalist: numbers are ticks without a label at that value, objects set `value`, `label`, `class` and `style`, and strings (or objects without `value`) are labels placed by their position in the array, from `min` to `max`. |

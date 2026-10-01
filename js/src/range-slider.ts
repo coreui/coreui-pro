@@ -50,7 +50,7 @@ type RangeSliderConfig = {
   tooltips: boolean | 'always'
   tooltipsFormat: ((value: number) => string) | null
   track: boolean | string
-  value: number[] | number
+  value: number[] | number | string
   vertical: boolean
 }
 
@@ -142,9 +142,10 @@ class RangeSlider extends BaseComponent {
 
   // Public
   setConfig(config: Partial<RangeSliderConfig>): void {
-    this._config = this._getConfig({ ...this._config, value: this._values(), ...config }) as RangeSliderConfig
+    const current = config && 'value' in config ? null : this._values()
+    this._config = this._getConfig({ ...this._config, ...config }) as RangeSliderConfig
     this._teardown()
-    this._build()
+    this._build(current)
   }
 
   override dispose(): void {
@@ -153,20 +154,20 @@ class RangeSlider extends BaseComponent {
   }
 
   // Private
-  _build(): void {
+  _build(current: number[] | null = null): void {
     this._wrapper = document.createElement('div')
     this._wrapper.className = CLASS_NAME_FORM_RANGE
     this._wrapper.classList.toggle(CLASS_NAME_FORM_RANGE_VERTICAL, this._config.vertical)
-    this._inputs = (this._config.value as number[]).map((value, index) => this._createInput(index, value))
+    this._inputs = (this._config.value as number[]).map((value, index) => this._createInput(index, value, current?.[index]))
     this._wrapper.append(...this._inputs)
     this._element.append(this._wrapper)
 
     const {
-      allowList, clickableTicks, distance, sanitize, sanitizeFn, ticks, tooltipClass, tooltips, tooltipsFormat, track
+      allowList, clickableTicks, distance, list, sanitize, sanitizeFn, ticks, tooltipClass, tooltips, tooltipsFormat, track
     } = this._config
 
     this._range = new Range(this._wrapper, {
-      allowList, clickableTicks, distance, sanitize, sanitizeFn, ticks, tooltipClass, tooltips, tooltipsFormat, track
+      allowList, clickableTicks, distance, list, sanitize, sanitizeFn, ticks, tooltipClass, tooltips, tooltipsFormat, track
     })
 
     EventHandler.on(this._element, EVENT_INPUT, this._onInput)
@@ -183,8 +184,8 @@ class RangeSlider extends BaseComponent {
     this._inputs = []
   }
 
-  _createInput(index: number, value: number): HTMLInputElement {
-    const { disabled, list, max, min, step, vertical } = this._config
+  _createInput(index: number, value: number, current?: number): HTMLInputElement {
+    const { disabled, max, min, step, vertical } = this._config
     const input = document.createElement('input')
     input.type = 'range'
     input.className = CLASS_NAME_FORM_RANGE_INPUT
@@ -194,16 +195,16 @@ class RangeSlider extends BaseComponent {
     input.defaultValue = `${value}`
     input.disabled = disabled
 
+    if (current !== undefined) {
+      input.value = `${current}`
+    }
+
     const name = Array.isArray(this._config.name) ?
       this._config.name[index] :
       this._config.name && `${this._config.name}-${index}`
 
     if (name !== undefined && name !== null && name !== '') {
       input.name = String(name)
-    }
-
-    if (list) {
-      input.setAttribute('list', list)
     }
 
     if (vertical) {

@@ -119,7 +119,7 @@ describe('RangeSlider', () => {
       expect(inputsOf(element).every(input => input.disabled)).toBeTrue()
     })
 
-    it('should link every input to the datalist of the list option', () => {
+    it('should draw the ticks of the list datalist without linking it to the inputs, which would snap a drag', () => {
       fixtureEl.innerHTML = `
         <div id="slider"></div>
         <datalist id="stops"><option value="0" label="Low"></option><option value="100" label="High"></option></datalist>
@@ -127,7 +127,7 @@ describe('RangeSlider', () => {
       const element = fixtureEl.querySelector('#slider')
       new RangeSlider(element, { list: 'stops', value: [20, 80] }) // eslint-disable-line no-new
 
-      expect(inputsOf(element).map(input => input.getAttribute('list'))).toEqual(['stops', 'stops'])
+      expect(inputsOf(element).some(input => input.hasAttribute('list'))).toBeFalse()
       expect([...element.querySelectorAll('.form-range-tick-label')].map(label => label.textContent)).toEqual(['Low', 'High'])
     })
 
@@ -187,6 +187,15 @@ describe('RangeSlider', () => {
       expect([low.value, high.value]).toEqual(['70', '80'])
     })
 
+    it('should forward the sanitizer options', () => {
+      const tooltipsFormat = value => `<b onclick="alert(1)">${value}</b>`
+      const { element } = mount({ sanitize: false, tooltipsFormat, value: [20] })
+      expect(element.querySelector('.tooltip-inner b').hasAttribute('onclick')).toBeTrue()
+
+      const { element: sanitized } = mount({ tooltipsFormat, value: [20] })
+      expect(sanitized.querySelector('.tooltip-inner b').hasAttribute('onclick')).toBeFalse()
+    })
+
     it('should leave the track empty with track false', () => {
       const { element } = mount({ track: false, value: [20, 80] })
 
@@ -230,6 +239,12 @@ describe('RangeSlider', () => {
       expect(inputsOf(element).map(input => input.hasAttribute('name'))).toEqual([true, false, false])
     })
 
+    it('should keep a zero in the array as a name', () => {
+      const { element } = mount({ name: [0, 'max'], value: [20, 80] })
+
+      expect(inputsOf(element).map(input => input.name)).toEqual(['0', 'max'])
+    })
+
     it('should not name the inputs by default', () => {
       const { element } = mount({ value: [20, 80] })
 
@@ -252,7 +267,13 @@ describe('RangeSlider', () => {
       expect(inputsOf(three).map(input => input.getAttribute('aria-label'))).toEqual(['Value 1', 'Value 2', 'Value 3'])
     })
 
-    it('should leave a single thumb to its page label', () => {
+    it('should name a single handle with ariaLabels', () => {
+      const { element } = mount({ ariaLabels: ['Volume'], value: 40 })
+
+      expect(inputsOf(element)[0].getAttribute('aria-label')).toEqual('Volume')
+    })
+
+    it('should leave a single handle unnamed without ariaLabels', () => {
       const { element } = mount({ value: 40 })
 
       expect(inputsOf(element)[0].hasAttribute('aria-label')).toBeFalse()
@@ -329,6 +350,25 @@ describe('RangeSlider', () => {
       expect([...new FormData(form)]).toEqual([['lo', '25'], ['hi', '75']])
       expect(element.querySelector('.form-range').style.getPropertyValue('--cui-range-fill')).toEqual('0.75')
     })
+
+    it('should reset to the configured values after a setConfig that leaves value out', async () => {
+      fixtureEl.innerHTML = '<form><div id="slider" data-coreui-name="lo, hi" data-coreui-value="25, 75"></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const element = fixtureEl.querySelector('#slider')
+      const rangeSlider = new RangeSlider(element)
+
+      move(inputsOf(element)[0], 40)
+      rangeSlider.setConfig({ disabled: true })
+      rangeSlider.setConfig({ disabled: false })
+      expect(inputsOf(element).map(input => input.value)).toEqual(['40', '75'])
+
+      form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect([...new FormData(form)]).toEqual([['lo', '25'], ['hi', '75']])
+    })
   })
 
   describe('setConfig', () => {
@@ -358,6 +398,17 @@ describe('RangeSlider', () => {
       expect(inputsOf(element).map(input => input.value)).toEqual(['5', '15'])
     })
 
+    it('should dispose the Range it replaces', () => {
+      const { element, rangeSlider } = mount({ value: [20, 80] })
+      const wrapper = element.querySelector('.form-range')
+
+      rangeSlider.setConfig({ value: [10, 90] })
+
+      expect(Range.getInstance(wrapper)).toBeNull()
+      expect(wrapper.isConnected).toBeFalse()
+      expect(Range.getInstance(element.querySelector('.form-range'))).toBeInstanceOf(Range)
+    })
+
     it('should switch the orientation both ways', () => {
       const { element, rangeSlider } = mount({ value: [20, 80], vertical: true })
 
@@ -374,9 +425,6 @@ describe('RangeSlider', () => {
       fixtureEl.innerHTML = '<div id="slider"><p class="note">Page content</p></div>'
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, { ticks: ['Low', 'High'], value: [20, 80], vertical: true })
-
-      rangeSlider.dispose()
-
       const wrapper = element.querySelector('.form-range')
 
       rangeSlider.dispose()

@@ -1990,9 +1990,11 @@ field behind that kept submitting.
   → `--cui-range-track-disabled-bg`. The Sass variables follow
   (`$range-slider-thumb-*`, `$range-slider-track-*` → `$form-range-*`).
   `--cui-range-slider-tick-label-*`, `--cui-range-slider-tooltip-margin-*`
-  and `--cui-range-slider-vertical-*` are gone as well: tick labels read
-  `--cui-range-tick-label-*`, the tooltips sit like the range's, and a vertical
-  slider's height is `--cui-range-vertical-height`. The filled band keeps its half-strength mix of the theme colour, now
+  and `--cui-range-slider-vertical-*` no longer reach the slider either: tick
+  labels read `--cui-range-tick-label-color` and `-font-size`, the tooltips
+  sit like the range's, a vertical slider's height is
+  `--cui-range-vertical-height` and its track width `--cui-range-track-height`;
+  the tick label padding has no counterpart. The filled band keeps its half-strength mix of the theme colour, now
   shared with the range's fill, and a disabled slider greys the band through
   the theme slot on the track.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
@@ -2029,9 +2031,11 @@ field behind that kept submitting.
   `--cui-range-slider-tooltip-*` look tokens (`-bg`, `-color`, `-padding-*`,
   `-font-size`, `-border-radius`, `-box-shadow`, `-arrow-*`, `-max-width`,
   `-transition`, `-zindex`) and their Sass variables are gone, and so are
-  `-margin-bottom` and `-margin-end`. For
-  the previous light bubble set `--cui-tooltip-bg: var(--cui-bg-4)` and
-  `--cui-tooltip-color: var(--cui-fg-body)` on the slider.
+  `-margin-bottom` and `-margin-end`. The tooltip declares its own
+  `--cui-tooltip-*` tokens, so set them on it: for the previous light bubble,
+  give the slider `tooltipClass: 'light-tip'` and declare
+  `--cui-tooltip-bg: var(--cui-bg-4)` and `--cui-tooltip-color: var(--cui-fg-body)`
+  on `.light-tip`.
 
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **The pressed thumb adapts to the color mode.** Its color was 70% white
