@@ -702,6 +702,22 @@ describe('DatePicker', () => {
       expect(el.querySelector('input[type="hidden"]').value).toEqual(`Week ${emitted.formattedDate.slice(5)}, ${emitted.formattedDate.slice(0, 4)}`)
     })
 
+    it('should pick a week whose Monday is disabled on any first day of the week', () => {
+      for (const firstDayOfWeek of [0, 1, 2, 3, 4, 5, 6]) {
+        const picker = buildPicker({
+          calendarDate: new Date(2026, 8, 1), disabledDates: [new Date(2026, 7, 31)], firstDayOfWeek, locale: 'en-US', selectionType: 'week'
+        })
+        const emitted = []
+        fixtureEl.querySelector('#picker').addEventListener('dateChange.coreui.date-picker', event => emitted.push(event.formattedDate))
+
+        picker.show()
+        fixtureEl.querySelector(`.date-picker-popup td[data-coreui-date="${new Date(2026, 8, 3).toDateString()}"]`).closest('tr').click()
+
+        expect(emitted).toEqual(['2026W36'])
+        expect(fixtureEl.querySelector('#picker [aria-invalid="true"]')).toBeNull()
+      }
+    })
+
     it('should pick the week of minDate and maxDate on any first day of the week', () => {
       for (const firstDayOfWeek of [0, 1, 2, 3, 4, 5, 6]) {
         const picker = buildPicker({

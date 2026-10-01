@@ -895,12 +895,12 @@ describe('Date Sections Utilities', () => {
   })
 
   describe('getLayoutPeriod', () => {
-    it('should name the period of a field without a day or a week', () => {
+    it('should name the period of a field without a day', () => {
       expect(getLayoutPeriod(getSectionsFromFormat('MM/yyyy', 'en-US'))).toBe('months')
       expect(getLayoutPeriod(getSectionsFromFormat('QQQ yyyy', 'en-US'))).toBe('quarters')
       expect(getLayoutPeriod(getSectionsFromFormat('yyyy', 'en-US'))).toBe('years')
       expect(getLayoutPeriod(getSectionsFromFormat('dd.MM.yyyy', 'en-US'))).toBeNull()
-      expect(getLayoutPeriod(getSectionsFromFormat('ww, yyyy', 'en-US'))).toBeNull()
+      expect(getLayoutPeriod(getSectionsFromFormat('ww, yyyy', 'en-US'))).toBe('weeks')
       expect(getLayoutPeriod(getSectionsFromFormat('HH:mm', 'en-US'))).toBeNull()
     })
   })
@@ -967,6 +967,15 @@ describe('Date Sections Utilities', () => {
       expect(getDateLimitError(week, new Date(2026, 7, 31), new Date(2026, 8, 2), new Date(2026, 8, 2))).toBeNull()
       expect(getDateLimitError(week, new Date(2026, 7, 24), new Date(2026, 8, 2), null)).toBe('minDate')
       expect(getDateLimitError(week, new Date(2026, 8, 7), null, new Date(2026, 8, 2))).toBe('maxDate')
+    })
+
+    it('should disable a week field only when every day of the week is disabled', () => {
+      const week = getSectionsFromFormat('yyyy-Www', 'en-US')
+
+      expect(getDateLimitError(week, new Date(2026, 7, 31), null, null, [new Date(2026, 7, 31)])).toBeNull()
+      expect(getDateLimitError(week, new Date(2026, 7, 31), null, null, [[new Date(2026, 7, 31), new Date(2026, 8, 6)]])).toBe('disabledDate')
+      expect(getDateLimitError(week, new Date(2026, 7, 31), new Date(2026, 8, 2), null, [[new Date(2026, 8, 2), new Date(2026, 8, 6)]])).toBeNull()
+      expect(getDateLimitError(week, new Date(2026, 7, 31), null, new Date(2026, 8, 3), [[new Date(2026, 7, 31), new Date(2026, 8, 3)]])).toBeNull()
     })
 
     it('should name a disabled date', () => {

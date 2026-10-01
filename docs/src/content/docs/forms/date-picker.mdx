@@ -263,9 +263,9 @@ The `disabledDates` option excludes specific dates — single `Date`s,
 `[start, end]` ranges, or a matcher function. The calendar grays them out and
 the field refuses them: a completed date that hits a disabled entry gets the
 `.is-invalid` class and the picker reports `null` until it is corrected.
-In month, quarter and year selection the calendar and the field judge the
+In week, month, quarter and year selection the calendar and the field judge the
 whole period: it is refused only when it lies wholly before `minDate` or after
-`maxDate`, or `disabledDates` covers every day of it that the limits leave.
+`maxDate`, or `disabledDates` covers every day of it that the limits leave. In week selection the limits count as whole weeks, so for a week that is all seven days.
 
 <Example pro code={`<div class="row">
     <div class="col-lg-5">

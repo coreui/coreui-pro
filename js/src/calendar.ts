@@ -56,8 +56,6 @@ import {
   isPeriodInRange,
   isPeriodSelected,
   isToday,
-  isWeekInRange,
-  isWeekSelected,
   isYearBeforeMonth,
   type KeptDay,
   parseToDateString,
@@ -379,6 +377,10 @@ class Calendar extends BaseComponent {
     return this._config.selectionType === 'week' && this._view === 'days'
   }
 
+  _cellUnit(): ViewTypes | 'weeks' {
+    return this._rowsAreTargets() ? 'weeks' : this._view
+  }
+
   _getDate(target: HTMLElement): Date {
     if (this._rowsAreTargets()) {
       const firstCell = SelectorEngine.findOne(SELECTOR_CALENDAR_CELL, target.closest(SELECTOR_CALENDAR_ROW) as ParentNode)
@@ -404,7 +406,7 @@ class Calendar extends BaseComponent {
     const cloneDate = new Date(date)
     const index = Manipulator.getDataAttribute(target.closest(SELECTOR_CALENDAR) as HTMLElement, 'calendar-index') as number
 
-    if (isCellDisabled(date, this._view, this._minDate, this._maxDate, this._config.disabledDates)) {
+    if (isCellDisabled(date, this._cellUnit(), this._minDate, this._maxDate, this._config.disabledDates)) {
       return
     }
 
@@ -522,7 +524,7 @@ class Calendar extends BaseComponent {
 
     const date = this._getPickedDate(target)
 
-    if (isCellDisabled(date, this._view, this._minDate, this._maxDate, this._config.disabledDates)) {
+    if (isCellDisabled(date, this._cellUnit(), this._minDate, this._maxDate, this._config.disabledDates)) {
       return
     }
 
@@ -684,14 +686,13 @@ class Calendar extends BaseComponent {
   }
 
   _selectDate(date: any): void {
-    if (isCellDisabled(date, this._view, this._minDate, this._maxDate, this._config.disabledDates)) {
+    if (isCellDisabled(date, this._cellUnit(), this._minDate, this._maxDate, this._config.disabledDates)) {
       return
     }
 
     if (this._config.range) {
-      const { firstDayOfWeek, selectionType } = this._config
-      const start = convertToSelectionDate(this._startDate, selectionType, firstDayOfWeek)
-      const end = convertToSelectionDate(this._endDate, selectionType, firstDayOfWeek)
+      const start = convertToSelectionDate(this._startDate, this._config.selectionType)
+      const end = convertToSelectionDate(this._endDate, this._config.selectionType)
 
       if (this._selectEndDate) {
         if (start && start > date) {
@@ -702,7 +703,7 @@ class Calendar extends BaseComponent {
 
         this._setSelectEndDate(false)
 
-        if (isDisableDateInRange(start, date, this._config.disabledDates, this._view)) {
+        if (isDisableDateInRange(start, date, this._config.disabledDates, this._cellUnit())) {
           this._setStartDate(null)
           this._setEndDate(null)
           return
@@ -719,7 +720,7 @@ class Calendar extends BaseComponent {
         return
       }
 
-      if (isDisableDateInRange(date, end, this._config.disabledDates, this._view)) {
+      if (isDisableDateInRange(date, end, this._config.disabledDates, this._cellUnit())) {
         this._setStartDate(null)
         this._setEndDate(null)
         return
@@ -916,12 +917,12 @@ class Calendar extends BaseComponent {
   _initializeDates(keys?: string[]): void {
     const changed = (...names: string[]) => !keys || keys.includes('selectionType') || names.some(name => keys.includes(name))
 
-    if (changed('minDate', 'firstDayOfWeek')) {
-      this._minDate = convertToLimitDate(this._config.minDate, this._config.selectionType, this._config.firstDayOfWeek, 'min')
+    if (changed('minDate')) {
+      this._minDate = convertToLimitDate(this._config.minDate, this._config.selectionType)
     }
 
-    if (changed('maxDate', 'firstDayOfWeek')) {
-      this._maxDate = convertToLimitDate(this._config.maxDate, this._config.selectionType, this._config.firstDayOfWeek, 'max')
+    if (changed('maxDate')) {
+      this._maxDate = convertToLimitDate(this._config.maxDate, this._config.selectionType)
     }
 
     if (changed('calendarDate', 'startDate', 'endDate')) {
@@ -1145,9 +1146,12 @@ class Calendar extends BaseComponent {
 
   _cellPeriodAttributes(date: Date): Record<string, any> {
     const view = this._view as PeriodViewTypes
+    const { firstDayOfWeek, selectionType } = this._config
+    const start = convertToShownDate(this._startDate, selectionType, firstDayOfWeek)
+    const end = convertToShownDate(this._endDate, selectionType, firstDayOfWeek)
     const isDisabled = isPeriodDisabled(date, view, this._minDate, this._maxDate, this._config.disabledDates)
-    const isSelected = isPeriodSelected(date, view, this._startDate, this._endDate)
-    const isInRange = isPeriodInRange(date, view, this._startDate, this._endDate)
+    const isSelected = isPeriodSelected(date, view, start, end)
+    const isInRange = isPeriodInRange(date, view, start, end)
     const isRangeHover = VIEW_BY_SELECTION_TYPE[this._config.selectionType] === view &&
       this._isRangeHover((start, end) => isPeriodInRange(date, view, start, end))
 
@@ -1182,11 +1186,11 @@ class Calendar extends BaseComponent {
     }
 
     const weekDate = getWeekRowDate(date)
-    const isDisabled = isDateDisabled(weekDate, this._minDate, this._maxDate, this._config.disabledDates)
-    const isSelected = isWeekSelected(weekDate, this._startDate, this._endDate)
-    const isInRange = isWeekInRange(weekDate, this._startDate, this._endDate)
+    const isDisabled = isPeriodDisabled(weekDate, 'weeks', this._minDate, this._maxDate, this._config.disabledDates)
+    const isSelected = isPeriodSelected(weekDate, 'weeks', this._startDate, this._endDate)
+    const isInRange = isPeriodInRange(weekDate, 'weeks', this._startDate, this._endDate)
 
-    const isRangeHover = this._isRangeHover((start, end) => isWeekInRange(weekDate, start, end))
+    const isRangeHover = this._isRangeHover((start, end) => isPeriodInRange(weekDate, 'weeks', start, end))
 
     const classNames = this._classNames({
       [CLASS_NAME_CALENDAR_ROW]: true,
