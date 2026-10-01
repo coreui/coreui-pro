@@ -1289,6 +1289,10 @@ removed in favour of `$translucent-opacity` and
   longer `aria-selected` either, and `renderDayCell` gets `isDisabled: true`
   and `isSelected: false` for it, so the copy of a picked date that fills the
   next panel reads as unavailable filler.
+- With `selectAdjacentDays`, the range and its hover preview are drawn on the
+  adjacent month's days as well, and `renderDayCell` gets `isInRange: true`
+  for them, as for the month's own days. Before, both stopped at the edge of
+  the month.
 - With `range`, the grid of the view that picks the range is
   `aria-multiselectable`, and every day, week row, month, quarter or year of
   the selected range that can be picked carries `aria-selected="true"`, not

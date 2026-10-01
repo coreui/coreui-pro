@@ -1045,7 +1045,7 @@ class Calendar extends BaseComponent {
     const isDisabled = isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates)
     const isSelected = isDateSelected(date, this._startDate, this._endDate)
     const isTodayDate = isCurrentMonth && isToday(date)
-    const isInRange = isCurrentMonth && isDateInRange(date, this._startDate, this._endDate)
+    const isInRange = !isFiller && isDateInRange(date, this._startDate, this._endDate)
     const meta = {
       isDisabled: isDisabled || isFiller,
       isInCurrentMonth: isCurrentMonth,
@@ -1071,7 +1071,7 @@ class Calendar extends BaseComponent {
       }
     }
 
-    const isRangeHover = isCurrentMonth && this._isRangeHover((start, end) => isDateInRange(date, start, end))
+    const isRangeHover = !isFiller && this._isRangeHover((start, end) => isDateInRange(date, start, end))
 
     const classNames = this._classNames({
       [CLASS_NAME_CALENDAR_CELL]: true,
