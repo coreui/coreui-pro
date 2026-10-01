@@ -2396,6 +2396,31 @@ describe('Calendar', () => {
       expect(event.defaultPrevented).toBeTrue()
     })
 
+    it('should keep the day a series of PageDown and PageUp presses started from', () => {
+      const div = renderCalendar({ calendarDate: new Date(2026, 0, 1) })
+
+      pressKey(focusDay(div, 2026, 0, 31), 'PageDown')
+      expect(activeDate()).toEqual(new Date(2026, 1, 28))
+
+      pressKey(document.activeElement, 'PageDown')
+      expect(activeDate()).toEqual(new Date(2026, 2, 31))
+
+      pressKey(document.activeElement, 'PageUp')
+      pressKey(document.activeElement, 'PageUp')
+      expect(activeDate()).toEqual(new Date(2026, 0, 31))
+    })
+
+    it('should start a new series of page turns from the day another key moved to', () => {
+      const div = renderCalendar({ calendarDate: new Date(2026, 0, 1) })
+
+      pressKey(focusDay(div, 2026, 0, 31), 'PageDown')
+      pressKey(document.activeElement, 'ArrowLeft')
+      pressKey(document.activeElement, 'ArrowRight')
+      pressKey(document.activeElement, 'PageDown')
+
+      expect(activeDate()).toEqual(new Date(2026, 2, 28))
+    })
+
     it('should land on the same day when PageDown leads into a month with nothing to pick', () => {
       renderCalendar({ disabledDates: date => date.getMonth() === 8 })
 

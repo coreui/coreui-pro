@@ -807,10 +807,18 @@ describe('Calendar Utilities', () => {
       type: 'move',
       years
     })
-    const page = (date, months, years = 0) => ({
+    const page = (date, months, years = 0, keepDay = date.getDate()) => ({
       date,
+      keepDay,
       months,
       type: 'page',
+      years
+    })
+    const stop = (date, keepDay, months = 0, years = 0) => ({
+      date,
+      keepDay,
+      months,
+      type: 'move',
       years
     })
     const rowMove = (date, panel = 0) => ({
@@ -995,12 +1003,21 @@ describe('Calendar Utilities', () => {
     it('should turn the calendar a month with PageDown and PageUp and move to the same day, cut to the length of the month', () => {
       expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 6, 15), context())).toEqual(page(new Date(2026, 7, 15), 1))
       expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 6, 1), context())).toEqual(page(new Date(2026, 7, 1), 1))
-      expect(getCalendarKeyAction(press('PageUp'), new Date(2026, 6, 31), context())).toEqual(page(new Date(2026, 5, 30), -1))
-      expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 0, 31), context({ calendarDate: new Date(2026, 0, 1) }))).toEqual(page(new Date(2026, 1, 28), 1))
+      expect(getCalendarKeyAction(press('PageUp'), new Date(2026, 6, 31), context())).toEqual(page(new Date(2026, 5, 30), -1, 0, 31))
+      expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 0, 31), context({ calendarDate: new Date(2026, 0, 1) }))).toEqual(page(new Date(2026, 1, 28), 1, 0, 31))
+    })
+
+    it('should keep the day a series of page turns started from while the focus is on the date the last turn reached', () => {
+      const february = context({ calendarDate: new Date(2026, 1, 1), keptDay: { date: new Date(2026, 1, 28), day: 31 } })
+
+      expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 1, 28), february)).toEqual(page(new Date(2026, 2, 31), 1, 0, 31))
+      expect(getCalendarKeyAction(press('PageUp'), new Date(2026, 1, 28), february)).toEqual(page(new Date(2026, 0, 31), -1, 0, 31))
+      expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 1, 27), february)).toEqual(page(new Date(2026, 2, 27), 1))
+      expect(getCalendarKeyAction(press('ArrowRight'), new Date(2026, 1, 28), february)).toEqual(move(new Date(2026, 2, 1), 1))
     })
 
     it('should turn the calendar a year with Shift, a year in the months and quarters views, and a page of years in the years view', () => {
-      expect(getCalendarKeyAction(press('PageDown', true), new Date(2028, 1, 29), context({ calendarDate: new Date(2028, 1, 1) }))).toEqual(page(new Date(2029, 1, 28), 0, 1))
+      expect(getCalendarKeyAction(press('PageDown', true), new Date(2028, 1, 29), context({ calendarDate: new Date(2028, 1, 1) }))).toEqual(page(new Date(2029, 1, 28), 0, 1, 29))
       expect(getCalendarKeyAction(press('PageUp', true), new Date(2026, 6, 15), context())).toEqual(page(new Date(2025, 6, 15), 0, -1))
       expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 4, 1), context({ view: 'months' }))).toEqual(page(new Date(2027, 4, 1), 0, 1))
       expect(getCalendarKeyAction(press('PageUp'), new Date(2026, 3, 1), context({ view: 'quarters' }))).toEqual(page(new Date(2025, 3, 1), 0, -1))
@@ -1008,10 +1025,10 @@ describe('Calendar Utilities', () => {
     })
 
     it('should stop PageDown and PageUp on the last date inside maxDate and minDate, paging only when it is out of view', () => {
-      expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 6, 10), context({ maxDate: new Date(2026, 6, 20) }))).toEqual(move(new Date(2026, 6, 20)))
-      expect(getCalendarKeyAction(press('PageUp'), new Date(2026, 6, 10), context({ minDate: new Date(2026, 5, 20) }))).toEqual(move(new Date(2026, 5, 20), -1))
-      expect(getCalendarKeyAction(press('PageDown', true), new Date(2026, 6, 10), context({ maxDate: new Date(2026, 9, 5) }))).toEqual(move(new Date(2026, 9, 5), 3))
-      expect(getCalendarKeyAction(press('PageUp'), new Date(2026, 6, 25), context({ minDate: new Date(2026, 6, 20, 12) }))).toEqual(move(new Date(2026, 6, 20)))
+      expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 6, 10), context({ maxDate: new Date(2026, 6, 20) }))).toEqual(stop(new Date(2026, 6, 20), 10))
+      expect(getCalendarKeyAction(press('PageUp'), new Date(2026, 6, 10), context({ minDate: new Date(2026, 5, 20) }))).toEqual(stop(new Date(2026, 5, 20), 10, -1))
+      expect(getCalendarKeyAction(press('PageDown', true), new Date(2026, 6, 10), context({ maxDate: new Date(2026, 9, 5) }))).toEqual(stop(new Date(2026, 9, 5), 10, 3))
+      expect(getCalendarKeyAction(press('PageUp'), new Date(2026, 6, 25), context({ minDate: new Date(2026, 6, 20, 12) }))).toEqual(stop(new Date(2026, 6, 20), 25))
       expect(getCalendarKeyAction(press('PageUp'), new Date(2026, 7, 31), context({ calendarDate: new Date(2026, 7, 1), minDate: new Date(2026, 6, 31, 14) })))
         .toEqual(page(new Date(2026, 6, 31), -1))
       expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 5, 20), context({ calendarDate: new Date(2026, 5, 1), maxDate: new Date(2026, 6, 20) })))
@@ -1025,19 +1042,19 @@ describe('Calendar Utilities', () => {
     })
 
     it('should reach the day of a minDate or maxDate that carries a time', () => {
-      expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 6, 10), context({ maxDate: new Date(2026, 6, 20, 8) }))).toEqual(move(new Date(2026, 6, 20)))
-      expect(getCalendarKeyAction(press('PageUp'), new Date(2026, 6, 20), context({ minDate: new Date(2026, 6, 5, 18) }))).toEqual(move(new Date(2026, 6, 5)))
+      expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 6, 10), context({ maxDate: new Date(2026, 6, 20, 8) }))).toEqual(stop(new Date(2026, 6, 20), 10))
+      expect(getCalendarKeyAction(press('PageUp'), new Date(2026, 6, 20), context({ minDate: new Date(2026, 6, 5, 18) }))).toEqual(stop(new Date(2026, 6, 5), 20))
     })
 
     it('should stop the months, quarters and years views on the last period inside the bound', () => {
       expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 2, 1), context({ calendarDate: new Date(2026, 0, 1), maxDate: new Date(2026, 7, 15), view: 'months' })))
-        .toEqual(move(new Date(2026, 7, 1)))
+        .toEqual(stop(new Date(2026, 7, 1), 1))
       expect(getCalendarKeyAction(press('PageUp'), new Date(2027, 2, 1), context({ calendarDate: new Date(2027, 0, 1), minDate: new Date(2026, 2, 20), view: 'months' })))
         .toEqual(page(new Date(2026, 2, 1), 0, -1))
       expect(getCalendarKeyAction(press('PageUp'), new Date(2027, 0, 1), context({ calendarDate: new Date(2027, 0, 1), minDate: new Date(2026, 4, 10), view: 'quarters' })))
-        .toEqual(move(new Date(2026, 3, 1), 0, -1))
+        .toEqual(stop(new Date(2026, 3, 1), 1, 0, -1))
       expect(getCalendarKeyAction(press('PageDown'), new Date(2024, 0, 1), context({ calendarDate: new Date(2026, 0, 1), maxDate: new Date(2028, 5, 1), view: 'years' })))
-        .toEqual(move(new Date(2028, 0, 1)))
+        .toEqual(stop(new Date(2028, 0, 1), 1))
       expect(getCalendarKeyAction(press('PageUp'), new Date(2026, 2, 1), context({ calendarDate: new Date(2026, 0, 1), minDate: new Date(2026, 2, 20), view: 'months' })))
         .toEqual({ type: 'stay' })
     })
@@ -1051,12 +1068,12 @@ describe('Calendar Utilities', () => {
     })
 
     it('should move from a day of an adjacent month to the same day a month away, turning only as far as it takes', () => {
-      expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 7, 1), context())).toEqual(move(new Date(2026, 8, 1), 2))
-      expect(getCalendarKeyAction(press('PageUp'), new Date(2026, 5, 30), context())).toEqual(move(new Date(2026, 4, 30), -2))
-      expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 5, 30), context())).toEqual(move(new Date(2026, 6, 30)))
-      expect(getCalendarKeyAction(press('PageDown', true), new Date(2026, 7, 1), context())).toEqual(move(new Date(2027, 7, 1), 13))
+      expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 7, 1), context())).toEqual(stop(new Date(2026, 8, 1), 1, 2))
+      expect(getCalendarKeyAction(press('PageUp'), new Date(2026, 5, 30), context())).toEqual(stop(new Date(2026, 4, 30), 30, -2))
+      expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 5, 30), context())).toEqual(stop(new Date(2026, 6, 30), 30))
+      expect(getCalendarKeyAction(press('PageDown', true), new Date(2026, 7, 1), context())).toEqual(stop(new Date(2027, 7, 1), 1, 13))
       expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 6, 1), context({ calendarDate: new Date(2026, 5, 1), calendars: 2 })))
-        .toEqual(move(new Date(2026, 7, 1), 1))
+        .toEqual(stop(new Date(2026, 7, 1), 1, 1))
       expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 6, 15), context({ calendarDate: new Date(2026, 5, 1), calendars: 2, panel: 1 })))
         .toEqual(page(new Date(2026, 7, 15), 1))
     })
@@ -1065,11 +1082,11 @@ describe('Calendar Utilities', () => {
       const rows = context({ rows: true })
 
       expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 5, 29), { ...rows, maxDate: new Date(2026, 6, 3) })).toEqual({ type: 'stay' })
-      expect(getCalendarKeyAction(press('PageUp'), new Date(2026, 5, 29), { ...rows, minDate: new Date(2026, 5, 10) })).toEqual(move(new Date(2026, 5, 8), -1))
+      expect(getCalendarKeyAction(press('PageUp'), new Date(2026, 5, 29), { ...rows, minDate: new Date(2026, 5, 10) })).toEqual(stop(new Date(2026, 5, 8), 29, -1))
       expect(getCalendarKeyAction(press('PageUp'), new Date(2026, 6, 27), { ...rows, minDate: new Date(2026, 5, 26) })).toEqual(page(new Date(2026, 5, 27), -1))
-      expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 6, 27), { ...rows, maxDate: new Date(2026, 7, 3) })).toEqual(move(new Date(2026, 7, 3), 1))
+      expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 6, 27), { ...rows, maxDate: new Date(2026, 7, 3) })).toEqual(stop(new Date(2026, 7, 3), 27, 1))
       expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 6, 27), { ...rows, maxDate: new Date(2026, 7, 24) })).toEqual(page(new Date(2026, 7, 27), 1))
-      expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 7, 1), context({ maxDate: new Date(2026, 7, 15) }))).toEqual(move(new Date(2026, 7, 15), 1))
+      expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 7, 1), context({ maxDate: new Date(2026, 7, 15) }))).toEqual(stop(new Date(2026, 7, 15), 1, 1))
       expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 7, 1), context({ maxDate: new Date(2026, 7, 1) }))).toEqual({ type: 'stay' })
     })
 
@@ -1116,12 +1133,12 @@ describe('Calendar Utilities', () => {
       for (const minDate of [undefined, createDate(-10)]) {
         expect(getCalendarKeyAction(press('ArrowLeft'), createDate(1), { ...january, minDate })).toEqual({ type: 'stay' })
         expect(getCalendarKeyAction(press('ArrowUp'), createDate(1, 0, 5), { ...january, minDate })).toEqual({ type: 'stay' })
-        expect(getCalendarKeyAction(press('PageUp'), createDate(1, 0, 15), { ...january, minDate })).toEqual(move(createDate(1)))
+        expect(getCalendarKeyAction(press('PageUp'), createDate(1, 0, 15), { ...january, minDate })).toEqual(stop(createDate(1), 15))
       }
 
       expect(getCalendarKeyAction(press('ArrowLeft'), createDate(1), context({ calendarDate: createDate(1), view: 'months' }))).toEqual({ type: 'stay' })
       expect(getCalendarKeyAction(press('ArrowLeft'), createDate(1), context({ calendarDate: createDate(1), view: 'years' }))).toEqual({ type: 'stay' })
-      expect(getCalendarKeyAction(press('PageUp'), createDate(5), context({ calendarDate: createDate(5), view: 'years' }))).toEqual(move(createDate(1)))
+      expect(getCalendarKeyAction(press('PageUp'), createDate(5), context({ calendarDate: createDate(5), view: 'years' }))).toEqual(stop(createDate(1), 1))
     })
 
     it('should page the calendar with PageDown and PageUp and stay on Home and End when the grid has the focus', () => {

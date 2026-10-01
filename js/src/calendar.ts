@@ -267,6 +267,7 @@ class Calendar extends BaseComponent {
   protected declare _minDate: Date | null
   protected declare _maxDate: Date | null
   protected declare _hoverDate: Date | null
+  protected declare _keptDay: { date: Date; day: number } | null
   protected declare _selectEndDate: boolean
   protected declare _view: ViewTypes
   protected declare _formatter: ReturnType<typeof createDateFormatter>
@@ -420,6 +421,7 @@ class Calendar extends BaseComponent {
     }
 
     event.preventDefault()
+    this._keptDay = 'keepDay' in action && action.keepDay !== undefined && action.date ? { date: action.date, day: action.keepDay } : null
 
     if (action.type === 'activate') {
       this._handleCalendarClick(event)
@@ -470,6 +472,7 @@ class Calendar extends BaseComponent {
       calendarDate: this._calendarDate,
       calendars: this._config.calendars,
       firstDayOfWeek: this._config.firstDayOfWeek,
+      keptDay: this._keptDay,
       maxDate: this._maxDate,
       minDate: this._minDate,
       panel: SelectorEngine.find(SELECTOR_CALENDAR, this._element as ParentNode).indexOf(target.closest(SELECTOR_CALENDAR) as HTMLElement),
