@@ -130,6 +130,7 @@ describe('Range', () => {
       const range = new Range(rangeEl)
 
       expect(range._input).toBeNull()
+      expect(() => range.update()).not.toThrow()
       expect(() => range.dispose()).not.toThrow()
     })
 
@@ -169,15 +170,6 @@ describe('Range', () => {
       range.update()
 
       expect(rangeEl.style.getPropertyValue('--cui-range-fill')).toEqual('0.1')
-    })
-
-    it('should start the band at the track start with a single thumb', () => {
-      fixtureEl.innerHTML = getRangeHtml()
-
-      const rangeEl = fixtureEl.querySelector('.form-range')
-      new Range(rangeEl) // eslint-disable-line no-new
-
-      expect(rangeEl.style.getPropertyValue('--cui-range-fill-start')).toEqual('')
     })
 
     it('should leave the band unset with track false', () => {
@@ -500,18 +492,6 @@ describe('Range', () => {
       expect(ticks[1]).not.toHaveClass('form-range-tick-end')
       expect(ticks[2]).toHaveClass('form-range-tick-end')
     })
-
-    it('should ignore clicks on ticks by default', () => {
-      fixtureEl.innerHTML = getMultiHtml('data-coreui-ticks="Low, Mid, High"')
-
-      new Range(fixtureEl.querySelector('.form-range')) // eslint-disable-line no-new
-
-      expect(fixtureEl.querySelector('.form-range-ticks')).not.toHaveClass('form-range-ticks-clickable')
-
-      fixtureEl.querySelectorAll('.form-range-tick-label')[2].dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, button: 0, pointerId: 1 }))
-
-      expect(fixtureEl.querySelectorAll('.form-range-input')[1].value).toEqual('75')
-    })
   })
 
   describe('events', () => {
@@ -590,19 +570,19 @@ describe('Range', () => {
     })
 
     it('should hand back the markup it changed', () => {
-      fixtureEl.innerHTML = getMultiHtml('data-coreui-ticks="Low, High"')
+      fixtureEl.innerHTML = getRangeHtml('data-coreui-ticks="Low, High"')
 
       const rangeEl = fixtureEl.querySelector('.form-range')
-      const [low, high] = fixtureEl.querySelectorAll('.form-range-input')
-      low.setAttribute('aria-valuetext', 'author text')
+      const inputEl = fixtureEl.querySelector('.form-range-input')
+      inputEl.setAttribute('aria-valuetext', 'author text')
       const range = new Range(rangeEl, { tooltipsFormat: value => `${value} km` })
+
+      expect(inputEl.getAttribute('aria-valuetext')).toEqual('50 km')
 
       range.dispose()
 
-      expect(low.getAttribute('aria-valuetext')).toEqual('author text')
-      expect(high.hasAttribute('aria-valuetext')).toBeFalse()
-      expect([low.style.zIndex, high.style.zIndex]).toEqual(['', ''])
-      expect(rangeEl.style.getPropertyValue('--cui-range-fill-start')).toEqual('')
+      expect(inputEl.getAttribute('aria-valuetext')).toEqual('author text')
+      expect(rangeEl.style.getPropertyValue('--cui-range-fill')).toEqual('')
       expect(fixtureEl.querySelector('.form-range-ticks')).toBeNull()
     })
 

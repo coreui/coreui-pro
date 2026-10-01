@@ -1,3 +1,4 @@
+import EventHandler from '../../src/dom/event-handler.js'
 import Range from '../../src/range.js'
 import RangeSlider from '../../src/range-slider.js'
 import {
@@ -100,6 +101,18 @@ describe('RangeSlider', () => {
         ['range', '10', '200', '5', '20'],
         ['range', '10', '200', '5', '150']
       ])
+    })
+
+    it('should keep the Range data API off the range it builds before DOMContentLoaded', () => {
+      const { element } = mount({ value: [20, 80] })
+      const [low] = inputsOf(element)
+
+      document.dispatchEvent(new Event('DOMContentLoaded'))
+      move(low, 30)
+
+      expect(Range.getInstance(wrapperOf(element))).toBeNull()
+      expect(wrapperOf(element).style.getPropertyValue('--cui-range-fill-start')).toEqual('0.3')
+      expect(wrapperOf(element).style.getPropertyValue('--cui-range-fill')).toEqual('0.8')
     })
 
     it('should write each value as the default value, so a form reset restores it', () => {
@@ -223,6 +236,11 @@ describe('RangeSlider', () => {
 
       const { element: single } = mount({ value: 40 })
       expect(wrapperOf(single).style.getPropertyValue('--cui-range-fill-start')).toEqual('')
+      expect(inputsOf(single)[0].style.zIndex).toEqual('')
+
+      const { element: unfilled } = mount({ track: false, value: [20, 80] })
+      expect(wrapperOf(unfilled).style.getPropertyValue('--cui-range-fill-start')).toEqual('')
+      expect(wrapperOf(unfilled).style.getPropertyValue('--cui-range-fill')).toEqual('')
     })
 
     it('should stack the thumbs so the one that can still move is on top', () => {
@@ -315,7 +333,10 @@ describe('RangeSlider', () => {
       const { element } = mount({ value: [25, 75] })
       const [low] = inputsOf(element)
 
-      low.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, button: 0, pointerId: 1 }))
+      const rect = low.getBoundingClientRect()
+      low.dispatchEvent(new PointerEvent('pointerdown', {
+        bubbles: true, button: 0, clientX: rect.left + (rect.width * 0.25) + 4, clientY: rect.top + (rect.height / 2), pointerId: 1
+      }))
 
       expect(inputsOf(element).map(input => input.value)).toEqual(['25', '75'])
     })
@@ -343,11 +364,11 @@ describe('RangeSlider', () => {
     })
 
     it('should pick the farther of two equal thumbs on the side of the press', () => {
-      const { element } = mount({ value: [20, 50, 50] })
+      const { element } = mount({ value: [20, 50, 50, 80] })
 
       pressAt(wrapperOf(element), 56)
 
-      expect(inputsOf(element).map(input => input.value)).toEqual(['20', '50', '56'])
+      expect(inputsOf(element).map(input => input.value)).toEqual(['20', '50', '56', '80'])
     })
 
     it('should leave thumbs disabled by a fieldset alone', () => {
@@ -359,6 +380,7 @@ describe('RangeSlider', () => {
       element.querySelectorAll('.form-range-tick-label')[1].dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, button: 0, pointerId: 1 }))
 
       expect(inputsOf(element).map(input => input.value)).toEqual(['25', '75'])
+      expect(element.querySelector('.form-range-ticks')).not.toHaveClass('form-range-ticks-clickable')
     })
 
     it('should ignore a press on the wrapper outside the track', () => {
@@ -437,7 +459,9 @@ describe('RangeSlider', () => {
       wrapper.addEventListener('input', () => events.push('input'))
       wrapper.addEventListener('change', () => events.push('change'))
 
-      low.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'ArrowRight' }))
+      const arrow = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'ArrowRight' })
+      low.dispatchEvent(arrow)
+      expect(arrow.defaultPrevented).toBeTrue()
       expect(low.value).toEqual('26')
 
       low.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'ArrowLeft' }))
@@ -490,6 +514,20 @@ describe('RangeSlider', () => {
       expect([...tooltips].map(tooltip => tooltip.textContent)).toEqual(['25', '75'])
       expect([...tooltips].map(tooltip => tooltip.style.getPropertyValue('--cui-range-fill'))).toEqual(['0.25', '0.75'])
       expect(tooltips[0].previousElementSibling).toEqual(inputsOf(element)[0])
+    })
+
+    it('should announce the label of the tick a handle sits on', () => {
+      const { element } = mount({ ticks: 'Low, Medium, High', value: [50] })
+
+      expect(inputsOf(element)[0].getAttribute('aria-valuetext')).toEqual('50, Medium')
+    })
+
+    it('should not move a handle to a tick with clickableTicks false', () => {
+      const { element } = mount({ clickableTicks: false, ticks: 'Low, Mid, High', value: [25, 75] })
+
+      element.querySelectorAll('.form-range-tick-label')[2].dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, button: 0, pointerId: 1 }))
+
+      expect(inputsOf(element)[1].value).toEqual('75')
     })
 
     it('should move the nearest thumb to a clicked tick and commit on release', () => {
@@ -602,6 +640,20 @@ describe('RangeSlider', () => {
 
       const { element: three } = mount({ value: [20, 50, 80] })
       expect(inputsOf(three).map(input => input.getAttribute('aria-label'))).toEqual(['Value 1', 'Value 2', 'Value 3'])
+    })
+
+    it('should read a string ariaLabel, comma separated for several handles', () => {
+      const { element } = mount({}, 'data-coreui-value="50" data-coreui-aria-label="Volume"')
+      expect(inputsOf(element)[0].getAttribute('aria-label')).toEqual('Volume')
+
+      const { element: two } = mount({ ariaLabel: 'Min, Max', value: [20, 80] })
+      expect(inputsOf(two).map(input => input.getAttribute('aria-label'))).toEqual(['Min', 'Max'])
+    })
+
+    it('should keep the generated name of a handle the array does not cover', () => {
+      const { element } = mount({ ariaLabel: ['Low'], value: [20, 80] })
+
+      expect(inputsOf(element).map(input => input.getAttribute('aria-label'))).toEqual(['Low', 'Maximum value'])
     })
 
     it('should name a single handle with ariaLabel', () => {
@@ -738,15 +790,13 @@ describe('RangeSlider', () => {
     it('should stop handling the wrapper it replaces', () => {
       const { element, rangeSlider } = mount({ value: [20, 80] })
       const wrapper = wrapperOf(element)
-      const [low] = inputsOf(element)
+      const off = spyOn(EventHandler, 'off').and.callThrough()
 
       rangeSlider.setConfig({ value: [10, 90] })
-      const events = []
-      element.addEventListener('input.coreui.range-slider', () => events.push('input'))
-      move(low, 30)
 
+      const removed = off.calls.allArgs().filter(([target]) => target === wrapper).map(([, type]) => type)
+      expect(removed).toEqual(['input.coreui.range-slider', 'change.coreui.range-slider', 'keydown.coreui.range-slider', 'pointerdown.coreui.range-slider'])
       expect(wrapper.isConnected).toBeFalse()
-      expect(events).toEqual([])
       expect(wrapperOf(element)).not.toEqual(wrapper)
     })
 

@@ -1983,15 +1983,18 @@ field behind that kept submitting.
   first input draws the track), and so is the `.disabled` class on the element
   (the inputs are disabled). The handles no longer carry `role="slider"`,
   `aria-valuemin`, `aria-valuemax` or `aria-valuenow`: the native inputs expose
-  them. Options, events and methods keep their names. The range tokens are
+  them. Options, events and methods keep their names, apart from `ariaLabels`
+  (below); the `changed.coreui.range` event that an inner Range fired on each
+  handle is gone, so listen to `input.coreui.range-slider` and
+  `change.coreui.range-slider` on the slider. The range tokens are
   declared on that inner `.form-range`, so a `--cui-range-*` token set on the
   slider element itself (inline, or by a class on it) no longer reaches the
   handles: target its `.form-range` (`.my-slider .form-range { … }`).
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **The range slider's `ariaLabels` option is `ariaLabel`.** It takes an
-  array with one name per handle, as before, or a function
-  `(index, total) => string`, the shape the OTP input uses for its digits;
-  `data-coreui-aria-labels` becomes `data-coreui-aria-label`.
+  array with one name per handle, as before, a comma-separated string, or a
+  function `(index, total) => string`, the shape the OTP input uses for its
+  digits; `data-coreui-aria-labels` becomes `data-coreui-aria-label`.
 - **Range slider interaction follows the native control.** Pressing a handle no
   longer moves it a step; a press on the track or a clickable tick moves the
   nearest handle and it follows the pointer (mouse, touch or pen), with
@@ -2028,8 +2031,7 @@ field behind that kept submitting.
   `.range-slider-labels-container` → `.form-range-ticks`,
   `.range-slider-label` → `.form-range-tick`, and `--cui-range-slider-label-*`
   → `--cui-range-tick-label-*`. The entry shape is unchanged: a string, a
-  bare number, or `{ value, label, class, style }`. `ariaLabels` names the
-  handles and keeps its name.
+  bare number, or `{ value, label, class, style }`.
 - **Range slider ticks sit on a grid.** The plugin builds
   `grid-template-columns` (rows when vertical) from the gaps between tick
   values, so ticks are in normal flow: the container sizes itself, and the

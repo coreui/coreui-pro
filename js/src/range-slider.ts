@@ -7,7 +7,6 @@
 
 import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
-import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
 import type { ComponentConfig } from './util/config.js'
 import { defineJQueryPlugin, isRTL, jQueryDispatch } from './util/index.js'
@@ -66,7 +65,7 @@ const SELECTOR_TICK = '.form-range-tick'
 
 type RangeSliderConfig = {
   allowList: SanitizerAllowList
-  ariaLabel: string[] | ((index: number, total: number) => string) | null
+  ariaLabel: string[] | string | ((index: number, total: number) => string) | null
   clickableTicks: boolean
   disabled: boolean
   distance: number
@@ -118,7 +117,7 @@ const Default: RangeSliderConfig = {
 
 const DefaultType: Record<string, string> = {
   allowList: 'object',
-  ariaLabel: '(array|function|null)',
+  ariaLabel: '(array|function|string|null)',
   clickableTicks: 'boolean',
   disabled: 'boolean',
   distance: 'number',
@@ -258,7 +257,7 @@ class RangeSlider extends BaseComponent {
 
     if (this._tickPoints.length > 0) {
       this._ticks = createTicks(this._tickPoints, vertical)
-      this._ticks.classList.toggle(CLASS_NAME_TICKS_CLICKABLE, this._config.clickableTicks && !this._config.disabled)
+      this._ticks.classList.toggle(CLASS_NAME_TICKS_CLICKABLE, this._config.clickableTicks && this._inputs.some(input => !input.matches(':disabled')))
       this._wrapper.append(this._ticks)
     }
 
@@ -344,7 +343,7 @@ class RangeSlider extends BaseComponent {
   _ariaLabel(index: number): string | null {
     const total = (this._config.value as number[]).length
     const { ariaLabel } = this._config
-    const given = typeof ariaLabel === 'function' ? ariaLabel(index, total) : ariaLabel?.[index]
+    const given = typeof ariaLabel === 'function' ? ariaLabel(index, total) : (ariaLabel as string[] | null)?.[index]
 
     if (given) {
       return given
@@ -380,14 +379,15 @@ class RangeSlider extends BaseComponent {
       const value = Number.parseFloat(input.value)
       const tooltip = this._tooltips[index]
 
+      const html = sanitizeByConfig(this._format(value), this._config)
+
       if (tooltip) {
         tooltip.style.setProperty(PROPERTY_FILL, `${ratios[index]}`)
-        tooltip.lastElementChild!.innerHTML = sanitizeByConfig(this._format(value), this._config)
+        tooltip.lastElementChild!.innerHTML = html
       }
 
       const label = getTickLabel(this._tickPoints, value, getStep(input))
-      const html = typeof this._config.tooltipsFormat === 'function' ? sanitizeByConfig(this._format(value), this._config) : null
-      const text = getValueText(value, label, html)
+      const text = getValueText(value, label, typeof this._config.tooltipsFormat === 'function' ? html : null)
 
       if (text === null) {
         input.removeAttribute('aria-valuetext')
@@ -448,7 +448,7 @@ class RangeSlider extends BaseComponent {
 
     if (tick && this._ticks?.contains(tick)) {
       if (this._ticks.classList.contains(CLASS_NAME_TICKS_CLICKABLE)) {
-        const value = Number(Manipulator.getDataAttribute(tick as HTMLElement, 'value'))
+        const value = Number(tick.getAttribute('data-coreui-value'))
         const { max, min } = this._config
         this._startPress(event, rect, (value - min) / ((max - min) || 1), value)
       }
@@ -526,6 +526,10 @@ class RangeSlider extends BaseComponent {
 
     if (typeof config.ticks === 'string') {
       config.ticks = config.ticks.split(/,\s*/)
+    }
+
+    if (typeof config.ariaLabel === 'string') {
+      config.ariaLabel = config.ariaLabel.split(/,\s*/)
     }
 
     if (typeof config.name === 'string' && config.name.includes(',')) {

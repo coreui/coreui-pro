@@ -9,6 +9,7 @@
  */
 
 import BaseComponent from './base-component.js'
+import Data from './dom/data.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import type { ComponentConfig } from './util/config.js'
@@ -34,6 +35,7 @@ const NAME = 'range'
 const DATA_KEY = 'coreui.range'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
+const DATA_KEY_RANGE_SLIDER = 'coreui.range-slider'
 
 const EVENT_CHANGE = `change${EVENT_KEY}`
 const EVENT_CHANGED = `changed${EVENT_KEY}`
@@ -164,7 +166,9 @@ class Range extends BaseComponent {
 
   // Public
   update(): void {
-    this._update()
+    if (this._input) {
+      this._update()
+    }
   }
 
   override dispose(): void {
@@ -224,12 +228,14 @@ class Range extends BaseComponent {
       this._element.style.setProperty(PROPERTY_FILL, `${ratio}`)
     }
 
+    const html = sanitizeByConfig(this._format(value), this._config)
+
     if (this._tooltip) {
       this._tooltip.style.setProperty(PROPERTY_FILL, `${ratio}`)
-      this._tooltip.lastElementChild!.innerHTML = sanitizeByConfig(this._format(value), this._config)
+      this._tooltip.lastElementChild!.innerHTML = html
     }
 
-    this._updateValueText(value)
+    this._updateValueText(value, typeof this._config.tooltipsFormat === 'function' ? html : null)
     EventHandler.trigger(input, EVENT_CHANGED, { value })
   }
 
@@ -237,9 +243,8 @@ class Range extends BaseComponent {
     return typeof this._config.tooltipsFormat === 'function' ? this._config.tooltipsFormat(value) : String(value)
   }
 
-  protected _updateValueText(value: number): void {
+  protected _updateValueText(value: number, html: string | null): void {
     const label = getTickLabel(this._tickPoints, value, getStep(this._input!))
-    const html = typeof this._config.tooltipsFormat === 'function' ? sanitizeByConfig(this._format(value), this._config) : null
     const text = getValueText(value, label, html)
 
     if (text === null) {
@@ -277,7 +282,9 @@ class Range extends BaseComponent {
 
 EventHandler.on(document, EVENT_DOM_CONTENT_LOADED, () => {
   for (const element of SelectorEngine.find(SELECTOR_RANGE)) {
-    Range.getOrCreateInstance(element)
+    if (!Data.get(element.parentElement!, DATA_KEY_RANGE_SLIDER)) {
+      Range.getOrCreateInstance(element)
+    }
   }
 })
 

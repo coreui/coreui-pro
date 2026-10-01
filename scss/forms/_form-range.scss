@@ -71,7 +71,7 @@ $form-range-tokens: defaults(
 }
 
 @mixin form-range-track() {
-  // The Range and RangeSlider plugins keep `--cui-range-fill-start` and `--cui-range-fill` (0–1) in sync; unset, the band is empty.
+  // The plugins keep `--cui-range-fill` (0–1) in sync, and RangeSlider `--cui-range-fill-start`; unset, the band is empty.
   --#{$prefix}range-fill-start-edge: calc(var(--#{$prefix}range-thumb-width) * .5 + var(--#{$prefix}range-fill-start) * (100% - var(--#{$prefix}range-thumb-width)));
   --#{$prefix}range-fill-edge: calc(var(--#{$prefix}range-thumb-width) * .5 + var(--#{$prefix}range-fill) * (100% - var(--#{$prefix}range-thumb-width)));
 

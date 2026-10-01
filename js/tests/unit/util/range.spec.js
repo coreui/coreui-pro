@@ -165,6 +165,7 @@ describe('Range utilities', () => {
       expect(getStep(inputs('min="0" max="10" step="any"')[0])).toEqual(0.1)
       expect(getStep(inputs('')[0])).toEqual(1)
       expect(getStep(inputs('step="0"')[0])).toEqual(1)
+      expect(getStep(inputs('step="-5"')[0])).toEqual(1)
     })
   })
 
@@ -193,13 +194,15 @@ describe('Range utilities', () => {
 
     it('reads the datalist given by id over the list attribute, and nothing for a boolean option', () => {
       fixtureEl.innerHTML = `
-        <input type="range" min="0" max="100">
+        <input type="range" min="0" max="100" list="ticksList">
+        <datalist id="ticksList"><option value="90" label="Hot"></option></datalist>
         <datalist id="other"><option value="50" label="Half"></option></datalist>
       `
       const input = fixtureEl.querySelector('input')
 
       expect(getTickPoints(input, false, 'other').map(point => point.label)).toEqual(['Half'])
-      expect(getTickPoints(input, true, null)).toEqual([])
+      expect(getTickPoints(input, true, null).map(point => point.label)).toEqual(['Hot'])
+      expect(getTickPoints(input, true, 'missing')).toEqual([])
     })
   })
 

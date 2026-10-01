@@ -1,6 +1,3 @@
-import Manipulator from '../dom/manipulator.js'
-import SelectorEngine from '../dom/selector-engine.js'
-
 export type RangeTick = number | string | { class?: string | string[], label?: string, style?: Record<string, string>, value?: number }
 
 export type RangeTickPoint = {
@@ -102,7 +99,7 @@ export const createTicks = (points: RangeTickPoint[], vertical: boolean): HTMLEl
     tick.className = 'form-range-tick'
     tick.classList.toggle('form-range-tick-start', point.ratio === 0)
     tick.classList.toggle('form-range-tick-end', point.ratio === 1)
-    Manipulator.setDataAttribute(tick, 'value', `${point.value}`)
+    tick.setAttribute('data-coreui-value', `${point.value}`)
 
     if (vertical) {
       tick.style.gridRowStart = `${points.length - index + 1}`
@@ -247,10 +244,16 @@ export const getStackOrder = (ratio: number, index: number, total: number): numb
  * Reads the step of a range input, with `step="any"` counted as a hundredth of the span.
  *
  * @param input - The range input
- * @returns The step as a number, `1` when the attribute is missing or invalid
+ * @returns The step as a number, `1` when the attribute is missing, invalid or not above 0
  */
-export const getStep = (input: HTMLInputElement): number =>
-  input.step === 'any' ? (getBound(input, 'max') - getBound(input, 'min')) / 100 : (Number.parseFloat(input.step) || 1)
+export const getStep = (input: HTMLInputElement): number => {
+  if (input.step === 'any') {
+    return (getBound(input, 'max') - getBound(input, 'min')) / 100
+  }
+
+  const step = Number.parseFloat(input.step)
+  return step > 0 ? step : 1
+}
 
 /**
  * Measures the thumb width of a range by laying out a hidden probe that reads
@@ -313,7 +316,7 @@ export const getTickPoints = (input: HTMLInputElement, ticks: RangeTick[] | bool
   const datalist = listId ? document.getElementById(listId) : null
 
   if (datalist) {
-    const options = SelectorEngine.find<HTMLOptionElement>('option', datalist)
+    const options = [...datalist.querySelectorAll('option')]
 
     for (const { index, ratio, value } of getTickPositions(min, max, options.map(option => Number.parseFloat(option.value)))) {
       points.push({ label: options[index].label, ratio, value })

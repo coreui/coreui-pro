@@ -48,7 +48,7 @@ Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label 
 
 ## Multiple handles
 
-Enable multiple handles to allow the selection of a range or/and multiple values.
+Enable multiple handles to allow the selection of a range or/and multiple values. The handles share one track, the band runs from the lowest handle to the highest, and each handle is a native range input, so dragging, the keyboard, touch, form submission and form reset work as they do for one. The handles stay in order, a press on the track moves the nearest one and it follows the pointer until it is released, and when two of them meet the one that can still move stays on top.
 
 <Example pro code={`<div class="mb-3" data-coreui-range-slider data-coreui-value="20,40"></div>
   <div class="mb-3" data-coreui-range-slider data-coreui-value="20,40,60"></div>
@@ -216,7 +216,7 @@ Please note that for security reasons, the `sanitize`, `sanitizeFn`, and `allowL
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
 | `allowList` | object | [Default value](/getting-started/javascript#sanitizer) |  Defines the set of permitted HTML tags and attributes that can safely appear in the tooltip content when HTML content is passedd. This helps maintain control over the output and prevent injection of malicious code. |
-| `ariaLabel` | array, function, null | `null` | Accessible name of each handle: an array with one name per handle, in order, or a function `(index, total) => string`. Handles are otherwise indistinguishable to a screen reader, so a slider with more than one wants this. A handle the array does not cover keeps its generated name, such as `Maximum value`. A single handle gets no generated name, and the generated input carries no `id` for a `<label for>`, so this is the only way to name it. |
+| `ariaLabel` | array, function, string, null | `null` | Accessible name of each handle: an array with one name per handle, in order, a comma-separated string, or a function `(index, total) => string`. Handles are otherwise indistinguishable to a screen reader, so a slider with more than one wants this. A handle the array does not cover keeps its generated name, such as `Maximum value`. A single handle gets no generated name, and the generated input carries no `id` for a `<label for>`, so this is the only way to name it. |
 | `clickableTicks` | boolean | `true` | Enables or disables the ability to click on ticks to set slider values. |
 | `disabled` | boolean | `false` | Disables the slider, making it non-interactive and grayed out. |
 | `distance` | number | `0` | Sets the minimum distance between multiple slider handles. |
@@ -251,6 +251,8 @@ Please note that for security reasons, the `sanitize`, `sanitizeFn`, and `allowL
 | `change.coreui.range-slider` | Fired when a handle's value changes and the user finishes interacting: on release of the pointer, and on every key press. The event's `value` holds the values of all handles as numbers. |
 | `input.coreui.range-slider` | Fired continuously while a handle moves. The event's `value` holds the values of all handles as numbers. |
 
+A press on the track or on a clickable tick dispatches the native `input` event on the handle it moves, and `change` when the pointer is released, the way the browser does when a handle is dragged, so listeners on the inputs see the same events either way. A form reset puts the handles back on their configured values.
+
 ```js
 const myRangeSlider = document.getElementById('myRangeSlider')
 myRangeSlider.addEventListener('change.coreui.range-slider', event => {
@@ -262,7 +264,7 @@ myRangeSlider.addEventListener('change.coreui.range-slider', event => {
 
 Each handle is a native `<input type="range">`, so it is a slider with its value, minimum and maximum without any ARIA of its own, and the browser handles the keyboard: the arrow keys, <kbd>Page Up</kbd>, <kbd>Page Down</kbd>, <kbd>Home</kbd> and <kbd>End</kbd>. In a vertical slider the handles carry `aria-orientation="vertical"`, and <kbd>→</kbd> increases the value in every browser, as <kbd>↑</kbd> does.
 
-Name each handle with `ariaLabel`: an array with one name per handle, or a function `(index, total) => string`. Without it, two handles are named "Minimum value" and "Maximum value", more handles "Value 1", "Value 2" and so on, and a single handle has no name: the generated input has no `id` for a `<label for>`, so give it `ariaLabel` or put the slider element inside a `<label>`. While a handle sits on a labelled tick, its `aria-valuetext` adds the label to the value ("50, Medium", or the `tooltipsFormat` text followed by the label when they differ).
+Name each handle with `ariaLabel`: an array with one name per handle, a comma-separated string, or a function `(index, total) => string`. Without it, two handles are named "Minimum value" and "Maximum value", more handles "Value 1", "Value 2" and so on, and a single handle has no name: the generated input has no `id` for a `<label for>`, so give it `ariaLabel` or put the slider element inside a `<label>`. While a handle sits on a labelled tick, its `aria-valuetext` adds the label to the value ("50, Medium", or the `tooltipsFormat` text followed by the label when they differ).
 
 Tooltips are hidden from assistive technology (`aria-hidden="true"`): they repeat the value the handle already announces, so exposing them would have screen readers read every change twice. Tick marks are hidden too: a label reaches the handle through `aria-valuetext` while the handle sits on its tick, so a label that carries meaning the value does not should also be said in the page text.
 
