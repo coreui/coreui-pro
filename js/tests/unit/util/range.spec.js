@@ -1,12 +1,18 @@
 import { onTestFinished } from 'vitest'
 import {
   constrainInput,
+  createTicks,
+  createTooltip,
   getNearestInput,
   getRatio,
   getRatioAt,
   getStackOrder,
+  getStep,
   getThumbSize,
+  getTickLabel,
+  getTickPoints,
   getTickPositions,
+  getValueText,
   sanitizeValue,
   setInputValue
 } from '../../../src/util/range.js'
@@ -107,6 +113,109 @@ describe('Range utilities', () => {
 
     it('returns 0 for an empty span', () => {
       expect(getRatio(inputs('min="5" max="5" value="5"')[0])).toBe(0)
+    })
+  })
+
+  describe('createTicks', () => {
+    it('lays the ticks on a grid of the gaps between them, marks the ends and keeps class, style and label', () => {
+      const ticks = createTicks([
+        { label: 'Low', ratio: 0, value: 0 },
+        {
+          class: 'fw-bold  text-danger', label: '', ratio: 0.25, style: { color: 'red' }, value: 25
+        },
+        { label: 'High', ratio: 1, value: 100 }
+      ], false)
+
+      expect(ticks).toHaveClass('form-range-ticks')
+      expect(ticks.getAttribute('aria-hidden')).toEqual('true')
+      expect(ticks.style.gridTemplateColumns).toEqual('0fr 0.25fr 0.75fr 0fr')
+      expect([...ticks.children].map(tick => tick.style.gridColumnStart)).toEqual(['2', '3', '4'])
+      expect(ticks.children[0]).toHaveClass('form-range-tick-start')
+      expect(ticks.children[2]).toHaveClass('form-range-tick-end')
+      expect(ticks.children[1]).toHaveClass('fw-bold')
+      expect(ticks.children[1]).toHaveClass('text-danger')
+      expect(ticks.children[1].style.color).toEqual('red')
+      expect(ticks.children[1].getAttribute('data-coreui-value')).toEqual('25')
+      expect([...ticks.querySelectorAll('.form-range-tick-label')].map(label => label.textContent)).toEqual(['Low', 'High'])
+    })
+
+    it('lays the ticks out in rows from the bottom when vertical', () => {
+      const ticks = createTicks([{ label: '', ratio: 0, value: 0 }, { label: '', ratio: 0.25, value: 25 }], true)
+
+      expect(ticks.style.gridTemplateRows).toEqual('0.75fr 0.25fr 0fr')
+      expect([...ticks.children].map(tick => tick.style.gridRowStart)).toEqual(['3', '2'])
+    })
+  })
+
+  describe('createTooltip', () => {
+    it('builds the tooltip markup with its placement, extra classes and the show state', () => {
+      const tooltip = createTooltip('bs-tooltip-start', 'theme-danger  fw-bold', true)
+
+      expect(tooltip.tagName).toEqual('DIV')
+      expect(tooltip.className).toEqual('form-range-tooltip tooltip bs-tooltip-start show theme-danger fw-bold')
+      expect(tooltip.getAttribute('aria-hidden')).toEqual('true')
+      expect([...tooltip.children].map(child => [child.tagName, child.className])).toEqual([['DIV', 'tooltip-arrow'], ['DIV', 'tooltip-inner']])
+      expect(createTooltip('bs-tooltip-top', '', false)).not.toHaveClass('show')
+    })
+  })
+
+  describe('getStep', () => {
+    it('reads the step, a hundredth of the span for step any, and 1 otherwise', () => {
+      expect(getStep(inputs('step="0.5"')[0])).toEqual(0.5)
+      expect(getStep(inputs('min="0" max="10" step="any"')[0])).toEqual(0.1)
+      expect(getStep(inputs('')[0])).toEqual(1)
+      expect(getStep(inputs('step="0"')[0])).toEqual(1)
+      expect(getStep(inputs('step="-5"')[0])).toEqual(1)
+    })
+  })
+
+  describe('getTickLabel', () => {
+    it('finds the label of the tick within half a step and skips unlabelled ticks', () => {
+      const points = [{ label: '', ratio: 0.5, value: 50 }, { label: 'Mid', ratio: 0.5, value: 50 }, { label: 'High', ratio: 1, value: 100 }]
+
+      expect(getTickLabel(points, 50, 1)).toEqual('Mid')
+      expect(getTickLabel(points, 52, 5)).toEqual('Mid')
+      expect(getTickLabel(points, 53, 5)).toBeNull()
+    })
+  })
+
+  describe('getTickPoints', () => {
+    it('reads the ticks option and a linked datalist, sorted along the track', () => {
+      fixtureEl.innerHTML = `
+        <input type="range" min="0" max="100" list="ticksList">
+        <datalist id="ticksList"><option value="90" label="Hot"></option><option value="x"></option></datalist>
+      `
+      const input = fixtureEl.querySelector('input')
+      const points = getTickPoints(input, [10, { class: 'low', label: 'Cold', value: 0 }, 'Middle'], null)
+
+      expect(points.map(point => [point.value, point.label, point.ratio])).toEqual([[0, 'Cold', 0], [10, '', 0.1], [90, 'Hot', 0.9], [100, 'Middle', 1]])
+      expect(points[0].class).toEqual('low')
+    })
+
+    it('reads the datalist given by id over the list attribute, and nothing for a boolean option', () => {
+      fixtureEl.innerHTML = `
+        <input type="range" min="0" max="100" list="ticksList">
+        <datalist id="ticksList"><option value="90" label="Hot"></option></datalist>
+        <datalist id="other"><option value="50" label="Half"></option></datalist>
+      `
+      const input = fixtureEl.querySelector('input')
+
+      expect(getTickPoints(input, false, 'other').map(point => point.label)).toEqual(['Half'])
+      expect(getTickPoints(input, true, null).map(point => point.label)).toEqual(['Hot'])
+      expect(getTickPoints(input, true, 'missing')).toEqual([])
+    })
+  })
+
+  describe('getValueText', () => {
+    it('announces the value with a label only, and nothing without one', () => {
+      expect(getValueText(50, 'Medium', null)).toEqual('50, Medium')
+      expect(getValueText(50, null, null)).toBeNull()
+    })
+
+    it('reads the formatter output as text with line breaks as spaces, followed by a label that differs', () => {
+      expect(getValueText(50, null, '<b>50</b><br>units')).toEqual('50 units')
+      expect(getValueText(50, 'Medium', '$50')).toEqual('$50, Medium')
+      expect(getValueText(50, 'Medium', 'Medium')).toEqual('Medium')
     })
   })
 

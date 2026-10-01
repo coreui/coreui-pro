@@ -437,7 +437,7 @@ export const a11yComponents = [
       {
         criterion: '4.1.2',
         status: 'built-in',
-        note: 'Each thumb is a role=slider input with aria-valuemin/max/now and aria-orientation; multi-thumb sliders get per-thumb aria-label (ariaLabels) and aria-valuetext when tooltipsFormat is set.'
+        note: 'Each thumb is a native range input, which exposes its value, minimum and maximum, with aria-orientation when vertical; multi-thumb sliders get a per-thumb aria-label (ariaLabel), and aria-valuetext carries the tooltipsFormat text or the label of the tick a thumb sits on.'
       },
       {
         criterion: '2.1.1',

@@ -8,10 +8,26 @@
 import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
-import Range, { type RangeTick } from './range.js'
 import type { ComponentConfig } from './util/config.js'
-import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
-import { DefaultAllowlist, type SanitizerAllowList } from './util/sanitizer.js'
+import { defineJQueryPlugin, isRTL, jQueryDispatch } from './util/index.js'
+import {
+  constrainInput,
+  createTicks,
+  createTooltip,
+  getNearestInput,
+  getRatio,
+  getRatioAt,
+  getStackOrder,
+  getStep,
+  getThumbSize,
+  getTickLabel,
+  getTickPoints,
+  getValueText,
+  setInputValue,
+  type RangeTick,
+  type RangeTickPoint
+} from './util/range.js'
+import { DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList } from './util/sanitizer.js'
 
 /**
  * Constants
@@ -24,17 +40,32 @@ const DATA_API_KEY = '.data-api'
 
 const EVENT_CHANGE = `change${EVENT_KEY}`
 const EVENT_INPUT = `input${EVENT_KEY}`
+const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
+const EVENT_POINTERCANCEL = `pointercancel${EVENT_KEY}`
+const EVENT_POINTERDOWN = `pointerdown${EVENT_KEY}`
+const EVENT_POINTERMOVE = `pointermove${EVENT_KEY}`
+const EVENT_POINTERUP = `pointerup${EVENT_KEY}`
+const EVENT_RESET = `reset${EVENT_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
 const CLASS_NAME_FORM_RANGE = 'form-range'
 const CLASS_NAME_FORM_RANGE_INPUT = 'form-range-input'
 const CLASS_NAME_FORM_RANGE_VERTICAL = 'form-range-vertical'
+const CLASS_NAME_TICKS_CLICKABLE = 'form-range-ticks-clickable'
+const CLASS_NAME_TOOLTIP_END = 'bs-tooltip-end'
+const CLASS_NAME_TOOLTIP_START = 'bs-tooltip-start'
+const CLASS_NAME_TOOLTIP_TOP = 'bs-tooltip-top'
+
+const PROPERTY_FILL = '--cui-range-fill'
+const PROPERTY_FILL_START = '--cui-range-fill-start'
 
 const SELECTOR_DATA_RANGE_SLIDER = '[data-coreui-range-slider]'
+const SELECTOR_INPUT = '.form-range-input'
+const SELECTOR_TICK = '.form-range-tick'
 
 type RangeSliderConfig = {
   allowList: SanitizerAllowList
-  ariaLabels: string[] | null
+  ariaLabel: string[] | string | ((index: number, total: number) => string) | null
   clickableTicks: boolean
   disabled: boolean
   distance: number
@@ -54,9 +85,17 @@ type RangeSliderConfig = {
   vertical: boolean
 }
 
+type RangeSliderPress = {
+  input: HTMLInputElement
+  pointerId: number
+  rect: DOMRect
+  start: string
+  thumb: number
+}
+
 const Default: RangeSliderConfig = {
   allowList: DefaultAllowlist,
-  ariaLabels: null,
+  ariaLabel: null,
   clickableTicks: true,
   disabled: false,
   distance: 0,
@@ -78,7 +117,7 @@ const Default: RangeSliderConfig = {
 
 const DefaultType: Record<string, string> = {
   allowList: 'object',
-  ariaLabels: '(array|null)',
+  ariaLabel: '(array|function|string|null)',
   clickableTicks: 'boolean',
   disabled: 'boolean',
   distance: 'number',
@@ -104,11 +143,21 @@ const DefaultType: Record<string, string> = {
 
 class RangeSlider extends BaseComponent {
   protected declare _config: RangeSliderConfig
+  protected declare _form: HTMLFormElement | null
   protected declare _inputs: HTMLInputElement[]
-  protected declare _range: Range | null
+  protected declare _press: RangeSliderPress | null
+  protected declare _resetTimeout: ReturnType<typeof setTimeout> | null
+  protected declare _tickPoints: RangeTickPoint[]
+  protected declare _ticks: HTMLElement | null
+  protected declare _tooltips: HTMLElement[]
   protected declare _wrapper: HTMLElement | null
   protected declare _onChange: (event: Event) => void
   protected declare _onInput: (event: Event) => void
+  protected declare _onKeydown: (event: Event) => void
+  protected declare _onPointerDown: (event: Event) => void
+  protected declare _onPointerMove: (event: Event) => void
+  protected declare _onPointerUp: (event: Event) => void
+  protected declare _onReset: () => void
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
@@ -117,12 +166,40 @@ class RangeSlider extends BaseComponent {
       return
     }
 
+    this._form = null
     this._inputs = []
-    this._range = null
+    this._press = null
+    this._resetTimeout = null
+    this._tickPoints = []
+    this._ticks = null
+    this._tooltips = []
     this._wrapper = null
 
-    this._onInput = event => this._relay(event, EVENT_INPUT)
-    this._onChange = event => this._relay(event, EVENT_CHANGE)
+    this._onInput = event => {
+      const input = event.target as HTMLInputElement
+
+      if (this._inputs.includes(input)) {
+        this._constrain(input)
+        this._update()
+        EventHandler.trigger(this._element, EVENT_INPUT, { value: this._values() })
+      }
+    }
+
+    this._onChange = event => {
+      if (this._inputs.includes(event.target as HTMLInputElement)) {
+        this._update()
+        EventHandler.trigger(this._element, EVENT_CHANGE, { value: this._values() })
+      }
+    }
+
+    this._onKeydown = event => this._keydown(event as KeyboardEvent)
+    this._onPointerDown = event => this._pointerDown(event as PointerEvent)
+    this._onPointerMove = event => this._pointerMove(event as PointerEvent)
+    this._onPointerUp = event => this._pointerUp(event as PointerEvent)
+    this._onReset = () => {
+      clearTimeout(this._resetTimeout!)
+      this._resetTimeout = setTimeout(() => this._update())
+    }
 
     this._build()
   }
@@ -155,33 +232,76 @@ class RangeSlider extends BaseComponent {
 
   // Private
   _build(current: number[] | null = null): void {
+    const { tooltipClass, tooltips, vertical } = this._config
+
     this._wrapper = document.createElement('div')
     this._wrapper.className = CLASS_NAME_FORM_RANGE
-    this._wrapper.classList.toggle(CLASS_NAME_FORM_RANGE_VERTICAL, this._config.vertical)
+    this._wrapper.classList.toggle(CLASS_NAME_FORM_RANGE_VERTICAL, vertical)
     this._inputs = (this._config.value as number[]).map((value, index) => this._createInput(index, value, current?.[index]))
     this._wrapper.append(...this._inputs)
     this._element.append(this._wrapper)
 
-    const {
-      allowList, clickableTicks, distance, list, sanitize, sanitizeFn, ticks, tooltipClass, tooltips, tooltipsFormat, track
-    } = this._config
+    if (tooltips) {
+      const placement = vertical ?
+        (isRTL(this._wrapper) ? CLASS_NAME_TOOLTIP_END : CLASS_NAME_TOOLTIP_START) :
+        CLASS_NAME_TOOLTIP_TOP
 
-    this._range = new Range(this._wrapper, {
-      allowList, clickableTicks, distance, list, sanitize, sanitizeFn, ticks, tooltipClass, tooltips, tooltipsFormat, track
-    })
+      for (const input of this._inputs) {
+        const tooltip = createTooltip(placement, tooltipClass, tooltips === 'always')
+        input.after(tooltip)
+        this._tooltips.push(tooltip)
+      }
+    }
 
-    EventHandler.on(this._element, EVENT_INPUT, this._onInput)
-    EventHandler.on(this._element, EVENT_CHANGE, this._onChange)
+    this._tickPoints = this._inputs.length > 0 ? getTickPoints(this._inputs[0], this._config.ticks, this._config.list) : []
+
+    if (this._tickPoints.length > 0) {
+      this._ticks = createTicks(this._tickPoints, vertical)
+      this._ticks.classList.toggle(CLASS_NAME_TICKS_CLICKABLE, this._config.clickableTicks && this._inputs.some(input => !input.matches(':disabled')))
+      this._wrapper.append(this._ticks)
+    }
+
+    this._form = this._inputs[0]?.form ?? null
+    this._addEventListeners()
+    this._update()
   }
 
   _teardown(): void {
-    EventHandler.off(this._element, EVENT_INPUT, this._onInput)
-    EventHandler.off(this._element, EVENT_CHANGE, this._onChange)
-    this._range?.dispose()
-    this._range = null
+    clearTimeout(this._resetTimeout!)
+    this._releasePress()
+
+    if (this._wrapper) {
+      EventHandler.off(this._wrapper, EVENT_INPUT, SELECTOR_INPUT, this._onInput)
+      EventHandler.off(this._wrapper, EVENT_CHANGE, SELECTOR_INPUT, this._onChange)
+      EventHandler.off(this._wrapper, EVENT_KEYDOWN, SELECTOR_INPUT, this._onKeydown)
+      EventHandler.off(this._wrapper, EVENT_POINTERDOWN, this._onPointerDown)
+    }
+
+    if (this._form) {
+      EventHandler.off(this._form, EVENT_RESET, this._onReset)
+    }
+
     this._wrapper?.remove()
-    this._wrapper = null
+    this._form = null
     this._inputs = []
+    this._tickPoints = []
+    this._ticks = null
+    this._tooltips = []
+    this._wrapper = null
+  }
+
+  _addEventListeners(): void {
+    const wrapper = this._wrapper!
+
+    // Delegated handlers run in the capture phase, so the order is kept before listeners on the inputs see the value
+    EventHandler.on(wrapper, EVENT_INPUT, SELECTOR_INPUT, this._onInput)
+    EventHandler.on(wrapper, EVENT_CHANGE, SELECTOR_INPUT, this._onChange)
+    EventHandler.on(wrapper, EVENT_KEYDOWN, SELECTOR_INPUT, this._onKeydown)
+    EventHandler.on(wrapper, EVENT_POINTERDOWN, this._onPointerDown)
+
+    if (this._form) {
+      EventHandler.on(this._form, EVENT_RESET, this._onReset)
+    }
   }
 
   _createInput(index: number, value: number, current?: number): HTMLInputElement {
@@ -213,7 +333,7 @@ class RangeSlider extends BaseComponent {
 
     const ariaLabel = this._ariaLabel(index)
 
-    if (ariaLabel !== null) {
+    if (ariaLabel) {
       input.setAttribute('aria-label', ariaLabel)
     }
 
@@ -221,17 +341,19 @@ class RangeSlider extends BaseComponent {
   }
 
   _ariaLabel(index: number): string | null {
-    const values = this._config.value as number[]
+    const total = (this._config.value as number[]).length
+    const { ariaLabel } = this._config
+    const given = typeof ariaLabel === 'function' ? ariaLabel(index, total) : (ariaLabel as string[] | null)?.[index]
 
-    if (Array.isArray(this._config.ariaLabels) && this._config.ariaLabels[index]) {
-      return this._config.ariaLabels[index]
+    if (given) {
+      return given
     }
 
-    if (values.length === 1) {
+    if (total === 1) {
       return null
     }
 
-    if (values.length === 2) {
+    if (total === 2) {
       return index === 0 ? 'Minimum value' : 'Maximum value'
     }
 
@@ -242,15 +364,172 @@ class RangeSlider extends BaseComponent {
     return this._inputs.map(input => Number(input.value))
   }
 
-  _relay(event: Event, type: string): void {
-    if (this._inputs.includes(event.target as HTMLInputElement)) {
-      EventHandler.trigger(this._element, type, { value: this._values() })
+  _update(): void {
+    const ratios = this._inputs.map(input => getRatio(input))
+
+    if (this._config.track && this._inputs.length > 0) {
+      if (this._inputs.length > 1) {
+        this._wrapper!.style.setProperty(PROPERTY_FILL_START, `${Math.min(...ratios)}`)
+      }
+
+      this._wrapper!.style.setProperty(PROPERTY_FILL, `${Math.max(...ratios)}`)
+    }
+
+    for (const [index, input] of this._inputs.entries()) {
+      const value = Number.parseFloat(input.value)
+      const tooltip = this._tooltips[index]
+
+      const html = sanitizeByConfig(this._format(value), this._config)
+
+      if (tooltip) {
+        tooltip.style.setProperty(PROPERTY_FILL, `${ratios[index]}`)
+        tooltip.lastElementChild!.innerHTML = html
+      }
+
+      const label = getTickLabel(this._tickPoints, value, getStep(input))
+      const text = getValueText(value, label, typeof this._config.tooltipsFormat === 'function' ? html : null)
+
+      if (text === null) {
+        input.removeAttribute('aria-valuetext')
+      } else {
+        input.setAttribute('aria-valuetext', text)
+      }
+
+      if (this._inputs.length > 1) {
+        input.style.zIndex = `${getStackOrder(ratios[index], index, this._inputs.length)}`
+      }
     }
   }
 
+  _format(value: number): string {
+    return typeof this._config.tooltipsFormat === 'function' ? this._config.tooltipsFormat(value) : String(value)
+  }
+
+  _constrain(input: HTMLInputElement): void {
+    const index = this._inputs.indexOf(input)
+    constrainInput(input, this._inputs[index - 1], this._inputs[index + 1], this._config.distance)
+  }
+
+  _setValue(input: HTMLInputElement, value: number): void {
+    const before = input.value
+    setInputValue(input, value)
+    this._constrain(input)
+
+    if (input.value !== before) {
+      input.dispatchEvent(new Event('input', { bubbles: true }))
+    }
+  }
+
+  _keydown(event: KeyboardEvent): void {
+    const input = event.target as HTMLInputElement
+
+    if (!this._config.vertical || !this._inputs.includes(input) || !['ArrowLeft', 'ArrowRight'].includes(event.key)) {
+      return
+    }
+
+    event.preventDefault()
+
+    const start = input.value
+    const step = getStep(input)
+    this._setValue(input, Number.parseFloat(input.value) + (event.key === 'ArrowRight' ? step : -step))
+
+    if (input.value !== start) {
+      input.dispatchEvent(new Event('change', { bubbles: true }))
+    }
+  }
+
+  _pointerDown(event: PointerEvent): void {
+    if (event.button !== 0 || this._press || this._inputs.length === 0) {
+      return
+    }
+
+    const rect = this._inputs[0].getBoundingClientRect()
+    const tick = (event.target as Element).closest?.(SELECTOR_TICK)
+
+    if (tick && this._ticks?.contains(tick)) {
+      if (this._ticks.classList.contains(CLASS_NAME_TICKS_CLICKABLE)) {
+        const value = Number(tick.getAttribute('data-coreui-value'))
+        const { max, min } = this._config
+        this._startPress(event, rect, (value - min) / ((max - min) || 1), value)
+      }
+
+      return
+    }
+
+    const inside = event.clientX >= rect.left && event.clientX <= rect.right && event.clientY >= rect.top && event.clientY <= rect.bottom
+
+    if (event.target !== this._wrapper || this._inputs.length < 2 || !inside) {
+      return
+    }
+
+    this._startPress(event, rect)
+  }
+
+  _startPress(event: PointerEvent, rect: DOMRect, ratio?: number, value?: number): void {
+    const thumb = getThumbSize(this._wrapper!)
+    const at = ratio ?? getRatioAt(event, rect, thumb, this._config.vertical, isRTL(this._wrapper!))
+    const input = getNearestInput(this._inputs, at)
+
+    if (!input) {
+      return
+    }
+
+    event.preventDefault()
+    this._press = {
+      input, pointerId: event.pointerId, rect, start: input.value, thumb
+    }
+    EventHandler.on(document, EVENT_POINTERMOVE, this._onPointerMove)
+    EventHandler.on(document, EVENT_POINTERUP, this._onPointerUp)
+    EventHandler.on(document, EVENT_POINTERCANCEL, this._onPointerUp)
+    input.focus({ preventScroll: true })
+    this._setValue(input, value ?? this._config.min + (at * (this._config.max - this._config.min)))
+  }
+
+  _pointerMove(event: PointerEvent): void {
+    if (!this._press || event.pointerId !== this._press.pointerId) {
+      return
+    }
+
+    const { input, rect, thumb } = this._press
+    const ratio = getRatioAt(event, rect, thumb, this._config.vertical, isRTL(this._wrapper!))
+    this._setValue(input, this._config.min + (ratio * (this._config.max - this._config.min)))
+  }
+
+  _pointerUp(event: PointerEvent): void {
+    if (!this._press || event.pointerId !== this._press.pointerId) {
+      return
+    }
+
+    const { input, start } = this._press
+    this._releasePress()
+
+    if (input.value !== start) {
+      input.dispatchEvent(new Event('change', { bubbles: true }))
+    }
+  }
+
+  _releasePress(): void {
+    this._press = null
+    EventHandler.off(document, EVENT_POINTERMOVE, this._onPointerMove)
+    EventHandler.off(document, EVENT_POINTERUP, this._onPointerUp)
+    EventHandler.off(document, EVENT_POINTERCANCEL, this._onPointerUp)
+  }
+
   override _configAfterMerge(config: any): any {
+    if (config.tooltips === null) {
+      config.tooltips = true
+    }
+
+    if (typeof config.ticks === 'number') {
+      config.ticks = String(config.ticks)
+    }
+
     if (typeof config.ticks === 'string') {
       config.ticks = config.ticks.split(/,\s*/)
+    }
+
+    if (typeof config.ariaLabel === 'string') {
+      config.ariaLabel = config.ariaLabel.split(/,\s*/)
     }
 
     if (typeof config.name === 'string' && config.name.includes(',')) {

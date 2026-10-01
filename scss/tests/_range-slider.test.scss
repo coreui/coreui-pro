@@ -13,4 +13,8 @@
     @include assert-true(map.has-key($form-range-tokens, --cui-range-thumb-bg));
     @include assert-true(map.has-key($form-range-tokens, --cui-range-track-fill-bg));
   }
+
+  @include it("declares the vertical height of the multi-thumb and vertical range it owns") {
+    @include assert-true(map.has-key($form-range-vertical-tokens, --cui-range-vertical-height));
+  }
 }

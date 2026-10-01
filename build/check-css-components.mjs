@@ -135,7 +135,7 @@ const plugins = {
   'password-input': 'forms/form-control-group',
   'password-strength': 'forms/password-strength',
   range: 'forms/form-range',
-  'range-slider': 'forms/form-range',
+  'range-slider': 'range-slider',
   scrollspy: null,
   tab: 'nav',
   'time-input': 'forms/form-date-time',

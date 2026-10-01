@@ -14,7 +14,7 @@ import rangeSliderCustomTooltips from './snippets/range-slider-custom-tooltips.j
 
 ## Overview
 
-The **Bootstrap 6 Range Slider** component allows users to select a value or range of values within a predefined range. It builds the markup of the [range](/forms/range/) from its options: a `<div class="form-range">` inside the element, with one native `.form-range-input` per handle, handed to the Range plugin. So it looks and behaves exactly like a range with several thumbs, and its options are one place to configure the handles, ticks, tooltips and orientation.
+The **Bootstrap 6 Range Slider** component allows users to select a value or range of values within a predefined range. It builds the markup of the [range](/forms/range/) from its options: a `<div class="form-range">` inside the element, with one native `.form-range-input` per handle, so it looks like a range and takes its tokens. The slider adds what the range does not have: several handles kept in order and `distance` apart on one track, a press on the track that moves the nearest handle, clickable ticks and a vertical orientation. Its options are one place to configure the handles, ticks, tooltips and orientation.
 
 <Example pro code={`<div data-coreui-range-slider
        data-coreui-value="25,75"
@@ -34,7 +34,7 @@ The **Bootstrap 6 Range Slider** component allows users to select a value or ran
 
 Create a simple range slider with default settings.
 
-<Example pro code={`<div data-coreui-range-slider data-coreui-value="50" data-coreui-aria-labels='["Volume"]'></div>`} />
+<Example pro code={`<div data-coreui-range-slider data-coreui-value="50" data-coreui-aria-label='["Volume"]'></div>`} />
 
 ## With form field
 
@@ -42,13 +42,13 @@ Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label 
 
 <Example pro code={`<div class="form-field">
     <span class="form-label">Budget</span>
-    <div data-coreui-range-slider data-coreui-name="budgetMin, budgetMax" data-coreui-value="25, 75" data-coreui-aria-labels='["Minimum budget", "Maximum budget"]'></div>
+    <div data-coreui-range-slider data-coreui-name="budgetMin, budgetMax" data-coreui-value="25, 75" data-coreui-aria-label='["Minimum budget", "Maximum budget"]'></div>
     <div class="form-text">Monthly spend, in thousands.</div>
   </div>`} />
 
 ## Multiple handles
 
-Enable multiple handles to allow the selection of a range or/and multiple values.
+Enable multiple handles to allow the selection of a range or/and multiple values. The handles share one track, the band runs from the lowest handle to the highest, and each handle is a native range input, so dragging, the keyboard, touch, form submission and form reset work as they do for one. The handles stay in order, a press on the track moves the nearest one and it follows the pointer until it is released, and when two of them meet the one that can still move stays on top.
 
 <Example pro code={`<div class="mb-3" data-coreui-range-slider data-coreui-value="20,40"></div>
   <div class="mb-3" data-coreui-range-slider data-coreui-value="20,40,60"></div>
@@ -59,7 +59,7 @@ Enable multiple handles to allow the selection of a range or/and multiple values
 Rotate the slider to a vertical orientation.
 
 <Example pro code={`<div class="d-flex ps-5">
-    <div class="me-3" data-coreui-range-slider data-coreui-value="20" data-coreui-vertical="true" data-coreui-aria-labels='["Volume"]'></div>
+    <div class="me-3" data-coreui-range-slider data-coreui-value="20" data-coreui-vertical="true" data-coreui-aria-label='["Volume"]'></div>
     <div class="me-3" data-coreui-range-slider data-coreui-value="20,80" data-coreui-vertical="true"></div>
     <div data-coreui-range-slider data-coreui-value="20,80,100" data-coreui-vertical="true"></div>
   </div>`} />
@@ -68,21 +68,21 @@ Rotate the slider to a vertical orientation.
 
 Disable the slider to prevent user interaction.
 
-<Example pro code={`<div class="mb-3" data-coreui-range-slider data-coreui-value="50" data-coreui-disabled="true" data-coreui-aria-labels='["Volume"]'></div>
+<Example pro code={`<div class="mb-3" data-coreui-range-slider data-coreui-value="50" data-coreui-disabled="true" data-coreui-aria-label='["Volume"]'></div>
   <div data-coreui-range-slider data-coreui-value="50, 75" data-coreui-disabled="true"></div>`} />
 
 ## Min and max
 
 Range Slider has implicit values for `min` and `max`—`0` and `100`, respectively. You may specify new values for those using the `min` and `max` attributes.
 
-<Example pro code={`<div class="mb-3" data-coreui-range-slider data-coreui-min="-50" data-coreui-max="150" data-coreui-value="50" data-coreui-aria-labels='["Temperature"]'></div>
+<Example pro code={`<div class="mb-3" data-coreui-range-slider data-coreui-min="-50" data-coreui-max="150" data-coreui-value="50" data-coreui-aria-label='["Temperature"]'></div>
   <div data-coreui-range-slider data-coreui-min="-50" data-coreui-max="150" data-coreui-value="50, 75"></div>`} />
 
 ## Steps
 
 Range Slider inputs automatically "snap" to whole numbers. To modify this behavior, set a `step` value. In the example below, we increase the number of steps by specifying `step="0.25"`.
 
-<Example pro code={`<div class="mb-3" data-coreui-range-slider data-coreui-step="0.25" data-coreui-value="50" data-coreui-aria-labels='["Weight"]'></div>
+<Example pro code={`<div class="mb-3" data-coreui-range-slider data-coreui-step="0.25" data-coreui-value="50" data-coreui-aria-label='["Weight"]'></div>
   <div data-coreui-range-slider data-coreui-step="0.25" data-coreui-value="50, 75"></div>`} />
 
 ## Distance
@@ -153,7 +153,7 @@ The `data-coreui-track` option allows you to customize how the slider's track is
 
 If you set `data-coreui-track` to `false`, the slider's track will not display any fill. Only the default track background will be visible, which can be useful for minimalist designs or when you use more then two handles.
 
-<Example pro code={`<div class="mb-3" data-coreui-range-slider data-coreui-track="false" data-coreui-value="50" data-coreui-aria-labels='["Volume"]'></div>
+<Example pro code={`<div class="mb-3" data-coreui-range-slider data-coreui-track="false" data-coreui-value="50" data-coreui-aria-label='["Volume"]'></div>
   <div class="mb-3" data-coreui-range-slider data-coreui-track="false" data-coreui-value="50, 75"></div>
   <div data-coreui-range-slider data-coreui-track="false" data-coreui-value="25, 50, 75"></div>`} />
 
@@ -161,12 +161,12 @@ If you set `data-coreui-track` to `false`, the slider's track will not display a
 
 Color the filled track and the handles by adding a [`.theme-{color}` class](/customize/components/#theme-variants) to the slider element.
 
-<Example pro class="d-flex flex-column gap-3" code={getData('theme-colors').map((c) => `<div class="theme-${c.name}" data-coreui-range-slider data-coreui-value="25, 75" data-coreui-aria-labels='["${c.title} minimum", "${c.title} maximum"]'></div>`)} />
+<Example pro class="d-flex flex-column gap-3" code={getData('theme-colors').map((c) => `<div class="theme-${c.name}" data-coreui-range-slider data-coreui-value="25, 75" data-coreui-aria-label='["${c.title} minimum", "${c.title} maximum"]'></div>`)} />
 
 The theme class on the slider colours the track and the handles; the tooltip keeps its default look. To theme the tooltip, set `tooltipClass` (`data-coreui-tooltip-class`) — the class lands on the tooltip only. `theme-secondary` gives a grey tooltip on the default slider; `theme-danger` makes the tooltip match a danger slider.
 
-<Example pro class="d-flex flex-column gap-3" code={`<div data-coreui-range-slider data-coreui-value="40" data-coreui-tooltip-class="theme-secondary" data-coreui-aria-labels='["Secondary tooltip"]'></div>
-  <div class="theme-danger" data-coreui-range-slider data-coreui-value="60" data-coreui-tooltip-class="theme-danger" data-coreui-aria-labels='["Danger slider, danger tooltip"]'></div>`} />
+<Example pro class="d-flex flex-column gap-3" code={`<div data-coreui-range-slider data-coreui-value="40" data-coreui-tooltip-class="theme-secondary" data-coreui-aria-label='["Secondary tooltip"]'></div>
+  <div class="theme-danger" data-coreui-range-slider data-coreui-value="60" data-coreui-tooltip-class="theme-danger" data-coreui-aria-label='["Danger slider, danger tooltip"]'></div>`} />
 
 ## Usage
 
@@ -216,7 +216,7 @@ Please note that for security reasons, the `sanitize`, `sanitizeFn`, and `allowL
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
 | `allowList` | object | [Default value](/getting-started/javascript#sanitizer) |  Defines the set of permitted HTML tags and attributes that can safely appear in the tooltip content when HTML content is passedd. This helps maintain control over the output and prevent injection of malicious code. |
-| `ariaLabels` | array, null | `null` | Accessible name of each handle, in order. Handles are otherwise indistinguishable to a screen reader, so a slider with more than one wants this. A shorter array leaves the remaining handles on their generated names, such as `Maximum value`. A single handle gets no generated name, and the generated input carries no `id` for a `<label for>` to reach, so this is the only way to name it. |
+| `ariaLabel` | array, function, string, null | `null` | Accessible name of each handle: an array with one name per handle, in order, a comma-separated string, or a function `(index, total) => string`. Handles are otherwise indistinguishable to a screen reader, so a slider with more than one wants this. A handle the array does not cover keeps its generated name, such as `Maximum value`. A single handle gets no generated name, and the generated input carries no `id` for a `<label for>`, so this is the only way to name it. |
 | `clickableTicks` | boolean | `true` | Enables or disables the ability to click on ticks to set slider values. |
 | `disabled` | boolean | `false` | Disables the slider, making it non-interactive and grayed out. |
 | `distance` | number | `0` | Sets the minimum distance between multiple slider handles. |
@@ -251,6 +251,8 @@ Please note that for security reasons, the `sanitize`, `sanitizeFn`, and `allowL
 | `change.coreui.range-slider` | Fired when a handle's value changes and the user finishes interacting: on release of the pointer, and on every key press. The event's `value` holds the values of all handles as numbers. |
 | `input.coreui.range-slider` | Fired continuously while a handle moves. The event's `value` holds the values of all handles as numbers. |
 
+A press on the track or on a clickable tick dispatches the native `input` event on the handle it moves, and `change` when the pointer is released, the way the browser does when a handle is dragged, so listeners on the inputs see the same events either way. A form reset puts the handles back on their configured values.
+
 ```js
 const myRangeSlider = document.getElementById('myRangeSlider')
 myRangeSlider.addEventListener('change.coreui.range-slider', event => {
@@ -262,7 +264,7 @@ myRangeSlider.addEventListener('change.coreui.range-slider', event => {
 
 Each handle is a native `<input type="range">`, so it is a slider with its value, minimum and maximum without any ARIA of its own, and the browser handles the keyboard: the arrow keys, <kbd>Page Up</kbd>, <kbd>Page Down</kbd>, <kbd>Home</kbd> and <kbd>End</kbd>. In a vertical slider the handles carry `aria-orientation="vertical"`, and <kbd>→</kbd> increases the value in every browser, as <kbd>↑</kbd> does.
 
-Name each handle with `ariaLabels`. Without it, two handles are named "Minimum value" and "Maximum value", more handles "Value 1", "Value 2" and so on, and a single handle has no name: the generated input has no `id` for a `<label for>`, so give it `ariaLabels` or put the slider element inside a `<label>`. While a handle sits on a labelled tick, its `aria-valuetext` adds the label to the value ("50, Medium", or the `tooltipsFormat` text followed by the label when they differ).
+Name each handle with `ariaLabel`: an array with one name per handle, a comma-separated string, or a function `(index, total) => string`. Without it, two handles are named "Minimum value" and "Maximum value", more handles "Value 1", "Value 2" and so on, and a single handle has no name: the generated input has no `id` for a `<label for>`, so give it `ariaLabel` or put the slider element inside a `<label>`. While a handle sits on a labelled tick, its `aria-valuetext` adds the label to the value ("50, Medium", or the `tooltipsFormat` text followed by the label when they differ).
 
 Tooltips are hidden from assistive technology (`aria-hidden="true"`): they repeat the value the handle already announces, so exposing them would have screen readers read every change twice. Tick marks are hidden too: a label reaches the handle through `aria-valuetext` while the handle sits on its tick, so a label that carries meaning the value does not should also be said in the page text.
 
@@ -285,4 +287,6 @@ The slider is a [range](/forms/range/#css-variables), so it reads the range's to
 
 A vertical slider's height:
 
-<ScssDocs file="scss/forms/_form-range.scss" capture="form-range-vertical-tokens" />
+<ScssDocs file="scss/_range-slider.scss" capture="form-range-vertical-tokens" />
+
+`--cui-range-fill-start` and `--cui-range-fill` are not tokens: the plugin writes them on the `.form-range` from the lowest and the highest handle, and the CSS draws the band between them.

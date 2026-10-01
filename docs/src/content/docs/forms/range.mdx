@@ -15,6 +15,8 @@ Create custom `<input type="range" />` controls with `.form-range`. The track (t
 <Example code={`<label for="customRange1" class="form-label">Example range</label>
   <input type="range" class="form-range" id="customRange1">`} />
 
+For several thumbs on one track, a vertical orientation or ticks that move a thumb when pressed, use the [range slider](/forms/range-slider/), which builds this markup.
+
 ## Filled track
 
 Only Firefox can fill the track up to the thumb from a stylesheet alone, and CSS cannot read an input's value. The fill is drawn a shade lighter than the thumb, at half the strength of `--cui-range-track-fill-bg`. So the filled track is a small **JavaScript component**: wrap an `<input class="form-range-input">` in `.form-range` and the plugin keeps a `--cui-range-fill` custom property (`0`–`1`) in sync on the wrapper, which the CSS uses to draw the fill, the value tooltip and the tick marks.
@@ -31,29 +33,9 @@ The fill is a single custom property, so a static fill needs no plugin at all: s
 <Example code={`<label for="rangeStatic" class="form-label">Static fill</label>
   <input type="range" class="form-range" value="40" id="rangeStatic" style="--cui-range-fill: .4">`} />
 
-## Multiple thumbs
-
-Put two or more `.form-range-input` elements in one wrapper to select a range. The inputs stack on one track, the band runs from the lowest thumb to the highest, and each thumb stays a native range input, so dragging, the keyboard, touch, form submission and form reset work as they do for one thumb. The plugin keeps the thumbs in order, moves the nearest one to a press on the track, and keeps the thumb that can still move on top when two of them meet. Give each thumb its own accessible name, because a screen reader cannot tell them apart otherwise.
-
-<Example code={`<label id="rangePriceLabel" class="form-label">Price</label>
-  <div class="form-range" data-coreui-tooltips role="group" aria-labelledby="rangePriceLabel">
-    <input type="range" class="form-range-input" name="priceMin" value="25" aria-label="Minimum price">
-    <input type="range" class="form-range-input" name="priceMax" value="75" aria-label="Maximum price">
-  </div>`} />
-
-### Distance
-
-`distance` keeps neighbouring thumbs at least that many units apart.
-
-<Example code={`<div class="form-range" data-coreui-distance="2" data-coreui-tooltips role="group" aria-label="Opening hours">
-    <input type="range" class="form-range-input" min="0" max="24" value="8" aria-label="Opens">
-    <input type="range" class="form-range-input" min="0" max="24" value="12" aria-label="Lunch">
-    <input type="range" class="form-range-input" min="0" max="24" value="18" aria-label="Closes">
-  </div>`} />
-
 ## Tooltip
 
-Add `data-coreui-tooltips` to the wrapper to show a tooltip with the value that follows the thumb, one per thumb. It appears while the pointer is over the input, while the thumb is held, and while the input has focus. The plugin renders `<div class="form-range-tooltip tooltip bs-tooltip-top">` with `.tooltip-arrow` and `.tooltip-inner`, so it takes the look and the `--cui-tooltip-*` tokens of the [tooltip](/components/tooltips/) component; `tooltipClass` adds classes to it, for example a `theme-{color}`. `tooltipsFormat` may return HTML, which is sanitized, and its text becomes the input's `aria-valuetext`.
+Add `data-coreui-tooltips` to the wrapper to show a tooltip with the value that follows the thumb. It appears while the pointer is over the input, while the thumb is held, and while the input has focus. The plugin renders `<div class="form-range-tooltip tooltip bs-tooltip-top">` with `.tooltip-arrow` and `.tooltip-inner`, so it takes the look and the `--cui-tooltip-*` tokens of the [tooltip](/components/tooltips/) component; `tooltipClass` adds classes to it, for example a `theme-{color}`. `tooltipsFormat` may return HTML, which is sanitized, and its text becomes the input's `aria-valuetext`.
 
 <Example code={`<label for="rangeTooltip" class="form-label">Brightness</label>
   <div class="form-range" data-coreui-tooltips>
@@ -83,32 +65,11 @@ Link a `<datalist>` to the input with the `list` attribute and the plugin render
     <option value="100" label="Hot"></option>
   </datalist>`} />
 
-The `ticks` option draws ticks without a datalist, and combines with one: a number is a tick without a label at that value; an object sets `value`, `label`, `class` and `style`; a string, or an object without `value`, is a label placed by its position in the array, the first at `min` and the last at `max`. A comma-separated `data-coreui-ticks` attribute is a list of labels. While a thumb sits on a labelled tick, its `aria-valuetext` adds the label to the value, so a screen reader announces "50, Medium"; with `tooltipsFormat` the label follows the formatted text when the two differ.
+The `ticks` option draws ticks without a datalist, and combines with one: a number is a tick without a label at that value; an object sets `value`, `label`, `class` and `style`; a string, or an object without `value`, is a label placed by its position in the array, the first at `min` and the last at `max`. A comma-separated `data-coreui-ticks` attribute is a list of labels. While the thumb sits on a labelled tick, its `aria-valuetext` adds the label to the value, so a screen reader announces "50, Medium"; with `tooltipsFormat` the label follows the formatted text when the two differ.
 
 <Example code={`<label for="rangePriority" class="form-label">Priority</label>
   <div class="form-range" data-coreui-ticks="Low, Medium, High">
     <input type="range" class="form-range-input" value="50" id="rangePriority">
-  </div>`} />
-
-### Clickable ticks
-
-With `clickableTicks`, a press on a tick moves the nearest thumb to its value, and the thumb follows the pointer until it is released.
-
-<Example code={`<div class="form-range" data-coreui-clickable-ticks="true" data-coreui-ticks='[{"value": 0, "label": "Cold"}, 25, {"value": 50, "label": "Mild"}, 75, {"value": 100, "label": "Hot"}]' role="group" aria-label="Temperature">
-    <input type="range" class="form-range-input" value="25" aria-label="Lowest temperature">
-    <input type="range" class="form-range-input" value="75" aria-label="Highest temperature">
-  </div>`} />
-
-## Vertical
-
-Add `.form-range-vertical` to the wrapper to stand the control up: the value grows from the bottom, the tooltips sit at the start and the ticks at the end. The height is `--cui-range-vertical-height`.
-
-<Example class="d-flex gap-5 ps-5" code={`<div class="form-range form-range-vertical" data-coreui-tooltips>
-    <input type="range" class="form-range-input" value="60" aria-label="Volume">
-  </div>
-  <div class="form-range form-range-vertical" data-coreui-tooltips data-coreui-ticks="Low, Mid, High" role="group" aria-label="Frequency band">
-    <input type="range" class="form-range-input" value="20" aria-label="Lowest frequency">
-    <input type="range" class="form-range-input" value="80" aria-label="Highest frequency">
   </div>`} />
 
 ## With form field
@@ -194,14 +155,12 @@ Options can be passed using data attributes or JavaScript. To do this, append an
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
 | `allowList` | object | [Default value](/getting-started/javascript#sanitizer) | Permitted tags and attributes in the HTML that `tooltipsFormat` returns. |
-| `clickableTicks` | boolean | `false` | Moves the nearest thumb to a tick's value when the tick is pressed. |
-| `distance` | number | `0` | Smallest gap, in value units, between neighbouring thumbs. |
 | `list` | string, null | `null` | `id` of a `<datalist>` whose options become tick marks, for an input that should not carry the `list` attribute itself (browsers snap a drag to the options of a linked datalist). |
 | `sanitize` | boolean | `true` | Sanitizes the HTML that `tooltipsFormat` returns. |
 | `sanitizeFn` | null, function | `null` | Replaces the built-in sanitizer. |
 | `ticks` | array, boolean, string | `false` | Tick marks in addition to a linked datalist: numbers are ticks without a label at that value, objects set `value`, `label`, `class` and `style`, and strings (or objects without `value`) are labels placed by their position in the array, from `min` to `max`. |
-| `tooltipClass` | string | `''` | Classes added to every tooltip. |
-| `tooltips` | boolean, `'always'` | `false` | Shows a tooltip with the current value of each thumb: `true` on hover, drag and focus, `'always'` at all times. |
+| `tooltipClass` | string | `''` | Classes added to the tooltip. |
+| `tooltips` | boolean, `'always'` | `false` | Shows a tooltip with the current value: `true` on hover, drag and focus, `'always'` at all times. |
 | `tooltipsFormat` | function, null | `null` | `(value) => string` that formats the tooltip; HTML is sanitized, and the text becomes the input's `aria-valuetext`. |
 | `track` | boolean, `'fill'` | `'fill'` | `false` leaves the track without the band. |
 
@@ -209,18 +168,16 @@ Options can be passed using data attributes or JavaScript. To do this, append an
 
 | Method | Description |
 | --- | --- |
-| `dispose` | Destroys the instance, removes the tooltips and tick marks it created, and hands back the attributes and styles it set on the inputs and the wrapper. |
+| `dispose` | Destroys the instance, removes the tooltip and tick marks it created, and hands back the attributes and styles it set on the input and the wrapper. |
 | `getInstance` | Static method which allows you to get the Range instance associated to a DOM element, you can use it like this: `coreui.Range.getInstance(element)` |
 | `getOrCreateInstance` | Static method which returns a Range instance associated to a DOM element or create a new one in case it wasn't initialized. You can use it like this: `coreui.Range.getOrCreateInstance(element)` |
-| `update` | Recomputes the band, the tooltips and the stacking from the inputs' current values. Useful after setting a value programmatically. |
+| `update` | Recomputes the fill and the tooltip from the input's current value. Useful after setting a value programmatically. |
 
 ### Events
 
 | Event | Description |
 | --- | --- |
 | `changed.coreui.range` | Fired on the input when the value updates (on `input` and `change`). The event's `value` property holds the current numeric value. |
-
-A press on the track or on a clickable tick dispatches the native `input` event on the thumb it moves, and `change` when the pointer is released, the way the browser does when the thumb is dragged. In a vertical range the plugin also handles <kbd>←</kbd> and <kbd>→</kbd>, so <kbd>→</kbd> increases the value in every browser, as <kbd>↑</kbd> does.
 
 ```js
 const input = document.querySelector('.form-range-input')
@@ -244,13 +201,9 @@ input.addEventListener('changed.coreui.range', event => {
 }
 ```
 
-`--cui-range-fill` and `--cui-range-fill-start` are not tokens: the plugin writes them on the wrapper and the CSS reads them, so setting `--cui-range-fill` yourself is how a [static fill](#filled-track) works. The band starts at the track start while `--cui-range-fill-start` is unset.
+`--cui-range-fill` is not a token: the plugin writes it on the wrapper and the CSS reads it, so setting it yourself is how a [static fill](#filled-track) works.
 
 <ScssDocs file="scss/forms/_form-range.scss" capture="form-range-tokens" />
-
-On the `.form-range-vertical` modifier class:
-
-<ScssDocs file="scss/forms/_form-range.scss" capture="form-range-vertical-tokens" />
 
 ### Sass mixins
 
