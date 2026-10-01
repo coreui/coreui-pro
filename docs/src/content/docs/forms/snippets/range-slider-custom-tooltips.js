@@ -2,7 +2,7 @@ const myRangeSliderCustomTooltips = document.getElementById('myRangeSliderCustom
 
 const optionsRangeSliderCustomTooltips = {
   max: 1000,
-  labels: [
+  ticks: [
     {
       value: 0,
       label: '$0'

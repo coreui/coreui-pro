@@ -345,6 +345,8 @@ $form-range-vertical-tokens: defaults(
     // Zero-width items so labels never widen their `fr` column; the tick line and label
     // overflow centered on the grid line via `align-items`.
     width: 0;
+    font-size: var(--#{$prefix}range-tick-label-font-size);
+    color: var(--#{$prefix}range-tick-label-color);
 
     &::before {
       width: var(--#{$prefix}range-tick-width);
@@ -368,8 +370,6 @@ $form-range-vertical-tokens: defaults(
 
   .form-range-tick-label {
     margin-top: var(--#{$prefix}range-tick-label-margin-top);
-    font-size: var(--#{$prefix}range-tick-label-font-size);
-    color: var(--#{$prefix}range-tick-label-color);
     white-space: nowrap;
   }
 }

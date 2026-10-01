@@ -698,7 +698,7 @@ describe('Range', () => {
       inputEl.setAttribute('aria-valuetext', 'author text')
       new Range(fixtureEl.querySelector('.form-range')) // eslint-disable-line no-new
 
-      expect(inputEl.getAttribute('aria-valuetext')).toEqual('Medium')
+      expect(inputEl.getAttribute('aria-valuetext')).toEqual('50, Medium')
 
       inputEl.value = '40'
       inputEl.dispatchEvent(createEvent('input'))
@@ -706,7 +706,23 @@ describe('Range', () => {
 
       inputEl.value = '100'
       inputEl.dispatchEvent(createEvent('input'))
-      expect(inputEl.getAttribute('aria-valuetext')).toEqual('High')
+      expect(inputEl.getAttribute('aria-valuetext')).toEqual('100, High')
+    })
+
+    it('should add a tick label to the tooltipsFormat text unless they read the same', () => {
+      fixtureEl.innerHTML = getRangeHtml()
+
+      const inputEl = fixtureEl.querySelector('.form-range-input')
+      new Range(fixtureEl.querySelector('.form-range'), { // eslint-disable-line no-new
+        ticks: [{ label: 'Mild', value: 50 }, { label: '$100', value: 100 }],
+        tooltipsFormat: value => `$${value}`
+      })
+
+      expect(inputEl.getAttribute('aria-valuetext')).toEqual('$50, Mild')
+
+      inputEl.value = '100'
+      inputEl.dispatchEvent(createEvent('input'))
+      expect(inputEl.getAttribute('aria-valuetext')).toEqual('$100')
     })
 
     it('should not set aria-valuetext without tooltipsFormat', () => {
@@ -822,6 +838,15 @@ describe('Range', () => {
       const tick = fixtureEl.querySelector('.form-range-tick')
       expect(tick).toHaveClass('fw-bold')
       expect(tick).toHaveClass('text-danger')
+    })
+
+    it('should read the datalist of the list option without a list attribute on the input', () => {
+      fixtureEl.innerHTML = getTicksHtml().replace(' list="ticksList"', '')
+
+      new Range(fixtureEl.querySelector('.form-range'), { list: 'ticksList' }) // eslint-disable-line no-new
+
+      expect(fixtureEl.querySelector('.form-range-input').hasAttribute('list')).toBeFalse()
+      expect([...fixtureEl.querySelectorAll('.form-range-tick-label')].map(label => label.textContent)).toEqual(['Low', 'High'])
     })
 
     it('should combine the ticks option with a linked datalist', () => {
