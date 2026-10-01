@@ -772,6 +772,18 @@ export const createDateTimeFormat = (locale?: string, options?: Intl.DateTimeFor
 }
 
 /**
+ * Tells whether a locale writes the year before the month, as Japanese,
+ * Chinese, Korean or Hungarian do.
+ *
+ * @param locale - The locale to check
+ * @returns `true` when the year comes first
+ */
+export const isYearBeforeMonth = (locale?: string) : boolean => {
+  const parts = createDateTimeFormat(locale, { month: 'long', year: 'numeric' }).formatToParts(new Date(2000, 0, 1))
+  return parts.findIndex(({ type }) => type === 'year') < parts.findIndex(({ type }) => type === 'month')
+}
+
+/**
  * Lists a locale's month names.
  *
  * @param locale - The locale to use

@@ -423,6 +423,17 @@ describe('Calendar', () => {
       ])
     })
 
+    it('should put the year button before the month button where the locale writes the year first', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { calendarDate: new Date(2026, 7, 1), locale: 'ja-JP' }) // eslint-disable-line no-new
+
+      expect([...div.querySelectorAll('.calendar-nav-date .calendar-nav-btn')].map(button => button.className)).toEqual([
+        'calendar-nav-btn btn-year',
+        'calendar-nav-btn btn-month'
+      ])
+    })
+
     it('should mark each panel with its index', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
@@ -1389,7 +1400,7 @@ describe('Calendar', () => {
       const div = fixtureEl.querySelector('div')
       // eslint-disable-next-line no-new
       new Calendar(div, {
-        navIconNext: '<svg xmlns="http://www.w3.org/2000/svg"><script>window.calendarHacked = true</script><circle r="4" /></svg>'
+        navNextIcon: '<svg xmlns="http://www.w3.org/2000/svg"><script>window.calendarHacked = true</script><circle r="4" /></svg>'
       })
 
       expect(navIcon(div, '.btn-next').querySelector('circle')).not.toBeNull()

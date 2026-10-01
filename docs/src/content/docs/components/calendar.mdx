@@ -187,6 +187,8 @@ In this example:
 
 The CoreUI Bootstrap Calendar allows users to display dates in non-English locales, making it suitable for international applications.
 
+The navigation writes the month and the year in the order the locale does: the year first in Japanese, Chinese, Korean or Hungarian, the month first in English or Polish.
+
 ### Auto
 
 By default, the Calendar component uses the browser's default locale. However, you can easily configure it to use a different locale supported by the JavaScript Internationalization API. This feature helps create inclusive and accessible applications for a diverse audience.
@@ -377,6 +379,10 @@ Note that for security reasons the `sanitize`, `sanitizeFn`, and `allowList` opt
 | `maxDate` | date, number, string, null | `null` | Max selectable date. |
 | `minDate` | date, number, string, null | `null` | Min selectable date. |
 | `monthFormat` | `'long'`, `'narrow'`, `'short'`, `'numeric'`, `'2-digit'` | `'short'` | Sets the format for month names. Accepts built-in formats (`'long'`, `'narrow'`, `'short'`, `'numeric'`, `'2-digit'`). |
+| `navNextDoubleIcon` | string | double chevron SVG | Inline SVG of the button that turns the calendar forward by a year, or by a page of years in the years view (sanitized). The next and previous icons swap in right-to-left. |
+| `navNextIcon` | string | chevron SVG | Inline SVG of the button that turns the calendar forward by a month (sanitized). |
+| `navPrevDoubleIcon` | string | double chevron SVG | Inline SVG of the button that turns the calendar back by a year, or by a page of years in the years view (sanitized). |
+| `navPrevIcon` | string | chevron SVG | Inline SVG of the button that turns the calendar back by a month (sanitized). |
 | `range` | boolean | `false` | Allow range selection |
 | `renderDayCell` | function, null | `null` | Custom function to render day cells. Receives `date` and `meta` object (with `isDisabled`, `isInCurrentMonth`, `isInRange`, `isSelected`, `isToday`, `label`) as parameters and should return HTML string. |
 | `renderMonthCell` | function, null | `null` | Custom function to render month cells. Receives `date` and `meta` object (with `isDisabled`, `isInRange`, `isSelected`, `label`) as parameters and should return HTML string. |
