@@ -125,8 +125,9 @@ const formatTypo: SectionFormat = getPickerFormat(42)
 // The range helpers take a pointer position and return plain numbers.
 const pressRatio: number = getRatioAt({ clientX: 0, clientY: 0 }, element.getBoundingClientRect(), 16, false, false)
 const sanitizedValue: number = sanitizeValue(52, 0, 100, 5)
-// @ts-expect-error — the step is a number, `step="any"` is passed as 0
-const stepTypo: number = sanitizeValue(52, 0, 100, 'any')
+const unroundedValue: number = sanitizeValue(52, 0, 100, 'any')
+// @ts-expect-error — the step is a number or 'any'
+const stepTypo: number = sanitizeValue(52, 0, 100, '5')
 
 const chipSet = new ChipSet(element, { removable: true })
 const values: string[] = chipSet.getValues()
@@ -137,6 +138,6 @@ export {
   inputConfigs, inputTypeTypo, instance, localeLayout, modalHiding, nestedTypo, modalShowing, modalToggling,
   monthFormatTypo, multiSelect, name, nullDate, orCreated,
   pickerConfig, popoverShowing, popupShown, popupShownText, pressRatio, rangeInputTypeTypo, rangePickerConfig, sanitizedValue,
-  selection, stepTypo, timePickerConfig, toast, toastShowing, tooltipToggling, typoCalendar, typoConfig, unsetDate, unsetFormat, values, version,
+  selection, stepTypo, timePickerConfig, toast, toastShowing, tooltipToggling, typoCalendar, typoConfig, unroundedValue, unsetDate, unsetFormat, values, version,
   weekdayFormatTypo, wrongResolution
 }
