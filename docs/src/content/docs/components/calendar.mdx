@@ -35,7 +35,7 @@ Select specific days using the Bootstrap Calendar component. The example below s
 
 Set the `data-coreui-selection-type` to `week` to enable selection of entire week. You can also use `data-coreui-show-week-number="true"` to show week numbers.
 
-Weeks are ISO 8601 weeks, which run from Monday to Sunday. When `firstDayOfWeek` starts the rows on another day, each row spans two of them and stands for the one that holds most of its days: with Sunday first, the row from August 30 to September 5, 2026 is week 36 and picks `2026W36`. The picked date is the row's first day in that week, which is also the day `disabledDates` is checked on. A week given as `startDate` or `endDate`, as a string or as any date inside it, selects the row that holds most of it, the calendar opens on a page that shows that row, and the weeks of `minDate` and `maxDate` stay selectable.
+Weeks are ISO 8601 weeks, which run from Monday to Sunday, and week selection treats them the way month selection treats months. When `firstDayOfWeek` starts the rows on another day, each row spans two weeks and stands for the one that holds most of its days: with Sunday first, the row from August 30 to September 5, 2026 is week 36, picks `2026W36` and gives its Monday, August 31. A week given as `startDate` or `endDate`, as a string or as any date inside it, selects that row, and the calendar opens on a page that shows it. `minDate` and `maxDate` count by whole weeks, so their weeks stay selectable, and `disabledDates` disables a week only when it disables every day of it.
 
 <Example pro code={`<div class="d-flex justify-content-center">
     <div
@@ -377,7 +377,7 @@ Note that for security reasons the `sanitize`, `sanitizeFn`, and `allowList` opt
 | `calendarDate` | date, number, string, null | `null` | Default date of the component. |
 | `calendars` | number | `1` | The number of calendars that render on desktop devices. |
 | `dayFormat` | `'numeric'`, `'2-digit'` | `'numeric'` | Sets the format for days. Accepts a built-in format (`'numeric'` or `'2-digit'`) |
-| `disabledDates` | array, function, null | `null` | Specify the list of dates that cannot be selected. |
+| `disabledDates` | array, function, null | `null` | Specify the list of dates that cannot be selected. In week, month, quarter and year selection a period is disabled when every day of it is. |
 | `endDate` | date, number, string, null | `null` | Initial selected to date (range). |
 | `firstDayOfWeek` | number | `1` | <p>Sets the day of start week.</p>  <ul><li>`0` - Sunday</li><li>`1` - Monday</li><li>`2` - Tuesday</li><li>`3` - Wednesday</li><li>`4` - Thursday</li><li>`5` - Friday</li><li>`6` - Saturday</li></ul> |
 | `locale` | string | `'default'` | Sets the default locale for components. If not set, it is inherited from the navigator.language. |

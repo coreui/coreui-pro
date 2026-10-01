@@ -719,14 +719,14 @@ describe('Calendar', () => {
         .toEqual([new Date(2026, 7, 10).toDateString(), new Date(2026, 8, 5).toDateString()])
     })
 
-    it('should move focus into the panel whose month was picked, even when its view has nothing to pick', () => {
+    it('should move focus into the panel whose month was picked, even when its first week cannot be picked', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
       new Calendar(div, { // eslint-disable-line no-new
         calendarDate: new Date(2026, 11, 1),
         calendars: 2,
-        disabledDates: date => date.getDay() === 1,
+        disabledDates: date => date < new Date(2027, 0, 11),
         firstDayOfWeek: 1,
         locale: 'en-US',
         selectionType: 'week'
@@ -742,7 +742,7 @@ describe('Calendar', () => {
       const grids = [...div.querySelectorAll('table')]
 
       expect(grids.map(grid => grid.getAttribute('aria-label'))).toEqual(['December 2026', 'January 2027'])
-      expect(div.querySelector('[data-coreui-selectable]')).toBeNull()
+      expect(grids[0].querySelector('[data-coreui-selectable]')).toBeNull()
       expect(document.activeElement.closest('table')).toBe(grids[1])
       expect(document.activeElement.getAttribute('aria-disabled')).toEqual('true')
     })
@@ -1063,7 +1063,7 @@ describe('Calendar', () => {
       const div = fixtureEl.querySelector('div')
       // eslint-disable-next-line no-new
       new Calendar(div, {
-        calendarDate: new Date(2026, 6, 9), disabledDates: [new Date(2026, 6, 6)], locale: 'en-US', selectionType: 'week'
+        calendarDate: new Date(2026, 6, 9), disabledDates: [[new Date(2026, 6, 6), new Date(2026, 6, 12)]], locale: 'en-US', selectionType: 'week'
       })
 
       const stop = div.querySelector('.calendar-row[tabindex="0"]')
@@ -2679,7 +2679,7 @@ describe('Calendar', () => {
       expect(description(renderCalendar({ disabledDates: date => date.getFullYear() === 2026, selectionType: 'month' }))).toEqual('Nothing on this page can be picked')
       expect(description(renderCalendar({ disabledDates: date => date.getFullYear() === 2026, selectionType: 'quarter' }))).toEqual('Nothing on this page can be picked')
       expect(description(renderCalendar({ disabledDates: date => date.getFullYear() >= 2020 && date.getFullYear() <= 2031, selectionType: 'year' }))).toEqual('Nothing on this page can be picked')
-      expect(description(renderCalendar({ disabledDates: date => date.getDay() === 1, firstDayOfWeek: 1, selectionType: 'week' }))).toEqual('Nothing on this page can be picked')
+      expect(description(renderCalendar({ disabledDates: date => date.getMonth() >= 6 && date.getMonth() <= 8, firstDayOfWeek: 1, selectionType: 'week' }))).toEqual('Nothing on this page can be picked')
       expect(description(renderCalendar({ disabledDates: [new Date(2026, 7, 14)] }))).toBeNull()
 
       for (const selectionType of ['week', 'month', 'quarter', 'year']) {
@@ -4507,7 +4507,7 @@ describe('Calendar', () => {
 
       new Calendar(weeks, { // eslint-disable-line no-new
         ...limits,
-        disabledDates: [new Date(2026, 7, 10)],
+        disabledDates: [[new Date(2026, 7, 10), new Date(2026, 7, 16)]],
         firstDayOfWeek: 1,
         selectionType: 'week'
       })
@@ -5011,7 +5011,7 @@ describe('Calendar', () => {
 
       new Calendar(fixtureEl.querySelector('#weeks'), { // eslint-disable-line no-new
         calendarDate: new Date(2026, 7, 1),
-        disabledDates: [new Date(2026, 7, 17)],
+        disabledDates: [[new Date(2026, 7, 17), new Date(2026, 7, 23)]],
         endDate: new Date(2026, 7, 26),
         firstDayOfWeek: 1,
         range: true,
@@ -5059,7 +5059,7 @@ describe('Calendar', () => {
 
       new Calendar(fixtureEl.querySelector('div'), { // eslint-disable-line no-new
         calendarDate: new Date(2026, 8, 1),
-        disabledDates: [new Date(2026, 8, 16), new Date(2026, 8, 21)],
+        disabledDates: [new Date(2026, 8, 16), [new Date(2026, 8, 21), new Date(2026, 8, 27)]],
         endDate: new Date(2026, 9, 5),
         firstDayOfWeek: 1,
         range: true,
@@ -6079,15 +6079,13 @@ describe('Calendar', () => {
       const picked = []
       div.addEventListener('startDateChange.coreui.calendar', event => picked.push([event.date, event.dateObject]))
       const calendar = new Calendar(div, { calendarDate: new Date(2026, 8, 1), selectionType: 'week', showWeekNumber: true })
-      const rowDates = [new Date(2026, 7, 31), new Date(2026, 7, 31), new Date(2026, 8, 1), new Date(2026, 8, 2), new Date(2026, 8, 3), new Date(2026, 7, 31), new Date(2026, 7, 31)]
-
-      for (const [firstDayOfWeek, rowDate] of rowDates.entries()) {
-        calendar.setConfig({ firstDayOfWeek })
+      for (const firstDayOfWeek of [0, 1, 2, 3, 4, 5, 6]) {
+        calendar.setConfig({ firstDayOfWeek, startDate: null })
         const row = div.querySelector(`td[data-coreui-date="${new Date(2026, 8, 3).toDateString()}"]`).closest('tr')
         row.click()
 
         expect(row.querySelector('th').textContent).toEqual('36')
-        expect(picked.at(-1)).toEqual(['2026W36', rowDate])
+        expect(picked.at(-1)).toEqual(['2026W36', new Date(2026, 7, 31)])
       }
     })
 
@@ -6135,6 +6133,28 @@ describe('Calendar', () => {
 
         expect(div.querySelector('tr[tabindex="0"]')).toBe(div.querySelector(`td[data-coreui-date="${new Date(2026, 8, 3).toDateString()}"]`).closest('tr'))
       }
+    })
+
+    it('should disable a week row only when every day of its week is disabled', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, { calendarDate: new Date(2026, 8, 1), selectionType: 'week' })
+      const row = () => div.querySelector(`td[data-coreui-date="${new Date(2026, 8, 3).toDateString()}"]`).closest('tr')
+
+      for (const firstDayOfWeek of [0, 1, 2, 3, 4, 5, 6]) {
+        calendar.setConfig({ disabledDates: [new Date(2026, 7, 31), new Date(2026, 8, 6)], firstDayOfWeek })
+
+        expect(row().hasAttribute('data-coreui-selectable')).toBeTrue()
+
+        calendar.setConfig({ disabledDates: [[new Date(2026, 7, 31), new Date(2026, 8, 6)]] })
+
+        expect(row().getAttribute('aria-disabled')).toEqual('true')
+      }
+
+      calendar.setConfig({ disabledDates: date => date.getDay() === 1, firstDayOfWeek: 1 })
+
+      expect(div.querySelector('table').hasAttribute('aria-describedby')).toBeFalse()
     })
 
     it('should keep the weeks of minDate and maxDate selectable', () => {
@@ -6188,21 +6208,25 @@ describe('Calendar', () => {
       }
     })
 
-    it('should open on the page of the week of maxDate when today is after it', () => {
+    it('should open on the page of the week of the limit today falls outside of', () => {
       vi.useFakeTimers({ toFake: ['Date'] })
-      vi.setSystemTime(new Date(2026, 9, 1))
       onTestFinished(() => vi.useRealTimers())
-      fixtureEl.innerHTML = '<div></div>'
 
-      const div = fixtureEl.querySelector('div')
-      new Calendar(div, { // eslint-disable-line no-new
-        firstDayOfWeek: 4,
-        locale: 'en-US',
-        maxDate: '2026W36',
-        selectionType: 'week'
-      })
+      for (const [today, limit] of [[new Date(2026, 9, 1), 'maxDate'], [new Date(2026, 7, 1), 'minDate']]) {
+        vi.setSystemTime(today)
+        fixtureEl.innerHTML = '<div></div>'
 
-      expect(div.querySelector('.btn-month').textContent.trim()).toEqual('September')
+        const div = fixtureEl.querySelector('div')
+        new Calendar(div, { // eslint-disable-line no-new
+          firstDayOfWeek: 4,
+          locale: 'en-US',
+          [limit]: '2026W36',
+          selectionType: 'week',
+          showAdjacentDays: false
+        })
+
+        expect(div.querySelector('.btn-month').textContent.trim()).toEqual('September')
+      }
     })
 
     it('should move to the page that holds the row of a week given later', () => {

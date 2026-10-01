@@ -6,7 +6,7 @@
  */
 
 import {
-  constrainDate, convertToDateObject, createDate, type DisabledDate, getDateOfISOWeek, getISOWeekNumberAndYear, getWeekLabel, isCellDisabled, parseYearSmart, type PeriodViewTypes, removeTimeFromDate, type SelectionTypes
+  constrainDate, convertToDateObject, convertToLimitDate, createDate, type DisabledDate, getDateOfISOWeek, getISOWeekNumberAndYear, getWeekLabel, isCellDisabled, parseYearSmart, type PeriodTypes, removeTimeFromDate, type SelectionTypes
 } from './calendar.js'
 import { convert12hTo24h, convert24hTo12h } from './time.js'
 
@@ -899,17 +899,21 @@ export const formatDateWithin = (layout: DateSection[], date: Date | null): stri
   date ? formatSections(setSectionsFromDate(layout, date)) : ''
 
 /**
- * Names the period a field picks when it has neither a day nor a week
- * section: months, quarters or years.
+ * Names the period a field picks when it has no day section: weeks, months,
+ * quarters or years.
  *
  * @param layout - The sections and literals of the field
- * @returns The period, or `null` for a field that picks days, weeks or only a time
+ * @returns The period, or `null` for a field that picks days or only a time
  */
-export const getLayoutPeriod = (layout: DateSection[]): PeriodViewTypes | null => {
+export const getLayoutPeriod = (layout: DateSection[]): PeriodTypes | null => {
   const types = new Set(layout.map(section => section.type))
 
-  if (types.has('day') || types.has('week')) {
+  if (types.has('day')) {
     return null
+  }
+
+  if (types.has('week')) {
+    return 'weeks'
   }
 
   if (types.has('month')) {
@@ -954,7 +958,7 @@ export const constrainDateTime = (date: Date, minDate: Date | null, maxDate: Dat
  * field's precision: to the smallest unit the field shows when it has a time,
  * where a latest date without a time of day covers its whole day, by the day
  * when it has none, by the whole period when it picks weeks, months, quarters
- * or years.
+ * or years, the limits of a week field rounded out to whole weeks.
  *
  * @param layout - The sections and literals of the field
  * @param date - The date the field holds
@@ -966,9 +970,10 @@ export const constrainDateTime = (date: Date, minDate: Date | null, maxDate: Dat
 export const getDateLimitError = (layout: DateSection[], date: Date, minDate: Date | null, maxDate: Date | null, disabledDates?: DisabledDate | DisabledDate[]): DateLimitError => {
   const period = getLayoutPeriod(layout)
   const timed = layout.some(section => section.type === 'hour')
-  const weeks = layout.some(section => section.type === 'week')
-  const min = period || timed || weeks ? getDateWithin(layout, minDate) : minDate && removeTimeFromDate(minDate)
-  const max = timed ? getInclusiveMax(maxDate) : maxDate
+  const lower = period === 'weeks' ? convertToLimitDate(minDate, 'week', 'min') : minDate
+  const upper = period === 'weeks' ? convertToLimitDate(maxDate, 'week', 'max') : maxDate
+  const min = period || timed ? getDateWithin(layout, lower) : lower && removeTimeFromDate(lower)
+  const max = timed ? getInclusiveMax(upper) : upper
 
   if (min && date < min) {
     return 'minDate'
@@ -978,7 +983,7 @@ export const getDateLimitError = (layout: DateSection[], date: Date, minDate: Da
     return 'maxDate'
   }
 
-  if (isCellDisabled(date, period ?? 'days', weeks ? min : minDate, maxDate, disabledDates)) {
+  if (isCellDisabled(date, period ?? 'days', lower, upper, disabledDates)) {
     return 'disabledDate'
   }
 

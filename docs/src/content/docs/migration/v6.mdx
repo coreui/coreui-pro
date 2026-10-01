@@ -1197,12 +1197,15 @@ removed in favour of `$translucent-opacity` and
   `2026W35`, and that value given back as `startDate` did not select the
   same row. The number, the picked value, the weeks of `startDate`, `endDate`,
   `minDate` and `maxDate`, and the range and its preview now all follow the
-  row's majority week, so that row is `2026W36`. The picked date is the row's
-  first day in that week: its Monday for rows that start on Friday to Sunday,
-  its first day otherwise. `disabledDates` is checked on that day, so with
-  Sunday first a function that disables weekends no longer disables every
-  row. With Tuesday to Thursday first, the numbers move instead, so the row
-  from September 1 to 7 shows 36 where it showed 37.
+  row's majority week, so that row is `2026W36` and the picked date is its
+  Monday, August 31, the date `2026W36` stands for. With Tuesday to Thursday
+  first, the numbers move instead, so the row from September 1 to 7 shows 36
+  where it showed 37.
+- **Changed.** **In week selection `disabledDates` disables a week only when
+  it disables every day of it**, as it does for a month, quarter or year.
+  Before, a week was disabled when its row's first day was: with Monday first
+  `disabledDates: [new Date(2026, 7, 31)]` disabled week 36, and with Sunday
+  first a function that disables weekends disabled every row.
 - **Changed.** **In week selection the weeks of `minDate` and `maxDate` can be
   picked on any first day of the week**, as the month, quarter or year of a
   limit can in those selections. Before, a `minDate` later than the first day
