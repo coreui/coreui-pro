@@ -32,6 +32,7 @@ import {
   formatYearsRange,
   getCalendarDate,
   getCalendarKeyAction,
+  getKeptDay,
   getClosestSelectable,
   getDateBySelectionType,
   getMonthDetails,
@@ -379,7 +380,6 @@ class Calendar extends BaseComponent {
 
   _handleCalendarClick(event: any): void {
     const target = this._getEventTarget(event)
-    this._keptDay = null
 
     if (!target) {
       return
@@ -417,16 +417,13 @@ class Calendar extends BaseComponent {
   _handleCalendarKeydown(event: any): void {
     const target = this._getEventTarget(event) as HTMLElement
     const action = getCalendarKeyAction(event, this._getDate(target), this._getKeyContext(target))
+    this._keptDay = getKeptDay(event.key, action, this._keptDay)
 
     if (!action) {
       return
     }
 
     event.preventDefault()
-
-    if (action.type !== 'stay') {
-      this._keptDay = 'keptDay' in action ? action.keptDay ?? null : null
-    }
 
     if (action.type === 'activate') {
       this._handleCalendarClick(event)
@@ -449,6 +446,7 @@ class Calendar extends BaseComponent {
 
     const context = this._getKeyContext(event.target)
     const action = getCalendarKeyAction(event, null, context)
+    this._keptDay = getKeptDay(event.key, action, this._keptDay)
 
     if (!action) {
       return
@@ -531,6 +529,10 @@ class Calendar extends BaseComponent {
   _addEventListeners(): void {
     const focusable = `${SELECTOR_CALENDAR_CELL_FOCUSABLE}, ${SELECTOR_CALENDAR_ROW_FOCUSABLE}`
     const selectable = `${SELECTOR_CALENDAR_CELL_SELECTABLE}, ${SELECTOR_CALENDAR_ROW_SELECTABLE}`
+
+    EventHandler.on(this._element, EVENT_CLICK_DATA_API, () => {
+      this._keptDay = null
+    })
 
     EventHandler.on(this._element, EVENT_CLICK_DATA_API, focusable, event => {
       this._handleCalendarClick(event)

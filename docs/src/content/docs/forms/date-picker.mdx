@@ -394,8 +394,8 @@ An `aria-label`, `aria-labelledby` or `aria-describedby` on the picker element m
 | <kbd>Arrow Right</kbd> / <kbd>Arrow Left</kbd> | Move focus to the next / previous day; crossing the edge of the grid moves to the adjacent month |
 | <kbd>Arrow Down</kbd> / <kbd>Arrow Up</kbd> | Move focus to the same day of the next / previous week |
 | <kbd>Home</kbd> / <kbd>End</kbd> | Move focus to the first / last day of the week inside `minDate` / `maxDate`, into the previous / next month when the week starts or ends there |
-| <kbd>Page Down</kbd> / <kbd>Page Up</kbd> | Move focus to the same day of the next / previous month, keeping the day number when the target month is long enough |
-| <kbd>Shift</kbd> + <kbd>Page Down</kbd> / <kbd>Shift</kbd> + <kbd>Page Up</kbd> | Move focus to the same day of the next / previous year |
+| <kbd>Page Down</kbd> / <kbd>Page Up</kbd> | Move focus to the same day of the next / previous month, keeping the day number when the target month is long enough; a series of presses keeps the day it started from, so January 31 goes to February 28 and then March 31, also across a stop at `minDate` / `maxDate`; any other key or a click starts a new series |
+| <kbd>Shift</kbd> + <kbd>Page Down</kbd> / <kbd>Shift</kbd> + <kbd>Page Up</kbd> | Move focus to the same day of the next / previous year, keeping the day of a series the same way |
 | <kbd>Enter</kbd> / <kbd>Space</kbd> | Select the focused date, and close the popup unless `timepicker` is on, where the time half still has to be set; nothing happens on a date that cannot be picked |
 
 ## Usage

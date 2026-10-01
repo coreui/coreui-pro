@@ -2454,6 +2454,61 @@ describe('Calendar', () => {
       expect(rowStart()).toEqual(new Date(2026, 7, 24))
     })
 
+    it('should keep the day of a series across a stop at maxDate', () => {
+      const div = renderCalendar({ calendarDate: new Date(2026, 0, 1), maxDate: new Date(2026, 1, 20) })
+
+      pressKey(focusDay(div, 2026, 0, 31), 'PageDown')
+      expect(activeDate()).toEqual(new Date(2026, 1, 20))
+
+      pressKey(document.activeElement, 'PageUp')
+      expect(activeDate()).toEqual(new Date(2026, 0, 31))
+    })
+
+    it('should start a new series of page turns after Tab or a navigation button', () => {
+      const div = renderCalendar({ calendarDate: new Date(2026, 0, 1) })
+
+      pressKey(focusDay(div, 2026, 0, 31), 'PageDown')
+      pressKey(document.activeElement, 'Tab')
+      pressKey(document.activeElement, 'PageDown')
+      expect(activeDate()).toEqual(new Date(2026, 2, 28))
+
+      pressKey(focusDay(div, 2026, 2, 31), 'PageUp')
+      div.querySelector('.btn-next').click()
+      div.querySelector('.btn-prev').click()
+      pressKey(focusDay(div, 2026, 1, 28), 'PageDown')
+      expect(activeDate()).toEqual(new Date(2026, 2, 28))
+    })
+
+    it('should start a new series of page turns after a key on a grid with nothing to focus', () => {
+      const div = renderCalendar({ calendarDate: new Date(2026, 0, 1), maxDate: new Date(2026, 1, 28) })
+      const calendar = Calendar.getInstance(div)
+
+      pressKey(focusDay(div, 2026, 0, 31), 'PageDown')
+      calendar.setConfig({ calendarDate: new Date(2026, 2, 1) })
+      const grid = div.querySelector('table')
+      grid.focus()
+      pressKey(grid, 'ArrowLeft')
+      expect(activeDate()).toEqual(new Date(2026, 1, 28))
+
+      pressKey(document.activeElement, 'PageUp')
+      expect(activeDate()).toEqual(new Date(2026, 0, 28))
+    })
+
+    it('should turn a week row that starts in the previous month from the month the series reached it in', () => {
+      const div = renderCalendar({
+        calendarDate: new Date(2026, 2, 1), firstDayOfWeek: 1, maxDate: new Date(2026, 3, 25), selectionType: 'week'
+      })
+      const rowStart = () => new Date(document.activeElement.querySelector('[data-coreui-date]').dataset.coreuiDate)
+
+      weekRow(div, new Date(2026, 2, 2)).focus()
+      pressKey(document.activeElement, 'PageDown')
+      expect(rowStart()).toEqual(new Date(2026, 2, 30))
+
+      pressKey(document.activeElement, 'PageDown')
+      expect(document.activeElement.tagName).toEqual('TR')
+      expect(rowStart()).toEqual(new Date(2026, 3, 20))
+    })
+
     it('should land on the same day when PageDown leads into a month with nothing to pick', () => {
       renderCalendar({ disabledDates: date => date.getMonth() === 8 })
 

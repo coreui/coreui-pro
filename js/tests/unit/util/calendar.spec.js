@@ -18,6 +18,7 @@ import {
   getDateBySelectionType,
   getDateOfISOWeek,
   getISOWeekNumberAndYear,
+  getKeptDay,
   getLocalDateFromString,
   getMonthsNames,
   getSelectableDates,
@@ -807,16 +808,16 @@ describe('Calendar Utilities', () => {
       type: 'move',
       years
     })
-    const page = (date, months, years = 0, day = date.getDate(), keptDate = date) => ({
+    const page = (date, months, years = 0, day = date.getDate(), focused = date) => ({
       date,
-      keptDay: { date: keptDate, day },
+      keptDay: { day, focused, target: date },
       months,
       type: 'page',
       years
     })
     const stop = (date, day, months = 0, years = 0) => ({
       date,
-      keptDay: { date, day },
+      keptDay: { day, focused: date, target: date },
       months,
       type: 'move',
       years
@@ -1008,7 +1009,7 @@ describe('Calendar Utilities', () => {
     })
 
     it('should keep the day a series of page turns started from while the focus is on the date the last turn reached', () => {
-      const february = context({ calendarDate: new Date(2026, 1, 1), keptDay: { date: new Date(2026, 1, 28), day: 31 } })
+      const february = context({ calendarDate: new Date(2026, 1, 1), keptDay: { day: 31, focused: new Date(2026, 1, 28), target: new Date(2026, 1, 28) } })
 
       expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 1, 28), february)).toEqual(page(new Date(2026, 2, 31), 1, 0, 31))
       expect(getCalendarKeyAction(press('PageUp'), new Date(2026, 1, 28), february)).toEqual(page(new Date(2026, 0, 31), -1, 0, 31))
@@ -1017,16 +1018,25 @@ describe('Calendar Utilities', () => {
     })
 
     it('should keep the day of a series across a stop at minDate or maxDate', () => {
-      const july = context({ keptDay: { date: new Date(2026, 6, 20), day: 10 }, maxDate: new Date(2026, 6, 20) })
+      const july = context({ keptDay: { day: 10, focused: new Date(2026, 6, 20), target: new Date(2026, 6, 20) }, maxDate: new Date(2026, 6, 20) })
 
       expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 6, 10), context({ maxDate: new Date(2026, 6, 20) }))).toEqual(stop(new Date(2026, 6, 20), 10))
       expect(getCalendarKeyAction(press('PageUp'), new Date(2026, 6, 20), july)).toEqual(page(new Date(2026, 5, 10), -1))
     })
 
     it('should keep the day of a series of week rows on the first day of the row the turn reached', () => {
-      const rows = context({ keptDay: { date: new Date(2026, 5, 22), day: 25 }, rows: true })
+      const rows = context({ keptDay: { day: 25, focused: new Date(2026, 5, 22), target: new Date(2026, 5, 25) }, rows: true })
 
       expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 5, 22), rows)).toEqual(page(new Date(2026, 6, 25), 1, 0, 25, new Date(2026, 6, 20)))
+      expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 5, 21), context({ firstDayOfWeek: 0, rows: true })))
+        .toEqual(page(new Date(2026, 6, 21), 1, 0, 21, new Date(2026, 6, 19)))
+    })
+
+    it('should turn a week row that starts in the previous month from the month the series reached it in', () => {
+      const april = context({ calendarDate: new Date(2026, 3, 1), keptDay: { day: 2, focused: new Date(2026, 2, 30), target: new Date(2026, 3, 2) }, rows: true })
+
+      expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 2, 30), april)).toEqual(page(new Date(2026, 4, 2), 1, 0, 2, new Date(2026, 3, 27)))
+      expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 2, 30), { ...april, maxDate: new Date(2026, 3, 25) })).toEqual(stop(new Date(2026, 3, 20), 2))
     })
 
     it('should turn the calendar a year with Shift, a year in the months and quarters views, and a page of years in the years view', () => {
@@ -1165,6 +1175,30 @@ describe('Calendar Utilities', () => {
       expect(getCalendarKeyAction(press('End'), null, context())).toEqual({ type: 'stay' })
       expect(getCalendarKeyAction(press('Enter'), null, context())).toBeNull()
       expect(getCalendarKeyAction(press(' '), null, context())).toBeNull()
+    })
+  })
+
+  describe('getKeptDay', () => {
+    const kept = { day: 31, focused: new Date(2026, 1, 28), target: new Date(2026, 1, 28) }
+    const turned = { day: 31, focused: new Date(2026, 2, 31), target: new Date(2026, 2, 31) }
+
+    it('should give the day a page turn returns', () => {
+      expect(getKeptDay('PageDown', {
+        date: new Date(2026, 2, 31), keptDay: turned, months: 1, type: 'page', years: 0
+      }, kept)).toBe(turned)
+    })
+
+    it('should hold the day while a turn is blocked or only a modifier key is pressed', () => {
+      expect(getKeptDay('PageDown', { type: 'stay' }, kept)).toBe(kept)
+      expect(getKeptDay('Shift', null, kept)).toBe(kept)
+    })
+
+    it('should drop the day after any other key', () => {
+      expect(getKeptDay('ArrowLeft', {
+        date: new Date(2026, 1, 27), months: 0, type: 'move', years: 0
+      }, kept)).toBeNull()
+      expect(getKeptDay('Enter', { type: 'activate' }, kept)).toBeNull()
+      expect(getKeptDay('Tab', null, kept)).toBeNull()
     })
   })
 
