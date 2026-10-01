@@ -1394,6 +1394,18 @@ describe('Calendar', () => {
       expect(rtlNext).not.toEqual(navIcon(ltrEl, '.btn-next').innerHTML)
     })
 
+    it('should swap the icons a page gives in a right-to-left layout', () => {
+      fixtureEl.innerHTML = '<div dir="rtl"><div></div></div>'
+      const div = fixtureEl.querySelector('div > div')
+      new Calendar(div, { // eslint-disable-line no-new
+        navNextIcon: '<svg><circle id="next"></circle></svg>',
+        navPrevIcon: '<svg><circle id="prev"></circle></svg>'
+      })
+
+      expect(navIcon(div, '.btn-prev').querySelector('circle').id).toEqual('next')
+      expect(navIcon(div, '.btn-next').querySelector('circle').id).toEqual('prev')
+    })
+
     it('should accept a custom navigation icon and sanitize it', () => {
       fixtureEl.innerHTML = '<div></div>'
 

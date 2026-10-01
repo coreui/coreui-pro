@@ -127,6 +127,8 @@ const ARROW_KEYS = new Set(['ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowUp'])
 
 const GREGORIAN_MONTH_CALENDARS = new Set(['buddhist', 'gregory', 'iso8601', 'japanese', 'roc'])
 
+const yearBeforeMonth = new Map<string, boolean>()
+
 const CELL_NAME_FORMATS: Record<Exclude<ViewTypes, 'quarters'>, Intl.DateTimeFormatOptions> = {
   days: {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
@@ -779,8 +781,14 @@ export const createDateTimeFormat = (locale?: string, options?: Intl.DateTimeFor
  * @returns `true` when the year comes first
  */
 export const isYearBeforeMonth = (locale?: string) : boolean => {
-  const parts = createDateTimeFormat(locale, { month: 'long', year: 'numeric' }).formatToParts(new Date(2000, 0, 1))
-  return parts.findIndex(({ type }) => type === 'year') < parts.findIndex(({ type }) => type === 'month')
+  const key = locale ?? ''
+
+  if (!yearBeforeMonth.has(key)) {
+    const parts = createDateTimeFormat(locale, { month: 'long', year: 'numeric' }).formatToParts(new Date(2000, 0, 1))
+    yearBeforeMonth.set(key, parts.findIndex(({ type }) => type === 'year') < parts.findIndex(({ type }) => type === 'month'))
+  }
+
+  return yearBeforeMonth.get(key) as boolean
 }
 
 /**
