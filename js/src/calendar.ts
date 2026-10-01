@@ -603,14 +603,16 @@ class Calendar extends BaseComponent {
 
   _showPeriodView(view: ViewTypes, index: number): boolean {
     const shown = getCalendarDate(this._calendarDate, index, this._view)
-    const start = getStartOfView(shown, view).toDateString()
+    const start = getStartOfView(createDate(shown.getFullYear(), shown.getMonth(), 1), view).toDateString()
     const focus = view !== this._view && this._element.contains(document.activeElement)
 
     this._setCalendarView(view, 'navigation')
     this._updateCalendar(() => {
       if (focus) {
         const panel = SelectorEngine.find(SELECTOR_CALENDAR, this._element as ParentNode)[index]
-        const target = SelectorEngine.findOne(`${SELECTOR_CALENDAR_CELL_FOCUSABLE}[data-coreui-date="${start}"]`, this._element) ?? SelectorEngine.findOne('[tabindex="0"]', panel)
+        const target = SelectorEngine.find(`[data-coreui-date="${start}"]`, this._element)
+          .map(cell => cell.closest<HTMLElement>(this._rovingSelector()))
+          .find(Boolean) ?? SelectorEngine.findOne('[tabindex="0"]', panel)
         target?.focus()
       }
     })

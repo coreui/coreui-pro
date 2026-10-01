@@ -778,7 +778,7 @@ describe('Calendar', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
-      new Calendar(div, { calendarDate: new Date(2026, 8, 1), locale: 'en-US' }) // eslint-disable-line no-new
+      new Calendar(div, { calendarDate: new Date(2026, 8, 15), locale: 'en-US' }) // eslint-disable-line no-new
 
       div.querySelector('.btn-year').click()
       div.querySelector('.btn-year').focus()
@@ -786,6 +786,25 @@ describe('Calendar', () => {
 
       expect(div.querySelector('table').getAttribute('aria-label')).toEqual('September 2026')
       expect(document.activeElement.dataset.coreuiDate).toEqual(new Date(2026, 8, 1).toDateString())
+    })
+
+    it('should focus the week that holds the start of the month when the year button goes back to the days view', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { // eslint-disable-line no-new
+        calendarDate: new Date(2026, 8, 15),
+        locale: 'en-US',
+        selectionType: 'week',
+        startDate: new Date(2026, 8, 21)
+      })
+
+      div.querySelector('.btn-year').focus()
+      div.querySelector('.btn-year').click()
+      div.querySelector('.btn-year').click()
+
+      expect(document.activeElement.matches('tr')).toBeTrue()
+      expect(document.activeElement.querySelector(`[data-coreui-date="${new Date(2026, 8, 1).toDateString()}"]`)).not.toBeNull()
     })
 
     it('should leave the year button disabled where the years view is the one that picks', () => {
