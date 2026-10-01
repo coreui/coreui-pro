@@ -509,7 +509,7 @@ describe('Calendar', () => {
       expect(polish.querySelector('thead th .visually-hidden').textContent).toEqual('Tydzień')
     })
 
-    it('should name each week number in the locale, or with ariaWeekNumberLabel', () => {
+    it('should name each week number in the locale, or with ariaWeekNumberLabel', async () => {
       fixtureEl.innerHTML = '<div></div><div></div><div></div>'
 
       const [english, polish, custom] = fixtureEl.querySelectorAll('div')
@@ -521,8 +521,19 @@ describe('Calendar', () => {
 
       expect(weekNumber(english).getAttribute('aria-label')).toEqual('Week 36')
       expect(weekNumber(english).textContent).toEqual('36')
+      expect(weekNumber(english).getAttribute('scope')).toEqual('row')
       expect(weekNumber(polish).getAttribute('aria-label')).toEqual('Tydzień 36')
       expect(weekNumber(custom).getAttribute('aria-label')).toEqual('Wk 36')
+
+      await cdp().send('Accessibility.enable')
+      onTestFinished(() => cdp().send('Accessibility.disable'))
+      const { frameTree } = await cdp().send('Page.getFrameTree')
+      const frames = [frameTree, ...(frameTree.childFrames ?? [])].map(({ frame }) => frame.id)
+      const trees = await Promise.all(frames.map(frameId => cdp().send('Accessibility.getFullAXTree', { frameId })))
+      const headers = trees.flatMap(({ nodes }) => nodes).filter(node => node.role?.value === 'rowheader').map(node => node.name?.value)
+
+      expect(headers).toContain('Week 36')
+      expect(headers).toContain('Tydzień 36')
     })
 
     it('should not show week numbers by default', () => {
@@ -1256,18 +1267,21 @@ describe('Calendar', () => {
       expect(cell.getAttribute('aria-label')).toEqual('Wednesday, August 12, 2026')
     })
 
-    it('should name a week row by the days it spans in week selection', () => {
-      fixtureEl.innerHTML = '<div></div>'
+    it('should name a week row by the days it spans in week selection, after its week number when it is shown', () => {
+      fixtureEl.innerHTML = '<div></div><div></div>'
 
-      const div = fixtureEl.querySelector('div')
-      const calendar = new Calendar(div, {
-        calendarDate: new Date(2026, 7, 1), firstDayOfWeek: 1, locale: 'en-US', selectionType: 'week', showWeekNumber: true
-      })
-      const cell = div.querySelector(`[data-coreui-date="${new Date(2026, 7, 12).toDateString()}"]`)
+      const [numbered, plain] = fixtureEl.querySelectorAll('div')
+      const config = {
+        calendarDate: new Date(2026, 7, 1), firstDayOfWeek: 1, locale: 'en-US', selectionType: 'week'
+      }
+      const calendar = new Calendar(numbered, { ...config, showWeekNumber: true })
+      new Calendar(plain, config) // eslint-disable-line no-new
+      const cell = div => div.querySelector(`[data-coreui-date="${new Date(2026, 7, 12).toDateString()}"]`)
 
       expect(calendar._view).toBe('days')
-      expect(cell.closest('tr').getAttribute('aria-label')).toMatch(/^August 10\s–\s16, 2026$/)
-      expect(cell.getAttribute('aria-label')).toEqual('Wednesday, August 12, 2026')
+      expect(cell(numbered).closest('tr').getAttribute('aria-label')).toMatch(/^Week 33, August 10\s–\s16, 2026$/)
+      expect(cell(plain).closest('tr').getAttribute('aria-label')).toMatch(/^August 10\s–\s16, 2026$/)
+      expect(cell(numbered).getAttribute('aria-label')).toEqual('Wednesday, August 12, 2026')
     })
 
     it('should not name the rows when days are selected', () => {
