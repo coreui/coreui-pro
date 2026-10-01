@@ -1205,12 +1205,16 @@ removed in favour of `$translucent-opacity` and
   it disables every day of it**, as it does for a month, quarter or year.
   Before, a week was disabled when its row's first day was: with Monday first
   `disabledDates: [new Date(2026, 7, 31)]` disabled week 36, and with Sunday
-  first a function that disables weekends disabled every row.
-- **Changed.** **In week selection the weeks of `minDate` and `maxDate` can be
-  picked on any first day of the week**, as the month, quarter or year of a
-  limit can in those selections. Before, a `minDate` later than the first day
-  of its row disabled that row, and with Tuesday to Thursday first a `maxDate`
-  of `2026W36` disabled the row of week 36.
+  first a function that disables weekends disabled every row. A range of
+  weeks across a week that holds a disabled day is kept, as a range of months
+  is.
+- **Changed.** **In week selection `minDate` and `maxDate` count as whole
+  weeks**, so their weeks can be picked on any first day of the week, as the
+  month, quarter or year of a limit can in those selections, and the months
+  view opens a month only when its page holds a week inside them. Before, a
+  `minDate` later than the first day of its row disabled that row, and with
+  Tuesday to Thursday first a `maxDate` of `2026W36` disabled the row of week
+  36.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **`cellHover` is gone.** It reported the date under the pointer or the focus
   for the hover preview in the date picker's field, which v6 no longer draws.

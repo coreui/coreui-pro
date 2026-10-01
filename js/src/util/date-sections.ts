@@ -6,7 +6,7 @@
  */
 
 import {
-  constrainDate, convertToDateObject, convertToLimitDate, createDate, type DisabledDate, getDateOfISOWeek, getISOWeekNumberAndYear, getWeekLabel, isCellDisabled, parseYearSmart, type PeriodTypes, removeTimeFromDate, type SelectionTypes
+  constrainDate, convertToDateObject, createDate, type DisabledDate, getDateOfISOWeek, getISOWeekNumberAndYear, getWeekLabel, isCellDisabled, parseYearSmart, type PeriodTypes, removeTimeFromDate, type SelectionTypes
 } from './calendar.js'
 import { convert12hTo24h, convert24hTo12h } from './time.js'
 
@@ -958,7 +958,7 @@ export const constrainDateTime = (date: Date, minDate: Date | null, maxDate: Dat
  * field's precision: to the smallest unit the field shows when it has a time,
  * where a latest date without a time of day covers its whole day, by the day
  * when it has none, by the whole period when it picks weeks, months, quarters
- * or years, the limits of a week field rounded out to whole weeks.
+ * or years.
  *
  * @param layout - The sections and literals of the field
  * @param date - The date the field holds
@@ -970,10 +970,8 @@ export const constrainDateTime = (date: Date, minDate: Date | null, maxDate: Dat
 export const getDateLimitError = (layout: DateSection[], date: Date, minDate: Date | null, maxDate: Date | null, disabledDates?: DisabledDate | DisabledDate[]): DateLimitError => {
   const period = getLayoutPeriod(layout)
   const timed = layout.some(section => section.type === 'hour')
-  const lower = period === 'weeks' ? convertToLimitDate(minDate, 'week', 'min') : minDate
-  const upper = period === 'weeks' ? convertToLimitDate(maxDate, 'week', 'max') : maxDate
-  const min = period || timed ? getDateWithin(layout, lower) : lower && removeTimeFromDate(lower)
-  const max = timed ? getInclusiveMax(upper) : upper
+  const min = period || timed ? getDateWithin(layout, minDate) : minDate && removeTimeFromDate(minDate)
+  const max = timed ? getInclusiveMax(maxDate) : maxDate
 
   if (min && date < min) {
     return 'minDate'
@@ -983,7 +981,7 @@ export const getDateLimitError = (layout: DateSection[], date: Date, minDate: Da
     return 'maxDate'
   }
 
-  if (isCellDisabled(date, period ?? 'days', lower, upper, disabledDates)) {
+  if (isCellDisabled(date, period ?? 'days', minDate, maxDate, disabledDates)) {
     return 'disabledDate'
   }
 

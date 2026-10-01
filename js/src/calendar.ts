@@ -918,11 +918,11 @@ class Calendar extends BaseComponent {
     const changed = (...names: string[]) => !keys || keys.includes('selectionType') || names.some(name => keys.includes(name))
 
     if (changed('minDate')) {
-      this._minDate = convertToLimitDate(this._config.minDate, this._config.selectionType, 'min')
+      this._minDate = convertToLimitDate(this._config.minDate, this._config.selectionType)
     }
 
     if (changed('maxDate')) {
-      this._maxDate = convertToLimitDate(this._config.maxDate, this._config.selectionType, 'max')
+      this._maxDate = convertToLimitDate(this._config.maxDate, this._config.selectionType)
     }
 
     if (changed('calendarDate', 'startDate', 'endDate')) {
@@ -934,8 +934,7 @@ class Calendar extends BaseComponent {
         convertToDateObject(source, this._config.selectionType) :
         convertToShownDate(source, this._config.selectionType, this._config.firstDayOfWeek)
 
-      this._calendarDate = date || this._calendarDate ||
-        convertToShownDate(constrainDate(new Date(), this._minDate, this._maxDate), this._config.selectionType, this._config.firstDayOfWeek) as Date
+      this._calendarDate = date || this._calendarDate || constrainDate(new Date(), this._minDate, this._maxDate)
     }
 
     if (changed('startDate')) {
@@ -1147,9 +1146,12 @@ class Calendar extends BaseComponent {
 
   _cellPeriodAttributes(date: Date): Record<string, any> {
     const view = this._view as PeriodViewTypes
+    const { firstDayOfWeek, selectionType } = this._config
+    const start = convertToShownDate(this._startDate, selectionType, firstDayOfWeek)
+    const end = convertToShownDate(this._endDate, selectionType, firstDayOfWeek)
     const isDisabled = isPeriodDisabled(date, view, this._minDate, this._maxDate, this._config.disabledDates)
-    const isSelected = isPeriodSelected(date, view, this._startDate, this._endDate)
-    const isInRange = isPeriodInRange(date, view, this._startDate, this._endDate)
+    const isSelected = isPeriodSelected(date, view, start, end)
+    const isInRange = isPeriodInRange(date, view, start, end)
     const isRangeHover = VIEW_BY_SELECTION_TYPE[this._config.selectionType] === view &&
       this._isRangeHover((start, end) => isPeriodInRange(date, view, start, end))
 

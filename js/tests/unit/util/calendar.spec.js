@@ -217,17 +217,17 @@ describe('Calendar Utilities', () => {
   })
 
   describe('convertToLimitDate', () => {
-    it('should round the limits of a week selection out to whole ISO weeks', () => {
-      expect(convertToLimitDate(new Date(2026, 8, 2, 10), 'week', 'min')).toEqual(new Date(2026, 7, 31))
-      expect(convertToLimitDate(new Date(2026, 8, 2, 10), 'week', 'max')).toEqual(new Date(2026, 8, 6))
-      expect(convertToLimitDate('2026W36', 'week', 'max')).toEqual(new Date(2026, 8, 6))
-      expect(convertToLimitDate(createDate(26, 0, 7), 'week', 'min')).toEqual(createDate(26, 0, 5))
+    it('should move a limit of a week selection to the Thursday of its ISO week', () => {
+      expect(convertToLimitDate(new Date(2026, 8, 6, 10), 'week')).toEqual(new Date(2026, 8, 3))
+      expect(convertToLimitDate(new Date(2026, 7, 31), 'week')).toEqual(new Date(2026, 8, 3))
+      expect(convertToLimitDate('2026W36', 'week')).toEqual(new Date(2026, 8, 3))
+      expect(convertToLimitDate(createDate(26, 0, 4), 'week')).toEqual(createDate(26, 0, 1))
     })
 
     it('should read a limit of any other selection as convertToDateObject does', () => {
-      expect(convertToLimitDate(new Date(2026, 8, 6, 10), 'day', 'min')).toEqual(new Date(2026, 8, 6, 10))
-      expect(convertToLimitDate('2026-09', 'month', 'max')).toEqual(new Date(2026, 8, 1))
-      expect(convertToLimitDate(null, 'week', 'max')).toBeNull()
+      expect(convertToLimitDate(new Date(2026, 8, 6, 10), 'day')).toEqual(new Date(2026, 8, 6, 10))
+      expect(convertToLimitDate('2026-09', 'month')).toEqual(new Date(2026, 8, 1))
+      expect(convertToLimitDate(null, 'week')).toBeNull()
     })
   })
 
@@ -1194,6 +1194,10 @@ describe('Calendar Utilities', () => {
       expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 6, 27), { ...rows, maxDate: new Date(2026, 7, 24) })).toEqual(page(new Date(2026, 7, 27), 1, 0, 27, new Date(2026, 7, 24)))
       expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 7, 1), context({ maxDate: new Date(2026, 7, 15) }))).toEqual(stop(new Date(2026, 7, 15), 1, 1))
       expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 7, 1), context({ maxDate: new Date(2026, 7, 1) }))).toEqual({ type: 'stay' })
+      expect(getCalendarKeyAction(press('PageDown'), new Date(2026, 9, 18), context({
+        calendarDate: new Date(2026, 9, 1), firstDayOfWeek: 0, maxDate: convertToLimitDate(new Date(2026, 9, 22), 'week'), rows: true
+      })))
+        .toEqual({ type: 'stay' })
     })
 
     it('should move to the limit the arrows point toward when the grid has the focus', () => {
@@ -1453,6 +1457,11 @@ describe('Calendar Utilities', () => {
   })
 
   describe('isDisableDateInRange', () => {
+    it('should count a day of a week range only when its whole week is disabled', () => {
+      expect(isDisableDateInRange(new Date(2026, 7, 31), new Date(2026, 8, 14), [new Date(2026, 8, 9)], 'weeks')).toBeFalse()
+      expect(isDisableDateInRange(new Date(2026, 7, 31), new Date(2026, 8, 14), [[new Date(2026, 8, 7), new Date(2026, 8, 13)]], 'weeks')).toBeTrue()
+    })
+
     it('should return false if range does not contain a disabled date', () => {
       const start = new Date(2023, 0, 1)
       const end = new Date(2023, 0, 3)
@@ -1802,11 +1811,11 @@ describe('Calendar Utilities', () => {
       expect(isPeriodDisabled(new Date(2026, 8, 21), 'weeks', min, max)).toBeTrue()
     })
 
-    it('should disable a week only when every day of it within the limits is disabled', () => {
+    it('should disable a week only when every day of it is disabled, the limits counting as whole weeks', () => {
       const weekdays = date => date.getDay() !== 0 && date.getDay() !== 6
 
       expect(isPeriodDisabled(new Date(2026, 8, 2), 'weeks', null, null, weekdays)).toBeFalse()
-      expect(isPeriodDisabled(new Date(2026, 8, 2), 'weeks', null, new Date(2026, 8, 4), weekdays)).toBeTrue()
+      expect(isPeriodDisabled(new Date(2026, 8, 2), 'weeks', null, new Date(2026, 8, 4), weekdays)).toBeFalse()
       expect(isPeriodDisabled(new Date(2026, 8, 2), 'weeks', null, null, [[new Date(2026, 7, 31), new Date(2026, 8, 6)]])).toBeTrue()
     })
   })
@@ -1818,6 +1827,16 @@ describe('Calendar Utilities', () => {
       expect(isPeriodSelected(new Date(2026, 8, 1), 'weeks', new Date(2026, 7, 30), new Date(2026, 8, 7))).toBeFalse()
       expect(isPeriodSelected(createDate(26, 0, 7), 'weeks', createDate(26, 0, 5), null)).toBeTrue()
       expect(isPeriodSelected(createDate(26, 0, 7), 'weeks', createDate(26, 0, 4), null)).toBeFalse()
+    })
+
+    it('should keep the week of a day whose midnight daylight saving time skips', async () => {
+      await cdp().send('Emulation.setTimezoneOverride', { timezoneId: 'America/Santiago' })
+      onTestFinished(() => cdp().send('Emulation.setTimezoneOverride', { timezoneId: '' }))
+
+      expect(isPeriodSelected(new Date(2026, 7, 31), 'weeks', new Date(2026, 8, 6, 12), null)).toBeTrue()
+      expect(convertToSelectionDate(new Date(2026, 8, 6), 'week')).toEqual(new Date(2026, 7, 31))
+      expect(convertToLimitDate(new Date(2026, 8, 6), 'week')).toEqual(new Date(2026, 8, 3))
+      expect(getWeekRowDate(new Date(2026, 8, 3))).toEqual(new Date(2026, 7, 31))
     })
   })
 

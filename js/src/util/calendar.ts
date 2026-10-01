@@ -185,7 +185,7 @@ export const YEARS_PER_PAGE = 12
  */
 const getPeriod = (date: Date, view: PeriodTypes) : number => {
   if (view === 'weeks') {
-    return getStartOfWeek(createDate(date.getFullYear(), date.getMonth(), date.getDate()), 1).getTime()
+    return getMonday(date).getTime()
   }
 
   return Math.floor(((date.getFullYear() * 12) + date.getMonth()) / MONTHS_IN_PERIOD[view])
@@ -700,7 +700,7 @@ export const convertToDateObject = (date: Date | string | null | undefined, sele
  */
 export const convertToSelectionDate = (date: Date | string | null | undefined, selectionType: SelectionTypes | undefined) : Date | null => {
   const value = convertToDateObject(date, selectionType)
-  return value && selectionType === 'week' ? getStartOfWeek(createDate(value.getFullYear(), value.getMonth(), value.getDate()), 1) : value
+  return value && selectionType === 'week' ? getMonday(value) : value
 }
 
 /**
@@ -721,32 +721,32 @@ export const convertToShownDate = (date: Date | string | null | undefined, selec
     return value
   }
 
-  const monday = getStartOfWeek(value, 1)
-  const thursday = createDate(monday.getFullYear(), monday.getMonth(), monday.getDate() + 3)
-  const rowStart = getStartOfWeek(thursday, firstDayOfWeek)
+  const rowStart = getWeekRowStart(value, firstDayOfWeek)
   const rowEnd = createDate(rowStart.getFullYear(), rowStart.getMonth(), rowStart.getDate() + 6)
-  return [rowStart, rowEnd].some(day => day.getFullYear() === value.getFullYear() && day.getMonth() === value.getMonth()) ? value : thursday
+  const monday = getMonday(value)
+  return [rowStart, rowEnd].some(day => day.getFullYear() === value.getFullYear() && day.getMonth() === value.getMonth()) ? value : createDate(monday.getFullYear(), monday.getMonth(), monday.getDate() + 3)
 }
 
 /**
  * Converts a `minDate` or `maxDate` value as `convertToDateObject` does and,
- * in week selection, rounds it out to whole ISO weeks: a `minDate` to the
- * Monday that starts its week, a `maxDate` to the Sunday that ends it.
+ * in week selection, moves it to the Thursday of its ISO week: the week stays
+ * the limit, and the Thursday lies in the row that stands for that week
+ * whatever day the rows start on, so the grid finds the row of a limit by
+ * its days.
  *
  * @param date - The limit as a `Date` or a string
  * @param selectionType - The unit the string names
- * @param limit - Which limit the value is
  * @returns The limit, or `null` for no value or an unreadable one
  */
-export const convertToLimitDate = (date: Date | string | null | undefined, selectionType: SelectionTypes | undefined, limit: 'max' | 'min') : Date | null => {
+export const convertToLimitDate = (date: Date | string | null | undefined, selectionType: SelectionTypes | undefined) : Date | null => {
   const value = convertToDateObject(date, selectionType)
 
   if (!value || selectionType !== 'week') {
     return value
   }
 
-  const monday = getStartOfWeek(createDate(value.getFullYear(), value.getMonth(), value.getDate()), 1)
-  return limit === 'min' ? monday : createDate(monday.getFullYear(), monday.getMonth(), monday.getDate() + 6)
+  const monday = getMonday(value)
+  return createDate(monday.getFullYear(), monday.getMonth(), monday.getDate() + 3)
 }
 
 /**
@@ -1311,7 +1311,33 @@ export const getStartOfWeek = (date: Date, firstDayOfWeek: number) : Date => {
  * @returns The Monday of the row's week
  */
 export const getWeekRowDate = (rowStart: Date) : Date =>
-  getStartOfWeek(createDate(rowStart.getFullYear(), rowStart.getMonth(), rowStart.getDate() + 3), 1)
+  getMonday(createDate(rowStart.getFullYear(), rowStart.getMonth(), rowStart.getDate() + 3))
+
+/**
+ * Finds the midnight that starts the ISO week of a date, read from the Monday
+ * itself, so a day whose midnight a daylight saving change skips gives the
+ * same Monday as the rest of its week.
+ *
+ * @param date - A day of the week
+ * @returns The Monday that starts the week
+ */
+const getMonday = (date: Date) : Date => {
+  const monday = getStartOfWeek(date, 1)
+  return createDate(monday.getFullYear(), monday.getMonth(), monday.getDate())
+}
+
+/**
+ * Finds the first day of the week row that stands for the ISO week of a date:
+ * the row, starting on `firstDayOfWeek`, that holds the week's Thursday.
+ *
+ * @param date - A day of the week
+ * @param firstDayOfWeek - The day the rows start on, `0` for Sunday to `6` for Saturday
+ * @returns The first day of the row
+ */
+const getWeekRowStart = (date: Date, firstDayOfWeek: number) : Date => {
+  const monday = getMonday(date)
+  return getStartOfWeek(createDate(monday.getFullYear(), monday.getMonth(), monday.getDate() + 3), firstDayOfWeek)
+}
 
 /**
  * Finds the first or the last day, month, quarter or year the panels of a
@@ -1892,7 +1918,8 @@ export const isDisableDateInRange = (startDate?: Date | null, endDate?: Date | n
 /**
  * Tells whether an ISO week, month, quarter or year cannot be picked: it lies
  * wholly before `min` or year 1, or after `max`, or `isEveryDayDisabled` finds
- * every day of it disabled.
+ * every day of it disabled, all seven days for a week, whose limits count as
+ * whole weeks.
  *
  * @param date - A date in the period
  * @param view - The unit of the period
@@ -1913,8 +1940,8 @@ export const isPeriodDisabled = (date: Date, view: PeriodTypes, min?: Date | nul
   }
 
   if (view === 'weeks') {
-    const monday = getStartOfWeek(createDate(date.getFullYear(), date.getMonth(), date.getDate()), 1)
-    return isEveryDayDisabled(monday, createDate(monday.getFullYear(), monday.getMonth(), monday.getDate() + 6), min, max, disabledDates)
+    const monday = getMonday(date)
+    return isEveryDayDisabled(monday, createDate(monday.getFullYear(), monday.getMonth(), monday.getDate() + 6), null, null, disabledDates)
   }
 
   const months = MONTHS_IN_PERIOD[view]
