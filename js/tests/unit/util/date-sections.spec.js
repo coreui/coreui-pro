@@ -961,6 +961,14 @@ describe('Date Sections Utilities', () => {
       expect(getDateLimitError(date, new Date(2026, 9, 21), null, new Date(2026, 9, 20, 8))).toBe('maxDate')
     })
 
+    it('should compare a week field by the whole week', () => {
+      const week = getSectionsFromFormat('yyyy-Www', 'en-US')
+
+      expect(getDateLimitError(week, new Date(2026, 7, 31), new Date(2026, 8, 2), new Date(2026, 8, 2))).toBeNull()
+      expect(getDateLimitError(week, new Date(2026, 7, 24), new Date(2026, 8, 2), null)).toBe('minDate')
+      expect(getDateLimitError(week, new Date(2026, 8, 7), null, new Date(2026, 8, 2))).toBe('maxDate')
+    })
+
     it('should name a disabled date', () => {
       expect(getDateLimitError(date, new Date(2026, 9, 15), null, null, [new Date(2026, 9, 15)])).toBe('disabledDate')
     })
