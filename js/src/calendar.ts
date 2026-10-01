@@ -38,6 +38,7 @@ import {
   getMonthsNames,
   getStartOfView,
   getStartOfWeek,
+  getWeekLabel,
   getYears,
   isCellDisabled,
   isCellOutsideLimits,
@@ -567,7 +568,7 @@ class Calendar extends BaseComponent {
       [SELECTOR_BTN_NEXT]: () => this._modifyCalendarDate(0, 1),
       [SELECTOR_BTN_DOUBLE_NEXT]: () => this._modifyCalendarDate(this._view === 'years' ? YEARS_PER_PAGE : 1),
       [SELECTOR_BTN_MONTH]: (index: number) => this._showPeriodView('months', index),
-      [SELECTOR_BTN_YEAR]: (index: number) => this._showPeriodView('years', index)
+      [SELECTOR_BTN_YEAR]: (index: number) => this._showPeriodView(this._view === 'years' ? this._selectionView() : 'years', index)
     }
 
     for (const [selector, handler] of Object.entries(navigationSelectors)) {
@@ -600,16 +601,18 @@ class Calendar extends BaseComponent {
     })
   }
 
-  _showPeriodView(view: 'months' | 'years', index: number): boolean {
-    const shown = getCalendarDate(this._calendarDate, index, this._view)
-    const start = createDate(shown.getFullYear(), view === 'months' ? shown.getMonth() : 0, 1).toDateString()
+  _showPeriodView(view: ViewTypes, index: number): boolean {
+    const shown = getCalendarDate(this._calendarDate, index, this._view === 'years' ? view : this._view)
+    const start = getStartOfView(createDate(shown.getFullYear(), shown.getMonth(), 1), view).toDateString()
     const focus = view !== this._view && this._element.contains(document.activeElement)
 
     this._setCalendarView(view, 'navigation')
     this._updateCalendar(() => {
       if (focus) {
         const panel = SelectorEngine.find(SELECTOR_CALENDAR, this._element as ParentNode)[index]
-        const target = SelectorEngine.findOne(`${SELECTOR_CALENDAR_CELL_FOCUSABLE}[data-coreui-date="${start}"]`, this._element) ?? SelectorEngine.findOne('[tabindex="0"]', panel)
+        const target = SelectorEngine.find(`[data-coreui-date="${start}"]`, this._element)
+          .map(cell => cell.closest<HTMLElement>(this._rovingSelector()))
+          .find(Boolean) ?? SelectorEngine.findOne('[tabindex="0"]', panel)
         target?.focus()
       }
     })
@@ -743,6 +746,8 @@ class Calendar extends BaseComponent {
       region.innerHTML = isYearBeforeMonth(this._config.locale) ? `${year} ${month}` : `${month} ${year}`
     }
 
+    (SelectorEngine.findOne(SELECTOR_BTN_YEAR, region) as HTMLButtonElement).disabled = years && this._selectionView() === 'years'
+
     this._describeGrid(panel)
   }
 
@@ -790,7 +795,9 @@ class Calendar extends BaseComponent {
       return `<tr class="${attributes.className}"${this._stateHtml(attributes)}${ariaLabel}>${showWeekNumber ? `<th class="calendar-cell-week-number">${week.number}</th>` : ''}${cells.join('')}</tr>`
     })
 
-    return `<thead><tr>${showWeekNumber ? headerCell(weekNumbersLabel ? escapeHtml(weekNumbersLabel) : '') : ''}${weekdays.join('')}</tr></thead><tbody>${rows.join('')}</tbody>`
+    const weekNumberHeader = weekNumbersLabel ? escapeHtml(weekNumbersLabel) : `<span class="${CLASS_NAME_VISUALLY_HIDDEN}">${escapeHtml(getWeekLabel(this._config.locale))}</span>`
+
+    return `<thead><tr>${showWeekNumber ? headerCell(weekNumberHeader) : ''}${weekdays.join('')}</tr></thead><tbody>${rows.join('')}</tbody>`
   }
 
   _periodsHtml(calendarDate: Date): string {
@@ -909,11 +916,15 @@ class Calendar extends BaseComponent {
   }
 
   _initializeView(): void {
-    this._view = VIEW_BY_SELECTION_TYPE[this._config.selectionType] || 'days'
+    this._view = this._selectionView()
   }
 
   _picksRange(): boolean {
-    return this._config.range && (VIEW_BY_SELECTION_TYPE[this._config.selectionType] || 'days') === this._view
+    return this._config.range && this._selectionView() === this._view
+  }
+
+  _selectionView(): ViewTypes {
+    return VIEW_BY_SELECTION_TYPE[this._config.selectionType] || 'days'
   }
 
   _updateCalendar(callback?: () => void): void {

@@ -95,6 +95,23 @@ export const parseToDateString = (value: string) : Date => {
 }
 
 /**
+ * Gives a locale's week-of-year label, capitalized the way the native week
+ * input shows it ("Week", "Tydzień", "Woche"), or "Week" where
+ * `Intl.DisplayNames` has no data.
+ *
+ * @param locale - The locale to use
+ * @returns The label
+ */
+export const getWeekLabel = (locale: string): string => {
+  try {
+    const label = new Intl.DisplayNames(locale, { type: 'dateTimeField' }).of('weekOfYear')
+    return label ? label.charAt(0).toLocaleUpperCase(locale) + label.slice(1) : 'Week'
+  } catch {
+    return 'Week'
+  }
+}
+
+/**
  * Finds the Monday that starts an ISO week.
  *
  * @param year - The full week-numbering year

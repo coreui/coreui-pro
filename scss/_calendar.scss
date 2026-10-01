@@ -123,7 +123,7 @@ $calendar-tokens: defaults(
       var(--#{$prefix}btn-input-transition-timing)
     );
 
-    &:hover {
+    &:hover:not(:disabled) {
       background-color: var(--#{$prefix}calendar-nav-btn-hover-bg);
       border-color: var(--#{$prefix}calendar-nav-btn-hover-border-color);
     }
@@ -144,7 +144,7 @@ $calendar-tokens: defaults(
       font-weight: var(--#{$prefix}calendar-nav-date-font-weight);
       color: var(--#{$prefix}calendar-nav-date-color);
 
-      &:hover {
+      &:hover:not(:disabled) {
         color: var(--#{$prefix}theme-bg, var(--#{$prefix}calendar-nav-date-hover-color));
       }
     }

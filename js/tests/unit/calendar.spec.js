@@ -498,6 +498,17 @@ describe('Calendar', () => {
       expect(headerCells[0].textContent).toContain('Wk')
     })
 
+    it('should name the week number column in the locale while weekNumbersLabel is not set', () => {
+      fixtureEl.innerHTML = '<div></div><div></div>'
+
+      const [english, polish] = fixtureEl.querySelectorAll('div')
+      new Calendar(english, { locale: 'en-US', showWeekNumber: true }) // eslint-disable-line no-new
+      new Calendar(polish, { locale: 'pl-PL', showWeekNumber: true }) // eslint-disable-line no-new
+
+      expect(english.querySelector('thead th .visually-hidden').textContent).toEqual('Week')
+      expect(polish.querySelector('thead th .visually-hidden').textContent).toEqual('Tydzień')
+    })
+
     it('should not show week numbers by default', () => {
       fixtureEl.innerHTML = '<div></div>'
 
@@ -761,6 +772,113 @@ describe('Calendar', () => {
 
       expect(div.querySelector('table').getAttribute('aria-label')).toEqual('2027')
       expect(document.activeElement.dataset.coreuiDate).toEqual(new Date(2027, 0, 1).toDateString())
+    })
+
+    it('should go back to the view that picks the date from the year button of the years view', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { calendarDate: new Date(2026, 8, 15), locale: 'en-US' }) // eslint-disable-line no-new
+
+      div.querySelector('.btn-year').click()
+      div.querySelector('.btn-year').focus()
+      div.querySelector('.btn-year').click()
+
+      expect(div.querySelector('table').getAttribute('aria-label')).toEqual('September 2026')
+      expect(document.activeElement.dataset.coreuiDate).toEqual(new Date(2026, 8, 1).toDateString())
+    })
+
+    it('should focus the week that holds the start of the month when the year button goes back to the days view', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { // eslint-disable-line no-new
+        calendarDate: new Date(2026, 8, 15),
+        locale: 'en-US',
+        selectionType: 'week',
+        startDate: new Date(2026, 8, 21)
+      })
+
+      div.querySelector('.btn-year').focus()
+      div.querySelector('.btn-year').click()
+      div.querySelector('.btn-year').click()
+
+      expect(document.activeElement.matches('tr')).toBeTrue()
+      expect(document.activeElement.querySelector(`[data-coreui-date="${new Date(2026, 8, 1).toDateString()}"]`)).not.toBeNull()
+    })
+
+    it('should focus the quarter that holds the start of the month when the year button goes back to the quarters view', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { // eslint-disable-line no-new
+        calendarDate: new Date(2026, 8, 15),
+        locale: 'en-US',
+        selectionType: 'quarter',
+        startDate: new Date(2026, 1, 10)
+      })
+
+      div.querySelector('.btn-year').focus()
+      div.querySelector('.btn-year').click()
+      div.querySelector('.btn-year').click()
+
+      expect(document.activeElement.dataset.coreuiDate).toEqual(new Date(2026, 6, 1).toDateString())
+    })
+
+    it('should focus the start of the month a later panel shows when its year button goes back', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { // eslint-disable-line no-new
+        calendarDate: new Date(2026, 8, 15),
+        calendars: 2,
+        locale: 'en-US',
+        startDate: new Date(2026, 9, 20)
+      })
+      const yearButton = () => div.querySelectorAll('.btn-year')[1]
+
+      yearButton().focus()
+      yearButton().click()
+      yearButton().click()
+
+      expect(document.activeElement.dataset.coreuiDate).toEqual(new Date(2026, 9, 1).toDateString())
+    })
+
+    it('should leave the year button disabled where the years view is the one that picks', () => {
+      fixtureEl.innerHTML = '<div></div><div></div>'
+
+      const [years, months] = fixtureEl.querySelectorAll('div')
+      new Calendar(years, { calendarDate: new Date(2026, 8, 1), locale: 'en-US', selectionType: 'year' }) // eslint-disable-line no-new
+      const calendar = new Calendar(months, { calendarDate: new Date(2026, 8, 1), locale: 'en-US', selectionType: 'month' })
+
+      expect(years.querySelector('.btn-year').disabled).toBeTrue()
+      expect(months.querySelector('.btn-year').disabled).toBeFalse()
+
+      months.querySelector('.btn-year').click()
+
+      expect(months.querySelector('.btn-year').disabled).toBeFalse()
+
+      months.querySelector('.btn-year').click()
+
+      expect(months.querySelector('.calendar-cell-inner.month')).not.toBeNull()
+
+      months.querySelector('.btn-year').click()
+      calendar.setConfig({ selectionType: 'year' })
+
+      expect(months.querySelector('.btn-year').disabled).toBeTrue()
+    })
+
+    it('should keep the navigation region across a page turn, so the new month is announced in it', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { calendarDate: new Date(2026, 8, 1), locale: 'en-US' }) // eslint-disable-line no-new
+      const region = div.querySelector('.calendar-nav-date')
+
+      div.querySelector('.btn-next').click()
+
+      expect(div.querySelector('.calendar-nav-date')).toBe(region)
+      expect(region.textContent.trim()).toContain('October')
     })
 
     it('should keep a stop in every panel, one per grid', () => {
@@ -3139,18 +3257,17 @@ describe('Calendar', () => {
       expect(document.activeElement.getAttribute('data-coreui-date')).toBe(new Date(2026, 0, 1).toDateString())
     })
 
-    it('should keep focus on btn-year in the years view', () => {
+    it('should keep the years view of a year selection, whose year button is disabled', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
       const calendar = new Calendar(div, { calendarDate: new Date(2026, 8, 1), locale: 'en-US', selectionType: 'year' })
       const button = div.querySelector('.btn-year')
 
-      button.focus()
       button.click()
 
+      expect(button.disabled).toBeTrue()
       expect(calendar._view).toBe('years')
-      expect(document.activeElement).toBe(button)
     })
 
     it('should stay in the years view while Enter repeats after btn-year', () => {
