@@ -35,7 +35,7 @@ const renders = {
   'forms/number-input': ['forms/form-control', 'forms/form-control-group'],
   'list-box': ['forms/check', 'forms/form-control'],
   'loading-button': ['buttons', 'spinner'],
-  'range-slider': ['tooltip'],
+  'range-slider': ['forms/form-range', 'tooltip'],
   rating: ['tooltip'],
   sidebar: ['transitions'],
   'time-picker': ['forms/floating-labels', 'forms/form-control', 'forms/form-control-group', 'forms/form-date-time', 'popup'],

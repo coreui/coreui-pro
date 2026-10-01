@@ -1,3 +1,16 @@
+import Manipulator from '../dom/manipulator.js'
+import SelectorEngine from '../dom/selector-engine.js'
+
+export type RangeTick = number | string | { class?: string | string[], label?: string, style?: Record<string, string>, value?: number }
+
+export type RangeTickPoint = {
+  class?: string | string[]
+  label: string
+  ratio: number
+  style?: Record<string, string>
+  value: number
+}
+
 export type RangeTickPosition = {
   index: number
   ratio: number
@@ -59,6 +72,88 @@ export const constrainInput = (
       input.stepDown()
     }
   }
+}
+
+/**
+ * Builds the tick marks of a range: a grid whose tracks are the gaps between the ticks, so every
+ * tick lands on a grid line, with a tick per point and its label beneath. A vertical range lays
+ * the ticks out in rows from the bottom.
+ *
+ * @param points - The ticks, sorted along the track
+ * @param vertical - Whether the range stands up
+ * @returns The `.form-range-ticks` element, hidden from assistive technology
+ */
+export const createTicks = (points: RangeTickPoint[], vertical: boolean): HTMLElement => {
+  const ticks = document.createElement('div')
+  ticks.className = 'form-range-ticks'
+  ticks.setAttribute('aria-hidden', 'true')
+
+  const stops = [0, ...points.map(point => point.ratio), 1]
+  const tracks = stops.slice(1).map((stop, index) => `${stop - stops[index]}fr`)
+
+  if (vertical) {
+    ticks.style.gridTemplateRows = tracks.toReversed().join(' ')
+  } else {
+    ticks.style.gridTemplateColumns = tracks.join(' ')
+  }
+
+  for (const [index, point] of points.entries()) {
+    const tick = document.createElement('span')
+    tick.className = 'form-range-tick'
+    tick.classList.toggle('form-range-tick-start', point.ratio === 0)
+    tick.classList.toggle('form-range-tick-end', point.ratio === 1)
+    Manipulator.setDataAttribute(tick, 'value', `${point.value}`)
+
+    if (vertical) {
+      tick.style.gridRowStart = `${points.length - index + 1}`
+    } else {
+      tick.style.gridColumnStart = `${index + 2}`
+    }
+
+    if (point.class) {
+      tick.classList.add(...[point.class].flat().flatMap(name => name.split(' ')).filter(Boolean))
+    }
+
+    if (point.style && typeof point.style === 'object') {
+      Object.assign(tick.style, point.style)
+    }
+
+    if (point.label) {
+      const label = document.createElement('span')
+      label.className = 'form-range-tick-label'
+      label.textContent = point.label
+      tick.append(label)
+    }
+
+    ticks.append(tick)
+  }
+
+  return ticks
+}
+
+/**
+ * Builds a value tooltip with the markup of the tooltip component, so it takes its look and
+ * tokens. The arrow and the body are blocks, because `.tooltip-inner` has no `display` rule.
+ *
+ * @param placement - The placement class, such as `bs-tooltip-top`
+ * @param tooltipClass - Extra classes, space separated
+ * @param always - Whether the tooltip shows at all times
+ * @returns The `.form-range-tooltip` element, hidden from assistive technology
+ */
+export const createTooltip = (placement: string, tooltipClass: string, always: boolean): HTMLElement => {
+  const tooltip = document.createElement('div')
+  tooltip.className = `form-range-tooltip tooltip ${placement}`
+  tooltip.classList.toggle('show', always)
+  tooltip.classList.add(...tooltipClass.split(' ').filter(Boolean))
+  tooltip.setAttribute('aria-hidden', 'true')
+
+  const arrow = document.createElement('div')
+  arrow.className = 'tooltip-arrow'
+  const inner = document.createElement('div')
+  inner.className = 'tooltip-inner'
+  tooltip.append(arrow, inner)
+
+  return tooltip
 }
 
 /**
@@ -149,6 +244,15 @@ export const getStackOrder = (ratio: number, index: number, total: number): numb
   ratio > 0.5 ? total - index : index + 1
 
 /**
+ * Reads the step of a range input, with `step="any"` counted as a hundredth of the span.
+ *
+ * @param input - The range input
+ * @returns The step as a number, `1` when the attribute is missing or invalid
+ */
+export const getStep = (input: HTMLInputElement): number =>
+  input.step === 'any' ? (getBound(input, 'max') - getBound(input, 'min')) / 100 : (Number.parseFloat(input.step) || 1)
+
+/**
  * Measures the thumb width of a range by laying out a hidden probe that reads
  * `--cui-range-thumb-width`, which may be set in any unit.
  *
@@ -163,6 +267,60 @@ export const getThumbSize = (element: HTMLElement): number => {
   probe.remove()
 
   return width
+}
+
+/**
+ * Finds the label of the tick a value sits on, within half a step of it.
+ *
+ * @param points - The ticks of the range
+ * @param value - The value of the thumb
+ * @param step - The step of the input
+ * @returns The label, or `null` when the value sits on no labelled tick
+ */
+export const getTickLabel = (points: RangeTickPoint[], value: number, step: number): string | null =>
+  points.find(point => point.label && Math.abs(point.value - value) < (step / 2) + TOLERANCE)?.label ?? null
+
+/**
+ * Reads the tick marks of a range input from the `ticks` option and from a linked `<datalist>`,
+ * whose options become ticks at their values with their labels.
+ *
+ * @param input - The first range input, whose `min` and `max` place the ticks
+ * @param ticks - The ticks option: numbers, labels or objects with `value`, `label`, `class` and `style`
+ * @param list - The id of a datalist, or `null` to read the input's `list` attribute
+ * @returns The ticks sorted along the track
+ */
+export const getTickPoints = (input: HTMLInputElement, ticks: RangeTick[] | boolean | string, list: string | null): RangeTickPoint[] => {
+  const min = getBound(input, 'min')
+  const max = getBound(input, 'max')
+  const points: RangeTickPoint[] = []
+
+  if (Array.isArray(ticks)) {
+    for (const { index, ratio, value } of getTickPositions(min, max, ticks)) {
+      const tick = ticks[index]
+      const options = typeof tick === 'object' && tick !== null ? tick : undefined
+
+      points.push({
+        class: options?.class,
+        label: typeof tick === 'string' ? tick : (options?.label ?? ''),
+        ratio,
+        style: options?.style,
+        value
+      })
+    }
+  }
+
+  const listId = list ?? input.getAttribute('list')
+  const datalist = listId ? document.getElementById(listId) : null
+
+  if (datalist) {
+    const options = SelectorEngine.find<HTMLOptionElement>('option', datalist)
+
+    for (const { index, ratio, value } of getTickPositions(min, max, options.map(option => Number.parseFloat(option.value)))) {
+      points.push({ label: options[index].label, ratio, value })
+    }
+  }
+
+  return points.toSorted((a, b) => a.ratio - b.ratio)
 }
 
 /**
@@ -192,6 +350,32 @@ export const getTickPositions = (min: number, max: number, ticks: unknown[]): Ra
     })
     .filter(position => Number.isFinite(position.value))
     .toSorted((a, b) => a.ratio - b.ratio)
+}
+
+/**
+ * Composes the `aria-valuetext` of a thumb: the formatted value as text, followed by the label of
+ * the tick it sits on when the two differ. Without a formatter the value is announced only with a
+ * label, so the browser keeps reading the plain number.
+ *
+ * @param value - The value of the thumb
+ * @param label - The label of the tick the thumb sits on, or `null`
+ * @param html - The sanitized output of the value formatter, or `null` without one
+ * @returns The text, or `null` when the browser's own announcement is enough
+ */
+export const getValueText = (value: number, label: string | null, html: string | null): string | null => {
+  if (html === null) {
+    return label === null ? null : `${value}, ${label}`
+  }
+
+  const template = document.createElement('template')
+  template.innerHTML = html
+
+  for (const lineBreak of template.content.querySelectorAll('br')) {
+    lineBreak.replaceWith(' ')
+  }
+
+  const text = (template.content.textContent ?? '').replaceAll(/\s+/g, ' ').trim()
+  return label === null || label === text ? text : `${text}, ${label}`
 }
 
 /**

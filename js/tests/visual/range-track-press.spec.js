@@ -10,10 +10,10 @@
 import { userEvent } from '@vitest/browser/context'
 // eslint-disable-next-line import/no-unassigned-import
 import '../../../scss/coreui.scss'
-import Range from '../../src/range.js'
+import RangeSlider from '../../src/range-slider.js'
 
 let container
-let range
+let rangeSlider
 
 const OBLONG = '--cui-range-thumb-width: 2rem; --cui-range-thumb-height: 1rem;'
 
@@ -21,14 +21,16 @@ const mount = ({ className = '', config = {}, dir = 'ltr', style = '', vertical 
   container = document.createElement('div')
   container.dir = dir
   container.style.cssText = 'padding: 4rem; width: 420px;'
-  container.innerHTML = `<div class="form-range${vertical ? ' form-range-vertical' : ''} ${className}" style="${style}">
-      <input type="range" class="form-range-input" value="25" aria-label="Minimum">
-      <input type="range" class="form-range-input" value="75" aria-label="Maximum">
-    </div>`
+  container.innerHTML = '<div></div>'
   document.body.append(container)
 
+  rangeSlider = new RangeSlider(container.firstElementChild, {
+    tooltips: false, ...config, ariaLabel: ['Minimum', 'Maximum'], value: [25, 75], vertical
+  })
+
   const element = container.querySelector('.form-range')
-  range = new Range(element, config)
+  element.classList.add(...className.split(' ').filter(Boolean))
+  element.style.cssText += style
 
   return { element, inputs: [...element.querySelectorAll('.form-range-input')] }
 }
@@ -62,7 +64,7 @@ const geometry = (element, inputs, vertical = false) => {
 }
 
 afterEach(() => {
-  range?.dispose()
+  rangeSlider?.dispose()
   container?.remove()
 })
 

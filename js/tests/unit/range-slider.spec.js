@@ -29,6 +29,17 @@ describe('RangeSlider', () => {
     input.dispatchEvent(createEvent('input', { bubbles: true }))
   }
 
+  const wrapperOf = element => element.querySelector(':scope > .form-range')
+
+  const pressAt = (wrapper, value, type = 'pointerdown') => {
+    const rect = wrapper.querySelector('.form-range-input').getBoundingClientRect()
+    const event = new PointerEvent(type, {
+      bubbles: true, button: 0, clientX: rect.left + (rect.width * value / 100), clientY: rect.top + (rect.height / 2), pointerId: 1
+    })
+
+    return type === 'pointerdown' ? wrapper.dispatchEvent(event) : document.dispatchEvent(event)
+  }
+
   describe('VERSION', () => {
     it('should return plugin version', () => {
       expect(RangeSlider.VERSION).toEqual(jasmine.any(String))
@@ -75,14 +86,15 @@ describe('RangeSlider', () => {
       expect(byElement._element).toEqual(element)
     })
 
-    it('should build a range with one input per value and hand it to Range', () => {
+    it('should build a range with one input per value and run it without the Range plugin', () => {
       const { element } = mount({
         max: 200, min: 10, step: 5, value: [20, 150]
       })
       const inputs = inputsOf(element)
 
-      const wrapper = element.querySelector(':scope > .form-range')
-      expect(Range.getInstance(wrapper)).toBeInstanceOf(Range)
+      const wrapper = wrapperOf(element)
+      expect(wrapper).toHaveClass('form-range')
+      expect(Range.getInstance(wrapper)).toBeNull()
       expect(element.className).toEqual('')
       expect(inputs.map(input => [input.type, input.min, input.max, input.step, input.value])).toEqual([
         ['range', '10', '200', '5', '20'],
@@ -142,7 +154,7 @@ describe('RangeSlider', () => {
     })
   })
 
-  describe('options forwarded to Range', () => {
+  describe('options', () => {
     it('should show a tooltip per thumb by default', () => {
       const { element } = mount({ value: [20, 80] })
 
@@ -203,6 +215,319 @@ describe('RangeSlider', () => {
     })
   })
 
+  describe('multiple thumbs', () => {
+    it('should span the band from the lowest to the highest thumb and leave it with track false', () => {
+      const { element } = mount({ value: [20, 50, 80] })
+      expect(wrapperOf(element).style.getPropertyValue('--cui-range-fill-start')).toEqual('0.2')
+      expect(wrapperOf(element).style.getPropertyValue('--cui-range-fill')).toEqual('0.8')
+
+      const { element: single } = mount({ value: 40 })
+      expect(wrapperOf(single).style.getPropertyValue('--cui-range-fill-start')).toEqual('')
+    })
+
+    it('should stack the thumbs so the one that can still move is on top', () => {
+      const { element } = mount({ value: [100, 100] })
+      const [low, high] = inputsOf(element)
+
+      expect(Number(low.style.zIndex)).toBeGreaterThan(Number(high.style.zIndex))
+
+      move(low, 0)
+      move(high, 0)
+
+      expect(Number(high.style.zIndex)).toBeGreaterThan(Number(low.style.zIndex))
+    })
+
+    it('should keep the thumbs in order', () => {
+      const { element } = mount({ value: [25, 75] })
+      const [low, high] = inputsOf(element)
+
+      move(low, 90)
+      move(high, 10)
+
+      expect([low.value, high.value]).toEqual(['75', '75'])
+    })
+
+    it('should keep the order before listeners on the inputs run', () => {
+      const { element } = mount({ value: [25, 75] })
+      const [low, high] = inputsOf(element)
+      const seen = []
+      low.addEventListener('input', () => seen.push(low.value))
+
+      move(low, 90)
+
+      expect(seen).toEqual(['75'])
+      expect(high.value).toEqual('75')
+    })
+
+    it('should keep a decimal distance without overshooting it', () => {
+      const { element } = mount({
+        distance: 0.1, max: 1, min: 0, step: 0.1, value: [0.1, 0.3]
+      })
+      const [low, high] = inputsOf(element)
+
+      move(low, 0.2)
+      expect(low.value).toEqual('0.2')
+
+      move(high, 0.2)
+      expect(high.value).toEqual('0.3')
+    })
+
+    it('should step past a bound that falls between steps', () => {
+      const { element } = mount({ distance: 2, step: 5, value: [0, 50] })
+      const high = inputsOf(element)[1]
+
+      move(high, 0)
+
+      expect(high.value).toEqual('5')
+    })
+
+    it('should move the nearest thumb to a pressed point of the track and commit on release', () => {
+      const { element } = mount({ value: [25, 75] })
+      const wrapper = wrapperOf(element)
+      const [low, high] = inputsOf(element)
+      const events = []
+      wrapper.addEventListener('input', event => events.push(`input:${event.target.value}`))
+      wrapper.addEventListener('change', event => events.push(`change:${event.target.value}`))
+
+      pressAt(wrapper, 60)
+      expect([low.value, high.value]).toEqual(['25', '60'])
+      expect(document.activeElement).toEqual(high)
+
+      pressAt(wrapper, 90, 'pointermove')
+      expect(high.value).toEqual('90')
+
+      pressAt(wrapper, 90, 'pointerup')
+      expect(events).toEqual(['input:60', 'input:90', 'change:90'])
+    })
+
+    it('should not let a dragged thumb pass its neighbour', () => {
+      const { element } = mount({ value: [25, 75] })
+      const wrapper = wrapperOf(element)
+
+      pressAt(wrapper, 10)
+      pressAt(wrapper, 95, 'pointermove')
+      pressAt(wrapper, 95, 'pointerup')
+
+      expect(inputsOf(element).map(input => input.value)).toEqual(['75', '75'])
+    })
+
+    it('should leave a press on a thumb to the browser', () => {
+      const { element } = mount({ value: [25, 75] })
+      const [low] = inputsOf(element)
+
+      low.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, button: 0, pointerId: 1 }))
+
+      expect(inputsOf(element).map(input => input.value)).toEqual(['25', '75'])
+    })
+
+    it('should leave a press on the track to the browser with a single thumb', () => {
+      const { element } = mount({ value: 50 })
+
+      pressAt(wrapperOf(element), 80)
+
+      expect(inputsOf(element)[0].value).toEqual('50')
+    })
+
+    it('should not move a disabled slider and ignore other buttons than the primary one', () => {
+      const { element } = mount({ disabled: true, value: [25, 75] })
+      pressAt(wrapperOf(element), 90)
+      expect(inputsOf(element)[1].value).toEqual('75')
+
+      const { element: enabled } = mount({ value: [25, 75] })
+      const wrapper = wrapperOf(enabled)
+      const rect = wrapper.querySelector('.form-range-input').getBoundingClientRect()
+      wrapper.dispatchEvent(new PointerEvent('pointerdown', {
+        bubbles: true, button: 2, clientX: rect.left + (rect.width * 0.9), clientY: rect.top, pointerId: 1
+      }))
+      expect(inputsOf(enabled)[1].value).toEqual('75')
+    })
+
+    it('should pick the farther of two equal thumbs on the side of the press', () => {
+      const { element } = mount({ value: [20, 50, 50] })
+
+      pressAt(wrapperOf(element), 56)
+
+      expect(inputsOf(element).map(input => input.value)).toEqual(['20', '50', '56'])
+    })
+
+    it('should leave thumbs disabled by a fieldset alone', () => {
+      fixtureEl.innerHTML = '<fieldset disabled><div id="slider" data-coreui-ticks="Low, High"></div></fieldset>'
+      const element = fixtureEl.querySelector('#slider')
+      new RangeSlider(element, { value: [25, 75] }) // eslint-disable-line no-new
+
+      pressAt(wrapperOf(element), 40)
+      element.querySelectorAll('.form-range-tick-label')[1].dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, button: 0, pointerId: 1 }))
+
+      expect(inputsOf(element).map(input => input.value)).toEqual(['25', '75'])
+    })
+
+    it('should ignore a press on the wrapper outside the track', () => {
+      const { element } = mount({ value: [25, 75] })
+      const wrapper = wrapperOf(element)
+      wrapper.style.paddingBottom = '40px'
+      const rect = wrapper.querySelector('.form-range-input').getBoundingClientRect()
+
+      wrapper.dispatchEvent(new PointerEvent('pointerdown', {
+        bubbles: true, button: 0, clientX: rect.left + (rect.width * 0.6), clientY: rect.bottom + 20, pointerId: 1
+      }))
+
+      expect(inputsOf(element)[1].value).toEqual('75')
+    })
+
+    it('should measure a press from the right in a right-to-left page', () => {
+      fixtureEl.innerHTML = '<div dir="rtl"><div id="slider"></div></div>'
+      const element = fixtureEl.querySelector('#slider')
+      new RangeSlider(element, { value: [25, 75] }) // eslint-disable-line no-new
+
+      pressAt(wrapperOf(element), 40)
+
+      expect(inputsOf(element).map(input => input.value)).toEqual(['25', '60'])
+    })
+
+    it('should ignore a second pointer while one press is in progress', () => {
+      const { element } = mount({ value: [25, 75] })
+      const wrapper = wrapperOf(element)
+      const rect = wrapper.querySelector('.form-range-input').getBoundingClientRect()
+      const changes = []
+      wrapper.addEventListener('change', event => changes.push(event.target.value))
+
+      pressAt(wrapper, 10)
+      wrapper.dispatchEvent(new PointerEvent('pointerdown', {
+        bubbles: true, button: 0, clientX: rect.left + (rect.width * 0.9), clientY: rect.top + (rect.height / 2), pointerId: 2
+      }))
+      pressAt(wrapper, 10, 'pointerup')
+
+      expect(inputsOf(element).map(input => input.value)).toEqual(['10', '75'])
+      expect(changes).toEqual(['10'])
+    })
+
+    it('should commit a press that the browser cancels', () => {
+      const { element } = mount({ value: [25, 75] })
+      const wrapper = wrapperOf(element)
+      const changes = []
+      wrapper.addEventListener('change', event => changes.push(event.target.value))
+
+      pressAt(wrapper, 60)
+      pressAt(wrapper, 60, 'pointercancel')
+      pressAt(wrapper, 95, 'pointermove')
+
+      expect(changes).toEqual(['60'])
+      expect(inputsOf(element)[1].value).toEqual('60')
+    })
+
+    it('should end a track press in progress on dispose', () => {
+      const { element, rangeSlider } = mount({ value: [25, 75] })
+      const wrapper = wrapperOf(element)
+      const high = inputsOf(element)[1]
+
+      pressAt(wrapper, 80)
+      rangeSlider.dispose()
+      pressAt(wrapper, 95, 'pointermove')
+
+      expect(high.value).toEqual('80')
+    })
+  })
+
+  describe('vertical', () => {
+    it('should step a thumb up with the right arrow in every browser', () => {
+      const { element } = mount({ value: [25, 75], vertical: true })
+      const wrapper = wrapperOf(element)
+      const [low] = inputsOf(element)
+      const events = []
+      wrapper.addEventListener('input', () => events.push('input'))
+      wrapper.addEventListener('change', () => events.push('change'))
+
+      low.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'ArrowRight' }))
+      expect(low.value).toEqual('26')
+
+      low.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'ArrowLeft' }))
+      expect(low.value).toEqual('25')
+      expect(events).toEqual(['input', 'change', 'input', 'change'])
+    })
+
+    it('should leave the arrow keys of a horizontal slider to the browser', () => {
+      const { element } = mount({ value: [25, 75] })
+      const [low] = inputsOf(element)
+      const event = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'ArrowRight' })
+
+      low.dispatchEvent(event)
+
+      expect(event.defaultPrevented).toBeFalse()
+      expect(low.value).toEqual('25')
+    })
+
+    it('should place the tooltips at the start, or at the end in a right-to-left page', () => {
+      const { element } = mount({ value: [25, 75], vertical: true })
+      for (const tooltip of element.querySelectorAll('.form-range-tooltip')) {
+        expect(tooltip).toHaveClass('bs-tooltip-start')
+        expect(tooltip).not.toHaveClass('bs-tooltip-top')
+      }
+
+      fixtureEl.innerHTML = '<div dir="rtl"><div id="slider"></div></div>'
+      const rtl = fixtureEl.querySelector('#slider')
+      new RangeSlider(rtl, { value: [25, 75], vertical: true }) // eslint-disable-line no-new
+      for (const tooltip of rtl.querySelectorAll('.form-range-tooltip')) {
+        expect(tooltip).toHaveClass('bs-tooltip-end')
+      }
+    })
+
+    it('should lay the ticks out in rows from the bottom', () => {
+      const { element } = mount({ ticks: 'Low, Mid, High', value: 50, vertical: true })
+      const ticksEl = element.querySelector('.form-range-ticks')
+
+      expect(ticksEl.style.gridTemplateRows).toEqual('0fr 0.5fr 0.5fr 0fr')
+      expect([...ticksEl.children].map(tick => tick.style.gridRowStart)).toEqual(['4', '3', '2'])
+      expect(ticksEl.children[0]).toHaveClass('form-range-tick-start')
+      expect(ticksEl.children[2]).toHaveClass('form-range-tick-end')
+    })
+  })
+
+  describe('tooltips and ticks', () => {
+    it('should render one tooltip per thumb, each at its own value', () => {
+      const { element } = mount({ value: [25, 75] })
+      const tooltips = element.querySelectorAll('.form-range-tooltip')
+
+      expect([...tooltips].map(tooltip => tooltip.textContent)).toEqual(['25', '75'])
+      expect([...tooltips].map(tooltip => tooltip.style.getPropertyValue('--cui-range-fill'))).toEqual(['0.25', '0.75'])
+      expect(tooltips[0].previousElementSibling).toEqual(inputsOf(element)[0])
+    })
+
+    it('should move the nearest thumb to a clicked tick and commit on release', () => {
+      const { element } = mount({ ticks: 'Low, Mid, High', value: [25, 75] })
+      const wrapper = wrapperOf(element)
+      const [low, high] = inputsOf(element)
+      const events = []
+      wrapper.addEventListener('input', event => events.push(`input:${event.target.value}`))
+      wrapper.addEventListener('change', event => events.push(`change:${event.target.value}`))
+
+      element.querySelectorAll('.form-range-tick-label')[2].dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, button: 0, pointerId: 1 }))
+
+      expect([low.value, high.value]).toEqual(['25', '100'])
+      expect(events).toEqual(['input:100'])
+
+      pressAt(wrapper, 100, 'pointerup')
+      expect(events).toEqual(['input:100', 'change:100'])
+    })
+
+    it('should follow the values a form reset restores', async () => {
+      fixtureEl.innerHTML = '<form><div id="slider"></div></form>'
+      const element = fixtureEl.querySelector('#slider')
+      new RangeSlider(element, { value: [25, 75] }) // eslint-disable-line no-new
+      const [low, high] = inputsOf(element)
+
+      move(low, 5)
+      move(high, 95)
+      fixtureEl.querySelector('form').reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(wrapperOf(element).style.getPropertyValue('--cui-range-fill-start')).toEqual('0.25')
+      expect(wrapperOf(element).style.getPropertyValue('--cui-range-fill')).toEqual('0.75')
+      expect([...element.querySelectorAll('.tooltip-inner')].map(inner => inner.textContent)).toEqual(['25', '75'])
+    })
+  })
+
   describe('value ownership', () => {
     it('should leave the array the page passed alone', () => {
       const value = [10, 40]
@@ -253,10 +578,22 @@ describe('RangeSlider', () => {
   })
 
   describe('accessible names', () => {
-    it('should take ariaLabels in order', () => {
-      const { element } = mount({ ariaLabels: ['Lowest price', 'Highest price'], value: [20, 80] })
+    it('should take an ariaLabel array in order', () => {
+      const { element } = mount({ ariaLabel: ['Lowest price', 'Highest price'], value: [20, 80] })
 
       expect(inputsOf(element).map(input => input.getAttribute('aria-label'))).toEqual(['Lowest price', 'Highest price'])
+    })
+
+    it('should take an ariaLabel function of the index and the total', () => {
+      const { element } = mount({ ariaLabel: (index, total) => `Handle ${index + 1} of ${total}`, value: [8, 12, 18] })
+
+      expect(inputsOf(element).map(input => input.getAttribute('aria-label'))).toEqual(['Handle 1 of 3', 'Handle 2 of 3', 'Handle 3 of 3'])
+    })
+
+    it('should read an ariaLabel array from a data attribute', () => {
+      const { element } = mount({}, 'data-coreui-value="25, 75" data-coreui-aria-label=\'["Min", "Max"]\'')
+
+      expect(inputsOf(element).map(input => input.getAttribute('aria-label'))).toEqual(['Min', 'Max'])
     })
 
     it('should fall back to Minimum and Maximum for two thumbs, and to Value n beyond', () => {
@@ -267,13 +604,13 @@ describe('RangeSlider', () => {
       expect(inputsOf(three).map(input => input.getAttribute('aria-label'))).toEqual(['Value 1', 'Value 2', 'Value 3'])
     })
 
-    it('should name a single handle with ariaLabels', () => {
-      const { element } = mount({ ariaLabels: ['Volume'], value: 40 })
+    it('should name a single handle with ariaLabel', () => {
+      const { element } = mount({ ariaLabel: ['Volume'], value: 40 })
 
       expect(inputsOf(element)[0].getAttribute('aria-label')).toEqual('Volume')
     })
 
-    it('should leave a single handle unnamed without ariaLabels', () => {
+    it('should leave a single handle unnamed without ariaLabel', () => {
       const { element } = mount({ value: 40 })
 
       expect(inputsOf(element)[0].hasAttribute('aria-label')).toBeFalse()
@@ -294,7 +631,7 @@ describe('RangeSlider', () => {
       expect(fired).toEqual([['input', [30, 80]], ['change', [30, 80]]])
     })
 
-    it('should report the values after Range has kept the thumbs in order', () => {
+    it('should report the values after the thumbs are kept in order', () => {
       const { element } = mount({ value: [20, 80] })
       const fired = []
       element.addEventListener('input.coreui.range-slider', event => fired.push(event.value))
@@ -398,15 +735,19 @@ describe('RangeSlider', () => {
       expect(inputsOf(element).map(input => input.value)).toEqual(['5', '15'])
     })
 
-    it('should dispose the Range it replaces', () => {
+    it('should stop handling the wrapper it replaces', () => {
       const { element, rangeSlider } = mount({ value: [20, 80] })
-      const wrapper = element.querySelector('.form-range')
+      const wrapper = wrapperOf(element)
+      const [low] = inputsOf(element)
 
       rangeSlider.setConfig({ value: [10, 90] })
+      const events = []
+      element.addEventListener('input.coreui.range-slider', () => events.push('input'))
+      move(low, 30)
 
-      expect(Range.getInstance(wrapper)).toBeNull()
       expect(wrapper.isConnected).toBeFalse()
-      expect(Range.getInstance(element.querySelector('.form-range'))).toBeInstanceOf(Range)
+      expect(events).toEqual([])
+      expect(wrapperOf(element)).not.toEqual(wrapper)
     })
 
     it('should switch the orientation both ways', () => {

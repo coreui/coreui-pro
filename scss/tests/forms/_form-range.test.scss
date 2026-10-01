@@ -11,7 +11,6 @@
     @include assert-true(map.has-key($form-range-tokens, --cui-range-tick-minor-height));
     @include assert-true(map.has-key($form-range-tokens, --cui-range-tick-bg));
     @include assert-true(map.has-key($form-range-tokens, --cui-range-tick-label-font-size));
-    @include assert-true(map.has-key($form-range-vertical-tokens, --cui-range-vertical-height));
   }
 
   @include it("track: paints the band at half strength between --cui-range-fill-start and --cui-range-fill, from the track start without a start, and empty without the plugin") {
