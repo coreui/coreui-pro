@@ -32,6 +32,7 @@ import {
   formatYearsRange,
   getCalendarDate,
   getCalendarKeyAction,
+  getKeptDay,
   getClosestSelectable,
   getDateBySelectionType,
   getMonthDetails,
@@ -51,6 +52,7 @@ import {
   isPeriodSelected,
   isToday,
   isYearBeforeMonth,
+  type KeptDay,
   parseToDateString,
   type PeriodViewTypes,
   type SelectionTypes,
@@ -267,6 +269,7 @@ class Calendar extends BaseComponent {
   protected declare _minDate: Date | null
   protected declare _maxDate: Date | null
   protected declare _hoverDate: Date | null
+  protected declare _keptDay: KeptDay | null
   protected declare _selectEndDate: boolean
   protected declare _view: ViewTypes
   protected declare _formatter: ReturnType<typeof createDateFormatter>
@@ -414,6 +417,7 @@ class Calendar extends BaseComponent {
   _handleCalendarKeydown(event: any): void {
     const target = this._getEventTarget(event) as HTMLElement
     const action = getCalendarKeyAction(event, this._getDate(target), this._getKeyContext(target))
+    this._keptDay = getKeptDay(event.key, action, this._keptDay)
 
     if (!action) {
       return
@@ -442,6 +446,7 @@ class Calendar extends BaseComponent {
 
     const context = this._getKeyContext(event.target)
     const action = getCalendarKeyAction(event, null, context)
+    this._keptDay = getKeptDay(event.key, action, this._keptDay)
 
     if (!action) {
       return
@@ -470,6 +475,7 @@ class Calendar extends BaseComponent {
       calendarDate: this._calendarDate,
       calendars: this._config.calendars,
       firstDayOfWeek: this._config.firstDayOfWeek,
+      keptDay: this._keptDay,
       maxDate: this._maxDate,
       minDate: this._minDate,
       panel: SelectorEngine.find(SELECTOR_CALENDAR, this._element as ParentNode).indexOf(target.closest(SELECTOR_CALENDAR) as HTMLElement),
@@ -523,6 +529,10 @@ class Calendar extends BaseComponent {
   _addEventListeners(): void {
     const focusable = `${SELECTOR_CALENDAR_CELL_FOCUSABLE}, ${SELECTOR_CALENDAR_ROW_FOCUSABLE}`
     const selectable = `${SELECTOR_CALENDAR_CELL_SELECTABLE}, ${SELECTOR_CALENDAR_ROW_SELECTABLE}`
+
+    EventHandler.on(this._element, EVENT_CLICK_DATA_API, () => {
+      this._keptDay = null
+    })
 
     EventHandler.on(this._element, EVENT_CLICK_DATA_API, focusable, event => {
       this._handleCalendarClick(event)
