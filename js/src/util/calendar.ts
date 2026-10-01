@@ -694,18 +694,66 @@ export const convertToDateObject = (date: Date | string | null | undefined, sele
 }
 
 /**
+ * Converts a selected value as `convertToDateObject` does and, in week
+ * selection, moves it to the day `getWeekDate` gives its week, the day a click
+ * on the row that stands for that week picks.
+ *
+ * @param date - The value as a `Date` or a string
+ * @param selectionType - The unit the string names
+ * @param firstDayOfWeek - The day the week rows start on, `0` for Sunday to `6` for Saturday
+ * @returns The date, or `null` for no value or an unreadable one
+ */
+export const convertToSelectionDate = (date: Date | string | null | undefined, selectionType: SelectionTypes | undefined, firstDayOfWeek: number) : Date | null => {
+  const value = convertToDateObject(date, selectionType)
+  return value && selectionType === 'week' ? getWeekDate(value, firstDayOfWeek) : value
+}
+
+/**
+ * Converts a selected value to the date a calendar opens on to show it: the
+ * value itself, unless in week selection the row that stands for its week
+ * lies wholly in another month, and then the day `getWeekDate` gives that
+ * week, so the opened page holds the row.
+ *
+ * @param date - The value as a `Date` or a string
+ * @param selectionType - The unit the string names
+ * @param firstDayOfWeek - The day the week rows start on, `0` for Sunday to `6` for Saturday
+ * @returns The date to open on, or `null` for no value or an unreadable one
+ */
+export const convertToShownDate = (date: Date | string | null | undefined, selectionType: SelectionTypes | undefined, firstDayOfWeek: number) : Date | null => {
+  const value = convertToDateObject(date, selectionType)
+  const weekDate = convertToSelectionDate(value, selectionType, firstDayOfWeek)
+
+  if (!value || !weekDate || weekDate === value) {
+    return value
+  }
+
+  const rowStart = getStartOfWeek(weekDate, firstDayOfWeek)
+  const rowEnd = createDate(rowStart.getFullYear(), rowStart.getMonth(), rowStart.getDate() + 6)
+  return [rowStart, rowEnd].some(day => day.getFullYear() === value.getFullYear() && day.getMonth() === value.getMonth()) ? value : weekDate
+}
+
+/**
  * Converts a `minDate` or `maxDate` value as `convertToDateObject` does and,
- * in week selection, moves it to the day `getWeekDate` gives its week, so the
- * week of a limit stays selectable whatever day the week rows start on.
+ * in week selection, widens it to the day `getWeekDate` gives its week when
+ * that day lies outside it, earlier for a `minDate` and later for a
+ * `maxDate`, so the week of a limit stays selectable whatever day the week
+ * rows start on and no limit moves inward.
  *
  * @param date - The limit as a `Date` or a string
  * @param selectionType - The unit the string names
  * @param firstDayOfWeek - The day the week rows start on, `0` for Sunday to `6` for Saturday
+ * @param limit - Which limit the value is
  * @returns The limit, or `null` for no value or an unreadable one
  */
-export const convertToLimitDate = (date: Date | string | null | undefined, selectionType: SelectionTypes | undefined, firstDayOfWeek: number) : Date | null => {
+export const convertToLimitDate = (date: Date | string | null | undefined, selectionType: SelectionTypes | undefined, firstDayOfWeek: number, limit: 'max' | 'min') : Date | null => {
   const value = convertToDateObject(date, selectionType)
-  return value && selectionType === 'week' ? getWeekDate(value, firstDayOfWeek) : value
+
+  if (!value || selectionType !== 'week') {
+    return value
+  }
+
+  const weekDate = getWeekDate(value, firstDayOfWeek)
+  return (limit === 'min' ? weekDate < value : weekDate > value) ? weekDate : value
 }
 
 /**

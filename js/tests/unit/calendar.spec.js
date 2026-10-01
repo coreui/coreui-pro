@@ -6124,18 +6124,16 @@ describe('Calendar', () => {
       }
     })
 
-    it('should put the tab stop on the row of the selected week, or of the only week that can be picked', () => {
+    it('should put the tab stop on the row of the selected week', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
-      const calendar = new Calendar(div, { selectionType: 'week' })
+      const calendar = new Calendar(div, { selectionType: 'week', startDate: '2026W36' })
 
       for (const firstDayOfWeek of [0, 1, 2, 3, 4, 5, 6]) {
-        for (const config of [{ maxDate: null, minDate: null, startDate: '2026W36' }, { maxDate: '2026W36', minDate: '2026W36', startDate: null }]) {
-          calendar.setConfig({ calendarDate: new Date(2026, 7, 1), firstDayOfWeek, ...config })
+        calendar.setConfig({ calendarDate: new Date(2026, 7, 1), firstDayOfWeek })
 
-          expect(div.querySelector('tr[tabindex="0"]')).toBe(div.querySelector(`td[data-coreui-date="${new Date(2026, 8, 3).toDateString()}"]`).closest('tr'))
-        }
+        expect(div.querySelector('tr[tabindex="0"]')).toBe(div.querySelector(`td[data-coreui-date="${new Date(2026, 8, 3).toDateString()}"]`).closest('tr'))
       }
     })
 
@@ -6159,6 +6157,125 @@ describe('Calendar', () => {
           }
         }
       }
+    })
+
+    it('should keep the month of maxDate in the months view of a week selection', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { calendarDate: new Date(2026, 9, 1), maxDate: new Date(2026, 9, 1), selectionType: 'week' }) // eslint-disable-line no-new
+      div.querySelector('.btn-month').click()
+
+      expect(div.querySelector(`td[data-coreui-date="${new Date(2026, 9, 1).toDateString()}"]`).hasAttribute('aria-disabled')).toBeFalse()
+      expect(div.querySelector(`td[data-coreui-date="${new Date(2026, 10, 1).toDateString()}"]`).getAttribute('aria-disabled')).toEqual('true')
+    })
+
+    it('should open on the page that holds the row of the selected week', () => {
+      for (const [firstDayOfWeek, startDate, day, month] of [[0, new Date(2026, 10, 1), new Date(2026, 9, 29), 'October'], [1, new Date(2026, 10, 1), new Date(2026, 10, 1), 'November'], [4, '2026W36', new Date(2026, 8, 3), 'September']]) {
+        fixtureEl.innerHTML = '<div></div>'
+
+        const div = fixtureEl.querySelector('div')
+        new Calendar(div, { // eslint-disable-line no-new
+          firstDayOfWeek,
+          locale: 'en-US',
+          selectionType: 'week',
+          showAdjacentDays: false,
+          startDate
+        })
+
+        expect(div.querySelector('.btn-month').textContent.trim()).toEqual(month)
+        expect(div.querySelector(`tr.selected td[data-coreui-date="${day.toDateString()}"]`)).not.toBeNull()
+      }
+    })
+
+    it('should open on the page of the week of maxDate when today is after it', () => {
+      vi.useFakeTimers({ toFake: ['Date'] })
+      vi.setSystemTime(new Date(2026, 9, 1))
+      onTestFinished(() => vi.useRealTimers())
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { // eslint-disable-line no-new
+        firstDayOfWeek: 4,
+        locale: 'en-US',
+        maxDate: '2026W36',
+        selectionType: 'week'
+      })
+
+      expect(div.querySelector('.btn-month').textContent.trim()).toEqual('September')
+    })
+
+    it('should move to the page that holds the row of a week given later', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+
+      for (const name of ['startDate', 'endDate']) {
+        const calendar = new Calendar(div, {
+          firstDayOfWeek: 0,
+          locale: 'en-US',
+          selectionType: 'week',
+          [name]: new Date(2026, 10, 15)
+        })
+        calendar.setConfig({ [name]: new Date(2026, 10, 1) })
+
+        expect(div.querySelector('.btn-month').textContent.trim()).toEqual('October')
+        calendar.dispose()
+      }
+    })
+
+    it('should read minDate and maxDate again when selectionType changes', () => {
+      fixtureEl.innerHTML = '<div></div><div></div>'
+
+      const [min, max] = fixtureEl.querySelectorAll('div')
+      const calendars = [
+        new Calendar(min, { calendarDate: new Date(2026, 8, 1), minDate: new Date(2026, 8, 2), selectionType: 'week' }),
+        new Calendar(max, {
+          calendarDate: new Date(2026, 8, 1), firstDayOfWeek: 2, maxDate: new Date(2026, 7, 31), selectionType: 'week'
+        })
+      ]
+
+      for (const calendar of calendars) {
+        calendar.setConfig({ selectionType: 'day' })
+      }
+
+      for (const div of [min, max]) {
+        expect(div.querySelector(`td[data-coreui-date="${new Date(2026, 8, 1).toDateString()}"]`).getAttribute('aria-disabled')).toEqual('true')
+      }
+    })
+
+    it('should compare the ends of a range of weeks by their weeks', () => {
+      fixtureEl.innerHTML = '<div></div><div></div>'
+
+      const [before, after] = fixtureEl.querySelectorAll('div')
+      const events = []
+      for (const div of [before, after]) {
+        div.addEventListener('startDateChange.coreui.calendar', event => events.push(['start', event.date]))
+        div.addEventListener('endDateChange.coreui.calendar', event => events.push(['end', event.date]))
+      }
+
+      new Calendar(before, { // eslint-disable-line no-new
+        calendarDate: new Date(2026, 8, 1),
+        endDate: '2026W38',
+        firstDayOfWeek: 4,
+        range: true,
+        selectionType: 'week',
+        startDate: '2026W36'
+      })
+      before.querySelector(`td[data-coreui-date="${new Date(2026, 8, 17).toDateString()}"]`).closest('tr').click()
+
+      expect(events).toEqual([['start', '2026W38']])
+
+      new Calendar(after, { // eslint-disable-line no-new
+        calendarDate: new Date(2026, 8, 1),
+        range: true,
+        selectEndDate: true,
+        selectionType: 'week',
+        startDate: new Date(2026, 8, 16)
+      })
+      after.querySelector(`td[data-coreui-date="${new Date(2026, 8, 16).toDateString()}"]`).closest('tr').click()
+
+      expect(events).toEqual([['start', '2026W38'], ['end', '2026W38']])
     })
 
     it('should keep the picked week when firstDayOfWeek changes', () => {

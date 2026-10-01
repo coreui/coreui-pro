@@ -24,6 +24,8 @@ import {
   constrainDate,
   convertToDateObject,
   convertToLimitDate,
+  convertToSelectionDate,
+  convertToShownDate,
   createDate,
   createDateFormatter,
   createGroupsInArray,
@@ -687,8 +689,12 @@ class Calendar extends BaseComponent {
     }
 
     if (this._config.range) {
+      const { firstDayOfWeek, selectionType } = this._config
+      const start = convertToSelectionDate(this._startDate, selectionType, firstDayOfWeek)
+      const end = convertToSelectionDate(this._endDate, selectionType, firstDayOfWeek)
+
       if (this._selectEndDate) {
-        if (this._startDate && this._startDate > date) {
+        if (start && start > date) {
           this._setStartDate(date)
           this._setEndDate(null)
           return
@@ -696,7 +702,7 @@ class Calendar extends BaseComponent {
 
         this._setSelectEndDate(false)
 
-        if (isDisableDateInRange(this._startDate, date, this._config.disabledDates, this._view)) {
+        if (isDisableDateInRange(start, date, this._config.disabledDates, this._view)) {
           this._setStartDate(null)
           this._setEndDate(null)
           return
@@ -706,14 +712,14 @@ class Calendar extends BaseComponent {
         return
       }
 
-      if (this._endDate && this._endDate < date) {
+      if (end && end < date) {
         this._setStartDate(date)
         this._setEndDate(null)
         this._setSelectEndDate(true)
         return
       }
 
-      if (isDisableDateInRange(date, this._endDate, this._config.disabledDates, this._view)) {
+      if (isDisableDateInRange(date, end, this._config.disabledDates, this._view)) {
         this._setStartDate(null)
         this._setEndDate(null)
         return
@@ -911,11 +917,11 @@ class Calendar extends BaseComponent {
     const changed = (...names: string[]) => !keys || keys.includes('selectionType') || names.some(name => keys.includes(name))
 
     if (changed('minDate', 'firstDayOfWeek')) {
-      this._minDate = convertToLimitDate(this._config.minDate, this._config.selectionType, this._config.firstDayOfWeek)
+      this._minDate = convertToLimitDate(this._config.minDate, this._config.selectionType, this._config.firstDayOfWeek, 'min')
     }
 
     if (changed('maxDate', 'firstDayOfWeek')) {
-      this._maxDate = convertToLimitDate(this._config.maxDate, this._config.selectionType, this._config.firstDayOfWeek)
+      this._maxDate = convertToLimitDate(this._config.maxDate, this._config.selectionType, this._config.firstDayOfWeek, 'max')
     }
 
     if (changed('calendarDate', 'startDate', 'endDate')) {
@@ -923,7 +929,11 @@ class Calendar extends BaseComponent {
         this._config.calendarDate || this._config.startDate || this._config.endDate :
         ['calendarDate', 'startDate', 'endDate'].filter(name => keys.includes(name)).map(name => this._config[name]).find(Boolean) ?? null
 
-      this._calendarDate = convertToDateObject(source, this._config.selectionType) || this._calendarDate || constrainDate(new Date(), this._minDate, this._maxDate)
+      const date = source === this._config.calendarDate ?
+        convertToDateObject(source, this._config.selectionType) :
+        convertToShownDate(source, this._config.selectionType, this._config.firstDayOfWeek)
+
+      this._calendarDate = date || this._calendarDate || constrainDate(new Date(), this._minDate, this._maxDate)
     }
 
     if (changed('startDate')) {

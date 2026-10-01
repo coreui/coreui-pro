@@ -218,16 +218,22 @@ describe('Calendar Utilities', () => {
   })
 
   describe('convertToLimitDate', () => {
-    it('should move a limit of a week selection to the day that stands for its week', () => {
-      expect(convertToLimitDate('2026W36', 'week', 2)).toEqual(new Date(2026, 8, 1))
-      expect(convertToLimitDate(new Date(2026, 8, 6), 'week', 0)).toEqual(new Date(2026, 7, 31))
-      expect(convertToLimitDate('2026W36', 'week', 1)).toEqual(new Date(2026, 7, 31))
+    it('should widen a limit of a week selection to the day that stands for its week', () => {
+      expect(convertToLimitDate('2026W36', 'week', 2, 'max')).toEqual(new Date(2026, 8, 1))
+      expect(convertToLimitDate(new Date(2026, 8, 6), 'week', 0, 'min')).toEqual(new Date(2026, 7, 31))
+      expect(convertToLimitDate(new Date(2026, 8, 2), 'week', 1, 'min')).toEqual(new Date(2026, 7, 31))
+    })
+
+    it('should never move a limit of a week selection inward', () => {
+      expect(convertToLimitDate(new Date(2026, 9, 1), 'week', 1, 'max')).toEqual(new Date(2026, 9, 1))
+      expect(convertToLimitDate(new Date(2026, 8, 2), 'week', 4, 'min')).toEqual(new Date(2026, 8, 2))
+      expect(convertToLimitDate('2026W36', 'week', 1, 'max')).toEqual(new Date(2026, 7, 31))
     })
 
     it('should read a limit of any other selection as convertToDateObject does', () => {
-      expect(convertToLimitDate(new Date(2026, 8, 6), 'day', 2)).toEqual(new Date(2026, 8, 6))
-      expect(convertToLimitDate('2026-09', 'month', 2)).toEqual(new Date(2026, 8, 1))
-      expect(convertToLimitDate(null, 'week', 2)).toBeNull()
+      expect(convertToLimitDate(new Date(2026, 8, 6), 'day', 2, 'min')).toEqual(new Date(2026, 8, 6))
+      expect(convertToLimitDate('2026-09', 'month', 2, 'max')).toEqual(new Date(2026, 8, 1))
+      expect(convertToLimitDate(null, 'week', 2, 'max')).toBeNull()
     })
   })
 

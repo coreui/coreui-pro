@@ -1199,12 +1199,15 @@ removed in favour of `$translucent-opacity` and
   `minDate` and `maxDate`, and the range and its preview now all follow the
   row's majority week, so that row is `2026W36`. The picked date is the row's
   first day in that week: its Monday for rows that start on Friday to Sunday,
-  its first day otherwise. With Tuesday to Thursday first, the numbers move
-  instead, so the row from September 1 to 7 shows 36 where it showed 37.
-- **Changed.** **In week selection the week of `minDate` can be picked**, as
-  the week of `maxDate` already could and as the month, quarter or year of a
+  its first day otherwise. `disabledDates` is checked on that day, so with
+  Sunday first a function that disables weekends no longer disables every
+  row. With Tuesday to Thursday first, the numbers move instead, so the row
+  from September 1 to 7 shows 36 where it showed 37.
+- **Changed.** **In week selection the weeks of `minDate` and `maxDate` can be
+  picked on any first day of the week**, as the month, quarter or year of a
   limit can in those selections. Before, a `minDate` later than the first day
-  of its row disabled that row.
+  of its row disabled that row, and with Tuesday to Thursday first a `maxDate`
+  of `2026W36` disabled the row of week 36.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **`cellHover` is gone.** It reported the date under the pointer or the focus
   for the hover preview in the date picker's field, which v6 no longer draws.
