@@ -1254,7 +1254,9 @@ removed in favour of `$translucent-opacity` and
   years view is the one that picks.
 - Without `weekNumbersLabel` the week-number column is named for screen readers
   with the locale's word for week, in a visually hidden span; before, its
-  header was empty.
+  header was empty. Each week number is named the same way with its number
+  (`Week 36`), and the new `ariaWeekNumberLabel` option takes a function of
+  the week number to name it yourself.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **The years view names its double arrows with new `ariaNavNextYearsLabel` /
   `ariaNavPrevYearsLabel` options** (`'Next 12 years'` / `'Previous 12 years'`)

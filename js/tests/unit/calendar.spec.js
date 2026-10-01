@@ -509,6 +509,22 @@ describe('Calendar', () => {
       expect(polish.querySelector('thead th .visually-hidden').textContent).toEqual('Tydzień')
     })
 
+    it('should name each week number in the locale, or with ariaWeekNumberLabel', () => {
+      fixtureEl.innerHTML = '<div></div><div></div><div></div>'
+
+      const [english, polish, custom] = fixtureEl.querySelectorAll('div')
+      const config = { calendarDate: new Date(2026, 8, 1), firstDayOfWeek: 1, showWeekNumber: true }
+      new Calendar(english, { ...config, locale: 'en-US' }) // eslint-disable-line no-new
+      new Calendar(polish, { ...config, locale: 'pl-PL' }) // eslint-disable-line no-new
+      new Calendar(custom, { ...config, ariaWeekNumberLabel: weekNumber => `Wk ${weekNumber}`, locale: 'en-US' }) // eslint-disable-line no-new
+      const weekNumber = div => div.querySelector('tbody .calendar-cell-week-number')
+
+      expect(weekNumber(english).getAttribute('aria-label')).toEqual('Week 36')
+      expect(weekNumber(english).textContent).toEqual('36')
+      expect(weekNumber(polish).getAttribute('aria-label')).toEqual('Tydzień 36')
+      expect(weekNumber(custom).getAttribute('aria-label')).toEqual('Wk 36')
+    })
+
     it('should not show week numbers by default', () => {
       fixtureEl.innerHTML = '<div></div>'
 
