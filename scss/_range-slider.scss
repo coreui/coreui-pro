@@ -237,13 +237,11 @@ $range-slider-vertical-tokens: defaults(
 
     .range-slider-inputs-container {
       justify-content: center;
-      width: string.unquote("max(var(--#{$prefix}range-thumb-width), var(--#{$prefix}range-slider-vertical-track-width))");
+      width: string.unquote("max(var(--#{$prefix}range-thumb-height), var(--#{$prefix}range-slider-vertical-track-width))");
       height: 100%;
     }
 
     .range-slider-track {
-      --#{$prefix}range-slider-track-thumb: var(--#{$prefix}range-thumb-height);
-
       width: var(--#{$prefix}range-slider-vertical-track-width);
       height: 100%;
     }
@@ -256,8 +254,8 @@ $range-slider-vertical-tokens: defaults(
 
     .range-slider-tooltip {
       inset-inline-start: auto;
-      inset-inline-end: calc(var(--#{$prefix}range-slider-tooltip-margin-end) + var(--#{$prefix}tooltip-arrow-height) + var(--#{$prefix}range-thumb-width));
-      bottom: calc(var(--#{$prefix}range-thumb-height) * .5 + var(--cui-range-slider-tooltip-position, 0) * (100% - var(--#{$prefix}range-thumb-height)));
+      inset-inline-end: calc(var(--#{$prefix}range-slider-tooltip-margin-end) + var(--#{$prefix}tooltip-arrow-height) + var(--#{$prefix}range-thumb-height));
+      bottom: calc(var(--#{$prefix}range-thumb-width) * .5 + var(--cui-range-slider-tooltip-position, 0) * (100% - var(--#{$prefix}range-thumb-width)));
       transform: translateY(50%);
 
       .tooltip-arrow {
@@ -270,7 +268,7 @@ $range-slider-vertical-tokens: defaults(
     .range-slider-ticks {
       flex-shrink: 0;
       height: 100%;
-      padding-block: calc(var(--#{$prefix}range-thumb-height) * .5);
+      padding-block: calc(var(--#{$prefix}range-thumb-width) * .5);
     }
 
     .range-slider-tick {

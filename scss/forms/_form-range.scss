@@ -126,6 +126,7 @@ $form-range-vertical-tokens: defaults(
     --#{$prefix}range-track-direction: to top;
 
     display: flex;
+    width: fit-content;
     height: var(--#{$prefix}range-vertical-height);
 
     > .form-range-ticks {
@@ -155,6 +156,11 @@ $form-range-vertical-tokens: defaults(
     .form-range-tick-label {
       margin-inline-start: var(--#{$prefix}range-tick-label-margin-top);
       margin-top: 0;
+    }
+
+    .form-range-ticks-clickable .form-range-tick::after {
+      inset-block: calc(var(--#{$prefix}range-thumb-width) * -.5);
+      inset-inline: 0;
     }
   }
 
@@ -233,11 +239,17 @@ $form-range-vertical-tokens: defaults(
   }
 
   .form-range:has(> .form-range-input ~ .form-range-input) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
     touch-action: pan-y;
     cursor: var(--#{$prefix}range-track-cursor);
 
+    &:not(:has(> .form-range-input:enabled)) {
+      cursor: auto;
+    }
+
     > .form-range-input {
-      position: relative;
+      grid-area: 1 / 1;
       pointer-events: none;
 
       &:not(:disabled) {
@@ -247,10 +259,6 @@ $form-range-vertical-tokens: defaults(
     }
 
     > .form-range-input ~ .form-range-input {
-      position: absolute;
-      inset-block-start: 0;
-      inset-inline-start: 0;
-
       &::-webkit-slider-runnable-track {
         background: none;
         @include box-shadow(none);
@@ -264,6 +272,8 @@ $form-range-vertical-tokens: defaults(
   }
 
   .form-range-vertical:has(> .form-range-input ~ .form-range-input) {
+    grid-template-columns: none;
+    grid-auto-flow: column;
     touch-action: pan-x;
   }
 
@@ -293,7 +303,7 @@ $form-range-vertical-tokens: defaults(
     }
   }
 
-  .form-range-tooltip.bs-tooltip-start {
+  .form-range-tooltip:is(.bs-tooltip-start, .bs-tooltip-end) {
     inset-inline-end: 100%;
     bottom: calc((var(--#{$prefix}range-thumb-width) * .5) + var(--#{$prefix}range-fill, 0) * (100% - var(--#{$prefix}range-thumb-width)));
     margin-inline-end: var(--#{$prefix}tooltip-arrow-height);
@@ -316,7 +326,15 @@ $form-range-vertical-tokens: defaults(
   }
 
   .form-range-ticks-clickable .form-range-tick {
+    position: relative;
     cursor: pointer;
+
+    &::after {
+      position: absolute;
+      inset-block: 0;
+      inset-inline: calc(var(--#{$prefix}range-thumb-width) * -.5);
+      content: "";
+    }
   }
 
   .form-range-tick {
@@ -340,12 +358,12 @@ $form-range-vertical-tokens: defaults(
     }
   }
 
-  .form-range-tick-start {
-    align-items: flex-start;
+  .form-range:not(.form-range-vertical) .form-range-tick-start > .form-range-tick-label {
+    align-self: flex-start;
   }
 
-  .form-range-tick-end {
-    align-items: flex-end;
+  .form-range:not(.form-range-vertical) .form-range-tick-end > .form-range-tick-label {
+    align-self: flex-end;
   }
 
   .form-range-tick-label {
@@ -354,7 +372,6 @@ $form-range-vertical-tokens: defaults(
     color: var(--#{$prefix}range-tick-label-color);
     white-space: nowrap;
   }
-
 }
 
 // Same layer as `.tooltip { opacity: 0 }`, which would otherwise win over `forms` regardless of specificity.

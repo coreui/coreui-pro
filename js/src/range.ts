@@ -28,6 +28,7 @@ const DATA_API_KEY = '.data-api'
 const EVENT_CHANGE = `change${EVENT_KEY}`
 const EVENT_CHANGED = `changed${EVENT_KEY}`
 const EVENT_INPUT = `input${EVENT_KEY}`
+const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 const EVENT_POINTERCANCEL = `pointercancel${EVENT_KEY}`
 const EVENT_POINTERDOWN = `pointerdown${EVENT_KEY}`
 const EVENT_POINTERMOVE = `pointermove${EVENT_KEY}`
@@ -47,6 +48,7 @@ const CLASS_NAME_TICK_START = 'form-range-tick-start'
 const CLASS_NAME_TICKS = 'form-range-ticks'
 const CLASS_NAME_TICKS_CLICKABLE = 'form-range-ticks-clickable'
 const CLASS_NAME_TOOLTIP = 'form-range-tooltip'
+const CLASS_NAME_TOOLTIP_END = 'bs-tooltip-end'
 const CLASS_NAME_TOOLTIP_START = 'bs-tooltip-start'
 const CLASS_NAME_TOOLTIP_TOP = 'bs-tooltip-top'
 const CLASS_NAME_VERTICAL = 'form-range-vertical'
@@ -54,6 +56,8 @@ const CLASS_NAME_VERTICAL = 'form-range-vertical'
 const PROPERTY_FILL = '--cui-range-fill'
 const PROPERTY_FILL_START = '--cui-range-fill-start'
 const PROPERTY_THUMB_WIDTH = '--cui-range-thumb-width'
+
+const TOLERANCE = 1e-9
 
 type RangeTick = number | string | { class?: string | string[], label?: string, style?: Record<string, string>, value?: number }
 
@@ -122,11 +126,14 @@ class Range extends BaseComponent {
   protected declare _inputs: HTMLInputElement[]
   protected declare _press: RangePress | null
   protected declare _resetTimeout: ReturnType<typeof setTimeout> | null
+  protected declare _tickLabels: Array<{ label: string, value: number }>
   protected declare _ticks: HTMLElement | null
   protected declare _tooltips: HTMLElement[]
   protected declare _valueTexts: Array<string | null>
+  protected declare _valueTextsSet: boolean[]
   protected declare _onChange: (event: Event) => void
   protected declare _onInput: (event: Event) => void
+  protected declare _onKeydown: (event: Event) => void
   protected declare _onPointerDown: (event: Event) => void
   protected declare _onPointerMove: (event: Event) => void
   protected declare _onPointerUp: (event: Event) => void
@@ -144,17 +151,28 @@ class Range extends BaseComponent {
     this._forms = [...new Set(this._inputs.map(input => input.form).filter(Boolean))] as HTMLFormElement[]
     this._press = null
     this._resetTimeout = null
+    this._tickLabels = []
     this._ticks = null
     this._tooltips = []
     this._valueTexts = this._inputs.map(input => input.getAttribute('aria-valuetext'))
+    this._valueTextsSet = this._inputs.map(() => false)
 
-    this._onChange = event => this._update(event.target as HTMLInputElement)
-    this._onInput = event => {
-      const input = event.target as HTMLInputElement
-      this._constrain(input)
-      this._update(input)
+    this._onChange = event => {
+      if (this._inputs.includes(event.target as HTMLInputElement)) {
+        this._update(event.target as HTMLInputElement)
+      }
     }
 
+    this._onInput = event => {
+      const input = event.target as HTMLInputElement
+
+      if (this._inputs.includes(input)) {
+        this._constrain(input)
+        this._update(input)
+      }
+    }
+
+    this._onKeydown = event => this._keydown(event as KeyboardEvent)
     this._onPointerDown = event => this._pointerDown(event as PointerEvent)
     this._onPointerMove = event => this._pointerMove(event as PointerEvent)
     this._onPointerUp = event => this._pointerUp(event as PointerEvent)
@@ -197,32 +215,34 @@ class Range extends BaseComponent {
   override dispose(): void {
     clearTimeout(this._resetTimeout!)
 
-    for (const [index, input] of this._inputs.entries()) {
-      EventHandler.off(input, EVENT_INPUT, this._onInput)
-      EventHandler.off(input, EVENT_CHANGE, this._onChange)
-      input.style.removeProperty('z-index')
-
-      if (this._valueTexts[index] === null) {
-        input.removeAttribute('aria-valuetext')
-      } else {
-        input.setAttribute('aria-valuetext', this._valueTexts[index]!)
-      }
-    }
+    EventHandler.off(this._element, EVENT_INPUT, SELECTOR_INPUT, this._onInput)
+    EventHandler.off(this._element, EVENT_CHANGE, SELECTOR_INPUT, this._onChange)
+    EventHandler.off(this._element, EVENT_KEYDOWN, SELECTOR_INPUT, this._onKeydown)
+    EventHandler.off(this._element, EVENT_POINTERDOWN, this._onPointerDown)
+    this._releasePress()
 
     for (const form of this._forms) {
       EventHandler.off(form, EVENT_RESET, this._onReset)
     }
 
-    EventHandler.off(this._element, EVENT_POINTERDOWN, this._onPointerDown)
-    this._releasePress()
+    for (const [index, input] of this._inputs.entries()) {
+      if (this._inputs.length > 1) {
+        input.style.removeProperty('z-index')
+      }
+
+      this._restoreValueText(index)
+    }
 
     for (const tooltip of this._tooltips) {
       tooltip.remove()
     }
 
     this._ticks?.remove()
-    this._element.style.removeProperty(PROPERTY_FILL)
-    this._element.style.removeProperty(PROPERTY_FILL_START)
+
+    if (this._config.track && this._inputs.length > 0) {
+      this._element.style.removeProperty(PROPERTY_FILL)
+      this._element.style.removeProperty(PROPERTY_FILL_START)
+    }
 
     super.dispose()
   }
@@ -246,16 +266,15 @@ class Range extends BaseComponent {
   }
 
   protected _addEventListeners(): void {
-    for (const input of this._inputs) {
-      EventHandler.on(input, EVENT_INPUT, this._onInput)
-      EventHandler.on(input, EVENT_CHANGE, this._onChange)
-    }
+    // Delegated handlers run in the capture phase, so the order is kept before listeners on the inputs see the value
+    EventHandler.on(this._element, EVENT_INPUT, SELECTOR_INPUT, this._onInput)
+    EventHandler.on(this._element, EVENT_CHANGE, SELECTOR_INPUT, this._onChange)
+    EventHandler.on(this._element, EVENT_KEYDOWN, SELECTOR_INPUT, this._onKeydown)
+    EventHandler.on(this._element, EVENT_POINTERDOWN, this._onPointerDown)
 
     for (const form of this._forms) {
       EventHandler.on(form, EVENT_RESET, this._onReset)
     }
-
-    EventHandler.on(this._element, EVENT_POINTERDOWN, this._onPointerDown)
   }
 
   protected _min(input: HTMLInputElement = this._inputs[0]): number {
@@ -270,9 +289,17 @@ class Range extends BaseComponent {
     return Number.parseFloat(input.value)
   }
 
+  protected _step(input: HTMLInputElement): number {
+    return input.step === 'any' ? (this._max(input) - this._min(input)) / 100 : (Number.parseFloat(input.step) || 1)
+  }
+
   protected _ratio(input: HTMLInputElement = this._inputs[0]): number {
     const span = this._max(input) - this._min(input)
     return span > 0 ? (this._value(input) - this._min(input)) / span : 0
+  }
+
+  protected _isDisabled(input: HTMLInputElement): boolean {
+    return input.matches(':disabled')
   }
 
   protected _isVertical(): boolean {
@@ -292,6 +319,7 @@ class Range extends BaseComponent {
 
     for (const [index, input] of this._inputs.entries()) {
       this._updateTooltip(index, ratios[index])
+      this._updateValueText(index)
 
       if (this._inputs.length > 1) {
         input.style.zIndex = `${ratios[index] > 0.5 ? this._inputs.length - index : index + 1}`
@@ -309,18 +337,18 @@ class Range extends BaseComponent {
     const next = this._inputs[index + 1]
     const { distance } = this._config
 
-    if (previous && this._value(input) < this._value(previous) + distance) {
+    if (previous && this._value(input) < this._value(previous) + distance - TOLERANCE) {
       input.value = `${this._value(previous) + distance}`
 
-      if (this._value(input) < this._value(previous) + distance && input.step !== 'any') {
+      if (this._value(input) < this._value(previous) + distance - TOLERANCE && input.step !== 'any') {
         input.stepUp()
       }
     }
 
-    if (next && this._value(input) > this._value(next) - distance) {
+    if (next && this._value(input) > this._value(next) - distance + TOLERANCE) {
       input.value = `${this._value(next) - distance}`
 
-      if (this._value(input) > this._value(next) - distance && input.step !== 'any') {
+      if (this._value(input) > this._value(next) - distance + TOLERANCE && input.step !== 'any') {
         input.stepDown()
       }
     }
@@ -331,7 +359,9 @@ class Range extends BaseComponent {
   }
 
   protected _createTooltips(): void {
-    const placement = this._isVertical() ? CLASS_NAME_TOOLTIP_START : CLASS_NAME_TOOLTIP_TOP
+    const placement = this._isVertical() ?
+      (isRTL(this._element) ? CLASS_NAME_TOOLTIP_END : CLASS_NAME_TOOLTIP_START) :
+      CLASS_NAME_TOOLTIP_TOP
 
     for (const input of this._inputs) {
       // Reuse the tooltip markup so we don't duplicate the pill and arrow styles
@@ -355,20 +385,56 @@ class Range extends BaseComponent {
   }
 
   protected _updateTooltip(index: number, ratio: number): void {
-    const input = this._inputs[index]
     const tooltip = this._tooltips[index]
-    const formatted = this._format(this._value(input))
 
     if (tooltip) {
       tooltip.style.setProperty(PROPERTY_FILL, `${ratio}`)
-      tooltip.lastElementChild!.innerHTML = sanitizeByConfig(formatted, this._config)
+      tooltip.lastElementChild!.innerHTML = sanitizeByConfig(this._format(this._value(this._inputs[index])), this._config)
     }
+  }
+
+  protected _valueText(input: HTMLInputElement): string | null {
+    const value = this._value(input)
 
     if (typeof this._config.tooltipsFormat === 'function') {
-      const text = document.createElement('template')
-      text.innerHTML = sanitizeByConfig(formatted, this._config)
-      input.setAttribute('aria-valuetext', text.content.textContent ?? '')
+      const html = document.createElement('template')
+      html.innerHTML = sanitizeByConfig(this._format(value), this._config)
+
+      for (const lineBreak of html.content.querySelectorAll('br')) {
+        lineBreak.replaceWith(' ')
+      }
+
+      return (html.content.textContent ?? '').replaceAll(/\s+/g, ' ').trim()
     }
+
+    const half = this._step(input) / 2
+    return this._tickLabels.find(tick => Math.abs(tick.value - value) < half + TOLERANCE)?.label ?? null
+  }
+
+  protected _updateValueText(index: number): void {
+    const text = this._valueText(this._inputs[index])
+
+    if (text === null) {
+      this._restoreValueText(index)
+      return
+    }
+
+    this._inputs[index].setAttribute('aria-valuetext', text)
+    this._valueTextsSet[index] = true
+  }
+
+  protected _restoreValueText(index: number): void {
+    if (!this._valueTextsSet[index]) {
+      return
+    }
+
+    if (this._valueTexts[index] === null) {
+      this._inputs[index].removeAttribute('aria-valuetext')
+    } else {
+      this._inputs[index].setAttribute('aria-valuetext', this._valueTexts[index]!)
+    }
+
+    this._valueTextsSet[index] = false
   }
 
   protected _tickPoints(): RangeTickPoint[] {
@@ -422,11 +488,12 @@ class Range extends BaseComponent {
 
     const vertical = this._isVertical()
 
+    this._tickLabels = points.filter(point => point.label).map(({ label, value }) => ({ label, value }))
     this._ticks = document.createElement('div')
     this._ticks.className = CLASS_NAME_TICKS
     this._ticks.setAttribute('aria-hidden', 'true')
 
-    if (this._config.clickableTicks && this._inputs.some(input => !input.disabled)) {
+    if (this._config.clickableTicks && this._inputs.some(input => !this._isDisabled(input))) {
       this._ticks.classList.add(CLASS_NAME_TICKS_CLICKABLE)
     }
 
@@ -443,18 +510,18 @@ class Range extends BaseComponent {
     for (const [index, point] of points.entries()) {
       const tick = document.createElement('span')
       tick.className = CLASS_NAME_TICK
+      tick.classList.toggle(CLASS_NAME_TICK_START, point.ratio === 0)
+      tick.classList.toggle(CLASS_NAME_TICK_END, point.ratio === 1)
       Manipulator.setDataAttribute(tick, 'value', `${point.value}`)
 
       if (vertical) {
         tick.style.gridRowStart = `${points.length - index + 1}`
       } else {
         tick.style.gridColumnStart = `${index + 2}`
-        tick.classList.toggle(CLASS_NAME_TICK_START, point.ratio === 0)
-        tick.classList.toggle(CLASS_NAME_TICK_END, point.ratio === 1)
       }
 
       if (point.class) {
-        tick.classList.add(...(Array.isArray(point.class) ? point.class : [point.class]))
+        tick.classList.add(...[point.class].flat().flatMap(name => name.split(' ')).filter(Boolean))
       }
 
       if (point.style && typeof point.style === 'object') {
@@ -474,22 +541,28 @@ class Range extends BaseComponent {
     this._element.append(this._ticks)
   }
 
-  protected _nearest(ratio: number): HTMLInputElement {
-    const ratios = this._inputs.map(input => this._ratio(input))
+  protected _nearest(ratio: number): HTMLInputElement | null {
+    const inputs = this._inputs.filter(input => !this._isDisabled(input))
+
+    if (inputs.length === 0) {
+      return null
+    }
+
+    const ratios = inputs.map(input => this._ratio(input))
 
     if (ratio <= ratios[0]) {
-      return this._inputs[0]
+      return inputs[0]
     }
 
     if (ratio >= ratios.at(-1)!) {
-      return this._inputs.at(-1)!
+      return inputs.at(-1)!
     }
 
     const distances = ratios.map(value => Math.abs(value - ratio))
     const closest = Math.min(...distances)
     const first = distances.indexOf(closest)
 
-    return this._inputs[ratio < ratios[first] ? first : distances.lastIndexOf(closest)]
+    return inputs[ratio < ratios[first] ? first : distances.lastIndexOf(closest)]
   }
 
   protected _ratioAt(event: PointerEvent, rect: DOMRect, thumb: number): number {
@@ -522,44 +595,55 @@ class Range extends BaseComponent {
     }
   }
 
+  protected _keydown(event: KeyboardEvent): void {
+    const input = event.target as HTMLInputElement
+
+    if (!this._isVertical() || !this._inputs.includes(input) || !['ArrowLeft', 'ArrowRight'].includes(event.key)) {
+      return
+    }
+
+    event.preventDefault()
+
+    const start = input.value
+    this._setValue(input, this._value(input) + (event.key === 'ArrowRight' ? this._step(input) : -this._step(input)))
+
+    if (input.value !== start) {
+      input.dispatchEvent(new Event('change', { bubbles: true }))
+    }
+  }
+
   protected _pointerDown(event: PointerEvent): void {
-    if (event.button !== 0) {
-      return
-    }
-
-    const tick = (event.target as Element).closest?.(SELECTOR_TICK)
-
-    if (tick && this._ticks?.contains(tick)) {
-      if (!this._ticks.classList.contains(CLASS_NAME_TICKS_CLICKABLE)) {
-        return
-      }
-
-      const value = Number(Manipulator.getDataAttribute(tick as HTMLElement, 'value'))
-      const input = this._nearest((value - this._min()) / ((this._max() - this._min()) || 1))
-
-      if (!input.disabled) {
-        const start = input.value
-        this._setValue(input, value)
-        input.focus({ preventScroll: true })
-
-        if (input.value !== start) {
-          input.dispatchEvent(new Event('change', { bubbles: true }))
-        }
-      }
-
-      return
-    }
-
-    if (event.target !== this._element || this._inputs.length < 2) {
+    if (event.button !== 0 || this._press) {
       return
     }
 
     const rect = this._inputs[0].getBoundingClientRect()
-    const thumb = this._thumbSize()
-    const ratio = this._ratioAt(event, rect, thumb)
-    const input = this._nearest(ratio)
+    const tick = (event.target as Element).closest?.(SELECTOR_TICK)
 
-    if (input.disabled) {
+    if (tick && this._ticks?.contains(tick)) {
+      if (this._ticks.classList.contains(CLASS_NAME_TICKS_CLICKABLE)) {
+        const value = Number(Manipulator.getDataAttribute(tick as HTMLElement, 'value'))
+        this._startPress(event, rect, (value - this._min()) / ((this._max() - this._min()) || 1), value)
+      }
+
+      return
+    }
+
+    const inside = event.clientX >= rect.left && event.clientX <= rect.right && event.clientY >= rect.top && event.clientY <= rect.bottom
+
+    if (event.target !== this._element || this._inputs.length < 2 || !inside) {
+      return
+    }
+
+    this._startPress(event, rect)
+  }
+
+  protected _startPress(event: PointerEvent, rect: DOMRect, ratio?: number, value?: number): void {
+    const thumb = this._thumbSize()
+    const at = ratio ?? this._ratioAt(event, rect, thumb)
+    const input = this._nearest(at)
+
+    if (!input) {
       return
     }
 
@@ -571,7 +655,7 @@ class Range extends BaseComponent {
     EventHandler.on(document, EVENT_POINTERUP, this._onPointerUp)
     EventHandler.on(document, EVENT_POINTERCANCEL, this._onPointerUp)
     input.focus({ preventScroll: true })
-    this._setValue(input, this._min(input) + (ratio * (this._max(input) - this._min(input))))
+    this._setValue(input, value ?? this._min(input) + (at * (this._max(input) - this._min(input))))
   }
 
   protected _pointerMove(event: PointerEvent): void {

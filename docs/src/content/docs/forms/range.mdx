@@ -83,15 +83,16 @@ Link a `<datalist>` to the input with the `list` attribute and the plugin render
     <option value="100" label="Hot"></option>
   </datalist>`} />
 
-The `ticks` option draws ticks without a datalist, and combines with one: a string is a label, spread evenly with the other strings; a number is a tick without a label at that value; an object sets `value`, `label`, `class` and `style`. A comma-separated `data-coreui-ticks` attribute is a list of labels.
+The `ticks` option draws ticks without a datalist, and combines with one: a number is a tick without a label at that value; an object sets `value`, `label`, `class` and `style`; a string, or an object without `value`, is a label placed by its position in the array, the first at `min` and the last at `max`. A comma-separated `data-coreui-ticks` attribute is a list of labels. While a thumb sits on a labelled tick, the label is its `aria-valuetext`, so a screen reader announces "Medium" rather than "50"; a `tooltipsFormat` takes precedence.
 
-<Example code={`<div class="form-range" data-coreui-ticks="Low, Medium, High" role="group" aria-label="Priority">
-    <input type="range" class="form-range-input" value="50" aria-label="Priority">
+<Example code={`<label for="rangePriority" class="form-label">Priority</label>
+  <div class="form-range" data-coreui-ticks="Low, Medium, High">
+    <input type="range" class="form-range-input" value="50" id="rangePriority">
   </div>`} />
 
 ### Clickable ticks
 
-With `clickableTicks`, a press on a tick moves the nearest thumb to its value.
+With `clickableTicks`, a press on a tick moves the nearest thumb to its value, and the thumb follows the pointer until it is released.
 
 <Example code={`<div class="form-range" data-coreui-clickable-ticks="true" data-coreui-ticks='[{"value": 0, "label": "Cold"}, 25, {"value": 50, "label": "Mild"}, 75, {"value": 100, "label": "Hot"}]' role="group" aria-label="Temperature">
     <input type="range" class="form-range-input" value="25" aria-label="Lowest temperature">
@@ -102,7 +103,7 @@ With `clickableTicks`, a press on a tick moves the nearest thumb to its value.
 
 Add `.form-range-vertical` to the wrapper to stand the control up: the value grows from the bottom, the tooltips sit at the start and the ticks at the end. The height is `--cui-range-vertical-height`.
 
-<Example class="d-flex gap-5" code={`<div class="form-range form-range-vertical" data-coreui-tooltips role="group" aria-label="Volume">
+<Example class="d-flex gap-5 ps-5" code={`<div class="form-range form-range-vertical" data-coreui-tooltips>
     <input type="range" class="form-range-input" value="60" aria-label="Volume">
   </div>
   <div class="form-range form-range-vertical" data-coreui-tooltips data-coreui-ticks="Low, Mid, High" role="group" aria-label="Frequency band">
@@ -197,7 +198,7 @@ Options can be passed using data attributes or JavaScript. To do this, append an
 | `distance` | number | `0` | Smallest gap, in value units, between neighbouring thumbs. |
 | `sanitize` | boolean | `true` | Sanitizes the HTML that `tooltipsFormat` returns. |
 | `sanitizeFn` | null, function | `null` | Replaces the built-in sanitizer. |
-| `ticks` | array, boolean, string | `false` | Tick marks in addition to a linked datalist: strings are labels spread evenly, numbers are ticks without a label at that value, objects set `value`, `label`, `class` and `style`. |
+| `ticks` | array, boolean, string | `false` | Tick marks in addition to a linked datalist: numbers are ticks without a label at that value, objects set `value`, `label`, `class` and `style`, and strings (or objects without `value`) are labels placed by their position in the array, from `min` to `max`. |
 | `tooltipClass` | string | `''` | Classes added to every tooltip. |
 | `tooltips` | boolean, `'always'` | `false` | Shows a tooltip with the current value of each thumb: `true` on hover, drag and focus, `'always'` at all times. |
 | `tooltipsFormat` | function, null | `null` | `(value) => string` that formats the tooltip; HTML is sanitized, and the text becomes the input's `aria-valuetext`. |
@@ -218,7 +219,7 @@ Options can be passed using data attributes or JavaScript. To do this, append an
 | --- | --- |
 | `changed.coreui.range` | Fired on the input when the value updates (on `input` and `change`). The event's `value` property holds the current numeric value. |
 
-A press on the track or on a clickable tick dispatches the native `input` event on the thumb it moves, and `change` when the pointer is released, the way the browser does when the thumb is dragged.
+A press on the track or on a clickable tick dispatches the native `input` event on the thumb it moves, and `change` when the pointer is released, the way the browser does when the thumb is dragged. In a vertical range the plugin also handles <kbd>←</kbd> and <kbd>→</kbd>, so <kbd>→</kbd> increases the value in every browser, as <kbd>↑</kbd> does.
 
 ```js
 const input = document.querySelector('.form-range-input')

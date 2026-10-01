@@ -349,6 +349,209 @@ describe('Range', () => {
 
       expect(fixtureEl.querySelectorAll('.form-range-input')[1].value).toEqual('75')
     })
+
+    it('should keep the thumbs in order before listeners on the inputs run', () => {
+      fixtureEl.innerHTML = getMultiHtml()
+
+      const [low, high] = fixtureEl.querySelectorAll('.form-range-input')
+      const seen = []
+      low.addEventListener('input', () => seen.push(low.value))
+      new Range(fixtureEl.querySelector('.form-range')) // eslint-disable-line no-new
+
+      low.value = '90'
+      low.dispatchEvent(createEvent('input'))
+
+      expect(seen).toEqual(['75'])
+      expect(high.value).toEqual('75')
+    })
+
+    it('should keep a decimal distance without overshooting it', () => {
+      fixtureEl.innerHTML = `
+        <div class="form-range" data-coreui-distance="0.1">
+          <input type="range" class="form-range-input" min="0" max="1" step="0.1" value="0.1">
+          <input type="range" class="form-range-input" min="0" max="1" step="0.1" value="0.3">
+        </div>
+      `
+
+      const [low, high] = fixtureEl.querySelectorAll('.form-range-input')
+      new Range(fixtureEl.querySelector('.form-range')) // eslint-disable-line no-new
+
+      low.value = '0.2'
+      low.dispatchEvent(createEvent('input'))
+      expect(low.value).toEqual('0.2')
+
+      high.value = '0.2'
+      high.dispatchEvent(createEvent('input'))
+      expect(high.value).toEqual('0.3')
+    })
+
+    it('should step past a bound that falls between steps', () => {
+      fixtureEl.innerHTML = `
+        <div class="form-range" data-coreui-distance="2">
+          <input type="range" class="form-range-input" min="0" max="100" step="5" value="0">
+          <input type="range" class="form-range-input" min="0" max="100" step="5" value="50">
+        </div>
+      `
+
+      const high = fixtureEl.querySelectorAll('.form-range-input')[1]
+      new Range(fixtureEl.querySelector('.form-range')) // eslint-disable-line no-new
+
+      high.value = '0'
+      high.dispatchEvent(createEvent('input'))
+
+      expect(high.value).toEqual('5')
+    })
+
+    it('should pick the farther of two equal thumbs on the side of the press', () => {
+      fixtureEl.innerHTML = getMultiHtml('', [20, 50, 50])
+
+      const rangeEl = fixtureEl.querySelector('.form-range')
+      const inputs = [...fixtureEl.querySelectorAll('.form-range-input')]
+      new Range(rangeEl) // eslint-disable-line no-new
+
+      pressAt(rangeEl, 56)
+
+      expect(inputs.map(input => input.value)).toEqual(['20', '50', '56'])
+    })
+
+    it('should move the nearest thumb that is not disabled', () => {
+      fixtureEl.innerHTML = getMultiHtml('', [20, 80])
+
+      const rangeEl = fixtureEl.querySelector('.form-range')
+      const [low, high] = fixtureEl.querySelectorAll('.form-range-input')
+      low.disabled = true
+      new Range(rangeEl) // eslint-disable-line no-new
+
+      pressAt(rangeEl, 35)
+
+      expect([low.value, high.value]).toEqual(['20', '35'])
+    })
+
+    it('should leave thumbs disabled by a fieldset alone', () => {
+      fixtureEl.innerHTML = `<fieldset disabled>${getMultiHtml('data-coreui-clickable-ticks="true" data-coreui-ticks="Low, High"')}</fieldset>`
+
+      const rangeEl = fixtureEl.querySelector('.form-range')
+      const inputs = [...fixtureEl.querySelectorAll('.form-range-input')]
+      new Range(rangeEl) // eslint-disable-line no-new
+
+      pressAt(rangeEl, 40)
+      fixtureEl.querySelectorAll('.form-range-tick-label')[1].dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, button: 0, pointerId: 1 }))
+
+      expect(inputs.map(input => input.value)).toEqual(['25', '75'])
+      expect(fixtureEl.querySelector('.form-range-ticks')).not.toHaveClass('form-range-ticks-clickable')
+    })
+
+    it('should ignore a press on the wrapper outside the track', () => {
+      fixtureEl.innerHTML = getMultiHtml().replace('class="form-range"', 'class="form-range" style="padding-bottom: 40px"')
+
+      const rangeEl = fixtureEl.querySelector('.form-range')
+      const rect = rangeEl.querySelector('.form-range-input').getBoundingClientRect()
+      new Range(rangeEl) // eslint-disable-line no-new
+
+      rangeEl.dispatchEvent(new PointerEvent('pointerdown', {
+        bubbles: true, button: 0, clientX: rect.left + (rect.width * 0.6), clientY: rect.bottom + 20, pointerId: 1
+      }))
+
+      expect(fixtureEl.querySelectorAll('.form-range-input')[1].value).toEqual('75')
+    })
+
+    it('should measure a press from the right in a right-to-left range', () => {
+      fixtureEl.innerHTML = `<div dir="rtl">${getMultiHtml()}</div>`
+
+      const rangeEl = fixtureEl.querySelector('.form-range')
+      const [low, high] = fixtureEl.querySelectorAll('.form-range-input')
+      new Range(rangeEl) // eslint-disable-line no-new
+
+      pressAt(rangeEl, 40)
+
+      expect([low.value, high.value]).toEqual(['25', '60'])
+    })
+
+    it('should ignore a second pointer while one press is in progress', () => {
+      fixtureEl.innerHTML = getMultiHtml()
+
+      const rangeEl = fixtureEl.querySelector('.form-range')
+      const [low, high] = fixtureEl.querySelectorAll('.form-range-input')
+      const rect = low.getBoundingClientRect()
+      new Range(rangeEl) // eslint-disable-line no-new
+
+      const changes = []
+      rangeEl.addEventListener('change', event => changes.push(event.target.value))
+
+      pressAt(rangeEl, 10)
+      rangeEl.dispatchEvent(new PointerEvent('pointerdown', {
+        bubbles: true, button: 0, clientX: rect.left + (rect.width * 0.9), clientY: rect.top + (rect.height / 2), pointerId: 2
+      }))
+      pressAt(rangeEl, 10, 'pointerup')
+
+      expect([low.value, high.value]).toEqual(['10', '75'])
+      expect(changes).toEqual(['10'])
+    })
+
+    it('should commit a press that the browser cancels', () => {
+      fixtureEl.innerHTML = getMultiHtml()
+
+      const rangeEl = fixtureEl.querySelector('.form-range')
+      new Range(rangeEl) // eslint-disable-line no-new
+
+      const changes = []
+      rangeEl.addEventListener('change', event => changes.push(event.target.value))
+
+      pressAt(rangeEl, 60)
+      pressAt(rangeEl, 60, 'pointercancel')
+      pressAt(rangeEl, 95, 'pointermove')
+
+      expect(changes).toEqual(['60'])
+      expect(fixtureEl.querySelectorAll('.form-range-input')[1].value).toEqual('60')
+    })
+
+    it('should fire changed only on the thumb that moved', () => {
+      fixtureEl.innerHTML = getMultiHtml()
+
+      const [low, high] = fixtureEl.querySelectorAll('.form-range-input')
+      new Range(fixtureEl.querySelector('.form-range')) // eslint-disable-line no-new
+
+      const fired = []
+      low.addEventListener('changed.coreui.range', () => fired.push('low'))
+      high.addEventListener('changed.coreui.range', () => fired.push('high'))
+
+      low.value = '30'
+      low.dispatchEvent(createEvent('input'))
+
+      expect(fired).toEqual(['low'])
+    })
+
+    it('should step a vertical thumb up with the right arrow in every browser', () => {
+      fixtureEl.innerHTML = getMultiHtml().replace('class="form-range"', 'class="form-range form-range-vertical"')
+
+      const rangeEl = fixtureEl.querySelector('.form-range')
+      const low = fixtureEl.querySelector('.form-range-input')
+      new Range(rangeEl) // eslint-disable-line no-new
+
+      const events = []
+      rangeEl.addEventListener('input', () => events.push('input'))
+      rangeEl.addEventListener('change', () => events.push('change'))
+
+      low.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'ArrowRight' }))
+      expect(low.value).toEqual('26')
+
+      low.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'ArrowLeft' }))
+      expect(low.value).toEqual('25')
+      expect(events).toEqual(['input', 'change', 'input', 'change'])
+    })
+
+    it('should leave the arrow keys of a horizontal range to the browser', () => {
+      fixtureEl.innerHTML = getMultiHtml()
+
+      const low = fixtureEl.querySelector('.form-range-input')
+      new Range(fixtureEl.querySelector('.form-range')) // eslint-disable-line no-new
+
+      const event = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'ArrowRight' })
+      low.dispatchEvent(event)
+
+      expect(event.defaultPrevented).toBeFalse()
+      expect(low.value).toEqual('25')
+    })
   })
 
   describe('tooltips', () => {
@@ -446,6 +649,16 @@ describe('Range', () => {
       }
     })
 
+    it('should place the tooltips at the end of a vertical range in a right-to-left page', () => {
+      fixtureEl.innerHTML = `<div dir="rtl">${getMultiHtml('data-coreui-tooltips').replace('class="form-range"', 'class="form-range form-range-vertical"')}</div>`
+
+      new Range(fixtureEl.querySelector('.form-range')) // eslint-disable-line no-new
+
+      for (const tooltip of fixtureEl.querySelectorAll('.form-range-tooltip')) {
+        expect(tooltip).toHaveClass('bs-tooltip-end')
+      }
+    })
+
     it('should add tooltipClass to every tooltip', () => {
       fixtureEl.innerHTML = getMultiHtml('data-coreui-tooltips data-coreui-tooltip-class="theme-danger fw-bold"')
 
@@ -468,6 +681,32 @@ describe('Range', () => {
       expect(inner.querySelector('strong')).not.toBeNull()
       expect(inner.querySelector('strong').hasAttribute('onclick')).toBeFalse()
       expect(fixtureEl.querySelector('.form-range-input').getAttribute('aria-valuetext')).toEqual('50 km')
+    })
+
+    it('should keep a word break between the lines of tooltipsFormat in aria-valuetext', () => {
+      fixtureEl.innerHTML = getRangeHtml()
+
+      new Range(fixtureEl.querySelector('.form-range'), { tooltipsFormat: value => `<b>$${value}</b><br>USD` }) // eslint-disable-line no-new
+
+      expect(fixtureEl.querySelector('.form-range-input').getAttribute('aria-valuetext')).toEqual('$50 USD')
+    })
+
+    it('should announce the label of the tick a thumb sits on', () => {
+      fixtureEl.innerHTML = getRangeHtml('data-coreui-ticks="Low, Medium, High"')
+
+      const inputEl = fixtureEl.querySelector('.form-range-input')
+      inputEl.setAttribute('aria-valuetext', 'author text')
+      new Range(fixtureEl.querySelector('.form-range')) // eslint-disable-line no-new
+
+      expect(inputEl.getAttribute('aria-valuetext')).toEqual('Medium')
+
+      inputEl.value = '40'
+      inputEl.dispatchEvent(createEvent('input'))
+      expect(inputEl.getAttribute('aria-valuetext')).toEqual('author text')
+
+      inputEl.value = '100'
+      inputEl.dispatchEvent(createEvent('input'))
+      expect(inputEl.getAttribute('aria-valuetext')).toEqual('High')
     })
 
     it('should not set aria-valuetext without tooltipsFormat', () => {
@@ -575,6 +814,24 @@ describe('Range', () => {
       expect(ticks[2].style.color).toEqual('red')
     })
 
+    it('should add every class of a tick object, space separated', () => {
+      fixtureEl.innerHTML = getRangeHtml()
+
+      new Range(fixtureEl.querySelector('.form-range'), { ticks: [{ class: 'fw-bold  text-danger', label: 'Mid', value: 50 }] }) // eslint-disable-line no-new
+
+      const tick = fixtureEl.querySelector('.form-range-tick')
+      expect(tick).toHaveClass('fw-bold')
+      expect(tick).toHaveClass('text-danger')
+    })
+
+    it('should combine the ticks option with a linked datalist', () => {
+      fixtureEl.innerHTML = getTicksHtml()
+
+      new Range(fixtureEl.querySelector('.form-range'), { ticks: [{ label: 'Half', value: 50 }] }) // eslint-disable-line no-new
+
+      expect([...fixtureEl.querySelectorAll('.form-range-tick')].map(tick => tick.dataset.coreuiValue)).toEqual(['0', '10', '50', '100'])
+    })
+
     it('should read a comma-separated ticks attribute as labels spread evenly', () => {
       fixtureEl.innerHTML = getRangeHtml('data-coreui-ticks="Low, Mid, High"')
 
@@ -613,7 +870,8 @@ describe('Range', () => {
       const ticksEl = fixtureEl.querySelector('.form-range-ticks')
       expect(ticksEl.style.gridTemplateRows).toEqual('0fr 0.5fr 0.5fr 0fr')
       expect([...ticksEl.children].map(tick => tick.style.gridRowStart)).toEqual(['4', '3', '2'])
-      expect(fixtureEl.querySelector('.form-range-tick-start')).toBeNull()
+      expect(ticksEl.children[0]).toHaveClass('form-range-tick-start')
+      expect(ticksEl.children[2]).toHaveClass('form-range-tick-end')
     })
 
     it('should move the nearest thumb to a clicked tick with clickableTicks', () => {
@@ -632,6 +890,9 @@ describe('Range', () => {
       fixtureEl.querySelectorAll('.form-range-tick-label')[2].dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, button: 0, pointerId: 1 }))
 
       expect([low.value, high.value]).toEqual(['25', '100'])
+      expect(events).toEqual(['input:100'])
+
+      pressAt(rangeEl, 100, 'pointerup')
       expect(events).toEqual(['input:100', 'change:100'])
     })
 
@@ -690,6 +951,24 @@ describe('Range', () => {
       expect(rangeEl.style.getPropertyValue('--cui-range-fill')).toEqual('0.75')
       expect([...fixtureEl.querySelectorAll('.tooltip-inner')].map(inner => inner.textContent)).toEqual(['25', '75'])
     })
+
+    it('should stop following resets after dispose', async () => {
+      fixtureEl.innerHTML = `<form>${getRangeHtml()}</form>`
+
+      const rangeEl = fixtureEl.querySelector('.form-range')
+      const inputEl = fixtureEl.querySelector('.form-range-input')
+      const range = new Range(rangeEl)
+      const spy = spyOn(range, '_update')
+
+      range.dispose()
+      inputEl.value = '5'
+      fixtureEl.querySelector('form').reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(spy).not.toHaveBeenCalled()
+    })
   })
 
   describe('dispose', () => {
@@ -737,6 +1016,23 @@ describe('Range', () => {
       pressAt(rangeEl, 95, 'pointermove')
 
       expect(high.value).toEqual('80')
+    })
+
+    it('should leave alone what it did not set', () => {
+      fixtureEl.innerHTML = getRangeHtml('data-coreui-track="false"')
+
+      const rangeEl = fixtureEl.querySelector('.form-range')
+      const inputEl = fixtureEl.querySelector('.form-range-input')
+      const range = new Range(rangeEl)
+
+      inputEl.setAttribute('aria-valuetext', 'author text')
+      inputEl.style.zIndex = '5'
+      rangeEl.style.setProperty('--cui-range-fill', '0.3')
+      range.dispose()
+
+      expect(inputEl.getAttribute('aria-valuetext')).toEqual('author text')
+      expect(inputEl.style.zIndex).toEqual('5')
+      expect(rangeEl.style.getPropertyValue('--cui-range-fill')).toEqual('0.3')
     })
 
     it('should stop following the input after dispose', () => {
