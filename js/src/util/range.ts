@@ -166,9 +166,10 @@ export const getThumbSize = (element: HTMLElement): number => {
 }
 
 /**
- * Places tick marks on a track. A number is a tick at that value, an object with a numeric
- * `value` is a tick at that value, and anything else is placed by its position in the list, the
- * first at `min` and the last at `max`. Ticks with a value that is not a finite number are left out.
+ * Places tick marks on a track. A number is a tick at that value, an object with a `value` is a
+ * tick at that value read as a number (so `'50'` from a JSON attribute works), and anything else is
+ * placed by its position in the list, the first at `min` and the last at `max`. Ticks whose value
+ * is not a number are left out.
  *
  * @param min - The lowest value of the track
  * @param max - The highest value of the track
@@ -180,22 +181,24 @@ export const getTickPositions = (min: number, max: number, ticks: unknown[]): Ra
 
   return ticks
     .map((tick, index) => {
+      const own = tick !== null && typeof tick === 'object' ? (tick as { value?: unknown }).value : undefined
       const value = typeof tick === 'number' ?
         tick :
-        (tick !== null && typeof tick === 'object' && typeof (tick as { value?: unknown }).value === 'number' ?
-          (tick as { value: number }).value :
-          min + (ticks.length === 1 ? 0 : (index / (ticks.length - 1)) * span))
+        (own === undefined || own === null ?
+          min + (ticks.length === 1 ? 0 : (index / (ticks.length - 1)) * span) :
+          Number(own))
 
       return { index, ratio: Math.min(Math.max((value - min) / span, 0), 1), value }
     })
-    .filter(position => Number.isFinite(position.value))
+    .filter(position => !Number.isNaN(position.value))
     .toSorted((a, b) => a.ratio - b.ratio)
 }
 
 /**
  * Applies the value sanitization of `<input type="range">` to a number: clamps it to the range,
- * rounds it to the nearest step from `min` (half way rounds up) and steps back when the rounded
- * value passes `max`. A value that is not a number becomes the midpoint.
+ * rounds it to the nearest step from `min` (half way rounds up, counted in decimals like the
+ * browser) and steps back when the rounded value passes `max`. A value that is not a finite number
+ * becomes the midpoint, and a `max` below `min` counts as `min`.
  *
  * @param value - The value to sanitize
  * @param min - The lowest value
@@ -204,16 +207,18 @@ export const getTickPositions = (min: number, max: number, ticks: unknown[]): Ra
  * @returns The value the input would hold
  */
 export const sanitizeValue = (value: number, min: number, max: number, step: number): number => {
-  const clamped = Math.min(Math.max(Number.isNaN(value) ? min + ((max - min) / 2) : value, min), max)
+  const top = Math.max(max, min)
+  const clamped = Math.min(Math.max(Number.isFinite(value) ? value : min + ((top - min) / 2), min), top)
 
   if (!(step > 0)) {
     return clamped
   }
 
   const decimals = Math.max(getDecimals(step), getDecimals(min))
-  const rounded = Number((min + (Math.round((clamped - min) / step) * step)).toFixed(decimals))
+  const steps = Math.round(Number(((clamped - min) / step).toFixed(9)))
+  const rounded = Number((min + (steps * step)).toFixed(decimals))
 
-  return rounded > max ? Number((rounded - step).toFixed(decimals)) : rounded
+  return rounded > top ? Number((rounded - step).toFixed(decimals)) : rounded
 }
 
 /**

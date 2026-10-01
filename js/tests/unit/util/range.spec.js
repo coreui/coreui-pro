@@ -82,6 +82,13 @@ describe('Range utilities', () => {
       expect(upper.value).toBe('22.5')
     })
 
+    it('does not step a step any input when the limit lies past max', () => {
+      const [lower, upper] = inputs('step="any" value="99"', 'step="any" value="0"')
+
+      expect(() => constrainInput(upper, lower, undefined, 5)).not.toThrow()
+      expect(upper.value).toBe('100')
+    })
+
     it('leaves an input that is in order', () => {
       const [first, second] = inputs('value="20"', 'value="40"')
 
@@ -118,8 +125,9 @@ describe('Range utilities', () => {
       expect(getNearestInput(thumbs, 0.39)).toBe(thumbs[0])
       expect(getNearestInput(thumbs, 0.41)).toBe(thumbs[1])
 
-      const spread = inputs('value="20"', 'value="60"')
-      expect(getNearestInput(spread, 0.4)).toBe(spread[1])
+      const stacked = inputs('value="20"', 'value="50"', 'value="50"', 'value="80"')
+      expect(getNearestInput(stacked, 0.45)).toBe(stacked[1])
+      expect(getNearestInput(stacked, 0.55)).toBe(stacked[2])
     })
 
     it('skips disabled thumbs and returns null when every thumb is disabled', () => {
@@ -137,6 +145,15 @@ describe('Range utilities', () => {
       expect(getRatioAt({ clientX: 10, clientY: 0 }, rect(220, 20), 20, false, false)).toBe(0)
       expect(getRatioAt({ clientX: 110, clientY: 0 }, rect(220, 20), 20, false, false)).toBe(0.5)
       expect(getRatioAt({ clientX: 500, clientY: 0 }, rect(220, 20), 20, false, false)).toBe(1)
+    })
+
+    it('measures from the box of the track wherever it sits and clamps both ends', () => {
+      const box = { ...rect(220, 20), left: 100, right: 320 }
+
+      expect(getRatioAt({ clientX: 210, clientY: 0 }, box, 20, false, false)).toBe(0.5)
+      expect(getRatioAt({ clientX: 0, clientY: 0 }, box, 20, false, false)).toBe(0)
+      expect(getRatioAt({ clientX: 260, clientY: 0 }, box, 20, false, true)).toBe(0.25)
+      expect(getRatioAt({ clientX: 0, clientY: 10 }, { ...rect(20, 220), top: 100, bottom: 320 }, 20, true, false)).toBe(1)
     })
 
     it('reads a right-to-left track from the right and a vertical one from the bottom', () => {
@@ -179,16 +196,24 @@ describe('Range utilities', () => {
       expect(positions[3].ratio).toBe(1)
     })
 
-    it('places a single label at min, clamps the ratio and drops values that are not finite', () => {
+    it('places a single label at min, clamps the ratio and drops values that are not numbers', () => {
       expect(getTickPositions(10, 20, ['Only'])).toEqual([{ index: 0, ratio: 0, value: 10 }])
       expect(getTickPositions(0, 10, [-5, 15, Number.NaN, Infinity])).toEqual([
         { index: 0, ratio: 0, value: -5 },
-        { index: 1, ratio: 1, value: 15 }
+        { index: 1, ratio: 1, value: 15 },
+        { index: 3, ratio: 1, value: Infinity }
       ])
     })
 
     it('treats an empty span as one unit', () => {
       expect(getTickPositions(5, 5, [6])).toEqual([{ index: 0, ratio: 1, value: 6 }])
+      expect(getTickPositions(5, 5, [5])).toEqual([{ index: 0, ratio: 0, value: 5 }])
+    })
+
+    it('reads an object value as a number and places a null tick by its position', () => {
+      expect(getTickPositions(0, 100, [{ value: '50', label: 'Half' }])).toEqual([{ index: 0, ratio: 0.5, value: 50 }])
+      expect(getTickPositions(0, 100, [null, 100]).map(position => position.value)).toEqual([0, 100])
+      expect(getTickPositions(0, 100, [{ value: 'half' }, Infinity]).map(position => position.ratio)).toEqual([1])
     })
   })
 
@@ -203,7 +228,12 @@ describe('Range utilities', () => {
         [9.7, 0, 10, 4],
         [10, 0, 10, 4],
         [6, 0, 10, 4],
-        [7, 1, 10, 2]
+        [7, 1, 10, 2],
+        [0.3, 0, 1, 0.1],
+        [0.15, 0, 1, 0.1],
+        [0.35, 0, 1, 0.1],
+        [0.125, 0.05, 1, 0.025],
+        [5, 10, 0, 1]
       ]
 
       for (const [value, min, max, step] of cases) {
@@ -212,9 +242,10 @@ describe('Range utilities', () => {
       }
     })
 
-    it('clamps without rounding for step any and takes the midpoint for NaN', () => {
+    it('clamps without rounding for step any and takes the midpoint for a value that is not finite', () => {
       expect(sanitizeValue(33.3, 0, 100, 0)).toBe(33.3)
       expect(sanitizeValue(Number.NaN, 0, 10, 1)).toBe(5)
+      expect(sanitizeValue(Infinity, 0, 100, 1)).toBe(50)
     })
   })
 })

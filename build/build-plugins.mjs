@@ -26,13 +26,19 @@ const resolvedPlugins = []
 const filenameToEntity = filename => filename.replace(/\.[jt]s$/, '')
   .replace(/(?:^|-|\/|\\)[a-z]/g, str => str.slice(-1).toUpperCase())
 
+// A util named like a component (`util/range.ts` next to `range.ts`) would share its global
+const componentFiles = new Set(tsFiles.filter(file => path.dirname(file) === sourcePath).map(file => path.basename(file)))
+
 for (const file of tsFiles) {
+  const fileName = path.basename(file)
+  const shadowsComponent = path.dirname(file) !== sourcePath && fileName !== 'index.ts' && componentFiles.has(fileName)
+
   resolvedPlugins.push({
     src: file,
     // TypeScript sources still emit a `.js` plugin
     dist: file.replace('src', 'dist').replace(/\.ts$/, '.js'),
-    fileName: path.basename(file),
-    className: filenameToEntity(path.basename(file))
+    fileName,
+    className: `${filenameToEntity(fileName)}${shadowsComponent ? 'Util' : ''}`
   })
 }
 
