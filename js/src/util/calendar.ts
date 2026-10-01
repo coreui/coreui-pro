@@ -183,6 +183,19 @@ export const YEARS_PER_PAGE = 12
 const getPeriod = (date: Date, view: PeriodViewTypes) : number => Math.floor(((date.getFullYear() * 12) + date.getMonth()) / MONTHS_IN_PERIOD[view])
 
 /**
+ * Gives the time of the midnight that starts the ISO week of a date, so that
+ * two dates share a week exactly when the times match.
+ *
+ * @param date - The date to place
+ * @returns The time of the Monday that starts the week
+ */
+const getWeekTime = (date: Date) : number => {
+  const monday = getStartOfWeek(date, 1)
+  monday.setHours(0, 0, 0, 0)
+  return monday.getTime()
+}
+
+/**
  * Tells whether `disabledDates` disables every day it reaches, walking a day
  * at a time from the day of the later of `start` and `min` to the day of the
  * earlier of `end` and `max`, times of day aside.
@@ -681,6 +694,21 @@ export const convertToDateObject = (date: Date | string | null | undefined, sele
 }
 
 /**
+ * Converts a `minDate` or `maxDate` value as `convertToDateObject` does and,
+ * in week selection, moves it to the day `getWeekDate` gives its week, so the
+ * week of a limit stays selectable whatever day the week rows start on.
+ *
+ * @param date - The limit as a `Date` or a string
+ * @param selectionType - The unit the string names
+ * @param firstDayOfWeek - The day the week rows start on, `0` for Sunday to `6` for Saturday
+ * @returns The limit, or `null` for no value or an unreadable one
+ */
+export const convertToLimitDate = (date: Date | string | null | undefined, selectionType: SelectionTypes | undefined, firstDayOfWeek: number) : Date | null => {
+  const value = convertToDateObject(date, selectionType)
+  return value && selectionType === 'week' ? getWeekDate(value, firstDayOfWeek) : value
+}
+
+/**
  * Reads a date string for a selection type, as `convertToDateObject` does,
  * and returns `null` for anything that is not a non-empty string.
  *
@@ -1003,8 +1031,8 @@ export const getISOWeekNumberAndYear = (date: Date) : { weekNumber: number; year
 }
 
 /**
- * Builds the six week rows of a month page, each with its ISO week and its
- * seven days marked `previous`, `current` or `next`.
+ * Builds the six week rows of a month page, each with the ISO week that holds
+ * most of its days and its seven days marked `previous`, `current` or `next`.
  *
  * @param year - The full year
  * @param month - The month, 0 to 11
@@ -1031,7 +1059,7 @@ export const getMonthDetails = (year: number, month: number, firstDayOfWeek: num
       })
     }
 
-    if ((index + 1) % 7 === 0) {
+    if (index % 7 === 3) {
       const { weekNumber, year } = getISOWeekNumberAndYear(day.date)
       const lastWeek = weeks[weeks.length - 1]
       if (lastWeek) {
@@ -1232,6 +1260,33 @@ export const getStartOfWeek = (date: Date, firstDayOfWeek: number) : Date => {
   const value = new Date(date)
   value.setDate(value.getDate() - ((value.getDay() - firstDayOfWeek + 7) % 7))
   return value
+}
+
+/**
+ * Finds the day that stands for a week row: the first of its days in the ISO
+ * week that holds most of them, which is the row's first day when the row
+ * starts on Monday to Thursday and the Monday in it otherwise.
+ *
+ * @param rowStart - The first day of the row
+ * @returns The day that stands for the row
+ */
+export const getWeekRowDate = (rowStart: Date) : Date => {
+  const monday = getStartOfWeek(createDate(rowStart.getFullYear(), rowStart.getMonth(), rowStart.getDate() + 3), 1)
+  return monday > rowStart ? monday : rowStart
+}
+
+/**
+ * Finds the day that stands for the ISO week of a date when week rows start
+ * on `firstDayOfWeek`: the day `getWeekRowDate` gives the row that holds the
+ * week's Thursday, and with it most of the week.
+ *
+ * @param date - A day of the week
+ * @param firstDayOfWeek - The day the rows start on, `0` for Sunday to `6` for Saturday
+ * @returns The day that stands for the week
+ */
+export const getWeekDate = (date: Date, firstDayOfWeek: number) : Date => {
+  const monday = getStartOfWeek(date, 1)
+  return getWeekRowDate(getStartOfWeek(createDate(monday.getFullYear(), monday.getMonth(), monday.getDate() + 3), firstDayOfWeek))
 }
 
 /**
@@ -1908,6 +1963,36 @@ export const isPeriodInRange = (date: Date, view: PeriodViewTypes, start: Date |
  */
 export const isPeriodSelected = (date: Date, view: PeriodViewTypes, start: Date | null, end: Date | null) : boolean =>
   [start, end].some(value => value !== null && getPeriod(value, view) === getPeriod(date, view))
+
+/**
+ * Tells whether the ISO week of a date holds the start or the end of a
+ * selection.
+ *
+ * @param date - A day of the week
+ * @param start - The selected start
+ * @param end - The selected end
+ * @returns `true` when either end falls in the week
+ */
+export const isWeekSelected = (date: Date, start: Date | null, end: Date | null) : boolean =>
+  [start, end].some(value => value !== null && getWeekTime(value) === getWeekTime(date))
+
+/**
+ * Tells whether the ISO week of a date lies between the weeks of two dates,
+ * both included.
+ *
+ * @param date - A day of the week
+ * @param start - The start of the range
+ * @param end - The end of the range
+ * @returns `true` for a week in the range, and `false` while either end is missing
+ */
+export const isWeekInRange = (date: Date, start: Date | null, end: Date | null) : boolean => {
+  if (!start || !end) {
+    return false
+  }
+
+  const week = getWeekTime(date)
+  return getWeekTime(start) <= week && week <= getWeekTime(end)
+}
 
 /**
  * Tells whether two dates are the same moment, down to the millisecond.

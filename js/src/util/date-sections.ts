@@ -953,7 +953,8 @@ export const constrainDateTime = (date: Date, minDate: Date | null, maxDate: Dat
  * Names the limit a date a field holds breaks. The bounds are compared at the
  * field's precision: to the smallest unit the field shows when it has a time,
  * where a latest date without a time of day covers its whole day, by the day
- * when it has none, by the whole period when it picks months, quarters or years.
+ * when it has none, by the whole period when it picks weeks, months, quarters
+ * or years.
  *
  * @param layout - The sections and literals of the field
  * @param date - The date the field holds
@@ -965,7 +966,8 @@ export const constrainDateTime = (date: Date, minDate: Date | null, maxDate: Dat
 export const getDateLimitError = (layout: DateSection[], date: Date, minDate: Date | null, maxDate: Date | null, disabledDates?: DisabledDate | DisabledDate[]): DateLimitError => {
   const period = getLayoutPeriod(layout)
   const timed = layout.some(section => section.type === 'hour')
-  const min = period || timed ? getDateWithin(layout, minDate) : minDate && removeTimeFromDate(minDate)
+  const weeks = layout.some(section => section.type === 'week')
+  const min = period || timed || weeks ? getDateWithin(layout, minDate) : minDate && removeTimeFromDate(minDate)
   const max = timed ? getInclusiveMax(maxDate) : maxDate
 
   if (min && date < min) {
@@ -976,7 +978,7 @@ export const getDateLimitError = (layout: DateSection[], date: Date, minDate: Da
     return 'maxDate'
   }
 
-  if (isCellDisabled(date, period ?? 'days', minDate, maxDate, disabledDates)) {
+  if (isCellDisabled(date, period ?? 'days', weeks ? min : minDate, maxDate, disabledDates)) {
     return 'disabledDate'
   }
 

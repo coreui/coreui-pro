@@ -5,6 +5,7 @@ import {
   constrainDate,
   convertIsoWeekToDate,
   convertToDateObject,
+  convertToLimitDate,
   createDateFormatter,
   createDateTimeFormat,
   createDate,
@@ -25,7 +26,9 @@ import {
   getStartOfView,
   getStartOfWeek,
   getTabStop,
+  getWeekDate,
   getWeekNumberName,
+  getWeekRowDate,
   getYears,
   getMonthDetails,
   isCellDisabled,
@@ -40,6 +43,8 @@ import {
   isSameInstantAs,
   isSameDateAs,
   isToday,
+  isWeekInRange,
+  isWeekSelected,
   isYearBeforeMonth,
   parseToDateString,
   parseYearSmart,
@@ -209,6 +214,20 @@ describe('Calendar Utilities', () => {
       expect(result.getFullYear()).toBe(2025)
       expect(result.getMonth()).toBe(0) // January
       expect(result.getDate()).toBe(1)
+    })
+  })
+
+  describe('convertToLimitDate', () => {
+    it('should move a limit of a week selection to the day that stands for its week', () => {
+      expect(convertToLimitDate('2026W36', 'week', 2)).toEqual(new Date(2026, 8, 1))
+      expect(convertToLimitDate(new Date(2026, 8, 6), 'week', 0)).toEqual(new Date(2026, 7, 31))
+      expect(convertToLimitDate('2026W36', 'week', 1)).toEqual(new Date(2026, 7, 31))
+    })
+
+    it('should read a limit of any other selection as convertToDateObject does', () => {
+      expect(convertToLimitDate(new Date(2026, 8, 6), 'day', 2)).toEqual(new Date(2026, 8, 6))
+      expect(convertToLimitDate('2026-09', 'month', 2)).toEqual(new Date(2026, 8, 1))
+      expect(convertToLimitDate(null, 'week', 2)).toBeNull()
     })
   })
 
@@ -573,6 +592,17 @@ describe('Calendar Utilities', () => {
 
       expect(days.at(-1).date).toEqual(createDate(0, 1, 29))
     })
+
+    it('should number each week row by the ISO week that holds most of its days', () => {
+      for (const firstDayOfWeek of [0, 1, 2, 3, 4, 5, 6]) {
+        const row = getMonthDetails(2026, 8, firstDayOfWeek).find(({ days }) => days.some(({ date }) => date.getTime() === new Date(2026, 8, 3).getTime()))
+
+        expect(row.week).toEqual({ number: 36, year: 2026 })
+      }
+
+      expect(getMonthDetails(2026, 0, 4)[0].week).toEqual({ number: 1, year: 2026 })
+      expect(getMonthDetails(2026, 0, 0)[0].week).toEqual({ number: 1, year: 2026 })
+    })
   })
 
   describe('getTabStop', () => {
@@ -788,6 +818,45 @@ describe('Calendar Utilities', () => {
 
       getStartOfWeek(date, 1)
       expect(date).toEqual(new Date(2026, 6, 2, 10))
+    })
+  })
+
+  describe('getWeekRowDate', () => {
+    it('should give a row its first day in the ISO week that holds most of its days', () => {
+      expect(getWeekRowDate(new Date(2026, 7, 31))).toEqual(new Date(2026, 7, 31))
+      expect(getWeekRowDate(new Date(2026, 8, 1))).toEqual(new Date(2026, 8, 1))
+      expect(getWeekRowDate(new Date(2026, 8, 2))).toEqual(new Date(2026, 8, 2))
+      expect(getWeekRowDate(new Date(2026, 8, 3))).toEqual(new Date(2026, 8, 3))
+      expect(getWeekRowDate(new Date(2026, 7, 28))).toEqual(new Date(2026, 7, 31))
+      expect(getWeekRowDate(new Date(2026, 7, 29))).toEqual(new Date(2026, 7, 31))
+      expect(getWeekRowDate(new Date(2026, 7, 30))).toEqual(new Date(2026, 7, 31))
+    })
+
+    it('should give a row below year 100 a day in that year', () => {
+      expect(getWeekRowDate(createDate(25, 11, 28))).toEqual(createDate(25, 11, 29))
+    })
+  })
+
+  describe('getWeekDate', () => {
+    it('should give every day of an ISO week the day that stands for its row', () => {
+      const rowDates = [new Date(2026, 7, 31), new Date(2026, 7, 31), new Date(2026, 8, 1), new Date(2026, 8, 2), new Date(2026, 8, 3), new Date(2026, 7, 31), new Date(2026, 7, 31)]
+
+      for (const [firstDayOfWeek, rowDate] of rowDates.entries()) {
+        for (let day = 31; day <= 37; day++) {
+          expect(getWeekDate(new Date(2026, 7, day, 10), firstDayOfWeek)).toEqual(rowDate)
+        }
+      }
+    })
+
+    it('should keep the day that stands for a row on any first day of the week', () => {
+      for (const firstDayOfWeek of [0, 1, 2, 3, 4, 5, 6]) {
+        for (const { days, week } of getMonthDetails(2026, 11, firstDayOfWeek)) {
+          const rowDate = getWeekRowDate(days[0].date)
+
+          expect(getWeekDate(rowDate, firstDayOfWeek)).toEqual(rowDate)
+          expect(getISOWeekNumberAndYear(rowDate)).toEqual({ weekNumber: week.number, year: week.year })
+        }
+      }
     })
   })
 
@@ -1699,6 +1768,37 @@ describe('Calendar Utilities', () => {
       const start = new Date(2022, 0, 1)
       const end = new Date(2024, 0, 1)
       expect(isPeriodInRange(date, 'years', start, end)).toBeFalse()
+    })
+  })
+
+  describe('isWeekSelected', () => {
+    it('should tell whether the ISO week of a date holds the start or the end', () => {
+      expect(isWeekSelected(new Date(2026, 8, 1), new Date(2026, 8, 6, 10), null)).toBeTrue()
+      expect(isWeekSelected(new Date(2026, 8, 1), null, new Date(2026, 7, 31))).toBeTrue()
+      expect(isWeekSelected(new Date(2026, 8, 1), new Date(2026, 7, 30), new Date(2026, 8, 7))).toBeFalse()
+      expect(isWeekSelected(new Date(2026, 8, 1), null, null)).toBeFalse()
+    })
+
+    it('should tell weeks below year 100 apart', () => {
+      expect(isWeekSelected(createDate(26, 0, 7), createDate(26, 0, 5), null)).toBeTrue()
+      expect(isWeekSelected(createDate(26, 0, 7), createDate(26, 0, 4), null)).toBeFalse()
+    })
+  })
+
+  describe('isWeekInRange', () => {
+    it('should include the ISO weeks of both ends', () => {
+      const start = new Date(2026, 8, 6)
+      const end = new Date(2026, 8, 14, 10)
+
+      expect(isWeekInRange(new Date(2026, 7, 31), start, end)).toBeTrue()
+      expect(isWeekInRange(new Date(2026, 8, 20), start, end)).toBeTrue()
+      expect(isWeekInRange(new Date(2026, 7, 30), start, end)).toBeFalse()
+      expect(isWeekInRange(new Date(2026, 8, 21), start, end)).toBeFalse()
+    })
+
+    it('should be false while either end is missing', () => {
+      expect(isWeekInRange(new Date(2026, 8, 1), new Date(2026, 8, 1), null)).toBeFalse()
+      expect(isWeekInRange(new Date(2026, 8, 1), null, new Date(2026, 8, 1))).toBeFalse()
     })
   })
 

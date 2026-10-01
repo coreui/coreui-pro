@@ -35,6 +35,8 @@ Select specific days using the Bootstrap Calendar component. The example below s
 
 Set the `data-coreui-selection-type` to `week` to enable selection of entire week. You can also use `data-coreui-show-week-number="true"` to show week numbers.
 
+Weeks are ISO 8601 weeks, which run from Monday to Sunday. When `firstDayOfWeek` starts the rows on another day, each row spans two of them and stands for the one that holds most of its days: with Sunday first, the row from August 30 to September 5, 2026 is week 36 and picks `2026W36`. The picked date is the row's first day in that week, and a week given as `startDate`, `endDate`, `minDate` or `maxDate`, as a string or as any date inside it, selects or limits the row that holds most of it.
+
 <Example pro code={`<div class="d-flex justify-content-center">
     <div
       class="border rounded"
@@ -379,8 +381,8 @@ Note that for security reasons the `sanitize`, `sanitizeFn`, and `allowList` opt
 | `endDate` | date, number, string, null | `null` | Initial selected to date (range). |
 | `firstDayOfWeek` | number | `1` | <p>Sets the day of start week.</p>  <ul><li>`0` - Sunday</li><li>`1` - Monday</li><li>`2` - Tuesday</li><li>`3` - Wednesday</li><li>`4` - Thursday</li><li>`5` - Friday</li><li>`6` - Saturday</li></ul> |
 | `locale` | string | `'default'` | Sets the default locale for components. If not set, it is inherited from the navigator.language. |
-| `maxDate` | date, number, string, null | `null` | Max selectable date. The days after its day are disabled, and a time of day it carries leaves its own day selectable. |
-| `minDate` | date, number, string, null | `null` | Min selectable date. The days before its day are disabled, and a time of day it carries leaves its own day selectable. |
+| `maxDate` | date, number, string, null | `null` | Max selectable date. The days after its day are disabled, and a time of day it carries leaves its own day selectable. In week selection its whole week stays selectable. |
+| `minDate` | date, number, string, null | `null` | Min selectable date. The days before its day are disabled, and a time of day it carries leaves its own day selectable. In week selection its whole week stays selectable. |
 | `monthFormat` | `'long'`, `'narrow'`, `'short'`, `'numeric'`, `'2-digit'` | `'short'` | Sets the format for month names. Accepts built-in formats (`'long'`, `'narrow'`, `'short'`, `'numeric'`, `'2-digit'`). |
 | `navNextDoubleIcon` | string | double chevron SVG | Inline SVG of the button that turns the calendar forward by a year, or by a page of years in the years view (sanitized). In right-to-left it shows on the backward button. |
 | `navNextIcon` | string | chevron SVG | Inline SVG of the button that turns the calendar forward by a month (sanitized). In right-to-left it shows on the backward button. |
