@@ -48,12 +48,23 @@ $form-range-tokens: defaults(
 );
 // scss-docs-end form-range-tokens
 
+$form-range-vertical-tokens: () !default;
+
+// scss-docs-start form-range-vertical-tokens
+$form-range-vertical-tokens: defaults(
+  (
+    --#{$prefix}range-vertical-height: 10rem,
+  ),
+  $form-range-vertical-tokens
+);
+// scss-docs-end form-range-vertical-tokens
+
 // stylelint-enable scss/dollar-variable-default
 
 // scss-docs-start form-range-mixins
 @mixin form-range-thumb() {
-  width: var(--#{$prefix}range-thumb-width);
-  height: var(--#{$prefix}range-thumb-height);
+  inline-size: var(--#{$prefix}range-thumb-width);
+  block-size: var(--#{$prefix}range-thumb-height);
   appearance: none;
   @include gradient-bg(var(--#{$prefix}theme-bg, var(--#{$prefix}range-thumb-bg)));
   border: var(--#{$prefix}range-thumb-border);
@@ -71,19 +82,20 @@ $form-range-tokens: defaults(
 }
 
 @mixin form-range-track() {
-  // Fill (progress) up to the thumb. The Range plugin keeps `--cui-range-fill` (0–1) in sync; without it
-  // the edge is invalid and the gradient falls back to an empty track. The thumb travels between half
-  // its width from either end, so the edge follows the same path.
+  // The Range plugin keeps `--cui-range-fill-start` and `--cui-range-fill` (0–1) in sync; unset, the band is empty.
+  --#{$prefix}range-fill-start-edge: calc(var(--#{$prefix}range-thumb-width) * .5 + var(--#{$prefix}range-fill-start) * (100% - var(--#{$prefix}range-thumb-width)));
   --#{$prefix}range-fill-edge: calc(var(--#{$prefix}range-thumb-width) * .5 + var(--#{$prefix}range-fill) * (100% - var(--#{$prefix}range-thumb-width)));
 
-  width: var(--#{$prefix}range-track-width);
-  height: var(--#{$prefix}range-track-height);
+  inline-size: var(--#{$prefix}range-track-width);
+  block-size: var(--#{$prefix}range-track-height);
   color: transparent;
   cursor: var(--#{$prefix}range-track-cursor);
   background-color: var(--#{$prefix}range-track-bg);
   background-image:
     linear-gradient(
       var(--#{$prefix}range-track-direction, to right),
+      transparent var(--#{$prefix}range-fill-start-edge, 0),
+      color-mix(in oklch, var(--#{$prefix}theme-bg, var(--#{$prefix}range-track-fill-bg)) 50%, transparent) var(--#{$prefix}range-fill-start-edge, 0),
       color-mix(in oklch, var(--#{$prefix}theme-bg, var(--#{$prefix}range-track-fill-bg)) 50%, transparent) var(--#{$prefix}range-fill-edge, 0),
       transparent var(--#{$prefix}range-fill-edge, 0)
     );
@@ -100,9 +112,55 @@ $form-range-tokens: defaults(
     position: relative;
     display: block;
     width: 100%;
+  }
 
+  .form-range:not(.form-range-vertical) {
     @include rtl() {
       --#{$prefix}range-track-direction: to left;
+    }
+  }
+
+  .form-range-vertical {
+    @include tokens($form-range-vertical-tokens);
+
+    --#{$prefix}range-track-direction: to top;
+
+    display: flex;
+    width: fit-content;
+    height: var(--#{$prefix}range-vertical-height);
+
+    > .form-range-ticks {
+      flex-shrink: 0;
+      padding-block: calc(var(--#{$prefix}range-thumb-width) * .5);
+      padding-inline: 0;
+    }
+
+    .form-range-tick {
+      flex-direction: row;
+      align-self: start;
+      justify-self: auto;
+      width: auto;
+      height: 0;
+
+      &::before {
+        width: var(--#{$prefix}range-tick-minor-height);
+        height: var(--#{$prefix}range-tick-width);
+      }
+
+      &:has(> .form-range-tick-label)::before {
+        width: var(--#{$prefix}range-tick-height);
+        height: var(--#{$prefix}range-tick-width);
+      }
+    }
+
+    .form-range-tick-label {
+      margin-inline-start: var(--#{$prefix}range-tick-label-margin-top);
+      margin-top: 0;
+    }
+
+    .form-range-ticks-clickable .form-range-tick::after {
+      inset-block: calc(var(--#{$prefix}range-thumb-width) * -.5);
+      inset-inline: 0;
     }
   }
 
@@ -110,8 +168,8 @@ $form-range-tokens: defaults(
   .form-range-input,
   input.form-range {
     display: block;
-    width: 100%;
-    height: calc(var(--#{$prefix}range-thumb-height) + var(--#{$prefix}range-thumb-focus-ring-width) * 2);
+    inline-size: 100%;
+    block-size: calc(var(--#{$prefix}range-thumb-height) + var(--#{$prefix}range-thumb-focus-ring-width) * 2);
     padding: 0; // Need to reset padding
     appearance: none;
     background-color: transparent;
@@ -137,7 +195,7 @@ $form-range-tokens: defaults(
     }
 
     &::-webkit-slider-thumb {
-      margin-top: calc((var(--#{$prefix}range-track-height) - var(--#{$prefix}range-thumb-height)) * .5);
+      margin-block-start: calc((var(--#{$prefix}range-track-height) - var(--#{$prefix}range-thumb-height)) * .5);
       @include form-range-thumb();
     }
 
@@ -175,33 +233,108 @@ $form-range-tokens: defaults(
   }
   // stylelint-enable selector-no-qualifying-type
 
+  .form-range-vertical > .form-range-input {
+    writing-mode: vertical-lr;
+    direction: rtl;
+  }
+
+  .form-range:has(> .form-range-input ~ .form-range-input) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    touch-action: pan-y;
+    cursor: var(--#{$prefix}range-track-cursor);
+
+    &:not(:has(> .form-range-input:enabled)) {
+      cursor: auto;
+    }
+
+    > .form-range-input {
+      grid-area: 1 / 1;
+      pointer-events: none;
+
+      &:not(:disabled) {
+        &::-webkit-slider-thumb { pointer-events: auto; }
+        &::-moz-range-thumb     { pointer-events: auto; }
+      }
+    }
+
+    > .form-range-input ~ .form-range-input {
+      &::-webkit-slider-runnable-track {
+        background: none;
+        @include box-shadow(none);
+      }
+
+      &::-moz-range-track {
+        background: none;
+        @include box-shadow(none);
+      }
+    }
+  }
+
+  .form-range-vertical:has(> .form-range-input ~ .form-range-input) {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    touch-action: pan-x;
+  }
+
   // Value tooltip: reuses the tooltip styles (`.tooltip` markup) so we don't duplicate the
   // pill and arrow. We only add the static positioning the Tooltip plugin would normally do.
   .form-range-tooltip {
     @include theme-reset();
 
     position: absolute;
-    inset-inline-start: calc((var(--#{$prefix}range-thumb-width) * .5) + var(--#{$prefix}range-fill, 0) * (100% - var(--#{$prefix}range-thumb-width)));
-    bottom: 100%;
-    margin-bottom: var(--#{$prefix}tooltip-arrow-height);
     pointer-events: none;
-    @include ltr-rtl("transform", translateX(-50%), null, translateX(50%));
 
     .tooltip-arrow {
       position: absolute;
+    }
+  }
+
+  .form-range-tooltip.bs-tooltip-top {
+    inset-inline-start: calc((var(--#{$prefix}range-thumb-width) * .5) + var(--#{$prefix}range-fill, 0) * (100% - var(--#{$prefix}range-thumb-width)));
+    bottom: 100%;
+    margin-bottom: var(--#{$prefix}tooltip-arrow-height);
+    @include ltr-rtl("transform", translateX(-50%), null, translateX(50%));
+
+    .tooltip-arrow {
       bottom: calc(-1 * var(--#{$prefix}tooltip-arrow-height));
       left: 50%;
       transform: translateX(-50%);
     }
   }
 
-  // Tick marks generated from the linked <datalist>. Plugin builds `grid-template-columns`
-  // from the gaps between values so each tick lands on a grid line (handles uneven values).
-  // The grid is inset by half the thumb, so the first and last tick sit under the thumb's
-  // centre at min and max.
+  .form-range-tooltip:is(.bs-tooltip-start, .bs-tooltip-end) {
+    inset-inline-end: 100%;
+    bottom: calc((var(--#{$prefix}range-thumb-width) * .5) + var(--#{$prefix}range-fill, 0) * (100% - var(--#{$prefix}range-thumb-width)));
+    margin-inline-end: var(--#{$prefix}tooltip-arrow-height);
+    transform: translateY(50%);
+
+    .tooltip-arrow {
+      top: 50%;
+      transform: translateY(-50%);
+    }
+  }
+
+  // Tick marks generated from the linked <datalist> or the `ticks` option. Plugin builds
+  // `grid-template-columns` from the gaps between values so each tick lands on a grid line
+  // (handles uneven values). The grid is inset by half the thumb, so the first and last tick
+  // sit under the thumb's centre at min and max.
   .form-range-ticks {
     display: grid;
     padding-inline: calc(var(--#{$prefix}range-thumb-width) * .5);
+    cursor: auto;
+  }
+
+  .form-range-ticks-clickable .form-range-tick {
+    position: relative;
+    cursor: pointer;
+
+    &::after {
+      position: absolute;
+      inset-block: 0;
+      inset-inline: calc(var(--#{$prefix}range-thumb-width) * -.5);
+      content: "";
+    }
   }
 
   .form-range-tick {
@@ -223,6 +356,14 @@ $form-range-tokens: defaults(
     &:has(> .form-range-tick-label)::before {
       height: var(--#{$prefix}range-tick-height);
     }
+  }
+
+  .form-range:not(.form-range-vertical) .form-range-tick-start > .form-range-tick-label {
+    align-self: flex-start;
+  }
+
+  .form-range:not(.form-range-vertical) .form-range-tick-end > .form-range-tick-label {
+    align-self: flex-end;
   }
 
   .form-range-tick-label {
