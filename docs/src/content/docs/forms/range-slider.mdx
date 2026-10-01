@@ -38,12 +38,12 @@ Create a simple range slider with default settings.
 
 ## With form field
 
-Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label and description, and to get validation feedback in the right place.
+Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label and description, and to get validation feedback in the right place. With several handles, give the slider's element `role="group"` and point `aria-labelledby` at the label, so the label names the group of handles; `aria-describedby` on it describes the group. A single handle takes its name from `ariaLabel` instead (see [Accessibility](#accessibility)).
 
 <Example pro code={`<div class="form-field">
-    <span class="form-label">Budget</span>
-    <div data-coreui-range-slider data-coreui-name="budgetMin, budgetMax" data-coreui-value="25, 75" data-coreui-aria-label='["Minimum budget", "Maximum budget"]'></div>
-    <div class="form-text">Monthly spend, in thousands.</div>
+    <span class="form-label" id="budgetLabel">Budget</span>
+    <div role="group" aria-labelledby="budgetLabel" aria-describedby="budgetHelp" data-coreui-range-slider data-coreui-name="budgetMin, budgetMax" data-coreui-value="25, 75" data-coreui-aria-label='["Minimum budget", "Maximum budget"]'></div>
+    <div class="form-text" id="budgetHelp">Monthly spend, in thousands.</div>
   </div>`} />
 
 ## Multiple handles

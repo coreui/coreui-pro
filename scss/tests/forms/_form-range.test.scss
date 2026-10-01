@@ -4,6 +4,7 @@
 
 @include describe("form-range") {
   @include it("tokens: the fill, disabled fill and tick keys are declared next to the track and thumb") {
+    @include assert-true(map.has-key($form-range-tokens, --cui-range-thumb-bg));
     @include assert-true(map.has-key($form-range-tokens, --cui-range-track-fill-bg));
     @include assert-true(map.has-key($form-range-tokens, --cui-range-track-disabled-bg));
     @include assert-true(map.has-key($form-range-tokens, --cui-range-tick-width));

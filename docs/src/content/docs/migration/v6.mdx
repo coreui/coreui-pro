@@ -1981,7 +1981,8 @@ field behind that kept submitting.
   per-tick `.clickable` → `.form-range-ticks-clickable` on the container.
   `.range-slider-inputs-container` and `.range-slider-track` are gone (the
   first input draws the track), and so is the `.disabled` class on the element
-  (the inputs are disabled). The handles no longer carry `role="slider"`,
+  (the inputs are disabled); the stylesheet styles none of the
+  `.range-slider-*` classes any more. The handles no longer carry `role="slider"`,
   `aria-valuemin`, `aria-valuemax` or `aria-valuenow`: the native inputs expose
   them. Options, events and methods keep their names, apart from `ariaLabels`
   (below); the `changed.coreui.range` event that an inner Range fired on each
@@ -2015,9 +2016,10 @@ field behind that kept submitting.
   `--cui-range-track-fill-bg`, `--cui-range-slider-disabled-track-in-range-bg`
   → `--cui-range-track-disabled-bg`. The Sass variables follow
   (`$range-slider-thumb-*`, `$range-slider-track-*` → `$form-range-*`).
-  `--cui-range-slider-tick-label-*`, `--cui-range-slider-tooltip-margin-*`
-  and `--cui-range-slider-vertical-*` no longer reach the slider either: tick
-  labels read `--cui-range-tick-label-color` and `-font-size`, the tooltips
+  `--cui-range-slider-label-*`, `--cui-range-slider-tooltip-margin-*`
+  and `--cui-range-slider-vertical-*` are gone too, with their Sass variables
+  (`$range-slider-label-*`, `$range-slider-tooltip-margin-*`,
+  `$range-slider-vertical-track-*`): tick labels read `--cui-range-tick-label-color` and `-font-size`, the tooltips
   sit like the range's, a vertical slider's height is
   `--cui-range-vertical-height` and its track width `--cui-range-track-height`;
   the tick label padding has no counterpart. The filled band keeps its half-strength mix of the theme colour, now
