@@ -138,6 +138,7 @@ describe('Range', () => {
       const range = new Range(rangeEl)
 
       expect(range._inputs).toEqual([])
+      expect(() => range.dispose()).not.toThrow()
     })
 
     it('should read the tooltips option from a bare data attribute', () => {
@@ -582,6 +583,14 @@ describe('Range', () => {
       const ticks = fixtureEl.querySelectorAll('.form-range-tick')
       expect([...ticks].map(tick => tick.dataset.coreuiValue)).toEqual(['0', '50', '100'])
       expect([...ticks].map(tick => tick.textContent)).toEqual(['Low', 'Mid', 'High'])
+    })
+
+    it('should read a numeric ticks attribute as a single label', () => {
+      fixtureEl.innerHTML = getRangeHtml('data-coreui-ticks="100"')
+
+      new Range(fixtureEl.querySelector('.form-range')) // eslint-disable-line no-new
+
+      expect(fixtureEl.querySelector('.form-range-tick').textContent).toEqual('100')
     })
 
     it('should mark the ticks at the ends of the track', () => {

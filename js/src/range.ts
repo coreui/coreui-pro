@@ -141,11 +141,6 @@ class Range extends BaseComponent {
     }
 
     this._inputs = SelectorEngine.children(this._element, SELECTOR_INPUT) as HTMLInputElement[]
-
-    if (this._inputs.length === 0) {
-      return
-    }
-
     this._forms = [...new Set(this._inputs.map(input => input.form).filter(Boolean))] as HTMLFormElement[]
     this._press = null
     this._resetTimeout = null
@@ -166,6 +161,10 @@ class Range extends BaseComponent {
     this._onReset = () => {
       clearTimeout(this._resetTimeout!)
       this._resetTimeout = setTimeout(() => this._update())
+    }
+
+    if (this._inputs.length === 0) {
+      return
     }
 
     if (this._config.tooltips) {
@@ -233,6 +232,10 @@ class Range extends BaseComponent {
     // A bare `data-coreui-tooltips` attribute normalizes to `null`; treat it as enabled
     if (config.tooltips === null) {
       config.tooltips = true
+    }
+
+    if (typeof config.ticks === 'number') {
+      config.ticks = String(config.ticks)
     }
 
     if (typeof config.ticks === 'string') {
@@ -378,7 +381,6 @@ class Range extends BaseComponent {
 
     if (Array.isArray(ticks)) {
       for (const [index, tick] of ticks.entries()) {
-        // A bare number is a tick without text at that value; strings and value-less objects spread evenly
         const value = typeof tick === 'number' ?
           tick :
           (typeof tick === 'object' && tick.value !== undefined ?

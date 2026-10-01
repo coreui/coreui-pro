@@ -130,7 +130,7 @@ $form-range-vertical-tokens: defaults(
 
     > .form-range-ticks {
       flex-shrink: 0;
-      padding-block: calc(var(--#{$prefix}range-thumb-height) * .5);
+      padding-block: calc(var(--#{$prefix}range-thumb-width) * .5);
       padding-inline: 0;
     }
 
@@ -295,7 +295,7 @@ $form-range-vertical-tokens: defaults(
 
   .form-range-tooltip.bs-tooltip-start {
     inset-inline-end: 100%;
-    bottom: calc((var(--#{$prefix}range-thumb-height) * .5) + var(--#{$prefix}range-fill, 0) * (100% - var(--#{$prefix}range-thumb-height)));
+    bottom: calc((var(--#{$prefix}range-thumb-width) * .5) + var(--#{$prefix}range-fill, 0) * (100% - var(--#{$prefix}range-thumb-width)));
     margin-inline-end: var(--#{$prefix}tooltip-arrow-height);
     transform: translateY(50%);
 
