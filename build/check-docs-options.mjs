@@ -24,10 +24,6 @@ const pages = {
 }
 
 const pending = {
-  calendar: {
-    keys: ['selectEndDate'],
-    reason: 'date and time family docs, plans/v6-date-time-closeout.md K9'
-  },
   'date-range-input': {
     keys: ['ariaHourLabel', 'ariaMeridiemLabel', 'ariaMinuteLabel', 'ariaSecondLabel', 'hourPlaceholder', 'meridiemPlaceholder', 'minutePlaceholder', 'secondPlaceholder'],
     reason: 'date and time family docs, plans/v6-date-time-closeout.md K9'
