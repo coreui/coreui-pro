@@ -14,7 +14,7 @@ import rangeSliderCustomTooltips from './snippets/range-slider-custom-tooltips.j
 
 ## Overview
 
-The **Bootstrap 6 Range Slider** component allows users to select a value or range of values within a predefined range. Unlike the standard `<input type="range" />`, the Range Slider offers enhanced customization options, including multiple handles, ticks, tooltips, and vertical orientation. It ensures consistent styling across browsers and provides a rich set of features for advanced use cases.
+The **Bootstrap 6 Range Slider** component allows users to select a value or range of values within a predefined range. It builds the markup of the [range](/forms/range/) from its options: a `<div class="form-range">` inside the element, with one native `.form-range-input` per handle, handed to the Range plugin. So it looks and behaves exactly like a range with several thumbs, and its options are one place to configure the handles, ticks, tooltips and orientation.
 
 <Example pro code={`<div data-coreui-range-slider
        data-coreui-value="25,75"
@@ -58,7 +58,7 @@ Enable multiple handles to allow the selection of a range or/and multiple values
 
 Rotate the slider to a vertical orientation.
 
-<Example pro code={`<div class="d-flex">
+<Example pro code={`<div class="d-flex ps-5">
     <div class="me-3" data-coreui-range-slider data-coreui-value="20" data-coreui-vertical="true"></div>
     <div class="me-3" data-coreui-range-slider data-coreui-value="20,80" data-coreui-vertical="true"></div>
     <div data-coreui-range-slider data-coreui-value="20,80,100" data-coreui-vertical="true"></div>
@@ -124,13 +124,13 @@ Point the `list` option at the `id` of a `<datalist>` and every `<option>` becom
 
 ### Clickable ticks
 
-By default, users can click on ticks to set the slider to specific values. You can disable this feature by setting `clickableTicks` to `false`.
+By default, a press on a tick moves the nearest handle to its value, and the handle follows the pointer until it is released. You can disable this feature by setting `clickableTicks` to `false`.
 
 <Example pro code={`<div data-coreui-range-slider data-coreui-clickable-ticks="false" data-coreui-value="20,80" data-coreui-ticks="Low,Medium,High"></div>`} />
 
 ## Tooltips
 
-The value tooltip is the [Tooltip](/components/tooltips/) component's markup: the plugin renders `<output class="range-slider-tooltip tooltip bs-tooltip-top">` with `.tooltip-arrow` and `.tooltip-inner`, so it takes the tooltip's look and its `--cui-tooltip-*` tokens. It does not inherit the slider's theme class; give it its own through `tooltipClass`.
+The value tooltip is the [Tooltip](/components/tooltips/) component's markup: the plugin renders `<div class="form-range-tooltip tooltip bs-tooltip-top">` (`bs-tooltip-start` when vertical, `bs-tooltip-end` in a right-to-left page) with `.tooltip-arrow` and `.tooltip-inner`, so it takes the tooltip's look and its `--cui-tooltip-*` tokens. It does not inherit the slider's theme class; give it its own through `tooltipClass`.
 
 By default, tooltips show the current value of a handle while the pointer is over it, while it is held, and while it has a visible focus. Set `tooltips` to `"always"` to keep them visible at all times, or to `false` to turn them off.
 
@@ -239,17 +239,17 @@ Please note that for security reasons, the `sanitize`, `sanitizeFn`, and `allowL
 
 | Method | Description |
 | --- | --- |
-| `dispose` | Destroys a component. (Removes stored data on the DOM element) |
+| `dispose` | Destroys the instance and removes the range it built; content the page put in the element stays. |
 | `getInstance` | Static method which allows you to get the Range Slider instance associated to a DOM element, you can use it like this: `coreui.RangeSlider.getInstance(element)` |
 | `getOrCreateInstance` | Static method which returns a Range Slider instance associated to a DOM element or create a new one in case it wasn't initialized. You can use it like this: `coreui.RangeSlider.getOrCreateInstance(element)` |
-| `setConfig` | Merges the given options over the current configuration and re-renders the slider. Options you leave out keep their current value. |
+| `setConfig` | Merges the given options over the current configuration and rebuilds the range. Options you leave out keep their current value, and content the page put in the element stays. |
 
 ### Events
 
 | Event | Description |
 | --- | --- |
-| `change.coreui.range-slider` | Fired when the slider value changes and the user finishes interacting (mouse up). |
-| `input.coreui.range-slider` | Fired continuously while the slider value is being changed during user interaction. |
+| `change.coreui.range-slider` | Fired when a handle's value changes and the user finishes interacting: on release of the pointer, and on every key press. The event's `value` holds the values of all handles as numbers. |
+| `input.coreui.range-slider` | Fired continuously while a handle moves. The event's `value` holds the values of all handles as numbers. |
 
 ```js
 const myRangeSlider = document.getElementById('myRangeSlider')
@@ -260,15 +260,11 @@ myRangeSlider.addEventListener('change.coreui.range-slider', event => {
 
 ## Accessibility
 
-The Range Slider component is built with accessibility in mind. Each slider handle includes the following ARIA attributes:
+Each handle is a native `<input type="range">`, so it is a slider with its value, minimum and maximum without any ARIA of its own, and the browser handles the keyboard: the arrow keys, <kbd>Page Up</kbd>, <kbd>Page Down</kbd>, <kbd>Home</kbd> and <kbd>End</kbd>. In a vertical slider the handles carry `aria-orientation="vertical"`, and <kbd>→</kbd> increases the value in every browser, as <kbd>↑</kbd> does.
 
-- `role="slider"`
-- `aria-valuemin`: Minimum value
-- `aria-valuemax`: Maximum value
-- `aria-valuenow`: Current value
-- `aria-orientation`: horizontal or vertical
+Name each handle with `ariaLabels`. Without it, two handles are named "Minimum value" and "Maximum value", more handles "Value 1", "Value 2" and so on, and a single handle is left to its page label. A handle's `aria-valuetext` is the text of `tooltipsFormat`, or the label of the tick it sits on.
 
-Tooltips are hidden from assistive technology (`aria-hidden="true"`): they repeat the value the handle already announces through `aria-valuenow`, so exposing them would have screen readers read every change twice.
+Tooltips are hidden from assistive technology (`aria-hidden="true"`): they repeat the value the handle already announces, so exposing them would have screen readers read every change twice. Tick marks are hidden too; their labels reach the handle through `aria-valuetext`.
 
 Additionally, ensure that labels and tooltips are clear and descriptive to provide the best experience for all users.
 
@@ -276,12 +272,10 @@ Additionally, ensure that labels and tooltips are clear and descriptive to provi
 
 ### CSS variables
 
-The track and the handles read the same tokens as the [range](/forms/range/#css-variables), declared on `.range-slider`, so one setting styles both controls; `--cui-range-track-fill-bg` colours the band between the handles and `--cui-range-tick-*` the tick marks under the labels.
+The slider is a [range](/forms/range/#css-variables), so it reads the range's tokens, declared on its `.form-range`: one setting styles both controls. `--cui-range-track-fill-bg` colours the band between the handles and `--cui-range-tick-*` the tick marks and their labels. Set them on the slider element or any ancestor.
 
 <ScssDocs file="scss/forms/_form-range.scss" capture="form-range-tokens" />
 
-The slider adds its own tokens for the labels and the tooltip offsets.
+A vertical slider's height:
 
-<ScssDocs file="scss/_range-slider.scss" capture="range-slider-tokens" />
-
-<ScssDocs file="scss/_range-slider.scss" capture="range-slider-vertical-tokens" />
+<ScssDocs file="scss/forms/_form-range.scss" capture="form-range-vertical-tokens" />

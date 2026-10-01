@@ -1,8 +1,7 @@
-/* eslint-disable no-unused-vars */
-import EventHandler from '../../src/dom/event-handler.js'
+import Range from '../../src/range.js'
 import RangeSlider from '../../src/range-slider.js'
 import {
-  clearFixture, getFixture, jQueryMock
+  clearFixture, createEvent, getFixture, jQueryMock
 } from '../helpers/fixture.js'
 
 describe('RangeSlider', () => {
@@ -16,6 +15,20 @@ describe('RangeSlider', () => {
     clearFixture()
   })
 
+  const mount = (config = {}, attributes = '') => {
+    fixtureEl.innerHTML = `<div id="slider" ${attributes}></div>`
+    const element = fixtureEl.querySelector('#slider')
+
+    return { element, rangeSlider: new RangeSlider(element, config) }
+  }
+
+  const inputsOf = element => [...element.querySelectorAll('.form-range-input')]
+
+  const move = (input, value) => {
+    input.value = String(value)
+    input.dispatchEvent(createEvent('input', { bubbles: true }))
+  }
+
   describe('VERSION', () => {
     it('should return plugin version', () => {
       expect(RangeSlider.VERSION).toEqual(jasmine.any(String))
@@ -23,13 +36,15 @@ describe('RangeSlider', () => {
   })
 
   describe('Default', () => {
-    it('should return plugin default config', () => {
+    it('should return default config', () => {
       expect(RangeSlider.Default).toEqual(jasmine.any(Object))
+      expect(RangeSlider.Default.tooltips).toBeTrue()
+      expect(RangeSlider.Default.clickableTicks).toBeTrue()
     })
   })
 
   describe('DefaultType', () => {
-    it('should return plugin default type config', () => {
+    it('should return default type config', () => {
       expect(RangeSlider.DefaultType).toEqual(jasmine.any(Object))
     })
   })
@@ -46,2010 +61,349 @@ describe('RangeSlider', () => {
     })
   })
 
-  describe('direction', () => {
-    it('should measure a click from the direction of the slider, not of the document', () => {
-      fixtureEl.innerHTML = '<div dir="rtl"><div data-coreui-range-slider></div></div>'
+  describe('constructor', () => {
+    it('should take care of element either passed as a CSS selector or DOM element', () => {
+      fixtureEl.innerHTML = '<div id="slider"></div>'
 
-      const rangeSlider = new RangeSlider(fixtureEl.querySelector('[data-coreui-range-slider]'))
-      const rect = { left: 0, right: 200, width: 200 }
+      const element = fixtureEl.querySelector('#slider')
+      const bySelector = new RangeSlider('#slider')
+      expect(bySelector._element).toEqual(element)
 
-      expect(rangeSlider._calculateHorizontalPosition(150, rect)).toEqual(0.25)
-      expect(rangeSlider._calculateHorizontalPosition(-10, rect)).toEqual('max')
+      bySelector.dispose()
+
+      const byElement = new RangeSlider(element)
+      expect(byElement._element).toEqual(element)
+    })
+
+    it('should build a range with one input per value and hand it to Range', () => {
+      const { element } = mount({
+        max: 200, min: 10, step: 5, value: [20, 150]
+      })
+      const inputs = inputsOf(element)
+
+      const wrapper = element.querySelector(':scope > .form-range')
+      expect(Range.getInstance(wrapper)).toBeInstanceOf(Range)
+      expect(element.className).toEqual('')
+      expect(inputs.map(input => [input.type, input.min, input.max, input.step, input.value])).toEqual([
+        ['range', '10', '200', '5', '20'],
+        ['range', '10', '200', '5', '150']
+      ])
+    })
+
+    it('should write each value as the default value, so a form reset restores it', () => {
+      const { element } = mount({ value: [25, 75] })
+
+      expect(inputsOf(element).map(input => input.getAttribute('value'))).toEqual(['25', '75'])
+    })
+
+    it('should read a single number and a comma-separated string as values', () => {
+      const { element } = mount({ value: 40 })
+      expect(inputsOf(element).map(input => input.value)).toEqual(['40'])
+
+      fixtureEl.innerHTML = '<div id="slider2" data-coreui-value="10, 30, 60"></div>'
+      const other = fixtureEl.querySelector('#slider2')
+      new RangeSlider(other) // eslint-disable-line no-new
+      expect(inputsOf(other).map(input => input.value)).toEqual(['10', '30', '60'])
+    })
+
+    it('should stand up a vertical slider', () => {
+      const { element } = mount({ value: [20, 80], vertical: true })
+
+      expect(element.querySelector('.form-range')).toHaveClass('form-range-vertical')
+      expect(inputsOf(element).map(input => input.getAttribute('aria-orientation'))).toEqual(['vertical', 'vertical'])
+    })
+
+    it('should disable every input', () => {
+      const { element } = mount({ disabled: true, value: [20, 80] })
+
+      expect(inputsOf(element).every(input => input.disabled)).toBeTrue()
+    })
+
+    it('should link every input to the datalist of the list option', () => {
+      fixtureEl.innerHTML = `
+        <div id="slider"></div>
+        <datalist id="stops"><option value="0" label="Low"></option><option value="100" label="High"></option></datalist>
+      `
+      const element = fixtureEl.querySelector('#slider')
+      new RangeSlider(element, { list: 'stops', value: [20, 80] }) // eslint-disable-line no-new
+
+      expect(inputsOf(element).map(input => input.getAttribute('list'))).toEqual(['stops', 'stops'])
+      expect([...element.querySelectorAll('.form-range-tick-label')].map(label => label.textContent)).toEqual(['Low', 'High'])
+    })
+
+    it('should not mark the inputs with what the native slider already exposes', () => {
+      const { element } = mount({ value: [20, 80] })
+
+      for (const input of inputsOf(element)) {
+        expect(input.hasAttribute('role')).toBeFalse()
+        expect(input.hasAttribute('aria-valuenow')).toBeFalse()
+        expect(input.hasAttribute('aria-orientation')).toBeFalse()
+      }
+    })
+  })
+
+  describe('options forwarded to Range', () => {
+    it('should show a tooltip per thumb by default', () => {
+      const { element } = mount({ value: [20, 80] })
+
+      expect(element.querySelectorAll('.form-range-tooltip')).toHaveSize(2)
+    })
+
+    it('should leave the tooltips out with tooltips false and keep them on with always', () => {
+      const { element } = mount({ tooltips: false, value: [20, 80] })
+      expect(element.querySelector('.form-range-tooltip')).toBeNull()
+
+      const { element: always } = mount({ tooltips: 'always', value: [20, 80] })
+      expect([...always.querySelectorAll('.form-range-tooltip')].every(tooltip => tooltip.classList.contains('show'))).toBeTrue()
+    })
+
+    it('should format the tooltips, add tooltipClass and announce the text', () => {
+      const { element } = mount({ tooltipClass: 'theme-danger', tooltipsFormat: value => `${value} km`, value: [20] })
+
+      expect(element.querySelector('.tooltip-inner').textContent).toEqual('20 km')
+      expect(element.querySelector('.form-range-tooltip')).toHaveClass('theme-danger')
+      expect(element.querySelector('.form-range-input').getAttribute('aria-valuetext')).toEqual('20 km')
+    })
+
+    it('should draw ticks from the ticks option, clickable by default', () => {
+      const { element } = mount({ ticks: 'Low, Mid, High', value: [20, 80] })
+
+      expect([...element.querySelectorAll('.form-range-tick-label')].map(label => label.textContent)).toEqual(['Low', 'Mid', 'High'])
+      expect(element.querySelector('.form-range-ticks')).toHaveClass('form-range-ticks-clickable')
+    })
+
+    it('should keep the ticks still with clickableTicks false', () => {
+      const { element } = mount({ clickableTicks: false, ticks: ['Low', 'High'], value: [20, 80] })
+
+      expect(element.querySelector('.form-range-ticks')).not.toHaveClass('form-range-ticks-clickable')
+    })
+
+    it('should keep the thumbs distance apart', () => {
+      const { element } = mount({ distance: 10, value: [20, 80] })
+      const [low, high] = inputsOf(element)
+
+      move(low, 75)
+
+      expect([low.value, high.value]).toEqual(['70', '80'])
+    })
+
+    it('should leave the track empty with track false', () => {
+      const { element } = mount({ track: false, value: [20, 80] })
+
+      expect(element.querySelector('.form-range').style.getPropertyValue('--cui-range-fill')).toEqual('')
     })
   })
 
   describe('value ownership', () => {
-    const move = (element, index, value) => {
-      const input = element.querySelectorAll('.range-slider-input')[index]
-      input.value = String(value)
-      input.dispatchEvent(new Event('input', { bubbles: true }))
-    }
-
     it('should leave the array the page passed alone', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
       const value = [10, 40]
-      const rangeSlider = new RangeSlider(element, { value })
+      const { element } = mount({ value })
 
-      move(element, 0, 30)
+      move(inputsOf(element)[0], 30)
 
       expect(value).toEqual([10, 40])
-
-      rangeSlider.dispose()
-    })
-
-    it('should keep the value a user picked across setConfig', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: [10, 40] })
-
-      move(element, 0, 30)
-      rangeSlider.setConfig({ disabled: false })
-
-      expect([...element.querySelectorAll('.range-slider-input')].map(input => input.value)).toEqual(['30', '40'])
-
-      rangeSlider.dispose()
-    })
-
-    it('should keep two sliders built from one array apart', () => {
-      fixtureEl.innerHTML = '<div id="first"></div><div id="second"></div>'
-      const first = fixtureEl.querySelector('#first')
-      const second = fixtureEl.querySelector('#second')
-      const value = [10, 40]
-      const one = new RangeSlider(first, { value })
-      const other = new RangeSlider(second, { value })
-
-      move(first, 0, 30)
-      other.setConfig({ disabled: false })
-
-      expect([...second.querySelectorAll('.range-slider-input')].map(input => input.value)).toEqual(['10', '40'])
-
-      one.dispose()
-      other.dispose()
-    })
-
-    it('should hand the listener a copy of the value', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: [10, 40] })
-      let payload = null
-
-      element.addEventListener('change.coreui.range-slider', event => {
-        payload = event.value
-      })
-
-      move(element, 0, 30)
-      element.querySelectorAll('.range-slider-input')[0].dispatchEvent(new Event('change', { bubbles: true }))
-
-      expect(payload).not.toBeNull()
-
-      payload[0] = 99
-
-      expect(rangeSlider._currentValue[0]).toBe(30)
-
-      rangeSlider.dispose()
     })
   })
 
-  describe('constructor', () => {
-    it('should initialize with default configuration', () => {
-      fixtureEl.innerHTML = '<div data-coreui-range-slider></div>'
+  describe('names', () => {
+    it('should name each input from an array, in order', () => {
+      const { element } = mount({ name: ['min', 'max'], value: [20, 80] })
 
-      const element = fixtureEl.querySelector('[data-coreui-range-slider]')
-      const rangeSlider = new RangeSlider(element)
-
-      expect(element.classList.contains('range-slider')).toBeTrue()
-
-      const inputs = element.querySelectorAll('.range-slider-input')
-      expect(inputs.length).toBe(1)
-
-      const tooltip = element.querySelector('.range-slider-tooltip')
-      expect(tooltip).not.toBeNull()
+      expect(inputsOf(element).map(input => input.name)).toEqual(['min', 'max'])
     })
 
-    it('should render the tooltip as a hidden <output> of phrasing content', () => {
-      fixtureEl.innerHTML = '<div data-coreui-range-slider></div>'
+    it('should read a comma-separated name attribute as an array', () => {
+      const { element } = mount({}, 'data-coreui-name="min, max" data-coreui-value="20, 80"')
 
-      const element = fixtureEl.querySelector('[data-coreui-range-slider]')
-      const rangeSlider = new RangeSlider(element)
-      const tooltip = element.querySelector('.range-slider-tooltip')
-
-      expect(tooltip.tagName).toBe('OUTPUT')
-      expect(tooltip.getAttribute('aria-hidden')).toBe('true')
-
-      expect([...tooltip.children].map(child => child.tagName)).toEqual(['SPAN', 'SPAN'])
+      expect(inputsOf(element).map(input => input.name)).toEqual(['min', 'max'])
     })
 
-    it('should add tooltipClass to the tooltip only', () => {
-      fixtureEl.innerHTML = '<div data-coreui-range-slider data-coreui-tooltip-class="theme-secondary my-bubble"></div>'
+    it('should number a single name across the inputs', () => {
+      const { element } = mount({ name: 'price', value: [20, 80] })
 
-      const element = fixtureEl.querySelector('[data-coreui-range-slider]')
-      const rangeSlider = new RangeSlider(element)
-      const tooltip = element.querySelector('.range-slider-tooltip')
-
-      expect(tooltip.classList.contains('theme-secondary')).toBeTrue()
-      expect(tooltip.classList.contains('my-bubble')).toBeTrue()
-      expect(element.classList.contains('theme-secondary')).toBeFalse()
+      expect(inputsOf(element).map(input => input.name)).toEqual(['price-0', 'price-1'])
     })
 
-    it('should render the tooltip with the Tooltip markup, placed by orientation', () => {
-      fixtureEl.innerHTML = '<div data-coreui-range-slider data-coreui-value="40"></div><div data-coreui-range-slider data-coreui-vertical="true"></div>'
+    it('should leave the inputs an array does not cover without a name', () => {
+      const { element } = mount({ name: ['min'], value: [20, 50, 80] })
 
-      const [horizontal, vertical] = fixtureEl.querySelectorAll('[data-coreui-range-slider]')
-      const horizontalSlider = new RangeSlider(horizontal)
-      const verticalSlider = new RangeSlider(vertical)
-      const tooltip = horizontal.querySelector('.range-slider-tooltip')
-
-      expect(tooltip.classList.contains('tooltip')).toBeTrue()
-      expect(tooltip.classList.contains('bs-tooltip-top')).toBeTrue()
-      expect([...tooltip.children].map(child => child.className)).toEqual(['tooltip-arrow', 'tooltip-inner'])
-      expect(tooltip.querySelector('.tooltip-inner').textContent).toBe('40')
-      expect(vertical.querySelector('.range-slider-tooltip').classList.contains('bs-tooltip-start')).toBeTrue()
-
-      horizontalSlider.setConfig({ value: 70 })
-      expect(horizontal.querySelector('.tooltip-inner').textContent).toBe('70')
-      verticalSlider.dispose()
+      expect(inputsOf(element).map(input => input.hasAttribute('name'))).toEqual([true, false, false])
     })
 
-    it('should position the tooltip through a custom property, not inline offsets', () => {
-      fixtureEl.innerHTML = '<div data-coreui-range-slider data-coreui-min="0" data-coreui-max="200" data-coreui-value="50"></div>'
+    it('should not name the inputs by default', () => {
+      const { element } = mount({ value: [20, 80] })
 
-      const element = fixtureEl.querySelector('[data-coreui-range-slider]')
-      const rangeSlider = new RangeSlider(element)
-      const tooltip = element.querySelector('.range-slider-tooltip')
-
-      expect(tooltip.style.getPropertyValue('--cui-range-slider-tooltip-position')).toBe('0.25')
-      expect(tooltip.style.insetInlineStart).toBe('')
-      expect(tooltip.style.marginInlineStart).toBe('')
-
-      // `update()` rebuilds the subtree, so the tooltip has to be read again.
-      rangeSlider.setConfig({ value: 150 })
-
-      expect(element.querySelector('.range-slider-tooltip').style.getPropertyValue('--cui-range-slider-tooltip-position')).toBe('0.75')
-    })
-
-    it('should initialize with custom configuration via data attributes', () => {
-      fixtureEl.innerHTML = `
-        <div
-          data-coreui-range-slider
-          data-coreui-min="10"
-          data-coreui-max="50"
-          data-coreui-step="5"
-          data-coreui-value="15,30"
-          data-coreui-vertical="true">
-        </div>
-      `
-
-      const element = fixtureEl.querySelector('[data-coreui-range-slider]')
-      const rangeSlider = new RangeSlider(element)
-
-      expect(element.classList.contains('range-slider-vertical')).toBeTrue()
-
-      const inputs = element.querySelectorAll('.range-slider-input')
-      expect(inputs.length).toBe(2)
-
-      expect(inputs[0].value).toBe('15')
-      expect(inputs[1].value).toBe('30')
-    })
-
-    it('should draw a bare number in ticks as a tick without text', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-
-      const element = fixtureEl.querySelector('#slider')
-      // eslint-disable-next-line no-new
-      new RangeSlider(element, { ticks: [{ value: 0, label: 'Cold' }, 25, { value: 50, label: 'Mild' }] })
-
-      const labels = element.querySelectorAll('.range-slider-tick')
-      expect(labels.length).toBe(3)
-      expect(labels[1].textContent).toBe('')
-      expect(labels[1].dataset.coreuiValue).toBe('25')
-      expect(labels[1].style.gridColumnStart).toBe('3')
-    })
-
-    it('should initialize with custom configuration via JavaScript', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-
-      const element = fixtureEl.querySelector('#slider')
-      const config = {
-        min: 0,
-        max: 200,
-        step: 10,
-        value: [50, 150],
-        ticks: ['Low', 'Medium', 'High'],
-        tooltipsFormat: value => `${value}%`,
-        vertical: false
-      }
-      const rangeSlider = new RangeSlider(element, config)
-
-      const labels = element.querySelectorAll('.range-slider-tick')
-      expect(labels.length).toBe(3)
-      expect(labels[0].textContent).toBe('Low')
-      expect(labels[1].textContent).toBe('Medium')
-      expect(labels[2].textContent).toBe('High')
-
-      const tooltips = element.querySelectorAll('.tooltip-inner')
-      expect(tooltips.length).toBe(2)
-      expect(tooltips[0].textContent).toBe('50%')
-      expect(tooltips[1].textContent).toBe('150%')
-    })
-
-    it('should sanitize tooltip content on the update path', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        tooltips: true,
-        value: 50,
-        tooltipsFormat: () => '<img src=x onerror="window.xss = true">'
-      })
-
-      rangeSlider._updateTooltip(0, 60)
-
-      const inner = element.querySelector('.tooltip-inner')
-      expect(inner.querySelector('img').hasAttribute('onerror')).toBeFalse()
-    })
-
-    it('should initialize with a single numeric value', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: 42 })
-
-      const inputs = element.querySelectorAll('.range-slider-input')
-      expect(inputs.length).toBe(1)
-      expect(inputs[0].value).toBe('42')
-    })
-
-    it('should initialize with a string value (comma separated)', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: '25, 75' })
-
-      const inputs = element.querySelectorAll('.range-slider-input')
-      expect(inputs.length).toBe(2)
-      expect(inputs[0].value).toBe('25')
-      expect(inputs[1].value).toBe('75')
+      expect(inputsOf(element).some(input => input.hasAttribute('name'))).toBeFalse()
     })
   })
 
-  describe('form payload', () => {
-    it('should suffix a string name with the handle index', () => {
-      fixtureEl.innerHTML = '<form id="form"><div class="range-slider"></div></form>'
-      const rangeSliderEl = fixtureEl.querySelector('.range-slider')
-      // eslint-disable-next-line no-new
-      new RangeSlider(rangeSliderEl, { value: [25, 75], name: 'price' })
+  describe('accessible names', () => {
+    it('should take ariaLabels in order', () => {
+      const { element } = mount({ ariaLabels: ['Lowest price', 'Highest price'], value: [20, 80] })
 
-      expect([...new FormData(fixtureEl.querySelector('#form')).entries()])
-        .toEqual([['price-0', '25'], ['price-1', '75']])
+      expect(inputsOf(element).map(input => input.getAttribute('aria-label'))).toEqual(['Lowest price', 'Highest price'])
     })
 
-    it('should map an array of names one to one', () => {
-      fixtureEl.innerHTML = '<form id="form"><div class="range-slider"></div></form>'
-      const rangeSliderEl = fixtureEl.querySelector('.range-slider')
-      // eslint-disable-next-line no-new
-      new RangeSlider(rangeSliderEl, { value: [25, 75], name: ['min', 'max'] })
+    it('should fall back to Minimum and Maximum for two thumbs, and to Value n beyond', () => {
+      const { element } = mount({ value: [20, 80] })
+      expect(inputsOf(element).map(input => input.getAttribute('aria-label'))).toEqual(['Minimum value', 'Maximum value'])
 
-      expect([...new FormData(fixtureEl.querySelector('#form')).entries()])
-        .toEqual([['min', '25'], ['max', '75']])
+      const { element: three } = mount({ value: [20, 50, 80] })
+      expect(inputsOf(three).map(input => input.getAttribute('aria-label'))).toEqual(['Value 1', 'Value 2', 'Value 3'])
     })
 
-    it('should leave a handle unnamed when the array is shorter', () => {
-      fixtureEl.innerHTML = '<form id="form"><div class="range-slider"></div></form>'
-      const rangeSliderEl = fixtureEl.querySelector('.range-slider')
-      // eslint-disable-next-line no-new
-      new RangeSlider(rangeSliderEl, { value: [25, 75], name: ['min'] })
+    it('should leave a single thumb to its page label', () => {
+      const { element } = mount({ value: 40 })
 
-      expect([...new FormData(fixtureEl.querySelector('#form')).entries()]).toEqual([['min', '25']])
-    })
-
-    it('should split a comma-separated name into one per handle', () => {
-      fixtureEl.innerHTML = '<form id="form"><div class="range-slider" data-coreui-name="min, max"></div></form>'
-      const rangeSliderEl = fixtureEl.querySelector('.range-slider')
-      // eslint-disable-next-line no-new
-      new RangeSlider(rangeSliderEl, { value: [25, 75] })
-
-      expect([...new FormData(fixtureEl.querySelector('#form')).entries()])
-        .toEqual([['min', '25'], ['max', '75']])
-    })
-
-    it('should keep a zero in the array as a name', () => {
-      fixtureEl.innerHTML = '<form id="form"><div class="range-slider"></div></form>'
-      const rangeSliderEl = fixtureEl.querySelector('.range-slider')
-      // eslint-disable-next-line no-new
-      new RangeSlider(rangeSliderEl, { value: [25, 75], name: [0, 'max'] })
-
-      expect([...new FormData(fixtureEl.querySelector('#form')).entries()])
-        .toEqual([['0', '25'], ['max', '75']])
-    })
-
-    it('should not submit a slider the page did not name', () => {
-      fixtureEl.innerHTML = '<form id="form"><div class="range-slider"></div></form>'
-      const rangeSliderEl = fixtureEl.querySelector('.range-slider')
-      // eslint-disable-next-line no-new
-      new RangeSlider(rangeSliderEl, { value: [25, 75] })
-
-      expect([...new FormData(fixtureEl.querySelector('#form')).keys()]).toEqual([])
+      expect(inputsOf(element)[0].hasAttribute('aria-label')).toBeFalse()
     })
   })
 
-  describe('Accessibility labels', () => {
-    it('should not set aria-label on a single-thumb slider', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      new RangeSlider(element, { value: 30 }) // eslint-disable-line no-new
+  describe('events', () => {
+    it('should fire input and change on the element with the numeric values', () => {
+      const { element } = mount({ value: [20, 80] })
+      const fired = []
+      element.addEventListener('input.coreui.range-slider', event => fired.push(['input', event.value]))
+      element.addEventListener('change.coreui.range-slider', event => fired.push(['change', event.value]))
 
-      const input = element.querySelector('.range-slider-input')
-      expect(input.getAttribute('aria-label')).toBeNull()
+      const [low] = inputsOf(element)
+      move(low, 30)
+      low.dispatchEvent(createEvent('change', { bubbles: true }))
+
+      expect(fired).toEqual([['input', [30, 80]], ['change', [30, 80]]])
     })
 
-    it('should apply ariaLabels on a single-thumb slider', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      new RangeSlider(element, { value: 30, ariaLabels: ['Volume'] }) // eslint-disable-line no-new
+    it('should report the values after Range has kept the thumbs in order', () => {
+      const { element } = mount({ value: [20, 80] })
+      const fired = []
+      element.addEventListener('input.coreui.range-slider', event => fired.push(event.value))
 
-      const input = element.querySelector('.range-slider-input')
-      expect(input.getAttribute('aria-label')).toBe('Volume')
+      move(inputsOf(element)[0], 95)
+
+      expect(fired).toEqual([[80, 80]])
     })
 
-    it('should label a two-thumb slider with Minimum/Maximum value by default', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      new RangeSlider(element, { value: [20, 80] }) // eslint-disable-line no-new
-
-      const inputs = element.querySelectorAll('.range-slider-input')
-      expect(inputs[0].getAttribute('aria-label')).toBe('Minimum value')
-      expect(inputs[1].getAttribute('aria-label')).toBe('Maximum value')
-    })
-
-    it('should label sliders with three or more thumbs positionally', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      new RangeSlider(element, { value: [10, 50, 90] }) // eslint-disable-line no-new
-
-      const inputs = element.querySelectorAll('.range-slider-input')
-      expect(inputs[0].getAttribute('aria-label')).toBe('Value 1')
-      expect(inputs[1].getAttribute('aria-label')).toBe('Value 2')
-      expect(inputs[2].getAttribute('aria-label')).toBe('Value 3')
-    })
-
-    it('should apply custom ariaLabels over the defaults', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      new RangeSlider(element, { value: [20, 80], ariaLabels: ['From', 'To'] }) // eslint-disable-line no-new
-
-      const inputs = element.querySelectorAll('.range-slider-input')
-      expect(inputs[0].getAttribute('aria-label')).toBe('From')
-      expect(inputs[1].getAttribute('aria-label')).toBe('To')
-    })
-
-    it('should expose the formatted value via aria-valuetext when tooltipsFormat is set', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      new RangeSlider(element, { value: 40, tooltipsFormat: value => `$${value}` }) // eslint-disable-line no-new
-
-      const input = element.querySelector('.range-slider-input')
-      expect(input.getAttribute('aria-valuetext')).toBe('$40')
-    })
-  })
-
-  describe('Multi-thumb', () => {
-    it('should create multiple thumbs for array values', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: [20, 40, 60] })
-
-      const inputs = element.querySelectorAll('.range-slider-input')
-      expect(inputs.length).toBe(3)
-      expect(inputs[0].value).toBe('20')
-      expect(inputs[1].value).toBe('40')
-      expect(inputs[2].value).toBe('60')
-    })
-
-    it('should enforce distance between thumb values', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        value: [20, 50, 80],
-        distance: 10
-      })
-
-      // Simulate trying to move first thumb beyond second thumb minus distance
-      const input = element.querySelectorAll('.range-slider-input')[0]
-      input.value = 45
-      input.dispatchEvent(new Event('input', { bubbles: true }))
-
-      // First thumb should be clamped to nextValue - distance = 50 - 10 = 40
-      expect(input.value).toBe('40')
-    })
-
-    it('should enforce distance for last thumb', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        value: [20, 50, 80],
-        distance: 10
-      })
-
-      // Try to move last thumb below prev + distance
-      const inputs = element.querySelectorAll('.range-slider-input')
-      inputs[2].value = 55
-      inputs[2].dispatchEvent(new Event('input', { bubbles: true }))
-
-      // Last thumb should be clamped to prevValue + distance = 50 + 10 = 60
-      expect(inputs[2].value).toBe('60')
-    })
-
-    it('should enforce distance for middle thumb', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        value: [20, 50, 80],
-        distance: 10
-      })
-
-      const inputs = element.querySelectorAll('.range-slider-input')
-
-      // Try to move middle thumb below prevValue + distance
-      inputs[1].value = 25
-      inputs[1].dispatchEvent(new Event('input', { bubbles: true }))
-
-      // Middle thumb should be clamped to prevValue + distance = 20 + 10 = 30
-      expect(inputs[1].value).toBe('30')
-    })
-
-    it('should enforce distance for middle thumb when moved too high', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        value: [20, 50, 80],
-        distance: 10
-      })
-
-      const inputs = element.querySelectorAll('.range-slider-input')
-
-      // Try to move middle thumb above nextValue - distance
-      inputs[1].value = 75
-      inputs[1].dispatchEvent(new Event('input', { bubbles: true }))
-
-      // Middle thumb should be clamped to nextValue - distance = 80 - 10 = 70
-      expect(inputs[1].value).toBe('70')
-    })
-
-    it('should allow free movement with distance 0', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        value: [20, 50, 80],
-        distance: 0
-      })
-
-      const inputs = element.querySelectorAll('.range-slider-input')
-
-      // Move first thumb close to second
-      inputs[0].value = 49
-      inputs[0].dispatchEvent(new Event('input', { bubbles: true }))
-      expect(inputs[0].value).toBe('49')
-    })
-  })
-
-  describe('Vertical mode', () => {
-    it('should add vertical class', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { vertical: true, value: 40 })
-
-      expect(element.classList.contains('range-slider-vertical')).toBeTrue()
-    })
-
-    it('should set aria-orientation to vertical', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { vertical: true, value: 40 })
-
-      const input = element.querySelector('.range-slider-input')
-      expect(input.getAttribute('aria-orientation')).toBe('vertical')
-    })
-
-    it('should set aria-orientation to horizontal when not vertical', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { vertical: false, value: 40 })
-
-      const input = element.querySelector('.range-slider-input')
-      expect(input.getAttribute('aria-orientation')).toBe('horizontal')
-    })
-
-    it('should lay ticks out on grid rows from max at the top to min at the bottom in vertical mode', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        vertical: true,
-        value: [25],
-        ticks: ['Start', 'Middle', 'End']
-      })
-
-      const container = element.querySelector('.range-slider-ticks')
-      expect(container.style.gridTemplateRows).toBe('0fr 0.5fr 0.5fr 0fr')
-      expect(container.style.gridTemplateColumns).toBe('')
-
-      const labels = element.querySelectorAll('.range-slider-tick')
-      expect(labels[0].style.gridRowStart).toBe('4')
-      expect(labels[1].style.gridRowStart).toBe('3')
-      expect(labels[2].style.gridRowStart).toBe('2')
-    })
-
-    it('should lay ticks out on grid columns in horizontal mode', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        vertical: false,
-        value: [25],
-        ticks: ['Start', 'End']
-      })
-
-      const container = element.querySelector('.range-slider-ticks')
-      expect(container.style.gridTemplateColumns).toBe('0fr 1fr 0fr')
-
-      const labels = element.querySelectorAll('.range-slider-tick')
-      expect(labels[0].style.gridColumnStart).toBe('2')
-      expect(labels[1].style.gridColumnStart).toBe('3')
-    })
-  })
-
-  describe('Ticks', () => {
-    it('should create ticks based on provided array', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        value: [20, 80],
-        ticks: ['Low', 'Medium', 'High']
-      })
-
-      const labels = element.querySelectorAll('.range-slider-tick')
-      expect(labels.length).toBe(3)
-      expect(labels[0].textContent).toBe('Low')
-      expect(labels[1].textContent).toBe('Medium')
-      expect(labels[2].textContent).toBe('High')
-    })
-
-    it('should place each tick on a grid line built from the gaps between values', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        value: [0, 50, 100],
-        ticks: ['Start', 'Middle', 'End']
-      })
-
-      expect(element.querySelector('.range-slider-ticks').style.gridTemplateColumns).toBe('0fr 0.5fr 0.5fr 0fr')
-
-      const labels = element.querySelectorAll('.range-slider-tick')
-      expect(labels[0].style.gridColumnStart).toBe('2')
-      expect(labels[1].style.gridColumnStart).toBe('3')
-      expect(labels[2].style.gridColumnStart).toBe('4')
-      expect(labels[0].style.left).toBe('')
-    })
-
-    it('should sort ticks by value so uneven values still land on grid lines', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        value: [50],
-        ticks: [
-          { label: 'High', value: 100 },
-          { label: 'Low', value: 0 },
-          { label: 'Ten', value: 10 }
-        ]
-      })
-
-      expect(element.querySelector('.range-slider-ticks').style.gridTemplateColumns).toBe('0fr 0.1fr 0.9fr 0fr')
-      expect([...element.querySelectorAll('.range-slider-tick')].map(label => label.textContent)).toEqual(['Low', 'Ten', 'High'])
-    })
-
-    it('should render ticks from a linked datalist through the list option', () => {
-      fixtureEl.innerHTML = `
-        <div id="slider"></div>
-        <datalist id="stops">
-          <option value="0" label="Cold"></option>
-          <option value="50"></option>
-          <option value="100" label="Hot"></option>
-        </datalist>
-      `
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: [50], list: 'stops' })
-
-      const labels = [...element.querySelectorAll('.range-slider-tick')]
-      expect(labels.map(label => label.textContent)).toEqual(['Cold', '', 'Hot'])
-      expect(labels.map(label => label.dataset.coreuiValue)).toEqual(['0', '50', '100'])
-      expect(element.querySelector('.range-slider-ticks').style.gridTemplateColumns).toBe('0fr 0.5fr 0.5fr 0fr')
-    })
-
-    it('should merge datalist ticks with the ticks option', () => {
-      fixtureEl.innerHTML = `
-        <div id="slider"></div>
-        <datalist id="stops"><option value="75"></option></datalist>
-      `
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: [50], list: 'stops', ticks: ['Low', 'High'] })
-
-      expect([...element.querySelectorAll('.range-slider-tick')].map(label => label.dataset.coreuiValue)).toEqual(['0', '75', '100'])
-    })
-
-    it('should handle ticks with specific values (object ticks)', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        value: [10, 90],
-        ticks: [
-          { label: 'Min', value: 10 },
-          { label: 'Max', value: 90 }
-        ]
-      })
-
-      const labels = element.querySelectorAll('.range-slider-tick')
-      expect(labels.length).toBe(2)
-      expect(labels[0].textContent).toBe('Min')
-      expect(labels[1].textContent).toBe('Max')
-      expect(element.querySelector('.range-slider-ticks').style.gridTemplateColumns).toBe('0.1fr 0.8fr 0.1fr')
-    })
-
-    it('should handle ticks with class property as string', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        value: [50],
-        ticks: [
-          { label: 'A', value: 0, class: 'custom-class' },
-          { label: 'B', value: 100, class: 'another-class' }
-        ]
-      })
-
-      const labels = element.querySelectorAll('.range-slider-tick')
-      expect(labels[0].classList.contains('custom-class')).toBeTrue()
-      expect(labels[1].classList.contains('another-class')).toBeTrue()
-    })
-
-    it('should handle ticks with class property as array', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        value: [50],
-        ticks: [
-          { label: 'A', value: 0, class: ['cls1', 'cls2'] }
-        ]
-      })
-
-      const labels = element.querySelectorAll('.range-slider-tick')
-      expect(labels[0].classList.contains('cls1')).toBeTrue()
-      expect(labels[0].classList.contains('cls2')).toBeTrue()
-    })
-
-    it('should handle ticks with style property', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        value: [50],
-        ticks: [
-          { label: 'Styled', value: 50, style: { color: 'red', fontWeight: 'bold' } }
-        ]
-      })
-
-      const labels = element.querySelectorAll('.range-slider-tick')
-      expect(labels[0].style.color).toBe('red')
-      expect(labels[0].style.fontWeight).toBe('bold')
-    })
-
-    it('should not apply style if style is not an object', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        value: [50],
-        ticks: [
-          { label: 'NoStyle', value: 50, style: 'not-an-object' }
-        ]
-      })
-
-      const labels = element.querySelectorAll('.range-slider-tick')
-      expect(labels[0].textContent).toBe('NoStyle')
-      expect(labels[0].getAttribute('style')).toBe('grid-column-start: 2;')
-    })
-
-    it('should add clickable class when clickableTicks is true and not disabled', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        value: [50],
-        ticks: ['A', 'B'],
-        clickableTicks: true,
-        disabled: false
-      })
-
-      const labels = element.querySelectorAll('.range-slider-tick')
-      expect(labels[0].classList.contains('clickable')).toBeTrue()
-      expect(labels[1].classList.contains('clickable')).toBeTrue()
-    })
-
-    it('should not add clickable class when clickableTicks is false', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        value: [50],
-        ticks: ['A', 'B'],
-        clickableTicks: false
-      })
-
-      const labels = element.querySelectorAll('.range-slider-tick')
-      expect(labels[0].classList.contains('clickable')).toBeFalse()
-    })
-
-    it('should not add clickable class when disabled', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        value: [50],
-        ticks: ['A', 'B'],
-        clickableTicks: true,
-        disabled: true
-      })
-
-      const labels = element.querySelectorAll('.range-slider-tick')
-      expect(labels[0].classList.contains('clickable')).toBeFalse()
-    })
-
-    it('should not create ticks when ticks is false', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        value: [50],
-        ticks: false
-      })
-
-      const labels = element.querySelectorAll('.range-slider-tick')
-      expect(labels.length).toBe(0)
-    })
-
-    it('should not create ticks when ticks is empty array', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        value: [50],
-        ticks: []
-      })
-
-      const labels = element.querySelectorAll('.range-slider-tick')
-      expect(labels.length).toBe(0)
-    })
-
-    it('should handle a single tick', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        value: [50],
-        ticks: ['Only']
-      })
-
-      const labels = element.querySelectorAll('.range-slider-tick')
-      expect(labels.length).toBe(1)
-      // Single label with string value: position calculation uses index/(length-1) = 0/0 = NaN
-      expect(labels[0].textContent).toBe('Only')
-    })
-
-    it('should split string ticks by comma', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        value: [50],
-        ticks: 'Low, Medium, High'
-      })
-
-      const labels = element.querySelectorAll('.range-slider-tick')
-      expect(labels.length).toBe(3)
-      expect(labels[0].textContent).toBe('Low')
-      expect(labels[1].textContent).toBe('Medium')
-      expect(labels[2].textContent).toBe('High')
-    })
-  })
-
-  describe('Tooltips', () => {
-    it('should display tooltips when enabled', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { tooltips: true, value: 60 })
-
-      const tooltip = element.querySelector('.range-slider-tooltip')
-      expect(tooltip).not.toBeNull()
-      expect(tooltip.querySelector('.tooltip-inner').textContent).toBe('60')
-    })
-
-    it('should keep the tooltip hidden until interaction by default', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: [50], tooltips: true })
-
-      expect(element.querySelector('.range-slider-tooltip')).not.toHaveClass('show')
-    })
-
-    it('should show the tooltip permanently with tooltips "always"', () => {
-      fixtureEl.innerHTML = '<div data-coreui-range-slider data-coreui-tooltips="always" data-coreui-value="20,80"></div>'
-      const element = fixtureEl.querySelector('[data-coreui-range-slider]')
-      const rangeSlider = new RangeSlider(element)
-
-      const tooltips = element.querySelectorAll('.range-slider-tooltip')
-      expect(tooltips).toHaveSize(2)
-      expect([...tooltips].every(tooltip => tooltip.classList.contains('show'))).toBeTrue()
-    })
-
-    it('should not display tooltips when disabled', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { tooltips: false, value: 60 })
-
-      const tooltip = element.querySelector('.range-slider-tooltip')
-      expect(tooltip).toBeNull()
-    })
-
-    it('should create tooltip with arrow element', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { tooltips: true, value: 50 })
-
-      const arrow = element.querySelector('.tooltip-arrow')
-      expect(arrow).not.toBeNull()
-    })
-
-    it('should create tooltips for each thumb in multi-thumb mode', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { tooltips: true, value: [20, 50, 80] })
-
-      const tooltips = element.querySelectorAll('.range-slider-tooltip')
-      expect(tooltips.length).toBe(3)
-    })
-
-    it('should format tooltips using tooltipsFormat function', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        tooltips: true,
-        tooltipsFormat: value => `$${value}`,
-        value: [25]
-      })
-
-      const tooltip = element.querySelector('.tooltip-inner')
-      expect(tooltip.textContent).toBe('$25')
-    })
-
-    it('should update tooltip when value changes', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        tooltips: true,
-        value: [30]
-      })
-
-      const input = element.querySelector('.range-slider-input')
-      input.value = 70
-      input.dispatchEvent(new Event('input', { bubbles: true }))
-
-      const tooltip = element.querySelector('.tooltip-inner')
-      expect(tooltip.textContent).toBe('70')
-    })
-
-    it('should update tooltip with format function when value changes', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        tooltips: true,
-        tooltipsFormat: value => `${value}%`,
-        value: [30]
-      })
-
-      const input = element.querySelector('.range-slider-input')
-      input.value = 70
-      input.dispatchEvent(new Event('input', { bubbles: true }))
-
-      const tooltip = element.querySelector('.tooltip-inner')
-      expect(tooltip.textContent).toBe('70%')
-    })
-
-    it('should not update tooltip when tooltips are disabled', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        tooltips: false,
-        value: [30]
-      })
-
-      const input = element.querySelector('.range-slider-input')
-      input.value = 70
-      input.dispatchEvent(new Event('input', { bubbles: true }))
-
-      const tooltip = element.querySelector('.range-slider-tooltip')
-      expect(tooltip).toBeNull()
-    })
-
-    it('should sanitize tooltip content by default with tooltipsFormat', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        tooltips: true,
-        tooltipsFormat: value => `<b>${value}</b>`,
-        value: [50]
-      })
-
-      const tooltip = element.querySelector('.tooltip-inner')
-      // sanitizeHtml should allow <b> tag
-      expect(tooltip.innerHTML).toContain('50')
-    })
-
-    it('should not sanitize tooltip content when sanitize is false', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        tooltips: true,
-        sanitize: false,
-        tooltipsFormat: value => `<b>${value}</b>`,
-        value: [50]
-      })
-
-      const tooltip = element.querySelector('.tooltip-inner')
-      expect(tooltip.innerHTML).toBe('<b>50</b>')
-    })
-  })
-
-  describe('Track / Gradient', () => {
-    const edges = track => [
-      track.style.getPropertyValue('--cui-range-slider-track-from'),
-      track.style.getPropertyValue('--cui-range-slider-track-to')
-    ]
-
-    it('should mark the filled band when track is fill', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { track: 'fill', value: 50 })
-
-      expect(edges(element.querySelector('.range-slider-track'))).toEqual(['', '0.5'])
-    })
-
-    it('should leave the band unset when track is false', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { track: false, value: 50 })
-
-      // Unset rather than zero-width: the stylesheet has no fallback for these,
-      // so the whole `background-image` falls back to `none`.
-      expect(edges(element.querySelector('.range-slider-track'))).toEqual(['', ''])
-      expect(element.querySelector('.range-slider-track').style.getPropertyValue('--cui-range-slider-track-from-edge')).toBe('')
-    })
-
-    it('should start a single-thumb band at the track edge, not at the thumb centre', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { track: 'fill', value: [50] })
-
-      const track = element.querySelector('.range-slider-track')
-      expect(track.style.getPropertyValue('--cui-range-slider-track-from-edge')).toBe('0')
-      expect(edges(track)).toEqual(['', '0.5'])
-    })
-
-    it('should span a multi-thumb band between the outermost handles', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { track: 'fill', value: [25, 75] })
-
-      expect(edges(element.querySelector('.range-slider-track'))).toEqual(['0.25', '0.75'])
-    })
-
-    it('should write the same band whatever the orientation', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { track: 'fill', value: [50], vertical: true })
-
-      // Direction is the stylesheet's business now.
-      expect(edges(element.querySelector('.range-slider-track'))).toEqual(['', '0.5'])
-      expect(element.querySelector('.range-slider-track').style.backgroundImage).toBe('')
-    })
-  })
-
-  describe('Disabled state', () => {
-    it('should add disabled class when disabled is true', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { disabled: true, value: 30 })
-
-      expect(element.classList.contains('disabled')).toBeTrue()
-    })
-
-    it('should set inputs to disabled', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { disabled: true, value: [30, 60] })
-
-      const inputs = element.querySelectorAll('.range-slider-input')
-      for (const input of inputs) {
-        expect(input.disabled).toBeTrue()
-      }
-    })
-
-    it('should not add event listeners when disabled', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { disabled: true, value: 30 })
-
-      // The input event should not fire on the element
-      const spy = jasmine.createSpy('inputSpy')
-      element.addEventListener('input.coreui.range-slider', spy)
-
-      const input = element.querySelector('.range-slider-input')
-      input.value = 50
-      input.dispatchEvent(new Event('input', { bubbles: true }))
-
-      expect(spy).not.toHaveBeenCalled()
-    })
-  })
-
-  describe('update() method', () => {
-    it('should rebuild slider with new config', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: 30 })
-
-      let inputs = element.querySelectorAll('.range-slider-input')
-      expect(inputs.length).toBe(1)
-      expect(inputs[0].value).toBe('30')
-
+    it('should fire once per change after setConfig', () => {
+      const { element, rangeSlider } = mount({ value: [20, 80] })
       rangeSlider.setConfig({ value: [10, 90] })
 
-      inputs = element.querySelectorAll('.range-slider-input')
-      expect(inputs.length).toBe(2)
-      expect(inputs[0].value).toBe('10')
-      expect(inputs[1].value).toBe('90')
-    })
+      const fired = []
+      element.addEventListener('input.coreui.range-slider', event => fired.push(event.value))
+      move(inputsOf(element)[0], 30)
 
-    it('should clear previous content on update', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
+      expect(fired).toEqual([[30, 90]])
+    })
+  })
+
+  describe('forms', () => {
+    it('should submit and reset the named values', async () => {
+      fixtureEl.innerHTML = '<form><div id="slider" data-coreui-name="lo, hi" data-coreui-value="25, 75"></div></form>'
+      const form = fixtureEl.querySelector('form')
       const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        value: [20, 80],
-        ticks: ['A', 'B', 'C']
+      new RangeSlider(element) // eslint-disable-line no-new
+
+      move(inputsOf(element)[1], 90)
+      expect([...new FormData(form)]).toEqual([['lo', '25'], ['hi', '90']])
+
+      form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
       })
 
-      rangeSlider.setConfig({ value: 50, ticks: false })
+      expect([...new FormData(form)]).toEqual([['lo', '25'], ['hi', '75']])
+      expect(element.querySelector('.form-range').style.getPropertyValue('--cui-range-fill')).toEqual('0.75')
+    })
+  })
 
-      const labels = element.querySelectorAll('.range-slider-tick')
-      expect(labels.length).toBe(0)
+  describe('setConfig', () => {
+    it('should rebuild from the merged config and keep the page content of the element', () => {
+      fixtureEl.innerHTML = '<div id="slider"><p class="note">Page content</p></div>'
+      const element = fixtureEl.querySelector('#slider')
+      const rangeSlider = new RangeSlider(element, { tooltips: false, value: [20, 80] })
 
-      const inputs = element.querySelectorAll('.range-slider-input')
-      expect(inputs.length).toBe(1)
+      rangeSlider.setConfig({ value: [10, 30, 60] })
+
+      expect(inputsOf(element).map(input => input.value)).toEqual(['10', '30', '60'])
+      expect(element.querySelector('.note')).not.toBeNull()
+      expect(element.querySelector('.form-range-tooltip')).toBeNull()
+      expect(rangeSlider._config.tooltips).toBeFalse()
     })
 
-    it('should emit one input event per native input after several setConfig calls', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: 30 })
-      let calls = 0
-
-      rangeSlider.setConfig({ value: 40 })
-      rangeSlider.setConfig({ value: 50 })
-      element.addEventListener('input.coreui.range-slider', () => {
-        calls++
-      })
-
-      const input = element.querySelector('.range-slider-input')
-      input.value = 60
-      input.dispatchEvent(new Event('input', { bubbles: true }))
-
-      expect(calls).toBe(1)
-    })
-
-    it('should handle a change, a track press and a tick press once after several setConfig calls', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: 30, ticks: ['A', 'B'], clickableTicks: true })
-      let changes = 0
-
-      rangeSlider.setConfig({ value: 40 })
-      rangeSlider.setConfig({ value: 50 })
-      element.addEventListener('change.coreui.range-slider', () => {
-        changes++
-      })
-      element.querySelector('.range-slider-input').dispatchEvent(new Event('change', { bubbles: true }))
-
-      expect(changes).toBe(1)
-
-      const spy = spyOn(rangeSlider, '_updateNearestValue')
-      const track = element.querySelector('.range-slider-track')
-      track.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0 }))
-      element.querySelector('.range-slider-tick').dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0 }))
-
-      expect(spy).toHaveBeenCalledTimes(2)
-    })
-
-    it('should ignore the track and the ticks once disabled with setConfig', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: 30, ticks: ['A', 'B'], clickableTicks: true })
-
-      rangeSlider.setConfig({ disabled: true })
-
-      const spy = spyOn(rangeSlider, '_updateNearestValue')
-      element.querySelector('.range-slider-track').dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0 }))
-      element.querySelector('.range-slider-tick').dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0 }))
-
-      expect(spy).not.toHaveBeenCalled()
-    })
-
-    it('should end a drag when setConfig rebuilds the slider', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: [10, 90], tooltips: false })
-
-      rangeSlider._isDragging = true
-      rangeSlider._dragIndex = 1
-      rangeSlider.setConfig({ value: 50 })
-
-      const spy = spyOn(rangeSlider, '_updateValue')
-      rangeSlider._onDocumentMouseMove({ clientX: 0, clientY: 0 })
-
-      expect(spy).not.toHaveBeenCalled()
-    })
-
-    it('should stop and start responding when disabled is switched with setConfig', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: 30 })
-      let calls = 0
-
-      element.addEventListener('input.coreui.range-slider', () => {
-        calls++
-      })
-
-      const move = () => {
-        const input = element.querySelector('.range-slider-input')
-        input.value = 60
-        input.dispatchEvent(new Event('input', { bubbles: true }))
-      }
-
-      rangeSlider.setConfig({ disabled: true })
-      move()
-
-      expect(calls).toBe(0)
-      expect(element).toHaveClass('disabled')
-
-      rangeSlider.setConfig({ disabled: false })
-      move()
-
-      expect(calls).toBe(1)
-      expect(element).not.toHaveClass('disabled')
-    })
-
-    it('should drop the vertical class when vertical is switched off', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: 30, vertical: true })
+    it('should switch the orientation both ways', () => {
+      const { element, rangeSlider } = mount({ value: [20, 80], vertical: true })
 
       rangeSlider.setConfig({ vertical: false })
+      expect(element.querySelector('.form-range')).not.toHaveClass('form-range-vertical')
 
-      expect(element).not.toHaveClass('range-slider-vertical')
-    })
-
-    it('should write the value into the tooltip of the rebuilt slider', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { tooltips: true, value: 30 })
-
-      rangeSlider.setConfig({ value: 40 })
-
-      const input = element.querySelector('.range-slider-input')
-      input.value = 70
-      input.dispatchEvent(new Event('input', { bubbles: true }))
-
-      expect(element.querySelector('.range-slider-tooltip .tooltip-inner').textContent).toBe('70')
+      rangeSlider.setConfig({ vertical: true })
+      expect(element.querySelector('.form-range')).toHaveClass('form-range-vertical')
     })
   })
 
-  describe('_roundToStep', () => {
-    it('should round value to the nearest step', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
+  describe('dispose', () => {
+    it('should remove what it built and keep the page content', () => {
+      fixtureEl.innerHTML = '<div id="slider"><p class="note">Page content</p></div>'
       const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: 0, step: 5 })
+      const rangeSlider = new RangeSlider(element, { ticks: ['Low', 'High'], value: [20, 80], vertical: true })
 
-      expect(element.querySelector('.range-slider-input').step).toBe('5')
-      expect(rangeSlider._roundToStep(23, 5)).toBe(25)
-      expect(rangeSlider._roundToStep(22, 5)).toBe(20)
-    })
+      rangeSlider.dispose()
 
-    it('should anchor the step grid at min and stay within max', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        min: 1, max: 10, step: 2, value: 1
-      })
+      const wrapper = element.querySelector('.form-range')
 
-      expect(rangeSlider._roundToStep(4, 2)).toBe(5)
-      expect(rangeSlider._roundToStep(5.9, 2)).toBe(5)
-      expect(rangeSlider._roundToStep(10, 2)).toBe(9)
-      expect(rangeSlider._roundToStep(50, 2)).toBe(9)
-      expect(rangeSlider._roundToStep(-5, 2)).toBe(1)
-    })
+      rangeSlider.dispose()
 
-    it('should round to the precision of the step', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        min: 0, max: 1, step: 0.1, value: 0
-      })
-
-      expect(rangeSlider._roundToStep(0.3, 0.1)).toBe(0.3)
-      expect(rangeSlider._roundToStep(0.26, 0.1)).toBe(0.3)
-      expect(rangeSlider._roundToStep(0.7, 0.1)).toBe(0.7)
-      expect(rangeSlider._roundToStep(1, 0.1)).toBe(1)
-    })
-
-    it('should only clamp when step is "any"', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { step: 'any', value: 0 })
-
-      expect(element.querySelector('.range-slider-input').step).toBe('any')
-      expect(rangeSlider._roundToStep(33.3, 'any')).toBe(33.3)
-      expect(rangeSlider._roundToStep(120, 'any')).toBe(100)
-      expect(rangeSlider._roundToStep(-1, 'any')).toBe(0)
-    })
-
-    it('should treat step 0 as step 1', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: 0, step: 0 })
-
-      expect(element.querySelector('.range-slider-input').step).toBe('0')
-      expect(rangeSlider._roundToStep(2.4, 0)).toBe(2)
-      expect(rangeSlider._roundToStep(2.6, 0)).toBe(3)
-    })
-
-    it('should write a float-clean value to the tooltip and aria-valuenow while dragging', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        min: 0, max: 1, step: 0.1, value: 0
-      })
-
-      const track = element.querySelector('.range-slider-track')
-      spyOn(track, 'getBoundingClientRect').and.returnValue({
-        top: 0, bottom: 50, left: 0, right: 200, height: 50, width: 200
-      })
-
-      const container = element.querySelector('.range-slider-inputs-container')
-      const mousedownEvent = new MouseEvent('mousedown', {
-        bubbles: true,
-        button: 0,
-        clientX: 0,
-        clientY: 25
-      })
-      Object.defineProperty(mousedownEvent, 'target', { value: track })
-      container.dispatchEvent(mousedownEvent)
-
-      document.documentElement.dispatchEvent(new MouseEvent('mousemove', {
-        bubbles: true,
-        clientX: 60,
-        clientY: 25
-      }))
-      document.documentElement.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }))
-
-      const input = element.querySelector('.range-slider-input')
-      expect(rangeSlider._currentValue).toEqual([0.3])
-      expect(input.value).toBe('0.3')
-      expect(input.getAttribute('aria-valuenow')).toBe('0.3')
-      expect(element.querySelector('.tooltip-inner').textContent).toBe('0.3')
+      expect(RangeSlider.getInstance(element)).toBeNull()
+      expect(Range.getInstance(wrapper)).toBeNull()
+      expect(element.className).toEqual('')
+      expect([...element.children].map(child => child.className)).toEqual(['note'])
     })
   })
 
-  describe('_getNearestValueIndex', () => {
-    it('should return 0 when value is less than first thumb', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: [30, 60, 90] })
+  describe('data-api', () => {
+    it('should initialize every element with data-coreui-range-slider on load', () => {
+      fixtureEl.innerHTML = '<div data-coreui-range-slider data-coreui-value="40"></div>'
+      const element = fixtureEl.querySelector('[data-coreui-range-slider]')
 
-      // Click on track at low position should target first thumb
-      const container = element.querySelector('.range-slider-inputs-container')
-      const track = element.querySelector('.range-slider-track')
+      window.dispatchEvent(new Event('load'))
 
-      // We can verify by checking that input 0 gets updated
-      const inputs = element.querySelectorAll('.range-slider-input')
-      inputs[0].value = 10
-      inputs[0].dispatchEvent(new Event('input', { bubbles: true }))
-      expect(inputs[0].value).toBe('10')
-    })
-
-    it('should return last index when value is greater than last thumb', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: [10, 30, 50] })
-
-      const inputs = element.querySelectorAll('.range-slider-input')
-      inputs[2].value = 90
-      inputs[2].dispatchEvent(new Event('input', { bubbles: true }))
-      expect(inputs[2].value).toBe('90')
+      expect(RangeSlider.getInstance(element)).toBeInstanceOf(RangeSlider)
+      expect(inputsOf(element).map(input => input.value)).toEqual(['40'])
     })
   })
 
-  describe('_validateValue', () => {
-    it('should return value unchanged for single thumb', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: 50 })
+  describe('getInstance', () => {
+    it('should return the instance or null', () => {
+      const { element, rangeSlider } = mount({ value: 40 })
 
-      const input = element.querySelector('.range-slider-input')
-      input.value = 75
-      input.dispatchEvent(new Event('input', { bubbles: true }))
-      expect(input.value).toBe('75')
+      expect(RangeSlider.getInstance(element)).toEqual(rangeSlider)
+
+      fixtureEl.innerHTML = '<div></div>'
+      expect(RangeSlider.getInstance(fixtureEl.querySelector('div'))).toBeNull()
     })
   })
 
-  describe('Drag handling', () => {
-    it('should handle mousedown on inputs container', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: [25, 75] })
+  describe('getOrCreateInstance', () => {
+    it('should return the existing instance or create one', () => {
+      const { element, rangeSlider } = mount({ value: 40 })
+      expect(RangeSlider.getOrCreateInstance(element)).toEqual(rangeSlider)
 
-      const track = element.querySelector('.range-slider-track')
-
-      // Simulate mousedown on track
-      const mousedownEvent = new MouseEvent('mousedown', {
-        bubbles: true,
-        button: 0,
-        offsetX: 50,
-        offsetY: 0
-      })
-      Object.defineProperty(mousedownEvent, 'target', { value: track })
-      track.dispatchEvent(mousedownEvent)
-
-      // Simulate mouseup
-      const mouseupEvent = new MouseEvent('mouseup', { bubbles: true })
-      document.documentElement.dispatchEvent(mouseupEvent)
-    })
-
-    it('should ignore mousedown with non-left button', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: [25, 75] })
-
-      const track = element.querySelector('.range-slider-track')
-
-      // Simulate right-click
-      const mousedownEvent = new MouseEvent('mousedown', {
-        bubbles: true,
-        button: 2,
-        offsetX: 50,
-        offsetY: 0
-      })
-      Object.defineProperty(mousedownEvent, 'target', { value: track })
-      track.dispatchEvent(mousedownEvent)
-
-      // Value should not change
-      const inputs = element.querySelectorAll('.range-slider-input')
-      expect(inputs[0].value).toBe('25')
-      expect(inputs[1].value).toBe('75')
-    })
-
-    it('should ignore mousedown on non-input non-track elements', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: [25, 75], tooltips: true })
-
-      const container = element.querySelector('.range-slider-inputs-container')
-      const tooltip = element.querySelector('.range-slider-tooltip')
-
-      if (tooltip) {
-        const mousedownEvent = new MouseEvent('mousedown', {
-          bubbles: true,
-          button: 0,
-          offsetX: 50,
-          offsetY: 0
-        })
-        Object.defineProperty(mousedownEvent, 'target', { value: tooltip })
-        container.dispatchEvent(mousedownEvent)
-
-        // Value should not change since target is tooltip (not input or track)
-        const inputs = element.querySelectorAll('.range-slider-input')
-        expect(inputs[0].value).toBe('25')
-        expect(inputs[1].value).toBe('75')
-      }
-    })
-
-    it('should not respond to mousemove when not dragging', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: [50] })
-
-      // Simulate mousemove without prior mousedown
-      const mousemoveEvent = new MouseEvent('mousemove', {
-        bubbles: true,
-        clientX: 80,
-        clientY: 0
-      })
-      document.documentElement.dispatchEvent(mousemoveEvent)
-
-      const input = element.querySelector('.range-slider-input')
-      expect(input.value).toBe('50')
+      fixtureEl.innerHTML = '<div id="other"></div>'
+      expect(RangeSlider.getOrCreateInstance(fixtureEl.querySelector('#other'))).toBeInstanceOf(RangeSlider)
     })
   })
 
-  describe('_configAfterMerge', () => {
-    it('should convert string ticks to array', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        value: 50,
-        ticks: 'A, B, C'
-      })
-
-      const labels = element.querySelectorAll('.range-slider-tick')
-      expect(labels.length).toBe(3)
-      expect(labels[0].textContent).toBe('A')
-      expect(labels[1].textContent).toBe('B')
-      expect(labels[2].textContent).toBe('C')
-    })
-
-    it('should convert string value to number array', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: '10, 90' })
-
-      const inputs = element.querySelectorAll('.range-slider-input')
-      expect(inputs.length).toBe(2)
-      expect(inputs[0].value).toBe('10')
-      expect(inputs[1].value).toBe('90')
-    })
-
-    it('should wrap single number value in array', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: 42 })
-
-      const inputs = element.querySelectorAll('.range-slider-input')
-      expect(inputs.length).toBe(1)
-      expect(inputs[0].value).toBe('42')
-    })
-
-    it('should split name string with comma into array', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        value: [10, 90],
-        name: 'min, max'
-      })
-
-      const inputs = element.querySelectorAll('.range-slider-input')
-      expect(inputs[0].name).toBe('min')
-      expect(inputs[1].name).toBe('max')
-    })
-
-    it('should keep name string without comma as is (with index suffix)', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        value: [10, 90],
-        name: 'slider'
-      })
-
-      const inputs = element.querySelectorAll('.range-slider-input')
-      expect(inputs[0].name).toBe('slider-0')
-      expect(inputs[1].name).toBe('slider-1')
-    })
-  })
-
-  describe('Name attribute', () => {
-    it('should set name with index suffix for string name', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        value: [20, 40, 60],
-        name: 'range'
-      })
-
-      const inputs = element.querySelectorAll('.range-slider-input')
-      expect(inputs[0].name).toBe('range-0')
-      expect(inputs[1].name).toBe('range-1')
-      expect(inputs[2].name).toBe('range-2')
-    })
-
-    it('should set name from array for array name', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        value: [20, 80],
-        name: ['min-val', 'max-val']
-      })
-
-      const inputs = element.querySelectorAll('.range-slider-input')
-      expect(inputs[0].name).toBe('min-val')
-      expect(inputs[1].name).toBe('max-val')
-    })
-
-    it('should not set name when name is null', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        value: [20, 80],
-        name: null
-      })
-
-      const inputs = element.querySelectorAll('.range-slider-input')
-      expect(inputs[0].name).toBe('')
-      expect(inputs[1].name).toBe('')
-    })
-  })
-
-  describe('Accessibility', () => {
-    it('should set role=slider on inputs', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: 50 })
-
-      const input = element.querySelector('.range-slider-input')
-      expect(input.getAttribute('role')).toBe('slider')
-    })
-
-    it('should set aria-valuemin', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: 50, min: 10 })
-
-      const input = element.querySelector('.range-slider-input')
-      expect(input.getAttribute('aria-valuemin')).toBe('10')
-    })
-
-    it('should set aria-valuemax', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: 50, max: 200 })
-
-      const input = element.querySelector('.range-slider-input')
-      expect(input.getAttribute('aria-valuemax')).toBe('200')
-    })
-
-    it('should set aria-valuenow to current value', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: 75 })
-
-      const input = element.querySelector('.range-slider-input')
-      expect(input.getAttribute('aria-valuenow')).toBe('75')
-    })
-
-    it('should update aria-valuenow when value changes', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: 30 })
-
-      const input = element.querySelector('.range-slider-input')
-      input.value = 60
-      input.dispatchEvent(new Event('input', { bubbles: true }))
-
-      expect(input.getAttribute('aria-valuenow')).toBe('60')
-    })
-
-    it('should set aria-orientation to horizontal', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: 50, vertical: false })
-
-      const input = element.querySelector('.range-slider-input')
-      expect(input.getAttribute('aria-orientation')).toBe('horizontal')
-    })
-
-    it('should set aria-orientation to vertical', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: 50, vertical: true })
-
-      const input = element.querySelector('.range-slider-input')
-      expect(input.getAttribute('aria-orientation')).toBe('vertical')
-    })
-  })
-
-  describe('Input and Change events', () => {
-    it('should fire input event when value changes via native input', () => {
-      return new Promise(resolve => {
-        fixtureEl.innerHTML = '<div id="slider"></div>'
-        const element = fixtureEl.querySelector('#slider')
-        const rangeSlider = new RangeSlider(element, { value: [50] })
-
-        element.addEventListener('input.coreui.range-slider', event => {
-          expect(event.value).toEqual(['60'])
-          resolve()
-        })
-
-        const input = element.querySelector('.range-slider-input')
-        input.value = 60
-        input.dispatchEvent(new Event('input', { bubbles: true }))
-      })
-    })
-
-    it('should fire change event when value changes via native change', () => {
-      return new Promise(resolve => {
-        fixtureEl.innerHTML = '<div id="slider"></div>'
-        const element = fixtureEl.querySelector('#slider')
-        const rangeSlider = new RangeSlider(element, { value: [50] })
-
-        element.addEventListener('change.coreui.range-slider', event => {
-          expect(event.value).toBeDefined()
-          resolve()
-        })
-
-        const input = element.querySelector('.range-slider-input')
-        input.dispatchEvent(new Event('change', { bubbles: true }))
-      })
-    })
-  })
-
-  describe('Clickable ticks interaction', () => {
-    it('should update value when clicking on a tick with clickableTicks true', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        value: [50],
-        ticks: [
-          { label: 'Zero', value: 0 },
-          { label: 'Half', value: 50 },
-          { label: 'Full', value: 100 }
-        ],
-        clickableTicks: true
-      })
-
-      const labels = element.querySelectorAll('.range-slider-tick')
-
-      // Click on the "Full" label
-      const mousedownEvent = new MouseEvent('mousedown', {
-        bubbles: true,
-        button: 0
-      })
-      labels[2].dispatchEvent(mousedownEvent)
-
-      const input = element.querySelector('.range-slider-input')
-      expect(input.value).toBe('100')
-    })
-
-    it('should not update value when clickableTicks is false', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        value: [50],
-        ticks: [
-          { label: 'Zero', value: 0 },
-          { label: 'Full', value: 100 }
-        ],
-        clickableTicks: false
-      })
-
-      const labels = element.querySelectorAll('.range-slider-tick')
-      const mousedownEvent = new MouseEvent('mousedown', {
-        bubbles: true,
-        button: 0
-      })
-      labels[0].dispatchEvent(mousedownEvent)
-
-      const input = element.querySelector('.range-slider-input')
-      expect(input.value).toBe('50')
-    })
-
-    it('should not update value on right-click on tick', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        value: [50],
-        ticks: [
-          { label: 'Zero', value: 0 },
-          { label: 'Full', value: 100 }
-        ],
-        clickableTicks: true
-      })
-
-      const labels = element.querySelectorAll('.range-slider-tick')
-      const mousedownEvent = new MouseEvent('mousedown', {
-        bubbles: true,
-        button: 2
-      })
-      labels[0].dispatchEvent(mousedownEvent)
-
-      const input = element.querySelector('.range-slider-input')
-      expect(input.value).toBe('50')
-    })
-  })
-
-  describe('Input properties', () => {
-    it('should set type to range', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: 50 })
-
-      const input = element.querySelector('.range-slider-input')
-      expect(input.type).toBe('range')
-    })
-
-    it('should set min and max attributes', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: 50, min: 10, max: 200 })
-
-      const input = element.querySelector('.range-slider-input')
-      expect(input.min).toBe('10')
-      expect(input.max).toBe('200')
-    })
-
-    it('should set step attribute', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: 50, step: 5 })
-
-      const input = element.querySelector('.range-slider-input')
-      expect(input.step).toBe('5')
-    })
-  })
-
-  describe('_calculateMoveValue', () => {
-    it('should return max when mouse is above track in vertical mode', () => {
-      fixtureEl.innerHTML = '<div id="slider" style="height: 200px;"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: [50], vertical: true })
-
-      const track = element.querySelector('.range-slider-track')
-      // Mock getBoundingClientRect
-      spyOn(track, 'getBoundingClientRect').and.returnValue({
-        top: 100,
-        bottom: 300,
-        left: 0,
-        right: 50,
-        height: 200,
-        width: 50
-      })
-
-      // Simulate mousedown to start dragging
-      const container = element.querySelector('.range-slider-inputs-container')
-      const mousedownEvent = new MouseEvent('mousedown', {
-        bubbles: true,
-        button: 0,
-        clientX: 25,
-        clientY: 200
-      })
-      Object.defineProperty(mousedownEvent, 'target', { value: track })
-      container.dispatchEvent(mousedownEvent)
-
-      // Simulate mousemove above the track
-      const mousemoveEvent = new MouseEvent('mousemove', {
-        bubbles: true,
-        clientX: 25,
-        clientY: 50 // above top (100)
-      })
-      document.documentElement.dispatchEvent(mousemoveEvent)
-
-      const input = element.querySelector('.range-slider-input')
-      expect(input.value).toBe('100')
-    })
-
-    it('should return min when mouse is below track in vertical mode', () => {
-      fixtureEl.innerHTML = '<div id="slider" style="height: 200px;"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: [50], vertical: true })
-
-      const track = element.querySelector('.range-slider-track')
-      spyOn(track, 'getBoundingClientRect').and.returnValue({
-        top: 100,
-        bottom: 300,
-        left: 0,
-        right: 50,
-        height: 200,
-        width: 50
-      })
-
-      const container = element.querySelector('.range-slider-inputs-container')
-      const mousedownEvent = new MouseEvent('mousedown', {
-        bubbles: true,
-        button: 0,
-        clientX: 25,
-        clientY: 200
-      })
-      Object.defineProperty(mousedownEvent, 'target', { value: track })
-      container.dispatchEvent(mousedownEvent)
-
-      // Simulate mousemove below the track
-      const mousemoveEvent = new MouseEvent('mousemove', {
-        bubbles: true,
-        clientX: 25,
-        clientY: 350 // below bottom (300)
-      })
-      document.documentElement.dispatchEvent(mousemoveEvent)
-
-      const input = element.querySelector('.range-slider-input')
-      expect(input.value).toBe('0')
-    })
-
-    it('should return min when mouse is left of track in horizontal mode', () => {
-      fixtureEl.innerHTML = '<div id="slider" style="width: 200px;"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: [50], vertical: false })
-
-      const track = element.querySelector('.range-slider-track')
-      spyOn(track, 'getBoundingClientRect').and.returnValue({
-        top: 0,
-        bottom: 50,
-        left: 100,
-        right: 300,
-        height: 50,
-        width: 200
-      })
-
-      const container = element.querySelector('.range-slider-inputs-container')
-      const mousedownEvent = new MouseEvent('mousedown', {
-        bubbles: true,
-        button: 0,
-        clientX: 200,
-        clientY: 25
-      })
-      Object.defineProperty(mousedownEvent, 'target', { value: track })
-      container.dispatchEvent(mousedownEvent)
-
-      // Simulate mousemove to the left of track
-      const mousemoveEvent = new MouseEvent('mousemove', {
-        bubbles: true,
-        clientX: 50, // left of left (100)
-        clientY: 25
-      })
-      document.documentElement.dispatchEvent(mousemoveEvent)
-
-      const input = element.querySelector('.range-slider-input')
-      expect(input.value).toBe('0')
-    })
-
-    it('should return max when mouse is right of track in horizontal mode', () => {
-      fixtureEl.innerHTML = '<div id="slider" style="width: 200px;"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: [50], vertical: false })
-
-      const track = element.querySelector('.range-slider-track')
-      spyOn(track, 'getBoundingClientRect').and.returnValue({
-        top: 0,
-        bottom: 50,
-        left: 100,
-        right: 300,
-        height: 50,
-        width: 200
-      })
-
-      const container = element.querySelector('.range-slider-inputs-container')
-      const mousedownEvent = new MouseEvent('mousedown', {
-        bubbles: true,
-        button: 0,
-        clientX: 200,
-        clientY: 25
-      })
-      Object.defineProperty(mousedownEvent, 'target', { value: track })
-      container.dispatchEvent(mousedownEvent)
-
-      // Simulate mousemove to the right of track
-      const mousemoveEvent = new MouseEvent('mousemove', {
-        bubbles: true,
-        clientX: 350, // right of right (300)
-        clientY: 25
-      })
-      document.documentElement.dispatchEvent(mousemoveEvent)
-
-      const input = element.querySelector('.range-slider-input')
-      expect(input.value).toBe('100')
-    })
-  })
-
-  describe('_getThumbSize', () => {
-    it('should handle CSS custom property with unit', () => {
-      fixtureEl.innerHTML = '<div id="slider" style="--cui-range-thumb-width: 16px;"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: 50, tooltips: true })
-
-      // If the computed style provides a valid value, thumbSize should parse it
-      const tooltip = element.querySelector('.range-slider-tooltip')
-      expect(tooltip).not.toBeNull()
-    })
-
-    it('should handle missing CSS custom property', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: 50, tooltips: true })
-
-      // Should still create tooltip even with fallback
-      const tooltip = element.querySelector('.range-slider-tooltip')
-      expect(tooltip).not.toBeNull()
-    })
-  })
-
-  describe('_positionTooltip', () => {
-    it('should write the ratio for horizontal mode', () => {
-      fixtureEl.innerHTML = '<div id="slider" style="--cui-range-thumb-width: 16px;"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        value: [75],
-        vertical: false,
-        tooltips: true
-      })
-
-      const tooltip = element.querySelector('.range-slider-tooltip')
-      expect(tooltip.style.getPropertyValue('--cui-range-slider-tooltip-position')).toBe('0.75')
-    })
-
-    it('should write the same ratio for vertical mode', () => {
-      fixtureEl.innerHTML = '<div id="slider" style="--cui-range-thumb-height: 16px;"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        value: [75],
-        vertical: true,
-        tooltips: true
-      })
-
-      const tooltip = element.querySelector('.range-slider-tooltip')
-      expect(tooltip.style.getPropertyValue('--cui-range-slider-tooltip-position')).toBe('0.75')
-    })
-
-    it('should write a property name the stylesheet cannot rename', () => {
-      // The name is outside `$prefix` on both sides: a build with a different
-      // prefix must still read what the plugin writes.
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: [50], tooltips: true })
-      const tooltip = element.querySelector('.range-slider-tooltip')
-
-      expect([...tooltip.style].filter(property => property.startsWith('--')))
-        .toEqual(['--cui-range-slider-tooltip-position'])
-    })
-
-    it('should give every thumb its own ratio', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        value: [20, 80],
-        tooltips: true
-      })
-
-      const positions = [...element.querySelectorAll('.range-slider-tooltip')]
-        .map(tooltip => tooltip.style.getPropertyValue('--cui-range-slider-tooltip-position'))
-
-      expect(positions).toEqual(['0.2', '0.8'])
-    })
-
-    it('should not fall back to a thumb size read from the stylesheet', () => {
-      // The old parser only matched a bare number and unit.
-      fixtureEl.innerHTML = '<div id="slider" style="--cui-range-thumb-width: calc(1rem + 2px);"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        value: [100],
-        tooltips: true
-      })
-
-      const tooltip = element.querySelector('.range-slider-tooltip')
-      expect(tooltip.style.getPropertyValue('--cui-range-slider-tooltip-position')).toBe('1')
-      expect(tooltip.style.marginInlineStart).toBe('')
-    })
-  })
-
-  describe('rangeSliderInterface static', () => {
-    it('should create an instance', () => {
+  describe('rangeSliderInterface', () => {
+    it('should create an instance, call a method, and throw on an unknown one', () => {
       fixtureEl.innerHTML = '<div id="slider"></div>'
       const element = fixtureEl.querySelector('#slider')
 
       RangeSlider.rangeSliderInterface(element, { value: 50 })
-      expect(RangeSlider.getInstance(element)).not.toBeNull()
-    })
-
-    it('should call a valid method', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: 50 })
+      const rangeSlider = RangeSlider.getInstance(element)
+      expect(rangeSlider).toBeInstanceOf(RangeSlider)
 
       spyOn(rangeSlider, 'setConfig')
-      RangeSlider.rangeSliderInterface(element, 'setConfig')
-      expect(rangeSlider.setConfig).toHaveBeenCalled()
-    })
-
-    it('should throw on undefined method', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: 50 })
+      RangeSlider.rangeSliderInterface(element, 'setConfig', { value: 20 })
+      expect(rangeSlider.setConfig).toHaveBeenCalledWith({ value: 20 })
 
       expect(() => {
         RangeSlider.rangeSliderInterface(element, 'nonExistentMethod')
@@ -2058,363 +412,31 @@ describe('RangeSlider', () => {
   })
 
   describe('jQueryInterface', () => {
-    it('should create a range slider via jQuery interface', () => {
-      fixtureEl.innerHTML = '<div data-coreui-range-slider></div>'
-
+    it('should create a range slider and call a method with its arguments', () => {
+      fixtureEl.innerHTML = '<div data-coreui-range-slider data-coreui-value="20"></div>'
       const element = fixtureEl.querySelector('[data-coreui-range-slider]')
 
       jQueryMock.fn.rangeSlider = RangeSlider.jQueryInterface
       jQueryMock.elements = [element]
-
       jQueryMock.fn.rangeSlider.call(jQueryMock)
 
-      expect(RangeSlider.getInstance(element)).not.toBeNull()
+      const rangeSlider = RangeSlider.getInstance(element)
+      expect(rangeSlider).not.toBeNull()
+
+      jQueryMock.fn.rangeSlider.call(jQueryMock, 'setConfig', { value: 60 })
+      expect(inputsOf(element).map(input => input.value)).toEqual(['60'])
     })
 
-    it('should pass the arguments to the method', () => {
+    it('should throw error on undefined method', () => {
       fixtureEl.innerHTML = '<div data-coreui-range-slider></div>'
-
-      const element = fixtureEl.querySelector('[data-coreui-range-slider]')
-
-      jQueryMock.fn.rangeSlider = RangeSlider.jQueryInterface
-      jQueryMock.elements = [element]
-
-      const instance = RangeSlider.getOrCreateInstance(element)
-      const spy = spyOn(instance, 'setConfig')
-
-      jQueryMock.fn.rangeSlider.call(jQueryMock, 'setConfig', { disabled: true })
-
-      expect(spy).toHaveBeenCalledWith({ disabled: true })
-      instance.dispose()
-    })
-
-    it('should not recreate range slider if already exists via jQuery interface', () => {
-      fixtureEl.innerHTML = '<div data-coreui-range-slider></div>'
-
-      const element = fixtureEl.querySelector('[data-coreui-range-slider]')
-      const rangeSlider = new RangeSlider(element)
-
-      jQueryMock.fn.rangeSlider = RangeSlider.jQueryInterface
-      jQueryMock.elements = [element]
-
-      jQueryMock.fn.rangeSlider.call(jQueryMock)
-
-      expect(RangeSlider.getInstance(element)).toEqual(rangeSlider)
-    })
-
-    it('should call a method via jQuery interface', () => {
-      fixtureEl.innerHTML = '<div data-coreui-range-slider></div>'
-
-      const element = fixtureEl.querySelector('[data-coreui-range-slider]')
-      const rangeSlider = new RangeSlider(element, { value: 50 })
-
-      jQueryMock.fn.rangeSlider = RangeSlider.jQueryInterface
-      jQueryMock.elements = [element]
-
-      spyOn(rangeSlider, 'setConfig')
-      jQueryMock.fn.rangeSlider.call(jQueryMock, 'setConfig')
-      expect(rangeSlider.setConfig).toHaveBeenCalled()
-    })
-
-    it('should throw error for undefined methods via jQuery interface', () => {
-      fixtureEl.innerHTML = '<div data-coreui-range-slider></div>'
-
-      const element = fixtureEl.querySelector('[data-coreui-range-slider]')
-      const action = 'undefinedMethod'
-
-      jQueryMock.fn.rangeSlider = RangeSlider.jQueryInterface
-      jQueryMock.elements = [element]
-
-      expect(() => {
-        jQueryMock.fn.rangeSlider.call(jQueryMock, action)
-      }).toThrowError(TypeError, `No method named "${action}"`)
-    })
-
-    it('should throw error for private methods (starting with _) via jQuery interface', () => {
-      fixtureEl.innerHTML = '<div data-coreui-range-slider></div>'
-
       const element = fixtureEl.querySelector('[data-coreui-range-slider]')
 
       jQueryMock.fn.rangeSlider = RangeSlider.jQueryInterface
       jQueryMock.elements = [element]
 
       expect(() => {
-        jQueryMock.fn.rangeSlider.call(jQueryMock, '_addEventListeners')
-      }).toThrowError(TypeError, 'No method named "_addEventListeners"')
-    })
-
-    it('should throw error for constructor via jQuery interface', () => {
-      fixtureEl.innerHTML = '<div data-coreui-range-slider></div>'
-
-      const element = fixtureEl.querySelector('[data-coreui-range-slider]')
-
-      jQueryMock.fn.rangeSlider = RangeSlider.jQueryInterface
-      jQueryMock.elements = [element]
-
-      expect(() => {
-        jQueryMock.fn.rangeSlider.call(jQueryMock, 'constructor')
-      }).toThrowError(TypeError, 'No method named "constructor"')
-    })
-
-    it('should return early for non-string config', () => {
-      fixtureEl.innerHTML = '<div data-coreui-range-slider></div>'
-
-      const element = fixtureEl.querySelector('[data-coreui-range-slider]')
-
-      jQueryMock.fn.rangeSlider = RangeSlider.jQueryInterface
-      jQueryMock.elements = [element]
-
-      // Calling with object config should not throw
-      jQueryMock.fn.rangeSlider.call(jQueryMock, { value: 50 })
-      expect(RangeSlider.getInstance(element)).not.toBeNull()
-    })
-  })
-
-  describe('Data API', () => {
-    it('should initialize from data attributes on load', () => {
-      fixtureEl.innerHTML = '<div data-coreui-range-slider data-coreui-value="40"></div>'
-
-      const element = fixtureEl.querySelector('[data-coreui-range-slider]')
-
-      // Trigger the load event
-      const loadEvent = new Event('load')
-      window.dispatchEvent(loadEvent)
-
-      // After the load event the instance should be created if
-      // the selector is in the document (fixtureEl is in document)
-      // Note: depends on whether fixture is in DOM
-      const instance = RangeSlider.getInstance(element)
-      if (instance) {
-        expect(instance).not.toBeNull()
-      }
-    })
-  })
-
-  describe('_getConfig', () => {
-    it('should filter out disallowed attributes', () => {
-      fixtureEl.innerHTML = `
-        <div id="slider"
-             data-coreui-range-slider
-             data-coreui-value="50"
-             data-coreui-sanitize="true">
-        </div>
-      `
-      const element = fixtureEl.querySelector('#slider')
-
-      // DISALLOWED_ATTRIBUTES (sanitize, allowList, sanitizeFn) should be filtered
-      // so 'sanitize' from data attrs is removed and default is used
-      const rangeSlider = new RangeSlider(element)
-      expect(rangeSlider._config.sanitize).toBeTrue()
-    })
-  })
-
-  describe('Edge cases', () => {
-    it('should handle min equal to max gracefully', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      // Not an explicitly handled case, but should not throw
-      expect(() => {
-        const rangeSlider = new RangeSlider(element, { value: 50, min: 50, max: 50 })
-      }).not.toThrow()
-    })
-
-    it('should handle value at min boundary', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: 0, min: 0, max: 100 })
-
-      const input = element.querySelector('.range-slider-input')
-      expect(input.value).toBe('0')
-    })
-
-    it('should handle value at max boundary', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: 100, min: 0, max: 100 })
-
-      const input = element.querySelector('.range-slider-input')
-      expect(input.value).toBe('100')
-    })
-
-    it('should handle negative min and max', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: -50, min: -100, max: 0 })
-
-      const input = element.querySelector('.range-slider-input')
-      expect(input.value).toBe('-50')
-      expect(input.min).toBe('-100')
-      expect(input.max).toBe('0')
-    })
-
-    it('should handle large step value', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: 50, step: 50 })
-
-      const input = element.querySelector('.range-slider-input')
-      expect(input.step).toBe('50')
-    })
-
-    it('should handle four thumbs', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: [10, 30, 60, 90] })
-
-      const inputs = element.querySelectorAll('.range-slider-input')
-      expect(inputs.length).toBe(4)
-      expect(inputs[0].value).toBe('10')
-      expect(inputs[1].value).toBe('30')
-      expect(inputs[2].value).toBe('60')
-      expect(inputs[3].value).toBe('90')
-    })
-  })
-
-  describe('Resize handling', () => {
-    it('should update ticks container size on window resize', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        value: [50],
-        ticks: ['A', 'B', 'C']
-      })
-
-      // Trigger resize
-      const resizeEvent = new Event('resize')
-      window.dispatchEvent(resizeEvent)
-
-      // Just ensure no error is thrown
-      const labelsContainer = element.querySelector('.range-slider-ticks')
-      expect(labelsContainer).not.toBeNull()
-    })
-  })
-
-  describe('Mouseup stops dragging', () => {
-    it('should stop dragging on mouseup', () => {
-      fixtureEl.innerHTML = '<div id="slider" style="width: 200px;"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: [50] })
-
-      const track = element.querySelector('.range-slider-track')
-      spyOn(track, 'getBoundingClientRect').and.returnValue({
-        top: 0, bottom: 50, left: 0, right: 200, height: 50, width: 200
-      })
-
-      // Start dragging
-      const container = element.querySelector('.range-slider-inputs-container')
-      const mousedownEvent = new MouseEvent('mousedown', {
-        bubbles: true,
-        button: 0,
-        clientX: 100,
-        clientY: 25
-      })
-      Object.defineProperty(mousedownEvent, 'target', { value: track })
-      container.dispatchEvent(mousedownEvent)
-
-      // Mouseup
-      const mouseupEvent = new MouseEvent('mouseup', { bubbles: true })
-      document.documentElement.dispatchEvent(mouseupEvent)
-
-      // Now mousemove should not change value
-      const input = element.querySelector('.range-slider-input')
-      const valueAfterUp = input.value
-
-      const mousemoveEvent = new MouseEvent('mousemove', {
-        bubbles: true,
-        clientX: 180,
-        clientY: 25
-      })
-      document.documentElement.dispatchEvent(mousemoveEvent)
-
-      expect(input.value).toBe(valueAfterUp)
-    })
-  })
-
-  describe('Input event sets isDragging to false', () => {
-    it('should set isDragging to false on native input event', () => {
-      fixtureEl.innerHTML = '<div id="slider" style="width: 200px;"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { value: [50] })
-
-      const track = element.querySelector('.range-slider-track')
-      spyOn(track, 'getBoundingClientRect').and.returnValue({
-        top: 0, bottom: 50, left: 0, right: 200, height: 50, width: 200
-      })
-
-      // Start dragging
-      const container = element.querySelector('.range-slider-inputs-container')
-      const mousedownEvent = new MouseEvent('mousedown', {
-        bubbles: true,
-        button: 0,
-        clientX: 100,
-        clientY: 25
-      })
-      Object.defineProperty(mousedownEvent, 'target', { value: track })
-      container.dispatchEvent(mousedownEvent)
-
-      // Fire native input event (this sets isDragging = false)
-      const input = element.querySelector('.range-slider-input')
-      input.value = 60
-      input.dispatchEvent(new Event('input', { bubbles: true }))
-
-      // Now mousemove should not change value since isDragging is false
-      const mousemoveEvent = new MouseEvent('mousemove', {
-        bubbles: true,
-        clientX: 180,
-        clientY: 25
-      })
-      document.documentElement.dispatchEvent(mousemoveEvent)
-
-      expect(input.value).toBe('60')
-    })
-  })
-
-  describe('dispose', () => {
-    it('should drop its window and documentElement listeners', () => {
-      fixtureEl.innerHTML = '<div id="mySlider"></div>'
-
-      const el = fixtureEl.querySelector('#mySlider')
-      const rangeSlider = new RangeSlider(el, { value: [10, 40] })
-
-      // Watch the prototype and match on the receiver: `dispose()` nulls the
-      // instance's own properties (an instance spy would be wiped), and other
-      // sliders in this file may still hold their own global listeners.
-      const original = RangeSlider.prototype._updateLabelsContainerSize
-      let calledOnDisposedInstance = false
-      RangeSlider.prototype._updateLabelsContainerSize = function (...args) {
-        if (this === rangeSlider) {
-          calledOnDisposedInstance = true
-        }
-
-        return original.apply(this, args)
-      }
-
-      try {
-        rangeSlider.dispose()
-        window.dispatchEvent(new Event('resize'))
-        document.documentElement.dispatchEvent(new MouseEvent('mousemove', { bubbles: true }))
-        document.documentElement.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }))
-      } finally {
-        RangeSlider.prototype._updateLabelsContainerSize = original
-      }
-
-      expect(calledOnDisposedInstance).toBeFalse()
-    })
-
-    it('should leave the listeners of other instances in place', () => {
-      fixtureEl.innerHTML = '<div id="first"></div><div id="second"></div>'
-
-      const first = new RangeSlider(fixtureEl.querySelector('#first'), { value: [10, 40] })
-      const second = new RangeSlider(fixtureEl.querySelector('#second'), { value: [10, 40] })
-
-      first.dispose()
-
-      second._isDragging = true
-      document.documentElement.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }))
-
-      expect(second._isDragging).toBeFalse()
-
-      second.dispose()
+        jQueryMock.fn.rangeSlider.call(jQueryMock, 'noMethod')
+      }).toThrowError(TypeError, 'No method named "noMethod"')
     })
   })
 })

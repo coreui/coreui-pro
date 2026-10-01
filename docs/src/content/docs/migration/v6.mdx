@@ -1951,10 +1951,33 @@ field behind that kept submitting.
   (either form) colour the thumb and its focus ring with the state, and a
   feedback element after the wrapper toggles through `:has()`.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The range slider is built on the range.** It renders
+  `<div class="form-range">` inside its element, with one native
+  `.form-range-input` per handle, and hands it to the `Range` plugin, so the
+  slider looks and behaves like a range with several thumbs. The class names
+  follow: `.range-slider` → the inner `.form-range`, `.range-slider-input` →
+  `.form-range-input`, `.range-slider-vertical` → `.form-range-vertical`,
+  `.range-slider-tooltip` → `.form-range-tooltip` (now a `<div>`),
+  `.range-slider-ticks`/`.range-slider-tick` → `.form-range-ticks`/
+  `.form-range-tick` with the text in `.form-range-tick-label`, and the
+  per-tick `.clickable` → `.form-range-ticks-clickable` on the container.
+  `.range-slider-inputs-container` and `.range-slider-track` are gone (the
+  first input draws the track), and so is the `.disabled` class on the element
+  (the inputs are disabled). The handles no longer carry `role="slider"`,
+  `aria-valuemin`, `aria-valuemax` or `aria-valuenow`: the native inputs expose
+  them. Options, events and methods keep their names.
+- **Range slider interaction follows the native control.** Pressing a handle no
+  longer moves it a step; a press on the track or a clickable tick moves the
+  nearest handle and it follows the pointer (mouse, touch or pen), with
+  `change.coreui.range-slider` on release instead of on press; the events carry
+  numbers; a form reset restores the configured values instead of the middle of
+  the range; `setConfig()` and `dispose()` touch only what the slider built, so
+  content of the element stays.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **The range slider's handles and track read the range's tokens.** The
   `--cui-range-slider-thumb-*` and `--cui-range-slider-track-*` families are
-  gone; `.range-slider` declares the `--cui-range-*` family instead, so one
-  setting styles both controls. Rename: `--cui-range-slider-thumb-{width,
+  gone; the slider's `.form-range` declares the `--cui-range-*` family
+  instead, so one setting styles both controls. Rename: `--cui-range-slider-thumb-{width,
   height,bg,border,border-radius,box-shadow,active-bg,disabled-bg}` →
   `--cui-range-thumb-*`, `--cui-range-slider-thumb-transition` →
   `--cui-range-thumb-transition-{property,duration,timing}`,
@@ -1964,7 +1987,9 @@ field behind that kept submitting.
   → `--cui-range-track-disabled-bg`. The Sass variables follow
   (`$range-slider-thumb-*`, `$range-slider-track-*` → `$form-range-*`).
   `--cui-range-slider-tick-label-*`, `--cui-range-slider-tooltip-margin-*`
-  and `--cui-range-slider-vertical-*` stay. The filled band keeps its half-strength mix of the theme colour, now
+  and `--cui-range-slider-vertical-*` are gone as well: tick labels read
+  `--cui-range-tick-label-*`, the tooltips sit like the range's, and a vertical
+  slider's height is `--cui-range-vertical-height`. The filled band keeps its half-strength mix of the theme colour, now
   shared with the range's fill, and a disabled slider greys the band through
   the theme slot on the track.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
@@ -1972,10 +1997,9 @@ field behind that kept submitting.
   mark, with or without text, so the option and everything around it carry the
   name the `Range` plugin uses: `labels` → `ticks`, `clickableLabels` →
   `clickableTicks` (`data-coreui-ticks`, `data-coreui-clickable-ticks`),
-  `.range-slider-labels-container` → `.range-slider-ticks`,
-  `.range-slider-label` → `.range-slider-tick`, `--cui-range-slider-label-*`
-  → `--cui-range-slider-tick-label-*` and `$range-slider-label-*` →
-  `$range-slider-tick-label-*`. The entry shape is unchanged: a string, a
+  `.range-slider-labels-container` → `.form-range-ticks`,
+  `.range-slider-label` → `.form-range-tick`, and `--cui-range-slider-label-*`
+  → `--cui-range-tick-label-*`. The entry shape is unchanged: a string, a
   bare number, or `{ value, label, class, style }`. `ariaLabels` names the
   handles and keeps its name.
 - **Range slider ticks sit on a grid.** The plugin builds
@@ -1992,19 +2016,17 @@ field behind that kept submitting.
 - **A theme beats `--cui-range-thumb-bg`, as everywhere else.** The token carried
   the `--cui-theme-*` slot inside its own default, so setting it inside a themed
   container dropped the theme. The slot sits on the property now.
-- **`--cui-range-slider-tick-label-padding-x`/`-y` reach the tick.** Both were
-  declared and nothing read them, so the knob existed and did nothing. They
-  default to `0`, so no tick moves.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **The value bubble is a tooltip.** The plugin renders
-  `<output class="range-slider-tooltip tooltip bs-tooltip-top">` (vertical:
-  `bs-tooltip-start`) with `.tooltip-arrow` and `.tooltip-inner`, so the
+  `<div class="form-range-tooltip tooltip bs-tooltip-top">` (vertical:
+  `bs-tooltip-start`, or `bs-tooltip-end` in a right-to-left page) with
+  `.tooltip-arrow` and `.tooltip-inner`, so the
   bubble looks like every other tooltip on the page — dark on a light page —
   and follows `--cui-tooltip-*` and the theme slots. The twelve
   `--cui-range-slider-tooltip-*` look tokens (`-bg`, `-color`, `-padding-*`,
   `-font-size`, `-border-radius`, `-box-shadow`, `-arrow-*`, `-max-width`,
-  `-transition`, `-zindex`) and their Sass variables are gone; only
-  `-margin-bottom` and `-margin-end` (the offset from the thumb) remain. For
+  `-transition`, `-zindex`) and their Sass variables are gone, and so are
+  `-margin-bottom` and `-margin-end`. For
   the previous light bubble set `--cui-tooltip-bg: var(--cui-bg-4)` and
   `--cui-tooltip-color: var(--cui-fg-body)` on the slider.
 
