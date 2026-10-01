@@ -128,7 +128,7 @@ export const getWeekLabel = (locale: string): string => {
  * @param label - A function that names a week number, `null` without one
  * @returns The name
  */
-export const getWeekNumberName = (weekNumber: number, weekLabel: string, label?: ((weekNumber: number) => string) | null): string =>
+export const getWeekNumberName = (weekNumber: number, weekLabel: string, label?: ((weekNumber: number) => string | undefined) | null): string =>
   label?.(weekNumber) || `${weekLabel} ${weekNumber}`
 
 /**

@@ -144,7 +144,7 @@ type CalendarConfig = {
   ariaNavPrevYearLabel: string
   ariaNavPrevYearsLabel: string
   ariaNothingToPickLabel: string | null
-  ariaWeekNumberLabel: ((weekNumber: number) => string) | null
+  ariaWeekNumberLabel: ((weekNumber: number) => string | undefined) | null
   calendarDate: Date | number | string | null
   calendars: number
   dayFormat: 'numeric' | '2-digit'
@@ -805,7 +805,7 @@ class Calendar extends BaseComponent {
       const cells = days.map(({ date, month }) => month === 'current' || showAdjacentDays ?
         this._cellHtml(date, this._cellDayAttributes(date, month, attributes.meta), this._formatDate(date, { day: this._config.dayFormat })) :
         '<td role="gridcell"></td>')
-      const weekNumberName = getWeekNumberName(week.number, weekLabel, ariaWeekNumberLabel)
+      const weekNumberName = showWeekNumber ? getWeekNumberName(week.number, weekLabel, ariaWeekNumberLabel) : ''
       const rowName = () => `${showWeekNumber ? `${weekNumberName}, ` : ''}${formatWeekName(days, this._config.locale)}`
       const ariaLabel = this._config.selectionType === 'week' && visible ? ` aria-label="${escapeHtml(rowName())}"` : ''
 

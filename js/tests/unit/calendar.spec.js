@@ -536,6 +536,32 @@ describe('Calendar', () => {
       expect(headers).toContain('Tydzień 36')
     })
 
+    it('should write a week number name into the markup as text', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { // eslint-disable-line no-new
+        ariaWeekNumberLabel: weekNumber => `"${weekNumber}" <b>x</b>`,
+        calendarDate: new Date(2026, 8, 1),
+        firstDayOfWeek: 1,
+        selectionType: 'week',
+        showWeekNumber: true
+      })
+
+      expect(div.querySelector('tbody .calendar-cell-week-number').getAttribute('aria-label')).toEqual('"36" <b>x</b>')
+      expect(div.querySelector('tbody tr').getAttribute('aria-label')).toMatch(/^"36" <b>x<\/b>, /)
+      expect(div.querySelectorAll('tbody b')).toHaveSize(0)
+    })
+
+    it('should not ask ariaWeekNumberLabel for a name while week numbers are hidden', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const label = vi.fn(weekNumber => `Wk ${weekNumber}`)
+      new Calendar(fixtureEl.querySelector('div'), { ariaWeekNumberLabel: label, calendarDate: new Date(2026, 8, 1), selectionType: 'week' }) // eslint-disable-line no-new
+
+      expect(label).not.toHaveBeenCalled()
+    })
+
     it('should not show week numbers by default', () => {
       fixtureEl.innerHTML = '<div></div>'
 
@@ -1268,19 +1294,21 @@ describe('Calendar', () => {
     })
 
     it('should name a week row by the days it spans in week selection, after its week number when it is shown', () => {
-      fixtureEl.innerHTML = '<div></div><div></div>'
+      fixtureEl.innerHTML = '<div></div><div></div><div></div>'
 
-      const [numbered, plain] = fixtureEl.querySelectorAll('div')
+      const [numbered, plain, custom] = fixtureEl.querySelectorAll('div')
       const config = {
         calendarDate: new Date(2026, 7, 1), firstDayOfWeek: 1, locale: 'en-US', selectionType: 'week'
       }
       const calendar = new Calendar(numbered, { ...config, showWeekNumber: true })
       new Calendar(plain, config) // eslint-disable-line no-new
+      new Calendar(custom, { ...config, ariaWeekNumberLabel: weekNumber => `Wk ${weekNumber}`, showWeekNumber: true }) // eslint-disable-line no-new
       const cell = div => div.querySelector(`[data-coreui-date="${new Date(2026, 7, 12).toDateString()}"]`)
 
       expect(calendar._view).toBe('days')
       expect(cell(numbered).closest('tr').getAttribute('aria-label')).toMatch(/^Week 33, August 10\s–\s16, 2026$/)
       expect(cell(plain).closest('tr').getAttribute('aria-label')).toMatch(/^August 10\s–\s16, 2026$/)
+      expect(cell(custom).closest('tr').getAttribute('aria-label')).toMatch(/^Wk 33, August 10\s–\s16, 2026$/)
       expect(cell(numbered).getAttribute('aria-label')).toEqual('Wednesday, August 12, 2026')
     })
 
