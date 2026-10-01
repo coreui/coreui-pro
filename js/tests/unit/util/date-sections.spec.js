@@ -9,7 +9,6 @@ import {
   formatSectionValue,
   getDateFromSections,
   getDateLimitError,
-  getDateOfISOWeek,
   getDateTimeSectionsFromLocale,
   getDaysInMonth,
   getDateWithin,
@@ -36,6 +35,7 @@ import {
   isEditableSection,
   setSectionsFromDate
 } from '../../../src/util/date-sections.js'
+import { getDateOfISOWeek } from '../../../src/util/calendar.js'
 
 describe('Date Sections Utilities', () => {
   describe('isEditableSection', () => {
@@ -513,20 +513,6 @@ describe('Date Sections Utilities', () => {
         expect(getISOWeeksInYear(year)).toBeGreaterThanOrEqual(52)
         expect(getISOWeeksInYear(year)).toBeLessThanOrEqual(53)
       }
-    })
-  })
-
-  describe('getDateOfISOWeek', () => {
-    it('should return the Monday of the ISO week', () => {
-      expect(getDateOfISOWeek(2026, 1)).toEqual(new Date(2025, 11, 29))
-      expect(getDateOfISOWeek(2026, 53)).toEqual(new Date(2026, 11, 28))
-      expect(getDateOfISOWeek(2030, 20)).toEqual(new Date(2030, 4, 13))
-    })
-
-    it('should keep a year below 100', () => {
-      const monday = new Date(2000, 0, 1)
-      monday.setFullYear(99, 0, 12)
-      expect(getDateOfISOWeek(99, 3)).toEqual(monday)
     })
   })
 

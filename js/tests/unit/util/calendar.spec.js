@@ -16,6 +16,7 @@ import {
   getCalendarKeyAction,
   getClosestSelectable,
   getDateBySelectionType,
+  getDateOfISOWeek,
   getISOWeekNumberAndYear,
   getLocalDateFromString,
   getMonthsNames,
@@ -168,6 +169,12 @@ describe('Calendar Utilities', () => {
       expect(result.getHours()).toBe(14)
       expect(result.getMinutes()).toBe(30)
       expect(result.getSeconds()).toBe(45)
+    })
+
+    it('should read a morning hour and midnight in either letter case', () => {
+      expect(convertToDateObject('2/15/2023, 9:05:00 AM', 'day', 'en-US', true)).toEqual(new Date(2023, 1, 15, 9, 5))
+      expect(convertToDateObject('2/15/2023, 12:15:00 AM', 'day', 'en-US', true)).toEqual(new Date(2023, 1, 15, 0, 15))
+      expect(convertToDateObject('2/15/2023, 12:15:00 pm', 'day', 'en-US', true)).toEqual(new Date(2023, 1, 15, 12, 15))
     })
 
     it('should call convertIsoWeekToDate for "week" selectionType', () => {
@@ -1122,6 +1129,20 @@ describe('Calendar Utilities', () => {
       expect(getCalendarKeyAction(press('End'), null, context())).toEqual({ type: 'stay' })
       expect(getCalendarKeyAction(press('Enter'), null, context())).toBeNull()
       expect(getCalendarKeyAction(press(' '), null, context())).toBeNull()
+    })
+  })
+
+  describe('getDateOfISOWeek', () => {
+    it('should return the Monday of the ISO week', () => {
+      expect(getDateOfISOWeek(2026, 1)).toEqual(new Date(2025, 11, 29))
+      expect(getDateOfISOWeek(2026, 53)).toEqual(new Date(2026, 11, 28))
+      expect(getDateOfISOWeek(2030, 20)).toEqual(new Date(2030, 4, 13))
+    })
+
+    it('should keep a year below 100', () => {
+      const monday = new Date(2000, 0, 1)
+      monday.setFullYear(99, 0, 12)
+      expect(getDateOfISOWeek(99, 3)).toEqual(monday)
     })
   })
 

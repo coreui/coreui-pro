@@ -1,3 +1,5 @@
+import { convert12hTo24h } from './time.js'
+
 export type DisabledDate = ((date: Date) => boolean) | Date | Date[]
 
 export type SelectionTypes = 'day' | 'week' | 'month' | 'quarter' | 'year'
@@ -95,32 +97,16 @@ export const parseToDateString = (value: string) : Date => {
 }
 
 /**
- * Finds the Monday that starts ISO week 1 of a year, the week holding 4 January.
- *
- * @param year - The full week-numbering year
- * @returns The Monday of week 1
- */
-const getMondayOfISOWeek1 = (year: number) : Date => {
-  const jan4 = createDate(year, 0, 4)
-  const jan4DayOfWeek = jan4.getDay()
-  const daysFromMonday = jan4DayOfWeek === 0 ? 6 : jan4DayOfWeek - 1
-  const mondayOfWeek1 = new Date(jan4)
-  mondayOfWeek1.setDate(jan4.getDate() - daysFromMonday)
-  return mondayOfWeek1
-}
-
-/**
  * Finds the Monday that starts an ISO week.
  *
  * @param year - The full week-numbering year
  * @param week - The ISO week number, starting at 1
  * @returns The Monday of the week
  */
-const getMondayOfISOWeek = (year: number, week: number) : Date => {
-  const mondayOfWeek1 = getMondayOfISOWeek1(year)
-  const weekStart = new Date(mondayOfWeek1)
-  weekStart.setDate(mondayOfWeek1.getDate() + ((week - 1) * 7))
-  return weekStart
+export const getDateOfISOWeek = (year: number, week: number) : Date => {
+  const date = createDate(year, 0, 4)
+  date.setDate(date.getDate() - ((date.getDay() + 6) % 7) + ((week - 1) * 7))
+  return date
 }
 
 const ARROW_KEYS = new Set(['ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowUp'])
@@ -200,7 +186,7 @@ export const convertIsoWeekToDate = (isoWeek: string) : Date => {
   const parsedYear = parseYearSmart(year)
   const parsedWeek = Number.parseInt(week, 10)
 
-  return getMondayOfISOWeek(parsedYear, parsedWeek)
+  return getDateOfISOWeek(parsedYear, parsedWeek)
 }
 
 /**
@@ -223,7 +209,7 @@ const parseWeekString = (dateString: string) : Date | null => {
       const parsedYear = parseYearSmart(match[1])
       const parsedWeek = Number.parseInt(match[2], 10)
 
-      return getMondayOfISOWeek(parsedYear, parsedWeek)
+      return getDateOfISOWeek(parsedYear, parsedWeek)
     }
   }
 
@@ -442,33 +428,6 @@ const tryParseWithPatterns = (dateString: string, patterns: string[], includeTim
 }
 
 /**
- * Converts a parsed hour to the 24-hour clock.
- *
- * @param hour - The hour as written
- * @param ampm - The day period as written, if any
- * @returns The hour on the 24-hour clock
- */
-const convertTo24Hour = (hour: string, ampm?: string) : number => {
-  const parsedHour = Number.parseInt(hour, 10)
-
-  if (!ampm) {
-    return parsedHour
-  }
-
-  const isPM = ampm.toLowerCase() === "pm"
-
-  if (isPM && parsedHour !== 12) {
-    return parsedHour + 12
-  }
-
-  if (!isPM && parsedHour === 12) {
-    return 0
-  }
-
-  return parsedHour
-}
-
-/**
  * Tells whether an hour, a minute and a second form a valid time.
  *
  * @param hour - The hour on the 24-hour clock
@@ -516,7 +475,7 @@ const createDateWithTime = (groups: DateTimeGroups) : Date | null => {
   const parsedYear = parseYearSmart(year)
   const parsedMonth = Number.parseInt(month, 10) - 1
   const parsedDay = Number.parseInt(day, 10)
-  const parsedHour = convertTo24Hour(hour, ampm)
+  const parsedHour = ampm ? convert12hTo24h(ampm.toLowerCase(), Number.parseInt(hour, 10)) : Number.parseInt(hour, 10)
   const parsedMinute = Number.parseInt(minute ?? "0", 10) || 0
   const parsedSecond = Number.parseInt(second ?? "0", 10) || 0
 
