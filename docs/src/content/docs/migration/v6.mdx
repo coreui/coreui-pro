@@ -200,6 +200,10 @@ or, if you are already resolving the package by name, `import { Tooltip } from
 
 The `util` modules are internal, but the package exports every file under `js/dist`, so a deep import could reach them. These helpers are no longer exported: `js/dist/util/date-range-picker.js` as a whole, `getFirstAvailableDateInRange`, `getSelectableDates`, `createDateFromMonth`, `createDateFromWeek` and `createDateFromYear` from `util/calendar.js`, `getDateSections` from `util/date-sections.js` (now `getSectionLayout`), and `convertTimeToDate`, `formatTimePartials`, `getAmPm`, `isValidTime` and `shouldUseTwoDigitHour` from `util/time.js`. Most had no reader in the library and are gone; `createDateFromYear`, `formatTimePartials` and `shouldUseTwoDigitHour` stay as module internals. Pass dates to the components in the formats their options take (`startDate: '2026W03'` with `selectionType: 'week'`), or keep a copy of the helper in your code. The nine per-unit comparisons of `util/calendar.js`, `isMonthDisabled`, `isMonthInRange`, `isMonthSelected` and their `isQuarter…` and `isYear…` counterparts, are three functions that take the calendar view as the second argument: `isPeriodDisabled(date, 'months', min, max, disabledDates)`, `isPeriodInRange(date, 'quarters', start, end)` and `isPeriodSelected(date, 'years', start, end)`.
 
+#### `CalendarUtil` and `RangeUtil` in the per-file UMD builds
+
+Loaded with a plain `<script>`, `js/dist/util/calendar.js` registers as `CalendarUtil`, and the new `js/dist/util/range.js` as `RangeUtil`. The calendar util used the `Calendar` global of the component, so the two files overwrote each other and `js/dist/calendar.js` read its helpers from itself. Load the util file before the component, as with the other `js/dist/util` files.
+
 #### `coreui.Offcanvas` in the UMD bundle
 
 The UMD bundle exposed the offcanvas plugin as `coreui.OffCanvas`, while the

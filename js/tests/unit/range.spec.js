@@ -840,6 +840,15 @@ describe('Range', () => {
       expect(tick).toHaveClass('text-danger')
     })
 
+    it('should read a tick value from a data attribute as a number and place a null tick by its position', () => {
+      fixtureEl.innerHTML = getRangeHtml(`data-coreui-ticks='[{"value": "25", "label": "Quarter"}, null, 100]'`)
+
+      new Range(fixtureEl.querySelector('.form-range')) // eslint-disable-line no-new
+
+      expect([...fixtureEl.querySelectorAll('.form-range-tick')].map(tick => tick.getAttribute('data-coreui-value'))).toEqual(['25', '50', '100'])
+      expect(fixtureEl.querySelector('.form-range-tick-label')).toHaveTextContent('Quarter')
+    })
+
     it('should read the datalist of the list option without a list attribute on the input', () => {
       fixtureEl.innerHTML = getTicksHtml().replace(' list="ticksList"', '')
 
