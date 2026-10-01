@@ -116,6 +116,11 @@
       "import": "./js/dist/util/date-sections.mjs",
       "require": "./js/dist/util/date-sections.js"
     },
+    "./utils/range": {
+      "types": "./js/dist/util/range.d.ts",
+      "import": "./js/dist/util/range.mjs",
+      "require": "./js/dist/util/range.js"
+    },
     "./utils/time": {
       "types": "./js/dist/util/time.d.ts",
       "import": "./js/dist/util/time.mjs",

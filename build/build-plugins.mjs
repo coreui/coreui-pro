@@ -17,6 +17,7 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const sourcePath = path.resolve(__dirname, '../js/src/').replace(/\\/g, '/')
+const distPath = path.resolve(__dirname, '../js/dist/').replace(/\\/g, '/')
 const tsFiles = await globby(`${sourcePath}/**/*.{js,ts}`)
 
 // Array which holds the resolved plugins
@@ -26,13 +27,18 @@ const resolvedPlugins = []
 const filenameToEntity = filename => filename.replace(/\.[jt]s$/, '')
   .replace(/(?:^|-|\/|\\)[a-z]/g, str => str.slice(-1).toUpperCase())
 
+const componentFiles = new Set(tsFiles.filter(file => path.dirname(file) === sourcePath).map(file => path.basename(file)))
+
 for (const file of tsFiles) {
+  const fileName = path.basename(file)
+  const shadowsComponent = path.dirname(file) !== sourcePath && fileName !== 'index.ts' && componentFiles.has(fileName)
+
   resolvedPlugins.push({
     src: file,
     // TypeScript sources still emit a `.js` plugin
-    dist: file.replace('src', 'dist').replace(/\.ts$/, '.js'),
-    fileName: path.basename(file),
-    className: filenameToEntity(path.basename(file))
+    dist: file.replace(sourcePath, distPath).replace(/\.ts$/, '.js'),
+    fileName,
+    className: `${filenameToEntity(fileName)}${shadowsComponent ? 'Util' : ''}`
   })
 }
 

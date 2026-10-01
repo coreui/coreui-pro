@@ -14,6 +14,16 @@ import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
 import type { ComponentConfig } from './util/config.js'
 import { defineJQueryPlugin, isRTL, jQueryDispatch } from './util/index.js'
+import {
+  constrainInput,
+  getNearestInput,
+  getRatio,
+  getRatioAt,
+  getStackOrder,
+  getThumbSize,
+  getTickPositions,
+  setInputValue
+} from './util/range.js'
 import { DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList } from './util/sanitizer.js'
 
 /**
@@ -55,7 +65,6 @@ const CLASS_NAME_VERTICAL = 'form-range-vertical'
 
 const PROPERTY_FILL = '--cui-range-fill'
 const PROPERTY_FILL_START = '--cui-range-fill-start'
-const PROPERTY_THUMB_WIDTH = '--cui-range-thumb-width'
 
 const TOLERANCE = 1e-9
 
@@ -296,11 +305,6 @@ class Range extends BaseComponent {
     return input.step === 'any' ? (this._max(input) - this._min(input)) / 100 : (Number.parseFloat(input.step) || 1)
   }
 
-  protected _ratio(input: HTMLInputElement = this._inputs[0]): number {
-    const span = this._max(input) - this._min(input)
-    return span > 0 ? (this._value(input) - this._min(input)) / span : 0
-  }
-
   protected _isDisabled(input: HTMLInputElement): boolean {
     return input.matches(':disabled')
   }
@@ -310,7 +314,7 @@ class Range extends BaseComponent {
   }
 
   protected _update(changed?: HTMLInputElement): void {
-    const ratios = this._inputs.map(input => this._ratio(input))
+    const ratios = this._inputs.map(input => getRatio(input))
 
     if (this._config.track) {
       if (this._inputs.length > 1) {
@@ -325,7 +329,7 @@ class Range extends BaseComponent {
       this._updateValueText(index)
 
       if (this._inputs.length > 1) {
-        input.style.zIndex = `${ratios[index] > 0.5 ? this._inputs.length - index : index + 1}`
+        input.style.zIndex = `${getStackOrder(ratios[index], index, this._inputs.length)}`
       }
 
       if (!changed || changed === input) {
@@ -336,25 +340,7 @@ class Range extends BaseComponent {
 
   protected _constrain(input: HTMLInputElement): void {
     const index = this._inputs.indexOf(input)
-    const previous = this._inputs[index - 1]
-    const next = this._inputs[index + 1]
-    const { distance } = this._config
-
-    if (previous && this._value(input) < this._value(previous) + distance - TOLERANCE) {
-      input.value = `${this._value(previous) + distance}`
-
-      if (this._value(input) < this._value(previous) + distance - TOLERANCE && input.step !== 'any') {
-        input.stepUp()
-      }
-    }
-
-    if (next && this._value(input) > this._value(next) - distance + TOLERANCE) {
-      input.value = `${this._value(next) - distance}`
-
-      if (this._value(input) > this._value(next) - distance + TOLERANCE && input.step !== 'any') {
-        input.stepDown()
-      }
-    }
+    constrainInput(input, this._inputs[index - 1], this._inputs[index + 1], this._config.distance)
   }
 
   protected _format(value: number): string {
@@ -445,24 +431,20 @@ class Range extends BaseComponent {
   protected _tickPoints(): RangeTickPoint[] {
     const input = this._inputs[0]
     const min = this._min(input)
-    const span = this._max(input) - min || 1
-    const ratio = (value: number) => Math.min(Math.max((value - min) / span, 0), 1)
+    const max = this._max(input)
     const { ticks } = this._config
     const points: RangeTickPoint[] = []
 
     if (Array.isArray(ticks)) {
-      for (const [index, tick] of ticks.entries()) {
-        const value = typeof tick === 'number' ?
-          tick :
-          (typeof tick === 'object' && tick.value !== undefined ?
-            tick.value :
-            min + (ticks.length === 1 ? 0 : (index / (ticks.length - 1)) * span))
+      for (const { index, ratio, value } of getTickPositions(min, max, ticks)) {
+        const tick = ticks[index]
+        const options = typeof tick === 'object' && tick !== null ? tick : undefined
 
         points.push({
-          class: typeof tick === 'object' ? tick.class : undefined,
-          label: typeof tick === 'number' ? '' : (typeof tick === 'object' ? (tick.label ?? '') : tick),
-          ratio: ratio(value),
-          style: typeof tick === 'object' ? tick.style : undefined,
+          class: options?.class,
+          label: typeof tick === 'string' ? tick : (options?.label ?? ''),
+          ratio,
+          style: options?.style,
           value
         })
       }
@@ -472,12 +454,10 @@ class Range extends BaseComponent {
     const datalist = listId ? document.getElementById(listId) : null
 
     if (datalist) {
-      for (const option of SelectorEngine.find<HTMLOptionElement>('option', datalist)) {
-        const value = Number.parseFloat(option.value)
+      const options = SelectorEngine.find<HTMLOptionElement>('option', datalist)
 
-        if (!Number.isNaN(value)) {
-          points.push({ label: option.label, ratio: ratio(value), value })
-        }
+      for (const { index, ratio, value } of getTickPositions(min, max, options.map(option => Number.parseFloat(option.value)))) {
+        points.push({ label: options[index].label, ratio, value })
       }
     }
 
@@ -546,53 +526,9 @@ class Range extends BaseComponent {
     this._element.append(this._ticks)
   }
 
-  protected _nearest(ratio: number): HTMLInputElement | null {
-    const inputs = this._inputs.filter(input => !this._isDisabled(input))
-
-    if (inputs.length === 0) {
-      return null
-    }
-
-    const ratios = inputs.map(input => this._ratio(input))
-
-    if (ratio <= ratios[0]) {
-      return inputs[0]
-    }
-
-    if (ratio >= ratios.at(-1)!) {
-      return inputs.at(-1)!
-    }
-
-    const distances = ratios.map(value => Math.abs(value - ratio))
-    const closest = Math.min(...distances)
-    const first = distances.indexOf(closest)
-
-    return inputs[ratio < ratios[first] ? first : distances.lastIndexOf(closest)]
-  }
-
-  protected _ratioAt(event: PointerEvent, rect: DOMRect, thumb: number): number {
-    const vertical = this._isVertical()
-    const length = (vertical ? rect.height : rect.width) - thumb
-    const offset = vertical ?
-      rect.bottom - event.clientY :
-      (isRTL(this._element) ? rect.right - event.clientX : event.clientX - rect.left)
-
-    return length > 0 ? Math.min(Math.max((offset - (thumb / 2)) / length, 0), 1) : 0
-  }
-
-  protected _thumbSize(): number {
-    const probe = document.createElement('div')
-    probe.style.cssText = `position: absolute; visibility: hidden; width: var(${PROPERTY_THUMB_WIDTH});`
-    this._element.append(probe)
-    const { width } = probe.getBoundingClientRect()
-    probe.remove()
-
-    return width
-  }
-
   protected _setValue(input: HTMLInputElement, value: number): void {
     const before = input.value
-    input.value = `${value}`
+    setInputValue(input, value)
     this._constrain(input)
 
     if (input.value !== before) {
@@ -644,9 +580,9 @@ class Range extends BaseComponent {
   }
 
   protected _startPress(event: PointerEvent, rect: DOMRect, ratio?: number, value?: number): void {
-    const thumb = this._thumbSize()
-    const at = ratio ?? this._ratioAt(event, rect, thumb)
-    const input = this._nearest(at)
+    const thumb = getThumbSize(this._element)
+    const at = ratio ?? getRatioAt(event, rect, thumb, this._isVertical(), isRTL(this._element))
+    const input = getNearestInput(this._inputs, at)
 
     if (!input) {
       return
@@ -669,7 +605,7 @@ class Range extends BaseComponent {
     }
 
     const { input, rect, thumb } = this._press
-    const ratio = this._ratioAt(event, rect, thumb)
+    const ratio = getRatioAt(event, rect, thumb, this._isVertical(), isRTL(this._element))
     this._setValue(input, this._min(input) + (ratio * (this._max(input) - this._min(input))))
   }
 
