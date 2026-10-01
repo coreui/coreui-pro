@@ -4499,8 +4499,8 @@ describe('Calendar', () => {
       })
     }
 
-    for (const [selectionType, adjacentInRange] of [['day', false], ['week', true]]) {
-      it(`should give a renderer isInRange where the range is drawn in ${selectionType} selection`, () => {
+    for (const [selectionType, selectAdjacentDays, adjacentInRange] of [['day', false, false], ['day', true, true], ['week', false, true]]) {
+      it(`should give a renderer isInRange where the range is drawn in ${selectionType} selection${selectAdjacentDays ? ' with selectAdjacentDays' : ''}`, () => {
         fixtureEl.innerHTML = '<div></div>'
 
         const div = fixtureEl.querySelector('div')
@@ -4518,6 +4518,7 @@ describe('Calendar', () => {
 
             return String(date.getDate())
           },
+          selectAdjacentDays,
           selectionType,
           startDate: new Date(2026, 8, 21)
         })
@@ -4664,6 +4665,15 @@ describe('Calendar', () => {
         .dispatchEvent(new MouseEvent('mouseover', { bubbles: true, relatedTarget: div }))
 
       expect(days('td.range-hover')).toEqual([28, 29, 30, 31, 1, 2])
+
+      fixtureEl.innerHTML = '<div></div>'
+      const filler = fixtureEl.querySelector('div')
+      new Calendar(filler, { ...config, calendars: 2 }) // eslint-disable-line no-new
+      filler.querySelector(`td.current[data-coreui-date="${new Date(2026, 8, 2).toDateString()}"]`)
+        .dispatchEvent(new MouseEvent('mouseover', { bubbles: true, relatedTarget: filler }))
+
+      expect(days('td.range-hover')).toEqual([28, 29, 30, 31, 1, 2])
+      expect(days('td.range-hover:is(.previous, .next)')).toEqual([])
     })
 
     it('should keep the preview of a range visual', () => {
