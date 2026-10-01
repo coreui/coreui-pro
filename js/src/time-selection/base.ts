@@ -8,6 +8,7 @@
 import EventHandler from '../dom/event-handler.js'
 import SelectorEngine from '../dom/selector-engine.js'
 import Config from '../util/config.js'
+import { constrainDate } from '../util/calendar.js'
 import { convertValue, getInclusiveMax } from '../util/date-sections.js'
 import {
   convert12hTo24h,
@@ -104,6 +105,13 @@ class TimeSelection extends Config {
     return this._date
   }
 
+  setTime(time: Date | null): void {
+    this._config.time = time as any
+    this._date = time
+    this._ampm = time ? (time.getHours() >= 12 ? 'pm' : 'am') : 'am'
+    this._markSelected()
+  }
+
   setConfig(config: any): void {
     this._config = this._getConfig({ ...this._config, ...config }) as typeof Default
     this._date = this._config.time as Date | null
@@ -182,15 +190,17 @@ class TimeSelection extends Config {
       return false
     }
 
-    const date = new Date((this._config.time as Date | null) ?? Date.now())
+    const date = new Date((this._config.time as Date | null) ?? constrainDate(new Date(), this._minDate, this._maxDate))
 
     if (this._date) {
       date.setHours(this._date.getHours(), this._date.getMinutes(), this._date.getSeconds())
     }
 
     const hour = part === 'hours' && this._partials.hour12 ? convert12hTo24h(this._ampm, Number(value)) : value
+    const offered = (part === 'hours' && this._config.minutes ? this._partials.listOfMinutes : (part === 'minutes' && this._config.seconds ? this._partials.listOfSeconds : []))
+      .map((option: any) => option.value)
 
-    return isTimeOutsideLimits(date, part as 'hours' | 'meridiem' | 'minutes' | 'seconds', hour, this._minDate, this._maxDate)
+    return isTimeOutsideLimits(date, part as 'hours' | 'meridiem' | 'minutes' | 'seconds', hour, { max: this._maxDate, min: this._minDate }, offered)
   }
 
   _renderBody(): void {

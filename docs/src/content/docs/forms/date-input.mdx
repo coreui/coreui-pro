@@ -142,7 +142,7 @@ Set the initial date with the `data-coreui-date` attribute.
 
 ## Min and max dates
 
-Constrain the selectable range with `minDate` and `maxDate`. A completed date outside the range gets the `.is-invalid` class and the component reports `null` until the value is corrected. A date field compares the limits by the day. A field with a time compares them by the instant, and there a `maxDate` without a time of day covers its whole day.
+Constrain the selectable range with `minDate` and `maxDate`. A completed date outside the range gets the `.is-invalid` class and the component reports `null` until the value is corrected. A date field compares the limits by the day. A field with a time compares them to the smallest unit it shows, and there a `maxDate` without a time of day covers its whole day.
 
 <Example pro code={`<label class="form-label" id="dateInputDateInJuly2026Label">Date in July 2026</label>
   <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="dd.MM.yyyy" data-coreui-min-date="2026-07-01" data-coreui-max-date="2026-07-31" aria-labelledby="dateInputDateInJuly2026Label"></div>`} />

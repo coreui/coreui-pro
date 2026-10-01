@@ -18,7 +18,9 @@ import {
   type SelectionTypes
 } from './util/calendar.js'
 import type { ComponentConfig } from './util/config.js'
-import { getHourCycle, getPickerFormat } from './util/date-sections.js'
+import {
+  constrainDateTime, convertValue, getHourCycle, getPickerFormat
+} from './util/date-sections.js'
 import {
   appendControlGroupField,
   applyControlGroupClasses,
@@ -369,14 +371,24 @@ class DatePicker extends PickerBase {
     }, this._config.selectionOptions))
   }
 
+  _withinTimeLimits(date: Date): Date {
+    const { locale, maxDate, minDate } = this._config
+
+    return constrainDateTime(date, convertValue(minDate, 'datetime', locale), convertValue(maxDate, 'datetime', locale))
+  }
+
   _withCurrentTime(date: Date | null): Date | null {
-    if (!date || !this._config.timepicker || !this._date) {
+    if (!date || !this._config.timepicker) {
       return date
     }
 
     const merged = new Date(date)
-    merged.setHours(this._date.getHours(), this._date.getMinutes(), this._date.getSeconds())
-    return merged
+
+    if (this._date) {
+      merged.setHours(this._date.getHours(), this._date.getMinutes(), this._date.getSeconds())
+    }
+
+    return this._withinTimeLimits(merged)
   }
 
   _applyTime(time: Date | null): void {
@@ -384,11 +396,12 @@ class DatePicker extends PickerBase {
       return
     }
 
-    const current = this.getDate()
-    const merged = current ? new Date(current) : new Date()
+    const merged = new Date(this.getDate() ?? this._withinTimeLimits(new Date()))
     merged.setHours(time.getHours(), time.getMinutes(), time.getSeconds())
+    const limited = this._withinTimeLimits(merged)
 
-    this._applyDate(merged, { selection: false })
+    this._applyDate(limited, { selection: false })
+    this._selection?.setTime(limited)
   }
 
   _applyDate(date: Date | null, { calendar = true, field = true, selection = true }: { calendar?: boolean, field?: boolean, selection?: boolean } = {}): void {

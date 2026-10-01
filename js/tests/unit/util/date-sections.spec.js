@@ -2,6 +2,7 @@
 import {
   applyDigitToSection,
   applyLetterToSection,
+  constrainDateTime,
   convertValue,
   formatDateWithin,
   formatSections,
@@ -915,6 +916,18 @@ describe('Date Sections Utilities', () => {
     })
   })
 
+  describe('constrainDateTime', () => {
+    it('should move a date and time before the earliest date to it', () => {
+      expect(constrainDateTime(new Date(2026, 9, 15, 8), new Date(2026, 9, 15, 10, 30), null)).toEqual(new Date(2026, 9, 15, 10, 30))
+    })
+
+    it('should move a date and time past the latest date to it, a date at midnight allowing its whole day', () => {
+      expect(constrainDateTime(new Date(2026, 9, 20, 18), null, new Date(2026, 9, 20, 17, 45))).toEqual(new Date(2026, 9, 20, 17, 45))
+      expect(constrainDateTime(new Date(2026, 9, 20, 18), null, new Date(2026, 9, 20))).toEqual(new Date(2026, 9, 20, 18))
+      expect(constrainDateTime(new Date(2026, 9, 21, 1), null, new Date(2026, 9, 20))).toEqual(new Date(2026, 9, 20, 23, 59, 59, 999))
+    })
+  })
+
   describe('getDateLimitError', () => {
     const dateTime = getDateTimeSectionsFromLocale('en-US')
     const date = getSectionsFromFormat('dd.MM.yyyy', 'en-US')
@@ -927,6 +940,13 @@ describe('Date Sections Utilities', () => {
       expect(getDateLimitError(dateTime, new Date(2026, 9, 15, 10, 30), min, max)).toBeNull()
       expect(getDateLimitError(dateTime, new Date(2026, 9, 20, 18), min, max)).toBeNull()
       expect(getDateLimitError(dateTime, new Date(2026, 9, 20, 18, 1), min, max)).toBe('maxDate')
+    })
+
+    it('should compare to the smallest unit the field shows', () => {
+      const withoutSeconds = getDateTimeSectionsFromLocale('en-US', false)
+
+      expect(getDateLimitError(withoutSeconds, new Date(2026, 9, 15, 10, 30), new Date(2026, 9, 15, 10, 30, 20), null)).toBeNull()
+      expect(getDateLimitError(withoutSeconds, new Date(2026, 9, 15, 10, 29), new Date(2026, 9, 15, 10, 30, 20), null)).toBe('minDate')
     })
 
     it('should let a latest date without a time of day cover its whole day in a field with a time', () => {

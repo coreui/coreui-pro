@@ -169,13 +169,16 @@ time" and "Toggle calendar and time selection" unless the page passed its own
 label.
 
 `minDate` and `maxDate` can carry a time of day. Their day stays selectable in
-the calendar, the time selects disable the hours, minutes and seconds before
-`minDate` or after `maxDate` on that day, and the field marks such a time
-invalid. A limit without a time of day covers its whole day.
+the calendar and the time selects disable the hours, minutes and seconds before
+`minDate` or after `maxDate` on that day. A time the panel sets beyond a limit,
+such as the current time when the day of `minDate` is picked, moves to the
+limit; a typed time beyond it marks the field invalid. Until a date is picked,
+the time selects work on today moved into the limits. A limit without a time of
+day covers its whole day.
 
 <Example pro code={`<div class="row">
     <div class="col-lg-5">
-      <div data-coreui-locale="en-US" data-coreui-timepicker="true" data-coreui-min-date="2026-10-15 09:30" data-coreui-max-date="2026-10-30 17:00" data-coreui-date-picker></div>
+      <div data-coreui-locale="en-US" data-coreui-timepicker="true" data-coreui-min-date="2026-10-15T09:30" data-coreui-max-date="2026-10-30T17:00" data-coreui-date-picker></div>
     </div>
   </div>`} />
 

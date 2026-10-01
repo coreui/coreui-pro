@@ -6,7 +6,7 @@
  */
 
 import {
-  convertToDateObject, createDate, type DisabledDate, getISOWeekNumberAndYear, isCellDisabled, parseYearSmart, type PeriodViewTypes, removeTimeFromDate, type SelectionTypes
+  constrainDate, convertToDateObject, createDate, type DisabledDate, getISOWeekNumberAndYear, isCellDisabled, parseYearSmart, type PeriodViewTypes, removeTimeFromDate, type SelectionTypes
 } from './calendar.js'
 import { convert12hTo24h, convert24hTo12h } from './time.js'
 
@@ -965,10 +965,23 @@ export const getInclusiveMax = (maxDate: Date | null): Date | null =>
     maxDate
 
 /**
+ * Moves a date and time into the limits of a field with a time: before
+ * `minDate` it becomes `minDate`, after the latest moment `maxDate` allows it
+ * becomes that moment, a `maxDate` at midnight allowing its whole day.
+ *
+ * @param date - The date and time to move
+ * @param minDate - The earliest date allowed, or `null` without one
+ * @param maxDate - The latest date allowed, or `null` without one
+ * @returns The date itself when the limits allow it, else a copy of the limit it crossed
+ */
+export const constrainDateTime = (date: Date, minDate: Date | null, maxDate: Date | null): Date =>
+  constrainDate(date, minDate, getInclusiveMax(maxDate))
+
+/**
  * Names the limit a date a field holds breaks. The bounds are compared at the
- * field's precision: by the instant when the field has a time, where a latest
- * date without a time of day covers its whole day, by the day when it has
- * none, by the whole period when it picks months, quarters or years.
+ * field's precision: to the smallest unit the field shows when it has a time,
+ * where a latest date without a time of day covers its whole day, by the day
+ * when it has none, by the whole period when it picks months, quarters or years.
  *
  * @param layout - The sections and literals of the field
  * @param date - The date the field holds
@@ -980,7 +993,7 @@ export const getInclusiveMax = (maxDate: Date | null): Date | null =>
 export const getDateLimitError = (layout: DateSection[], date: Date, minDate: Date | null, maxDate: Date | null, disabledDates?: DisabledDate | DisabledDate[]): DateLimitError => {
   const period = getLayoutPeriod(layout)
   const timed = layout.some(section => section.type === 'hour')
-  const min = period ? getDateWithin(layout, minDate) : (minDate && !timed ? removeTimeFromDate(minDate) : minDate)
+  const min = period || timed ? getDateWithin(layout, minDate) : minDate && removeTimeFromDate(minDate)
   const max = timed ? getInclusiveMax(maxDate) : maxDate
 
   if (min && date < min) {

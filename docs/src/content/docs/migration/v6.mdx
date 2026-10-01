@@ -1182,6 +1182,10 @@ removed in favour of `$translucent-opacity` and
 `--cui-card-translucent-cap-bg-opacity` token on `.card-translucent`.
 #### Calendar
 
+- **Changed.** **`minDate` and `maxDate` are compared by the day.** v5 compared
+  a day cell at midnight with the instant, so a limit that carried a time of
+  day, such as `minDate: new Date()`, disabled its own day. Now that day can be
+  picked; the Date Picker's time selects and the field bound the time on it.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **`cellHover` is gone.** It reported the date under the pointer or the focus
   for the hover preview in the date picker's field, which v6 no longer draws.
@@ -1359,12 +1363,11 @@ behaviour, v5 is the reference. Mapping:
   keeps the day. `seconds` narrows what the time half offers and
   `selectionOptions` is its escape hatch.
 - **Changed.** With `timepicker`, a `minDate` or `maxDate` that carries a time
-  of day bounds the instant: its day stays selectable in the calendar, the time
-  selects disable the hours, minutes and seconds before `minDate` or after
-  `maxDate` on that day, and the field marks such a time invalid. A limit
-  without a time of day still covers its whole day. The limits used to be
-  widened to whole days, so a `minDate` of 15 October 10:00 accepted 08:00 that
-  day.
+  of day bounds the time on its day: the time selects disable the hours,
+  minutes and seconds before `minDate` or after `maxDate` there, a time the
+  panel sets beyond the limit (the current time when that day is picked) moves
+  to the limit, and a typed time beyond it marks the field invalid. A limit
+  without a time of day covers its whole day.
 - **Kept.** Calendar passthrough (`locale`, `minDate`/`maxDate`,
   `disabledDates`, `selectionType`, `showWeekNumber`, custom cell renderers, …),
   `container`, `startDate`/`endDate`/`date`, `startName`/`endName`/`name`,
