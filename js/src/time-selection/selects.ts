@@ -49,6 +49,16 @@ class TimeSelects extends TimeSelection {
     }
   }
 
+  override _markDisabled(): void {
+    for (const part of this._parts()) {
+      const { options } = SelectorEngine.findOne(`select.${part.name}`, this._element as ParentNode) as HTMLSelectElement
+
+      for (const [index, option] of part.options.entries()) {
+        options[index].disabled = option.disabled
+      }
+    }
+  }
+
   _renderSelects(): void {
     const icon = document.createElement('span')
     icon.classList.add(CLASS_NAME_TIME_ICON)

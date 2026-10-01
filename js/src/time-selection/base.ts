@@ -8,12 +8,14 @@
 import EventHandler from '../dom/event-handler.js'
 import SelectorEngine from '../dom/selector-engine.js'
 import Config from '../util/config.js'
+import { convertValue, getInclusiveMax } from '../util/date-sections.js'
 import {
   convert12hTo24h,
   getLocalizedTimePartials,
   getSelectedHour,
   getSelectedMinutes,
-  getSelectedSeconds
+  getSelectedSeconds,
+  isTimeOutsideLimits
 } from '../util/time.js'
 import { execute } from '../util/index.js'
 
@@ -36,6 +38,8 @@ const Default = {
   hourCycle: null,
   hours: null,
   locale: 'default',
+  maxDate: null,
+  minDate: null,
   minutes: true,
   onChange: null,
   seconds: true,
@@ -51,6 +55,8 @@ const DefaultType = {
   hourCycle: '(string|null)',
   hours: '(array|function|null)',
   locale: 'string',
+  maxDate: '(date|string|null)',
+  minDate: '(date|string|null)',
   minutes: '(array|boolean|function)',
   onChange: '(function|null)',
   seconds: '(array|boolean|function)',
@@ -67,6 +73,8 @@ class TimeSelection extends Config {
   protected declare _partials: any
   protected declare _date: Date | null
   protected declare _ampm: string
+  protected declare _maxDate: Date | null
+  protected declare _minDate: Date | null
 
   constructor(element?: string | Element | null, config?: Partial<typeof Default> | null) {
     super()
@@ -119,6 +127,8 @@ class TimeSelection extends Config {
     this._element!.setAttribute('role', 'group')
     this._element!.setAttribute('aria-label', this._config.ariaLabel as string)
 
+    this._minDate = convertValue(this._config.minDate as Date | string | null, 'datetime', this._config.locale)
+    this._maxDate = getInclusiveMax(convertValue(this._config.maxDate as Date | string | null, 'datetime', this._config.locale))
     this._partials = getLocalizedTimePartials(
       this._config.locale,
       this._ampmOption(),
@@ -161,7 +171,26 @@ class TimeSelection extends Config {
       })
     }
 
-    return parts
+    return parts.map(part => ({
+      ...part,
+      options: part.options.map((option: any) => ({ ...option, disabled: this._isOutsideLimits(part.name, option.value) }))
+    }))
+  }
+
+  _isOutsideLimits(part: string, value: number | string): boolean {
+    if (!this._minDate && !this._maxDate) {
+      return false
+    }
+
+    const date = new Date((this._config.time as Date | null) ?? Date.now())
+
+    if (this._date) {
+      date.setHours(this._date.getHours(), this._date.getMinutes(), this._date.getSeconds())
+    }
+
+    const hour = part === 'hours' && this._partials.hour12 ? convert12hTo24h(this._ampm, Number(value)) : value
+
+    return isTimeOutsideLimits(date, part as 'hours' | 'meridiem' | 'minutes' | 'seconds', hour, this._minDate, this._maxDate)
   }
 
   _renderBody(): void {
@@ -177,6 +206,8 @@ class TimeSelection extends Config {
   }
 
   _markPart(_part: string, _value: string, _instant: boolean): void {}
+
+  _markDisabled(): void {}
 
   _updateRovingTabIndex(preferred?: HTMLElement): void {
     const list = this._stops()
@@ -245,6 +276,7 @@ class TimeSelection extends Config {
       this._markPart(part, value as string, instant)
     }
 
+    this._markDisabled()
     this._updateRovingTabIndex(
       SelectorEngine.findOne(':focus', this._element as ParentNode) as HTMLElement
     )

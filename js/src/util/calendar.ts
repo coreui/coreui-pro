@@ -1622,9 +1622,10 @@ export const constrainDate = (date: Date, min: Date | null, max: Date | null) : 
 }
 
 /**
- * Tells whether a day cannot be picked: it lies before `min` or year 1, or after
- * `max`, or it matches the disabled dates, which can be a function, a date, or
- * an array mixing functions, dates and `[start, end]` ranges.
+ * Tells whether a day cannot be picked: it lies before the day of `min` or
+ * before year 1, or after the day of `max`, times of day aside, or it matches
+ * the disabled dates, which can be a function, a date, or an array mixing
+ * functions, dates and `[start, end]` ranges.
  *
  * @param date - The day to check
  * @param min - The earliest date allowed
@@ -1633,11 +1634,13 @@ export const constrainDate = (date: Date, min: Date | null, max: Date | null) : 
  * @returns `true` for a day that cannot be picked
  */
 export const isDateDisabled = (date: Date, min?: Date | null, max?: Date | null, disabledDates?: DisabledDate | DisabledDate[]) : boolean => {
-  if ((min && date < min) || date.getFullYear() < 1) {
+  const day = removeTimeFromDate(date)
+
+  if ((min && day < removeTimeFromDate(min)) || date.getFullYear() < 1) {
     return true
   }
 
-  if (max && date > max) {
+  if (max && day > removeTimeFromDate(max)) {
     return true
   }
 

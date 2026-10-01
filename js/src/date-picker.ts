@@ -13,7 +13,6 @@ import SelectorEngine from './dom/selector-engine.js'
 import type { SectionInputConfig } from './section-input.js'
 import TimeSelects from './time-selection/selects.js'
 import {
-  convertToDateObject,
   getDateBySelectionType,
   isSameInstantAs,
   type SelectionTypes
@@ -306,7 +305,6 @@ class DatePicker extends PickerBase {
       name: this._config.name,
       seconds: Boolean(this._config.seconds),
       ...(this._config.timepicker ? { type: 'datetime' } : {}),
-      ...(this._config.timepicker ? this._dayBounds() : {}),
       ...(format ? { format } : {})
     }, { ...(this._config.floatingLabel ? { ariaLabel: this._config.floatingLabel } : {}), ...this._config.inputOptions }))
 
@@ -369,22 +367,6 @@ class DatePicker extends PickerBase {
       onChange: (time: Date | null) => this._applyTime(time),
       time: this.getDate()
     }, this._config.selectionOptions))
-  }
-
-  _dayBounds(): { maxDate?: Date, minDate?: Date } {
-    const bounds: { maxDate?: Date, minDate?: Date } = {}
-    const min = convertToDateObject(this._config.minDate, this._config.selectionType)
-    const max = convertToDateObject(this._config.maxDate, this._config.selectionType)
-
-    if (min) {
-      bounds.minDate = new Date(new Date(min).setHours(0, 0, 0, 0))
-    }
-
-    if (max) {
-      bounds.maxDate = new Date(new Date(max).setHours(23, 59, 59, 999))
-    }
-
-    return bounds
   }
 
   _withCurrentTime(date: Date | null): Date | null {

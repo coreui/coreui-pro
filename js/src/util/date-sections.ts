@@ -6,7 +6,7 @@
  */
 
 import {
-  convertToDateObject, createDate, type DisabledDate, getISOWeekNumberAndYear, isCellDisabled, parseYearSmart, type PeriodViewTypes, type SelectionTypes
+  convertToDateObject, createDate, type DisabledDate, getISOWeekNumberAndYear, isCellDisabled, parseYearSmart, type PeriodViewTypes, removeTimeFromDate, type SelectionTypes
 } from './calendar.js'
 import { convert12hTo24h, convert24hTo12h } from './time.js'
 
@@ -30,6 +30,8 @@ export type LiteralSection = {
 export type DateSection = EditableSection | LiteralSection
 
 export type SectionInputType = 'date' | 'datetime' | 'time'
+
+export type DateLimitError = 'disabledDate' | 'maxDate' | 'minDate' | null
 
 /**
  * Tells an editable section from a literal.
@@ -950,10 +952,56 @@ export const getLayoutPeriod = (layout: DateSection[]): PeriodViewTypes | null =
 }
 
 /**
+ * Reads the latest date a field with a time allows: a date at midnight stands
+ * for its whole day and moves to the last moment of that day, any other date
+ * is kept as it is.
+ *
+ * @param maxDate - The latest date given, or `null` without one
+ * @returns The latest moment allowed, or `null` without a limit
+ */
+export const getInclusiveMax = (maxDate: Date | null): Date | null =>
+  maxDate && maxDate.getTime() === removeTimeFromDate(maxDate).getTime() ?
+    new Date(new Date(maxDate).setHours(23, 59, 59, 999)) :
+    maxDate
+
+/**
+ * Names the limit a date a field holds breaks. The bounds are compared at the
+ * field's precision: by the instant when the field has a time, where a latest
+ * date without a time of day covers its whole day, by the day when it has
+ * none, by the whole period when it picks months, quarters or years.
+ *
+ * @param layout - The sections and literals of the field
+ * @param date - The date the field holds
+ * @param minDate - The earliest date allowed
+ * @param maxDate - The latest date allowed
+ * @param disabledDates - The dates that cannot be picked
+ * @returns `'minDate'`, `'maxDate'` or `'disabledDate'`, or `null` for a date within the limits
+ */
+export const getDateLimitError = (layout: DateSection[], date: Date, minDate: Date | null, maxDate: Date | null, disabledDates?: DisabledDate | DisabledDate[]): DateLimitError => {
+  const period = getLayoutPeriod(layout)
+  const timed = layout.some(section => section.type === 'hour')
+  const min = period ? getDateWithin(layout, minDate) : (minDate && !timed ? removeTimeFromDate(minDate) : minDate)
+  const max = timed ? getInclusiveMax(maxDate) : maxDate
+
+  if (min && date < min) {
+    return 'minDate'
+  }
+
+  if (max && date > max) {
+    return 'maxDate'
+  }
+
+  if (isCellDisabled(date, period ?? 'days', minDate, maxDate, disabledDates)) {
+    return 'disabledDate'
+  }
+
+  return null
+}
+
+/**
  * Tells whether a field with the given layout can hold a date: the date is
- * first brought into the layout and then checked against the bounds and the
- * disabled dates, as a whole period when the field picks months, quarters or
- * years.
+ * first brought into the layout and then checked against the limits the way
+ * `getDateLimitError` checks them.
  *
  * @param layout - The sections and literals of the field
  * @param date - The date to check
@@ -969,5 +1017,5 @@ export const isDateSelectableWithin = (layout: DateSection[], date: Date | null,
 
   const normalized = getDateWithin(layout, date)
 
-  return normalized !== null && !isCellDisabled(normalized, getLayoutPeriod(layout) ?? 'days', minDate, maxDate, disabledDates)
+  return normalized !== null && getDateLimitError(layout, normalized, minDate, maxDate, disabledDates) === null
 }

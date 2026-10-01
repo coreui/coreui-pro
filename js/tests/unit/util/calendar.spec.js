@@ -1191,6 +1191,16 @@ describe('Calendar Utilities', () => {
       expect(isDateDisabled(date, null, max, undefined)).toBeTrue()
     })
 
+    it('should compare the limits by the day, times of day aside', () => {
+      const min = new Date(2026, 9, 15, 10)
+      const max = new Date(2026, 9, 20, 8)
+
+      expect(isDateDisabled(new Date(2026, 9, 14, 23), min, max)).toBeTrue()
+      expect(isDateDisabled(new Date(2026, 9, 15), min, max)).toBeFalse()
+      expect(isDateDisabled(new Date(2026, 9, 20, 18), min, max)).toBeFalse()
+      expect(isDateDisabled(new Date(2026, 9, 21), min, max)).toBeTrue()
+    })
+
     it('should return false if within min/max and no disabledDates provided', () => {
       const date = new Date(2023, 0, 5)
       const min = new Date(2023, 0, 1)

@@ -1358,6 +1358,13 @@ behaviour, v5 is the reference. Mapping:
   time does not auto-close: picking a day keeps the time and picking a time
   keeps the day. `seconds` narrows what the time half offers and
   `selectionOptions` is its escape hatch.
+- **Changed.** With `timepicker`, a `minDate` or `maxDate` that carries a time
+  of day bounds the instant: its day stays selectable in the calendar, the time
+  selects disable the hours, minutes and seconds before `minDate` or after
+  `maxDate` on that day, and the field marks such a time invalid. A limit
+  without a time of day still covers its whole day. The limits used to be
+  widened to whole days, so a `minDate` of 15 October 10:00 accepted 08:00 that
+  day.
 - **Kept.** Calendar passthrough (`locale`, `minDate`/`maxDate`,
   `disabledDates`, `selectionType`, `showWeekNumber`, custom cell renderers, …),
   `container`, `startDate`/`endDate`/`date`, `startName`/`endName`/`name`,
