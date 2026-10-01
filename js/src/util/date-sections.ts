@@ -6,9 +6,11 @@
  */
 
 import {
-  constrainDate, convertToDateObject, createDate, type DisabledDate, getISOWeekNumberAndYear, isCellDisabled, parseYearSmart, type PeriodViewTypes, removeTimeFromDate, type SelectionTypes
+  constrainDate, convertToDateObject, createDate, type DisabledDate, getDateOfISOWeek, getISOWeekNumberAndYear, isCellDisabled, parseYearSmart, type PeriodViewTypes, removeTimeFromDate, type SelectionTypes
 } from './calendar.js'
 import { convert12hTo24h, convert24hTo12h } from './time.js'
+
+export { getDateOfISOWeek } from './calendar.js'
 
 export type EditableSectionType = 'day' | 'week' | 'month' | 'quarter' | 'year' | 'hour' | 'minute' | 'second' | 'meridiem'
 
@@ -557,19 +559,6 @@ export const getDaysInMonth = (year: number, month: number): number => {
  */
 export const getISOWeeksInYear = (year: number): number => {
   return getISOWeekNumberAndYear(createDate(year, 11, 28)).weekNumber
-}
-
-/**
- * Finds the Monday that starts an ISO week.
- *
- * @param year - The full week-numbering year
- * @param week - The ISO week number, starting at 1
- * @returns The Monday of the week
- */
-export const getDateOfISOWeek = (year: number, week: number): Date => {
-  const date = createDate(year, 0, 4)
-  date.setDate(date.getDate() - ((date.getDay() + 6) % 7) + ((week - 1) * 7))
-  return date
 }
 
 /**
