@@ -51,6 +51,7 @@ import {
   isPeriodSelected,
   isToday,
   isYearBeforeMonth,
+  type KeptDay,
   parseToDateString,
   type PeriodViewTypes,
   type SelectionTypes,
@@ -267,7 +268,7 @@ class Calendar extends BaseComponent {
   protected declare _minDate: Date | null
   protected declare _maxDate: Date | null
   protected declare _hoverDate: Date | null
-  protected declare _keptDay: { date: Date; day: number } | null
+  protected declare _keptDay: KeptDay | null
   protected declare _selectEndDate: boolean
   protected declare _view: ViewTypes
   protected declare _formatter: ReturnType<typeof createDateFormatter>
@@ -378,6 +379,7 @@ class Calendar extends BaseComponent {
 
   _handleCalendarClick(event: any): void {
     const target = this._getEventTarget(event)
+    this._keptDay = null
 
     if (!target) {
       return
@@ -421,7 +423,10 @@ class Calendar extends BaseComponent {
     }
 
     event.preventDefault()
-    this._keptDay = 'keepDay' in action && action.keepDay !== undefined && action.date ? { date: action.date, day: action.keepDay } : null
+
+    if (action.type !== 'stay') {
+      this._keptDay = 'keptDay' in action ? action.keptDay ?? null : null
+    }
 
     if (action.type === 'activate') {
       this._handleCalendarClick(event)

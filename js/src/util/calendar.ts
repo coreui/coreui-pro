@@ -16,15 +16,20 @@ export type TabStopTarget = {
 
 export type CalendarKeyAction =
   | { type: 'activate' }
-  | { date: Date; keepDay?: number; months: number; panel?: number; type: 'move'; years: number }
-  | { date?: Date; keepDay?: number; months: number; type: 'page'; years: number }
+  | { date: Date; keptDay?: KeptDay; months: number; panel?: number; type: 'move'; years: number }
+  | { date?: Date; keptDay?: KeptDay; months: number; type: 'page'; years: number }
   | { type: 'stay' }
+
+export type KeptDay = {
+  date: Date
+  day: number
+}
 
 export type CalendarKeyContext = {
   calendarDate: Date
   calendars: number
   firstDayOfWeek: number
-  keptDay?: { date: Date; day: number } | null
+  keptDay?: KeptDay | null
   maxDate?: Date | null
   minDate?: Date | null
   panel: number
@@ -1455,9 +1460,9 @@ const getPageOffset = (direction: number, shiftKey: boolean, view: ViewTypes) : 
  * turns by `getPageOffset` and the focus moves to the same day there, cut to
  * the length of the month. The day is the one the first of a series of page
  * turns started from (`context.keptDay` while the focus is still on the date
- * the previous turn reached), so January 31 turns to February 28 and then to
- * March 31. From a day of an adjacent month the calendar turns
- * only as far as that day takes. A date past `minDate` / `maxDate` gives way to
+ * the previous turn reached, also after a stop at `minDate` / `maxDate`), so
+ * January 31 turns to February 28 and then to March 31. From a day of an
+ * adjacent month the calendar turns only as far as that day takes. A date past `minDate` / `maxDate` gives way to
  * the last date inside the limits, and the calendar turns only when that date
  * lies outside the months the panels show.
  *
@@ -1465,7 +1470,7 @@ const getPageOffset = (direction: number, shiftKey: boolean, view: ViewTypes) : 
  * @param direction - `1` for Page Down, `-1` for Page Up
  * @param shiftKey - Whether Shift is held
  * @param context - The state of the calendar
- * @returns A `page` action, a `move` to the date the focus stops on, both with the day to keep as `keepDay`, or `stay` when that is the focused date
+ * @returns A `page` action, a `move` to the date the focus stops on, both with the `keptDay` for the next turn (its `date` is the start of the week for week rows), or `stay` when that is the focused date
  */
 const getPageAction = (date: Date, direction: number, shiftKey: boolean, context: CalendarKeyContext) : CalendarKeyAction => {
   const { firstDayOfWeek, keptDay, maxDate, minDate, rows, view } = context
@@ -1487,7 +1492,7 @@ const getPageAction = (date: Date, direction: number, shiftKey: boolean, context
   } else {
     return {
       date: target,
-      keepDay: day,
+      keptDay: { date: rows ? getStartOfWeek(target, firstDayOfWeek) : target, day },
       ...offset,
       type: 'page'
     }
@@ -1501,7 +1506,7 @@ const getPageAction = (date: Date, direction: number, shiftKey: boolean, context
 
   return {
     date: stop,
-    keepDay: day,
+    keptDay: { date: stop, day },
     ...getRevealOffset(stop, context),
     type: 'move'
   }
@@ -1616,7 +1621,7 @@ const getCellKeyAction = ({ code, key, repeat, shiftKey }: { code: string; key: 
  * @param event.repeat - Whether the key repeats while held
  * @param date - The date of the focused cell or week row, `null` when the grid itself has the focus
  * @param context - The state of the calendar
- * @returns `activate` to pick the focused date, `move` to focus `date` after paging by `years` and `months` when either is not zero (inside `panel` when it is set, for week rows), `page` to page the calendar by `years` and `months` and then focus `date` (on a grid without one, its panel's tab stop), `stay` when the key is handled and the focus stays, or `null` for a key the grid leaves alone; a `move` or `page` from Page Up / Page Down carries `keepDay`, which the caller passes back as `keptDay` with that `date`
+ * @returns `activate` to pick the focused date, `move` to focus `date` after paging by `years` and `months` when either is not zero (inside `panel` when it is set, for week rows), `page` to page the calendar by `years` and `months` and then focus `date` (on a grid without one, its panel's tab stop), `stay` when the key is handled and the focus stays, or `null` for a key the grid leaves alone; a `move` or `page` from Page Up / Page Down carries the `keptDay` the caller passes back in the context of the next key
  */
 export const getCalendarKeyAction = (event: { code: string; key: string; repeat?: boolean; shiftKey: boolean }, date: Date | null, context: CalendarKeyContext) : CalendarKeyAction | null =>
   date ? getCellKeyAction(event, date, context) : getGridKeyAction(event, context)
