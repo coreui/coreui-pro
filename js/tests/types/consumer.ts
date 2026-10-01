@@ -24,6 +24,7 @@ import { convertToDateObject } from '../../dist/util/calendar.js'
 import { getPickerFormat, getSectionLayout } from '../../dist/util/date-sections.js'
 import type { DateSection, SectionFormat } from '../../dist/util/date-sections.js'
 import type Popup from '../../dist/util/popup.js'
+import { getRatioAt, sanitizeValue } from '../../dist/util/range.js'
 
 const element = document.querySelector('.example') as HTMLElement
 
@@ -121,6 +122,12 @@ const localeLayout: DateSection[] = getSectionLayout(undefined, 'en-US')
 // @ts-expect-error — a format is a token string, a function or nothing
 const formatTypo: SectionFormat = getPickerFormat(42)
 
+// The range helpers take a pointer position and return plain numbers.
+const pressRatio: number = getRatioAt({ clientX: 0, clientY: 0 }, element.getBoundingClientRect(), 16, false, false)
+const sanitizedValue: number = sanitizeValue(52, 0, 100, 5)
+// @ts-expect-error — the step is a number, `step="any"` is passed as 0
+const stepTypo: number = sanitizeValue(52, 0, 100, 'any')
+
 const chipSet = new ChipSet(element, { removable: true })
 const values: string[] = chipSet.getValues()
 const chip: Chip | null = Chip.getInstance(element)
@@ -129,7 +136,7 @@ export {
   alert, calendarConfig, chip, chipSet, closing, datePicker, dayFormatFunction, disabledDatesString, formatTypo,
   inputConfigs, inputTypeTypo, instance, localeLayout, modalHiding, nestedTypo, modalShowing, modalToggling,
   monthFormatTypo, multiSelect, name, nullDate, orCreated,
-  pickerConfig, popoverShowing, popupShown, popupShownText, rangeInputTypeTypo, rangePickerConfig, selection,
-  timePickerConfig, toast, toastShowing, tooltipToggling, typoCalendar, typoConfig, unsetDate, unsetFormat, values, version,
+  pickerConfig, popoverShowing, popupShown, popupShownText, pressRatio, rangeInputTypeTypo, rangePickerConfig, sanitizedValue,
+  selection, stepTypo, timePickerConfig, toast, toastShowing, tooltipToggling, typoCalendar, typoConfig, unsetDate, unsetFormat, values, version,
   weekdayFormatTypo, wrongResolution
 }
