@@ -6,11 +6,11 @@
  */
 
 import {
-  constrainDate, convertToDateObject, createDate, type DisabledDate, getDateOfISOWeek, getISOWeekNumberAndYear, isCellDisabled, parseYearSmart, type PeriodViewTypes, removeTimeFromDate, type SelectionTypes
+  constrainDate, convertToDateObject, createDate, type DisabledDate, getDateOfISOWeek, getISOWeekNumberAndYear, getWeekLabel, isCellDisabled, parseYearSmart, type PeriodViewTypes, removeTimeFromDate, type SelectionTypes
 } from './calendar.js'
 import { convert12hTo24h, convert24hTo12h } from './time.js'
 
-export { getDateOfISOWeek } from './calendar.js'
+export { getDateOfISOWeek, getWeekLabel } from './calendar.js'
 
 export type EditableSectionType = 'day' | 'week' | 'month' | 'quarter' | 'year' | 'hour' | 'minute' | 'second' | 'meridiem'
 
@@ -323,23 +323,6 @@ export const getSectionsFromLocale = (locale: string): DateSection[] =>
     month: '2-digit',
     day: '2-digit'
   }), locale)
-
-/**
- * Gives a locale's week-of-year label, capitalized the way the native week
- * input shows it ("Week", "Tydzień", "Woche"), or "Week" where
- * `Intl.DisplayNames` has no data.
- *
- * @param locale - The locale to use
- * @returns The label
- */
-export const getWeekLabel = (locale: string): string => {
-  try {
-    const label = new Intl.DisplayNames(locale, { type: 'dateTimeField' }).of('weekOfYear')
-    return label ? label.charAt(0).toLocaleUpperCase(locale) + label.slice(1) : 'Week'
-  } catch {
-    return 'Week'
-  }
-}
 
 /**
  * Derives the week mask of a locale the way the native week input shows it

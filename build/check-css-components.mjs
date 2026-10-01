@@ -143,7 +143,6 @@ const plugins = {
 }
 
 const inert = {
-  calendar: { 'btn-sm': 'the navigation buttons read none of the tokens it sets' },
   'forms/chip-input': { 'form-floating': 'only a field with a floating label renders it' },
   'forms/form-control-group': { 'form-floating': 'only a field with a floating label renders it' },
   'forms/number-input': { 'form-floating': 'only a field with a floating label renders it' }
