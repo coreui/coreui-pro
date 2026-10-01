@@ -10,6 +10,8 @@ import {
 } from './calendar.js'
 import { convert12hTo24h, convert24hTo12h } from './time.js'
 
+export { getDateOfISOWeek } from './calendar.js'
+
 export type EditableSectionType = 'day' | 'week' | 'month' | 'quarter' | 'year' | 'hour' | 'minute' | 'second' | 'meridiem'
 
 export type EditableSection = {

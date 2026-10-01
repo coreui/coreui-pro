@@ -175,6 +175,12 @@ describe('Calendar Utilities', () => {
       expect(convertToDateObject('2/15/2023, 9:05:00 AM', 'day', 'en-US', true)).toEqual(new Date(2023, 1, 15, 9, 5))
       expect(convertToDateObject('2/15/2023, 12:15:00 AM', 'day', 'en-US', true)).toEqual(new Date(2023, 1, 15, 0, 15))
       expect(convertToDateObject('2/15/2023, 12:15:00 pm', 'day', 'en-US', true)).toEqual(new Date(2023, 1, 15, 12, 15))
+      expect(convertToDateObject('2/15/2023, 9:05:00 am', 'day', 'en-US', true)).toEqual(new Date(2023, 1, 15, 9, 5))
+      expect(convertToDateObject('2/15/2023, 12:15:00 am', 'day', 'en-US', true)).toEqual(new Date(2023, 1, 15, 0, 15))
+    })
+
+    it('should read noon on a 24-hour clock without a marker', () => {
+      expect(convertToDateObject('15.2.2023, 12:15:00', 'day', 'de-DE', true)).toEqual(new Date(2023, 1, 15, 12, 15))
     })
 
     it('should call convertIsoWeekToDate for "week" selectionType', () => {
@@ -1137,6 +1143,7 @@ describe('Calendar Utilities', () => {
       expect(getDateOfISOWeek(2026, 1)).toEqual(new Date(2025, 11, 29))
       expect(getDateOfISOWeek(2026, 53)).toEqual(new Date(2026, 11, 28))
       expect(getDateOfISOWeek(2030, 20)).toEqual(new Date(2030, 4, 13))
+      expect(getDateOfISOWeek(2027, 1)).toEqual(new Date(2027, 0, 4))
     })
 
     it('should keep a year below 100', () => {

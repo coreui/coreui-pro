@@ -1,5 +1,3 @@
-import { convert12hTo24h } from './time.js'
-
 export type DisabledDate = ((date: Date) => boolean) | Date | Date[]
 
 export type SelectionTypes = 'day' | 'week' | 'month' | 'quarter' | 'year'
@@ -428,6 +426,33 @@ const tryParseWithPatterns = (dateString: string, patterns: string[], includeTim
 }
 
 /**
+ * Converts a parsed hour to the 24-hour clock.
+ *
+ * @param hour - The hour as written
+ * @param ampm - The day period as written, if any
+ * @returns The hour on the 24-hour clock
+ */
+const convertTo24Hour = (hour: string, ampm?: string) : number => {
+  const parsedHour = Number.parseInt(hour, 10)
+
+  if (!ampm) {
+    return parsedHour
+  }
+
+  const isPM = ampm.toLowerCase() === "pm"
+
+  if (isPM && parsedHour !== 12) {
+    return parsedHour + 12
+  }
+
+  if (!isPM && parsedHour === 12) {
+    return 0
+  }
+
+  return parsedHour
+}
+
+/**
  * Tells whether an hour, a minute and a second form a valid time.
  *
  * @param hour - The hour on the 24-hour clock
@@ -475,7 +500,7 @@ const createDateWithTime = (groups: DateTimeGroups) : Date | null => {
   const parsedYear = parseYearSmart(year)
   const parsedMonth = Number.parseInt(month, 10) - 1
   const parsedDay = Number.parseInt(day, 10)
-  const parsedHour = ampm ? convert12hTo24h(ampm.toLowerCase(), Number.parseInt(hour, 10)) : Number.parseInt(hour, 10)
+  const parsedHour = convertTo24Hour(hour, ampm)
   const parsedMinute = Number.parseInt(minute ?? "0", 10) || 0
   const parsedSecond = Number.parseInt(second ?? "0", 10) || 0
 

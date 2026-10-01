@@ -8,6 +8,7 @@ import {
   formatSections,
   formatSectionValue,
   getDateFromSections,
+  getDateOfISOWeek,
   getDateLimitError,
   getDateTimeSectionsFromLocale,
   getDaysInMonth,
@@ -35,7 +36,7 @@ import {
   isEditableSection,
   setSectionsFromDate
 } from '../../../src/util/date-sections.js'
-import { getDateOfISOWeek } from '../../../src/util/calendar.js'
+import { getISOWeekNumberAndYear } from '../../../src/util/calendar.js'
 
 describe('Date Sections Utilities', () => {
   describe('isEditableSection', () => {
@@ -498,6 +499,19 @@ describe('Date Sections Utilities', () => {
 
     it('should allow 29 days in February while the year is unknown', () => {
       expect(getDaySectionMax(layout(2, null))).toBe(29)
+    })
+  })
+
+  describe('getDateOfISOWeek', () => {
+    it('should give the Monday of every week of the years 1 to 3000', () => {
+      for (let year = 1; year <= 3000; year++) {
+        for (let week = 1; week <= getISOWeeksInYear(year); week++) {
+          const monday = getDateOfISOWeek(year, week)
+
+          expect(monday.getDay()).toBe(1)
+          expect(getISOWeekNumberAndYear(monday)).toEqual({ weekNumber: week, year })
+        }
+      }
     })
   })
 
