@@ -107,8 +107,8 @@ class RangeSlider extends BaseComponent {
   protected declare _inputs: HTMLInputElement[]
   protected declare _range: Range | null
   protected declare _wrapper: HTMLElement | null
-  protected declare _onChange: () => void
-  protected declare _onInput: () => void
+  protected declare _onChange: (event: Event) => void
+  protected declare _onInput: (event: Event) => void
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
@@ -121,8 +121,8 @@ class RangeSlider extends BaseComponent {
     this._range = null
     this._wrapper = null
 
-    this._onInput = () => EventHandler.trigger(this._element, EVENT_INPUT, { value: this._values() })
-    this._onChange = () => EventHandler.trigger(this._element, EVENT_CHANGE, { value: this._values() })
+    this._onInput = event => this._relay(event, EVENT_INPUT)
+    this._onChange = event => this._relay(event, EVENT_CHANGE)
 
     this._build()
   }
@@ -142,7 +142,7 @@ class RangeSlider extends BaseComponent {
 
   // Public
   setConfig(config: Partial<RangeSliderConfig>): void {
-    this._config = this._getConfig({ ...this._config, ...config }) as RangeSliderConfig
+    this._config = this._getConfig({ ...this._config, value: this._values(), ...config }) as RangeSliderConfig
     this._teardown()
     this._build()
   }
@@ -239,6 +239,12 @@ class RangeSlider extends BaseComponent {
 
   _values(): number[] {
     return this._inputs.map(input => Number(input.value))
+  }
+
+  _relay(event: Event, type: string): void {
+    if (this._inputs.includes(event.target as HTMLInputElement)) {
+      EventHandler.trigger(this._element, type, { value: this._values() })
+    }
   }
 
   override _configAfterMerge(config: any): any {

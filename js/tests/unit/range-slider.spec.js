@@ -283,6 +283,22 @@ describe('RangeSlider', () => {
       expect(fired).toEqual([[80, 80]])
     })
 
+    it('should not report the input and change of a control the page put in the element', () => {
+      fixtureEl.innerHTML = '<div id="slider"><input type="number" class="note"></div>'
+      const element = fixtureEl.querySelector('#slider')
+      new RangeSlider(element, { value: [20, 80] }) // eslint-disable-line no-new
+
+      const fired = []
+      element.addEventListener('input.coreui.range-slider', () => fired.push('input'))
+      element.addEventListener('change.coreui.range-slider', () => fired.push('change'))
+
+      const note = element.querySelector('.note')
+      note.dispatchEvent(createEvent('input', { bubbles: true }))
+      note.dispatchEvent(createEvent('change', { bubbles: true }))
+
+      expect(fired).toEqual([])
+    })
+
     it('should fire once per change after setConfig', () => {
       const { element, rangeSlider } = mount({ value: [20, 80] })
       rangeSlider.setConfig({ value: [10, 90] })
@@ -327,6 +343,19 @@ describe('RangeSlider', () => {
       expect(element.querySelector('.note')).not.toBeNull()
       expect(element.querySelector('.form-range-tooltip')).toBeNull()
       expect(rangeSlider._config.tooltips).toBeFalse()
+    })
+
+    it('should keep the values the user picked when the change leaves value out', () => {
+      const { element, rangeSlider } = mount({ value: [10, 40] })
+
+      move(inputsOf(element)[0], 30)
+      rangeSlider.setConfig({ disabled: true })
+
+      expect(inputsOf(element).map(input => input.value)).toEqual(['30', '40'])
+      expect(inputsOf(element).every(input => input.disabled)).toBeTrue()
+
+      rangeSlider.setConfig({ value: [5, 15] })
+      expect(inputsOf(element).map(input => input.value)).toEqual(['5', '15'])
     })
 
     it('should switch the orientation both ways', () => {

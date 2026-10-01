@@ -1965,7 +1965,10 @@ field behind that kept submitting.
   first input draws the track), and so is the `.disabled` class on the element
   (the inputs are disabled). The handles no longer carry `role="slider"`,
   `aria-valuemin`, `aria-valuemax` or `aria-valuenow`: the native inputs expose
-  them. Options, events and methods keep their names.
+  them. Options, events and methods keep their names. The range tokens are
+  declared on that inner `.form-range`, so a `--cui-range-*` token set on the
+  slider element itself (inline, or by a class on it) no longer reaches the
+  handles: target its `.form-range` (`.my-slider .form-range { … }`).
 - **Range slider interaction follows the native control.** Pressing a handle no
   longer moves it a step; a press on the track or a clickable tick moves the
   nearest handle and it follows the pointer (mouse, touch or pen), with

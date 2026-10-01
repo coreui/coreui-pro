@@ -272,7 +272,14 @@ Additionally, ensure that labels and tooltips are clear and descriptive to provi
 
 ### CSS variables
 
-The slider is a [range](/forms/range/#css-variables), so it reads the range's tokens, declared on its `.form-range`: one setting styles both controls. `--cui-range-track-fill-bg` colours the band between the handles and `--cui-range-tick-*` the tick marks and their labels. Set them on the slider element or any ancestor.
+The slider is a [range](/forms/range/#css-variables), so it reads the range's tokens, declared on the `.form-range` it renders inside its element: one setting styles both controls. `--cui-range-track-fill-bg` colours the band between the handles and `--cui-range-tick-*` the tick marks and their labels. Because the `.form-range` declares them, set them on it, not on the slider element:
+
+```css
+.price-filter .form-range {
+  --cui-range-track-fill-bg: var(--cui-success-base);
+  --cui-range-vertical-height: 14rem;
+}
+```
 
 <ScssDocs file="scss/forms/_form-range.scss" capture="form-range-tokens" />
 
