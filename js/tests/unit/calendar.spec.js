@@ -807,6 +807,43 @@ describe('Calendar', () => {
       expect(document.activeElement.querySelector(`[data-coreui-date="${new Date(2026, 8, 1).toDateString()}"]`)).not.toBeNull()
     })
 
+    it('should focus the quarter that holds the start of the month when the year button goes back to the quarters view', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { // eslint-disable-line no-new
+        calendarDate: new Date(2026, 8, 15),
+        locale: 'en-US',
+        selectionType: 'quarter',
+        startDate: new Date(2026, 1, 10)
+      })
+
+      div.querySelector('.btn-year').focus()
+      div.querySelector('.btn-year').click()
+      div.querySelector('.btn-year').click()
+
+      expect(document.activeElement.dataset.coreuiDate).toEqual(new Date(2026, 6, 1).toDateString())
+    })
+
+    it('should focus the start of the month a later panel shows when its year button goes back', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { // eslint-disable-line no-new
+        calendarDate: new Date(2026, 8, 15),
+        calendars: 2,
+        locale: 'en-US',
+        startDate: new Date(2026, 9, 20)
+      })
+      const yearButton = () => div.querySelectorAll('.btn-year')[1]
+
+      yearButton().focus()
+      yearButton().click()
+      yearButton().click()
+
+      expect(document.activeElement.dataset.coreuiDate).toEqual(new Date(2026, 9, 1).toDateString())
+    })
+
     it('should leave the year button disabled where the years view is the one that picks', () => {
       fixtureEl.innerHTML = '<div></div><div></div>'
 

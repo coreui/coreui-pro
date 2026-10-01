@@ -602,7 +602,7 @@ class Calendar extends BaseComponent {
   }
 
   _showPeriodView(view: ViewTypes, index: number): boolean {
-    const shown = getCalendarDate(this._calendarDate, index, this._view)
+    const shown = getCalendarDate(this._calendarDate, index, this._view === 'years' ? view : this._view)
     const start = getStartOfView(createDate(shown.getFullYear(), shown.getMonth(), 1), view).toDateString()
     const focus = view !== this._view && this._element.contains(document.activeElement)
 
