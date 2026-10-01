@@ -2,11 +2,13 @@
 import {
   applyDigitToSection,
   applyLetterToSection,
+  constrainDateTime,
   convertValue,
   formatDateWithin,
   formatSections,
   formatSectionValue,
   getDateFromSections,
+  getDateLimitError,
   getDateOfISOWeek,
   getDateTimeSectionsFromLocale,
   getDaysInMonth,
@@ -15,6 +17,7 @@ import {
   getFormatMonthNames,
   getFullYearFromSection,
   getHourCycle,
+  getInclusiveMax,
   getIncrementedSectionValue,
   getISOWeeksInYear,
   getLayoutPeriod,
@@ -902,6 +905,67 @@ describe('Date Sections Utilities', () => {
     })
   })
 
+  describe('getInclusiveMax', () => {
+    it('should move a date at midnight to the last moment of its day', () => {
+      expect(getInclusiveMax(new Date(2026, 8, 22))).toEqual(new Date(2026, 8, 22, 23, 59, 59, 999))
+    })
+
+    it('should keep a date with a time of day and no date at all', () => {
+      expect(getInclusiveMax(new Date(2026, 8, 22, 18))).toEqual(new Date(2026, 8, 22, 18))
+      expect(getInclusiveMax(null)).toBeNull()
+    })
+  })
+
+  describe('constrainDateTime', () => {
+    it('should move a date and time before the earliest date to it', () => {
+      expect(constrainDateTime(new Date(2026, 9, 15, 8), new Date(2026, 9, 15, 10, 30), null)).toEqual(new Date(2026, 9, 15, 10, 30))
+    })
+
+    it('should move a date and time past the latest date to it, a date at midnight allowing its whole day', () => {
+      expect(constrainDateTime(new Date(2026, 9, 20, 18), null, new Date(2026, 9, 20, 17, 45))).toEqual(new Date(2026, 9, 20, 17, 45))
+      expect(constrainDateTime(new Date(2026, 9, 20, 18), null, new Date(2026, 9, 20))).toEqual(new Date(2026, 9, 20, 18))
+      expect(constrainDateTime(new Date(2026, 9, 21, 1), null, new Date(2026, 9, 20))).toEqual(new Date(2026, 9, 20, 23, 59, 59, 999))
+    })
+  })
+
+  describe('getDateLimitError', () => {
+    const dateTime = getDateTimeSectionsFromLocale('en-US')
+    const date = getSectionsFromFormat('dd.MM.yyyy', 'en-US')
+
+    it('should compare a field with a time by the instant', () => {
+      const min = new Date(2026, 9, 15, 10, 30)
+      const max = new Date(2026, 9, 20, 18)
+
+      expect(getDateLimitError(dateTime, new Date(2026, 9, 15, 10, 29), min, max)).toBe('minDate')
+      expect(getDateLimitError(dateTime, new Date(2026, 9, 15, 10, 30), min, max)).toBeNull()
+      expect(getDateLimitError(dateTime, new Date(2026, 9, 20, 18), min, max)).toBeNull()
+      expect(getDateLimitError(dateTime, new Date(2026, 9, 20, 18, 1), min, max)).toBe('maxDate')
+    })
+
+    it('should compare to the smallest unit the field shows', () => {
+      const withoutSeconds = getDateTimeSectionsFromLocale('en-US', false)
+
+      expect(getDateLimitError(withoutSeconds, new Date(2026, 9, 15, 10, 30), new Date(2026, 9, 15, 10, 30, 20), null)).toBeNull()
+      expect(getDateLimitError(withoutSeconds, new Date(2026, 9, 15, 10, 29), new Date(2026, 9, 15, 10, 30, 20), null)).toBe('minDate')
+    })
+
+    it('should let a latest date without a time of day cover its whole day in a field with a time', () => {
+      expect(getDateLimitError(dateTime, new Date(2026, 8, 22, 23, 59), null, new Date(2026, 8, 22))).toBeNull()
+      expect(getDateLimitError(dateTime, new Date(2026, 8, 23), null, new Date(2026, 8, 22))).toBe('maxDate')
+    })
+
+    it('should compare a field without a time by the day', () => {
+      expect(getDateLimitError(date, new Date(2026, 9, 15), new Date(2026, 9, 15, 10), null)).toBeNull()
+      expect(getDateLimitError(date, new Date(2026, 9, 14), new Date(2026, 9, 15, 10), null)).toBe('minDate')
+      expect(getDateLimitError(date, new Date(2026, 9, 20), null, new Date(2026, 9, 20, 8))).toBeNull()
+      expect(getDateLimitError(date, new Date(2026, 9, 21), null, new Date(2026, 9, 20, 8))).toBe('maxDate')
+    })
+
+    it('should name a disabled date', () => {
+      expect(getDateLimitError(date, new Date(2026, 9, 15), null, null, [new Date(2026, 9, 15)])).toBe('disabledDate')
+    })
+  })
+
   describe('isDateSelectableWithin', () => {
     const layout = getSectionsFromFormat('dd.MM.yyyy', 'en-US')
 
@@ -918,6 +982,13 @@ describe('Date Sections Utilities', () => {
     it('should reject a disabled date', () => {
       expect(isDateSelectableWithin(layout, new Date(2026, 6, 15), null, null, [new Date(2026, 6, 15)])).toBe(false)
       expect(isDateSelectableWithin(layout, new Date(2026, 6, 16), null, null, [new Date(2026, 6, 15)])).toBe(true)
+    })
+
+    it('should check a field with a time against the bounds by the instant', () => {
+      const dateTime = getDateTimeSectionsFromLocale('en-US')
+
+      expect(isDateSelectableWithin(dateTime, new Date(2026, 9, 15, 8), new Date(2026, 9, 15, 10), null)).toBe(false)
+      expect(isDateSelectableWithin(dateTime, new Date(2026, 9, 15, 10), new Date(2026, 9, 15, 10), null)).toBe(true)
     })
 
     it('should reject a date the layout cannot hold', () => {

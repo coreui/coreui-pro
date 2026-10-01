@@ -13,13 +13,14 @@ import SelectorEngine from './dom/selector-engine.js'
 import type { SectionInputConfig } from './section-input.js'
 import TimeSelects from './time-selection/selects.js'
 import {
-  convertToDateObject,
   getDateBySelectionType,
   isSameInstantAs,
   type SelectionTypes
 } from './util/calendar.js'
 import type { ComponentConfig } from './util/config.js'
-import { getHourCycle, getPickerFormat } from './util/date-sections.js'
+import {
+  constrainDateTime, convertValue, getHourCycle, getPickerFormat
+} from './util/date-sections.js'
 import {
   appendControlGroupField,
   applyControlGroupClasses,
@@ -306,7 +307,6 @@ class DatePicker extends PickerBase {
       name: this._config.name,
       seconds: Boolean(this._config.seconds),
       ...(this._config.timepicker ? { type: 'datetime' } : {}),
-      ...(this._config.timepicker ? this._dayBounds() : {}),
       ...(format ? { format } : {})
     }, { ...(this._config.floatingLabel ? { ariaLabel: this._config.floatingLabel } : {}), ...this._config.inputOptions }))
 
@@ -371,30 +371,24 @@ class DatePicker extends PickerBase {
     }, this._config.selectionOptions))
   }
 
-  _dayBounds(): { maxDate?: Date, minDate?: Date } {
-    const bounds: { maxDate?: Date, minDate?: Date } = {}
-    const min = convertToDateObject(this._config.minDate, this._config.selectionType)
-    const max = convertToDateObject(this._config.maxDate, this._config.selectionType)
+  _withinTimeLimits(date: Date): Date {
+    const { locale, maxDate, minDate } = this._config
 
-    if (min) {
-      bounds.minDate = new Date(new Date(min).setHours(0, 0, 0, 0))
-    }
-
-    if (max) {
-      bounds.maxDate = new Date(new Date(max).setHours(23, 59, 59, 999))
-    }
-
-    return bounds
+    return constrainDateTime(date, convertValue(minDate, 'datetime', locale), convertValue(maxDate, 'datetime', locale))
   }
 
   _withCurrentTime(date: Date | null): Date | null {
-    if (!date || !this._config.timepicker || !this._date) {
+    if (!date || !this._config.timepicker) {
       return date
     }
 
     const merged = new Date(date)
-    merged.setHours(this._date.getHours(), this._date.getMinutes(), this._date.getSeconds())
-    return merged
+
+    if (this._date) {
+      merged.setHours(this._date.getHours(), this._date.getMinutes(), this._date.getSeconds())
+    }
+
+    return this._withinTimeLimits(merged)
   }
 
   _applyTime(time: Date | null): void {
@@ -402,11 +396,12 @@ class DatePicker extends PickerBase {
       return
     }
 
-    const current = this.getDate()
-    const merged = current ? new Date(current) : new Date()
+    const merged = new Date(this.getDate() ?? this._withinTimeLimits(new Date()))
     merged.setHours(time.getHours(), time.getMinutes(), time.getSeconds())
+    const limited = this._withinTimeLimits(merged)
 
-    this._applyDate(merged, { selection: false })
+    this._applyDate(limited, { selection: false })
+    this._selection?.setTime(limited)
   }
 
   _applyDate(date: Date | null, { calendar = true, field = true, selection = true }: { calendar?: boolean, field?: boolean, selection?: boolean } = {}): void {

@@ -1,5 +1,5 @@
 import { userEvent } from '@vitest/browser/context'
-import { vi } from 'vitest'
+import { onTestFinished, vi } from 'vitest'
 import DatePicker from '../../src/date-picker.js'
 import Dialog from '../../src/dialog.js'
 import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
@@ -1487,7 +1487,7 @@ describe('DatePicker', () => {
       expect(picker.getDate().getMinutes()).toEqual(45)
     })
 
-    it('should bound min and max by the day, not by the instant', () => {
+    it('should let a maxDate without a time of day cover its whole day', () => {
       const picker = buildPicker({
         timepicker: true, locale: 'en-US', maxDate: '2026-09-22', date: '2026-09-22 10:00'
       })
@@ -1498,6 +1498,149 @@ describe('DatePicker', () => {
       pickMinutes(45)
 
       expect(picker.getDate().getMinutes()).toEqual(45)
+      expect(fixtureEl.querySelectorAll('.date-picker-popup select.date-picker-time-select option:disabled')).toHaveSize(0)
+    })
+
+    it('should let the day of a minDate with a time be picked and disable the time before it on that day', () => {
+      buildPicker({
+        timepicker: true, locale: 'pl-PL', minDate: new Date(2026, 9, 15, 10, 30), date: new Date(2026, 9, 15, 12)
+      }).show()
+      const popup = fixtureEl.querySelector('.date-picker-popup')
+      const disabled = part => [...popup.querySelectorAll(`select.date-picker-time-select.${part} option`)]
+        .filter(option => option.disabled)
+        .map(option => Number(option.value))
+
+      expect(popup.querySelector(`.calendar-cell[data-coreui-date="${new Date(2026, 9, 15).toDateString()}"]`).hasAttribute('aria-disabled')).toBeFalse()
+      expect(disabled('hours')).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+      expect(disabled('minutes')).toEqual([])
+
+      const hours = popup.querySelector('select.date-picker-time-select.hours')
+      hours.value = '10'
+      hours.dispatchEvent(new Event('change'))
+
+      expect(disabled('minutes')).toEqual(Array.from({ length: 30 }, (_, minute) => minute))
+    })
+
+    it('should read limits given as strings with a time', () => {
+      buildPicker({
+        timepicker: true, locale: 'pl-PL', minDate: '2026-10-15 10:30', date: new Date(2026, 9, 15, 12)
+      }).show()
+      const popup = fixtureEl.querySelector('.date-picker-popup')
+      const cell = day => popup.querySelector(`.calendar-cell[data-coreui-date="${new Date(2026, 9, day).toDateString()}"]`)
+
+      expect(cell(14).getAttribute('aria-disabled')).toEqual('true')
+      expect(cell(15).hasAttribute('aria-disabled')).toBeFalse()
+      expect(popup.querySelectorAll('select.date-picker-time-select.hours option:disabled')).toHaveSize(10)
+    })
+
+    it('should disable the time after a maxDate with a time on its day only', () => {
+      const picker = buildPicker({
+        timepicker: true, locale: 'pl-PL', maxDate: new Date(2026, 9, 20, 17, 45), date: new Date(2026, 9, 19, 12)
+      })
+      picker.show()
+      const disabled = () => [...fixtureEl.querySelectorAll('.date-picker-popup select.date-picker-time-select.hours option')]
+        .filter(option => option.disabled)
+        .map(option => Number(option.value))
+
+      expect(disabled()).toEqual([])
+
+      picker.setDate(new Date(2026, 9, 20, 12))
+
+      expect(disabled()).toEqual([18, 19, 20, 21, 22, 23])
+    })
+
+    it('should disable the morning on a minDate day that starts after noon in a 12-hour locale', () => {
+      buildPicker({
+        timepicker: true, locale: 'en-US', minDate: new Date(2026, 9, 15, 13), date: new Date(2026, 9, 15, 14)
+      }).show()
+      const option = (part, value) => fixtureEl.querySelector(`.date-picker-popup select.date-picker-time-select.${part} option[value="${value}"]`)
+
+      expect(option('meridiem', 'am').disabled).toBeTrue()
+      expect(option('meridiem', 'pm').disabled).toBeFalse()
+      expect(option('hours', '12').disabled).toBeTrue()
+      expect(option('hours', '1').disabled).toBeFalse()
+    })
+
+    it('should move the time to the minDate when its day is picked with an earlier time', () => {
+      const picker = buildPicker({
+        timepicker: true, locale: 'pl-PL', minDate: new Date(2026, 9, 15, 10, 30), date: new Date(2026, 9, 16, 8)
+      })
+      picker.show()
+      fixtureEl.querySelector(`.date-picker-popup .calendar-cell[data-coreui-date="${new Date(2026, 9, 15).toDateString()}"]`).click()
+
+      expect(picker.getDate()).toEqual(new Date(2026, 9, 15, 10, 30))
+      expect(fixtureEl.querySelector('.form-date-time').classList.contains('is-invalid')).toBeFalse()
+      expect(fixtureEl.querySelector('select.date-picker-time-select.hours').value).toEqual('10')
+      expect(fixtureEl.querySelector('select.date-picker-time-select.minutes').value).toEqual('30')
+    })
+
+    it('should move a time picked in the panel to the minDate and keep the day', () => {
+      const picker = buildPicker({
+        timepicker: true, locale: 'pl-PL', minDate: new Date(2026, 9, 15, 10, 30), date: new Date(2026, 9, 15, 11, 15)
+      })
+      picker.show()
+      const select = part => fixtureEl.querySelector(`select.date-picker-time-select.${part}`)
+      const pick = (part, value) => {
+        select(part).value = String(value)
+        select(part).dispatchEvent(new Event('change'))
+      }
+
+      pick('hours', 10)
+
+      expect(picker.getDate()).toEqual(new Date(2026, 9, 15, 10, 30))
+      expect(select('minutes').value).toEqual('30')
+
+      pick('minutes', 45)
+
+      expect(picker.getDate()).toEqual(new Date(2026, 9, 15, 10, 45))
+    })
+
+    it('should work on the minDate day while no date is picked and today lies before it', () => {
+      vi.useFakeTimers({ toFake: ['Date'] })
+      vi.setSystemTime(new Date(2026, 9, 1, 9))
+      onTestFinished(() => vi.useRealTimers())
+      const picker = buildPicker({ timepicker: true, locale: 'pl-PL', minDate: new Date(2026, 9, 15, 10, 30) })
+      picker.show()
+      const hours = fixtureEl.querySelector('select.date-picker-time-select.hours')
+
+      expect(fixtureEl.querySelectorAll('select.date-picker-time-select.hours option:disabled')).toHaveSize(10)
+
+      hours.value = '12'
+      hours.dispatchEvent(new Event('change'))
+
+      expect(picker.getDate()).toEqual(new Date(2026, 9, 15, 12))
+    })
+
+    it('should disable an hour none of whose offered minutes is allowed', () => {
+      buildPicker({
+        timepicker: true, locale: 'pl-PL', minutes: [0, 15, 30, 45], minDate: new Date(2026, 9, 15, 10, 50), date: new Date(2026, 9, 15, 12)
+      }).show()
+      const option = value => fixtureEl.querySelector(`select.date-picker-time-select.hours option[value="${value}"]`)
+
+      expect(option(10).disabled).toBeTrue()
+      expect(option(11).disabled).toBeFalse()
+    })
+
+    it('should let a field without seconds hold the minute of a minDate with seconds', () => {
+      const picker = buildPicker({
+        timepicker: true, locale: 'pl-PL', seconds: false, minDate: new Date(2026, 9, 15, 10, 30, 20), date: new Date(2026, 9, 15, 12)
+      })
+      picker.show()
+      const hours = fixtureEl.querySelector('select.date-picker-time-select.hours')
+      hours.value = '10'
+      hours.dispatchEvent(new Event('change'))
+
+      expect(picker.getDate()).toEqual(new Date(2026, 9, 15, 10, 30))
+      expect(fixtureEl.querySelector('.form-date-time').classList.contains('is-invalid')).toBeFalse()
+    })
+
+    it('should mark a time before a minDate with a time of day invalid', () => {
+      const picker = buildPicker({
+        timepicker: true, locale: 'en-US', minDate: new Date(2026, 8, 22, 12), date: new Date(2026, 8, 22, 10)
+      })
+
+      expect(fixtureEl.querySelector('.form-date-time').classList.contains('is-invalid')).toBeTrue()
+      expect(picker.getDate()).toBeNull()
     })
 
     it('should accept a narrowed seconds list while the time half is off', () => {

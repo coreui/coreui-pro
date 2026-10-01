@@ -168,6 +168,20 @@ selects, and with the flag on the field actions call themselves "Clear date and
 time" and "Toggle calendar and time selection" unless the page passed its own
 label.
 
+`minDate` and `maxDate` can carry a time of day. Their day stays selectable in
+the calendar and the time selects disable the hours, minutes and seconds before
+`minDate` or after `maxDate` on that day. A time the panel sets beyond a limit,
+such as the current time when the day of `minDate` is picked, moves to the
+limit; a typed time beyond it marks the field invalid. Until a date is picked,
+the time selects work on today moved into the limits. A limit without a time of
+day covers its whole day.
+
+<Example pro code={`<div class="row">
+    <div class="col-lg-5">
+      <div data-coreui-locale="en-US" data-coreui-timepicker="true" data-coreui-min-date="2026-10-15T09:30" data-coreui-max-date="2026-10-30T17:00" data-coreui-date-picker></div>
+    </div>
+  </div>`} />
+
 ## With form field
 
 Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label and description, and to get validation feedback in the right place.
@@ -436,8 +450,8 @@ attributes work on the picker element too.
 | `format` | function, string, null | `null` | Mask layout of the field: `null` derives it from the locale (or, for week, month, quarter and year selection, uses the matching default mask), a string is parsed as format tokens, a function receives the locale and returns the section layout. |
 | `inputOptions` | object | `{}` | Programmatic escape hatch for date input options. |
 | `locale` | string | browser locale | Drives section order, separators, and calendar labels. |
-| `maxDate` | date, string, null | `null` | Upper bound, enforced by both layers. |
-| `minDate` | date, string, null | `null` | Lower bound, enforced by both layers. |
+| `maxDate` | date, string, null | `null` | Upper bound, enforced by both layers. With `timepicker`, a time of day bounds the time on that day, and a date without one covers its whole day. |
+| `minDate` | date, string, null | `null` | Lower bound, enforced by both layers. With `timepicker`, a time of day bounds the time on that day. |
 | `monthNames` | array, null | `null` | Twelve custom month names for text month sections (`MMM`/`MMMM`). |
 | `name` | string, null | `null` | Name of the generated hidden input. Without it the field is not submitted with the form. |
 | `pickerIcon` | string, boolean | `true` | The button that opens the calendar: `true` for the built-in icon, an inline SVG string for your own (sanitized), `false` for no button. Not used for a `data-coreui-picker-toggle` you wrote. Without either the popup has no pointer opener and nothing reports the expanded state, though the field keeps the keyboard openers below. |

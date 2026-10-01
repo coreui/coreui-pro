@@ -9,7 +9,8 @@ import {
   getSelectedHour,
   getSelectedMinutes,
   getSelectedSeconds,
-  isAmPm
+  isAmPm,
+  isTimeOutsideLimits
 } from '../../../src/util/time.js'
 
 describe('Time Utilities', () => {
@@ -228,6 +229,49 @@ describe('Time Utilities', () => {
       // Usually "en-GB" might or might not show 12 or 24 hour format
       // We'll just check the logic—this could be false in many environment setups
       expect(typeof result).toBe('boolean')
+    })
+  })
+
+  describe('isTimeOutsideLimits', () => {
+    const min = new Date(2026, 9, 15, 10, 30, 15)
+    const max = new Date(2026, 9, 20, 17, 45, 30)
+
+    it('should put an hour outside only when none of its minutes lies within the limits', () => {
+      const day = new Date(2026, 9, 15, 12)
+
+      expect(isTimeOutsideLimits(day, 'hours', 9, { max, min })).toBeTrue()
+      expect(isTimeOutsideLimits(day, 'hours', 10, { max, min })).toBeFalse()
+      expect(isTimeOutsideLimits(new Date(2026, 9, 20, 12), 'hours', 17, { max, min })).toBeFalse()
+      expect(isTimeOutsideLimits(new Date(2026, 9, 20, 12), 'hours', 18, { max, min })).toBeTrue()
+    })
+
+    it('should check a minute within the hour and a second within the minute of the date', () => {
+      expect(isTimeOutsideLimits(new Date(2026, 9, 15, 10), 'minutes', 29, { max, min })).toBeTrue()
+      expect(isTimeOutsideLimits(new Date(2026, 9, 15, 10), 'minutes', 30, { max, min })).toBeFalse()
+      expect(isTimeOutsideLimits(new Date(2026, 9, 15, 10, 30), 'seconds', 14, { max, min })).toBeTrue()
+      expect(isTimeOutsideLimits(new Date(2026, 9, 15, 10, 30), 'seconds', 15, { max, min })).toBeFalse()
+      expect(isTimeOutsideLimits(new Date(2026, 9, 20, 17, 45), 'seconds', 31, { max, min })).toBeTrue()
+    })
+
+    it('should put a half of the day outside when none of it lies within the limits', () => {
+      expect(isTimeOutsideLimits(new Date(2026, 9, 15), 'meridiem', 'am', { max: null, min: new Date(2026, 9, 15, 13) })).toBeTrue()
+      expect(isTimeOutsideLimits(new Date(2026, 9, 15), 'meridiem', 'pm', { max: null, min: new Date(2026, 9, 15, 13) })).toBeFalse()
+      expect(isTimeOutsideLimits(new Date(2026, 9, 15), 'meridiem', 'pm', { max: new Date(2026, 9, 15, 11), min: null })).toBeTrue()
+      expect(isTimeOutsideLimits(new Date(2026, 9, 15), 'meridiem', 'am', { max: new Date(2026, 9, 15, 11), min: null })).toBeFalse()
+    })
+
+    it('should put an hour or a minute outside when every minute or second it offers is', () => {
+      const limits = { max: null, min: new Date(2026, 9, 15, 10, 50) }
+
+      expect(isTimeOutsideLimits(new Date(2026, 9, 15), 'hours', 10, limits, [0, 15, 30, 45])).toBeTrue()
+      expect(isTimeOutsideLimits(new Date(2026, 9, 15), 'hours', 10, limits, [0, 50])).toBeFalse()
+      expect(isTimeOutsideLimits(new Date(2026, 9, 15, 10), 'minutes', 50, { max: null, min: new Date(2026, 9, 15, 10, 50, 45) }, [0, 30])).toBeTrue()
+    })
+
+    it('should keep every value on a day between the limits and without limits', () => {
+      expect(isTimeOutsideLimits(new Date(2026, 9, 16), 'hours', 0, { max, min })).toBeFalse()
+      expect(isTimeOutsideLimits(new Date(2026, 9, 16), 'hours', 23, { max, min })).toBeFalse()
+      expect(isTimeOutsideLimits(new Date(2026, 9, 15), 'hours', 0, { max: null, min: null })).toBeFalse()
     })
   })
 })

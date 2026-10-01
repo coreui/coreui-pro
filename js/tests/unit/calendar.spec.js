@@ -573,6 +573,24 @@ describe('Calendar', () => {
       expect(stop(after)).toEqual(new Date(2026, 11, 3))
     })
 
+    it('should let the day of a limit with a time of day be picked', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { // eslint-disable-line no-new
+        calendarDate: new Date(2026, 9, 1),
+        locale: 'en-US',
+        maxDate: new Date(2026, 9, 20, 8),
+        minDate: new Date(2026, 9, 15, 10)
+      })
+
+      const cell = day => div.querySelector(`.calendar-cell[data-coreui-date="${new Date(2026, 9, day).toDateString()}"]`)
+
+      expect(cell(14).getAttribute('aria-disabled')).toEqual('true')
+      expect(cell(15).hasAttribute('aria-disabled')).toBeFalse()
+      expect(cell(20).hasAttribute('aria-disabled')).toBeFalse()
+      expect(cell(21).getAttribute('aria-disabled')).toEqual('true')
+    })
+
     it('should hold the stop on the limit today falls outside of, even when that day cannot be picked', () => {
       vi.useFakeTimers({ toFake: ['Date'] })
       vi.setSystemTime(new Date(2026, 8, 30))
@@ -580,7 +598,7 @@ describe('Calendar', () => {
       fixtureEl.innerHTML = '<div></div><div></div>'
 
       const [after, before] = fixtureEl.querySelectorAll('div')
-      new Calendar(after, { locale: 'en-US', minDate: new Date(2026, 9, 31, 9) }) // eslint-disable-line no-new
+      new Calendar(after, { disabledDates: [new Date(2026, 9, 31)], locale: 'en-US', minDate: new Date(2026, 9, 31) }) // eslint-disable-line no-new
       new Calendar(before, { disabledDates: [[new Date(2026, 6, 1), new Date(2026, 6, 14)]], locale: 'en-US', maxDate: new Date(2026, 6, 14) }) // eslint-disable-line no-new
 
       const stop = element => element.querySelector('.calendar-cell[tabindex="0"]')

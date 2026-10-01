@@ -9,7 +9,7 @@ import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import {
-  type DisabledDate, getLocalDateFromString, isCellDisabled, isSameInstantAs
+  type DisabledDate, getLocalDateFromString, isSameInstantAs
 } from './util/calendar.js'
 import {
   applyDigitToSection,
@@ -18,11 +18,11 @@ import {
   formatSections,
   formatSectionValue,
   getDateFromSections,
+  getDateLimitError,
   getDateWithin,
   getDaySectionMax,
   getFullYearFromSection,
   getIncrementedSectionValue,
-  getLayoutPeriod,
   getSectionBounds,
   getSectionLayout,
   getSectionsFromString,
@@ -718,22 +718,7 @@ abstract class SectionInput extends BaseComponent {
       return isFilled ? 'incomplete' : null
     }
 
-    const period = getLayoutPeriod(this._sections)
-    const min = period ? getDateWithin(this._sections, this._minDate) : this._minDate
-
-    if (min && date < min) {
-      return 'minDate'
-    }
-
-    if (this._maxDate && date > this._maxDate) {
-      return 'maxDate'
-    }
-
-    if (isCellDisabled(date, period ?? 'days', this._minDate, this._maxDate, this._config.disabledDates)) {
-      return 'disabledDate'
-    }
-
-    return null
+    return getDateLimitError(this._sections, date, this._minDate, this._maxDate, this._config.disabledDates)
   }
 
   _restoreAttribute(name: string, value: string | null): void {

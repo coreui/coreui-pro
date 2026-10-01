@@ -376,8 +376,8 @@ Note that for security reasons the `sanitize`, `sanitizeFn`, and `allowList` opt
 | `endDate` | date, number, string, null | `null` | Initial selected to date (range). |
 | `firstDayOfWeek` | number | `1` | <p>Sets the day of start week.</p>  <ul><li>`0` - Sunday</li><li>`1` - Monday</li><li>`2` - Tuesday</li><li>`3` - Wednesday</li><li>`4` - Thursday</li><li>`5` - Friday</li><li>`6` - Saturday</li></ul> |
 | `locale` | string | `'default'` | Sets the default locale for components. If not set, it is inherited from the navigator.language. |
-| `maxDate` | date, number, string, null | `null` | Max selectable date. |
-| `minDate` | date, number, string, null | `null` | Min selectable date. |
+| `maxDate` | date, number, string, null | `null` | Max selectable date. The days after its day are disabled, and a time of day it carries leaves its own day selectable. |
+| `minDate` | date, number, string, null | `null` | Min selectable date. The days before its day are disabled, and a time of day it carries leaves its own day selectable. |
 | `monthFormat` | `'long'`, `'narrow'`, `'short'`, `'numeric'`, `'2-digit'` | `'short'` | Sets the format for month names. Accepts built-in formats (`'long'`, `'narrow'`, `'short'`, `'numeric'`, `'2-digit'`). |
 | `navNextDoubleIcon` | string | double chevron SVG | Inline SVG of the button that turns the calendar forward by a year, or by a page of years in the years view (sanitized). In right-to-left it shows on the backward button. |
 | `navNextIcon` | string | chevron SVG | Inline SVG of the button that turns the calendar forward by a month (sanitized). In right-to-left it shows on the backward button. |

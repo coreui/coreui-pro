@@ -219,6 +219,53 @@ export const isAmPm = (locale: string): boolean =>
   )
 
 /**
+ * Tells whether a value of a time selection part leaves its whole span outside
+ * the limits: the hour, minute or second set on the day and time of `date`, or
+ * that day's morning or afternoon for the `AM`/`PM` marker. Given the minutes
+ * an hour offers, or the seconds a minute offers, the value is outside when
+ * every one of them is.
+ *
+ * @param date - The date that gives the day and the parts the value is not for
+ * @param part - The part the value is for
+ * @param value - The value, with hours on the 24-hour clock and `'am'` or `'pm'` for the marker
+ * @param limits - The earliest and the latest date allowed, each `null` without one
+ * @param limits.max - The latest date allowed
+ * @param limits.min - The earliest date allowed
+ * @param offered - The minutes of an hour or the seconds of a minute the selection offers
+ * @returns `true` when no moment of the span lies between the limits
+ */
+export const isTimeOutsideLimits = (date: Date, part: 'hours' | 'meridiem' | 'minutes' | 'seconds', value: number | string, { max, min }: { max: Date | null, min: Date | null }, offered: number[] = []): boolean => {
+  const start = new Date(date)
+  const end = new Date(date)
+
+  if (part === 'meridiem') {
+    start.setHours(value === 'pm' ? 12 : 0, 0, 0, 0)
+    end.setHours(value === 'pm' ? 23 : 11, 59, 59, 999)
+  }
+
+  if (part === 'hours') {
+    start.setHours(Number(value), 0, 0, 0)
+    end.setHours(Number(value), 59, 59, 999)
+  }
+
+  if (part === 'minutes') {
+    start.setMinutes(Number(value), 0, 0)
+    end.setMinutes(Number(value), 59, 999)
+  }
+
+  if (part === 'seconds') {
+    start.setSeconds(Number(value), 0)
+    end.setSeconds(Number(value), 999)
+  }
+
+  if (offered.length > 0 && (part === 'hours' || part === 'minutes')) {
+    return offered.every(inner => isTimeOutsideLimits(start, part === 'hours' ? 'minutes' : 'seconds', inner, { max, min }))
+  }
+
+  return Boolean((min && end < min) || (max && start > max))
+}
+
+/**
  * Tells whether a locale pads a single-digit hour with a leading zero
  * (`07:05` rather than `7:05`), so hour labels can follow it.
  *
