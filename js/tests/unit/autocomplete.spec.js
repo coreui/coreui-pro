@@ -283,6 +283,34 @@ describe('Autocomplete', () => {
       expect(autocompleteEl.classList.contains('is-valid')).toBe(true)
     })
 
+    it('should keep a validation class written in the markup and mark the field invalid', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete is-invalid"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        options: [{ label: 'Option 1', value: '1' }]
+      })
+
+      expect(autocompleteEl.classList.contains('is-invalid')).toBeTrue()
+      expect(autocomplete._inputElement.getAttribute('aria-invalid')).toBe('true')
+    })
+
+    it('should drop a validation class from the markup once the text changes, and bring it back with the text it started with', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete is-valid"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        options: [{ label: 'Option 1', value: '1' }, { label: 'Option 2', value: '2' }],
+        value: '1'
+      })
+
+      autocomplete._onOptionSelected('2')
+
+      expect(autocompleteEl.classList.contains('is-valid')).toBeFalse()
+
+      autocomplete._onOptionSelected('1')
+
+      expect(autocompleteEl.classList.contains('is-valid')).toBeTrue()
+    })
+
     it('should set optionsMaxHeight on the options container', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
@@ -678,6 +706,21 @@ describe('Autocomplete', () => {
       expect(placeholder.textContent).toBe('<img src=x onerror="window.xss = true">')
     })
 
+    it('should show the default text for searchNoResultsLabel true', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        searchNoResultsLabel: true,
+        options: [{ label: 'Option 1', value: '1' }]
+      })
+
+      autocomplete.show()
+      autocomplete._search = 'nonexistent'
+      autocomplete._filterOptionsList()
+
+      expect(autocomplete._menu.querySelector('.list-box-empty').textContent).toBe('No results found')
+    })
+
     it('should show with container mode', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div><div id="container"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
@@ -929,6 +972,25 @@ describe('Autocomplete', () => {
   })
 
   describe('setConfig', () => {
+    it('should apply invalid and valid given to setConfig', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        options: [{ label: 'Option 1', value: '1' }]
+      })
+
+      autocomplete.setConfig({ invalid: true })
+
+      expect(autocompleteEl.classList.contains('is-invalid')).toBeTrue()
+      expect(autocomplete._inputElement.getAttribute('aria-invalid')).toBe('true')
+
+      autocomplete.setConfig({ invalid: false, valid: true })
+
+      expect(autocompleteEl.classList.contains('is-invalid')).toBeFalse()
+      expect(autocompleteEl.classList.contains('is-valid')).toBeTrue()
+      expect(autocomplete._inputElement.hasAttribute('aria-invalid')).toBeFalse()
+    })
+
     it('should update configuration and options', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
@@ -2762,6 +2824,22 @@ describe('Autocomplete', () => {
   })
 
   describe('dispose', () => {
+    it('should give back validation classes from the markup and remove its own', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete is-valid"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        invalid: true,
+        options: []
+      })
+
+      expect(autocompleteEl.classList.contains('is-valid')).toBeFalse()
+
+      autocomplete.dispose()
+
+      expect(autocompleteEl.classList.contains('is-valid')).toBeTrue()
+      expect(autocompleteEl.classList.contains('is-invalid')).toBeFalse()
+    })
+
     it('should dispose autocomplete', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
@@ -3273,6 +3351,20 @@ describe('Autocomplete', () => {
       autocomplete._inputElement.dispatchEvent(createEvent('input', { bubbles: true }))
 
       expect(autocomplete._inputHintElement.value).toBe('')
+    })
+
+    it('should not hint a disabled option', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        showHints: true,
+        options: [{ label: 'Option 1', value: '1', disabled: true }, { label: 'Option 2', value: '2' }]
+      })
+
+      autocomplete._inputElement.value = 'Opt'
+      autocomplete._inputElement.dispatchEvent(createEvent('input', { bubbles: true }))
+
+      expect(autocomplete._inputHintElement.value).toBe('Option 2')
     })
   })
 

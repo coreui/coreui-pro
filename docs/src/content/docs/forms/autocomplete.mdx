@@ -183,6 +183,8 @@ Apply validation styling to indicate input validity.
 
 <Example pro code={`<div data-coreui-autocomplete data-coreui-options="Angular, Bootstrap, React.js, Vue.js" data-coreui-placeholder="Invalid autocomplete..." data-coreui-invalid="true"></div>`} />
 
+An `is-invalid` or `is-valid` class written in the markup, for example by a server that has already checked the value, stays while the field holds the text it started with. Once the text changes, only the `invalid` and `valid` options apply. An invalid autocomplete also sets `aria-invalid` on its input.
+
 ## Disabled
 
 Add the `data-coreui-disabled="true"` attribute to disable the component:
@@ -326,7 +328,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `sanitize` | boolean | `true` | Enables HTML sanitization for custom templates to prevent XSS attacks. |
 | `sanitizeFn` | function, null | `null` | Custom sanitization function. If provided, it will be used instead of the built-in sanitizer. |
 | `search` | array, string, null | `null` | Enables search functionality. Use `'global'` for global search across the component and `'external'` when options are provided from external sources. |
-| `searchNoResultsLabel` | boolean, string | `false` | Text displayed when no search results are found. |
+| `searchNoResultsLabel` | boolean, string | `false` | Text displayed when no search results are found; `true` shows "No results found". |
 | `showHints` | boolean | `false` | Shows completion hints as users type. |
 | `valid` | boolean | `false` | Applies valid styling to the component. |
 | `value` | number, string, null | `null` | Sets the initial value of the component. It is applied once, as soon as the options contain it; pass it to `setConfig()` to select another option, or `null` to clear the field. |
