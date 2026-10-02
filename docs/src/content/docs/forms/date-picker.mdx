@@ -523,8 +523,9 @@ myDatePicker.addEventListener('dateChange.coreui.date-picker', event => {
 
 ### CSS variables
 
-The shell uses local CSS variables on `.date-picker` for real-time
-customization. Values are set via Sass, so Sass customization is supported too.
+The picker declares its local CSS variables on its panel, `.date-picker-popup`,
+for real-time customization. Values are set via Sass, so Sass customization is
+supported too.
 
 <ScssDocs file="scss/_date-picker.scss" capture="date-picker-tokens" />
 
