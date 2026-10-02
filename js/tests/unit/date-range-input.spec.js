@@ -645,6 +645,56 @@ describe('DateRangeInput', () => {
       expect(root().querySelector('[data-coreui-range-end]')).toEqual(root().children[2])
     })
 
+    it('should put the parts it generates around the ones the author wrote', () => {
+      const order = (html, config = {}) => {
+        build(config, `<div id="range">${html}</div>`)
+        return [...root().children].map(child => {
+          const part = child.matches('[data-coreui-range-start], [data-coreui-range-separator], [data-coreui-range-end]') ?
+            child :
+            child.querySelector('[data-coreui-range-start], [data-coreui-range-end]')
+
+          if (part.hasAttribute('data-coreui-range-start')) {
+            return 'start'
+          }
+
+          return part.hasAttribute('data-coreui-range-end') ? 'end' : 'separator'
+        })
+      }
+
+      expect(order('<div data-coreui-range-end></div>')).toEqual(['start', 'separator', 'end'])
+      expect(order('<span data-coreui-range-separator>to</span>')).toEqual(['start', 'separator', 'end'])
+      expect(order('<div data-coreui-range-start></div><div data-coreui-range-end></div>')).toEqual(['start', 'separator', 'end'])
+      expect(order('<span data-coreui-range-separator>to</span><div data-coreui-range-end></div>')).toEqual(['start', 'separator', 'end'])
+      expect(order('<div data-coreui-range-start></div>')).toEqual(['start', 'separator', 'end'])
+      expect(order('<div data-coreui-range-end></div>', { startFloatingLabel: 'From' })).toEqual(['start', 'separator', 'end'])
+    })
+
+    it('should keep the generated parts next to the separator when the author wrote more after it', () => {
+      build({}, '<div id="range"><span data-coreui-range-separator>to</span><span id="note">nights</span></div>')
+      const separator = root().querySelector('[data-coreui-range-separator]')
+
+      expect(separator.previousElementSibling.hasAttribute('data-coreui-range-start')).toBeTrue()
+      expect(separator.nextElementSibling.hasAttribute('data-coreui-range-end')).toBeTrue()
+      expect(root().lastElementChild.id).toEqual('note')
+    })
+
+    it('should put the generated parts beside a wrapper the author wrote around an end', () => {
+      build({}, '<div id="range"><div class="form-floating" id="end-wrapper"><div data-coreui-range-end id="end"></div><label for="end">To</label></div></div>')
+      const wrapper = root().querySelector('#end-wrapper')
+
+      expect(wrapper.querySelector('[data-coreui-range-separator], [data-coreui-range-start]')).toBeNull()
+      expect([...root().children].indexOf(wrapper)).toEqual(2)
+      expect(root().children[1].hasAttribute('data-coreui-range-separator')).toBeTrue()
+    })
+
+    it('should tab from the start to the end when the author wrote only the end', () => {
+      build({}, '<div id="range"><div data-coreui-range-end></div></div>')
+      const tabStops = [...root().querySelectorAll('.form-date-time-section[tabindex="0"]')]
+
+      expect(tabStops[0].closest('[data-coreui-range-start]')).not.toBeNull()
+      expect(tabStops[1].closest('[data-coreui-range-end]')).not.toBeNull()
+    })
+
     it('should leave the author\'s elements in place on dispose', () => {
       const range = build({}, OWN_MARKUP)
 
