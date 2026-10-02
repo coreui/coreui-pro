@@ -163,7 +163,8 @@ value, so the interaction is not over until the user says so.
   </div>`} />
 
 `hours`, `minutes` and `seconds` narrow what the time half offers, and are
-ignored without `timepicker`. The four `ariaSelect*Label` options name its
+ignored without `timepicker`. Hours are 0 to 23 in every locale; on a 12-hour
+clock an hour that only one period allows sets that period. The four `ariaSelect*Label` options name its
 selects, and with the flag on the field actions call themselves "Clear date and
 time" and "Toggle calendar and time selection" unless the page passed its own
 label.

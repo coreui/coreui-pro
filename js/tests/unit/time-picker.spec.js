@@ -259,6 +259,44 @@ describe('TimePicker', () => {
 
     const cell = (type, value) => fixtureEl.querySelector(`.time-picker-popup [data-coreui-${type}="${value}"]`)
 
+    it('should read hours as 0 to 23 and take the day period from an hour only one period allows', () => {
+      const picker = buildPicker({ locale: 'en-US', hours: [8, 9, 10, 11, 12, 13, 14, 15, 16], seconds: false })
+      picker.show()
+
+      cell('hours', '1').click()
+
+      expect(picker.getTime().getHours()).toEqual(13)
+      expect(cell('meridiem', 'pm').classList.contains('selected')).toBeTrue()
+      expect(cell('meridiem', 'am').getAttribute('aria-disabled')).toEqual('true')
+
+      cell('meridiem', 'am').click()
+
+      expect(picker.getTime().getHours()).toEqual(13)
+
+      cell('hours', '9').click()
+
+      expect(picker.getTime().getHours()).toEqual(9)
+      expect(cell('meridiem', 'pm').getAttribute('aria-disabled')).toEqual('true')
+    })
+
+    it('should leave the day period to the user for an hour both periods allow', () => {
+      const picker = buildPicker({ locale: 'en-US', seconds: false })
+      picker.show()
+
+      cell('meridiem', 'pm').click()
+      cell('hours', '3').click()
+
+      expect(picker.getTime().getHours()).toEqual(15)
+      expect(cell('meridiem', 'am').getAttribute('aria-disabled')).toEqual('false')
+    })
+
+    it('should offer no morning when every listed hour is in the afternoon', () => {
+      buildPicker({ locale: 'en-US', hours: [13, 14, 15, 16, 17] }).show()
+
+      expect(cell('meridiem', 'am').getAttribute('aria-disabled')).toEqual('true')
+      expect(cell('meridiem', 'pm').getAttribute('aria-disabled')).toEqual('false')
+    })
+
     it('should name the day periods of the column the way the field does', () => {
       const picker = buildPicker({ locale: 'ko', time: '09:15' })
       picker.show()

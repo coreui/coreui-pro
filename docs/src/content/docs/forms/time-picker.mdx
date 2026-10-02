@@ -114,7 +114,7 @@ The time picker supports [floating labels](/forms/floating-labels/): set `floati
 
 ### Custom hours, minutes and seconds
 
-Pass a list or a filter function through `hours`, `minutes`, and `seconds`.
+Pass a list or a filter function through `hours`, `minutes`, and `seconds`. Hours are 0 to 23 in every locale. On a 12-hour clock the column still lists 1 to 12 next to AM/PM: picking an hour that only one period allows sets that period, and the period the picked hour does not allow is disabled, so the example below offers 8 AM to 4 PM.
 
 ```js
 const picker = new coreui.TimePicker(element, {
@@ -126,6 +126,8 @@ const picker = new coreui.TimePicker(element, {
 ```
 
 ## Locale
+
+The locale decides whether the field and the time columns use a 12-hour or a 24-hour clock, and names the day periods in its own words, 오전 and 오후 in Korean. A `format` pins the clock in every locale, `'HH:mm'` for 24 hours and `'hh:mm a'` for 12.
 
 ### Auto
 
@@ -232,7 +234,7 @@ forwarded by name, so their data attributes work on the picker element too.
 | `container` | string, element, false | `false` | Teleport target for the dropdown. Inside a modal dialog it goes into the dialog instead, because the rest of the page is inert. |
 | `disabled` | boolean | `false` | Disables the field and the popup. |
 | `floatingLabel` | string, null | `null` | Renders a floating label over the field, which also becomes its accessible name. An `aria-label` or `aria-labelledby` on the picker element names the field instead. |
-| `hours` | array, function, null | `null` | Allowed hours — a list or a filter. |
+| `hours` | array, function, null | `null` | Allowed hours, 0 to 23 in every locale — a list or a filter. |
 | `inputOptions` | object | `{}` | Programmatic escape hatch for time input options. |
 | `locale` | string | browser locale | Drives the mask and the 12/24-hour split. |
 | `minutes` | array, boolean, function | `true` | Allowed minutes, or `false` to drop the column. |

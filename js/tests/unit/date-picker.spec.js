@@ -796,6 +796,17 @@ describe('DatePicker', () => {
     })
   })
 
+  describe('time selects', () => {
+    it('should disable the day period no listed hour falls in', () => {
+      const picker = buildPicker({ locale: 'en-US', selectionOptions: { hours: [13, 14, 15] }, timepicker: true })
+      picker.show()
+      const meridiem = fixtureEl.querySelector('select.date-picker-time-select.meridiem')
+
+      expect(meridiem.querySelector('option[value="am"]').disabled).toBeTrue()
+      expect(meridiem.querySelector('option[value="pm"]').disabled).toBeFalse()
+    })
+  })
+
   describe('picker shortcut', () => {
     it('should open the calendar without moving the focused section', () => {
       const picker = buildPicker({ date: new Date(2026, 6, 14) })

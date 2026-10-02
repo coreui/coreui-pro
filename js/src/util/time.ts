@@ -3,6 +3,7 @@ export type AmPm = 'am' | 'pm'
 export type FormattedPartial = {
   label: string
   value: number
+  hours?: number[]
 }
 
 export type LocalizedTimePartials = {
@@ -123,11 +124,13 @@ const formatTimePartials = (values: number[], locale: string, partial: 'hour' | 
  * Lists the localized hours, minutes and seconds a time selection offers.
  * For each part, a non-empty array lists exactly those values, a function
  * keeps the values for which it returns `true`, and anything else lists every
- * value.
+ * value. Hours are always 0 to 23, whatever the cycle: on the 12-hour cycle
+ * each listed hour carries in `hours` the 24-hour values it stands for, one
+ * when only the morning or only the afternoon is allowed, both when either is.
  *
  * @param locale - The locale to format with
  * @param ampm - `true` for the 12-hour cycle, `false` for the 24-hour cycle, `'auto'` to follow the locale
- * @param hours - The hours to list
+ * @param hours - The hours to list, 0 to 23
  * @param minutes - The minutes to list
  * @param seconds - The seconds to list
  * @returns The labelled hours, minutes and seconds, and whether hours use the 12-hour cycle
@@ -140,15 +143,15 @@ export const getLocalizedTimePartials = (
   seconds: PartialFilter = []
 ): LocalizedTimePartials => {
   const hour12 = (ampm === 'auto' && isAmPm(locale)) || ampm === true
+  const allowedHours = Array.isArray(hours) && hours.length > 0 ?
+    hours :
+    (typeof hours === 'function' ? Array.from({ length: 24 }, (_, i) => i).filter(hour => hours(hour)) : null)
+  const hourValues = new Map<number, number[]>()
 
-  const listOfHours =
-    Array.isArray(hours) && hours.length > 0 ?
-      hours :
-      (typeof hours === 'function' ?
-        Array.from({ length: hour12 ? 12 : 24 }, (_, i) =>
-          hour12 ? i + 1 : i
-        ).filter(hour => hours(hour)) :
-        Array.from({ length: hour12 ? 12 : 24 }, (_, i) => (hour12 ? i + 1 : i)))
+  for (const hour of allowedHours ?? Array.from({ length: 24 }, (_, i) => (hour12 ? (i + 1) % 24 : i))) {
+    const value = hour12 ? convert24hTo12h(hour) : hour
+    hourValues.set(value, [...(hourValues.get(value) ?? []), hour])
+  }
 
   const listOfMinutes =
     Array.isArray(minutes) && minutes.length > 0 ?
@@ -169,7 +172,8 @@ export const getLocalizedTimePartials = (
         Array.from({ length: 60 }, (_, i) => i))
 
   return {
-    listOfHours: formatTimePartials(listOfHours, locale, 'hour', hour12),
+    listOfHours: formatTimePartials([...hourValues.keys()], locale, 'hour', hour12)
+      .map(partial => ({ ...partial, hours: hourValues.get(partial.value) })),
     listOfMinutes: formatTimePartials(listOfMinutes, locale, 'minute'),
     listOfSeconds: formatTimePartials(listOfSeconds, locale, 'second'),
     hour12

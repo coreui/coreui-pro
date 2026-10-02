@@ -19,6 +19,7 @@ const NAME = 'time-roll'
 
 const CLASS_NAME_CELL = 'time-picker-cell'
 const CLASS_NAME_COL = 'time-picker-col'
+const CLASS_NAME_DISABLED = 'disabled'
 const CLASS_NAME_SELECTED = 'selected'
 
 const ARROW_DOWN_KEY = 'ArrowDown'
@@ -73,6 +74,17 @@ class TimeRoll extends TimeSelection {
     }
   }
 
+  override _markDisabled(): void {
+    for (const part of this._parts()) {
+      for (const option of part.options) {
+        const cell = SelectorEngine.findOne(`[data-coreui-${part.name}="${option.value}"]`, this._element as ParentNode)
+
+        cell?.classList.toggle(CLASS_NAME_DISABLED, option.disabled)
+        cell?.setAttribute('aria-disabled', option.disabled ? 'true' : 'false')
+      }
+    }
+  }
+
   _renderColumns(): void {
     for (const part of this._parts()) {
       const column = document.createElement('div')
@@ -90,10 +102,19 @@ class TimeRoll extends TimeSelection {
         cell.textContent = option.label
         Manipulator.setDataAttribute(cell, part.name, (option as HTMLSelectElement).value)
 
-        cell.addEventListener('click', () => this._change(part.name, (option as HTMLSelectElement).value))
+        cell.addEventListener('click', () => {
+          if (!cell.classList.contains(CLASS_NAME_DISABLED)) {
+            this._change(part.name, (option as HTMLSelectElement).value)
+          }
+        })
         cell.addEventListener('keydown', event => {
           if (event.code === SPACE_KEY || event.key === ENTER_KEY) {
             event.preventDefault()
+
+            if (cell.classList.contains(CLASS_NAME_DISABLED)) {
+              return
+            }
+
             this._change(part.name, (option as HTMLSelectElement).value)
             this._moveFocusToColumn(cell, 1)
           }
