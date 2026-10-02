@@ -715,14 +715,8 @@ class Autocomplete extends ComboboxBase {
     optionsDiv.setAttribute('aria-labelledby', this._uniqueId)
   }
 
-  override _syncPanelReferences(): void {
-    super._syncPanelReferences()
-
-    if (this._config.container && this._menu.isConnected) {
-      this._inputElement.setAttribute('aria-owns', `${this._uniqueId}-listbox`)
-    } else {
-      this._inputElement.removeAttribute('aria-owns')
-    }
+  override _getPanelOwner(): HTMLElement {
+    return this._inputElement
   }
 
   override _getActiveDescendantField(): HTMLElement {

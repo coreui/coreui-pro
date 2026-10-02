@@ -5277,6 +5277,25 @@ describe('MultiSelect', () => {
       expect(referrers.map(element => element.getAttribute('aria-controls'))).toEqual([null, null])
     })
 
+    it('should own the list from the toggler while it is moved out of place', async () => {
+      fixtureEl.innerHTML = '<select id="test-select"></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { container: 'body', options: [{ value: '1', text: 'One' }] })
+      const toggler = multiSelect._togglerElement
+
+      expect(toggler.getAttribute('aria-owns')).toBeNull()
+
+      multiSelect.show()
+
+      expect(toggler.getAttribute('aria-owns')).toBe('test-select-listbox')
+
+      multiSelect.hide()
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect(toggler.getAttribute('aria-owns')).toBeNull()
+    })
+
     it('should set listbox role on the options element', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')

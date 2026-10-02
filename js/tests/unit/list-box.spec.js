@@ -816,6 +816,32 @@ describe('ListBox', () => {
   })
 
   describe('activeDescendant', () => {
+    it('should drop its references on the field while the list is out of the document', () => {
+      fixtureEl.innerHTML = [
+        '<input type="text" id="field">',
+        '<div class="list-box">',
+        '<div class="list-box-option" data-coreui-value="lettuce">Lettuce</div>',
+        '</div>'
+      ].join('')
+
+      const field = fixtureEl.querySelector('#field')
+      const el = fixtureEl.querySelector('.list-box')
+      const listBox = new ListBox(el, { activeDescendant: field })
+
+      listBox.setActive('lettuce')
+      el.remove()
+      listBox.update()
+
+      expect(field.getAttribute('aria-controls')).toBeNull()
+      expect(field.getAttribute('aria-activedescendant')).toBeNull()
+
+      fixtureEl.append(el)
+      listBox.update()
+
+      expect(field.getAttribute('aria-controls')).toEqual(el.id)
+      expect(field.getAttribute('aria-activedescendant')).toEqual(item(el, 'lettuce').id)
+    })
+
     it('should keep the focus in the field and follow the highlight', () => {
       fixtureEl.innerHTML = [
         '<input type="text" id="field">',

@@ -564,7 +564,10 @@ class ListBox extends BaseComponent {
       this._searchField.setAttribute('aria-label', this._config.ariaSearchLabel)
     }
 
-    this._searchField.setAttribute('aria-controls', this._list.id)
+    if (this._searchField !== this._field) {
+      this._searchField.setAttribute('aria-controls', this._list.id)
+    }
+
     this._searchField.disabled = this._config.disabled
   }
 
@@ -1081,11 +1084,13 @@ class ListBox extends BaseComponent {
       this._list.id = getUID(`${NAME}-options-`)
     }
 
-    if (this._list.isConnected) {
-      this._field.setAttribute('aria-controls', this._list.id)
-    } else {
+    if (!this._list.isConnected) {
       this._field.removeAttribute('aria-controls')
+      this._field.removeAttribute('aria-activedescendant')
+      return
     }
+
+    this._field.setAttribute('aria-controls', this._list.id)
 
     const option = this._activeOption()
 

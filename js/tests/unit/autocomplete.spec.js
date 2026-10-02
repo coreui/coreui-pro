@@ -141,6 +141,7 @@ describe('Autocomplete', () => {
       autocomplete.show()
 
       expect(document.getElementById(input.getAttribute('aria-controls'))).toBe(autocomplete._menu.querySelector('[role="listbox"]'))
+      expect(input.getAttribute('aria-owns')).toBeNull()
 
       autocomplete.hide()
       await new Promise(resolve => {
@@ -153,6 +154,24 @@ describe('Autocomplete', () => {
       autocomplete.setConfig({ options: ['Option 3'] })
 
       expect(input.getAttribute('aria-controls')).toBeNull()
+    })
+
+    it('should own the list while it is moved away from an ancestor that would clip it', async () => {
+      fixtureEl.innerHTML = '<div style="overflow: hidden"><div class="autocomplete"></div></div>'
+      const autocomplete = new Autocomplete(fixtureEl.querySelector('.autocomplete'), { options: ['Option 1'] })
+      const input = autocomplete._inputElement
+
+      autocomplete.show()
+
+      expect(autocomplete._menu.parentElement).toBe(document.body)
+      expect(input.getAttribute('aria-owns')).toBe(`${autocomplete._uniqueId}-listbox`)
+
+      autocomplete.hide()
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect(input.getAttribute('aria-owns')).toBeNull()
     })
 
     it('should render each option with role="option"', () => {

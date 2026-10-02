@@ -101,7 +101,7 @@ export const a11yComponents = [
       {
         criterion: '4.1.2',
         status: 'built-in',
-        note: 'The input gets role=combobox with aria-autocomplete, aria-expanded, aria-haspopup and aria-controls; the dropdown is a listbox of role=option items carrying aria-selected/aria-disabled.'
+        note: 'The input gets role=combobox with aria-autocomplete, aria-expanded and aria-haspopup, plus aria-controls while the dropdown is open (and aria-owns when the dropdown is moved out of place); the dropdown is a listbox of role=option items carrying aria-selected/aria-disabled.'
       },
       {
         criterion: '4.1.3',
@@ -135,7 +135,7 @@ export const a11yComponents = [
       {
         criterion: '4.1.2',
         status: 'built-in',
-        note: 'The toggler gets role=combobox named from the associated <label> via aria-labelledby (or the select\'s aria-label), with aria-expanded, aria-haspopup and aria-controls; options render as a role=listbox with aria-multiselectable and role=option items; the replaced native <select> is removed from the accessibility tree (aria-hidden, tabindex=-1).'
+        note: 'The toggler gets role=combobox named from the associated <label> via aria-labelledby (or the select\'s aria-label), with aria-expanded and aria-haspopup, plus aria-controls while the panel is open (and aria-owns when the panel is moved out of place); options render as a role=listbox with aria-multiselectable and role=option items; the replaced native <select> is removed from the accessibility tree (aria-hidden, tabindex=-1).'
       },
       {
         criterion: '4.1.3',

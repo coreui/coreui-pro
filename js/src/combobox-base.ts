@@ -184,13 +184,31 @@ class ComboboxBase extends BaseComponent {
   _syncPanelReferences(): void {
     this._listBox?._updateActiveDescendant()
 
+    const mounted = this._menu.isConnected
+    const moved = mounted && this._menu.parentElement !== this._getShowTarget().parentElement
+
     for (const element of this._getPanelReferrers()) {
-      if (this._menu.isConnected) {
-        element.setAttribute('aria-controls', `${this._uniqueId}-listbox`)
-      } else {
-        element.removeAttribute('aria-controls')
-      }
+      this._togglePanelReference(element, 'aria-controls', mounted)
     }
+
+    const owner = this._getPanelOwner()
+
+    if (owner) {
+      this._togglePanelReference(owner, 'aria-owns', moved)
+    }
+  }
+
+  _togglePanelReference(element: HTMLElement, name: string, on: boolean): void {
+    if (on) {
+      element.setAttribute(name, `${this._uniqueId}-listbox`)
+      return
+    }
+
+    element.removeAttribute(name)
+  }
+
+  _getPanelOwner(): HTMLElement | null {
+    return null
   }
 
   _getPanelReferrers(): HTMLElement[] {

@@ -351,7 +351,7 @@ A `.list-box-empty` element inside the options is shown whenever nothing is left
 
 ## With an input
 
-Pass `activeDescendant` an input and the focus never leaves it: the plugin drops the roving `tabindex`, gives every option an `id`, and keeps `aria-activedescendant` and `aria-controls` on the field pointing at the highlighted option and at `.list-box-options`. The arrows and <kbd>Enter</kbd> are handled on the field, so typing and choosing happen in one place — a combobox in two elements. A text field keeps <kbd>Home</kbd>, <kbd>End</kbd> and the space bar for its own text; give `activeDescendant` a non-text element (a button, a `tabindex` div) and those select instead. Hiding an option with `hidden`, or calling `filter()`, takes it out of the navigation and leaves the selection alone.
+Pass `activeDescendant` an input and the focus never leaves it: the plugin drops the roving `tabindex`, gives every option an `id`, and keeps `aria-activedescendant` and `aria-controls` on the field pointing at the highlighted option and at `.list-box-options` while the list is in the document; a list taken out of it, such as a closed combobox panel, takes both references off the field. The arrows and <kbd>Enter</kbd> are handled on the field, so typing and choosing happen in one place — a combobox in two elements. A text field keeps <kbd>Home</kbd>, <kbd>End</kbd> and the space bar for its own text; give `activeDescendant` a non-text element (a button, a `tabindex` div) and those select instead. Hiding an option with `hidden`, or calling `filter()`, takes it out of the navigation and leaves the selection alone.
 
 <Example code={`<label for="listBoxField" class="form-label">Filter</label>
   <input type="text" class="form-control mb-2" id="listBoxField" role="combobox" aria-expanded="true" autocomplete="off" style="max-width: 20rem">
@@ -426,7 +426,7 @@ const listBox = new coreui.ListBox('#myListBox', {
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
-| `activeDescendant` | null, string, element | `null` | Field that keeps the focus. The plugin drops the roving `tabindex`, gives the options ids, and writes `aria-activedescendant` and `aria-controls` on the field. The keyboard is handled on the field. |
+| `activeDescendant` | null, string, element | `null` | Field that keeps the focus. The plugin drops the roving `tabindex`, gives the options ids, and writes `aria-activedescendant` and `aria-controls` on the field while the list is in the document. The keyboard is handled on the field. |
 | `allowList` | object | [Default value](/getting-started/javascript/#sanitizer) | Object which contains allowed attributes and tags for the labels rendered from `items`. |
 | `ariaSearchLabel` | string | `'Search options'` | Accessible name of the search field. An input with its own `aria-label` keeps it. |
 | `counter` | boolean | `false` | Puts a `{selected}/{available} selected` readout in the header, counting the visible, enabled options. Builds the header when the markup has none. |

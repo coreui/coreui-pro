@@ -139,6 +139,17 @@ describe('Combobox', () => {
       expect(toggle.getAttribute('aria-controls')).toBeNull()
     })
 
+    it('should not name an active option on the toggle while the panel is closed', () => {
+      const toggle = setMarkup()
+      new Combobox(toggle) // eslint-disable-line no-new
+
+      toggle.focus()
+      toggle.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true, cancelable: true }))
+
+      expect(toggle.getAttribute('aria-expanded')).toEqual('false')
+      expect(toggle.getAttribute('aria-activedescendant')).toBeNull()
+    })
+
     it('should build the caret from the default icon', () => {
       const toggle = setMarkup()
       // eslint-disable-next-line no-new
