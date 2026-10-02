@@ -258,6 +258,8 @@ describe('DatePicker', () => {
     it('should name the panel by ariaPopupLabel', () => {
       expect(buildPicker()._menu.getAttribute('aria-label')).toEqual('Calendar')
       expect(buildPicker({ ariaPopupLabel: 'Arrival day' })._menu.getAttribute('aria-label')).toEqual('Arrival day')
+      expect(buildPicker({ timepicker: true })._menu.getAttribute('aria-label')).toEqual('Calendar and time selection')
+      expect(buildPicker({ ariaPopupLabel: 'Arrival', timepicker: true })._menu.getAttribute('aria-label')).toEqual('Arrival')
     })
 
     it('should toggle on indicator click and fire lifecycle events', async () => {
@@ -380,13 +382,19 @@ describe('DatePicker', () => {
       expect(picker.getDate()).toBeNull()
     })
 
-    it('should name an adopted toggle by ariaPickerLabel only when it has no text of its own', () => {
+    it('should name an adopted button by its label option only when it shows no text', () => {
       buildPicker({}, `<div id="picker" data-coreui-locale="en-US">
         <div data-coreui-picker-field></div>
-        <button type="button" data-coreui-picker-toggle><svg viewBox="0 0 16 16"><path d="M0 0h16"/></svg></button>
+        <button type="button" data-coreui-picker-cleaner><span aria-hidden="true">×</span></button>
+        <button type="button" data-coreui-picker-toggle><svg viewBox="0 0 16 16"><title>Calendar</title><path d="M0 0h16"/></svg></button>
       </div>`)
 
+      expect(fixtureEl.querySelector('[data-coreui-picker-cleaner]').getAttribute('aria-label')).toEqual('Clear date')
       expect(fixtureEl.querySelector('[data-coreui-picker-toggle]').getAttribute('aria-label')).toEqual('Toggle calendar')
+
+      buildPicker({}, OWN_MARKUP)
+
+      expect(fixtureEl.querySelector('[data-coreui-picker-toggle]').hasAttribute('aria-label')).toBeFalse()
     })
 
     it('should give an adopted toggle the accessibility it would have given its own', () => {
@@ -805,6 +813,8 @@ describe('DatePicker', () => {
     it('should not open the calendar from the keyboard while disabled', () => {
       const picker = buildPicker({ date: new Date(2026, 6, 14), disabled: true })
       const section = fixtureEl.querySelector('.form-date-time-section')
+      const showSpy = jasmine.createSpy('show')
+      fixtureEl.querySelector('#picker').addEventListener('show.coreui.date-picker', showSpy)
 
       section.focus()
       for (const init of [{ key: 'F4' }, { key: 'ArrowDown', altKey: true }]) {
@@ -812,6 +822,7 @@ describe('DatePicker', () => {
       }
 
       expect(picker._popup.isShown).toBeFalse()
+      expect(showSpy).not.toHaveBeenCalled()
       expect(fixtureEl.querySelector('.form-control-action').getAttribute('aria-expanded')).toEqual('false')
     })
 
@@ -865,6 +876,43 @@ describe('DatePicker', () => {
       cleaner.click()
 
       expect(document.activeElement).toBe(fixtureEl.querySelector('.form-date-time-section'))
+    })
+
+    it('should leave focus where a dateChange listener moved it when the cleaner clears the value', () => {
+      buildPicker({ date: new Date(2026, 6, 14) })
+      const other = document.createElement('input')
+      fixtureEl.append(other)
+      fixtureEl.querySelector('#picker').addEventListener('dateChange.coreui.date-picker', event => {
+        if (!event.date) {
+          other.focus()
+        }
+      })
+      const cleaner = fixtureEl.querySelector('.form-control-cleaner')
+
+      cleaner.focus()
+      cleaner.click()
+
+      expect(document.activeElement).toBe(other)
+    })
+
+    it('should not throw when a dateChange listener disposes the picker the cleaner cleared', () => {
+      const picker = buildPicker({ date: new Date(2026, 6, 14) })
+      const errors = []
+      const onError = event => {
+        errors.push(event.error)
+        event.preventDefault()
+      }
+
+      fixtureEl.querySelector('#picker').addEventListener('dateChange.coreui.date-picker', event => {
+        if (!event.date) {
+          picker.dispose()
+        }
+      })
+      window.addEventListener('error', onError)
+      fixtureEl.querySelector('.form-control-cleaner').click()
+      window.removeEventListener('error', onError)
+
+      expect(errors).toEqual([])
     })
 
     it('should clear the value when the cleaner is clicked', () => {

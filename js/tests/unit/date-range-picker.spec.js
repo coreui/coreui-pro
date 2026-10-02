@@ -571,6 +571,13 @@ describe('DateRangePicker', () => {
     })
   })
 
+  describe('panel', () => {
+    it('should name the panel by ariaPopupLabel', () => {
+      expect(buildPicker()._menu.getAttribute('aria-label')).toEqual('Calendar')
+      expect(buildPicker({ ariaPopupLabel: 'Your stay' })._menu.getAttribute('aria-label')).toEqual('Your stay')
+    })
+  })
+
   describe('cleaner', () => {
     it('should name the cleaner after the value it clears', () => {
       buildPicker({ startDate: new Date(2026, 5, 1), endDate: new Date(2026, 5, 15) })

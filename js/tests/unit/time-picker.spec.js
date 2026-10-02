@@ -416,6 +416,7 @@ describe('TimePicker', () => {
   describe('options', () => {
     it('should name the panel by ariaPopupLabel', () => {
       expect(buildPicker()._menu.getAttribute('aria-label')).toEqual('Time selection')
+      expect(buildPicker({ ariaPopupLabel: 'Departure time' })._menu.getAttribute('aria-label')).toEqual('Departure time')
     })
 
     it('should not open when disabled', () => {

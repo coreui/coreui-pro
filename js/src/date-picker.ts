@@ -274,10 +274,8 @@ class DatePicker extends PickerBase {
     this._fieldElement = ownField ?? appendControlGroupField(inputGroup, inputEl, this._config.floatingLabel, `${this.constructor.NAME}-`)
     this._moveAriaToField(inputEl)
 
-    const withTime = (key: 'ariaCleanerLabel' | 'ariaPickerLabel', timed: string) =>
-      this._config.timepicker && this._config[key] === ORIGINAL_DEFAULT[key] ? timed : this._config[key]
-    const cleanerLabel = withTime('ariaCleanerLabel', 'Clear date and time')
-    const pickerLabel = withTime('ariaPickerLabel', 'Toggle calendar and time selection')
+    const cleanerLabel = this._withTime('ariaCleanerLabel', 'Clear date and time')
+    const pickerLabel = this._withTime('ariaPickerLabel', 'Toggle calendar and time selection')
 
     const ownCleaner = SelectorEngine.findOne(SELECTOR_ROLE_CLEANER, inputGroup)
 
@@ -342,6 +340,14 @@ class DatePicker extends PickerBase {
 
   override _isNowSelectable(): boolean {
     return this._input.isDateSelectable(new Date())
+  }
+
+  override _popupLabel(): string {
+    return this._withTime('ariaPopupLabel', 'Calendar and time selection')
+  }
+
+  _withTime(key: 'ariaCleanerLabel' | 'ariaPickerLabel' | 'ariaPopupLabel', timed: string): string {
+    return this._config.timepicker && this._config[key] === ORIGINAL_DEFAULT[key] ? timed : this._config[key]
   }
 
   _ensureCalendar(): void {
