@@ -206,6 +206,7 @@ abstract class SectionInput extends BaseComponent {
   protected declare _date: Date | null
   protected declare _minDate: Date | null
   protected declare _ownerInvalid: boolean
+  protected declare _valid: boolean
   protected declare _maxDate: Date | null
   protected declare _sections: DateSection[]
   protected declare _draft: string
@@ -267,6 +268,7 @@ abstract class SectionInput extends BaseComponent {
     this._submitted = false
     this._submittedSinceReset = false
     this._ownerInvalid = false
+    this._valid = false
     this._hostAriaInvalid = this._element.getAttribute('aria-invalid')
     this._hostAriaLabel = this._element.getAttribute('aria-label')
     this._hostClasses = captureHostClasses(this._element, HOST_CLASS_NAMES)
@@ -466,7 +468,7 @@ abstract class SectionInput extends BaseComponent {
 
       this._submitValid = !isInvalid && form.matches(SELECTOR_FORM_VALIDATE_VALID)
       this._setInvalid(isInvalid)
-      this._element.classList.toggle(CLASS_NAME_IS_VALID, this._submitValid)
+      this._setValid(this._submitValid)
     })
   }
 
@@ -658,10 +660,7 @@ abstract class SectionInput extends BaseComponent {
 
     this._element.classList.toggle(CLASS_NAME_FILLED, isFilled)
     this._setInvalid(isDisabled || this._config.invalid || (this._submitted && this._isMissing(date)))
-    this._element.classList.toggle(
-      CLASS_NAME_IS_VALID,
-      this._config.valid || (this._submitValid && isFilled && !isDisabled)
-    )
+    this._setValid(this._config.valid || (this._submitValid && isFilled && !isDisabled))
     this._inputElement!.value = date ? formatSections(this._sections) : ''
 
     if (error !== this._error) {
@@ -683,6 +682,7 @@ abstract class SectionInput extends BaseComponent {
   _setOwnerInvalid(isInvalid: boolean): void {
     this._ownerInvalid = isInvalid
     this._setInvalid(this._element.classList.contains(CLASS_NAME_IS_INVALID))
+    this._setValid(this._valid)
   }
 
   _setInvalid(isInvalid: boolean): void {
@@ -698,6 +698,11 @@ abstract class SectionInput extends BaseComponent {
     }
 
     this._syncDescription()
+  }
+
+  _setValid(isValid: boolean): void {
+    this._valid = isValid
+    this._element.classList.toggle(CLASS_NAME_IS_VALID, isValid && !this._ownerInvalid && this._hostAriaInvalid !== 'true')
   }
 
   _syncDescription(): void {

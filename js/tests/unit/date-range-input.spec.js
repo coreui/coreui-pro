@@ -486,6 +486,26 @@ describe('DateRangeInput', () => {
 
       expect(root().classList.contains('is-valid')).toBeFalse()
       expect(root().classList.contains('is-invalid')).toBeTrue()
+      expect(fields().some(field => field.classList.contains('is-valid'))).toBeFalse()
+
+      range.setRange(new Date(2026, 6, 20), new Date(2026, 6, 21))
+
+      expect(fields().every(field => field.classList.contains('is-valid'))).toBeTrue()
+    })
+
+    it('should keep the submit verdict off the fields while the end is before the start', async () => {
+      const range = build({ startDate: new Date(2026, 6, 20), endDate: new Date(2026, 6, 14) }, '<form data-coreui-validate="valid"><div id="range"></div></form>')
+      const form = fixtureEl.querySelector('form')
+
+      form.addEventListener('submit', event => event.preventDefault())
+      form.requestSubmit()
+      await Promise.resolve()
+
+      expect(fields().some(field => field.classList.contains('is-valid'))).toBeFalse()
+
+      range.setRange(new Date(2026, 6, 14), new Date(2026, 6, 20))
+
+      expect(fields().every(field => field.classList.contains('is-valid'))).toBeTrue()
     })
   })
 
