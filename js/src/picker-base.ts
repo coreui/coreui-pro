@@ -210,7 +210,7 @@ abstract class PickerBase extends BaseComponent {
   }
 
   _adoptAction(element: HTMLElement, label: string): HTMLElement {
-    if (!element.hasAttribute('aria-label') && !element.hasAttribute('aria-labelledby')) {
+    if (!element.hasAttribute('aria-label') && !element.hasAttribute('aria-labelledby') && !element.textContent?.trim()) {
       this._writeAdoptedAttribute(element, 'aria-label', label)
     }
 

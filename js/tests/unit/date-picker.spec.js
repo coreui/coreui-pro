@@ -350,7 +350,7 @@ describe('DatePicker', () => {
       const toggle = el.querySelector('[data-coreui-picker-toggle]')
 
       expect(toggle).not.toBeNull()
-      expect(toggle.getAttribute('aria-label')).toEqual('Toggle calendar')
+      expect(toggle.hasAttribute('aria-label')).toBeFalse()
 
       picker.show()
 
@@ -375,12 +375,21 @@ describe('DatePicker', () => {
       expect(picker.getDate()).toBeNull()
     })
 
+    it('should name an adopted toggle by ariaPickerLabel only when it has no text of its own', () => {
+      buildPicker({}, `<div id="picker" data-coreui-locale="en-US">
+        <div data-coreui-picker-field></div>
+        <button type="button" data-coreui-picker-toggle><svg viewBox="0 0 16 16"><path d="M0 0h16"/></svg></button>
+      </div>`)
+
+      expect(fixtureEl.querySelector('[data-coreui-picker-toggle]').getAttribute('aria-label')).toEqual('Toggle calendar')
+    })
+
     it('should give an adopted toggle the accessibility it would have given its own', () => {
       const picker = buildPicker({}, OWN_MARKUP)
       const el = fixtureEl.querySelector('#picker')
       const toggle = el.querySelector('[data-coreui-picker-toggle]')
 
-      expect(toggle.getAttribute('aria-label')).toEqual('Toggle calendar')
+      expect(toggle.hasAttribute('aria-label')).toBeFalse()
       expect(toggle.getAttribute('aria-haspopup')).toEqual('dialog')
       expect(toggle.getAttribute('aria-expanded')).toEqual('false')
       expect(toggle.hasAttribute('aria-controls')).toBeFalse()
@@ -1285,7 +1294,7 @@ describe('DatePicker', () => {
     it('should give back a cleaner the author supplied too', () => {
       const picker = buildPicker({}, `<div id="picker">
         <div data-coreui-picker-field></div>
-        <button data-coreui-picker-cleaner>Clear</button>
+        <button data-coreui-picker-cleaner><svg viewBox="0 0 16 16"></svg></button>
         <button data-coreui-picker-toggle>Pick</button>
       </div>`)
       const cleaner = fixtureEl.querySelector('[data-coreui-picker-cleaner]')
@@ -1295,7 +1304,7 @@ describe('DatePicker', () => {
       picker.dispose()
       pickers.length = 0
 
-      expect(cleaner.outerHTML).toEqual('<button data-coreui-picker-cleaner="">Clear</button>')
+      expect(cleaner.outerHTML).toEqual('<button data-coreui-picker-cleaner=""><svg viewBox="0 0 16 16"></svg></button>')
     })
 
     it('should give back an attribute the author wrote rather than dropping it', () => {
