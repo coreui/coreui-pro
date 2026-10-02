@@ -181,6 +181,99 @@ describe('validation feedback next to a frame', () => {
     expect(borderOf('#host')).toEqual(borderOf('#reference'))
   })
 
+  it('keeps the success message away from floating labels while an end is invalid', () => {
+    const config = {
+      endDate: new Date(2026, 6, 20),
+      endFloatingLabel: 'Check-out',
+      maxDate: new Date(2026, 6, 14),
+      startDate: new Date(2026, 6, 10),
+      startFloatingLabel: 'Check-in',
+      valid: true
+    }
+
+    for (const markup of [
+      '<div id="host"></div><div class="invalid-feedback">Pick an earlier day.</div><div class="valid-feedback">Looks good!</div>',
+      '<div class="form-field"><div id="host"></div><div class="invalid-feedback">Pick an earlier day.</div><div class="valid-feedback">Looks good!</div></div>',
+      '<div id="host"></div><div class="invalid-tooltip">Pick an earlier day.</div><div class="valid-tooltip">Looks good!</div>'
+    ]) {
+      mount(markup, config)
+
+      expect(fields().map(field => field.classList.contains('is-valid'))).toEqual([true, false])
+      expect(displayOf('[class^="invalid-"]')).toBe('block')
+      expect(displayOf('[class^="valid-"]')).toBe('none')
+
+      instance.dispose()
+      container.remove()
+    }
+
+    instance = null
+  })
+
+  it('shows the success message for floating labels once both ends are valid', () => {
+    const config = {
+      endDate: new Date(2026, 6, 14),
+      endFloatingLabel: 'Check-out',
+      startDate: new Date(2026, 6, 10),
+      startFloatingLabel: 'Check-in',
+      valid: true
+    }
+
+    for (const markup of [
+      '<div id="host"></div><div class="valid-feedback">Looks good!</div>',
+      '<div class="form-field"><div id="host"></div><div><div class="valid-feedback">Looks good!</div></div></div>',
+      '<div id="host"></div><div class="valid-tooltip">Looks good!</div>'
+    ]) {
+      mount(markup, config)
+
+      expect(displayOf('[class^="valid-"]')).toBe('block')
+
+      instance.dispose()
+      container.remove()
+    }
+
+    instance = null
+  })
+
+  it('keeps the success message of an invalid frame hidden after a valid one', () => {
+    for (const control of ['<input class="form-control is-valid">', '<div class="form-floating"><input class="form-control is-valid"></div>']) {
+      mount(`<div class="form-control-group">${control}</div><div class="valid-feedback">Strong.</div><div class="form-control-group"><input class="form-control is-invalid"></div><div class="invalid-feedback">No match.</div><div id="second" class="valid-feedback">Matches.</div>`)
+
+      expect(displayOf('.valid-feedback')).toBe('block')
+      expect(displayOf('#second')).toBe('none')
+
+      container.remove()
+    }
+  })
+
+  it('leaves class-driven success alone in a form that did not opt in', () => {
+    mount('<form novalidate><div class="form-control-group"><input class="form-control is-valid" value="12"><select class="form-select" required><option value="">unit</option></select></div><div class="valid-feedback">Looks good!</div></form>')
+    const form = container.querySelector('form')
+
+    form.addEventListener('submit', event => event.preventDefault())
+    form.requestSubmit()
+
+    expect(container.querySelector('select').matches(':user-invalid')).toBeTrue()
+    expect(displayOf('.valid-feedback')).toBe('block')
+  })
+
+  it('keeps the success message away while a control in a valid frame is user-invalid', () => {
+    for (const markup of [
+      '<form data-coreui-validate="valid" novalidate><div class="form-control-group is-valid"><input class="form-control" required></div><div class="invalid-feedback">Required.</div><div class="valid-feedback">Looks good!</div></form>',
+      '<form data-coreui-validate="valid" novalidate><div class="form-field"><div class="form-control-group is-valid"><input class="form-control" required></div><div><div class="valid-feedback">Looks good!</div></div></div></form>',
+      '<form data-coreui-validate="valid" novalidate><div class="form-field"><div class="input-group"><input class="form-control" value="1" required><input class="form-control" required></div><div class="valid-feedback">Looks good!</div></div></form>'
+    ]) {
+      mount(markup)
+      const form = container.querySelector('form')
+
+      form.addEventListener('submit', event => event.preventDefault())
+      form.requestSubmit()
+
+      expect(displayOf('.valid-feedback')).toBe('none')
+
+      container.remove()
+    }
+  })
+
   it('keeps the success message away for a helper field that validates nothing', () => {
     mount('<form data-coreui-validate="valid" novalidate><div class="form-control-group"><input value="tag"></div><div class="valid-feedback">Looks good!</div></form>')
     const form = container.querySelector('form')
