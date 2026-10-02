@@ -788,6 +788,19 @@ describe('DatePicker', () => {
       expect(picker.getDate().getDate()).toEqual(14)
     })
 
+    it('should not open the calendar from the keyboard while disabled', () => {
+      const picker = buildPicker({ date: new Date(2026, 6, 14), disabled: true })
+      const section = fixtureEl.querySelector('.form-date-time-section')
+
+      section.focus()
+      for (const init of [{ key: 'F4' }, { key: 'ArrowDown', altKey: true }]) {
+        section.dispatchEvent(new KeyboardEvent('keydown', { ...init, bubbles: true, cancelable: true }))
+      }
+
+      expect(picker._popup.isShown).toBeFalse()
+      expect(fixtureEl.querySelector('.form-control-action').getAttribute('aria-expanded')).toEqual('false')
+    })
+
     it('should still step the section when the arrow carries no modifier', () => {
       const picker = buildPicker({ date: new Date(2026, 6, 14) })
       const section = fixtureEl.querySelectorAll('.form-date-time-section')[1]

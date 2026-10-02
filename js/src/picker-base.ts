@@ -91,7 +91,7 @@ abstract class PickerBase extends BaseComponent {
       container: this._config.container,
       content: this._menu,
       onBeforeHide: () => !EventHandler.trigger(this._element, this.constructor.eventName('hide'))?.defaultPrevented,
-      onBeforeShow: () => !EventHandler.trigger(this._element, this.constructor.eventName('show'))?.defaultPrevented,
+      onBeforeShow: () => !this._config.disabled && !EventHandler.trigger(this._element, this.constructor.eventName('show'))?.defaultPrevented,
       onHidden: () => EventHandler.trigger(this._element, this.constructor.eventName('hidden')),
       onHide: () => {
         this._clearToggleAttribute('aria-controls')
