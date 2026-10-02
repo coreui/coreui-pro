@@ -571,6 +571,13 @@ describe('DateRangePicker', () => {
     })
   })
 
+  describe('panel', () => {
+    it('should name the panel by ariaPopupLabel', () => {
+      expect(buildPicker()._menu.getAttribute('aria-label')).toEqual('Calendar')
+      expect(buildPicker({ ariaPopupLabel: 'Your stay' })._menu.getAttribute('aria-label')).toEqual('Your stay')
+    })
+  })
+
   describe('cleaner', () => {
     it('should name the cleaner after the value it clears', () => {
       buildPicker({ startDate: new Date(2026, 5, 1), endDate: new Date(2026, 5, 15) })
@@ -585,6 +592,16 @@ describe('DateRangePicker', () => {
 
       expect(picker.getStartDate()).toBeNull()
       expect(picker.getEndDate()).toBeNull()
+    })
+
+    it('should move focus to the start field once the cleaner has cleared the range', () => {
+      buildPicker({ startDate: new Date(2026, 5, 1), endDate: new Date(2026, 5, 15) })
+      const cleaner = fixtureEl.querySelector('.form-control-cleaner')
+
+      cleaner.focus()
+      cleaner.click()
+
+      expect(document.activeElement).toBe(fixtureEl.querySelector('[data-coreui-range-start] .form-date-time-section'))
     })
 
     it('should not render a cleaner when the option is off', () => {

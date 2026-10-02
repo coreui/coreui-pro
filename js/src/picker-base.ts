@@ -22,6 +22,7 @@ const CLASS_NAME_POPUP = 'popup'
 const CLASS_NAME_SHOW = 'show'
 
 const SELECTOR_ACTION = '[data-coreui-picker-action]'
+const SELECTOR_SECTION = '[data-coreui-section]'
 const SELECTOR_SVG = 'svg'
 const SELECTOR_TEMPLATE_FOOTER = 'template[data-coreui-template="footer"]'
 
@@ -51,10 +52,6 @@ abstract class PickerBase extends BaseComponent {
 
   // Public
   show(): void {
-    if (this._config.disabled) {
-      return
-    }
-
     this._popup.show()
   }
 
@@ -91,7 +88,7 @@ abstract class PickerBase extends BaseComponent {
       container: this._config.container,
       content: this._menu,
       onBeforeHide: () => !EventHandler.trigger(this._element, this.constructor.eventName('hide'))?.defaultPrevented,
-      onBeforeShow: () => !EventHandler.trigger(this._element, this.constructor.eventName('show'))?.defaultPrevented,
+      onBeforeShow: () => !this._config.disabled && !EventHandler.trigger(this._element, this.constructor.eventName('show'))?.defaultPrevented,
       onHidden: () => EventHandler.trigger(this._element, this.constructor.eventName('hidden')),
       onHide: () => {
         this._clearToggleAttribute('aria-controls')
@@ -117,6 +114,10 @@ abstract class PickerBase extends BaseComponent {
       EventHandler.on(this._cleanerElement, eventName, (event: any) => {
         event.stopPropagation()
         this.clear()
+
+        if (this._element && [this._cleanerElement, document.body].includes(document.activeElement as HTMLElement)) {
+          SelectorEngine.findOne(SELECTOR_SECTION, this._popupAnchor())?.focus()
+        }
       })
     }
 
@@ -146,6 +147,7 @@ abstract class PickerBase extends BaseComponent {
     this._menu = document.createElement('div')
     this._menu.id = getUID(`${this.constructor.NAME}-popup-`)
     this._menu.classList.add(CLASS_NAME_POPUP, `${prefix}-popup`)
+    this._menu.setAttribute('aria-label', this._popupLabel())
     this._menu.append(body)
     this._writeToggleAttribute('aria-expanded', 'false')
     this._writeToggleAttribute('aria-haspopup', 'dialog')
@@ -208,7 +210,7 @@ abstract class PickerBase extends BaseComponent {
   }
 
   _adoptAction(element: HTMLElement, label: string): HTMLElement {
-    if (!element.hasAttribute('aria-label') && !element.hasAttribute('aria-labelledby')) {
+    if (!element.hasAttribute('aria-label') && !element.hasAttribute('aria-labelledby') && !this._showsText(element)) {
       this._writeAdoptedAttribute(element, 'aria-label', label)
     }
 
@@ -224,6 +226,12 @@ abstract class PickerBase extends BaseComponent {
     }
 
     return element
+  }
+
+  _showsText(element: Element): boolean {
+    return [...element.childNodes].some(node => node.nodeType === Node.TEXT_NODE ?
+      Boolean(node.textContent?.trim()) :
+      node instanceof HTMLElement && !node.hidden && node.getAttribute('aria-hidden') !== 'true' && this._showsText(node))
   }
 
   _moveAriaToField(element: Element): void {
@@ -262,6 +270,10 @@ abstract class PickerBase extends BaseComponent {
 
   _popupAnchor(): HTMLElement {
     return this._element
+  }
+
+  _popupLabel(): string {
+    return this._config.ariaPopupLabel
   }
 
   _writeToggleAttribute(name: string, value: string): void {
