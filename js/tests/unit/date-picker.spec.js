@@ -796,6 +796,33 @@ describe('DatePicker', () => {
     })
   })
 
+  describe('time selects', () => {
+    it('should disable the day period no listed hour falls in', () => {
+      const picker = buildPicker({ locale: 'en-US', selectionOptions: { hours: [13, 14, 15] }, timepicker: true })
+      picker.show()
+      const meridiem = fixtureEl.querySelector('select.date-picker-time-select.meridiem')
+
+      expect(meridiem.querySelector('option[value="am"]').disabled).toBeTrue()
+      expect(meridiem.querySelector('option[value="pm"]').disabled).toBeFalse()
+      expect(meridiem.value).toEqual('pm')
+    })
+
+    it('should check the limits against the hour a listed entry stands for', () => {
+      const picker = buildPicker({
+        date: new Date(2026, 9, 15, 9),
+        locale: 'en-US',
+        maxDate: new Date(2026, 9, 15, 12),
+        selectionOptions: { hours: [8, 9, 10, 11, 12, 13, 14, 15, 16] },
+        timepicker: true
+      })
+      picker.show()
+      const hours = fixtureEl.querySelector('select.date-picker-time-select.hours')
+
+      expect(hours.querySelector('option[value="1"]').disabled).toBeTrue()
+      expect(hours.querySelector('option[value="9"]').disabled).toBeFalse()
+    })
+  })
+
   describe('picker shortcut', () => {
     it('should open the calendar without moving the focused section', () => {
       const picker = buildPicker({ date: new Date(2026, 6, 14) })

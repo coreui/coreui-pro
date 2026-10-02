@@ -259,6 +259,104 @@ describe('TimePicker', () => {
 
     const cell = (type, value) => fixtureEl.querySelector(`.time-picker-popup [data-coreui-${type}="${value}"]`)
 
+    it('should read hours as 0 to 23 and take the day period from an hour only one period allows', () => {
+      const picker = buildPicker({ locale: 'en-US', hours: [8, 9, 10, 11, 12, 13, 14, 15, 16], seconds: false })
+      picker.show()
+
+      cell('hours', '1').click()
+
+      expect(picker.getTime().getHours()).toEqual(13)
+      expect(cell('meridiem', 'pm').classList.contains('selected')).toBeTrue()
+      expect(cell('meridiem', 'am').getAttribute('aria-disabled')).toEqual('true')
+
+      cell('meridiem', 'am').click()
+
+      expect(picker.getTime().getHours()).toEqual(13)
+
+      cell('hours', '9').click()
+
+      expect(picker.getTime().getHours()).toEqual(9)
+      expect(cell('meridiem', 'pm').getAttribute('aria-disabled')).toEqual('true')
+    })
+
+    it('should leave the day period to the user for an hour both periods allow', () => {
+      const picker = buildPicker({ locale: 'en-US', seconds: false })
+      picker.show()
+
+      cell('meridiem', 'pm').click()
+      cell('hours', '3').click()
+
+      expect(picker.getTime().getHours()).toEqual(15)
+      expect(cell('meridiem', 'am').getAttribute('aria-disabled')).toEqual('false')
+    })
+
+    it('should offer no morning when every listed hour is in the afternoon', () => {
+      buildPicker({ locale: 'en-US', hours: [13, 14, 15, 16, 17] }).show()
+
+      expect(cell('meridiem', 'am').getAttribute('aria-disabled')).toEqual('true')
+      expect(cell('meridiem', 'am').getAttribute('aria-selected')).not.toEqual('true')
+      expect(cell('meridiem', 'pm').getAttribute('aria-disabled')).toEqual('false')
+    })
+
+    it('should ignore Enter and Space on a disabled cell', () => {
+      const picker = buildPicker({
+        locale: 'en-US', hours: [13, 14, 15], seconds: false, time: '13:00'
+      })
+      picker.show()
+
+      for (const init of [{ key: 'Enter' }, { key: ' ', code: 'Space' }]) {
+        cell('meridiem', 'am').dispatchEvent(new KeyboardEvent('keydown', { ...init, bubbles: true, cancelable: true }))
+      }
+
+      expect(picker.getTime().getHours()).toEqual(13)
+    })
+
+    it('should keep both periods for a time the list does not hold', () => {
+      buildPicker({ locale: 'en-US', hours: [8, 9, 10, 11, 12, 13, 14, 15, 16], time: '20:00' }).show()
+
+      expect(cell('meridiem', 'pm').getAttribute('aria-disabled')).toEqual('false')
+      expect(cell('meridiem', 'am').getAttribute('aria-disabled')).toEqual('false')
+    })
+
+    it('should pick an hour listed twice as that hour', () => {
+      const picker = buildPicker({ locale: 'en-US', hours: [8, 9, 10, 11, 12, 12, 13], seconds: false })
+      picker.show()
+
+      cell('hours', '12').click()
+
+      expect(picker.getTime().getHours()).toEqual(12)
+    })
+
+    it('should land on a listed hour when the day period is picked before the hour', () => {
+      const morning = buildPicker({ locale: 'en-US', hours: [8, 9, 10, 11, 12, 13, 14, 15, 16], seconds: false })
+      morning.show()
+      cell('meridiem', 'am').click()
+
+      expect(morning.getTime().getHours()).toEqual(8)
+
+      const afternoon = buildPicker({ locale: 'en-US', hours: [13, 14, 15, 16, 17], seconds: false })
+      afternoon.show()
+      cell('meridiem', 'pm').click()
+
+      expect(afternoon.getTime().getHours()).toEqual(13)
+    })
+
+    it('should keep the 12-hour clock a format pins on a 24-hour locale', () => {
+      buildPicker({ locale: 'en-GB', format: 'hh:mm a' }).show()
+
+      expect(cell('meridiem', 'pm')).not.toBeNull()
+      expect(cell('hours', '13')).toBeNull()
+    })
+
+    it('should name the day periods of the column the way the field does', () => {
+      const picker = buildPicker({ locale: 'ko', time: '09:15' })
+      picker.show()
+
+      expect(cell('meridiem', 'am').textContent).toEqual('오전')
+      expect(cell('meridiem', 'pm').textContent).toEqual('오후')
+      expect(fixtureEl.querySelector('[data-coreui-section="meridiem"]').textContent).toEqual('오전')
+    })
+
     it('should emit timeChange once per change, carrying what getTime returns', () => {
       const picker = buildPicker({ time: '09:15', seconds: false })
       const emitted = listen()

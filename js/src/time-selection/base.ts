@@ -9,9 +9,10 @@ import EventHandler from '../dom/event-handler.js'
 import SelectorEngine from '../dom/selector-engine.js'
 import Config from '../util/config.js'
 import { constrainDate } from '../util/calendar.js'
-import { convertValue, getInclusiveMax } from '../util/date-sections.js'
+import { convertValue, getDayPeriodNames, getInclusiveMax } from '../util/date-sections.js'
 import {
   convert12hTo24h,
+  type FormattedPartial,
   getLocalizedTimePartials,
   getSelectedHour,
   getSelectedMinutes,
@@ -82,7 +83,6 @@ class TimeSelection extends Config {
     this._element = element as HTMLElement
     this._config = this._getConfig(config) as typeof Default
     this._date = this._config.time as Date | null
-    this._ampm = this._date ? (this._date.getHours() >= 12 ? 'pm' : 'am') : 'am'
 
     this._render()
   }
@@ -108,14 +108,13 @@ class TimeSelection extends Config {
   setTime(time: Date | null): void {
     this._config.time = time as any
     this._date = time
-    this._ampm = time ? (time.getHours() >= 12 ? 'pm' : 'am') : 'am'
+    this._ampm = this._dayPeriod()
     this._markSelected()
   }
 
   setConfig(config: any): void {
     this._config = this._getConfig({ ...this._config, ...config }) as typeof Default
     this._date = this._config.time as Date | null
-    this._ampm = this._date ? (this._date.getHours() >= 12 ? 'pm' : 'am') : 'am'
     this._render()
   }
 
@@ -144,6 +143,7 @@ class TimeSelection extends Config {
       this._config.minutes as any,
       this._config.seconds as any
     )
+    this._ampm = this._dayPeriod()
 
     this._element!.innerHTML = ''
     EventHandler.off(this._element, EVENT_KEYDOWN)
@@ -172,16 +172,21 @@ class TimeSelection extends Config {
     }
 
     if (this._partials.hour12) {
+      const [am, pm] = getDayPeriodNames(this._config.locale as string)
+
       parts.push({
         ariaLabel: this._config.ariaSelectMeridiemLabel,
         name: 'meridiem',
-        options: [{ label: 'AM', value: 'am' }, { label: 'PM', value: 'pm' }]
+        options: [{ label: am, value: 'am' }, { label: pm, value: 'pm' }]
       })
     }
 
     return parts.map(part => ({
       ...part,
-      options: part.options.map((option: any) => ({ ...option, disabled: this._isOutsideLimits(part.name, option.value) }))
+      options: part.options.map((option: any) => ({
+        ...option,
+        disabled: this._isUnavailable(part.name, option.value) || this._isOutsideLimits(part.name, option.value)
+      }))
     }))
   }
 
@@ -196,11 +201,45 @@ class TimeSelection extends Config {
       date.setHours(this._date.getHours(), this._date.getMinutes(), this._date.getSeconds())
     }
 
-    const hour = part === 'hours' && this._partials.hour12 ? convert12hTo24h(this._ampm, Number(value)) : value
+    const hour = part === 'hours' ? this._hourOf(value) : value
     const offered = (part === 'hours' && this._config.minutes ? this._partials.listOfMinutes : (part === 'minutes' && this._config.seconds ? this._partials.listOfSeconds : []))
       .map((option: any) => option.value)
 
     return isTimeOutsideLimits(date, part as 'hours' | 'meridiem' | 'minutes' | 'seconds', hour, { max: this._maxDate, min: this._minDate }, offered)
+  }
+
+  _hourOf(value: number | string): number {
+    const hour = Number(value)
+
+    if (!this._partials.hour12) {
+      return hour
+    }
+
+    const hours = this._partials.listOfHours.find((option: FormattedPartial) => option.value === hour)?.hours ?? []
+
+    return hours.length === 1 ? hours[0] : convert12hTo24h(this._ampm, hour)
+  }
+
+  _dayPeriod(): string {
+    const hour = this._date ? this._date.getHours() : this._partials.listOfHours[0]?.hours?.[0] ?? 0
+
+    return hour >= 12 ? 'pm' : 'am'
+  }
+
+  _isUnavailable(part: string, value: number | string): boolean {
+    if (part !== 'meridiem') {
+      return false
+    }
+
+    const option = this._date && this._partials.listOfHours.find((item: FormattedPartial) => item.hours?.includes(this._date!.getHours()))
+
+    if (this._date && !option) {
+      return false
+    }
+
+    const hours: number[] = option ? option.hours ?? [] : this._partials.listOfHours.flatMap((item: FormattedPartial) => item.hours ?? [])
+
+    return !hours.some(hour => (hour >= 12) === (value === 'pm'))
   }
 
   _renderBody(): void {
@@ -249,12 +288,21 @@ class TimeSelection extends Config {
       if (value === 'pm' && hours < 12) {
         date.setHours(hours + 12)
       }
+
+      const allowed: number[] = this._partials.listOfHours.flatMap((option: FormattedPartial) => option.hours ?? [])
+
+      if (!allowed.includes(date.getHours())) {
+        date.setHours(allowed.find(hour => (hour >= 12) === (value === 'pm')) ?? date.getHours())
+      }
     }
 
     if (part === 'hours') {
-      date.setHours(this._partials.hour12 ?
-        convert12hTo24h(this._ampm, Number.parseInt(value, 10)) :
-        Number.parseInt(value, 10))
+      const hour = this._hourOf(value)
+      date.setHours(hour)
+
+      if (this._partials.hour12) {
+        this._ampm = hour < 12 ? 'am' : 'pm'
+      }
     }
 
     if (part === 'minutes') {

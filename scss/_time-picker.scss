@@ -20,9 +20,11 @@ $time-picker-tokens: defaults(
     --#{$prefix}time-picker-col-border-width: var(--#{$prefix}border-width),
     --#{$prefix}time-picker-col-border-color: var(--#{$prefix}border-color),
     --#{$prefix}time-picker-cell-width: 3rem,
+    --#{$prefix}time-picker-cell-padding-x: .5rem,
     --#{$prefix}time-picker-cell-height: 2rem,
     --#{$prefix}time-picker-cell-hover-color: var(--#{$prefix}fg-body),
     --#{$prefix}time-picker-cell-hover-bg: var(--#{$prefix}bg-2),
+    --#{$prefix}time-picker-cell-disabled-color: var(--#{$prefix}fg-4),
     --#{$prefix}time-picker-cell-selected-color: var(--#{$prefix}primary-contrast),
     --#{$prefix}time-picker-cell-selected-bg: var(--#{$prefix}primary-base),
     --#{$prefix}time-picker-cell-selected-hover-color: var(--#{$prefix}primary-contrast),
@@ -81,11 +83,13 @@ $time-picker-tokens: defaults(
     display: flex;
     align-items: center;
     justify-content: center;
-    width: var(--#{$prefix}time-picker-cell-width);
+    min-width: var(--#{$prefix}time-picker-cell-width);
     height: var(--#{$prefix}time-picker-cell-height);
+    padding-inline: var(--#{$prefix}time-picker-cell-padding-x);
+    white-space: nowrap;
     cursor: pointer;
 
-    &:hover,
+    &:hover:not(.disabled),
     &:focus-visible:not(.selected) {
       color: var(--#{$prefix}time-picker-cell-hover-color);
       background: var(--#{$prefix}time-picker-cell-hover-bg);
@@ -93,6 +97,12 @@ $time-picker-tokens: defaults(
 
     &:focus-visible {
       outline: 0;
+    }
+
+    &.disabled,
+    &.disabled:focus-visible {
+      color: var(--#{$prefix}time-picker-cell-disabled-color);
+      cursor: default;
     }
 
     &.selected {
