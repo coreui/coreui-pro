@@ -255,6 +255,11 @@ describe('DatePicker', () => {
   })
 
   describe('show/hide', () => {
+    it('should name the panel by ariaPopupLabel', () => {
+      expect(buildPicker()._menu.getAttribute('aria-label')).toEqual('Calendar')
+      expect(buildPicker({ ariaPopupLabel: 'Arrival day' })._menu.getAttribute('aria-label')).toEqual('Arrival day')
+    })
+
     it('should toggle on indicator click and fire lifecycle events', async () => {
       const picker = buildPicker()
       const el = fixtureEl.querySelector('#picker')

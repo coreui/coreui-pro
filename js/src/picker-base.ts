@@ -148,6 +148,7 @@ abstract class PickerBase extends BaseComponent {
     this._menu = document.createElement('div')
     this._menu.id = getUID(`${this.constructor.NAME}-popup-`)
     this._menu.classList.add(CLASS_NAME_POPUP, `${prefix}-popup`)
+    this._menu.setAttribute('aria-label', this._config.ariaPopupLabel)
     this._menu.append(body)
     this._writeToggleAttribute('aria-expanded', 'false')
     this._writeToggleAttribute('aria-haspopup', 'dialog')

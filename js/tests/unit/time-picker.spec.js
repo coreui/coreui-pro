@@ -414,6 +414,10 @@ describe('TimePicker', () => {
   })
 
   describe('options', () => {
+    it('should name the panel by ariaPopupLabel', () => {
+      expect(buildPicker()._menu.getAttribute('aria-label')).toEqual('Time selection')
+    })
+
     it('should not open when disabled', () => {
       const picker = buildPicker({ disabled: true })
 
