@@ -272,8 +272,12 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | `allowList` | object | SVG allow list | Allowed tags and attributes for the generated separator icon |
 | `ariaDayLabel` | string | `'Day'` | The `aria-label` of the day section. |
 | `ariaEndLabel` | string | `'End date'` | Accessible name of the end field when it has no floating label and no `aria-label` of its own |
+| `ariaHourLabel` | string | `'Hour'` | The `aria-label` of the hour section. |
+| `ariaMeridiemLabel` | string | `'AM/PM'` | The `aria-label` of the meridiem section. |
+| `ariaMinuteLabel` | string | `'Minute'` | The `aria-label` of the minute section. |
 | `ariaMonthLabel` | string | `'Month'` | The `aria-label` of the month section. |
 | `ariaQuarterLabel` | string | `'Quarter'` | The `aria-label` of the quarter section. |
+| `ariaSecondLabel` | string | `'Second'` | The `aria-label` of the second section. |
 | `ariaStartLabel` | string | `'Start date'` | Accessible name of the start field when it has no floating label and no `aria-label` of its own |
 | `ariaWeekLabel` | string | `'Week'` | The `aria-label` of the week section. |
 | `ariaYearLabel` | string | `'Year'` | The `aria-label` of the year section. |
@@ -285,12 +289,15 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | `endFloatingLabel` | string, null | `null` | Floating label of the end field |
 | `endName` | string, null | `null` | Name of the hidden input carrying the end date. Without it the end date is not submitted with the form. |
 | `format` | function, string, null | `null` | Mask layout for both ends: `null` derives it from the locale, a string is parsed as format tokens, a function receives the locale and returns the section layout |
+| `hourPlaceholder` | string, null | `null` | Replaces the `HH` the hour section shows while it is empty. |
 | `inputDateParse` | function, null | `null` | Custom parser used for pasted text, e.g. a date library |
 | `inputOptions` | object | `{}` | Extra options passed to both date inputs |
 | `invalid` | boolean | `false` | Force the invalid state (`.is-invalid`) on both ends |
 | `locale` | string | browser locale | Locale used to derive the masks and month names |
 | `maxDate` | date, string, null | `null` | Latest date either end can hold |
+| `meridiemPlaceholder` | string, null | `null` | Replaces the `AM` the meridiem section shows while it is empty. |
 | `minDate` | date, string, null | `null` | Earliest date either end can hold |
+| `minutePlaceholder` | string, null | `null` | Replaces the `mm` the minute section shows while it is empty. |
 | `monthNames` | array, null | `null` | Twelve custom month names for text month sections (`MMM`/`MMMM`) |
 | `monthPlaceholder` | string, null | `null` | Replaces the `MM` the month section shows while it is empty. |
 | `quarterPlaceholder` | string, null | `null` | Replaces the `Q` the quarter section shows while it is empty. |
@@ -298,6 +305,7 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | `required` | boolean | `false` | Required attribute of the hidden inputs |
 | `sanitize` | boolean | `true` | Sanitize the generated separator icon |
 | `sanitizeFn` | function, null | `null` | Custom sanitizer |
+| `secondPlaceholder` | string, null | `null` | Replaces the `ss` the second section shows while it is empty. |
 | `seconds` | boolean | `false` | Include a seconds section in the locale-derived layout of `type="datetime"`; both ends follow |
 | `separatorIcon` | string | arrow SVG | Icon of the generated separator; ignored for a `data-coreui-range-separator` you wrote |
 | `separatorIconRtl` | string | mirrored arrow SVG | Its right-to-left counterpart |
