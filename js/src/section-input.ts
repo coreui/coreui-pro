@@ -467,8 +467,8 @@ abstract class SectionInput extends BaseComponent {
       const isInvalid = this._element.classList.contains(CLASS_NAME_IS_INVALID) || this._isMissing(this._date)
 
       this._submitValid = !isInvalid && form.matches(SELECTOR_FORM_VALIDATE_VALID)
+      this._valid = this._submitValid
       this._setInvalid(isInvalid)
-      this._setValid(this._submitValid)
     })
   }
 
@@ -659,8 +659,8 @@ abstract class SectionInput extends BaseComponent {
     const isDisabled = error !== null && error !== 'incomplete'
 
     this._element.classList.toggle(CLASS_NAME_FILLED, isFilled)
+    this._valid = this._config.valid || (this._submitValid && isFilled && !isDisabled)
     this._setInvalid(isDisabled || this._config.invalid || (this._submitted && this._isMissing(date)))
-    this._setValid(this._config.valid || (this._submitValid && isFilled && !isDisabled))
     this._inputElement!.value = date ? formatSections(this._sections) : ''
 
     if (error !== this._error) {
@@ -682,12 +682,12 @@ abstract class SectionInput extends BaseComponent {
   _setOwnerInvalid(isInvalid: boolean): void {
     this._ownerInvalid = isInvalid
     this._setInvalid(this._element.classList.contains(CLASS_NAME_IS_INVALID))
-    this._setValid(this._valid)
   }
 
   _setInvalid(isInvalid: boolean): void {
     const ariaInvalid = isInvalid || this._ownerInvalid ? 'true' : this._hostAriaInvalid
     this._element.classList.toggle(CLASS_NAME_IS_INVALID, isInvalid)
+    this._element.classList.toggle(CLASS_NAME_IS_VALID, this._valid && ariaInvalid !== 'true')
 
     for (const element of [this._element, ...this._getSectionElements()]) {
       if (ariaInvalid === null) {
@@ -698,11 +698,6 @@ abstract class SectionInput extends BaseComponent {
     }
 
     this._syncDescription()
-  }
-
-  _setValid(isValid: boolean): void {
-    this._valid = isValid
-    this._element.classList.toggle(CLASS_NAME_IS_VALID, isValid && !this._ownerInvalid && this._hostAriaInvalid !== 'true')
   }
 
   _syncDescription(): void {
