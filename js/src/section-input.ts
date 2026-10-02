@@ -206,6 +206,7 @@ abstract class SectionInput extends BaseComponent {
   protected declare _date: Date | null
   protected declare _minDate: Date | null
   protected declare _ownerInvalid: boolean
+  protected declare _valid: boolean
   protected declare _maxDate: Date | null
   protected declare _sections: DateSection[]
   protected declare _draft: string
@@ -267,6 +268,7 @@ abstract class SectionInput extends BaseComponent {
     this._submitted = false
     this._submittedSinceReset = false
     this._ownerInvalid = false
+    this._valid = false
     this._hostAriaInvalid = this._element.getAttribute('aria-invalid')
     this._hostAriaLabel = this._element.getAttribute('aria-label')
     this._hostClasses = captureHostClasses(this._element, HOST_CLASS_NAMES)
@@ -465,8 +467,8 @@ abstract class SectionInput extends BaseComponent {
       const isInvalid = this._element.classList.contains(CLASS_NAME_IS_INVALID) || this._isMissing(this._date)
 
       this._submitValid = !isInvalid && form.matches(SELECTOR_FORM_VALIDATE_VALID)
+      this._valid = this._submitValid
       this._setInvalid(isInvalid)
-      this._element.classList.toggle(CLASS_NAME_IS_VALID, this._submitValid)
     })
   }
 
@@ -657,11 +659,8 @@ abstract class SectionInput extends BaseComponent {
     const isDisabled = error !== null && error !== 'incomplete'
 
     this._element.classList.toggle(CLASS_NAME_FILLED, isFilled)
+    this._valid = this._config.valid || (this._submitValid && isFilled && !isDisabled)
     this._setInvalid(isDisabled || this._config.invalid || (this._submitted && this._isMissing(date)))
-    this._element.classList.toggle(
-      CLASS_NAME_IS_VALID,
-      this._config.valid || (this._submitValid && isFilled && !isDisabled)
-    )
     this._inputElement!.value = date ? formatSections(this._sections) : ''
 
     if (error !== this._error) {
@@ -688,6 +687,7 @@ abstract class SectionInput extends BaseComponent {
   _setInvalid(isInvalid: boolean): void {
     const ariaInvalid = isInvalid || this._ownerInvalid ? 'true' : this._hostAriaInvalid
     this._element.classList.toggle(CLASS_NAME_IS_INVALID, isInvalid)
+    this._element.classList.toggle(CLASS_NAME_IS_VALID, this._valid && ariaInvalid !== 'true')
 
     for (const element of [this._element, ...this._getSectionElements()]) {
       if (ariaInvalid === null) {

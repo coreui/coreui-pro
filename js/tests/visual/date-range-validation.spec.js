@@ -171,6 +171,16 @@ describe('validation feedback next to a frame', () => {
     expect(displayOf('.valid-feedback')).toBe('none')
   })
 
+  it('draws a reversed range with the valid option in the invalid colour', () => {
+    mount('<div id="host" style="transition: none"></div><div id="reference" class="form-control-group is-invalid"><input class="form-control"></div>', {
+      endDate: new Date(2026, 6, 14),
+      startDate: new Date(2026, 6, 20),
+      valid: true
+    })
+
+    expect(borderOf('#host')).toEqual(borderOf('#reference'))
+  })
+
   it('keeps the success message away for a helper field that validates nothing', () => {
     mount('<form data-coreui-validate="valid" novalidate><div class="form-control-group"><input value="tag"></div><div class="valid-feedback">Looks good!</div></form>')
     const form = container.querySelector('form')

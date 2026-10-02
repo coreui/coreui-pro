@@ -1134,6 +1134,23 @@ describe('DateInput', () => {
       expect(validInput._element.classList.contains('is-valid')).toBeTrue()
     })
 
+    it('should not draw a field the page announces as invalid as valid', () => {
+      fixtureEl.innerHTML = '<div aria-invalid="true"></div>'
+      const dateInput = new DateInput(fixtureEl.querySelector('div'), { format: 'dd.MM.yyyy', valid: true })
+
+      expect(dateInput._element.classList.contains('is-valid')).toBeFalse()
+    })
+
+    it('should not draw a field invalid on its own as valid', () => {
+      for (const config of [{ date: new Date(2026, 6, 20), maxDate: new Date(2026, 6, 14) }, { invalid: true }]) {
+        const dateInput = createDateInput({ valid: true, ...config })
+
+        expect(dateInput._element.classList.contains('is-invalid')).toBeTrue()
+        expect(dateInput._element.classList.contains('is-valid')).toBeFalse()
+        dateInput.dispose()
+      }
+    })
+
     it('should mark a required empty field as invalid on submit of a validated form', async () => {
       const dateInput = createInForm({ required: true })
 

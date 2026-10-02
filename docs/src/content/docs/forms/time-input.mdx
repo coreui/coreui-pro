@@ -104,7 +104,7 @@ The built-in token parser covers dayjs, moment, date-fns, and luxon format strin
 
 ## Validation
 
-The field participates in the standard form validation styling, [the same way as the date input](/forms/date-input/#validation): a completed time outside `minDate`/`maxDate` gets `.is-invalid` automatically, the `valid`/`invalid` options force a state, and submitting a form with the `data-coreui-validate` attribute marks a `required` empty field invalid — and a filled one valid when the form carries `data-coreui-validate="valid"`. Sibling `.valid-feedback`/`.invalid-feedback` elements work as with any other form control.
+The field participates in the standard form validation styling, [the same way as the date input](/forms/date-input/#validation): a completed time outside `minDate`/`maxDate` gets `.is-invalid` automatically, the `valid`/`invalid` options force a state (a field announced invalid with `aria-invalid="true"` is never drawn valid), and submitting a form with the `data-coreui-validate` attribute marks a `required` empty field invalid — and a filled one valid when the form carries `data-coreui-validate="valid"`. Sibling `.valid-feedback`/`.invalid-feedback` elements work as with any other form control.
 
 <Example pro code={`<div class="mb-3">
     <div class="form-control form-date-time" data-coreui-time-input data-coreui-format="HH:mm" data-coreui-date="09:30" data-coreui-valid="true"></div>
@@ -212,7 +212,7 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | `required` | boolean | `false` | Required attribute of the hidden input |
 | `secondPlaceholder` | string, null | `null` | Replaces the `ss` the second section shows while it is empty. |
 | `seconds` | boolean | `false` | Include a seconds section in the locale-derived layout |
-| `valid` | boolean | `false` | Force the valid state (`.is-valid`) |
+| `valid` | boolean | `false` | Force the valid state (`.is-valid`) while the field is not announced invalid |
 
 ### Methods
 
