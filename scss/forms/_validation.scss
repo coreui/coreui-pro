@@ -152,16 +152,12 @@
     ~ .#{$state}-tooltip { display: block; }
   }
 
-  .form-control-group.is-#{$state},
-  .form-control-group:has(> .is-#{$state}),
-  .form-control-group:has(> .form-floating > .is-#{$state}) {
+  .form-control-group:where(.is-#{$state}, :has(> .is-#{$state}), :has(> .form-floating > .is-#{$state})) {
     ~ .#{$state}-feedback,
     ~ .#{$state}-tooltip { display: block; }
   }
 
-  .form-field:has(.form-control-group.is-#{$state}),
-  .form-field:has(.form-control-group > .is-#{$state}),
-  .form-field:has(.form-control-group > .form-floating > .is-#{$state}) {
+  .form-field:where(:has(.form-control-group.is-#{$state}, .form-control-group > .is-#{$state}, .form-control-group > .form-floating > .is-#{$state})) {
     .#{$state}-feedback,
     .#{$state}-tooltip { display: block; }
   }
@@ -198,13 +194,15 @@
     }
 
     .form-control-group.is-invalid,
-    .form-control-group:has(.is-invalid) {
+    .form-control-group:has(.is-invalid),
+    [data-coreui-validate] .form-control-group:has(:user-invalid) {
       ~ .valid-feedback,
       ~ .valid-tooltip { display: none; }
     }
 
     .form-field:has(.form-control-group.is-invalid),
-    .form-field:has(.form-control-group .is-invalid) {
+    .form-field:has(.form-control-group .is-invalid),
+    [data-coreui-validate] .form-field:has(.form-control-group :user-invalid) {
       .valid-feedback,
       .valid-tooltip { display: none; }
     }
@@ -218,7 +216,7 @@
       }
     }
   } @else if $state == "valid" {
-    [data-coreui-validate~="valid"] .form-field:has(.input-group :user-valid) {
+    [data-coreui-validate~="valid"] .form-field:not(:has(.is-invalid, :user-invalid)):has(.input-group :user-valid) {
       .valid-feedback,
       .valid-tooltip {
         display: block;
