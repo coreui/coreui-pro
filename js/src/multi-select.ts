@@ -1038,10 +1038,6 @@ class MultiSelect extends ComboboxBase {
     return null
   }
 
-  override _getPanelOwner(): HTMLElement {
-    return this._togglerElement
-  }
-
   override _getPanelReferrers(): HTMLElement[] {
     return [this._togglerElement, this._searchElement].filter(Boolean)
   }

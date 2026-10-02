@@ -564,10 +564,7 @@ class ListBox extends BaseComponent {
       this._searchField.setAttribute('aria-label', this._config.ariaSearchLabel)
     }
 
-    if (this._searchField !== this._field) {
-      this._searchField.setAttribute('aria-controls', this._list.id)
-    }
-
+    this._searchField.setAttribute('aria-controls', this._list.id)
     this._searchField.disabled = this._config.disabled
   }
 
@@ -1215,6 +1212,10 @@ class ListBox extends BaseComponent {
 
     const target = this._field ?? this._list
     EventHandler.on(target, this.constructor.eventName(EVENT_KEYDOWN), (event: any) => this._handleKeydown(event))
+
+    if (this._field) {
+      EventHandler.on(this._field, this.constructor.eventName(EVENT_FOCUSIN), () => this._updateActiveDescendant())
+    }
   }
 
   _handleClick(event: any): void {

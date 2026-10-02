@@ -84,6 +84,7 @@ class ComboboxBase extends BaseComponent {
     this._mountMenu()
     showTarget.classList.add(CLASS_NAME_SHOW)
     this._getAriaExpandedTarget().setAttribute('aria-expanded', 'true')
+    this._syncPanelReferences()
 
     // The panel carries its own open state, teleported or not: `.popup` keys
     // both its display and its entry transition on it, so a panel shown only
@@ -121,6 +122,7 @@ class ComboboxBase extends BaseComponent {
     this._listBox?.setActive(null)
 
     this._onHideEnd()
+    this._syncPanelReferences()
     EventHandler.trigger(this._element, this.constructor.eventName('hidden'))
 
     // The panel lives in the DOM only while a choice is being made; let the
@@ -178,37 +180,26 @@ class ComboboxBase extends BaseComponent {
     this._syncMenuWidth()
     this._widthObserver = new ResizeObserver(() => this._syncMenuWidth())
     this._widthObserver.observe(showTarget)
-    this._syncPanelReferences()
   }
 
   _syncPanelReferences(): void {
     this._listBox?._updateActiveDescendant()
 
-    const mounted = this._menu.isConnected
-    const moved = mounted && this._menu.parentElement !== this._getShowTarget().parentElement
+    const open = this._menu.isConnected && this._isShown()
+    const field = this._getActiveDescendantField()
+
+    if (field && !open) {
+      field.removeAttribute('aria-controls')
+      field.removeAttribute('aria-activedescendant')
+    }
 
     for (const element of this._getPanelReferrers()) {
-      this._togglePanelReference(element, 'aria-controls', mounted)
+      if (open) {
+        element.setAttribute('aria-controls', `${this._uniqueId}-listbox`)
+      } else {
+        element.removeAttribute('aria-controls')
+      }
     }
-
-    const owner = this._getPanelOwner()
-
-    if (owner) {
-      this._togglePanelReference(owner, 'aria-owns', moved)
-    }
-  }
-
-  _togglePanelReference(element: HTMLElement, name: string, on: boolean): void {
-    if (on) {
-      element.setAttribute(name, `${this._uniqueId}-listbox`)
-      return
-    }
-
-    element.removeAttribute(name)
-  }
-
-  _getPanelOwner(): HTMLElement | null {
-    return null
   }
 
   _getPanelReferrers(): HTMLElement[] {

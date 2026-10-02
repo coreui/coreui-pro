@@ -144,6 +144,9 @@ describe('Autocomplete', () => {
       expect(input.getAttribute('aria-owns')).toBeNull()
 
       autocomplete.hide()
+
+      expect(input.getAttribute('aria-controls')).toBeNull()
+
       await new Promise(resolve => {
         setTimeout(resolve, 50)
       })
@@ -156,7 +159,7 @@ describe('Autocomplete', () => {
       expect(input.getAttribute('aria-controls')).toBeNull()
     })
 
-    it('should own the list while it is moved away from an ancestor that would clip it', async () => {
+    it('should point a moved list through aria-controls only, with no aria-owns', () => {
       fixtureEl.innerHTML = '<div style="overflow: hidden"><div class="autocomplete"></div></div>'
       const autocomplete = new Autocomplete(fixtureEl.querySelector('.autocomplete'), { options: ['Option 1'] })
       const input = autocomplete._inputElement
@@ -164,13 +167,7 @@ describe('Autocomplete', () => {
       autocomplete.show()
 
       expect(autocomplete._menu.parentElement).toBe(document.body)
-      expect(input.getAttribute('aria-owns')).toBe(`${autocomplete._uniqueId}-listbox`)
-
-      autocomplete.hide()
-      await new Promise(resolve => {
-        setTimeout(resolve, 50)
-      })
-
+      expect(document.getElementById(input.getAttribute('aria-controls'))).not.toBeNull()
       expect(input.getAttribute('aria-owns')).toBeNull()
     })
 
@@ -3882,7 +3879,7 @@ describe('Autocomplete', () => {
       expect(document.activeElement).toBe(autocomplete._inputElement)
     })
 
-    it('should append dropdown to container element', async () => {
+    it('should append dropdown to container element', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div><div id="my-container"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
       const containerEl = fixtureEl.querySelector('#my-container')
@@ -3897,13 +3894,7 @@ describe('Autocomplete', () => {
       autocomplete.show()
 
       expect(containerEl.querySelector('.combobox-popup')).toBeTruthy()
-      expect(document.getElementById(autocomplete._inputElement.getAttribute('aria-owns'))).not.toBeNull()
-
-      autocomplete.hide()
-      await new Promise(resolve => {
-        setTimeout(resolve, 50)
-      })
-
+      expect(containerEl.contains(document.getElementById(autocomplete._inputElement.getAttribute('aria-controls')))).toBeTrue()
       expect(autocomplete._inputElement.getAttribute('aria-owns')).toBeNull()
     })
 

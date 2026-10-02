@@ -816,7 +816,7 @@ describe('ListBox', () => {
   })
 
   describe('activeDescendant', () => {
-    it('should drop its references on the field while the list is out of the document', () => {
+    it('should drop its references on the field while the list is out of the document, and restore them on focus', () => {
       fixtureEl.innerHTML = [
         '<input type="text" id="field">',
         '<div class="list-box">',
@@ -836,7 +836,7 @@ describe('ListBox', () => {
       expect(field.getAttribute('aria-activedescendant')).toBeNull()
 
       fixtureEl.append(el)
-      listBox.update()
+      field.focus()
 
       expect(field.getAttribute('aria-controls')).toEqual(el.id)
       expect(field.getAttribute('aria-activedescendant')).toEqual(item(el, 'lettuce').id)
