@@ -843,6 +843,16 @@ describe('DatePicker', () => {
       expect(fixtureEl.querySelector('.form-control-cleaner').getAttribute('aria-label')).toEqual('Clear date')
     })
 
+    it('should move focus to the field once the cleaner has cleared the value', () => {
+      buildPicker({ date: new Date(2026, 6, 14) })
+      const cleaner = fixtureEl.querySelector('.form-control-cleaner')
+
+      cleaner.focus()
+      cleaner.click()
+
+      expect(document.activeElement).toBe(fixtureEl.querySelector('.form-date-time-section'))
+    })
+
     it('should clear the value when the cleaner is clicked', () => {
       const picker = buildPicker({ date: new Date(2026, 6, 14) })
 

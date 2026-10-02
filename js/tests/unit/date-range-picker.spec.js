@@ -587,6 +587,16 @@ describe('DateRangePicker', () => {
       expect(picker.getEndDate()).toBeNull()
     })
 
+    it('should move focus to the start field once the cleaner has cleared the range', () => {
+      buildPicker({ startDate: new Date(2026, 5, 1), endDate: new Date(2026, 5, 15) })
+      const cleaner = fixtureEl.querySelector('.form-control-cleaner')
+
+      cleaner.focus()
+      cleaner.click()
+
+      expect(document.activeElement).toBe(fixtureEl.querySelector('[data-coreui-range-start] .form-date-time-section'))
+    })
+
     it('should not render a cleaner when the option is off', () => {
       buildPicker({ cleaner: false, startDate: new Date(2026, 5, 1) })
 

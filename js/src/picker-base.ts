@@ -22,6 +22,7 @@ const CLASS_NAME_POPUP = 'popup'
 const CLASS_NAME_SHOW = 'show'
 
 const SELECTOR_ACTION = '[data-coreui-picker-action]'
+const SELECTOR_SECTION = '[data-coreui-section]'
 const SELECTOR_SVG = 'svg'
 const SELECTOR_TEMPLATE_FOOTER = 'template[data-coreui-template="footer"]'
 
@@ -117,6 +118,7 @@ abstract class PickerBase extends BaseComponent {
       EventHandler.on(this._cleanerElement, eventName, (event: any) => {
         event.stopPropagation()
         this.clear()
+        SelectorEngine.findOne(SELECTOR_SECTION, this._popupAnchor())?.focus()
       })
     }
 
