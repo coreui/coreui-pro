@@ -201,7 +201,7 @@ Localized formats work the same way — the section names come from the componen
 The field participates in the standard form validation styling. Three mechanisms set the state:
 
 - **Range validation (automatic)** — a completed date outside `minDate`/`maxDate`/`disabledDates` gets `.is-invalid` until corrected.
-- **The `valid`/`invalid` options** — force the state, e.g. after server-side validation. A field announced invalid (`aria-invalid="true"`, its own or the page's) is never drawn valid, so `valid` waits until it is not.
+- **The `valid`/`invalid` options** — force the state, e.g. after server-side validation. An invalid field is never drawn valid: `valid` waits while its date is rejected or, in a date range, while the end is before the start.
 - **Form submit** — the date input renders a hidden input, which is excluded from native constraint validation, so the component applies the state itself when a form with the `data-coreui-validate` attribute is submitted: a `required` empty field becomes `.is-invalid`, and a filled one becomes `.is-valid` when the form opts into success styling with `data-coreui-validate="valid"`. A native form reset returns the field to the date it was created with and drops that state; a submit that follows the reset in the same task judges the restored date again, and a `reset` listener that calls `preventDefault()` cancels the whole reset.
 
 Sibling `.valid-feedback`/`.invalid-feedback` elements work as with any other form control.
@@ -357,7 +357,7 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | `secondPlaceholder` | string, null | `null` | Replaces the `ss` the second section shows while it is empty. |
 | `seconds` | boolean | `false` | Include a seconds section in the locale-derived layout of `type="datetime"` |
 | `type` | string | `'date'` | Which sections the locale-derived layout carries: `'date'` or `'datetime'`. A `format` names the sections itself and overrides this. |
-| `valid` | boolean | `false` | Force the valid state (`.is-valid`) while the field is not announced invalid |
+| `valid` | boolean | `false` | Force the valid state (`.is-valid`) while the field is not invalid |
 | `weekPlaceholder` | string, null | `null` | Replaces the `WW` the week section shows while it is empty. |
 | `yearPlaceholder` | string, null | `null` | Replaces the `YYYY` the year section shows while it is empty. |
 
