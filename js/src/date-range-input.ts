@@ -414,13 +414,13 @@ class DateRangeInput extends BaseComponent {
     this._moveDescriptionToFields()
 
     this._startInput = this._createInput(this._startElement, {
-      ariaLabel: this._config.startFloatingLabel ?? this._config.ariaStartLabel,
+      ariaLabel: this._config.startFloatingLabel || this._config.ariaStartLabel,
       date: this._config.startDate,
       name: this._config.startName
     })
 
     this._endInput = this._createInput(this._endElement, {
-      ariaLabel: this._config.endFloatingLabel ?? this._config.ariaEndLabel,
+      ariaLabel: this._config.endFloatingLabel || this._config.ariaEndLabel,
       date: this._config.endDate,
       name: this._config.endName
     })
