@@ -84,6 +84,7 @@ class ComboboxBase extends BaseComponent {
     this._mountMenu()
     showTarget.classList.add(CLASS_NAME_SHOW)
     this._getAriaExpandedTarget().setAttribute('aria-expanded', 'true')
+    this._syncPanelReferences()
 
     // The panel carries its own open state, teleported or not: `.popup` keys
     // both its display and its entry transition on it, so a panel shown only
@@ -121,6 +122,7 @@ class ComboboxBase extends BaseComponent {
     this._listBox?.setActive(null)
 
     this._onHideEnd()
+    this._syncPanelReferences()
     EventHandler.trigger(this._element, this.constructor.eventName('hidden'))
 
     // The panel lives in the DOM only while a choice is being made; let the
@@ -129,6 +131,7 @@ class ComboboxBase extends BaseComponent {
     executeAfterTransition(() => {
       if (this._menu && !this._isShown()) {
         this._menu.remove()
+        this._syncPanelReferences()
       }
     }, this._menu)
   }
@@ -177,6 +180,30 @@ class ComboboxBase extends BaseComponent {
     this._syncMenuWidth()
     this._widthObserver = new ResizeObserver(() => this._syncMenuWidth())
     this._widthObserver.observe(showTarget)
+  }
+
+  _syncPanelReferences(): void {
+    this._listBox?._updateActiveDescendant()
+
+    const open = this._menu.isConnected && this._isShown()
+    const field = this._getActiveDescendantField()
+
+    if (field && !open) {
+      field.removeAttribute('aria-controls')
+      field.removeAttribute('aria-activedescendant')
+    }
+
+    for (const element of this._getPanelReferrers()) {
+      if (open) {
+        element.setAttribute('aria-controls', `${this._uniqueId}-listbox`)
+      } else {
+        element.removeAttribute('aria-controls')
+      }
+    }
+  }
+
+  _getPanelReferrers(): HTMLElement[] {
+    return []
   }
 
   _syncMenuWidth(): void {

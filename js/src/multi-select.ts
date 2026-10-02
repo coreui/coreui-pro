@@ -861,7 +861,6 @@ class MultiSelect extends ComboboxBase {
     togglerEl.setAttribute('role', 'combobox')
     togglerEl.setAttribute('aria-expanded', 'false')
     togglerEl.setAttribute('aria-haspopup', 'dialog')
-    togglerEl.setAttribute('aria-controls', `${this._uniqueId}-listbox`)
     this._togglerElement = togglerEl
 
     if (this._config.disabled) {
@@ -935,7 +934,6 @@ class MultiSelect extends ComboboxBase {
     input.setAttribute('id', `search-${this._uniqueId}`)
     input.autocomplete = 'off'
     input.setAttribute('aria-label', this._config.ariaSearchLabel)
-    input.setAttribute('aria-controls', `${this._uniqueId}-listbox`)
 
     this._searchElement = input
     this._updateSearchSize()
@@ -1038,6 +1036,10 @@ class MultiSelect extends ComboboxBase {
   // A dialog carries no aria-activedescendant: the options take the focus.
   override _getActiveDescendantField(): null {
     return null
+  }
+
+  override _getPanelReferrers(): HTMLElement[] {
+    return [this._togglerElement, this._searchElement].filter(Boolean)
   }
 
   override _optionText(option: any): string {

@@ -1081,6 +1081,12 @@ class ListBox extends BaseComponent {
       this._list.id = getUID(`${NAME}-options-`)
     }
 
+    if (!this._list.isConnected) {
+      this._field.removeAttribute('aria-controls')
+      this._field.removeAttribute('aria-activedescendant')
+      return
+    }
+
     this._field.setAttribute('aria-controls', this._list.id)
 
     const option = this._activeOption()
@@ -1206,6 +1212,10 @@ class ListBox extends BaseComponent {
 
     const target = this._field ?? this._list
     EventHandler.on(target, this.constructor.eventName(EVENT_KEYDOWN), (event: any) => this._handleKeydown(event))
+
+    if (this._field) {
+      EventHandler.on(this._field, this.constructor.eventName(EVENT_FOCUSIN), () => this._updateActiveDescendant())
+    }
   }
 
   _handleClick(event: any): void {

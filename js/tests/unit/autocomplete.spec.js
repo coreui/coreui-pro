@@ -130,7 +130,45 @@ describe('Autocomplete', () => {
       expect(autocomplete._inputElement.getAttribute('role')).toBe('combobox')
       expect(autocomplete._inputElement.getAttribute('aria-autocomplete')).toBe('list')
       expect(autocomplete._inputElement.getAttribute('aria-haspopup')).toBe('listbox')
-      expect(autocomplete._inputElement.getAttribute('aria-controls')).toBe(`${autocomplete._uniqueId}-listbox`)
+      expect(autocomplete._inputElement.getAttribute('aria-controls')).toBeNull()
+    })
+
+    it('should point aria-controls at the list only while the list is in the document', async () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocomplete = new Autocomplete(fixtureEl.querySelector('.autocomplete'), { options: ['Option 1', 'Option 2'] })
+      const input = autocomplete._inputElement
+
+      autocomplete.show()
+
+      expect(document.getElementById(input.getAttribute('aria-controls'))).toBe(autocomplete._menu.querySelector('[role="listbox"]'))
+      expect(input.getAttribute('aria-owns')).toBeNull()
+
+      autocomplete.hide()
+
+      expect(input.getAttribute('aria-controls')).toBeNull()
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect(autocomplete._menu.isConnected).toBeFalse()
+      expect(input.getAttribute('aria-controls')).toBeNull()
+
+      autocomplete.setConfig({ options: ['Option 3'] })
+
+      expect(input.getAttribute('aria-controls')).toBeNull()
+    })
+
+    it('should point a moved list through aria-controls only, with no aria-owns', () => {
+      fixtureEl.innerHTML = '<div style="overflow: hidden"><div class="autocomplete"></div></div>'
+      const autocomplete = new Autocomplete(fixtureEl.querySelector('.autocomplete'), { options: ['Option 1'] })
+      const input = autocomplete._inputElement
+
+      autocomplete.show()
+
+      expect(autocomplete._menu.parentElement).toBe(document.body)
+      expect(document.getElementById(input.getAttribute('aria-controls'))).not.toBeNull()
+      expect(input.getAttribute('aria-owns')).toBeNull()
     })
 
     it('should render each option with role="option"', () => {
@@ -3856,7 +3894,8 @@ describe('Autocomplete', () => {
       autocomplete.show()
 
       expect(containerEl.querySelector('.combobox-popup')).toBeTruthy()
-      expect(autocomplete._inputElement.getAttribute('aria-owns')).toBeTruthy()
+      expect(containerEl.contains(document.getElementById(autocomplete._inputElement.getAttribute('aria-controls')))).toBeTrue()
+      expect(autocomplete._inputElement.getAttribute('aria-owns')).toBeNull()
     })
 
     it('should handle container as true (uses document.body)', () => {

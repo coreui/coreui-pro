@@ -120,6 +120,36 @@ describe('Combobox', () => {
       expect(menu(combobox).classList.contains('combobox-popup')).toBeTrue()
     })
 
+    it('should point aria-controls at the list only while the list is in the document', async () => {
+      const toggle = setMarkup()
+      const combobox = new Combobox(toggle)
+
+      expect(toggle.getAttribute('aria-controls')).toBeNull()
+
+      combobox.show()
+
+      expect(document.getElementById(toggle.getAttribute('aria-controls'))).toBe(menu(combobox).querySelector('.list-box-options'))
+
+      combobox.hide()
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect(menu(combobox).isConnected).toBeFalse()
+      expect(toggle.getAttribute('aria-controls')).toBeNull()
+    })
+
+    it('should not name an active option on the toggle while the panel is closed', () => {
+      const toggle = setMarkup()
+      new Combobox(toggle) // eslint-disable-line no-new
+
+      toggle.focus()
+      toggle.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true, cancelable: true }))
+
+      expect(toggle.getAttribute('aria-expanded')).toEqual('false')
+      expect(toggle.getAttribute('aria-activedescendant')).toBeNull()
+    })
+
     it('should build the caret from the default icon', () => {
       const toggle = setMarkup()
       // eslint-disable-next-line no-new
