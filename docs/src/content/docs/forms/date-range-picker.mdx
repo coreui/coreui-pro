@@ -175,6 +175,24 @@ The frame the picker builds takes the standard validation styling, and a state c
 
 The component sets the state itself as well: an end before the start makes the frame invalid while it stands, and the `invalid` and `valid` options force it whatever the range is.
 
+### Blocking the submit
+
+The picker marks the range but does not stop the form: the dates travel in hidden inputs, which native constraint validation skips, so `form.checkValidity()` stays `true` while the end is before the start, a `required` range is empty or an end is outside the limits. Check the range in your `submit` listener. `getStartDate()` and `getEndDate()` return what the fields hold, and `null` for an end that is empty, incomplete or rejected by the limits, so one condition covers all three:
+
+```js
+const element = document.querySelector('#stayRange')
+const range = coreui.DateRangePicker.getOrCreateInstance(element)
+
+element.closest('form').addEventListener('submit', event => {
+  const start = range.getStartDate()
+  const end = range.getEndDate()
+
+  if (!start || !end || end < start) {
+    event.preventDefault()
+  }
+})
+```
+
 ## Custom ranges
 
 There is no `ranges` option. Project a `<template data-coreui-template="ranges">`
