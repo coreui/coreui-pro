@@ -115,6 +115,22 @@ describe('DatePicker', () => {
       expect(document.activeElement.querySelector('[aria-current="date"]')).not.toBeNull()
     })
 
+    it('should land on the first week the limits allow when the week of today is before minDate', () => {
+      vi.useFakeTimers({ toFake: ['Date'] })
+      vi.setSystemTime(new Date(2026, 6, 15))
+      onTestFinished(() => vi.useRealTimers())
+      const picker = buildPicker({ locale: 'en-US', minDate: new Date(2026, 6, 22), selectionType: 'week' })
+      picker.show()
+
+      const today = fixtureEl.querySelector('.date-picker-popup [aria-current="date"]')
+      const active = document.activeElement
+
+      expect(today.closest('tr').getAttribute('aria-disabled')).toEqual('true')
+      expect(active.tagName).toEqual('TR')
+      expect(active.hasAttribute('data-coreui-selectable')).toBeTrue()
+      expect([...active.querySelectorAll('[data-coreui-date]')].map(cell => new Date(cell.dataset.coreuiDate).getDate())).toContain(22)
+    })
+
     it('should enter the calendar on today even when today cannot be picked', () => {
       const picker = buildPicker({ disabledDates: [new Date()] })
       picker.show()
