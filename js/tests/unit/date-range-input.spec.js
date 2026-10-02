@@ -84,6 +84,13 @@ describe('DateRangeInput', () => {
       expect(fields()[0].getAttribute('aria-label')).toEqual('Check-in')
     })
 
+    it('should name an end by its default label when its floating label is empty', () => {
+      build({ startFloatingLabel: '', endFloatingLabel: '' })
+
+      expect(root().querySelector('.form-floating')).toBeNull()
+      expect(fields().map(field => field.getAttribute('aria-label'))).toEqual(['Start date', 'End date'])
+    })
+
     it('should remove the floating-label fields it built on dispose', () => {
       const range = build({ startFloatingLabel: 'Check-in', endFloatingLabel: 'Check-out' })
 
