@@ -628,4 +628,8 @@ The options panel is the shared combobox surface, which only sizes itself:
 
 <ScssDocs file="scss/_combobox.scss" capture="combobox-tokens" />
 
+Its surface, border, shadow, stacking and fade come from the `.popup` tokens it shares with the pickers. `.popup` declares them itself, so set them on `.combobox-popup` or on `.popup`; a value set on an ancestor or on `:root` does not reach it.
+
+<ScssDocs file="scss/_popup.scss" capture="popup-tokens" />
+
 Everything inside it — options, section labels, checkbox indicators and the select all button — is a [List box](/components/list-box/) and takes its `--cui-list-box-*` variables. Set them on `.combobox-popup` to restyle one Multi Select, or on `:root` for all of them.

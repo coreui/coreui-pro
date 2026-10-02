@@ -164,17 +164,6 @@ Each field carries its own [floating label](/forms/floating-labels/): set `start
 
 ## Validation
 
-Write `.is-invalid` or `.is-valid` on the picker element and it lands on the frame the picker builds, which is where the stylesheet looks for it. The class judges the range the markup rendered, so it drops as soon as either end moves and comes back when the range returns, through `reset()` or a native form reset. An end before the start is invalid on its own; `isRangeValid()` reports it.
-
-<Example pro code={`<div class="row">
-    <div class="col-lg-7">
-      <div class="is-invalid" data-coreui-date-range-picker data-coreui-locale="en-US" data-coreui-start-date="2026-07-20" data-coreui-end-date="2026-07-14"></div>
-      <div class="invalid-feedback d-block">Check-out has to be on or after check-in.</div>
-    </div>
-  </div>`} />
-
-## Validation
-
 The frame the picker builds takes the standard validation styling, and a state class written on the picker element reaches it: `.is-invalid` or `.is-valid` on the element you author styles the frame underneath it. That is the server-side route, so the class stays until the page changes it, and a sibling `.invalid-feedback` or `.valid-feedback` reads from the same element.
 
 <Example pro code={`<div class="row">
@@ -404,5 +393,9 @@ myPicker.addEventListener('endDateChange.coreui.date-range-picker', event => {
 ### CSS variables
 
 <ScssDocs file="scss/_date-picker.scss" capture="date-picker-tokens" />
+
+The panel is a `.popup`: its surface, border, shadow, stacking and fade come from the tokens every popup panel shares with the other pickers, Combobox, Autocomplete and Multi Select. `.popup` declares them itself, so set them on `.date-picker-popup` to restyle the panels of the date and date range pickers, or on `.popup` for all of them; a value set on an ancestor or on `:root` does not reach it.
+
+<ScssDocs file="scss/_popup.scss" capture="popup-tokens" />
 
 <ScssDocs file="scss/_calendar.scss" capture="calendar-tokens" />

@@ -23,16 +23,7 @@ const pages = {
   navigation: { page: 'components/sidebar.mdx', heading: 'Navigation options' }
 }
 
-const pending = {
-  'date-range-input': {
-    keys: ['ariaHourLabel', 'ariaMeridiemLabel', 'ariaMinuteLabel', 'ariaSecondLabel', 'hourPlaceholder', 'meridiemPlaceholder', 'minutePlaceholder', 'secondPlaceholder'],
-    reason: 'date and time family docs, plans/v6-date-time-closeout.md K9'
-  },
-  'time-picker': {
-    keys: ['floatingLabel', 'sanitize', 'sanitizeFn'],
-    reason: 'date and time family docs, plans/v6-date-time-closeout.md K9'
-  }
-}
+const pending = {}
 
 const inherited = {
   dropdown: {
@@ -123,4 +114,6 @@ if (problems.length > 0) {
 
 const listed = map => Object.entries(map).map(([file, { keys, reason }]) => `${file} (${keys.length}: ${reason})`).join('; ')
 
-console.log(`Every option of ${checked} components has a row in its docs. Waiting: ${listed(pending)}. Left out on purpose: ${listed(inherited)}.`)
+const waitingNote = Object.keys(pending).length > 0 ? ` Waiting: ${listed(pending)}.` : ''
+
+console.log(`Every option of ${checked} components has a row in its docs.${waitingNote} Left out on purpose: ${listed(inherited)}.`)

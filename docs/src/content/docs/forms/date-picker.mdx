@@ -523,8 +523,9 @@ myDatePicker.addEventListener('dateChange.coreui.date-picker', event => {
 
 ### CSS variables
 
-The shell uses local CSS variables on `.date-picker` for real-time
-customization. Values are set via Sass, so Sass customization is supported too.
+The picker declares its local CSS variables on its panel, `.date-picker-popup`,
+for real-time customization. Values are set via Sass, so Sass customization is
+supported too.
 
 <ScssDocs file="scss/_date-picker.scss" capture="date-picker-tokens" />
 
@@ -532,5 +533,9 @@ The time half declares its own on `.date-picker-time-body`, so it can be
 restyled without touching the panel around it.
 
 <ScssDocs file="scss/_date-picker.scss" capture="date-picker-time-tokens" />
+
+The panel is a `.popup`: its surface, border, shadow, stacking and fade come from the tokens every popup panel shares with the other pickers, Combobox, Autocomplete and Multi Select. `.popup` declares them itself, so set them on `.date-picker-popup` to restyle this panel or on `.popup` for all of them; a value set on an ancestor or on `:root` does not reach it.
+
+<ScssDocs file="scss/_popup.scss" capture="popup-tokens" />
 
 <ScssDocs file="scss/_calendar.scss" capture="calendar-tokens" />
