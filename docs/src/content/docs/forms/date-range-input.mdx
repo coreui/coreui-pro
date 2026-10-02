@@ -144,7 +144,7 @@ The field participates in the standard form validation styling. Four mechanisms 
 
 - **Order (automatic)** — an end before the start is a state of the range, not of either date, so `.is-invalid` lands on the frame and both fields stay editable. Assistive technology hears it on both fields: each one and its sections carry `aria-invalid="true"` until the order is fixed, and neither field turns valid meanwhile, whatever the `valid` option or a validated submit says. `isRangeValid()` reports it.
 - **Range validation (automatic)** — a completed date outside `minDate`/`maxDate`/`disabledDates` gets `.is-invalid` on its own field, which the frame picks up.
-- **The `valid`/`invalid` options** — force the state on both ends, e.g. after server-side validation; `valid` skips an end that is announced invalid, such as one the limits reject.
+- **The `valid`/`invalid` options** — force the state on both ends, e.g. after server-side validation; `valid` skips an end the limits reject.
 - **A state class in the markup** — `.is-invalid` or `.is-valid` written on the frame judges the range the markup rendered, so the component keeps it while that range stands, drops it as soon as either end moves, and brings it back if the range returns, whether through `reset()`, a native form reset, or the user typing its way back. While an invalid class holds, neither field is drawn valid.
 - **Form submit** — each end renders a hidden input, which is excluded from native constraint validation, so the component applies the state itself when a form with the `data-coreui-validate` attribute is submitted: a `required` empty end becomes `.is-invalid`, and a filled one becomes `.is-valid` when the form opts into success styling with `data-coreui-validate="valid"`. A native form reset returns both ends to the dates they were created with and drops that state; a submit that follows the reset in the same task judges the restored dates again, and a `reset` listener that calls `preventDefault()` cancels the whole reset.
 
@@ -332,7 +332,7 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | `startFloatingLabel` | string, null | `null` | Floating label of the start field |
 | `startName` | string, null | `null` | Name of the hidden input carrying the start date. Without it the start date is not submitted with the form. |
 | `type` | string | `'date'` | Which sections the locale-derived layout carries on both ends: `'date'` or `'datetime'`. A `format` names the sections itself and overrides this. |
-| `valid` | boolean | `false` | Force the valid state (`.is-valid`) on both ends, except an end announced invalid |
+| `valid` | boolean | `false` | Force the valid state (`.is-valid`) on both ends, except an end the limits reject |
 | `weekPlaceholder` | string, null | `null` | Replaces the `WW` the week section shows while it is empty. |
 | `yearPlaceholder` | string, null | `null` | Replaces the `YYYY` the year section shows while it is empty. |
 
