@@ -129,6 +129,7 @@ class ComboboxBase extends BaseComponent {
     executeAfterTransition(() => {
       if (this._menu && !this._isShown()) {
         this._menu.remove()
+        this._syncPanelReferences()
       }
     }, this._menu)
   }
@@ -177,6 +178,23 @@ class ComboboxBase extends BaseComponent {
     this._syncMenuWidth()
     this._widthObserver = new ResizeObserver(() => this._syncMenuWidth())
     this._widthObserver.observe(showTarget)
+    this._syncPanelReferences()
+  }
+
+  _syncPanelReferences(): void {
+    this._listBox?._updateActiveDescendant()
+
+    for (const element of this._getPanelReferrers()) {
+      if (this._menu.isConnected) {
+        element.setAttribute('aria-controls', `${this._uniqueId}-listbox`)
+      } else {
+        element.removeAttribute('aria-controls')
+      }
+    }
+  }
+
+  _getPanelReferrers(): HTMLElement[] {
+    return []
   }
 
   _syncMenuWidth(): void {

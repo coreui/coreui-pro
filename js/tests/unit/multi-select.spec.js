@@ -5211,6 +5211,10 @@ describe('MultiSelect', () => {
       const input = multiSelect._searchElement
 
       expect(input.getAttribute('aria-label')).toBe('Search')
+      expect(input.getAttribute('aria-controls')).toBeNull()
+
+      multiSelect.show()
+
       expect(input.getAttribute('aria-controls')).toBe('test-select-listbox')
 
       // It filters the list, it does not complete the value: the options take
@@ -5250,12 +5254,27 @@ describe('MultiSelect', () => {
       expect(multiSelect._togglerElement.getAttribute('aria-disabled')).toBeNull()
     })
 
-    it('should set aria-controls referencing listbox id', () => {
+    it('should point aria-controls at the list only while the list is in the document', async () => {
       fixtureEl.innerHTML = '<select id="test-select"></select>'
       const selectEl = fixtureEl.querySelector('select')
-      const multiSelect = new MultiSelect(selectEl, { options: [] })
+      const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'One' }], search: true })
+      const referrers = [multiSelect._togglerElement, multiSelect._searchElement]
 
-      expect(multiSelect._togglerElement.getAttribute('aria-controls')).toBe('test-select-listbox')
+      expect(referrers.map(element => element.getAttribute('aria-controls'))).toEqual([null, null])
+
+      multiSelect.show()
+
+      expect(referrers.map(element => document.getElementById(element.getAttribute('aria-controls')))).toEqual([
+        multiSelect._menu.querySelector('#test-select-listbox'),
+        multiSelect._menu.querySelector('#test-select-listbox')
+      ])
+
+      multiSelect.hide()
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect(referrers.map(element => element.getAttribute('aria-controls'))).toEqual([null, null])
     })
 
     it('should set listbox role on the options element', () => {

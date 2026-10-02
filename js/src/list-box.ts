@@ -1081,7 +1081,11 @@ class ListBox extends BaseComponent {
       this._list.id = getUID(`${NAME}-options-`)
     }
 
-    this._field.setAttribute('aria-controls', this._list.id)
+    if (this._list.isConnected) {
+      this._field.setAttribute('aria-controls', this._list.id)
+    } else {
+      this._field.removeAttribute('aria-controls')
+    }
 
     const option = this._activeOption()
 

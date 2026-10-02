@@ -657,7 +657,6 @@ class Autocomplete extends ComboboxBase {
     inputEl.setAttribute('aria-autocomplete', 'list')
     inputEl.setAttribute('aria-expanded', 'false')
     inputEl.setAttribute('aria-haspopup', 'listbox')
-    inputEl.setAttribute('aria-controls', `${this._uniqueId}-listbox`)
 
     if (this._config.disabled) {
       inputEl.setAttribute('disabled', true as any)
@@ -716,9 +715,13 @@ class Autocomplete extends ComboboxBase {
     optionsDiv.setAttribute('aria-labelledby', this._uniqueId)
   }
 
-  override _afterMenuCreated(): void {
-    if (this._config.container) {
+  override _syncPanelReferences(): void {
+    super._syncPanelReferences()
+
+    if (this._config.container && this._menu.isConnected) {
       this._inputElement.setAttribute('aria-owns', `${this._uniqueId}-listbox`)
+    } else {
+      this._inputElement.removeAttribute('aria-owns')
     }
   }
 

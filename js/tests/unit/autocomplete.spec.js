@@ -130,7 +130,29 @@ describe('Autocomplete', () => {
       expect(autocomplete._inputElement.getAttribute('role')).toBe('combobox')
       expect(autocomplete._inputElement.getAttribute('aria-autocomplete')).toBe('list')
       expect(autocomplete._inputElement.getAttribute('aria-haspopup')).toBe('listbox')
-      expect(autocomplete._inputElement.getAttribute('aria-controls')).toBe(`${autocomplete._uniqueId}-listbox`)
+      expect(autocomplete._inputElement.getAttribute('aria-controls')).toBeNull()
+    })
+
+    it('should point aria-controls at the list only while the list is in the document', async () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocomplete = new Autocomplete(fixtureEl.querySelector('.autocomplete'), { options: ['Option 1', 'Option 2'] })
+      const input = autocomplete._inputElement
+
+      autocomplete.show()
+
+      expect(document.getElementById(input.getAttribute('aria-controls'))).toBe(autocomplete._menu.querySelector('[role="listbox"]'))
+
+      autocomplete.hide()
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect(autocomplete._menu.isConnected).toBeFalse()
+      expect(input.getAttribute('aria-controls')).toBeNull()
+
+      autocomplete.setConfig({ options: ['Option 3'] })
+
+      expect(input.getAttribute('aria-controls')).toBeNull()
     })
 
     it('should render each option with role="option"', () => {
@@ -3841,7 +3863,7 @@ describe('Autocomplete', () => {
       expect(document.activeElement).toBe(autocomplete._inputElement)
     })
 
-    it('should append dropdown to container element', () => {
+    it('should append dropdown to container element', async () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div><div id="my-container"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
       const containerEl = fixtureEl.querySelector('#my-container')
@@ -3856,7 +3878,14 @@ describe('Autocomplete', () => {
       autocomplete.show()
 
       expect(containerEl.querySelector('.combobox-popup')).toBeTruthy()
-      expect(autocomplete._inputElement.getAttribute('aria-owns')).toBeTruthy()
+      expect(document.getElementById(autocomplete._inputElement.getAttribute('aria-owns'))).not.toBeNull()
+
+      autocomplete.hide()
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect(autocomplete._inputElement.getAttribute('aria-owns')).toBeNull()
     })
 
     it('should handle container as true (uses document.body)', () => {
