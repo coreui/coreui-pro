@@ -410,6 +410,7 @@ class DateRangeInput extends BaseComponent {
     this._separatorElement = SelectorEngine.findOne(SELECTOR_ROLE_SEPARATOR, this._element) ?? this._createSeparator()
     this._hideFromAssistiveTech(this._separatorElement)
     this._endElement = this._createField(ATTRIBUTE_ROLE_END, this._config.endFloatingLabel)
+    this._placeCreatedParts()
     this._moveDescriptionToFields()
 
     this._startInput = this._createInput(this._startElement, {
@@ -471,6 +472,38 @@ class DateRangeInput extends BaseComponent {
     this._createdElements.push(appendControlGroupField(this._element, element, floatingLabel, `${NAME}-`))
 
     return element
+  }
+
+  _getHostChild(part: HTMLElement): HTMLElement {
+    let child = part
+
+    while (child.parentElement !== this._element) {
+      child = child.parentElement as HTMLElement
+    }
+
+    return child
+  }
+
+  _placeCreatedParts(): void {
+    const [start, separator, end] = [this._startElement, this._separatorElement, this._endElement]
+      .map(part => this._getHostChild(part))
+    const isCreated = (element: HTMLElement) => this._createdElements.includes(element)
+
+    if (isCreated(separator)) {
+      if (isCreated(end)) {
+        start.after(separator)
+      } else {
+        end.before(separator)
+      }
+    }
+
+    if (isCreated(start)) {
+      separator.before(start)
+    }
+
+    if (isCreated(end)) {
+      separator.after(end)
+    }
   }
 
   _createSeparator(): HTMLElement {
