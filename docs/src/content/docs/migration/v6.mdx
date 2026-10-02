@@ -1398,6 +1398,11 @@ behaviour, v5 is the reference. Mapping:
   always a valid partial date; there is no free-text parsing to debounce.
   Section placeholders come from the section fields' own per-section options —
   `dayPlaceholder`, `monthPlaceholder`, `yearPlaceholder` and the rest.
+- **Removed — `previewDateOnHover` and `separator` on the date range picker.**
+  The fields no longer preview the hovered day in a second, read-only input;
+  the calendar still highlights the range up to the hovered day. The separator
+  between the two fields is always rendered, and `separatorIcon` /
+  `separatorIconRtl` replace its icon.
 - **Kept.** `timepicker: true` still adds the time half to the date picker, now
   as a row of time selects under the calendar rather than a second panel beside
   it. Because the two halves own different parts of one value, a picker with
@@ -1428,8 +1433,9 @@ behaviour, v5 is the reference. Mapping:
   ISO week-numbering year. Quarter selection narrows to `QQQ yyyy`
   (`Q4 2026`). The v1 text input rendered `2026W27`/`2026Q1`; the submitted
   value now follows the mask (set `format="yyyy-Www"` for an ISO-style
-  field), and the event still carries the v1-formatted string (`event.date`)
-  next to the `Date` (`event.dateObject`). The format parser gained `ww`
+  field), and the event carries the v1-formatted string in
+  `event.formattedDate` next to the `Date` in `event.date` (see "Picker events
+  can be cancelled" below). The format parser gained `ww`
   (ISO week) and `q`/`QQQ` (quarter) tokens, plus quoted literals
   (`'Week' ww` — fixed text that may contain token letters, `''` escapes a
   quote).
