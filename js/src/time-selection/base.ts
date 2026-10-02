@@ -9,7 +9,7 @@ import EventHandler from '../dom/event-handler.js'
 import SelectorEngine from '../dom/selector-engine.js'
 import Config from '../util/config.js'
 import { constrainDate } from '../util/calendar.js'
-import { convertValue, getInclusiveMax } from '../util/date-sections.js'
+import { convertValue, getDayPeriodNames, getInclusiveMax } from '../util/date-sections.js'
 import {
   convert12hTo24h,
   getLocalizedTimePartials,
@@ -172,10 +172,12 @@ class TimeSelection extends Config {
     }
 
     if (this._partials.hour12) {
+      const [am, pm] = getDayPeriodNames(this._config.locale as string)
+
       parts.push({
         ariaLabel: this._config.ariaSelectMeridiemLabel,
         name: 'meridiem',
-        options: [{ label: 'AM', value: 'am' }, { label: 'PM', value: 'pm' }]
+        options: [{ label: am, value: 'am' }, { label: pm, value: 'pm' }]
       })
     }
 

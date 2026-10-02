@@ -259,6 +259,15 @@ describe('TimePicker', () => {
 
     const cell = (type, value) => fixtureEl.querySelector(`.time-picker-popup [data-coreui-${type}="${value}"]`)
 
+    it('should name the day periods of the column the way the field does', () => {
+      const picker = buildPicker({ locale: 'ko', time: '09:15' })
+      picker.show()
+
+      expect(cell('meridiem', 'am').textContent).toEqual('오전')
+      expect(cell('meridiem', 'pm').textContent).toEqual('오후')
+      expect(fixtureEl.querySelector('[data-coreui-section="meridiem"]').textContent).toEqual('오전')
+    })
+
     it('should emit timeChange once per change, carrying what getTime returns', () => {
       const picker = buildPicker({ time: '09:15', seconds: false })
       const emitted = listen()
