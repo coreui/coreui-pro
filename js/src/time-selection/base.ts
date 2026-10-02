@@ -12,7 +12,6 @@ import { constrainDate } from '../util/calendar.js'
 import { convertValue, getDayPeriodNames, getInclusiveMax } from '../util/date-sections.js'
 import {
   convert12hTo24h,
-  convert24hTo12h,
   type FormattedPartial,
   getLocalizedTimePartials,
   getSelectedHour,
@@ -84,7 +83,6 @@ class TimeSelection extends Config {
     this._element = element as HTMLElement
     this._config = this._getConfig(config) as typeof Default
     this._date = this._config.time as Date | null
-    this._ampm = this._date ? (this._date.getHours() >= 12 ? 'pm' : 'am') : 'am'
 
     this._render()
   }
@@ -110,14 +108,13 @@ class TimeSelection extends Config {
   setTime(time: Date | null): void {
     this._config.time = time as any
     this._date = time
-    this._ampm = time ? (time.getHours() >= 12 ? 'pm' : 'am') : 'am'
+    this._ampm = this._dayPeriod()
     this._markSelected()
   }
 
   setConfig(config: any): void {
     this._config = this._getConfig({ ...this._config, ...config }) as typeof Default
     this._date = this._config.time as Date | null
-    this._ampm = this._date ? (this._date.getHours() >= 12 ? 'pm' : 'am') : 'am'
     this._render()
   }
 
@@ -146,6 +143,7 @@ class TimeSelection extends Config {
       this._config.minutes as any,
       this._config.seconds as any
     )
+    this._ampm = this._dayPeriod()
 
     this._element!.innerHTML = ''
     EventHandler.off(this._element, EVENT_KEYDOWN)
@@ -222,12 +220,18 @@ class TimeSelection extends Config {
     return hours.length === 1 ? hours[0] : convert12hTo24h(this._ampm, hour)
   }
 
+  _dayPeriod(): string {
+    const hour = this._date ? this._date.getHours() : this._partials.listOfHours[0]?.hours?.[0] ?? 0
+
+    return hour >= 12 ? 'pm' : 'am'
+  }
+
   _isUnavailable(part: string, value: number | string): boolean {
     if (part !== 'meridiem') {
       return false
     }
 
-    const option = this._date && this._partials.listOfHours.find((item: FormattedPartial) => item.value === convert24hTo12h(this._date!.getHours()))
+    const option = this._date && this._partials.listOfHours.find((item: FormattedPartial) => item.hours?.includes(this._date!.getHours()))
 
     if (this._date && !option) {
       return false
@@ -283,6 +287,12 @@ class TimeSelection extends Config {
 
       if (value === 'pm' && hours < 12) {
         date.setHours(hours + 12)
+      }
+
+      const allowed: number[] = this._partials.listOfHours.flatMap((option: FormattedPartial) => option.hours ?? [])
+
+      if (!allowed.includes(date.getHours())) {
+        date.setHours(allowed.find(hour => (hour >= 12) === (value === 'pm')) ?? date.getHours())
       }
     }
 

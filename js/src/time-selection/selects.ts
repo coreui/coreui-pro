@@ -103,6 +103,10 @@ class TimeSelects extends TimeSelection {
         select.append(optionEl)
       }
 
+      if (part.name === 'meridiem') {
+        select.value = this._ampm
+      }
+
       this._element!.append(select)
     }
   }

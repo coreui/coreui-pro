@@ -294,7 +294,58 @@ describe('TimePicker', () => {
       buildPicker({ locale: 'en-US', hours: [13, 14, 15, 16, 17] }).show()
 
       expect(cell('meridiem', 'am').getAttribute('aria-disabled')).toEqual('true')
+      expect(cell('meridiem', 'am').getAttribute('aria-selected')).not.toEqual('true')
       expect(cell('meridiem', 'pm').getAttribute('aria-disabled')).toEqual('false')
+    })
+
+    it('should ignore Enter and Space on a disabled cell', () => {
+      const picker = buildPicker({
+        locale: 'en-US', hours: [13, 14, 15], seconds: false, time: '13:00'
+      })
+      picker.show()
+
+      for (const init of [{ key: 'Enter' }, { key: ' ', code: 'Space' }]) {
+        cell('meridiem', 'am').dispatchEvent(new KeyboardEvent('keydown', { ...init, bubbles: true, cancelable: true }))
+      }
+
+      expect(picker.getTime().getHours()).toEqual(13)
+    })
+
+    it('should keep both periods for a time the list does not hold', () => {
+      buildPicker({ locale: 'en-US', hours: [8, 9, 10, 11, 12, 13, 14, 15, 16], time: '20:00' }).show()
+
+      expect(cell('meridiem', 'pm').getAttribute('aria-disabled')).toEqual('false')
+      expect(cell('meridiem', 'am').getAttribute('aria-disabled')).toEqual('false')
+    })
+
+    it('should pick an hour listed twice as that hour', () => {
+      const picker = buildPicker({ locale: 'en-US', hours: [8, 9, 10, 11, 12, 12, 13], seconds: false })
+      picker.show()
+
+      cell('hours', '12').click()
+
+      expect(picker.getTime().getHours()).toEqual(12)
+    })
+
+    it('should land on a listed hour when the day period is picked before the hour', () => {
+      const morning = buildPicker({ locale: 'en-US', hours: [8, 9, 10, 11, 12, 13, 14, 15, 16], seconds: false })
+      morning.show()
+      cell('meridiem', 'am').click()
+
+      expect(morning.getTime().getHours()).toEqual(8)
+
+      const afternoon = buildPicker({ locale: 'en-US', hours: [13, 14, 15, 16, 17], seconds: false })
+      afternoon.show()
+      cell('meridiem', 'pm').click()
+
+      expect(afternoon.getTime().getHours()).toEqual(13)
+    })
+
+    it('should keep the 12-hour clock a format pins on a 24-hour locale', () => {
+      buildPicker({ locale: 'en-GB', format: 'hh:mm a' }).show()
+
+      expect(cell('meridiem', 'pm')).not.toBeNull()
+      expect(cell('hours', '13')).toBeNull()
     })
 
     it('should name the day periods of the column the way the field does', () => {

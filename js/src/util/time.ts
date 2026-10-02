@@ -143,12 +143,13 @@ export const getLocalizedTimePartials = (
   seconds: PartialFilter = []
 ): LocalizedTimePartials => {
   const hour12 = (ampm === 'auto' && isAmPm(locale)) || ampm === true
+  const cycle = Array.from({ length: 24 }, (_, i) => (hour12 ? (i + 1) % 24 : i))
   const allowedHours = Array.isArray(hours) && hours.length > 0 ?
-    hours :
-    (typeof hours === 'function' ? Array.from({ length: 24 }, (_, i) => i).filter(hour => hours(hour)) : null)
+    new Set(hours) :
+    cycle.filter(hour => typeof hours !== 'function' || hours(hour))
   const hourValues = new Map<number, number[]>()
 
-  for (const hour of allowedHours ?? Array.from({ length: 24 }, (_, i) => (hour12 ? (i + 1) % 24 : i))) {
+  for (const hour of allowedHours) {
     const value = hour12 ? convert24hTo12h(hour) : hour
     hourValues.set(value, [...(hourValues.get(value) ?? []), hour])
   }

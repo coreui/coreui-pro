@@ -1579,17 +1579,23 @@ validation and the arrow between them. Two consequences:
 
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **`hours` is 0 to 23 in every locale.** v5 read the list and the filter in the
-  column's cycle, so on a 12-hour locale `hours: [1, 3, 5, 7]` meant 1, 3, 5 and
-  7 in the morning and in the afternoon, and a filter received 1 to 12. The
-  12-hour column still lists 1 to 12 next to AM/PM, but each entry now stands for
-  the 24-hour hours the list allows: picking an hour that only one period allows
-  sets that period, and the period the picked hour does not allow is disabled.
-  To keep the v5 list, name both halves: `[1, 3, 5, 7, 13, 15, 17, 19]`. More
+  column's cycle, so on a locale whose v5 columns were 12-hour (the ones that
+  write AM and PM in Latin letters, such as `en-US`) `hours: [1, 3, 5, 7]` meant
+  1, 3, 5 and 7 in the morning and in the afternoon, `12` meant noon and
+  midnight, and a filter received 1 to 12. The 12-hour column still lists 1 to 12
+  next to AM/PM, but each entry now stands for the 24-hour hours the list
+  allows: picking an hour that only one period allows sets that period, and the
+  period the picked hour does not allow is disabled. To keep such a list, name
+  both halves: `[1, 3, 5, 7, 13, 15, 17, 19]`, with `0` and `12` for `12`. More
   locales get 12-hour columns than in v5, because the columns follow the field's
-  clock, Korean, Traditional Chinese, Arabic and Mexican Spanish among them.
+  clock, Korean, Traditional Chinese, Arabic and Mexican Spanish among them;
+  their v5 columns were 24-hour, so a list written for them keeps its meaning.
 
 - **The day period column speaks the locale.** It read "AM" and "PM" in every
-  locale; it now shows the names the field shows, 오전 and 오후 in Korean.
+  locale; it now shows the names the field shows, 오전 and 오후 in Korean. A
+  longer name widens its column, so `--cui-time-picker-cell-width` is now the
+  narrowest a cell gets, and `--cui-time-picker-cell-padding-x` keeps the name
+  off the cell's edges.
 
 - The time selection body is now a shared primitive used by both pickers, so the
   `hours`/`minutes`/`seconds` filters and the 12/24-hour locale split behave

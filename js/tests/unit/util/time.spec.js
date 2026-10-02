@@ -86,12 +86,23 @@ describe('Time Utilities', () => {
       expect(getLocalizedTimePartials('en-US', true, [8, 20]).listOfHours).toEqual([{ value: 8, label: '8', hours: [8, 20] }])
     })
 
+    it('should count an hour listed twice once', () => {
+      expect(getLocalizedTimePartials('en-US', true, [12, 12]).listOfHours).toEqual([{ value: 12, label: '12', hours: [12] }])
+    })
+
     it('should pass the hour filter 0 to 23 on the 12-hour cycle', () => {
       const filter = vi.fn(hour => hour >= 9 && hour <= 17)
       const { listOfHours } = getLocalizedTimePartials('en-US', true, filter)
 
-      expect(filter.mock.calls.map(([hour]) => hour)).toEqual(Array.from({ length: 24 }, (_, index) => index))
+      expect(filter.mock.calls.map(([hour]) => hour).toSorted((a, b) => a - b)).toEqual(Array.from({ length: 24 }, (_, index) => index))
       expect(listOfHours.map(({ value }) => value)).toEqual([9, 10, 11, 12, 1, 2, 3, 4, 5])
+    })
+
+    it('should list the hours a filter keeps in the order of the column', () => {
+      const values = partials => partials.listOfHours.map(({ value }) => value)
+
+      expect(values(getLocalizedTimePartials('en-US', true, () => true))).toEqual(values(getLocalizedTimePartials('en-US', true)))
+      expect(values(getLocalizedTimePartials('en-US', false, () => true))).toEqual(values(getLocalizedTimePartials('en-US', false)))
     })
 
     it('should label a 12-hour picker with the hours 1 to 12', () => {
