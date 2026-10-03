@@ -622,6 +622,25 @@ describe('DatePicker', () => {
   })
 
   describe('dateChange payload', () => {
+    it('should keep a date an errorChange listener sets while setDate runs', () => {
+      const max = new Date(2026, 6, 14)
+      const picker = buildPicker({ locale: 'en-US', date: max, maxDate: max })
+      const el = fixtureEl.querySelector('#picker')
+      const emitted = []
+
+      el.addEventListener('dateChange.coreui.date-picker', event => emitted.push(event.date))
+      el.addEventListener('errorChange.coreui.date-input', event => {
+        if (event.error === 'maxDate') {
+          picker.setDate(max)
+        }
+      })
+      picker.setDate(new Date(2026, 6, 20))
+
+      expect(picker.getDate()).toEqual(max)
+      expect([...el.querySelectorAll('.form-date-time-section')].map(section => section.textContent)).toEqual(['07', '14', '2026'])
+      expect(emitted).toEqual([])
+    })
+
     it('should carry the same shape whether the day comes from the calendar or the field', () => {
       const picker = buildPicker({ locale: 'en-US', date: new Date(2026, 6, 14) })
       const el = fixtureEl.querySelector('#picker')

@@ -1335,6 +1335,57 @@ describe('DateInput', () => {
       return new DateInput(fixtureEl.querySelector('div'), { format: 'dd.MM.yyyy', ...config })
     }
 
+    it('should report the date before the error it changes', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 6, 14), maxDate: new Date(2026, 6, 14) })
+      const [day] = getSections(dateInput._element)
+      const log = []
+
+      dateInput._element.addEventListener('dateChange.coreui.date-input', event => log.push(`date:${event.date?.getDate() ?? null}`))
+      dateInput._element.addEventListener('errorChange.coreui.date-input', event => log.push(`error:${event.error}`))
+      day.focus()
+      pressKey(day, 'ArrowUp')
+      pressKey(day, 'ArrowDown')
+
+      expect(log).toEqual(['date:null', 'error:maxDate', 'date:14', 'error:null'])
+    })
+
+    it('should keep a date an errorChange listener sets', () => {
+      const max = new Date(2026, 6, 14)
+      const dateInput = createDateInput({ date: max, maxDate: max })
+      const [day] = getSections(dateInput._element)
+
+      dateInput._element.addEventListener('errorChange.coreui.date-input', event => {
+        if (event.error === 'maxDate') {
+          dateInput.setConfig({ date: max })
+        }
+      })
+      day.focus()
+      pressKey(day, 'ArrowUp')
+
+      expect(dateInput.getDate()).toEqual(max)
+      expect(getSections(dateInput._element)[0].textContent).toEqual('14')
+      expect(dateInput._element.classList.contains('is-invalid')).toBeFalse()
+    })
+
+    it('should announce an error once when a dateChange listener sets another rejected date', () => {
+      const max = new Date(2026, 6, 14)
+      const dateInput = createDateInput({ date: max, maxDate: max })
+      const [day] = getSections(dateInput._element)
+      const errors = []
+
+      dateInput._element.addEventListener('errorChange.coreui.date-input', event => errors.push(event.error))
+      dateInput._element.addEventListener('dateChange.coreui.date-input', event => {
+        if (event.date === null) {
+          dateInput.setConfig({ date: new Date(2026, 6, 20) })
+        }
+      })
+      day.focus()
+      pressKey(day, 'ArrowUp')
+
+      expect(errors).toEqual(['maxDate'])
+      expect(dateInput.getDate()).toBeNull()
+    })
+
     it('should apply the valid and invalid config options', () => {
       const invalidInput = createDateInput({ invalid: true })
       expect(invalidInput._element.classList.contains('is-invalid')).toBeTrue()

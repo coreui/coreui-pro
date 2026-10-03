@@ -130,6 +130,25 @@ describe('DateRangeInput', () => {
   })
 
   describe('range state', () => {
+    it('should keep a range an errorChange listener sets while setRange runs', () => {
+      const range = build({ maxDate: new Date(2026, 6, 14), startDate: new Date(2026, 6, 1), endDate: new Date(2026, 6, 10) })
+      const seen = []
+
+      for (const name of ['startDateChange', 'endDateChange']) {
+        root().addEventListener(`${name}.coreui.date-range-input`, event => seen.push([name, event.date]))
+      }
+
+      root().addEventListener('errorChange.coreui.date-input', event => {
+        if (event.error === 'maxDate') {
+          range.setRange(new Date(2026, 6, 2), new Date(2026, 6, 12))
+        }
+      })
+      range.setRange(new Date(2026, 6, 20), new Date(2026, 6, 25))
+
+      expect([range.getStartDate(), range.getEndDate()]).toEqual([new Date(2026, 6, 2), new Date(2026, 6, 12)])
+      expect(seen).toEqual([['startDateChange', new Date(2026, 6, 2)], ['endDateChange', new Date(2026, 6, 12)]])
+    })
+
     it('should set both dates, update the fields and emit once per change', () => {
       const range = build()
       const seen = []

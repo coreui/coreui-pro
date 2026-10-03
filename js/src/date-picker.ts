@@ -163,7 +163,7 @@ class DatePicker extends PickerBase {
   protected declare _calendarElement: any
   protected declare _selection: any
   protected declare _selectionElement: any
-  protected declare _applying: boolean
+  protected declare _applying: number
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
@@ -172,7 +172,7 @@ class DatePicker extends PickerBase {
     this._created = { cleaner: false, field: false, toggle: false }
     this._input = null
     this._calendar = null
-    this._applying = false
+    this._applying = 0
     this._calendarElement = null
     this._selection = null
     this._selectionElement = null
@@ -312,7 +312,9 @@ class DatePicker extends PickerBase {
     }, { ...(this._config.floatingLabel ? { ariaLabel: this._config.floatingLabel } : {}), ...this._config.inputOptions }))
 
     EventHandler.on(inputEl, DateInput.eventName(DateInput.CHANGE_EVENT_NAME), (event: any) => {
-      this._applyDate(event.date, { field: false })
+      if (!this._applying) {
+        this._applyDate(event.date, { field: false })
+      }
     })
 
     const body = document.createElement('div')
@@ -414,18 +416,14 @@ class DatePicker extends PickerBase {
   }
 
   _applyDate(date: Date | null, { calendar = true, field = true, selection = true }: { calendar?: boolean, field?: boolean, selection?: boolean } = {}): void {
-    if (this._applying) {
-      return
-    }
+    if (field) {
+      this._applying++
 
-    this._applying = true
-
-    try {
-      if (field) {
+      try {
         this._input.setConfig({ date })
+      } finally {
+        this._applying--
       }
-    } finally {
-      this._applying = false
     }
 
     const applied = field ? this._input.getDate() : date

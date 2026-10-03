@@ -237,7 +237,8 @@ class DateRangeInput extends BaseComponent {
   protected declare _initialEndDate: any
   protected declare _startDate: Date | null
   protected declare _endDate: Date | null
-  protected declare _applying: boolean
+  protected declare _applies: number
+  protected declare _applying: number
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
@@ -253,7 +254,8 @@ class DateRangeInput extends BaseComponent {
     this._addedStateClassNames = new Set()
     this._initialStartDate = config?.startDate ?? this._config.startDate
     this._initialEndDate = config?.endDate ?? this._config.endDate
-    this._applying = false
+    this._applies = 0
+    this._applying = 0
 
     this._createDateRangeInput()
     this._startDate = this._startInput.getDate()
@@ -519,19 +521,24 @@ class DateRangeInput extends BaseComponent {
   }
 
   _applyRange(startDate: Date | null, endDate: Date | null, { fields = true }: { fields?: boolean } = {}): void {
-    if (this._applying) {
-      return
-    }
+    const apply = ++this._applies
 
-    this._applying = true
+    if (fields) {
+      this._applying++
 
-    try {
-      if (fields) {
+      try {
         this._startInput.setConfig({ date: startDate })
-        this._endInput.setConfig({ date: endDate })
+
+        if (apply === this._applies) {
+          this._endInput.setConfig({ date: endDate })
+        }
+      } finally {
+        this._applying--
       }
-    } finally {
-      this._applying = false
+
+      if (apply !== this._applies) {
+        return
+      }
     }
 
     const start = fields ? this._startInput.getDate() : startDate
@@ -548,7 +555,7 @@ class DateRangeInput extends BaseComponent {
       EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, { date: start })
     }
 
-    if (endChanged) {
+    if (endChanged && apply === this._applies) {
       EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, { date: end })
     }
   }
@@ -567,11 +574,15 @@ class DateRangeInput extends BaseComponent {
 
   _addEventListeners(): void {
     EventHandler.on(this._startElement, DateInput.eventName(DateInput.CHANGE_EVENT_NAME), (event: any) => {
-      this._applyRange(event.date, this._endDate, { fields: false })
+      if (!this._applying) {
+        this._applyRange(event.date, this._endDate, { fields: false })
+      }
     })
 
     EventHandler.on(this._endElement, DateInput.eventName(DateInput.CHANGE_EVENT_NAME), (event: any) => {
-      this._applyRange(this._startDate, event.date, { fields: false })
+      if (!this._applying) {
+        this._applyRange(this._startDate, event.date, { fields: false })
+      }
     })
 
     if (this._separatorElement.getAttribute('aria-hidden') !== 'true') {

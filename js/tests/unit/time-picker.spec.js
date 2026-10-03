@@ -233,6 +233,23 @@ describe('TimePicker', () => {
   })
 
   describe('time selection', () => {
+    it('should keep a time an errorChange listener sets while setTime runs', () => {
+      const picker = buildPicker({ locale: 'en-GB', time: '10:00', inputOptions: { maxDate: '12:00' } })
+      const el = fixtureEl.querySelector('#picker')
+      const emitted = []
+
+      el.addEventListener('timeChange.coreui.time-picker', event => emitted.push(event.time?.getHours() ?? null))
+      el.addEventListener('errorChange.coreui.time-input', event => {
+        if (event.error === 'maxDate') {
+          picker.setTime('12:00')
+        }
+      })
+      picker.setTime('15:00')
+
+      expect(picker.getTime()).toEqual(new Date(1970, 0, 1, 12))
+      expect(emitted).toEqual([12])
+    })
+
     it('should update the field and emit timeChange when a cell is clicked', () => {
       const picker = buildPicker({ time: new Date(2026, 0, 1, 10, 0, 0) })
       const el = fixtureEl.querySelector('#picker')

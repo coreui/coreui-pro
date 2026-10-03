@@ -218,6 +218,7 @@ abstract class SectionInput extends BaseComponent {
   protected declare _draft: string
   protected declare _allSelected: boolean
   protected declare _error: string | null
+  protected declare _validationError: string | null
   protected declare _hostAriaInvalid: string | null
   protected declare _hostAriaLabel: string | null
   protected declare _hostClasses: HostClasses
@@ -240,6 +241,7 @@ abstract class SectionInput extends BaseComponent {
     this._date = getDateFromSections(this._sections)
     this._allSelected = false
     this._error = null
+    this._validationError = null
     this._inputElement = null
     this._form = null
     this._resetHandler = (event: Event) => {
@@ -284,6 +286,7 @@ abstract class SectionInput extends BaseComponent {
     this._createSectionInput()
     this._initialDate = getDateFromSections(this._sections)
     this._date = this._applyValidationState()
+    this._announceError()
     this._addEventListeners()
 
     if (this._config.autofocus && !this._config.disabled) {
@@ -653,15 +656,15 @@ abstract class SectionInput extends BaseComponent {
 
     const date = this._applyValidationState()
 
-    if (isSameInstantAs(date, this._date)) {
-      return
+    if (!isSameInstantAs(date, this._date)) {
+      this._date = date
+
+      EventHandler.trigger(this._element, this.constructor.eventName(this.constructor.CHANGE_EVENT_NAME), {
+        date
+      })
     }
 
-    this._date = date
-
-    EventHandler.trigger(this._element, this.constructor.eventName(this.constructor.CHANGE_EVENT_NAME), {
-      date
-    })
+    this._announceError()
   }
 
   _applyValidationState(): Date | null {
@@ -681,17 +684,22 @@ abstract class SectionInput extends BaseComponent {
     this._valid = this._config.valid || (this._submitValid && isFilled && !isDisabled)
     this._setInvalid(isDisabled || this._config.invalid || (this._submitted && this._isMissing(date)))
     this._inputElement!.value = date ? formatSections(this._sections) : ''
-
-    if (error !== this._error) {
-      this._error = error
-
-      EventHandler.trigger(this._element, this.constructor.eventName('errorChange'), {
-        error
-      })
-      this._syncDescription()
-    }
+    this._validationError = error
 
     return isDisabled ? null : date
+  }
+
+  _announceError(): void {
+    if (this._validationError === this._error) {
+      return
+    }
+
+    this._error = this._validationError
+
+    EventHandler.trigger(this._element, this.constructor.eventName('errorChange'), {
+      error: this._error
+    })
+    this._syncDescription()
   }
 
   _isMissing(date: Date | null): boolean {
