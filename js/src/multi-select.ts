@@ -791,7 +791,8 @@ class MultiSelect extends ComboboxBase {
   _wireTogglerAccessibleName(): void {
     const labelledBy = this._element.getAttribute('aria-labelledby')
     const ariaLabel = this._element.getAttribute('aria-label')
-    const nativeLabel = (this._element as HTMLSelectElement).labels?.[0]
+    const nativeLabel = [...((this._element as HTMLSelectElement).labels ?? [])]
+      .find(label => !label.contains(this._element))
 
     if (labelledBy) {
       this._togglerElement.setAttribute('aria-labelledby', labelledBy)
@@ -804,17 +805,13 @@ class MultiSelect extends ComboboxBase {
 
       this._togglerElement.setAttribute('aria-labelledby', nativeLabel.id)
     }
-
-    const togglerLabelledBy = this._togglerElement.getAttribute('aria-labelledby')
-
-    if (this._searchElement && togglerLabelledBy) {
-      this._searchElement.setAttribute('aria-labelledby', `${togglerLabelledBy} ${this._searchElement.id}`)
-    }
   }
 
   _markRequired(): void {
-    if (this._config.required) {
-      (this._searchElement ?? this._togglerElement).setAttribute('aria-required', 'true')
+    const ariaRequired = this._element.getAttribute('aria-required') ?? (this._config.required ? 'true' : null)
+
+    if (ariaRequired) {
+      this._togglerElement.setAttribute('aria-required', ariaRequired)
     }
   }
 

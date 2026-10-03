@@ -5466,7 +5466,7 @@ describe('MultiSelect', () => {
       fixtureEl.innerHTML = [
         '<h2 id="heading">Heading</h2>',
         '<label for="labelled">Choose fruits</label>',
-        '<select id="labelled" aria-labelledby="heading"></select>',
+        '<select id="labelled" aria-labelledby="heading" aria-label="Fruits"></select>',
         '<label for="named">Choose fruits</label>',
         '<select id="named" aria-label="Fruits"></select>'
       ].join('')
@@ -5475,11 +5475,24 @@ describe('MultiSelect', () => {
       }))
 
       expect(labelled._togglerElement.getAttribute('aria-labelledby')).toBe('heading')
+      expect(labelled._togglerElement.hasAttribute('aria-label')).toBeFalse()
+      expect(labelled._menu.getAttribute('aria-labelledby')).toBe('heading')
       expect(named._togglerElement.getAttribute('aria-label')).toBe('Fruits')
       expect(named._togglerElement.hasAttribute('aria-labelledby')).toBeFalse()
+      expect(named._menu.getAttribute('aria-label')).toBe('Fruits')
     })
 
-    it('should name the search input after the label', () => {
+    it('should leave a label that wraps the select out of the name', () => {
+      fixtureEl.innerHTML = '<label>Choose fruits <select></select></label>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), {
+        options: [{ value: '1', text: 'Opt 1' }]
+      })
+
+      expect(fixtureEl.querySelector('label').id).toBe('')
+      expect(multiSelect._togglerElement.hasAttribute('aria-labelledby')).toBeFalse()
+    })
+
+    it('should leave the search input a name of its own', () => {
       fixtureEl.innerHTML = [
         '<label for="searchable">Choose fruits</label>',
         '<select id="searchable"></select>'
@@ -5488,20 +5501,26 @@ describe('MultiSelect', () => {
         options: [{ value: '1', text: 'Opt 1' }],
         search: true
       })
-      const label = fixtureEl.querySelector('label')
 
-      expect(multiSelect._searchElement.getAttribute('aria-labelledby')).toBe(`${label.id} ${multiSelect._searchElement.id}`)
+      expect(multiSelect._searchElement.getAttribute('aria-label')).toBe('Search')
+      expect(multiSelect._searchElement.hasAttribute('aria-labelledby')).toBeFalse()
     })
 
-    it('should mark the focused control as required', () => {
-      fixtureEl.innerHTML = '<select id="plain"></select><select id="searchable"></select>'
-      const [plain, searchable] = [...fixtureEl.querySelectorAll('select')]
+    it('should mark the combobox as required, keeping a value the page sets', () => {
+      fixtureEl.innerHTML = [
+        '<select id="plain"></select>',
+        '<select id="searchable"></select>',
+        '<select id="page" aria-required="true"></select>'
+      ].join('')
+      const [plain, searchable, page] = [...fixtureEl.querySelectorAll('select')]
       const plainSelect = new MultiSelect(plain, { options: [{ value: '1', text: 'Opt 1' }], required: true })
       const searchableSelect = new MultiSelect(searchable, { options: [{ value: '1', text: 'Opt 1' }], required: true, search: true })
+      const pageSelect = new MultiSelect(page, { options: [{ value: '1', text: 'Opt 1' }] })
 
       expect(plainSelect._togglerElement.getAttribute('aria-required')).toBe('true')
-      expect(searchableSelect._togglerElement.hasAttribute('aria-required')).toBeFalse()
-      expect(searchableSelect._searchElement.getAttribute('aria-required')).toBe('true')
+      expect(searchableSelect._togglerElement.getAttribute('aria-required')).toBe('true')
+      expect(searchableSelect._searchElement.hasAttribute('aria-required')).toBeFalse()
+      expect(pageSelect._togglerElement.getAttribute('aria-required')).toBe('true')
     })
   })
 
