@@ -297,6 +297,26 @@ describe('PasswordInput', () => {
       expect(input.type).toBe('password')
     })
 
+    it('should hide a revealed password again on dispose', () => {
+      const input = initialized('<input type="password" class="form-control" data-coreui-password-input>')
+      const passwordInput = PasswordInput.getInstance(input)
+
+      passwordInput.toggle()
+      passwordInput.dispose()
+
+      expect(input.getAttribute('type')).toBe('password')
+    })
+
+    it('should leave no type on dispose when the markup had none', () => {
+      const input = initialized('<input class="form-control" data-coreui-password-input>')
+      const passwordInput = PasswordInput.getInstance(input)
+
+      passwordInput.toggle()
+      passwordInput.dispose()
+
+      expect(input.hasAttribute('type')).toBe(false)
+    })
+
     it('should disable its button for a disabled control', () => {
       initialized('<input type="password" class="form-control" disabled data-coreui-password-input>')
 
