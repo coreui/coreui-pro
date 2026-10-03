@@ -576,6 +576,15 @@ describe('DatePicker', () => {
       expect(el.querySelector('[data-coreui-picker-cleaner]')).not.toBeNull()
     })
 
+    it('should keep the time of the date it holds when a day is picked in the calendar', () => {
+      const picker = buildPicker({ locale: 'en-US', date: new Date(2026, 6, 14, 9, 30) })
+
+      picker.show()
+      fixtureEl.querySelector('.date-picker-popup .calendar-cell[data-coreui-date^="Mon Jul 20 2026"]').click()
+
+      expect(picker.getDate()).toEqual(new Date(2026, 6, 20, 9, 30))
+    })
+
     it('should keep the field and the calendar on the one date the picker owns', () => {
       const picker = buildPicker({ locale: 'en-US', date: new Date(2026, 6, 14) })
       const emitted = []
@@ -1184,6 +1193,25 @@ describe('DatePicker', () => {
       const picker = buildPicker({ maxDate: midnight })
 
       expect(picker.getContext().isDateSelectable(new Date())).toBeTrue()
+    })
+
+    it('should set the start of today without a time picker and the current time with one', () => {
+      vi.useFakeTimers({ toFake: ['Date'] })
+      vi.setSystemTime(new Date(2026, 8, 25, 9, 41, 27))
+
+      try {
+        const picker = buildPicker({ date: new Date(2026, 6, 14, 9, 30) })
+
+        picker.getContext().today()
+        expect(picker.getDate()).toEqual(new Date(2026, 8, 25))
+
+        const timed = buildPicker({ timepicker: true, seconds: true })
+
+        timed.getContext().today()
+        expect(timed.getDate()).toEqual(new Date(2026, 8, 25, 9, 41, 27))
+      } finally {
+        vi.useRealTimers()
+      }
     })
 
     it('should set today through the context', () => {

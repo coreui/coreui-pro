@@ -15,6 +15,7 @@ import TimeSelects from './time-selection/selects.js'
 import {
   getDateBySelectionType,
   isSameInstantAs,
+  removeTimeFromDate,
   type SelectionTypes
 } from './util/calendar.js'
 import type { ComponentConfig } from './util/config.js'
@@ -215,7 +216,7 @@ class DatePicker extends PickerBase {
   }
 
   today(): void {
-    this._applyDate(new Date())
+    this._applyDate(this._config.timepicker ? new Date() : removeTimeFromDate(new Date()))
   }
 
   override getContext(): Record<string, any> {
