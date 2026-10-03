@@ -931,6 +931,17 @@ describe('Calendar Utilities', () => {
       years: 0
     })
 
+    it('should leave a key with Alt, Control or Meta to the browser', () => {
+      for (const modifier of ['altKey', 'ctrlKey', 'metaKey']) {
+        for (const key of ['ArrowLeft', 'ArrowDown', 'Home', 'PageUp', 'Enter']) {
+          expect(getCalendarKeyAction({ ...press(key), [modifier]: true }, new Date(2026, 6, 15), context())).toBeNull()
+          expect(getCalendarKeyAction({ ...press(key), [modifier]: true }, null, context())).toBeNull()
+        }
+      }
+
+      expect(getCalendarKeyAction(press('PageUp', true), new Date(2026, 6, 15), context()).type).toEqual('page')
+    })
+
     it('should activate the focused date on Space and Enter', () => {
       expect(getCalendarKeyAction(press(' '), new Date(2026, 6, 15), context())).toEqual({ type: 'activate' })
       expect(getCalendarKeyAction(press('Enter'), new Date(2026, 6, 15), context())).toEqual({ type: 'activate' })

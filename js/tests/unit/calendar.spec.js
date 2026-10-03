@@ -2103,6 +2103,21 @@ describe('Calendar', () => {
       expect(activeDate()).toEqual(new Date(2026, 7, 12))
     })
 
+    it('should leave an arrow pressed with Alt, Control or Meta to the browser', () => {
+      const div = renderCalendar()
+      const cell = focusDay(div, 2026, 7, 12)
+
+      for (const modifier of ['altKey', 'ctrlKey', 'metaKey']) {
+        const event = new KeyboardEvent('keydown', {
+          bubbles: true, cancelable: true, key: 'ArrowLeft', [modifier]: true
+        })
+        cell.dispatchEvent(event)
+
+        expect(event.defaultPrevented).toBeFalse()
+        expect(activeDate()).toEqual(new Date(2026, 7, 12))
+      }
+    })
+
     it('should move focus one week with ArrowDown and ArrowUp', () => {
       const div = renderCalendar()
 
