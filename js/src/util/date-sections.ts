@@ -6,11 +6,11 @@
  */
 
 import {
-  constrainDate, convertToDateObject, createDate, type DisabledDate, getDateOfISOWeek, getISOWeekNumberAndYear, getWeekLabel, isCellDisabled, parseYearSmart, type PeriodTypes, removeTimeFromDate, type SelectionTypes
+  constrainDate, convertToDateObject, createDate, type DisabledDate, getDateOfISOWeek, getISOWeekNumberAndYear, getWeekLabel, hasShortcutModifier, isCellDisabled, parseYearSmart, type PeriodTypes, removeTimeFromDate, type SelectionTypes
 } from './calendar.js'
 import { convert12hTo24h, convert24hTo12h } from './time.js'
 
-export { getDateOfISOWeek, getWeekLabel } from './calendar.js'
+export { getDateOfISOWeek, getWeekLabel, hasShortcutModifier } from './calendar.js'
 
 export type EditableSectionType = 'day' | 'week' | 'month' | 'quarter' | 'year' | 'hour' | 'minute' | 'second' | 'meridiem'
 
@@ -420,17 +420,6 @@ export const getSectionLayout = (format: SectionFormat | undefined, locale: stri
  */
 export const getHourCycle = (layout: DateSection[]): EditableSection['cycle'] =>
   layout.find((section): section is EditableSection => section.type === 'hour')?.cycle
-
-/**
- * Tells whether a key press carries Alt, Control or Meta. A section moves no
- * focus, changes no value and types nothing on such a press and leaves it
- * uncancelled for the browser, assistive technology or a picker around it.
- *
- * @param event - The key press
- * @returns `true` when Alt, Control or Meta is held
- */
-export const hasShortcutModifier = (event: Pick<KeyboardEvent, 'altKey' | 'ctrlKey' | 'metaKey'>): boolean =>
-  event.altKey || event.ctrlKey || event.metaKey
 
 /**
  * Tells whether a key press types its character into a section: one character

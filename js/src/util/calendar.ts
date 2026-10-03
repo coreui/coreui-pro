@@ -1757,6 +1757,19 @@ const getCellKeyAction = ({ code, key, repeat, shiftKey }: { code: string; key: 
 }
 
 /**
+ * Tells whether a key press carries Alt, Control or Meta, the modifiers of the
+ * shortcuts the browser and assistive technology own.
+ *
+ * @param event - The key press
+ * @param event.altKey - Whether Alt is held
+ * @param event.ctrlKey - Whether Control is held
+ * @param event.metaKey - Whether Meta is held
+ * @returns `true` when Alt, Control or Meta is held
+ */
+export const hasShortcutModifier = (event: { altKey?: boolean; ctrlKey?: boolean; metaKey?: boolean }): boolean =>
+  Boolean(event.altKey || event.ctrlKey || event.metaKey)
+
+/**
  * Decides what a key does in a calendar grid. The focus moves over every cell
  * inside `minDate` / `maxDate`, whether it can be picked or not. On a cell or a
  * week row, Space and Enter pick its date, the arrows move to the next cell or
@@ -1773,19 +1786,28 @@ const getCellKeyAction = ({ code, key, repeat, shiftKey }: { code: string; key: 
  * panel; to the first and last month or year of the row; and to the first and
  * last quarter of the year. On a grid with nothing to focus, the arrows move to
  * the limit they point toward, Page Up / Page Down turn the calendar the same
- * way, and Home / End do nothing.
+ * way, and Home / End do nothing. A key pressed with Alt, Control or Meta
+ * is left to the browser and assistive technology.
  *
  * @param event - The key and its modifiers
+ * @param event.altKey - Whether Alt is held
  * @param event.code - The physical key
+ * @param event.ctrlKey - Whether Control is held
  * @param event.key - The key value
+ * @param event.metaKey - Whether Meta is held
  * @param event.shiftKey - Whether Shift is held
  * @param event.repeat - Whether the key repeats while held
  * @param date - The date of the focused cell or week row, `null` when the grid itself has the focus
  * @param context - The state of the calendar
  * @returns `activate` to pick the focused date, `move` to focus `date` after paging by `years` and `months` when either is not zero (inside `panel` when it is set, for week rows), `page` to page the calendar by `years` and `months` and then focus `date` (on a grid without one, its panel's tab stop), `stay` when the key is handled and the focus stays, or `null` for a key the grid leaves alone; a `move` or `page` from Page Up / Page Down on a cell or a week row carries the `keptDay` that `getKeptDay` hands back for the next key
  */
-export const getCalendarKeyAction = (event: { code: string; key: string; repeat?: boolean; shiftKey: boolean }, date: Date | null, context: CalendarKeyContext) : CalendarKeyAction | null =>
-  date ? getCellKeyAction(event, date, context) : getGridKeyAction(event, context)
+export const getCalendarKeyAction = (event: { altKey?: boolean; code: string; ctrlKey?: boolean; key: string; metaKey?: boolean; repeat?: boolean; shiftKey: boolean }, date: Date | null, context: CalendarKeyContext) : CalendarKeyAction | null => {
+  if (hasShortcutModifier(event)) {
+    return null
+  }
+
+  return date ? getCellKeyAction(event, date, context) : getGridKeyAction(event, context)
+}
 
 /**
  * Gives the day a series of Page Up / Page Down turns keeps after a key: the
