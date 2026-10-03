@@ -763,6 +763,50 @@ describe('DateInput', () => {
       expect(day.textContent).toEqual('13')
     })
 
+    it('should edit a section from a virtual keyboard', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 6, 14) })
+      const [day, month] = getSections(dateInput._element)
+      const virtualInput = (section, inputType, data = null) => {
+        const event = new InputEvent('beforeinput', {
+          inputType, data, bubbles: true, cancelable: true
+        })
+
+        section.dispatchEvent(new KeyboardEvent('keydown', { key: 'Unidentified', bubbles: true, cancelable: true }))
+        section.dispatchEvent(event)
+        return event
+      }
+
+      day.focus()
+
+      expect(virtualInput(day, 'deleteContentBackward').defaultPrevented).toBeTrue()
+      expect(day.textContent).toEqual('DD')
+
+      virtualInput(day, 'insertText', '2')
+      virtualInput(day, 'insertText', '5')
+
+      expect(day.textContent).toEqual('25')
+      expect(virtualInput(month, 'deleteContentForward').defaultPrevented).toBeTrue()
+      expect(month.textContent).toEqual('MM')
+    })
+
+    it('should send no extra keydown for a virtual edit of a read-only field', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 6, 14), readonly: true })
+      const [day] = getSections(dateInput._element)
+      const onKeydown = vi.fn()
+      const event = new InputEvent('beforeinput', {
+        inputType: 'deleteContentBackward', bubbles: true, cancelable: true
+      })
+
+      document.addEventListener('keydown', onKeydown)
+      day.focus()
+      day.dispatchEvent(event)
+      document.removeEventListener('keydown', onKeydown)
+
+      expect(event.defaultPrevented).toBeTrue()
+      expect(onKeydown).not.toHaveBeenCalled()
+      expect(day.textContent).toEqual('14')
+    })
+
     it('should leave the value alone when the arrow carries the picker modifier', () => {
       const dateInput = createDateInput({ date: new Date(2026, 6, 14) })
       const [day] = getSections(dateInput._element)
