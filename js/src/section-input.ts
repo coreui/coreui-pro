@@ -46,6 +46,10 @@ const ARROW_RIGHT_KEY = 'ArrowRight'
 const ARROW_UP_KEY = 'ArrowUp'
 const BACKSPACE_KEY = 'Backspace'
 const DELETE_KEY = 'Delete'
+const INPUT_TYPE_KEYS: Record<string, string> = {
+  deleteContentBackward: BACKSPACE_KEY,
+  deleteContentForward: DELETE_KEY
+}
 const END_KEY = 'End'
 const HOME_KEY = 'Home'
 
@@ -379,9 +383,10 @@ abstract class SectionInput extends BaseComponent {
 
     EventHandler.on(this._element, eventName('beforeinput'), SELECTOR_SECTION, (event: any) => {
       event.preventDefault()
+      const key = event.inputType === 'insertText' && event.data?.length === 1 ? event.data : INPUT_TYPE_KEYS[event.inputType]
 
-      if (this._isEditable() && event.inputType === 'insertText' && event.data?.length === 1) {
-        this._applyCharacter(event.target, event.data)
+      if (key && this._isEditable()) {
+        event.target.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key }))
       }
     })
 
