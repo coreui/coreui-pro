@@ -981,6 +981,7 @@ class MultiSelect extends ComboboxBase {
   }
 
   override _afterMenuCreated(): void {
+    this._menu.id = `${this._uniqueId}-dialog`
     this._menu.setAttribute('role', 'dialog')
     this._menu.setAttribute('tabindex', '-1')
     this._nameMenu()
@@ -1038,8 +1039,14 @@ class MultiSelect extends ComboboxBase {
     return null
   }
 
-  override _getPanelReferrers(): HTMLElement[] {
-    return [this._togglerElement, this._searchElement].filter(Boolean)
+  override _getPanelReferences(): Array<[HTMLElement, string]> {
+    const references: Array<[HTMLElement, string]> = [[this._togglerElement, this._menu.id]]
+
+    if (this._searchElement) {
+      references.push([this._searchElement, `${this._uniqueId}-listbox`])
+    }
+
+    return references
   }
 
   override _optionText(option: any): string {

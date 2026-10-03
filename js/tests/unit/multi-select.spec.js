@@ -5254,7 +5254,7 @@ describe('MultiSelect', () => {
       expect(multiSelect._togglerElement.getAttribute('aria-disabled')).toBeNull()
     })
 
-    it('should point aria-controls at the list only while the list is in the document', async () => {
+    it('should point the toggler at the dialog and the search input at the list only while the panel is open', async () => {
       fixtureEl.innerHTML = '<select id="test-select"></select>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'One' }], search: true })
@@ -5265,9 +5265,10 @@ describe('MultiSelect', () => {
       multiSelect.show()
 
       expect(referrers.map(element => document.getElementById(element.getAttribute('aria-controls')))).toEqual([
-        multiSelect._menu.querySelector('#test-select-listbox'),
+        multiSelect._menu,
         multiSelect._menu.querySelector('#test-select-listbox')
       ])
+      expect(multiSelect._menu.getAttribute('role')).toBe('dialog')
 
       multiSelect.hide()
 
@@ -5288,7 +5289,7 @@ describe('MultiSelect', () => {
       multiSelect.show()
 
       expect(multiSelect._menu.parentElement).toBe(document.body)
-      expect(toggler.getAttribute('aria-controls')).toBe('test-select-listbox')
+      expect(document.getElementById(toggler.getAttribute('aria-controls'))).toBe(multiSelect._menu)
       expect(toggler.getAttribute('aria-owns')).toBeNull()
     })
 

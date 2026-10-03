@@ -193,16 +193,16 @@ class ComboboxBase extends BaseComponent {
       field.removeAttribute('aria-activedescendant')
     }
 
-    for (const element of this._getPanelReferrers()) {
+    for (const [element, id] of this._getPanelReferences()) {
       if (open) {
-        element.setAttribute('aria-controls', `${this._uniqueId}-listbox`)
+        element.setAttribute('aria-controls', id)
       } else {
         element.removeAttribute('aria-controls')
       }
     }
   }
 
-  _getPanelReferrers(): HTMLElement[] {
+  _getPanelReferences(): Array<[HTMLElement, string]> {
     return []
   }
 
