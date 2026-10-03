@@ -1968,9 +1968,64 @@ describe('DateInput', () => {
 
       expect(dateInput.getDate()).toBeNull()
 
+      const onChange = vi.fn()
+
+      document.activeElement.blur()
+      dateInput._element.addEventListener('dateChange.coreui.date-input', onChange)
       dateInput.setConfig({ maxDate: new Date(2026, 6, 31) })
 
       expect(dateInput.getDate()).toEqual(new Date(2026, 6, 14))
+      expect(onChange).toHaveBeenCalledOnce()
+      expect(onChange.mock.calls[0][0].date).toEqual(new Date(2026, 6, 14))
+    })
+
+    it('should keep a partly typed date when the sections stay the same', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 6, 1) })
+      const [day] = getSections(dateInput._element)
+      const onChange = vi.fn()
+
+      day.focus()
+      pressKey(day, 'Backspace')
+      dateInput._element.addEventListener('dateChange.coreui.date-input', onChange)
+      dateInput.setConfig({ maxDate: new Date(2026, 11, 31) })
+
+      expect([...getSections(dateInput._element)].map(section => section.textContent)).toEqual(['DD', '07', '2026'])
+      expect(onChange).not.toHaveBeenCalled()
+    })
+
+    it('should clear a partly typed date when the sections change', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 6, 1) })
+      const [day] = getSections(dateInput._element)
+
+      day.focus()
+      pressKey(day, 'Backspace')
+      dateInput.setConfig({ format: 'yyyy-MM-dd' })
+
+      expect([...getSections(dateInput._element)].map(section => section.getAttribute('aria-valuenow'))).toEqual([null, null, null])
+    })
+
+    it('should rebuild from the date it shows when the sections change', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 6, 14, 9, 30) })
+      const onChange = vi.fn()
+
+      dateInput._element.addEventListener('dateChange.coreui.date-input', onChange)
+      dateInput.setConfig({ format: 'dd.MM.yyyy HH:mm' })
+
+      expect(dateInput.getDate()).toEqual(new Date(2026, 6, 14))
+      expect(onChange).not.toHaveBeenCalled()
+    })
+
+    it('should reset to the date the field was created with after keeping a typed one', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 6, 1) })
+      const [day] = getSections(dateInput._element)
+
+      day.focus()
+      pressKey(day, '1')
+      pressKey(day, '4')
+      dateInput.setConfig({ maxDate: new Date(2026, 11, 31) })
+      dateInput.reset()
+
+      expect(dateInput.getDate()).toEqual(new Date(2026, 6, 1))
     })
 
     it('should replace the typed date with the one the new config sets', () => {

@@ -329,8 +329,15 @@ abstract class SectionInput extends BaseComponent {
       return
     }
 
-    this._config = this._getConfig({ ...this._config, date: getDateFromSections(this._sections), ...config })
+    const sections = this._sections
+
+    this._config = this._getConfig({ ...this._config, date: getDateFromSections(sections), ...config })
     this._applyConfig()
+
+    if (config?.date === undefined && this._getLayoutKey(this._sections) === this._getLayoutKey(sections)) {
+      this._sections = sections
+    }
+
     this._createSectionInput()
     this._commitSections()
   }
@@ -372,6 +379,10 @@ abstract class SectionInput extends BaseComponent {
     this._maxDate = this._convertDate(maxDate)
     this._sections = setSectionsFromDate(sections, date ? this._convertDate(date) : null)
     this._draft = ''
+  }
+
+  _getLayoutKey(sections: DateSection[]): string {
+    return JSON.stringify(sections.map(section => (isEditableSection(section) ? { ...section, value: null } : section)))
   }
 
   _addEventListeners(): void {
