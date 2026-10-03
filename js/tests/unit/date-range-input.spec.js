@@ -91,10 +91,25 @@ describe('DateRangeInput', () => {
       expect(fields().map(field => field.getAttribute('aria-label'))).toEqual(['Start date', 'End date'])
     })
 
-    it('should name an end by the date field default when its label is empty', () => {
+    it('should name an end by its default label when its label is empty', () => {
       build({ ariaStartLabel: '', ariaEndLabel: '' })
 
-      expect(fields().map(field => field.getAttribute('aria-label'))).toEqual(['Date input', 'Date input'])
+      expect(fields().map(field => field.getAttribute('aria-label'))).toEqual(['Start date', 'End date'])
+    })
+
+    it('should fall back to the end labels the page set when the option is empty', () => {
+      const { ariaStartLabel, ariaEndLabel } = DateRangeInput.Default
+      DateRangeInput.Default.ariaStartLabel = 'Od'
+      DateRangeInput.Default.ariaEndLabel = 'Do'
+
+      try {
+        build({ ariaStartLabel: '', ariaEndLabel: '' })
+
+        expect(fields().map(field => field.getAttribute('aria-label'))).toEqual(['Od', 'Do'])
+      } finally {
+        DateRangeInput.Default.ariaStartLabel = ariaStartLabel
+        DateRangeInput.Default.ariaEndLabel = ariaEndLabel
+      }
     })
 
     it('should remove the floating-label fields it built on dispose', () => {
