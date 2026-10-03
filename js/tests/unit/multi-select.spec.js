@@ -5506,7 +5506,7 @@ describe('MultiSelect', () => {
       expect(multiSelect._searchElement.hasAttribute('aria-labelledby')).toBeFalse()
     })
 
-    it('should mark the combobox as required, keeping a value the page sets', () => {
+    it('should mark the focused control as required, keeping a value the page sets', () => {
       fixtureEl.innerHTML = [
         '<select id="plain"></select>',
         '<select id="searchable"></select>',
@@ -5518,9 +5518,13 @@ describe('MultiSelect', () => {
       const pageSelect = new MultiSelect(page, { options: [{ value: '1', text: 'Opt 1' }] })
 
       expect(plainSelect._togglerElement.getAttribute('aria-required')).toBe('true')
-      expect(searchableSelect._togglerElement.getAttribute('aria-required')).toBe('true')
-      expect(searchableSelect._searchElement.hasAttribute('aria-required')).toBeFalse()
+      expect(searchableSelect._togglerElement.hasAttribute('aria-required')).toBeFalse()
+      expect(searchableSelect._searchElement.getAttribute('aria-required')).toBe('true')
       expect(pageSelect._togglerElement.getAttribute('aria-required')).toBe('true')
+
+      searchableSelect.setConfig({ search: false })
+
+      expect(searchableSelect._togglerElement.getAttribute('aria-required')).toBe('true')
     })
   })
 

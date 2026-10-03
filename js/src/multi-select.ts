@@ -811,7 +811,7 @@ class MultiSelect extends ComboboxBase {
     const ariaRequired = this._element.getAttribute('aria-required') ?? (this._config.required ? 'true' : null)
 
     if (ariaRequired) {
-      this._togglerElement.setAttribute('aria-required', ariaRequired)
+      (this._config.search ? this._searchElement! : this._togglerElement).setAttribute('aria-required', ariaRequired)
     }
   }
 
