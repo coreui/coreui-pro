@@ -601,7 +601,9 @@ myMutliSelect.addEventListener('change.coreui.multi-select', event => {
 
 ## Accessibility
 
-The options panel is a dialog named by the control. Opening it moves the focus inside — onto the search box when `search` is on, otherwise onto the option the list points at, which is the selection the user left or the first option. The options are focusable one at a time: the arrows move the focus itself rather than a highlight read through `aria-activedescendant`. <kbd>Tab</kbd> cycles through what the panel offers and the search box in the control, and reaches nothing outside them until the panel closes, which <kbd>Escape</kbd> does, returning the focus to the control.
+The control takes its name the way the native select it replaces was named: from the select's `aria-labelledby`, then its `aria-label`, then a `<label>` pointing at it or wrapping it. The search box takes the same name together with its own label, and when `required` is set, the control that takes the focus, the search box when `search` is on, carries `aria-required`. The native select itself is hidden from assistive technology.
+
+The options panel is a dialog named like the control. Opening it moves the focus inside — onto the search box when `search` is on, otherwise onto the option the list points at, which is the selection the user left or the first option. The options are focusable one at a time: the arrows move the focus itself rather than a highlight read through `aria-activedescendant`. <kbd>Tab</kbd> cycles through what the panel offers and the search box in the control, and reaches nothing outside them until the panel closes, which <kbd>Escape</kbd> does, returning the focus to the control.
 
 ### Keyboard shortcuts
 

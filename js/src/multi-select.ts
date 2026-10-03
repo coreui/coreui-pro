@@ -788,23 +788,34 @@ class MultiSelect extends ComboboxBase {
     this._element.setAttribute('aria-hidden', 'true')
   }
 
-  // Name the combobox toggler from a <label for> pointing at the native
-  // select, so the replacement control keeps the accessible name.
+  // Name the combobox toggler the way the replaced native select was named.
   _wireTogglerAccessibleName(): void {
+    const labelledBy = this._element.getAttribute('aria-labelledby')
+    const ariaLabel = this._element.getAttribute('aria-label')
     const nativeLabel = (this._element as HTMLSelectElement).labels?.[0]
 
-    if (nativeLabel) {
+    if (labelledBy) {
+      this._togglerElement.setAttribute('aria-labelledby', labelledBy)
+    } else if (ariaLabel) {
+      this._togglerElement.setAttribute('aria-label', ariaLabel)
+    } else if (nativeLabel) {
       if (!nativeLabel.id) {
         nativeLabel.id = `${this._uniqueId}-label`
       }
 
       this._togglerElement.setAttribute('aria-labelledby', nativeLabel.id)
-      return
     }
 
-    const ariaLabel = this._element.getAttribute('aria-label')
-    if (ariaLabel) {
-      this._togglerElement.setAttribute('aria-label', ariaLabel)
+    const togglerLabelledBy = this._togglerElement.getAttribute('aria-labelledby')
+
+    if (this._searchElement && togglerLabelledBy) {
+      this._searchElement.setAttribute('aria-labelledby', `${togglerLabelledBy} ${this._searchElement.id}`)
+    }
+  }
+
+  _markRequired(): void {
+    if (this._config.required) {
+      (this._searchElement ?? this._togglerElement).setAttribute('aria-required', 'true')
     }
   }
 
@@ -846,6 +857,7 @@ class MultiSelect extends ComboboxBase {
     }
 
     this._wireTogglerAccessibleName()
+    this._markRequired()
 
     this._createOptionsContainer()
     this._hideNativeSelect()

@@ -5461,6 +5461,48 @@ describe('MultiSelect', () => {
 
       expect(multiSelect._togglerElement.getAttribute('aria-label')).toBe('Fruits')
     })
+
+    it('should let the select\'s aria-labelledby and aria-label win over its label', () => {
+      fixtureEl.innerHTML = [
+        '<h2 id="heading">Heading</h2>',
+        '<label for="labelled">Choose fruits</label>',
+        '<select id="labelled" aria-labelledby="heading"></select>',
+        '<label for="named">Choose fruits</label>',
+        '<select id="named" aria-label="Fruits"></select>'
+      ].join('')
+      const [labelled, named] = [...fixtureEl.querySelectorAll('select')].map(selectEl => new MultiSelect(selectEl, {
+        options: [{ value: '1', text: 'Opt 1' }]
+      }))
+
+      expect(labelled._togglerElement.getAttribute('aria-labelledby')).toBe('heading')
+      expect(named._togglerElement.getAttribute('aria-label')).toBe('Fruits')
+      expect(named._togglerElement.hasAttribute('aria-labelledby')).toBeFalse()
+    })
+
+    it('should name the search input after the label', () => {
+      fixtureEl.innerHTML = [
+        '<label for="searchable">Choose fruits</label>',
+        '<select id="searchable"></select>'
+      ].join('')
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), {
+        options: [{ value: '1', text: 'Opt 1' }],
+        search: true
+      })
+      const label = fixtureEl.querySelector('label')
+
+      expect(multiSelect._searchElement.getAttribute('aria-labelledby')).toBe(`${label.id} ${multiSelect._searchElement.id}`)
+    })
+
+    it('should mark the focused control as required', () => {
+      fixtureEl.innerHTML = '<select id="plain"></select><select id="searchable"></select>'
+      const [plain, searchable] = [...fixtureEl.querySelectorAll('select')]
+      const plainSelect = new MultiSelect(plain, { options: [{ value: '1', text: 'Opt 1' }], required: true })
+      const searchableSelect = new MultiSelect(searchable, { options: [{ value: '1', text: 'Opt 1' }], required: true, search: true })
+
+      expect(plainSelect._togglerElement.getAttribute('aria-required')).toBe('true')
+      expect(searchableSelect._togglerElement.hasAttribute('aria-required')).toBeFalse()
+      expect(searchableSelect._searchElement.getAttribute('aria-required')).toBe('true')
+    })
   })
 
   describe('selectionType chips', () => {
