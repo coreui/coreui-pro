@@ -756,12 +756,13 @@ abstract class SectionInput extends BaseComponent {
       }
 
       const { min, max } = getSectionBounds(section)
+      const labelKey = `aria${section.type[0].toUpperCase()}${section.type.slice(1)}Label`
       const attributes: Record<string, string> = {
         role: 'spinbutton',
         inputmode: section.names ? 'text' : 'numeric',
         autocorrect: 'off',
         spellcheck: 'false',
-        'aria-label': this._config[`aria${section.type[0].toUpperCase()}${section.type.slice(1)}Label`],
+        'aria-label': this._config[labelKey] || this.constructor.Default[labelKey],
         'aria-valuemin': String(min),
         'aria-valuemax': String(max),
         'data-coreui-section': section.type

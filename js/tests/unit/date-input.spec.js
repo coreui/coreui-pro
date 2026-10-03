@@ -243,6 +243,25 @@ describe('DateInput', () => {
       expect(dateInput._element.querySelector('.form-date-time-separator').getAttribute('aria-hidden')).toEqual('true')
     })
 
+    it('should keep the default section names when their options are empty', () => {
+      const dateInput = createDateInput({ ariaDayLabel: '', ariaMonthLabel: '', ariaYearLabel: '' })
+
+      expect([...getSections(dateInput._element)].map(section => section.getAttribute('aria-label'))).toEqual(['Day', 'Month', 'Year'])
+    })
+
+    it('should fall back to the section name the page set for an empty option', () => {
+      const { ariaDayLabel } = DateInput.Default
+      DateInput.Default.ariaDayLabel = 'Tag'
+
+      try {
+        const dateInput = createDateInput({ ariaDayLabel: '' })
+
+        expect(getSections(dateInput._element)[0].getAttribute('aria-label')).toEqual('Tag')
+      } finally {
+        DateInput.Default.ariaDayLabel = ariaDayLabel
+      }
+    })
+
     it('should show a configured placeholder', () => {
       const dateInput = createDateInput({ dayPlaceholder: 'jj' })
 
