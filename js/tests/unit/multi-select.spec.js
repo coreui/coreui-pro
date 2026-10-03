@@ -5290,6 +5290,7 @@ describe('MultiSelect', () => {
 
       expect(multiSelect._menu.parentElement).toBe(document.body)
       expect(document.getElementById(toggler.getAttribute('aria-controls'))).toBe(multiSelect._menu)
+      expect(multiSelect._menu.contains(document.getElementById('test-select-listbox'))).toBeTrue()
       expect(toggler.getAttribute('aria-owns')).toBeNull()
     })
 

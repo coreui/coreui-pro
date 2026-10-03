@@ -135,7 +135,7 @@ export const a11yComponents = [
       {
         criterion: '4.1.2',
         status: 'built-in',
-        note: 'The toggler gets role=combobox named from the associated <label> via aria-labelledby (or the select\'s aria-label), with aria-expanded and aria-haspopup=dialog, plus aria-controls on the role=dialog panel while it is open (the search input points at the list); options render as a role=listbox with aria-multiselectable and role=option items; the replaced native <select> is removed from the accessibility tree (aria-hidden, tabindex=-1).'
+        note: 'The toggler gets role=combobox named from the associated <label> via aria-labelledby (or the select\'s aria-label), with aria-expanded and aria-haspopup=dialog, plus aria-controls pointing at the role=dialog panel while it is open (the search input points at the list); options render as a role=listbox with aria-multiselectable and role=option items; the replaced native <select> is removed from the accessibility tree (aria-hidden, tabindex=-1).'
       },
       {
         criterion: '4.1.3',

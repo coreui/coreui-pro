@@ -981,7 +981,7 @@ class MultiSelect extends ComboboxBase {
   }
 
   override _afterMenuCreated(): void {
-    this._menu.id = `${this._uniqueId}-dialog`
+    this._menu.id = getUID(`${this.constructor.NAME}-dialog-`)
     this._menu.setAttribute('role', 'dialog')
     this._menu.setAttribute('tabindex', '-1')
     this._nameMenu()
@@ -1043,7 +1043,7 @@ class MultiSelect extends ComboboxBase {
     const references: Array<[HTMLElement, string]> = [[this._togglerElement, this._menu.id]]
 
     if (this._searchElement) {
-      references.push([this._searchElement, `${this._uniqueId}-listbox`])
+      references.push([this._searchElement, this._optionsElement.id])
     }
 
     return references
