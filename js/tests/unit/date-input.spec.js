@@ -950,6 +950,27 @@ describe('DateInput', () => {
       expect(document.activeElement).toEqual(day)
     })
 
+    it('should drop the selection of all sections when it clears them', () => {
+      const cut = section => {
+        const event = new Event('cut', { bubbles: true, cancelable: true })
+        event.clipboardData = { setData() {} }
+        section.dispatchEvent(event)
+      }
+
+      for (const clearAll of [day => pressKey(day, 'Backspace'), day => pressKey(day, 'Delete'), day => pressKey(day, 'x'), cut]) {
+        const dateInput = createDateInput({ date: new Date(2026, 6, 14) })
+        const [day] = getSections(dateInput._element)
+
+        day.focus()
+        pressKey(day, 'a', { ctrlKey: true })
+        clearAll(day)
+
+        expect(dateInput.getDate()).toBeNull()
+        expect(dateInput._element.classList.contains('form-date-time-all-selected')).toBeFalse()
+        dateInput.dispose()
+      }
+    })
+
     it('should drop the selection of all sections when the focus leaves the field', () => {
       const dateInput = createDateInput({ date: new Date(2026, 6, 14) })
       const [day] = getSections(dateInput._element)
