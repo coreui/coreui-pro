@@ -317,7 +317,7 @@ describe('PasswordInput', () => {
       expect(input.hasAttribute('type')).toBe(false)
     })
 
-    it('should keep a type the page set after the toggle on dispose', () => {
+    it('should put the markup type back on dispose even after the page changed it', () => {
       const input = initialized('<input type="password" class="form-control" data-coreui-password-input>')
       const passwordInput = PasswordInput.getInstance(input)
 
@@ -325,7 +325,7 @@ describe('PasswordInput', () => {
       input.setAttribute('type', 'search')
       passwordInput.dispose()
 
-      expect(input.getAttribute('type')).toBe('search')
+      expect(input.getAttribute('type')).toBe('password')
     })
 
     it('should do nothing on a second dispose', () => {
