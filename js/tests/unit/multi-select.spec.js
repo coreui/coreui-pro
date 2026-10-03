@@ -5254,7 +5254,7 @@ describe('MultiSelect', () => {
       expect(multiSelect._togglerElement.getAttribute('aria-disabled')).toBeNull()
     })
 
-    it('should point aria-controls at the list only while the list is in the document', async () => {
+    it('should point the toggler at the dialog and the search input at the list only while the panel is open', async () => {
       fixtureEl.innerHTML = '<select id="test-select"></select>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'One' }], search: true })
@@ -5265,9 +5265,10 @@ describe('MultiSelect', () => {
       multiSelect.show()
 
       expect(referrers.map(element => document.getElementById(element.getAttribute('aria-controls')))).toEqual([
-        multiSelect._menu.querySelector('#test-select-listbox'),
+        multiSelect._menu,
         multiSelect._menu.querySelector('#test-select-listbox')
       ])
+      expect(multiSelect._menu.getAttribute('role')).toBe('dialog')
 
       multiSelect.hide()
 
@@ -5280,6 +5281,15 @@ describe('MultiSelect', () => {
       expect(referrers.map(element => element.getAttribute('aria-controls'))).toEqual([null, null])
     })
 
+    it('should point the toggler at its own dialog when the page already uses the select id with -dialog', () => {
+      fixtureEl.innerHTML = '<div id="test-select-dialog"></div><select id="test-select"></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { options: [{ value: '1', text: 'One' }] })
+
+      multiSelect.show()
+
+      expect(document.getElementById(multiSelect._togglerElement.getAttribute('aria-controls'))).toBe(multiSelect._menu)
+    })
+
     it('should keep a moved list inside its panel, with no aria-owns', () => {
       fixtureEl.innerHTML = '<select id="test-select"></select>'
       const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { container: 'body', options: [{ value: '1', text: 'One' }] })
@@ -5288,7 +5298,8 @@ describe('MultiSelect', () => {
       multiSelect.show()
 
       expect(multiSelect._menu.parentElement).toBe(document.body)
-      expect(toggler.getAttribute('aria-controls')).toBe('test-select-listbox')
+      expect(document.getElementById(toggler.getAttribute('aria-controls'))).toBe(multiSelect._menu)
+      expect(multiSelect._menu.contains(document.getElementById('test-select-listbox'))).toBeTrue()
       expect(toggler.getAttribute('aria-owns')).toBeNull()
     })
 
