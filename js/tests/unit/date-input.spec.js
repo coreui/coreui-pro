@@ -717,6 +717,21 @@ describe('DateInput', () => {
       expect(day.textContent).toEqual('13')
     })
 
+    it('should select the focused section again after a change', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 6, 14) })
+      const [day] = getSections(dateInput._element)
+
+      day.focus()
+      window.getSelection().collapse(day, 0)
+      pressKey(day, 'ArrowUp')
+
+      expect(window.getSelection().toString()).toEqual('15')
+
+      pressKey(day, 'ArrowDown')
+
+      expect(window.getSelection().toString()).toEqual('14')
+    })
+
     it('should leave the value alone when the arrow carries the picker modifier', () => {
       const dateInput = createDateInput({ date: new Date(2026, 6, 14) })
       const [day] = getSections(dateInput._element)

@@ -823,6 +823,10 @@ abstract class SectionInput extends BaseComponent {
       } else {
         sectionElement.setAttribute('aria-valuenow', String(section.type === 'year' ? getFullYearFromSection(section) : section.value))
       }
+
+      if (sectionElement === document.activeElement && !this._allSelected) {
+        this._selectSectionContent(sectionElement)
+      }
     }
   }
 
