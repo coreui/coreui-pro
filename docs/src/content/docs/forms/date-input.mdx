@@ -137,6 +137,8 @@ Without an explicit format, the mask follows the locale set via `data-coreui-loc
 
 Set the initial date with the `data-coreui-date` attribute.
 
+A field holds what its format shows. A date given with a time of day to a field without a time keeps only its day: `getDate()` and `dateChange` report midnight, and a format with a time set later starts at 00:00. Use a format with a time when the time matters.
+
 <Example pro code={`<label class="form-label" id="dateInputDateOfBirthLabel">Date of birth</label>
   <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="dd.MM.yyyy" data-coreui-date="2000-01-15" aria-labelledby="dateInputDateOfBirthLabel"></div>`} />
 
