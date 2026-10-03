@@ -1,6 +1,7 @@
 const myRangeSliderCustomTicks = document.getElementById('myRangeSliderCustomTicks')
 
 const optionsRangeSliderCustomTicks = {
+  ariaLabel: ['Minimum temperature', 'Maximum temperature'],
   min: -50,
   max: 100,
   ticks: [

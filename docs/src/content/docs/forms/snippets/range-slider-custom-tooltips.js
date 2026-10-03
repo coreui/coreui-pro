@@ -1,6 +1,7 @@
 const myRangeSliderCustomTooltips = document.getElementById('myRangeSliderCustomTooltips')
 
 const optionsRangeSliderCustomTooltips = {
+  ariaLabel: ['Minimum price', 'Maximum price'],
   max: 1000,
   ticks: [
     {
