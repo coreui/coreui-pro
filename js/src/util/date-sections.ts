@@ -422,6 +422,28 @@ export const getHourCycle = (layout: DateSection[]): EditableSection['cycle'] =>
   layout.find((section): section is EditableSection => section.type === 'hour')?.cycle
 
 /**
+ * Tells whether a key press carries Alt, Control or Meta. A section moves no
+ * focus, changes no value and types nothing on such a press and leaves it
+ * uncancelled for the browser, assistive technology or a picker around it.
+ *
+ * @param event - The key press
+ * @returns `true` when Alt, Control or Meta is held
+ */
+export const hasShortcutModifier = (event: Pick<KeyboardEvent, 'altKey' | 'ctrlKey' | 'metaKey'>): boolean =>
+  event.altKey || event.ctrlKey || event.metaKey
+
+/**
+ * Tells whether a key press types its character into a section: one character
+ * with no Alt, Control or Meta held. A character such a press composes, as
+ * AltGr or Option do, reaches the section through `beforeinput` instead.
+ *
+ * @param event - The key press
+ * @returns `true` for a typed character
+ */
+export const isTypedKey = (event: Pick<KeyboardEvent, 'altKey' | 'ctrlKey' | 'key' | 'metaKey'>): boolean =>
+  event.key.length === 1 && !hasShortcutModifier(event)
+
+/**
  * Applies a typed digit to a section: digits add up while the value is still
  * ambiguous and start over when it would exceed the bounds or follow typed
  * letters. A digit that

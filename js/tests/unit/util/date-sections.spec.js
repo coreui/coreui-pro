@@ -32,8 +32,10 @@ import {
   getWeekLabel,
   getWeekSectionMax,
   getWeekSectionsFromLocale,
+  hasShortcutModifier,
   isDateSelectableWithin,
   isEditableSection,
+  isTypedKey,
   setSectionsFromDate
 } from '../../../src/util/date-sections.js'
 import { getISOWeekNumberAndYear } from '../../../src/util/calendar.js'
@@ -365,6 +367,42 @@ describe('Date Sections Utilities', () => {
 
     it('should return undefined for a layout without hours', () => {
       expect(getHourCycle(getSectionsFromFormat('dd.MM.yyyy', 'en-US'))).toBeUndefined()
+    })
+  })
+
+  describe('hasShortcutModifier', () => {
+    it('should tell a key press with Alt, Control or Meta from one without', () => {
+      const press = (modifiers = {}) => ({
+        altKey: false, ctrlKey: false, metaKey: false, ...modifiers
+      })
+
+      expect(hasShortcutModifier(press())).toBeFalse()
+      expect(hasShortcutModifier(press({ altKey: true }))).toBeTrue()
+      expect(hasShortcutModifier(press({ ctrlKey: true }))).toBeTrue()
+      expect(hasShortcutModifier(press({ metaKey: true }))).toBeTrue()
+    })
+  })
+
+  describe('isTypedKey', () => {
+    const press = (key, modifiers = {}) => ({
+      key, altKey: false, ctrlKey: false, metaKey: false, ...modifiers
+    })
+
+    it('should type one character without a modifier', () => {
+      expect(isTypedKey(press('4'))).toBeTrue()
+      expect(isTypedKey(press('j'))).toBeTrue()
+      expect(isTypedKey(press('ArrowUp'))).toBeFalse()
+    })
+
+    it('should leave a character with Control or Meta to the browser', () => {
+      expect(isTypedKey(press('4', { ctrlKey: true }))).toBeFalse()
+      expect(isTypedKey(press('c', { metaKey: true }))).toBeFalse()
+    })
+
+    it('should leave any character with Alt to the browser', () => {
+      for (const key of ['1', 'F', 'ф', '-', '!', '¡']) {
+        expect(isTypedKey(press(key, { altKey: true }))).toBeFalse()
+      }
     })
   })
 
