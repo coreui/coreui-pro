@@ -641,6 +641,28 @@ describe('Date Sections Utilities', () => {
 
       expect(getDateFromSections(quarter)).toEqual(new Date(2026, 9, 1))
     })
+
+    it('should take the time a date layout does not show from the reference', () => {
+      const reference = new Date(2026, 6, 14, 9, 30, 15, 250)
+
+      expect(getDateFromSections(sections(new Date(2026, 6, 20)), reference)).toEqual(new Date(2026, 6, 20, 9, 30, 15, 250))
+    })
+
+    it('should hold a layout with a time to the smallest unit it shows whatever the reference', () => {
+      const reference = new Date(2026, 6, 14, 9, 30, 15, 250)
+      const dateTime = setSectionsFromDate(getSectionsFromFormat('dd.MM.yyyy hh:mm A', 'en-US'), new Date(2026, 6, 20, 21, 5))
+      const time = setSectionsFromDate(getSectionsFromFormat('HH:mm'), new Date(1970, 0, 1, 14, 45))
+
+      expect(getDateFromSections(dateTime, reference)).toEqual(new Date(2026, 6, 20, 21, 5))
+      expect(getDateFromSections(time, reference)).toEqual(new Date(1970, 0, 1, 14, 45))
+    })
+
+    it('should keep midnight in a period layout whatever the reference', () => {
+      const reference = new Date(2026, 6, 14, 9, 30)
+      const month = setSectionsFromDate(getSectionsFromFormat('MM.yyyy'), new Date(2026, 7, 1))
+
+      expect(getDateFromSections(month, reference)).toEqual(new Date(2026, 7, 1))
+    })
   })
 
   describe('setSectionsFromDate', () => {
@@ -873,6 +895,14 @@ describe('Date Sections Utilities', () => {
       expect(getDateWithin(getSectionsFromFormat('dd.MM.yyyy', 'en-US'), new Date(2026, 6, 14, 18, 5))).toEqual(new Date(2026, 6, 14))
       expect(getDateWithin(getSectionsFromFormat('MM/yyyy', 'en-US'), new Date(2026, 6, 14))).toEqual(new Date(2026, 6, 1))
       expect(getDateWithin(getSectionsFromFormat('dd.MM.yyyy HH:mm', 'en-US'), new Date(2026, 6, 14, 18, 5, 30))).toEqual(new Date(2026, 6, 14, 18, 5))
+    })
+
+    it('should keep the time of day of the reference in a date field without a time', () => {
+      const date = new Date(2026, 6, 14, 18, 5, 30)
+
+      expect(getDateWithin(getSectionsFromFormat('dd.MM.yyyy', 'en-US'), date, date)).toEqual(date)
+      expect(getDateWithin(getSectionsFromFormat('MM/yyyy', 'en-US'), date, date)).toEqual(new Date(2026, 6, 1))
+      expect(getDateWithin(getSectionsFromFormat('dd.MM.yyyy HH:mm', 'en-US'), date, date)).toEqual(new Date(2026, 6, 14, 18, 5))
     })
 
     it('should return null for no date or an invalid one', () => {

@@ -11,7 +11,7 @@ import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { type DisabledDate, isSameInstantAs } from './util/calendar.js'
 import type { ComponentConfig } from './util/config.js'
-import type { SectionFormat } from './util/date-sections.js'
+import { getDateWithin, type SectionFormat } from './util/date-sections.js'
 import {
   appendControlGroupField,
   applyControlGroupClasses,
@@ -312,7 +312,10 @@ class DateRangeInput extends BaseComponent {
   }
 
   isRangeValid(): boolean {
-    return this._startDate === null || this._endDate === null || this._endDate >= this._startDate
+    const start = getDateWithin(this._startInput._sections, this._startDate)
+    const end = getDateWithin(this._endInput._sections, this._endDate)
+
+    return start === null || end === null || end >= start
   }
 
   override dispose(): void {

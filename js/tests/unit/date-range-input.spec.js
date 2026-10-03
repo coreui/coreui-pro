@@ -255,6 +255,14 @@ describe('DateRangeInput', () => {
       expect(invalid()).toEqual(Array.from({ length: 8 }, () => null))
     })
 
+    it('should compare the ends by the days the fields show', () => {
+      const range = build({ startDate: new Date(2026, 6, 14, 18), endDate: new Date(2026, 6, 14, 9) })
+
+      expect(range.getStartDate()).toEqual(new Date(2026, 6, 14, 18))
+      expect(range.isRangeValid()).toBeTrue()
+      expect(root().classList.contains('is-invalid')).toBeFalse()
+    })
+
     it('should keep the fields announced as invalid while a typed end stays before the start', () => {
       const range = build({ startDate: new Date(2026, 6, 20), endDate: new Date(2026, 6, 21) })
       const [, end] = fields()

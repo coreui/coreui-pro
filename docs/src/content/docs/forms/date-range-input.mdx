@@ -344,7 +344,7 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | `getEndDate` | Return the end date, or `null` when that end is incomplete or invalid |
 | `getStartDate` | Return the start date, or `null` when that end is incomplete or invalid |
 | `isDateSelectable` | Whether a date passes the shared limits |
-| `isRangeValid` | `false` while the end is before the start |
+| `isRangeValid` | `false` while the end is before the start, comparing the ends as the fields show them |
 | `reset` | Restore the dates the component was created with, emitting the change events when a value moves. A state class the markup carried comes back with them, since it judged exactly that range. A native form reset does the same. |
 | `setRange` | Set both ends: `setRange(start, end)`. Each end validates its own date, so what the range keeps is what the fields kept. |
 

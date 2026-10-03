@@ -611,16 +611,30 @@ export const getFullYearFromSection = (section: EditableSection): number | null 
 }
 
 /**
+ * Tells whether a layout picks days and shows no time, the one kind of field
+ * that keeps the time of day of the date it holds.
+ *
+ * @param sections - The sections and literals of a field
+ * @returns `true` for a date field without a time, `false` for a period, time or date and time field
+ */
+const keepsTimeOfDay = (sections: DateSection[]): boolean =>
+  getLayoutPeriod(sections) === null && !sections.some(section => section.type === 'hour')
+
+/**
  * Builds a date from filled sections, cutting the day to the length of the
  * month. A week section gives the Monday of the ISO week (the year section then
  * holds the ISO week-numbering year), and a quarter section the first day of
- * the quarter. A layout without a date part gets 1 January 1970, and one
- * without a time part gets midnight.
+ * the quarter. A layout without a date part gets 1 January 1970. A layout that
+ * picks days and shows no time takes the time of day, milliseconds included,
+ * from `reference`; any other layout fills the parts it does not show with
+ * zero, so a period layout gives midnight and a layout with a time holds it to
+ * the smallest unit it shows.
  *
  * @param sections - The sections and literals of a field
+ * @param reference - The date whose time of day a layout that picks days and shows no time keeps, or `null` for midnight
  * @returns The date, or `null` while any section is empty or below its minimum, such as a day of `0` before its second digit
  */
-export const getDateFromSections = (sections: DateSection[]): Date | null => {
+export const getDateFromSections = (sections: DateSection[], reference: Date | null = null): Date | null => {
   const values: Record<string, any> = {}
   let hourCycle = null
 
@@ -645,7 +659,8 @@ export const getDateFromSections = (sections: DateSection[]): Date | null => {
     (values.quarter === undefined ? 1 : ((values.quarter - 1) * 3) + 1) :
     values.month
   const day = values.day === undefined ? 1 : values.day
-  let hour = values.hour === undefined ? 0 : values.hour
+  const base = reference && keepsTimeOfDay(sections) ? reference : createDate(1970, 0, 1)
+  let hour = values.hour === undefined ? base.getHours() : values.hour
 
   if (hourCycle === 'h12') {
     hour = convert12hTo24h(values.meridiem === 2 ? 'pm' : 'am', hour)
@@ -655,7 +670,12 @@ export const getDateFromSections = (sections: DateSection[]): Date | null => {
     createDate(year, month - 1, Math.min(day, getDaysInMonth(year, month))) :
     getDateOfISOWeek(year, Math.min(values.week, getISOWeeksInYear(year)))
 
-  date.setHours(hour, values.minute === undefined ? 0 : values.minute, values.second === undefined ? 0 : values.second, 0)
+  date.setHours(
+    hour,
+    values.minute === undefined ? base.getMinutes() : values.minute,
+    values.second === undefined ? base.getSeconds() : values.second,
+    base.getMilliseconds()
+  )
   return date
 }
 
@@ -875,17 +895,19 @@ export const convertValue = (value: Date | string | null | undefined, type: Sect
 }
 
 /**
- * Brings a date to what a field with the given layout holds: the parts the
+ * Brings a date to what a field with the given layout shows: the parts the
  * layout has no section for are dropped, such as the time in a date-only field
- * or the day in a month field.
+ * or the day in a month field. With a `reference`, a date field without a time
+ * keeps the time of day of the reference instead, as `getDateFromSections` does.
  *
  * @param layout - The sections and literals of the field
  * @param date - The date to bring into the layout
+ * @param reference - The date whose time of day a date field without a time keeps, or `null` to drop it
  * @returns The date the field holds, or `null` for an empty or invalid date
  */
-export const getDateWithin = (layout: DateSection[], date: Date | null): Date | null =>
+export const getDateWithin = (layout: DateSection[], date: Date | null, reference: Date | null = null): Date | null =>
   date && !Number.isNaN(date.getTime()) ?
-    getDateFromSections(setSectionsFromDate(layout, date)) :
+    getDateFromSections(setSectionsFromDate(layout, date), reference) :
     null
 
 /**

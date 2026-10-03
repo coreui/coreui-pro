@@ -1917,6 +1917,65 @@ describe('DateInput', () => {
     })
   })
 
+  describe('time the format does not show', () => {
+    it('should keep the time of the date it was given', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 6, 14, 9, 30, 15) })
+
+      expect(dateInput.getDate()).toEqual(new Date(2026, 6, 14, 9, 30, 15))
+    })
+
+    it('should keep the time when the user changes the date', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 6, 14, 9, 30) })
+      const [day] = getSections(dateInput._element)
+      const onChange = vi.fn()
+
+      dateInput._element.addEventListener('dateChange.coreui.date-input', onChange)
+      day.focus()
+      pressKey(day, 'ArrowUp')
+
+      expect(onChange).toHaveBeenCalledOnce()
+      expect(onChange.mock.calls[0][0].date).toEqual(new Date(2026, 6, 15, 9, 30))
+      expect(dateInput._element.querySelector('input[type="hidden"]').value).toEqual('15.07.2026')
+    })
+
+    it('should keep the time of the last date across a cleared field', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 6, 14, 9, 30) })
+
+      dateInput.clear()
+      getSections(dateInput._element)[0].focus()
+      for (const digit of '20072026') {
+        pressKey(document.activeElement, digit)
+      }
+
+      expect(dateInput.getDate()).toEqual(new Date(2026, 6, 20, 9, 30))
+    })
+
+    it('should judge the limits by the day it shows', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 6, 14, 9, 30), maxDate: new Date(2026, 6, 14), minDate: new Date(2026, 6, 14, 12) })
+
+      expect(dateInput.getDate()).toEqual(new Date(2026, 6, 14, 9, 30))
+      expect(dateInput._element.classList.contains('is-invalid')).toBeFalse()
+    })
+
+    it('should reset to the time it was created with', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 6, 14, 9, 30) })
+      const [day] = getSections(dateInput._element)
+
+      dateInput.setConfig({ date: new Date(2026, 6, 20, 18) })
+      day.focus()
+      pressKey(day, 'ArrowUp')
+      dateInput.reset()
+
+      expect(dateInput.getDate()).toEqual(new Date(2026, 6, 14, 9, 30))
+    })
+
+    it('should start at midnight in a period field', () => {
+      const dateInput = createDateInput({ format: 'MM.yyyy', date: new Date(2026, 6, 14, 9, 30) })
+
+      expect(dateInput.getDate()).toEqual(new Date(2026, 6, 1))
+    })
+  })
+
   describe('setConfig', () => {
     it('should rebuild the component with the new config', () => {
       const dateInput = createDateInput()
@@ -2004,14 +2063,15 @@ describe('DateInput', () => {
       expect([...getSections(dateInput._element)].map(section => section.getAttribute('aria-valuenow'))).toEqual([null, null, null])
     })
 
-    it('should rebuild from the date it shows when the sections change', () => {
+    it('should show the time it kept once the new sections show it', () => {
       const dateInput = createDateInput({ date: new Date(2026, 6, 14, 9, 30) })
       const onChange = vi.fn()
 
       dateInput._element.addEventListener('dateChange.coreui.date-input', onChange)
       dateInput.setConfig({ format: 'dd.MM.yyyy HH:mm' })
 
-      expect(dateInput.getDate()).toEqual(new Date(2026, 6, 14))
+      expect([...getSections(dateInput._element)].map(section => section.textContent)).toEqual(['14', '07', '2026', '09', '30'])
+      expect(dateInput.getDate()).toEqual(new Date(2026, 6, 14, 9, 30))
       expect(onChange).not.toHaveBeenCalled()
     })
 

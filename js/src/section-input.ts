@@ -212,6 +212,7 @@ abstract class SectionInput extends BaseComponent {
   protected declare _ownerInvalid: boolean
   protected declare _valid: boolean
   protected declare _maxDate: Date | null
+  protected declare _referenceDate: Date | null
   protected declare _sections: DateSection[]
   protected declare _draft: string
   protected declare _allSelected: boolean
@@ -235,7 +236,7 @@ abstract class SectionInput extends BaseComponent {
     super(element, config)
 
     this._applyConfig()
-    this._date = getDateFromSections(this._sections)
+    this._date = this._getFieldDate()
     this._allSelected = false
     this._error = null
     this._inputElement = null
@@ -280,7 +281,7 @@ abstract class SectionInput extends BaseComponent {
     this._hostRole = this._element.getAttribute('role')
 
     this._createSectionInput()
-    this._initialDate = getDateFromSections(this._sections)
+    this._initialDate = this._getFieldDate()
     this._date = this._applyValidationState()
     this._addEventListeners()
 
@@ -310,6 +311,7 @@ abstract class SectionInput extends BaseComponent {
 
   reset(): void {
     this._draft = ''
+    this._referenceDate = this._initialDate ?? this._referenceDate
     this._setAllSelected(false)
     this._commitSections(setSectionsFromDate(this._sections, this._initialDate))
   }
@@ -331,7 +333,7 @@ abstract class SectionInput extends BaseComponent {
 
     const sections = this._sections
 
-    this._config = this._getConfig({ ...this._config, date: getDateFromSections(sections), ...config })
+    this._config = this._getConfig({ ...this._config, date: this._getFieldDate(sections), ...config })
     this._applyConfig()
 
     if (config?.date === undefined && this._getLayoutKey(this._sections) === this._getLayoutKey(sections)) {
@@ -374,11 +376,17 @@ abstract class SectionInput extends BaseComponent {
   _applyConfig(): void {
     const { date, format, locale, maxDate, minDate, monthNames } = this._config
     const sections = format ? getSectionLayout(format, locale, monthNames) : this._getDefaultSections(locale)
+    const value = date ? this._convertDate(date) : null
 
     this._minDate = this._convertDate(minDate)
     this._maxDate = this._convertDate(maxDate)
-    this._sections = setSectionsFromDate(sections, date ? this._convertDate(date) : null)
+    this._referenceDate = value ?? this._referenceDate ?? null
+    this._sections = setSectionsFromDate(sections, value)
     this._draft = ''
+  }
+
+  _getFieldDate(sections: DateSection[] = this._sections): Date | null {
+    return getDateFromSections(sections, this._referenceDate)
   }
 
   _getLayoutKey(sections: DateSection[]): string {
@@ -689,7 +697,11 @@ abstract class SectionInput extends BaseComponent {
       this._syncDescription()
     }
 
-    return isDisabled ? null : date
+    if (date) {
+      this._referenceDate = this._getFieldDate()
+    }
+
+    return isDisabled || !date ? null : this._referenceDate
   }
 
   _isMissing(date: Date | null): boolean {
