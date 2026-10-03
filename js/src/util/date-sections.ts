@@ -858,9 +858,9 @@ export const getSectionsFromString = (text: string, sections: DateSection[]): Da
 /**
  * Converts the value a date or time field is given to a `Date`. A time field
  * also reads time-only strings such as `'14:30'` or `'2:05 pm'` on 1 January
- * 1970, without checking the range, so `'24:00'` rolls over into 2 January;
- * a date and time field reads the time with the date before trying the date
- * alone.
+ * 1970, and gives `null` for a time no clock shows, such as `'24:00'` or
+ * `'13:30 pm'`; a date and time field reads the time with the date before
+ * trying the date alone.
  *
  * @param value - The value as a `Date` or a string
  * @param type - The kind of field
@@ -877,6 +877,11 @@ export const convertValue = (value: Date | string | null | undefined, type: Sect
 
     if (match) {
       const [, hour, minute, second, meridiem] = match
+
+      if (Number.parseInt(hour, 10) > (meridiem ? 12 : 23) || Number.parseInt(minute, 10) > 59 || Number.parseInt(second ?? '0', 10) > 59) {
+        return null
+      }
+
       const hours = meridiem ?
         convert12hTo24h(meridiem.toLowerCase(), Number.parseInt(hour, 10)) :
         Number.parseInt(hour, 10)

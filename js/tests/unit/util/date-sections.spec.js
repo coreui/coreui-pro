@@ -900,6 +900,16 @@ describe('Date Sections Utilities', () => {
       expect(convertValue('14:30', 'date', 'en-US')).toBeNull()
     })
 
+    it('should return null for a day its month does not have, in a date or a date and time field', () => {
+      expect(convertValue('2022-02-30', 'date', 'en-US')).toBeNull()
+      expect(convertValue('2/30/2022, 10:00:00 AM', 'datetime', 'en-US')).toBeNull()
+      expect(convertValue('30.02.2022, 10:00:00', 'datetime', 'de-DE')).toBeNull()
+    })
+
+    it.each(['24:00', '23:60', '23:59:60', '13:30 pm', '13:30 AM'])('should return null for the time %j, which no clock shows', value => {
+      expect(convertValue(value, 'time', 'en-US')).toBeNull()
+    })
+
     it('should return null for a string no field can read', () => {
       expect(convertValue('garbage', 'date', 'en-US')).toBeNull()
       expect(convertValue('garbage', 'time', 'en-US')).toBeNull()
