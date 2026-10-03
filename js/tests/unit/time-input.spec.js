@@ -98,6 +98,15 @@ describe('TimeInput', () => {
       expect(timeInput._element.getAttribute('aria-label')).toEqual('Time input')
     })
 
+    it('should keep the default section names when their options are empty', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const timeInput = new TimeInput(fixtureEl.querySelector('div'), {
+        ariaHourLabel: '', ariaMeridiemLabel: '', ariaMinuteLabel: '', ariaSecondLabel: '', locale: 'en-US', seconds: true
+      })
+
+      expect([...getSections(timeInput._element)].map(section => section.getAttribute('aria-label'))).toEqual(['Hour', 'Minute', 'Second', 'AM/PM'])
+    })
+
     it('should derive a meridiem section from a 12-hour locale', () => {
       fixtureEl.innerHTML = '<div></div>'
       const timeInput = new TimeInput(fixtureEl.querySelector('div'), { locale: 'en-US' })
