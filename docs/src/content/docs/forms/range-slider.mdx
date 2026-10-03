@@ -176,7 +176,7 @@ The theme class on the slider colours the track and the handles; the tooltip kee
 Add `data-coreui-range-slider` to a `div` element.
 
 ```html
-<div aria-label="Budget" data-coreui-range-slider data-coreui-name="budgetMin, budgetMax" data-coreui-value="25, 75">
+<div data-coreui-range-slider data-coreui-name="budgetMin, budgetMax" data-coreui-value="25, 75" data-coreui-aria-label='["Minimum budget", "Maximum budget"]'>
 </div>
 ```
 
@@ -185,12 +185,13 @@ Add `data-coreui-range-slider` to a `div` element.
 Call the Range Slider component via JavaScript:
 
 ```html
-<div id="myRangeSlider" aria-label="Budget"></div>
+<div id="myRangeSlider"></div>
 ```
 
 ```js
 const rangeSliderElement = document.getElementById('myRangeSlider')
 const rangeSlider = new RangeSlider(rangeSliderElement, {
+  ariaLabel: ['Minimum budget', 'Maximum budget'],
   name: ['budgetMin', 'budgetMax'],
   min: 0,
   max: 100,
@@ -265,7 +266,7 @@ myRangeSlider.addEventListener('change.coreui.range-slider', event => {
 
 Each handle is a native `<input type="range">`, so it is a slider with its value, minimum and maximum without any ARIA of its own, and the browser handles the keyboard: the arrow keys, <kbd>Page Up</kbd>, <kbd>Page Down</kbd>, <kbd>Home</kbd> and <kbd>End</kbd>. In a vertical slider the handles carry `aria-orientation="vertical"`, and <kbd>→</kbd> increases the value in every browser, as <kbd>↑</kbd> does.
 
-Every handle's own name says what it sets, so a screen reader that lists the controls of the page can tell the handles of one slider from another's. Give the slider element the name of the field, with `aria-labelledby` pointing at a visible label or with `aria-label`: the component moves it onto the handles, where it comes in front of each handle's name, "Budget Minimum value" and "Budget Maximum value", and moves `aria-describedby` onto every handle as well. Name the handles themselves with `ariaLabel`: an array with one name per handle, a comma-separated string, or a function `(index, total) => string`. Without it, two handles are named "Minimum value" and "Maximum value" and more handles "Value 1", "Value 2" and so on. A single handle has no generated name: it takes `ariaLabel`, or the `aria-label` or `aria-labelledby` of the slider element, and the generated input has no `id` for a `<label for>`. `dispose()` gives the slider element its attributes back. While a handle sits on a labelled tick, its `aria-valuetext` adds the label to the value ("50, Medium", or the `tooltipsFormat` text followed by the label when they differ).
+Every handle's own name says what it sets, so a screen reader that lists the controls of the page can tell the handles of one slider from another's. Give the slider element the name of the field, with `aria-labelledby` pointing at a visible label or with `aria-label`: the component moves it onto the handles, where it comes in front of each handle's name, "Budget Minimum value" and "Budget Maximum value", and moves `aria-describedby` onto every handle as well. Name the handles themselves with `ariaLabel`: an array with one name per handle, a comma-separated string, or a function `(index, total) => string`. Without it, two handles are named "Minimum value" and "Maximum value" and more handles "Value 1", "Value 2" and so on. A single handle has no generated name: it takes the name of the slider element, followed by its `ariaLabel` when it has one, and there is no `<label for>` to point at the generated input. A slider element with a `role` of its own keeps its label and description, and the handles keep only their own names. `dispose()` gives the slider element its attributes back, unless the page has set them again in the meantime. While a handle sits on a labelled tick, its `aria-valuetext` adds the label to the value ("50, Medium", or the `tooltipsFormat` text followed by the label when they differ).
 
 Tooltips are hidden from assistive technology (`aria-hidden="true"`): they repeat the value the handle already announces, so exposing them would have screen readers read every change twice. Tick marks are hidden too: a label reaches the handle through `aria-valuetext` while the handle sits on its tick, so a label that carries meaning the value does not should also be said in the page text.
 

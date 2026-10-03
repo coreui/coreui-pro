@@ -694,6 +694,26 @@ describe('RangeSlider', () => {
       expect(inputsOf(named)[0].getAttribute('aria-label')).toEqual('Volume')
     })
 
+    it('should put the label of the element in front of the name of a single handle', () => {
+      const { element } = mount({ ariaLabel: ['Master'], value: 40 }, 'aria-labelledby="volumeLabel"')
+      const [input] = inputsOf(element)
+
+      expect(input.getAttribute('aria-labelledby')).toEqual(`volumeLabel ${input.id}`)
+      expect(input.getAttribute('aria-label')).toEqual('Master')
+
+      const { element: named } = mount({ ariaLabel: ['Master'], value: 40 }, 'aria-label="Volume"')
+      expect(inputsOf(named)[0].getAttribute('aria-label')).toEqual('Volume Master')
+    })
+
+    it('should leave the label and description on an element with a role of its own', () => {
+      const { element } = mount({ value: [20, 80] }, 'role="group" aria-labelledby="budgetLabel" aria-describedby="budgetHelp"')
+
+      expect(element.getAttribute('aria-labelledby')).toEqual('budgetLabel')
+      expect(element.getAttribute('aria-describedby')).toEqual('budgetHelp')
+      expect(inputsOf(element).map(input => input.getAttribute('aria-label'))).toEqual(['Minimum value', 'Maximum value'])
+      expect(inputsOf(element).some(input => input.hasAttribute('aria-labelledby') || input.hasAttribute('aria-describedby'))).toBeFalse()
+    })
+
     it('should describe every handle with the description of the element', () => {
       const { element } = mount({ value: [20, 80] }, 'aria-describedby="budgetHelp"')
 
@@ -708,6 +728,16 @@ describe('RangeSlider', () => {
 
       expect(inputsOf(element).map(input => input.getAttribute('aria-label'))).toEqual(['Budget Value 1', 'Budget Value 2', 'Budget Value 3'])
       expect(inputsOf(element).every(input => input.getAttribute('aria-describedby') === 'budgetHelp')).toBeTrue()
+    })
+
+    it('should take a label the page gives the element later on setConfig', () => {
+      const { element, rangeSlider } = mount({ value: [20, 80] }, 'aria-label="Budget"')
+
+      element.setAttribute('aria-label', 'Cost')
+      rangeSlider.setConfig({})
+
+      expect(inputsOf(element).map(input => input.getAttribute('aria-label'))).toEqual(['Cost Minimum value', 'Cost Maximum value'])
+      expect(element.hasAttribute('aria-label')).toBeFalse()
     })
   })
 
@@ -876,6 +906,31 @@ describe('RangeSlider', () => {
       expect(element.getAttribute('aria-label')).toEqual('Budget')
       expect(element.getAttribute('aria-labelledby')).toEqual('budgetLabel')
       expect(element.getAttribute('aria-describedby')).toEqual('budgetHelp')
+    })
+
+    it('should leave no label or description on an element that had none', () => {
+      const { element, rangeSlider } = mount({ value: [20, 80] })
+
+      rangeSlider.dispose()
+
+      expect(['aria-label', 'aria-labelledby', 'aria-describedby'].some(name => element.hasAttribute(name))).toBeFalse()
+    })
+
+    it('should keep a label the page set while the slider lived', () => {
+      const { element, rangeSlider } = mount({ value: [20, 80] }, 'aria-label="Budget"')
+
+      element.setAttribute('aria-label', 'Cost')
+      rangeSlider.dispose()
+
+      expect(element.getAttribute('aria-label')).toEqual('Cost')
+    })
+
+    it('should tolerate a second dispose', () => {
+      const { rangeSlider } = mount({ value: [20, 80] })
+
+      rangeSlider.dispose()
+
+      expect(() => rangeSlider.dispose()).not.toThrow()
     })
   })
 

@@ -148,7 +148,7 @@ const DefaultType: Record<string, string> = {
 class RangeSlider extends BaseComponent {
   protected declare _config: RangeSliderConfig
   protected declare _form: HTMLFormElement | null
-  protected declare _hostAttributes: Map<string, string | null>
+  protected declare _hostAttributes: Map<string, string>
   protected declare _inputs: HTMLInputElement[]
   protected declare _press: RangeSliderPress | null
   protected declare _resetTimeout: ReturnType<typeof setTimeout> | null
@@ -179,11 +179,7 @@ class RangeSlider extends BaseComponent {
     this._ticks = null
     this._tooltips = []
     this._wrapper = null
-    this._hostAttributes = new Map(HOST_ATTRIBUTES.map(name => [name, this._element.getAttribute(name)]))
-
-    for (const name of HOST_ATTRIBUTES) {
-      this._element.removeAttribute(name)
-    }
+    this._hostAttributes = new Map()
 
     this._onInput = event => {
       const input = event.target as HTMLInputElement
@@ -236,10 +232,14 @@ class RangeSlider extends BaseComponent {
   }
 
   override dispose(): void {
+    if (!this._element) {
+      return
+    }
+
     this._teardown()
 
     for (const [name, value] of this._hostAttributes) {
-      if (value !== null) {
+      if (!this._element.hasAttribute(name)) {
         this._element.setAttribute(name, value)
       }
     }
@@ -251,6 +251,7 @@ class RangeSlider extends BaseComponent {
   _build(current: number[] | null = null): void {
     const { tooltipClass, tooltips, vertical } = this._config
 
+    this._takeHostAttributes()
     this._wrapper = document.createElement('div')
     this._wrapper.className = CLASS_NAME_FORM_RANGE
     this._wrapper.classList.toggle(CLASS_NAME_FORM_RANGE_VERTICAL, vertical)
@@ -353,6 +354,21 @@ class RangeSlider extends BaseComponent {
     return input
   }
 
+  _takeHostAttributes(): void {
+    if (this._element.hasAttribute('role')) {
+      return
+    }
+
+    for (const name of HOST_ATTRIBUTES) {
+      const value = this._element.getAttribute(name)
+
+      if (value !== null) {
+        this._hostAttributes.set(name, value)
+        this._element.removeAttribute(name)
+      }
+    }
+  }
+
   _nameInput(input: HTMLInputElement, index: number): void {
     const handleLabel = this._ariaLabel(index)
     const describedBy = this._hostAttributes.get('aria-describedby')
@@ -363,28 +379,22 @@ class RangeSlider extends BaseComponent {
       input.setAttribute('aria-describedby', describedBy)
     }
 
-    if ((this._config.value as number[]).length === 1) {
-      const name = handleLabel ?? label
-
-      if (name) {
-        input.setAttribute('aria-label', name)
-      }
-
-      if (labelledBy) {
-        input.setAttribute('aria-labelledby', labelledBy)
-      }
-
+    if (labelledBy && handleLabel) {
+      input.id = getUID(`${NAME}-handle-`)
+      input.setAttribute('aria-labelledby', `${labelledBy} ${input.id}`)
+      input.setAttribute('aria-label', handleLabel)
       return
+    }
+
+    const name = [label, handleLabel].filter(Boolean).join(' ')
+
+    if (name) {
+      input.setAttribute('aria-label', name)
     }
 
     if (labelledBy) {
-      input.id = getUID(`${NAME}-handle-`)
-      input.setAttribute('aria-labelledby', `${labelledBy} ${input.id}`)
-      input.setAttribute('aria-label', handleLabel!)
-      return
+      input.setAttribute('aria-labelledby', labelledBy)
     }
-
-    input.setAttribute('aria-label', label ? `${label} ${handleLabel}` : handleLabel!)
   }
 
   _ariaLabel(index: number): string | null {

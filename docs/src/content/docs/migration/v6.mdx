@@ -2060,6 +2060,15 @@ field behind that kept submitting.
   array with one name per handle, as before, a comma-separated string, or a
   function `(index, total) => string`, the shape the OTP input uses for its
   digits; `data-coreui-aria-labels` becomes `data-coreui-aria-label`.
+- **The range slider names every handle after the field.** An `aria-label`,
+  `aria-labelledby` or `aria-describedby` on the slider element moves onto the
+  handles: the field name comes in front of each handle's own name ("Budget
+  Minimum value"), and every handle carries the description, so
+  `role="group"` on the element is no longer needed. Handle names that
+  already repeat the field (`aria-labelledby="budgetLabel"` with
+  `["Minimum budget", "Maximum budget"]`) now read "Budget Minimum budget":
+  shorten them to `["Minimum", "Maximum"]`. An element that keeps a `role` of
+  its own keeps its label and description.
 - **Range slider interaction follows the native control.** Pressing a handle no
   longer moves it a step; a press on the track or a clickable tick moves the
   nearest handle and it follows the pointer (mouse, touch or pen), with
