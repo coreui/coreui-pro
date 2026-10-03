@@ -570,6 +570,27 @@ describe('DateRangeInput', () => {
       expect(document.activeElement).toBe(lastOfStart)
     })
 
+    it('should leave an arrow with Alt, Control or Meta at the separator to the browser', () => {
+      build()
+      const [start, end] = fields()
+      const lastOfStart = sections(start).at(-1)
+      const firstOfEnd = sections(end)[0]
+
+      for (const [target, key] of [[lastOfStart, 'ArrowRight'], [firstOfEnd, 'ArrowLeft']]) {
+        for (const modifier of ['altKey', 'ctrlKey', 'metaKey']) {
+          const event = new KeyboardEvent('keydown', {
+            key, bubbles: true, cancelable: true, [modifier]: true
+          })
+
+          target.focus()
+          target.dispatchEvent(event)
+
+          expect(event.defaultPrevented).toBeFalse()
+          expect(document.activeElement).toBe(target)
+        }
+      }
+    })
+
     it('should keep the arrows inside a field away from its edge', () => {
       build()
       const [start] = fields()

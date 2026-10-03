@@ -11,7 +11,7 @@ import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { type DisabledDate, isSameInstantAs } from './util/calendar.js'
 import type { ComponentConfig } from './util/config.js'
-import type { SectionFormat } from './util/date-sections.js'
+import { hasShortcutModifier, type SectionFormat } from './util/date-sections.js'
 import {
   appendControlGroupField,
   applyControlGroupClasses,
@@ -581,7 +581,7 @@ class DateRangeInput extends BaseComponent {
     }
 
     EventHandler.on(this._element, EVENT_KEYDOWN, (event: any) => {
-      if (event.key !== ARROW_LEFT_KEY && event.key !== ARROW_RIGHT_KEY) {
+      if ((event.key !== ARROW_LEFT_KEY && event.key !== ARROW_RIGHT_KEY) || hasShortcutModifier(event)) {
         return
       }
 

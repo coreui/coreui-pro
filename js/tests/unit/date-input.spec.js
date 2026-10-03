@@ -817,6 +817,104 @@ describe('DateInput', () => {
       expect(day.textContent).toEqual('14')
     })
 
+    it.each(['altKey', 'ctrlKey', 'metaKey'])('should leave arrows, Home and End with %s to the browser', modifier => {
+      const dateInput = createDateInput({ date: new Date(2026, 6, 14) })
+      const [day, month] = getSections(dateInput._element)
+
+      month.focus()
+
+      for (const key of ['ArrowLeft', 'ArrowRight', 'Home', 'End', 'ArrowUp', 'ArrowDown']) {
+        const event = new KeyboardEvent('keydown', {
+          key, bubbles: true, cancelable: true, [modifier]: true
+        })
+
+        month.dispatchEvent(event)
+
+        expect(event.defaultPrevented).toBeFalse()
+      }
+
+      expect(document.activeElement).toEqual(month)
+      expect([day, month].map(section => section.textContent)).toEqual(['14', '07'])
+    })
+
+    it('should leave a digit or a letter with Alt, Control or Meta to the browser', () => {
+      const dateInput = createDateInput({ format: 'dd MMMM yyyy', locale: 'en-US' })
+      const [day, month] = getSections(dateInput._element)
+
+      for (const [section, key] of [[day, '4'], [month, 'j']]) {
+        for (const modifier of ['altKey', 'ctrlKey', 'metaKey']) {
+          const event = new KeyboardEvent('keydown', {
+            key, bubbles: true, cancelable: true, [modifier]: true
+          })
+
+          section.focus()
+          section.dispatchEvent(event)
+
+          expect(event.defaultPrevented).toBeFalse()
+        }
+      }
+
+      expect(dateInput.getDate()).toBeNull()
+      expect(day.getAttribute('aria-valuenow')).toBeNull()
+    })
+
+    it('should type a character a modifier composed once it arrives as text', () => {
+      const dateInput = createDateInput({ format: 'dd MMMM yyyy', locale: 'cs-CZ' })
+      const [, month] = getSections(dateInput._element)
+      const keydown = new KeyboardEvent('keydown', {
+        key: 'ú', bubbles: true, cancelable: true, altKey: true
+      })
+
+      month.focus()
+      month.dispatchEvent(keydown)
+
+      expect(keydown.defaultPrevented).toBeFalse()
+      expect(month.getAttribute('aria-valuenow')).toBeNull()
+
+      month.dispatchEvent(new InputEvent('beforeinput', {
+        data: 'ú', inputType: 'insertText', bubbles: true, cancelable: true
+      }))
+
+      expect(month.getAttribute('aria-valuenow')).toEqual('2')
+    })
+
+    it('should leave Alt, Control or Meta keys alone once the whole value is selected', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 6, 14) })
+      const [day] = getSections(dateInput._element)
+
+      day.focus()
+      pressKey(day, 'a', { ctrlKey: true })
+
+      for (const modifier of ['altKey', 'ctrlKey', 'metaKey']) {
+        const event = new KeyboardEvent('keydown', {
+          key: '4', bubbles: true, cancelable: true, [modifier]: true
+        })
+
+        day.dispatchEvent(event)
+
+        expect(event.defaultPrevented).toBeFalse()
+      }
+
+      expect(dateInput.getDate()).toEqual(new Date(2026, 6, 14))
+      expect(dateInput._element.classList.contains('form-date-time-all-selected')).toBeTrue()
+    })
+
+    it('should leave Control, Meta and Alt keys of a read-only field to the browser', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 6, 14), readonly: true })
+      const [day] = getSections(dateInput._element)
+
+      for (const [key, modifier] of [['c', 'ctrlKey'], ['c', 'metaKey'], ['1', 'altKey']]) {
+        const event = new KeyboardEvent('keydown', {
+          key, bubbles: true, cancelable: true, [modifier]: true
+        })
+
+        day.focus()
+        day.dispatchEvent(event)
+
+        expect(event.defaultPrevented).toBeFalse()
+      }
+    })
+
     it('should start empty sections at the boundary, except year at the current year', () => {
       const dateInput = createDateInput()
       const [day, month, year] = getSections(dateInput._element)
