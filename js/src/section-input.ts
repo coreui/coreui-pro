@@ -28,7 +28,9 @@ import {
   getSectionsFromString,
   getSectionValueText,
   getWeekSectionMax,
+  hasShortcutModifier,
   isEditableSection,
+  isTypedKey,
   setSectionsFromDate
 } from './util/date-sections.js'
 import type { ComponentConfig } from './util/config.js'
@@ -498,14 +500,14 @@ abstract class SectionInput extends BaseComponent {
       return
     }
 
-    if ([ARROW_LEFT_KEY, ARROW_RIGHT_KEY, HOME_KEY, END_KEY].includes(key)) {
+    if ([ARROW_LEFT_KEY, ARROW_RIGHT_KEY, HOME_KEY, END_KEY].includes(key) && !hasShortcutModifier(event)) {
       event.preventDefault()
       this._focusSectionByKey(target, key)
       return
     }
 
     if (!this._isEditable()) {
-      if (key.length === 1) {
+      if (isTypedKey(event)) {
         event.preventDefault()
       }
 
@@ -518,7 +520,7 @@ abstract class SectionInput extends BaseComponent {
 
     const section = this._getSection(this._getSectionIndex(target))
 
-    if ((key === ARROW_UP_KEY || key === ARROW_DOWN_KEY) && !(event.altKey && key === ARROW_DOWN_KEY)) {
+    if ((key === ARROW_UP_KEY || key === ARROW_DOWN_KEY) && !hasShortcutModifier(event)) {
       event.preventDefault()
       section.value = getIncrementedSectionValue(section, key === ARROW_UP_KEY ? 1 : -1, this._getSectionMax(section))
       this._draft = ''
@@ -540,7 +542,7 @@ abstract class SectionInput extends BaseComponent {
       return
     }
 
-    if (/^\d$/.test(key) || (key.length === 1 && !event.ctrlKey && !event.metaKey)) {
+    if (isTypedKey(event)) {
       event.preventDefault()
       this._applyCharacter(target, key)
     }
@@ -548,7 +550,7 @@ abstract class SectionInput extends BaseComponent {
 
   _onKeydownAllSelected(event: KeyboardEvent): boolean {
     const { key } = event
-    const isCharacter = key.length === 1 && !event.ctrlKey && !event.metaKey
+    const isCharacter = isTypedKey(event)
 
     if (!isCharacter && key !== BACKSPACE_KEY && key !== DELETE_KEY) {
       return false
