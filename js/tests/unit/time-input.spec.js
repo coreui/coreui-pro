@@ -1,4 +1,4 @@
-
+import { vi } from 'vitest'
 import TimeInput from '../../src/time-input.js'
 import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
 
@@ -276,6 +276,25 @@ describe('TimeInput', () => {
       getSections(timeInput._element)[0].dispatchEvent(event)
 
       expect(timeInput.getDate()).toEqual(new Date(1970, 0, 1, 14, 30))
+    })
+  })
+
+  describe('setConfig', () => {
+    it('should keep the time the user typed when the new config sets none', () => {
+      const timeInput = createTimeInput()
+      const onChange = vi.fn()
+
+      getSections(timeInput._element)[0].focus()
+      for (const digit of '1430') {
+        pressKey(document.activeElement, digit)
+      }
+
+      timeInput._element.addEventListener('timeChange.coreui.time-input', onChange)
+      timeInput.setConfig({ format: 'hh:mm A', locale: 'en-US' })
+
+      expect(timeInput.getDate()).toEqual(new Date(1970, 0, 1, 14, 30))
+      expect([...getSections(timeInput._element)].map(section => section.textContent)).toEqual(['02', '30', 'PM'])
+      expect(onChange).not.toHaveBeenCalled()
     })
   })
 
