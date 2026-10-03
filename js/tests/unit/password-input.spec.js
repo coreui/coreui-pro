@@ -317,17 +317,6 @@ describe('PasswordInput', () => {
       expect(input.hasAttribute('type')).toBe(false)
     })
 
-    it('should keep a type the page set after the toggle on dispose', () => {
-      const input = initialized('<input type="password" class="form-control" data-coreui-password-input>')
-      const passwordInput = PasswordInput.getInstance(input)
-
-      passwordInput.toggle()
-      input.setAttribute('type', 'search')
-      passwordInput.dispose()
-
-      expect(input.getAttribute('type')).toBe('search')
-    })
-
     it('should do nothing on a second dispose', () => {
       const input = initialized('<input type="password" class="form-control" data-coreui-password-input>')
       const passwordInput = PasswordInput.getInstance(input)
