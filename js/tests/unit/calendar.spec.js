@@ -5597,6 +5597,21 @@ describe('Calendar', () => {
       expect(events).toEqual([['end', null]])
     })
 
+    it('should keep a range whose end has a time of day when the day after the end is disabled', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const events = []
+      new Calendar(div, { // eslint-disable-line no-new
+        calendarDate: new Date(2026, 6, 1), disabledDates: [new Date(2026, 6, 4)], endDate: new Date(2026, 6, 3, 18), range: true
+      })
+      div.addEventListener('startDateChange.coreui.calendar', event => events.push(['start', event.dateObject]))
+      div.addEventListener('endDateChange.coreui.calendar', event => events.push(['end', event.dateObject]))
+
+      div.querySelector(`td.current[data-coreui-date="${new Date(2026, 6, 1).toDateString()}"]`).click()
+
+      expect(events).toEqual([['start', new Date(2026, 6, 1)]])
+    })
+
     it('should report a day picked again', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')

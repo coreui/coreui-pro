@@ -474,6 +474,32 @@ const tryParseWithPatterns = (dateString: string, patterns: string[], includeTim
 }
 
 /**
+ * Reads the year, month and day a string starts with, in ISO order or in the
+ * locale's numeric order, without checking that they name a day.
+ *
+ * @param dateString - The trimmed string
+ * @param locale - The locale whose numeric order is tried after ISO
+ * @returns The parts as written, or `null` when the string starts with neither
+ */
+const readWrittenDay = (dateString: string, locale: string) : DateOnlyGroups | null => {
+  const iso = /^(?<year>\d{4,})-(?<month>\d{1,2})-(?<day>\d{1,2})(?!\d)/.exec(dateString)
+
+  if (iso?.groups) {
+    return iso.groups as DateOnlyGroups
+  }
+
+  for (const pattern of generateDatePatterns(locale, false)) {
+    const match = new RegExp(`^${buildDateRegexPattern(pattern, false)}(?!\\d)`).exec(dateString)
+
+    if (match?.groups) {
+      return match.groups as DateOnlyGroups
+    }
+  }
+
+  return null
+}
+
+/**
  * Converts a parsed hour to the 24-hour clock.
  *
  * @param hour - The hour as written
@@ -520,19 +546,21 @@ const validateTimeComponents = (hour: number, minute: number, second: number) : 
 }
 
 /**
- * Tells whether a parsed month and day are within range; the day is checked
- * against 31, whatever the month.
+ * Tells whether a parsed year, month and day name a day that exists: the month
+ * within 1 to 12 and the day within the length of that month, so 29 February
+ * only in a leap year.
  *
+ * @param year - The year as written
  * @param month - The month as written, 1 to 12
  * @param day - The day as written
- * @returns `true` for a month and day within range
+ * @returns `true` for a day that exists
  */
-const validateDateComponents = (month: string, day: string) : boolean => {
-  const parsedMonth = Number.parseInt(month, 10) - 1
+const validateDateComponents = (year: string, month: string, day: string) : boolean => {
+  const parsedMonth = Number.parseInt(month, 10)
   const parsedDay = Number.parseInt(day, 10)
 
   return (
-    parsedMonth >= 0 && parsedMonth <= 11 && parsedDay >= 1 && parsedDay <= 31
+    parsedMonth >= 1 && parsedMonth <= 12 && parsedDay >= 1 && parsedDay <= createDate(parseYearSmart(year), parsedMonth, 0).getDate()
   )
 }
 
@@ -540,10 +568,14 @@ const validateDateComponents = (month: string, day: string) : boolean => {
  * Builds a date with its time from parsed groups.
  *
  * @param groups - The parsed date and time parts
- * @returns The date, or `null` for an invalid time
+ * @returns The date, or `null` for an invalid time or an hour past 12 with a day period
  */
 const createDateWithTime = (groups: DateTimeGroups) : Date | null => {
   const { year, month, day, hour, minute, second, ampm } = groups
+
+  if (ampm && Number.parseInt(hour, 10) > 12) {
+    return null
+  }
 
   const parsedYear = parseYearSmart(year)
   const parsedMonth = Number.parseInt(month, 10) - 1
@@ -570,7 +602,7 @@ const createDateWithTime = (groups: DateTimeGroups) : Date | null => {
 const createDateOnly = (groups: DateOnlyGroups) : Date | null => {
   const { year, month, day } = groups
 
-  if (!validateDateComponents(month, day)) {
+  if (!validateDateComponents(year, month, day)) {
     return null
   }
 
@@ -601,7 +633,8 @@ const getExpectedPartsCount = (patterns: string[]) : number => {
  * Parses a day, and optionally its time, in the locale's numeric format
  * written with Latin digits and a Gregorian year. When no pattern of the locale
  * matches, a string with separators and at least as many parts as the locale's
- * format goes to the native date parser.
+ * format goes to the native date parser, unless it starts with a day that does
+ * not exist, in ISO order or the locale's.
  *
  * @param dateString - The string to parse
  * @param locale - The locale whose format is tried first
@@ -620,15 +653,16 @@ const parseDayString = (dateString: string, locale: string, includeTime: boolean
     const hasRequiredParts = parts.length >= expectedPartsCount
 
     if (hasDateSeparators && hasRequiredParts) {
-      return parseLocalDateString(dateString)
+      const written = readWrittenDay(trimmed, locale)
+      return written && !validateDateComponents(written.year, written.month, written.day) ? null : parseLocalDateString(dateString)
     }
 
     return null
   }
 
   if ("year" in groups && "month" in groups && "day" in groups) {
-    const { month, day } = groups
-    if (!validateDateComponents(month, day)) {
+    const { year, month, day } = groups
+    if (!validateDateComponents(year, month, day)) {
       return null
     }
   } else {
@@ -659,16 +693,17 @@ const parseLocalDateString = (dateString: string) : Date | null => {
 /**
  * Converts a value to a `Date` for a selection type: a week, a month, a
  * quarter or a year string is read as the first day of that unit, and anything
- * else as a day by `parseDayString`. A day past the end of its month rolls over
- * into the next month.
+ * else as a day by `parseDayString`. A day written in numbers that its month
+ * does not have gives `null`. A number is read as the digits it is written
+ * with, the way a `data-*` attribute gives it, so a timestamp is no date.
  *
- * @param date - The value as a `Date` or a string; `null`, `undefined` or an empty string means no date
+ * @param date - The value as a `Date`, a string or a number; `null`, `undefined` or an empty string means no date
  * @param selectionType - The unit the string names
  * @param locale - The locale whose format reads a day
  * @param includeTime - Whether a day is read with its time
  * @returns The date, or `null` for no value or an invalid or unreadable one
  */
-export const convertToDateObject = (date: Date | string | null | undefined, selectionType?: SelectionTypes, locale: string = 'en-US', includeTime: boolean = false) : Date | null => {
+export const convertToDateObject = (date: Date | number | string | null | undefined, selectionType?: SelectionTypes, locale: string = 'en-US', includeTime: boolean = false) : Date | null => {
   if (!date) {
     return null
   }
@@ -683,8 +718,9 @@ export const convertToDateObject = (date: Date | string | null | undefined, sele
     quarter: parseQuarterString,
     year: parseYearString
   }
+  const value = typeof date === 'number' ? String(date) : date
   const parse = selectionType ? parsers[selectionType] : undefined
-  const parsed = parse ? parse(date) : parseDayString(date, locale, includeTime)
+  const parsed = parse ? parse(value) : parseDayString(value, locale, includeTime)
 
   return parsed && !Number.isNaN(parsed.getTime()) ? parsed : null
 }
@@ -1884,10 +1920,9 @@ export const isDateSelected = (date: Date, start: Date | null, end: Date | null)
 /**
  * Tells whether a disabled day comes after the start of a range, where for
  * week rows and in the months, quarters and years views a day counts only when
- * its whole period is disabled. The check walks a day at a time from `startDate` while it is
- * still before `endDate`, keeping the start's time of day, so an end later in
- * the day than the start also checks the day after the end. `min` and `max`
- * are not taken into account.
+ * its whole period is disabled. The check walks the days after the start's day
+ * through the end's day, whatever the time of day of either end. `min` and
+ * `max` are not taken into account.
  *
  * @param startDate - The first day of the range
  * @param endDate - The last day of the range
@@ -1897,19 +1932,13 @@ export const isDateSelected = (date: Date, start: Date | null, end: Date | null)
  */
 export const isDisableDateInRange = (startDate?: Date | null, endDate?: Date | null, disabledDates?: DisabledDate | DisabledDate[], view: ViewTypes | 'weeks' = 'days') : boolean => {
   if (startDate && endDate) {
-    const date = new Date(startDate)
-    let disabled = false
+    const end = createDate(endDate.getFullYear(), endDate.getMonth(), endDate.getDate())
 
-    // eslint-disable-next-line no-unmodified-loop-condition
-    while (date < endDate) {
-      date.setDate(date.getDate() + 1)
+    for (let date = createDate(startDate.getFullYear(), startDate.getMonth(), startDate.getDate() + 1); date <= end; date = createDate(date.getFullYear(), date.getMonth(), date.getDate() + 1)) {
       if (isCellDisabled(date, view, null, null, disabledDates)) {
-        disabled = true
-        break
+        return true
       }
     }
-
-    return disabled
   }
 
   return false

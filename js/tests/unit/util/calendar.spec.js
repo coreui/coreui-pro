@@ -274,8 +274,26 @@ describe('Calendar Utilities', () => {
       expect(convertToDateObject(value, 'day', locale)).toEqual(new Date(year, month, day))
     })
 
-    it.each(['', '   ', 'not-a-date', '2/16', '2/32/2022', '13/16/2022'])('should return null for %j', value => {
+    it.each(['', '   ', 'not-a-date', '2/16', '2/32/2022', '13/16/2022', '2/30/2022', '2/29/2023', '4/31/2022', '2022-02-30'])('should return null for %j', value => {
       expect(convertToDateObject(value, 'day', 'en-US')).toBeNull()
+    })
+
+    it('should return null for a day its month does not have, with a time too', () => {
+      expect(convertToDateObject('2/30/2022, 10:00:00 AM', 'day', 'en-US', true)).toBeNull()
+      expect(convertToDateObject('30.02.2022', 'day', 'de-DE')).toBeNull()
+      expect(convertToDateObject('2022-02-30T10:00', 'day', 'en-US', true)).toBeNull()
+      expect(convertToDateObject('2022-03-02', 'day', 'en-US')).toEqual(new Date(2022, 2, 2))
+    })
+
+    it('should return null for an hour past 12 with a day period', () => {
+      expect(convertToDateObject('7/14/2026, 13:30:00 AM', 'day', 'en-US', true)).toBeNull()
+      expect(convertToDateObject('7/14/2026, 12:30:00 PM', 'day', 'en-US', true)).toEqual(new Date(2026, 6, 14, 12, 30))
+    })
+
+    it('should read a number as the digits it is written with', () => {
+      expect(convertToDateObject(2026, 'year')).toEqual(new Date(2026, 0, 1))
+      expect(convertToDateObject(Date.UTC(2026, 6, 14), 'day')).toBeNull()
+      expect(convertToDateObject(Date.UTC(2026, 6, 14), 'month')).toBeNull()
     })
 
     it('should keep the day when daylight saving time starts at midnight', async () => {
@@ -1474,6 +1492,13 @@ describe('Calendar Utilities', () => {
       const end = new Date(2023, 0, 5)
       const disabledDates = [new Date(2023, 0, 3)]
       expect(isDisableDateInRange(start, end, disabledDates)).toBeTrue()
+    })
+
+    it('should check the days of the range whatever the time of day of its ends', () => {
+      expect(isDisableDateInRange(new Date(2026, 6, 1, 8), new Date(2026, 6, 3, 18), [new Date(2026, 6, 4)])).toBeFalse()
+      expect(isDisableDateInRange(new Date(2026, 6, 1, 8), new Date(2026, 6, 3, 18), [new Date(2026, 6, 3)])).toBeTrue()
+      expect(isDisableDateInRange(new Date(2026, 6, 1, 18), new Date(2026, 6, 2, 8), [new Date(2026, 6, 2)])).toBeTrue()
+      expect(isDisableDateInRange(new Date(2026, 6, 1, 8), new Date(2026, 6, 3), [new Date(2026, 6, 1)])).toBeFalse()
     })
 
     it('should walk whole periods in the months, quarters and years views', () => {
