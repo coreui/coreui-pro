@@ -91,6 +91,13 @@ describe('TimeInput', () => {
       expect(timeInput._element.getAttribute('aria-label')).toEqual('Opening time')
     })
 
+    it('should keep the default name when the ariaLabel option is empty', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const timeInput = new TimeInput(fixtureEl.querySelector('div'), { ariaLabel: '' })
+
+      expect(timeInput._element.getAttribute('aria-label')).toEqual('Time input')
+    })
+
     it('should derive a meridiem section from a 12-hour locale', () => {
       fixtureEl.innerHTML = '<div></div>'
       const timeInput = new TimeInput(fixtureEl.querySelector('div'), { locale: 'en-US' })

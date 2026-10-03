@@ -327,6 +327,33 @@ describe('DateInput', () => {
       expect(element.getAttribute('aria-label')).toEqual('')
     })
 
+    it('should keep the default name when the ariaLabel option is empty', () => {
+      fixtureEl.innerHTML = '<div></div><div></div>'
+      const [dateElement, dateTimeElement] = fixtureEl.querySelectorAll('div')
+      const dateInput = new DateInput(dateElement, { ariaLabel: '', format: 'dd.MM.yyyy' })
+      const dateTimeInput = new DateInput(dateTimeElement, { ariaLabel: '', type: 'datetime' })
+
+      expect(dateElement.getAttribute('aria-label')).toEqual('Date input')
+      expect(dateTimeElement.getAttribute('aria-label')).toEqual('Date and time input')
+
+      dateInput.dispose()
+      dateTimeInput.dispose()
+    })
+
+    it('should fall back to the default name the page set for an empty ariaLabel', () => {
+      const { ariaLabel } = DateInput.Default
+      DateInput.Default.ariaLabel = 'Datum'
+
+      try {
+        fixtureEl.innerHTML = '<div></div>'
+        const dateInput = new DateInput(fixtureEl.querySelector('div'), { ariaLabel: '', format: 'dd.MM.yyyy' })
+
+        expect(dateInput._element.getAttribute('aria-label')).toEqual('Datum')
+      } finally {
+        DateInput.Default.ariaLabel = ariaLabel
+      }
+    })
+
     it('should keep the aria-labelledby the page wrote', () => {
       fixtureEl.innerHTML = '<span id="birth-label">Birth date</span><div aria-labelledby="birth-label"></div>'
       const element = fixtureEl.querySelector('div')

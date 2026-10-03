@@ -353,7 +353,7 @@ abstract class SectionInput extends BaseComponent {
 
   // Private
   _getAriaLabel(): string {
-    return this._config.ariaLabel
+    return this._config.ariaLabel || this.constructor.Default.ariaLabel
   }
 
   _convertDate(value: any): Date | null {
