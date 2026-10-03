@@ -329,7 +329,7 @@ abstract class SectionInput extends BaseComponent {
       return
     }
 
-    this._config = this._getConfig({ ...this._config, ...config })
+    this._config = this._getConfig({ ...this._config, date: getDateFromSections(this._sections), ...config })
     this._applyConfig()
     this._createSectionInput()
     this._commitSections()
