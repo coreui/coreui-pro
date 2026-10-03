@@ -788,7 +788,6 @@ class MultiSelect extends ComboboxBase {
     this._element.setAttribute('aria-hidden', 'true')
   }
 
-  // Name the combobox toggler the way the replaced native select was named.
   _wireTogglerAccessibleName(): void {
     const labelledBy = this._element.getAttribute('aria-labelledby')
     const ariaLabel = this._element.getAttribute('aria-label')
