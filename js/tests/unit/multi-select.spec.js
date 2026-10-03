@@ -5281,6 +5281,15 @@ describe('MultiSelect', () => {
       expect(referrers.map(element => element.getAttribute('aria-controls'))).toEqual([null, null])
     })
 
+    it('should point the toggler at its own dialog when the page already uses the select id with -dialog', () => {
+      fixtureEl.innerHTML = '<div id="test-select-dialog"></div><select id="test-select"></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { options: [{ value: '1', text: 'One' }] })
+
+      multiSelect.show()
+
+      expect(document.getElementById(multiSelect._togglerElement.getAttribute('aria-controls'))).toBe(multiSelect._menu)
+    })
+
     it('should keep a moved list inside its panel, with no aria-owns', () => {
       fixtureEl.innerHTML = '<select id="test-select"></select>'
       const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { container: 'body', options: [{ value: '1', text: 'One' }] })
