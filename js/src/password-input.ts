@@ -69,6 +69,7 @@ class PasswordInput extends BaseComponent {
   private _group: ControlGroup | null = null
   private _hostType: string | null = null
   private _toggleElement: HTMLButtonElement | null = null
+  private _toggledType: string | null = null
 
   constructor(element: string | Element, config?: Partial<PasswordInputConfig>) {
     super(element, config)
@@ -94,10 +95,15 @@ class PasswordInput extends BaseComponent {
   // Public
   toggle(): any {
     this._element.type = this._element.type === 'password' ? 'text' : 'password'
+    this._toggledType = this._element.getAttribute('type')
     this._updateToggleState()
   }
 
   override dispose(): void {
+    if (!this._element) {
+      return
+    }
+
     if (this._toggleElement) {
       EventHandler.off(this._toggleElement, EVENT_KEY)
       this._toggleElement.remove()
@@ -108,10 +114,12 @@ class PasswordInput extends BaseComponent {
       releaseControlGroup(this._element, this._group)
     }
 
-    if (this._hostType === null) {
-      this._element.removeAttribute('type')
-    } else {
-      this._element.setAttribute('type', this._hostType)
+    if (this._element.getAttribute('type') === this._toggledType) {
+      if (this._hostType === null) {
+        this._element.removeAttribute('type')
+      } else {
+        this._element.setAttribute('type', this._hostType)
+      }
     }
 
     super.dispose()
