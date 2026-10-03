@@ -667,6 +667,48 @@ describe('RangeSlider', () => {
 
       expect(inputsOf(element)[0].hasAttribute('aria-label')).toBeFalse()
     })
+
+    it('should name every handle after the label the element points at, then its own name', () => {
+      const { element } = mount({ value: [20, 80] }, 'aria-labelledby="budgetLabel"')
+      const inputs = inputsOf(element)
+
+      expect(inputs.map(input => input.getAttribute('aria-labelledby'))).toEqual(inputs.map(input => `budgetLabel ${input.id}`))
+      expect(inputs.every(input => input.id !== '')).toBeTrue()
+      expect(inputs.map(input => input.getAttribute('aria-label'))).toEqual(['Minimum value', 'Maximum value'])
+      expect(element.hasAttribute('aria-labelledby')).toBeFalse()
+    })
+
+    it('should put the aria-label of the element in front of every handle name', () => {
+      const { element } = mount({ ariaLabel: ['Minimum', 'Maximum'], value: [20, 80] }, 'aria-label="Budget"')
+
+      expect(inputsOf(element).map(input => input.getAttribute('aria-label'))).toEqual(['Budget Minimum', 'Budget Maximum'])
+      expect(inputsOf(element).some(input => input.hasAttribute('aria-labelledby'))).toBeFalse()
+      expect(element.hasAttribute('aria-label')).toBeFalse()
+    })
+
+    it('should name a single handle with the label of the element', () => {
+      const { element } = mount({ value: 40 }, 'aria-labelledby="volumeLabel"')
+      expect(inputsOf(element)[0].getAttribute('aria-labelledby')).toEqual('volumeLabel')
+
+      const { element: named } = mount({ value: 40 }, 'aria-label="Volume"')
+      expect(inputsOf(named)[0].getAttribute('aria-label')).toEqual('Volume')
+    })
+
+    it('should describe every handle with the description of the element', () => {
+      const { element } = mount({ value: [20, 80] }, 'aria-describedby="budgetHelp"')
+
+      expect(inputsOf(element).map(input => input.getAttribute('aria-describedby'))).toEqual(['budgetHelp', 'budgetHelp'])
+      expect(element.hasAttribute('aria-describedby')).toBeFalse()
+    })
+
+    it('should keep naming the handles after setConfig', () => {
+      const { element, rangeSlider } = mount({ value: [20, 80] }, 'aria-label="Budget" aria-describedby="budgetHelp"')
+
+      rangeSlider.setConfig({ value: [10, 50, 90] })
+
+      expect(inputsOf(element).map(input => input.getAttribute('aria-label'))).toEqual(['Budget Value 1', 'Budget Value 2', 'Budget Value 3'])
+      expect(inputsOf(element).every(input => input.getAttribute('aria-describedby') === 'budgetHelp')).toBeTrue()
+    })
   })
 
   describe('events', () => {
@@ -824,6 +866,16 @@ describe('RangeSlider', () => {
       expect(Range.getInstance(wrapper)).toBeNull()
       expect(element.className).toEqual('')
       expect([...element.children].map(child => child.className)).toEqual(['note'])
+    })
+
+    it('should give the element back its label and description', () => {
+      const { element, rangeSlider } = mount({ value: [20, 80] }, 'aria-label="Budget" aria-labelledby="budgetLabel" aria-describedby="budgetHelp"')
+
+      rangeSlider.dispose()
+
+      expect(element.getAttribute('aria-label')).toEqual('Budget')
+      expect(element.getAttribute('aria-labelledby')).toEqual('budgetLabel')
+      expect(element.getAttribute('aria-describedby')).toEqual('budgetHelp')
     })
   })
 
