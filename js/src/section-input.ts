@@ -585,6 +585,7 @@ abstract class SectionInput extends BaseComponent {
   }
 
   _clearAndFocus(): HTMLElement {
+    this._setAllSelected(false)
     this.clear()
     const [firstSection] = this._getSectionElements()
     firstSection.focus()
