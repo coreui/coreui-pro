@@ -91,6 +91,12 @@ describe('DateRangeInput', () => {
       expect(fields().map(field => field.getAttribute('aria-label'))).toEqual(['Start date', 'End date'])
     })
 
+    it('should name an end by the date field default when its label is empty', () => {
+      build({ ariaStartLabel: '', ariaEndLabel: '' })
+
+      expect(fields().map(field => field.getAttribute('aria-label'))).toEqual(['Date input', 'Date input'])
+    })
+
     it('should remove the floating-label fields it built on dispose', () => {
       const range = build({ startFloatingLabel: 'Check-in', endFloatingLabel: 'Check-out' })
 

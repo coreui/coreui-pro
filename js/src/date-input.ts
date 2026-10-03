@@ -65,9 +65,9 @@ class DateInput extends SectionInput {
 
   // Private
   override _getAriaLabel(): string {
-    return this._config.ariaLabel === ARIA_LABEL_DATE && this._config.type === 'datetime' ?
-      ARIA_LABEL_DATE_TIME :
-      this._config.ariaLabel
+    const ariaLabel = super._getAriaLabel()
+
+    return ariaLabel === ARIA_LABEL_DATE && this._config.type === 'datetime' ? ARIA_LABEL_DATE_TIME : ariaLabel
   }
 
   override _convertDate(value: any): Date | null {
