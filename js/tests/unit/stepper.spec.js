@@ -241,7 +241,7 @@ describe('Stepper', () => {
       const panes = fixtureEl.querySelectorAll('.stepper-pane')
       expect(panes[0].getAttribute('role')).toBe('tabpanel')
       expect(panes[0].getAttribute('aria-labelledby')).toBe(buttons[0].id)
-      expect(panes[0].getAttribute('aria-live')).toBe('polite')
+      expect(panes[0].hasAttribute('aria-live')).toBeFalse()
     })
 
     it('should drop the tab pattern when the steps own their content', () => {
@@ -584,6 +584,45 @@ describe('Stepper', () => {
   })
 
   describe('next()', () => {
+    it('should move focus to the new step when focus was in the stepper', () => {
+      fixtureEl.innerHTML = getThreeStepFixture()
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      const action = document.createElement('button')
+      fixtureEl.querySelector('#step1').append(action)
+
+      action.focus()
+      stepper.next()
+
+      expect(document.activeElement).toEqual(fixtureEl.querySelectorAll('.stepper-step-button')[1])
+    })
+
+    it('should move focus to the new step when focus was in the step content', () => {
+      fixtureEl.innerHTML = getStepContentFixture()
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      const action = document.createElement('button')
+      fixtureEl.querySelector('.stepper-step-content').append(action)
+
+      action.focus()
+      stepper.next()
+
+      expect(document.activeElement).toEqual(fixtureEl.querySelectorAll('.stepper-step-button')[1])
+    })
+
+    it('should leave focus where it is when the step changes from outside', () => {
+      fixtureEl.innerHTML = `${getThreeStepFixture()}<button type="button" id="outside">Outside</button>`
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      const outside = fixtureEl.querySelector('#outside')
+
+      outside.focus()
+      stepper.next()
+
+      expect(fixtureEl.querySelectorAll('.stepper-step-button')[1]).toHaveClass('active')
+      expect(document.activeElement).toEqual(outside)
+    })
+
     it('should move to next step', () => {
       fixtureEl.innerHTML = getThreeStepFixture()
       const stepperElement = fixtureEl.querySelector('.stepper')
@@ -856,6 +895,33 @@ describe('Stepper', () => {
   })
 
   describe('reset()', () => {
+    it('should move focus to the first step when focus was in the stepper', () => {
+      fixtureEl.innerHTML = getThreeStepFixture()
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      const action = document.createElement('button')
+      fixtureEl.querySelector('#step3').append(action)
+
+      stepper.showStep(3)
+      action.focus()
+      stepper.reset()
+
+      expect(document.activeElement).toEqual(fixtureEl.querySelectorAll('.stepper-step-button')[0])
+    })
+
+    it('should leave focus where it is when reset from outside', () => {
+      fixtureEl.innerHTML = `${getThreeStepFixture()}<button type="button" id="outside">Outside</button>`
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      const outside = fixtureEl.querySelector('#outside')
+
+      stepper.showStep(3)
+      outside.focus()
+      stepper.reset()
+
+      expect(document.activeElement).toEqual(outside)
+    })
+
     it('should reset to initial state', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = getThreeStepFixture()

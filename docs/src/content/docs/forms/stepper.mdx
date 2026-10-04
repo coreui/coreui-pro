@@ -540,7 +540,7 @@ The CoreUI Stepper Component is built with accessibility in mind:
 - **When the steps hold their own `.stepper-step-content`, the stepper is a list of expandable steps instead.** A tablist cannot own the form controls of the open step, so none of the tab roles are written: the list stays a list, each step stays a list item, and the buttons carry `aria-expanded` rather than `aria-selected`.
 - In the tab set, each step button is assigned `role="tab"` and attributes like `aria-selected`, `aria-controls` and `tabindex`, and its `.stepper-step` wrapper is marked `role="presentation"` so the tabs stay direct children of the list in the accessibility tree.
 - Step contents (`stepper-pane`) use `role="tabpanel"` and are properly linked to their trigger buttons.
-- Live updates are announced to screen readers with `aria-live="polite"`.
+- When the step changes while focus is inside the stepper, for example on a **Next** button in the pane, focus moves to the new step's button, so a screen reader reads which step the user is on. A step changed from outside the stepper leaves focus where it is.
 - Keyboard navigation is fully supported
 
 Thanks to these features, your form wizard will be fully compliant with WCAG and modern accessibility standards without additional work.

@@ -154,11 +154,16 @@ class Stepper extends BaseComponent {
     const index = this._stepButtons.indexOf(button) + 1
     EventHandler.trigger(this._element, EVENT_STEP_CHANGE, { index })
 
+    const holdsFocus = this._holdsFocus()
     this._activeStepButton = button
     this._deactivate(active)
     this._activate(button)
     this._updateStepButtonsDisabledState()
     this._complete(button)
+
+    if (holdsFocus) {
+      button.focus()
+    }
   }
 
   next(): void {
@@ -243,6 +248,8 @@ class Stepper extends BaseComponent {
       return
     }
 
+    const holdsFocus = this._holdsFocus()
+
     for (const pane of SelectorEngine.find(SELECTOR_STEPPER_PANE, this._element as ParentNode)) {
       pane.classList.remove(CLASS_NAME_ACTIVE, CLASS_NAME_SHOW)
       pane.setAttribute('aria-hidden', 'true')
@@ -288,6 +295,11 @@ class Stepper extends BaseComponent {
     this._activeStepButton = firstStep
     this._isFinished = false
     this._updateStepButtonsDisabledState()
+
+    if (holdsFocus) {
+      firstStep.focus()
+    }
+
     EventHandler.trigger(this._element, EVENT_RESET)
   }
 
@@ -318,6 +330,10 @@ class Stepper extends BaseComponent {
 
   _elemIsActive(elem: HTMLElement): boolean {
     return elem.classList.contains(CLASS_NAME_ACTIVE)
+  }
+
+  _holdsFocus(): boolean {
+    return this._element.contains(document.activeElement)
   }
 
   _isCurrentStepValid(element: any): boolean {
@@ -616,7 +632,6 @@ class Stepper extends BaseComponent {
         }
 
         pane.setAttribute('aria-labelledby', stepButton.id)
-        pane.setAttribute('aria-live', 'polite')
         pane.setAttribute('aria-hidden', !this._elemIsActive(stepButton) as any)
       }
 

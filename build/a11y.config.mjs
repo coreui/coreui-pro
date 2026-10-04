@@ -706,7 +706,7 @@ export const a11yComponents = [
       {
         criterion: '4.1.3',
         status: 'built-in',
-        note: 'Step panes are aria-live=polite, so step changes are announced without moving focus.'
+        note: 'A step change made from inside the stepper moves focus to the new step button, so the step is read without a live region; the panes are not aria-live.'
       }
     ]
   },
