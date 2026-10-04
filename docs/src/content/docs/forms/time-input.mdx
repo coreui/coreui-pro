@@ -82,7 +82,7 @@ Set the initial time with the `data-coreui-date` attribute — a time string lik
 
 ## Min and max times
 
-Constrain the selectable range with `minDate` and `maxDate` — time strings work here too. A completed time outside the range gets the `.is-invalid` class and the component reports `null` until the value is corrected.
+Constrain the selectable range with `minDate` and `maxDate` — time strings work here too. A completed time outside the range gets the `.is-invalid` class and the component reports `null`, and submits no time, until the value is corrected.
 
 <Example pro code={`<label class="form-label" id="timeInputBusinessHours09001700Label">Business hours (09:00–17:00)</label>
   <div class="form-control form-date-time" data-coreui-time-input data-coreui-format="HH:mm" data-coreui-date="09:30"
