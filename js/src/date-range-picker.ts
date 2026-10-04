@@ -13,7 +13,6 @@ import SelectorEngine from './dom/selector-engine.js'
 import type { SectionInputConfig } from './section-input.js'
 import { captureHostClasses } from './util/form-control-group.js'
 import { getDateBySelectionType, isSameInstantAs, type SelectionTypes } from './util/calendar.js'
-import type { ComponentConfig } from './util/config.js'
 import { getPickerFormat } from './util/date-sections.js'
 import {
   CALENDAR_ICON, CLEANER_ICON, SEPARATOR_ICON, SEPARATOR_ICON_RTL
@@ -79,6 +78,8 @@ type DateRangePickerConfig = {
   startFloatingLabel: string | null,
   startName: string | null
 }
+
+type DateRangePickerOptions = Partial<DateRangePickerConfig> & Partial<Omit<CalendarConfig & DateRangeInputConfig, keyof DateRangePickerConfig>>
 
 const Default: DateRangePickerConfig = {
   allowList: SVGAllowlist,
@@ -161,7 +162,7 @@ class DateRangePicker extends PickerBase {
   protected declare _calendarElement: any
   protected declare _selectEndDate: any
 
-  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
+  constructor(element?: string | Element | null, config?: DateRangePickerOptions | null) {
     super(element, config)
 
     this._rangesTemplate = SelectorEngine.findOne(SELECTOR_TEMPLATE_RANGES, this._element)

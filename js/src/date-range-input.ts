@@ -6,12 +6,11 @@
  */
 
 import BaseComponent from './base-component.js'
-import DateInput from './date-input.js'
+import DateInput, { type DateInputConfig } from './date-input.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { type DisabledDate, isSameInstantAs } from './util/calendar.js'
 import { getForwardedOptions } from './util/composite.js'
-import type { ComponentConfig } from './util/config.js'
 import { hasShortcutModifier, type SectionFormat } from './util/date-sections.js'
 import {
   appendControlGroupField,
@@ -108,6 +107,8 @@ type DateRangeInputConfig = {
   weekPlaceholder: string | null
   yearPlaceholder: string | null
 }
+
+type DateRangeInputOptions = Partial<DateRangeInputConfig> & Partial<Omit<DateInputConfig, keyof DateRangeInputConfig>>
 
 const Default: DateRangeInputConfig = {
   allowList: SVGAllowlist,
@@ -240,7 +241,7 @@ class DateRangeInput extends BaseComponent {
   protected declare _endDate: Date | null
   protected declare _applying: boolean
 
-  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
+  constructor(element?: string | Element | null, config?: DateRangeInputOptions | null) {
     super(element, config)
 
     this._createdElements = []

@@ -9,7 +9,6 @@
  */
 
 import BaseComponent from './base-component.js'
-import type { ComponentConfig } from './util/config.js'
 import EventHandler, { type CoreUIEvent } from './dom/event-handler.js'
 import { enableDismissTrigger } from './util/component-functions.js'
 import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
@@ -62,7 +61,7 @@ class Toast extends BaseComponent {
   protected declare _hasMouseInteraction: boolean
   protected declare _hasKeyboardInteraction: boolean
 
-  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
+  constructor(element?: string | Element | null, config?: Partial<ToastConfig> | null) {
     super(element, config)
 
     this._timeout = null

@@ -6,7 +6,6 @@
  */
 
 import BaseComponent from './base-component.js'
-import type { ComponentConfig } from './util/config.js'
 import Chip from './chip.js'
 import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
@@ -127,7 +126,7 @@ class ChipSet extends BaseComponent {
   protected declare _search: string
   protected declare _searchTimeout: ReturnType<typeof setTimeout> | null
 
-  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
+  constructor(element?: string | Element | null, config?: Partial<ChipSetConfig> | null) {
     super(element, config)
 
     this._addedAttributes = HOST_ATTRIBUTES.filter(name => !this._element.hasAttribute(name))

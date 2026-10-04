@@ -9,9 +9,9 @@ import PickerBase from './picker-base.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import TimeInput, { type TimeInputConfig } from './time-input.js'
+import type { TimeSelectionConfig } from './time-selection/base.js'
 import TimeRoll from './time-selection/roll.js'
 import { type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
-import type { ComponentConfig } from './util/config.js'
 import { getHourCycle } from './util/date-sections.js'
 import {
   appendControlGroupField,
@@ -66,6 +66,8 @@ type TimePickerConfig = {
   size: string | null,
   time: Date | string | null
 }
+
+type TimePickerOptions = Partial<TimePickerConfig> & Partial<Omit<TimeInputConfig & TimeSelectionConfig, keyof TimePickerConfig>>
 
 const Default: TimePickerConfig = {
   allowList: SVGAllowlist,
@@ -125,7 +127,7 @@ class TimePicker extends PickerBase {
   protected declare _applying: number
   protected declare _time: Date | null
 
-  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
+  constructor(element?: string | Element | null, config?: TimePickerOptions | null) {
     super(element, config)
 
     this._initialTime = config?.time ?? this._config.time

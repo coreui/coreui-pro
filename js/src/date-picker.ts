@@ -11,13 +11,13 @@ import DateInput, { type DateInputConfig } from './date-input.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import type { SectionInputConfig } from './section-input.js'
+import type { TimeSelectionConfig } from './time-selection/base.js'
 import TimeSelects from './time-selection/selects.js'
 import {
   getDateBySelectionType,
   isSameInstantAs,
   type SelectionTypes
 } from './util/calendar.js'
-import type { ComponentConfig } from './util/config.js'
 import {
   constrainDateTime, convertValue, getHourCycle, getPickerFormat
 } from './util/date-sections.js'
@@ -89,6 +89,8 @@ type DatePickerConfig = {
   size: string | null,
   timepicker: boolean
 }
+
+type DatePickerOptions = Partial<DatePickerConfig> & Partial<Omit<CalendarConfig & DateInputConfig & TimeSelectionConfig, keyof DatePickerConfig>>
 
 const Default: DatePickerConfig = {
   allowList: SVGAllowlist,
@@ -165,7 +167,7 @@ class DatePicker extends PickerBase {
   protected declare _selectionElement: any
   protected declare _applying: boolean
 
-  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
+  constructor(element?: string | Element | null, config?: DatePickerOptions | null) {
     super(element, config)
 
     this._initialDate = config?.date ?? this._config.date

@@ -31,7 +31,24 @@ const EVENT_KEY = '.coreui.time-selection'
 const EVENT_FOCUSIN = `focusin${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 
-const Default = {
+type TimeSelectionConfig = {
+  ariaSelectHoursLabel: string,
+  ariaSelectMeridiemLabel: string,
+  ariaSelectMinutesLabel: string,
+  ariaLabel: string,
+  ariaSelectSecondsLabel: string,
+  hourCycle: string | null,
+  hours: number[] | ((hour: number) => boolean) | null,
+  locale: string,
+  maxDate: Date | string | null,
+  minDate: Date | string | null,
+  minutes: number[] | boolean | ((minute: number) => boolean),
+  onChange: ((...args: any[]) => void) | null,
+  seconds: number[] | boolean | ((second: number) => boolean),
+  time: Date | null
+}
+
+const Default: TimeSelectionConfig = {
   ariaSelectHoursLabel: 'Select hours',
   ariaSelectMeridiemLabel: 'Select AM/PM',
   ariaSelectMinutesLabel: 'Select minutes',
@@ -71,14 +88,14 @@ const DefaultType = {
 
 class TimeSelection extends Config {
   protected declare _element: HTMLElement | null
-  protected declare _config: typeof Default
+  protected declare _config: TimeSelectionConfig
   protected declare _partials: any
   protected declare _date: Date | null
   protected declare _ampm: string
   protected declare _maxDate: Date | null
   protected declare _minDate: Date | null
 
-  constructor(element?: string | Element | null, config?: Partial<typeof Default> | null) {
+  constructor(element?: string | Element | null, config?: Partial<TimeSelectionConfig> | null) {
     super()
     this._element = element as HTMLElement
     this._config = this._getConfig(config) as typeof Default
@@ -342,3 +359,4 @@ class TimeSelection extends Config {
 }
 
 export default TimeSelection
+export type { TimeSelectionConfig }

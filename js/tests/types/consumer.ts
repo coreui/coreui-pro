@@ -11,7 +11,8 @@
 // type that does not survive declaration emit.
 
 import {
-  Alert, Calendar, Chip, ChipSet, DateInput, DatePicker, Modal, MultiSelect, Popover, Toast, Tooltip
+  Alert, Calendar, Chip, ChipSet, Combobox, DateInput, DatePicker, DateRangeInput, DateRangePicker, ListBox, Menu, Modal,
+  MultiSelect, Popover, Range, RangeSlider, TimeInput, TimePicker, Toast, Toaster, Tooltip, Transfer
 } from '../../dist/index.js'
 import type { CalendarConfig } from '../../dist/calendar.js'
 import type { DateInputConfig } from '../../dist/date-input.js'
@@ -133,11 +134,66 @@ const chipSet = new ChipSet(element, { removable: true })
 const values: string[] = chipSet.getValues()
 const chip: Chip | null = Chip.getInstance(element)
 
+// A component with a config type takes only its own options, through the
+// constructor, getOrCreateInstance and setConfig alike.
+const unknownOptions = [
+  // @ts-expect-error — not a chip option
+  new Chip(element, { removeable: true }),
+  // @ts-expect-error — not a chip set option
+  new ChipSet(element, { removeable: true }),
+  // @ts-expect-error — not a combobox option
+  new Combobox(element, { searchable: true }),
+  // @ts-expect-error — not a date input option
+  new DateInput(element, { formatt: 'dd.MM.yyyy' }),
+  // @ts-expect-error — not a list box option
+  new ListBox(element, { multi: true }),
+  // @ts-expect-error — not a menu option
+  new Menu(element, { autoclose: true }),
+  // @ts-expect-error — not a popover option
+  new Popover(element, { contents: 'Hello' }),
+  // @ts-expect-error — not a range option
+  new Range(element, { steps: 5 }),
+  // @ts-expect-error — not a range slider option
+  new RangeSlider(element, { steps: 5 }),
+  // @ts-expect-error — not a time input option
+  new TimeInput(element, { second: true }),
+  // @ts-expect-error — not a toast option
+  new Toast(element, { autoHide: false }),
+  // @ts-expect-error — not a toaster option
+  new Toaster(element, { position: 'top' }),
+  // @ts-expect-error — not a tooltip option
+  new Tooltip(element, { titel: 'Hello' }),
+  // @ts-expect-error — not a transfer option
+  new Transfer(element, { searchable: true }),
+  // @ts-expect-error — getOrCreateInstance takes the constructor's options
+  Tooltip.getOrCreateInstance(element, { titel: 'Hello' }),
+  // @ts-expect-error — and so does a field's setConfig
+  new TimeInput(element).setConfig({ second: true })
+]
+
+// A composite also takes the options of the parts it forwards them to.
+const forwardedOptions = [
+  new DatePicker(element, { ariaDayLabel: 'Tag', firstDayOfWeek: 0, hours: [9, 10] }),
+  new DateRangePicker(element, { ariaDayLabel: 'Tag', firstDayOfWeek: 0 }),
+  new DateRangeInput(element, { ariaDayLabel: 'Tag', monthNames: null }),
+  new TimePicker(element, { ariaSelectHoursLabel: 'Stunden', hours: [9, 10] }),
+  DatePicker.getOrCreateInstance(element, { firstDayOfWeek: 0 }),
+  // @ts-expect-error — not an option of the picker or of its parts
+  new DatePicker(element, { firstDayOfWek: 0 }),
+  // @ts-expect-error — the range input forwards to date inputs, not to a calendar
+  new DateRangeInput(element, { firstDayOfWeek: 0 }),
+  // @ts-expect-error — the range picker forwards to the range input, not to a date input
+  new DateRangePicker(element, { hours: [9, 10] }),
+  // @ts-expect-error — the time picker has no calendar
+  new TimePicker(element, { firstDayOfWeek: 0 })
+]
+
 export {
-  alert, calendarConfig, chip, chipSet, closing, datePicker, dayFormatFunction, disabledDatesString, formatTypo,
+  alert, calendarConfig, chip, chipSet, closing, datePicker, dayFormatFunction, disabledDatesString, formatTypo, forwardedOptions,
   inputConfigs, inputTypeTypo, instance, localeLayout, modalHiding, nestedTypo, modalShowing, modalToggling,
   monthFormatTypo, multiSelect, name, nullDate, orCreated,
   pickerConfig, popoverShowing, popupShown, popupShownText, pressRatio, rangeInputTypeTypo, rangePickerConfig, sanitizedValue,
-  selection, stepTypo, timePickerConfig, toast, toastShowing, tooltipToggling, typoCalendar, typoConfig, unroundedValue, unsetDate, unsetFormat, values, version,
+  selection, stepTypo, timePickerConfig, toast, toastShowing, tooltipToggling, typoCalendar, typoConfig, unknownOptions, unroundedValue, unsetDate,
+  unsetFormat, values, version,
   weekdayFormatTypo, wrongResolution
 }

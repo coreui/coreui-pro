@@ -34,7 +34,6 @@ import {
   isTypedKey,
   setSectionsFromDate
 } from './util/date-sections.js'
-import type { ComponentConfig } from './util/config.js'
 import type { DateSection, EditableSection, SectionFormat } from './util/date-sections.js'
 import { captureHostClasses, type HostClasses, restoreHostClasses } from './util/form-control-group.js'
 import { getNextActiveElement, isRTL } from './util/index.js'
@@ -208,7 +207,7 @@ const DefaultPlaceholders = {
  * Class definition
  */
 
-abstract class SectionInput extends BaseComponent {
+abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> extends BaseComponent {
   declare ['constructor']: typeof SectionInput & typeof BaseComponent
   protected declare _date: Date | null
   protected declare _minDate: Date | null
@@ -234,7 +233,7 @@ abstract class SectionInput extends BaseComponent {
   protected declare _submitted: boolean
   protected declare _submittedSinceReset: boolean
 
-  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
+  constructor(element?: string | Element | null, config?: Partial<C> | null) {
     super(element, config)
 
     this._applyConfig()
@@ -327,7 +326,7 @@ abstract class SectionInput extends BaseComponent {
     return normalized !== null && this._getValidationError(normalized, true) === null
   }
 
-  setConfig(config: ComponentConfig | null): void {
+  setConfig(config: Partial<C> | null): void {
     if (typeof config !== 'object') {
       return
     }

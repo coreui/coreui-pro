@@ -49,7 +49,7 @@ const DefaultType: Record<string, string> = {
  * Class definition
  */
 
-class DateInput extends SectionInput {
+class DateInput extends SectionInput<DateInputConfig> {
   // Getters
   static override get Default(): typeof Default {
     return Default
