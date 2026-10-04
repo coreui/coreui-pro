@@ -1663,6 +1663,14 @@ describe('DateInput', () => {
       expect(element.classList.contains('is-invalid')).toBeTrue()
       expect(element.getAttribute('aria-invalid')).toEqual('true')
       expect(dateInput.getDate()).toBeNull()
+
+      const [day] = getSections(element)
+      day.focus()
+      day.blur()
+
+      expect(dateInput.getDate().getFullYear()).toBe(1)
+      expect(errors.at(-1)).toBeNull()
+      expect(element.classList.contains('is-invalid')).toBeFalse()
     })
 
     it('should answer whether a date would pass validation', () => {
