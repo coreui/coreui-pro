@@ -1,4 +1,5 @@
 import { vi } from 'vitest'
+import Modal from '../../src/modal.js'
 import Toaster from '../../src/toaster.js'
 import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
 
@@ -10,13 +11,14 @@ describe('Toaster', () => {
     fixtureEl = getFixture()
   })
 
-  afterEach(() => {
+  afterEach(async () => {
     if (toaster && toaster._element) {
       toaster.dispose()
     }
 
     toaster = null
     clearFixture()
+    await Promise.resolve()
 
     for (const announcer of document.querySelectorAll('[data-coreui-live-announcer]')) {
       announcer.remove()
@@ -274,6 +276,33 @@ describe('Toaster', () => {
       } finally {
         dialog.close()
       }
+    })
+
+    it('should announce a toast added once a modal has hidden, after focus has settled', async () => {
+      fixtureEl.innerHTML = '<dialog class="modal"><div class="modal-dialog"><div class="modal-content"><button type="button">Close</button></div></div></dialog>'
+      const modalEl = fixtureEl.querySelector('.modal')
+      const modal = new Modal(modalEl)
+      toaster = new Toaster()
+      toaster.add({ description: 'Before', instant: true })
+      await vi.waitFor(() => {
+        expect(messages('polite')).toEqual(['Before'])
+      })
+      await modal.show()
+
+      modalEl.addEventListener('hidden.coreui.modal', () => {
+        toaster.add({ description: 'Saved', instant: true })
+      }, { once: true })
+      await modal.hide()
+      await new Promise(resolve => {
+        setTimeout(resolve, 400)
+      })
+      expect(messages('polite')).toEqual(['Before'])
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 200)
+      })
+      expect(messages('polite')).toEqual(['Before', 'Saved'])
+      modal.dispose()
     })
 
     it('should announce inside an open modal dialog, which leaves the toaster inert', async () => {

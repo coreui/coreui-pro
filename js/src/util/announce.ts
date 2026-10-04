@@ -15,6 +15,8 @@ type Message = {
 }
 
 const ATTRIBUTE = 'data-coreui-live-announcer'
+const CLASS_NAME_HIDING = 'hiding'
+const CLOSE_DELAY = 500
 const FIRST_MESSAGE_DELAY = 100
 const PRIORITIES: AnnouncePriority[] = ['assertive', 'polite']
 
@@ -31,6 +33,7 @@ const VISUALLY_HIDDEN: Partial<CSSStyleDeclaration> = {
   width: '1px'
 }
 
+const holds = new WeakMap<Element, number>()
 const readyAt = new WeakMap<Element, number>()
 const pending: Message[] = []
 
@@ -56,6 +59,21 @@ const getModal = (context: Element | null): HTMLDialogElement | null => {
 }
 
 /**
+ * Tells when new regions of a host can take a message: 100 ms from now, or later while a dialog
+ * that closed less than 500 ms ago holds the host. A hold further away than that comes from
+ * another clock, such as a test's, and is ignored.
+ *
+ * @param host - `document.body` or an open modal dialog
+ * @returns The time, on the `performance.now()` clock, the first message can be added
+ */
+const getReadyTime = (host: HTMLElement): number => {
+  const now = performance.now()
+  const hold = holds.get(host) ?? 0
+
+  return Math.max(now + FIRST_MESSAGE_DELAY, hold - now <= CLOSE_DELAY ? hold : 0)
+}
+
+/**
  * Returns the live regions a host carries, creating them when it has none. Regions this copy of
  * the util has not seen yet count as new, and regions in a dialog leave with it when it closes.
  *
@@ -67,7 +85,7 @@ const getAnnouncer = (host: HTMLElement): HTMLElement => {
 
   if (existing) {
     if (!readyAt.has(existing)) {
-      readyAt.set(existing, performance.now() + FIRST_MESSAGE_DELAY)
+      readyAt.set(existing, getReadyTime(host))
     }
 
     return existing
@@ -99,15 +117,42 @@ const getAnnouncer = (host: HTMLElement): HTMLElement => {
     host.addEventListener('close', onClose)
   }
 
-  readyAt.set(announcer, performance.now() + FIRST_MESSAGE_DELAY)
+  readyAt.set(announcer, getReadyTime(host))
 
   return announcer
 }
 
 /**
+ * Holds the host that takes over when a dialog closes for 500 ms: focus moves back to the page
+ * then, and a screen reader following it drops a message added at that moment. The observer
+ * reports the close before a queued insertion runs.
+ *
+ * @param records - The changes of the `open` attribute
+ */
+const holdAfterClose = (records: MutationRecord[]): void => {
+  if (!records.some(record => record.target.nodeName === 'DIALOG' && !(record.target as HTMLDialogElement).open)) {
+    return
+  }
+
+  const host = getModal(null) ?? document.body
+  const until = performance.now() + CLOSE_DELAY
+  const announcer = host.querySelector(`:scope > [${ATTRIBUTE}]`)
+  holds.set(host, until)
+
+  if (announcer && readyAt.has(announcer)) {
+    readyAt.set(announcer, Math.max(readyAt.get(announcer)!, until))
+  }
+
+  if (pending.length > 0) {
+    setTimeout(flush, CLOSE_DELAY)
+  }
+}
+
+/**
  * Adds the waiting messages to their regions in the order they came in. Each goes to the page or
- * to the modal dialog open at that moment, and a region younger than 100 ms holds the queue until
- * it is ready. A message that waited for page regions removed since is dropped with them.
+ * to the modal dialog open at that moment. The queue holds while that dialog, or the dialog holding
+ * focus, plays its closing transition, for 500 ms after a dialog closes, and while a region is
+ * younger than 100 ms. A message that waited for page regions removed since is dropped with them.
  */
 const flush = (): void => {
   while (pending.length > 0) {
@@ -118,7 +163,14 @@ const flush = (): void => {
       continue
     }
 
-    const announcer = getAnnouncer(getModal(context) ?? document.body)
+    const modal = getModal(context)
+
+    if (modal?.classList.contains(CLASS_NAME_HIDING) || document.activeElement?.closest(`dialog.${CLASS_NAME_HIDING}`)) {
+      setTimeout(flush, CLOSE_DELAY)
+      return
+    }
+
+    const announcer = getAnnouncer(modal ?? document.body)
     const wait = readyAt.get(announcer)! - performance.now()
 
     if (wait > 0) {
@@ -138,9 +190,10 @@ const flush = (): void => {
 /**
  * Reads a message to screen reader users. The message goes to a visually hidden live region at
  * the start of the page or, while a modal dialog leaves the rest of the page inert, to one inside
- * that dialog. The region is picked when the message is added: one task after the call, or once a
- * new region is 100 ms old. Messages are added in the order of the calls, and each call adds a new
- * one, so the same text is read again.
+ * that dialog. The region is picked when the message is added: one task after the call, once a
+ * new region is 100 ms old, and after a closing dialog has closed and 500 ms have passed. Messages
+ * are added in the order of the calls, and each call adds a new one, so the same text is read
+ * again.
  *
  * @param message - The text to read
  * @param options - `priority` picks the polite (default) or the assertive region, `timeout` how
@@ -155,7 +208,8 @@ export const announce = (message: string, { context = null, priority = 'polite',
 
   const node = document.createElement('div')
   node.textContent = message
-  const host = getModal(context) ?? document.body
+  const modal = getModal(context)
+  const host = modal && !modal.classList.contains(CLASS_NAME_HIDING) ? modal : document.body
   const announcer = getAnnouncer(host)
 
   pending.push({
@@ -172,4 +226,8 @@ export const announce = (message: string, { context = null, priority = 'polite',
 
     node.remove()
   }
+}
+
+if (typeof document !== 'undefined' && typeof MutationObserver !== 'undefined') {
+  new MutationObserver(holdAfterClose).observe(document.documentElement, { attributeFilter: ['open'], subtree: true })
 }
