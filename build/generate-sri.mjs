@@ -34,10 +34,6 @@ const files = [
     configPropertyName: 'css_pro_hash'
   },
   {
-    file: 'dist/css/themes/bootstrap/bootstrap.min.css',
-    configPropertyName: 'css_bs_pro_hash'
-  },
-  {
     file: 'dist/js/coreui.min.js',
     configPropertyName: 'js_pro_hash'
   },
@@ -48,14 +44,6 @@ const files = [
   {
     file: 'dist/js/coreui.esm.min.js',
     configPropertyName: 'js_pro_esm_hash'
-  },
-  {
-    file: 'dist/js/bootstrap.min.js',
-    configPropertyName: 'js_bs_pro_hash'
-  },
-  {
-    file: 'dist/js/bootstrap.bundle.min.js',
-    configPropertyName: 'js_bs_pro_bundle_hash'
   },
   {
     file: 'node_modules/@popperjs/core/dist/umd/popper.min.js',

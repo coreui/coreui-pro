@@ -7,7 +7,7 @@
  *
  * This is a modified version of the Bootstrap's build/css-minify.mjs,
  * including the `Features.LightDark` exclusion. Deviations: the walk recurses,
- * because the themed build lives in dist/css/themes/; browserslist is a static
+ * because the per-component files live in dist/css/components/; browserslist is a static
  * import rather than an optional dynamic one; and the per-file logging is
  * trimmed.
  * Copyright 2017-2026 The Bootstrap Authors
@@ -22,7 +22,7 @@ import { Features, browserslistToTargets, transform } from 'lightningcss'
 
 const distDir = path.join(process.cwd(), 'dist/css')
 
-// The themed build sits in a subdirectory, so the walk has to recurse.
+// The per-component files sit in a subdirectory, so the walk has to recurse.
 const collect = dir => fs.readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
   const entryPath = path.join(dir, entry.name)
 

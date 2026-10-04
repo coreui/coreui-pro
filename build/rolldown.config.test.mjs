@@ -27,7 +27,7 @@ const virtual = {
 const floatingUi = 'var FloatingUIDOM = { computePosition: \'computePosition\' }\n'
 
 const load = async environment => {
-  for (const key of ['BOOTSTRAP', 'BUNDLE', 'ESM']) {
+  for (const key of ['BUNDLE', 'ESM']) {
     process.env[key] = environment[key] ?? 'false'
   }
 
@@ -97,13 +97,6 @@ describe('rolldown config', () => {
     assert.equal(coreui.constructor.name, 'Object')
     assert.equal(coreui.Tooltip, undefined)
     assert.equal(coreui.Alert, 'alert')
-  })
-
-  it('replaces window.bootstrap in the Bootstrap-compatible build', async () => {
-    const config = await load({ BOOTSTRAP: 'true' })
-
-    assert.equal(config.output.name, 'bootstrap')
-    assert.equal(config.plugins.some(plugin => plugin?.name === 'adopt-coreui-global'), false)
   })
 
   it('fails the build when the UMD wrapper no longer matches', async () => {
