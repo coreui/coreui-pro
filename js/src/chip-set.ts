@@ -29,6 +29,7 @@ const EVENT_ADD = 'add'
 const EVENT_REMOVE = 'remove'
 const EVENT_CHANGE = 'change'
 const EVENT_SELECT = 'select'
+const EVENT_BLUR = 'blur'
 const EVENT_CLICK = 'click'
 const EVENT_KEYDOWN = 'keydown'
 
@@ -637,6 +638,10 @@ class ChipSet extends BaseComponent {
     return null
   }
 
+  _getRemovalFocusTarget(chip: HTMLElement): HTMLElement {
+    return this._getRemovalNeighbor(chip) ?? this._element
+  }
+
   _getRemovalNeighbor(chip: HTMLElement): HTMLElement | null {
     const chips = this._getFocusableChips()
     if (chips.length === 0) {
@@ -680,17 +685,38 @@ class ChipSet extends BaseComponent {
   }
 
   _handleChipRemove(event: any): void {
-    const chip = (event.target as HTMLElement).closest(SELECTOR_CHIP)
-    this._pendingFocus = chip ? this._getRemovalNeighbor(chip as HTMLElement) : null
+    const chip = (event.target as HTMLElement).closest<HTMLElement>(SELECTOR_CHIP)
+    const active = document.activeElement
+    const holdsFocus = !active || active === document.body || Boolean(chip?.contains(active))
+
+    this._pendingFocus = chip && holdsFocus ? this._getRemovalFocusTarget(chip) : null
   }
 
   _handleChipRemoved(event: any): void {
     const chip = (event.target as HTMLElement).closest(SELECTOR_CHIP)
 
-    this._pendingFocus?.focus()
+    if (this._pendingFocus === this._element) {
+      this._focusSet()
+    } else {
+      this._pendingFocus?.focus()
+    }
+
     this._pendingFocus = null
 
     this._handleChipRemoval(chip as HTMLElement, this._getChipValue(chip as HTMLElement))
+  }
+
+  _focusSet(): void {
+    if (!this._element.hasAttribute('tabindex')) {
+      this._element.setAttribute('tabindex', '-1')
+      this._addedAttributes.push('tabindex')
+      EventHandler.one(this._element, this.constructor.eventName(EVENT_BLUR), () => {
+        this._element.removeAttribute('tabindex')
+        this._addedAttributes = this._addedAttributes.filter(name => name !== 'tabindex')
+      })
+    }
+
+    this._element.focus()
   }
 
   _handleChipRemoval(chip: HTMLElement, value: string): void {

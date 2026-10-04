@@ -539,6 +539,35 @@ describe('ChipInput', () => {
       expect(chipInput.getValues()).toEqual([])
     })
 
+    it('should move focus to the text input after removing a focused chip', () => {
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
+
+      const el = fixtureEl.querySelector('.chip-input')
+      const chipInput = new ChipInput(el)
+
+      chipInput.add('JavaScript')
+      chipInput.add('TypeScript')
+      const chip = el.querySelector('.chip')
+      chip.focus()
+      chip.dispatchEvent(new KeyboardEvent('keydown', { key: 'Backspace', bubbles: true }))
+
+      expect(document.activeElement).toEqual(chipInput._input)
+    })
+
+    it('should leave focus where it is when a chip is removed from elsewhere', () => {
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div><button type="button">Clear</button>'
+
+      const el = fixtureEl.querySelector('.chip-input')
+      const chipInput = new ChipInput(el)
+      const button = fixtureEl.querySelector('button')
+
+      chipInput.add('JavaScript')
+      button.focus()
+      chipInput.remove('JavaScript')
+
+      expect(document.activeElement).toEqual(button)
+    })
+
     it('should return false for non-existent value', () => {
       fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 

@@ -9,7 +9,7 @@ description: "Bootstrap Chip set component for CoreUI — group chips into an ac
 The CoreUI **Bootstrap Chip set component** groups multiple [chips](/components/chip/) into a single container that manages roving focus, keyboard navigation, and selection. While an individual chip handles its own state (selection, removal), the chip set is responsible for everything that spans the whole group:
 
 - Arrow-key navigation between chips, with <kbd>Home</kbd>/<kbd>End</kbd> jumping to the edges.
-- Moving focus to a neighboring chip after one is removed.
+- Moving focus to a neighboring chip, or to the set after the last one, when the focused chip is removed.
 - Single or multiple selection through the `selectionMode` option.
 - A flexible, wrapping layout with a configurable gap.
 
@@ -62,7 +62,7 @@ Customize the check with the `selectedIcon` option (or `data-coreui-selected-ico
 
 ## Removable chips
 
-Set `data-coreui-removable="true"` to add a remove button to every chip. When a chip is removed, focus moves to a neighboring chip.
+Set `data-coreui-removable="true"` to add a remove button to every chip. When the focused chip is removed, focus moves to a neighboring chip. Once the last one is gone, focus moves to the set itself, which holds `tabindex="-1"` until focus leaves it. Removing a chip while focus is elsewhere, for example with `remove()`, leaves focus where it is.
 
 <Example code={`<div class="chip-set" data-coreui-chip-set data-coreui-removable="true">
     <span class="chip">Filter one</span>

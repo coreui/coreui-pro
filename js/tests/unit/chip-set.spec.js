@@ -370,6 +370,61 @@ describe('ChipSet', () => {
       expect(document.activeElement).toEqual(remaining[0])
     })
 
+    it('should move focus to the set after removing its only chip', () => {
+      const el = setMarkup(['First'])
+      // eslint-disable-next-line no-new
+      new ChipSet(el, { removable: true })
+
+      const chip = el.querySelector('.chip')
+      chip.focus()
+      chip.dispatchEvent(new KeyboardEvent('keydown', { key: 'Backspace', bubbles: true }))
+
+      expect(el.querySelectorAll('.chip')).toHaveSize(0)
+      expect(document.activeElement).toEqual(el)
+      expect(el.getAttribute('tabindex')).toEqual('-1')
+    })
+
+    it('should drop the tabindex it gave the set once focus leaves it', () => {
+      fixtureEl.innerHTML = '<div class="chip-set"><span class="chip">First</span></div><button type="button">Next</button>'
+      const el = fixtureEl.querySelector('.chip-set')
+      // eslint-disable-next-line no-new
+      new ChipSet(el, { removable: true })
+
+      const chip = el.querySelector('.chip')
+      chip.focus()
+      chip.dispatchEvent(new KeyboardEvent('keydown', { key: 'Backspace', bubbles: true }))
+      fixtureEl.querySelector('button').focus()
+
+      expect(el.hasAttribute('tabindex')).toBeFalse()
+    })
+
+    it('should keep a tabindex the page gave the set', () => {
+      const el = setMarkup(['First'], ' tabindex="0"')
+      // eslint-disable-next-line no-new
+      new ChipSet(el, { removable: true })
+
+      const chip = el.querySelector('.chip')
+      chip.focus()
+      chip.dispatchEvent(new KeyboardEvent('keydown', { key: 'Backspace', bubbles: true }))
+      el.blur()
+
+      expect(el.getAttribute('tabindex')).toEqual('0')
+    })
+
+    it('should leave focus where it is when a chip is removed from elsewhere', () => {
+      fixtureEl.innerHTML = '<div class="chip-set"><span class="chip">First</span><span class="chip">Second</span></div><input type="text">'
+      const el = fixtureEl.querySelector('.chip-set')
+      const chipSet = new ChipSet(el, { removable: true })
+      const input = fixtureEl.querySelector('input')
+
+      input.focus()
+      chipSet.remove('First')
+      chipSet.remove('Second')
+
+      expect(document.activeElement).toEqual(input)
+      expect(el.hasAttribute('tabindex')).toBeFalse()
+    })
+
     it('should emit a cancelable remove.coreui.chip-set with the chip and value', () => {
       const el = setMarkup(['First', 'Second'], ' data-coreui-removable="true"')
       const chipSet = new ChipSet(el, { removable: true })
@@ -762,6 +817,18 @@ describe('ChipSet', () => {
 
       expect(el.getAttribute('role')).toEqual('group')
       expect(el.querySelector('.chip').hasAttribute('role')).toBeFalse()
+    })
+
+    it('should give back the tabindex it added to hold focus', () => {
+      const el = setMarkup(['First'])
+      const chipSet = new ChipSet(el, { removable: true })
+
+      const chip = el.querySelector('.chip')
+      chip.focus()
+      chip.dispatchEvent(new KeyboardEvent('keydown', { key: 'Backspace', bubbles: true }))
+      chipSet.dispose()
+
+      expect(el.hasAttribute('tabindex')).toBeFalse()
     })
 
     it('should keep the roles written in the markup', () => {

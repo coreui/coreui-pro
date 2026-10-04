@@ -200,11 +200,13 @@ class ChipInput extends ChipSet {
     }
   }
 
-  // Sync the form mirror and refocus the text field after a chip is removed.
+  override _getRemovalFocusTarget(chip: HTMLElement): HTMLElement {
+    return this._input ?? super._getRemovalFocusTarget(chip)
+  }
+
   override _handleChipRemoved(event: any): void {
     super._handleChipRemoved(event)
     this._syncHiddenInput()
-    this._input?.focus()
   }
 
   _syncHiddenInput(): void {
