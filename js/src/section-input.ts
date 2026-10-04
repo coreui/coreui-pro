@@ -29,6 +29,7 @@ import {
   getSectionValueText,
   getWeekSectionMax,
   hasShortcutModifier,
+  isBeforeYearOne,
   isEditableSection,
   isTypedKey,
   setSectionsFromDate
@@ -571,9 +572,7 @@ abstract class SectionInput extends BaseComponent {
 
     if (key === HOME_KEY || key === END_KEY) {
       const sections = this._getSectionElements()
-      const first = rtl ? sections.length - 1 : 0
-      const last = rtl ? 0 : sections.length - 1
-      sections[key === HOME_KEY ? first : last].focus()
+      sections[key === HOME_KEY ? 0 : sections.length - 1].focus()
       return
     }
 
@@ -734,7 +733,13 @@ abstract class SectionInput extends BaseComponent {
 
   _getValidationError(date: Date | null, isFilled: boolean): string | null {
     if (!(date instanceof Date)) {
-      return isFilled ? 'incomplete' : null
+      if (!isFilled) {
+        return null
+      }
+
+      const root = this._element.getRootNode() as Document | ShadowRoot
+
+      return !this._element.contains(root.activeElement) && isBeforeYearOne(this._sections) ? 'minDate' : 'incomplete'
     }
 
     return getDateLimitError(this._sections, date, this._minDate, this._maxDate, this._config.disabledDates)

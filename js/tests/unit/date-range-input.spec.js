@@ -251,6 +251,13 @@ describe('DateRangeInput', () => {
       expect(seen).toEqual([['endDateChange', new Date(2026, 6, 20)]])
     })
 
+    it('should mark the field of a date before year 1 invalid', () => {
+      const range = build({ endDate: new Date(2026, 6, 20), startDate: new Date('0000-06-15T00:00') })
+
+      expect(fields().map(field => field.classList.contains('is-invalid'))).toEqual([true, false])
+      expect(range.getStartDate()).toBeNull()
+    })
+
     it('should flag an end before the start on the frame and lift it once fixed', () => {
       const range = build()
 

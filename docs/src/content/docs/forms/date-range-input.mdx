@@ -143,7 +143,7 @@ The token parser covers dayjs, moment, date-fns, and luxon format strings, so yo
 The field participates in the standard form validation styling. Four mechanisms set the state:
 
 - **Order (automatic)** — an end before the start is a state of the range, not of either date, so `.is-invalid` lands on the frame and both fields stay editable. Assistive technology hears it on both fields: each one and its sections carry `aria-invalid="true"` until the order is fixed, and neither field turns valid meanwhile, whatever the `valid` option or a validated submit says. `isRangeValid()` reports it.
-- **Range validation (automatic)** — a completed date outside `minDate`/`maxDate`/`disabledDates` gets `.is-invalid` on its own field, which the frame picks up.
+- **Range validation (automatic)** — a completed date outside `minDate`/`maxDate`/`disabledDates` gets `.is-invalid` on its own field, which the frame picks up. A date before year 1 counts as before `minDate` even without that option; when the field loses the focus, its year becomes 1.
 - **The `valid`/`invalid` options** — force the state on both ends, e.g. after server-side validation; `valid` skips an end the limits reject.
 - **A state class in the markup** — `.is-invalid` or `.is-valid` written on the frame judges the range the markup rendered, so the component keeps it while that range stands, drops it as soon as either end moves, and brings it back if the range returns, whether through `reset()`, a native form reset, or the user typing its way back. While an invalid class holds, neither field is drawn valid.
 - **Form submit** — each end renders a hidden input, which is excluded from native constraint validation, so the component applies the state itself when a form with the `data-coreui-validate` attribute is submitted: a `required` empty end becomes `.is-invalid`, and a filled one becomes `.is-valid` when the form opts into success styling with `data-coreui-validate="valid"`. A native form reset returns both ends to the dates they were created with and drops that state; a submit that follows the reset in the same task judges the restored dates again, and a `reset` listener that calls `preventDefault()` cancels the whole reset.
@@ -253,7 +253,7 @@ Each end is a [date input](/forms/date-input/#accessibility) with the spinbutton
 | <kbd>0</kbd>–<kbd>9</kbd> | Type into the focused section; the caret advances when the section is complete |
 | <kbd>A</kbd>–<kbd>Z</kbd> | In text month sections, match a month name by prefix |
 | <kbd>Arrow Up</kbd> / <kbd>Arrow Down</kbd> | Increment / decrement the focused section |
-| <kbd>Arrow Right</kbd> / <kbd>Arrow Left</kbd> | Move focus to the next / previous section, crossing the separator from the last section of the start date into the end date and back |
+| <kbd>Arrow Right</kbd> / <kbd>Arrow Left</kbd> | Move focus to the next / previous section, crossing the separator from the last section of the start date into the end date and back; in a right-to-left layout the two keys swap |
 | <kbd>Home</kbd> / <kbd>End</kbd> | Move focus to the first / last section of the focused end |
 | <kbd>Backspace</kbd> | Clear the focused section; move to the previous section when already empty |
 | <kbd>Delete</kbd> | Clear the focused section |
@@ -309,7 +309,7 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | `endFloatingLabel` | string, null | `null` | Floating label of the end field |
 | `endName` | string, null | `null` | Name of the hidden input carrying the end date. Without it the end date is not submitted with the form. |
 | `format` | function, string, null | `null` | Mask layout for both ends: `null` derives it from the locale, a string is parsed as format tokens, a function receives the locale and returns the section layout |
-| `hourPlaceholder` | string, null | `null` | Replaces the `HH` the hour section shows while it is empty. |
+| `hourPlaceholder` | string, null | `null` | Replaces the `HH` (`hh` on a 12-hour clock) the hour section shows while it is empty. |
 | `inputDateParse` | function, null | `null` | Custom parser used for pasted text, e.g. a date library |
 | `inputOptions` | object | `{}` | Extra options passed to both date inputs |
 | `invalid` | boolean | `false` | Force the invalid state (`.is-invalid`) on both ends |

@@ -508,6 +508,26 @@ describe('DateInput', () => {
       expect(dateInput.getDate().getFullYear()).toBe(1)
     })
 
+    it('should keep a typed year 0000 an entry in progress inside a shadow root', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const shadowRoot = fixtureEl.querySelector('div').attachShadow({ mode: 'open' })
+      shadowRoot.innerHTML = '<div></div>'
+      const element = shadowRoot.querySelector('div')
+      const dateInput = new DateInput(element, { date: new Date(2026, 5, 15), format: 'dd.MM.yyyy' })
+      const errors = []
+      element.addEventListener('errorChange.coreui.date-input', event => errors.push(event.error))
+      const year = getSections(element)[2]
+
+      year.focus()
+      for (const digit of '0000') {
+        pressKey(year, digit)
+      }
+
+      expect(errors).toEqual(['incomplete'])
+      expect(element.classList.contains('is-invalid')).toBeFalse()
+      dateInput.dispose()
+    })
+
     it('should keep the year a two-digit field was given when it loses focus', () => {
       const dateInput = createDateInput({ date: new Date(2026, 5, 15), format: 'dd.MM.yy' })
       const year = getSections(dateInput._element)[2]
@@ -725,17 +745,17 @@ describe('DateInput', () => {
       expect(document.activeElement).toEqual(day)
     })
 
-    it('should mirror Home and End inside an RTL ancestor', () => {
+    it('should keep Home and End on the first and last section inside an RTL ancestor', () => {
       fixtureEl.innerHTML = '<div dir="rtl"><div id="mydateinput"></div></div>'
       const dateInput = new DateInput(fixtureEl.querySelector('#mydateinput'), { format: 'dd.MM.yyyy' })
       const [day, , year] = getSections(dateInput._element)
 
       year.focus()
       pressKey(year, 'Home')
-      expect(document.activeElement).toEqual(year)
-
-      pressKey(year, 'End')
       expect(document.activeElement).toEqual(day)
+
+      pressKey(day, 'End')
+      expect(document.activeElement).toEqual(year)
     })
 
     it('should jump to the first and last section with Home and End', () => {
@@ -1630,6 +1650,27 @@ describe('DateInput', () => {
       expect(spy.calls.mostRecent().args[0].error).toEqual('incomplete')
 
       expect(spy).toHaveBeenCalledTimes(3)
+    })
+
+    it('should report minDate and mark the field invalid for a date before year 1', () => {
+      fixtureEl.innerHTML = '<div id="mydateinput"></div>'
+      const element = fixtureEl.querySelector('div')
+      const errors = []
+      element.addEventListener('errorChange.coreui.date-input', event => errors.push(event.error))
+      const dateInput = new DateInput(element, { date: new Date('0000-06-15T00:00'), format: 'dd.MM.yyyy' })
+
+      expect(errors).toEqual(['minDate'])
+      expect(element.classList.contains('is-invalid')).toBeTrue()
+      expect(element.getAttribute('aria-invalid')).toEqual('true')
+      expect(dateInput.getDate()).toBeNull()
+
+      const [day] = getSections(element)
+      day.focus()
+      day.blur()
+
+      expect(dateInput.getDate().getFullYear()).toBe(1)
+      expect(errors.at(-1)).toBeNull()
+      expect(element.classList.contains('is-invalid')).toBeFalse()
     })
 
     it('should answer whether a date would pass validation', () => {
