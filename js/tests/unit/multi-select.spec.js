@@ -5230,12 +5230,12 @@ describe('MultiSelect', () => {
       expect(multiSelect._searchElement.getAttribute('aria-label')).toBe('Szukaj')
     })
 
-    it('should announce chip changes through a status region next to the selection', () => {
+    it('should leave the selection without a live region of its own', () => {
       fixtureEl.innerHTML = '<select multiple><option value="1" selected>One</option></select>'
       const multiSelect = new MultiSelect(fixtureEl.querySelector('select'))
 
       expect(multiSelect._selectionElement.getAttribute('aria-live')).toBeNull()
-      expect(multiSelect._wrapperElement.querySelector('[role="status"]')).not.toBeNull()
+      expect(multiSelect._wrapperElement.querySelector('[role="status"], [role="log"], [aria-live]')).toBeNull()
     })
 
     it('should set aria-disabled on the toggler when disabled', () => {

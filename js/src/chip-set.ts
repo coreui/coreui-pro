@@ -10,6 +10,7 @@ import Chip from './chip.js'
 import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
+import { announce } from './util/announce.js'
 import { CHECK_ICON, REMOVE_ICON } from './util/icons.js'
 import {
   defineJQueryPlugin, getNextActiveElement, isRTL, jQueryDispatch
@@ -121,7 +122,6 @@ class ChipSet extends BaseComponent {
   protected declare _optionChips: Set<HTMLElement>
   protected declare _ownedChips: Map<HTMLElement, Chip>
   protected declare _input: HTMLElement | null
-  protected declare _liveRegion: HTMLElement | null
   protected declare _anchor: HTMLElement | null
   protected declare _search: string
   protected declare _searchTimeout: ReturnType<typeof setTimeout> | null
@@ -135,14 +135,12 @@ class ChipSet extends BaseComponent {
     this._chips = []
     this._optionChips = new Set()
     this._ownedChips = new Map()
-    this._liveRegion = null
     this._anchor = null
     this._search = ''
     this._searchTimeout = null
 
     this._applyAccessibilityRoles()
     this._initChips()
-    this._createLiveRegion()
     this._addEventListeners()
   }
 
@@ -321,11 +319,6 @@ class ChipSet extends BaseComponent {
       clearTimeout(this._searchTimeout)
     }
 
-    if (this._liveRegion) {
-      this._liveRegion.remove()
-      this._liveRegion = null
-    }
-
     super.dispose()
   }
 
@@ -407,21 +400,8 @@ class ChipSet extends BaseComponent {
     }
   }
 
-  // Announce add/remove without moving focus. The region lives NEXT TO the
-  // set element: a role=status child inside a listbox would violate the
-  // listbox's required children.
-  _createLiveRegion(): void {
-    const region = document.createElement('span')
-    region.classList.add('visually-hidden')
-    region.setAttribute('role', 'status')
-    this._element.after(region)
-    this._liveRegion = region
-  }
-
   _announce(message: string): void {
-    if (this._liveRegion) {
-      this._liveRegion.textContent = message
-    }
+    announce(message, { context: this._element })
   }
 
   _setupChip(chip: HTMLElement): void {

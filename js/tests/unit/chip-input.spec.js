@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import ChipInput from '../../src/chip-input.js'
 import Chip from '../../src/chip.js'
 import ChipSet from '../../src/chip-set.js'
@@ -272,11 +273,17 @@ describe('ChipInput', () => {
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el)
 
-      chipInput.add('News')
+      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'performance'] })
 
-      expect(el.hasAttribute('role')).toBe(false)
-      expect(el.nextElementSibling.getAttribute('role')).toEqual('status')
-      expect(el.nextElementSibling.textContent).toEqual('News added')
+      try {
+        chipInput.add('News')
+        vi.advanceTimersByTime(100)
+
+        expect(el.hasAttribute('role')).toBe(false)
+        expect(document.querySelector('[data-coreui-live-announcer] [aria-live="polite"]').lastElementChild.textContent).toEqual('News added')
+      } finally {
+        vi.useRealTimers()
+      }
     })
 
     it('should set label for attribute when label has no for', () => {

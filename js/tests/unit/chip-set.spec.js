@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import Chip from '../../src/chip.js'
 import ChipSet from '../../src/chip-set.js'
 import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
@@ -950,20 +951,36 @@ describe('ChipSet', () => {
     })
   })
 
-  describe('live region', () => {
-    it('should announce added and removed chips in a status region next to the set', () => {
+  describe('announcement', () => {
+    const messages = () => [...document.querySelectorAll('[data-coreui-live-announcer] [aria-live="polite"] > *')].map(message => message.textContent)
+
+    const removeAnnouncers = () => {
+      for (const announcer of document.querySelectorAll('[data-coreui-live-announcer]')) {
+        announcer.remove()
+      }
+    }
+
+    beforeEach(() => {
+      removeAnnouncers()
+      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'performance'] })
+    })
+
+    afterEach(() => {
+      vi.useRealTimers()
+      removeAnnouncers()
+    })
+
+    it('should announce added and removed chips through the live regions of the page', () => {
       const el = setMarkup([])
       const chipSet = new ChipSet(el, { removable: true })
 
-      const region = el.nextElementSibling
-      expect(region.getAttribute('role')).toEqual('status')
-      expect(region).toHaveClass('visually-hidden')
-
       chipSet.add('Alpha')
-      expect(region.textContent).toEqual('Alpha added')
-
       chipSet.remove('Alpha')
-      expect(region.textContent).toEqual('Alpha removed')
+      vi.advanceTimersByTime(100)
+
+      expect(el.nextElementSibling).toBeNull()
+      expect(el.querySelector('[role="status"], [role="log"], [role="alert"], [aria-live]')).toBeNull()
+      expect(messages()).toEqual(['Alpha added', 'Alpha removed'])
     })
 
     it('should use the configured announcement labels', () => {
@@ -974,19 +991,31 @@ describe('ChipSet', () => {
       })
 
       chipSet.add('Alfa')
+      chipSet.remove('Alfa')
+      vi.advanceTimersByTime(100)
 
-      expect(el.nextElementSibling.textContent).toEqual('Alfa dodano')
+      expect(messages()).toEqual(['Alfa dodano', 'Alfa usuni\u0119to'])
     })
 
-    it('should remove the live region on dispose', () => {
+    it('should announce in the modal dialog around it, which the page cannot see into', () => {
       const el = setMarkup([])
+      const host = document.createElement('div')
+      fixtureEl.append(host)
+      const dialog = document.createElement('dialog')
+      host.attachShadow({ mode: 'open' }).append(dialog)
+      dialog.append(el)
       const chipSet = new ChipSet(el)
+      dialog.showModal()
 
-      expect(el.nextElementSibling.getAttribute('role')).toEqual('status')
+      try {
+        chipSet.add('Alpha')
+        vi.advanceTimersByTime(100)
 
-      chipSet.dispose()
-
-      expect(el.nextElementSibling).toBeNull()
+        expect(dialog.querySelector(':scope > [data-coreui-live-announcer] [aria-live="polite"]').textContent).toEqual('Alpha added')
+        expect(messages()).toEqual([])
+      } finally {
+        dialog.close()
+      }
     })
   })
 })
