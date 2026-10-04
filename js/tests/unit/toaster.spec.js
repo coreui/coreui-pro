@@ -284,7 +284,9 @@ describe('Toaster', () => {
       const modal = new Modal(modalEl)
       toaster = new Toaster()
       toaster.add({ description: 'Before', instant: true })
-      await announced()
+      await vi.waitFor(() => {
+        expect(messages('polite')).toEqual(['Before'])
+      })
       await modal.show()
 
       modalEl.addEventListener('hidden.coreui.modal', () => {

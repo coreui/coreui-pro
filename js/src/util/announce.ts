@@ -33,9 +33,9 @@ const VISUALLY_HIDDEN: Partial<CSSStyleDeclaration> = {
   width: '1px'
 }
 
+const holds = new WeakMap<Element, number>()
 const readyAt = new WeakMap<Element, number>()
 const pending: Message[] = []
-let watchingClose = false
 
 /**
  * Finds the modal dialog the rest of the page is inert behind: the one holding focus, then the
@@ -59,6 +59,21 @@ const getModal = (context: Element | null): HTMLDialogElement | null => {
 }
 
 /**
+ * Tells when new regions of a host can take a message: 100 ms from now, or later while a dialog
+ * that closed less than 500 ms ago holds the host. A hold further away than that comes from
+ * another clock, such as a test's, and is ignored.
+ *
+ * @param host - `document.body` or an open modal dialog
+ * @returns The time, on the `performance.now()` clock, the first message can be added
+ */
+const getReadyTime = (host: HTMLElement): number => {
+  const now = performance.now()
+  const hold = holds.get(host) ?? 0
+
+  return Math.max(now + FIRST_MESSAGE_DELAY, hold - now <= CLOSE_DELAY ? hold : 0)
+}
+
+/**
  * Returns the live regions a host carries, creating them when it has none. Regions this copy of
  * the util has not seen yet count as new, and regions in a dialog leave with it when it closes.
  *
@@ -70,7 +85,7 @@ const getAnnouncer = (host: HTMLElement): HTMLElement => {
 
   if (existing) {
     if (!readyAt.has(existing)) {
-      readyAt.set(existing, performance.now() + FIRST_MESSAGE_DELAY)
+      readyAt.set(existing, getReadyTime(host))
     }
 
     return existing
@@ -102,35 +117,42 @@ const getAnnouncer = (host: HTMLElement): HTMLElement => {
     host.addEventListener('close', onClose)
   }
 
-  readyAt.set(announcer, performance.now() + FIRST_MESSAGE_DELAY)
+  readyAt.set(announcer, getReadyTime(host))
 
   return announcer
 }
 
 /**
- * From the first message on, holds the regions that take over when a dialog closes for 500 ms:
- * focus moves back to the page then, and a screen reader following it drops a message added at
- * that moment. The observer reports the close before any queued insertion runs.
+ * Holds the host that takes over when a dialog closes for 500 ms: focus moves back to the page
+ * then, and a screen reader following it drops a message added at that moment. The observer
+ * reports the close before a queued insertion runs.
+ *
+ * @param records - The changes of the `open` attribute
  */
-const watchClose = (): void => {
-  if (watchingClose) {
+const holdAfterClose = (records: MutationRecord[]): void => {
+  if (!records.some(record => record.target.nodeName === 'DIALOG' && !(record.target as HTMLDialogElement).open)) {
     return
   }
 
-  watchingClose = true
-  new MutationObserver(records => {
-    if (records.some(record => record.target.nodeName === 'DIALOG' && !(record.target as HTMLDialogElement).open)) {
-      const announcer = getAnnouncer(getModal(null) ?? document.body)
-      readyAt.set(announcer, Math.max(readyAt.get(announcer)!, performance.now() + CLOSE_DELAY))
-    }
-  }).observe(document.documentElement, { attributeFilter: ['open'], subtree: true })
+  const host = getModal(null) ?? document.body
+  const until = performance.now() + CLOSE_DELAY
+  const announcer = host.querySelector(`:scope > [${ATTRIBUTE}]`)
+  holds.set(host, until)
+
+  if (announcer && readyAt.has(announcer)) {
+    readyAt.set(announcer, Math.max(readyAt.get(announcer)!, until))
+  }
+
+  if (pending.length > 0) {
+    setTimeout(flush, CLOSE_DELAY)
+  }
 }
 
 /**
  * Adds the waiting messages to their regions in the order they came in. Each goes to the page or
- * to the modal dialog open at that moment. The queue holds while that dialog plays its closing
- * transition, for 500 ms after any dialog closes, and while a region is younger than 100 ms. A
- * message that waited for page regions removed since is dropped with them.
+ * to the modal dialog open at that moment. The queue holds while that dialog, or the dialog holding
+ * focus, plays its closing transition, for 500 ms after a dialog closes, and while a region is
+ * younger than 100 ms. A message that waited for page regions removed since is dropped with them.
  */
 const flush = (): void => {
   while (pending.length > 0) {
@@ -143,7 +165,7 @@ const flush = (): void => {
 
     const modal = getModal(context)
 
-    if (modal?.classList.contains(CLASS_NAME_HIDING)) {
+    if (modal?.classList.contains(CLASS_NAME_HIDING) || document.activeElement?.closest(`dialog.${CLASS_NAME_HIDING}`)) {
       setTimeout(flush, CLOSE_DELAY)
       return
     }
@@ -184,8 +206,6 @@ export const announce = (message: string, { context = null, priority = 'polite',
     return () => {}
   }
 
-  watchClose()
-
   const node = document.createElement('div')
   node.textContent = message
   const modal = getModal(context)
@@ -206,4 +226,8 @@ export const announce = (message: string, { context = null, priority = 'polite',
 
     node.remove()
   }
+}
+
+if (typeof document !== 'undefined' && typeof MutationObserver !== 'undefined') {
+  new MutationObserver(holdAfterClose).observe(document.documentElement, { attributeFilter: ['open'], subtree: true })
 }
