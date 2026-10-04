@@ -11,7 +11,6 @@ import ComboboxBase from './combobox-base.js'
 import Data from './dom/data.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
-import type { ComponentConfig } from './util/config.js'
 import FocusTrap from './util/focustrap.js'
 import { CLEANER_ICON, PICKER_ICON } from './util/icons.js'
 import {
@@ -82,7 +81,50 @@ const CLASS_NAME_SELECTION = 'form-multi-select-selection'
 const CLASS_NAME_SELECTION_TAGS = 'form-multi-select-selection-tags'
 const CLASS_NAME_SHOW = 'show'
 
-const Default = {
+type MultiSelectConfig = {
+  allowList: SanitizerAllowList
+  ariaCleanerLabel: string
+  ariaPickerLabel: string
+  ariaSearchLabel: string
+  ariaTagDeleteLabel: string
+  cleaner: boolean
+  clearSearchOnSelect: boolean
+  container: Element | boolean | string
+  deselectAllLabel: string
+  deselectFilteredLabel: string
+  disabled: boolean
+  globalSearch: boolean
+  headerTemplate: ((state: any, actions: any) => string | Node) | null
+  hideSelectAllOnSearchNoResults: boolean
+  id: string | null
+  indicator: 'checkbox' | 'none'
+  invalid: boolean
+  multiple: boolean
+  name: string | null
+  options: false | any[]
+  optionsGroupsSelectable: boolean
+  optionsGroupsTemplate: ((group: any) => string) | null
+  optionsMaxHeight: number | string
+  optionsTemplate: ((option: any) => string) | null
+  pickerIcon: string | boolean
+  placeholder: string
+  required: boolean
+  sanitize: boolean
+  sanitizeFn: ((unsafeHtml: string) => string) | null
+  search: boolean
+  searchNoResultsLabel: string
+  selectAll: boolean
+  selectAllLabel: string
+  selectAllMode: 'all' | 'filtered'
+  selectedLabel: string | ((count: number, total: number) => string)
+  selectFilteredLabel: string
+  selectionLimit: number | null
+  selectionType: 'chips' | 'counter' | 'tags' | 'text'
+  valid: boolean
+  value: number | string | string[] | null
+}
+
+const Default: MultiSelectConfig = {
   allowList: DefaultAllowlist as SanitizerAllowList,
   ariaCleanerLabel: 'Clear all selections',
   ariaPickerLabel: 'Toggle options list',
@@ -202,7 +244,7 @@ class MultiSelect extends ComboboxBase {
   protected declare _refocusOnHide: boolean
   protected declare _nativeKeydownHandler: any
 
-  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
+  constructor(element?: string | Element | null, config?: Partial<MultiSelectConfig> | null) {
     super(element, config)
 
     this._hostAttributes = new Map(HOST_ATTRIBUTES.map(name => [name, this._element.getAttribute(name)]))
@@ -377,7 +419,7 @@ class MultiSelect extends ComboboxBase {
     EventHandler.trigger(this._element, EVENT_SEARCH)
   }
 
-  setConfig(config: any): void {
+  setConfig(config: Partial<MultiSelectConfig> | null): void {
     if (config?.value) {
       this.deselectAll()
     }
@@ -1699,3 +1741,4 @@ EventHandler.on(document, EVENT_KEYUP_DATA_API, MultiSelect.clearMenus)
 defineJQueryPlugin(MultiSelect)
 
 export default MultiSelect
+export type { MultiSelectConfig }

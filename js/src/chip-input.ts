@@ -8,7 +8,6 @@
 import ChipSet, { type ChipSetConfig } from './chip-set.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
-import type { ComponentConfig } from './util/config.js'
 import { applyControlGroupClasses } from './util/form-control-group.js'
 import { getUID, isRTL } from './util/index.js'
 
@@ -88,7 +87,7 @@ class ChipInput extends ChipSet {
   private _createdInput = false
   private _labelledFor: Element | null = null
 
-  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
+  constructor(element?: string | Element | null, config?: Partial<ChipInputConfig> | null) {
     super(element, config)
 
     this._uniqueId = this._config.id ?? getUID(NAME)
@@ -439,3 +438,4 @@ EventHandler.on(document, `DOMContentLoaded${EVENT_KEY}${DATA_API_KEY}`, () => {
 })
 
 export default ChipInput
+export type { ChipInputConfig }

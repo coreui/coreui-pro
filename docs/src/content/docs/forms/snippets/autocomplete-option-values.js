@@ -2,7 +2,6 @@ const myAutoCompleteValues = document.getElementById('myAutoCompleteValues')
 
 new coreui.Autocomplete(myAutoCompleteValues, {
   cleaner: true,
-  indicator: true,
   name: 'autocomplete-option-values',
   options: [
     { label: 'Product A', value: 1 },
@@ -18,6 +17,7 @@ new coreui.Autocomplete(myAutoCompleteValues, {
       ]
     }
   ],
+  pickerIcon: true,
   placeholder: 'Select product by ID...',
   search: 'global',
   value: 100

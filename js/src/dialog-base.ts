@@ -44,7 +44,7 @@ const POPUP_DATA_KEYS = [
  * body scroll prevention, and child component cleanup.
  */
 
-class DialogBase extends BaseComponent {
+class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseComponent {
   protected declare _element: HTMLDialogElement
   protected declare _isTransitioning: boolean
   protected declare _openedAsModal: boolean
@@ -52,7 +52,7 @@ class DialogBase extends BaseComponent {
   protected declare _cancelHandler: (event: Event) => void
   protected declare _closeHandler: (event: Event) => void
 
-  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
+  constructor(element?: string | Element | null, config?: Partial<C> | null) {
     super(element, config)
 
     this._isTransitioning = false

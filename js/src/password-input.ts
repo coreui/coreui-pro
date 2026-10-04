@@ -181,3 +181,4 @@ EventHandler.on(document, `DOMContentLoaded${EVENT_KEY}${DATA_API_KEY}`, () => {
 defineJQueryPlugin(PasswordInput)
 
 export default PasswordInput
+export type { PasswordInputConfig }

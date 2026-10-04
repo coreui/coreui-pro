@@ -89,15 +89,15 @@ type MenuConfig = {
   autoClose: boolean | 'inside' | 'outside'
   boundary: string | Element
   container: string | Element | boolean
-  display: string
+  display: 'dynamic' | 'static'
   floatingConfig: FloatingConfigOption
   menu: Element | null
   offset: FloatingOffsetOption
   placement: string | null
-  reference: string | Element | Record<string, any>
-  strategy: string
+  reference: string | Element | { getBoundingClientRect: () => DOMRect }
+  strategy: 'absolute' | 'fixed'
   submenuDelay: number
-  submenuTrigger: string
+  submenuTrigger: 'both' | 'click' | 'hover'
 }
 
 const Default: MenuConfig = {

@@ -6,7 +6,6 @@
  */
 
 import BaseComponent from './base-component.js'
-import type { ComponentConfig } from './util/config.js'
 import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
@@ -60,7 +59,12 @@ const ARROW_DOWN_KEY = 'ArrowDown'
 const HOME_KEY = 'Home'
 const END_KEY = 'End'
 
-const Default = {
+type StepperConfig = {
+  linear: boolean
+  skipValidation: boolean
+}
+
+const Default: StepperConfig = {
   linear: true,
   skipValidation: false
 }
@@ -82,7 +86,7 @@ class Stepper extends BaseComponent {
   protected declare _validatedForms: Set<HTMLFormElement>
   protected declare _tabPattern: boolean
 
-  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
+  constructor(element?: string | Element | null, config?: Partial<StepperConfig> | null) {
     super(element, config)
 
     this._stepButtons = this._getStepButtons()
@@ -721,3 +725,4 @@ EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
 defineJQueryPlugin(Stepper)
 
 export default Stepper
+export type { StepperConfig }

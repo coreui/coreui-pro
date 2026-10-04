@@ -367,3 +367,4 @@ EventHandler.on(document, `DOMContentLoaded${EVENT_KEY}${DATA_API_KEY}`, () => {
 defineJQueryPlugin(NumberInput)
 
 export default NumberInput
+export type { NumberInputConfig }

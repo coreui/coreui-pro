@@ -36,7 +36,13 @@ const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="drawer"]'
 // match them too
 const SELECTOR_DISMISS_SCOPE = '.drawer, .drawer-sm, .drawer-md, .drawer-lg, .drawer-xl, .drawer-2xl'
 
-const Default = {
+type DrawerConfig = {
+  backdrop: boolean | 'static'
+  keyboard: boolean
+  scroll: boolean
+}
+
+const Default: DrawerConfig = {
   backdrop: true,
   keyboard: true,
   scroll: false
@@ -52,7 +58,7 @@ const DefaultType = {
  * Class definition
  */
 
-class Drawer extends DialogBase {
+class Drawer extends DialogBase<DrawerConfig> {
   // Getters
   static override get Default(): typeof Default {
     return Default
@@ -146,3 +152,4 @@ enableDismissTrigger(Drawer, 'hide', SELECTOR_DISMISS_SCOPE)
 defineJQueryPlugin(Drawer)
 
 export default Drawer
+export type { DrawerConfig }

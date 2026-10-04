@@ -35,7 +35,13 @@ const CLASS_NAME_SWAP_IN = 'dialog-swap-in'
 
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="dialog"]'
 
-const Default = {
+type DialogConfig = {
+  backdrop: boolean | 'static'
+  keyboard: boolean
+  modal: boolean
+}
+
+const Default: DialogConfig = {
   backdrop: true,
   keyboard: true,
   modal: true
@@ -51,7 +57,7 @@ const DefaultType = {
  * Class definition
  */
 
-class Dialog extends DialogBase {
+class Dialog extends DialogBase<DialogConfig> {
   // Getters
   static override get Default(): typeof Default {
     return Default
@@ -178,3 +184,4 @@ enableDismissTrigger(Dialog)
 defineJQueryPlugin(Dialog)
 
 export default Dialog
+export type { DialogConfig }

@@ -6,7 +6,6 @@
  */
 
 import BaseComponent from './base-component.js'
-import type { ComponentConfig } from './util/config.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
@@ -54,21 +53,21 @@ const SELECTOR_RATING_ITEM_INPUT = '.rating-item-input'
 const SELECTOR_RATING_ITEM_LABEL = '.rating-item-label'
 
 type RatingConfig = {
-  activeIcon: string | null
+  activeIcon: string | Record<number, string> | null
   allowClear: boolean
   allowList: SanitizerAllowList
   ariaLabel: (value: number, itemCount: number) => string
   disabled: boolean
   highlightOnlySelected: boolean
-  icon: string | null
+  icon: string | Record<number, string> | null
   itemCount: number
   name: string | null
   precision: number
   readonly: boolean
   sanitize: boolean
   sanitizeFn: ((unsafeHtml: string) => string) | null
-  size: string | null
-  tooltips: boolean | string[] | Record<string, string>
+  size: 'sm' | 'lg' | null
+  tooltips: boolean | string | string[] | Record<string, string>
   value: number | null
 }
 
@@ -127,7 +126,7 @@ class Rating extends BaseComponent {
   protected declare _sizeClassNames: Set<string>
   protected declare _tooltip: any
 
-  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
+  constructor(element?: string | Element | null, config?: Partial<RatingConfig> | null) {
     super(element)
 
     this._hostClasses = captureHostClasses(this._element, [
@@ -188,7 +187,7 @@ class Rating extends BaseComponent {
   }
 
   // Public
-  setConfig(config: any): void {
+  setConfig(config: Partial<RatingConfig> | null): void {
     this._config = this._getConfig({ ...this._config, ...config })
     this._name = this._config.name || this._name
 
@@ -633,3 +632,4 @@ EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
 defineJQueryPlugin(Rating)
 
 export default Rating
+export type { RatingConfig }

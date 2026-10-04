@@ -9,7 +9,6 @@ import ComboboxBase from './combobox-base.js'
 import Data from './dom/data.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
-import type { ComponentConfig } from './util/config.js'
 import { applyControlGroupClasses } from './util/form-control-group.js'
 import {
   DefaultAllowlist, escapeHtml, sanitizeByConfig, type SanitizerAllowList, SVGAllowlist
@@ -62,7 +61,36 @@ const SELECTOR_DATA_AUTOCOMPLETE = '[data-coreui-autocomplete]:not(.disabled)'
 const SELECTOR_DATA_TOGGLE_SHOWN = `.autocomplete:not(.disabled).${CLASS_NAME_SHOW}`
 const SELECTOR_INDICATOR = '.form-control-action'
 
-const Default = {
+type AutocompleteConfig = {
+  allowList: SanitizerAllowList
+  allowOnlyDefinedOptions: boolean
+  ariaCleanerLabel: string
+  ariaPickerLabel: string
+  cleaner: boolean
+  clearSearchOnSelect: boolean
+  container: Element | boolean | string
+  disabled: boolean
+  highlightOptionsOnSearch: boolean
+  id: string | null
+  invalid: boolean
+  name: string | null
+  options: string | any[] | null
+  optionsGroupsTemplate: ((group: any) => string) | null
+  optionsMaxHeight: number | string
+  optionsTemplate: ((option: any) => string) | null
+  pickerIcon: string | boolean
+  placeholder: string | null
+  required: boolean
+  sanitize: boolean
+  sanitizeFn: ((unsafeHtml: string) => string) | null
+  search: string | ('external' | 'global')[] | null
+  searchNoResultsLabel: boolean | string
+  showHints: boolean
+  valid: boolean
+  value: number | string | null
+}
+
+const Default: AutocompleteConfig = {
   allowList: DefaultAllowlist as SanitizerAllowList,
   allowOnlyDefinedOptions: false,
   ariaCleanerLabel: 'Clear selection',
@@ -143,7 +171,7 @@ class Autocomplete extends ComboboxBase {
   protected declare _seenOptionValues: Set<string>
   protected declare _valueApplied: boolean
 
-  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
+  constructor(element?: string | Element | null, config?: Partial<AutocompleteConfig> | null) {
     super(element, config)
 
     this._uniqueId = this._config.id ?? getUID(`${this.constructor.NAME}`)
@@ -282,7 +310,7 @@ class Autocomplete extends ComboboxBase {
     })
   }
 
-  setConfig(config: any): void {
+  setConfig(config: Partial<AutocompleteConfig> | null): void {
     this._config = this._getConfig({ ...this._config, ...config })
     this._options = this._getOptionsFromConfig()
     this._setListBoxItems()
@@ -985,3 +1013,4 @@ EventHandler.on(document, EVENT_KEYUP_DATA_API, Autocomplete.clearMenus)
 defineJQueryPlugin(Autocomplete)
 
 export default Autocomplete
+export type { AutocompleteConfig }

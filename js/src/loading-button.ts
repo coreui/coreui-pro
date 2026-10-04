@@ -6,7 +6,6 @@
  */
 
 import BaseComponent from './base-component.js'
-import type { ComponentConfig } from './util/config.js'
 import EventHandler from './dom/event-handler.js'
 import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
 
@@ -29,7 +28,14 @@ const CLASS_NAME_LOADING_BUTTON_SPINNER = 'btn-loading-spinner'
 
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="loading-button"]'
 
-const Default = {
+type LoadingButtonConfig = {
+  disabledOnLoading: boolean
+  spinner: boolean
+  spinnerType: 'border' | 'grow'
+  timeout: boolean | number
+}
+
+const Default: LoadingButtonConfig = {
   disabledOnLoading: false,
   spinner: true,
   spinnerType: 'border',
@@ -53,7 +59,7 @@ class LoadingButton extends BaseComponent {
   protected declare _spinner: HTMLElement | null
   protected declare _state: string
 
-  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
+  constructor(element?: string | Element | null, config?: Partial<LoadingButtonConfig> | null) {
     super(element)
 
     this._config = this._getConfig(config)
@@ -211,3 +217,4 @@ EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, event => {
 defineJQueryPlugin(LoadingButton)
 
 export default LoadingButton
+export type { LoadingButtonConfig }

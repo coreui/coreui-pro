@@ -80,11 +80,11 @@ const cities = [
 
 new coreui.Autocomplete(myAutocompleteCountries, {
   cleaner: true,
-  indicator: true,
   options: countries,
   optionsTemplate(option) {
     return `<div class="d-flex align-items-center gap-2"><span class="fs-5">${option.flag}</span><span>${option.label}</span></div>`
   },
+  pickerIcon: true,
   placeholder: 'Select country',
   showHints: true,
   search: 'global'
@@ -92,11 +92,11 @@ new coreui.Autocomplete(myAutocompleteCountries, {
 
 new coreui.Autocomplete(myAutocompleteCountriesAndCities, {
   cleaner: true,
-  indicator: true,
   options: cities,
   optionsGroupsTemplate(optionGroup) {
     return `<div class="d-flex align-items-center gap-2"><span class="fg-body fs-5">${optionGroup.flag}</span><span>${optionGroup.label}</span></div>`
   },
+  pickerIcon: true,
   placeholder: 'Select city',
   showHints: true,
   search: 'global'
