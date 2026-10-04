@@ -37,11 +37,15 @@ const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="context-menu"]'
 
 type Point = { x: number, y: number }
 
-const Default: MenuConfig = {
+type ContextMenuConfig = Omit<MenuConfig, 'placement'> & {
+  placement: string
+}
+
+const Default = {
   ...Menu.Default,
   reference: 'pointer',
   strategy: 'fixed'
-}
+} as ContextMenuConfig
 
 const DefaultType: Record<string, string> = {
   ...Menu.DefaultType
@@ -56,7 +60,7 @@ class ContextMenu extends Menu {
   protected declare _point: Point | null
   protected declare _scrollBlocker: ((event: Event) => void) | null
 
-  constructor(element?: string | Element | null, config?: Partial<MenuConfig> | null) {
+  constructor(element?: string | Element | null, config?: Partial<ContextMenuConfig> | null) {
     super(element, config)
 
     this._point = null
@@ -311,3 +315,4 @@ EventHandler.on(document, EVENT_KEYDOWN_DATA_API, SELECTOR_DATA_TOGGLE, ContextM
 defineJQueryPlugin(ContextMenu)
 
 export default ContextMenu
+export type { ContextMenuConfig }

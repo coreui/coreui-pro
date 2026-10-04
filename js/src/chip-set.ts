@@ -70,7 +70,7 @@ export type ChipSetConfig = {
   removeIcon: string
   selectable: boolean
   selectedIcon: string
-  selectionMode: string
+  selectionMode: 'multiple' | 'single'
   typeahead: boolean
   unique: boolean
 }

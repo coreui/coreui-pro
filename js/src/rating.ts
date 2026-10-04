@@ -66,7 +66,7 @@ type RatingConfig = {
   readonly: boolean
   sanitize: boolean
   sanitizeFn: ((unsafeHtml: string) => string) | null
-  size: string | null
+  size: 'sm' | 'lg' | null
   tooltips: boolean | string | string[] | Record<string, string>
   value: number | null
 }

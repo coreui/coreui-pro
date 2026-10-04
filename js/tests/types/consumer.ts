@@ -22,17 +22,28 @@ import type { DateInputConfig } from '../../dist/date-input.js'
 import type { DatePickerConfig } from '../../dist/date-picker.js'
 import type { DateRangeInputConfig } from '../../dist/date-range-input.js'
 import type { DateRangePickerConfig } from '../../dist/date-range-picker.js'
+import type { ChipInputConfig } from '../../dist/chip-input.js'
+import type { ContextMenuConfig } from '../../dist/context-menu.js'
+import type { DialogConfig } from '../../dist/dialog.js'
+import type { DrawerConfig } from '../../dist/drawer.js'
+import type { DropdownConfig } from '../../dist/dropdown.js'
+import type { LoadingButtonConfig } from '../../dist/loading-button.js'
 import type { ModalConfig } from '../../dist/modal.js'
 import type { MultiSelectConfig } from '../../dist/multi-select.js'
+import type { NavigationConfig } from '../../dist/navigation.js'
 import type { NumberInputConfig } from '../../dist/number-input.js'
+import type { OffcanvasConfig } from '../../dist/offcanvas.js'
 import type { PasswordInputConfig } from '../../dist/password-input.js'
 import type { RatingConfig } from '../../dist/rating.js'
+import type { SearchButtonConfig } from '../../dist/search-button.js'
+import type { StepperConfig } from '../../dist/stepper.js'
 import type { TimeInputConfig } from '../../dist/time-input.js'
 import type { TimePickerConfig } from '../../dist/time-picker.js'
 import { convertToDateObject } from '../../dist/util/calendar.js'
 import { getPickerFormat, getSectionLayout } from '../../dist/util/date-sections.js'
 import type { DateSection, SectionFormat } from '../../dist/util/date-sections.js'
 import type Popup from '../../dist/util/popup.js'
+import TimeSelects from '../../dist/time-selection/selects.js'
 import { getRatioAt, sanitizeValue } from '../../dist/util/range.js'
 
 const element = document.querySelector('.example') as HTMLElement
@@ -195,7 +206,14 @@ const otherOptions = [
   new MultiSelect(element, { selectedLabel: (count, total) => `${count}/${total}`, selectionType: 'counter' }),
   new Navigation(element, { groupsAutoCollapse: false }),
   new Offcanvas(element, { backdrop: false }),
-  new Rating(element, { activeIcon: { 1: '<b>1</b>' }, value: 3 }),
+  new Rating(element, {
+    activeIcon: { 1: '<b>1</b>' }, icon: { 1: '<i>1</i>' }, size: 'lg', value: 3
+  }),
+  // What the runtime converts before it checks: comma lists and a single number.
+  new Autocomplete(element, { options: 'Apple, Banana' }),
+  new MultiSelect(element, { value: 1 }),
+  new MultiSelect(element, { value: 'a, b' }),
+  new Rating(element, { tooltips: 'Bad,Good' }),
   new SearchButton(element, { shortcut: 'ctrl+k' }),
   new Stepper(element, { linear: false }),
   // @ts-expect-error — not an autocomplete option
@@ -206,22 +224,57 @@ const otherOptions = [
   new ContextMenu(element, { autoclose: 'outside' }),
   // @ts-expect-error — not a backdrop value
   new Dialog(element, { backdrop: 'statik' }),
+  // @ts-expect-error — not a dialog option
+  new Dialog(element, { modl: true }),
+  // @ts-expect-error — nor a drawer backdrop
+  new Drawer(element, { backdrop: 'statik' }),
+  // @ts-expect-error — nor a modal one
+  new Modal(element, { backdrop: 'statik' }),
+  // @ts-expect-error — nor an offcanvas one
+  new Offcanvas(element, { backdrop: 'statik' }),
   // @ts-expect-error — not a drawer option
   new Drawer(element, { scrolling: true }),
   // @ts-expect-error — not a dropdown option
   new Dropdown(element, { autoclose: false }),
+  // A dropdown leaves its placement to the markup with null; a context menu needs one.
+  new Dropdown(element, { placement: null }),
+  // @ts-expect-error — the context menu checks placement as a string
+  new ContextMenu(element, { placement: null }),
+  // @ts-expect-error — a reference object has to measure itself
+  new Dropdown(element, { reference: {} }),
+  new Dropdown(element, { reference: { getBoundingClientRect: () => new DOMRect() } }),
+  // @ts-expect-error — not a display mode
+  new Dropdown(element, { display: 'statik' }),
+  // @ts-expect-error — not a positioning strategy
+  new ContextMenu(element, { strategy: 'absolut' }),
+  // @ts-expect-error — not a submenu trigger
+  new Menu(element, { submenuTrigger: 'hovr' }),
+  // @ts-expect-error — not a chip selection mode
+  new ChipInput(element, { selectionMode: 'singel' }),
+  // @ts-expect-error — a multi select takes a list of options or false
+  new MultiSelect(element, { options: true }),
   // @ts-expect-error — not a spinner type
   new LoadingButton(element, { spinnerType: 'dots' }),
+  // @ts-expect-error — not a loading button option
+  new LoadingButton(element, { spiner: false }),
   // @ts-expect-error — not a modal option
   new Modal(element, { backdorp: 'static' }),
   // @ts-expect-error — not a selection type
   new MultiSelect(element, { selectionType: 'pills' }),
+  // @ts-expect-error — not an indicator
+  new MultiSelect(element, { indicator: 'radio' }),
+  // @ts-expect-error — not a select all mode
+  new MultiSelect(element, { selectAllMode: 'visible' }),
+  // @ts-expect-error — not a multi select option
+  new MultiSelect(element, { multi: true }),
   // @ts-expect-error — not a navigation option
   new Navigation(element, { autoCollapse: false }),
   // @ts-expect-error — not an offcanvas option
   new Offcanvas(element, { scrolling: true }),
   // @ts-expect-error — not a rating option
   new Rating(element, { valu: 3 }),
+  // @ts-expect-error — a rating is small or large
+  new Rating(element, { size: 'xl' }),
   // @ts-expect-error — not a search button option
   new SearchButton(element, { shortcuts: 'ctrl+k' }),
   // @ts-expect-error — not a stepper option
@@ -231,13 +284,34 @@ const otherOptions = [
   // @ts-expect-error — and so does the multi select's
   new MultiSelect(element).setConfig({ selectionType: 'pills' }),
   // @ts-expect-error — and the rating's
-  new Rating(element).setConfig({ valu: 3 })
+  new Rating(element).setConfig({ valu: 3 }),
+  // @ts-expect-error — and the time columns'
+  new TimeSelects(element).setConfig({ hourz: [9] })
 ]
 
 const exportedConfigs: [
-  Partial<AutocompleteConfig>, Partial<ModalConfig>, Partial<MultiSelectConfig>, Partial<NumberInputConfig>,
-  Partial<PasswordInputConfig>, Partial<RatingConfig>
-] = [{ search: 'global' }, { keyboard: false }, { search: true }, { repeat: false }, { ariaToggleLabel: 'Show' }, { itemCount: 10 }]
+  Partial<AutocompleteConfig>, Partial<ChipInputConfig>, Partial<ContextMenuConfig>, Partial<DialogConfig>,
+  Partial<DrawerConfig>, Partial<DropdownConfig>, Partial<LoadingButtonConfig>, Partial<ModalConfig>, Partial<MultiSelectConfig>, Partial<NavigationConfig>,
+  Partial<NumberInputConfig>, Partial<OffcanvasConfig>, Partial<PasswordInputConfig>, Partial<RatingConfig>,
+  Partial<SearchButtonConfig>, Partial<StepperConfig>
+] = [
+  { search: 'global' },
+  { maxChips: 3 },
+  { reference: 'pointer' },
+  { modal: false },
+  { scroll: true },
+  { placement: null },
+  { timeout: 1000 },
+  { keyboard: false },
+  { search: true },
+  { activeLinksExact: false },
+  { repeat: false },
+  { scroll: true },
+  { ariaToggleLabel: 'Show' },
+  { itemCount: 10 },
+  { shortcut: 'ctrl+k' },
+  { linear: false }
+]
 
 // A component without options still takes an empty object.
 const tab: Tab = Tab.getOrCreateInstance(element, {})

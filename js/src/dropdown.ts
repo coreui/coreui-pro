@@ -50,7 +50,9 @@ const PLACEMENT_START = 'left-start'
 const PLACEMENT_TOPCENTER = 'top'
 const PLACEMENT_BOTTOMCENTER = 'bottom'
 
-const Default: MenuConfig = {
+type DropdownConfig = MenuConfig
+
+const Default: DropdownConfig = {
   ...Menu.Default,
   placement: null
 }
@@ -68,7 +70,7 @@ class Dropdown extends Menu {
   declare ['constructor']: typeof Dropdown
   protected declare _inNavbar: boolean
 
-  constructor(element?: string | Element | null, config?: Partial<MenuConfig> | null) {
+  constructor(element?: string | Element | null, config?: Partial<DropdownConfig> | null) {
     super(element, config)
 
     this._inNavbar = this._detectNavbar()
@@ -217,3 +219,4 @@ EventHandler.on(document, EVENT_CLICK_DATA_API, Dropdown.SELECTOR_DATA_TOGGLE, f
 defineJQueryPlugin(Dropdown)
 
 export default Dropdown
+export type { DropdownConfig }

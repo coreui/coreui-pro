@@ -101,7 +101,7 @@ type MultiSelectConfig = {
   invalid: boolean
   multiple: boolean
   name: string | null
-  options: boolean | any[]
+  options: false | any[]
   optionsGroupsSelectable: boolean
   optionsGroupsTemplate: ((group: any) => string) | null
   optionsMaxHeight: number | string
