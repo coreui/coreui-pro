@@ -9,7 +9,6 @@
  */
 
 import DialogBase from './dialog-base.js'
-import type { ComponentConfig } from './util/config.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { enableDismissTrigger } from './util/component-functions.js'
@@ -38,7 +37,13 @@ const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="offcanvas"]'
 // match them too
 const SELECTOR_DISMISS_SCOPE = '.offcanvas, .offcanvas-sm, .offcanvas-md, .offcanvas-lg, .offcanvas-xl, .offcanvas-2xl'
 
-const Default = {
+type OffcanvasConfig = {
+  backdrop: boolean | 'static'
+  keyboard: boolean
+  scroll: boolean
+}
+
+const Default: OffcanvasConfig = {
   backdrop: true,
   keyboard: true,
   scroll: false
@@ -54,8 +59,8 @@ const DefaultType = {
  * Class definition
  */
 
-class Offcanvas extends DialogBase {
-  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
+class Offcanvas extends DialogBase<OffcanvasConfig> {
+  constructor(element?: string | Element | null, config?: Partial<OffcanvasConfig> | null) {
     super(resolveDialogElement(element, NAME), config)
   }
 
@@ -152,3 +157,4 @@ enableDismissTrigger(Offcanvas, 'hide', SELECTOR_DISMISS_SCOPE)
 defineJQueryPlugin(Offcanvas)
 
 export default Offcanvas
+export type { OffcanvasConfig }

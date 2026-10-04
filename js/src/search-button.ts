@@ -6,7 +6,6 @@
  */
 
 import BaseComponent from './base-component.js'
-import type { ComponentConfig } from './util/config.js'
 import EventHandler from './dom/event-handler.js'
 import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
 
@@ -41,7 +40,12 @@ type ParsedShortcut = {
   shortcut: string
 }
 
-const Default = {
+type SearchButtonConfig = {
+  preventDefault: boolean
+  shortcut: string
+}
+
+const Default: SearchButtonConfig = {
   preventDefault: true,
   shortcut: 'meta+/,ctrl+/'
 }
@@ -83,7 +87,7 @@ class SearchButton extends BaseComponent {
   protected declare _shortcuts: ParsedShortcut[]
   protected declare _preferredShortcut: ParsedShortcut | null
 
-  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
+  constructor(element?: string | Element | null, config?: Partial<SearchButtonConfig> | null) {
     super(element, config)
 
     this._shortcutTriggered = false
@@ -441,3 +445,4 @@ EventHandler.on(window, EVENT_BLUR_DATA_API, () => {
 defineJQueryPlugin(SearchButton)
 
 export default SearchButton
+export type { SearchButtonConfig }

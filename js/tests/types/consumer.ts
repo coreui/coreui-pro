@@ -11,14 +11,22 @@
 // type that does not survive declaration emit.
 
 import {
-  Alert, Calendar, Chip, ChipSet, Combobox, DateInput, DatePicker, DateRangeInput, DateRangePicker, ListBox, Menu, Modal,
-  MultiSelect, OTPInput, Popover, Range, RangeSlider, Tab, TimeInput, TimePicker, Toast, Toaster, Tooltip, Transfer
+  Alert, Autocomplete, Calendar, Chip, ChipInput, ChipSet, Combobox, ContextMenu, DateInput, DatePicker, DateRangeInput,
+  DateRangePicker, Dialog, Drawer, Dropdown, ListBox, LoadingButton, Menu, Modal, MultiSelect, Navigation, Offcanvas,
+  OTPInput, Popover, Range, RangeSlider, Rating, SearchButton, Stepper, Tab, TimeInput, TimePicker, Toast, Toaster,
+  Tooltip, Transfer
 } from '../../dist/index.js'
+import type { AutocompleteConfig } from '../../dist/autocomplete.js'
 import type { CalendarConfig } from '../../dist/calendar.js'
 import type { DateInputConfig } from '../../dist/date-input.js'
 import type { DatePickerConfig } from '../../dist/date-picker.js'
 import type { DateRangeInputConfig } from '../../dist/date-range-input.js'
 import type { DateRangePickerConfig } from '../../dist/date-range-picker.js'
+import type { ModalConfig } from '../../dist/modal.js'
+import type { MultiSelectConfig } from '../../dist/multi-select.js'
+import type { NumberInputConfig } from '../../dist/number-input.js'
+import type { PasswordInputConfig } from '../../dist/password-input.js'
+import type { RatingConfig } from '../../dist/rating.js'
 import type { TimeInputConfig } from '../../dist/time-input.js'
 import type { TimePickerConfig } from '../../dist/time-picker.js'
 import { convertToDateObject } from '../../dist/util/calendar.js'
@@ -175,6 +183,62 @@ const unknownOptions = [
   new OTPInput(element).setConfig({ lenght: 4 })
 ]
 
+// Every component with options type-checks them.
+const otherOptions = [
+  new Autocomplete(element, { optionsTemplate: option => `<b>${option.text}</b>`, search: ['external', 'global'] }),
+  new ChipInput(element, { maxChips: 3, selectionMode: 'single' }),
+  new ContextMenu(element, { autoClose: 'outside' }),
+  new Dialog(element, { backdrop: 'static' }),
+  new Drawer(element, { scroll: true }),
+  new Dropdown(element, { autoClose: false, placement: 'bottom-end' }),
+  new LoadingButton(element, { spinnerType: 'grow', timeout: 2000 }),
+  new MultiSelect(element, { selectedLabel: (count, total) => `${count}/${total}`, selectionType: 'counter' }),
+  new Navigation(element, { groupsAutoCollapse: false }),
+  new Offcanvas(element, { backdrop: false }),
+  new Rating(element, { activeIcon: { 1: '<b>1</b>' }, value: 3 }),
+  new SearchButton(element, { shortcut: 'ctrl+k' }),
+  new Stepper(element, { linear: false }),
+  // @ts-expect-error — not an autocomplete option
+  new Autocomplete(element, { searchable: true }),
+  // @ts-expect-error — not a chip input option
+  new ChipInput(element, { maxChip: 3 }),
+  // @ts-expect-error — not a context menu option
+  new ContextMenu(element, { autoclose: 'outside' }),
+  // @ts-expect-error — not a backdrop value
+  new Dialog(element, { backdrop: 'statik' }),
+  // @ts-expect-error — not a drawer option
+  new Drawer(element, { scrolling: true }),
+  // @ts-expect-error — not a dropdown option
+  new Dropdown(element, { autoclose: false }),
+  // @ts-expect-error — not a spinner type
+  new LoadingButton(element, { spinnerType: 'dots' }),
+  // @ts-expect-error — not a modal option
+  new Modal(element, { backdorp: 'static' }),
+  // @ts-expect-error — not a selection type
+  new MultiSelect(element, { selectionType: 'pills' }),
+  // @ts-expect-error — not a navigation option
+  new Navigation(element, { autoCollapse: false }),
+  // @ts-expect-error — not an offcanvas option
+  new Offcanvas(element, { scrolling: true }),
+  // @ts-expect-error — not a rating option
+  new Rating(element, { valu: 3 }),
+  // @ts-expect-error — not a search button option
+  new SearchButton(element, { shortcuts: 'ctrl+k' }),
+  // @ts-expect-error — not a stepper option
+  new Stepper(element, { liner: false }),
+  // @ts-expect-error — setConfig takes the same options
+  new Autocomplete(element).setConfig({ searchable: true }),
+  // @ts-expect-error — and so does the multi select's
+  new MultiSelect(element).setConfig({ selectionType: 'pills' }),
+  // @ts-expect-error — and the rating's
+  new Rating(element).setConfig({ valu: 3 })
+]
+
+const exportedConfigs: [
+  Partial<AutocompleteConfig>, Partial<ModalConfig>, Partial<MultiSelectConfig>, Partial<NumberInputConfig>,
+  Partial<PasswordInputConfig>, Partial<RatingConfig>
+] = [{ search: 'global' }, { keyboard: false }, { search: true }, { repeat: false }, { ariaToggleLabel: 'Show' }, { itemCount: 10 }]
+
 // A component without options still takes an empty object.
 const tab: Tab = Tab.getOrCreateInstance(element, {})
 
@@ -225,7 +289,7 @@ const setByComposite = [
 
 export {
   alert, calendarConfig, chip, chipSet, closing, datePicker, dayFormatFunction, disabledDatesString, formatTypo, forwardedOptions,
-  ownOptions, setByComposite, tab,
+  exportedConfigs, otherOptions, ownOptions, setByComposite, tab,
   inputConfigs, inputTypeTypo, instance, localeLayout, modalHiding, nestedTypo, modalShowing, modalToggling,
   monthFormatTypo, multiSelect, name, nullDate, orCreated,
   pickerConfig, popoverShowing, popupShown, popupShownText, pressRatio, rangeInputTypeTypo, rangePickerConfig, sanitizedValue,

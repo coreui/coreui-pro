@@ -6,7 +6,6 @@
  */
 
 import BaseComponent from './base-component.js'
-import type { ComponentConfig } from './util/config.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
@@ -23,7 +22,12 @@ const DATA_KEY = 'coreui.navigation'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
-const Default = {
+type NavigationConfig = {
+  activeLinksExact: boolean
+  groupsAutoCollapse: boolean | string
+}
+
+const Default: NavigationConfig = {
   activeLinksExact: true,
   groupsAutoCollapse: true
 }
@@ -56,7 +60,7 @@ const SELECTOR_DATA_NAVIGATION = '[data-coreui-navigation]'
  */
 
 class Navigation extends BaseComponent {
-  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
+  constructor(element?: string | Element | null, config?: Partial<NavigationConfig> | null) {
     super(element)
     this._config = this._getConfig(config)
     this._setActiveLink()
@@ -208,3 +212,4 @@ EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
 defineJQueryPlugin(Navigation)
 
 export default Navigation
+export type { NavigationConfig }

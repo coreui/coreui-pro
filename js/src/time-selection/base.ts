@@ -129,7 +129,7 @@ class TimeSelection extends Config {
     this._markSelected()
   }
 
-  setConfig(config: any): void {
+  setConfig(config: Partial<TimeSelectionConfig> | null): void {
     this._config = this._getConfig({ ...this._config, ...config }) as typeof Default
     this._date = this._config.time as Date | null
     this._render()

@@ -9,7 +9,6 @@ import type { ReferenceElement } from '@floating-ui/dom'
 import EventHandler, { type CoreUIEvent } from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import Menu, { type MenuConfig } from './menu.js'
-import type { ComponentConfig } from './util/config.js'
 import {
   defineJQueryPlugin, isDisabled, jQueryDispatch, noop
 } from './util/index.js'
@@ -57,7 +56,7 @@ class ContextMenu extends Menu {
   protected declare _point: Point | null
   protected declare _scrollBlocker: ((event: Event) => void) | null
 
-  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
+  constructor(element?: string | Element | null, config?: Partial<MenuConfig> | null) {
     super(element, config)
 
     this._point = null

@@ -9,7 +9,6 @@
  */
 
 import DialogBase from './dialog-base.js'
-import type { ComponentConfig } from './util/config.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { enableDismissTrigger } from './util/component-functions.js'
@@ -37,7 +36,13 @@ const CLASS_NAME_SWAP_IN = 'modal-swap-in'
 
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="modal"]'
 
-const Default = {
+type ModalConfig = {
+  backdrop: boolean | 'static'
+  keyboard: boolean
+  modal: boolean
+}
+
+const Default: ModalConfig = {
   backdrop: true,
   keyboard: true,
   modal: true
@@ -53,8 +58,8 @@ const DefaultType = {
  * Class definition
  */
 
-class Modal extends DialogBase {
-  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
+class Modal extends DialogBase<ModalConfig> {
+  constructor(element?: string | Element | null, config?: Partial<ModalConfig> | null) {
     super(resolveDialogElement(element, NAME), config)
   }
 
@@ -184,3 +189,4 @@ enableDismissTrigger(Modal)
 defineJQueryPlugin(Modal)
 
 export default Modal
+export type { ModalConfig }

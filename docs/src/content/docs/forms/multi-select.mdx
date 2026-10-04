@@ -561,7 +561,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `selectionLimit` | number, null | `null` | Sets the maximum number of selectable options. The select all button stays enabled and selects up to the limit (firing the `selectionLimit` event), then toggles to deselect all once the limit is reached. |
 | `selectionType` | string | `'tags'` | Sets the selection style: `'chips'`, `'counter'`, `'tags'` or `'text'`. Selections render as [Chip](/components/chip/) components — `'tags'` and `'chips'` are the same thing, kept as synonyms. |
 | `valid` | boolean | `false` | Toggle the valid state for the component. |
-| `value` | boolean | `null` | Sets the initially selected values for the multi-select component. |
+| `value` | string, number, array, null | `null` | Sets the initially selected values for the multi-select component; a string may list several values separated by commas. |
 
 ### Methods
 

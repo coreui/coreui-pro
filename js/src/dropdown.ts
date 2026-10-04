@@ -68,7 +68,7 @@ class Dropdown extends Menu {
   declare ['constructor']: typeof Dropdown
   protected declare _inNavbar: boolean
 
-  constructor(element?: string | Element | null, config?: Record<string, any> | null) {
+  constructor(element?: string | Element | null, config?: Partial<MenuConfig> | null) {
     super(element, config)
 
     this._inNavbar = this._detectNavbar()
