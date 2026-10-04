@@ -1,4 +1,4 @@
-/* eslint-disable import/no-unassigned-import */
+/* eslint-disable import/no-unassigned-import, import/no-unresolved */
 
 import Tooltip from '../../dist/tooltip.mjs'
 import '../../dist/carousel.mjs'
