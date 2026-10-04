@@ -309,7 +309,7 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | `endFloatingLabel` | string, null | `null` | Floating label of the end field |
 | `endName` | string, null | `null` | Name of the hidden input carrying the end date. Without it the end date is not submitted with the form. |
 | `format` | function, string, null | `null` | Mask layout for both ends: `null` derives it from the locale, a string is parsed as format tokens, a function receives the locale and returns the section layout |
-| `hourPlaceholder` | string, null | `null` | Replaces the `HH` the hour section shows while it is empty. |
+| `hourPlaceholder` | string, null | `null` | Replaces the `HH` (`hh` on a 12-hour clock) the hour section shows while it is empty. |
 | `inputDateParse` | function, null | `null` | Custom parser used for pasted text, e.g. a date library |
 | `inputOptions` | object | `{}` | Extra options passed to both date inputs |
 | `invalid` | boolean | `false` | Force the invalid state (`.is-invalid`) on both ends |

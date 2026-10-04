@@ -33,6 +33,7 @@ import {
   getWeekSectionMax,
   getWeekSectionsFromLocale,
   hasShortcutModifier,
+  isBeforeYearOne,
   isDateSelectableWithin,
   isEditableSection,
   isTypedKey,
@@ -595,6 +596,24 @@ describe('Date Sections Utilities', () => {
 
     it('should return four-digit years as-is', () => {
       expect(getFullYearFromSection({ type: 'year', length: 4, value: 2026 })).toBe(2026)
+    })
+  })
+
+  describe('isBeforeYearOne', () => {
+    const layout = getSectionsFromFormat('dd.MM.yyyy', 'en-US')
+    const fill = (day, month, year) => layout.map(section => ({
+      ...section, value: { day, month, year }[section.type] ?? section.value
+    }))
+
+    it('should tell a filled field whose year is below 1', () => {
+      expect(isBeforeYearOne(fill(15, 6, 0))).toBeTrue()
+    })
+
+    it('should not tell a field with an empty or out-of-bounds section, or a year from 1', () => {
+      expect(isBeforeYearOne(fill(null, 6, 0))).toBeFalse()
+      expect(isBeforeYearOne(fill(0, 6, 0))).toBeFalse()
+      expect(isBeforeYearOne(fill(15, 6, 1))).toBeFalse()
+      expect(isBeforeYearOne(getSectionsFromFormat('HH:mm', 'en-US'))).toBeFalse()
     })
   })
 

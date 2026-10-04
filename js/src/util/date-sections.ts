@@ -622,6 +622,21 @@ export const getFullYearFromSection = (section: EditableSection): number | null 
 }
 
 /**
+ * Tells whether a field's sections are all filled and within their bounds
+ * except a year before year 1, which no date can hold.
+ *
+ * @param sections - The sections and literals of a field
+ * @returns `true` for a filled field whose only fault is a year below 1
+ */
+export const isBeforeYearOne = (sections: DateSection[]): boolean => {
+  const editable = sections.filter(isEditableSection)
+  const year = editable.find(section => section.type === 'year')
+
+  return year !== undefined && (getFullYearFromSection(year) ?? 1) < 1 && editable.every(section =>
+    section === year || (section.value !== null && section.value >= getSectionBounds(section).min))
+}
+
+/**
  * Builds a date from filled sections, cutting the day to the length of the
  * month. A week section gives the Monday of the ISO week (the year section then
  * holds the ISO week-numbering year), and a quarter section the first day of
