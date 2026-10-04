@@ -1293,6 +1293,16 @@ describe('DateInput', () => {
       expect(dateInput.getDate()).toEqual(new Date(2026, 6, 14))
     })
 
+    it('should read a two-digit year pasted into a four-digit year as that year', () => {
+      const dateInput = createDateInput()
+      const [day, , year] = getSections(dateInput._element)
+
+      paste(day, '15.06.26')
+
+      expect(year.textContent).toEqual('0026')
+      expect(dateInput.getDate()).toEqual(new Date('0026-06-15T00:00'))
+    })
+
     it('should cut the day of a pasted date while the year is being typed', () => {
       const dateInput = createDateInput({ date: new Date(2026, 6, 14) })
       const [day, , year] = getSections(dateInput._element)
