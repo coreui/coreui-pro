@@ -33,6 +33,8 @@ Plugins can be included individually (using CoreUI's individual `js/dist/*.js`),
 
 If you use a bundler (Webpack, Rollup...), import the individual plugins from `@coreui/coreui-pro/js/dist/*`: an `import` resolves to the ES module next to each plugin (`js/dist/*.mjs`), a `require()` to its UMD file (`js/dist/*.js`).
 
+Load the plugins one way. The bundle, the per-plugin ES modules and the per-plugin UMD files each carry their own copy of the shared internals, so a plugin that reaches the page through two of them registers its data attribute handlers twice — a dropdown toggle then opens and closes on the same click.
+
 ## TypeScript
 
 Our plugins are authored in TypeScript and ship with type declarations — no `@types/…` package is needed. The main entry point and every individual plugin under `js/dist/` come with their own declarations, `.d.ts` for the UMD files and `.d.mts` for the ES modules:

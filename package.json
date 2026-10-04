@@ -54,6 +54,8 @@
     "js-test-visual": "vitest run --config js/tests/vitest-visual.config.mts",
     "js-test-integration-bundle": "rolldown --config js/tests/integration/rolldown.bundle.mjs",
     "js-test-integration-modularity": "rolldown --config js/tests/integration/rolldown.bundle-modularity.mjs",
+    "js-test-integration-modularity-esm": "rolldown --config js/tests/integration/rolldown.bundle-modularity-esm.mjs",
+    "js-test-package": "node build/check-package.mjs",
     "js-test-jquery": "cross-env JQUERY=true vitest run --config js/tests/vitest.config.mts",
     "lint": "npm-run-all --aggregate-output --continue-on-error --parallel js-lint js-typecheck js-test-default-type js-test-docs-options css-lint css-components-test lockfile-lint",
     "docs": "npm-run-all docs-build docs-lint",
@@ -85,9 +87,14 @@
   },
   "exports": {
     ".": {
-      "types": "./js/dist/index.d.ts",
-      "import": "./dist/js/coreui.esm.js",
-      "require": "./dist/js/coreui.js"
+      "import": {
+        "types": "./js/dist/index.d.mts",
+        "default": "./dist/js/coreui.esm.js"
+      },
+      "require": {
+        "types": "./js/dist/index.d.ts",
+        "default": "./dist/js/coreui.js"
+      }
     },
     "./js/src/*.js": {
       "import": {
@@ -110,6 +117,7 @@
         "default": "./js/dist/*.js"
       }
     },
+    "./js/dist/*.mjs": "./js/dist/*.mjs",
     "./js/dist/*": {
       "import": {
         "types": "./js/dist/*.d.mts",

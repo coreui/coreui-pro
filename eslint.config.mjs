@@ -184,7 +184,7 @@ export default [
   {
     // The consumer type test imports the emitted declarations on purpose, so it
     // resolves only after a build — and the lint job runs before one.
-    files: ['js/tests/types/**/*.ts'],
+    files: ['js/tests/types/**/*.{cts,mts,ts}'],
     languageOptions: {
       parser: tseslint.parser,
       sourceType: 'module'

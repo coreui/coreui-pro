@@ -100,7 +100,7 @@ const build = async plugin => {
     }
   })
 
-  await bundle.write({
+  const { output: [chunk] } = await bundle.write({
     banner: banner(plugin.fileName),
     format: 'umd',
     name: plugin.className,
@@ -109,6 +109,11 @@ const build = async plugin => {
     generatedCode: { preset: 'es2015' },
     file: plugin.dist
   })
+
+  // A named export puts the UMD file in named mode, so require() returns an object instead of the plugin
+  if (path.dirname(plugin.src) === sourcePath && plugin.fileName !== 'index.ts' && chunk.exports.some(name => name !== 'default')) {
+    throw new Error(`${plugin.fileName} exports ${chunk.exports.join(', ')}; a plugin file exports only its default`)
+  }
 
   if (plugin.esmDist) {
     await bundle.write({
