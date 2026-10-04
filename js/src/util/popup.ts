@@ -347,21 +347,24 @@ class Popup extends Config {
       }
 
       settled = true
-      content.removeEventListener('transitionend', onTransitionEnd)
 
       if (transition === this._transition) {
         callback()
       }
     }
 
-    const onTransitionEnd = (event: TransitionEvent) => {
-      if (event.target === content && event.propertyName === 'opacity') {
-        settle()
-      }
+    const duration = getTransitionDurationFromElement(content)
+    const fades = typeof content.getAnimations === 'function' ?
+      content.getAnimations().filter(animation => animation instanceof CSSTransition && animation.transitionProperty === 'opacity') :
+      []
+
+    if (fades.length === 0) {
+      setTimeout(settle, duration + 5)
+      return
     }
 
-    content.addEventListener('transitionend', onTransitionEnd)
-    setTimeout(settle, getTransitionDurationFromElement(content) + 5)
+    Promise.allSettled(fades.map(fade => fade.finished)).then(settle)
+    setTimeout(settle, duration + 1000)
   }
 
   _unmount(): void {

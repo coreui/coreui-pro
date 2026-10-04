@@ -45,6 +45,66 @@ describe('picker popup events', () => {
     expect(await opacity).toBe('1')
   })
 
+  it('should fire shown once the panel has faded in while the main thread is busy', async () => {
+    const host = mount()
+    const opacity = once(host, 'shown', () => getComputedStyle(picker._menu).opacity)
+
+    picker.show()
+    await new Promise(resolve => {
+      requestAnimationFrame(resolve)
+    })
+
+    const until = performance.now() + 220
+
+    while (performance.now() < until) {
+      Math.random()
+    }
+
+    expect(await opacity).toBe('1')
+  })
+
+  it('should fire shown at once when the fade in is cut short', async () => {
+    const host = mount()
+    const shown = once(host, 'shown', () => performance.now())
+    const start = performance.now()
+
+    picker.show()
+    container.style.display = 'none'
+
+    expect(await shown - start).toBeLessThan(500)
+  })
+
+  it('should take the panel out once it has faded out while the main thread is busy', async () => {
+    const host = mount()
+    const shown = once(host, 'shown', () => null)
+    picker.show()
+    await shown
+
+    const menu = picker._menu
+    const remove = menu.remove.bind(menu)
+    let opacity = null
+    menu.remove = () => {
+      opacity = getComputedStyle(menu).opacity
+      remove()
+    }
+
+    const hidden = once(host, 'hidden', () => null)
+    picker.hide()
+    await new Promise(resolve => {
+      requestAnimationFrame(resolve)
+    })
+
+    const until = performance.now() + 220
+
+    while (performance.now() < until) {
+      Math.random()
+    }
+
+    await hidden
+
+    expect(opacity).toBe('0')
+  })
+
   it('should fire hidden once the panel has faded out and left the page', async () => {
     const host = mount()
     const shown = once(host, 'shown', () => null)
