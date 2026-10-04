@@ -66,7 +66,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
-| `ariaLoadingLabel`| string | `'Loading'`| Announced after the button's name when loading starts. |
+| `ariaLoadingLabel`| string | `'Loading'`| Names the spinner while the button loads and follows the button's name when the start is announced. An empty string hides the spinner from assistive technologies. |
 | `disabledOnLoading`| boolean | `false`| Blocks the button while it is loading: it gets `aria-disabled="true"` and `.disabled`, keeps focus, and ignores clicks and form submission. |
 | `spinner`| boolean | `true`| Renders a spinner at the start of the button while it is loading. |
 | `spinnerType`| 'border', 'grow' | `'border'`| Sets type of spinner. |
@@ -105,6 +105,6 @@ myBtnLoading.addEventListener('stop.coreui.loading-button', () => {
 
 ## Accessibility
 
-- While the button loads with `disabledOnLoading`, it keeps focus. It gets `aria-disabled="true"` and the `.disabled` class rather than the `disabled` attribute, and clicks and form submission are ignored until it stops.
-- When the button has focus, the start of loading is announced through [`announce()`](/getting-started/accessibility/#announcing-messages) as its name followed by `ariaLoadingLabel` ("Save, Loading"), and the end as its name again. Nothing is announced while focus is elsewhere.
-- The spinner is decorative and hidden from assistive technologies.
+- While the button loads with `disabledOnLoading`, it keeps focus. It gets `aria-disabled="true"` and the `.disabled` class rather than the `disabled` attribute, and activating it does nothing until it stops; a disabled state the page set itself is left alone.
+- While it loads, the spinner is named by `ariaLoadingLabel`, so the button reads as "Loading Save" to anyone who reaches it.
+- When the button has focus, the start of loading is announced through [`announce()`](/getting-started/accessibility/#announcing-messages) as its name followed by `ariaLoadingLabel` ("Save, Loading"), and the end, politely, as its name again. Nothing is announced while focus is elsewhere.

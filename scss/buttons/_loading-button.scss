@@ -22,4 +22,8 @@
       opacity: 1;
     }
   }
+
+  .btn-loading.is-loading.disabled:focus-visible {
+    opacity: 1;
+  }
 }

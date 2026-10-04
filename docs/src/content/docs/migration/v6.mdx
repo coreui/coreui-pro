@@ -2604,7 +2604,8 @@ field behind that kept submitting.
   `[aria-disabled="true"]` instead.
 - **The start and the end of loading are announced** when the button has
   focus: its name followed by the new `ariaLoadingLabel` option, then its name
-  again. The spinner no longer carries `role="status"`.
+  again. While loading, the spinner is a `role="img"` named by
+  `ariaLoadingLabel` instead of an empty `role="status"`.
 
 #### Navbar
 

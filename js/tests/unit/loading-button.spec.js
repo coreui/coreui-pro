@@ -123,8 +123,9 @@ describe('LoadingButton', () => {
           const spinner = button.querySelector('.btn-loading-spinner')
           expect(spinner).toBeTruthy()
           expect(spinner.classList.contains('spinner-border')).toBe(true)
-          expect(spinner.hasAttribute('role')).toBeFalse()
-          expect(spinner.getAttribute('aria-hidden')).toBe('true')
+          expect(spinner.getAttribute('role')).toBe('img')
+          expect(spinner.getAttribute('aria-label')).toBe('Loading')
+          expect(spinner.hasAttribute('aria-hidden')).toBeFalse()
           resolve()
         })
 
@@ -321,7 +322,7 @@ describe('LoadingButton', () => {
   })
 
   describe('while loading', () => {
-    const messages = () => [...document.querySelectorAll('[data-coreui-live-announcer] [aria-live="assertive"] > *')].map(message => message.textContent)
+    const messages = (priority = 'assertive') => [...document.querySelectorAll(`[data-coreui-live-announcer] [aria-live="${priority}"] > *`)].map(message => message.textContent)
 
     const removeAnnouncers = () => {
       for (const announcer of document.querySelectorAll('[data-coreui-live-announcer]')) {
@@ -339,16 +340,25 @@ describe('LoadingButton', () => {
       removeAnnouncers()
     })
 
-    it('should keep focus on the button with disabledOnLoading', () => {
+    it('should keep focus on the button with disabledOnLoading', async () => {
+      vi.useRealTimers()
       fixtureEl.innerHTML = '<button>Save</button>'
       const button = fixtureEl.querySelector('button')
       const loadingButton = new LoadingButton(button, { disabledOnLoading: true })
 
       button.focus()
       loadingButton.start()
-      vi.advanceTimersByTime(10)
+      await new Promise(resolve => {
+        setTimeout(resolve, 10)
+      })
+      await new Promise(resolve => {
+        requestAnimationFrame(resolve)
+      })
+      await new Promise(resolve => {
+        requestAnimationFrame(resolve)
+      })
 
-      expect(document.activeElement).toEqual(button)
+      expect(document.activeElement).toBe(button)
     })
 
     it('should block clicks and form submission with disabledOnLoading', () => {
@@ -362,6 +372,7 @@ describe('LoadingButton', () => {
       const loadingButton = new LoadingButton(button, { disabledOnLoading: true })
 
       loadingButton.start()
+      vi.advanceTimersByTime(10)
       button.click()
 
       expect(clickSpy).not.toHaveBeenCalled()
@@ -402,7 +413,39 @@ describe('LoadingButton', () => {
       loadingButton.stop()
       vi.advanceTimersByTime(110)
 
-      expect(messages()).toEqual(['Save, Loading', 'Save'])
+      expect(messages('polite')).toEqual(['Save'])
+    })
+
+    it('should cancel a start message that was not read yet', () => {
+      fixtureEl.innerHTML = '<button>Save</button>'
+      const button = fixtureEl.querySelector('button')
+      const loadingButton = new LoadingButton(button, { spinner: false })
+
+      button.focus()
+      loadingButton.start()
+      vi.advanceTimersByTime(50)
+      loadingButton.stop()
+      vi.advanceTimersByTime(110)
+
+      expect(messages()).toEqual([])
+      expect(messages('polite')).toEqual(['Save'])
+    })
+
+    it('should announce the accessible name', () => {
+      fixtureEl.innerHTML = '<button aria-labelledby="name"><span aria-hidden="true">save</span></button><span id="name">Save draft</span><button id="text"><span aria-hidden="true">save</span>Save</button>'
+      const named = fixtureEl.querySelector('button')
+      const text = fixtureEl.querySelector('#text')
+      const first = new LoadingButton(named, { spinner: false })
+      const second = new LoadingButton(text)
+
+      named.focus()
+      first.start()
+      vi.advanceTimersByTime(110)
+      text.focus()
+      second.start()
+      vi.advanceTimersByTime(110)
+
+      expect(messages()).toEqual(['Save draft, Loading', 'Save, Loading'])
     })
 
     it('should take custom ariaLoadingLabel wording', () => {
@@ -431,6 +474,90 @@ describe('LoadingButton', () => {
       expect(messages()).toEqual([])
     })
 
+    it('should name the spinner with ariaLoadingLabel and hide it without one', () => {
+      fixtureEl.innerHTML = '<button id="a">Save</button><button id="b">Save</button>'
+      const named = new LoadingButton(fixtureEl.querySelector('#a'))
+      const hidden = new LoadingButton(fixtureEl.querySelector('#b'), { ariaLoadingLabel: '' })
+
+      named.start()
+      hidden.start()
+      const [first, second] = fixtureEl.querySelectorAll('.btn-loading-spinner')
+
+      expect(first.getAttribute('aria-label')).toBe('Loading')
+      expect(second.getAttribute('aria-hidden')).toBe('true')
+      expect(second.hasAttribute('role')).toBeFalse()
+    })
+
+    it('should keep the click that started loading', () => {
+      fixtureEl.innerHTML = '<form><button type="submit">Save</button></form>'
+      const form = fixtureEl.querySelector('form')
+      const button = fixtureEl.querySelector('button')
+      const submitSpy = vi.fn(event => event.preventDefault())
+      const loadingButton = new LoadingButton(button, { disabledOnLoading: true })
+      const start = () => loadingButton.start()
+
+      form.addEventListener('submit', submitSpy)
+      document.addEventListener('click', start, true)
+      button.click()
+      document.removeEventListener('click', start, true)
+
+      expect(submitSpy).toHaveBeenCalled()
+    })
+
+    it('should leave a disabled state the page set itself', () => {
+      fixtureEl.innerHTML = '<a class="btn disabled" aria-disabled="true" href="#next">Next</a>'
+      const link = fixtureEl.querySelector('a')
+      const loadingButton = new LoadingButton(link, { disabledOnLoading: true, spinner: false })
+
+      loadingButton.start()
+      vi.advanceTimersByTime(10)
+      loadingButton.stop()
+
+      expect(link).toHaveClass('disabled')
+      expect(link.getAttribute('aria-disabled')).toBe('true')
+    })
+
+    it('should give back the disabled state when disposed while loading', () => {
+      fixtureEl.innerHTML = '<button>Save</button>'
+      const button = fixtureEl.querySelector('button')
+      const loadingButton = new LoadingButton(button, { disabledOnLoading: true })
+
+      loadingButton.start()
+      vi.advanceTimersByTime(10)
+      loadingButton.dispose()
+
+      expect(button.hasAttribute('aria-disabled')).toBeFalse()
+      expect(button).not.toHaveClass('disabled')
+    })
+
+    it('should not throw when a stop listener disposes the instance', () => {
+      fixtureEl.innerHTML = '<button>Save</button>'
+      const button = fixtureEl.querySelector('button')
+      const loadingButton = new LoadingButton(button, { spinner: false })
+
+      button.addEventListener('stop.coreui.loading-button', () => loadingButton.dispose())
+      button.focus()
+      loadingButton.start()
+      vi.advanceTimersByTime(10)
+
+      expect(() => loadingButton.stop()).not.toThrow()
+    })
+
+    it('should end idle and announce in order when a start listener stops loading', () => {
+      fixtureEl.innerHTML = '<button>Save</button>'
+      const button = fixtureEl.querySelector('button')
+      const loadingButton = new LoadingButton(button, { disabledOnLoading: true, spinner: false })
+
+      button.addEventListener('start.coreui.loading-button', () => loadingButton.stop())
+      button.focus()
+      loadingButton.start()
+      vi.advanceTimersByTime(110)
+
+      expect(button.hasAttribute('aria-disabled')).toBeFalse()
+      expect(messages()).toEqual([])
+      expect(messages('polite')).toEqual(['Save'])
+    })
+
     it('should stop blocking clicks after dispose', () => {
       fixtureEl.innerHTML = '<button>Save</button>'
       const button = fixtureEl.querySelector('button')
@@ -446,6 +573,7 @@ describe('LoadingButton', () => {
 
       window.addEventListener('error', onError)
       loadingButton.start()
+      vi.advanceTimersByTime(10)
       loadingButton.dispose()
       button.click()
       window.removeEventListener('error', onError)
