@@ -67,7 +67,9 @@ type TimePickerConfig = {
   time: Date | string | null
 }
 
-type TimePickerOptions = Partial<TimePickerConfig> & Partial<Omit<TimeInputConfig & TimeSelectionConfig, keyof TimePickerConfig>>
+type TimePickerOptions = Partial<TimePickerConfig>
+  & Partial<Omit<TimeInputConfig, keyof TimePickerConfig | 'date'>>
+  & Partial<Omit<TimeSelectionConfig, keyof TimePickerConfig | 'hourCycle' | 'onChange'>>
 
 const Default: TimePickerConfig = {
   allowList: SVGAllowlist,

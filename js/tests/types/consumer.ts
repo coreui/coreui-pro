@@ -12,7 +12,7 @@
 
 import {
   Alert, Calendar, Chip, ChipSet, Combobox, DateInput, DatePicker, DateRangeInput, DateRangePicker, ListBox, Menu, Modal,
-  MultiSelect, Popover, Range, RangeSlider, TimeInput, TimePicker, Toast, Toaster, Tooltip, Transfer
+  MultiSelect, OTPInput, Popover, Range, RangeSlider, Tab, TimeInput, TimePicker, Toast, Toaster, Tooltip, Transfer
 } from '../../dist/index.js'
 import type { CalendarConfig } from '../../dist/calendar.js'
 import type { DateInputConfig } from '../../dist/date-input.js'
@@ -161,6 +161,8 @@ const unknownOptions = [
   new Toast(element, { autoHide: false }),
   // @ts-expect-error — not a toaster option
   new Toaster(element, { position: 'top' }),
+  // @ts-expect-error — a toaster placement is an edge and an alignment
+  new Toaster(element, { placement: 'top-right' }),
   // @ts-expect-error — not a tooltip option
   new Tooltip(element, { titel: 'Hello' }),
   // @ts-expect-error — not a transfer option
@@ -168,7 +170,19 @@ const unknownOptions = [
   // @ts-expect-error — getOrCreateInstance takes the constructor's options
   Tooltip.getOrCreateInstance(element, { titel: 'Hello' }),
   // @ts-expect-error — and so does a field's setConfig
-  new TimeInput(element).setConfig({ second: true })
+  new TimeInput(element).setConfig({ second: true }),
+  // @ts-expect-error — and the one-time password field's
+  new OTPInput(element).setConfig({ lenght: 4 })
+]
+
+// A component without options still takes an empty object.
+const tab: Tab = Tab.getOrCreateInstance(element, {})
+
+// A field takes its own options on top of the shared ones.
+const ownOptions = [
+  new DateInput(element, { seconds: true, type: 'datetime' }),
+  new TimeInput(element, { seconds: true }),
+  new OTPInput(element, { placeholder: 0, value: 123456 })
 ]
 
 // A composite also takes the options of the parts it forwards them to.
@@ -176,20 +190,42 @@ const forwardedOptions = [
   new DatePicker(element, { ariaDayLabel: 'Tag', firstDayOfWeek: 0, hours: [9, 10] }),
   new DateRangePicker(element, { ariaDayLabel: 'Tag', firstDayOfWeek: 0 }),
   new DateRangeInput(element, { ariaDayLabel: 'Tag', monthNames: null }),
-  new TimePicker(element, { ariaSelectHoursLabel: 'Stunden', hours: [9, 10] }),
+  new TimePicker(element, { ariaSelectHoursLabel: 'Stunden', hourPlaceholder: '--', hours: [9, 10] }),
   DatePicker.getOrCreateInstance(element, { firstDayOfWeek: 0 }),
+  // The picker's own option wins over a part's option of the same name.
+  new DatePicker(element, { seconds: [0, 30] }),
+  new TimePicker(element, { seconds: [0, 30] }),
+  // The range picker's input options reach the two date inputs.
+  new DateRangePicker(element, { inputOptions: { ariaLabel: 'Trip dates' } }),
+  // @ts-expect-error — and so they are date input options, not range input ones
+  new DateRangePicker(element, { inputOptions: { startName: 'from' } }),
   // @ts-expect-error — not an option of the picker or of its parts
   new DatePicker(element, { firstDayOfWek: 0 }),
-  // @ts-expect-error — the range input forwards to date inputs, not to a calendar
+  // @ts-expect-error — the range input has no calendar
   new DateRangeInput(element, { firstDayOfWeek: 0 }),
-  // @ts-expect-error — the range picker forwards to the range input, not to a date input
-  new DateRangePicker(element, { hours: [9, 10] }),
+  // @ts-expect-error — the range input names its fields startName and endName
+  new DateRangePicker(element, { name: 'range' }),
   // @ts-expect-error — the time picker has no calendar
-  new TimePicker(element, { firstDayOfWeek: 0 })
+  new TimePicker(element, { firstDayOfWeek: 0 }),
+  // @ts-expect-error — the time columns refuse a numeric limit, so the picker does
+  new TimePicker(element, { minDate: 5 })
+]
+
+// An option the composite always sets on its part is not taken from the caller.
+const setByComposite = [
+  // @ts-expect-error — the date picker sets its calendar's start date
+  new DatePicker(element, { startDate: new Date() }),
+  // @ts-expect-error — the range picker sets its calendar's range mode
+  new DateRangePicker(element, { range: false }),
+  // @ts-expect-error — the time picker listens to its columns itself
+  new TimePicker(element, { onChange: () => null }),
+  // @ts-expect-error — the range input names and fills its two fields
+  new DateRangeInput(element, { name: 'when' })
 ]
 
 export {
   alert, calendarConfig, chip, chipSet, closing, datePicker, dayFormatFunction, disabledDatesString, formatTypo, forwardedOptions,
+  ownOptions, setByComposite, tab,
   inputConfigs, inputTypeTypo, instance, localeLayout, modalHiding, nestedTypo, modalShowing, modalToggling,
   monthFormatTypo, multiSelect, name, nullDate, orCreated,
   pickerConfig, popoverShowing, popupShown, popupShownText, pressRatio, rangeInputTypeTypo, rangePickerConfig, sanitizedValue,

@@ -433,9 +433,12 @@ append the option name to `data-coreui-`, converting "_camelCase_" to
 "_kebab-case_" — write `data-coreui-selection-type="week"`, not
 `data-coreui-selectionType="week"`.
 
-Options belonging to the inner [calendar](/components/calendar/#options) or
-[date input](/forms/date-input/#options) are forwarded by name, so their data
-attributes work on the picker element too.
+Options belonging to the inner [calendar](/components/calendar/#options),
+[date input](/forms/date-input/#options) or, with `timepicker`, the time
+columns of the [time picker](/forms/time-picker/#options) are forwarded by
+name, so their data attributes work on the picker element too. The calendar's
+`startDate` and the time columns' `hourCycle`, `onChange` and `time` are set
+by the picker itself.
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |

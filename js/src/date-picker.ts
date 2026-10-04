@@ -90,7 +90,10 @@ type DatePickerConfig = {
   timepicker: boolean
 }
 
-type DatePickerOptions = Partial<DatePickerConfig> & Partial<Omit<CalendarConfig & DateInputConfig & TimeSelectionConfig, keyof DatePickerConfig>>
+type DatePickerOptions = Partial<DatePickerConfig>
+  & Partial<Omit<CalendarConfig, keyof DatePickerConfig | 'startDate'>>
+  & Partial<Omit<DateInputConfig, keyof DatePickerConfig>>
+  & Partial<Omit<TimeSelectionConfig, keyof DatePickerConfig | 'hourCycle' | 'onChange' | 'time'>>
 
 const Default: DatePickerConfig = {
   allowList: SVGAllowlist,

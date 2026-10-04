@@ -170,7 +170,7 @@ type ToasterConfig = {
   leave: Edge
   limit: number
   pauseOnHover: boolean
-  placement: string
+  placement: 'top-start' | 'top-center' | 'top-end' | 'middle-start' | 'middle-center' | 'middle-end' | 'bottom-start' | 'bottom-center' | 'bottom-end'
   sanitize: boolean
   sanitizeFn: ((unsafeHtml: string) => string) | null
   stack: boolean

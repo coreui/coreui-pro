@@ -80,7 +80,7 @@ type DateRangeInputConfig = {
   format: SectionFormat
   hourPlaceholder: string | null
   inputDateParse: ((value: string) => Date | null) | null
-  inputOptions: Record<string, any>
+  inputOptions: Partial<DateInputConfig>
   invalid: boolean
   locale: string
   maxDate: Date | string | null
@@ -107,8 +107,6 @@ type DateRangeInputConfig = {
   weekPlaceholder: string | null
   yearPlaceholder: string | null
 }
-
-type DateRangeInputOptions = Partial<DateRangeInputConfig> & Partial<Omit<DateInputConfig, keyof DateRangeInputConfig>>
 
 const Default: DateRangeInputConfig = {
   allowList: SVGAllowlist,
@@ -241,7 +239,7 @@ class DateRangeInput extends BaseComponent {
   protected declare _endDate: Date | null
   protected declare _applying: boolean
 
-  constructor(element?: string | Element | null, config?: DateRangeInputOptions | null) {
+  constructor(element?: string | Element | null, config?: Partial<DateRangeInputConfig> | null) {
     super(element, config)
 
     this._createdElements = []

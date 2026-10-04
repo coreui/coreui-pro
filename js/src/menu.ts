@@ -91,7 +91,7 @@ type MenuConfig = {
   container: string | Element | boolean
   display: string
   floatingConfig: FloatingConfigOption
-  menu: HTMLElement | null
+  menu: Element | null
   offset: FloatingOffsetOption
   placement: string | null
   reference: string | Element | Record<string, any>
