@@ -10,6 +10,7 @@ import Chip from './chip.js'
 import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
+import { announce } from './util/announce.js'
 import { CHECK_ICON, REMOVE_ICON } from './util/icons.js'
 import {
   defineJQueryPlugin, getNextActiveElement, isRTL, jQueryDispatch
@@ -121,10 +122,11 @@ class ChipSet extends BaseComponent {
   protected declare _optionChips: Set<HTMLElement>
   protected declare _ownedChips: Map<HTMLElement, Chip>
   protected declare _input: HTMLElement | null
-  protected declare _liveRegion: HTMLElement | null
   protected declare _anchor: HTMLElement | null
   protected declare _search: string
   protected declare _searchTimeout: ReturnType<typeof setTimeout> | null
+  protected declare _announcedFrom: string[] | null
+  protected declare _settled: boolean
 
   constructor(element?: string | Element | null, config?: Partial<ChipSetConfig> | null) {
     super(element, config)
@@ -135,15 +137,18 @@ class ChipSet extends BaseComponent {
     this._chips = []
     this._optionChips = new Set()
     this._ownedChips = new Map()
-    this._liveRegion = null
     this._anchor = null
     this._search = ''
     this._searchTimeout = null
+    this._announcedFrom = null
+    this._settled = false
 
     this._applyAccessibilityRoles()
     this._initChips()
-    this._createLiveRegion()
     this._addEventListeners()
+    queueMicrotask(() => {
+      this._settled = true
+    })
   }
 
   // Getters
@@ -192,8 +197,8 @@ class ChipSet extends BaseComponent {
     const element = isElement ? chip : this._createChip(value)
     this._appendChip(element)
     this._setupChip(element)
+    this._noteChange()
     this._chips.push(value)
-    this._announce(`${value} ${this._config.ariaAddedAnnouncement}`)
 
     EventHandler.trigger(this._element, this.constructor.eventName(EVENT_CHANGE), {
       value: this.getValues()
@@ -321,11 +326,6 @@ class ChipSet extends BaseComponent {
       clearTimeout(this._searchTimeout)
     }
 
-    if (this._liveRegion) {
-      this._liveRegion.remove()
-      this._liveRegion = null
-    }
-
     super.dispose()
   }
 
@@ -407,20 +407,30 @@ class ChipSet extends BaseComponent {
     }
   }
 
-  // Announce add/remove without moving focus. The region lives NEXT TO the
-  // set element: a role=status child inside a listbox would violate the
-  // listbox's required children.
-  _createLiveRegion(): void {
-    const region = document.createElement('span')
-    region.classList.add('visually-hidden')
-    region.setAttribute('role', 'status')
-    this._element.after(region)
-    this._liveRegion = region
+  _noteChange(): void {
+    if (!this._settled || this._announcedFrom) {
+      return
+    }
+
+    this._announcedFrom = [...this._chips]
+    queueMicrotask(() => this._announceChange())
   }
 
-  _announce(message: string): void {
-    if (this._liveRegion) {
-      this._liveRegion.textContent = message
+  _announceChange(): void {
+    const before = this._announcedFrom ?? []
+    this._announcedFrom = null
+
+    if (!this._element?.isConnected || !this._element.checkVisibility()) {
+      return
+    }
+
+    const added = this._chips.find(value => !before.includes(value))
+    const removed = before.find(value => !this._chips.includes(value))
+
+    if (added) {
+      announce(`${added} ${this._config.ariaAddedAnnouncement}`, { context: this._element })
+    } else if (removed) {
+      announce(`${removed} ${this._config.ariaRemovedAnnouncement}`, { context: this._element })
     }
   }
 
@@ -689,10 +699,9 @@ class ChipSet extends BaseComponent {
 
     const index = this._chips.indexOf(value)
     if (index !== -1) {
+      this._noteChange()
       this._chips.splice(index, 1)
     }
-
-    this._announce(`${value} ${this._config.ariaRemovedAnnouncement}`)
 
     EventHandler.trigger(this._element, this.constructor.eventName(EVENT_CHANGE), {
       value: this.getValues()

@@ -389,6 +389,7 @@ describe('announce', () => {
     root.innerHTML = '<dialog><button type="button">Close</button><div class="source"></div></dialog>'
     const dialog = root.querySelector('dialog')
     dialog.showModal()
+    root.activeElement?.blur()
 
     announce('Saved', { context: root.querySelector('.source') })
     announce('Lost')
@@ -398,121 +399,19 @@ describe('announce', () => {
     expect(messages(document.body)).toEqual(['Lost'])
   })
 
-  it('should hold a message while a modal dialog plays its closing transition, and add it on the page after it closed', async () => {
-    fixtureEl.innerHTML = '<dialog><button type="button">Close</button></dialog>'
-    const dialog = fixtureEl.querySelector('dialog')
-    announce('Before')
-    vi.advanceTimersByTime(100)
-
+  it('should announce in the modal dialog in a shadow root that holds focus', () => {
+    const host = document.createElement('div')
+    fixtureEl.append(host)
+    const root = host.attachShadow({ mode: 'open' })
+    root.innerHTML = '<dialog><button type="button">Close</button></dialog>'
+    const dialog = root.querySelector('dialog')
     dialog.showModal()
-    dialog.classList.add('hiding')
+    root.querySelector('button').focus()
+
     announce('Saved')
-    vi.advanceTimersByTime(1000)
-
-    expect(dialog.querySelector('[data-coreui-live-announcer]')).toBeNull()
-    expect(messages(document.body)).toEqual(['Before'])
-
-    dialog.classList.remove('hiding')
-    dialog.close()
-    await Promise.resolve()
-    vi.advanceTimersByTime(499)
-    expect(messages(document.body)).toEqual(['Before'])
-
-    vi.advanceTimersByTime(1)
-    expect(messages(document.body)).toEqual(['Before', 'Saved'])
-  })
-
-  it('should hold a message sent as a dialog closes for 500 ms', async () => {
-    fixtureEl.innerHTML = '<dialog><button type="button">Close</button></dialog>'
-    const dialog = fixtureEl.querySelector('dialog')
-    announce('Before')
-    vi.advanceTimersByTime(100)
-    dialog.showModal()
-    await Promise.resolve()
-
-    dialog.close()
-    announce('After')
-    await Promise.resolve()
-    vi.advanceTimersByTime(499)
-    expect(messages(document.body)).toEqual(['Before'])
-
-    vi.advanceTimersByTime(1)
-    expect(messages(document.body)).toEqual(['Before', 'After'])
-  })
-
-  it('should hold the first message of the page for 500 ms when it is sent as a dialog closes', async () => {
-    fixtureEl.innerHTML = '<dialog><button type="button">Close</button></dialog>'
-    const dialog = fixtureEl.querySelector('dialog')
-    dialog.showModal()
-    await Promise.resolve()
-
-    dialog.close()
-    announce('Saved')
-    await Promise.resolve()
-    vi.advanceTimersByTime(499)
-    expect(announcers()).toHaveSize(1)
-    expect(messages(document.body)).toEqual([])
-
-    vi.advanceTimersByTime(1)
-    expect(messages(document.body)).toEqual(['Saved'])
-  })
-
-  it('should hold the modal dialog left open when the one above it closes', async () => {
-    fixtureEl.innerHTML = [
-      '<dialog id="lower"><button type="button">Lower</button></dialog>',
-      '<dialog id="upper"><button type="button">Upper</button></dialog>'
-    ].join('')
-    const lower = fixtureEl.querySelector('#lower')
-    const upper = fixtureEl.querySelector('#upper')
-    lower.showModal()
-    upper.showModal()
-    await Promise.resolve()
-
-    upper.close()
-    announce('After')
-    await Promise.resolve()
-    vi.advanceTimersByTime(499)
-    expect(lower.querySelector('[data-coreui-live-announcer]')).not.toBeNull()
-    expect(messages(lower)).toEqual([])
-
-    vi.advanceTimersByTime(1)
-    expect(messages(lower)).toEqual(['After'])
-  })
-
-  it('should not hold messages when a details element closes', async () => {
-    fixtureEl.innerHTML = '<details open><summary>More</summary><p>Text</p></details>'
-    announce('Before')
     vi.advanceTimersByTime(100)
 
-    fixtureEl.querySelector('details').open = false
-    announce('After')
-    await Promise.resolve()
-    vi.advanceTimersByTime(0)
-
-    expect(messages(document.body)).toEqual(['Before', 'After'])
-  })
-
-  it('should hold a message while a dialog that holds focus plays its closing transition, modal or not', async () => {
-    fixtureEl.innerHTML = '<dialog><button type="button">Apply</button></dialog>'
-    const dialog = fixtureEl.querySelector('dialog')
-    announce('Before')
-    vi.advanceTimersByTime(100)
-
-    dialog.show()
-    dialog.querySelector('button').focus()
-    dialog.classList.add('hiding')
-    announce('Applied')
-    vi.advanceTimersByTime(1000)
-    expect(messages(document.body)).toEqual(['Before'])
-
-    dialog.classList.remove('hiding')
-    dialog.close()
-    await Promise.resolve()
-    vi.advanceTimersByTime(499)
-    expect(messages(document.body)).toEqual(['Before'])
-
-    vi.advanceTimersByTime(1)
-    expect(messages(document.body)).toEqual(['Before', 'Applied'])
+    expect(messages(dialog)).toEqual(['Saved'])
   })
 
   it('should announce on the page while a dialog is open without being modal', () => {

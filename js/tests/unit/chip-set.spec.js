@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import Chip from '../../src/chip.js'
 import ChipSet from '../../src/chip-set.js'
 import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
@@ -950,43 +951,153 @@ describe('ChipSet', () => {
     })
   })
 
-  describe('live region', () => {
-    it('should announce added and removed chips in a status region next to the set', () => {
-      const el = setMarkup([])
-      const chipSet = new ChipSet(el, { removable: true })
+  describe('announcement', () => {
+    const messages = () => [...document.querySelectorAll('[data-coreui-live-announcer] [aria-live="polite"] > *')].map(message => message.textContent)
 
-      const region = el.nextElementSibling
-      expect(region.getAttribute('role')).toEqual('status')
-      expect(region).toHaveClass('visually-hidden')
+    const removeAnnouncers = () => {
+      for (const announcer of document.querySelectorAll('[data-coreui-live-announcer]')) {
+        announcer.remove()
+      }
+    }
 
-      chipSet.add('Alpha')
-      expect(region.textContent).toEqual('Alpha added')
-
-      chipSet.remove('Alpha')
-      expect(region.textContent).toEqual('Alpha removed')
+    beforeEach(() => {
+      removeAnnouncers()
+      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'performance'] })
     })
 
-    it('should use the configured announcement labels', () => {
+    afterEach(() => {
+      vi.useRealTimers()
+      removeAnnouncers()
+    })
+
+    const settle = async () => {
+      await Promise.resolve()
+      vi.advanceTimersByTime(100)
+    }
+
+    it('should announce added and removed chips through the live regions of the page', async () => {
+      const el = setMarkup([])
+      const chipSet = new ChipSet(el, { removable: true })
+      await Promise.resolve()
+
+      chipSet.add('Alpha')
+      await settle()
+      chipSet.remove('Alpha')
+      await settle()
+
+      expect(el.nextElementSibling).toBeNull()
+      expect(el.querySelector('[role="status"], [role="log"], [role="alert"], [aria-live]')).toBeNull()
+      expect(messages()).toEqual(['Alpha added', 'Alpha removed'])
+    })
+
+    it('should use the configured announcement labels', async () => {
       const el = setMarkup([])
       const chipSet = new ChipSet(el, {
         ariaAddedAnnouncement: 'dodano',
         ariaRemovedAnnouncement: 'usuni\u0119to'
       })
+      await Promise.resolve()
 
       chipSet.add('Alfa')
+      await settle()
+      chipSet.remove('Alfa')
+      await settle()
 
-      expect(el.nextElementSibling.textContent).toEqual('Alfa dodano')
+      expect(messages()).toEqual(['Alfa dodano', 'Alfa usuni\u0119to'])
     })
 
-    it('should remove the live region on dispose', () => {
+    it('should not announce chips added while it is set up', async () => {
       const el = setMarkup([])
       const chipSet = new ChipSet(el)
 
-      expect(el.nextElementSibling.getAttribute('role')).toEqual('status')
+      chipSet.add('JavaScript')
+      chipSet.add('TypeScript')
+      await settle()
 
-      chipSet.dispose()
+      expect(messages()).toEqual([])
+    })
 
-      expect(el.nextElementSibling).toBeNull()
+    it('should announce one change for the chips of one task, the net one', async () => {
+      const el = setMarkup([])
+      const chipSet = new ChipSet(el)
+      chipSet.add('a')
+      chipSet.add('b')
+      await Promise.resolve()
+
+      chipSet.clear()
+      chipSet.add('a')
+      chipSet.add('b')
+      chipSet.add('c')
+      await settle()
+
+      chipSet.add('d')
+      chipSet.add('e')
+      await settle()
+
+      expect(messages()).toEqual(['c added', 'd added'])
+    })
+
+    it('should stay silent while the set is hidden or out of the page', async () => {
+      const el = setMarkup([])
+      const chipSet = new ChipSet(el)
+      await Promise.resolve()
+
+      el.style.display = 'none'
+      chipSet.add('Hidden')
+      await settle()
+
+      el.style.display = ''
+      el.remove()
+      chipSet.add('Detached')
+      await settle()
+
+      expect(messages()).toEqual([])
+    })
+
+    it('should announce in the modal dialog the set is slotted into', async () => {
+      const el = setMarkup([])
+      const host = document.createElement('div')
+      fixtureEl.append(host)
+      const dialog = document.createElement('dialog')
+      dialog.append(document.createElement('slot'))
+      host.attachShadow({ mode: 'open' }).append(dialog)
+      host.append(el)
+      const chipSet = new ChipSet(el)
+      dialog.showModal()
+      host.shadowRoot.activeElement?.blur()
+      await Promise.resolve()
+
+      try {
+        chipSet.add('Alpha')
+        await settle()
+
+        expect(dialog.querySelector(':scope > [data-coreui-live-announcer] [aria-live="polite"]').textContent).toEqual('Alpha added')
+        expect(messages()).toEqual([])
+      } finally {
+        dialog.close()
+      }
+    })
+
+    it('should announce in the modal dialog around it, which the page cannot see into', async () => {
+      const el = setMarkup([])
+      const host = document.createElement('div')
+      fixtureEl.append(host)
+      const dialog = document.createElement('dialog')
+      host.attachShadow({ mode: 'open' }).append(dialog)
+      dialog.append(el)
+      const chipSet = new ChipSet(el)
+      dialog.showModal()
+      await Promise.resolve()
+
+      try {
+        chipSet.add('Alpha')
+        await settle()
+
+        expect(dialog.querySelector(':scope > [data-coreui-live-announcer] [aria-live="polite"]').textContent).toEqual('Alpha added')
+        expect(messages()).toEqual([])
+      } finally {
+        dialog.close()
+      }
     })
   })
 })

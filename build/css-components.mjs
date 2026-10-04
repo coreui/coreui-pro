@@ -25,7 +25,7 @@ const tailModules = ['helpers', 'utilities/api']
 const renders = {
   autocomplete: ['combobox', 'forms/floating-labels', 'forms/form-control', 'forms/form-control-group'],
   calendar: ['helpers/visually-hidden'],
-  'chip-set': ['chip', 'helpers/visually-hidden'],
+  'chip-set': ['chip'],
   combobox: ['popup', 'list-box', 'forms/form-control'],
   'date-picker': ['forms/floating-labels', 'forms/form-control', 'forms/form-control-group', 'forms/form-date-time', 'popup'],
   'forms/chip-input': ['chip', 'forms/form-control', 'forms/form-control-group'],
@@ -40,7 +40,7 @@ const renders = {
   sidebar: ['transitions'],
   'time-picker': ['forms/floating-labels', 'forms/form-control', 'forms/form-control-group', 'forms/form-date-time', 'popup'],
   toaster: ['buttons', 'close'],
-  transfer: ['list-box', 'buttons', 'helpers/visually-hidden', 'icon']
+  transfer: ['list-box', 'buttons', 'icon']
 }
 
 const groups = [
