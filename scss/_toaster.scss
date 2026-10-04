@@ -1,5 +1,4 @@
 @use "mixins/transition" as *;
-@use "mixins/visually-hidden" as *;
 @use "config" as *;
 @use "toasts";
 
@@ -28,10 +27,6 @@
   .toast-container-bottom-center,
   .toast-container-bottom-end {
     --#{$prefix}toast-limited-translate: 0 -50%;
-  }
-
-  .toast-announcer {
-    @include visually-hidden();
   }
 
   // scss-docs-start toast-stack
