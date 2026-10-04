@@ -202,7 +202,7 @@ Localized formats work the same way — the section names come from the componen
 
 The field participates in the standard form validation styling. Three mechanisms set the state:
 
-- **Range validation (automatic)** — a completed date outside `minDate`/`maxDate`/`disabledDates` gets `.is-invalid` until corrected. A date before year 1 counts as before `minDate` even without that option; when the field loses the focus, its year becomes 1.
+- **Range validation (automatic)** — a completed date outside `minDate`/`maxDate`/`disabledDates` gets `.is-invalid` until corrected, and until then the hidden input submits no date, as `getDate()` returns none. A date before year 1 counts as before `minDate` even without that option; when the field loses the focus, its year becomes 1.
 - **The `valid`/`invalid` options** — force the state, e.g. after server-side validation. An invalid field is never drawn valid: `valid` waits while its date is rejected or, in a date range, while the end is before the start.
 - **Form submit** — the date input renders a hidden input, which is excluded from native constraint validation, so the component applies the state itself when a form with the `data-coreui-validate` attribute is submitted: a `required` empty field becomes `.is-invalid`, and a filled one becomes `.is-valid` when the form opts into success styling with `data-coreui-validate="valid"`. A native form reset returns the field to the date it was created with and drops that state; a submit that follows the reset in the same task judges the restored date again, and a `reset` listener that calls `preventDefault()` cancels the whole reset.
 

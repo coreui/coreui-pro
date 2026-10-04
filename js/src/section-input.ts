@@ -678,7 +678,7 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
     this._element.classList.toggle(CLASS_NAME_FILLED, isFilled)
     this._valid = this._config.valid || (this._submitValid && isFilled && !isDisabled)
     this._setInvalid(isDisabled || this._config.invalid || (this._submitted && this._isMissing(date)))
-    this._inputElement!.value = date ? formatSections(this._sections) : ''
+    this._inputElement!.value = date && !isDisabled ? formatSections(this._sections) : ''
 
     if (error !== this._error) {
       this._error = error
