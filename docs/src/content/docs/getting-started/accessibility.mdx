@@ -53,7 +53,7 @@ announce('The connection was lost', { priority: 'assertive' })
 
 The first call adds a visually hidden live region at the start of `<body>`. Every call adds a message of its own to it one task later, or 100 ms after a new region was created, so messages sent together each get read, in the order they were sent, and the same text is read again. While a modal dialog is open the rest of the page is inert and screen readers ignore it, so the message goes to a region inside the dialog instead: the one holding focus, then the one around `context`, then the last one open in the document. The dialog is picked when the message is added, so one opened right after the call still gets it, and its region leaves with it when it closes.
 
-A modal dialog is still open while it plays its closing transition, and a message added to it then, or right before it closes, is lost with it. Announce the outcome of a dialog once it has closed: listen for `hidden.coreui.modal`, or wait for the promise `hide()` returns.
+A modal dialog is still open while it plays its closing transition, and a message added to it then, or right before it closes, is lost with it. A message sent from `hidden.coreui.modal` itself can be missed as well, while the screen reader follows focus back to the page: VoiceOver skipped it in Safari when focus went back to the button that opened the dialog, and in Chrome when it went to the page. Sent half a second later, with focus back on that button, it was read in both. Safari also skipped a message sent while the page was still loading, and read one sent a second later.
 
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
