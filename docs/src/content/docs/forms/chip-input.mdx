@@ -211,7 +211,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `focus()` | Focuses the ghost input. |
 | `getSelectedValues()` | Returns an array of selected chip values. |
 | `getValues()` | Returns an array of all chip values. |
-| `remove(chipOrValue)` | Removes a chip by element reference or value string. Returns `true` if removed. |
+| `remove(chipOrValue)` | Removes a chip by element reference or value string. Focus moves to the text field only when the chip had it. Returns `true` if removed. |
 | `removeSelected()` | Removes all currently selected chips. |
 | `selectChip(chip)` | Selects a specific chip element. |
 
@@ -276,7 +276,7 @@ chipInputElement.addEventListener('change.coreui.chip-input', event => {
 | Key | Action |
 | --- | --- |
 | `Enter` / `Space` | Toggle selection (selectable chips) |
-| `Backspace` / `Delete` | Remove chip (removable chips) |
+| `Backspace` / `Delete` | Remove the chip and move focus to the text field (removable chips) |
 | `←` | Move to previous chip |
 | `→` | Move to next chip |
 | `Home` | Move to first chip |

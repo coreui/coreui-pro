@@ -29,6 +29,7 @@ const EVENT_ADD = 'add'
 const EVENT_REMOVE = 'remove'
 const EVENT_CHANGE = 'change'
 const EVENT_SELECT = 'select'
+const EVENT_BLUR = 'blur'
 const EVENT_CLICK = 'click'
 const EVENT_KEYDOWN = 'keydown'
 
@@ -637,6 +638,10 @@ class ChipSet extends BaseComponent {
     return null
   }
 
+  _getRemovalFocusTarget(chip: HTMLElement): HTMLElement {
+    return this._getRemovalNeighbor(chip) ?? this._element
+  }
+
   _getRemovalNeighbor(chip: HTMLElement): HTMLElement | null {
     const chips = this._getFocusableChips()
     if (chips.length === 0) {
@@ -680,17 +685,47 @@ class ChipSet extends BaseComponent {
   }
 
   _handleChipRemove(event: any): void {
-    const chip = (event.target as HTMLElement).closest(SELECTOR_CHIP)
-    this._pendingFocus = chip ? this._getRemovalNeighbor(chip as HTMLElement) : null
+    const chip = (event.target as HTMLElement).closest<HTMLElement>(SELECTOR_CHIP)
+    this._pendingFocus = chip ? this._getRemovalFocusTarget(chip) : null
   }
 
   _handleChipRemoved(event: any): void {
-    const chip = (event.target as HTMLElement).closest(SELECTOR_CHIP)
-
-    this._pendingFocus?.focus()
+    const chip = (event.target as HTMLElement).closest<HTMLElement>(SELECTOR_CHIP)
+    const target = this._pendingFocus
     this._pendingFocus = null
 
+    if (target && chip?.contains((chip.getRootNode() as Document | ShadowRoot).activeElement)) {
+      if (target === this._element) {
+        this._focusSet()
+      } else {
+        target.focus()
+      }
+    }
+
     this._handleChipRemoval(chip as HTMLElement, this._getChipValue(chip as HTMLElement))
+  }
+
+  _focusSet(): void {
+    if (this._element.hasAttribute('tabindex')) {
+      this._element.focus()
+      return
+    }
+
+    this._element.setAttribute('tabindex', '-1')
+    this._addedAttributes.push('tabindex')
+    EventHandler.on(this._element, this.constructor.eventName(EVENT_BLUR), () => this._releaseSetTabindex())
+    this._element.focus()
+    this._releaseSetTabindex()
+  }
+
+  _releaseSetTabindex(): void {
+    if ((this._element.getRootNode() as Document | ShadowRoot).activeElement === this._element) {
+      return
+    }
+
+    EventHandler.off(this._element, this.constructor.eventName(EVENT_BLUR))
+    this._element.removeAttribute('tabindex')
+    this._addedAttributes = this._addedAttributes.filter(name => name !== 'tabindex')
   }
 
   _handleChipRemoval(chip: HTMLElement, value: string): void {

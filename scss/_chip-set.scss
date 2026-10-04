@@ -1,4 +1,5 @@
 @use "functions/defaults" as *;
+@use "mixins/focus-ring" as *;
 @use "mixins/tokens" as *;
 @use "config" as *;
 
@@ -23,5 +24,9 @@ $chip-set-tokens: defaults(
     display: flex;
     flex-wrap: wrap;
     gap: var(--#{$prefix}chip-set-gap);
+
+    &:focus-visible {
+      @include focus-ring();
+    }
   }
 }
