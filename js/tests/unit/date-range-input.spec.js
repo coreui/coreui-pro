@@ -112,6 +112,19 @@ describe('DateRangeInput', () => {
       }
     })
 
+    it('should fall back to the section labels the page set when the option is empty', () => {
+      const { ariaDayLabel } = DateRangeInput.Default
+      DateRangeInput.Default.ariaDayLabel = 'Dzień'
+
+      try {
+        build({ ariaDayLabel: '', format: 'dd.MM.yyyy' })
+
+        expect(fields().map(field => field.querySelector('[data-coreui-section="day"]').getAttribute('aria-label'))).toEqual(['Dzień', 'Dzień'])
+      } finally {
+        DateRangeInput.Default.ariaDayLabel = ariaDayLabel
+      }
+    })
+
     it('should remove the floating-label fields it built on dispose', () => {
       const range = build({ startFloatingLabel: 'Check-in', endFloatingLabel: 'Check-out' })
 
@@ -629,6 +642,13 @@ describe('DateRangeInput', () => {
       expect(root().querySelector('[data-coreui-range-separator]').getAttribute('aria-hidden')).toEqual('true')
       expect(root().querySelector('[data-coreui-range-separator] svg').hasAttribute('aria-hidden')).toBeFalse()
       expect(range.getStartDate()).toEqual(new Date(2026, 6, 14))
+    })
+
+    it('should put a separator it creates between ends written in reverse order', () => {
+      build({}, '<div id="range"><div data-coreui-range-end></div><div data-coreui-range-start></div></div>')
+      const order = [...root().children].map(element => Object.keys(element.dataset)[0])
+
+      expect(order).toEqual(['coreuiRangeEnd', 'coreuiRangeSeparator', 'coreuiRangeStart'])
     })
 
     it('should keep the aria-label of an end the author wrote', () => {

@@ -10,6 +10,7 @@ import DateInput from './date-input.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { type DisabledDate, isSameInstantAs } from './util/calendar.js'
+import { getForwardedOptions } from './util/composite.js'
 import type { ComponentConfig } from './util/config.js'
 import { hasShortcutModifier, type SectionFormat } from './util/date-sections.js'
 import {
@@ -431,13 +432,7 @@ class DateRangeInput extends BaseComponent {
   }
 
   _createInput(element: HTMLElement, overrides: Record<string, any>): any {
-    const forwarded: Record<string, any> = {}
-
-    for (const key of Object.keys(DateInput.Default)) {
-      if (key in this._config && this._config[key] !== (ORIGINAL_DEFAULT as Record<string, any>)[key]) {
-        forwarded[key] = this._config[key]
-      }
-    }
+    const forwarded = getForwardedOptions(Object.keys(DateInput.Default), this._config, this.constructor.Default, ORIGINAL_DEFAULT)
 
     return new DateInput(element, {
       ...forwarded, ...overrides, autofocus: false, ...this._config.inputOptions
@@ -492,8 +487,10 @@ class DateRangeInput extends BaseComponent {
     if (isCreated(separator)) {
       if (isCreated(end)) {
         start.after(separator)
-      } else {
+      } else if (isCreated(start)) {
         end.before(separator)
+      } else {
+        this._placeBetweenEnds(separator)
       }
     }
 
@@ -503,6 +500,18 @@ class DateRangeInput extends BaseComponent {
 
     if (isCreated(end)) {
       separator.after(end)
+    }
+  }
+
+  _placeBetweenEnds(separator: HTMLElement): void {
+    const start = this._getHostChild(this._startElement)
+    const end = this._getHostChild(this._endElement)
+    const children = [...this._element.children]
+
+    if (children.indexOf(start) <= children.indexOf(end)) {
+      end.before(separator)
+    } else {
+      end.after(separator)
     }
   }
 
