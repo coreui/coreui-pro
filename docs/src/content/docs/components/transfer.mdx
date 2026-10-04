@@ -1,7 +1,7 @@
 ---
 title: "Bootstrap 6 Transfer"
 name: "Transfer"
-description: "Two lists side by side and four buttons that move options between them — the selection or everything at once: a select-all header with a counter, an optional per-list search, a one-way mode and a live region that announces every move."
+description: "Two lists side by side and four buttons that move options between them — the selection or everything at once: a select-all header with a counter, an optional per-list search, a one-way mode and an announcement of every move."
 otherFrameworks:
   - transfer
 ---
@@ -287,7 +287,7 @@ What the transfer adds is the crossing. Each move button is named — `ariaMoveT
 
 The move happens away from the focus, and the button that did it usually turns off in the process — a list with nothing selected left. Rather than dropping the focus on the document, the plugin puts it on the first option that just arrived.
 
-A `.transfer-announcer` region marked `role="status"` reports the move either way: `ariaMovedAnnouncement` is `'{count} moved to {title}'` by default, with `{title}` the destination's title. `{count}` and `{title}` are replaced wherever they appear, so the sentence can be reordered for a translation.
+Every move, either way, is announced through [`announce()`](/getting-started/accessibility/#announcing-messages) as a message of its own, so the same move made twice is announced twice: `ariaMovedAnnouncement` is `'{count} moved to {title}'` by default, with `{title}` the destination's title. `{count}` and `{title}` are replaced wherever they appear, so the sentence can be reordered for a translation.
 
 | Key | Action |
 | --- | --- |
@@ -354,7 +354,7 @@ const transfer = new coreui.Transfer('#myTransfer', {
 | `allowList` | object | `SVGAllowlist` | What the icon sanitizer keeps. |
 | `ariaMoveAllToSourceLabel` | string | `'Move all to available'` | Accessible name of the button that moves everything back to the source list. |
 | `ariaMoveAllToTargetLabel` | string | `'Move all to chosen'` | Accessible name of the button that moves everything to the target list. |
-| `ariaMovedAnnouncement` | string | `'{count} moved to {title}'` | What the live region says after a move. `{count}` is how many options moved, `{title}` the destination's title. |
+| `ariaMovedAnnouncement` | string | `'{count} moved to {title}'` | What is announced after a move. `{count}` is how many options moved, `{title}` the destination's title. |
 | `ariaMoveToSourceLabel` | string | `'Move to available'` | Accessible name of the button that moves the selection back to the source list. A button with its own `aria-label` keeps it. |
 | `ariaMoveToTargetLabel` | string | `'Move to chosen'` | Accessible name of the button that moves the selection to the target list. |
 | `disabled` | boolean | `false` | Turns the whole transfer off: both list boxes, both move buttons and both search fields. |
@@ -381,7 +381,7 @@ const transfer = new coreui.Transfer('#myTransfer', {
 
 | Method | Description |
 | --- | --- |
-| `dispose` | Destroys the transfer and both list boxes, and removes the live region. |
+| `dispose` | Destroys the transfer and both list boxes. |
 | `getInstance` | Static method which allows you to get the transfer instance associated to a DOM element, you can use it like this: `coreui.Transfer.getInstance(element)`. |
 | `getItems()` | The items array both lists were built from. |
 | `getOrCreateInstance` | Static method which returns a transfer instance associated to a DOM element or creates a new one in case it wasn't initialized. You can use it like this: `coreui.Transfer.getOrCreateInstance(element)`. |

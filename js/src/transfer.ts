@@ -9,6 +9,7 @@ import BaseComponent from './base-component.js'
 import ListBox, { type ListBoxEntry, type ListBoxGroup, type ListBoxItem } from './list-box.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
+import { announce } from './util/announce.js'
 import {
   CHEVRON_DOUBLE_LEFT_ICON, CHEVRON_DOUBLE_RIGHT_ICON, CHEVRON_LEFT_ICON, CHEVRON_RIGHT_ICON
 } from './util/icons.js'
@@ -36,10 +37,8 @@ const EVENT_INPUT = 'input'
 const EVENT_LIST_BOX_CHANGE = 'change.coreui.list-box'
 const EVENT_LIST_BOX_SEARCH = 'search.coreui.list-box'
 
-const CLASS_NAME_ANNOUNCER = 'transfer-announcer'
 const CLASS_NAME_DISABLED = 'disabled'
 const CLASS_NAME_OPTIONS = 'list-box-options'
-const CLASS_NAME_VISUALLY_HIDDEN = 'visually-hidden'
 
 const SELECTOR_DATA_TRANSFER = '[data-coreui-transfer]'
 const SELECTOR_LIST = '[data-coreui-transfer-list]'
@@ -153,7 +152,6 @@ const DefaultType: Record<string, string> = {
  */
 
 class Transfer extends BaseComponent {
-  protected declare _announcer: HTMLElement
   protected declare _itemRanks: Map<string, number>
   protected declare _items: ListBoxEntry[] | null
   protected declare _onListBoxChange: () => void
@@ -166,7 +164,6 @@ class Transfer extends BaseComponent {
   constructor(element?: string | Element | null, config?: Partial<TransferConfig> | null) {
     super(element, config)
 
-    this._announcer = this._createAnnouncer()
     this._itemRanks = new Map()
     this._items = this._config.items.length > 0 ? this._config.items : null
     this._sides = {
@@ -276,22 +273,10 @@ class Transfer extends BaseComponent {
       side.listBox.dispose()
     }
 
-    this._announcer.remove()
-
     super.dispose()
   }
 
   // Private
-  _createAnnouncer(): HTMLElement {
-    const announcer = document.createElement('div')
-
-    announcer.classList.add(CLASS_NAME_ANNOUNCER, CLASS_NAME_VISUALLY_HIDDEN)
-    announcer.setAttribute('role', 'status')
-    this._element.append(announcer)
-
-    return announcer
-  }
-
   _createSide(name: string): TransferSide {
     const element = SelectorEngine.findOne(`[data-coreui-transfer-list="${name}"]`, this._element) as HTMLElement | null
 
@@ -660,9 +645,11 @@ class Transfer extends BaseComponent {
   }
 
   _announce(count: number, title: string): void {
-    this._announcer.textContent = this._config.ariaMovedAnnouncement
-      .replace('{count}', String(count))
-      .replace('{title}', title)
+    const message = this._config.ariaMovedAnnouncement
+      .replaceAll('{count}', String(count))
+      .replaceAll('{title}', title)
+
+    announce(message, { context: this._element })
   }
 
   _addEventListeners(): void {

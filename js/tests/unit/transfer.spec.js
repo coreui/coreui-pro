@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import Transfer from '../../src/transfer.js'
 import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
 
@@ -195,16 +196,12 @@ describe('Transfer', () => {
       expect(moveButton(el, 'target').textContent).toEqual('Add')
     })
 
-    it('should add a live region', () => {
+    it('should add no live region of its own', () => {
       const el = setMarkup()
       // eslint-disable-next-line no-new
       new Transfer(el)
 
-      const announcer = el.querySelector('.transfer-announcer')
-
-      expect(announcer).not.toBeNull()
-      expect(announcer.getAttribute('role')).toEqual('status')
-      expect(announcer).toHaveClass('visually-hidden')
+      expect(el.querySelector('[role="status"], [aria-live]')).toBeNull()
     })
 
     it('should initialize on page load with the data api', () => {
@@ -880,18 +877,56 @@ describe('Transfer', () => {
     })
   })
 
-  describe('live region', () => {
+  describe('announcement', () => {
+    const messages = () => [...document.querySelectorAll('[data-coreui-live-announcer] [aria-live="polite"] > *')].map(message => message.textContent)
+
+    const removeAnnouncers = () => {
+      for (const announcer of document.querySelectorAll('[data-coreui-live-announcer]')) {
+        announcer.remove()
+      }
+    }
+
+    beforeEach(() => {
+      removeAnnouncers()
+      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'performance'] })
+    })
+
+    afterEach(() => {
+      vi.useRealTimers()
+      removeAnnouncers()
+    })
+
     it('should announce the move with the count and the destination title', () => {
       const el = setMarkup()
       const transfer = new Transfer(el)
 
       transfer.moveToTarget(['one', 'two'])
-
-      expect(el.querySelector('.transfer-announcer').textContent).toEqual('2 moved to Chosen')
-
       transfer.moveToSource(['four'])
+      vi.advanceTimersByTime(100)
 
-      expect(el.querySelector('.transfer-announcer').textContent).toEqual('1 moved to Available')
+      expect(messages()).toEqual(['2 moved to Chosen', '1 moved to Available'])
+    })
+
+    it('should announce the same move again', () => {
+      const el = setMarkup()
+      const transfer = new Transfer(el)
+
+      transfer.moveToTarget(['one'])
+      transfer.moveToSource(['one'])
+      transfer.moveToTarget(['one'])
+      vi.advanceTimersByTime(100)
+
+      expect(messages()).toEqual(['1 moved to Chosen', '1 moved to Available', '1 moved to Chosen'])
+    })
+
+    it('should replace every placeholder in ariaMovedAnnouncement', () => {
+      const el = setMarkup()
+      const transfer = new Transfer(el, { ariaMovedAnnouncement: '{title}: {count} added, {count} in all to {title}' })
+
+      transfer.moveToTarget(['one'])
+      vi.advanceTimersByTime(100)
+
+      expect(messages()).toEqual(['Chosen: 1 added, 1 in all to Chosen'])
     })
   })
 
@@ -923,7 +958,7 @@ describe('Transfer', () => {
   })
 
   describe('dispose', () => {
-    it('should destroy both list boxes and remove the live region', () => {
+    it('should destroy both list boxes', () => {
       const el = setMarkup()
       const transfer = new Transfer(el)
       const sourceList = side(el, 'source')
@@ -931,7 +966,6 @@ describe('Transfer', () => {
       transfer.dispose()
 
       expect(Transfer.getInstance(el)).toBeNull()
-      expect(el.querySelector('.transfer-announcer')).toBeNull()
       expect(sourceList).not.toBeNull()
     })
   })
