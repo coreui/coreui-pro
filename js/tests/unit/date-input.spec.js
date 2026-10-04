@@ -68,6 +68,21 @@ describe('DateInput', () => {
         .toEqual([['later', '15.01.2026']])
     })
 
+    it('should submit no date while the field rejects it, as getDate does', () => {
+      fixtureEl.innerHTML = '<form id="form"><div class="date-input"></div></form>'
+      const dateInputEl = fixtureEl.querySelector('.date-input')
+      const dateInput = new DateInput(dateInputEl, {
+        date: new Date(2026, 0, 15), format: 'dd.MM.yyyy', maxDate: new Date(2026, 0, 10), name: 'from'
+      })
+
+      expect(dateInput.getDate()).toBeNull()
+      expect([...new FormData(fixtureEl.querySelector('#form')).entries()]).toEqual([['from', '']])
+
+      dateInput.setConfig({ maxDate: null })
+
+      expect([...new FormData(fixtureEl.querySelector('#form')).entries()]).toEqual([['from', '15.01.2026']])
+    })
+
     it('should stop submitting once disposed', () => {
       fixtureEl.innerHTML = '<form id="form"><div class="date-input"></div></form>'
       const dateInputEl = fixtureEl.querySelector('.date-input')
