@@ -125,6 +125,8 @@ class ChipSet extends BaseComponent {
   protected declare _anchor: HTMLElement | null
   protected declare _search: string
   protected declare _searchTimeout: ReturnType<typeof setTimeout> | null
+  protected declare _announcedFrom: string[] | null
+  protected declare _settled: boolean
 
   constructor(element?: string | Element | null, config?: Partial<ChipSetConfig> | null) {
     super(element, config)
@@ -138,10 +140,15 @@ class ChipSet extends BaseComponent {
     this._anchor = null
     this._search = ''
     this._searchTimeout = null
+    this._announcedFrom = null
+    this._settled = false
 
     this._applyAccessibilityRoles()
     this._initChips()
     this._addEventListeners()
+    queueMicrotask(() => {
+      this._settled = true
+    })
   }
 
   // Getters
@@ -190,8 +197,8 @@ class ChipSet extends BaseComponent {
     const element = isElement ? chip : this._createChip(value)
     this._appendChip(element)
     this._setupChip(element)
+    this._noteChange()
     this._chips.push(value)
-    this._announce(`${value} ${this._config.ariaAddedAnnouncement}`)
 
     EventHandler.trigger(this._element, this.constructor.eventName(EVENT_CHANGE), {
       value: this.getValues()
@@ -400,8 +407,31 @@ class ChipSet extends BaseComponent {
     }
   }
 
-  _announce(message: string): void {
-    announce(message, { context: this._element })
+  _noteChange(): void {
+    if (!this._settled || this._announcedFrom) {
+      return
+    }
+
+    this._announcedFrom = [...this._chips]
+    queueMicrotask(() => this._announceChange())
+  }
+
+  _announceChange(): void {
+    const before = this._announcedFrom ?? []
+    this._announcedFrom = null
+
+    if (!this._element?.isConnected || !this._element.checkVisibility()) {
+      return
+    }
+
+    const added = this._chips.find(value => !before.includes(value))
+    const removed = before.find(value => !this._chips.includes(value))
+
+    if (added) {
+      announce(`${added} ${this._config.ariaAddedAnnouncement}`, { context: this._element })
+    } else if (removed) {
+      announce(`${removed} ${this._config.ariaRemovedAnnouncement}`, { context: this._element })
+    }
   }
 
   _setupChip(chip: HTMLElement): void {
@@ -669,10 +699,9 @@ class ChipSet extends BaseComponent {
 
     const index = this._chips.indexOf(value)
     if (index !== -1) {
+      this._noteChange()
       this._chips.splice(index, 1)
     }
-
-    this._announce(`${value} ${this._config.ariaRemovedAnnouncement}`)
 
     EventHandler.trigger(this._element, this.constructor.eventName(EVENT_CHANGE), {
       value: this.getValues()

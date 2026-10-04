@@ -194,7 +194,7 @@ Disabled chips (`.chip.disabled`) are skipped while navigating.
 - Add a descriptive `aria-label` to the chip set element when the group has a meaningful role (e.g., "Applied filters").
 - A selectable set is exposed as a horizontal `role="listbox"` (with `aria-multiselectable` in multiple mode) and each chip becomes a `role="option"` with `aria-selected`; a non-selectable set is a `role="group"`.
 - In a selectable set the remove affordance is a `<span aria-hidden="true">` rather than a button: the listbox interaction model cannot reach a control inside an option, so a real button there would be announced and never operable, and its label would join the option's name. Removing stays on <kbd>Backspace</kbd> / <kbd>Delete</kbd> for the keyboard and on the affordance itself for the pointer. A set that is not a listbox keeps a real `<button>` labelled with `ariaRemoveLabel`.
-- Adding and removing a chip is announced through [`announce()`](/getting-started/accessibility/#announcing-messages), as a message of its own in the live region of the page; customize the wording with the `ariaAddedAnnouncement` and `ariaRemovedAnnouncement` options.
+- Adding and removing chips is announced through [`announce()`](/getting-started/accessibility/#announcing-messages) in the live region of the page, or of the modal dialog around the set, one message per update: the first chip added, or else the first one removed, and nothing while the set is hidden; customize the wording with the `ariaAddedAnnouncement` and `ariaRemovedAnnouncement` options.
 
 ## Customizing
 

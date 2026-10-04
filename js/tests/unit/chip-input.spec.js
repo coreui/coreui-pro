@@ -267,7 +267,7 @@ describe('ChipInput', () => {
       expect(el.getAttribute('aria-readonly')).toBeNull()
     })
 
-    it('should not stamp a role on the container and announce added chips', () => {
+    it('should not stamp a role on the container and announce added chips', async () => {
       fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
@@ -275,12 +275,21 @@ describe('ChipInput', () => {
 
       vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'performance'] })
 
+      for (const announcer of document.querySelectorAll('[data-coreui-live-announcer]')) {
+        announcer.remove()
+      }
+
       try {
+        await Promise.resolve()
         chipInput.add('News')
+        await Promise.resolve()
+        vi.advanceTimersByTime(100)
+        chipInput.remove('News')
+        await Promise.resolve()
         vi.advanceTimersByTime(100)
 
         expect(el.hasAttribute('role')).toBe(false)
-        expect(document.querySelector('[data-coreui-live-announcer] [aria-live="polite"]').lastElementChild.textContent).toEqual('News added')
+        expect([...document.querySelectorAll('[data-coreui-live-announcer] [aria-live="polite"] > *')].map(message => message.textContent)).toEqual(['News added', 'News removed'])
       } finally {
         vi.useRealTimers()
       }

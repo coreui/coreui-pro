@@ -40,6 +40,27 @@ const readyAt = new WeakMap<Element, Moment>()
 const pending: Message[] = []
 
 /**
+ * Finds the open modal dialog around an element, through the slots it is assigned to and the
+ * shadow roots it sits in.
+ *
+ * @param element - The element to start from
+ * @returns The closest open modal dialog, or `null` when there is none
+ */
+const getDialogAround = (element: Element | null): HTMLDialogElement | null => {
+  let node = element
+
+  while (node) {
+    if (node.matches('dialog[open]') && node.matches(':modal')) {
+      return node as HTMLDialogElement
+    }
+
+    node = node.assignedSlot ?? node.parentElement ?? ((node.getRootNode() as ShadowRoot).host ?? null)
+  }
+
+  return null
+}
+
+/**
  * Finds the modal dialog the rest of the page is inert behind: the one holding focus, then the
  * one around `context`, then the last one open in the document.
  *
@@ -47,17 +68,15 @@ const pending: Message[] = []
  * @returns The modal dialog to announce in, or `null` when none is open
  */
 const getModal = (context: Element | null): HTMLDialogElement | null => {
-  for (const element of [document.activeElement, context]) {
-    const dialog = element?.closest<HTMLDialogElement>('dialog[open]')
+  let focused = document.activeElement
 
-    if (dialog?.matches(':modal')) {
-      return dialog
-    }
+  while (focused?.shadowRoot?.activeElement) {
+    focused = focused.shadowRoot.activeElement
   }
 
   const modals = [...document.querySelectorAll<HTMLDialogElement>('dialog[open]')].filter(dialog => dialog.matches(':modal'))
 
-  return modals.at(-1) ?? null
+  return getDialogAround(focused) ?? getDialogAround(context) ?? modals.at(-1) ?? null
 }
 
 /**

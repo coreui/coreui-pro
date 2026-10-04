@@ -312,7 +312,7 @@ export const a11yComponents = [
       {
         criterion: '4.1.3',
         status: 'built-in',
-        note: 'Adding and removing chips is announced through the inherited visually hidden role=status region next to the container. Verified here: typing a value and pressing Enter updates the region.'
+        note: 'Adding and removing chips is announced through announce(), as a message in the visually hidden polite log region of the page. Verified here: typing a value and pressing Enter adds the message.'
       }
     ],
     html: `<div class="chip-input" id="a11yChipInput" data-coreui-chip-input>
@@ -321,14 +321,14 @@ export const a11yComponents = [
     assertions: [
       {
         criterion: '4.1.3',
-        label: 'adding a chip is announced in the status region',
+        label: 'adding a chip is announced in the live region of the page',
         steps: [
           { click: '#a11yChipInput input' },
           { type: 'News' },
           { press: 'Enter' },
-          { wait: 100 }
+          { wait: 250 }
         ],
-        run: 'const region = document.querySelector(\'.chip-input + [role="status"]\'); return Boolean(region && region.textContent.includes(\'added\'))'
+        run: 'const region = document.querySelector(\'[data-coreui-live-announcer] [aria-live="polite"]\'); return Boolean(region && region.textContent.includes(\'News added\'))'
       }
     ]
   },
@@ -343,9 +343,9 @@ export const a11yComponents = [
     assertions: [
       {
         criterion: '4.1.3',
-        label: 'removing a chip is announced in the status region',
-        steps: [{ click: '.chip .chip-remove' }, { wait: 100 }],
-        run: 'const region = document.querySelector(\'.chip-set + [role="status"]\'); return Boolean(region && region.textContent.includes(\'removed\'))'
+        label: 'removing a chip is announced in the live region of the page',
+        steps: [{ click: '.chip .chip-remove' }, { wait: 250 }],
+        run: 'const region = document.querySelector(\'[data-coreui-live-announcer] [aria-live="polite"]\'); return Boolean(region && region.textContent.includes(\'removed\'))'
       }
     ],
     criteria: [
@@ -362,12 +362,12 @@ export const a11yComponents = [
       {
         criterion: '1.3.1',
         status: 'built-in',
-        note: 'The listbox contains only option children — the add/remove live region lives next to the set, not inside it.'
+        note: 'The listbox contains only option children; additions and removals are announced through the live region of the page, not from inside the set.'
       },
       {
         criterion: '4.1.3',
         status: 'built-in',
-        note: 'Adding and removing chips is announced through a visually hidden role=status region (labels configurable via ariaAddedAnnouncement/ariaRemovedAnnouncement). Verified here: removing a chip updates the region.'
+        note: 'Adding and removing chips is announced through announce(), as a message in the visually hidden polite log region of the page (labels configurable via ariaAddedAnnouncement/ariaRemovedAnnouncement). Verified here: removing a chip adds the message.'
       }
     ]
   },
