@@ -235,6 +235,13 @@ export default [
     }
   },
   {
+    // Imports the ES modules the build writes, while lint runs before it
+    files: ['js/tests/integration/bundle-modularity-esm.js'],
+    rules: {
+      'import/no-unresolved': 'off'
+    }
+  },
+  {
     files: ['js/tests/unit/**', 'js/tests/visual/**'],
     languageOptions: {
       globals: {
