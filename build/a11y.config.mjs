@@ -706,7 +706,7 @@ export const a11yComponents = [
       {
         criterion: '4.1.3',
         status: 'built-in',
-        note: 'A step change made from inside the stepper moves focus to the new step button, so the step is read without a live region; the panes are not aria-live.'
+        note: 'Panes are aria-live=polite, so a validation message that appears in the open step is announced (VoiceOver, Safari and Chrome). A step change made while focus is inside the stepper moves focus to the new step button instead.'
       }
     ]
   },

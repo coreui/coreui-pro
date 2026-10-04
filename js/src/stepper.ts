@@ -295,6 +295,7 @@ class Stepper extends BaseComponent {
     this._activeStepButton = firstStep
     this._isFinished = false
     this._updateStepButtonsDisabledState()
+    this._setupAccessibilityAttributes()
 
     if (holdsFocus) {
       firstStep.focus()
@@ -333,7 +334,7 @@ class Stepper extends BaseComponent {
   }
 
   _holdsFocus(): boolean {
-    return this._element.contains(document.activeElement)
+    return this._element.contains((this._element.getRootNode() as Document | ShadowRoot).activeElement)
   }
 
   _isCurrentStepValid(element: any): boolean {
@@ -632,6 +633,7 @@ class Stepper extends BaseComponent {
         }
 
         pane.setAttribute('aria-labelledby', stepButton.id)
+        pane.setAttribute('aria-live', 'polite')
         pane.setAttribute('aria-hidden', !this._elemIsActive(stepButton) as any)
       }
 
