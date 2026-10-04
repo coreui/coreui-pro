@@ -202,6 +202,20 @@ describe('announce', () => {
     expect(messages(document.body)).toEqual(['First', 'Second'])
   })
 
+  it('should not wait on a region made ready on another clock', async () => {
+    vi.useRealTimers()
+    announce('First')
+    await new Promise(resolve => {
+      setTimeout(resolve, 600)
+    })
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'performance', 'Date'] })
+
+    announce('Second')
+    vi.advanceTimersByTime(0)
+
+    expect(messages(document.body)).toEqual(['First', 'Second'])
+  })
+
   it('should wait 100 ms before it uses regions another copy of the util added', () => {
     document.body.insertAdjacentHTML('afterbegin', [
       '<div data-coreui-live-announcer>',

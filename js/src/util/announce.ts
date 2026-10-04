@@ -74,6 +74,25 @@ const getReadyTime = (host: HTMLElement): number => {
 }
 
 /**
+ * Tells how long a region still needs before it takes a message. A wait longer than any hold
+ * comes from another clock, such as a test's, and ends now.
+ *
+ * @param announcer - The element holding the regions
+ * @returns The wait in milliseconds, `0` or less when the region is ready
+ */
+const getWait = (announcer: Element): number => {
+  const now = performance.now()
+  const wait = readyAt.get(announcer)! - now
+
+  if (wait > CLOSE_DELAY) {
+    readyAt.set(announcer, now)
+    return 0
+  }
+
+  return wait
+}
+
+/**
  * Returns the live regions a host carries, creating them when it has none. Regions this copy of
  * the util has not seen yet count as new, and regions in a dialog leave with it when it closes.
  *
@@ -171,7 +190,7 @@ const flush = (): void => {
     }
 
     const announcer = getAnnouncer(modal ?? document.body)
-    const wait = readyAt.get(announcer)! - performance.now()
+    const wait = getWait(announcer)
 
     if (wait > 0) {
       setTimeout(flush, wait)
@@ -215,7 +234,7 @@ export const announce = (message: string, { context = null, priority = 'polite',
   pending.push({
     context, node, page: host === document.body ? announcer : null, priority: priority === 'assertive' ? 'assertive' : 'polite', timeout
   })
-  setTimeout(flush, Math.max(0, readyAt.get(announcer)! - performance.now()))
+  setTimeout(flush, Math.max(0, getWait(announcer)))
 
   return () => {
     const index = pending.findIndex(message => message.node === node)
