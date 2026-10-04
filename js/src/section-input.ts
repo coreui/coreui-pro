@@ -737,7 +737,9 @@ abstract class SectionInput extends BaseComponent {
         return null
       }
 
-      return !this._element.contains(document.activeElement) && isBeforeYearOne(this._sections) ? 'minDate' : 'incomplete'
+      const root = this._element.getRootNode() as Document | ShadowRoot
+
+      return !this._element.contains(root.activeElement) && isBeforeYearOne(this._sections) ? 'minDate' : 'incomplete'
     }
 
     return getDateLimitError(this._sections, date, this._minDate, this._maxDate, this._config.disabledDates)

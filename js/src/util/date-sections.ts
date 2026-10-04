@@ -622,11 +622,11 @@ export const getFullYearFromSection = (section: EditableSection): number | null 
 }
 
 /**
- * Tells whether a field's sections are all filled and within their bounds
- * except a year before year 1, which no date can hold.
+ * Tells whether every section of a field is filled and the only one below its
+ * minimum is a year before year 1, for which the sections build no date.
  *
  * @param sections - The sections and literals of a field
- * @returns `true` for a filled field whose only fault is a year below 1
+ * @returns `true` for a filled field whose only section below its minimum is a year below 1
  */
 export const isBeforeYearOne = (sections: DateSection[]): boolean => {
   const editable = sections.filter(isEditableSection)

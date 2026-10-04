@@ -202,7 +202,7 @@ Localized formats work the same way — the section names come from the componen
 
 The field participates in the standard form validation styling. Three mechanisms set the state:
 
-- **Range validation (automatic)** — a completed date outside `minDate`/`maxDate`/`disabledDates` gets `.is-invalid` until corrected.
+- **Range validation (automatic)** — a completed date outside `minDate`/`maxDate`/`disabledDates` gets `.is-invalid` until corrected. A date before year 1 counts as before `minDate` even without that option; when the field loses the focus, its year becomes 1.
 - **The `valid`/`invalid` options** — force the state, e.g. after server-side validation. An invalid field is never drawn valid: `valid` waits while its date is rejected or, in a date range, while the end is before the start.
 - **Form submit** — the date input renders a hidden input, which is excluded from native constraint validation, so the component applies the state itself when a form with the `data-coreui-validate` attribute is submitted: a `required` empty field becomes `.is-invalid`, and a filled one becomes `.is-valid` when the form opts into success styling with `data-coreui-validate="valid"`. A native form reset returns the field to the date it was created with and drops that state; a submit that follows the reset in the same task judges the restored date again, and a `reset` listener that calls `preventDefault()` cancels the whole reset.
 
@@ -282,7 +282,7 @@ The date input implements the [spinbutton pattern](https://www.w3.org/WAI/ARIA/a
 - **Role attributes**: the container has `role="group"`, every section is a `role="spinbutton"` with `aria-valuemin`, `aria-valuemax`, `aria-valuenow`, and `aria-valuetext` (month sections announce the localized month name).
 - **Roving tabindex**: the whole field is a single tab stop; arrow keys move between sections.
 - **Labels**: point `aria-labelledby` at the visible label, as the examples on this page do, because a `<label for>` does not name a group. An `aria-label` written on the element stays as it is, and the `ariaLabel` option fills it in only when the element has none. Sections receive `aria-label`s (`Day`, `Month`, `Year`), each replaceable on its own — `ariaDayLabel`, `ariaMonthLabel`, `ariaYearLabel` — for localization.
-- **Validity**: while the field is invalid (a date outside `minDate` / `maxDate` or in `disabledDates`, the `invalid` option, or a required field still empty after a validated form is submitted), the group and every section carry `aria-invalid="true"`; otherwise they carry the `aria-invalid` the page wrote on the element, if any. A disabled or read-only field is never reported as missing. With `required`, every section carries `aria-required="true"`.
+- **Validity**: while the field is invalid (a date outside `minDate` / `maxDate` or in `disabledDates`, a date before year 1, the `invalid` option, or a required field still empty after a validated form is submitted), the group and every section carry `aria-invalid="true"`; otherwise they carry the `aria-invalid` the page wrote on the element, if any. A disabled or read-only field is never reported as missing. With `required`, every section carries `aria-required="true"`.
 - **Description**: the `aria-describedby` of the field, pointing at its help text or feedback message, reaches the first section, and every section while the field is invalid, so the reason for an error is read wherever the focus sits without the help text repeating on each section.
 - **Mobile input**: sections use `inputmode="numeric"`, so touch devices show the numeric keyboard.
 
@@ -293,7 +293,7 @@ The date input implements the [spinbutton pattern](https://www.w3.org/WAI/ARIA/a
 | <kbd>0</kbd>–<kbd>9</kbd> | Type into the focused section; the caret advances when the section is complete |
 | <kbd>A</kbd>–<kbd>Z</kbd> | In text month sections, match a month name by prefix; the caret advances when the prefix is unambiguous |
 | <kbd>Arrow Up</kbd> / <kbd>Arrow Down</kbd> | Increment / decrement the focused section, wrapping day and month around their bounds; an empty year starts at the current year |
-| <kbd>Arrow Right</kbd> / <kbd>Arrow Left</kbd> | Move focus to the next / previous section |
+| <kbd>Arrow Right</kbd> / <kbd>Arrow Left</kbd> | Move focus to the next / previous section; in a right-to-left layout the two keys swap |
 | <kbd>Home</kbd> / <kbd>End</kbd> | Move focus to the first / last section |
 | <kbd>Backspace</kbd> | Clear the focused section; move to the previous section when already empty |
 | <kbd>Delete</kbd> | Clear the focused section |
