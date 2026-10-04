@@ -1,5 +1,6 @@
 import { vi } from 'vitest'
 import Transfer from '../../src/transfer.js'
+import { announce } from '../../src/util/announce.js'
 import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
 
 describe('Transfer', () => {
@@ -201,7 +202,7 @@ describe('Transfer', () => {
       // eslint-disable-next-line no-new
       new Transfer(el)
 
-      expect(el.querySelector('[role="status"], [aria-live]')).toBeNull()
+      expect(el.querySelector('[role="status"], [role="log"], [role="alert"], [aria-live]')).toBeNull()
     })
 
     it('should initialize on page load with the data api', () => {
@@ -907,16 +908,59 @@ describe('Transfer', () => {
       expect(messages()).toEqual(['2 moved to Chosen', '1 moved to Available'])
     })
 
-    it('should announce the same move again', () => {
+    it('should announce the same move twice in a row', () => {
       const el = setMarkup()
       const transfer = new Transfer(el)
 
       transfer.moveToTarget(['one'])
-      transfer.moveToSource(['one'])
+      transfer.moveToTarget(['two'])
+      vi.advanceTimersByTime(100)
+
+      expect(messages()).toEqual(['1 moved to Chosen', '1 moved to Chosen'])
+    })
+
+    it('should announce in the modal dialog around it, which the page cannot see into', () => {
+      const el = setMarkup()
+      const host = document.createElement('div')
+      fixtureEl.append(host)
+      const dialog = document.createElement('dialog')
+      host.attachShadow({ mode: 'open' }).append(dialog)
+      dialog.append(el)
+      const transfer = new Transfer(el)
+      dialog.showModal()
+
+      try {
+        transfer.moveToTarget(['one'])
+        vi.advanceTimersByTime(100)
+
+        expect(dialog.querySelector(':scope > [data-coreui-live-announcer] [aria-live="polite"]').textContent).toEqual('1 moved to Chosen')
+        expect(messages()).toEqual([])
+      } finally {
+        dialog.close()
+      }
+    })
+
+    it('should announce the move before the change listeners run', () => {
+      const el = setMarkup()
+      const transfer = new Transfer(el)
+      el.addEventListener('change.coreui.transfer', () => {
+        announce('Saved')
+      })
+
       transfer.moveToTarget(['one'])
       vi.advanceTimersByTime(100)
 
-      expect(messages()).toEqual(['1 moved to Chosen', '1 moved to Available', '1 moved to Chosen'])
+      expect(messages()).toEqual(['1 moved to Chosen', 'Saved'])
+    })
+
+    it('should keep a dollar sign in the title', () => {
+      const el = setMarkup()
+      const transfer = new Transfer(el, { targetTitle: 'Price $$ and $&' })
+
+      transfer.moveToTarget(['one'])
+      vi.advanceTimersByTime(100)
+
+      expect(messages()).toEqual(['1 moved to Price $$ and $&'])
     })
 
     it('should replace every placeholder in ariaMovedAnnouncement', () => {

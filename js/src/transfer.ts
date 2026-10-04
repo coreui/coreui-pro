@@ -624,9 +624,9 @@ class Transfer extends BaseComponent {
     this._refresh()
     this._restoreFocus(trigger, options[0])
 
+    this._announce(moved.length, to.title)
     EventHandler.trigger(this._element, this.constructor.eventName(EVENT_MOVED), { direction: side, values: moved })
     this._triggerChange()
-    this._announce(moved.length, to.title)
   }
 
   _restoreFocus(trigger: HTMLElement | null, option: HTMLElement): void {
@@ -647,7 +647,7 @@ class Transfer extends BaseComponent {
   _announce(count: number, title: string): void {
     const message = this._config.ariaMovedAnnouncement
       .replaceAll('{count}', String(count))
-      .replaceAll('{title}', title)
+      .replaceAll('{title}', () => title)
 
     announce(message, { context: this._element })
   }
