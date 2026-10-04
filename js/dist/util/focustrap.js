@@ -1,7 +1,7 @@
 /*!
-  * CoreUI focustrap.js v5.27.1 (https://coreui.io)
+  * CoreUI PRO focustrap.js v5.28.0 (https://coreui.io)
   * Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
-  * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
+  * License (https://coreui.io/pro/license/)
   */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('../dom/event-handler.js'), require('../dom/selector-engine.js'), require('./config.js')) :
@@ -35,13 +35,19 @@
   const Default = {
     additionalElement: null,
     autofocus: true,
+    returnFocus: false,
     trapElement: null // The element to trap focus inside of
   };
   const DefaultType = {
     additionalElement: '(element|null|undefined)',
     autofocus: 'boolean',
+    returnFocus: 'boolean',
     trapElement: 'element'
   };
+
+  // Only the most recently activated trap reacts. Two traps over disjoint
+  // elements would otherwise throw focus at each other without end.
+  const activeTraps = [];
 
   /**
    * Class definition
@@ -53,6 +59,9 @@
       this._config = this._getConfig(config);
       this._isActive = false;
       this._lastTabNavDirection = null;
+      this._previouslyFocused = null;
+      this._focusinHandler = event => this._handleFocusin(event);
+      this._keydownHandler = event => this._handleKeydown(event);
     }
 
     // Getters
@@ -71,12 +80,13 @@
       if (this._isActive) {
         return;
       }
+      this._previouslyFocused = document.activeElement;
       if (this._config.autofocus) {
         this._config.trapElement.focus();
       }
-      EventHandler.off(document, EVENT_KEY); // guard against infinite focus loop
-      EventHandler.on(document, EVENT_FOCUSIN, event => this._handleFocusin(event));
-      EventHandler.on(document, EVENT_KEYDOWN_TAB, event => this._handleKeydown(event));
+      EventHandler.on(document, EVENT_FOCUSIN, this._focusinHandler);
+      EventHandler.on(document, EVENT_KEYDOWN_TAB, this._keydownHandler);
+      activeTraps.push(this);
       this._isActive = true;
     }
     deactivate() {
@@ -84,7 +94,14 @@
         return;
       }
       this._isActive = false;
-      EventHandler.off(document, EVENT_KEY);
+      activeTraps.splice(activeTraps.indexOf(this), 1);
+      EventHandler.off(document, EVENT_FOCUSIN, this._focusinHandler);
+      EventHandler.off(document, EVENT_KEYDOWN_TAB, this._keydownHandler);
+      if (this._config.returnFocus && this._holdsFocus()) {
+        var _this$_returnFocusTar;
+        (_this$_returnFocusTar = this._returnFocusTarget()) == null || _this$_returnFocusTar.focus();
+      }
+      this._previouslyFocused = null;
     }
 
     // Private
@@ -93,7 +110,7 @@
         additionalElement,
         trapElement
       } = this._config;
-      if (event.target === document || event.target === trapElement || trapElement.contains(event.target)) {
+      if (!this._isTopmost() || event.target === document || event.target === trapElement || trapElement.contains(event.target)) {
         return;
       }
       if (additionalElement && (event.target === additionalElement || additionalElement.contains(event.target))) {
@@ -109,7 +126,7 @@
       }
     }
     _handleKeydown(event) {
-      if (event.key !== TAB_KEY) {
+      if (!this._isTopmost() || event.key !== TAB_KEY) {
         return;
       }
       this._lastTabNavDirection = event.shiftKey ? TAB_NAV_BACKWARD : TAB_NAV_FORWARD;
@@ -125,22 +142,46 @@
       if (trapElements.length === 0 || additionalElements.length === 0) {
         return;
       }
-      event.preventDefault();
-      if (trapElements.indexOf(event.target) === trapElements.length - 1 && !event.shiftKey) {
-        additionalElements[0].focus();
+      const trapIndex = trapElements.indexOf(event.target);
+      const additionalIndex = additionalElements.indexOf(event.target);
+      const redirect = element => {
+        event.preventDefault();
+        element.focus();
+      };
+      if (trapIndex === trapElements.length - 1 && !event.shiftKey) {
+        redirect(additionalElements[0]);
         return;
       }
-      if (trapElements.indexOf(event.target) === 0 && event.shiftKey) {
-        additionalElements[additionalElements.length - 1].focus();
+      if (trapIndex === 0 && event.shiftKey) {
+        redirect(additionalElements[additionalElements.length - 1]);
         return;
       }
-      if (additionalElements.indexOf(event.target) === additionalElements.length - 1 && !event.shiftKey) {
-        trapElements[0].focus();
+      if (additionalIndex === additionalElements.length - 1 && !event.shiftKey) {
+        redirect(trapElements[0]);
         return;
       }
-      if (additionalElements.indexOf(event.target) === 0 && event.shiftKey) {
-        trapElements[trapElements.length - 1].focus();
+      if (additionalIndex === 0 && event.shiftKey) {
+        redirect(trapElements[trapElements.length - 1]);
       }
+    }
+    _holdsFocus() {
+      const {
+        additionalElement,
+        trapElement
+      } = this._config;
+      const active = document.activeElement;
+      return Boolean(active && (active === document.body || trapElement.contains(active) || additionalElement && additionalElement.contains(active)));
+    }
+    _returnFocusTarget() {
+      var _SelectorEngine$focus;
+      const previous = this._previouslyFocused;
+      if (previous && previous !== document.body && previous.isConnected) {
+        return previous;
+      }
+      return (_SelectorEngine$focus = SelectorEngine.focusableChildren(this._config.trapElement)[0]) != null ? _SelectorEngine$focus : null;
+    }
+    _isTopmost() {
+      return activeTraps[activeTraps.length - 1] === this;
     }
   }
 

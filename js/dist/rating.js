@@ -1,7 +1,7 @@
 /*!
-  * CoreUI rating.js v5.27.1 (https://coreui.io)
+  * CoreUI PRO rating.js v5.28.0 (https://coreui.io)
   * Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
-  * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
+  * License (https://coreui.io/pro/license/)
   */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('./base-component.js'), require('./dom/event-handler.js'), require('./dom/manipulator.js'), require('./dom/selector-engine.js'), require('./util/sanitizer.js'), require('./util/index.js'), require('./tooltip.js')) :
@@ -45,6 +45,7 @@
   const CLASS_NAME_RATING_ITEM_LABEL = 'rating-item-label';
   const CLASS_NAME_READONLY = 'readonly';
   const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="rating"]';
+  const SELECTOR_RATING_ITEM = '.rating-item';
   const SELECTOR_RATING_ITEM_INPUT = '.rating-item-input';
   const SELECTOR_RATING_ITEM_LABEL = '.rating-item-label';
   const Default = {
@@ -114,18 +115,22 @@
     update(config) {
       this._config = this._getConfig(config);
       this._currentValue = this._config.value;
+      this._disposeTooltips();
       this._element.innerHTML = '';
       this._createRating();
-      this._addEventListeners();
     }
     reset(value = null) {
       this._currentValue = value;
+      this._disposeTooltips();
       this._element.innerHTML = '';
       this._createRating();
-      this._addEventListeners();
       EventHandler.trigger(this._element, EVENT_CHANGE, {
         value
       });
+    }
+    dispose() {
+      this._disposeTooltips();
+      super.dispose();
     }
 
     // Private
@@ -242,6 +247,13 @@
           this._tooltip.hide();
         }
       });
+    }
+    _disposeTooltips() {
+      for (const item of SelectorEngine.find(SELECTOR_RATING_ITEM, this._element)) {
+        var _Tooltip$getInstance;
+        (_Tooltip$getInstance = Tooltip.getInstance(item)) == null || _Tooltip$getInstance.dispose();
+      }
+      this._tooltip = null;
     }
     _createTooltip(selector, value) {
       if (this._config.tooltips === false) {

@@ -1,7 +1,7 @@
 /*!
-  * CoreUI v5.27.1 (https://coreui.io)
+  * CoreUI PRO v5.28.0 (https://coreui.io)
   * Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
-  * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
+  * License (https://coreui.io/pro/license/)
   */
 import * as Popper from '@popperjs/core';
 
@@ -31,7 +31,7 @@ const Data = {
     // can be removed later when multiple key/instances are fine to be used
     if (!instanceMap.has(key) && instanceMap.size !== 0) {
       // eslint-disable-next-line no-console
-      console.error(`Bootstrap doesn't allow more than one instance per element. Bound instance: ${Array.from(instanceMap.keys())[0]}.`);
+      console.error(`CoreUI doesn't allow more than one instance per element. Bound instance: ${Array.from(instanceMap.keys())[0]}.`);
       return;
     }
     instanceMap.set(key, instance);
@@ -329,7 +329,7 @@ const customEvents = {
   mouseenter: 'mouseover',
   mouseleave: 'mouseout'
 };
-const nativeEvents = new Set(['click', 'dblclick', 'mouseup', 'mousedown', 'contextmenu', 'mousewheel', 'DOMMouseScroll', 'mouseover', 'mouseout', 'mousemove', 'selectstart', 'selectend', 'keydown', 'keypress', 'keyup', 'orientationchange', 'touchstart', 'touchmove', 'touchend', 'touchcancel', 'pointerdown', 'pointermove', 'pointerup', 'pointerleave', 'pointercancel', 'gesturestart', 'gesturechange', 'gestureend', 'focus', 'blur', 'change', 'input', 'reset', 'select', 'submit', 'focusin', 'focusout', 'load', 'unload', 'beforeunload', 'resize', 'move', 'DOMContentLoaded', 'readystatechange', 'error', 'abort', 'scroll']);
+const nativeEvents = new Set(['click', 'dblclick', 'mouseup', 'mousedown', 'contextmenu', 'mousewheel', 'DOMMouseScroll', 'mouseover', 'mouseout', 'mousemove', 'selectstart', 'selectend', 'keydown', 'keypress', 'keyup', 'beforeinput', 'paste', 'orientationchange', 'touchstart', 'touchmove', 'touchend', 'touchcancel', 'pointerdown', 'pointermove', 'pointerup', 'pointerleave', 'pointercancel', 'gesturestart', 'gesturechange', 'gestureend', 'focus', 'blur', 'change', 'input', 'reset', 'select', 'submit', 'focusin', 'focusout', 'load', 'unload', 'beforeunload', 'resize', 'move', 'DOMContentLoaded', 'readystatechange', 'error', 'abort', 'scroll']);
 
 /**
  * Private methods
@@ -344,18 +344,35 @@ function getElementEvents(element) {
   eventRegistry[uid] = eventRegistry[uid] || {};
   return eventRegistry[uid];
 }
-function bootstrapHandler(element, fn) {
+
+// `mouseenter` and `mouseleave` ride on `mouseover` and `mouseout`, which also fire when
+// the pointer moves between descendants of the listening element. Drop those events, so the
+// handler only sees the pointer entering or leaving `delegateTarget` itself.
+// `Node.contains()` is inclusive, so this also covers `relatedTarget === delegateTarget`.
+function isMouseEventWithinTarget(event) {
+  const {
+    delegateTarget,
+    relatedTarget
+  } = event;
+  return Boolean(relatedTarget && delegateTarget.contains(relatedTarget));
+}
+function bootstrapHandler(element, fn, handlerTypeEvent) {
+  const isCustomMouseEvent = handlerTypeEvent in customEvents;
   return function handler(event) {
-    hydrateObj(event, {
+    const bsEvent = hydrateObj(event, {
       delegateTarget: element
     });
-    if (handler.oneOff) {
-      EventHandler.off(element, event.type, fn);
+    if (isCustomMouseEvent && isMouseEventWithinTarget(bsEvent)) {
+      return;
     }
-    return fn.apply(element, [event]);
+    if (handler.oneOff) {
+      EventHandler.off(element, handlerTypeEvent, fn);
+    }
+    return fn.apply(element, [bsEvent]);
   };
 }
-function bootstrapDelegationHandler(element, selector, fn) {
+function bootstrapDelegationHandler(element, selector, fn, handlerTypeEvent) {
+  const isCustomMouseEvent = handlerTypeEvent in customEvents;
   return function handler(event) {
     const domElements = element.querySelectorAll(selector);
     for (let {
@@ -365,77 +382,81 @@ function bootstrapDelegationHandler(element, selector, fn) {
         if (domElement !== target) {
           continue;
         }
-        hydrateObj(event, {
+        const bsEvent = hydrateObj(event, {
           delegateTarget: target
         });
-        if (handler.oneOff) {
-          EventHandler.off(element, event.type, selector, fn);
+        if (isCustomMouseEvent && isMouseEventWithinTarget(bsEvent)) {
+          return;
         }
-        return fn.apply(target, [event]);
+        if (handler.oneOff) {
+          EventHandler.off(element, handlerTypeEvent, selector, fn);
+        }
+        return fn.apply(target, [bsEvent]);
       }
     }
   };
 }
-function findHandler(events, callable, delegationSelector = null) {
-  return Object.values(events).find(event => event.callable === callable && event.delegationSelector === delegationSelector);
+function findHandler(events, callable, handlerTypeEvent, delegationSelector = null) {
+  return Object.values(events).find(event => event.callable === callable && event.handlerTypeEvent === handlerTypeEvent && event.delegationSelector === delegationSelector);
 }
+
+// `typeEvent` is the DOM event type the listener is registered under. `handlerTypeEvent` is
+// the type the caller asked for. The two differ only for `mouseenter` and `mouseleave`, which
+// the registry must keep apart from the `mouseover` and `mouseout` listeners they share.
 function normalizeParameters(originalTypeEvent, handler, delegationFunction) {
   const isDelegated = typeof handler === 'string';
   // TODO: tooltip passes `false` instead of selector, so we need to check
   const callable = isDelegated ? delegationFunction : handler || delegationFunction;
-  let typeEvent = getTypeEvent(originalTypeEvent);
+  // Strip the namespace to get the plain event ('click.bs.button' --> 'click')
+  const baseTypeEvent = originalTypeEvent.replace(stripNameRegex, '');
+  let typeEvent = customEvents[baseTypeEvent] || baseTypeEvent;
   if (!nativeEvents.has(typeEvent)) {
     typeEvent = originalTypeEvent;
   }
-  return [isDelegated, callable, typeEvent];
+  const handlerTypeEvent = baseTypeEvent in customEvents ? baseTypeEvent : typeEvent;
+  return {
+    isDelegated,
+    callable,
+    typeEvent,
+    handlerTypeEvent
+  };
 }
 function addHandler(element, originalTypeEvent, handler, delegationFunction, oneOff) {
   if (typeof originalTypeEvent !== 'string' || !element) {
     return;
   }
-  let [isDelegated, callable, typeEvent] = normalizeParameters(originalTypeEvent, handler, delegationFunction);
-
-  // in case of mouseenter or mouseleave wrap the handler within a function that checks for its DOM position
-  // this prevents the handler from being dispatched the same way as mouseover or mouseout does
-  if (originalTypeEvent in customEvents) {
-    const wrapFunction = fn => {
-      return function (event) {
-        if (!event.relatedTarget || event.relatedTarget !== event.delegateTarget && !event.delegateTarget.contains(event.relatedTarget)) {
-          return fn.call(this, event);
-        }
-      };
-    };
-    callable = wrapFunction(callable);
-  }
+  const {
+    isDelegated,
+    callable,
+    typeEvent,
+    handlerTypeEvent
+  } = normalizeParameters(originalTypeEvent, handler, delegationFunction);
   const events = getElementEvents(element);
   const handlers = events[typeEvent] || (events[typeEvent] = {});
-  const previousFunction = findHandler(handlers, callable, isDelegated ? handler : null);
+  const previousFunction = findHandler(handlers, callable, handlerTypeEvent, isDelegated ? handler : null);
   if (previousFunction) {
     previousFunction.oneOff = previousFunction.oneOff && oneOff;
     return;
   }
   const uid = makeEventUid(callable, originalTypeEvent.replace(namespaceRegex, ''));
-  const fn = isDelegated ? bootstrapDelegationHandler(element, handler, callable) : bootstrapHandler(element, callable);
+  const fn = isDelegated ? bootstrapDelegationHandler(element, handler, callable, handlerTypeEvent) : bootstrapHandler(element, callable, handlerTypeEvent);
   fn.delegationSelector = isDelegated ? handler : null;
   fn.callable = callable;
+  fn.handlerTypeEvent = handlerTypeEvent;
   fn.oneOff = oneOff;
   fn.uidEvent = uid;
   handlers[uid] = fn;
   element.addEventListener(typeEvent, fn, isDelegated);
 }
-function removeHandler(element, events, typeEvent, handler, delegationSelector) {
-  const fn = findHandler(events[typeEvent], handler, delegationSelector);
-  if (!fn) {
-    return;
-  }
-  element.removeEventListener(typeEvent, fn, Boolean(delegationSelector));
-  delete events[typeEvent][fn.uidEvent];
+function removeHandler(element, events, typeEvent, handler) {
+  element.removeEventListener(typeEvent, handler, Boolean(handler.delegationSelector));
+  delete events[typeEvent][handler.uidEvent];
 }
 function removeNamespacedHandlers(element, events, typeEvent, namespace) {
   const storeElementEvent = events[typeEvent] || {};
   for (const [handlerKey, event] of Object.entries(storeElementEvent)) {
     if (handlerKey.includes(namespace)) {
-      removeHandler(element, events, typeEvent, event.callable, event.delegationSelector);
+      removeHandler(element, events, typeEvent, event);
     }
   }
 }
@@ -455,8 +476,15 @@ const EventHandler = {
     if (typeof originalTypeEvent !== 'string' || !element) {
       return;
     }
-    const [isDelegated, callable, typeEvent] = normalizeParameters(originalTypeEvent, handler, delegationFunction);
-    const inNamespace = typeEvent !== originalTypeEvent;
+    const {
+      isDelegated,
+      callable,
+      typeEvent,
+      handlerTypeEvent
+    } = normalizeParameters(originalTypeEvent, handler, delegationFunction);
+    // The caller gave a namespace when neither event type matches what they passed in.
+    // `handlerTypeEvent` must take part, or plain `mouseenter` looks namespaced next to `mouseover`.
+    const inNamespace = typeEvent !== originalTypeEvent && handlerTypeEvent !== originalTypeEvent;
     const events = getElementEvents(element);
     const storeElementEvent = events[typeEvent] || {};
     const isNamespace = originalTypeEvent.startsWith('.');
@@ -465,7 +493,10 @@ const EventHandler = {
       if (!Object.keys(storeElementEvent).length) {
         return;
       }
-      removeHandler(element, events, typeEvent, callable, isDelegated ? handler : null);
+      const fn = findHandler(storeElementEvent, callable, handlerTypeEvent, isDelegated ? handler : null);
+      if (fn) {
+        removeHandler(element, events, typeEvent, fn);
+      }
       return;
     }
     if (isNamespace) {
@@ -475,8 +506,8 @@ const EventHandler = {
     }
     for (const [keyHandlers, event] of Object.entries(storeElementEvent)) {
       const handlerKey = keyHandlers.replace(stripUidRegex, '');
-      if (!inNamespace || originalTypeEvent.includes(handlerKey)) {
-        removeHandler(element, events, typeEvent, event.callable, event.delegationSelector);
+      if (event.handlerTypeEvent === handlerTypeEvent && (!inNamespace || originalTypeEvent.includes(handlerKey))) {
+        removeHandler(element, events, typeEvent, event);
       }
     }
   },
@@ -602,6 +633,12 @@ const Manipulator = {
 
 
 /**
+ * Constants
+ */
+
+const DISALLOWED_ATTRIBUTES$4 = new Set(['sanitize', 'allowList', 'sanitizeFn']);
+
+/**
  * Class definition
  */
 
@@ -627,11 +664,16 @@ class Config {
   }
   _mergeConfigObj(config, element) {
     const jsonConfig = isElement(element) ? Manipulator.getDataAttribute(element, 'config') : {}; // try to parse
-
+    const markupConfig = {
+      ...(typeof jsonConfig === 'object' ? jsonConfig : {}),
+      ...(isElement(element) ? Manipulator.getDataAttributes(element) : {})
+    };
+    for (const key of DISALLOWED_ATTRIBUTES$4) {
+      delete markupConfig[key];
+    }
     return {
       ...this.constructor.Default,
-      ...(typeof jsonConfig === 'object' ? jsonConfig : {}),
-      ...(isElement(element) ? Manipulator.getDataAttributes(element) : {}),
+      ...markupConfig,
       ...(typeof config === 'object' ? config : {})
     };
   }
@@ -661,7 +703,7 @@ class Config {
  * Constants
  */
 
-const VERSION = '5.27.1';
+const VERSION = '5.28.0';
 
 /**
  * Class definition
@@ -676,6 +718,13 @@ class BaseComponent extends Config {
     }
     this._element = element;
     this._config = this._getConfig(config);
+
+    // Dispose any existing instance bound to this element before registering the new one,
+    // so its event listeners and timers are cleaned up instead of leaking
+    const existingInstance = Data.get(this._element, this.constructor.DATA_KEY);
+    if (existingInstance) {
+      existingInstance.dispose();
+    }
     Data.set(this._element, this.constructor.DATA_KEY, this);
   }
 
@@ -690,7 +739,12 @@ class BaseComponent extends Config {
 
   // Private
   _queueCallback(callback, element, isAnimated = true) {
-    executeAfterTransition(callback, element, isAnimated);
+    executeAfterTransition(() => {
+      // Don't run the completion callback if the instance was disposed mid-transition
+      if (this._element) {
+        callback();
+      }
+    }, element, isAnimated);
   }
   _getConfig(config) {
     config = this._mergeConfigObj(config, this._element);
@@ -918,6 +972,25 @@ enableDismissTrigger(Alert, 'close');
 
 defineJQueryPlugin(Alert);
 
+const addHostClassNames = (element, classNames) => {
+  const added = classNames.filter(className => className && !element.classList.contains(className));
+  element.classList.add(...added);
+  return added;
+};
+const restoreHost = (element, {
+  classNames,
+  eventKey,
+  nodes
+}) => {
+  for (const node of nodes) {
+    if (node) {
+      EventHandler.off(node, eventKey);
+      node.remove();
+    }
+  }
+  element.classList.remove(...classNames);
+};
+
 /**
  * --------------------------------------------------------------------------
  * CoreUI util/sanitizer.js
@@ -1015,12 +1088,20 @@ const uriAttributes = new Set(['background', 'cite', 'href', 'itemtype', 'longde
  *
  * Shout-out to Angular https://github.com/angular/angular/blob/15.2.8/packages/core/src/sanitization/url_sanitizer.ts#L38
  */
-const SAFE_URL_PATTERN = /^(?!javascript:)(?:[a-z0-9+.-]+:|[^&:/?#]*(?:[/?#]|$))/i;
+const SAFE_URL_PATTERN = /^(?!(?:javascript|data|vbscript):)(?:[a-z0-9+.-]+:|[^&:/?#]*(?:[/?#]|$))/i;
+
+/**
+ * A pattern that matches safe data URLs. Only matches image, video and audio
+ * types — notably NOT `data:text/html`, which is an XSS vector.
+ *
+ * Shout-out to Angular https://github.com/angular/angular/blob/15.2.8/packages/core/src/sanitization/url_sanitizer.ts#L49
+ */
+const DATA_URL_PATTERN = /^data:(?:image\/(?:bmp|gif|jpeg|jpg|png|tiff|webp)|video\/(?:mpeg|mp4|ogg|webm)|audio\/(?:mp3|oga|ogg|opus));base64,[\d+/a-z=]+$/i;
 const allowedAttribute = (attribute, allowedAttributeList) => {
   const attributeName = attribute.nodeName.toLowerCase();
   if (allowedAttributeList.includes(attributeName)) {
     if (uriAttributes.has(attributeName)) {
-      return Boolean(SAFE_URL_PATTERN.test(attribute.nodeValue));
+      return Boolean(SAFE_URL_PATTERN.test(attribute.nodeValue) || DATA_URL_PATTERN.test(attribute.nodeValue));
     }
     return true;
   }
@@ -1084,13 +1165,13 @@ const HOME_KEY$4 = 'Home';
 const TAB_KEY$6 = 'Tab';
 const RIGHT_MOUSE_BUTTON$5 = 2; // MouseEvent.button value for the secondary button, usually the right button
 
-const EVENT_BLUR$1 = `blur${EVENT_KEY$s}`;
+const EVENT_BLUR$2 = `blur${EVENT_KEY$s}`;
 const EVENT_CHANGED$1 = `changed${EVENT_KEY$s}`;
-const EVENT_CLICK$6 = `click${EVENT_KEY$s}`;
+const EVENT_CLICK$8 = `click${EVENT_KEY$s}`;
 const EVENT_HIDE$c = `hide${EVENT_KEY$s}`;
 const EVENT_HIDDEN$c = `hidden${EVENT_KEY$s}`;
 const EVENT_INPUT$5 = `input${EVENT_KEY$s}`;
-const EVENT_KEYDOWN$a = `keydown${EVENT_KEY$s}`;
+const EVENT_KEYDOWN$c = `keydown${EVENT_KEY$s}`;
 const EVENT_KEYUP$1 = `keyup${EVENT_KEY$s}`;
 const EVENT_MOUSEDOWN$2 = `mousedown${EVENT_KEY$s}`;
 const EVENT_SHOW$c = `show${EVENT_KEY$s}`;
@@ -1107,6 +1188,8 @@ const CLASS_NAME_INDICATOR$2 = 'autocomplete-indicator';
 const CLASS_NAME_INPUT$2 = 'autocomplete-input';
 const CLASS_NAME_INPUT_HINT = 'autocomplete-input-hint';
 const CLASS_NAME_INPUT_GROUP$3 = 'autocomplete-input-group';
+const CLASS_NAME_IS_INVALID$2 = 'is-invalid';
+const CLASS_NAME_IS_VALID$2 = 'is-valid';
 const CLASS_NAME_LABEL$1 = 'label';
 const CLASS_NAME_OPTGROUP$1 = 'autocomplete-optgroup';
 const CLASS_NAME_OPTGROUP_LABEL$1 = 'autocomplete-optgroup-label';
@@ -1137,7 +1220,7 @@ const Default$t = {
   indicator: false,
   invalid: false,
   name: null,
-  options: false,
+  options: [],
   optionsGroupsTemplate: null,
   optionsMaxHeight: 'auto',
   optionsTemplate: null,
@@ -1165,7 +1248,7 @@ const DefaultType$t = {
   indicator: 'boolean',
   invalid: 'boolean',
   name: '(string|null)',
-  options: '(array|null)',
+  options: '(array|string|null)',
   optionsGroupsTemplate: '(function|null)',
   optionsMaxHeight: '(number|string)',
   optionsTemplate: '(function|null)',
@@ -1174,7 +1257,7 @@ const DefaultType$t = {
   sanitize: 'boolean',
   sanitizeFn: '(null|function)',
   search: '(array|string|null)',
-  searchNoResultsLabel: 'boolean|string',
+  searchNoResultsLabel: '(boolean|string)',
   showHints: 'boolean',
   valid: 'boolean',
   value: '(number|string|null)'
@@ -1191,6 +1274,8 @@ class Autocomplete extends BaseComponent {
     var _this$_config$id;
     super(element, config);
     this._uniqueId = (_this$_config$id = this._config.id) != null ? _this$_config$id : getUID(`${this.constructor.NAME}`);
+    this._addedClassNames = [];
+    this._cleanerElement = null;
     this._indicatorElement = null;
     this._inputElement = null;
     this._inputHintElement = null;
@@ -1256,9 +1341,10 @@ class Autocomplete extends BaseComponent {
     EventHandler.trigger(this._element, EVENT_HIDDEN$c);
   }
   dispose() {
-    if (this._popper) {
-      this._popper.destroy();
+    if (!this._element) {
+      return;
     }
+    this._destroyAutocomplete();
     super.dispose();
   }
   clear() {
@@ -1285,6 +1371,7 @@ class Autocomplete extends BaseComponent {
       ...this._config,
       ...this._configAfterMerge(config)
     };
+    this._syncInputName();
     this._options = this._getOptionsFromConfig();
     this._optionsElement.innerHTML = '';
     this._createOptions(this._optionsElement, this._options);
@@ -1323,6 +1410,9 @@ class Autocomplete extends BaseComponent {
     }
     return flat;
   }
+  _selectableOptions() {
+    return this._flattenOptions().filter(option => !option.disabled);
+  }
   _getClassNames() {
     return this._element.classList.value.split(' ');
   }
@@ -1351,12 +1441,12 @@ class Autocomplete extends BaseComponent {
   // Private
 
   _addEventListeners() {
-    EventHandler.on(this._element, EVENT_CLICK$6, event => {
+    EventHandler.on(this._element, EVENT_CLICK$8, event => {
       if (!this._config.disabled && !event.target.closest(SELECTOR_INDICATOR)) {
         this.show();
       }
     });
-    EventHandler.on(this._element, EVENT_KEYDOWN$a, event => {
+    EventHandler.on(this._element, EVENT_KEYDOWN$c, event => {
       if (event.key === ESCAPE_KEY$7) {
         this.hide();
         if (this._config.allowOnlyDefinedOptions && this._selected.length === 0) {
@@ -1369,12 +1459,12 @@ class Autocomplete extends BaseComponent {
         this._inputElement.focus();
       }
     });
-    EventHandler.on(this._menu, EVENT_KEYDOWN$a, event => {
+    EventHandler.on(this._menu, EVENT_KEYDOWN$c, event => {
       if (this._isGlobalSearch() && (event.key.length === 1 || event.key === BACKSPACE_KEY$2 || event.key === DELETE_KEY$1)) {
         this._inputElement.focus();
       }
     });
-    EventHandler.on(this._togglerElement, EVENT_KEYDOWN$a, event => {
+    EventHandler.on(this._togglerElement, EVENT_KEYDOWN$c, event => {
       if (!this._isShown() && (event.key === ENTER_KEY$4 || event.key === ARROW_DOWN_KEY$6)) {
         event.preventDefault();
         this.show();
@@ -1385,17 +1475,17 @@ class Autocomplete extends BaseComponent {
         this._selectMenuItem(event);
       }
     });
-    EventHandler.on(this._indicatorElement, EVENT_CLICK$6, event => {
+    EventHandler.on(this._indicatorElement, EVENT_CLICK$8, event => {
       event.preventDefault();
       this.toggle();
     });
-    EventHandler.on(this._inputElement, EVENT_BLUR$1, () => {
+    EventHandler.on(this._inputElement, EVENT_BLUR$2, () => {
       const inputValue = this._inputElement.value;
       if (inputValue.length === 0) {
         return;
       }
       const inputValueLower = inputValue.toLowerCase();
-      const exactMatches = this._flattenOptions().filter(option => option.label.toLowerCase() === inputValueLower);
+      const exactMatches = this._selectableOptions().filter(option => option.label.toLowerCase() === inputValueLower);
       if (exactMatches.length === 1) {
         this._selectOption(exactMatches[0]);
         return;
@@ -1406,7 +1496,7 @@ class Autocomplete extends BaseComponent {
       }
       this._triggerChangeEvent(inputValue);
     });
-    EventHandler.on(this._inputElement, EVENT_KEYDOWN$a, event => {
+    EventHandler.on(this._inputElement, EVENT_KEYDOWN$c, event => {
       if (!this._isShown() && event.key !== TAB_KEY$6) {
         this.show();
       }
@@ -1419,7 +1509,7 @@ class Autocomplete extends BaseComponent {
           event.preventDefault();
           event.stopPropagation();
         }
-        const options = this._flattenOptions().filter(option => option.label.toLowerCase().startsWith(this._inputElement.value.toLowerCase()));
+        const options = this._selectableOptions().filter(option => option.label.toLowerCase().startsWith(this._inputElement.value.toLowerCase()));
         if (options.length > 0) {
           this._selectOption(options[0]);
         }
@@ -1430,7 +1520,7 @@ class Autocomplete extends BaseComponent {
         if (this._inputElement.value.length === 0) {
           return;
         }
-        const options = this._flattenOptions().filter(option => option.label.toLowerCase() === this._inputElement.value.toLowerCase());
+        const options = this._selectableOptions().filter(option => option.label.toLowerCase() === this._inputElement.value.toLowerCase());
         if (options.length > 0) {
           this._selectOption(options[0]);
         }
@@ -1450,7 +1540,7 @@ class Autocomplete extends BaseComponent {
         } = event.target;
         this.search(value);
         if (this._config.showHints) {
-          const options = value ? this._flattenOptions().filter(option => option.label.toLowerCase().startsWith(value.toLowerCase())) : [];
+          const options = value ? this._selectableOptions().filter(option => option.label.toLowerCase().startsWith(value.toLowerCase())) : [];
           this._inputHintElement.value = options.length > 0 ? `${value}${options[0].label.slice(value.length)}` : '';
         }
         if (this._selected.length > 0) {
@@ -1464,26 +1554,26 @@ class Autocomplete extends BaseComponent {
       // (and re-render the list) before the click selects the option.
       event.preventDefault();
     });
-    EventHandler.on(this._optionsElement, EVENT_CLICK$6, event => {
+    EventHandler.on(this._optionsElement, EVENT_CLICK$8, event => {
       event.preventDefault();
       event.stopPropagation();
       this._onOptionsClick(event.target);
     });
-    EventHandler.on(this._cleanerElement, EVENT_CLICK$6, event => {
+    EventHandler.on(this._cleanerElement, EVENT_CLICK$8, event => {
       if (!this._config.disabled) {
         event.preventDefault();
         event.stopPropagation();
         this.clear();
       }
     });
-    EventHandler.on(this._cleanerElement, EVENT_KEYDOWN$a, event => {
+    EventHandler.on(this._cleanerElement, EVENT_KEYDOWN$c, event => {
       if (!this._config.disabled && event.key === ENTER_KEY$4) {
         event.preventDefault();
         event.stopPropagation();
         this.clear();
       }
     });
-    EventHandler.on(this._optionsElement, EVENT_KEYDOWN$a, event => {
+    EventHandler.on(this._optionsElement, EVENT_KEYDOWN$c, event => {
       if (event.key === ENTER_KEY$4) {
         this._onOptionsClick(event.target);
       }
@@ -1497,7 +1587,14 @@ class Autocomplete extends BaseComponent {
       }
     });
   }
-  _getOptionsFromConfig(options = this._config.options) {
+  _syncInputName() {
+    if (this._config.name) {
+      this._inputElement.setAttribute('name', this._config.name.toString());
+      return;
+    }
+    this._inputElement.removeAttribute('name');
+  }
+  _getOptionsFromConfig(options = this._config.options, disabled = false) {
     if (!options || !Array.isArray(options)) {
       return [];
     }
@@ -1508,12 +1605,17 @@ class Autocomplete extends BaseComponent {
         const customGroupProperties = {
           ...option
         };
+        const groupDisabled = disabled || Boolean(option.disabled);
+        delete customGroupProperties.disabled;
         delete customGroupProperties.label;
         delete customGroupProperties.options;
         _options.push({
           ...customGroupProperties,
           label: option.label,
-          options: this._getOptionsFromConfig(option.options)
+          ...(groupDisabled && {
+            disabled: true
+          }),
+          options: this._getOptionsFromConfig(option.options, groupDisabled)
         });
         continue;
       }
@@ -1534,7 +1636,7 @@ class Autocomplete extends BaseComponent {
         ...(isSelected && {
           selected: true
         }),
-        ...(option.disabled && {
+        ...((disabled || option.disabled) && {
           disabled: true
         })
       });
@@ -1547,13 +1649,21 @@ class Autocomplete extends BaseComponent {
     }
     return _options;
   }
-  _createAutocomplete() {
-    this._element.classList.add(CLASS_NAME_AUTOCOMPLETE);
-    this._element.classList.toggle('is-invalid', this._config.invalid);
-    this._element.classList.toggle('is-valid', this._config.valid);
-    if (this._config.disabled) {
-      this._element.classList.add(CLASS_NAME_DISABLED$8);
+  _destroyAutocomplete() {
+    if (this._popper) {
+      this._popper.destroy();
     }
+    restoreHost(this._element, {
+      classNames: [CLASS_NAME_SHOW$f, ...this._addedClassNames],
+      eventKey: EVENT_KEY$s,
+      nodes: [this._optionsElement, this._inputHintElement, this._inputElement, this._cleanerElement, this._indicatorElement, this._menu, this._togglerElement]
+    });
+    this._addedClassNames = [];
+  }
+  _createAutocomplete() {
+    this._addedClassNames = addHostClassNames(this._element, [CLASS_NAME_AUTOCOMPLETE, this._config.invalid && CLASS_NAME_IS_INVALID$2, this._config.valid && CLASS_NAME_IS_VALID$2, this._config.disabled && CLASS_NAME_DISABLED$8]);
+    this._element.classList.toggle(CLASS_NAME_IS_INVALID$2, this._config.invalid);
+    this._element.classList.toggle(CLASS_NAME_IS_VALID$2, this._config.valid);
     for (const className of this._getClassNames()) {
       this._element.classList.add(className);
     }
@@ -1573,7 +1683,6 @@ class Autocomplete extends BaseComponent {
     if (!this._config.disabled && this._config.showHints) {
       const inputHintEl = document.createElement('input');
       inputHintEl.classList.add(CLASS_NAME_INPUT$2, CLASS_NAME_INPUT_HINT);
-      inputHintEl.setAttribute('name', (this._config.name || `${this._uniqueId}-hint`).toString());
       inputHintEl.autocomplete = 'off';
       inputHintEl.readOnly = true;
       inputHintEl.tabIndex = -1;
@@ -1584,7 +1693,6 @@ class Autocomplete extends BaseComponent {
     const inputEl = document.createElement('input');
     inputEl.classList.add(CLASS_NAME_INPUT$2);
     inputEl.id = this._uniqueId;
-    inputEl.setAttribute('name', (this._config.name || this._uniqueId).toString());
     inputEl.autocomplete = 'off';
     inputEl.placeholder = (_this$_config$placeho = this._config.placeholder) != null ? _this$_config$placeho : '';
     inputEl.role = 'combobox';
@@ -1601,6 +1709,7 @@ class Autocomplete extends BaseComponent {
     }
     togglerEl.append(inputEl);
     this._inputElement = inputEl;
+    this._syncInputName();
     this._element.append(togglerEl);
   }
   _createButtons() {
@@ -1627,7 +1736,6 @@ class Autocomplete extends BaseComponent {
         indicator.tabIndex = -1;
       }
       buttons.append(indicator);
-      this._indicatorElement = indicator;
       this._indicatorElement = indicator;
     }
     this._togglerElement.append(buttons);
@@ -1693,6 +1801,9 @@ class Autocomplete extends BaseComponent {
           optgrouplabel.textContent = option.label;
         }
         optgrouplabel.classList.add(CLASS_NAME_OPTGROUP_LABEL$1);
+        if (option.disabled) {
+          optgrouplabel.classList.add(CLASS_NAME_DISABLED$8);
+        }
         optgroup.append(optgrouplabel);
         this._createOptions(optgroup, option.options);
         parentElement.append(optgroup);
@@ -1707,7 +1818,7 @@ class Autocomplete extends BaseComponent {
         optionDiv.setAttribute('aria-disabled', 'true');
       }
       optionDiv.dataset.value = option.value;
-      optionDiv.tabIndex = 0;
+      optionDiv.tabIndex = option.disabled ? -1 : 0;
       if (this._isExternalSearch() && this._config.highlightOptionsOnSearch && this._search) {
         optionDiv.innerHTML = this._highlightOption(option.label);
       } else if (this._config.optionsTemplate && typeof this._config.optionsTemplate === 'function') {
@@ -1727,6 +1838,9 @@ class Autocomplete extends BaseComponent {
       if (!element) {
         return;
       }
+    }
+    if (element.classList.contains(CLASS_NAME_DISABLED$8)) {
+      return;
     }
     const {
       value
@@ -1964,7 +2078,9 @@ const EVENT_KEY$r = `.${DATA_KEY$q}`;
 const DATA_API_KEY$m = '.data-api';
 const CLASS_NAME_ACTIVE$8 = 'active';
 const SELECTOR_DATA_TOGGLE$h = '[data-bs-toggle="button"]';
+const SELECTOR_PRESSABLE = 'button, [role="button"], input[type="button"], input[type="reset"], input[type="submit"]';
 const EVENT_CLICK_DATA_API$h = `click${EVENT_KEY$r}${DATA_API_KEY$m}`;
+const EVENT_DOM_CONTENT_LOADED = `DOMContentLoaded${EVENT_KEY$r}${DATA_API_KEY$m}`;
 
 /**
  * Class definition
@@ -1997,6 +2113,16 @@ class Button extends BaseComponent {
  * Data API implementation
  */
 
+// A toggle button must always expose `aria-pressed`. Without it, assistive technology
+// reads the control as a plain button and never announces the pressed state.
+// See https://www.w3.org/WAI/ARIA/apg/patterns/button/
+EventHandler.on(document, EVENT_DOM_CONTENT_LOADED, () => {
+  for (const element of SelectorEngine.find(SELECTOR_DATA_TOGGLE$h)) {
+    if (element.matches(SELECTOR_PRESSABLE) && !element.hasAttribute('aria-pressed')) {
+      element.setAttribute('aria-pressed', element.classList.contains(CLASS_NAME_ACTIVE$8));
+    }
+  }
+});
 EventHandler.on(document, EVENT_CLICK_DATA_API$h, SELECTOR_DATA_TOGGLE$h, event => {
   event.preventDefault();
   const button = event.target.closest(SELECTOR_DATA_TOGGLE$h);
@@ -2086,6 +2212,16 @@ const isOutsideRange = (value, min, max) => {
     return true;
   }
   return false;
+};
+const isPeriodDisabled = (start, end, min, max, disabledDates) => {
+  const startTime = min ? Math.max(start.getTime(), min.getTime()) : start.getTime();
+  const endTime = max ? Math.min(end.getTime(), max.getTime()) : end.getTime();
+  for (const currentDate = new Date(startTime); currentDate.getTime() <= endTime; currentDate.setDate(currentDate.getDate() + 1)) {
+    if (!isDateDisabled(currentDate, min, max, disabledDates)) {
+      return false;
+    }
+  }
+  return true;
 };
 
 /**
@@ -2231,22 +2367,56 @@ const parseYearString = dateString => {
 };
 
 /**
+ * Default Intl time parts, matching a time picker that shows all three units.
+ */
+const DEFAULT_TIME_OPTIONS = {
+  hour: "numeric",
+  minute: "numeric",
+  second: "numeric"
+};
+
+/**
+ * Builds the Intl time parts for a time picker configuration, so that formatting
+ * and parsing always agree on which units a value carries.
+ * @param minutes - Whether minutes are offered.
+ * @param seconds - Whether seconds are offered.
+ * @returns Intl.DateTimeFormat options for the time part.
+ */
+const getTimeFormatOptions = (minutes, seconds) => ({
+  hour: "numeric",
+  ...(minutes && {
+    minute: "numeric"
+  }),
+  ...(minutes && seconds && {
+    second: "numeric"
+  })
+});
+
+/**
  * Helper function to generate multiple date format patterns based on locale.
  * @param locale - The locale to use for date format patterns.
  * @param includeTime - Whether to include time in the patterns.
+ * @param timeOptions - Intl time parts the value carries.
  * @returns Array of date format patterns.
  */
-const generateDatePatterns = (locale, includeTime) => {
+const generateDatePatterns = (locale, includeTime, timeOptions) => {
   const referenceDate = new Date(2013, 11, 31, 17, 19, 22);
+  const dateOptions = {
+    year: "numeric",
+    month: "numeric",
+    day: "numeric"
+  };
+  const format = includeTime ? {
+    ...dateOptions,
+    ...timeOptions
+  } : dateOptions;
   const patterns = [];
   try {
     // Get the standard locale format
-    const standardFormat = includeTime ? referenceDate.toLocaleString(locale) : referenceDate.toLocaleDateString(locale);
-    patterns.push(standardFormat);
+    patterns.push(referenceDate.toLocaleString(locale, format));
   } catch (_unused) {
     // Fallback to default locale if invalid locale provided
-    const standardFormat = includeTime ? referenceDate.toLocaleString("en-US") : referenceDate.toLocaleDateString("en-US");
-    patterns.push(standardFormat);
+    patterns.push(referenceDate.toLocaleString("en-US", format));
   }
 
   // Generate common alternative formats by replacing separators
@@ -2282,7 +2452,7 @@ const generateDatePatterns = (locale, includeTime) => {
 const buildDateRegexPattern = (formatString, includeTime) => {
   // First escape special regex characters
 
-  let regexPattern = formatString.replaceAll(/[.*+?^${}()|[\\]\\]/g, "\\$&");
+  let regexPattern = formatString.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
   // Then replace the date/time components with regex groups
   regexPattern = regexPattern.replace("2013", String.raw(_t2 || (_t2 = _2`(?<year>\d{2,4})`))).replace("12", String.raw(_t3 || (_t3 = _2`(?<month>\d{1,2})`))).replace("31", String.raw(_t4 || (_t4 = _2`(?<day>\d{1,2})`)));
@@ -2423,10 +2593,11 @@ const getExpectedPartsCount = patterns => {
  * @param dateString - The day string to parse.
  * @param locale - The locale to use for parsing.
  * @param includeTime - Whether to include time parsing.
+ * @param timeOptions - Intl time parts the value carries.
  * @returns Date object or null if invalid.
  */
-const parseDayString = (dateString, locale, includeTime) => {
-  const patterns = generateDatePatterns(locale, includeTime);
+const parseDayString = (dateString, locale, includeTime, timeOptions) => {
+  const patterns = generateDatePatterns(locale, includeTime, timeOptions);
   const groups = tryParseWithPatterns(dateString, patterns, includeTime);
   if (!groups) {
     // Check if input looks like a complete date (has separators and multiple parts)
@@ -2481,9 +2652,10 @@ const parseLocalDateString = dateString => {
  * @param selectionType - The type of selection ('day', 'week', 'month', 'year').
  * @param locale - The locale to use for date parsing (for day parsing).
  * @param includeTime - Whether to include time parsing (for day parsing).
+ * @param timeOptions - Intl time parts the value carries (for day parsing).
  * @returns The corresponding Date object or null if invalid.
  */
-const convertToDateObject = (date, selectionType, locale = "en-US", includeTime = false) => {
+const convertToDateObject = (date, selectionType, locale = "en-US", includeTime = false, timeOptions = DEFAULT_TIME_OPTIONS) => {
   if (date === null) {
     return null;
   }
@@ -2511,7 +2683,7 @@ const convertToDateObject = (date, selectionType, locale = "en-US", includeTime 
     default:
       {
         // Enhanced day parsing with locale support
-        return parseDayString(dateString, locale, includeTime);
+        return parseDayString(dateString, locale, includeTime, timeOptions);
       }
   }
 };
@@ -2522,14 +2694,15 @@ const convertToDateObject = (date, selectionType, locale = "en-US", includeTime 
  * @param locale - The locale to use for date format patterns.
  * @param includeTime - Whether to include time parsing.
  * @param selectionType - The selection type ('day', 'week', 'month', 'quarter', 'year').
+ * @param timeOptions - Intl time parts the value carries.
  * @returns A Date object if parsing succeeds, null if parsing fails.
  */
-const getLocalDateFromString = (dateString, locale = "en-US", includeTime = false, selectionType = "day") => {
+const getLocalDateFromString = (dateString, locale = "en-US", includeTime = false, selectionType = "day", timeOptions = DEFAULT_TIME_OPTIONS) => {
   // Input validation
   if (!dateString || typeof dateString !== "string") {
     return null;
   }
-  return convertToDateObject(dateString, selectionType, locale, includeTime);
+  return convertToDateObject(dateString, selectionType, locale, includeTime, timeOptions);
 };
 
 /**
@@ -2710,7 +2883,8 @@ const getISOWeekNumberAndYear = date => {
 
   // Thursday in current week decides the year
   tempDate.setDate(tempDate.getDate() + 3 - (tempDate.getDay() + 6) % 7);
-  const week1 = new Date(tempDate.getFullYear(), 0, 4);
+  const week1 = new Date(tempDate);
+  week1.setMonth(0, 4);
 
   // Calculate full weeks to the date
   const weekNumber = 1 + Math.round((tempDate.getTime() - week1.getTime()) / (86400000 * 7));
@@ -2878,14 +3052,9 @@ const isMonthDisabled = (date, min, max, disabledDates) => {
   if (disabledDates === undefined) {
     return false;
   }
-  const startTime = min ? Math.max(date.getTime(), min.getTime()) : date.getTime();
-  const endTime = max ? Math.min(date.getTime(), max.getTime()) : new Date(new Date().getFullYear(), 11, 31).getTime();
-  for (const currentDate = new Date(startTime); currentDate.getTime() <= endTime; currentDate.setDate(currentDate.getDate() + 1)) {
-    if (!isDateDisabled(currentDate, min, max, disabledDates)) {
-      return false;
-    }
-  }
-  return false;
+  const year = date.getFullYear();
+  const month = date.getMonth();
+  return isPeriodDisabled(new Date(year, month, 1), new Date(year, month + 1, 0), min, max, disabledDates);
 };
 
 /**
@@ -2939,23 +3108,9 @@ const isQuarterDisabled = (date, min, max, disabledDates) => {
   if (disabledDates === undefined) {
     return false;
   }
-
-  // Get the start and end of the quarter
-  const quarter = Math.floor(date.getMonth() / 3);
-  const quarterStartMonth = quarter * 3;
-  const quarterEndMonth = quarterStartMonth + 2;
   const year = date.getFullYear();
-  const quarterStart = new Date(year, quarterStartMonth, 1);
-  const quarterEnd = new Date(year, quarterEndMonth + 1, 0); // Last day of the quarter
-
-  const startTime = min ? Math.max(quarterStart.getTime(), min.getTime()) : quarterStart.getTime();
-  const endTime = max ? Math.min(quarterEnd.getTime(), max.getTime()) : quarterEnd.getTime();
-  for (const currentDate = new Date(startTime); currentDate.getTime() <= endTime; currentDate.setDate(currentDate.getDate() + 1)) {
-    if (!isDateDisabled(currentDate, min, max, disabledDates)) {
-      return false;
-    }
-  }
-  return false;
+  const quarterStartMonth = Math.floor(date.getMonth() / 3) * 3;
+  return isPeriodDisabled(new Date(year, quarterStartMonth, 1), new Date(year, quarterStartMonth + 3, 0), min, max, disabledDates);
 };
 
 /**
@@ -3043,14 +3198,7 @@ const isYearDisabled = (date, min, max, disabledDates) => {
   if (disabledDates === undefined) {
     return false;
   }
-  const startTime = min ? Math.max(date.getTime(), min.getTime()) : date.getTime();
-  const endTime = max ? Math.min(date.getTime(), max.getTime()) : new Date(new Date().getFullYear(), 11, 31).getTime();
-  for (const currentDate = new Date(startTime); currentDate.getTime() <= endTime; currentDate.setDate(currentDate.getDate() + 1)) {
-    if (!isDateDisabled(currentDate, min, max, disabledDates)) {
-      return false;
-    }
-  }
-  return false;
+  return isPeriodDisabled(new Date(year, 0, 1), new Date(year, 11, 31), min, max, disabledDates);
 };
 
 /**
@@ -3169,21 +3317,21 @@ const NAME$u = 'calendar';
 const DATA_KEY$p = 'bs.calendar';
 const EVENT_KEY$q = `.${DATA_KEY$p}`;
 const DATA_API_KEY$l = '.data-api';
-const DISALLOWED_ATTRIBUTES$5 = new Set(['sanitize', 'allowList', 'sanitizeFn']);
+const DISALLOWED_ATTRIBUTES$3 = new Set(['sanitize', 'allowList', 'sanitizeFn']);
 const ARROW_UP_KEY$5 = 'ArrowUp';
 const ARROW_RIGHT_KEY$5 = 'ArrowRight';
 const ARROW_DOWN_KEY$5 = 'ArrowDown';
 const ARROW_LEFT_KEY$5 = 'ArrowLeft';
 const ENTER_KEY$3 = 'Enter';
 const SPACE_KEY$2 = 'Space';
-const EVENT_BLUR = `blur${EVENT_KEY$q}`;
+const EVENT_BLUR$1 = `blur${EVENT_KEY$q}`;
 const EVENT_CALENDAR_DATE_CHANGE = `calendarDateChange${EVENT_KEY$q}`;
 const EVENT_CALENDAR_MOUSE_LEAVE = `calendarMouseleave${EVENT_KEY$q}`;
 const EVENT_CALENDAR_VIEW_CHANGE = `calendarViewChange${EVENT_KEY$q}`;
 const EVENT_CELL_HOVER = `cellHover${EVENT_KEY$q}`;
 const EVENT_END_DATE_CHANGE$1 = `endDateChange${EVENT_KEY$q}`;
-const EVENT_FOCUS$1 = `focus${EVENT_KEY$q}`;
-const EVENT_KEYDOWN$9 = `keydown${EVENT_KEY$q}`;
+const EVENT_FOCUS$2 = `focus${EVENT_KEY$q}`;
+const EVENT_KEYDOWN$b = `keydown${EVENT_KEY$q}`;
 const EVENT_SELECT_END_CHANGE = `selectEndChange${EVENT_KEY$q}`;
 const EVENT_START_DATE_CHANGE$1 = `startDateChange${EVENT_KEY$q}`;
 const EVENT_MOUSEENTER$3 = `mouseenter${EVENT_KEY$q}`;
@@ -3329,8 +3477,17 @@ class Calendar extends BaseComponent {
     }
     return new Date(Manipulator.getDataAttribute(target, 'date'));
   }
+  _getEventTarget(event) {
+    var _event$target$closest;
+    // When weeks are the unit, the row is the focusable thing — a click then
+    // arrives with no cell above it, and the row stands in for one.
+    return (_event$target$closest = event.target.closest(SELECTOR_CALENDAR_CELL)) != null ? _event$target$closest : event.target.closest(SELECTOR_CALENDAR_ROW);
+  }
   _handleCalendarClick(event) {
-    const target = event.target.closest(SELECTOR_CALENDAR_CELL);
+    const target = this._getEventTarget(event);
+    if (!target) {
+      return;
+    }
     const date = this._getDate(target);
     const cloneDate = new Date(date);
     const index = Manipulator.getDataAttribute(target.closest(SELECTOR_CALENDAR$1), 'calendar-index');
@@ -3430,7 +3587,10 @@ class Calendar extends BaseComponent {
     }
   }
   _handleCalendarMouseEnter(event) {
-    const target = event.target.closest(SELECTOR_CALENDAR_CELL);
+    const target = this._getEventTarget(event);
+    if (!target) {
+      return;
+    }
     const date = this._getDate(target);
     if (isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates)) {
       return;
@@ -3452,7 +3612,7 @@ class Calendar extends BaseComponent {
     EventHandler.on(this._element, EVENT_CLICK_DATA_API$g, SELECTOR_CALENDAR_CELL_CLICKABLE, event => {
       this._handleCalendarClick(event);
     });
-    EventHandler.on(this._element, EVENT_KEYDOWN$9, SELECTOR_CALENDAR_CELL_CLICKABLE, event => {
+    EventHandler.on(this._element, EVENT_KEYDOWN$b, SELECTOR_CALENDAR_CELL_CLICKABLE, event => {
       this._handleCalendarKeydown(event);
     });
     EventHandler.on(this._element, EVENT_MOUSEENTER$3, SELECTOR_CALENDAR_CELL_CLICKABLE, event => {
@@ -3461,16 +3621,16 @@ class Calendar extends BaseComponent {
     EventHandler.on(this._element, EVENT_MOUSELEAVE$3, SELECTOR_CALENDAR_CELL_CLICKABLE, () => {
       this._handleCalendarMouseLeave();
     });
-    EventHandler.on(this._element, EVENT_FOCUS$1, SELECTOR_CALENDAR_CELL_CLICKABLE, event => {
+    EventHandler.on(this._element, EVENT_FOCUS$2, SELECTOR_CALENDAR_CELL_CLICKABLE, event => {
       this._handleCalendarMouseEnter(event);
     });
-    EventHandler.on(this._element, EVENT_BLUR, SELECTOR_CALENDAR_CELL_CLICKABLE, () => {
+    EventHandler.on(this._element, EVENT_BLUR$1, SELECTOR_CALENDAR_CELL_CLICKABLE, () => {
       this._handleCalendarMouseLeave();
     });
     EventHandler.on(this._element, EVENT_CLICK_DATA_API$g, SELECTOR_CALENDAR_ROW_CLICKABLE, event => {
       this._handleCalendarClick(event);
     });
-    EventHandler.on(this._element, EVENT_KEYDOWN$9, SELECTOR_CALENDAR_ROW_CLICKABLE, event => {
+    EventHandler.on(this._element, EVENT_KEYDOWN$b, SELECTOR_CALENDAR_ROW_CLICKABLE, event => {
       this._handleCalendarKeydown(event);
     });
     EventHandler.on(this._element, EVENT_MOUSEENTER$3, SELECTOR_CALENDAR_ROW_CLICKABLE, event => {
@@ -3479,10 +3639,10 @@ class Calendar extends BaseComponent {
     EventHandler.on(this._element, EVENT_MOUSELEAVE$3, SELECTOR_CALENDAR_ROW_CLICKABLE, () => {
       this._handleCalendarMouseLeave();
     });
-    EventHandler.on(this._element, EVENT_FOCUS$1, SELECTOR_CALENDAR_ROW_CLICKABLE, event => {
+    EventHandler.on(this._element, EVENT_FOCUS$2, SELECTOR_CALENDAR_ROW_CLICKABLE, event => {
       this._handleCalendarMouseEnter(event);
     });
-    EventHandler.on(this._element, EVENT_BLUR, SELECTOR_CALENDAR_ROW_CLICKABLE, () => {
+    EventHandler.on(this._element, EVENT_BLUR$1, SELECTOR_CALENDAR_ROW_CLICKABLE, () => {
       this._handleCalendarMouseLeave();
     });
 
@@ -3809,7 +3969,7 @@ class Calendar extends BaseComponent {
     this._element.innerHTML = '';
     this._createCalendar();
     if (callback) {
-      setTimeout(callback, 1);
+      callback();
     }
   }
   _updateClassNamesAndAriaLabels() {
@@ -3993,7 +4153,7 @@ class Calendar extends BaseComponent {
     const isDisabled = isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates);
     const isSelected = isDateSelected(date, this._startDate, this._endDate);
     const isInRange = isDateInRange(date, this._startDate, this._endDate);
-    const isRangeHover = this._hoverDate && (this._selectEndDate ? isYearInRange(date, this._startDate, this._hoverDate) : isYearInRange(date, this._hoverDate, this._endDate));
+    const isRangeHover = this._hoverDate && (this._selectEndDate ? isDateInRange(date, this._startDate, this._hoverDate) : isDateInRange(date, this._hoverDate, this._endDate));
     const classNames = this._classNames({
       [CLASS_NAME_CALENDAR_ROW]: true,
       disabled: isDisabled,
@@ -4016,7 +4176,7 @@ class Calendar extends BaseComponent {
   _getConfig(config) {
     const dataAttributes = Manipulator.getDataAttributes(this._element);
     for (const dataAttribute of Object.keys(dataAttributes)) {
-      if (DISALLOWED_ATTRIBUTES$5.has(dataAttribute)) {
+      if (DISALLOWED_ATTRIBUTES$3.has(dataAttribute)) {
         delete dataAttributes[dataAttribute];
       }
     }
@@ -4223,7 +4383,7 @@ const DIRECTION_LEFT = 'left';
 const DIRECTION_RIGHT = 'right';
 const EVENT_SLIDE = `slide${EVENT_KEY$o}`;
 const EVENT_SLID = `slid${EVENT_KEY$o}`;
-const EVENT_KEYDOWN$8 = `keydown${EVENT_KEY$o}`;
+const EVENT_KEYDOWN$a = `keydown${EVENT_KEY$o}`;
 const EVENT_MOUSEENTER$2 = `mouseenter${EVENT_KEY$o}`;
 const EVENT_MOUSELEAVE$2 = `mouseleave${EVENT_KEY$o}`;
 const EVENT_DRAG_START = `dragstart${EVENT_KEY$o}`;
@@ -4361,7 +4521,7 @@ class Carousel extends BaseComponent {
   }
   _addEventListeners() {
     if (this._config.keyboard) {
-      EventHandler.on(this._element, EVENT_KEYDOWN$8, event => this._keydown(event));
+      EventHandler.on(this._element, EVENT_KEYDOWN$a, event => this._keydown(event));
     }
     if (this._config.pause === 'hover') {
       EventHandler.on(this._element, EVENT_MOUSEENTER$2, () => this.pause());
@@ -4592,6 +4752,8 @@ const EVENT_SELECT$1 = `select${EVENT_KEY$n}`;
 const EVENT_SELECTED = `selected${EVENT_KEY$n}`;
 const EVENT_DESELECT = `deselect${EVENT_KEY$n}`;
 const EVENT_DESELECTED = `deselected${EVENT_KEY$n}`;
+const EVENT_CLICK$7 = `click${EVENT_KEY$n}`;
+const EVENT_KEYDOWN$9 = `keydown${EVENT_KEY$n}`;
 const SELECTOR_CHIP_CHECK = '.chip-check';
 const SELECTOR_CHIP_REMOVE$2 = '.chip-remove';
 const SELECTOR_DATA_CHIP = '[data-bs-chip]';
@@ -4602,7 +4764,6 @@ const CLASS_NAME_ACTIVE$6 = 'active';
 const CLASS_NAME_DISABLED$7 = 'disabled';
 const DEFAULT_REMOVE_ICON$1 = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="4" x2="12" y2="12"/><line x1="12" y1="4" x2="4" y2="12"/></svg>';
 const DEFAULT_SELECTED_ICON$1 = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512" fill="currentColor"><path d="M425.373 89.373 196 318.745 86.627 209.373l-45.254 45.254L196 409.255l274.627-274.628z"/></svg>';
-const DISALLOWED_ATTRIBUTES$4 = new Set(['sanitize', 'allowList', 'sanitizeFn']);
 const Default$p = {
   allowList: SVGAllowlist,
   ariaRemoveLabel: 'Remove',
@@ -4716,8 +4877,8 @@ class Chip extends BaseComponent {
     return config;
   }
   _addEventListeners() {
-    EventHandler.on(this._element, 'keydown', event => this._handleKeydown(event));
-    EventHandler.on(this._element, 'click', event => {
+    EventHandler.on(this._element, EVENT_KEYDOWN$9, event => this._handleKeydown(event));
+    EventHandler.on(this._element, EVENT_CLICK$7, event => {
       if (this._disabled) {
         return;
       }
@@ -4726,7 +4887,7 @@ class Chip extends BaseComponent {
       }
       this.toggle();
     });
-    EventHandler.on(this._element, 'click', SELECTOR_CHIP_REMOVE$2, event => {
+    EventHandler.on(this._element, EVENT_CLICK$7, SELECTOR_CHIP_REMOVE$2, event => {
       event.stopPropagation();
       this.remove();
     });
@@ -4837,22 +4998,6 @@ class Chip extends BaseComponent {
   _sanitizeIcon(icon) {
     return this._config.sanitize ? sanitizeHtml(icon, this._config.allowList, this._config.sanitizeFn) : icon;
   }
-  _getConfig(config) {
-    const dataAttributes = Manipulator.getDataAttributes(this._element);
-    for (const dataAttribute of Object.keys(dataAttributes)) {
-      if (DISALLOWED_ATTRIBUTES$4.has(dataAttribute)) {
-        delete dataAttributes[dataAttribute];
-      }
-    }
-    config = {
-      ...dataAttributes,
-      ...(typeof config === 'object' && config ? config : {})
-    };
-    config = this._mergeConfigObj(config);
-    config = this._configAfterMerge(config);
-    this._typeCheckConfig(config);
-    return config;
-  }
 
   // Static
   static chipInterface(element, config) {
@@ -4914,7 +5059,7 @@ const EVENT_ADD = 'add';
 const EVENT_REMOVE = 'remove';
 const EVENT_CHANGE$3 = 'change';
 const EVENT_SELECT = 'select';
-const EVENT_KEYDOWN$7 = 'keydown';
+const EVENT_KEYDOWN$8 = 'keydown';
 const EVENT_CHIP_SELECTED = 'selected.bs.chip';
 const EVENT_CHIP_DESELECTED = 'deselected.bs.chip';
 const EVENT_CHIP_REMOVE = 'remove.bs.chip';
@@ -5190,7 +5335,7 @@ class ChipSet extends BaseComponent {
     return typeof chipClassName === 'string' ? chipClassName : '';
   }
   _addEventListeners() {
-    EventHandler.on(this._element, this.constructor.eventName(EVENT_KEYDOWN$7), SELECTOR_CHIP$1, event => this._handleKeydown(event));
+    EventHandler.on(this._element, this.constructor.eventName(EVENT_KEYDOWN$8), SELECTOR_CHIP$1, event => this._handleKeydown(event));
     EventHandler.on(this._element, EVENT_CHIP_SELECTED, SELECTOR_CHIP$1, event => this._handleSelectionChange(event));
     EventHandler.on(this._element, EVENT_CHIP_DESELECTED, SELECTOR_CHIP$1, event => this._handleSelectionChange(event));
     EventHandler.on(this._element, EVENT_CHIP_REMOVE, SELECTOR_CHIP$1, event => this._handleChipRemove(event));
@@ -5362,7 +5507,12 @@ const NAME$p = 'chip-input';
 const DATA_KEY$l = 'bs.chip-input';
 const EVENT_KEY$l = `.${DATA_KEY$l}`;
 const DATA_API_KEY$h = '.data-api';
+const EVENT_BLUR = `blur${EVENT_KEY$l}`;
+const EVENT_CLICK$6 = `click${EVENT_KEY$l}`;
+const EVENT_FOCUS$1 = `focus${EVENT_KEY$l}`;
 const EVENT_INPUT$4 = `input${EVENT_KEY$l}`;
+const EVENT_KEYDOWN$7 = `keydown${EVENT_KEY$l}`;
+const EVENT_PASTE$1 = `paste${EVENT_KEY$l}`;
 const SELECTOR_DATA_CHIP_INPUT = '[data-bs-chip-input]';
 const SELECTOR_CHIP = '.chip';
 const SELECTOR_CHIP_INPUT_LABEL = '.chip-input-label';
@@ -5440,6 +5590,12 @@ class ChipInput extends ChipSet {
     var _this$_input;
     (_this$_input = this._input) == null || _this$_input.focus();
   }
+  dispose() {
+    var _this$_hiddenInput;
+    (_this$_hiddenInput = this._hiddenInput) == null || _this$_hiddenInput.remove();
+    EventHandler.off(this._input, EVENT_KEY$l);
+    super.dispose();
+  }
 
   // Private
   _canModify() {
@@ -5485,7 +5641,7 @@ class ChipInput extends ChipSet {
     }
   }
   _addInputEventListeners() {
-    EventHandler.on(this._element, 'keydown', event => {
+    EventHandler.on(this._element, EVENT_KEYDOWN$7, event => {
       if (event.target === this._input) {
         return;
       }
@@ -5505,12 +5661,12 @@ class ChipInput extends ChipSet {
         this._input.focus();
       }
     });
-    EventHandler.on(this._input, 'keydown', event => this._handleInputKeydown(event));
-    EventHandler.on(this._input, 'input', event => this._handleInput(event));
-    EventHandler.on(this._input, 'paste', event => this._handlePaste(event));
-    EventHandler.on(this._input, 'focus', () => this.clearSelection());
+    EventHandler.on(this._input, EVENT_KEYDOWN$7, event => this._handleInputKeydown(event));
+    EventHandler.on(this._input, EVENT_INPUT$4, event => this._handleInput(event));
+    EventHandler.on(this._input, EVENT_PASTE$1, event => this._handlePaste(event));
+    EventHandler.on(this._input, EVENT_FOCUS$1, () => this.clearSelection());
     if (this._config.createOnBlur) {
-      EventHandler.on(this._input, 'blur', event => {
+      EventHandler.on(this._input, EVENT_BLUR, event => {
         var _event$relatedTarget;
         // Don't create chip if clicking on a chip
         if (!((_event$relatedTarget = event.relatedTarget) != null && _event$relatedTarget.closest(SELECTOR_CHIP))) {
@@ -5520,7 +5676,7 @@ class ChipInput extends ChipSet {
     }
 
     // Focus input when clicking container background
-    EventHandler.on(this._element, 'click', event => {
+    EventHandler.on(this._element, EVENT_CLICK$6, event => {
       if (event.target === this._element) {
         var _this$_input3;
         (_this$_input3 = this._input) == null || _this$_input3.focus();
@@ -5549,7 +5705,9 @@ class ChipInput extends ChipSet {
     const hiddenInput = document.createElement('input');
     hiddenInput.type = 'hidden';
     hiddenInput.id = this._uniqueId;
-    hiddenInput.name = this._config.name || this._uniqueId;
+    if (this._config.name) {
+      hiddenInput.name = this._config.name;
+    }
     this._element.append(hiddenInput);
     this._hiddenInput = hiddenInput;
     this._hiddenInput.value = this.getValues().join(',');
@@ -5572,8 +5730,6 @@ class ChipInput extends ChipSet {
     this._element.classList.toggle(CLASS_NAME_DISABLED$5, this._disabled);
     this._input.disabled = this._disabled;
     this._input.readOnly = !this._disabled && readonly;
-    this._element.setAttribute('aria-disabled', this._disabled ? 'true' : 'false');
-    this._element.setAttribute('aria-readonly', readonly ? 'true' : 'false');
   }
   _handleInputKeydown(event) {
     const {
@@ -5946,13 +6102,19 @@ const TAB_NAV_BACKWARD = 'backward';
 const Default$l = {
   additionalElement: null,
   autofocus: true,
+  returnFocus: false,
   trapElement: null // The element to trap focus inside of
 };
 const DefaultType$l = {
   additionalElement: '(element|null|undefined)',
   autofocus: 'boolean',
+  returnFocus: 'boolean',
   trapElement: 'element'
 };
+
+// Only the most recently activated trap reacts. Two traps over disjoint
+// elements would otherwise throw focus at each other without end.
+const activeTraps = [];
 
 /**
  * Class definition
@@ -5964,6 +6126,9 @@ class FocusTrap extends Config {
     this._config = this._getConfig(config);
     this._isActive = false;
     this._lastTabNavDirection = null;
+    this._previouslyFocused = null;
+    this._focusinHandler = event => this._handleFocusin(event);
+    this._keydownHandler = event => this._handleKeydown(event);
   }
 
   // Getters
@@ -5982,12 +6147,13 @@ class FocusTrap extends Config {
     if (this._isActive) {
       return;
     }
+    this._previouslyFocused = document.activeElement;
     if (this._config.autofocus) {
       this._config.trapElement.focus();
     }
-    EventHandler.off(document, EVENT_KEY$j); // guard against infinite focus loop
-    EventHandler.on(document, EVENT_FOCUSIN$3, event => this._handleFocusin(event));
-    EventHandler.on(document, EVENT_KEYDOWN_TAB, event => this._handleKeydown(event));
+    EventHandler.on(document, EVENT_FOCUSIN$3, this._focusinHandler);
+    EventHandler.on(document, EVENT_KEYDOWN_TAB, this._keydownHandler);
+    activeTraps.push(this);
     this._isActive = true;
   }
   deactivate() {
@@ -5995,7 +6161,14 @@ class FocusTrap extends Config {
       return;
     }
     this._isActive = false;
-    EventHandler.off(document, EVENT_KEY$j);
+    activeTraps.splice(activeTraps.indexOf(this), 1);
+    EventHandler.off(document, EVENT_FOCUSIN$3, this._focusinHandler);
+    EventHandler.off(document, EVENT_KEYDOWN_TAB, this._keydownHandler);
+    if (this._config.returnFocus && this._holdsFocus()) {
+      var _this$_returnFocusTar;
+      (_this$_returnFocusTar = this._returnFocusTarget()) == null || _this$_returnFocusTar.focus();
+    }
+    this._previouslyFocused = null;
   }
 
   // Private
@@ -6004,7 +6177,7 @@ class FocusTrap extends Config {
       additionalElement,
       trapElement
     } = this._config;
-    if (event.target === document || event.target === trapElement || trapElement.contains(event.target)) {
+    if (!this._isTopmost() || event.target === document || event.target === trapElement || trapElement.contains(event.target)) {
       return;
     }
     if (additionalElement && (event.target === additionalElement || additionalElement.contains(event.target))) {
@@ -6020,7 +6193,7 @@ class FocusTrap extends Config {
     }
   }
   _handleKeydown(event) {
-    if (event.key !== TAB_KEY$5) {
+    if (!this._isTopmost() || event.key !== TAB_KEY$5) {
       return;
     }
     this._lastTabNavDirection = event.shiftKey ? TAB_NAV_BACKWARD : TAB_NAV_FORWARD;
@@ -6036,22 +6209,46 @@ class FocusTrap extends Config {
     if (trapElements.length === 0 || additionalElements.length === 0) {
       return;
     }
-    event.preventDefault();
-    if (trapElements.indexOf(event.target) === trapElements.length - 1 && !event.shiftKey) {
-      additionalElements[0].focus();
+    const trapIndex = trapElements.indexOf(event.target);
+    const additionalIndex = additionalElements.indexOf(event.target);
+    const redirect = element => {
+      event.preventDefault();
+      element.focus();
+    };
+    if (trapIndex === trapElements.length - 1 && !event.shiftKey) {
+      redirect(additionalElements[0]);
       return;
     }
-    if (trapElements.indexOf(event.target) === 0 && event.shiftKey) {
-      additionalElements[additionalElements.length - 1].focus();
+    if (trapIndex === 0 && event.shiftKey) {
+      redirect(additionalElements[additionalElements.length - 1]);
       return;
     }
-    if (additionalElements.indexOf(event.target) === additionalElements.length - 1 && !event.shiftKey) {
-      trapElements[0].focus();
+    if (additionalIndex === additionalElements.length - 1 && !event.shiftKey) {
+      redirect(trapElements[0]);
       return;
     }
-    if (additionalElements.indexOf(event.target) === 0 && event.shiftKey) {
-      trapElements[trapElements.length - 1].focus();
+    if (additionalIndex === 0 && event.shiftKey) {
+      redirect(trapElements[trapElements.length - 1]);
     }
+  }
+  _holdsFocus() {
+    const {
+      additionalElement,
+      trapElement
+    } = this._config;
+    const active = document.activeElement;
+    return Boolean(active && (active === document.body || trapElement.contains(active) || additionalElement && additionalElement.contains(active)));
+  }
+  _returnFocusTarget() {
+    var _SelectorEngine$focus;
+    const previous = this._previouslyFocused;
+    if (previous && previous !== document.body && previous.isConnected) {
+      return previous;
+    }
+    return (_SelectorEngine$focus = SelectorEngine.focusableChildren(this._config.trapElement)[0]) != null ? _SelectorEngine$focus : null;
+  }
+  _isTopmost() {
+    return activeTraps[activeTraps.length - 1] === this;
   }
 }
 
@@ -6382,7 +6579,9 @@ class TimePicker extends BaseComponent {
     this._initialDate = null;
     this._ampm = this._date ? getAmPm(new Date(this._date), this._config.locale) : 'am';
     this._popper = null;
+    this._addedClassNames = [];
     this._indicatorElement = null;
+    this._onFormSubmit = null;
     this._input = null;
     this._menu = null;
     this._timePickerBody = null;
@@ -6439,6 +6638,10 @@ class TimePicker extends BaseComponent {
     EventHandler.trigger(this._element, EVENT_HIDDEN$a);
   }
   dispose() {
+    var _this$_input;
+    if (!this._element) {
+      return;
+    }
     if (this._popper) {
       this._popper.destroy();
     }
@@ -6446,6 +6649,18 @@ class TimePicker extends BaseComponent {
       clearTimeout(this._inputTimeout);
     }
     this._focustrap.deactivate();
+    const form = (_this$_input = this._input) == null ? void 0 : _this$_input.form;
+    restoreHost(this._element, {
+      classNames: [CLASS_NAME_SHOW$d, ...this._addedClassNames],
+      eventKey: EVENT_KEY$i,
+      nodes: [this._indicatorElement, this._input, this._togglerElement, this._timePickerBody, this._menu]
+    });
+    this._addedClassNames = [];
+    Manipulator.removeDataAttribute(this._element, 'meridiem');
+    this._element.removeAttribute('aria-expanded');
+    if (form && this._onFormSubmit) {
+      EventHandler.off(form, EVENT_SUBMIT$1, this._onFormSubmit);
+    }
     super.dispose();
   }
   cancel() {
@@ -6483,6 +6698,7 @@ class TimePicker extends BaseComponent {
   _initializeFocusTrap() {
     return new FocusTrap({
       additionalElement: this._config.container ? this._menu : null,
+      returnFocus: true,
       trapElement: this._element
     });
   }
@@ -6590,11 +6806,13 @@ class TimePicker extends BaseComponent {
         }
       });
     }
-    EventHandler.on(this._element, EVENT_KEYDOWN$6, event => {
-      if (event.key === ESCAPE_KEY$6) {
-        this.hide();
-      }
-    });
+    for (const element of this._config.container ? [this._element, this._menu] : [this._element]) {
+      EventHandler.on(element, EVENT_KEYDOWN$6, event => {
+        if (event.key === ESCAPE_KEY$6) {
+          this.hide();
+        }
+      });
+    }
     EventHandler.on(this._element, 'timeChange.bs.time-picker', () => {
       if (this._config.variant === 'roll') {
         this._setUpRolls();
@@ -6622,7 +6840,7 @@ class TimePicker extends BaseComponent {
       }, this._config.inputOnChangeDelay);
     });
     if (this._config.type === 'dropdown') {
-      EventHandler.on(this._input.form, EVENT_SUBMIT$1, () => {
+      this._onFormSubmit = () => {
         if (this._input.form.classList.contains(CLASS_NAME_WAS_VALIDATED$1)) {
           if (Number.isNaN(Date.parse(`1970-01-01 ${this._input.value}`))) {
             return this._element.classList.add(CLASS_NAME_IS_INVALID$1);
@@ -6632,19 +6850,14 @@ class TimePicker extends BaseComponent {
           }
           this._element.classList.add(CLASS_NAME_IS_INVALID$1);
         }
-      });
+      };
+      EventHandler.on(this._input.form, EVENT_SUBMIT$1, this._onFormSubmit);
     }
   }
   _createTimePicker() {
-    this._element.classList.add(CLASS_NAME_TIME_PICKER$1);
+    this._addedClassNames.push(...addHostClassNames(this._element, [CLASS_NAME_TIME_PICKER$1, this._config.size && `time-picker-${this._config.size}`, this._config.disabled && CLASS_NAME_DISABLED$4, this._config.invalid && CLASS_NAME_IS_INVALID$1, this._config.valid && CLASS_NAME_IS_VALID$1]));
     Manipulator.setDataAttribute(this._element, 'meridiem', CLASS_NAME_TIME_PICKER$1);
-    if (this._config.size) {
-      this._element.classList.add(`time-picker-${this._config.size}`);
-    }
     this._element.classList.toggle(CLASS_NAME_IS_VALID$1, this._config.valid);
-    if (this._config.disabled) {
-      this._element.classList.add(CLASS_NAME_DISABLED$4);
-    }
     this._element.classList.toggle(CLASS_NAME_IS_INVALID$1, this._config.invalid);
     if (this._config.type === 'dropdown') {
       this._element.append(this._createTimePickerInputGroup());
@@ -6971,12 +7184,13 @@ class TimePicker extends BaseComponent {
   _configAfterMerge(config) {
     if (config.container === 'dropdown' || config.container === 'inline') {
       config.type = config.container;
+      config.container = false;
     }
     if (config.container === true) {
       config.container = document.body;
     }
-    if (typeof config.container === 'object' || typeof config.container === 'string' && config.container === 'dropdown' && config.container === 'inline') {
-      config.container = getElement(config.container);
+    if (typeof config.container === 'object' || typeof config.container === 'string') {
+      config.container = getElement(config.container) || false;
     }
     return config;
   }
@@ -7061,7 +7275,7 @@ const NAME$l = 'date-range-picker';
 const DATA_KEY$h = 'bs.date-range-picker';
 const EVENT_KEY$h = `.${DATA_KEY$h}`;
 const DATA_API_KEY$e = '.data-api';
-const DISALLOWED_ATTRIBUTES$3 = new Set(['sanitize', 'allowList', 'sanitizeFn']);
+const DISALLOWED_ATTRIBUTES$2 = new Set(['sanitize', 'allowList', 'sanitizeFn']);
 const ENTER_KEY$1 = 'Enter';
 const ESCAPE_KEY$5 = 'Escape';
 const TAB_KEY$3 = 'Tab';
@@ -7072,7 +7286,7 @@ const EVENT_HIDE$9 = `hide${EVENT_KEY$h}`;
 const EVENT_HIDDEN$9 = `hidden${EVENT_KEY$h}`;
 const EVENT_INPUT$2 = `input${EVENT_KEY$h}`;
 const EVENT_KEYDOWN$5 = `keydown${EVENT_KEY$h}`;
-const EVENT_RESIZE$4 = 'resize';
+const EVENT_RESIZE$4 = `resize${EVENT_KEY$h}`;
 const EVENT_SHOW$9 = `show${EVENT_KEY$h}`;
 const EVENT_SHOWN$9 = `shown${EVENT_KEY$h}`;
 const EVENT_SUBMIT = 'submit';
@@ -7117,9 +7331,9 @@ const Default$j = {
   calendars: 2,
   cancelButton: 'Cancel',
   cancelButtonClasses: ['btn', 'btn-sm', 'btn-ghost-primary'],
+  cleaner: true,
   confirmButton: 'OK',
   confirmButtonClasses: ['btn', 'btn-sm', 'btn-primary'],
-  cleaner: true,
   container: false,
   date: null,
   dayFormat: 'numeric',
@@ -7129,15 +7343,17 @@ const Default$j = {
   endName: null,
   firstDayOfWeek: 1,
   footer: false,
+  hours: null,
+  indicator: true,
   inputDateFormat: null,
   inputDateParse: null,
   inputOnChangeDelay: 750,
   inputReadOnly: false,
   invalid: false,
-  indicator: true,
   locale: 'default',
   maxDate: null,
   minDate: null,
+  minutes: true,
   monthFormat: 'short',
   name: null,
   placeholder: ['Start date', 'End date'],
@@ -7152,15 +7368,16 @@ const Default$j = {
   required: true,
   sanitize: true,
   sanitizeFn: null,
-  separator: true,
-  size: null,
-  startDate: null,
-  startName: null,
+  seconds: true,
   selectAdjacementDays: false,
   selectEndDate: false,
   selectionType: 'day',
+  separator: true,
   showAdjacementDays: true,
   showWeekNumber: false,
+  size: null,
+  startDate: null,
+  startName: null,
   timepicker: false,
   todayButton: 'Today',
   todayButtonClasses: ['btn', 'btn-sm', 'btn-primary', 'me-auto'],
@@ -7185,12 +7402,13 @@ const DefaultType$j = {
   container: '(string|element|boolean)',
   date: '(date|number|string|null)',
   dayFormat: 'string',
-  disabledDates: '(array|date|function|null)',
   disabled: 'boolean',
+  disabledDates: '(array|date|function|null)',
   endDate: '(date|number|string|null)',
   endName: '(string|null)',
   firstDayOfWeek: 'number',
   footer: 'boolean',
+  hours: '(array|function|null)',
   indicator: 'boolean',
   inputDateFormat: '(function|null)',
   inputDateParse: '(function|null)',
@@ -7200,6 +7418,7 @@ const DefaultType$j = {
   locale: 'string',
   maxDate: '(date|number|string|null)',
   minDate: '(date|number|string|null)',
+  minutes: '(array|boolean|function)',
   monthFormat: 'string',
   name: '(string|null)',
   placeholder: '(array|string)',
@@ -7214,15 +7433,16 @@ const DefaultType$j = {
   required: 'boolean',
   sanitize: 'boolean',
   sanitizeFn: '(null|function)',
-  separator: 'boolean',
-  size: '(string|null)',
-  startDate: '(date|number|string|null)',
-  startName: '(string|null)',
+  seconds: '(array|boolean|function)',
   selectAdjacementDays: 'boolean',
   selectEndDate: 'boolean',
   selectionType: 'string',
+  separator: 'boolean',
   showAdjacementDays: 'boolean',
   showWeekNumber: 'boolean',
+  size: '(string|null)',
+  startDate: '(date|number|string|null)',
+  startName: '(string|null)',
   timepicker: 'boolean',
   todayButton: '(boolean|string)',
   todayButtonClasses: '(array|string)',
@@ -7248,7 +7468,12 @@ class DateRangePicker extends BaseComponent {
     this._mobile = window.innerWidth < 768;
     this._popper = null;
     this._selectEndDate = this._config.selectEndDate;
+    this._addedClassNames = [];
     this._calendar = null;
+    this._hadToggleAttribute = false;
+    this._onFormSubmit = null;
+    this._onWindowResize = null;
+    this._ownTimePickers = [];
     this._calendars = null;
     this._endInput = null;
     this._endInputTimeout = null;
@@ -7314,6 +7539,10 @@ class DateRangePicker extends BaseComponent {
     EventHandler.trigger(this._element, EVENT_HIDDEN$9);
   }
   dispose() {
+    var _this$_startInput;
+    if (!this._element) {
+      return;
+    }
     if (this._popper) {
       this._popper.destroy();
     }
@@ -7324,6 +7553,24 @@ class DateRangePicker extends BaseComponent {
       clearTimeout(this._endInputTimeout);
     }
     this._focustrap.deactivate();
+    for (const component of [this._calendar, ...this._ownTimePickers]) {
+      if (component) {
+        component.dispose();
+      }
+    }
+    EventHandler.off(this._element, EVENT_KEY$h);
+    const form = (_this$_startInput = this._startInput) == null ? void 0 : _this$_startInput.form;
+    restoreHost(this._element, {
+      classNames: [CLASS_NAME_SHOW$c, ...this._addedClassNames],
+      eventKey: EVENT_KEY$h,
+      nodes: [this._indicatorElement, this._startInput, this._endInput, this._startPreviewInput, this._endPreviewInput, this._togglerElement, this._calendars, this._menu]
+    });
+    this._addedClassNames = [];
+    this._element.removeAttribute('aria-expanded');
+    if (!this._hadToggleAttribute) {
+      Manipulator.removeDataAttribute(this._element, 'toggle');
+    }
+    this._removeGlobalEventListeners(form);
     super.dispose();
   }
   cancel() {
@@ -7365,10 +7612,22 @@ class DateRangePicker extends BaseComponent {
   _initializeFocusTrap() {
     return new FocusTrap({
       additionalElement: this._config.container ? this._menu : null,
+      returnFocus: true,
       trapElement: this._element
     });
   }
+  _removeGlobalEventListeners(form = (_this$_startInput2 => (_this$_startInput2 = this._startInput) == null ? void 0 : _this$_startInput2.form)()) {
+    if (form && this._onFormSubmit) {
+      EventHandler.off(form, EVENT_SUBMIT, this._onFormSubmit);
+    }
+    if (this._onWindowResize) {
+      EventHandler.off(window, EVENT_RESIZE$4, this._onWindowResize);
+    }
+    this._onFormSubmit = null;
+    this._onWindowResize = null;
+  }
   _addEventListeners() {
+    this._removeGlobalEventListeners();
     EventHandler.on(this._indicatorElement, EVENT_CLICK$4, () => {
       if (!this._config.disabled) {
         this.toggle();
@@ -7384,12 +7643,13 @@ class DateRangePicker extends BaseComponent {
         this.show();
       }
     });
-    EventHandler.on(this._element, EVENT_KEYDOWN$5, event => {
-      if (event.key === ESCAPE_KEY$5) {
-        this.hide();
-        this._startInput.focus();
-      }
-    });
+    for (const element of this._config.container ? [this._element, this._menu] : [this._element]) {
+      EventHandler.on(element, EVENT_KEYDOWN$5, event => {
+        if (event.key === ESCAPE_KEY$5) {
+          this.hide();
+        }
+      });
+    }
     EventHandler.on(this._startInput, EVENT_CLICK$4, () => {
       this._selectEndDate = false;
       this._calendar.update(this._getCalendarConfig());
@@ -7421,7 +7681,7 @@ class DateRangePicker extends BaseComponent {
         });
       }, this._config.inputOnChangeDelay);
     });
-    EventHandler.on(this._startInput.form, EVENT_SUBMIT, () => {
+    this._onFormSubmit = () => {
       if (this._startInput.form.classList.contains(CLASS_NAME_WAS_VALIDATED)) {
         if (this._config.range && (Number.isNaN(Date.parse(this._startInput.value)) || Number.isNaN(Date.parse(this._endInput.value)))) {
           return this._element.classList.add(CLASS_NAME_IS_INVALID);
@@ -7437,7 +7697,8 @@ class DateRangePicker extends BaseComponent {
         }
         this._element.classList.add(CLASS_NAME_IS_INVALID);
       }
-    });
+    };
+    EventHandler.on(this._startInput.form, EVENT_SUBMIT, this._onFormSubmit);
     EventHandler.on(this._endInput, EVENT_CLICK$4, () => {
       this._selectEndDate = true;
       this._calendar.update(this._getCalendarConfig());
@@ -7469,9 +7730,10 @@ class DateRangePicker extends BaseComponent {
         });
       }, this._config.inputOnChangeDelay);
     });
-    EventHandler.on(window, EVENT_RESIZE$4, () => {
+    this._onWindowResize = () => {
       this._mobile = window.innerWidth < 768;
-    });
+    };
+    EventHandler.on(window, EVENT_RESIZE$4, this._onWindowResize);
   }
   _addCalendarEventListeners() {
     for (const calendar of SelectorEngine.find(SELECTOR_CALENDAR, this._menu)) {
@@ -7563,21 +7825,19 @@ class DateRangePicker extends BaseComponent {
   _getTimePickerConfig(start) {
     return {
       disabled: start ? !this._startDate : !this._endDate,
+      hours: this._config.hours,
       locale: this._config.locale,
+      minutes: this._config.minutes,
+      seconds: this._config.minutes && this._config.seconds,
       time: start ? this._startDate && new Date(this._startDate) : this._endDate && new Date(this._endDate),
       type: 'inline',
       variant: 'select'
     };
   }
   _createDateRangePicker() {
-    this._element.classList.add(CLASS_NAME_DATE_PICKER);
+    this._addedClassNames.push(...addHostClassNames(this._element, [CLASS_NAME_DATE_PICKER, this._config.size && `date-picker-${this._config.size}`, this._config.disabled && CLASS_NAME_DISABLED$3, this._config.invalid && CLASS_NAME_IS_INVALID, this._config.valid && CLASS_NAME_IS_VALID]));
+    this._hadToggleAttribute = this._element.hasAttribute('data-bs-toggle');
     Manipulator.setDataAttribute(this._element, 'toggle', this._config.range ? CLASS_NAME_DATE_RANGE_PICKER : CLASS_NAME_DATE_PICKER);
-    if (this._config.size) {
-      this._element.classList.add(`date-picker-${this._config.size}`);
-    }
-    if (this._config.disabled) {
-      this._element.classList.add(CLASS_NAME_DISABLED$3);
-    }
     this._element.classList.toggle(CLASS_NAME_IS_INVALID, this._config.invalid);
     this._element.classList.toggle(CLASS_NAME_IS_VALID, this._config.valid);
     this._element.append(this._createDateRangePickerInputGroup());
@@ -7726,6 +7986,7 @@ class DateRangePicker extends BaseComponent {
         const timePickerStartEl = document.createElement('div');
         timePickerStartEl.classList.add(CLASS_NAME_TIME_PICKER);
         this._timePickerStart = new TimePicker(timePickerStartEl, this._getTimePickerConfig(true));
+        this._ownTimePickers.push(this._timePickerStart);
         this._timepickers.append(timePickerStartEl);
         EventHandler.on(timePickerStartEl, 'timeChange.bs.time-picker', event => {
           this._changeStartDate(event.date, true);
@@ -7734,6 +7995,7 @@ class DateRangePicker extends BaseComponent {
         const timePickerEndEl = document.createElement('div');
         timePickerEndEl.classList.add(CLASS_NAME_TIME_PICKER);
         this._timePickerEnd = new TimePicker(timePickerEndEl, this._getTimePickerConfig(false));
+        this._ownTimePickers.push(this._timePickerEnd);
         this._timepickers.append(timePickerEndEl);
         EventHandler.on(timePickerEndEl, 'timeChange.bs.time-picker', event => {
           this._changeEndDate(event.date, true);
@@ -7746,6 +8008,7 @@ class DateRangePicker extends BaseComponent {
           const timePickerEl = document.createElement('div');
           timePickerEl.classList.add(CLASS_NAME_TIME_PICKER);
           const _timepicker = new TimePicker(timePickerEl, this._getTimePickerConfig(index === 0));
+          this._ownTimePickers.push(_timepicker);
           if (index === 0) {
             this._timePickerStart = _timepicker;
           } else {
@@ -7896,7 +8159,7 @@ class DateRangePicker extends BaseComponent {
       return this._config.inputDateParse(str);
     }
     if (this._config.selectionType === 'day') {
-      return getLocalDateFromString(str, this._config.locale, this._config.timepicker);
+      return getLocalDateFromString(str, this._config.locale, this._config.timepicker, this._config.selectionType, this._getTimeFormatOptions());
     }
     return convertToDateObject(str, this._config.selectionType);
   }
@@ -7911,7 +8174,18 @@ class DateRangePicker extends BaseComponent {
       return date;
     }
     const _date = new Date(date);
-    return this._config.timepicker ? _date.toLocaleString(this._config.locale) : _date.toLocaleDateString(this._config.locale);
+    if (!this._config.timepicker) {
+      return _date.toLocaleDateString(this._config.locale);
+    }
+    return _date.toLocaleString(this._config.locale, {
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric',
+      ...this._getTimeFormatOptions()
+    });
+  }
+  _getTimeFormatOptions() {
+    return getTimeFormatOptions(this._config.minutes, this._config.seconds);
   }
   _getButtonClasses(classes) {
     if (typeof classes === 'string') {
@@ -7940,7 +8214,7 @@ class DateRangePicker extends BaseComponent {
   _getConfig(config) {
     const dataAttributes = Manipulator.getDataAttributes(this._element);
     for (const dataAttribute of Object.keys(dataAttributes)) {
-      if (DISALLOWED_ATTRIBUTES$3.has(dataAttribute)) {
+      if (DISALLOWED_ATTRIBUTES$2.has(dataAttribute)) {
         delete dataAttributes[dataAttribute];
       }
     }
@@ -8502,10 +8776,13 @@ class Dropdown extends BaseComponent {
     if (isInput && !isEscapeEvent) {
       return;
     }
-    event.preventDefault();
 
     // TODO: v6 revert #37011 & change markup https://getbootstrap.com/docs/5.3/forms/input-group/
     const getToggleButton = this.matches(SELECTOR_DATA_TOGGLE$b) ? this : SelectorEngine.prev(this, SELECTOR_DATA_TOGGLE$b)[0] || SelectorEngine.next(this, SELECTOR_DATA_TOGGLE$b)[0] || SelectorEngine.findOne(SELECTOR_DATA_TOGGLE$b, event.delegateTarget.parentNode);
+    if (!getToggleButton) {
+      return;
+    }
+    event.preventDefault();
     const instance = Dropdown.getOrCreateInstance(getToggleButton);
     if (isUpOrDownEvent) {
       event.stopPropagation();
@@ -9037,6 +9314,11 @@ class Modal extends BaseComponent {
     this._queueCallback(() => this._hideModal(), this._element, this._isAnimated());
   }
   dispose() {
+    if (this._isShown) {
+      document.body.classList.remove(CLASS_NAME_OPEN);
+      this._resetAdjustments();
+      this._scrollBar.reset();
+    }
     EventHandler.off(window, EVENT_KEY$d);
     EventHandler.off(this._dialog, EVENT_KEY$d);
     this._backdrop.dispose();
@@ -9212,7 +9494,10 @@ EventHandler.on(document, EVENT_CLICK_DATA_API$8, SELECTOR_DATA_TOGGLE$9, functi
     }
     EventHandler.one(target, EVENT_HIDDEN$6, () => {
       if (isVisible(this)) {
-        this.focus();
+        // Returning focus must not scroll the page back to the trigger.
+        this.focus({
+          preventScroll: true
+        });
       }
     });
   });
@@ -9271,7 +9556,7 @@ const SELECTOR_SELECTION = '.form-multi-select-selection';
 const SELECTOR_TAG = '.form-multi-select-tag';
 const SELECTOR_TAG_DELETE = '.form-multi-select-tag-delete';
 const SELECTOR_VISIBLE_ITEMS = '.form-multi-select-options .form-multi-select-option:not(.disabled):not(:disabled)';
-const SELECTOR_NAVIGABLE_ITEMS = `.form-multi-select-all:not(.disabled):not(:disabled), ${SELECTOR_VISIBLE_ITEMS}, .form-multi-select-options .form-multi-select-optgroup-label-with-checkbox`;
+const SELECTOR_NAVIGABLE_ITEMS = `.form-multi-select-all:not(.disabled):not(:disabled), ${SELECTOR_VISIBLE_ITEMS}, .form-multi-select-options .form-multi-select-optgroup-label-with-checkbox:not(.disabled)`;
 const EVENT_CHANGED = `changed${EVENT_KEY$c}`;
 const EVENT_CLICK$3 = `click${EVENT_KEY$c}`;
 const EVENT_HIDE$5 = `hide${EVENT_KEY$c}`;
@@ -9314,7 +9599,7 @@ const Default$d = {
   allowList: DefaultAllowlist,
   ariaCleanerLabel: 'Clear all selections',
   ariaIndicatorLabel: 'Toggle visibility of options menu',
-  ariaSearchLabel: 'Search',
+  ariaSearchLabel: 'Search options',
   ariaTagDeleteLabel: 'Remove',
   cleaner: true,
   clearSearchOnSelect: false,
@@ -9345,10 +9630,10 @@ const Default$d = {
   selectAllLabel: 'Select all',
   selectAllMode: 'all',
   selectAllStyle: 'checkbox',
+  selectFilteredLabel: 'Select filtered',
   selectionLimit: null,
   selectionType: 'tags',
   selectionTypeCounterText: 'item(s) selected',
-  selectFilteredLabel: 'Select filtered',
   valid: false,
   value: null
 };
@@ -9384,13 +9669,13 @@ const DefaultType$d = {
   search: '(boolean|string)',
   searchNoResultsLabel: 'string',
   selectAll: 'boolean',
-  selectAllStyle: 'string',
   selectAllLabel: 'string',
   selectAllMode: 'string',
+  selectAllStyle: 'string',
+  selectFilteredLabel: 'string',
   selectionLimit: '(number|null)',
   selectionType: 'string',
   selectionTypeCounterText: 'string',
-  selectFilteredLabel: 'string',
   valid: 'boolean',
   value: '(string|array|null)'
 };
@@ -9403,9 +9688,12 @@ const DefaultType$d = {
 
 class MultiSelect extends BaseComponent {
   constructor(element, config) {
+    var _this$_element$labels, _this$_element$labels2;
     super(element, config);
     this._uniqueId = this._config.id || this._element.id || getUID(`${this.constructor.NAME}`);
-    this._uniqueName = this._config.name || this._element.name || this._uniqueId;
+    this._markupName = this._element.getAttribute('name');
+    this._markupLabel = (_this$_element$labels = (_this$_element$labels2 = this._element.labels) == null ? void 0 : _this$_element$labels2[0]) != null ? _this$_element$labels : null;
+    this._generatedLabelId = null;
     this._configureNativeSelect();
     this._indicatorElement = null;
     this._selectAllElement = null;
@@ -9423,7 +9711,7 @@ class MultiSelect extends BaseComponent {
     this._popper = null;
     this._search = '';
     if (this._config.options.length > 0) {
-      this._createNativeOptions(this._element, this._config.options);
+      this._createNativeOptions(this._element, this._options);
     }
     this._createSelect();
     this._addEventListeners();
@@ -9487,22 +9775,13 @@ class MultiSelect extends BaseComponent {
     EventHandler.trigger(this._element, EVENT_HIDDEN$5);
   }
   dispose() {
-    if (this._popper) {
-      this._popper.destroy();
-    }
-    for (const element of [this._wrapperElement, this._menu, this._selectionElement, this._togglerElement, this._searchElement, this._indicatorElement, this._selectAllElement, this._headerElement, this._optionsElement]) {
-      if (element) {
-        EventHandler.off(element, EVENT_KEY$c);
-      }
-    }
-    if (this._menu) {
-      this._menu.remove();
-    }
-    if (this._wrapperElement) {
-      this._wrapperElement.before(this._element);
-      this._wrapperElement.remove();
-    }
+    this._destroySelect();
     this._element.removeAttribute('tabindex');
+    if (this._markupName === null) {
+      this._element.removeAttribute('name');
+    } else {
+      this._element.setAttribute('name', this._markupName);
+    }
     super.dispose();
   }
   search(text) {
@@ -9520,9 +9799,7 @@ class MultiSelect extends BaseComponent {
     };
     this._selected = [];
     this._options = this._getOptions();
-    this._menu.remove();
-    this._wrapperElement.before(this._element);
-    this._wrapperElement.remove();
+    this._destroySelect();
     this._element.innerHTML = '';
     this._configureNativeSelect();
     this._createNativeOptions(this._element, this._options);
@@ -9723,25 +10000,31 @@ class MultiSelect extends BaseComponent {
     }
     return this._getOptionsFromElement();
   }
-  _getOptionsFromConfig(options = this._config.options) {
+  _getOptionsFromConfig(options = this._config.options, disabled = false) {
     const _options = [];
     for (const option of options) {
       if (this._isOptionGroup(option)) {
         const customGroupProperties = {
           ...option
         };
+        const groupDisabled = disabled || Boolean(option.disabled);
+        delete customGroupProperties.disabled;
         delete customGroupProperties.label;
         delete customGroupProperties.options;
         _options.push({
           ...customGroupProperties,
           label: option.label,
-          options: this._getOptionsFromConfig(option.options)
+          ...(groupDisabled && {
+            disabled: true
+          }),
+          options: this._getOptionsFromConfig(option.options, groupDisabled)
         });
         continue;
       }
       const value = String(option.value);
       const isSelected = option.selected || this._config.value && this._config.value.includes(value);
       const shouldSelect = isSelected && !this._isSelectionLimitReached();
+      const isDisabled = disabled || Boolean(option.disabled);
       const customProperties = typeof option === 'object' ? {
         ...option
       } : {};
@@ -9754,20 +10037,23 @@ class MultiSelect extends BaseComponent {
         ...(shouldSelect && {
           selected: true
         }),
-        ...(option.disabled && {
+        ...(isDisabled && {
           disabled: true
         })
       });
       if (shouldSelect) {
         this._selected.push({
           value: String(option.value),
-          text: option.text
+          text: option.text,
+          ...(isDisabled && {
+            disabled: true
+          })
         });
       }
     }
     return _options;
   }
-  _getOptionsFromElement(node = this._element) {
+  _getOptionsFromElement(node = this._element, disabled = false) {
     const nodes = Array.from(node.childNodes).filter(element => element.nodeName === 'OPTION' || element.nodeName === 'OPTGROUP');
     const options = [];
     for (const node of nodes) {
@@ -9776,27 +10062,32 @@ class MultiSelect extends BaseComponent {
         const text = node.textContent;
         const isSelected = node.selected || this._config.value && this._config.value.includes(node.value);
         const shouldSelect = isSelected && !this._isSelectionLimitReached();
+        const isDisabled = disabled || node.disabled;
         options.push({
           value,
           text,
           selected: shouldSelect,
-          disabled: node.disabled
+          disabled: isDisabled
         });
         node.selected = shouldSelect;
         if (shouldSelect) {
           this._selected.push({
             value,
             text: node.textContent,
-            ...(node.disabled && {
+            ...(isDisabled && {
               disabled: true
             })
           });
         }
       }
       if (node.nodeName === 'OPTGROUP') {
+        const groupDisabled = disabled || node.disabled;
         options.push({
           label: node.label,
-          options: this._getOptionsFromElement(node)
+          ...(groupDisabled && {
+            disabled: true
+          }),
+          options: this._getOptionsFromElement(node, groupDisabled)
         });
       }
     }
@@ -9822,6 +10113,7 @@ class MultiSelect extends BaseComponent {
       if (this._isOptionGroup(option)) {
         const optgroup = document.createElement('optgroup');
         optgroup.label = option.label;
+        optgroup.disabled = option.disabled === true;
         this._createNativeOptions(optgroup, option.options);
         parentElement.append(optgroup);
       } else {
@@ -9841,7 +10133,67 @@ class MultiSelect extends BaseComponent {
   _hideNativeSelect() {
     this._element.tabIndex = '-1';
   }
+  _nameControls() {
+    const labelledBy = this._element.getAttribute('aria-labelledby');
+    if (labelledBy) {
+      this._applyControlName({
+        labelledBy
+      });
+      return;
+    }
+    const label = this._element.getAttribute('aria-label');
+    if (label) {
+      this._applyControlName({
+        label
+      });
+      return;
+    }
+    if (!this._markupLabel || this._markupLabel.contains(this._togglerElement)) {
+      return;
+    }
+    if (!this._markupLabel.id) {
+      const id = `${this._uniqueId}-label`;
+      this._generatedLabelId = document.getElementById(id) ? getUID(`${this._uniqueId}-label`) : id;
+      this._markupLabel.id = this._generatedLabelId;
+    }
+    this._applyControlName({
+      labelledBy: this._markupLabel.id
+    });
+  }
+  _applyControlName({
+    label,
+    labelledBy
+  }) {
+    if (labelledBy) {
+      this._togglerElement.setAttribute('aria-labelledby', labelledBy);
+      return;
+    }
+    this._togglerElement.setAttribute('aria-label', label);
+  }
+  _destroySelect() {
+    if (this._popper) {
+      this._popper.destroy();
+    }
+    for (const element of [this._element, this._wrapperElement, this._menu, this._selectionElement, this._togglerElement, this._searchElement, this._indicatorElement, this._selectAllElement, this._headerElement, this._optionsElement]) {
+      if (element) {
+        EventHandler.off(element, EVENT_KEY$c);
+      }
+    }
+    if (this._menu) {
+      this._menu.remove();
+    }
+    if (this._wrapperElement) {
+      this._wrapperElement.before(this._element);
+      this._wrapperElement.remove();
+    }
+    if (this._markupLabel && this._markupLabel.id === this._generatedLabelId) {
+      this._markupLabel.removeAttribute('id');
+      this._generatedLabelId = null;
+    }
+  }
   _createSelect() {
+    this._uniqueId = this._config.id || this._element.id || this._uniqueId;
+    this._uniqueName = this._config.name || this._markupName;
     const wrapper = document.createElement('div');
     wrapper.classList.add(CLASS_NAME_SELECT);
     wrapper.classList.toggle('is-invalid', this._config.invalid);
@@ -9864,9 +10216,14 @@ class MultiSelect extends BaseComponent {
       this._updateSearch();
     }
     this._element.setAttribute('id', this._uniqueId);
-    this._element.setAttribute('name', this._uniqueName);
+    if (this._uniqueName) {
+      this._element.setAttribute('name', this._uniqueName);
+    } else {
+      this._element.removeAttribute('name');
+    }
     this._createOptionsContainer();
     this._hideNativeSelect();
+    this._nameControls();
     this._selectInitialOptions();
   }
   _createSelection() {
@@ -9943,7 +10300,7 @@ class MultiSelect extends BaseComponent {
       input.disabled = true;
     }
     input.setAttribute('id', `search-${this._uniqueId}`);
-    input.setAttribute('name', `search-${this._uniqueName}`);
+    input.autocomplete = 'off';
     input.setAttribute('aria-label', this._config.ariaSearchLabel);
     input.setAttribute('aria-autocomplete', 'list');
     input.setAttribute('aria-controls', `${this._uniqueId}-listbox`);
@@ -10016,12 +10373,13 @@ class MultiSelect extends BaseComponent {
         optionDiv.classList.add(CLASS_NAME_OPTION);
         if (option.disabled) {
           optionDiv.classList.add(CLASS_NAME_DISABLED$2);
+          optionDiv.setAttribute('aria-disabled', 'true');
         }
         if (this._config.optionsStyle === 'checkbox') {
           optionDiv.classList.add(CLASS_NAME_OPTION_WITH_CHECKBOX);
         }
         optionDiv.dataset.value = String(option.value);
-        optionDiv.tabIndex = 0;
+        optionDiv.tabIndex = option.disabled ? -1 : 0;
         optionDiv.setAttribute('role', 'option');
         optionDiv.setAttribute('aria-selected', option.selected === true ? 'true' : 'false');
         if (typeof this._config.optionsTemplate === 'function') {
@@ -10043,8 +10401,13 @@ class MultiSelect extends BaseComponent {
         optgrouplabel.classList.add(CLASS_NAME_OPTGROUP_LABEL);
         if (this._config.optionsGroupsSelectable && this._config.optionsGroupsStyle === 'checkbox' && this._config.multiple) {
           optgrouplabel.classList.add(CLASS_NAME_OPTGROUP_LABEL_WITH_CHECKBOX);
-          optgrouplabel.tabIndex = 0;
-          optgrouplabel.setAttribute('role', 'button');
+          if (!option.disabled) {
+            optgrouplabel.tabIndex = 0;
+            optgrouplabel.setAttribute('role', 'button');
+          }
+        }
+        if (option.disabled) {
+          optgrouplabel.classList.add(CLASS_NAME_DISABLED$2);
         }
         optgroup.append(optgrouplabel);
         this._createOptions(optgroup, option.options);
@@ -10095,7 +10458,7 @@ class MultiSelect extends BaseComponent {
   _onOptionsClick(element) {
     if (this._config.optionsGroupsSelectable) {
       const groupLabel = element.closest(`.${CLASS_NAME_OPTGROUP_LABEL_WITH_CHECKBOX}`);
-      if (groupLabel) {
+      if (groupLabel && !groupLabel.classList.contains(CLASS_NAME_DISABLED$2)) {
         this._toggleGroup(groupLabel.closest(SELECTOR_OPTGROUP));
         return;
       }
@@ -10108,6 +10471,9 @@ class MultiSelect extends BaseComponent {
       if (!element) {
         return;
       }
+    }
+    if (element.classList.contains(CLASS_NAME_DISABLED$2)) {
+      return;
     }
     const value = String(element.dataset.value);
     const {
@@ -10123,7 +10489,9 @@ class MultiSelect extends BaseComponent {
     if (!this._config.multiple) {
       this.hide();
       this.search('');
-      this._searchElement.value = null;
+      if (this._config.search) {
+        this._searchElement.value = null;
+      }
     }
     if (this._config.clearSearchOnSelect && this._config.search) {
       this.search('');
@@ -10487,7 +10855,7 @@ class MultiSelect extends BaseComponent {
     }
     for (const optgroup of SelectorEngine.find(`.${CLASS_NAME_OPTGROUP}`, this._menu)) {
       const label = SelectorEngine.findOne(`.${CLASS_NAME_OPTGROUP_LABEL_WITH_CHECKBOX}`, optgroup);
-      if (!label) {
+      if (!label || label.classList.contains(CLASS_NAME_DISABLED$2)) {
         continue;
       }
       const items = SelectorEngine.children(optgroup, SELECTOR_OPTION).filter(element => !element.classList.contains(CLASS_NAME_DISABLED$2));
@@ -10760,15 +11128,11 @@ class Navigation extends BaseComponent {
     this._config = this._getConfig(config);
     this._setActiveLink();
     this._addEventListeners();
-    Data.set(element, DATA_KEY$b, this);
   }
   // Getters
 
   static get Default() {
     return Default$c;
-  }
-  static get DATA_KEY() {
-    return DATA_KEY$b;
   }
   static get DefaultType() {
     return DefaultType$c;
@@ -11084,6 +11448,9 @@ class Offcanvas extends BaseComponent {
     this._queueCallback(completeCallback, this._element, true);
   }
   dispose() {
+    if (this._isShown && !this._config.scroll) {
+      new ScrollBarHelper().reset();
+    }
     this._backdrop.dispose();
     this._focustrap.deactivate();
     super.dispose();
@@ -11157,7 +11524,10 @@ EventHandler.on(document, EVENT_CLICK_DATA_API$5, SELECTOR_DATA_TOGGLE$8, functi
   EventHandler.one(target, EVENT_HIDDEN$4, () => {
     // focus on trigger when it is closed
     if (isVisible(this)) {
-      this.focus();
+      // Returning focus must not scroll the page back to the trigger.
+      this.focus({
+        preventScroll: true
+      });
     }
   });
 
@@ -11208,12 +11578,13 @@ const DATA_API_KEY$6 = '.data-api';
 const ARROW_RIGHT_KEY$2 = 'ArrowRight';
 const ARROW_LEFT_KEY$2 = 'ArrowLeft';
 const BACKSPACE_KEY = 'Backspace';
+const EVENT_BEFORE_INPUT = `beforeinput${EVENT_KEY$9}`;
 const EVENT_CHANGE$2 = `change${EVENT_KEY$9}`;
 const EVENT_COMPLETE = `complete${EVENT_KEY$9}`;
 const EVENT_FOCUS = `focus${EVENT_KEY$9}`;
 const EVENT_INPUT$1 = `input${EVENT_KEY$9}`;
 const EVENT_KEYDOWN$3 = `keydown${EVENT_KEY$9}`;
-const EVENT_PASTE = `paste`;
+const EVENT_PASTE = `paste${EVENT_KEY$9}`;
 const EVENT_LOAD_DATA_API$6 = `load${EVENT_KEY$9}${DATA_API_KEY$6}`;
 const SELECTOR_FORM_OTP_CONTROL = '.form-otp-control';
 const SELECTOR_DATA_TOGGLE$7 = '[data-bs-toggle="otp"]';
@@ -11255,9 +11626,9 @@ class OTPInput extends BaseComponent {
     super(element, config);
     this._config = this._getConfig(config);
     this._inputElement = null;
-    this._createHiddenInput();
     this._setRoleAttribute();
     this._setInputsAttributes();
+    this._createHiddenInput();
     this._setInputsTabIndexes();
     this._addEventListeners();
   }
@@ -11283,13 +11654,19 @@ class OTPInput extends BaseComponent {
     this._syncFirstInputMaxLength();
     this._setInputsTabIndexes();
   }
+  dispose() {
+    var _this$_inputElement;
+    (_this$_inputElement = this._inputElement) == null || _this$_inputElement.remove();
+    super.dispose();
+  }
   reset() {
     const inputs = this._getInputs();
     for (const [index, input] of inputs.entries()) {
-      const valueString = String(this._config.value || '');
+      var _this$_config$value;
+      const valueString = String((_this$_config$value = this._config.value) != null ? _this$_config$value : '');
       input.value = valueString && valueString[index] ? valueString[index] : '';
     }
-    this._setHiddenInputValue(null);
+    this._setHiddenInputValue(this._readSlots() || null);
     this._syncFirstInputMaxLength();
     this._setInputsTabIndexes();
   }
@@ -11310,6 +11687,15 @@ class OTPInput extends BaseComponent {
 
   // Private
   _addEventListeners() {
+    EventHandler.on(this._element, EVENT_BEFORE_INPUT, SELECTOR_FORM_OTP_CONTROL, event => {
+      const {
+        data,
+        inputType
+      } = event;
+      if (inputType === 'insertText' && data && data.length === 1 && !this._isValidInput(data)) {
+        event.preventDefault();
+      }
+    });
     EventHandler.on(this._element, EVENT_FOCUS, SELECTOR_FORM_OTP_CONTROL, event => {
       const {
         target
@@ -11341,27 +11727,29 @@ class OTPInput extends BaseComponent {
         target.value = '';
         if (chars) {
           this._distributeChars(target, chars);
+          return;
         }
-        return;
       }
       if (target.value.length === 1 && !this._isValidInput(target.value)) {
         target.value = '';
+      }
+      const inputs = this._getInputs();
+      if (!inputs.length) {
         return;
       }
+      const value = inputs.map(input => input.value).join('');
+      if (value !== (this._inputElement ? this._inputElement.value : '')) {
+        this._setHiddenInputValue(value);
+      }
       if (target.value.length === 1) {
-        const inputs = this._getInputs();
-        if (!inputs.length) {
-          return;
-        }
-        const currentValue = inputs.map(input => input.value).join('');
-        this._setHiddenInputValue(currentValue);
         const nextInput = getNextActiveElement(inputs, target, true);
         if (nextInput) {
           nextInput.focus();
         }
-        this._setInputsTabIndexes();
-        this._checkAutoSubmit(inputs);
       }
+      this._setInputsTabIndexes();
+      this._syncFirstInputMaxLength();
+      this._checkAutoSubmit(inputs);
     });
     EventHandler.on(this._element, EVENT_KEYDOWN$3, SELECTOR_FORM_OTP_CONTROL, event => {
       const {
@@ -11374,8 +11762,6 @@ class OTPInput extends BaseComponent {
           return;
         }
         getNextActiveElement(inputs, target, false).focus();
-        const currentValue = inputs.map(input => input.value).join('');
-        this._setHiddenInputValue(currentValue);
         this._setInputsTabIndexes();
         return;
       }
@@ -11469,6 +11855,9 @@ class OTPInput extends BaseComponent {
   _getInputs() {
     return SelectorEngine.find(SELECTOR_FORM_OTP_CONTROL, this._element);
   }
+  _readSlots() {
+    return this._extractValidChars(this._getInputs().map(input => input.value).join(''));
+  }
   _createHiddenInput() {
     const hiddenInput = document.createElement('input');
     hiddenInput.type = 'hidden';
@@ -11481,7 +11870,7 @@ class OTPInput extends BaseComponent {
     if (this._config.name) {
       hiddenInput.name = this._config.name;
     }
-    hiddenInput.value = this._config.value || '';
+    hiddenInput.value = this._readSlots();
     this._element.append(hiddenInput);
     this._inputElement = hiddenInput;
   }
@@ -11528,6 +11917,7 @@ class OTPInput extends BaseComponent {
   _setInputsAttributes() {
     const inputs = SelectorEngine.find(SELECTOR_FORM_OTP_CONTROL, this._element);
     for (const [index, input] of inputs.entries()) {
+      var _this$_config$value2;
       input.type = this._config.masked ? 'password' : 'text';
       input.maxLength = 1;
       // Only the first slot advertises the one-time code, so SMS autofill and
@@ -11541,9 +11931,7 @@ class OTPInput extends BaseComponent {
         const placeholder = String(this._config.placeholder);
         input.placeholder = placeholder.length > 1 ? placeholder[index] || '' : placeholder;
       }
-      if (this._config.required !== null) {
-        input.setAttribute('required', true);
-      }
+      input.required = this._config.required;
       switch (this._config.type) {
         case 'number':
           {
@@ -11560,16 +11948,13 @@ class OTPInput extends BaseComponent {
       if (this._config.disabled) {
         input.disabled = true;
       }
-      if (this._config.id) {
+      if (this._config.id && !input.id) {
         input.id = `${this._config.id}-${index}`;
-      }
-      if (this._config.name) {
-        input.name = `${this._config.name}-${index}`;
       }
       if (this._config.readonly) {
         input.readOnly = true;
       }
-      const valueString = String(this._config.value || '');
+      const valueString = String((_this$_config$value2 = this._config.value) != null ? _this$_config$value2 : '');
       if (valueString && valueString[index]) {
         input.value = valueString[index];
       }
@@ -11581,10 +11966,13 @@ class OTPInput extends BaseComponent {
     this._syncFirstInputMaxLength();
   }
   _setInputsTabIndexes() {
+    const inputs = this._getInputs();
     if (!this._config.linear) {
+      for (const input of inputs) {
+        input.removeAttribute('tabindex');
+      }
       return;
     }
-    const inputs = this._getInputs();
     let foundEmpty = false;
     for (const input of inputs) {
       const hasValue = input.value !== '';
@@ -11870,7 +12258,6 @@ class TemplateFactory extends Config {
  */
 
 const NAME$9 = 'tooltip';
-const DISALLOWED_ATTRIBUTES$2 = new Set(['sanitize', 'allowList', 'sanitizeFn']);
 const ESCAPE_KEY = 'Escape';
 const CLASS_NAME_FADE$2 = 'fade';
 const CLASS_NAME_MODAL = 'modal';
@@ -12319,22 +12706,6 @@ class Tooltip extends BaseComponent {
   _isWithActiveTrigger() {
     return Object.values(this._activeTrigger).includes(true);
   }
-  _getConfig(config) {
-    const dataAttributes = Manipulator.getDataAttributes(this._element);
-    for (const dataAttribute of Object.keys(dataAttributes)) {
-      if (DISALLOWED_ATTRIBUTES$2.has(dataAttribute)) {
-        delete dataAttributes[dataAttribute];
-      }
-    }
-    config = {
-      ...dataAttributes,
-      ...(typeof config === 'object' && config ? config : {})
-    };
-    config = this._mergeConfigObj(config);
-    config = this._configAfterMerge(config);
-    this._typeCheckConfig(config);
-    return config;
-  }
   _configAfterMerge(config) {
     config.container = config.container === false ? document.body : getElement(config.container);
     if (typeof config.delay === 'number') {
@@ -12570,10 +12941,16 @@ class RangeSlider extends BaseComponent {
   constructor(element, config) {
     super(element);
     this._config = this._getConfig(config);
+    this._addedClassNames = [];
     this._currentValue = this._config.value;
     this._dragIndex = 0;
     this._inputs = [];
+    this._inputsContainer = null;
     this._isDragging = false;
+    this._labelsContainer = null;
+    this._onDocumentMouseMove = null;
+    this._onDocumentMouseUp = null;
+    this._onWindowResize = null;
     this._sliderTrack = null;
     this._thumbSize = null;
     this._tooltips = [];
@@ -12592,15 +12969,39 @@ class RangeSlider extends BaseComponent {
   }
 
   // Public
+  dispose() {
+    if (!this._element) {
+      return;
+    }
+    this._removeGlobalEventListeners();
+    restoreHost(this._element, {
+      classNames: this._addedClassNames,
+      eventKey: EVENT_KEY$7,
+      nodes: [this._inputsContainer, this._labelsContainer]
+    });
+    super.dispose();
+  }
   update(config) {
     this._config = this._getConfig(config);
     this._currentValue = this._config.value;
     this._element.innerHTML = '';
+    this._tooltips = [];
     this._initializeRangeSlider();
   }
 
   // Private
+  _removeGlobalEventListeners() {
+    for (const [element, event, handler] of [[document.documentElement, EVENT_MOUSEUP, this._onDocumentMouseUp], [document.documentElement, EVENT_MOUSEMOVE, this._onDocumentMouseMove], [window, EVENT_RESIZE$1, this._onWindowResize]]) {
+      if (handler) {
+        EventHandler.off(element, event, handler);
+      }
+    }
+    this._onDocumentMouseMove = null;
+    this._onDocumentMouseUp = null;
+    this._onWindowResize = null;
+  }
   _addEventListeners() {
+    this._removeGlobalEventListeners();
     if (this._config.disabled) {
       return;
     }
@@ -12646,28 +13047,25 @@ class RangeSlider extends BaseComponent {
         value: this._currentValue
       });
     });
-    EventHandler.on(document.documentElement, EVENT_MOUSEUP, () => {
+    this._onDocumentMouseUp = () => {
       this._isDragging = false;
-    });
-    EventHandler.on(document.documentElement, EVENT_MOUSEMOVE, event => {
+    };
+    this._onDocumentMouseMove = event => {
       if (!this._isDragging) {
         return;
       }
       const moveValue = this._calculateMoveValue(event);
       this._updateValue(moveValue, this._dragIndex);
-    });
-    EventHandler.on(window, EVENT_RESIZE$1, () => {
+    };
+    this._onWindowResize = () => {
       this._updateLabelsContainerSize();
-    });
+    };
+    EventHandler.on(document.documentElement, EVENT_MOUSEUP, this._onDocumentMouseUp);
+    EventHandler.on(document.documentElement, EVENT_MOUSEMOVE, this._onDocumentMouseMove);
+    EventHandler.on(window, EVENT_RESIZE$1, this._onWindowResize);
   }
   _initializeRangeSlider() {
-    this._element.classList.add(CLASS_NAME_RANGE_SLIDER);
-    if (this._config.vertical) {
-      this._element.classList.add(CLASS_NAME_RANGE_SLIDER_VERTICAL);
-    }
-    if (this._config.disabled) {
-      this._element.classList.add(CLASS_NAME_DISABLED$1);
-    }
+    this._addedClassNames.push(...addHostClassNames(this._element, [CLASS_NAME_RANGE_SLIDER, this._config.vertical && CLASS_NAME_RANGE_SLIDER_VERTICAL, this._config.disabled && CLASS_NAME_DISABLED$1]));
     this._sliderTrack = this._createSliderTrack();
     this._createInputs();
     this._createLabels();
@@ -12689,6 +13087,7 @@ class RangeSlider extends BaseComponent {
     }
     container.append(this._sliderTrack);
     this._element.append(container);
+    this._inputsContainer = container;
   }
   _createInput(index, value) {
     const inputElement = this._createElement('input', CLASS_NAME_RANGE_SLIDER_INPUT);
@@ -12697,8 +13096,9 @@ class RangeSlider extends BaseComponent {
     inputElement.max = this._config.max;
     inputElement.step = this._config.step;
     inputElement.value = value;
-    if (this._config.name) {
-      inputElement.name = Array.isArray(this._config.name) ? `${this._config.name[index]}` : `${this._config.name}-${index}`;
+    const name = Array.isArray(this._config.name) ? this._config.name[index] : this._config.name && `${this._config.name}-${index}`;
+    if (name !== undefined && name !== null && name !== '' && name !== false) {
+      inputElement.name = String(name);
     }
     inputElement.disabled = this._config.disabled;
 
@@ -12777,6 +13177,7 @@ class RangeSlider extends BaseComponent {
       labelsContainer.append(labelElement);
     }
     this._element.append(labelsContainer);
+    this._labelsContainer = labelsContainer;
   }
   _calculateLabelPosition(label, index) {
     // Check if label is an object with a specific value
@@ -13109,6 +13510,7 @@ const CLASS_NAME_RATING_ITEM_INPUT = 'rating-item-input';
 const CLASS_NAME_RATING_ITEM_LABEL = 'rating-item-label';
 const CLASS_NAME_READONLY = 'readonly';
 const SELECTOR_DATA_TOGGLE$4 = '[data-bs-toggle="rating"]';
+const SELECTOR_RATING_ITEM = '.rating-item';
 const SELECTOR_RATING_ITEM_INPUT = '.rating-item-input';
 const SELECTOR_RATING_ITEM_LABEL = '.rating-item-label';
 const Default$5 = {
@@ -13178,18 +13580,22 @@ class Rating extends BaseComponent {
   update(config) {
     this._config = this._getConfig(config);
     this._currentValue = this._config.value;
+    this._disposeTooltips();
     this._element.innerHTML = '';
     this._createRating();
-    this._addEventListeners();
   }
   reset(value = null) {
     this._currentValue = value;
+    this._disposeTooltips();
     this._element.innerHTML = '';
     this._createRating();
-    this._addEventListeners();
     EventHandler.trigger(this._element, EVENT_CHANGE, {
       value
     });
+  }
+  dispose() {
+    this._disposeTooltips();
+    super.dispose();
   }
 
   // Private
@@ -13306,6 +13712,13 @@ class Rating extends BaseComponent {
         this._tooltip.hide();
       }
     });
+  }
+  _disposeTooltips() {
+    for (const item of SelectorEngine.find(SELECTOR_RATING_ITEM, this._element)) {
+      var _Tooltip$getInstance;
+      (_Tooltip$getInstance = Tooltip.getInstance(item)) == null || _Tooltip$getInstance.dispose();
+    }
+    this._tooltip = null;
   }
   _createTooltip(selector, value) {
     if (this._config.tooltips === false) {
@@ -14115,7 +14528,7 @@ const EVENT_SHOWN$2 = `shown${EVENT_KEY$3}`;
 const EVENT_CLICK_DATA_API$2 = `click${EVENT_KEY$3}${DATA_API_KEY}`;
 const EVENT_LOAD_DATA_API$2 = `load${EVENT_KEY$3}${DATA_API_KEY}`;
 const SELECTOR_DATA_CLOSE = '[data-bs-close="sidebar"]';
-const SELECTOR_DATA_TOGGLE$2 = '[data-bs-toggle]';
+const SELECTOR_DATA_TOGGLE$2 = '[data-bs-toggle="narrow"], [data-bs-toggle="unfoldable"]';
 const SELECTOR_SIDEBAR = '.sidebar';
 
 /**
@@ -14134,6 +14547,13 @@ class Sidebar extends BaseComponent {
     this._narrow = this._isNarrow();
     this._unfoldable = this._isUnfoldable();
     this._backdrop = this._initializeBackDrop();
+    this._clickOutHandler = event => this._clickOutListener(event);
+    this._resizeHandler = () => {
+      if (this._isMobile() && this._isVisible()) {
+        this.hide();
+        this._backdrop = this._initializeBackDrop();
+      }
+    };
     this._addEventListeners();
   }
 
@@ -14243,6 +14663,15 @@ class Sidebar extends BaseComponent {
     }
     this.unfoldable();
   }
+  dispose() {
+    if (this._isMobile() && this._isVisible()) {
+      new ScrollBarHelper().reset();
+    }
+    this._backdrop.dispose();
+    this._removeClickOutListener();
+    EventHandler.off(window, EVENT_RESIZE, this._resizeHandler);
+    super.dispose();
+  }
 
   // Private
 
@@ -14279,12 +14708,10 @@ class Sidebar extends BaseComponent {
     }
   }
   _addClickOutListener() {
-    EventHandler.on(document, EVENT_CLICK_DATA_API$2, event => {
-      this._clickOutListener(event);
-    });
+    EventHandler.on(document, EVENT_CLICK_DATA_API$2, this._clickOutHandler);
   }
   _removeClickOutListener() {
-    EventHandler.off(document, EVENT_CLICK_DATA_API$2);
+    EventHandler.off(document, EVENT_CLICK_DATA_API$2, this._clickOutHandler);
   }
 
   // Sidebar navigation
@@ -14309,12 +14736,7 @@ class Sidebar extends BaseComponent {
       event.preventDefault();
       this.hide();
     });
-    EventHandler.on(window, EVENT_RESIZE, () => {
-      if (this._isMobile() && this._isVisible()) {
-        this.hide();
-        this._backdrop = this._initializeBackDrop();
-      }
-    });
+    EventHandler.on(window, EVENT_RESIZE, this._resizeHandler);
   }
 
   // Static
@@ -14943,7 +15365,6 @@ const END_KEY = 'End';
 const CLASS_NAME_ACTIVE = 'active';
 const CLASS_NAME_FADE$1 = 'fade';
 const CLASS_NAME_SHOW$1 = 'show';
-const CLASS_DROPDOWN = 'dropdown';
 const SELECTOR_DROPDOWN_TOGGLE = '.dropdown-toggle';
 const SELECTOR_DROPDOWN_MENU = '.dropdown-menu';
 const NOT_SELECTOR_DROPDOWN_TOGGLE = `:not(${SELECTOR_DROPDOWN_TOGGLE})`;
@@ -15049,6 +15470,12 @@ class Tab extends BaseComponent {
     if (![ARROW_LEFT_KEY, ARROW_RIGHT_KEY, ARROW_UP_KEY, ARROW_DOWN_KEY, HOME_KEY, END_KEY].includes(event.key)) {
       return;
     }
+
+    // Don't hijack modifier+arrow shortcuts (e.g. Alt+Left/Right for browser
+    // history navigation); only the bare keys drive tablist navigation.
+    if (event.altKey || event.ctrlKey || event.metaKey) {
+      return;
+    }
     event.stopPropagation(); // stopPropagation/preventDefault both added to support up/down keys without scrolling the page
     event.preventDefault();
     const children = this._getChildren().filter(element => !isDisabled(element));
@@ -15107,18 +15534,16 @@ class Tab extends BaseComponent {
   }
   _toggleDropDown(element, open) {
     const outerElem = this._getOuterElement(element);
-    if (!outerElem.classList.contains(CLASS_DROPDOWN)) {
+    const dropdownToggle = SelectorEngine.findOne(SELECTOR_DROPDOWN_TOGGLE, outerElem);
+    if (!dropdownToggle) {
       return;
     }
-    const toggle = (selector, className) => {
-      const element = SelectorEngine.findOne(selector, outerElem);
-      if (element) {
-        element.classList.toggle(className, open);
-      }
-    };
-    toggle(SELECTOR_DROPDOWN_TOGGLE, CLASS_NAME_ACTIVE);
-    toggle(SELECTOR_DROPDOWN_MENU, CLASS_NAME_SHOW$1);
-    outerElem.setAttribute('aria-expanded', open);
+    const dropdownMenu = SelectorEngine.findOne(SELECTOR_DROPDOWN_MENU, outerElem);
+    dropdownToggle.classList.toggle(CLASS_NAME_ACTIVE, open);
+    if (dropdownMenu) {
+      dropdownMenu.classList.toggle(CLASS_NAME_SHOW$1, open);
+    }
+    dropdownToggle.setAttribute('aria-expanded', open);
   }
   _setAttributeIfNotExists(element, attribute, value) {
     if (!element.hasAttribute(attribute)) {

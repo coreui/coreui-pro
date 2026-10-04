@@ -1,13 +1,13 @@
 /*!
-  * CoreUI range-slider.js v5.27.1 (https://coreui.io)
+  * CoreUI PRO range-slider.js v5.28.0 (https://coreui.io)
   * Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
-  * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
+  * License (https://coreui.io/pro/license/)
   */
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('./base-component.js'), require('./dom/event-handler.js'), require('./dom/manipulator.js'), require('./dom/selector-engine.js'), require('./util/index.js'), require('./util/sanitizer.js')) :
-  typeof define === 'function' && define.amd ? define(['./base-component', './dom/event-handler', './dom/manipulator', './dom/selector-engine', './util/index', './util/sanitizer'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.RangeSlider = factory(global.BaseComponent, global.EventHandler, global.Manipulator, global.SelectorEngine, global.Index, global.Sanitizer));
-})(this, (function (BaseComponent, EventHandler, Manipulator, SelectorEngine, index_js, sanitizer_js) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('./base-component.js'), require('./dom/event-handler.js'), require('./dom/manipulator.js'), require('./dom/selector-engine.js'), require('./util/host.js'), require('./util/index.js'), require('./util/sanitizer.js')) :
+  typeof define === 'function' && define.amd ? define(['./base-component', './dom/event-handler', './dom/manipulator', './dom/selector-engine', './util/host', './util/index', './util/sanitizer'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.RangeSlider = factory(global.BaseComponent, global.EventHandler, global.Manipulator, global.SelectorEngine, global.Host, global.Index, global.Sanitizer));
+})(this, (function (BaseComponent, EventHandler, Manipulator, SelectorEngine, host_js, index_js, sanitizer_js) { 'use strict';
 
   /**
    * --------------------------------------------------------------------------
@@ -97,10 +97,16 @@
     constructor(element, config) {
       super(element);
       this._config = this._getConfig(config);
+      this._addedClassNames = [];
       this._currentValue = this._config.value;
       this._dragIndex = 0;
       this._inputs = [];
+      this._inputsContainer = null;
       this._isDragging = false;
+      this._labelsContainer = null;
+      this._onDocumentMouseMove = null;
+      this._onDocumentMouseUp = null;
+      this._onWindowResize = null;
       this._sliderTrack = null;
       this._thumbSize = null;
       this._tooltips = [];
@@ -119,15 +125,39 @@
     }
 
     // Public
+    dispose() {
+      if (!this._element) {
+        return;
+      }
+      this._removeGlobalEventListeners();
+      host_js.restoreHost(this._element, {
+        classNames: this._addedClassNames,
+        eventKey: EVENT_KEY,
+        nodes: [this._inputsContainer, this._labelsContainer]
+      });
+      super.dispose();
+    }
     update(config) {
       this._config = this._getConfig(config);
       this._currentValue = this._config.value;
       this._element.innerHTML = '';
+      this._tooltips = [];
       this._initializeRangeSlider();
     }
 
     // Private
+    _removeGlobalEventListeners() {
+      for (const [element, event, handler] of [[document.documentElement, EVENT_MOUSEUP, this._onDocumentMouseUp], [document.documentElement, EVENT_MOUSEMOVE, this._onDocumentMouseMove], [window, EVENT_RESIZE, this._onWindowResize]]) {
+        if (handler) {
+          EventHandler.off(element, event, handler);
+        }
+      }
+      this._onDocumentMouseMove = null;
+      this._onDocumentMouseUp = null;
+      this._onWindowResize = null;
+    }
     _addEventListeners() {
+      this._removeGlobalEventListeners();
       if (this._config.disabled) {
         return;
       }
@@ -173,28 +203,25 @@
           value: this._currentValue
         });
       });
-      EventHandler.on(document.documentElement, EVENT_MOUSEUP, () => {
+      this._onDocumentMouseUp = () => {
         this._isDragging = false;
-      });
-      EventHandler.on(document.documentElement, EVENT_MOUSEMOVE, event => {
+      };
+      this._onDocumentMouseMove = event => {
         if (!this._isDragging) {
           return;
         }
         const moveValue = this._calculateMoveValue(event);
         this._updateValue(moveValue, this._dragIndex);
-      });
-      EventHandler.on(window, EVENT_RESIZE, () => {
+      };
+      this._onWindowResize = () => {
         this._updateLabelsContainerSize();
-      });
+      };
+      EventHandler.on(document.documentElement, EVENT_MOUSEUP, this._onDocumentMouseUp);
+      EventHandler.on(document.documentElement, EVENT_MOUSEMOVE, this._onDocumentMouseMove);
+      EventHandler.on(window, EVENT_RESIZE, this._onWindowResize);
     }
     _initializeRangeSlider() {
-      this._element.classList.add(CLASS_NAME_RANGE_SLIDER);
-      if (this._config.vertical) {
-        this._element.classList.add(CLASS_NAME_RANGE_SLIDER_VERTICAL);
-      }
-      if (this._config.disabled) {
-        this._element.classList.add(CLASS_NAME_DISABLED);
-      }
+      this._addedClassNames.push(...host_js.addHostClassNames(this._element, [CLASS_NAME_RANGE_SLIDER, this._config.vertical && CLASS_NAME_RANGE_SLIDER_VERTICAL, this._config.disabled && CLASS_NAME_DISABLED]));
       this._sliderTrack = this._createSliderTrack();
       this._createInputs();
       this._createLabels();
@@ -216,6 +243,7 @@
       }
       container.append(this._sliderTrack);
       this._element.append(container);
+      this._inputsContainer = container;
     }
     _createInput(index, value) {
       const inputElement = this._createElement('input', CLASS_NAME_RANGE_SLIDER_INPUT);
@@ -224,8 +252,9 @@
       inputElement.max = this._config.max;
       inputElement.step = this._config.step;
       inputElement.value = value;
-      if (this._config.name) {
-        inputElement.name = Array.isArray(this._config.name) ? `${this._config.name[index]}` : `${this._config.name}-${index}`;
+      const name = Array.isArray(this._config.name) ? this._config.name[index] : this._config.name && `${this._config.name}-${index}`;
+      if (name !== undefined && name !== null && name !== '' && name !== false) {
+        inputElement.name = String(name);
       }
       inputElement.disabled = this._config.disabled;
 
@@ -304,6 +333,7 @@
         labelsContainer.append(labelElement);
       }
       this._element.append(labelsContainer);
+      this._labelsContainer = labelsContainer;
     }
     _calculateLabelPosition(label, index) {
       // Check if label is an object with a specific value

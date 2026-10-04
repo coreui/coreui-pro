@@ -1,7 +1,7 @@
 /*!
-  * CoreUI multi-select.js v5.27.1 (https://coreui.io)
+  * CoreUI PRO multi-select.js v5.28.0 (https://coreui.io)
   * Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
-  * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
+  * License (https://coreui.io/pro/license/)
   */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('@popperjs/core'), require('./base-component.js'), require('./dom/data.js'), require('./dom/event-handler.js'), require('./dom/selector-engine.js'), require('./util/sanitizer.js'), require('./util/index.js')) :
@@ -66,7 +66,7 @@
   const SELECTOR_TAG = '.form-multi-select-tag';
   const SELECTOR_TAG_DELETE = '.form-multi-select-tag-delete';
   const SELECTOR_VISIBLE_ITEMS = '.form-multi-select-options .form-multi-select-option:not(.disabled):not(:disabled)';
-  const SELECTOR_NAVIGABLE_ITEMS = `.form-multi-select-all:not(.disabled):not(:disabled), ${SELECTOR_VISIBLE_ITEMS}, .form-multi-select-options .form-multi-select-optgroup-label-with-checkbox`;
+  const SELECTOR_NAVIGABLE_ITEMS = `.form-multi-select-all:not(.disabled):not(:disabled), ${SELECTOR_VISIBLE_ITEMS}, .form-multi-select-options .form-multi-select-optgroup-label-with-checkbox:not(.disabled)`;
   const EVENT_CHANGED = `changed${EVENT_KEY}`;
   const EVENT_CLICK = `click${EVENT_KEY}`;
   const EVENT_HIDE = `hide${EVENT_KEY}`;
@@ -109,7 +109,7 @@
     allowList: sanitizer_js.DefaultAllowlist,
     ariaCleanerLabel: 'Clear all selections',
     ariaIndicatorLabel: 'Toggle visibility of options menu',
-    ariaSearchLabel: 'Search',
+    ariaSearchLabel: 'Search options',
     ariaTagDeleteLabel: 'Remove',
     cleaner: true,
     clearSearchOnSelect: false,
@@ -140,10 +140,10 @@
     selectAllLabel: 'Select all',
     selectAllMode: 'all',
     selectAllStyle: 'checkbox',
+    selectFilteredLabel: 'Select filtered',
     selectionLimit: null,
     selectionType: 'tags',
     selectionTypeCounterText: 'item(s) selected',
-    selectFilteredLabel: 'Select filtered',
     valid: false,
     value: null
   };
@@ -179,13 +179,13 @@
     search: '(boolean|string)',
     searchNoResultsLabel: 'string',
     selectAll: 'boolean',
-    selectAllStyle: 'string',
     selectAllLabel: 'string',
     selectAllMode: 'string',
+    selectAllStyle: 'string',
+    selectFilteredLabel: 'string',
     selectionLimit: '(number|null)',
     selectionType: 'string',
     selectionTypeCounterText: 'string',
-    selectFilteredLabel: 'string',
     valid: 'boolean',
     value: '(string|array|null)'
   };
@@ -198,9 +198,12 @@
 
   class MultiSelect extends BaseComponent {
     constructor(element, config) {
+      var _this$_element$labels, _this$_element$labels2;
       super(element, config);
       this._uniqueId = this._config.id || this._element.id || index_js.getUID(`${this.constructor.NAME}`);
-      this._uniqueName = this._config.name || this._element.name || this._uniqueId;
+      this._markupName = this._element.getAttribute('name');
+      this._markupLabel = (_this$_element$labels = (_this$_element$labels2 = this._element.labels) == null ? void 0 : _this$_element$labels2[0]) != null ? _this$_element$labels : null;
+      this._generatedLabelId = null;
       this._configureNativeSelect();
       this._indicatorElement = null;
       this._selectAllElement = null;
@@ -218,7 +221,7 @@
       this._popper = null;
       this._search = '';
       if (this._config.options.length > 0) {
-        this._createNativeOptions(this._element, this._config.options);
+        this._createNativeOptions(this._element, this._options);
       }
       this._createSelect();
       this._addEventListeners();
@@ -282,22 +285,13 @@
       EventHandler.trigger(this._element, EVENT_HIDDEN);
     }
     dispose() {
-      if (this._popper) {
-        this._popper.destroy();
-      }
-      for (const element of [this._wrapperElement, this._menu, this._selectionElement, this._togglerElement, this._searchElement, this._indicatorElement, this._selectAllElement, this._headerElement, this._optionsElement]) {
-        if (element) {
-          EventHandler.off(element, EVENT_KEY);
-        }
-      }
-      if (this._menu) {
-        this._menu.remove();
-      }
-      if (this._wrapperElement) {
-        this._wrapperElement.before(this._element);
-        this._wrapperElement.remove();
-      }
+      this._destroySelect();
       this._element.removeAttribute('tabindex');
+      if (this._markupName === null) {
+        this._element.removeAttribute('name');
+      } else {
+        this._element.setAttribute('name', this._markupName);
+      }
       super.dispose();
     }
     search(text) {
@@ -315,9 +309,7 @@
       };
       this._selected = [];
       this._options = this._getOptions();
-      this._menu.remove();
-      this._wrapperElement.before(this._element);
-      this._wrapperElement.remove();
+      this._destroySelect();
       this._element.innerHTML = '';
       this._configureNativeSelect();
       this._createNativeOptions(this._element, this._options);
@@ -518,25 +510,31 @@
       }
       return this._getOptionsFromElement();
     }
-    _getOptionsFromConfig(options = this._config.options) {
+    _getOptionsFromConfig(options = this._config.options, disabled = false) {
       const _options = [];
       for (const option of options) {
         if (this._isOptionGroup(option)) {
           const customGroupProperties = {
             ...option
           };
+          const groupDisabled = disabled || Boolean(option.disabled);
+          delete customGroupProperties.disabled;
           delete customGroupProperties.label;
           delete customGroupProperties.options;
           _options.push({
             ...customGroupProperties,
             label: option.label,
-            options: this._getOptionsFromConfig(option.options)
+            ...(groupDisabled && {
+              disabled: true
+            }),
+            options: this._getOptionsFromConfig(option.options, groupDisabled)
           });
           continue;
         }
         const value = String(option.value);
         const isSelected = option.selected || this._config.value && this._config.value.includes(value);
         const shouldSelect = isSelected && !this._isSelectionLimitReached();
+        const isDisabled = disabled || Boolean(option.disabled);
         const customProperties = typeof option === 'object' ? {
           ...option
         } : {};
@@ -549,20 +547,23 @@
           ...(shouldSelect && {
             selected: true
           }),
-          ...(option.disabled && {
+          ...(isDisabled && {
             disabled: true
           })
         });
         if (shouldSelect) {
           this._selected.push({
             value: String(option.value),
-            text: option.text
+            text: option.text,
+            ...(isDisabled && {
+              disabled: true
+            })
           });
         }
       }
       return _options;
     }
-    _getOptionsFromElement(node = this._element) {
+    _getOptionsFromElement(node = this._element, disabled = false) {
       const nodes = Array.from(node.childNodes).filter(element => element.nodeName === 'OPTION' || element.nodeName === 'OPTGROUP');
       const options = [];
       for (const node of nodes) {
@@ -571,27 +572,32 @@
           const text = node.textContent;
           const isSelected = node.selected || this._config.value && this._config.value.includes(node.value);
           const shouldSelect = isSelected && !this._isSelectionLimitReached();
+          const isDisabled = disabled || node.disabled;
           options.push({
             value,
             text,
             selected: shouldSelect,
-            disabled: node.disabled
+            disabled: isDisabled
           });
           node.selected = shouldSelect;
           if (shouldSelect) {
             this._selected.push({
               value,
               text: node.textContent,
-              ...(node.disabled && {
+              ...(isDisabled && {
                 disabled: true
               })
             });
           }
         }
         if (node.nodeName === 'OPTGROUP') {
+          const groupDisabled = disabled || node.disabled;
           options.push({
             label: node.label,
-            options: this._getOptionsFromElement(node)
+            ...(groupDisabled && {
+              disabled: true
+            }),
+            options: this._getOptionsFromElement(node, groupDisabled)
           });
         }
       }
@@ -617,6 +623,7 @@
         if (this._isOptionGroup(option)) {
           const optgroup = document.createElement('optgroup');
           optgroup.label = option.label;
+          optgroup.disabled = option.disabled === true;
           this._createNativeOptions(optgroup, option.options);
           parentElement.append(optgroup);
         } else {
@@ -636,7 +643,67 @@
     _hideNativeSelect() {
       this._element.tabIndex = '-1';
     }
+    _nameControls() {
+      const labelledBy = this._element.getAttribute('aria-labelledby');
+      if (labelledBy) {
+        this._applyControlName({
+          labelledBy
+        });
+        return;
+      }
+      const label = this._element.getAttribute('aria-label');
+      if (label) {
+        this._applyControlName({
+          label
+        });
+        return;
+      }
+      if (!this._markupLabel || this._markupLabel.contains(this._togglerElement)) {
+        return;
+      }
+      if (!this._markupLabel.id) {
+        const id = `${this._uniqueId}-label`;
+        this._generatedLabelId = document.getElementById(id) ? index_js.getUID(`${this._uniqueId}-label`) : id;
+        this._markupLabel.id = this._generatedLabelId;
+      }
+      this._applyControlName({
+        labelledBy: this._markupLabel.id
+      });
+    }
+    _applyControlName({
+      label,
+      labelledBy
+    }) {
+      if (labelledBy) {
+        this._togglerElement.setAttribute('aria-labelledby', labelledBy);
+        return;
+      }
+      this._togglerElement.setAttribute('aria-label', label);
+    }
+    _destroySelect() {
+      if (this._popper) {
+        this._popper.destroy();
+      }
+      for (const element of [this._element, this._wrapperElement, this._menu, this._selectionElement, this._togglerElement, this._searchElement, this._indicatorElement, this._selectAllElement, this._headerElement, this._optionsElement]) {
+        if (element) {
+          EventHandler.off(element, EVENT_KEY);
+        }
+      }
+      if (this._menu) {
+        this._menu.remove();
+      }
+      if (this._wrapperElement) {
+        this._wrapperElement.before(this._element);
+        this._wrapperElement.remove();
+      }
+      if (this._markupLabel && this._markupLabel.id === this._generatedLabelId) {
+        this._markupLabel.removeAttribute('id');
+        this._generatedLabelId = null;
+      }
+    }
     _createSelect() {
+      this._uniqueId = this._config.id || this._element.id || this._uniqueId;
+      this._uniqueName = this._config.name || this._markupName;
       const wrapper = document.createElement('div');
       wrapper.classList.add(CLASS_NAME_SELECT);
       wrapper.classList.toggle('is-invalid', this._config.invalid);
@@ -659,9 +726,14 @@
         this._updateSearch();
       }
       this._element.setAttribute('id', this._uniqueId);
-      this._element.setAttribute('name', this._uniqueName);
+      if (this._uniqueName) {
+        this._element.setAttribute('name', this._uniqueName);
+      } else {
+        this._element.removeAttribute('name');
+      }
       this._createOptionsContainer();
       this._hideNativeSelect();
+      this._nameControls();
       this._selectInitialOptions();
     }
     _createSelection() {
@@ -738,7 +810,7 @@
         input.disabled = true;
       }
       input.setAttribute('id', `search-${this._uniqueId}`);
-      input.setAttribute('name', `search-${this._uniqueName}`);
+      input.autocomplete = 'off';
       input.setAttribute('aria-label', this._config.ariaSearchLabel);
       input.setAttribute('aria-autocomplete', 'list');
       input.setAttribute('aria-controls', `${this._uniqueId}-listbox`);
@@ -811,12 +883,13 @@
           optionDiv.classList.add(CLASS_NAME_OPTION);
           if (option.disabled) {
             optionDiv.classList.add(CLASS_NAME_DISABLED);
+            optionDiv.setAttribute('aria-disabled', 'true');
           }
           if (this._config.optionsStyle === 'checkbox') {
             optionDiv.classList.add(CLASS_NAME_OPTION_WITH_CHECKBOX);
           }
           optionDiv.dataset.value = String(option.value);
-          optionDiv.tabIndex = 0;
+          optionDiv.tabIndex = option.disabled ? -1 : 0;
           optionDiv.setAttribute('role', 'option');
           optionDiv.setAttribute('aria-selected', option.selected === true ? 'true' : 'false');
           if (typeof this._config.optionsTemplate === 'function') {
@@ -838,8 +911,13 @@
           optgrouplabel.classList.add(CLASS_NAME_OPTGROUP_LABEL);
           if (this._config.optionsGroupsSelectable && this._config.optionsGroupsStyle === 'checkbox' && this._config.multiple) {
             optgrouplabel.classList.add(CLASS_NAME_OPTGROUP_LABEL_WITH_CHECKBOX);
-            optgrouplabel.tabIndex = 0;
-            optgrouplabel.setAttribute('role', 'button');
+            if (!option.disabled) {
+              optgrouplabel.tabIndex = 0;
+              optgrouplabel.setAttribute('role', 'button');
+            }
+          }
+          if (option.disabled) {
+            optgrouplabel.classList.add(CLASS_NAME_DISABLED);
           }
           optgroup.append(optgrouplabel);
           this._createOptions(optgroup, option.options);
@@ -890,7 +968,7 @@
     _onOptionsClick(element) {
       if (this._config.optionsGroupsSelectable) {
         const groupLabel = element.closest(`.${CLASS_NAME_OPTGROUP_LABEL_WITH_CHECKBOX}`);
-        if (groupLabel) {
+        if (groupLabel && !groupLabel.classList.contains(CLASS_NAME_DISABLED)) {
           this._toggleGroup(groupLabel.closest(SELECTOR_OPTGROUP));
           return;
         }
@@ -903,6 +981,9 @@
         if (!element) {
           return;
         }
+      }
+      if (element.classList.contains(CLASS_NAME_DISABLED)) {
+        return;
       }
       const value = String(element.dataset.value);
       const {
@@ -918,7 +999,9 @@
       if (!this._config.multiple) {
         this.hide();
         this.search('');
-        this._searchElement.value = null;
+        if (this._config.search) {
+          this._searchElement.value = null;
+        }
       }
       if (this._config.clearSearchOnSelect && this._config.search) {
         this.search('');
@@ -1282,7 +1365,7 @@
       }
       for (const optgroup of SelectorEngine.find(`.${CLASS_NAME_OPTGROUP}`, this._menu)) {
         const label = SelectorEngine.findOne(`.${CLASS_NAME_OPTGROUP_LABEL_WITH_CHECKBOX}`, optgroup);
-        if (!label) {
+        if (!label || label.classList.contains(CLASS_NAME_DISABLED)) {
           continue;
         }
         const items = SelectorEngine.children(optgroup, SELECTOR_OPTION).filter(element => !element.classList.contains(CLASS_NAME_DISABLED));

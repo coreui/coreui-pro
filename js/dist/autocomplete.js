@@ -1,13 +1,13 @@
 /*!
-  * CoreUI autocomplete.js v5.27.1 (https://coreui.io)
+  * CoreUI PRO autocomplete.js v5.28.0 (https://coreui.io)
   * Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
-  * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
+  * License (https://coreui.io/pro/license/)
   */
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('@popperjs/core'), require('./base-component.js'), require('./dom/data.js'), require('./dom/event-handler.js'), require('./dom/selector-engine.js'), require('./util/sanitizer.js'), require('./util/index.js')) :
-  typeof define === 'function' && define.amd ? define(['@popperjs/core', './base-component', './dom/data', './dom/event-handler', './dom/selector-engine', './util/sanitizer', './util/index'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.Autocomplete = factory(global["@popperjs/core"], global.BaseComponent, global.Data, global.EventHandler, global.SelectorEngine, global.Sanitizer, global.Index));
-})(this, (function (Popper, BaseComponent, Data, EventHandler, SelectorEngine, sanitizer_js, index_js) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('@popperjs/core'), require('./base-component.js'), require('./dom/data.js'), require('./dom/event-handler.js'), require('./dom/selector-engine.js'), require('./util/host.js'), require('./util/sanitizer.js'), require('./util/index.js')) :
+  typeof define === 'function' && define.amd ? define(['@popperjs/core', './base-component', './dom/data', './dom/event-handler', './dom/selector-engine', './util/host', './util/sanitizer', './util/index'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.Autocomplete = factory(global["@popperjs/core"], global.BaseComponent, global.Data, global.EventHandler, global.SelectorEngine, global.Host, global.Sanitizer, global.Index));
+})(this, (function (Popper, BaseComponent, Data, EventHandler, SelectorEngine, host_js, sanitizer_js, index_js) { 'use strict';
 
   function _interopNamespaceDefault(e) {
     const n = Object.create(null, { [Symbol.toStringTag]: { value: 'Module' } });
@@ -80,6 +80,8 @@
   const CLASS_NAME_INPUT = 'autocomplete-input';
   const CLASS_NAME_INPUT_HINT = 'autocomplete-input-hint';
   const CLASS_NAME_INPUT_GROUP = 'autocomplete-input-group';
+  const CLASS_NAME_IS_INVALID = 'is-invalid';
+  const CLASS_NAME_IS_VALID = 'is-valid';
   const CLASS_NAME_LABEL = 'label';
   const CLASS_NAME_OPTGROUP = 'autocomplete-optgroup';
   const CLASS_NAME_OPTGROUP_LABEL = 'autocomplete-optgroup-label';
@@ -110,7 +112,7 @@
     indicator: false,
     invalid: false,
     name: null,
-    options: false,
+    options: [],
     optionsGroupsTemplate: null,
     optionsMaxHeight: 'auto',
     optionsTemplate: null,
@@ -138,7 +140,7 @@
     indicator: 'boolean',
     invalid: 'boolean',
     name: '(string|null)',
-    options: '(array|null)',
+    options: '(array|string|null)',
     optionsGroupsTemplate: '(function|null)',
     optionsMaxHeight: '(number|string)',
     optionsTemplate: '(function|null)',
@@ -147,7 +149,7 @@
     sanitize: 'boolean',
     sanitizeFn: '(null|function)',
     search: '(array|string|null)',
-    searchNoResultsLabel: 'boolean|string',
+    searchNoResultsLabel: '(boolean|string)',
     showHints: 'boolean',
     valid: 'boolean',
     value: '(number|string|null)'
@@ -164,6 +166,8 @@
       var _this$_config$id;
       super(element, config);
       this._uniqueId = (_this$_config$id = this._config.id) != null ? _this$_config$id : index_js.getUID(`${this.constructor.NAME}`);
+      this._addedClassNames = [];
+      this._cleanerElement = null;
       this._indicatorElement = null;
       this._inputElement = null;
       this._inputHintElement = null;
@@ -229,9 +233,10 @@
       EventHandler.trigger(this._element, EVENT_HIDDEN);
     }
     dispose() {
-      if (this._popper) {
-        this._popper.destroy();
+      if (!this._element) {
+        return;
       }
+      this._destroyAutocomplete();
       super.dispose();
     }
     clear() {
@@ -258,6 +263,7 @@
         ...this._config,
         ...this._configAfterMerge(config)
       };
+      this._syncInputName();
       this._options = this._getOptionsFromConfig();
       this._optionsElement.innerHTML = '';
       this._createOptions(this._optionsElement, this._options);
@@ -295,6 +301,9 @@
         flat.push(opt);
       }
       return flat;
+    }
+    _selectableOptions() {
+      return this._flattenOptions().filter(option => !option.disabled);
     }
     _getClassNames() {
       return this._element.classList.value.split(' ');
@@ -368,7 +377,7 @@
           return;
         }
         const inputValueLower = inputValue.toLowerCase();
-        const exactMatches = this._flattenOptions().filter(option => option.label.toLowerCase() === inputValueLower);
+        const exactMatches = this._selectableOptions().filter(option => option.label.toLowerCase() === inputValueLower);
         if (exactMatches.length === 1) {
           this._selectOption(exactMatches[0]);
           return;
@@ -392,7 +401,7 @@
             event.preventDefault();
             event.stopPropagation();
           }
-          const options = this._flattenOptions().filter(option => option.label.toLowerCase().startsWith(this._inputElement.value.toLowerCase()));
+          const options = this._selectableOptions().filter(option => option.label.toLowerCase().startsWith(this._inputElement.value.toLowerCase()));
           if (options.length > 0) {
             this._selectOption(options[0]);
           }
@@ -403,7 +412,7 @@
           if (this._inputElement.value.length === 0) {
             return;
           }
-          const options = this._flattenOptions().filter(option => option.label.toLowerCase() === this._inputElement.value.toLowerCase());
+          const options = this._selectableOptions().filter(option => option.label.toLowerCase() === this._inputElement.value.toLowerCase());
           if (options.length > 0) {
             this._selectOption(options[0]);
           }
@@ -423,7 +432,7 @@
           } = event.target;
           this.search(value);
           if (this._config.showHints) {
-            const options = value ? this._flattenOptions().filter(option => option.label.toLowerCase().startsWith(value.toLowerCase())) : [];
+            const options = value ? this._selectableOptions().filter(option => option.label.toLowerCase().startsWith(value.toLowerCase())) : [];
             this._inputHintElement.value = options.length > 0 ? `${value}${options[0].label.slice(value.length)}` : '';
           }
           if (this._selected.length > 0) {
@@ -470,7 +479,14 @@
         }
       });
     }
-    _getOptionsFromConfig(options = this._config.options) {
+    _syncInputName() {
+      if (this._config.name) {
+        this._inputElement.setAttribute('name', this._config.name.toString());
+        return;
+      }
+      this._inputElement.removeAttribute('name');
+    }
+    _getOptionsFromConfig(options = this._config.options, disabled = false) {
       if (!options || !Array.isArray(options)) {
         return [];
       }
@@ -481,12 +497,17 @@
           const customGroupProperties = {
             ...option
           };
+          const groupDisabled = disabled || Boolean(option.disabled);
+          delete customGroupProperties.disabled;
           delete customGroupProperties.label;
           delete customGroupProperties.options;
           _options.push({
             ...customGroupProperties,
             label: option.label,
-            options: this._getOptionsFromConfig(option.options)
+            ...(groupDisabled && {
+              disabled: true
+            }),
+            options: this._getOptionsFromConfig(option.options, groupDisabled)
           });
           continue;
         }
@@ -507,7 +528,7 @@
           ...(isSelected && {
             selected: true
           }),
-          ...(option.disabled && {
+          ...((disabled || option.disabled) && {
             disabled: true
           })
         });
@@ -520,13 +541,21 @@
       }
       return _options;
     }
-    _createAutocomplete() {
-      this._element.classList.add(CLASS_NAME_AUTOCOMPLETE);
-      this._element.classList.toggle('is-invalid', this._config.invalid);
-      this._element.classList.toggle('is-valid', this._config.valid);
-      if (this._config.disabled) {
-        this._element.classList.add(CLASS_NAME_DISABLED);
+    _destroyAutocomplete() {
+      if (this._popper) {
+        this._popper.destroy();
       }
+      host_js.restoreHost(this._element, {
+        classNames: [CLASS_NAME_SHOW, ...this._addedClassNames],
+        eventKey: EVENT_KEY,
+        nodes: [this._optionsElement, this._inputHintElement, this._inputElement, this._cleanerElement, this._indicatorElement, this._menu, this._togglerElement]
+      });
+      this._addedClassNames = [];
+    }
+    _createAutocomplete() {
+      this._addedClassNames = host_js.addHostClassNames(this._element, [CLASS_NAME_AUTOCOMPLETE, this._config.invalid && CLASS_NAME_IS_INVALID, this._config.valid && CLASS_NAME_IS_VALID, this._config.disabled && CLASS_NAME_DISABLED]);
+      this._element.classList.toggle(CLASS_NAME_IS_INVALID, this._config.invalid);
+      this._element.classList.toggle(CLASS_NAME_IS_VALID, this._config.valid);
       for (const className of this._getClassNames()) {
         this._element.classList.add(className);
       }
@@ -546,7 +575,6 @@
       if (!this._config.disabled && this._config.showHints) {
         const inputHintEl = document.createElement('input');
         inputHintEl.classList.add(CLASS_NAME_INPUT, CLASS_NAME_INPUT_HINT);
-        inputHintEl.setAttribute('name', (this._config.name || `${this._uniqueId}-hint`).toString());
         inputHintEl.autocomplete = 'off';
         inputHintEl.readOnly = true;
         inputHintEl.tabIndex = -1;
@@ -557,7 +585,6 @@
       const inputEl = document.createElement('input');
       inputEl.classList.add(CLASS_NAME_INPUT);
       inputEl.id = this._uniqueId;
-      inputEl.setAttribute('name', (this._config.name || this._uniqueId).toString());
       inputEl.autocomplete = 'off';
       inputEl.placeholder = (_this$_config$placeho = this._config.placeholder) != null ? _this$_config$placeho : '';
       inputEl.role = 'combobox';
@@ -574,6 +601,7 @@
       }
       togglerEl.append(inputEl);
       this._inputElement = inputEl;
+      this._syncInputName();
       this._element.append(togglerEl);
     }
     _createButtons() {
@@ -600,7 +628,6 @@
           indicator.tabIndex = -1;
         }
         buttons.append(indicator);
-        this._indicatorElement = indicator;
         this._indicatorElement = indicator;
       }
       this._togglerElement.append(buttons);
@@ -666,6 +693,9 @@
             optgrouplabel.textContent = option.label;
           }
           optgrouplabel.classList.add(CLASS_NAME_OPTGROUP_LABEL);
+          if (option.disabled) {
+            optgrouplabel.classList.add(CLASS_NAME_DISABLED);
+          }
           optgroup.append(optgrouplabel);
           this._createOptions(optgroup, option.options);
           parentElement.append(optgroup);
@@ -680,7 +710,7 @@
           optionDiv.setAttribute('aria-disabled', 'true');
         }
         optionDiv.dataset.value = option.value;
-        optionDiv.tabIndex = 0;
+        optionDiv.tabIndex = option.disabled ? -1 : 0;
         if (this._isExternalSearch() && this._config.highlightOptionsOnSearch && this._search) {
           optionDiv.innerHTML = this._highlightOption(option.label);
         } else if (this._config.optionsTemplate && typeof this._config.optionsTemplate === 'function') {
@@ -700,6 +730,9 @@
         if (!element) {
           return;
         }
+      }
+      if (element.classList.contains(CLASS_NAME_DISABLED)) {
+        return;
       }
       const {
         value

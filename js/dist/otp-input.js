@@ -1,7 +1,7 @@
 /*!
-  * CoreUI otp-input.js v5.27.1 (https://coreui.io)
+  * CoreUI PRO otp-input.js v5.28.0 (https://coreui.io)
   * Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
-  * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
+  * License (https://coreui.io/pro/license/)
   */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('./base-component.js'), require('./dom/event-handler.js'), require('./dom/selector-engine.js'), require('./util/index.js')) :
@@ -28,12 +28,13 @@
   const ARROW_RIGHT_KEY = 'ArrowRight';
   const ARROW_LEFT_KEY = 'ArrowLeft';
   const BACKSPACE_KEY = 'Backspace';
+  const EVENT_BEFORE_INPUT = `beforeinput${EVENT_KEY}`;
   const EVENT_CHANGE = `change${EVENT_KEY}`;
   const EVENT_COMPLETE = `complete${EVENT_KEY}`;
   const EVENT_FOCUS = `focus${EVENT_KEY}`;
   const EVENT_INPUT = `input${EVENT_KEY}`;
   const EVENT_KEYDOWN = `keydown${EVENT_KEY}`;
-  const EVENT_PASTE = `paste`;
+  const EVENT_PASTE = `paste${EVENT_KEY}`;
   const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`;
   const SELECTOR_FORM_OTP_CONTROL = '.form-otp-control';
   const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="otp"]';
@@ -75,9 +76,9 @@
       super(element, config);
       this._config = this._getConfig(config);
       this._inputElement = null;
-      this._createHiddenInput();
       this._setRoleAttribute();
       this._setInputsAttributes();
+      this._createHiddenInput();
       this._setInputsTabIndexes();
       this._addEventListeners();
     }
@@ -103,13 +104,19 @@
       this._syncFirstInputMaxLength();
       this._setInputsTabIndexes();
     }
+    dispose() {
+      var _this$_inputElement;
+      (_this$_inputElement = this._inputElement) == null || _this$_inputElement.remove();
+      super.dispose();
+    }
     reset() {
       const inputs = this._getInputs();
       for (const [index, input] of inputs.entries()) {
-        const valueString = String(this._config.value || '');
+        var _this$_config$value;
+        const valueString = String((_this$_config$value = this._config.value) != null ? _this$_config$value : '');
         input.value = valueString && valueString[index] ? valueString[index] : '';
       }
-      this._setHiddenInputValue(null);
+      this._setHiddenInputValue(this._readSlots() || null);
       this._syncFirstInputMaxLength();
       this._setInputsTabIndexes();
     }
@@ -130,6 +137,15 @@
 
     // Private
     _addEventListeners() {
+      EventHandler.on(this._element, EVENT_BEFORE_INPUT, SELECTOR_FORM_OTP_CONTROL, event => {
+        const {
+          data,
+          inputType
+        } = event;
+        if (inputType === 'insertText' && data && data.length === 1 && !this._isValidInput(data)) {
+          event.preventDefault();
+        }
+      });
       EventHandler.on(this._element, EVENT_FOCUS, SELECTOR_FORM_OTP_CONTROL, event => {
         const {
           target
@@ -161,27 +177,29 @@
           target.value = '';
           if (chars) {
             this._distributeChars(target, chars);
+            return;
           }
-          return;
         }
         if (target.value.length === 1 && !this._isValidInput(target.value)) {
           target.value = '';
+        }
+        const inputs = this._getInputs();
+        if (!inputs.length) {
           return;
         }
+        const value = inputs.map(input => input.value).join('');
+        if (value !== (this._inputElement ? this._inputElement.value : '')) {
+          this._setHiddenInputValue(value);
+        }
         if (target.value.length === 1) {
-          const inputs = this._getInputs();
-          if (!inputs.length) {
-            return;
-          }
-          const currentValue = inputs.map(input => input.value).join('');
-          this._setHiddenInputValue(currentValue);
           const nextInput = index_js.getNextActiveElement(inputs, target, true);
           if (nextInput) {
             nextInput.focus();
           }
-          this._setInputsTabIndexes();
-          this._checkAutoSubmit(inputs);
         }
+        this._setInputsTabIndexes();
+        this._syncFirstInputMaxLength();
+        this._checkAutoSubmit(inputs);
       });
       EventHandler.on(this._element, EVENT_KEYDOWN, SELECTOR_FORM_OTP_CONTROL, event => {
         const {
@@ -194,8 +212,6 @@
             return;
           }
           index_js.getNextActiveElement(inputs, target, false).focus();
-          const currentValue = inputs.map(input => input.value).join('');
-          this._setHiddenInputValue(currentValue);
           this._setInputsTabIndexes();
           return;
         }
@@ -289,6 +305,9 @@
     _getInputs() {
       return SelectorEngine.find(SELECTOR_FORM_OTP_CONTROL, this._element);
     }
+    _readSlots() {
+      return this._extractValidChars(this._getInputs().map(input => input.value).join(''));
+    }
     _createHiddenInput() {
       const hiddenInput = document.createElement('input');
       hiddenInput.type = 'hidden';
@@ -301,7 +320,7 @@
       if (this._config.name) {
         hiddenInput.name = this._config.name;
       }
-      hiddenInput.value = this._config.value || '';
+      hiddenInput.value = this._readSlots();
       this._element.append(hiddenInput);
       this._inputElement = hiddenInput;
     }
@@ -348,6 +367,7 @@
     _setInputsAttributes() {
       const inputs = SelectorEngine.find(SELECTOR_FORM_OTP_CONTROL, this._element);
       for (const [index, input] of inputs.entries()) {
+        var _this$_config$value2;
         input.type = this._config.masked ? 'password' : 'text';
         input.maxLength = 1;
         // Only the first slot advertises the one-time code, so SMS autofill and
@@ -361,9 +381,7 @@
           const placeholder = String(this._config.placeholder);
           input.placeholder = placeholder.length > 1 ? placeholder[index] || '' : placeholder;
         }
-        if (this._config.required !== null) {
-          input.setAttribute('required', true);
-        }
+        input.required = this._config.required;
         switch (this._config.type) {
           case 'number':
             {
@@ -380,16 +398,13 @@
         if (this._config.disabled) {
           input.disabled = true;
         }
-        if (this._config.id) {
+        if (this._config.id && !input.id) {
           input.id = `${this._config.id}-${index}`;
-        }
-        if (this._config.name) {
-          input.name = `${this._config.name}-${index}`;
         }
         if (this._config.readonly) {
           input.readOnly = true;
         }
-        const valueString = String(this._config.value || '');
+        const valueString = String((_this$_config$value2 = this._config.value) != null ? _this$_config$value2 : '');
         if (valueString && valueString[index]) {
           input.value = valueString[index];
         }
@@ -401,10 +416,13 @@
       this._syncFirstInputMaxLength();
     }
     _setInputsTabIndexes() {
+      const inputs = this._getInputs();
       if (!this._config.linear) {
+        for (const input of inputs) {
+          input.removeAttribute('tabindex');
+        }
         return;
       }
-      const inputs = this._getInputs();
       let foundEmpty = false;
       for (const input of inputs) {
         const hasValue = input.value !== '';

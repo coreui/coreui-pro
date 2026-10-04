@@ -1,7 +1,7 @@
 /*!
-  * CoreUI calendar.js v5.27.1 (https://coreui.io)
+  * CoreUI PRO calendar.js v5.28.0 (https://coreui.io)
   * Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
-  * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
+  * License (https://coreui.io/pro/license/)
   */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('./base-component.js'), require('./dom/event-handler.js'), require('./dom/manipulator.js'), require('./dom/selector-engine.js'), require('./util/sanitizer.js'), require('./util/index.js'), require('./util/calendar.js')) :
@@ -186,8 +186,17 @@
       }
       return new Date(Manipulator.getDataAttribute(target, 'date'));
     }
+    _getEventTarget(event) {
+      var _event$target$closest;
+      // When weeks are the unit, the row is the focusable thing — a click then
+      // arrives with no cell above it, and the row stands in for one.
+      return (_event$target$closest = event.target.closest(SELECTOR_CALENDAR_CELL)) != null ? _event$target$closest : event.target.closest(SELECTOR_CALENDAR_ROW);
+    }
     _handleCalendarClick(event) {
-      const target = event.target.closest(SELECTOR_CALENDAR_CELL);
+      const target = this._getEventTarget(event);
+      if (!target) {
+        return;
+      }
       const date = this._getDate(target);
       const cloneDate = new Date(date);
       const index = Manipulator.getDataAttribute(target.closest(SELECTOR_CALENDAR), 'calendar-index');
@@ -287,7 +296,10 @@
       }
     }
     _handleCalendarMouseEnter(event) {
-      const target = event.target.closest(SELECTOR_CALENDAR_CELL);
+      const target = this._getEventTarget(event);
+      if (!target) {
+        return;
+      }
       const date = this._getDate(target);
       if (calendar_js.isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates)) {
         return;
@@ -666,7 +678,7 @@
       this._element.innerHTML = '';
       this._createCalendar();
       if (callback) {
-        setTimeout(callback, 1);
+        callback();
       }
     }
     _updateClassNamesAndAriaLabels() {
@@ -850,7 +862,7 @@
       const isDisabled = calendar_js.isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates);
       const isSelected = calendar_js.isDateSelected(date, this._startDate, this._endDate);
       const isInRange = calendar_js.isDateInRange(date, this._startDate, this._endDate);
-      const isRangeHover = this._hoverDate && (this._selectEndDate ? calendar_js.isYearInRange(date, this._startDate, this._hoverDate) : calendar_js.isYearInRange(date, this._hoverDate, this._endDate));
+      const isRangeHover = this._hoverDate && (this._selectEndDate ? calendar_js.isDateInRange(date, this._startDate, this._hoverDate) : calendar_js.isDateInRange(date, this._hoverDate, this._endDate));
       const classNames = this._classNames({
         [CLASS_NAME_CALENDAR_ROW]: true,
         disabled: isDisabled,

@@ -1,13 +1,13 @@
 /*!
-  * CoreUI date-range-picker.js v5.27.1 (https://coreui.io)
+  * CoreUI PRO date-range-picker.js v5.28.0 (https://coreui.io)
   * Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
-  * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
+  * License (https://coreui.io/pro/license/)
   */
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('@popperjs/core'), require('./base-component.js'), require('./calendar.js'), require('./time-picker.js'), require('./dom/event-handler.js'), require('./dom/manipulator.js'), require('./dom/selector-engine.js'), require('./util/sanitizer.js'), require('./util/index.js'), require('./util/calendar.js'), require('./util/focustrap.js')) :
-  typeof define === 'function' && define.amd ? define(['@popperjs/core', './base-component', './calendar', './time-picker', './dom/event-handler', './dom/manipulator', './dom/selector-engine', './util/sanitizer', './util/index', './util/calendar', './util/focustrap'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.DateRangePicker = factory(global["@popperjs/core"], global.BaseComponent, global.Calendar, global.TimePicker, global.EventHandler, global.Manipulator, global.SelectorEngine, global.Sanitizer, global.Index, global.Calendar, global.Focustrap));
-})(this, (function (Popper, BaseComponent, Calendar, TimePicker, EventHandler, Manipulator, SelectorEngine, sanitizer_js, index_js, calendar_js, FocusTrap) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('@popperjs/core'), require('./base-component.js'), require('./calendar.js'), require('./time-picker.js'), require('./dom/event-handler.js'), require('./dom/manipulator.js'), require('./dom/selector-engine.js'), require('./util/sanitizer.js'), require('./util/index.js'), require('./util/calendar.js'), require('./util/focustrap.js'), require('./util/host.js')) :
+  typeof define === 'function' && define.amd ? define(['@popperjs/core', './base-component', './calendar', './time-picker', './dom/event-handler', './dom/manipulator', './dom/selector-engine', './util/sanitizer', './util/index', './util/calendar', './util/focustrap', './util/host'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.DateRangePicker = factory(global["@popperjs/core"], global.BaseComponent, global.Calendar, global.TimePicker, global.EventHandler, global.Manipulator, global.SelectorEngine, global.Sanitizer, global.Index, global.Calendar, global.Focustrap, global.Host));
+})(this, (function (Popper, BaseComponent, Calendar, TimePicker, EventHandler, Manipulator, SelectorEngine, sanitizer_js, index_js, calendar_js, FocusTrap, host_js) { 'use strict';
 
   function _interopNamespaceDefault(e) {
     const n = Object.create(null, { [Symbol.toStringTag]: { value: 'Module' } });
@@ -55,7 +55,7 @@
   const EVENT_HIDDEN = `hidden${EVENT_KEY}`;
   const EVENT_INPUT = `input${EVENT_KEY}`;
   const EVENT_KEYDOWN = `keydown${EVENT_KEY}`;
-  const EVENT_RESIZE = 'resize';
+  const EVENT_RESIZE = `resize${EVENT_KEY}`;
   const EVENT_SHOW = `show${EVENT_KEY}`;
   const EVENT_SHOWN = `shown${EVENT_KEY}`;
   const EVENT_SUBMIT = 'submit';
@@ -100,9 +100,9 @@
     calendars: 2,
     cancelButton: 'Cancel',
     cancelButtonClasses: ['btn', 'btn-sm', 'btn-ghost-primary'],
+    cleaner: true,
     confirmButton: 'OK',
     confirmButtonClasses: ['btn', 'btn-sm', 'btn-primary'],
-    cleaner: true,
     container: false,
     date: null,
     dayFormat: 'numeric',
@@ -112,15 +112,17 @@
     endName: null,
     firstDayOfWeek: 1,
     footer: false,
+    hours: null,
+    indicator: true,
     inputDateFormat: null,
     inputDateParse: null,
     inputOnChangeDelay: 750,
     inputReadOnly: false,
     invalid: false,
-    indicator: true,
     locale: 'default',
     maxDate: null,
     minDate: null,
+    minutes: true,
     monthFormat: 'short',
     name: null,
     placeholder: ['Start date', 'End date'],
@@ -135,15 +137,16 @@
     required: true,
     sanitize: true,
     sanitizeFn: null,
-    separator: true,
-    size: null,
-    startDate: null,
-    startName: null,
+    seconds: true,
     selectAdjacementDays: false,
     selectEndDate: false,
     selectionType: 'day',
+    separator: true,
     showAdjacementDays: true,
     showWeekNumber: false,
+    size: null,
+    startDate: null,
+    startName: null,
     timepicker: false,
     todayButton: 'Today',
     todayButtonClasses: ['btn', 'btn-sm', 'btn-primary', 'me-auto'],
@@ -168,12 +171,13 @@
     container: '(string|element|boolean)',
     date: '(date|number|string|null)',
     dayFormat: 'string',
-    disabledDates: '(array|date|function|null)',
     disabled: 'boolean',
+    disabledDates: '(array|date|function|null)',
     endDate: '(date|number|string|null)',
     endName: '(string|null)',
     firstDayOfWeek: 'number',
     footer: 'boolean',
+    hours: '(array|function|null)',
     indicator: 'boolean',
     inputDateFormat: '(function|null)',
     inputDateParse: '(function|null)',
@@ -183,6 +187,7 @@
     locale: 'string',
     maxDate: '(date|number|string|null)',
     minDate: '(date|number|string|null)',
+    minutes: '(array|boolean|function)',
     monthFormat: 'string',
     name: '(string|null)',
     placeholder: '(array|string)',
@@ -197,15 +202,16 @@
     required: 'boolean',
     sanitize: 'boolean',
     sanitizeFn: '(null|function)',
-    separator: 'boolean',
-    size: '(string|null)',
-    startDate: '(date|number|string|null)',
-    startName: '(string|null)',
+    seconds: '(array|boolean|function)',
     selectAdjacementDays: 'boolean',
     selectEndDate: 'boolean',
     selectionType: 'string',
+    separator: 'boolean',
     showAdjacementDays: 'boolean',
     showWeekNumber: 'boolean',
+    size: '(string|null)',
+    startDate: '(date|number|string|null)',
+    startName: '(string|null)',
     timepicker: 'boolean',
     todayButton: '(boolean|string)',
     todayButtonClasses: '(array|string)',
@@ -231,7 +237,12 @@
       this._mobile = window.innerWidth < 768;
       this._popper = null;
       this._selectEndDate = this._config.selectEndDate;
+      this._addedClassNames = [];
       this._calendar = null;
+      this._hadToggleAttribute = false;
+      this._onFormSubmit = null;
+      this._onWindowResize = null;
+      this._ownTimePickers = [];
       this._calendars = null;
       this._endInput = null;
       this._endInputTimeout = null;
@@ -297,6 +308,10 @@
       EventHandler.trigger(this._element, EVENT_HIDDEN);
     }
     dispose() {
+      var _this$_startInput;
+      if (!this._element) {
+        return;
+      }
       if (this._popper) {
         this._popper.destroy();
       }
@@ -307,6 +322,24 @@
         clearTimeout(this._endInputTimeout);
       }
       this._focustrap.deactivate();
+      for (const component of [this._calendar, ...this._ownTimePickers]) {
+        if (component) {
+          component.dispose();
+        }
+      }
+      EventHandler.off(this._element, EVENT_KEY);
+      const form = (_this$_startInput = this._startInput) == null ? void 0 : _this$_startInput.form;
+      host_js.restoreHost(this._element, {
+        classNames: [CLASS_NAME_SHOW, ...this._addedClassNames],
+        eventKey: EVENT_KEY,
+        nodes: [this._indicatorElement, this._startInput, this._endInput, this._startPreviewInput, this._endPreviewInput, this._togglerElement, this._calendars, this._menu]
+      });
+      this._addedClassNames = [];
+      this._element.removeAttribute('aria-expanded');
+      if (!this._hadToggleAttribute) {
+        Manipulator.removeDataAttribute(this._element, 'toggle');
+      }
+      this._removeGlobalEventListeners(form);
       super.dispose();
     }
     cancel() {
@@ -348,10 +381,22 @@
     _initializeFocusTrap() {
       return new FocusTrap({
         additionalElement: this._config.container ? this._menu : null,
+        returnFocus: true,
         trapElement: this._element
       });
     }
+    _removeGlobalEventListeners(form = (_this$_startInput2 => (_this$_startInput2 = this._startInput) == null ? void 0 : _this$_startInput2.form)()) {
+      if (form && this._onFormSubmit) {
+        EventHandler.off(form, EVENT_SUBMIT, this._onFormSubmit);
+      }
+      if (this._onWindowResize) {
+        EventHandler.off(window, EVENT_RESIZE, this._onWindowResize);
+      }
+      this._onFormSubmit = null;
+      this._onWindowResize = null;
+    }
     _addEventListeners() {
+      this._removeGlobalEventListeners();
       EventHandler.on(this._indicatorElement, EVENT_CLICK, () => {
         if (!this._config.disabled) {
           this.toggle();
@@ -367,12 +412,13 @@
           this.show();
         }
       });
-      EventHandler.on(this._element, EVENT_KEYDOWN, event => {
-        if (event.key === ESCAPE_KEY) {
-          this.hide();
-          this._startInput.focus();
-        }
-      });
+      for (const element of this._config.container ? [this._element, this._menu] : [this._element]) {
+        EventHandler.on(element, EVENT_KEYDOWN, event => {
+          if (event.key === ESCAPE_KEY) {
+            this.hide();
+          }
+        });
+      }
       EventHandler.on(this._startInput, EVENT_CLICK, () => {
         this._selectEndDate = false;
         this._calendar.update(this._getCalendarConfig());
@@ -404,7 +450,7 @@
           });
         }, this._config.inputOnChangeDelay);
       });
-      EventHandler.on(this._startInput.form, EVENT_SUBMIT, () => {
+      this._onFormSubmit = () => {
         if (this._startInput.form.classList.contains(CLASS_NAME_WAS_VALIDATED)) {
           if (this._config.range && (Number.isNaN(Date.parse(this._startInput.value)) || Number.isNaN(Date.parse(this._endInput.value)))) {
             return this._element.classList.add(CLASS_NAME_IS_INVALID);
@@ -420,7 +466,8 @@
           }
           this._element.classList.add(CLASS_NAME_IS_INVALID);
         }
-      });
+      };
+      EventHandler.on(this._startInput.form, EVENT_SUBMIT, this._onFormSubmit);
       EventHandler.on(this._endInput, EVENT_CLICK, () => {
         this._selectEndDate = true;
         this._calendar.update(this._getCalendarConfig());
@@ -452,9 +499,10 @@
           });
         }, this._config.inputOnChangeDelay);
       });
-      EventHandler.on(window, EVENT_RESIZE, () => {
+      this._onWindowResize = () => {
         this._mobile = window.innerWidth < 768;
-      });
+      };
+      EventHandler.on(window, EVENT_RESIZE, this._onWindowResize);
     }
     _addCalendarEventListeners() {
       for (const calendar of SelectorEngine.find(SELECTOR_CALENDAR, this._menu)) {
@@ -546,21 +594,19 @@
     _getTimePickerConfig(start) {
       return {
         disabled: start ? !this._startDate : !this._endDate,
+        hours: this._config.hours,
         locale: this._config.locale,
+        minutes: this._config.minutes,
+        seconds: this._config.minutes && this._config.seconds,
         time: start ? this._startDate && new Date(this._startDate) : this._endDate && new Date(this._endDate),
         type: 'inline',
         variant: 'select'
       };
     }
     _createDateRangePicker() {
-      this._element.classList.add(CLASS_NAME_DATE_PICKER);
+      this._addedClassNames.push(...host_js.addHostClassNames(this._element, [CLASS_NAME_DATE_PICKER, this._config.size && `date-picker-${this._config.size}`, this._config.disabled && CLASS_NAME_DISABLED, this._config.invalid && CLASS_NAME_IS_INVALID, this._config.valid && CLASS_NAME_IS_VALID]));
+      this._hadToggleAttribute = this._element.hasAttribute('data-coreui-toggle');
       Manipulator.setDataAttribute(this._element, 'toggle', this._config.range ? CLASS_NAME_DATE_RANGE_PICKER : CLASS_NAME_DATE_PICKER);
-      if (this._config.size) {
-        this._element.classList.add(`date-picker-${this._config.size}`);
-      }
-      if (this._config.disabled) {
-        this._element.classList.add(CLASS_NAME_DISABLED);
-      }
       this._element.classList.toggle(CLASS_NAME_IS_INVALID, this._config.invalid);
       this._element.classList.toggle(CLASS_NAME_IS_VALID, this._config.valid);
       this._element.append(this._createDateRangePickerInputGroup());
@@ -709,6 +755,7 @@
           const timePickerStartEl = document.createElement('div');
           timePickerStartEl.classList.add(CLASS_NAME_TIME_PICKER);
           this._timePickerStart = new TimePicker(timePickerStartEl, this._getTimePickerConfig(true));
+          this._ownTimePickers.push(this._timePickerStart);
           this._timepickers.append(timePickerStartEl);
           EventHandler.on(timePickerStartEl, 'timeChange.coreui.time-picker', event => {
             this._changeStartDate(event.date, true);
@@ -717,6 +764,7 @@
           const timePickerEndEl = document.createElement('div');
           timePickerEndEl.classList.add(CLASS_NAME_TIME_PICKER);
           this._timePickerEnd = new TimePicker(timePickerEndEl, this._getTimePickerConfig(false));
+          this._ownTimePickers.push(this._timePickerEnd);
           this._timepickers.append(timePickerEndEl);
           EventHandler.on(timePickerEndEl, 'timeChange.coreui.time-picker', event => {
             this._changeEndDate(event.date, true);
@@ -729,6 +777,7 @@
             const timePickerEl = document.createElement('div');
             timePickerEl.classList.add(CLASS_NAME_TIME_PICKER);
             const _timepicker = new TimePicker(timePickerEl, this._getTimePickerConfig(index === 0));
+            this._ownTimePickers.push(_timepicker);
             if (index === 0) {
               this._timePickerStart = _timepicker;
             } else {
@@ -879,7 +928,7 @@
         return this._config.inputDateParse(str);
       }
       if (this._config.selectionType === 'day') {
-        return calendar_js.getLocalDateFromString(str, this._config.locale, this._config.timepicker);
+        return calendar_js.getLocalDateFromString(str, this._config.locale, this._config.timepicker, this._config.selectionType, this._getTimeFormatOptions());
       }
       return calendar_js.convertToDateObject(str, this._config.selectionType);
     }
@@ -894,7 +943,18 @@
         return date;
       }
       const _date = new Date(date);
-      return this._config.timepicker ? _date.toLocaleString(this._config.locale) : _date.toLocaleDateString(this._config.locale);
+      if (!this._config.timepicker) {
+        return _date.toLocaleDateString(this._config.locale);
+      }
+      return _date.toLocaleString(this._config.locale, {
+        year: 'numeric',
+        month: 'numeric',
+        day: 'numeric',
+        ...this._getTimeFormatOptions()
+      });
+    }
+    _getTimeFormatOptions() {
+      return calendar_js.getTimeFormatOptions(this._config.minutes, this._config.seconds);
     }
     _getButtonClasses(classes) {
       if (typeof classes === 'string') {

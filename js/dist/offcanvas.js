@@ -1,7 +1,7 @@
 /*!
-  * CoreUI offcanvas.js v5.27.1 (https://coreui.io)
+  * CoreUI PRO offcanvas.js v5.28.0 (https://coreui.io)
   * Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
-  * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
+  * License (https://coreui.io/pro/license/)
   */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('./base-component.js'), require('./dom/event-handler.js'), require('./dom/selector-engine.js'), require('./util/backdrop.js'), require('./util/component-functions.js'), require('./util/focustrap.js'), require('./util/index.js'), require('./util/scrollbar.js')) :
@@ -138,6 +138,9 @@
       this._queueCallback(completeCallback, this._element, true);
     }
     dispose() {
+      if (this._isShown && !this._config.scroll) {
+        new ScrollBarHelper().reset();
+      }
       this._backdrop.dispose();
       this._focustrap.deactivate();
       super.dispose();
@@ -211,7 +214,10 @@
     EventHandler.one(target, EVENT_HIDDEN, () => {
       // focus on trigger when it is closed
       if (index_js.isVisible(this)) {
-        this.focus();
+        // Returning focus must not scroll the page back to the trigger.
+        this.focus({
+          preventScroll: true
+        });
       }
     });
 

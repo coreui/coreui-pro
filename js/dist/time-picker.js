@@ -1,13 +1,13 @@
 /*!
-  * CoreUI time-picker.js v5.27.1 (https://coreui.io)
+  * CoreUI PRO time-picker.js v5.28.0 (https://coreui.io)
   * Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
-  * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
+  * License (https://coreui.io/pro/license/)
   */
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('@popperjs/core'), require('./base-component.js'), require('./dom/event-handler.js'), require('./dom/manipulator.js'), require('./dom/selector-engine.js'), require('./util/index.js'), require('./util/focustrap.js'), require('./util/time.js')) :
-  typeof define === 'function' && define.amd ? define(['@popperjs/core', './base-component', './dom/event-handler', './dom/manipulator', './dom/selector-engine', './util/index', './util/focustrap', './util/time'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.TimePicker = factory(global["@popperjs/core"], global.BaseComponent, global.EventHandler, global.Manipulator, global.SelectorEngine, global.Index, global.Focustrap, global.Time));
-})(this, (function (Popper, BaseComponent, EventHandler, Manipulator, SelectorEngine, index_js, FocusTrap, time_js) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('@popperjs/core'), require('./base-component.js'), require('./dom/event-handler.js'), require('./dom/manipulator.js'), require('./dom/selector-engine.js'), require('./util/index.js'), require('./util/focustrap.js'), require('./util/host.js'), require('./util/time.js')) :
+  typeof define === 'function' && define.amd ? define(['@popperjs/core', './base-component', './dom/event-handler', './dom/manipulator', './dom/selector-engine', './util/index', './util/focustrap', './util/host', './util/time'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.TimePicker = factory(global["@popperjs/core"], global.BaseComponent, global.EventHandler, global.Manipulator, global.SelectorEngine, global.Index, global.Focustrap, global.Host, global.Time));
+})(this, (function (Popper, BaseComponent, EventHandler, Manipulator, SelectorEngine, index_js, FocusTrap, host_js, time_js) { 'use strict';
 
   function _interopNamespaceDefault(e) {
     const n = Object.create(null, { [Symbol.toStringTag]: { value: 'Module' } });
@@ -209,7 +209,9 @@
       this._initialDate = null;
       this._ampm = this._date ? time_js.getAmPm(new Date(this._date), this._config.locale) : 'am';
       this._popper = null;
+      this._addedClassNames = [];
       this._indicatorElement = null;
+      this._onFormSubmit = null;
       this._input = null;
       this._menu = null;
       this._timePickerBody = null;
@@ -266,6 +268,10 @@
       EventHandler.trigger(this._element, EVENT_HIDDEN);
     }
     dispose() {
+      var _this$_input;
+      if (!this._element) {
+        return;
+      }
       if (this._popper) {
         this._popper.destroy();
       }
@@ -273,6 +279,18 @@
         clearTimeout(this._inputTimeout);
       }
       this._focustrap.deactivate();
+      const form = (_this$_input = this._input) == null ? void 0 : _this$_input.form;
+      host_js.restoreHost(this._element, {
+        classNames: [CLASS_NAME_SHOW, ...this._addedClassNames],
+        eventKey: EVENT_KEY,
+        nodes: [this._indicatorElement, this._input, this._togglerElement, this._timePickerBody, this._menu]
+      });
+      this._addedClassNames = [];
+      Manipulator.removeDataAttribute(this._element, 'meridiem');
+      this._element.removeAttribute('aria-expanded');
+      if (form && this._onFormSubmit) {
+        EventHandler.off(form, EVENT_SUBMIT, this._onFormSubmit);
+      }
       super.dispose();
     }
     cancel() {
@@ -310,6 +328,7 @@
     _initializeFocusTrap() {
       return new FocusTrap({
         additionalElement: this._config.container ? this._menu : null,
+        returnFocus: true,
         trapElement: this._element
       });
     }
@@ -417,11 +436,13 @@
           }
         });
       }
-      EventHandler.on(this._element, EVENT_KEYDOWN, event => {
-        if (event.key === ESCAPE_KEY) {
-          this.hide();
-        }
-      });
+      for (const element of this._config.container ? [this._element, this._menu] : [this._element]) {
+        EventHandler.on(element, EVENT_KEYDOWN, event => {
+          if (event.key === ESCAPE_KEY) {
+            this.hide();
+          }
+        });
+      }
       EventHandler.on(this._element, 'timeChange.coreui.time-picker', () => {
         if (this._config.variant === 'roll') {
           this._setUpRolls();
@@ -449,7 +470,7 @@
         }, this._config.inputOnChangeDelay);
       });
       if (this._config.type === 'dropdown') {
-        EventHandler.on(this._input.form, EVENT_SUBMIT, () => {
+        this._onFormSubmit = () => {
           if (this._input.form.classList.contains(CLASS_NAME_WAS_VALIDATED)) {
             if (Number.isNaN(Date.parse(`1970-01-01 ${this._input.value}`))) {
               return this._element.classList.add(CLASS_NAME_IS_INVALID);
@@ -459,19 +480,14 @@
             }
             this._element.classList.add(CLASS_NAME_IS_INVALID);
           }
-        });
+        };
+        EventHandler.on(this._input.form, EVENT_SUBMIT, this._onFormSubmit);
       }
     }
     _createTimePicker() {
-      this._element.classList.add(CLASS_NAME_TIME_PICKER);
+      this._addedClassNames.push(...host_js.addHostClassNames(this._element, [CLASS_NAME_TIME_PICKER, this._config.size && `time-picker-${this._config.size}`, this._config.disabled && CLASS_NAME_DISABLED, this._config.invalid && CLASS_NAME_IS_INVALID, this._config.valid && CLASS_NAME_IS_VALID]));
       Manipulator.setDataAttribute(this._element, 'meridiem', CLASS_NAME_TIME_PICKER);
-      if (this._config.size) {
-        this._element.classList.add(`time-picker-${this._config.size}`);
-      }
       this._element.classList.toggle(CLASS_NAME_IS_VALID, this._config.valid);
-      if (this._config.disabled) {
-        this._element.classList.add(CLASS_NAME_DISABLED);
-      }
       this._element.classList.toggle(CLASS_NAME_IS_INVALID, this._config.invalid);
       if (this._config.type === 'dropdown') {
         this._element.append(this._createTimePickerInputGroup());
@@ -798,12 +814,13 @@
     _configAfterMerge(config) {
       if (config.container === 'dropdown' || config.container === 'inline') {
         config.type = config.container;
+        config.container = false;
       }
       if (config.container === true) {
         config.container = document.body;
       }
-      if (typeof config.container === 'object' || typeof config.container === 'string' && config.container === 'dropdown' && config.container === 'inline') {
-        config.container = index_js.getElement(config.container);
+      if (typeof config.container === 'object' || typeof config.container === 'string') {
+        config.container = index_js.getElement(config.container) || false;
       }
       return config;
     }
