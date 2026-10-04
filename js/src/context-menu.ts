@@ -312,4 +312,3 @@ EventHandler.on(document, EVENT_KEYDOWN_DATA_API, SELECTOR_DATA_TOGGLE, ContextM
 defineJQueryPlugin(ContextMenu)
 
 export default ContextMenu
-export { Default, DefaultType }

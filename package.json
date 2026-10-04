@@ -40,8 +40,8 @@
     "js-compile-plugins": "node build/build-plugins.mjs",
     "js-compile-utils": "node build/build-utils.mjs",
     "js-typecheck": "tsc --noEmit",
-    "js-typecheck-dist": "tsc --project js/tests/types/tsconfig.json",
-    "js-emit-types": "tsc --project build/tsconfig.dts.json",
+    "js-typecheck-dist": "tsc --project js/tests/types/tsconfig.json && tsc --project js/tests/types/tsconfig.node.json",
+    "js-emit-types": "tsc --project build/tsconfig.dts.json && node build/emit-esm-types.mjs",
     "js-lint": "eslint --cache --cache-location .cache/.eslintcache --report-unused-disable-directives",
     "js-minify": "npm-run-all --aggregate-output --parallel js-minify-*",
     "js-minify-standalone": "terser --compress passes=2 --mangle --comments \"/^!/\" --source-map \"content=dist/js/coreui.js.map,includeSources,url=coreui.min.js.map\" --output dist/js/coreui.min.js dist/js/coreui.js",
@@ -89,10 +89,37 @@
       "import": "./dist/js/coreui.esm.js",
       "require": "./dist/js/coreui.js"
     },
-    "./js/src/*.js": "./js/dist/*.js",
+    "./js/src/*.js": {
+      "import": {
+        "types": "./js/dist/*.d.mts",
+        "default": "./js/dist/*.mjs"
+      },
+      "require": {
+        "types": "./js/dist/*.d.ts",
+        "default": "./js/dist/*.js"
+      }
+    },
     "./js/src/*": "./js/src/*",
-    "./js/dist/*.js": "./js/dist/*.js",
-    "./js/dist/*": "./js/dist/*.js",
+    "./js/dist/*.js": {
+      "import": {
+        "types": "./js/dist/*.d.mts",
+        "default": "./js/dist/*.mjs"
+      },
+      "require": {
+        "types": "./js/dist/*.d.ts",
+        "default": "./js/dist/*.js"
+      }
+    },
+    "./js/dist/*": {
+      "import": {
+        "types": "./js/dist/*.d.mts",
+        "default": "./js/dist/*.mjs"
+      },
+      "require": {
+        "types": "./js/dist/*.d.ts",
+        "default": "./js/dist/*.js"
+      }
+    },
     "./dist/js/*": "./dist/js/*",
     "./dist/css/*": "./dist/css/*",
     "./css/base.css": "./dist/css/base.css",
@@ -101,24 +128,44 @@
     "./css/*": "./dist/css/*",
     "./scss/*": "./scss/*",
     "./utils/calendar": {
-      "types": "./js/dist/util/calendar.d.ts",
-      "import": "./js/dist/util/calendar.mjs",
-      "require": "./js/dist/util/calendar.js"
+      "import": {
+        "types": "./js/dist/util/calendar.d.mts",
+        "default": "./js/dist/util/calendar.mjs"
+      },
+      "require": {
+        "types": "./js/dist/util/calendar.d.ts",
+        "default": "./js/dist/util/calendar.js"
+      }
     },
     "./utils/date-sections": {
-      "types": "./js/dist/util/date-sections.d.ts",
-      "import": "./js/dist/util/date-sections.mjs",
-      "require": "./js/dist/util/date-sections.js"
+      "import": {
+        "types": "./js/dist/util/date-sections.d.mts",
+        "default": "./js/dist/util/date-sections.mjs"
+      },
+      "require": {
+        "types": "./js/dist/util/date-sections.d.ts",
+        "default": "./js/dist/util/date-sections.js"
+      }
     },
     "./utils/range": {
-      "types": "./js/dist/util/range.d.ts",
-      "import": "./js/dist/util/range.mjs",
-      "require": "./js/dist/util/range.js"
+      "import": {
+        "types": "./js/dist/util/range.d.mts",
+        "default": "./js/dist/util/range.mjs"
+      },
+      "require": {
+        "types": "./js/dist/util/range.d.ts",
+        "default": "./js/dist/util/range.js"
+      }
     },
     "./utils/time": {
-      "types": "./js/dist/util/time.d.ts",
-      "import": "./js/dist/util/time.mjs",
-      "require": "./js/dist/util/time.js"
+      "import": {
+        "types": "./js/dist/util/time.d.mts",
+        "default": "./js/dist/util/time.mjs"
+      },
+      "require": {
+        "types": "./js/dist/util/time.d.ts",
+        "default": "./js/dist/util/time.js"
+      }
     },
     "./package.json": "./package.json"
   },
@@ -127,6 +174,7 @@
     "**/*.scss",
     "./js/src/*.ts",
     "./js/dist/*.js",
+    "./js/dist/*.mjs",
     "./dist/js/*.js"
   ],
   "style": "dist/css/coreui.css",
@@ -196,7 +244,7 @@
     "dist/{css,js}/**/*.{css,js,map}",
     "dist/css/components/classes.json",
     "dist/css/components/manifest.json",
-    "js/dist/**/*.{js,mjs,map,d.ts}",
+    "js/dist/**/*.{js,mjs,map,d.ts,d.mts}",
     "js/src/**/*.ts",
     "scss/**/*.scss",
     "!scss/tests/**",

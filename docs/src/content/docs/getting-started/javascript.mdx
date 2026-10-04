@@ -31,11 +31,11 @@ Curious which components explicitly require our JavaScript and [Floating UI](htt
 
 Plugins can be included individually (using CoreUI's individual `js/dist/*.js`), or all at once using `coreui.js` or the minified `coreui.min.js` (don't include both).
 
-If you use a bundler (Webpack, Rollup...), you can use `/js/dist/*.js` files which are UMD ready.
+If you use a bundler (Webpack, Rollup...), import the individual plugins from `@coreui/coreui-pro/js/dist/*`: an `import` resolves to the ES module next to each plugin (`js/dist/*.mjs`), a `require()` to its UMD file (`js/dist/*.js`).
 
 ## TypeScript
 
-Our plugins are authored in TypeScript and ship with type declarations — no `@types/…` package is needed. The main entry point and every individual plugin under `js/dist/*.js` come with their own `.d.ts`:
+Our plugins are authored in TypeScript and ship with type declarations — no `@types/…` package is needed. The main entry point and every individual plugin under `js/dist/` come with their own declarations, `.d.ts` for the UMD files and `.d.mts` for the ES modules:
 
 ```ts
 import { Tooltip } from '@coreui/coreui-pro'
@@ -109,7 +109,7 @@ To fix this, use an [import map](https://developer.mozilla.org/en-US/docs/Web/HT
 </html>
 ```
 
-The map is needed whatever you import. `coreui.esm.js` is the only build we ship as an ES module and it imports Floating UI at the top, so the specifier has to resolve even for a component that never positions anything. The per-component files under `js/dist/` are UMD — load them with a plain `<script>`, not `<script type="module">`.
+The map is needed whatever you import. `coreui.esm.js` imports Floating UI at the top, so the specifier has to resolve even for a component that never positions anything. Of the per-component files under `js/dist/`, the `*.js` ones are UMD — load them with a plain `<script>`, not `<script type="module">`; the `*.mjs` ones are the ES modules a bundler picks up.
 
 ## Dependencies
 
