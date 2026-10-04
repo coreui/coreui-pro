@@ -217,4 +217,3 @@ EventHandler.on(document, EVENT_CLICK_DATA_API, Dropdown.SELECTOR_DATA_TOGGLE, f
 defineJQueryPlugin(Dropdown)
 
 export default Dropdown
-export { Default, DefaultType }

@@ -173,13 +173,17 @@ shipped types cannot drift from the code.
 
 The package used to ship `js/src/**/*.js`; it now ships `js/src/**/*.ts`. The
 documented per-plugin path is unaffected — **`js/dist/*.js` still ships,
-unchanged and UMD-ready**, and that is what the [Webpack](/guides/webpack/),
+UMD-ready**, and that is what the [Webpack](/guides/webpack/),
 [Vite](/guides/vite/) and [Parcel](/guides/parcel/)
 guides tell you to import:
 
 ```js
 import Alert from '@coreui/coreui-pro/js/dist/alert'
 ```
+
+A bundler that reads the package's `exports` now resolves that `import` to
+the ES module next to the UMD file, `js/dist/alert.mjs`; a `require()` still
+gets `js/dist/alert.js`.
 
 Only imports that reached into the raw sources are affected:
 
@@ -190,7 +194,8 @@ Only imports that reached into the raw sources are affected:
 
 If your toolchain compiles TypeScript, you can import `js/src/*.ts` directly and
 get types and tree-shaking together. The per-plugin files are typed as well —
-`js/dist/alert.js` ships next to `js/dist/alert.d.ts`.
+`js/dist/alert.js` ships next to `js/dist/alert.d.ts`, and `js/dist/alert.mjs`
+next to `js/dist/alert.d.mts`.
 
 #### `js/index.esm.js` and `js/index.umd.js` are no longer published
 
