@@ -59,6 +59,20 @@ description: "Track and review changes to the CoreUI for Bootstrap source files,
   build and `$enable-ltr: false` an RTL-only one, so nothing that was possible
   before stops being possible.
 
+- **The Bootstrap theme and the Bootstrap-compatible JavaScript are gone.**
+  <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  `dist/css/themes/bootstrap/bootstrap.css`, `dist/js/bootstrap.js`,
+  `bootstrap.bundle.js` and `bootstrap.esm.js` no longer ship, with their
+  minified twins, source maps and SRI hashes, and neither does
+  `scss/themes/bootstrap/bootstrap.scss`. The two halves no longer agreed in
+  v6: the JavaScript wrote `data-bs-*` attributes and `--bs-*` properties
+  where the stylesheet still read `data-coreui-*` and `--cui-*` ones.
+
+  **What to change:** load `coreui.min.css` and `coreui.bundle.min.js` (or
+  `coreui.min.js`), write `data-coreui-*` attributes, listen for
+  `*.coreui.*` events, reach the plugins through `coreui` instead of
+  `bootstrap`, and set `--cui-*` properties instead of `--bs-*`.
+
 - **`dist/css` gained `base.css` and a stylesheet per component.**
   `base.css` holds the `:root` tokens and Reboot; `css/components/` holds one
   file per component plus `manifest.json`, which records each file's load order
@@ -3878,9 +3892,7 @@ it at the colour's slots, so nothing is defined in a file that never renders it.
   recoloured to a light background kept near-white text. It reads the
   `contrast` slot now. Against the default primary that lifts the ratio from
   **4.71** to **5.65**, and it matches `.text-bg-primary`, which already used
-  the slot — the two whites in the library are one white again. Our own
-  Bootstrap theme was already overriding the pair to pure white, so it renders
-  as before.
+  the slot — the two whites in the library are one white again.
 - **Override the colour, not the pair.** Set `$primary` (or
   `--cui-primary-500` at runtime) to move every active state at once, or the
   component's own knob to move one. Per instance, `.theme-*` still wins where a
@@ -4486,8 +4498,7 @@ pair, and `[data#{$data-infix}theme="dark"]` only declares `color-scheme: dark`.
   colour — the weakest pair goes from 6.03:1 to 7.57:1.
 - **The dark grey palette is gone**: `$gray-100-dark` … `$gray-900-dark` and the
   `$grays-dark` map. Every one of them was defined as exactly its light
-  counterpart, so they generated nothing — read `$gray-*` directly. The bundled
-  Bootstrap theme no longer passes `$grays-dark: ()` through its `with()` block.
+  counterpart, so they generated nothing — read `$gray-*` directly.
 - **`$theme-colors-dark` is gone**, along with `$theme-colors-fg-emphasis-dark`,
   `$theme-colors-bg-subtle-dark`, `$theme-colors-border-dark` and
   `$theme-colors-contrast-dark`, and the eight `$primary-dark` … `$dark-dark`
@@ -4590,9 +4601,7 @@ Two consequences for the tokens:
   `$body-secondary-color`, `$body-secondary-bg`, `$body-tertiary-color` and
   `$body-tertiary-bg`; every entry holds one `light-dark()` expression, so
   `$body-bg-dark` and `$body-tertiary-bg-dark` are gone too — the translucent
-  tints that needed their Sass colors read the grays inline, which also means
-  the bundled Bootstrap theme recomputes them from its own grays instead of
-  forwarding frozen copies.
+  tints that needed their Sass colors read the grays inline.
 
 #### `light` and `dark` are replaced by `inverse`
 

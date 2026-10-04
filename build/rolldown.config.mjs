@@ -1,29 +1,18 @@
 import path from 'node:path'
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
-import replace from '@rollup/plugin-replace'
 import banner from './banner.mjs'
 import browserTargets from './browser-targets.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const BUNDLE = process.env.BUNDLE === 'true'
-const BOOTSTRAP = process.env.BOOTSTRAP === 'true'
 const ESM = process.env.ESM === 'true'
 
-let destinationFile = BOOTSTRAP ? `bootstrap${ESM ? '.esm' : ''}` : `coreui${ESM ? '.esm' : ''}`
+let destinationFile = `coreui${ESM ? '.esm' : ''}`
 const external = ['@floating-ui/core', '@floating-ui/dom']
 const plugins = [
-  BOOTSTRAP && replace({
-    preventAssignment: false,
-    delimiters: ['', ''],
-    '/coreui': '/coreui', // prevents changes in URLs
-    coreui: 'bs',
-    '-coreui': '-bs',
-    'coreui=': 'bs=', // [data-coreui="navigation"] => [data-bs="navigation"] (workaround for `preventAssignment` being true),
-    '--cui-': '--bs-'
-  }),
-  !ESM && !BOOTSTRAP && {
+  !ESM && {
     name: 'adopt-coreui-global',
     generateBundle(options, bundle) {
       const assignment = 'factory(global.coreui = {}'
@@ -73,7 +62,7 @@ const rolldownConfig = {
 }
 
 if (!ESM) {
-  rolldownConfig.output.name = BOOTSTRAP ? 'bootstrap' : 'coreui'
+  rolldownConfig.output.name = 'coreui'
 }
 
 export default rolldownConfig
