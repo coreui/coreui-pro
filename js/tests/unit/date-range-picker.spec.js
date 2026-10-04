@@ -76,6 +76,19 @@ describe('DateRangePicker', () => {
       }
     })
 
+    it('should fall back to the end labels the page set on the picker when the option is empty', () => {
+      const pickerLabel = DateRangePicker.Default.ariaStartLabel
+      DateRangePicker.Default.ariaStartLabel = 'Od'
+
+      try {
+        buildPicker({ ariaStartLabel: '', locale: 'en-US' })
+
+        expect(fixtureEl.querySelector('#picker .form-date-time').getAttribute('aria-label')).toEqual('Od')
+      } finally {
+        DateRangePicker.Default.ariaStartLabel = pickerLabel
+      }
+    })
+
     it('should keep a global field default the picker leaves alone', () => {
       const fieldLabel = DateRangeInput.Default.ariaStartLabel
       DateRangeInput.Default.ariaStartLabel = 'Początek'

@@ -1913,6 +1913,25 @@ describe('DatePicker', () => {
       }
     })
 
+    it('should fall back to the section labels the page set on the picker when the option is empty', () => {
+      DatePicker.Default.ariaDayLabel = 'Dzień'
+
+      try {
+        buildPicker({ ariaDayLabel: '', format: 'dd.MM.yyyy', locale: 'en-US' })
+
+        expect(fixtureEl.querySelector('[data-coreui-section="day"]').getAttribute('aria-label')).toEqual('Dzień')
+      } finally {
+        delete DatePicker.Default.ariaDayLabel
+      }
+    })
+
+    it('should pass an empty description label to the calendar, which leaves the grid undescribed', () => {
+      const picker = buildPicker({ ariaNothingToPickLabel: '', disabledDates: () => true, locale: 'en-US' })
+      picker.show()
+
+      expect(fixtureEl.querySelector('.date-picker-popup table').hasAttribute('aria-describedby')).toBeFalse()
+    })
+
     it('should give an adopted toggle the same wording as a generated one', () => {
       buildPicker({ timepicker: true, locale: 'en-US' }, '<div id="picker"><button data-coreui-picker-toggle></button></div>')
 

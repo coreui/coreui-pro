@@ -183,6 +183,18 @@ describe('TimePicker', () => {
       }
     })
 
+    it('should fall back to the section labels the page set on the picker when the option is empty', () => {
+      TimePicker.Default.ariaHourLabel = 'Godzina'
+
+      try {
+        buildPicker({ ariaHourLabel: '', locale: 'en-GB' })
+
+        expect(fixtureEl.querySelector('[data-coreui-section="hour"]').getAttribute('aria-label')).toEqual('Godzina')
+      } finally {
+        delete TimePicker.Default.ariaHourLabel
+      }
+    })
+
     it('should ignore a variant passed through the config', () => {
       const picker = buildPicker({ variant: 'select' })
       picker.show()

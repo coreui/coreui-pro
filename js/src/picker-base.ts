@@ -8,10 +8,11 @@
 import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
-import Popup from './util/popup.js'
+import { getForwardedOptions } from './util/composite.js'
 import type { ComponentConfig } from './util/config.js'
 import { createControlGroupAction, type HostClasses, restoreHostClasses } from './util/form-control-group.js'
 import { getUID } from './util/index.js'
+import Popup from './util/popup.js'
 import { sanitizeByConfig } from './util/sanitizer.js'
 
 /**
@@ -176,14 +177,7 @@ abstract class PickerBase extends BaseComponent {
   }
 
   _forwardConfig(Component: any, overrides: Record<string, any> = {}, extra: Record<string, any> = {}): Record<string, any> {
-    const forwarded: Record<string, any> = {}
-    const original = this._originalDefault()
-
-    for (const key of Object.keys(Component.Default)) {
-      if (key in this._config && this._config[key] !== original[key]) {
-        forwarded[key] = this._config[key]
-      }
-    }
+    const forwarded = getForwardedOptions(Object.keys(Component.Default), this._config, this.constructor.Default, this._originalDefault())
 
     return { ...forwarded, ...overrides, ...extra }
   }
