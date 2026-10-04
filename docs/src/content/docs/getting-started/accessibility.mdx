@@ -40,6 +40,26 @@ For visually hidden interactive controls, such as traditional "skip" links, use 
 <a class="visually-hidden-focusable" href="#content">Skip to main content</a>
 ```
 
+### Announcing messages
+
+`announce()` reads a short message to screen reader users without moving focus, for a change the page shows but does not focus, such as a saved form or a filtered list. The Toaster announces every toast through it.
+
+```js
+import { announce } from '@coreui/coreui-pro'
+
+announce('3 results')
+announce('The connection was lost', { priority: 'assertive' })
+```
+
+The first call adds a visually hidden live region at the start of `<body>`, and every call adds a message of its own to it, so messages sent together are each read and the same text is read again. While a modal dialog is open, the rest of the page is inert and screen readers ignore it, so the message goes to a region inside the topmost open modal dialog, which leaves with the dialog when it closes. A message sent right before a modal dialog closes is lost with it: announce the outcome of a dialog after it has closed.
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `priority` | `'polite'` \| `'assertive'` | `'polite'` | `'polite'` waits until the screen reader is idle, `'assertive'` interrupts; keep it for the few messages that cannot wait. |
+| `timeout` | number | `7000` | Time (ms) the message stays in the region. |
+
+`announce()` returns a function that removes the message, or cancels it before it is read, for a status that a newer one replaces. The bundle exposes it as `coreui.announce()`, and `@coreui/coreui-pro/utils/announce` loads it on its own.
+
 ### Reduced motion
 
 CoreUI for Bootstrap includes support for the [`prefers-reduced-motion` media feature](https://www.w3.org/TR/mediaqueries-5/#prefers-reduced-motion). In browsers/environments that allow the user to specify their preference for reduced motion, most CSS transition effects in CoreUI for Bootstrap (for instance, when a modal dialog is opened or closed, or the sliding animation in carousels) will be disabled, and meaningful animations (such as spinners) will be slowed down.

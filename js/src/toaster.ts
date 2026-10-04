@@ -8,6 +8,7 @@
 import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import Toast, { type ToastConfig } from './toast.js'
+import { announce } from './util/announce.js'
 import type { TemplateContentEntry } from './util/template-factory.js'
 import { DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList } from './util/sanitizer.js'
 import {
@@ -34,7 +35,6 @@ const EVENT_HIDDEN_TOAST = 'hidden.coreui.toast'
 
 const CLASS_NAME_CONTAINER = 'toast-container'
 const CLASS_NAME_STACK = 'toast-container-stack'
-const CLASS_NAME_ANNOUNCER = 'toast-announcer'
 const CLASS_NAME_INSTANT = 'toast-instant'
 const CLASS_NAME_SHOW = 'show'
 const CLASS_NAME_TRANSLUCENT = 'toast-translucent'
@@ -55,7 +55,6 @@ const ATTRIBUTE_UPDATE_KEY = 'data-coreui-update-key'
 const PROPERTY_STACK_INDEX = '--cui-toast-stack-index'
 const STACK_VISIBLE = 3
 const GLIDE_ID = 'coreui.toaster.glide'
-const MESSAGE_DURATION = 7000
 
 const PROPERTY_STACK_BEFORE = '--cui-toast-stack-before'
 const PROPERTY_STACK_COUNT = '--cui-toast-stack-count'
@@ -232,8 +231,7 @@ class Toaster extends BaseComponent {
   protected declare _ownsContainer: boolean
   protected declare _resizeObserver: ResizeObserver | null
   protected declare _order: number
-  protected declare _announcers: Record<'high' | 'low', HTMLElement>
-  protected declare _announcements: Map<HTMLElement, HTMLElement>
+  protected declare _announcements: Map<HTMLElement, () => void>
 
   constructor(element?: string | Element | null, config?: Partial<ToasterConfig> | null) {
     const ownsContainer = !getElement(element)
@@ -272,10 +270,6 @@ class Toaster extends BaseComponent {
     }
 
     this._announcements = new Map()
-    this._announcers = {
-      high: this._createAnnouncer('assertive'),
-      low: this._createAnnouncer('polite')
-    }
 
     if (this._config.pauseOnHover) {
       EventHandler.on(this._element, EVENT_MOUSEOVER, () => this.pause())
@@ -462,8 +456,6 @@ class Toaster extends BaseComponent {
 
     this._entries.clear()
     this._resizeObserver?.disconnect()
-    this._announcers.high.remove()
-    this._announcers.low.remove()
 
     if (this._ownsContainer) {
       this._element.remove()
@@ -550,7 +542,7 @@ class Toaster extends BaseComponent {
 
     this._entries.delete(entry.toast.id)
     EventHandler.off(entry.toast.element, EVENT_KEY)
-    this._announcements.get(entry.toast.element)?.remove()
+    this._announcements.get(entry.toast.element)?.()
     this._announcements.delete(entry.toast.element)
     // A toast replaced from its own onClose is still inside Toast#hide()
     queueMicrotask(() => entry.instance.dispose())
@@ -656,45 +648,19 @@ class Toaster extends BaseComponent {
     this._element.style.setProperty(PROPERTY_STACK_HEIGHTS, `${before}px`)
   }
 
-  _createAnnouncer(live: string): HTMLElement {
-    const announcer = document.createElement('div')
-    announcer.className = CLASS_NAME_ANNOUNCER
-    announcer.setAttribute('role', 'log')
-    announcer.setAttribute('aria-live', live)
-    announcer.setAttribute('aria-relevant', 'additions')
-    this._element.append(announcer)
-    return announcer
-  }
-
   _announce(toast: ToastObject): void {
-    const announcer = this._announcers[toast.priority === 'high' ? 'high' : 'low']
     const text = [toast.title, toast.description]
       .map(part => execute(part, [undefined, this]) as string | Element | null | undefined)
       .map(part => (isElement(part) ? part.textContent : part))
       .filter(Boolean)
       .join('. ')
 
-    this._announcements.get(toast.element)?.remove()
+    this._announcements.get(toast.element)?.()
     this._announcements.delete(toast.element)
 
-    if (!text) {
-      return
+    if (text) {
+      this._announcements.set(toast.element, announce(text, { priority: toast.priority === 'high' ? 'assertive' : 'polite' }))
     }
-
-    const message = document.createElement('div')
-    message.textContent = text
-    this._announcements.set(toast.element, message)
-    requestAnimationFrame(() => {
-      if (this._announcements?.get(toast.element) === message) {
-        announcer.append(message)
-      }
-    })
-    setTimeout(() => {
-      message.remove()
-      if (this._announcements?.get(toast.element) === message) {
-        this._announcements.delete(toast.element)
-      }
-    }, MESSAGE_DURATION)
   }
 
   _onLeave(event: any): void {

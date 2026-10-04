@@ -136,6 +136,16 @@
     "./css/components/*": "./dist/css/components/*",
     "./css/*": "./dist/css/*",
     "./scss/*": "./scss/*",
+    "./utils/announce": {
+      "import": {
+        "types": "./js/dist/util/announce.d.mts",
+        "default": "./js/dist/util/announce.mjs"
+      },
+      "require": {
+        "types": "./js/dist/util/announce.d.ts",
+        "default": "./js/dist/util/announce.js"
+      }
+    },
     "./utils/calendar": {
       "import": {
         "types": "./js/dist/util/calendar.d.mts",

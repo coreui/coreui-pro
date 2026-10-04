@@ -17,10 +17,20 @@ describe('Toaster', () => {
 
     toaster = null
     clearFixture()
+
+    for (const announcer of document.querySelectorAll('[data-coreui-live-announcer]')) {
+      announcer.remove()
+    }
   })
 
   const hidden = element => new Promise(resolve => {
     element.addEventListener('hidden.coreui.toast', () => resolve(), { once: true })
+  })
+
+  const region = (priority = 'polite', host = document.body) => host.querySelector(`:scope > [data-coreui-live-announcer] > [aria-live="${priority}"]`)
+  const messages = (priority, host) => [...(region(priority, host)?.children ?? [])].map(message => message.textContent)
+  const announced = () => new Promise(resolve => {
+    setTimeout(resolve, 150)
   })
 
   describe('VERSION', () => {
@@ -153,99 +163,116 @@ describe('Toaster', () => {
       expect([...closeButtons].map(button => button.getAttribute('aria-label'))).toEqual(['Zamknij', 'Zamknij'])
     })
 
-    it('should announce the title and description through a live region by priority', async () => {
+    it('should announce the title and description through the live regions of the page by priority', async () => {
       toaster = new Toaster(null, { container: fixtureEl })
-      const status = fixtureEl.querySelector('.toast-announcer[aria-live="polite"]')
-      const alert = fixtureEl.querySelector('.toast-announcer[aria-live="assertive"]')
-      for (const region of [status, alert]) {
-        expect(region.getAttribute('role')).toEqual('log')
-        expect(region.getAttribute('aria-relevant')).toEqual('additions')
-      }
 
       toaster.add({ title: 'Saved', description: 'Done', instant: true })
       toaster.add({ description: 'Failed', priority: 'high', instant: true })
-      await new Promise(resolve => {
-        requestAnimationFrame(() => requestAnimationFrame(resolve))
-      })
+      await announced()
 
-      expect(status.textContent).toEqual('Saved. Done')
-      expect(alert.textContent).toEqual('Failed')
+      expect(messages('polite')).toEqual(['Saved. Done'])
+      expect(messages('assertive')).toEqual(['Failed'])
+      expect(fixtureEl.querySelector('[aria-live]')).toBeNull()
       expect(fixtureEl.querySelector('.toast').hasAttribute('role')).toBeFalse()
     })
 
     it('should announce every toast added at once', async () => {
       toaster = new Toaster(null, { container: fixtureEl, limit: 0 })
-      const status = fixtureEl.querySelector('.toast-announcer[aria-live="polite"]')
 
       toaster.add({ description: 'Row 1 saved', instant: true })
       toaster.add({ description: 'Row 2 saved', instant: true })
       toaster.add({ description: 'Row 3 saved', instant: true })
-      await new Promise(resolve => {
-        requestAnimationFrame(() => requestAnimationFrame(resolve))
-      })
+      await announced()
 
-      expect([...status.children].map(message => message.textContent)).toEqual(['Row 1 saved', 'Row 2 saved', 'Row 3 saved'])
+      expect(messages('polite')).toEqual(['Row 1 saved', 'Row 2 saved', 'Row 3 saved'])
     })
 
     it('should replace the announcement of an updated toast and drop it on removal', async () => {
       toaster = new Toaster(null, { container: fixtureEl })
-      const status = fixtureEl.querySelector('.toast-announcer[aria-live="polite"]')
-      const frames = () => new Promise(resolve => {
-        requestAnimationFrame(() => requestAnimationFrame(resolve))
-      })
 
       const id = toaster.add({ description: 'Uploading', instant: true })
-      await frames()
+      await announced()
       toaster.update(id, { description: 'Uploaded' })
-      await frames()
+      await announced()
 
-      expect([...status.children].map(message => message.textContent)).toEqual(['Uploaded'])
+      expect(messages('polite')).toEqual(['Uploaded'])
 
       const removed = hidden(fixtureEl.querySelector('.toast'))
       toaster.close(id)
       await removed
 
-      expect(status.children).toHaveSize(0)
+      expect(messages('polite')).toEqual([])
+    })
+
+    it('should announce only the update of a toast updated before its message was read', async () => {
+      toaster = new Toaster(null, { container: fixtureEl })
+
+      const id = toaster.add({ description: 'Uploading', instant: true })
+      toaster.update(id, { description: 'Uploaded' })
+      await announced()
+
+      expect(messages('polite')).toEqual(['Uploaded'])
     })
 
     it('should announce an update as a new message so a repeat is read again', async () => {
       toaster = new Toaster(null, { container: fixtureEl })
-      const status = fixtureEl.querySelector('.toast-announcer[aria-live="polite"]')
-      const frames = () => new Promise(resolve => {
-        requestAnimationFrame(() => requestAnimationFrame(resolve))
-      })
 
       const id = toaster.add({ description: 'Uploading', instant: true })
-      await frames()
-      const first = status.firstElementChild
+      await announced()
+      const first = region().firstElementChild
       toaster.update(id, { description: 'Uploading' })
-      await frames()
+      await announced()
 
-      expect(status.children).toHaveSize(1)
-      expect(status.firstElementChild).not.toBe(first)
-      expect(status.textContent).toEqual('Uploading')
+      expect(messages('polite')).toEqual(['Uploading'])
+      expect(region().firstElementChild).not.toBe(first)
     })
 
-    it('should drop a message from the region seven seconds after it was announced', async () => {
-      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
+    it('should drop a message from the region seven seconds after it was announced', () => {
+      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'Date'] })
       toaster = new Toaster(null, { container: fixtureEl, timeout: 0 })
-      const status = fixtureEl.querySelector('.toast-announcer[aria-live="polite"]')
 
       try {
         toaster.add({ description: 'Saved', instant: true })
-        await new Promise(resolve => {
-          requestAnimationFrame(() => requestAnimationFrame(resolve))
-        })
-        expect(status.textContent).toEqual('Saved')
+        vi.advanceTimersByTime(100)
+        expect(messages('polite')).toEqual(['Saved'])
 
-        vi.advanceTimersByTime(6999)
-        expect(status.textContent).toEqual('Saved')
+        vi.advanceTimersByTime(6899)
+        expect(messages('polite')).toEqual(['Saved'])
 
         vi.advanceTimersByTime(1)
-        expect(status.children).toHaveSize(0)
+        expect(messages('polite')).toEqual([])
         expect(fixtureEl.querySelectorAll('.toast')).toHaveSize(1)
       } finally {
         vi.useRealTimers()
+      }
+    })
+
+    it('should announce a toast once, even when the toaster is disposed right after adding it', async () => {
+      toaster = new Toaster(null, { container: fixtureEl })
+
+      toaster.add({ description: 'Saved', instant: true })
+      toaster.dispose()
+      toaster = new Toaster(null, { container: fixtureEl })
+      await announced()
+
+      expect(messages('polite')).toEqual(['Saved'])
+    })
+
+    it('should announce inside an open modal dialog, which leaves the toaster inert', async () => {
+      const dialog = document.createElement('dialog')
+      dialog.innerHTML = '<button type="button">Close</button>'
+      fixtureEl.append(dialog)
+      toaster = new Toaster()
+      dialog.showModal()
+
+      try {
+        toaster.add({ description: 'Saved', instant: true })
+        await announced()
+
+        expect(messages('polite', dialog)).toEqual(['Saved'])
+        expect(messages('polite')).toEqual([])
+      } finally {
+        dialog.close()
       }
     })
 
