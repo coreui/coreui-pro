@@ -6,6 +6,8 @@ export type AnnounceOptions = {
   timeout?: number
 }
 
+type Moment = [time: number, clock: () => number]
+
 type Message = {
   context: Element | null
   node: HTMLElement
@@ -33,8 +35,8 @@ const VISUALLY_HIDDEN: Partial<CSSStyleDeclaration> = {
   width: '1px'
 }
 
-const holds = new WeakMap<Element, number>()
-const readyAt = new WeakMap<Element, number>()
+const holds = new WeakMap<Element, Moment>()
+const readyAt = new WeakMap<Element, Moment>()
 const pending: Message[] = []
 
 /**
@@ -59,38 +61,28 @@ const getModal = (context: Element | null): HTMLDialogElement | null => {
 }
 
 /**
- * Tells when new regions of a host can take a message: 100 ms from now, or later while a dialog
- * that closed less than 500 ms ago holds the host. A hold further away than that comes from
- * another clock, such as a test's, and is ignored.
+ * Reads a stored time when it was taken on the clock in use now. A time from another clock, such
+ * as a test's fake timers, counts as long past.
  *
- * @param host - `document.body` or an open modal dialog
- * @returns The time, on the `performance.now()` clock, the first message can be added
+ * @param times - The ready times of regions or the holds of hosts
+ * @param element - The element the time belongs to
+ * @returns The time on the `performance.now()` clock, `0` when there is none
  */
-const getReadyTime = (host: HTMLElement): number => {
-  const now = performance.now()
-  const hold = holds.get(host) ?? 0
+const readTime = (times: WeakMap<Element, Moment>, element: Element): number => {
+  const [time, clock] = times.get(element) ?? [0, null]
 
-  return Math.max(now + FIRST_MESSAGE_DELAY, hold - now <= CLOSE_DELAY ? hold : 0)
+  return clock === performance.now ? time : 0
 }
 
 /**
- * Tells how long a region still needs before it takes a message. A wait longer than any hold
- * comes from another clock, such as a test's, and ends now.
+ * Tells when new regions of a host can take a message: 100 ms from now, or later while a dialog
+ * that closed less than 500 ms ago holds the host.
  *
- * @param announcer - The element holding the regions
- * @returns The wait in milliseconds, `0` or less when the region is ready
+ * @param host - `document.body` or an open modal dialog
+ * @returns The ready time with the clock it was read from
  */
-const getWait = (announcer: Element): number => {
-  const now = performance.now()
-  const wait = readyAt.get(announcer)! - now
-
-  if (wait > CLOSE_DELAY) {
-    readyAt.set(announcer, now)
-    return 0
-  }
-
-  return wait
-}
+const getReadyTime = (host: HTMLElement): Moment =>
+  [Math.max(performance.now() + FIRST_MESSAGE_DELAY, readTime(holds, host)), performance.now]
 
 /**
  * Returns the live regions a host carries, creating them when it has none. Regions this copy of
@@ -156,10 +148,10 @@ const holdAfterClose = (records: MutationRecord[]): void => {
   const host = getModal(null) ?? document.body
   const until = performance.now() + CLOSE_DELAY
   const announcer = host.querySelector(`:scope > [${ATTRIBUTE}]`)
-  holds.set(host, until)
+  holds.set(host, [until, performance.now])
 
   if (announcer && readyAt.has(announcer)) {
-    readyAt.set(announcer, Math.max(readyAt.get(announcer)!, until))
+    readyAt.set(announcer, [Math.max(readTime(readyAt, announcer), until), performance.now])
   }
 
   if (pending.length > 0) {
@@ -190,7 +182,7 @@ const flush = (): void => {
     }
 
     const announcer = getAnnouncer(modal ?? document.body)
-    const wait = getWait(announcer)
+    const wait = readTime(readyAt, announcer) - performance.now()
 
     if (wait > 0) {
       setTimeout(flush, wait)
@@ -234,7 +226,7 @@ export const announce = (message: string, { context = null, priority = 'polite',
   pending.push({
     context, node, page: host === document.body ? announcer : null, priority: priority === 'assertive' ? 'assertive' : 'polite', timeout
   })
-  setTimeout(flush, Math.max(0, getWait(announcer)))
+  setTimeout(flush, Math.max(0, readTime(readyAt, announcer) - performance.now()))
 
   return () => {
     const index = pending.findIndex(message => message.node === node)
