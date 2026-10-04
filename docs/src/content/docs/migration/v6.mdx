@@ -555,8 +555,8 @@ does have a selection, already fires `change`.
 
 #### `announce()` (new)
 
-`announce(message, { priority, timeout })` reads a message to screen reader
-users through a visually hidden live region of the page, or of the topmost open
+`announce(message, { context, priority, timeout })` reads a message to screen
+reader users through a visually hidden live region of the page, or of the open
 modal dialog, since a modal dialog leaves the rest of the page inert. Toaster
 announces its toasts through it. See
 [Accessibility](/getting-started/accessibility/#announcing-messages).

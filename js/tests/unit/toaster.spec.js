@@ -228,7 +228,7 @@ describe('Toaster', () => {
     })
 
     it('should drop a message from the region seven seconds after it was announced', () => {
-      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'Date'] })
+      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'performance'] })
       toaster = new Toaster(null, { container: fixtureEl, timeout: 0 })
 
       try {
@@ -236,7 +236,7 @@ describe('Toaster', () => {
         vi.advanceTimersByTime(100)
         expect(messages('polite')).toEqual(['Saved'])
 
-        vi.advanceTimersByTime(6899)
+        vi.advanceTimersByTime(6999)
         expect(messages('polite')).toEqual(['Saved'])
 
         vi.advanceTimersByTime(1)
@@ -256,6 +256,24 @@ describe('Toaster', () => {
       await announced()
 
       expect(messages('polite')).toEqual(['Saved'])
+    })
+
+    it('should announce in the dialog that holds the toaster when it opens right after the toast', async () => {
+      fixtureEl.innerHTML = '<dialog><button type="button">Close</button><div class="toaster-host"></div></dialog>'
+      const dialog = fixtureEl.querySelector('dialog')
+      toaster = new Toaster(dialog.querySelector('.toaster-host'))
+
+      try {
+        toaster.add({ description: 'Loaded', instant: true })
+        dialog.showModal()
+        await new Promise(resolve => {
+          setTimeout(resolve, 250)
+        })
+
+        expect(messages('polite', dialog)).toEqual(['Loaded'])
+      } finally {
+        dialog.close()
+      }
     })
 
     it('should announce inside an open modal dialog, which leaves the toaster inert', async () => {

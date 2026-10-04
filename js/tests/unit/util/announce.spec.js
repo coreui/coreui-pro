@@ -10,7 +10,7 @@ describe('announce', () => {
   })
 
   beforeEach(() => {
-    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'Date'] })
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'performance', 'Date'] })
   })
 
   afterEach(() => {
@@ -126,17 +126,30 @@ describe('announce', () => {
     expect(messages(document.body)).toEqual(['Saved', 'Saved'])
   })
 
-  it('should drop a message after seven seconds, or after its timeout', () => {
+  it('should drop a message seven seconds after it was added, or after its timeout', () => {
     announce('Saved')
-    announce('Copied', { timeout: 1000 })
-    vi.advanceTimersByTime(1000)
+    announce('Copied', { timeout: 50 })
+    vi.advanceTimersByTime(100)
 
+    expect(messages(document.body)).toEqual(['Saved', 'Copied'])
+
+    vi.advanceTimersByTime(50)
     expect(messages(document.body)).toEqual(['Saved'])
 
-    vi.advanceTimersByTime(5999)
+    vi.advanceTimersByTime(6949)
     expect(messages(document.body)).toEqual(['Saved'])
 
     vi.advanceTimersByTime(1)
+    expect(messages(document.body)).toEqual([])
+  })
+
+  it('should keep a message with a timeout of 0 until it is removed', () => {
+    const remove = announce('Kept', { timeout: 0 })
+    vi.advanceTimersByTime(60_000)
+
+    expect(messages(document.body)).toEqual(['Kept'])
+
+    remove()
     expect(messages(document.body)).toEqual([])
   })
 
@@ -153,6 +166,55 @@ describe('announce', () => {
 
     remove()
     expect(messages(document.body)).toEqual([])
+  })
+
+  it('should add the waiting messages once another one comes, when their timer was lost', () => {
+    announce('First')
+    vi.useRealTimers()
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'performance', 'Date'] })
+
+    announce('Second')
+    vi.advanceTimersByTime(100)
+
+    expect(messages(document.body)).toEqual(['First', 'Second'])
+  })
+
+  it('should drop the messages waiting for page regions that were removed', () => {
+    announce('Gone')
+    announcers()[0].remove()
+
+    announce('Kept')
+    vi.advanceTimersByTime(100)
+
+    expect(messages(document.body)).toEqual(['Kept'])
+  })
+
+  it('should keep counting the first 100 ms when the wall clock steps back', () => {
+    announce('First')
+    vi.advanceTimersByTime(100)
+    vi.setSystemTime(Date.now() - 10_000)
+
+    announce('Second')
+    vi.advanceTimersByTime(0)
+
+    expect(messages(document.body)).toEqual(['First', 'Second'])
+  })
+
+  it('should wait 100 ms before it uses regions another copy of the util added', () => {
+    document.body.insertAdjacentHTML('afterbegin', [
+      '<div data-coreui-live-announcer>',
+      '<div role="log" aria-live="assertive" aria-relevant="additions"></div>',
+      '<div role="log" aria-live="polite" aria-relevant="additions"></div>',
+      '</div>'
+    ].join(''))
+
+    announce('Saved')
+    vi.advanceTimersByTime(99)
+    expect(messages(document.body)).toEqual([])
+
+    vi.advanceTimersByTime(1)
+    expect(announcers()).toHaveSize(1)
+    expect(messages(document.body)).toEqual(['Saved'])
   })
 
   it('should share the regions a page already has', () => {
@@ -183,6 +245,41 @@ describe('announce', () => {
     expect(dialog.lastElementChild.hasAttribute('data-coreui-live-announcer')).toBeTrue()
     expect(messages(dialog)).toEqual(['Saved'])
     expect(messages(document.body)).toEqual(['Before'])
+  })
+
+  it('should announce in a modal dialog that opens before the message is added', () => {
+    fixtureEl.innerHTML = '<dialog><button type="button">Close</button></dialog>'
+    const dialog = fixtureEl.querySelector('dialog')
+    announce('Before')
+    vi.advanceTimersByTime(100)
+
+    announce('Saved')
+    dialog.showModal()
+    vi.advanceTimersByTime(99)
+    expect(messages(document.body)).toEqual(['Before'])
+
+    vi.advanceTimersByTime(1)
+    expect(messages(dialog)).toEqual(['Saved'])
+  })
+
+  it('should keep the regions of a dialog closed and opened again in one task', async () => {
+    fixtureEl.innerHTML = '<dialog><button type="button">Close</button></dialog>'
+    const dialog = fixtureEl.querySelector('dialog')
+    dialog.showModal()
+    announce('First')
+    vi.advanceTimersByTime(100)
+
+    const closed = new Promise(resolve => {
+      dialog.addEventListener('close', resolve, { once: true })
+    })
+    dialog.close()
+    dialog.showModal()
+    await closed
+
+    announce('Second')
+    vi.advanceTimersByTime(0)
+
+    expect(messages(dialog)).toEqual(['First', 'Second'])
   })
 
   it('should remove the regions of a dialog when it closes and create new ones when it opens again', async () => {
@@ -246,6 +343,22 @@ describe('announce', () => {
 
     expect(messages(second)).toEqual(['Saved'])
     expect(first.querySelector('[data-coreui-live-announcer]')).toBeNull()
+  })
+
+  it('should announce in the modal dialog around context, which the page cannot see into', () => {
+    const host = document.createElement('div')
+    fixtureEl.append(host)
+    const root = host.attachShadow({ mode: 'open' })
+    root.innerHTML = '<dialog><button type="button">Close</button><div class="source"></div></dialog>'
+    const dialog = root.querySelector('dialog')
+    dialog.showModal()
+
+    announce('Saved', { context: root.querySelector('.source') })
+    announce('Lost')
+    vi.advanceTimersByTime(100)
+
+    expect(messages(dialog)).toEqual(['Saved'])
+    expect(messages(document.body)).toEqual(['Lost'])
   })
 
   it('should announce on the page while a dialog is open without being modal', () => {

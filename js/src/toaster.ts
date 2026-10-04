@@ -659,7 +659,7 @@ class Toaster extends BaseComponent {
     this._announcements.delete(toast.element)
 
     if (text) {
-      this._announcements.set(toast.element, announce(text, { priority: toast.priority === 'high' ? 'assertive' : 'polite' }))
+      this._announcements.set(toast.element, announce(text, { context: this._element, priority: toast.priority === 'high' ? 'assertive' : 'polite' }))
     }
   }
 

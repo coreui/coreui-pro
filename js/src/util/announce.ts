@@ -1,8 +1,17 @@
 export type AnnouncePriority = 'assertive' | 'polite'
 
 export type AnnounceOptions = {
+  context?: Element | null
   priority?: AnnouncePriority
   timeout?: number
+}
+
+type Message = {
+  context: Element | null
+  node: HTMLElement
+  page: HTMLElement | null
+  priority: AnnouncePriority
+  timeout: number
 }
 
 const ATTRIBUTE = 'data-coreui-live-announcer'
@@ -23,19 +32,22 @@ const VISUALLY_HIDDEN: Partial<CSSStyleDeclaration> = {
 }
 
 const readyAt = new WeakMap<Element, number>()
-const queues = new WeakMap<Element, (() => void)[]>()
+const pending: Message[] = []
 
 /**
- * Finds the modal dialog the rest of the page is inert behind. Focus cannot leave the topmost
- * one, so the dialog holding focus wins; without focus in a dialog, the last one in the document.
+ * Finds the modal dialog the rest of the page is inert behind: the one holding focus, then the
+ * one around `context`, then the last one open in the document.
  *
- * @returns The topmost open modal dialog, or `null` when none is open
+ * @param context - The element the message comes from, if any
+ * @returns The modal dialog to announce in, or `null` when none is open
  */
-const getTopModal = (): HTMLDialogElement | null => {
-  const focused = document.activeElement?.closest<HTMLDialogElement>('dialog[open]')
+const getModal = (context: Element | null): HTMLDialogElement | null => {
+  for (const element of [document.activeElement, context]) {
+    const dialog = element?.closest<HTMLDialogElement>('dialog[open]')
 
-  if (focused?.matches(':modal')) {
-    return focused
+    if (dialog?.matches(':modal')) {
+      return dialog
+    }
   }
 
   const modals = [...document.querySelectorAll<HTMLDialogElement>('dialog[open]')].filter(dialog => dialog.matches(':modal'))
@@ -44,8 +56,8 @@ const getTopModal = (): HTMLDialogElement | null => {
 }
 
 /**
- * Returns the live regions a host carries, creating them when it has none. Regions in a dialog
- * leave with it when it closes, so a dialog opened again gets new ones.
+ * Returns the live regions a host carries, creating them when it has none. Regions this copy of
+ * the util has not seen yet count as new, and regions in a dialog leave with it when it closes.
  *
  * @param host - `document.body` or an open modal dialog
  * @returns The element holding the assertive and the polite region
@@ -54,6 +66,10 @@ const getAnnouncer = (host: HTMLElement): HTMLElement => {
   const existing = host.querySelector<HTMLElement>(`:scope > [${ATTRIBUTE}]`)
 
   if (existing) {
+    if (!readyAt.has(existing)) {
+      readyAt.set(existing, performance.now() + FIRST_MESSAGE_DELAY)
+    }
+
     return existing
   }
 
@@ -72,74 +88,88 @@ const getAnnouncer = (host: HTMLElement): HTMLElement => {
   if (host === document.body) {
     host.prepend(announcer)
   } else {
+    const onClose = (event: Event): void => {
+      if (event.target === host && !(host as HTMLDialogElement).open) {
+        announcer.remove()
+        host.removeEventListener('close', onClose)
+      }
+    }
+
     host.append(announcer)
-    host.addEventListener('close', () => announcer.remove(), { once: true })
+    host.addEventListener('close', onClose)
   }
 
-  readyAt.set(announcer, Date.now() + FIRST_MESSAGE_DELAY)
+  readyAt.set(announcer, performance.now() + FIRST_MESSAGE_DELAY)
 
   return announcer
 }
 
 /**
- * Runs an insertion once the regions are ready, in the order the messages came in. The first
- * message after the regions were created waits until 100 ms have passed, the rest one task.
- *
- * @param announcer - The element holding the regions
- * @param insert - Adds one message to its region
+ * Adds the waiting messages to their regions in the order they came in. Each goes to the page or
+ * to the modal dialog open at that moment, and a region younger than 100 ms holds the queue until
+ * it is ready. A message that waited for page regions removed since is dropped with them.
  */
-const enqueue = (announcer: HTMLElement, insert: () => void): void => {
-  const queue = queues.get(announcer)
+const flush = (): void => {
+  while (pending.length > 0) {
+    const [{ context, node, page, priority, timeout }] = pending
 
-  if (queue) {
-    queue.push(insert)
-    return
-  }
-
-  queues.set(announcer, [insert])
-  setTimeout(() => {
-    const inserts = queues.get(announcer) ?? []
-    queues.delete(announcer)
-
-    for (const run of inserts) {
-      run()
+    if (page && !page.isConnected) {
+      pending.shift()
+      continue
     }
-  }, Math.max(0, (readyAt.get(announcer) ?? 0) - Date.now()))
+
+    const announcer = getAnnouncer(getModal(context) ?? document.body)
+    const wait = readyAt.get(announcer)! - performance.now()
+
+    if (wait > 0) {
+      setTimeout(flush, wait)
+      return
+    }
+
+    pending.shift()
+    announcer.querySelector(`[aria-live="${priority}"]`)!.append(node)
+
+    if (timeout > 0 && Number.isFinite(timeout)) {
+      setTimeout(() => node.remove(), timeout)
+    }
+  }
 }
 
 /**
- * Reads a message to screen reader users. The message goes to a visually hidden live region of
- * the page, or of the topmost open modal dialog, since a modal dialog leaves the rest of the page
- * inert. Each call adds a new message, so the same text is read again. The first message after a
- * region is created waits 100 ms, which Safari needs before it reads a new region.
+ * Reads a message to screen reader users. The message goes to a visually hidden live region at
+ * the start of the page or, while a modal dialog leaves the rest of the page inert, to one inside
+ * that dialog. The region is picked when the message is added: one task after the call, or once a
+ * new region is 100 ms old. Messages are added in the order of the calls, and each call adds a new
+ * one, so the same text is read again.
  *
  * @param message - The text to read
  * @param options - `priority` picks the polite (default) or the assertive region, `timeout` how
- *   long (ms) the message stays in the region, 7000 by default
- * @returns A function that removes the message, or cancels it while it waits for the region
+ *   long (ms) the message stays once added, 7000 by default and `0` to keep it, `context` the
+ *   element the message comes from, which tells a modal dialog it sits in
+ * @returns A function that removes the message, or cancels it before it is added
  */
-export const announce = (message: string, { priority = 'polite', timeout = 7000 }: AnnounceOptions = {}): (() => void) => {
+export const announce = (message: string, { context = null, priority = 'polite', timeout = 7000 }: AnnounceOptions = {}): (() => void) => {
   if (typeof document === 'undefined' || !document.body || !message) {
     return () => {}
   }
 
-  const announcer = getAnnouncer(getTopModal() ?? document.body)
-  const region = announcer.querySelector(`[aria-live="${priority === 'assertive' ? 'assertive' : 'polite'}"]`)!
   const node = document.createElement('div')
   node.textContent = message
-  let cancelled = false
+  const host = getModal(context) ?? document.body
+  const announcer = getAnnouncer(host)
 
-  const remove = (): void => {
-    cancelled = true
+  pending.push({
+    context, node, page: host === document.body ? announcer : null, priority: priority === 'assertive' ? 'assertive' : 'polite', timeout
+  })
+  setTimeout(flush, Math.max(0, readyAt.get(announcer)! - performance.now()))
+
+  return () => {
+    const index = pending.findIndex(message => message.node === node)
+
+    if (index !== -1) {
+      pending.splice(index, 1)
+    }
+
     node.remove()
   }
-
-  enqueue(announcer, () => {
-    if (!cancelled) {
-      region.append(node)
-    }
-  })
-  setTimeout(remove, timeout)
-
-  return remove
 }
