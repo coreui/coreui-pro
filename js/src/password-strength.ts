@@ -45,7 +45,7 @@ type StrengthResult = number | { score: number, warning?: string, suggestions?: 
 interface PasswordStrengthConfig {
   busyLabel: string
   debounce: number
-  input: string | HTMLInputElement | null
+  input: string | Element | null
   levels: string[]
   minLength: number
   scorer: ((password: string, userInputs: string[]) => StrengthResult | Promise<StrengthResult>) | null
@@ -164,7 +164,7 @@ class PasswordStrength extends BaseComponent {
     if (this._config.input) {
       return typeof this._config.input === 'string' ?
         SelectorEngine.findOne<HTMLInputElement>(this._config.input) :
-        this._config.input
+        this._config.input as HTMLInputElement
     }
 
     const parent = this._element.parentElement

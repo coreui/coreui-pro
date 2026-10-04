@@ -173,7 +173,7 @@ class Tooltip extends BaseComponent {
   protected declare _hideModalHandler: () => void
   declare tip: HTMLElement | null
 
-  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
+  constructor(element?: string | Element | null, config?: Partial<TooltipConfig> | null) {
     if (typeof computePosition === 'undefined') {
       throw new TypeError('CoreUI\'s tooltips require Floating UI (https://floating-ui.com)')
     }

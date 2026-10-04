@@ -10,7 +10,6 @@ import Data from './dom/data.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import ListBox, { type ListBoxEntry } from './list-box.js'
-import type { ComponentConfig } from './util/config.js'
 import { CARET_ICON } from './util/icons.js'
 import {
   DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList, SVGAllowlist
@@ -161,7 +160,7 @@ class Combobox extends ComboboxBase {
   protected declare _valueElement: HTMLElement
   protected declare _valueFromMarkup: boolean
 
-  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
+  constructor(element?: string | Element | null, config?: Partial<ComboboxConfig> | null) {
     super(element, config)
 
     this._uniqueId = this._element.id || getUID(NAME)

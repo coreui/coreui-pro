@@ -91,7 +91,7 @@ type MenuConfig = {
   container: string | Element | boolean
   display: string
   floatingConfig: FloatingConfigOption
-  menu: HTMLElement | null
+  menu: Element | null
   offset: FloatingOffsetOption
   placement: string | null
   reference: string | Element | Record<string, any>
@@ -151,7 +151,7 @@ class Menu extends BaseComponent {
   protected declare _menuOriginalParent: ParentNode | null
   protected declare _menuDirection: string | null
 
-  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
+  constructor(element?: string | Element | null, config?: Partial<MenuConfig> | null) {
     if (typeof computePosition === 'undefined') {
       throw new TypeError('CoreUI\'s menus require Floating UI (https://floating-ui.com)')
     }

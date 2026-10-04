@@ -9,7 +9,6 @@ import BaseComponent from './base-component.js'
 import ListBox, { type ListBoxEntry, type ListBoxGroup, type ListBoxItem } from './list-box.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
-import type { ComponentConfig } from './util/config.js'
 import {
   CHEVRON_DOUBLE_LEFT_ICON, CHEVRON_DOUBLE_RIGHT_ICON, CHEVRON_LEFT_ICON, CHEVRON_RIGHT_ICON
 } from './util/icons.js'
@@ -164,7 +163,7 @@ class Transfer extends BaseComponent {
   protected declare _rendered: boolean
   protected declare _sides: Record<string, TransferSide>
 
-  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
+  constructor(element?: string | Element | null, config?: Partial<TransferConfig> | null) {
     super(element, config)
 
     this._announcer = this._createAnnouncer()

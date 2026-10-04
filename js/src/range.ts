@@ -103,7 +103,7 @@ class Range extends BaseComponent {
   protected declare _onChange: (event: Event) => void
   protected declare _onReset: () => void
 
-  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
+  constructor(element?: string | Element | null, config?: Partial<RangeConfig> | null) {
     super(element, config)
 
     // BaseComponent bails (no `_element`) when the element can't be resolved

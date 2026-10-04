@@ -6,7 +6,6 @@
  */
 
 import BaseComponent from './base-component.js'
-import type { ComponentConfig } from './util/config.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
@@ -98,7 +97,7 @@ class Chip extends BaseComponent {
   protected declare _removeControl: HTMLElement | null
   protected declare _selected: any
 
-  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
+  constructor(element?: string | Element | null, config?: Partial<ChipConfig> | null) {
     super(element, config)
 
     this._addedAttributes = HOST_ATTRIBUTES.filter(name => !this._element.hasAttribute(name))

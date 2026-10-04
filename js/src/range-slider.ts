@@ -8,7 +8,6 @@
 import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
-import type { ComponentConfig } from './util/config.js'
 import {
   defineJQueryPlugin, getUID, isRTL, jQueryDispatch
 } from './util/index.js'
@@ -164,7 +163,7 @@ class RangeSlider extends BaseComponent {
   protected declare _onPointerUp: (event: Event) => void
   protected declare _onReset: () => void
 
-  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
+  constructor(element?: string | Element | null, config?: Partial<RangeSliderConfig> | null) {
     super(element, config)
 
     if (!this._element) {

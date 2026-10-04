@@ -8,7 +8,6 @@
 import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
-import type { ComponentConfig } from './util/config.js'
 import { DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList } from './util/sanitizer.js'
 import {
   type CountLabel, defineJQueryPlugin, getElement, getNextActiveElement, getUID, jQueryDispatch, resolveCountLabel
@@ -196,7 +195,7 @@ class ListBox extends BaseComponent {
   protected declare _selected: Set<string>
   protected declare _selectAll: HTMLButtonElement | null
 
-  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
+  constructor(element?: string | Element | null, config?: Partial<ListBoxConfig> | null) {
     super(element, config)
 
     this._active = null

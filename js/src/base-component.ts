@@ -90,7 +90,7 @@ class BaseComponent extends Config {
     return Data.get(getElement(element), this.DATA_KEY)
   }
 
-  static getOrCreateInstance<T extends typeof BaseComponent>(this: T, element?: string | Element | null, config: ComponentConfig | null = {}): InstanceType<T> {
+  static getOrCreateInstance<T extends typeof BaseComponent>(this: T, element?: string | Element | null, config: ([ConstructorParameters<T>[1]] extends [undefined] ? ComponentConfig : NonNullable<ConstructorParameters<T>[1]>) | null = {}): InstanceType<T> {
     return this.getInstance(element) || (new this(element, typeof config === 'object' ? config : null) as InstanceType<T>)
   }
 

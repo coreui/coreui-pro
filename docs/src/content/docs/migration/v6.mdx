@@ -163,9 +163,13 @@ const version: string = Modal.VERSION
 ```
 
 Each component also exports its config type, so an options object can be typed
-and reused. Declarations are generated from the sources, not maintained by hand,
-and CI type-checks a consumer file against the **emitted** declarations, so the
-shipped types cannot drift from the code.
+and reused. A component that exports its config type takes it in the
+constructor and `getOrCreateInstance`, and in `setConfig` where it has one, so
+an option it does not know is a type error; a picker also takes the options it
+forwards to its calendar, its field and its time columns, except those it sets
+itself. Declarations are generated from
+the sources, not maintained by hand, and CI type-checks a consumer file against
+the **emitted** declarations, so the shipped types cannot drift from the code.
 
 #### The `js/src` sources ship as TypeScript
 

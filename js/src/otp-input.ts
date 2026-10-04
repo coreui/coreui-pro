@@ -49,11 +49,11 @@ type OtpInputConfig = {
   linear: boolean
   masked: boolean
   name: string | null
-  placeholder: string | null
+  placeholder: number | string | null
   readonly: boolean
   required: boolean
   type: string
-  value: string | null
+  value: number | string | null
 }
 
 const Default: OtpInputConfig = {
@@ -166,7 +166,7 @@ class OTPInput extends BaseComponent {
     this._setInputsTabIndexes()
   }
 
-  setConfig(config: any): void {
+  setConfig(config: Partial<OtpInputConfig> | null): void {
     if (typeof config !== 'object' || config === null) {
       return
     }

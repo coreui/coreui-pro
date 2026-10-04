@@ -9,7 +9,6 @@
  */
 
 import Tooltip, { type TooltipConfig } from './tooltip.js'
-import type { ComponentConfig } from './util/config.js'
 import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
 import EventHandler, { type CoreUIEvent } from './dom/event-handler.js'
 import type { TemplateContentEntry } from './util/template-factory.js'
@@ -58,7 +57,7 @@ class Popover extends Tooltip {
   protected declare _config: PopoverConfig
 
   // eslint-disable-next-line no-useless-constructor -- narrows the config param type
-  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
+  constructor(element?: string | Element | null, config?: Partial<PopoverConfig> | null) {
     super(element, config)
   }
 

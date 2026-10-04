@@ -6,7 +6,6 @@
  */
 
 import BaseComponent from './base-component.js'
-import type { ComponentConfig } from './util/config.js'
 import EventHandler from './dom/event-handler.js'
 import Toast, { type ToastConfig } from './toast.js'
 import type { TemplateContentEntry } from './util/template-factory.js'
@@ -171,7 +170,7 @@ type ToasterConfig = {
   leave: Edge
   limit: number
   pauseOnHover: boolean
-  placement: string
+  placement: 'top-start' | 'top-center' | 'top-end' | 'middle-start' | 'middle-center' | 'middle-end' | 'bottom-start' | 'bottom-center' | 'bottom-end'
   sanitize: boolean
   sanitizeFn: ((unsafeHtml: string) => string) | null
   stack: boolean
@@ -236,7 +235,7 @@ class Toaster extends BaseComponent {
   protected declare _announcers: Record<'high' | 'low', HTMLElement>
   protected declare _announcements: Map<HTMLElement, HTMLElement>
 
-  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
+  constructor(element?: string | Element | null, config?: Partial<ToasterConfig> | null) {
     const ownsContainer = !getElement(element)
     super(ownsContainer ? document.createElement('div') : element, config)
 
