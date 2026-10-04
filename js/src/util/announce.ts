@@ -6,6 +6,8 @@ export type AnnounceOptions = {
   timeout?: number
 }
 
+type Moment = [time: number, clock: () => number]
+
 type Message = {
   context: Element | null
   node: HTMLElement
@@ -33,8 +35,8 @@ const VISUALLY_HIDDEN: Partial<CSSStyleDeclaration> = {
   width: '1px'
 }
 
-const holds = new WeakMap<Element, number>()
-const readyAt = new WeakMap<Element, number>()
+const holds = new WeakMap<Element, Moment>()
+const readyAt = new WeakMap<Element, Moment>()
 const pending: Message[] = []
 
 /**
@@ -59,19 +61,28 @@ const getModal = (context: Element | null): HTMLDialogElement | null => {
 }
 
 /**
+ * Reads a stored time when it was taken on the clock in use now. A time from another clock, such
+ * as a test's fake timers, counts as long past.
+ *
+ * @param times - The ready times of regions or the holds of hosts
+ * @param element - The element the time belongs to
+ * @returns The time on the `performance.now()` clock, `0` when there is none
+ */
+const readTime = (times: WeakMap<Element, Moment>, element: Element): number => {
+  const [time, clock] = times.get(element) ?? [0, null]
+
+  return clock === performance.now ? time : 0
+}
+
+/**
  * Tells when new regions of a host can take a message: 100 ms from now, or later while a dialog
- * that closed less than 500 ms ago holds the host. A hold further away than that comes from
- * another clock, such as a test's, and is ignored.
+ * that closed less than 500 ms ago holds the host.
  *
  * @param host - `document.body` or an open modal dialog
- * @returns The time, on the `performance.now()` clock, the first message can be added
+ * @returns The ready time with the clock it was read from
  */
-const getReadyTime = (host: HTMLElement): number => {
-  const now = performance.now()
-  const hold = holds.get(host) ?? 0
-
-  return Math.max(now + FIRST_MESSAGE_DELAY, hold - now <= CLOSE_DELAY ? hold : 0)
-}
+const getReadyTime = (host: HTMLElement): Moment =>
+  [Math.max(performance.now() + FIRST_MESSAGE_DELAY, readTime(holds, host)), performance.now]
 
 /**
  * Returns the live regions a host carries, creating them when it has none. Regions this copy of
@@ -137,10 +148,10 @@ const holdAfterClose = (records: MutationRecord[]): void => {
   const host = getModal(null) ?? document.body
   const until = performance.now() + CLOSE_DELAY
   const announcer = host.querySelector(`:scope > [${ATTRIBUTE}]`)
-  holds.set(host, until)
+  holds.set(host, [until, performance.now])
 
   if (announcer && readyAt.has(announcer)) {
-    readyAt.set(announcer, Math.max(readyAt.get(announcer)!, until))
+    readyAt.set(announcer, [Math.max(readTime(readyAt, announcer), until), performance.now])
   }
 
   if (pending.length > 0) {
@@ -171,7 +182,7 @@ const flush = (): void => {
     }
 
     const announcer = getAnnouncer(modal ?? document.body)
-    const wait = readyAt.get(announcer)! - performance.now()
+    const wait = readTime(readyAt, announcer) - performance.now()
 
     if (wait > 0) {
       setTimeout(flush, wait)
@@ -215,7 +226,7 @@ export const announce = (message: string, { context = null, priority = 'polite',
   pending.push({
     context, node, page: host === document.body ? announcer : null, priority: priority === 'assertive' ? 'assertive' : 'polite', timeout
   })
-  setTimeout(flush, Math.max(0, readyAt.get(announcer)! - performance.now()))
+  setTimeout(flush, Math.max(0, readTime(readyAt, announcer) - performance.now()))
 
   return () => {
     const index = pending.findIndex(message => message.node === node)

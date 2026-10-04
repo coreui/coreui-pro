@@ -202,6 +202,41 @@ describe('announce', () => {
     expect(messages(document.body)).toEqual(['First', 'Second'])
   })
 
+  it('should not wait on a region made ready on another clock', () => {
+    announce('First')
+    vi.advanceTimersByTime(100)
+    vi.useRealTimers()
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'performance', 'Date'] })
+
+    announce('Second')
+    vi.advanceTimersByTime(0)
+
+    expect(messages(document.body)).toEqual(['First', 'Second'])
+  })
+
+  it('should keep the hold after a close on a clock with fractions of a millisecond', async () => {
+    vi.useRealTimers()
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
+    let now = 3000.1
+    vi.spyOn(performance, 'now').mockImplementation(() => now)
+    fixtureEl.innerHTML = '<dialog><button type="button">Close</button></dialog>'
+    const dialog = fixtureEl.querySelector('dialog')
+    announce('Before')
+    now = 3100.1
+    vi.advanceTimersByTime(100)
+    dialog.showModal()
+    await Promise.resolve()
+
+    now = 4001.1
+    dialog.close()
+    await Promise.resolve()
+    announce('After')
+    vi.advanceTimersByTime(0)
+
+    expect(messages(document.body)).toEqual(['Before'])
+    vi.restoreAllMocks()
+  })
+
   it('should wait 100 ms before it uses regions another copy of the util added', () => {
     document.body.insertAdjacentHTML('afterbegin', [
       '<div data-coreui-live-announcer>',

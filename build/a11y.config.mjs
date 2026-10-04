@@ -536,19 +536,19 @@ export const a11yComponents = [
       {
         criterion: '4.1.3',
         status: 'built-in',
-        note: 'Moving options updates a visually hidden role=status region with ariaMovedAnnouncement. Verified here: selecting an option and moving it right announces the count and the destination title.'
+        note: 'Every move is announced through announce(), as a new message in the visually hidden polite log region of the page, with ariaMovedAnnouncement. Verified here: selecting an option and moving it right adds a message with the count and the destination title.'
       }
     ],
     assertions: [
       {
         criterion: '4.1.3',
-        label: 'moving an option is announced in the status region',
+        label: 'moving an option is announced in the live region of the page',
         steps: [
           { click: '#transferItems [data-coreui-transfer-list="source"] .list-box-option' },
           { click: '#transferItems [data-coreui-transfer-move="target"]' },
-          { wait: 100 }
+          { wait: 250 }
         ],
-        run: 'const region = document.querySelector(\'#transferItems .transfer-announcer\'); return Boolean(region && region.textContent.includes(\'moved to\'))'
+        run: 'const region = document.querySelector(\'[data-coreui-live-announcer] [aria-live="polite"]\'); return Boolean(region && region.textContent.includes(\'moved to\'))'
       }
     ]
   },
