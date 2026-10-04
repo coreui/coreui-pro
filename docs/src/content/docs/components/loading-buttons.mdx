@@ -66,7 +66,8 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
-| `disabledOnLoading`| boolean | `false`| Makes button disabled when loading. |
+| `ariaLoadingLabel`| string | `'Loading'`| Announced after the button's name when loading starts. |
+| `disabledOnLoading`| boolean | `false`| Blocks the button while it is loading: it gets `aria-disabled="true"` and `.disabled`, keeps focus, and ignores clicks and form submission. |
 | `spinner`| boolean | `true`| Renders a spinner at the start of the button while it is loading. |
 | `spinnerType`| 'border', 'grow' | `'border'`| Sets type of spinner. |
 | `timeout`| boolean, number | `false`| Automatically starts loading animation and stops after a determined amount of milliseconds. |
@@ -101,3 +102,9 @@ myBtnLoading.addEventListener('stop.coreui.loading-button', () => {
   // do something...
 })
 ```
+
+## Accessibility
+
+- While the button loads with `disabledOnLoading`, it keeps focus. It gets `aria-disabled="true"` and the `.disabled` class rather than the `disabled` attribute, and clicks and form submission are ignored until it stops.
+- When the button has focus, the start of loading is announced through [`announce()`](/getting-started/accessibility/#announcing-messages) as its name followed by `ariaLoadingLabel` ("Save, Loading"), and the end as its name again. Nothing is announced while focus is elsewhere.
+- The spinner is decorative and hidden from assistive technologies.

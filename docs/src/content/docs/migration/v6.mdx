@@ -2593,6 +2593,19 @@ field behind that kept submitting.
   (`inset 0 1px 0 rgba(white, .15), 0 1px 1px rgba(black, .075)`); put it back
   with your own `.btn { box-shadow: … }` if you want it.
 
+#### Loading button
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`disabledOnLoading` no longer sets the `disabled` attribute.** A disabled
+  button drops focus, so a keyboard or screen reader user who pressed it landed
+  on the page body. While loading, the button now gets `aria-disabled="true"`
+  and `.disabled`, keeps focus, and ignores clicks and form submission until it
+  stops. CSS or scripts that read `:disabled` on a loading button should read
+  `[aria-disabled="true"]` instead.
+- **The start and the end of loading are announced** when the button has
+  focus: its name followed by the new `ariaLoadingLabel` option, then its name
+  again. The spinner no longer carries `role="status"`.
+
 #### Navbar
 
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
