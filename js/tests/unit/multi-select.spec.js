@@ -253,6 +253,95 @@ describe('MultiSelect', () => {
       expect(selectEl.checkValidity()).toBe(true)
     })
 
+    it('should hand validation focus to the custom control in a novalidate form', () => {
+      fixtureEl.innerHTML = '<form novalidate><select required></select></form>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }] })
+
+      selectEl.focus()
+
+      expect(document.activeElement).toBe(multiSelect._togglerElement)
+    })
+
+    it('should hand validation focus to the search input when the control searches', () => {
+      fixtureEl.innerHTML = '<form novalidate><select required></select></form>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }], search: true })
+
+      selectEl.focus()
+
+      expect(document.activeElement).toBe(multiSelect._searchElement)
+    })
+
+    it('should keep validation focus on the native select where the browser shows its bubble', () => {
+      fixtureEl.innerHTML = '<form><select required></select></form>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }] })
+
+      selectEl.focus()
+
+      expect(document.activeElement).toBe(selectEl)
+
+      multiSelect.setConfig({ options: [{ value: '1', text: 'Option 1' }] })
+      selectEl.closest('form').noValidate = true
+      selectEl.blur()
+      selectEl.focus()
+
+      expect(document.activeElement).toBe(multiSelect._togglerElement)
+    })
+
+    it('should carry the validity of the native select to the custom control', async () => {
+      fixtureEl.innerHTML = '<form novalidate><select required aria-describedby="hint"></select></form>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }], search: true })
+      const target = multiSelect._searchElement
+
+      expect(target.getAttribute('aria-describedby')).toBe('hint')
+      expect(target.hasAttribute('aria-invalid')).toBeFalse()
+
+      selectEl.setAttribute('aria-invalid', 'true')
+      selectEl.setAttribute('aria-describedby', 'hint error')
+      await Promise.resolve()
+
+      expect(target.getAttribute('aria-invalid')).toBe('true')
+      expect(target.getAttribute('aria-describedby')).toBe('hint error')
+
+      selectEl.removeAttribute('aria-invalid')
+      selectEl.removeAttribute('aria-describedby')
+      await Promise.resolve()
+
+      expect(target.hasAttribute('aria-invalid')).toBeFalse()
+      expect(target.hasAttribute('aria-describedby')).toBeFalse()
+    })
+
+    it('should mark the custom control invalid with the invalid option', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }], invalid: true })
+
+      expect(multiSelect._togglerElement.getAttribute('aria-invalid')).toBe('true')
+    })
+
+    it('should stop watching the native select once disposed', async () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }] })
+      const toggler = multiSelect._togglerElement
+      const errors = []
+      const recordError = event => errors.push(event.message)
+      window.addEventListener('error', recordError)
+
+      multiSelect.dispose()
+      selectEl.setAttribute('aria-invalid', 'true')
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+      window.removeEventListener('error', recordError)
+
+      expect(toggler.hasAttribute('aria-invalid')).toBeFalse()
+      expect(errors).toEqual([])
+    })
+
     it('should hand native select keyboard interaction to the custom control', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
