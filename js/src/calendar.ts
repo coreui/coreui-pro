@@ -112,6 +112,7 @@ const SELECTOR_CALENDAR_ROW = '.calendar-row'
 const SELECTOR_CALENDAR_ROW_FOCUSABLE = `${SELECTOR_CALENDAR_ROW}[tabindex]`
 const SELECTOR_CALENDAR_ROW_SELECTABLE = `${SELECTOR_CALENDAR_ROW}[data-coreui-selectable]`
 const SELECTOR_DATA_CALENDAR = '[data-coreui-calendar]'
+const SELECTOR_POPUP_CLOSING = '.popup:not(.show)'
 
 const CELL_RENDERERS: Record<ViewTypes, keyof CalendarConfig> = {
   days: 'renderDayCell',
@@ -839,7 +840,7 @@ class Calendar extends BaseComponent {
         .replaceAll('{end}', () => this._selectionName(end)) :
       start && ariaSelectedDateAnnouncement?.replaceAll('{date}', () => this._selectionName(start))
 
-    if (!message || !this._element.checkVisibility()) {
+    if (!message || !this._element.checkVisibility() || this._element.closest(SELECTOR_POPUP_CLOSING)) {
       return
     }
 
