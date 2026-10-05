@@ -2865,6 +2865,17 @@ describe('Calendar', () => {
         expect(messages()).toEqual(['September 2026, Nothing on this page can be picked'])
       })
 
+      it('should not announce a page that a key turns to from the grid when a date takes focus', () => {
+        const div = renderCalendar({ minDate: new Date(2026, 8, 10) })
+
+        div.querySelector('table').focus()
+        pressKey(div.querySelector('table'), 'PageDown')
+        vi.advanceTimersByTime(110)
+
+        expect(activeDate()).toEqual(new Date(2026, 8, 10))
+        expect(messages()).toEqual([])
+      })
+
       it('should not announce when the month button moves focus into the months grid', () => {
         const div = renderCalendar()
 
