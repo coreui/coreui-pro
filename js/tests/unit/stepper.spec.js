@@ -1446,6 +1446,124 @@ describe('Stepper', () => {
       expect(fixtureEl.querySelector('#filled')).not.toHaveClass('is-valid')
     })
 
+    it('should set aria-invalid on the invalid controls of noValidate forms on failure', () => {
+      fixtureEl.innerHTML = validationFixture('novalidate')
+
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+
+      stepper.next()
+
+      expect(fixtureEl.querySelector('#empty').getAttribute('aria-invalid')).toBe('true')
+      expect(fixtureEl.querySelector('#filled').hasAttribute('aria-invalid')).toBeFalse()
+    })
+
+    it('should move focus to the first invalid control of noValidate forms on failure', () => {
+      fixtureEl.innerHTML = validationFixture('novalidate')
+      fixtureEl.querySelector('form').prepend(Object.assign(document.createElement('input'), { id: 'leading', required: true, value: 'filled' }))
+      fixtureEl.querySelector('form').append(Object.assign(document.createElement('input'), { id: 'trailing', required: true }))
+
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+
+      stepper.next()
+
+      expect(document.activeElement).toBe(fixtureEl.querySelector('#empty'))
+
+      document.activeElement.blur()
+      expect(document.activeElement).toBe(document.body)
+      stepper.next()
+
+      expect(document.activeElement).toBe(fixtureEl.querySelector('#empty'))
+    })
+
+    it('should move focus past invalid controls that cannot take focus or are hidden from assistive technologies', () => {
+      fixtureEl.innerHTML = validationFixture('novalidate')
+      const form = fixtureEl.querySelector('form')
+      form.insertAdjacentHTML('afterbegin', '<div hidden><input id="hidden" required></div><select id="overlay" aria-hidden="true" tabindex="-1" required><option value=""></option></select>')
+
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+
+      stepper.next()
+
+      expect(document.activeElement).toBe(fixtureEl.querySelector('#empty'))
+    })
+
+    it('should leave focus where a stepValidationComplete handler moves it', () => {
+      fixtureEl.innerHTML = `${validationFixture('novalidate')}<div id="summary" tabindex="-1"></div>`
+
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const summary = fixtureEl.querySelector('#summary')
+      stepperElement.addEventListener('stepValidationComplete.coreui.stepper', event => {
+        if (!event.isValid) {
+          summary.focus()
+        }
+      })
+      const stepper = new Stepper(stepperElement)
+
+      stepper.next()
+
+      expect(document.activeElement).toBe(summary)
+      expect(fixtureEl.querySelector('#empty').getAttribute('aria-invalid')).toBe('true')
+    })
+
+    it('should keep the aria-invalid it did not set', () => {
+      fixtureEl.innerHTML = validationFixture('novalidate')
+      const filled = fixtureEl.querySelector('#filled')
+      filled.setAttribute('aria-invalid', 'true')
+
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+
+      stepper.next()
+      filled.dispatchEvent(new Event('input', { bubbles: true }))
+      stepper.reset()
+
+      expect(filled.getAttribute('aria-invalid')).toBe('true')
+    })
+
+    it('should update every control of the form when one of them changes', () => {
+      fixtureEl.innerHTML = validationFixture('novalidate')
+      const form = fixtureEl.querySelector('form')
+      form.innerHTML = '<input type="radio" name="plan" id="basic" required><input type="radio" name="plan" id="pro">'
+
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+
+      stepper.next()
+      expect(fixtureEl.querySelector('#basic').getAttribute('aria-invalid')).toBe('true')
+
+      const pro = fixtureEl.querySelector('#pro')
+      pro.checked = true
+      pro.dispatchEvent(new Event('input', { bubbles: true }))
+
+      expect(fixtureEl.querySelector('#basic').hasAttribute('aria-invalid')).toBeFalse()
+      expect(fixtureEl.querySelector('#basic')).not.toHaveClass('is-invalid')
+    })
+
+    it('should not validate the current step when going back or selecting it again', () => {
+      fixtureEl.innerHTML = validationFixture('novalidate')
+
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      const activeButton = fixtureEl.querySelector('.stepper-step-button.active')
+
+      activeButton.focus()
+      activeButton.click()
+
+      expect(document.activeElement).toBe(activeButton)
+      expect(fixtureEl.querySelector('#empty').hasAttribute('aria-invalid')).toBeFalse()
+
+      fixtureEl.querySelector('#empty').value = 'filled'
+      stepper.next()
+      fixtureEl.querySelector('#step2').innerHTML = '<form novalidate><input id="second" required></form>'
+      stepper.prev()
+
+      expect(activeButton).toHaveClass('active')
+      expect(fixtureEl.querySelector('#second').hasAttribute('aria-invalid')).toBeFalse()
+    })
+
     it('should mark valid controls only when the form opts in with data-coreui-validate="valid"', () => {
       fixtureEl.innerHTML = validationFixture('novalidate data-coreui-validate="valid"')
 
@@ -1473,6 +1591,7 @@ describe('Stepper', () => {
       input.dispatchEvent(new Event('input', { bubbles: true }))
 
       expect(input).not.toHaveClass('is-invalid')
+      expect(input.hasAttribute('aria-invalid')).toBeFalse()
     })
 
     it('should clear the validation state on reset', () => {
@@ -1487,6 +1606,20 @@ describe('Stepper', () => {
       stepper.reset()
 
       expect(fixtureEl.querySelector('#empty')).not.toHaveClass('is-invalid')
+      expect(fixtureEl.querySelector('#empty').hasAttribute('aria-invalid')).toBeFalse()
+    })
+
+    it('should clear the validation state on dispose', () => {
+      fixtureEl.innerHTML = validationFixture('novalidate')
+
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+
+      stepper.next()
+      stepper.dispose()
+
+      expect(fixtureEl.querySelector('#empty')).not.toHaveClass('is-invalid')
+      expect(fixtureEl.querySelector('#empty').hasAttribute('aria-invalid')).toBeFalse()
     })
 
     it('should call reportValidity on non-noValidate forms on failure', () => {

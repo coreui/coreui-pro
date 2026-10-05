@@ -342,7 +342,7 @@ In non-linear mode, all steps are accessible unless explicitly disabled.
 
 The Stepper Component includes native HTML5 validation for each step. Before allowing the user to move to the next step, the associated form (if present) is validated automatically.
 
-If a form is invalid, the stepper blocks navigation and displays validation messages.
+If a form is invalid, the stepper blocks navigation and displays validation messages. Going back to an earlier step does not validate the current one.
 
 ### Browser default validation
 
@@ -408,7 +408,7 @@ This example shows a stepper with native browser validation enabled:
 
 ### Custom styles
 
-To disable native browser styles validation and turn on custom styles, add the `novalidate` attribute to your forms. The stepper then marks the invalid controls with `.is-invalid` when a step fails, and keeps the state updated as the user corrects them; add `data-coreui-validate="valid"` to a form to also mark the valid controls with `.is-valid`:
+To disable native browser styles validation and turn on custom styles, add the `novalidate` attribute to your forms. The stepper then marks the invalid controls with `.is-invalid` and `aria-invalid="true"` when a step fails, moves focus to the first of them, and keeps the state updated as the user corrects them; add `data-coreui-validate="valid"` to a form to also mark the valid controls with `.is-valid`. If a handler of `stepValidationComplete.coreui.stepper` moves focus itself, for example to an error summary, the stepper leaves it there:
 
 <Example pro code={`<div class="stepper" data-coreui-stepper id="novalidateStepper">
     <ol class="stepper-steps">
@@ -541,6 +541,7 @@ The CoreUI Stepper Component is built with accessibility in mind:
 - In the tab set, each step button is assigned `role="tab"` and attributes like `aria-selected`, `aria-controls` and `tabindex`, and its `.stepper-step` wrapper is marked `role="presentation"` so the tabs stay direct children of the list in the accessibility tree.
 - Step contents (`stepper-pane`) use `role="tabpanel"` and are properly linked to their trigger buttons.
 - When the step changes while focus is inside the stepper, for example on a **Next** button in the pane, focus moves to the new step's button, so a screen reader reads which step the user is on. A step changed from outside the stepper leaves focus where it is.
+- When a step whose form has `novalidate` fails validation, the invalid controls get `aria-invalid="true"` and focus moves to the first of them that can take focus, as the browser does for a form without `novalidate`.
 - Panes are `aria-live="polite"`, so a validation message that appears in the open step is announced.
 - Keyboard navigation is fully supported
 
