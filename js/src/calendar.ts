@@ -9,6 +9,7 @@ import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
+import { announce } from './util/announce.js'
 import {
   escapeHtml, sanitizeByConfig, type SanitizerAllowList, SVGAllowlist
 } from './util/sanitizer.js'
@@ -281,11 +282,13 @@ class Calendar extends BaseComponent {
   protected declare _selectEndDate: boolean
   protected declare _view: ViewTypes
   protected declare _formatter: ReturnType<typeof createDateFormatter>
+  protected declare _announcement: (() => void) | null
 
   constructor(element?: string | Element | null, config?: Partial<CalendarConfig> | null) {
     super(element)
 
     this._formatter = createDateFormatter()
+    this._announcement = null
     this._config = this._getConfig(config)
     this._initializeDates()
     this._initializeView()
@@ -323,6 +326,7 @@ class Calendar extends BaseComponent {
   }
 
   override dispose(): void {
+    this._announcement?.()
     this._element.innerHTML = ''
     this._element.classList.remove(CLASS_NAME_CALENDARS, CLASS_NAME_SHOW_WEEK_NUMBERS, `select-${this._config.selectionType}`)
 
@@ -740,7 +744,7 @@ class Calendar extends BaseComponent {
 
     Manipulator.setDataAttribute(calendarPanelEl, 'calendar-index', order)
 
-    calendarPanelEl.innerHTML = `<div class="calendar-nav"><div class="calendar-nav-prev"></div><div class="calendar-nav-date" aria-live="polite" aria-atomic="true"></div><div class="calendar-nav-next"></div></div><table role="grid"></table><span id="${getUID('calendar-description')}" hidden></span>`
+    calendarPanelEl.innerHTML = `<div class="calendar-nav"><div class="calendar-nav-prev"></div><div class="calendar-nav-date"></div><div class="calendar-nav-next"></div></div><table role="grid"></table><span id="${getUID('calendar-description')}" hidden></span>`
     this._renderCalendarPanel(calendarPanelEl, order)
 
     return calendarPanelEl
@@ -782,25 +786,48 @@ class Calendar extends BaseComponent {
   }
 
   _describeGrid(panel: Element): void {
-    const [navigation, grid, description] = panel.children
-    const region = navigation.children[1]
+    const [, grid, description] = panel.children
     const label = this._config.ariaNothingToPickLabel
-    const note = SelectorEngine.findOne(`.${CLASS_NAME_VISUALLY_HIDDEN}`, region)
 
     description.textContent = label
 
     if (!label || SelectorEngine.findOne('[data-coreui-selectable]', grid)) {
       grid.removeAttribute('aria-describedby')
-      note?.remove()
       return
     }
 
     grid.setAttribute('aria-describedby', description.id)
+  }
 
-    if (!note) {
-      region.insertAdjacentHTML('beforeend', `<span class="${CLASS_NAME_VISUALLY_HIDDEN}">${escapeHtml(label)}</span>`)
-    } else if (note.textContent !== label) {
-      note.textContent = label
+  _pages(): Array<[string | null, boolean]> {
+    return SelectorEngine.find(SELECTOR_CALENDAR, this._element as ParentNode).map(panel => {
+      const grid = panel.children[1]
+      return [grid.getAttribute('aria-label'), grid.hasAttribute('aria-describedby')]
+    })
+  }
+
+  _announcePages(pages: Array<[string | null, boolean]>): void {
+    const active = document.activeElement
+
+    if (!active || !this._element.contains(active)) {
+      return
+    }
+
+    const panels = SelectorEngine.find(SELECTOR_CALENDAR, this._element as ParentNode)
+    const date = active.closest(`${SELECTOR_CALENDAR_CELL}, ${SELECTOR_CALENDAR_ROW}`)
+    const message = this._pages().flatMap(([label, nothing], index) => {
+      const [previousLabel, previousNothing] = pages[index] ?? []
+
+      if ((label === previousLabel && (previousNothing || !nothing)) || (date && !nothing)) {
+        return []
+      }
+
+      return [[date && panels[index].contains(date) ? '' : label, nothing && this._config.ariaNothingToPickLabel].filter(Boolean).join(', ')]
+    }).join(', ')
+
+    if (message) {
+      this._announcement?.()
+      this._announcement = announce(message, { context: this._element })
     }
   }
 
@@ -968,6 +995,7 @@ class Calendar extends BaseComponent {
     const focused = this._element.contains(document.activeElement) ? document.activeElement as HTMLElement : null
     const restoreFocus = focused && this._focusRestorer(focused)
     const panels = SelectorEngine.find(SELECTOR_CALENDAR, this._element as ParentNode)
+    const pages = this._pages()
 
     if (panels.length === this._config.calendars) {
       this._setCalendarClasses()
@@ -989,6 +1017,8 @@ class Calendar extends BaseComponent {
     if (restoreFocus && (!document.activeElement || document.activeElement === document.body)) {
       restoreFocus()
     }
+
+    this._announcePages(pages)
   }
 
   _focusRestorer(focused: HTMLElement): () => void {
@@ -1009,6 +1039,8 @@ class Calendar extends BaseComponent {
   }
 
   _updateClassNamesAndAriaLabels(): void {
+    const pages = this._pages()
+
     if (this._rowsAreTargets()) {
       for (const row of SelectorEngine.find(SELECTOR_CALENDAR_ROW, this._element as ParentNode)) {
         const firstCell = SelectorEngine.findOne(SELECTOR_CALENDAR_CELL, row)
@@ -1030,6 +1062,8 @@ class Calendar extends BaseComponent {
     for (const panel of SelectorEngine.find(SELECTOR_CALENDAR, this._element as ParentNode)) {
       this._describeGrid(panel)
     }
+
+    this._announcePages(pages)
   }
 
   _updateCellContent(): void {

@@ -737,7 +737,7 @@ describe('DateRangePicker', () => {
       expect(fixtureEl.querySelector('.date-picker-popup table').getAttribute('aria-label')).toBe('September 2026')
     })
 
-    it('should keep the announced month region when the context turns the calendar', () => {
+    it('should keep the navigation month and year when the context turns the calendar', () => {
       const picker = buildPicker({ calendarDate: new Date(2026, 8, 1), calendars: 1, locale: 'en-US' })
 
       picker.show()
