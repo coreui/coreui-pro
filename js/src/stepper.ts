@@ -83,6 +83,7 @@ class Stepper extends BaseComponent {
   protected declare _activeStepButton: HTMLButtonElement
   protected declare _initialStepButton: HTMLButtonElement
   protected declare _isFinished: boolean
+  protected declare _markedInvalid: WeakSet<Element>
   protected declare _validatedForms: Set<HTMLFormElement>
   protected declare _tabPattern: boolean
 
@@ -94,6 +95,7 @@ class Stepper extends BaseComponent {
     this._activeStepButton = this._getActiveElem()
     this._initialStepButton = this._activeStepButton
     this._isFinished = false
+    this._markedInvalid = new WeakSet()
     this._validatedForms = new Set()
 
     this._addStepperConnector()
@@ -133,11 +135,13 @@ class Stepper extends BaseComponent {
 
     const active = this._getActiveElem()
 
-    if (active && !this._isCurrentStepValid(active)) {
+    if (this._elemIsActive(button)) {
       return
     }
 
-    if (this._elemIsActive(button)) {
+    const isForward = this._stepButtons.indexOf(button) > this._stepButtons.indexOf(active)
+
+    if (active && isForward && !this._isCurrentStepValid(active)) {
       return
     }
 
@@ -270,9 +274,7 @@ class Stepper extends BaseComponent {
     }
 
     for (const form of this._validatedForms) {
-      for (const control of form.elements) {
-        control.classList.remove(CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID)
-      }
+      this._clearValidationState(form)
     }
 
     const firstStep = this._initialStepButton || this._stepButtons[0]
@@ -307,6 +309,7 @@ class Stepper extends BaseComponent {
   override dispose(): void {
     for (const form of this._validatedForms) {
       EventHandler.off(form, EVENT_INPUT)
+      this._clearValidationState(form)
     }
 
     super.dispose()
@@ -333,8 +336,12 @@ class Stepper extends BaseComponent {
     return elem.classList.contains(CLASS_NAME_ACTIVE)
   }
 
+  _getFocusedElement(): Element | null {
+    return (this._element.getRootNode() as Document | ShadowRoot).activeElement
+  }
+
   _holdsFocus(): boolean {
-    return this._element.contains((this._element.getRootNode() as Document | ShadowRoot).activeElement)
+    return this._element.contains(this._getFocusedElement())
   }
 
   _isCurrentStepValid(element: any): boolean {
@@ -355,6 +362,7 @@ class Stepper extends BaseComponent {
     }
 
     const isValid = form.checkValidity()
+    const focusedElement = this._getFocusedElement()
 
     EventHandler.trigger(this._element, EVENT_STEP_VALIDATION_COMPLETE, {
       stepIndex: this._stepButtons.indexOf(element) + 1,
@@ -363,7 +371,7 @@ class Stepper extends BaseComponent {
 
     if (!isValid) {
       if (form.noValidate) {
-        this._showValidationState(form)
+        this._showValidationState(form, this._getFocusedElement() === focusedElement)
       } else {
         form.reportValidity()
       }
@@ -374,24 +382,69 @@ class Stepper extends BaseComponent {
     return true
   }
 
-  _showValidationState(form: HTMLFormElement): void {
-    for (const control of form.elements) {
-      this._updateControlValidationState(control, form)
-    }
+  _showValidationState(form: HTMLFormElement, moveFocus: boolean): void {
+    this._updateFormValidationState(form)
 
     if (!this._validatedForms.has(form)) {
       this._validatedForms.add(form)
-      EventHandler.on(form, EVENT_INPUT, (event: any) => this._updateControlValidationState(event.target, form))
+      EventHandler.on(form, EVENT_INPUT, () => this._updateFormValidationState(form))
+    }
+
+    if (moveFocus) {
+      this._focusFirstInvalidControl(form)
+    }
+  }
+
+  _updateFormValidationState(form: HTMLFormElement): void {
+    for (const control of form.elements) {
+      this._updateControlValidationState(control, form)
     }
   }
 
   _updateControlValidationState(control: any, form: HTMLFormElement): void {
-    if (!control.willValidate || ['button', 'reset', 'submit'].includes(control.type)) {
+    if (!this._isValidatable(control)) {
       return
     }
 
     control.classList.toggle(CLASS_NAME_IS_INVALID, !control.validity.valid)
     control.classList.toggle(CLASS_NAME_IS_VALID, control.validity.valid && form.matches(SELECTOR_FORM_VALIDATE_VALID))
+
+    if (!control.validity.valid && control.getAttribute('aria-invalid') !== 'true') {
+      control.setAttribute('aria-invalid', 'true')
+      this._markedInvalid.add(control)
+    } else if (control.validity.valid && this._markedInvalid.has(control)) {
+      control.removeAttribute('aria-invalid')
+      this._markedInvalid.delete(control)
+    }
+  }
+
+  _clearValidationState(form: HTMLFormElement): void {
+    for (const control of form.elements) {
+      if (this._isValidatable(control)) {
+        control.classList.remove(CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID)
+      }
+
+      if (this._markedInvalid.has(control)) {
+        control.removeAttribute('aria-invalid')
+        this._markedInvalid.delete(control)
+      }
+    }
+  }
+
+  _focusFirstInvalidControl(form: HTMLFormElement): void {
+    const invalidControls = [...form.elements].filter((control: any) => this._isValidatable(control) && !control.validity.valid && !control.closest('[aria-hidden="true"]')) as HTMLElement[]
+
+    for (const control of invalidControls) {
+      control.focus()
+
+      if (this._getFocusedElement() === control) {
+        return
+      }
+    }
+  }
+
+  _isValidatable(control: any): boolean {
+    return control.willValidate && !['button', 'reset', 'submit'].includes(control.type)
   }
 
   _activate(element: any): void {
