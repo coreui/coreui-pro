@@ -14,6 +14,8 @@ import type { SectionInputConfig } from './section-input.js'
 import type { TimeSelectionConfig } from './time-selection/base.js'
 import TimeSelects from './time-selection/selects.js'
 import {
+  createDateTimeFormat,
+  formatSelectionName,
   getDateBySelectionType,
   isSameInstantAs,
   type SelectionTypes
@@ -169,6 +171,7 @@ class DatePicker extends PickerBase {
   protected declare _selection: any
   protected declare _selectionElement: any
   protected declare _applying: boolean
+  protected declare _toggleLabel: string | null
 
   constructor(element?: string | Element | null, config?: DatePickerOptions | null) {
     super(element, config)
@@ -185,6 +188,7 @@ class DatePicker extends PickerBase {
     this._hostClasses = captureHostClasses(this._element, this._managedClassNames())
     this._createDatePicker()
     this._date = this._input.getDate()
+    this._nameToggle()
     this._createPopup()
     this._addEventListeners()
   }
@@ -295,10 +299,13 @@ class DatePicker extends PickerBase {
     const ownToggle = SelectorEngine.findOne(SELECTOR_ROLE_TOGGLE, inputGroup)
 
     this._toggleElement = null
+    this._toggleLabel = null
 
     if (ownToggle) {
+      this._toggleLabel = ownToggle.hasAttribute('aria-label') || ownToggle.hasAttribute('aria-labelledby') || this._showsText(ownToggle) ? null : pickerLabel
       this._toggleElement = this._adoptAction(ownToggle, pickerLabel)
     } else if (this._config.pickerIcon) {
+      this._toggleLabel = pickerLabel
       this._toggleElement = this._createAction(CLASS_NAME_INDICATOR, this._config.pickerIcon === true ? CALENDAR_ICON : this._config.pickerIcon, pickerLabel)
       this._created.toggle = true
       inputGroup.append(this._toggleElement)
@@ -363,7 +370,10 @@ class DatePicker extends PickerBase {
     this._calendar = new Calendar(this._calendarElement, this._forwardConfig(Calendar, {
       locale: this._config.locale,
       startDate: this.getDate()
-    }, this._config.calendarOptions))
+    }, {
+      ...this._config.calendarOptions,
+      ...(this._config.timepicker ? {} : { ariaSelectedDateAnnouncement: '' })
+    }))
 
     EventHandler.on(this._calendar._element, 'startDateChange.coreui.calendar', event => {
       this._applyDate(this._withCurrentTime(event.dateObject), { calendar: false })
@@ -445,9 +455,23 @@ class DatePicker extends PickerBase {
       this._selection?.setConfig({ time: applied })
     }
 
+    this._nameToggle()
+
     if (changed) {
       EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date: applied, formattedDate: getDateBySelectionType(applied, this._config.selectionType) })
     }
+  }
+
+  _nameToggle(): void {
+    if (!this._toggleElement || !this._toggleLabel) {
+      return
+    }
+
+    const date = this._date
+    const name = date && formatSelectionName(date, { ...this._config.calendarOptions, locale: this._config.locale, selectionType: this._config.selectionType })
+    const time = date && this._config.timepicker && createDateTimeFormat(this._config.locale, { timeStyle: this._config.seconds === false ? 'short' : 'medium' }).format(date)
+
+    this._writeToggleAttribute('aria-label', [this._toggleLabel, name, time].filter(Boolean).join(', '))
   }
 
   override _writeToggleAttribute(name: string, value: string): void {

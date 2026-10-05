@@ -426,26 +426,6 @@ describe('announce', () => {
     expect(region(document.body)).toBeNull()
   })
 
-  it('should hold a message while a popup with aria-modal closes, and announce it on the page once it has', () => {
-    fixtureEl.innerHTML = '<div class="popup show" role="dialog" aria-modal="true"><button type="button">Friday, August 14, 2026</button></div><button type="button">Toggle calendar</button>'
-    const panel = fixtureEl.querySelector('[aria-modal]')
-    const cell = panel.querySelector('button')
-
-    cell.focus()
-    announce('Selected date: Friday, August 14, 2026', { context: cell })
-    panel.classList.remove('show')
-    fixtureEl.querySelector('button:not([aria-modal] button)').focus()
-    vi.advanceTimersByTime(100)
-
-    expect(panel.querySelector('[data-coreui-live-announcer] [aria-live="polite"] > *')).toBeNull()
-    expect(region(document.body)).toBeNull()
-
-    panel.remove()
-    vi.advanceTimersByTime(600)
-
-    expect(messages(document.body)).toEqual(['Selected date: Friday, August 14, 2026'])
-  })
-
   it('should announce on the page while an element with aria-modal is hidden', () => {
     fixtureEl.innerHTML = '<div role="dialog" aria-modal="true" hidden><button type="button">Next month</button></div><button type="button">Open</button>'
     const panel = fixtureEl.querySelector('[aria-modal]')

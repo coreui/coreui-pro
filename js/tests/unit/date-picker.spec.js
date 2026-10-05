@@ -1,5 +1,6 @@
 import { userEvent } from '@vitest/browser/context'
 import { onTestFinished, vi } from 'vitest'
+import Calendar from '../../src/calendar.js'
 import DatePicker from '../../src/date-picker.js'
 import Dialog from '../../src/dialog.js'
 import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
@@ -253,6 +254,43 @@ describe('DatePicker', () => {
     })
   })
 
+  describe('toggle name', () => {
+    const toggle = () => fixtureEl.querySelector('[aria-haspopup]')
+
+    it('should name the toggle with the date the picker holds', () => {
+      const picker = buildPicker({ date: new Date(2026, 7, 10), locale: 'en-US' })
+
+      expect(toggle().getAttribute('aria-label')).toEqual('Toggle calendar, Monday, August 10, 2026')
+
+      picker.setDate(new Date(2026, 7, 14))
+      expect(toggle().getAttribute('aria-label')).toEqual('Toggle calendar, Friday, August 14, 2026')
+
+      picker.clear()
+      expect(toggle().getAttribute('aria-label')).toEqual('Toggle calendar')
+    })
+
+    it('should name the toggle with the picked unit and, with the time selects, the time', () => {
+      buildPicker({ date: new Date(2026, 7, 10), locale: 'en-US', selectionType: 'month' })
+      expect(toggle().getAttribute('aria-label')).toEqual('Toggle calendar, August 2026')
+
+      buildPicker({ date: new Date(2026, 7, 10, 10, 30), locale: 'en-US', timepicker: true })
+      expect(toggle().getAttribute('aria-label')).toEqual('Toggle calendar and time selection, Monday, August 10, 2026, 10:30:00 AM')
+    })
+
+    it('should leave a toggle the page named itself alone', () => {
+      const picker = buildPicker({ date: new Date(2026, 7, 10), locale: 'en-US' }, [
+        '<div id="picker">',
+        '  <button type="button" data-coreui-picker-toggle aria-label="Wybierz datę"></button>',
+        '</div>'
+      ].join(''))
+      const own = fixtureEl.querySelector('[data-coreui-picker-toggle]')
+
+      picker.setDate(new Date(2026, 7, 14))
+
+      expect(own.getAttribute('aria-label')).toEqual('Wybierz datę')
+    })
+  })
+
   describe('page announcements', () => {
     const popupMessages = () => [...document.querySelectorAll('.date-picker-popup > [data-coreui-live-announcer] > [aria-live="polite"] > *')].map(message => message.textContent)
 
@@ -282,20 +320,37 @@ describe('DatePicker', () => {
       expect(popupMessages()).toEqual(['September 2026'])
     })
 
-    it('should announce a date picked in a panel that closes on the page, once the panel has closed', () => {
-      const pageMessages = () => [...document.querySelectorAll('body > [data-coreui-live-announcer] > [aria-live="polite"] > *')].map(message => message.textContent)
+    it('should leave a date picked in a panel that closes to the name of the toggle', () => {
       const picker = buildPicker({ date: new Date(2026, 7, 10), locale: 'en-US' })
+      const toggle = fixtureEl.querySelector('[data-coreui-picker-toggle], .date-picker-indicator, [aria-haspopup]')
 
+      toggle.focus()
       picker.show()
       vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'performance'] })
+      const added = []
+      const observer = new MutationObserver(records => {
+        for (const record of records) {
+          added.push(...[...record.addedNodes].filter(node => node.parentElement?.matches('[aria-live]')).map(node => node.textContent))
+        }
+      })
+      observer.observe(document.body, { childList: true, subtree: true })
       document.querySelector(`.date-picker-popup [data-coreui-date="${new Date(2026, 7, 14).toDateString()}"]`).click()
-
-      expect(popupMessages()).toEqual([])
-
       vi.advanceTimersByTime(2000)
 
-      expect(document.querySelector('.date-picker-popup')?.isConnected).not.toBeTrue()
-      expect(pageMessages()).toEqual(['Selected date: Friday, August 14, 2026'])
+      observer.disconnect()
+
+      expect(added.filter(message => message.startsWith('Selected'))).toEqual([])
+      expect(toggle.getAttribute('aria-label')).toEqual('Toggle calendar, Friday, August 14, 2026')
+    })
+
+    it('should turn off the pick message of the calendar only in a panel that closes on the pick', () => {
+      const pickMessage = () => Calendar.getInstance(document.querySelector('.date-picker-popup .date-picker-calendar'))._config.ariaSelectedDateAnnouncement
+
+      buildPicker({ date: new Date(2026, 7, 10), locale: 'en-US' }).show()
+      expect(pickMessage()).toEqual('')
+
+      buildPicker({ date: new Date(2026, 7, 10), locale: 'en-US', timepicker: true }).show()
+      expect(pickMessage()).toEqual('Selected date: {date}')
     })
 
     it('should announce a date picked in a panel that stays open', () => {

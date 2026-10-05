@@ -162,6 +162,14 @@ const CELL_NAME_FORMATS: Record<Exclude<ViewTypes, 'quarters'>, Intl.DateTimeFor
   years: { year: 'numeric' }
 }
 
+const VIEW_BY_SELECTION_TYPE: Record<SelectionTypes, ViewTypes> = {
+  day: 'days',
+  week: 'days',
+  month: 'months',
+  quarter: 'quarters',
+  year: 'years'
+}
+
 const MONTHS_IN_PERIOD: Record<PeriodViewTypes, number> = {
   months: 1,
   quarters: 3,
@@ -1009,6 +1017,67 @@ export const formatCellName = (date: Date, view: ViewTypes, format: (date: Date,
  */
 export const formatWeekName = (days: { date: Date }[], locale?: string) : string =>
   createDateTimeFormat(locale, { day: 'numeric', month: 'long', year: 'numeric' }).formatRange(days[0].date, (days.at(-1) as { date: Date }).date)
+
+export type SelectionNameOptions = {
+  ariaWeekNumberLabel?: ((weekNumber: number) => string | undefined) | null
+  firstDayOfWeek?: number
+  locale?: string
+  selectionType?: SelectionTypes
+  showWeekNumber?: boolean
+}
+
+/**
+ * Names a picked date in full, the way the calendar names the cell or the week row it is picked
+ * from: the day with its weekday, the week by the days of its row (after the week's name with
+ * `showWeekNumber`), the month, the quarter or the year.
+ *
+ * @param date - The picked date; for a week, any day of its ISO week
+ * @param options - The calendar's `selectionType`, `locale` and `firstDayOfWeek`, and for weeks
+ *   `showWeekNumber` and `ariaWeekNumberLabel`
+ * @returns The name, e.g. `Wednesday, August 12, 2026` or `August 10 – 16, 2026`
+ */
+export const formatSelectionName = (date: Date, { ariaWeekNumberLabel = null, firstDayOfWeek = 1, locale, selectionType = 'day', showWeekNumber = false }: SelectionNameOptions = {}) : string => {
+  if (selectionType !== 'week') {
+    return formatCellName(date, VIEW_BY_SELECTION_TYPE[selectionType], (value, options) => createDateTimeFormat(locale, options).format(value))
+  }
+
+  const first = getWeekRowStart(date, firstDayOfWeek)
+  const name = formatWeekName([{ date: first }, { date: createDate(first.getFullYear(), first.getMonth(), first.getDate() + 6) }], locale)
+
+  return showWeekNumber ? `${getWeekNumberName(getISOWeekNumberAndYear(date).weekNumber, getWeekLabel(locale ?? ''), ariaWeekNumberLabel)}, ${name}` : name
+}
+
+/**
+ * Names a picked range in full, as one range written by the locale where it can be: the days,
+ * the days of the week rows, the months or the years it spans, or its two quarters. A range that
+ * starts and ends on the same day, week, month, quarter or year is named as that one.
+ *
+ * @param start - The first picked date
+ * @param end - The last picked date
+ * @param options - As for `formatSelectionName`
+ * @returns The name, e.g. `Thursday, August 20 – Sunday, August 23, 2026`
+ */
+export const formatSelectionRangeName = (start: Date, end: Date, options: SelectionNameOptions = {}) : string => {
+  const { firstDayOfWeek = 1, locale, selectionType = 'day' } = options
+  const startName = formatSelectionName(start, options)
+  const endName = formatSelectionName(end, options)
+
+  if (startName === endName) {
+    return startName
+  }
+
+  if (selectionType === 'quarter') {
+    return `${startName} – ${endName}`
+  }
+
+  if (selectionType === 'week') {
+    const last = getWeekRowStart(end, firstDayOfWeek)
+    return createDateTimeFormat(locale, { day: 'numeric', month: 'long', year: 'numeric' })
+      .formatRange(getWeekRowStart(start, firstDayOfWeek), createDate(last.getFullYear(), last.getMonth(), last.getDate() + 6))
+  }
+
+  return createDateTimeFormat(locale, CELL_NAME_FORMATS[VIEW_BY_SELECTION_TYPE[selectionType] as Exclude<ViewTypes, 'quarters'>]).formatRange(start, end)
+}
 
 /**
  * Lists the days of the previous month that fill the first week row of a

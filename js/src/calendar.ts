@@ -32,6 +32,7 @@ import {
   createGroupsInArray,
   type DisabledDate,
   formatCellName,
+  formatSelectionName,
   formatWeekName,
   formatYearsRange,
   getCalendarDate,
@@ -39,7 +40,6 @@ import {
   getKeptDay,
   getClosestSelectable,
   getDateBySelectionType,
-  getISOWeekNumberAndYear,
   getMonthDetails,
   getMonthsNames,
   getStartOfView,
@@ -47,7 +47,6 @@ import {
   getWeekLabel,
   getWeekNumberName,
   getWeekRowDate,
-  getWeekRowStart,
   getYears,
   isCellDisabled,
   isCellOutsideLimits,
@@ -855,18 +854,11 @@ class Calendar extends BaseComponent {
   }
 
   _selectionName(date: Date): string {
-    if (this._config.selectionType !== 'week') {
-      return formatCellName(date, this._selectionView(), (value, options) => this._formatDate(value, options))
-    }
+    const { ariaWeekNumberLabel, firstDayOfWeek, locale, selectionType, showWeekNumber } = this._config
 
-    const { ariaWeekNumberLabel, firstDayOfWeek, locale, showWeekNumber } = this._config
-    const first = getWeekRowStart(date, firstDayOfWeek)
-    const last = createDate(first.getFullYear(), first.getMonth(), first.getDate() + 6)
-    const name = formatWeekName([{ date: first }, { date: last }], locale)
-
-    return showWeekNumber ?
-      `${getWeekNumberName(getISOWeekNumberAndYear(date).weekNumber, getWeekLabel(locale), ariaWeekNumberLabel)}, ${name}` :
-      name
+    return formatSelectionName(date, {
+      ariaWeekNumberLabel, firstDayOfWeek, locale, selectionType, showWeekNumber
+    })
   }
 
   _announcePages(pages: Array<[string | null, boolean]>): void {

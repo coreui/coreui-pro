@@ -1,4 +1,5 @@
 import { vi } from 'vitest'
+import Calendar from '../../src/calendar.js'
 import DateRangeInput from '../../src/date-range-input.js'
 import DateRangePicker from '../../src/date-range-picker.js'
 import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
@@ -450,16 +451,66 @@ describe('DateRangePicker', () => {
       }
     })
 
-    it('should announce the range its second pick completes, once the panel has closed', () => {
+    it('should name the toggle with the range it holds and leave the picks of a closing panel to it', () => {
       const picker = buildPicker({ calendarDate: new Date(2026, 7, 1), calendars: 1, locale: 'en-US' })
+      const toggle = fixtureEl.querySelector('[aria-haspopup]')
+
+      expect(toggle.getAttribute('aria-label')).toEqual('Toggle calendar')
+
+      picker.show()
+      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'performance'] })
+      const added = []
+      const observer = new MutationObserver(records => {
+        for (const record of records) {
+          added.push(...[...record.addedNodes].filter(node => node.parentElement?.matches('[aria-live]')).map(node => node.textContent))
+        }
+      })
+      observer.observe(document.body, { childList: true, subtree: true })
+      document.querySelector(`.date-picker-popup [data-coreui-date="${new Date(2026, 7, 20).toDateString()}"]`).click()
+      document.querySelector(`.date-picker-popup [data-coreui-date="${new Date(2026, 7, 23).toDateString()}"]`).click()
+      vi.advanceTimersByTime(2000)
+
+      observer.disconnect()
+
+      expect(added.filter(message => message.startsWith('Selected'))).toEqual([])
+      expect(toggle.getAttribute('aria-label')).toMatch(/^Toggle calendar, Thursday, August 20\s–\sSunday, August 23, 2026$/)
+
+      picker.setRange(new Date(2026, 8, 1), new Date(2026, 8, 1))
+      expect(toggle.getAttribute('aria-label')).toEqual('Toggle calendar, Tuesday, September 1, 2026')
+
+      picker.clear()
+      expect(toggle.getAttribute('aria-label')).toEqual('Toggle calendar')
+    })
+
+    it('should turn off the pick messages of the calendar only in a panel that closes on the pick', () => {
+      const messages = () => {
+        const { ariaSelectedDateAnnouncement, ariaSelectedRangeAnnouncement } = Calendar.getInstance(document.querySelector('.date-picker-popup .date-picker-calendar'))._config
+        return [ariaSelectedDateAnnouncement, ariaSelectedRangeAnnouncement]
+      }
+
+      buildPicker({ locale: 'en-US' }).show()
+      expect(messages()).toEqual(['', ''])
+
+      buildPicker({ locale: 'en-US' }, '<div id="picker"><template data-coreui-template="footer"><button type="button" data-coreui-picker-action="close">OK</button></template></div>').show()
+      expect(messages()).toEqual(['Selected date: {date}', 'Selected range: {start} to {end}'])
+    })
+
+    it('should announce the range a panel that stays open completes', () => {
+      const picker = buildPicker({ calendarDate: new Date(2026, 7, 1), calendars: 1, locale: 'en-US' }, [
+        '<div id="picker">',
+        '  <template data-coreui-template="footer">',
+        '    <button type="button" data-coreui-picker-action="close">OK</button>',
+        '  </template>',
+        '</div>'
+      ].join(''))
 
       picker.show()
       vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'performance'] })
       document.querySelector(`.date-picker-popup [data-coreui-date="${new Date(2026, 7, 20).toDateString()}"]`).click()
       document.querySelector(`.date-picker-popup [data-coreui-date="${new Date(2026, 7, 23).toDateString()}"]`).click()
-      vi.advanceTimersByTime(2000)
+      vi.advanceTimersByTime(110)
 
-      expect([...document.querySelectorAll('body > [data-coreui-live-announcer] > [aria-live="polite"] > *')].map(message => message.textContent)).toContain(
+      expect([...document.querySelectorAll('.date-picker-popup > [data-coreui-live-announcer] > [aria-live="polite"] > *')].map(message => message.textContent)).toContain(
         'Selected range: Thursday, August 20, 2026 to Sunday, August 23, 2026'
       )
     })

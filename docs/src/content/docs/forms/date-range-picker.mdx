@@ -285,6 +285,8 @@ The fields and the popup answer to the [same keys as the date picker](/forms/dat
 
 The picker element is a `role="group"` unless it carries a role of its own, so an `aria-labelledby` on it, pointing at the visible label as the example on this page does, names the pair of fields, and an `aria-describedby` on it moves to both fields, whatever role the element carries.
 
+The toggle's name ends with the range the picker holds, written by the locale (`Toggle calendar, Thursday, August 20 – Sunday, August 23, 2026`), so a screen reader reads the picked range when the popup closes and focus goes back to the toggle. A live message would be lost at that moment, so the calendar does not announce the picks of a popup that closes on the range; with a footer the popup stays open and the calendar announces the range through `ariaSelectedRangeAnnouncement`.
+
 ## Usage
 
 ### Via data attributes
@@ -320,7 +322,7 @@ and `selectEndDate` are set by the picker itself.
 | `allowList` | object | `SVGAllowlist` | Allowlist used when sanitizing icon markup. |
 | `ariaCleanerLabel` | string | `'Clear date range'` | Accessible label of the cleaner button. |
 | `ariaEndLabel` | string | `'End date'` | Accessible name of the end field when it has no floating label. Both halves are the same control, so naming them apart is what tells a screen reader which end of the range it is on. |
-| `ariaPickerLabel` | string | `'Toggle calendar'` | Accessible label of the picker button. |
+| `ariaPickerLabel` | string | `'Toggle calendar'` | Accessible label of the picker button, followed by the range the picker holds. |
 | `ariaPopupLabel` | string | `'Calendar'` | Accessible name of the calendar panel, which opens as a `role="dialog"`. |
 | `ariaStartLabel` | string | `'Start date'` | Accessible name of the start field when it has no floating label. |
 | `calendarOptions` | object | `{}` | Programmatic escape hatch for calendar options. |

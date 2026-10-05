@@ -1329,6 +1329,10 @@ removed in favour of `$translucent-opacity` and
   `'Selected range: {start} to {end}'`); before, picking a date with
   <kbd>Enter</kbd> left a screen reader silent. A page that translates the other
   calendar labels translates these two as well.
+- The toggle of a date picker and of a date range picker is named with the
+  value the picker holds (`Toggle calendar, Friday, August 14, 2026`), so a
+  screen reader reads the picked date when the popup closes and focus goes back
+  to it. A toggle the page named itself keeps its name.
 - The month and year between the navigation arrows are no longer a live region.
   A page turn is announced through `announce()`, inside the panel of a date
   picker when the calendar sits in one, and a key that leaves a day or a week

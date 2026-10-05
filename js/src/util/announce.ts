@@ -18,7 +18,6 @@ type Message = {
 
 const ATTRIBUTE = 'data-coreui-live-announcer'
 const CLASS_NAME_HIDING = 'hiding'
-const SELECTOR_CLOSING = `.${CLASS_NAME_HIDING}, .popup:not(.show)`
 const CLOSE_DELAY = 500
 const FIRST_MESSAGE_DELAY = 100
 const PRIORITIES: AnnouncePriority[] = ['assertive', 'polite']
@@ -198,7 +197,7 @@ const holdAfterClose = (records: MutationRecord[]): void => {
 /**
  * Adds the waiting messages to their regions in the order they came in. Each goes to the page or
  * to the modal dialog open at that moment. The queue holds while that dialog, or the dialog holding
- * focus, plays its closing transition, `.hiding` on a native dialog and a `.popup` without `.show`, for 500 ms after a dialog closes, and while a region is
+ * focus, plays its closing transition, for 500 ms after a dialog closes, and while a region is
  * younger than 100 ms. A message that waited for page regions removed since is dropped with them.
  */
 const flush = (): void => {
@@ -212,7 +211,7 @@ const flush = (): void => {
 
     const modal = getModal(context)
 
-    if (modal?.matches(SELECTOR_CLOSING) || document.activeElement?.closest(`dialog.${CLASS_NAME_HIDING}`)) {
+    if (modal?.classList.contains(CLASS_NAME_HIDING) || document.activeElement?.closest(`dialog.${CLASS_NAME_HIDING}`)) {
       setTimeout(flush, CLOSE_DELAY)
       return
     }
@@ -256,7 +255,7 @@ export const announce = (message: string, { context = null, priority = 'polite',
   const node = document.createElement('div')
   node.textContent = message
   const modal = getModal(context)
-  const host = modal && !modal.matches(SELECTOR_CLOSING) ? modal : document.body
+  const host = modal && !modal.classList.contains(CLASS_NAME_HIDING) ? modal : document.body
   const announcer = getAnnouncer(host)
 
   pending.push({
