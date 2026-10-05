@@ -1324,6 +1324,11 @@ removed in favour of `$translucent-opacity` and
   `ariaNothingToPickLabel` option** (`'Nothing on this page can be picked'`),
   also announced when the calendar turns to such a page, so a page that
   translates the other calendar labels translates this one too.
+- **A pick is announced through the new `ariaSelectedDateAnnouncement` and
+  `ariaSelectedRangeAnnouncement` options** (`'Selected date: {date}'`,
+  `'Selected range: {start} to {end}'`); before, picking a date with
+  <kbd>Enter</kbd> left a screen reader silent. A page that translates the other
+  calendar labels translates these two as well.
 - The month and year between the navigation arrows are no longer a live region.
   A page turn is announced through `announce()`, inside the panel of a date
   picker when the calendar sits in one, and a key that leaves a day or a week

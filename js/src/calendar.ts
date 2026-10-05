@@ -149,6 +149,8 @@ type CalendarConfig = {
   ariaNavPrevYearLabel: string
   ariaNavPrevYearsLabel: string
   ariaNothingToPickLabel: string | null
+  ariaSelectedDateAnnouncement: string | null
+  ariaSelectedRangeAnnouncement: string | null
   ariaWeekNumberLabel: ((weekNumber: number) => string | undefined) | null
   calendarDate: Date | number | string | null
   calendars: number
@@ -191,6 +193,8 @@ const Default: CalendarConfig = {
   ariaNavPrevYearLabel: 'Previous year',
   ariaNavPrevYearsLabel: 'Previous 12 years',
   ariaNothingToPickLabel: 'Nothing on this page can be picked',
+  ariaSelectedDateAnnouncement: 'Selected date: {date}',
+  ariaSelectedRangeAnnouncement: 'Selected range: {start} to {end}',
   ariaWeekNumberLabel: null,
   calendarDate: null,
   calendars: 1,
@@ -233,6 +237,8 @@ const DefaultType: Record<string, string> = {
   ariaNavPrevYearLabel: 'string',
   ariaNavPrevYearsLabel: 'string',
   ariaNothingToPickLabel: '(string|null)',
+  ariaSelectedDateAnnouncement: '(string|null)',
+  ariaSelectedRangeAnnouncement: '(string|null)',
   ariaWeekNumberLabel: '(function|null)',
   calendarDate: '(date|number|string|null)',
   calendars: 'number',
@@ -283,12 +289,14 @@ class Calendar extends BaseComponent {
   protected declare _view: ViewTypes
   protected declare _formatter: ReturnType<typeof createDateFormatter>
   protected declare _announcements: Array<() => void>
+  protected declare _selectionAnnouncement: (() => void) | null
 
   constructor(element?: string | Element | null, config?: Partial<CalendarConfig> | null) {
     super(element)
 
     this._formatter = createDateFormatter()
     this._announcements = []
+    this._selectionAnnouncement = null
     this._config = this._getConfig(config)
     this._initializeDates()
     this._initializeView()
@@ -329,6 +337,8 @@ class Calendar extends BaseComponent {
     for (const remove of this._announcements) {
       remove()
     }
+
+    this._selectionAnnouncement?.()
 
     this._element.innerHTML = ''
     this._element.classList.remove(CLASS_NAME_CALENDARS, CLASS_NAME_SHOW_WEEK_NUMBERS, `select-${this._config.selectionType}`)
@@ -436,6 +446,7 @@ class Calendar extends BaseComponent {
     this._updateClassNamesAndAriaLabels()
     this._updateCellContent()
     this._updateRovingTabIndex(SelectorEngine.findOne(':focus', this._element as ParentNode) as HTMLElement)
+    this._announceSelection()
   }
 
   _handleCalendarKeydown(event: any): void {
@@ -816,6 +827,35 @@ class Calendar extends BaseComponent {
       const grid = panel.children[1]
       return [grid.getAttribute('aria-label'), grid.hasAttribute('aria-describedby')]
     })
+  }
+
+  _announceSelection(): void {
+    const { ariaSelectedDateAnnouncement, ariaSelectedRangeAnnouncement, range } = this._config
+    const start = this._startDate
+    const end = this._endDate
+    const message = range ?
+      start && end && !this._selectEndDate && ariaSelectedRangeAnnouncement
+        ?.replaceAll('{start}', () => this._selectionName(start))
+        .replaceAll('{end}', () => this._selectionName(end)) :
+      start && ariaSelectedDateAnnouncement?.replaceAll('{date}', () => this._selectionName(start))
+
+    if (!message || !this._element.checkVisibility()) {
+      return
+    }
+
+    this._selectionAnnouncement?.()
+    this._selectionAnnouncement = announce(message, { context: this._element })
+  }
+
+  _selectionName(date: Date): string {
+    if (this._config.selectionType !== 'week') {
+      return formatCellName(date, this._selectionView(), (value, options) => this._formatDate(value, options))
+    }
+
+    const first = getStartOfWeek(date, this._config.firstDayOfWeek)
+    const last = createDate(first.getFullYear(), first.getMonth(), first.getDate() + 6)
+
+    return formatWeekName([{ date: first }, { date: last }], this._config.locale)
   }
 
   _announcePages(pages: Array<[string | null, boolean]>): void {
