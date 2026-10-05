@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import DateRangeInput from '../../src/date-range-input.js'
 import DateRangePicker from '../../src/date-range-picker.js'
 import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
@@ -437,6 +438,30 @@ describe('DateRangePicker', () => {
 
       expect(picker._popup.isShown).toBeTrue()
       picker.hide()
+    })
+  })
+
+  describe('announcements', () => {
+    afterEach(() => {
+      vi.useRealTimers()
+
+      for (const announcer of document.querySelectorAll('[data-coreui-live-announcer]')) {
+        announcer.remove()
+      }
+    })
+
+    it('should announce the range its second pick completes, once the panel has closed', () => {
+      const picker = buildPicker({ calendarDate: new Date(2026, 7, 1), calendars: 1, locale: 'en-US' })
+
+      picker.show()
+      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'performance'] })
+      document.querySelector(`.date-picker-popup [data-coreui-date="${new Date(2026, 7, 20).toDateString()}"]`).click()
+      document.querySelector(`.date-picker-popup [data-coreui-date="${new Date(2026, 7, 23).toDateString()}"]`).click()
+      vi.advanceTimersByTime(2000)
+
+      expect([...document.querySelectorAll('body > [data-coreui-live-announcer] > [aria-live="polite"] > *')].map(message => message.textContent)).toContain(
+        'Selected range: Thursday, August 20, 2026 to Sunday, August 23, 2026'
+      )
     })
   })
 

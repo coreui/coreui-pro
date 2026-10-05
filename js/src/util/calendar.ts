@@ -1370,7 +1370,7 @@ const getMonday = (date: Date) : Date => {
  * @param firstDayOfWeek - The day the rows start on, `0` for Sunday to `6` for Saturday
  * @returns The first day of the row
  */
-const getWeekRowStart = (date: Date, firstDayOfWeek: number) : Date => {
+export const getWeekRowStart = (date: Date, firstDayOfWeek: number) : Date => {
   const monday = getMonday(date)
   return getStartOfWeek(createDate(monday.getFullYear(), monday.getMonth(), monday.getDate() + 3), firstDayOfWeek)
 }

@@ -39,6 +39,7 @@ import {
   getKeptDay,
   getClosestSelectable,
   getDateBySelectionType,
+  getISOWeekNumberAndYear,
   getMonthDetails,
   getMonthsNames,
   getStartOfView,
@@ -46,6 +47,7 @@ import {
   getWeekLabel,
   getWeekNumberName,
   getWeekRowDate,
+  getWeekRowStart,
   getYears,
   isCellDisabled,
   isCellOutsideLimits,
@@ -112,7 +114,6 @@ const SELECTOR_CALENDAR_ROW = '.calendar-row'
 const SELECTOR_CALENDAR_ROW_FOCUSABLE = `${SELECTOR_CALENDAR_ROW}[tabindex]`
 const SELECTOR_CALENDAR_ROW_SELECTABLE = `${SELECTOR_CALENDAR_ROW}[data-coreui-selectable]`
 const SELECTOR_DATA_CALENDAR = '[data-coreui-calendar]'
-const SELECTOR_POPUP_CLOSING = '.popup:not(.show)'
 
 const CELL_RENDERERS: Record<ViewTypes, keyof CalendarConfig> = {
   days: 'renderDayCell',
@@ -339,8 +340,6 @@ class Calendar extends BaseComponent {
       remove()
     }
 
-    this._selectionAnnouncement?.()
-
     this._element.innerHTML = ''
     this._element.classList.remove(CLASS_NAME_CALENDARS, CLASS_NAME_SHOW_WEEK_NUMBERS, `select-${this._config.selectionType}`)
 
@@ -442,12 +441,14 @@ class Calendar extends BaseComponent {
       return
     }
 
+    const visible = this._element.checkVisibility()
+
     this._hoverDate = null
     this._selectDate(date)
+    this._announceSelection(visible)
     this._updateClassNamesAndAriaLabels()
     this._updateCellContent()
     this._updateRovingTabIndex(SelectorEngine.findOne(':focus', this._element as ParentNode) as HTMLElement)
-    this._announceSelection()
   }
 
   _handleCalendarKeydown(event: any): void {
@@ -830,22 +831,27 @@ class Calendar extends BaseComponent {
     })
   }
 
-  _announceSelection(): void {
+  _announceSelection(visible: boolean): void {
+    this._selectionAnnouncement?.()
+    this._selectionAnnouncement = null
+
     const { ariaSelectedDateAnnouncement, ariaSelectedRangeAnnouncement, range } = this._config
     const start = this._startDate
-    const end = this._endDate
-    const message = range ?
-      start && end && !this._selectEndDate && ariaSelectedRangeAnnouncement
-        ?.replaceAll('{start}', () => this._selectionName(start))
-        .replaceAll('{end}', () => this._selectionName(end)) :
-      start && ariaSelectedDateAnnouncement?.replaceAll('{date}', () => this._selectionName(start))
+    const end = range ? this._endDate : start
 
-    if (!message || !this._element.checkVisibility() || this._element.closest(SELECTOR_POPUP_CLOSING)) {
+    if (!visible || !start || !end) {
       return
     }
 
-    this._selectionAnnouncement?.()
-    this._selectionAnnouncement = announce(message, { context: this._element })
+    const startName = this._selectionName(start)
+    const endName = this._selectionName(end)
+    const message = startName === endName ?
+      ariaSelectedDateAnnouncement?.replaceAll('{date}', () => startName) :
+      ariaSelectedRangeAnnouncement?.replaceAll('{start}', () => startName).replaceAll('{end}', () => endName)
+
+    if (message) {
+      this._selectionAnnouncement = announce(message, { context: this._element })
+    }
   }
 
   _selectionName(date: Date): string {
@@ -853,10 +859,14 @@ class Calendar extends BaseComponent {
       return formatCellName(date, this._selectionView(), (value, options) => this._formatDate(value, options))
     }
 
-    const first = getStartOfWeek(date, this._config.firstDayOfWeek)
+    const { ariaWeekNumberLabel, firstDayOfWeek, locale, showWeekNumber } = this._config
+    const first = getWeekRowStart(date, firstDayOfWeek)
     const last = createDate(first.getFullYear(), first.getMonth(), first.getDate() + 6)
+    const name = formatWeekName([{ date: first }, { date: last }], locale)
 
-    return formatWeekName([{ date: first }, { date: last }], this._config.locale)
+    return showWeekNumber ?
+      `${getWeekNumberName(getISOWeekNumberAndYear(date).weekNumber, getWeekLabel(locale), ariaWeekNumberLabel)}, ${name}` :
+      name
   }
 
   _announcePages(pages: Array<[string | null, boolean]>): void {

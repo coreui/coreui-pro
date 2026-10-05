@@ -30,6 +30,7 @@ import {
   getTabStop,
   getWeekNumberName,
   getWeekRowDate,
+  getWeekRowStart,
   getYears,
   getMonthDetails,
   isCellDisabled,
@@ -863,6 +864,15 @@ describe('Calendar Utilities', () => {
 
       getStartOfWeek(date, 1)
       expect(date).toEqual(new Date(2026, 6, 2, 10))
+    })
+  })
+
+  describe('getWeekRowStart', () => {
+    it('should start the row that holds the Thursday of the ISO week, for every first day of the week', () => {
+      const monday = new Date(2026, 7, 10)
+
+      expect([0, 1, 2, 3, 4, 5, 6].map(firstDayOfWeek => getWeekRowStart(monday, firstDayOfWeek).getDate())).toEqual([9, 10, 11, 12, 13, 7, 8])
+      expect(getWeekRowStart(new Date(2026, 7, 16), 0)).toEqual(new Date(2026, 7, 9))
     })
   })
 

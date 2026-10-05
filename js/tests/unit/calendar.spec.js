@@ -3052,7 +3052,7 @@ describe('Calendar', () => {
         expect(messages()).toEqual(['Selected range: Monday, August 3, 2026 to Friday, August 7, 2026'])
       })
 
-      it('should not announce a range again while its new end is still to be picked', () => {
+      it('should announce the range a new start makes with the end it keeps', () => {
         const div = renderCalendar({ range: true })
         const day = date => div.querySelector(`[data-coreui-date="${date.toDateString()}"]`)
 
@@ -3060,6 +3060,44 @@ describe('Calendar', () => {
         day(new Date(2026, 7, 7)).click()
         vi.advanceTimersByTime(7000)
         day(new Date(2026, 7, 1)).click()
+        vi.advanceTimersByTime(110)
+
+        expect(messages()).toEqual(['Selected range: Saturday, August 1, 2026 to Friday, August 7, 2026'])
+      })
+
+      it('should announce a range completed by picking its start second', () => {
+        const div = renderCalendar({ range: true, selectEndDate: true })
+        const day = date => div.querySelector(`[data-coreui-date="${date.toDateString()}"]`)
+
+        day(new Date(2026, 7, 20)).click()
+        vi.advanceTimersByTime(110)
+
+        expect(messages()).toEqual([])
+
+        day(new Date(2026, 7, 10)).click()
+        vi.advanceTimersByTime(110)
+
+        expect(messages()).toEqual(['Selected range: Monday, August 10, 2026 to Thursday, August 20, 2026'])
+      })
+
+      it('should announce a range of one day as a date', () => {
+        const div = renderCalendar({ range: true })
+        const day = div.querySelector(`[data-coreui-date="${new Date(2026, 7, 3).toDateString()}"]`)
+
+        day.click()
+        div.querySelector(`[data-coreui-date="${new Date(2026, 7, 3).toDateString()}"]`).click()
+        vi.advanceTimersByTime(110)
+
+        expect(messages()).toEqual(['Selected date: Monday, August 3, 2026'])
+      })
+
+      it('should cancel a range message that was not read yet when a pick starts a new range', () => {
+        const div = renderCalendar({ range: true })
+        const day = date => div.querySelector(`[data-coreui-date="${date.toDateString()}"]`)
+
+        day(new Date(2026, 7, 3)).click()
+        day(new Date(2026, 7, 7)).click()
+        day(new Date(2026, 7, 10)).click()
         vi.advanceTimersByTime(110)
 
         expect(messages()).toEqual([])
@@ -3077,22 +3115,30 @@ describe('Calendar', () => {
       })
 
       it('should name a picked week, month, quarter and year the way their cells are named', () => {
-        const picked = (selectionType, target) => {
-          const div = renderCalendar({ firstDayOfWeek: 1, selectionType })
-          target(div).click()
+        const picked = (config, target) => {
+          const div = renderCalendar(config)
+          const element = target(div)
+          element.click()
           vi.advanceTimersByTime(110)
           const [message] = messages()
+          const name = element.getAttribute('aria-label')
           Calendar.getInstance(div).dispose()
           removeAnnouncers()
-          return message
+          return [message, name]
         }
 
-        const row = picked('week', div => weekRow(div, new Date(2026, 7, 10)))
-        const month = picked('month', div => div.querySelector(`[data-coreui-date="${new Date(2026, 7, 1).toDateString()}"]`))
-        const quarter = picked('quarter', div => div.querySelector(`[data-coreui-date="${new Date(2026, 6, 1).toDateString()}"]`))
-        const year = picked('year', div => div.querySelector(`[data-coreui-date="${new Date(2027, 0, 1).toDateString()}"]`))
+        for (const [firstDayOfWeek, rowStart] of [[0, 9], [1, 10], [2, 11], [4, 13], [6, 8]]) {
+          const [message, name] = picked({ firstDayOfWeek, selectionType: 'week' }, div => weekRow(div, new Date(2026, 7, rowStart)))
+          expect(message).toEqual(`Selected date: ${name}`)
+        }
 
-        expect(row).toMatch(/^Selected date: August 10\s–\s16, 2026$/)
+        const [numbered, numberedName] = picked({ selectionType: 'week', showWeekNumber: true }, div => weekRow(div, new Date(2026, 7, 10)))
+        const [month] = picked({ selectionType: 'month' }, div => div.querySelector(`[data-coreui-date="${new Date(2026, 7, 1).toDateString()}"]`))
+        const [quarter] = picked({ selectionType: 'quarter' }, div => div.querySelector(`[data-coreui-date="${new Date(2026, 6, 1).toDateString()}"]`))
+        const [year] = picked({ selectionType: 'year' }, div => div.querySelector(`[data-coreui-date="${new Date(2027, 0, 1).toDateString()}"]`))
+
+        expect(numbered).toMatch(/^Selected date: Week 33, August 10\s–\s16, 2026$/)
+        expect(numbered).toEqual(`Selected date: ${numberedName}`)
         expect([month, quarter, year]).toEqual(['Selected date: August 2026', 'Selected date: Q3 2026', 'Selected date: 2027'])
       })
 
@@ -3147,14 +3193,39 @@ describe('Calendar', () => {
         expect(messages()).toEqual([])
       })
 
-      it('should cancel a selection message that was not read yet when the calendar is disposed', () => {
+      it('should keep a selection message when the calendar is disposed, since the pick stands', () => {
         const div = renderCalendar()
 
         div.querySelector(`[data-coreui-date="${new Date(2026, 7, 12).toDateString()}"]`).click()
         Calendar.getInstance(div).dispose()
         vi.advanceTimersByTime(110)
 
-        expect(messages()).toEqual([])
+        expect(messages()).toEqual(['Selected date: Wednesday, August 12, 2026'])
+      })
+
+      it('should announce a pick before the page message it causes', () => {
+        let start = null
+        const div = renderCalendar({ calendars: 2, disabledDates: date => start !== null && date.getMonth() === 8 })
+
+        div.addEventListener('startDateChange.coreui.calendar', event => {
+          start = event.dateObject
+        })
+
+        div.querySelector(`[data-coreui-date="${new Date(2026, 7, 3).toDateString()}"]`).click()
+        vi.advanceTimersByTime(110)
+
+        expect(messages()).toEqual(['Selected date: Monday, August 3, 2026', 'September 2026, Nothing on this page can be picked'])
+      })
+
+      it('should announce a pick inside an element the page calls popup', () => {
+        fixtureEl.innerHTML = '<div class="popup"><div></div></div>'
+        const calendar = fixtureEl.querySelector('.popup > div')
+
+        new Calendar(calendar, { calendarDate: new Date(2026, 7, 1), locale: 'en-US' }) // eslint-disable-line no-new
+        calendar.querySelector(`[data-coreui-date="${new Date(2026, 7, 12).toDateString()}"]`).click()
+        vi.advanceTimersByTime(110)
+
+        expect(messages()).toEqual(['Selected date: Wednesday, August 12, 2026'])
       })
 
       it('should cancel a page message that was not read yet when the calendar is disposed', () => {

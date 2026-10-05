@@ -282,16 +282,20 @@ describe('DatePicker', () => {
       expect(popupMessages()).toEqual(['September 2026'])
     })
 
-    it('should not announce a date picked in a panel that closes, since the field reads it', () => {
+    it('should announce a date picked in a panel that closes on the page, once the panel has closed', () => {
+      const pageMessages = () => [...document.querySelectorAll('body > [data-coreui-live-announcer] > [aria-live="polite"] > *')].map(message => message.textContent)
       const picker = buildPicker({ date: new Date(2026, 7, 10), locale: 'en-US' })
 
       picker.show()
       vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'performance'] })
       document.querySelector(`.date-picker-popup [data-coreui-date="${new Date(2026, 7, 14).toDateString()}"]`).click()
+
+      expect(popupMessages()).toEqual([])
+
       vi.advanceTimersByTime(2000)
 
-      expect(picker.getDate().toDateString()).toEqual(new Date(2026, 7, 14).toDateString())
-      expect([...document.querySelectorAll('[data-coreui-live-announcer] [aria-live] > *')]).toHaveSize(0)
+      expect(document.querySelector('.date-picker-popup')?.isConnected).not.toBeTrue()
+      expect(pageMessages()).toEqual(['Selected date: Friday, August 14, 2026'])
     })
 
     it('should announce a date picked in a panel that stays open', () => {
