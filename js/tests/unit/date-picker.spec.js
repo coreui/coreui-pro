@@ -253,6 +253,54 @@ describe('DatePicker', () => {
     })
   })
 
+  describe('page announcements', () => {
+    const popupMessages = () => [...document.querySelectorAll('.date-picker-popup > [data-coreui-live-announcer] > [aria-live="polite"] > *')].map(message => message.textContent)
+
+    afterEach(() => {
+      vi.useRealTimers()
+
+      for (const announcer of document.querySelectorAll('[data-coreui-live-announcer]')) {
+        announcer.remove()
+      }
+    })
+
+    it('should announce a page turn inside the panel, which hides the rest of the page', () => {
+      const picker = buildPicker({ date: new Date(2026, 7, 10), locale: 'en-US' })
+
+      picker.show()
+      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'performance'] })
+      vi.advanceTimersByTime(110)
+
+      expect(document.querySelector('.date-picker-popup').getAttribute('aria-modal')).toEqual('true')
+      expect(document.querySelectorAll('[data-coreui-live-announcer] > * > *')).toHaveSize(0)
+
+      const next = document.querySelector('.date-picker-popup .btn-next')
+      next.focus()
+      next.click()
+      vi.advanceTimersByTime(110)
+
+      expect(popupMessages()).toEqual(['September 2026'])
+    })
+
+    it('should announce a page turned from a control of the panel outside the calendar', () => {
+      const picker = buildPicker({ date: new Date(2026, 7, 10), locale: 'en-US' }, [
+        '<div id="picker">',
+        '  <template data-coreui-template="footer">',
+        '    <button type="button" data-coreui-picker-action="today">Today</button>',
+        '  </template>',
+        '</div>'
+      ].join(''))
+
+      picker.show()
+      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'performance'] })
+      document.querySelector('.date-picker-footer [data-coreui-picker-action="today"]').focus()
+      picker.getContext().setDate(new Date(2027, 0, 10))
+      vi.advanceTimersByTime(110)
+
+      expect(popupMessages()).toEqual(['January 2027'])
+    })
+  })
+
   describe('form payload', () => {
     it('should not submit a floating-label picker the page did not name', () => {
       buildPicker({ date: new Date(2026, 0, 15), floatingLabel: 'Pick a date', format: 'dd.MM.yyyy' }, '<form id="form"><div id="picker"></div></form>')

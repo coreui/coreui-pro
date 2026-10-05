@@ -2722,7 +2722,7 @@ describe('Calendar', () => {
 
       Calendar.getInstance(div).setConfig({ ariaNothingToPickLabel: 'Brak dat do wyboru' })
 
-      expect(document.getElementById(div.querySelector('table').getAttribute('aria-describedby')).textContent).toEqual('Brak dat do wyboru')
+      expect(div.querySelector('.calendar-nav-date .visually-hidden').textContent).toEqual('Brak dat do wyboru')
     })
 
     it('should describe a grid again when a pick leaves nothing on it to pick', () => {
@@ -2740,6 +2740,8 @@ describe('Calendar', () => {
 
       expect(panels[0].querySelector('table').hasAttribute('aria-describedby')).toBeFalse()
       expect(panels[1].querySelector('table').hasAttribute('aria-describedby')).toBeTrue()
+      expect(panels[0].querySelector('.calendar-nav-date .visually-hidden')).toBeNull()
+      expect(panels[1].querySelector('.calendar-nav-date .visually-hidden').textContent).toEqual('Nothing on this page can be picked')
     })
 
     describe('page announcements', () => {
@@ -2766,11 +2768,12 @@ describe('Calendar', () => {
         removeAnnouncers()
       })
 
-      it('should not make the navigation a live region', () => {
-        const region = renderCalendar().querySelector('.calendar-nav-date')
+      it('should keep the note in the navigation without making it a live region', () => {
+        const region = renderCalendar({ minDate: new Date(2026, 8, 1) }).querySelector('.calendar-nav-date')
 
         expect(region.hasAttribute('aria-live')).toBeFalse()
         expect(region.hasAttribute('aria-atomic')).toBeFalse()
+        expect(region.textContent).toMatch(/^August 2026\s*Nothing on this page can be picked$/)
       })
 
       it('should announce the page a navigation button turns to while it has focus', () => {
@@ -2788,13 +2791,22 @@ describe('Calendar', () => {
         expect(messages()).toEqual(['September 2025'])
       })
 
-      it('should announce every page the calendars turn to as one message', () => {
-        const div = renderCalendar({ calendars: 2 })
+      it('should announce the page a navigation button turns to when the click does not focus it', () => {
+        const div = renderCalendar()
+
+        div.querySelector('.btn-next').click()
+        vi.advanceTimersByTime(110)
+
+        expect(messages()).toEqual(['September 2026'])
+      })
+
+      it('should announce every page the calendars turn to, one message each', () => {
+        const div = renderCalendar({ calendars: 2, disabledDates: date => date.getMonth() === 9 })
 
         clickWithFocus(div.querySelector('.btn-next'))
         vi.advanceTimersByTime(110)
 
-        expect(messages()).toEqual(['September 2026, October 2026'])
+        expect(messages()).toEqual(['September 2026', 'October 2026, Nothing on this page can be picked'])
       })
 
       it('should replace a page message that was not read yet', () => {
@@ -2851,6 +2863,48 @@ describe('Calendar', () => {
 
         expect(activeDate()).toEqual(new Date(2026, 8, 12))
         expect(messages()).toEqual(['Nothing on this page can be picked'])
+
+        vi.advanceTimersByTime(7000)
+        pressKey(document.activeElement, 'PageDown')
+        vi.advanceTimersByTime(110)
+
+        expect(activeDate()).toEqual(new Date(2026, 9, 12))
+        expect(messages()).toEqual(['Nothing on this page can be picked'])
+      })
+
+      it('should not announce a page a key turns to from a week row, which names the month itself', () => {
+        const div = renderCalendar({ selectionType: 'week' })
+        const row = weekRow(div, new Date(2026, 7, 10))
+
+        row.focus()
+        pressKey(row, 'PageDown')
+        vi.advanceTimersByTime(110)
+
+        expect(document.activeElement.matches('.calendar-row')).toBeTrue()
+        expect(div.querySelector('table').getAttribute('aria-label')).toEqual('September 2026')
+        expect(messages()).toEqual([])
+      })
+
+      it('should announce the year a key turns to from a month, which names only itself', () => {
+        const div = renderCalendar({ selectionType: 'month' })
+        const month = div.querySelector(`[data-coreui-date="${new Date(2026, 7, 1).toDateString()}"]`)
+
+        month.focus()
+        pressKey(month, 'PageDown')
+        vi.advanceTimersByTime(110)
+
+        expect(document.activeElement.textContent.trim()).toEqual('Aug')
+        expect(messages()).toEqual(['2027'])
+      })
+
+      it('should announce the range of years a navigation button turns to', () => {
+        const div = renderCalendar({ selectionType: 'year' })
+
+        clickWithFocus(div.querySelector('.btn-double-next'))
+        vi.advanceTimersByTime(110)
+
+        expect(messages()).toEqual([div.querySelector('table').getAttribute('aria-label')])
+        expect(messages()[0]).toMatch(/^2032\s–\s2043$/)
       })
 
       it('should announce the page a key turns to while the grid itself has focus', () => {
@@ -2876,23 +2930,65 @@ describe('Calendar', () => {
         expect(messages()).toEqual([])
       })
 
-      it('should not announce when the month button moves focus into the months grid', () => {
+      it('should announce the year when the month button moves focus into the months grid', () => {
         const div = renderCalendar()
 
         clickWithFocus(div.querySelector('.btn-month'))
         vi.advanceTimersByTime(110)
 
         expect(document.activeElement.closest('table')).toBe(div.querySelector('table'))
-        expect(messages()).toEqual([])
+        expect(messages()).toEqual(['2026'])
       })
 
-      it('should not announce a page that turns while focus is outside the calendar', () => {
-        const div = renderCalendar({ disabledDates: date => date.getMonth() > 7 })
+      it('should announce a page that turns while focus is outside the calendar', () => {
+        const div = renderCalendar({ disabledDates: date => date.getMonth() > 7 }, '<div></div><input>')
 
+        fixtureEl.querySelector('input').focus()
+        Calendar.getInstance(div).setConfig({ calendarDate: new Date(2026, 8, 1) })
+        vi.advanceTimersByTime(110)
+
+        expect(messages()).toEqual(['September 2026, Nothing on this page can be picked'])
+      })
+
+      it('should not announce a page that turns while the calendar is hidden', () => {
+        const div = renderCalendar()
+
+        div.hidden = true
         Calendar.getInstance(div).setConfig({ calendarDate: new Date(2026, 8, 1) })
         div.querySelector('.btn-next').click()
         vi.advanceTimersByTime(110)
 
+        expect(messages()).toEqual([])
+      })
+
+      it('should announce in the modal around the calendar in a shadow root while focus is outside it', () => {
+        fixtureEl.innerHTML = '<div></div><input>'
+        const root = fixtureEl.querySelector('div').attachShadow({ mode: 'open' })
+        root.innerHTML = '<div role="dialog" aria-modal="true"><div></div></div>'
+        const modal = root.querySelector('[aria-modal]')
+        const div = modal.querySelector('div')
+        const calendar = new Calendar(div, { calendarDate: new Date(2026, 7, 1), locale: 'en-US' })
+
+        fixtureEl.querySelector('input').focus()
+        calendar.setConfig({ calendarDate: new Date(2026, 8, 1) })
+        vi.advanceTimersByTime(110)
+
+        expect([...modal.querySelectorAll(':scope > [data-coreui-live-announcer] [aria-live="polite"] > *')].map(message => message.textContent)).toEqual(['September 2026'])
+      })
+
+      it('should read focus inside the shadow root the calendar renders in', () => {
+        fixtureEl.innerHTML = '<div></div>'
+        const root = fixtureEl.querySelector('div').attachShadow({ mode: 'open' })
+        root.innerHTML = '<div></div>'
+        const div = root.querySelector('div')
+        new Calendar(div, { calendarDate: new Date(2026, 7, 1), locale: 'en-US' }) // eslint-disable-line no-new
+
+        const cell = findDayCell(div, 2026, 7, 31)
+        cell.focus()
+        pressKey(cell, 'ArrowRight')
+        vi.advanceTimersByTime(110)
+
+        expect(root.activeElement.dataset.coreuiDate).toEqual(new Date(2026, 8, 1).toDateString())
         expect(messages()).toEqual([])
       })
 
@@ -2934,16 +3030,17 @@ describe('Calendar', () => {
       })
     })
 
-    it('should drop the description when a page gets something to pick without turning', () => {
+    it('should drop the note and the description when a page gets something to pick without turning', () => {
       let blocked = true
       const div = renderCalendar({ calendars: 2, disabledDates: date => blocked && date.getMonth() === 8 })
       const [first, second] = [...div.querySelectorAll('.calendar')]
 
-      expect(second.querySelector('table').hasAttribute('aria-describedby')).toBeTrue()
+      expect(second.querySelector('.calendar-nav-date .visually-hidden')).not.toBeNull()
 
       blocked = false
       first.querySelector(`[data-coreui-date="${new Date(2026, 7, 12).toDateString()}"]`).click()
 
+      expect(second.querySelector('.calendar-nav-date .visually-hidden')).toBeNull()
       expect(second.querySelector('table').hasAttribute('aria-describedby')).toBeFalse()
     })
 

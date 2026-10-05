@@ -40,18 +40,34 @@ const readyAt = new WeakMap<Element, Moment>()
 const pending: Message[] = []
 
 /**
+ * Tells whether an element is an open modal dialog: a native dialog opened with `showModal()`, or
+ * a shown element with `aria-modal="true"`, such as a picker panel that traps focus.
+ *
+ * @param element - The element to check
+ * @returns `true` when the rest of the page is inert or hidden behind the element
+ */
+const isModal = (element: Element): boolean => {
+  if (element.matches('dialog[open]')) {
+    return element.matches(':modal')
+  }
+
+  return element.matches('[aria-modal="true"]') && element.isConnected &&
+    (typeof element.checkVisibility !== 'function' || element.checkVisibility())
+}
+
+/**
  * Finds the open modal dialog around an element, through the slots it is assigned to and the
  * shadow roots it sits in.
  *
  * @param element - The element to start from
  * @returns The closest open modal dialog, or `null` when there is none
  */
-const getDialogAround = (element: Element | null): HTMLDialogElement | null => {
+const getDialogAround = (element: Element | null): HTMLElement | null => {
   let node = element
 
   while (node) {
-    if (node.matches('dialog[open]') && node.matches(':modal')) {
-      return node as HTMLDialogElement
+    if (isModal(node)) {
+      return node as HTMLElement
     }
 
     node = node.assignedSlot ?? node.parentElement ?? ((node.getRootNode() as ShadowRoot).host ?? null)
@@ -67,14 +83,14 @@ const getDialogAround = (element: Element | null): HTMLDialogElement | null => {
  * @param context - The element the message comes from, if any
  * @returns The modal dialog to announce in, or `null` when none is open
  */
-const getModal = (context: Element | null): HTMLDialogElement | null => {
+const getModal = (context: Element | null): HTMLElement | null => {
   let focused = document.activeElement
 
   while (focused?.shadowRoot?.activeElement) {
     focused = focused.shadowRoot.activeElement
   }
 
-  const modals = [...document.querySelectorAll<HTMLDialogElement>('dialog[open]')].filter(dialog => dialog.matches(':modal'))
+  const modals = [...document.querySelectorAll<HTMLElement>('dialog[open], [aria-modal="true"]')].filter(isModal)
 
   return getDialogAround(focused) ?? getDialogAround(context) ?? modals.at(-1) ?? null
 }
@@ -220,7 +236,7 @@ const flush = (): void => {
 /**
  * Reads a message to screen reader users. The message goes to a visually hidden live region at
  * the start of the page or, while a modal dialog leaves the rest of the page inert, to one inside
- * that dialog. The region is picked when the message is added: one task after the call, once a
+ * that dialog, native or marked with `aria-modal="true"`. The region is picked when the message is added: one task after the call, once a
  * new region is 100 ms old, and after a closing dialog has closed and 500 ms have passed. Messages
  * are added in the order of the calls, and each call adds a new one, so the same text is read
  * again.

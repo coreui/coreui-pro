@@ -282,13 +282,13 @@ class Calendar extends BaseComponent {
   protected declare _selectEndDate: boolean
   protected declare _view: ViewTypes
   protected declare _formatter: ReturnType<typeof createDateFormatter>
-  protected declare _announcement: (() => void) | null
+  protected declare _announcements: Array<() => void>
 
   constructor(element?: string | Element | null, config?: Partial<CalendarConfig> | null) {
     super(element)
 
     this._formatter = createDateFormatter()
-    this._announcement = null
+    this._announcements = []
     this._config = this._getConfig(config)
     this._initializeDates()
     this._initializeView()
@@ -326,7 +326,10 @@ class Calendar extends BaseComponent {
   }
 
   override dispose(): void {
-    this._announcement?.()
+    for (const remove of this._announcements) {
+      remove()
+    }
+
     this._element.innerHTML = ''
     this._element.classList.remove(CLASS_NAME_CALENDARS, CLASS_NAME_SHOW_WEEK_NUMBERS, `select-${this._config.selectionType}`)
 
@@ -786,17 +789,26 @@ class Calendar extends BaseComponent {
   }
 
   _describeGrid(panel: Element): void {
-    const [, grid, description] = panel.children
+    const [navigation, grid, description] = panel.children
+    const region = navigation.children[1]
     const label = this._config.ariaNothingToPickLabel
+    const note = SelectorEngine.findOne(`.${CLASS_NAME_VISUALLY_HIDDEN}`, region)
 
     description.textContent = label
 
     if (!label || SelectorEngine.findOne('[data-coreui-selectable]', grid)) {
       grid.removeAttribute('aria-describedby')
+      note?.remove()
       return
     }
 
     grid.setAttribute('aria-describedby', description.id)
+
+    if (!note) {
+      region.insertAdjacentHTML('beforeend', `<span class="${CLASS_NAME_VISUALLY_HIDDEN}">${escapeHtml(label)}</span>`)
+    } else if (note.textContent !== label) {
+      note.textContent = label
+    }
   }
 
   _pages(): Array<[string | null, boolean]> {
@@ -807,15 +819,16 @@ class Calendar extends BaseComponent {
   }
 
   _announcePages(pages: Array<[string | null, boolean]>): void {
-    const active = document.activeElement
-
-    if (!active || !this._element.contains(active)) {
+    if (!this._element.isConnected || !this._element.checkVisibility()) {
       return
     }
 
     const panels = SelectorEngine.find(SELECTOR_CALENDAR, this._element as ParentNode)
-    const date = active.closest(`${SELECTOR_CALENDAR_CELL}, ${SELECTOR_CALENDAR_ROW}`)
-    const message = this._pages().flatMap(([label, nothing], index) => {
+    const active = (this._element.getRootNode() as Document | ShadowRoot).activeElement
+    const date = active && this._element.contains(active) ?
+      active.closest(`${SELECTOR_CALENDAR_CELL}[aria-label], ${SELECTOR_CALENDAR_ROW}[aria-label]`) :
+      null
+    const messages = this._pages().flatMap(([label, nothing], index) => {
       const [previousLabel, previousNothing] = pages[index] ?? []
 
       if ((label === previousLabel && (previousNothing || !nothing)) || (date && !nothing)) {
@@ -823,11 +836,14 @@ class Calendar extends BaseComponent {
       }
 
       return [[date && panels[index].contains(date) ? '' : label, nothing && this._config.ariaNothingToPickLabel].filter(Boolean).join(', ')]
-    }).join(', ')
+    })
 
-    if (message) {
-      this._announcement?.()
-      this._announcement = announce(message, { context: this._element })
+    if (messages.length > 0) {
+      for (const remove of this._announcements) {
+        remove()
+      }
+
+      this._announcements = messages.map(message => announce(message, { context: this._element }))
     }
   }
 

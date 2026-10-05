@@ -414,6 +414,29 @@ describe('announce', () => {
     expect(messages(dialog)).toEqual(['Saved'])
   })
 
+  it('should announce inside a shown element with aria-modal, which hides the page', () => {
+    fixtureEl.innerHTML = '<div role="dialog" aria-modal="true"><button type="button">Next month</button></div>'
+    const panel = fixtureEl.querySelector('[aria-modal]')
+
+    panel.querySelector('button').focus()
+    announce('September 2026')
+    vi.advanceTimersByTime(100)
+
+    expect(messages(panel)).toEqual(['September 2026'])
+    expect(region(document.body)).toBeNull()
+  })
+
+  it('should announce on the page while an element with aria-modal is hidden', () => {
+    fixtureEl.innerHTML = '<div role="dialog" aria-modal="true" hidden><button type="button">Next month</button></div><button type="button">Open</button>'
+    const panel = fixtureEl.querySelector('[aria-modal]')
+
+    announce('Saved', { context: panel.querySelector('button') })
+    vi.advanceTimersByTime(100)
+
+    expect(messages(document.body)).toEqual(['Saved'])
+    expect(panel.querySelector('[data-coreui-live-announcer]')).toBeNull()
+  })
+
   it('should announce on the page while a dialog is open without being modal', () => {
     fixtureEl.innerHTML = '<dialog><p>Details</p></dialog>'
     const dialog = fixtureEl.querySelector('dialog')

@@ -557,7 +557,8 @@ does have a selection, already fires `change`.
 
 `announce(message, { context, priority, timeout })` reads a message to screen
 reader users through a visually hidden live region of the page, or of the open
-modal dialog, since a modal dialog leaves the rest of the page inert. Toaster
+modal dialog, native or marked with `aria-modal="true"` like the panel of a
+date picker, since a modal dialog leaves the rest of the page inert. Toaster
 announces its toasts through it. See
 [Accessibility](/getting-started/accessibility/#announcing-messages).
 
@@ -1324,10 +1325,11 @@ removed in favour of `$translucent-opacity` and
   also announced when the calendar turns to such a page, so a page that
   translates the other calendar labels translates this one too.
 - The month and year between the navigation arrows are no longer a live region.
-  A page turn is announced through `announce()` while focus is in the
-  calendar, and the page is named only when focus is not on a date: a key that
-  moved from August 31 to September 1 used to be read twice, as the date and
-  then as `September 2026`.
+  A page turn is announced through `announce()`, inside the panel of a date
+  picker when the calendar sits in one, and a key that leaves a day or a week
+  row names no page, since the date that takes focus names it: a key that moved
+  from August 31 to September 1 used to be read twice, as the date and then as
+  `September 2026`.
 - A locale whose own calendar has different months (Persian by default in
   `fa-IR`, or an Islamic, Hebrew or Chinese calendar asked for with `-u-ca-`)
   now shows the calendar in the Gregorian calendar, in its own language and
