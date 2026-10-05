@@ -192,7 +192,11 @@ abstract class PickerBase extends BaseComponent {
   }
 
   _writeAdoptedAttribute(element: Element, name: string, value: string | null): void {
-    if (!this._adoptedAttributes.some(([recorded, recordedName]) => recorded === element && recordedName === name)) {
+    const recorded = this._adoptedAttributes.find(([recordedElement, recordedName]) => recordedElement === element && recordedName === name)
+
+    if (recorded) {
+      recorded[3] = value
+    } else {
       this._adoptedAttributes.push([element, name, element.getAttribute(name), value])
     }
 

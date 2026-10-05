@@ -451,7 +451,7 @@ describe('DateRangePicker', () => {
       }
     })
 
-    it('should name the toggle with the range it holds and leave the picks of a closing panel to it', () => {
+    it('should name the toggle with the range it holds and leave the picks of a closing panel to it', async () => {
       const picker = buildPicker({ calendarDate: new Date(2026, 7, 1), calendars: 1, locale: 'en-US' })
       const toggle = fixtureEl.querySelector('[aria-haspopup]')
 
@@ -460,16 +460,19 @@ describe('DateRangePicker', () => {
       picker.show()
       vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'performance'] })
       const added = []
-      const observer = new MutationObserver(records => {
+      const collect = records => {
         for (const record of records) {
           added.push(...[...record.addedNodes].filter(node => node.parentElement?.matches('[aria-live]')).map(node => node.textContent))
         }
-      })
+      }
+
+      const observer = new MutationObserver(collect)
       observer.observe(document.body, { childList: true, subtree: true })
       document.querySelector(`.date-picker-popup [data-coreui-date="${new Date(2026, 7, 20).toDateString()}"]`).click()
+      await Promise.resolve()
       document.querySelector(`.date-picker-popup [data-coreui-date="${new Date(2026, 7, 23).toDateString()}"]`).click()
       vi.advanceTimersByTime(2000)
-
+      collect(observer.takeRecords())
       observer.disconnect()
 
       expect(added.filter(message => message.startsWith('Selected'))).toEqual([])
@@ -482,17 +485,54 @@ describe('DateRangePicker', () => {
       expect(toggle.getAttribute('aria-label')).toEqual('Toggle calendar')
     })
 
-    it('should turn off the pick messages of the calendar only in a panel that closes on the pick', () => {
+    it('should name the toggle with the calendar options given to the picker', () => {
+      buildPicker({
+        endDate: new Date(2026, 7, 24), firstDayOfWeek: 0, locale: 'en-US', selectionType: 'week', showWeekNumber: true, startDate: new Date(2026, 7, 10)
+      })
+
+      expect(fixtureEl.querySelector('[aria-haspopup]').getAttribute('aria-label')).toMatch(/^Toggle calendar, Week 33 – Week 35, August 9\s–\s29, 2026$/)
+    })
+
+    it('should turn off the pick messages of the calendar only in a panel that closes on the pick', async () => {
       const messages = () => {
         const { ariaSelectedDateAnnouncement, ariaSelectedRangeAnnouncement } = Calendar.getInstance(document.querySelector('.date-picker-popup .date-picker-calendar'))._config
         return [ariaSelectedDateAnnouncement, ariaSelectedRangeAnnouncement]
       }
 
-      buildPicker({ locale: 'en-US' }).show()
+      buildPicker({ calendarDate: new Date(2026, 7, 1), calendars: 1, locale: 'en-US' }).show()
+      expect(messages()).toEqual(['Selected date: {date}', 'Selected range: {start} to {end}'])
+
+      document.querySelector(`.date-picker-popup [data-coreui-date="${new Date(2026, 7, 20).toDateString()}"]`).click()
+      await Promise.resolve()
       expect(messages()).toEqual(['', ''])
 
-      buildPicker({ locale: 'en-US' }, '<div id="picker"><template data-coreui-template="footer"><button type="button" data-coreui-picker-action="close">OK</button></template></div>').show()
+      buildPicker({ calendarDate: new Date(2026, 7, 1), calendars: 1, locale: 'en-US' }, '<div id="picker"><template data-coreui-template="footer"><button type="button" data-coreui-picker-action="close">OK</button></template></div>').show()
+      document.querySelector(`.date-picker-popup [data-coreui-date="${new Date(2026, 7, 20).toDateString()}"]`).click()
+      await Promise.resolve()
       expect(messages()).toEqual(['Selected date: {date}', 'Selected range: {start} to {end}'])
+
+      buildPicker({
+        calendarDate: new Date(2026, 7, 1), calendars: 1, locale: 'en-US', pickerIcon: false
+      }).show()
+      document.querySelector(`.date-picker-popup [data-coreui-date="${new Date(2026, 7, 20).toDateString()}"]`).click()
+      await Promise.resolve()
+      expect(messages()).toEqual(['Selected date: {date}', 'Selected range: {start} to {end}'])
+    })
+
+    it('should announce a new start that keeps the end, since the panel stays open', () => {
+      const picker = buildPicker({
+        calendarDate: new Date(2026, 7, 1), calendars: 1, endDate: new Date(2026, 7, 23), locale: 'en-US', startDate: new Date(2026, 7, 20)
+      })
+
+      picker.show()
+      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'performance'] })
+      document.querySelector(`.date-picker-popup [data-coreui-date="${new Date(2026, 7, 18).toDateString()}"]`).click()
+      vi.advanceTimersByTime(110)
+
+      expect(picker._popup.isShown).toBeTrue()
+      expect([...document.querySelectorAll('.date-picker-popup > [data-coreui-live-announcer] > [aria-live="polite"] > *')].map(message => message.textContent)).toContain(
+        'Selected range: Tuesday, August 18, 2026 to Sunday, August 23, 2026'
+      )
     })
 
     it('should announce the range a panel that stays open completes', () => {

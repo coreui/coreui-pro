@@ -372,7 +372,7 @@ class DatePicker extends PickerBase {
       startDate: this.getDate()
     }, {
       ...this._config.calendarOptions,
-      ...(this._config.timepicker ? {} : { ariaSelectedDateAnnouncement: '' })
+      ...(this._config.timepicker || !this._toggleLabel ? {} : { ariaSelectedDateAnnouncement: '' })
     }))
 
     EventHandler.on(this._calendar._element, 'startDateChange.coreui.calendar', event => {
@@ -468,7 +468,7 @@ class DatePicker extends PickerBase {
     }
 
     const date = this._date
-    const name = date && formatSelectionName(date, { ...this._config.calendarOptions, locale: this._config.locale, selectionType: this._config.selectionType })
+    const name = date && formatSelectionName(date, this._forwardConfig(Calendar, { locale: this._config.locale }, this._config.calendarOptions))
     const time = date && this._config.timepicker && createDateTimeFormat(this._config.locale, { timeStyle: this._config.seconds === false ? 'short' : 'medium' }).format(date)
 
     this._writeToggleAttribute('aria-label', [this._toggleLabel, name, time].filter(Boolean).join(', '))

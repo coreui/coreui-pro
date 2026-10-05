@@ -277,6 +277,14 @@ describe('DatePicker', () => {
       expect(toggle().getAttribute('aria-label')).toEqual('Toggle calendar and time selection, Monday, August 10, 2026, 10:30:00 AM')
     })
 
+    it('should name the toggle with the calendar options given to the picker', () => {
+      buildPicker({
+        date: new Date(2026, 7, 10), firstDayOfWeek: 0, locale: 'en-US', selectionType: 'week', showWeekNumber: true
+      })
+
+      expect(toggle().getAttribute('aria-label')).toMatch(/^Toggle calendar, Week 33, August 9\s–\s15, 2026$/)
+    })
+
     it('should leave a toggle the page named itself alone', () => {
       const picker = buildPicker({ date: new Date(2026, 7, 10), locale: 'en-US' }, [
         '<div id="picker">',
@@ -288,6 +296,17 @@ describe('DatePicker', () => {
       picker.setDate(new Date(2026, 7, 14))
 
       expect(own.getAttribute('aria-label')).toEqual('Wybierz datę')
+    })
+
+    it('should leave a toggle that shows its own text or is labelled by the page without a name of its own', () => {
+      for (const own of [
+        '<button type="button" data-coreui-picker-toggle>Pick a date</button>',
+        '<span id="toggle-name">Pick</span><button type="button" data-coreui-picker-toggle aria-labelledby="toggle-name"></button>'
+      ]) {
+        buildPicker({ date: new Date(2026, 7, 10), locale: 'en-US' }, `<div id="picker">${own}</div>`)
+
+        expect(fixtureEl.querySelector('[data-coreui-picker-toggle]').hasAttribute('aria-label')).toBeFalse()
+      }
     })
   })
 
@@ -328,15 +347,17 @@ describe('DatePicker', () => {
       picker.show()
       vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'performance'] })
       const added = []
-      const observer = new MutationObserver(records => {
+      const collect = records => {
         for (const record of records) {
           added.push(...[...record.addedNodes].filter(node => node.parentElement?.matches('[aria-live]')).map(node => node.textContent))
         }
-      })
+      }
+
+      const observer = new MutationObserver(collect)
       observer.observe(document.body, { childList: true, subtree: true })
       document.querySelector(`.date-picker-popup [data-coreui-date="${new Date(2026, 7, 14).toDateString()}"]`).click()
       vi.advanceTimersByTime(2000)
-
+      collect(observer.takeRecords())
       observer.disconnect()
 
       expect(added.filter(message => message.startsWith('Selected'))).toEqual([])
@@ -350,6 +371,12 @@ describe('DatePicker', () => {
       expect(pickMessage()).toEqual('')
 
       buildPicker({ date: new Date(2026, 7, 10), locale: 'en-US', timepicker: true }).show()
+      expect(pickMessage()).toEqual('Selected date: {date}')
+
+      buildPicker({ date: new Date(2026, 7, 10), locale: 'en-US', pickerIcon: false }).show()
+      expect(pickMessage()).toEqual('Selected date: {date}')
+
+      buildPicker({ date: new Date(2026, 7, 10), locale: 'en-US' }, '<div id="picker"><button type="button" data-coreui-picker-toggle>Pick a date</button></div>').show()
       expect(pickMessage()).toEqual('Selected date: {date}')
     })
 
@@ -1488,6 +1515,25 @@ describe('DatePicker', () => {
       pickers.length = 0
 
       expect(toggle.outerHTML).toEqual('<button data-coreui-picker-toggle=""><svg viewBox="0 0 16 16"></svg></button>')
+    })
+
+    it('should take back the dated name it gave a toggle the author supplied', () => {
+      const picker = buildPicker({ date: new Date(2026, 7, 10), locale: 'en-US' }, `<div id="picker">
+        <div data-coreui-picker-field></div>
+        <button data-coreui-picker-toggle><svg viewBox="0 0 16 16"></svg></button>
+      </div>`)
+      const toggle = fixtureEl.querySelector('[data-coreui-picker-toggle]')
+
+      expect(toggle.getAttribute('aria-label')).toEqual('Toggle calendar, Monday, August 10, 2026')
+
+      picker.dispose()
+      pickers.length = 0
+
+      expect(toggle.hasAttribute('aria-label')).toBeFalse()
+
+      pickers.push(new DatePicker(fixtureEl.querySelector('#picker'), { date: new Date(2026, 7, 14), locale: 'en-US' }))
+
+      expect(toggle.getAttribute('aria-label')).toEqual('Toggle calendar, Friday, August 14, 2026')
     })
 
     it('should take back what it wrote even when the picker was open', () => {

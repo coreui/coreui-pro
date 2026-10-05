@@ -376,14 +376,14 @@ The field is a [date input](/forms/date-input/#accessibility) — a group of spi
 
 An `aria-label`, `aria-labelledby` or `aria-describedby` on the picker element moves to the field, so a screen reader announces the name and the description when focus enters it, and the picker element gets them back on dispose. Point `aria-labelledby` at the visible label, as the examples on this page do; it names the field over `floatingLabel` and an `ariaLabel` in `inputOptions`, the way the browser ranks names. A `data-coreui-picker-field` you wrote that already has an `aria-label` or `aria-labelledby` keeps its own name, and its own `aria-describedby` comes first, followed by the one that moves.
 
-The toggle's name ends with the date the picker holds, written in full (`Toggle calendar, Friday, August 14, 2026`, with the time after it with `timepicker`), so a screen reader reads the picked date when the popup closes and focus goes back to the toggle. A live message would be lost at that moment, so the calendar does not announce a pick that closes the popup; with `timepicker` the popup stays open and the calendar announces the pick through `ariaSelectedDateAnnouncement`. A `data-coreui-picker-toggle` that has a name or text of its own keeps it unchanged.
+The toggle's name ends with the date the picker holds, written in full (`Toggle calendar, Friday, August 14, 2026`, with the time after it with `timepicker`), so a screen reader reads the picked date when the popup closes and focus goes back to the toggle. A live message would be lost at that moment, so the calendar does not announce a pick that closes the popup onto that toggle. With `timepicker` the popup stays open, and the calendar announces the pick through `ariaSelectedDateAnnouncement`; it does the same without a toggle (`pickerIcon: false`) and with a `data-coreui-picker-toggle` that has a name or text of its own, which keeps it unchanged.
 
 ### Keyboard support
 
 | Key | Action |
 | --- | --- |
 | <kbd>Alt</kbd> (<kbd>Option</kbd> on macOS) + <kbd>Arrow Down</kbd> / <kbd>F4</kbd> | Open the calendar popup and move focus into the grid |
-| <kbd>Escape</kbd> | Close the popup and return focus to the field |
+| <kbd>Escape</kbd> | Close the popup and return focus to the field or the toggle that opened it |
 | <kbd>Tab</kbd> / <kbd>Shift</kbd> + <kbd>Tab</kbd> | Move within the open calendar; the field is outside the dialog and stays out of the cycle |
 | <kbd>Arrow Right</kbd> / <kbd>Arrow Left</kbd> | Move focus to the next / previous day; crossing the edge of the grid moves to the adjacent month |
 | <kbd>Arrow Down</kbd> / <kbd>Arrow Up</kbd> | Move focus to the same day of the next / previous week |

@@ -263,6 +263,24 @@ class DateRangePicker extends PickerBase {
 
     this._selectEndDate = value
     this._calendar?.setConfig({ selectEndDate: value })
+    this._syncPickMessages()
+  }
+
+  _pickMessages(): Partial<CalendarConfig> {
+    if (!this._footerTemplate && this._toggleElement && this._selectEndDate && this.getStartDate()) {
+      return { ariaSelectedDateAnnouncement: '', ariaSelectedRangeAnnouncement: '' }
+    }
+
+    const {
+      ariaSelectedDateAnnouncement = Calendar.Default.ariaSelectedDateAnnouncement,
+      ariaSelectedRangeAnnouncement = Calendar.Default.ariaSelectedRangeAnnouncement
+    } = this._forwardConfig(Calendar, {}, this._config.calendarOptions)
+
+    return { ariaSelectedDateAnnouncement, ariaSelectedRangeAnnouncement }
+  }
+
+  _syncPickMessages(): void {
+    queueMicrotask(() => this._calendar?.setConfig(this._pickMessages()))
   }
 
   _showRange(): void {
@@ -301,6 +319,7 @@ class DateRangePicker extends PickerBase {
 
     EventHandler.on(inputGroup, DateRangeInput.eventName('startDateChange'), (event: any) => {
       this._nameToggle()
+      this._syncPickMessages()
 
       if (!this._syncingFromPanel) {
         this._calendar?.setConfig({ startDate: event.date })
@@ -363,11 +382,12 @@ class DateRangePicker extends PickerBase {
       startDate: this.getStartDate()
     }, {
       ...this._config.calendarOptions,
-      ...(this._footerTemplate ? {} : { ariaSelectedDateAnnouncement: '', ariaSelectedRangeAnnouncement: '' })
+      ...this._pickMessages()
     }))
 
     EventHandler.on(this._calendar._element, 'selectEndChange.coreui.calendar', event => {
       this._selectEndDate = event.value
+      this._syncPickMessages()
     })
 
     EventHandler.on(this._calendar._element, 'startDateChange.coreui.calendar', event => {
@@ -404,7 +424,7 @@ class DateRangePicker extends PickerBase {
 
     const start = this.getStartDate()
     const end = this.getEndDate()
-    const name = start && end && formatSelectionRangeName(start, end, { ...this._config.calendarOptions, locale: this._config.locale, selectionType: this._config.selectionType })
+    const name = start && end && formatSelectionRangeName(start, end, this._forwardConfig(Calendar, { locale: this._config.locale }, this._config.calendarOptions))
 
     this._toggleElement.setAttribute('aria-label', name ? `${this._config.ariaPickerLabel}, ${name}` : this._config.ariaPickerLabel)
   }

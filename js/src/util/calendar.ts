@@ -1049,8 +1049,9 @@ export const formatSelectionName = (date: Date, { ariaWeekNumberLabel = null, fi
 
 /**
  * Names a picked range in full, as one range written by the locale where it can be: the days,
- * the days of the week rows, the months or the years it spans, or its two quarters. A range that
- * starts and ends on the same day, week, month, quarter or year is named as that one.
+ * the days of the week rows (after the numbers of the two weeks with `showWeekNumber`), the months
+ * or the years it spans, or its two quarters. A range that starts and ends on the same day, week,
+ * month, quarter or year is named as that one, and one that ends before it starts by its two ends.
  *
  * @param start - The first picked date
  * @param end - The last picked date
@@ -1058,7 +1059,7 @@ export const formatSelectionName = (date: Date, { ariaWeekNumberLabel = null, fi
  * @returns The name, e.g. `Thursday, August 20 – Sunday, August 23, 2026`
  */
 export const formatSelectionRangeName = (start: Date, end: Date, options: SelectionNameOptions = {}) : string => {
-  const { firstDayOfWeek = 1, locale, selectionType = 'day' } = options
+  const { ariaWeekNumberLabel = null, firstDayOfWeek = 1, locale, selectionType = 'day', showWeekNumber = false } = options
   const startName = formatSelectionName(start, options)
   const endName = formatSelectionName(end, options)
 
@@ -1066,14 +1067,17 @@ export const formatSelectionRangeName = (start: Date, end: Date, options: Select
     return startName
   }
 
-  if (selectionType === 'quarter') {
+  if (selectionType === 'quarter' || end < start) {
     return `${startName} – ${endName}`
   }
 
   if (selectionType === 'week') {
     const last = getWeekRowStart(end, firstDayOfWeek)
-    return createDateTimeFormat(locale, { day: 'numeric', month: 'long', year: 'numeric' })
+    const days = createDateTimeFormat(locale, { day: 'numeric', month: 'long', year: 'numeric' })
       .formatRange(getWeekRowStart(start, firstDayOfWeek), createDate(last.getFullYear(), last.getMonth(), last.getDate() + 6))
+    const weekName = (date: Date): string => getWeekNumberName(getISOWeekNumberAndYear(date).weekNumber, getWeekLabel(locale ?? ''), ariaWeekNumberLabel)
+
+    return showWeekNumber ? `${weekName(start)} – ${weekName(end)}, ${days}` : days
   }
 
   return createDateTimeFormat(locale, CELL_NAME_FORMATS[VIEW_BY_SELECTION_TYPE[selectionType] as Exclude<ViewTypes, 'quarters'>]).formatRange(start, end)

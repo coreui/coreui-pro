@@ -899,6 +899,16 @@ describe('Calendar Utilities', () => {
       expect(formatSelectionRangeName(new Date(2026, 0, 1), new Date(2028, 0, 1), { locale: 'en-US', selectionType: 'year' })).toMatch(/^2026\s–\s2028$/)
       expect(formatSelectionRangeName(new Date(2026, 6, 1), new Date(2026, 9, 1), { locale: 'en-US', selectionType: 'quarter' })).toEqual('Q3 2026 – Q4 2026')
       expect(formatSelectionRangeName(new Date(2026, 7, 10), new Date(2026, 7, 24), { firstDayOfWeek: 1, locale: 'en-US', selectionType: 'week' })).toMatch(/^August 10\s–\s30, 2026$/)
+      expect(formatSelectionRangeName(new Date(2026, 7, 10), new Date(2026, 7, 24), { firstDayOfWeek: 3, locale: 'en-US', selectionType: 'week' })).toMatch(/^August 12\s–\sSeptember 1, 2026$/)
+    })
+
+    it('should put the numbers of the two weeks before their days with showWeekNumber', () => {
+      expect(formatSelectionRangeName(new Date(2026, 7, 10), new Date(2026, 7, 24), { locale: 'en-US', selectionType: 'week', showWeekNumber: true })).toMatch(/^Week 33 – Week 35, August 10\s–\s30, 2026$/)
+    })
+
+    it('should name a range that ends before it starts by its two ends', () => {
+      expect(formatSelectionRangeName(new Date(2026, 7, 23), new Date(2026, 7, 20), { locale: 'en-US' })).toEqual('Sunday, August 23, 2026 – Thursday, August 20, 2026')
+      expect(formatSelectionRangeName(new Date(2026, 7, 17), new Date(2026, 7, 10), { locale: 'en-US', selectionType: 'week' })).toMatch(/^August 17\s–\s23, 2026 – August 10\s–\s16, 2026$/)
     })
 
     it('should name a range of one day, week, month, quarter or year as that one', () => {

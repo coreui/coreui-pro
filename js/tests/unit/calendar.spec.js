@@ -3028,6 +3028,18 @@ describe('Calendar', () => {
         expect(messages()).toEqual(['Selected date: Wednesday, August 12, 2026'])
       })
 
+      it('should announce a pick that hides the calendar, since it was on screen when it was picked', () => {
+        const div = renderCalendar()
+
+        div.addEventListener('startDateChange.coreui.calendar', () => {
+          div.hidden = true
+        })
+        div.querySelector(`[data-coreui-date="${new Date(2026, 7, 12).toDateString()}"]`).click()
+        vi.advanceTimersByTime(110)
+
+        expect(messages()).toEqual(['Selected date: Wednesday, August 12, 2026'])
+      })
+
       it('should announce the date Enter picks', () => {
         const div = renderCalendar()
 
