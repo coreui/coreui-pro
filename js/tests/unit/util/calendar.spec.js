@@ -13,6 +13,8 @@ import {
   createDate,
   createGroupsInArray,
   formatCellName,
+  formatSelectionName,
+  formatSelectionRangeName,
   formatWeekName,
   formatYearsRange,
   getCalendarDate,
@@ -30,6 +32,7 @@ import {
   getTabStop,
   getWeekNumberName,
   getWeekRowDate,
+  getWeekRowStart,
   getYears,
   getMonthDetails,
   isCellDisabled,
@@ -863,6 +866,63 @@ describe('Calendar Utilities', () => {
 
       getStartOfWeek(date, 1)
       expect(date).toEqual(new Date(2026, 6, 2, 10))
+    })
+  })
+
+  describe('formatSelectionName', () => {
+    it('should name a picked day, month, quarter and year the way the cells are named', () => {
+      const date = new Date(2026, 7, 12)
+
+      expect(formatSelectionName(date, { locale: 'en-US' })).toEqual('Wednesday, August 12, 2026')
+      expect(formatSelectionName(date, { locale: 'en-US', selectionType: 'month' })).toEqual('August 2026')
+      expect(formatSelectionName(date, { locale: 'en-US', selectionType: 'quarter' })).toEqual('Q3 2026')
+      expect(formatSelectionName(date, { locale: 'en-US', selectionType: 'year' })).toEqual('2026')
+      expect(formatSelectionName(date, { locale: 'pl-PL' })).toEqual('środa, 12 sierpnia 2026')
+    })
+
+    it('should name a picked week by the row that holds it, after its number with showWeekNumber', () => {
+      const monday = new Date(2026, 7, 10)
+
+      expect(formatSelectionName(monday, { firstDayOfWeek: 1, locale: 'en-US', selectionType: 'week' })).toMatch(/^August 10\s–\s16, 2026$/)
+      expect(formatSelectionName(monday, { firstDayOfWeek: 4, locale: 'en-US', selectionType: 'week' })).toMatch(/^August 13\s–\s19, 2026$/)
+      expect(formatSelectionName(monday, { locale: 'en-US', selectionType: 'week', showWeekNumber: true })).toMatch(/^Week 33, August 10\s–\s16, 2026$/)
+      expect(formatSelectionName(monday, {
+        ariaWeekNumberLabel: week => `Tydzień ${week}`, locale: 'en-US', selectionType: 'week', showWeekNumber: true
+      })).toMatch(/^Tydzień 33, August 10\s–\s16, 2026$/)
+    })
+  })
+
+  describe('formatSelectionRangeName', () => {
+    it('should write a picked range as one range of the locale', () => {
+      expect(formatSelectionRangeName(new Date(2026, 7, 20), new Date(2026, 7, 23), { locale: 'en-US' })).toMatch(/^Thursday, August 20\s–\sSunday, August 23, 2026$/)
+      expect(formatSelectionRangeName(new Date(2026, 7, 1), new Date(2026, 9, 1), { locale: 'en-US', selectionType: 'month' })).toMatch(/^August\s–\sOctober 2026$/)
+      expect(formatSelectionRangeName(new Date(2026, 0, 1), new Date(2028, 0, 1), { locale: 'en-US', selectionType: 'year' })).toMatch(/^2026\s–\s2028$/)
+      expect(formatSelectionRangeName(new Date(2026, 6, 1), new Date(2026, 9, 1), { locale: 'en-US', selectionType: 'quarter' })).toEqual('Q3 2026 – Q4 2026')
+      expect(formatSelectionRangeName(new Date(2026, 7, 10), new Date(2026, 7, 24), { firstDayOfWeek: 1, locale: 'en-US', selectionType: 'week' })).toMatch(/^August 10\s–\s30, 2026$/)
+      expect(formatSelectionRangeName(new Date(2026, 7, 10), new Date(2026, 7, 24), { firstDayOfWeek: 3, locale: 'en-US', selectionType: 'week' })).toMatch(/^August 12\s–\sSeptember 1, 2026$/)
+    })
+
+    it('should put the numbers of the two weeks before their days with showWeekNumber', () => {
+      expect(formatSelectionRangeName(new Date(2026, 7, 10), new Date(2026, 7, 24), { locale: 'en-US', selectionType: 'week', showWeekNumber: true })).toMatch(/^Week 33 – Week 35, August 10\s–\s30, 2026$/)
+    })
+
+    it('should name a range that ends before it starts by its two ends', () => {
+      expect(formatSelectionRangeName(new Date(2026, 7, 23), new Date(2026, 7, 20), { locale: 'en-US' })).toEqual('Sunday, August 23, 2026 – Thursday, August 20, 2026')
+      expect(formatSelectionRangeName(new Date(2026, 7, 17), new Date(2026, 7, 10), { locale: 'en-US', selectionType: 'week' })).toMatch(/^August 17\s–\s23, 2026 – August 10\s–\s16, 2026$/)
+    })
+
+    it('should name a range of one day, week, month, quarter or year as that one', () => {
+      expect(formatSelectionRangeName(new Date(2026, 7, 3), new Date(2026, 7, 3, 18), { locale: 'en-US' })).toEqual('Monday, August 3, 2026')
+      expect(formatSelectionRangeName(new Date(2026, 7, 3), new Date(2026, 7, 20), { locale: 'en-US', selectionType: 'month' })).toEqual('August 2026')
+    })
+  })
+
+  describe('getWeekRowStart', () => {
+    it('should start the row that holds the Thursday of the ISO week, for every first day of the week', () => {
+      const monday = new Date(2026, 7, 10)
+
+      expect([0, 1, 2, 3, 4, 5, 6].map(firstDayOfWeek => getWeekRowStart(monday, firstDayOfWeek).getDate())).toEqual([9, 10, 11, 12, 13, 7, 8])
+      expect(getWeekRowStart(new Date(2026, 7, 16), 0)).toEqual(new Date(2026, 7, 9))
     })
   })
 

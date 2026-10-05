@@ -198,9 +198,15 @@ const holdAfterClose = (records: MutationRecord[]): void => {
  * Adds the waiting messages to their regions in the order they came in. Each goes to the page or
  * to the modal dialog open at that moment. The queue holds while that dialog, or the dialog holding
  * focus, plays its closing transition, for 500 ms after a dialog closes, and while a region is
- * younger than 100 ms. A message that waited for page regions removed since is dropped with them.
+ * younger than 100 ms. A message that waited for page regions removed since is dropped with them,
+ * and the whole queue once there is no document, as when a test environment tears down.
  */
 const flush = (): void => {
+  if (typeof document === 'undefined') {
+    pending.length = 0
+    return
+  }
+
   while (pending.length > 0) {
     const [{ context, node, page, priority, timeout }] = pending
 

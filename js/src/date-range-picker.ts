@@ -13,7 +13,9 @@ import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import type { SectionInputConfig } from './section-input.js'
 import { captureHostClasses } from './util/form-control-group.js'
-import { getDateBySelectionType, isSameInstantAs, type SelectionTypes } from './util/calendar.js'
+import {
+  formatSelectionRangeName, getDateBySelectionType, isSameInstantAs, type SelectionTypes
+} from './util/calendar.js'
 import { getPickerFormat } from './util/date-sections.js'
 import {
   CALENDAR_ICON, CLEANER_ICON, SEPARATOR_ICON, SEPARATOR_ICON_RTL
@@ -177,6 +179,7 @@ class DateRangePicker extends PickerBase {
 
     this._hostClasses = captureHostClasses(this._element, this._managedClassNames())
     this._createDateRangePicker()
+    this._nameToggle()
     this._createPopup()
     this._addEventListeners()
   }
@@ -260,6 +263,24 @@ class DateRangePicker extends PickerBase {
 
     this._selectEndDate = value
     this._calendar?.setConfig({ selectEndDate: value })
+    this._syncPickMessages()
+  }
+
+  _pickMessages(): Partial<CalendarConfig> {
+    if (!this._footerTemplate && this._toggleElement && this._selectEndDate && this.getStartDate()) {
+      return { ariaSelectedDateAnnouncement: '', ariaSelectedRangeAnnouncement: '' }
+    }
+
+    const {
+      ariaSelectedDateAnnouncement = Calendar.Default.ariaSelectedDateAnnouncement,
+      ariaSelectedRangeAnnouncement = Calendar.Default.ariaSelectedRangeAnnouncement
+    } = this._forwardConfig(Calendar, {}, this._config.calendarOptions)
+
+    return { ariaSelectedDateAnnouncement, ariaSelectedRangeAnnouncement }
+  }
+
+  _syncPickMessages(): void {
+    queueMicrotask(() => this._calendar?.setConfig(this._pickMessages()))
   }
 
   _showRange(): void {
@@ -297,6 +318,9 @@ class DateRangePicker extends PickerBase {
     }, { inputOptions: this._config.inputOptions }))
 
     EventHandler.on(inputGroup, DateRangeInput.eventName('startDateChange'), (event: any) => {
+      this._nameToggle()
+      this._syncPickMessages()
+
       if (!this._syncingFromPanel) {
         this._calendar?.setConfig({ startDate: event.date })
         this._triggerDateChange(EVENT_START_DATE_CHANGE, event.date)
@@ -304,6 +328,8 @@ class DateRangePicker extends PickerBase {
     })
 
     EventHandler.on(inputGroup, DateRangeInput.eventName('endDateChange'), (event: any) => {
+      this._nameToggle()
+
       if (!this._syncingFromPanel) {
         this._calendar?.setConfig({ endDate: event.date })
         this._triggerDateChange(EVENT_END_DATE_CHANGE, event.date)
@@ -354,10 +380,14 @@ class DateRangePicker extends PickerBase {
       range: true,
       selectEndDate: this._selectEndDate,
       startDate: this.getStartDate()
-    }, this._config.calendarOptions))
+    }, {
+      ...this._config.calendarOptions,
+      ...this._pickMessages()
+    }))
 
     EventHandler.on(this._calendar._element, 'selectEndChange.coreui.calendar', event => {
       this._selectEndDate = event.value
+      this._syncPickMessages()
     })
 
     EventHandler.on(this._calendar._element, 'startDateChange.coreui.calendar', event => {
@@ -385,6 +415,18 @@ class DateRangePicker extends PickerBase {
         this.hide()
       }
     })
+  }
+
+  _nameToggle(): void {
+    if (!this._toggleElement) {
+      return
+    }
+
+    const start = this.getStartDate()
+    const end = this.getEndDate()
+    const name = start && end && formatSelectionRangeName(start, end, this._forwardConfig(Calendar, { locale: this._config.locale }, this._config.calendarOptions))
+
+    this._toggleElement.setAttribute('aria-label', name ? `${this._config.ariaPickerLabel}, ${name}` : this._config.ariaPickerLabel)
   }
 
   _triggerDateChange(eventName: string, date: Date | null): void {
