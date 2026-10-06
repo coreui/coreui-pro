@@ -1,6 +1,7 @@
 /* eslint-env jasmine */
 
 import {
+  constrainDate,
   convertIsoWeekToDate,
   convertToDateObject,
   createDateFromMonth,
@@ -36,6 +37,31 @@ import {
 } from '../../../src/util/calendar.js'
 
 describe('Calendar Utilities', () => {
+  describe('constrainDate', () => {
+    it('should return the date itself within the limits', () => {
+      const date = new Date(2026, 6, 10)
+
+      expect(constrainDate(date, new Date(2026, 6, 1), new Date(2026, 6, 31))).toBe(date)
+      expect(constrainDate(date, null, null)).toBe(date)
+    })
+
+    it('should return a copy of minDate for a date before it', () => {
+      const min = new Date(2026, 6, 14)
+      const result = constrainDate(new Date(2026, 5, 1), min, null)
+
+      expect(result).toEqual(min)
+      expect(result).not.toBe(min)
+    })
+
+    it('should return a copy of maxDate for a date after it', () => {
+      const max = new Date(2026, 6, 14)
+      const result = constrainDate(new Date(2026, 8, 30), null, max)
+
+      expect(result).toEqual(max)
+      expect(result).not.toBe(max)
+    })
+  })
+
   describe('convertIsoWeekToDate', () => {
     it('should convert a valid ISO week string to the corresponding Monday', () => {
       const result = convertIsoWeekToDate('2023W05')

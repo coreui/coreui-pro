@@ -88,6 +88,26 @@ const isPeriodDisabled = (start, end, min, max, disabledDates) => {
 }
 
 /**
+ * Moves a date between two limits: a date before the earliest one becomes
+ * that date, a date after the latest one becomes that date.
+ * @param date - The date to move.
+ * @param min - The earliest date allowed, or `null` without one.
+ * @param max - The latest date allowed, or `null` without one.
+ * @returns The date itself when the limits allow it, else a copy of the limit it crossed.
+ */
+export const constrainDate = (date, min, max) => {
+  if (min && date < min) {
+    return new Date(min)
+  }
+
+  if (max && date > max) {
+    return new Date(max)
+  }
+
+  return date
+}
+
+/**
  * Converts an ISO week string to a Date object representing the Monday of that week.
  * @param isoWeek - The ISO week string (e.g., "2023W05" or "2023w05").
  * @returns The Date object for the Monday of the specified week.
