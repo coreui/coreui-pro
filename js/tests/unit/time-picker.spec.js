@@ -1333,6 +1333,34 @@ describe('TimePicker', () => {
       tp.cancel()
       expect(tp._input.value).toBe(initialInputValue)
     })
+
+    it('should leave an empty picker empty', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const tp = new TimePicker(div)
+      const dates = []
+
+      div.addEventListener('timeChange.coreui.time-picker', event => dates.push(event.date))
+      tp.show()
+      tp.cancel()
+
+      expect(tp._date).toBeNull()
+      expect(tp._input.value).toBe('')
+      expect(dates).toEqual([null])
+    })
+
+    it('should clear a time picked on an empty picker', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const tp = new TimePicker(div)
+
+      tp.show()
+      tp._handleTimeChange('minutes', 30)
+      tp.cancel()
+
+      expect(tp._date).toBeNull()
+      expect(tp._input.value).toBe('')
+    })
   })
 
   describe('clear', () => {
@@ -2560,6 +2588,18 @@ describe('TimePicker', () => {
 
       expect(tp._date).toBeInstanceOf(Date)
       expect(tp._date.getHours()).toBe(5)
+    })
+
+    it('should start from local midnight when _date is null', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const tp = new TimePicker(div)
+
+      tp._handleTimeChange('minutes', 30)
+
+      expect(tp._date.getHours()).toBe(0)
+      expect(tp._date.getMinutes()).toBe(30)
+      expect(tp._date.getSeconds()).toBe(0)
     })
 
     it('should handle hours in 24h mode', () => {

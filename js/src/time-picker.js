@@ -212,7 +212,7 @@ class TimePicker extends BaseComponent {
       return
     }
 
-    this._initialDate = new Date(this._date)
+    this._initialDate = this._date ? new Date(this._date) : null
 
     EventHandler.trigger(this._element, EVENT_SHOW)
     this._element.classList.add(CLASS_NAME_SHOW)
@@ -978,7 +978,7 @@ class TimePicker extends BaseComponent {
   }
 
   _handleTimeChange = (set, value) => {
-    const _date = this._date || new Date('1970-01-01')
+    const _date = this._date || new Date(1970, 0, 1)
 
     if (set === 'meridiem') {
       const currentHours = _date.getHours()
