@@ -156,7 +156,7 @@ Each field carries its own [floating label](/forms/floating-labels/): set `start
 
 ## Validation
 
-The frame the picker builds takes the standard validation styling, and a state class written on the picker element reaches it: `.is-invalid` or `.is-valid` on the element you author styles the frame underneath it. That is the server-side route, so the class stays until the page changes it, and a sibling `.invalid-feedback` or `.valid-feedback` reads from the same element.
+The frame the picker builds takes the standard validation styling, and a state class written on the picker element reaches it: `.is-invalid` or `.is-valid` on the element you author styles the frame underneath it. That is the server-side route, so the class stays until the page changes it, and a sibling `.invalid-feedback` or `.valid-feedback` reads from the same element. While the element carries `.is-invalid` or `aria-invalid="true"`, both fields and their sections carry `aria-invalid="true"`, are described by that message and never turn valid, and they follow the page when it removes the class.
 
 <Example pro code={`<div class="row">
     <div class="col-lg-7 form-field">

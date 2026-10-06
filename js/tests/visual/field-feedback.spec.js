@@ -46,7 +46,10 @@ const DATE_LAYOUTS = {
   'inside a floating label after a date field': [DateInput, `<div class="form-floating"><div data-test></div><label>Due</label>${FEEDBACK}</div>`],
   'after a date picker': [DatePicker, `<div data-test></div>${FEEDBACK}`],
   'after a date range': [DateRangeInput, `<div data-test></div>${FEEDBACK}`],
-  'after a date range picker': [DateRangePicker, `<div data-test></div>${FEEDBACK}`]
+  'after a date range picker': [DateRangePicker, `<div data-test></div>${FEEDBACK}`],
+  'after a date picker the page marks invalid': [DatePicker, `<div class="is-invalid" data-test></div>${FEEDBACK}`, {}],
+  'after a date range picker the page marks invalid': [DateRangePicker, `<div class="is-invalid" data-test></div>${FEEDBACK}`, {}],
+  'next to a date range picker the page marks invalid, outside a field': [DateRangePicker, `<div class="is-invalid" data-test></div>${FEEDBACK}`, {}, false]
 }
 
 let container
@@ -136,10 +139,10 @@ describe('messages of a form field', () => {
     })
   }
 
-  for (const [layout, [Component, fields]] of Object.entries(DATE_LAYOUTS)) {
+  for (const [layout, [Component, fields, config = { invalid: true }, wrap = true]] of Object.entries(DATE_LAYOUTS)) {
     it(`links to every section of an invalid date field the very messages it shows ${layout}`, () => {
-      mount(fields)
-      const instance = new Component(container.querySelector('[data-test]'), { invalid: true })
+      mount(fields, '', wrap)
+      const instance = new Component(container.querySelector('[data-test]'), config)
       const shown = [...container.querySelectorAll('.invalid-feedback, .invalid-tooltip')]
         .filter(feedback => getComputedStyle(feedback).display !== 'none')
 

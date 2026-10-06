@@ -261,6 +261,10 @@ class TimePicker extends PickerBase {
     return this._input.isDateSelectable(new Date())
   }
 
+  override _setFieldInvalid(isInvalid: boolean): void {
+    this._input._setOwnerInvalid(isInvalid)
+  }
+
   _ensureSelection(): void {
     if (this._selection) {
       return

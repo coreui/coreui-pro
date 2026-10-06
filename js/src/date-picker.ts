@@ -354,6 +354,10 @@ class DatePicker extends PickerBase {
     return this._input.isDateSelectable(new Date())
   }
 
+  override _setFieldInvalid(isInvalid: boolean): void {
+    this._input._setOwnerInvalid(isInvalid)
+  }
+
   override _popupLabel(): string {
     return this._withTime('ariaPopupLabel', 'Calendar and time selection')
   }

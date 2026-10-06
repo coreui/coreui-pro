@@ -19,6 +19,7 @@ import { sanitizeByConfig } from './util/sanitizer.js'
  * Constants
  */
 
+const CLASS_NAME_IS_INVALID = 'is-invalid'
 const CLASS_NAME_POPUP = 'popup'
 const CLASS_NAME_SHOW = 'show'
 
@@ -37,9 +38,11 @@ abstract class PickerBase extends BaseComponent {
   protected declare _fieldElement: HTMLElement
   protected declare _footerTemplate: HTMLTemplateElement | null
   protected declare _hostClasses: HostClasses
+  protected declare _invalid: boolean
   protected declare _menu: HTMLElement
   protected declare _popup: Popup
   protected declare _toggleElement: HTMLElement | null
+  protected declare _validityObserver: MutationObserver | null
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
@@ -47,8 +50,10 @@ abstract class PickerBase extends BaseComponent {
     this._adoptedAttributes = []
     this._cleanerElement = null
     this._footerTemplate = SelectorEngine.findOne(SELECTOR_TEMPLATE_FOOTER, this._element) as HTMLTemplateElement | null
+    this._invalid = false
     this._menu = null as any
     this._popup = null as any
+    this._validityObserver = null
   }
 
   // Public
@@ -73,6 +78,7 @@ abstract class PickerBase extends BaseComponent {
       EventHandler.off(element, this.constructor.EVENT_KEY)
     }
 
+    this._validityObserver?.disconnect()
     this._popup.dispose()
     this._disposeParts()
     this._restoreAdoptedAttributes()
@@ -136,6 +142,19 @@ abstract class PickerBase extends BaseComponent {
         context[action]()
       }
     })
+
+    this._syncValidity()
+    this._validityObserver = new MutationObserver(() => this._syncValidity())
+    this._validityObserver.observe(this._element, { attributeFilter: ['aria-invalid', 'class'] })
+  }
+
+  _syncValidity(): void {
+    const isInvalid = this._element.classList.contains(CLASS_NAME_IS_INVALID) || this._element.getAttribute('aria-invalid') === 'true'
+
+    if (isInvalid !== this._invalid) {
+      this._invalid = isInvalid
+      this._setFieldInvalid(isInvalid)
+    }
   }
 
   _createAction(className: string, icon: string, label: string): HTMLElement {
@@ -300,6 +319,8 @@ abstract class PickerBase extends BaseComponent {
   abstract _managedClassNames(): string[]
 
   abstract _isNowSelectable(): boolean
+
+  abstract _setFieldInvalid(isInvalid: boolean): void
 
   abstract getContext(): Record<string, any>
 
