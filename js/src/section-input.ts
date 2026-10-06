@@ -79,6 +79,7 @@ const HOST_CLASS_NAMES = [
 const SELECTOR_FORM_VALIDATE = '[data-coreui-validate]'
 const SELECTOR_FORM_VALIDATE_VALID = '[data-coreui-validate~="valid"]'
 const SELECTOR_SECTION = '.form-date-time-section'
+const SELECTOR_VALUE_FIELD = 'textarea'
 
 export type SectionInputConfig = {
   ariaDayLabel: string
@@ -223,9 +224,10 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
   protected declare _hostClasses: HostClasses
   protected declare _hostNodes: ChildNode[]
   protected declare _hostRole: string | null
-  protected declare _inputElement: HTMLInputElement | null
+  protected declare _inputElement: HTMLTextAreaElement | null
   protected declare _form: HTMLFormElement | null
   protected declare _initialDate: Date | null
+  protected declare _isBuilt: boolean
   protected declare _resetHandler: (event: Event) => void
   protected declare _submitCaptureHandler: () => void
   protected declare _submitHandler: () => void
@@ -241,6 +243,7 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
     this._allSelected = false
     this._error = null
     this._inputElement = null
+    this._isBuilt = false
     this._form = null
     this._resetHandler = (event: Event) => {
       this._submittedSinceReset = false
@@ -284,6 +287,8 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
     this._createSectionInput()
     this._initialDate = getDateFromSections(this._sections)
     this._date = this._applyValidationState()
+    this._inputElement!.defaultValue = this._getResetValue()
+    this._isBuilt = true
     this._addEventListeners()
 
     if (this._config.autofocus && !this._config.disabled) {
@@ -413,6 +418,15 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
       this._selectSectionContent(event.target)
     })
 
+    EventHandler.on(this._element, eventName('focusin'), SELECTOR_VALUE_FIELD, () => {
+      this._focusFirstEmptySection()
+    })
+
+    EventHandler.on(this._element, eventName('invalid'), SELECTOR_VALUE_FIELD, () => {
+      this._submitted = true
+      this._setInvalid(true)
+    })
+
     EventHandler.on(this._element, eventName('mousedown'), SELECTOR_SECTION, (event: any) => {
       if (this._config.disabled) {
         return
@@ -462,15 +476,31 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
     }
 
     EventHandler.on(this._element, eventName('click'), (event: any) => {
-      if (this._config.disabled || event.target.closest(SELECTOR_SECTION)) {
+      if (event.target.closest(SELECTOR_SECTION)) {
+        event.preventDefault()
         return
       }
 
-      const sections = this._getSectionElements()
-      const target = sections.find((sectionElement, index) => this._getSection(index).value === null) || sections[0]
-
-      target?.focus()
+      if (!this._config.disabled) {
+        this._focusFirstEmptySection()
+      }
     })
+  }
+
+  _getResetValue(): string {
+    const sections = setSectionsFromDate(this._sections, this._initialDate)
+    const date = getDateFromSections(sections)
+
+    return date && !getDateLimitError(sections, date, this._minDate, this._maxDate, this._config.disabledDates) ?
+      formatSections(sections) :
+      ''
+  }
+
+  _focusFirstEmptySection(): void {
+    const sections = this._getSectionElements()
+    const target = sections.find((sectionElement, index) => this._getSection(index).value === null) || sections[0]
+
+    target?.focus()
   }
 
   _onFormSubmit(): void {
@@ -678,7 +708,16 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
     this._element.classList.toggle(CLASS_NAME_FILLED, isFilled)
     this._valid = this._config.valid || (this._submitValid && isFilled && !isDisabled)
     this._setInvalid(isDisabled || this._config.invalid || (this._submitted && this._isMissing(date)))
-    this._inputElement!.value = date && !isDisabled ? formatSections(this._sections) : ''
+    const value = date && !isDisabled ? formatSections(this._sections) : ''
+
+    if (this._inputElement!.value !== value) {
+      this._inputElement!.value = value
+
+      if (this._isBuilt) {
+        this._inputElement!.dispatchEvent(new Event('input', { bubbles: true }))
+        this._inputElement!.dispatchEvent(new Event('change', { bubbles: true }))
+      }
+    }
 
     if (error !== this._error) {
       this._error = error
@@ -813,10 +852,14 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
       this._element.append(element)
     }
 
-    this._inputElement = document.createElement('input')
-    this._inputElement.type = 'hidden'
+    this._inputElement = document.createElement('textarea')
+    this._inputElement.autocomplete = 'off'
+    this._inputElement.defaultValue = this._isBuilt ? this._getResetValue() : ''
     this._inputElement.disabled = disabled
+    this._inputElement.readOnly = readonly
     this._inputElement.required = required
+    this._inputElement.tabIndex = -1
+    this._inputElement.setAttribute('aria-hidden', 'true')
 
     if (name) {
       this._inputElement.name = name

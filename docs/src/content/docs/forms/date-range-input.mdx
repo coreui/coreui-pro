@@ -143,10 +143,10 @@ The token parser covers dayjs, moment, date-fns, and luxon format strings, so yo
 The field participates in the standard form validation styling. Four mechanisms set the state:
 
 - **Order (automatic)** — an end before the start is a state of the range, not of either date, so `.is-invalid` lands on the frame and both fields stay editable. Assistive technology hears it on both fields: each one and its sections carry `aria-invalid="true"` until the order is fixed, and neither field turns valid meanwhile, whatever the `valid` option or a validated submit says. `isRangeValid()` reports it.
-- **Range validation (automatic)** — a completed date outside `minDate`/`maxDate`/`disabledDates` gets `.is-invalid` on its own field, which the frame picks up, and that field's hidden input submits no date until it is corrected. A date before year 1 counts as before `minDate` even without that option; when the field loses the focus, its year becomes 1.
+- **Range validation (automatic)** — a completed date outside `minDate`/`maxDate`/`disabledDates` gets `.is-invalid` on its own field, which the frame picks up, and that field's value input submits no date until it is corrected. A date before year 1 counts as before `minDate` even without that option; when the field loses the focus, its year becomes 1.
 - **The `valid`/`invalid` options** — force the state on both ends, e.g. after server-side validation; `valid` skips an end the limits reject.
 - **A state class in the markup** — `.is-invalid` or `.is-valid` written on the frame judges the range the markup rendered, so the component keeps it while that range stands, drops it as soon as either end moves, and brings it back if the range returns, whether through `reset()`, a native form reset, or the user typing its way back. While an invalid class holds, neither field is drawn valid.
-- **Form submit** — each end renders a hidden input, which is excluded from native constraint validation, so the component applies the state itself when a form with the `data-coreui-validate` attribute is submitted: a `required` empty end becomes `.is-invalid`, and a filled one becomes `.is-valid` when the form opts into success styling with `data-coreui-validate="valid"`. A native form reset returns both ends to the dates they were created with and drops that state; a submit that follows the reset in the same task judges the restored dates again, and a `reset` listener that calls `preventDefault()` cancels the whole reset.
+- **Form submit** — each end keeps its value in an input laid invisibly over its field, which takes part in native constraint validation: a `required` end that is empty, incomplete or holds a rejected date blocks the submit, and the browser, or the [form plugin](/forms/validation/#usage), puts focus on its first empty section. In a form with the `data-coreui-validate` attribute the component also applies the state itself on submit: a `required` empty end becomes `.is-invalid`, and a filled one becomes `.is-valid` when the form opts into success styling with `data-coreui-validate="valid"`. A native form reset returns both ends to the dates they were created with and drops that state; a submit that follows the reset in the same task judges the restored dates again, and a `reset` listener that calls `preventDefault()` cancels the whole reset.
 
 Sibling `.valid-feedback`/`.invalid-feedback` elements work as with any other form control. The error shows when the frame is invalid and when a field inside it is, which is where the state of a single date lands; the success message waits until nothing is invalid.
 
@@ -169,7 +169,7 @@ Sibling `.valid-feedback`/`.invalid-feedback` elements work as with any other fo
 
 ### Blocking the submit
 
-The component marks the range but does not stop the form: the dates travel in hidden inputs, which native constraint validation skips, so `form.checkValidity()` stays `true` while the end is before the start, a `required` range is empty or an end is outside the limits. Check the range in your `submit` listener. `getStartDate()` and `getEndDate()` return what the fields hold, and `null` for an end that is empty, incomplete or rejected by the limits, so one condition covers all three:
+A `required` end that is empty, incomplete or rejected by the limits blocks the submit by itself. An end before the start does not, since both ends hold dates the browser accepts, and neither does an optional end that is empty, incomplete or rejected, which submits no date. Check the range in your `submit` listener; `getStartDate()` and `getEndDate()` return `null` for an end that is empty, incomplete or rejected, so one condition covers both:
 
 ```js
 const element = document.querySelector('#stayRange')
@@ -267,7 +267,7 @@ Apart from the shortcuts in the table, a key pressed with <kbd>Alt</kbd>, <kbd>C
 
 ### Via data attributes
 
-Add `data-coreui-date-range-input` to an empty `div`. The component renders both fields, the separator, and a hidden input per end, each submitted with the form once you give it a `startName` or an `endName`.
+Add `data-coreui-date-range-input` to an empty `div`. The component renders both fields, the separator, and a value input per end, each submitted with the form once you give it a `startName` or an `endName`.
 
 ```html
 <div data-coreui-date-range-input data-coreui-format="dd.MM.yyyy" data-coreui-start-name="from" data-coreui-end-name="to"></div>
@@ -307,7 +307,7 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | `disabledDates` | array, date, function, null | `null` | Dates (or a matcher function) neither end can hold |
 | `endDate` | date, string, null | `null` | Initial end date |
 | `endFloatingLabel` | string, null | `null` | Floating label of the end field |
-| `endName` | string, null | `null` | Name of the hidden input carrying the end date. Without it the end date is not submitted with the form. |
+| `endName` | string, null | `null` | Name of the value input carrying the end date. Without it the end date is not submitted with the form. |
 | `format` | function, string, null | `null` | Mask layout for both ends: `null` derives it from the locale, a string is parsed as format tokens, a function receives the locale and returns the section layout |
 | `hourPlaceholder` | string, null | `null` | Replaces the `HH` (`hh` on a 12-hour clock) the hour section shows while it is empty. |
 | `inputDateParse` | function, null | `null` | Custom parser used for pasted text, e.g. a date library |
@@ -322,7 +322,7 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | `monthPlaceholder` | string, null | `null` | Replaces the `MM` the month section shows while it is empty. |
 | `quarterPlaceholder` | string, null | `null` | Replaces the `Q` the quarter section shows while it is empty. |
 | `readonly` | boolean | `false` | Make both ends focusable but non-editable |
-| `required` | boolean | `false` | Required attribute of the hidden inputs |
+| `required` | boolean | `false` | Required attribute of the value inputs |
 | `sanitize` | boolean | `true` | Sanitize the generated separator icon |
 | `sanitizeFn` | function, null | `null` | Custom sanitizer |
 | `secondPlaceholder` | string, null | `null` | Replaces the `ss` the second section shows while it is empty. |
@@ -332,7 +332,7 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | `size` | string, null | `null` | `'sm'` or `'lg'` |
 | `startDate` | date, string, null | `null` | Initial start date |
 | `startFloatingLabel` | string, null | `null` | Floating label of the start field |
-| `startName` | string, null | `null` | Name of the hidden input carrying the start date. Without it the start date is not submitted with the form. |
+| `startName` | string, null | `null` | Name of the value input carrying the start date. Without it the start date is not submitted with the form. |
 | `type` | string | `'date'` | Which sections the locale-derived layout carries on both ends: `'date'` or `'datetime'`. A `format` names the sections itself and overrides this. |
 | `valid` | boolean | `false` | Force the valid state (`.is-valid`) on both ends, except an end the limits reject |
 | `weekPlaceholder` | string, null | `null` | Replaces the `WW` the week section shows while it is empty. |

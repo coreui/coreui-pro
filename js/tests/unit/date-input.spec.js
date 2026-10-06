@@ -1,5 +1,7 @@
 import { vi } from 'vitest'
 import DateInput from '../../src/date-input.js'
+import TimeInput from '../../src/time-input.js'
+import Form from '../../src/form.js'
 import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
 
 describe('DateInput', () => {
@@ -94,6 +96,227 @@ describe('DateInput', () => {
     })
   })
 
+  describe('constraint validation', () => {
+    const mountForm = (config, attributes = '') => {
+      fixtureEl.innerHTML = `<form ${attributes}><div class="date-input"></div><button type="submit">Send</button></form>`
+      const dateInput = new DateInput(fixtureEl.querySelector('.date-input'), { format: 'dd.MM.yyyy', name: 'when', ...config })
+
+      return { dateInput, form: fixtureEl.querySelector('form'), input: fixtureEl.querySelector('.form-date-time > textarea') }
+    }
+
+    it('should keep the value in a textarea out of the tab order and away from assistive technologies', () => {
+      const { input } = mountForm({})
+
+      expect(input.tagName).toEqual('TEXTAREA')
+      expect(input.tabIndex).toEqual(-1)
+      expect(input.getAttribute('aria-hidden')).toEqual('true')
+      expect(input.autocomplete).toEqual('off')
+    })
+
+    it('should make a required empty field, and a required field holding a rejected date, block the form', () => {
+      const { dateInput, form } = mountForm({ required: true })
+
+      expect(form.checkValidity()).toBeFalse()
+
+      dateInput.setConfig({ date: new Date(2026, 0, 15), maxDate: new Date(2026, 0, 10) })
+
+      expect(form.checkValidity()).toBeFalse()
+
+      dateInput.setConfig({ maxDate: null })
+
+      expect(form.checkValidity()).toBeTrue()
+    })
+
+    it('should leave a read-only or disabled field out of the form validation', () => {
+      for (const config of [{ readonly: true }, { disabled: true }]) {
+        const { form } = mountForm({ required: true, ...config })
+
+        expect(form.checkValidity()).toBeTrue()
+      }
+    })
+
+    it('should hand the focus the browser gives the value field to the first empty section', () => {
+      const { dateInput } = mountForm({ date: new Date(2026, 0, 15) })
+
+      dateInput.setConfig({ date: null })
+      fixtureEl.querySelector('.form-date-time > textarea').focus()
+
+      expect(document.activeElement).toEqual(fixtureEl.querySelector('.form-date-time-section'))
+    })
+
+    it('should mark itself invalid when a validation reports its value field, outside a submit as well', () => {
+      const { form } = mountForm({ required: true }, 'novalidate')
+      const host = fixtureEl.querySelector('.form-date-time')
+
+      expect(form.checkValidity()).toBeFalse()
+      expect(host).toHaveClass('is-invalid')
+      expect(host.getAttribute('aria-invalid')).toEqual('true')
+    })
+
+    it('should judge the date a reset restores when a submit follows it in the same task', () => {
+      const { dateInput, form } = mountForm({ date: new Date(2026, 0, 15), required: true })
+      let submitted = false
+      form.addEventListener('submit', event => {
+        submitted = true
+        event.preventDefault()
+      })
+
+      dateInput.clear()
+      form.reset()
+      form.requestSubmit()
+
+      expect(submitted).toBeTrue()
+    })
+
+    it('should judge the date a reset restores under the current limits when a submit follows it in the same task', () => {
+      const { dateInput, form } = mountForm({ date: new Date(2026, 0, 15), required: true })
+      let submitted = false
+      form.addEventListener('submit', event => {
+        submitted = true
+        event.preventDefault()
+      })
+
+      dateInput.setConfig({ maxDate: new Date(2026, 0, 10) })
+      dateInput.clear()
+      form.reset()
+      form.requestSubmit()
+
+      expect(submitted).toBeFalse()
+    })
+
+    it('should report a change of its value to the form from the value field, and stay silent when a reset puts the initial date back', async () => {
+      const { dateInput, form } = mountForm({ date: new Date(2026, 0, 15) })
+      const events = []
+      form.addEventListener('input', event => events.push(`${event.type}:${event.target.tagName}`))
+      form.addEventListener('change', event => events.push(`${event.type}:${event.target.tagName}`))
+
+      dateInput.clear()
+
+      expect(events).toEqual(['input:TEXTAREA', 'change:TEXTAREA'])
+
+      events.length = 0
+      form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(dateInput.getDate()).toEqual(new Date(2026, 0, 15))
+      expect(events).toEqual([])
+    })
+
+    it('should not report a change while it is built or rebuilt with the same date', () => {
+      const events = []
+      const listener = event => events.push(event.type)
+      fixtureEl.addEventListener('input', listener)
+      fixtureEl.addEventListener('change', listener)
+
+      const { dateInput } = mountForm({ date: new Date(2026, 0, 15) })
+      dateInput.setConfig({ locale: 'en-US' })
+
+      fixtureEl.removeEventListener('input', listener)
+      fixtureEl.removeEventListener('change', listener)
+
+      expect(events).toEqual([])
+    })
+
+    it('should hand the focus to the first empty section of a partly filled field', () => {
+      const { input } = mountForm({})
+      const [day, month] = fixtureEl.querySelectorAll('.form-date-time-section')
+
+      day.focus()
+      pressKey(day, '1')
+      pressKey(day, '5')
+      document.activeElement.blur()
+      fixtureEl.querySelector('.form-date-time > textarea').focus()
+
+      expect(input.isConnected).toBeTrue()
+      expect(document.activeElement).toEqual(month)
+    })
+
+    it('should make an incomplete required field block the form, and a field that stops being read-only', () => {
+      const { dateInput, form } = mountForm({ required: true, readonly: true })
+
+      expect(form.checkValidity()).toBeTrue()
+
+      dateInput.setConfig({ readonly: false })
+      const [day] = fixtureEl.querySelectorAll('.form-date-time-section')
+      day.focus()
+      pressKey(day, '1')
+      pressKey(day, '5')
+
+      expect(form.checkValidity()).toBeFalse()
+    })
+
+    it('should make a required empty time field block the form', () => {
+      fixtureEl.innerHTML = '<form><div class="time-input"></div></form>'
+      // eslint-disable-next-line no-new
+      new TimeInput(fixtureEl.querySelector('.time-input'), { required: true })
+
+      expect(fixtureEl.querySelector('form').checkValidity()).toBeFalse()
+    })
+
+    it('should keep the success state of a valid-mode field after a validation that saw it empty', async () => {
+      const { dateInput, form } = mountForm({ date: new Date(2026, 0, 15), required: true }, 'data-coreui-validate="valid" novalidate')
+      const host = fixtureEl.querySelector('.form-date-time')
+      form.addEventListener('submit', event => event.preventDefault())
+      form.requestSubmit()
+      await Promise.resolve()
+
+      expect(host).toHaveClass('is-valid')
+
+      dateInput.clear()
+      form.checkValidity()
+
+      expect(host).toHaveClass('is-invalid')
+
+      const [day, month, year] = fixtureEl.querySelectorAll('.form-date-time-section')
+      day.focus()
+      for (const [section, keys] of [[day, '15'], [month, '01'], [year, '2026']]) {
+        section.focus()
+        for (const key of keys) {
+          pressKey(section, key)
+        }
+      }
+
+      expect(dateInput.getDate()).toEqual(new Date(2026, 0, 15))
+      expect(host).toHaveClass('is-valid')
+    })
+
+    it('should keep focus on the section the user activates inside a wrapping label', () => {
+      fixtureEl.innerHTML = '<form><label>Due <div class="date-input"></div></label></form>'
+      // eslint-disable-next-line no-new
+      new DateInput(fixtureEl.querySelector('.date-input'), { format: 'dd.MM.yyyy' })
+      const year = fixtureEl.querySelector('[data-coreui-section="year"]')
+
+      year.focus()
+      year.click()
+
+      expect(document.activeElement).toEqual(year)
+    })
+
+    it('should be the control the browser and the form plugin focus when it is the first invalid one', () => {
+      const { form } = mountForm({ required: true }, 'data-coreui-validate novalidate')
+      let prevented
+      form.addEventListener('submit', event => {
+        prevented = event.defaultPrevented
+        event.preventDefault()
+      })
+
+      form.requestSubmit()
+
+      expect(prevented).toBeTrue()
+      expect(document.activeElement).toEqual(fixtureEl.querySelector('.form-date-time-section'))
+
+      Form.getInstance(form).dispose()
+      document.activeElement.blur()
+
+      expect(document.activeElement).toEqual(document.body)
+
+      expect(form.reportValidity()).toBeFalse()
+      expect(document.activeElement).toEqual(fixtureEl.querySelector('.form-date-time-section'))
+    })
+  })
+
   describe('dispose', () => {
     it('should give the host back the way the page wrote it', () => {
       fixtureEl.innerHTML = '<div class="form-control form-date-time my-own" id="start" role="note"></div>'
@@ -161,7 +384,7 @@ describe('DateInput', () => {
       const second = new DateInput(dateInputEl, config)
 
       expect(dateInputEl.outerHTML).toEqual(built)
-      expect(dateInputEl.querySelectorAll('input[type="hidden"]')).toHaveLength(1)
+      expect(dateInputEl.querySelectorAll('.form-date-time > textarea')).toHaveLength(1)
 
       second.dispose()
     })
@@ -221,7 +444,7 @@ describe('DateInput', () => {
   })
 
   describe('constructor', () => {
-    it('should create sections, separators and a hidden input from the format', () => {
+    it('should create sections, separators and a value field from the format', () => {
       const dateInput = createDateInput()
       const element = dateInput._element
 
@@ -230,7 +453,7 @@ describe('DateInput', () => {
       expect(element.getAttribute('role')).toEqual('group')
       expect(getSections(element)).toHaveSize(3)
       expect(element.querySelectorAll('.form-date-time-separator')).toHaveSize(2)
-      expect(element.querySelector('input[type="hidden"]')).not.toBeNull()
+      expect(element.querySelector('.form-date-time > textarea')).not.toBeNull()
     })
 
     it('should show placeholders in empty sections', () => {
@@ -283,14 +506,14 @@ describe('DateInput', () => {
       expect(getSections(dateInput._element)[0].textContent).toEqual('jj')
     })
 
-    it('should fill sections and the hidden input from the initial date', () => {
+    it('should fill sections and the value field from the initial date', () => {
       const dateInput = createDateInput({ date: new Date(2026, 6, 14), name: 'my-date' })
       const [day, month, year] = getSections(dateInput._element)
 
       expect(day.textContent).toEqual('14')
       expect(month.textContent).toEqual('07')
       expect(year.textContent).toEqual('2026')
-      expect(dateInput._element.querySelector('input[type="hidden"]').value).toEqual('14.07.2026')
+      expect(dateInput._element.querySelector('.form-date-time > textarea').value).toEqual('14.07.2026')
       expect(dateInput._element.classList.contains('form-date-time-filled')).toBeTrue()
     })
 
@@ -455,7 +678,7 @@ describe('DateInput', () => {
       expect(spy).toHaveBeenCalled()
       expect(spy.calls.mostRecent().args[0].date).toEqual(new Date(2026, 6, 4))
       expect(dateInput.getDate()).toEqual(new Date(2026, 6, 4))
-      expect(element.querySelector('input[type="hidden"]').value).toEqual('04.07.2026')
+      expect(element.querySelector('.form-date-time > textarea').value).toEqual('04.07.2026')
     })
 
     it.each(['q yyyy', 'QQQ yyyy'])('should ignore a quarter digit above 4 in %s', format => {
@@ -628,7 +851,7 @@ describe('DateInput', () => {
       }
 
       expect(dateInput.getDate()).toEqual(new Date(2026, 6, 1))
-      expect(dateInput._element.querySelector('input[type="hidden"]').value).toEqual('07.2026')
+      expect(dateInput._element.querySelector('.form-date-time > textarea').value).toEqual('07.2026')
     })
 
     it('should fill month and year sections from an initial date', () => {
@@ -1815,7 +2038,7 @@ describe('DateInput', () => {
       expect(day.isContentEditable).toBeFalse()
       expect(day.tabIndex).toBe(-1)
       expect(day.getAttribute('aria-disabled')).toEqual('true')
-      expect(dateInput._element.querySelector('input[type="hidden"]').disabled).toBeTrue()
+      expect(dateInput._element.querySelector('.form-date-time > textarea').disabled).toBeTrue()
     })
 
     it('should mark readonly sections read-only and keep them focusable', () => {
@@ -1854,14 +2077,14 @@ describe('DateInput', () => {
   })
 
   describe('clear', () => {
-    it('should empty all sections and the hidden input', () => {
+    it('should empty all sections and the value field', () => {
       const dateInput = createDateInput({ date: new Date(2026, 6, 14) })
 
       dateInput.clear()
 
       expect(dateInput.getDate()).toBeNull()
       expect(getSections(dateInput._element)[0].textContent).toEqual('DD')
-      expect(dateInput._element.querySelector('input[type="hidden"]').value).toEqual('')
+      expect(dateInput._element.querySelector('.form-date-time > textarea').value).toEqual('')
       expect(dateInput._element.classList.contains('form-date-time-filled')).toBeFalse()
     })
   })
@@ -1910,7 +2133,7 @@ describe('DateInput', () => {
 
         setTimeout(() => {
           expect(dateInput.getDate()).toEqual(new Date(2026, 6, 14))
-          expect(dateInput._element.querySelector('input[type="hidden"]').value).toEqual('14.07.2026')
+          expect(dateInput._element.querySelector('.form-date-time > textarea').value).toEqual('14.07.2026')
           resolve()
         }, 10)
       })
@@ -2089,7 +2312,7 @@ describe('DateInput', () => {
 
       const [year] = getSections(dateInput._element)
       expect(year.getAttribute('aria-label')).toEqual('Year')
-      expect(dateInput._element.querySelector('input[type="hidden"]').value).toEqual('2026-07-14')
+      expect(dateInput._element.querySelector('.form-date-time > textarea').value).toEqual('2026-07-14')
     })
 
     it('should keep the date the user typed when the new config sets none', () => {
@@ -2291,10 +2514,10 @@ describe('DateInput', () => {
       expect(createDateInput()._element.getAttribute("aria-label")).toEqual("Date input")
     })
 
-    it("should fill sections and the hidden input from the initial date", () => {
+    it("should fill sections and the value field from the initial date", () => {
       const dateInput = createDateTimeInput({ date: new Date(2026, 6, 14, 14, 30) })
 
-      expect(dateInput._element.querySelector("input[type=\"hidden\"]").value).toEqual("14.07.2026 14:30")
+      expect(dateInput._element.querySelector(".form-date-time > textarea").value).toEqual("14.07.2026 14:30")
     })
 
     it("should keep the time part of an initial date string", () => {

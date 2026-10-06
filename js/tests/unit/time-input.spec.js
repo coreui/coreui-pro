@@ -130,14 +130,14 @@ describe('TimeInput', () => {
 
       expect(hour.textContent).toEqual('14')
       expect(minute.textContent).toEqual('30')
-      expect(timeInput._element.querySelector('input[type="hidden"]').value).toEqual('14:30')
+      expect(timeInput._element.querySelector('.form-date-time > textarea').value).toEqual('14:30')
     })
 
     it('should accept a time string as the initial value', () => {
       const timeInput = createTimeInput({ date: '09:30' })
 
       expect(timeInput.getDate()).toEqual(new Date(1970, 0, 1, 9, 30))
-      expect(timeInput._element.querySelector('input[type="hidden"]').value).toEqual('09:30')
+      expect(timeInput._element.querySelector('.form-date-time > textarea').value).toEqual('09:30')
     })
 
     it('should accept 12-hour time strings with a day period', () => {
