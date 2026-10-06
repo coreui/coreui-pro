@@ -477,6 +477,20 @@ describe('Calendar', () => {
       expect(div.querySelector('.calendar-cell[tabindex="0"]')).not.toBeNull()
     })
 
+    it('should open on maxDate set through update() when no date is given', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const today = new Date()
+      const maxDate = new Date(today.getFullYear(), today.getMonth() - 2, 14)
+      const calendar = new Calendar(div)
+
+      calendar.update({ maxDate })
+
+      expect(calendar._calendarDate.getFullYear()).toEqual(maxDate.getFullYear())
+      expect(calendar._calendarDate.getMonth()).toEqual(maxDate.getMonth())
+    })
+
     it('should open on today when it is within the limits and no date is given', () => {
       fixtureEl.innerHTML = '<div></div>'
 
