@@ -1555,6 +1555,16 @@ describe('OTPInput', () => {
       expect(document.activeElement).toEqual(slots[1])
     })
 
+    it('should move focus to the first empty slot from a label pointing at its id', () => {
+      const { slots } = mountForm({ id: 'code' })
+      fixtureEl.querySelector('form').insertAdjacentHTML('afterbegin', '<label for="code">Code</label>')
+      type(slots[0], '1')
+
+      fixtureEl.querySelector('label').click()
+
+      expect(document.activeElement).toEqual(slots[1])
+    })
+
     it('should mark every slot and describe it with the message after the group once the browser or the form plugin reports the code', () => {
       for (const attributes of ['', 'data-coreui-validate novalidate']) {
         const { form, slots } = mountForm({ required: true }, attributes)
