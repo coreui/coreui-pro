@@ -294,6 +294,47 @@ describe('DateInput', () => {
       expect(document.activeElement).toEqual(year)
     })
 
+    it('should describe the sections with the message under the field once the browser or the form plugin finds it empty', () => {
+      for (const attributes of ['', 'data-coreui-validate novalidate']) {
+        fixtureEl.innerHTML = `<form ${attributes}><div class="date-input"></div><div class="invalid-feedback">Pick a date.</div><button type="submit">Send</button></form>`
+        const dateInput = new DateInput(fixtureEl.querySelector('.date-input'), { format: 'dd.MM.yyyy', name: 'when', required: true })
+        const form = fixtureEl.querySelector('form')
+        form.addEventListener('submit', event => event.preventDefault())
+
+        form.requestSubmit()
+
+        expect([...getSections(dateInput._element)].map(section => section.getAttribute('aria-describedby'))).toEqual(Array.from({ length: 3 }, () => fixtureEl.querySelector('.invalid-feedback').id))
+      }
+    })
+
+    it('should announce the message under the field when the form plugin finds focus already on its first empty section', () => {
+      fixtureEl.innerHTML = '<form data-coreui-validate novalidate><div class="date-input"></div><div class="invalid-feedback">Pick a date.</div></form>'
+      // eslint-disable-next-line no-new
+      new DateInput(fixtureEl.querySelector('.date-input'), { format: 'dd.MM.yyyy', name: 'when', required: true })
+      const removeAnnouncers = () => {
+        for (const announcer of document.querySelectorAll('[data-coreui-live-announcer]')) {
+          announcer.remove()
+        }
+      }
+
+      removeAnnouncers()
+      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'performance'] })
+      let messages
+
+      try {
+        fixtureEl.querySelector('.form-date-time-section').focus()
+        Form.getOrCreateInstance(fixtureEl.querySelector('form')).validate()
+        vi.advanceTimersByTime(100)
+        messages = [...document.querySelectorAll('[data-coreui-live-announcer] [aria-live="polite"] > *')].map(message => message.textContent)
+      } finally {
+        vi.useRealTimers()
+        removeAnnouncers()
+      }
+
+      expect(document.activeElement).toEqual(fixtureEl.querySelector('.form-date-time-section'))
+      expect(messages).toEqual(['Pick a date.'])
+    })
+
     it('should be the control the browser and the form plugin focus when it is the first invalid one', () => {
       const { form } = mountForm({ required: true }, 'data-coreui-validate novalidate')
       let prevented
@@ -1758,6 +1799,37 @@ describe('DateInput', () => {
       const dateInput = new DateInput(fixtureEl.querySelector('div'), { format: 'dd.MM.yyyy' })
 
       expect([...getSections(dateInput._element)].map(section => section.getAttribute('aria-describedby'))).toEqual(['help', 'help', 'help'])
+    })
+
+    it('should describe every section with the message shown under the field while it is invalid', () => {
+      fixtureEl.innerHTML = '<div class="form-field"><div aria-describedby="help"></div><div id="help">Pick a date before 15.07.2026</div><div class="invalid-feedback">Too late</div></div>'
+      const dateInput = new DateInput(fixtureEl.querySelector('[aria-describedby]'), { date: new Date(2026, 6, 10), format: 'dd.MM.yyyy', maxDate: new Date(2026, 6, 14) })
+      const feedback = fixtureEl.querySelector('.invalid-feedback')
+      const describedBy = () => [...getSections(dateInput._element)].map(section => section.getAttribute('aria-describedby'))
+
+      expect(describedBy()).toEqual(['help', null, null])
+
+      dateInput.setConfig({ date: new Date(2026, 6, 20) })
+
+      expect(describedBy()).toEqual(Array.from({ length: 3 }, () => `help ${feedback.id}`))
+
+      dateInput.setConfig({ date: new Date(2026, 6, 10) })
+
+      expect(describedBy()).toEqual(['help', null, null])
+    })
+
+    it('should not repeat a message the page already describes the field with', () => {
+      fixtureEl.innerHTML = '<div aria-describedby="late"></div><div id="late" class="invalid-feedback">Too late</div>'
+      const dateInput = new DateInput(fixtureEl.querySelector('div'), { format: 'dd.MM.yyyy', invalid: true })
+
+      expect([...getSections(dateInput._element)].map(section => section.getAttribute('aria-describedby'))).toEqual(['late', 'late', 'late'])
+    })
+
+    it('should describe the sections with the message named in data-coreui-invalid-feedback', () => {
+      fixtureEl.innerHTML = '<div data-coreui-invalid-feedback="late"></div><div class="invalid-feedback">Sibling</div><p id="late">Too late</p>'
+      const dateInput = new DateInput(fixtureEl.querySelector('div'), { format: 'dd.MM.yyyy', invalid: true })
+
+      expect([...getSections(dateInput._element)].map(section => section.getAttribute('aria-describedby'))).toEqual(['late', 'late', 'late'])
     })
 
     it('should not describe the sections of a field without a description', () => {

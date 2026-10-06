@@ -10,6 +10,10 @@
 
 // eslint-disable-next-line import/no-unassigned-import
 import '../../../scss/coreui.scss'
+import DateInput from '../../src/date-input.js'
+import DatePicker from '../../src/date-picker.js'
+import DateRangeInput from '../../src/date-range-input.js'
+import DateRangePicker from '../../src/date-range-picker.js'
 import { updateValidationState } from '../../src/util/form-validation.js'
 
 const FEEDBACK = '<div class="invalid-feedback">Error</div><div class="valid-feedback">Looks good!</div>'
@@ -34,6 +38,15 @@ const FIELDLESS_LAYOUTS = {
   'bare in an input group': '<div class="form-field"><div class="input-group"><input data-test required></div><div class="invalid-feedback">Error</div></div>',
   'in a range': '<div class="form-range"><input class="form-range-input" type="range" data-test></div><div class="invalid-feedback">Error</div>',
   'next to a range input inside the range wrapper': '<div class="form-range"><input type="number" data-test required></div><div class="invalid-feedback">Error</div>'
+}
+
+const DATE_LAYOUTS = {
+  'next to a date field': [DateInput, `<div data-test></div>${FEEDBACK}`],
+  'after a date field in an input group': [DateInput, `<div class="input-group"><span class="input-group-text">@</span><div class="form-control" data-test></div></div>${FEEDBACK}`],
+  'after a date field in a floating label': [DateInput, `<div class="form-floating"><div data-test></div><label>Due</label></div>${FEEDBACK}`],
+  'after a date picker': [DatePicker, `<div data-test></div>${FEEDBACK}`],
+  'after a date range': [DateRangeInput, `<div data-test></div>${FEEDBACK}`],
+  'after a date range picker': [DateRangePicker, `<div data-test></div>${FEEDBACK}`]
 }
 
 let container
@@ -120,6 +133,24 @@ describe('messages of a form field', () => {
         .map(id => document.getElementById(id))
 
       expect(linked).toEqual(shown)
+    })
+  }
+
+  for (const [layout, [Component, fields]] of Object.entries(DATE_LAYOUTS)) {
+    it(`links to every section of an invalid date field the very messages it shows ${layout}`, () => {
+      mount(fields)
+      const instance = new Component(container.querySelector('[data-test]'), { invalid: true })
+      const shown = [...container.querySelectorAll('.invalid-feedback, .invalid-tooltip')]
+        .filter(feedback => getComputedStyle(feedback).display !== 'none')
+
+      for (const section of container.querySelectorAll('[role="spinbutton"]')) {
+        const linked = (section.getAttribute('aria-describedby') ?? '').split(' ').filter(Boolean)
+          .map(id => document.getElementById(id))
+
+        expect(linked).toEqual(shown)
+      }
+
+      instance.dispose()
     })
   }
 
