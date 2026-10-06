@@ -58,6 +58,16 @@ describe('Form validation utilities', () => {
       expect(getFeedbackIds(fixtureEl.querySelector('#to'))).toEqual(['toError'])
     })
 
+    it('should leave out a message the page hides', () => {
+      fixtureEl.innerHTML = `<form>
+        <input id="city" required><div class="invalid-feedback" hidden>Too short.</div><div id="cityError" class="invalid-feedback">Enter a city.</div>
+        <div class="form-field"><div class="form-control form-date-time"><textarea id="when" required></textarea></div><div class="invalid-feedback" aria-hidden="true">Too early.</div><div id="whenError" class="invalid-feedback">Too late.</div></div>
+      </form>`
+
+      expect(getFeedbackIds(fixtureEl.querySelector('#city'))).toEqual(['cityError'])
+      expect(getFeedbackIds(fixtureEl.querySelector('#when'))).toEqual(['whenError'])
+    })
+
     it('should read data-coreui-invalid-feedback from the date field for its value field', () => {
       fixtureEl.innerHTML = '<form><div class="form-control form-date-time" data-coreui-invalid-feedback="whenError"><textarea id="when" required></textarea></div><div class="invalid-feedback">Sibling</div><p id="whenError">Pick a date.</p></form>'
 

@@ -94,8 +94,18 @@ const startsAnotherField = (element: Element, control: FormControl): boolean =>
     isValidatable(other) && other !== control && !(control.name && other.name === control.name && other.matches(SELECTOR_CHOICE)))
 
 /**
+ * Tells whether an element is an invalid feedback the page has not hidden with `hidden` or
+ * `aria-hidden="true"`.
+ *
+ * @param element - The element to check
+ * @returns `true` when the element is a feedback a screen reader may read
+ */
+const isShownFeedback = (element: Element): boolean =>
+  element.matches(SELECTOR_INVALID_FEEDBACK) && !element.matches(SELECTOR_HIDDEN)
+
+/**
  * Collects the invalid feedback elements among the siblings that follow an element, up to the
- * sibling where the next field starts.
+ * sibling where the next field starts, leaving out the ones the page hid.
  *
  * @param element - The element whose following siblings are searched
  * @param control - The control whose feedback is searched
@@ -105,7 +115,7 @@ const getFollowingFeedback = (element: Element, control: FormControl): Element[]
   const feedback: Element[] = []
 
   for (let sibling = element.nextElementSibling; sibling && !startsAnotherField(sibling, control); sibling = sibling.nextElementSibling) {
-    if (sibling.matches(SELECTOR_INVALID_FEEDBACK)) {
+    if (isShownFeedback(sibling)) {
       feedback.push(sibling)
     }
   }
@@ -159,7 +169,8 @@ const reachesField = (control: Element, field: Element): boolean => {
  * `.invalid-tooltip` after it, after its frame or after the `.form-range` of a `.form-range-input`,
  * up to where the next field starts, and in each `.form-field` around it that shows its messages
  * for the control, those that sit in a field around the control. A field grouping several also
- * shows the messages of the fields inside it; those belong to other controls and are left out.
+ * shows the messages of the fields inside it; those belong to other controls and are left out, and
+ * so are the messages the page hid.
  *
  * @param control - The control
  * @returns The feedback elements, in document order per rule
@@ -171,7 +182,7 @@ const getStructuralFeedback = (control: FormControl): Element[] => {
 
   for (let field = element.closest(SELECTOR_FIELD); field; field = field.parentElement?.closest(SELECTOR_FIELD) ?? null) {
     if (reachesField(element, field)) {
-      fieldFeedback.push(...[...field.querySelectorAll(SELECTOR_INVALID_FEEDBACK)].filter(feedback => feedback.closest(SELECTOR_FIELD)?.contains(element)))
+      fieldFeedback.push(...[...field.querySelectorAll(SELECTOR_INVALID_FEEDBACK)].filter(feedback => isShownFeedback(feedback) && feedback.closest(SELECTOR_FIELD)?.contains(element)))
     }
   }
 
