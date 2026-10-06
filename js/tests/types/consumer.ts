@@ -12,9 +12,9 @@
 
 import {
   Alert, Autocomplete, Calendar, Chip, ChipInput, ChipSet, Combobox, ContextMenu, DateInput, DatePicker, DateRangeInput,
-  DateRangePicker, Dialog, Drawer, Dropdown, ListBox, LoadingButton, Menu, Modal, MultiSelect, Navigation, Offcanvas,
-  OTPInput, Popover, Range, RangeSlider, Rating, SearchButton, Stepper, Tab, TimeInput, TimePicker, Toast, Toaster,
-  Tooltip, Transfer
+  DateRangePicker, Dialog, Drawer, Dropdown, Form, ListBox, LoadingButton, Menu, Modal, MultiSelect, Navigation,
+  Offcanvas, OTPInput, Popover, Range, RangeSlider, Rating, SearchButton, Stepper, Tab, TimeInput, TimePicker, Toast,
+  Toaster, Tooltip, Transfer
 } from '../../dist/index.js'
 import type { AutocompleteConfig } from '../../dist/autocomplete.js'
 import type { CalendarConfig } from '../../dist/calendar.js'
@@ -316,6 +316,10 @@ const exportedConfigs: [
 // A component without options still takes an empty object.
 const tab: Tab = Tab.getOrCreateInstance(element, {})
 
+// A form validates on demand and tells whether it is valid.
+const form = new Form(document.querySelector('form')!)
+const isValid: boolean = form.validate()
+
 // A field takes its own options on top of the shared ones.
 const ownOptions = [
   new DateInput(element, { seconds: true, type: 'datetime' }),
@@ -364,7 +368,7 @@ const setByComposite = [
 export {
   alert, calendarConfig, chip, chipSet, closing, datePicker, dayFormatFunction, disabledDatesString, formatTypo, forwardedOptions,
   exportedConfigs, otherOptions, ownOptions, setByComposite, tab,
-  inputConfigs, inputTypeTypo, instance, localeLayout, modalHiding, nestedTypo, modalShowing, modalToggling,
+  inputConfigs, inputTypeTypo, instance, isValid, localeLayout, modalHiding, nestedTypo, modalShowing, modalToggling,
   monthFormatTypo, multiSelect, name, nullDate, orCreated,
   pickerConfig, popoverShowing, popupShown, popupShownText, pressRatio, rangeInputTypeTypo, rangePickerConfig, sanitizedValue,
   selection, stepTypo, timePickerConfig, toast, toastShowing, tooltipToggling, typoCalendar, typoConfig, unknownOptions, unroundedValue, unsetDate,

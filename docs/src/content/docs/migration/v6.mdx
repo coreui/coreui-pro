@@ -1122,6 +1122,15 @@ check, radio, carousel and toggler icons already work:
   select-all header and counter per list, an optional search, a one-way mode and
   an announcement of every move through `announce()`.
 
+#### Form (new)
+
+- **New plugin: [Form](/forms/validation/#usage)** (PRO) — validates a form with
+  `data-coreui-validate` and `novalidate` on submit: stops an invalid submit,
+  marks the invalid controls with `.is-invalid` and `aria-invalid`, links their
+  messages with `aria-describedby` and moves focus to the first. It replaces
+  the starter script of the validation page, see
+  [Validation](#validation-data-coreui-validate-replaces-was-validated).
+
 #### Modal and Offcanvas on the native `<dialog>`
 
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
@@ -1814,9 +1823,13 @@ remove to reset the form's appearance.
 + <form data-coreui-validate novalidate>
 ```
 
-In the starter JavaScript, select the forms with
-`document.querySelectorAll('form[data-coreui-validate]')` and remove the
-`form.classList.add('was-validated')` line. Components follow the attribute:
+The starter JavaScript is gone. A form with `data-coreui-validate` and
+`novalidate` is handled by the new [form plugin](/forms/validation/#usage): it
+stops an invalid submit, marks the invalid controls with `.is-invalid` and
+`aria-invalid="true"`, links the message of each to it with `aria-describedby`
+while it stays invalid, and moves focus to the first. Remove the copied
+script; to show the errors your own way, call `preventDefault()` on
+`validate.coreui.form`. Components follow the attribute:
 the stepper marks the controls of a failing `novalidate` step form with
 `.is-invalid` itself (and `.is-valid` under `data-coreui-validate="valid"`),
 and the date / time / date-time inputs key their submit-time state off the

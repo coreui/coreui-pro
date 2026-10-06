@@ -4,8 +4,6 @@ name: "Validation"
 description: "Provide valuable, actionable feedback to your users with HTML5 form validation, via browser default behaviors or custom styles and JavaScript."
 ---
 
-import validateForms from './snippets/validate-forms.js?raw'
-
 ## How it works
 
 Here's how form validation works with Bootstrap:
@@ -14,6 +12,7 @@ Here's how form validation works with Bootstrap:
 - By default, **client-side validation only shows invalid styling.** To also show success styling for valid fields, set `data-coreui-validate="valid"`.
 - **Server-side validation** uses the `.is-invalid` and `.is-valid` classes to indicate field state without requiring user interaction. These work globally—no `data-coreui-validate` attribute needed.
 - Custom validation states beyond `valid`/`invalid` (e.g., `warning`) are supported via the `.is-*` class pattern and the `$form-validation-states` Sass map. There are no generated pseudo-classes for custom states.
+- With `novalidate` as well, the [form plugin](#usage) handles the submit: it stops an invalid form, marks its invalid controls with `.is-invalid` and `aria-invalid="true"`, links the message of each to it with `aria-describedby` and moves focus to the first.
 - Feedback shows when it follows the control. For a check, a radio, a switch, a `.form-control` or `.form-select` in an input group, or a control placed directly in a component frame, it can sit anywhere in the [`.form-field`](/forms/field/) around the control.
 - All modern browsers support the [constraint validation API](https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#the-constraint-validation-api), a series of JavaScript methods for validating form controls.
 - Feedback messages may utilize the [browser defaults](#browser-defaults) (different for each browser, and unstylable via CSS) or our custom feedback styles with additional HTML and CSS.
@@ -23,7 +22,9 @@ With that in mind, consider the following demos for our custom form validation s
 
 ## Custom styles
 
-For custom CoreUI for Bootstrap form validation messages, add `data-coreui-validate` and the `novalidate` boolean attribute to your `<form>`. The examples on this page use `data-coreui-validate="valid"`, so the fields that pass show their success message too. The `data-coreui-validate` attribute opts in to the `:user-invalid` styling, while `novalidate` disables the browser default feedback tooltips but still provides access to the form validation APIs in JavaScript. Try to submit the form below; our JavaScript will intercept the submit button and relay feedback to you.
+For custom CoreUI for Bootstrap form validation messages, add `data-coreui-validate` and the `novalidate` boolean attribute to your `<form>`. The examples on this page use `data-coreui-validate="valid"`, so the fields that pass show their success message too. The `data-coreui-validate` attribute opts in to the `:user-invalid` styling, while `novalidate` disables the browser default feedback tooltips and hands their job to the [form plugin](#usage). Try to submit the form below.
+
+When the form is submitted with an invalid control, the plugin stops the submit before your own `submit` handlers run, so they see `event.defaultPrevented`. It marks every invalid control with `.is-invalid` and `aria-invalid="true"`, and adds the message the stylesheet shows for it to its `aria-describedby` while it stays invalid, so a screen reader reads the error with the field. Then it moves focus to the first invalid control, as the browser does. Under `data-coreui-validate="valid"` the valid controls get `.is-valid`. The state follows the corrections the user makes until the form is reset. A message placed where the stylesheet does not show it for the control can be named in `data-coreui-invalid-feedback` on the control.
 
 Custom feedback styles apply custom colors, borders and focus styles to communicate feedback.
 
@@ -92,9 +93,7 @@ Custom feedback styles apply custom colors, borders and focus styles to communic
     <div class="col-12">
       <button class="btn-solid theme-primary" type="submit">Submit form</button>
     </div>
-  </form>`} sandboxJs={validateForms} />
-
-<Code code={validateForms} lang="js" />
+  </form>`} />
 
 ## Browser defaults
 
@@ -151,6 +150,8 @@ While these feedback styles cannot be styled with CSS, you can still customize t
 We recommend using client-side validation, but in case you require server-side validation, you can indicate invalid and valid form fields with `.is-invalid` and `.is-valid`. Note that `.invalid-feedback` is also supported with these classes.
 
 For invalid fields, ensure that the invalid feedback/error message is associated with the relevant form field using `aria-describedby` (noting that this attribute allows more than one `id` to be referenced, in case the field already points to additional form text).
+
+In a form the [form plugin](#usage) validates, a `.is-invalid` or `.is-valid` you set on a control stays: the plugin leaves that control's classes to you until you remove yours, and only adds and removes its own.
 
 For a validated input group, wrap the group in a [`.form-field`](/forms/field/) and place the feedback outside the group, so it renders under the whole frame.
 
@@ -337,7 +338,69 @@ If your form layout allows it, you can swap the `.{valid|invalid}-feedback` clas
     <div class="col-12">
       <button class="btn-solid theme-primary" type="submit">Submit form</button>
     </div>
-  </form>`} sandboxJs={validateForms} />
+  </form>`} />
+
+## Usage
+
+### Via data attributes
+
+A form with both `data-coreui-validate` and `novalidate` is validated on submit with no code of your own:
+
+```html
+<form data-coreui-validate novalidate>
+  <input class="form-control" id="email" type="email" required>
+  <div class="invalid-feedback">Enter an email address.</div>
+</form>
+```
+
+Without `novalidate` the browser validates the form itself, and without `data-coreui-validate` the plugin leaves the form alone.
+
+### Via JavaScript
+
+Validate a form without submitting it, for example before saving a draft:
+
+```js
+const form = coreui.Form.getOrCreateInstance('#signupForm')
+
+if (form.validate()) {
+  saveDraft()
+}
+```
+
+### Handling the result yourself
+
+Every validation triggers `validate.coreui.form` first, with `event.isValid` telling whether every control passed. A validity the handler sets with `setCustomValidity()`, for example when two passwords differ, counts for the rest of the validation. A submit from a button with `formnovalidate` is not validated, as with the browser's own validation. A handler that moves focus, for example to an error summary, keeps it there; the plugin still marks the controls and stops an invalid submit. A handler that calls `preventDefault()` takes the whole result over: the plugin then neither stops the submit, nor marks the controls, nor moves focus, so stop an invalid submit in your own `submit` handler.
+
+```js
+const form = document.getElementById('signupForm')
+
+form.addEventListener('validate.coreui.form', event => {
+  event.preventDefault()
+  showErrorSummary(form, event.isValid)
+})
+
+form.addEventListener('submit', event => {
+  if (!form.checkValidity()) {
+    event.preventDefault()
+  }
+})
+```
+
+### Methods
+
+| Method | Description |
+| --- | --- |
+| `dispose()` | Removes the validation state the plugin added and destroys the instance. |
+| `getInstance(element)` | Retrieves the Form instance of a `<form>` element. |
+| `getOrCreateInstance(element)` | Retrieves the Form instance of a `<form>` element, or creates one. |
+| `reset()` | Removes the classes, `aria-invalid` and `aria-describedby` ids the plugin added and stops following the user's corrections. Resetting the form does the same. |
+| `validate()` | Validates the form as a submit does, including the focus move, and returns whether it is valid. |
+
+### Events
+
+| Event | Description |
+| --- | --- |
+| `validate.coreui.form` | Fired when the form is validated, on submit or by `validate()`, before the plugin shows the result. `event.isValid` tells whether every control passed; `preventDefault()` leaves the result to you. |
 
 ## Customizing
 

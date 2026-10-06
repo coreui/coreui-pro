@@ -3,6 +3,7 @@ import { getUID } from './index.js'
 
 export type ValidationMark = {
   ariaInvalid: boolean
+  classes: string[]
   describedBy: string[]
 }
 
@@ -33,6 +34,14 @@ const SELECTOR_INPUT_GROUP_CONTROL = '.form-control, .form-select'
 const SELECTOR_INVALID_FEEDBACK = '.invalid-feedback, .invalid-tooltip'
 const SELECTOR_RANGE = '.form-range'
 const SELECTOR_RANGE_INPUT = '.form-range-input'
+const STATE_CLASSES = [CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID]
+
+/**
+ * Creates the record of what the marking functions added to one control.
+ *
+ * @returns A record with nothing added yet
+ */
+const createMark = (): ValidationMark => ({ ariaInvalid: false, classes: [], describedBy: [] })
 
 /**
  * Tells whether an element is a form control the browser validates: an input, select, textarea or
@@ -192,7 +201,7 @@ const getFeedbackIds = (control: FormControl): string[] => {
  * @param marks - What the marking functions added, per control
  */
 const markControl = (control: FormControl, marks: ValidationMarks): void => {
-  const mark = marks.get(control) ?? { ariaInvalid: false, describedBy: [] }
+  const mark = marks.get(control) ?? createMark()
 
   if (control.getAttribute('aria-invalid') !== 'true') {
     control.setAttribute('aria-invalid', 'true')
@@ -233,9 +242,31 @@ const unmarkControl = (control: Element, marks: ValidationMarks): void => {
 }
 
 /**
- * Updates one control of a validated form: toggles `.is-invalid`, and `.is-valid` when the form
- * has `data-coreui-validate="valid"`, then marks or unmarks it. A control the functions styled that
- * stopped taking part in validation, for example by being disabled, loses its classes and marks.
+ * Puts state classes on a control and records the ones it adds. A state class the page or a
+ * component set stays, and while one is there the classes the marking added come off, so the page
+ * decides what the control shows.
+ *
+ * @param control - The control
+ * @param mark - What the marking functions added to the control
+ * @param classes - The state classes the control should carry
+ */
+const setStateClasses = (control: Element, mark: ValidationMark, classes: string[]): void => {
+  const pageSet = STATE_CLASSES.some(name => control.classList.contains(name) && !mark.classes.includes(name))
+  const owned = pageSet ? [] : classes
+
+  for (const name of mark.classes.filter(name => !owned.includes(name))) {
+    control.classList.remove(name)
+  }
+
+  control.classList.add(...owned)
+  mark.classes = owned
+}
+
+/**
+ * Updates one control of a validated form: puts `.is-invalid` on it, or `.is-valid` when the form
+ * has `data-coreui-validate="valid"`, unless the page set a state class itself, then marks or
+ * unmarks it. A control the functions styled that stopped taking part in validation, for example by
+ * being disabled, loses what they added.
  *
  * @param control - The control
  * @param form - The form it belongs to
@@ -243,8 +274,10 @@ const unmarkControl = (control: Element, marks: ValidationMarks): void => {
  */
 const updateControlValidationState = (control: Element, form: HTMLFormElement, marks: ValidationMarks): void => {
   if (!isValidatable(control)) {
-    if (marks.has(control)) {
-      control.classList.remove(CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID)
+    const mark = marks.get(control)
+
+    if (mark) {
+      setStateClasses(control, mark, [])
       unmarkControl(control, marks)
       marks.delete(control)
     }
@@ -252,12 +285,14 @@ const updateControlValidationState = (control: Element, form: HTMLFormElement, m
     return
   }
 
-  control.classList.toggle(CLASS_NAME_IS_INVALID, !control.validity.valid)
-  control.classList.toggle(CLASS_NAME_IS_VALID, control.validity.valid && form.matches(SELECTOR_FORM_VALIDATE_VALID))
+  const mark = marks.get(control) ?? createMark()
+  const isValid = control.validity.valid
 
-  if (control.validity.valid) {
+  marks.set(control, mark)
+  setStateClasses(control, mark, isValid ? (form.matches(SELECTOR_FORM_VALIDATE_VALID) ? [CLASS_NAME_IS_VALID] : []) : [CLASS_NAME_IS_INVALID])
+
+  if (isValid) {
     unmarkControl(control, marks)
-    marks.set(control, marks.get(control) ?? { ariaInvalid: false, describedBy: [] })
   } else {
     markControl(control, marks)
   }
@@ -279,16 +314,18 @@ export const updateValidationState = (form: HTMLFormElement, marks: ValidationMa
 }
 
 /**
- * Clears the validation state of a form: removes `.is-invalid` and `.is-valid` from its controls,
- * and the `aria-invalid` and `aria-describedby` ids the marking added.
+ * Clears the validation state of a form: removes the `.is-invalid` and `.is-valid` classes, the
+ * `aria-invalid` and the `aria-describedby` ids the marking added, and nothing the page set.
  *
  * @param form - The form to clear
  * @param marks - What the marking functions added, per control
  */
 export const clearValidationState = (form: HTMLFormElement, marks: ValidationMarks): void => {
   for (const control of form.elements) {
-    if (isValidatable(control) || marks.has(control)) {
-      control.classList.remove(CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID)
+    const mark = marks.get(control)
+
+    if (mark) {
+      setStateClasses(control, mark, [])
     }
 
     unmarkControl(control, marks)
@@ -412,4 +449,40 @@ export const focusFirstInvalidControl = (form: HTMLFormElement): void => {
   if (invalidControls.length > 0) {
     announceInvalid(invalidControls[0])
   }
+}
+
+/**
+ * Validates a form the way a submit does. The hook learns whether every control is valid; unless it
+ * takes the result over, every control shows its state, and when one is invalid focus moves to the
+ * first that can take it, unless the hook moved focus itself. Validity is read again after the hook,
+ * so a custom validity the hook set counts, and only then does `checkValidity()` fire the `invalid`
+ * events.
+ *
+ * @param form - The form to validate
+ * @param marks - What the marking functions added, per control; keep one map per owner
+ * @param onValidate - Called with the validity before anything is shown; returns `true` to take the
+ * result over
+ * @returns Whether the result was shown, and whether the form is valid
+ */
+export const validateForm = (
+  form: HTMLFormElement,
+  marks: ValidationMarks,
+  onValidate?: (isValid: boolean) => boolean
+): { handled: boolean, isValid: boolean } => {
+  const focusedElement = getFocusedElement(form)
+  const isValid = [...form.elements].every(control => !isValidatable(control) || control.validity.valid)
+
+  if (onValidate?.(isValid)) {
+    return { handled: false, isValid }
+  }
+
+  const isValidAfterHook = form.checkValidity()
+
+  updateValidationState(form, marks)
+
+  if (!isValidAfterHook && getFocusedElement(form) === focusedElement) {
+    focusFirstInvalidControl(form)
+  }
+
+  return { handled: true, isValid: isValidAfterHook }
 }

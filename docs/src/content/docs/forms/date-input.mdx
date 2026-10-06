@@ -225,13 +225,15 @@ Sibling `.valid-feedback`/`.invalid-feedback` elements work as with any other fo
 </form>
 ```
 
-```javascript
-const form = document.querySelector('form[data-coreui-validate]')
+The [form plugin](/forms/validation/#usage) stops the submit of such a form while a native control is invalid, but it does not see the date input, since the hidden input is skipped by `checkValidity()`. Check the date in your `submit` listener:
 
-form.addEventListener('submit', event => {
-  if (!form.checkValidity()) {
+```javascript
+const element = document.querySelector('[data-coreui-name="delivery"]')
+const dateInput = coreui.DateInput.getOrCreateInstance(element)
+
+element.closest('form').addEventListener('submit', event => {
+  if (!dateInput.getDate()) {
     event.preventDefault()
-    event.stopPropagation()
   }
 })
 ```
