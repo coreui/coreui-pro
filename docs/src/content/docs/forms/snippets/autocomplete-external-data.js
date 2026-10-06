@@ -2,7 +2,7 @@ const myAutoCompleteExternalData = document.getElementById('myAutoCompleteExtern
 
 const getUsers = async (name = '') => {
   try {
-    const response = await fetch(`https://apitest.coreui.io/demos/users?first_name=${name}&limit=10`)
+    const response = await fetch(`https://apitest.coreui.io/demos/users?first_name=${encodeURIComponent(name)}&limit=10`)
     const users = await response.json()
 
     return users.records.map(user => ({
@@ -11,6 +11,7 @@ const getUsers = async (name = '') => {
     }))
   } catch (error) {
     console.error('Error fetching users:', error)
+    return []
   }
 }
 
@@ -27,9 +28,18 @@ const autocomplete = new coreui.Autocomplete(myAutoCompleteExternalData, {
 let lastQuery = null
 let debounceTimer = null
 
-myAutoCompleteExternalData.addEventListener('show.coreui.autocomplete', async () => {
-  const users = await getUsers()
-  autocomplete.update({ options: users })
+const loadUsers = async query => {
+  const users = await getUsers(query)
+
+  // Skip responses that arrive after a newer query
+  if (query === lastQuery) {
+    autocomplete.update({ options: users })
+  }
+}
+
+myAutoCompleteExternalData.addEventListener('show.coreui.autocomplete', () => {
+  lastQuery = ''
+  loadUsers('')
 })
 
 myAutoCompleteExternalData.addEventListener('input.coreui.autocomplete', event => {
@@ -43,8 +53,7 @@ myAutoCompleteExternalData.addEventListener('input.coreui.autocomplete', event =
 
   clearTimeout(debounceTimer)
 
-  debounceTimer = setTimeout(async () => {
-    const users = await getUsers(query)
-    autocomplete.update({ options: users })
+  debounceTimer = setTimeout(() => {
+    loadUsers(query)
   }, 200)
 })
