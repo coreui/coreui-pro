@@ -2753,6 +2753,57 @@ describe('MultiSelect', () => {
         expect(multiSelect._selectAllElement.textContent).toBe('Deselect all')
       })
 
+      it('should deselect only the loaded results when the limit is filled', () => {
+        const { multiSelect } = createExternal({ selectionLimit: 3 })
+
+        multiSelect._selectOption('1', 'Angular')
+        multiSelect._selectOption('2', 'React.js')
+        multiSelect.update({ options: [{ value: '3', text: 'Vue.js' }, { value: '4', text: 'Svelte' }] })
+        multiSelect._toggleSelectAll()
+        multiSelect._toggleSelectAll()
+
+        expect(multiSelect.getValue().map(option => option.value)).toEqual(['1', '2'])
+        expect(multiSelect._selectAllElement.textContent).toBe('Select all')
+      })
+
+      it('should select nothing from the results when the selection outside them fills the limit', () => {
+        const { multiSelect, selectEl } = createExternal({ selectionLimit: 2 })
+        const limits = []
+
+        multiSelect._selectOption('1', 'Angular')
+        multiSelect._selectOption('2', 'React.js')
+        multiSelect.update({ options: [{ value: '3', text: 'Vue.js' }, { value: '4', text: 'Svelte' }] })
+        selectEl.addEventListener('selectionLimit.coreui.multi-select', event => limits.push(event.selectionLimit))
+
+        expect(multiSelect._selectAllElement.textContent).toBe('Select all')
+
+        multiSelect._toggleSelectAll()
+
+        expect(multiSelect.getValue().map(option => option.value)).toEqual(['1', '2'])
+        expect(multiSelect._optionsElement.querySelectorAll('[aria-selected="true"]').length).toBe(0)
+        expect(limits).toEqual([2])
+        expect(multiSelect._selectAllElement.textContent).toBe('Select all')
+      })
+
+      it('should stop at the limit when the new results flag options as selected', () => {
+        const { multiSelect, selectEl } = createExternal({ selectionLimit: 2 })
+        const limits = []
+
+        multiSelect._selectOption('1', 'Angular')
+        selectEl.addEventListener('selectionLimit.coreui.multi-select', event => limits.push(event.selectionLimit))
+        multiSelect.update({
+          options: [
+            { value: '3', text: 'Vue.js', selected: true },
+            { value: '4', text: 'Svelte', selected: true }
+          ]
+        })
+
+        expect(multiSelect.getValue().map(option => option.value)).toEqual(['1', '3'])
+        expect(multiSelect._optionsElement.querySelector('[data-value="4"]').getAttribute('aria-selected')).toBe('false')
+        expect(selectEl.querySelector('option[value="4"]').selected).toBeFalse()
+        expect(limits).toEqual([2])
+      })
+
       it('should move the focus back to the same option after the update', () => {
         const { multiSelect } = createExternal()
 
