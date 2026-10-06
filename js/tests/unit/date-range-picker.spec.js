@@ -770,6 +770,24 @@ describe('DateRangePicker', () => {
       expect(invalid().every(value => value === null)).toBeTrue()
     })
 
+    it('should describe the sections with the message only while the class that shows it stays', async () => {
+      buildPicker({ locale: 'en-US' }, '<div id="picker" aria-invalid="true"></div><div class="invalid-feedback">Already booked.</div>')
+      const picker = fixtureEl.querySelector('#picker')
+      const feedback = fixtureEl.querySelector('.invalid-feedback')
+
+      expect(sectionStates()).toEqual(Array.from({ length: 6 }, () => ['true', null]))
+
+      picker.classList.add('is-invalid')
+      await Promise.resolve()
+
+      expect(sectionStates()).toEqual(Array.from({ length: 6 }, () => ['true', feedback.id]))
+
+      picker.classList.remove('is-invalid')
+      await Promise.resolve()
+
+      expect(sectionStates()).toEqual(Array.from({ length: 6 }, () => ['true', null]))
+    })
+
     it('should not draw the range valid while the page marks the picker invalid', async () => {
       buildPicker({
         endDate: new Date(2026, 6, 20), locale: 'en-US', startDate: new Date(2026, 6, 14), valid: true

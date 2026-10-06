@@ -38,7 +38,6 @@ abstract class PickerBase extends BaseComponent {
   protected declare _fieldElement: HTMLElement
   protected declare _footerTemplate: HTMLTemplateElement | null
   protected declare _hostClasses: HostClasses
-  protected declare _invalid: boolean
   protected declare _menu: HTMLElement
   protected declare _popup: Popup
   protected declare _toggleElement: HTMLElement | null
@@ -50,7 +49,6 @@ abstract class PickerBase extends BaseComponent {
     this._adoptedAttributes = []
     this._cleanerElement = null
     this._footerTemplate = SelectorEngine.findOne(SELECTOR_TEMPLATE_FOOTER, this._element) as HTMLTemplateElement | null
-    this._invalid = false
     this._menu = null as any
     this._popup = null as any
     this._validityObserver = null
@@ -149,12 +147,7 @@ abstract class PickerBase extends BaseComponent {
   }
 
   _syncValidity(): void {
-    const isInvalid = this._element.classList.contains(CLASS_NAME_IS_INVALID) || this._element.getAttribute('aria-invalid') === 'true'
-
-    if (isInvalid !== this._invalid) {
-      this._invalid = isInvalid
-      this._setFieldInvalid(isInvalid)
-    }
+    this._setFieldInvalid(this._element.classList.contains(CLASS_NAME_IS_INVALID) || this._element.getAttribute('aria-invalid') === 'true')
   }
 
   _createAction(className: string, icon: string, label: string): HTMLElement {

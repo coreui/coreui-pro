@@ -14,6 +14,7 @@ import DateInput from '../../src/date-input.js'
 import DatePicker from '../../src/date-picker.js'
 import DateRangeInput from '../../src/date-range-input.js'
 import DateRangePicker from '../../src/date-range-picker.js'
+import TimePicker from '../../src/time-picker.js'
 import { updateValidationState } from '../../src/util/form-validation.js'
 
 const FEEDBACK = '<div class="invalid-feedback">Error</div><div class="valid-feedback">Looks good!</div>'
@@ -48,6 +49,7 @@ const DATE_LAYOUTS = {
   'after a date range': [DateRangeInput, `<div data-test></div>${FEEDBACK}`],
   'after a date range picker': [DateRangePicker, `<div data-test></div>${FEEDBACK}`],
   'after a date picker the page marks invalid': [DatePicker, `<div class="is-invalid" data-test></div>${FEEDBACK}`, {}],
+  'after a time picker the page marks invalid': [TimePicker, `<div class="is-invalid" data-test></div>${FEEDBACK}`, {}],
   'after a date range picker the page marks invalid': [DateRangePicker, `<div class="is-invalid" data-test></div>${FEEDBACK}`, {}],
   'next to a date range picker the page marks invalid, outside a field': [DateRangePicker, `<div class="is-invalid" data-test></div>${FEEDBACK}`, {}, false]
 }
