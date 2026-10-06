@@ -1361,6 +1361,20 @@ describe('TimePicker', () => {
       expect(tp._date).toBeNull()
       expect(tp._input.value).toBe('')
     })
+
+    it('should reset the meridiem when it clears a time picked on an empty picker', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const tp = new TimePicker(div, { locale: 'en-US' })
+
+      tp.show()
+      tp._handleTimeChange('meridiem', 'pm')
+      tp.cancel()
+      tp.show()
+      tp._handleTimeChange('hours', 3)
+
+      expect(tp._date.getHours()).toBe(3)
+    })
   })
 
   describe('clear', () => {
@@ -2577,7 +2591,7 @@ describe('TimePicker', () => {
   })
 
   describe('_handleTimeChange', () => {
-    it('should create new date from epoch when _date is null', () => {
+    it('should create a new date when _date is null', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
       const tp = new TimePicker(div)

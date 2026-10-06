@@ -289,6 +289,9 @@ class TimePicker extends BaseComponent {
 
   cancel() {
     this._date = this._initialDate
+    this._ampm = this._date ?
+      getAmPm(new Date(this._date), this._config.locale) :
+      'am'
     this._setInputValue(this._initialDate || '')
     this._timePickerBody.innerHTML = ''
     this.hide()
