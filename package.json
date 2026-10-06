@@ -166,6 +166,16 @@
         "default": "./js/dist/util/date-sections.js"
       }
     },
+    "./utils/form-validation": {
+      "import": {
+        "types": "./js/dist/util/form-validation.d.mts",
+        "default": "./js/dist/util/form-validation.mjs"
+      },
+      "require": {
+        "types": "./js/dist/util/form-validation.d.ts",
+        "default": "./js/dist/util/form-validation.js"
+      }
+    },
     "./utils/range": {
       "import": {
         "types": "./js/dist/util/range.d.mts",
