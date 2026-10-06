@@ -307,4 +307,29 @@ describe('validation feedback next to a frame', () => {
     expect(container.querySelector('input').matches(':user-valid')).toBeTrue()
     expect(displayOf('.valid-feedback')).toBe('none')
   })
+
+  it('lays the value field of each end over its field, invisible and out of the pointer\'s way', async () => {
+    mount('<form data-coreui-validate novalidate><div class="form-field"><div id="host"></div><div class="invalid-feedback">Pick both dates.</div></div></form>', { required: true })
+    const form = container.querySelector('form')
+
+    form.addEventListener('submit', event => event.preventDefault())
+    form.requestSubmit()
+
+    for (const field of fields()) {
+      const input = field.querySelector(':scope > textarea')
+      const styles = getComputedStyle(input)
+      const fieldRect = field.getBoundingClientRect()
+      const inputRect = input.getBoundingClientRect()
+
+      expect(input.matches(':user-invalid')).toBeTrue()
+      expect(styles.opacity).toBe('0')
+      expect(styles.pointerEvents).toBe('none')
+      expect([inputRect.left, inputRect.top, inputRect.width, inputRect.height].map(Math.round))
+        .toEqual([fieldRect.left + field.clientLeft, fieldRect.top + field.clientTop, field.clientWidth, field.clientHeight].map(Math.round))
+    }
+
+    await Promise.resolve()
+
+    expect(displayOf('.invalid-feedback')).toBe('block')
+  })
 })

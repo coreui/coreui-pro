@@ -13,7 +13,7 @@ describe('DateRangeInput', () => {
   }
 
   const root = () => fixtureEl.querySelector('#range')
-  const hiddenInputs = () => [...root().querySelectorAll('input[type="hidden"]')]
+  const hiddenInputs = () => [...root().querySelectorAll('.form-date-time > textarea')]
   const fields = () => [...root().querySelectorAll('.form-date-time')]
 
   beforeAll(() => {

@@ -165,11 +165,11 @@ describe('DateRangePicker', () => {
       expect(picker.getEndDate()).toEqual(new Date(2026, 5, 15))
     })
 
-    it('should generate named hidden inputs for both fields', () => {
+    it('should generate named value fields for both ends', () => {
       buildPicker({ startName: 'trip-start', endName: 'trip-end' })
 
-      expect(fixtureEl.querySelector('input[name="trip-start"]')).not.toBeNull()
-      expect(fixtureEl.querySelector('input[name="trip-end"]')).not.toBeNull()
+      expect(fixtureEl.querySelector('textarea[name="trip-start"]')).not.toBeNull()
+      expect(fixtureEl.querySelector('textarea[name="trip-end"]')).not.toBeNull()
     })
 
     it('should build its field inside the element rather than on it', () => {
@@ -233,7 +233,7 @@ describe('DateRangePicker', () => {
         endDate: new Date(2026, 7, 5)
       })
 
-      const values = [...fixtureEl.querySelectorAll('#picker input[type="hidden"]')].map(input => input.value)
+      const values = [...fixtureEl.querySelectorAll('#picker .form-date-time > textarea')].map(input => input.value)
       expect(values).toEqual(['Week 29, 2026', 'Week 32, 2026'])
     })
 
@@ -244,7 +244,7 @@ describe('DateRangePicker', () => {
         endDate: new Date(2026, 10, 15)
       })
 
-      const values = [...fixtureEl.querySelectorAll('#picker input[type="hidden"]')].map(input => input.value)
+      const values = [...fixtureEl.querySelectorAll('#picker .form-date-time > textarea')].map(input => input.value)
       expect(values).toEqual(['Q1 2026', 'Q4 2026'])
     })
   })

@@ -1612,6 +1612,19 @@ validation and the arrow between them. Two consequences:
   right-to-left; the direction is read from the element's computed style
   instead of `document.documentElement.dir`, so a `dir="rtl"` ancestor works
   and not only a document-level direction.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **A required field blocks the form.** The value moved from an
+  `<input type="hidden">`, which the browser leaves out of validation, to a
+  `<textarea>` laid invisibly over the field, with `tabindex="-1"` and
+  `aria-hidden="true"`; a textarea, unlike a text input, leaves Enter
+  submitting a form that has no submit button. A `required` field that is
+  empty, incomplete or holds a rejected date now stops the submit, and the
+  browser puts focus on its first empty section with its own message over the
+  field. The field marks itself invalid whenever a validation reports it, also
+  outside a submit, and its value field fires `input` and `change` when the
+  date changes. This applies to the date and time pickers and to both ends of a
+  date range as well. Code that selects `input[type="hidden"]` inside the field
+  needs `.form-date-time > textarea`.
 
 #### Time Picker
 
@@ -2070,10 +2083,10 @@ permission to submit, naming their hidden input `<component>-<id>` when no
 `<label for>` needs anyway. Date Picker and Time Picker
 inherit the rule through the field they embed, and with `floatingLabel` that
 field is given a generated id, so they posted a key that changed on every load
-(`date-input-date-picker-190423`). The hidden input is named from `name` alone
+(`date-input-date-picker-190423`). The value field is named from `name` alone
 now, and a field without one stays out of the form. `dispose()` gives the host
-back the way the page wrote it: the sections, the separators and the hidden
-input are gone, the classes the component added go with them while the ones the
+back the way the page wrote it: the sections, the separators and the value
+field are gone, the classes the component added go with them while the ones the
 markup carried stay, the `role` and `aria-label` come back, and the author's own
 child nodes are the same nodes, not copies. It used to leave a live-looking
 field behind that kept submitting.

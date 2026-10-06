@@ -202,9 +202,9 @@ Localized formats work the same way — the section names come from the componen
 
 The field participates in the standard form validation styling. Three mechanisms set the state:
 
-- **Range validation (automatic)** — a completed date outside `minDate`/`maxDate`/`disabledDates` gets `.is-invalid` until corrected, and until then the hidden input submits no date, as `getDate()` returns none; a read-only field holding such a date submits none either. A date before year 1 counts as before `minDate` even without that option; when the field loses the focus, its year becomes 1.
+- **Range validation (automatic)** — a completed date outside `minDate`/`maxDate`/`disabledDates` gets `.is-invalid` until corrected, and until then the value input submits no date, as `getDate()` returns none; a read-only field holding such a date submits none either. A date before year 1 counts as before `minDate` even without that option; when the field loses the focus, its year becomes 1.
 - **The `valid`/`invalid` options** — force the state, e.g. after server-side validation. An invalid field is never drawn valid: `valid` waits while its date is rejected or, in a date range, while the end is before the start.
-- **Form submit** — the date input renders a hidden input, which is excluded from native constraint validation, so the component applies the state itself when a form with the `data-coreui-validate` attribute is submitted: a `required` empty field becomes `.is-invalid`, and a filled one becomes `.is-valid` when the form opts into success styling with `data-coreui-validate="valid"`. A native form reset returns the field to the date it was created with and drops that state; a submit that follows the reset in the same task judges the restored date again, and a `reset` listener that calls `preventDefault()` cancels the whole reset.
+- **Form submit** — the date input keeps its value in an input laid invisibly over the field, which takes part in native constraint validation: a `required` field that is empty, incomplete or holds a rejected date blocks the submit, and the browser, or the [form plugin](/forms/validation/#usage), puts focus on its first empty section, the browser with its own message over the field. A field that is not required does not block, and submits no date while it rejects one. In a form with the `data-coreui-validate` attribute the component also applies the state itself on submit: a `required` empty field becomes `.is-invalid`, and a filled one becomes `.is-valid` when the form opts into success styling with `data-coreui-validate="valid"`. A native form reset returns the field to the date it was created with and drops that state; a submit that follows the reset in the same task judges the restored date again, and a `reset` listener that calls `preventDefault()` cancels the whole reset.
 
 Sibling `.valid-feedback`/`.invalid-feedback` elements work as with any other form control.
 
@@ -223,19 +223,6 @@ Sibling `.valid-feedback`/`.invalid-feedback` elements work as with any other fo
   <div class="invalid-feedback">Please provide a delivery date.</div>
   <button type="submit">Submit</button>
 </form>
-```
-
-The [form plugin](/forms/validation/#usage) stops the submit of such a form while a native control is invalid, but it does not see the date input, since the hidden input is skipped by `checkValidity()`. Check the date in your `submit` listener:
-
-```javascript
-const element = document.querySelector('[data-coreui-name="delivery"]')
-const dateInput = coreui.DateInput.getOrCreateInstance(element)
-
-element.closest('form').addEventListener('submit', event => {
-  if (!dateInput.getDate()) {
-    event.preventDefault()
-  }
-})
 ```
 
 ## Floating labels
@@ -309,7 +296,7 @@ Apart from the shortcuts in the table, a key pressed with <kbd>Alt</kbd>, <kbd>C
 
 ### Via data attributes
 
-Add `data-coreui-date-input` to an empty `div`. The component renders the sections, separators, and a hidden input, which is submitted with the form once you give it a `name`. Include the `form-control form-date-time` classes in the markup — the component adds them on initialization anyway, but having them from the start keeps the field styled and full-height before the JavaScript runs (no flash of an unstyled element on load).
+Add `data-coreui-date-input` to an empty `div`. The component renders the sections, separators, and a value input, which is submitted with the form once you give it a `name`. Include the `form-control form-date-time` classes in the markup — the component adds them on initialization anyway, but having them from the start keeps the field styled and full-height before the JavaScript runs (no flash of an unstyled element on load).
 
 ```html
 <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="dd.MM.yyyy" data-coreui-name="date"></div>
@@ -356,10 +343,10 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | `minutePlaceholder` | string, null | `null` | Replaces the `mm` the minute section shows while it is empty. |
 | `monthNames` | array, null | `null` | Twelve custom month names for text month sections (`MMM`/`MMMM`), overriding the locale-derived, date-context grammatical form |
 | `monthPlaceholder` | string, null | `null` | Replaces the `MM` the month section shows while it is empty. |
-| `name` | string, null | `null` | Name of the hidden input the value is submitted under. Without it the field is not submitted with the form. |
+| `name` | string, null | `null` | Name of the value input the value is submitted under. Without it the field is not submitted with the form. |
 | `quarterPlaceholder` | string, null | `null` | Replaces the `Q` the quarter section shows while it is empty. |
 | `readonly` | boolean | `false` | Make the field focusable but non-editable |
-| `required` | boolean | `false` | Required attribute of the hidden input |
+| `required` | boolean | `false` | Required attribute of the value input |
 | `secondPlaceholder` | string, null | `null` | Replaces the `ss` the second section shows while it is empty. |
 | `seconds` | boolean | `false` | Include a seconds section in the locale-derived layout of `type="datetime"` |
 | `type` | string | `'date'` | Which sections the locale-derived layout carries: `'date'` or `'datetime'`. A `format` names the sections itself and overrides this. |
