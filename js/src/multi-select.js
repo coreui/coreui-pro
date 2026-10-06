@@ -1390,15 +1390,23 @@ class MultiSelect extends BaseComponent {
     const selected = this._selected
     this._selected = []
     this._options = this._getOptions()
+    const preselected = this._selected.filter(option => !selected.some(item => item.value === option.value))
     this._selected = selected
 
     const selectedValues = new Set(selected.map(option => option.value))
     const missing = selected.filter(option => !this._findOptionByValue(option.value))
+    const { activeElement } = document
+    const hadFocus = this._wrapperElement.contains(activeElement) || this._menu.contains(activeElement)
+    const emptyMessage = SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._optionsElement)
 
     this._element.innerHTML = ''
     this._createNativeOptions(this._element, [...this._options, ...missing])
     this._optionsElement.innerHTML = ''
     this._createOptions(this._optionsElement, this._options)
+
+    if (emptyMessage) {
+      this._optionsElement.append(emptyMessage)
+    }
 
     for (const nativeOption of SelectorEngine.find('option', this._element)) {
       nativeOption.selected = selectedValues.has(nativeOption.value)
@@ -1410,11 +1418,29 @@ class MultiSelect extends BaseComponent {
       option.setAttribute('aria-selected', String(isSelected))
     }
 
+    if (preselected.length > 0) {
+      for (const option of preselected) {
+        this._selectOption(option.value, option.text, { refresh: false })
+      }
+
+      this._refreshAfterSelectionChange()
+
+      if (this._searchElement) {
+        this._updateSearchSize(this._searchElement.value.length + 1)
+      }
+    }
+
     this._filterOptionsList()
     this._updateGroupsState()
 
     if (this._popper) {
       this._popper.update()
+    }
+
+    if (hadFocus && !this._wrapperElement.contains(document.activeElement) && !this._menu.contains(document.activeElement)) {
+      const { value } = activeElement.dataset
+      const target = (value && this._getOptionElement(value)) || this._searchElement || this._togglerElement
+      target.focus()
     }
   }
 
@@ -1556,7 +1582,7 @@ class MultiSelect extends BaseComponent {
 
   _isAllSelected() {
     const { selected, total } = this._getSelectAllScope()
-    const target = this._getSelectableTarget(total)
+    const target = this._getSelectableTarget(total, selected)
     return target > 0 && selected >= target
   }
 
@@ -1577,7 +1603,7 @@ class MultiSelect extends BaseComponent {
   }
 
   _toggleSelectAll() {
-    const filteredMode = this._config.selectAllMode === 'filtered'
+    const filteredMode = this._config.selectAllMode === 'filtered' || this._isExternalSearch()
 
     if (this._isAllSelected()) {
       if (filteredMode) {
@@ -1596,8 +1622,13 @@ class MultiSelect extends BaseComponent {
     }
   }
 
-  _getSelectableTarget(total) {
-    return this._hasSelectionLimit() ? Math.min(total, this._config.selectionLimit) : total
+  _getSelectableTarget(total, selected) {
+    if (!this._hasSelectionLimit()) {
+      return total
+    }
+
+    const selectedElsewhere = this._isExternalSearch() ? this._selected.length - selected : 0
+    return Math.min(total, this._config.selectionLimit - selectedElsewhere)
   }
 
   _getCheckboxState(selected, total) {
@@ -1637,7 +1668,7 @@ class MultiSelect extends BaseComponent {
     }
 
     const { selected, total } = this._getSelectAllScope()
-    this._applyCheckboxState(this._selectAllElement, this._getCheckboxState(selected, this._getSelectableTarget(total)))
+    this._applyCheckboxState(this._selectAllElement, this._getCheckboxState(selected, this._getSelectableTarget(total, selected)))
   }
 
   _renderHeader() {
@@ -1808,7 +1839,7 @@ class MultiSelect extends BaseComponent {
       config.container = getElement(config.container)
     }
 
-    if (typeof config.search === 'string') {
+    if (typeof config.search === 'string' && config.search !== '') {
       config.search = config.search.split(/,\s*/).map(String)
     }
 
