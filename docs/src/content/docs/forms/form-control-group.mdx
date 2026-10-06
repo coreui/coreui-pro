@@ -117,15 +117,17 @@ the frame up without any extra wiring. A sibling `.invalid-feedback` follows the
 and a `.valid-feedback` waits until nothing is invalid, the frame included.
 The actions inside the group carry the state colour too.
 
-<Example code={`<div class="form-control-group is-invalid">
-    <input type="text" class="form-control" value="Not quite" aria-label="Invalid example">
-    <button type="button" class="form-control-action" aria-label="Clear">
-      <span class="form-control-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor"><path d="M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z"/></svg>
-      </span>
-    </button>
-  </div>
-  <div class="invalid-feedback">Please pick a different value.</div>`} />
+<Example code={`<div class="form-field">
+    <div class="form-control-group is-invalid">
+      <input type="text" class="form-control" value="Not quite" aria-label="Invalid example" aria-invalid="true" aria-describedby="formControlGroupInvalidFeedback">
+      <button type="button" class="form-control-action" aria-label="Clear">
+        <span class="form-control-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor"><path d="M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z"/></svg>
+        </span>
+      </button>
+    </div>
+    <div id="formControlGroupInvalidFeedback" class="invalid-feedback">Please pick a different value.</div>
+  </div>`} />
 
 ## Disabled
 

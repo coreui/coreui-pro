@@ -22,12 +22,17 @@ const CLASS_NAME_IS_VALID = 'is-valid'
 const SELECTOR_ARIA_HIDDEN = '[aria-hidden="true"]'
 const SELECTOR_CHOICE = '[type="checkbox"], [type="radio"]'
 const SELECTOR_CONTROL = 'input, select, textarea'
-const SELECTOR_FEEDBACK_ANCHOR = '.form-control-group, .form-range'
 const SELECTOR_FIELD = '.form-field'
-const SELECTOR_FIELD_GROUP = '.form-control-group, .input-group'
+const SELECTOR_FIELD_CONTROL = '.check, .radio, .switch'
+const SELECTOR_FLOATING = '.form-floating'
 const SELECTOR_FORM_VALIDATE_VALID = '[data-coreui-validate~="valid"]'
+const SELECTOR_FRAME = '.form-control-group'
 const SELECTOR_HIDDEN = `[hidden], ${SELECTOR_ARIA_HIDDEN}`
+const SELECTOR_INPUT_GROUP = '.input-group'
+const SELECTOR_INPUT_GROUP_CONTROL = '.form-control, .form-select'
 const SELECTOR_INVALID_FEEDBACK = '.invalid-feedback, .invalid-tooltip'
+const SELECTOR_RANGE = '.form-range'
+const SELECTOR_RANGE_INPUT = '.form-range-input'
 
 /**
  * Tells whether an element is a form control the browser validates: an input, select, textarea or
@@ -99,21 +104,54 @@ const getFollowingFeedback = (element: Element, control: FormControl): Element[]
 }
 
 /**
+ * Finds the `.form-control-group` a control sits in directly, or through a `.form-floating`, which
+ * is how deep the frame answers for the state of what it holds.
+ *
+ * @param control - The control
+ * @returns The frame, or `null` when the control is not in one at that depth
+ */
+const getFrame = (control: Element): Element | null => {
+  const parent = control.parentElement
+  const holder = parent?.matches(SELECTOR_FLOATING) ? parent.parentElement : parent
+
+  return holder?.matches(SELECTOR_FRAME) ? holder : null
+}
+
+/**
+ * Tells whether the stylesheet shows the messages of a `.form-field` for a control: one around a
+ * check, a radio or a switch, or around the frame of the control, or around the input group of a
+ * `.form-control` or `.form-select`.
+ *
+ * @param control - The control
+ * @param field - A `.form-field` around the control
+ * @returns `true` when the field shows its messages for the control
+ */
+const reachesField = (control: Element, field: Element): boolean => {
+  const inputGroup = control.matches(SELECTOR_INPUT_GROUP_CONTROL) ? control.closest(SELECTOR_INPUT_GROUP) : null
+
+  return control.matches(SELECTOR_FIELD_CONTROL) ||
+    [getFrame(control), inputGroup].some(group => group && group !== field && field.contains(group))
+}
+
+/**
  * Collects the invalid feedback the stylesheet shows for one control: the `.invalid-feedback` and
- * `.invalid-tooltip` after it or after its `.form-control-group` or `.form-range`, up to where the
- * next field starts, and those in the `.form-field` around its `.form-control-group` or
- * `.input-group`.
+ * `.invalid-tooltip` after it, after its frame or after the `.form-range` of a `.form-range-input`,
+ * up to where the next field starts, and in each `.form-field` around it that shows its messages
+ * for the control, those that sit in a field around the control. A field grouping several also
+ * shows the messages of the fields inside it; those belong to other controls and are left out.
  *
  * @param control - The control
  * @returns The feedback elements, in document order per rule
  */
 const getStructuralFeedback = (control: FormControl): Element[] => {
-  const anchor = control.closest(SELECTOR_FEEDBACK_ANCHOR)
-  const group = control.closest(SELECTOR_FIELD_GROUP)
-  const field = control.closest(SELECTOR_FIELD)
-  const fieldFeedback = group && field?.contains(group) ?
-    [...field.querySelectorAll(SELECTOR_INVALID_FEEDBACK)].filter(feedback => feedback.closest(SELECTOR_FIELD) === field) :
-    []
+  const anchor = getFrame(control) ?? (control.matches(SELECTOR_RANGE_INPUT) ? control.closest(SELECTOR_RANGE) : null)
+  const fieldFeedback: Element[] = []
+
+  for (let field = control.closest(SELECTOR_FIELD); field; field = field.parentElement?.closest(SELECTOR_FIELD) ?? null) {
+    if (reachesField(control, field)) {
+      fieldFeedback.push(...[...field.querySelectorAll(SELECTOR_INVALID_FEEDBACK)].filter(feedback => feedback.closest(SELECTOR_FIELD)?.contains(control)))
+    }
+  }
 
   return [...getFollowingFeedback(control, control), ...(anchor ? getFollowingFeedback(anchor, control) : []), ...fieldFeedback]
 }

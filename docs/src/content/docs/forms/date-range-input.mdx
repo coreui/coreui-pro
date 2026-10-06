@@ -150,11 +150,11 @@ The field participates in the standard form validation styling. Four mechanisms 
 
 Sibling `.valid-feedback`/`.invalid-feedback` elements work as with any other form control. The error shows when the frame is invalid and when a field inside it is, which is where the state of a single date lands; the success message waits until nothing is invalid.
 
-<Example pro code={`<div class="mb-3">
+<Example pro code={`<div class="mb-3 form-field">
     <div data-coreui-date-range-input data-coreui-locale="en-US" data-coreui-format="dd.MM.yyyy" data-coreui-start-date="2026-07-20" data-coreui-end-date="2026-07-14"></div>
     <div class="invalid-feedback">Check-out has to be on or after check-in.</div>
   </div>
-  <div>
+  <div class="form-field">
     <div data-coreui-date-range-input data-coreui-locale="en-US" data-coreui-format="dd.MM.yyyy" data-coreui-start-date="2026-07-14" data-coreui-end-date="2026-07-20" data-coreui-valid="true"></div>
     <div class="valid-feedback">Looks good!</div>
   </div>`} />

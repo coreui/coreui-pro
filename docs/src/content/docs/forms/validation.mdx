@@ -14,6 +14,7 @@ Here's how form validation works with Bootstrap:
 - By default, **client-side validation only shows invalid styling.** To also show success styling for valid fields, set `data-coreui-validate="valid"`.
 - **Server-side validation** uses the `.is-invalid` and `.is-valid` classes to indicate field state without requiring user interaction. These work globally—no `data-coreui-validate` attribute needed.
 - Custom validation states beyond `valid`/`invalid` (e.g., `warning`) are supported via the `.is-*` class pattern and the `$form-validation-states` Sass map. There are no generated pseudo-classes for custom states.
+- Feedback shows when it follows the control. For a check, a radio, a switch, a `.form-control` or `.form-select` in an input group, or a control placed directly in a component frame, it can sit anywhere in the [`.form-field`](/forms/field/) around the control.
 - All modern browsers support the [constraint validation API](https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#the-constraint-validation-api), a series of JavaScript methods for validating form controls.
 - Feedback messages may utilize the [browser defaults](#browser-defaults) (different for each browser, and unstylable via CSS) or our custom feedback styles with additional HTML and CSS.
 - You may provide custom validity messages with `setCustomValidity` in JavaScript.
@@ -27,14 +28,14 @@ For custom CoreUI for Bootstrap form validation messages, add `data-coreui-valid
 Custom feedback styles apply custom colors, borders and focus styles to communicate feedback.
 
 <Example code={`<form class="row g-3" data-coreui-validate="valid" novalidate>
-    <div class="col-md-4">
+    <div class="col-md-4 form-field">
       <label for="validationCustom01" class="form-label">First name</label>
       <input type="text" class="form-control" id="validationCustom01" value="Mark" required>
       <div class="valid-feedback">
         Looks good!
       </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-4 form-field">
       <label for="validationCustom02" class="form-label">Last name</label>
       <input type="text" class="form-control" id="validationCustom02" value="Otto" required>
       <div class="valid-feedback">
@@ -53,14 +54,14 @@ Custom feedback styles apply custom colors, borders and focus styles to communic
         </div>
       </div>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-6 form-field">
       <label for="validationCustom03" class="form-label">City</label>
       <input type="text" class="form-control" id="validationCustom03" required>
       <div class="invalid-feedback">
         Please provide a valid city.
       </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-3 form-field">
       <label for="validationCustom04" class="form-label">State</label>
       <select class="form-control" id="validationCustom04" required>
         <option selected disabled value="">Choose...</option>
@@ -70,7 +71,7 @@ Custom feedback styles apply custom colors, borders and focus styles to communic
         Please select a valid state.
       </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-3 form-field">
       <label for="validationCustom05" class="form-label">Zip</label>
       <input type="text" class="form-control" id="validationCustom05" required>
       <div class="invalid-feedback">
@@ -154,14 +155,14 @@ For invalid fields, ensure that the invalid feedback/error message is associated
 For a validated input group, wrap the group in a [`.form-field`](/forms/field/) and place the feedback outside the group, so it renders under the whole frame.
 
 <Example code={`<form class="row g-3">
-    <div class="col-md-4">
+    <div class="col-md-4 form-field">
       <label for="validationServer01" class="form-label">First name</label>
       <input type="text" class="form-control is-valid" id="validationServer01" value="Mark" required>
       <div class="valid-feedback">
         Looks good!
       </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-4 form-field">
       <label for="validationServer02" class="form-label">Last name</label>
       <input type="text" class="form-control is-valid" id="validationServer02" value="Otto" required>
       <div class="valid-feedback">
@@ -180,14 +181,14 @@ For a validated input group, wrap the group in a [`.form-field`](/forms/field/) 
         </div>
       </div>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-6 form-field">
       <label for="validationServer03" class="form-label">City</label>
       <input type="text" class="form-control is-invalid" id="validationServer03" aria-describedby="validationServer03Feedback" required>
       <div id="validationServer03Feedback" class="invalid-feedback">
         Please provide a valid city.
       </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-3 form-field">
       <label for="validationServer04" class="form-label">State</label>
       <select class="form-control is-invalid" id="validationServer04" aria-describedby="validationServer04Feedback" required>
         <option selected disabled value="">Choose...</option>
@@ -197,7 +198,7 @@ For a validated input group, wrap the group in a [`.form-field`](/forms/field/) 
         Please select a valid state.
       </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-3 form-field">
       <label for="validationServer05" class="form-label">Zip</label>
       <input type="text" class="form-control is-invalid" id="validationServer05" aria-describedby="validationServer05Feedback" required>
       <div id="validationServer05Feedback" class="invalid-feedback">
@@ -229,7 +230,7 @@ Validation styles are available for the following form controls and components:
 - checkboxes, radios and switches with `.check`, `.radio` or `.switch`, laid out by a [`.form-field`](/forms/field/)
 
 <Example code={`<form>
-    <div class="mb-3">
+    <div class="mb-3 form-field">
       <label for="validationTextarea" class="form-label">Textarea</label>
       <textarea class="form-control is-invalid" id="validationTextarea" placeholder="Required example textarea" required aria-describedby="validationTextareaFeedback"></textarea>
       <div id="validationTextareaFeedback" class="invalid-feedback">
@@ -258,7 +259,7 @@ Validation styles are available for the following form controls and components:
       <label for="validationSwitch">Accept the terms</label>
       <div id="validationSwitchFeedback" class="invalid-feedback">You must accept before submitting.</div>
     </div>
-    <div class="mb-3">
+    <div class="mb-3 form-field">
       <select class="form-control is-invalid" required aria-label="select example" aria-describedby="validationSelectFeedback">
         <option value="">Open this select menu</option>
         <option value="1">One</option>
@@ -268,7 +269,7 @@ Validation styles are available for the following form controls and components:
       <div id="validationSelectFeedback" class="invalid-feedback">Example invalid select feedback</div>
     </div>
 
-    <div class="mb-3">
+    <div class="mb-3 form-field">
       <input type="file" class="form-control is-invalid" aria-label="file example" required aria-describedby="validationFileFeedback">
       <div id="validationFileFeedback" class="invalid-feedback">Example invalid form file feedback</div>
     </div>
@@ -283,14 +284,14 @@ Validation styles are available for the following form controls and components:
 If your form layout allows it, you can swap the `.{valid|invalid}-feedback` classes for `.{valid|invalid}-tooltip` classes to display validation feedback in a styled tooltip. Be sure to have a parent with `position: relative` on it for tooltip positioning. In the example below, our column classes have this already, but your project may require an alternative setup.
 
 <Example code={`<form class="row g-3" data-coreui-validate="valid" novalidate>
-    <div class="col-md-4 position-relative">
+    <div class="col-md-4 position-relative form-field">
       <label for="validationTooltip01" class="form-label">First name</label>
       <input type="text" class="form-control" id="validationTooltip01" value="Mark" required>
       <div class="valid-tooltip">
         Looks good!
       </div>
     </div>
-    <div class="col-md-4 position-relative">
+    <div class="col-md-4 position-relative form-field">
       <label for="validationTooltip02" class="form-label">Last name</label>
       <input type="text" class="form-control" id="validationTooltip02" value="Otto" required>
       <div class="valid-tooltip">
@@ -309,14 +310,14 @@ If your form layout allows it, you can swap the `.{valid|invalid}-feedback` clas
         </div>
       </div>
     </div>
-    <div class="col-md-6 position-relative">
+    <div class="col-md-6 position-relative form-field">
       <label for="validationTooltip03" class="form-label">City</label>
       <input type="text" class="form-control" id="validationTooltip03" required>
       <div class="invalid-tooltip">
         Please provide a valid city.
       </div>
     </div>
-    <div class="col-md-3 position-relative">
+    <div class="col-md-3 position-relative form-field">
       <label for="validationTooltip04" class="form-label">State</label>
       <select class="form-control" id="validationTooltip04" required>
         <option selected disabled value="">Choose...</option>
@@ -326,7 +327,7 @@ If your form layout allows it, you can swap the `.{valid|invalid}-feedback` clas
         Please select a valid state.
       </div>
     </div>
-    <div class="col-md-3 position-relative">
+    <div class="col-md-3 position-relative form-field">
       <label for="validationTooltip05" class="form-label">Zip</label>
       <input type="text" class="form-control" id="validationTooltip05" required>
       <div class="invalid-tooltip">
