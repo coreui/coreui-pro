@@ -2,7 +2,7 @@ const myAutoCompleteExternalData = document.getElementById('myAutoCompleteExtern
 
 const getUsers = async (name = '') => {
   try {
-    const response = await fetch(`https://apitest.coreui.io/demos/users?first_name=${name}&limit=10`)
+    const response = await fetch(`https://apitest.coreui.io/demos/users?first_name=${encodeURIComponent(name)}&limit=10`)
     const users = await response.json()
 
     return users.records.map(user => ({
