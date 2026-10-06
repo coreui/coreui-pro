@@ -43,7 +43,7 @@ const FIELDLESS_LAYOUTS = {
 const DATE_LAYOUTS = {
   'next to a date field': [DateInput, `<div data-test></div>${FEEDBACK}`],
   'after a date field in an input group': [DateInput, `<div class="input-group"><span class="input-group-text">@</span><div class="form-control" data-test></div></div>${FEEDBACK}`],
-  'after a date field in a floating label': [DateInput, `<div class="form-floating"><div data-test></div><label>Due</label></div>${FEEDBACK}`],
+  'inside a floating label after a date field': [DateInput, `<div class="form-floating"><div data-test></div><label>Due</label>${FEEDBACK}</div>`],
   'after a date picker': [DatePicker, `<div data-test></div>${FEEDBACK}`],
   'after a date range': [DateRangeInput, `<div data-test></div>${FEEDBACK}`],
   'after a date range picker': [DateRangePicker, `<div data-test></div>${FEEDBACK}`]
@@ -142,6 +142,8 @@ describe('messages of a form field', () => {
       const instance = new Component(container.querySelector('[data-test]'), { invalid: true })
       const shown = [...container.querySelectorAll('.invalid-feedback, .invalid-tooltip')]
         .filter(feedback => getComputedStyle(feedback).display !== 'none')
+
+      expect(shown).toHaveSize(1)
 
       for (const section of container.querySelectorAll('[role="spinbutton"]')) {
         const linked = (section.getAttribute('aria-describedby') ?? '').split(' ').filter(Boolean)

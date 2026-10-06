@@ -1818,6 +1818,23 @@ describe('DateInput', () => {
       expect(describedBy()).toEqual(['help', null, null])
     })
 
+    it('should describe the sections with a message the page adds on errorChange', () => {
+      fixtureEl.innerHTML = '<div class="form-field"><div class="date-input"></div></div>'
+      const element = fixtureEl.querySelector('.date-input')
+      const dateInput = new DateInput(element, { date: new Date(2026, 6, 10), format: 'dd.MM.yyyy', maxDate: new Date(2026, 6, 14) })
+
+      element.addEventListener('errorChange.coreui.date-input', event => {
+        fixtureEl.querySelector('.invalid-feedback')?.remove()
+
+        if (event.error) {
+          element.insertAdjacentHTML('afterend', '<div id="late" class="invalid-feedback">Too late</div>')
+        }
+      })
+      dateInput.setConfig({ date: new Date(2026, 6, 20) })
+
+      expect([...getSections(element)].map(section => section.getAttribute('aria-describedby'))).toEqual(['late', 'late', 'late'])
+    })
+
     it('should not repeat a message the page already describes the field with', () => {
       fixtureEl.innerHTML = '<div aria-describedby="late"></div><div id="late" class="invalid-feedback">Too late</div>'
       const dateInput = new DateInput(fixtureEl.querySelector('div'), { format: 'dd.MM.yyyy', invalid: true })
