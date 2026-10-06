@@ -9,6 +9,8 @@ import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
+import { clearValidationState, focusFirstInvalidControl, updateValidationState } from './util/form-validation.js'
+import type { ValidationMarks } from './util/form-validation.js'
 import {
   defineJQueryPlugin, getNextActiveElement, getUID, isDisabled, jQueryDispatch
 } from './util/index.js'
@@ -32,8 +34,6 @@ const EVENT_LOAD_DATA_API = `load${EVENT_KEY}`
 
 const CLASS_NAME_ACTIVE = 'active'
 const CLASS_NAME_COMPLETE = 'complete'
-const CLASS_NAME_IS_INVALID = 'is-invalid'
-const CLASS_NAME_IS_VALID = 'is-valid'
 const CLASS_NAME_SHOW = 'show'
 const CLASS_NAME_STEPPER_STEP_CONNECTOR = 'stepper-step-connector'
 const CLASS_NAME_STEPPER_STEP_INDICATOR_ICON = 'stepper-step-indicator-icon'
@@ -41,7 +41,6 @@ const CLASS_NAME_STEPPER_STEP_INDICATOR_TEXT = 'stepper-step-indicator-text'
 const CLASS_NAME_STEPPER_VERTICAL = 'stepper-vertical'
 
 const SELECTOR_DATA_STEPPER = '[data-coreui-stepper]'
-const SELECTOR_FORM_VALIDATE_VALID = '[data-coreui-validate~="valid"]'
 const SELECTOR_STEPPER = '.stepper'
 const SELECTOR_STEPPER_ACTION = '[data-coreui-stepper-action]'
 const SELECTOR_STEPPER_STEP = '.stepper-step'
@@ -83,7 +82,7 @@ class Stepper extends BaseComponent {
   protected declare _activeStepButton: HTMLButtonElement
   protected declare _initialStepButton: HTMLButtonElement
   protected declare _isFinished: boolean
-  protected declare _markedInvalid: WeakSet<Element>
+  protected declare _validationMarks: ValidationMarks
   protected declare _validatedForms: Set<HTMLFormElement>
   protected declare _tabPattern: boolean
 
@@ -95,7 +94,7 @@ class Stepper extends BaseComponent {
     this._activeStepButton = this._getActiveElem()
     this._initialStepButton = this._activeStepButton
     this._isFinished = false
-    this._markedInvalid = new WeakSet()
+    this._validationMarks = new WeakMap()
     this._validatedForms = new Set()
 
     this._addStepperConnector()
@@ -274,8 +273,11 @@ class Stepper extends BaseComponent {
     }
 
     for (const form of this._validatedForms) {
-      this._clearValidationState(form)
+      EventHandler.off(form, EVENT_INPUT)
+      clearValidationState(form, this._validationMarks)
     }
+
+    this._validatedForms.clear()
 
     const firstStep = this._initialStepButton || this._stepButtons[0]
     firstStep.classList.add(CLASS_NAME_ACTIVE)
@@ -309,7 +311,7 @@ class Stepper extends BaseComponent {
   override dispose(): void {
     for (const form of this._validatedForms) {
       EventHandler.off(form, EVENT_INPUT)
-      this._clearValidationState(form)
+      clearValidationState(form, this._validationMarks)
     }
 
     super.dispose()
@@ -383,68 +385,16 @@ class Stepper extends BaseComponent {
   }
 
   _showValidationState(form: HTMLFormElement, moveFocus: boolean): void {
-    this._updateFormValidationState(form)
+    updateValidationState(form, this._validationMarks)
 
     if (!this._validatedForms.has(form)) {
       this._validatedForms.add(form)
-      EventHandler.on(form, EVENT_INPUT, () => this._updateFormValidationState(form))
+      EventHandler.on(form, EVENT_INPUT, () => updateValidationState(form, this._validationMarks))
     }
 
     if (moveFocus) {
-      this._focusFirstInvalidControl(form)
+      focusFirstInvalidControl(form)
     }
-  }
-
-  _updateFormValidationState(form: HTMLFormElement): void {
-    for (const control of form.elements) {
-      this._updateControlValidationState(control, form)
-    }
-  }
-
-  _updateControlValidationState(control: any, form: HTMLFormElement): void {
-    if (!this._isValidatable(control)) {
-      return
-    }
-
-    control.classList.toggle(CLASS_NAME_IS_INVALID, !control.validity.valid)
-    control.classList.toggle(CLASS_NAME_IS_VALID, control.validity.valid && form.matches(SELECTOR_FORM_VALIDATE_VALID))
-
-    if (!control.validity.valid && control.getAttribute('aria-invalid') !== 'true') {
-      control.setAttribute('aria-invalid', 'true')
-      this._markedInvalid.add(control)
-    } else if (control.validity.valid && this._markedInvalid.has(control)) {
-      control.removeAttribute('aria-invalid')
-      this._markedInvalid.delete(control)
-    }
-  }
-
-  _clearValidationState(form: HTMLFormElement): void {
-    for (const control of form.elements) {
-      if (this._isValidatable(control)) {
-        control.classList.remove(CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID)
-      }
-
-      if (this._markedInvalid.has(control)) {
-        control.removeAttribute('aria-invalid')
-        this._markedInvalid.delete(control)
-      }
-    }
-  }
-
-  _focusFirstInvalidControl(form: HTMLFormElement): void {
-    const invalidControls = [...form.elements].filter((control: any) => this._isValidatable(control) && !control.validity.valid && !control.closest('[aria-hidden="true"]')) as HTMLElement[]
-
-    for (const control of invalidControls) {
-      control.focus()
-
-      if (this._getFocusedElement() === control) {
-        return
-      }
-    }
-  }
-
-  _isValidatable(control: any): boolean {
-    return control.willValidate && !['button', 'reset', 'submit'].includes(control.type)
   }
 
   _activate(element: any): void {
@@ -686,7 +636,6 @@ class Stepper extends BaseComponent {
         }
 
         pane.setAttribute('aria-labelledby', stepButton.id)
-        pane.setAttribute('aria-live', 'polite')
         pane.setAttribute('aria-hidden', !this._elemIsActive(stepButton) as any)
       }
 

@@ -1,4 +1,5 @@
 // stepper.spec.js
+import { vi } from 'vitest'
 import Stepper from '../../src/stepper.js'
 import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
 
@@ -241,7 +242,7 @@ describe('Stepper', () => {
       const panes = fixtureEl.querySelectorAll('.stepper-pane')
       expect(panes[0].getAttribute('role')).toBe('tabpanel')
       expect(panes[0].getAttribute('aria-labelledby')).toBe(buttons[0].id)
-      expect(panes[0].getAttribute('aria-live')).toBe('polite')
+      expect(panes[0].hasAttribute('aria-live')).toBeFalse()
     })
 
     it('should drop the tab pattern when the steps own their content', () => {
@@ -1434,6 +1435,28 @@ describe('Stepper', () => {
         </div>
       `
 
+    const withAnnouncements = async run => {
+      const removeAnnouncers = () => {
+        for (const announcer of document.querySelectorAll('[data-coreui-live-announcer]')) {
+          announcer.remove()
+        }
+      }
+
+      removeAnnouncers()
+      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'performance'] })
+
+      try {
+        run()
+        await Promise.resolve()
+        vi.advanceTimersByTime(100)
+
+        return [...document.querySelectorAll('[data-coreui-live-announcer] [aria-live="polite"] > *')].map(message => message.textContent)
+      } finally {
+        vi.useRealTimers()
+        removeAnnouncers()
+      }
+    }
+
     it('should mark invalid controls on noValidate forms on failure', () => {
       fixtureEl.innerHTML = validationFixture('novalidate')
 
@@ -1506,6 +1529,336 @@ describe('Stepper', () => {
 
       expect(document.activeElement).toBe(summary)
       expect(fixtureEl.querySelector('#empty').getAttribute('aria-invalid')).toBe('true')
+    })
+
+    it('should describe an invalid control by its invalid feedback while it is invalid', () => {
+      fixtureEl.innerHTML = validationFixture('novalidate')
+      const input = fixtureEl.querySelector('#empty')
+      input.setAttribute('aria-describedby', 'hint')
+      input.setAttribute('data-coreui-invalid-feedback', 'emptyError')
+
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+
+      stepper.next()
+      expect(input.getAttribute('aria-describedby')).toBe('hint emptyError')
+
+      input.dispatchEvent(new Event('input', { bubbles: true }))
+      expect(input.getAttribute('aria-describedby')).toBe('hint emptyError')
+
+      input.value = 'corrected'
+      input.dispatchEvent(new Event('input', { bubbles: true }))
+      expect(input.getAttribute('aria-describedby')).toBe('hint')
+
+      input.value = ''
+      stepper.next()
+      stepper.reset()
+      expect(input.getAttribute('aria-describedby')).toBe('hint')
+    })
+
+    it('should drop the aria-describedby it created once the control is valid', () => {
+      fixtureEl.innerHTML = validationFixture('novalidate')
+      const input = fixtureEl.querySelector('#empty')
+      input.setAttribute('data-coreui-invalid-feedback', 'emptyError')
+
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+
+      stepper.next()
+      expect(input.getAttribute('aria-describedby')).toBe('emptyError')
+
+      input.value = 'corrected'
+      input.dispatchEvent(new Event('input', { bubbles: true }))
+      expect(input.hasAttribute('aria-describedby')).toBeFalse()
+    })
+
+    it('should keep the aria-describedby it did not add', () => {
+      fixtureEl.innerHTML = validationFixture('novalidate')
+      const input = fixtureEl.querySelector('#empty')
+      input.setAttribute('aria-describedby', 'emptyError')
+      input.setAttribute('data-coreui-invalid-feedback', 'emptyError formatError')
+
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+
+      stepper.next()
+      expect(input.getAttribute('aria-describedby')).toBe('emptyError formatError')
+
+      input.value = 'corrected'
+      input.dispatchEvent(new Event('input', { bubbles: true }))
+      expect(input.getAttribute('aria-describedby')).toBe('emptyError')
+    })
+
+    it('should follow the invalid feedback ids as they change while the control stays invalid', () => {
+      fixtureEl.innerHTML = validationFixture('novalidate')
+      const input = fixtureEl.querySelector('#empty')
+      input.setAttribute('data-coreui-invalid-feedback', 'requiredError requiredError')
+
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+
+      stepper.next()
+      expect(input.getAttribute('aria-describedby')).toBe('requiredError')
+
+      input.setAttribute('data-coreui-invalid-feedback', 'formatError')
+      input.dispatchEvent(new Event('input', { bubbles: true }))
+      expect(input.getAttribute('aria-describedby')).toBe('formatError')
+
+      input.setAttribute('aria-describedby', 'hint')
+      input.dispatchEvent(new Event('input', { bubbles: true }))
+      expect(input.getAttribute('aria-describedby')).toBe('hint formatError')
+    })
+
+    it('should keep the ids added to aria-describedby by others while it was marked', () => {
+      fixtureEl.innerHTML = validationFixture('novalidate')
+      const input = fixtureEl.querySelector('#empty')
+      input.setAttribute('aria-describedby', 'hint')
+      input.setAttribute('data-coreui-invalid-feedback', 'emptyError')
+
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+
+      stepper.next()
+      input.setAttribute('aria-describedby', 'hint emptyError later')
+      input.value = 'corrected'
+      input.dispatchEvent(new Event('input', { bubbles: true }))
+
+      expect(input.getAttribute('aria-describedby')).toBe('hint later')
+    })
+
+    it('should describe an invalid control that already carries aria-invalid, and leave that attribute', () => {
+      fixtureEl.innerHTML = validationFixture('novalidate')
+      const input = fixtureEl.querySelector('#empty')
+      input.setAttribute('aria-invalid', 'true')
+      input.setAttribute('data-coreui-invalid-feedback', 'emptyError')
+
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+
+      stepper.next()
+      expect(input.getAttribute('aria-describedby')).toBe('emptyError')
+
+      input.value = 'corrected'
+      input.dispatchEvent(new Event('input', { bubbles: true }))
+
+      expect(input.getAttribute('aria-invalid')).toBe('true')
+      expect(input.hasAttribute('aria-describedby')).toBeFalse()
+    })
+
+    it('should unmark a control that stops taking part in validation', () => {
+      fixtureEl.innerHTML = validationFixture('novalidate')
+      const input = fixtureEl.querySelector('#empty')
+      input.setAttribute('data-coreui-invalid-feedback', 'emptyError')
+
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+
+      stepper.next()
+      input.disabled = true
+      fixtureEl.querySelector('#filled').dispatchEvent(new Event('input', { bubbles: true }))
+
+      expect(input).not.toHaveClass('is-invalid')
+      expect(input.hasAttribute('aria-invalid')).toBeFalse()
+      expect(input.hasAttribute('aria-describedby')).toBeFalse()
+    })
+
+    it('should announce the invalid feedback when the first invalid control already has focus', async () => {
+      fixtureEl.innerHTML = `${validationFixture('novalidate')}<div id="emptyError">Enter a value.</div>`
+      const input = fixtureEl.querySelector('#empty')
+      input.setAttribute('data-coreui-invalid-feedback', 'emptyError')
+      const stepper = new Stepper(fixtureEl.querySelector('.stepper'))
+
+      const messages = await withAnnouncements(() => {
+        input.focus()
+        stepper.next()
+      })
+
+      expect(document.activeElement).toBe(input)
+      expect(messages).toEqual(['Enter a value.'])
+    })
+
+    it('should announce the invalid feedback linked through aria-describedby when the control names none', async () => {
+      fixtureEl.innerHTML = `${validationFixture('novalidate')}<div id="hint">Your name.</div><div id="emptyError" class="invalid-feedback">Enter a value.</div>`
+      const input = fixtureEl.querySelector('#empty')
+      input.setAttribute('aria-describedby', 'hint emptyError')
+      const stepper = new Stepper(fixtureEl.querySelector('.stepper'))
+
+      const messages = await withAnnouncements(() => {
+        input.focus()
+        stepper.next()
+      })
+
+      expect(messages).toEqual(['Enter a value.'])
+    })
+
+    it('should announce the browser validation message when the control has no invalid feedback', async () => {
+      fixtureEl.innerHTML = validationFixture('novalidate')
+      const input = fixtureEl.querySelector('#empty')
+      const stepper = new Stepper(fixtureEl.querySelector('.stepper'))
+
+      const messages = await withAnnouncements(() => {
+        input.focus()
+        stepper.next()
+      })
+
+      expect(messages).toEqual([input.validationMessage])
+    })
+
+    it('should not announce the invalid feedback when focus moves to the control', async () => {
+      fixtureEl.innerHTML = `${validationFixture('novalidate')}<button id="next" type="button">Next</button><div id="emptyError">Enter a value.</div>`
+      const input = fixtureEl.querySelector('#empty')
+      input.setAttribute('data-coreui-invalid-feedback', 'emptyError')
+      const stepper = new Stepper(fixtureEl.querySelector('.stepper'))
+
+      const messages = await withAnnouncements(() => {
+        fixtureEl.querySelector('#next').focus()
+        stepper.next()
+      })
+
+      expect(document.activeElement).toBe(input)
+      expect(messages).toEqual([])
+    })
+
+    it('should announce the invalid feedback when a control hands focus back to where it was', async () => {
+      fixtureEl.innerHTML = `${validationFixture('novalidate')}<button id="proxy" type="button">Proxy</button><div id="overlayError">Pick an option.</div>`
+      const overlay = Object.assign(document.createElement('select'), { required: true })
+      overlay.setAttribute('aria-hidden', 'true')
+      overlay.setAttribute('data-coreui-invalid-feedback', 'overlayError')
+      overlay.tabIndex = -1
+      overlay.addEventListener('focus', () => fixtureEl.querySelector('#proxy').focus())
+      fixtureEl.querySelector('form').prepend(overlay)
+      const stepper = new Stepper(fixtureEl.querySelector('.stepper'))
+
+      const messages = await withAnnouncements(() => {
+        fixtureEl.querySelector('#proxy').focus()
+        stepper.next()
+      })
+
+      expect(document.activeElement).toBe(fixtureEl.querySelector('#proxy'))
+      expect(messages).toEqual(['Pick an option.'])
+    })
+
+    it('should leave no focus on a control hidden from assistive technologies when nothing had focus', () => {
+      fixtureEl.innerHTML = validationFixture('novalidate')
+      fixtureEl.querySelector('form').innerHTML = '<div aria-hidden="true"><input id="hiddenRequired" required></div>'
+      const stepper = new Stepper(fixtureEl.querySelector('.stepper'))
+
+      document.activeElement.blur()
+      stepper.next()
+
+      expect(document.activeElement).toBe(document.body)
+    })
+
+    it('should announce the first invalid feedback when no control takes focus', async () => {
+      fixtureEl.innerHTML = `${validationFixture('novalidate')}<button id="next" type="button">Next</button><div id="hiddenError">Enter a value.</div>`
+      fixtureEl.querySelector('form').innerHTML = '<div aria-hidden="true"><input id="hiddenRequired" data-coreui-invalid-feedback="hiddenError" required></div>'
+      const stepper = new Stepper(fixtureEl.querySelector('.stepper'))
+
+      const messages = await withAnnouncements(() => {
+        fixtureEl.querySelector('#next').focus()
+        stepper.next()
+      })
+
+      expect(document.activeElement).toBe(fixtureEl.querySelector('#next'))
+      expect(messages).toEqual(['Enter a value.'])
+    })
+
+    it('should accept focus a control hands over and put focus back when no control takes it', () => {
+      fixtureEl.innerHTML = `${validationFixture('novalidate')}<button id="next" type="button">Next</button><button id="proxy" type="button">Proxy</button>`
+      const form = fixtureEl.querySelector('form')
+      const overlay = Object.assign(document.createElement('select'), { id: 'overlay', required: true })
+      overlay.setAttribute('aria-hidden', 'true')
+      overlay.tabIndex = -1
+      overlay.addEventListener('focus', () => fixtureEl.querySelector('#proxy').focus())
+      form.prepend(overlay)
+
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      const next = fixtureEl.querySelector('#next')
+
+      next.focus()
+      stepper.next()
+      expect(document.activeElement).toBe(fixtureEl.querySelector('#proxy'))
+
+      overlay.remove()
+      form.innerHTML = '<div aria-hidden="true"><input id="hiddenRequired" required></div>'
+      next.focus()
+      stepper.next()
+      expect(document.activeElement).toBe(next)
+    })
+
+    it('should pass over a control whose focus ends up nowhere', () => {
+      fixtureEl.innerHTML = `${validationFixture('novalidate')}<button id="next" type="button">Next</button><button id="proxy" type="button">Proxy</button>`
+      const empty = fixtureEl.querySelector('#empty')
+      const proxy = fixtureEl.querySelector('#proxy')
+      const dropping = Object.assign(document.createElement('input'), { required: true })
+      dropping.addEventListener('focus', () => {
+        proxy.focus()
+        proxy.blur()
+      })
+      fixtureEl.querySelector('form').prepend(dropping)
+      const stepper = new Stepper(fixtureEl.querySelector('.stepper'))
+
+      fixtureEl.querySelector('#next').focus()
+      stepper.next()
+
+      expect(document.activeElement).toBe(empty)
+    })
+
+    it('should leave out the hidden parts of the invalid feedback it announces', async () => {
+      fixtureEl.innerHTML = `${validationFixture('novalidate')}<div id="emptyError">Enter
+        a value.<span hidden>Use name@example.com.</span><svg aria-hidden="true"><title>Error</title></svg></div>`
+      const input = fixtureEl.querySelector('#empty')
+      input.setAttribute('data-coreui-invalid-feedback', 'emptyError')
+      const stepper = new Stepper(fixtureEl.querySelector('.stepper'))
+
+      const messages = await withAnnouncements(() => {
+        input.focus()
+        stepper.next()
+      })
+
+      expect(messages).toEqual(['Enter a value.'])
+    })
+
+    it('should clear the classes of a control that stopped taking part in validation on reset', () => {
+      fixtureEl.innerHTML = validationFixture('novalidate')
+      const input = fixtureEl.querySelector('#empty')
+      const stepper = new Stepper(fixtureEl.querySelector('.stepper'))
+
+      stepper.next()
+      input.disabled = true
+      stepper.reset()
+
+      expect(input).not.toHaveClass('is-invalid')
+      expect(input.hasAttribute('aria-invalid')).toBeFalse()
+    })
+
+    it('should stop updating the controls after reset until a step fails again', () => {
+      fixtureEl.innerHTML = validationFixture('novalidate')
+      const stepper = new Stepper(fixtureEl.querySelector('.stepper'))
+      const filled = fixtureEl.querySelector('#filled')
+
+      stepper.next()
+      stepper.reset()
+      filled.value = 'typed'
+      filled.dispatchEvent(new Event('input', { bubbles: true }))
+
+      expect(fixtureEl.querySelector('#empty')).not.toHaveClass('is-invalid')
+      expect(fixtureEl.querySelector('#empty').hasAttribute('aria-invalid')).toBeFalse()
+    })
+
+    it('should update the controls again when a step fails after reset', () => {
+      fixtureEl.innerHTML = validationFixture('novalidate')
+      const stepper = new Stepper(fixtureEl.querySelector('.stepper'))
+      const empty = fixtureEl.querySelector('#empty')
+
+      stepper.next()
+      stepper.reset()
+      stepper.next()
+      empty.value = 'corrected'
+      empty.dispatchEvent(new Event('input', { bubbles: true }))
+
+      expect(empty).not.toHaveClass('is-invalid')
     })
 
     it('should keep the aria-invalid it did not set', () => {

@@ -1816,6 +1816,15 @@ the stepper marks the controls of a failing `novalidate` step form with
 and the date / time / date-time inputs key their submit-time state off the
 attribute instead of the class.
 
+The stepper also sets `aria-invalid` on those controls and moves focus to the
+first of them, and its panes are no longer `aria-live`: while a control is
+invalid, the stepper adds its `.invalid-feedback` to `aria-describedby` instead,
+the one that follows it or the one named in `data-coreui-invalid-feedback`, so
+the message is read with the field. The panes used to read out every message that appeared in them;
+a message that changes while the user types is now silent, so pass the ones
+that have to be heard to [`announce()`](/getting-started/accessibility/#announcing-messages).
+Going back to an earlier step no longer validates the current one.
+
 #### Input group: `.has-validation` removed
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>

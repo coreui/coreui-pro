@@ -15,6 +15,7 @@ import Tooltip from '@coreui/coreui-pro/js/src/tooltip.js'
 import { announce } from '@coreui/coreui-pro/utils/announce'
 import { createDate } from '@coreui/coreui-pro/utils/calendar'
 import { getSectionLayout } from '@coreui/coreui-pro/utils/date-sections'
+import { focusFirstInvalidControl } from '@coreui/coreui-pro/utils/form-validation'
 
 const element = document.createElement('div')
 
@@ -30,5 +31,6 @@ rootAnnounce('Saved', { context: element, timeout: 1000 })()
 announce('Saved', { priority: 'high' })
 createDate(2026, 0, 1).getFullYear()
 getSectionLayout('dd.MM.yyyy', 'en-US')
+focusFirstInvalidControl(document.createElement('form'))
 
 export { rootTooltip }
