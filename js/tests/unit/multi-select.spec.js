@@ -2577,6 +2577,155 @@ describe('MultiSelect', () => {
 
       expect(multiSelect._searchElement.value).toBe('')
     })
+
+    describe('external search', () => {
+      const createExternal = (config = {}) => {
+        fixtureEl.innerHTML = '<form><select name="tech"></select></form>'
+        const selectEl = fixtureEl.querySelector('select')
+        const multiSelect = new MultiSelect(selectEl, {
+          options: [
+            { value: '1', text: 'Angular' },
+            { value: '2', text: 'React.js' }
+          ],
+          search: 'external',
+          ...config
+        })
+
+        return { multiSelect, selectEl }
+      }
+
+      it('should read a comma separated search string as a list of modes', () => {
+        const { multiSelect } = createExternal({ search: 'external, global' })
+
+        expect(multiSelect._config.search).toEqual(['external', 'global'])
+        expect(multiSelect._isExternalSearch()).toBeTrue()
+        expect(multiSelect._isGlobalSearch()).toBeTrue()
+      })
+
+      it('should not filter the options list', () => {
+        const { multiSelect } = createExternal()
+
+        multiSelect.search('vue')
+
+        const displayed = [...multiSelect._optionsElement.querySelectorAll('.form-multi-select-option')]
+          .filter(option => multiSelect._isOptionDisplayed(option))
+
+        expect(displayed.length).toBe(2)
+      })
+
+      it('should pass the typed text with the search event', () => {
+        const { multiSelect, selectEl } = createExternal()
+        const values = []
+
+        selectEl.addEventListener('search.coreui.multi-select', event => values.push(event.value))
+        multiSelect.search('Vue')
+
+        expect(values).toEqual(['Vue'])
+      })
+
+      it('should keep the open menu and the typed text when the options are updated', () => {
+        const { multiSelect } = createExternal()
+
+        multiSelect.show()
+        const searchEl = multiSelect._searchElement
+        searchEl.value = 'vu'
+        multiSelect.search('vu')
+
+        multiSelect.update({ options: [{ value: '3', text: 'Vue.js' }] })
+
+        expect(multiSelect._isShown()).toBeTrue()
+        expect(multiSelect._searchElement).toBe(searchEl)
+        expect(searchEl.value).toBe('vu')
+        expect(document.activeElement).toBe(searchEl)
+        expect([...multiSelect._optionsElement.querySelectorAll('.form-multi-select-option')].map(option => option.textContent)).toEqual(['Vue.js'])
+      })
+
+      it('should keep the selection outside the new results', () => {
+        const { multiSelect, selectEl } = createExternal()
+
+        multiSelect._selectOption('1', 'Angular')
+        multiSelect.update({ options: [{ value: '3', text: 'Vue.js' }] })
+
+        expect(multiSelect.getValue()).toEqual([{ value: '1', text: 'Angular' }])
+        expect([...new FormData(fixtureEl.querySelector('form')).getAll('tech')]).toEqual(['1'])
+        expect(selectEl.querySelector('option[value="3"]').selected).toBeFalse()
+        expect(multiSelect._wrapperElement.querySelectorAll('.form-multi-select-tag').length).toBe(1)
+      })
+
+      it('should mark a selected option that comes back in the results', () => {
+        const { multiSelect } = createExternal()
+
+        multiSelect._selectOption('2', 'React.js')
+        multiSelect.update({ options: [{ value: '3', text: 'Vue.js' }] })
+        multiSelect.update({ options: [{ value: '2', text: 'React.js' }, { value: '3', text: 'Vue.js' }] })
+
+        const option = multiSelect._optionsElement.querySelector('[data-value="2"]')
+
+        expect(option.classList.contains('form-multi-selected')).toBeTrue()
+        expect(option.getAttribute('aria-selected')).toBe('true')
+        expect(multiSelect.getValue().length).toBe(1)
+      })
+
+      it('should not fire a change when only the options are updated', () => {
+        const { multiSelect, selectEl } = createExternal()
+        let changes = 0
+
+        multiSelect._selectOption('1', 'Angular')
+        selectEl.addEventListener('changed.coreui.multi-select', () => changes++)
+        multiSelect.update({ options: [{ value: '3', text: 'Vue.js' }] })
+
+        expect(changes).toBe(0)
+      })
+
+      it('should clear the selection outside the results with deselectAll', () => {
+        const { multiSelect, selectEl } = createExternal()
+
+        multiSelect._selectOption('1', 'Angular')
+        multiSelect.update({ options: [{ value: '3', text: 'Vue.js' }] })
+        multiSelect.deselectAll()
+
+        expect(multiSelect.getValue()).toEqual([])
+        expect(selectEl.querySelector('option[value="1"]').selected).toBeFalse()
+      })
+
+      it('should replace a single selection made from earlier results', () => {
+        const { multiSelect } = createExternal({ multiple: false })
+
+        multiSelect._selectOption('1', 'Angular')
+        multiSelect.update({ options: [{ value: '3', text: 'Vue.js' }] })
+        multiSelect._selectOption('3', 'Vue.js')
+
+        expect(multiSelect.getValue()).toEqual([{ value: '3', text: 'Vue.js' }])
+      })
+
+      it('should scope select all to the loaded results', () => {
+        const { multiSelect } = createExternal()
+
+        multiSelect._selectOption('1', 'Angular')
+        multiSelect._selectOption('2', 'React.js')
+        multiSelect.update({ options: [{ value: '3', text: 'Vue.js' }, { value: '4', text: 'Svelte' }] })
+
+        expect(multiSelect._isAllSelected()).toBeFalse()
+        expect(multiSelect._selectAllElement.textContent).toBe('Select all')
+      })
+
+      it('should show the no results message for an empty result', () => {
+        const { multiSelect } = createExternal()
+
+        multiSelect.update({ options: [] })
+
+        expect(multiSelect._optionsElement.querySelector('.form-multi-select-options-empty')).not.toBeNull()
+      })
+
+      it('should rebuild the component when update carries more than options', () => {
+        const { multiSelect } = createExternal()
+        const searchEl = multiSelect._searchElement
+
+        multiSelect.update({ options: [{ value: '3', text: 'Vue.js' }], placeholder: 'Pick' })
+
+        expect(multiSelect._searchElement).not.toBe(searchEl)
+      })
+    })
   })
 
   describe('selection', () => {

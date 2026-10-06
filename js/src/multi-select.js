@@ -172,7 +172,7 @@ const DefaultType = {
   required: 'boolean',
   sanitize: 'boolean',
   sanitizeFn: '(null|function)',
-  search: '(boolean|string)',
+  search: '(array|boolean|string)',
   searchNoResultsLabel: 'string',
   selectAll: 'boolean',
   selectAllLabel: 'string',
@@ -316,8 +316,13 @@ class MultiSelect extends BaseComponent {
 
   search(text) {
     this._search = text.length > 0 ? text.toLowerCase() : text
-    this._filterOptionsList()
-    EventHandler.trigger(this._element, EVENT_SEARCH)
+    if (!this._isExternalSearch()) {
+      this._filterOptionsList()
+    }
+
+    EventHandler.trigger(this._element, EVENT_SEARCH, {
+      value: text
+    })
   }
 
   update(config) {
@@ -326,6 +331,12 @@ class MultiSelect extends BaseComponent {
     }
 
     this._config = { ...this._config, ...this._configAfterMerge(config) }
+
+    if (this._isExternalSearch() && Object.keys(config).every(key => key === 'options')) {
+      this._updateExternalOptions()
+      return
+    }
+
     this._selected = []
     this._options = this._getOptions()
     this._destroySelect()
@@ -345,7 +356,7 @@ class MultiSelect extends BaseComponent {
     }
   }
 
-  deselectAll(options = this._options) {
+  deselectAll(options = this._selected) {
     this._deselectAllOptions(options)
     this._refreshAfterSelectionChange()
   }
@@ -424,13 +435,13 @@ class MultiSelect extends BaseComponent {
         return
       }
 
-      if (this._config.search === 'global' && (event.key.length === 1 || event.key === BACKSPACE_KEY || event.key === DELETE_KEY)) {
+      if (this._isGlobalSearch() && (event.key.length === 1 || event.key === BACKSPACE_KEY || event.key === DELETE_KEY)) {
         this._searchElement.focus()
       }
     })
 
     EventHandler.on(this._menu, EVENT_KEYDOWN, event => {
-      if (this._config.search === 'global' && (event.key.length === 1 || event.key === BACKSPACE_KEY || event.key === DELETE_KEY)) {
+      if (this._isGlobalSearch() && (event.key.length === 1 || event.key === BACKSPACE_KEY || event.key === DELETE_KEY)) {
         this._searchElement.focus()
       }
     })
@@ -1375,6 +1386,38 @@ class MultiSelect extends BaseComponent {
     this._refreshAfterSelectionChange()
   }
 
+  _updateExternalOptions() {
+    const selected = this._selected
+    this._selected = []
+    this._options = this._getOptions()
+    this._selected = selected
+
+    const selectedValues = new Set(selected.map(option => option.value))
+    const missing = selected.filter(option => !this._findOptionByValue(option.value))
+
+    this._element.innerHTML = ''
+    this._createNativeOptions(this._element, [...this._options, ...missing])
+    this._optionsElement.innerHTML = ''
+    this._createOptions(this._optionsElement, this._options)
+
+    for (const nativeOption of SelectorEngine.find('option', this._element)) {
+      nativeOption.selected = selectedValues.has(nativeOption.value)
+    }
+
+    for (const option of SelectorEngine.find(SELECTOR_OPTION, this._optionsElement)) {
+      const isSelected = selectedValues.has(option.dataset.value)
+      option.classList.toggle(CLASS_NAME_SELECTED, isSelected)
+      option.setAttribute('aria-selected', String(isSelected))
+    }
+
+    this._filterOptionsList()
+    this._updateGroupsState()
+
+    if (this._popper) {
+      this._popper.update()
+    }
+  }
+
   _updateSelection() {
     const selection = SelectorEngine.findOne(SELECTOR_SELECTION, this._wrapperElement)
     const search = SelectorEngine.findOne(SELECTOR_SEARCH, this._wrapperElement)
@@ -1519,7 +1562,7 @@ class MultiSelect extends BaseComponent {
 
   _getSelectAllScope() {
     const { selected, total, filtered, filteredSelected } = this._getSelectionState()
-    return this._config.selectAllMode === 'filtered' ?
+    return this._config.selectAllMode === 'filtered' || this._isExternalSearch() ?
       { selected: filteredSelected, total: filtered } :
       { selected, total }
   }
@@ -1632,6 +1675,14 @@ class MultiSelect extends BaseComponent {
     }
   }
 
+  _isExternalSearch() {
+    return Array.isArray(this._config.search) && this._config.search.includes('external')
+  }
+
+  _isGlobalSearch() {
+    return Array.isArray(this._config.search) && this._config.search.includes('global')
+  }
+
   _onSearchChange(element) {
     if (element) {
       this.search(element.value)
@@ -1671,7 +1722,7 @@ class MultiSelect extends BaseComponent {
 
     for (const option of options) {
       // eslint-disable-next-line unicorn/prefer-includes
-      if (option.textContent.toLowerCase().indexOf(this._search) === -1) {
+      if (!this._isExternalSearch() && option.textContent.toLowerCase().indexOf(this._search) === -1) {
         option.style.display = 'none'
       } else {
         option.style.removeProperty('display')
@@ -1755,6 +1806,10 @@ class MultiSelect extends BaseComponent {
 
     if (typeof config.container === 'object' || typeof config.container === 'string') {
       config.container = getElement(config.container)
+    }
+
+    if (typeof config.search === 'string') {
+      config.search = config.search.split(/,\s*/).map(String)
     }
 
     if (typeof config.value === 'number') {
