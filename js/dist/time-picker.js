@@ -1,5 +1,5 @@
 /*!
-  * CoreUI PRO time-picker.js v5.29.0 (https://coreui.io)
+  * CoreUI PRO time-picker.js v5.29.1 (https://coreui.io)
   * Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
   * License (https://coreui.io/pro/license/)
   */
@@ -162,7 +162,7 @@
     constructor(element, config) {
       super(element);
       this._handleTimeChange = (set, value) => {
-        const _date = this._date || new Date('1970-01-01');
+        const _date = this._date || new Date(1970, 0, 1);
         if (set === 'meridiem') {
           const currentHours = _date.getHours();
           if (value === 'am') {
@@ -243,7 +243,7 @@
       if (this._config.disabled || this._isShown()) {
         return;
       }
-      this._initialDate = new Date(this._date);
+      this._initialDate = this._date ? new Date(this._date) : null;
       EventHandler.trigger(this._element, EVENT_SHOW);
       this._element.classList.add(CLASS_NAME_SHOW);
       this._element.setAttribute('aria-expanded', true);
@@ -295,6 +295,7 @@
     }
     cancel() {
       this._date = this._initialDate;
+      this._ampm = this._date ? time_js.getAmPm(new Date(this._date), this._config.locale) : 'am';
       this._setInputValue(this._initialDate || '');
       this._timePickerBody.innerHTML = '';
       this.hide();

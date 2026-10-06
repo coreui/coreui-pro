@@ -1,5 +1,5 @@
 /*!
-  * CoreUI PRO v5.29.0 (https://coreui.io)
+  * CoreUI PRO v5.29.1 (https://coreui.io)
   * Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
   * License (https://coreui.io/pro/license/)
   */
@@ -703,7 +703,7 @@ class Config {
  * Constants
  */
 
-const VERSION = '5.29.0';
+const VERSION = '5.29.1';
 
 /**
  * Class definition
@@ -2222,6 +2222,24 @@ const isPeriodDisabled = (start, end, min, max, disabledDates) => {
     }
   }
   return true;
+};
+
+/**
+ * Moves a date between two limits: a date before the earliest one becomes
+ * that date, a date after the latest one becomes that date.
+ * @param date - The date to move.
+ * @param min - The earliest date allowed, or `null` without one.
+ * @param max - The latest date allowed, or `null` without one.
+ * @returns The date itself when the limits allow it, else a copy of the limit it crossed.
+ */
+const constrainDate = (date, min, max) => {
+  if (min && date < min) {
+    return new Date(min);
+  }
+  if (max && date > max) {
+    return new Date(max);
+  }
+  return date;
 };
 
 /**
@@ -3947,11 +3965,11 @@ class Calendar extends BaseComponent {
   }
   _initializeDates() {
     // Convert dates to date objects based on the selection type
-    this._calendarDate = convertToDateObject(this._config.calendarDate || this._config.startDate || this._config.endDate, this._config.selectionType) || new Date();
-    this._startDate = convertToDateObject(this._config.startDate, this._config.selectionType);
-    this._endDate = convertToDateObject(this._config.endDate, this._config.selectionType);
     this._minDate = convertToDateObject(this._config.minDate, this._config.selectionType);
     this._maxDate = convertToDateObject(this._config.maxDate, this._config.selectionType);
+    this._calendarDate = convertToDateObject(this._config.calendarDate || this._config.startDate || this._config.endDate, this._config.selectionType) || constrainDate(new Date(), this._minDate, this._maxDate);
+    this._startDate = convertToDateObject(this._config.startDate, this._config.selectionType);
+    this._endDate = convertToDateObject(this._config.endDate, this._config.selectionType);
     this._hoverDate = null;
     this._selectEndDate = this._config.selectEndDate;
   }
@@ -6532,7 +6550,7 @@ class TimePicker extends BaseComponent {
   constructor(element, config) {
     super(element);
     this._handleTimeChange = (set, value) => {
-      const _date = this._date || new Date('1970-01-01');
+      const _date = this._date || new Date(1970, 0, 1);
       if (set === 'meridiem') {
         const currentHours = _date.getHours();
         if (value === 'am') {
@@ -6613,7 +6631,7 @@ class TimePicker extends BaseComponent {
     if (this._config.disabled || this._isShown()) {
       return;
     }
-    this._initialDate = new Date(this._date);
+    this._initialDate = this._date ? new Date(this._date) : null;
     EventHandler.trigger(this._element, EVENT_SHOW$a);
     this._element.classList.add(CLASS_NAME_SHOW$d);
     this._element.setAttribute('aria-expanded', true);
@@ -6665,6 +6683,7 @@ class TimePicker extends BaseComponent {
   }
   cancel() {
     this._date = this._initialDate;
+    this._ampm = this._date ? getAmPm(new Date(this._date), this._config.locale) : 'am';
     this._setInputValue(this._initialDate || '');
     this._timePickerBody.innerHTML = '';
     this.hide();

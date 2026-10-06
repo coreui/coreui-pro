@@ -1,5 +1,5 @@
 /*!
-  * CoreUI PRO calendar.js v5.29.0 (https://coreui.io)
+  * CoreUI PRO calendar.js v5.29.1 (https://coreui.io)
   * Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
   * License (https://coreui.io/pro/license/)
   */
@@ -95,6 +95,24 @@
       }
     }
     return true;
+  };
+
+  /**
+   * Moves a date between two limits: a date before the earliest one becomes
+   * that date, a date after the latest one becomes that date.
+   * @param date - The date to move.
+   * @param min - The earliest date allowed, or `null` without one.
+   * @param max - The latest date allowed, or `null` without one.
+   * @returns The date itself when the limits allow it, else a copy of the limit it crossed.
+   */
+  const constrainDate = (date, min, max) => {
+    if (min && date < min) {
+      return new Date(min);
+    }
+    if (max && date > max) {
+      return new Date(max);
+    }
+    return date;
   };
 
   /**
@@ -1240,6 +1258,7 @@
     return getMondayOfISOWeek(parsedYear, parsedWeek);
   };
 
+  exports.constrainDate = constrainDate;
   exports.convertIsoWeekToDate = convertIsoWeekToDate;
   exports.convertToDateObject = convertToDateObject;
   exports.createDateFromMonth = createDateFromMonth;

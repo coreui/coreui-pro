@@ -1,5 +1,5 @@
 /*!
-  * CoreUI PRO calendar.js v5.29.0 (https://coreui.io)
+  * CoreUI PRO calendar.js v5.29.1 (https://coreui.io)
   * Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
   * License (https://coreui.io/pro/license/)
   */
@@ -656,11 +656,11 @@
     }
     _initializeDates() {
       // Convert dates to date objects based on the selection type
-      this._calendarDate = calendar_js.convertToDateObject(this._config.calendarDate || this._config.startDate || this._config.endDate, this._config.selectionType) || new Date();
-      this._startDate = calendar_js.convertToDateObject(this._config.startDate, this._config.selectionType);
-      this._endDate = calendar_js.convertToDateObject(this._config.endDate, this._config.selectionType);
       this._minDate = calendar_js.convertToDateObject(this._config.minDate, this._config.selectionType);
       this._maxDate = calendar_js.convertToDateObject(this._config.maxDate, this._config.selectionType);
+      this._calendarDate = calendar_js.convertToDateObject(this._config.calendarDate || this._config.startDate || this._config.endDate, this._config.selectionType) || calendar_js.constrainDate(new Date(), this._minDate, this._maxDate);
+      this._startDate = calendar_js.convertToDateObject(this._config.startDate, this._config.selectionType);
+      this._endDate = calendar_js.convertToDateObject(this._config.endDate, this._config.selectionType);
       this._hoverDate = null;
       this._selectEndDate = this._config.selectEndDate;
     }
