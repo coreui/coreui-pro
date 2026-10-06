@@ -1,5 +1,5 @@
 /*!
-  * CoreUI PRO v5.28.0 (https://coreui.io)
+  * CoreUI PRO v5.29.0 (https://coreui.io)
   * Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
   * License (https://coreui.io/pro/license/)
   */
@@ -707,7 +707,7 @@
    * Constants
    */
 
-  const VERSION = '5.28.0';
+  const VERSION = '5.29.0';
 
   /**
    * Class definition
@@ -11499,7 +11499,7 @@
     required: 'boolean',
     sanitize: 'boolean',
     sanitizeFn: '(null|function)',
-    search: '(boolean|string)',
+    search: '(array|boolean|string)',
     searchNoResultsLabel: 'string',
     selectAll: 'boolean',
     selectAllLabel: 'string',
@@ -11619,8 +11619,12 @@
     }
     search(text) {
       this._search = text.length > 0 ? text.toLowerCase() : text;
-      this._filterOptionsList();
-      EventHandler.trigger(this._element, EVENT_SEARCH);
+      if (!this._isExternalSearch()) {
+        this._filterOptionsList();
+      }
+      EventHandler.trigger(this._element, EVENT_SEARCH, {
+        value: text
+      });
     }
     update(config) {
       if (config.value) {
@@ -11630,6 +11634,10 @@
         ...this._config,
         ...this._configAfterMerge(config)
       };
+      if (this._isExternalSearch() && Object.keys(config).every(key => key === 'options')) {
+        this._updateExternalOptions();
+        return;
+      }
       this._selected = [];
       this._options = this._getOptions();
       this._destroySelect();
@@ -11646,7 +11654,7 @@
         this._triggerSelectionLimit();
       }
     }
-    deselectAll(options = this._options) {
+    deselectAll(options = this._selected) {
       this._deselectAllOptions(options);
       this._refreshAfterSelectionChange();
     }
@@ -11715,12 +11723,12 @@
           this.hide();
           return;
         }
-        if (this._config.search === 'global' && (event.key.length === 1 || event.key === BACKSPACE_KEY$1 || event.key === DELETE_KEY)) {
+        if (this._isGlobalSearch() && (event.key.length === 1 || event.key === BACKSPACE_KEY$1 || event.key === DELETE_KEY)) {
           this._searchElement.focus();
         }
       });
       EventHandler.on(this._menu, EVENT_KEYDOWN$4, event => {
-        if (this._config.search === 'global' && (event.key.length === 1 || event.key === BACKSPACE_KEY$1 || event.key === DELETE_KEY)) {
+        if (this._isGlobalSearch() && (event.key.length === 1 || event.key === BACKSPACE_KEY$1 || event.key === DELETE_KEY)) {
           this._searchElement.focus();
         }
       });
@@ -12510,6 +12518,58 @@
       }
       this._refreshAfterSelectionChange();
     }
+    _updateExternalOptions() {
+      const selected = this._selected;
+      this._selected = [];
+      this._options = this._getOptions();
+      const preselected = this._selected.filter(option => !selected.some(item => item.value === option.value));
+      this._selected = selected;
+      const selectedValues = new Set(selected.map(option => option.value));
+      const missing = selected.filter(option => !this._findOptionByValue(option.value));
+      const {
+        activeElement
+      } = document;
+      const hadFocus = this._wrapperElement.contains(activeElement) || this._menu.contains(activeElement);
+      const emptyMessage = SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._optionsElement);
+      this._element.innerHTML = '';
+      this._createNativeOptions(this._element, [...this._options, ...missing]);
+      this._optionsElement.innerHTML = '';
+      this._createOptions(this._optionsElement, this._options);
+      if (emptyMessage) {
+        this._optionsElement.append(emptyMessage);
+      }
+      for (const nativeOption of SelectorEngine.find('option', this._element)) {
+        nativeOption.selected = selectedValues.has(nativeOption.value);
+      }
+      for (const option of SelectorEngine.find(SELECTOR_OPTION, this._optionsElement)) {
+        const isSelected = selectedValues.has(option.dataset.value);
+        option.classList.toggle(CLASS_NAME_SELECTED, isSelected);
+        option.setAttribute('aria-selected', String(isSelected));
+      }
+      if (preselected.length > 0) {
+        for (const option of preselected) {
+          this._selectOption(option.value, option.text, {
+            refresh: false
+          });
+        }
+        this._refreshAfterSelectionChange();
+        if (this._searchElement) {
+          this._updateSearchSize(this._searchElement.value.length + 1);
+        }
+      }
+      this._filterOptionsList();
+      this._updateGroupsState();
+      if (this._popper) {
+        this._popper.update();
+      }
+      if (hadFocus && !this._wrapperElement.contains(document.activeElement) && !this._menu.contains(document.activeElement)) {
+        const {
+          value
+        } = activeElement.dataset;
+        const target = value && this._getOptionElement(value) || this._searchElement || this._togglerElement;
+        target.focus();
+      }
+    }
     _updateSelection() {
       const selection = SelectorEngine.findOne(SELECTOR_SELECTION, this._wrapperElement);
       const search = SelectorEngine.findOne(SELECTOR_SEARCH, this._wrapperElement);
@@ -12625,7 +12685,7 @@
         selected,
         total
       } = this._getSelectAllScope();
-      const target = this._getSelectableTarget(total);
+      const target = this._getSelectableTarget(total, selected);
       return target > 0 && selected >= target;
     }
     _getSelectAllScope() {
@@ -12635,7 +12695,7 @@
         filtered,
         filteredSelected
       } = this._getSelectionState();
-      return this._config.selectAllMode === 'filtered' ? {
+      return this._config.selectAllMode === 'filtered' || this._isExternalSearch() ? {
         selected: filteredSelected,
         total: filtered
       } : {
@@ -12654,7 +12714,7 @@
       return filtered < total;
     }
     _toggleSelectAll() {
-      const filteredMode = this._config.selectAllMode === 'filtered';
+      const filteredMode = this._config.selectAllMode === 'filtered' || this._isExternalSearch();
       if (this._isAllSelected()) {
         if (filteredMode) {
           this.deselectFiltered();
@@ -12669,8 +12729,12 @@
         this.selectAll();
       }
     }
-    _getSelectableTarget(total) {
-      return this._hasSelectionLimit() ? Math.min(total, this._config.selectionLimit) : total;
+    _getSelectableTarget(total, selected) {
+      if (!this._hasSelectionLimit()) {
+        return total;
+      }
+      const selectedElsewhere = this._isExternalSearch() ? this._selected.length - selected : 0;
+      return Math.min(total, this._config.selectionLimit - selectedElsewhere);
     }
     _getCheckboxState(selected, total) {
       if (total > 0 && selected >= total) {
@@ -12704,7 +12768,7 @@
         selected,
         total
       } = this._getSelectAllScope();
-      this._applyCheckboxState(this._selectAllElement, this._getCheckboxState(selected, this._getSelectableTarget(total)));
+      this._applyCheckboxState(this._selectAllElement, this._getCheckboxState(selected, this._getSelectableTarget(total, selected)));
     }
     _renderHeader() {
       if (!this._headerElement || typeof this._config.headerTemplate !== 'function') {
@@ -12734,6 +12798,12 @@
         selectFiltered: () => this.selectFiltered(),
         deselectFiltered: () => this.deselectFiltered()
       };
+    }
+    _isExternalSearch() {
+      return Array.isArray(this._config.search) && this._config.search.includes('external');
+    }
+    _isGlobalSearch() {
+      return Array.isArray(this._config.search) && this._config.search.includes('global');
     }
     _onSearchChange(element) {
       if (element) {
@@ -12767,7 +12837,7 @@
       let visibleOptions = 0;
       for (const option of options) {
         // eslint-disable-next-line unicorn/prefer-includes
-        if (option.textContent.toLowerCase().indexOf(this._search) === -1) {
+        if (!this._isExternalSearch() && option.textContent.toLowerCase().indexOf(this._search) === -1) {
           option.style.display = 'none';
         } else {
           option.style.removeProperty('display');
@@ -12838,6 +12908,9 @@
       }
       if (typeof config.container === 'object' || typeof config.container === 'string') {
         config.container = getElement(config.container);
+      }
+      if (typeof config.search === 'string' && config.search !== '') {
+        config.search = config.search.split(/,\s*/).map(String);
       }
       if (typeof config.value === 'number') {
         config.value = [String(config.value)];

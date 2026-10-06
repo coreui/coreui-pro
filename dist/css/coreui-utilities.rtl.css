@@ -1,6 +1,6 @@
 @charset "UTF-8";
 /*!
- * CoreUI PRO Utilities v5.28.0 (https://coreui.io)
+ * CoreUI PRO Utilities v5.29.0 (https://coreui.io)
  * Copyright (c) 2026 creativeLabs Łukasz Holeczek
  * License (https://coreui.io/pro/license/)
  */
@@ -59,7 +59,7 @@
   --cui-info-bg-subtle: #c0e6ff;
   --cui-warning-bg-subtle: #feecc5;
   --cui-danger-bg-subtle: #f9d4d4;
-  --cui-light-bg-subtle: rgb(97.6470588235%, 97.8431372549%, 98.431372549%);
+  --cui-light-bg-subtle: rgb(249, 249.5, 251);
   --cui-dark-bg-subtle: #cfd4de;
   --cui-primary-border-subtle: #9d92e6;
   --cui-secondary-border-subtle: #9da5b1;
@@ -102,17 +102,17 @@
   --cui-body-font-size: 1rem;
   --cui-body-font-weight: 400;
   --cui-body-line-height: 1.5;
-  --cui-body-color: rgba(14.5098039216%, 16.831372549%, 21.1843137255%, 0.95);
+  --cui-body-color: rgba(37, 42.92, 54.02, 0.95);
   --cui-body-color-rgb: 37, 42.92, 54.02;
   --cui-body-bg: #fff;
   --cui-body-bg-rgb: 255, 255, 255;
   --cui-emphasis-color: #080a0c;
   --cui-emphasis-color-rgb: 8, 10, 12;
-  --cui-secondary-color: rgba(14.5098039216%, 16.831372549%, 21.1843137255%, 0.681);
+  --cui-secondary-color: rgba(37, 42.92, 54.02, 0.681);
   --cui-secondary-color-rgb: 37, 42.92, 54.02;
   --cui-secondary-bg: #e7eaee;
   --cui-secondary-bg-rgb: 231, 234, 238;
-  --cui-tertiary-color: rgba(14.5098039216%, 16.831372549%, 21.1843137255%, 0.38);
+  --cui-tertiary-color: rgba(37, 42.92, 54.02, 0.38);
   --cui-tertiary-color-rgb: 37, 42.92, 54.02;
   --cui-tertiary-bg: #f3f4f7;
   --cui-tertiary-bg-rgb: 243, 244, 247;
@@ -129,11 +129,11 @@
   --cui-secondary-bg-rgb-dark: 50, 58, 73;
   --cui-tertiary-color-dark: rgba(255, 255, 255, 0.38);
   --cui-tertiary-color-rgb-dark: 255, 255, 255;
-  --cui-tertiary-bg-dark: rgb(16.2745098039%, 18.8235294118%, 23.9215686275%);
+  --cui-tertiary-bg-dark: rgb(41.5, 48, 61);
   --cui-tertiary-bg-rgb-dark: 41.5, 48, 61;
-  --cui-high-emphasis: rgba(14.5098039216%, 16.831372549%, 21.1843137255%, 0.95);
-  --cui-medium-emphasis: rgba(14.5098039216%, 16.831372549%, 21.1843137255%, 0.681);
-  --cui-disabled: rgba(14.5098039216%, 16.831372549%, 21.1843137255%, 0.38);
+  --cui-high-emphasis: rgba(37, 42.92, 54.02, 0.95);
+  --cui-medium-emphasis: rgba(37, 42.92, 54.02, 0.681);
+  --cui-disabled: rgba(37, 42.92, 54.02, 0.38);
   --cui-high-emphasis-inverse: rgba(255, 255, 255, 0.87);
   --cui-medium-emphasis-inverse: rgba(255, 255, 255, 0.6);
   --cui-disabled-inverse: rgba(255, 255, 255, 0.38);
@@ -141,11 +141,11 @@
   --cui-link-color: #5856d6;
   --cui-link-color-rgb: 88, 86, 214;
   --cui-link-decoration: underline;
-  --cui-link-hover-color: rgb(27.6078431373%, 26.9803921569%, 67.137254902%);
+  --cui-link-hover-color: rgb(70.4, 68.8, 171.2);
   --cui-link-hover-color-rgb: 70.4, 68.8, 171.2;
   --cui-code-color: #d63384;
-  --cui-highlight-color: rgba(14.5098039216%, 16.831372549%, 21.1843137255%, 0.95);
-  --cui-highlight-bg: rgb(100%, 95.137254902%, 80.5490196078%);
+  --cui-highlight-color: rgba(37, 42.92, 54.02, 0.95);
+  --cui-highlight-bg: rgb(255, 242.6, 205.4);
   --cui-border-width: 1px;
   --cui-border-style: solid;
   --cui-border-color: #dbdfe6;
@@ -186,19 +186,19 @@
   --cui-secondary-bg-rgb: 50, 58, 73;
   --cui-tertiary-color: rgba(255, 255, 255, 0.38);
   --cui-tertiary-color-rgb: 255, 255, 255;
-  --cui-tertiary-bg: rgb(16.2745098039%, 18.8235294118%, 23.9215686275%);
+  --cui-tertiary-bg: rgb(41.5, 48, 61);
   --cui-tertiary-bg-rgb: 41.5, 48, 61;
   --cui-tertiary-bg-translucent: rgba(118, 138, 169, 0.1);
   --cui-elevation-base-color: 0, 0, 0;
   --cui-high-emphasis: rgba(255, 255, 255, 0.87);
   --cui-medium-emphasis: rgba(255, 255, 255, 0.6);
   --cui-disabled: rgba(255, 255, 255, 0.38);
-  --cui-primary: rgb(36.9411764706%, 36.2352941176%, 81.4117647059%);
+  --cui-primary: rgb(94.2, 92.4, 207.6);
   --cui-secondary: #6b7785;
-  --cui-success: rgb(13.1568627451%, 59.3921568627%, 25.5098039216%);
-  --cui-info: rgb(24%, 60%, 96%);
-  --cui-warning: rgb(93.1764705882%, 67.7647058824%, 12.7058823529%);
-  --cui-danger: rgb(86.9411764706%, 35.4117647059%, 35.4117647059%);
+  --cui-success: rgb(33.55, 151.45, 65.05);
+  --cui-info: rgb(61.2, 153, 244.8);
+  --cui-warning: rgb(237.6, 172.8, 32.4);
+  --cui-danger: rgb(221.7, 90.3, 90.3);
   --cui-light: #f3f4f7;
   --cui-dark: #212631;
   --cui-gray-100: #f3f4f7;
@@ -218,12 +218,12 @@
   --cui-danger-rgb: 221.7, 90.3, 90.3;
   --cui-light-rgb: 243, 244, 247;
   --cui-dark-rgb: 33, 38, 49;
-  --cui-primary-text-emphasis: rgb(23.2745098039%, 22.568627451%, 61.7450980392%);
+  --cui-primary-text-emphasis: rgb(59.35, 57.55, 157.45);
   --cui-secondary-text-emphasis: #212233;
-  --cui-success-text-emphasis: rgb(7.2941176471%, 32.7058823529%, 14%);
-  --cui-info-text-emphasis: rgb(11.2745098039%, 29.6274509804%, 44.8039215686%);
-  --cui-warning-text-emphasis: rgb(44.0588235294%, 27.4705882353%, 4.1764705882%);
-  --cui-danger-text-emphasis: rgb(38.7647058824%, 9.4705882353%, 9.4705882353%);
+  --cui-success-text-emphasis: rgb(18.6, 83.4, 35.7);
+  --cui-info-text-emphasis: rgb(28.75, 75.55, 114.25);
+  --cui-warning-text-emphasis: rgb(112.35, 70.05, 10.65);
+  --cui-danger-text-emphasis: rgb(98.85, 24.15, 24.15);
   --cui-light-text-emphasis: #f3f4f7;
   --cui-dark-text-emphasis: #dbdfe6;
   --cui-primary-bg-subtle: #cfc7f3;
@@ -233,7 +233,7 @@
   --cui-warning-bg-subtle: #feecc5;
   --cui-danger-bg-subtle: #f9d4d4;
   --cui-light-bg-subtle: #323a49;
-  --cui-dark-bg-subtle: rgb(11.3725490196%, 13.3333333333%, 16.6666666667%);
+  --cui-dark-bg-subtle: rgb(29, 34, 42.5);
   --cui-primary-border-subtle: #9d92e6;
   --cui-secondary-border-subtle: #9da5b1;
   --cui-success-border-subtle: #96dbad;
@@ -242,36 +242,36 @@
   --cui-danger-border-subtle: #f2a9a9;
   --cui-light-border-subtle: #4a566d;
   --cui-dark-border-subtle: #323a49;
-  --cui-primary-start: rgb(36.9411764706%, 36.2352941176%, 81.4117647059%);
-  --cui-primary-stop: rgb(45.4901960784%, 42.6666666667%, 83.6078431373%);
+  --cui-primary-start: rgb(94.2, 92.4, 207.6);
+  --cui-primary-stop: rgb(116, 108.8, 213.2);
   --cui-secondary-start: #c9d2db;
   --cui-secondary-stop: white;
-  --cui-success-start: rgb(20.7450980392%, 69.4509803922%, 36.9803921569%);
-  --cui-success-stop: rgb(13.1568627451%, 59.3921568627%, 25.5098039216%);
-  --cui-info-start: rgb(24%, 60%, 96%);
-  --cui-info-stop: rgb(19.2745098039%, 50.6862745098%, 76.8039215686%);
-  --cui-warning-start: rgb(93.1764705882%, 67.7647058824%, 12.7058823529%);
-  --cui-warning-stop: rgb(91.862745098%, 57.9803921569%, 8.9215686275%);
-  --cui-danger-start: rgb(86.9411764706%, 35.4117647059%, 35.4117647059%);
-  --cui-danger-stop: rgb(81.9215686275%, 24.7450980392%, 24.7450980392%);
-  --cui-light-start: rgb(89.2156862745%, 90.9803921569%, 92.7450980392%);
+  --cui-success-start: rgb(52.9, 177.1, 94.3);
+  --cui-success-stop: rgb(33.55, 151.45, 65.05);
+  --cui-info-start: rgb(61.2, 153, 244.8);
+  --cui-info-stop: rgb(49.15, 129.25, 195.85);
+  --cui-warning-start: rgb(237.6, 172.8, 32.4);
+  --cui-warning-stop: rgb(234.25, 147.85, 22.75);
+  --cui-danger-start: rgb(221.7, 90.3, 90.3);
+  --cui-danger-stop: rgb(208.9, 63.1, 63.1);
+  --cui-light-start: rgb(227.5, 232, 236.5);
   --cui-light-stop: white;
-  --cui-dark-start: rgb(24.3137254902%, 29.6078431373%, 38.431372549%);
-  --cui-dark-stop: rgb(13.2941176471%, 14%, 19.6470588235%);
+  --cui-dark-start: rgb(62, 75.5, 98);
+  --cui-dark-stop: rgb(33.9, 35.7, 50.1);
   --cui-heading-color: inherit;
-  --cui-link-color: rgb(36.9411764706%, 36.2352941176%, 81.4117647059%);
-  --cui-link-hover-color: rgb(49.5529411765%, 48.9882352941%, 85.1294117647%);
+  --cui-link-color: rgb(94.2, 92.4, 207.6);
+  --cui-link-hover-color: rgb(126.36, 124.92, 217.08);
   --cui-link-color-rgb: 94.2, 92.4, 207.6;
   --cui-link-hover-color-rgb: 126.36, 124.92, 217.08;
-  --cui-code-color: rgb(90.3529411765%, 52%, 71.0588235294%);
+  --cui-code-color: rgb(230.4, 132.6, 181.2);
   --cui-highlight-color: rgba(255, 255, 255, 0.87);
-  --cui-highlight-bg: rgb(40%, 30.2745098039%, 1.0980392157%);
+  --cui-highlight-bg: rgb(102, 77.2, 2.8);
   --cui-border-color: #323a49;
   --cui-border-color-translucent: rgba(130, 152, 186, 0.175);
-  --cui-form-valid-color: rgb(45.8823529412%, 71.7647058824%, 59.7647058824%);
-  --cui-form-valid-border-color: rgb(45.8823529412%, 71.7647058824%, 59.7647058824%);
-  --cui-form-invalid-color: rgb(91.7647058824%, 52.4705882353%, 56.2352941176%);
-  --cui-form-invalid-border-color: rgb(91.7647058824%, 52.4705882353%, 56.2352941176%);
+  --cui-form-valid-color: rgb(117, 183, 152.4);
+  --cui-form-valid-border-color: rgb(117, 183, 152.4);
+  --cui-form-invalid-color: rgb(234, 133.8, 143.4);
+  --cui-form-invalid-border-color: rgb(234, 133.8, 143.4);
 }
 
 .clearfix::after {

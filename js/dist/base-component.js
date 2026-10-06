@@ -1,5 +1,5 @@
 /*!
-  * CoreUI PRO base-component.js v5.28.0 (https://coreui.io)
+  * CoreUI PRO base-component.js v5.29.0 (https://coreui.io)
   * Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
   * License (https://coreui.io/pro/license/)
   */
@@ -24,7 +24,7 @@
    * Constants
    */
 
-  const VERSION = '5.28.0';
+  const VERSION = '5.29.0';
 
   /**
    * Class definition
