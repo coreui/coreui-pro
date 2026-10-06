@@ -13,6 +13,7 @@ import SelectorEngine from './dom/selector-engine.js'
 import { DefaultAllowlist, escapeHtml, sanitizeHtml } from './util/sanitizer.js'
 import { defineJQueryPlugin } from './util/index.js'
 import {
+  constrainDate,
   convertToDateObject,
   createGroupsInArray,
   getCalendarDate,
@@ -794,13 +795,13 @@ class Calendar extends BaseComponent {
 
   _initializeDates() {
     // Convert dates to date objects based on the selection type
-    this._calendarDate = convertToDateObject(
-      this._config.calendarDate || this._config.startDate || this._config.endDate, this._config.selectionType
-    ) || new Date()
-    this._startDate = convertToDateObject(this._config.startDate, this._config.selectionType)
-    this._endDate = convertToDateObject(this._config.endDate, this._config.selectionType)
     this._minDate = convertToDateObject(this._config.minDate, this._config.selectionType)
     this._maxDate = convertToDateObject(this._config.maxDate, this._config.selectionType)
+    this._calendarDate = convertToDateObject(
+      this._config.calendarDate || this._config.startDate || this._config.endDate, this._config.selectionType
+    ) || constrainDate(new Date(), this._minDate, this._maxDate)
+    this._startDate = convertToDateObject(this._config.startDate, this._config.selectionType)
+    this._endDate = convertToDateObject(this._config.endDate, this._config.selectionType)
     this._hoverDate = null
     this._selectEndDate = this._config.selectEndDate
   }

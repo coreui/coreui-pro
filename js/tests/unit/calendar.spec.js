@@ -450,6 +450,46 @@ describe('Calendar', () => {
       calendar._selectDate(new Date(2023, 5, 25))
       expect(calendar._startDate).toBeNull()
     })
+
+    it('should open on maxDate when today is after it and no date is given', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const today = new Date()
+      const maxDate = new Date(today.getFullYear(), today.getMonth() - 2, 14)
+      const calendar = new Calendar(div, { maxDate })
+
+      expect(calendar._calendarDate.getFullYear()).toEqual(maxDate.getFullYear())
+      expect(calendar._calendarDate.getMonth()).toEqual(maxDate.getMonth())
+      expect(div.querySelector('.calendar-cell[tabindex="0"]')).not.toBeNull()
+    })
+
+    it('should open on minDate when today is before it and no date is given', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const today = new Date()
+      const minDate = new Date(today.getFullYear(), today.getMonth() + 2, 14)
+      const calendar = new Calendar(div, { minDate })
+
+      expect(calendar._calendarDate.getFullYear()).toEqual(minDate.getFullYear())
+      expect(calendar._calendarDate.getMonth()).toEqual(minDate.getMonth())
+      expect(div.querySelector('.calendar-cell[tabindex="0"]')).not.toBeNull()
+    })
+
+    it('should open on today when it is within the limits and no date is given', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const today = new Date()
+      const calendar = new Calendar(div, {
+        minDate: new Date(today.getFullYear() - 1, 0, 1),
+        maxDate: new Date(today.getFullYear() + 1, 11, 31)
+      })
+
+      expect(calendar._calendarDate.getFullYear()).toEqual(today.getFullYear())
+      expect(calendar._calendarDate.getMonth()).toEqual(today.getMonth())
+    })
   })
 
   describe('renderDayCell', () => {
