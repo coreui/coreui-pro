@@ -55,6 +55,7 @@ const SELECTOR_SELECTION = '.form-multi-select-selection'
 
 const EVENT_CHANGE = `change${EVENT_KEY}`
 const EVENT_CLICK = `click${EVENT_KEY}`
+const EVENT_FOCUS = `focus${EVENT_KEY}`
 const EVENT_HIDDEN = `hidden${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 const EVENT_KEYUP = `keyup${EVENT_KEY}`
@@ -228,6 +229,7 @@ class MultiSelectChipSet extends ChipSet {
 class MultiSelect extends ComboboxBase {
   protected declare _uniqueName: any
   protected declare _hostAttributes: Map<string, string | null>
+  protected declare _validityObserver: MutationObserver | null
   protected declare _addedSelectClass: boolean
   protected declare _indicatorElement: any
   protected declare _selectAllElement: any
@@ -242,6 +244,7 @@ class MultiSelect extends ComboboxBase {
   protected declare _focustrap: any
   protected declare _pointerDownListener: any
   protected declare _refocusOnHide: boolean
+  protected declare _nativeFocusHandler: any
   protected declare _nativeKeydownHandler: any
 
   constructor(element?: string | Element | null, config?: Partial<MultiSelectConfig> | null) {
@@ -262,7 +265,9 @@ class MultiSelect extends ComboboxBase {
 
     this._wrapperElement = null
     this._menu = null
+    this._nativeFocusHandler = null
     this._nativeKeydownHandler = null
+    this._validityObserver = null
     this._selected = []
     this._options = this._getOptions()
     this._floatingCleanup = null
@@ -497,6 +502,8 @@ class MultiSelect extends ComboboxBase {
     this._disposeFloating()
     this._disposeListBox()
     this._disposeSelection()
+    this._validityObserver?.disconnect()
+    this._validityObserver = null
 
     for (const element of [
       this._wrapperElement,
@@ -640,6 +647,16 @@ class MultiSelect extends ComboboxBase {
     }
 
     EventHandler.on(this._element, EVENT_KEYDOWN, this._nativeKeydownHandler)
+
+    if (this._nativeFocusHandler) {
+      EventHandler.off(this._element, EVENT_FOCUS, this._nativeFocusHandler)
+    }
+
+    this._nativeFocusHandler = () => {
+      this._getFocusTarget().focus()
+    }
+
+    EventHandler.on(this._element, EVENT_FOCUS, this._nativeFocusHandler)
 
     EventHandler.on(this._indicatorElement, EVENT_CLICK, (event: any) => {
       event.preventDefault()
@@ -849,6 +866,27 @@ class MultiSelect extends ComboboxBase {
     }
   }
 
+  _getFocusTarget(): HTMLElement {
+    return this._config.search ? this._searchElement! : this._togglerElement
+  }
+
+  _syncValidityAttributes(): void {
+    const target = this._getFocusTarget()
+    const describedBy = this._element.getAttribute('aria-describedby')
+
+    if (this._config.invalid || this._element.classList.contains('is-invalid') || this._element.getAttribute('aria-invalid') === 'true') {
+      target.setAttribute('aria-invalid', 'true')
+    } else {
+      target.removeAttribute('aria-invalid')
+    }
+
+    if (describedBy) {
+      target.setAttribute('aria-describedby', describedBy)
+    } else {
+      target.removeAttribute('aria-describedby')
+    }
+  }
+
   _markRequired(): void {
     const ariaRequired = this._element.getAttribute('aria-required') ?? (this._config.required ? 'true' : null)
 
@@ -896,6 +934,10 @@ class MultiSelect extends ComboboxBase {
 
     this._wireTogglerAccessibleName()
     this._markRequired()
+    this._syncValidityAttributes()
+
+    this._validityObserver = new MutationObserver(() => this._syncValidityAttributes())
+    this._validityObserver.observe(this._element, { attributeFilter: ['aria-describedby', 'aria-invalid', 'class'] })
 
     this._createOptionsContainer()
     this._hideNativeSelect()
@@ -1309,13 +1351,18 @@ class MultiSelect extends ComboboxBase {
     }
   }
 
-  _refreshAfterSelectionChange(): void {
+  _refreshAfterSelectionChange(notify = true): void {
     this._updateSelection()
     this._updateSelectionCleaner()
     this._updateSearch()
     this._updateSearchSize()
     this._updateHeader()
     this._updateMasterCheckbox()
+
+    if (notify) {
+      this._element.dispatchEvent(new Event('input', { bubbles: true }))
+      this._element.dispatchEvent(new Event('change', { bubbles: true }))
+    }
   }
 
   _selectInitialOptions(): void {
@@ -1325,7 +1372,7 @@ class MultiSelect extends ComboboxBase {
       this._selectOption(option.value, option.text, { refresh: false })
     }
 
-    this._refreshAfterSelectionChange()
+    this._refreshAfterSelectionChange(false)
   }
 
   _updateSelection(): void {

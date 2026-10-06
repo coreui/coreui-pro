@@ -605,6 +605,8 @@ The control takes its name from the select's `aria-labelledby`, then its `aria-l
 
 The options panel is a dialog named like the control. Opening it moves the focus inside — onto the search box when `search` is on, otherwise onto the option the list points at, which is the selection the user left or the first option. The options are focusable one at a time: the arrows move the focus itself rather than a highlight read through `aria-activedescendant`. <kbd>Tab</kbd> cycles through what the panel offers and the search box in the control, and reaches nothing outside them until the panel closes, which <kbd>Escape</kbd> does, returning the focus to the control.
 
+The select stays in the page as an invisible overlay for form validation and is hidden from screen readers, so the control speaks for it: an `aria-describedby`, an `aria-invalid` or `.is-invalid` on the select, or the `invalid` option, lands on the control (the search box when `search` is on), and focus that reaches the select, from validation or from its label, goes on to the control. A change of selection fires `input` and `change` on the select, as a native list does, so a script that clears a field's error on input sees it.
+
 ### Keyboard shortcuts
 
 | Key | Action |
