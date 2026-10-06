@@ -142,8 +142,17 @@ abstract class PickerBase extends BaseComponent {
     })
 
     this._syncValidity()
-    this._validityObserver = new MutationObserver(() => this._syncValidity())
-    this._validityObserver.observe(this._element, { attributeFilter: ['aria-invalid', 'class'] })
+    this._validityObserver = new MutationObserver(records => {
+      if (records.some(record => this._changesValidity(record))) {
+        this._syncValidity()
+      }
+    })
+    this._validityObserver.observe(this._element, { attributeFilter: ['aria-invalid', 'class'], attributeOldValue: true })
+  }
+
+  _changesValidity(record: MutationRecord): boolean {
+    return record.attributeName === 'aria-invalid' ||
+      (record.oldValue ?? '').split(/\s+/).includes(CLASS_NAME_IS_INVALID) !== this._element.classList.contains(CLASS_NAME_IS_INVALID)
   }
 
   _syncValidity(): void {

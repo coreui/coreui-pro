@@ -69,6 +69,14 @@ describe('Form validation utilities', () => {
       expect(getFeedbackIds(fixtureEl.querySelector('#end'))).toEqual(['stayError'])
     })
 
+    it('should take the messages after marked elements innermost first, and none after the form', () => {
+      fixtureEl.innerHTML = `<div class="is-invalid"><form>
+        <div class="is-invalid"><div class="is-invalid"><input id="name" required></div><div id="innerError" class="invalid-feedback">Too short.</div></div><div id="outerError" class="invalid-feedback">Enter a name.</div>
+      </form></div><div class="invalid-feedback">Fix the form.</div>`
+
+      expect(getFeedbackIds(fixtureEl.querySelector('#name'))).toEqual(['innerError', 'outerError'])
+    })
+
     it('should leave out a message the page hides', () => {
       fixtureEl.innerHTML = `<form>
         <input id="city" required><div class="invalid-feedback" hidden>Too short.</div><div id="cityError" class="invalid-feedback">Enter a city.</div>

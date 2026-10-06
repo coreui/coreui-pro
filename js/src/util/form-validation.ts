@@ -33,6 +33,7 @@ const SELECTOR_HIDDEN = `[hidden], ${SELECTOR_ARIA_HIDDEN}`
 const SELECTOR_INPUT_GROUP = '.input-group'
 const SELECTOR_INPUT_GROUP_CONTROL = '.form-control, .form-select'
 const SELECTOR_INVALID_FEEDBACK = '.invalid-feedback, .invalid-tooltip'
+const SELECTOR_POPUP = '.popup'
 const SELECTOR_RANGE = '.form-range'
 const SELECTOR_RANGE_INPUT = '.form-range-input'
 const STATE_CLASSES = [CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID]
@@ -105,7 +106,8 @@ const isShownFeedback = (element: Element): boolean =>
 
 /**
  * Collects the invalid feedback elements among the siblings that follow an element, up to the
- * sibling where the next field starts, leaving out the ones the page hid.
+ * sibling where the next field starts, leaving out the ones the page hid. A `.popup` a component
+ * laid after its anchor is passed over, since its controls belong to that component.
  *
  * @param element - The element whose following siblings are searched
  * @param control - The control whose feedback is searched
@@ -114,7 +116,7 @@ const isShownFeedback = (element: Element): boolean =>
 const getFollowingFeedback = (element: Element, control: FormControl): Element[] => {
   const feedback: Element[] = []
 
-  for (let sibling = element.nextElementSibling; sibling && !startsAnotherField(sibling, control); sibling = sibling.nextElementSibling) {
+  for (let sibling = element.nextElementSibling; sibling && (sibling.matches(SELECTOR_POPUP) || !startsAnotherField(sibling, control)); sibling = sibling.nextElementSibling) {
     if (isShownFeedback(sibling)) {
       feedback.push(sibling)
     }

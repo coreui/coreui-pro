@@ -808,6 +808,7 @@ describe('DateRangePicker', () => {
       fixtureEl.querySelector('#picker').classList.remove('is-invalid')
       await Promise.resolve()
 
+      expect(sectionStates()).toHaveSize(6)
       expect(sectionStates().every(([ariaInvalid]) => ariaInvalid === 'true')).toBeTrue()
     })
   })

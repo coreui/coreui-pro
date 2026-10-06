@@ -1178,6 +1178,30 @@ describe('DatePicker', () => {
       expect(sectionStates()).toEqual(Array.from({ length: count }, () => [null, null]))
     })
 
+    it('should keep the message on the sections while the popup with time selects is open and after it closes', async () => {
+      const picker = buildPicker({ invalid: true, locale: 'en-US', timepicker: true }, '<div id="picker"></div><div class="invalid-feedback">Already booked.</div>')
+      const { id } = fixtureEl.querySelector('.invalid-feedback')
+      const describedBy = () => sectionStates().map(([, description]) => description)
+      const count = describedBy().length
+
+      picker.show()
+      await Promise.resolve()
+
+      expect(fixtureEl.querySelector('.popup select')).not.toBeNull()
+      expect(describedBy()).toEqual(Array.from({ length: count }, () => id))
+
+      pickMinutes(5)
+
+      expect(describedBy()).toEqual(Array.from({ length: count }, () => id))
+
+      picker.hide()
+      await new Promise(resolve => {
+        fixtureEl.querySelector('#picker').addEventListener('hidden.coreui.date-picker', resolve, { once: true })
+      })
+
+      expect(describedBy()).toEqual(Array.from({ length: count }, () => id))
+    })
+
     it('should announce an aria-invalid the page writes on the picker element', async () => {
       buildPicker({ locale: 'en-US' }, '<div id="picker" aria-invalid="true"></div>')
       const invalid = () => sectionStates().map(([ariaInvalid]) => ariaInvalid)
