@@ -23,6 +23,7 @@ const CLASS_NAME_IS_VALID = 'is-valid'
 const SELECTOR_ARIA_HIDDEN = '[aria-hidden="true"]'
 const SELECTOR_CHOICE = '[type="checkbox"], [type="radio"]'
 const SELECTOR_CONTROL = 'input, select, textarea'
+const SELECTOR_DATE_TIME = '.form-date-time'
 const SELECTOR_FIELD = '.form-field'
 const SELECTOR_FIELD_CONTROL = '.check, .radio, .switch'
 const SELECTOR_FLOATING = '.form-floating'
@@ -93,8 +94,18 @@ const startsAnotherField = (element: Element, control: FormControl): boolean =>
     isValidatable(other) && other !== control && !(control.name && other.name === control.name && other.matches(SELECTOR_CHOICE)))
 
 /**
+ * Tells whether an element is an invalid feedback the page has not hidden with `hidden` or
+ * `aria-hidden="true"`.
+ *
+ * @param element - The element to check
+ * @returns `true` when the element is a feedback a screen reader may read
+ */
+const isShownFeedback = (element: Element): boolean =>
+  element.matches(SELECTOR_INVALID_FEEDBACK) && !element.matches(SELECTOR_HIDDEN)
+
+/**
  * Collects the invalid feedback elements among the siblings that follow an element, up to the
- * sibling where the next field starts.
+ * sibling where the next field starts, leaving out the ones the page hid.
  *
  * @param element - The element whose following siblings are searched
  * @param control - The control whose feedback is searched
@@ -104,13 +115,24 @@ const getFollowingFeedback = (element: Element, control: FormControl): Element[]
   const feedback: Element[] = []
 
   for (let sibling = element.nextElementSibling; sibling && !startsAnotherField(sibling, control); sibling = sibling.nextElementSibling) {
-    if (sibling.matches(SELECTOR_INVALID_FEEDBACK)) {
+    if (isShownFeedback(sibling)) {
       feedback.push(sibling)
     }
   }
 
   return feedback
 }
+
+/**
+ * Finds the element that stands for a control in the layout: the `.form-date-time` field for the
+ * value field laid over it, which carries the state and is followed by the messages, otherwise the
+ * control itself.
+ *
+ * @param control - The control
+ * @returns The element the layout places the control's messages around
+ */
+const getLayoutElement = (control: FormControl): Element =>
+  control.parentElement?.matches(SELECTOR_DATE_TIME) ? control.parentElement : control
 
 /**
  * Finds the `.form-control-group` a control sits in directly, or through a `.form-floating`, which
@@ -147,34 +169,37 @@ const reachesField = (control: Element, field: Element): boolean => {
  * `.invalid-tooltip` after it, after its frame or after the `.form-range` of a `.form-range-input`,
  * up to where the next field starts, and in each `.form-field` around it that shows its messages
  * for the control, those that sit in a field around the control. A field grouping several also
- * shows the messages of the fields inside it; those belong to other controls and are left out.
+ * shows the messages of the fields inside it; those belong to other controls and are left out, and
+ * so are the messages the page hid.
  *
  * @param control - The control
  * @returns The feedback elements, in document order per rule
  */
 const getStructuralFeedback = (control: FormControl): Element[] => {
-  const anchor = getFrame(control) ?? (control.matches(SELECTOR_RANGE_INPUT) ? control.closest(SELECTOR_RANGE) : null)
+  const element = getLayoutElement(control)
+  const anchor = getFrame(element) ?? (element.matches(SELECTOR_RANGE_INPUT) ? element.closest(SELECTOR_RANGE) : null)
   const fieldFeedback: Element[] = []
 
-  for (let field = control.closest(SELECTOR_FIELD); field; field = field.parentElement?.closest(SELECTOR_FIELD) ?? null) {
-    if (reachesField(control, field)) {
-      fieldFeedback.push(...[...field.querySelectorAll(SELECTOR_INVALID_FEEDBACK)].filter(feedback => feedback.closest(SELECTOR_FIELD)?.contains(control)))
+  for (let field = element.closest(SELECTOR_FIELD); field; field = field.parentElement?.closest(SELECTOR_FIELD) ?? null) {
+    if (reachesField(element, field)) {
+      fieldFeedback.push(...[...field.querySelectorAll(SELECTOR_INVALID_FEEDBACK)].filter(feedback => isShownFeedback(feedback) && feedback.closest(SELECTOR_FIELD)?.contains(element)))
     }
   }
 
-  return [...getFollowingFeedback(control, control), ...(anchor ? getFollowingFeedback(anchor, control) : []), ...fieldFeedback]
+  return [...getFollowingFeedback(element, control), ...(anchor ? getFollowingFeedback(anchor, control) : []), ...fieldFeedback]
 }
 
 /**
  * Finds the invalid feedback of a control: the elements named in `data-coreui-invalid-feedback`,
  * or else the ones the stylesheet shows when the control is invalid, for a radio or checkbox those
- * of every choice that shares its name. A found element without an id gets one.
+ * of every choice that shares its name. The value field of a `.form-date-time` takes both from the
+ * field. A found element without an id gets one.
  *
  * @param control - The control
  * @returns The ids of its invalid feedback, without duplicates
  */
-const getFeedbackIds = (control: FormControl): string[] => {
-  const named = splitIds(control.getAttribute(ATTRIBUTE_INVALID_FEEDBACK))
+export const getFeedbackIds = (control: FormControl): string[] => {
+  const named = splitIds(getLayoutElement(control).getAttribute(ATTRIBUTE_INVALID_FEEDBACK))
 
   if (named.length > 0) {
     return [...new Set(named)]

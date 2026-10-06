@@ -570,6 +570,18 @@ describe('DateRangeInput', () => {
 
       expect(fields().every(field => field.classList.contains('is-valid'))).toBeTrue()
     })
+
+    it('should describe every section of both fields with the message after the frame while the end is before the start', () => {
+      const range = build({ startDate: new Date(2026, 6, 20), endDate: new Date(2026, 6, 14) }, '<div id="range"></div><div class="invalid-feedback">Check-out has to be on or after check-in.</div>')
+      const feedback = fixtureEl.querySelector('.invalid-feedback')
+      const describedBy = () => [...root().querySelectorAll('.form-date-time-section')].map(section => section.getAttribute('aria-describedby'))
+
+      expect(describedBy()).toEqual(Array.from({ length: 6 }, () => feedback.id))
+
+      range.setRange(new Date(2026, 6, 14), new Date(2026, 6, 20))
+
+      expect(describedBy()).toEqual(Array.from({ length: 6 }, () => null))
+    })
   })
 
   describe('keyboard', () => {

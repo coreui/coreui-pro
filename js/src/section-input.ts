@@ -36,6 +36,7 @@ import {
 } from './util/date-sections.js'
 import type { DateSection, EditableSection, SectionFormat } from './util/date-sections.js'
 import { captureHostClasses, type HostClasses, restoreHostClasses } from './util/form-control-group.js'
+import { getFeedbackIds } from './util/form-validation.js'
 import { getNextActiveElement, isRTL } from './util/index.js'
 
 /**
@@ -757,8 +758,11 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
   }
 
   _syncDescription(): void {
-    const describedBy = this._element.getAttribute('aria-describedby')
     const isAnnouncedInvalid = this._element.getAttribute('aria-invalid') === 'true'
+    const describedBy = [...new Set([
+      ...(this._element.getAttribute('aria-describedby') ?? '').split(/\s+/),
+      ...(isAnnouncedInvalid ? getFeedbackIds(this._inputElement!) : [])
+    ])].filter(Boolean).join(' ')
 
     for (const [index, element] of this._getSectionElements().entries()) {
       if (describedBy && (index === 0 || isAnnouncedInvalid)) {

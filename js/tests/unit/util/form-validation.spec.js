@@ -1,6 +1,6 @@
 import { vi } from 'vitest'
 import {
-  clearValidationState, focusFirstInvalidControl, updateValidationState, validateForm
+  clearValidationState, focusFirstInvalidControl, getFeedbackIds, updateValidationState, validateForm
 } from '../../../src/util/form-validation.js'
 import { clearFixture, getFixture } from '../../helpers/fixture.js'
 
@@ -37,6 +37,43 @@ describe('Form validation utilities', () => {
       removeAnnouncers()
     }
   }
+
+  describe('getFeedbackIds', () => {
+    it('should find the messages of the value field of a date field around the field, giving them an id', () => {
+      fixtureEl.innerHTML = `<form>
+        <div class="form-field"><div class="form-control form-date-time"><textarea id="when" required></textarea></div><div class="invalid-feedback">Pick a date.</div></div>
+        <div class="form-control-group"><div class="form-control form-date-time"><textarea id="framed" required></textarea></div></div><div id="framedError" class="invalid-feedback">Pick a time.</div>
+      </form>`
+      const feedback = fixtureEl.querySelector('.invalid-feedback')
+
+      expect(getFeedbackIds(fixtureEl.querySelector('#when'))).toEqual([feedback.id])
+      expect(feedback.id).not.toBe('')
+      expect(getFeedbackIds(fixtureEl.querySelector('#framed'))).toEqual(['framedError'])
+    })
+
+    it('should leave the message after the next date field to that field', () => {
+      fixtureEl.innerHTML = '<form><div class="form-control form-date-time"><textarea id="from" required></textarea></div><div class="form-control form-date-time"><textarea id="to" required></textarea></div><div id="toError" class="invalid-feedback">Pick a date.</div></form>'
+
+      expect(getFeedbackIds(fixtureEl.querySelector('#from'))).toEqual([])
+      expect(getFeedbackIds(fixtureEl.querySelector('#to'))).toEqual(['toError'])
+    })
+
+    it('should leave out a message the page hides', () => {
+      fixtureEl.innerHTML = `<form>
+        <input id="city" required><div class="invalid-feedback" hidden>Too short.</div><div id="cityError" class="invalid-feedback">Enter a city.</div>
+        <div class="form-field"><div class="form-control form-date-time"><textarea id="when" required></textarea></div><div class="invalid-feedback" aria-hidden="true">Too early.</div><div id="whenError" class="invalid-feedback">Too late.</div></div>
+      </form>`
+
+      expect(getFeedbackIds(fixtureEl.querySelector('#city'))).toEqual(['cityError'])
+      expect(getFeedbackIds(fixtureEl.querySelector('#when'))).toEqual(['whenError'])
+    })
+
+    it('should read data-coreui-invalid-feedback from the date field for its value field', () => {
+      fixtureEl.innerHTML = '<form><div class="form-control form-date-time" data-coreui-invalid-feedback="whenError"><textarea id="when" required></textarea></div><div class="invalid-feedback">Sibling</div><p id="whenError">Pick a date.</p></form>'
+
+      expect(getFeedbackIds(fixtureEl.querySelector('#when'))).toEqual(['whenError'])
+    })
+  })
 
   describe('updateValidationState', () => {
     it('should link the invalid feedback that follows a control, giving it an id', () => {
