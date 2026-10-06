@@ -652,11 +652,8 @@ class MultiSelect extends ComboboxBase {
       EventHandler.off(this._element, EVENT_FOCUS, this._nativeFocusHandler)
     }
 
-    // A novalidate form shows no native bubble to keep anchored here, so validation focus goes to the custom control.
     this._nativeFocusHandler = () => {
-      if ((this._element as HTMLSelectElement).form?.noValidate && !this._config.disabled) {
-        this._getFocusTarget().focus()
-      }
+      this._getFocusTarget().focus()
     }
 
     EventHandler.on(this._element, EVENT_FOCUS, this._nativeFocusHandler)
@@ -877,7 +874,7 @@ class MultiSelect extends ComboboxBase {
     const target = this._getFocusTarget()
     const describedBy = this._element.getAttribute('aria-describedby')
 
-    if (this._config.invalid || this._element.getAttribute('aria-invalid') === 'true') {
+    if (this._config.invalid || this._element.classList.contains('is-invalid') || this._element.getAttribute('aria-invalid') === 'true') {
       target.setAttribute('aria-invalid', 'true')
     } else {
       target.removeAttribute('aria-invalid')
@@ -940,7 +937,7 @@ class MultiSelect extends ComboboxBase {
     this._syncValidityAttributes()
 
     this._validityObserver = new MutationObserver(() => this._syncValidityAttributes())
-    this._validityObserver.observe(this._element, { attributeFilter: ['aria-describedby', 'aria-invalid'] })
+    this._validityObserver.observe(this._element, { attributeFilter: ['aria-describedby', 'aria-invalid', 'class'] })
 
     this._createOptionsContainer()
     this._hideNativeSelect()
@@ -1354,13 +1351,18 @@ class MultiSelect extends ComboboxBase {
     }
   }
 
-  _refreshAfterSelectionChange(): void {
+  _refreshAfterSelectionChange(notify = true): void {
     this._updateSelection()
     this._updateSelectionCleaner()
     this._updateSearch()
     this._updateSearchSize()
     this._updateHeader()
     this._updateMasterCheckbox()
+
+    if (notify) {
+      this._element.dispatchEvent(new Event('input', { bubbles: true }))
+      this._element.dispatchEvent(new Event('change', { bubbles: true }))
+    }
   }
 
   _selectInitialOptions(): void {
@@ -1370,7 +1372,7 @@ class MultiSelect extends ComboboxBase {
       this._selectOption(option.value, option.text, { refresh: false })
     }
 
-    this._refreshAfterSelectionChange()
+    this._refreshAfterSelectionChange(false)
   }
 
   _updateSelection(): void {
