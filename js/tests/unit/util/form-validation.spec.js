@@ -75,7 +75,7 @@ describe('Form validation utilities', () => {
 
     it('should link the feedback of the form field around an input group, but not of a field nested in it', () => {
       fixtureEl.innerHTML = `<form><div class="form-field">
-        <div class="input-group"><span class="input-group-text">@</span><input id="user" required></div>
+        <div class="input-group"><span class="input-group-text">@</span><input id="user" class="form-control" required></div>
         <div id="userError" class="invalid-feedback">Choose a username.</div>
         <div class="form-field"><input id="other"><div id="otherError" class="invalid-feedback">Other</div></div>
       </div></form>`
@@ -158,6 +158,75 @@ describe('Form validation utilities', () => {
       expect(custom.getAttribute('aria-invalid')).toBe('true')
       expect(describedBy(custom)).toBe('customError')
       expect(document.activeElement).toBe(custom)
+    })
+
+    it('should link the message in the content of a check', () => {
+      fixtureEl.innerHTML = '<form><div class="form-field"><input id="agree" class="check" type="checkbox" required><div class="form-field-content"><label for="agree">Agree</label><div id="agreeError" class="invalid-feedback">You must agree.</div></div></div></form>'
+
+      updateValidationState(fixtureEl.querySelector('form'), new WeakMap())
+
+      expect(describedBy(fixtureEl.querySelector('#agree'))).toBe('agreeError')
+    })
+
+    it('should link the shared message of a grouping field to a radio in a field inside it, and only its own message to a plain control', () => {
+      fixtureEl.innerHTML = `<form><div class="form-field">
+        <div class="form-field"><input id="basic" class="radio" type="radio" name="plan" required><label for="basic">Basic</label></div>
+        <div class="form-field"><input id="other" required><div id="otherError" class="invalid-feedback">Other</div></div>
+        <div id="planError" class="invalid-feedback">Pick a plan.</div>
+      </div></form>`
+
+      updateValidationState(fixtureEl.querySelector('form'), new WeakMap())
+
+      expect(describedBy(fixtureEl.querySelector('#basic'))).toBe('planError')
+      expect(describedBy(fixtureEl.querySelector('#other'))).toBe('otherError')
+    })
+
+    it('should link the message in the content of a switch', () => {
+      fixtureEl.innerHTML = '<form><div class="form-field"><input id="news" class="switch" type="checkbox" role="switch" required><div class="form-field-content"><label for="news">Subscribe</label><div id="newsError" class="invalid-feedback">You must subscribe.</div></div></div></form>'
+
+      updateValidationState(fixtureEl.querySelector('form'), new WeakMap())
+
+      expect(describedBy(fixtureEl.querySelector('#news'))).toBe('newsError')
+    })
+
+    it('should not link the field message of an input group control the stylesheet does not reach', () => {
+      fixtureEl.innerHTML = '<form><div class="form-field"><div class="input-group"><input id="bare" required></div><div class="invalid-feedback">Required</div></div></form>'
+
+      updateValidationState(fixtureEl.querySelector('form'), new WeakMap())
+
+      expect(fixtureEl.querySelector('#bare').hasAttribute('aria-describedby')).toBeFalse()
+    })
+
+    it('should link the feedback after a frame to a control in its floating label, but not to one deeper than the frame', () => {
+      fixtureEl.innerHTML = `<form>
+        <div class="form-field"><div class="form-control-group"><div class="form-floating"><input id="floating" placeholder="Name" required><label for="floating">Name</label></div></div><div id="floatingError" class="invalid-feedback">Floating</div></div>
+        <div class="form-field"><div class="form-control-group"><span><input id="deep" required></span></div><div class="invalid-feedback">Deep</div></div>
+      </form>`
+
+      updateValidationState(fixtureEl.querySelector('form'), new WeakMap())
+
+      expect(describedBy(fixtureEl.querySelector('#floating'))).toBe('floatingError')
+      expect(fixtureEl.querySelector('#deep').hasAttribute('aria-describedby')).toBeFalse()
+    })
+
+    it('should link the message of a field inside an input group only when a field around the input group shows it', () => {
+      fixtureEl.innerHTML = `<form>
+        <div class="input-group"><div class="form-field"><div class="form-floating"><input id="alone" class="form-control" placeholder="Alone" required><label for="alone">Alone</label></div><div class="invalid-feedback">Alone</div></div></div>
+        <div class="form-field"><div class="input-group"><div class="form-field"><div class="form-floating"><input id="wrapped" class="form-control" placeholder="Wrapped" required><label for="wrapped">Wrapped</label></div><div id="wrappedError" class="invalid-feedback">Wrapped</div></div></div></div>
+      </form>`
+
+      updateValidationState(fixtureEl.querySelector('form'), new WeakMap())
+
+      expect(fixtureEl.querySelector('#alone').hasAttribute('aria-describedby')).toBeFalse()
+      expect(describedBy(fixtureEl.querySelector('#wrapped'))).toBe('wrappedError')
+    })
+
+    it('should not link the feedback after a range wrapper to a control other than its range input', () => {
+      fixtureEl.innerHTML = '<form><div class="form-range"><input id="amount" type="number" required></div><div class="invalid-feedback">Amount</div></form>'
+
+      updateValidationState(fixtureEl.querySelector('form'), new WeakMap())
+
+      expect(fixtureEl.querySelector('#amount').hasAttribute('aria-describedby')).toBeFalse()
     })
 
     it('should not link feedback the stylesheet does not show for the control', () => {

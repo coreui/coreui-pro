@@ -159,7 +159,7 @@ Each field carries its own [floating label](/forms/floating-labels/): set `start
 The frame the picker builds takes the standard validation styling, and a state class written on the picker element reaches it: `.is-invalid` or `.is-valid` on the element you author styles the frame underneath it. That is the server-side route, so the class stays until the page changes it, and a sibling `.invalid-feedback` or `.valid-feedback` reads from the same element.
 
 <Example pro code={`<div class="row">
-    <div class="col-lg-7">
+    <div class="col-lg-7 form-field">
       <div class="is-invalid" data-coreui-date-range-picker data-coreui-locale="en-US" data-coreui-start-date="2026-07-14" data-coreui-end-date="2026-07-20"></div>
       <div class="invalid-feedback">Those dates are already booked.</div>
     </div>

@@ -97,6 +97,29 @@ describe('validation feedback next to a frame', () => {
     expect(displayOf('.invalid-feedback')).toBe('block')
   })
 
+  it('shows the message in the field around an input group holding an invalid control', () => {
+    mount('<div class="form-field"><div class="input-group"><span class="input-group-text">@</span><input class="form-control"></div><div class="invalid-feedback">Choose a username.</div></div>')
+
+    expect(displayOf('.invalid-feedback')).toBe('none')
+
+    container.querySelector('.form-control').classList.add('is-invalid')
+
+    expect(displayOf('.invalid-feedback')).toBe('block')
+  })
+
+  it('shows the message in the field around an input group holding an invalid floating label', () => {
+    mount('<div class="form-field"><div class="input-group"><span class="input-group-text">@</span><div class="form-floating"><label for="user">Username</label><input class="form-control is-invalid" id="user"></div></div><div class="invalid-feedback">Choose a username.</div></div>')
+
+    expect(displayOf('.invalid-feedback')).toBe('block')
+  })
+
+  it('keeps the success message away while a frame inside an input group holds an error', () => {
+    mount('<div class="form-field"><div class="input-group"><span class="input-group-text">@</span><div class="form-control-group is-invalid"><input class="form-control is-valid"></div></div><div class="valid-feedback">Looks good!</div><div class="invalid-feedback">Pick another value.</div></div>')
+
+    expect(displayOf('.valid-feedback')).toBe('none')
+    expect(displayOf('.invalid-feedback')).toBe('block')
+  })
+
   it('styles a frame the author wrote the state around', () => {
     mount('<div id="wrapped" class="is-invalid"><div class="form-control-group"><input class="form-control"></div></div><div class="invalid-feedback">Pick both dates.</div><div id="plain"><div class="form-control-group"><input class="form-control"></div></div>')
 
