@@ -33,6 +33,7 @@ const SELECTOR_HIDDEN = `[hidden], ${SELECTOR_ARIA_HIDDEN}`
 const SELECTOR_INPUT_GROUP = '.input-group'
 const SELECTOR_INPUT_GROUP_CONTROL = '.form-control, .form-select'
 const SELECTOR_INVALID_FEEDBACK = '.invalid-feedback, .invalid-tooltip'
+const SELECTOR_OTP = '.form-otp'
 const SELECTOR_POPUP = '.popup'
 const SELECTOR_RANGE = '.form-range'
 const SELECTOR_RANGE_INPUT = '.form-range-input'
@@ -127,14 +128,14 @@ const getFollowingFeedback = (element: Element, control: FormControl): Element[]
 
 /**
  * Finds the element that stands for a control in the layout: the `.form-date-time` field for the
- * value field laid over it, which carries the state and is followed by the messages, otherwise the
- * control itself.
+ * value field laid over it, the `.form-otp` group for its value field and its slots, which the
+ * messages follow, otherwise the control itself.
  *
  * @param control - The control
  * @returns The element the layout places the control's messages around
  */
 const getLayoutElement = (control: FormControl): Element =>
-  control.parentElement?.matches(SELECTOR_DATE_TIME) ? control.parentElement : control
+  control.closest(`${SELECTOR_DATE_TIME}, ${SELECTOR_OTP}`) ?? control
 
 /**
  * Finds the `.form-control-group` a control sits in directly, or through a `.form-floating`, which
@@ -219,7 +220,7 @@ const getStructuralFeedback = (control: FormControl): Element[] => {
  * Finds the invalid feedback of a control: the elements named in `data-coreui-invalid-feedback`,
  * or else the ones the stylesheet shows when the control is invalid, for a radio or checkbox those
  * of every choice that shares its name. The value field of a `.form-date-time` takes both from the
- * field. A found element without an id gets one.
+ * field, and a control of a `.form-otp` from the group. A found element without an id gets one.
  *
  * @param control - The control
  * @returns The ids of its invalid feedback, without duplicates

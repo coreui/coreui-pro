@@ -311,6 +311,28 @@ Use the `data-coreui-readonly="true"` attribute to make the one-time password in
     <input class="form-otp-control">
   </div>`} />
 
+## Validation
+
+The code is validated as one value, kept in an input laid invisibly over the group. With `data-coreui-required="true"` an empty or incomplete code blocks the submit, and an incomplete code blocks it even when the field is not required; the browser puts focus on the first empty slot and shows its own message over the group. In a form with the `data-coreui-validate` attribute the stylesheet colours every slot and shows the `.invalid-feedback` that follows the group once a submit fails, and so does the [form plugin](/forms/validation/#usage) for a form with `novalidate` too. While the code is reported invalid, every slot carries `aria-invalid="true"` and is described by that message. An `.is-invalid` class you write on the group or on a slot, the server-side route, shows the message as well.
+
+<Example pro code={`<form class="row g-3" data-coreui-validate novalidate>
+    <div class="col-12">
+      <label class="form-label" for="otpValidation">Verification code</label>
+      <div class="form-otp" data-coreui-otp data-coreui-id="otpValidation" data-coreui-name="code" data-coreui-required="true">
+        <input class="form-otp-control">
+        <input class="form-otp-control">
+        <input class="form-otp-control">
+        <input class="form-otp-control">
+        <input class="form-otp-control">
+        <input class="form-otp-control">
+      </div>
+      <div class="invalid-feedback">Enter the six digits we sent you.</div>
+    </div>
+    <div class="col-12">
+      <button class="btn btn-primary" type="submit">Verify</button>
+    </div>
+  </form>`} />
+
 ## Accessibility
 
 The one-time password input component is designed with accessibility in mind and follows WCAG guidelines for form inputs.
@@ -318,7 +340,7 @@ The one-time password input component is designed with accessibility in mind and
 - **ARIA Labels**: Each input field automatically receives descriptive `aria-label` attributes
 - **Role Attribute**: The container has `role="group"` to indicate related form controls
 - **Keyboard Navigation**: Full keyboard support with arrow keys, tab, and backspace
-- **Screen Reader Support**: Clear announcements when values change or validation occurs
+- **Screen Reader Support**: Clear announcements when values change; while the code is reported invalid, every slot carries `aria-invalid="true"` and the error message after the group
 - **Focus Management**: Automatic focus handling for seamless navigation
 - **Autofill**: only the first field advertises `autocomplete="one-time-code"`, so SMS autofill and password managers target a single field; a code delivered that way is spread across the slots automatically, exactly like a paste
 
@@ -386,13 +408,13 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | `ariaLabel` | function | `(index, total) => Digit ${index + 1} of ${total}` | Function to generate aria-label for each input field. Receives current index (0-based) and total number of inputs |
 | `autoSubmit` | boolean | `false` | Automatically submit the form when all OTP fields are filled |
 | `disabled` | boolean | `false` | Disable all OTP input fields |
-| `id` | string, null | `null` | ID attribute for the hidden input field |
+| `id` | string, null | `null` | ID attribute for the value input; a `<label for>` pointing at it moves focus to the first empty slot |
 | `linear` | boolean | `true` | Enforce sequential input (users must fill fields in order) |
 | `masked` | boolean | `false` | Show input as password (masked characters) |
-| `name` | string, null | `null` | Name of the hidden input the code is submitted under. Without it the code is not submitted with the form. |
+| `name` | string, null | `null` | Name of the value input the code is submitted under. Without it the code is not submitted with the form. |
 | `placeholder` | string, null | `null` | Placeholder text for input fields. Single character applies to all fields, longer strings apply character-by-character |
 | `readonly` | boolean | `false` | Make OTP input read-only |
-| `required` | boolean | `false` | Makes the input field required for form validation. |
+| `required` | boolean | `false` | Makes the code required: an empty or incomplete code blocks the submit. |
 | `type` | string | `'number'` | Input validation type: 'number' for digits only, or any other string for free text |
 | `value` | string, number, null | `null` | Value the slots start with. Characters the `type` does not accept are dropped, the same way typing and pasting drop them. |
 

@@ -1,5 +1,6 @@
 
 import { userEvent } from '@vitest/browser/context'
+import Form from '../../src/form.js'
 import OTPInput from '../../src/otp-input.js'
 import {
   getFixture, clearFixture, createEvent, jQueryMock
@@ -63,7 +64,7 @@ describe('OTPInput', () => {
       expect(otpInput._element).toEqual(otpContainer)
     })
 
-    it('should create a hidden input element', () => {
+    it('should keep the value in a field out of the tab order and away from assistive technologies', () => {
       fixtureEl.innerHTML = `
         <div class="form-otp">
           <input type="text" class="form-otp-control">
@@ -75,7 +76,10 @@ describe('OTPInput', () => {
       const otpInput = new OTPInput(otpContainer)
 
       expect(otpInput._inputElement).toBeTruthy()
-      expect(otpInput._inputElement.type).toBe('hidden')
+      expect(otpInput._inputElement.type).toBe('text')
+      expect(otpInput._inputElement.tabIndex).toBe(-1)
+      expect(otpInput._inputElement.getAttribute('aria-hidden')).toBe('true')
+      expect(otpInput._inputElement.autocomplete).toBe('off')
     })
 
     it('should set role attribute to group', () => {
@@ -117,7 +121,7 @@ describe('OTPInput', () => {
       }
     })
 
-    it('should set required on every input when required is true', () => {
+    it('should make the value field required when required is true, not the slots', () => {
       fixtureEl.innerHTML = `
         <div class="form-otp">
           <input type="text" class="form-otp-control">
@@ -126,10 +130,12 @@ describe('OTPInput', () => {
       `
 
       const otpContainer = fixtureEl.querySelector('.form-otp')
-      new OTPInput(otpContainer, { required: true }) // eslint-disable-line no-new
+      const otpInput = new OTPInput(otpContainer, { required: true })
+
+      expect(otpInput._inputElement.required).toBeTrue()
 
       for (const input of otpContainer.querySelectorAll('.form-otp-control')) {
-        expect(input.required).toBe(true)
+        expect(input.required).toBeFalse()
       }
     })
 
@@ -548,7 +554,7 @@ describe('OTPInput', () => {
       otpInput.setConfig({ masked: true })
 
       expect(slots()).toEqual(['9', '8', '7'])
-      expect(fixtureEl.querySelector('input[type="hidden"]').value).toEqual('987')
+      expect(fixtureEl.querySelector('.form-otp > input:not(.form-otp-control)').value).toEqual('987')
     })
 
     it('should repaint the slots when the call carries a value', () => {
@@ -558,7 +564,7 @@ describe('OTPInput', () => {
       otpInput.setConfig({ value: '98' })
 
       expect(slots()).toEqual(['9', '8', ''])
-      expect(fixtureEl.querySelector('input[type="hidden"]').value).toEqual('98')
+      expect(fixtureEl.querySelector('.form-otp > input:not(.form-otp-control)').value).toEqual('98')
     })
 
     it('should not repaint when the call carries the same value it already had', () => {
@@ -583,7 +589,7 @@ describe('OTPInput', () => {
       otpInput.setConfig({ value: null })
 
       expect(slots()).toEqual(['', '', ''])
-      expect(fixtureEl.querySelector('input[type="hidden"]').value).toEqual('')
+      expect(fixtureEl.querySelector('.form-otp > input:not(.form-otp-control)').value).toEqual('')
     })
 
     it('should report a value it repainted', () => {
@@ -714,7 +720,7 @@ describe('OTPInput', () => {
         expect(input.disabled).toBeFalse()
       }
 
-      expect(fixtureEl.querySelector('input[type="hidden"]').disabled).toBeFalse()
+      expect(fixtureEl.querySelector('.form-otp > input:not(.form-otp-control)').disabled).toBeFalse()
     })
 
     it('should make the slots editable again when readonly is turned off', () => {
@@ -1484,6 +1490,139 @@ describe('OTPInput', () => {
     })
   })
 
+  describe('constraint validation', () => {
+    const mountForm = (config, attributes = '', slots = '<input class="form-otp-control"><input class="form-otp-control">') => {
+      fixtureEl.innerHTML = `<form ${attributes}><div class="form-otp">${slots}</div><div class="invalid-feedback">Enter the code.</div><button type="submit">Send</button></form>`
+      const form = fixtureEl.querySelector('form')
+      const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'), { name: 'code', ...config })
+      form.addEventListener('submit', event => event.preventDefault())
+
+      return {
+        form, otpInput, slots: [...fixtureEl.querySelectorAll('.form-otp-control')], valueField: otpInput._inputElement
+      }
+    }
+
+    const type = (slot, value) => {
+      slot.value = value
+      slot.dispatchEvent(new Event('input', { bubbles: true }))
+    }
+
+    const slotStates = slots => slots.map(slot => [slot.getAttribute('aria-invalid'), slot.getAttribute('aria-describedby')])
+
+    it('should make a required empty or incomplete code block the form', () => {
+      const { form, slots } = mountForm({ required: true })
+
+      expect(form.checkValidity()).toBeFalse()
+
+      type(slots[0], '1')
+
+      expect(form.checkValidity()).toBeFalse()
+
+      type(slots[1], '2')
+
+      expect(form.checkValidity()).toBeTrue()
+    })
+
+    it('should let an empty code that is not required pass, and block an incomplete one', () => {
+      const { form, slots } = mountForm({})
+
+      expect(form.checkValidity()).toBeTrue()
+
+      type(slots[0], '1')
+
+      expect(form.checkValidity()).toBeFalse()
+    })
+
+    it('should leave a read-only or disabled code out of the form validation', () => {
+      for (const config of [{ readonly: true }, { disabled: true }]) {
+        const { form } = mountForm({ required: true, ...config })
+
+        expect(form.checkValidity()).toBeTrue()
+      }
+    })
+
+    it('should hand the focus the browser gives the value field to the first empty slot', () => {
+      const { form, slots, valueField } = mountForm({ required: true })
+      type(slots[0], '1')
+
+      valueField.focus()
+
+      expect(document.activeElement).toEqual(slots[1])
+
+      document.activeElement.blur()
+
+      expect(form.reportValidity()).toBeFalse()
+      expect(document.activeElement).toEqual(slots[1])
+    })
+
+    it('should mark every slot and describe it with the message after the group once the browser or the form plugin reports the code', () => {
+      for (const attributes of ['', 'data-coreui-validate novalidate']) {
+        const { form, slots } = mountForm({ required: true }, attributes)
+
+        form.requestSubmit()
+
+        const { id } = fixtureEl.querySelector('.invalid-feedback')
+
+        expect(slotStates(slots)).toEqual([['true', id], ['true', id]])
+      }
+    })
+
+    it('should give the slots back their own description and state once the code is complete', () => {
+      const { form, slots } = mountForm({ required: true }, '', '<input class="form-otp-control" aria-describedby="hint"><input class="form-otp-control">')
+      form.requestSubmit()
+      const { id } = fixtureEl.querySelector('.invalid-feedback')
+
+      expect(slotStates(slots)).toEqual([['true', `hint ${id}`], ['true', id]])
+
+      type(slots[0], '1')
+      type(slots[1], '2')
+
+      expect(slotStates(slots)).toEqual([[null, 'hint'], [null, null]])
+    })
+
+    it('should not mark the slots before the code is reported', () => {
+      const { slots } = mountForm({ required: true })
+
+      type(slots[0], '1')
+
+      expect(slotStates(slots)).toEqual([[null, null], [null, null]])
+    })
+
+    it('should drop the state on a native form reset, and restore the value the slots show', async () => {
+      const { form, slots, valueField } = mountForm({ required: true }, '', '<input class="form-otp-control" value="4"><input class="form-otp-control">')
+      form.requestSubmit()
+      type(slots[1], '2')
+      type(slots[1], '')
+
+      expect(slotStates(slots)[0][0]).toEqual('true')
+
+      form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(valueField.value).toEqual('4')
+      expect(slotStates(slots)).toEqual([[null, null], [null, null]])
+    })
+
+    it('should give the slots back their attributes on dispose', () => {
+      const { form, otpInput, slots } = mountForm({ required: true }, '', '<input class="form-otp-control" aria-describedby="hint"><input class="form-otp-control">')
+      form.requestSubmit()
+
+      otpInput.dispose()
+
+      expect(slotStates(slots)).toEqual([[null, 'hint'], [null, null]])
+    })
+
+    it('should be found by the form plugin as the first invalid control', () => {
+      const { form, slots } = mountForm({ required: true }, 'data-coreui-validate novalidate')
+
+      Form.getOrCreateInstance(form).validate()
+
+      expect(document.activeElement).toEqual(slots[0])
+    })
+  })
+
   describe('static methods', () => {
     describe('otpInputInterface', () => {
       it('should create instance when not exists', () => {
@@ -1770,7 +1909,7 @@ describe('OTPInput', () => {
       inputs[0].dispatchEvent(new Event('input', { bubbles: true }))
 
       expect(inputs.map(input => input.value)).toEqual(['4', '2', '4', '2', '4', '2'])
-      expect(otpContainer.querySelector('input[type="hidden"]').value).toEqual('424242')
+      expect(otpContainer.querySelector('.form-otp > input:not(.form-otp-control)').value).toEqual('424242')
     })
 
     it('should spread a full code even when another slot received it', () => {
@@ -1828,7 +1967,7 @@ describe('OTPInput', () => {
       inputs[1].dispatchEvent(pasteEvent)
 
       expect(inputs.map(input => input.value)).toEqual(['9', '8', '7', ''])
-      expect(otpContainer.querySelector('input[type="hidden"]').value).toEqual('987')
+      expect(otpContainer.querySelector('.form-otp > input:not(.form-otp-control)').value).toEqual('987')
     })
 
     it('should let the first slot accept a code again after clear()', () => {

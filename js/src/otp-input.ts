@@ -8,6 +8,7 @@
 import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
+import { getFeedbackIds } from './util/form-validation.js'
 import {
   defineJQueryPlugin, getNextActiveElement, isRTL, jQueryDispatch
 } from './util/index.js'
@@ -30,12 +31,15 @@ const EVENT_CHANGE = `change${EVENT_KEY}`
 const EVENT_COMPLETE = `complete${EVENT_KEY}`
 const EVENT_FOCUS = `focus${EVENT_KEY}`
 const EVENT_INPUT = `input${EVENT_KEY}`
+const EVENT_INVALID = `invalid${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 const EVENT_PASTE = `paste${EVENT_KEY}`
+const EVENT_RESET = `reset${EVENT_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
 const SELECTOR_DATA_OTP = '[data-coreui-otp]'
 const SELECTOR_FORM_OTP_CONTROL = '.form-otp-control'
+const SELECTOR_VALUE_FIELD = 'input:not(.form-otp-control)'
 
 /**
  * Types
@@ -92,18 +96,24 @@ const DefaultType = {
 
 class OTPInput extends BaseComponent {
   protected declare _disabledSlots: Set<HTMLInputElement>
+  protected declare _form: HTMLFormElement | null
   protected declare _inputElement: HTMLInputElement | null
   protected declare _placeholders: Map<HTMLInputElement, string | null>
   protected declare _readOnlySlots: Set<HTMLInputElement>
+  protected declare _reported: boolean
+  protected declare _slotAria: Map<HTMLInputElement, { describedBy: string | null, invalid: string | null }>
 
   constructor(element?: string | Element | null, config?: Partial<OtpInputConfig> | null) {
     super(element, config)
 
     this._config = this._getConfig(config)
     this._disabledSlots = new Set()
+    this._form = this._element.closest('form')
     this._inputElement = null
     this._placeholders = new Map()
     this._readOnlySlots = new Set()
+    this._reported = false
+    this._slotAria = new Map()
 
     this._setRoleAttribute()
     this._setInputsAttributes()
@@ -143,7 +153,10 @@ class OTPInput extends BaseComponent {
       return
     }
 
+    EventHandler.off(this._form, EVENT_RESET)
     this._inputElement?.remove()
+    this._reported = false
+    this._syncValidity()
 
     for (const input of this._disabledSlots) {
       input.disabled = false
@@ -308,6 +321,27 @@ class OTPInput extends BaseComponent {
 
       this._distributeChars(event.target as HTMLInputElement, validChars)
     })
+
+    EventHandler.on(this._element, EVENT_FOCUS, SELECTOR_VALUE_FIELD, () => {
+      const inputs = this._getInputs()
+      const target = inputs.find(input => !input.value) ?? inputs[0]
+
+      target?.focus()
+    })
+
+    EventHandler.on(this._element, EVENT_INVALID, SELECTOR_VALUE_FIELD, () => {
+      this._reported = true
+      this._syncValidity()
+    })
+
+    EventHandler.on(this._form, EVENT_RESET, (event: Event) => {
+      setTimeout(() => {
+        if (this._element && !event.defaultPrevented) {
+          this._reported = false
+          this._syncValidity()
+        }
+      })
+    })
   }
 
   // Write `chars` across the slots starting at `startInput`, then sync focus,
@@ -377,11 +411,16 @@ class OTPInput extends BaseComponent {
 
   _createHiddenInput(): void {
     const hiddenInput = document.createElement('input')
-    hiddenInput.type = 'hidden'
-
-    if (this._config.disabled) {
-      hiddenInput.disabled = true
-    }
+    const inputs = this._getInputs()
+    hiddenInput.type = 'text'
+    hiddenInput.autocomplete = 'off'
+    hiddenInput.defaultValue = inputs.map(input => input.defaultValue).join('')
+    hiddenInput.disabled = this._config.disabled
+    hiddenInput.pattern = `${this._config.type === 'number' ? '[0-9]' : '.'}{${inputs.length}}`
+    hiddenInput.readOnly = this._config.readonly
+    hiddenInput.required = this._config.required
+    hiddenInput.tabIndex = -1
+    hiddenInput.setAttribute('aria-hidden', 'true')
 
     if (this._config.id) {
       hiddenInput.id = this._config.id
@@ -395,6 +434,7 @@ class OTPInput extends BaseComponent {
 
     this._element.append(hiddenInput)
     this._inputElement = hiddenInput
+    this._syncValidity()
   }
 
   _extractValidChars(text: string): string {
@@ -428,12 +468,46 @@ class OTPInput extends BaseComponent {
   _setHiddenInputValue(value: string | null): void {
     if (this._inputElement) {
       this._inputElement.value = value || ''
+      this._syncValidity()
     }
 
     EventHandler.trigger(this._element, EVENT_CHANGE, { value })
 
     if (value && value.length === this._getInputs().length) {
       EventHandler.trigger(this._element, EVENT_COMPLETE, { value })
+    }
+  }
+
+  _syncValidity(): void {
+    if (!this._reported || !this._inputElement || this._inputElement.validity.valid) {
+      for (const [input, { describedBy, invalid }] of this._slotAria) {
+        this._writeSlotAttribute(input, 'aria-describedby', describedBy)
+        this._writeSlotAttribute(input, 'aria-invalid', invalid)
+      }
+
+      this._slotAria.clear()
+      return
+    }
+
+    const feedbackIds = getFeedbackIds(this._inputElement)
+
+    for (const input of this._getInputs()) {
+      if (!this._slotAria.has(input)) {
+        this._slotAria.set(input, { describedBy: input.getAttribute('aria-describedby'), invalid: input.getAttribute('aria-invalid') })
+      }
+
+      const ids = [...new Set([...(this._slotAria.get(input)!.describedBy ?? '').split(/\s+/), ...feedbackIds])].filter(Boolean)
+
+      this._writeSlotAttribute(input, 'aria-describedby', ids.length > 0 ? ids.join(' ') : null)
+      this._writeSlotAttribute(input, 'aria-invalid', 'true')
+    }
+  }
+
+  _writeSlotAttribute(input: HTMLInputElement, name: string, value: string | null): void {
+    if (value === null) {
+      input.removeAttribute(name)
+    } else {
+      input.setAttribute(name, value)
     }
   }
 
@@ -475,8 +549,6 @@ class OTPInput extends BaseComponent {
       } else if (this._placeholders.has(input)) {
         this._restorePlaceholder(input)
       }
-
-      input.required = this._config.required
 
       switch (this._config.type) {
         case 'number': {

@@ -14,8 +14,9 @@ import DateInput from '../../src/date-input.js'
 import DatePicker from '../../src/date-picker.js'
 import DateRangeInput from '../../src/date-range-input.js'
 import DateRangePicker from '../../src/date-range-picker.js'
+import OTPInput from '../../src/otp-input.js'
 import TimePicker from '../../src/time-picker.js'
-import { updateValidationState } from '../../src/util/form-validation.js'
+import { updateValidationState, validateForm } from '../../src/util/form-validation.js'
 
 const FEEDBACK = '<div class="invalid-feedback">Error</div><div class="valid-feedback">Looks good!</div>'
 
@@ -160,6 +161,77 @@ describe('messages of a form field', () => {
       instance.dispose()
     })
   }
+
+  describe('a one-time password', () => {
+    const OTP = `<div class="form-otp"><input class="form-otp-control"><input class="form-otp-control"></div>${FEEDBACK}`
+
+    const mountOtp = (formAttributes, required = true) => {
+      const form = mount(OTP, formAttributes)
+      const instance = new OTPInput(container.querySelector('.form-otp'), { required })
+
+      return { form, instance, slots: [...container.querySelectorAll('.form-otp-control')] }
+    }
+
+    for (const [route, formAttributes, validate] of [
+      ['the browser', 'data-coreui-validate', form => form.requestSubmit()],
+      ['the form validation', 'data-coreui-validate novalidate', form => validateForm(form, new WeakMap())]
+    ]) {
+      it(`shows the error after the group and links it to every slot once ${route} reports the code`, () => {
+        const { form, instance, slots } = mountOtp(formAttributes)
+
+        validate(form)
+
+        const feedback = container.querySelector('.invalid-feedback')
+
+        expect(displayOf('.invalid-feedback')).toBe('block')
+        expect(displayOf('.valid-feedback')).toBe('none')
+        expect(getComputedStyle(slots[1]).borderTopColor).toBe(getComputedStyle(feedback).color)
+
+        for (const slot of slots) {
+          expect(slot.getAttribute('aria-describedby')).toBe(feedback.id)
+        }
+
+        instance.dispose()
+      })
+    }
+
+    it('shows the success after the group once the browser takes the code', () => {
+      const { form, instance, slots } = mountOtp('data-coreui-validate="valid"')
+
+      for (const [index, slot] of slots.entries()) {
+        slot.value = String(index)
+        slot.dispatchEvent(new Event('input', { bubbles: true }))
+      }
+
+      form.requestSubmit()
+
+      expect(displayOf('.valid-feedback')).toBe('block')
+      expect(displayOf('.invalid-feedback')).toBe('none')
+
+      instance.dispose()
+    })
+
+    it('lays the value field over the group, where the browser shows its message', () => {
+      const { instance } = mountOtp('')
+      const group = container.querySelector('.form-otp').getBoundingClientRect()
+      const field = instance._inputElement.getBoundingClientRect()
+
+      expect([field.left, field.top, field.width, field.height]).toEqual([group.left, group.top, group.width, group.height])
+      expect(getComputedStyle(instance._inputElement).opacity).toBe('0')
+
+      instance.dispose()
+    })
+
+    it('shows the error after the group for a slot the page marks invalid', () => {
+      const { instance, slots } = mountOtp('', false)
+
+      slots[0].classList.add('is-invalid')
+
+      expect(displayOf('.invalid-feedback')).toBe('block')
+
+      instance.dispose()
+    })
+  })
 
   it('colours a check, a radio and a switch, and their label, with the state', () => {
     for (const [markup, framed] of [
