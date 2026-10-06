@@ -128,6 +128,7 @@ const plugins = {
   'date-input': 'forms/form-date-time',
   'date-range-input': 'forms/form-date-time',
   'date-range-picker': 'date-picker',
+  form: 'forms/validation',
   'multi-select': 'forms/form-multi-select',
   navigation: 'sidebar',
   'number-input': 'forms/number-input',

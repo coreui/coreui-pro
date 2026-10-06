@@ -1,5 +1,7 @@
 import { vi } from 'vitest'
-import { clearValidationState, focusFirstInvalidControl, updateValidationState } from '../../../src/util/form-validation.js'
+import {
+  clearValidationState, focusFirstInvalidControl, updateValidationState, validateForm
+} from '../../../src/util/form-validation.js'
 import { clearFixture, getFixture } from '../../helpers/fixture.js'
 
 describe('Form validation utilities', () => {
@@ -267,6 +269,41 @@ describe('Form validation utilities', () => {
     })
   })
 
+  describe('state classes', () => {
+    it('should leave a state class the page set, and take its own off while one is there', () => {
+      fixtureEl.innerHTML = '<form data-coreui-validate="valid"><input id="server" class="is-invalid" aria-invalid="true" value="taken" required><input id="later" value="ok" required></form>'
+      const form = fixtureEl.querySelector('form')
+      const marks = new WeakMap()
+      const server = fixtureEl.querySelector('#server')
+      const later = fixtureEl.querySelector('#later')
+
+      updateValidationState(form, marks)
+
+      expect(server).toHaveClass('is-invalid')
+      expect(server).not.toHaveClass('is-valid')
+      expect(later).toHaveClass('is-valid')
+
+      later.classList.add('is-invalid')
+      updateValidationState(form, marks)
+
+      expect(later).toHaveClass('is-invalid')
+      expect(later).not.toHaveClass('is-valid')
+    })
+
+    it('should put back a class of its own a re-render dropped', () => {
+      fixtureEl.innerHTML = '<form><input id="empty" required></form>'
+      const form = fixtureEl.querySelector('form')
+      const marks = new WeakMap()
+      const empty = fixtureEl.querySelector('#empty')
+
+      updateValidationState(form, marks)
+      empty.className = ''
+      updateValidationState(form, marks)
+
+      expect(empty).toHaveClass('is-invalid')
+    })
+  })
+
   describe('clearValidationState', () => {
     it('should remove the classes and only the attributes the marking added', () => {
       fixtureEl.innerHTML = '<form data-coreui-validate="valid"><input id="filled" required value="ok"><input id="empty" aria-describedby="hint" required><div id="emptyError" class="invalid-feedback">Required</div><div id="hint">Hint</div></form>'
@@ -284,6 +321,85 @@ describe('Form validation utilities', () => {
       expect(empty).not.toHaveClass('is-invalid')
       expect(empty.hasAttribute('aria-invalid')).toBeFalse()
       expect(describedBy(empty)).toBe('hint')
+    })
+
+    it('should leave the classes another owner or the page added', () => {
+      fixtureEl.innerHTML = '<form><input id="empty" required><input id="server" class="is-invalid" value="taken"></form>'
+      const form = fixtureEl.querySelector('form')
+      const stepperMarks = new WeakMap()
+      const formMarks = new WeakMap()
+      const empty = fixtureEl.querySelector('#empty')
+
+      updateValidationState(form, stepperMarks)
+      updateValidationState(form, formMarks)
+      clearValidationState(form, formMarks)
+
+      expect(empty).toHaveClass('is-invalid')
+      expect(empty.getAttribute('aria-invalid')).toBe('true')
+      expect(fixtureEl.querySelector('#server')).toHaveClass('is-invalid')
+
+      clearValidationState(form, stepperMarks)
+
+      expect(empty).not.toHaveClass('is-invalid')
+      expect(empty.hasAttribute('aria-invalid')).toBeFalse()
+    })
+  })
+
+  describe('validateForm', () => {
+    it('should tell the hook the validity, then show the state and focus the first invalid control', () => {
+      fixtureEl.innerHTML = '<form><input id="name" required><div id="nameError" class="invalid-feedback">Required</div><button id="send">Send</button></form>'
+      const form = fixtureEl.querySelector('form')
+      const name = fixtureEl.querySelector('#name')
+      const hook = vi.fn(() => false)
+      fixtureEl.querySelector('#send').focus()
+
+      expect(validateForm(form, new WeakMap(), hook)).toEqual({ handled: true, isValid: false })
+      expect(hook).toHaveBeenCalledWith(false)
+      expect(name).toHaveClass('is-invalid')
+      expect(describedBy(name)).toBe('nameError')
+      expect(document.activeElement).toBe(name)
+    })
+
+    it('should show nothing and fire no invalid event when the hook takes the result over', () => {
+      fixtureEl.innerHTML = '<form><input id="name" required><button id="send">Send</button></form>'
+      const form = fixtureEl.querySelector('form')
+      const name = fixtureEl.querySelector('#name')
+      const handleInvalid = vi.fn()
+      name.addEventListener('invalid', handleInvalid)
+      fixtureEl.querySelector('#send').focus()
+
+      expect(validateForm(form, new WeakMap(), () => true)).toEqual({ handled: false, isValid: false })
+      expect(handleInvalid).not.toHaveBeenCalled()
+      expect(name).not.toHaveClass('is-invalid')
+      expect(document.activeElement).toBe(fixtureEl.querySelector('#send'))
+    })
+
+    it('should count a custom validity the hook set, and keep focus where the hook moved it', () => {
+      fixtureEl.innerHTML = '<form><input id="password" value="secret"><input id="confirm" value="secrets"><h2 id="summary" tabindex="-1">Errors</h2></form>'
+      const form = fixtureEl.querySelector('form')
+      const confirm = fixtureEl.querySelector('#confirm')
+      const summary = fixtureEl.querySelector('#summary')
+
+      const result = validateForm(form, new WeakMap(), isValid => {
+        confirm.setCustomValidity(confirm.value === fixtureEl.querySelector('#password').value ? '' : 'Mismatch')
+        summary.focus()
+        return !isValid
+      })
+
+      expect(result).toEqual({ handled: true, isValid: false })
+      expect(confirm).toHaveClass('is-invalid')
+      expect(document.activeElement).toBe(summary)
+    })
+
+    it('should validate without a hook and read focus inside a shadow root', () => {
+      const host = document.createElement('div')
+      fixtureEl.append(host)
+      const root = host.attachShadow({ mode: 'open' })
+      root.innerHTML = '<form><input id="name" required><button id="send">Send</button></form>'
+      root.querySelector('#send').focus()
+
+      expect(validateForm(root.querySelector('form'), new WeakMap())).toEqual({ handled: true, isValid: false })
+      expect(root.activeElement).toBe(root.querySelector('#name'))
     })
   })
 
