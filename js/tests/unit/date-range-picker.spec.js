@@ -740,6 +740,79 @@ describe('DateRangePicker', () => {
     })
   })
 
+  describe('validation state', () => {
+    const sectionStates = () => [...fixtureEl.querySelectorAll('.form-date-time-section')]
+      .map(section => [section.getAttribute('aria-invalid'), section.getAttribute('aria-describedby')])
+
+    it('should announce a state class the page writes on the picker element, with the message after it', async () => {
+      buildPicker({ locale: 'en-US' }, '<div class="form-field"><div id="picker" class="is-invalid"></div><div class="invalid-feedback">Already booked.</div></div>')
+      const { id } = fixtureEl.querySelector('.invalid-feedback')
+      const count = fixtureEl.querySelectorAll('.form-date-time-section').length
+
+      expect(count).toBeGreaterThan(0)
+      expect(sectionStates()).toEqual(Array.from({ length: count }, () => ['true', id]))
+
+      fixtureEl.querySelector('#picker').classList.remove('is-invalid')
+      await Promise.resolve()
+
+      expect(sectionStates()).toEqual(Array.from({ length: count }, () => [null, null]))
+    })
+
+    it('should announce an aria-invalid the page writes on the picker element', async () => {
+      buildPicker({ locale: 'en-US' }, '<div id="picker" aria-invalid="true"></div>')
+      const invalid = () => sectionStates().map(([ariaInvalid]) => ariaInvalid)
+
+      expect(invalid().every(value => value === 'true')).toBeTrue()
+
+      fixtureEl.querySelector('#picker').setAttribute('aria-invalid', 'false')
+      await Promise.resolve()
+
+      expect(invalid().every(value => value === null)).toBeTrue()
+    })
+
+    it('should describe the sections with the message only while the class that shows it stays', async () => {
+      buildPicker({ locale: 'en-US' }, '<div id="picker" aria-invalid="true"></div><div class="invalid-feedback">Already booked.</div>')
+      const picker = fixtureEl.querySelector('#picker')
+      const feedback = fixtureEl.querySelector('.invalid-feedback')
+
+      expect(sectionStates()).toEqual(Array.from({ length: 6 }, () => ['true', null]))
+
+      picker.classList.add('is-invalid')
+      await Promise.resolve()
+
+      expect(sectionStates()).toEqual(Array.from({ length: 6 }, () => ['true', feedback.id]))
+
+      picker.classList.remove('is-invalid')
+      await Promise.resolve()
+
+      expect(sectionStates()).toEqual(Array.from({ length: 6 }, () => ['true', null]))
+    })
+
+    it('should not draw the range valid while the page marks the picker invalid', async () => {
+      buildPicker({
+        endDate: new Date(2026, 6, 20), locale: 'en-US', startDate: new Date(2026, 6, 14), valid: true
+      }, '<div id="picker" class="is-invalid"></div>')
+      const frame = fixtureEl.querySelector('.form-date-range')
+
+      expect(frame).not.toHaveClass('is-valid')
+
+      fixtureEl.querySelector('#picker').classList.remove('is-invalid')
+      await Promise.resolve()
+
+      expect(frame).toHaveClass('is-valid')
+    })
+
+    it('should keep the fields invalid while the end is before the start after the page drops its class', async () => {
+      buildPicker({ endDate: new Date(2026, 6, 14), locale: 'en-US', startDate: new Date(2026, 6, 20) }, '<div id="picker" class="is-invalid"></div>')
+
+      fixtureEl.querySelector('#picker').classList.remove('is-invalid')
+      await Promise.resolve()
+
+      expect(sectionStates()).toHaveSize(6)
+      expect(sectionStates().every(([ariaInvalid]) => ariaInvalid === 'true')).toBeTrue()
+    })
+  })
+
   describe('slot context', () => {
     it('should expose the range contract', () => {
       const picker = buildPicker()

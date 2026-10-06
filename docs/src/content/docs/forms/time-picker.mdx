@@ -177,6 +177,8 @@ The toggle button carries the panel's state — `aria-haspopup="dialog"`, `aria-
 
 An `aria-label`, `aria-labelledby` or `aria-describedby` on the picker element moves to the field, so a screen reader announces the name and the description when focus enters it, and the picker element gets them back on dispose. Point `aria-labelledby` at the visible label, as the examples on this page do; it names the field over `floatingLabel` and an `ariaLabel` in `inputOptions`, the way the browser ranks names.
 
+An `.is-invalid` class you write on the picker element, the server-side route, marks the field invalid for assistive technologies too: its sections carry `aria-invalid="true"` and are described by the error message after the picker, for as long as the class stays. An `aria-invalid="true"` on the element marks the sections invalid as well; write it with the class, which is what shows the message.
+
 ### Keyboard support
 
 | Key | Action |

@@ -1160,6 +1160,61 @@ describe('DatePicker', () => {
     })
   })
 
+  describe('validation state', () => {
+    const sectionStates = () => [...fixtureEl.querySelectorAll('.form-date-time-section')]
+      .map(section => [section.getAttribute('aria-invalid'), section.getAttribute('aria-describedby')])
+
+    it('should announce a state class the page writes on the picker element, with the message after it', async () => {
+      buildPicker({ locale: 'en-US' }, '<div id="picker" class="is-invalid"></div><div class="invalid-feedback">Already booked.</div>')
+      const { id } = fixtureEl.querySelector('.invalid-feedback')
+      const count = fixtureEl.querySelectorAll('.form-date-time-section').length
+
+      expect(count).toBeGreaterThan(0)
+      expect(sectionStates()).toEqual(Array.from({ length: count }, () => ['true', id]))
+
+      fixtureEl.querySelector('#picker').classList.remove('is-invalid')
+      await Promise.resolve()
+
+      expect(sectionStates()).toEqual(Array.from({ length: count }, () => [null, null]))
+    })
+
+    it('should keep the message on the sections while the popup with time selects is open and after it closes', async () => {
+      const picker = buildPicker({ invalid: true, locale: 'en-US', timepicker: true }, '<div id="picker"></div><div class="invalid-feedback">Already booked.</div>')
+      const { id } = fixtureEl.querySelector('.invalid-feedback')
+      const describedBy = () => sectionStates().map(([, description]) => description)
+      const count = describedBy().length
+
+      picker.show()
+      await Promise.resolve()
+
+      expect(fixtureEl.querySelector('.popup select')).not.toBeNull()
+      expect(describedBy()).toEqual(Array.from({ length: count }, () => id))
+
+      pickMinutes(5)
+
+      expect(describedBy()).toEqual(Array.from({ length: count }, () => id))
+
+      picker.hide()
+      await new Promise(resolve => {
+        fixtureEl.querySelector('#picker').addEventListener('hidden.coreui.date-picker', resolve, { once: true })
+      })
+
+      expect(describedBy()).toEqual(Array.from({ length: count }, () => id))
+    })
+
+    it('should announce an aria-invalid the page writes on the picker element', async () => {
+      buildPicker({ locale: 'en-US' }, '<div id="picker" aria-invalid="true"></div>')
+      const invalid = () => sectionStates().map(([ariaInvalid]) => ariaInvalid)
+
+      expect(invalid().every(value => value === 'true')).toBeTrue()
+
+      fixtureEl.querySelector('#picker').setAttribute('aria-invalid', 'false')
+      await Promise.resolve()
+
+      expect(invalid().every(value => value === null)).toBeTrue()
+    })
+  })
+
   describe('min/max validation', () => {
     it('should propagate field validation to a programmatic date beyond maxDate', () => {
       const yesterday = new Date()

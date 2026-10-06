@@ -232,6 +232,7 @@ class DateRangeInput extends BaseComponent {
   protected declare _claimedInvalid: boolean
   protected declare _claimedStartDate: Date | null
   protected declare _claimedValid: boolean
+  protected declare _ownerInvalid: boolean
   protected declare _addedStateClassNames: Set<string>
   protected declare _initialStartDate: any
   protected declare _initialEndDate: any
@@ -254,6 +255,7 @@ class DateRangeInput extends BaseComponent {
     this._initialStartDate = config?.startDate ?? this._config.startDate
     this._initialEndDate = config?.endDate ?? this._config.endDate
     this._applying = false
+    this._ownerInvalid = false
 
     this._createDateRangeInput()
     this._startDate = this._startInput.getDate()
@@ -561,14 +563,19 @@ class DateRangeInput extends BaseComponent {
     }
   }
 
+  _setOwnerInvalid(isInvalid: boolean): void {
+    this._ownerInvalid = isInvalid
+    this._applyOrder()
+  }
+
   _applyOrder(): void {
     const claimed = this._markupClaimApplies()
     const isInvalid = (claimed && this._claimedInvalid) || this._config.invalid || !this.isRangeValid()
-    const isValid = ((claimed && this._claimedValid) || this._config.valid) && !isInvalid
+    const isValid = ((claimed && this._claimedValid) || this._config.valid) && !isInvalid && !this._ownerInvalid
 
     this._toggleStateClassName(CLASS_NAME_IS_INVALID, isInvalid)
     this._toggleStateClassName(CLASS_NAME_IS_VALID, isValid)
-    const isOwnerInvalid = (claimed && this._claimedInvalid) || !this.isRangeValid()
+    const isOwnerInvalid = (claimed && this._claimedInvalid) || !this.isRangeValid() || this._ownerInvalid
     this._startInput._setOwnerInvalid(isOwnerInvalid)
     this._endInput._setOwnerInvalid(isOwnerInvalid)
   }

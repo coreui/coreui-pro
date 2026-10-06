@@ -58,6 +58,25 @@ describe('Form validation utilities', () => {
       expect(getFeedbackIds(fixtureEl.querySelector('#to'))).toEqual(['toError'])
     })
 
+    it('should find the message after an element around the control that the page marks invalid', () => {
+      fixtureEl.innerHTML = `<form>
+        <div class="input-group is-invalid"><span class="input-group-text">@</span><input id="user" required></div><div id="userError" class="invalid-feedback">Pick a user name.</div>
+        <div class="picker is-invalid"><div class="form-control-group"><div class="form-control form-date-time"><textarea id="start" required></textarea></div><div class="form-control form-date-time"><textarea id="end" required></textarea></div></div></div><div id="stayError" class="invalid-feedback">Already booked.</div>
+      </form>`
+
+      expect(getFeedbackIds(fixtureEl.querySelector('#user'))).toEqual(['userError'])
+      expect(getFeedbackIds(fixtureEl.querySelector('#start'))).toEqual(['stayError'])
+      expect(getFeedbackIds(fixtureEl.querySelector('#end'))).toEqual(['stayError'])
+    })
+
+    it('should take the messages after marked elements innermost first, and none after the form', () => {
+      fixtureEl.innerHTML = `<div class="is-invalid"><form>
+        <div class="is-invalid"><div class="is-invalid"><input id="name" required></div><div id="innerError" class="invalid-feedback">Too short.</div></div><div id="outerError" class="invalid-feedback">Enter a name.</div>
+      </form></div><div class="invalid-feedback">Fix the form.</div>`
+
+      expect(getFeedbackIds(fixtureEl.querySelector('#name'))).toEqual(['innerError', 'outerError'])
+    })
+
     it('should leave out a message the page hides', () => {
       fixtureEl.innerHTML = `<form>
         <input id="city" required><div class="invalid-feedback" hidden>Too short.</div><div id="cityError" class="invalid-feedback">Enter a city.</div>

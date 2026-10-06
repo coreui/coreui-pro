@@ -33,6 +33,7 @@ const SELECTOR_HIDDEN = `[hidden], ${SELECTOR_ARIA_HIDDEN}`
 const SELECTOR_INPUT_GROUP = '.input-group'
 const SELECTOR_INPUT_GROUP_CONTROL = '.form-control, .form-select'
 const SELECTOR_INVALID_FEEDBACK = '.invalid-feedback, .invalid-tooltip'
+const SELECTOR_POPUP = '.popup'
 const SELECTOR_RANGE = '.form-range'
 const SELECTOR_RANGE_INPUT = '.form-range-input'
 const STATE_CLASSES = [CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID]
@@ -105,7 +106,8 @@ const isShownFeedback = (element: Element): boolean =>
 
 /**
  * Collects the invalid feedback elements among the siblings that follow an element, up to the
- * sibling where the next field starts, leaving out the ones the page hid.
+ * sibling where the next field starts, leaving out the ones the page hid. A `.popup` a component
+ * laid after its anchor is passed over, since its controls belong to that component.
  *
  * @param element - The element whose following siblings are searched
  * @param control - The control whose feedback is searched
@@ -114,7 +116,7 @@ const isShownFeedback = (element: Element): boolean =>
 const getFollowingFeedback = (element: Element, control: FormControl): Element[] => {
   const feedback: Element[] = []
 
-  for (let sibling = element.nextElementSibling; sibling && !startsAnotherField(sibling, control); sibling = sibling.nextElementSibling) {
+  for (let sibling = element.nextElementSibling; sibling && (sibling.matches(SELECTOR_POPUP) || !startsAnotherField(sibling, control)); sibling = sibling.nextElementSibling) {
     if (isShownFeedback(sibling)) {
       feedback.push(sibling)
     }
@@ -149,6 +151,25 @@ const getFrame = (control: Element): Element | null => {
 }
 
 /**
+ * Collects the elements around an element, up to its form, that carry `.is-invalid`, whose
+ * following messages the stylesheet shows.
+ *
+ * @param element - The element
+ * @returns The marked elements, innermost first
+ */
+const getMarkedAncestors = (element: Element): Element[] => {
+  const ancestors: Element[] = []
+
+  for (let ancestor = element.parentElement; ancestor && ancestor.tagName !== 'FORM'; ancestor = ancestor.parentElement) {
+    if (ancestor.classList.contains(CLASS_NAME_IS_INVALID)) {
+      ancestors.push(ancestor)
+    }
+  }
+
+  return ancestors
+}
+
+/**
  * Tells whether the stylesheet shows the messages of a `.form-field` for a control: one around a
  * check, a radio or a switch, or around the frame of the control, or around the input group of a
  * `.form-control` or `.form-select`.
@@ -166,11 +187,11 @@ const reachesField = (control: Element, field: Element): boolean => {
 
 /**
  * Collects the invalid feedback the stylesheet shows for one control: the `.invalid-feedback` and
- * `.invalid-tooltip` after it, after its frame or after the `.form-range` of a `.form-range-input`,
- * up to where the next field starts, and in each `.form-field` around it that shows its messages
- * for the control, those that sit in a field around the control. A field grouping several also
- * shows the messages of the fields inside it; those belong to other controls and are left out, and
- * so are the messages the page hid.
+ * `.invalid-tooltip` after it, after its frame, after the `.form-range` of a `.form-range-input` or
+ * after an element around it marked `.is-invalid`, up to where the next field starts, and in each
+ * `.form-field` around it that shows its messages for the control, those that sit in a field around
+ * the control. A field grouping several also shows the messages of the fields inside it; those
+ * belong to other controls and are left out, and so are the messages the page hid.
  *
  * @param control - The control
  * @returns The feedback elements, in document order per rule
@@ -186,7 +207,12 @@ const getStructuralFeedback = (control: FormControl): Element[] => {
     }
   }
 
-  return [...getFollowingFeedback(element, control), ...(anchor ? getFollowingFeedback(anchor, control) : []), ...fieldFeedback]
+  return [
+    ...getFollowingFeedback(element, control),
+    ...(anchor ? getFollowingFeedback(anchor, control) : []),
+    ...getMarkedAncestors(element).flatMap(ancestor => getFollowingFeedback(ancestor, control)),
+    ...fieldFeedback
+  ]
 }
 
 /**

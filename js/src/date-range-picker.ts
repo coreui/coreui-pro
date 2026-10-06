@@ -459,6 +459,10 @@ class DateRangePicker extends PickerBase {
     return this._rangeInput.isDateSelectable(new Date())
   }
 
+  override _setFieldInvalid(isInvalid: boolean): void {
+    this._rangeInput._setOwnerInvalid(isInvalid)
+  }
+
   // Static
   static jQueryInterface(this: any, config: any, ...args: any[]): void {
     return jQueryDispatch(this, DateRangePicker, config, args)
