@@ -2,7 +2,7 @@ const myMultiSelectExternalData = document.getElementById('myMultiSelectExternal
 
 const getUsers = async (name = '') => {
   try {
-    const response = await fetch(`https://apitest.coreui.io/demos/users?first_name=${name}&limit=10`)
+    const response = await fetch(`https://apitest.coreui.io/demos/users?first_name=${encodeURIComponent(name)}&limit=10`)
     const users = await response.json()
 
     return users.records.map(user => ({
@@ -11,6 +11,7 @@ const getUsers = async (name = '') => {
     }))
   } catch (error) {
     console.error('Error fetching users:', error)
+    return []
   }
 }
 
@@ -24,9 +25,18 @@ const multiSelect = new coreui.MultiSelect(myMultiSelectExternalData, {
 let lastQuery = null
 let debounceTimer = null
 
-myMultiSelectExternalData.addEventListener('show.coreui.multi-select', async () => {
-  const users = await getUsers()
-  multiSelect.update({ options: users })
+const loadUsers = async query => {
+  const users = await getUsers(query)
+
+  // Skip responses that arrive after a newer query
+  if (query === lastQuery) {
+    multiSelect.update({ options: users })
+  }
+}
+
+myMultiSelectExternalData.addEventListener('show.coreui.multi-select', () => {
+  lastQuery = ''
+  loadUsers('')
 })
 
 myMultiSelectExternalData.addEventListener('search.coreui.multi-select', event => {
@@ -40,8 +50,7 @@ myMultiSelectExternalData.addEventListener('search.coreui.multi-select', event =
 
   clearTimeout(debounceTimer)
 
-  debounceTimer = setTimeout(async () => {
-    const users = await getUsers(query)
-    multiSelect.update({ options: users })
+  debounceTimer = setTimeout(() => {
+    loadUsers(query)
   }, 200)
 })
