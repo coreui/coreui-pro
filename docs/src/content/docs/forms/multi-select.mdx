@@ -9,6 +9,7 @@ otherFrameworks:
 
 import multiSelectArrayData from './snippets/multi-select-array-data.js?raw'
 import multiSelectCustomOptions from './snippets/multi-select-custom-options.js?raw'
+import multiSelectExternalData from './snippets/multi-select-external-data.js?raw'
 import multiSelectHeader from './snippets/multi-select-header.js?raw'
 import multiSelectIndeterminate from './snippets/multi-select-indeterminate.js?raw'
 import multiSelectSelectionLimit from './snippets/multi-select-selection-limit.js?raw'
@@ -133,6 +134,22 @@ To enable the global search functionality within the Multi Select component, ple
       <option value="6">Node.js</option>
     </optgroup>
   </select>`} />
+
+### External search
+
+<AddedIn version="5.29.0" />
+
+Set `search` to `'external'` to fetch the options from a server or an API. The component stops filtering the list itself and passes the typed text in the `search.coreui.multi-select` event, so your code can request matching options and hand them over with `update({ options })`. Combine both modes with `['external', 'global']` (or `data-coreui-search="external, global"`) to keep the global search behavior.
+
+<Example pro code={`<select id="myMultiSelectExternalData"></select>`} sandboxJs={multiSelectExternalData} />
+
+We use the following JavaScript to set up our multi-select:
+
+<Code code={multiSelectExternalData} lang="js" />
+
+<Callout color="info">
+In external search mode, `update({ options })` replaces only the list: the dropdown stays open and keeps the typed text. Selected options that are missing from the new results stay selected, keep their tags and are still submitted with the form. `deselectAll()` and the cleaner clear them as well, while the select all button selects and deselects only the loaded results.
+</Callout>
 
 ## Selection types
 
@@ -502,7 +519,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `required` | boolean | `false` | Makes the input field required for form validation. |
 | `sanitize` | boolean | `true` | Enables HTML sanitization for custom templates to prevent XSS attacks. |
 | `sanitizeFn` | function, null | `null` | Custom sanitization function. If provided, it will be used instead of the built-in sanitizer. |
-| `search` | boolean, string | `false` | Enables search input element. When set to `'global'`, the user can perform searches across the entire component, regardless of where their focus is within the component. |
+| `search` | array, boolean, string | `false` | Enables search input element. When set to `'global'`, the user can perform searches across the entire component, regardless of where their focus is within the component. When set to `'external'`, the component does not filter the options and leaves the search to your code (see [External search](#external-search)). Combine the modes with `['external', 'global']` or `'external, global'`. |
 | `searchNoResultsLabel` | string | `'No results found'` | Sets the label for no results when filtering.	|
 | `selectAll` | boolean | `true` | Enables select all button.|
 | `selectAllLabel` | string | `'Select all'` | Sets the select all button label shown until everything is selected. The button is a toggle: it shows `selectAllLabel` (and selects all) until everything is selected, then shows `deselectAllLabel` (and deselects all). |
@@ -542,6 +559,7 @@ Multi Select component exposes a few events for hooking into multi select functi
 | `shown.coreui.multi-select` | Fired when the multi select options have been made visible to the user and CSS transitions have completed. |
 | `hide.coreui.multi-select` | Fires immediately when the hide instance method has been called. |
 | `hidden.coreui.multi-select` | Fired when the multi select options have finished being hidden from the user and CSS transitions have completed. |
+| `search.coreui.multi-select` | Fires when the search text changes. The typed text is available as `event.value`. |
 
 ```js
 const myMutliSelect = document.getElementById('myMutliSelect')
