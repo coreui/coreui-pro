@@ -35,6 +35,7 @@ import {
   setSectionsFromDate
 } from './util/date-sections.js'
 import type { DateSection, EditableSection, SectionFormat } from './util/date-sections.js'
+import { onLabelClick } from './util/field-label.js'
 import { captureHostClasses, type HostClasses, restoreHostClasses } from './util/form-control-group.js'
 import { getFeedbackIds } from './util/form-validation.js'
 import { getNextActiveElement, isRTL } from './util/index.js'
@@ -229,6 +230,7 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
   protected declare _form: HTMLFormElement | null
   protected declare _initialDate: Date | null
   protected declare _isBuilt: boolean
+  protected declare _removeLabelClick: () => void
   protected declare _resetHandler: (event: Event) => void
   protected declare _submitCaptureHandler: () => void
   protected declare _submitHandler: () => void
@@ -291,6 +293,7 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
     this._inputElement!.defaultValue = this._getResetValue()
     this._isBuilt = true
     this._addEventListeners()
+    this._removeLabelClick = onLabelClick(this._element, () => this._focusFirstEmptySection())
 
     if (this._config.autofocus && !this._config.disabled) {
       this._getSectionElements()[0]?.focus()
@@ -355,6 +358,7 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
       return
     }
 
+    this._removeLabelClick()
     EventHandler.off(this._form, this.constructor.eventName('reset'), this._resetHandler)
     EventHandler.off(this._form, this.constructor.eventName('submit'), this._submitHandler)
     this._form?.removeEventListener('submit', this._submitCaptureHandler, true)
@@ -498,6 +502,10 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
   }
 
   _focusFirstEmptySection(): void {
+    if (this._config.disabled || this._inputElement?.matches(':disabled')) {
+      return
+    }
+
     const sections = this._getSectionElements()
     const target = sections.find((sectionElement, index) => this._getSection(index).value === null) || sections[0]
 

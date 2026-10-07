@@ -677,6 +677,22 @@ describe('DateRangeInput', () => {
       expect(root().querySelector('[data-coreui-range-end]').getAttribute('aria-label')).toEqual('End date')
     })
 
+    it('should move focus to the first empty section of the start date when a label of the range is clicked', () => {
+      build({ format: 'dd.MM.yyyy' }, '<span id="stay-label" class="form-label">Stay</span><div id="range" aria-labelledby="stay-label"></div>')
+
+      fixtureEl.querySelector('#stay-label').click()
+
+      expect(document.activeElement).toEqual(fixtureEl.querySelector('.form-date-time-section'))
+    })
+
+    it('should leave the focus where it is when a label of a disabled range is clicked', () => {
+      build({ disabled: true, format: 'dd.MM.yyyy' }, '<span id="stay-label" class="form-label">Stay</span><div id="range" aria-labelledby="stay-label"></div>')
+
+      fixtureEl.querySelector('#stay-label').click()
+
+      expect(document.activeElement).toEqual(document.body)
+    })
+
     it('should make the host a group the page can name, and take the role back on dispose', () => {
       const range = build({}, '<span id="stay-label">Stay</span><div id="range" aria-labelledby="stay-label"></div>')
 

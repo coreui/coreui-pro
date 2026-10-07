@@ -604,6 +604,18 @@ describe('DatePicker', () => {
       expect(fixtureEl.querySelector('[data-coreui-picker-field]').getAttribute('aria-label')).toEqual('Arrival date')
     })
 
+    it('should move focus to the first empty section of its field when a label of the picker is clicked', () => {
+      buildPicker({ format: 'dd.MM.yyyy' }, '<label for="picker" class="form-label">Delivery</label><span id="delivery-label" class="form-label">Delivery date</span><div id="picker" aria-labelledby="delivery-label"></div>')
+      const firstSection = fixtureEl.querySelector('.form-date-time-section')
+
+      for (const label of fixtureEl.querySelectorAll('.form-label')) {
+        document.activeElement.blur()
+        label.click()
+
+        expect(document.activeElement).toEqual(firstSection)
+      }
+    })
+
     it('should pass the aria-labelledby of the picker to its field', () => {
       buildPicker({}, '<span id="delivery-label">Delivery date</span><div id="picker" aria-labelledby="delivery-label"></div>')
 

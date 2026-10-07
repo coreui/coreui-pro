@@ -723,6 +723,18 @@ describe('TimePicker', () => {
       expect(fixtureEl.querySelector('.form-date-time').getAttribute('aria-labelledby')).toEqual('opening-label')
     })
 
+    it('should move focus to the first empty section of its field when a label of the picker is clicked', () => {
+      buildPicker({}, '<label for="picker">Opening</label><span id="opening-label" class="form-label">Opening time</span><div id="picker" aria-labelledby="opening-label"></div>')
+      const firstSection = fixtureEl.querySelector('.form-date-time-section')
+
+      for (const label of fixtureEl.querySelectorAll('.form-label, label')) {
+        document.activeElement.blur()
+        label.click()
+
+        expect(document.activeElement).toEqual(firstSection)
+      }
+    })
+
     it('should move the aria-labelledby of the picker to its field over a floating label', () => {
       buildPicker({ floatingLabel: 'Pick a time' }, '<div id="picker" aria-labelledby="opening-label"></div>')
       const field = fixtureEl.querySelector('.form-date-time')

@@ -160,7 +160,7 @@ The component reports a `Date` object anchored to `1970-01-01` — the same conv
 
 ## Accessibility
 
-The time input shares the [accessibility model of the date input](/forms/date-input/#accessibility): `role="group"` on the container, a `role="spinbutton"` with full ARIA value attributes per section, a single tab stop with roving focus, and `inputmode` hints for mobile keyboards. The AM/PM section announces its localized name via `aria-valuetext` and can be toggled with the <kbd>A</kbd>/<kbd>P</kbd> letters or arrow keys.
+The time input shares the [accessibility model of the date input](/forms/date-input/#accessibility): `role="group"` on the container, a `role="spinbutton"` with full ARIA value attributes per section, a single tab stop with roving focus, and `inputmode` hints for mobile keyboards. Clicking a label that names the field, through `aria-labelledby` or a `<label for>` pointing at the element, moves focus to the first empty section. The AM/PM section announces its localized name via `aria-valuetext` and can be toggled with the <kbd>A</kbd>/<kbd>P</kbd> letters or arrow keys.
 
 The [keyboard support table](/forms/date-input/#keyboard-support) applies unchanged, including <kbd>Ctrl</kbd> + <kbd>A</kbd> (select all), <kbd>Ctrl</kbd> + <kbd>C</kbd> (copy), and paste.
 

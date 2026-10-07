@@ -678,6 +678,26 @@ describe('DateRangePicker', () => {
       expect(element.hasAttribute('role')).toBeFalse()
     })
 
+    it('should move focus to the first empty section of its own start date when a label of the picker is clicked', () => {
+      buildPicker({ format: 'dd.MM.yyyy' }, '<textarea id="notes"></textarea><span id="period-label" class="form-label">Reporting period</span><label for="picker">Period</label><div id="picker" aria-labelledby="period-label"></div>')
+      const start = fixtureEl.querySelector('#picker .form-date-time-section')
+
+      for (const label of fixtureEl.querySelectorAll('.form-label, label')) {
+        document.activeElement.blur()
+        label.click()
+
+        expect(document.activeElement).toEqual(start)
+      }
+    })
+
+    it('should leave the focus where it is when a label of a disabled picker is clicked', () => {
+      buildPicker({ disabled: true, format: 'dd.MM.yyyy' }, '<textarea id="notes"></textarea><span id="period-label" class="form-label">Reporting period</span><div id="picker" aria-labelledby="period-label"></div>')
+
+      fixtureEl.querySelector('#period-label').click()
+
+      expect(document.activeElement).toEqual(document.body)
+    })
+
     it('should keep a role the page wrote on the picker', () => {
       buildPicker({}, '<div id="picker" role="region" aria-label="Reporting period"></div>')
 

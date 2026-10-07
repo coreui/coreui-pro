@@ -8,6 +8,7 @@
 import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
+import { onLabelClick } from './util/field-label.js'
 import { getFeedbackIds } from './util/form-validation.js'
 import {
   defineJQueryPlugin, getNextActiveElement, isRTL, jQueryDispatch
@@ -102,6 +103,7 @@ class OTPInput extends BaseComponent {
   protected declare _ownsInvalidClass: boolean
   protected declare _placeholders: Map<HTMLInputElement, string | null>
   protected declare _readOnlySlots: Set<HTMLInputElement>
+  protected declare _removeLabelClick: () => void
   protected declare _reported: boolean
   protected declare _requiredSlots: Set<HTMLInputElement>
   protected declare _resetHandler: (event: Event) => void
@@ -140,6 +142,7 @@ class OTPInput extends BaseComponent {
     this._createValueField()
     this._setInputsTabIndexes()
     this._addEventListeners()
+    this._removeLabelClick = onLabelClick(this._element, () => this._focusFirstEmptySlot())
   }
 
   // Getters
@@ -172,6 +175,7 @@ class OTPInput extends BaseComponent {
       return
     }
 
+    this._removeLabelClick()
     EventHandler.off(document, EVENT_RESET, this._resetHandler)
     this._validityObserver?.disconnect()
     this._inputElement?.remove()
@@ -348,10 +352,7 @@ class OTPInput extends BaseComponent {
     })
 
     EventHandler.on(this._element, EVENT_FOCUS, SELECTOR_VALUE_FIELD, () => {
-      const inputs = this._getInputs()
-      const target = inputs.find(input => !input.value) ?? inputs[0]
-
-      target?.focus()
+      this._focusFirstEmptySlot()
     })
 
     EventHandler.on(this._element, EVENT_INVALID, SELECTOR_VALUE_FIELD, () => {
@@ -420,6 +421,13 @@ class OTPInput extends BaseComponent {
         form.requestSubmit()
       }
     }
+  }
+
+  _focusFirstEmptySlot(): void {
+    const inputs = this._getInputs()
+    const target = inputs.find(input => !input.value) ?? inputs[0]
+
+    target?.focus()
   }
 
   _getInputs(): HTMLInputElement[] {

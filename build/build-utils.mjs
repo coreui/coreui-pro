@@ -8,7 +8,7 @@ import browserTargets from './browser-targets.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-const UTILS = ['announce', 'calendar', 'date-sections', 'form-validation', 'range', 'time']
+const UTILS = ['announce', 'calendar', 'date-sections', 'field-label', 'form-validation', 'range', 'time']
 
 const bundle = await rolldown({
   input: Object.fromEntries(UTILS.map(name => [name, path.resolve(__dirname, `../js/src/util/${name}.ts`)])),

@@ -175,6 +175,8 @@ The locale decides whether the field and the time columns use a 12-hour or a 24-
 
 The toggle button carries the panel's state — `aria-haspopup="dialog"`, `aria-controls` pointing at the popup while it is open, and `aria-expanded` tracking whether it is open — so a screen reader announces what the button does and whether the panel is showing. The panel itself is a `dialog` with `aria-modal`, so focus moves into it on open, stays there while it is open, and returns to the field when it closes. The field itself is a [time input](/forms/time-input/#accessibility), a group of spinbutton sections, so its arrow keys belong to the value and the popup opens on the native dropdown keys.
 
+Clicking a label that names the field, through `aria-labelledby` or a `<label for>` pointing at the element, moves focus to the first empty section of the field.
+
 An `aria-label`, `aria-labelledby` or `aria-describedby` on the picker element moves to the field, so a screen reader announces the name and the description when focus enters it, and the picker element gets them back on dispose. Point `aria-labelledby` at the visible label, as the examples on this page do; it names the field over `floatingLabel` and an `ariaLabel` in `inputOptions`, the way the browser ranks names.
 
 An `.is-invalid` class you write on the picker element, the server-side route, marks the field invalid for assistive technologies too: its sections carry `aria-invalid="true"` and are described by the error message after the picker, for as long as the class stays. An `aria-invalid="true"` on the element marks the sections invalid as well; write it with the class, which is what shows the message.

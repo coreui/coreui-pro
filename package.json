@@ -166,6 +166,16 @@
         "default": "./js/dist/util/date-sections.js"
       }
     },
+    "./utils/field-label": {
+      "import": {
+        "types": "./js/dist/util/field-label.d.mts",
+        "default": "./js/dist/util/field-label.mjs"
+      },
+      "require": {
+        "types": "./js/dist/util/field-label.d.ts",
+        "default": "./js/dist/util/field-label.js"
+      }
+    },
     "./utils/form-validation": {
       "import": {
         "types": "./js/dist/util/form-validation.d.mts",
