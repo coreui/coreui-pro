@@ -9,7 +9,7 @@ import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
-import { clearValidationState, focusFirstInvalidControl, updateValidationState } from './util/form-validation.js'
+import { clearValidationState, updateValidationState, validateForm } from './util/form-validation.js'
 import type { ValidationMarks } from './util/form-validation.js'
 import {
   defineJQueryPlugin, getNextActiveElement, getUID, isDisabled, jQueryDispatch
@@ -363,37 +363,28 @@ class Stepper extends BaseComponent {
       return true
     }
 
-    const isValid = form.checkValidity()
-    const focusedElement = this._getFocusedElement()
+    const stepIndex = this._stepButtons.indexOf(element) + 1
 
-    EventHandler.trigger(this._element, EVENT_STEP_VALIDATION_COMPLETE, {
-      stepIndex: this._stepButtons.indexOf(element) + 1,
-      isValid
-    })
+    if (!form.noValidate) {
+      EventHandler.trigger(this._element, EVENT_STEP_VALIDATION_COMPLETE, { stepIndex, isValid: form.checkValidity() })
 
-    if (!isValid) {
-      if (form.noValidate) {
-        this._showValidationState(form, this._getFocusedElement() === focusedElement)
-      } else {
-        form.reportValidity()
-      }
-
-      return false
+      return form.reportValidity()
     }
 
-    return true
+    const { isValid } = validateForm(form, this._validationMarks, isValid => {
+      EventHandler.trigger(this._element, EVENT_STEP_VALIDATION_COMPLETE, { stepIndex, isValid })
+      return false
+    })
+
+    this._trackValidatedForm(form)
+
+    return isValid
   }
 
-  _showValidationState(form: HTMLFormElement, moveFocus: boolean): void {
-    updateValidationState(form, this._validationMarks)
-
+  _trackValidatedForm(form: HTMLFormElement): void {
     if (!this._validatedForms.has(form)) {
       this._validatedForms.add(form)
       EventHandler.on(form, EVENT_INPUT, () => updateValidationState(form, this._validationMarks))
-    }
-
-    if (moveFocus) {
-      focusFirstInvalidControl(form)
     }
   }
 

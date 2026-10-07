@@ -1833,7 +1833,7 @@ describe('Stepper', () => {
       expect(input.hasAttribute('aria-invalid')).toBeFalse()
     })
 
-    it('should stop updating the controls after reset until a step fails again', () => {
+    it('should stop updating the controls after reset until a step is validated again', () => {
       fixtureEl.innerHTML = validationFixture('novalidate')
       const stepper = new Stepper(fixtureEl.querySelector('.stepper'))
       const filled = fixtureEl.querySelector('#filled')
@@ -1927,6 +1927,70 @@ describe('Stepper', () => {
 
       expect(fixtureEl.querySelector('#empty')).toHaveClass('is-invalid')
       expect(fixtureEl.querySelector('#filled')).toHaveClass('is-valid')
+    })
+
+    it('should block a step whose stepValidationComplete handler sets a custom validity', () => {
+      fixtureEl.innerHTML = validationFixture('novalidate')
+      fixtureEl.querySelector('#empty').value = 'taken'
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      const filled = fixtureEl.querySelector('#filled')
+
+      stepperElement.addEventListener('stepValidationComplete.coreui.stepper', () => {
+        filled.setCustomValidity('This name is taken.')
+      })
+      stepper.showStep(2)
+
+      expect(fixtureEl.querySelector('#step1')).toHaveClass('active')
+      expect(filled).toHaveClass('is-invalid')
+      expect(document.activeElement).toEqual(filled)
+    })
+
+    it('should block a step whose stepValidationComplete handler sets a custom validity in a form the browser validates', () => {
+      fixtureEl.innerHTML = validationFixture('')
+      fixtureEl.querySelector('#empty').value = 'taken'
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      const filled = fixtureEl.querySelector('#filled')
+      const events = []
+
+      stepperElement.addEventListener('stepValidationComplete.coreui.stepper', event => {
+        events.push(event.isValid)
+        filled.setCustomValidity('This name is taken.')
+      })
+      stepper.showStep(2)
+
+      expect(events).toEqual([true])
+      expect(fixtureEl.querySelector('#step1')).toHaveClass('active')
+      expect(filled).not.toHaveClass('is-invalid')
+    })
+
+    it('should take the state off a control fixed without typing once the step passes', () => {
+      fixtureEl.innerHTML = validationFixture('novalidate')
+      const stepper = new Stepper(fixtureEl.querySelector('.stepper'))
+      const input = fixtureEl.querySelector('#empty')
+
+      stepper.next()
+
+      expect(input).toHaveClass('is-invalid')
+
+      input.value = 'set by the page'
+      stepper.next()
+
+      expect(fixtureEl.querySelector('#step2')).toHaveClass('active')
+      expect(input).not.toHaveClass('is-invalid')
+      expect(input.hasAttribute('aria-invalid')).toBeFalse()
+    })
+
+    it('should mark the valid controls of a step that passes in a form with data-coreui-validate="valid"', () => {
+      fixtureEl.innerHTML = validationFixture('novalidate data-coreui-validate="valid"')
+      fixtureEl.querySelector('#empty').value = 'filled'
+      const stepper = new Stepper(fixtureEl.querySelector('.stepper'))
+
+      stepper.next()
+
+      expect(fixtureEl.querySelector('#step2')).toHaveClass('active')
+      expect([...fixtureEl.querySelectorAll('#step1 input')].map(input => input.classList.contains('is-valid'))).toEqual([true, true])
     })
 
     it('should clear the invalid state as the user corrects the control', () => {
