@@ -186,7 +186,7 @@ class Stepper extends BaseComponent {
       return
     }
 
-    this._isCurrentStepValid(active)
+    this.finish()
   }
 
   prev(): void {
