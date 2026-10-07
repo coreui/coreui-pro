@@ -58,6 +58,10 @@ $form-group-tokens: defaults(
     margin-bottom: 0;
   }
 
+  > .form-text {
+    margin-top: 0;
+  }
+
   &:has(#{$control-children}) {
     grid-template-columns: auto 1fr;
     column-gap: var(--#{$prefix}form-field-column-gap);

@@ -58,6 +58,10 @@
     color: $color;
   }
 
+  .form-field > .#{$state}-feedback {
+    margin-top: 0;
+  }
+
   // More specific to override base tooltip styles
   .tooltip.#{$state}-tooltip,
   .#{$state}-tooltip {

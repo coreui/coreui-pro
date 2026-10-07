@@ -2885,6 +2885,10 @@ Multi Select's option indicators moved with it — they render as a decorative
   form is spaced by the field instead of by margin utilities on its parts. A bare
   `.form-check-input` (one written without its `.form-check` wrapper) switches the
   field to a two-column layout through `:has()`.
+  Inside a field the gap is the only spacing: a `.form-text` and a `-feedback`
+  that are its direct children lose their `margin-top`, as the label loses its
+  `margin-bottom`, so the help text sits 0.5rem under the control instead of
+  0.75rem.
 
 #### Stacks
 
