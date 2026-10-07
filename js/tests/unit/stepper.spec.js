@@ -706,15 +706,57 @@ describe('Stepper', () => {
       expect(buttons[0]).toHaveClass('active')
     })
 
-    it('should do nothing if on the last step', () => {
+    it('should finish the stepper on the last step, as finish() does', () => {
       fixtureEl.innerHTML = getThreeStepFixture({ activeStep: 3 })
       const stepperElement = fixtureEl.querySelector('.stepper')
       const stepper = new Stepper(stepperElement)
+      let finished = 0
+      stepperElement.addEventListener('finish.coreui.stepper', () => {
+        finished++
+      })
 
       stepper.next()
 
-      const buttons = fixtureEl.querySelectorAll('.stepper-step-button')
-      expect(buttons[2]).toHaveClass('active')
+      expect(finished).toBe(1)
+      expect(stepper._isFinished).toBeTrue()
+      expect(fixtureEl.querySelectorAll('.stepper-step-button')[2]).toHaveClass('complete')
+    })
+
+    it('should not finish the stepper on a last step that fails validation', () => {
+      fixtureEl.innerHTML = `
+        <div class="stepper" data-coreui-stepper>
+          <ol class="stepper-steps">
+            <li class="stepper-step">
+              <button type="button" class="stepper-step-button" data-coreui-target="#step1">
+                <span class="stepper-step-indicator">1</span>
+              </button>
+            </li>
+            <li class="stepper-step">
+              <button type="button" class="stepper-step-button active" data-coreui-target="#step2">
+                <span class="stepper-step-indicator">2</span>
+              </button>
+            </li>
+          </ol>
+          <div id="step1" class="stepper-pane"></div>
+          <div id="step2" class="stepper-pane active show">
+            <form novalidate>
+              <input type="text" required value="">
+            </form>
+          </div>
+        </div>
+      `
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      let finished = 0
+      stepperElement.addEventListener('finish.coreui.stepper', () => {
+        finished++
+      })
+
+      stepper.next()
+
+      expect(finished).toBe(0)
+      expect(stepper._isFinished).toBeFalse()
+      expect(fixtureEl.querySelector('input')).toHaveClass('is-invalid')
     })
   })
 
@@ -889,6 +931,38 @@ describe('Stepper', () => {
 
         stepper.finish()
       })
+    })
+
+    it('should finish once when next() or finish() is called again while the step content collapses', async () => {
+      fixtureEl.innerHTML = `
+        <div class="stepper" data-coreui-stepper>
+          <ol class="stepper-steps">
+            <li class="stepper-step">
+              <button type="button" class="stepper-step-button active">
+                <span class="stepper-step-indicator">1</span>
+              </button>
+              <div class="stepper-step-content active show">
+                <p>Content</p>
+              </div>
+            </li>
+          </ol>
+        </div>
+      `
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      let finished = 0
+      stepperElement.addEventListener('finish.coreui.stepper', () => {
+        finished++
+      })
+
+      stepper.next()
+      stepper.next()
+      stepper.finish()
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect(finished).toBe(1)
     })
 
     it('should call finishHandler directly when neither pane nor stepContent exist', () => {
@@ -3228,7 +3302,7 @@ describe('Stepper', () => {
   })
 
   describe('edge cases', () => {
-    it('should handle stepper with only one step', () => {
+    it('should finish a stepper with only one step on next()', () => {
       fixtureEl.innerHTML = `
         <div class="stepper" data-coreui-stepper>
           <ol class="stepper-steps">
@@ -3249,7 +3323,9 @@ describe('Stepper', () => {
       stepper.prev()
 
       const button = fixtureEl.querySelector('.stepper-step-button')
-      expect(button).toHaveClass('active')
+      expect(stepper._isFinished).toBeTrue()
+      expect(button).toHaveClass('complete')
+      expect(button).not.toHaveClass('active')
     })
 
     it('should handle finish() when on non-last step (advances to next)', () => {

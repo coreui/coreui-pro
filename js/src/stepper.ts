@@ -186,7 +186,7 @@ class Stepper extends BaseComponent {
       return
     }
 
-    this._isCurrentStepValid(active)
+    this.finish()
   }
 
   prev(): void {
@@ -225,6 +225,8 @@ class Stepper extends BaseComponent {
     if (!this._isCurrentStepValid(active)) {
       return
     }
+
+    this._isFinished = true
 
     const finishHandler = () => {
       active.classList.remove(CLASS_NAME_ACTIVE)

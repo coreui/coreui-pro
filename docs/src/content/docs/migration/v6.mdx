@@ -1863,6 +1863,14 @@ as `validate.coreui.form` does, so a validity its handler sets with
 control passed before the handler ran. `next()` and `finish()` fire it once
 per step instead of twice.
 
+#### Stepper: `next()` on the last step finishes the stepper
+
+`next()` on the last enabled step now does what `finish()` does: it validates
+the step and, when it passes, finishes the stepper and fires
+`finish.coreui.stepper`. It used to validate the step and stop, so a wizard
+driven by a single Next control never finished. A step button with
+`.disabled` does not count, so `next()` finishes on the step before it.
+
 #### Input group: `.has-validation` removed
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
