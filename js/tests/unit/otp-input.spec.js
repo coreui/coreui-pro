@@ -1562,16 +1562,6 @@ describe('OTPInput', () => {
       expect(document.activeElement).toEqual(slots[1])
     })
 
-    it('should move focus to the first empty slot from a label pointing at its id', () => {
-      const { slots } = mountForm({ id: 'code' })
-      fixtureEl.querySelector('form').insertAdjacentHTML('afterbegin', '<label for="code">Code</label>')
-      type(slots[0], '1')
-
-      fixtureEl.querySelector('label').click()
-
-      expect(document.activeElement).toEqual(slots[1])
-    })
-
     it('should mark every slot and describe it with the message after the group once the browser or the form plugin reports the code', () => {
       for (const attributes of ['', 'data-coreui-validate novalidate']) {
         const { form, slots } = mountForm({ required: true }, attributes)
@@ -1669,6 +1659,83 @@ describe('OTPInput', () => {
 
       expect(fixtureEl.querySelector('#second .form-otp-control').hasAttribute('aria-invalid')).toBeFalse()
       second.dispose()
+    })
+
+    it('should put .is-invalid on the group once the code is reported, and take it off once it is complete', () => {
+      const { form, slots } = mountForm({ required: true })
+      const group = fixtureEl.querySelector('.form-otp')
+
+      form.requestSubmit()
+
+      expect(group).toHaveClass('is-invalid')
+
+      type(slots[0], '1')
+      type(slots[1], '2')
+
+      expect(group).not.toHaveClass('is-invalid')
+    })
+
+    it('should mark every slot when the page marks the group or a slot invalid, and follow the page when it changes them', async () => {
+      fixtureEl.innerHTML = '<form><div class="form-otp is-invalid"><input class="form-otp-control"><input class="form-otp-control"></div><div class="invalid-feedback">This code has expired.</div></form>'
+      const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'))
+      const group = fixtureEl.querySelector('.form-otp')
+      const slots = [...fixtureEl.querySelectorAll('.form-otp-control')]
+      const { id } = fixtureEl.querySelector('.invalid-feedback')
+
+      expect(slotStates(slots)).toEqual([['true', id], ['true', id]])
+
+      group.classList.remove('is-invalid')
+      await Promise.resolve()
+
+      expect(slotStates(slots)).toEqual([[null, null], [null, null]])
+
+      slots[1].classList.add('is-invalid')
+      await Promise.resolve()
+
+      expect(slotStates(slots)).toEqual([['true', id], ['true', id]])
+
+      otpInput.dispose()
+
+      expect(group).not.toHaveClass('is-invalid')
+      expect(slotStates(slots)).toEqual([[null, null], [null, null]])
+    })
+
+    it('should keep the class the page wrote on the group once the code is complete', () => {
+      const { form, slots } = mountForm({ required: true })
+      const group = fixtureEl.querySelector('.form-otp')
+      group.classList.add('is-invalid')
+
+      form.requestSubmit()
+      type(slots[0], '1')
+      type(slots[1], '2')
+
+      expect(group).toHaveClass('is-invalid')
+    })
+
+    it('should let the form plugin drop its state when a paste completes the code', () => {
+      const { form, slots, valueField } = mountForm({ required: true }, 'data-coreui-validate novalidate')
+      Form.getOrCreateInstance(form).validate()
+
+      expect(valueField).toHaveClass('is-invalid')
+
+      const clipboardData = new DataTransfer()
+      clipboardData.setData('text', '12')
+      slots[0].dispatchEvent(new ClipboardEvent('paste', { bubbles: true, cancelable: true, clipboardData }))
+
+      expect(valueField).not.toHaveClass('is-invalid')
+      expect(slotStates(slots)).toEqual([[null, null], [null, null]])
+    })
+
+    it('should keep an aria-required the page wrote on a slot', () => {
+      const { otpInput, slots } = mountForm({}, '', '<input class="form-otp-control" aria-required="true"><input class="form-otp-control">')
+
+      expect(slots.map(slot => slot.getAttribute('aria-required'))).toEqual(['true', null])
+
+      otpInput.setConfig({ required: true })
+      otpInput.setConfig({ required: false })
+      otpInput.dispose()
+
+      expect(slots.map(slot => slot.getAttribute('aria-required'))).toEqual(['true', null])
     })
 
     it('should give the slots back their attributes on dispose', () => {

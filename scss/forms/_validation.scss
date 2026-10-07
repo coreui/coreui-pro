@@ -41,7 +41,7 @@
   $border-color: var(--#{$prefix}#{$theme}-fg)
 ) {
   $without-error: ":not(.is-invalid, :has(.is-invalid, > :user-invalid, > .form-floating > :user-invalid))";
-  $form-otp-state: ".form-otp:where(.is-#{$state}, :has(.is-#{$state}))";
+  $form-otp-state: ".form-otp:is(.is-#{$state}, :has(.is-#{$state}))";
 
   @if $state != "invalid" {
     $form-otp-state: "#{$form-otp-state}#{$without-error}";
@@ -389,7 +389,7 @@
       ~ .invalid-tooltip { display: block; }
     }
   } @else if $state == "valid" {
-    [data-coreui-validate~="valid"] .form-otp:not(:has(.is-invalid, :user-invalid)):has(> input:not(.form-otp-control):user-valid) {
+    [data-coreui-validate~="valid"] .form-otp#{$without-error}:not(:has(:user-invalid)):has(> input:not(.form-otp-control):user-valid) {
       .form-otp-control {
         @include form-otp-control-validation-state($border-color, $focus-ring-color);
       }

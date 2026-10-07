@@ -8,6 +8,7 @@
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  */
 
+import { userEvent } from '@vitest/browser/context'
 // eslint-disable-next-line import/no-unassigned-import
 import '../../../scss/coreui.scss'
 import DateInput from '../../src/date-input.js'
@@ -201,6 +202,43 @@ describe('messages of a form field', () => {
       slots[0].dispatchEvent(new Event('input', { bubbles: true }))
 
       validateForm(form, new WeakMap())
+
+      expect(displayOf('.invalid-feedback')).toBe('block')
+      expect(displayOf('.valid-feedback')).toBe('none')
+
+      instance.dispose()
+    })
+
+    it('keeps every slot in the error colour when the form validation reports a code the user touched', async () => {
+      const { form, instance, slots } = mountOtp('data-coreui-validate="valid" novalidate')
+
+      for (const slot of slots) {
+        slot.style.transition = 'none'
+      }
+
+      await userEvent.type(slots[0], '1')
+
+      expect(slots[0].matches(':user-valid')).toBeTrue()
+
+      validateForm(form, new WeakMap())
+
+      const { color } = getComputedStyle(container.querySelector('.invalid-feedback'))
+
+      expect(slots.map(slot => getComputedStyle(slot).borderTopColor)).toEqual([color, color])
+
+      instance.dispose()
+    })
+
+    it('shows only the error once the page marks the group invalid after a submit the browser took', () => {
+      const { form, instance, slots } = mountOtp('data-coreui-validate="valid" novalidate')
+
+      for (const [index, slot] of slots.entries()) {
+        slot.value = String(index)
+        slot.dispatchEvent(new Event('input', { bubbles: true }))
+      }
+
+      form.requestSubmit()
+      container.querySelector('.form-otp').classList.add('is-invalid')
 
       expect(displayOf('.invalid-feedback')).toBe('block')
       expect(displayOf('.valid-feedback')).toBe('none')
