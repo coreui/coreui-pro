@@ -1,6 +1,6 @@
 import { vi } from 'vitest'
 import {
-  clearValidationState, focusFirstInvalidControl, getFeedbackIds, updateValidationState, validateForm
+  clearValidationState, focusFirstInvalidControl, getFeedbackIds, isFormValid, updateValidationState, validateForm
 } from '../../../src/util/form-validation.js'
 import { clearFixture, getFixture } from '../../helpers/fixture.js'
 
@@ -398,6 +398,29 @@ describe('Form validation utilities', () => {
 
       expect(empty).not.toHaveClass('is-invalid')
       expect(empty.hasAttribute('aria-invalid')).toBeFalse()
+    })
+  })
+
+  describe('isFormValid', () => {
+    it('should answer as checkValidity() does, without firing invalid events', () => {
+      fixtureEl.innerHTML = '<form><input id="name" required value="filled"><button id="send">Send</button><fieldset><input id="note"></fieldset></form>'
+      const form = fixtureEl.querySelector('form')
+      const name = fixtureEl.querySelector('#name')
+      const handleInvalid = vi.fn()
+      form.addEventListener('invalid', handleInvalid, true)
+
+      expect(isFormValid(form)).toBeTrue()
+
+      name.value = ''
+
+      expect(isFormValid(form)).toBeFalse()
+
+      name.value = 'filled'
+      fixtureEl.querySelector('#send').setCustomValidity('Not now')
+
+      expect(isFormValid(form)).toBe(form.checkValidity())
+      expect(isFormValid(form)).toBeFalse()
+      expect(handleInvalid).toHaveBeenCalledTimes(1)
     })
   })
 

@@ -504,6 +504,15 @@ export const focusFirstInvalidControl = (form: HTMLFormElement): void => {
 }
 
 /**
+ * Reads whether a form is valid the way `checkValidity()` answers, without firing `invalid` events.
+ *
+ * @param form - The form to read
+ * @returns Whether every control that takes part in validation is valid
+ */
+export const isFormValid = (form: HTMLFormElement): boolean =>
+  [...form.elements].every(control => (control as FormControl).willValidate !== true || (control as FormControl).validity.valid)
+
+/**
  * Validates a form the way a submit does. The hook learns whether every control is valid; unless it
  * takes the result over, every control shows its state, and when one is invalid focus moves to the
  * first that can take it, unless the hook moved focus itself. Validity is read again after the hook,
@@ -522,7 +531,7 @@ export const validateForm = (
   onValidate?: (isValid: boolean) => boolean
 ): { handled: boolean, isValid: boolean } => {
   const focusedElement = getFocusedElement(form)
-  const isValid = [...form.elements].every(control => !isValidatable(control) || control.validity.valid)
+  const isValid = isFormValid(form)
 
   if (onValidate?.(isValid)) {
     return { handled: false, isValid }

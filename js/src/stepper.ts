@@ -9,7 +9,9 @@ import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
-import { clearValidationState, focusFirstInvalidControl, updateValidationState } from './util/form-validation.js'
+import {
+  clearValidationState, isFormValid, updateValidationState, validateForm
+} from './util/form-validation.js'
 import type { ValidationMarks } from './util/form-validation.js'
 import {
   defineJQueryPlugin, getNextActiveElement, getUID, isDisabled, jQueryDispatch
@@ -174,10 +176,6 @@ class Stepper extends BaseComponent {
       return
     }
 
-    if (!this._isCurrentStepValid(this._getActiveElem())) {
-      return
-    }
-
     const steps = this._getEnabledStepButtons()
     const active = this._getActiveElem()
     const index = steps.indexOf(active)
@@ -185,7 +183,10 @@ class Stepper extends BaseComponent {
 
     if (next) {
       this.showStep(next)
+      return
     }
+
+    this._isCurrentStepValid(active)
   }
 
   prev(): void {
@@ -208,10 +209,6 @@ class Stepper extends BaseComponent {
       return
     }
 
-    if (!this._isCurrentStepValid(this._getActiveElem())) {
-      return
-    }
-
     const steps = this._getEnabledStepButtons()
     const active = this._getActiveElem()
     const index = steps.indexOf(active)
@@ -222,6 +219,10 @@ class Stepper extends BaseComponent {
         this.showStep(next)
       }
 
+      return
+    }
+
+    if (!this._isCurrentStepValid(active)) {
       return
     }
 
@@ -273,11 +274,8 @@ class Stepper extends BaseComponent {
     }
 
     for (const form of this._validatedForms) {
-      EventHandler.off(form, EVENT_INPUT)
-      clearValidationState(form, this._validationMarks)
+      this._untrackValidatedForm(form)
     }
-
-    this._validatedForms.clear()
 
     const firstStep = this._initialStepButton || this._stepButtons[0]
     firstStep.classList.add(CLASS_NAME_ACTIVE)
@@ -310,8 +308,7 @@ class Stepper extends BaseComponent {
 
   override dispose(): void {
     for (const form of this._validatedForms) {
-      EventHandler.off(form, EVENT_INPUT)
-      clearValidationState(form, this._validationMarks)
+      this._untrackValidatedForm(form)
     }
 
     super.dispose()
@@ -363,38 +360,37 @@ class Stepper extends BaseComponent {
       return true
     }
 
-    const isValid = form.checkValidity()
-    const focusedElement = this._getFocusedElement()
+    const stepIndex = this._stepButtons.indexOf(element) + 1
 
-    EventHandler.trigger(this._element, EVENT_STEP_VALIDATION_COMPLETE, {
-      stepIndex: this._stepButtons.indexOf(element) + 1,
-      isValid
-    })
+    if (!form.noValidate) {
+      EventHandler.trigger(this._element, EVENT_STEP_VALIDATION_COMPLETE, { stepIndex, isValid: isFormValid(form) })
 
-    if (!isValid) {
-      if (form.noValidate) {
-        this._showValidationState(form, this._getFocusedElement() === focusedElement)
-      } else {
-        form.reportValidity()
-      }
-
-      return false
+      return form.reportValidity()
     }
 
-    return true
+    const { isValid } = validateForm(form, this._validationMarks, isValid => {
+      EventHandler.trigger(this._element, EVENT_STEP_VALIDATION_COMPLETE, { stepIndex, isValid })
+      return false
+    })
+
+    this._trackValidatedForm(form)
+
+    return isValid
   }
 
-  _showValidationState(form: HTMLFormElement, moveFocus: boolean): void {
-    updateValidationState(form, this._validationMarks)
-
+  _trackValidatedForm(form: HTMLFormElement): void {
     if (!this._validatedForms.has(form)) {
       this._validatedForms.add(form)
       EventHandler.on(form, EVENT_INPUT, () => updateValidationState(form, this._validationMarks))
+      EventHandler.on(form, EVENT_RESET, () => this._untrackValidatedForm(form))
     }
+  }
 
-    if (moveFocus) {
-      focusFirstInvalidControl(form)
-    }
+  _untrackValidatedForm(form: HTMLFormElement): void {
+    EventHandler.off(form, EVENT_INPUT)
+    EventHandler.off(form, EVENT_RESET)
+    clearValidationState(form, this._validationMarks)
+    this._validatedForms.delete(form)
   }
 
   _activate(element: any): void {

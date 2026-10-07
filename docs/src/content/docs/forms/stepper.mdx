@@ -342,7 +342,17 @@ In non-linear mode, all steps are accessible unless explicitly disabled.
 
 The Stepper Component includes native HTML5 validation for each step. Before allowing the user to move to the next step, the associated form (if present) is validated automatically.
 
-If a form is invalid, the stepper blocks navigation and displays validation messages. Going back to an earlier step does not validate the current one.
+If a form is invalid, the stepper blocks navigation and displays validation messages. Going back to an earlier step does not validate the current one. Every validation triggers `stepValidationComplete.coreui.stepper` first, before the browser's `invalid` events and before the stepper decides, with `event.isValid` telling whether every control passed. A validity the handler sets with `setCustomValidity()`, for example when two passwords differ, counts for the step; clear it with `setCustomValidity('')` once the rule holds, or the step stays blocked. `preventDefault()` on the event has no effect.
+
+```js
+const stepperElement = document.getElementById('myStepper')
+const password = document.getElementById('password')
+const confirmPassword = document.getElementById('confirmPassword')
+
+stepperElement.addEventListener('stepValidationComplete.coreui.stepper', () => {
+  confirmPassword.setCustomValidity(confirmPassword.value === password.value ? '' : 'Passwords do not match.')
+})
+```
 
 ### Browser default validation
 
@@ -408,7 +418,7 @@ This example shows a stepper with native browser validation enabled:
 
 ### Custom styles
 
-To disable native browser styles validation and turn on custom styles, add the `novalidate` attribute to your forms. The stepper then marks the invalid controls with `.is-invalid` and `aria-invalid="true"` when a step fails, moves focus to the first of them, and keeps the state updated as the user corrects them; add `data-coreui-validate="valid"` to a form to also mark the valid controls with `.is-valid`. If a handler of `stepValidationComplete.coreui.stepper` moves focus itself, for example to an error summary, the stepper leaves it there. While a control is invalid, the stepper adds its `.invalid-feedback` to its `aria-describedby` and takes it out once the control is valid, so the message is read together with the field: the `.invalid-feedback` and `.invalid-tooltip` the stylesheet shows for the control, that is the ones after it or after its `.form-control-group`, and, for a check, a radio, a switch, a `.form-control` or `.form-select` in an input group, or a control placed directly in a frame, the ones of each `.form-field` around it. Name a message placed anywhere else in `data-coreui-invalid-feedback`. A message that changes while the user types is not read again; announce it with [`announce()`](/getting-started/accessibility/#announcing-messages) when it has to be:
+To disable native browser styles validation and turn on custom styles, add the `novalidate` attribute to your forms. Each time it validates a step, the stepper then marks the invalid controls with `.is-invalid` and `aria-invalid="true"` and takes that state off the controls that pass, moves focus to the first invalid control when the step fails, and from then on keeps the state updated as the user changes the controls, until the form or the stepper is reset; add `data-coreui-validate="valid"` to a form to also mark the valid controls with `.is-valid`. If a handler of `stepValidationComplete.coreui.stepper` moves focus itself, for example to an error summary, the stepper leaves it there. While a control is invalid, the stepper adds its `.invalid-feedback` to its `aria-describedby` and takes it out once the control is valid, so the message is read together with the field: the `.invalid-feedback` and `.invalid-tooltip` the stylesheet shows for the control, that is the ones after it or after its `.form-control-group`, and, for a check, a radio, a switch, a `.form-control` or `.form-select` in an input group, or a control placed directly in a frame, the ones of each `.form-field` around it. Name a message placed anywhere else in `data-coreui-invalid-feedback`. A message that changes while the user types is not read again; announce it with [`announce()`](/getting-started/accessibility/#announcing-messages) when it has to be:
 
 <Example pro code={`<div class="stepper" data-coreui-stepper id="novalidateStepper">
     <ol class="stepper-steps">
@@ -610,7 +620,7 @@ const stepperList = stepperElementList.map(stepperEl => {
 | `finish.coreui.stepper` | Triggered when the last step is completed. |
 | `reset.coreui.stepper` | Triggered when the stepper is reset. |
 | `stepChange.coreui.stepper` | Fired when the active step changes. |
-| `stepValidationComplete.coreui.stepper` | Fired after validating the current step's form. |
+| `stepValidationComplete.coreui.stepper` | Fired when the current step's form is validated, before the stepper decides. `event.isValid` tells whether every control passed; a validity the handler sets with `setCustomValidity()` counts for the step. |
 
 Example:
 
