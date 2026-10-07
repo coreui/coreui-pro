@@ -339,6 +339,7 @@ The one-time password input component is designed with accessibility in mind and
 
 - **ARIA Labels**: Each input field automatically receives descriptive `aria-label` attributes
 - **Role Attribute**: The container has `role="group"` to indicate related form controls
+- **Required**: with `data-coreui-required="true"`, every slot carries `aria-required="true"`, since the value input that holds `required` is hidden from assistive technologies
 - **Keyboard Navigation**: Full keyboard support with arrow keys, tab, and backspace
 - **Screen Reader Support**: Clear announcements when values change; while the code is reported invalid, every slot carries `aria-invalid="true"` and the error message after the group
 - **Focus Management**: Automatic focus handling for seamless navigation

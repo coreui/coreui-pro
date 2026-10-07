@@ -96,11 +96,11 @@ const DefaultType = {
 
 class OTPInput extends BaseComponent {
   protected declare _disabledSlots: Set<HTMLInputElement>
-  protected declare _form: HTMLFormElement | null
   protected declare _inputElement: HTMLInputElement | null
   protected declare _placeholders: Map<HTMLInputElement, string | null>
   protected declare _readOnlySlots: Set<HTMLInputElement>
   protected declare _reported: boolean
+  protected declare _resetHandler: (event: Event) => void
   protected declare _slotAria: Map<HTMLInputElement, { describedBy: string | null, invalid: string | null }>
 
   constructor(element?: string | Element | null, config?: Partial<OtpInputConfig> | null) {
@@ -108,17 +108,28 @@ class OTPInput extends BaseComponent {
 
     this._config = this._getConfig(config)
     this._disabledSlots = new Set()
-    this._form = this._element.closest('form')
     this._inputElement = null
     this._placeholders = new Map()
     this._readOnlySlots = new Set()
     this._reported = false
     this._slotAria = new Map()
+    this._resetHandler = (event: Event) => {
+      if (!(event.target as Node).contains(this._element)) {
+        return
+      }
+
+      setTimeout(() => {
+        if (this._element && !event.defaultPrevented) {
+          this._reported = false
+          this._syncValidity()
+        }
+      })
+    }
 
     this._setRoleAttribute()
     this._setInputsAttributes()
     this._seedSlots()
-    this._createHiddenInput()
+    this._createValueField()
     this._setInputsTabIndexes()
     this._addEventListeners()
   }
@@ -143,7 +154,7 @@ class OTPInput extends BaseComponent {
       input.value = ''
     }
 
-    this._setHiddenInputValue(null)
+    this._setValue(null)
     this._syncFirstInputMaxLength()
     this._setInputsTabIndexes()
   }
@@ -153,10 +164,16 @@ class OTPInput extends BaseComponent {
       return
     }
 
-    EventHandler.off(this._form, EVENT_RESET)
+    EventHandler.off(document, EVENT_RESET, this._resetHandler)
     this._inputElement?.remove()
     this._reported = false
     this._syncValidity()
+
+    if (this._config.required) {
+      for (const input of this._getInputs()) {
+        input.removeAttribute('aria-required')
+      }
+    }
 
     for (const input of this._disabledSlots) {
       input.disabled = false
@@ -175,7 +192,7 @@ class OTPInput extends BaseComponent {
 
   reset(): void {
     this._seedSlots({ clearWhenEmpty: true })
-    this._setHiddenInputValue(this._readSlots() || null)
+    this._setValue(this._readSlots() || null)
     this._setInputsTabIndexes()
   }
 
@@ -195,11 +212,10 @@ class OTPInput extends BaseComponent {
     }
 
     this._setInputsTabIndexes()
-    this._inputElement!.remove()
-    this._createHiddenInput()
+    this._syncValueField()
 
     if (repaint) {
-      this._setHiddenInputValue(this._readSlots() || null)
+      this._setValue(this._readSlots() || null)
     }
   }
 
@@ -262,7 +278,7 @@ class OTPInput extends BaseComponent {
       const value = inputs.map((input: HTMLInputElement) => input.value).join('')
 
       if (value !== (this._inputElement ? this._inputElement.value : '')) {
-        this._setHiddenInputValue(value)
+        this._setValue(value)
       }
 
       if (target!.value.length === 1) {
@@ -334,18 +350,11 @@ class OTPInput extends BaseComponent {
       this._syncValidity()
     })
 
-    EventHandler.on(this._form, EVENT_RESET, (event: Event) => {
-      setTimeout(() => {
-        if (this._element && !event.defaultPrevented) {
-          this._reported = false
-          this._syncValidity()
-        }
-      })
-    })
+    EventHandler.on(document, EVENT_RESET, this._resetHandler)
   }
 
   // Write `chars` across the slots starting at `startInput`, then sync focus,
-  // the hidden form value and auto-submit. Shared by paste and by multi-character
+  // the form value and auto-submit. Shared by paste and by multi-character
   // `input` events.
   _distributeChars(startInput: HTMLInputElement, chars: string): void {
     const inputs = this._getInputs()
@@ -367,7 +376,7 @@ class OTPInput extends BaseComponent {
     inputs[nextEmptyIndex < inputs.length ? nextEmptyIndex : inputs.length - 1].focus()
 
     // Read the value back from the slots so already-filled ones are preserved.
-    this._setHiddenInputValue(inputs.map((input: HTMLInputElement) => input.value).join(''))
+    this._setValue(inputs.map((input: HTMLInputElement) => input.value).join(''))
     this._syncFirstInputMaxLength()
     this._setInputsTabIndexes()
     this._checkAutoSubmit(inputs)
@@ -409,31 +418,36 @@ class OTPInput extends BaseComponent {
     return this._getInputs().map(input => input.value).join('')
   }
 
-  _createHiddenInput(): void {
-    const hiddenInput = document.createElement('input')
+  _createValueField(): void {
+    const valueField = document.createElement('input')
+    valueField.type = 'text'
+    valueField.autocomplete = 'off'
+    valueField.tabIndex = -1
+    valueField.setAttribute('aria-hidden', 'true')
+    valueField.value = this._readSlots()
+
+    this._element.append(valueField)
+    this._inputElement = valueField
+    this._syncValueField()
+  }
+
+  _syncValueField(): void {
+    const valueField = this._inputElement!
     const inputs = this._getInputs()
-    hiddenInput.type = 'text'
-    hiddenInput.autocomplete = 'off'
-    hiddenInput.defaultValue = inputs.map(input => input.defaultValue).join('')
-    hiddenInput.disabled = this._config.disabled
-    hiddenInput.pattern = `${this._config.type === 'number' ? '[0-9]' : '.'}{${inputs.length}}`
-    hiddenInput.readOnly = this._config.readonly
-    hiddenInput.required = this._config.required
-    hiddenInput.tabIndex = -1
-    hiddenInput.setAttribute('aria-hidden', 'true')
+    valueField.defaultValue = inputs.map(input => input.defaultValue).join('')
+    valueField.disabled = this._config.disabled
+    valueField.pattern = `${this._config.type === 'number' ? '[0-9]' : '.'}{${inputs.length}}`
+    valueField.readOnly = this._config.readonly
+    valueField.required = this._config.required
 
-    if (this._config.id) {
-      hiddenInput.id = this._config.id
+    for (const name of ['id', 'name'] as const) {
+      if (this._config[name]) {
+        valueField[name] = this._config[name]
+      } else {
+        valueField.removeAttribute(name)
+      }
     }
 
-    if (this._config.name) {
-      hiddenInput.name = this._config.name
-    }
-
-    hiddenInput.value = this._readSlots()
-
-    this._element.append(hiddenInput)
-    this._inputElement = hiddenInput
     this._syncValidity()
   }
 
@@ -465,7 +479,7 @@ class OTPInput extends BaseComponent {
     }
   }
 
-  _setHiddenInputValue(value: string | null): void {
+  _setValue(value: string | null): void {
     if (this._inputElement) {
       this._inputElement.value = value || ''
       this._syncValidity()
@@ -549,6 +563,8 @@ class OTPInput extends BaseComponent {
       } else if (this._placeholders.has(input)) {
         this._restorePlaceholder(input)
       }
+
+      this._writeSlotAttribute(input, 'aria-required', this._config.required ? 'true' : null)
 
       switch (this._config.type) {
         case 'number': {

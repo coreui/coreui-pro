@@ -136,6 +136,13 @@ describe('OTPInput', () => {
 
       for (const input of otpContainer.querySelectorAll('.form-otp-control')) {
         expect(input.required).toBeFalse()
+        expect(input.getAttribute('aria-required')).toBe('true')
+      }
+
+      otpInput.setConfig({ required: false })
+
+      for (const input of otpContainer.querySelectorAll('.form-otp-control')) {
+        expect(input.hasAttribute('aria-required')).toBeFalse()
       }
     })
 
@@ -1613,6 +1620,55 @@ describe('OTPInput', () => {
 
       expect(valueField.value).toEqual('4')
       expect(slotStates(slots)).toEqual([[null, null], [null, null]])
+    })
+
+    it('should keep the value field and its state through setConfig', () => {
+      const { form, otpInput, slots, valueField } = mountForm({ required: true }, 'data-coreui-validate novalidate')
+      Form.getOrCreateInstance(form).validate()
+
+      otpInput.setConfig({ placeholder: '0' })
+
+      expect(otpInput._inputElement).toBe(valueField)
+      expect(valueField).toHaveClass('is-invalid')
+      expect(slotStates(slots).map(([invalid]) => invalid)).toEqual(['true', 'true'])
+    })
+
+    it('should drop the state on a reset of the form it was moved into', async () => {
+      fixtureEl.innerHTML = '<form><button type="submit">Send</button></form><div class="form-otp"><input class="form-otp-control"><input class="form-otp-control"></div>'
+      const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'), { required: true })
+      const form = fixtureEl.querySelector('form')
+      form.prepend(fixtureEl.querySelector('.form-otp'))
+      const slots = [...fixtureEl.querySelectorAll('.form-otp-control')]
+      form.addEventListener('submit', event => event.preventDefault())
+      form.requestSubmit()
+
+      expect(slotStates(slots).map(([invalid]) => invalid)).toEqual(['true', 'true'])
+
+      form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(slotStates(slots).map(([invalid]) => invalid)).toEqual([null, null])
+      otpInput.dispose()
+    })
+
+    it('should keep the reset of another code in the same form after dispose', async () => {
+      fixtureEl.innerHTML = '<form><div class="form-otp" id="first"><input class="form-otp-control"></div><div class="form-otp" id="second"><input class="form-otp-control"></div><button type="submit">Send</button></form>'
+      const first = new OTPInput(fixtureEl.querySelector('#first'), { required: true })
+      const second = new OTPInput(fixtureEl.querySelector('#second'), { required: true })
+      const form = fixtureEl.querySelector('form')
+      form.addEventListener('submit', event => event.preventDefault())
+      form.requestSubmit()
+
+      first.dispose()
+      form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(fixtureEl.querySelector('#second .form-otp-control').hasAttribute('aria-invalid')).toBeFalse()
+      second.dispose()
     })
 
     it('should give the slots back their attributes on dispose', () => {

@@ -195,6 +195,19 @@ describe('messages of a form field', () => {
       })
     }
 
+    it('keeps the success away while the form validation finds the code incomplete', () => {
+      const { form, instance, slots } = mountOtp('data-coreui-validate="valid" novalidate')
+      slots[0].value = '1'
+      slots[0].dispatchEvent(new Event('input', { bubbles: true }))
+
+      validateForm(form, new WeakMap())
+
+      expect(displayOf('.invalid-feedback')).toBe('block')
+      expect(displayOf('.valid-feedback')).toBe('none')
+
+      instance.dispose()
+    })
+
     it('shows the success after the group once the browser takes the code', () => {
       const { form, instance, slots } = mountOtp('data-coreui-validate="valid"')
 
