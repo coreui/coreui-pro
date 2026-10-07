@@ -933,6 +933,38 @@ describe('Stepper', () => {
       })
     })
 
+    it('should finish once when next() or finish() is called again while the step content collapses', async () => {
+      fixtureEl.innerHTML = `
+        <div class="stepper" data-coreui-stepper>
+          <ol class="stepper-steps">
+            <li class="stepper-step">
+              <button type="button" class="stepper-step-button active">
+                <span class="stepper-step-indicator">1</span>
+              </button>
+              <div class="stepper-step-content active show">
+                <p>Content</p>
+              </div>
+            </li>
+          </ol>
+        </div>
+      `
+      const stepperElement = fixtureEl.querySelector('.stepper')
+      const stepper = new Stepper(stepperElement)
+      let finished = 0
+      stepperElement.addEventListener('finish.coreui.stepper', () => {
+        finished++
+      })
+
+      stepper.next()
+      stepper.next()
+      stepper.finish()
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect(finished).toBe(1)
+    })
+
     it('should call finishHandler directly when neither pane nor stepContent exist', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = `

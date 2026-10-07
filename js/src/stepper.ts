@@ -226,6 +226,8 @@ class Stepper extends BaseComponent {
       return
     }
 
+    this._isFinished = true
+
     const finishHandler = () => {
       active.classList.remove(CLASS_NAME_ACTIVE)
       this._markAsComplete(active)
