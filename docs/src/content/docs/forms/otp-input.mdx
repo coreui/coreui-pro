@@ -338,6 +338,7 @@ The code is validated as one value, kept in an input laid invisibly over the gro
 The one-time password input component is designed with accessibility in mind and follows WCAG guidelines for form inputs.
 
 - **ARIA Labels**: Each input field automatically receives descriptive `aria-label` attributes
+- **Label click**: clicking a label that names the field, through `aria-labelledby` or a `<label for>` pointing at the element, moves focus to the first empty slot, as clicking the label of an input focuses it.
 - **Role Attribute**: The container has `role="group"` to indicate related form controls
 - **Required**: with `data-coreui-required="true"`, every slot carries `aria-required="true"`, since the value input that holds `required` is hidden from assistive technologies
 - **Keyboard Navigation**: Full keyboard support with arrow keys, tab, and backspace

@@ -2,6 +2,7 @@ import { vi } from 'vitest'
 import DateInput from '../../src/date-input.js'
 import TimeInput from '../../src/time-input.js'
 import Form from '../../src/form.js'
+import { getFieldHandler } from '../../src/util/field-label.js'
 import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
 
 describe('DateInput', () => {
@@ -292,6 +293,31 @@ describe('DateInput', () => {
       year.click()
 
       expect(document.activeElement).toEqual(year)
+    })
+
+    it('should move focus to the first empty section when a label of the field is clicked, until it is disposed', () => {
+      fixtureEl.innerHTML = '<label for="due" class="form-label">Due</label><span id="dueName" class="form-label">Due date</span><div class="date-input" id="due" aria-labelledby="dueName"></div>'
+      const dateInput = new DateInput(fixtureEl.querySelector('.date-input'), { format: 'dd.MM.yyyy' })
+      const [day, month] = getSections(dateInput._element)
+
+      fixtureEl.querySelector('label').click()
+
+      expect(document.activeElement).toEqual(day)
+
+      pressKey(day, '1')
+      pressKey(day, '5')
+      document.activeElement.blur()
+      fixtureEl.querySelector('#dueName').click()
+
+      expect(document.activeElement).toEqual(month)
+
+      document.activeElement.blur()
+      const element = dateInput._element
+      dateInput.dispose()
+      fixtureEl.querySelector('label').click()
+
+      expect(document.activeElement).toEqual(document.body)
+      expect(getFieldHandler(element)).toBeUndefined()
     })
 
     it('should describe the sections with the message under the field once the browser or the form plugin finds it empty', () => {
@@ -2144,6 +2170,26 @@ describe('DateInput', () => {
       expect(day.tabIndex).toBe(-1)
       expect(day.getAttribute('aria-disabled')).toEqual('true')
       expect(dateInput._element.querySelector('.form-date-time > textarea').disabled).toBeTrue()
+    })
+
+    it('should leave the focus where it is when a label of a disabled field is clicked', () => {
+      fixtureEl.innerHTML = '<label for="due" class="form-label">Due</label><div class="date-input" id="due"></div>'
+      const dateInput = new DateInput(fixtureEl.querySelector('.date-input'), { disabled: true, format: 'dd.MM.yyyy' })
+
+      fixtureEl.querySelector('label').click()
+
+      expect(document.activeElement).toEqual(document.body)
+      expect(getSections(dateInput._element)[0].tabIndex).toEqual(-1)
+    })
+
+    it('should leave the focus where it is when a label of a field in a disabled fieldset is clicked', () => {
+      fixtureEl.innerHTML = '<fieldset disabled><label for="due">Due</label><div class="date-input" id="due"></div></fieldset>'
+      const dateInput = new DateInput(fixtureEl.querySelector('.date-input'), { format: 'dd.MM.yyyy' })
+
+      fixtureEl.querySelector('label').click()
+
+      expect(document.activeElement).toEqual(document.body)
+      dateInput.dispose()
     })
 
     it('should mark readonly sections read-only and keep them focusable', () => {

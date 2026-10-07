@@ -2,6 +2,7 @@
 import { userEvent } from '@vitest/browser/context'
 import Form from '../../src/form.js'
 import OTPInput from '../../src/otp-input.js'
+import { getFieldHandler } from '../../src/util/field-label.js'
 import {
   getFixture, clearFixture, createEvent, jQueryMock
 } from '../helpers/fixture.js'
@@ -1560,6 +1561,25 @@ describe('OTPInput', () => {
 
       expect(form.reportValidity()).toBeFalse()
       expect(document.activeElement).toEqual(slots[1])
+    })
+
+    it('should move focus to the first empty slot when a label of the group is clicked, until it is disposed', () => {
+      fixtureEl.innerHTML = '<label for="code" class="form-label">Code</label><div class="form-otp" id="code"><input class="form-otp-control"><input class="form-otp-control"></div>'
+      const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'))
+      const slots = fixtureEl.querySelectorAll('.form-otp-control')
+      type(slots[0], '1')
+      document.activeElement.blur()
+
+      fixtureEl.querySelector('label').click()
+
+      expect(document.activeElement).toEqual(slots[1])
+
+      document.activeElement.blur()
+      otpInput.dispose()
+      fixtureEl.querySelector('label').click()
+
+      expect(document.activeElement).toEqual(document.body)
+      expect(getFieldHandler(fixtureEl.querySelector('.form-otp'))).toBeUndefined()
     })
 
     it('should mark every slot and describe it with the message after the group once the browser or the form plugin reports the code', () => {
