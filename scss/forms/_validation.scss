@@ -22,6 +22,15 @@
   --#{$prefix}control-group-action-color: #{$color};
 }
 
+@mixin form-otp-control-validation-state($border-color, $focus-ring-color) {
+  border-color: $border-color;
+
+  &:focus {
+    border-color: $border-color;
+    @include focus-ring(true, $color: $focus-ring-color);
+  }
+}
+
 // scss-docs-start form-validation-state-mixin
 @mixin form-validation-state(
   $state,
@@ -32,6 +41,11 @@
   $border-color: var(--#{$prefix}#{$theme}-fg)
 ) {
   $without-error: ":not(.is-invalid, :has(.is-invalid, > :user-invalid, > .form-floating > :user-invalid))";
+  $form-otp-state: ".form-otp:is(.is-#{$state}, :has(.is-#{$state}))";
+
+  @if $state != "invalid" {
+    $form-otp-state: "#{$form-otp-state}#{$without-error}";
+  }
 
   .#{$state}-feedback {
     @include tokens($form-feedback-tokens);
@@ -350,12 +364,38 @@
 
   .form-otp-control {
     @include form-validation-state-selector($state) {
-      border-color: $border-color;
+      @include form-otp-control-validation-state($border-color, $focus-ring-color);
+    }
+  }
 
-      &:focus {
-        border-color: $border-color;
-        @include focus-ring(true, $color: $focus-ring-color);
+  // OTP — the state of the code: the group, its value field or a slot marked
+  // colours every slot and shows the messages that follow the group.
+  #{$form-otp-state} {
+    .form-otp-control {
+      @include form-otp-control-validation-state($border-color, $focus-ring-color);
+    }
+
+    ~ .#{$state}-feedback,
+    ~ .#{$state}-tooltip { display: block; }
+  }
+
+  @if $state == "invalid" {
+    [data-coreui-validate] .form-otp:has(:user-invalid) {
+      .form-otp-control {
+        @include form-otp-control-validation-state($border-color, $focus-ring-color);
       }
+
+      ~ .invalid-feedback,
+      ~ .invalid-tooltip { display: block; }
+    }
+  } @else if $state == "valid" {
+    [data-coreui-validate~="valid"] .form-otp#{$without-error}:not(:has(:user-invalid)):has(> input:not(.form-otp-control):user-valid) {
+      .form-otp-control {
+        @include form-otp-control-validation-state($border-color, $focus-ring-color);
+      }
+
+      ~ .valid-feedback,
+      ~ .valid-tooltip { display: block; }
     }
   }
 }

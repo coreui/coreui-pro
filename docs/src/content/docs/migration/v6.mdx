@@ -2396,6 +2396,24 @@ field behind that kept submitting.
   and `ArrowRight` walks back freely. Previously the guard was attached to the
   key name, which let the caret jump ahead over empty slots in RTL and refused
   to walk back.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The code is validated as one value.** It moved from an
+  `<input type="hidden">`, which the browser leaves out of validation, to a
+  text input laid invisibly over the group, with `tabindex="-1"` and
+  `aria-hidden="true"`, a `pattern` for the full length of the code and the
+  `required` that the slots used to carry. A `required` code that is empty or
+  incomplete stops the submit, so does an incomplete code that is not
+  required, and the browser puts focus on the first empty slot with its own
+  message over the group. Once a validation reports the code, the group gets
+  `.is-invalid` and every slot carries `aria-invalid="true"` and is described
+  by the message after the group while the code stays invalid; an
+  `.is-invalid` or `aria-invalid="true"` the page writes on the group, or
+  `.is-invalid` on a slot, does the same. The stylesheet colours every slot and
+  shows that message, which it never did for a slot marked invalid. Code that
+  selects `input[type="hidden"]` inside the field needs
+  `.form-otp > input:not(.form-otp-control)`, a slot no longer gets
+  `required`, and a `data-coreui-invalid-feedback` written on the slots goes
+  on the `.form-otp` element.
 
 #### Rating
 
