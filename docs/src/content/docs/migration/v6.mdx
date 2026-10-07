@@ -1843,9 +1843,9 @@ stops an invalid submit, marks the invalid controls with `.is-invalid` and
 while it stays invalid, and moves focus to the first. Remove the copied
 script; to show the errors your own way, call `preventDefault()` on
 `validate.coreui.form`. Components follow the attribute:
-the stepper marks the controls of a failing `novalidate` step form with
-`.is-invalid` itself (and `.is-valid` under `data-coreui-validate="valid"`),
-and the date / time / date-time inputs key their submit-time state off the
+the stepper marks the controls of a `novalidate` step form itself each time
+it validates the step, passing or not: `.is-invalid` on the invalid ones (and
+`.is-valid` on the valid ones under `data-coreui-validate="valid"`), and the date / time / date-time inputs key their submit-time state off the
 attribute instead of the class.
 
 The stepper also sets `aria-invalid` on those controls and moves focus to the
@@ -1857,6 +1857,11 @@ the controls the [field page](/forms/field/) lists) or the one named in
 a message that changes while the user types is now silent, so pass the ones
 that have to be heard to [`announce()`](/getting-started/accessibility/#announcing-messages).
 Going back to an earlier step no longer validates the current one.
+`stepValidationComplete.coreui.stepper` now fires before the stepper decides,
+as `validate.coreui.form` does, so a validity its handler sets with
+`setCustomValidity()` blocks the step, and `event.isValid` tells whether every
+control passed before the handler ran. `next()` and `finish()` fire it once
+per step instead of twice.
 
 #### Input group: `.has-validation` removed
 
