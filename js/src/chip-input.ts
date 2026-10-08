@@ -5,10 +5,15 @@
  * --------------------------------------------------------------------------
  */
 
+import Chip from './chip.js'
 import ChipSet, { type ChipSetConfig } from './chip-set.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { applyControlGroupClasses } from './util/form-control-group.js'
+import {
+  configureValueField, createValueField, dispatchValueChange, followUserValidity, getFeedbackIds, getValidationState,
+  nextStateSerial, ownValidationState, setStateValidity, type UserValidity, type ValidationState, writeValueField
+} from './util/form-validation.js'
 import { getUID, isRTL } from './util/index.js'
 
 /**
@@ -35,15 +40,23 @@ const SELECTOR_CHIP_REMOVE = '.chip-remove'
 const CLASS_NAME_DISABLED = 'disabled'
 const CLASS_NAME_CHIP_INPUT_FIELD = 'chip-input-field'
 const CLASS_NAME_GROUP = 'form-control-group'
+const CLASS_NAME_IS_INVALID = 'is-invalid'
+const CLASS_NAME_IS_VALID = 'is-valid'
+
+const VALIDATION_OPTIONS = ['invalid', 'valid', 'validationState']
 
 type ChipInputConfig = ChipSetConfig & {
   create: boolean
   createOnBlur: boolean
   id: string | null
+  invalid: boolean
   name: string | null
   placeholder: string
   readonly: boolean
+  required: boolean
   separator: string | null
+  valid: boolean
+  validationState: ValidationState | null
 }
 
 const Default: ChipInputConfig = {
@@ -51,12 +64,16 @@ const Default: ChipInputConfig = {
   create: true,
   createOnBlur: true,
   id: null,
+  invalid: false,
   name: null,
   placeholder: '',
   readonly: false,
   removable: true,
+  required: false,
   separator: ',',
-  unique: true
+  unique: true,
+  valid: false,
+  validationState: null
 }
 
 const DefaultType: Record<string, string> = {
@@ -64,10 +81,14 @@ const DefaultType: Record<string, string> = {
   create: 'boolean',
   createOnBlur: 'boolean',
   id: '(string|null)',
+  invalid: 'boolean',
   name: '(string|null)',
   placeholder: 'string',
   readonly: 'boolean',
-  separator: '(string|null)'
+  required: 'boolean',
+  separator: '(string|null)',
+  valid: 'boolean',
+  validationState: '(string|null|undefined)'
 }
 
 /**
@@ -75,14 +96,24 @@ const DefaultType: Record<string, string> = {
  *
  * ChipInput is a thin input layer on top of ChipSet: ChipSet owns the chips
  * (the single source of truth), while ChipInput only adds the text field, form
- * integration (hidden input) and turns typed text into chips. The public API
+ * integration (value field) and turns typed text into chips. The public API
  * (methods + `*.coreui.chip-input` events) is preserved through overrides.
  */
 
 class ChipInput extends ChipSet {
   protected declare _uniqueId: string
-  protected declare _hiddenInput: HTMLInputElement | null
+  protected declare _valueField: HTMLTextAreaElement | null
   protected declare _input: HTMLInputElement
+  protected declare _describedBy: string | null
+  protected declare _initialChips: HTMLElement[]
+  protected declare _releaseValidationState: (() => void) | null
+  protected declare _removingByCode: boolean
+  protected declare _serverClasses: string[]
+  protected declare _stateClass: string | null
+  protected declare _stateSerial: number
+  protected declare _userChange: boolean
+  protected declare _userValidity: UserValidity | null
+  private _addedAriaRequired = false
   private _addedGroupClass = false
   private _createdInput = false
   private _labelledFor: Element | null = null
@@ -91,7 +122,15 @@ class ChipInput extends ChipSet {
     super(element, config)
 
     this._uniqueId = this._config.id ?? getUID(NAME)
-    this._hiddenInput = null
+    this._valueField = null
+    this._releaseValidationState = null
+    this._removingByCode = false
+    this._serverClasses = [CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID].filter(name => this._element.classList.contains(name))
+    this._element.classList.remove(...this._serverClasses)
+    this._stateClass = null
+    this._stateSerial = nextStateSerial()
+    this._userChange = false
+    this._userValidity = null
 
     // The element is the frame: unlike the components that wrap a control, a
     // chip input has nothing to wrap, so it takes the frame class itself and
@@ -106,16 +145,20 @@ class ChipInput extends ChipSet {
       this._createInput()
     }
 
+    this._describedBy = this._input.getAttribute('aria-describedby')
     this._applyInteractionState()
 
     // In the controlled mode (`create: false`) the chips come from the host —
     // a listbox selection, say — so typed text never becomes a chip and the
-    // host owns the form value; no hidden input is rendered.
+    // host owns the form value; no value field is rendered.
     if (this._config.create) {
-      this._createHiddenInput()
+      this._createValueField()
     }
 
+    this._initialChips = this._getChipElements()
+    this._releaseValidationState = ownValidationState(...[this._valueField, this._input].filter(Boolean) as Element[])
     this._addInputEventListeners()
+    this._updateValidity()
   }
 
   // Getters
@@ -132,31 +175,61 @@ class ChipInput extends ChipSet {
   }
 
   // Public
-  // Keep the inherited add behavior and mirror the new value into the form input.
-  override add(value: HTMLElement | string): HTMLElement | null {
-    const chip = super.add(value)
-    if (chip) {
-      this._syncHiddenInput()
-    }
+  override remove(chipOrValue: HTMLElement | string): boolean {
+    const previous = this._removingByCode
+    this._removingByCode = true
 
-    return chip
+    try {
+      return super.remove(chipOrValue)
+    } finally {
+      this._removingByCode = previous
+    }
   }
 
   focus(): void {
     this._input?.focus()
   }
 
+  setConfig(config: Partial<ChipInputConfig> | null): void {
+    const keys = VALIDATION_OPTIONS.filter(key => config && key in config) as (keyof ChipInputConfig)[]
+
+    if (keys.length === 0) {
+      return
+    }
+
+    this._serverClasses = []
+    this._stateSerial = nextStateSerial()
+    this._config = this._getConfig({ ...this._config, ...Object.fromEntries(keys.map(key => [key, config![key]])) })
+    this._updateValidity()
+  }
+
   override dispose(): void {
+    this._userValidity?.stop()
+    this._releaseValidationState?.()
+
     if (this._addedGroupClass) {
       this._element.classList.remove(CLASS_NAME_GROUP)
     }
 
+    if (this._stateClass) {
+      this._element.classList.remove(this._stateClass)
+    }
+
+    this._element.classList.add(...this._serverClasses)
+
     EventHandler.off(this._input, EVENT_KEY)
-    this._hiddenInput?.remove()
+    this._valueField?.remove()
 
     if (this._createdInput) {
       this._input.remove()
       this._labelledFor?.removeAttribute('for')
+    } else {
+      this._input.removeAttribute('aria-invalid')
+      this._restoreAttribute('aria-describedby', this._describedBy)
+
+      if (this._addedAriaRequired) {
+        this._input.removeAttribute('aria-required')
+      }
     }
 
     super.dispose()
@@ -205,14 +278,140 @@ class ChipInput extends ChipSet {
   }
 
   override _handleChipRemoved(event: any): void {
-    super._handleChipRemoved(event)
-    this._syncHiddenInput()
+    if (this._removingByCode) {
+      super._handleChipRemoved(event)
+      return
+    }
+
+    this._runAsUser(() => super._handleChipRemoved(event))
   }
 
-  _syncHiddenInput(): void {
-    if (this._hiddenInput) {
-      this._hiddenInput.value = this.getValues().join(',')
+  override _noteChange(): void {
+    super._noteChange()
+
+    if (this._userChange) {
+      this._userChange = false
+      this._dismissValidationState()
     }
+  }
+
+  override _triggerChange(): void {
+    const isChanged = this._valueField ? writeValueField(this._valueField, this.getValues()) : false
+
+    this._updateValidity()
+    super._triggerChange()
+
+    if (isChanged) {
+      dispatchValueChange(this._valueField!)
+    }
+  }
+
+  _runAsUser(action: () => void): void {
+    this._userChange = true
+
+    try {
+      action()
+    } finally {
+      this._userChange = false
+    }
+  }
+
+  _dismissValidationState(serial: number = Number.POSITIVE_INFINITY): void {
+    if (this._stateSerial > serial) {
+      return
+    }
+
+    this._config.invalid = false
+    this._config.valid = false
+    this._config.validationState = null
+    this._serverClasses = []
+  }
+
+  _updateValidity(): void {
+    const field = this._valueField
+    const givenState = getValidationState(this._config.validationState, this._config.valid, this._config.invalid) ??
+      getValidationState(null, this._serverClasses.includes(CLASS_NAME_IS_VALID), this._serverClasses.includes(CLASS_NAME_IS_INVALID))
+
+    if (field) {
+      setStateValidity(field, givenState === 'invalid')
+    }
+
+    const state = givenState ?? this._userValidity?.read()
+    const stateClass = state ? `is-${state}` : null
+    const describedBy = [...new Set([
+      ...(this._describedBy ?? '').split(/\s+/),
+      ...(state === 'invalid' ? getFeedbackIds(field ?? this._input) : [])
+    ])].filter(Boolean).join(' ')
+
+    if (stateClass !== this._stateClass) {
+      if (this._stateClass) {
+        this._element.classList.remove(this._stateClass)
+      }
+
+      if (stateClass) {
+        this._element.classList.add(stateClass)
+      }
+
+      this._stateClass = stateClass
+    }
+
+    if (state === 'invalid') {
+      this._input.setAttribute('aria-invalid', 'true')
+    } else {
+      this._input.removeAttribute('aria-invalid')
+    }
+
+    this._restoreAttribute('aria-describedby', describedBy || null)
+  }
+
+  _restoreChips(serial: number): void {
+    const values = this.getValues().join(',')
+    let hadFocus = false
+
+    for (const chip of this._getChipElements()) {
+      if (!this._initialChips.includes(chip)) {
+        hadFocus ||= chip.contains((chip.getRootNode() as Document | ShadowRoot).activeElement)
+        Chip.getInstance(chip)?.dispose()
+        this._ownedChips.delete(chip)
+        this._optionChips.delete(chip)
+        chip.remove()
+      }
+    }
+
+    let anchor: HTMLElement = this._input
+
+    for (const chip of this._initialChips.toReversed()) {
+      if (!this._element.contains(chip)) {
+        this._element.insertBefore(chip, anchor)
+        this._setupChip(chip)
+      }
+
+      anchor = chip
+    }
+
+    this._chips = this._initialChips.map(chip => this._getChipValue(chip))
+    this._setInputSize()
+    this._dismissValidationState(serial)
+
+    if (hadFocus) {
+      this._input.focus()
+    }
+
+    if (this.getValues().join(',') !== values || this._valueField!.value !== this.getValues().join(',')) {
+      this._triggerChange()
+      return
+    }
+
+    this._updateValidity()
+  }
+
+  _restoreAttribute(name: string, value: string | null): void {
+    if (value === null) {
+      this._input.removeAttribute(name)
+      return
+    }
+
+    this._input.setAttribute(name, value)
   }
 
   _addInputEventListeners(): void {
@@ -284,18 +483,26 @@ class ChipInput extends ChipSet {
     this._element.append(input)
   }
 
-  _createHiddenInput(): void {
-    const hiddenInput = document.createElement('input')
-    hiddenInput.type = 'hidden'
-    hiddenInput.id = this._uniqueId
+  _createValueField(): void {
+    const field = createValueField('textarea', () => this._input)
 
-    if (this._config.name) {
-      hiddenInput.name = this._config.name
+    field.id = this._uniqueId
+    configureValueField(field, {
+      disabled: this._disabled,
+      name: this._config.name,
+      readOnly: this._config.readonly,
+      required: this._config.required
+    })
+    field.defaultValue = this.getValues().join(',')
+
+    if (this._config.required && !this._input.hasAttribute('aria-required')) {
+      this._input.setAttribute('aria-required', 'true')
+      this._addedAriaRequired = true
     }
 
-    this._element.append(hiddenInput)
-    this._hiddenInput = hiddenInput
-    this._hiddenInput.value = this.getValues().join(',')
+    this._element.append(field)
+    this._valueField = field
+    this._userValidity = followUserValidity(field, () => this._updateValidity(), serial => this._restoreChips(serial))
   }
 
   _createChipFromInput(): void {
@@ -305,7 +512,7 @@ class ChipInput extends ChipSet {
 
     const value = this._input.value.trim()
     if (value) {
-      this.add(value)
+      this._runAsUser(() => this.add(value))
       this._input.value = ''
       this._setInputSize()
     }
@@ -385,9 +592,11 @@ class ChipInput extends ChipSet {
 
     if (this._config.create && separator && value.includes(separator)) {
       const parts = value.split(separator)
-      for (const part of parts.slice(0, -1)) {
-        this.add(part.trim())
-      }
+      this._runAsUser(() => {
+        for (const part of parts.slice(0, -1)) {
+          this.add(part.trim())
+        }
+      })
 
       this._input.value = parts[parts.length - 1]
     }
@@ -414,9 +623,11 @@ class ChipInput extends ChipSet {
       event.preventDefault()
 
       const parts = pastedData.split(separator)
-      for (const part of parts) {
-        this.add(part.trim())
-      }
+      this._runAsUser(() => {
+        for (const part of parts) {
+          this.add(part.trim())
+        }
+      })
     }
   }
 
