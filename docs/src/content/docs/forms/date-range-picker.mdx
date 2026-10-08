@@ -165,7 +165,7 @@ The picker takes its validation state the way the [date range input](/forms/date
     </div>
   </div>`} />
 
-A given state is a verdict on the range it was given for, so the next change the user makes drops it from both ends and from the picker element: a date picked in the calendar, the cleaner, a footer button other than the one that closes the popup, or typing in either field. A change your own code makes, with `setRange()`, `clear()` or `reset()`, keeps it. `setConfig({ validationState })` sets it again without rebuilding the picker; for now `setConfig` changes only the validation options. A class or an `aria-invalid` written on the picker element after it starts is not read. A native form reset puts back the range the picker started with and drops the state.
+A given state is a verdict on the range it was given for, so the next change of the range the user makes drops it from both ends and from the picker element: a date picked in the calendar, the cleaner, a button in the footer or among the [custom ranges](#custom-ranges) that changes the range through the context, or typing in either field. An action that leaves the range as it is keeps the state. A change your own code makes, with `setRange()`, `clear()` or `reset()`, keeps it. `setConfig({ validationState })` sets it again without rebuilding the picker; for now `setConfig` changes only the validation options. A class or an `aria-invalid` written on the picker element after it starts is not read. A native form reset puts back the range the picker started with and drops the state.
 
 ### Blocking the submit
 
@@ -335,7 +335,7 @@ and `selectEndDate` are set by the picker itself.
 | `endFloatingLabel` | string, null | `null` | Renders a floating label over the end field, which also becomes that field's accessible name. |
 | `endName` | string, null | `null` | Name of the end value input. Without it the end date is not submitted with the form. |
 | `format` | function, string, null | `null` | Mask layout of both fields: `null` derives it from the locale (or, for week, month, quarter and year selection, uses the matching default mask), a string is parsed as format tokens, a function receives the locale and returns the section layout. |
-| `inputOptions` | object | `{}` | Programmatic escape hatch for date input options. |
+| `inputOptions` | object | `{}` | Programmatic escape hatch for date input options, except `validationState`, `invalid` and `valid`, which the picker owns. |
 | `invalid` | boolean | `false` | Deprecated alias of `validationState: 'invalid'`, ignored once `validationState` is set. |
 | `locale` | string | browser locale | Drives section order, separators, and calendar labels. |
 | `maxDate` | date, string, null | `null` | Upper bound, enforced by both layers. |

@@ -242,8 +242,8 @@ class DatePicker extends PickerBase {
       ...this._baseContext(),
       date: this.getDate(),
       isDateSelectable: (date: Date | null) => this._input.isDateSelectable(date),
-      setDate: (date: Date | null) => this.setDate(date),
-      today: () => this.today()
+      setDate: (date: Date | null) => this._runAsUser(() => this.setDate(date)),
+      today: () => this._runAsUser(() => this.today())
     }
   }
 
@@ -326,15 +326,18 @@ class DatePicker extends PickerBase {
     this._input = new DateInput(inputEl, this._forwardConfig(DateInput, {
       date: this._config.date,
       disabled: this._config.disabled,
-      invalid: false,
       locale: this._config.locale,
       name: this._config.name,
       seconds: Boolean(this._config.seconds),
-      valid: false,
-      validationState: null,
       ...(this._config.timepicker ? { type: 'datetime' } : {}),
       ...(format ? { format } : {})
-    }, { ...(this._config.floatingLabel ? { ariaLabel: this._config.floatingLabel } : {}), ...this._config.inputOptions }))
+    }, {
+      ...(this._config.floatingLabel ? { ariaLabel: this._config.floatingLabel } : {}),
+      ...this._config.inputOptions,
+      invalid: false,
+      valid: false,
+      validationState: null
+    }))
     this._input._setOwnerDismiss((serial: number) => this._dismissValidationState(serial))
 
     EventHandler.on(inputEl, DateInput.eventName(DateInput.CHANGE_EVENT_NAME), (event: any) => {
@@ -394,8 +397,7 @@ class DatePicker extends PickerBase {
     }))
 
     EventHandler.on(this._calendar._element, 'startDateChange.coreui.calendar', event => {
-      this._dismissValidationState()
-      this._applyDate(this._withCurrentTime(event.dateObject), { calendar: false })
+      this._runAsUser(() => this._applyDate(this._withCurrentTime(event.dateObject), { calendar: false }))
 
       if (!this._config.timepicker) {
         this.hide()
@@ -409,7 +411,7 @@ class DatePicker extends PickerBase {
     this._selection = new TimeSelects(this._selectionElement, this._forwardConfig(TimeSelects, {
       hourCycle: getHourCycle(this._input._sections) ?? null,
       locale: this._config.locale,
-      onChange: (time: Date | null) => this._applyTime(time),
+      onChange: (time: Date | null) => this._runAsUser(() => this._applyTime(time)),
       time: this.getDate()
     }, this._config.selectionOptions))
   }
@@ -439,8 +441,6 @@ class DatePicker extends PickerBase {
       return
     }
 
-    this._dismissValidationState()
-
     const merged = new Date(this.getDate() ?? this._withinTimeLimits(new Date()))
     merged.setHours(time.getHours(), time.getMinutes(), time.getSeconds())
     const limited = this._withinTimeLimits(merged)
@@ -458,7 +458,7 @@ class DatePicker extends PickerBase {
 
     try {
       if (field) {
-        this._input.setConfig({ date })
+        this._withUser(this._input, () => this._input.setConfig({ date }))
       }
     } finally {
       this._applying = false

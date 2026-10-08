@@ -38,13 +38,16 @@ const VALIDATION_OPTIONS = new Set(['invalid', 'valid', 'validationState'])
 
 abstract class PickerBase extends BaseComponent {
   protected declare _adoptedAttributes: [Element, string, string | null, string | null][]
+  protected declare _byUser: boolean
   protected declare _cleanerElement: HTMLElement | null
   protected declare _fieldElement: HTMLElement
   protected declare _footerTemplate: HTMLTemplateElement | null
   protected declare _hostClasses: HostClasses
   protected declare _menu: HTMLElement
+  protected declare _ownsStateClass: boolean
   protected declare _popup: Popup
   protected declare _serverClasses: string[]
+  protected declare _stateClass: string | null
   protected declare _stateSerial: number
   protected declare _toggleElement: HTMLElement | null
 
@@ -52,15 +55,18 @@ abstract class PickerBase extends BaseComponent {
     super(element, config)
 
     this._adoptedAttributes = []
+    this._byUser = false
     this._cleanerElement = null
     this._footerTemplate = SelectorEngine.findOne(SELECTOR_TEMPLATE_FOOTER, this._element) as HTMLTemplateElement | null
     this._menu = null as any
+    this._ownsStateClass = false
     this._popup = null as any
     this._serverClasses = [CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID].filter(name => this._element.classList.contains(name))
+    this._stateClass = null
     this._stateSerial = nextStateSerial()
 
-    if (getValidationState(this._config.validationState, this._config.valid, this._config.invalid)) {
-      this._dropServerClasses()
+    if (this._serverClasses.length > 0) {
+      this._element.classList.remove(...this._serverClasses)
     }
   }
 
@@ -85,7 +91,7 @@ abstract class PickerBase extends BaseComponent {
     }
 
     this._config = this._getConfig({ ...this._config, ...validation })
-    this._dropServerClasses()
+    this._serverClasses = []
     this._stateSerial = nextStateSerial()
     this._updateValidity()
   }
@@ -102,6 +108,14 @@ abstract class PickerBase extends BaseComponent {
     this._popup.dispose()
     this._disposeParts()
     this._restoreAdoptedAttributes()
+
+    if (this._stateClass && this._ownsStateClass) {
+      this._element.classList.remove(this._stateClass)
+    }
+
+    if (this._serverClasses.length > 0) {
+      this._element.classList.add(...this._serverClasses)
+    }
 
     restoreHostClasses(this._element, this._managedClassNames(), this._hostClasses)
 
@@ -140,8 +154,7 @@ abstract class PickerBase extends BaseComponent {
     if (this._cleanerElement) {
       EventHandler.on(this._cleanerElement, eventName, (event: any) => {
         event.stopPropagation()
-        this._dismissValidationState()
-        this.clear()
+        this._runAsUser(() => this.clear())
 
         if (this._element && [this._cleanerElement, document.body].includes(document.activeElement as HTMLElement)) {
           SelectorEngine.findOne(SELECTOR_SECTION, this._popupAnchor())?.focus()
@@ -160,10 +173,6 @@ abstract class PickerBase extends BaseComponent {
       const context = this.getContext()
 
       if (typeof context[action] === 'function') {
-        if (action !== 'close') {
-          this._dismissValidationState()
-        }
-
         context[action]()
       }
     })
@@ -172,8 +181,25 @@ abstract class PickerBase extends BaseComponent {
   }
 
   _updateValidity(): void {
-    this._setFieldState(getValidationState(this._config.validationState, this._config.valid, this._config.invalid) ??
-      getValidationState(null, this._serverClasses.includes(CLASS_NAME_IS_VALID), this._serverClasses.includes(CLASS_NAME_IS_INVALID)))
+    const givenState = getValidationState(this._config.validationState, this._config.valid, this._config.invalid) ??
+      getValidationState(null, this._serverClasses.includes(CLASS_NAME_IS_VALID), this._serverClasses.includes(CLASS_NAME_IS_INVALID))
+    const stateClass = givenState ? `is-${givenState}` : null
+
+    if (stateClass !== this._stateClass) {
+      if (this._stateClass && this._ownsStateClass) {
+        this._element.classList.remove(this._stateClass)
+      }
+
+      this._ownsStateClass = stateClass !== null && !this._element.classList.contains(stateClass)
+
+      if (this._ownsStateClass) {
+        this._element.classList.add(stateClass!)
+      }
+
+      this._stateClass = stateClass
+    }
+
+    this._setFieldState(givenState)
   }
 
   _dismissValidationState(serial: number = Number.POSITIVE_INFINITY): void {
@@ -184,15 +210,28 @@ abstract class PickerBase extends BaseComponent {
     this._config.invalid = false
     this._config.valid = false
     this._config.validationState = null
-    this._dropServerClasses()
+    this._serverClasses = []
     this._updateValidity()
   }
 
-  _dropServerClasses(): void {
-    if (this._serverClasses.length > 0) {
-      this._element.classList.remove(...this._serverClasses)
-      this._serverClasses = []
+  _runAsUser(action: () => void): void {
+    const previous = this._byUser
+    this._byUser = true
+
+    try {
+      action()
+    } finally {
+      this._byUser = previous
     }
+  }
+
+  _withUser(part: any, action: () => void): void {
+    if (this._byUser) {
+      part._runAsUser(action)
+      return
+    }
+
+    action()
   }
 
   _createAction(className: string, icon: string, label: string): HTMLElement {
@@ -241,10 +280,10 @@ abstract class PickerBase extends BaseComponent {
 
   _baseContext(): Record<string, any> {
     return {
-      clear: () => this.clear(),
+      clear: () => this._runAsUser(() => this.clear()),
       close: () => this.hide(),
       disabled: this._config.disabled,
-      reset: () => this.reset()
+      reset: () => this._runAsUser(() => this.reset())
     }
   }
 

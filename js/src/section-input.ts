@@ -240,6 +240,7 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
   protected declare _serverClasses: string[]
   protected declare _stateClass: string | null
   protected declare _stateSerial: number
+  protected declare _userCommit: boolean
   protected declare _userValidity: UserValidity
   protected declare _valueKey: string
 
@@ -259,6 +260,7 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
     this._rejected = false
     this._stateClass = null
     this._stateSerial = nextStateSerial()
+    this._userCommit = false
     this._hostAriaLabel = this._element.getAttribute('aria-label')
     this._hostClasses = captureHostClasses(this._element, HOST_CLASS_NAMES)
     this._hostNodes = [...this._element.childNodes]
@@ -665,7 +667,7 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
     this._commitSections()
   }
 
-  _commitSections(sections: DateSection[] = this._sections, byUser = false): void {
+  _commitSections(sections: DateSection[] = this._sections, byUser: boolean = this._userCommit): void {
     if (byUser && this._getValueKey(sections) !== this._valueKey) {
       this._dismissValidationState()
     }
@@ -726,6 +728,17 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
     }
 
     return isDisabled ? null : date
+  }
+
+  _runAsUser(action: () => void): void {
+    const previous = this._userCommit
+    this._userCommit = true
+
+    try {
+      action()
+    } finally {
+      this._userCommit = previous
+    }
   }
 
   _setOwnerDismiss(onDismiss: (serial: number) => void): void {

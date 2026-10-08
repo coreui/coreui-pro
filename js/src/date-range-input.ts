@@ -245,6 +245,7 @@ class DateRangeInput extends BaseComponent {
   protected declare _startDate: Date | null
   protected declare _endDate: Date | null
   protected declare _applying: boolean
+  protected declare _byUser: boolean
 
   constructor(element?: string | Element | null, config?: Partial<DateRangeInputConfig> | null) {
     super(element, config)
@@ -265,6 +266,7 @@ class DateRangeInput extends BaseComponent {
     this._initialStartDate = config?.startDate ?? this._config.startDate
     this._initialEndDate = config?.endDate ?? this._config.endDate
     this._applying = false
+    this._byUser = false
 
     this._createDateRangeInput()
     this._startDate = this._startInput.getDate()
@@ -441,7 +443,7 @@ class DateRangeInput extends BaseComponent {
   _createInput(element: HTMLElement, overrides: Record<string, any>): any {
     const forwarded = getForwardedOptions(Object.keys(DateInput.Default), this._config, this.constructor.Default, ORIGINAL_DEFAULT)
     const input = new DateInput(element, {
-      ...forwarded, ...overrides, autofocus: false, invalid: false, valid: false, validationState: null, ...this._config.inputOptions
+      ...forwarded, ...overrides, autofocus: false, ...this._config.inputOptions, invalid: false, valid: false, validationState: null
     })
 
     input._setOwnerDismiss((serial: number) => this._dismissValidationState(serial))
@@ -546,8 +548,8 @@ class DateRangeInput extends BaseComponent {
 
     try {
       if (fields) {
-        this._startInput.setConfig({ date: startDate })
-        this._endInput.setConfig({ date: endDate })
+        this._setInputDate(this._startInput, startDate)
+        this._setInputDate(this._endInput, endDate)
       }
     } finally {
       this._applying = false
@@ -569,6 +571,26 @@ class DateRangeInput extends BaseComponent {
 
     if (endChanged) {
       EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, { date: end })
+    }
+  }
+
+  _setInputDate(input: any, date: Date | null): void {
+    if (this._byUser) {
+      input._runAsUser(() => input.setConfig({ date }))
+      return
+    }
+
+    input.setConfig({ date })
+  }
+
+  _runAsUser(action: () => void): void {
+    const previous = this._byUser
+    this._byUser = true
+
+    try {
+      action()
+    } finally {
+      this._byUser = previous
     }
   }
 

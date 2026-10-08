@@ -1532,13 +1532,15 @@ behaviour, v5 is the reference. Mapping:
 `invalid` and `valid` on `DatePicker`, `DateRangePicker` and `TimePicker` are
 deprecated aliases of `validationState: 'invalid'` and `'valid'`, and
 `validationState` also takes a state from `$form-validation-states`. A given
-`'invalid'` now blocks the submit, and the next change the user makes (a pick
-in the panel, the cleaner, a footer button, typing in the field) drops it; a
-change your code makes keeps it. An `.is-invalid` or `.is-valid` class on the
-picker element is read once, when the picker starts, and an `aria-invalid` on
-it is not read at all, so set the state after start with
-`setConfig({ validationState })`, which for now changes only the validation
-options. See the Validation sections of the
+`'invalid'` now blocks the submit, and the next change of the value the user
+makes (a pick in the panel, the cleaner, a footer or custom-range button that
+changes the value, typing in the field) drops it; closing the popup and a
+change your code makes keep it. An `.is-invalid` or `.is-valid` class on the
+picker element is read once, when the picker starts. An `aria-invalid` on it is
+not read at all; remove it, since the date range picker makes its element a
+group and the attribute would be announced on that group. Set the state after
+start with `setConfig({ validationState })`, which for now changes only the
+validation options. See the Validation sections of the
 [date picker](/forms/date-picker/#validation),
 [date range picker](/forms/date-range-picker/#validation) and
 [time picker](/forms/time-picker/#validation).

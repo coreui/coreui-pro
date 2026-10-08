@@ -182,7 +182,7 @@ class TimePicker extends PickerBase {
   }
 
   clear(): void {
-    this._input.clear()
+    this._withUser(this._input, () => this._input.clear())
     this._applyTime(null, { field: false })
   }
 
@@ -194,8 +194,8 @@ class TimePicker extends PickerBase {
     return {
       ...this._baseContext(),
       isTimeSelectable: (time: Date | null) => this._input.isDateSelectable(time),
-      now: () => this.now(),
-      setTime: (time: Date | null) => this.setTime(time),
+      now: () => this._runAsUser(() => this.now()),
+      setTime: (time: Date | null) => this._runAsUser(() => this.setTime(time)),
       time: this.getTime()
     }
   }
@@ -249,13 +249,16 @@ class TimePicker extends PickerBase {
     this._input = new TimeInput(inputEl, this._forwardConfig(TimeInput, {
       date: this._config.time,
       disabled: this._config.disabled,
-      invalid: false,
       locale: this._config.locale,
       name: this._config.name,
-      seconds: Boolean(this._config.seconds),
+      seconds: Boolean(this._config.seconds)
+    }, {
+      ...(this._config.floatingLabel ? { ariaLabel: this._config.floatingLabel } : {}),
+      ...this._config.inputOptions,
+      invalid: false,
       valid: false,
       validationState: null
-    }, { ...(this._config.floatingLabel ? { ariaLabel: this._config.floatingLabel } : {}), ...this._config.inputOptions }))
+    }))
 
     this._input._setOwnerDismiss((serial: number) => this._dismissValidationState(serial))
     this._time = this._input.getDate()
@@ -287,10 +290,7 @@ class TimePicker extends PickerBase {
     this._selection = new TimeRoll(this._selectionElement, this._forwardConfig(TimeRoll, {
       hourCycle: getHourCycle(this._input._sections) ?? null,
       locale: this._config.locale,
-      onChange: (time: Date | null) => {
-        this._dismissValidationState()
-        this._applyTime(time, { selection: false })
-      },
+      onChange: (time: Date | null) => this._runAsUser(() => this._applyTime(time, { selection: false })),
       time: this.getTime()
     }, this._config.selectionOptions))
   }
@@ -300,7 +300,7 @@ class TimePicker extends PickerBase {
       this._applying++
 
       try {
-        this._input.setConfig({ date: time })
+        this._withUser(this._input, () => this._input.setConfig({ date: time }))
       } finally {
         this._applying--
       }

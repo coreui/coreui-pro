@@ -807,22 +807,36 @@ describe('Form validation utilities', () => {
       expect(empty.validity.valueMissing).toBeTrue()
     })
 
-    it('should take its validity back from a control that was disabled or read-only while it set or cleared it', () => {
-      fixtureEl.innerHTML = '<form><input id="disabled" value="x"><input id="readonly" value="x" readonly></form>'
+    it('should leave a control barred from validation alone, and settle it once the control takes part again', () => {
+      fixtureEl.innerHTML = '<form><input id="disabled" value="x"><input id="readonly" value="x" readonly><input id="page" value="x"></form>'
       const disabled = fixtureEl.querySelector('#disabled')
       const readonly = fixtureEl.querySelector('#readonly')
+      const page = fixtureEl.querySelector('#page')
 
       setStateValidity(disabled, true)
       disabled.disabled = true
       setStateValidity(disabled, false)
       disabled.disabled = false
+      setStateValidity(disabled, false)
 
       setStateValidity(readonly, true)
+
+      expect(readonly.validity.customError).toBeFalse()
+
       readonly.readOnly = false
-      setStateValidity(readonly, false)
+      setStateValidity(readonly, true)
+
+      expect(readonly.validationMessage).toBe('Invalid value.')
+
+      setStateValidity(page, true)
+      page.disabled = true
+      page.setCustomValidity('Page rule.')
+      setStateValidity(page, false)
+      page.disabled = false
+      setStateValidity(page, false)
 
       expect(disabled.validity.valid).toBeTrue()
-      expect(readonly.validity.valid).toBeTrue()
+      expect(page.validationMessage).toBe('Page rule.')
     })
 
     it('should leave a validity the page set before or after it', () => {

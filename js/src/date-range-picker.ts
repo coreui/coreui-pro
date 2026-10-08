@@ -217,18 +217,18 @@ class DateRangePicker extends PickerBase {
   }
 
   setRange(startDate: Date | null, endDate: Date | null): void {
-    this._rangeInput.setRange(startDate, endDate)
+    this._withUser(this._rangeInput, () => this._rangeInput.setRange(startDate, endDate))
     this._showRange()
     this._setSelectEndDate(false)
   }
 
   clear(): void {
-    this._rangeInput.clear()
+    this._withUser(this._rangeInput, () => this._rangeInput.clear())
     this._setSelectEndDate(false)
   }
 
   reset(): void {
-    this._rangeInput.reset()
+    this._withUser(this._rangeInput, () => this._rangeInput.reset())
     this._showRange()
     this._setSelectEndDate(false)
   }
@@ -238,7 +238,7 @@ class DateRangePicker extends PickerBase {
       ...this._baseContext(),
       endDate: this.getEndDate(),
       isDateSelectable: (date: Date | null) => this._rangeInput.isDateSelectable(date),
-      setRange: (startDate: Date | null, endDate: Date | null) => this.setRange(startDate, endDate),
+      setRange: (startDate: Date | null, endDate: Date | null) => this._runAsUser(() => this.setRange(startDate, endDate)),
       startDate: this.getStartDate()
     }
   }
@@ -405,10 +405,9 @@ class DateRangePicker extends PickerBase {
     })
 
     EventHandler.on(this._calendar._element, 'startDateChange.coreui.calendar', event => {
-      this._dismissValidationState()
       const previous = this.getStartDate()
       this._syncingFromPanel = true
-      this._rangeInput.setRange(event.dateObject, this.getEndDate())
+      this._rangeInput._runAsUser(() => this._rangeInput.setRange(event.dateObject, this.getEndDate()))
       this._syncingFromPanel = false
 
       if (!isSameInstantAs(previous, this.getStartDate())) {
@@ -417,10 +416,9 @@ class DateRangePicker extends PickerBase {
     })
 
     EventHandler.on(this._calendar._element, 'endDateChange.coreui.calendar', event => {
-      this._dismissValidationState()
       const previous = this.getEndDate()
       this._syncingFromPanel = true
-      this._rangeInput.setRange(this.getStartDate(), event.dateObject)
+      this._rangeInput._runAsUser(() => this._rangeInput.setRange(this.getStartDate(), event.dateObject))
       this._syncingFromPanel = false
 
       if (!isSameInstantAs(previous, this.getEndDate())) {

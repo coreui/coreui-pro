@@ -774,6 +774,40 @@ describe('DateRangePicker', () => {
       expect(fixtureEl.querySelector('form').checkValidity()).toBeFalse()
     })
 
+    it('should show a state given by the option or by setConfig on the picker element, with the message after it', () => {
+      const picker = buildPicker({
+        endDate: new Date(2026, 6, 20), locale: 'en-US', startDate: new Date(2026, 6, 14), validationState: 'invalid'
+      }, '<form><div id="picker"></div><div class="invalid-feedback">Already booked.</div></form>')
+      const feedback = fixtureEl.querySelector('.invalid-feedback')
+
+      expect(fixtureEl.querySelector('#picker')).toHaveClass('is-invalid')
+      expect(sectionStates()).toEqual(Array.from({ length: 6 }, () => ['true', feedback.id]))
+      expect(fixtureEl.querySelector('textarea').validationMessage).toEqual('Already booked.')
+
+      picker.setConfig({ validationState: 'valid' })
+      picker.setConfig({ validationState: 'invalid' })
+
+      expect(fixtureEl.querySelector('#picker')).toHaveClass('is-invalid')
+      expect(sectionStates()).toEqual(Array.from({ length: 6 }, () => ['true', feedback.id]))
+    })
+
+    it('should drop the given state when a template action picks a range, and keep it when code sets one', () => {
+      const picker = buildPicker({
+        endDate: new Date(2026, 6, 20), locale: 'en-US', startDate: new Date(2026, 6, 14), validationState: 'invalid'
+      }, '<form><div id="picker"></div></form>')
+      const form = fixtureEl.querySelector('form')
+
+      picker.setRange(new Date(2026, 6, 15), new Date(2026, 6, 21))
+
+      expect(form.checkValidity()).toBeFalse()
+
+      picker.getContext().setRange(new Date(2026, 6, 1), new Date(2026, 6, 7))
+
+      expect(form.checkValidity()).toBeTrue()
+      expect(sectionStates().every(([ariaInvalid]) => ariaInvalid === null)).toBeTrue()
+      expect(fixtureEl.querySelector('#picker')).not.toHaveClass('is-invalid')
+    })
+
     it('should take no state from a class or an aria-invalid the page writes on the picker element', async () => {
       buildPicker({ locale: 'en-US' }, '<div id="picker" aria-invalid="true"></div><div class="invalid-feedback">Already booked.</div>')
 

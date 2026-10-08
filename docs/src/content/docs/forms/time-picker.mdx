@@ -91,7 +91,7 @@ The time picker supports [floating labels](/forms/floating-labels/): set `floati
 
 ## Validation
 
-The picker takes its validation state [the way the date picker does](/forms/date-picker/#validation): the `validationState` option (with `invalid` and `valid` as deprecated aliases) or an `.is-invalid` or `.is-valid` class written on the picker element, read once when the picker starts. A given state drops on the next change the user makes, a time picked in the panel, the cleaner, a footer button other than the one that closes the popup, or typing in the field, and stays through `setTime()`, `clear()`, `reset()` and `now()` called by your code. `setConfig({ validationState })` sets it again; for now `setConfig` changes only the validation options. While the given state is `'invalid'`, the sections of the field carry `aria-invalid="true"`, are described by the message after the picker, and the picker blocks the submit with its text, or `Invalid value.` when there is none.
+The picker takes its validation state [the way the date picker does](/forms/date-picker/#validation): the `validationState` option (with `invalid` and `valid` as deprecated aliases) or an `.is-invalid` or `.is-valid` class written on the picker element, read once when the picker starts. A given state drops on the next change of the time the user makes, a time picked in the panel, the cleaner, a footer button that changes the time through the context, or typing in the field, and stays through `setTime()`, `clear()`, `reset()` and `now()` called by your code. `setConfig({ validationState })` sets it again; for now `setConfig` changes only the validation options. While the given state is `'invalid'`, the sections of the field carry `aria-invalid="true"`, are described by the message after the picker, and the picker blocks the submit with its text, or `Invalid value.` when there is none.
 
 <Example pro code={`<div class="row">
     <div class="col-lg-4 form-field">
@@ -244,7 +244,7 @@ picker itself.
 | `disabled` | boolean | `false` | Disables the field and the popup. |
 | `floatingLabel` | string, null | `null` | Renders a floating label over the field, which also becomes its accessible name. An `aria-label` or `aria-labelledby` on the picker element names the field instead. |
 | `hours` | array, function, null | `null` | Allowed hours, 0 to 23 in every locale — a list or a filter. |
-| `inputOptions` | object | `{}` | Programmatic escape hatch for time input options. |
+| `inputOptions` | object | `{}` | Programmatic escape hatch for time input options, except `validationState`, `invalid` and `valid`, which the picker owns. |
 | `invalid` | boolean | `false` | Deprecated alias of `validationState: 'invalid'`, ignored once `validationState` is set. |
 | `locale` | string | browser locale | Drives the mask and the 12/24-hour split. |
 | `minutes` | array, boolean, function | `true` | Allowed minutes, or `false` to drop the column. |

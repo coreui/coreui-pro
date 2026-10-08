@@ -810,6 +810,29 @@ describe('TimePicker', () => {
       expect(fixtureEl.querySelector('form').checkValidity()).toBeTrue()
     })
 
+    it('should drop the given state when the user types in the field, and through a native form reset', async () => {
+      buildPicker({ time: '10:30:00' }, '<form><div id="picker" class="is-invalid"></div><div id="second" data-coreui-validation-state="invalid"></div></form>')
+      const form = fixtureEl.querySelector('form')
+      const [hour] = fixtureEl.querySelectorAll('#picker .form-date-time-section')
+
+      hour.focus()
+      hour.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true, cancelable: true }))
+
+      expect(fixtureEl.querySelector('#picker').classList.contains('is-invalid')).toBeFalse()
+      expect([...fixtureEl.querySelectorAll('#picker .form-date-time-section')].every(section => !section.hasAttribute('aria-invalid'))).toBeTrue()
+
+      pickers.push(new TimePicker(fixtureEl.querySelector('#second'), { locale: 'en-US', time: '10:30:00' }))
+
+      expect(form.checkValidity()).toBeFalse()
+
+      form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(form.checkValidity()).toBeTrue()
+    })
+
     it.each([
       ['picks a time', picker => {
         picker.show()
@@ -824,6 +847,7 @@ describe('TimePicker', () => {
 
       picker.setTime('11:45:00')
       picker.clear()
+      picker.reset()
 
       expect(form.checkValidity()).toBeFalse()
 

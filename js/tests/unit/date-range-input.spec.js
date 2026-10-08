@@ -449,6 +449,27 @@ describe('DateRangeInput', () => {
       expect(configuredElement.classList.contains('is-valid')).toBeFalse()
     })
 
+    it('should leave a state class the page put on the frame after start when the order breaks and mends', () => {
+      const range = build({ startDate: new Date(2026, 6, 14), endDate: new Date(2026, 6, 20) })
+
+      root().classList.add('is-invalid')
+      range.setRange(new Date(2026, 6, 20), new Date(2026, 6, 14))
+      range.setRange(new Date(2026, 6, 14), new Date(2026, 6, 20))
+
+      expect(root().classList.contains('is-invalid')).toBeTrue()
+    })
+
+    it('should leave the validation options of inputOptions out, so the range owns the state', () => {
+      const range = build({ inputOptions: { validationState: 'invalid' }, startDate: new Date(2026, 6, 14), endDate: new Date(2026, 6, 20) }, '<form><div id="range"></div></form>')
+
+      expect(fields().some(field => field.classList.contains('is-invalid'))).toBeFalse()
+
+      range.setConfig({ validationState: 'invalid' })
+      typeIn(fields()[0])
+
+      expect(fixtureEl.querySelector('form').checkValidity()).toBeTrue()
+    })
+
     it('should keep a state class the page put on while it lived', () => {
       const range = build({}, '<div id="range" class="mine"></div>')
       const element = root()
