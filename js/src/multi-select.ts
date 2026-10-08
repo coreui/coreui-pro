@@ -13,7 +13,7 @@ import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import FocusTrap from './util/focustrap.js'
 import {
-  followUserValidity, getFeedbackIds, getValidationState, ownValidationState, setStateValidity,
+  followUserValidity, getFeedbackIds, getValidationState, nextStateSerial, ownValidationState, setStateValidity,
   type UserValidity, type ValidationState
 } from './util/form-validation.js'
 import { CLEANER_ICON, PICKER_ICON } from './util/icons.js'
@@ -241,9 +241,12 @@ class MultiSelect extends ComboboxBase {
   protected declare _hostAttributes: Map<string, string | null>
   protected declare _describedBy: string | null
   protected declare _initialValues: string[]
+  protected declare _listGesture: boolean
   protected declare _releaseValidationState: (() => void) | null
   protected declare _serverClasses: string[]
   protected declare _stateClass: string | null
+  protected declare _stateSerial: number
+  protected declare _userChange: boolean
   protected declare _userValidity: UserValidity
   protected declare _addedSelectClass: boolean
   protected declare _indicatorElement: any
@@ -285,9 +288,12 @@ class MultiSelect extends ComboboxBase {
     this._nativeFocusHandler = null
     this._nativeKeydownHandler = null
     this._describedBy = null
+    this._listGesture = false
     this._releaseValidationState = null
     this._stateClass = null
-    this._userValidity = followUserValidity(this._element as HTMLSelectElement, () => this._updateValidity(), () => this._restoreSelection())
+    this._stateSerial = nextStateSerial()
+    this._userChange = false
+    this._userValidity = followUserValidity(this._element as HTMLSelectElement, () => this._updateValidity(), serial => this._restoreSelection(serial))
     this._selected = []
     this._options = this._getOptions()
     this._floatingCleanup = null
@@ -453,6 +459,7 @@ class MultiSelect extends ComboboxBase {
 
     if (keys.some(key => VALIDATION_OPTIONS.has(key))) {
       this._serverClasses = []
+      this._stateSerial = nextStateSerial()
     }
 
     if (keys.length > 0 && keys.every(key => VALIDATION_OPTIONS.has(key))) {
@@ -575,8 +582,7 @@ class MultiSelect extends ComboboxBase {
 
       const chip = event.target.closest(SELECTOR_CHIP)
       if (chip) {
-        this._dismissValidationState()
-        this._deselectOption(String(chip.dataset.value))
+        this._runAsUser(() => this._deselectOption(String(chip.dataset.value)))
       }
     })
 
@@ -584,8 +590,7 @@ class MultiSelect extends ComboboxBase {
       if (!this._config.disabled) {
         event.preventDefault()
         event.stopPropagation()
-        this._dismissValidationState()
-        this.deselectAll()
+        this._runAsUser(() => this.deselectAll())
       }
     })
 
@@ -726,8 +731,7 @@ class MultiSelect extends ComboboxBase {
         event.stopPropagation()
 
         if (!this._config.disabled) {
-          this._dismissValidationState()
-          this._toggleSelectAll()
+          this._runAsUser(() => this._toggleSelectAll())
         }
       })
     }
@@ -954,11 +958,26 @@ class MultiSelect extends ComboboxBase {
     }
   }
 
-  _dismissValidationState(): void {
+  _dismissValidationState(serial: number = Number.POSITIVE_INFINITY): void {
+    if (this._stateSerial > serial) {
+      return
+    }
+
     this._config.invalid = false
     this._config.valid = false
     this._config.validationState = null
     this._serverClasses = []
+    setStateValidity(this._element as HTMLSelectElement, false)
+  }
+
+  _runAsUser(action: () => void): void {
+    this._userChange = true
+
+    try {
+      action()
+    } finally {
+      this._userChange = false
+    }
   }
 
   _markRequired(): void {
@@ -1270,16 +1289,25 @@ class MultiSelect extends ComboboxBase {
 
   override _onOptionSelected(value: string): void {
     const option = this._findOptionByValue(value)
-    this._dismissValidationState()
+    this._startListGesture()
     this._selectOption(value, option ? option.text : value, { refresh: false })
   }
 
   override _onOptionDeselected(value: string): void {
-    this._dismissValidationState()
+    this._startListGesture()
     this._deselectOption(value, { refresh: false })
   }
 
+  _startListGesture(): void {
+    if (!this._listGesture) {
+      this._listGesture = true
+      this._userChange = true
+    }
+  }
+
   override _onSelectionChange(): void {
+    this._listGesture = false
+
     if (!this._config.multiple) {
       this.hide()
       this.search('')
@@ -1361,6 +1389,15 @@ class MultiSelect extends ComboboxBase {
   }
 
   _selectOption(value: any, text: string, { refresh = true }: { refresh?: boolean } = {}): void {
+    if (this._userChange) {
+      if (this._selected.some((option: any) => option.value === String(value))) {
+        return
+      }
+
+      this._userChange = false
+      this._dismissValidationState()
+    }
+
     if (!this._config.multiple) {
       this.deselectAll()
     }
@@ -1400,6 +1437,15 @@ class MultiSelect extends ComboboxBase {
   }
 
   _deselectOption(value: any, { refresh = true }: { refresh?: boolean } = {}): void {
+    if (this._userChange) {
+      if (!this._selected.some((option: any) => option.value === String(value))) {
+        return
+      }
+
+      this._userChange = false
+      this._dismissValidationState()
+    }
+
     this._selected = this._selected.filter((option: any) => option.value !== String(value))
 
     const nativeOption = this._getNativeOption(value)
@@ -1422,13 +1468,13 @@ class MultiSelect extends ComboboxBase {
     if (this._selected.length > 0) {
       const last = this._selected.findLast((option: any) => option.disabled !== true)
       if (last) {
-        this._dismissValidationState()
-        this._deselectOption(last.value)
+        this._runAsUser(() => this._deselectOption(last.value))
       }
     }
   }
 
   _refreshAfterSelectionChange(notify = true): void {
+    this._userChange = false
     this._updateSelection()
     this._updateSelectionCleaner()
     this._updateSearch()
@@ -1454,7 +1500,7 @@ class MultiSelect extends ComboboxBase {
     this._refreshAfterSelectionChange(false)
   }
 
-  _restoreSelection(): void {
+  _restoreSelection(serial: number = Number.POSITIVE_INFINITY): void {
     const options = this._flattenOptions()
     const values = new Set(this._initialValues)
 
@@ -1474,7 +1520,7 @@ class MultiSelect extends ComboboxBase {
     }
 
     this._onSearchChange(this._searchElement)
-    this._dismissValidationState()
+    this._dismissValidationState(serial)
     this._refreshAfterSelectionChange(false)
   }
 
@@ -1747,22 +1793,10 @@ class MultiSelect extends ComboboxBase {
 
   _getSelectionActions(): any {
     return {
-      selectAll: () => {
-        this._dismissValidationState()
-        this.selectAll()
-      },
-      deselectAll: () => {
-        this._dismissValidationState()
-        this.deselectAll()
-      },
-      selectFiltered: () => {
-        this._dismissValidationState()
-        this.selectFiltered()
-      },
-      deselectFiltered: () => {
-        this._dismissValidationState()
-        this.deselectFiltered()
-      }
+      selectAll: () => this._runAsUser(() => this.selectAll()),
+      deselectAll: () => this._runAsUser(() => this.deselectAll()),
+      selectFiltered: () => this._runAsUser(() => this.selectFiltered()),
+      deselectFiltered: () => this._runAsUser(() => this.deselectFiltered())
     }
   }
 
