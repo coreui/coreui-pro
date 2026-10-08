@@ -351,6 +351,42 @@ Add the `data-coreui-multiple="false"` boolean attribute to implement single-sel
     </optgroup>
   </select>`} />
 
+## Validation
+
+The control shows its validation state on the frame and on the element that takes the focus, and links the message that follows it, the way the [form plugin](/forms/validation/) does for a native field.
+
+<Example pro code={`<form class="row g-3" data-coreui-validate novalidate>
+    <div class="col-12">
+      <select id="ms-validation" data-coreui-multi-select multiple data-coreui-required="true" aria-label="Frameworks">
+        <option value="0">Angular</option>
+        <option value="1">Bootstrap</option>
+        <option value="2">React.js</option>
+        <option value="3">Vue.js</option>
+      </select>
+      <div class="invalid-feedback">Pick at least one framework.</div>
+    </div>
+    <div class="col-12">
+      <button class="btn btn-primary" type="submit">Submit</button>
+    </div>
+  </form>`} />
+
+The state comes from four places, in this order:
+
+- The `validationState` option: `'valid'`, `'invalid'` or a state you added to `$form-validation-states`. The `invalid` and `valid` options still work as aliases; `invalid` wins when both are set, and both are ignored once `validationState` is set.
+- An `.is-invalid` or `.is-valid` class written on the select in the markup, for example by a server that has already checked the value. It is read once, when the component starts, and moves to the frame.
+- A validation that reports the select invalid: a submit, `checkValidity()` or `reportValidity()`, which the form plugin and the [stepper](/forms/stepper/) call as well. From then on the control shows it invalid whenever its selection is invalid, until a native reset of the form.
+- In a form with `data-coreui-validate`, the `:user-invalid` and `:user-valid` states of the select.
+
+A state you give, with the option or with the class, is a verdict on the selection it was given for, so the next change the user makes drops it: a pick in the list, a removed chip, the cleaner, select all, or <kbd>Backspace</kbd> in the search box. A change your own code makes, with the selection methods or `setConfig({ value })`, keeps it. To set it again, from a `change.coreui.multi-select` or `input` listener or after a server response, call `setConfig({ validationState })`. It updates the state without rebuilding the control and replaces a class written on the select, so `setConfig({ validationState: null })` withdraws that class. A class or an `aria-invalid` written on the select after the component starts is not read. While the given state is `'invalid'`, the select blocks the submit like any invalid field, with the text of the linked message, or `Invalid value.` when there is none; a custom validity you set on the select yourself stays as it is, and a disabled control does not block. A native reset of the form puts back the selection the control started with and drops the state.
+
+<Example pro code={`<select id="ms-validation-server" class="is-invalid" data-coreui-multi-select multiple aria-label="Frameworks">
+    <option value="0" selected>Angular</option>
+    <option value="1">Bootstrap</option>
+    <option value="2">React.js</option>
+    <option value="3">Vue.js</option>
+  </select>
+  <div class="invalid-feedback">Angular is not available in this plan.</div>`} />
+
 ## Disabled
 
 Add the `data-coreui-disabled="true"` boolean attribute to give it a grayed out appearance, remove pointer events, and prevent focusing.
@@ -538,7 +574,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `hideSelectAllOnSearchNoResults` | boolean | `true` | Hides the dropdown header with the built-in select all button when a search filter leaves no matching options. Set to `false` to keep the select all button visible even when there are no results. |
 | `id` | string, null | `null` | Id of the native select and the base of the ids the component builds (`-listbox`, `-label`, `search-`). Without it the select keeps its own `id`, or gets a generated one. |
 | `indicator` | string | `'checkbox'` | Sets the marker used by the options, the selectable group labels and the select all button: `'checkbox'` or `'none'`. |
-| `invalid` | boolean | `false` | Toggle the invalid state for the component. |
+| `invalid` | boolean | `false` | Deprecated alias of `validationState: 'invalid'`, ignored once `validationState` is set. |
 | `multiple` | boolean | `true` | It specifies that multiple options can be selected at once. |
 | `name` | string, null | `null` | Name of the native select the selection is submitted under. A `name` written on the `<select>` itself is honoured too, and this option wins over it. With neither the selection is not submitted with the form. |
 | `options` | boolean, array | `false` | List of option elements. |
@@ -560,7 +596,8 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `selectFilteredLabel` | string | `'Select filtered'` | Label shown instead of `selectAllLabel` when `selectAllMode: 'filtered'` and a search filter narrows the list, so the button reads as acting on the filtered options rather than the whole list. |
 | `selectionLimit` | number, null | `null` | Sets the maximum number of selectable options. The select all button stays enabled and selects up to the limit (firing the `selectionLimit` event), then toggles to deselect all once the limit is reached. |
 | `selectionType` | string | `'tags'` | Sets the selection style: `'chips'`, `'counter'`, `'tags'` or `'text'`. Selections render as [Chip](/components/chip/) components — `'tags'` and `'chips'` are the same thing, kept as synonyms. |
-| `valid` | boolean | `false` | Toggle the valid state for the component. |
+| `valid` | boolean | `false` | Deprecated alias of `validationState: 'valid'`, ignored once `validationState` is set. |
+| `validationState` | string, null | `null` | The validation state the control shows: `'valid'`, `'invalid'` or a state of `$form-validation-states`. `'invalid'` also blocks the submit. The next change of the selection by the user clears it, see [Validation](#validation). |
 | `value` | string, number, array, null | `null` | Sets the initially selected values for the multi-select component; a string may list several values separated by commas. |
 
 ### Methods
@@ -575,7 +612,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `hide` | Hides the multi select's options. |
 | `selectAll` | Select all options. |
 | `selectFiltered` | Select only the currently filtered (search-matched) options. |
-| `setConfig` | Merges the given options over the current configuration and rebuilds the interface. Options you leave out keep their current value. |
+| `setConfig` | Merges the given options over the current configuration and rebuilds the interface. Options you leave out keep their current value. A call that only changes `validationState`, `invalid` or `valid` updates the state without rebuilding. |
 | `show` | Shows the multi select's options. |
 
 ### Events
@@ -605,7 +642,7 @@ The control takes its name from the select's `aria-labelledby`, then its `aria-l
 
 The options panel is a dialog named like the control. Opening it moves the focus inside — onto the search box when `search` is on, otherwise onto the option the list points at, which is the selection the user left or the first option. The options are focusable one at a time: the arrows move the focus itself rather than a highlight read through `aria-activedescendant`. <kbd>Tab</kbd> cycles through what the panel offers and the search box in the control, and reaches nothing outside them until the panel closes, which <kbd>Escape</kbd> does, returning the focus to the control.
 
-The select stays in the page as an invisible overlay for form validation and is hidden from screen readers, so the control speaks for it: an `aria-describedby`, an `aria-invalid` or `.is-invalid` on the select, or the `invalid` option, lands on the control (the search box when `search` is on), and focus that reaches the select, from validation or from its label, goes on to the control. A change of selection fires `input` and `change` on the select, as a native list does, so a script that clears a field's error on input sees it.
+The select stays in the page as an invisible overlay for form validation and is hidden from screen readers, so the control speaks for it. The `aria-describedby` the select has when the component starts goes on the control, the search box when `search` is on, and while the state is invalid the control carries `aria-invalid` and is described by the message that follows it as well. Focus that reaches the select, from validation or from its label, goes on to the control. A change of selection fires `input` and `change` on the select, as a native list does, so a script that clears a field's error on input sees it.
 
 ### Keyboard shortcuts
 

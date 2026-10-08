@@ -1,6 +1,7 @@
 
 import Chip from '../../src/chip.js'
 import ChipSet from '../../src/chip-set.js'
+import Form from '../../src/form.js'
 import MultiSelect from '../../src/multi-select.js'
 import EventHandler from '../../src/dom/event-handler.js'
 import {
@@ -313,104 +314,447 @@ describe('MultiSelect', () => {
       expect(events).toEqual(['input', 'change'])
     })
 
-    it('should clear the carried invalid state once a page script sees the select become valid', async () => {
-      fixtureEl.innerHTML = '<form novalidate><select required multiple></select></form>'
+    it('should show the state it is given on the control, linking the message after it', () => {
+      fixtureEl.innerHTML = '<form><select></select><div class="invalid-feedback">Pick a framework.</div></form>'
       const selectEl = fixtureEl.querySelector('select')
-      fixtureEl.querySelector('form').addEventListener('input', event => {
-        event.target.setAttribute('aria-invalid', String(!event.target.validity.valid))
-      })
-      const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }], multiple: true })
+      const feedback = fixtureEl.querySelector('.invalid-feedback')
+      const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }], validationState: 'invalid' })
 
-      selectEl.setAttribute('aria-invalid', 'true')
-      await Promise.resolve()
+      expect(multiSelect._wrapperElement.classList.contains('is-invalid')).toBeTrue()
       expect(multiSelect._togglerElement.getAttribute('aria-invalid')).toBe('true')
-
-      multiSelect.selectAll()
-      await Promise.resolve()
-
-      expect(multiSelect._togglerElement.hasAttribute('aria-invalid')).toBeFalse()
+      expect(multiSelect._togglerElement.getAttribute('aria-describedby')).toBe(feedback.id)
+      expect(selectEl.validationMessage).toBe('Pick a framework.')
     })
 
-    it('should mark the custom control invalid while the native select carries .is-invalid', async () => {
-      fixtureEl.innerHTML = '<select class="is-invalid"></select>'
+    it('should take validationState over the invalid and valid aliases, and invalid over valid', () => {
+      fixtureEl.innerHTML = '<select id="both"></select><select id="state"></select>'
+      const both = new MultiSelect(fixtureEl.querySelector('#both'), { options: [], invalid: true, valid: true })
+      const state = new MultiSelect(fixtureEl.querySelector('#state'), { options: [], invalid: true, validationState: 'warning' })
+
+      expect([...both._wrapperElement.classList].filter(name => name.startsWith('is-'))).toEqual(['is-invalid'])
+      expect(state._wrapperElement.classList.contains('is-warning')).toBeTrue()
+      expect(state._wrapperElement.classList.contains('is-invalid')).toBeFalse()
+      expect(state._togglerElement.hasAttribute('aria-invalid')).toBeFalse()
+      expect(fixtureEl.querySelector('#state').checkValidity()).toBeTrue()
+    })
+
+    it('should take a state class written on the select as the state of the value it loads with, and give it back on dispose', () => {
+      fixtureEl.innerHTML = '<form><select class="is-invalid"></select><div class="invalid-feedback">Taken.</div></form>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }] })
 
+      expect(selectEl.classList.contains('is-invalid')).toBeFalse()
+      expect(multiSelect._wrapperElement.classList.contains('is-invalid')).toBeTrue()
       expect(multiSelect._togglerElement.getAttribute('aria-invalid')).toBe('true')
+      expect(selectEl.validationMessage).toBe('Taken.')
 
-      selectEl.classList.remove('is-invalid')
-      await Promise.resolve()
+      multiSelect.dispose()
 
-      expect(multiSelect._togglerElement.hasAttribute('aria-invalid')).toBeFalse()
+      expect(selectEl.classList.contains('is-invalid')).toBeTrue()
+      expect(selectEl.checkValidity()).toBeTrue()
     })
 
-    it('should keep carrying the validity after setConfig rebuilds the control', async () => {
+    it('should keep the state of a single select that loads with a selected option', () => {
+      fixtureEl.innerHTML = '<select class="is-invalid"></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), {
+        multiple: false,
+        options: [{ value: '1', text: 'Option 1', selected: true }, { value: '2', text: 'Option 2' }]
+      })
+
+      expect(multiSelect._wrapperElement.classList.contains('is-invalid')).toBeTrue()
+    })
+
+    it('should drop a given state once the user changes the selection, without bringing it back', () => {
+      fixtureEl.innerHTML = '<form><select id="server" class="is-invalid"></select><select id="option"></select></form>'
+      const options = [{ value: '1', text: 'Option 1' }, { value: '2', text: 'Option 2' }]
+      const server = new MultiSelect(fixtureEl.querySelector('#server'), { options })
+      const option = new MultiSelect(fixtureEl.querySelector('#option'), { options, validationState: 'invalid' })
+      const pick = (multiSelect, value) => multiSelect._optionsElement.querySelector(`[data-coreui-value="${value}"]`).click()
+
+      pick(server, '1')
+      pick(option, '1')
+
+      expect(server._wrapperElement.classList.contains('is-invalid')).toBeFalse()
+      expect(server._togglerElement.hasAttribute('aria-invalid')).toBeFalse()
+      expect(fixtureEl.querySelector('#server').checkValidity()).toBeTrue()
+      expect(option._wrapperElement.classList.contains('is-invalid')).toBeFalse()
+
+      pick(server, '1')
+      option.setConfig({ search: true })
+
+      expect(server._wrapperElement.classList.contains('is-invalid')).toBeFalse()
+      expect(option._wrapperElement.classList.contains('is-invalid')).toBeFalse()
+      expect(fixtureEl.querySelector('#option').checkValidity()).toBeTrue()
+    })
+
+    it('should keep a given state through changes made from code', () => {
+      fixtureEl.innerHTML = '<form><select class="is-invalid"></select></form>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }, { value: '2', text: 'Option 2' }] })
+
+      multiSelect.deselectAll()
+      multiSelect.selectAll()
+      multiSelect.setConfig({ value: ['1'] })
+
+      expect(multiSelect._wrapperElement.classList.contains('is-invalid')).toBeTrue()
+      expect(selectEl.checkValidity()).toBeFalse()
+    })
+
+    it('should keep a state the page sets while handling change.coreui.multi-select', () => {
+      fixtureEl.innerHTML = '<form><select></select></form>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }] })
+
+      selectEl.addEventListener('change.coreui.multi-select', () => {
+        multiSelect.setConfig({ validationState: 'invalid' })
+      })
+      multiSelect._optionsElement.querySelector('[data-coreui-value="1"]').click()
+
+      expect(multiSelect._wrapperElement.classList.contains('is-invalid')).toBeTrue()
+      expect(selectEl.form.checkValidity()).toBeFalse()
+    })
+
+    it('should let a page listening to input set the state again after a change', () => {
+      fixtureEl.innerHTML = '<form><select></select></form>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }], validationState: 'invalid' })
+
+      selectEl.form.addEventListener('input', () => {
+        multiSelect.setConfig({ validationState: 'valid' })
+      })
+      multiSelect._optionsElement.querySelector('[data-coreui-value="1"]').click()
+
+      expect(multiSelect._wrapperElement.classList.contains('is-valid')).toBeTrue()
+    })
+
+    it('should let setConfig withdraw a state class written on the select', () => {
+      fixtureEl.innerHTML = '<form><select class="is-invalid"></select></form>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }] })
+
+      multiSelect.setConfig({ validationState: null })
+
+      expect(multiSelect._wrapperElement.classList.contains('is-invalid')).toBeFalse()
+      expect(selectEl.form.checkValidity()).toBeTrue()
+
+      multiSelect.dispose()
+
+      expect(selectEl.classList.contains('is-invalid')).toBeFalse()
+    })
+
+    it('should not give a state class back on dispose once the user dropped it', () => {
+      fixtureEl.innerHTML = '<form><select class="is-invalid"></select></form>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }] })
+
+      multiSelect._optionsElement.querySelector('[data-coreui-value="1"]').click()
+      multiSelect.dispose()
+
+      const next = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }] })
+
+      expect(selectEl.classList.contains('is-invalid')).toBeFalse()
+      expect(next._wrapperElement.classList.contains('is-invalid')).toBeFalse()
+      expect(selectEl.form.checkValidity()).toBeTrue()
+    })
+
+    it('should not follow a class or aria-invalid the page writes on the select later', async () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }] })
 
-      multiSelect.setConfig({ invalid: true })
-      expect(multiSelect._togglerElement.getAttribute('aria-invalid')).toBe('true')
-
-      multiSelect.setConfig({ invalid: false })
-      selectEl.setAttribute('aria-describedby', 'hint')
+      selectEl.classList.add('is-invalid')
+      selectEl.setAttribute('aria-invalid', 'true')
       await Promise.resolve()
 
-      expect(multiSelect._togglerElement.getAttribute('aria-describedby')).toBe('hint')
       expect(multiSelect._togglerElement.hasAttribute('aria-invalid')).toBeFalse()
+      expect(multiSelect._wrapperElement.classList.contains('is-invalid')).toBeFalse()
+
+      multiSelect.setConfig({ search: true })
+
+      expect(multiSelect._wrapperElement.classList.contains('is-invalid')).toBeFalse()
+      expect(multiSelect._searchElement.hasAttribute('aria-invalid')).toBeFalse()
     })
 
-    it('should carry the validity of the native select to the custom control', async () => {
-      fixtureEl.innerHTML = '<form novalidate><select required aria-describedby="hint"></select></form>'
+    it('should change the state with setConfig without rebuilding the control', () => {
+      fixtureEl.innerHTML = '<select aria-describedby="hint"></select><p id="hint">Hint</p>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }], search: true })
-      const target = multiSelect._searchElement
+      const wrapper = multiSelect._wrapperElement
 
-      expect(target.getAttribute('aria-describedby')).toBe('hint')
-      expect(target.hasAttribute('aria-invalid')).toBeFalse()
+      expect(multiSelect._searchElement.getAttribute('aria-describedby')).toBe('hint')
 
-      selectEl.setAttribute('aria-invalid', 'true')
-      selectEl.setAttribute('aria-describedby', 'hint error')
-      await Promise.resolve()
+      multiSelect.setConfig({ validationState: 'invalid' })
 
-      expect(target.getAttribute('aria-invalid')).toBe('true')
-      expect(target.getAttribute('aria-describedby')).toBe('hint error')
+      expect(multiSelect._wrapperElement).toBe(wrapper)
+      expect(wrapper.classList.contains('is-invalid')).toBeTrue()
+      expect(multiSelect._searchElement.getAttribute('aria-invalid')).toBe('true')
 
-      selectEl.removeAttribute('aria-invalid')
-      selectEl.removeAttribute('aria-describedby')
-      await Promise.resolve()
+      multiSelect.setConfig({ validationState: null })
 
-      expect(target.hasAttribute('aria-invalid')).toBeFalse()
-      expect(target.hasAttribute('aria-describedby')).toBeFalse()
+      expect(wrapper.classList.contains('is-invalid')).toBeFalse()
+      expect(multiSelect._searchElement.hasAttribute('aria-invalid')).toBeFalse()
+      expect(selectEl.checkValidity()).toBeTrue()
     })
 
-    it('should mark the custom control invalid with the invalid option', () => {
-      fixtureEl.innerHTML = '<select></select>'
+    it('should block the submit while it is given invalid, with a generic message when none is linked', () => {
+      fixtureEl.innerHTML = '<form><select></select></form>'
       const selectEl = fixtureEl.querySelector('select')
-      const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }], invalid: true })
+      new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }], invalid: true }) // eslint-disable-line no-new
 
+      expect(selectEl.validationMessage).toBe('Invalid value.')
+      expect(selectEl.form.checkValidity()).toBeFalse()
+    })
+
+    it('should leave a validity the page sets on the select', () => {
+      fixtureEl.innerHTML = '<form><select></select></form>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }] })
+
+      selectEl.setCustomValidity('Pick two.')
+      multiSelect.setConfig({ validationState: 'invalid' })
+
+      expect(selectEl.validationMessage).toBe('Pick two.')
+
+      multiSelect.setConfig({ validationState: null })
+      multiSelect.selectAll()
+
+      expect(selectEl.validationMessage).toBe('Pick two.')
+      expect(selectEl.form.checkValidity()).toBeFalse()
+
+      selectEl.setCustomValidity('')
+      multiSelect.setConfig({ validationState: 'invalid' })
+      selectEl.setCustomValidity('Pick three.')
+      multiSelect.setConfig({ validationState: null })
+
+      expect(selectEl.validationMessage).toBe('Pick three.')
+    })
+
+    it('should not block the submit while disabled', () => {
+      fixtureEl.innerHTML = '<form><select></select></form>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }], disabled: true, invalid: true })
+
+      expect(multiSelect._wrapperElement.classList.contains('is-invalid')).toBeTrue()
+      expect(selectEl.form.checkValidity()).toBeTrue()
+    })
+
+    it('should name a message the select already points to once', () => {
+      fixtureEl.innerHTML = '<form><select class="is-invalid" aria-describedby="hint fb"></select><div id="fb" class="invalid-feedback">Taken.</div></form><p id="hint">Hint</p>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { options: [{ value: '1', text: 'Option 1' }] })
+
+      expect(multiSelect._togglerElement.getAttribute('aria-describedby')).toBe('hint fb')
+    })
+
+    it('should show a select a validation reported invalid until its selection is valid', () => {
+      fixtureEl.innerHTML = '<form novalidate><select></select><div class="invalid-feedback">Pick one.</div></form>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }], required: true })
+
+      expect(multiSelect._togglerElement.hasAttribute('aria-invalid')).toBeFalse()
+
+      selectEl.form.checkValidity()
+
+      expect(multiSelect._wrapperElement.classList.contains('is-invalid')).toBeTrue()
+      expect(multiSelect._togglerElement.getAttribute('aria-invalid')).toBe('true')
+      expect(multiSelect._togglerElement.getAttribute('aria-describedby')).toBe(fixtureEl.querySelector('.invalid-feedback').id)
+
+      multiSelect.selectAll()
+
+      expect(multiSelect._wrapperElement.classList.contains('is-invalid')).toBeFalse()
+      expect(multiSelect._togglerElement.hasAttribute('aria-invalid')).toBeFalse()
+      expect(multiSelect._togglerElement.hasAttribute('aria-describedby')).toBeFalse()
+    })
+
+    it('should keep a reported state through a rebuild', () => {
+      fixtureEl.innerHTML = '<form novalidate><select></select></form>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }], required: true })
+
+      selectEl.form.checkValidity()
+      multiSelect.setConfig({ placeholder: 'Pick one' })
+
+      expect(multiSelect._wrapperElement.classList.contains('is-invalid')).toBeTrue()
       expect(multiSelect._togglerElement.getAttribute('aria-invalid')).toBe('true')
     })
 
-    it('should stop watching the native select once disposed', async () => {
-      fixtureEl.innerHTML = '<select></select>'
+    it('should let a given state win over a reported one', () => {
+      fixtureEl.innerHTML = '<form novalidate><select></select></form>'
       const selectEl = fixtureEl.querySelector('select')
-      const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }] })
-      multiSelect.setConfig({ options: [{ value: '1', text: 'Option 1' }] })
-      const toggler = multiSelect._togglerElement
+      const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }], required: true })
+
+      selectEl.form.checkValidity()
+      multiSelect.setConfig({ validationState: 'valid' })
+
+      expect(multiSelect._wrapperElement.classList.contains('is-valid')).toBeTrue()
+      expect(multiSelect._wrapperElement.classList.contains('is-invalid')).toBeFalse()
+      expect(multiSelect._togglerElement.hasAttribute('aria-invalid')).toBeFalse()
+    })
+
+    it('should follow a select that names its form from outside it', async () => {
+      fixtureEl.innerHTML = '<form id="outsideForm" novalidate></form><select form="outsideForm"></select>'
+      const form = fixtureEl.querySelector('form')
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { options: [{ value: '1', text: 'Option 1' }], required: true })
+
+      form.checkValidity()
+
+      expect(multiSelect._wrapperElement.classList.contains('is-invalid')).toBeTrue()
+
+      form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(multiSelect._wrapperElement.classList.contains('is-invalid')).toBeFalse()
+    })
+
+    it('should leave input in the other fields of the form alone', () => {
+      fixtureEl.innerHTML = '<form><select></select><textarea></textarea></form>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { options: [{ value: '1', text: 'Option 1' }] })
+      const spy = spyOn(multiSelect, '_updateValidity').and.callThrough()
+      const textarea = fixtureEl.querySelector('textarea')
+
+      for (let index = 0; index < 3; index++) {
+        textarea.dispatchEvent(new Event('input', { bubbles: true }))
+        textarea.dispatchEvent(new Event('change', { bubbles: true }))
+      }
+
+      expect(spy).not.toHaveBeenCalled()
+    })
+
+    it('should leave the select and its search input to itself when the form plugin validates', () => {
+      fixtureEl.innerHTML = '<form data-coreui-validate="valid" novalidate><select></select></form>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }], required: true, search: true })
+
+      Form.getOrCreateInstance(selectEl.form).validate()
+
+      expect(selectEl.classList.contains('is-invalid')).toBeFalse()
+      expect(selectEl.hasAttribute('aria-invalid')).toBeFalse()
+      expect(multiSelect._searchElement.classList.contains('is-valid')).toBeFalse()
+      expect(multiSelect._searchElement.getAttribute('aria-invalid')).toBe('true')
+      expect(multiSelect._wrapperElement.classList.contains('is-invalid')).toBeTrue()
+      expect(document.activeElement).toBe(multiSelect._searchElement)
+    })
+
+    it('should restore the selection it loaded with on a native reset, and drop a given state', async () => {
+      fixtureEl.innerHTML = '<form novalidate><select></select></form>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [{ value: '1', text: 'Option 1' }, { value: '2', text: 'Option 2' }],
+        value: ['2']
+      })
+
+      multiSelect._optionsElement.querySelector('[data-coreui-value="1"]').click()
+      multiSelect.setConfig({ validationState: 'invalid' })
+      selectEl.form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['2'])
+      expect([...selectEl.selectedOptions].map(option => option.value)).toEqual(['2'])
+      expect(multiSelect._wrapperElement.classList.contains('is-invalid')).toBeFalse()
+      expect(selectEl.checkValidity()).toBeTrue()
+    })
+
+    it('should restore no more than the selection limit allowed at load', async () => {
+      fixtureEl.innerHTML = '<form><select multiple><option value="1" selected>One</option><option value="2" selected>Two</option><option value="3" selected>Three</option></select></form>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { selectionLimit: 2 })
+
+      multiSelect._optionsElement.querySelector('[data-coreui-value="1"]').click()
+      selectEl.form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['1', '2'])
+    })
+
+    it('should forget a reported state on a native reset', async () => {
+      fixtureEl.innerHTML = '<form novalidate><select></select></form>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }], required: true })
+
+      selectEl.form.checkValidity()
+
+      expect(multiSelect._togglerElement.getAttribute('aria-invalid')).toBe('true')
+
+      selectEl.form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(selectEl.validity.valid).toBeFalse()
+      expect(multiSelect._togglerElement.hasAttribute('aria-invalid')).toBeFalse()
+      expect(multiSelect._wrapperElement.classList.contains('is-invalid')).toBeFalse()
+    })
+
+    it('should show every option again after a native reset clears the search', async () => {
+      fixtureEl.innerHTML = '<form><select></select></form>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [{ value: '1', text: 'Angular' }, { value: '2', text: 'React' }],
+        search: true
+      })
+
+      multiSelect._searchElement.value = 'ang'
+      multiSelect._onSearchChange(multiSelect._searchElement)
+
+      expect(multiSelect._getDisplayedOptions().length).toBe(1)
+
+      selectEl.form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(multiSelect._searchElement.value).toBe('')
+      expect(multiSelect._getDisplayedOptions().length).toBe(2)
+    })
+
+    it('should leave the selection and the state alone when a listener cancels the reset', async () => {
+      fixtureEl.innerHTML = '<form novalidate><select></select></form>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [{ value: '1', text: 'Option 1', selected: true }, { value: '2', text: 'Option 2' }]
+      })
+
+      multiSelect.selectAll()
+      multiSelect.setConfig({ validationState: 'invalid' })
+      selectEl.form.addEventListener('reset', event => event.preventDefault())
+      selectEl.form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['1', '2'])
+      expect(multiSelect._wrapperElement.classList.contains('is-invalid')).toBeTrue()
+    })
+
+    it('should stop following the form and hand the select back to the form plugin once disposed', async () => {
+      fixtureEl.innerHTML = '<form novalidate><select multiple></select></form>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }], required: true })
       const errors = []
       const recordError = event => errors.push(event.message)
       window.addEventListener('error', recordError)
 
       multiSelect.dispose()
-      selectEl.setAttribute('aria-invalid', 'true')
+      selectEl.form.checkValidity()
+      selectEl.dispatchEvent(new Event('input', { bubbles: true }))
+      selectEl.form.reset()
       await new Promise(resolve => {
         setTimeout(resolve)
       })
       window.removeEventListener('error', recordError)
 
-      expect(toggler.hasAttribute('aria-invalid')).toBeFalse()
       expect(errors).toEqual([])
+
+      selectEl.required = true
+      Form.getOrCreateInstance(selectEl.form).validate()
+
+      expect(selectEl.classList.contains('is-invalid')).toBeTrue()
+      expect(selectEl.getAttribute('aria-invalid')).toBe('true')
     })
 
     it('should hand native select keyboard interaction to the custom control', () => {

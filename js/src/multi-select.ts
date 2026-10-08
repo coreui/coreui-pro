@@ -12,6 +12,10 @@ import Data from './dom/data.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import FocusTrap from './util/focustrap.js'
+import {
+  followUserValidity, getFeedbackIds, getValidationState, ownValidationState, setStateValidity,
+  type UserValidity, type ValidationState
+} from './util/form-validation.js'
 import { CLEANER_ICON, PICKER_ICON } from './util/icons.js'
 import {
   DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList, SVGAllowlist
@@ -71,6 +75,8 @@ const CLASS_NAME_CLEANER = 'form-control-cleaner'
 const CLASS_NAME_DISABLED = 'disabled'
 const CLASS_NAME_HEADER = 'list-box-header'
 const CLASS_NAME_INPUT_GROUP = 'form-control-group'
+const CLASS_NAME_IS_INVALID = 'is-invalid'
+const CLASS_NAME_IS_VALID = 'is-valid'
 const CLASS_NAME_SELECT = 'form-multi-select'
 const HOST_ATTRIBUTES = ['aria-hidden', 'id', 'multiple', 'name', 'required', 'tabindex']
 const CLASS_NAME_SELECT_FILLED = 'form-multi-select-filled'
@@ -81,6 +87,7 @@ const CLASS_NAME_INDETERMINATE = 'indeterminate'
 const CLASS_NAME_SELECTION = 'form-multi-select-selection'
 const CLASS_NAME_SELECTION_TAGS = 'form-multi-select-selection-tags'
 const CLASS_NAME_SHOW = 'show'
+const VALIDATION_OPTIONS = new Set(['invalid', 'valid', 'validationState'])
 
 type MultiSelectConfig = {
   allowList: SanitizerAllowList
@@ -122,6 +129,7 @@ type MultiSelectConfig = {
   selectionLimit: number | null
   selectionType: 'chips' | 'counter' | 'tags' | 'text'
   valid: boolean
+  validationState: ValidationState | null
   value: number | string | string[] | null
 }
 
@@ -165,6 +173,7 @@ const Default: MultiSelectConfig = {
   selectionLimit: null,
   selectionType: 'tags',
   valid: false,
+  validationState: null,
   value: null
 }
 
@@ -208,6 +217,7 @@ const DefaultType: Record<string, string> = {
   selectionLimit: '(number|null)',
   selectionType: 'string',
   valid: 'boolean',
+  validationState: '(string|null|undefined)',
   value: '(string|array|null)'
 }
 
@@ -229,7 +239,12 @@ class MultiSelectChipSet extends ChipSet {
 class MultiSelect extends ComboboxBase {
   protected declare _uniqueName: any
   protected declare _hostAttributes: Map<string, string | null>
-  protected declare _validityObserver: MutationObserver | null
+  protected declare _describedBy: string | null
+  protected declare _initialValues: string[]
+  protected declare _releaseValidationState: (() => void) | null
+  protected declare _serverClasses: string[]
+  protected declare _stateClass: string | null
+  protected declare _userValidity: UserValidity
   protected declare _addedSelectClass: boolean
   protected declare _indicatorElement: any
   protected declare _selectAllElement: any
@@ -252,6 +267,8 @@ class MultiSelect extends ComboboxBase {
 
     this._hostAttributes = new Map(HOST_ATTRIBUTES.map(name => [name, this._element.getAttribute(name)]))
     this._addedSelectClass = !this._element.classList.contains(CLASS_NAME_SELECT)
+    this._serverClasses = [CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID].filter(name => this._element.classList.contains(name))
+    this._element.classList.remove(...this._serverClasses)
     this._configureNativeSelect()
     this._indicatorElement = null
     this._selectAllElement = null
@@ -267,7 +284,10 @@ class MultiSelect extends ComboboxBase {
     this._menu = null
     this._nativeFocusHandler = null
     this._nativeKeydownHandler = null
-    this._validityObserver = null
+    this._describedBy = null
+    this._releaseValidationState = null
+    this._stateClass = null
+    this._userValidity = followUserValidity(this._element as HTMLSelectElement, () => this._updateValidity(), () => this._restoreSelection())
     this._selected = []
     this._options = this._getOptions()
     this._floatingCleanup = null
@@ -279,6 +299,7 @@ class MultiSelect extends ComboboxBase {
     }
 
     this._createSelect()
+    this._initialValues = this._selected.map((option: any) => option.value)
     this._addEventListeners()
     Data.set(this._element, DATA_KEY, this)
   }
@@ -406,6 +427,8 @@ class MultiSelect extends ComboboxBase {
 
   override dispose(): void {
     this._destroySelect()
+    this._userValidity.stop()
+    setStateValidity(this._element as HTMLSelectElement, false)
 
     for (const [name, value] of this._hostAttributes) {
       this._restoreAttribute(name, value)
@@ -415,6 +438,7 @@ class MultiSelect extends ComboboxBase {
       this._element.classList.remove(CLASS_NAME_SELECT)
     }
 
+    this._element.classList.add(...this._serverClasses)
     super.dispose()
   }
 
@@ -425,6 +449,18 @@ class MultiSelect extends ComboboxBase {
   }
 
   setConfig(config: Partial<MultiSelectConfig> | null): void {
+    const keys = Object.keys(config ?? {})
+
+    if (keys.some(key => VALIDATION_OPTIONS.has(key))) {
+      this._serverClasses = []
+    }
+
+    if (keys.length > 0 && keys.every(key => VALIDATION_OPTIONS.has(key))) {
+      this._config = this._getConfig({ ...this._config, ...config })
+      this._updateValidity()
+      return
+    }
+
     if (config?.value) {
       this.deselectAll()
     }
@@ -502,8 +538,8 @@ class MultiSelect extends ComboboxBase {
     this._disposeFloating()
     this._disposeListBox()
     this._disposeSelection()
-    this._validityObserver?.disconnect()
-    this._validityObserver = null
+    this._releaseValidationState?.()
+    this._releaseValidationState = null
 
     for (const element of [
       this._wrapperElement,
@@ -539,6 +575,7 @@ class MultiSelect extends ComboboxBase {
 
       const chip = event.target.closest(SELECTOR_CHIP)
       if (chip) {
+        this._dismissValidationState()
         this._deselectOption(String(chip.dataset.value))
       }
     })
@@ -547,6 +584,7 @@ class MultiSelect extends ComboboxBase {
       if (!this._config.disabled) {
         event.preventDefault()
         event.stopPropagation()
+        this._dismissValidationState()
         this.deselectAll()
       }
     })
@@ -688,6 +726,7 @@ class MultiSelect extends ComboboxBase {
         event.stopPropagation()
 
         if (!this._config.disabled) {
+          this._dismissValidationState()
           this._toggleSelectAll()
         }
       })
@@ -870,11 +909,39 @@ class MultiSelect extends ComboboxBase {
     return this._config.search ? this._searchElement! : this._togglerElement
   }
 
-  _syncValidityAttributes(): void {
+  _updateValidity(): void {
     const target = this._getFocusTarget()
-    const describedBy = this._element.getAttribute('aria-describedby')
 
-    if (this._config.invalid || this._element.classList.contains('is-invalid') || this._element.getAttribute('aria-invalid') === 'true') {
+    if (!target) {
+      return
+    }
+
+    const select = this._element as HTMLSelectElement
+    const givenState = getValidationState(this._config.validationState, this._config.valid, this._config.invalid) ??
+      getValidationState(null, this._serverClasses.includes(CLASS_NAME_IS_VALID), this._serverClasses.includes(CLASS_NAME_IS_INVALID))
+
+    setStateValidity(select, givenState === 'invalid' && !this._config.disabled)
+
+    const state = givenState ?? this._userValidity.read()
+    const stateClass = state ? `is-${state}` : null
+    const describedBy = [...new Set([
+      ...(this._describedBy ?? '').split(/\s+/),
+      ...(state === 'invalid' ? getFeedbackIds(select) : [])
+    ])].filter(Boolean).join(' ')
+
+    if (stateClass !== this._stateClass) {
+      if (this._stateClass) {
+        this._wrapperElement.classList.remove(this._stateClass)
+      }
+
+      if (stateClass) {
+        this._wrapperElement.classList.add(stateClass)
+      }
+
+      this._stateClass = stateClass
+    }
+
+    if (state === 'invalid') {
       target.setAttribute('aria-invalid', 'true')
     } else {
       target.removeAttribute('aria-invalid')
@@ -887,6 +954,13 @@ class MultiSelect extends ComboboxBase {
     }
   }
 
+  _dismissValidationState(): void {
+    this._config.invalid = false
+    this._config.valid = false
+    this._config.validationState = null
+    this._serverClasses = []
+  }
+
   _markRequired(): void {
     const ariaRequired = this._element.getAttribute('aria-required') ?? (this._config.required ? 'true' : null)
 
@@ -896,17 +970,19 @@ class MultiSelect extends ComboboxBase {
   }
 
   _createSelect(): void {
+    this._stateClass = null
+
     const wrapper = document.createElement('div')
     wrapper.classList.add(CLASS_NAME_SELECT)
-    wrapper.classList.toggle('is-invalid', this._config.invalid)
-    wrapper.classList.toggle('is-valid', this._config.valid)
 
     if (this._config.disabled) {
       this._element.classList.add(CLASS_NAME_DISABLED)
     }
 
-    for (const className of this._element.classList.value.split(' ')) {
-      wrapper.classList.add(className)
+    for (const className of this._element.classList) {
+      if (className !== CLASS_NAME_IS_INVALID && className !== CLASS_NAME_IS_VALID) {
+        wrapper.classList.add(className)
+      }
     }
 
     this._wrapperElement = wrapper
@@ -934,10 +1010,8 @@ class MultiSelect extends ComboboxBase {
 
     this._wireTogglerAccessibleName()
     this._markRequired()
-    this._syncValidityAttributes()
-
-    this._validityObserver = new MutationObserver(() => this._syncValidityAttributes())
-    this._validityObserver.observe(this._element, { attributeFilter: ['aria-describedby', 'aria-invalid', 'class'] })
+    this._describedBy = this._element.getAttribute('aria-describedby')
+    this._releaseValidationState = ownValidationState(...[this._element, this._searchElement].filter(Boolean))
 
     this._createOptionsContainer()
     this._hideNativeSelect()
@@ -1196,10 +1270,12 @@ class MultiSelect extends ComboboxBase {
 
   override _onOptionSelected(value: string): void {
     const option = this._findOptionByValue(value)
+    this._dismissValidationState()
     this._selectOption(value, option ? option.text : value, { refresh: false })
   }
 
   override _onOptionDeselected(value: string): void {
+    this._dismissValidationState()
     this._deselectOption(value, { refresh: false })
   }
 
@@ -1346,6 +1422,7 @@ class MultiSelect extends ComboboxBase {
     if (this._selected.length > 0) {
       const last = this._selected.findLast((option: any) => option.disabled !== true)
       if (last) {
+        this._dismissValidationState()
         this._deselectOption(last.value)
       }
     }
@@ -1358,6 +1435,8 @@ class MultiSelect extends ComboboxBase {
     this._updateSearchSize()
     this._updateHeader()
     this._updateMasterCheckbox()
+
+    this._updateValidity()
 
     if (notify) {
       this._element.dispatchEvent(new Event('input', { bubbles: true }))
@@ -1372,6 +1451,30 @@ class MultiSelect extends ComboboxBase {
       this._selectOption(option.value, option.text, { refresh: false })
     }
 
+    this._refreshAfterSelectionChange(false)
+  }
+
+  _restoreSelection(): void {
+    const options = this._flattenOptions()
+    const values = new Set(this._initialValues)
+
+    this._selected = options
+      .filter((option: any) => values.has(String(option.value)))
+      .map((option: any) => ({ value: String(option.value), text: option.text, ...option.disabled && { disabled: true } }))
+
+    for (const option of options) {
+      const selected = values.has(String(option.value))
+      const nativeOption = this._getNativeOption(option.value)
+
+      if (nativeOption) {
+        nativeOption.selected = selected
+      }
+
+      this._syncOptionElementState(option.value, selected)
+    }
+
+    this._onSearchChange(this._searchElement)
+    this._dismissValidationState()
     this._refreshAfterSelectionChange(false)
   }
 
@@ -1644,10 +1747,22 @@ class MultiSelect extends ComboboxBase {
 
   _getSelectionActions(): any {
     return {
-      selectAll: () => this.selectAll(),
-      deselectAll: () => this.deselectAll(),
-      selectFiltered: () => this.selectFiltered(),
-      deselectFiltered: () => this.deselectFiltered()
+      selectAll: () => {
+        this._dismissValidationState()
+        this.selectAll()
+      },
+      deselectAll: () => {
+        this._dismissValidationState()
+        this.deselectAll()
+      },
+      selectFiltered: () => {
+        this._dismissValidationState()
+        this.selectFiltered()
+      },
+      deselectFiltered: () => {
+        this._dismissValidationState()
+        this.deselectFiltered()
+      }
     }
   }
 
