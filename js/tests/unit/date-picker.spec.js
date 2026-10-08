@@ -1293,8 +1293,25 @@ describe('DatePicker', () => {
       fixtureEl.querySelector('.date-picker-popup .calendar-cell[data-coreui-date^="Mon Jul 20 2026"]').click()
 
       expect(seen).toEqual([true])
-      expect(fixtureEl.querySelector('#picker').classList.contains('is-warning')).toBeTrue()
+      expect(fixtureEl.querySelector('.form-date-time').classList.contains('is-warning')).toBeTrue()
       expect(fixtureEl.querySelector('form').checkValidity()).toBeTrue()
+    })
+
+    it('should treat what the page does in a change listener during a user pick as a change made by code', () => {
+      const picker = buildPicker({ date: new Date(2026, 6, 14), locale: 'en-US', validationState: 'invalid' }, '<form><div id="picker"></div></form>')
+      const element = fixtureEl.querySelector('#picker')
+
+      element.addEventListener('dateChange.coreui.date-picker', event => {
+        if (event.date?.getDate() === 20) {
+          picker.setConfig({ validationState: 'invalid' })
+          picker.setDate(new Date(2026, 6, 21))
+        }
+      })
+      picker.show()
+      fixtureEl.querySelector('.date-picker-popup .calendar-cell[data-coreui-date^="Mon Jul 20 2026"]').click()
+
+      expect(picker.getDate()).toEqual(new Date(2026, 6, 21))
+      expect(fixtureEl.querySelector('form').checkValidity()).toBeFalse()
     })
 
     it('should leave the validation options of inputOptions out, so the picker owns the state', () => {
@@ -1324,7 +1341,7 @@ describe('DatePicker', () => {
       const picker = buildPicker({ locale: 'en-US', validationState: 'valid' }, '<div id="picker" class="is-invalid"></div>')
       const element = fixtureEl.querySelector('#picker')
 
-      expect(element.classList.contains('is-valid')).toBeTrue()
+      expect(fixtureEl.querySelector('.form-date-time').classList.contains('is-valid')).toBeTrue()
       expect(element.classList.contains('is-invalid')).toBeFalse()
 
       picker.dispose()

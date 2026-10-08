@@ -791,6 +791,41 @@ describe('DateRangePicker', () => {
       expect(sectionStates()).toEqual(Array.from({ length: 6 }, () => ['true', feedback.id]))
     })
 
+    it('should show the order error on the picker element over a given valid state', () => {
+      const picker = buildPicker({
+        endDate: new Date(2026, 6, 20), locale: 'en-US', startDate: new Date(2026, 6, 14), validationState: 'valid'
+      }, '<div id="picker"></div><div class="invalid-feedback">Check-out has to be on or after check-in.</div>')
+      const element = fixtureEl.querySelector('#picker')
+      const feedback = fixtureEl.querySelector('.invalid-feedback')
+
+      expect(element).toHaveClass('is-valid')
+
+      picker.setRange(new Date(2026, 6, 20), new Date(2026, 6, 14))
+
+      expect(element).toHaveClass('is-invalid')
+      expect(element).not.toHaveClass('is-valid')
+      expect(sectionStates()).toEqual(Array.from({ length: 6 }, () => ['true', feedback.id]))
+
+      picker.setRange(new Date(2026, 6, 14), new Date(2026, 6, 20))
+
+      expect(element).toHaveClass('is-valid')
+    })
+
+    it('should treat what the page does in a change listener during a template action as a change made by code', () => {
+      const picker = buildPicker({
+        endDate: new Date(2026, 6, 20), locale: 'en-US', startDate: new Date(2026, 6, 14), validationState: 'invalid'
+      }, '<form><div id="picker"></div></form>')
+
+      fixtureEl.querySelector('#picker').addEventListener('endDateChange.coreui.date-range-picker', () => {
+        picker.setConfig({ validationState: 'invalid' })
+        picker.setRange(new Date(2026, 6, 2), new Date(2026, 6, 8))
+      }, { once: true })
+      picker.getContext().setRange(new Date(2026, 6, 1), new Date(2026, 6, 7))
+
+      expect(picker.getStartDate()).toEqual(new Date(2026, 6, 2))
+      expect(fixtureEl.querySelector('form').checkValidity()).toBeFalse()
+    })
+
     it('should drop the given state when a template action picks a range, and keep it when code sets one', () => {
       const picker = buildPicker({
         endDate: new Date(2026, 6, 20), locale: 'en-US', startDate: new Date(2026, 6, 14), validationState: 'invalid'

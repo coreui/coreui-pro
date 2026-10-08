@@ -668,6 +668,8 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
   }
 
   _commitSections(sections: DateSection[] = this._sections, byUser: boolean = this._userCommit): void {
+    this._userCommit = false
+
     if (byUser && this._getValueKey(sections) !== this._valueKey) {
       this._dismissValidationState()
     }

@@ -332,6 +332,7 @@ class DateRangePicker extends PickerBase {
     this._rangeInput._setOwnerDismiss((serial: number) => this._dismissValidationState(serial))
 
     EventHandler.on(inputGroup, DateRangeInput.eventName('startDateChange'), (event: any) => {
+      this._syncRangeState()
       this._nameToggle()
       this._syncPickMessages()
 
@@ -342,6 +343,7 @@ class DateRangePicker extends PickerBase {
     })
 
     EventHandler.on(inputGroup, DateRangeInput.eventName('endDateChange'), (event: any) => {
+      this._syncRangeState()
       this._nameToggle()
 
       if (!this._syncingFromPanel) {
@@ -475,6 +477,19 @@ class DateRangePicker extends PickerBase {
 
   override _setFieldState(givenState: ValidationState | undefined): void {
     this._rangeInput._setOwnerState(givenState)
+  }
+
+  override _shownStateClass(): string | null {
+    const { _endInput: end, _startInput: start } = this._rangeInput
+    const state = !this._rangeInput.isRangeValid() || start._rejected || end._rejected ? 'invalid' : this._givenState
+
+    return state ? `is-${state}` : null
+  }
+
+  _syncRangeState(): void {
+    if (this._syncStateClass()) {
+      this._rangeInput._updateValidity()
+    }
   }
 
   // Static

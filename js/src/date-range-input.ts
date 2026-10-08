@@ -544,12 +544,14 @@ class DateRangeInput extends BaseComponent {
       return
     }
 
+    const byUser = this._byUser
     this._applying = true
+    this._byUser = false
 
     try {
       if (fields) {
-        this._setInputDate(this._startInput, startDate)
-        this._setInputDate(this._endInput, endDate)
+        this._setInputDate(this._startInput, startDate, byUser)
+        this._setInputDate(this._endInput, endDate, byUser)
       }
     } finally {
       this._applying = false
@@ -574,8 +576,8 @@ class DateRangeInput extends BaseComponent {
     }
   }
 
-  _setInputDate(input: any, date: Date | null): void {
-    if (this._byUser) {
+  _setInputDate(input: any, date: Date | null, byUser: boolean): void {
+    if (byUser) {
       input._runAsUser(() => input.setConfig({ date }))
       return
     }
@@ -608,7 +610,7 @@ class DateRangeInput extends BaseComponent {
       getValidationState(null, this._serverClasses.includes(CLASS_NAME_IS_VALID), this._serverClasses.includes(CLASS_NAME_IS_INVALID)) ??
       this._ownerState
     const isOrderInvalid = !this.isRangeValid()
-    const state = isOrderInvalid ? 'invalid' : givenState
+    const state = isOrderInvalid || this._startInput._rejected || this._endInput._rejected ? 'invalid' : givenState
     const stateClass = state ? `is-${state}` : null
 
     if (stateClass !== this._stateClass) {

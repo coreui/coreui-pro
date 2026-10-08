@@ -42,6 +42,7 @@ abstract class PickerBase extends BaseComponent {
   protected declare _cleanerElement: HTMLElement | null
   protected declare _fieldElement: HTMLElement
   protected declare _footerTemplate: HTMLTemplateElement | null
+  protected declare _givenState: ValidationState | undefined
   protected declare _hostClasses: HostClasses
   protected declare _menu: HTMLElement
   protected declare _ownsStateClass: boolean
@@ -58,6 +59,7 @@ abstract class PickerBase extends BaseComponent {
     this._byUser = false
     this._cleanerElement = null
     this._footerTemplate = SelectorEngine.findOne(SELECTOR_TEMPLATE_FOOTER, this._element) as HTMLTemplateElement | null
+    this._givenState = undefined
     this._menu = null as any
     this._ownsStateClass = false
     this._popup = null as any
@@ -181,25 +183,36 @@ abstract class PickerBase extends BaseComponent {
   }
 
   _updateValidity(): void {
-    const givenState = getValidationState(this._config.validationState, this._config.valid, this._config.invalid) ??
+    this._givenState = getValidationState(this._config.validationState, this._config.valid, this._config.invalid) ??
       getValidationState(null, this._serverClasses.includes(CLASS_NAME_IS_VALID), this._serverClasses.includes(CLASS_NAME_IS_INVALID))
-    const stateClass = givenState ? `is-${givenState}` : null
+    this._syncStateClass()
+    this._setFieldState(this._givenState)
+  }
 
-    if (stateClass !== this._stateClass) {
-      if (this._stateClass && this._ownsStateClass) {
-        this._element.classList.remove(this._stateClass)
-      }
+  _syncStateClass(): boolean {
+    const stateClass = this._shownStateClass()
 
-      this._ownsStateClass = stateClass !== null && !this._element.classList.contains(stateClass)
-
-      if (this._ownsStateClass) {
-        this._element.classList.add(stateClass!)
-      }
-
-      this._stateClass = stateClass
+    if (stateClass === this._stateClass) {
+      return false
     }
 
-    this._setFieldState(givenState)
+    if (this._stateClass && this._ownsStateClass) {
+      this._element.classList.remove(this._stateClass)
+    }
+
+    this._ownsStateClass = stateClass !== null && !this._element.classList.contains(stateClass)
+
+    if (this._ownsStateClass) {
+      this._element.classList.add(stateClass!)
+    }
+
+    this._stateClass = stateClass
+
+    return true
+  }
+
+  _shownStateClass(): string | null {
+    return null
   }
 
   _dismissValidationState(serial: number = Number.POSITIVE_INFINITY): void {
@@ -226,7 +239,10 @@ abstract class PickerBase extends BaseComponent {
   }
 
   _withUser(part: any, action: () => void): void {
-    if (this._byUser) {
+    const byUser = this._byUser
+    this._byUser = false
+
+    if (byUser) {
       part._runAsUser(action)
       return
     }

@@ -1891,6 +1891,23 @@ describe('DateInput', () => {
       expect(form.checkValidity()).toBeTrue()
     })
 
+    it('should settle a given state set while a fieldset around it is disabled, as an async submit does', () => {
+      fixtureEl.innerHTML = '<form><fieldset><div id="cleared"></div><div id="blocked"></div></fieldset></form>'
+      const form = fixtureEl.querySelector('form')
+      const fieldset = fixtureEl.querySelector('fieldset')
+      const cleared = new DateInput(fixtureEl.querySelector('#cleared'), { date: new Date(2026, 6, 14), format: 'dd.MM.yyyy', validationState: 'invalid' })
+      const blocked = new DateInput(fixtureEl.querySelector('#blocked'), { date: new Date(2026, 6, 14), format: 'dd.MM.yyyy' })
+
+      fieldset.disabled = true
+      cleared.setConfig({ validationState: null })
+      blocked.setConfig({ validationState: 'invalid' })
+      fieldset.disabled = false
+
+      expect(cleared._element.querySelector('textarea').validity.valid).toBeTrue()
+      expect(blocked._element.querySelector('textarea').validity.valid).toBeFalse()
+      expect(form.checkValidity()).toBeFalse()
+    })
+
     it('should leave a state class of its own that the markup carried', () => {
       fixtureEl.innerHTML = '<div class="is-warning"></div>'
       const dateInput = new DateInput(fixtureEl.querySelector('div'), { format: 'dd.MM.yyyy', validationState: 'warning' })

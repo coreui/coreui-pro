@@ -742,19 +742,16 @@ export const ownValidationState = (...controls: Element[]): (() => void) => {
  * the text of its invalid feedback as the message, or a generic one when it has none. A custom
  * validity the page set is left as it is: it is not overwritten while it stands, and clearing takes
  * back only a message this function set and the page has not replaced since. While the control is
- * barred from validation, disabled or read-only, its message cannot be read, so nothing changes;
- * call it again once the control takes part in validation.
+ * barred from validation, disabled or read-only, its message cannot be read, so a message this
+ * function set counts as its own, and a custom validity the page sets meanwhile may be replaced.
  *
  * @param control - The control that carries the value
  * @param invalid - Whether the given state is `'invalid'`
  */
 export const setStateValidity = (control: FormControl, invalid: boolean): void => {
-  if (!control.willValidate) {
-    return
-  }
-
   const ownMessage = stateMessages.get(control)
-  const isOwn = ownMessage !== undefined && control.validity.customError && control.validationMessage === ownMessage
+  const isOwn = ownMessage !== undefined && control.validity.customError &&
+    (!control.willValidate || control.validationMessage === ownMessage)
 
   if (ownMessage !== undefined && !isOwn) {
     stateMessages.delete(control)
@@ -776,5 +773,5 @@ export const setStateValidity = (control: FormControl, invalid: boolean): void =
   const message = getFeedbackText(control) || STATE_INVALID_MESSAGE
 
   control.setCustomValidity(message)
-  stateMessages.set(control, control.validationMessage)
+  stateMessages.set(control, control.willValidate ? control.validationMessage : message)
 }

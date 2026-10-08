@@ -807,36 +807,29 @@ describe('Form validation utilities', () => {
       expect(empty.validity.valueMissing).toBeTrue()
     })
 
-    it('should leave a control barred from validation alone, and settle it once the control takes part again', () => {
-      fixtureEl.innerHTML = '<form><input id="disabled" value="x"><input id="readonly" value="x" readonly><input id="page" value="x"></form>'
-      const disabled = fixtureEl.querySelector('#disabled')
+    it('should set and take back its validity while the control is barred from validation, as in a disabled fieldset', () => {
+      fixtureEl.innerHTML = '<form><fieldset><input id="cleared" value="x"><input id="blocked" value="x"></fieldset><input id="readonly" value="x" readonly></form>'
+      const fieldset = fixtureEl.querySelector('fieldset')
+      const cleared = fixtureEl.querySelector('#cleared')
+      const blocked = fixtureEl.querySelector('#blocked')
       const readonly = fixtureEl.querySelector('#readonly')
-      const page = fixtureEl.querySelector('#page')
 
-      setStateValidity(disabled, true)
-      disabled.disabled = true
-      setStateValidity(disabled, false)
-      disabled.disabled = false
-      setStateValidity(disabled, false)
+      setStateValidity(cleared, true)
+      fieldset.disabled = true
+      setStateValidity(cleared, false)
+      setStateValidity(blocked, true)
+      fieldset.disabled = false
 
       setStateValidity(readonly, true)
-
-      expect(readonly.validity.customError).toBeFalse()
-
       readonly.readOnly = false
-      setStateValidity(readonly, true)
 
+      expect(cleared.validity.valid).toBeTrue()
+      expect(blocked.validationMessage).toBe('Invalid value.')
       expect(readonly.validationMessage).toBe('Invalid value.')
 
-      setStateValidity(page, true)
-      page.disabled = true
-      page.setCustomValidity('Page rule.')
-      setStateValidity(page, false)
-      page.disabled = false
-      setStateValidity(page, false)
+      setStateValidity(readonly, false)
 
-      expect(disabled.validity.valid).toBeTrue()
-      expect(page.validationMessage).toBe('Page rule.')
+      expect(readonly.validity.valid).toBeTrue()
     })
 
     it('should leave a validity the page set before or after it', () => {

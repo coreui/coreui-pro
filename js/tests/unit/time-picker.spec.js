@@ -833,6 +833,20 @@ describe('TimePicker', () => {
       expect(form.checkValidity()).toBeTrue()
     })
 
+    it('should treat what the page does in a native change listener during a user pick as a change made by code', () => {
+      const picker = buildPicker({ time: '10:30:00', validationState: 'invalid' }, '<form><div id="picker"></div></form>')
+      const form = fixtureEl.querySelector('form')
+
+      form.addEventListener('change', () => {
+        picker.setConfig({ validationState: 'invalid' })
+        picker.clear()
+      }, { once: true })
+      picker.show()
+      fixtureEl.querySelector('.time-picker-popup').querySelectorAll('[data-coreui-minutes]')[15].click()
+
+      expect(form.checkValidity()).toBeFalse()
+    })
+
     it.each([
       ['picks a time', picker => {
         picker.show()
