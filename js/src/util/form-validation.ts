@@ -9,8 +9,17 @@ export type ValidationMark = {
 
 export type ValidationMarks = WeakMap<Element, ValidationMark>
 
+export type ValidationState = 'invalid' | 'valid' | (string & {})
+
+export type UserValidity = {
+  read: () => ValidationState | undefined
+  stop: () => void
+}
+
 type FormControl = HTMLElement & {
+  form: HTMLFormElement | null
   name: string
+  setCustomValidity: (message: string) => void
   type: string
   validationMessage: string
   validity: ValidityState
@@ -37,7 +46,13 @@ const SELECTOR_OTP = '.form-otp'
 const SELECTOR_POPUP = '.popup'
 const SELECTOR_RANGE = '.form-range'
 const SELECTOR_RANGE_INPUT = '.form-range-input'
+const SELECTOR_USER_INVALID = '[data-coreui-validate] :user-invalid'
+const SELECTOR_USER_VALID = '[data-coreui-validate~="valid"] :user-valid'
 const STATE_CLASSES = [CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID]
+const STATE_INVALID_MESSAGE = 'Invalid value.'
+
+const ownedControls = new WeakSet<Element>()
+const stateInvalidControls = new WeakSet<Element>()
 
 /**
  * Creates the record of what the marking functions added to one control.
@@ -318,14 +333,14 @@ const setStateClasses = (control: Element, mark: ValidationMark, classes: string
  * Updates one control of a validated form: puts `.is-invalid` on it, or `.is-valid` when the form
  * has `data-coreui-validate="valid"`, unless the page set a state class itself, then marks or
  * unmarks it. A control the functions styled that stopped taking part in validation, for example by
- * being disabled, loses what they added.
+ * being disabled, or that a component took over, loses what they added.
  *
  * @param control - The control
  * @param form - The form it belongs to
  * @param marks - What the marking functions added, per control
  */
 const updateControlValidationState = (control: Element, form: HTMLFormElement, marks: ValidationMarks): void => {
-  if (!isValidatable(control)) {
+  if (!isValidatable(control) || ownedControls.has(control)) {
     const mark = marks.get(control)
 
     if (mark) {
@@ -353,8 +368,9 @@ const updateControlValidationState = (control: Element, form: HTMLFormElement, m
 /**
  * Shows the validation state of every control of a form: `.is-invalid` and `aria-invalid` on the
  * invalid ones, with their invalid feedback added to `aria-describedby`, and `.is-valid` on the
- * valid ones when the form has `data-coreui-validate="valid"`. Call it again whenever the form
- * changes to keep the state current.
+ * valid ones when the form has `data-coreui-validate="valid"`. The controls a component took over
+ * with `ownValidationState()` are left to it. Call it again whenever the form changes to keep the
+ * state current.
  *
  * @param form - The form to show the state of
  * @param marks - What the marking functions added, per control; keep one map per owner
@@ -437,25 +453,36 @@ const getText = (element: Element | null): string => {
 }
 
 /**
+ * Reads the text of the invalid feedback of a control: of the elements `getFeedbackIds()` finds,
+ * else of the `.invalid-feedback` its `aria-describedby` points to.
+ *
+ * @param control - The control
+ * @returns The text, or an empty string when the control has no invalid feedback
+ */
+export const getFeedbackText = (control: FormControl): string => {
+  const root = control.getRootNode() as Document | ShadowRoot | Element
+  const getById = (id: string) => 'getElementById' in root ? root.getElementById(id) : root.querySelector(`#${CSS.escape(id)}`)
+  const feedbackIds = getFeedbackIds(control)
+  const ids = feedbackIds.length > 0 ?
+    feedbackIds :
+    splitIds(control.getAttribute('aria-describedby')).filter(id => getById(id)?.matches(SELECTOR_INVALID_FEEDBACK))
+
+  return ids
+    .map(id => getText(getById(id)))
+    .filter(Boolean)
+    .join(' ')
+}
+
+/**
  * Announces the validation message of a control through the live regions of the page: the text of
- * its invalid feedback, else of the `.invalid-feedback` its `aria-describedby` points to, else the
- * browser's validation message. The text is read in the next task, after a framework has rendered
- * a message set while the step was validated.
+ * its invalid feedback, else the browser's validation message. The text is read in the next task,
+ * after a framework has rendered a message set while the step was validated.
  *
  * @param control - The invalid control
  */
 const announceInvalid = (control: FormControl): void => {
   setTimeout(() => {
-    const root = control.getRootNode() as Document | ShadowRoot | Element
-    const getById = (id: string) => 'getElementById' in root ? root.getElementById(id) : root.querySelector(`#${CSS.escape(id)}`)
-    const feedbackIds = getFeedbackIds(control)
-    const ids = feedbackIds.length > 0 ?
-      feedbackIds :
-      splitIds(control.getAttribute('aria-describedby')).filter(id => getById(id)?.matches(SELECTOR_INVALID_FEEDBACK))
-    const message = ids
-      .map(id => getText(getById(id)))
-      .filter(Boolean)
-      .join(' ') || control.validationMessage
+    const message = getFeedbackText(control) || control.validationMessage
 
     if (message) {
       announce(message, { context: control })
@@ -546,4 +573,148 @@ export const validateForm = (
   }
 
   return { handled: true, isValid: isValidAfterHook }
+}
+
+/**
+ * Resolves the validation state a component was given: `validationState` when it is set, else
+ * `'invalid'` for the `invalid` alias and `'valid'` for the `valid` alias, `invalid` first.
+ *
+ * @param validationState - `'valid'`, `'invalid'` or a state of the `$form-validation-states` map
+ * @param valid - The alias for `'valid'`
+ * @param invalid - The alias for `'invalid'`
+ * @returns The state, or `undefined` when none is set
+ */
+export const getValidationState = (validationState?: ValidationState | null, valid?: boolean, invalid?: boolean): ValidationState | undefined =>
+  validationState ?? (invalid ? 'invalid' : (valid ? 'valid' : undefined))
+
+/**
+ * Tells whether a selector matches an element, treating a selector the browser does not know as
+ * no match.
+ *
+ * @param element - The element
+ * @param selector - The selector
+ * @returns `true` when the selector matches
+ */
+const matchesSafely = (element: Element, selector: string): boolean => {
+  try {
+    return element.matches(selector)
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Reads the state the stylesheet shows for a control from the browser alone: `'invalid'` while it
+ * matches `:user-invalid` in a `data-coreui-validate` form, `'valid'` while it matches `:user-valid`
+ * in a `data-coreui-validate="valid"` one.
+ *
+ * @param control - The control
+ * @returns The state, or `undefined` when the stylesheet shows none
+ */
+export const getUserValidity = (control: Element): ValidationState | undefined => {
+  if (matchesSafely(control, SELECTOR_USER_INVALID)) {
+    return 'invalid'
+  }
+
+  return matchesSafely(control, SELECTOR_USER_VALID) ? 'valid' : undefined
+}
+
+/**
+ * Follows the state a form shows for the control a component carries its value in: invalid once a
+ * validation reported it, that is `checkValidity()`, `reportValidity()` or a submit fired `invalid`
+ * on it, for as long as its value stays invalid, otherwise what `getUserValidity()` reads. A native
+ * reset of the form forgets the report in the next task, unless a listener cancelled the reset.
+ *
+ * @param control - The control that carries the value
+ * @param onUpdate - Called with the state after every event of the form that may change it
+ * @returns `read()` for the current state, and `stop()` to remove the listeners
+ */
+export const followUserValidity = (control: FormControl, onUpdate: (state: ValidationState | undefined) => void): UserValidity => {
+  const root = control.form ?? control
+  let reported = false
+  let resetTimeout: ReturnType<typeof setTimeout> | undefined
+  const read = () => (reported && !control.validity.valid ? 'invalid' : getUserValidity(control))
+  const update = () => onUpdate(read())
+  const handleInvalid = (event: Event) => {
+    if (event.target === control) {
+      reported = true
+    }
+
+    update()
+  }
+
+  const handleReset = (event: Event) => {
+    clearTimeout(resetTimeout)
+    resetTimeout = setTimeout(() => {
+      if (!event.defaultPrevented) {
+        reported = false
+      }
+
+      update()
+    })
+  }
+
+  const listeners: Array<[string, EventListener, boolean]> = [
+    ['change', update, false],
+    ['focusout', update, false],
+    ['input', update, false],
+    ['invalid', handleInvalid, true],
+    ['reset', handleReset, false],
+    ['submit', update, false]
+  ]
+
+  for (const [type, listener, capture] of listeners) {
+    root.addEventListener(type, listener, capture)
+  }
+
+  return {
+    read,
+    stop() {
+      clearTimeout(resetTimeout)
+
+      for (const [type, listener, capture] of listeners) {
+        root.removeEventListener(type, listener, capture)
+      }
+    }
+  }
+}
+
+/**
+ * Hands the validation state of form controls to the component that draws them: `updateValidationState()`
+ * leaves their classes and ARIA to it, while validation and focus still go through them.
+ *
+ * @param controls - The controls the component shows the state of, such as the value it carries in
+ * a hidden control and its own inputs
+ * @returns A function that hands them back
+ */
+export const ownValidationState = (...controls: Element[]): (() => void) => {
+  for (const control of controls) {
+    ownedControls.add(control)
+  }
+
+  return () => {
+    for (const control of controls) {
+      ownedControls.delete(control)
+    }
+  }
+}
+
+/**
+ * Makes a control block the submit while a component shows it invalid by a state it was given, with
+ * the text of its invalid feedback as the message, or a generic one when it has none. Clearing takes
+ * back only a validity this function set, so one the page set itself stays.
+ *
+ * @param control - The control that carries the value
+ * @param invalid - Whether the given state is `'invalid'`
+ */
+export const setStateValidity = (control: FormControl, invalid: boolean): void => {
+  if (invalid) {
+    control.setCustomValidity(getFeedbackText(control) || STATE_INVALID_MESSAGE)
+    stateInvalidControls.add(control)
+    return
+  }
+
+  if (stateInvalidControls.delete(control)) {
+    control.setCustomValidity('')
+  }
 }

@@ -12,6 +12,10 @@ import Data from './dom/data.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import FocusTrap from './util/focustrap.js'
+import {
+  followUserValidity, getFeedbackIds, getValidationState, ownValidationState, setStateValidity,
+  type UserValidity, type ValidationState
+} from './util/form-validation.js'
 import { CLEANER_ICON, PICKER_ICON } from './util/icons.js'
 import {
   DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList, SVGAllowlist
@@ -64,6 +68,7 @@ const EVENT_SELECTION_LIMIT = `selectionLimit${EVENT_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_KEYUP_DATA_API = `keyup${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
+const EVENT_RESET = `reset${EVENT_KEY}`
 const EVENT_CHIP_REMOVE = 'remove.coreui.chip'
 
 const CLASS_NAME_CHIP = 'chip'
@@ -71,6 +76,8 @@ const CLASS_NAME_CLEANER = 'form-control-cleaner'
 const CLASS_NAME_DISABLED = 'disabled'
 const CLASS_NAME_HEADER = 'list-box-header'
 const CLASS_NAME_INPUT_GROUP = 'form-control-group'
+const CLASS_NAME_IS_INVALID = 'is-invalid'
+const CLASS_NAME_IS_VALID = 'is-valid'
 const CLASS_NAME_SELECT = 'form-multi-select'
 const HOST_ATTRIBUTES = ['aria-hidden', 'id', 'multiple', 'name', 'required', 'tabindex']
 const CLASS_NAME_SELECT_FILLED = 'form-multi-select-filled'
@@ -81,6 +88,7 @@ const CLASS_NAME_INDETERMINATE = 'indeterminate'
 const CLASS_NAME_SELECTION = 'form-multi-select-selection'
 const CLASS_NAME_SELECTION_TAGS = 'form-multi-select-selection-tags'
 const CLASS_NAME_SHOW = 'show'
+const VALIDATION_OPTIONS = new Set(['invalid', 'valid', 'validationState'])
 
 type MultiSelectConfig = {
   allowList: SanitizerAllowList
@@ -122,6 +130,7 @@ type MultiSelectConfig = {
   selectionLimit: number | null
   selectionType: 'chips' | 'counter' | 'tags' | 'text'
   valid: boolean
+  validationState: ValidationState | null
   value: number | string | string[] | null
 }
 
@@ -165,6 +174,7 @@ const Default: MultiSelectConfig = {
   selectionLimit: null,
   selectionType: 'tags',
   valid: false,
+  validationState: null,
   value: null
 }
 
@@ -208,6 +218,7 @@ const DefaultType: Record<string, string> = {
   selectionLimit: '(number|null)',
   selectionType: 'string',
   valid: 'boolean',
+  validationState: '(string|null)',
   value: '(string|array|null)'
 }
 
@@ -229,7 +240,15 @@ class MultiSelectChipSet extends ChipSet {
 class MultiSelect extends ComboboxBase {
   protected declare _uniqueName: any
   protected declare _hostAttributes: Map<string, string | null>
-  protected declare _validityObserver: MutationObserver | null
+  protected declare _building: boolean
+  protected declare _describedBy: string | null
+  protected declare _form: HTMLFormElement | null
+  protected declare _releaseValidationState: (() => void) | null
+  protected declare _resetHandler: (event: Event) => void
+  protected declare _serverClasses: string[]
+  protected declare _serverState: ValidationState | null
+  protected declare _stateClass: string | null
+  protected declare _userValidity: UserValidity | null
   protected declare _addedSelectClass: boolean
   protected declare _indicatorElement: any
   protected declare _selectAllElement: any
@@ -252,6 +271,9 @@ class MultiSelect extends ComboboxBase {
 
     this._hostAttributes = new Map(HOST_ATTRIBUTES.map(name => [name, this._element.getAttribute(name)]))
     this._addedSelectClass = !this._element.classList.contains(CLASS_NAME_SELECT)
+    this._serverClasses = [CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID].filter(name => this._element.classList.contains(name))
+    this._serverState = this._readServerState()
+    this._element.classList.remove(...this._serverClasses)
     this._configureNativeSelect()
     this._indicatorElement = null
     this._selectAllElement = null
@@ -267,7 +289,20 @@ class MultiSelect extends ComboboxBase {
     this._menu = null
     this._nativeFocusHandler = null
     this._nativeKeydownHandler = null
-    this._validityObserver = null
+    this._building = false
+    this._describedBy = null
+    this._form = (this._element as HTMLSelectElement).form
+    this._releaseValidationState = null
+    this._resetHandler = (event: Event) => {
+      setTimeout(() => {
+        if (this._element && !event.defaultPrevented) {
+          this._restoreSelection()
+        }
+      })
+    }
+
+    this._stateClass = null
+    this._userValidity = null
     this._selected = []
     this._options = this._getOptions()
     this._floatingCleanup = null
@@ -280,6 +315,11 @@ class MultiSelect extends ComboboxBase {
 
     this._createSelect()
     this._addEventListeners()
+
+    if (this._form) {
+      EventHandler.on(this._form, EVENT_RESET, this._resetHandler)
+    }
+
     Data.set(this._element, DATA_KEY, this)
   }
 
@@ -406,6 +446,11 @@ class MultiSelect extends ComboboxBase {
 
   override dispose(): void {
     this._destroySelect()
+    setStateValidity(this._element as HTMLSelectElement, false)
+
+    if (this._form) {
+      EventHandler.off(this._form, EVENT_RESET, this._resetHandler)
+    }
 
     for (const [name, value] of this._hostAttributes) {
       this._restoreAttribute(name, value)
@@ -415,6 +460,7 @@ class MultiSelect extends ComboboxBase {
       this._element.classList.remove(CLASS_NAME_SELECT)
     }
 
+    this._element.classList.add(...this._serverClasses)
     super.dispose()
   }
 
@@ -425,6 +471,14 @@ class MultiSelect extends ComboboxBase {
   }
 
   setConfig(config: Partial<MultiSelectConfig> | null): void {
+    const keys = Object.keys(config ?? {})
+
+    if (keys.length > 0 && keys.every(key => VALIDATION_OPTIONS.has(key))) {
+      this._config = this._getConfig({ ...this._config, ...config })
+      this._updateValidity()
+      return
+    }
+
     if (config?.value) {
       this.deselectAll()
     }
@@ -502,8 +556,10 @@ class MultiSelect extends ComboboxBase {
     this._disposeFloating()
     this._disposeListBox()
     this._disposeSelection()
-    this._validityObserver?.disconnect()
-    this._validityObserver = null
+    this._userValidity?.stop()
+    this._userValidity = null
+    this._releaseValidationState?.()
+    this._releaseValidationState = null
 
     for (const element of [
       this._wrapperElement,
@@ -870,11 +926,38 @@ class MultiSelect extends ComboboxBase {
     return this._config.search ? this._searchElement! : this._togglerElement
   }
 
-  _syncValidityAttributes(): void {
-    const target = this._getFocusTarget()
-    const describedBy = this._element.getAttribute('aria-describedby')
+  _readServerState(): ValidationState | null {
+    if (this._serverClasses.includes(CLASS_NAME_IS_INVALID)) {
+      return 'invalid'
+    }
 
-    if (this._config.invalid || this._element.classList.contains('is-invalid') || this._element.getAttribute('aria-invalid') === 'true') {
+    return this._serverClasses.includes(CLASS_NAME_IS_VALID) ? 'valid' : null
+  }
+
+  _updateValidity(): void {
+    const select = this._element as HTMLSelectElement
+    const givenState = getValidationState(this._config.validationState, this._config.valid, this._config.invalid) ?? this._serverState
+
+    setStateValidity(select, givenState === 'invalid')
+
+    const state = givenState ?? this._userValidity?.read()
+    const stateClass = state ? `is-${state}` : null
+    const target = this._getFocusTarget()
+    const describedBy = [this._describedBy, ...(state === 'invalid' ? getFeedbackIds(select) : [])].filter(Boolean).join(' ')
+
+    if (stateClass !== this._stateClass) {
+      if (this._stateClass) {
+        this._wrapperElement.classList.remove(this._stateClass)
+      }
+
+      if (stateClass) {
+        this._wrapperElement.classList.add(stateClass)
+      }
+
+      this._stateClass = stateClass
+    }
+
+    if (state === 'invalid') {
       target.setAttribute('aria-invalid', 'true')
     } else {
       target.removeAttribute('aria-invalid')
@@ -887,6 +970,13 @@ class MultiSelect extends ComboboxBase {
     }
   }
 
+  _dismissValidationState(): void {
+    this._config.invalid = false
+    this._config.valid = false
+    this._config.validationState = null
+    this._serverState = null
+  }
+
   _markRequired(): void {
     const ariaRequired = this._element.getAttribute('aria-required') ?? (this._config.required ? 'true' : null)
 
@@ -896,17 +986,20 @@ class MultiSelect extends ComboboxBase {
   }
 
   _createSelect(): void {
+    this._building = true
+    this._stateClass = null
+
     const wrapper = document.createElement('div')
     wrapper.classList.add(CLASS_NAME_SELECT)
-    wrapper.classList.toggle('is-invalid', this._config.invalid)
-    wrapper.classList.toggle('is-valid', this._config.valid)
 
     if (this._config.disabled) {
       this._element.classList.add(CLASS_NAME_DISABLED)
     }
 
-    for (const className of this._element.classList.value.split(' ')) {
-      wrapper.classList.add(className)
+    for (const className of this._element.classList) {
+      if (className !== CLASS_NAME_IS_INVALID && className !== CLASS_NAME_IS_VALID) {
+        wrapper.classList.add(className)
+      }
     }
 
     this._wrapperElement = wrapper
@@ -934,14 +1027,14 @@ class MultiSelect extends ComboboxBase {
 
     this._wireTogglerAccessibleName()
     this._markRequired()
-    this._syncValidityAttributes()
-
-    this._validityObserver = new MutationObserver(() => this._syncValidityAttributes())
-    this._validityObserver.observe(this._element, { attributeFilter: ['aria-describedby', 'aria-invalid', 'class'] })
+    this._describedBy = this._element.getAttribute('aria-describedby')
+    this._releaseValidationState = ownValidationState(...[this._element, this._searchElement].filter(Boolean))
+    this._userValidity = followUserValidity(this._element as HTMLSelectElement, () => this._updateValidity())
 
     this._createOptionsContainer()
     this._hideNativeSelect()
     this._selectInitialOptions()
+    this._building = false
   }
 
   _createSelection(): void {
@@ -1359,6 +1452,12 @@ class MultiSelect extends ComboboxBase {
     this._updateHeader()
     this._updateMasterCheckbox()
 
+    if (notify && !this._building) {
+      this._dismissValidationState()
+    }
+
+    this._updateValidity()
+
     if (notify) {
       this._element.dispatchEvent(new Event('input', { bubbles: true }))
       this._element.dispatchEvent(new Event('change', { bubbles: true }))
@@ -1372,6 +1471,32 @@ class MultiSelect extends ComboboxBase {
       this._selectOption(option.value, option.text, { refresh: false })
     }
 
+    this._refreshAfterSelectionChange(false)
+  }
+
+  _restoreSelection(): void {
+    const options = this._flattenOptions()
+    const defaults = new Set([...(this._element as HTMLSelectElement).options]
+      .filter(option => option.defaultSelected)
+      .map(option => option.value))
+
+    this._selected = options
+      .filter((option: any) => defaults.has(String(option.value)))
+      .map((option: any) => ({ value: String(option.value), text: option.text, ...option.disabled && { disabled: true } }))
+
+    for (const option of options) {
+      const selected = defaults.has(String(option.value))
+      const nativeOption = this._getNativeOption(option.value)
+
+      if (nativeOption) {
+        nativeOption.selected = selected
+      }
+
+      this._syncOptionElementState(option.value, selected)
+    }
+
+    this._onSearchChange(this._searchElement)
+    this._dismissValidationState()
     this._refreshAfterSelectionChange(false)
   }
 

@@ -1,6 +1,7 @@
 import { vi } from 'vitest'
 import {
-  clearValidationState, focusFirstInvalidControl, getFeedbackIds, isFormValid, updateValidationState, validateForm
+  clearValidationState, focusFirstInvalidControl, followUserValidity, getFeedbackIds, getFeedbackText, getUserValidity,
+  getValidationState, isFormValid, ownValidationState, setStateValidity, updateValidationState, validateForm
 } from '../../../src/util/form-validation.js'
 import { clearFixture, getFixture } from '../../helpers/fixture.js'
 
@@ -542,6 +543,164 @@ describe('Form validation utilities', () => {
       focusFirstInvalidControl(shadowRoot.querySelector('form'))
 
       expect(document.activeElement).toBe(next)
+    })
+  })
+
+  describe('getFeedbackText', () => {
+    it('should read the text of the invalid feedback without the parts hidden from screen readers', () => {
+      fixtureEl.innerHTML = '<form><input id="name" required><div class="invalid-feedback">Enter <span aria-hidden="true">*</span> a   name.</div></form>'
+
+      expect(getFeedbackText(fixtureEl.querySelector('#name'))).toBe('Enter a name.')
+    })
+
+    it('should fall back to the invalid feedback aria-describedby points to, and to an empty string', () => {
+      fixtureEl.innerHTML = '<form><input id="named" required aria-describedby="hint error"><input id="bare" required></form><p id="hint">Hint</p><p id="error" class="invalid-feedback">Wrong.</p>'
+
+      expect(getFeedbackText(fixtureEl.querySelector('#named'))).toBe('Wrong.')
+      expect(getFeedbackText(fixtureEl.querySelector('#bare'))).toBe('')
+    })
+  })
+
+  describe('getValidationState', () => {
+    it('should take validationState over the aliases and invalid over valid', () => {
+      expect(getValidationState('warning', true, true)).toBe('warning')
+      expect(getValidationState(null, true, true)).toBe('invalid')
+      expect(getValidationState(undefined, true, false)).toBe('valid')
+      expect(getValidationState(null, false, false)).toBeUndefined()
+    })
+  })
+
+  describe('getUserValidity', () => {
+    it('should read :user-invalid and :user-valid only in the forms that opt in', () => {
+      fixtureEl.innerHTML = `<form id="invalid" data-coreui-validate novalidate><input id="empty" required></form>
+        <form id="valid" data-coreui-validate="valid" novalidate><input id="filled" required value="x"></form>
+        <form id="plain" novalidate><input id="plainEmpty" required></form>`
+
+      for (const form of fixtureEl.querySelectorAll('form')) {
+        form.addEventListener('submit', event => event.preventDefault())
+        form.requestSubmit()
+      }
+
+      expect(getUserValidity(fixtureEl.querySelector('#empty'))).toBe('invalid')
+      expect(getUserValidity(fixtureEl.querySelector('#filled'))).toBe('valid')
+      expect(getUserValidity(fixtureEl.querySelector('#plainEmpty'))).toBeUndefined()
+    })
+  })
+
+  describe('followUserValidity', () => {
+    it('should report a control invalid once a validation reports it, until its value is valid', () => {
+      fixtureEl.innerHTML = '<form novalidate><select id="value" required><option value="">None</option><option value="1">One</option></select><input id="other" required></form>'
+      const control = fixtureEl.querySelector('#value')
+      const updates = []
+      const validity = followUserValidity(control, state => updates.push(state))
+
+      expect(validity.read()).toBeUndefined()
+
+      fixtureEl.querySelector('#other').checkValidity()
+      expect(validity.read()).toBeUndefined()
+
+      control.form.checkValidity()
+      expect(validity.read()).toBe('invalid')
+      expect(updates.at(-1)).toBe('invalid')
+
+      control.value = '1'
+      control.dispatchEvent(new Event('change', { bubbles: true }))
+      expect(updates.at(-1)).toBeUndefined()
+
+      control.value = ''
+      expect(validity.read()).toBe('invalid')
+
+      validity.stop()
+    })
+
+    it('should forget the report after a native reset, unless the reset was cancelled', async () => {
+      fixtureEl.innerHTML = '<form novalidate><input id="value" required></form>'
+      const control = fixtureEl.querySelector('#value')
+      const validity = followUserValidity(control, () => {})
+      const nextTask = () => new Promise(resolve => {
+        setTimeout(resolve)
+      })
+      const cancel = event => event.preventDefault()
+
+      control.form.checkValidity()
+      control.form.addEventListener('reset', cancel)
+      control.form.reset()
+      await nextTask()
+
+      expect(validity.read()).toBe('invalid')
+
+      control.form.removeEventListener('reset', cancel)
+      control.form.reset()
+      await nextTask()
+
+      expect(validity.read()).toBeUndefined()
+
+      validity.stop()
+    })
+
+    it('should follow a control outside a form on the control itself, and stop when told', () => {
+      fixtureEl.innerHTML = '<input id="value" required>'
+      const control = fixtureEl.querySelector('#value')
+      const updates = []
+      const validity = followUserValidity(control, state => updates.push(state))
+
+      control.checkValidity()
+      expect(updates).toEqual(['invalid'])
+
+      validity.stop()
+      control.checkValidity()
+      control.dispatchEvent(new Event('input'))
+
+      expect(updates).toEqual(['invalid'])
+    })
+  })
+
+  describe('ownValidationState', () => {
+    it('should leave the controls a component took over to it, and mark them again once handed back', () => {
+      fixtureEl.innerHTML = '<form data-coreui-validate="valid" novalidate><select id="value" required><option value="">None</option></select><input id="search"><div class="invalid-feedback">Pick one.</div></form>'
+      const form = fixtureEl.querySelector('form')
+      const select = fixtureEl.querySelector('#value')
+      const search = fixtureEl.querySelector('#search')
+      const marks = new WeakMap()
+
+      updateValidationState(form, marks)
+      expect(select.getAttribute('aria-invalid')).toBe('true')
+
+      const handBack = ownValidationState(select, search)
+      updateValidationState(form, marks)
+
+      expect(select.hasAttribute('aria-invalid')).toBeFalse()
+      expect(select.classList.contains('is-invalid')).toBeFalse()
+      expect(search.classList.contains('is-valid')).toBeFalse()
+      expect(isFormValid(form)).toBeFalse()
+
+      handBack()
+      updateValidationState(form, marks)
+
+      expect(select.getAttribute('aria-invalid')).toBe('true')
+      expect(search.classList.contains('is-valid')).toBeTrue()
+    })
+  })
+
+  describe('setStateValidity', () => {
+    it('should block the control with its invalid feedback, or a generic message, and clear only its own validity', () => {
+      fixtureEl.innerHTML = '<form><input id="described"><div class="invalid-feedback">Taken.</div><input id="bare"><input id="page"></form>'
+      const described = fixtureEl.querySelector('#described')
+      const bare = fixtureEl.querySelector('#bare')
+      const page = fixtureEl.querySelector('#page')
+
+      setStateValidity(described, true)
+      setStateValidity(bare, true)
+      page.setCustomValidity('Ours.')
+      setStateValidity(page, false)
+
+      expect(described.validationMessage).toBe('Taken.')
+      expect(bare.validationMessage).toBe('Invalid value.')
+      expect(page.validationMessage).toBe('Ours.')
+
+      setStateValidity(described, false)
+
+      expect(described.checkValidity()).toBeTrue()
     })
   })
 })
