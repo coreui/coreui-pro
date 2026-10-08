@@ -41,6 +41,8 @@ const CLASS_NAME_IS_VALID = 'is-valid'
 const SELECTOR_ARIA_HIDDEN = '[aria-hidden="true"]'
 const SELECTOR_CHIP_INPUT = '.chip-input'
 const SELECTOR_CHOICE = '[type="checkbox"], [type="radio"]'
+const SELECTOR_COMBOBOX_SELECT = '.combobox-select'
+const SELECTOR_COMBOBOX_TOGGLE = '.combobox-toggle'
 const SELECTOR_CONTROL = 'input, select, textarea'
 const SELECTOR_DATE_TIME = '.form-date-time'
 const SELECTOR_FIELD = '.form-field'
@@ -154,15 +156,19 @@ const getFollowingFeedback = (element: Element, control: FormControl): Element[]
 
 /**
  * Finds the element that stands for a control in the layout: the `.form-date-time` field for the
- * value field laid over it, the `.form-otp` group for its value field and its slots, and the
- * `.chip-input` for its value field and its text field, which the messages follow, otherwise the
- * control itself.
+ * value field laid over it, the `.form-otp` group for its value field and its slots, the
+ * `.chip-input` for its value field and its text field, and the `.combobox-toggle` for the
+ * `.combobox-select` right after it, which the messages follow, otherwise the control itself.
  *
  * @param control - The control
  * @returns The element the layout places the control's messages around
  */
-const getLayoutElement = (control: FormControl): Element =>
-  control.closest(`${SELECTOR_CHIP_INPUT}, ${SELECTOR_DATE_TIME}, ${SELECTOR_OTP}`) ?? control
+const getLayoutElement = (control: FormControl): Element => {
+  const previous = control.previousElementSibling
+
+  return control.closest(`${SELECTOR_CHIP_INPUT}, ${SELECTOR_DATE_TIME}, ${SELECTOR_OTP}`) ??
+    (control.matches(SELECTOR_COMBOBOX_SELECT) && previous?.matches(SELECTOR_COMBOBOX_TOGGLE) ? previous : control)
+}
 
 /**
  * Finds the `.form-control-group` a control sits in directly, or through a `.form-floating`, which
@@ -248,8 +254,8 @@ const getStructuralFeedback = (control: FormControl): Element[] => {
  * Finds the invalid feedback of a control: the elements named in `data-coreui-invalid-feedback`,
  * or else the ones the stylesheet shows when the control is invalid, for a radio or checkbox those
  * of every choice that shares its name. The value field of a `.form-date-time` takes both from the
- * field, and a control of a `.form-otp` or a `.chip-input` from the group. A found element without
- * an id gets one.
+ * field, a control of a `.form-otp` or a `.chip-input` from the group, and the value field of a
+ * combobox from its toggle. A found element without an id gets one.
  *
  * @param control - The control
  * @returns The ids of its invalid feedback, without duplicates
@@ -844,8 +850,10 @@ export const configureValueField = (
 /**
  * Writes the value of a value field: the text of an input or a textarea, and for a select the
  * options it holds, rebuilt so that exactly the given values are selected, one key each in the
- * submitted data; a select that is not multiple takes the first value only. A value list given to
- * a text field is joined with commas.
+ * submitted data, and marked selected by default so a native reset leaves them as written; a
+ * select that is not multiple takes the first value only, and without a value holds one empty
+ * option, so it still posts its name as a native select with a placeholder option does. A value
+ * list given to a text field is joined with commas.
  *
  * @param field - The value field
  * @param value - The value, or the values of a multiple choice
@@ -854,14 +862,14 @@ export const configureValueField = (
 export const writeValueField = (field: ValueField, value: string | string[]): boolean => {
   if (field instanceof HTMLSelectElement) {
     const list = Array.isArray(value) ? value : [value]
-    const values = field.multiple ? list : list.slice(0, 1)
+    const values = field.multiple ? list : (list.length > 0 ? list.slice(0, 1) : [''])
     const current = [...field.selectedOptions].map(option => option.value)
 
     if (values.length === current.length && values.every((item, index) => item === current[index])) {
       return false
     }
 
-    field.replaceChildren(...values.map(item => new Option(item, item, false, true)))
+    field.replaceChildren(...values.map(item => new Option(item, item, true, true)))
     return true
   }
 
@@ -883,4 +891,25 @@ export const writeValueField = (field: ValueField, value: string | string[]): bo
 export const dispatchValueChange = (field: ValueField): void => {
   field.dispatchEvent(new Event('input', { bubbles: true }))
   field.dispatchEvent(new Event('change', { bubbles: true }))
+}
+
+/**
+ * Lays a value field along the start edge of the element it stands for when the field sits next to
+ * that element rather than inside it, such as after a button: the field takes the element's top
+ * and height and keeps its own narrow width, so the browser shows its message under the element
+ * and the field never reaches past it. Called when the field is reported invalid, which happens
+ * before the browser shows the message.
+ *
+ * @param field - The value field, positioned absolutely
+ * @param target - The element the field stands for
+ */
+export const alignValueField = (field: ValueField, target: Element): void => {
+  const fieldRect = field.getBoundingClientRect()
+  const targetRect = target.getBoundingClientRect()
+  const style = getComputedStyle(field)
+  const offset = getComputedStyle(target).direction === 'rtl' ? targetRect.right - fieldRect.right : targetRect.left - fieldRect.left
+
+  field.style.top = `${Number.parseFloat(style.top) + targetRect.top - fieldRect.top}px`
+  field.style.left = `${Number.parseFloat(style.left) + offset}px`
+  field.style.height = `${targetRect.height}px`
 }

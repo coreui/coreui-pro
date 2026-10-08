@@ -10,6 +10,11 @@ import Data from './dom/data.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import ListBox, { type ListBoxEntry } from './list-box.js'
+import {
+  alignValueField, configureValueField, createValueField, dispatchValueChange, followUserValidity, getFeedbackIds,
+  getValidationState, nextStateSerial, ownValidationState, setStateValidity, type UserValidity, type ValidationState,
+  writeValueField
+} from './util/form-validation.js'
 import { CARET_ICON } from './util/icons.js'
 import {
   DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList, SVGAllowlist
@@ -47,18 +52,22 @@ const EVENT_LIST_BOX_SEARCH = `search${EVENT_LIST_BOX}`
 
 const CLASS_NAME_CARET = 'combobox-caret'
 const CLASS_NAME_DISABLED = 'disabled'
+const CLASS_NAME_IS_INVALID = 'is-invalid'
+const CLASS_NAME_IS_VALID = 'is-valid'
 const CLASS_NAME_LIST_BOX = 'list-box'
 const CLASS_NAME_OPTIONS = 'list-box-options'
+const CLASS_NAME_INPUT_GROUP_IGNORE = 'input-group-ignore'
 const CLASS_NAME_PLACEHOLDER = 'combobox-placeholder'
 const CLASS_NAME_POPUP = 'popup'
 const CLASS_NAME_POPUP_COMBOBOX = 'combobox-popup'
 const CLASS_NAME_SEARCH = 'list-box-search'
+const CLASS_NAME_SELECT = 'combobox-select'
 const CLASS_NAME_SELECTED = 'selected'
 const CLASS_NAME_SHOW = 'show'
 const CLASS_NAME_TOGGLE = 'combobox-toggle'
 const CLASS_NAME_VALUE = 'combobox-value'
 
-const HOST_ATTRIBUTES = ['aria-activedescendant', 'aria-controls', 'aria-expanded', 'aria-haspopup', 'type']
+const HOST_ATTRIBUTES = ['aria-activedescendant', 'aria-controls', 'aria-describedby', 'aria-expanded', 'aria-haspopup', 'type']
 const HOST_CLASS_NAMES = [CLASS_NAME_DISABLED, CLASS_NAME_TOGGLE]
 const MENU_STYLE_PROPERTIES = ['left', 'min-width', 'position', 'top']
 
@@ -73,6 +82,8 @@ const SELECTOR_POPUP = '.popup'
 const SELECTOR_SEARCH = '[data-coreui-list-box-search]'
 const SELECTOR_VALUE = '.combobox-value'
 
+const VALIDATION_OPTIONS = ['invalid', 'valid', 'validationState']
+
 type ComboboxConfig = {
   allowList: SanitizerAllowList
   ariaSearchLabel: string
@@ -81,10 +92,12 @@ type ComboboxConfig = {
   disabled: boolean
   html: boolean
   indicator: string
+  invalid: boolean
   items: ListBoxEntry[]
   multiple: boolean
   name: string | null
   placeholder: string
+  required: boolean
   sanitize: boolean
   sanitizeFn: ((unsafeHtml: string) => string) | null
   search: boolean | string
@@ -93,6 +106,8 @@ type ComboboxConfig = {
   selectedLabel: CountLabel
   selectionLimit: number | null
   typeahead: boolean
+  valid: boolean
+  validationState: ValidationState | null
   value: string | string[] | null
 }
 
@@ -104,10 +119,12 @@ const Default: ComboboxConfig = {
   disabled: false,
   html: false,
   indicator: 'none',
+  invalid: false,
   items: [],
   multiple: false,
   name: null,
   placeholder: '',
+  required: false,
   sanitize: true,
   sanitizeFn: null,
   search: false,
@@ -116,6 +133,8 @@ const Default: ComboboxConfig = {
   selectedLabel: (count: number) => `${count} selected`,
   selectionLimit: null,
   typeahead: true,
+  valid: false,
+  validationState: null,
   value: null
 }
 
@@ -127,10 +146,12 @@ const DefaultType: Record<string, string> = {
   disabled: 'boolean',
   html: 'boolean',
   indicator: 'string',
+  invalid: 'boolean',
   items: 'array',
   multiple: 'boolean',
   name: '(string|null)',
   placeholder: 'string',
+  required: 'boolean',
   sanitize: 'boolean',
   sanitizeFn: '(null|function)',
   search: '(boolean|string)',
@@ -139,6 +160,8 @@ const DefaultType: Record<string, string> = {
   selectedLabel: '(string|function)',
   selectionLimit: '(null|number)',
   typeahead: 'boolean',
+  valid: 'boolean',
+  validationState: '(string|null|undefined)',
   value: '(string|array|null)'
 }
 
@@ -151,13 +174,21 @@ class Combobox extends ComboboxBase {
   protected declare _addedDisabled: boolean
   protected declare _addedMenuClassNames: string[]
   protected declare _createdNodes: ChildNode[]
-  protected declare _hiddenInput: HTMLInputElement | null
+  protected declare _describedBy: string | null
   protected declare _hostAttributes: Map<string, string | null>
   protected declare _hostMenuStyle: Map<string, string> | null
   protected declare _hostOptionsId: string
   protected declare _hostValue: { nodes: Node[], placeholder: boolean } | null
+  protected declare _listGesture: boolean
+  protected declare _releaseValidationState: (() => void) | null
+  protected declare _resetValues: string[]
   protected declare _searchElement: HTMLInputElement | null
+  protected declare _serverClasses: string[]
+  protected declare _stateClass: string | null
+  protected declare _stateSerial: number
+  protected declare _userValidity: UserValidity
   protected declare _valueElement: HTMLElement
+  protected declare _valueField: HTMLSelectElement
   protected declare _valueFromMarkup: boolean
 
   constructor(element?: string | Element | null, config?: Partial<ComboboxConfig> | null) {
@@ -173,8 +204,14 @@ class Combobox extends ComboboxBase {
     this._hostMenuStyle = null
     this._hostOptionsId = ''
     this._hostValue = null
-    this._hiddenInput = null
+    this._listGesture = false
+    this._releaseValidationState = null
+    this._resetValues = []
     this._searchElement = null
+    this._serverClasses = [CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID].filter(name => this._element.classList.contains(name))
+    this._element.classList.remove(...this._serverClasses)
+    this._stateClass = null
+    this._stateSerial = nextStateSerial()
     this._listBox = null
     this._listBoxElement = null
     this._menu = null
@@ -228,6 +265,19 @@ class Combobox extends ComboboxBase {
     this._updateValue()
   }
 
+  setConfig(config: Partial<ComboboxConfig> | null): void {
+    const keys = VALIDATION_OPTIONS.filter(key => config && key in config) as (keyof ComboboxConfig)[]
+
+    if (keys.length === 0) {
+      return
+    }
+
+    this._serverClasses = []
+    this._stateSerial = nextStateSerial()
+    this._config = this._getConfig({ ...this._config, ...Object.fromEntries(keys.map(key => [key, config![key]])) })
+    this._updateValidity()
+  }
+
   override dispose(): void {
     if (!this._element) {
       return
@@ -236,7 +286,15 @@ class Combobox extends ComboboxBase {
     this._disposeFloating()
     this._disposeListBox()
 
-    this._hiddenInput?.remove()
+    this._userValidity.stop()
+    this._releaseValidationState?.()
+    this._valueField.remove()
+
+    if (this._stateClass) {
+      this._element.classList.remove(this._stateClass)
+    }
+
+    this._element.classList.add(...this._serverClasses)
 
     if (this._menu) {
       EventHandler.off(this._menu, EVENT_KEY)
@@ -327,15 +385,17 @@ class Combobox extends ComboboxBase {
 
     this._createValueElement()
     this._createCaret()
-    this._createHiddenInput()
+    this._createValueField()
     this._resolveMenu()
     this._createSearchInput()
+    this._releaseValidationState = ownValidationState(...[this._valueField, this._searchElement].filter(Boolean) as Element[])
 
     this._listBox = new ListBox(this._listBoxElement, this._getListBoxConfig())
     this._addListBoxListeners()
     this._addPanelEscapeListener(this._menu)
 
     this._updateValue()
+    this._resetValues = this._listBox.getSelectedValues()
   }
 
   _createValueElement(): void {
@@ -376,17 +436,22 @@ class Combobox extends ComboboxBase {
     this._element.append(template.content)
   }
 
-  _createHiddenInput(): void {
-    if (!this._config.name) {
-      return
-    }
+  _createValueField(): void {
+    const field = createValueField('select', () => this._element)
 
-    const input = document.createElement('input')
-    input.type = 'hidden'
-    input.name = this._config.name
-    this._element.before(input)
+    field.classList.add(CLASS_NAME_SELECT, CLASS_NAME_INPUT_GROUP_IGNORE)
+    field.multiple = this._config.multiple
+    configureValueField(field, {
+      disabled: this._config.disabled,
+      name: this._config.name,
+      required: this._config.required
+    })
+    field.addEventListener('invalid', () => alignValueField(field, this._element))
+    this._element.after(field)
 
-    this._hiddenInput = input
+    this._valueField = field
+    this._describedBy = this._hostAttributes.get('aria-describedby') ?? null
+    this._userValidity = followUserValidity(field, () => this._updateValidity(), serial => this._restoreValue(serial))
   }
 
   // The panel is written next to the toggle, or built here when the options
@@ -519,17 +584,30 @@ class Combobox extends ComboboxBase {
 
     this._syncing = false
 
-    this._updateValue()
-    EventHandler.trigger(this._element, EVENT_CHANGE, { value: this.getValue() })
+    this._commitValue()
   }
 
-  _updateValue(): void {
-    const values = this._listBox ? this._listBox.getSelectedValues() : []
+  _commitValue(): void {
+    const isChanged = this._updateValue()
 
-    if (this._hiddenInput) {
-      this._hiddenInput.value = values.join(',')
+    EventHandler.trigger(this._element, EVENT_CHANGE, { value: this.getValue() })
+
+    if (isChanged) {
+      dispatchValueChange(this._valueField)
     }
+  }
 
+  _updateValue(): boolean {
+    const values = this._listBox ? this._listBox.getSelectedValues() : []
+    const isChanged = writeValueField(this._valueField, values)
+
+    this._updateValidity()
+    this._updateValueText(values)
+
+    return isChanged
+  }
+
+  _updateValueText(values: string[]): void {
     if (values.length === 0) {
       this._valueElement.textContent = this._config.placeholder
       this._valueElement.classList.add(CLASS_NAME_PLACEHOLDER)
@@ -570,9 +648,21 @@ class Combobox extends ComboboxBase {
     }
   }
 
+  override _onOptionSelected(): void {
+    this._listGesture = true
+  }
+
+  override _onOptionDeselected(): void {
+    this._listGesture = true
+  }
+
   override _onSelectionChange(): void {
-    this._updateValue()
-    EventHandler.trigger(this._element, EVENT_CHANGE, { value: this.getValue() })
+    if (this._listGesture) {
+      this._listGesture = false
+      this._dismissValidationState()
+    }
+
+    this._commitValue()
 
     // One value, one decision: the panel has nothing left to offer, so it
     // closes and hands the focus back to the control the user came from.
@@ -580,6 +670,56 @@ class Combobox extends ComboboxBase {
       this.hide()
       this._element.focus()
     }
+  }
+
+  _dismissValidationState(serial: number = Number.POSITIVE_INFINITY): void {
+    if (this._stateSerial > serial) {
+      return
+    }
+
+    this._config.invalid = false
+    this._config.valid = false
+    this._config.validationState = null
+    this._serverClasses = []
+  }
+
+  _updateValidity(): void {
+    const givenState = getValidationState(this._config.validationState, this._config.valid, this._config.invalid) ??
+      getValidationState(null, this._serverClasses.includes(CLASS_NAME_IS_VALID), this._serverClasses.includes(CLASS_NAME_IS_INVALID))
+
+    setStateValidity(this._valueField, givenState === 'invalid')
+
+    const state = givenState ?? this._userValidity.read()
+    const stateClass = state ? `is-${state}` : null
+    const describedBy = [...new Set([
+      ...(this._describedBy ?? '').split(/\s+/),
+      ...(state === 'invalid' ? getFeedbackIds(this._valueField) : [])
+    ])].filter(Boolean).join(' ')
+
+    if (stateClass !== this._stateClass) {
+      if (this._stateClass) {
+        this._element.classList.remove(this._stateClass)
+      }
+
+      if (stateClass) {
+        this._element.classList.add(stateClass)
+      }
+
+      this._stateClass = stateClass
+    }
+
+    this._restoreAttribute('aria-describedby', describedBy || null)
+  }
+
+  _restoreValue(serial: number): void {
+    this._dismissValidationState(serial)
+
+    if (this._listBox && this._listBox.getSelectedValues().join('\u0000') !== this._resetValues.join('\u0000')) {
+      this._applySelection(this._resetValues)
+      return
+    }
+
+    this._updateValidity()
   }
 
   _addEventListeners(): void {
