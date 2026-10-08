@@ -58,6 +58,26 @@ describe('TimeInput', () => {
     })
   })
 
+  describe('validation', () => {
+    it('should take the state from validationState, block with it and drop it when the user edits the time', () => {
+      fixtureEl.innerHTML = '<form><div class="time-input"></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const timeInput = new TimeInput(fixtureEl.querySelector('.time-input'), { date: '10:30', format: 'HH:mm', validationState: 'invalid' })
+      const [hour] = getSections(timeInput._element)
+
+      expect(timeInput._element.classList.contains('is-invalid')).toBeTrue()
+      expect(hour.getAttribute('aria-invalid')).toEqual('true')
+      expect(form.checkValidity()).toBeFalse()
+
+      hour.focus()
+      pressKey(hour, 'ArrowUp')
+
+      expect(timeInput._element.classList.contains('is-invalid')).toBeFalse()
+      expect(hour.hasAttribute('aria-invalid')).toBeFalse()
+      expect(form.checkValidity()).toBeTrue()
+    })
+  })
+
   describe('DATA_KEY', () => {
     it('should return plugin data key', () => {
       expect(TimeInput.DATA_KEY).toEqual('coreui.time-input')

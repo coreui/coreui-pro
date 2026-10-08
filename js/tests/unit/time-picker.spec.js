@@ -108,8 +108,8 @@ describe('TimePicker', () => {
       const form = fixtureEl.querySelector('#form')
       const field = fixtureEl.querySelector('.form-date-time')
 
-      form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
-      await Promise.resolve()
+      form.addEventListener('submit', event => event.preventDefault())
+      form.requestSubmit()
       picker.setTime('11:45:00')
 
       expect(field.classList.contains('is-valid')).toBeTrue()

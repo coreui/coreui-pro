@@ -37,7 +37,10 @@ import {
 import type { DateSection, EditableSection, SectionFormat } from './util/date-sections.js'
 import { onLabelClick } from './util/field-label.js'
 import { captureHostClasses, type HostClasses, restoreHostClasses } from './util/form-control-group.js'
-import { getFeedbackIds } from './util/form-validation.js'
+import {
+  followUserValidity, getFeedbackIds, getValidationState, ownValidationState, setStateValidity,
+  type UserValidity, type ValidationState
+} from './util/form-validation.js'
 import { getNextActiveElement, isRTL } from './util/index.js'
 
 /**
@@ -73,15 +76,13 @@ const HOST_CLASS_NAMES = [
   CLASS_NAME_DISABLED,
   CLASS_NAME_FILLED,
   CLASS_NAME_FORM_CONTROL,
-  CLASS_NAME_IS_INVALID,
-  CLASS_NAME_IS_VALID,
   CLASS_NAME_SECTION_INPUT
 ]
 
-const SELECTOR_FORM_VALIDATE = '[data-coreui-validate]'
-const SELECTOR_FORM_VALIDATE_VALID = '[data-coreui-validate~="valid"]'
 const SELECTOR_SECTION = '.form-date-time-section'
 const SELECTOR_VALUE_FIELD = 'textarea'
+
+const VALIDATION_OPTIONS = new Set(['invalid', 'valid', 'validationState'])
 
 export type SectionInputConfig = {
   ariaDayLabel: string
@@ -116,6 +117,7 @@ export type SectionInputConfig = {
   required: boolean
   secondPlaceholder: string | null
   valid: boolean
+  validationState: ValidationState | null
   weekPlaceholder: string | null
   yearPlaceholder: string | null
 }
@@ -153,6 +155,7 @@ const Default: SectionInputConfig = {
   required: false,
   secondPlaceholder: null,
   valid: false,
+  validationState: null,
   weekPlaceholder: null,
   yearPlaceholder: null
 }
@@ -190,6 +193,7 @@ const DefaultType: Record<string, string> = {
   required: 'boolean',
   secondPlaceholder: '(string|null)',
   valid: 'boolean',
+  validationState: '(string|null|undefined)',
   weekPlaceholder: '(string|null)',
   yearPlaceholder: '(string|null)'
 }
@@ -215,28 +219,24 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
   protected declare _date: Date | null
   protected declare _minDate: Date | null
   protected declare _ownerInvalid: boolean
-  protected declare _valid: boolean
   protected declare _maxDate: Date | null
   protected declare _sections: DateSection[]
   protected declare _draft: string
   protected declare _allSelected: boolean
   protected declare _error: string | null
-  protected declare _hostAriaInvalid: string | null
   protected declare _hostAriaLabel: string | null
   protected declare _hostClasses: HostClasses
   protected declare _hostNodes: ChildNode[]
   protected declare _hostRole: string | null
   protected declare _inputElement: HTMLTextAreaElement | null
-  protected declare _form: HTMLFormElement | null
   protected declare _initialDate: Date | null
   protected declare _isBuilt: boolean
+  protected declare _rejected: boolean
+  protected declare _releaseValidationState: () => void
   protected declare _removeLabelClick: () => void
-  protected declare _resetHandler: (event: Event) => void
-  protected declare _submitCaptureHandler: () => void
-  protected declare _submitHandler: () => void
-  protected declare _submitValid: boolean
-  protected declare _submitted: boolean
-  protected declare _submittedSinceReset: boolean
+  protected declare _serverClasses: string[]
+  protected declare _stateClass: string | null
+  protected declare _userValidity: UserValidity
 
   constructor(element?: string | Element | null, config?: Partial<C> | null) {
     super(element, config)
@@ -247,47 +247,19 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
     this._error = null
     this._inputElement = null
     this._isBuilt = false
-    this._form = null
-    this._resetHandler = (event: Event) => {
-      this._submittedSinceReset = false
-      setTimeout(() => {
-        if (!this._element || event.defaultPrevented) {
-          return
-        }
-
-        const submitted = this._submittedSinceReset
-
-        if (!submitted) {
-          this._submitted = false
-          this._submitValid = false
-        }
-
-        this.reset()
-
-        if (submitted) {
-          this._onFormSubmit()
-        }
-      })
-    }
-
-    this._submitCaptureHandler = () => {
-      this._submittedSinceReset = true
-    }
-
-    this._submitHandler = () => this._onFormSubmit()
-
-    this._submitValid = false
-    this._submitted = false
-    this._submittedSinceReset = false
     this._ownerInvalid = false
-    this._valid = false
-    this._hostAriaInvalid = this._element.getAttribute('aria-invalid')
+    this._rejected = false
+    this._stateClass = null
     this._hostAriaLabel = this._element.getAttribute('aria-label')
     this._hostClasses = captureHostClasses(this._element, HOST_CLASS_NAMES)
     this._hostNodes = [...this._element.childNodes]
     this._hostRole = this._element.getAttribute('role')
+    this._serverClasses = [CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID].filter(name => this._element.classList.contains(name))
+    this._element.classList.remove(...this._serverClasses)
 
     this._createSectionInput()
+    this._userValidity = followUserValidity(this._inputElement!, () => this._updateValidity(), () => this._onFormReset())
+    this._releaseValidationState = ownValidationState(this._inputElement!)
     this._initialDate = getDateFromSections(this._sections)
     this._date = this._applyValidationState()
     this._inputElement!.defaultValue = this._getResetValue()
@@ -340,6 +312,18 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
       return
     }
 
+    const keys = Object.keys(config ?? {})
+
+    if (keys.some(key => VALIDATION_OPTIONS.has(key))) {
+      this._serverClasses = []
+    }
+
+    if (keys.length > 0 && keys.every(key => VALIDATION_OPTIONS.has(key))) {
+      this._config = this._getConfig({ ...this._config, ...config })
+      this._updateValidity()
+      return
+    }
+
     const sections = this._sections
 
     this._config = this._getConfig({ ...this._config, date: getDateFromSections(sections), ...config })
@@ -359,11 +343,17 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
     }
 
     this._removeLabelClick()
-    EventHandler.off(this._form, this.constructor.eventName('reset'), this._resetHandler)
-    EventHandler.off(this._form, this.constructor.eventName('submit'), this._submitHandler)
-    this._form?.removeEventListener('submit', this._submitCaptureHandler, true)
+    EventHandler.off(this._element, this.constructor.EVENT_KEY)
+    this._userValidity.stop()
+    this._releaseValidationState()
+    setStateValidity(this._inputElement!, false)
+
+    if (this._stateClass) {
+      this._element.classList.remove(this._stateClass)
+    }
+
+    this._element.classList.add(...this._serverClasses)
     restoreHostClasses(this._element, HOST_CLASS_NAMES, this._hostClasses)
-    this._restoreAttribute('aria-invalid', this._hostAriaInvalid)
 
     if (!this._hostAriaLabel) {
       this._restoreAttribute('aria-label', this._hostAriaLabel)
@@ -427,11 +417,6 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
       this._focusFirstEmptySection()
     })
 
-    EventHandler.on(this._element, eventName('invalid'), SELECTOR_VALUE_FIELD, () => {
-      this._submitted = true
-      this._setInvalid(true)
-    })
-
     EventHandler.on(this._element, eventName('mousedown'), SELECTOR_SECTION, (event: any) => {
       if (this._config.disabled) {
         return
@@ -472,14 +457,6 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
       })
     }
 
-    this._form = this._element.closest('form')
-
-    if (this._form) {
-      EventHandler.on(this._form, eventName('reset'), this._resetHandler)
-      EventHandler.on(this._form, eventName('submit'), this._submitHandler)
-      this._form.addEventListener('submit', this._submitCaptureHandler, true)
-    }
-
     EventHandler.on(this._element, eventName('click'), (event: any) => {
       if (event.target.closest(SELECTOR_SECTION)) {
         event.preventDefault()
@@ -512,21 +489,9 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
     target?.focus()
   }
 
-  _onFormSubmit(): void {
-    const form = this._form!
-
-    queueMicrotask(() => {
-      if (!this._element || !form.matches(SELECTOR_FORM_VALIDATE)) {
-        return
-      }
-
-      this._submitted = true
-      const isInvalid = this._element.classList.contains(CLASS_NAME_IS_INVALID) || this._isMissing(this._date)
-
-      this._submitValid = !isInvalid && form.matches(SELECTOR_FORM_VALIDATE_VALID)
-      this._valid = this._submitValid
-      this._setInvalid(isInvalid)
-    })
+  _onFormReset(): void {
+    this._dismissValidationState()
+    this.reset()
   }
 
   _onKeydown(event: KeyboardEvent): void {
@@ -563,6 +528,7 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
       event.preventDefault()
       section.value = getIncrementedSectionValue(section, key === ARROW_UP_KEY ? 1 : -1, this._getSectionMax(section))
       this._draft = ''
+      this._dismissValidationState()
       this._commitSections()
       return
     }
@@ -577,6 +543,7 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
 
       section.value = null
       this._draft = ''
+      this._dismissValidationState()
       this._commitSections()
       return
     }
@@ -630,6 +597,7 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
 
     this._draft = result.completed ? '' : result.draft
     section.value = result.value
+    this._dismissValidationState()
     this._commitSections()
 
     if (result.completed) {
@@ -641,6 +609,7 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
 
   _clearAndFocus(): HTMLElement {
     this._setAllSelected(false)
+    this._dismissValidationState()
     this.clear()
     const [firstSection] = this._getSectionElements()
     firstSection.focus()
@@ -657,6 +626,7 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
     const sections = this._config.inputDateParse ? null : getSectionsFromString(text, this._sections)
 
     if (sections) {
+      this._dismissValidationState()
       this._commitSections(sections)
       return
     }
@@ -666,6 +636,7 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
       getLocalDateFromString(text, this._config.locale)
 
     if (date instanceof Date && !Number.isNaN(date.getTime())) {
+      this._dismissValidationState()
       this._commitSections(setSectionsFromDate(this._sections, date))
     }
   }
@@ -713,19 +684,21 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
     const isFilled = this._sections.some(section => section.type !== 'literal' && section.value !== null)
     const error = this._getValidationError(date, isFilled)
     const isDisabled = error !== null && error !== 'incomplete'
+    const value = date && !isDisabled ? formatSections(this._sections) : ''
+    const isChanged = this._inputElement!.value !== value
 
     this._element.classList.toggle(CLASS_NAME_FILLED, isFilled)
-    this._valid = this._config.valid || (this._submitValid && isFilled && !isDisabled)
-    this._setInvalid(isDisabled || this._config.invalid || (this._submitted && this._isMissing(date)))
-    const value = date && !isDisabled ? formatSections(this._sections) : ''
+    this._rejected = isDisabled
 
-    if (this._inputElement!.value !== value) {
+    if (isChanged) {
       this._inputElement!.value = value
+    }
 
-      if (this._isBuilt) {
-        this._inputElement!.dispatchEvent(new Event('input', { bubbles: true }))
-        this._inputElement!.dispatchEvent(new Event('change', { bubbles: true }))
-      }
+    this._updateValidity()
+
+    if (isChanged && this._isBuilt) {
+      this._inputElement!.dispatchEvent(new Event('input', { bubbles: true }))
+      this._inputElement!.dispatchEvent(new Event('change', { bubbles: true }))
     }
 
     if (error !== this._error) {
@@ -740,33 +713,54 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
     return isDisabled ? null : date
   }
 
-  _isMissing(date: Date | null): boolean {
-    return this._config.required && !this._config.disabled && !this._config.readonly && date === null
-  }
-
   _setOwnerInvalid(isInvalid: boolean): void {
     this._ownerInvalid = isInvalid
-    this._setInvalid(this._element.classList.contains(CLASS_NAME_IS_INVALID))
+    this._updateValidity()
   }
 
-  _setInvalid(isInvalid: boolean): void {
-    const ariaInvalid = isInvalid || this._ownerInvalid ? 'true' : this._hostAriaInvalid
-    this._element.classList.toggle(CLASS_NAME_IS_INVALID, isInvalid)
-    this._element.classList.toggle(CLASS_NAME_IS_VALID, this._valid && ariaInvalid !== 'true')
+  _updateValidity(): void {
+    const givenState = getValidationState(this._config.validationState, this._config.valid, this._config.invalid) ??
+      getValidationState(null, this._serverClasses.includes(CLASS_NAME_IS_VALID), this._serverClasses.includes(CLASS_NAME_IS_INVALID))
 
-    for (const element of [this._element, ...this._getSectionElements()]) {
-      if (ariaInvalid === null) {
-        element.removeAttribute('aria-invalid')
+    setStateValidity(this._inputElement!, givenState === 'invalid' && !this._config.disabled)
+
+    const ownState = this._rejected ? 'invalid' : givenState ?? this._userValidity.read()
+    const state = this._ownerInvalid && ownState !== 'invalid' ? undefined : ownState
+    const stateClass = state ? `is-${state}` : null
+    const isInvalid = state === 'invalid' || this._ownerInvalid
+
+    if (stateClass !== this._stateClass) {
+      if (this._stateClass) {
+        this._element.classList.remove(this._stateClass)
+      }
+
+      if (stateClass) {
+        this._element.classList.add(stateClass)
+      }
+
+      this._stateClass = stateClass
+    }
+
+    for (const section of this._getSectionElements()) {
+      if (isInvalid) {
+        section.setAttribute('aria-invalid', 'true')
       } else {
-        element.setAttribute('aria-invalid', ariaInvalid)
+        section.removeAttribute('aria-invalid')
       }
     }
 
     this._syncDescription()
   }
 
+  _dismissValidationState(): void {
+    this._config.invalid = false
+    this._config.valid = false
+    this._config.validationState = null
+    this._serverClasses = []
+  }
+
   _syncDescription(): void {
-    const isAnnouncedInvalid = this._element.getAttribute('aria-invalid') === 'true'
+    const isAnnouncedInvalid = this._getSectionElements()[0]?.getAttribute('aria-invalid') === 'true'
     const describedBy = [...new Set([
       ...(this._element.getAttribute('aria-describedby') ?? '').split(/\s+/),
       ...(isAnnouncedInvalid ? getFeedbackIds(this._inputElement!) : [])
@@ -864,17 +858,22 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
       this._element.append(element)
     }
 
-    this._inputElement = document.createElement('textarea')
-    this._inputElement.autocomplete = 'off'
+    if (!this._inputElement) {
+      this._inputElement = document.createElement('textarea')
+      this._inputElement.autocomplete = 'off'
+      this._inputElement.tabIndex = -1
+      this._inputElement.setAttribute('aria-hidden', 'true')
+    }
+
     this._inputElement.defaultValue = this._isBuilt ? this._getResetValue() : ''
     this._inputElement.disabled = disabled
     this._inputElement.readOnly = readonly
     this._inputElement.required = required
-    this._inputElement.tabIndex = -1
-    this._inputElement.setAttribute('aria-hidden', 'true')
 
     if (name) {
       this._inputElement.name = name
+    } else {
+      this._inputElement.removeAttribute('name')
     }
 
     this._element.append(this._inputElement)
