@@ -721,6 +721,29 @@ describe('RangeSlider', () => {
       expect(element.hasAttribute('aria-describedby')).toBeFalse()
     })
 
+    it('should mark every handle invalid with the error message of the element, and give both back on dispose', () => {
+      const { element, rangeSlider } = mount({ value: [20, 80] }, 'aria-invalid="true" aria-errormessage="budgetError"')
+
+      expect(inputsOf(element).map(input => input.getAttribute('aria-invalid'))).toEqual(['true', 'true'])
+      expect(inputsOf(element).map(input => input.getAttribute('aria-errormessage'))).toEqual(['budgetError', 'budgetError'])
+      expect(element.hasAttribute('aria-invalid')).toBeFalse()
+      expect(element.hasAttribute('aria-errormessage')).toBeFalse()
+
+      rangeSlider.dispose()
+
+      expect(element.getAttribute('aria-invalid')).toEqual('true')
+      expect(element.getAttribute('aria-errormessage')).toEqual('budgetError')
+    })
+
+    it('should move the validation state to the handles from an element with a role of its own', () => {
+      const { element } = mount({ value: [20, 80] }, 'role="group" aria-labelledby="budgetLabel" aria-invalid="true" aria-errormessage="budgetError"')
+
+      expect(element.getAttribute('aria-labelledby')).toEqual('budgetLabel')
+      expect(element.hasAttribute('aria-invalid')).toBeFalse()
+      expect(inputsOf(element).map(input => input.getAttribute('aria-invalid'))).toEqual(['true', 'true'])
+      expect(inputsOf(element).map(input => input.getAttribute('aria-errormessage'))).toEqual(['budgetError', 'budgetError'])
+    })
+
     it('should keep naming the handles after setConfig', () => {
       const { element, rangeSlider } = mount({ value: [20, 80] }, 'aria-label="Budget" aria-describedby="budgetHelp"')
 

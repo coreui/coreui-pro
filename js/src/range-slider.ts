@@ -49,7 +49,8 @@ const EVENT_POINTERUP = `pointerup${EVENT_KEY}`
 const EVENT_RESET = `reset${EVENT_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
-const HOST_ATTRIBUTES = ['aria-describedby', 'aria-label', 'aria-labelledby']
+const HOST_ATTRIBUTES = ['aria-describedby', 'aria-errormessage', 'aria-invalid', 'aria-label', 'aria-labelledby']
+const VALIDATION_ATTRIBUTES = ['aria-errormessage', 'aria-invalid']
 
 const CLASS_NAME_FORM_RANGE = 'form-range'
 const CLASS_NAME_FORM_RANGE_INPUT = 'form-range-input'
@@ -354,11 +355,9 @@ class RangeSlider extends BaseComponent {
   }
 
   _takeHostAttributes(): void {
-    if (this._element.hasAttribute('role')) {
-      return
-    }
+    const names = this._element.hasAttribute('role') ? VALIDATION_ATTRIBUTES : HOST_ATTRIBUTES
 
-    for (const name of HOST_ATTRIBUTES) {
+    for (const name of names) {
       const value = this._element.getAttribute(name)
 
       if (value !== null) {
@@ -376,6 +375,14 @@ class RangeSlider extends BaseComponent {
 
     if (describedBy) {
       input.setAttribute('aria-describedby', describedBy)
+    }
+
+    for (const name of VALIDATION_ATTRIBUTES) {
+      const value = this._hostAttributes.get(name)
+
+      if (value) {
+        input.setAttribute(name, value)
+      }
     }
 
     if (labelledBy && handleLabel) {
