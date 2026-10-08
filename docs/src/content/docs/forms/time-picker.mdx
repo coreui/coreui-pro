@@ -89,6 +89,17 @@ The time picker supports [floating labels](/forms/floating-labels/): set `floati
   there is nothing to make read-only. Use `disabled`.
 </Callout>
 
+## Validation
+
+The picker takes its validation state [the way the date picker does](/forms/date-picker/#validation): the `validationState` option (with `invalid` and `valid` as deprecated aliases) or an `.is-invalid` or `.is-valid` class written on the picker element, read once when the picker starts. A given state drops on the next change the user makes, a time picked in the panel, the cleaner, a footer button other than the one that closes the popup, or typing in the field, and stays through `setTime()`, `clear()`, `reset()` and `now()` called by your code. `setConfig({ validationState })` sets it again; for now `setConfig` changes only the validation options. While the given state is `'invalid'`, the sections of the field carry `aria-invalid="true"`, are described by the message after the picker, and the picker blocks the submit with its text, or `Invalid value.` when there is none.
+
+<Example pro code={`<div class="row">
+    <div class="col-lg-4 form-field">
+      <div class="is-invalid" data-coreui-time-picker data-coreui-locale="en-US" data-coreui-time="12:30:00"></div>
+      <div class="invalid-feedback">The room is taken at this time.</div>
+    </div>
+  </div>`} />
+
 ## Custom formats
 
 ### Disable minutes and seconds
@@ -179,7 +190,7 @@ Clicking a label that names the field, through `aria-labelledby` or a `<label fo
 
 An `aria-label`, `aria-labelledby` or `aria-describedby` on the picker element moves to the field, so a screen reader announces the name and the description when focus enters it, and the picker element gets them back on dispose. Point `aria-labelledby` at the visible label, as the examples on this page do; it names the field over `floatingLabel` and an `ariaLabel` in `inputOptions`, the way the browser ranks names.
 
-An `.is-invalid` class you write on the picker element, the server-side route, marks the field invalid for assistive technologies too: its sections carry `aria-invalid="true"` and are described by the error message after the picker, for as long as the class stays. An `aria-invalid="true"` on the element marks the sections invalid as well; write it with the class, which is what shows the message.
+While the picker shows an invalid state, the sections of its field carry `aria-invalid="true"` and are described by the error message after the picker, see [Validation](#validation). An `aria-invalid` written on the picker element is not read; give the state with `validationState` or with the class.
 
 ### Keyboard support
 
@@ -234,6 +245,7 @@ picker itself.
 | `floatingLabel` | string, null | `null` | Renders a floating label over the field, which also becomes its accessible name. An `aria-label` or `aria-labelledby` on the picker element names the field instead. |
 | `hours` | array, function, null | `null` | Allowed hours, 0 to 23 in every locale — a list or a filter. |
 | `inputOptions` | object | `{}` | Programmatic escape hatch for time input options. |
+| `invalid` | boolean | `false` | Deprecated alias of `validationState: 'invalid'`, ignored once `validationState` is set. |
 | `locale` | string | browser locale | Drives the mask and the 12/24-hour split. |
 | `minutes` | array, boolean, function | `true` | Allowed minutes, or `false` to drop the column. |
 | `name` | string, null | `null` | Name of the generated value input. Without it the field is not submitted with the form. |
@@ -244,6 +256,8 @@ picker itself.
 | `selectionOptions` | object | `{}` | Programmatic escape hatch for the selection body. |
 | `size` | string, null | `null` | `'sm'` or `'lg'`. |
 | `time` | date, string, null | `null` | Initial value. |
+| `valid` | boolean | `false` | Deprecated alias of `validationState: 'valid'`, ignored once `validationState` is set. |
+| `validationState` | string, null | `null` | The validation state the picker shows: `'valid'`, `'invalid'` or a state of `$form-validation-states`. `'invalid'` also blocks the submit. The next change the user makes clears it, see [Validation](#validation). |
 
 ### Methods
 
@@ -255,6 +269,7 @@ picker itself.
 | `getTime` | Returns the current value (`Date` or `null`). |
 | `now` | Sets the current time. |
 | `reset` | Restores the initial value. |
+| `setConfig` | Changes the validation options, `validationState`, `invalid` and `valid`, without rebuilding the picker. The other options are read when the picker starts and are left as they are. |
 | `setTime` | Sets the value. Emits `timeChange` when the value changes. |
 | `show` / `hide` / `toggle` | Popup control. |
 

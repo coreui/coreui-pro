@@ -30,6 +30,7 @@ import {
   captureHostClasses,
   managedSizeClassNames
 } from './util/form-control-group.js'
+import type { ValidationState } from './util/form-validation.js'
 import { CALENDAR_ICON, CLEANER_ICON } from './util/icons.js'
 import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
 import { type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
@@ -77,6 +78,7 @@ type DatePickerConfig = {
   floatingLabel: string | null,
   format: SectionInputConfig['format'],
   inputOptions: Partial<DateInputConfig>,
+  invalid: boolean,
   locale: string,
   maxDate: Date | string | null,
   minDate: Date | string | null,
@@ -89,7 +91,9 @@ type DatePickerConfig = {
   selectionOptions: Record<string, any>,
   selectionType: SelectionTypes,
   size: string | null,
-  timepicker: boolean
+  timepicker: boolean,
+  valid: boolean,
+  validationState: ValidationState | null
 }
 
 type DatePickerOptions = Partial<DatePickerConfig>
@@ -111,6 +115,7 @@ const Default: DatePickerConfig = {
   floatingLabel: null,
   format: null,
   inputOptions: {},
+  invalid: false,
   locale: navigator.language,
   maxDate: null,
   minDate: null,
@@ -123,7 +128,9 @@ const Default: DatePickerConfig = {
   selectionOptions: {},
   selectionType: 'day',
   size: null,
-  timepicker: false
+  timepicker: false,
+  valid: false,
+  validationState: null
 }
 
 const ORIGINAL_DEFAULT: DatePickerConfig = { ...Default }
@@ -142,6 +149,7 @@ const DefaultType: Record<string, string> = {
   floatingLabel: '(string|null)',
   format: '(function|string|null)',
   inputOptions: 'object',
+  invalid: 'boolean',
   locale: 'string',
   maxDate: '(date|string|null)',
   minDate: '(date|string|null)',
@@ -154,7 +162,9 @@ const DefaultType: Record<string, string> = {
   selectionOptions: 'object',
   selectionType: 'string',
   size: '(string|null)',
-  timepicker: 'boolean'
+  timepicker: 'boolean',
+  valid: 'boolean',
+  validationState: '(string|null|undefined)'
 }
 
 /**
@@ -316,12 +326,16 @@ class DatePicker extends PickerBase {
     this._input = new DateInput(inputEl, this._forwardConfig(DateInput, {
       date: this._config.date,
       disabled: this._config.disabled,
+      invalid: false,
       locale: this._config.locale,
       name: this._config.name,
       seconds: Boolean(this._config.seconds),
+      valid: false,
+      validationState: null,
       ...(this._config.timepicker ? { type: 'datetime' } : {}),
       ...(format ? { format } : {})
     }, { ...(this._config.floatingLabel ? { ariaLabel: this._config.floatingLabel } : {}), ...this._config.inputOptions }))
+    this._input._setOwnerDismiss((serial: number) => this._dismissValidationState(serial))
 
     EventHandler.on(inputEl, DateInput.eventName(DateInput.CHANGE_EVENT_NAME), (event: any) => {
       this._applyDate(event.date, { field: false })
@@ -354,8 +368,8 @@ class DatePicker extends PickerBase {
     return this._input.isDateSelectable(new Date())
   }
 
-  override _setFieldInvalid(isInvalid: boolean): void {
-    this._input._setOwnerInvalid(isInvalid)
+  override _setFieldState(givenState: ValidationState | undefined): void {
+    this._input._setOwnerState(givenState)
   }
 
   override _popupLabel(): string {
@@ -380,6 +394,7 @@ class DatePicker extends PickerBase {
     }))
 
     EventHandler.on(this._calendar._element, 'startDateChange.coreui.calendar', event => {
+      this._dismissValidationState()
       this._applyDate(this._withCurrentTime(event.dateObject), { calendar: false })
 
       if (!this._config.timepicker) {
@@ -423,6 +438,8 @@ class DatePicker extends PickerBase {
     if (!time) {
       return
     }
+
+    this._dismissValidationState()
 
     const merged = new Date(this.getDate() ?? this._withinTimeLimits(new Date()))
     merged.setHours(time.getHours(), time.getMinutes(), time.getSeconds())

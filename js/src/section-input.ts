@@ -38,7 +38,7 @@ import type { DateSection, EditableSection, SectionFormat } from './util/date-se
 import { onLabelClick } from './util/field-label.js'
 import { captureHostClasses, type HostClasses, restoreHostClasses } from './util/form-control-group.js'
 import {
-  followUserValidity, getFeedbackIds, getValidationState, ownValidationState, setStateValidity,
+  followUserValidity, getFeedbackIds, getValidationState, nextStateSerial, ownValidationState, setStateValidity,
   type UserValidity, type ValidationState
 } from './util/form-validation.js'
 import { getNextActiveElement, isRTL } from './util/index.js'
@@ -218,7 +218,10 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
   declare ['constructor']: typeof SectionInput & typeof BaseComponent
   protected declare _date: Date | null
   protected declare _minDate: Date | null
+  protected declare _onDismissValidationState: ((serial: number) => void) | null
   protected declare _ownerInvalid: boolean
+  protected declare _ownerState: ValidationState | undefined
+  protected declare _ownsStateClass: boolean
   protected declare _maxDate: Date | null
   protected declare _sections: DateSection[]
   protected declare _draft: string
@@ -236,7 +239,9 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
   protected declare _removeLabelClick: () => void
   protected declare _serverClasses: string[]
   protected declare _stateClass: string | null
+  protected declare _stateSerial: number
   protected declare _userValidity: UserValidity
+  protected declare _valueKey: string
 
   constructor(element?: string | Element | null, config?: Partial<C> | null) {
     super(element, config)
@@ -247,9 +252,13 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
     this._error = null
     this._inputElement = null
     this._isBuilt = false
+    this._onDismissValidationState = null
     this._ownerInvalid = false
+    this._ownerState = undefined
+    this._ownsStateClass = false
     this._rejected = false
     this._stateClass = null
+    this._stateSerial = nextStateSerial()
     this._hostAriaLabel = this._element.getAttribute('aria-label')
     this._hostClasses = captureHostClasses(this._element, HOST_CLASS_NAMES)
     this._hostNodes = [...this._element.childNodes]
@@ -258,10 +267,11 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
     this._element.classList.remove(...this._serverClasses)
 
     this._createSectionInput()
-    this._userValidity = followUserValidity(this._inputElement!, () => this._updateValidity(), () => this._onFormReset())
+    this._userValidity = followUserValidity(this._inputElement!, () => this._updateValidity(), serial => this._onFormReset(serial))
     this._releaseValidationState = ownValidationState(this._inputElement!)
     this._initialDate = getDateFromSections(this._sections)
     this._date = this._applyValidationState()
+    this._valueKey = this._getValueKey(this._sections)
     this._inputElement!.defaultValue = this._getResetValue()
     this._isBuilt = true
     this._addEventListeners()
@@ -316,6 +326,7 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
 
     if (keys.some(key => VALIDATION_OPTIONS.has(key))) {
       this._serverClasses = []
+      this._stateSerial = nextStateSerial()
     }
 
     if (keys.length > 0 && keys.every(key => VALIDATION_OPTIONS.has(key))) {
@@ -348,7 +359,7 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
     this._releaseValidationState()
     setStateValidity(this._inputElement!, false)
 
-    if (this._stateClass) {
+    if (this._stateClass && this._ownsStateClass) {
       this._element.classList.remove(this._stateClass)
     }
 
@@ -385,6 +396,10 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
 
   _getLayoutKey(sections: DateSection[]): string {
     return JSON.stringify(sections.map(section => (isEditableSection(section) ? { ...section, value: null } : section)))
+  }
+
+  _getValueKey(sections: DateSection[]): string {
+    return JSON.stringify(sections.map(section => section.value))
   }
 
   _addEventListeners(): void {
@@ -489,8 +504,8 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
     target?.focus()
   }
 
-  _onFormReset(): void {
-    this._dismissValidationState()
+  _onFormReset(serial: number): void {
+    this._dismissValidationState(serial)
     this.reset()
   }
 
@@ -528,8 +543,7 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
       event.preventDefault()
       section.value = getIncrementedSectionValue(section, key === ARROW_UP_KEY ? 1 : -1, this._getSectionMax(section))
       this._draft = ''
-      this._dismissValidationState()
-      this._commitSections()
+      this._commitSections(this._sections, true)
       return
     }
 
@@ -543,8 +557,7 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
 
       section.value = null
       this._draft = ''
-      this._dismissValidationState()
-      this._commitSections()
+      this._commitSections(this._sections, true)
       return
     }
 
@@ -597,8 +610,7 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
 
     this._draft = result.completed ? '' : result.draft
     section.value = result.value
-    this._dismissValidationState()
-    this._commitSections()
+    this._commitSections(this._sections, true)
 
     if (result.completed) {
       this._focusSibling(sectionElement, true)
@@ -609,8 +621,8 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
 
   _clearAndFocus(): HTMLElement {
     this._setAllSelected(false)
-    this._dismissValidationState()
-    this.clear()
+    this._draft = ''
+    this._commitSections(setSectionsFromDate(this._sections, null), true)
     const [firstSection] = this._getSectionElements()
     firstSection.focus()
     return firstSection
@@ -626,8 +638,7 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
     const sections = this._config.inputDateParse ? null : getSectionsFromString(text, this._sections)
 
     if (sections) {
-      this._dismissValidationState()
-      this._commitSections(sections)
+      this._commitSections(sections, true)
       return
     }
 
@@ -636,8 +647,7 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
       getLocalDateFromString(text, this._config.locale)
 
     if (date instanceof Date && !Number.isNaN(date.getTime())) {
-      this._dismissValidationState()
-      this._commitSections(setSectionsFromDate(this._sections, date))
+      this._commitSections(setSectionsFromDate(this._sections, date), true)
     }
   }
 
@@ -655,11 +665,16 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
     this._commitSections()
   }
 
-  _commitSections(sections: DateSection[] = this._sections): void {
+  _commitSections(sections: DateSection[] = this._sections, byUser = false): void {
+    if (byUser && this._getValueKey(sections) !== this._valueKey) {
+      this._dismissValidationState()
+    }
+
     this._sections = sections
     this._syncSections()
 
     const date = this._applyValidationState()
+    this._valueKey = this._getValueKey(this._sections)
 
     if (isSameInstantAs(date, this._date)) {
       return
@@ -713,14 +728,20 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
     return isDisabled ? null : date
   }
 
-  _setOwnerInvalid(isInvalid: boolean): void {
+  _setOwnerDismiss(onDismiss: (serial: number) => void): void {
+    this._onDismissValidationState = onDismiss
+  }
+
+  _setOwnerState(givenState: ValidationState | undefined, isInvalid = false): void {
+    this._ownerState = givenState
     this._ownerInvalid = isInvalid
     this._updateValidity()
   }
 
   _updateValidity(): void {
     const givenState = getValidationState(this._config.validationState, this._config.valid, this._config.invalid) ??
-      getValidationState(null, this._serverClasses.includes(CLASS_NAME_IS_VALID), this._serverClasses.includes(CLASS_NAME_IS_INVALID))
+      getValidationState(null, this._serverClasses.includes(CLASS_NAME_IS_VALID), this._serverClasses.includes(CLASS_NAME_IS_INVALID)) ??
+      this._ownerState
 
     setStateValidity(this._inputElement!, givenState === 'invalid' && !this._config.disabled)
 
@@ -730,12 +751,14 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
     const isInvalid = state === 'invalid' || this._ownerInvalid
 
     if (stateClass !== this._stateClass) {
-      if (this._stateClass) {
+      if (this._stateClass && this._ownsStateClass) {
         this._element.classList.remove(this._stateClass)
       }
 
-      if (stateClass) {
-        this._element.classList.add(stateClass)
+      this._ownsStateClass = stateClass !== null && !this._element.classList.contains(stateClass)
+
+      if (this._ownsStateClass) {
+        this._element.classList.add(stateClass!)
       }
 
       this._stateClass = stateClass
@@ -752,11 +775,15 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
     this._syncDescription()
   }
 
-  _dismissValidationState(): void {
-    this._config.invalid = false
-    this._config.valid = false
-    this._config.validationState = null
-    this._serverClasses = []
+  _dismissValidationState(serial: number = Number.POSITIVE_INFINITY): void {
+    if (this._stateSerial <= serial) {
+      this._config.invalid = false
+      this._config.valid = false
+      this._config.validationState = null
+      this._serverClasses = []
+    }
+
+    this._onDismissValidationState?.(serial)
   }
 
   _syncDescription(): void {

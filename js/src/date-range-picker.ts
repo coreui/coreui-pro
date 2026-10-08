@@ -13,6 +13,7 @@ import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import type { SectionInputConfig } from './section-input.js'
 import { captureHostClasses } from './util/form-control-group.js'
+import type { ValidationState } from './util/form-validation.js'
 import {
   formatSelectionRangeName, getDateBySelectionType, isSameInstantAs, type SelectionTypes
 } from './util/calendar.js'
@@ -67,6 +68,7 @@ type DateRangePickerConfig = {
   endName: string | null,
   format: SectionInputConfig['format'],
   inputOptions: Partial<DateInputConfig>,
+  invalid: boolean,
   locale: string,
   maxDate: Date | string | null,
   minDate: Date | string | null,
@@ -79,7 +81,9 @@ type DateRangePickerConfig = {
   size: string | null,
   startDate: Date | string | null,
   startFloatingLabel: string | null,
-  startName: string | null
+  startName: string | null,
+  valid: boolean,
+  validationState: ValidationState | null
 }
 
 type DateRangePickerOptions = Partial<DateRangePickerConfig>
@@ -104,6 +108,7 @@ const Default: DateRangePickerConfig = {
   endName: null,
   format: null,
   inputOptions: {},
+  invalid: false,
   locale: navigator.language,
   maxDate: null,
   minDate: null,
@@ -116,7 +121,9 @@ const Default: DateRangePickerConfig = {
   size: null,
   startDate: null,
   startFloatingLabel: null,
-  startName: null
+  startName: null,
+  valid: false,
+  validationState: null
 }
 
 const ORIGINAL_DEFAULT: DateRangePickerConfig = { ...Default }
@@ -139,6 +146,7 @@ const DefaultType: Record<string, string> = {
   endName: '(string|null)',
   format: '(function|string|null)',
   inputOptions: 'object',
+  invalid: 'boolean',
   locale: 'string',
   maxDate: '(date|string|null)',
   minDate: '(date|string|null)',
@@ -151,7 +159,9 @@ const DefaultType: Record<string, string> = {
   size: '(string|null)',
   startDate: '(date|string|null)',
   startFloatingLabel: '(string|null)',
-  startName: '(string|null)'
+  startName: '(string|null)',
+  valid: 'boolean',
+  validationState: '(string|null|undefined)'
 }
 
 /**
@@ -311,11 +321,15 @@ class DateRangePicker extends PickerBase {
     this._rangeInput = new DateRangeInput(inputGroup, this._forwardConfig(DateRangeInput, {
       disabled: this._config.disabled,
       endDate: this._config.endDate,
+      invalid: false,
       locale: this._config.locale,
       size: this._config.size,
       startDate: this._config.startDate,
+      valid: false,
+      validationState: null,
       ...(format ? { format } : {})
     }, { inputOptions: this._config.inputOptions }))
+    this._rangeInput._setOwnerDismiss((serial: number) => this._dismissValidationState(serial))
 
     EventHandler.on(inputGroup, DateRangeInput.eventName('startDateChange'), (event: any) => {
       this._nameToggle()
@@ -391,6 +405,7 @@ class DateRangePicker extends PickerBase {
     })
 
     EventHandler.on(this._calendar._element, 'startDateChange.coreui.calendar', event => {
+      this._dismissValidationState()
       const previous = this.getStartDate()
       this._syncingFromPanel = true
       this._rangeInput.setRange(event.dateObject, this.getEndDate())
@@ -402,6 +417,7 @@ class DateRangePicker extends PickerBase {
     })
 
     EventHandler.on(this._calendar._element, 'endDateChange.coreui.calendar', event => {
+      this._dismissValidationState()
       const previous = this.getEndDate()
       this._syncingFromPanel = true
       this._rangeInput.setRange(this.getStartDate(), event.dateObject)
@@ -459,8 +475,8 @@ class DateRangePicker extends PickerBase {
     return this._rangeInput.isDateSelectable(new Date())
   }
 
-  override _setFieldInvalid(isInvalid: boolean): void {
-    this._rangeInput._setOwnerInvalid(isInvalid)
+  override _setFieldState(givenState: ValidationState | undefined): void {
+    this._rangeInput._setOwnerState(givenState)
   }
 
   // Static

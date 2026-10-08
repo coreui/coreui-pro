@@ -1525,6 +1525,24 @@ behaviour, v5 is the reference. Mapping:
   the end date when both changed. `clear()` leaves it where it is; `setDate()`,
   `today()` and `reset()` on the Date Picker already showed their date.
 
+#### The pickers take their validation state from `validationState`
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+`invalid` and `valid` on `DatePicker`, `DateRangePicker` and `TimePicker` are
+deprecated aliases of `validationState: 'invalid'` and `'valid'`, and
+`validationState` also takes a state from `$form-validation-states`. A given
+`'invalid'` now blocks the submit, and the next change the user makes (a pick
+in the panel, the cleaner, a footer button, typing in the field) drops it; a
+change your code makes keeps it. An `.is-invalid` or `.is-valid` class on the
+picker element is read once, when the picker starts, and an `aria-invalid` on
+it is not read at all, so set the state after start with
+`setConfig({ validationState })`, which for now changes only the validation
+options. See the Validation sections of the
+[date picker](/forms/date-picker/#validation),
+[date range picker](/forms/date-range-picker/#validation) and
+[time picker](/forms/time-picker/#validation).
+
 #### The date picker adopts the markup you write
 
 The date picker is composed from the date input, the calendar and a popup,

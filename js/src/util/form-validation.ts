@@ -52,6 +52,7 @@ const STATE_CLASSES = [CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID]
 const STATE_INVALID_MESSAGE = 'Invalid value.'
 
 const ownedControls = new WeakSet<Element>()
+let stateSerial = 0
 const stateMessages = new WeakMap<Element, string>()
 
 /**
@@ -621,31 +622,44 @@ export const getUserValidity = (control: Element): ValidationState | undefined =
 }
 
 /**
+ * Numbers a validation state a component was given, so a native reset that started before it can
+ * tell the state apart from the ones it has to take back.
+ *
+ * @returns The serial of the state, higher than every serial before it
+ */
+export const nextStateSerial = (): number => ++stateSerial
+
+/**
  * Follows the state a form shows for the control a component carries its value in. From the first
  * time a validation reports the control, that is `checkValidity()`, `reportValidity()` or a submit
  * fires `invalid` on it, the state is `'invalid'` whenever its value is invalid; before that, and
  * while its value is valid, it is what `getUserValidity()` reads. A native reset of the form the
- * control belongs to forgets the report in the next task, unless a listener cancelled the reset.
- * The control is followed wherever it sits, also outside the `<form>` it names with `form`.
+ * control belongs to forgets the report in the next task, unless a listener cancelled the reset or a
+ * validation reported the control again after it. The control is followed wherever it sits, also
+ * outside the `<form>` it names with `form` and inside a shadow root, and a reset reaches it even
+ * when a listener stops its propagation.
  *
  * @param control - The control that carries the value
  * @param onUpdate - Called with the state after every event that may change it
  * @param onReset - Called in the task after a native reset of the control's form that was not
- * cancelled, before `onUpdate`
+ * cancelled, before `onUpdate`, with the last `nextStateSerial()` given out before the reset
  * @returns `read()` for the current state, and `stop()` to remove the listeners
  */
 export const followUserValidity = (
   control: FormControl,
   onUpdate: (state: ValidationState | undefined) => void,
-  onReset?: () => void
+  onReset?: (serial: number) => void
 ): UserValidity => {
-  const { ownerDocument } = control
+  const root = control.getRootNode()
+  const roots = root instanceof ShadowRoot ? [control.ownerDocument, root] : [control.ownerDocument]
   let reported = false
+  let reportedSinceReset = false
   let resetTimeout: ReturnType<typeof setTimeout> | undefined
   const read = () => (reported && !control.validity.valid ? 'invalid' : getUserValidity(control))
   const update = () => onUpdate(read())
   const handleInvalid = () => {
     reported = true
+    reportedSinceReset = true
     update()
   }
 
@@ -659,11 +673,14 @@ export const followUserValidity = (
       return
     }
 
+    const serial = stateSerial
+
     clearTimeout(resetTimeout)
+    reportedSinceReset = false
     resetTimeout = setTimeout(() => {
       if (!event.defaultPrevented) {
-        reported = false
-        onReset?.()
+        reported = reportedSinceReset
+        onReset?.(serial)
       }
 
       update()
@@ -675,8 +692,11 @@ export const followUserValidity = (
   }
 
   control.addEventListener('invalid', handleInvalid)
-  ownerDocument.addEventListener('reset', handleFormEvent)
-  ownerDocument.addEventListener('submit', handleFormEvent)
+
+  for (const node of roots) {
+    node.addEventListener('reset', handleFormEvent, true)
+    node.addEventListener('submit', handleFormEvent)
+  }
 
   return {
     read,
@@ -688,8 +708,11 @@ export const followUserValidity = (
       }
 
       control.removeEventListener('invalid', handleInvalid)
-      ownerDocument.removeEventListener('reset', handleFormEvent)
-      ownerDocument.removeEventListener('submit', handleFormEvent)
+
+      for (const node of roots) {
+        node.removeEventListener('reset', handleFormEvent, true)
+        node.removeEventListener('submit', handleFormEvent)
+      }
     }
   }
 }
@@ -718,14 +741,17 @@ export const ownValidationState = (...controls: Element[]): (() => void) => {
  * Makes a control block the submit while a component shows it invalid by a state it was given, with
  * the text of its invalid feedback as the message, or a generic one when it has none. A custom
  * validity the page set is left as it is: it is not overwritten while it stands, and clearing takes
- * back only a message this function set and the page has not replaced since.
+ * back only a message this function set and the page has not replaced since. While the control is
+ * barred from validation, disabled or read-only, its message cannot be read, so a message this
+ * function set counts as its own and is still taken back.
  *
  * @param control - The control that carries the value
  * @param invalid - Whether the given state is `'invalid'`
  */
 export const setStateValidity = (control: FormControl, invalid: boolean): void => {
   const ownMessage = stateMessages.get(control)
-  const isOwn = ownMessage !== undefined && control.validity.customError && control.validationMessage === ownMessage
+  const isOwn = ownMessage !== undefined && control.validity.customError &&
+    (!control.willValidate || control.validationMessage === ownMessage)
 
   if (ownMessage !== undefined && !isOwn) {
     stateMessages.delete(control)
@@ -747,5 +773,5 @@ export const setStateValidity = (control: FormControl, invalid: boolean): void =
   const message = getFeedbackText(control) || STATE_INVALID_MESSAGE
 
   control.setCustomValidity(message)
-  stateMessages.set(control, control.validationMessage)
+  stateMessages.set(control, control.willValidate ? control.validationMessage : message)
 }

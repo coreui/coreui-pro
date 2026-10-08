@@ -279,6 +279,19 @@ Pass a function to disable every date that matches a rule.
 
 <Code code={datePickerWeekends} lang="js" />
 
+## Validation
+
+The picker shows its validation state on the frame and on the sections of its field, which the message after the picker describes, the way the [form plugin](/forms/validation/) does for a native field. The field keeps its value in a `<textarea>` laid invisibly over it, so a `required` picker that is empty, incomplete or holds a rejected date blocks the submit, as the [date input](/forms/date-input/#validation) does.
+
+You give a state with the `validationState` option (`'valid'`, `'invalid'` or a state of `$form-validation-states`, with `invalid` and `valid` as deprecated aliases) or with an `.is-invalid` or `.is-valid` class written on the picker element, the server-side route, which is read once, when the picker starts; the option wins over the class. A given state is a verdict on the date it was given for, so the next change the user makes drops it: a day picked in the calendar, a time picked with `timepicker`, the cleaner, a footer button other than the one that closes the popup, or typing in the field. A change your own code makes, with `setDate()`, `clear()`, `reset()` or `today()`, keeps it. `setConfig({ validationState })` sets it again without rebuilding the picker; for now `setConfig` changes only the validation options. A class or an `aria-invalid` written on the picker element after it starts is not read. While the given state is `'invalid'`, the picker blocks the submit with the text of the message after it, or `Invalid value.` when there is none. A native form reset puts back the date the picker started with and drops the state.
+
+<Example pro code={`<div class="row">
+    <div class="col-lg-5 form-field">
+      <div class="is-invalid" data-coreui-date-picker data-coreui-locale="en-US" data-coreui-date="2026-07-14"></div>
+      <div class="invalid-feedback">We have no delivery slots left on this date.</div>
+    </div>
+  </div>`} />
+
 ## Locale
 
 ### Auto
@@ -378,7 +391,7 @@ Clicking a label that names the field, through `aria-labelledby` or a `<label fo
 
 An `aria-label`, `aria-labelledby` or `aria-describedby` on the picker element moves to the field, so a screen reader announces the name and the description when focus enters it, and the picker element gets them back on dispose. Point `aria-labelledby` at the visible label, as the examples on this page do; it names the field over `floatingLabel` and an `ariaLabel` in `inputOptions`, the way the browser ranks names. A `data-coreui-picker-field` you wrote that already has an `aria-label` or `aria-labelledby` keeps its own name, and its own `aria-describedby` comes first, followed by the one that moves.
 
-An `.is-invalid` class you write on the picker element, the server-side route, marks the field invalid for assistive technologies too: its sections carry `aria-invalid="true"` and are described by the error message after the picker, for as long as the class stays. An `aria-invalid="true"` on the element marks the sections invalid as well; write it with the class, which is what shows the message.
+While the picker shows an invalid state, the sections of its field carry `aria-invalid="true"` and are described by the error message after the picker, see [Validation](#validation). An `aria-invalid` written on the picker element is not read; give the state with `validationState` or with the class.
 
 The toggle's name ends with the date the picker holds, written in full (`Toggle calendar, Friday, August 14, 2026`, with the time after it with `timepicker`), so a screen reader reads the picked date when the popup closes and focus goes back to the toggle. A live message would be lost at that moment, so the calendar does not announce a pick that closes the popup onto that toggle. With `timepicker` the popup stays open, and the calendar announces the pick through `ariaSelectedDateAnnouncement`; it does the same without a toggle (`pickerIcon: false`) and with a `data-coreui-picker-toggle` that has a name or text of its own, which keeps it unchanged.
 
@@ -453,6 +466,7 @@ by the picker itself.
 | `floatingLabel` | string, null | `null` | Renders a floating label over the field, which also becomes its accessible name. Not rendered for a `data-coreui-picker-field` you wrote, which only takes the name, and not even that when the field carries an `aria-label` of its own. An `aria-label` or `aria-labelledby` on the picker element names the field instead. |
 | `format` | function, string, null | `null` | Mask layout of the field: `null` derives it from the locale (or, for week, month, quarter and year selection, uses the matching default mask), a string is parsed as format tokens, a function receives the locale and returns the section layout. |
 | `inputOptions` | object | `{}` | Programmatic escape hatch for date input options. |
+| `invalid` | boolean | `false` | Deprecated alias of `validationState: 'invalid'`, ignored once `validationState` is set. |
 | `locale` | string | browser locale | Drives section order, separators, and calendar labels. |
 | `maxDate` | date, string, null | `null` | Upper bound, enforced by both layers. With `timepicker`, a time of day bounds the time on that day, and a date without one covers its whole day. |
 | `minDate` | date, string, null | `null` | Lower bound, enforced by both layers. With `timepicker`, a time of day bounds the time on that day. |
@@ -466,6 +480,8 @@ by the picker itself.
 | `selectionType` | string | `'day'` | What the picker selects: `'day'`, `'week'`, `'month'`, `'quarter'` or `'year'`. The calendar and the field mask follow it. |
 | `size` | string, null | `null` | `'sm'` or `'lg'`. |
 | `timepicker` | boolean | `false` | Add a time half to the panel and switch the field to a date and time mask. |
+| `valid` | boolean | `false` | Deprecated alias of `validationState: 'valid'`, ignored once `validationState` is set. |
+| `validationState` | string, null | `null` | The validation state the picker shows: `'valid'`, `'invalid'` or a state of `$form-validation-states`. `'invalid'` also blocks the submit. The next change the user makes clears it, see [Validation](#validation). |
 
 ### Methods
 
@@ -479,6 +495,7 @@ by the picker itself.
 | `getOrCreateInstance` | Static — returns the instance, creating it if needed. |
 | `hide` | Closes the popup. |
 | `reset` | Restores the initial value. |
+| `setConfig` | Changes the validation options, `validationState`, `invalid` and `valid`, without rebuilding the picker. The other options are read when the picker starts and are left as they are. |
 | `setDate` | Sets the value. Emits `dateChange` when the value changes. |
 | `show` | Opens the popup. |
 | `today` | Sets today's date. |

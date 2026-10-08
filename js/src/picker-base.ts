@@ -11,6 +11,7 @@ import SelectorEngine from './dom/selector-engine.js'
 import { getForwardedOptions } from './util/composite.js'
 import type { ComponentConfig } from './util/config.js'
 import { createControlGroupAction, type HostClasses, restoreHostClasses } from './util/form-control-group.js'
+import { getValidationState, nextStateSerial, type ValidationState } from './util/form-validation.js'
 import { getUID } from './util/index.js'
 import Popup from './util/popup.js'
 import { sanitizeByConfig } from './util/sanitizer.js'
@@ -20,6 +21,7 @@ import { sanitizeByConfig } from './util/sanitizer.js'
  */
 
 const CLASS_NAME_IS_INVALID = 'is-invalid'
+const CLASS_NAME_IS_VALID = 'is-valid'
 const CLASS_NAME_POPUP = 'popup'
 const CLASS_NAME_SHOW = 'show'
 
@@ -27,6 +29,8 @@ const SELECTOR_ACTION = '[data-coreui-picker-action]'
 const SELECTOR_SECTION = '[data-coreui-section]'
 const SELECTOR_SVG = 'svg'
 const SELECTOR_TEMPLATE_FOOTER = 'template[data-coreui-template="footer"]'
+
+const VALIDATION_OPTIONS = new Set(['invalid', 'valid', 'validationState'])
 
 /**
  * Class definition
@@ -40,8 +44,9 @@ abstract class PickerBase extends BaseComponent {
   protected declare _hostClasses: HostClasses
   protected declare _menu: HTMLElement
   protected declare _popup: Popup
+  protected declare _serverClasses: string[]
+  protected declare _stateSerial: number
   protected declare _toggleElement: HTMLElement | null
-  protected declare _validityObserver: MutationObserver | null
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
@@ -51,7 +56,12 @@ abstract class PickerBase extends BaseComponent {
     this._footerTemplate = SelectorEngine.findOne(SELECTOR_TEMPLATE_FOOTER, this._element) as HTMLTemplateElement | null
     this._menu = null as any
     this._popup = null as any
-    this._validityObserver = null
+    this._serverClasses = [CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID].filter(name => this._element.classList.contains(name))
+    this._stateSerial = nextStateSerial()
+
+    if (getValidationState(this._config.validationState, this._config.valid, this._config.invalid)) {
+      this._dropServerClasses()
+    }
   }
 
   // Public
@@ -67,6 +77,19 @@ abstract class PickerBase extends BaseComponent {
     return this._popup.isShown ? this.hide() : this.show()
   }
 
+  setConfig(config: ComponentConfig | null): void {
+    const validation = Object.fromEntries(Object.entries(config ?? {}).filter(([key]) => VALIDATION_OPTIONS.has(key)))
+
+    if (Object.keys(validation).length === 0) {
+      return
+    }
+
+    this._config = this._getConfig({ ...this._config, ...validation })
+    this._dropServerClasses()
+    this._stateSerial = nextStateSerial()
+    this._updateValidity()
+  }
+
   override dispose(): void {
     if (!this._element) {
       return
@@ -76,7 +99,6 @@ abstract class PickerBase extends BaseComponent {
       EventHandler.off(element, this.constructor.EVENT_KEY)
     }
 
-    this._validityObserver?.disconnect()
     this._popup.dispose()
     this._disposeParts()
     this._restoreAdoptedAttributes()
@@ -118,6 +140,7 @@ abstract class PickerBase extends BaseComponent {
     if (this._cleanerElement) {
       EventHandler.on(this._cleanerElement, eventName, (event: any) => {
         event.stopPropagation()
+        this._dismissValidationState()
         this.clear()
 
         if (this._element && [this._cleanerElement, document.body].includes(document.activeElement as HTMLElement)) {
@@ -137,26 +160,39 @@ abstract class PickerBase extends BaseComponent {
       const context = this.getContext()
 
       if (typeof context[action] === 'function') {
+        if (action !== 'close') {
+          this._dismissValidationState()
+        }
+
         context[action]()
       }
     })
 
-    this._syncValidity()
-    this._validityObserver = new MutationObserver(records => {
-      if (records.some(record => this._changesValidity(record))) {
-        this._syncValidity()
-      }
-    })
-    this._validityObserver.observe(this._element, { attributeFilter: ['aria-invalid', 'class'], attributeOldValue: true })
+    this._updateValidity()
   }
 
-  _changesValidity(record: MutationRecord): boolean {
-    return record.attributeName === 'aria-invalid' ||
-      (record.oldValue ?? '').split(/\s+/).includes(CLASS_NAME_IS_INVALID) !== this._element.classList.contains(CLASS_NAME_IS_INVALID)
+  _updateValidity(): void {
+    this._setFieldState(getValidationState(this._config.validationState, this._config.valid, this._config.invalid) ??
+      getValidationState(null, this._serverClasses.includes(CLASS_NAME_IS_VALID), this._serverClasses.includes(CLASS_NAME_IS_INVALID)))
   }
 
-  _syncValidity(): void {
-    this._setFieldInvalid(this._element.classList.contains(CLASS_NAME_IS_INVALID) || this._element.getAttribute('aria-invalid') === 'true')
+  _dismissValidationState(serial: number = Number.POSITIVE_INFINITY): void {
+    if (this._stateSerial > serial) {
+      return
+    }
+
+    this._config.invalid = false
+    this._config.valid = false
+    this._config.validationState = null
+    this._dropServerClasses()
+    this._updateValidity()
+  }
+
+  _dropServerClasses(): void {
+    if (this._serverClasses.length > 0) {
+      this._element.classList.remove(...this._serverClasses)
+      this._serverClasses = []
+    }
   }
 
   _createAction(className: string, icon: string, label: string): HTMLElement {
@@ -322,7 +358,7 @@ abstract class PickerBase extends BaseComponent {
 
   abstract _isNowSelectable(): boolean
 
-  abstract _setFieldInvalid(isInvalid: boolean): void
+  abstract _setFieldState(givenState: ValidationState | undefined): void
 
   abstract getContext(): Record<string, any>
 

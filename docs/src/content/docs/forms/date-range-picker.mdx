@@ -156,7 +156,7 @@ Each field carries its own [floating label](/forms/floating-labels/): set `start
 
 ## Validation
 
-The frame the picker builds takes the standard validation styling, and a state class written on the picker element reaches it: `.is-invalid` or `.is-valid` on the element you author styles the frame underneath it. That is the server-side route, so the class stays until the page changes it, and a sibling `.invalid-feedback` or `.valid-feedback` reads from the same element. While the element carries `.is-invalid`, both fields and their sections carry `aria-invalid="true"`, the sections are described by that message, neither field turns valid, and they follow the page when it removes the class. An `aria-invalid="true"` on the element marks them invalid too; write it with the class, which is what shows the message.
+The picker takes its validation state the way the [date range input](/forms/date-range-input/#validation) does: an end before the start makes the frame invalid while it stands and keeps both fields from being drawn valid, and a state you give lands on the frame and on both ends. You give it with the `validationState` option (`'valid'`, `'invalid'` or a state of `$form-validation-states`, with `invalid` and `valid` as deprecated aliases) or with an `.is-invalid` or `.is-valid` class written on the picker element, the server-side route, which is read once, when the picker starts; the option wins over the class. While the given state is `'invalid'`, every section of both fields carries `aria-invalid="true"` and is described by the message after the picker, and both ends block the submit with its text, or `Invalid value.` when there is none.
 
 <Example pro code={`<div class="row">
     <div class="col-lg-7 form-field">
@@ -165,7 +165,7 @@ The frame the picker builds takes the standard validation styling, and a state c
     </div>
   </div>`} />
 
-The component sets the state itself as well: an end before the start makes the frame invalid while it stands, and keeps both fields from being drawn valid; the `invalid` option forces the state whatever the range is, and `valid` holds while the range is in order.
+A given state is a verdict on the range it was given for, so the next change the user makes drops it from both ends and from the picker element: a date picked in the calendar, the cleaner, a footer button other than the one that closes the popup, or typing in either field. A change your own code makes, with `setRange()`, `clear()` or `reset()`, keeps it. `setConfig({ validationState })` sets it again without rebuilding the picker; for now `setConfig` changes only the validation options. A class or an `aria-invalid` written on the picker element after it starts is not read. A native form reset puts back the range the picker started with and drops the state.
 
 ### Blocking the submit
 
@@ -336,7 +336,7 @@ and `selectEndDate` are set by the picker itself.
 | `endName` | string, null | `null` | Name of the end value input. Without it the end date is not submitted with the form. |
 | `format` | function, string, null | `null` | Mask layout of both fields: `null` derives it from the locale (or, for week, month, quarter and year selection, uses the matching default mask), a string is parsed as format tokens, a function receives the locale and returns the section layout. |
 | `inputOptions` | object | `{}` | Programmatic escape hatch for date input options. |
-| `invalid` | boolean | `false` | Force the invalid state (`.is-invalid`) on the frame. |
+| `invalid` | boolean | `false` | Deprecated alias of `validationState: 'invalid'`, ignored once `validationState` is set. |
 | `locale` | string | browser locale | Drives section order, separators, and calendar labels. |
 | `maxDate` | date, string, null | `null` | Upper bound, enforced by both layers. |
 | `minDate` | date, string, null | `null` | Lower bound, enforced by both layers. |
@@ -350,7 +350,8 @@ and `selectEndDate` are set by the picker itself.
 | `startDate` | date, string, null | `null` | Initial start of the range. |
 | `startFloatingLabel` | string, null | `null` | Renders a floating label over the start field, which also becomes that field's accessible name. |
 | `startName` | string, null | `null` | Name of the start value input. Without it the start date is not submitted with the form. |
-| `valid` | boolean | `false` | Force the valid state (`.is-valid`) on the frame. |
+| `valid` | boolean | `false` | Deprecated alias of `validationState: 'valid'`, ignored once `validationState` is set. |
+| `validationState` | string, null | `null` | The validation state of the range, shown on the frame and on both ends: `'valid'`, `'invalid'` or a state of `$form-validation-states`. `'invalid'` also blocks the submit. The next change the user makes to the range clears it, see [Validation](#validation). |
 
 ### Methods
 
@@ -365,6 +366,7 @@ and `selectEndDate` are set by the picker itself.
 | `getStartDate` | Returns the start of the range (`Date` or `null`). |
 | `hide` | Closes the popup. |
 | `reset` | Restores the initial range. |
+| `setConfig` | Changes the validation options, `validationState`, `invalid` and `valid`, without rebuilding the picker. The other options are read when the picker starts and are left as they are. |
 | `setRange` | Sets both ends. Emits the change event of each end that changes. |
 | `show` | Opens the popup. |
 | `toggle` | Toggles the popup. |
