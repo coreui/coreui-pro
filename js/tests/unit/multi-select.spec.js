@@ -387,6 +387,153 @@ describe('MultiSelect', () => {
       expect(fixtureEl.querySelector('#option').checkValidity()).toBeTrue()
     })
 
+    it.each([
+      ['a removed chip', { selectionType: 'tags' }, multiSelect => multiSelect._selectionElement.querySelector('.chip-remove').click()],
+      ['the cleaner', {}, multiSelect => multiSelect._selectionCleanerElement.click()],
+      ['select all', { selectAll: true }, multiSelect => multiSelect._selectAllElement.click()],
+      ['Backspace in the search box', { search: true }, multiSelect => multiSelect._searchElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'Backspace', bubbles: true, cancelable: true }))]
+    ])('should drop a given state through %s', (_, config, act) => {
+      fixtureEl.innerHTML = '<form><select multiple></select></form>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1', selected: true }, { value: '2', text: 'Option 2' }], validationState: 'invalid', ...config })
+      const before = multiSelect.getValue().map(option => option.value).join(',')
+
+      act(multiSelect)
+
+      expect(multiSelect.getValue().map(option => option.value).join(',')).not.toBe(before)
+      expect(multiSelect._wrapperElement.classList.contains('is-invalid')).toBeFalse()
+      expect(selectEl.checkValidity()).toBeTrue()
+    })
+
+    it('should keep a given state through user actions that leave the selection as it is', () => {
+      fixtureEl.innerHTML = '<form><select class="is-invalid" multiple></select></form>'
+      const options = [{ value: '1', text: 'Option 1', selected: true }, { value: '2', text: 'Option 2', selected: true }]
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { options, selectAll: true })
+
+      multiSelect._getSelectionActions().selectAll()
+
+      expect(multiSelect._wrapperElement.classList.contains('is-invalid')).toBeTrue()
+
+      multiSelect._getSelectionActions().deselectAll()
+
+      expect(multiSelect._wrapperElement.classList.contains('is-invalid')).toBeFalse()
+
+      multiSelect.setConfig({ validationState: 'invalid' })
+      multiSelect._getSelectionActions().deselectAll()
+
+      expect(multiSelect._wrapperElement.classList.contains('is-invalid')).toBeTrue()
+    })
+
+    it('should spend one pick in the list once, also when the list reports it in two steps', () => {
+      fixtureEl.innerHTML = '<form><select></select></form>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { multiple: false, options: [{ value: '1', text: 'Option 1', selected: true }, { value: '2', text: 'Option 2' }], validationState: 'invalid' })
+
+      selectEl.addEventListener('change.coreui.multi-select', () => multiSelect.setConfig({ validationState: 'invalid' }), { once: true })
+      multiSelect._optionsElement.querySelector('[data-coreui-value="2"]').click()
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['2'])
+      expect(multiSelect._wrapperElement.classList.contains('is-invalid')).toBeTrue()
+      expect(selectEl.checkValidity()).toBeFalse()
+
+      multiSelect._optionsElement.querySelector('[data-coreui-value="1"]').click()
+
+      expect(multiSelect._wrapperElement.classList.contains('is-invalid')).toBeFalse()
+    })
+
+    it('should not report the options a user action leaves as they are before its first change', () => {
+      fixtureEl.innerHTML = '<form><select multiple></select></form>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }, { value: '2', text: 'Option 2', selected: true }], validationState: 'invalid' })
+
+      selectEl.addEventListener('change.coreui.multi-select', () => multiSelect.setConfig({ validationState: 'invalid' }), { once: true })
+      multiSelect._selectionCleanerElement.click()
+
+      expect(multiSelect.getValue()).toEqual([])
+      expect(multiSelect._wrapperElement.classList.contains('is-invalid')).toBeTrue()
+      expect(selectEl.checkValidity()).toBeFalse()
+    })
+
+    it('should treat what the page does in a change listener after a user action without a change as code', () => {
+      fixtureEl.innerHTML = '<form><select multiple></select></form>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1', selected: true }], validationState: 'invalid' })
+
+      selectEl.addEventListener('change', () => multiSelect.deselectAll(), { once: true })
+      multiSelect._getSelectionActions().selectAll()
+
+      expect(multiSelect.getValue()).toEqual([])
+      expect(multiSelect._wrapperElement.classList.contains('is-invalid')).toBeTrue()
+    })
+
+    it('should close a user action that ends without a change', () => {
+      fixtureEl.innerHTML = '<form><select multiple></select></form>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { options: [{ value: '1', text: 'Option 1' }], validationState: 'invalid' })
+
+      multiSelect._runAsUser(() => {})
+      multiSelect.selectAll()
+
+      expect(multiSelect._wrapperElement.classList.contains('is-invalid')).toBeTrue()
+    })
+
+    it('should lift the block before change.coreui.multi-select and treat what the page does there as code', () => {
+      fixtureEl.innerHTML = '<form><select></select></form>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }, { value: '2', text: 'Option 2' }], validationState: 'invalid' })
+      const seen = []
+
+      selectEl.addEventListener('change.coreui.multi-select', () => {
+        seen.push(selectEl.validity.valid)
+
+        if (seen.length === 1) {
+          multiSelect.setConfig({ validationState: 'invalid' })
+          multiSelect.deselectAll()
+        }
+      })
+      multiSelect._optionsElement.querySelector('[data-coreui-value="1"]').click()
+
+      expect(seen[0]).toBeTrue()
+      expect(multiSelect._wrapperElement.classList.contains('is-invalid')).toBeTrue()
+      expect(selectEl.checkValidity()).toBeFalse()
+    })
+
+    it('should treat what the page does in change.coreui.multi-select after the user deselects an option as code', () => {
+      fixtureEl.innerHTML = '<form><select multiple></select></form>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1', selected: true }, { value: '2', text: 'Option 2' }], validationState: 'invalid' })
+
+      selectEl.addEventListener('change.coreui.multi-select', () => {
+        multiSelect.setConfig({ validationState: 'invalid' })
+        multiSelect.selectAll()
+      }, { once: true })
+      multiSelect._optionsElement.querySelector('[data-coreui-value="1"]').click()
+
+      expect(multiSelect._wrapperElement.classList.contains('is-invalid')).toBeTrue()
+      expect(selectEl.checkValidity()).toBeFalse()
+    })
+
+    it.each([['in a reset listener', true], ['in the same task', false]])('should keep a state the page gives after a native reset started, %s', async (_, inListener) => {
+      fixtureEl.innerHTML = '<form><select class="is-valid"></select></form>'
+      const selectEl = fixtureEl.querySelector('select')
+      const form = fixtureEl.querySelector('form')
+      const multiSelect = new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }] })
+
+      if (inListener) {
+        form.addEventListener('reset', () => multiSelect.setConfig({ validationState: 'invalid' }))
+        form.reset()
+      } else {
+        form.reset()
+        multiSelect.setConfig({ validationState: 'invalid' })
+      }
+
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(multiSelect._wrapperElement.classList.contains('is-invalid')).toBeTrue()
+      expect(selectEl.checkValidity()).toBeFalse()
+    })
+
     it('should keep a given state through changes made from code', () => {
       fixtureEl.innerHTML = '<form><select class="is-invalid"></select></form>'
       const selectEl = fixtureEl.querySelector('select')
