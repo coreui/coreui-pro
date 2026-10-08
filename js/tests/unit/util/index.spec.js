@@ -2,6 +2,14 @@ import * as Util from '../../../src/util/index.js'
 import { noop } from '../../../src/util/index.js'
 import { clearFixture, getFixture } from '../../helpers/fixture.js'
 
+const busy = ms => {
+  const until = performance.now() + ms
+
+  while (performance.now() < until) {
+    Math.random()
+  }
+}
+
 describe('Util', () => {
   let fixtureEl
 
@@ -796,6 +804,136 @@ describe('Util', () => {
           resolve()
         }, 70)
       })
+    })
+
+    it('should settle on its timer when it fires on time, even while a covered transition runs', async () => {
+      fixtureEl.innerHTML = '<div style="transition: opacity 0s, transform 5s linear"></div>'
+      const el = fixtureEl.querySelector('div')
+
+      Util.reflow(el)
+      el.style.transform = 'translateX(10px)'
+
+      const start = performance.now()
+      const elapsed = await new Promise(resolve => {
+        Util.executeAfterTransition(() => resolve(performance.now() - start), el, true, 'transform')
+      })
+
+      expect(elapsed).toBeLessThan(300)
+    })
+
+    it('should wait for a covered transition when its timer fires late, at most as long again and one more second', async () => {
+      fixtureEl.innerHTML = '<div style="transition: opacity 200ms, transform 5s linear"></div>'
+      const el = fixtureEl.querySelector('div')
+
+      Util.reflow(el)
+      el.style.transform = 'translateX(10px)'
+
+      const start = performance.now()
+      const elapsed = new Promise(resolve => {
+        Util.executeAfterTransition(() => resolve(performance.now() - start), el, true, 'transform')
+      })
+
+      busy(250)
+
+      expect(await elapsed).toBeGreaterThan(1350)
+      expect(await elapsed).toBeLessThan(1800)
+    })
+
+    it('should settle as soon as the transition it waits for is cancelled', async () => {
+      fixtureEl.innerHTML = '<div style="transition: opacity 0s, transform 5s linear"></div>'
+      const el = fixtureEl.querySelector('div')
+
+      Util.reflow(el)
+      el.style.transform = 'translateX(10px)'
+
+      const start = performance.now()
+      const elapsed = new Promise(resolve => {
+        Util.executeAfterTransition(() => resolve(performance.now() - start), el, true, 'transform')
+      })
+
+      busy(50)
+      setTimeout(() => {
+        el.style.display = 'none'
+      }, 50)
+
+      expect(await elapsed).toBeLessThan(500)
+    })
+
+    it('should settle on its timer when the transition was cancelled before it', async () => {
+      fixtureEl.innerHTML = '<div style="transition: opacity 0s, transform 5s linear"></div>'
+      const el = fixtureEl.querySelector('div')
+
+      Util.reflow(el)
+      el.style.transform = 'translateX(10px)'
+
+      const start = performance.now()
+      const elapsed = new Promise(resolve => {
+        Util.executeAfterTransition(() => resolve(performance.now() - start), el, true, 'transform')
+      })
+
+      el.style.display = 'none'
+      busy(50)
+
+      expect(await elapsed).toBeLessThan(500)
+    })
+
+    it('should ignore a transition that starts after the call', async () => {
+      fixtureEl.innerHTML = '<div style="transition: opacity 0s, transform 5s linear"></div>'
+      const el = fixtureEl.querySelector('div')
+
+      Util.reflow(el)
+
+      const start = performance.now()
+      const elapsed = new Promise(resolve => {
+        Util.executeAfterTransition(() => resolve(performance.now() - start), el, true, 'transform')
+      })
+
+      el.style.transform = 'translateX(10px)'
+      Util.reflow(el)
+      busy(50)
+
+      expect(await elapsed).toBeLessThan(500)
+    })
+
+    it('should not wait for a transition longer than its own timer', async () => {
+      fixtureEl.innerHTML = '<div style="transition: opacity 50ms linear, background-color 2s linear"></div>'
+      const el = fixtureEl.querySelector('div')
+
+      Util.reflow(el)
+      el.style.backgroundColor = 'blue'
+      Util.reflow(el)
+
+      const start = performance.now()
+      const elapsed = new Promise(resolve => {
+        Util.executeAfterTransition(() => resolve(performance.now() - start), el)
+      })
+
+      busy(100)
+
+      expect(await elapsed).toBeLessThan(500)
+    })
+  })
+
+  describe('getCoveredTransitions', () => {
+    it('should return the unfinished transitions that end within the duration, or those of the given property', () => {
+      fixtureEl.innerHTML = '<div style="transition: opacity 100ms linear, background-color 2s linear"></div>'
+      const el = fixtureEl.querySelector('div')
+
+      Util.reflow(el)
+      el.style.opacity = '0.5'
+      el.style.backgroundColor = 'blue'
+      Util.reflow(el)
+
+      expect(Util.getCoveredTransitions(el, 105).map(transition => transition.transitionProperty)).toEqual(['opacity'])
+      expect(Util.getCoveredTransitions(el, 105, 'background-color').map(transition => transition.transitionProperty)).toEqual(['background-color'])
+    })
+
+    it('should return no transitions where Web Animations are not available', () => {
+      const el = document.createElement('div')
+
+      Object.defineProperty(el, 'getAnimations', { value: undefined })
+
+      expect(Util.getCoveredTransitions(el, 105)).toEqual([])
     })
   })
 

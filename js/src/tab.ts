@@ -125,6 +125,10 @@ class Tab extends BaseComponent {
     this._activate(pane) // Search and activate/show the proper section
 
     const complete = () => {
+      if (!element.classList.contains(CLASS_NAME_ACTIVE)) {
+        return
+      }
+
       element.removeAttribute('tabindex')
       setAriaAttribute(element, 'aria-selected', true)
       this._toggleDropDown(element, true)
