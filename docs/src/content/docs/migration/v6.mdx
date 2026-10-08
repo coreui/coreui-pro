@@ -1962,6 +1962,20 @@ was not set, so a form carried a key nobody chose. It is named only when you
 ask for one, and the option table no longer lists the name as auto-generated.
 `dispose()` also removes that input, where it used to leave it in the page.
 
+#### Chip Input carries its chips in a `<textarea>`
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+The chips travel in a hidden `<textarea>` instead of an `<input type="hidden">`,
+because the browser leaves a hidden input out of validation. The submitted value
+is the same, the chips separated by commas, and the `id` and `name` options land
+on the `<textarea>`. A script or a selector that looked for
+`.chip-input input[type="hidden"]` looks for `.chip-input > textarea` instead.
+With it the chip input takes `required` and `validationState`, blocks the submit
+while it is empty and required, and a native form reset puts back the chips it
+started with. A disabled chip input is no longer submitted, like any disabled
+field. See [Validation](/forms/chip-input/#validation).
+
 #### Chip Input takes the frame class itself
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>

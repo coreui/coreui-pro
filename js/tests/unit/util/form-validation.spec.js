@@ -1,7 +1,8 @@
 import { vi } from 'vitest'
 import {
-  clearValidationState, focusFirstInvalidControl, followUserValidity, getFeedbackIds, getFeedbackText, getUserValidity,
-  getValidationState, isFormValid, nextStateSerial, ownValidationState, setStateValidity, updateValidationState, validateForm
+  clearValidationState, configureValueField, createValueField, dispatchValueChange, focusFirstInvalidControl, followUserValidity,
+  getFeedbackIds, getFeedbackText, getUserValidity, getValidationState, isFormValid, nextStateSerial, ownValidationState,
+  setStateValidity, updateValidationState, validateForm, writeValueField
 } from '../../../src/util/form-validation.js'
 import { clearFixture, getFixture } from '../../helpers/fixture.js'
 
@@ -852,6 +853,82 @@ describe('Form validation utilities', () => {
       setStateValidity(after, false)
 
       expect(after.validationMessage).toBe('Page rule.')
+    })
+  })
+
+  describe('value fields', () => {
+    it('should create a field the browser validates, out of the accessibility tree and the tab order, that hands its focus on', () => {
+      fixtureEl.innerHTML = '<form><button type="button">Target</button></form>'
+      const target = fixtureEl.querySelector('button')
+      const field = createValueField('textarea', () => target)
+
+      fixtureEl.querySelector('form').append(field)
+      field.focus()
+
+      expect(field.tagName).toBe('TEXTAREA')
+      expect(field.getAttribute('aria-hidden')).toBe('true')
+      expect(field.tabIndex).toBe(-1)
+      expect(field.getAttribute('autocomplete')).toBe('off')
+      expect(field.willValidate).toBeTrue()
+      expect(document.activeElement).toBe(target)
+    })
+
+    it('should give a field the form options, and a name only when there is one', () => {
+      const textarea = createValueField('textarea', () => null)
+      const select = createValueField('select', () => null)
+
+      configureValueField(textarea, {
+        disabled: true, name: 'tags', readOnly: true, required: true
+      })
+      configureValueField(select, { name: 'country', readOnly: true })
+
+      expect([textarea.disabled, textarea.readOnly, textarea.required, textarea.name]).toEqual([true, true, true, 'tags'])
+      expect([select.disabled, select.required, select.name, select.hasAttribute('readonly')]).toEqual([false, false, 'country', false])
+
+      configureValueField(textarea)
+
+      expect([textarea.disabled, textarea.readOnly, textarea.required, textarea.hasAttribute('name')]).toEqual([false, false, false, false])
+    })
+
+    it('should write a text value, joining a list, and the selected options of a select, telling whether it changed', () => {
+      fixtureEl.innerHTML = '<form></form>'
+      const form = fixtureEl.querySelector('form')
+      const textarea = createValueField('textarea', () => null)
+      const select = createValueField('select', () => null)
+
+      select.multiple = true
+      configureValueField(textarea, { name: 'tags' })
+      configureValueField(select, { name: 'country' })
+      form.append(textarea, select)
+
+      expect(writeValueField(textarea, ['one', 'two'])).toBeTrue()
+      expect(writeValueField(textarea, 'one,two')).toBeFalse()
+      expect(writeValueField(select, ['us', 'uk'])).toBeTrue()
+      expect(writeValueField(select, ['us', 'uk'])).toBeFalse()
+      expect([...new FormData(form).entries()]).toEqual([['tags', 'one,two'], ['country', 'us'], ['country', 'uk']])
+
+      expect(writeValueField(select, [])).toBeTrue()
+      expect(select.options.length).toBe(0)
+
+      const single = createValueField('select', () => null)
+
+      expect(writeValueField(single, ['a', 'b'])).toBeTrue()
+      expect(writeValueField(single, ['a', 'b'])).toBeFalse()
+      expect([...single.options].map(option => option.value)).toEqual(['a'])
+    })
+
+    it('should send input and change from a field', () => {
+      fixtureEl.innerHTML = '<form></form>'
+      const form = fixtureEl.querySelector('form')
+      const field = createValueField('textarea', () => null)
+      const events = []
+
+      form.append(field)
+      form.addEventListener('input', event => events.push(['input', event.target]))
+      form.addEventListener('change', event => events.push(['change', event.target]))
+      dispatchValueChange(field)
+
+      expect(events).toEqual([['input', field], ['change', field]])
     })
   })
 })

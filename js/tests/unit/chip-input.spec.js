@@ -2,9 +2,20 @@ import { vi } from 'vitest'
 import ChipInput from '../../src/chip-input.js'
 import Chip from '../../src/chip.js'
 import ChipSet from '../../src/chip-set.js'
+import { updateValidationState } from '../../src/util/form-validation.js'
 import { clearFixture, getFixture } from '../helpers/fixture.js'
 
 describe('ChipInput', () => {
+  let fixtureEl
+
+  beforeAll(() => {
+    fixtureEl = getFixture()
+  })
+
+  afterEach(() => {
+    clearFixture()
+  })
+
   describe('form payload', () => {
     it('should not submit a field the page did not name', () => {
       fixtureEl.innerHTML = '<form id="form"><div class="chip-input"></div></form>'
@@ -13,7 +24,7 @@ describe('ChipInput', () => {
 
       chipInput.add('one')
 
-      expect(chipInput._hiddenInput.hasAttribute('name')).toBeFalse()
+      expect(chipInput._valueField.hasAttribute('name')).toBeFalse()
       expect([...new FormData(fixtureEl.querySelector('#form')).keys()]).toEqual([])
     })
 
@@ -37,7 +48,7 @@ describe('ChipInput', () => {
       expect(chipInputEl.querySelector('.chip-input-field')).not.toBeNull()
     })
 
-    it('should leave no hidden input behind when disposed', () => {
+    it('should leave no value field behind when disposed', () => {
       fixtureEl.innerHTML = '<div class="chip-input"></div>'
       const chipInputEl = fixtureEl.querySelector('.chip-input')
 
@@ -90,14 +101,384 @@ describe('ChipInput', () => {
     })
   })
 
-  let fixtureEl
+  describe('validation', () => {
+    const tick = () => new Promise(resolve => {
+      setTimeout(resolve)
+    })
 
-  beforeAll(() => {
-    fixtureEl = getFixture()
-  })
+    it('should block the submit while it is required and holds no chip, and tell the text field it is required', () => {
+      fixtureEl.innerHTML = '<form><div class="chip-input"></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const chipInput = new ChipInput(fixtureEl.querySelector('.chip-input'), { required: true })
 
-  afterEach(() => {
-    clearFixture()
+      expect(form.checkValidity()).toBeFalse()
+      expect(chipInput._valueField.validity.valueMissing).toBeTrue()
+      expect(chipInput._input.getAttribute('aria-required')).toBe('true')
+
+      chipInput.add('one')
+
+      expect(form.checkValidity()).toBeTrue()
+    })
+
+    it('should show a given state on the frame and the text field, block the submit with its message, and give the class back on dispose', () => {
+      fixtureEl.innerHTML = '<form><div class="chip-input is-invalid"><input type="text" class="chip-input-field" aria-describedby="hint"></div><div id="hint">Up to five.</div><div class="invalid-feedback">Pick a tag.</div></form>'
+      const form = fixtureEl.querySelector('form')
+      const element = fixtureEl.querySelector('.chip-input')
+      const feedback = fixtureEl.querySelector('.invalid-feedback')
+      const chipInput = new ChipInput(element)
+      const input = chipInput._input
+
+      expect(element.classList.contains('is-invalid')).toBeTrue()
+      expect(input.getAttribute('aria-invalid')).toBe('true')
+      expect(input.getAttribute('aria-describedby')).toBe(`hint ${feedback.id}`)
+      expect(chipInput._valueField.validationMessage).toBe('Pick a tag.')
+      expect(form.checkValidity()).toBeFalse()
+
+      chipInput.dispose()
+
+      expect(element.classList.contains('is-invalid')).toBeTrue()
+      expect(input.hasAttribute('aria-invalid')).toBeFalse()
+      expect(input.getAttribute('aria-describedby')).toBe('hint')
+      expect(form.checkValidity()).toBeTrue()
+    })
+
+    it('should take no state from an undefined option, and the deprecated aliases until validationState is set', () => {
+      fixtureEl.innerHTML = '<form><div class="chip-input"></div></form>'
+      const element = fixtureEl.querySelector('.chip-input')
+      const chipInput = new ChipInput(element, { validationState: undefined, invalid: true })
+
+      expect(element.classList.contains('is-invalid')).toBeTrue()
+
+      chipInput.setConfig({ validationState: 'valid' })
+
+      expect(element.classList.contains('is-valid')).toBeTrue()
+
+      chipInput.setConfig({ validationState: undefined, invalid: false, valid: false })
+
+      expect(element.classList.contains('is-valid')).toBeFalse()
+      expect(element.classList.contains('is-invalid')).toBeFalse()
+    })
+
+    it('should let the option win over a class from the markup', () => {
+      fixtureEl.innerHTML = '<form><div class="chip-input is-valid"></div></form>'
+      const element = fixtureEl.querySelector('.chip-input')
+      const chipInput = new ChipInput(element, { validationState: 'invalid' }) // eslint-disable-line no-unused-vars
+
+      expect(element.classList.contains('is-invalid')).toBeTrue()
+      expect(element.classList.contains('is-valid')).toBeFalse()
+    })
+
+    it('should change only the state with setConfig, and withdraw a class from the markup with null', () => {
+      fixtureEl.innerHTML = '<form><div class="chip-input is-invalid"></div></form>'
+      const element = fixtureEl.querySelector('.chip-input')
+      const chipInput = new ChipInput(element, { placeholder: 'Tags' })
+      const input = chipInput._input
+
+      chipInput.setConfig({ validationState: 'valid', placeholder: 'Other' })
+
+      expect(element.classList.contains('is-valid')).toBeTrue()
+      expect(element.classList.contains('is-invalid')).toBeFalse()
+      expect(input.hasAttribute('aria-invalid')).toBeFalse()
+      expect(chipInput._input).toBe(input)
+      expect(input.placeholder).toBe('Tags')
+
+      chipInput.setConfig({ validationState: null })
+      chipInput.dispose()
+
+      expect(element.classList.contains('is-valid')).toBeFalse()
+      expect(element.classList.contains('is-invalid')).toBeFalse()
+    })
+
+    it.each([
+      ['Enter in the text field', chipInput => {
+        chipInput._input.value = 'two'
+        chipInput._input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }))
+      }],
+      ['a typed separator', chipInput => {
+        chipInput._input.value = 'two,'
+        chipInput._input.dispatchEvent(new Event('input', { bubbles: true }))
+      }],
+      ['a paste with separators', chipInput => {
+        const clipboardData = new DataTransfer()
+        clipboardData.setData('text', 'two,three')
+        chipInput._input.dispatchEvent(new ClipboardEvent('paste', { clipboardData, bubbles: true, cancelable: true }))
+      }],
+      ['the remove button of a chip', chipInput => chipInput._element.querySelector('.chip-remove').click()],
+      ['Backspace on a chip', chipInput => chipInput._element.querySelector('.chip').dispatchEvent(new KeyboardEvent('keydown', { key: 'Backspace', bubbles: true, cancelable: true }))]
+    ])('should drop a given state through %s', (_, act) => {
+      fixtureEl.innerHTML = '<form><div class="chip-input"><span class="chip">one</span></div></form>'
+      const element = fixtureEl.querySelector('.chip-input')
+      const chipInput = new ChipInput(element, { validationState: 'invalid' })
+
+      act(chipInput)
+
+      expect(chipInput.getValues()).not.toEqual(['one'])
+      expect(element.classList.contains('is-invalid')).toBeFalse()
+      expect(chipInput._input.hasAttribute('aria-invalid')).toBeFalse()
+      expect(fixtureEl.querySelector('form').checkValidity()).toBeTrue()
+    })
+
+    it('should keep a given state through changes made from code and through user actions that change nothing', () => {
+      fixtureEl.innerHTML = '<form><div class="chip-input"><span class="chip">one</span></div></form>'
+      const element = fixtureEl.querySelector('.chip-input')
+      const chipInput = new ChipInput(element, { validationState: 'invalid' })
+      const enter = value => {
+        chipInput._input.value = value
+        chipInput._input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }))
+      }
+
+      chipInput.add('two')
+      chipInput.remove('one')
+      enter('two')
+      element.addEventListener('add.coreui.chip-input', event => event.preventDefault(), { once: true })
+      enter('three')
+      chipInput.clear()
+
+      expect(chipInput.getValues()).toEqual([])
+      expect(element.classList.contains('is-invalid')).toBeTrue()
+      expect(fixtureEl.querySelector('form').checkValidity()).toBeFalse()
+    })
+
+    it('should lift the block before change.coreui.chip-input and treat what the page does there as code', () => {
+      fixtureEl.innerHTML = '<form><div class="chip-input"></div></form>'
+      const element = fixtureEl.querySelector('.chip-input')
+      const chipInput = new ChipInput(element, { validationState: 'invalid' })
+      const seen = []
+
+      element.addEventListener('change.coreui.chip-input', () => {
+        seen.push([chipInput._valueField.value, chipInput._valueField.validity.valid, element.classList.contains('is-invalid')])
+
+        if (seen.length === 1) {
+          chipInput.setConfig({ validationState: 'invalid' })
+        }
+      })
+      chipInput._input.value = 'one,two,'
+      chipInput._input.dispatchEvent(new Event('input', { bubbles: true }))
+
+      expect(seen[0]).toEqual(['one', true, false])
+      expect(chipInput.getValues()).toEqual(['one', 'two'])
+      expect(element.classList.contains('is-invalid')).toBeTrue()
+      expect(fixtureEl.querySelector('form').checkValidity()).toBeFalse()
+    })
+
+    it('should send input and change from the value field when the chips change', () => {
+      fixtureEl.innerHTML = '<form><div class="chip-input"></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const chipInput = new ChipInput(fixtureEl.querySelector('.chip-input'))
+      const events = []
+
+      form.addEventListener('input', event => events.push(['input', event.target.value]))
+      form.addEventListener('change', event => events.push(['change', event.target.value]))
+      chipInput.add('one')
+      chipInput.add('one')
+
+      expect(events).toEqual([['input', 'one'], ['change', 'one']])
+    })
+
+    it('should show what a validation reports until the value is valid', () => {
+      fixtureEl.innerHTML = '<form><div class="chip-input"></div><div class="invalid-feedback">Add a tag.</div></form>'
+      const element = fixtureEl.querySelector('.chip-input')
+      const chipInput = new ChipInput(element, { required: true })
+
+      fixtureEl.querySelector('form').checkValidity()
+
+      expect(element.classList.contains('is-invalid')).toBeTrue()
+      expect(chipInput._input.getAttribute('aria-invalid')).toBe('true')
+      expect(chipInput._input.getAttribute('aria-describedby')).toBe(fixtureEl.querySelector('.invalid-feedback').id)
+
+      chipInput.add('one')
+
+      expect(element.classList.contains('is-invalid')).toBeFalse()
+      expect(chipInput._input.hasAttribute('aria-invalid')).toBeFalse()
+    })
+
+    it('should leave its fields to itself when the form marks the controls', () => {
+      fixtureEl.innerHTML = '<form data-coreui-validate="valid"><div class="chip-input"></div></form>'
+      const chipInput = new ChipInput(fixtureEl.querySelector('.chip-input'), { required: true })
+
+      chipInput.add('one')
+      updateValidationState(fixtureEl.querySelector('form'), new WeakMap())
+
+      expect(chipInput._input.classList.contains('is-valid')).toBeFalse()
+      expect(chipInput._valueField.classList.contains('is-valid')).toBeFalse()
+    })
+
+    it.each([
+      ['after the frame', '<form><div class="form-field"><div class="chip-input"></div><div class="form-text">Up to five.</div><div class="invalid-feedback">Add a tag.</div></div></form>'],
+      ['before the frame in the field', '<form><div class="form-field"><div class="invalid-feedback">Add a tag.</div><div class="chip-input"></div></div></form>'],
+      ['named on the chip input', '<form><div class="chip-input" data-coreui-invalid-feedback="named"></div><p><span id="named" class="invalid-feedback">Add a tag.</span></p></form>']
+    ])('should link the message %s', (_, html) => {
+      fixtureEl.innerHTML = html
+      const chipInput = new ChipInput(fixtureEl.querySelector('.chip-input'), { validationState: 'invalid' })
+      const feedback = fixtureEl.querySelector('.invalid-feedback')
+
+      expect(chipInput._input.getAttribute('aria-describedby')).toBe(feedback.id)
+      expect(chipInput._valueField.validationMessage).toBe('Add a tag.')
+    })
+
+    it('should hand the focus the value field gets to the text field', () => {
+      fixtureEl.innerHTML = '<form><div class="chip-input"></div></form>'
+      const chipInput = new ChipInput(fixtureEl.querySelector('.chip-input'), { required: true })
+
+      chipInput._valueField.focus()
+
+      expect(document.activeElement).toBe(chipInput._input)
+    })
+
+    it('should put back the chips it started with on a native reset, the same elements', async () => {
+      fixtureEl.innerHTML = '<form><div class="chip-input"><span class="chip">one</span><span class="chip">two</span></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const element = fixtureEl.querySelector('.chip-input')
+      const chipInput = new ChipInput(element, { name: 'tags' })
+      const [one, two] = element.querySelectorAll('.chip')
+
+      chipInput.remove('one')
+      chipInput.add('three')
+      form.reset()
+      await tick()
+
+      expect(chipInput.getValues()).toEqual(['one', 'two'])
+      expect([...element.querySelectorAll('.chip')]).toEqual([one, two])
+      expect(one.querySelector('.chip-remove')).not.toBeNull()
+      expect([...new FormData(form).entries()]).toEqual([['tags', 'one,two']])
+
+      one.querySelector('.chip-remove').click()
+
+      expect(chipInput.getValues()).toEqual(['two'])
+    })
+
+    it.each([['before the reset', 'before', false], ['in a reset listener', 'listener', true], ['right after form.reset()', 'after', true]])('should treat a state given %s as the reset says', async (_, when, kept) => {
+      fixtureEl.innerHTML = '<form><div class="chip-input"></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const element = fixtureEl.querySelector('.chip-input')
+      const chipInput = new ChipInput(element)
+      const giveState = () => chipInput.setConfig({ validationState: 'invalid' })
+
+      if (when === 'before') {
+        giveState()
+      } else if (when === 'listener') {
+        form.addEventListener('reset', giveState)
+      }
+
+      form.reset()
+
+      if (when === 'after') {
+        giveState()
+      }
+
+      await tick()
+
+      expect(element.classList.contains('is-invalid')).toBe(kept)
+      expect(form.checkValidity()).toBe(!kept)
+    })
+
+    it('should write the chips it restores into the value field and report the change, also after a change from code in the same task', async () => {
+      fixtureEl.innerHTML = '<form><div class="chip-input"><span class="chip">one</span><span class="chip">two</span></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const element = fixtureEl.querySelector('.chip-input')
+      const chipInput = new ChipInput(element, { name: 'tags' })
+      const changes = []
+
+      chipInput.add('three')
+      element.addEventListener('change.coreui.chip-input', event => changes.push(event.value))
+      form.reset()
+      chipInput.clear()
+      changes.length = 0
+      await tick()
+
+      expect(chipInput.getValues()).toEqual(['one', 'two'])
+      expect(new FormData(form).get('tags')).toBe('one,two')
+      expect(changes).toEqual([['one', 'two']])
+    })
+
+    it('should keep the focus on a chip the reset leaves, and move it to the text field from a chip it takes', async () => {
+      fixtureEl.innerHTML = '<form><div class="chip-input"><span class="chip">one</span></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const chipInput = new ChipInput(fixtureEl.querySelector('.chip-input'))
+      const one = fixtureEl.querySelector('.chip')
+
+      one.focus()
+      form.reset()
+      await tick()
+
+      expect(document.activeElement).toBe(one)
+
+      chipInput.add('two')
+      fixtureEl.querySelectorAll('.chip')[1].focus()
+      form.reset()
+      await tick()
+
+      expect(document.activeElement).toBe(chipInput._input)
+    })
+
+    it('should treat a removal from code as code, also when a listener removes another chip meanwhile', () => {
+      fixtureEl.innerHTML = '<form><div class="chip-input"><span class="chip">one</span><span class="chip">two</span></div></form>'
+      const element = fixtureEl.querySelector('.chip-input')
+      const chipInput = new ChipInput(element, { validationState: 'invalid' })
+
+      element.addEventListener('remove.coreui.chip-input', event => {
+        if (event.value === 'one') {
+          chipInput.remove('two')
+        }
+      })
+      chipInput.remove('one')
+
+      expect(chipInput.getValues()).toEqual([])
+      expect(element.classList.contains('is-invalid')).toBeTrue()
+    })
+
+    it('should keep a given state and send nothing from the value field when a removed chip carried no value', () => {
+      fixtureEl.innerHTML = '<form><div class="chip-input"><span class="chip"></span><span class="chip">one</span></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const element = fixtureEl.querySelector('.chip-input')
+      const chipInput = new ChipInput(element, { validationState: 'invalid' })
+      const events = []
+
+      form.addEventListener('change', event => events.push(event.target))
+      element.querySelector('.chip-remove').click()
+
+      expect(chipInput.getValues()).toEqual(['one'])
+      expect(events).toEqual([])
+      expect(element.classList.contains('is-invalid')).toBeTrue()
+    })
+
+    it('should take back on dispose the state class and an aria-required it added, and leave the chips to a later reset', async () => {
+      fixtureEl.innerHTML = '<form><div class="chip-input"><span class="chip">one</span><input type="text" class="chip-input-field"></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const element = fixtureEl.querySelector('.chip-input')
+      const input = element.querySelector('.chip-input-field')
+      const chipInput = new ChipInput(element, { required: true, validationState: 'invalid' })
+
+      chipInput.remove('one')
+      chipInput.dispose()
+
+      expect(element.classList.contains('is-invalid')).toBeFalse()
+      expect(input.hasAttribute('aria-required')).toBeFalse()
+
+      form.reset()
+      await tick()
+
+      expect(element.querySelectorAll('.chip').length).toBe(0)
+    })
+
+    it.each([['disabled', 'disabled'], ['read-only', 'readonly']])('should not block the submit while %s', (_, option) => {
+      fixtureEl.innerHTML = '<form><div class="chip-input"></div></form>'
+      const chipInput = new ChipInput(fixtureEl.querySelector('.chip-input'), { [option]: true, required: true, validationState: 'invalid' })
+
+      expect(chipInput._valueField.willValidate).toBeFalse()
+      expect(fixtureEl.querySelector('form').checkValidity()).toBeTrue()
+    })
+
+    it('should draw a given state without a value field in the controlled mode', () => {
+      fixtureEl.innerHTML = '<form><div class="chip-input"></div></form>'
+      const element = fixtureEl.querySelector('.chip-input')
+      const chipInput = new ChipInput(element, { create: false, required: true, validationState: 'invalid' })
+
+      expect(element.querySelector('textarea')).toBeNull()
+      expect(element.classList.contains('is-invalid')).toBeTrue()
+      expect(chipInput._input.getAttribute('aria-invalid')).toBe('true')
+      expect(chipInput._input.hasAttribute('aria-required')).toBeFalse()
+    })
   })
 
   it('should take care of element either passed as a CSS selector or DOM element', () => {
@@ -172,34 +553,40 @@ describe('ChipInput', () => {
       expect(chipInput._input).toEqual(existingInput)
     })
 
-    it('should create a hidden input for form submission', () => {
+    it('should create a value field for form submission that the browser validates', () => {
       fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       // eslint-disable-next-line no-new
       new ChipInput(el)
 
-      expect(el.querySelector('input[type="hidden"]')).not.toBeNull()
+      const field = el.querySelector('textarea')
+
+      expect(field).not.toBeNull()
+      expect(field.willValidate).toBeTrue()
+      expect(field.getAttribute('aria-hidden')).toBe('true')
+      expect(field.tabIndex).toBe(-1)
+      expect(el.querySelector('input[type="hidden"]')).toBeNull()
     })
 
-    it('should use custom name on hidden input', () => {
+    it('should use custom name on the value field', () => {
       fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       // eslint-disable-next-line no-new
       new ChipInput(el, { name: 'my-tags' })
 
-      expect(el.querySelector('input[type="hidden"]').name).toEqual('my-tags')
+      expect(el.querySelector('textarea').name).toEqual('my-tags')
     })
 
-    it('should use custom id on hidden input', () => {
+    it('should use custom id on the value field', () => {
       fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       // eslint-disable-next-line no-new
       new ChipInput(el, { id: 'my-id' })
 
-      expect(el.querySelector('input[type="hidden"]').id).toEqual('my-id')
+      expect(el.querySelector('textarea').id).toEqual('my-id')
     })
 
     it('should initialize as disabled via config', () => {
@@ -478,7 +865,7 @@ describe('ChipInput', () => {
       expect(chipInput.getValues()).toEqual([])
     })
 
-    it('should update hidden input value after adding', () => {
+    it('should update the value field after adding', () => {
       fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
@@ -487,7 +874,7 @@ describe('ChipInput', () => {
       chipInput.add('First')
       chipInput.add('Second')
 
-      expect(chipInput._hiddenInput.value).toEqual('First,Second')
+      expect(chipInput._valueField.value).toEqual('First,Second')
     })
 
     it('should apply chipClassName string to added chip', () => {
@@ -657,7 +1044,7 @@ describe('ChipInput', () => {
       expect(chipInput.getValues()).toEqual(['JavaScript'])
     })
 
-    it('should update hidden input value after removing', () => {
+    it('should update the value field after removing', () => {
       fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
@@ -667,7 +1054,7 @@ describe('ChipInput', () => {
       chipInput.add('Second')
       chipInput.remove('First')
 
-      expect(chipInput._hiddenInput.value).toEqual('Second')
+      expect(chipInput._valueField.value).toEqual('Second')
     })
   })
 
@@ -724,7 +1111,7 @@ describe('ChipInput', () => {
       expect(el.querySelectorAll('.chip')).toHaveSize(0)
     })
 
-    it('should clear hidden input value', () => {
+    it('should clear the value field', () => {
       fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
@@ -733,7 +1120,7 @@ describe('ChipInput', () => {
       chipInput.add('First')
       chipInput.clear()
 
-      expect(chipInput._hiddenInput.value).toEqual('')
+      expect(chipInput._valueField.value).toEqual('')
     })
   })
 
@@ -1271,11 +1658,11 @@ describe('ChipInput', () => {
       expect(chipInput.getValues()).toEqual([])
     })
 
-    it('should not render a hidden form input', () => {
+    it('should not render a value field', () => {
       fixtureEl.innerHTML = '<div id="ci"></div>'
       const chipInput = new ChipInput(fixtureEl.querySelector('#ci'), { create: false }) // eslint-disable-line no-unused-vars
 
-      expect(fixtureEl.querySelector('input[type="hidden"]')).toBeNull()
+      expect(fixtureEl.querySelector('textarea, input[type="hidden"]')).toBeNull()
     })
 
     it('should still accept chips from the host', () => {

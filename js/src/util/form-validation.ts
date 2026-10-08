@@ -16,6 +16,15 @@ export type UserValidity = {
   stop: () => void
 }
 
+export type ValueField = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+
+export type ValueFieldOptions = {
+  disabled?: boolean
+  name?: string | null
+  readOnly?: boolean
+  required?: boolean
+}
+
 type FormControl = HTMLElement & {
   form: HTMLFormElement | null
   name: string
@@ -30,6 +39,7 @@ const ATTRIBUTE_INVALID_FEEDBACK = 'data-coreui-invalid-feedback'
 const CLASS_NAME_IS_INVALID = 'is-invalid'
 const CLASS_NAME_IS_VALID = 'is-valid'
 const SELECTOR_ARIA_HIDDEN = '[aria-hidden="true"]'
+const SELECTOR_CHIP_INPUT = '.chip-input'
 const SELECTOR_CHOICE = '[type="checkbox"], [type="radio"]'
 const SELECTOR_CONTROL = 'input, select, textarea'
 const SELECTOR_DATE_TIME = '.form-date-time'
@@ -144,14 +154,15 @@ const getFollowingFeedback = (element: Element, control: FormControl): Element[]
 
 /**
  * Finds the element that stands for a control in the layout: the `.form-date-time` field for the
- * value field laid over it, the `.form-otp` group for its value field and its slots, which the
- * messages follow, otherwise the control itself.
+ * value field laid over it, the `.form-otp` group for its value field and its slots, and the
+ * `.chip-input` for its value field and its text field, which the messages follow, otherwise the
+ * control itself.
  *
  * @param control - The control
  * @returns The element the layout places the control's messages around
  */
 const getLayoutElement = (control: FormControl): Element =>
-  control.closest(`${SELECTOR_DATE_TIME}, ${SELECTOR_OTP}`) ?? control
+  control.closest(`${SELECTOR_CHIP_INPUT}, ${SELECTOR_DATE_TIME}, ${SELECTOR_OTP}`) ?? control
 
 /**
  * Finds the `.form-control-group` a control sits in directly, or through a `.form-floating`, which
@@ -188,8 +199,8 @@ const getMarkedAncestors = (element: Element): Element[] => {
 
 /**
  * Tells whether the stylesheet shows the messages of a `.form-field` for a control: one around a
- * check, a radio or a switch, or around the frame of the control, or around the input group of a
- * `.form-control` or `.form-select`.
+ * check, a radio or a switch, or around the frame of the control or the frame the control is, or
+ * around the input group of a `.form-control` or `.form-select`.
  *
  * @param control - The control
  * @param field - A `.form-field` around the control
@@ -197,9 +208,10 @@ const getMarkedAncestors = (element: Element): Element[] => {
  */
 const reachesField = (control: Element, field: Element): boolean => {
   const inputGroup = control.matches(SELECTOR_INPUT_GROUP_CONTROL) ? control.closest(SELECTOR_INPUT_GROUP) : null
+  const frame = control.matches(SELECTOR_FRAME) ? control : getFrame(control)
 
   return control.matches(SELECTOR_FIELD_CONTROL) ||
-    [getFrame(control), inputGroup].some(group => group && group !== field && field.contains(group))
+    [frame, inputGroup].some(group => group && group !== field && field.contains(group))
 }
 
 /**
@@ -236,7 +248,8 @@ const getStructuralFeedback = (control: FormControl): Element[] => {
  * Finds the invalid feedback of a control: the elements named in `data-coreui-invalid-feedback`,
  * or else the ones the stylesheet shows when the control is invalid, for a radio or checkbox those
  * of every choice that shares its name. The value field of a `.form-date-time` takes both from the
- * field, and a control of a `.form-otp` from the group. A found element without an id gets one.
+ * field, and a control of a `.form-otp` or a `.chip-input` from the group. A found element without
+ * an id gets one.
  *
  * @param control - The control
  * @returns The ids of its invalid feedback, without duplicates
@@ -774,4 +787,100 @@ export const setStateValidity = (control: FormControl, invalid: boolean): void =
 
   control.setCustomValidity(message)
   stateMessages.set(control, control.willValidate ? control.validationMessage : message)
+}
+
+/**
+ * Creates the field that carries a component's value into its form: a native control the browser
+ * validates and submits, left out of the accessibility tree and the tab order, which hands the
+ * focus it gets, from a validation or an extension, to the element the user works in. The
+ * component lays it over itself, never with `display: none` or `hidden`, so the browser shows its
+ * message there.
+ *
+ * @param tagName - `textarea` for one text value, `select` for a choice from a list, `input` where
+ * the value needs a `pattern`
+ * @param getFocusTarget - Returns the element that takes the focus instead of the field
+ * @returns The field, not yet in the document
+ */
+export const createValueField = <K extends 'input' | 'select' | 'textarea'>(
+  tagName: K,
+  getFocusTarget: () => HTMLElement | null | undefined
+): HTMLElementTagNameMap[K] => {
+  const field = document.createElement(tagName)
+
+  field.tabIndex = -1
+  field.setAttribute('aria-hidden', 'true')
+  field.setAttribute('autocomplete', 'off')
+  field.addEventListener('focus', () => getFocusTarget()?.focus())
+
+  return field
+}
+
+/**
+ * Gives a value field the form options of its component: `disabled`, `readOnly` and `required` as
+ * they are, and a `name` only when the page gave one, since a field without a name is left out of
+ * the submitted data. A select has no read-only state, so it ignores `readOnly`.
+ *
+ * @param field - The value field
+ * @param options - The component's form options
+ */
+export const configureValueField = (
+  field: ValueField,
+  { disabled = false, name = null, readOnly = false, required = false }: ValueFieldOptions = {}
+): void => {
+  field.disabled = disabled
+  field.required = required
+
+  if (!(field instanceof HTMLSelectElement)) {
+    field.readOnly = readOnly
+  }
+
+  if (name) {
+    field.name = name
+  } else {
+    field.removeAttribute('name')
+  }
+}
+
+/**
+ * Writes the value of a value field: the text of an input or a textarea, and for a select the
+ * options it holds, rebuilt so that exactly the given values are selected, one key each in the
+ * submitted data; a select that is not multiple takes the first value only. A value list given to
+ * a text field is joined with commas.
+ *
+ * @param field - The value field
+ * @param value - The value, or the values of a multiple choice
+ * @returns `true` when the value changed
+ */
+export const writeValueField = (field: ValueField, value: string | string[]): boolean => {
+  if (field instanceof HTMLSelectElement) {
+    const list = Array.isArray(value) ? value : [value]
+    const values = field.multiple ? list : list.slice(0, 1)
+    const current = [...field.selectedOptions].map(option => option.value)
+
+    if (values.length === current.length && values.every((item, index) => item === current[index])) {
+      return false
+    }
+
+    field.replaceChildren(...values.map(item => new Option(item, item, false, true)))
+    return true
+  }
+
+  const text = Array.isArray(value) ? value.join(',') : value
+
+  if (field.value === text) {
+    return false
+  }
+
+  field.value = text
+  return true
+}
+
+/**
+ * Sends `input` and `change` from a value field, as a native field does when its value changes.
+ *
+ * @param field - The value field
+ */
+export const dispatchValueChange = (field: ValueField): void => {
+  field.dispatchEvent(new Event('input', { bubbles: true }))
+  field.dispatchEvent(new Event('change', { bubbles: true }))
 }

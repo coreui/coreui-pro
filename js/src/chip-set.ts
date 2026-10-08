@@ -200,10 +200,7 @@ class ChipSet extends BaseComponent {
     this._setupChip(element)
     this._noteChange()
     this._chips.push(value)
-
-    EventHandler.trigger(this._element, this.constructor.eventName(EVENT_CHANGE), {
-      value: this.getValues()
-    })
+    this._triggerChange()
 
     return element
   }
@@ -433,6 +430,12 @@ class ChipSet extends BaseComponent {
     } else if (removed) {
       announce(`${removed} ${this._config.ariaRemovedAnnouncement}`, { context: this._element })
     }
+  }
+
+  _triggerChange(): void {
+    EventHandler.trigger(this._element, this.constructor.eventName(EVENT_CHANGE), {
+      value: this.getValues()
+    })
   }
 
   _setupChip(chip: HTMLElement): void {
@@ -738,9 +741,7 @@ class ChipSet extends BaseComponent {
       this._chips.splice(index, 1)
     }
 
-    EventHandler.trigger(this._element, this.constructor.eventName(EVENT_CHANGE), {
-      value: this.getValues()
-    })
+    this._triggerChange()
     EventHandler.trigger(this._element, this.constructor.eventName(EVENT_SELECT), {
       selected: this.getSelectedValues()
     })
