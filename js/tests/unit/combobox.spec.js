@@ -1,4 +1,5 @@
 import Combobox from '../../src/combobox.js'
+import { updateValidationState } from '../../src/util/form-validation.js'
 import { CARET_ICON } from '../../src/util/icons.js'
 import { DefaultAllowlist } from '../../src/util/sanitizer.js'
 import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
@@ -33,6 +34,17 @@ describe('Combobox', () => {
       '</div>',
       '</div>'
     ].join('')
+
+    return fixtureEl.querySelector('.combobox-toggle')
+  }
+
+  const setMarkupInForm = (attrs = '', options = null, after = '') => {
+    setMarkup(attrs, options)
+
+    const form = document.createElement('form')
+    form.append(...fixtureEl.childNodes)
+    form.insertAdjacentHTML('beforeend', after)
+    fixtureEl.append(form)
 
     return fixtureEl.querySelector('.combobox-toggle')
   }
@@ -85,10 +97,12 @@ describe('Combobox', () => {
         disabled: false,
         html: false,
         indicator: 'none',
+        invalid: false,
         items: [],
         multiple: false,
         name: null,
         placeholder: '',
+        required: false,
         sanitize: true,
         sanitizeFn: null,
         search: false,
@@ -97,6 +111,8 @@ describe('Combobox', () => {
         selectedLabel: jasmine.any(Function),
         selectionLimit: null,
         typeahead: true,
+        valid: false,
+        validationState: null,
         value: null
       })
     })
@@ -510,35 +526,364 @@ describe('Combobox', () => {
     })
   })
 
-  describe('name and the hidden input', () => {
-    it('should insert a hidden input before the toggle', () => {
+  describe('name and the value field', () => {
+    it('should insert a value field after the toggle that the browser validates', () => {
       const toggle = setMarkup()
       const combobox = new Combobox(toggle, { name: 'country' })
 
       combobox.setValue('ca')
 
-      const input = toggle.previousElementSibling
+      const field = toggle.nextElementSibling
 
-      expect(input.type).toEqual('hidden')
-      expect(input.name).toEqual('country')
-      expect(input.value).toEqual('ca')
+      expect(field.tagName).toEqual('SELECT')
+      expect(field.classList.contains('combobox-select')).toBeTrue()
+      expect(field.classList.contains('input-group-ignore')).toBeTrue()
+      expect(field.name).toEqual('country')
+      expect(field.value).toEqual('ca')
+      expect(field.willValidate).toBeTrue()
+      expect(field.getAttribute('aria-hidden')).toEqual('true')
+      expect(field.tabIndex).toEqual(-1)
     })
 
-    it('should join the values with a comma in multiple mode', () => {
-      const toggle = setMarkup()
+    it('should submit one key per value in multiple mode', () => {
+      const toggle = setMarkupInForm()
       const combobox = new Combobox(toggle, { multiple: true, name: 'country' })
 
       combobox.setValue(['us', 'ca'])
 
-      expect(toggle.previousElementSibling.value).toEqual('us,ca')
+      expect(new FormData(fixtureEl.querySelector('form')).getAll('country')).toEqual(['us', 'ca'])
     })
 
-    it('should build no hidden input without a name', () => {
-      const toggle = setMarkup()
-      // eslint-disable-next-line no-new
-      new Combobox(toggle)
+    it('should submit nothing without a name', () => {
+      const toggle = setMarkupInForm()
+      const combobox = new Combobox(toggle)
 
-      expect(toggle.previousElementSibling).toBeNull()
+      combobox.setValue('ca')
+
+      expect(toggle.nextElementSibling.hasAttribute('name')).toBeFalse()
+      expect([...new FormData(fixtureEl.querySelector('form')).keys()]).toEqual([])
+    })
+
+    it('should post an empty value for an empty single combobox and nothing for an empty multiple one', () => {
+      const toggle = setMarkupInForm()
+      const single = new Combobox(toggle, { name: 'country' })
+      const form = fixtureEl.querySelector('form')
+
+      expect([...new FormData(form).entries()]).toEqual([['country', '']])
+
+      single.dispose()
+      new Combobox(toggle, { multiple: true, name: 'country' }) // eslint-disable-line no-new
+
+      expect([...new FormData(form).entries()]).toEqual([])
+    })
+
+    it('should leave a label around the toggle naming the toggle', () => {
+      setMarkup()
+      const label = document.createElement('label')
+      label.append('Country ', fixtureEl.querySelector('.combobox-toggle'))
+      fixtureEl.prepend(label)
+
+      const toggle = label.querySelector('.combobox-toggle')
+      new Combobox(toggle) // eslint-disable-line no-new
+
+      expect(label.control).toBe(toggle)
+    })
+  })
+
+  describe('validation', () => {
+    const tick = () => new Promise(resolve => {
+      setTimeout(resolve)
+    })
+    const pick = (combobox, key) => {
+      combobox.show()
+      option(combobox, key).click()
+    }
+
+    it('should block the submit while it is required and holds no value, with the message of a select', () => {
+      const toggle = setMarkupInForm()
+      const combobox = new Combobox(toggle, { required: true })
+      const form = fixtureEl.querySelector('form')
+
+      expect(form.checkValidity()).toBeFalse()
+      expect(combobox._valueField.validity.valueMissing).toBeTrue()
+
+      combobox.setValue('ca')
+
+      expect(form.checkValidity()).toBeTrue()
+    })
+
+    it('should show a given state on the toggle, block the submit with its message, and give back what it took on dispose', () => {
+      const toggle = setMarkupInForm(' aria-describedby="hint"', null, '<div id="hint">Ships in a week.</div><div class="invalid-feedback">Pick a country.</div>')
+      const form = fixtureEl.querySelector('form')
+
+      toggle.classList.add('is-invalid')
+
+      const feedback = fixtureEl.querySelector('.invalid-feedback')
+      const combobox = new Combobox(toggle)
+
+      expect(toggle.classList.contains('is-invalid')).toBeTrue()
+      expect(toggle.hasAttribute('aria-invalid')).toBeFalse()
+      expect(toggle.getAttribute('aria-describedby')).toBe(`hint ${feedback.id}`)
+      expect(combobox._valueField.validationMessage).toBe('Pick a country.')
+      expect(form.checkValidity()).toBeFalse()
+
+      combobox.dispose()
+
+      expect(toggle.classList.contains('is-invalid')).toBeTrue()
+      expect(toggle.hasAttribute('aria-invalid')).toBeFalse()
+      expect(toggle.getAttribute('aria-describedby')).toBe('hint')
+      expect(fixtureEl.querySelector('.combobox-select')).toBeNull()
+      expect(form.checkValidity()).toBeTrue()
+    })
+
+    it('should let the option win over a class from the markup, and take the deprecated aliases until validationState is set', () => {
+      const toggle = setMarkupInForm()
+
+      toggle.classList.add('is-valid')
+
+      const combobox = new Combobox(toggle, { invalid: true, validationState: undefined })
+
+      expect(toggle.classList.contains('is-invalid')).toBeTrue()
+      expect(toggle.classList.contains('is-valid')).toBeFalse()
+
+      combobox.setConfig({ validationState: 'valid', placeholder: 'Other' })
+
+      expect(toggle.classList.contains('is-valid')).toBeTrue()
+      expect(combobox._config.placeholder).toBe('')
+
+      combobox.setConfig({ invalid: false, validationState: null })
+
+      expect(toggle.classList.contains('is-valid')).toBeFalse()
+      expect(toggle.classList.contains('is-invalid')).toBeFalse()
+    })
+
+    it('should drop a given state through a pick in the list, and keep it through changes from code and a pick that changes nothing', () => {
+      const toggle = setMarkupInForm()
+      const combobox = new Combobox(toggle, { validationState: 'invalid', value: 'us' })
+      const form = fixtureEl.querySelector('form')
+
+      combobox.setValue('uk')
+      combobox.clear()
+      combobox.setValue('us')
+      pick(combobox, 'us')
+
+      expect(toggle.classList.contains('is-invalid')).toBeTrue()
+      expect(form.checkValidity()).toBeFalse()
+
+      pick(combobox, 'ca')
+
+      expect(combobox.getValue()).toBe('ca')
+      expect(toggle.classList.contains('is-invalid')).toBeFalse()
+      expect(toggle.hasAttribute('aria-invalid')).toBeFalse()
+      expect(form.checkValidity()).toBeTrue()
+    })
+
+    it.each([['a class in the markup', true], ['the deprecated alias', false]])('should drop a state given through %s with a pick in the list', (_, fromClass) => {
+      const toggle = setMarkupInForm()
+
+      if (fromClass) {
+        toggle.classList.add('is-invalid')
+      }
+
+      const combobox = new Combobox(toggle, fromClass ? {} : { invalid: true })
+
+      pick(combobox, 'ca')
+
+      expect(toggle.classList.contains('is-invalid')).toBeFalse()
+      expect(fixtureEl.querySelector('form').checkValidity()).toBeTrue()
+
+      combobox.dispose()
+
+      expect(toggle.classList.contains('is-invalid')).toBeFalse()
+    })
+
+    it('should send input and change from the value field on a pick, and keep a state the page gives there', () => {
+      const toggle = setMarkupInForm()
+      const combobox = new Combobox(toggle, { name: 'country', validationState: 'invalid' })
+      const form = fixtureEl.querySelector('form')
+      const events = []
+
+      form.addEventListener('input', event => events.push(['input', event.target.value]))
+      form.addEventListener('change', event => {
+        events.push(['change', event.target.value])
+        combobox.setConfig({ validationState: 'invalid' })
+      })
+      pick(combobox, 'ca')
+
+      expect(events).toEqual([['input', 'ca'], ['change', 'ca']])
+      expect(toggle.classList.contains('is-invalid')).toBeTrue()
+    })
+
+    it('should leave its search field to itself when the form marks the controls', () => {
+      const toggle = setMarkupInForm()
+      const combobox = new Combobox(toggle, { search: true, validationState: 'invalid' })
+      const form = fixtureEl.querySelector('form')
+
+      combobox.show()
+      form.dataset.coreuiValidate = 'valid'
+      updateValidationState(form, new WeakMap())
+
+      expect(searchField(combobox).classList.contains('is-valid')).toBeFalse()
+    })
+
+    it('should keep a state given after a pick through setItems that drops the picked value', () => {
+      const toggle = setMarkupInForm()
+      const combobox = new Combobox(toggle, { validationState: 'invalid' })
+
+      pick(combobox, 'ca')
+      combobox.setConfig({ validationState: 'invalid' })
+      combobox.setItems([{ value: 'us', label: 'United States' }])
+
+      expect(combobox.getValue()).toBeNull()
+      expect(toggle.classList.contains('is-invalid')).toBeTrue()
+    })
+
+    it('should lift the block before change.coreui.combobox and treat what the page does there as code', () => {
+      const toggle = setMarkupInForm()
+      const combobox = new Combobox(toggle, { multiple: true, validationState: 'invalid' })
+      const seen = []
+
+      toggle.addEventListener('change.coreui.combobox', () => {
+        seen.push(combobox._valueField.validity.valid)
+
+        if (seen.length === 1) {
+          combobox.setConfig({ validationState: 'invalid' })
+          combobox.setValue(['us', 'uk'])
+        }
+      })
+      pick(combobox, 'us')
+
+      expect(seen[0]).toBeTrue()
+      expect(toggle.classList.contains('is-invalid')).toBeTrue()
+      expect(fixtureEl.querySelector('form').checkValidity()).toBeFalse()
+    })
+
+    it('should send input and change from the value field when the value changes', () => {
+      const toggle = setMarkupInForm()
+      const combobox = new Combobox(toggle, { name: 'country' })
+      const events = []
+
+      fixtureEl.querySelector('form').addEventListener('input', event => events.push(['input', event.target.value]))
+      fixtureEl.querySelector('form').addEventListener('change', event => events.push(['change', event.target.value]))
+      combobox.setValue('ca')
+      combobox.setValue('ca')
+      combobox.update()
+
+      expect(events).toEqual([['input', 'ca'], ['change', 'ca']])
+    })
+
+    it('should show what a validation reports until the value is valid, and link the message', () => {
+      const toggle = setMarkupInForm('', null, '<div class="invalid-feedback">Pick a country.</div>')
+      const combobox = new Combobox(toggle, { required: true })
+      const feedback = fixtureEl.querySelector('.invalid-feedback')
+
+      fixtureEl.querySelector('form').checkValidity()
+
+      expect(toggle.classList.contains('is-invalid')).toBeTrue()
+      expect(toggle.getAttribute('aria-describedby')).toBe(feedback.id)
+      expect(toggle.hasAttribute('aria-invalid')).toBeFalse()
+      expect(toggle.hasAttribute('aria-required')).toBeFalse()
+
+      combobox.setValue('us')
+
+      expect(toggle.classList.contains('is-invalid')).toBeFalse()
+      expect(toggle.hasAttribute('aria-describedby')).toBeFalse()
+    })
+
+    it('should link a message named on the toggle', () => {
+      const toggle = setMarkupInForm(' data-coreui-invalid-feedback="named"', null, '<p><span id="named" class="invalid-feedback">Pick a country.</span></p>')
+      const combobox = new Combobox(toggle, { validationState: 'invalid' })
+
+      expect(toggle.getAttribute('aria-describedby')).toBe('named')
+      expect(combobox._valueField.validationMessage).toBe('Pick a country.')
+    })
+
+    it('should lay the value field over the toggle when it is reported invalid, and hand its focus to the toggle', () => {
+      const toggle = setMarkupInForm()
+      const combobox = new Combobox(toggle, { required: true })
+      const field = combobox._valueField
+
+      field.style.cssText = 'position: absolute; box-sizing: border-box; width: 1px; padding: 0; border: 0'
+      toggle.style.marginLeft = '30px'
+      fixtureEl.querySelector('form').checkValidity()
+
+      const fieldRect = field.getBoundingClientRect()
+      const toggleRect = toggle.getBoundingClientRect()
+
+      expect([fieldRect.top, fieldRect.left, fieldRect.height]).toEqual([toggleRect.top, toggleRect.left, toggleRect.height])
+      expect(fieldRect.width).toBe(1)
+
+      field.focus()
+
+      expect(document.activeElement).toBe(toggle)
+    })
+
+    it('should leave its value field to itself when the form marks the controls', () => {
+      const toggle = setMarkupInForm()
+      const combobox = new Combobox(toggle, { required: true })
+
+      combobox.setValue('us')
+      fixtureEl.querySelector('form').dataset.coreuiValidate = 'valid'
+      updateValidationState(fixtureEl.querySelector('form'), new WeakMap())
+
+      expect(combobox._valueField.classList.contains('is-valid')).toBeFalse()
+    })
+
+    it.each([['before the reset', 'before', false], ['in a reset listener', 'listener', true], ['right after form.reset()', 'after', true]])('should put back the value it started with on a native reset and treat a state given %s as the reset says', async (_, when, kept) => {
+      const toggle = setMarkupInForm()
+      const combobox = new Combobox(toggle, { name: 'country', value: 'us' })
+      const form = fixtureEl.querySelector('form')
+      const changes = []
+      const giveState = () => combobox.setConfig({ validationState: 'invalid' })
+
+      pick(combobox, 'ca')
+      toggle.addEventListener('change.coreui.combobox', event => changes.push(event.value))
+
+      if (when === 'before') {
+        giveState()
+      } else if (when === 'listener') {
+        form.addEventListener('reset', giveState)
+      }
+
+      form.reset()
+
+      if (when === 'after') {
+        giveState()
+      }
+
+      await tick()
+
+      expect(combobox.getValue()).toBe('us')
+      expect(new FormData(form).get('country')).toBe('us')
+      expect(changes).toEqual(['us'])
+      expect(toggle.classList.contains('is-invalid')).toBe(kept)
+      expect(form.checkValidity()).toBe(!kept)
+    })
+
+    it('should keep its value field through a native reset that changes nothing', async () => {
+      const toggle = setMarkupInForm()
+      const combobox = new Combobox(toggle, {
+        multiple: true, name: 'country', required: true, value: ['us', 'ca']
+      })
+      const form = fixtureEl.querySelector('form')
+
+      form.reset()
+      await tick()
+
+      expect(combobox.getValue()).toEqual(['us', 'ca'])
+      expect(new FormData(form).getAll('country')).toEqual(['us', 'ca'])
+      expect(form.checkValidity()).toBeTrue()
+    })
+
+    it('should not block or submit while disabled', () => {
+      const toggle = setMarkupInForm(' disabled')
+      const combobox = new Combobox(toggle, {
+        name: 'country', required: true, validationState: 'invalid', value: 'us'
+      })
+
+      expect(combobox._valueField.disabled).toBeTrue()
+      expect(fixtureEl.querySelector('form').checkValidity()).toBeTrue()
+      expect([...new FormData(fixtureEl.querySelector('form')).keys()]).toEqual([])
     })
   })
 
@@ -789,7 +1134,7 @@ describe('Combobox', () => {
   })
 
   describe('dispose', () => {
-    it('should put the panel back and remove the hidden input', () => {
+    it('should put the panel back and remove the value field', () => {
       const toggle = setMarkup()
       const combobox = new Combobox(toggle, { name: 'country' })
       const panel = menu(combobox)
@@ -798,7 +1143,7 @@ describe('Combobox', () => {
 
       expect(Combobox.getInstance(toggle)).toBeNull()
       expect(toggle.nextElementSibling).toEqual(panel)
-      expect(toggle.previousElementSibling).toBeNull()
+      expect(fixtureEl.querySelector('.combobox-select')).toBeNull()
       expect(toggle.hasAttribute('aria-expanded')).toBeFalse()
     })
 

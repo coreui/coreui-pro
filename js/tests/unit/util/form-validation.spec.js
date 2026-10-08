@@ -1,6 +1,6 @@
 import { vi } from 'vitest'
 import {
-  clearValidationState, configureValueField, createValueField, dispatchValueChange, focusFirstInvalidControl, followUserValidity,
+  alignValueField, clearValidationState, configureValueField, createValueField, dispatchValueChange, focusFirstInvalidControl, followUserValidity,
   getFeedbackIds, getFeedbackText, getUserValidity, getValidationState, isFormValid, nextStateSerial, ownValidationState,
   setStateValidity, updateValidationState, validateForm, writeValueField
 } from '../../../src/util/form-validation.js'
@@ -907,6 +907,10 @@ describe('Form validation utilities', () => {
       expect(writeValueField(select, ['us', 'uk'])).toBeFalse()
       expect([...new FormData(form).entries()]).toEqual([['tags', 'one,two'], ['country', 'us'], ['country', 'uk']])
 
+      form.reset()
+
+      expect(new FormData(form).getAll('country')).toEqual(['us', 'uk'])
+
       expect(writeValueField(select, [])).toBeTrue()
       expect(select.options.length).toBe(0)
 
@@ -915,6 +919,23 @@ describe('Form validation utilities', () => {
       expect(writeValueField(single, ['a', 'b'])).toBeTrue()
       expect(writeValueField(single, ['a', 'b'])).toBeFalse()
       expect([...single.options].map(option => option.value)).toEqual(['a'])
+      expect(writeValueField(single, [])).toBeTrue()
+      expect(writeValueField(single, [])).toBeFalse()
+      expect([...single.options].map(option => option.value)).toEqual([''])
+    })
+
+    it.each([['ltr', 'left'], ['rtl', 'right']])('should lay a narrow field along the start edge of the element it stands for, %s', (dir, edge) => {
+      fixtureEl.innerHTML = `<div dir="${dir}" style="position: relative; padding: 7px"><button type="button" style="margin: 11px 13px 0; width: 120px; height: 30px">Pick</button><select style="position: absolute; box-sizing: border-box; width: 1px; padding: 0; border: 0"></select></div>`
+      const field = fixtureEl.querySelector('select')
+      const target = fixtureEl.querySelector('button')
+
+      alignValueField(field, target)
+
+      const fieldRect = field.getBoundingClientRect()
+      const targetRect = target.getBoundingClientRect()
+
+      expect([fieldRect.top, fieldRect.height, fieldRect.width]).toEqual([targetRect.top, targetRect.height, 1])
+      expect(fieldRect[edge]).toBe(targetRect[edge])
     })
 
     it('should send input and change from a field', () => {

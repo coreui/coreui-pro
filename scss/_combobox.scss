@@ -63,6 +63,19 @@ $combobox-toggle-tokens: defaults(
     }
   }
 
+  .combobox-select {
+    position: absolute;
+    box-sizing: border-box;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: 0;
+    pointer-events: none;
+    border: 0;
+    outline: 0;
+    opacity: 0;
+  }
+
   .combobox-value {
     display: flex;
     flex: 1;

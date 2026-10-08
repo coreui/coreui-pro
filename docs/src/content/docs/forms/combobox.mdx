@@ -8,7 +8,7 @@ otherFrameworks:
 
 ## Overview
 
-A combobox is a `<button class="form-control combobox-toggle">` followed by a `.popup` holding a [List box](/components/list-box/). The toggle shows the current value and the list holds the choices; the plugin keeps the two in step — it opens and closes the panel, positions it against the toggle, tracks the selection, runs the keyboard through `aria-activedescendant`, and submits the value through a hidden input.
+A combobox is a `<button class="form-control combobox-toggle">` followed by a `.popup` holding a [List box](/components/list-box/). The toggle shows the current value and the list holds the choices; the plugin keeps the two in step — it opens and closes the panel, positions it against the toggle, tracks the selection, runs the keyboard through `aria-activedescendant`, and submits the value through a hidden `<select>` the browser validates.
 
 Everything inside the panel is List box markup, so an option is whatever you put in it: plain text, an icon, a two-line label with a description. The plugin never rewrites an option's content.
 
@@ -401,7 +401,7 @@ The toggle carries `.form-control`, so `.form-control-sm` and `.form-control-lg`
 
 ## Form submission
 
-Set `name` and the plugin inserts a hidden input right before the toggle and keeps its value in step with the selection, so a combobox posts like a `<select>`.
+The plugin inserts a hidden `<select class="combobox-select">` right after the toggle and keeps its selected options in step with the selection, so a combobox posts like a `<select>`, and like a `<select multiple>` in `multiple` mode: one key per value. Set `name` to submit it; without a name the combobox is not submitted with the form. The select carries `.input-group-ignore`, so a toggle in an [input group](/forms/input-group/) keeps its corners.
 
 ```html
 <!-- What you write -->
@@ -411,24 +411,82 @@ Set `name` and the plugin inserts a hidden input right before the toggle and kee
 </button>
 <div class="popup combobox-popup">…</div>
 
-<!-- What the plugin inserts before the toggle -->
-<input type="hidden" name="country" value="us">
+<!-- What the plugin inserts after the toggle -->
+<select class="combobox-select input-group-ignore" name="country" tabindex="-1" aria-hidden="true">
+  <option value="us" selected>us</option>
+</select>
 ```
 
-In `multiple` mode the value is the selected values joined with a comma.
+In `multiple` mode three selections post `country=us&country=uk&country=ca`, so read them on the server as a list. With nothing selected a single combobox posts `country=`, as a native select with an empty first option does, and a `multiple` one posts nothing, as a `<select multiple>` does. A disabled combobox is not submitted, like any disabled field.
+
+## Validation
+
+The hidden `<select>` takes part in the browser's validation, so `required` blocks the submit while nothing is selected. When a validation reports it, the plugin lays it along the start of the toggle, so the browser shows its message under the combobox, and the focus it gets goes to the toggle. The state shows on the toggle as the `.is-*` class, and the message that follows the toggle is added to its `aria-describedby` while the state is `'invalid'`.
+
+<Example code={`<form class="row g-3" data-coreui-validate novalidate>
+    <div class="col-md-6">
+      <label for="cbValidationCountry" class="form-label">Country (required)</label>
+      <button class="form-control combobox-toggle" type="button" id="cbValidationCountry"
+          data-coreui-toggle="combobox"
+          data-coreui-name="country"
+          data-coreui-required="true"
+          data-coreui-placeholder="Pick a country…">
+      </button>
+      <div class="popup combobox-popup">
+        <div class="list-box">
+          <div class="list-box-options" role="listbox" aria-label="Country">
+            <div class="list-box-option" data-coreui-value="us">United States</div>
+            <div class="list-box-option" data-coreui-value="uk">United Kingdom</div>
+            <div class="list-box-option" data-coreui-value="ca">Canada</div>
+          </div>
+        </div>
+      </div>
+      <div class="invalid-feedback">Pick a country.</div>
+    </div>
+    <div class="col-md-6">
+      <label for="cbValidationRole" class="form-label">Role</label>
+      <button class="form-control combobox-toggle is-invalid" type="button" id="cbValidationRole"
+          data-coreui-toggle="combobox"
+          data-coreui-name="role">
+      </button>
+      <div class="popup combobox-popup">
+        <div class="list-box">
+          <div class="list-box-options" role="listbox" aria-label="Role">
+            <div class="list-box-option selected" data-coreui-value="admin">Admin</div>
+            <div class="list-box-option" data-coreui-value="editor">Editor</div>
+          </div>
+        </div>
+      </div>
+      <div class="invalid-feedback">This project already has an admin.</div>
+    </div>
+    <div class="col-12">
+      <button class="btn btn-primary" type="submit">Submit</button>
+    </div>
+  </form>`} />
+
+The state comes from four places, in this order:
+
+- The `validationState` option: `'valid'`, `'invalid'` or a state you added to `$form-validation-states`. The `invalid` and `valid` options work as aliases; `invalid` wins when both are set, and both are ignored once `validationState` is set.
+- An `.is-invalid` or `.is-valid` class written on the toggle in the markup, for example by a server that has already checked the value. It is read once, when the component starts.
+- A validation that reports the hidden select invalid: a submit, `checkValidity()` or `reportValidity()`, which the form plugin and the [stepper](/forms/stepper/) call as well. From then on the toggle shows it invalid whenever the value is invalid, until a native reset of the form.
+- In a form with `data-coreui-validate`, the `:user-invalid` and `:user-valid` states of the hidden select.
+
+A state you give, with the option or with the class, is a verdict on the value it was given for, so the next change of the value the user makes in the list drops it; picking the option a single combobox already holds keeps it. What your code does in a `change.coreui.combobox`, `input` or `change` listener while the pick runs counts as your change, so a state you give there stays, and a change through `setValue()`, `clear()` or `setItems()` keeps the state. To set it again, call `setConfig({ validationState })`: it updates the state without rebuilding the combobox, replaces a class written on the toggle, so `setConfig({ validationState: null })` withdraws that class, and the validation options are the only ones `setConfig` changes for now. While the given state is `'invalid'`, the select blocks the submit with the text of the linked message, or `Invalid value.` when there is none; a disabled combobox does not block. A native reset of the form puts back the value the combobox started with and drops a state given before it; a state you give from a `reset` listener on the form, or right after `form.reset()`, stays. A message placed where the stylesheet does not show it for the toggle can be named in `data-coreui-invalid-feedback` on the toggle.
+
+The toggle is a `<button>`, a role that has neither an invalid nor a required state, so it carries neither `aria-invalid` nor `aria-required`: a screen reader learns what is wrong from the message in its description, and that the field is required only from its label, so say it there, as the first field above does.
 
 ## Usage
 
 ### Via data attributes
 
-Add `data-coreui-toggle="combobox"` to the toggle and the plugin initializes it on page load — soon enough for a `.selected` option to reach the toggle text and the hidden input before anything is submitted.
+Add `data-coreui-toggle="combobox"` to the toggle and the plugin initializes it on page load — soon enough for a `.selected` option to reach the toggle text and the hidden select before anything is submitted.
 
 | Attribute | Description |
 | --- | --- |
 | `data-coreui-toggle="combobox"` | Initializes the combobox on the toggle button. |
 | `data-coreui-value` (on an option) | The value the option stands for. Defaults to the option's text. |
 | `data-coreui-value` (on the toggle) | The values that start selected. In `multiple` mode a comma separated list, since markup has no other way to name several, which also means a value of its own cannot contain a comma there; everywhere else one value, commas included. Configuration takes an array instead. |
-| `data-coreui-name` | `name` of the hidden input the plugin inserts for form submission. In `multiple` mode it submits the values joined with a comma, so a value carrying one cannot be told apart on the server. |
+| `data-coreui-name` | `name` of the hidden select the plugin inserts for form submission. In `multiple` mode it submits one key per value. |
 | `data-coreui-placeholder` | Text shown in the toggle while nothing is selected. |
 | `data-coreui-multiple="true"` | Toggles options instead of replacing the selection, and keeps the panel open. |
 | `data-coreui-search="true"` | Builds the search field at the top of the panel. |
@@ -479,10 +537,12 @@ const combobox = new coreui.Combobox('#myCombobox', {
 | `disabled` | boolean | `false` | Turns the control off: the panel never opens and the list box is disabled. The `disabled` attribute on the toggle sets it too. |
 | `html` | boolean | `false` | Parses the labels rendered from `items` as HTML instead of inserting them as text. |
 | `indicator` | string | `'none'` | `'checkbox'` puts a decorative checkbox in front of every option. |
+| `invalid` | boolean | `false` | Deprecated alias of `validationState: 'invalid'`, ignored once `validationState` is set. |
 | `items` | array | `[]` | The options to render: `{ value, label, description, disabled, selected }`, or `{ label, items }` for a section. Replaces whatever the panel already holds. |
 | `multiple` | boolean | `false` | Toggles options instead of replacing the selection, and keeps the panel open. |
-| `name` | string, null | `null` | Name of the hidden input the value is submitted under, inserted right before the toggle. With `multiple` all values go into that one input joined by commas, so three selections post one `tags=a,b,c`. Without a name the combobox is not submitted with the form. |
+| `name` | string, null | `null` | Name of the hidden select the value is submitted under, inserted right before the toggle. With `multiple` it posts one key per value, as a `<select multiple>` does: `tags=a&tags=b&tags=c`. Without a name the combobox is not submitted with the form. |
 | `placeholder` | string | `''` | Text shown in the toggle while nothing is selected. |
+| `required` | boolean | `false` | Makes the hidden select required, so an empty combobox blocks the submit. See [Validation](#validation). |
 | `sanitize` | boolean | `true` | Enables the sanitization of the labels rendered from `items` with `html`, and of the `caretIcon`. |
 | `sanitizeFn` | null, function | `null` | Sanitization function of your own, used instead of the built-in one. |
 | `search` | boolean, string | `false` | Builds a search field at the top of the panel. `true` filters the list itself; `'external'` filters nothing and fires `search.coreui.combobox` instead. |
@@ -491,6 +551,8 @@ const combobox = new coreui.Combobox('#myCombobox', {
 | `selectedLabel` | string, function | `` (count) => `${count} selected` `` | What the toggle shows past one selected option in `multiple` mode. A function `(count, total) => string`, or a string in which `{count}` and `{total}` are replaced. |
 | `selectionLimit` | null, number | `null` | How many options can be selected at once in `multiple` mode. |
 | `typeahead` | boolean | `true` | Move the highlight to the option matching what the user types. The buffer resets after 500 ms. |
+| `valid` | boolean | `false` | Deprecated alias of `validationState: 'valid'`, ignored once `validationState` is set. |
+| `validationState` | string, null | `null` | The state the combobox shows: `'valid'`, `'invalid'` or a state of `$form-validation-states`. `'invalid'` blocks the submit. The user's pick of a different value drops it. See [Validation](#validation). |
 | `value` | string, array, null | `null` | Initially selected values, merged with the options marked `.selected` in the markup. A string is one value, commas included; pass an array for several. |
 
 ### Methods
@@ -498,11 +560,12 @@ const combobox = new coreui.Combobox('#myCombobox', {
 | Method | Description |
 | --- | --- |
 | `clear()` | Empties the selection. |
-| `dispose` | Destroys the combobox and removes what it created: the hidden input, the caret, the value element, the search field and the panel, or the parts of the panel your markup lacked. A panel from your markup goes back after the toggle with its classes and inline style, and the toggle gets back the classes and attributes your markup gave it. |
+| `dispose` | Destroys the combobox and removes what it created: the hidden select, the caret, the value element, the search field and the panel, or the parts of the panel your markup lacked. A panel from your markup goes back after the toggle with its classes and inline style, and the toggle gets back the classes and attributes your markup gave it. |
 | `getInstance` | Static method which allows you to get the combobox instance associated to a DOM element, you can use it like this: `coreui.Combobox.getInstance(element)`. |
 | `getOrCreateInstance` | Static method which returns a combobox instance associated to a DOM element or creates a new one in case it wasn't initialized. You can use it like this: `coreui.Combobox.getOrCreateInstance(element)`. |
 | `getValue()` | The selected value — an array in `multiple` mode, a string or `null` otherwise. |
 | `hide` | Closes the panel. |
+| `setConfig(config)` | Changes the validation state: `setConfig({ validationState })`, or the `invalid` and `valid` aliases. Other options are ignored for now. See [Validation](#validation). |
 | `setItems(items)` | Rebuilds the list from an `items` array. Values that are still there keep their selection, the rest drop out. |
 | `setValue(value)` | Replaces the selection with `value` (a string, an array, or `null` to empty it). |
 | `show` | Opens the panel. |
