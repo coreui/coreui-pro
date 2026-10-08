@@ -567,6 +567,7 @@ describe('Form validation utilities', () => {
       expect(getValidationState(null, true, true)).toBe('invalid')
       expect(getValidationState(undefined, true, false)).toBe('valid')
       expect(getValidationState(null, false, false)).toBeUndefined()
+      expect(getValidationState('', true, false)).toBe('valid')
     })
   })
 
@@ -616,7 +617,8 @@ describe('Form validation utilities', () => {
     it('should forget the report after a native reset, unless the reset was cancelled', async () => {
       fixtureEl.innerHTML = '<form novalidate><input id="value" required></form>'
       const control = fixtureEl.querySelector('#value')
-      const validity = followUserValidity(control, () => {})
+      const resets = []
+      const validity = followUserValidity(control, () => {}, () => resets.push(validity.read()))
       const nextTask = () => new Promise(resolve => {
         setTimeout(resolve)
       })
@@ -628,12 +630,36 @@ describe('Form validation utilities', () => {
       await nextTask()
 
       expect(validity.read()).toBe('invalid')
+      expect(resets).toEqual([])
 
       control.form.removeEventListener('reset', cancel)
       control.form.reset()
       await nextTask()
 
       expect(validity.read()).toBeUndefined()
+      expect(resets).toEqual([undefined])
+
+      validity.stop()
+    })
+
+    it('should follow a control that names its form from outside it, and leave the other fields of the form alone', async () => {
+      fixtureEl.innerHTML = '<form id="owner" novalidate><input id="other"></form><input id="value" form="owner" required>'
+      const control = fixtureEl.querySelector('#value')
+      const updates = []
+      const validity = followUserValidity(control, state => updates.push(state))
+
+      fixtureEl.querySelector('#other').dispatchEvent(new Event('input', { bubbles: true }))
+      expect(updates).toEqual([])
+
+      control.form.checkValidity()
+      expect(updates).toEqual(['invalid'])
+
+      control.form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(updates).toEqual(['invalid', undefined])
 
       validity.stop()
     })
@@ -684,7 +710,7 @@ describe('Form validation utilities', () => {
 
   describe('setStateValidity', () => {
     it('should block the control with its invalid feedback, or a generic message, and clear only its own validity', () => {
-      fixtureEl.innerHTML = '<form><input id="described"><div class="invalid-feedback">Taken.</div><input id="bare"><input id="page"></form>'
+      fixtureEl.innerHTML = '<form><input id="described" required value="x"><div class="invalid-feedback">Taken.</div><input id="bare"><input id="page"></form>'
       const described = fixtureEl.querySelector('#described')
       const bare = fixtureEl.querySelector('#bare')
       const page = fixtureEl.querySelector('#page')
@@ -701,6 +727,39 @@ describe('Form validation utilities', () => {
       setStateValidity(described, false)
 
       expect(described.checkValidity()).toBeTrue()
+    })
+
+    it('should take its validity back from a control that is also missing its value', () => {
+      fixtureEl.innerHTML = '<form><input id="empty" required></form>'
+      const empty = fixtureEl.querySelector('#empty')
+
+      setStateValidity(empty, true)
+      setStateValidity(empty, false)
+
+      expect(empty.validity.customError).toBeFalse()
+      expect(empty.validity.valueMissing).toBeTrue()
+    })
+
+    it('should leave a validity the page set before or after it', () => {
+      fixtureEl.innerHTML = '<form><input id="before"><input id="after"></form>'
+      const before = fixtureEl.querySelector('#before')
+      const after = fixtureEl.querySelector('#after')
+
+      before.setCustomValidity('Page rule.')
+      setStateValidity(before, true)
+
+      expect(before.validationMessage).toBe('Page rule.')
+
+      setStateValidity(before, false)
+
+      expect(before.validationMessage).toBe('Page rule.')
+
+      setStateValidity(after, true)
+      after.setCustomValidity('Page rule.')
+      setStateValidity(after, true)
+      setStateValidity(after, false)
+
+      expect(after.validationMessage).toBe('Page rule.')
     })
   })
 })

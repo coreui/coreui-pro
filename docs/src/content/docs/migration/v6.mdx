@@ -1990,6 +1990,16 @@ instead of a literal `.65`. Rendered values are unchanged.
   checkbox: `--cui-check-size` where the indicator can see it, and the shared
   `--cui-control-size` otherwise. Theme the option checkbox through `$check-*` /
   `--cui-check-*` instead.
+- **Validation state comes from `validationState`, and the select is no longer
+  watched.** `invalid` and `valid` are deprecated aliases of
+  `validationState: 'invalid'` and `'valid'`, and `validationState` also takes a
+  state from `$form-validation-states`. A given `'invalid'` now blocks the submit,
+  and the next change the user makes to the selection drops it. An `.is-invalid`
+  or `.is-valid` class on the select is read once, when the component starts, and
+  moves to the frame; a class or `aria-invalid` written on the select later is not
+  read, so set the state with `setConfig({ validationState })`. A native form
+  reset restores the selection the control started with. See
+  [Validation](/forms/multi-select/#validation).
 
 #### Password Input and Number Input build their own frame
 

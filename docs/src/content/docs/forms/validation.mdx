@@ -24,7 +24,7 @@ With that in mind, consider the following demos for our custom form validation s
 
 For custom CoreUI for Bootstrap form validation messages, add `data-coreui-validate` and the `novalidate` boolean attribute to your `<form>`. The examples on this page use `data-coreui-validate="valid"`, so the fields that pass show their success message too. The `data-coreui-validate` attribute opts in to the `:user-invalid` styling, while `novalidate` disables the browser default feedback tooltips and hands their job to the [form plugin](#usage). Try to submit the form below.
 
-When the form is submitted with an invalid control, the plugin stops the submit before your own `submit` handlers run, so they see `event.defaultPrevented`. It marks every invalid control with `.is-invalid` and `aria-invalid="true"`, and adds the message the stylesheet shows for it to its `aria-describedby` while it stays invalid, so a screen reader reads the error with the field. Then it moves focus to the first invalid control, as the browser does. Under `data-coreui-validate="valid"` the valid controls get `.is-valid`. The state follows the corrections the user makes until the form is reset. The message can follow the control, its frame or an element around it that carries `.is-invalid`, or sit in the `.form-field` around a check, a radio, a switch, an input group or a frame. A message placed where the stylesheet does not show it for the control can be named in `data-coreui-invalid-feedback` on the control, and a message with the `hidden` attribute is left out, so a field can keep one message per kind of error and show the one that applies. A [date input](/forms/date-input/#validation) or time input describes its sections with the message itself and reads `data-coreui-invalid-feedback` from its own element, and an [OTP input](/forms/otp-input/#validation) describes its slots with the message after the group.
+When the form is submitted with an invalid control, the plugin stops the submit before your own `submit` handlers run, so they see `event.defaultPrevented`. It marks every invalid control with `.is-invalid` and `aria-invalid="true"`, and adds the message the stylesheet shows for it to its `aria-describedby` while it stays invalid, so a screen reader reads the error with the field. Then it moves focus to the first invalid control, as the browser does. Under `data-coreui-validate="valid"` the valid controls get `.is-valid`. The state follows the corrections the user makes until the form is reset. The message can follow the control, its frame or an element around it that carries `.is-invalid`, or sit in the `.form-field` around a check, a radio, a switch, an input group or a frame. A message placed where the stylesheet does not show it for the control can be named in `data-coreui-invalid-feedback` on the control, and a message with the `hidden` attribute is left out, so a field can keep one message per kind of error and show the one that applies. A [date input](/forms/date-input/#validation) or time input describes its sections with the message itself and reads `data-coreui-invalid-feedback` from its own element, and an [OTP input](/forms/otp-input/#validation) describes its slots with the message after the group. A [multi select](/forms/multi-select/#validation) shows the state on its frame and on the control that takes the focus, and the plugin leaves its hidden select to it.
 
 Custom feedback styles apply custom colors, borders and focus styles to communicate feedback.
 
@@ -369,18 +369,20 @@ if (form.validate()) {
 
 ### Handling the result yourself
 
-Every validation triggers `validate.coreui.form` first, with `event.isValid` telling whether every control passed. A validity the handler sets with `setCustomValidity()`, for example when two passwords differ, counts for the rest of the validation. A submit from a button with `formnovalidate` is not validated, as with the browser's own validation. A handler that moves focus, for example to an error summary, keeps it there; the plugin still marks the controls and stops an invalid submit. A handler that calls `preventDefault()` takes the whole result over: the plugin then neither stops the submit, nor marks the controls, nor moves focus, so stop an invalid submit in your own `submit` handler.
+Every validation triggers `validate.coreui.form` first, with `event.isValid` telling whether every control passed. A validity the handler sets with `setCustomValidity()`, for example when two passwords differ, counts for the rest of the validation. A submit from a button with `formnovalidate` is not validated, as with the browser's own validation. A handler that moves focus, for example to an error summary, keeps it there; the plugin still marks the controls and stops an invalid submit. A handler that calls `preventDefault()` takes the whole result over: the plugin then neither stops the submit, nor marks the controls, nor moves focus, so stop an invalid submit in your own `submit` handler. Keep `event.isValid` for that rather than calling `checkValidity()`: the call reports every invalid control again, and the components that follow those reports, such as the multi select or the date fields, then show their error.
 
 ```js
 const form = document.getElementById('signupForm')
+let isValid = true
 
 form.addEventListener('validate.coreui.form', event => {
   event.preventDefault()
-  showErrorSummary(form, event.isValid)
+  isValid = event.isValid
+  showErrorSummary(form, isValid)
 })
 
 form.addEventListener('submit', event => {
-  if (!form.checkValidity()) {
+  if (!isValid) {
     event.preventDefault()
   }
 })
@@ -393,7 +395,7 @@ form.addEventListener('submit', event => {
 | `dispose()` | Removes the validation state the plugin added and destroys the instance. |
 | `getInstance(element)` | Retrieves the Form instance of a `<form>` element. |
 | `getOrCreateInstance(element)` | Retrieves the Form instance of a `<form>` element, or creates one. |
-| `reset()` | Removes the classes, `aria-invalid` and `aria-describedby` ids the plugin added and stops following the user's corrections. Resetting the form does the same. |
+| `reset()` | Removes the classes, `aria-invalid` and `aria-describedby` ids the plugin added and stops following the user's corrections. Resetting the form does the same. A multi select keeps showing an error a validation reported until its selection is valid or the form is reset. |
 | `validate()` | Validates the form as a submit does, including the focus move, and returns whether it is valid. |
 
 ### Events
