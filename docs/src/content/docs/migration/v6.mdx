@@ -2464,14 +2464,20 @@ field behind that kept submitting.
   required, and the browser puts focus on the first empty slot with its own
   message over the group. Once a validation reports the code, the group gets
   `.is-invalid` and every slot carries `aria-invalid="true"` and is described
-  by the message after the group while the code stays invalid; an
-  `.is-invalid` or `aria-invalid="true"` the page writes on the group, or
-  `.is-invalid` on a slot, does the same. The stylesheet colours every slot and
-  shows that message, which it never did for a slot marked invalid. Code that
-  selects `input[type="hidden"]` inside the field needs
-  `.form-otp > input:not(.form-otp-control)`, a slot no longer gets
+  by the message after the group while the code stays invalid. The stylesheet
+  colours every slot and shows that message, which it never did for a slot
+  marked invalid. Code that selects `input[type="hidden"]` inside the field
+  needs `.form-otp > input:not(.form-otp-control)`, a slot no longer gets
   `required`, and a `data-coreui-invalid-feedback` written on the slots goes
   on the `.form-otp` element.
+- **The code takes a validation state.** The new `validationState` option, or
+  an `.is-invalid`/`.is-valid` class on the `.form-otp` element or on a slot in
+  the markup, shows the state on the group and the slots, and `'invalid'` blocks
+  the submit. A class on one slot, which used to colour only that slot, now
+  marks the whole code. The user's next change of the code drops it, `setConfig({
+  validationState })` sets it again, and a native form reset puts back the
+  code the field started with. A change of the code sends `input` and `change`
+  from the input that holds the value.
 
 #### Rating
 

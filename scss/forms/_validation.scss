@@ -368,8 +368,6 @@
     }
   }
 
-  // OTP — the state of the code: the group, its value field or a slot marked
-  // colours every slot and shows the messages that follow the group.
   #{$form-otp-state} {
     .form-otp-control {
       @include form-otp-control-validation-state($border-color, $focus-ring-color);

@@ -229,7 +229,7 @@ describe('messages of a form field', () => {
       instance.dispose()
     })
 
-    it('shows only the error once the page marks the group invalid after a submit the browser took', () => {
+    it('shows only the error once the page gives the code the invalid state after a submit the browser took', () => {
       const { form, instance, slots } = mountOtp('data-coreui-validate="valid" novalidate')
 
       for (const [index, slot] of slots.entries()) {
@@ -238,7 +238,7 @@ describe('messages of a form field', () => {
       }
 
       form.requestSubmit()
-      container.querySelector('.form-otp').classList.add('is-invalid')
+      instance.setConfig({ validationState: 'invalid' })
 
       expect(displayOf('.invalid-feedback')).toBe('block')
       expect(displayOf('.valid-feedback')).toBe('none')
@@ -273,12 +273,14 @@ describe('messages of a form field', () => {
       instance.dispose()
     })
 
-    it('shows the error after the group for a slot the page marks invalid', () => {
-      const { instance, slots } = mountOtp('', false)
-
-      slots[0].classList.add('is-invalid')
+    it('shows the error after the group for a slot the server marked invalid, and gives the state to every slot', () => {
+      const form = mount(OTP.replace('form-otp-control', 'form-otp-control is-invalid'), '')
+      const instance = new OTPInput(container.querySelector('.form-otp'))
+      const slots = [...container.querySelectorAll('.form-otp-control')]
 
       expect(displayOf('.invalid-feedback')).toBe('block')
+      expect(slots.map(slot => slot.getAttribute('aria-invalid'))).toEqual(['true', 'true'])
+      expect(form.checkValidity()).toBeFalse()
 
       instance.dispose()
     })

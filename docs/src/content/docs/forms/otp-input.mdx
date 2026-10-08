@@ -313,7 +313,7 @@ Use the `data-coreui-readonly="true"` attribute to make the one-time password in
 
 ## Validation
 
-The code is validated as one value, kept in an input laid invisibly over the group. With `data-coreui-required="true"` an empty or incomplete code blocks the submit, and an incomplete code blocks it even when the field is not required; the browser, or the [form plugin](/forms/validation/#usage) in a form with `novalidate`, puts focus on the first empty slot, the browser with its own message over the group. Once a validation reports the code, the group gets `.is-invalid`, which colours every slot and shows the `.invalid-feedback` that follows the group, and every slot carries `aria-invalid="true"` and is described by that message, for as long as the code stays invalid or until the form resets. An `.is-invalid` class or `aria-invalid="true"` you write on the group, or `.is-invalid` on a slot, the server-side route, does the same until you remove it. A message placed anywhere else can be named in `data-coreui-invalid-feedback` on the `.form-otp` element.
+The code is validated as one value, kept in an input laid invisibly over the group. With `data-coreui-required="true"` an empty or incomplete code blocks the submit, and an incomplete code blocks it even when the field is not required; the browser, or the [form plugin](/forms/validation/#usage) in a form with `novalidate`, puts focus on the first empty slot, the browser with its own message over the group. The state shows on the group as `.is-{state}`, which colours every slot and shows the `.invalid-feedback` that follows the group, and while it is `'invalid'` every slot carries `aria-invalid="true"` and is described by that message. Every change of the code sends `input` and `change` from the input that holds the value.
 
 <Example pro code={`<form class="row g-3" data-coreui-validate novalidate>
     <div class="col-12">
@@ -333,6 +333,26 @@ The code is validated as one value, kept in an input laid invisibly over the gro
     </div>
   </form>`} />
 
+The state comes from four places, in this order:
+
+- The `validationState` option: `'valid'`, `'invalid'` or a state you added to `$form-validation-states`.
+- An `.is-invalid` or `.is-valid` class written on the `.form-otp` element or on a slot in the markup, for example by a server that has already checked the code. It is read once, when the component starts, and moves to the group, since the code is one value.
+- A validation that reports the code invalid: a submit, `checkValidity()` or `reportValidity()`, which the form plugin and the [stepper](/forms/stepper/) call as well. From then on the group shows it invalid whenever the code is invalid, until a native reset of the form.
+- In a form with `data-coreui-validate`, the `:user-invalid` state of the input that holds the value, and with `data-coreui-validate="valid"` also its `:user-valid` state.
+
+A state you give, with the option or with the class, is a verdict on the code it was given for, so the next change of the code the user makes drops it: typing or deleting a character, a paste or an autofill. A keystroke that leaves the code as it was keeps it. One action drops the state once, at its first change, so a state you give from a `change.coreui.otp-input`, `input` or `change` listener while the action runs stays. A change your own code makes with `clear()`, `reset()` or `setConfig({ value })` keeps it. To set it again, call `setConfig({ validationState })`: it also replaces a class written in the markup, so `setConfig({ validationState: null })` withdraws that class. The component does not read `aria-invalid` on the group or a slot, and a state class written after it started only paints the group: the slots get no `aria-invalid` and the submit is not blocked, so change the state after start with `setConfig`. While the given state is `'invalid'`, the code blocks the submit with the text of the linked message, or `Invalid value.` when there is none; a disabled or read-only code does not block. A message placed where the stylesheet does not show it for the group can be named in `data-coreui-invalid-feedback` on the `.form-otp` element. A native reset of the form puts back the code the field started with and drops a state given before it; a state you give from a `reset` listener on the form, or right after `form.reset()`, stays.
+
+<Example pro code={`<span class="form-label" id="otpServerLabel">Verification code</span>
+  <div class="form-otp is-invalid" data-coreui-otp aria-labelledby="otpServerLabel" data-coreui-name="code" data-coreui-value="482910">
+    <input class="form-otp-control">
+    <input class="form-otp-control">
+    <input class="form-otp-control">
+    <input class="form-otp-control">
+    <input class="form-otp-control">
+    <input class="form-otp-control">
+  </div>
+  <div class="invalid-feedback">This code has expired. Request a new one.</div>`} />
+
 ## Accessibility
 
 The one-time password input component is designed with accessibility in mind and follows WCAG guidelines for form inputs.
@@ -342,7 +362,7 @@ The one-time password input component is designed with accessibility in mind and
 - **Role Attribute**: The container has `role="group"` to indicate related form controls
 - **Required**: with `data-coreui-required="true"`, every slot carries `aria-required="true"`, since the value input that holds `required` is hidden from assistive technologies
 - **Keyboard Navigation**: Full keyboard support with arrow keys, tab, and backspace
-- **Screen Reader Support**: Clear announcements when values change; while the code is reported invalid, every slot carries `aria-invalid="true"` and the error message after the group
+- **Screen Reader Support**: Clear announcements when values change; while the state is `'invalid'`, every slot carries `aria-invalid="true"` and the error message after the group
 - **Focus Management**: Automatic focus handling for seamless navigation
 - **Autofill**: only the first field advertises `autocomplete="one-time-code"`, so SMS autofill and password managers target a single field; a code delivered that way is spread across the slots automatically, exactly like a paste
 
@@ -418,6 +438,7 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | `readonly` | boolean | `false` | Make OTP input read-only |
 | `required` | boolean | `false` | Makes the code required: an empty or incomplete code blocks the submit. |
 | `type` | string | `'number'` | Input validation type: 'number' for digits only, or any other string for free text |
+| `validationState` | string, null | `null` | The state the code shows: `'valid'`, `'invalid'` or a state of `$form-validation-states`. `'invalid'` blocks the submit. The user's next change of the code drops it. See [Validation](#validation). |
 | `value` | string, number, null | `null` | Value the slots start with. Characters the `type` does not accept are dropped, the same way typing and pasting drop them. |
 
 ### Methods
@@ -426,7 +447,7 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | --- | --- |
 | `clear` | Clear all OTP input fields |
 | `reset` | Reset OTP input to its initial value |
-| `setConfig` | Merges the given options over the current configuration and re-renders the inputs. Options you leave out keep their current value, and so does the code in the field: the slots are repainted only when the call changes `value`, and then they show exactly that value, cleared where it does not reach. A repaint reports the new code through `change`. |
+| `setConfig` | Merges the given options over the current configuration and re-renders the inputs. Options you leave out keep their current value, and so does the code in the field: the slots are repainted only when the call changes `value`, and then they show exactly that value, cleared where it does not reach. A repaint reports the new code through `change`. `setConfig({ validationState })` sets the state without touching the code. |
 
 ```javascript
 const otp = coreui.OTPInput.getInstance(document.querySelector('.form-otp'))

@@ -9,7 +9,10 @@ import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { onLabelClick } from './util/field-label.js'
-import { getFeedbackIds } from './util/form-validation.js'
+import {
+  configureValueField, createValueField, dispatchValueChange, followUserValidity, getFeedbackIds, getValidationState,
+  nextStateSerial, ownValidationState, setStateValidity, writeValueField, type UserValidity, type ValidationState
+} from './util/form-validation.js'
 import {
   defineJQueryPlugin, getNextActiveElement, isRTL, jQueryDispatch
 } from './util/index.js'
@@ -32,17 +35,16 @@ const EVENT_CHANGE = `change${EVENT_KEY}`
 const EVENT_COMPLETE = `complete${EVENT_KEY}`
 const EVENT_FOCUS = `focus${EVENT_KEY}`
 const EVENT_INPUT = `input${EVENT_KEY}`
-const EVENT_INVALID = `invalid${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 const EVENT_PASTE = `paste${EVENT_KEY}`
-const EVENT_RESET = `reset${EVENT_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
 const CLASS_NAME_IS_INVALID = 'is-invalid'
+const CLASS_NAME_IS_VALID = 'is-valid'
+const STATE_CLASSES = [CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID]
 
 const SELECTOR_DATA_OTP = '[data-coreui-otp]'
 const SELECTOR_FORM_OTP_CONTROL = '.form-otp-control'
-const SELECTOR_VALUE_FIELD = 'input:not(.form-otp-control)'
 
 /**
  * Types
@@ -60,6 +62,7 @@ type OtpInputConfig = {
   readonly: boolean
   required: boolean
   type: string
+  validationState: ValidationState | null
   value: number | string | null
 }
 
@@ -75,6 +78,7 @@ const Default: OtpInputConfig = {
   readonly: false,
   required: false,
   type: 'number',
+  validationState: null,
   value: null
 }
 
@@ -90,6 +94,7 @@ const DefaultType = {
   readonly: 'boolean',
   required: 'boolean',
   type: 'string',
+  validationState: '(string|null|undefined)',
   value: '(number|string|null)'
 }
 
@@ -100,15 +105,17 @@ const DefaultType = {
 class OTPInput extends BaseComponent {
   protected declare _disabledSlots: Set<HTMLInputElement>
   protected declare _inputElement: HTMLInputElement | null
-  protected declare _ownsInvalidClass: boolean
   protected declare _placeholders: Map<HTMLInputElement, string | null>
   protected declare _readOnlySlots: Set<HTMLInputElement>
+  protected declare _releaseValidationState: (() => void) | null
   protected declare _removeLabelClick: () => void
-  protected declare _reported: boolean
   protected declare _requiredSlots: Set<HTMLInputElement>
-  protected declare _resetHandler: (event: Event) => void
+  protected declare _resetCode: string | null
+  protected declare _serverMarks: Map<Element, string[]>
   protected declare _slotAria: Map<HTMLInputElement, { describedBy: string | null, invalid: string | null }>
-  protected declare _validityObserver: MutationObserver | null
+  protected declare _stateClass: string | null
+  protected declare _stateSerial: number
+  protected declare _userValidity: UserValidity | null
 
   constructor(element?: string | Element | null, config?: Partial<OtpInputConfig> | null) {
     super(element, config)
@@ -116,24 +123,24 @@ class OTPInput extends BaseComponent {
     this._config = this._getConfig(config)
     this._disabledSlots = new Set()
     this._inputElement = null
-    this._ownsInvalidClass = false
     this._placeholders = new Map()
     this._readOnlySlots = new Set()
-    this._reported = false
+    this._releaseValidationState = null
     this._requiredSlots = new Set()
+    this._resetCode = null
+    this._serverMarks = new Map()
     this._slotAria = new Map()
-    this._validityObserver = null
-    this._resetHandler = (event: Event) => {
-      if (!(event.target as Node).contains(this._element)) {
-        return
-      }
+    this._stateClass = null
+    this._stateSerial = nextStateSerial()
+    this._userValidity = null
 
-      setTimeout(() => {
-        if (this._element && !event.defaultPrevented) {
-          this._reported = false
-          this._syncValidity()
-        }
-      })
+    for (const element of [this._element, ...this._getInputs()]) {
+      const names = STATE_CLASSES.filter(name => element.classList.contains(name))
+
+      if (names.length > 0) {
+        element.classList.remove(...names)
+        this._serverMarks.set(element, names)
+      }
     }
 
     this._setRoleAttribute()
@@ -142,7 +149,7 @@ class OTPInput extends BaseComponent {
     this._createValueField()
     this._setInputsTabIndexes()
     this._addEventListeners()
-    this._removeLabelClick = onLabelClick(this._element, () => this._focusFirstEmptySlot())
+    this._removeLabelClick = onLabelClick(this._element, () => this._getFirstEmptySlot()?.focus())
   }
 
   // Getters
@@ -176,13 +183,23 @@ class OTPInput extends BaseComponent {
     }
 
     this._removeLabelClick()
-    EventHandler.off(document, EVENT_RESET, this._resetHandler)
-    this._validityObserver?.disconnect()
+    this._userValidity?.stop()
+    this._releaseValidationState?.()
     this._inputElement?.remove()
     this._inputElement = null
-    this._reported = false
-    this._syncValidity()
-    this._unmarkSlots()
+
+    if (this._stateClass) {
+      this._element.classList.remove(this._stateClass)
+    }
+
+    for (const [element, names] of this._serverMarks) {
+      element.classList.add(...names)
+    }
+
+    for (const [input, { describedBy, invalid }] of this._slotAria) {
+      this._writeSlotAttribute(input, 'aria-describedby', describedBy)
+      this._writeSlotAttribute(input, 'aria-invalid', invalid)
+    }
 
     for (const input of this._requiredSlots) {
       input.removeAttribute('aria-required')
@@ -217,6 +234,16 @@ class OTPInput extends BaseComponent {
     const previousValue = this._config.value
     this._config = this._getConfig({ ...this._config, ...config })
     const repaint = this._config.value !== previousValue
+
+    if ('validationState' in config) {
+      this._serverMarks.clear()
+      this._stateSerial = nextStateSerial()
+
+      if (Object.keys(config).length === 1) {
+        this._updateValidity()
+        return
+      }
+    }
 
     this._setInputsAttributes()
 
@@ -291,7 +318,7 @@ class OTPInput extends BaseComponent {
       const value = inputs.map((input: HTMLInputElement) => input.value).join('')
 
       if (value !== (this._inputElement ? this._inputElement.value : '')) {
-        this._setValue(value)
+        this._setValue(value, true)
       }
 
       if (target!.value.length === 1) {
@@ -341,6 +368,11 @@ class OTPInput extends BaseComponent {
 
     EventHandler.on(this._element, EVENT_PASTE, SELECTOR_FORM_OTP_CONTROL, event => {
       event.preventDefault()
+
+      if (this._config.readonly) {
+        return
+      }
+
       const pastedData = event.clipboardData.getData('text')
       const validChars = this._extractValidChars(pastedData)
 
@@ -350,20 +382,6 @@ class OTPInput extends BaseComponent {
 
       this._distributeChars(event.target as HTMLInputElement, validChars)
     })
-
-    EventHandler.on(this._element, EVENT_FOCUS, SELECTOR_VALUE_FIELD, () => {
-      this._focusFirstEmptySlot()
-    })
-
-    EventHandler.on(this._element, EVENT_INVALID, SELECTOR_VALUE_FIELD, () => {
-      this._reported = true
-      this._syncValidity()
-    })
-
-    EventHandler.on(document, EVENT_RESET, this._resetHandler)
-
-    this._validityObserver = new MutationObserver(() => this._syncValidity())
-    this._validityObserver.observe(this._element, { attributeFilter: ['aria-invalid', 'class'], subtree: true })
   }
 
   // Write `chars` across the slots starting at `startInput`, then sync focus,
@@ -389,7 +407,7 @@ class OTPInput extends BaseComponent {
     inputs[nextEmptyIndex < inputs.length ? nextEmptyIndex : inputs.length - 1].focus()
 
     // Read the value back from the slots so already-filled ones are preserved.
-    this._setValue(inputs.map((input: HTMLInputElement) => input.value).join(''))
+    this._setValue(inputs.map((input: HTMLInputElement) => input.value).join(''), true)
     this._syncFirstInputMaxLength()
     this._setInputsTabIndexes()
     this._checkAutoSubmit(inputs)
@@ -423,11 +441,10 @@ class OTPInput extends BaseComponent {
     }
   }
 
-  _focusFirstEmptySlot(): void {
+  _getFirstEmptySlot(): HTMLInputElement | undefined {
     const inputs = this._getInputs()
-    const target = inputs.find(input => !input.value) ?? inputs[0]
 
-    target?.focus()
+    return inputs.find(input => !input.value) ?? inputs[0]
   }
 
   _getInputs(): HTMLInputElement[] {
@@ -439,36 +456,37 @@ class OTPInput extends BaseComponent {
   }
 
   _createValueField(): void {
-    const valueField = document.createElement('input')
-    valueField.type = 'text'
-    valueField.autocomplete = 'off'
-    valueField.tabIndex = -1
-    valueField.setAttribute('aria-hidden', 'true')
-    valueField.value = this._readSlots()
+    const field = createValueField('input', () => this._getFirstEmptySlot())
+    this._resetCode = this._extractValidChars(String(this._config.value ?? '')) ? this._readSlots() : null
+    field.defaultValue = this._resetCode ?? this._getInputs().map(input => input.defaultValue).join('')
+    field.value = this._readSlots()
 
-    this._element.append(valueField)
-    this._inputElement = valueField
+    this._element.append(field)
+    this._inputElement = field
+    this._userValidity = followUserValidity(field, () => this._updateValidity(), serial => this._restoreValue(serial))
     this._syncValueField()
   }
 
   _syncValueField(): void {
-    const valueField = this._inputElement!
-    const inputs = this._getInputs()
-    valueField.defaultValue = inputs.map(input => input.defaultValue).join('')
-    valueField.disabled = this._config.disabled
-    valueField.pattern = `${this._config.type === 'number' ? '[0-9]' : '.'}{${inputs.length}}`
-    valueField.readOnly = this._config.readonly
-    valueField.required = this._config.required
+    const field = this._inputElement!
 
-    for (const name of ['id', 'name'] as const) {
-      if (this._config[name]) {
-        valueField[name] = this._config[name]
-      } else {
-        valueField.removeAttribute(name)
-      }
+    configureValueField(field, {
+      disabled: this._config.disabled,
+      name: this._config.name,
+      readOnly: this._config.readonly,
+      required: this._config.required
+    })
+    field.pattern = `${this._config.type === 'number' ? '[0-9]' : '.'}{${this._getInputs().length}}`
+    this._releaseValidationState?.()
+    this._releaseValidationState = ownValidationState(field, ...this._getInputs())
+
+    if (this._config.id) {
+      field.id = this._config.id
+    } else {
+      field.removeAttribute('id')
     }
 
-    this._syncValidity()
+    this._updateValidity()
   }
 
   _extractValidChars(text: string): string {
@@ -499,16 +517,19 @@ class OTPInput extends BaseComponent {
     }
   }
 
-  _setValue(value: string | null): void {
+  _setValue(value: string | null, byUser = false): void {
     if (this._inputElement) {
-      const isChanged = this._inputElement.value !== (value || '')
-      this._inputElement.value = value || ''
+      const isChanged = writeValueField(this._inputElement, value || '')
 
-      if (isChanged) {
-        this._inputElement.dispatchEvent(new Event('input', { bubbles: true }))
+      if (isChanged && byUser) {
+        this._dismissValidationState()
       }
 
-      this._syncValidity()
+      this._updateValidity()
+
+      if (isChanged) {
+        dispatchValueChange(this._inputElement)
+      }
     }
 
     EventHandler.trigger(this._element, EVENT_CHANGE, { value })
@@ -518,20 +539,43 @@ class OTPInput extends BaseComponent {
     }
   }
 
-  _syncValidity(): void {
-    const isReported = this._reported && this._inputElement !== null && !this._inputElement.validity.valid
-
-    if (isReported !== this._ownsInvalidClass && (!isReported || !this._element.classList.contains(CLASS_NAME_IS_INVALID))) {
-      this._ownsInvalidClass = isReported
-      this._element.classList.toggle(CLASS_NAME_IS_INVALID, isReported)
-    }
-
-    if (!isReported && !this._isMarkedInvalid()) {
-      this._unmarkSlots()
+  _dismissValidationState(serial: number = Number.POSITIVE_INFINITY): void {
+    if (this._stateSerial > serial) {
       return
     }
 
-    const feedbackIds = this._inputElement ? getFeedbackIds(this._inputElement) : []
+    this._config.validationState = null
+    this._serverMarks.clear()
+  }
+
+  _updateValidity(): void {
+    const field = this._inputElement
+
+    if (!field) {
+      return
+    }
+
+    const serverClasses = new Set([...this._serverMarks.values()].flat())
+    const givenState = getValidationState(this._config.validationState) ??
+      getValidationState(null, serverClasses.has(CLASS_NAME_IS_VALID), serverClasses.has(CLASS_NAME_IS_INVALID))
+
+    setStateValidity(field, givenState === 'invalid')
+
+    const state = givenState ?? this._userValidity?.read()
+    const stateClass = state ? `is-${state}` : null
+    const feedbackIds = state === 'invalid' ? getFeedbackIds(field) : []
+
+    if (stateClass !== this._stateClass) {
+      if (this._stateClass) {
+        this._element.classList.remove(this._stateClass)
+      }
+
+      if (stateClass) {
+        this._element.classList.add(stateClass)
+      }
+
+      this._stateClass = stateClass
+    }
 
     for (const input of this._getInputs()) {
       if (!this._slotAria.has(input)) {
@@ -541,23 +585,23 @@ class OTPInput extends BaseComponent {
       const ids = [...new Set([...(this._slotAria.get(input)!.describedBy ?? '').split(/\s+/), ...feedbackIds])].filter(Boolean)
 
       this._writeSlotAttribute(input, 'aria-describedby', ids.length > 0 ? ids.join(' ') : null)
-      this._writeSlotAttribute(input, 'aria-invalid', 'true')
+      this._writeSlotAttribute(input, 'aria-invalid', state === 'invalid' ? 'true' : null)
     }
   }
 
-  _unmarkSlots(): void {
-    for (const [input, { describedBy, invalid }] of this._slotAria) {
-      this._writeSlotAttribute(input, 'aria-describedby', describedBy)
-      this._writeSlotAttribute(input, 'aria-invalid', invalid)
+  _restoreValue(serial: number): void {
+    const code = this._resetCode
+
+    this._dismissValidationState(serial)
+
+    if (code !== null) {
+      for (const [index, input] of this._getInputs().entries()) {
+        input.value = code[index] ?? ''
+      }
     }
 
-    this._slotAria.clear()
-  }
-
-  _isMarkedInvalid(): boolean {
-    return this._element.getAttribute('aria-invalid') === 'true' ||
-      (!this._ownsInvalidClass && this._element.classList.contains(CLASS_NAME_IS_INVALID)) ||
-      this._getInputs().some(input => input.classList.contains(CLASS_NAME_IS_INVALID))
+    this._syncFirstInputMaxLength()
+    this._setInputsTabIndexes()
   }
 
   _writeSlotAttribute(input: HTMLInputElement, name: string, value: string | null): void {
