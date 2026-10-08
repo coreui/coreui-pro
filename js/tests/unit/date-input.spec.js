@@ -1672,17 +1672,15 @@ describe('DateInput', () => {
       return new DateInput(fixtureEl.querySelector('div'), { format: 'dd.MM.yyyy', ...config })
     }
 
-    it('should apply the valid and invalid config options', () => {
-      const invalidInput = createDateInput({ invalid: true })
-      expect(invalidInput._element.classList.contains('is-invalid')).toBeTrue()
+    it('should take no state from invalid or valid', () => {
+      const dateInput = createDateInput({ invalid: true, valid: true })
 
-      const validInput = createDateInput({ valid: true })
-      expect(validInput._element.classList.contains('is-valid')).toBeTrue()
+      expect([...dateInput._element.classList].filter(name => name.startsWith('is-'))).toEqual([])
     })
 
     it('should take no state from an aria-invalid the page writes on the element', () => {
       fixtureEl.innerHTML = '<div aria-invalid="true"></div>'
-      const dateInput = new DateInput(fixtureEl.querySelector('div'), { format: 'dd.MM.yyyy', valid: true })
+      const dateInput = new DateInput(fixtureEl.querySelector('div'), { format: 'dd.MM.yyyy', validationState: 'valid' })
 
       expect(dateInput._element.classList.contains('is-valid')).toBeTrue()
       expect([...getSections(dateInput._element)].map(section => section.hasAttribute('aria-invalid'))).toEqual([false, false, false])
@@ -1690,22 +1688,17 @@ describe('DateInput', () => {
     })
 
     it('should not draw a field invalid on its own as valid', () => {
-      for (const config of [{ date: new Date(2026, 6, 20), maxDate: new Date(2026, 6, 14) }, { invalid: true }]) {
-        const dateInput = createDateInput({ valid: true, ...config })
+      const dateInput = createDateInput({ date: new Date(2026, 6, 20), maxDate: new Date(2026, 6, 14), validationState: 'valid' })
 
-        expect(dateInput._element.classList.contains('is-invalid')).toBeTrue()
-        expect(dateInput._element.classList.contains('is-valid')).toBeFalse()
-        dateInput.dispose()
-      }
+      expect(dateInput._element.classList.contains('is-invalid')).toBeTrue()
+      expect(dateInput._element.classList.contains('is-valid')).toBeFalse()
     })
 
-    it('should take the state from validationState, and let it win over invalid and valid', () => {
+    it('should take the state from validationState', () => {
       const states = [
         [{ validationState: 'invalid' }, 'is-invalid'],
         [{ validationState: 'valid' }, 'is-valid'],
         [{ validationState: 'warning' }, 'is-warning'],
-        [{ validationState: 'valid', invalid: true }, 'is-valid'],
-        [{ invalid: true, valid: true }, 'is-invalid'],
         [{ validationState: '' }, null],
         [{ validationState: undefined }, null]
       ]
@@ -1739,7 +1732,7 @@ describe('DateInput', () => {
     it('should block with a generic message when the field shows none', () => {
       fixtureEl.innerHTML = '<form><div class="date-input"></div></form>'
       // eslint-disable-next-line no-new
-      new DateInput(fixtureEl.querySelector('.date-input'), { format: 'dd.MM.yyyy', invalid: true })
+      new DateInput(fixtureEl.querySelector('.date-input'), { format: 'dd.MM.yyyy', validationState: 'invalid' })
 
       expect(fixtureEl.querySelector('.form-date-time > textarea').validationMessage).toEqual('Invalid value.')
     })
@@ -1974,13 +1967,13 @@ describe('DateInput', () => {
       const dateInput = new DateInput(fixtureEl.querySelector('div'), { date: new Date(2026, 6, 14), format: 'dd.MM.yyyy' })
       const [day] = getSections(dateInput._element)
 
-      dateInput.setConfig({ valid: true })
+      dateInput.setConfig({ validationState: 'valid' })
 
       expect(getSections(dateInput._element)[0]).toBe(day)
       expect(dateInput._element.classList.contains('is-valid')).toBeTrue()
       expect(dateInput._element.classList.contains('is-invalid')).toBeFalse()
 
-      dateInput.setConfig({ validationState: undefined, valid: false })
+      dateInput.setConfig({ validationState: undefined })
 
       expect([...dateInput._element.classList].filter(name => name.startsWith('is-'))).toEqual([])
     })
@@ -2261,20 +2254,20 @@ describe('DateInput', () => {
 
     it('should not repeat a message the page already describes the field with', () => {
       fixtureEl.innerHTML = '<div aria-describedby="late"></div><div id="late" class="invalid-feedback">Too late</div>'
-      const dateInput = new DateInput(fixtureEl.querySelector('div'), { format: 'dd.MM.yyyy', invalid: true })
+      const dateInput = new DateInput(fixtureEl.querySelector('div'), { format: 'dd.MM.yyyy', validationState: 'invalid' })
 
       expect([...getSections(dateInput._element)].map(section => section.getAttribute('aria-describedby'))).toEqual(['late', 'late', 'late'])
     })
 
     it('should describe the sections with the message named in data-coreui-invalid-feedback', () => {
       fixtureEl.innerHTML = '<div data-coreui-invalid-feedback="late"></div><div class="invalid-feedback">Sibling</div><p id="late">Too late</p>'
-      const dateInput = new DateInput(fixtureEl.querySelector('div'), { format: 'dd.MM.yyyy', invalid: true })
+      const dateInput = new DateInput(fixtureEl.querySelector('div'), { format: 'dd.MM.yyyy', validationState: 'invalid' })
 
       expect([...getSections(dateInput._element)].map(section => section.getAttribute('aria-describedby'))).toEqual(['late', 'late', 'late'])
     })
 
     it('should not describe the sections of a field without a description', () => {
-      const dateInput = createDateInput({ invalid: true })
+      const dateInput = createDateInput({ validationState: 'invalid' })
 
       expect([...getSections(dateInput._element)].map(section => section.hasAttribute('aria-describedby'))).toEqual([false, false, false])
     })

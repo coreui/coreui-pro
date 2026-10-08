@@ -58,8 +58,6 @@ const SELECTOR_ROLE_SEPARATOR = `[${ATTRIBUTE_ROLE_SEPARATOR}]`
 const SELECTOR_SECTION = '.form-date-time-section'
 const SELECTOR_SVG = 'svg'
 
-const VALIDATION_OPTIONS = new Set(['invalid', 'valid', 'validationState'])
-
 type DateRangeInputConfig = {
   allowList: SanitizerAllowList
   ariaDayLabel: string
@@ -84,7 +82,6 @@ type DateRangeInputConfig = {
   hourPlaceholder: string | null
   inputDateParse: ((value: string) => Date | null) | null
   inputOptions: Partial<DateInputConfig>
-  invalid: boolean
   locale: string
   maxDate: Date | string | null
   meridiemPlaceholder: string | null
@@ -106,7 +103,6 @@ type DateRangeInputConfig = {
   startFloatingLabel: string | null
   startName: string | null
   type: 'date' | 'datetime'
-  valid: boolean
   validationState: ValidationState | null
   weekPlaceholder: string | null
   yearPlaceholder: string | null
@@ -136,7 +132,6 @@ const Default: DateRangeInputConfig = {
   hourPlaceholder: null,
   inputDateParse: null,
   inputOptions: {},
-  invalid: false,
   locale: navigator.language,
   maxDate: null,
   meridiemPlaceholder: null,
@@ -158,7 +153,6 @@ const Default: DateRangeInputConfig = {
   startFloatingLabel: null,
   startName: null,
   type: 'date',
-  valid: false,
   validationState: null,
   weekPlaceholder: null,
   yearPlaceholder: null
@@ -190,7 +184,6 @@ const DefaultType: Record<string, string> = {
   hourPlaceholder: '(string|null)',
   inputDateParse: '(function|null)',
   inputOptions: 'object',
-  invalid: 'boolean',
   locale: 'string',
   maxDate: '(date|string|null)',
   meridiemPlaceholder: '(string|null)',
@@ -212,7 +205,6 @@ const DefaultType: Record<string, string> = {
   startFloatingLabel: '(string|null)',
   startName: '(string|null)',
   type: 'string',
-  valid: 'boolean',
   validationState: '(string|null|undefined)',
   weekPlaceholder: '(string|null)',
   yearPlaceholder: '(string|null)'
@@ -327,13 +319,11 @@ class DateRangeInput extends BaseComponent {
   }
 
   setConfig(config: Partial<DateRangeInputConfig> | null): void {
-    const validation = Object.fromEntries(Object.entries(config ?? {}).filter(([key]) => VALIDATION_OPTIONS.has(key)))
-
-    if (Object.keys(validation).length === 0) {
+    if (!config || !('validationState' in config)) {
       return
     }
 
-    this._config = this._getConfig({ ...this._config, ...validation })
+    this._config = this._getConfig({ ...this._config, validationState: config.validationState })
     this._serverClasses = []
     this._stateSerial = nextStateSerial()
     this._updateValidity()
@@ -443,7 +433,7 @@ class DateRangeInput extends BaseComponent {
   _createInput(element: HTMLElement, overrides: Record<string, any>): any {
     const forwarded = getForwardedOptions(Object.keys(DateInput.Default), this._config, this.constructor.Default, ORIGINAL_DEFAULT)
     const input = new DateInput(element, {
-      ...forwarded, ...overrides, autofocus: false, ...this._config.inputOptions, invalid: false, valid: false, validationState: null
+      ...forwarded, ...overrides, autofocus: false, ...this._config.inputOptions, validationState: null
     })
 
     input._setOwnerDismiss((serial: number) => this._dismissValidationState(serial))
@@ -606,7 +596,7 @@ class DateRangeInput extends BaseComponent {
   }
 
   _updateValidity(): void {
-    const givenState = getValidationState(this._config.validationState, this._config.valid, this._config.invalid) ??
+    const givenState = getValidationState(this._config.validationState) ??
       getValidationState(null, this._serverClasses.includes(CLASS_NAME_IS_VALID), this._serverClasses.includes(CLASS_NAME_IS_INVALID)) ??
       this._ownerState
     const isOrderInvalid = !this.isRangeValid()
@@ -633,8 +623,6 @@ class DateRangeInput extends BaseComponent {
 
   _dismissValidationState(serial: number = Number.POSITIVE_INFINITY): void {
     if (this._stateSerial <= serial) {
-      this._config.invalid = false
-      this._config.valid = false
       this._config.validationState = null
       this._serverClasses = []
       this._updateValidity()

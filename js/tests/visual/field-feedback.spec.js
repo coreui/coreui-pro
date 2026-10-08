@@ -143,7 +143,7 @@ describe('messages of a form field', () => {
     })
   }
 
-  for (const [layout, [Component, fields, config = { invalid: true }, wrap = true]] of Object.entries(DATE_LAYOUTS)) {
+  for (const [layout, [Component, fields, config = { validationState: 'invalid' }, wrap = true]] of Object.entries(DATE_LAYOUTS)) {
     it(`links to every section of an invalid date field the very messages it shows ${layout}`, () => {
       mount(fields, '', wrap)
       const instance = new Component(container.querySelector('[data-test]'), config)

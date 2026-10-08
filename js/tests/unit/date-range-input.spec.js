@@ -386,7 +386,7 @@ describe('DateRangeInput', () => {
     })
 
     it('should drop the given state from both ends and the frame when the user edits one end', () => {
-      for (const config of [{}, { invalid: true }, { validationState: 'invalid' }]) {
+      for (const config of [{}, { validationState: 'invalid' }]) {
         build({ ...config, startDate: new Date(2026, 6, 14), endDate: new Date(2026, 6, 20) }, `<form><div id="range"${Object.keys(config).length > 0 ? '' : ' class="is-invalid"'}></div></form>`)
 
         typeIn(fields()[0])
@@ -410,14 +410,15 @@ describe('DateRangeInput', () => {
       expect(fields().some(field => field.classList.contains('is-valid'))).toBeFalse()
     })
 
-    it('should let the options win over a class the markup carries, validationState over invalid and valid', () => {
-      build({ valid: true }, '<div id="range" class="is-invalid"></div>')
+    it('should let validationState win over a class the markup carries, and take no state from invalid or valid', () => {
+      build({ validationState: 'valid' }, '<div id="range" class="is-invalid"></div>')
 
       expect(root().classList.contains('is-valid')).toBeTrue()
+      expect(root().classList.contains('is-invalid')).toBeFalse()
 
-      build({ invalid: true, validationState: 'valid' })
+      build({ invalid: true, valid: true })
 
-      expect(root().classList.contains('is-valid')).toBeTrue()
+      expect(root().classList.contains('is-valid')).toBeFalse()
       expect(root().classList.contains('is-invalid')).toBeFalse()
     })
 
@@ -440,7 +441,7 @@ describe('DateRangeInput', () => {
 
       expect(element.classList.contains('is-invalid')).toBeFalse()
 
-      const configured = build({ valid: true })
+      const configured = build({ validationState: 'valid' })
       const configuredElement = root()
 
       configured.dispose()
@@ -556,7 +557,7 @@ describe('DateRangeInput', () => {
     })
 
     it('should put the valid option on the frame while the range holds', () => {
-      const range = build({ valid: true })
+      const range = build({ validationState: 'valid' })
 
       expect(root().classList.contains('is-valid')).toBeTrue()
 

@@ -335,7 +335,7 @@ and `selectEndDate` are set by the picker itself.
 | `endFloatingLabel` | string, null | `null` | Renders a floating label over the end field, which also becomes that field's accessible name. |
 | `endName` | string, null | `null` | Name of the end value input. Without it the end date is not submitted with the form. |
 | `format` | function, string, null | `null` | Mask layout of both fields: `null` derives it from the locale (or, for week, month, quarter and year selection, uses the matching default mask), a string is parsed as format tokens, a function receives the locale and returns the section layout. |
-| `inputOptions` | object | `{}` | Programmatic escape hatch for date input options, except `validationState`, `invalid` and `valid`, which the picker owns. |
+| `inputOptions` | object | `{}` | Programmatic escape hatch for date input options, except `validationState`, which the picker owns. |
 | `invalid` | boolean | `false` | Deprecated alias of `validationState: 'invalid'`, ignored once `validationState` is set. |
 | `locale` | string | browser locale | Drives section order, separators, and calendar labels. |
 | `maxDate` | date, string, null | `null` | Upper bound, enforced by both layers. |

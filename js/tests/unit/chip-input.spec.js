@@ -142,18 +142,18 @@ describe('ChipInput', () => {
       expect(form.checkValidity()).toBeTrue()
     })
 
-    it('should take no state from an undefined option, and the deprecated aliases until validationState is set', () => {
+    it('should take no state from an undefined option, and none from invalid or valid', () => {
       fixtureEl.innerHTML = '<form><div class="chip-input"></div></form>'
       const element = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(element, { validationState: undefined, invalid: true })
 
-      expect(element.classList.contains('is-invalid')).toBeTrue()
+      expect(element.classList.contains('is-invalid')).toBeFalse()
 
       chipInput.setConfig({ validationState: 'valid' })
 
       expect(element.classList.contains('is-valid')).toBeTrue()
 
-      chipInput.setConfig({ validationState: undefined, invalid: false, valid: false })
+      chipInput.setConfig({ validationState: undefined, valid: true })
 
       expect(element.classList.contains('is-valid')).toBeFalse()
       expect(element.classList.contains('is-invalid')).toBeFalse()

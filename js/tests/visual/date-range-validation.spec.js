@@ -198,7 +198,7 @@ describe('validation feedback next to a frame', () => {
     mount('<div id="host" style="transition: none"></div><div id="reference" class="form-control-group is-invalid"><input class="form-control"></div>', {
       endDate: new Date(2026, 6, 14),
       startDate: new Date(2026, 6, 20),
-      valid: true
+      validationState: 'valid'
     })
 
     expect(borderOf('#host')).toEqual(borderOf('#reference'))
@@ -211,7 +211,7 @@ describe('validation feedback next to a frame', () => {
       maxDate: new Date(2026, 6, 14),
       startDate: new Date(2026, 6, 10),
       startFloatingLabel: 'Check-in',
-      valid: true
+      validationState: 'valid'
     }
 
     for (const markup of [
@@ -238,7 +238,7 @@ describe('validation feedback next to a frame', () => {
       endFloatingLabel: 'Check-out',
       startDate: new Date(2026, 6, 10),
       startFloatingLabel: 'Check-in',
-      valid: true
+      validationState: 'valid'
     }
 
     for (const markup of [
