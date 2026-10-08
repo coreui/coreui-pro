@@ -1,7 +1,7 @@
 import { vi } from 'vitest'
 import {
   clearValidationState, focusFirstInvalidControl, followUserValidity, getFeedbackIds, getFeedbackText, getUserValidity,
-  getValidationState, isFormValid, ownValidationState, setStateValidity, updateValidationState, validateForm
+  getValidationState, isFormValid, nextStateSerial, ownValidationState, setStateValidity, updateValidationState, validateForm
 } from '../../../src/util/form-validation.js'
 import { clearFixture, getFixture } from '../../helpers/fixture.js'
 
@@ -642,6 +642,73 @@ describe('Form validation utilities', () => {
       validity.stop()
     })
 
+    it('should hand the reset the serial of the last state given out before it', async () => {
+      fixtureEl.innerHTML = '<form novalidate><input id="value"></form>'
+      const control = fixtureEl.querySelector('#value')
+      const serials = []
+      const validity = followUserValidity(control, () => {}, serial => serials.push(serial))
+      const before = nextStateSerial()
+
+      control.form.reset()
+      const after = nextStateSerial()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(after).toBeGreaterThan(before)
+      expect(serials).toEqual([before])
+
+      validity.stop()
+    })
+
+    it('should keep a report made after a native reset in the same task', async () => {
+      fixtureEl.innerHTML = '<form novalidate><input id="value" required></form>'
+      const control = fixtureEl.querySelector('#value')
+      const validity = followUserValidity(control, () => {})
+
+      control.form.checkValidity()
+      control.form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(validity.read()).toBeUndefined()
+
+      control.form.reset()
+      control.form.checkValidity()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(validity.read()).toBe('invalid')
+
+      validity.stop()
+    })
+
+    it('should follow a reset in a shadow root and one whose propagation a listener stops', async () => {
+      const host = document.createElement('div')
+      fixtureEl.append(host)
+      const shadowRoot = host.attachShadow({ mode: 'open' })
+      shadowRoot.innerHTML = '<form novalidate><input id="value" required></form>'
+      fixtureEl.insertAdjacentHTML('beforeend', '<form id="stopped" novalidate><input id="light" required></form>')
+      const resets = []
+      const followers = [shadowRoot.querySelector('#value'), fixtureEl.querySelector('#light')]
+        .map(control => followUserValidity(control, () => {}, () => resets.push(control.id)))
+
+      fixtureEl.querySelector('#stopped').addEventListener('reset', event => event.stopPropagation())
+      shadowRoot.querySelector('form').reset()
+      fixtureEl.querySelector('#stopped').reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(resets).toEqual(['value', 'light'])
+
+      for (const follower of followers) {
+        follower.stop()
+      }
+    })
+
     it('should follow a control that names its form from outside it, and leave the other fields of the form alone', async () => {
       fixtureEl.innerHTML = '<form id="owner" novalidate><input id="other"></form><input id="value" form="owner" required>'
       const control = fixtureEl.querySelector('#value')
@@ -738,6 +805,31 @@ describe('Form validation utilities', () => {
 
       expect(empty.validity.customError).toBeFalse()
       expect(empty.validity.valueMissing).toBeTrue()
+    })
+
+    it('should set and take back its validity while the control is barred from validation, as in a disabled fieldset', () => {
+      fixtureEl.innerHTML = '<form><fieldset><input id="cleared" value="x"><input id="blocked" value="x"></fieldset><input id="readonly" value="x" readonly></form>'
+      const fieldset = fixtureEl.querySelector('fieldset')
+      const cleared = fixtureEl.querySelector('#cleared')
+      const blocked = fixtureEl.querySelector('#blocked')
+      const readonly = fixtureEl.querySelector('#readonly')
+
+      setStateValidity(cleared, true)
+      fieldset.disabled = true
+      setStateValidity(cleared, false)
+      setStateValidity(blocked, true)
+      fieldset.disabled = false
+
+      setStateValidity(readonly, true)
+      readonly.readOnly = false
+
+      expect(cleared.validity.valid).toBeTrue()
+      expect(blocked.validationMessage).toBe('Invalid value.')
+      expect(readonly.validationMessage).toBe('Invalid value.')
+
+      setStateValidity(readonly, false)
+
+      expect(readonly.validity.valid).toBeTrue()
     })
 
     it('should leave a validity the page set before or after it', () => {

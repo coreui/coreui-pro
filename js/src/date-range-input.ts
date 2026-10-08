@@ -12,6 +12,7 @@ import SelectorEngine from './dom/selector-engine.js'
 import { type DisabledDate, isSameInstantAs } from './util/calendar.js'
 import { getForwardedOptions } from './util/composite.js'
 import { hasShortcutModifier, type SectionFormat } from './util/date-sections.js'
+import { getValidationState, nextStateSerial, type ValidationState } from './util/form-validation.js'
 import {
   appendControlGroupField,
   applyControlGroupClasses,
@@ -56,6 +57,8 @@ const SELECTOR_DATA_DATE_RANGE_INPUT = '[data-coreui-date-range-input]'
 const SELECTOR_ROLE_SEPARATOR = `[${ATTRIBUTE_ROLE_SEPARATOR}]`
 const SELECTOR_SECTION = '.form-date-time-section'
 const SELECTOR_SVG = 'svg'
+
+const VALIDATION_OPTIONS = new Set(['invalid', 'valid', 'validationState'])
 
 type DateRangeInputConfig = {
   allowList: SanitizerAllowList
@@ -104,6 +107,7 @@ type DateRangeInputConfig = {
   startName: string | null
   type: 'date' | 'datetime'
   valid: boolean
+  validationState: ValidationState | null
   weekPlaceholder: string | null
   yearPlaceholder: string | null
 }
@@ -155,6 +159,7 @@ const Default: DateRangeInputConfig = {
   startName: null,
   type: 'date',
   valid: false,
+  validationState: null,
   weekPlaceholder: null,
   yearPlaceholder: null
 }
@@ -208,6 +213,7 @@ const DefaultType: Record<string, string> = {
   startName: '(string|null)',
   type: 'string',
   valid: 'boolean',
+  validationState: '(string|null|undefined)',
   weekPlaceholder: '(string|null)',
   yearPlaceholder: '(string|null)'
 }
@@ -228,41 +234,44 @@ class DateRangeInput extends BaseComponent {
   protected declare _hostRole: string | null
   protected declare _hostDescribedBy: string | null
   protected declare _describedFields: [HTMLElement, string | null, string][]
-  protected declare _claimedEndDate: Date | null
-  protected declare _claimedInvalid: boolean
-  protected declare _claimedStartDate: Date | null
-  protected declare _claimedValid: boolean
-  protected declare _ownerInvalid: boolean
-  protected declare _addedStateClassNames: Set<string>
+  protected declare _onDismissValidationState: ((serial: number) => void) | null
+  protected declare _ownerState: ValidationState | undefined
+  protected declare _ownsStateClass: boolean
+  protected declare _serverClasses: string[]
+  protected declare _stateClass: string | null
+  protected declare _stateSerial: number
   protected declare _initialStartDate: any
   protected declare _initialEndDate: any
   protected declare _startDate: Date | null
   protected declare _endDate: Date | null
   protected declare _applying: boolean
+  protected declare _byUser: boolean
 
   constructor(element?: string | Element | null, config?: Partial<DateRangeInputConfig> | null) {
     super(element, config)
 
     this._createdElements = []
     this._hiddenFromAssistiveTech = []
-    this._hostClasses = captureHostClasses(this._element, [...this._managedClassNames(), CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID])
+    this._hostClasses = captureHostClasses(this._element, this._managedClassNames())
     this._hostRole = this._element.getAttribute('role')
     this._hostDescribedBy = this._element.getAttribute('aria-describedby')
     this._describedFields = []
-    this._claimedInvalid = this._element.classList.contains(CLASS_NAME_IS_INVALID)
-    this._claimedValid = this._element.classList.contains(CLASS_NAME_IS_VALID)
-    this._addedStateClassNames = new Set()
+    this._onDismissValidationState = null
+    this._ownerState = undefined
+    this._ownsStateClass = false
+    this._serverClasses = [CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID].filter(name => this._element.classList.contains(name))
+    this._stateClass = null
+    this._stateSerial = nextStateSerial()
+    this._element.classList.remove(...this._serverClasses)
     this._initialStartDate = config?.startDate ?? this._config.startDate
     this._initialEndDate = config?.endDate ?? this._config.endDate
     this._applying = false
-    this._ownerInvalid = false
+    this._byUser = false
 
     this._createDateRangeInput()
     this._startDate = this._startInput.getDate()
     this._endDate = this._endInput.getDate()
-    this._claimedStartDate = this._startDate
-    this._claimedEndDate = this._endDate
-    this._applyOrder()
+    this._updateValidity()
     this._addEventListeners()
   }
 
@@ -317,6 +326,19 @@ class DateRangeInput extends BaseComponent {
     return this._startDate === null || this._endDate === null || this._endDate >= this._startDate
   }
 
+  setConfig(config: Partial<DateRangeInputConfig> | null): void {
+    const validation = Object.fromEntries(Object.entries(config ?? {}).filter(([key]) => VALIDATION_OPTIONS.has(key)))
+
+    if (Object.keys(validation).length === 0) {
+      return
+    }
+
+    this._config = this._getConfig({ ...this._config, ...validation })
+    this._serverClasses = []
+    this._stateSerial = nextStateSerial()
+    this._updateValidity()
+  }
+
   override dispose(): void {
     if (!this._element) {
       return
@@ -333,13 +355,11 @@ class DateRangeInput extends BaseComponent {
       element.remove()
     }
 
-    this._element.classList.remove(...this._addedStateClassNames)
-
-    for (const className of [CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID]) {
-      if (this._hostClasses.classNames.includes(className)) {
-        this._element.classList.add(className)
-      }
+    if (this._stateClass && this._ownsStateClass) {
+      this._element.classList.remove(this._stateClass)
     }
+
+    this._element.classList.add(...this._serverClasses)
 
     for (const element of this._hiddenFromAssistiveTech) {
       element.removeAttribute('aria-hidden')
@@ -371,18 +391,6 @@ class DateRangeInput extends BaseComponent {
   }
 
   // Private
-  _markupClaimApplies(): boolean {
-    return isSameInstantAs(this._startDate, this._claimedStartDate) && isSameInstantAs(this._endDate, this._claimedEndDate)
-  }
-
-  _toggleStateClassName(className: string, on: boolean): void {
-    if (on && !this._hostClasses.classNames.includes(className)) {
-      this._addedStateClassNames.add(className)
-    }
-
-    this._element.classList.toggle(className, on)
-  }
-
   _hideFromAssistiveTech(element: Element): void {
     if (element.hasAttribute('aria-hidden')) {
       return
@@ -434,10 +442,13 @@ class DateRangeInput extends BaseComponent {
 
   _createInput(element: HTMLElement, overrides: Record<string, any>): any {
     const forwarded = getForwardedOptions(Object.keys(DateInput.Default), this._config, this.constructor.Default, ORIGINAL_DEFAULT)
-
-    return new DateInput(element, {
-      ...forwarded, ...overrides, autofocus: false, ...this._config.inputOptions
+    const input = new DateInput(element, {
+      ...forwarded, ...overrides, autofocus: false, ...this._config.inputOptions, invalid: false, valid: false, validationState: null
     })
+
+    input._setOwnerDismiss((serial: number) => this._dismissValidationState(serial))
+
+    return input
   }
 
   _moveDescriptionToFields(): void {
@@ -533,12 +544,14 @@ class DateRangeInput extends BaseComponent {
       return
     }
 
+    const byUser = this._byUser
     this._applying = true
+    this._byUser = false
 
     try {
       if (fields) {
-        this._startInput.setConfig({ date: startDate })
-        this._endInput.setConfig({ date: endDate })
+        this._setInputDate(this._startInput, startDate, byUser)
+        this._setInputDate(this._endInput, endDate, byUser)
       }
     } finally {
       this._applying = false
@@ -552,7 +565,7 @@ class DateRangeInput extends BaseComponent {
     this._startDate = start
     this._endDate = end
 
-    this._applyOrder()
+    this._updateValidity()
 
     if (startChanged) {
       EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, { date: start })
@@ -563,21 +576,71 @@ class DateRangeInput extends BaseComponent {
     }
   }
 
-  _setOwnerInvalid(isInvalid: boolean): void {
-    this._ownerInvalid = isInvalid
-    this._applyOrder()
+  _setInputDate(input: any, date: Date | null, byUser: boolean): void {
+    if (byUser) {
+      input._runAsUser(() => input.setConfig({ date }))
+      return
+    }
+
+    input.setConfig({ date })
   }
 
-  _applyOrder(): void {
-    const claimed = this._markupClaimApplies()
-    const isInvalid = (claimed && this._claimedInvalid) || this._config.invalid || !this.isRangeValid()
-    const isValid = ((claimed && this._claimedValid) || this._config.valid) && !isInvalid && !this._ownerInvalid
+  _runAsUser(action: () => void): void {
+    const previous = this._byUser
+    this._byUser = true
 
-    this._toggleStateClassName(CLASS_NAME_IS_INVALID, isInvalid)
-    this._toggleStateClassName(CLASS_NAME_IS_VALID, isValid)
-    const isOwnerInvalid = (claimed && this._claimedInvalid) || !this.isRangeValid() || this._ownerInvalid
-    this._startInput._setOwnerInvalid(isOwnerInvalid)
-    this._endInput._setOwnerInvalid(isOwnerInvalid)
+    try {
+      action()
+    } finally {
+      this._byUser = previous
+    }
+  }
+
+  _setOwnerDismiss(onDismiss: (serial: number) => void): void {
+    this._onDismissValidationState = onDismiss
+  }
+
+  _setOwnerState(givenState: ValidationState | undefined): void {
+    this._ownerState = givenState
+    this._updateValidity()
+  }
+
+  _updateValidity(): void {
+    const givenState = getValidationState(this._config.validationState, this._config.valid, this._config.invalid) ??
+      getValidationState(null, this._serverClasses.includes(CLASS_NAME_IS_VALID), this._serverClasses.includes(CLASS_NAME_IS_INVALID)) ??
+      this._ownerState
+    const isOrderInvalid = !this.isRangeValid()
+    const state = isOrderInvalid || this._startInput._rejected || this._endInput._rejected ? 'invalid' : givenState
+    const stateClass = state ? `is-${state}` : null
+
+    if (stateClass !== this._stateClass) {
+      if (this._stateClass && this._ownsStateClass) {
+        this._element.classList.remove(this._stateClass)
+      }
+
+      this._ownsStateClass = stateClass !== null && !this._element.classList.contains(stateClass)
+
+      if (this._ownsStateClass) {
+        this._element.classList.add(stateClass!)
+      }
+
+      this._stateClass = stateClass
+    }
+
+    this._startInput._setOwnerState(givenState, isOrderInvalid)
+    this._endInput._setOwnerState(givenState, isOrderInvalid)
+  }
+
+  _dismissValidationState(serial: number = Number.POSITIVE_INFINITY): void {
+    if (this._stateSerial <= serial) {
+      this._config.invalid = false
+      this._config.valid = false
+      this._config.validationState = null
+      this._serverClasses = []
+      this._updateValidity()
+    }
+
+    this._onDismissValidationState?.(serial)
   }
 
   _addEventListeners(): void {
