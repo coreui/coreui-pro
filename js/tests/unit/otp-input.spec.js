@@ -1639,7 +1639,7 @@ describe('OTPInput', () => {
       otpInput.setConfig({ placeholder: '0' })
 
       expect(otpInput._inputElement).toBe(valueField)
-      expect(valueField).toHaveClass('is-invalid')
+      expect(fixtureEl.querySelector('.form-otp')).toHaveClass('is-invalid')
       expect(slotStates(slots).map(([invalid]) => invalid)).toEqual(['true', 'true'])
     })
 
@@ -1695,55 +1695,366 @@ describe('OTPInput', () => {
       expect(group).not.toHaveClass('is-invalid')
     })
 
-    it('should mark every slot when the page marks the group or a slot invalid, and follow the page when it changes them', async () => {
-      fixtureEl.innerHTML = '<form><div class="form-otp is-invalid"><input class="form-otp-control"><input class="form-otp-control"></div><div class="invalid-feedback">This code has expired.</div></form>'
-      const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'))
+    it('should show validationState on the group and the slots, and block the submit with the message while it is invalid', () => {
+      const { form, otpInput, slots, valueField } = mountForm({ validationState: 'invalid' })
       const group = fixtureEl.querySelector('.form-otp')
-      const slots = [...fixtureEl.querySelectorAll('.form-otp-control')]
       const { id } = fixtureEl.querySelector('.invalid-feedback')
 
+      expect(group).toHaveClass('is-invalid')
       expect(slotStates(slots)).toEqual([['true', id], ['true', id]])
+      expect(form.checkValidity()).toBeFalse()
+      expect(valueField.validationMessage).toBe('Enter the code.')
 
-      group.classList.remove('is-invalid')
-      await Promise.resolve()
+      otpInput.setConfig({ validationState: 'valid' })
 
+      expect(group).toHaveClass('is-valid')
+      expect(group).not.toHaveClass('is-invalid')
       expect(slotStates(slots)).toEqual([[null, null], [null, null]])
+      expect(form.checkValidity()).toBeTrue()
 
-      slots[1].classList.add('is-invalid')
-      await Promise.resolve()
+      otpInput.setConfig({ validationState: null })
 
-      expect(slotStates(slots)).toEqual([['true', id], ['true', id]])
+      expect(group.classList.contains('is-valid')).toBeFalse()
+
+      otpInput.setConfig({ validationState: 'invalid' })
+      otpInput.dispose()
+
+      expect(group.className).toBe('form-otp')
+    })
+
+    it('should take validationState from a data attribute', () => {
+      fixtureEl.innerHTML = '<form><div class="form-otp" data-coreui-validation-state="invalid"><input class="form-otp-control"></div></form>'
+      const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'))
+
+      expect(fixtureEl.querySelector('.form-otp')).toHaveClass('is-invalid')
+      expect(fixtureEl.querySelector('form').checkValidity()).toBeFalse()
+      expect(otpInput._inputElement.validationMessage).toBe('Invalid value.')
+    })
+
+    it('should show a given state while disabled or read-only without blocking the submit', () => {
+      for (const config of [{ disabled: true }, { readonly: true }]) {
+        const { form } = mountForm({ ...config, validationState: 'invalid' })
+
+        expect(fixtureEl.querySelector('.form-otp')).toHaveClass('is-invalid')
+        expect(form.checkValidity()).toBeTrue()
+      }
+    })
+
+    it('should show a state of its own without aria-invalid and without blocking the submit', () => {
+      const { form, slots } = mountForm({ validationState: 'warning' })
+
+      expect(fixtureEl.querySelector('.form-otp')).toHaveClass('is-warning')
+      expect(slotStates(slots)).toEqual([[null, null], [null, null]])
+      expect(form.checkValidity()).toBeTrue()
+    })
+
+    it('should describe the slots with the message named on the group and block with its text', () => {
+      fixtureEl.innerHTML = '<form><p id="otp-message">Wrong code.</p><div class="form-otp" data-coreui-invalid-feedback="otp-message"><input class="form-otp-control"></div></form>'
+      const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'), { validationState: 'invalid' })
+
+      expect(fixtureEl.querySelector('.form-otp-control').getAttribute('aria-describedby')).toBe('otp-message')
+      expect(otpInput._inputElement.validationMessage).toBe('Wrong code.')
+    })
+
+    it.each([
+      ['on the group', '<div class="form-otp is-invalid"><input class="form-otp-control"><input class="form-otp-control"></div>'],
+      ['on a slot', '<div class="form-otp"><input class="form-otp-control is-invalid"><input class="form-otp-control"></div>']
+    ])('should take a state class the server wrote %s, and give it back on dispose until a change drops it', (_, markup) => {
+      for (const drop of [false, true]) {
+        fixtureEl.innerHTML = `<form>${markup}</form><div class="invalid-feedback">This code has expired.</div>`
+        fixtureEl.querySelector('form').append(fixtureEl.querySelector('.invalid-feedback'))
+        const group = fixtureEl.querySelector('.form-otp')
+        const marked = fixtureEl.querySelector('.is-invalid')
+        const otpInput = new OTPInput(group)
+        const slots = [...fixtureEl.querySelectorAll('.form-otp-control')]
+        const { id } = fixtureEl.querySelector('.invalid-feedback')
+
+        expect(slotStates(slots)).toEqual([['true', id], ['true', id]])
+        expect(group.className).toBe('form-otp is-invalid')
+        expect(slots.some(slot => slot.classList.contains('is-invalid'))).toBeFalse()
+        expect(fixtureEl.querySelector('form').checkValidity()).toBeFalse()
+
+        if (drop) {
+          type(slots[0], '1')
+          type(slots[1], '2')
+
+          expect(group).not.toHaveClass('is-invalid')
+          expect(slotStates(slots)).toEqual([[null, null], [null, null]])
+        }
+
+        otpInput.dispose()
+
+        expect(marked.classList.contains('is-invalid')).toBe(!drop)
+        expect(fixtureEl.querySelectorAll('.is-invalid')).toHaveSize(drop ? 0 : 1)
+        expect(slotStates(slots)).toEqual([[null, null], [null, null]])
+      }
+    })
+
+    it('should take a valid class the server wrote, and give it back on dispose', () => {
+      fixtureEl.innerHTML = '<form><div class="form-otp is-valid"><input class="form-otp-control"></div></form>'
+      const group = fixtureEl.querySelector('.form-otp')
+      const otpInput = new OTPInput(group)
+
+      expect(group.className).toBe('form-otp is-valid')
+
+      otpInput.dispose()
+
+      expect(group.className).toBe('form-otp is-valid')
+    })
+
+    it('should let validationState, given at start or later, replace the server class', () => {
+      fixtureEl.innerHTML = '<form><div class="form-otp is-invalid"><input class="form-otp-control"></div></form>'
+      const group = fixtureEl.querySelector('.form-otp')
+
+      new OTPInput(group, { validationState: 'valid' }).dispose()
+
+      expect(group.className).toBe('form-otp is-invalid')
+
+      const shown = new OTPInput(group, { validationState: 'valid' })
+
+      expect(group.className).toBe('form-otp is-valid')
+
+      shown.dispose()
+
+      const otpInput = new OTPInput(group)
+
+      otpInput.setConfig({ validationState: null })
+
+      expect(group).not.toHaveClass('is-invalid')
+      expect(fixtureEl.querySelector('form').checkValidity()).toBeTrue()
 
       otpInput.dispose()
 
       expect(group).not.toHaveClass('is-invalid')
-      expect(slotStates(slots)).toEqual([[null, null], [null, null]])
     })
 
-    it('should keep the class the page wrote on the group once the code is complete', () => {
-      const { form, slots } = mountForm({ required: true })
+    it('should not take a class or aria-invalid the page writes after start, or aria-invalid on the group or a slot', async () => {
+      const { form, otpInput, slots } = mountForm({}, '', '<input class="form-otp-control" aria-invalid="true"><input class="form-otp-control">')
       const group = fixtureEl.querySelector('.form-otp')
+
+      expect(slotStates(slots)).toEqual([[null, null], [null, null]])
+
       group.classList.add('is-invalid')
+      group.setAttribute('aria-invalid', 'true')
+      slots[1].classList.add('is-invalid')
+      await Promise.resolve()
 
-      form.requestSubmit()
-      type(slots[0], '1')
-      type(slots[1], '2')
+      expect(slotStates(slots)).toEqual([[null, null], [null, null]])
+      expect(form.checkValidity()).toBeTrue()
 
-      expect(group).toHaveClass('is-invalid')
+      slots[1].classList.remove('is-invalid')
+      otpInput.dispose()
+
+      expect(slotStates(slots)).toEqual([['true', null], [null, null]])
     })
 
-    it('should let the form plugin drop its state when a paste completes the code', () => {
-      const { form, slots, valueField } = mountForm({ required: true }, 'data-coreui-validate novalidate')
+    it('should give a slot added after start the state and keep it from the form plugin', () => {
+      const { form, otpInput } = mountForm({ validationState: 'invalid' }, 'data-coreui-validate="valid" novalidate')
+      const group = fixtureEl.querySelector('.form-otp')
+      group.insertAdjacentHTML('afterbegin', '<input class="form-otp-control">')
+      otpInput.setConfig({})
+      const slots = [...fixtureEl.querySelectorAll('.form-otp-control')]
+
       Form.getOrCreateInstance(form).validate()
 
-      expect(valueField).toHaveClass('is-invalid')
+      expect(slots.map(slot => slot.getAttribute('aria-invalid'))).toEqual(['true', 'true', 'true'])
+      expect(slots[0].className).toBe('form-otp-control')
+    })
+
+    it('should not repaint the slots when setConfig changes only the validation state', () => {
+      const ariaLabel = jasmine.createSpy('ariaLabel').and.returnValue('Digit')
+      const { otpInput } = mountForm({ ariaLabel })
+      ariaLabel.calls.reset()
+
+      otpInput.setConfig({ validationState: 'invalid' })
+
+      expect(ariaLabel).not.toHaveBeenCalled()
+      expect(fixtureEl.querySelector('.form-otp')).toHaveClass('is-invalid')
+    })
+
+    it('should ignore a paste into a read-only code', () => {
+      const { form, slots, valueField } = mountForm({ readonly: true, validationState: 'invalid', value: '1' })
+      const clipboardData = new DataTransfer()
+      clipboardData.setData('text', '12')
+
+      slots[0].dispatchEvent(new ClipboardEvent('paste', { bubbles: true, cancelable: true, clipboardData }))
+
+      expect(valueField.value).toBe('1')
+      expect(fixtureEl.querySelector('.form-otp')).toHaveClass('is-invalid')
+      expect(form.checkValidity()).toBeTrue()
+    })
+
+    it.each([
+      ['typing', slots => type(slots[0], '1')],
+      ['a deletion', slots => type(slots[0], '')],
+      ['a paste', slots => {
+        const clipboardData = new DataTransfer()
+        clipboardData.setData('text', '12')
+        slots[0].dispatchEvent(new ClipboardEvent('paste', { bubbles: true, cancelable: true, clipboardData }))
+      }],
+      ['an autofill', slots => type(slots[1], '34')]
+    ])('should drop a given state through %s', (_, act) => {
+      const { form, slots } = mountForm({ validationState: 'invalid', value: '9' })
+
+      act(slots)
+
+      expect(fixtureEl.querySelector('.form-otp')).not.toHaveClass('is-invalid')
+      expect(slotStates(slots)).toEqual([[null, null], [null, null]])
+      expect(form.checkValidity()).toBe(slots.every(slot => slot.value) || slots.every(slot => !slot.value))
+    })
+
+    it('should keep a given state through changes from code and through keystrokes that leave the code as it was', () => {
+      const { form, otpInput, slots } = mountForm({ validationState: 'invalid', value: '1' })
+
+      const clipboardData = new DataTransfer()
+      clipboardData.setData('text', '1')
+
+      type(slots[1], 'a')
+      slots[1].dispatchEvent(new KeyboardEvent('keydown', { key: 'Backspace', bubbles: true }))
+      slots[0].dispatchEvent(new ClipboardEvent('paste', { bubbles: true, cancelable: true, clipboardData }))
+      otpInput.clear()
+      otpInput.reset()
+      otpInput.setConfig({ value: '12' })
+
+      expect(otpInput._inputElement.value).toBe('12')
+      expect(fixtureEl.querySelector('.form-otp')).toHaveClass('is-invalid')
+      expect(form.checkValidity()).toBeFalse()
+    })
+
+    it.each([
+      ['change.coreui.otp-input', ({ group }) => group, 'change.coreui.otp-input'],
+      ['input', ({ valueField }) => valueField, 'input'],
+      ['change', ({ valueField }) => valueField, 'change']
+    ])('should lift the block before %s and treat what the page does there as code', (_, getTarget, type_) => {
+      const { form, otpInput, slots, valueField } = mountForm({ validationState: 'invalid', value: '1' })
+      const group = fixtureEl.querySelector('.form-otp')
+      const seen = []
+
+      form.addEventListener('input', event => {
+        if (event.target === valueField) {
+          seen.push(valueField.validity.valid)
+        }
+      }, true)
+      getTarget({ group, valueField }).addEventListener(type_, () => otpInput.setConfig({ validationState: 'invalid' }), { once: true })
+      type(slots[1], '2')
+
+      expect(seen).toEqual([true])
+      expect(group).toHaveClass('is-invalid')
+      expect(form.checkValidity()).toBeFalse()
+    })
+
+    it('should send input and change from the value field when the code changes', () => {
+      const { otpInput, slots, valueField } = mountForm({})
+      const events = []
+
+      for (const name of ['input', 'change']) {
+        valueField.addEventListener(name, () => events.push([name, valueField.value]))
+      }
+
+      type(slots[0], '1')
+      type(slots[0], '1')
+      otpInput.setConfig({ value: '12' })
+      otpInput.clear()
+      otpInput.clear()
+
+      expect(events).toEqual([['input', '1'], ['change', '1'], ['input', '12'], ['change', '12'], ['input', ''], ['change', '']])
+    })
+
+    it.each([['before the reset', 'before', false], ['in a reset listener', 'listener', true], ['right after form.reset()', 'after', true]])('should put back the code it started with on a native reset and treat a state given %s as the reset says', async (_, when, kept) => {
+      const { form, otpInput, slots, valueField } = mountForm({ value: '4' }, '', '<input class="form-otp-control"><input class="form-otp-control"><input class="form-otp-control">')
+      const giveState = () => otpInput.setConfig({ validationState: 'invalid' })
+
+      type(slots[1], '5')
+      type(slots[2], '6')
+
+      if (when === 'before') {
+        giveState()
+      } else if (when === 'listener') {
+        form.addEventListener('reset', giveState)
+      }
+
+      form.reset()
+
+      if (when === 'after') {
+        giveState()
+      }
+
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(slots.map(slot => slot.value)).toEqual(['4', '', ''])
+      expect(valueField.value).toBe('4')
+      expect(slots.map(slot => slot.tabIndex)).toEqual([0, 0, -1])
+      expect(fixtureEl.querySelector('.form-otp').classList.contains('is-invalid')).toBe(kept)
+    })
+
+    it('should put back the markup defaults, not what the slots held before start, on a native reset', async () => {
+      fixtureEl.innerHTML = '<form><div class="form-otp"><input class="form-otp-control"><input class="form-otp-control" value="2"></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const slots = [...fixtureEl.querySelectorAll('.form-otp-control')]
+      slots[0].value = '1'
+      const otpInput = new OTPInput(fixtureEl.querySelector('.form-otp'))
+
+      expect(otpInput._inputElement.value).toBe('12')
+
+      form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(slots.map(slot => slot.value)).toEqual(['', '2'])
+      expect(otpInput._inputElement.value).toBe('2')
+    })
+
+    it('should let the first slot take a whole code again after a native reset empties it', async () => {
+      const { form, slots } = mountForm({})
+      type(slots[0], '1')
+
+      expect(slots[0].maxLength).toBe(1)
+
+      form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(slots[0].maxLength).toBe(2)
+    })
+
+    it('should show what the form plugin reports on the group, and drop it when a paste completes the code', () => {
+      const { form, slots } = mountForm({ required: true }, 'data-coreui-validate novalidate')
+      const group = fixtureEl.querySelector('.form-otp')
+      Form.getOrCreateInstance(form).validate()
+
+      expect(group).toHaveClass('is-invalid')
 
       const clipboardData = new DataTransfer()
       clipboardData.setData('text', '12')
       slots[0].dispatchEvent(new ClipboardEvent('paste', { bubbles: true, cancelable: true, clipboardData }))
 
-      expect(valueField).not.toHaveClass('is-invalid')
+      expect(group).not.toHaveClass('is-invalid')
       expect(slotStates(slots)).toEqual([[null, null], [null, null]])
+    })
+
+    it('should leave the value field and the slots to itself when the form plugin marks the controls', () => {
+      const { form, otpInput, slots, valueField } = mountForm({ required: true }, 'data-coreui-validate="valid" novalidate')
+      const formPlugin = Form.getOrCreateInstance(form)
+      const marks = () => [valueField, ...slots].map(control => [control.className.includes('is-'), control.getAttribute('aria-invalid')])
+
+      formPlugin.validate()
+
+      expect(marks()).toEqual([[false, null], [false, 'true'], [false, 'true']])
+
+      type(slots[0], '1')
+      type(slots[1], '2')
+      formPlugin.validate()
+
+      expect(marks()).toEqual([[false, null], [false, null], [false, null]])
+
+      otpInput.dispose()
+      formPlugin.validate()
+
+      expect(slots[0]).toHaveClass('is-valid')
     })
 
     it('should keep an aria-required the page wrote on a slot', () => {
