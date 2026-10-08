@@ -289,11 +289,44 @@ const execute = <T = any>(possibleCallback: T | ((...functionArgs: any[]) => T),
   return typeof possibleCallback === 'function' ? (possibleCallback as (...functionArgs: any[]) => T).call(...args as [any, ...any[]]) : defaultValue as T
 }
 
-// `transitionProperty` narrows the wait to that property's own `transitionend`.
-// A multi-property transition fires one event per property, and the events of a
-// run that just finished can land after the next run has started waiting — an
-// unfiltered waiter picks such a leftover up and settles a whole animation
-// early. The emulated event carries no `propertyName` and always passes.
+/**
+ * Return the unfinished CSS transitions of an element that a wait of the given length covers.
+ *
+ * @param element The element whose transitions are read.
+ * @param duration Without a property, only the transitions whose delay and duration add up to no more than this many milliseconds count.
+ * @param transitionProperty When given, only the transitions of this property count, whatever their length.
+ * @returns The transitions, or an empty list where Web Animations are not available.
+ */
+const getCoveredTransitions = (element: Element, duration: number, transitionProperty?: string): CSSTransition[] => {
+  if (typeof element.getAnimations !== 'function' || typeof CSSTransition === 'undefined') {
+    return []
+  }
+
+  return element.getAnimations().filter((animation): animation is CSSTransition =>
+    animation instanceof CSSTransition &&
+    animation.playState !== 'finished' &&
+    (transitionProperty ?
+      animation.transitionProperty === transitionProperty :
+      Number(animation.effect?.getComputedTiming().endTime) <= duration)
+  )
+}
+
+/**
+ * Run a callback once the transition of an element has finished.
+ *
+ * The callback runs on the element's own `transitionend`, or when a timer as long as the
+ * transition expires. A timer that fires more than a frame late means a busy main thread, which
+ * delayed the start of the transition too; a covered transition still running at that moment is
+ * then waited for until it finishes or is cancelled, at most as long again and one more second.
+ * In a hidden document the timer always settles. `transitionProperty` narrows the wait to that
+ * property, since the events of a run that just finished can land after the next run has started
+ * waiting.
+ *
+ * @param callback The function to run.
+ * @param transitionElement The element whose transition is waited for.
+ * @param waitForTransition When false, the callback runs at once.
+ * @param transitionProperty When given, only this property's transition is waited for.
+ */
 const executeAfterTransition = (callback: () => void, transitionElement: Element, waitForTransition = true, transitionProperty?: string): void => {
   if (!waitForTransition) {
     execute(callback)
@@ -302,8 +335,20 @@ const executeAfterTransition = (callback: () => void, transitionElement: Element
 
   const durationPadding = 5
   const emulatedDuration = getTransitionDurationFromElement(transitionElement) + durationPadding
+  const start = Date.now()
+  const transitions = getCoveredTransitions(transitionElement, emulatedDuration, transitionProperty)
 
   let called = false
+
+  const finish = (): void => {
+    if (called) {
+      return
+    }
+
+    called = true
+    transitionElement.removeEventListener(TRANSITION_END, handler)
+    execute(callback)
+  }
 
   const handler = (event: Event): void => {
     if (event.target !== transitionElement) {
@@ -315,16 +360,24 @@ const executeAfterTransition = (callback: () => void, transitionElement: Element
       return
     }
 
-    called = true
-    transitionElement.removeEventListener(TRANSITION_END, handler)
-    execute(callback)
+    finish()
   }
 
   transitionElement.addEventListener(TRANSITION_END, handler)
   setTimeout(() => {
-    if (!called) {
-      triggerTransitionEnd(transitionElement)
+    const late = Date.now() - start > emulatedDuration + 16
+    const running = called || document.hidden || !late ? [] : transitions.filter(transition => transition.playState === 'running')
+
+    if (running.length === 0) {
+      if (!called) {
+        triggerTransitionEnd(transitionElement)
+      }
+
+      return
     }
+
+    Promise.race(running.map(transition => transition.finished)).then(finish, finish)
+    setTimeout(finish, emulatedDuration + 1000)
   }, emulatedDuration)
 }
 
@@ -405,6 +458,7 @@ export {
   execute,
   executeAfterTransition,
   findShadowRoot,
+  getCoveredTransitions,
   getElement,
   getjQuery,
   getNextActiveElement,

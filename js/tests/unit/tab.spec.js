@@ -449,6 +449,32 @@ describe('Tab', () => {
         tab.show()
       })
     })
+
+    it('should leave a tab switched away from before its pane faded in unselected', async () => {
+      fixtureEl.innerHTML = [
+        '<ul class="nav" role="tablist">',
+        '  <li><button type="button" id="one" class="active" data-coreui-target="#pane-one" role="tab" aria-selected="true">One</button></li>',
+        '  <li><button type="button" id="two" data-coreui-target="#pane-two" role="tab" aria-selected="false" tabindex="-1">Two</button></li>',
+        '</ul>',
+        '<div class="tab-content">',
+        '  <div class="tab-pane active" id="pane-one" role="tabpanel" style="transition: opacity .1s">One</div>',
+        '  <div class="tab-pane" id="pane-two" role="tabpanel" style="transition: opacity .1s">Two</div>',
+        '</div>'
+      ].join('')
+
+      const one = fixtureEl.querySelector('#one')
+      const two = fixtureEl.querySelector('#two')
+
+      new Tab(two).show()
+      new Tab(one).show()
+      await new Promise(resolve => {
+        setTimeout(resolve, 200)
+      })
+
+      expect(two.getAttribute('aria-selected')).toEqual('false')
+      expect(two.getAttribute('tabindex')).toEqual('-1')
+      expect(one.getAttribute('aria-selected')).toEqual('true')
+    })
   })
 
   describe('dispose', () => {
