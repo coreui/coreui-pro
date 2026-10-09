@@ -222,6 +222,25 @@ For a validated input group, wrap the group in a [`.form-field`](/forms/field/) 
     </div>
   </form>`} />
 
+## Form components
+
+A [multi select](/forms/multi-select/#validation), a [chip input](/forms/chip-input/#validation), a [combobox](/forms/combobox/#validation), an [OTP input](/forms/otp-input/#validation), a [date input](/forms/date-input/#validation), a [time input](/forms/time-input/#validation) and the pickers built on them keep their value in a native field laid invisibly over the component. That field carries the `name`, takes part in the browser's validation and hands the focus to the component when the browser points at it. An [autocomplete](/forms/autocomplete/#validation) validates its own input. Each of these components shows one validation state, on its frame and on what takes the focus, and decides it in this order:
+
+1. its own error, such as a date outside `minDate` and `maxDate` or an incomplete code;
+2. the state you give it;
+3. the state a validation reports for its field: a submit, the [form plugin](#usage), the [stepper](/forms/stepper/#form-validation), or your own `checkValidity()` or `reportValidity()` call;
+4. `:user-invalid` or `:user-valid` of its field, in a form with `data-coreui-validate`.
+
+Give a state with the `validationState` option (`data-coreui-validation-state`), or with `.is-invalid` or `.is-valid` on the component's element in the HTML the server renders. The autocomplete, the multi select and the pickers also take the deprecated `invalid` and `valid` options. The class is read once, when the component starts; after that, set the state with `setConfig({ validationState: 'invalid' })`, since a class or an `aria-invalid` written on the element later is not read. Put the message on the page before you set the state, or call `setConfig` once it is there: a message added later, with no change of state, is not linked to the field.
+
+A given `'invalid'` blocks the submit, with the text of the component's invalid feedback as the message the browser shows, or `Invalid value.` when it has none. `'valid'` and a custom state such as `'warning'` do not block, and neither does a disabled component. A given `'valid'` shows over a reported error, but the browser's own constraints still apply, so an empty `required` field keeps blocking. A given state is a verdict on the value it was given for: the user's change of the value, such as a pick, a removed chip, the cleaner, <kbd>Backspace</kbd> or a native form reset, removes it before the change events fire, so a state you set in a `change` listener stays. A change from code, such as a method of the component, keeps it.
+
+You can bring your own validation in three ways:
+
+- **Your own rules next to the browser's.** Give the state as above, or call `setCustomValidity()` on the field that carries the value, which you reach through `form.elements` by its name. The component leaves a validity you set as it is.
+- **Taking the whole result over.** Call `preventDefault()` on `validate.coreui.form` and keep `event.isValid`, as [handling the result yourself](#handling-the-result-yourself) shows. No field is reported then, so the components show only `:user-invalid` or `:user-valid` of their field, as a plain field in the same form does after a submit attempt.
+- **Showing the errors.** A `checkValidity()` or `reportValidity()` call reports every invalid field and each component marks itself, so make that call only when the page shows the errors.
+
 ## Supported elements
 
 Validation styles are available for the following form controls and components:
