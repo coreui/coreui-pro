@@ -42,9 +42,11 @@
 ) {
   $without-error: ":not(.is-invalid, :has(.is-invalid, > :user-invalid, > .form-floating > :user-invalid))";
   $form-otp-state: ".form-otp:is(.is-#{$state}, :has(.is-#{$state}))";
+  $range-without-error: "";
 
   @if $state != "invalid" {
     $form-otp-state: "#{$form-otp-state}#{$without-error}";
+    $range-without-error: ":not(.is-invalid)";
   }
 
   .#{$state}-feedback {
@@ -300,9 +302,8 @@
 
   // Range — the validation class lives on .form-range-input, while feedback sits outside
   // the .form-range wrapper, so we use :has() to toggle it.
-  // stylelint-disable selector-no-qualifying-type
-  .form-range-input,
-  input.form-range {
+  .form-range-input#{$range-without-error},
+  input.form-range#{$range-without-error} {
     @include form-validation-state-selector($state) {
       &::-webkit-slider-thumb { background: var(--#{$prefix}#{$theme}-bg); }
       &::-moz-range-thumb { background: var(--#{$prefix}#{$theme}-bg); }
@@ -317,7 +318,6 @@
       }
     }
   }
-  // stylelint-enable selector-no-qualifying-type
 
   .form-range:has(.form-range-input.is-#{$state}) {
     ~ .#{$state}-feedback,

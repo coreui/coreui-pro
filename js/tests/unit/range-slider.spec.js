@@ -713,6 +713,10 @@ describe('RangeSlider', () => {
       expect(element.getAttribute('aria-describedby')).toEqual('budgetHelp')
       expect(inputsOf(element).map(input => input.getAttribute('aria-label'))).toEqual(['Minimum value', 'Maximum value'])
       expect(inputsOf(element).some(input => input.hasAttribute('aria-labelledby') || input.hasAttribute('aria-describedby'))).toBeFalse()
+
+      const { element: single } = mount({ value: 40 }, 'role="presentation" aria-label="Volume"')
+
+      expect(inputsOf(single)[0].getAttribute('aria-label')).toEqual('Volume')
     })
 
     it('should describe every handle with the description of the element', () => {
@@ -749,6 +753,13 @@ describe('RangeSlider', () => {
       rangeSlider.dispose()
 
       expect(element.hasAttribute('role')).toBeFalse()
+
+      const { element: region, rangeSlider: regionSlider } = mount({ value: 40 })
+
+      region.setAttribute('role', 'region')
+      regionSlider.dispose()
+
+      expect(region.getAttribute('role')).toEqual('region')
     })
   })
 
@@ -899,6 +910,7 @@ describe('RangeSlider', () => {
       expect(form.checkValidity()).toBeFalse()
 
       element.classList.add('is-valid')
+      inputsOf(element)[0].dispatchEvent(createEvent('focusout'))
 
       expect(form.checkValidity()).toBeFalse()
       expect(inputsOf(element)[0]).not.toHaveClass('is-valid')
@@ -913,6 +925,17 @@ describe('RangeSlider', () => {
 
       expect(seen).toEqual([false, true])
       expect(inputsOf(element).some(input => input.hasAttribute('aria-invalid'))).toBeFalse()
+    })
+
+    it('should keep a given state when the distance keeps a moved handle in place', () => {
+      const { element, form } = mountInForm({ distance: 5, validationState: 'invalid', value: [50, 55] })
+      const [first] = inputsOf(element)
+
+      move(first, 53)
+
+      expect(first.value).toEqual('50')
+      expect(element).toHaveClass('is-invalid')
+      expect(form.checkValidity()).toBeFalse()
     })
 
     it('should drop the server class when the user moves a handle', () => {
@@ -962,6 +985,20 @@ describe('RangeSlider', () => {
       expect(form.checkValidity()).toBeTrue()
     })
 
+    it('should drop a state given before a native reset when the page rebuilds the slider in the reset', async () => {
+      const { element, form, rangeSlider } = mountInForm({ validationState: 'invalid', value: [20, 80] })
+
+      form.addEventListener('reset', () => rangeSlider.setConfig({ max: 200 }))
+      form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(element).not.toHaveClass('is-invalid')
+      expect(inputsOf(element).some(input => input.classList.contains('is-invalid'))).toBeFalse()
+      expect(form.checkValidity()).toBeTrue()
+    })
+
     it('should keep a state given in a reset listener of the form', async () => {
       const { element, form, rangeSlider } = mountInForm({ value: 40 })
 
@@ -973,6 +1010,24 @@ describe('RangeSlider', () => {
 
       expect(element).toHaveClass('is-invalid')
       expect(form.checkValidity()).toBeFalse()
+    })
+
+    it('should keep the description of the page on every handle and add the feedback only while invalid', () => {
+      const { element, form, rangeSlider } = mountInForm({ validationState: 'invalid', value: [20, 80] }, 'aria-describedby="budgetHelp"')
+      const feedback = form.querySelector('.invalid-feedback')
+
+      expect(inputsOf(element).map(input => input.getAttribute('aria-describedby'))).toEqual([`budgetHelp ${feedback.id}`, `budgetHelp ${feedback.id}`])
+
+      rangeSlider.setConfig({ validationState: null })
+
+      expect(inputsOf(element).map(input => input.getAttribute('aria-describedby'))).toEqual(['budgetHelp', 'budgetHelp'])
+    })
+
+    it('should find the feedback named in data-coreui-invalid-feedback on the element', () => {
+      const { element } = mountInForm({ validationState: 'invalid', value: [20, 80] }, 'data-coreui-invalid-feedback="budgetError"', '<p><span id="budgetError">Pick a budget.</span></p>')
+
+      expect(inputsOf(element).map(input => input.getAttribute('aria-describedby'))).toEqual(['budgetError', 'budgetError'])
+      expect(inputsOf(element)[0].validationMessage).toEqual('Pick a budget.')
     })
 
     it('should show the state a validation reports for a handle the page sets a validity on', () => {

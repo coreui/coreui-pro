@@ -2250,7 +2250,8 @@ field behind that kept submitting.
   ("Minimum value"); a single handle takes the name of the group, followed by
   its `ariaLabel` when it has one. `aria-describedby` moves onto every handle.
   An element with a `role` of its own keeps it, with its label and
-  description, and its handles keep only their own names.
+  description; a single handle still takes its name, and several handles keep
+  only their own names.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **The range slider takes a validation state.** The new `validationState`
   option, or `.is-invalid`/`.is-valid` on the slider element read once when it
