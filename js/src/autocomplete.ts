@@ -11,6 +11,10 @@ import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { applyControlGroupClasses } from './util/form-control-group.js'
 import {
+  followUserValidity, getFeedbackIds, getValidationState, nextStateSerial, ownValidationState, setStateValidity,
+  type UserValidity, type ValidationState
+} from './util/form-validation.js'
+import {
   DefaultAllowlist, escapeHtml, sanitizeByConfig, type SanitizerAllowList, SVGAllowlist
 } from './util/sanitizer.js'
 import { CLEANER_ICON, PICKER_ICON } from './util/icons.js'
@@ -40,8 +44,8 @@ const EVENT_CHANGE = `change${EVENT_KEY}`
 const EVENT_CLICK = `click${EVENT_KEY}`
 const EVENT_INPUT = `input${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
+const EVENT_KEYUP = `keyup${EVENT_KEY}`
 const EVENT_MOUSEDOWN = `mousedown${EVENT_KEY}`
-const EVENT_RESET = `reset${EVENT_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_KEYUP_DATA_API = `keyup${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
@@ -60,6 +64,8 @@ const CLASS_NAME_SHOW = 'show'
 const SELECTOR_DATA_AUTOCOMPLETE = '[data-coreui-autocomplete]:not(.disabled)'
 const SELECTOR_DATA_TOGGLE_SHOWN = `.autocomplete:not(.disabled).${CLASS_NAME_SHOW}`
 const SELECTOR_INDICATOR = '.form-control-action'
+
+const VALIDATION_OPTIONS = new Set(['invalid', 'valid', 'validationState'])
 
 type AutocompleteConfig = {
   allowList: SanitizerAllowList
@@ -87,6 +93,7 @@ type AutocompleteConfig = {
   searchNoResultsLabel: boolean | string
   showHints: boolean
   valid: boolean
+  validationState: ValidationState | null
   value: number | string | null
 }
 
@@ -116,6 +123,7 @@ const Default: AutocompleteConfig = {
   searchNoResultsLabel: false,
   showHints: false,
   valid: false,
+  validationState: null,
   value: null
 }
 
@@ -145,6 +153,7 @@ const DefaultType: Record<string, string> = {
   searchNoResultsLabel: 'boolean|string',
   showHints: 'boolean',
   valid: 'boolean',
+  validationState: '(string|null|undefined)',
   value: '(number|string|null)'
 }
 
@@ -160,15 +169,17 @@ class Autocomplete extends ComboboxBase {
   protected declare _inputElement: any
   protected declare _inputHintElement: any
   protected declare _addedClassNames: string[]
-  protected declare _claimedText: string
+  protected declare _feedbackIds: string[]
+  protected declare _keySerial: number | null
   protected declare _previousTabIndex: string | null
-  protected declare _form: HTMLFormElement | null
-  protected declare _hostStateClassNames: string[]
   protected declare _initialValue: any
-  protected declare _ownedStateClassNames: Set<string>
   protected declare _reportSeed: boolean
-  protected declare _resetHandler: (event: Event) => void
   protected declare _seenOptionValues: Set<string>
+  protected declare _serverClasses: string[]
+  protected declare _shownText: string
+  protected declare _stateClass: string | null
+  protected declare _stateSerial: number
+  protected declare _userValidity: UserValidity | null
   protected declare _valueApplied: boolean
 
   constructor(element?: string | Element | null, config?: Partial<AutocompleteConfig> | null) {
@@ -180,8 +191,13 @@ class Autocomplete extends ComboboxBase {
     this._inputHintElement = null
     this._togglerElement = null
     this._addedClassNames = []
-    this._hostStateClassNames = [CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID].filter(className => this._element.classList.contains(className))
-    this._ownedStateClassNames = new Set(this._hostStateClassNames)
+    this._feedbackIds = []
+    this._keySerial = null
+    this._serverClasses = [CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID].filter(className => this._element.classList.contains(className))
+    this._element.classList.remove(...this._serverClasses)
+    this._shownText = ''
+    this._stateClass = null
+    this._stateSerial = nextStateSerial()
     this._previousTabIndex = null
     this._optionsElement = null
 
@@ -195,19 +211,10 @@ class Autocomplete extends ComboboxBase {
     this._valueApplied = false
     this._initialValue = this._config.value
     this._reportSeed = false
-    this._form = this._element.closest('form')
-    this._resetHandler = (event: Event) => {
-      const text = this._inputElement.value
-
-      setTimeout(() => {
-        if (this._element && !event.defaultPrevented) {
-          this._restoreInitialSelection(text)
-        }
-      })
-    }
 
     this._createAutocomplete()
-    this._claimedText = this._inputElement.value
+    ownValidationState(this._inputElement)
+    this._userValidity = followUserValidity(this._inputElement, () => this._updateValidationState(), serial => this._restoreInitialSelection(serial))
     this._updateValidationState()
     this._addEventListeners()
 
@@ -256,7 +263,7 @@ class Autocomplete extends ComboboxBase {
 
     this._disposeFloating()
     this._disposeListBox()
-    EventHandler.off(this._form, EVENT_RESET, this._resetHandler)
+    this._userValidity?.stop()
 
     for (const element of [
       this._menu,
@@ -272,13 +279,13 @@ class Autocomplete extends ComboboxBase {
       }
     }
 
-    const claimed = this._markupClaimApplies()
+    this._element.classList.remove(CLASS_NAME_SHOW, ...this._addedClassNames)
 
-    this._element.classList.remove(CLASS_NAME_SHOW, ...this._addedClassNames, ...this._ownedStateClassNames)
-
-    if (claimed) {
-      this._element.classList.add(...this._hostStateClassNames)
+    if (this._stateClass) {
+      this._element.classList.remove(this._stateClass)
     }
+
+    this._element.classList.add(...this._serverClasses)
 
     if (this._previousTabIndex === null) {
       this._element.removeAttribute('tabindex')
@@ -293,7 +300,7 @@ class Autocomplete extends ComboboxBase {
     this.deselectAll()
     this.search('')
     this._filterOptionsList()
-    this._inputElement.value = ''
+    this._setText('')
     this._updateValidationState()
 
     this._triggerChangeEvent(null)
@@ -311,7 +318,20 @@ class Autocomplete extends ComboboxBase {
   }
 
   setConfig(config: Partial<AutocompleteConfig> | null): void {
+    const keys = Object.keys(config ?? {})
+
     this._config = this._getConfig({ ...this._config, ...config })
+
+    if (keys.some(key => VALIDATION_OPTIONS.has(key))) {
+      this._serverClasses = []
+      this._stateSerial = nextStateSerial()
+    }
+
+    if (keys.length > 0 && keys.every(key => VALIDATION_OPTIONS.has(key))) {
+      this._updateValidationState()
+      return
+    }
+
     this._options = this._getOptionsFromConfig()
     this._setListBoxItems()
     this._syncInputName()
@@ -323,7 +343,7 @@ class Autocomplete extends ComboboxBase {
     if (config?.value !== undefined) {
       this._valueApplied = false
       this.deselectAll()
-      this._inputElement.value = ''
+      this._setText('')
     }
 
     this._seedSelection()
@@ -389,6 +409,8 @@ class Autocomplete extends ComboboxBase {
     })
 
     EventHandler.on(this._element, EVENT_KEYDOWN, (event: any) => {
+      this._keySerial = nextStateSerial()
+
       if (event.key === ESCAPE_KEY) {
         // An open menu owns the press; a closed one leaves it to whatever
         // encloses the field, such as a modal dialog.
@@ -399,9 +421,8 @@ class Autocomplete extends ComboboxBase {
 
         this.hide()
         if (this._config.allowOnlyDefinedOptions && this._selected.length === 0) {
+          this._emptyByUser()
           this.search('')
-          this._inputElement.value = ''
-          this._updateValidationState()
         }
 
         return
@@ -412,9 +433,15 @@ class Autocomplete extends ComboboxBase {
       }
 
       if (event.target === this._inputElement && (event.key === BACKSPACE_KEY || event.key === DELETE_KEY) && this._selected.length > 0) {
+        this._dismissValidationState(this._keySerial)
         this.deselectAll()
+        this._updateValidationState()
         this._triggerChangeEvent(null)
       }
+    })
+
+    EventHandler.on(this._element, EVENT_KEYUP, () => {
+      this._keySerial = null
     })
 
     EventHandler.on(this._menu, EVENT_KEYDOWN, (event: any) => {
@@ -446,7 +473,7 @@ class Autocomplete extends ComboboxBase {
       }
 
       if (this._config.allowOnlyDefinedOptions) {
-        this.clear()
+        this._clearByUser()
         return
       }
 
@@ -485,6 +512,11 @@ class Autocomplete extends ComboboxBase {
     EventHandler.on(this._inputElement, EVENT_INPUT, () => {
       const { value } = this._inputElement
 
+      if (value !== this._shownText) {
+        this._dismissValidationState(this._keySerial ?? Number.POSITIVE_INFINITY)
+      }
+
+      this._shownText = value
       this._updateValidationState()
 
       if (this._selected.length > 0) {
@@ -503,10 +535,6 @@ class Autocomplete extends ComboboxBase {
       }
     })
 
-    if (this._form) {
-      EventHandler.on(this._form, EVENT_RESET, this._resetHandler)
-    }
-
     EventHandler.on(this._optionsElement, EVENT_MOUSEDOWN, (event: any) => {
       // Keep focus on the input so its blur handler doesn't clear the search
       // (and re-render the list) before the click selects the option.
@@ -517,7 +545,7 @@ class Autocomplete extends ComboboxBase {
       if (!this._config.disabled) {
         event.preventDefault()
         event.stopPropagation()
-        this.clear()
+        this._clearByUser()
       }
     })
 
@@ -525,7 +553,7 @@ class Autocomplete extends ComboboxBase {
       if (!this._config.disabled && event.key === ENTER_KEY) {
         event.preventDefault()
         event.stopPropagation()
-        this.clear()
+        this._clearByUser()
       }
     })
   }
@@ -757,6 +785,10 @@ class Autocomplete extends ComboboxBase {
   }
 
   _selectOption(option: any): void {
+    if (this._inputElement.value !== option.label) {
+      this._dismissValidationState()
+    }
+
     this._applySelection(option)
     this._updateValidationState()
     this._triggerChangeEvent(option)
@@ -780,7 +812,7 @@ class Autocomplete extends ComboboxBase {
     this.deselectAll()
     this._selected.push(option)
     this._syncOptionElementState(option.value, true)
-    this._inputElement.value = option.label
+    this._setText(option.label)
     this._updateCleaner()
   }
 
@@ -794,37 +826,81 @@ class Autocomplete extends ComboboxBase {
     return this._flattenOptions().find(option => !option.disabled && option.label.toLowerCase().startsWith(text.toLowerCase()))
   }
 
-  _markupClaimApplies(): boolean {
-    return this._inputElement.value === this._claimedText
-  }
-
-  _updateValidationState(): void {
-    const claimed = this._markupClaimApplies()
-    const isInvalid = (claimed && this._hostStateClassNames.includes(CLASS_NAME_IS_INVALID)) || this._config.invalid
-    const isValid = ((claimed && this._hostStateClassNames.includes(CLASS_NAME_IS_VALID)) || this._config.valid) && !isInvalid
-
-    this._toggleStateClassName(CLASS_NAME_IS_INVALID, isInvalid)
-    this._toggleStateClassName(CLASS_NAME_IS_VALID, isValid)
-
-    if (this._element.classList.contains(CLASS_NAME_IS_INVALID)) {
-      this._inputElement.setAttribute('aria-invalid', 'true')
-    } else {
-      this._inputElement.removeAttribute('aria-invalid')
+  _clearByUser(): void {
+    if (this._selected.length > 0 || this._inputElement.value !== '') {
+      this._dismissValidationState()
     }
+
+    this.clear()
   }
 
-  _toggleStateClassName(className: string, on: boolean): void {
-    if (on) {
-      if (!this._element.classList.contains(className)) {
-        this._element.classList.add(className)
-        this._ownedStateClassNames.add(className)
-      }
+  _emptyByUser(): void {
+    if (this._inputElement.value !== '') {
+      this._dismissValidationState()
+    }
 
+    this._setText('')
+    this._updateValidationState()
+  }
+
+  _setText(text: string): void {
+    this._inputElement.value = text
+    this._shownText = text
+  }
+
+  _dismissValidationState(serial: number = Number.POSITIVE_INFINITY): void {
+    if (this._stateSerial > serial) {
       return
     }
 
-    if (this._ownedStateClassNames.delete(className)) {
-      this._element.classList.remove(className)
+    this._config.invalid = false
+    this._config.valid = false
+    this._config.validationState = null
+    this._serverClasses = []
+    this._updateValidationState()
+  }
+
+  _updateValidationState(): void {
+    const input = this._inputElement
+    const givenState = getValidationState(this._config.validationState, this._config.valid, this._config.invalid) ??
+      getValidationState(null, this._serverClasses.includes(CLASS_NAME_IS_VALID), this._serverClasses.includes(CLASS_NAME_IS_INVALID))
+
+    setStateValidity(input, givenState === 'invalid')
+
+    const state = givenState ?? this._userValidity?.read()
+    const stateClass = state ? `is-${state}` : null
+    const feedbackIds = state === 'invalid' ? getFeedbackIds(input) : []
+
+    if (stateClass !== this._stateClass) {
+      if (this._stateClass) {
+        this._element.classList.remove(this._stateClass)
+      }
+
+      if (stateClass) {
+        this._element.classList.add(stateClass)
+      }
+
+      this._stateClass = stateClass
+    }
+
+    const current: string = input.getAttribute('aria-describedby') ?? ''
+    const pageIds = current.split(/\s+/).filter(id => id && !this._feedbackIds.includes(id))
+    const describedBy = [...new Set([...pageIds, ...feedbackIds])].join(' ')
+
+    this._feedbackIds = feedbackIds.filter(id => !pageIds.includes(id))
+    this._writeInputAttribute('aria-invalid', state === 'invalid' ? 'true' : null)
+    this._writeInputAttribute('aria-describedby', describedBy || null)
+  }
+
+  _writeInputAttribute(name: string, value: string | null): void {
+    if (this._inputElement.getAttribute(name) === value) {
+      return
+    }
+
+    if (value === null) {
+      this._inputElement.removeAttribute(name)
+    } else {
+      this._inputElement.setAttribute(name, value)
     }
   }
 
@@ -845,12 +921,14 @@ class Autocomplete extends ComboboxBase {
     return event.key === ARROW_DOWN_KEY || (event.key === ENTER_KEY && event.target === this._togglerElement)
   }
 
-  _restoreInitialSelection(text: string): void {
+  _restoreInitialSelection(serial: number): void {
     const previous = this._selected[0]?.value
+    const text = this._shownText
 
+    this._dismissValidationState(serial)
     this._reportSeed = false
     this.deselectAll()
-    this._inputElement.value = ''
+    this._setText('')
 
     if (this._inputHintElement) {
       this._inputHintElement.value = ''
@@ -894,13 +972,7 @@ class Autocomplete extends ComboboxBase {
     }
 
     if (seed && !this._selected.some((option: any) => option.value === seed.value)) {
-      const claimsSeed = this._config.value === this._initialValue && this._inputElement.value === this._claimedText
-
       this._applySelection(seed)
-
-      if (claimsSeed && this._selected.includes(seed)) {
-        this._claimedText = seed.label
-      }
 
       if (this._reportSeed && this._selected.includes(seed)) {
         this._reportSeed = false
@@ -985,11 +1057,11 @@ class Autocomplete extends ComboboxBase {
       }
 
       context.hide()
-      context.search('')
       if (context._config.allowOnlyDefinedOptions && context._selected.length === 0) {
-        context._inputElement.value = ''
-        context._updateValidationState()
+        context._emptyByUser()
       }
+
+      context.search('')
     }
   }
 }

@@ -1,6 +1,7 @@
 import { userEvent } from '@vitest/browser/context'
 import Autocomplete from '../../src/autocomplete.js'
 import Dialog from '../../src/dialog.js'
+import Form from '../../src/form.js'
 import {
   clearFixture, createEvent, getFixture, jQueryMock
 } from '../helpers/fixture.js'
@@ -332,194 +333,6 @@ describe('Autocomplete', () => {
       expect(autocomplete._inputElement.getAttribute('aria-invalid')).toBe('true')
     })
 
-    it('should drop a validation class from the markup once the text changes, and bring it back with the text it started with', () => {
-      fixtureEl.innerHTML = '<div class="autocomplete is-valid"></div>'
-      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
-      const autocomplete = new Autocomplete(autocompleteEl, {
-        options: [{ label: 'Option 1', value: '1' }, { label: 'Option 2', value: '2' }],
-        value: '1'
-      })
-
-      autocomplete._onOptionSelected('2')
-
-      expect(autocompleteEl.classList.contains('is-valid')).toBeFalse()
-
-      autocomplete._onOptionSelected('1')
-
-      expect(autocompleteEl.classList.contains('is-valid')).toBeTrue()
-    })
-
-    it('should keep a validation class from the markup when the value arrives with later options', () => {
-      fixtureEl.innerHTML = '<div class="autocomplete is-invalid"></div>'
-      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
-      const autocomplete = new Autocomplete(autocompleteEl, {
-        options: [],
-        value: '3'
-      })
-
-      autocomplete.setConfig({ options: [{ label: 'Option 3', value: '3' }] })
-
-      expect(autocomplete._inputElement.value).toBe('Option 3')
-      expect(autocompleteEl.classList.contains('is-invalid')).toBeTrue()
-    })
-
-    it('should leave a validation class the page adds after construction', () => {
-      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
-      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
-      const autocomplete = new Autocomplete(autocompleteEl, {
-        options: [{ label: 'Option 1', value: '1' }]
-      })
-
-      autocompleteEl.classList.add('is-invalid')
-      autocomplete.setConfig({ options: [{ label: 'Option 1', value: '1' }, { label: 'Option 2', value: '2' }] })
-      autocomplete._onOptionSelected('2')
-
-      expect(autocompleteEl.classList.contains('is-invalid')).toBeTrue()
-    })
-
-    it('should settle its validation state before reporting a change', async () => {
-      fixtureEl.innerHTML = '<div class="autocomplete is-valid"></div>'
-      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
-      const autocomplete = new Autocomplete(autocompleteEl, {
-        options: [{ label: 'Option 1', value: '1' }],
-        value: '1'
-      })
-      const seen = []
-
-      autocompleteEl.addEventListener('change.coreui.autocomplete', () => seen.push(autocompleteEl.classList.contains('is-valid')))
-      autocomplete._inputElement.focus()
-      await userEvent.keyboard('{End}x')
-
-      expect(seen).toEqual([false])
-    })
-
-    it('should not take a validation class from the markup off while it is created', () => {
-      fixtureEl.innerHTML = '<div class="autocomplete is-valid"></div>'
-      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
-      const observer = new MutationObserver(() => {})
-
-      observer.observe(autocompleteEl, { attributeFilter: ['class'], attributeOldValue: true })
-      new Autocomplete(autocompleteEl, { // eslint-disable-line no-new
-        options: [{ label: 'Option 1', value: '1' }],
-        value: '1'
-      })
-      const oldValues = observer.takeRecords().map(record => record.oldValue)
-      observer.disconnect()
-
-      expect(oldValues.every(oldValue => oldValue.split(' ').includes('is-valid'))).toBeTrue()
-    })
-
-    it('should leave a validation class the page puts back after the autocomplete took its own off', () => {
-      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
-      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
-      const autocomplete = new Autocomplete(autocompleteEl, {
-        invalid: true,
-        options: [{ label: 'Option 1', value: '1' }, { label: 'Option 2', value: '2' }]
-      })
-
-      autocomplete.setConfig({ invalid: false })
-      autocompleteEl.classList.add('is-invalid')
-      autocomplete._onOptionSelected('2')
-
-      expect(autocompleteEl.classList.contains('is-invalid')).toBeTrue()
-      expect(autocomplete._inputElement.getAttribute('aria-invalid')).toBe('true')
-
-      autocomplete.dispose()
-
-      expect(autocompleteEl.classList.contains('is-invalid')).toBeTrue()
-    })
-
-    it('should not hold a markup verdict for an emptied field after a late value', () => {
-      fixtureEl.innerHTML = '<div class="autocomplete is-valid"></div>'
-      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
-      const autocomplete = new Autocomplete(autocompleteEl, {
-        options: [],
-        value: '3'
-      })
-
-      autocomplete.setConfig({ options: [{ label: 'Option 3', value: '3' }] })
-      autocomplete.clear()
-
-      expect(autocompleteEl.classList.contains('is-valid')).toBeFalse()
-    })
-
-    it('should not give back a markup verdict on dispose once the value changed', () => {
-      fixtureEl.innerHTML = '<div class="autocomplete is-invalid"></div>'
-      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
-      const autocomplete = new Autocomplete(autocompleteEl, {
-        options: [{ label: 'Option 1', value: '1' }, { label: 'Option 2', value: '2' }],
-        value: '1'
-      })
-
-      autocomplete._onOptionSelected('2')
-      autocomplete.dispose()
-
-      expect(autocompleteEl.classList.contains('is-invalid')).toBeFalse()
-    })
-
-    it('should follow the markup verdict through the cleaner and a form reset', async () => {
-      fixtureEl.innerHTML = '<form><div class="autocomplete is-valid"></div></form>'
-      const form = fixtureEl.querySelector('form')
-      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
-      const autocomplete = new Autocomplete(autocompleteEl, {
-        cleaner: true,
-        options: [{ label: 'Option 1', value: '1' }],
-        value: '1'
-      })
-
-      autocomplete.clear()
-
-      expect(autocompleteEl.classList.contains('is-valid')).toBeFalse()
-
-      form.reset()
-      await new Promise(resolve => {
-        setTimeout(resolve)
-      })
-
-      expect(autocompleteEl.classList.contains('is-valid')).toBeTrue()
-    })
-
-    it('should bring a markup verdict back when Escape empties a field that started empty', async () => {
-      fixtureEl.innerHTML = '<div class="autocomplete is-valid"></div>'
-      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
-      const autocomplete = new Autocomplete(autocompleteEl, {
-        allowOnlyDefinedOptions: true,
-        options: [{ label: 'Option 1', value: '1' }]
-      })
-
-      autocomplete._inputElement.focus()
-      await userEvent.keyboard('x')
-
-      expect(autocompleteEl.classList.contains('is-valid')).toBeFalse()
-
-      await userEvent.keyboard('{Escape}')
-
-      expect(autocomplete._inputElement.value).toBe('')
-      expect(autocompleteEl.classList.contains('is-valid')).toBeTrue()
-    })
-
-    it('should settle its validation state before reporting a late seed', async () => {
-      fixtureEl.innerHTML = '<form><div class="autocomplete is-valid"></div></form>'
-      const form = fixtureEl.querySelector('form')
-      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
-      const option = { label: 'Option 3', value: '3' }
-      const autocomplete = new Autocomplete(autocompleteEl, {
-        options: [option],
-        value: '3'
-      })
-      const seen = []
-
-      autocomplete.setConfig({ options: [] })
-      form.reset()
-      await new Promise(resolve => {
-        setTimeout(resolve)
-      })
-      autocompleteEl.addEventListener('change.coreui.autocomplete', () => seen.push(autocompleteEl.classList.contains('is-valid')))
-      autocomplete.setConfig({ options: [option] })
-
-      expect(seen).toEqual([true])
-    })
-
     it('should set optionsMaxHeight on the options container', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
@@ -704,6 +517,408 @@ describe('Autocomplete', () => {
       })
 
       expect(autocomplete._togglerElement.tabIndex).toBe(-1)
+    })
+  })
+
+  describe('validation', () => {
+    const OPTIONS = [{ label: 'Option 1', value: '1' }, { label: 'Option 2', value: '2' }]
+    const settle = () => new Promise(resolve => {
+      setTimeout(resolve)
+    })
+    const mountInForm = (config = {}, { attributes = '', classes = '' } = {}) => {
+      fixtureEl.innerHTML = `<form ${attributes}><div class="autocomplete ${classes}"></div><div class="invalid-feedback">Pick a country.</div><button type="submit">Send</button></form>`
+      const form = fixtureEl.querySelector('form')
+      form.addEventListener('submit', event => event.preventDefault())
+      const element = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(element, { name: 'country', options: OPTIONS, ...config })
+
+      return {
+        autocomplete, element, form, input: autocomplete._inputElement
+      }
+    }
+
+    const typeInto = (input, text) => {
+      input.value = text
+      input.dispatchEvent(new Event('input', { bubbles: true }))
+    }
+
+    it('should show validationState on the frame and the field, and block the submit with the message while it is invalid', () => {
+      const { autocomplete, element, form, input } = mountInForm({ validationState: 'invalid' })
+      const { id } = fixtureEl.querySelector('.invalid-feedback')
+
+      expect(element).toHaveClass('is-invalid')
+      expect(input.getAttribute('aria-invalid')).toBe('true')
+      expect(input.getAttribute('aria-describedby')).toBe(id)
+      expect(form.checkValidity()).toBeFalse()
+      expect(input.validationMessage).toBe('Pick a country.')
+
+      autocomplete.setConfig({ validationState: 'warning' })
+
+      expect(element.className).toContain('is-warning')
+      expect(element).not.toHaveClass('is-invalid')
+      expect(input.hasAttribute('aria-invalid')).toBeFalse()
+      expect(input.hasAttribute('aria-describedby')).toBeFalse()
+      expect(form.checkValidity()).toBeTrue()
+    })
+
+    it('should take validationState from a data attribute and let it win over the deprecated aliases', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete" data-coreui-validation-state="valid"></div>'
+      const element = fixtureEl.querySelector('.autocomplete')
+      new Autocomplete(element, { invalid: true, options: OPTIONS }) // eslint-disable-line no-new
+
+      expect(element).toHaveClass('is-valid')
+      expect(element).not.toHaveClass('is-invalid')
+    })
+
+    it('should show a given state while disabled without blocking the submit', () => {
+      const { element, form } = mountInForm({ disabled: true, validationState: 'invalid' })
+
+      expect(element).toHaveClass('is-invalid')
+      expect(form.checkValidity()).toBeTrue()
+    })
+
+    it('should change only the state when setConfig gets only validation options', () => {
+      const { autocomplete, element, input } = mountInForm({}, { classes: 'is-valid' })
+      const items = autocomplete._options
+      input.value = 'Opt'
+
+      autocomplete.setConfig({ invalid: true })
+
+      expect(autocomplete._options).toBe(items)
+      expect(input.value).toBe('Opt')
+      expect(element).toHaveClass('is-invalid')
+      expect(element).not.toHaveClass('is-valid')
+
+      autocomplete.setConfig({ invalid: false })
+
+      expect(element).not.toHaveClass('is-valid')
+
+      autocomplete.dispose()
+
+      expect(element.className).toBe('autocomplete')
+    })
+
+    it.each([
+      ['typing', ({ input }) => typeInto(input, 'x')],
+      ['a pick of a different option', ({ autocomplete }) => autocomplete._onOptionSelected('2')],
+      ['the cleaner', ({ autocomplete }) => autocomplete._cleanerElement.click()],
+      ['Enter on the cleaner', ({ autocomplete }) => autocomplete._cleanerElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))],
+      ['Backspace on the selected option', ({ input }) => input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Backspace', bubbles: true }))],
+      ['Delete on the selected option', ({ input }) => input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Delete', bubbles: true }))]
+    ])('should drop a given state and a state class from the markup through %s', (_, act) => {
+      for (const given of [{ config: { validationState: 'invalid' } }, { classes: 'is-invalid' }]) {
+        const mounted = mountInForm({ cleaner: true, value: '1', ...given.config }, { classes: given.classes ?? '' })
+
+        act(mounted)
+
+        expect(mounted.element).not.toHaveClass('is-invalid')
+        expect(mounted.input.hasAttribute('aria-invalid')).toBeFalse()
+        expect(mounted.form.checkValidity()).toBeTrue()
+
+        mounted.autocomplete.dispose()
+
+        expect(mounted.element).not.toHaveClass('is-invalid')
+      }
+    })
+
+    it.each([['Escape', 'escape'], ['a click outside', 'click'], ['leaving the field', 'blur']])('should drop a given state when %s empties a field that takes only defined options', async (_, how) => {
+      const { element, input } = mountInForm({ allowOnlyDefinedOptions: true, validationState: 'invalid' })
+      input.focus()
+      await userEvent.keyboard('Op')
+      Autocomplete.getInstance(element).setConfig({ validationState: 'invalid' })
+
+      if (how === 'escape') {
+        await userEvent.keyboard('{Escape}')
+      } else if (how === 'click') {
+        document.body.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+      } else {
+        input.blur()
+      }
+
+      expect(input.value).toBe('')
+      expect(element).not.toHaveClass('is-invalid')
+    })
+
+    it('should keep a given state when Escape leaves an empty field empty', async () => {
+      const { element, input } = mountInForm({ allowOnlyDefinedOptions: true, validationState: 'invalid' })
+      input.focus()
+
+      await userEvent.keyboard('{Escape}')
+
+      expect(element).toHaveClass('is-invalid')
+    })
+
+    it('should keep a given state through changes from code and through user actions that change nothing', () => {
+      const { autocomplete, element, form } = mountInForm({ value: '1', validationState: 'invalid' }, { classes: 'is-invalid' })
+
+      autocomplete._onOptionSelected('1')
+      autocomplete.setConfig({ options: [...OPTIONS, { label: 'Option 3', value: '3' }] })
+      autocomplete.setConfig({ value: '2' })
+      autocomplete.clear()
+      autocomplete.deselectAll()
+
+      expect(element).toHaveClass('is-invalid')
+      expect(form.checkValidity()).toBeFalse()
+
+      autocomplete.dispose()
+
+      expect(element).toHaveClass('is-invalid')
+    })
+
+    it('should lift the block before change.coreui.autocomplete and treat what the page does there as code', () => {
+      const { autocomplete, element, form, input } = mountInForm({ validationState: 'invalid' })
+      const seen = []
+
+      element.addEventListener('change.coreui.autocomplete', () => {
+        seen.push(input.validity.valid)
+        autocomplete.setConfig({ validationState: 'invalid' })
+      }, { once: true })
+      autocomplete._onOptionSelected('2')
+
+      expect(seen).toEqual([true])
+      expect(element).toHaveClass('is-invalid')
+      expect(form.checkValidity()).toBeFalse()
+    })
+
+    it('should keep a state the page gives on the change Backspace reports through the input of the same key', async () => {
+      const { autocomplete, element, input } = mountInForm({ value: '1', validationState: 'invalid' })
+
+      element.addEventListener('change.coreui.autocomplete', () => autocomplete.setConfig({ validationState: 'invalid' }), { once: true })
+      input.focus()
+      input.setSelectionRange(input.value.length, input.value.length)
+      await userEvent.keyboard('{Backspace}')
+
+      expect(input.value).toBe('Option ')
+      expect(element).toHaveClass('is-invalid')
+    })
+
+    it('should show what a validation reports on the frame and the field, and leave the field to itself when the form plugin marks the controls', () => {
+      const { element, form, input } = mountInForm({ required: true }, { attributes: 'data-coreui-validate novalidate' })
+
+      Form.getOrCreateInstance(form).validate()
+
+      const { id } = fixtureEl.querySelector('.invalid-feedback')
+
+      expect(element).toHaveClass('is-invalid')
+      expect(input.getAttribute('aria-invalid')).toBe('true')
+      expect(input.getAttribute('aria-describedby')).toBe(id)
+      expect(input.className).toBe('form-control')
+
+      typeInto(input, 'Option 1')
+
+      expect(element).not.toHaveClass('is-invalid')
+      expect(input.hasAttribute('aria-invalid')).toBeFalse()
+    })
+
+    it('should not read aria-invalid on the element, nor a state class the page writes after start', () => {
+      fixtureEl.innerHTML = '<form><div class="autocomplete" aria-invalid="true"></div></form>'
+      const element = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(element, { options: OPTIONS })
+
+      element.classList.add('is-invalid')
+      autocomplete._onOptionSelected('2')
+
+      expect(autocomplete._inputElement.hasAttribute('aria-invalid')).toBeFalse()
+      expect(element.getAttribute('aria-invalid')).toBe('true')
+      expect(fixtureEl.querySelector('form').checkValidity()).toBeTrue()
+    })
+
+    it('should block the submit for a state class from the markup', () => {
+      expect(mountInForm({}, { classes: 'is-invalid' }).form.checkValidity()).toBeFalse()
+    })
+
+    it('should keep the description the page gives its input and add the message only while it is invalid', () => {
+      const { autocomplete, input } = mountInForm()
+      const observer = new MutationObserver(() => {})
+      input.setAttribute('aria-describedby', 'help')
+
+      autocomplete.setConfig({ validationState: 'invalid' })
+      const { id } = fixtureEl.querySelector('.invalid-feedback')
+
+      expect(input.getAttribute('aria-describedby')).toBe(`help ${id}`)
+
+      observer.observe(input, { attributeFilter: ['aria-describedby', 'aria-invalid'] })
+      autocomplete.setConfig({ options: OPTIONS })
+      input.dispatchEvent(new Event('focusout'))
+
+      expect(observer.takeRecords()).toHaveSize(0)
+      observer.disconnect()
+
+      typeInto(input, 'x')
+
+      expect(input.getAttribute('aria-describedby')).toBe('help')
+    })
+
+    it('should describe the input with the message named in data-coreui-invalid-feedback on the element', () => {
+      fixtureEl.innerHTML = '<form><p id="ac-message">Pick a country.</p><div class="autocomplete" data-coreui-invalid-feedback="ac-message"></div></form>'
+      const autocomplete = new Autocomplete(fixtureEl.querySelector('.autocomplete'), { options: OPTIONS, validationState: 'invalid' })
+
+      expect(autocomplete._inputElement.getAttribute('aria-describedby')).toBe('ac-message')
+      expect(autocomplete._inputElement.validationMessage).toBe('Pick a country.')
+    })
+
+    it.each([['leaving the field', 'blur'], ['Enter', 'enter']])('should keep a given state when %s picks the option the text already names', (_, how) => {
+      for (const disabled of [false, true]) {
+        const { autocomplete, element, input } = mountInForm({ options: [{ label: 'Option 1', value: '1', disabled }, { label: 'Option 2', value: '2' }] })
+        typeInto(input, 'Option 1')
+        autocomplete.setConfig({ validationState: 'invalid' })
+
+        if (how === 'blur') {
+          input.dispatchEvent(new FocusEvent('blur'))
+        } else {
+          input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }))
+        }
+
+        expect(element).toHaveClass('is-invalid')
+        autocomplete.dispose()
+      }
+    })
+
+    it('should keep a given state when an input leaves the text as it was', () => {
+      const { autocomplete, element, input } = mountInForm()
+      typeInto(input, 'Germany')
+      autocomplete.setConfig({ validationState: 'invalid' })
+
+      typeInto(input, 'Germany')
+
+      expect(element).toHaveClass('is-invalid')
+
+      autocomplete._onOptionSelected('1')
+      autocomplete.setConfig({ validationState: 'invalid' })
+      typeInto(input, 'Option 1')
+
+      expect(element).toHaveClass('is-invalid')
+    })
+
+    it('should not let a key that changed nothing hold back the next change', () => {
+      const { autocomplete, element, input } = mountInForm()
+
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Shift', bubbles: true }))
+      input.dispatchEvent(new KeyboardEvent('keyup', { key: 'Shift', bubbles: true }))
+      autocomplete.setConfig({ validationState: 'invalid' })
+      typeInto(input, 'x')
+
+      expect(element).not.toHaveClass('is-invalid')
+    })
+
+    it('should treat two inputs without a key between them as two actions', () => {
+      const { autocomplete, element, input } = mountInForm()
+
+      element.addEventListener('input.coreui.autocomplete', event => {
+        if (event.value === 'a') {
+          autocomplete.setConfig({ validationState: 'invalid' })
+        }
+      })
+      typeInto(input, 'a')
+
+      expect(element).toHaveClass('is-invalid')
+
+      typeInto(input, 'ab')
+
+      expect(element).not.toHaveClass('is-invalid')
+    })
+
+    it('should lift the block before input.coreui.autocomplete when the cleaner empties the field', () => {
+      const { autocomplete, element, input } = mountInForm({ cleaner: true, value: '1', validationState: 'invalid' })
+      const seen = []
+
+      element.addEventListener('input.coreui.autocomplete', () => seen.push([input.validity.valid, element.classList.contains('is-invalid'), input.getAttribute('aria-invalid')]))
+      autocomplete._cleanerElement.click()
+
+      expect(seen[0]).toEqual([true, false, null])
+    })
+
+    it('should keep a state the page gives on input.coreui.autocomplete when Escape empties a field that takes only defined options', async () => {
+      const { autocomplete, element, input } = mountInForm({ allowOnlyDefinedOptions: true })
+
+      element.addEventListener('input.coreui.autocomplete', event => {
+        if (event.value === '') {
+          autocomplete.setConfig({ validationState: 'invalid' })
+        }
+      })
+      input.focus()
+      await userEvent.keyboard('Op')
+      await userEvent.keyboard('{Escape}')
+
+      expect(input.value).toBe('')
+      expect(element).toHaveClass('is-invalid')
+    })
+
+    it('should keep the state class from the markup when setConfig rejects the options', () => {
+      const { autocomplete, element, input } = mountInForm({}, { classes: 'is-invalid' })
+
+      expect(() => autocomplete.setConfig({ validationState: 1 })).toThrowError(TypeError)
+
+      input.dispatchEvent(new Event('focusout'))
+
+      expect(element).toHaveClass('is-invalid')
+    })
+
+    it('should report the free text a native reset clears, also when the page gives a state right after it', async () => {
+      const { autocomplete, element, form, input } = mountInForm()
+      const changes = []
+      typeInto(input, 'foo')
+      element.addEventListener('change.coreui.autocomplete', event => changes.push(event.value))
+
+      form.reset()
+      autocomplete.setConfig({ validationState: 'invalid' })
+      await settle()
+
+      expect(changes).toEqual([null])
+      expect(element).toHaveClass('is-invalid')
+
+      typeInto(input, 'foo')
+
+      expect(element).not.toHaveClass('is-invalid')
+    })
+
+    it('should settle its state before it reports a value that arrives with late options after a reset', async () => {
+      const { autocomplete, element, form } = mountInForm({ options: [], required: true, value: '3' })
+      const seen = []
+
+      form.reset()
+      await settle()
+      form.checkValidity()
+
+      expect(element).toHaveClass('is-invalid')
+
+      element.addEventListener('change.coreui.autocomplete', () => seen.push(element.classList.contains('is-invalid')))
+      autocomplete.setConfig({ options: [{ label: 'Option 3', value: '3' }] })
+
+      expect(seen).toEqual([false])
+    })
+
+    it.each([['before the reset', 'before', false], ['in a reset listener', 'listener', true], ['right after form.reset()', 'after', true]])('should put back the value it started with on a native reset and treat a state given %s as the reset says', async (_, when, kept) => {
+      const { autocomplete, element, form, input } = mountInForm({ value: '1' })
+      const giveState = () => autocomplete.setConfig({ validationState: 'invalid' })
+
+      autocomplete._onOptionSelected('2')
+
+      if (when === 'before') {
+        giveState()
+      } else if (when === 'listener') {
+        form.addEventListener('reset', giveState)
+      }
+
+      form.reset()
+
+      if (when === 'after') {
+        giveState()
+      }
+
+      await settle()
+
+      expect(input.value).toBe('Option 1')
+      expect(element.classList.contains('is-invalid')).toBe(kept)
+    })
+
+    it('should drop a state class from the markup on a native reset', async () => {
+      const { element, form } = mountInForm({ value: '1' }, { classes: 'is-valid' })
+
+      form.reset()
+      await settle()
+
+      expect(element).not.toHaveClass('is-valid')
     })
   })
 

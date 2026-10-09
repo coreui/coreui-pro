@@ -39,6 +39,7 @@ const ATTRIBUTE_INVALID_FEEDBACK = 'data-coreui-invalid-feedback'
 const CLASS_NAME_IS_INVALID = 'is-invalid'
 const CLASS_NAME_IS_VALID = 'is-valid'
 const SELECTOR_ARIA_HIDDEN = '[aria-hidden="true"]'
+const SELECTOR_AUTOCOMPLETE = '.autocomplete'
 const SELECTOR_CHIP_INPUT = '.chip-input'
 const SELECTOR_CHOICE = '[type="checkbox"], [type="radio"]'
 const SELECTOR_COMBOBOX_SELECT = '.combobox-select'
@@ -157,8 +158,9 @@ const getFollowingFeedback = (element: Element, control: FormControl): Element[]
 /**
  * Finds the element that stands for a control in the layout: the `.form-date-time` field for the
  * value field laid over it, the `.form-otp` group for its value field and its slots, the
- * `.chip-input` for its value field and its text field, and the `.combobox-toggle` for the
- * `.combobox-select` right after it, which the messages follow, otherwise the control itself.
+ * `.chip-input` for its value field and its text field, the `.autocomplete` for the text field it
+ * builds, and the `.combobox-toggle` for the `.combobox-select` right after it, which the messages
+ * follow, otherwise the control itself.
  *
  * @param control - The control
  * @returns The element the layout places the control's messages around
@@ -166,7 +168,7 @@ const getFollowingFeedback = (element: Element, control: FormControl): Element[]
 const getLayoutElement = (control: FormControl): Element => {
   const previous = control.previousElementSibling
 
-  return control.closest(`${SELECTOR_CHIP_INPUT}, ${SELECTOR_DATE_TIME}, ${SELECTOR_OTP}`) ??
+  return control.closest(`${SELECTOR_AUTOCOMPLETE}, ${SELECTOR_CHIP_INPUT}, ${SELECTOR_DATE_TIME}, ${SELECTOR_OTP}`) ??
     (control.matches(SELECTOR_COMBOBOX_SELECT) && previous?.matches(SELECTOR_COMBOBOX_TOGGLE) ? previous : control)
 }
 
