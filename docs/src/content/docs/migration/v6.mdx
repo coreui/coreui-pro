@@ -1063,6 +1063,20 @@ check, radio, carousel and toggler icons already work:
   generated `name` when the option was not set, so a form carried a key nobody
   chose. It does not now, and a name given later through `setConfig()` reaches
   the input, which it never did. The generated `id` is unaffected.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **Validation state comes from `validationState`.** `invalid` and `valid` are
+  deprecated aliases of `validationState: 'invalid'` and `'valid'`, and
+  `validationState` also takes a state from `$form-validation-states`. A given
+  `'invalid'`, from the options or from an `.is-invalid` class in the markup, now
+  blocks the submit, and the next change the user makes to the value drops it,
+  while a change from code keeps it. The markup class is read once, when the
+  component starts, so it no longer comes back when the text returns to the
+  value it started with, a native form reset drops it, and a class written later
+  is not read. A validation that reports the input, from a
+  submit or the page's own `checkValidity()`, now shows on the frame, and the
+  autocomplete is the only one that writes `aria-invalid` and the message link on
+  its input: the form plugin and the stepper leave the input to it. See
+  [Validation](/forms/autocomplete/#validation).
 
 #### Menu (new) and Dropdown
 
