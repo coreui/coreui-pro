@@ -466,10 +466,10 @@ The hidden `<select>` takes part in the browser's validation, so `required` bloc
 
 The state comes from four places, in this order:
 
-- The `validationState` option: `'valid'`, `'invalid'` or a state you added to `$form-validation-states`. The `invalid` and `valid` options work as aliases; `invalid` wins when both are set, and both are ignored once `validationState` is set.
+- The `validationState` option: `'valid'`, `'invalid'` or a state you added to `$form-validation-states`.
 - An `.is-invalid` or `.is-valid` class written on the toggle in the markup, for example by a server that has already checked the value. It is read once, when the component starts.
 - A validation that reports the hidden select invalid: a submit, `checkValidity()` or `reportValidity()`, which the form plugin and the [stepper](/forms/stepper/) call as well. From then on the toggle shows it invalid whenever the value is invalid, until a native reset of the form.
-- In a form with `data-coreui-validate`, the `:user-invalid` and `:user-valid` states of the hidden select.
+- In a form with `data-coreui-validate`, the `:user-invalid` state of the hidden select, and with `data-coreui-validate="valid"` also its `:user-valid` state.
 
 A state you give, with the option or with the class, is a verdict on the value it was given for, so the next change of the value the user makes in the list drops it; picking the option a single combobox already holds keeps it. What your code does in a `change.coreui.combobox`, `input` or `change` listener while the pick runs counts as your change, so a state you give there stays, and a change through `setValue()`, `clear()` or `setItems()` keeps the state. To set it again, call `setConfig({ validationState })`: it updates the state without rebuilding the combobox, replaces a class written on the toggle, so `setConfig({ validationState: null })` withdraws that class, and the validation options are the only ones `setConfig` changes for now. While the given state is `'invalid'`, the select blocks the submit with the text of the linked message, or `Invalid value.` when there is none; a disabled combobox does not block. A native reset of the form puts back the value the combobox started with and drops a state given before it; a state you give from a `reset` listener on the form, or right after `form.reset()`, stays. A message placed where the stylesheet does not show it for the toggle can be named in `data-coreui-invalid-feedback` on the toggle.
 
@@ -537,7 +537,6 @@ const combobox = new coreui.Combobox('#myCombobox', {
 | `disabled` | boolean | `false` | Turns the control off: the panel never opens and the list box is disabled. The `disabled` attribute on the toggle sets it too. |
 | `html` | boolean | `false` | Parses the labels rendered from `items` as HTML instead of inserting them as text. |
 | `indicator` | string | `'none'` | `'checkbox'` puts a decorative checkbox in front of every option. |
-| `invalid` | boolean | `false` | Deprecated alias of `validationState: 'invalid'`, ignored once `validationState` is set. |
 | `items` | array | `[]` | The options to render: `{ value, label, description, disabled, selected }`, or `{ label, items }` for a section. Replaces whatever the panel already holds. |
 | `multiple` | boolean | `false` | Toggles options instead of replacing the selection, and keeps the panel open. |
 | `name` | string, null | `null` | Name of the hidden select the value is submitted under, inserted right before the toggle. With `multiple` it posts one key per value, as a `<select multiple>` does: `tags=a&tags=b&tags=c`. Without a name the combobox is not submitted with the form. |
@@ -551,7 +550,6 @@ const combobox = new coreui.Combobox('#myCombobox', {
 | `selectedLabel` | string, function | `` (count) => `${count} selected` `` | What the toggle shows past one selected option in `multiple` mode. A function `(count, total) => string`, or a string in which `{count}` and `{total}` are replaced. |
 | `selectionLimit` | null, number | `null` | How many options can be selected at once in `multiple` mode. |
 | `typeahead` | boolean | `true` | Move the highlight to the option matching what the user types. The buffer resets after 500 ms. |
-| `valid` | boolean | `false` | Deprecated alias of `validationState: 'valid'`, ignored once `validationState` is set. |
 | `validationState` | string, null | `null` | The state the combobox shows: `'valid'`, `'invalid'` or a state of `$form-validation-states`. `'invalid'` blocks the submit. The user's pick of a different value drops it. See [Validation](#validation). |
 | `value` | string, array, null | `null` | Initially selected values, merged with the options marked `.selected` in the markup. A string is one value, commas included; pass an array for several. |
 
@@ -565,7 +563,7 @@ const combobox = new coreui.Combobox('#myCombobox', {
 | `getOrCreateInstance` | Static method which returns a combobox instance associated to a DOM element or creates a new one in case it wasn't initialized. You can use it like this: `coreui.Combobox.getOrCreateInstance(element)`. |
 | `getValue()` | The selected value — an array in `multiple` mode, a string or `null` otherwise. |
 | `hide` | Closes the panel. |
-| `setConfig(config)` | Changes the validation state: `setConfig({ validationState })`, or the `invalid` and `valid` aliases. Other options are ignored for now. See [Validation](#validation). |
+| `setConfig(config)` | Changes the validation state: `setConfig({ validationState })`. Other options are ignored for now. See [Validation](#validation). |
 | `setItems(items)` | Rebuilds the list from an `items` array. Values that are still there keep their selection, the rest drop out. |
 | `setValue(value)` | Replaces the selection with `value` (a string, an array, or `null` to empty it). |
 | `show` | Opens the panel. |

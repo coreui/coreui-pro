@@ -97,7 +97,6 @@ describe('Combobox', () => {
         disabled: false,
         html: false,
         indicator: 'none',
-        invalid: false,
         items: [],
         multiple: false,
         name: null,
@@ -111,7 +110,6 @@ describe('Combobox', () => {
         selectedLabel: jasmine.any(Function),
         selectionLimit: null,
         typeahead: true,
-        valid: false,
         validationState: null,
         value: null
       })
@@ -636,12 +634,20 @@ describe('Combobox', () => {
       expect(form.checkValidity()).toBeTrue()
     })
 
-    it('should let the option win over a class from the markup, and take the deprecated aliases until validationState is set', () => {
+    it('should take no state from invalid or valid', () => {
+      const toggle = setMarkupInForm()
+      const combobox = new Combobox(toggle, { invalid: true, valid: true })
+
+      expect([...toggle.classList].some(name => name.startsWith('is-'))).toBeFalse()
+      expect(combobox._valueField.validity.valid).toBeTrue()
+    })
+
+    it('should let the option win over a class from the markup', () => {
       const toggle = setMarkupInForm()
 
       toggle.classList.add('is-valid')
 
-      const combobox = new Combobox(toggle, { invalid: true, validationState: undefined })
+      const combobox = new Combobox(toggle, { validationState: 'invalid' })
 
       expect(toggle.classList.contains('is-invalid')).toBeTrue()
       expect(toggle.classList.contains('is-valid')).toBeFalse()
@@ -651,7 +657,7 @@ describe('Combobox', () => {
       expect(toggle.classList.contains('is-valid')).toBeTrue()
       expect(combobox._config.placeholder).toBe('')
 
-      combobox.setConfig({ invalid: false, validationState: null })
+      combobox.setConfig({ invalid: true, validationState: null })
 
       expect(toggle.classList.contains('is-valid')).toBeFalse()
       expect(toggle.classList.contains('is-invalid')).toBeFalse()
@@ -678,14 +684,14 @@ describe('Combobox', () => {
       expect(form.checkValidity()).toBeTrue()
     })
 
-    it.each([['a class in the markup', true], ['the deprecated alias', false]])('should drop a state given through %s with a pick in the list', (_, fromClass) => {
+    it.each([['a class in the markup', true], ['the option', false]])('should drop a state given through %s with a pick in the list', (_, fromClass) => {
       const toggle = setMarkupInForm()
 
       if (fromClass) {
         toggle.classList.add('is-invalid')
       }
 
-      const combobox = new Combobox(toggle, fromClass ? {} : { invalid: true })
+      const combobox = new Combobox(toggle, fromClass ? {} : { validationState: 'invalid' })
 
       pick(combobox, 'ca')
 

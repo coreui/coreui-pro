@@ -129,10 +129,10 @@ The chip input carries its chips in a hidden `<textarea>` the browser validates,
 
 The state comes from four places, in this order:
 
-- The `validationState` option: `'valid'`, `'invalid'` or a state you added to `$form-validation-states`. The `invalid` and `valid` options work as aliases; `invalid` wins when both are set, and both are ignored once `validationState` is set.
+- The `validationState` option: `'valid'`, `'invalid'` or a state you added to `$form-validation-states`.
 - An `.is-invalid` or `.is-valid` class written on the chip input in the markup, for example by a server that has already checked the value. It is read once, when the component starts.
 - A validation that reports the field invalid: a submit, `checkValidity()` or `reportValidity()`, which the form plugin and the [stepper](/forms/stepper/) call as well. From then on the chip input shows it invalid whenever its value is invalid, until a native reset of the form.
-- In a form with `data-coreui-validate`, the `:user-invalid` and `:user-valid` states of the hidden field.
+- In a form with `data-coreui-validate`, the `:user-invalid` state of the hidden field, and with `data-coreui-validate="valid"` also its `:user-valid` state.
 
 A state you give, with the option or with the class, is a verdict on the chips it was given for, so the next change of the chips the user makes drops it: a value confirmed with <kbd>Enter</kbd>, a separator or by leaving the text field, a paste, or a chip removed with its button, <kbd>Backspace</kbd> or <kbd>Delete</kbd>. An action that changes nothing, such as entering a value the field already holds, keeps it. One action drops the state once, at its first change, so a state you give from a `change.coreui.chip-input`, `input` or `change` listener while the action runs stays. A change your own code makes with `add()`, `remove()` or `clear()` keeps it. To set it again, call `setConfig({ validationState })`: it updates the state without rebuilding the field, replaces a class written on the chip input, so `setConfig({ validationState: null })` withdraws that class, and the validation options are the only ones `setConfig` changes for now. A message placed where the stylesheet does not show it for the chip input can be named in `data-coreui-invalid-feedback` on the chip input. While the given state is `'invalid'`, the field blocks the submit with the text of the linked message, or `Invalid value.` when there is none; a disabled or read-only chip input does not block. A native reset of the form puts back the chips the field started with, the same elements, and drops a state given before it; a state you give from a `reset` listener on the form, or right after `form.reset()`, stays.
 
@@ -221,7 +221,6 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `disabled` | boolean | `false` | Disables the input and marks managed chips as non-interactive. |
 | `filter` | boolean | `false` | Turns the chips into filter chips: a check icon is shown on the selected ones. Implies `selectable`. |
 | `id` | string \| null | auto-generated | Custom id for the generated hidden field. |
-| `invalid` | boolean | `false` | Deprecated alias of `validationState: 'invalid'`, ignored once `validationState` is set. |
 | `maxChips` | number \| null | `null` | Maximum number of chips allowed. `null` for unlimited. |
 | `name` | string \| null | `null` | Name for the generated hidden field, which is what carries the chips into a form submission. Without a name that field is not submitted. |
 | `placeholder` | string | `''` | Placeholder text for dynamically created inputs. |
@@ -235,7 +234,6 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `separator` | string \| null | `','` | Character that triggers chip creation when typed. Set to `null` to disable. |
 | `typeahead` | boolean | `true` | Moves focus to the chip whose value starts with the typed characters. |
 | `unique` | boolean | `true` | Refuses a chip whose value the field already holds. A Chip Input turns this on, where a bare [Chip Set](/components/chip-set/) leaves it off. |
-| `valid` | boolean | `false` | Deprecated alias of `validationState: 'valid'`, ignored once `validationState` is set. |
 | `validationState` | string \| null | `null` | The state the chip input shows: `'valid'`, `'invalid'` or a state of `$form-validation-states`. `'invalid'` blocks the submit. The user's next change of the chips drops it. See [Validation](#validation). |
 
 ### Methods
@@ -251,7 +249,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `getValues()` | Returns an array of all chip values. |
 | `remove(chipOrValue)` | Removes a chip by element reference or value string. Focus moves to the text field only when the chip had it. Returns `true` if removed. |
 | `removeSelected()` | Removes all currently selected chips. |
-| `setConfig(config)` | Changes the validation state: `setConfig({ validationState })`, or the `invalid` and `valid` aliases. Other options are ignored for now. See [Validation](#validation). |
+| `setConfig(config)` | Changes the validation state: `setConfig({ validationState })`. Other options are ignored for now. See [Validation](#validation). |
 | `selectChip(chip)` | Selects a specific chip element. |
 
 ```js

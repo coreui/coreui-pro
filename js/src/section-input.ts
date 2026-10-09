@@ -82,8 +82,6 @@ const HOST_CLASS_NAMES = [
 const SELECTOR_SECTION = '.form-date-time-section'
 const SELECTOR_VALUE_FIELD = 'textarea'
 
-const VALIDATION_OPTIONS = new Set(['invalid', 'valid', 'validationState'])
-
 export type SectionInputConfig = {
   ariaDayLabel: string
   ariaHourLabel: string
@@ -103,7 +101,6 @@ export type SectionInputConfig = {
   format: SectionFormat
   hourPlaceholder: string | null
   inputDateParse: ((value: string) => Date | null) | null
-  invalid: boolean
   locale: string
   maxDate: Date | number | string | null
   meridiemPlaceholder: string | null
@@ -116,7 +113,6 @@ export type SectionInputConfig = {
   readonly: boolean
   required: boolean
   secondPlaceholder: string | null
-  valid: boolean
   validationState: ValidationState | null
   weekPlaceholder: string | null
   yearPlaceholder: string | null
@@ -141,7 +137,6 @@ const Default: SectionInputConfig = {
   format: null,
   hourPlaceholder: null,
   inputDateParse: null,
-  invalid: false,
   locale: 'default',
   maxDate: null,
   meridiemPlaceholder: null,
@@ -154,7 +149,6 @@ const Default: SectionInputConfig = {
   readonly: false,
   required: false,
   secondPlaceholder: null,
-  valid: false,
   validationState: null,
   weekPlaceholder: null,
   yearPlaceholder: null
@@ -179,7 +173,6 @@ const DefaultType: Record<string, string> = {
   format: '(function|string|null)',
   hourPlaceholder: '(string|null)',
   inputDateParse: '(function|null)',
-  invalid: 'boolean',
   locale: 'string',
   maxDate: '(date|number|string|null)',
   meridiemPlaceholder: '(string|null)',
@@ -192,7 +185,6 @@ const DefaultType: Record<string, string> = {
   readonly: 'boolean',
   required: 'boolean',
   secondPlaceholder: '(string|null)',
-  valid: 'boolean',
   validationState: '(string|null|undefined)',
   weekPlaceholder: '(string|null)',
   yearPlaceholder: '(string|null)'
@@ -326,12 +318,12 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
 
     const keys = Object.keys(config ?? {})
 
-    if (keys.some(key => VALIDATION_OPTIONS.has(key))) {
+    if (keys.includes('validationState')) {
       this._serverClasses = []
       this._stateSerial = nextStateSerial()
     }
 
-    if (keys.length > 0 && keys.every(key => VALIDATION_OPTIONS.has(key))) {
+    if (keys.length === 1 && keys[0] === 'validationState') {
       this._config = this._getConfig({ ...this._config, ...config })
       this._updateValidity()
       return
@@ -754,7 +746,7 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
   }
 
   _updateValidity(): void {
-    const givenState = getValidationState(this._config.validationState, this._config.valid, this._config.invalid) ??
+    const givenState = getValidationState(this._config.validationState) ??
       getValidationState(null, this._serverClasses.includes(CLASS_NAME_IS_VALID), this._serverClasses.includes(CLASS_NAME_IS_INVALID)) ??
       this._ownerState
 
@@ -792,8 +784,6 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
 
   _dismissValidationState(serial: number = Number.POSITIVE_INFINITY): void {
     if (this._stateSerial <= serial) {
-      this._config.invalid = false
-      this._config.valid = false
       this._config.validationState = null
       this._serverClasses = []
     }

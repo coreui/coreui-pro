@@ -334,8 +334,6 @@ class DatePicker extends PickerBase {
     }, {
       ...(this._config.floatingLabel ? { ariaLabel: this._config.floatingLabel } : {}),
       ...this._config.inputOptions,
-      invalid: false,
-      valid: false,
       validationState: null
     }))
     this._input._setOwnerDismiss((serial: number) => this._dismissValidationState(serial))

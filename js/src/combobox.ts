@@ -82,8 +82,6 @@ const SELECTOR_POPUP = '.popup'
 const SELECTOR_SEARCH = '[data-coreui-list-box-search]'
 const SELECTOR_VALUE = '.combobox-value'
 
-const VALIDATION_OPTIONS = ['invalid', 'valid', 'validationState']
-
 type ComboboxConfig = {
   allowList: SanitizerAllowList
   ariaSearchLabel: string
@@ -92,7 +90,6 @@ type ComboboxConfig = {
   disabled: boolean
   html: boolean
   indicator: string
-  invalid: boolean
   items: ListBoxEntry[]
   multiple: boolean
   name: string | null
@@ -106,7 +103,6 @@ type ComboboxConfig = {
   selectedLabel: CountLabel
   selectionLimit: number | null
   typeahead: boolean
-  valid: boolean
   validationState: ValidationState | null
   value: string | string[] | null
 }
@@ -119,7 +115,6 @@ const Default: ComboboxConfig = {
   disabled: false,
   html: false,
   indicator: 'none',
-  invalid: false,
   items: [],
   multiple: false,
   name: null,
@@ -133,7 +128,6 @@ const Default: ComboboxConfig = {
   selectedLabel: (count: number) => `${count} selected`,
   selectionLimit: null,
   typeahead: true,
-  valid: false,
   validationState: null,
   value: null
 }
@@ -146,7 +140,6 @@ const DefaultType: Record<string, string> = {
   disabled: 'boolean',
   html: 'boolean',
   indicator: 'string',
-  invalid: 'boolean',
   items: 'array',
   multiple: 'boolean',
   name: '(string|null)',
@@ -160,7 +153,6 @@ const DefaultType: Record<string, string> = {
   selectedLabel: '(string|function)',
   selectionLimit: '(null|number)',
   typeahead: 'boolean',
-  valid: 'boolean',
   validationState: '(string|null|undefined)',
   value: '(string|array|null)'
 }
@@ -266,15 +258,13 @@ class Combobox extends ComboboxBase {
   }
 
   setConfig(config: Partial<ComboboxConfig> | null): void {
-    const keys = VALIDATION_OPTIONS.filter(key => config && key in config) as (keyof ComboboxConfig)[]
-
-    if (keys.length === 0) {
+    if (!config || !('validationState' in config)) {
       return
     }
 
     this._serverClasses = []
     this._stateSerial = nextStateSerial()
-    this._config = this._getConfig({ ...this._config, ...Object.fromEntries(keys.map(key => [key, config![key]])) })
+    this._config = this._getConfig({ ...this._config, validationState: config.validationState })
     this._updateValidity()
   }
 
@@ -677,14 +667,12 @@ class Combobox extends ComboboxBase {
       return
     }
 
-    this._config.invalid = false
-    this._config.valid = false
     this._config.validationState = null
     this._serverClasses = []
   }
 
   _updateValidity(): void {
-    const givenState = getValidationState(this._config.validationState, this._config.valid, this._config.invalid) ??
+    const givenState = getValidationState(this._config.validationState) ??
       getValidationState(null, this._serverClasses.includes(CLASS_NAME_IS_VALID), this._serverClasses.includes(CLASS_NAME_IS_INVALID))
 
     setStateValidity(this._valueField, givenState === 'invalid')

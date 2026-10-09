@@ -43,19 +43,15 @@ const CLASS_NAME_GROUP = 'form-control-group'
 const CLASS_NAME_IS_INVALID = 'is-invalid'
 const CLASS_NAME_IS_VALID = 'is-valid'
 
-const VALIDATION_OPTIONS = ['invalid', 'valid', 'validationState']
-
 type ChipInputConfig = ChipSetConfig & {
   create: boolean
   createOnBlur: boolean
   id: string | null
-  invalid: boolean
   name: string | null
   placeholder: string
   readonly: boolean
   required: boolean
   separator: string | null
-  valid: boolean
   validationState: ValidationState | null
 }
 
@@ -64,7 +60,6 @@ const Default: ChipInputConfig = {
   create: true,
   createOnBlur: true,
   id: null,
-  invalid: false,
   name: null,
   placeholder: '',
   readonly: false,
@@ -72,7 +67,6 @@ const Default: ChipInputConfig = {
   required: false,
   separator: ',',
   unique: true,
-  valid: false,
   validationState: null
 }
 
@@ -81,13 +75,11 @@ const DefaultType: Record<string, string> = {
   create: 'boolean',
   createOnBlur: 'boolean',
   id: '(string|null)',
-  invalid: 'boolean',
   name: '(string|null)',
   placeholder: 'string',
   readonly: 'boolean',
   required: 'boolean',
   separator: '(string|null)',
-  valid: 'boolean',
   validationState: '(string|null|undefined)'
 }
 
@@ -191,15 +183,13 @@ class ChipInput extends ChipSet {
   }
 
   setConfig(config: Partial<ChipInputConfig> | null): void {
-    const keys = VALIDATION_OPTIONS.filter(key => config && key in config) as (keyof ChipInputConfig)[]
-
-    if (keys.length === 0) {
+    if (!config || !('validationState' in config)) {
       return
     }
 
     this._serverClasses = []
     this._stateSerial = nextStateSerial()
-    this._config = this._getConfig({ ...this._config, ...Object.fromEntries(keys.map(key => [key, config![key]])) })
+    this._config = this._getConfig({ ...this._config, validationState: config.validationState })
     this._updateValidity()
   }
 
@@ -321,15 +311,13 @@ class ChipInput extends ChipSet {
       return
     }
 
-    this._config.invalid = false
-    this._config.valid = false
     this._config.validationState = null
     this._serverClasses = []
   }
 
   _updateValidity(): void {
     const field = this._valueField
-    const givenState = getValidationState(this._config.validationState, this._config.valid, this._config.invalid) ??
+    const givenState = getValidationState(this._config.validationState) ??
       getValidationState(null, this._serverClasses.includes(CLASS_NAME_IS_VALID), this._serverClasses.includes(CLASS_NAME_IS_INVALID))
 
     if (field) {

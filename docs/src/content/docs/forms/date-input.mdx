@@ -205,7 +205,7 @@ The field shows its validation state on the element and on its sections, and lin
 The state comes from five places, in this order:
 
 - The limits: a completed date outside `minDate`/`maxDate`/`disabledDates` makes the field invalid until it is corrected, whatever else is set, and until then the value field submits no date, as `getDate()` returns none; a read-only field holding such a date submits none either. A date before year 1 counts as before `minDate` even without that option; when the field loses the focus, its year becomes 1.
-- The `validationState` option: `'valid'`, `'invalid'` or a state you added to `$form-validation-states`. The `invalid` and `valid` options still work as aliases; `invalid` wins when both are set, and both are ignored once `validationState` is set.
+- The `validationState` option: `'valid'`, `'invalid'` or a state you added to `$form-validation-states`.
 - An `.is-invalid` or `.is-valid` class written on the element in the markup, for example by a server that has already checked the date. It is read once, when the component starts.
 - A validation that reports the field invalid: a submit, `checkValidity()` or `reportValidity()`, which the form plugin and the [stepper](/forms/stepper/) call as well. From then on the field shows it invalid whenever its date is invalid, until a native reset of the form.
 - In a form with `data-coreui-validate`, the `:user-invalid` and `:user-valid` states of the value field, the same states the stylesheet reads on a native field. A field becomes `.is-valid` after a submit only when the form opts into success styling with `data-coreui-validate="valid"`.
@@ -342,7 +342,6 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | `format` | function, string, null | `null` | Mask layout: `null` derives it from the locale, a string is parsed as format tokens, a function receives the locale and returns the section layout |
 | `hourPlaceholder` | string, null | `null` | Replaces the `HH` (`hh` on a 12-hour clock) the hour section shows while it is empty. |
 | `inputDateParse` | function, null | `null` | Custom parser used for pasted text, e.g. a date library |
-| `invalid` | boolean | `false` | Deprecated alias of `validationState: 'invalid'`, ignored once `validationState` is set. |
 | `locale` | string | `'default'` | Locale used to derive the mask layout and month names |
 | `maxDate` | date, number, string, null | `null` | Latest selectable date |
 | `meridiemPlaceholder` | string, null | `null` | Replaces the `AM` the meridiem section shows while it is empty. |
@@ -357,7 +356,6 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | `secondPlaceholder` | string, null | `null` | Replaces the `ss` the second section shows while it is empty. |
 | `seconds` | boolean | `false` | Include a seconds section in the locale-derived layout of `type="datetime"` |
 | `type` | string | `'date'` | Which sections the locale-derived layout carries: `'date'` or `'datetime'`. A `format` names the sections itself and overrides this. |
-| `valid` | boolean | `false` | Deprecated alias of `validationState: 'valid'`, ignored once `validationState` is set. |
 | `validationState` | string, null | `null` | The validation state the field shows: `'valid'`, `'invalid'` or a state of `$form-validation-states`. `'invalid'` also blocks the submit. The next change of the date by the user clears it, see [Validation](#validation). |
 | `weekPlaceholder` | string, null | `null` | Replaces the `WW` the week section shows while it is empty. |
 | `yearPlaceholder` | string, null | `null` | Replaces the `YYYY` the year section shows while it is empty. |
@@ -369,7 +367,7 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | `clear` | Clear all sections |
 | `getDate` | Return the current date, or `null` when incomplete or invalid |
 | `reset` | Reset the field to the date it was created with, emitting `dateChange` when the value moves. A native form reset does the same. |
-| `setConfig` | Merges the given options over the current configuration and re-renders the field. Options you leave out keep their current value. Without `date` the field keeps what the user typed, and when the new options change the sections, such as a new format, only a complete date carries over. A call that only changes `validationState`, `invalid` or `valid` updates the state without re-rendering. |
+| `setConfig` | Merges the given options over the current configuration and re-renders the field. Options you leave out keep their current value. Without `date` the field keeps what the user typed, and when the new options change the sections, such as a new format, only a complete date carries over. A call that only changes `validationState` updates the state without re-rendering. |
 
 ```javascript
 const dateInput = coreui.DateInput.getInstance(document.querySelector('#myDateInput'))

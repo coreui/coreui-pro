@@ -255,8 +255,6 @@ class TimePicker extends PickerBase {
     }, {
       ...(this._config.floatingLabel ? { ariaLabel: this._config.floatingLabel } : {}),
       ...this._config.inputOptions,
-      invalid: false,
-      valid: false,
       validationState: null
     }))
 

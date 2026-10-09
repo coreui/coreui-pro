@@ -104,7 +104,7 @@ The built-in token parser covers dayjs, moment, date-fns, and luxon format strin
 
 ## Validation
 
-The field takes its validation state [the same way as the date input](/forms/date-input/#validation): a completed time outside `minDate`/`maxDate` makes it invalid whatever else is set, then the `validationState` option (with `invalid` and `valid` as deprecated aliases) or an `.is-invalid`/`.is-valid` class written on the element in the markup, then a validation that reported the field, and in a form with `data-coreui-validate` the `:user-invalid` and `:user-valid` states of its value field. A given state drops on the next change the user makes to the time and stays through changes your code makes; `setConfig({ validationState })` sets it again without re-rendering the field. A given `'invalid'` blocks the submit with the text of the linked message, or `Invalid value.` when there is none. Sibling `.valid-feedback`/`.invalid-feedback` elements work as with any other form control, and while the field is invalid the error message describes every section.
+The field takes its validation state [the same way as the date input](/forms/date-input/#validation): a completed time outside `minDate`/`maxDate` makes it invalid whatever else is set, then the `validationState` option or an `.is-invalid`/`.is-valid` class written on the element in the markup, then a validation that reported the field, and in a form with `data-coreui-validate` the `:user-invalid` state of its value field, with `data-coreui-validate="valid"` also its `:user-valid` state. A given state drops on the next change the user makes to the time and stays through changes your code makes; `setConfig({ validationState })` sets it again without re-rendering the field. A given `'invalid'` blocks the submit with the text of the linked message, or `Invalid value.` when there is none. Sibling `.valid-feedback`/`.invalid-feedback` elements work as with any other form control, and while the field is invalid the error message describes every section.
 
 <Example pro code={`<div class="mb-3 form-field">
     <div class="form-control form-date-time" data-coreui-time-input data-coreui-format="HH:mm" data-coreui-date="09:30" data-coreui-validation-state="valid"></div>
@@ -201,7 +201,6 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | `format` | function, string, null | `null` | Mask layout: `null` derives it from the locale, a string is parsed as format tokens, a function receives the locale and returns the section layout |
 | `hourPlaceholder` | string, null | `null` | Replaces the `HH` (`hh` on a 12-hour clock) the hour section shows while it is empty. |
 | `inputDateParse` | function, null | `null` | Custom parser used for pasted text, e.g. a date library |
-| `invalid` | boolean | `false` | Deprecated alias of `validationState: 'invalid'`, ignored once `validationState` is set. |
 | `locale` | string | `'default'` | Locale used to derive the hour cycle and layout |
 | `maxDate` | date, number, string, null | `null` | Latest selectable time |
 | `meridiemPlaceholder` | string, null | `null` | Replaces the `AM` the meridiem section shows while it is empty. |
@@ -212,7 +211,6 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | `required` | boolean | `false` | Required attribute of the value input |
 | `secondPlaceholder` | string, null | `null` | Replaces the `ss` the second section shows while it is empty. |
 | `seconds` | boolean | `false` | Include a seconds section in the locale-derived layout |
-| `valid` | boolean | `false` | Deprecated alias of `validationState: 'valid'`, ignored once `validationState` is set. |
 | `validationState` | string, null | `null` | The validation state the field shows: `'valid'`, `'invalid'` or a state of `$form-validation-states`. `'invalid'` also blocks the submit. The next change of the time by the user clears it, see [Validation](#validation). |
 
 ### Methods
@@ -222,7 +220,7 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | `clear` | Clear all sections |
 | `getDate` | Return the current time as a `Date` on 1970-01-01, or `null` when incomplete or invalid |
 | `reset` | Reset the field to its initial time |
-| `setConfig` | Merges the given options over the current configuration and re-renders the field. Options you leave out keep their current value. Without `date` the field keeps what the user typed, and when the new options change the sections, such as a new format, only a complete time carries over. A call that only changes `validationState`, `invalid` or `valid` updates the state without re-rendering. |
+| `setConfig` | Merges the given options over the current configuration and re-renders the field. Options you leave out keep their current value. Without `date` the field keeps what the user typed, and when the new options change the sections, such as a new format, only a complete time carries over. A call that only changes `validationState` updates the state without re-rendering. |
 
 ```javascript
 const timeInput = coreui.TimeInput.getInstance(document.querySelector('#myTimeInput'))

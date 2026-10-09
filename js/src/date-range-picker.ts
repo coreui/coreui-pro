@@ -321,11 +321,9 @@ class DateRangePicker extends PickerBase {
     this._rangeInput = new DateRangeInput(inputGroup, this._forwardConfig(DateRangeInput, {
       disabled: this._config.disabled,
       endDate: this._config.endDate,
-      invalid: false,
       locale: this._config.locale,
       size: this._config.size,
       startDate: this._config.startDate,
-      valid: false,
       validationState: null,
       ...(format ? { format } : {})
     }, { inputOptions: this._config.inputOptions }))
