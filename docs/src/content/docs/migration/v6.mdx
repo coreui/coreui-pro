@@ -2243,15 +2243,22 @@ field behind that kept submitting.
   array with one name per handle, as before, a comma-separated string, or a
   function `(index, total) => string`, the shape the OTP input uses for its
   digits; `data-coreui-aria-labels` becomes `data-coreui-aria-label`.
-- **The range slider names every handle after the field.** An `aria-label`,
-  `aria-labelledby` or `aria-describedby` on the slider element moves onto the
-  handles: the field name comes in front of each handle's own name ("Budget
-  Minimum value"), and every handle carries the description, so
-  `role="group"` on the element is no longer needed. Handle names that
-  already repeat the field (`aria-labelledby="budgetLabel"` with
-  `["Minimum budget", "Maximum budget"]`) now read "Budget Minimum budget":
-  shorten them to `["Minimum", "Maximum"]`. An element that keeps a `role` of
-  its own keeps its label and description.
+- **The range slider element is a group named after the field.** The
+  component gives it `role="group"`, so an `aria-label` or `aria-labelledby` on
+  it names the group, and a screen reader announces it when the focus enters
+  the slider. With several handles, each handle carries only its own name
+  ("Minimum value"); a single handle takes the name of the group, followed by
+  its `ariaLabel` when it has one. `aria-describedby` moves onto every handle.
+  An element with a `role` of its own keeps it, with its label and
+  description, and its handles keep only their own names.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The range slider takes a validation state.** The new `validationState`
+  option, or `.is-invalid`/`.is-valid` on the slider element read once when it
+  starts, shows on the element and on the handles, and a given `'invalid'`
+  blocks the submit through the first handle until the user moves a handle or
+  the form is reset. A class written on the element later is not read; set
+  the state with `setConfig({ validationState })`. See
+  [Validation](/forms/range-slider/#validation).
 - **Range slider interaction follows the native control.** Pressing a handle no
   longer moves it a step; a press on the track or a clickable tick moves the
   nearest handle and it follows the pointer (mouse, touch or pen), with

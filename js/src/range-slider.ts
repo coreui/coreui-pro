@@ -9,6 +9,10 @@ import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import {
+  followUserValidity, getFeedbackIds, getValidationState, nextStateSerial, ownValidationState, setStateValidity,
+  type UserValidity, type ValidationState
+} from './util/form-validation.js'
+import {
   defineJQueryPlugin, getUID, isRTL, jQueryDispatch
 } from './util/index.js'
 import {
@@ -54,10 +58,14 @@ const HOST_ATTRIBUTES = ['aria-describedby', 'aria-label', 'aria-labelledby']
 const CLASS_NAME_FORM_RANGE = 'form-range'
 const CLASS_NAME_FORM_RANGE_INPUT = 'form-range-input'
 const CLASS_NAME_FORM_RANGE_VERTICAL = 'form-range-vertical'
+const CLASS_NAME_IS_INVALID = 'is-invalid'
+const CLASS_NAME_IS_VALID = 'is-valid'
 const CLASS_NAME_TICKS_CLICKABLE = 'form-range-ticks-clickable'
 const CLASS_NAME_TOOLTIP_END = 'bs-tooltip-end'
 const CLASS_NAME_TOOLTIP_START = 'bs-tooltip-start'
 const CLASS_NAME_TOOLTIP_TOP = 'bs-tooltip-top'
+
+const STATE_CLASSES = [CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID]
 
 const PROPERTY_FILL = '--cui-range-fill'
 const PROPERTY_FILL_START = '--cui-range-fill-start'
@@ -84,6 +92,7 @@ type RangeSliderConfig = {
   tooltips: boolean | 'always'
   tooltipsFormat: ((value: number) => string) | null
   track: boolean | string
+  validationState: ValidationState | null
   value: number[] | number | string
   vertical: boolean
 }
@@ -114,6 +123,7 @@ const Default: RangeSliderConfig = {
   tooltips: true,
   tooltipsFormat: null,
   track: 'fill',
+  validationState: null,
   value: 0,
   vertical: false
 }
@@ -136,6 +146,7 @@ const DefaultType: Record<string, string> = {
   tooltips: '(boolean|string)',
   tooltipsFormat: '(function|null)',
   track: '(boolean|string)',
+  validationState: '(string|null|undefined)',
   value: '(array|number)',
   vertical: 'boolean'
 }
@@ -145,15 +156,21 @@ const DefaultType: Record<string, string> = {
  */
 
 class RangeSlider extends BaseComponent {
+  protected declare _addedRole: boolean
   protected declare _config: RangeSliderConfig
   protected declare _form: HTMLFormElement | null
   protected declare _hostAttributes: Map<string, string>
   protected declare _inputs: HTMLInputElement[]
   protected declare _press: RangeSliderPress | null
+  protected declare _releaseValidationState: (() => void) | null
   protected declare _resetTimeout: ReturnType<typeof setTimeout> | null
+  protected declare _serverMarks: string[]
+  protected declare _stateClass: string | null
+  protected declare _stateSerial: number
   protected declare _tickPoints: RangeTickPoint[]
   protected declare _ticks: HTMLElement | null
   protected declare _tooltips: HTMLElement[]
+  protected declare _userValidity: UserValidity[]
   protected declare _wrapper: HTMLElement | null
   protected declare _onChange: (event: Event) => void
   protected declare _onInput: (event: Event) => void
@@ -170,21 +187,34 @@ class RangeSlider extends BaseComponent {
       return
     }
 
+    this._addedRole = !this._element.hasAttribute('role')
     this._form = null
     this._inputs = []
     this._press = null
+    this._releaseValidationState = null
     this._resetTimeout = null
+    this._serverMarks = STATE_CLASSES.filter(name => this._element.classList.contains(name))
+    this._stateClass = null
+    this._stateSerial = nextStateSerial()
     this._tickPoints = []
     this._ticks = null
     this._tooltips = []
+    this._userValidity = []
     this._wrapper = null
     this._hostAttributes = new Map()
+
+    this._element.classList.remove(...this._serverMarks)
+
+    if (this._addedRole) {
+      this._element.setAttribute('role', 'group')
+    }
 
     this._onInput = event => {
       const input = event.target as HTMLInputElement
 
       if (this._inputs.includes(input)) {
         this._constrain(input)
+        this._dismissValidationState()
         this._update()
         EventHandler.trigger(this._element, EVENT_INPUT, { value: this._values() })
       }
@@ -226,6 +256,17 @@ class RangeSlider extends BaseComponent {
   setConfig(config: Partial<RangeSliderConfig>): void {
     const current = config && 'value' in config ? null : this._values()
     this._config = this._getConfig({ ...this._config, ...config }) as RangeSliderConfig
+
+    if (config && 'validationState' in config) {
+      this._serverMarks = []
+      this._stateSerial = nextStateSerial()
+
+      if (Object.keys(config).length === 1) {
+        this._updateValidity()
+        return
+      }
+    }
+
     this._teardown()
     this._build(current)
   }
@@ -237,10 +278,20 @@ class RangeSlider extends BaseComponent {
 
     this._teardown()
 
-    for (const [name, value] of this._hostAttributes) {
-      if (!this._element.hasAttribute(name)) {
-        this._element.setAttribute(name, value)
-      }
+    if (this._stateClass) {
+      this._element.classList.remove(this._stateClass)
+    }
+
+    this._element.classList.add(...this._serverMarks)
+
+    if (this._addedRole) {
+      this._element.removeAttribute('role')
+    }
+
+    const describedBy = this._hostAttributes.get('aria-describedby')
+
+    if (describedBy && !this._element.hasAttribute('aria-describedby')) {
+      this._element.setAttribute('aria-describedby', describedBy)
     }
 
     super.dispose()
@@ -250,7 +301,7 @@ class RangeSlider extends BaseComponent {
   _build(current: number[] | null = null): void {
     const { tooltipClass, tooltips, vertical } = this._config
 
-    this._takeHostAttributes()
+    this._readHostAttributes()
     this._wrapper = document.createElement('div')
     this._wrapper.className = CLASS_NAME_FORM_RANGE
     this._wrapper.classList.toggle(CLASS_NAME_FORM_RANGE_VERTICAL, vertical)
@@ -279,13 +330,28 @@ class RangeSlider extends BaseComponent {
     }
 
     this._form = this._inputs[0]?.form ?? null
+    this._userValidity = this._inputs.map((input, index) => followUserValidity(
+      input,
+      () => this._updateValidity(),
+      index === 0 ? serial => this._dismissValidationState(serial) : undefined
+    ))
+    this._releaseValidationState = ownValidationState(...this._inputs)
     this._addEventListeners()
     this._update()
+    this._updateValidity()
   }
 
   _teardown(): void {
     clearTimeout(this._resetTimeout!)
     this._releasePress()
+
+    for (const follower of this._userValidity) {
+      follower.stop()
+    }
+
+    this._releaseValidationState?.()
+    this._releaseValidationState = null
+    this._userValidity = []
 
     if (this._wrapper) {
       EventHandler.off(this._wrapper, EVENT_INPUT, SELECTOR_INPUT, this._onInput)
@@ -353,8 +419,8 @@ class RangeSlider extends BaseComponent {
     return input
   }
 
-  _takeHostAttributes(): void {
-    if (this._element.hasAttribute('role')) {
+  _readHostAttributes(): void {
+    if (!this._addedRole) {
       return
     }
 
@@ -363,9 +429,12 @@ class RangeSlider extends BaseComponent {
 
       if (value !== null) {
         this._hostAttributes.set(name, value)
-        this._element.removeAttribute(name)
+      } else if (name !== 'aria-describedby') {
+        this._hostAttributes.delete(name)
       }
     }
+
+    this._element.removeAttribute('aria-describedby')
   }
 
   _nameInput(input: HTMLInputElement, index: number): void {
@@ -376,6 +445,14 @@ class RangeSlider extends BaseComponent {
 
     if (describedBy) {
       input.setAttribute('aria-describedby', describedBy)
+    }
+
+    if ((this._config.value as number[]).length > 1) {
+      if (handleLabel) {
+        input.setAttribute('aria-label', handleLabel)
+      }
+
+      return
     }
 
     if (labelledBy && handleLabel) {
@@ -418,6 +495,75 @@ class RangeSlider extends BaseComponent {
 
   _values(): number[] {
     return this._inputs.map(input => Number(input.value))
+  }
+
+  _dismissValidationState(serial: number = Number.POSITIVE_INFINITY): void {
+    if (this._stateSerial > serial) {
+      return
+    }
+
+    this._config.validationState = null
+    this._serverMarks = []
+    this._updateValidity()
+  }
+
+  _updateValidity(): void {
+    const [first] = this._inputs
+
+    if (!first) {
+      return
+    }
+
+    const givenState = getValidationState(this._config.validationState) ??
+      getValidationState(null, this._serverMarks.includes(CLASS_NAME_IS_VALID), this._serverMarks.includes(CLASS_NAME_IS_INVALID))
+
+    if (givenState !== 'invalid') {
+      setStateValidity(first, false)
+    }
+
+    const reported = this._userValidity.map(follower => follower.read())
+    const state = givenState ?? (reported.includes('invalid') ? 'invalid' : reported.find(Boolean))
+    const stateClass = state ? `is-${state}` : null
+    const previousClass = this._stateClass
+
+    if (stateClass !== previousClass) {
+      if (previousClass) {
+        this._element.classList.remove(previousClass)
+      }
+
+      if (stateClass) {
+        this._element.classList.add(stateClass)
+      }
+
+      this._stateClass = stateClass
+    }
+
+    setStateValidity(first, givenState === 'invalid')
+
+    const feedbackIds = state === 'invalid' ? getFeedbackIds(first) : []
+    const describedBy = [...new Set([...(this._hostAttributes.get('aria-describedby') ?? '').split(/\s+/), ...feedbackIds])].filter(Boolean)
+
+    for (const input of this._inputs) {
+      if (previousClass && previousClass !== stateClass) {
+        input.classList.remove(previousClass)
+      }
+
+      if (stateClass) {
+        input.classList.add(stateClass)
+      }
+
+      if (describedBy.length > 0) {
+        input.setAttribute('aria-describedby', describedBy.join(' '))
+      } else {
+        input.removeAttribute('aria-describedby')
+      }
+
+      if (state === 'invalid') {
+        input.setAttribute('aria-invalid', 'true')
+      } else {
+        input.removeAttribute('aria-invalid')
+      }
+    }
   }
 
   _update(): void {

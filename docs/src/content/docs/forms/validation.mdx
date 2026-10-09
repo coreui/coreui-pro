@@ -224,7 +224,7 @@ For a validated input group, wrap the group in a [`.form-field`](/forms/field/) 
 
 ## Form components
 
-A [multi select](/forms/multi-select/#validation), a [chip input](/forms/chip-input/#validation), a [combobox](/forms/combobox/#validation), an [OTP input](/forms/otp-input/#validation), a [date input](/forms/date-input/#validation), a [time input](/forms/time-input/#validation) and the pickers built on them keep their value in a native field laid invisibly over the component. That field carries the `name`, takes part in the browser's validation and hands the focus to the component when the browser points at it. An [autocomplete](/forms/autocomplete/#validation) validates its own input. Each of these components shows one validation state, on its frame and on what takes the focus, and decides it in this order:
+A [multi select](/forms/multi-select/#validation), a [chip input](/forms/chip-input/#validation), a [combobox](/forms/combobox/#validation), an [OTP input](/forms/otp-input/#validation), a [date input](/forms/date-input/#validation), a [time input](/forms/time-input/#validation) and the pickers built on them keep their value in a native field laid invisibly over the component. That field carries the `name`, takes part in the browser's validation and hands the focus to the component when the browser points at it. An [autocomplete](/forms/autocomplete/#validation) validates its own input, and a [range slider](/forms/range-slider/#validation) its handles. Each of these components shows one validation state, on its frame and on what takes the focus, and decides it in this order:
 
 1. its own error, such as a date outside `minDate` and `maxDate` or an incomplete code;
 2. the state you give it;

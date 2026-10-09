@@ -39,7 +39,7 @@ Create a simple range slider with default settings.
 
 ## With form field
 
-Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label and description, and to get validation feedback in the right place. Point the slider element's `aria-labelledby` at the label and its `aria-describedby` at the description: the component moves both onto the handles, so every handle is named by the label followed by its own name, "Budget Minimum" here, and described by the text below (see [Accessibility](#accessibility)).
+Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label and description, and to get validation feedback in the right place. Point the slider element's `aria-labelledby` at the label and its `aria-describedby` at the description: the slider element is a group named by the label, "Budget" here, its handles carry their own names, "Minimum" and "Maximum", and the component moves the description onto every handle (see [Accessibility](#accessibility)).
 
 <Example pro code={`<div class="form-field">
     <span class="form-label" id="budgetLabel">Budget</span>
@@ -169,6 +169,27 @@ The theme class on the slider colours the track and the handles; the tooltip kee
 <Example pro class="d-flex flex-column gap-3" code={`<div data-coreui-range-slider data-coreui-value="40" data-coreui-tooltip-class="theme-secondary" data-coreui-aria-label='["Secondary tooltip"]'></div>
   <div class="theme-danger" data-coreui-range-slider data-coreui-value="60" data-coreui-tooltip-class="theme-danger" data-coreui-aria-label='["Danger slider, danger tooltip"]'></div>`} />
 
+## Validation
+
+A range never fails the browser's own validation: a handle always holds a value between `min` and `max` on a step, and `required` does not apply to it. A state comes from the page, when the value breaks a rule the browser does not know, such as a budget below the minimum of a plan.
+
+- Give it with the `validationState` option (`data-coreui-validation-state`), or with `.is-invalid` or `.is-valid` on the slider element in the HTML the server renders. The class is read once, when the slider starts; after that, use `setConfig({ validationState })`, which changes the state without building the handles again.
+- The state shows on the slider element and on its handles: `'invalid'` colours the thumbs, sets `aria-invalid` on every handle and adds the invalid feedback that follows the slider element to their `aria-describedby`.
+- `'invalid'` blocks the submit through the first handle, with the text of the feedback as the message the browser shows, or `Invalid value.` without one, and the browser moves the focus to that handle. `'valid'` and a custom state do not block, and neither does a disabled slider.
+- The user's move of a handle, or a native form reset, removes the state before the change events fire. A change from code, such as `setConfig({ value })`, keeps it.
+- A validity you set on a handle with `setCustomValidity()` shows on the slider once a validation reports it, and a given `'valid'` shows over it.
+
+<Example pro code={`<form class="row g-3" data-coreui-validate novalidate>
+    <div class="col-12 form-field">
+      <span class="form-label" id="planBudgetLabel">Budget</span>
+      <div class="is-invalid" aria-labelledby="planBudgetLabel" data-coreui-range-slider data-coreui-name="planBudgetMin, planBudgetMax" data-coreui-value="5, 40" data-coreui-aria-label='["Minimum", "Maximum"]'></div>
+      <div class="invalid-feedback">The Team plan starts at 10 thousand a month.</div>
+    </div>
+    <div class="col-12">
+      <button class="btn-solid theme-primary" type="submit">Save</button>
+    </div>
+  </form>`} />
+
 ## Usage
 
 ### Via data attributes
@@ -234,6 +255,7 @@ Please note that for security reasons, the `sanitize`, `sanitizeFn`, and `allowL
 | `tooltips` | boolean, `'always'` | `true` | Shows the current value of each handle: `true` on hover, drag and focus, `'always'` at all times, `false` never. |
 | `tooltipsFormat` | function, null | `null` | Provides a custom formatting function for tooltip values. |
 | `track` | boolean, 'fill' | `'fill'` | Controls the visual representation of the slider's track. When set to `'fill'`, the track is dynamically filled based on the slider's value(s). Setting it to `false` disables the filled track. |
+| `validationState` | string, null | `null` | The validation state the page gives the slider: `'valid'`, `'invalid'` or a state added to `$form-validation-states`. See [Validation](#validation). |
 | `value` | array, number | `0` | Sets the initial value(s) of the slider. |
 | `vertical` | boolean | `false` | Rotates the slider to a vertical orientation. |
 
@@ -266,7 +288,7 @@ myRangeSlider.addEventListener('change.coreui.range-slider', event => {
 
 Each handle is a native `<input type="range">`, so it is a slider with its value, minimum and maximum without any ARIA of its own, and the browser handles the keyboard: the arrow keys, <kbd>Page Up</kbd>, <kbd>Page Down</kbd>, <kbd>Home</kbd> and <kbd>End</kbd>. In a vertical slider the handles carry `aria-orientation="vertical"`, and <kbd>→</kbd> increases the value in every browser, as <kbd>↑</kbd> does.
 
-Every handle's own name says what it sets, so a screen reader that lists the controls of the page can tell the handles of one slider from another's. Give the slider element the name of the field, with `aria-labelledby` pointing at a visible label or with `aria-label`: the component moves it onto the handles, where it comes in front of each handle's name, "Budget Minimum value" and "Budget Maximum value", and moves `aria-describedby` onto every handle as well. Name the handles themselves with `ariaLabel`: an array with one name per handle, a comma-separated string, or a function `(index, total) => string`. Without it, two handles are named "Minimum value" and "Maximum value" and more handles "Value 1", "Value 2" and so on. A single handle has no generated name: it takes the name of the slider element, followed by its `ariaLabel` when it has one, and there is no `<label for>` to point at the generated input. A slider element with a `role` of its own keeps its label and description, and the handles keep only their own names. `dispose()` gives the slider element its attributes back, unless the page has set them again in the meantime. While a handle sits on a labelled tick, its `aria-valuetext` adds the label to the value ("50, Medium", or the `tooltipsFormat` text followed by the label when they differ).
+The slider element is a `group`. Give it the name of the field, with `aria-labelledby` pointing at a visible label or with `aria-label`: a screen reader announces the group, "Budget", when the focus enters it, and then each handle by its own name, so it can tell the handles of one slider from another's. The component moves `aria-describedby` onto every handle. Name the handles themselves with `ariaLabel`: an array with one name per handle, a comma-separated string, or a function `(index, total) => string`. Without it, two handles are named "Minimum value" and "Maximum value" and more handles "Value 1", "Value 2" and so on. A single handle has no generated name: it takes the name of the group, followed by its `ariaLabel` when it has one, and there is no `<label for>` to point at the generated input. A slider element with a `role` of its own keeps it, with its label and description, and the handles keep only their own names. `dispose()` takes the role back and gives the slider element its description back, unless the page has set it again in the meantime. While a handle sits on a labelled tick, its `aria-valuetext` adds the label to the value ("50, Medium", or the `tooltipsFormat` text followed by the label when they differ).
 
 Tooltips are hidden from assistive technology (`aria-hidden="true"`): they repeat the value the handle already announces, so exposing them would have screen readers read every change twice. Tick marks are hidden too: a label reaches the handle through `aria-valuetext` while the handle sits on its tick, so a label that carries meaning the value does not should also be said in the page text.
 

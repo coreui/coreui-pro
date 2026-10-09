@@ -1,4 +1,5 @@
 import EventHandler from '../../src/dom/event-handler.js'
+import Form from '../../src/form.js'
 import Range from '../../src/range.js'
 import RangeSlider from '../../src/range-slider.js'
 import {
@@ -668,22 +669,22 @@ describe('RangeSlider', () => {
       expect(inputsOf(element)[0].hasAttribute('aria-label')).toBeFalse()
     })
 
-    it('should name every handle after the label the element points at, then its own name', () => {
+    it('should name the group after the label the element points at and every handle by its own name', () => {
       const { element } = mount({ value: [20, 80] }, 'aria-labelledby="budgetLabel"')
       const inputs = inputsOf(element)
 
-      expect(inputs.map(input => input.getAttribute('aria-labelledby'))).toEqual(inputs.map(input => `budgetLabel ${input.id}`))
-      expect(inputs.every(input => input.id !== '')).toBeTrue()
+      expect(element.getAttribute('role')).toEqual('group')
+      expect(element.getAttribute('aria-labelledby')).toEqual('budgetLabel')
+      expect(inputs.some(input => input.hasAttribute('aria-labelledby'))).toBeFalse()
       expect(inputs.map(input => input.getAttribute('aria-label'))).toEqual(['Minimum value', 'Maximum value'])
-      expect(element.hasAttribute('aria-labelledby')).toBeFalse()
     })
 
-    it('should put the aria-label of the element in front of every handle name', () => {
+    it('should leave the aria-label of the element to the group and name every handle by its own name', () => {
       const { element } = mount({ ariaLabel: ['Minimum', 'Maximum'], value: [20, 80] }, 'aria-label="Budget"')
 
-      expect(inputsOf(element).map(input => input.getAttribute('aria-label'))).toEqual(['Budget Minimum', 'Budget Maximum'])
+      expect(element.getAttribute('aria-label')).toEqual('Budget')
+      expect(inputsOf(element).map(input => input.getAttribute('aria-label'))).toEqual(['Minimum', 'Maximum'])
       expect(inputsOf(element).some(input => input.hasAttribute('aria-labelledby'))).toBeFalse()
-      expect(element.hasAttribute('aria-label')).toBeFalse()
     })
 
     it('should name a single handle with the label of the element', () => {
@@ -726,18 +727,28 @@ describe('RangeSlider', () => {
 
       rangeSlider.setConfig({ value: [10, 50, 90] })
 
-      expect(inputsOf(element).map(input => input.getAttribute('aria-label'))).toEqual(['Budget Value 1', 'Budget Value 2', 'Budget Value 3'])
+      expect(element.getAttribute('aria-label')).toEqual('Budget')
+      expect(inputsOf(element).map(input => input.getAttribute('aria-label'))).toEqual(['Value 1', 'Value 2', 'Value 3'])
       expect(inputsOf(element).every(input => input.getAttribute('aria-describedby') === 'budgetHelp')).toBeTrue()
     })
 
     it('should take a label the page gives the element later on setConfig', () => {
-      const { element, rangeSlider } = mount({ value: [20, 80] }, 'aria-label="Budget"')
+      const { element, rangeSlider } = mount({ value: 40 }, 'aria-label="Budget"')
 
       element.setAttribute('aria-label', 'Cost')
       rangeSlider.setConfig({})
 
-      expect(inputsOf(element).map(input => input.getAttribute('aria-label'))).toEqual(['Cost Minimum value', 'Cost Maximum value'])
-      expect(element.hasAttribute('aria-label')).toBeFalse()
+      expect(inputsOf(element)[0].getAttribute('aria-label')).toEqual('Cost')
+    })
+
+    it('should make the element a group and take the role back on dispose', () => {
+      const { element, rangeSlider } = mount({ value: 40 })
+
+      expect(element.getAttribute('role')).toEqual('group')
+
+      rangeSlider.dispose()
+
+      expect(element.hasAttribute('role')).toBeFalse()
     })
   })
 
@@ -829,6 +840,179 @@ describe('RangeSlider', () => {
       })
 
       expect([...new FormData(form)]).toEqual([['lo', '25'], ['hi', '75']])
+    })
+  })
+
+  describe('validation', () => {
+    const mountInForm = (config = {}, attributes = '', after = '<div class="invalid-feedback">Pick a budget.</div>') => {
+      fixtureEl.innerHTML = `<form><div id="slider" ${attributes}></div>${after}</form>`
+      const element = fixtureEl.querySelector('#slider')
+
+      return { element, form: fixtureEl.querySelector('form'), rangeSlider: new RangeSlider(element, config) }
+    }
+
+    it('should show a given state on the element and every handle and block the submit through the first handle', () => {
+      const { element, form } = mountInForm({ validationState: 'invalid', value: [20, 80] })
+      const [first, second] = inputsOf(element)
+      const feedback = form.querySelector('.invalid-feedback')
+
+      expect(element).toHaveClass('is-invalid')
+      expect(inputsOf(element).every(input => input.classList.contains('is-invalid'))).toBeTrue()
+      expect(inputsOf(element).map(input => input.getAttribute('aria-invalid'))).toEqual(['true', 'true'])
+      expect(inputsOf(element).map(input => input.getAttribute('aria-describedby'))).toEqual([feedback.id, feedback.id])
+      expect(first.validationMessage).toEqual('Pick a budget.')
+      expect(second.validity.valid).toBeTrue()
+      expect(form.checkValidity()).toBeFalse()
+    })
+
+    it('should block with a generic message without a feedback', () => {
+      const { element } = mountInForm({ validationState: 'invalid', value: 40 }, '', '')
+
+      expect(inputsOf(element)[0].validationMessage).toEqual('Invalid value.')
+    })
+
+    it('should not block for a valid or a custom state', () => {
+      const { element, form, rangeSlider } = mountInForm({ validationState: 'valid', value: 40 })
+
+      expect(element).toHaveClass('is-valid')
+      expect(inputsOf(element)[0].hasAttribute('aria-invalid')).toBeFalse()
+      expect(form.checkValidity()).toBeTrue()
+
+      rangeSlider.setConfig({ validationState: 'warning' })
+
+      expect(element).toHaveClass('is-warning')
+      expect(element).not.toHaveClass('is-valid')
+      expect(form.checkValidity()).toBeTrue()
+    })
+
+    it('should not block the submit while disabled', () => {
+      const { element, form } = mountInForm({ disabled: true, validationState: 'invalid', value: 40 })
+
+      expect(element).toHaveClass('is-invalid')
+      expect(form.checkValidity()).toBeTrue()
+    })
+
+    it('should read the server class of the element once, when it starts', () => {
+      const { element, form } = mountInForm({ value: 40 }, 'class="is-invalid"')
+
+      expect(element).toHaveClass('is-invalid')
+      expect(form.checkValidity()).toBeFalse()
+
+      element.classList.add('is-valid')
+
+      expect(form.checkValidity()).toBeFalse()
+      expect(inputsOf(element)[0]).not.toHaveClass('is-valid')
+    })
+
+    it('should drop a given state when the user moves a handle, before the input event', () => {
+      const { element, form } = mountInForm({ validationState: 'invalid', value: [20, 80] })
+      const seen = []
+
+      element.addEventListener('input.coreui.range-slider', () => seen.push(element.classList.contains('is-invalid'), form.checkValidity()))
+      move(inputsOf(element)[1], 70)
+
+      expect(seen).toEqual([false, true])
+      expect(inputsOf(element).some(input => input.hasAttribute('aria-invalid'))).toBeFalse()
+    })
+
+    it('should drop the server class when the user moves a handle', () => {
+      const { element, form } = mountInForm({ value: 40 }, 'class="is-invalid"')
+
+      move(inputsOf(element)[0], 50)
+
+      expect(element).not.toHaveClass('is-invalid')
+      expect(form.checkValidity()).toBeTrue()
+    })
+
+    it('should keep a given state when the value changes from code', () => {
+      const { element, form, rangeSlider } = mountInForm({ validationState: 'invalid', value: [20, 80] })
+
+      rangeSlider.setConfig({ value: [30, 70] })
+
+      expect(element).toHaveClass('is-invalid')
+      expect(form.checkValidity()).toBeFalse()
+    })
+
+    it('should change the state on setConfig without building the handles again', () => {
+      const { element, form, rangeSlider } = mountInForm({ value: [20, 80] })
+      const before = inputsOf(element)
+
+      rangeSlider.setConfig({ validationState: 'invalid' })
+
+      expect(inputsOf(element)).toEqual(before)
+      expect(element).toHaveClass('is-invalid')
+      expect(form.checkValidity()).toBeFalse()
+
+      rangeSlider.setConfig({ validationState: null })
+
+      expect(element).not.toHaveClass('is-invalid')
+      expect(inputsOf(element).some(input => input.classList.contains('is-invalid'))).toBeFalse()
+      expect(form.checkValidity()).toBeTrue()
+    })
+
+    it('should drop a state given before a native reset', async () => {
+      const { element, form } = mountInForm({ validationState: 'invalid', value: 40 })
+
+      form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(element).not.toHaveClass('is-invalid')
+      expect(form.checkValidity()).toBeTrue()
+    })
+
+    it('should keep a state given in a reset listener of the form', async () => {
+      const { element, form, rangeSlider } = mountInForm({ value: 40 })
+
+      form.addEventListener('reset', () => rangeSlider.setConfig({ validationState: 'invalid' }))
+      form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve)
+      })
+
+      expect(element).toHaveClass('is-invalid')
+      expect(form.checkValidity()).toBeFalse()
+    })
+
+    it('should show the state a validation reports for a handle the page sets a validity on', () => {
+      const { element, form } = mountInForm({ value: [20, 80] })
+      const [, second] = inputsOf(element)
+
+      second.setCustomValidity('Too wide.')
+      form.checkValidity()
+
+      expect(element).toHaveClass('is-invalid')
+      expect(inputsOf(element).map(input => input.getAttribute('aria-invalid'))).toEqual(['true', 'true'])
+    })
+
+    it('should keep a given valid state over a validity the page sets on a handle when the form plugin validates', () => {
+      const { element, form } = mountInForm({ validationState: 'valid', value: [20, 80] })
+      const [, second] = inputsOf(element)
+
+      form.setAttribute('data-coreui-validate', '')
+      form.noValidate = true
+      second.setCustomValidity('Too wide.')
+      Form.getOrCreateInstance(form).validate()
+
+      expect(element).toHaveClass('is-valid')
+      expect(inputsOf(element).some(input => input.classList.contains('is-invalid') || input.hasAttribute('aria-invalid'))).toBeFalse()
+    })
+
+    it('should give back the server class it still holds and the description on dispose', () => {
+      const { element, rangeSlider } = mountInForm({ value: 40 }, 'class="is-invalid" aria-describedby="budgetHelp"')
+
+      rangeSlider.dispose()
+
+      expect(element).toHaveClass('is-invalid')
+      expect(element.getAttribute('aria-describedby')).toEqual('budgetHelp')
+
+      const { element: moved, rangeSlider: dismissed } = mountInForm({ value: 40 }, 'class="is-invalid"')
+
+      move(inputsOf(moved)[0], 50)
+      dismissed.dispose()
+
+      expect(moved).not.toHaveClass('is-invalid')
     })
   })
 
