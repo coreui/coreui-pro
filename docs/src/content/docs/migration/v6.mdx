@@ -1898,6 +1898,28 @@ as `validate.coreui.form` does, so a validity its handler sets with
 control passed before the handler ran. `next()` and `finish()` fire it once
 per step instead of twice.
 
+#### Form components share one validation state
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+The multi select, the chip input, the combobox, the OTP input, the date and
+time fields, the pickers and the autocomplete take and show their validation
+state the same way, described under
+[Form components](/forms/validation/#form-components):
+
+- **The state comes from the `validationState` option**, or from `.is-invalid`
+  or `.is-valid` on the component's element, read once when the component
+  starts. A class or an `aria-invalid` written on the element later is not
+  read; set the state with `setConfig({ validationState })`.
+- **A given `'invalid'` blocks the submit**, with the text of the component's
+  invalid feedback as the browser's message, until the user changes the value
+  or the form is reset, which removes the state.
+- **The form plugin and the stepper leave the field that carries a component's
+  value to the component**, which shows the state they report on its frame.
+- **After taking the result over** with `preventDefault()` on
+  `validate.coreui.form`, keep `event.isValid` rather than calling
+  `checkValidity()`: the call reports every invalid field again, and the
+  components then show their error.
+
 #### Stepper: `next()` on the last step finishes the stepper
 
 `next()` on the last enabled step now does what `finish()` does: it validates
