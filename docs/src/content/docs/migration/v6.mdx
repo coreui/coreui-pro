@@ -1639,10 +1639,11 @@ validation and the arrow between them. Two consequences:
 
 #### Date Input / Time Input
 
-- **A `.disabled` class written on the field disables it**, the way
-  `disabled: true` does. `dispose()` takes off only a `.disabled` the field
-  added itself, so a class from the markup, or one the page writes later,
-  stays.
+- **A `.disabled` class in the markup disables the field**, the way
+  `disabled: true` does, unless the options set `disabled`. The date range
+  input and the date, date range and time pickers set it for the fields they
+  build or adopt, so there their own `disabled` decides. `dispose()` gives the field back the class
+  the markup had.
 - **`reset()` restores the date the field was created with**, not the last one
   passed to `update()`, and emits `dateChange` when the value moves. A native
   form reset (`form.reset()`, a reset button) now resets the field too.
@@ -2052,6 +2053,14 @@ instead of a literal `.65`. Rendered values are unchanged.
   [`.form-control-group`](/forms/form-control-group/) frame. Nothing to migrate —
   it is listed here because the `number-input` name, its classes and its Sass
   variables are new in v6.
+
+#### Autocomplete and Multi Select read a `.disabled` class from the markup
+
+A `.disabled` class on the autocomplete element, or on the select a multi
+select enhances, now disables the component, the way `disabled: true` does,
+as it already did for Combobox, Chip and Chip Input. The data API used to skip
+an autocomplete with the class, and a multi select only looked disabled while
+it kept working. `dispose()` gives the element back the class the markup had.
 
 #### Multi Select
 
@@ -2544,12 +2553,12 @@ field behind that kept submitting.
   written in the markup come back as they were. A rating left in the page after
   `dispose()` used to keep working as a plain radio group.
 - **A `.disabled` written in the markup disables the rating**, the way
-  `disabled: true` does, and is still there after `dispose()`, which takes off
-  only a `.disabled` the rating added itself. **While the rating lives, its
-  options decide `.readonly` and the size class.** A `.readonly` written in the
-  markup without the option is removed at init, and `size` replaces a
-  `rating-sm` or `rating-lg` the markup wrote. `setConfig({ disabled: false })`
-  used to leave `.disabled` behind.
+  `disabled: true` does. **While the rating lives, its options decide
+  `.disabled`, `.readonly` and the size class:** `setConfig({ disabled: false })`
+  takes `.disabled` off, where it used to leave it behind, a `.readonly`
+  written in the markup without the option is removed at init, and `size`
+  replaces a `rating-sm` or `rating-lg` the markup wrote. `dispose()` gives the
+  element back the classes the markup had.
 - **A read-only rating submits its value under the `name` you give it.**
   `readonly` used to disable the radios, so the form left the value out; now
   they stay enabled, the mouse and the keyboard cannot change them, only the

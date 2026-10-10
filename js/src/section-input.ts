@@ -239,7 +239,7 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
   constructor(element?: string | Element | null, config?: Partial<C> | null) {
     super(element, config)
 
-    this._config.disabled = this._config.disabled || this._element.classList.contains(CLASS_NAME_DISABLED)
+    this._config.disabled = config?.disabled ?? (this._config.disabled || this._element.classList.contains(CLASS_NAME_DISABLED))
     this._applyConfig()
     this._date = getDateFromSections(this._sections)
     this._allSelected = false

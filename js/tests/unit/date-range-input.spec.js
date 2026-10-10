@@ -681,6 +681,12 @@ describe('DateRangeInput', () => {
         <div data-coreui-range-end></div>
       </div>`
 
+    it('should leave a disabled class on an adopted field to the range input, which stays enabled', () => {
+      build({}, OWN_MARKUP.replace('<div data-coreui-range-start>', '<div data-coreui-range-start class="disabled">'))
+
+      expect(root().querySelector('[data-coreui-range-start] textarea').disabled).toBeFalse()
+    })
+
     it('should adopt the hosts and the separator the author wrote', () => {
       const range = build({ startDate: new Date(2026, 6, 14) }, OWN_MARKUP)
 

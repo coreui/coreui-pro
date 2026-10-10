@@ -3277,6 +3277,18 @@ describe('Autocomplete', () => {
       expect(marked.getAttribute('class')).toEqual('disabled')
     })
 
+    it('should take a disabled class the markup wrote as the disabled option, and keep it on dispose', () => {
+      fixtureEl.innerHTML = '<div class="disabled"></div>'
+      const element = fixtureEl.querySelector('div')
+      const autocomplete = new Autocomplete(element, { options: [] })
+
+      expect(autocomplete._config.disabled).toBeTrue()
+
+      autocomplete.dispose()
+
+      expect(element.getAttribute('class')).toEqual('disabled')
+    })
+
     it('should keep a disabled class the page writes after init', () => {
       fixtureEl.innerHTML = '<div></div>'
       const element = fixtureEl.querySelector('div')
@@ -4446,6 +4458,15 @@ describe('Autocomplete', () => {
 
       expect(Autocomplete.getInstance(first)).toBeInstanceOf(Autocomplete)
       expect(Autocomplete.getInstance(second)).toBeInstanceOf(Autocomplete)
+    })
+
+    it('should initialize an element the markup marks disabled, as a disabled autocomplete', () => {
+      fixtureEl.innerHTML = '<div class="disabled" data-coreui-autocomplete></div>'
+      const autocompleteEl = fixtureEl.querySelector('[data-coreui-autocomplete]')
+
+      window.dispatchEvent(createEvent('load'))
+
+      expect(Autocomplete.getInstance(autocompleteEl)._config.disabled).toBeTrue()
     })
 
     it('should initialize autocomplete from data attributes', () => {

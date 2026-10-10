@@ -410,6 +410,33 @@ describe('DateInput', () => {
       expect(added.hasAttribute('class')).toBeFalse()
     })
 
+    it('should give back a disabled class from the markup that setConfig took off', () => {
+      fixtureEl.innerHTML = '<div class="disabled"></div>'
+      const element = fixtureEl.querySelector('div')
+      const dateInput = new DateInput(element, { format: 'dd.MM.yyyy' })
+
+      dateInput.setConfig({ disabled: false })
+
+      expect(element.classList.contains('disabled')).toBeFalse()
+      expect(element.querySelector('textarea').disabled).toBeFalse()
+
+      dateInput.dispose()
+
+      expect(element.getAttribute('class')).toEqual('disabled')
+    })
+
+    it('should leave the disabled class to the options when they set disabled', () => {
+      fixtureEl.innerHTML = '<div class="disabled"></div>'
+      const element = fixtureEl.querySelector('div')
+      const dateInput = new DateInput(element, { disabled: false, format: 'dd.MM.yyyy' })
+
+      expect(element.querySelector('textarea').disabled).toBeFalse()
+
+      dateInput.dispose()
+
+      expect(element.getAttribute('class')).toEqual('disabled')
+    })
+
     it('should give the host back the way the page wrote it', () => {
       fixtureEl.innerHTML = '<div class="form-control form-date-time my-own" id="start" role="note"></div>'
       const dateInputEl = fixtureEl.querySelector('#start')

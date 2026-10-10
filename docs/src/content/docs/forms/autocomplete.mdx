@@ -205,7 +205,7 @@ A state you give, with the option or with the class, is a verdict on the value i
 
 ## Disabled
 
-Add the `data-coreui-disabled="true"` attribute to disable the component:
+Add the `data-coreui-disabled="true"` attribute, or write the `.disabled` class in the markup, to disable the component:
 
 <Example pro code={`<div data-coreui-autocomplete data-coreui-disabled="true" data-coreui-options="" data-coreui-placeholder="Disabled autocomplete..." ></div>`} />
 
@@ -331,7 +331,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `cleaner` | boolean | `false` | Enables the selection cleaner button. |
 | `clearSearchOnSelect` | boolean | `true` | Clears the search input when an option is selected. |
 | `container` | string, element, boolean | `false` | Appends the dropdown to a specific element. Example: `container: 'body'`. Inside a modal dialog it goes into the dialog instead, because the rest of the page is inert. |
-| `disabled` | boolean | `false` | Disables the component when set to `true`. |
+| `disabled` | boolean | `false` | Disables the component when set to `true`. You can also apply the `.disabled` class in markup. |
 | `highlightOptionsOnSearch` | boolean | `false` | Highlights matching text in options during search. |
 | `id` | string, null | `null` | Sets a custom ID for the component. If not provided, a unique ID is auto-generated. |
 | `invalid` | boolean | `false` | Deprecated alias of `validationState: 'invalid'`, ignored once `validationState` is set. |

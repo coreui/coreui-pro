@@ -2195,6 +2195,18 @@ describe('Rating', () => {
       expect(markup.getAttribute('class')).toEqual('disabled')
     })
 
+    it('should leave a disabled class the page writes after the rating took back its own', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div, { disabled: true })
+
+      rating.setConfig({ disabled: false })
+      div.classList.add('disabled')
+      rating.dispose()
+
+      expect(div.getAttribute('class')).toEqual('disabled')
+    })
+
     it('should take back the items and radios it rendered', () => {
       fixtureEl.innerHTML = '<form><div data-coreui-rating></div></form>'
       const form = fixtureEl.querySelector('form')

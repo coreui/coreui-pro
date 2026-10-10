@@ -21,7 +21,7 @@ import {
 } from './util/sanitizer.js'
 import {
   captureHostClasses, type CountLabel, defineJQueryPlugin, getUID, type HostClasses, jQueryDispatch, resolveCountLabel,
-  restoreHostClasses
+  restoreHostClasses, toggleHostClass
 } from './util/index.js'
 
 /**
@@ -164,12 +164,12 @@ const DefaultType: Record<string, string> = {
 
 class Combobox extends ComboboxBase {
   protected declare _addedDisabled: boolean
-  protected declare _addedDisabledClass: boolean
   protected declare _addedMenuClassNames: string[]
   protected declare _createdNodes: ChildNode[]
   protected declare _describedBy: string | null
   protected declare _hostAttributes: Map<string, string | null>
   protected declare _hostClasses: HostClasses
+  protected declare _hostDisabledClass: boolean | null
   protected declare _hostMenuStyle: Map<string, string> | null
   protected declare _hostOptionsId: string
   protected declare _hostValue: { nodes: Node[], placeholder: boolean } | null
@@ -191,11 +191,11 @@ class Combobox extends ComboboxBase {
     this._uniqueId = this._element.id || getUID(NAME)
     this._togglerElement = this._element
     this._addedDisabled = false
-    this._addedDisabledClass = false
     this._addedMenuClassNames = []
     this._createdNodes = []
     this._hostAttributes = new Map(HOST_ATTRIBUTES.map(name => [name, this._element.getAttribute(name)]))
     this._hostClasses = captureHostClasses(this._element, HOST_CLASS_NAMES)
+    this._hostDisabledClass = null
     this._hostMenuStyle = null
     this._hostOptionsId = ''
     this._hostValue = null
@@ -331,8 +331,8 @@ class Combobox extends ComboboxBase {
       this._element.removeAttribute('disabled')
     }
 
-    if (this._addedDisabledClass) {
-      this._element.classList.remove(CLASS_NAME_DISABLED)
+    if (this._hostDisabledClass !== null) {
+      this._element.classList.toggle(CLASS_NAME_DISABLED, this._hostDisabledClass)
     }
 
     for (const [name, value] of this._hostAttributes) {
@@ -363,11 +363,12 @@ class Combobox extends ComboboxBase {
 
   _createCombobox(): void {
     const hadDisabled = this._element.hasAttribute('disabled')
-    const hadDisabledClass = this._element.classList.contains(CLASS_NAME_DISABLED)
 
     this._element.classList.add(CLASS_NAME_TOGGLE)
     this._element.setAttribute('aria-haspopup', 'listbox')
     this._element.setAttribute('aria-expanded', 'false')
+
+    this._config.disabled = this._config.disabled || this._element.classList.contains(CLASS_NAME_DISABLED)
 
     if (this._element instanceof HTMLButtonElement) {
       this._element.type = 'button'
@@ -375,9 +376,7 @@ class Combobox extends ComboboxBase {
       this._element.disabled = this._config.disabled
     }
 
-    this._config.disabled = this._config.disabled || this._element.classList.contains(CLASS_NAME_DISABLED)
-    this._element.classList.toggle(CLASS_NAME_DISABLED, this._config.disabled)
-    this._addedDisabledClass = !hadDisabledClass && this._config.disabled
+    this._hostDisabledClass = toggleHostClass(this._element, CLASS_NAME_DISABLED, this._config.disabled, this._hostDisabledClass)
     this._addedDisabled = !hadDisabled && this._element.hasAttribute('disabled')
 
     this._createValueElement()

@@ -525,6 +525,14 @@ describe('DatePicker', () => {
         <button type="button" class="btn btn-subtle btn-sm" data-coreui-picker-toggle>Pick a date <svg viewBox="0 0 16 16"><path d="M0 0h16"/></svg></button>
       </div>`
 
+    it('should leave a disabled class on an adopted field to the picker, which stays enabled', () => {
+      buildPicker({}, OWN_MARKUP.replace('<div data-coreui-picker-field>', '<div data-coreui-picker-field class="disabled">'))
+      const field = fixtureEl.querySelector('[data-coreui-picker-field]')
+
+      expect(field.querySelector('textarea').disabled).toBeFalse()
+      expect(field.querySelector('.form-date-time-section').hasAttribute('aria-disabled')).toBeFalse()
+    })
+
     it('should keep an adopted toggle when pickerIcon is off', () => {
       const picker = buildPicker({ date: new Date(2026, 6, 14), pickerIcon: false }, OWN_MARKUP)
       const el = fixtureEl.querySelector('#picker')

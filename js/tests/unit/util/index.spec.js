@@ -1076,12 +1076,21 @@ describe('Util', () => {
       expect(div.className).toEqual('disabled')
     })
 
-    it('should keep the state from before the first change through later ones', () => {
+    it('should keep the state from before its change while that change is in effect', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
       const original = Util.toggleHostClass(div, 'disabled', true, null)
 
-      expect(Util.toggleHostClass(div, 'disabled', false, original)).toBeFalse()
+      expect(Util.toggleHostClass(div, 'disabled', true, original)).toBeFalse()
+      expect(div.className).toEqual('disabled')
+    })
+
+    it('should report no change once the component undid its own change', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const original = Util.toggleHostClass(div, 'disabled', true, null)
+
+      expect(Util.toggleHostClass(div, 'disabled', false, original)).toBeNull()
       expect(div.classList.contains('disabled')).toBeFalse()
     })
   })
