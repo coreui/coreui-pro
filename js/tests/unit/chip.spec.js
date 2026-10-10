@@ -898,7 +898,7 @@ describe('Chip', () => {
       fixtureEl.innerHTML = '<span>Tag</span>'
       const chipEl = fixtureEl.querySelector('span')
 
-      new Chip(chipEl, { clickable: true }).dispose()
+      new Chip(chipEl, { selectable: true }).dispose()
 
       expect(chipEl.hasAttribute('class')).toBeFalse()
     })

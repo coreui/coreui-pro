@@ -1534,6 +1534,17 @@ describe('ChipInput', () => {
       expect(marked.getAttribute('class')).toEqual('disabled')
     })
 
+    it('should keep a disabled class the page writes after init', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const element = fixtureEl.querySelector('div')
+      const chipInput = new ChipInput(element)
+
+      element.classList.add('disabled')
+      chipInput.dispose()
+
+      expect(element.getAttribute('class')).toEqual('disabled')
+    })
+
     it('should dispose a chip-input instance', () => {
       fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 

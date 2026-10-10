@@ -357,6 +357,18 @@ describe('PasswordStrength', () => {
       expect(element.querySelector('.password-strength-text')).toBeNull()
     })
 
+    it('should take back the busy class when disposed while a promise is pending', () => {
+      const { element, input, instance } = setup({ scorer: () => new Promise(() => {}) })
+
+      type(input, 'anything')
+
+      expect(element.classList.contains('password-strength-busy')).toBeTrue()
+
+      instance.dispose()
+
+      expect(element.hasAttribute('class')).toBeFalse()
+    })
+
     it('should keep the class the page wrote on the element', () => {
       fixtureEl.innerHTML = '<input type="password"><div class="password-strength"></div>'
       const element = fixtureEl.querySelector('div')

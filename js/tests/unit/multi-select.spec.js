@@ -4902,7 +4902,7 @@ describe('MultiSelect', () => {
       const marked = fixtureEl.querySelector('#marked')
 
       for (const select of [bare, marked]) {
-        new MultiSelect(select, { disabled: true, validationState: 'invalid' }).dispose()
+        new MultiSelect(select, { disabled: true }).dispose()
       }
 
       expect(bare.hasAttribute('class')).toBeFalse()
@@ -4920,6 +4920,27 @@ describe('MultiSelect', () => {
       expect(fixtureEl.querySelector('.form-multi-select').classList.contains('disabled')).toBeFalse()
 
       multiSelect.dispose()
+    })
+
+    it('should keep a disabled class the page writes after init, also once setConfig enabled the select', () => {
+      fixtureEl.innerHTML = [
+        '<select id="plain" multiple><option value="1">One</option></select>',
+        '<select id="enabled" multiple><option value="1">One</option></select>'
+      ].join('')
+      const plain = fixtureEl.querySelector('#plain')
+      const enabled = fixtureEl.querySelector('#enabled')
+      const first = new MultiSelect(plain)
+      const second = new MultiSelect(enabled, { disabled: true })
+
+      second.setConfig({ disabled: false })
+
+      for (const [select, instance] of [[plain, first], [enabled, second]]) {
+        select.classList.add('disabled')
+        instance.dispose()
+      }
+
+      expect(plain.getAttribute('class')).toEqual('disabled')
+      expect(enabled.getAttribute('class')).toEqual('disabled')
     })
 
     it('should keep the name the page wrote on the select', () => {

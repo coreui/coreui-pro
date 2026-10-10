@@ -6317,6 +6317,15 @@ describe('Calendar', () => {
       expect(marked.getAttribute('class')).toEqual('calendars select-week')
     })
 
+    it('should take back the selection class of a selectionType it does not know', () => {
+      fixtureEl.innerHTML = '<div class="border"></div>'
+      const div = fixtureEl.querySelector('div')
+
+      new Calendar(div, { selectionType: 'days' }).dispose()
+
+      expect(div.getAttribute('class')).toEqual('border')
+    })
+
     it('should remove the panels it built', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')

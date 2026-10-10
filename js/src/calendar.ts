@@ -303,10 +303,10 @@ class Calendar extends BaseComponent {
     super(element)
 
     this._formatter = createDateFormatter()
-    this._hostClasses = captureHostClasses(this._element, HOST_CLASS_NAMES)
     this._announcements = []
     this._selectionAnnouncement = null
     this._config = this._getConfig(config)
+    this._hostClasses = captureHostClasses(this._element, this._managedClassNames())
     this._initializeDates()
     this._initializeView()
     this._createCalendar()
@@ -348,7 +348,7 @@ class Calendar extends BaseComponent {
     }
 
     this._element.innerHTML = ''
-    restoreHostClasses(this._element, HOST_CLASS_NAMES, this._hostClasses)
+    restoreHostClasses(this._element, this._managedClassNames(), this._hostClasses)
 
     super.dispose()
   }
@@ -994,6 +994,10 @@ class Calendar extends BaseComponent {
     }
 
     this._updateRovingTabIndex()
+  }
+
+  _managedClassNames(): string[] {
+    return [...HOST_CLASS_NAMES, `select-${this._config.selectionType}`]
   }
 
   _setCalendarClasses(): void {

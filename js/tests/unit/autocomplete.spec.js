@@ -3277,6 +3277,17 @@ describe('Autocomplete', () => {
       expect(marked.getAttribute('class')).toEqual('disabled')
     })
 
+    it('should keep a disabled class the page writes after init', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const element = fixtureEl.querySelector('div')
+      const autocomplete = new Autocomplete(element, { options: [] })
+
+      element.classList.add('disabled')
+      autocomplete.dispose()
+
+      expect(element.getAttribute('class')).toEqual('disabled')
+    })
+
     it('should dispose autocomplete', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
