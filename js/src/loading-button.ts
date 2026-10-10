@@ -31,7 +31,7 @@ const CLASS_NAME_IS_LOADING = 'is-loading'
 const CLASS_NAME_LOADING_BUTTON = 'btn-loading'
 const CLASS_NAME_LOADING_BUTTON_SPINNER = 'btn-loading-spinner'
 
-const HOST_CLASS_NAMES = [CLASS_NAME_IS_LOADING, CLASS_NAME_LOADING_BUTTON]
+const HOST_CLASS_NAMES = [CLASS_NAME_LOADING_BUTTON]
 
 const SELECTOR_HIDDEN_CONTENT = `[aria-hidden="true"], [hidden], .${CLASS_NAME_LOADING_BUTTON_SPINNER}`
 
@@ -172,6 +172,7 @@ class LoadingButton extends BaseComponent {
     this._spinner?.remove()
     this._announcement?.()
     this._element.removeEventListener(EVENT_CLICK, this._handleClick, true)
+    this._element.classList.remove(CLASS_NAME_IS_LOADING)
     restoreHostClasses(this._element, HOST_CLASS_NAMES, this._hostClasses)
 
     super.dispose()

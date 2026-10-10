@@ -528,6 +528,7 @@ describe('LoadingButton', () => {
 
       expect(button.hasAttribute('aria-disabled')).toBeFalse()
       expect(button).not.toHaveClass('disabled')
+      expect(button.hasAttribute('class')).toBeFalse()
     })
 
     it('should take back its classes, the spinner and an unread message when disposed while loading', () => {
@@ -538,11 +539,44 @@ describe('LoadingButton', () => {
       button.focus()
       loadingButton.start()
       vi.advanceTimersByTime(10)
+
+      expect(typeof loadingButton._announcement).toBe('function')
+
       loadingButton.dispose()
       vi.advanceTimersByTime(200)
 
       expect(button.outerHTML).toEqual('<button>Save</button>')
       expect(messages()).toEqual([])
+    })
+
+    it('should take back a start message already read when disposed while loading', () => {
+      fixtureEl.innerHTML = '<button>Save</button>'
+      const button = fixtureEl.querySelector('button')
+      const loadingButton = new LoadingButton(button)
+
+      button.focus()
+      loadingButton.start()
+      vi.advanceTimersByTime(110)
+
+      expect(messages()).toEqual(['Save, Loading'])
+
+      loadingButton.dispose()
+
+      expect(messages()).toEqual([])
+    })
+
+    it('should not give back is-loading from the markup once it stopped loading itself', () => {
+      fixtureEl.innerHTML = '<button class="btn-loading is-loading">Save</button>'
+      const button = fixtureEl.querySelector('button')
+      const loadingButton = new LoadingButton(button, { spinner: false })
+
+      loadingButton.start()
+      vi.advanceTimersByTime(10)
+      loadingButton.stop()
+      vi.advanceTimersByTime(200)
+      loadingButton.dispose()
+
+      expect(button.getAttribute('class')).toEqual('btn-loading')
     })
 
     it('should take back the spinner when disposed while it stops', () => {
