@@ -3277,24 +3277,14 @@ describe('Autocomplete', () => {
       expect(marked.getAttribute('class')).toEqual('disabled')
     })
 
-    it('should take a disabled class the markup wrote as the disabled option, and keep it on dispose', () => {
+    it('should leave the disabled state to the option, not a class in the markup, and give the class back on dispose', () => {
       fixtureEl.innerHTML = '<div class="disabled"></div>'
       const element = fixtureEl.querySelector('div')
       const autocomplete = new Autocomplete(element, { options: [] })
 
-      expect(element.querySelector('input[role="combobox"]').disabled).toBeTrue()
+      expect(element.querySelector('input[role="combobox"]').disabled).toBeFalse()
+      expect(element.classList.contains('disabled')).toBeFalse()
 
-      autocomplete.dispose()
-
-      expect(element.getAttribute('class')).toEqual('disabled')
-    })
-
-    it('should keep a disabled class the page writes after init', () => {
-      fixtureEl.innerHTML = '<div></div>'
-      const element = fixtureEl.querySelector('div')
-      const autocomplete = new Autocomplete(element, { options: [] })
-
-      element.classList.add('disabled')
       autocomplete.dispose()
 
       expect(element.getAttribute('class')).toEqual('disabled')
@@ -4460,14 +4450,14 @@ describe('Autocomplete', () => {
       expect(Autocomplete.getInstance(second)).toBeInstanceOf(Autocomplete)
     })
 
-    it('should initialize an element the markup marks disabled, as a disabled autocomplete', () => {
+    it('should initialize an element with a disabled class like any other, leaving the state to the option', () => {
       fixtureEl.innerHTML = '<div class="disabled" data-coreui-autocomplete></div>'
       const autocompleteEl = fixtureEl.querySelector('[data-coreui-autocomplete]')
 
       window.dispatchEvent(createEvent('load'))
 
       expect(Autocomplete.getInstance(autocompleteEl)).toBeInstanceOf(Autocomplete)
-      expect(autocompleteEl.querySelector('input[role="combobox"]').disabled).toBeTrue()
+      expect(autocompleteEl.querySelector('input[role="combobox"]').disabled).toBeFalse()
     })
 
     it('should initialize autocomplete from data attributes', () => {

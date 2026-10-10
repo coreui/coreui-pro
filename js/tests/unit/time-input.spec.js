@@ -319,12 +319,12 @@ describe('TimeInput', () => {
   })
 
   describe('dispose', () => {
-    it('should take a disabled class the markup wrote as the disabled option, and keep it on dispose', () => {
+    it('should leave the disabled state to the option, not a class in the markup, and give the class back on dispose', () => {
       fixtureEl.innerHTML = '<div class="disabled"></div>'
       const element = fixtureEl.querySelector('div')
       const timeInput = new TimeInput(element)
 
-      expect(element.querySelector('textarea').disabled).toBeTrue()
+      expect(element.querySelector('textarea').disabled).toBeFalse()
 
       timeInput.dispose()
 

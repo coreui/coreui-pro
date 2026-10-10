@@ -15,7 +15,7 @@ import {
   nextStateSerial, ownValidationState, setStateValidity, type UserValidity, type ValidationState, writeValueField
 } from './util/form-validation.js'
 import {
-  captureHostClasses, getUID, type HostClasses, isRTL, restoreHostClasses, toggleHostClass
+  captureHostClasses, getUID, type HostClasses, isRTL, restoreHostClasses
 } from './util/index.js'
 
 /**
@@ -45,7 +45,7 @@ const CLASS_NAME_GROUP = 'form-control-group'
 const CLASS_NAME_IS_INVALID = 'is-invalid'
 const CLASS_NAME_IS_VALID = 'is-valid'
 
-const HOST_CLASS_NAMES = [CLASS_NAME_GROUP]
+const HOST_CLASS_NAMES = [CLASS_NAME_DISABLED, CLASS_NAME_GROUP]
 
 type ChipInputConfig = ChipSetConfig & {
   create: boolean
@@ -102,7 +102,6 @@ class ChipInput extends ChipSet {
   protected declare _input: HTMLInputElement
   protected declare _describedBy: string | null
   protected declare _hostClasses: HostClasses
-  protected declare _hostDisabledClass: boolean | null
   protected declare _initialChips: HTMLElement[]
   protected declare _releaseValidationState: (() => void) | null
   protected declare _removingByCode: boolean
@@ -201,10 +200,6 @@ class ChipInput extends ChipSet {
   override dispose(): void {
     this._userValidity?.stop()
     this._releaseValidationState?.()
-
-    if (this._hostDisabledClass !== null) {
-      this._element.classList.toggle(CLASS_NAME_DISABLED, this._hostDisabledClass)
-    }
 
     if (this._stateClass) {
       this._element.classList.remove(this._stateClass)
@@ -514,7 +509,7 @@ class ChipInput extends ChipSet {
 
   _applyInteractionState(): void {
     const { readonly } = this._config
-    this._hostDisabledClass = toggleHostClass(this._element, CLASS_NAME_DISABLED, this._disabled, null)
+    this._element.classList.toggle(CLASS_NAME_DISABLED, this._disabled)
     // The container is a generic element, so `aria-disabled`/`aria-readonly`
     // are not allowed on it — the native input states carry the semantics.
     this._input.disabled = this._disabled

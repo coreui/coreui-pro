@@ -4909,28 +4909,26 @@ describe('MultiSelect', () => {
       expect(marked.getAttribute('class')).toEqual('disabled')
     })
 
-    it('should take a disabled class the markup wrote as the disabled option, and give it back on dispose once setConfig enabled the select', () => {
-      fixtureEl.innerHTML = '<select class="disabled" multiple><option value="1">One</option></select>'
+    it('should leave the disabled state to the option, not a class or the disabled attribute on the select, and give them back on dispose', () => {
+      fixtureEl.innerHTML = '<select class="disabled" multiple disabled><option value="1">One</option></select>'
       const select = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(select)
 
-      expect(fixtureEl.querySelector('[role="combobox"]').getAttribute('aria-disabled')).toEqual('true')
-
-      multiSelect.setConfig({ disabled: false })
-
-      expect(select.classList.contains('disabled')).toBeFalse()
       expect(fixtureEl.querySelector('[role="combobox"]').hasAttribute('aria-disabled')).toBeFalse()
+      expect(select.disabled).toBeFalse()
+      expect(select.classList.contains('disabled')).toBeFalse()
 
       multiSelect.dispose()
 
+      expect(select.disabled).toBeTrue()
       expect(select.getAttribute('class')).toEqual('disabled')
     })
 
     it('should disable the select with the component, so a required one does not block the form', () => {
-      fixtureEl.innerHTML = '<form><select class="disabled" multiple required><option value="1">One</option></select></form>'
+      fixtureEl.innerHTML = '<form><select multiple required><option value="1">One</option></select></form>'
       const form = fixtureEl.querySelector('form')
       const select = fixtureEl.querySelector('select')
-      const multiSelect = new MultiSelect(select)
+      const multiSelect = new MultiSelect(select, { disabled: true })
 
       expect(select.disabled).toBeTrue()
       expect(form.checkValidity()).toBeTrue()
@@ -4938,22 +4936,6 @@ describe('MultiSelect', () => {
       multiSelect.dispose()
 
       expect(select.hasAttribute('disabled')).toBeFalse()
-    })
-
-    it('should take a disabled select from the markup as the disabled option and keep it disabled', () => {
-      fixtureEl.innerHTML = '<select multiple disabled><option value="1">One</option></select>'
-      const select = fixtureEl.querySelector('select')
-      const multiSelect = new MultiSelect(select)
-
-      expect(fixtureEl.querySelector('[role="combobox"]').getAttribute('aria-disabled')).toEqual('true')
-
-      multiSelect.setConfig({ search: true })
-
-      expect(select.disabled).toBeTrue()
-
-      multiSelect.dispose()
-
-      expect(select.disabled).toBeTrue()
     })
 
     it('should take back the disabled class it added once setConfig enables the select', () => {
@@ -4967,27 +4949,6 @@ describe('MultiSelect', () => {
       expect(fixtureEl.querySelector('.form-multi-select').classList.contains('disabled')).toBeFalse()
 
       multiSelect.dispose()
-    })
-
-    it('should keep a disabled class the page writes after init, also once setConfig enabled the select', () => {
-      fixtureEl.innerHTML = [
-        '<select id="plain" multiple><option value="1">One</option></select>',
-        '<select id="enabled" multiple><option value="1">One</option></select>'
-      ].join('')
-      const plain = fixtureEl.querySelector('#plain')
-      const enabled = fixtureEl.querySelector('#enabled')
-      const first = new MultiSelect(plain)
-      const second = new MultiSelect(enabled, { disabled: true })
-
-      second.setConfig({ disabled: false })
-
-      for (const [select, instance] of [[plain, first], [enabled, second]]) {
-        select.classList.add('disabled')
-        instance.dispose()
-      }
-
-      expect(plain.getAttribute('class')).toEqual('disabled')
-      expect(enabled.getAttribute('class')).toEqual('disabled')
     })
 
     it('should keep the name the page wrote on the select', () => {

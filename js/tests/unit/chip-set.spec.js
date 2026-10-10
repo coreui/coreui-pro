@@ -202,7 +202,7 @@ describe('ChipSet', () => {
       fixtureEl.innerHTML = [
         '<div class="chip-set">',
         '  <span class="chip">First</span>',
-        '  <span class="chip disabled">Second</span>',
+        '  <span class="chip" data-coreui-disabled="true">Second</span>',
         '  <span class="chip">Third</span>',
         '</div>'
       ].join('')
@@ -442,7 +442,7 @@ describe('ChipSet', () => {
     })
 
     it('should move focus to the set once only disabled chips are left', () => {
-      fixtureEl.innerHTML = '<div class="chip-set"><span class="chip">First</span><span class="chip disabled">Second</span></div>'
+      fixtureEl.innerHTML = '<div class="chip-set"><span class="chip">First</span><span class="chip" data-coreui-disabled="true">Second</span></div>'
       const el = fixtureEl.querySelector('.chip-set')
       // eslint-disable-next-line no-new
       new ChipSet(el, { removable: true })

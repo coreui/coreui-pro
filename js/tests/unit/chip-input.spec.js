@@ -600,13 +600,18 @@ describe('ChipInput', () => {
       expect(el.querySelector('input[type="text"]').disabled).toBeTrue()
     })
 
-    it('should initialize as disabled via class', () => {
+    it('should leave the disabled state to the option, not a class in the markup', () => {
       fixtureEl.innerHTML = '<div class="chip-input disabled"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el)
 
-      expect(chipInput._disabled).toBeTrue()
+      expect(chipInput._disabled).toBeFalse()
+      expect(el.classList.contains('disabled')).toBeFalse()
+
+      chipInput.dispose()
+
+      expect(el.classList.contains('disabled')).toBeTrue()
     })
 
     it('should initialize as readonly via config', () => {
@@ -1532,17 +1537,6 @@ describe('ChipInput', () => {
 
       expect(bare.hasAttribute('class')).toBeFalse()
       expect(marked.getAttribute('class')).toEqual('disabled')
-    })
-
-    it('should keep a disabled class the page writes after init', () => {
-      fixtureEl.innerHTML = '<div></div>'
-      const element = fixtureEl.querySelector('div')
-      const chipInput = new ChipInput(element)
-
-      element.classList.add('disabled')
-      chipInput.dispose()
-
-      expect(element.getAttribute('class')).toEqual('disabled')
     })
 
     it('should dispose a chip-input instance', () => {
