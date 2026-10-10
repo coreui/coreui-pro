@@ -8,7 +8,9 @@
 import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import { announce, type AnnouncePriority } from './util/announce.js'
-import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
+import {
+  captureHostClasses, defineJQueryPlugin, type HostClasses, jQueryDispatch, restoreHostClasses
+} from './util/index.js'
 
 /**
  * Constants
@@ -28,6 +30,8 @@ const CLASS_NAME_DISABLED = 'disabled'
 const CLASS_NAME_IS_LOADING = 'is-loading'
 const CLASS_NAME_LOADING_BUTTON = 'btn-loading'
 const CLASS_NAME_LOADING_BUTTON_SPINNER = 'btn-loading-spinner'
+
+const HOST_CLASS_NAMES = [CLASS_NAME_LOADING_BUTTON]
 
 const SELECTOR_HIDDEN_CONTENT = `[aria-hidden="true"], [hidden], .${CLASS_NAME_LOADING_BUTTON_SPINNER}`
 
@@ -69,6 +73,7 @@ class LoadingButton extends BaseComponent {
   protected declare _handleClick: (event: Event) => void
   protected declare _blocked: boolean
   protected declare _announcement: (() => void) | null
+  protected declare _hostClasses: HostClasses
 
   constructor(element?: string | Element | null, config?: Partial<LoadingButtonConfig> | null) {
     super(element)
@@ -81,6 +86,7 @@ class LoadingButton extends BaseComponent {
     this._handleClick = event => this._blockClick(event)
     this._blocked = false
     this._announcement = null
+    this._hostClasses = captureHostClasses(this._element, HOST_CLASS_NAMES)
 
     this._createButton()
     this._element.addEventListener(EVENT_CLICK, this._handleClick, true)
@@ -163,7 +169,11 @@ class LoadingButton extends BaseComponent {
   override dispose(): void {
     this._clearTimeouts()
     this._unblock()
+    this._spinner?.remove()
+    this._announcement?.()
     this._element.removeEventListener(EVENT_CLICK, this._handleClick, true)
+    this._element.classList.remove(CLASS_NAME_IS_LOADING)
+    restoreHostClasses(this._element, HOST_CLASS_NAMES, this._hostClasses)
 
     super.dispose()
   }
