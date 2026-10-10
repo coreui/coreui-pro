@@ -2,6 +2,7 @@
 @use "functions/defaults" as *;
 @use "functions/escape-svg" as *;
 @use "mixins/focus-ring" as *;
+@use "mixins/form-validation" as *;
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
 @use "config" as *;
@@ -135,4 +136,18 @@ $rating-tokens: defaults(
     }
   }
   // scss-docs-end rating-sizes-loop
+
+  // scss-docs-start rating-validation-states-loop
+  @each $state, $data in $form-validation-states {
+    $theme: map.get($data, "theme");
+
+    .rating.is-#{$state} {
+      --#{$prefix}rating-item-color: var(--#{$prefix}#{$theme}-fg);
+
+      .rating-item:has(.rating-item-input:focus-visible) {
+        @include focus-ring(true, $color: var(--#{$prefix}#{$theme}-focus-ring));
+      }
+    }
+  }
+  // scss-docs-end rating-validation-states-loop
 }

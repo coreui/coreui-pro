@@ -2554,6 +2554,16 @@ field behind that kept submitting.
   and `setConfig({ name })` renames the radios; a value the new options cannot
   show is dropped. Any option change used to reset the rating to its initial
   value and ignore `name`.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The rating takes a validation state.** The new `validationState` option,
+  or `.is-invalid`/`.is-valid` on the rating element read once when it starts,
+  colours the empty stars and the focus ring, and a given `'invalid'` sets
+  `aria-invalid` on the group and blocks the submit until the user picks or
+  clears a star or the form is reset. A class written on the element later is
+  not read; set the state with `setConfig({ validationState })`. See
+  [Validation](/forms/rating/#validation).
+- **The rating can be required.** `required` makes every radio required and
+  gives the group `aria-required="true"`.
 
 #### Search Button
 

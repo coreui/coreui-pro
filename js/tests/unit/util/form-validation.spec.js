@@ -94,6 +94,16 @@ describe('Form validation utilities', () => {
 
       expect(getFeedbackIds(fixtureEl.querySelector('#when'))).toEqual(['whenError'])
     })
+
+    it('should read the feedback of a rating from the rating for its radios', () => {
+      fixtureEl.innerHTML = '<form><div class="rating"><div class="rating-item"><input id="star" name="score" type="radio"></div></div><div id="scoreError" class="invalid-feedback">Rate the delivery.</div></form>'
+
+      expect(getFeedbackIds(fixtureEl.querySelector('#star'))).toEqual(['scoreError'])
+
+      fixtureEl.querySelector('.rating').setAttribute('data-coreui-invalid-feedback', 'scoreHelp')
+
+      expect(getFeedbackIds(fixtureEl.querySelector('#star'))).toEqual(['scoreHelp'])
+    })
   })
 
   describe('updateValidationState', () => {
