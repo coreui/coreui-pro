@@ -102,6 +102,7 @@ class ChipInput extends ChipSet {
   protected declare _input: HTMLInputElement
   protected declare _describedBy: string | null
   protected declare _hostClasses: HostClasses
+  protected declare _hostDisabledClass: boolean | null
   protected declare _initialChips: HTMLElement[]
   protected declare _releaseValidationState: (() => void) | null
   protected declare _removingByCode: boolean
@@ -112,7 +113,6 @@ class ChipInput extends ChipSet {
   protected declare _userValidity: UserValidity | null
   private _addedAriaRequired = false
   private _createdInput = false
-  private _hostDisabledClass: boolean | null = null
   private _labelledFor: Element | null = null
 
   constructor(element?: string | Element | null, config?: Partial<ChipInputConfig> | null) {
@@ -514,7 +514,7 @@ class ChipInput extends ChipSet {
 
   _applyInteractionState(): void {
     const { readonly } = this._config
-    this._hostDisabledClass = toggleHostClass(this._element, CLASS_NAME_DISABLED, this._disabled, this._hostDisabledClass)
+    this._hostDisabledClass = toggleHostClass(this._element, CLASS_NAME_DISABLED, this._disabled, null)
     // The container is a generic element, so `aria-disabled`/`aria-readonly`
     // are not allowed on it — the native input states carry the semantics.
     this._input.disabled = this._disabled

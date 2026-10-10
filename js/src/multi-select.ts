@@ -853,7 +853,7 @@ class MultiSelect extends ComboboxBase {
       this._element.removeAttribute('required')
     }
 
-    this._element.toggleAttribute('disabled', Boolean(this._config.disabled))
+    this._element.toggleAttribute('disabled', this._config.disabled)
   }
 
   _createNativeOptions(parentElement: HTMLElement, options: any[]): void {
@@ -1003,7 +1003,7 @@ class MultiSelect extends ComboboxBase {
     const wrapper = document.createElement('div')
     wrapper.classList.add(CLASS_NAME_SELECT)
 
-    this._hostDisabledClass = toggleHostClass(this._element, CLASS_NAME_DISABLED, Boolean(this._config.disabled), this._hostDisabledClass)
+    this._hostDisabledClass = toggleHostClass(this._element, CLASS_NAME_DISABLED, this._config.disabled, this._hostDisabledClass)
 
     for (const className of this._element.classList) {
       if (className !== CLASS_NAME_IS_INVALID && className !== CLASS_NAME_IS_VALID) {

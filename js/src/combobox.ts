@@ -195,7 +195,6 @@ class Combobox extends ComboboxBase {
     this._createdNodes = []
     this._hostAttributes = new Map(HOST_ATTRIBUTES.map(name => [name, this._element.getAttribute(name)]))
     this._hostClasses = captureHostClasses(this._element, HOST_CLASS_NAMES)
-    this._hostDisabledClass = null
     this._hostMenuStyle = null
     this._hostOptionsId = ''
     this._hostValue = null
@@ -376,7 +375,7 @@ class Combobox extends ComboboxBase {
       this._element.disabled = this._config.disabled
     }
 
-    this._hostDisabledClass = toggleHostClass(this._element, CLASS_NAME_DISABLED, this._config.disabled, this._hostDisabledClass)
+    this._hostDisabledClass = toggleHostClass(this._element, CLASS_NAME_DISABLED, this._config.disabled, null)
     this._addedDisabled = !hadDisabled && this._element.hasAttribute('disabled')
 
     this._createValueElement()

@@ -278,7 +278,7 @@ class Chip extends BaseComponent {
       this._element.classList.add(CLASS_NAME_CHIP_CLICKABLE)
     }
 
-    this._hostDisabledClass = toggleHostClass(this._element, CLASS_NAME_DISABLED, Boolean(this._disabled), this._hostDisabledClass)
+    this._hostDisabledClass = toggleHostClass(this._element, CLASS_NAME_DISABLED, this._disabled, this._hostDisabledClass)
 
     // aria-disabled is not allowed on a generic element — only stamp it when
     // the chip carries a role; a role-less chip conveys the state through the

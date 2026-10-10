@@ -196,7 +196,6 @@ class Autocomplete extends ComboboxBase {
     this._inputElement = null
     this._inputHintElement = null
     this._togglerElement = null
-    this._hostDisabledClass = null
     this._hostClasses = captureHostClasses(this._element, HOST_CLASS_NAMES)
     this._feedbackIds = []
     this._keySerial = null
@@ -666,7 +665,7 @@ class Autocomplete extends ComboboxBase {
     this._element.classList.add(CLASS_NAME_AUTOCOMPLETE)
 
     this._config.disabled = this._config.disabled || this._element.classList.contains(CLASS_NAME_DISABLED)
-    this._hostDisabledClass = toggleHostClass(this._element, CLASS_NAME_DISABLED, this._config.disabled, this._hostDisabledClass)
+    this._hostDisabledClass = toggleHostClass(this._element, CLASS_NAME_DISABLED, this._config.disabled, null)
 
     this._createInputGroup()
     this._createButtons()

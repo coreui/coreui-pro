@@ -555,7 +555,7 @@ class Rating extends BaseComponent {
 
   _createRating(anchor: ChildNode | null = null): void {
     this._element.classList.add(CLASS_NAME_RATING)
-    this._hostDisabledClass = toggleHostClass(this._element, CLASS_NAME_DISABLED, Boolean(this._config.disabled), this._hostDisabledClass)
+    this._hostDisabledClass = toggleHostClass(this._element, CLASS_NAME_DISABLED, this._config.disabled, this._hostDisabledClass)
     this._element.classList.toggle(CLASS_NAME_READONLY, Boolean(this._config.readonly))
 
     if (this._sizeClassName) {
