@@ -345,6 +345,72 @@ describe('PasswordInput', () => {
       expect(fixtureEl.querySelector('.form-control-action').disabled).toBe(true)
     })
 
+    it('should not reveal a control the page disabled after init, and keep focus on its button', () => {
+      initialized('<input type="password" class="form-control" data-coreui-password-input>')
+      const input = fixtureEl.querySelector('input')
+      const button = fixtureEl.querySelector('.form-control-action')
+
+      button.focus()
+      input.disabled = true
+      button.click()
+
+      expect(input.type).toBe('password')
+      expect(document.activeElement).toBe(button)
+    })
+
+    it('should still hide a password revealed before the page disabled the control', () => {
+      initialized('<input type="password" class="form-control" data-coreui-password-input>')
+      const input = fixtureEl.querySelector('input')
+      const button = fixtureEl.querySelector('.form-control-action')
+
+      button.click()
+      input.disabled = true
+      button.click()
+
+      expect(input.type).toBe('password')
+    })
+
+    it('should not reveal a control disabled by its fieldset through toggle()', () => {
+      initialized('<fieldset disabled><input type="password" class="form-control" data-coreui-password-input></fieldset>')
+      const input = fixtureEl.querySelector('input')
+
+      PasswordInput.getInstance(input).toggle()
+
+      expect(input.type).toBe('password')
+    })
+
+    it('should enable its button once a control the page enabled after init takes focus', () => {
+      initialized('<input type="password" class="form-control" disabled data-coreui-password-input>')
+      const input = fixtureEl.querySelector('input')
+      const button = fixtureEl.querySelector('.form-control-action')
+
+      input.disabled = false
+      input.focus()
+
+      expect(button.disabled).toBe(false)
+
+      button.click()
+
+      expect(input.type).toBe('text')
+    })
+
+    it('should drop the focus listener of the control on dispose', () => {
+      initialized('<input type="password" class="form-control" data-coreui-password-input>')
+      const input = fixtureEl.querySelector('input')
+      const errors = []
+      const onError = event => {
+        errors.push(event.error)
+        event.preventDefault()
+      }
+
+      window.addEventListener('error', onError)
+      PasswordInput.getInstance(input).dispose()
+      input.focus()
+      window.removeEventListener('error', onError)
+
+      expect(errors).toEqual([])
+    })
+
     it('should handle several controls independently', () => {
       fixtureEl.innerHTML = [
         '<input type="password" class="form-control" data-coreui-password-input>',

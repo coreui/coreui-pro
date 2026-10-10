@@ -25,6 +25,7 @@ const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
 const EVENT_CLICK = `click${EVENT_KEY}`
+const EVENT_FOCUS = `focus${EVENT_KEY}`
 
 const CLASS_NAME_ACTION = 'form-control-action'
 const CLASS_NAME_PASSWORD_INPUT = 'password-input'
@@ -93,6 +94,10 @@ class PasswordInput extends BaseComponent {
 
   // Public
   toggle(): any {
+    if (this._element.type === 'password' && this._element.matches(':disabled')) {
+      return
+    }
+
     this._element.type = this._element.type === 'password' ? 'text' : 'password'
     this._updateToggleState()
   }
@@ -137,6 +142,9 @@ class PasswordInput extends BaseComponent {
     })
 
     EventHandler.on(this._toggleElement, EVENT_CLICK, () => this.toggle())
+    EventHandler.on(this._element, EVENT_FOCUS, () => {
+      this._toggleElement!.disabled = false
+    })
     this._group.element.append(this._toggleElement)
   }
 
