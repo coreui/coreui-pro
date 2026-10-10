@@ -1133,7 +1133,7 @@ describe('RangeSlider', () => {
 
       expect(RangeSlider.getInstance(element)).toBeNull()
       expect(Range.getInstance(wrapper)).toBeNull()
-      expect(element.className).toEqual('')
+      expect(element.hasAttribute('class')).toBeFalse()
       expect([...element.children].map(child => child.className)).toEqual(['note'])
     })
 

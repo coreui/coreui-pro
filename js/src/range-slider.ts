@@ -305,7 +305,9 @@ class RangeSlider extends BaseComponent {
       this._element.classList.remove(this._stateClass)
     }
 
-    this._element.classList.add(...this._serverMarks)
+    if (this._serverMarks.length > 0) {
+      this._element.classList.add(...this._serverMarks)
+    }
 
     if (this._addedRole && this._element.getAttribute('role') === 'group') {
       this._element.removeAttribute('role')
