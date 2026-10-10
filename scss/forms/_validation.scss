@@ -324,6 +324,10 @@
     ~ .#{$state}-tooltip { display: block; }
   }
 
+  .rating.is-#{$state} .rating-item {
+    --#{$prefix}theme-focus-ring: #{$focus-ring-color};
+  }
+
   // Input group — feedback lives outside the input-group in the parent
   // .form-field, so we use :has() to toggle display.
   .form-field:where(:has(.input-group .form-control.is-#{$state}, .input-group .form-select.is-#{$state})) {

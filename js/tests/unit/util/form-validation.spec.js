@@ -94,6 +94,16 @@ describe('Form validation utilities', () => {
 
       expect(getFeedbackIds(fixtureEl.querySelector('#when'))).toEqual(['whenError'])
     })
+
+    it('should read the feedback of a rating from the rating for its radios', () => {
+      fixtureEl.innerHTML = '<form><div class="rating"><div class="rating-item"><input id="star" name="score" type="radio"></div></div><div id="scoreError" class="invalid-feedback">Rate the delivery.</div></form>'
+
+      expect(getFeedbackIds(fixtureEl.querySelector('#star'))).toEqual(['scoreError'])
+
+      fixtureEl.querySelector('.rating').setAttribute('data-coreui-invalid-feedback', 'scoreHelp')
+
+      expect(getFeedbackIds(fixtureEl.querySelector('#star'))).toEqual(['scoreHelp'])
+    })
   })
 
   describe('updateValidationState', () => {
@@ -613,6 +623,23 @@ describe('Form validation utilities', () => {
       expect(validity.read()).toBe('invalid')
 
       validity.stop()
+    })
+
+    it('should start from a report the control it replaces had', () => {
+      fixtureEl.innerHTML = '<form novalidate><select id="value" required><option value="">None</option><option value="1">One</option></select></form>'
+      const control = fixtureEl.querySelector('#value')
+      const fresh = followUserValidity(control, () => {})
+      const carried = followUserValidity(control, () => {}, undefined, true)
+
+      expect(fresh.read()).toBeUndefined()
+      expect(carried.read()).toBe('invalid')
+
+      control.value = '1'
+
+      expect(carried.read()).toBeUndefined()
+
+      fresh.stop()
+      carried.stop()
     })
 
     it('should forget the report after a native reset, unless the reset was cancelled', async () => {

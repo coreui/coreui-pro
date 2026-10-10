@@ -59,6 +59,7 @@ const SELECTOR_OTP = '.form-otp'
 const SELECTOR_POPUP = '.popup'
 const SELECTOR_RANGE = '.form-range'
 const SELECTOR_RANGE_INPUT = '.form-range-input'
+const SELECTOR_RATING = '.rating'
 const SELECTOR_USER_INVALID = '[data-coreui-validate] :user-invalid'
 const SELECTOR_USER_VALID = '[data-coreui-validate~="valid"] :user-valid'
 const STATE_CLASSES = [CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID]
@@ -159,8 +160,8 @@ const getFollowingFeedback = (element: Element, control: FormControl): Element[]
  * Finds the element that stands for a control in the layout: the `.form-date-time` field for the
  * value field laid over it, the `.form-otp` group for its value field and its slots, the
  * `.chip-input` for its value field and its text field, the `.autocomplete` for the text field it
- * builds, and the `.combobox-toggle` for the `.combobox-select` right after it, which the messages
- * follow, otherwise the control itself.
+ * builds, the `.rating` for its radios, and the `.combobox-toggle` for the `.combobox-select` right
+ * after it, which the messages follow, otherwise the control itself.
  *
  * @param control - The control
  * @returns The element the layout places the control's messages around
@@ -168,7 +169,7 @@ const getFollowingFeedback = (element: Element, control: FormControl): Element[]
 const getLayoutElement = (control: FormControl): Element => {
   const previous = control.previousElementSibling
 
-  return control.closest(`${SELECTOR_AUTOCOMPLETE}, ${SELECTOR_CHIP_INPUT}, ${SELECTOR_DATE_TIME}, ${SELECTOR_OTP}`) ??
+  return control.closest(`${SELECTOR_AUTOCOMPLETE}, ${SELECTOR_CHIP_INPUT}, ${SELECTOR_DATE_TIME}, ${SELECTOR_OTP}, ${SELECTOR_RATING}`) ??
     (control.matches(SELECTOR_COMBOBOX_SELECT) && previous?.matches(SELECTOR_COMBOBOX_TOGGLE) ? previous : control)
 }
 
@@ -256,8 +257,8 @@ const getStructuralFeedback = (control: FormControl): Element[] => {
  * Finds the invalid feedback of a control: the elements named in `data-coreui-invalid-feedback`,
  * or else the ones the stylesheet shows when the control is invalid, for a radio or checkbox those
  * of every choice that shares its name. The value field of a `.form-date-time` takes both from the
- * field, a control of a `.form-otp` or a `.chip-input` from the group, and the value field of a
- * combobox from its toggle. A found element without an id gets one.
+ * field, a control of a `.form-otp`, a `.chip-input` or a `.rating` from the group, and the value
+ * field of a combobox from its toggle. A found element without an id gets one.
  *
  * @param control - The control
  * @returns The ids of its invalid feedback, without duplicates
@@ -664,16 +665,19 @@ export const nextStateSerial = (): number => ++stateSerial
  * @param onUpdate - Called with the state after every event that may change it
  * @param onReset - Called in the task after a native reset of the control's form that was not
  * cancelled, before `onUpdate`, with the last `nextStateSerial()` given out before the reset
+ * @param wasReported - Whether a validation already reported the control, for a control that
+ * replaces one a validation reported
  * @returns `read()` for the current state, and `stop()` to remove the listeners
  */
 export const followUserValidity = (
   control: FormControl,
   onUpdate: (state: ValidationState | undefined) => void,
-  onReset?: (serial: number) => void
+  onReset?: (serial: number) => void,
+  wasReported = false
 ): UserValidity => {
   const root = control.getRootNode()
   const roots = root instanceof ShadowRoot ? [control.ownerDocument, root] : [control.ownerDocument]
-  let reported = false
+  let reported = wasReported
   let reportedSinceReset = false
   let resetTimeout: ReturnType<typeof setTimeout> | undefined
   const read = () => (reported && !control.validity.valid ? 'invalid' : getUserValidity(control))

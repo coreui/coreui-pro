@@ -3,6 +3,7 @@ import { vi } from 'vitest'
 
 import Rating from '../../src/rating.js'
 import EventHandler from '../../src/dom/event-handler.js'
+import Form from '../../src/form.js'
 import Tooltip from '../../src/tooltip.js'
 import {
   getFixture, clearFixture, createEvent, jQueryMock
@@ -1819,7 +1820,7 @@ describe('Rating', () => {
 
       first.dispose()
 
-      expect(offSpy).toHaveBeenCalledWith(form, 'reset.coreui.rating', expect.any(Function))
+      expect(offSpy).toHaveBeenCalledWith(document, 'reset.coreui.rating', 'form', expect.any(Function))
 
       input.checked = true
       input.dispatchEvent(createEvent('change', { bubbles: true }))
@@ -1830,6 +1831,342 @@ describe('Rating', () => {
       expect(changeSpy).toHaveBeenCalledTimes(1)
       expect(secondEl.querySelectorAll('.rating-item-label.active')).toHaveSize(2)
       offSpy.mockRestore()
+    })
+  })
+
+  describe('validation', () => {
+    const wait = () => new Promise(resolve => {
+      setTimeout(resolve)
+    })
+
+    const mountInForm = (config = {}, attributes = '', after = '<div class="invalid-feedback">Rate the delivery.</div>') => {
+      fixtureEl.innerHTML = `<form><div id="score" ${attributes}></div>${after}</form>`
+      const element = fixtureEl.querySelector('#score')
+
+      return { element, form: fixtureEl.querySelector('form'), rating: new Rating(element, { name: 'score', ...config }) }
+    }
+
+    const radiosOf = element => [...element.querySelectorAll('.rating-item-input')]
+
+    it('should show a given state on the element and block the submit through the first radio', () => {
+      const { element, form } = mountInForm({ validationState: 'invalid' })
+      const [first, second] = radiosOf(element)
+      const feedback = form.querySelector('.invalid-feedback')
+
+      expect(element).toHaveClass('is-invalid')
+      expect(element.getAttribute('aria-invalid')).toEqual('true')
+      expect(element.hasAttribute('aria-describedby')).toBeFalse()
+      expect(radiosOf(element).every(radio => radio.getAttribute('aria-describedby') === feedback.id)).toBeTrue()
+      expect(radiosOf(element).some(radio => radio.hasAttribute('aria-invalid'))).toBeFalse()
+      expect(first.validationMessage).toEqual('Rate the delivery.')
+      expect(second.validity.valid).toBeTrue()
+      expect(form.checkValidity()).toBeFalse()
+    })
+
+    it('should block the submit through the checked star, and the focus goes there', () => {
+      const { element, form } = mountInForm({ validationState: 'invalid', value: 3 })
+      const radios = radiosOf(element)
+
+      expect(radios[2].validationMessage).toEqual('Rate the delivery.')
+      expect(radios[0].validity.valid).toBeTrue()
+
+      form.reportValidity()
+
+      expect(document.activeElement).toBe(radios[2])
+    })
+
+    it('should block with a generic message without a feedback', () => {
+      const { element } = mountInForm({ validationState: 'invalid' }, '', '')
+
+      expect(radiosOf(element)[0].validationMessage).toEqual('Invalid value.')
+    })
+
+    it('should not block for a valid or a custom state', () => {
+      const { element, form, rating } = mountInForm({ validationState: 'valid' })
+
+      expect(element).toHaveClass('is-valid')
+      expect(element.hasAttribute('aria-invalid')).toBeFalse()
+      expect(form.checkValidity()).toBeTrue()
+
+      rating.setConfig({ validationState: 'warning' })
+
+      expect(element).toHaveClass('is-warning')
+      expect(element).not.toHaveClass('is-valid')
+      expect(form.checkValidity()).toBeTrue()
+    })
+
+    it('should show a given state but not block the submit while disabled or read-only', () => {
+      for (const config of [{ disabled: true }, { readonly: true }]) {
+        const { element, form } = mountInForm({ validationState: 'invalid', ...config })
+
+        expect(element).toHaveClass('is-invalid')
+        expect(form.checkValidity()).toBeTrue()
+      }
+    })
+
+    it('should read the server class of the element once, when it starts', () => {
+      const { element, form } = mountInForm({}, 'class="is-invalid"')
+
+      expect(element).toHaveClass('is-invalid')
+      expect(form.checkValidity()).toBeFalse()
+
+      element.classList.add('is-valid')
+      radiosOf(element)[0].dispatchEvent(createEvent('focusout'))
+
+      expect(form.checkValidity()).toBeFalse()
+      expect(element.getAttribute('aria-invalid')).toEqual('true')
+
+      const { element: valid } = mountInForm({}, 'class="is-valid"')
+
+      expect(valid).toHaveClass('is-valid')
+
+      valid.querySelectorAll('.rating-item-label')[1].click()
+
+      expect(valid).not.toHaveClass('is-valid')
+    })
+
+    it('should drop a given state when the user picks a star, before the change event', () => {
+      const { element, form } = mountInForm({ validationState: 'invalid' })
+      const seen = []
+
+      element.addEventListener('change.coreui.rating', () => seen.push(element.classList.contains('is-invalid'), form.checkValidity()))
+      element.querySelectorAll('.rating-item-label')[3].click()
+
+      expect(seen).toEqual([false, true])
+      expect(element.hasAttribute('aria-invalid')).toBeFalse()
+      expect(radiosOf(element).some(radio => radio.hasAttribute('aria-describedby'))).toBeFalse()
+    })
+
+    it('should drop a given valid state when the user picks a star', () => {
+      const { element } = mountInForm({ validationState: 'valid' })
+
+      element.querySelectorAll('.rating-item-label')[3].click()
+
+      expect(element).not.toHaveClass('is-valid')
+    })
+
+    it('should drop a given state when the user clears the rating', () => {
+      const { element, form } = mountInForm({ allowClear: true, validationState: 'invalid', value: 3 })
+      const seen = []
+
+      element.addEventListener('change.coreui.rating', () => seen.push(element.classList.contains('is-invalid')))
+      element.querySelectorAll('.rating-item-label')[2].click()
+
+      expect(seen).toEqual([false])
+      expect(radiosOf(element).some(radio => radio.checked)).toBeFalse()
+      expect(element).not.toHaveClass('is-invalid')
+      expect(form.checkValidity()).toBeTrue()
+    })
+
+    it('should keep a given state when the value changes from code', () => {
+      const { element, form, rating } = mountInForm({ validationState: 'invalid', value: 2 })
+
+      rating.setConfig({ value: 4 })
+      rating.reset(3)
+
+      expect(element).toHaveClass('is-invalid')
+      expect(form.checkValidity()).toBeFalse()
+    })
+
+    it('should change the state on setConfig without building the stars again', () => {
+      const { element, form, rating } = mountInForm()
+      const before = radiosOf(element)
+
+      rating.setConfig({ validationState: 'invalid' })
+
+      expect(radiosOf(element)).toEqual(before)
+      expect(element).toHaveClass('is-invalid')
+      expect(form.checkValidity()).toBeFalse()
+
+      rating.setConfig({ validationState: null })
+
+      expect(element).not.toHaveClass('is-invalid')
+      expect(form.checkValidity()).toBeTrue()
+    })
+
+    it('should drop a state given before a native reset, also when the page rebuilds the rating in the reset', async () => {
+      const { element, form, rating } = mountInForm({ validationState: 'invalid' })
+
+      form.addEventListener('reset', () => rating.setConfig({ itemCount: 6 }))
+      form.reset()
+      await wait()
+
+      expect(element).not.toHaveClass('is-invalid')
+      expect(form.checkValidity()).toBeTrue()
+    })
+
+    it('should drop a state on a native reset of the form the rating was put in after it started', async () => {
+      fixtureEl.innerHTML = '<form></form>'
+      const form = fixtureEl.querySelector('form')
+      const element = document.createElement('div')
+      // eslint-disable-next-line no-new
+      new Rating(element, { name: 'score', validationState: 'invalid' })
+
+      form.append(element)
+      form.reset()
+      await wait()
+
+      expect(element).not.toHaveClass('is-invalid')
+      expect(form.checkValidity()).toBeTrue()
+    })
+
+    it('should follow a native reset of a form cloned from a template and inside a shadow root', async () => {
+      const template = document.createElement('template')
+      template.innerHTML = '<form><div></div></form>'
+      const clone = template.content.cloneNode(true)
+      const cloned = clone.querySelector('div')
+      // eslint-disable-next-line no-new
+      new Rating(cloned, { name: 'score', validationState: 'invalid', value: 2 })
+      fixtureEl.append(clone)
+
+      cloned.querySelectorAll('.rating-item-label')[3].click()
+      cloned.closest('form').reset()
+      await wait()
+
+      expect(cloned.querySelectorAll('.rating-item-label.active')).toHaveSize(2)
+
+      const host = document.createElement('div')
+      fixtureEl.append(host)
+      host.attachShadow({ mode: 'open' }).innerHTML = '<form><div></div></form>'
+      const shadowed = host.shadowRoot.querySelector('div')
+      // eslint-disable-next-line no-new
+      new Rating(shadowed, { name: 'score', validationState: 'invalid' })
+
+      host.shadowRoot.querySelector('form').reset()
+      await wait()
+
+      expect(shadowed).not.toHaveClass('is-invalid')
+    })
+
+    it('should keep a state given in a reset listener the page added before the rating', async () => {
+      fixtureEl.innerHTML = '<form><div id="score"></div></form>'
+      const form = fixtureEl.querySelector('form')
+      const element = fixtureEl.querySelector('#score')
+      let rating = null
+
+      form.addEventListener('reset', () => rating.setConfig({ validationState: 'invalid' }))
+      rating = new Rating(element, { name: 'score' })
+      form.reset()
+      await wait()
+
+      expect(element).toHaveClass('is-invalid')
+      expect(form.checkValidity()).toBeFalse()
+    })
+
+    it('should make every radio required and the element aria-required, unless it is read-only', () => {
+      const { element, form, rating } = mountInForm({ required: true })
+
+      expect(radiosOf(element).every(radio => radio.required)).toBeTrue()
+      expect(element.getAttribute('aria-required')).toEqual('true')
+      expect(form.checkValidity()).toBeFalse()
+
+      element.querySelectorAll('.rating-item-label')[1].click()
+
+      expect(form.checkValidity()).toBeTrue()
+
+      rating.setConfig({ readonly: true, value: null })
+
+      expect(radiosOf(element).some(radio => radio.required)).toBeFalse()
+      expect(element.hasAttribute('aria-required')).toBeFalse()
+      expect(form.checkValidity()).toBeTrue()
+    })
+
+    it('should show the state a validation reports for a required rating without a value, and drop it once a star is picked', () => {
+      const { element, form } = mountInForm({ required: true })
+      const feedback = form.querySelector('.invalid-feedback')
+
+      form.checkValidity()
+
+      expect(element).toHaveClass('is-invalid')
+      expect(element.getAttribute('aria-invalid')).toEqual('true')
+      expect(radiosOf(element)[0].getAttribute('aria-describedby')).toEqual(feedback.id)
+
+      element.querySelectorAll('.rating-item-label')[1].click()
+
+      expect(element).not.toHaveClass('is-invalid')
+      expect(element.hasAttribute('aria-invalid')).toBeFalse()
+    })
+
+    it('should keep the state a validation reported when setConfig renders the stars again', () => {
+      const { element, form, rating } = mountInForm({ required: true })
+
+      form.checkValidity()
+      rating.setConfig({ size: 'lg' })
+
+      expect(element).toHaveClass('is-invalid')
+      expect(element.getAttribute('aria-invalid')).toEqual('true')
+    })
+
+    it('should keep a given valid state over what the form plugin reports', () => {
+      const { element, form } = mountInForm({ required: true, validationState: 'valid' })
+
+      form.setAttribute('data-coreui-validate', '')
+      form.noValidate = true
+      Form.getOrCreateInstance(form).validate()
+
+      expect(element).toHaveClass('is-valid')
+      expect(element.hasAttribute('aria-invalid')).toBeFalse()
+      expect(radiosOf(element).some(radio => radio.classList.contains('is-invalid') || radio.hasAttribute('aria-invalid'))).toBeFalse()
+    })
+
+    it('should keep the description of the page and add the feedback to every star only while invalid', () => {
+      const { element, form, rating } = mountInForm({ validationState: 'invalid' }, 'aria-describedby="scoreHelp"')
+      const feedback = form.querySelector('.invalid-feedback')
+
+      expect(element.getAttribute('aria-describedby')).toEqual('scoreHelp')
+      expect(radiosOf(element).every(radio => radio.getAttribute('aria-describedby') === feedback.id)).toBeTrue()
+
+      rating.setConfig({ validationState: null })
+
+      expect(element.getAttribute('aria-describedby')).toEqual('scoreHelp')
+      expect(radiosOf(element).some(radio => radio.hasAttribute('aria-describedby'))).toBeFalse()
+    })
+
+    it('should find the feedback named in data-coreui-invalid-feedback on the element', () => {
+      const { element } = mountInForm({ validationState: 'invalid' }, 'data-coreui-invalid-feedback="scoreError"', '<p><span id="scoreError">Rate the delivery.</span></p>')
+
+      expect(radiosOf(element)[0].getAttribute('aria-describedby')).toEqual('scoreError')
+      expect(radiosOf(element)[0].validationMessage).toEqual('Rate the delivery.')
+    })
+
+    it('should leave aria-invalid and aria-required the page set on the element', () => {
+      const { element, rating } = mountInForm({ required: true, validationState: 'invalid' }, 'aria-invalid="false" aria-required="false"')
+
+      expect(element.getAttribute('aria-invalid')).toEqual('false')
+      expect(element.getAttribute('aria-required')).toEqual('false')
+
+      rating.setConfig({ validationState: null })
+
+      expect(element.getAttribute('aria-invalid')).toEqual('false')
+
+      rating.dispose()
+
+      expect(element.getAttribute('aria-invalid')).toEqual('false')
+      expect(element.getAttribute('aria-required')).toEqual('false')
+    })
+
+    it('should give back the server class it still holds and take its own attributes back on dispose', () => {
+      const { element, rating } = mountInForm({ required: true }, 'class="is-invalid" aria-describedby="scoreHelp"')
+
+      rating.dispose()
+
+      expect(element).toHaveClass('is-invalid')
+      expect(element.getAttribute('aria-describedby')).toEqual('scoreHelp')
+      expect(element.hasAttribute('aria-invalid')).toBeFalse()
+      expect(element.hasAttribute('aria-required')).toBeFalse()
+
+      const { element: picked, rating: dismissed } = mountInForm({}, 'class="is-invalid"')
+
+      picked.querySelectorAll('.rating-item-label')[1].click()
+      dismissed.dispose()
+
+      expect(picked).not.toHaveClass('is-invalid')
+
+      const { element: plain, rating: given } = mountInForm({ validationState: 'invalid' })
+
+      given.dispose()
+
+      expect(plain.outerHTML).toEqual('<div id="score"></div>')
     })
   })
 
