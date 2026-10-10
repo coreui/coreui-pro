@@ -159,6 +159,7 @@ const DefaultType: Record<string, string> = {
 
 class RangeSlider extends BaseComponent {
   protected declare _addedRole: boolean
+  protected declare _hadClassAttribute: boolean
   protected declare _config: RangeSliderConfig
   protected declare _hostAttributes: Map<string, string>
   protected declare _inputs: HTMLInputElement[]
@@ -191,6 +192,7 @@ class RangeSlider extends BaseComponent {
     }
 
     this._addedRole = !this._element.hasAttribute('role')
+    this._hadClassAttribute = this._element.hasAttribute('class')
     this._inputs = []
     this._press = null
     this._releaseValidationState = null
@@ -306,6 +308,10 @@ class RangeSlider extends BaseComponent {
     }
 
     this._element.classList.add(...this._serverMarks)
+
+    if (!this._hadClassAttribute && this._element.getAttribute('class') === '') {
+      this._element.removeAttribute('class')
+    }
 
     if (this._addedRole && this._element.getAttribute('role') === 'group') {
       this._element.removeAttribute('role')
