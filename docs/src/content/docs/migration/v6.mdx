@@ -1640,9 +1640,10 @@ validation and the arrow between them. Two consequences:
 #### Date Input / Time Input
 
 - **A `.disabled` class in the markup disables the field**, the way
-  `disabled: true` does, unless the options set `disabled`. The date range
-  input and the date, date range and time pickers set it for the fields they
-  build or adopt, so there their own `disabled` decides. `dispose()` gives the field back the class
+  `disabled: true` does, unless the options passed in JavaScript set
+  `disabled`. The date range input and the date, date range and time pickers
+  pass it for the fields they build or adopt, so there their own `disabled`
+  decides. `dispose()` gives the field back the class
   the markup had.
 - **`reset()` restores the date the field was created with**, not the last one
   passed to `update()`, and emits `dateChange` when the value moves. A native
@@ -2061,6 +2062,11 @@ select enhances, now disables the component, the way `disabled: true` does,
 as it already did for Combobox, Chip and Chip Input. The data API used to skip
 an autocomplete with the class, and a multi select only looked disabled while
 it kept working. `dispose()` gives the element back the class the markup had.
+
+A disabled multi select now disables its select too, so the form leaves it out
+of validation and of the submitted data, as it does for the other disabled
+fields; a `required` multi select that is disabled no longer blocks the
+submit. A `disabled` attribute on the select disables the component as well.
 
 #### Multi Select
 

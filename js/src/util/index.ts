@@ -463,13 +463,11 @@ const restoreHostClasses = (element: HTMLElement, managed: string[], host: HostC
  *   it, or `null` while no change of the component is in effect
  */
 const toggleHostClass = (element: HTMLElement, className: string, force: boolean, original: boolean | null): boolean | null => {
-  if (element.classList.contains(className) === force) {
-    return original
-  }
+  const before = original ?? element.classList.contains(className)
 
   element.classList.toggle(className, force)
 
-  return original === force ? null : original ?? !force
+  return before === force ? null : before
 }
 
 export {

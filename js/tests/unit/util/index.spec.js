@@ -1085,6 +1085,16 @@ describe('Util', () => {
       expect(div.className).toEqual('disabled')
     })
 
+    it('should report no change once the page undid the change of the component', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const original = Util.toggleHostClass(div, 'disabled', true, null)
+
+      div.classList.remove('disabled')
+
+      expect(Util.toggleHostClass(div, 'disabled', false, original)).toBeNull()
+    })
+
     it('should report no change once the component undid its own change', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')

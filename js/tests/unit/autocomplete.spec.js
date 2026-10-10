@@ -3282,7 +3282,7 @@ describe('Autocomplete', () => {
       const element = fixtureEl.querySelector('div')
       const autocomplete = new Autocomplete(element, { options: [] })
 
-      expect(autocomplete._config.disabled).toBeTrue()
+      expect(element.querySelector('input[role="combobox"]').disabled).toBeTrue()
 
       autocomplete.dispose()
 
@@ -4466,7 +4466,8 @@ describe('Autocomplete', () => {
 
       window.dispatchEvent(createEvent('load'))
 
-      expect(Autocomplete.getInstance(autocompleteEl)._config.disabled).toBeTrue()
+      expect(Autocomplete.getInstance(autocompleteEl)).toBeInstanceOf(Autocomplete)
+      expect(autocompleteEl.querySelector('input[role="combobox"]').disabled).toBeTrue()
     })
 
     it('should initialize autocomplete from data attributes', () => {

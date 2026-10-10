@@ -79,7 +79,7 @@ const CLASS_NAME_INPUT_GROUP = 'form-control-group'
 const CLASS_NAME_IS_INVALID = 'is-invalid'
 const CLASS_NAME_IS_VALID = 'is-valid'
 const CLASS_NAME_SELECT = 'form-multi-select'
-const HOST_ATTRIBUTES = ['aria-hidden', 'id', 'multiple', 'name', 'required', 'tabindex']
+const HOST_ATTRIBUTES = ['aria-hidden', 'disabled', 'id', 'multiple', 'name', 'required', 'tabindex']
 const CLASS_NAME_SELECT_FILLED = 'form-multi-select-filled'
 const CLASS_NAME_SELECT_ALL = 'list-box-select-all'
 const CLASS_NAME_SEARCH = 'form-multi-select-search'
@@ -271,7 +271,7 @@ class MultiSelect extends ComboboxBase {
   constructor(element?: string | Element | null, config?: Partial<MultiSelectConfig> | null) {
     super(element, config)
 
-    this._config.disabled = this._config.disabled || this._element.classList.contains(CLASS_NAME_DISABLED)
+    this._config.disabled = this._config.disabled || (this._element as HTMLSelectElement).disabled || this._element.classList.contains(CLASS_NAME_DISABLED)
     this._hostAttributes = new Map(HOST_ATTRIBUTES.map(name => [name, this._element.getAttribute(name)]))
     this._hostClasses = captureHostClasses(this._element, HOST_CLASS_NAMES)
     this._hostDisabledClass = null
@@ -852,6 +852,8 @@ class MultiSelect extends ComboboxBase {
     } else {
       this._element.removeAttribute('required')
     }
+
+    this._element.toggleAttribute('disabled', Boolean(this._config.disabled))
   }
 
   _createNativeOptions(parentElement: HTMLElement, options: any[]): void {
