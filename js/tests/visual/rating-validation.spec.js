@@ -7,6 +7,7 @@
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  */
 
+import { userEvent } from 'vitest/browser'
 // eslint-disable-next-line import/no-unassigned-import
 import '../../../scss/coreui.scss'
 import Rating from '../../src/rating.js'
@@ -14,9 +15,9 @@ import Rating from '../../src/rating.js'
 let container
 let rating
 
-const mount = validationState => {
+const mount = (validationState, className = '') => {
   container = document.createElement('div')
-  container.innerHTML = '<div></div>'
+  container.innerHTML = `<div class="${className}"></div>`
   document.body.append(container)
   rating = new Rating(container.firstElementChild, { validationState })
 
@@ -39,16 +40,24 @@ describe('rating validation', () => {
     container?.remove()
   })
 
-  it('colours the empty stars and the focus ring with the theme of a given state', () => {
+  it('colours the empty stars with the theme of a given state', () => {
     for (const [state, theme] of [['invalid', 'danger'], ['valid', 'success']]) {
       const label = mount(state)
 
       expect(getComputedStyle(label).color).toEqual(colourOf(`var(--cui-${theme}-fg)`))
-      expect(colourOf(getComputedStyle(label.closest('.rating-item')).getPropertyValue('--cui-focus-ring-color'))).toEqual(colourOf(`var(--cui-${theme}-focus-ring)`))
 
       rating.dispose()
       container.remove()
     }
+  })
+
+  it('draws the focus ring in the colour of the state, also on a themed rating', async () => {
+    const label = mount('invalid', 'theme-success')
+
+    await userEvent.keyboard('{Tab}')
+
+    expect(document.activeElement).toBe(label.closest('.rating-item').querySelector('.rating-item-input'))
+    expect(getComputedStyle(label.closest('.rating-item')).outlineColor).toEqual(colourOf('var(--cui-danger-focus-ring)'))
   })
 
   it('keeps the empty stars in the rating colour without a state', () => {

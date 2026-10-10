@@ -625,6 +625,23 @@ describe('Form validation utilities', () => {
       validity.stop()
     })
 
+    it('should start from a report the control it replaces had', () => {
+      fixtureEl.innerHTML = '<form novalidate><select id="value" required><option value="">None</option><option value="1">One</option></select></form>'
+      const control = fixtureEl.querySelector('#value')
+      const fresh = followUserValidity(control, () => {})
+      const carried = followUserValidity(control, () => {}, undefined, true)
+
+      expect(fresh.read()).toBeUndefined()
+      expect(carried.read()).toBe('invalid')
+
+      control.value = '1'
+
+      expect(carried.read()).toBeUndefined()
+
+      fresh.stop()
+      carried.stop()
+    })
+
     it('should forget the report after a native reset, unless the reset was cancelled', async () => {
       fixtureEl.innerHTML = '<form novalidate><input id="value" required></form>'
       const control = fixtureEl.querySelector('#value')

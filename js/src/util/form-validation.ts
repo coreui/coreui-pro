@@ -665,16 +665,19 @@ export const nextStateSerial = (): number => ++stateSerial
  * @param onUpdate - Called with the state after every event that may change it
  * @param onReset - Called in the task after a native reset of the control's form that was not
  * cancelled, before `onUpdate`, with the last `nextStateSerial()` given out before the reset
+ * @param wasReported - Whether a validation already reported the control, for a control that
+ * replaces one a validation reported
  * @returns `read()` for the current state, and `stop()` to remove the listeners
  */
 export const followUserValidity = (
   control: FormControl,
   onUpdate: (state: ValidationState | undefined) => void,
-  onReset?: (serial: number) => void
+  onReset?: (serial: number) => void,
+  wasReported = false
 ): UserValidity => {
   const root = control.getRootNode()
   const roots = root instanceof ShadowRoot ? [control.ownerDocument, root] : [control.ownerDocument]
-  let reported = false
+  let reported = wasReported
   let reportedSinceReset = false
   let resetTimeout: ReturnType<typeof setTimeout> | undefined
   const read = () => (reported && !control.validity.valid ? 'invalid' : getUserValidity(control))

@@ -130,7 +130,6 @@ const DefaultType = {
 
 class Rating extends BaseComponent {
   protected declare _currentValue: number | string | null
-  protected declare _feedbackIds: string[]
   protected declare _form: HTMLFormElement | null
   protected declare _hostAriaInvalid: string | null
   protected declare _hostAriaReadonly: string | null
@@ -140,6 +139,8 @@ class Rating extends BaseComponent {
   protected declare _items: HTMLElement[]
   protected declare _name: string
   protected declare _releaseValidationState: (() => void) | null
+  protected declare _reported: boolean
+  protected declare _resetEvent: Event | null
   protected declare _resetHandler: (event: Event) => void
   protected declare _resetRoot: Document | ShadowRoot
   protected declare _serverMarks: string[]
@@ -163,10 +164,11 @@ class Rating extends BaseComponent {
     this._hostAriaReadonly = this._element.getAttribute('aria-readonly')
     this._hostAriaRequired = this._element.getAttribute('aria-required')
     this._hostRole = this._element.getAttribute('role')
-    this._feedbackIds = []
     this._items = []
     this._form = this._element.closest('form')
     this._releaseValidationState = null
+    this._reported = false
+    this._resetEvent = null
     this._resetRoot = this._element.getRootNode() instanceof ShadowRoot ? this._element.getRootNode() as ShadowRoot : this._element.ownerDocument
     this._serverMarks = STATE_CLASSES.filter(name => this._element.classList.contains(name))
     this._stateClass = null
@@ -178,10 +180,11 @@ class Rating extends BaseComponent {
     }
 
     this._resetHandler = (event: Event) => {
-      if (event.target !== this._form) {
+      if (event === this._resetEvent || event.target !== this._radios()[0]?.form) {
         return
       }
 
+      this._resetEvent = event
       const serial = nextStateSerial()
 
       setTimeout(() => {
@@ -270,18 +273,18 @@ class Rating extends BaseComponent {
     }
 
     EventHandler.off(this._resetRoot, EVENT_RESET, SELECTOR_FORM, this._resetHandler)
+    this._form?.removeEventListener('reset', this._resetHandler, true)
     this._removeRating()
-    restoreHostClasses(this._element, this._managedClassNames(), this._hostClasses)
 
     if (this._stateClass) {
       this._element.classList.remove(this._stateClass)
     }
 
+    restoreHostClasses(this._element, this._managedClassNames(), this._hostClasses)
+
     if (this._serverMarks.length > 0) {
       this._element.classList.add(...this._serverMarks)
     }
-
-    this._writeFeedbackIds([])
 
     if (this._hostAriaInvalid === null) {
       this._element.removeAttribute('aria-invalid')
@@ -318,6 +321,7 @@ class Rating extends BaseComponent {
       follower.stop()
     }
 
+    this._reported = this._userValidity.some(follower => follower.read() === 'invalid')
     this._userValidity = []
     this._releaseValidationState?.()
     this._releaseValidationState = null
@@ -341,9 +345,8 @@ class Rating extends BaseComponent {
   }
 
   _addEventListeners(): void {
-    if (this._form) {
-      EventHandler.on(this._resetRoot, EVENT_RESET, SELECTOR_FORM, this._resetHandler)
-    }
+    EventHandler.on(this._resetRoot, EVENT_RESET, SELECTOR_FORM, this._resetHandler)
+    this._form?.addEventListener('reset', this._resetHandler, true)
 
     EventHandler.on(this._element, EVENT_CLICK, SELECTOR_RATING_ITEM_INPUT, (event: any) => {
       const { target } = event
@@ -596,7 +599,7 @@ class Rating extends BaseComponent {
     }
 
     const radios = this._radios()
-    this._userValidity = radios.map(radio => followUserValidity(radio, () => this._updateValidity()))
+    this._userValidity = radios.map(radio => followUserValidity(radio, () => this._updateValidity(), undefined, this._reported))
     this._releaseValidationState = ownValidationState(...radios)
     this._updateValidity()
   }
@@ -616,17 +619,20 @@ class Rating extends BaseComponent {
   }
 
   _updateValidity(): void {
-    const [first] = this._radios()
+    const radios = this._radios()
 
-    if (!first) {
+    if (radios.length === 0) {
       return
     }
 
+    const blocked = radios.find(radio => radio.checked) ?? radios[0]
     const givenState = getValidationState(this._config.validationState) ??
       getValidationState(null, this._serverMarks.includes(CLASS_NAME_IS_VALID), this._serverMarks.includes(CLASS_NAME_IS_INVALID))
 
-    if (givenState !== 'invalid') {
-      setStateValidity(first, false)
+    for (const radio of radios) {
+      if (radio !== blocked || givenState !== 'invalid') {
+        setStateValidity(radio, false)
+      }
     }
 
     const reported = this._userValidity.map(follower => follower.read())
@@ -645,29 +651,29 @@ class Rating extends BaseComponent {
       this._stateClass = stateClass
     }
 
-    setStateValidity(first, givenState === 'invalid' && !this._config.readonly)
-    this._writeFeedbackIds(state === 'invalid' ? getFeedbackIds(first) : [])
+    setStateValidity(blocked, givenState === 'invalid' && !this._config.readonly)
+    this._writeInvalid(state === 'invalid', radios, blocked)
+  }
+
+  _writeInvalid(invalid: boolean, radios: HTMLInputElement[], blocked: HTMLInputElement): void {
+    const feedbackIds = invalid ? getFeedbackIds(blocked).join(' ') : ''
+
+    for (const radio of radios) {
+      if (!feedbackIds) {
+        radio.removeAttribute('aria-describedby')
+      } else if (radio.getAttribute('aria-describedby') !== feedbackIds) {
+        radio.setAttribute('aria-describedby', feedbackIds)
+      }
+    }
 
     if (this._hostAriaInvalid !== null) {
       return
     }
 
-    if (state !== 'invalid') {
+    if (!invalid) {
       this._element.removeAttribute('aria-invalid')
     } else if (!this._element.hasAttribute('aria-invalid')) {
       this._element.setAttribute('aria-invalid', 'true')
-    }
-  }
-
-  _writeFeedbackIds(feedbackIds: string[]): void {
-    const pageIds = (this._element.getAttribute('aria-describedby') ?? '').split(/\s+/).filter(id => id && !this._feedbackIds.includes(id))
-    this._feedbackIds = feedbackIds.filter(id => !pageIds.includes(id))
-    const describedBy = [...pageIds, ...this._feedbackIds].join(' ')
-
-    if (!describedBy) {
-      this._element.removeAttribute('aria-describedby')
-    } else if (this._element.getAttribute('aria-describedby') !== describedBy) {
-      this._element.setAttribute('aria-describedby', describedBy)
     }
   }
 

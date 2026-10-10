@@ -326,7 +326,7 @@
 
   .rating.is-#{$state} .rating-item {
     --#{$prefix}rating-item-color: #{$color};
-    --#{$prefix}focus-ring-color: #{$focus-ring-color};
+    --#{$prefix}theme-focus-ring: #{$focus-ring-color};
   }
 
   // Input group — feedback lives outside the input-group in the parent
