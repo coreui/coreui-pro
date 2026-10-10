@@ -15,8 +15,9 @@ import Rating from '../../src/rating.js'
 let container
 let rating
 
-const mount = (validationState, className = '') => {
+const mount = (validationState, className = '', scheme = 'light') => {
   container = document.createElement('div')
+  container.setAttribute('data-coreui-theme', scheme)
   container.innerHTML = `<div class="${className}"></div>`
   document.body.append(container)
   rating = new Rating(container.firstElementChild, { validationState })
@@ -40,14 +41,16 @@ describe('rating validation', () => {
     container?.remove()
   })
 
-  it('keeps the colours of the stars under a given state', () => {
-    for (const state of ['invalid', 'valid']) {
-      const label = mount(state)
+  it('draws the empty stars in gray-600 in both colour schemes, also under a given state', () => {
+    for (const scheme of ['light', 'dark']) {
+      for (const state of [null, 'invalid', 'valid']) {
+        const label = mount(state, '', scheme)
 
-      expect(getComputedStyle(label).color).toEqual(colourOf('var(--cui-fg-3)'))
+        expect(getComputedStyle(label).color).toEqual(colourOf('var(--cui-gray-600)'))
 
-      rating.dispose()
-      container.remove()
+        rating.dispose()
+        container.remove()
+      }
     }
   })
 
