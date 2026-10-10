@@ -84,11 +84,6 @@ The time picker supports [floating labels](/forms/floating-labels/): set `floati
     </div>
   </div>`} />
 
-<Callout color="info">
-  **`inputReadOnly` is gone** — a section field is never free-text, so
-  there is nothing to make read-only. Use `disabled`.
-</Callout>
-
 ## Validation
 
 The picker takes its validation state [the way the date picker does](/forms/date-picker/#validation): the `validationState` option (with `invalid` and `valid` as deprecated aliases) or an `.is-invalid` or `.is-valid` class written on the picker element, read once when the picker starts. A given state drops on the next change of the time the user makes, a time picked in the panel, the cleaner, a footer button that changes the time through the context, or typing in the field, and stays through `setTime()`, `clear()`, `reset()` and `now()` called by your code. `setConfig({ validationState })` sets it again; for now `setConfig` changes only the validation options. While the given state is `'invalid'`, the sections of the field carry `aria-invalid="true"`, are described by the message after the picker, and the picker blocks the submit with its text, or `Invalid value.` when there is none.

@@ -242,13 +242,6 @@ appearance and remove pointer events.
     </div>
   </div>`} />
 
-<Callout color="info">
-  **`inputReadOnly` and `previewDateOnHover` are gone.** A section field is
-  never free-text, so there is nothing to make read-only — use `disabled`. The
-  hover preview wrote into the input value, which does not compose with
-  sections. See the [migration guide](/migration/v6/).
-</Callout>
-
 ## Disabled dates
 
 The `disabledDates` option excludes specific dates — single `Date`s,
@@ -356,9 +349,8 @@ The date picker is Gregorian: with a locale whose own calendar has different mon
 
 ## Custom formats
 
-`inputDateFormat` and `inputOnChangeDelay` are gone — the mask itself defines
-the format. Set it with `data-coreui-format` (or the `format` option), which the
-field forwards from the shell. The parser accepts both dayjs/moment-style tokens
+The mask of the field defines the format. Set it with `data-coreui-format` (or
+the `format` option), which the field forwards from the shell. The parser accepts both dayjs/moment-style tokens
 (`DD`, `MM`, `YYYY`, `YY`) and date-fns/Unicode-style tokens (`dd`, `MM`,
 `yyyy`, `yy`), plus `ww` for ISO week numbers and `q` (numeric) or `QQQ`
 (`Q1`–`Q4`) for quarters; any other character becomes a literal separator.
