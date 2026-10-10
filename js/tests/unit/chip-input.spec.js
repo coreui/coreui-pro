@@ -600,6 +600,41 @@ describe('ChipInput', () => {
       expect(el.querySelector('input[type="text"]').disabled).toBeTrue()
     })
 
+    it('should disable a single chip that carries data-coreui-disabled, and every chip while the input is disabled', () => {
+      fixtureEl.innerHTML = '<div class="chip-input"><span class="chip" data-coreui-disabled="true">Locked</span><span class="chip">Free</span></div>'
+      const el = fixtureEl.querySelector('.chip-input')
+      const chipInput = new ChipInput(el, { removable: true })
+      const [locked, free] = el.querySelectorAll('.chip')
+
+      expect(Chip.getInstance(locked)._disabled).toBeTrue()
+      expect(locked.querySelector('.chip-remove')).toBeNull()
+      expect(Chip.getInstance(free)._disabled).toBeFalse()
+
+      chipInput.dispose()
+
+      fixtureEl.innerHTML = '<div class="chip-input"><span class="chip" data-coreui-disabled="false">Free</span></div>'
+      const disabledInput = new ChipInput(fixtureEl.querySelector('.chip-input'), { disabled: true })
+
+      expect(Chip.getInstance(fixtureEl.querySelector('.chip'))._disabled).toBeTrue()
+
+      disabledInput.dispose()
+    })
+
+    it('should give a text field from the markup back its disabled and readonly state on dispose', () => {
+      fixtureEl.innerHTML = '<div class="chip-input"><input type="text" class="chip-input-field" disabled readonly></div>'
+      const el = fixtureEl.querySelector('.chip-input')
+      const input = el.querySelector('input')
+      const chipInput = new ChipInput(el)
+
+      expect(input.disabled).toBeFalse()
+      expect(input.readOnly).toBeFalse()
+
+      chipInput.dispose()
+
+      expect(input.disabled).toBeTrue()
+      expect(input.readOnly).toBeTrue()
+    })
+
     it('should leave the disabled state to the option, not a class in the markup', () => {
       fixtureEl.innerHTML = '<div class="chip-input disabled"></div>'
 

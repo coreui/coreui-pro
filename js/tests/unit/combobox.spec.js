@@ -1244,7 +1244,12 @@ describe('Combobox', () => {
       const configured = fixtureEl.querySelector('#configured')
       const marked = fixtureEl.querySelector('#marked')
 
-      new Combobox(configured, { disabled: true }).dispose()
+      const combobox = new Combobox(configured, { disabled: true })
+
+      expect(configured.disabled).toBeTrue()
+      expect(configured.classList.contains('disabled')).toBeTrue()
+
+      combobox.dispose()
       new Combobox(marked).dispose()
 
       expect(configured.outerHTML).toEqual('<button class="form-control" id="configured"></button>')

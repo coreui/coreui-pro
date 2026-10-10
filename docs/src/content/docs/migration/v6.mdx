@@ -2058,11 +2058,13 @@ Combobox, Autocomplete, Multi Select, Chip Input, Chip Set, Chip, Rating, Date
 Input and Time Input take their disabled state only from the `disabled` option
 (`data-coreui-disabled="true"`). A `.disabled` class in the markup, or a
 `disabled` attribute on the select a multi select enhances or on a combobox
-toggle button, does not disable them: while they live they set the class, and
-that attribute, from the option, and `dispose()` gives the element back the
-markup it had. In v5 a `.disabled` class disabled a chip and a chip set, and
-the autocomplete data API skipped an element with the class; write
-`data-coreui-disabled="true"` instead.
+toggle button, does not disable them. While they live, all but Chip Set set the
+class from the option, Combobox and Multi Select also that attribute, and
+`dispose()` gives the element back the markup it had; Chip Set passes the
+option to its chips. In v5 a `.disabled` class disabled a chip, a chip set and
+a chip input, and the autocomplete data API skipped an element with the class;
+write `data-coreui-disabled="true"` instead, on a single chip too. A
+`disabled` class returned by `chipClassName` no longer disables a chip.
 
 A disabled multi select now disables its select, so the form leaves it out of
 validation and of the submitted data, as it does for the other disabled

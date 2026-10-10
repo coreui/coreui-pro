@@ -4943,8 +4943,11 @@ describe('MultiSelect', () => {
       const select = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(select, { disabled: true })
 
+      expect(select.disabled).toBeTrue()
+
       multiSelect.setConfig({ disabled: false })
 
+      expect(select.disabled).toBeFalse()
       expect(select.classList.contains('disabled')).toBeFalse()
       expect(fixtureEl.querySelector('.form-multi-select').classList.contains('disabled')).toBeFalse()
 

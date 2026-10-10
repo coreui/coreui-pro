@@ -899,6 +899,19 @@ describe('Chip', () => {
       expect(Chip.getInstance(chipEl)).toBeNull()
     })
 
+    it('should give back the aria-disabled the markup had on dispose', () => {
+      fixtureEl.innerHTML = '<span class="chip disabled" role="button" aria-disabled="true">A</span>'
+      const chipEl = fixtureEl.querySelector('span')
+      const chip = new Chip(chipEl)
+
+      expect(chipEl.getAttribute('aria-disabled')).toEqual('false')
+
+      chip.dispose()
+
+      expect(chipEl.getAttribute('aria-disabled')).toEqual('true')
+      expect(chipEl.getAttribute('class')).toEqual('chip disabled')
+    })
+
     it('should take back the disabled class it added', () => {
       fixtureEl.innerHTML = '<span>Tag</span>'
       const chipEl = fixtureEl.querySelector('span')

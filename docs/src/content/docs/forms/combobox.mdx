@@ -370,11 +370,11 @@ The toggle carries `.form-control`, so `.form-control-sm` and `.form-control-lg`
 
 ## Disabled
 
-`disabled` on the toggle button turns the whole control off — the panel never opens and the list box is disabled with it. A single option opts out with `.disabled` and `aria-disabled="true"`, which takes it out of the keyboard order and out of every selection method.
+Set `data-coreui-disabled="true"` (or the `disabled` option) to turn the whole control off: the panel never opens, the list box is disabled with it, and a button toggle gets the `disabled` attribute. A single option opts out with `.disabled` and `aria-disabled="true"`, which takes it out of the keyboard order and out of every selection method.
 
 <Example code={`<button class="form-control combobox-toggle mb-3" type="button"
       data-coreui-toggle="combobox"
-      data-coreui-placeholder="Cannot interact…" disabled>
+      data-coreui-placeholder="Cannot interact…" data-coreui-disabled="true">
   </button>
   <div class="popup combobox-popup">
     <div class="list-box">

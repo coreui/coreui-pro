@@ -92,9 +92,9 @@ const DefaultType = {
  */
 
 class Chip extends BaseComponent {
-  protected declare _addedAttributes: string[]
   protected declare _checkIcon: HTMLElement | null
   protected declare _disabled: any
+  protected declare _hostAttributes: Map<string, string | null>
   protected declare _hostClasses: HostClasses
   protected declare _removeControl: HTMLElement | null
   protected declare _selected: any
@@ -102,7 +102,7 @@ class Chip extends BaseComponent {
   constructor(element?: string | Element | null, config?: Partial<ChipConfig> | null) {
     super(element, config)
 
-    this._addedAttributes = HOST_ATTRIBUTES.filter(name => !this._element.hasAttribute(name))
+    this._hostAttributes = new Map(HOST_ATTRIBUTES.map(name => [name, this._element.getAttribute(name)]))
     this._hostClasses = captureHostClasses(this._element, HOST_CLASS_NAMES)
     this._checkIcon = null
     this._disabled = this._config.disabled
@@ -205,8 +205,12 @@ class Chip extends BaseComponent {
     this._checkIcon?.remove()
     this._removeControl?.remove()
 
-    for (const name of this._addedAttributes) {
-      this._element.removeAttribute(name)
+    for (const [name, value] of this._hostAttributes) {
+      if (value === null) {
+        this._element.removeAttribute(name)
+      } else {
+        this._element.setAttribute(name, value)
+      }
     }
 
     restoreHostClasses(this._element, HOST_CLASS_NAMES, this._hostClasses)

@@ -8,6 +8,7 @@
 import Chip from './chip.js'
 import ChipSet, { type ChipSetConfig } from './chip-set.js'
 import EventHandler from './dom/event-handler.js'
+import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { applyControlGroupClasses } from './util/form-control-group.js'
 import {
@@ -100,6 +101,8 @@ class ChipInput extends ChipSet {
   protected declare _uniqueId: string
   protected declare _valueField: HTMLTextAreaElement | null
   protected declare _input: HTMLInputElement
+  protected declare _inputDisabled: string | null
+  protected declare _inputReadonly: string | null
   protected declare _describedBy: string | null
   protected declare _hostClasses: HostClasses
   protected declare _initialChips: HTMLElement[]
@@ -142,6 +145,8 @@ class ChipInput extends ChipSet {
     }
 
     this._describedBy = this._input.getAttribute('aria-describedby')
+    this._inputDisabled = this._input.getAttribute('disabled')
+    this._inputReadonly = this._input.getAttribute('readonly')
     this._applyInteractionState()
 
     // In the controlled mode (`create: false`) the chips come from the host —
@@ -217,6 +222,8 @@ class ChipInput extends ChipSet {
     } else {
       this._input.removeAttribute('aria-invalid')
       this._restoreAttribute('aria-describedby', this._describedBy)
+      this._restoreAttribute('disabled', this._inputDisabled)
+      this._restoreAttribute('readonly', this._inputReadonly)
 
       if (this._addedAriaRequired) {
         this._input.removeAttribute('aria-required')
@@ -245,10 +252,12 @@ class ChipInput extends ChipSet {
   // Per-chip configuration based on the chip value and the input's
   // disabled/readonly state.
   override _getChipConfig(chip: HTMLElement): Record<string, any> {
+    const disabled = this._disabled || Manipulator.getDataAttribute(chip, 'disabled') === true
+
     return {
       ariaRemoveLabel: `Remove ${this._getChipValue(chip)}`,
-      disabled: this._disabled,
-      removable: this._config.removable && !this._config.readonly && !this._disabled,
+      disabled,
+      removable: this._config.removable && !this._config.readonly && !disabled,
       removeIcon: this._config.removeIcon,
       selectable: this._config.selectable
     }
