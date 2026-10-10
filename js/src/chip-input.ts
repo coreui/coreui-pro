@@ -14,7 +14,9 @@ import {
   configureValueField, createValueField, dispatchValueChange, followUserValidity, getFeedbackIds, getValidationState,
   nextStateSerial, ownValidationState, setStateValidity, type UserValidity, type ValidationState, writeValueField
 } from './util/form-validation.js'
-import { getUID, isRTL } from './util/index.js'
+import {
+  captureHostClasses, getUID, type HostClasses, isRTL, restoreHostClasses
+} from './util/index.js'
 
 /**
  * Constants
@@ -42,6 +44,8 @@ const CLASS_NAME_CHIP_INPUT_FIELD = 'chip-input-field'
 const CLASS_NAME_GROUP = 'form-control-group'
 const CLASS_NAME_IS_INVALID = 'is-invalid'
 const CLASS_NAME_IS_VALID = 'is-valid'
+
+const HOST_CLASS_NAMES = [CLASS_NAME_GROUP]
 
 type ChipInputConfig = ChipSetConfig & {
   create: boolean
@@ -97,6 +101,7 @@ class ChipInput extends ChipSet {
   protected declare _valueField: HTMLTextAreaElement | null
   protected declare _input: HTMLInputElement
   protected declare _describedBy: string | null
+  protected declare _hostClasses: HostClasses
   protected declare _initialChips: HTMLElement[]
   protected declare _releaseValidationState: (() => void) | null
   protected declare _removingByCode: boolean
@@ -106,7 +111,7 @@ class ChipInput extends ChipSet {
   protected declare _userChange: boolean
   protected declare _userValidity: UserValidity | null
   private _addedAriaRequired = false
-  private _addedGroupClass = false
+  private _addedDisabledClass = false
   private _createdInput = false
   private _labelledFor: Element | null = null
 
@@ -114,6 +119,7 @@ class ChipInput extends ChipSet {
     super(element, config)
 
     this._uniqueId = this._config.id ?? getUID(NAME)
+    this._hostClasses = captureHostClasses(this._element, HOST_CLASS_NAMES)
     this._valueField = null
     this._releaseValidationState = null
     this._removingByCode = false
@@ -127,7 +133,6 @@ class ChipInput extends ChipSet {
     // The element is the frame: unlike the components that wrap a control, a
     // chip input has nothing to wrap, so it takes the frame class itself and
     // the author writes only what the field is.
-    this._addedGroupClass = !this._element.classList.contains(CLASS_NAME_GROUP)
     applyControlGroupClasses(this._element, CLASS_NAME_GROUP)
 
     this._input = SelectorEngine.findOne('input', this._element as ParentNode) as HTMLInputElement
@@ -197,8 +202,8 @@ class ChipInput extends ChipSet {
     this._userValidity?.stop()
     this._releaseValidationState?.()
 
-    if (this._addedGroupClass) {
-      this._element.classList.remove(CLASS_NAME_GROUP)
+    if (this._addedDisabledClass) {
+      this._element.classList.remove(CLASS_NAME_DISABLED)
     }
 
     if (this._stateClass) {
@@ -206,6 +211,7 @@ class ChipInput extends ChipSet {
     }
 
     this._element.classList.add(...this._serverClasses)
+    restoreHostClasses(this._element, HOST_CLASS_NAMES, this._hostClasses)
 
     EventHandler.off(this._input, EVENT_KEY)
     this._valueField?.remove()
@@ -508,6 +514,7 @@ class ChipInput extends ChipSet {
 
   _applyInteractionState(): void {
     const { readonly } = this._config
+    this._addedDisabledClass = this._disabled && !this._element.classList.contains(CLASS_NAME_DISABLED)
     this._element.classList.toggle(CLASS_NAME_DISABLED, this._disabled)
     // The container is a generic element, so `aria-disabled`/`aria-readonly`
     // are not allowed on it — the native input states carry the semantics.

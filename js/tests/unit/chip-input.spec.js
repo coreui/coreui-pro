@@ -1521,6 +1521,19 @@ describe('ChipInput', () => {
   })
 
   describe('dispose', () => {
+    it('should leave no class attribute on an element that had none, and keep a disabled class the page wrote', () => {
+      fixtureEl.innerHTML = '<div id="bare"></div><div id="marked" class="disabled"></div>'
+      const bare = fixtureEl.querySelector('#bare')
+      const marked = fixtureEl.querySelector('#marked')
+
+      for (const element of [bare, marked]) {
+        new ChipInput(element, { disabled: true, validationState: 'invalid' }).dispose()
+      }
+
+      expect(bare.hasAttribute('class')).toBeFalse()
+      expect(marked.getAttribute('class')).toEqual('disabled')
+    })
+
     it('should dispose a chip-input instance', () => {
       fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 

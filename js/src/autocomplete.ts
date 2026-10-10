@@ -18,7 +18,9 @@ import {
   DefaultAllowlist, escapeHtml, sanitizeByConfig, type SanitizerAllowList, SVGAllowlist
 } from './util/sanitizer.js'
 import { CLEANER_ICON, PICKER_ICON } from './util/icons.js'
-import { defineJQueryPlugin, getUID, jQueryDispatch } from './util/index.js'
+import {
+  captureHostClasses, defineJQueryPlugin, getUID, type HostClasses, jQueryDispatch, restoreHostClasses
+} from './util/index.js'
 
 /**
  * ------------------------------------------------------------------------
@@ -60,6 +62,8 @@ const CLASS_NAME_INPUT_GROUP = 'form-control-group'
 const CLASS_NAME_IS_INVALID = 'is-invalid'
 const CLASS_NAME_IS_VALID = 'is-valid'
 const CLASS_NAME_SHOW = 'show'
+
+const HOST_CLASS_NAMES = [CLASS_NAME_AUTOCOMPLETE, CLASS_NAME_INPUT_GROUP, CLASS_NAME_SHOW]
 
 const SELECTOR_DATA_AUTOCOMPLETE = '[data-coreui-autocomplete]:not(.disabled)'
 const SELECTOR_DATA_TOGGLE_SHOWN = `.autocomplete:not(.disabled).${CLASS_NAME_SHOW}`
@@ -168,7 +172,8 @@ class Autocomplete extends ComboboxBase {
   protected declare _cleanerElement: any
   protected declare _inputElement: any
   protected declare _inputHintElement: any
-  protected declare _addedClassNames: string[]
+  protected declare _addedDisabledClass: boolean
+  protected declare _hostClasses: HostClasses
   protected declare _feedbackIds: string[]
   protected declare _keySerial: number | null
   protected declare _previousTabIndex: string | null
@@ -190,7 +195,8 @@ class Autocomplete extends ComboboxBase {
     this._inputElement = null
     this._inputHintElement = null
     this._togglerElement = null
-    this._addedClassNames = []
+    this._addedDisabledClass = false
+    this._hostClasses = captureHostClasses(this._element, HOST_CLASS_NAMES)
     this._feedbackIds = []
     this._keySerial = null
     this._serverClasses = [CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID].filter(className => this._element.classList.contains(className))
@@ -279,13 +285,16 @@ class Autocomplete extends ComboboxBase {
       }
     }
 
-    this._element.classList.remove(CLASS_NAME_SHOW, ...this._addedClassNames)
+    if (this._addedDisabledClass) {
+      this._element.classList.remove(CLASS_NAME_DISABLED)
+    }
 
     if (this._stateClass) {
       this._element.classList.remove(this._stateClass)
     }
 
     this._element.classList.add(...this._serverClasses)
+    restoreHostClasses(this._element, HOST_CLASS_NAMES, this._hostClasses)
 
     if (this._previousTabIndex === null) {
       this._element.removeAttribute('tabindex')
@@ -652,20 +661,12 @@ class Autocomplete extends ComboboxBase {
     return _options
   }
 
-  _addClassName(className: string): void {
-    if (this._element.classList.contains(className)) {
-      return
-    }
-
-    this._element.classList.add(className)
-    this._addedClassNames.push(className)
-  }
-
   _createAutocomplete(): void {
-    this._addClassName(CLASS_NAME_AUTOCOMPLETE)
+    this._element.classList.add(CLASS_NAME_AUTOCOMPLETE)
 
-    if (this._config.disabled) {
-      this._addClassName(CLASS_NAME_DISABLED)
+    if (this._config.disabled && !this._element.classList.contains(CLASS_NAME_DISABLED)) {
+      this._element.classList.add(CLASS_NAME_DISABLED)
+      this._addedDisabledClass = true
     }
 
     this._createInputGroup()
@@ -679,10 +680,6 @@ class Autocomplete extends ComboboxBase {
     // carries `.form-control-group` itself instead of nesting one.
     const togglerEl = this._element
     this._previousTabIndex = togglerEl.getAttribute('tabindex')
-
-    if (!togglerEl.classList.contains(CLASS_NAME_INPUT_GROUP)) {
-      this._addedClassNames.push(CLASS_NAME_INPUT_GROUP)
-    }
 
     applyControlGroupClasses(togglerEl, CLASS_NAME_INPUT_GROUP)
     this._togglerElement = togglerEl

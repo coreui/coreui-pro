@@ -3264,6 +3264,19 @@ describe('Autocomplete', () => {
       expect(autocompleteEl.classList.contains('is-invalid')).toBeFalse()
     })
 
+    it('should leave no class attribute on an element that had none, and keep a disabled class the page wrote', () => {
+      fixtureEl.innerHTML = '<div id="bare"></div><div id="marked" class="disabled"></div>'
+      const bare = fixtureEl.querySelector('#bare')
+      const marked = fixtureEl.querySelector('#marked')
+
+      for (const element of [bare, marked]) {
+        new Autocomplete(element, { disabled: true, options: [], validationState: 'invalid' }).dispose()
+      }
+
+      expect(bare.hasAttribute('class')).toBeFalse()
+      expect(marked.getAttribute('class')).toEqual('disabled')
+    })
+
     it('should dispose autocomplete', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')

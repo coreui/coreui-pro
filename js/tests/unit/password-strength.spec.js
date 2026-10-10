@@ -350,11 +350,20 @@ describe('PasswordStrength', () => {
 
       expect(element.querySelector('.password-strength-meter')).toBeNull()
       expect(element.querySelector('.password-strength-feedback')).toBeNull()
-      expect(element.classList.contains('password-strength')).toBeFalse()
+      expect(element.hasAttribute('class')).toBeFalse()
 
       type(input, 'Str0ng!&Passphrase99')
 
       expect(element.querySelector('.password-strength-text')).toBeNull()
+    })
+
+    it('should keep the class the page wrote on the element', () => {
+      fixtureEl.innerHTML = '<input type="password"><div class="password-strength"></div>'
+      const element = fixtureEl.querySelector('div')
+
+      new PasswordStrength(element).dispose()
+
+      expect(element.getAttribute('class')).toEqual('password-strength')
     })
 
     it('should leave other input listeners on the field alone', () => {

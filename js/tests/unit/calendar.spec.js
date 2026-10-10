@@ -6304,6 +6304,19 @@ describe('Calendar', () => {
       expect(spy.calls.count()).toBeGreaterThan(0)
     })
 
+    it('should leave no class attribute on an element that had none, and keep the classes the page wrote', () => {
+      fixtureEl.innerHTML = '<div id="bare"></div><div id="marked" class="calendars select-week"></div>'
+      const bare = fixtureEl.querySelector('#bare')
+      const marked = fixtureEl.querySelector('#marked')
+
+      for (const element of [bare, marked]) {
+        new Calendar(element, { selectionType: 'week', showWeekNumber: true }).dispose()
+      }
+
+      expect(bare.hasAttribute('class')).toBeFalse()
+      expect(marked.getAttribute('class')).toEqual('calendars select-week')
+    })
+
     it('should remove the panels it built', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')

@@ -21,7 +21,7 @@ import {
   DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList, SVGAllowlist
 } from './util/sanitizer.js'
 import {
-  defineJQueryPlugin, getUID, jQueryDispatch, resolveCountLabel
+  captureHostClasses, defineJQueryPlugin, getUID, type HostClasses, jQueryDispatch, resolveCountLabel, restoreHostClasses
 } from './util/index.js'
 
 /**
@@ -87,6 +87,7 @@ const CLASS_NAME_INDETERMINATE = 'indeterminate'
 const CLASS_NAME_SELECTION = 'form-multi-select-selection'
 const CLASS_NAME_SELECTION_TAGS = 'form-multi-select-selection-tags'
 const CLASS_NAME_SHOW = 'show'
+const HOST_CLASS_NAMES = [CLASS_NAME_SELECT]
 const VALIDATION_OPTIONS = new Set(['invalid', 'valid', 'validationState'])
 
 type MultiSelectConfig = {
@@ -239,6 +240,7 @@ class MultiSelectChipSet extends ChipSet {
 class MultiSelect extends ComboboxBase {
   protected declare _uniqueName: any
   protected declare _hostAttributes: Map<string, string | null>
+  protected declare _hostClasses: HostClasses
   protected declare _describedBy: string | null
   protected declare _initialValues: string[]
   protected declare _listGesture: boolean
@@ -248,7 +250,7 @@ class MultiSelect extends ComboboxBase {
   protected declare _stateSerial: number
   protected declare _userChange: boolean
   protected declare _userValidity: UserValidity
-  protected declare _addedSelectClass: boolean
+  protected declare _addedDisabledClass: boolean
   protected declare _indicatorElement: any
   protected declare _selectAllElement: any
   protected declare _selectAllLabelElement: any
@@ -268,8 +270,9 @@ class MultiSelect extends ComboboxBase {
   constructor(element?: string | Element | null, config?: Partial<MultiSelectConfig> | null) {
     super(element, config)
 
+    this._addedDisabledClass = false
     this._hostAttributes = new Map(HOST_ATTRIBUTES.map(name => [name, this._element.getAttribute(name)]))
-    this._addedSelectClass = !this._element.classList.contains(CLASS_NAME_SELECT)
+    this._hostClasses = captureHostClasses(this._element, HOST_CLASS_NAMES)
     this._serverClasses = [CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID].filter(name => this._element.classList.contains(name))
     this._element.classList.remove(...this._serverClasses)
     this._configureNativeSelect()
@@ -440,11 +443,8 @@ class MultiSelect extends ComboboxBase {
       this._restoreAttribute(name, value)
     }
 
-    if (this._addedSelectClass) {
-      this._element.classList.remove(CLASS_NAME_SELECT)
-    }
-
     this._element.classList.add(...this._serverClasses)
+    restoreHostClasses(this._element, HOST_CLASS_NAMES, this._hostClasses)
     super.dispose()
   }
 
@@ -571,6 +571,11 @@ class MultiSelect extends ComboboxBase {
     if (this._wrapperElement) {
       this._wrapperElement.before(this._element)
       this._wrapperElement.remove()
+    }
+
+    if (this._addedDisabledClass) {
+      this._element.classList.remove(CLASS_NAME_DISABLED)
+      this._addedDisabledClass = false
     }
   }
 
@@ -994,8 +999,9 @@ class MultiSelect extends ComboboxBase {
     const wrapper = document.createElement('div')
     wrapper.classList.add(CLASS_NAME_SELECT)
 
-    if (this._config.disabled) {
+    if (this._config.disabled && !this._element.classList.contains(CLASS_NAME_DISABLED)) {
       this._element.classList.add(CLASS_NAME_DISABLED)
+      this._addedDisabledClass = true
     }
 
     for (const className of this._element.classList) {
