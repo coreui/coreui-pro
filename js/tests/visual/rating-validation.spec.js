@@ -41,12 +41,12 @@ describe('rating validation', () => {
     container?.remove()
   })
 
-  it('draws the empty stars in gray-600 in both colour schemes, also under a given state', () => {
+  it('draws the empty stars in fg-4 in both colour schemes, also under a given state', () => {
     for (const scheme of ['light', 'dark']) {
       for (const state of [null, 'invalid', 'valid']) {
         const label = mount(state, '', scheme)
 
-        expect(getComputedStyle(label).color).toEqual(colourOf('var(--cui-gray-600)'))
+        expect(getComputedStyle(label).color).toEqual(colourOf(scheme === 'light' ? 'var(--cui-gray-500)' : 'var(--cui-gray-600)'))
 
         rating.dispose()
         container.remove()
