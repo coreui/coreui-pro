@@ -1135,6 +1135,16 @@ describe('RangeSlider', () => {
       expect(Range.getInstance(wrapper)).toBeNull()
       expect(element.hasAttribute('class')).toBeFalse()
       expect([...element.children].map(child => child.className)).toEqual(['note'])
+
+      fixtureEl.innerHTML = '<div id="styled"></div><div id="kept" class=""></div>'
+
+      for (const id of ['styled', 'kept']) {
+        const styled = fixtureEl.querySelector(`#${id}`)
+        new RangeSlider(styled, { validationState: 'invalid', value: 40 }).dispose()
+      }
+
+      expect(fixtureEl.querySelector('#styled').hasAttribute('class')).toBeFalse()
+      expect(fixtureEl.querySelector('#kept').getAttribute('class')).toEqual('')
     })
 
     it('should give the element back its label and description', () => {
