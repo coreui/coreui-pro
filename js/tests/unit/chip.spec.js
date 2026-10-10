@@ -894,6 +894,15 @@ describe('Chip', () => {
       expect(Chip.getInstance(chipEl)).toBeNull()
     })
 
+    it('should leave no class attribute on an element that had none', () => {
+      fixtureEl.innerHTML = '<span>Tag</span>'
+      const chipEl = fixtureEl.querySelector('span')
+
+      new Chip(chipEl, { selectable: true }).dispose()
+
+      expect(chipEl.hasAttribute('class')).toBeFalse()
+    })
+
     it('should remove its listeners on dispose', () => {
       fixtureEl.innerHTML = '<span class="chip">Tag<button type="button" class="chip-remove"></button></span>'
 

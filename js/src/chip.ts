@@ -10,7 +10,9 @@ import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 import { CHECK_ICON, REMOVE_ICON } from './util/icons.js'
-import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
+import {
+  captureHostClasses, defineJQueryPlugin, type HostClasses, jQueryDispatch, restoreHostClasses
+} from './util/index.js'
 
 /**
  * Constants
@@ -91,9 +93,9 @@ const DefaultType = {
 
 class Chip extends BaseComponent {
   protected declare _addedAttributes: string[]
-  protected declare _addedClassNames: string[]
   protected declare _checkIcon: HTMLElement | null
   protected declare _disabled: any
+  protected declare _hostClasses: HostClasses
   protected declare _removeControl: HTMLElement | null
   protected declare _selected: any
 
@@ -101,7 +103,7 @@ class Chip extends BaseComponent {
     super(element, config)
 
     this._addedAttributes = HOST_ATTRIBUTES.filter(name => !this._element.hasAttribute(name))
-    this._addedClassNames = HOST_CLASS_NAMES.filter(name => !this._element.classList.contains(name))
+    this._hostClasses = captureHostClasses(this._element, HOST_CLASS_NAMES)
     this._checkIcon = null
     this._disabled = this._config.disabled || this._element.classList.contains(CLASS_NAME_DISABLED)
     this._removeControl = null
@@ -207,7 +209,7 @@ class Chip extends BaseComponent {
       this._element.removeAttribute(name)
     }
 
-    this._element.classList.remove(...this._addedClassNames)
+    restoreHostClasses(this._element, HOST_CLASS_NAMES, this._hostClasses)
 
     super.dispose()
   }

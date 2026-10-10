@@ -4893,6 +4893,56 @@ describe('MultiSelect', () => {
   })
 
   describe('dispose', () => {
+    it('should leave no class attribute on a select that had none, and keep a disabled class the page wrote', () => {
+      fixtureEl.innerHTML = [
+        '<select id="bare" multiple><option value="1">One</option></select>',
+        '<select id="marked" class="disabled" multiple><option value="1">One</option></select>'
+      ].join('')
+      const bare = fixtureEl.querySelector('#bare')
+      const marked = fixtureEl.querySelector('#marked')
+
+      for (const select of [bare, marked]) {
+        new MultiSelect(select, { disabled: true }).dispose()
+      }
+
+      expect(bare.hasAttribute('class')).toBeFalse()
+      expect(marked.getAttribute('class')).toEqual('disabled')
+    })
+
+    it('should take back the disabled class it added once setConfig enables the select', () => {
+      fixtureEl.innerHTML = '<select multiple><option value="1">One</option></select>'
+      const select = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(select, { disabled: true })
+
+      multiSelect.setConfig({ disabled: false })
+
+      expect(select.classList.contains('disabled')).toBeFalse()
+      expect(fixtureEl.querySelector('.form-multi-select').classList.contains('disabled')).toBeFalse()
+
+      multiSelect.dispose()
+    })
+
+    it('should keep a disabled class the page writes after init, also once setConfig enabled the select', () => {
+      fixtureEl.innerHTML = [
+        '<select id="plain" multiple><option value="1">One</option></select>',
+        '<select id="enabled" multiple><option value="1">One</option></select>'
+      ].join('')
+      const plain = fixtureEl.querySelector('#plain')
+      const enabled = fixtureEl.querySelector('#enabled')
+      const first = new MultiSelect(plain)
+      const second = new MultiSelect(enabled, { disabled: true })
+
+      second.setConfig({ disabled: false })
+
+      for (const [select, instance] of [[plain, first], [enabled, second]]) {
+        select.classList.add('disabled')
+        instance.dispose()
+      }
+
+      expect(plain.getAttribute('class')).toEqual('disabled')
+      expect(enabled.getAttribute('class')).toEqual('disabled')
+    })
+
     it('should keep the name the page wrote on the select', () => {
       fixtureEl.innerHTML = '<select id="multi-select" name="tech" multiple></select>'
 

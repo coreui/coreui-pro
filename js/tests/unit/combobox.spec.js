@@ -1167,6 +1167,19 @@ describe('Combobox', () => {
       }
     })
 
+    it('should leave no class attribute on a toggle that had none, and keep a disabled class the page wrote', () => {
+      fixtureEl.innerHTML = '<button id="bare"></button><button id="marked" class="disabled"></button>'
+      const bare = fixtureEl.querySelector('#bare')
+      const marked = fixtureEl.querySelector('#marked')
+
+      for (const toggle of [bare, marked]) {
+        new Combobox(toggle, { disabled: true, items: [{ value: 'a', label: 'A' }], validationState: 'invalid' }).dispose()
+      }
+
+      expect(bare.hasAttribute('class')).toBeFalse()
+      expect(marked.getAttribute('class')).toEqual('disabled')
+    })
+
     it('should give the toggle and a page panel back their markup after the panel was open', async () => {
       fixtureEl.innerHTML = [
         '<form>',

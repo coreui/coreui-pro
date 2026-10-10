@@ -14,7 +14,8 @@ import {
   nextStateSerial, ownValidationState, setStateValidity, writeValueField, type UserValidity, type ValidationState
 } from './util/form-validation.js'
 import {
-  defineJQueryPlugin, getNextActiveElement, isRTL, jQueryDispatch
+  captureHostClasses, defineJQueryPlugin, getNextActiveElement, type HostClasses, isRTL, jQueryDispatch,
+  restoreHostClasses
 } from './util/index.js'
 
 /**
@@ -104,6 +105,7 @@ const DefaultType = {
 
 class OTPInput extends BaseComponent {
   protected declare _disabledSlots: Set<HTMLInputElement>
+  protected declare _hostClasses: HostClasses
   protected declare _inputElement: HTMLInputElement | null
   protected declare _placeholders: Map<HTMLInputElement, string | null>
   protected declare _readOnlySlots: Set<HTMLInputElement>
@@ -122,6 +124,7 @@ class OTPInput extends BaseComponent {
 
     this._config = this._getConfig(config)
     this._disabledSlots = new Set()
+    this._hostClasses = captureHostClasses(this._element, [])
     this._inputElement = null
     this._placeholders = new Map()
     this._readOnlySlots = new Set()
@@ -195,6 +198,8 @@ class OTPInput extends BaseComponent {
     for (const [element, names] of this._serverMarks) {
       element.classList.add(...names)
     }
+
+    restoreHostClasses(this._element, [], this._hostClasses)
 
     for (const [input, { describedBy, invalid }] of this._slotAria) {
       this._writeSlotAttribute(input, 'aria-describedby', describedBy)

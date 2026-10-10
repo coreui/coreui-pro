@@ -825,6 +825,15 @@ describe('OTPInput', () => {
       </div>
     `
 
+    it('should leave no class attribute on an element that had none', () => {
+      fixtureEl.innerHTML = '<div><input type="text"><input type="text"></div>'
+      const otpElement = fixtureEl.querySelector('div')
+
+      new OTPInput(otpElement, { validationState: 'invalid' }).dispose()
+
+      expect(otpElement.hasAttribute('class')).toBeFalse()
+    })
+
     it('should give back what the options set on the slots', () => {
       fixtureEl.innerHTML = `
         <div class="form-otp">
