@@ -324,6 +324,12 @@
     ~ .#{$state}-tooltip { display: block; }
   }
 
+  // Rating — its tokens sit on .rating in the components layer, so the state sets them on the items
+  .rating.is-#{$state} .rating-item {
+    --#{$prefix}rating-item-color: #{$color};
+    --#{$prefix}focus-ring-color: #{$focus-ring-color};
+  }
+
   // Input group — feedback lives outside the input-group in the parent
   // .form-field, so we use :has() to toggle display.
   .form-field:where(:has(.input-group .form-control.is-#{$state}, .input-group .form-select.is-#{$state})) {

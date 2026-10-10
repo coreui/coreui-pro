@@ -1,7 +1,8 @@
 /*!
- * A rating with a validation state colours its empty stars with the state's
- * theme. The rule competes with the rating's own tokens in the components
- * layer, which only a real browser with the stylesheet can settle.
+ * A rating with a validation state colours its empty stars and its focus ring
+ * with the state's theme. The rule lives in the forms layer and the rating's
+ * own tokens in the components layer, which only a real browser with the
+ * stylesheet can settle.
  * Copyright 2026 The Bootstrap Authors
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  */
@@ -38,11 +39,12 @@ describe('rating validation', () => {
     container?.remove()
   })
 
-  it('colours the empty stars with the theme of a given state', () => {
+  it('colours the empty stars and the focus ring with the theme of a given state', () => {
     for (const [state, theme] of [['invalid', 'danger'], ['valid', 'success']]) {
       const label = mount(state)
 
       expect(getComputedStyle(label).color).toEqual(colourOf(`var(--cui-${theme}-fg)`))
+      expect(colourOf(getComputedStyle(label.closest('.rating-item')).getPropertyValue('--cui-focus-ring-color'))).toEqual(colourOf(`var(--cui-${theme}-focus-ring)`))
 
       rating.dispose()
       container.remove()

@@ -243,14 +243,10 @@ Ratings use local CSS variables on `.rating` for enhanced real-time customizatio
 
 <ScssDocs file="scss/_rating.scss" capture="rating-tokens" />
 
+A validation state sets `--cui-rating-item-color` and `--cui-focus-ring-color` on the items of a `.rating.is-{state}`, from the theme of the state in `$form-validation-states`.
+
 ### Sass maps
 
 Each size is one entry, and the map merges with your overrides — add a key to define a size, or set one to `null` to drop it:
 
 <ScssDocs file="scss/_rating.scss" capture="rating-sizes" />
-
-### Sass loops
-
-Each state in `$form-validation-states` colours the empty stars and the focus ring of a rating with that state:
-
-<ScssDocs file="scss/_rating.scss" capture="rating-validation-states-loop" />
