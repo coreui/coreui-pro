@@ -102,6 +102,7 @@ const build = async plugin => {
 
   const { output: [chunk] } = await bundle.write({
     banner: banner(plugin.fileName),
+    comments: { jsdoc: false },
     format: 'umd',
     name: plugin.className,
     sourcemap: true,
@@ -118,6 +119,7 @@ const build = async plugin => {
   if (plugin.esmDist) {
     await bundle.write({
       banner: banner(plugin.fileName),
+      comments: { jsdoc: false },
       format: 'esm',
       sourcemap: true,
       paths: id => path.isAbsolute(id) ? esmSpecifier(plugin.esmDist, id) : id,

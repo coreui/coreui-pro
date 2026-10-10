@@ -10,7 +10,7 @@ import vm from 'node:vm'
 import { rolldown } from 'rolldown'
 
 const modules = {
-  entry: 'import { computePosition } from \'@floating-ui/dom\'\nexport const Alert = \'alert\'\nexport const position = computePosition\n',
+  entry: 'import { computePosition } from \'@floating-ui/dom\'\n/**\n * The alert plugin.\n */\nexport const Alert = \'alert\'\nexport const position = /* @__PURE__ */ (() => computePosition)()\n',
   '@floating-ui/dom': 'export const computePosition = \'computePosition\'\n'
 }
 
@@ -38,9 +38,9 @@ const load = async environment => {
 const build = async environment => {
   const config = await load(environment)
   const bundle = await rolldown({ input: 'entry', external: config.external, plugins: [virtual, ...config.plugins.filter(Boolean)] })
-  const { name, format, generatedCode, globals } = config.output
+  const { banner, comments, name, format, generatedCode, globals } = config.output
   const { output } = await bundle.generate({
-    name, format, generatedCode, globals
+    banner, comments, name, format, generatedCode, globals
   })
 
   return output[0].code
@@ -97,6 +97,14 @@ describe('rolldown config', () => {
     assert.equal(coreui.constructor.name, 'Object')
     assert.equal(coreui.Tooltip, undefined)
     assert.equal(coreui.Alert, 'alert')
+  })
+
+  it('drops JSDoc and keeps the license banner and pure annotations', async () => {
+    const code = await build({})
+
+    assert.doesNotMatch(code, /The alert plugin/)
+    assert.match(code, /^\/\*!/)
+    assert.match(code, /@__PURE__/)
   })
 
   it('fails the build when the UMD wrapper no longer matches', async () => {
