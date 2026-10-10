@@ -324,7 +324,6 @@
     ~ .#{$state}-tooltip { display: block; }
   }
 
-  // Rating — its tokens sit on .rating in the components layer, so the state sets them on the items
   .rating.is-#{$state} .rating-item {
     --#{$prefix}rating-item-color: #{$color};
     --#{$prefix}focus-ring-color: #{$focus-ring-color};
