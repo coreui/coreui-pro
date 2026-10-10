@@ -318,6 +318,20 @@ describe('TimeInput', () => {
     })
   })
 
+  describe('dispose', () => {
+    it('should take a disabled class the markup wrote as the disabled option, and keep it on dispose', () => {
+      fixtureEl.innerHTML = '<div class="disabled"></div>'
+      const element = fixtureEl.querySelector('div')
+      const timeInput = new TimeInput(element)
+
+      expect(element.querySelector('textarea').disabled).toBeTrue()
+
+      timeInput.dispose()
+
+      expect(element.getAttribute('class')).toEqual('disabled')
+    })
+  })
+
   describe('data-api', () => {
     it('should initialise elements carrying the attribute on load', () => {
       fixtureEl.innerHTML = '<div data-coreui-time-input></div>'

@@ -19,7 +19,8 @@ import {
 } from './util/sanitizer.js'
 import { CLEANER_ICON, PICKER_ICON } from './util/icons.js'
 import {
-  captureHostClasses, defineJQueryPlugin, getUID, type HostClasses, jQueryDispatch, restoreHostClasses
+  captureHostClasses, defineJQueryPlugin, getUID, type HostClasses, jQueryDispatch, restoreHostClasses,
+  toggleHostClass
 } from './util/index.js'
 
 /**
@@ -65,7 +66,7 @@ const CLASS_NAME_SHOW = 'show'
 
 const HOST_CLASS_NAMES = [CLASS_NAME_AUTOCOMPLETE, CLASS_NAME_INPUT_GROUP, CLASS_NAME_SHOW]
 
-const SELECTOR_DATA_AUTOCOMPLETE = '[data-coreui-autocomplete]:not(.disabled)'
+const SELECTOR_DATA_AUTOCOMPLETE = '[data-coreui-autocomplete]'
 const SELECTOR_DATA_TOGGLE_SHOWN = `.autocomplete:not(.disabled).${CLASS_NAME_SHOW}`
 const SELECTOR_INDICATOR = '.form-control-action'
 
@@ -172,7 +173,7 @@ class Autocomplete extends ComboboxBase {
   protected declare _cleanerElement: any
   protected declare _inputElement: any
   protected declare _inputHintElement: any
-  protected declare _addedDisabledClass: boolean
+  protected declare _hostDisabledClass: boolean | null
   protected declare _hostClasses: HostClasses
   protected declare _feedbackIds: string[]
   protected declare _keySerial: number | null
@@ -195,7 +196,6 @@ class Autocomplete extends ComboboxBase {
     this._inputElement = null
     this._inputHintElement = null
     this._togglerElement = null
-    this._addedDisabledClass = false
     this._hostClasses = captureHostClasses(this._element, HOST_CLASS_NAMES)
     this._feedbackIds = []
     this._keySerial = null
@@ -285,8 +285,8 @@ class Autocomplete extends ComboboxBase {
       }
     }
 
-    if (this._addedDisabledClass) {
-      this._element.classList.remove(CLASS_NAME_DISABLED)
+    if (this._hostDisabledClass !== null) {
+      this._element.classList.toggle(CLASS_NAME_DISABLED, this._hostDisabledClass)
     }
 
     if (this._stateClass) {
@@ -664,10 +664,8 @@ class Autocomplete extends ComboboxBase {
   _createAutocomplete(): void {
     this._element.classList.add(CLASS_NAME_AUTOCOMPLETE)
 
-    if (this._config.disabled && !this._element.classList.contains(CLASS_NAME_DISABLED)) {
-      this._element.classList.add(CLASS_NAME_DISABLED)
-      this._addedDisabledClass = true
-    }
+    this._config.disabled = this._config.disabled || this._element.classList.contains(CLASS_NAME_DISABLED)
+    this._hostDisabledClass = toggleHostClass(this._element, CLASS_NAME_DISABLED, this._config.disabled, null)
 
     this._createInputGroup()
     this._createButtons()

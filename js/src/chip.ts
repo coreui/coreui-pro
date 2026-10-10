@@ -11,7 +11,7 @@ import SelectorEngine from './dom/selector-engine.js'
 import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 import { CHECK_ICON, REMOVE_ICON } from './util/icons.js'
 import {
-  captureHostClasses, defineJQueryPlugin, type HostClasses, jQueryDispatch, restoreHostClasses
+  captureHostClasses, defineJQueryPlugin, type HostClasses, jQueryDispatch, restoreHostClasses, toggleHostClass
 } from './util/index.js'
 
 /**
@@ -43,7 +43,7 @@ const CLASS_NAME_ACTIVE = 'active'
 const CLASS_NAME_DISABLED = 'disabled'
 
 const HOST_ATTRIBUTES = ['aria-disabled', 'aria-pressed', 'aria-selected', 'role', 'tabindex']
-const HOST_CLASS_NAMES = [CLASS_NAME_CHIP_CLICKABLE, CLASS_NAME_DISABLED]
+const HOST_CLASS_NAMES = [CLASS_NAME_CHIP_CLICKABLE]
 
 type ChipConfig = {
   allowList: SanitizerAllowList
@@ -96,6 +96,7 @@ class Chip extends BaseComponent {
   protected declare _checkIcon: HTMLElement | null
   protected declare _disabled: any
   protected declare _hostClasses: HostClasses
+  protected declare _hostDisabledClass: boolean | null
   protected declare _removeControl: HTMLElement | null
   protected declare _selected: any
 
@@ -104,6 +105,7 @@ class Chip extends BaseComponent {
 
     this._addedAttributes = HOST_ATTRIBUTES.filter(name => !this._element.hasAttribute(name))
     this._hostClasses = captureHostClasses(this._element, HOST_CLASS_NAMES)
+    this._hostDisabledClass = null
     this._checkIcon = null
     this._disabled = this._config.disabled || this._element.classList.contains(CLASS_NAME_DISABLED)
     this._removeControl = null
@@ -209,6 +211,10 @@ class Chip extends BaseComponent {
       this._element.removeAttribute(name)
     }
 
+    if (this._hostDisabledClass !== null) {
+      this._element.classList.toggle(CLASS_NAME_DISABLED, this._hostDisabledClass)
+    }
+
     restoreHostClasses(this._element, HOST_CLASS_NAMES, this._hostClasses)
 
     super.dispose()
@@ -272,26 +278,24 @@ class Chip extends BaseComponent {
       this._element.classList.add(CLASS_NAME_CHIP_CLICKABLE)
     }
 
+    this._hostDisabledClass = toggleHostClass(this._element, CLASS_NAME_DISABLED, this._disabled, this._hostDisabledClass)
+
     // aria-disabled is not allowed on a generic element — only stamp it when
     // the chip carries a role; a role-less chip conveys the state through the
     // disabled class and the removed interactivity.
     const hasRole = this._element.hasAttribute('role')
 
     if (this._disabled) {
-      this._element.classList.add(CLASS_NAME_DISABLED)
       if (hasRole) {
         this._element.setAttribute('aria-disabled', 'true')
       } else {
         this._element.removeAttribute('aria-disabled')
       }
-    } else {
-      this._element.classList.remove(CLASS_NAME_DISABLED)
-      if (this._element.hasAttribute('aria-disabled')) {
-        if (hasRole) {
-          this._element.setAttribute('aria-disabled', 'false')
-        } else {
-          this._element.removeAttribute('aria-disabled')
-        }
+    } else if (this._element.hasAttribute('aria-disabled')) {
+      if (hasRole) {
+        this._element.setAttribute('aria-disabled', 'false')
+      } else {
+        this._element.removeAttribute('aria-disabled')
       }
     }
 

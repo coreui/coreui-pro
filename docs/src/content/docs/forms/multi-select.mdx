@@ -389,7 +389,7 @@ A state you give, with the option or with the class, is a verdict on the selecti
 
 ## Disabled
 
-Add the `data-coreui-disabled="true"` boolean attribute to give it a grayed out appearance, remove pointer events, and prevent focusing.
+Add the `data-coreui-disabled="true"` boolean attribute, or write the `.disabled` class on the select, to give it a grayed out appearance, remove pointer events, and prevent focusing.
 
 <Example pro code={`<select id="ms1-disabled" data-coreui-multi-select multiple data-coreui-search="true"  data-coreui-disabled="true">
     <option value="0">Angular</option>
@@ -568,7 +568,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `container` | string, element, false | `false` | Appends the dropdown to a specific element. Example: `container: 'body'`. Inside a modal dialog it goes into the dialog instead, because the rest of the page is inert. |
 | `deselectAllLabel` | string | `'Deselect all'` | Sets the select all button label shown once everything is selected. See `selectAllLabel`. |
 | `deselectFilteredLabel` | string | `'Deselect filtered'` | Label shown instead of `deselectAllLabel` when `selectAllMode: 'filtered'` and a search filter narrows the list. See `selectFilteredLabel`. |
-| `disabled` | boolean | `false` | Toggle the disabled state for the component. |
+| `disabled` | boolean | `false` | Toggle the disabled state for the component. You can also apply the `.disabled` class in markup. |
 | `globalSearch` | boolean | `true` | Routes typing to the search box from anywhere in the component, so a keystroke never depends on where the focus sits. Set to `false` to keep it local: the search box then filters only while it has the focus, and typing over the options list jumps to the first option that starts with what was typed. Needs `search`. |
 | `headerTemplate` | function, null | `null` | Custom template function for rendering the dropdown header (the area above the options list). Replaces the built-in select all button and renders independently of `selectAll`. Receives a `state` object (`{ selected, total, filtered, filteredSelected }`) and an `actions` object (`{ selectAll, deselectAll, selectFiltered, deselectFiltered }`) whose functions act for the user and drop a given validation state. Return an `HTMLElement` (wire your own listeners using `actions`, supports multiple controls) or an HTML string (sanitized, no actions wired). Re-renders on every selection change and search filter. |
 | `hideSelectAllOnSearchNoResults` | boolean | `true` | Hides the dropdown header with the built-in select all button when a search filter leaves no matching options. Set to `false` to keep the select all button visible even when there are no results. |

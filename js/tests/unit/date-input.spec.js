@@ -386,6 +386,57 @@ describe('DateInput', () => {
   })
 
   describe('dispose', () => {
+    it('should take a disabled class the markup wrote as the disabled option, and leave on dispose only a disabled class it did not add', () => {
+      fixtureEl.innerHTML = '<div id="markup" class="disabled"></div><div id="page"></div><div id="added"></div>'
+      const markup = fixtureEl.querySelector('#markup')
+      const page = fixtureEl.querySelector('#page')
+      const added = fixtureEl.querySelector('#added')
+      const instances = [
+        new DateInput(markup, { format: 'dd.MM.yyyy' }),
+        new DateInput(page, { format: 'dd.MM.yyyy' }),
+        new DateInput(added, { disabled: true, format: 'dd.MM.yyyy' })
+      ]
+
+      expect(markup.querySelector('textarea').disabled).toBeTrue()
+
+      page.classList.add('disabled')
+
+      for (const instance of instances) {
+        instance.dispose()
+      }
+
+      expect(markup.getAttribute('class')).toEqual('disabled')
+      expect(page.getAttribute('class')).toEqual('disabled')
+      expect(added.hasAttribute('class')).toBeFalse()
+    })
+
+    it('should give back a disabled class from the markup that setConfig took off', () => {
+      fixtureEl.innerHTML = '<div class="disabled"></div>'
+      const element = fixtureEl.querySelector('div')
+      const dateInput = new DateInput(element, { format: 'dd.MM.yyyy' })
+
+      dateInput.setConfig({ disabled: false })
+
+      expect(element.classList.contains('disabled')).toBeFalse()
+      expect(element.querySelector('textarea').disabled).toBeFalse()
+
+      dateInput.dispose()
+
+      expect(element.getAttribute('class')).toEqual('disabled')
+    })
+
+    it('should leave the disabled class to the options when they set disabled', () => {
+      fixtureEl.innerHTML = '<div class="disabled"></div>'
+      const element = fixtureEl.querySelector('div')
+      const dateInput = new DateInput(element, { disabled: false, format: 'dd.MM.yyyy' })
+
+      expect(element.querySelector('textarea').disabled).toBeFalse()
+
+      dateInput.dispose()
+
+      expect(element.getAttribute('class')).toEqual('disabled')
+    })
+
     it('should give the host back the way the page wrote it', () => {
       fixtureEl.innerHTML = '<div class="form-control form-date-time my-own" id="start" role="note"></div>'
       const dateInputEl = fixtureEl.querySelector('#start')

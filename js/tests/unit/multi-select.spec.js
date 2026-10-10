@@ -4909,6 +4909,53 @@ describe('MultiSelect', () => {
       expect(marked.getAttribute('class')).toEqual('disabled')
     })
 
+    it('should take a disabled class the markup wrote as the disabled option, and give it back on dispose once setConfig enabled the select', () => {
+      fixtureEl.innerHTML = '<select class="disabled" multiple><option value="1">One</option></select>'
+      const select = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(select)
+
+      expect(fixtureEl.querySelector('[role="combobox"]').getAttribute('aria-disabled')).toEqual('true')
+
+      multiSelect.setConfig({ disabled: false })
+
+      expect(select.classList.contains('disabled')).toBeFalse()
+      expect(fixtureEl.querySelector('[role="combobox"]').hasAttribute('aria-disabled')).toBeFalse()
+
+      multiSelect.dispose()
+
+      expect(select.getAttribute('class')).toEqual('disabled')
+    })
+
+    it('should disable the select with the component, so a required one does not block the form', () => {
+      fixtureEl.innerHTML = '<form><select class="disabled" multiple required><option value="1">One</option></select></form>'
+      const form = fixtureEl.querySelector('form')
+      const select = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(select)
+
+      expect(select.disabled).toBeTrue()
+      expect(form.checkValidity()).toBeTrue()
+
+      multiSelect.dispose()
+
+      expect(select.hasAttribute('disabled')).toBeFalse()
+    })
+
+    it('should take a disabled select from the markup as the disabled option and keep it disabled', () => {
+      fixtureEl.innerHTML = '<select multiple disabled><option value="1">One</option></select>'
+      const select = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(select)
+
+      expect(fixtureEl.querySelector('[role="combobox"]').getAttribute('aria-disabled')).toEqual('true')
+
+      multiSelect.setConfig({ search: true })
+
+      expect(select.disabled).toBeTrue()
+
+      multiSelect.dispose()
+
+      expect(select.disabled).toBeTrue()
+    })
+
     it('should take back the disabled class it added once setConfig enables the select', () => {
       fixtureEl.innerHTML = '<select multiple><option value="1">One</option></select>'
       const select = fixtureEl.querySelector('select')

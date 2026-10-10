@@ -894,6 +894,21 @@ describe('Chip', () => {
       expect(Chip.getInstance(chipEl)).toBeNull()
     })
 
+    it('should leave a disabled class the page writes after init, and take back the one it added', () => {
+      fixtureEl.innerHTML = '<span id="page">A</span><span id="added">B</span>'
+      const page = fixtureEl.querySelector('#page')
+      const added = fixtureEl.querySelector('#added')
+      const pageChip = new Chip(page)
+      const addedChip = new Chip(added, { disabled: true })
+
+      page.classList.add('disabled')
+      pageChip.dispose()
+      addedChip.dispose()
+
+      expect(page.getAttribute('class')).toEqual('disabled')
+      expect(added.hasAttribute('class')).toBeFalse()
+    })
+
     it('should leave no class attribute on an element that had none', () => {
       fixtureEl.innerHTML = '<span>Tag</span>'
       const chipEl = fixtureEl.querySelector('span')

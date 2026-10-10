@@ -1225,6 +1225,19 @@ describe('Combobox', () => {
       expect(fixtureEl.querySelector('.popup').className).toEqual('popup combobox-popup')
     })
 
+    it('should disable a toggle button the markup marks with the disabled class, and give the markup back', () => {
+      fixtureEl.innerHTML = '<button class="form-control disabled" id="pick"></button>'
+      const toggle = fixtureEl.querySelector('#pick')
+      const combobox = new Combobox(toggle, { items: [{ value: 'a', label: 'A' }] })
+
+      expect(toggle.disabled).toBeTrue()
+
+      combobox.dispose()
+
+      expect(toggle.disabled).toBeFalse()
+      expect(toggle.getAttribute('class')).toEqual('form-control disabled')
+    })
+
     it('should leave the disabled state the page set after init', () => {
       fixtureEl.innerHTML = '<button class="form-control" id="pick"></button>'
       const toggle = fixtureEl.querySelector('#pick')

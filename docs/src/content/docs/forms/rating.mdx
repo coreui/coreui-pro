@@ -55,7 +55,7 @@ Set the Rating component to read-only by adding `data-coreui-readonly="true"`. T
 
 ## Disabled
 
-Add the `data-coreui-disabled="true"` boolean attribute to give it a grayed out appearance, remove pointer events, and prevent focusing.
+Add the `data-coreui-disabled="true"` boolean attribute, or write the `.disabled` class in the markup, to give it a grayed out appearance, remove pointer events, and prevent focusing.
 
 <Example pro code={`<div data-coreui-disabled="true" data-coreui-rating data-coreui-value="3"></div>`} />
 
@@ -196,7 +196,7 @@ Note that for security reasons the `sanitize`, `sanitizeFn`, and `allowList` opt
 | `allowClear` | boolean | `false` | Enables the clearing upon clicking the selected item again. |
 | `allowList` | object | [Default value](/getting-started/javascript/#sanitizer) |  Object which contains allowed attributes and tags. |
 | `ariaLabel` | function | `` (value, itemCount) => `${value} of ${itemCount}` `` | Accessible name of each item, built from its value and the total. |
-| `disabled` | boolean | `false` | Toggle the disabled state for the component. |
+| `disabled` | boolean | `false` | Toggle the disabled state for the component. You can also apply the `.disabled` class in markup. |
 | `highlightOnlySelected` | boolean | `false` | If enabled, only the currently selected icon will be visibly highlighted. |
 | `icon` | object, string, null | `null` | The default icon to display when the item is not selected. |
 | `itemCount` | number | `5` | The maximum value the user can select. |

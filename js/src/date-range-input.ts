@@ -433,7 +433,7 @@ class DateRangeInput extends BaseComponent {
   _createInput(element: HTMLElement, overrides: Record<string, any>): any {
     const forwarded = getForwardedOptions(Object.keys(DateInput.Default), this._config, this.constructor.Default, ORIGINAL_DEFAULT)
     const input = new DateInput(element, {
-      ...forwarded, ...overrides, autofocus: false, ...this._config.inputOptions, validationState: null
+      ...forwarded, ...overrides, autofocus: false, disabled: this._config.disabled, ...this._config.inputOptions, validationState: null
     })
 
     input._setOwnerDismiss((serial: number) => this._dismissValidationState(serial))
