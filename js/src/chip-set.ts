@@ -133,7 +133,7 @@ class ChipSet extends BaseComponent {
     super(element, config)
 
     this._addedAttributes = HOST_ATTRIBUTES.filter(name => !this._element.hasAttribute(name))
-    this._disabled = this._config.disabled || this._element.classList.contains(CLASS_NAME_DISABLED)
+    this._disabled = this._config.disabled
     this._pendingFocus = null
     this._chips = []
     this._optionChips = new Set()

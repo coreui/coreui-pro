@@ -280,14 +280,15 @@ describe('Combobox', () => {
       expect(toggle.classList.contains('combobox-toggle')).toBeTrue()
     })
 
-    it('should take the disabled attribute of the toggle as the disabled option', () => {
+    it('should leave the disabled state to the option, not the disabled attribute of the toggle', () => {
       const toggle = setMarkup(' disabled')
       const combobox = new Combobox(toggle)
 
-      combobox.show()
+      expect(toggle.disabled).toBeFalse()
 
-      expect(combobox._config.disabled).toBeTrue()
-      expect(toggle.classList.contains('show')).toBeFalse()
+      combobox.dispose()
+
+      expect(toggle.disabled).toBeTrue()
     })
   })
 
@@ -882,9 +883,9 @@ describe('Combobox', () => {
     })
 
     it('should not block or submit while disabled', () => {
-      const toggle = setMarkupInForm(' disabled')
+      const toggle = setMarkupInForm('')
       const combobox = new Combobox(toggle, {
-        name: 'country', required: true, validationState: 'invalid', value: 'us'
+        disabled: true, name: 'country', required: true, validationState: 'invalid', value: 'us'
       })
 
       expect(combobox._valueField.disabled).toBeTrue()
@@ -1225,30 +1226,17 @@ describe('Combobox', () => {
       expect(fixtureEl.querySelector('.popup').className).toEqual('popup combobox-popup')
     })
 
-    it('should disable a toggle button the markup marks with the disabled class, and give the markup back', () => {
+    it('should leave the disabled state to the option, not a class on the toggle, and give the markup back', () => {
       fixtureEl.innerHTML = '<button class="form-control disabled" id="pick"></button>'
       const toggle = fixtureEl.querySelector('#pick')
       const combobox = new Combobox(toggle, { items: [{ value: 'a', label: 'A' }] })
 
-      expect(toggle.disabled).toBeTrue()
-
-      combobox.dispose()
-
       expect(toggle.disabled).toBeFalse()
-      expect(toggle.getAttribute('class')).toEqual('form-control disabled')
-    })
+      expect(toggle.classList.contains('disabled')).toBeFalse()
 
-    it('should leave the disabled state the page set after init', () => {
-      fixtureEl.innerHTML = '<button class="form-control" id="pick"></button>'
-      const toggle = fixtureEl.querySelector('#pick')
-      const combobox = new Combobox(toggle, { items: [{ value: 'a', label: 'A' }] })
-
-      toggle.disabled = true
-      toggle.classList.add('disabled')
       combobox.dispose()
 
-      expect(toggle.disabled).toBeTrue()
-      expect(toggle.classList.contains('disabled')).toBeTrue()
+      expect(toggle.getAttribute('class')).toEqual('form-control disabled')
     })
 
     it('should take back the disabled state it set itself', () => {
@@ -1256,7 +1244,12 @@ describe('Combobox', () => {
       const configured = fixtureEl.querySelector('#configured')
       const marked = fixtureEl.querySelector('#marked')
 
-      new Combobox(configured, { disabled: true }).dispose()
+      const combobox = new Combobox(configured, { disabled: true })
+
+      expect(configured.disabled).toBeTrue()
+      expect(configured.classList.contains('disabled')).toBeTrue()
+
+      combobox.dispose()
       new Combobox(marked).dispose()
 
       expect(configured.outerHTML).toEqual('<button class="form-control" id="configured"></button>')

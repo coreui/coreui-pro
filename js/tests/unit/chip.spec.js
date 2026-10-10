@@ -60,13 +60,18 @@ describe('Chip', () => {
   })
 
   describe('constructor', () => {
-    it('should initialize with disabled class on element', () => {
+    it('should leave the disabled state to the option, not a class in the markup', () => {
       fixtureEl.innerHTML = '<span class="chip disabled">Tag</span>'
 
       const chipEl = fixtureEl.querySelector('.chip')
       const chip = new Chip(chipEl)
 
-      expect(chip._disabled).toBeTrue()
+      expect(chip._disabled).toBeFalse()
+      expect(chipEl.classList.contains('disabled')).toBeFalse()
+
+      chip.dispose()
+
+      expect(chipEl.classList.contains('disabled')).toBeTrue()
     })
 
     it('should initialize with active class on element as selected', () => {
@@ -170,11 +175,11 @@ describe('Chip', () => {
     })
 
     it('should not append a remove button when the chip is disabled', () => {
-      fixtureEl.innerHTML = '<span class="chip disabled">Tag</span>'
+      fixtureEl.innerHTML = '<span class="chip">Tag</span>'
 
       const chipEl = fixtureEl.querySelector('.chip')
       // eslint-disable-next-line no-new
-      new Chip(chipEl, { removable: true })
+      new Chip(chipEl, { disabled: true, removable: true })
 
       expect(chipEl.querySelector('.chip-remove')).toBeNull()
     })
@@ -894,19 +899,26 @@ describe('Chip', () => {
       expect(Chip.getInstance(chipEl)).toBeNull()
     })
 
-    it('should leave a disabled class the page writes after init, and take back the one it added', () => {
-      fixtureEl.innerHTML = '<span id="page">A</span><span id="added">B</span>'
-      const page = fixtureEl.querySelector('#page')
-      const added = fixtureEl.querySelector('#added')
-      const pageChip = new Chip(page)
-      const addedChip = new Chip(added, { disabled: true })
+    it('should give back the aria-disabled the markup had on dispose', () => {
+      fixtureEl.innerHTML = '<span class="chip disabled" role="button" aria-disabled="true">A</span>'
+      const chipEl = fixtureEl.querySelector('span')
+      const chip = new Chip(chipEl)
 
-      page.classList.add('disabled')
-      pageChip.dispose()
-      addedChip.dispose()
+      expect(chipEl.getAttribute('aria-disabled')).toEqual('false')
 
-      expect(page.getAttribute('class')).toEqual('disabled')
-      expect(added.hasAttribute('class')).toBeFalse()
+      chip.dispose()
+
+      expect(chipEl.getAttribute('aria-disabled')).toEqual('true')
+      expect(chipEl.getAttribute('class')).toEqual('chip disabled')
+    })
+
+    it('should take back the disabled class it added', () => {
+      fixtureEl.innerHTML = '<span>Tag</span>'
+      const chipEl = fixtureEl.querySelector('span')
+
+      new Chip(chipEl, { disabled: true }).dispose()
+
+      expect(chipEl.hasAttribute('class')).toBeFalse()
     })
 
     it('should leave no class attribute on an element that had none', () => {

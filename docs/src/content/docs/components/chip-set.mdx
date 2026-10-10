@@ -67,7 +67,7 @@ Set `data-coreui-removable="true"` to add a remove button to every chip. When th
 <Example code={`<div class="chip-set" data-coreui-chip-set data-coreui-removable="true">
     <span class="chip">Filter one</span>
     <span class="chip">Filter two</span>
-    <span class="chip disabled">Filter three</span>
+    <span class="chip" data-coreui-disabled="true">Filter three</span>
   </div>`} />
 
 ## JavaScript plugin
@@ -186,7 +186,7 @@ Selecting a range works with the pointer too: `Shift` + click selects every chip
 
 The four selection keys are the optional multi-select model from the [listbox pattern](https://www.w3.org/WAI/ARIA/apg/patterns/listbox/) and apply only when `selectable` is on and `selectionMode` is `multiple`. They add to the selection — they never clear it.
 
-Disabled chips (`.chip.disabled`) are skipped while navigating.
+Disabled chips (`data-coreui-disabled="true"` on the chip, or the set's `disabled` option) are skipped while navigating.
 
 ## Accessibility
 

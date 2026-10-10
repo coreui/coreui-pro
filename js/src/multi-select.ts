@@ -21,8 +21,7 @@ import {
   DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList, SVGAllowlist
 } from './util/sanitizer.js'
 import {
-  captureHostClasses, defineJQueryPlugin, getUID, type HostClasses, jQueryDispatch, resolveCountLabel, restoreHostClasses,
-  toggleHostClass
+  captureHostClasses, defineJQueryPlugin, getUID, type HostClasses, jQueryDispatch, resolveCountLabel, restoreHostClasses
 } from './util/index.js'
 
 /**
@@ -88,7 +87,7 @@ const CLASS_NAME_INDETERMINATE = 'indeterminate'
 const CLASS_NAME_SELECTION = 'form-multi-select-selection'
 const CLASS_NAME_SELECTION_TAGS = 'form-multi-select-selection-tags'
 const CLASS_NAME_SHOW = 'show'
-const HOST_CLASS_NAMES = [CLASS_NAME_SELECT]
+const HOST_CLASS_NAMES = [CLASS_NAME_DISABLED, CLASS_NAME_SELECT]
 const VALIDATION_OPTIONS = new Set(['invalid', 'valid', 'validationState'])
 
 type MultiSelectConfig = {
@@ -251,7 +250,6 @@ class MultiSelect extends ComboboxBase {
   protected declare _stateSerial: number
   protected declare _userChange: boolean
   protected declare _userValidity: UserValidity
-  protected declare _hostDisabledClass: boolean | null
   protected declare _indicatorElement: any
   protected declare _selectAllElement: any
   protected declare _selectAllLabelElement: any
@@ -271,10 +269,8 @@ class MultiSelect extends ComboboxBase {
   constructor(element?: string | Element | null, config?: Partial<MultiSelectConfig> | null) {
     super(element, config)
 
-    this._config.disabled = this._config.disabled || (this._element as HTMLSelectElement).disabled || this._element.classList.contains(CLASS_NAME_DISABLED)
     this._hostAttributes = new Map(HOST_ATTRIBUTES.map(name => [name, this._element.getAttribute(name)]))
     this._hostClasses = captureHostClasses(this._element, HOST_CLASS_NAMES)
-    this._hostDisabledClass = null
     this._serverClasses = [CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID].filter(name => this._element.classList.contains(name))
     this._element.classList.remove(...this._serverClasses)
     this._configureNativeSelect()
@@ -446,11 +442,6 @@ class MultiSelect extends ComboboxBase {
     }
 
     this._element.classList.add(...this._serverClasses)
-
-    if (this._hostDisabledClass !== null) {
-      this._element.classList.toggle(CLASS_NAME_DISABLED, this._hostDisabledClass)
-    }
-
     restoreHostClasses(this._element, HOST_CLASS_NAMES, this._hostClasses)
     super.dispose()
   }
@@ -1003,7 +994,7 @@ class MultiSelect extends ComboboxBase {
     const wrapper = document.createElement('div')
     wrapper.classList.add(CLASS_NAME_SELECT)
 
-    this._hostDisabledClass = toggleHostClass(this._element, CLASS_NAME_DISABLED, this._config.disabled, this._hostDisabledClass)
+    this._element.classList.toggle(CLASS_NAME_DISABLED, this._config.disabled)
 
     for (const className of this._element.classList) {
       if (className !== CLASS_NAME_IS_INVALID && className !== CLASS_NAME_IS_VALID) {

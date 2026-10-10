@@ -8,6 +8,7 @@
 import Chip from './chip.js'
 import ChipSet, { type ChipSetConfig } from './chip-set.js'
 import EventHandler from './dom/event-handler.js'
+import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { applyControlGroupClasses } from './util/form-control-group.js'
 import {
@@ -15,7 +16,7 @@ import {
   nextStateSerial, ownValidationState, setStateValidity, type UserValidity, type ValidationState, writeValueField
 } from './util/form-validation.js'
 import {
-  captureHostClasses, getUID, type HostClasses, isRTL, restoreHostClasses, toggleHostClass
+  captureHostClasses, getUID, type HostClasses, isRTL, restoreHostClasses
 } from './util/index.js'
 
 /**
@@ -45,7 +46,7 @@ const CLASS_NAME_GROUP = 'form-control-group'
 const CLASS_NAME_IS_INVALID = 'is-invalid'
 const CLASS_NAME_IS_VALID = 'is-valid'
 
-const HOST_CLASS_NAMES = [CLASS_NAME_GROUP]
+const HOST_CLASS_NAMES = [CLASS_NAME_DISABLED, CLASS_NAME_GROUP]
 
 type ChipInputConfig = ChipSetConfig & {
   create: boolean
@@ -100,9 +101,10 @@ class ChipInput extends ChipSet {
   protected declare _uniqueId: string
   protected declare _valueField: HTMLTextAreaElement | null
   protected declare _input: HTMLInputElement
+  protected declare _inputDisabled: string | null
+  protected declare _inputReadonly: string | null
   protected declare _describedBy: string | null
   protected declare _hostClasses: HostClasses
-  protected declare _hostDisabledClass: boolean | null
   protected declare _initialChips: HTMLElement[]
   protected declare _releaseValidationState: (() => void) | null
   protected declare _removingByCode: boolean
@@ -143,6 +145,8 @@ class ChipInput extends ChipSet {
     }
 
     this._describedBy = this._input.getAttribute('aria-describedby')
+    this._inputDisabled = this._input.getAttribute('disabled')
+    this._inputReadonly = this._input.getAttribute('readonly')
     this._applyInteractionState()
 
     // In the controlled mode (`create: false`) the chips come from the host —
@@ -202,10 +206,6 @@ class ChipInput extends ChipSet {
     this._userValidity?.stop()
     this._releaseValidationState?.()
 
-    if (this._hostDisabledClass !== null) {
-      this._element.classList.toggle(CLASS_NAME_DISABLED, this._hostDisabledClass)
-    }
-
     if (this._stateClass) {
       this._element.classList.remove(this._stateClass)
     }
@@ -222,6 +222,8 @@ class ChipInput extends ChipSet {
     } else {
       this._input.removeAttribute('aria-invalid')
       this._restoreAttribute('aria-describedby', this._describedBy)
+      this._restoreAttribute('disabled', this._inputDisabled)
+      this._restoreAttribute('readonly', this._inputReadonly)
 
       if (this._addedAriaRequired) {
         this._input.removeAttribute('aria-required')
@@ -250,10 +252,12 @@ class ChipInput extends ChipSet {
   // Per-chip configuration based on the chip value and the input's
   // disabled/readonly state.
   override _getChipConfig(chip: HTMLElement): Record<string, any> {
+    const disabled = this._disabled || Manipulator.getDataAttribute(chip, 'disabled') === true
+
     return {
       ariaRemoveLabel: `Remove ${this._getChipValue(chip)}`,
-      disabled: this._disabled,
-      removable: this._config.removable && !this._config.readonly && !this._disabled,
+      disabled,
+      removable: this._config.removable && !this._config.readonly && !disabled,
       removeIcon: this._config.removeIcon,
       selectable: this._config.selectable
     }
@@ -514,7 +518,7 @@ class ChipInput extends ChipSet {
 
   _applyInteractionState(): void {
     const { readonly } = this._config
-    this._hostDisabledClass = toggleHostClass(this._element, CLASS_NAME_DISABLED, this._disabled, null)
+    this._element.classList.toggle(CLASS_NAME_DISABLED, this._disabled)
     // The container is a generic element, so `aria-disabled`/`aria-readonly`
     // are not allowed on it — the native input states carry the semantics.
     this._input.disabled = this._disabled

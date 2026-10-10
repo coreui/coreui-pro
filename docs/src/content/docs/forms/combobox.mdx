@@ -370,11 +370,11 @@ The toggle carries `.form-control`, so `.form-control-sm` and `.form-control-lg`
 
 ## Disabled
 
-`disabled` on the toggle button turns the whole control off — the panel never opens and the list box is disabled with it. A single option opts out with `.disabled` and `aria-disabled="true"`, which takes it out of the keyboard order and out of every selection method.
+Set `data-coreui-disabled="true"` (or the `disabled` option) to turn the whole control off: the panel never opens, the list box is disabled with it, and a button toggle gets the `disabled` attribute. A single option opts out with `.disabled` and `aria-disabled="true"`, which takes it out of the keyboard order and out of every selection method.
 
 <Example code={`<button class="form-control combobox-toggle mb-3" type="button"
       data-coreui-toggle="combobox"
-      data-coreui-placeholder="Cannot interact…" disabled>
+      data-coreui-placeholder="Cannot interact…" data-coreui-disabled="true">
   </button>
   <div class="popup combobox-popup">
     <div class="list-box">
@@ -534,7 +534,7 @@ const combobox = new coreui.Combobox('#myCombobox', {
 | `ariaSearchLabel` | string | `'Search options'` | Accessible name of the search field. An input with its own `aria-label` keeps it. |
 | `caretIcon` | string | `'<svg …>'` | The caret drawn at the end of the toggle, as inline SVG, sanitized against the SVG allow list whatever `allowList` holds; its last element becomes the caret. Empty string, or a `.combobox-caret` already in the markup, and the plugin draws none. |
 | `container` | string, element, boolean | `false` | Where the panel is mounted while open. `true` means `<body>`; leave it alone and the panel goes next to the toggle unless an ancestor would clip it. Inside a modal dialog it goes into the dialog instead, because the rest of the page is inert. |
-| `disabled` | boolean | `false` | Turns the control off: the panel never opens and the list box is disabled. The `disabled` attribute or the `.disabled` class on the toggle sets it too. |
+| `disabled` | boolean | `false` | Turns the control off: the panel never opens and the list box is disabled. The combobox sets the `.disabled` class and, on a button toggle, the `disabled` attribute from it. |
 | `html` | boolean | `false` | Parses the labels rendered from `items` as HTML instead of inserting them as text. |
 | `indicator` | string | `'none'` | `'checkbox'` puts a decorative checkbox in front of every option. |
 | `items` | array | `[]` | The options to render: `{ value, label, description, disabled, selected }`, or `{ label, items }` for a section. Replaces whatever the panel already holds. |
