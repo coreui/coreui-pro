@@ -2557,7 +2557,7 @@ field behind that kept submitting.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **The rating takes a validation state.** The new `validationState` option,
   or `.is-invalid`/`.is-valid` on the rating element read once when it starts,
-  colours the empty stars and the focus ring, and a given `'invalid'` sets
+  colours the focus ring, and a given `'invalid'` sets
   `aria-invalid` on the group and blocks the submit until the user picks or
   clears a star or the form is reset. A class written on the element later is
   not read; set the state with `setConfig({ validationState })`. See

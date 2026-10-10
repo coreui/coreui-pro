@@ -1,8 +1,8 @@
 /*!
- * A rating with a validation state colours its empty stars and its focus ring
- * with the state's theme. The rule lives in the forms layer and the rating's
- * own tokens in the components layer, which only a real browser with the
- * stylesheet can settle.
+ * A rating with a validation state draws its focus ring in the state's theme,
+ * also over a theme of its own, and keeps the colours of its stars. The rule
+ * lives in the forms layer and the rating's own tokens in the components
+ * layer, which only a real browser with the stylesheet can settle.
  * Copyright 2026 The Bootstrap Authors
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  */
@@ -40,11 +40,11 @@ describe('rating validation', () => {
     container?.remove()
   })
 
-  it('colours the empty stars with the theme of a given state', () => {
-    for (const [state, theme] of [['invalid', 'danger'], ['valid', 'success']]) {
+  it('keeps the colours of the stars under a given state', () => {
+    for (const state of ['invalid', 'valid']) {
       const label = mount(state)
 
-      expect(getComputedStyle(label).color).toEqual(colourOf(`var(--cui-${theme}-fg)`))
+      expect(getComputedStyle(label).color).toEqual(colourOf('var(--cui-fg-3)'))
 
       rating.dispose()
       container.remove()
@@ -58,11 +58,5 @@ describe('rating validation', () => {
 
     expect(document.activeElement).toBe(label.closest('.rating-item').querySelector('.rating-item-input'))
     expect(getComputedStyle(label.closest('.rating-item')).outlineColor).toEqual(colourOf('var(--cui-danger-focus-ring)'))
-  })
-
-  it('keeps the empty stars in the rating colour without a state', () => {
-    const label = mount(null)
-
-    expect(getComputedStyle(label).color).toEqual(colourOf('var(--cui-fg-3)'))
   })
 })

@@ -65,7 +65,7 @@ A rating can be required, and it takes a validation state from the page.
 
 - `required` (`data-coreui-required="true"`) makes every radio required, so the browser stops the submit while no star is picked, and gives the rating `aria-required="true"`. A read-only rating is never required.
 - Give a state with the `validationState` option (`data-coreui-validation-state`), or with `.is-invalid` or `.is-valid` on the rating element in the HTML the server renders. The class is read once, when the rating starts; after that, use `setConfig({ validationState })`, which changes the state without rendering the stars again when it is the only option you pass.
-- The state shows on the rating element: it colours the empty stars and the focus ring, and `'invalid'` sets `aria-invalid` on the group and adds the invalid feedback that follows the rating, or the one named in its `data-coreui-invalid-feedback`, to the `aria-describedby` of every star.
+- The state shows on the rating element: it colours the focus ring, the stars keep their colours, and `'invalid'` sets `aria-invalid` on the group and adds the invalid feedback that follows the rating, or the one named in its `data-coreui-invalid-feedback`, to the `aria-describedby` of every star.
 - `'invalid'` blocks the submit through the checked star, or the first one when none is picked, with the text of the feedback as the message the browser shows, or `Invalid value.` without one, and the browser moves the focus to that star. `'valid'` and a custom state do not block, and neither does a disabled or read-only rating.
 - Picking or clearing a star, or a native form reset, removes the state before `change.coreui.rating` fires. A change from code, such as `setConfig({ value })` or `reset()`, keeps it.
 - A required rating without a value shows `'invalid'` once a validation reports it, and a given state shows over it.
@@ -243,7 +243,7 @@ Ratings use local CSS variables on `.rating` for enhanced real-time customizatio
 
 <ScssDocs file="scss/_rating.scss" capture="rating-tokens" />
 
-A validation state sets `--cui-rating-item-color` and `--cui-theme-focus-ring` on the items of a `.rating.is-{state}`, from the theme of the state in `$form-validation-states`.
+A validation state sets `--cui-theme-focus-ring` on the items of a `.rating.is-{state}`, from the theme of the state in `$form-validation-states`; the stars keep their colours.
 
 ### Sass maps
 
