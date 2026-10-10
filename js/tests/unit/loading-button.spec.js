@@ -530,6 +530,35 @@ describe('LoadingButton', () => {
       expect(button).not.toHaveClass('disabled')
     })
 
+    it('should take back its classes, the spinner and an unread message when disposed while loading', () => {
+      fixtureEl.innerHTML = '<button>Save</button>'
+      const button = fixtureEl.querySelector('button')
+      const loadingButton = new LoadingButton(button)
+
+      button.focus()
+      loadingButton.start()
+      vi.advanceTimersByTime(10)
+      loadingButton.dispose()
+      vi.advanceTimersByTime(200)
+
+      expect(button.outerHTML).toEqual('<button>Save</button>')
+      expect(messages()).toEqual([])
+    })
+
+    it('should take back the spinner when disposed while it stops', () => {
+      fixtureEl.innerHTML = '<button>Save</button>'
+      const button = fixtureEl.querySelector('button')
+      const loadingButton = new LoadingButton(button)
+
+      loadingButton.start()
+      vi.advanceTimersByTime(10)
+      loadingButton.stop()
+      loadingButton.dispose()
+      vi.advanceTimersByTime(200)
+
+      expect(button.outerHTML).toEqual('<button>Save</button>')
+    })
+
     it('should not throw when a stop listener disposes the instance', () => {
       fixtureEl.innerHTML = '<button>Save</button>'
       const button = fixtureEl.querySelector('button')
@@ -594,6 +623,19 @@ describe('LoadingButton', () => {
       loadingButton.dispose()
 
       expect(Data.get(button, 'coreui.loading-button')).toBeNull()
+    })
+
+    it('should leave no class attribute on a button that had none, and keep the classes the page wrote', () => {
+      fixtureEl.innerHTML = '<button id="bare">Save</button><button id="marked" class="btn btn-loading">Save</button>'
+      const bare = fixtureEl.querySelector('#bare')
+      const marked = fixtureEl.querySelector('#marked')
+
+      for (const button of [bare, marked]) {
+        new LoadingButton(button).dispose()
+      }
+
+      expect(bare.hasAttribute('class')).toBeFalse()
+      expect(marked.getAttribute('class')).toEqual('btn btn-loading')
     })
 
     it('should not let the timers fire after dispose', () => {
