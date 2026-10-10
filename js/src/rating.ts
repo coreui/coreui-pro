@@ -14,7 +14,8 @@ import {
 } from './util/form-validation.js'
 import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 import {
-  captureHostClasses, defineJQueryPlugin, getUID, type HostClasses, jQueryDispatch, restoreHostClasses
+  captureHostClasses, defineJQueryPlugin, getUID, type HostClasses, jQueryDispatch, restoreHostClasses,
+  toggleHostClass
 } from './util/index.js'
 import Tooltip from './tooltip.js'
 
@@ -135,6 +136,7 @@ class Rating extends BaseComponent {
   protected declare _hostAriaReadonly: string | null
   protected declare _hostAriaRequired: string | null
   protected declare _hostClasses: HostClasses
+  protected declare _hostDisabledClass: boolean | null
   protected declare _hostRole: string | null
   protected declare _items: HTMLElement[]
   protected declare _name: string
@@ -156,13 +158,13 @@ class Rating extends BaseComponent {
 
     this._hostClasses = captureHostClasses(this._element, [
       CLASS_NAME_RATING,
-      CLASS_NAME_DISABLED,
       CLASS_NAME_READONLY,
       ...[...this._element.classList].filter(className => className.startsWith(`${CLASS_NAME_RATING}-`))
     ])
     this._hostAriaInvalid = this._element.getAttribute('aria-invalid')
     this._hostAriaReadonly = this._element.getAttribute('aria-readonly')
     this._hostAriaRequired = this._element.getAttribute('aria-required')
+    this._hostDisabledClass = null
     this._hostRole = this._element.getAttribute('role')
     this._items = []
     this._form = this._element.closest('form')
@@ -214,6 +216,7 @@ class Rating extends BaseComponent {
     this._sizeClassName = null
     this._sizeClassNames = new Set()
     this._config = this._getConfig(config)
+    this._config.disabled = this._config.disabled || this._element.classList.contains(CLASS_NAME_DISABLED)
     this._currentValue = this._config.value
     this._name = this._config.name || getUID(`${this.constructor.NAME}-name-`).toString()
     this._tooltip = null
@@ -280,6 +283,10 @@ class Rating extends BaseComponent {
       this._element.classList.remove(this._stateClass)
     }
 
+    if (this._hostDisabledClass !== null) {
+      this._element.classList.toggle(CLASS_NAME_DISABLED, this._hostDisabledClass)
+    }
+
     restoreHostClasses(this._element, this._managedClassNames(), this._hostClasses)
 
     if (this._serverMarks.length > 0) {
@@ -307,7 +314,7 @@ class Rating extends BaseComponent {
 
   // Private
   _managedClassNames(): string[] {
-    return [CLASS_NAME_RATING, CLASS_NAME_DISABLED, CLASS_NAME_READONLY, ...this._sizeClassNames]
+    return [CLASS_NAME_RATING, CLASS_NAME_READONLY, ...this._sizeClassNames]
   }
 
   _radios(): HTMLInputElement[] {
@@ -548,7 +555,7 @@ class Rating extends BaseComponent {
 
   _createRating(anchor: ChildNode | null = null): void {
     this._element.classList.add(CLASS_NAME_RATING)
-    this._element.classList.toggle(CLASS_NAME_DISABLED, Boolean(this._config.disabled))
+    this._hostDisabledClass = toggleHostClass(this._element, CLASS_NAME_DISABLED, Boolean(this._config.disabled), this._hostDisabledClass)
     this._element.classList.toggle(CLASS_NAME_READONLY, Boolean(this._config.readonly))
 
     if (this._sizeClassName) {

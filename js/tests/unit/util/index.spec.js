@@ -1049,4 +1049,40 @@ describe('Util', () => {
       expect(div.getAttribute('class')).toEqual('')
     })
   })
+
+  describe('toggleHostClass', () => {
+    it('should add a class and keep that the element did not carry it', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+
+      expect(Util.toggleHostClass(div, 'disabled', true, null)).toBeFalse()
+      expect(div.className).toEqual('disabled')
+    })
+
+    it('should remove a class and keep that the element carried it', () => {
+      fixtureEl.innerHTML = '<div class="disabled"></div>'
+      const div = fixtureEl.querySelector('div')
+
+      expect(Util.toggleHostClass(div, 'disabled', false, null)).toBeTrue()
+      expect(div.hasAttribute('class')).toBeTrue()
+      expect(div.classList.contains('disabled')).toBeFalse()
+    })
+
+    it('should report no change while the element already matches', () => {
+      fixtureEl.innerHTML = '<div class="disabled"></div>'
+      const div = fixtureEl.querySelector('div')
+
+      expect(Util.toggleHostClass(div, 'disabled', true, null)).toBeNull()
+      expect(div.className).toEqual('disabled')
+    })
+
+    it('should keep the state from before the first change through later ones', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const original = Util.toggleHostClass(div, 'disabled', true, null)
+
+      expect(Util.toggleHostClass(div, 'disabled', false, original)).toBeFalse()
+      expect(div.classList.contains('disabled')).toBeFalse()
+    })
+  })
 })

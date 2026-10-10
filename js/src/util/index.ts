@@ -451,6 +451,28 @@ const restoreHostClasses = (element: HTMLElement, managed: string[], host: HostC
   }
 }
 
+/**
+ * Sets whether the element carries a class, and keeps whether it carried it
+ * before the component changed it the first time, so that `dispose()` can undo
+ * the component's own change and leave a class the page set alone.
+ *
+ * @param element - The element the component decorates
+ * @param className - The class to set
+ * @param force - Whether the element should carry the class
+ * @param original - What the previous call returned, `null` before the first one
+ * @returns Whether the element carried the class before the component first
+ *   changed it, or `null` while the component has not changed it
+ */
+const toggleHostClass = (element: HTMLElement, className: string, force: boolean, original: boolean | null): boolean | null => {
+  if (element.classList.contains(className) === force) {
+    return original
+  }
+
+  element.classList.toggle(className, force)
+
+  return original ?? !force
+}
+
 export {
   captureHostClasses,
   type CountLabel,
@@ -476,6 +498,7 @@ export {
   resolveCountLabel,
   restoreHostClasses,
   setAriaAttribute,
+  toggleHostClass,
   triggerTransitionEnd,
   toType
 }

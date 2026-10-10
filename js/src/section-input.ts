@@ -41,7 +41,7 @@ import {
   followUserValidity, getFeedbackIds, getValidationState, nextStateSerial, ownValidationState, setStateValidity,
   type UserValidity, type ValidationState
 } from './util/form-validation.js'
-import { getNextActiveElement, isRTL } from './util/index.js'
+import { getNextActiveElement, isRTL, toggleHostClass } from './util/index.js'
 
 /**
  * Constants
@@ -73,7 +73,6 @@ const CLASS_NAME_SEPARATOR = 'form-date-time-separator'
 
 const HOST_CLASS_NAMES = [
   CLASS_NAME_ALL_SELECTED,
-  CLASS_NAME_DISABLED,
   CLASS_NAME_FILLED,
   CLASS_NAME_FORM_CONTROL,
   CLASS_NAME_SECTION_INPUT
@@ -221,6 +220,7 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
   protected declare _error: string | null
   protected declare _hostAriaLabel: string | null
   protected declare _hostClasses: HostClasses
+  protected declare _hostDisabledClass: boolean | null
   protected declare _hostNodes: ChildNode[]
   protected declare _hostRole: string | null
   protected declare _inputElement: HTMLTextAreaElement | null
@@ -239,6 +239,7 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
   constructor(element?: string | Element | null, config?: Partial<C> | null) {
     super(element, config)
 
+    this._config.disabled = this._config.disabled || this._element.classList.contains(CLASS_NAME_DISABLED)
     this._applyConfig()
     this._date = getDateFromSections(this._sections)
     this._allSelected = false
@@ -255,6 +256,7 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
     this._userCommit = false
     this._hostAriaLabel = this._element.getAttribute('aria-label')
     this._hostClasses = captureHostClasses(this._element, HOST_CLASS_NAMES)
+    this._hostDisabledClass = null
     this._hostNodes = [...this._element.childNodes]
     this._hostRole = this._element.getAttribute('role')
     this._serverClasses = [CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID].filter(name => this._element.classList.contains(name))
@@ -358,6 +360,11 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
     }
 
     this._element.classList.add(...this._serverClasses)
+
+    if (this._hostDisabledClass !== null) {
+      this._element.classList.toggle(CLASS_NAME_DISABLED, this._hostDisabledClass)
+    }
+
     restoreHostClasses(this._element, HOST_CLASS_NAMES, this._hostClasses)
 
     if (!this._hostAriaLabel) {
@@ -834,7 +841,7 @@ abstract class SectionInput<C extends SectionInputConfig = SectionInputConfig> e
     const { disabled, name, readonly, required } = this._config
 
     this._element.classList.add(CLASS_NAME_FORM_CONTROL, CLASS_NAME_SECTION_INPUT)
-    this._element.classList.toggle(CLASS_NAME_DISABLED, disabled)
+    this._hostDisabledClass = toggleHostClass(this._element, CLASS_NAME_DISABLED, disabled, this._hostDisabledClass)
     this._element.setAttribute('role', 'group')
 
     if (!this._hostAriaLabel) {

@@ -39,13 +39,14 @@ describe('Rating', () => {
   })
 
   describe('constructor', () => {
-    it('should let the options decide a state class the markup wrote, and give it back on dispose', () => {
+    it('should take a disabled class the markup wrote as the disabled option, and give the markup back on dispose', () => {
       fixtureEl.innerHTML = '<div class="rating disabled"></div>'
       const div = fixtureEl.querySelector('div')
       const markup = div.outerHTML
       const rating = new Rating(div)
 
-      expect(div).not.toHaveClass('disabled')
+      expect(div).toHaveClass('disabled')
+      expect(div.querySelector('input').disabled).toBeTrue()
 
       rating.dispose()
 
@@ -2171,6 +2172,29 @@ describe('Rating', () => {
   })
 
   describe('dispose', () => {
+    it('should leave a disabled class the page writes after init, and give back the one it added or removed', () => {
+      fixtureEl.innerHTML = '<div id="page"></div><div id="added"></div><div id="markup" class="disabled"></div>'
+      const page = fixtureEl.querySelector('#page')
+      const added = fixtureEl.querySelector('#added')
+      const markup = fixtureEl.querySelector('#markup')
+      const pageRating = new Rating(page)
+      const addedRating = new Rating(added, { disabled: true })
+      const markupRating = new Rating(markup)
+
+      page.classList.add('disabled')
+      markupRating.setConfig({ disabled: false })
+
+      expect(markup).not.toHaveClass('disabled')
+
+      for (const rating of [pageRating, addedRating, markupRating]) {
+        rating.dispose()
+      }
+
+      expect(page.getAttribute('class')).toEqual('disabled')
+      expect(added.hasAttribute('class')).toBeFalse()
+      expect(markup.getAttribute('class')).toEqual('disabled')
+    })
+
     it('should take back the items and radios it rendered', () => {
       fixtureEl.innerHTML = '<form><div data-coreui-rating></div></form>'
       const form = fixtureEl.querySelector('form')
