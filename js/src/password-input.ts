@@ -94,6 +94,10 @@ class PasswordInput extends BaseComponent {
 
   // Public
   toggle(): any {
+    if (this._element.type === 'password' && this._element.matches(':disabled')) {
+      return
+    }
+
     this._element.type = this._element.type === 'password' ? 'text' : 'password'
     this._updateToggleState()
   }
@@ -137,19 +141,11 @@ class PasswordInput extends BaseComponent {
       sanitizeIcon: (icon: string) => sanitizeByConfig(icon, this._config)
     })
 
-    EventHandler.on(this._toggleElement, EVENT_CLICK, () => {
-      if (!this._syncDisabled()) {
-        this.toggle()
-      }
+    EventHandler.on(this._toggleElement, EVENT_CLICK, () => this.toggle())
+    EventHandler.on(this._element, EVENT_FOCUS, () => {
+      this._toggleElement!.disabled = false
     })
-    EventHandler.on(this._element, EVENT_FOCUS, () => this._syncDisabled())
     this._group.element.append(this._toggleElement)
-  }
-
-  _syncDisabled(): boolean {
-    this._toggleElement!.disabled = this._element.disabled
-
-    return this._element.disabled
   }
 
   // The toggle reflects the input's type: the pressed state for assistive
