@@ -345,6 +345,33 @@ describe('PasswordInput', () => {
       expect(fixtureEl.querySelector('.form-control-action').disabled).toBe(true)
     })
 
+    it('should not reveal a control the page disabled after init, and disable its button', () => {
+      initialized('<input type="password" class="form-control" data-coreui-password-input>')
+      const input = fixtureEl.querySelector('input')
+      const button = fixtureEl.querySelector('.form-control-action')
+
+      input.disabled = true
+      button.click()
+
+      expect(input.type).toBe('password')
+      expect(button.disabled).toBe(true)
+    })
+
+    it('should enable its button once a control the page enabled after init takes focus', () => {
+      initialized('<input type="password" class="form-control" disabled data-coreui-password-input>')
+      const input = fixtureEl.querySelector('input')
+      const button = fixtureEl.querySelector('.form-control-action')
+
+      input.disabled = false
+      input.focus()
+
+      expect(button.disabled).toBe(false)
+
+      button.click()
+
+      expect(input.type).toBe('text')
+    })
+
     it('should handle several controls independently', () => {
       fixtureEl.innerHTML = [
         '<input type="password" class="form-control" data-coreui-password-input>',
