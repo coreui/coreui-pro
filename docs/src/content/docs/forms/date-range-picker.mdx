@@ -139,11 +139,6 @@ Each field carries its own [floating label](/forms/floating-labels/): set `start
     </div>
   </div>`} />
 
-<Callout color="info">
-  **`inputReadOnly` and `previewDateOnHover` are gone** — see the
-  [migration guide](/migration/v6/).
-</Callout>
-
 ## Disabled dates
 
 <Example pro code={`<div class="row">
@@ -270,8 +265,8 @@ in an RTL context — the document direction or any `dir="rtl"` ancestor.
 
 ## Custom formats
 
-`inputDateFormat` and `inputOnChangeDelay` are gone — the mask defines the
-format. Set it with `data-coreui-format`, forwarded to both fields.
+The mask of the fields defines the format. Set it with `data-coreui-format`,
+forwarded to both fields.
 
 <Example pro code={`<div class="row">
     <div class="col-lg-7">
