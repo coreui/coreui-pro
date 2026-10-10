@@ -26,7 +26,9 @@ const DATA_API_KEY = '.data-api'
 
 const EVENT_CHANGE = `change${EVENT_KEY}`
 const EVENT_CLICK = `click${EVENT_KEY}`
+const EVENT_FOCUS = `focus${EVENT_KEY}`
 const EVENT_INPUT = `input${EVENT_KEY}`
+const EVENT_MOUSEOVER = `mouseover${EVENT_KEY}`
 const EVENT_POINTERDOWN = `pointerdown${EVENT_KEY}`
 const EVENT_RESET = `reset${EVENT_KEY}`
 const EVENTS_STOP_REPEAT = ['pointerup', 'pointercancel', 'pointerleave'].map(event => `${event}${EVENT_KEY}`)
@@ -85,7 +87,6 @@ class NumberInput extends BaseComponent {
   private _decrementElement: HTMLButtonElement | null = null
   private _incrementElement: HTMLButtonElement | null = null
   private _group: ControlGroup | null = null
-  private _observer: MutationObserver | null = null
   private _repeatTimeout: ReturnType<typeof setTimeout> | null = null
   private _repeatInterval: ReturnType<typeof setInterval> | null = null
   private _repeated = false
@@ -132,7 +133,6 @@ class NumberInput extends BaseComponent {
     }
 
     EventHandler.off(this._element.form, EVENT_RESET, this._resetHandler)
-    this._observer?.disconnect()
 
     for (const button of [this._decrementElement, this._incrementElement]) {
       EventHandler.off(button, EVENT_KEY)
@@ -140,7 +140,7 @@ class NumberInput extends BaseComponent {
     }
 
     if (this._group) {
-      EventHandler.off(this._group.element, EVENT_POINTERDOWN)
+      EventHandler.off(this._group.element, EVENT_KEY)
       this._group.element.classList.remove(CLASS_NAME_NUMBER_INPUT)
       releaseControlGroup(this._element, this._group)
     }
@@ -254,19 +254,18 @@ class NumberInput extends BaseComponent {
     }
 
     if (this._group) {
+      EventHandler.on(this._group.element, EVENT_MOUSEOVER, () => this._updateButtonState())
       EventHandler.on(this._group.element, EVENT_POINTERDOWN, (event: any) => this._handleFramePointerDown(event))
     }
 
     // The value can change without the buttons — typing, a form reset — and the
     // bounds have to follow it. The reset event precedes the reset itself.
     EventHandler.on(this._element, EVENT_INPUT, () => this._updateButtonState())
+    EventHandler.on(this._element, EVENT_FOCUS, () => this._updateButtonState())
 
     if (this._element.form) {
       EventHandler.on(this._element.form, EVENT_RESET, this._resetHandler)
     }
-
-    this._observer = new MutationObserver(() => this._updateButtonState())
-    this._observer.observe(this._element, { attributeFilter: ['disabled', 'max', 'min', 'readonly', 'step'] })
 
     for (const event of EVENTS_STOP_REPEAT) {
       EventHandler.on(document, event, this._stopRepeatingHandler)
@@ -275,6 +274,8 @@ class NumberInput extends BaseComponent {
 
   _handleFramePointerDown(event: PointerEvent): void {
     const target = event.target as Element
+
+    this._updateButtonState()
 
     // A disabled button lets the press through to the frame.
     if (event.pointerType !== 'mouse' || (target !== this._group?.element && ![this._decrementElement, this._incrementElement].includes(target.closest('button')))) {

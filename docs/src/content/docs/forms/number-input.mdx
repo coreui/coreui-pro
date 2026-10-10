@@ -36,7 +36,8 @@ Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label 
 `min`, `max` and `step` are the native attributes — the component does not
 reimplement them, it calls the browser's own stepping. **A button that cannot
 move the value any further is disabled**, so the bound is visible rather than
-just unresponsive.
+just unresponsive. When a script changes these attributes later, the buttons
+follow as described under [Disabled and read-only](#disabled-and-read-only).
 
 <Example pro code={`<input type="number" class="form-control" value="10" min="0" max="10" aria-label="Quantity" data-coreui-number-input>`} />
 
@@ -73,9 +74,11 @@ and a validator that toggles the class keeps working.
 
 <Example pro code={`<input type="number" class="form-control" value="3" aria-label="Quantity" readonly data-coreui-number-input>`} />
 
-Both buttons are disabled while the field is `disabled` or `readonly`, and they
-follow either attribute, and `min`, `max` and `step`, when a script changes it
-later.
+Both buttons are disabled while the field is `disabled` or `readonly`. When a
+script changes either attribute, or `min`, `max` or `step`, later, the buttons
+catch up as soon as the pointer moves over or presses the field, the field takes
+focus or the user edits it. A press never steps a field it should not step, and
+a touch on a button that still looks disabled brings it up to date first.
 
 ## Inside your own group
 

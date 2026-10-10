@@ -24,10 +24,6 @@ describe('NumberInput', () => {
 
   const buttons = () => fixtureEl.querySelectorAll('.form-control-action')
 
-  const settle = () => new Promise(resolve => {
-    setTimeout(resolve)
-  })
-
   describe('VERSION', () => {
     it('should return plugin version', () => {
       expect(NumberInput.VERSION).toEqual(expect.any(String))
@@ -243,7 +239,7 @@ describe('NumberInput', () => {
       expect(buttons()[1].disabled).toBe(false)
     })
 
-    it('should disable both buttons while the field is disabled or read-only, and follow later changes', async () => {
+    it('should disable both buttons while the field is disabled or read-only, and catch up with later changes when used', () => {
       const input = markup('value="5" readonly')
       const numberInput = new NumberInput(input) // eslint-disable-line no-unused-vars
       const states = () => [...buttons()].map(button => button.disabled)
@@ -251,21 +247,61 @@ describe('NumberInput', () => {
       expect(states()).toEqual([true, true])
 
       input.readOnly = false
-      await settle()
+      input.focus()
       expect(states()).toEqual([false, false])
 
       input.disabled = true
-      await settle()
+      buttons()[1].click()
+      expect(input.value).toBe('5')
+
+      input.closest('.form-control-group').dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }))
       expect(states()).toEqual([true, true])
     })
 
-    it('should follow min, max and step changed by a script', async () => {
-      const input = markup('value="5" max="10"')
+    it('should catch up with min, max and step changed by a script when the field takes focus', () => {
+      const input = markup('value="5" min="0" max="10"')
       const numberInput = new NumberInput(input) // eslint-disable-line no-unused-vars
 
       input.max = '5'
-      await settle()
+      input.focus()
+      expect(buttons()[1].disabled).toBe(true)
+      input.blur()
 
+      input.min = '5'
+      input.focus()
+      expect(buttons()[0].disabled).toBe(true)
+      input.blur()
+
+      input.max = '20'
+      input.step = '20'
+      input.focus()
+      expect(buttons()[1].disabled).toBe(true)
+    })
+
+    it('should keep focus on a button whose press is refused', () => {
+      const input = markup('value="1" max="5"')
+      const numberInput = new NumberInput(input) // eslint-disable-line no-unused-vars
+
+      input.value = '5'
+      buttons()[1].focus()
+      buttons()[1].click()
+
+      expect(input.value).toBe('5')
+      expect(document.activeElement).toBe(buttons()[1])
+    })
+
+    it('should catch up when a pointer moves over or presses the frame', () => {
+      const input = markup('value="5" max="5"')
+      const numberInput = new NumberInput(input) // eslint-disable-line no-unused-vars
+      const group = input.closest('.form-control-group')
+
+      input.max = '10'
+      group.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+      expect(buttons()[1].disabled).toBe(false)
+
+      input.focus()
+      input.max = '5'
+      group.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true, pointerType: 'touch' }))
       expect(buttons()[1].disabled).toBe(true)
     })
 
@@ -542,15 +578,18 @@ describe('NumberInput', () => {
   })
 
   describe('dispose', () => {
-    it('should stop watching the input', async () => {
+    it('should stop listening to the input and its frame', () => {
       const input = markup('value="1"')
       const numberInput = new NumberInput(input)
+      const group = input.closest('.form-control-group')
       const update = vi.spyOn(NumberInput.prototype, '_updateButtonState')
 
       try {
         numberInput.dispose()
-        input.disabled = true
-        await settle()
+        input.focus()
+        input.dispatchEvent(new Event('input'))
+        group.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+        group.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, pointerType: 'touch' }))
 
         expect(update).not.toHaveBeenCalled()
       } finally {
