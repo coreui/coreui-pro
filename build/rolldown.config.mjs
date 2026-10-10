@@ -52,6 +52,7 @@ const rolldownConfig = {
   },
   output: {
     banner: banner(),
+    comments: { jsdoc: false },
     file: path.resolve(__dirname, `../dist/js/${destinationFile}.js`),
     format: ESM ? 'esm' : 'umd',
     globals,

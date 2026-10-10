@@ -22,6 +22,7 @@ const bundle = await rolldown({
 
 await bundle.write({
   banner: chunk => banner(`util/${chunk.name}.ts`),
+  comments: { jsdoc: false },
   dir: path.resolve(__dirname, '../js/dist/util'),
   entryFileNames: '[name].mjs',
   format: 'esm',
