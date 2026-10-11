@@ -169,14 +169,12 @@ const getAnnouncer = (host: HTMLElement): HTMLElement => {
 }
 
 /**
- * Holds the host that takes over when a dialog closes for 500 ms: focus moves back to the page
- * then, and a screen reader following it drops a message added at that moment. The observer
- * reports the close before a queued insertion runs.
- *
- * @param records - The changes of the `open` attribute
+ * Holds the host that takes over after a dialog closes for 500 ms: the rest of the page comes back
+ * to screen readers then, and they drop a message added at that moment. The dialog components of
+ * every edition call it right after they close their dialog, before their `hidden` event.
  */
-const holdAfterClose = (records: MutationRecord[]): void => {
-  if (!records.some(record => record.target.nodeName === 'DIALOG' && !(record.target as HTMLDialogElement).open)) {
+export const holdAnnouncements = (): void => {
+  if (typeof document === 'undefined') {
     return
   }
 
@@ -197,8 +195,8 @@ const holdAfterClose = (records: MutationRecord[]): void => {
 /**
  * Adds the waiting messages to their regions in the order they came in. Each goes to the page or
  * to the modal dialog open at that moment. The queue holds while that dialog, or the dialog holding
- * focus, plays its closing transition, for 500 ms after a dialog closes, and while a region is
- * younger than 100 ms. A message that waited for page regions removed since is dropped with them,
+ * focus, plays its closing transition, for 500 ms after a dialog component closes its dialog, and
+ * while a region is younger than 100 ms. A message that waited for page regions removed since is dropped with them,
  * and the whole queue once there is no document, as when a test environment tears down.
  */
 const flush = (): void => {
@@ -243,7 +241,7 @@ const flush = (): void => {
  * Reads a message to screen reader users. The message goes to a visually hidden live region at
  * the start of the page or, while a modal dialog leaves the rest of the page inert, to one inside
  * that dialog, native or marked with `aria-modal="true"`. The region is picked when the message is added: one task after the call, once a
- * new region is 100 ms old, and after a closing dialog has closed and 500 ms have passed. Messages
+ * new region is 100 ms old, and 500 ms after a dialog component has closed its dialog. Messages
  * are added in the order of the calls, and each call adds a new one, so the same text is read
  * again.
  *
@@ -278,8 +276,4 @@ export const announce = (message: string, { context = null, priority = 'polite',
 
     node.remove()
   }
-}
-
-if (typeof document !== 'undefined' && typeof MutationObserver !== 'undefined') {
-  new MutationObserver(holdAfterClose).observe(document.documentElement, { attributeFilter: ['open'], subtree: true })
 }

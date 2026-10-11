@@ -1,5 +1,5 @@
 import { vi } from 'vitest'
-import { announce } from '../../../src/util/announce.js'
+import { announce, holdAnnouncements } from '../../../src/util/announce.js'
 import { clearFixture, getFixture } from '../../helpers/fixture.js'
 
 describe('announce on a fresh page', () => {
@@ -13,7 +13,7 @@ describe('announce on a fresh page', () => {
     clearFixture()
   })
 
-  it('should hold for 500 ms a first message sent as a dialog closes', async () => {
+  it('should hold for 500 ms a first message sent as a dialog component closes its dialog', async () => {
     vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'performance'] })
     const fixtureEl = getFixture()
     fixtureEl.innerHTML = '<dialog><button type="button">Close</button></dialog>'
@@ -22,6 +22,7 @@ describe('announce on a fresh page', () => {
     await Promise.resolve()
 
     dialog.close()
+    holdAnnouncements()
     announce('Saved')
     await Promise.resolve()
     vi.advanceTimersByTime(499)

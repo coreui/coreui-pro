@@ -1,5 +1,5 @@
 import { vi } from 'vitest'
-import { announce } from '../../../src/util/announce.js'
+import { announce, holdAnnouncements } from '../../../src/util/announce.js'
 import { clearFixture, getFixture } from '../../helpers/fixture.js'
 
 describe('announce', () => {
@@ -214,6 +214,39 @@ describe('announce', () => {
     expect(messages(document.body)).toEqual(['First', 'Second'])
   })
 
+  it('should not hold after a dialog the page closes itself', () => {
+    fixtureEl.innerHTML = '<dialog><button type="button">Close</button></dialog>'
+    const dialog = fixtureEl.querySelector('dialog')
+    announce('Before')
+    vi.advanceTimersByTime(100)
+    dialog.showModal()
+
+    dialog.close()
+    announce('After')
+    vi.advanceTimersByTime(0)
+
+    expect(messages(document.body)).toEqual(['Before', 'After'])
+  })
+
+  it('should hold the modal dialog that stays open when a dialog inside it closes', () => {
+    fixtureEl.innerHTML = '<dialog id="outer"><button type="button">Outer</button><dialog id="inner"><button type="button">Inner</button></dialog></dialog>'
+    const outer = fixtureEl.querySelector('#outer')
+    const inner = fixtureEl.querySelector('#inner')
+    outer.showModal()
+    announce('Before')
+    vi.advanceTimersByTime(100)
+    inner.showModal()
+
+    inner.close()
+    holdAnnouncements()
+    announce('After')
+    vi.advanceTimersByTime(499)
+    expect(messages(outer)).toEqual(['Before'])
+
+    vi.advanceTimersByTime(1)
+    expect(messages(outer)).toEqual(['Before', 'After'])
+  })
+
   it('should keep the hold after a close on a clock with fractions of a millisecond', async () => {
     vi.useRealTimers()
     vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
@@ -229,7 +262,7 @@ describe('announce', () => {
 
     now = 4001.1
     dialog.close()
-    await Promise.resolve()
+    holdAnnouncements()
     announce('After')
     vi.advanceTimersByTime(0)
 
