@@ -13,6 +13,7 @@ import type { ComponentConfig } from './util/config.js'
 import Data from './dom/data.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
+import { holdAnnouncements } from './util/announce.js'
 import { unwrapLegacyShell } from './util/legacy-markup.js'
 
 /**
@@ -207,6 +208,7 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
       this._element.close()
     }
 
+    holdAnnouncements()
     this._openedAsModal = false
 
     if (!document.querySelector('dialog[open]:modal')) {

@@ -1,6 +1,8 @@
+import { vi } from 'vitest'
 import Data from '../../src/dom/data.js'
 import EventHandler from '../../src/dom/event-handler.js'
 import Modal from '../../src/modal.js'
+import { announce } from '../../src/util/announce.js'
 import {
   clearBodyAndDocument, clearFixture, createEvent, getFixture, jQueryMock
 } from '../helpers/fixture.js'
@@ -366,6 +368,86 @@ describe('Modal', () => {
 
         dialog.show()
       })
+    })
+
+    it('should hold page announcements from the moment it closes its dialog', async () => {
+      fixtureEl.innerHTML = '<dialog class="modal modal-instant"><div class="modal-dialog"><div class="modal-content"></div></div></dialog>'
+      const dialog = new Modal(fixtureEl.querySelector('.modal'))
+      const messages = () => [...document.body.querySelector(':scope > [data-coreui-live-announcer] > [aria-live="polite"]').children].map(message => message.textContent)
+      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'performance'] })
+
+      try {
+        announce('Before')
+        vi.advanceTimersByTime(100)
+        await dialog.show()
+
+        dialog.hide()
+        announce('After')
+        vi.advanceTimersByTime(499)
+        expect(messages()).toEqual(['Before'])
+
+        vi.advanceTimersByTime(1)
+        expect(messages()).toEqual(['Before', 'After'])
+      } finally {
+        vi.useRealTimers()
+        document.body.querySelector(':scope > [data-coreui-live-announcer]')?.remove()
+      }
+    })
+
+    it('should hold page announcements when it closes its dialog after the closing transition', async () => {
+      fixtureEl.innerHTML = '<dialog class="modal"><div class="modal-dialog"><div class="modal-content"></div></div></dialog>'
+      const modalEl = fixtureEl.querySelector('.modal')
+      const dialog = new Modal(modalEl)
+      const messages = () => [...document.body.querySelector(':scope > [data-coreui-live-announcer] > [aria-live="polite"]').children].map(message => message.textContent)
+      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'performance'] })
+
+      try {
+        announce('Before')
+        vi.advanceTimersByTime(100)
+        const shown = dialog.show()
+        vi.advanceTimersByTime(50)
+        await shown
+
+        modalEl.addEventListener('hidden.coreui.modal', () => announce('After'), { once: true })
+        const hidden = dialog.hide()
+        vi.advanceTimersByTime(50)
+        await hidden
+        vi.advanceTimersByTime(400)
+        expect(messages()).toEqual(['Before'])
+
+        vi.advanceTimersByTime(200)
+        expect(messages()).toEqual(['Before', 'After'])
+      } finally {
+        vi.useRealTimers()
+        document.body.querySelector(':scope > [data-coreui-live-announcer]')?.remove()
+      }
+    })
+
+    it('should keep a message sent during its closing transition for the page', async () => {
+      fixtureEl.innerHTML = '<dialog class="modal" style="transition: opacity .3s"><div class="modal-dialog"><div class="modal-content"></div></div></dialog>'
+      const modalEl = fixtureEl.querySelector('.modal')
+      const dialog = new Modal(modalEl)
+      const messages = () => [...document.body.querySelector(':scope > [data-coreui-live-announcer] > [aria-live="polite"]').children].map(message => message.textContent)
+      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'performance'] })
+
+      try {
+        announce('Before')
+        vi.advanceTimersByTime(100)
+        const shown = dialog.show()
+        vi.advanceTimersByTime(350)
+        await shown
+
+        const hidden = dialog.hide()
+        announce('During')
+        vi.advanceTimersByTime(350)
+        await hidden
+        vi.advanceTimersByTime(600)
+
+        expect(messages()).toEqual(['Before', 'During'])
+      } finally {
+        vi.useRealTimers()
+        document.body.querySelector(':scope > [data-coreui-live-announcer]')?.remove()
+      }
     })
   })
 
