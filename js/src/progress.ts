@@ -42,8 +42,6 @@ const PROPERTY_SEGMENT_BORDER_RADIUS = '--cui-progress-segment-border-radius'
  */
 
 class Progress extends BaseComponent {
-  protected declare _bar: HTMLElement | null
-  protected declare _observer: MutationObserver | null
   protected declare _resizeObserver: ResizeObserver | null
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
@@ -53,14 +51,6 @@ class Progress extends BaseComponent {
       return
     }
 
-    this._bar = SelectorEngine.children<HTMLElement>(this._element, SELECTOR_BAR)[0] ?? null
-
-    if (!this._bar) {
-      return
-    }
-
-    this._observer = new MutationObserver(() => this._update())
-    this._observer.observe(this._bar, { attributeFilter: [ATTRIBUTE_VALUE_NOW, ATTRIBUTE_VALUE_MIN, ATTRIBUTE_VALUE_MAX] })
     this._resizeObserver = new ResizeObserver(() => this._update())
     this._resizeObserver.observe(this._element)
     this._update()
@@ -77,26 +67,29 @@ class Progress extends BaseComponent {
   }
 
   override dispose(): void {
-    this._observer?.disconnect()
     this._resizeObserver?.disconnect()
     this._element.style.removeProperty(PROPERTY_SEGMENTS_FIT)
     this._element.style.removeProperty(PROPERTY_SEGMENT_RADIUS_FIT)
-    this._bar?.style.removeProperty(PROPERTY_SEGMENTS_FILLED)
+    this._getBar()?.style.removeProperty(PROPERTY_SEGMENTS_FILLED)
 
     super.dispose()
   }
 
   // Private
-  protected _attribute(name: string, fallback: number): number {
-    const value = Number.parseFloat(this._bar!.getAttribute(name) ?? '')
+  protected _getBar(): HTMLElement | undefined {
+    return SelectorEngine.children<HTMLElement>(this._element, SELECTOR_BAR)[0]
+  }
+
+  protected _attribute(bar: HTMLElement, name: string, fallback: number): number {
+    const value = Number.parseFloat(bar.getAttribute(name) ?? '')
     return Number.isNaN(value) ? fallback : value
   }
 
-  protected _ratio(): number {
-    const min = this._attribute(ATTRIBUTE_VALUE_MIN, 0)
-    const max = this._attribute(ATTRIBUTE_VALUE_MAX, 100)
+  protected _ratio(bar: HTMLElement): number {
+    const min = this._attribute(bar, ATTRIBUTE_VALUE_MIN, 0)
+    const max = this._attribute(bar, ATTRIBUTE_VALUE_MAX, 100)
     const span = max - min
-    return span > 0 ? Math.min(Math.max((this._attribute(ATTRIBUTE_VALUE_NOW, min) - min) / span, 0), 1) : 0
+    return span > 0 ? Math.min(Math.max((this._attribute(bar, ATTRIBUTE_VALUE_NOW, min) - min) / span, 0), 1) : 0
   }
 
   protected _length(value: string): number {
@@ -144,13 +137,19 @@ class Progress extends BaseComponent {
   }
 
   protected _update(): void {
+    const bar = this._getBar()
+
+    if (!bar) {
+      return
+    }
+
     const segments = this._segmentsThatFit()
 
     // Nothing to count against: no token and no minimum width, so the stylesheet's fallback tiles apply
     if (!Number.isFinite(segments)) {
       this._element.style.removeProperty(PROPERTY_SEGMENTS_FIT)
       this._element.style.removeProperty(PROPERTY_SEGMENT_RADIUS_FIT)
-      this._bar!.style.removeProperty(PROPERTY_SEGMENTS_FILLED)
+      bar.style.removeProperty(PROPERTY_SEGMENTS_FILLED)
       return
     }
 
@@ -158,12 +157,12 @@ class Progress extends BaseComponent {
     this._element.style.setProperty(PROPERTY_SEGMENT_RADIUS_FIT, `${this._radiusThatFits(segments)}px`)
 
     // No value on the bar means the page sets the fill itself, so leave its variable alone
-    if (!this._bar!.hasAttribute(ATTRIBUTE_VALUE_NOW)) {
+    if (!bar.hasAttribute(ATTRIBUTE_VALUE_NOW)) {
       return
     }
 
     // Floor, so the bar never reads as complete before the value is
-    this._bar!.style.setProperty(PROPERTY_SEGMENTS_FILLED, `${Math.floor(this._ratio() * segments)}`)
+    bar.style.setProperty(PROPERTY_SEGMENTS_FILLED, `${Math.floor(this._ratio(bar) * segments)}`)
   }
 
   // Static

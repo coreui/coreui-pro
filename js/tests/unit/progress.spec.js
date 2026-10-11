@@ -195,18 +195,17 @@ describe('Progress', () => {
   })
 
   describe('update', () => {
-    it('should follow aria-valuenow changes on its own', async () => {
+    it('should follow an aria-valuenow change once update() is called', async () => {
       fixtureEl.innerHTML = getProgressHtml()
 
       const progressEl = fixtureEl.querySelector('.progress')
-      // eslint-disable-next-line no-new
-      new Progress(progressEl)
+      const progress = new Progress(progressEl)
 
       progressEl.querySelector('.progress-bar').setAttribute('aria-valuenow', '75')
-      await new Promise(resolve => {
-        setTimeout(resolve, 0)
-      })
+      await Promise.resolve()
+      expect(filled(progressEl)).toEqual('18')
 
+      progress.update()
       expect(filled(progressEl)).toEqual('30')
     })
 
@@ -221,10 +220,30 @@ describe('Progress', () => {
 
       expect(filled(progressEl)).toEqual('9')
     })
+
+    it('should fill the bar the page puts in place of the old one', () => {
+      fixtureEl.innerHTML = getProgressHtml()
+
+      const progressEl = fixtureEl.querySelector('.progress')
+      const progress = new Progress(progressEl)
+
+      progressEl.innerHTML = '<div class="progress-bar" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>'
+      progress.update()
+
+      expect(filled(progressEl)).toEqual('30')
+    })
+
+    it('should not throw without a bar of its own', () => {
+      fixtureEl.innerHTML = '<div class="progress-stacked progress-segmented" style="--cui-progress-segments: 10"><div class="progress" role="progressbar" aria-valuenow="15" style="width: 15%"><div class="progress-bar"></div></div></div>'
+
+      const progress = new Progress(fixtureEl.firstElementChild)
+
+      expect(() => progress.update()).not.toThrow()
+    })
   })
 
   describe('dispose', () => {
-    it('should stop observing and remove the variables', async () => {
+    it('should remove the variables', () => {
       fixtureEl.innerHTML = getProgressHtml()
 
       const progressEl = fixtureEl.querySelector('.progress')
@@ -236,13 +255,6 @@ describe('Progress', () => {
       expect(segments(progressEl)).toEqual('')
       expect(radius(progressEl)).toEqual('')
       expect(Progress.getInstance(progressEl)).toBeNull()
-
-      progressEl.querySelector('.progress-bar').setAttribute('aria-valuenow', '75')
-      await new Promise(resolve => {
-        setTimeout(resolve, 0)
-      })
-
-      expect(filled(progressEl)).toEqual('')
     })
   })
 
