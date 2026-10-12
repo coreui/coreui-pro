@@ -3366,13 +3366,27 @@ Multi Select's option indicators moved with it — they render as a decorative
 
 #### Placeholder
 
-- **The two opacities are CSS variables.** `--cui-placeholder-opacity-max` and
-  `--cui-placeholder-opacity-min` are declared on `.placeholder` and
-  `.placeholder-wave`, and both animations read them, so the resting opacity,
-  the glow's pulse and the wave's gradient can be retuned on an instance. They
-  were compiled in, and the wave's trough was Sass arithmetic
-  (`1 - $placeholder-opacity-min`) resolved at build time — it is
-  `calc(1 - var(…))` now.
+- **The opacities are CSS variables.** `--cui-placeholder-opacity-max` and
+  `--cui-placeholder-opacity-min` on `.placeholder` set the resting opacity
+  and the pulse, and `--cui-placeholder-wave-opacity-max` and `-min` on
+  `.placeholder-wave` set its highlight, so both can be retuned on an
+  instance. They were compiled in from `$placeholder-opacity-max` and
+  `-min`.
+- **Placeholders are paler, taller and rounded.** The resting opacity is `.18`
+  (was `.5`) and the pulse dips to `.1` (was `.2`). The default height is
+  `1.25em` (was `1em`), capped a quarter em below the line height so a
+  placeholder never makes a heading or a tight line taller; `.placeholder-xs`
+  is `.75em` (was `.6em`), `.placeholder-sm` `1em` (was `.8em`) and
+  `.placeholder-lg` `1.75em` (was `1.2em`). Each placeholder has a
+  `--cui-radius-3` corner. A button, avatar, badge or chip that takes
+  `.placeholder` as a modifier keeps its own height and corners.
+- **`.placeholder-wave` is a sweeping highlight and the recommended loading
+  animation.** A narrow bright band crosses the placeholders every 1.6s
+  instead of a wide gradient every 2s, and it also works on text. The opacity
+  pulse is `.placeholder-pulse` now; `.placeholder-glow` stays as its alias.
+  The keyframes are renamed with it, so custom CSS that names
+  `animation: placeholder-glow` needs `placeholder-pulse`.
+  With reduced motion the wave stops and drops its mask.
 
 #### Popover and Tooltip
 
