@@ -523,7 +523,10 @@ context.disabled         // disabled state
 
 The field's own events (`dateChange.coreui.date-input`,
 `errorChange.coreui.date-input`) still bubble from the inner element — the shell
-does not duplicate them.
+does not duplicate them. `dateChange.coreui.date-picker` fires before the
+field's `errorChange` for the same change, whether it comes from the calendar,
+the field or a method, so a date an `errorChange` listener sets replaces the one
+just reported.
 
 ```js
 const myDatePicker = document.getElementById('myDatePicker')

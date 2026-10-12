@@ -16,6 +16,7 @@ import {
   createDateTimeFormat,
   formatSelectionName,
   getDateBySelectionType,
+  isSameDateAs,
   isSameInstantAs,
   type SelectionTypes
 } from './util/calendar.js'
@@ -173,13 +174,12 @@ const DefaultType: Record<string, string> = {
 class DatePicker extends PickerBase {
   protected declare _created: { cleaner: boolean, field: boolean, toggle: boolean }
   protected declare _initialDate: any
-  protected declare _date: Date | null
   protected declare _input: any
   protected declare _calendar: any
   protected declare _calendarElement: any
   protected declare _selection: any
   protected declare _selectionElement: any
-  protected declare _applying: boolean
+  protected declare _source: 'calendar' | 'selection' | null
   protected declare _toggleLabel: string | null
 
   constructor(element?: string | Element | null, config?: DatePickerOptions | null) {
@@ -189,14 +189,13 @@ class DatePicker extends PickerBase {
     this._created = { cleaner: false, field: false, toggle: false }
     this._input = null
     this._calendar = null
-    this._applying = false
     this._calendarElement = null
     this._selection = null
     this._selectionElement = null
+    this._source = null
 
     this._hostClasses = captureHostClasses(this._element, this._managedClassNames())
     this._createDatePicker()
-    this._date = this._input.getDate()
     this._nameToggle()
     this._createPopup()
     this._addEventListeners()
@@ -217,23 +216,23 @@ class DatePicker extends PickerBase {
 
   // Public
   getDate(): Date | null {
-    return this._date
+    return this._input?.getDate() ?? null
   }
 
   setDate(date: Date | null): void {
-    this._applyDate(date)
+    this._writeField(date)
   }
 
   clear(): void {
-    this._applyDate(null)
+    this._writeField(null)
   }
 
   reset(): void {
-    this._applyDate(this._initialDate)
+    this._writeField(this._initialDate)
   }
 
   today(): void {
-    this._applyDate(new Date())
+    this._writeField(new Date())
   }
 
   override getContext(): Record<string, any> {
@@ -338,7 +337,7 @@ class DatePicker extends PickerBase {
     this._input._setOwnerDismiss((serial: number) => this._dismissValidationState(serial))
 
     EventHandler.on(inputEl, DateInput.eventName(DateInput.CHANGE_EVENT_NAME), (event: any) => {
-      this._applyDate(event.date, { field: false })
+      this._onFieldChange(event.date)
     })
 
     const body = document.createElement('div')
@@ -394,7 +393,7 @@ class DatePicker extends PickerBase {
     }))
 
     EventHandler.on(this._calendar._element, 'startDateChange.coreui.calendar', event => {
-      this._runAsUser(() => this._applyDate(this._withCurrentTime(event.dateObject), { calendar: false }))
+      this._runAsUser(() => this._writeField(this._withCurrentTime(event.dateObject), 'calendar'))
 
       if (!this._config.timepicker) {
         this.hide()
@@ -425,9 +424,10 @@ class DatePicker extends PickerBase {
     }
 
     const merged = new Date(date)
+    const current = this.getDate()
 
-    if (this._date) {
-      merged.setHours(this._date.getHours(), this._date.getMinutes(), this._date.getSeconds())
+    if (current) {
+      merged.setHours(current.getHours(), current.getMinutes(), current.getSeconds())
     }
 
     return this._withinTimeLimits(merged)
@@ -442,42 +442,49 @@ class DatePicker extends PickerBase {
     merged.setHours(time.getHours(), time.getMinutes(), time.getSeconds())
     const limited = this._withinTimeLimits(merged)
 
-    this._applyDate(limited, { selection: false })
-    this._selection?.setTime(limited)
+    this._writeField(limited, 'selection')
+
+    if (this._element) {
+      this._selection?.setTime(this.getDate() ?? limited)
+    }
   }
 
-  _applyDate(date: Date | null, { calendar = true, field = true, selection = true }: { calendar?: boolean, field?: boolean, selection?: boolean } = {}): void {
-    if (this._applying) {
+  _writeField(date: Date | null, source: 'calendar' | 'selection' | null = null): void {
+    const before = this.getDate()
+    const previous = this._source
+    this._source = source
+
+    try {
+      this._withUser(this._input, () => this._input.setConfig({ date }))
+    } finally {
+      this._source = previous
+    }
+
+    if (!this._element) {
       return
     }
 
-    this._applying = true
+    if (!source && isSameInstantAs(before, this.getDate())) {
+      this._calendar?.setConfig({ startDate: before })
+      this._selection?.setConfig({ time: before })
+    }
+  }
 
-    try {
-      if (field) {
-        this._withUser(this._input, () => this._input.setConfig({ date }))
-      }
-    } finally {
-      this._applying = false
+  _onFieldChange(date: Date | null): void {
+    const source = this._source
+    this._source = null
+
+    if (this._calendar && !isSameDateAs(this._calendar._startDate, date)) {
+      this._calendar.setConfig({ startDate: date })
     }
 
-    const applied = field ? this._input.getDate() : date
-    const changed = !isSameInstantAs(applied, this._date)
-    this._date = applied
-
-    if (calendar) {
-      this._calendar?.setConfig({ startDate: applied })
-    }
-
-    if (selection) {
-      this._selection?.setConfig({ time: applied })
+    if (source !== 'selection') {
+      this._selection?.setConfig({ time: date })
     }
 
     this._nameToggle()
 
-    if (changed) {
-      EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date: applied, formattedDate: getDateBySelectionType(applied, this._config.selectionType) })
-    }
+    EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date, formattedDate: getDateBySelectionType(date, this._config.selectionType) })
   }
 
   _nameToggle(): void {
@@ -485,7 +492,7 @@ class DatePicker extends PickerBase {
       return
     }
 
-    const date = this._date
+    const date = this.getDate()
     const name = date && formatSelectionName(date, this._forwardConfig(Calendar, { locale: this._config.locale }, this._config.calendarOptions))
     const time = date && this._config.timepicker && createDateTimeFormat(this._config.locale, { timeStyle: this._config.seconds === false ? 'short' : 'medium' }).format(date)
 
