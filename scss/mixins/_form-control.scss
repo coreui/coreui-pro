@@ -40,6 +40,6 @@
 // its popup gives a keyboard user two focus indicators (WCAG 2.4.7).
 @mixin form-control-group-focus() {
   @include form-control-group-active();
-  @include focus-ring(true, $color: var(--#{$prefix}control-focus-ring));
+  @include focus-ring(true);
 }
 // scss-docs-end form-control-group-focus-mixin

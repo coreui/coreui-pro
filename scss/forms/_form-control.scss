@@ -44,7 +44,6 @@ $form-control-tokens: defaults(
     --#{$prefix}control-focus-color: var(--#{$prefix}btn-input-focus-color),
     --#{$prefix}control-focus-bg: var(--#{$prefix}btn-input-focus-bg),
     --#{$prefix}control-focus-border-color: var(--#{$prefix}btn-input-focus-border-color),
-    --#{$prefix}control-focus-ring: var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring-color)),
     --#{$prefix}control-disabled-color: var(--#{$prefix}control-fg),
     --#{$prefix}control-disabled-bg: var(--#{$prefix}bg-2),
     --#{$prefix}control-disabled-border-color: var(--#{$prefix}control-border-color),
@@ -101,7 +100,7 @@ $form-control-select-tokens: defaults(
       color: var(--#{$prefix}control-focus-color);
       background-color: var(--#{$prefix}control-focus-bg);
       border-color: var(--#{$prefix}control-focus-border-color);
-      @include focus-ring(true, $color: var(--#{$prefix}control-focus-ring));
+      @include focus-ring(true);
     }
 
     &::-webkit-date-and-time-value {

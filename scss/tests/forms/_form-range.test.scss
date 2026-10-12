@@ -62,7 +62,7 @@
           }
         }
         .test:active {
-          background-color: var(--cui-range-thumb-active-bg);
+          background-color: var(--cui-theme-bg-muted, var(--cui-range-thumb-active-bg));
         }
       }
     }

@@ -30,7 +30,7 @@ $form-range-tokens: defaults(
     --#{$prefix}range-thumb-border: 0,
     --#{$prefix}range-thumb-border-radius: 1rem,
     --#{$prefix}range-thumb-box-shadow: 0 .1rem .25rem color-mix(in oklch, var(--#{$prefix}black) 10%, transparent),
-    --#{$prefix}range-thumb-active-bg: color-mix(in oklch, var(--#{$prefix}theme-bg, var(--#{$prefix}primary-base)) 30%, var(--#{$prefix}bg-body)),
+    --#{$prefix}range-thumb-active-bg: var(--#{$prefix}primary-bg-muted),
     --#{$prefix}range-thumb-disabled-bg: var(--#{$prefix}fg-3),
     --#{$prefix}range-thumb-transition-property: #{"background-color, border-color, box-shadow"},
     --#{$prefix}range-thumb-transition-duration: .15s,
@@ -66,7 +66,7 @@ $form-range-tokens: defaults(
   );
 
   &:active {
-    @include gradient-bg(var(--#{$prefix}range-thumb-active-bg));
+    @include gradient-bg(var(--#{$prefix}theme-bg-muted, var(--#{$prefix}range-thumb-active-bg)));
   }
 }
 

@@ -134,4 +134,78 @@ describe('theme slots', () => {
 
     expect(style('#el').backgroundColor).toBe(resolve('theme-danger', 'color-mix(in oklch, var(--cui-theme-bg) 5%, transparent)'))
   })
+
+  it('should draw the field focus ring like every other control', () => {
+    mount(`<input class="form-control" id="plain">
+      <div class="theme-success"><input class="form-control" id="themed"></div>`)
+
+    container.querySelector('#plain').focus()
+    expect(style('#plain').outlineColor).toBe(resolve('', 'var(--cui-focus-ring-color)'))
+    container.querySelector('#themed').focus()
+    expect(style('#themed').outlineColor).toBe(slot('theme-success', 'focus-ring'))
+  })
+
+  for (const [state, theme] of [['is-invalid', 'theme-danger'], ['is-valid', 'theme-success']]) {
+    it(`should keep the ${state} ring on a field inside a form of another theme`, () => {
+      mount(`<div class="theme-primary">
+        <input class="form-control ${state}" id="field">
+        <select class="form-select ${state}" id="select"><option>a</option></select>
+        <div class="form-control-group ${state}" id="group"><input class="form-control" id="inner"></div>
+        <div class="form-control-group"><select class="form-select ${state}" id="grouped-select"><option>a</option></select></div>
+        <div class="form-control form-date-time ${state}" id="date"><span class="form-date-time-section" tabindex="0" id="section">MM</span></div>
+      </div>`)
+      const ring = slot(theme, 'focus-ring')
+
+      for (const [focus, ringed] of [['#field', '#field'], ['#select', '#select'], ['#inner', '#group'], ['#grouped-select', '#grouped-select'], ['#section', '#date']]) {
+        container.querySelector(focus).focus()
+        expect(style(ringed).outlineColor).toBe(ring)
+      }
+    })
+  }
+
+  it('should not ring an invalid field inside a control group frame', () => {
+    mount('<div class="form-control-group"><input class="form-control is-invalid" id="inner"></div>')
+
+    container.querySelector('#inner').focus()
+    expect(style('#inner').outlineStyle).toBe('none')
+  })
+
+  it('should ring a list box option with the theme focus ring', () => {
+    mount('<div class="theme-danger"><div class="list-box"><div class="list-box-option" tabindex="0" id="option">a</div></div></div>')
+
+    container.querySelector('#option').focus()
+    expect(style('#option').outlineColor).toBe(slot('theme-danger', 'focus-ring'))
+  })
+
+  it('should highlight a date section with the subtle slot, whatever the focus ring is', () => {
+    mount(`<div class="theme-danger"><div class="form-control form-date-time"><span class="form-date-time-section" tabindex="0" id="themed">MM</span></div></div>
+      <div class="form-control form-date-time"><span class="form-date-time-section" tabindex="0" id="plain">MM</span></div>`, ':root { --cui-focus-ring-opacity: 1; }')
+
+    container.querySelector('#themed').focus()
+    expect(style('#themed').backgroundColor).toBe(slot('theme-danger', 'bg-subtle'))
+    container.querySelector('#plain').focus()
+    expect(style('#plain').backgroundColor).toBe(resolve('', 'var(--cui-primary-bg-subtle)'))
+  })
+
+  it('should lay the calendar range under the cell content', () => {
+    mount(`<div class="calendars theme-danger"><table class="calendar" id="table"><tbody><tr class="calendar-row">
+      <td class="calendar-cell range" id="day"><div class="calendar-cell-inner">2</div></td>
+    </tr></tbody></table></div>`)
+    const band = getComputedStyle(container.querySelector('#day .calendar-cell-inner'), '::after')
+
+    expect([band.backgroundColor, band.zIndex, style('#table').isolation]).toEqual([slot('theme-danger', 'bg-subtle'), '-1', 'isolate'])
+  })
+
+  for (const [mode, cells] of [
+    ['day', '<tr class="calendar-row"><td class="calendar-cell range" id="hovered"><div class="calendar-cell-inner">3</div></td></tr>'],
+    ['adjacent day', '<tr class="calendar-row"><td class="calendar-cell range next clickable" id="hovered"><div class="calendar-cell-inner">1</div></td></tr>'],
+    ['week', '<tr class="calendar-row range" id="hovered"><td class="calendar-cell"><div class="calendar-cell-inner">3</div></td></tr>']
+  ]) {
+    it(`should mark a hovered ${mode} in the calendar range with the muted slot`, async () => {
+      mount(`<div class="calendars theme-danger${mode === 'week' ? ' select-week' : ''}"><table class="calendar"><tbody>${cells}</tbody></table></div>`)
+      await userEvent.hover(container.querySelector('#hovered'))
+
+      expect(style('#hovered .calendar-cell-inner').backgroundColor).toBe(slot('theme-danger', 'bg-muted'))
+    })
+  }
 })

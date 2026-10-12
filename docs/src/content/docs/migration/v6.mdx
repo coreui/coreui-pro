@@ -1251,6 +1251,13 @@ removed in favour of `$translucent-opacity` and
 `--cui-card-translucent-cap-bg-opacity` token on `.card-translucent`.
 #### Calendar
 
+- **Changed.** **The range band sits under the day cells and follows the
+  theme.** `--cui-calendar-cell-range-bg` is `--cui-primary-bg-subtle` (the
+  theme's `bg-subtle` under a `.theme-*` class) instead of a 12.5% tint laid
+  over the cells, so the selected start and end keep their solid fill and the
+  day numbers are no longer tinted. A hovered day in the range takes
+  `--cui-primary-bg-muted` (the theme's `bg-muted`), one step stronger than the
+  band.
 - **Changed.** **`minDate` and `maxDate` are compared by the day.** v5 compared
   a day cell at midnight with the instant, so a limit that carried a time of
   day, such as `minDate: new Date()`, disabled its own day. Now that day can be
@@ -2229,6 +2236,9 @@ field behind that kept submitting.
 
 #### Range / Range Slider
 
+- **Changed.** **A pressed thumb takes `--cui-primary-bg-muted`**, the theme's
+  `bg-muted` under a `.theme-*` class, instead of a 30% tint of the primary
+  colour (`$form-range-thumb-active-bg`).
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **A Range Slider handle with no name of its own is no longer submitted.** An
   array of names shorter than the handle count gave the leftover handles the
@@ -5622,10 +5632,10 @@ box-shadow ring was cut off.
   A runtime override written against an old name is now inert — there is no
   fallback path, because the value goes to a different property.
 
-  `--cui-control-focus-ring` is the exception that stays: the field frame keeps
-  it because a validation state writes it once and the whole family — text
-  input, select, control group, date-time, OTP cell — reads it. Its value is now
-  a **colour**, not an outline shorthand.
+  Form fields draw the same ring: the text input, select, control group,
+  date-time field, OTP cell and List Box option read the theme's focus ring or
+  `--cui-focus-ring-color`, and a validation state draws its own ring in its
+  colour. The ring has no per-field colour token.
 - **The Sass variables follow**: `$focus-ring-box-shadow` → `$focus-ring`, and
   the per-component ones (`$btn-focus-box-shadow`, `$pagination-focus-ring`,
   `$combobox-focus-ring`, `$form-check-input-focus-ring`, …) are removed.
