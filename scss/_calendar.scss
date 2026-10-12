@@ -55,7 +55,7 @@ $calendar-tokens: defaults(
     --#{$prefix}calendar-cell-selected-adjacent-bg: var(--#{$prefix}primary-bg-subtle),
     --#{$prefix}calendar-cell-selected-adjacent-hover-color: var(--#{$prefix}calendar-cell-selected-adjacent-color),
     --#{$prefix}calendar-cell-selected-adjacent-hover-bg: var(--#{$prefix}primary-bg-muted),
-    --#{$prefix}calendar-cell-range-bg: color-mix(in oklch, var(--#{$prefix}theme-bg, var(--#{$prefix}primary-base)) 12.5%, transparent),
+    --#{$prefix}calendar-cell-range-bg: var(--#{$prefix}primary-bg-subtle),
     --#{$prefix}calendar-cell-range-hover-border-color: var(--#{$prefix}primary-base),
     --#{$prefix}calendar-cell-today-color: var(--#{$prefix}danger-base),
   ),
@@ -69,6 +69,7 @@ $calendar-tokens: defaults(
     @include tokens($calendar-tokens);
 
     font-weight: initial;
+    isolation: isolate;
 
     table {
       width: calc(var(--#{$prefix}calendar-table-cell-size) * 7);
@@ -207,10 +208,11 @@ $calendar-tokens: defaults(
 
       &::after {
         position: absolute;
+        z-index: -1;
         width: 100%;
         height: 100%;
         content: "";
-        background: var(--#{$prefix}calendar-cell-range-bg);
+        background: var(--#{$prefix}theme-bg-subtle, var(--#{$prefix}calendar-cell-range-bg));
       }
     }
 
@@ -260,6 +262,11 @@ $calendar-tokens: defaults(
     .calendars:not(.select-week) &.selected:not(.disabled, .next, .previous):hover .calendar-cell-inner {
       color: var(--#{$prefix}theme-contrast, var(--#{$prefix}calendar-cell-selected-hover-color));
       background-color: var(--#{$prefix}theme-hover, var(--#{$prefix}calendar-cell-selected-hover-bg));
+    }
+
+    .calendars:not(.select-week) &.range:not(.disabled, .next, .previous, .selected):hover .calendar-cell-inner,
+    .calendars:not(.select-week) &.range.clickable:not(.selected):hover .calendar-cell-inner {
+      background-color: var(--#{$prefix}theme-bg-muted, var(--#{$prefix}primary-bg-muted));
     }
 
     .calendars:not(.select-week) &.selected.clickable:is(.next, .previous):not(.disabled):hover .calendar-cell-inner {
@@ -312,6 +319,10 @@ $calendar-tokens: defaults(
         cursor: pointer;
         background-color: var(--#{$prefix}calendar-cell-hover-bg);
       }
+    }
+
+    .calendars.select-week &.range:not(.disabled, .selected):hover .calendar-cell-inner {
+      background-color: var(--#{$prefix}theme-bg-muted, var(--#{$prefix}primary-bg-muted));
     }
 
     .calendars.select-week &.selected:not(.disabled):hover .calendar-cell-inner {

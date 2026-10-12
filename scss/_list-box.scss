@@ -21,7 +21,6 @@ $list-box-tokens: defaults(
     --#{$prefix}list-box-border-width: var(--#{$prefix}border-width),
     --#{$prefix}list-box-border-color: var(--#{$prefix}border-color),
     --#{$prefix}list-box-border-radius: var(--#{$prefix}radius-7),
-    --#{$prefix}list-box-focus-ring-color: var(--#{$prefix}focus-ring-color),
     --#{$prefix}list-box-loading-opacity: .65,
     --#{$prefix}list-box-header-border-width: var(--#{$prefix}border-width),
     --#{$prefix}list-box-header-border-color: var(--#{$prefix}border-color),
@@ -154,7 +153,7 @@ $list-box-tokens: defaults(
 
     &:focus-visible {
       z-index: 5;
-      @include focus-ring(true, var(--#{$prefix}list-box-focus-ring-color));
+      @include focus-ring(true);
     }
 
     // The label runs at a reduced font-size; the indicator is sized in `em`,
@@ -204,7 +203,7 @@ $list-box-tokens: defaults(
 
     &:focus-visible {
       z-index: 5;
-      @include focus-ring(true, var(--#{$prefix}list-box-focus-ring-color));
+      @include focus-ring(true);
     }
   }
 

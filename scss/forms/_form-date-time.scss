@@ -14,7 +14,7 @@ $form-date-time-tokens: defaults(
   (
     --#{$prefix}form-date-time-placeholder-color: var(--#{$prefix}fg-3),
     --#{$prefix}form-date-time-section-border-radius: .25rem,
-    --#{$prefix}form-date-time-section-focus-bg: color-mix(in oklch, var(--#{$prefix}theme-bg, var(--#{$prefix}primary-base)) 25%, transparent),
+    --#{$prefix}form-date-time-section-focus-bg: var(--#{$prefix}primary-bg-subtle),
   ),
   $form-date-time-tokens
 );
@@ -69,7 +69,7 @@ $form-date-time-tokens: defaults(
     @include border-radius(var(--#{$prefix}form-date-time-section-border-radius), 0);
 
     &:focus {
-      background-color: var(--#{$prefix}form-date-time-section-focus-bg);
+      background-color: var(--#{$prefix}theme-bg-subtle, var(--#{$prefix}form-date-time-section-focus-bg));
 
       &::selection {
         background-color: transparent;
@@ -84,7 +84,7 @@ $form-date-time-tokens: defaults(
   .form-date-time-all-selected {
     .form-date-time-section,
     .form-date-time-separator {
-      background-color: var(--#{$prefix}form-date-time-section-focus-bg);
+      background-color: var(--#{$prefix}theme-bg-subtle, var(--#{$prefix}form-date-time-section-focus-bg));
     }
   }
 

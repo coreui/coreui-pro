@@ -17,9 +17,12 @@
 @mixin form-control-group-validation-state($color, $border-color, $focus-ring-color) {
   --#{$prefix}control-border-color: #{$border-color};
   --#{$prefix}control-focus-border-color: #{$border-color};
-  --#{$prefix}control-focus-ring: #{$focus-ring-color};
   --#{$prefix}control-group-icon-color: #{$color};
   --#{$prefix}control-group-action-color: #{$color};
+
+  &:focus-within {
+    @include focus-ring(true, $color: $focus-ring-color);
+  }
 }
 
 @mixin form-otp-control-validation-state($border-color, $focus-ring-color) {
@@ -94,7 +97,13 @@
     @include form-validation-state-selector($state) {
       --#{$prefix}control-border-color: #{$border-color};
       --#{$prefix}control-focus-border-color: #{$border-color};
-      --#{$prefix}control-focus-ring: #{$focus-ring-color};
+
+      &:focus,
+      &.form-date-time:focus-within {
+        &:not(.form-control-group .form-control) {
+          @include focus-ring(true, $color: $focus-ring-color);
+        }
+      }
     }
   }
 
@@ -105,7 +114,10 @@
     @include form-validation-state-selector($state) {
       --#{$prefix}control-border-color: #{$border-color};
       --#{$prefix}control-focus-border-color: #{$border-color};
-      --#{$prefix}control-focus-ring: #{$focus-ring-color};
+
+      &:focus:not(.form-control-group .form-control) {
+        @include focus-ring(true, $color: $focus-ring-color);
+      }
     }
   }
   // stylelint-enable selector-no-qualifying-type
