@@ -764,6 +764,24 @@ describe('ChipInput', () => {
       expect(chip.classList.contains('chip')).toBeTrue()
     })
 
+    it('should name the remove button with ariaRemoveLabel followed by the chip value', () => {
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input" id="plain"></div>' +
+        '<div class="form-control-group chip-input" id="custom" data-coreui-aria-remove-label="Usuń"></div>'
+
+      const plain = new ChipInput(fixtureEl.querySelector('#plain'))
+      const custom = new ChipInput(fixtureEl.querySelector('#custom'))
+
+      expect(plain.add('JavaScript').querySelector('.chip-remove').getAttribute('aria-label')).toBe('Remove JavaScript')
+      expect(plain.add('a$&b').querySelector('.chip-remove').getAttribute('aria-label')).toBe('Remove a$&b')
+      expect(custom.add('JavaScript').querySelector('.chip-remove').getAttribute('aria-label')).toBe('Usuń JavaScript')
+      expect(custom.add('TypeScript').querySelector('.chip-remove').getAttribute('aria-label')).toBe('Usuń TypeScript')
+
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
+      const bare = new ChipInput(fixtureEl.querySelector('.chip-input'), { ariaRemoveLabel: '' })
+
+      expect(bare.add('JavaScript').querySelector('.chip-remove').getAttribute('aria-label')).toBe('JavaScript')
+    })
+
     it('should trim whitespace from value', () => {
       fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 

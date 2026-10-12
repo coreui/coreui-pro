@@ -251,7 +251,7 @@ class ChipInput extends ChipSet {
     const disabled = this._disabled || Manipulator.getDataAttribute(chip, 'disabled') === true
 
     return {
-      ariaRemoveLabel: `Remove ${this._getChipValue(chip)}`,
+      ariaRemoveLabel: `${this._config.ariaRemoveLabel} ${this._getChipValue(chip)}`.trim(),
       disabled,
       removable: this._config.removable && !this._config.readonly && !disabled,
       removeIcon: this._config.removeIcon,
