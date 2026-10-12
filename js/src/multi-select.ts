@@ -17,6 +17,7 @@ import {
   ownValidationState, setStateValidity, swapStateClass, type UserValidity, type ValidationState, writeDescribedBy
 } from './util/form-validation.js'
 import { CLEANER_ICON, PICKER_ICON } from './util/icons.js'
+import { getAriaPressed, getSelectionState, type SelectionState } from './util/selection-state.js'
 import {
   DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList, SVGAllowlist
 } from './util/sanitizer.js'
@@ -1662,9 +1663,12 @@ class MultiSelect extends ComboboxBase {
   }
 
   _isAllSelected(): boolean {
+    return this._getSelectAllState() === 'all'
+  }
+
+  _getSelectAllState(): SelectionState {
     const { selected, total } = this._getSelectAllScope()
-    const target = this._getSelectableTarget(total)
-    return target > 0 && selected >= target
+    return getSelectionState(selected, total, this._hasSelectionLimit() ? this._config.selectionLimit : null)
   }
 
   _getSelectAllScope(): any {
@@ -1703,31 +1707,16 @@ class MultiSelect extends ComboboxBase {
     }
   }
 
-  _getSelectableTarget(total: any): any {
-    return this._hasSelectionLimit() ? Math.min(total, this._config.selectionLimit) : total
-  }
-
-  _getCheckboxState(selected: number, total: number): string {
-    if (total > 0 && selected >= total) {
-      return 'all'
-    }
-
-    return selected === 0 ? 'none' : 'indeterminate'
-  }
-
-  _applyCheckboxState(element: any, state: string): void {
-    element.classList.toggle(CLASS_NAME_SELECTED, state === 'all')
-    element.classList.toggle(CLASS_NAME_INDETERMINATE, state === 'indeterminate')
-    element.setAttribute('aria-pressed', state === 'all' ? 'true' : (state === 'none' ? 'false' : 'mixed'))
-  }
-
   _updateMasterCheckbox(): void {
     if (!this._selectAllElement) {
       return
     }
 
-    const { selected, total } = this._getSelectAllScope()
-    this._applyCheckboxState(this._selectAllElement, this._getCheckboxState(selected, this._getSelectableTarget(total)))
+    const state = this._getSelectAllState()
+
+    this._selectAllElement.classList.toggle(CLASS_NAME_SELECTED, state === 'all')
+    this._selectAllElement.classList.toggle(CLASS_NAME_INDETERMINATE, state === 'some')
+    this._selectAllElement.setAttribute('aria-pressed', getAriaPressed(state))
   }
 
   _renderHeader(): void {
