@@ -2937,16 +2937,6 @@ describe('MultiSelect', () => {
       multiSelect._selectAllElement.click()
       expect(multiSelect._selected.length).toBe(0)
     })
-
-    it('should compute checkbox state at boundaries', () => {
-      fixtureEl.innerHTML = '<select></select>'
-      const selectEl = fixtureEl.querySelector('select')
-      const multiSelect = new MultiSelect(selectEl, { options })
-
-      expect(multiSelect._getCheckboxState(0, 3)).toBe('none')
-      expect(multiSelect._getCheckboxState(2, 3)).toBe('indeterminate')
-      expect(multiSelect._getCheckboxState(3, 3)).toBe('all')
-    })
   })
 
   describe('getValue', () => {

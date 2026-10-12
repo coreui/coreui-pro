@@ -196,6 +196,16 @@
         "default": "./js/dist/util/range.js"
       }
     },
+    "./utils/selection-state": {
+      "import": {
+        "types": "./js/dist/util/selection-state.d.mts",
+        "default": "./js/dist/util/selection-state.mjs"
+      },
+      "require": {
+        "types": "./js/dist/util/selection-state.d.ts",
+        "default": "./js/dist/util/selection-state.js"
+      }
+    },
     "./utils/time": {
       "import": {
         "types": "./js/dist/util/time.d.mts",

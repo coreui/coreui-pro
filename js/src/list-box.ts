@@ -9,6 +9,7 @@ import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList } from './util/sanitizer.js'
+import { getAriaPressed, getSelectionState, type SelectionState } from './util/selection-state.js'
 import {
   type CountLabel, defineJQueryPlugin, getElement, getNextActiveElement, getUID, jQueryDispatch, resolveCountLabel
 } from './util/index.js'
@@ -794,12 +795,8 @@ class ListBox extends BaseComponent {
     for (const label of SelectorEngine.find(SELECTOR_SECTION_TOGGLE, this._list)) {
       const options = this._sectionOptions(label.closest(SELECTOR_SECTION) as HTMLElement)
       const selected = options.filter(option => this._selected.has(this._optionValue(option))).length
-      const all = options.length > 0 && selected >= options.length
-      const some = selected > 0
 
-      label.setAttribute('aria-pressed', all ? 'true' : (some ? 'mixed' : 'false'))
-      label.classList.toggle(CLASS_NAME_SELECTED, all)
-      label.classList.toggle(CLASS_NAME_INDETERMINATE, !all && some)
+      this._showSelectionState(label, getSelectionState(selected, options.length))
       label.classList.toggle(CLASS_NAME_ACTIVE, this._optionValue(label) === this._active && (this._focused || Boolean(this._field)))
 
       if (this._field) {
@@ -904,20 +901,18 @@ class ListBox extends BaseComponent {
     })
   }
 
-  _selectionCap(): number {
+  _selectionState(): SelectionState {
     const { selectionLimit, selectionMode } = this._config
-    const options = this._navigableOptions().length
+    const options = this._navigableOptions()
+    const selected = options.filter(option => this._selected.has(this._optionValue(option))).length
 
-    return selectionMode === SELECTION_MODE_MULTIPLE && selectionLimit !== null ? Math.min(selectionLimit, options) : options
+    return getSelectionState(selected, options.length, selectionMode === SELECTION_MODE_MULTIPLE ? selectionLimit : null)
   }
 
-  _selectedNavigable(): number {
-    return this._navigableOptions().filter(option => this._selected.has(this._optionValue(option))).length
-  }
-
-  _allSelected(): boolean {
-    const cap = this._selectionCap()
-    return cap > 0 && this._selectedNavigable() >= cap
+  _showSelectionState(element: HTMLElement, state: SelectionState): void {
+    element.setAttribute('aria-pressed', getAriaPressed(state))
+    element.classList.toggle(CLASS_NAME_SELECTED, state === 'all')
+    element.classList.toggle(CLASS_NAME_INDETERMINATE, state === 'some')
   }
 
   _updateSelectAll(): void {
@@ -932,17 +927,12 @@ class ListBox extends BaseComponent {
     this._selectAll.setAttribute('aria-controls', this._list.id)
     this._selectAll.disabled = this._config.disabled || this._config.selectionMode !== SELECTION_MODE_MULTIPLE
 
-    const all = this._allSelected()
-    const some = this._selectedNavigable() > 0
-
     this._decorateOption(this._selectAll)
-    this._selectAll.setAttribute('aria-pressed', all ? 'true' : (some ? 'mixed' : 'false'))
-    this._selectAll.classList.toggle(CLASS_NAME_SELECTED, all)
-    this._selectAll.classList.toggle(CLASS_NAME_INDETERMINATE, !all && some)
+    this._showSelectionState(this._selectAll, this._selectionState())
   }
 
   _toggleSelectAll(): void {
-    if (this._allSelected()) {
+    if (this._selectionState() === 'all') {
       this._deselectAll()
       return
     }
