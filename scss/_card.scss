@@ -61,26 +61,18 @@ $card-tokens: defaults(
     }
 
     > .list-group {
-      border-block-start: inherit;
-      border-block-end: inherit;
-
       &:first-child {
-        border-top-width: 0;
         @include border-top-radius(var(--#{$prefix}card-inner-border-radius));
       }
 
-      &:last-child  {
-        border-bottom-width: 0;
+      &:last-child {
         @include border-bottom-radius(var(--#{$prefix}card-inner-border-radius));
       }
     }
+  }
 
-    // Due to specificity of the above selector (`.card > .list-group`), we must
-    // use a child selector here to prevent double borders.
-    > .card-header + .list-group,
-    > .list-group + .card-footer {
-      border-block-start: 0;
-    }
+  .card:where(:not(.card-row)) > :where(.card-img-top, .card-img-bottom, .card-body, .list-group):where(:not([hidden], .d-none)) + :is(.card-body, .card-img-bottom, .list-group) {
+    border-block-start: inherit;
   }
 
   .card-body {
@@ -274,14 +266,14 @@ $card-tokens: defaults(
             @include border-end-radius(0);
 
             > .card-img-top,
-            > .card-header {
-              // stylelint-disable-next-line property-disallowed-list
-              border-top-right-radius: 0;
+            > .card-header,
+            > .list-group {
+              border-start-end-radius: 0;
             }
             > .card-img-bottom,
-            > .card-footer {
-              // stylelint-disable-next-line property-disallowed-list
-              border-bottom-right-radius: 0;
+            > .card-footer,
+            > .list-group {
+              border-end-end-radius: 0;
             }
           }
 
@@ -289,14 +281,14 @@ $card-tokens: defaults(
             @include border-start-radius(0);
 
             > .card-img-top,
-            > .card-header {
-              // stylelint-disable-next-line property-disallowed-list
-              border-top-left-radius: 0;
+            > .card-header,
+            > .list-group {
+              border-start-start-radius: 0;
             }
             > .card-img-bottom,
-            > .card-footer {
-              // stylelint-disable-next-line property-disallowed-list
-              border-bottom-left-radius: 0;
+            > .card-footer,
+            > .list-group {
+              border-end-start-radius: 0;
             }
           }
         }
