@@ -5089,6 +5089,14 @@ Upstream v6 does the same, with a `mask-icon()` mixin.
   them was overwritten by the token anyway. Configure the frame once on `:root`
   with the `$input-btn-*` variables, or set `--cui-btn-*` on the button.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`$btn-font-weight` is removed, and buttons take their weight from the
+  shared frame.** `--cui-btn-font-weight` reads `--cui-btn-input-font-weight`,
+  the weight fields and input group addons use, which defaults to
+  `--cui-body-font-weight` on `:root`. A page that sets a lighter body weight
+  gets lighter buttons with it; `.btn-link` keeps the normal weight. Set
+  `--cui-btn-font-weight` on `.btn` to change buttons alone, or
+  `--cui-btn-input-font-weight` on `:root` to change buttons and fields together.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **`button-size()` is removed.** Sizes are a loop over `$button-sizes`, which
   points the button's tokens at the matching `--cui-btn-input-{size}-*` set. Add
   a size by adding its tokens on `:root` and its name to the map.

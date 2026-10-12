@@ -37,7 +37,7 @@ $button-tokens: defaults(
     --#{$prefix}btn-padding-y: var(--#{$prefix}btn-input-padding-y),
     --#{$prefix}btn-padding-x: var(--#{$prefix}btn-input-padding-x),
     --#{$prefix}btn-font-size: var(--#{$prefix}btn-input-font-size),
-    --#{$prefix}btn-font-weight: var(--#{$prefix}font-weight-normal),
+    --#{$prefix}btn-font-weight: var(--#{$prefix}btn-input-font-weight),
     --#{$prefix}btn-line-height: var(--#{$prefix}btn-input-line-height),
     --#{$prefix}btn-white-space: nowrap,
     --#{$prefix}btn-color: #{$btn-color},

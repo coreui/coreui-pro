@@ -121,6 +121,6 @@ Many form values are set at a general level and re-used by individual form compo
 
 ### CSS variables
 
-The frame a button and a form control both draw is declared once on `:root`, so retuning it there moves buttons and fields together. A component that needs its own frame overrides the token on itself.
+Buttons and form controls share the size and type of one frame, declared once on `:root`: padding, minimum height, font size, weight and line height, border width and radius, and the transition duration and timing. Retuning those there moves buttons and fields together. The color tokens (`-fg`, `-bg`, `-border-color`, `-box-shadow` and `-focus-*`) belong to the fields; a button takes its colors from its variant. A component that needs its own frame overrides the token on itself.
 
 <ScssDocs file="scss/_root.scss" capture="root-btn-input-variables" />
