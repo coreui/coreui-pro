@@ -15,7 +15,7 @@ Bootstrap placeholders can enhance your application's user experience. They're b
 ## Example
 
 In the example below, we use the Bootstrap card component and modify it with placeholders to form a "loading card." The size and proportions remain consistent between the two.
-<Example class="docs-example-placeholder-cards d-flex justify-content-around" html={[`<div class="card">`, `  <svg class="docs-placeholder-img card-img-top" width="100%" height="180" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text></svg>`, `  <div class="card-body">`, `    <h5 class="card-title">Bootstrap card title</h5>`, `    <p class="card-text">Some brief example text to expand on the card title and form most of the card's content.</p>`, `    <a href="#" class="btn-solid theme-primary">Go somewhere</a>`, `  </div>`, `</div>`, ``, `<div class="card" aria-hidden="true">`, `  <svg class="docs-placeholder-img card-img-top" width="100%" height="180" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text></svg>`, `  <div class="card-body">`, `    <div class="h5 card-title placeholder-glow">`, `      <span class="placeholder col-6"></span>`, `    </div>`, `    <p class="card-text placeholder-glow">`, `      <span class="placeholder col-7"></span>`, `      <span class="placeholder col-4"></span>`, `      <span class="placeholder col-4"></span>`, `      <span class="placeholder col-6"></span>`, `      <span class="placeholder col-8"></span>`, `    </p>`, `    <a class="btn-solid theme-primary disabled placeholder col-6" aria-disabled="true"></a>`, `  </div>`, `</div>`]} />
+<Example class="docs-example-placeholder-cards d-flex justify-content-around" html={[`<div class="card">`, `  <svg class="docs-placeholder-img card-img-top" width="100%" height="180" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text></svg>`, `  <div class="card-body">`, `    <h5 class="card-title">Bootstrap card title</h5>`, `    <p class="card-text">Some brief example text to expand on the card title and form most of the card's content.</p>`, `    <a href="#" class="btn-solid theme-primary">Go somewhere</a>`, `  </div>`, `</div>`, ``, `<div class="card" aria-hidden="true">`, `  <svg class="docs-placeholder-img card-img-top" width="100%" height="180" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text></svg>`, `  <div class="card-body">`, `    <div class="h5 card-title placeholder-wave">`, `      <span class="placeholder col-6"></span>`, `    </div>`, `    <p class="card-text placeholder-wave">`, `      <span class="placeholder col-7"></span>`, `      <span class="placeholder col-4"></span>`, `      <span class="placeholder col-4"></span>`, `      <span class="placeholder col-6"></span>`, `      <span class="placeholder col-8"></span>`, `    </p>`, `    <a class="btn-solid theme-primary disabled placeholder col-6" aria-disabled="true"></a>`, `  </div>`, `</div>`]} />
 
 ```html
 <div class="card">
@@ -31,10 +31,10 @@ In the example below, we use the Bootstrap card component and modify it with pla
 <div class="card" aria-hidden="true">
   <img src="..." class="card-img-top" alt="...">
   <div class="card-body">
-    <h5 class="card-title placeholder-glow">
+    <h5 class="card-title placeholder-wave">
       <span class="placeholder col-6"></span>
     </h5>
-    <p class="card-text placeholder-glow">
+    <p class="card-text placeholder-wave">
       <span class="placeholder col-7"></span>
       <span class="placeholder col-4"></span>
       <span class="placeholder col-4"></span>
@@ -48,7 +48,7 @@ In the example below, we use the Bootstrap card component and modify it with pla
 
 ## How it works
 
-Create placeholders using the `.placeholder` class along with a grid column class (e.g., `.col-6`) to define the `width`. These placeholders can either replace text inside an element or be added as a modifier class to an existing component.
+Create placeholders using the `.placeholder` class along with a grid column class (e.g., `.col-6`) to define the `width`. These placeholders can either replace text inside an element or be added as a modifier class to an existing component, which then keeps its own height and corners. A placeholder in text stays a quarter em below the line height, so a heading or a paragraph keeps its height when the text arrives.
 
 To ensure the `height` is maintained, we style `.btn`s with `::before`. This pattern can be expanded for other cases or a `&nbsp;` can be added inside the element to match the height when actual text appears.
 
@@ -87,15 +87,21 @@ The size of `.placeholder`s depends on the typographic style of the parent eleme
 
 ### Animation
 
-Animate Bootstrap placeholders using `.placeholder-glow` or `.placeholder-wave` to visually suggest that content is _actively_ loading.
+Animate placeholders to suggest that content is _actively_ loading. Use `.placeholder-wave` for the default loading animation, a highlight that sweeps across the placeholders, and `.placeholder-pulse` for an opacity pulse. `.placeholder-glow` remains as an alias of `.placeholder-pulse`. Both stop when the user asks for reduced motion.
 
-<Example code={`<p class="placeholder-glow">
+<Example code={`<p class="placeholder-wave">
     <span class="placeholder col-12"></span>
   </p>
 
-  <p class="placeholder-wave">
+  <p class="placeholder-pulse">
     <span class="placeholder col-12"></span>
   </p>`} />
+
+#### Text
+
+`.placeholder-wave` masks whatever it sits on, so it animates text as well, for an inline status while something loads.
+
+<Example code={`<span class="placeholder-wave fg-3">Working on it…</span>`} />
 
 ## Customizing
 
@@ -105,10 +111,10 @@ Placeholders use local CSS variables on `.placeholder` and `.placeholder-wave` f
 
 <ScssDocs file="scss/_placeholder.scss" capture="placeholder-tokens" />
 
-Both animations read them, so lowering the minimum deepens the pulse of `.placeholder-glow` and the trough of the `.placeholder-wave` gradient:
+The pulse reads `--cui-placeholder-opacity-max` and `-min` on each `.placeholder`, and the wave reads `--cui-placeholder-wave-opacity-max` and `-min` on `.placeholder-wave`, the brightness of its highlight and of the rest of the placeholder. Lowering a minimum deepens the effect:
 
 ```html
-<p class="placeholder-glow" style="--cui-placeholder-opacity-min: 0">
-  <span class="placeholder col-12"></span>
+<p class="placeholder-pulse">
+  <span class="placeholder col-12" style="--cui-placeholder-opacity-min: 0"></span>
 </p>
 ```
