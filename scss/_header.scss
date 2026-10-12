@@ -24,8 +24,8 @@ $header-tokens: () !default;
 // scss-docs-start header-tokens
 $header-tokens: defaults(
   (
-    --#{$prefix}header-padding-x: var(--#{$prefix}spacer-2),
-    --#{$prefix}header-padding-y: var(--#{$prefix}spacer-2),
+    --#{$prefix}header-padding-x: var(--#{$prefix}spacer-3),
+    --#{$prefix}header-padding-y: var(--#{$prefix}spacer-3),
     --#{$prefix}header-bg: var(--#{$prefix}bg-body),
     --#{$prefix}header-color: color-mix(in oklch, var(--#{$prefix}emphasis-color) 65%, transparent),
     --#{$prefix}header-border-color: var(--#{$prefix}border-color),

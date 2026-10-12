@@ -61,11 +61,11 @@ Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label 
 
 Set an explicit format with the `data-coreui-format` attribute. The parser accepts both dayjs/moment-style tokens (`DD`, `MM`, `YYYY`, `YY`) and date-fns/Unicode-style tokens (`dd`, `MM`, `yyyy`, `yy`), plus `ww` for ISO week numbers and `q` (numeric) or `QQQ` (`Q1`–`Q4`) for quarters, so you can reuse the format strings from the date library you already use. Any other character becomes a literal separator — a fixed, non-editable part of the mask — and text wrapped in single quotes is always a literal, even when it contains token letters (`'Week' ww` renders `Week 29`; escape a quote by doubling it, `''`).
 
-<Example pro code={`<div class="mb-3">
+<Example pro code={`<div class="mb-4">
     <label class="form-label" id="dateInputDdMMYyyyLabel">dd.MM.yyyy</label>
     <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="dd.MM.yyyy" aria-labelledby="dateInputDdMMYyyyLabel"></div>
   </div>
-  <div class="mb-3">
+  <div class="mb-4">
     <label class="form-label" id="dateInputYYYYMMDDLabel">YYYY-MM-DD</label>
     <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="YYYY-MM-DD" aria-labelledby="dateInputYYYYMMDDLabel"></div>
   </div>
@@ -78,7 +78,7 @@ Two-digit year sections expand with smart century assignment — values up to 50
 
 The format doesn't have to include every section — a month-and-year mask works like the native `month` input and reports the first day of the month:
 
-<Example pro code={`<div class="mb-3">
+<Example pro code={`<div class="mb-4">
     <label class="form-label" id="dateInputMMYyyyLabel">MM.yyyy</label>
     <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="MM.yyyy" aria-labelledby="dateInputMMYyyyLabel"></div>
   </div>
@@ -89,11 +89,11 @@ The format doesn't have to include every section — a month-and-year mask works
 
 Week and quarter masks work the same way. A week mask edits the ISO week directly and reports the Monday of that week; its year section holds the ISO week-numbering year, which can differ from the calendar year around January 1st. Combine a quoted label with the `ww` token for the native week input's presentation, or use `yyyy-Www` (the uppercase `W` is a literal) for the ISO wire format. A quarter mask reports the first day of the quarter:
 
-<Example pro code={`<div class="mb-3">
+<Example pro code={`<div class="mb-4">
     <label class="form-label" id="dateInputWeekWwYyyyLabel">'Week' ww, yyyy</label>
     <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="'Week' ww, yyyy" aria-labelledby="dateInputWeekWwYyyyLabel"></div>
   </div>
-  <div class="mb-3">
+  <div class="mb-4">
     <label class="form-label" id="dateInputYyyyWwwLabel">yyyy-Www</label>
     <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="yyyy-Www" aria-labelledby="dateInputYyyyWwwLabel"></div>
   </div>
@@ -106,7 +106,7 @@ Week and quarter masks work the same way. A week mask edits the ISO week directl
 
 Use the `MMM` or `MMMM` tokens for text month sections with localized short or full month names. Type letters to match a month by prefix — `m` selects <strong>M</strong>arch, continuing with `may` switches to <strong>May</strong> — and the caret moves on as soon as the prefix is unambiguous. Digits and arrow keys keep working too.
 
-<Example pro code={`<div class="mb-3">
+<Example pro code={`<div class="mb-4">
     <label class="form-label" id="dateInputDDMMMMYYYYLabel">DD MMMM YYYY</label>
     <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="DD MMMM YYYY" data-coreui-locale="en-US" aria-labelledby="dateInputDDMMMMYYYYLabel"></div>
   </div>
@@ -125,11 +125,11 @@ Month names default to the grammatical form used inside a full date — e.g. Pol
 
 Without an explicit format, the mask follows the locale set via `data-coreui-locale`.
 
-<Example pro code={`<div class="mb-3">
+<Example pro code={`<div class="mb-4">
     <label class="form-label" id="dateInputEnUSLabel">en-US</label>
     <div class="form-control form-date-time" data-coreui-date-input data-coreui-locale="en-US" aria-labelledby="dateInputEnUSLabel"></div>
   </div>
-  <div class="mb-3">
+  <div class="mb-4">
     <label class="form-label" id="dateInputPlPLLabel">pl-PL</label>
     <div class="form-control form-date-time" data-coreui-date-input data-coreui-locale="pl-PL" data-coreui-day-placeholder="DD" data-coreui-month-placeholder="MM" data-coreui-year-placeholder="RRRR" aria-labelledby="dateInputPlPLLabel"></div>
   </div>
@@ -219,7 +219,7 @@ A state you give, with the option or with the class, is a verdict on the date it
 
 Sibling `.valid-feedback`/`.invalid-feedback` elements work as with any other form control. While the field is invalid, its error message, an `.invalid-feedback` or `.invalid-tooltip` after the field, after the frame around it or in its `.form-field`, describes every section, so a screen reader reads the error with the field. A message placed anywhere else can be named in `data-coreui-invalid-feedback` on the field, and one with the `hidden` attribute is left out, so an `errorChange` listener can show the message that matches `event.error` and hide the rest. A message the page adds later, while the field stays invalid, is picked up the next time the field changes, or right away when it is added in an `errorChange` listener.
 
-<Example pro code={`<div class="mb-3 form-field">
+<Example pro code={`<div class="mb-4 form-field">
     <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="dd.MM.yyyy" data-coreui-date="2026-07-14" data-coreui-validation-state="valid"></div>
     <div class="valid-feedback">Looks good!</div>
   </div>
@@ -249,11 +249,11 @@ The date input supports [floating labels](/forms/floating-labels/). When the fie
 
 The field renders as a `.form-control`, so the standard sizing classes work — add `.form-control-sm` or `.form-control-lg` to the container. Validation states (`.is-invalid` set automatically for out-of-range dates, or your own `.is-valid`) and input groups work the same way.
 
-<Example pro code={`<div class="mb-3">
+<Example pro code={`<div class="mb-4">
     <label class="form-label" id="dateInputLargeLabel">Large</label>
     <div class="form-control form-date-time form-control-lg" data-coreui-date-input data-coreui-format="dd.MM.yyyy" aria-labelledby="dateInputLargeLabel"></div>
   </div>
-  <div class="mb-3">
+  <div class="mb-4">
     <label class="form-label" id="dateInputDefaultLabel">Default</label>
     <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="dd.MM.yyyy" aria-labelledby="dateInputDefaultLabel"></div>
   </div>
@@ -266,7 +266,7 @@ The field renders as a `.form-control`, so the standard sizing classes work — 
 
 Add `data-coreui-disabled="true"` to disable the field, or `data-coreui-readonly="true"` to make it focusable but non-editable.
 
-<Example pro code={`<div class="mb-3">
+<Example pro code={`<div class="mb-4">
     <label class="form-label" id="dateInputDisabledLabel">Disabled</label>
     <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="dd.MM.yyyy" data-coreui-date="2026-07-14" data-coreui-disabled="true" aria-labelledby="dateInputDisabledLabel"></div>
   </div>

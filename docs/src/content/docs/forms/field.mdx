@@ -98,7 +98,7 @@ Feedback elements are children of the field like any other, so they inherit its 
 
 Add `data-coreui-validate` to the `<form>` to style fields from `:user-invalid`, which only matches after the user has interacted with a control — so a field is not marked wrong before it has been filled in. `novalidate` suppresses the browser's own tooltips while keeping the constraint validation API available.
 
-<Example code={`<form class="vstack gap-3" data-coreui-validate novalidate>
+<Example code={`<form class="vstack gap-4" data-coreui-validate novalidate>
     <div class="form-field">
       <label for="fieldValidateEmail" class="form-label">Email address</label>
       <input type="email" class="form-control" id="fieldValidateEmail" required>
@@ -128,7 +128,7 @@ See [validation](/forms/validation/) for the full picture, including the server-
 
 Add a `<small class="form-text">` after the label and wrap both in a `.form-field-content` so the description sits under the label rather than beside the control.
 
-<Example class="d-flex flex-column gap-3" code={`<div class="form-field">
+<Example class="d-flex flex-column gap-4" code={`<div class="form-field">
     <input type="checkbox" id="fieldCheckDesc" class="check" />
     <div class="form-field-content">
       <label for="fieldCheckDesc">Subscribe to updates</label>

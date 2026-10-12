@@ -34,7 +34,7 @@ These classes can also be added to groups of links, as an alternative to the [`.
 
 Add a divider between buttons by adding the `.btn-group-divider` class to the `.btn-group`. Most useful when used with buttons that have the same theme color and a solid fill.
 
-<Example class="d-flex gap-2" code={`<div class="btn-group btn-group-divider" role="group" aria-label="Divided button group">
+<Example class="d-flex gap-3" code={`<div class="btn-group btn-group-divider" role="group" aria-label="Divided button group">
     <button type="button" class="btn-solid theme-primary">Left</button>
     <button type="button" class="btn-solid theme-primary active">Active</button>
     <button type="button" class="btn-solid theme-primary">Right</button>
@@ -47,7 +47,7 @@ Add a divider between buttons by adding the `.btn-group-divider` class to the `.
 
 Works with vertical button groups, too.
 
-<Example class="d-flex align-items-start gap-2" code={`<div class="btn-group-vertical btn-group-divider" role="group" aria-label="Divided vertical button group">
+<Example class="d-flex align-items-start gap-3" code={`<div class="btn-group-vertical btn-group-divider" role="group" aria-label="Divided vertical button group">
     <button type="button" class="btn-solid theme-primary">Left</button>
     <button type="button" class="btn-solid theme-primary active">Active</button>
     <button type="button" class="btn-solid theme-primary">Right</button>
@@ -161,7 +161,7 @@ Combine sets of button groups into button toolbars for more complex components. 
 
 Feel free to mix input groups with button groups in your toolbars.
 
-<Example class="d-flex gap-3 flex-column" code={`<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+<Example class="d-flex gap-4 flex-column" code={`<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
     <div class="btn-group" role="group" aria-label="First group">
       <button type="button" class="btn-outline theme-secondary">1</button>
       <button type="button" class="btn-outline theme-secondary">2</button>
@@ -191,7 +191,7 @@ Feel free to mix input groups with button groups in your toolbars.
 
 Instead of applying button sizing classes to every button in a group, just add `.btn-group-*` to each `.btn-group`, including each one when nesting multiple groups. The sizes are `.btn-group-xs`, `.btn-group-sm` and `.btn-group-lg` — the same ladder the buttons themselves use.
 
-<Example class="d-flex gap-3 flex-column align-items-start" code={`<div class="btn-group btn-group-lg" role="group" aria-label="Large button group">
+<Example class="d-flex gap-4 flex-column align-items-start" code={`<div class="btn-group btn-group-lg" role="group" aria-label="Large button group">
     <button type="button" class="btn-outline theme-primary">Left</button>
     <button type="button" class="btn-outline theme-primary">Middle</button>
     <button type="button" class="btn-outline theme-primary">Right</button>

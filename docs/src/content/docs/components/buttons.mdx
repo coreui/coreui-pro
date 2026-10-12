@@ -27,11 +27,11 @@ A button is a **shape plus a colour**. The shape is the variant — how much ink
 | `.btn-subtle` | Filled with the theme's tinted background, text in the theme's foreground. |
 | `.btn-ghost` | Text only; the fill appears on hover. |
 
-<Example class="d-flex flex-wrap gap-2" code={[`<button type="button" class="btn-solid theme-primary">Solid</button>`, `<button type="button" class="btn-outline theme-primary">Outline</button>`, `<button type="button" class="btn-subtle theme-primary">Subtle</button>`, `<button type="button" class="btn-ghost theme-primary">Ghost</button>`]} />
+<Example class="d-flex flex-wrap gap-3" code={[`<button type="button" class="btn-solid theme-primary">Solid</button>`, `<button type="button" class="btn-outline theme-primary">Outline</button>`, `<button type="button" class="btn-subtle theme-primary">Subtle</button>`, `<button type="button" class="btn-ghost theme-primary">Ghost</button>`]} />
 
 The colour is a [`.theme-*` class](/customize/components/#theme-variants), which may sit on the button or on any element above it — theme a toolbar and every button inside follows. Without one, the variant renders in the neutral surface colours.
 
-<Example class="d-flex flex-wrap gap-2" code={[`<button type="button" class="btn-solid">Solid</button>`, `<button type="button" class="btn-outline">Outline</button>`, `<button type="button" class="btn-subtle">Subtle</button>`, `<button type="button" class="btn-ghost">Ghost</button>`]} />
+<Example class="d-flex flex-wrap gap-3" code={[`<button type="button" class="btn-solid">Solid</button>`, `<button type="button" class="btn-outline">Outline</button>`, `<button type="button" class="btn-subtle">Subtle</button>`, `<button type="button" class="btn-ghost">Ghost</button>`]} />
 
 Pair the variant with any theme colour. `.btn-link` is the exception — it is a link that behaves like a button, so it takes its colour from the link colour rather than from a theme.
 
@@ -188,29 +188,29 @@ To cover cases where you have to keep the `href` attribute on a disabled link, t
 
 Create buttons that span the full width of a parent—by using utilities.
 
-<Example code={`<div class="d-grid gap-2">
+<Example code={`<div class="d-grid gap-3">
     <button class="btn-solid theme-primary" type="button">Button</button>
     <button class="btn-solid theme-primary" type="button">Button</button>
   </div>`} />
 
-Here we create a responsive variation, starting with vertically stacked buttons until the `md` breakpoint, where `.d-md-block` replaces the `.d-grid` class, thus nullifying the `gap-2` utility. Resize your browser to see them change.
+Here we create a responsive variation, starting with vertically stacked buttons until the `md` breakpoint, where `.d-md-block` replaces the `.d-grid` class, thus nullifying the `gap-3` utility. Resize your browser to see them change.
 
-<Example code={`<div class="d-grid gap-2 d-md-block">
+<Example code={`<div class="d-grid gap-3 d-md-block">
     <button class="btn-solid theme-primary" type="button">Button</button>
     <button class="btn-solid theme-primary" type="button">Button</button>
   </div>`} />
 
 You can adjust the width of your block buttons with grid column width classes. For example, for a half-width "block button", use `.col-6`. Center it horizontally with `.mx-auto`, too.
 
-<Example code={`<div class="d-grid gap-2 col-6 mx-auto">
+<Example code={`<div class="d-grid gap-3 col-6 mx-auto">
     <button class="btn-solid theme-primary" type="button">Button</button>
     <button class="btn-solid theme-primary" type="button">Button</button>
   </div>`} />
 
 Additional utilities can be used to adjust the alignment of buttons when horizontal. Here we've taken our previous responsive example and added some flex utilities and a margin utility on the button to right align the buttons when they're no longer stacked.
 
-<Example code={`<div class="d-grid gap-2 d-md-flex justify-content-md-end">
-    <button class="btn-solid theme-primary me-md-2" type="button">Button</button>
+<Example code={`<div class="d-grid gap-3 d-md-flex justify-content-md-end">
+    <button class="btn-solid theme-primary me-md-3" type="button">Button</button>
     <button class="btn-solid theme-primary" type="button">Button</button>
   </div>`} />
 
@@ -226,7 +226,7 @@ Visually, these toggle buttons are identical to the [checkbox toggle buttons](/f
 
 Add `data-coreui-toggle="button"` to toggle a button's `active` state. Also add `aria-pressed` so assistive technologies announce the control as a toggle button. Use `aria-pressed="false"` for the default state. If you're pre-toggling a button, add the `.active` class **and** `aria-pressed="true"`.
 
-<Example code={`<div class="d-flex flex-wrap gap-1 mb-3">
+<Example code={`<div class="d-flex flex-wrap gap-1 mb-4">
     <button type="button" class="btn" data-coreui-toggle="button" aria-pressed="false">Toggle button</button>
     <button type="button" class="btn active" data-coreui-toggle="button" aria-pressed="true">Active toggle button</button>
     <button type="button" class="btn" disabled data-coreui-toggle="button" aria-pressed="false">Disabled toggle button</button>
@@ -237,7 +237,7 @@ Add `data-coreui-toggle="button"` to toggle a button's `active` state. Also add 
     <button type="button" class="btn-solid theme-primary" disabled data-coreui-toggle="button" aria-pressed="false">Disabled toggle button</button>
   </div>`} />
 
-<Example code={`<div class="d-flex flex-wrap gap-1 mb-3">
+<Example code={`<div class="d-flex flex-wrap gap-1 mb-4">
     <a href="#" class="btn" role="button" data-coreui-toggle="button" aria-pressed="false">Toggle link</a>
     <a href="#" class="btn active" role="button" data-coreui-toggle="button" aria-pressed="true">Active toggle link</a>
     <a class="btn disabled" aria-disabled="true" role="button" data-coreui-toggle="button" aria-pressed="false">Disabled toggle link</a>

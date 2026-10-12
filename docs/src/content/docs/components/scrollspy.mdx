@@ -35,7 +35,7 @@ If you're making a scrollable container (other than the `<body>`), be sure to ha
 
 Scroll the area below the navbar and watch the active class change. Open the menu and watch the menu items be highlighted as well.
 
-<Example html={`<nav id="navbar-example2" class="navbar bg-1 px-3 mb-3 rounded-2">
+<Example html={`<nav id="navbar-example2" class="navbar bg-1 px-4 mb-4 rounded-2">
     <a class="navbar-brand" href="#">Navbar</a>
     <ul class="nav nav-pills">
       <li class="nav-item">
@@ -55,7 +55,7 @@ Scroll the area below the navbar and watch the active class change. Open the men
       </li>
     </ul>
   </nav>
-  <div class="scrollspy-example bg-1 p-3 rounded-2" data-coreui-spy="scroll" data-coreui-target="#navbar-example2" data-coreui-smooth-scroll="true" tabindex="0">
+  <div class="scrollspy-example bg-1 p-4 rounded-2" data-coreui-spy="scroll" data-coreui-target="#navbar-example2" data-coreui-smooth-scroll="true" tabindex="0">
     <h4 id="scrollspyHeading1">First heading</h4>
     <p>This is some placeholder content for the scrollspy page. Note that as you scroll down the page, the appropriate navigation link is highlighted. It's repeated throughout the component example. We keep adding some more example copy here to emphasize the scrolling and highlighting.</p>
     <h4 id="scrollspyHeading2">Second heading</h4>
@@ -69,7 +69,7 @@ Scroll the area below the navbar and watch the active class change. Open the men
   </div>`} />
 
 ```html
-<nav id="navbar-example2" class="navbar bg-1 px-3 mb-3 rounded-2">
+<nav id="navbar-example2" class="navbar bg-1 px-4 mb-4 rounded-2">
   <a class="navbar-brand" href="#">Navbar</a>
   <ul class="nav nav-pills">
     <li class="nav-item">
@@ -89,7 +89,7 @@ Scroll the area below the navbar and watch the active class change. Open the men
     </li>
   </ul>
 </nav>
-<div data-coreui-spy="scroll" data-coreui-target="#navbar-example2" data-coreui-smooth-scroll="true" class="scrollspy-example bg-1 p-3 rounded-2" tabindex="0">
+<div data-coreui-spy="scroll" data-coreui-target="#navbar-example2" data-coreui-smooth-scroll="true" class="scrollspy-example bg-1 p-4 rounded-2" tabindex="0">
   <h4 id="scrollspyHeading1">First heading</h4>
   <p>...</p>
   <h4 id="scrollspyHeading2">Second heading</h4>
@@ -109,18 +109,18 @@ Scrollspy also works with nested `.nav`s. If a nested `.nav` is `.active`, its p
 
 <Example html={`<div class="row">
     <div class="col-4">
-      <nav id="navbar-example3" class="h-100 flex-column align-items-stretch pe-4 border-end">
+      <nav id="navbar-example3" class="h-100 flex-column align-items-stretch pe-5 border-end">
         <nav class="nav nav-pills flex-column">
           <a class="nav-link" href="#item-1">Item 1</a>
           <nav class="nav nav-pills flex-column">
-            <a class="nav-link ms-3 my-1" href="#item-1-1">Item 1-1</a>
-            <a class="nav-link ms-3 my-1" href="#item-1-2">Item 1-2</a>
+            <a class="nav-link ms-4 my-1" href="#item-1-1">Item 1-1</a>
+            <a class="nav-link ms-4 my-1" href="#item-1-2">Item 1-2</a>
           </nav>
           <a class="nav-link" href="#item-2">Item 2</a>
           <a class="nav-link" href="#item-3">Item 3</a>
           <nav class="nav nav-pills flex-column">
-            <a class="nav-link ms-3 my-1" href="#item-3-1">Item 3-1</a>
-            <a class="nav-link ms-3 my-1" href="#item-3-2">Item 3-2</a>
+            <a class="nav-link ms-4 my-1" href="#item-3-1">Item 3-1</a>
+            <a class="nav-link ms-4 my-1" href="#item-3-2">Item 3-2</a>
           </nav>
         </nav>
       </nav>
@@ -169,18 +169,18 @@ Scrollspy also works with nested `.nav`s. If a nested `.nav` is `.active`, its p
 ```html
 <div class="row">
   <div class="col-4">
-    <nav id="navbar-example3" class="h-100 flex-column align-items-stretch pe-4 border-end">
+    <nav id="navbar-example3" class="h-100 flex-column align-items-stretch pe-5 border-end">
       <nav class="nav nav-pills flex-column">
         <a class="nav-link" href="#item-1">Item 1</a>
         <nav class="nav nav-pills flex-column">
-          <a class="nav-link ms-3 my-1" href="#item-1-1">Item 1-1</a>
-          <a class="nav-link ms-3 my-1" href="#item-1-2">Item 1-2</a>
+          <a class="nav-link ms-4 my-1" href="#item-1-1">Item 1-1</a>
+          <a class="nav-link ms-4 my-1" href="#item-1-2">Item 1-2</a>
         </nav>
         <a class="nav-link" href="#item-2">Item 2</a>
         <a class="nav-link" href="#item-3">Item 3</a>
         <nav class="nav nav-pills flex-column">
-          <a class="nav-link ms-3 my-1" href="#item-3-1">Item 3-1</a>
-          <a class="nav-link ms-3 my-1" href="#item-3-2">Item 3-2</a>
+          <a class="nav-link ms-4 my-1" href="#item-3-1">Item 3-1</a>
+          <a class="nav-link ms-4 my-1" href="#item-3-2">Item 3-2</a>
         </nav>
       </nav>
     </nav>
@@ -279,7 +279,7 @@ Scrollspy is not limited to nav components and list groups, so it will work on a
 
 <Example html={`<div class="row">
     <div class="col-4">
-      <div id="simple-list-example" class="d-flex flex-column gap-2 simple-list-example-scrollspy text-center">
+      <div id="simple-list-example" class="d-flex flex-column gap-3 simple-list-example-scrollspy text-center">
         <a class="p-1 rounded" href="#simple-list-item-1">Item 1</a>
         <a class="p-1 rounded" href="#simple-list-item-2">Item 2</a>
         <a class="p-1 rounded" href="#simple-list-item-3">Item 3</a>
@@ -306,7 +306,7 @@ Scrollspy is not limited to nav components and list groups, so it will work on a
 ```html
 <div class="row">
   <div class="col-4">
-    <div id="simple-list-example" class="d-flex flex-column gap-2 simple-list-example-scrollspy text-center">
+    <div id="simple-list-example" class="d-flex flex-column gap-3 simple-list-example-scrollspy text-center">
       <a class="p-1 rounded" href="#simple-list-item-1">Item 1</a>
       <a class="p-1 rounded" href="#simple-list-item-2">Item 2</a>
       <a class="p-1 rounded" href="#simple-list-item-3">Item 3</a>

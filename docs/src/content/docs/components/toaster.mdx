@@ -45,7 +45,7 @@ Two toasters, each with its container in a top corner of the viewport: a list on
 
 A toast is a plain options object. `title` renders the header with a close button, `description` the body; a toast without a title puts the close button in the body. `theme` adds the `theme-{color}` class, `priority: 'high'` has screen readers announce it right away, `timeout` overrides the toaster's default (`0` keeps the toast until it is closed) and `dismissible: false` drops the close button.
 
-<Example code={`<div class="hstack gap-2 flex-wrap mb-3">
+<Example code={`<div class="hstack gap-3 flex-wrap mb-4">
     <button type="button" class="btn-solid theme-primary" id="toasterTitleBtn">Title and description</button>
     <button type="button" class="btn-solid theme-secondary" id="toasterDescriptionBtn">Description only</button>
     <button type="button" class="btn-solid theme-danger" id="toasterThemeBtn">Themed, high priority</button>
@@ -61,7 +61,7 @@ Strings are written as text. Set `html: true` on the toaster to render markup; i
 
 Passing an `id` that already exists updates that toast instead of adding a second one, and bumps its `updateKey`, so a "Draft saved" toast clicked twice stays a single toast. `update()` does the same for a toast whose id you kept, and accepts a function of the current toast when the change depends on it: `toaster.update(id, previous => ({ description: previous.data.step + 1 }))`. A toast that is already closing is not reused: adding its `id` again removes it at once and adds a new toast, which takes the newest place in the container.
 
-<Example code={`<div class="hstack gap-2 flex-wrap mb-3">
+<Example code={`<div class="hstack gap-3 flex-wrap mb-4">
     <button type="button" class="btn-solid theme-primary" id="toasterDraftBtn">Save draft</button>
     <button type="button" class="btn-solid theme-secondary" id="toasterUploadBtn">Upload with progress</button>
   </div>
@@ -73,7 +73,7 @@ Passing an `id` that already exists updates that toast instead of adding a secon
 
 `promise()` adds a toast in the `loading` state and updates it when the promise settles: `success` receives the resolved value, `error` the rejection. Each state is a description string, a full options object, or a function returning either.
 
-<Example code={`<button type="button" class="btn-solid theme-primary mb-3" id="toasterPromiseBtn">Save</button>
+<Example code={`<button type="button" class="btn-solid theme-primary mb-4" id="toasterPromiseBtn">Save</button>
   <div class="toast-container position-static" id="toasterPromise"></div>`} sandboxJs={toasterPromise} />
 
 <Code code={toasterPromise} lang="js" />
@@ -82,7 +82,7 @@ Passing an `id` that already exists updates that toast instead of adding a secon
 
 `action` renders a button in the body; its `onClick` receives the click event and the toast object, so an undo can rewrite the same toast.
 
-<Example code={`<button type="button" class="btn-solid theme-primary mb-3" id="toasterArchiveBtn">Archive message</button>
+<Example code={`<button type="button" class="btn-solid theme-primary mb-4" id="toasterArchiveBtn">Archive message</button>
   <div class="toast-container position-static" id="toasterAction"></div>`} sandboxJs={toasterAction} />
 
 <Code code={toasterAction} lang="js" />
@@ -91,7 +91,7 @@ Passing an `id` that already exists updates that toast instead of adding a secon
 
 `limit` caps how many toasts are visible at once. The newest stay on screen; older ones sink away from the edge and fade, remain in the DOM with `inert` and `data-coreui-limited`, and rise back in as the visible ones go away. `limit: 0` shows everything.
 
-<Example code={`<div class="hstack gap-2 mb-3">
+<Example code={`<div class="hstack gap-3 mb-4">
     <button type="button" class="btn-solid theme-primary" id="toasterLimitBtn">Add a toast</button>
     <button type="button" class="btn-outline theme-secondary" id="toasterLimitCloseBtn">Close all</button>
   </div>
@@ -103,7 +103,7 @@ Passing an `id` that already exists updates that toast instead of adding a secon
 
 With `stack: true` the toasts sit on top of each other: the newest in front at full size, the ones behind it scaled down by `--cui-toast-stack-scale` per step and receding towards a vanishing depth. The first toast behind peeks out by `--cui-toast-stack-peek` and every further one by that strip times the scale ratio, so the corners of the stack line up like a deck of cards seen in perspective. Only the front toast's timer runs; the ones behind wait their turn and start counting when they reach the front, so the stack empties from the front. A toast that leaves from behind — closed by id, or pushed over the limit — fades where it is instead of sliding out from under the deck. Hovering or focusing the container spreads the stack into a list; leaving it folds the stack back. The stack takes the place of the flow layout; `limit` decides how many toasts it holds. Folded, the deck shows the front toast and two behind it (`--cui-toast-stack-visible`); spreading it reveals every toast within the limit.
 
-<Example code={`<div class="hstack gap-2 mb-3">
+<Example code={`<div class="hstack gap-3 mb-4">
     <button type="button" class="btn-solid theme-primary" id="toasterStackBtn">Add a toast</button>
     <button type="button" class="btn-outline theme-secondary" id="toasterStackCloseBtn">Close all</button>
   </div>
@@ -115,7 +115,7 @@ The toaster keeps the geometry in tokens the CSS reads: `--cui-toast-stack-index
 
 A stack works in every placement: it grows away from the edge it is pinned to, so at the bottom the newest toast is the lowest one and the stack peeks upward.
 
-<Example code={`<div class="d-grid gap-2" style="grid-template-columns: repeat(3, 1fr); max-width: 30rem" id="toasterPlacementStack">
+<Example code={`<div class="d-grid gap-3" style="grid-template-columns: repeat(3, 1fr); max-width: 30rem" id="toasterPlacementStack">
     <button type="button" class="btn-outline theme-secondary" data-coreui-placement="top-start">Top start</button>
     <button type="button" class="btn-outline theme-secondary" data-coreui-placement="top-center">Top center</button>
     <button type="button" class="btn-outline theme-secondary" data-coreui-placement="top-end">Top end</button>
@@ -141,7 +141,7 @@ const toaster = new coreui.Toaster(null, { placement: 'top-end', enter: 'top', l
 
 A toast with `instant: true` skips all of it — no slide, no fade, no glide of its neighbours, no stack transition — and so does every toast when the user prefers reduced motion: the stylesheet emits no transitions under `prefers-reduced-motion: reduce` and the toaster skips its position animations, so toasts appear, move and vanish in place.
 
-<Example code={`<div class="hstack gap-2 mb-3">
+<Example code={`<div class="hstack gap-3 mb-4">
     <button type="button" class="btn-solid theme-primary" id="toasterInstantBtn">Add an instant toast</button>
     <button type="button" class="btn-solid theme-secondary" id="toasterAnimatedBtn">Add an animated toast</button>
   </div>
@@ -155,7 +155,7 @@ A toast with `instant: true` skips all of it — no slide, no fade, no glide of 
 
 Each button below adds a toast through a toaster placed at that spot, so you can see where a toast enters from: from the side in the `start` and `end` columns, from above in `top-center` and from below in `bottom-center`, while `middle-center` fades in place.
 
-<Example code={`<div class="d-grid gap-2" style="grid-template-columns: repeat(3, 1fr); max-width: 30rem" id="toasterPlacement">
+<Example code={`<div class="d-grid gap-3" style="grid-template-columns: repeat(3, 1fr); max-width: 30rem" id="toasterPlacement">
     <button type="button" class="btn-outline theme-secondary" data-coreui-placement="top-start">Top start</button>
     <button type="button" class="btn-outline theme-secondary" data-coreui-placement="top-center">Top center</button>
     <button type="button" class="btn-outline theme-secondary" data-coreui-placement="top-end">Top end</button>

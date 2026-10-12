@@ -51,17 +51,17 @@ Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label 
 
 Enable multiple handles to allow the selection of a range or/and multiple values. The handles share one track, the band runs from the lowest handle to the highest, and each handle is a native range input, so dragging, the keyboard, touch, form submission and form reset work as they do for one. The handles stay in order, a press on the track moves the nearest one and it follows the pointer until it is released, and when two of them meet the one that can still move stays on top.
 
-<Example pro code={`<div class="mb-3" data-coreui-range-slider data-coreui-value="20,40" data-coreui-aria-label='["Minimum price", "Maximum price"]'></div>
-  <div class="mb-3" data-coreui-range-slider data-coreui-value="20,40,60" data-coreui-aria-label='["Checkpoint 1", "Checkpoint 2", "Checkpoint 3"]'></div>
+<Example pro code={`<div class="mb-4" data-coreui-range-slider data-coreui-value="20,40" data-coreui-aria-label='["Minimum price", "Maximum price"]'></div>
+  <div class="mb-4" data-coreui-range-slider data-coreui-value="20,40,60" data-coreui-aria-label='["Checkpoint 1", "Checkpoint 2", "Checkpoint 3"]'></div>
   <div data-coreui-range-slider data-coreui-value="20,40,60,80" data-coreui-aria-label='["Stage 1", "Stage 2", "Stage 3", "Stage 4"]'></div>`} />
 
 ## Vertical Range Slider
 
 Rotate the slider to a vertical orientation.
 
-<Example pro code={`<div class="d-flex ps-5">
-    <div class="me-3" data-coreui-range-slider data-coreui-value="20" data-coreui-vertical="true" data-coreui-aria-label='["Volume"]'></div>
-    <div class="me-3" data-coreui-range-slider data-coreui-value="20,80" data-coreui-vertical="true" data-coreui-aria-label='["Minimum temperature", "Maximum temperature"]'></div>
+<Example pro code={`<div class="d-flex ps-6">
+    <div class="me-4" data-coreui-range-slider data-coreui-value="20" data-coreui-vertical="true" data-coreui-aria-label='["Volume"]'></div>
+    <div class="me-4" data-coreui-range-slider data-coreui-value="20,80" data-coreui-vertical="true" data-coreui-aria-label='["Minimum temperature", "Maximum temperature"]'></div>
     <div data-coreui-range-slider data-coreui-value="20,80,100" data-coreui-vertical="true" data-coreui-aria-label='["Level 1", "Level 2", "Level 3"]'></div>
   </div>`} />
 
@@ -69,21 +69,21 @@ Rotate the slider to a vertical orientation.
 
 Disable the slider to prevent user interaction.
 
-<Example pro code={`<div class="mb-3" data-coreui-range-slider data-coreui-value="50" data-coreui-disabled="true" data-coreui-aria-label='["Volume"]'></div>
+<Example pro code={`<div class="mb-4" data-coreui-range-slider data-coreui-value="50" data-coreui-disabled="true" data-coreui-aria-label='["Volume"]'></div>
   <div data-coreui-range-slider data-coreui-value="50, 75" data-coreui-disabled="true" data-coreui-aria-label='["Minimum price", "Maximum price"]'></div>`} />
 
 ## Min and max
 
 Range Slider has implicit values for `min` and `max`—`0` and `100`, respectively. You may specify new values for those using the `min` and `max` attributes.
 
-<Example pro code={`<div class="mb-3" data-coreui-range-slider data-coreui-min="-50" data-coreui-max="150" data-coreui-value="50" data-coreui-aria-label='["Temperature"]'></div>
+<Example pro code={`<div class="mb-4" data-coreui-range-slider data-coreui-min="-50" data-coreui-max="150" data-coreui-value="50" data-coreui-aria-label='["Temperature"]'></div>
   <div data-coreui-range-slider data-coreui-min="-50" data-coreui-max="150" data-coreui-value="50, 75" data-coreui-aria-label='["Minimum temperature", "Maximum temperature"]'></div>`} />
 
 ## Steps
 
 Range Slider inputs automatically "snap" to whole numbers. To modify this behavior, set a `step` value. In the example below, we increase the number of steps by specifying `step="0.25"`.
 
-<Example pro code={`<div class="mb-3" data-coreui-range-slider data-coreui-step="0.25" data-coreui-value="50" data-coreui-aria-label='["Weight"]'></div>
+<Example pro code={`<div class="mb-4" data-coreui-range-slider data-coreui-step="0.25" data-coreui-value="50" data-coreui-aria-label='["Weight"]'></div>
   <div data-coreui-range-slider data-coreui-step="0.25" data-coreui-value="50, 75" data-coreui-aria-label='["Minimum weight", "Maximum weight"]'></div>`} />
 
 ## Distance
@@ -135,7 +135,7 @@ The value tooltip is the [Tooltip](/components/tooltips/) component's markup: th
 
 By default, tooltips show the current value of a handle while the pointer is over it, while it is held, and while it has a visible focus. Set `tooltips` to `"always"` to keep them visible at all times, or to `false` to turn them off.
 
-<Example pro class="d-flex flex-column gap-4 pt-4" code={`<div data-coreui-range-slider data-coreui-value="40,60" data-coreui-tooltips="always" data-coreui-aria-label='["Minimum price", "Maximum price"]'></div>
+<Example pro class="d-flex flex-column gap-5 pt-5" code={`<div data-coreui-range-slider data-coreui-value="40,60" data-coreui-tooltips="always" data-coreui-aria-label='["Minimum price", "Maximum price"]'></div>
   <div data-coreui-range-slider data-coreui-value="40,60" data-coreui-tooltips="false" data-coreui-aria-label='["Minimum price", "Maximum price"]'></div>`} />
 
 ### Tooltips formatting
@@ -154,19 +154,19 @@ The `data-coreui-track` option allows you to customize how the slider's track is
 
 If you set `data-coreui-track` to `false`, the slider's track will not display any fill. Only the default track background will be visible, which can be useful for minimalist designs or when you use more then two handles.
 
-<Example pro code={`<div class="mb-3" data-coreui-range-slider data-coreui-track="false" data-coreui-value="50" data-coreui-aria-label='["Volume"]'></div>
-  <div class="mb-3" data-coreui-range-slider data-coreui-track="false" data-coreui-value="50, 75" data-coreui-aria-label='["Minimum price", "Maximum price"]'></div>
+<Example pro code={`<div class="mb-4" data-coreui-range-slider data-coreui-track="false" data-coreui-value="50" data-coreui-aria-label='["Volume"]'></div>
+  <div class="mb-4" data-coreui-range-slider data-coreui-track="false" data-coreui-value="50, 75" data-coreui-aria-label='["Minimum price", "Maximum price"]'></div>
   <div data-coreui-range-slider data-coreui-track="false" data-coreui-value="25, 50, 75" data-coreui-aria-label='["Checkpoint 1", "Checkpoint 2", "Checkpoint 3"]'></div>`} />
 
 ## Theme variants
 
 Color the filled track and the handles by adding a [`.theme-{color}` class](/customize/components/#theme-variants) to the slider element.
 
-<Example pro class="d-flex flex-column gap-3" code={getData('theme-colors').map((c) => `<div class="theme-${c.name}" data-coreui-range-slider data-coreui-value="25, 75" data-coreui-aria-label='["${c.title} minimum", "${c.title} maximum"]'></div>`)} />
+<Example pro class="d-flex flex-column gap-4" code={getData('theme-colors').map((c) => `<div class="theme-${c.name}" data-coreui-range-slider data-coreui-value="25, 75" data-coreui-aria-label='["${c.title} minimum", "${c.title} maximum"]'></div>`)} />
 
 The theme class on the slider colours the track and the handles; the tooltip keeps its default look. To theme the tooltip, set `tooltipClass` (`data-coreui-tooltip-class`) — the class lands on the tooltip only. `theme-secondary` gives a grey tooltip on the default slider; `theme-danger` makes the tooltip match a danger slider.
 
-<Example pro class="d-flex flex-column gap-3" code={`<div data-coreui-range-slider data-coreui-value="40" data-coreui-tooltip-class="theme-secondary" data-coreui-aria-label='["Secondary tooltip"]'></div>
+<Example pro class="d-flex flex-column gap-4" code={`<div data-coreui-range-slider data-coreui-value="40" data-coreui-tooltip-class="theme-secondary" data-coreui-aria-label='["Secondary tooltip"]'></div>
   <div class="theme-danger" data-coreui-range-slider data-coreui-value="60" data-coreui-tooltip-class="theme-danger" data-coreui-aria-label='["Danger slider, danger tooltip"]'></div>`} />
 
 ## Validation
@@ -179,7 +179,7 @@ A range never fails the browser's own validation: a handle always holds a value 
 - The user's move of a handle, or a native form reset, removes the state before the change events fire. A change from code, such as `setConfig({ value })`, keeps it.
 - A validity you set on a handle with `setCustomValidity()` shows on the slider once a validation reports it, and a given `'valid'` shows over it.
 
-<Example pro code={`<form class="row g-3" data-coreui-validate novalidate>
+<Example pro code={`<form class="row g-4" data-coreui-validate novalidate>
     <div class="col-12 form-field">
       <span class="form-label" id="planBudgetLabel">Budget</span>
       <div class="is-invalid" aria-labelledby="planBudgetLabel" data-coreui-range-slider data-coreui-name="planBudgetMin, planBudgetMax" data-coreui-value="5, 40" data-coreui-aria-label='["Minimum", "Maximum"]'></div>

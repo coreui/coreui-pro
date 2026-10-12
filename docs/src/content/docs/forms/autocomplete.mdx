@@ -179,7 +179,7 @@ Highlight matching portions of suggestions during search:
 
 The text input carries the value, so `required` blocks the submit of an empty field and the browser shows its message over the input. The state shows on the frame as `.is-{state}`, and while it is `'invalid'` the input carries `aria-invalid="true"` and is described by the message that follows the frame, the way the [form plugin](/forms/validation/) does for a native field.
 
-<Example pro code={`<form class="row g-3" data-coreui-validate novalidate>
+<Example pro code={`<form class="row g-4" data-coreui-validate novalidate>
     <div class="col-12">
       <label class="form-label" for="autocompleteValidationCountry">Country</label>
       <div data-coreui-autocomplete data-coreui-id="autocompleteValidationCountry" data-coreui-name="country" data-coreui-options="Germany, Poland, Spain" data-coreui-required="true"></div>
@@ -213,7 +213,7 @@ Add the `data-coreui-disabled="true"` attribute to disable the component:
 
 The frame carries the size. Add `.form-control-sm` or `.form-control-lg` to the element you initialize — it becomes the `.form-control-group`, so the field matches our similarly sized text inputs.
 
-<Example pro class="d-flex flex-column gap-3" code={`<div 
+<Example pro class="d-flex flex-column gap-4" code={`<div 
     class="form-control-lg"
     data-coreui-cleaner="true"
     data-coreui-highlight-options-on-search="true"

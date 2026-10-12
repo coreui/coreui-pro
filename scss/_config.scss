@@ -49,14 +49,17 @@ $spacers: defaults(
   (
     0: 0,
     1: calc(var(--#{$prefix}spacer) * .25),
-    2: calc(var(--#{$prefix}spacer) * .5),
-    3: calc(var(--#{$prefix}spacer) * .75),
-    4: var(--#{$prefix}spacer),
-    5: calc(var(--#{$prefix}spacer) * 1.25),
-    6: calc(var(--#{$prefix}spacer) * 1.5),
-    7: calc(var(--#{$prefix}spacer) * 2),
-    8: calc(var(--#{$prefix}spacer) * 2.5),
-    9: calc(var(--#{$prefix}spacer) * 3),
+    2: calc(var(--#{$prefix}spacer) * .375),
+    3: calc(var(--#{$prefix}spacer) * .5),
+    4: calc(var(--#{$prefix}spacer) * .75),
+    5: var(--#{$prefix}spacer),
+    6: calc(var(--#{$prefix}spacer) * 1.25),
+    7: calc(var(--#{$prefix}spacer) * 1.5),
+    8: calc(var(--#{$prefix}spacer) * 1.75),
+    9: calc(var(--#{$prefix}spacer) * 2),
+    10: calc(var(--#{$prefix}spacer) * 2.25),
+    11: calc(var(--#{$prefix}spacer) * 2.5),
+    12: calc(var(--#{$prefix}spacer) * 3),
   ),
   $spacers
 );
@@ -109,8 +112,8 @@ $radii: defaults(
     5: var(--#{$prefix}radius),
     6: calc(var(--#{$prefix}radius) * 1.25),
     7: calc(var(--#{$prefix}radius) * 1.5),
-    8: calc(var(--#{$prefix}radius) * 2),
-    9: calc(var(--#{$prefix}radius) * 3),
+    8: calc(var(--#{$prefix}radius) * 1.75),
+    9: calc(var(--#{$prefix}radius) * 2),
   ),
   $radii
 );

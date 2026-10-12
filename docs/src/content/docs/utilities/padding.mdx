@@ -30,15 +30,18 @@ Where *sides* is one of:
 Where *size* is one of:
 
 - `0` - for classes that eliminate the `padding` by setting it to `0`
-- `1` - (by default) for classes that set the `padding` to `--cui-spacer-1` (`calc(var(--cui-spacer) * .25)`)
-- `2` - (by default) for classes that set the `padding` to `--cui-spacer-2` (`calc(var(--cui-spacer) * .5)`)
-- `3` - (by default) for classes that set the `padding` to `--cui-spacer-3` (`calc(var(--cui-spacer) * .75)`)
-- `4` - (by default) for classes that set the `padding` to `--cui-spacer-4` (`var(--cui-spacer)`)
-- `5` - (by default) for classes that set the `padding` to `$spacer * 1.25`
-- `6` - (by default) for classes that set the `padding` to `$spacer * 1.5`
-- `7` - (by default) for classes that set the `padding` to `$spacer * 2`
-- `8` - (by default) for classes that set the `padding` to `$spacer * 2.5`
-- `9` - (by default) for classes that set the `padding` to `$spacer * 3`
+- `1` - (by default) for classes that set the `padding` to `$spacer * .25`
+- `2` - (by default) for classes that set the `padding` to `$spacer * .375`
+- `3` - (by default) for classes that set the `padding` to `$spacer * .5`
+- `4` - (by default) for classes that set the `padding` to `$spacer * .75`
+- `5` - (by default) for classes that set the `padding` to `$spacer`
+- `6` - (by default) for classes that set the `padding` to `$spacer * 1.25`
+- `7` - (by default) for classes that set the `padding` to `$spacer * 1.5`
+- `8` - (by default) for classes that set the `padding` to `$spacer * 1.75`
+- `9` - (by default) for classes that set the `padding` to `$spacer * 2`
+- `10` - (by default) for classes that set the `padding` to `$spacer * 2.25`
+- `11` - (by default) for classes that set the `padding` to `$spacer * 2.5`
+- `12` - (by default) for classes that set the `padding` to `$spacer * 3`
 
 (You can add more sizes by adding entries to the `$spacers` Sass map variable.)
 
@@ -51,12 +54,12 @@ Here are some representative examples of these classes:
   padding-top: 0;
 }
 
-.px-2 {
+.px-3 {
   padding-left: ($spacer * .5);
   padding-right: ($spacer * .5);
 }
 
-.p-3 {
+.p-5 {
   padding: $spacer;
 }
 ```

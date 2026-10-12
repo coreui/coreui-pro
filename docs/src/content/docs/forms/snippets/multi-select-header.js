@@ -16,7 +16,7 @@ new coreui.MultiSelect(myMultiSelectHeader, {
   selectionType: 'tags',
   headerTemplate(state, actions) {
     const wrapper = document.createElement('div')
-    wrapper.className = 'd-flex flex-wrap gap-2'
+    wrapper.className = 'd-flex flex-wrap gap-3'
 
     const selectAll = document.createElement('button')
     selectAll.type = 'button'

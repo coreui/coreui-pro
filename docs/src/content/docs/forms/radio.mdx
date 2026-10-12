@@ -59,9 +59,9 @@ Any number of radios that are immediate siblings stack vertically and are spaced
 
 ## Inline
 
-There is no inline modifier: the control is an inline element, so a row is a flex container with a gap. Wrap the group in `.d-flex.gap-3`.
+There is no inline modifier: the control is an inline element, so a row is a flex container with a gap. Wrap the group in `.d-flex.gap-4`.
 
-<Example code={`<div class="d-flex gap-3">
+<Example code={`<div class="d-flex gap-4">
     <div class="form-field">
       <input class="radio" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1">
       <label for="inlineRadio1">1</label>
@@ -80,7 +80,7 @@ There is no inline modifier: the control is an inline element, so a row is a fle
 
 `.radio-sm` and `.radio-lg` size the whole row — the box, its label, and the space they sit in. Each sets one font size: the box is `1em`, so it follows, and so does the alignment margin, which is computed from the line. Nothing needs re-tuning per size, and a size of your own is one custom property.
 
-<Example code={`<div class="d-flex align-items-start gap-3">
+<Example code={`<div class="d-flex align-items-start gap-4">
     <div class="form-field">
       <input class="radio radio-sm" type="radio" name="sizeRadio" id="radioSm" checked>
       <label for="radioSm">Small</label>
@@ -190,7 +190,7 @@ See the [v6 migration guide](/migration/v6/) for the full picture.
 
 Modify the appearance of checked radios by adding a [`.theme-{color}` class](/customize/components/#theme-variants) to the `.radio` input, or to any element above it. This sets the checked background and border color to the theme color.
 
-<Example class="d-flex flex-column gap-2" code={getData('theme-colors').map((c) => `<div class="form-field theme-${c.name}">
+<Example class="d-flex flex-column gap-3" code={getData('theme-colors').map((c) => `<div class="form-field theme-${c.name}">
     <input class="radio" type="radio" name="radio-theme-${c.name}" id="radio-${c.name}" checked>
     <label for="radio-${c.name}">${c.title} radio</label>
   </div>`)} />

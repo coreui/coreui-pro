@@ -9,7 +9,7 @@ Components animate with CSS transitions, and the timing is customizable — see 
 
 Hover both buttons. The first eases into its hover colour; the second snaps.
 
-<Example class="d-flex gap-3" code={`<button type="button" class="btn-solid theme-primary">Default</button>
+<Example class="d-flex gap-4" code={`<button type="button" class="btn-solid theme-primary">Default</button>
 <button type="button" class="btn-solid theme-primary transition-none">No hover transition</button>`} />
 
 ```html
@@ -24,7 +24,7 @@ The utility sets the `transition` shorthand, so it removes every transition on t
 
 Two keyframe animations ship as utilities: `.animation-shake` draws attention to something that went wrong, `.animation-pop` scales an element in as it appears. `.animation-none` removes an animation the way `.transition-none` removes a transition.
 
-<Example class="d-flex gap-3" code={`<button type="button" class="btn-solid theme-danger animation-shake">Shake</button>
+<Example class="d-flex gap-4" code={`<button type="button" class="btn-solid theme-danger animation-shake">Shake</button>
 <button type="button" class="btn-solid theme-primary animation-pop">Pop</button>`} />
 
 The keyframes are named `animation-shake` and `animation-pop` rather than `shake` and `pop`, so declaring an animation of your own under either bare name does not redefine ours.

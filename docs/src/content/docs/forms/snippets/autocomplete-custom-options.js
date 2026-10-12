@@ -82,7 +82,7 @@ new coreui.Autocomplete(myAutocompleteCountries, {
   cleaner: true,
   options: countries,
   optionsTemplate(option) {
-    return `<div class="d-flex align-items-center gap-2"><span class="fs-5">${option.flag}</span><span>${option.label}</span></div>`
+    return `<div class="d-flex align-items-center gap-3"><span class="fs-5">${option.flag}</span><span>${option.label}</span></div>`
   },
   pickerIcon: true,
   placeholder: 'Select country',
@@ -94,7 +94,7 @@ new coreui.Autocomplete(myAutocompleteCountriesAndCities, {
   cleaner: true,
   options: cities,
   optionsGroupsTemplate(optionGroup) {
-    return `<div class="d-flex align-items-center gap-2"><span class="fg-body fs-5">${optionGroup.flag}</span><span>${optionGroup.label}</span></div>`
+    return `<div class="d-flex align-items-center gap-3"><span class="fg-body fs-5">${optionGroup.flag}</span><span>${optionGroup.label}</span></div>`
   },
   pickerIcon: true,
   placeholder: 'Select city',

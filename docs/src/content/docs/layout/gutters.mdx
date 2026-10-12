@@ -14,15 +14,15 @@ description: "Gutters are the padding between your columns, used to responsively
 
 ## Horizontal gutters
 
-`.gx-*` classes can be used to control the horizontal gutter widths. The `.container` or `.container-fluid` parent may need to be adjusted if larger gutters are used too to avoid unwanted overflow, using a matching padding utility. For example, in the following example we've increased the padding with `.px-4`:
+`.gx-*` classes can be used to control the horizontal gutter widths. The `.container` or `.container-fluid` parent may need to be adjusted if larger gutters are used too to avoid unwanted overflow, using a matching padding utility. For example, in the following example we've increased the padding with `.px-5`:
 
-<Example class="docs-example-cols" code={`<div class="container px-4 text-center">
-    <div class="row gx-5">
+<Example class="docs-example-cols" code={`<div class="container px-5 text-center">
+    <div class="row gx-6">
       <div class="col">
-       <div class="p-3 border bg-4">Custom column padding</div>
+       <div class="p-4 border bg-4">Custom column padding</div>
       </div>
       <div class="col">
-        <div class="p-3 border bg-4">Custom column padding</div>
+        <div class="p-4 border bg-4">Custom column padding</div>
       </div>
     </div>
   </div>`} />
@@ -30,12 +30,12 @@ description: "Gutters are the padding between your columns, used to responsively
 An alternative solution is to add a wrapper around the `.row` with the `.overflow-hidden` class:
 
 <Example class="docs-example-cols" code={`<div class="container overflow-hidden text-center">
-    <div class="row gx-5">
+    <div class="row gx-6">
       <div class="col">
-       <div class="p-3 border bg-4">Custom column padding</div>
+       <div class="p-4 border bg-4">Custom column padding</div>
       </div>
       <div class="col">
-        <div class="p-3 border bg-4">Custom column padding</div>
+        <div class="p-4 border bg-4">Custom column padding</div>
       </div>
     </div>
   </div>`} />
@@ -45,18 +45,18 @@ An alternative solution is to add a wrapper around the `.row` with the `.overflo
 `.gy-*` classes can be used to control the vertical gutter widths. Like the horizontal gutters, the vertical gutters can cause some overflow below the `.row` at the end of a page. If this occurs, you add a wrapper around `.row` with the `.overflow-hidden` class:
 
 <Example class="docs-example-cols" code={`<div class="container overflow-hidden text-center">
-    <div class="row gy-5">
+    <div class="row gy-6">
       <div class="col-6">
-        <div class="p-3 border bg-4">Custom column padding</div>
+        <div class="p-4 border bg-4">Custom column padding</div>
       </div>
       <div class="col-6">
-        <div class="p-3 border bg-4">Custom column padding</div>
+        <div class="p-4 border bg-4">Custom column padding</div>
       </div>
       <div class="col-6">
-        <div class="p-3 border bg-4">Custom column padding</div>
+        <div class="p-4 border bg-4">Custom column padding</div>
       </div>
       <div class="col-6">
-        <div class="p-3 border bg-4">Custom column padding</div>
+        <div class="p-4 border bg-4">Custom column padding</div>
       </div>
     </div>
   </div>`} />
@@ -66,18 +66,18 @@ An alternative solution is to add a wrapper around the `.row` with the `.overflo
 `.g-*` classes can be used to control the horizontal gutter widths, for the following example we use a smaller gutter width, so there won't be a need to add the `.overflow-hidden` wrapper class.
 
 <Example class="docs-example-cols" code={`<div class="container text-center">
-    <div class="row g-2">
+    <div class="row g-3">
       <div class="col-6">
-        <div class="p-3 border bg-4">Custom column padding</div>
+        <div class="p-4 border bg-4">Custom column padding</div>
       </div>
       <div class="col-6">
-        <div class="p-3 border bg-4">Custom column padding</div>
+        <div class="p-4 border bg-4">Custom column padding</div>
       </div>
       <div class="col-6">
-        <div class="p-3 border bg-4">Custom column padding</div>
+        <div class="p-4 border bg-4">Custom column padding</div>
       </div>
       <div class="col-6">
-        <div class="p-3 border bg-4">Custom column padding</div>
+        <div class="p-4 border bg-4">Custom column padding</div>
       </div>
     </div>
   </div>`} />
@@ -87,36 +87,36 @@ An alternative solution is to add a wrapper around the `.row` with the `.overflo
 Gutter classes can also be added to [row columns](/layout/grid/#row-columns). In the following example, we use responsive row columns and responsive gutter classes.
 
 <Example class="docs-example-cols" code={`<div class="container text-center">
-    <div class="row row-cols-2 row-cols-lg-5 g-2 g-lg-3">
+    <div class="row row-cols-2 row-cols-lg-5 g-3 g-lg-4">
       <div class="col">
-        <div class="p-3 border bg-4">Row column</div>
+        <div class="p-4 border bg-4">Row column</div>
       </div>
       <div class="col">
-        <div class="p-3 border bg-4">Row column</div>
+        <div class="p-4 border bg-4">Row column</div>
       </div>
       <div class="col">
-        <div class="p-3 border bg-4">Row column</div>
+        <div class="p-4 border bg-4">Row column</div>
       </div>
       <div class="col">
-        <div class="p-3 border bg-4">Row column</div>
+        <div class="p-4 border bg-4">Row column</div>
       </div>
       <div class="col">
-        <div class="p-3 border bg-4">Row column</div>
+        <div class="p-4 border bg-4">Row column</div>
       </div>
       <div class="col">
-        <div class="p-3 border bg-4">Row column</div>
+        <div class="p-4 border bg-4">Row column</div>
       </div>
       <div class="col">
-        <div class="p-3 border bg-4">Row column</div>
+        <div class="p-4 border bg-4">Row column</div>
       </div>
       <div class="col">
-        <div class="p-3 border bg-4">Row column</div>
+        <div class="p-4 border bg-4">Row column</div>
       </div>
       <div class="col">
-        <div class="p-3 border bg-4">Row column</div>
+        <div class="p-4 border bg-4">Row column</div>
       </div>
       <div class="col">
-        <div class="p-3 border bg-4">Row column</div>
+        <div class="p-4 border bg-4">Row column</div>
       </div>
     </div>
   </div>`} />
@@ -143,9 +143,16 @@ $grid-gutter-x: 1.5rem;
 $gutters: (
   0: 0,
   1: $spacer * .25,
-  2: $spacer * .5,
-  3: $spacer,
-  4: $spacer * 1.5,
-  5: $spacer * 3,
+  2: $spacer * .375,
+  3: $spacer * .5,
+  4: $spacer * .75,
+  5: $spacer,
+  6: $spacer * 1.25,
+  7: $spacer * 1.5,
+  8: $spacer * 1.75,
+  9: $spacer * 2,
+  10: $spacer * 2.25,
+  11: $spacer * 2.5,
+  12: $spacer * 3,
 );
 ```

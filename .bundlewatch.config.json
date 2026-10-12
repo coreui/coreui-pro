@@ -2,11 +2,11 @@
   "files": [
     {
       "path": "./dist/css/coreui-grid.css",
-      "maxSize": "11.5 kB"
+      "maxSize": "13.5 kB"
     },
     {
       "path": "./dist/css/coreui-grid.min.css",
-      "maxSize": "10.5 kB"
+      "maxSize": "12.25 kB"
     },
     {
       "path": "./dist/css/coreui-legacy.css",
@@ -26,19 +26,19 @@
     },
     {
       "path": "./dist/css/coreui-utilities.css",
-      "maxSize": "22 kB"
+      "maxSize": "24 kB"
     },
     {
       "path": "./dist/css/coreui-utilities.min.css",
-      "maxSize": "20.75 kB"
+      "maxSize": "22.5 kB"
     },
     {
       "path": "./dist/css/coreui.css",
-      "maxSize": "73.5 kB"
+      "maxSize": "75.75 kB"
     },
     {
       "path": "./dist/css/coreui.min.css",
-      "maxSize": "69.5 kB"
+      "maxSize": "71.5 kB"
     },
     {
       "path": "./dist/css/base.css",

@@ -38,7 +38,7 @@ The fix is one line, written by you, before either stylesheet: a single `@layer`
 Two decisions are baked into that file:
 
 - **One reset, not two.** `@import "tailwindcss"` also brings Preflight; the two explicit imports above bring Tailwind's theme and utilities and leave the reset out, because `base.css` already carries [Reboot](/content/reboot/). Two resets on one page never agree on form controls and headings.
-- **CoreUI's utilities stay out.** `coreui-utilities.css` is not imported. Nothing in a component depends on it, so the components render the same. If you do want both sets, import ours too — they share the `utilities` layer, and the later file wins on a name both define.
+- **CoreUI's utilities stay out.** `coreui-utilities.css` is not imported. Nothing in a component depends on it, so the components render the same. If you do want both sets, import ours too — they share the `utilities` layer, and the later file wins on a name both define. That includes the numbered spacing classes: `p-4` is `.75rem` in CoreUI and `1rem` in Tailwind, and only steps `0`, `1` and `12` give the same value in both.
 
 ## Class names both libraries use
 
@@ -83,7 +83,7 @@ Tailwind's utilities take their values from its `@theme` block, and a theme valu
 }
 ```
 
-`--spacing` is Tailwind's multiplier — `p-4` is four times it — and `--cui-spacer-1` is a quarter of `--cui-spacer`, so the two scales line up. Override `--cui-primary-base` on `:root` and both libraries repaint. Every token that can be mapped is listed on the [CSS variables](/customize/css-variables/) page.
+`--spacing` is Tailwind's multiplier — `p-4` is four times it — and `--cui-spacer-1` is a quarter of `--cui-spacer`, so Tailwind's spacing follows `--cui-spacer`. The step numbers do not line up with ours, so pick one set of spacing classes per page. Override `--cui-primary-base` on `:root` and both libraries repaint. Every token that can be mapped is listed on the [CSS variables](/customize/css-variables/) page.
 
 The other direction needs nothing: a component reads its color from the [theme slots](/customize/theme/) on the element, so `<button class="btn-solid theme-primary">` is themed the same way whether Tailwind is on the page or not, and a `.theme-brand` class of your own works next to Tailwind's `bg-*` classes.
 

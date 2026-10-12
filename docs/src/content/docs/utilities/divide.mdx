@@ -13,17 +13,17 @@ actions gets its separators without a border on the outer edges and without
 marking up the last item differently.
 
 <Example code={`<div class="divide-y border rounded">
-    <div class="p-2">First</div>
-    <div class="p-2">Second</div>
-    <div class="p-2">Third</div>
+    <div class="p-3">First</div>
+    <div class="p-3">Second</div>
+    <div class="p-3">Third</div>
   </div>`} />
 
 `divide-x` separates along the inline axis and follows the writing direction.
 
 <Example code={`<div class="d-flex divide-x border rounded">
-    <div class="p-2">First</div>
-    <div class="p-2">Second</div>
-    <div class="p-2">Third</div>
+    <div class="p-3">First</div>
+    <div class="p-3">Second</div>
+    <div class="p-3">Third</div>
   </div>`} />
 
 The dividers take the global `--cui-border-width`, `--cui-border-style`
@@ -33,9 +33,9 @@ Both are responsive, which is what makes a list that changes direction work: the
 dividers can switch axis at a breakpoint instead of being written twice.
 
 <Example code={`<div class="d-md-flex divide-y divide-y-md-0 divide-x-md border rounded">
-    <div class="p-2">First</div>
-    <div class="p-2">Second</div>
-    <div class="p-2">Third</div>
+    <div class="p-3">First</div>
+    <div class="p-3">Second</div>
+    <div class="p-3">Third</div>
   </div>`} />
 
 `divide-y` separates the stacked rows, `divide-y-md-0` removes those separators

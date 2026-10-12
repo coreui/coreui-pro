@@ -9,12 +9,12 @@ utility: ["shadow", "focus-ring"]
 
 While shadows on components are disabled by default in CoreUI for Bootstrap and can be enabled via `$enable-shadows`, you can also quickly add or remove a shadow with our `box-shadow` utility classes. Includes support for `.shadow-none` and five sizes, `.shadow-xs` to `.shadow-xl` (each with a matching `--cui-box-shadow-*` token).
 
-<Example code={`<div class="shadow-none p-3 mb-5 bg-4 rounded">No shadow</div>
-  <div class="shadow-xs p-3 mb-5 bg-body rounded">Extra small shadow</div>
-<div class="shadow-sm p-3 mb-5 bg-body rounded">Small shadow</div>
-  <div class="shadow p-3 mb-5 bg-body rounded">Regular shadow</div>
-  <div class="shadow-lg p-3 mb-5 bg-body rounded">Larger shadow</div>
-  <div class="shadow-xl p-3 mb-5 bg-body rounded">Extra large shadow</div>`} />
+<Example code={`<div class="shadow-none p-4 mb-6 bg-4 rounded">No shadow</div>
+  <div class="shadow-xs p-4 mb-6 bg-body rounded">Extra small shadow</div>
+<div class="shadow-sm p-4 mb-6 bg-body rounded">Small shadow</div>
+  <div class="shadow p-4 mb-6 bg-body rounded">Regular shadow</div>
+  <div class="shadow-lg p-4 mb-6 bg-body rounded">Larger shadow</div>
+  <div class="shadow-xl p-4 mb-6 bg-body rounded">Extra large shadow</div>`} />
 
 ## Color
 
@@ -22,17 +22,17 @@ While shadows on components are disabled by default in CoreUI for Bootstrap and 
 
 A shadow does not have to be grey. Add a `.shadow-{color}` class next to the size class to tint it — the size class supplies the geometry, the colour class supplies the hue.
 
-<Example code={`<div class="d-flex flex-wrap gap-4">
-    <div class="shadow shadow-primary p-3 bg-body rounded">Primary</div>
-    <div class="shadow shadow-success p-3 bg-body rounded">Success</div>
-    <div class="shadow shadow-danger p-3 bg-body rounded">Danger</div>
-    <div class="shadow shadow-current p-3 bg-body rounded fg-info">Current color</div>
+<Example code={`<div class="d-flex flex-wrap gap-5">
+    <div class="shadow shadow-primary p-4 bg-body rounded">Primary</div>
+    <div class="shadow shadow-success p-4 bg-body rounded">Success</div>
+    <div class="shadow shadow-danger p-4 bg-body rounded">Danger</div>
+    <div class="shadow shadow-current p-4 bg-body rounded fg-info">Current color</div>
   </div>`} />
 
 The tint does not reach nested shadows: an element inside a `.shadow-primary` box draws its own shadow in the default colour, so a tinted card does not silently recolour everything inside it.
 
-<Example code={`<div class="shadow shadow-primary p-5 bg-body rounded">
-    <div class="shadow p-3 bg-body rounded">Untinted, inside a tinted parent</div>
+<Example code={`<div class="shadow shadow-primary p-6 bg-body rounded">
+    <div class="shadow p-4 bg-body rounded">Untinted, inside a tinted parent</div>
   </div>`} />
 
 ## Opacity
@@ -41,11 +41,11 @@ The tint does not reach nested shadows: an element inside a `.shadow-primary` bo
 
 `.shadow-opacity-{10…100}`, in steps of ten, scales the shadow without touching its colour or geometry, which is the usual way to soften a shadow on a busy surface. `.shadow-opacity-25` and `-75` are deprecated v5 steps, removed in v7.
 
-<Example code={`<div class="d-flex flex-wrap gap-4">
-    <div class="shadow shadow-opacity-30 p-3 bg-body rounded">30%</div>
-    <div class="shadow shadow-opacity-50 p-3 bg-body rounded">50%</div>
-    <div class="shadow shadow-opacity-70 p-3 bg-body rounded">70%</div>
-    <div class="shadow shadow-opacity-100 p-3 bg-body rounded">100%</div>
+<Example code={`<div class="d-flex flex-wrap gap-5">
+    <div class="shadow shadow-opacity-30 p-4 bg-body rounded">30%</div>
+    <div class="shadow shadow-opacity-50 p-4 bg-body rounded">50%</div>
+    <div class="shadow shadow-opacity-70 p-4 bg-body rounded">70%</div>
+    <div class="shadow shadow-opacity-100 p-4 bg-body rounded">100%</div>
   </div>`} />
 
 ## Customizing

@@ -182,7 +182,7 @@ The field is a `.form-control.list-box-search` carrying `data-coreui-list-box-se
 The built-in search field is not the only way in. `filter(query)` runs the same text filter from wherever you like — a field elsewhere on the page, a chip bar, a URL parameter — and everything downstream follows it: the arrows skip what is hidden, a section left without a match is hidden with its label, the select-all button takes only what is on screen, and the empty state appears when nothing is left. `filter(null)` clears it and shows every option again. The selection is untouched throughout: filter a selected value out and it stays selected, it just leaves the list.
 
 <Example code={`<label for="listBoxOwnField" class="form-label">Fruit</label>
-  <input type="search" class="form-control mb-2" id="listBoxOwnField" autocomplete="off" style="max-width: 20rem">
+  <input type="search" class="form-control mb-3" id="listBoxOwnField" autocomplete="off" style="max-width: 20rem">
   <div class="list-box" id="listBoxOwnFieldList" style="max-width: 20rem">
     <div class="list-box-header">
       <button type="button" class="list-box-select-all" data-coreui-select-all>Select all</button>
@@ -195,7 +195,7 @@ The built-in search field is not the only way in. `filter(query)` runs the same 
       <div class="list-box-empty">No fruit matches</div>
     </div>
   </div>
-  <button type="button" class="btn btn-secondary mt-2" id="listBoxOwnFieldReset">Clear the filter</button>`} sandboxJs={listBoxFilter} />
+  <button type="button" class="btn btn-secondary mt-3" id="listBoxOwnFieldReset">Clear the filter</button>`} sandboxJs={listBoxFilter} />
 
 <Code code={listBoxFilter} lang="js" />
 
@@ -354,7 +354,7 @@ A `.list-box-empty` element inside the options is shown whenever nothing is left
 Pass `activeDescendant` an input and the focus never leaves it: the plugin drops the roving `tabindex`, gives every option an `id`, and keeps `aria-activedescendant` and `aria-controls` on the field pointing at the highlighted option and at `.list-box-options` while the list is in the document: a list out of the document, such as a closed combobox panel, leaves the field without them from its next update, and the field gets them back when it takes the focus or the list updates in place. The arrows and <kbd>Enter</kbd> are handled on the field, so typing and choosing happen in one place — a combobox in two elements. A text field keeps <kbd>Home</kbd>, <kbd>End</kbd> and the space bar for its own text; give `activeDescendant` a non-text element (a button, a `tabindex` div) and those select instead. Hiding an option with `hidden`, or calling `filter()`, takes it out of the navigation and leaves the selection alone.
 
 <Example code={`<label for="listBoxField" class="form-label">Filter</label>
-  <input type="text" class="form-control mb-2" id="listBoxField" role="combobox" aria-expanded="true" autocomplete="off" style="max-width: 20rem">
+  <input type="text" class="form-control mb-3" id="listBoxField" role="combobox" aria-expanded="true" autocomplete="off" style="max-width: 20rem">
   <div class="list-box" id="listBoxWithInput" style="max-width: 20rem">
     <div class="list-box-options" role="listbox" aria-label="Sandwich">
       <div class="list-box-option" data-coreui-value="lettuce">Lettuce</div>
@@ -363,7 +363,7 @@ Pass `activeDescendant` an input and the focus never leaves it: the plugin drops
       <div class="list-box-option" data-coreui-value="cheese">Cheese</div>
     </div>
   </div>
-  <p class="mt-2 mb-0">Selected: <span id="listBoxFieldOutput">nothing</span></p>`} sandboxJs={listBoxInput} />
+  <p class="mt-3 mb-0">Selected: <span id="listBoxFieldOutput">nothing</span></p>`} sandboxJs={listBoxInput} />
 
 <Code code={listBoxInput} lang="js" />
 

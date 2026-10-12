@@ -329,7 +329,7 @@ Group options in a `.list-box-section` and name it with a `.list-box-section-lab
 
 The toggle carries `.form-control`, so `.form-control-sm` and `.form-control-lg` reach it unchanged and it stands exactly as tall as a text input of the same size.
 
-<Example code={`<button class="form-control form-control-sm combobox-toggle mb-3" type="button"
+<Example code={`<button class="form-control form-control-sm combobox-toggle mb-4" type="button"
       data-coreui-toggle="combobox"
       data-coreui-placeholder="Small select…">
   </button>
@@ -342,7 +342,7 @@ The toggle carries `.form-control`, so `.form-control-sm` and `.form-control-lg`
     </div>
   </div>
 
-  <button class="form-control combobox-toggle mb-3" type="button"
+  <button class="form-control combobox-toggle mb-4" type="button"
       data-coreui-toggle="combobox"
       data-coreui-placeholder="Default select…">
   </button>
@@ -372,7 +372,7 @@ The toggle carries `.form-control`, so `.form-control-sm` and `.form-control-lg`
 
 Set `data-coreui-disabled="true"` (or the `disabled` option) to turn the whole control off: the panel never opens, the list box is disabled with it, and a button toggle gets the `disabled` attribute. A single option opts out with `.disabled` and `aria-disabled="true"`, which takes it out of the keyboard order and out of every selection method.
 
-<Example code={`<button class="form-control combobox-toggle mb-3" type="button"
+<Example code={`<button class="form-control combobox-toggle mb-4" type="button"
       data-coreui-toggle="combobox"
       data-coreui-placeholder="Cannot interact…" data-coreui-disabled="true">
   </button>
@@ -423,7 +423,7 @@ In `multiple` mode three selections post `country=us&country=uk&country=ca`, so 
 
 The hidden `<select>` takes part in the browser's validation, so `required` blocks the submit while nothing is selected. When a validation reports it, the plugin lays it along the start of the toggle, so the browser shows its message under the combobox, and the focus it gets goes to the toggle. The state shows on the toggle as the `.is-*` class, and the message that follows the toggle is added to its `aria-describedby` while the state is `'invalid'`.
 
-<Example code={`<form class="row g-3" data-coreui-validate novalidate>
+<Example code={`<form class="row g-4" data-coreui-validate novalidate>
     <div class="col-md-6">
       <label for="cbValidationCountry" class="form-label">Country (required)</label>
       <button class="form-control combobox-toggle" type="button" id="cbValidationCountry"

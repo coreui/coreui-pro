@@ -178,7 +178,7 @@ describe('range track press', () => {
   })
 
   it('stacks the thumbs on one track despite the padding of the wrapper', () => {
-    const { inputs } = mount({ className: 'px-4 pt-4' })
+    const { inputs } = mount({ className: 'px-5 pt-5' })
     const [first, second] = inputs.map(input => input.getBoundingClientRect())
 
     expect([second.left, second.top, second.width]).toEqual([first.left, first.top, first.width])

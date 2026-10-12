@@ -334,7 +334,7 @@ Trigger dropdown menus at the left of the elements by adding `.dropstart` to the
 
 The direction classes above pick one of six fixed positions. `data-coreui-placement` on the toggle takes the same values the [Menu](/components/menu/#placement) takes — physical (`top`, `bottom`, `left`, `right`), logical (`start`, `end`, which mirror in RTL) and every `-start`/`-end` alignment — and it wins over the wrapper classes when both are present. Breakpoint prefixes make it responsive: `bottom-start md:top-end` reads as bottom-start below `md` and top-end from `md` up.
 
-<Example class="d-flex gap-2" code={`<div class="dropdown">
+<Example class="d-flex gap-3" code={`<div class="dropdown">
     <button type="button" class="btn-solid theme-secondary dropdown-toggle" data-coreui-toggle="dropdown" data-coreui-placement="top-end" aria-expanded="false">
       Top end
     </button>
@@ -557,7 +557,7 @@ Separate groups of related menu items with a divider.
 
 Place any freeform text within a dropdown menu with text and use [spacing utilities](/utilities/margin/). Note that you'll likely need additional sizing styles to constrain the menu width.
 
-<Example code={`<div class="dropdown-menu p-4 fg-2" style="max-width: 200px;">
+<Example code={`<div class="dropdown-menu p-5 fg-2" style="max-width: 200px;">
     <p>
       Some example text that's free-flowing within the dropdown menu.
     </p>
@@ -571,16 +571,16 @@ Place any freeform text within a dropdown menu with text and use [spacing utilit
 Put a form within a dropdown menu, or make it into a dropdown menu, and use [margin or padding utilities](/utilities/margin/) to give it the negative space you require.
 
 <Example code={`<div class="dropdown-menu">
-    <form class="px-4 py-3">
-      <div class="mb-3">
+    <form class="px-5 py-4">
+      <div class="mb-4">
         <label for="exampleDropdownFormEmail1" class="form-label">Email address</label>
         <input type="email" class="form-control" id="exampleDropdownFormEmail1" placeholder="email@example.com">
       </div>
-      <div class="mb-3">
+      <div class="mb-4">
         <label for="exampleDropdownFormPassword1" class="form-label">Password</label>
         <input type="password" class="form-control" id="exampleDropdownFormPassword1" placeholder="Password">
       </div>
-      <div class="mb-3">
+      <div class="mb-4">
         <div class="form-field">
           <input type="checkbox" class="check" id="dropdownCheck">
           <label for="dropdownCheck">
@@ -599,16 +599,16 @@ Put a form within a dropdown menu, or make it into a dropdown menu, and use [mar
     <button type="button" class="btn-solid theme-primary dropdown-toggle" data-coreui-toggle="dropdown" aria-expanded="false" data-coreui-auto-close="outside">
       Dropdown form
     </button>
-    <form class="dropdown-menu p-4">
-      <div class="mb-3">
+    <form class="dropdown-menu p-5">
+      <div class="mb-4">
         <label for="exampleDropdownFormEmail2" class="form-label">Email address</label>
         <input type="email" class="form-control" id="exampleDropdownFormEmail2" placeholder="email@example.com">
       </div>
-      <div class="mb-3">
+      <div class="mb-4">
         <label for="exampleDropdownFormPassword2" class="form-label">Password</label>
         <input type="password" class="form-control" id="exampleDropdownFormPassword2" placeholder="Password">
       </div>
-      <div class="mb-3">
+      <div class="mb-4">
         <div class="form-field">
           <input type="checkbox" class="check" id="dropdownCheck2">
           <label for="dropdownCheck2">
@@ -744,7 +744,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
-| `autoClose` | boolean, string | `true` | Configure the auto close behavior of the dropdown: <ul class="my-2"><li>`true` - the dropdown will be closed by clicking outside or inside the dropdown menu.</li><li>`false` - the dropdown will be closed by clicking the toggle button and manually calling `hide` or `toggle` method. (Also will not be closed by pressing <kbd>esc</kbd> key)</li><li>`'inside'` - the dropdown will be closed (only) by clicking inside the dropdown menu.</li>  <li>`'outside'` - the dropdown will be closed (only) by clicking outside the dropdown menu.</li></ul> Note: the dropdown can always be closed with the <kbd>ESC</kbd> key |
+| `autoClose` | boolean, string | `true` | Configure the auto close behavior of the dropdown: <ul class="my-3"><li>`true` - the dropdown will be closed by clicking outside or inside the dropdown menu.</li><li>`false` - the dropdown will be closed by clicking the toggle button and manually calling `hide` or `toggle` method. (Also will not be closed by pressing <kbd>esc</kbd> key)</li><li>`'inside'` - the dropdown will be closed (only) by clicking inside the dropdown menu.</li>  <li>`'outside'` - the dropdown will be closed (only) by clicking outside the dropdown menu.</li></ul> Note: the dropdown can always be closed with the <kbd>ESC</kbd> key |
 | `boundary` | string, element | `'clippingParents'` | Overflow constraint boundary of the dropdown menu. By default it's `clippingParents` and can accept an HTMLElement reference (via JavaScript only). For more information refer to Floating UI's [detectOverflow docs](https://floating-ui.com/docs/detectOverflow/#boundary). |
 | `container` | string, element, boolean | `false` | Appends the dropdown menu to a specific element when shown. Use `'body'` or `true` to append to the document body, which helps escape containers with `overflow: hidden`. The menu is moved back to its original position when hidden. Inside a modal dialog it goes into the dialog instead, because the rest of the page is inert. |
 | `display` | string | `'dynamic'` | By default, we use Floating UI for dynamic positioning. Disable this with `static`. |

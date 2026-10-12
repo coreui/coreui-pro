@@ -145,7 +145,7 @@ For example, `data-coreui-placement="bottom-start md:bottom-end lg:end-start"` w
 - Switch to `bottom-end` at the `md` breakpoint
 - Switch to `right-start` at the `lg` breakpoint
 
-<Example class="d-flex flex-column flex-lg-row gap-2" code={`<button class="btn-solid theme-secondary" type="button" data-coreui-toggle="menu" data-coreui-placement="bottom-start md:bottom-end" aria-expanded="false">
+<Example class="d-flex flex-column flex-lg-row gap-3" code={`<button class="btn-solid theme-secondary" type="button" data-coreui-toggle="menu" data-coreui-placement="bottom-start md:bottom-end" aria-expanded="false">
     Bottom start → md:bottom-end
   </button>
   <div class="menu">
@@ -218,7 +218,7 @@ Add `.disabled` to items in the menu to style them as disabled.
 
 Colour an individual item with a [`.theme-*` class](/customize/components/#theme-variants). The item reads the theme's foreground while at rest and swaps to the theme's fill with a contrasting label once it is `.active`, so one class covers both states.
 
-<Example class="hstack gap-3" code={`<div class="menu show position-static">
+<Example class="hstack gap-4" code={`<div class="menu show position-static">
     <a class="menu-item theme-primary" href="#">Primary link</a>
     <a class="menu-item theme-secondary" href="#">Secondary link</a>
     <a class="menu-item theme-success" href="#">Success link</a>
@@ -343,7 +343,7 @@ Separate groups of related menu items with a divider.
 
 Place any freeform text within a menu with text and use [spacing utilities](/utilities/margin/). Note that you’ll likely need additional sizing styles to constrain the menu width.
 
-<Example code={`<div class="menu show position-static p-3 fg-2"
+<Example code={`<div class="menu show position-static p-4 fg-2"
        style="--cui-menu-min-width: 240px;">
     <p>
       Some example text that’s free-flowing within the menu.
@@ -359,7 +359,7 @@ Put a form within a menu, or make it into a menu, and use [spacing utilities](/u
 
 <Example code={`<div class="menu show position-static"
        style="--cui-menu-min-width: 300px;">
-    <form class="d-flex flex-column gap-3 p-3">
+    <form class="d-flex flex-column gap-4 p-4">
       <div>
         <label for="exampleMenuFormEmail1" class="form-label">Email address</label>
         <input type="email" class="form-control" id="exampleMenuFormEmail1" placeholder="email@example.com">
@@ -372,7 +372,7 @@ Put a form within a menu, or make it into a menu, and use [spacing utilities](/u
         <input type="checkbox" id="checkLabel" class="check" />
         <label for="checkLabel">Example new checkbox</label>
       </div>
-      <div class="vstack gap-2">
+      <div class="vstack gap-3">
         <button type="submit" class="btn-solid theme-primary">Sign in</button>
         <a class="btn-ghost theme-secondary" href="#">New around here? Sign up</a>
         <a class="btn-ghost theme-secondary" href="#">Forgot password?</a>
@@ -497,7 +497,7 @@ By default, the menu is closed when clicking inside or outside the menu. You can
 
 Regardless of the `autoClose` setting, pressing <kbd>Esc</kbd> while focus is within the menu (its toggle or items) closes the menu and returns focus to the toggle.
 
-<Example class="d-flex flex-wrap gap-2" code={`<div class="btn-group">
+<Example class="d-flex flex-wrap gap-3" code={`<div class="btn-group">
     <button class="btn-solid theme-secondary" type="button" data-coreui-toggle="menu" data-coreui-auto-close="true" aria-expanded="false">
       Default menu
     </button>
@@ -614,7 +614,7 @@ menu.toggle()
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
-| `autoClose` | boolean, string | `true` | Configure the auto close behavior of the menu: <ul class="my-2"><li>`true` - the menu will be closed by clicking outside or inside the menu.</li><li>`false` - the menu will be closed by clicking the toggle button and manually calling `hide` or `toggle` method. (Also will not be closed by pressing <kbd>Esc</kbd> key)</li><li>`'inside'` - the menu will be closed (only) by clicking inside the menu.</li> <li>`'outside'` - the menu will be closed (only) by clicking outside the menu.</li></ul> Note: the menu can always be closed with the <kbd>Esc</kbd> key. |
+| `autoClose` | boolean, string | `true` | Configure the auto close behavior of the menu: <ul class="my-3"><li>`true` - the menu will be closed by clicking outside or inside the menu.</li><li>`false` - the menu will be closed by clicking the toggle button and manually calling `hide` or `toggle` method. (Also will not be closed by pressing <kbd>Esc</kbd> key)</li><li>`'inside'` - the menu will be closed (only) by clicking inside the menu.</li> <li>`'outside'` - the menu will be closed (only) by clicking outside the menu.</li></ul> Note: the menu can always be closed with the <kbd>Esc</kbd> key. |
 | `boundary` | string, element | `'clippingParents'` | Overflow constraint boundary of the menu (applies only to the shift middleware). By default it’s `clippingParents` and can accept an HTMLElement reference (via JavaScript only). For more information refer to Floating UI’s [shift docs](https://floating-ui.com/docs/shift). |
 | `container` | string, element, boolean | `false` | Appends the menu to a specific element when shown. Use `'body'` or `true` to append to the document body, which helps escape containers with `overflow: hidden`. The menu is moved back to its original position when hidden. Inside a modal dialog it goes into the dialog instead, because the rest of the page is inert. |
 | `display` | string | `'dynamic'` | By default, we use Floating UI for dynamic positioning. Disable this with `static`. |

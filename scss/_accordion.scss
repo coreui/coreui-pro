@@ -30,7 +30,7 @@ $accordion-tokens: defaults(
     --#{$prefix}accordion-border-color: var(--#{$prefix}border-color),
     --#{$prefix}accordion-border-width: var(--#{$prefix}border-width),
     --#{$prefix}accordion-border-radius: var(--#{$prefix}radius-7),
-    --#{$prefix}accordion-gap: var(--#{$prefix}spacer-2),
+    --#{$prefix}accordion-gap: var(--#{$prefix}spacer-3),
     --#{$prefix}accordion-header-color: var(--#{$prefix}fg-2),
     --#{$prefix}accordion-header-bg: var(--#{$prefix}accordion-bg),
     --#{$prefix}accordion-header-icon: #{escape-svg(url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-linecap='round' stroke-linejoin='round'><path d='m2 5 6 6 6-6'/></svg>"))},

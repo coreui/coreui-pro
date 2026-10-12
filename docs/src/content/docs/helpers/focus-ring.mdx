@@ -12,7 +12,7 @@ The `.focus-ring` helper replaces the browser's default focus indicator with one
 
 Tab to the link below to see the focus ring. Clicking it will not show one — the helper styles `:focus-visible`, which the browser reserves for keyboard focus.
 
-<Example code={`<a href="#" class="d-inline-flex focus-ring py-1 px-2 text-decoration-none border rounded-2">
+<Example code={`<a href="#" class="d-inline-flex focus-ring py-1 px-3 text-decoration-none border rounded-2">
     Custom focus ring
   </a>`} />
 
@@ -20,7 +20,7 @@ Tab to the link below to see the focus ring. Clicking it will not show one — t
 
 Pair `.focus-ring` with a [theme color](/customize/theme/) class to recolour the ring. The helper reads `--cui-theme-focus-ring`, which every `.theme-*` class sets, so the ring follows the element's theme rather than needing its own class.
 
-<Example class="vstack gap-2 align-items-start" code={getData('theme-colors').map((c) => `<a href="#" class="d-inline-flex focus-ring theme-${c.name} py-1 px-2 text-decoration-none border rounded-2">${c.title} focus</a>`)} />
+<Example class="vstack gap-3 align-items-start" code={getData('theme-colors').map((c) => `<a href="#" class="d-inline-flex focus-ring theme-${c.name} py-1 px-3 text-decoration-none border rounded-2">${c.title} focus</a>`)} />
 
 Use this when the element already carries a theme; reach for the `.focus-ring-*` utilities below when you only want to change the ring.
 
@@ -32,7 +32,7 @@ Modify the styling of a focus ring with our CSS variables, Sass variables, utili
 
 Modify the `--cui-focus-ring-*` CSS variables as needed to change the default appearance.
 
-<Example code={`<a href="#" class="d-inline-flex focus-ring py-1 px-2 text-decoration-none border rounded-2" style="--cui-focus-ring-color: color-mix(in srgb, var(--cui-success-base) 25%, transparent)">
+<Example code={`<a href="#" class="d-inline-flex focus-ring py-1 px-3 text-decoration-none border rounded-2" style="--cui-focus-ring-color: color-mix(in srgb, var(--cui-success-base) 25%, transparent)">
     Green focus ring
   </a>`} />
 
@@ -45,7 +45,7 @@ it stays visible inside scroll containers, where a `box-shadow` ring was cut off
 Push it away from the element with `--cui-focus-ring-offset`, which defaults to
 `0`:
 
-<Example code={`<a href="#" class="d-inline-flex focus-ring py-1 px-2 text-decoration-none border rounded-2" style="--cui-focus-ring-offset: 4px">
+<Example code={`<a href="#" class="d-inline-flex focus-ring py-1 px-3 text-decoration-none border rounded-2" style="--cui-focus-ring-offset: 4px">
     Offset focus ring
   </a>`} />
 
@@ -53,7 +53,7 @@ Push it away from the element with `--cui-focus-ring-offset`, which defaults to
 
 In addition to `.focus-ring`, we have several `.focus-ring-*` utilities to modify the helper class defaults. Modify the color with any of our [theme colors](/customize/color/#theme-colors). Note that the light and dark variants may not be visible on all background colors given current color mode support.
 
-<Example code={getData('theme-colors').map((c) => `<p><a href="#" class="d-inline-flex focus-ring focus-ring-${c.name} py-1 px-2 text-decoration-none border rounded-2">${c.title} focus</a></p>`)} />
+<Example code={getData('theme-colors').map((c) => `<p><a href="#" class="d-inline-flex focus-ring focus-ring-${c.name} py-1 px-3 text-decoration-none border rounded-2">${c.title} focus</a></p>`)} />
 
 Focus ring utilities are declared in our utilities API in `scss/_utilities.scss`. [Learn how to use the utilities API.](/utilities/api/#using-the-api)
 
