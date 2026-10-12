@@ -30,7 +30,7 @@ $dropdown-tokens: defaults(
     --#{$prefix}dropdown-border-radius: var(--#{$prefix}radius-7),
     --#{$prefix}dropdown-border-width: var(--#{$prefix}border-width),
     --#{$prefix}dropdown-divider-bg: #{$dropdown-border-color},
-    --#{$prefix}dropdown-divider-margin-y: var(--#{$prefix}spacer-2),
+    --#{$prefix}dropdown-divider-margin-y: var(--#{$prefix}spacer-3),
     --#{$prefix}dropdown-box-shadow: var(--#{$prefix}box-shadow),
     --#{$prefix}dropdown-link-color: var(--#{$prefix}fg-body),
     --#{$prefix}dropdown-link-hover-color: var(--#{$prefix}fg-body),

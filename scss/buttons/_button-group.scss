@@ -68,7 +68,7 @@ $group-toggle-input: "input.btn-check" !default;
   .btn-toolbar {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--#{$prefix}spacer-2);
+    gap: var(--#{$prefix}spacer-3);
     justify-content: flex-start;
 
     .input-group {

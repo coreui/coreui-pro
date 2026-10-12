@@ -17,50 +17,50 @@ See [Theme](/customize/theme/) for how the slots resolve and how to add a color 
 
 `.theme-contrast` fills with the solid theme color and sets the text to the color that reads on it — the pairing behind solid component variants:
 
-<Example class="d-grid gap-2" code={getData('theme-colors').map((c) => `<div class="p-2 theme-${c.name} theme-contrast">.theme-${c.name} .theme-contrast</div>`)} />
+<Example class="d-grid gap-3" code={getData('theme-colors').map((c) => `<div class="p-3 theme-${c.name} theme-contrast">.theme-${c.name} .theme-contrast</div>`)} />
 
 ### Subtle
 
 `.theme-subtle` uses the theme's subtle surface with its readable foreground. The pairing adjusts to the color mode on its own:
 
-<Example class="d-grid gap-2" code={getData('theme-colors').map((c) => `<div class="p-2 theme-${c.name} theme-subtle">.theme-${c.name} .theme-subtle</div>`)} />
+<Example class="d-grid gap-3" code={getData('theme-colors').map((c) => `<div class="p-3 theme-${c.name} theme-subtle">.theme-${c.name} .theme-subtle</div>`)} />
 
 And with `.theme-border`:
 
-<Example class="d-grid gap-2" code={getData('theme-colors').map((c) => `<div class="p-2 theme-${c.name} theme-subtle theme-border">.theme-${c.name} .theme-subtle .theme-border</div>`)} />
+<Example class="d-grid gap-3" code={getData('theme-colors').map((c) => `<div class="p-3 theme-${c.name} theme-subtle theme-border">.theme-${c.name} .theme-subtle .theme-border</div>`)} />
 
 ### Muted
 
 `.theme-muted` uses the theme's muted surface with its emphasis foreground, for the quietest of the three pairings:
 
-<Example class="d-grid gap-2" code={getData('theme-colors').map((c) => `<div class="p-2 theme-${c.name} theme-muted">.theme-${c.name} .theme-muted</div>`)} />
+<Example class="d-grid gap-3" code={getData('theme-colors').map((c) => `<div class="p-3 theme-${c.name} theme-muted">.theme-${c.name} .theme-muted</div>`)} />
 
 ## Comparison
 
 All three pairings side by side, per theme color:
 
-<Example code={getData('theme-colors').map((c) => `<div class="d-flex gap-2 mb-2">
-    <div class="theme-${c.name} theme-contrast p-3 flex-fill text-center rounded">${c.title}</div>
-    <div class="theme-${c.name} theme-subtle p-3 flex-fill text-center rounded">${c.title}</div>
-    <div class="theme-${c.name} theme-muted p-3 flex-fill text-center rounded">${c.title}</div>
+<Example code={getData('theme-colors').map((c) => `<div class="d-flex gap-3 mb-3">
+    <div class="theme-${c.name} theme-contrast p-4 flex-fill text-center rounded">${c.title}</div>
+    <div class="theme-${c.name} theme-subtle p-4 flex-fill text-center rounded">${c.title}</div>
+    <div class="theme-${c.name} theme-muted p-4 flex-fill text-center rounded">${c.title}</div>
   </div>`)} />
 
 ## Mixing colors
 
 Each element carries its own `.theme-{color}`, so siblings can differ — the utility reads whichever theme is in scope:
 
-<Example code={`<div class="d-flex gap-2">
-    <div class="theme-success theme-contrast p-3 rounded">Success</div>
-    <div class="theme-warning theme-contrast p-3 rounded">Warning</div>
-    <div class="theme-danger theme-contrast p-3 rounded">Danger</div>
+<Example code={`<div class="d-flex gap-3">
+    <div class="theme-success theme-contrast p-4 rounded">Success</div>
+    <div class="theme-warning theme-contrast p-4 rounded">Warning</div>
+    <div class="theme-danger theme-contrast p-4 rounded">Danger</div>
   </div>`} />
 
 The theme can also come from any element above, so one wrapper themes every pairing inside it:
 
-<Example code={`<div class="theme-primary d-flex gap-2">
-    <div class="theme-contrast p-3 rounded">Contrast</div>
-    <div class="theme-subtle p-3 rounded">Subtle</div>
-    <div class="theme-muted p-3 rounded">Muted</div>
+<Example code={`<div class="theme-primary d-flex gap-3">
+    <div class="theme-contrast p-4 rounded">Contrast</div>
+    <div class="theme-subtle p-4 rounded">Subtle</div>
+    <div class="theme-muted p-4 rounded">Muted</div>
   </div>`} />
 
 ## Reset
@@ -69,7 +69,7 @@ The theme can also come from any element above, so one wrapper themes every pair
 
 `.theme-reset` drops the theme a subtree inherits: it sets every `--cui-theme-*` slot back to `initial`, so components and utilities below it fall back to their defaults.
 
-<Example code={`<div class="theme-primary p-3 rounded">
+<Example code={`<div class="theme-primary p-4 rounded">
     <span class="badge">Primary badge</span>
     <span class="badge theme-reset">Default badge</span>
   </div>`} />

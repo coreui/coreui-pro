@@ -12,7 +12,7 @@ Wrap a `<label>` and an `<input class="form-control" />` in `.form-floating` to 
 
 Write the `<label>` first, so a screen reader announces it before the field's value. The v5 order — control first, label after — keeps working: every state is matched in both directions, forward with `:has()` and backward with the sibling combinator.
 
-<Example code={`<div class="form-floating mb-3">
+<Example code={`<div class="form-floating mb-4">
     <label for="floatingInput">Email address</label>
     <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
   </div>
@@ -69,15 +69,15 @@ Other than `.form-control`, floating labels are only available on `.form-control
 
 Add the `disabled` boolean attribute on an input, a textarea or a select to give it a grayed out appearance, remove pointer events, and prevent focusing.
 
-<Example code={`<div class="form-floating mb-3">
+<Example code={`<div class="form-floating mb-4">
     <label for="floatingInputDisabled">Email address</label>
     <input type="email" class="form-control" id="floatingInputDisabled" placeholder="name@example.com" disabled>
   </div>
-  <div class="form-floating mb-3">
+  <div class="form-floating mb-4">
     <label for="floatingTextareaDisabled">Comments</label>
     <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextareaDisabled" disabled></textarea>
   </div>
-  <div class="form-floating mb-3">
+  <div class="form-floating mb-4">
     <label for="floatingTextarea2Disabled">Comments</label>
     <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea2Disabled" style="height: 100px" disabled>Disabled textarea with some text inside</textarea>
   </div>
@@ -95,11 +95,11 @@ Add the `disabled` boolean attribute on an input, a textarea or a select to give
 
 Floating labels also support `.form-control-plaintext`, which can be helpful for toggling from an editable `<input />` to a plaintext value without affecting the page layout.
 
-<Example code={`<div class="form-floating mb-3">
+<Example code={`<div class="form-floating mb-4">
     <label for="floatingEmptyPlaintextInput">Empty input</label>
     <input type="email" readonly class="form-control-plaintext" id="floatingEmptyPlaintextInput" placeholder="name@example.com">
   </div>
-  <div class="form-floating mb-3">
+  <div class="form-floating mb-4">
     <label for="floatingPlaintextInput">Input with value</label>
     <input type="email" readonly class="form-control-plaintext" id="floatingPlaintextInput" placeholder="name@example.com" value="name@example.com">
   </div>`} />
@@ -108,7 +108,7 @@ Floating labels also support `.form-control-plaintext`, which can be helpful for
 
 Floating labels also support `.input-group` — put the `.form-floating` next to the other addons:
 
-<Example code={`<div class="input-group mb-3">
+<Example code={`<div class="input-group mb-4">
     <span class="input-group-text">@</span>
     <div class="form-floating">
       <label for="floatingInputGroup1">Username</label>
@@ -135,7 +135,7 @@ When using `.input-group` and `.form-floating` along with form validation, wrap 
 
 When working with the CoreUI for Bootstrap grid system, be sure to place form elements within column classes.
 
-<Example code={`<div class="row g-2">
+<Example code={`<div class="row g-3">
     <div class="col-md">
       <div class="form-floating">
         <label for="floatingInputGrid">Email address</label>

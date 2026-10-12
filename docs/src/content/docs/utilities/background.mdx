@@ -14,24 +14,24 @@ Similar to the contextual text color classes, set the background of an element t
 Each theme color comes in three weights: the solid color, `.bg-muted-*` and `.bg-subtle-*`. The two lighter ones are surfaces to read text on, and `.fg-emphasis-*` is the color that reads on them — `.bg-muted-*` is the step you want when a subtle surface has to separate from a subtle surface behind it, which is what a hovered row or a selected item needs.
 
 <Example code={[
-  ...getData('theme-colors').map((c) => `<div class="p-3 mb-2 text-bg-${c.name}">.bg-${c.name}</div>
-<div class="p-3 mb-2 bg-muted-${c.name} fg-emphasis-${c.name}">.bg-muted-${c.name}</div>
-<div class="p-3 mb-2 bg-subtle-${c.name} fg-emphasis-${c.name}">.bg-subtle-${c.name}</div>`),
-  `<div class="p-3 mb-2 bg-body fg-body">.bg-body</div>
-<div class="p-3 mb-2 bg-black fg-white">.bg-black</div>
-<div class="p-3 mb-2 bg-white fg-black">.bg-white</div>
-<div class="p-3 mb-2 bg-transparent fg-body">.bg-transparent</div>`
+  ...getData('theme-colors').map((c) => `<div class="p-4 mb-3 text-bg-${c.name}">.bg-${c.name}</div>
+<div class="p-4 mb-3 bg-muted-${c.name} fg-emphasis-${c.name}">.bg-muted-${c.name}</div>
+<div class="p-4 mb-3 bg-subtle-${c.name} fg-emphasis-${c.name}">.bg-subtle-${c.name}</div>`),
+  `<div class="p-4 mb-3 bg-body fg-body">.bg-body</div>
+<div class="p-4 mb-3 bg-black fg-white">.bg-black</div>
+<div class="p-4 mb-3 bg-white fg-black">.bg-white</div>
+<div class="p-4 mb-3 bg-transparent fg-body">.bg-transparent</div>`
 ]} />
 
 ## Surface ladder
 
 Five neutral surfaces run from the page background to the deepest panel. The numbers say how far a surface sits from the body — `.bg-1` is barely off the page, `.bg-4` is the deepest — and the ladder keeps its order in both color schemes.
 
-<Example code={`<div class="p-3 mb-2 bg-body">.bg-body</div>
-<div class="p-3 mb-2 bg-1">.bg-1</div>
-<div class="p-3 mb-2 bg-2">.bg-2</div>
-<div class="p-3 mb-2 bg-3">.bg-3</div>
-<div class="p-3 mb-2 bg-4">.bg-4</div>`} />
+<Example code={`<div class="p-4 mb-3 bg-body">.bg-body</div>
+<div class="p-4 mb-3 bg-1">.bg-1</div>
+<div class="p-4 mb-3 bg-2">.bg-2</div>
+<div class="p-4 mb-3 bg-3">.bg-3</div>
+<div class="p-4 mb-3 bg-4">.bg-4</div>`} />
 
 `.bg-body-secondary` and `.bg-body-tertiary` are deprecated names for `.bg-3` and `.bg-2` — they render identically and go away in v7. The ordinal names replace them because the old adjectives ran backwards for backgrounds: "tertiary" sat *closer* to the page than "secondary".
 
@@ -41,7 +41,7 @@ By adding a `.bg-gradient` class, a linear gradient is added as background image
 
 Do you need a gradient in your custom CSS? Read the token: `background-image: var(--cui-gradient);`.
 
-<Example code={[`<div class="p-3 mb-2 text-bg-primary bg-gradient">.bg-primary.bg-gradient</div>`, `<div class="p-3 mb-2 text-bg-secondary bg-gradient">.bg-secondary.bg-gradient</div>`, `<div class="p-3 mb-2 text-bg-success bg-gradient">.bg-success.bg-gradient</div>`, `<div class="p-3 mb-2 text-bg-danger bg-gradient">.bg-danger.bg-gradient</div>`, `<div class="p-3 mb-2 text-bg-warning bg-gradient">.bg-warning.bg-gradient</div>`, `<div class="p-3 mb-2 text-bg-info bg-gradient">.bg-info.bg-gradient</div>`, `<div class="p-3 mb-2 bg-black bg-gradient fg-white">.bg-black.bg-gradient</div>`]} />
+<Example code={[`<div class="p-4 mb-3 text-bg-primary bg-gradient">.bg-primary.bg-gradient</div>`, `<div class="p-4 mb-3 text-bg-secondary bg-gradient">.bg-secondary.bg-gradient</div>`, `<div class="p-4 mb-3 text-bg-success bg-gradient">.bg-success.bg-gradient</div>`, `<div class="p-4 mb-3 text-bg-danger bg-gradient">.bg-danger.bg-gradient</div>`, `<div class="p-4 mb-3 text-bg-warning bg-gradient">.bg-warning.bg-gradient</div>`, `<div class="p-4 mb-3 text-bg-info bg-gradient">.bg-info.bg-gradient</div>`, `<div class="p-4 mb-3 bg-black bg-gradient fg-white">.bg-black.bg-gradient</div>`]} />
 
 ## Opacity
 
@@ -60,12 +60,12 @@ Every `.bg-*` utility writes its colour into `--cui-bg` and reads it back, so a 
 
 Override `--cui-bg` to repaint the utility with another colour; the opacity class keeps working, because it reads whatever the token holds.
 
-<Example class="d-flex flex-column gap-2" code={`<div class="text-bg-success p-2">This is default success background</div>
-<div class="bg-success p-2 bg-90">This is 90% opacity success background</div>
-<div class="bg-success p-2 bg-70">This is 70% opacity success background</div>
-<div class="bg-success p-2 bg-50">This is 50% opacity success background</div>
-<div class="bg-success p-2 bg-30">This is 30% opacity success background</div>
-<div class="bg-success p-2 bg-10">This is 10% opacity success background</div>`} />
+<Example class="d-flex flex-column gap-3" code={`<div class="text-bg-success p-3">This is default success background</div>
+<div class="bg-success p-3 bg-90">This is 90% opacity success background</div>
+<div class="bg-success p-3 bg-70">This is 70% opacity success background</div>
+<div class="bg-success p-3 bg-50">This is 50% opacity success background</div>
+<div class="bg-success p-3 bg-30">This is 30% opacity success background</div>
+<div class="bg-success p-3 bg-10">This is 10% opacity success background</div>`} />
 
 `.bg-opacity-{10|15|25|50|75|100}` and `.bg-{color}-subtle` / `.bg-{color}-muted` are the deprecated v5 spellings of `.bg-{percentage}`, `.bg-subtle-{color}` and `.bg-muted-{color}`; they still render and are removed in v7.
 

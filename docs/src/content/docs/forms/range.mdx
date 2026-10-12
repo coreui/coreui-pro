@@ -45,7 +45,7 @@ Add `data-coreui-tooltips` to the wrapper to show a tooltip with the value that 
 Set `data-coreui-tooltips="always"` to keep the tooltip visible at all times.
 
 <Example code={`<label for="rangeTooltipAlways" class="form-label">Brightness</label>
-  <div class="form-range mt-4" data-coreui-tooltips="always">
+  <div class="form-range mt-5" data-coreui-tooltips="always">
     <input type="range" class="form-range-input" min="0" max="100" value="60" id="rangeTooltipAlways">
   </div>`} />
 
@@ -90,7 +90,7 @@ Add the `disabled` boolean attribute on the input to give it a grayed out appear
 
 <Example code={`<label for="disabledRange" class="form-label">Disabled range</label>
   <input type="range" class="form-range" id="disabledRange" disabled>
-  <label for="disabledRangeFill" class="form-label mt-3">Disabled range with a filled track</label>
+  <label for="disabledRangeFill" class="form-label mt-4">Disabled range with a filled track</label>
   <div class="form-range">
     <input type="range" class="form-range-input" value="40" id="disabledRangeFill" disabled>
   </div>`} />
@@ -113,7 +113,7 @@ By default, range inputs "snap" to integer values. To change this, you can speci
 
 Color the thumb and the fill by adding a [`.theme-{color}` class](/customize/components/#theme-variants) to the input or a wrapper.
 
-<Example class="d-flex flex-column gap-2" code={getData('theme-colors').map((c) => `<label for="range-${c.name}" class="form-label">${c.title} range</label>
+<Example class="d-flex flex-column gap-3" code={getData('theme-colors').map((c) => `<label for="range-${c.name}" class="form-label">${c.title} range</label>
   <div class="form-range theme-${c.name}">
     <input type="range" class="form-range-input" value="60" id="range-${c.name}">
   </div>`)} />

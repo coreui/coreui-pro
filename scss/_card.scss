@@ -20,7 +20,7 @@ $card-tokens: defaults(
     --#{$prefix}card-subtitle-color: inherit,
     --#{$prefix}card-border-width: var(--#{$prefix}border-width),
     --#{$prefix}card-border-color: var(--#{$prefix}border-color-translucent),
-    --#{$prefix}card-border-radius: var(--#{$prefix}radius-8),
+    --#{$prefix}card-border-radius: var(--#{$prefix}radius-9),
     --#{$prefix}card-box-shadow: none,
     --#{$prefix}card-inner-border-radius: calc(var(--#{$prefix}card-border-radius) - var(--#{$prefix}card-border-width)),
     --#{$prefix}card-cap-padding-y: calc(var(--#{$prefix}spacer) * .5),

@@ -13,7 +13,7 @@ import contextMenuTable from './snippets/context-menu-table.js?raw'
 
 Context menus replace the browser's native menu on an element with a [Menu](/components/menu/). Add `data-coreui-toggle="context-menu"` to any element and place a `.menu` next to it: a right-click (or <kbd>Shift</kbd>+<kbd>F10</kbd> / the <kbd>Menu</kbd> key when the element has focus) opens it at the pointer, and every menu feature - items, icons, dividers, headers, submenus and the keyboard navigation - works unchanged.
 
-<Example code={`<div class="border rounded-3 p-5 text-center fg-2" tabindex="0" data-coreui-toggle="context-menu">
+<Example code={`<div class="border rounded-3 p-6 text-center fg-2" tabindex="0" data-coreui-toggle="context-menu">
     Right-click anywhere in this area
   </div>
   <div class="menu">
@@ -47,7 +47,7 @@ Context menus are built on a third party library, [Floating UI](https://floating
 
 Submenus work as in [Menu](/components/menu/#submenus): wrap a `.menu-item` trigger and a nested `.menu` in a `.submenu`.
 
-<Example code={`<div class="border rounded-3 p-5 text-center fg-2" tabindex="0" data-coreui-toggle="context-menu">
+<Example code={`<div class="border rounded-3 p-6 text-center fg-2" tabindex="0" data-coreui-toggle="context-menu">
     Right-click to see the submenus
   </div>
   <div class="menu">
@@ -119,10 +119,10 @@ Preventing the `show` event keeps the browser's own menu away too - the right-cl
 
 By default the plugin looks for the `.menu` next to the trigger. Point `data-coreui-target` at it when the menu lives elsewhere, for example one menu shared by several independent areas.
 
-<Example class="d-flex flex-wrap gap-3" code={`<div class="border rounded-3 p-4 flex-fill text-center fg-2" tabindex="0" data-coreui-toggle="context-menu" data-coreui-target="#sharedContextMenu">
+<Example class="d-flex flex-wrap gap-4" code={`<div class="border rounded-3 p-5 flex-fill text-center fg-2" tabindex="0" data-coreui-toggle="context-menu" data-coreui-target="#sharedContextMenu">
     Area one
   </div>
-  <div class="border rounded-3 p-4 flex-fill text-center fg-2" tabindex="0" data-coreui-toggle="context-menu" data-coreui-target="#sharedContextMenu">
+  <div class="border rounded-3 p-5 flex-fill text-center fg-2" tabindex="0" data-coreui-toggle="context-menu" data-coreui-target="#sharedContextMenu">
     Area two
   </div>
   <div class="menu" id="sharedContextMenu">
@@ -134,7 +134,7 @@ By default the plugin looks for the `.menu` next to the trigger. Point `data-cor
 
 The menu is positioned with `position: fixed` at the pointer, so it escapes ancestors with `overflow: hidden` on its own. A `transform`, `filter` or `contain` on an ancestor turns that ancestor into the containing block for fixed elements and the menu drifts; append it to the body with `data-coreui-container="body"` in that case. The menu returns to its original place when hidden.
 
-<Example code={`<div class="border rounded-3 p-5 text-center fg-2 overflow-hidden" style="transform: translateZ(0)" tabindex="0" data-coreui-toggle="context-menu" data-coreui-container="body">
+<Example code={`<div class="border rounded-3 p-6 text-center fg-2 overflow-hidden" style="transform: translateZ(0)" tabindex="0" data-coreui-toggle="context-menu" data-coreui-container="body">
     Right-click inside a transformed, clipping container
     <div class="menu">
       <button class="menu-item" type="button">Still in the viewport</button>
@@ -212,7 +212,7 @@ The context menu accepts every [Menu option](/components/menu/#options). Two def
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
-| `autoClose` | boolean, string | `true` | Configure the auto close behavior of the menu: <ul class="my-2"><li>`true` - the menu will be closed by clicking outside or inside the menu. A click on the trigger area counts as outside.</li><li>`false` - the menu will be closed by manually calling `hide` or `toggle` method. (Also will not be closed by pressing <kbd>Esc</kbd> key)</li><li>`'inside'` - the menu will be closed (only) by clicking inside the menu.</li> <li>`'outside'` - the menu will be closed (only) by clicking outside the menu.</li></ul> A right-click elsewhere closes the menu under the same rules as a left-click outside. |
+| `autoClose` | boolean, string | `true` | Configure the auto close behavior of the menu: <ul class="my-3"><li>`true` - the menu will be closed by clicking outside or inside the menu. A click on the trigger area counts as outside.</li><li>`false` - the menu will be closed by manually calling `hide` or `toggle` method. (Also will not be closed by pressing <kbd>Esc</kbd> key)</li><li>`'inside'` - the menu will be closed (only) by clicking inside the menu.</li> <li>`'outside'` - the menu will be closed (only) by clicking outside the menu.</li></ul> A right-click elsewhere closes the menu under the same rules as a left-click outside. |
 | `boundary` | string, element | `'clippingParents'` | Overflow constraint boundary of the menu (applies only to the shift middleware). By default it's `clippingParents` and can accept an HTMLElement reference (via JavaScript only). For more information refer to Floating UI's [shift docs](https://floating-ui.com/docs/shift). |
 | `container` | string, element, boolean | `false` | Appends the menu to a specific element when shown. Use `'body'` or `true` to append to the document body, which helps escape ancestors that act as a containing block for fixed elements. The menu is moved back to its original position when hidden. Inside a modal dialog it goes into the dialog instead, because the rest of the page is inert. |
 | `display` | string | `'dynamic'` | By default, we use Floating UI for dynamic positioning. Disable this with `static`. |

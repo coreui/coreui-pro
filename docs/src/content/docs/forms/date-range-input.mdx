@@ -45,7 +45,7 @@ Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label 
 
 Set an explicit mask for both ends with the `data-coreui-format` attribute. The parser is the [date input's](/forms/date-input/#formats), so dayjs/moment tokens (`DD`, `MM`, `YYYY`) and date-fns/Unicode tokens (`dd`, `MM`, `yyyy`) both work, and any other character becomes a literal separator.
 
-<Example pro code={`<div class="mb-3">
+<Example pro code={`<div class="mb-4">
     <label class="form-label" id="dateRangeInputDdMMYyyyLabel">dd.MM.yyyy</label>
     <div data-coreui-date-range-input data-coreui-locale="en-US" data-coreui-format="dd.MM.yyyy" aria-labelledby="dateRangeInputDdMMYyyyLabel"></div>
   </div>
@@ -63,7 +63,7 @@ A mask that leaves out sections works here too — a month-and-year range report
 
 Use the `MMM` or `MMMM` tokens for text month sections in both ends; typing letters matches a month by prefix. Pass all twelve names through `monthNames` to override the locale-derived, date-context grammatical form.
 
-<Example pro code={`<div class="mb-3">
+<Example pro code={`<div class="mb-4">
     <label class="form-label" id="dateRangeInputDDMMMMYYYYLabel">DD MMMM YYYY</label>
     <div data-coreui-date-range-input data-coreui-locale="en-US" data-coreui-format="DD MMMM YYYY" aria-labelledby="dateRangeInputDDMMMMYYYYLabel"></div>
   </div>
@@ -77,11 +77,11 @@ Use the `MMM` or `MMMM` tokens for text month sections in both ends; typing lett
 
 Without an explicit format, both masks follow the locale set via `data-coreui-locale`.
 
-<Example pro code={`<div class="mb-3">
+<Example pro code={`<div class="mb-4">
     <label class="form-label" id="dateRangeInputEnUSLabel">en-US</label>
     <div data-coreui-date-range-input data-coreui-locale="en-US" aria-labelledby="dateRangeInputEnUSLabel"></div>
   </div>
-  <div class="mb-3">
+  <div class="mb-4">
     <label class="form-label" id="dateRangeInputPlPLLabel">pl-PL</label>
     <div data-coreui-date-range-input data-coreui-locale="pl-PL" data-coreui-day-placeholder="DD" data-coreui-month-placeholder="MM" data-coreui-year-placeholder="RRRR" aria-labelledby="dateRangeInputPlPLLabel"></div>
   </div>
@@ -154,7 +154,7 @@ A state you give, with the option or with the class, is a verdict on the range i
 
 Sibling `.valid-feedback`/`.invalid-feedback` elements work as with any other form control. The error shows when the frame is invalid and when a field inside it is, which is where the state of a single date lands; the success message waits until nothing is invalid. While a field is invalid, the error message describes each of its sections.
 
-<Example pro code={`<div class="mb-3 form-field">
+<Example pro code={`<div class="mb-4 form-field">
     <div data-coreui-date-range-input data-coreui-locale="en-US" data-coreui-format="dd.MM.yyyy" data-coreui-start-date="2026-07-20" data-coreui-end-date="2026-07-14"></div>
     <div class="invalid-feedback">Check-out has to be on or after check-in.</div>
   </div>
@@ -199,11 +199,11 @@ Each end can carry its own [floating label](/forms/floating-labels/); the text i
 
 The frame is a `.form-control-group`, so the standard sizing classes work — set `data-coreui-size="lg"` or `data-coreui-size="sm"` and both ends follow.
 
-<Example pro code={`<div class="mb-3">
+<Example pro code={`<div class="mb-4">
     <label class="form-label" id="dateRangeInputLargeLabel">Large</label>
     <div data-coreui-date-range-input data-coreui-locale="en-US" data-coreui-size="lg" aria-labelledby="dateRangeInputLargeLabel"></div>
   </div>
-  <div class="mb-3">
+  <div class="mb-4">
     <label class="form-label" id="dateRangeInputDefaultLabel">Default</label>
     <div data-coreui-date-range-input data-coreui-locale="en-US" aria-labelledby="dateRangeInputDefaultLabel"></div>
   </div>
@@ -216,7 +216,7 @@ The frame is a `.form-control-group`, so the standard sizing classes work — se
 
 Add `data-coreui-disabled="true"` to disable both ends, or `data-coreui-readonly="true"` to make them focusable but non-editable.
 
-<Example pro code={`<div class="mb-3">
+<Example pro code={`<div class="mb-4">
     <label class="form-label" id="dateRangeInputDisabledLabel">Disabled</label>
     <div data-coreui-date-range-input data-coreui-locale="en-US" data-coreui-start-date="2026-07-14" data-coreui-end-date="2026-07-20" data-coreui-disabled="true" aria-labelledby="dateRangeInputDisabledLabel"></div>
   </div>
@@ -237,7 +237,7 @@ The component adopts the parts you write inside its element and generates the re
 
 <Example pro code={`<div data-coreui-date-range-input data-coreui-locale="en-US">
     <div data-coreui-range-start></div>
-    <span class="mx-2 text-body-secondary" data-coreui-range-separator>to</span>
+    <span class="mx-3 text-body-secondary" data-coreui-range-separator>to</span>
     <div data-coreui-range-end></div>
   </div>`} />
 

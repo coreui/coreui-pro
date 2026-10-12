@@ -87,7 +87,7 @@ A hidden `.transition-size` element ends up `display: none`, the way a closed co
 
 Two more things travel with the class. It sets `overflow: hidden` for as long as it is on the element, not only while the box moves, so keep it off anything that has to spill out of its own box, such as an alert holding a dropdown. And `interpolate-size` is inherited, so a descendant that animates to or from `auto` starts interpolating too.
 
-The hidden state is emitted in the `utilities` layer, because it has to zero the spacing a utility may have set: `<div class="alert fade transition-size show py-5 mb-5">` collapses its padding and its margin like any other alert.
+The hidden state is emitted in the `utilities` layer, because it has to zero the spacing a utility may have set: `<div class="alert fade transition-size show py-6 mb-6">` collapses its padding and its margin like any other alert.
 
 The class carries a transition of its own, which replaces the one a component declares unless that component's rule is the more specific of the two. The alert's is, so the alert instead names the sizes in `--cui-alert-transition-property` and keeps its own duration and easing, and `<div class="alert fade transition-size show">` is the whole opt-in. Do the same on any other component whose timing you want to keep.
 

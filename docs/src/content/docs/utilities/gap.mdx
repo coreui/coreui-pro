@@ -9,14 +9,14 @@ utility: ["gap", "row-gap", "column-gap"]
 
 When using `display: grid` or `display: flex`, you can make use of `gap` utilities on the parent element. This can save on having to add margin utilities to individual children of a grid or flex container. Gap utilities are responsive by default, and are generated via our utilities API, based on the `$spacers` Sass map.
 
-<Example class="docs-example-cssgrid" code={`<div style="grid-template-columns: 1fr 1fr;" class="d-grid gap-3">
-    <div class="p-2">Grid item 1</div>
-    <div class="p-2">Grid item 2</div>
-    <div class="p-2">Grid item 3</div>
-    <div class="p-2">Grid item 4</div>
+<Example class="docs-example-cssgrid" code={`<div style="grid-template-columns: 1fr 1fr;" class="d-grid gap-4">
+    <div class="p-3">Grid item 1</div>
+    <div class="p-3">Grid item 2</div>
+    <div class="p-3">Grid item 3</div>
+    <div class="p-3">Grid item 4</div>
   </div>`} />
 
-Support includes responsive options for all of CoreUI's grid breakpoints, as well as six sizes from the `$spacers` map (`0`–`5`). There is no `.gap-auto` utility class as it's effectively the same as `.gap-0`.
+Support includes responsive options for all of CoreUI's grid breakpoints, as well as thirteen sizes from the `$spacers` map (`0`–`12`). There is no `.gap-auto` utility class as it's effectively the same as `.gap-0`.
 
 `gap` only applies inside a flex or grid container. On a plain block layout it does nothing — reach for [space between](/utilities/space/) there.
 
@@ -24,29 +24,29 @@ Support includes responsive options for all of CoreUI's grid breakpoints, as wel
 
 `row-gap` sets the vertical space between children items in the specified container.
 
-<Example class="docs-example-cssgrid" code={`<div style="grid-template-columns: 1fr 1fr;" class="d-grid gap-0 row-gap-3">
-    <div class="p-2">Grid item 1</div>
-    <div class="p-2">Grid item 2</div>
-    <div class="p-2">Grid item 3</div>
-    <div class="p-2">Grid item 4</div>
+<Example class="docs-example-cssgrid" code={`<div style="grid-template-columns: 1fr 1fr;" class="d-grid gap-0 row-gap-4">
+    <div class="p-3">Grid item 1</div>
+    <div class="p-3">Grid item 2</div>
+    <div class="p-3">Grid item 3</div>
+    <div class="p-3">Grid item 4</div>
   </div>`} />
 
 ## column-gap
 
 `column-gap` sets the horizontal space between children items in the specified container.
 
-<Example class="docs-example-cssgrid" code={`<div style="grid-template-columns: 1fr 1fr;" class="d-grid gap-0 column-gap-3">
-    <div class="p-2">Grid item 1</div>
-    <div class="p-2">Grid item 2</div>
-    <div class="p-2">Grid item 3</div>
-    <div class="p-2">Grid item 4</div>
+<Example class="docs-example-cssgrid" code={`<div style="grid-template-columns: 1fr 1fr;" class="d-grid gap-0 column-gap-4">
+    <div class="p-3">Grid item 1</div>
+    <div class="p-3">Grid item 2</div>
+    <div class="p-3">Grid item 3</div>
+    <div class="p-3">Grid item 4</div>
   </div>`} />
 
 ## Customizing
 
 ### Sass variables
 
-`$spacer` sets the default of `--cui-spacer`, the step the whole scale is built from: the stops `--cui-spacer-1` … `-9` are `calc()` multiples of it on `:root`, the utilities read the stops, so `:root { --cui-spacer: .75rem }` rescales every spacing utility at run time, no recompile.
+`$spacer` sets the default of `--cui-spacer`, the step the whole scale is built from: the stops `--cui-spacer-1` … `-12` are `calc()` multiples of it on `:root`, the utilities read the stops, so `:root { --cui-spacer: .75rem }` rescales every spacing utility at run time, no recompile.
 
 <ScssDocs file="scss/_config.scss" capture="spacer-variables" />
 

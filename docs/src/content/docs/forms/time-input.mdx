@@ -36,11 +36,11 @@ Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label 
 
 Set an explicit format with the `data-coreui-format` attribute: `HH`/`H` for the 23-hour cycle, `hh`/`h` for the 12-hour cycle, `mm` for minutes, `ss` for seconds, and `A`/`a` for the day period. Type `a` or `p` in the AM/PM section to switch it, or use the arrow keys.
 
-<Example pro code={`<div class="mb-3">
+<Example pro code={`<div class="mb-4">
     <label class="form-label" id="timeInputHHMmLabel">HH:mm</label>
     <div class="form-control form-date-time" data-coreui-time-input data-coreui-format="HH:mm" aria-labelledby="timeInputHHMmLabel"></div>
   </div>
-  <div class="mb-3">
+  <div class="mb-4">
     <label class="form-label" id="timeInputHHMmSsLabel">HH:mm:ss</label>
     <div class="form-control form-date-time" data-coreui-time-input data-coreui-format="HH:mm:ss" aria-labelledby="timeInputHHMmSsLabel"></div>
   </div>
@@ -53,11 +53,11 @@ Set an explicit format with the `data-coreui-format` attribute: `HH`/`H` for the
 
 Without an explicit format, the hour cycle and layout follow the locale set via `data-coreui-locale` — `en-US` gets a 12-hour clock with an AM/PM section, `pl-PL` or `de-DE` a 24-hour one.
 
-<Example pro code={`<div class="mb-3">
+<Example pro code={`<div class="mb-4">
     <label class="form-label" id="timeInputEnUSLabel">en-US</label>
     <div class="form-control form-date-time" data-coreui-time-input data-coreui-locale="en-US" aria-labelledby="timeInputEnUSLabel"></div>
   </div>
-  <div class="mb-3">
+  <div class="mb-4">
     <label class="form-label" id="timeInputPlPLLabel">pl-PL</label>
     <div class="form-control form-date-time" data-coreui-time-input data-coreui-locale="pl-PL" aria-labelledby="timeInputPlPLLabel"></div>
   </div>
@@ -106,7 +106,7 @@ The built-in token parser covers dayjs, moment, date-fns, and luxon format strin
 
 The field takes its validation state [the same way as the date input](/forms/date-input/#validation): a completed time outside `minDate`/`maxDate` makes it invalid whatever else is set, then the `validationState` option or an `.is-invalid`/`.is-valid` class written on the element in the markup, then a validation that reported the field, and in a form with `data-coreui-validate` the `:user-invalid` state of its value field, with `data-coreui-validate="valid"` also its `:user-valid` state. A given state drops on the next change the user makes to the time and stays through changes your code makes; `setConfig({ validationState })` sets it again without re-rendering the field. A given `'invalid'` blocks the submit with the text of the linked message, or `Invalid value.` when there is none. Sibling `.valid-feedback`/`.invalid-feedback` elements work as with any other form control, and while the field is invalid the error message describes every section.
 
-<Example pro code={`<div class="mb-3 form-field">
+<Example pro code={`<div class="mb-4 form-field">
     <div class="form-control form-date-time" data-coreui-time-input data-coreui-format="HH:mm" data-coreui-date="09:30" data-coreui-validation-state="valid"></div>
     <div class="valid-feedback">Looks good!</div>
   </div>
@@ -128,11 +128,11 @@ The time input supports [floating labels](/forms/floating-labels/). When the fie
 
 The field renders as a `.form-control`, so the standard sizing classes work — add `.form-control-sm` or `.form-control-lg` to the container.
 
-<Example pro code={`<div class="mb-3">
+<Example pro code={`<div class="mb-4">
     <label class="form-label" id="timeInputLargeLabel">Large</label>
     <div class="form-control form-date-time form-control-lg" data-coreui-time-input data-coreui-format="HH:mm" aria-labelledby="timeInputLargeLabel"></div>
   </div>
-  <div class="mb-3">
+  <div class="mb-4">
     <label class="form-label" id="timeInputDefaultLabel">Default</label>
     <div class="form-control form-date-time" data-coreui-time-input data-coreui-format="HH:mm" aria-labelledby="timeInputDefaultLabel"></div>
   </div>
@@ -145,7 +145,7 @@ The field renders as a `.form-control`, so the standard sizing classes work — 
 
 Add `data-coreui-disabled="true"` to disable the field, or `data-coreui-readonly="true"` to make it focusable but non-editable.
 
-<Example pro code={`<div class="mb-3">
+<Example pro code={`<div class="mb-4">
     <label class="form-label" id="timeInputDisabledLabel">Disabled</label>
     <div class="form-control form-date-time" data-coreui-time-input data-coreui-format="HH:mm" data-coreui-date="14:30" data-coreui-disabled="true" aria-labelledby="timeInputDisabledLabel"></div>
   </div>

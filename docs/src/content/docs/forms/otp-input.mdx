@@ -41,7 +41,7 @@ Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label 
 
 The one-time password input supports different input types for various use cases.
 
-<Example pro code={`<div class="mb-3">
+<Example pro code={`<div class="mb-4">
     <label class="form-label">Numeric OTP (default)</label>
     <div class="form-otp" data-coreui-otp data-coreui-type="number">
       <input class="form-otp-control">
@@ -52,7 +52,7 @@ The one-time password input supports different input types for various use cases
       <input class="form-otp-control">
     </div>
   </div>
-  <div class="mb-3">
+  <div class="mb-4">
     <label class="form-label">Text OTP</label>
     <div class="form-otp" data-coreui-otp data-coreui-type="text">
       <input class="form-otp-control">
@@ -79,7 +79,7 @@ The one-time password input supports different input types for various use cases
 
 Provide visual hints to users by setting placeholder text for OTP input fields. You can use a single character for all fields or specify different placeholders for each field.
 
-<Example pro code={`<div class="mb-3">
+<Example pro code={`<div class="mb-4">
     <label class="form-label">Single character placeholder</label>
     <div class="form-otp" data-coreui-otp data-coreui-placeholder="0">
       <input class="form-otp-control">
@@ -90,7 +90,7 @@ Provide visual hints to users by setting placeholder text for OTP input fields. 
       <input class="form-otp-control">
     </div>
   </div>
-  <div class="mb-3">
+  <div class="mb-4">
     <label class="form-label">Different placeholders per field</label>
     <div class="form-otp" data-coreui-otp data-coreui-placeholder="123456">
       <input class="form-otp-control">
@@ -131,7 +131,7 @@ Set initial values using the `data-coreui-value` attribute.
 
 Control user input behavior with linear and non-linear modes.
 
-<Example pro code={`<div class="mb-3">
+<Example pro code={`<div class="mb-4">
     <label class="form-label">Linear mode (sequential input)</label>
     <div class="form-otp" data-coreui-otp data-coreui-linear="true">
       <input class="form-otp-control">
@@ -174,29 +174,29 @@ Enable automatic form submission when all one-time password fields are completed
 
 Create custom one-time password layouts with separators and different field counts.
 
-<Example pro code={`<div class="mb-3">
+<Example pro code={`<div class="mb-4">
     <label class="form-label">6-digit OTP with separators</label>
     <div class="form-otp" data-coreui-otp>
       <input class="form-otp-control">
       <input class="form-otp-control">
       <input class="form-otp-control">
-      <div class="px-2 fg-3 fw-bold">-</div>
+      <div class="px-3 fg-3 fw-bold">-</div>
       <input class="form-otp-control">
       <input class="form-otp-control">
       <input class="form-otp-control">
     </div>
   </div>
-  <div class="mb-3">
+  <div class="mb-4">
     <label class="form-label">9-digit OTP with separators</label>
     <div class="form-otp" data-coreui-otp>
       <input class="form-otp-control">
       <input class="form-otp-control">
       <input class="form-otp-control">
-      <div class="px-2 fg-3 fw-bold">•</div>
+      <div class="px-3 fg-3 fw-bold">•</div>
       <input class="form-otp-control">
       <input class="form-otp-control">
       <input class="form-otp-control">
-      <div class="px-2 fg-3 fw-bold">•</div>
+      <div class="px-3 fg-3 fw-bold">•</div>
       <input class="form-otp-control">
       <input class="form-otp-control">
       <input class="form-otp-control">
@@ -216,7 +216,7 @@ Create custom one-time password layouts with separators and different field coun
 
 Wrap cells in `.form-otp-group` to join them into one field: the cells share their borders and only the outer corners keep the radius. One group joins the whole code; several groups split it into segments, spaced by the `--cui-form-otp-gap` of the wrapper.
 
-<Example pro code={`<div class="mb-3">
+<Example pro code={`<div class="mb-4">
     <label class="form-label">6-digit OTP, one group</label>
     <div class="form-otp" data-coreui-otp>
       <div class="form-otp-group">
@@ -249,7 +249,7 @@ Wrap cells in `.form-otp-group` to join them into one field: the cells share the
 
 One-time password input supports different sizes. You may choose from small, normal (default), and large inputs to match our similarly sized text inputs.  To adjust the size of a component, use `.form-otp-lg` or `.form-otp-sm`.
 
-<Example pro code={`<div class="mb-3">
+<Example pro code={`<div class="mb-4">
     <label class="form-label">Large OTP input</label>
     <div class="form-otp form-otp-lg" data-coreui-otp>
       <input class="form-otp-control">
@@ -260,7 +260,7 @@ One-time password input supports different sizes. You may choose from small, nor
       <input class="form-otp-control">
     </div>
   </div>
-  <div class="mb-3">
+  <div class="mb-4">
     <label class="form-label">Default OTP input</label>
     <div class="form-otp" data-coreui-otp>
       <input class="form-otp-control">
@@ -315,7 +315,7 @@ Use the `data-coreui-readonly="true"` attribute to make the one-time password in
 
 The code is validated as one value, kept in an input laid invisibly over the group. With `data-coreui-required="true"` an empty or incomplete code blocks the submit, and an incomplete code blocks it even when the field is not required; the browser, or the [form plugin](/forms/validation/#usage) in a form with `novalidate`, puts focus on the first empty slot, the browser with its own message over the group. The state shows on the group as `.is-{state}`, which colours every slot and shows the `.invalid-feedback` that follows the group, and while it is `'invalid'` every slot carries `aria-invalid="true"` and is described by that message. Every change of the code sends `input` and `change` from the input that holds the value.
 
-<Example pro code={`<form class="row g-3" data-coreui-validate novalidate>
+<Example pro code={`<form class="row g-4" data-coreui-validate novalidate>
     <div class="col-12">
       <span class="form-label" id="otpValidationLabel">Verification code</span>
       <div class="form-otp" data-coreui-otp aria-labelledby="otpValidationLabel" data-coreui-name="code" data-coreui-required="true">

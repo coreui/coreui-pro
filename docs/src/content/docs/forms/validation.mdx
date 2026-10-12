@@ -28,7 +28,7 @@ When the form is submitted with an invalid control, the plugin stops the submit 
 
 Custom feedback styles apply custom colors, borders and focus styles to communicate feedback.
 
-<Example code={`<form class="row g-3" data-coreui-validate="valid" novalidate>
+<Example code={`<form class="row g-4" data-coreui-validate="valid" novalidate>
     <div class="col-md-4 form-field">
       <label for="validationCustom01" class="form-label">First name</label>
       <input type="text" class="form-control" id="validationCustom01" value="Mark" required>
@@ -101,7 +101,7 @@ Not interested in custom validation feedback messages or writing JavaScript to c
 
 While these feedback styles cannot be styled with CSS, you can still customize the feedback text through JavaScript.
 
-<Example code={`<form class="row g-3">
+<Example code={`<form class="row g-4">
     <div class="col-md-4">
       <label for="validationDefault01" class="form-label">First name</label>
       <input type="text" class="form-control" id="validationDefault01" value="Mark" required>
@@ -155,7 +155,7 @@ In a form the [form plugin](#usage) validates, a `.is-invalid` or `.is-valid` yo
 
 For a validated input group, wrap the group in a [`.form-field`](/forms/field/) and place the feedback outside the group, so it renders under the whole frame.
 
-<Example code={`<form class="row g-3">
+<Example code={`<form class="row g-4">
     <div class="col-md-4 form-field">
       <label for="validationServer01" class="form-label">First name</label>
       <input type="text" class="form-control is-valid" id="validationServer01" value="Mark" required>
@@ -250,7 +250,7 @@ Validation styles are available for the following form controls and components:
 - checkboxes, radios and switches with `.check`, `.radio` or `.switch`, laid out by a [`.form-field`](/forms/field/)
 
 <Example code={`<form>
-    <div class="mb-3 form-field">
+    <div class="mb-4 form-field">
       <label for="validationTextarea" class="form-label">Textarea</label>
       <textarea class="form-control is-invalid" id="validationTextarea" placeholder="Required example textarea" required aria-describedby="validationTextareaFeedback"></textarea>
       <div id="validationTextareaFeedback" class="invalid-feedback">
@@ -258,7 +258,7 @@ Validation styles are available for the following form controls and components:
       </div>
     </div>
 
-    <div class="form-field mb-3">
+    <div class="form-field mb-4">
       <input type="checkbox" class="check is-invalid" id="validationFormCheck1" required aria-describedby="validationFormCheck1Feedback">
       <label for="validationFormCheck1">Check this checkbox</label>
       <div id="validationFormCheck1Feedback" class="invalid-feedback">Example invalid feedback text</div>
@@ -268,18 +268,18 @@ Validation styles are available for the following form controls and components:
       <input type="radio" class="radio is-invalid" id="validationFormCheck2" name="radio-stacked" required>
       <label for="validationFormCheck2">Toggle this radio</label>
     </div>
-    <div class="form-field mb-3">
+    <div class="form-field mb-4">
       <input type="radio" class="radio is-invalid" id="validationFormCheck3" name="radio-stacked" required aria-describedby="validationFormCheck3Feedback">
       <label for="validationFormCheck3">Or toggle this other radio</label>
       <div id="validationFormCheck3Feedback" class="invalid-feedback">More example invalid feedback text</div>
     </div>
 
-    <div class="form-field mb-3">
+    <div class="form-field mb-4">
       <input type="checkbox" class="switch is-invalid" role="switch" id="validationSwitch" required aria-describedby="validationSwitchFeedback">
       <label for="validationSwitch">Accept the terms</label>
       <div id="validationSwitchFeedback" class="invalid-feedback">You must accept before submitting.</div>
     </div>
-    <div class="mb-3 form-field">
+    <div class="mb-4 form-field">
       <select class="form-control is-invalid" required aria-label="select example" aria-describedby="validationSelectFeedback">
         <option value="">Open this select menu</option>
         <option value="1">One</option>
@@ -289,12 +289,12 @@ Validation styles are available for the following form controls and components:
       <div id="validationSelectFeedback" class="invalid-feedback">Example invalid select feedback</div>
     </div>
 
-    <div class="mb-3 form-field">
+    <div class="mb-4 form-field">
       <input type="file" class="form-control is-invalid" aria-label="file example" required aria-describedby="validationFileFeedback">
       <div id="validationFileFeedback" class="invalid-feedback">Example invalid form file feedback</div>
     </div>
 
-    <div class="mb-3">
+    <div class="mb-4">
       <button class="btn-solid theme-primary" type="submit" disabled>Submit form</button>
     </div>
   </form>`} />
@@ -303,7 +303,7 @@ Validation styles are available for the following form controls and components:
 
 If your form layout allows it, you can swap the `.{valid|invalid}-feedback` classes for `.{valid|invalid}-tooltip` classes to display validation feedback in a styled tooltip. Be sure to have a parent with `position: relative` on it for tooltip positioning. In the example below, our column classes have this already, but your project may require an alternative setup.
 
-<Example code={`<form class="row g-3" data-coreui-validate="valid" novalidate>
+<Example code={`<form class="row g-4" data-coreui-validate="valid" novalidate>
     <div class="col-md-4 position-relative form-field">
       <label for="validationTooltip01" class="form-label">First name</label>
       <input type="text" class="form-control" id="validationTooltip01" value="Mark" required>

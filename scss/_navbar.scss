@@ -30,7 +30,7 @@ $navbar-tokens: () !default;
 $navbar-tokens: defaults(
   (
     --#{$prefix}navbar-padding-x: #{if(sass($navbar-padding-x == null): 0; else: $navbar-padding-x)},
-    --#{$prefix}navbar-padding-y: var(--#{$prefix}spacer-2),
+    --#{$prefix}navbar-padding-y: var(--#{$prefix}spacer-3),
     --#{$prefix}navbar-min-height: 3.5rem,
     --#{$prefix}navbar-bg: var(--#{$prefix}bg-body),
     --#{$prefix}navbar-color: color-mix(in oklch, var(--#{$prefix}emphasis-color) 65%, transparent),

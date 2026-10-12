@@ -93,8 +93,8 @@ describe('Transition size helper', () => {
   })
 
   it('zeroes the box under the utilities it has to outrank', () => {
-    const reference = mount('alert py-5 mb-5')
-    const alertEl = mount('alert transition-size py-5 mb-5 opacity-100')
+    const reference = mount('alert py-6 mb-6')
+    const alertEl = mount('alert transition-size py-6 mb-6 opacity-100')
     const { height } = alertEl.getBoundingClientRect()
 
     new Alert(alertEl).close()

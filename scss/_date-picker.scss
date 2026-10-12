@@ -35,8 +35,8 @@ $date-picker-time-tokens: () !default;
 // scss-docs-start date-picker-time-tokens
 $date-picker-time-tokens: defaults(
   (
-    --#{$prefix}date-picker-time-body-padding-y: var(--#{$prefix}spacer-2),
-    --#{$prefix}date-picker-time-body-padding-x: var(--#{$prefix}spacer-2),
+    --#{$prefix}date-picker-time-body-padding-y: var(--#{$prefix}spacer-3),
+    --#{$prefix}date-picker-time-body-padding-x: var(--#{$prefix}spacer-3),
     --#{$prefix}date-picker-time-icon-width: 2.5rem,
     --#{$prefix}date-picker-time-icon-size: 1rem,
     --#{$prefix}date-picker-time-icon-color: var(--#{$prefix}fg-3),

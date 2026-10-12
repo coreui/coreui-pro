@@ -13,7 +13,7 @@ $reboot-mark-tokens: () !default;
 $reboot-tokens: defaults(
   (
     --#{$prefix}paragraph-margin-bottom: var(--#{$prefix}spacer),
-    --#{$prefix}heading-margin-bottom: var(--#{$prefix}spacer-2),
+    --#{$prefix}heading-margin-bottom: var(--#{$prefix}spacer-3),
     --#{$prefix}heading-font-family: inherit,
     --#{$prefix}heading-font-style: inherit,
     --#{$prefix}heading-font-weight: var(--#{$prefix}font-weight-medium),
@@ -23,7 +23,7 @@ $reboot-tokens: defaults(
     --#{$prefix}hr-color: inherit,
     --#{$prefix}hr-border-width: var(--#{$prefix}border-width),
     --#{$prefix}hr-opacity: .25,
-    --#{$prefix}legend-margin-bottom: var(--#{$prefix}spacer-2),
+    --#{$prefix}legend-margin-bottom: var(--#{$prefix}spacer-3),
     --#{$prefix}legend-font-size: clamp(1.275rem, 1.275rem + .3vw, 1.5rem),
     --#{$prefix}legend-font-weight: inherit,
     --#{$prefix}list-padding-x: 2rem,
@@ -261,7 +261,7 @@ $reboot-mark-tokens: defaults(
 
   dd {
     margin-inline-start: 0; // 1
-    margin-bottom: var(--#{$prefix}spacer-2);
+    margin-bottom: var(--#{$prefix}spacer-3);
   }
 
   // Blockquote
@@ -424,7 +424,7 @@ $reboot-mark-tokens: defaults(
   }
 
   caption {
-    padding-block: var(--#{$prefix}spacer-2);
+    padding-block: var(--#{$prefix}spacer-3);
     color: var(--#{$prefix}fg-3);
     text-align: start;
   }

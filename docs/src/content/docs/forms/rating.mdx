@@ -44,7 +44,7 @@ Our Bootstrap Rating component allows users to assign and reset a star rating wi
 
 <Example pro code={`<div class="d-flex align-items-center">
     <div id="myRatingResettable" data-coreui-rating data-coreui-value="3"></div>
-    <button class="btn-solid theme-primary ms-3" type="button" onclick="coreui.Rating.getInstance('#myRatingResettable').reset()">reset</button>
+    <button class="btn-solid theme-primary ms-4" type="button" onclick="coreui.Rating.getInstance('#myRatingResettable').reset()">reset</button>
   </div>`} />
 
 ## Readonly
@@ -70,7 +70,7 @@ A rating can be required, and it takes a validation state from the page.
 - Picking or clearing a star, or a native form reset, removes the state before `change.coreui.rating` fires. A change from code, such as `setConfig({ value })` or `reset()`, keeps it.
 - A required rating without a value shows `'invalid'` once a validation reports it, and a given state shows over it.
 
-<Example pro code={`<form class="row g-3" data-coreui-validate novalidate>
+<Example pro code={`<form class="row g-4" data-coreui-validate novalidate>
     <div class="col-12 form-field">
       <span class="form-label" id="deliveryRatingLabel">Delivery</span>
       <div class="is-invalid" aria-labelledby="deliveryRatingLabel" data-coreui-rating data-coreui-name="deliveryRating" data-coreui-required="true"></div>
@@ -148,9 +148,9 @@ For a more dynamic experience, define different icons for each rating value, enh
 The Bootstrap Rating component integrates interactive star ratings with dynamic textual feedback using other components from CoreUI. It enables users to select a rating that updates the display and label in real-time, enhancing the interactive experience. Hover effects provide immediate feedback on potential ratings before selection, ensuring an intuitive user interface.
 
 <Example pro code={`<div class="d-flex align-items-center">
-    <div id="myRatingCustomFeedbackStart" class="fg-2 me-3">3 / 5</div>
+    <div id="myRatingCustomFeedbackStart" class="fg-2 me-4">3 / 5</div>
     <div id="myRatingCustomFeedback"></div>
-    <div id="myRatingCustomFeedbackEnd" class="badge text-bg-inverse ms-3">Meh</div>
+    <div id="myRatingCustomFeedbackEnd" class="badge text-bg-inverse ms-4">Meh</div>
   </div>`} sandboxJs={ratingCustomFeedback} />
 
 <Code code={ratingCustomFeedback} lang="js" />

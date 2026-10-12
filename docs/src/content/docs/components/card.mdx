@@ -56,7 +56,7 @@ Anything else in the body is a flex item too, so a link or a button takes its na
       <h5 class="card-title">Card title</h5>
       <h6 class="card-subtitle fg-2">Card subtitle</h6>
       <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-      <div class="hstack gap-3">
+      <div class="hstack gap-4">
         <a href="#">Card link</a>
         <a href="#">Another link</a>
       </div>
@@ -124,7 +124,7 @@ Combine and match many content types to build the card you need, or throw everyt
       <li class="list-group-item">A third item</li>
     </ul>
     <div class="card-body">
-      <div class="hstack gap-3">
+      <div class="hstack gap-4">
         <a href="#">Card link</a>
         <a href="#">Another link</a>
       </div>
@@ -192,7 +192,7 @@ Cards assume no specific `width` to start, so they'll be 100% wide unless otherw
 Using the grid, wrap cards in columns and rows as needed.
 
 <Example code={`<div class="row">
-    <div class="col-sm-6 mb-3 mb-sm-0">
+    <div class="col-sm-6 mb-4 mb-sm-0">
       <div class="card">
         <div class="card-body">
           <h5 class="card-title">Special title treatment</h5>
@@ -216,7 +216,7 @@ Using the grid, wrap cards in columns and rows as needed.
 
 Use some of [available sizing utilities](/utilities/width/) to rapidly set a card's width.
 
-<Example code={`<div class="card w-75 mb-3">
+<Example code={`<div class="card w-75 mb-4">
     <div class="card-body">
       <h5 class="card-title">Card title</h5>
       <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
@@ -250,7 +250,7 @@ You can instantly change the text arrangement of any card—in its whole or spec
 
 `text-align` reaches the text but not the body's own flex items, so a button or a link stays at the start of the card. Move it with a [margin utility](/utilities/margin/): `.mx-auto` to centre it, `.ms-auto` to push it to the end.
 
-<Example code={`<div class="card mb-3" style="width: 18rem;">
+<Example code={`<div class="card mb-4" style="width: 18rem;">
     <div class="card-body">
       <h5 class="card-title">Special title treatment</h5>
       <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
@@ -258,7 +258,7 @@ You can instantly change the text arrangement of any card—in its whole or spec
     </div>
   </div>
 
-  <div class="card text-center mb-3" style="width: 18rem;">
+  <div class="card text-center mb-4" style="width: 18rem;">
     <div class="card-body">
       <h5 class="card-title">Special title treatment</h5>
       <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
@@ -330,7 +330,7 @@ Cards introduce several options for acting with images. Pick from appending "ima
 
 Similar to headers and footers, cards can include top and bottom "image caps"—images at the top or bottom of a card.
 
-<Example code={`<div class="card mb-3">
+<Example code={`<div class="card mb-4">
     <svg class="docs-placeholder-img card-img-top" width="100%" height="180" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Image cap" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Image cap</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em">Image cap</text></svg>
     <div class="card-body">
       <h5 class="card-title">Card title</h5>
@@ -368,7 +368,7 @@ Note that content should not be larger than the height of the image. If content 
 
 Add `.card-row` to lay a card out along the inline axis. The sections sit side by side with a single divider between each pair, so no wrapper markup is needed. For an image cap, use `.card-img-start` or `.card-img-end` to round the leading or trailing edge.
 
-<Example code={`<div class="card card-row mb-3" style="max-width: 540px;">
+<Example code={`<div class="card card-row mb-4" style="max-width: 540px;">
     <svg class="docs-placeholder-img card-img-start" width="40%" height="200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Image" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Image</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em">Image</text></svg>
     <div class="card-body">
       <h5 class="card-title">Card title</h5>
@@ -400,7 +400,7 @@ These are general-purpose utilities applied to the card as a whole: `.text-bg-*`
 
 Set a `background-color` with contrasting foreground `color` with [our `.text-bg-{color}` helpers](/helpers/color-background/). Previously it was required to manually pair your choice of [`.text-{color}`](/utilities/colors/) and [`.bg-{color}`](/utilities/background/) utilities for styling, which you still may use if you prefer.
 
-<Example code={getData('theme-colors').map((c) => `<div class="card text-bg-${c.name} mb-3" style="max-width: 18rem;">
+<Example code={getData('theme-colors').map((c) => `<div class="card text-bg-${c.name} mb-4" style="max-width: 18rem;">
     <div class="card-header">Header</div>
     <div class="card-body">
       <h5 class="card-title">${c.title} card title</h5>
@@ -418,7 +418,7 @@ Relying on color to convey meaning creates a visual cue that assistive technolog
 
 Use [border utilities](/utilities/border/) to change just the `border-color` of a card. Note that you can put `.text-{color}` classes on the parent `.card` or a subset of the card's contents as shown below.
 
-<Example code={getData('theme-colors').map((c) => `<div class="card border-${c.name} mb-3" style="max-width: 18rem;">
+<Example code={getData('theme-colors').map((c) => `<div class="card border-${c.name} mb-4" style="max-width: 18rem;">
     <div class="card-header">Header</div>
     <div class="card-body text-${c.name}">
       <h5 class="card-title">${c.title} card title</h5>
@@ -430,7 +430,7 @@ Use [border utilities](/utilities/border/) to change just the `border-color` of 
 
 Use [border utilities](/utilities/border/) to change just the `border-top-color` of a card. Note that you can put `.text-{color}` classes on the parent `.card` or a subset of the card's contents as shown below.
 
-<Example code={getData('theme-colors').map((c) => `<div class="card border-top-${c.name} border-top-3 mb-3" style="max-width: 18rem;">
+<Example code={getData('theme-colors').map((c) => `<div class="card border-top-${c.name} border-top-3 mb-4" style="max-width: 18rem;">
     <div class="card-header">Header</div>
     <div class="card-body text-${c.name}">
       <h5 class="card-title">${c.title} card title</h5>
@@ -442,7 +442,7 @@ Use [border utilities](/utilities/border/) to change just the `border-top-color`
 
 You are able to adjust the borders on the card elements as needed, and even exclude their `background-color` with `.bg-transparent`.
 
-<Example code={`<div class="card border-success mb-3" style="max-width: 18rem;">
+<Example code={`<div class="card border-success mb-4" style="max-width: 18rem;">
     <div class="card-header bg-transparent border-success">Header</div>
     <div class="card-body fg-success">
       <h5 class="card-title">Success card title</h5>
@@ -455,7 +455,7 @@ You are able to adjust the borders on the card elements as needed, and even excl
 
 A [theme class](/customize/components/#theme-variants) paints the card's frame and caps with the theme color, with contrast text in the header and footer:
 
-<Example class="d-flex flex-wrap gap-3" code={getData('theme-colors').map((c) => `<div class="card theme-${c.name}" style="width: 15rem;">
+<Example class="d-flex flex-wrap gap-4" code={getData('theme-colors').map((c) => `<div class="card theme-${c.name}" style="width: 15rem;">
     <div class="card-header">Header</div>
     <div class="card-body">
       <p class="card-text">Some quick example text to build on the card title.</p>
@@ -475,7 +475,7 @@ Put the theme class on a single section instead and only that section follows it
 
 Add `.card-subtle` to swap the solid fill for the theme's subtle background and border, with emphasis text in the caps.
 
-<Example class="d-flex flex-wrap gap-3" code={getData('theme-colors').map((c) => `<div class="card card-subtle theme-${c.name}" style="width: 15rem;">
+<Example class="d-flex flex-wrap gap-4" code={getData('theme-colors').map((c) => `<div class="card card-subtle theme-${c.name}" style="width: 15rem;">
     <div class="card-header">Header</div>
     <div class="card-body">
       <p class="card-text">Some quick example text to build on the card title.</p>
@@ -487,7 +487,7 @@ Add `.card-subtle` to swap the solid fill for the theme's subtle background and 
 
 Add `.card-translucent` to let the background through the card and blur it. The caps thin out with it, so the whole card reads as one surface.
 
-<Example class="bg-black p-4" code={`<div class="card card-translucent" style="width: 18rem;">
+<Example class="bg-black p-5" code={`<div class="card card-translucent" style="width: 18rem;">
     <div class="card-header">Header</div>
     <div class="card-body">
       <h5 class="card-title">Card title</h5>
@@ -572,7 +572,7 @@ When using card groups with footers, their content will automatically line up.
 
 Use the Bootstrap grid system and its [`.row-cols` classes](/layout/grid/#row-columns) to control how many grid columns (wrapped around your cards) you show per row. For example, here's `.row-cols-1` laying out the cards on one column, and `.row-cols-md-2` splitting four cards to equal width across multiple rows, from the medium breakpoint up.
 
-<Example code={`<div class="row row-cols-1 row-cols-md-2 g-4">
+<Example code={`<div class="row row-cols-1 row-cols-md-2 g-5">
     <div class="col">
       <div class="card">
         <svg class="docs-placeholder-img card-img-top" width="100%" height="140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Image cap" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Image cap</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em">Image cap</text></svg>
@@ -613,7 +613,7 @@ Use the Bootstrap grid system and its [`.row-cols` classes](/layout/grid/#row-co
 
 Change it to `.row-cols-3` and you'll see the fourth card wrap.
 
-<Example code={`<div class="row row-cols-1 row-cols-md-3 g-4">
+<Example code={`<div class="row row-cols-1 row-cols-md-3 g-5">
     <div class="col">
       <div class="card">
         <svg class="docs-placeholder-img card-img-top" width="100%" height="140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Image cap" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Image cap</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em">Image cap</text></svg>
@@ -654,7 +654,7 @@ Change it to `.row-cols-3` and you'll see the fourth card wrap.
 
 When you need equal height, add `.h-100` to the cards. If you want equal heights by default, you can set `$card-height: 100%` in Sass.
 
-<Example code={`<div class="row row-cols-1 row-cols-md-3 g-4">
+<Example code={`<div class="row row-cols-1 row-cols-md-3 g-5">
     <div class="col">
       <div class="card h-100">
         <svg class="docs-placeholder-img card-img-top" width="100%" height="140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Image cap" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Image cap</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em">Image cap</text></svg>
@@ -695,7 +695,7 @@ When you need equal height, add `.h-100` to the cards. If you want equal heights
 
 Just like with card groups, card footers will automatically line up.
 
-<Example code={`<div class="row row-cols-1 row-cols-md-3 g-4">
+<Example code={`<div class="row row-cols-1 row-cols-md-3 g-5">
     <div class="col">
       <div class="card h-100">
         <svg class="docs-placeholder-img card-img-top" width="100%" height="180" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Image cap" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Image cap</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em">Image cap</text></svg>

@@ -77,12 +77,12 @@ The JavaScript below initializes the example:
 
 Use `chip-input-sm` and `chip-input-lg` to match surrounding form controls. Default size is provided by `.chip-input` without a size modifier.
 
-<Example code={`<div class="chip-input chip-input-sm mb-3" data-coreui-chip-input data-coreui-placeholder="Add small tag...">
+<Example code={`<div class="chip-input chip-input-sm mb-4" data-coreui-chip-input data-coreui-placeholder="Add small tag...">
     <label class="chip-input-label" for="skillsInputSm">Small</label>
     <span class="chip">HTML</span>
   </div>
 
-  <div class="chip-input mb-3" data-coreui-chip-input data-coreui-placeholder="Add default tag...">
+  <div class="chip-input mb-4" data-coreui-chip-input data-coreui-placeholder="Add default tag...">
     <label class="chip-input-label" for="skillsInputMd">Default</label>
     <span class="chip">JavaScript</span>
   </div>
@@ -115,7 +115,7 @@ Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label 
 
 The chip input carries its chips in a hidden `<textarea>` the browser validates, so `required` blocks the submit of an empty field and the browser shows its message over the chip input. The state shows on the frame and on the text field, and the message that follows the frame is linked to the text field, the way the [form plugin](/forms/validation/) does for a native field.
 
-<Example code={`<form class="row g-3" data-coreui-validate novalidate>
+<Example code={`<form class="row g-4" data-coreui-validate novalidate>
     <div class="col-12">
       <div class="chip-input" data-coreui-chip-input data-coreui-name="topics" data-coreui-required="true" data-coreui-placeholder="Add a topic...">
         <label class="chip-input-label">Topics</label>
@@ -177,7 +177,7 @@ In this example, `select.coreui.chip-input` updates a live list of selected valu
     <span class="chip active">QA</span>
     <span class="chip active">DevOps</span>
   </div>
-  <p class="form-text mt-2 mb-0">Selected chips: <span id="chipSelectableOutput">None</span></p>`} sandboxJs={chipSelectable} />
+  <p class="form-text mt-3 mb-0">Selected chips: <span id="chipSelectableOutput">None</span></p>`} sandboxJs={chipSelectable} />
 
 ## Usage
 

@@ -31,14 +31,17 @@ Where *size* is one of:
 
 - `0` - for classes that eliminate the `margin` by setting it to `0`
 - `1` - (by default) for classes that set the `margin` to `$spacer * .25`
-- `2` - (by default) for classes that set the `margin` to `$spacer * .5`
-- `3` - (by default) for classes that set the `margin` to `$spacer * .75`
-- `4` - (by default) for classes that set the `margin` to `$spacer`
-- `5` - (by default) for classes that set the `margin` to `$spacer * 1.25`
-- `6` - (by default) for classes that set the `margin` to `$spacer * 1.5`
-- `7` - (by default) for classes that set the `margin` to `$spacer * 2`
-- `8` - (by default) for classes that set the `margin` to `$spacer * 2.5`
-- `9` - (by default) for classes that set the `margin` to `$spacer * 3`
+- `2` - (by default) for classes that set the `margin` to `$spacer * .375`
+- `3` - (by default) for classes that set the `margin` to `$spacer * .5`
+- `4` - (by default) for classes that set the `margin` to `$spacer * .75`
+- `5` - (by default) for classes that set the `margin` to `$spacer`
+- `6` - (by default) for classes that set the `margin` to `$spacer * 1.25`
+- `7` - (by default) for classes that set the `margin` to `$spacer * 1.5`
+- `8` - (by default) for classes that set the `margin` to `$spacer * 1.75`
+- `9` - (by default) for classes that set the `margin` to `$spacer * 2`
+- `10` - (by default) for classes that set the `margin` to `$spacer * 2.25`
+- `11` - (by default) for classes that set the `margin` to `$spacer * 2.5`
+- `12` - (by default) for classes that set the `margin` to `$spacer * 3`
 - `auto` - for classes that set the `margin` to auto
 
 (You can add more sizes by adding entries to the `$spacers` Sass map variable.)
@@ -56,7 +59,7 @@ Here are some representative examples of these classes:
   margin-left: ($spacer * .25);
 }
 
-.my-2 {
+.my-3 {
   margin-top: ($spacer * .5);
   margin-bottom: ($spacer * .5);
 }
@@ -66,7 +69,7 @@ Here are some representative examples of these classes:
 
 Additionally, CoreUI for Bootstrap also includes an `.mx-auto` class for horizontally centering fixed-width block level content—that is, content that has `display: block` and a `width` set—by setting the horizontal margins to `auto`.
 
-<Example html={[`<div class="mx-auto p-2" style="width: 200px; background-color: rgba(var(--cd-violet-rgb),.15); border: rgba(var(--cd-violet-rgb),.3) solid 1px;">`, `  Centered element`, `</div>`]} />
+<Example html={[`<div class="mx-auto p-3" style="width: 200px; background-color: rgba(var(--cd-violet-rgb),.15); border: rgba(var(--cd-violet-rgb),.3) solid 1px;">`, `  Centered element`, `</div>`]} />
 
 ```html
 <div class="mx-auto" style="width: 200px;">
@@ -76,7 +79,7 @@ Additionally, CoreUI for Bootstrap also includes an `.mx-auto` class for horizon
 
 ## Negative margin
 
-Two negative steps ship for the inline margins, `.me--1`, `.me--2`, `.ms--1` and `.ms--2`, for pulling an element back over its neighbour's gap. They come from the `$negative-spacers` map; add a key there to extend the set (`"-3": calc(var(--cui-spacer) * -.75)`), or set one to `null` to drop it. The block margins have no negative form.
+Two negative steps ship for the inline margins, `.me--1`, `.me--2`, `.ms--1` and `.ms--2`, for pulling an element back over its neighbour's gap: `-1` is `-.25rem` and `-2` is `-.5rem`, so the keys do not mirror the positive steps (`.ms-2` is `.375rem`). They come from the `$negative-spacers` map; add a key there to extend the set (`"-3": calc(var(--cui-spacer) * -.75)`), or set one to `null` to drop it. The block margins have no negative form.
 
 <ScssDocs file="scss/_config.scss" capture="negative-spacers-map" />
 
@@ -84,7 +87,7 @@ Two negative steps ship for the inline margins, `.me--1`, `.me--2`, `.ms--1` and
 
 ### Sass variables
 
-`$spacer` sets the default of `--cui-spacer`, the step the whole scale is built from: the stops `--cui-spacer-1` … `-9` are `calc()` multiples of it on `:root`, the utilities read the stops, so `:root { --cui-spacer: .75rem }` rescales every spacing utility at run time, no recompile.
+`$spacer` sets the default of `--cui-spacer`, the step the whole scale is built from: the stops `--cui-spacer-1` … `-12` are `calc()` multiples of it on `:root`, the utilities read the stops, so `:root { --cui-spacer: .75rem }` rescales every spacing utility at run time, no recompile.
 
 <ScssDocs file="scss/_config.scss" capture="spacer-variables" />
 

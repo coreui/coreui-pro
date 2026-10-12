@@ -29,7 +29,7 @@ $thumbnail-tokens: defaults(
 // scss-docs-start figure-tokens
 $figure-tokens: defaults(
   (
-    --#{$prefix}figure-gap: var(--#{$prefix}spacer-2),
+    --#{$prefix}figure-gap: var(--#{$prefix}spacer-3),
   ),
   $figure-tokens
 );

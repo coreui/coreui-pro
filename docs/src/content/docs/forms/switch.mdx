@@ -70,7 +70,7 @@ Any other size is that one property:
 
 The switch reads its size from two tokens, so a wider switch with a larger thumb is two declarations — no new class.
 
-<Example class="d-flex flex-column gap-3" code={`<div class="form-field">
+<Example class="d-flex flex-column gap-4" code={`<div class="form-field">
     <div class="switch" style="--cui-switch-width: 2.75rem; --cui-switch-thumb-size: 1.5rem;">
       <input type="checkbox" id="switchCustomWidth" role="switch" switch checked>
     </div>
@@ -110,7 +110,7 @@ See the [v6 migration guide](/migration/v6/) for the full picture.
 
 Modify the appearance of checked switches by adding a [`.theme-{color}` class](/customize/components/#theme-variants) to the `.switch` input, or to any element above it. This sets the checked background and border color to the theme color.
 
-<Example class="d-flex flex-column gap-2" code={getData('theme-colors').map((c) => `<div class="form-field theme-${c.name}">
+<Example class="d-flex flex-column gap-3" code={getData('theme-colors').map((c) => `<div class="form-field theme-${c.name}">
     <input class="switch" type="checkbox" role="switch" id="switch-${c.name}" checked>
     <label for="switch-${c.name}">${c.title} switch</label>
   </div>`)} />

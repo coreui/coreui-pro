@@ -9,19 +9,19 @@ utility: ["w", "max-w", "min-w", "vw", "min-vw", "dvw", "min-dvw"]
 
 Width utilities are generated from the utility API in `_utilities.scss`. Includes support for `25%`, `50%`, `75%`, `100%`, and `auto` by default. Modify those values as you need to generate different utilities here.
 
-<Example code={`<div class="w-25 p-3" style="background-color: #eee;">Width 25%</div>
-  <div class="w-50 p-3" style="background-color: #eee;">Width 50%</div>
-  <div class="w-75 p-3" style="background-color: #eee;">Width 75%</div>
-  <div class="w-100 p-3" style="background-color: #eee;">Width 100%</div>
-  <div class="w-auto p-3" style="background-color: #eee;">Width auto</div>`} />
+<Example code={`<div class="w-25 p-4" style="background-color: #eee;">Width 25%</div>
+  <div class="w-50 p-4" style="background-color: #eee;">Width 50%</div>
+  <div class="w-75 p-4" style="background-color: #eee;">Width 75%</div>
+  <div class="w-100 p-4" style="background-color: #eee;">Width 100%</div>
+  <div class="w-auto p-4" style="background-color: #eee;">Width auto</div>`} />
 
 ## Fixed widths
 
 `.w-1` through `.w-12` set a width from the `$sizes` map, one `--cui-spacer` (1rem) per step, computed in the browser, for boxes that should hold their size whatever the parent does — an avatar column, a fixed label, a swatch.
 
-<Example code={`<div class="w-4 p-2 bg-2">.w-4</div>
-<div class="w-8 p-2 bg-2">.w-8</div>
-<div class="w-12 p-2 bg-2">.w-12</div>`} />
+<Example code={`<div class="w-4 p-3 bg-2">.w-4</div>
+<div class="w-8 p-3 bg-2">.w-8</div>
+<div class="w-12 p-3 bg-2">.w-12</div>`} />
 
 ## Max width
 
@@ -35,11 +35,11 @@ Use `.max-w-100` to cap an element at the width of its parent — the usual reas
 
 `.min-w-0` is the one you reach for most. A flex or grid child starts at `min-width: auto`, which refuses to shrink below its own content — and a `.text-truncate` child never breaks its line, so its content width is the whole string. The item pushes past its track instead of ellipsizing. Dropping the floor to `0` lets it shrink so the truncation can happen.
 
-<Example code={`<div class="d-flex gap-2 border p-2 mb-2" style="max-width: 320px;">
+<Example code={`<div class="d-flex gap-3 border p-3 mb-3" style="max-width: 320px;">
     <div class="text-truncate">Without a floor this line pushes the button out of the box</div>
     <button class="btn-solid theme-primary flex-shrink-0" type="button">Action</button>
   </div>
-  <div class="d-flex gap-2 border p-2" style="max-width: 320px;">
+  <div class="d-flex gap-3 border p-3" style="max-width: 320px;">
     <div class="min-w-0 text-truncate">With .min-w-0 the same line truncates instead</div>
     <button class="btn-solid theme-primary flex-shrink-0" type="button">Action</button>
   </div>`} />
@@ -66,9 +66,9 @@ A mobile browser resizes the viewport as it shows or hides its URL bar, so `vw` 
 
 Size an element from its content instead of its container: `.w-min` (the widest unbreakable word), `.w-max` (the full unwrapped content), `.w-fit` (the content, capped at the container).
 
-<Example code={`<div class="w-min p-2 mb-2 bg-4 border">Min width</div>
-  <div class="w-max p-2 mb-2 bg-4 border">Max width</div>
-  <div class="w-fit p-2 bg-4 border">Fit width</div>`} />
+<Example code={`<div class="w-min p-3 mb-3 bg-4 border">Min width</div>
+  <div class="w-max p-3 mb-3 bg-4 border">Max width</div>
+  <div class="w-fit p-3 bg-4 border">Fit width</div>`} />
 
 ## Customizing
 

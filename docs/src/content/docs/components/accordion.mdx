@@ -75,7 +75,7 @@ Put a whole `.accordion` inside an `.accordion-body` to nest one. Give each leve
       <summary class="accordion-header">Accordion Item #1</summary>
       <div class="accordion-body">
         <strong>This item contains a nested accordion.</strong>
-        <div class="accordion mt-3">
+        <div class="accordion mt-4">
           <details class="accordion-item" name="accordionNestedInner" open>
             <summary class="accordion-header">Nested Item #1</summary>
             <div class="accordion-body">Body of the first nested item.</div>
@@ -150,7 +150,7 @@ The gap sits on the accordion, not on the panel, so opening and closing still an
     </details>
   </div>`} />
 
-Set the distance with `--cui-accordion-gap`, which defaults to `--cui-spacer-2`.
+Set the distance with `--cui-accordion-gap`, which defaults to `--cui-spacer-3`.
 
 ## Always open
 
@@ -185,8 +185,8 @@ They work on an exclusive accordion too: the HTML Standard forbids leaving more 
 
 Both return a promise that settles once the items have finished moving.
 
-<Example code={`<button class="btn-solid theme-primary mb-3" type="button" id="accordionExpandAll">Expand all</button>
-  <button class="btn-solid theme-secondary mb-3" type="button" id="accordionCollapseAll">Collapse all</button>
+<Example code={`<button class="btn-solid theme-primary mb-4" type="button" id="accordionExpandAll">Expand all</button>
+  <button class="btn-solid theme-secondary mb-4" type="button" id="accordionCollapseAll">Collapse all</button>
   <div class="accordion" id="accordionToggleAll">
     <details class="accordion-item" name="accordionToggleAll" open>
       <summary class="accordion-header">Accordion Item #1</summary>

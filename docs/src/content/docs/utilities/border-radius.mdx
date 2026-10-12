@@ -44,10 +44,10 @@ Use the scaling classes for larger or smaller rounded corners. Sizes range from 
 
 `.rounded-size-*` writes the radius into `--cui-rounded-size` without setting `border-radius` itself. The unprefixed corner classes — `.rounded`, `.rounded-top`, `.rounded-end`, `.rounded-bottom`, `.rounded-start` — read that token, so one size class drives whichever corners you round.
 
-<Example class="docs-example-rounded-utils" html={`<div class="rounded-size-5 d-flex gap-3">
-    <div class="rounded-top bg-3 p-4">Top</div>
-    <div class="rounded-start bg-3 p-4">Start</div>
-    <div class="rounded bg-3 p-4">All</div>
+<Example class="docs-example-rounded-utils" html={`<div class="rounded-size-5 d-flex gap-4">
+    <div class="rounded-top bg-3 p-5">Top</div>
+    <div class="rounded-start bg-3 p-5">Start</div>
+    <div class="rounded bg-3 p-5">All</div>
   </div>`} />
 
 Without a `.rounded-size-*` in scope the corner classes fall back to `--cui-radius-5`. A numbered `.rounded-{n}` also writes the token, so `.rounded-3 .rounded-top` keeps the top corners on size 3 while a side class with its own number (`.rounded-top-3`) sets that side directly and ignores the token.

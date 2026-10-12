@@ -49,16 +49,16 @@ Using utilities you can change the border on one side only, or you can change al
 
 The same utilities repaint the border a component ships with:
 
-<Example code={`<div class="mb-4">
+<Example code={`<div class="mb-5">
     <label for="exampleFormControlInput1" class="form-label">Email address</label>
     <input type="email" class="form-control border-success" id="exampleFormControlInput1" placeholder="name@example.com">
   </div>
 
-  <div class="h4 pb-2 mb-4 fg-danger border-bottom border-danger">
+  <div class="h4 pb-3 mb-5 fg-danger border-bottom border-danger">
     Dangerous heading
   </div>
 
-  <div class="p-3 bg-info bg-10 border border-info border-start-0 rounded-end">
+  <div class="p-4 bg-info bg-10 border border-info border-start-0 rounded-end">
     Changing border color and width
   </div>`} />
 
@@ -79,11 +79,11 @@ Every `.border-{color}` utility writes its colour into `--cui-border` and reads 
 
 Override `--cui-border` to repaint the utility with another colour; the opacity class keeps working, because it reads whatever the token holds.
 
-<Example code={`<div class="border border-success p-2 mb-2">This is default success border</div>
-<div class="border border-success p-2 mb-2 border-70">This is 70% opacity success border</div>
-<div class="border border-success p-2 mb-2 border-50">This is 50% opacity success border</div>
-<div class="border border-success p-2 mb-2 border-30">This is 30% opacity success border</div>
-<div class="border border-success p-2 border-10">This is 10% opacity success border</div>`} />
+<Example code={`<div class="border border-success p-3 mb-3">This is default success border</div>
+<div class="border border-success p-3 mb-3 border-70">This is 70% opacity success border</div>
+<div class="border border-success p-3 mb-3 border-50">This is 50% opacity success border</div>
+<div class="border border-success p-3 mb-3 border-30">This is 30% opacity success border</div>
+<div class="border border-success p-3 border-10">This is 10% opacity success border</div>`} />
 
 `.border-opacity-{10|25|50|75|100}` and `.border-{color}-subtle` are the deprecated v5 spellings of `.border-{percentage}` and `.border-subtle-{color}`; they still render and are removed in v7.
 

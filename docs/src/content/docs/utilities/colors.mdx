@@ -59,7 +59,7 @@ Every `.fg-*` utility writes its colour into `--cui-fg` and reads it back, so a 
 
 Override `--cui-fg` to repaint the utility with another colour; the opacity class keeps working, because it reads whatever the token holds.
 
-<Example class="d-flex flex-column gap-2" code={`<div class="fg-primary">This is default primary text</div>
+<Example class="d-flex flex-column gap-3" code={`<div class="fg-primary">This is default primary text</div>
 <div class="fg-primary fg-90">This is 90% opacity primary text</div>
 <div class="fg-primary fg-80">This is 80% opacity primary text</div>
 <div class="fg-primary fg-70">This is 70% opacity primary text</div>
@@ -77,14 +77,14 @@ Override `--cui-fg` to repaint the utility with another colour; the opacity clas
 `.fg-contrast-{color}` sets `--cui-fg` to the theme colour's `contrast` slot — the text colour that reads on the solid colour — so a label on a `.bg-{color}` surface picks the right ink without naming it.
 
 <Example code={[
-  ...getData('theme-colors').map((c) => `<p class="bg-${c.name} fg-contrast-${c.name} p-2">.fg-contrast-${c.name}</p>`)
+  ...getData('theme-colors').map((c) => `<p class="bg-${c.name} fg-contrast-${c.name} p-3">.fg-contrast-${c.name}</p>`)
 ]} />
 
 These compose with the opacity utilities too.
 
-<Example class="d-flex flex-column gap-2" code={`<p class="bg-primary fg-contrast-primary fg-100 p-2">.fg-contrast-primary .fg-100</p>
-<p class="bg-primary fg-contrast-primary fg-70 p-2">.fg-contrast-primary .fg-70</p>
-<p class="bg-primary fg-contrast-primary fg-40 p-2">.fg-contrast-primary .fg-40</p>`} />
+<Example class="d-flex flex-column gap-3" code={`<p class="bg-primary fg-contrast-primary fg-100 p-3">.fg-contrast-primary .fg-100</p>
+<p class="bg-primary fg-contrast-primary fg-70 p-3">.fg-contrast-primary .fg-70</p>
+<p class="bg-primary fg-contrast-primary fg-40 p-3">.fg-contrast-primary .fg-40</p>`} />
 
 ## Reset color
 

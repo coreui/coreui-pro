@@ -11,10 +11,10 @@ utility: ["space-x", "space-y"]
 blocks, an inline row of links — `space-x-*` and `space-y-*` put the spacing on
 the children themselves: every child except the last one gets a margin.
 
-<Example code={`<div class="space-y-3">
-    <div class="p-2 border">First</div>
-    <div class="p-2 border">Second</div>
-    <div class="p-2 border">Third</div>
+<Example code={`<div class="space-y-4">
+    <div class="p-3 border">First</div>
+    <div class="p-3 border">Second</div>
+    <div class="p-3 border">Third</div>
   </div>`} />
 
 ## Horizontal
@@ -23,7 +23,7 @@ the children themselves: every child except the last one gets a margin.
 so in a right-to-left document the spacing lands on the correct side without
 another class.
 
-<Example code={`<div class="space-x-3">
+<Example code={`<div class="space-x-4">
     <a href="#">First</a>
     <a href="#">Second</a>
     <a href="#">Third</a>
@@ -31,19 +31,19 @@ another class.
 
 ## Changing axis across breakpoints
 
-Both are responsive and take the same `0`–`5` steps from the `$spacers` map as
+Both are responsive and take the same `0`–`12` steps from the `$spacers` map as
 every other spacing utility. Combining the two axes is the usual reason to reach
 for them: a stack on small screens that becomes a row further up needs the
 spacing to change axis with it.
 
-<Example code={`<div class="d-md-flex space-y-3 space-y-md-0 space-x-md-3">
-    <div class="p-2 border">First</div>
-    <div class="p-2 border">Second</div>
-    <div class="p-2 border">Third</div>
+<Example code={`<div class="d-md-flex space-y-4 space-y-md-0 space-x-md-4">
+    <div class="p-3 border">First</div>
+    <div class="p-3 border">Second</div>
+    <div class="p-3 border">Third</div>
   </div>`} />
 
-`space-y-3` spaces the stack, `space-y-md-0` drops that spacing once the items
-sit in a row, and `space-x-md-3` takes over along the inline axis.
+`space-y-4` spaces the stack, `space-y-md-0` drops that spacing once the items
+sit in a row, and `space-x-md-4` takes over along the inline axis.
 
 ## How it works
 
@@ -58,7 +58,7 @@ sit in a row, and `space-x-md-3` takes over along the inline axis.
 
 ### Sass variables
 
-`$spacer` sets the default of `--cui-spacer`, the step the whole scale is built from: the stops `--cui-spacer-1` … `-9` are `calc()` multiples of it on `:root`, the utilities read the stops, so `:root { --cui-spacer: .75rem }` rescales every spacing utility at run time, no recompile.
+`$spacer` sets the default of `--cui-spacer`, the step the whole scale is built from: the stops `--cui-spacer-1` … `-12` are `calc()` multiples of it on `:root`, the utilities read the stops, so `:root { --cui-spacer: .75rem }` rescales every spacing utility at run time, no recompile.
 
 <ScssDocs file="scss/_config.scss" capture="spacer-variables" />
 

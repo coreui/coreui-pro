@@ -94,7 +94,7 @@ $toast-tokens: defaults(
   .toast-container {
     // scss-docs-start toast-container-css-vars
     --#{$prefix}toast-zindex: var(--#{$prefix}z-toast);
-    --#{$prefix}toast-container-inset: #{var(--#{$prefix}spacer-4)};
+    --#{$prefix}toast-container-inset: #{var(--#{$prefix}spacer-5)};
     --#{$prefix}toast-inline-sign: 1;
     --#{$prefix}toast-max-width: #{350px};
     --#{$prefix}toast-spacing: #{$container-padding-x};
