@@ -23,6 +23,8 @@ import { unwrapLegacyShell } from './util/legacy-markup.js'
 const CLASS_NAME_OPEN = 'dialog-open'
 const CLASS_NAME_HIDING = 'hiding'
 
+const SELECTOR_NAVBAR_EXPAND = '.navbar[class*="navbar-expand"]'
+
 const POPUP_DATA_KEYS = [
   'coreui.autocomplete',
   'coreui.combobox',
@@ -52,6 +54,8 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
   protected declare _closedByComponent: boolean
   protected declare _cancelHandler: (event: Event) => void
   protected declare _closeHandler: (event: Event) => void
+  protected declare _resizeObserver: ResizeObserver | null
+  protected declare _resizeFrame: number | null
 
   constructor(element?: string | Element | null, config?: Partial<C> | null) {
     super(element, config)
@@ -59,6 +63,8 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
     this._isTransitioning = false
     this._openedAsModal = false
     this._closedByComponent = false
+    this._resizeObserver = null
+    this._resizeFrame = null
     this._addDialogListeners()
   }
 
@@ -146,6 +152,12 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
   }
 
   override dispose(): void {
+    this._resizeObserver?.disconnect()
+
+    if (this._resizeFrame !== null) {
+      cancelAnimationFrame(this._resizeFrame)
+    }
+
     // Disposed while still open (e.g. an SPA tearing the component down
     // mid-navigation): close the native <dialog> and restore body scroll, or
     // `dialog-open` (overflow: hidden) stays stuck on the root element.
@@ -283,6 +295,36 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
         instance.hide()
       }
     }
+  }
+
+  protected _initResizeObserver(): void {
+    const navbar = this._element?.classList.contains(this.constructor.NAME) && this._element.closest(SELECTOR_NAVBAR_EXPAND)
+
+    if (!navbar || typeof ResizeObserver === 'undefined') {
+      return
+    }
+
+    const hideWhenInline = (): void => {
+      if (this._isTransitioning) {
+        this._resizeFrame = requestAnimationFrame(hideWhenInline)
+        return
+      }
+
+      this._resizeFrame = null
+
+      if (this._element.open && getComputedStyle(this._element).position !== 'fixed') {
+        this.hide()
+      }
+    }
+
+    this._resizeObserver = new ResizeObserver(() => {
+      if (this._resizeFrame !== null) {
+        cancelAnimationFrame(this._resizeFrame)
+      }
+
+      this._resizeFrame = requestAnimationFrame(hideWhenInline)
+    })
+    this._resizeObserver.observe(navbar)
   }
 
   // Private

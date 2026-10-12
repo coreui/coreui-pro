@@ -6,6 +6,19 @@ import {
   clearBodyAndDocument, clearFixture, createEvent, getFixture, jQueryMock
 } from '../helpers/fixture.js'
 
+const frames = count => new Promise(resolve => {
+  const step = () => (count-- > 0 ? requestAnimationFrame(step) : resolve())
+  step()
+})
+
+const eventWithin = (element, name, timeout) => new Promise(resolve => {
+  const timer = setTimeout(() => resolve(false), timeout)
+  element.addEventListener(name, () => {
+    clearTimeout(timer)
+    resolve(true)
+  }, { once: true })
+})
+
 describe('Drawer', () => {
   let fixtureEl
 
@@ -230,6 +243,137 @@ describe('Drawer', () => {
 
         drawer.show()
       })
+    })
+
+    it('should not hide a plain `.drawer` on resize, since only a responsive variant lays out inline', async () => {
+      fixtureEl.innerHTML = '<dialog class="drawer drawer-end drawer-instant"></dialog>'
+
+      const drawerEl = fixtureEl.querySelector('dialog')
+      await new Drawer(drawerEl).show()
+      drawerEl.style.position = 'static'
+
+      window.dispatchEvent(createEvent('resize'))
+      await frames(2)
+
+      expect(drawerEl.open).toBeTrue()
+    })
+
+    it('should hide a drawer of a custom breakpoint on resize when its position is not fixed', async () => {
+      fixtureEl.innerHTML = '<dialog class="drawer-3xl drawer-end drawer-instant"></dialog>'
+
+      const drawerEl = fixtureEl.querySelector('dialog')
+      const drawer = new Drawer(drawerEl)
+      await drawer.show()
+      const spy = spyOn(drawer, 'hide').and.callThrough()
+      drawerEl.style.position = 'static'
+
+      window.dispatchEvent(createEvent('resize'))
+
+      expect(spy).toHaveBeenCalled()
+    })
+
+    it('should hide a drawer when its expanding navbar widens without a window resize', async () => {
+      fixtureEl.innerHTML = [
+        '<nav class="navbar navbar-expand-md" style="width: 100px">',
+        '  <dialog class="drawer drawer-end drawer-instant" style="position: fixed"></dialog>',
+        '</nav>'
+      ].join('')
+
+      const navbarEl = fixtureEl.querySelector('.navbar')
+      const drawerEl = fixtureEl.querySelector('dialog')
+      await new Drawer(drawerEl).show()
+      await frames(2)
+
+      expect(drawerEl.open).toBeTrue()
+
+      drawerEl.style.position = 'static'
+      const hidden = eventWithin(drawerEl, 'hidden.coreui.drawer', 500)
+      navbarEl.style.width = '200px'
+
+      expect(await hidden).toBeTrue()
+    })
+
+    it('should keep a drawer open when its navbar widens and the drawer stays fixed', async () => {
+      fixtureEl.innerHTML = [
+        '<nav class="navbar navbar-expand-md" style="width: 100px">',
+        '  <dialog class="drawer drawer-end drawer-instant" style="position: fixed"></dialog>',
+        '</nav>'
+      ].join('')
+
+      const navbarEl = fixtureEl.querySelector('.navbar')
+      const drawerEl = fixtureEl.querySelector('dialog')
+      await new Drawer(drawerEl).show()
+      await frames(2)
+      navbarEl.style.width = '200px'
+      await frames(3)
+
+      expect(drawerEl.open).toBeTrue()
+    })
+
+    it('should observe only a plain drawer in an expanding navbar', () => {
+      fixtureEl.innerHTML = [
+        '<dialog class="drawer" id="alone"></dialog>',
+        '<nav class="navbar"><dialog class="drawer" id="static-navbar"></dialog></nav>',
+        '<nav class="navbar navbar-expand-md"><dialog class="drawer-lg" id="responsive"></dialog></nav>',
+        '<nav class="navbar navbar-expand-md"><dialog class="drawer" id="expanding"></dialog></nav>'
+      ].join('')
+
+      const observed = ['#alone', '#static-navbar', '#responsive', '#expanding']
+        .map(selector => new Drawer(fixtureEl.querySelector(selector))._resizeObserver !== null)
+
+      expect(observed).toEqual([false, false, false, true])
+    })
+
+    it('should not throw when created without an element', () => {
+      expect(() => new Drawer(null)).not.toThrow()
+    })
+
+    it('should disconnect the navbar resize observer on dispose', () => {
+      fixtureEl.innerHTML = [
+        '<nav class="navbar navbar-expand-md">',
+        '  <dialog class="drawer"></dialog>',
+        '</nav>'
+      ].join('')
+
+      const navbarEl = fixtureEl.querySelector('.navbar')
+      const drawerEl = fixtureEl.querySelector('dialog')
+      const observeSpy = spyOn(ResizeObserver.prototype, 'observe').and.callThrough()
+      const drawer = new Drawer(drawerEl)
+      const observer = drawer._resizeObserver
+      const disconnectSpy = spyOn(observer, 'disconnect').and.callThrough()
+
+      expect(observeSpy).toHaveBeenCalledWith(navbarEl)
+
+      drawer.dispose()
+
+      expect(disconnectSpy).toHaveBeenCalled()
+    })
+
+    it('should cancel a pending navbar check on dispose', async () => {
+      fixtureEl.innerHTML = [
+        '<nav class="navbar navbar-expand-md" style="width: 100px">',
+        '  <dialog class="drawer drawer-end drawer-instant" style="position: fixed"></dialog>',
+        '</nav>'
+      ].join('')
+
+      const navbarEl = fixtureEl.querySelector('.navbar')
+      const drawer = new Drawer(fixtureEl.querySelector('dialog'))
+      await drawer.show()
+      await frames(2)
+      const cancelSpy = spyOn(window, 'cancelAnimationFrame').and.callThrough()
+      navbarEl.style.width = '200px'
+
+      await new Promise(resolve => {
+        const poll = () => (drawer._resizeFrame === null ? setTimeout(poll) : resolve())
+        poll()
+      })
+
+      const frame = drawer._resizeFrame
+      drawer.dispose()
+      await frames(2)
+
+      expect(frame).not.toBeNull()
+      expect(cancelSpy).toHaveBeenCalledWith(frame)
     })
   })
 
@@ -1003,6 +1147,22 @@ describe('Drawer', () => {
 
         drawer.show()
       })
+    })
+
+    it('should not hide a dialog that only has "drawer" inside another class name', async () => {
+      fixtureEl.innerHTML = '<dialog class="my-drawer"></dialog>'
+
+      const dialogEl = fixtureEl.querySelector('dialog')
+      dialogEl.show()
+
+      const resizeEvent = createEvent('resize')
+      window.dispatchEvent(resizeEvent)
+      await new Promise(resolve => {
+        setTimeout(resolve, 20)
+      })
+
+      expect(Drawer.getInstance(dialogEl)).toBeNull()
+      expect(dialogEl.open).toBeTrue()
     })
   })
 
