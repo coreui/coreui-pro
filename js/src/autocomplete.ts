@@ -467,8 +467,13 @@ class Autocomplete extends ComboboxBase {
         return
       }
 
+      if (this._namesSelection(inputValue)) {
+        this.hide()
+        return
+      }
+
       const inputValueLower = inputValue.toLowerCase()
-      const exactMatches = this._flattenOptions().filter(option => option.label.toLowerCase() === inputValueLower)
+      const exactMatches = this._selectableOptions().filter(option => option.label.toLowerCase() === inputValueLower)
 
       if (exactMatches.length === 1) {
         this._selectOption(exactMatches[0])
@@ -575,7 +580,12 @@ class Autocomplete extends ComboboxBase {
       return
     }
 
-    const options = this._flattenOptions().filter(option => !option.disabled && option.label.toLowerCase() === this._inputElement.value.toLowerCase())
+    if (this._namesSelection(this._inputElement.value)) {
+      this.hide()
+      return
+    }
+
+    const options = this._selectableOptions().filter(option => option.label.toLowerCase() === this._inputElement.value.toLowerCase())
 
     if (options.length > 0) {
       if (this._selected.some((option: any) => option.value === options[0].value)) {
@@ -773,6 +783,10 @@ class Autocomplete extends ComboboxBase {
   }
 
   _selectOption(option: any): void {
+    if (option.disabled) {
+      return
+    }
+
     if (this._inputElement.value !== option.label) {
       this._dismissValidationState()
     }
@@ -811,7 +825,15 @@ class Autocomplete extends ComboboxBase {
   }
 
   _findHintOption(text: string): any {
-    return this._flattenOptions().find(option => !option.disabled && option.label.toLowerCase().startsWith(text.toLowerCase()))
+    return this._selectableOptions().find(option => option.label.toLowerCase().startsWith(text.toLowerCase()))
+  }
+
+  _namesSelection(text: string): boolean {
+    return this._selected.some((option: any) => option.label === text)
+  }
+
+  _selectableOptions(): any[] {
+    return this._flattenOptions().filter(option => !option.disabled)
   }
 
   _clearByUser(): void {
