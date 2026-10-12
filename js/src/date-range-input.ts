@@ -234,10 +234,10 @@ class DateRangeInput extends BaseComponent {
   protected declare _stateSerial: number
   protected declare _initialStartDate: any
   protected declare _initialEndDate: any
-  protected declare _startDate: Date | null
-  protected declare _endDate: Date | null
-  protected declare _applying: boolean
+  protected declare _batching: boolean
   protected declare _byUser: boolean
+  protected declare _generation: number
+  protected declare _reported: { end: Date | null, start: Date | null }
 
   constructor(element?: string | Element | null, config?: Partial<DateRangeInputConfig> | null) {
     super(element, config)
@@ -257,12 +257,12 @@ class DateRangeInput extends BaseComponent {
     this._element.classList.remove(...this._serverClasses)
     this._initialStartDate = config?.startDate ?? this._config.startDate
     this._initialEndDate = config?.endDate ?? this._config.endDate
-    this._applying = false
+    this._batching = false
     this._byUser = false
+    this._generation = 0
 
     this._createDateRangeInput()
-    this._startDate = this._startInput.getDate()
-    this._endDate = this._endInput.getDate()
+    this._reported = { end: this.getEndDate(), start: this.getStartDate() }
     this._updateValidity()
     this._addEventListeners()
   }
@@ -282,11 +282,11 @@ class DateRangeInput extends BaseComponent {
 
   // Public
   getStartDate(): Date | null {
-    return this._startDate
+    return this._startInput?.getDate() ?? null
   }
 
   getEndDate(): Date | null {
-    return this._endDate
+    return this._endInput?.getDate() ?? null
   }
 
   setRange(startDate: Date | null, endDate: Date | null): void {
@@ -315,7 +315,10 @@ class DateRangeInput extends BaseComponent {
   }
 
   isRangeValid(): boolean {
-    return this._startDate === null || this._endDate === null || this._endDate >= this._startDate
+    const start = this.getStartDate()
+    const end = this.getEndDate()
+
+    return start === null || end === null || end >= start
   }
 
   setConfig(config: Partial<DateRangeInputConfig> | null): void {
@@ -529,41 +532,52 @@ class DateRangeInput extends BaseComponent {
     return separator
   }
 
-  _applyRange(startDate: Date | null, endDate: Date | null, { fields = true }: { fields?: boolean } = {}): void {
-    if (this._applying) {
+  _applyRange(startDate: Date | null, endDate: Date | null): void {
+    const byUser = this._byUser
+    const batching = this._batching
+    const generation = ++this._generation
+    this._byUser = false
+    this._batching = true
+    this._startInput._holdErrors(true)
+    this._endInput._holdErrors(true)
+
+    try {
+      this._setInputDate(this._startInput, startDate, byUser)
+
+      if (generation === this._generation) {
+        this._setInputDate(this._endInput, endDate, byUser)
+      }
+
+      if (this._element) {
+        this._updateValidity()
+        this._reportDate('start')
+        this._reportDate('end')
+      }
+    } finally {
+      this._batching = batching
+      this._startInput?._holdErrors(false)
+      this._endInput?._holdErrors(false)
+    }
+  }
+
+  _onFieldChange(end: 'end' | 'start'): void {
+    if (this._batching) {
       return
     }
 
-    const byUser = this._byUser
-    this._applying = true
-    this._byUser = false
-
-    try {
-      if (fields) {
-        this._setInputDate(this._startInput, startDate, byUser)
-        this._setInputDate(this._endInput, endDate, byUser)
-      }
-    } finally {
-      this._applying = false
-    }
-
-    const start = fields ? this._startInput.getDate() : startDate
-    const end = fields ? this._endInput.getDate() : endDate
-
-    const startChanged = !isSameInstantAs(start, this._startDate)
-    const endChanged = !isSameInstantAs(end, this._endDate)
-    this._startDate = start
-    this._endDate = end
-
     this._updateValidity()
+    this._reportDate(end)
+  }
 
-    if (startChanged) {
-      EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, { date: start })
+  _reportDate(end: 'end' | 'start'): void {
+    const date = end === 'start' ? this.getStartDate() : this.getEndDate()
+
+    if (!this._reported || isSameInstantAs(date, this._reported[end])) {
+      return
     }
 
-    if (endChanged) {
-      EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, { date: end })
-    }
+    this._reported[end] = date
+    EventHandler.trigger(this._element, end === 'start' ? EVENT_START_DATE_CHANGE : EVENT_END_DATE_CHANGE, { date })
   }
 
   _setInputDate(input: any, date: Date | null, byUser: boolean): void {
@@ -632,12 +646,12 @@ class DateRangeInput extends BaseComponent {
   }
 
   _addEventListeners(): void {
-    EventHandler.on(this._startElement, DateInput.eventName(DateInput.CHANGE_EVENT_NAME), (event: any) => {
-      this._applyRange(event.date, this._endDate, { fields: false })
+    EventHandler.on(this._startElement, DateInput.eventName(DateInput.CHANGE_EVENT_NAME), () => {
+      this._onFieldChange('start')
     })
 
-    EventHandler.on(this._endElement, DateInput.eventName(DateInput.CHANGE_EVENT_NAME), (event: any) => {
-      this._applyRange(this._startDate, event.date, { fields: false })
+    EventHandler.on(this._endElement, DateInput.eventName(DateInput.CHANGE_EVENT_NAME), () => {
+      this._onFieldChange('end')
     })
 
     if (this._separatorElement.getAttribute('aria-hidden') !== 'true') {

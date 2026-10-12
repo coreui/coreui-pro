@@ -2447,6 +2447,79 @@ describe('DateInput', () => {
       expect(spy).toHaveBeenCalledTimes(3)
     })
 
+    it('should report the date before the error it changes, from the keyboard and from setConfig', () => {
+      const max = new Date(2026, 6, 14)
+      const dateInput = createDateInput({ date: max, maxDate: max })
+      const [day] = getSections(dateInput._element)
+      const log = []
+
+      dateInput._element.addEventListener('dateChange.coreui.date-input', event => log.push(`date:${event.date?.getDate() ?? null}`))
+      dateInput._element.addEventListener('errorChange.coreui.date-input', event => log.push(`error:${event.error}`))
+      day.focus()
+      pressKey(day, 'ArrowUp')
+      pressKey(day, 'ArrowDown')
+      dateInput.setConfig({ date: new Date(2026, 6, 20) })
+
+      expect(log).toEqual(['date:null', 'error:maxDate', 'date:14', 'error:null', 'date:null', 'error:maxDate'])
+    })
+
+    it('should keep a date an errorChange listener sets', () => {
+      const max = new Date(2026, 6, 14)
+      const dateInput = createDateInput({ date: max, maxDate: max })
+      const [day] = getSections(dateInput._element)
+
+      dateInput._element.addEventListener('errorChange.coreui.date-input', event => {
+        if (event.error === 'maxDate') {
+          dateInput.setConfig({ date: max })
+        }
+      })
+      day.focus()
+      pressKey(day, 'ArrowUp')
+
+      expect(dateInput.getDate()).toEqual(max)
+      expect(getSections(dateInput._element)[0].textContent).toEqual('14')
+      expect(dateInput._element.classList.contains('is-invalid')).toBeFalse()
+    })
+
+    it('should announce an error once, after the date, when a dateChange listener sets another refused date', () => {
+      const max = new Date(2026, 6, 14)
+      const dateInput = createDateInput({ date: max, maxDate: max })
+      const [day] = getSections(dateInput._element)
+      const log = []
+
+      dateInput._element.addEventListener('errorChange.coreui.date-input', event => log.push(`error:${event.error}`))
+      dateInput._element.addEventListener('dateChange.coreui.date-input', event => {
+        log.push(`date:${event.date}`)
+
+        if (event.date === null) {
+          dateInput.setConfig({ date: new Date(2026, 6, 20) })
+        }
+      })
+      day.focus()
+      pressKey(day, 'ArrowUp')
+
+      expect(log).toEqual(['date:null', 'error:maxDate'])
+      expect(dateInput.getDate()).toBeNull()
+      expect(getSections(dateInput._element)[0].textContent).toEqual('20')
+    })
+
+    it('should report only the date a native input listener sets while a change is committed', () => {
+      const dateInput = createDateInput({ date: new Date(2026, 6, 14) })
+      const [day] = getSections(dateInput._element)
+      const dates = []
+
+      dateInput._element.addEventListener('dateChange.coreui.date-input', event => dates.push(event.date.getDate()))
+      dateInput._element.querySelector('textarea').addEventListener('input', () => {
+        dateInput.setConfig({ date: new Date(2026, 6, 3) })
+      }, { once: true })
+      day.focus()
+      pressKey(day, 'ArrowUp')
+
+      expect(dates).toEqual([3])
+      expect(dateInput.getDate()).toEqual(new Date(2026, 6, 3))
+      expect(getSections(dateInput._element)[0].textContent).toEqual('03')
+    })
+
     it('should report minDate and mark the field invalid for a date before year 1', () => {
       fixtureEl.innerHTML = '<div id="mydateinput"></div>'
       const element = fixtureEl.querySelector('div')

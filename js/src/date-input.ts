@@ -244,6 +244,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
   protected declare _draft: string
   protected declare _allSelected: boolean
   protected declare _error: string | null
+  protected declare _errorHolds: number
   protected declare _hostAriaLabel: string | null
   protected declare _hostClasses: HostClasses
   protected declare _hostNodes: ChildNode[]
@@ -254,11 +255,13 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
   protected declare _rejected: boolean
   protected declare _releaseValidationState: () => void
   protected declare _removeLabelClick: () => void
+  protected declare _reportedDate: Date | null
   protected declare _serverClasses: string[]
   protected declare _stateClass: string | null
   protected declare _stateSerial: number
   protected declare _userCommit: boolean
   protected declare _userValidity: UserValidity
+  protected declare _validationError: string | null
   protected declare _valueKey: string
 
   constructor(element?: string | Element | null, config?: Partial<C> | null) {
@@ -268,6 +271,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
     this._date = getDateFromSections(this._sections)
     this._allSelected = false
     this._error = null
+    this._errorHolds = 0
     this._inputElement = null
     this._isBuilt = false
     this._onDismissValidationState = null
@@ -278,6 +282,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
     this._stateClass = null
     this._stateSerial = nextStateSerial()
     this._userCommit = false
+    this._validationError = null
     this._hostAriaLabel = this._element.getAttribute('aria-label')
     this._hostClasses = captureHostClasses(this._element, HOST_CLASS_NAMES)
     this._hostNodes = [...this._element.childNodes]
@@ -289,7 +294,9 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
     this._userValidity = followUserValidity(this._inputElement!, () => this._updateValidity(), serial => this._onFormReset(serial))
     this._releaseValidationState = ownValidationState(this._inputElement!)
     this._initialDate = getDateFromSections(this._sections)
-    this._date = this._applyValidationState()
+    this._applyValidationState()
+    this._reportedDate = this._date
+    this._announceError()
     this._valueKey = this._getValueKey(this._sections)
     this._inputElement!.defaultValue = this._getResetValue()
     this._isBuilt = true
@@ -702,21 +709,29 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
     this._sections = sections
     this._syncSections()
 
-    const date = this._applyValidationState()
+    const value = this._applyValidationState()
     this._valueKey = this._getValueKey(this._sections)
 
-    if (isSameInstantAs(date, this._date)) {
-      return
+    if (value !== null) {
+      this._inputElement!.dispatchEvent(new Event('input', { bubbles: true }))
+
+      if (this._inputElement?.value === value) {
+        this._inputElement.dispatchEvent(new Event('change', { bubbles: true }))
+      }
     }
 
-    this._date = date
+    if (!isSameInstantAs(this._date, this._reportedDate)) {
+      this._reportedDate = this._date
 
-    EventHandler.trigger(this._element, this.constructor.eventName(this.constructor.CHANGE_EVENT_NAME), {
-      date
-    })
+      EventHandler.trigger(this._element, this.constructor.eventName(this.constructor.CHANGE_EVENT_NAME), {
+        date: this._date
+      })
+    }
+
+    this._announceError()
   }
 
-  _applyValidationState(): Date | null {
+  _applyValidationState(): string | null {
     for (const section of this._sections) {
       if (!this._draft && (section.type === 'day' || section.type === 'week') && section.value !== null && section.value > this._getSectionMax(section)) {
         section.value = this._getSectionMax(section)
@@ -739,22 +754,28 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
     }
 
     this._updateValidity()
+    this._date = isDisabled ? null : date
+    this._validationError = error
 
-    if (isChanged && this._isBuilt) {
-      this._inputElement!.dispatchEvent(new Event('input', { bubbles: true }))
-      this._inputElement!.dispatchEvent(new Event('change', { bubbles: true }))
+    return isChanged && this._isBuilt ? value : null
+  }
+
+  _announceError(): void {
+    if (this._errorHolds || this._validationError === this._error) {
+      return
     }
 
-    if (error !== this._error) {
-      this._error = error
+    this._error = this._validationError
 
-      EventHandler.trigger(this._element, this.constructor.eventName('errorChange'), {
-        error
-      })
-      this._syncDescription()
-    }
+    EventHandler.trigger(this._element, this.constructor.eventName('errorChange'), {
+      error: this._error
+    })
+    this._syncDescription()
+  }
 
-    return isDisabled ? null : date
+  _holdErrors(hold: boolean): void {
+    this._errorHolds += hold ? 1 : -1
+    this._announceError()
   }
 
   _runAsUser(action: () => void): void {

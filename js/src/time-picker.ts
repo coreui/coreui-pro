@@ -12,6 +12,7 @@ import TimeInput, { type TimeInputConfig } from './time-input.js'
 import type { TimeSelectionConfig } from './time-selection/base.js'
 import TimeRoll from './time-selection/roll.js'
 import { type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
+import { isSameInstantAs } from './util/calendar.js'
 import { getHourCycle } from './util/date-sections.js'
 import {
   appendControlGroupField,
@@ -136,8 +137,7 @@ class TimePicker extends PickerBase {
   protected declare _input: any
   protected declare _selection: any
   protected declare _selectionElement: any
-  protected declare _applying: number
-  protected declare _time: Date | null
+  protected declare _source: 'selection' | null
 
   constructor(element?: string | Element | null, config?: TimePickerOptions | null) {
     super(element, config)
@@ -145,9 +145,8 @@ class TimePicker extends PickerBase {
     this._initialTime = config?.time ?? this._config.time
     this._input = null
     this._selection = null
-    this._applying = 0
-    this._time = null
     this._selectionElement = null
+    this._source = null
 
     this._hostClasses = captureHostClasses(this._element, this._managedClassNames())
     this._createTimePicker()
@@ -170,11 +169,11 @@ class TimePicker extends PickerBase {
 
   // Public
   getTime(): Date | null {
-    return this._input.getDate()
+    return this._input?.getDate() ?? null
   }
 
   setTime(time: Date | null): void {
-    this._applyTime(time)
+    this._write(() => this._input.setConfig({ date: time }))
   }
 
   now(): void {
@@ -182,8 +181,7 @@ class TimePicker extends PickerBase {
   }
 
   clear(): void {
-    this._withUser(this._input, () => this._input.clear())
-    this._applyTime(null, { field: false })
+    this._write(() => this._input.clear())
   }
 
   reset(): void {
@@ -259,12 +257,9 @@ class TimePicker extends PickerBase {
     }))
 
     this._input._setOwnerDismiss((serial: number) => this._dismissValidationState(serial))
-    this._time = this._input.getDate()
 
     EventHandler.on(inputEl, TimeInput.eventName(TimeInput.CHANGE_EVENT_NAME), (event: any) => {
-      if (!this._applying) {
-        this._applyTime(event.date, { field: false })
-      }
+      this._onFieldChange(event.date)
     })
 
     this._selectionElement = document.createElement('div')
@@ -288,33 +283,40 @@ class TimePicker extends PickerBase {
     this._selection = new TimeRoll(this._selectionElement, this._forwardConfig(TimeRoll, {
       hourCycle: getHourCycle(this._input._sections) ?? null,
       locale: this._config.locale,
-      onChange: (time: Date | null) => this._runAsUser(() => this._applyTime(time, { selection: false })),
+      onChange: (time: Date | null) => this._runAsUser(() => this._write(() => this._input.setConfig({ date: time }), 'selection')),
       time: this.getTime()
     }, this._config.selectionOptions))
   }
 
-  _applyTime(time: Date | null, { field = true, selection = true }: { field?: boolean, selection?: boolean } = {}): void {
-    if (field) {
-      this._applying++
+  _write(action: () => void, source: 'selection' | null = null): void {
+    const previous = this._source
+    this._source = source
 
-      try {
-        this._withUser(this._input, () => this._input.setConfig({ date: time }))
-      } finally {
-        this._applying--
-      }
+    try {
+      this._withUser(this._input, action)
+    } finally {
+      this._source = previous
     }
 
-    const applied = field ? this._input.getDate() : time
-    const stamp = (date: Date | null) => (date ? date.getTime() : null)
-    const changed = stamp(applied) !== stamp(this._time)
-    this._time = applied
+    if (this._element && !source) {
+      this._showTime(this.getTime())
+    }
+  }
 
-    if (selection && this._selection && stamp(this._selection.getTime()) !== stamp(applied)) {
-      this._selection.setConfig({ time: applied })
+  _onFieldChange(time: Date | null): void {
+    const source = this._source
+    this._source = null
+
+    if (source !== 'selection') {
+      this._showTime(time)
     }
 
-    if (changed) {
-      EventHandler.trigger(this._element, EVENT_TIME_CHANGE, { time: applied })
+    EventHandler.trigger(this._element, EVENT_TIME_CHANGE, { time })
+  }
+
+  _showTime(time: Date | null): void {
+    if (this._selection && !isSameInstantAs(this._selection.getTime(), time)) {
+      this._selection.setConfig({ time })
     }
   }
 

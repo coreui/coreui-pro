@@ -392,6 +392,8 @@ context.disabled               // disabled state
 | `shown.coreui.date-range-picker` | Fired once the popup has finished its entry transition. Skipped when the popup closes first. |
 | `startDateChange.coreui.date-range-picker` | Fired when the start changes. `event.date` is the validated `Date`, or `null`; `event.formattedDate` is the same value in the shape of `selectionType` (`2026-01`, `2026W03`, `2026Q1`, `2026`, or the `Date` itself for `day`), with the year in at least four digits (`0026-01`). |
 
+`startDateChange` and `endDateChange` fire before the fields' `errorChange.coreui.date-input` for the same change, whether it comes from the calendar, the fields or a method.
+
 ```js
 const myPicker = document.getElementById('myPicker')
 myPicker.addEventListener('endDateChange.coreui.date-range-picker', event => {

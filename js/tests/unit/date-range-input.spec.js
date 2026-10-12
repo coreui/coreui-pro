@@ -143,6 +143,144 @@ describe('DateRangeInput', () => {
   })
 
   describe('range state', () => {
+    it('should report the range before the field errors, from the keyboard and from setRange', () => {
+      const max = new Date(2026, 6, 14)
+      build({ endDate: max, maxDate: max, startDate: max })
+      const [day] = fields()[0].querySelectorAll('.form-date-time-section')
+      const log = []
+
+      for (const name of ['startDateChange', 'endDateChange']) {
+        root().addEventListener(`${name}.coreui.date-range-input`, event => log.push(`${name}:${event.date?.getDate() ?? null}`))
+      }
+
+      root().addEventListener('errorChange.coreui.date-input', event => log.push(`error:${event.error}`))
+      day.focus()
+      day.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true, cancelable: true }))
+      DateRangeInput.getInstance(root()).setRange(new Date(2026, 6, 20), new Date(2026, 6, 25))
+
+      expect(log).toEqual(['startDateChange:null', 'error:maxDate', 'endDateChange:null', 'error:maxDate'])
+    })
+
+    it('should fire each change once when a range event listener sets another range', () => {
+      const range = build({ endDate: new Date(2026, 6, 10), startDate: new Date(2026, 6, 1) })
+      const seen = []
+      let nested = false
+
+      for (const name of ['startDateChange', 'endDateChange']) {
+        root().addEventListener(`${name}.coreui.date-range-input`, event => seen.push([name, event.date]))
+      }
+
+      root().addEventListener('startDateChange.coreui.date-range-input', () => {
+        if (!nested) {
+          nested = true
+          range.setRange(new Date(2026, 6, 2), new Date(2026, 6, 12))
+        }
+      })
+      range.setRange(new Date(2026, 6, 5), new Date(2026, 6, 20))
+
+      expect([range.getStartDate(), range.getEndDate()]).toEqual([new Date(2026, 6, 2), new Date(2026, 6, 12)])
+      expect(seen).toEqual([
+        ['startDateChange', new Date(2026, 6, 5)],
+        ['startDateChange', new Date(2026, 6, 2)],
+        ['endDateChange', new Date(2026, 6, 12)]
+      ])
+    })
+
+    it('should report the end when a startDateChange listener sets the same range again', () => {
+      const range = build({ endDate: new Date(2026, 6, 10), startDate: new Date(2026, 6, 1) })
+      const seen = []
+
+      for (const name of ['startDateChange', 'endDateChange']) {
+        root().addEventListener(`${name}.coreui.date-range-input`, event => seen.push([name, event.date]))
+      }
+
+      root().addEventListener('startDateChange.coreui.date-range-input', () => {
+        range.setRange(new Date(2026, 6, 5), new Date(2026, 6, 20))
+      }, { once: true })
+      range.setRange(new Date(2026, 6, 5), new Date(2026, 6, 20))
+
+      expect(range.getEndDate()).toEqual(new Date(2026, 6, 20))
+      expect(seen).toEqual([
+        ['startDateChange', new Date(2026, 6, 5)],
+        ['endDateChange', new Date(2026, 6, 20)]
+      ])
+    })
+
+    it('should report both ends once when a field change listener sets another range while setRange runs', () => {
+      const range = build({ endDate: new Date(2026, 6, 10), startDate: new Date(2026, 6, 1) })
+      const seen = []
+
+      for (const name of ['startDateChange', 'endDateChange']) {
+        root().addEventListener(`${name}.coreui.date-range-input`, event => seen.push([name, event.date]))
+      }
+
+      hiddenInputs()[0].addEventListener('change', () => {
+        range.setRange(new Date(2026, 6, 5), new Date(2026, 6, 12))
+      }, { once: true })
+      range.setRange(new Date(2026, 6, 5), new Date(2026, 6, 20))
+
+      expect([range.getStartDate(), range.getEndDate()]).toEqual([new Date(2026, 6, 5), new Date(2026, 6, 12)])
+      expect(seen).toEqual([
+        ['startDateChange', new Date(2026, 6, 5)],
+        ['endDateChange', new Date(2026, 6, 12)]
+      ])
+    })
+
+    it('should not report an end a field change listener sets back while setRange runs', () => {
+      const range = build({ endDate: new Date(2026, 6, 10), startDate: new Date(2026, 6, 1) })
+      const seen = []
+
+      for (const name of ['startDateChange', 'endDateChange']) {
+        root().addEventListener(`${name}.coreui.date-range-input`, event => seen.push([name, event.date]))
+      }
+
+      hiddenInputs()[1].addEventListener('change', () => {
+        range.setRange(new Date(2026, 6, 5), new Date(2026, 6, 10))
+      }, { once: true })
+      range.setRange(new Date(2026, 6, 5), new Date(2026, 6, 20))
+
+      expect([range.getStartDate(), range.getEndDate()]).toEqual([new Date(2026, 6, 5), new Date(2026, 6, 10)])
+      expect(seen).toEqual([['startDateChange', new Date(2026, 6, 5)]])
+    })
+
+    it('should read empty ends from an errorChange listener while the fields are built', () => {
+      const read = []
+      const onError = () => {
+        const range = DateRangeInput.getInstance(root())
+        read.push([range.getStartDate(), range.getEndDate()])
+      }
+
+      fixtureEl.addEventListener('errorChange.coreui.date-input', onError)
+      build({ maxDate: new Date(2026, 6, 14), startDate: new Date(2026, 6, 20) })
+      fixtureEl.removeEventListener('errorChange.coreui.date-input', onError)
+
+      expect(read).toEqual([[null, null]])
+    })
+
+    it('should keep a range an errorChange listener sets while setRange runs', () => {
+      const range = build({ endDate: new Date(2026, 6, 10), maxDate: new Date(2026, 6, 14), startDate: new Date(2026, 6, 1) })
+      const seen = []
+
+      for (const name of ['startDateChange', 'endDateChange']) {
+        root().addEventListener(`${name}.coreui.date-range-input`, event => seen.push([name, event.date]))
+      }
+
+      root().addEventListener('errorChange.coreui.date-input', event => {
+        if (event.error === 'maxDate') {
+          range.setRange(new Date(2026, 6, 2), new Date(2026, 6, 12))
+        }
+      })
+      range.setRange(new Date(2026, 6, 20), new Date(2026, 6, 25))
+
+      expect([range.getStartDate(), range.getEndDate()]).toEqual([new Date(2026, 6, 2), new Date(2026, 6, 12)])
+      expect(seen).toEqual([
+        ['startDateChange', null],
+        ['endDateChange', null],
+        ['startDateChange', new Date(2026, 6, 2)],
+        ['endDateChange', new Date(2026, 6, 12)]
+      ])
+    })
+
     it('should set both dates, update the fields and emit once per change', () => {
       const range = build()
       const seen = []

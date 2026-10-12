@@ -1,3 +1,4 @@
+import TimeInput from '../../src/time-input.js'
 import TimePicker from '../../src/time-picker.js'
 import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
 
@@ -26,6 +27,21 @@ describe('TimePicker', () => {
   }
 
   describe('constructor', () => {
+    it('should read an empty time from an errorChange listener while the field is built', () => {
+      const read = []
+      const onError = () => read.push(TimePicker.getInstance(fixtureEl.querySelector('#picker')).getTime())
+
+      fixtureEl.addEventListener('errorChange.coreui.time-input', onError)
+
+      try {
+        buildPicker({ inputOptions: { maxDate: '12:00' }, locale: 'en-GB', time: '14:00' })
+      } finally {
+        fixtureEl.removeEventListener('errorChange.coreui.time-input', onError)
+      }
+
+      expect(read).toEqual([null])
+    })
+
     it('should point aria-controls at the panel only while it exists', () => {
       const picker = buildPicker()
       const indicator = fixtureEl.querySelector('.form-control-action')
@@ -245,6 +261,39 @@ describe('TimePicker', () => {
   })
 
   describe('time selection', () => {
+    it('should report the time before the field error, from the keyboard and from setTime', () => {
+      const picker = buildPicker({ inputOptions: { maxDate: '12:00' }, locale: 'en-GB', time: '12:00' })
+      const el = fixtureEl.querySelector('#picker')
+      const [hour] = el.querySelectorAll('.form-date-time-section')
+      const log = []
+
+      el.addEventListener('timeChange.coreui.time-picker', event => log.push(`time:${event.time?.getHours() ?? null}`))
+      el.addEventListener('errorChange.coreui.time-input', event => log.push(`error:${event.error}`))
+      hour.focus()
+      hour.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true, cancelable: true }))
+      picker.setTime('12:00')
+      picker.setTime('15:00')
+
+      expect(log).toEqual(['time:null', 'error:maxDate', 'time:12', 'error:null', 'time:null', 'error:maxDate'])
+    })
+
+    it('should keep a time an errorChange listener sets while setTime runs', () => {
+      const picker = buildPicker({ inputOptions: { maxDate: '12:00' }, locale: 'en-GB', time: '10:00' })
+      const el = fixtureEl.querySelector('#picker')
+      const emitted = []
+
+      el.addEventListener('timeChange.coreui.time-picker', event => emitted.push(event.time?.getHours() ?? null))
+      el.addEventListener('errorChange.coreui.time-input', event => {
+        if (event.error === 'maxDate') {
+          picker.setTime('12:00')
+        }
+      })
+      picker.setTime('15:00')
+
+      expect(picker.getTime()).toEqual(new Date(1970, 0, 1, 12))
+      expect(emitted).toEqual([null, 12])
+    })
+
     it('should update the field and emit timeChange when a cell is clicked', () => {
       const picker = buildPicker({ time: new Date(2026, 0, 1, 10, 0, 0) })
       const el = fixtureEl.querySelector('#picker')
@@ -418,6 +467,21 @@ describe('TimePicker', () => {
       cell('meridiem', 'am').click()
 
       expect(picker.getTime()).toEqual(new Date(1970, 0, 1, 9, 15))
+    })
+
+    it('should show in the panel a time the field takes from a listener during a panel pick', () => {
+      const picker = buildPicker({ locale: 'en-GB', seconds: false, time: '09:15' })
+
+      fixtureEl.querySelector('#picker').addEventListener('timeChange.coreui.time-input', event => {
+        if (event.date?.getHours() === 10) {
+          TimeInput.getInstance(event.target).setConfig({ date: '08:15' })
+        }
+      })
+      picker.show()
+      cell('hours', '10').click()
+
+      expect(picker.getTime()).toEqual(new Date(1970, 0, 1, 8, 15))
+      expect(fixtureEl.querySelector('.time-picker-popup [data-coreui-hours].selected').getAttribute('data-coreui-hours')).toEqual('8')
     })
 
     it('should empty the panel when a refused pick is cleared', () => {

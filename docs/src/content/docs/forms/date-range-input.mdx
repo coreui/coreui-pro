@@ -369,6 +369,8 @@ dateRangeInput.clear()
 | `endDateChange.coreui.date-range-input` | Fired when the end changes; `event.date` is a `Date`, or `null` when that end is incomplete or invalid |
 | `startDateChange.coreui.date-range-input` | Fired when the start changes, with the same payload shape as the end |
 
+`setRange()` writes both ends before either event fires. The range events come before the `errorChange.coreui.date-input` of the fields, whether the dates are typed or set, so a range an `errorChange` listener sets replaces the one just reported.
+
 Each event carries the date of its own end; a listener reads the whole range from the instance:
 
 ```javascript

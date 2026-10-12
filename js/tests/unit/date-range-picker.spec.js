@@ -1,5 +1,6 @@
 import { vi } from 'vitest'
 import Calendar from '../../src/calendar.js'
+import DateInput from '../../src/date-input.js'
 import DateRangeInput from '../../src/date-range-input.js'
 import DateRangePicker from '../../src/date-range-picker.js'
 import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
@@ -57,6 +58,24 @@ describe('DateRangePicker', () => {
   })
 
   describe('constructor', () => {
+    it('should read empty ends from an errorChange listener while the fields are built', () => {
+      const read = []
+      const onError = () => {
+        const picker = DateRangePicker.getInstance(fixtureEl.querySelector('#picker'))
+        read.push([picker.getStartDate(), picker.getEndDate()])
+      }
+
+      fixtureEl.addEventListener('errorChange.coreui.date-input', onError)
+
+      try {
+        buildPicker({ maxDate: new Date(2026, 6, 14), startDate: new Date(2026, 6, 20) })
+      } finally {
+        fixtureEl.removeEventListener('errorChange.coreui.date-input', onError)
+      }
+
+      expect(read).toEqual([[null, null]])
+    })
+
     it('should let a global picker default reach the calendar and win over a global field default', () => {
       const pickerSelection = DateRangePicker.Default.selectionType
       const pickerLabel = DateRangePicker.Default.ariaStartLabel
@@ -250,6 +269,75 @@ describe('DateRangePicker', () => {
   })
 
   describe('range selection', () => {
+    it('should show in the calendar a start date the field takes from a listener during a calendar pick', () => {
+      const picker = buildPicker({ endDate: new Date(2026, 6, 20), locale: 'en-US', startDate: new Date(2026, 6, 10) })
+      const el = fixtureEl.querySelector('#picker')
+
+      el.addEventListener('dateChange.coreui.date-input', event => {
+        if (event.date?.getDate() === 5) {
+          DateInput.getInstance(event.target).setConfig({ date: new Date(2026, 6, 3) })
+        }
+      })
+      picker.show();
+      [...fixtureEl.querySelectorAll('.date-picker-popup .calendar-cell[data-coreui-selectable]')]
+        .find(cell => cell.textContent.trim() === '5')
+        .click()
+
+      expect(picker.getStartDate()).toEqual(new Date(2026, 6, 3))
+      expect([...fixtureEl.querySelectorAll('.date-picker-popup .calendar-cell.selected')].map(cell => cell.textContent.trim())).toEqual(['3', '20'])
+    })
+
+    it('should show in the calendar an end date the field takes from a listener during a calendar pick', () => {
+      const picker = buildPicker({ endDate: new Date(2026, 6, 20), locale: 'en-US', startDate: new Date(2026, 6, 10) })
+      const el = fixtureEl.querySelector('#picker')
+      const pick = day => [...fixtureEl.querySelectorAll('.date-picker-popup .calendar-cell[data-coreui-selectable]')]
+        .find(cell => cell.textContent.trim() === day)
+        .click()
+
+      el.addEventListener('dateChange.coreui.date-input', event => {
+        if (event.date?.getDate() === 22) {
+          DateInput.getInstance(event.target).setConfig({ date: new Date(2026, 6, 24) })
+        }
+      })
+      picker.show()
+      pick('5')
+      pick('22')
+
+      expect(picker.getEndDate()).toEqual(new Date(2026, 6, 24))
+      expect([...fixtureEl.querySelectorAll('.date-picker-popup .calendar-cell.selected')].map(cell => cell.textContent.trim())).toEqual(['5', '24'])
+    })
+
+    it('should show each end in the calendar before its change event fires', () => {
+      const picker = buildPicker({ endDate: new Date(2026, 6, 10), locale: 'en-US', startDate: new Date(2026, 6, 1) })
+      const el = fixtureEl.querySelector('#picker')
+      const selected = []
+      const record = () => selected.push([...fixtureEl.querySelectorAll('.date-picker-popup .calendar-cell.selected')].map(cell => cell.textContent.trim()))
+
+      el.addEventListener('startDateChange.coreui.date-range-picker', record)
+      el.addEventListener('endDateChange.coreui.date-range-picker', record)
+      picker.show()
+      picker.setRange(new Date(2026, 6, 5), new Date(2026, 6, 20))
+
+      expect(selected).toEqual([['5', '10'], ['5', '20']])
+    })
+
+    it('should report the start date before the field error', () => {
+      const max = new Date(2026, 6, 14)
+      buildPicker({
+        endDate: max, format: 'dd.MM.yyyy', maxDate: max, startDate: max
+      })
+      const el = fixtureEl.querySelector('#picker')
+      const [day] = el.querySelectorAll('.form-date-time-section')
+      const log = []
+
+      el.addEventListener('startDateChange.coreui.date-range-picker', event => log.push(`start:${event.date?.getDate() ?? null}`))
+      el.addEventListener('errorChange.coreui.date-input', event => log.push(`error:${event.error}`))
+      day.focus()
+      day.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true, cancelable: true }))
+
+      expect(log).toEqual(['start:null', 'error:maxDate'])
+    })
+
     it('should update both fields, emit both events, and close after the end date', () => {
       const picker = buildPicker()
       const el = fixtureEl.querySelector('#picker')

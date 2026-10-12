@@ -289,6 +289,8 @@ context.disabled         // disabled state
 | `show/shown/hide/hidden.coreui.time-picker` | Popup lifecycle. `shown` and `hidden` fire once the popup's transition has ended; `shown` is skipped when the popup closes first, `hidden` when it reopens first. |
 | `timeChange.coreui.time-picker` | Fired once when the value changes, whether from the field, the panel or a method. `event.time` is the value the field accepted, the same as `getTime()`, or `null` when it refused the time. |
 
+`timeChange.coreui.time-picker` fires before the field's `errorChange.coreui.time-input` for the same change, so a time an `errorChange` listener sets replaces the one just reported.
+
 ## Customizing
 
 ### CSS variables

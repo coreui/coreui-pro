@@ -14,7 +14,7 @@ import SelectorEngine from './dom/selector-engine.js'
 import { captureHostClasses } from './util/form-control-group.js'
 import type { ValidationState } from './util/form-validation.js'
 import {
-  formatSelectionRangeName, getDateBySelectionType, isSameInstantAs, type SelectionTypes
+  formatSelectionRangeName, getDateBySelectionType, isSameDateAs, type SelectionTypes
 } from './util/calendar.js'
 import { getPickerFormat } from './util/date-sections.js'
 import {
@@ -172,7 +172,6 @@ class DateRangePicker extends PickerBase {
   protected declare _rangesTemplate: any
   protected declare _rangeInput: any
   protected declare _calendar: any
-  protected declare _syncingFromPanel: boolean
   protected declare _calendarElement: any
   protected declare _selectEndDate: any
 
@@ -182,7 +181,6 @@ class DateRangePicker extends PickerBase {
     this._rangesTemplate = SelectorEngine.findOne(SELECTOR_TEMPLATE_RANGES, this._element)
     this._rangeInput = null
     this._calendar = null
-    this._syncingFromPanel = false
     this._calendarElement = null
     this._selectEndDate = false
 
@@ -208,11 +206,11 @@ class DateRangePicker extends PickerBase {
 
   // Public
   getStartDate(): Date | null {
-    return this._rangeInput.getStartDate()
+    return this._rangeInput?.getStartDate() ?? null
   }
 
   getEndDate(): Date | null {
-    return this._rangeInput.getEndDate()
+    return this._rangeInput?.getEndDate() ?? null
   }
 
   setRange(startDate: Date | null, endDate: Date | null): void {
@@ -333,20 +331,22 @@ class DateRangePicker extends PickerBase {
       this._nameToggle()
       this._syncPickMessages()
 
-      if (!this._syncingFromPanel) {
-        this._calendar?.setConfig({ startDate: event.date })
-        this._triggerDateChange(EVENT_START_DATE_CHANGE, event.date)
+      if (this._calendar && !isSameDateAs(this._calendar._startDate, event.date)) {
+        this._calendar.setConfig({ startDate: event.date })
       }
+
+      this._triggerDateChange(EVENT_START_DATE_CHANGE, event.date)
     })
 
     EventHandler.on(inputGroup, DateRangeInput.eventName('endDateChange'), (event: any) => {
       this._syncRangeState()
       this._nameToggle()
 
-      if (!this._syncingFromPanel) {
-        this._calendar?.setConfig({ endDate: event.date })
-        this._triggerDateChange(EVENT_END_DATE_CHANGE, event.date)
+      if (this._calendar && !isSameDateAs(this._calendar._endDate, event.date)) {
+        this._calendar.setConfig({ endDate: event.date })
       }
+
+      this._triggerDateChange(EVENT_END_DATE_CHANGE, event.date)
     })
 
     if (this._config.cleaner) {
@@ -404,25 +404,11 @@ class DateRangePicker extends PickerBase {
     })
 
     EventHandler.on(this._calendar._element, 'startDateChange.coreui.calendar', event => {
-      const previous = this.getStartDate()
-      this._syncingFromPanel = true
       this._rangeInput._runAsUser(() => this._rangeInput.setRange(event.dateObject, this.getEndDate()))
-      this._syncingFromPanel = false
-
-      if (!isSameInstantAs(previous, this.getStartDate())) {
-        this._triggerDateChange(EVENT_START_DATE_CHANGE, this.getStartDate())
-      }
     })
 
     EventHandler.on(this._calendar._element, 'endDateChange.coreui.calendar', event => {
-      const previous = this.getEndDate()
-      this._syncingFromPanel = true
       this._rangeInput._runAsUser(() => this._rangeInput.setRange(this.getStartDate(), event.dateObject))
-      this._syncingFromPanel = false
-
-      if (!isSameInstantAs(previous, this.getEndDate())) {
-        this._triggerDateChange(EVENT_END_DATE_CHANGE, this.getEndDate())
-      }
 
       if (this.getEndDate() && this.getStartDate() && !this._footerTemplate) {
         this.hide()
