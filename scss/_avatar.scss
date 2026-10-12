@@ -35,8 +35,8 @@ $avatar-tokens: defaults(
   (
     --#{$prefix}avatar-size: 2rem,
     --#{$prefix}avatar-font-size: calc(var(--#{$prefix}avatar-size) * .4),
-    --#{$prefix}avatar-color: var(--#{$prefix}theme-contrast, inherit),
-    --#{$prefix}avatar-bg: var(--#{$prefix}theme-bg, var(--#{$prefix}bg-2)),
+    --#{$prefix}avatar-color: inherit,
+    --#{$prefix}avatar-bg: var(--#{$prefix}bg-2),
     --#{$prefix}avatar-border-radius: 50em,
     --#{$prefix}avatar-status-size: .5rem,
     --#{$prefix}avatar-status-bg: var(--#{$prefix}fg-4),
@@ -94,9 +94,9 @@ $avatar-variants: defaults(
     width: var(--#{$prefix}avatar-size);
     height: var(--#{$prefix}avatar-size);
     font-size: var(--#{$prefix}avatar-font-size);
-    color: var(--#{$prefix}avatar-color);
+    color: var(--#{$prefix}theme-contrast, var(--#{$prefix}avatar-color));
     vertical-align: middle;
-    background-color: var(--#{$prefix}avatar-bg);
+    background-color: var(--#{$prefix}theme-bg, var(--#{$prefix}avatar-bg));
     @include border-radius(var(--#{$prefix}avatar-border-radius));
     @include transition(var(--#{$prefix}avatar-transition));
   }
@@ -108,8 +108,13 @@ $avatar-variants: defaults(
         --#{$prefix}avatar-#{$property}: var(--#{$prefix}theme-#{$value});
       }
 
-      color: var(--#{$prefix}avatar-color);
-      background-color: var(--#{$prefix}avatar-bg);
+      @each $property, $value in $properties {
+        @if $property == "bg" {
+          background-color: var(--#{$prefix}avatar-bg);
+        } @else {
+          #{$property}: var(--#{$prefix}avatar-#{$property});
+        }
+      }
     }
   }
   // scss-docs-end avatar-modifiers

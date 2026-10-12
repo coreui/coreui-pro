@@ -31,8 +31,8 @@ $radio-tokens: defaults(
     --#{$prefix}radio-bg: var(--#{$prefix}btn-input-bg),
     --#{$prefix}radio-border: var(--#{$prefix}border-width) solid var(--#{$prefix}border-color),
     --#{$prefix}radio-border-radius: 50%,
-    --#{$prefix}radio-checked-bg: var(--#{$prefix}theme-bg, var(--#{$prefix}control-checked-bg)),
-    --#{$prefix}radio-checked-border-color: var(--#{$prefix}theme-bg, var(--#{$prefix}control-checked-border-color)),
+    --#{$prefix}radio-checked-bg: var(--#{$prefix}control-checked-bg),
+    --#{$prefix}radio-checked-border-color: var(--#{$prefix}control-checked-border-color),
     --#{$prefix}radio-mark-color: var(--#{$prefix}primary-contrast),
     --#{$prefix}radio-mark: #{escape-svg(url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='2' fill='black'/></svg>"))},
     --#{$prefix}radio-disabled-opacity: var(--#{$prefix}control-disabled-opacity),
@@ -76,8 +76,8 @@ $radio-tokens: defaults(
   }
 
   &:checked {
-    background-color: var(--#{$prefix}radio-checked-bg);
-    border-color: var(--#{$prefix}radio-checked-border-color);
+    background-color: var(--#{$prefix}theme-bg, var(--#{$prefix}radio-checked-bg));
+    border-color: var(--#{$prefix}theme-bg, var(--#{$prefix}radio-checked-border-color));
 
     &::before {
       opacity: 1;

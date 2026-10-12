@@ -21,8 +21,8 @@ $tooltip-tokens: defaults(
     --#{$prefix}tooltip-padding-x: calc(var(--#{$prefix}spacer) * .75),
     --#{$prefix}tooltip-padding-y: calc(var(--#{$prefix}spacer) * .375),
     --#{$prefix}tooltip-font-size: var(--#{$prefix}font-size-sm),
-    --#{$prefix}tooltip-color: var(--#{$prefix}theme-contrast, #{$tooltip-color}),
-    --#{$prefix}tooltip-bg: var(--#{$prefix}theme-bg, var(--#{$prefix}fg-body)),
+    --#{$prefix}tooltip-color: #{$tooltip-color},
+    --#{$prefix}tooltip-bg: var(--#{$prefix}fg-body),
     --#{$prefix}tooltip-border-radius: var(--#{$prefix}radius-5),
     --#{$prefix}tooltip-opacity: .95,
     --#{$prefix}tooltip-arrow-width: .8rem,
@@ -43,7 +43,7 @@ $tooltip-tokens: defaults(
     // Fold `--#{$prefix}tooltip-opacity` into the surface colour instead of the
     // element: element-level opacity also faded the label text, compositing it
     // below the WCAG 1.4.3 contrast minimum.
-    --#{$prefix}tooltip-surface-bg: color-mix(in oklch, var(--#{$prefix}tooltip-bg) calc(var(--#{$prefix}tooltip-opacity) * 100%), transparent);
+    --#{$prefix}tooltip-surface-bg: color-mix(in oklch, var(--#{$prefix}theme-bg, var(--#{$prefix}tooltip-bg)) calc(var(--#{$prefix}tooltip-opacity) * 100%), transparent);
 
     z-index: var(--#{$prefix}tooltip-zindex);
     display: block;
@@ -190,9 +190,11 @@ $tooltip-tokens: defaults(
 
   // Wrapper for the tooltip content
   .tooltip-inner {
+    --#{$prefix}tooltip-surface-bg: color-mix(in oklch, var(--#{$prefix}theme-bg, var(--#{$prefix}tooltip-bg)) calc(var(--#{$prefix}tooltip-opacity) * 100%), transparent);
+
     max-width: var(--#{$prefix}tooltip-max-width);
     padding: var(--#{$prefix}tooltip-padding-y) var(--#{$prefix}tooltip-padding-x);
-    color: var(--#{$prefix}tooltip-color);
+    color: var(--#{$prefix}theme-contrast, var(--#{$prefix}tooltip-color));
     text-align: center;
     background-color: var(--#{$prefix}tooltip-surface-bg);
     @include border-radius(var(--#{$prefix}tooltip-border-radius));

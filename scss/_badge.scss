@@ -39,8 +39,8 @@ $badge-tokens: defaults(
     --#{$prefix}badge-padding-y: .25em,
     --#{$prefix}badge-font-size: clamp(#{$badge-font-size-floor}, .75em, .75em),
     --#{$prefix}badge-font-weight: var(--#{$prefix}font-weight-semibold),
-    --#{$prefix}badge-color: var(--#{$prefix}theme-contrast, inherit),
-    --#{$prefix}badge-bg: var(--#{$prefix}theme-bg, var(--#{$prefix}bg-2)),
+    --#{$prefix}badge-color: inherit,
+    --#{$prefix}badge-bg: var(--#{$prefix}bg-2),
     --#{$prefix}badge-border-width: var(--#{$prefix}border-width),
     --#{$prefix}badge-border-color: transparent,
     --#{$prefix}badge-border-radius: var(--#{$prefix}radius-7),
@@ -84,12 +84,12 @@ $badge-variants: defaults(
     font-size: var(--#{$prefix}badge-font-size);
     font-weight: var(--#{$prefix}badge-font-weight);
     line-height: 1;
-    color: var(--#{$prefix}badge-color);
+    color: var(--#{$prefix}theme-contrast, var(--#{$prefix}badge-color));
     text-align: center;
     text-decoration: none;
     white-space: nowrap;
     vertical-align: baseline;
-    background-color: var(--#{$prefix}badge-bg);
+    background-color: var(--#{$prefix}theme-bg, var(--#{$prefix}badge-bg));
     border: var(--#{$prefix}badge-border-width) solid var(--#{$prefix}badge-border-color);
     @include border-radius(var(--#{$prefix}badge-border-radius));
 
@@ -133,9 +133,13 @@ $badge-variants: defaults(
         }
       }
 
-      color: var(--#{$prefix}badge-color);
-      background-color: var(--#{$prefix}badge-bg);
-      border-color: var(--#{$prefix}badge-border-color);
+      @each $property, $value in $properties {
+        @if $property == "bg" {
+          background-color: var(--#{$prefix}badge-bg);
+        } @else {
+          #{$property}: var(--#{$prefix}badge-#{$property});
+        }
+      }
     }
   }
   // scss-docs-end badge-modifiers

@@ -11,22 +11,21 @@ $alert-tokens: () !default;
 // scss-docs-start alert-tokens
 $alert-tokens: defaults(
   (
-    --#{$prefix}alert-bg: var(--#{$prefix}theme-bg-subtle, var(--#{$prefix}bg-1)),
+    --#{$prefix}alert-bg: var(--#{$prefix}bg-1),
     --#{$prefix}alert-padding-x: var(--#{$prefix}spacer),
     --#{$prefix}alert-padding-y: var(--#{$prefix}spacer),
     --#{$prefix}alert-gap: var(--#{$prefix}spacer-3),
     --#{$prefix}alert-margin-bottom: 1rem,
-    --#{$prefix}alert-color: var(--#{$prefix}theme-fg-emphasis, inherit),
-    --#{$prefix}alert-border-color: var(--#{$prefix}theme-border, var(--#{$prefix}border-color)),
+    --#{$prefix}alert-color: inherit,
+    --#{$prefix}alert-border-color: var(--#{$prefix}border-color),
     --#{$prefix}alert-border-width: var(--#{$prefix}border-width),
-    --#{$prefix}alert-border: var(--#{$prefix}alert-border-width) solid var(--#{$prefix}alert-border-color),
-    --#{$prefix}alert-border-radius: var(--#{$prefix}radius-5),
+    --#{$prefix}alert-border-radius: var(--#{$prefix}radius-7),
     --#{$prefix}alert-link-color: inherit,
     --#{$prefix}alert-link-font-weight: var(--#{$prefix}font-weight-bold),
     --#{$prefix}alert-transition-property: opacity,
     --#{$prefix}alert-transition-duration: .15s,
     --#{$prefix}alert-transition-timing: linear,
-    --#{$prefix}hr-border-color: var(--#{$prefix}theme-border, var(--#{$prefix}border-color)),
+    --#{$prefix}hr-border-color: var(--#{$prefix}theme-border, var(--#{$prefix}alert-border-color)),
   ),
   $alert-tokens
 );
@@ -62,9 +61,9 @@ $alert-variants: defaults(
     align-items: start;
     padding: var(--#{$prefix}alert-padding-y) var(--#{$prefix}alert-padding-x);
     margin-bottom: var(--#{$prefix}alert-margin-bottom);
-    color: var(--#{$prefix}alert-color);
-    background-color: var(--#{$prefix}alert-bg);
-    border: var(--#{$prefix}alert-border);
+    color: var(--#{$prefix}theme-fg-emphasis, var(--#{$prefix}alert-color));
+    background-color: var(--#{$prefix}theme-bg-subtle, var(--#{$prefix}alert-bg));
+    border: var(--#{$prefix}alert-border-width) solid var(--#{$prefix}theme-border, var(--#{$prefix}alert-border-color));
     @include border-radius(var(--#{$prefix}alert-border-radius));
 
     // scss-docs-start alert-transition
@@ -125,6 +124,16 @@ $alert-variants: defaults(
           --#{$prefix}alert-#{$property}: transparent;
         } @else {
           --#{$prefix}alert-#{$property}: var(--#{$prefix}theme-#{$value});
+        }
+      }
+
+      --#{$prefix}hr-border-color: var(--#{$prefix}theme-border, currentcolor);
+
+      @each $property, $value in $properties {
+        @if $property == "bg" {
+          background-color: var(--#{$prefix}alert-bg);
+        } @else {
+          #{$property}: var(--#{$prefix}alert-#{$property});
         }
       }
     }

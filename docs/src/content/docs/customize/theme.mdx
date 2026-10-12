@@ -91,7 +91,7 @@ A `.theme-{color}` class is generated for every key of `$theme-colors`. It sets 
 
 <ScssDocs file="scss/_theme.scss" capture="theme-classes" />
 
-Because the tokens are ordinary custom properties, they inherit: put a `.theme-*` class on a container and every themeable component inside follows it. Components read the slots only as defaults of their own tokens, so an explicit component token override still wins over the region's theme.
+Because the tokens are ordinary custom properties, they inherit: put a `.theme-*` class on a container and every themeable component inside follows it. Components read the slots on the property and fall back to their own tokens, so under a theme class the theme wins over a component token set on the element; a variant class such as `.btn-solid` or `.alert-solid` maps its tokens to the slots, so there the component token is still the override point. To recolor one themed element, set the slot itself (`--cui-theme-bg-subtle`, `--cui-theme-bg`, …).
 
 <Example html={[`<div class="theme-primary d-flex gap-3 align-items-center">`, `  <span class="badge">Regional</span>`, `  <span class="badge theme-danger">Local override</span>`, `</div>`]} />
 

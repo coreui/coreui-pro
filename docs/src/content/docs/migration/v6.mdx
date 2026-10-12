@@ -817,9 +817,18 @@ announces its toasts through it. See
   laid out by that wrapper like any other content. Move it up to be a direct
   child of the alert to keep it at the trailing edge.
 
-- **An `<hr>` inside an alert takes the variant's border colour.** The alert
-  redeclares `--cui-hr-border-color`, so a separator in a `.alert-success` is
-  green rather than the page's neutral grey.
+- **An `<hr>` inside an alert takes the alert's border colour.** The alert
+  redeclares `--cui-hr-border-color` from the theme's border colour, falling
+  back to `--cui-alert-border-color`, so a separator in a `.theme-success`
+  alert is green rather than the page's neutral grey, and one in an alert whose
+  border you recoloured follows it. A variant such as `.alert-solid` paints its
+  border with the surface colour, so there the separator takes the theme's
+  border colour, or the text colour without one.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`--cui-alert-border` is gone.** The border is written in the rule from
+  `--cui-alert-border-width` and the border colour, so that a `.theme-*` class
+  can colour it. Set `--cui-alert-border-width` and `--cui-alert-border-color`
+  instead, and `border-style` on the alert for a dashed or dotted line.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **`$alert-dismissible-padding-r` is gone; the space for the close button
   follows `--cui-alert-padding-x`.** The variable was multiplied out in Sass
@@ -1931,6 +1940,17 @@ the step and, when it passes, finishes the stepper and fires
 driven by a single Next control never finished. A step button with
 `.disabled` does not count, so `next()` finishes on the step before it.
 
+#### Stepper: the active indicator's background follows the theme
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+`--cui-stepper-step-indicator-active-bg` is removed. The active step's
+indicator background is a 5% tint mixed on the step from the theme colour, or
+from `--cui-stepper-step-indicator-active-color` without one, so a `.theme-*`
+class on the stepper or on a single step button tints it along with the text
+and border. To give the active indicator another background, set
+`--cui-stepper-step-indicator-bg` on `.stepper-step-button.active`.
+
 #### Input group: `.has-validation` removed
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
@@ -2488,10 +2508,10 @@ field behind that kept submitting.
   `--cui-tooltip-padding-x` is `calc(var(--cui-spacer) * .75)` (was `.5rem`) and
   `--cui-tooltip-opacity` is `.95` (was `.9`). Set the three tokens on
   `.tooltip` to keep the old proportions.
-- **Tooltips take theme classes.** `--cui-tooltip-bg` and `--cui-tooltip-color`
-  carry the `--cui-theme-bg`/`--cui-theme-contrast` slots, so a
-  `.theme-{color}` class on the tip (via `customClass`) colours it; the
-  default look is unchanged.
+- **Tooltips take theme classes.** The surface and the text read the
+  `--cui-theme-bg`/`--cui-theme-contrast` slots, with `--cui-tooltip-bg` and
+  `--cui-tooltip-color` as the fallbacks, so a `.theme-{color}` class on the
+  tip (via `customClass`) colours it; the default look is unchanged.
 
 #### OTP input
 
@@ -3650,6 +3670,27 @@ runtime color math in place of precompiled shades. The global Sass knobs stay
 the build-time customization API, while a component's own surface is its token
 map — several things below are breaking and are called out as such.
 
+#### A theme class wins over a component's own colour token
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **Under a `.theme-*` class the theme wins over a component colour token.** A
+  component reads the `--cui-theme-*` slot on the property and its own token
+  only as the fallback. In v5 the colour came from the component's tokens,
+  which a modifier such as `.alert-danger` set, so a token you set on a coloured
+  alert applied. In v6 a token set on a themed element, or for the whole page
+  in your stylesheet or a `$…-tokens` map, changes only the components without
+  a theme; the alert, avatar, badge, callout, chip, checkbox, radio, switch,
+  List Box indicator, sidebar and tooltip follow the same order as the card,
+  toast, list group and nav. To recolour one themed element, set the slot
+  rather than the component token:
+  `<div class="alert theme-danger" style="--cui-theme-bg-subtle: …">`.
+- **Variant classes keep the component token as the override point.**
+  `.btn-solid` and the other button variants, `.alert-solid`, `.badge-subtle`,
+  `.badge-outline`, `.avatar-subtle` and `.chip-outline` map the component
+  tokens to their own slots and paint from the tokens, so on those elements a
+  component token you set wins over the theme, as on a v5 button. Validation
+  states (`.is-invalid`, `.is-valid`) win over a theme class too.
+
 #### A numeric radius scale replaces the one global radius
 
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
@@ -3658,9 +3699,9 @@ map — several things below are breaking and are called out as such.
   `--cui-radius-0` through `--cui-radius-9` as `calc()` multiples of it, plus
   `--cui-radius-pill`, and component tokens read stops instead of the one
   global `--cui-border-radius`: buttons, inputs,
-  alerts, list groups, tabs, nav links, progress, tooltips, thumbnails,
+  list groups, tabs, nav links, progress, tooltips, thumbnails,
   callouts, combobox options and the range slider's tooltip sit on
-  `--cui-radius-5` (`.5rem`), badges, popovers, dialogs, drawers, menus,
+  `--cui-radius-5` (`.5rem`), alerts, badges, popovers, dialogs, drawers, menus,
   accordions, toasts, dropdowns and popups on `--cui-radius-7` (`.75rem`),
   cards on `--cui-radius-9` (`1rem`), and pills on `calc(var(--cui-radius) * 3)` (`1.5rem`),
   computed from the base because no stop carries that value.

@@ -17,9 +17,9 @@ $callout-tokens: defaults(
     --#{$prefix}callout-margin-x: 0,
     --#{$prefix}callout-margin-y: var(--#{$prefix}spacer),
     --#{$prefix}callout-border-width: var(--#{$prefix}border-width),
-    --#{$prefix}callout-border-color: var(--#{$prefix}theme-border, var(--#{$prefix}border-color)),
+    --#{$prefix}callout-border-color: var(--#{$prefix}border-color),
     --#{$prefix}callout-border-left-width: calc(var(--#{$prefix}border-width) * 4),
-    --#{$prefix}callout-border-left-color: var(--#{$prefix}theme-bg, var(--#{$prefix}callout-border-color)),
+    --#{$prefix}callout-border-left-color: var(--#{$prefix}callout-border-color),
     --#{$prefix}callout-border-radius: var(--#{$prefix}radius-5),
   ),
   $callout-tokens
@@ -33,8 +33,8 @@ $callout-tokens: defaults(
 
     padding: var(--#{$prefix}callout-padding-y) var(--#{$prefix}callout-padding-x);
     margin: var(--#{$prefix}callout-margin-y) var(--#{$prefix}callout-margin-x);
-    border: var(--#{$prefix}callout-border-width) solid var(--#{$prefix}callout-border-color);
-    border-inline-start-color: var(--#{$prefix}callout-border-left-color);
+    border: var(--#{$prefix}callout-border-width) solid var(--#{$prefix}theme-border, var(--#{$prefix}callout-border-color));
+    border-inline-start-color: var(--#{$prefix}theme-bg, var(--#{$prefix}callout-border-left-color));
     border-inline-start-width: var(--#{$prefix}callout-border-left-width);
     @include border-radius(var(--#{$prefix}callout-border-radius));
   }
