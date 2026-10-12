@@ -77,6 +77,11 @@ class Dialog extends DialogBase<DialogConfig> {
     // manual adjustments.
   }
 
+  override dispose(): void {
+    this._element.classList.remove(CLASS_NAME_SWAP_IN)
+    super.dispose()
+  }
+
   // Protected — hook overrides
 
   protected override _getShowOptions(): { modal: boolean, preventBodyScroll: boolean } {
@@ -108,41 +113,53 @@ class Dialog extends DialogBase<DialogConfig> {
   }
 
   // Static
+  static {
+    EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, function (this: HTMLElement, event: Event) {
+      Dialog._handleDataApiClick(this, event)
+    })
+  }
+
   static jQueryInterface(this: any, config?: any, relatedTarget?: HTMLElement | null): void {
     return jQueryDispatch(this, Dialog, config, [relatedTarget])
   }
-}
 
-/**
- * Data API implementation
- */
-
-EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, function (event) {
-  const target = SelectorEngine.getElementFromSelector(this)
-
-  if (['A', 'AREA'].includes(this.tagName)) {
-    event.preventDefault()
-  }
-
-  EventHandler.one(target, EVENT_SHOW, showEvent => {
-    if (showEvent.defaultPrevented) {
-      // only register focus restorer if dialog will actually get shown
+  protected static _handleDataApiClick(trigger: HTMLElement, event: Event): void {
+    const target = SelectorEngine.getElementFromSelector(trigger)
+    if (!target) {
       return
     }
 
-    EventHandler.one(target, EVENT_HIDDEN, () => {
-      if (isVisible(this)) {
-        // Returning focus must not scroll the page back to the trigger.
-        this.focus({ preventScroll: true })
-      }
-    })
-  })
+    if (['A', 'AREA'].includes(trigger.tagName)) {
+      event.preventDefault()
+    }
 
-  // A trigger inside an open dialog swaps to the target one
-  const currentDialog = this.closest('dialog[open]')
-  const shouldSwap = currentDialog && currentDialog !== target
+    // A trigger inside an open dialog swaps to the target one
+    const currentDialog = trigger.closest<HTMLDialogElement>('dialog[open]')
+    const currentInstance = currentDialog && currentDialog !== target ? Dialog.getInstance(currentDialog) : null
 
-  if (shouldSwap && target) {
+    if (!currentDialog || !currentInstance) {
+      EventHandler.one(target, EVENT_SHOW, showEvent => {
+        if (!showEvent.defaultPrevented) {
+          Dialog._registerFocusRestoration(target, trigger)
+        }
+      })
+
+      Dialog.getOrCreateInstance(target).toggle(trigger)
+      return
+    }
+
+    if (currentDialog.classList.contains(CLASS_NAME_SWAP_IN)) {
+      return
+    }
+
+    const newDialog = Dialog.getOrCreateInstance(target)
+
+    // Check both cancelable events before changing either dialog. This keeps
+    // the current dialog open when either side rejects the swap.
+    if (!newDialog._canShow(trigger) || !currentInstance._canHide()) {
+      return
+    }
+
     // Swap strategy (seamless backdrop, no flash):
     //   1. .dialog-swap-in makes the incoming ::backdrop skip its
     //      @starting-style fade-in and appear fully opaque on its first frame.
@@ -151,29 +168,33 @@ EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, function (
     //      non-deferred close path), so its ::backdrop is removed in the same
     //      frame the incoming one appears — the user sees one continuous
     //      backdrop instead of a double-darkened or half-faded flash.
-    const newDialog = Dialog.getOrCreateInstance(target)
+    Dialog._registerFocusRestoration(target, trigger)
     target.classList.add(CLASS_NAME_SWAP_IN)
-    newDialog.show(this)
     EventHandler.one(target, EVENT_SHOWN, () => {
       target.classList.remove(CLASS_NAME_SWAP_IN)
     })
+    newDialog._show(trigger)
 
-    const currentInstance = Dialog.getInstance(currentDialog)
-    if (currentInstance) {
-      currentDialog.classList.add(CLASS_NAME_INSTANT)
-      EventHandler.one(currentDialog, EVENT_HIDDEN, () => {
-        currentDialog.classList.remove(CLASS_NAME_INSTANT)
-      })
-      currentInstance.hide()
-    }
-
-    return
+    currentDialog.classList.add(CLASS_NAME_INSTANT)
+    EventHandler.one(currentDialog, EVENT_HIDDEN, () => {
+      currentDialog.classList.remove(CLASS_NAME_INSTANT)
+    })
+    currentInstance._hide()
   }
 
-  const data: any = Dialog.getOrCreateInstance(target)
+  protected static _registerFocusRestoration(target: Element, trigger: HTMLElement): void {
+    EventHandler.one(target, EVENT_HIDDEN, () => {
+      if (isVisible(trigger)) {
+        // Returning focus must not scroll the page back to the trigger.
+        trigger.focus({ preventScroll: true })
+      }
+    })
+  }
+}
 
-  data.toggle(this)
-})
+/**
+ * Data API implementation
+ */
 
 enableDismissTrigger(Dialog)
 

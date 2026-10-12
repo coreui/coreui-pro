@@ -1059,6 +1059,119 @@ describe('Dialog', () => {
         firstTrigger.click()
       })
     })
+
+    describe('mid-swap and rejected swaps', () => {
+      const once = (element, type) => new Promise(resolve => {
+        element.addEventListener(type, resolve, { once: true })
+      })
+
+      const mount = (secondAttributes = '', firstAttributes = '') => {
+        fixtureEl.innerHTML = [
+          '<button id="open" data-coreui-toggle="dialog" data-coreui-target="#first">Open first</button>',
+          `<dialog id="first" ${firstAttributes || 'class="dialog"'}>`,
+          '  <button id="to-second" data-coreui-toggle="dialog" data-coreui-target="#second">Go to second</button>',
+          '</dialog>',
+          `<dialog id="second" ${secondAttributes || 'class="dialog"'}>`,
+          '  <button id="to-first" data-coreui-toggle="dialog" data-coreui-target="#first">Back to first</button>',
+          '</dialog>'
+        ].join('')
+
+        return ['#open', '#first', '#second', '#to-second', '#to-first'].map(selector => fixtureEl.querySelector(selector))
+      }
+
+      it('should not open both dialogs when a swap trigger is clicked mid-swap, and swap back once the incoming one is shown', async () => {
+        const [open, first, second, toSecond, toFirst] = mount()
+        open.click()
+        await once(first, 'shown.coreui.dialog')
+
+        const secondShown = once(second, 'shown.coreui.dialog')
+        toSecond.click()
+        toFirst.click()
+
+        expect([first.open, second.open]).toEqual([false, true])
+
+        await secondShown
+        const firstShown = once(first, 'shown.coreui.dialog')
+        toFirst.click()
+        await firstShown
+
+        expect([first.open, second.open]).toEqual([true, false])
+      })
+
+      it('should swap back from an instant dialog', async () => {
+        const [open, first, second, toSecond, toFirst] = mount('class="dialog dialog-instant"')
+        open.click()
+        await once(first, 'shown.coreui.dialog')
+
+        toSecond.click()
+
+        expect(second.classList.contains('dialog-swap-in')).toBeFalse()
+
+        const firstShown = once(first, 'shown.coreui.dialog')
+        toFirst.click()
+        await firstShown
+
+        expect([first.open, second.open]).toEqual([true, false])
+      })
+
+      it('should not swap out of a dialog that is still opening', async () => {
+        const [open, first, second, toSecond] = mount()
+        const firstShown = once(first, 'shown.coreui.dialog')
+        open.click()
+        toSecond.click()
+
+        expect([first.open, second.open]).toEqual([true, false])
+        await firstShown
+      })
+
+      it('should not swap into a dialog that is already open', async () => {
+        const [, first, second, toSecond] = mount('class="dialog" data-coreui-modal="false"', 'class="dialog" data-coreui-modal="false"')
+        await Dialog.getOrCreateInstance(first).show()
+        await Dialog.getOrCreateInstance(second).show()
+        toSecond.click()
+
+        expect([first.open, second.open, second.classList.contains('dialog-swap-in')]).toEqual([true, true, false])
+      })
+
+      it('should keep the current dialog open when the incoming one cancels its show', async () => {
+        const [open, first, second, toSecond] = mount()
+        open.click()
+        await once(first, 'shown.coreui.dialog')
+        second.addEventListener('show.coreui.dialog', event => event.preventDefault(), { once: true })
+        toSecond.click()
+
+        expect([first.open, second.open]).toEqual([true, false])
+      })
+
+      it('should not open the incoming dialog when the current one cancels its hide', async () => {
+        const [open, first, second, toSecond] = mount()
+        open.click()
+        await once(first, 'shown.coreui.dialog')
+        first.addEventListener('hide.coreui.dialog', event => event.preventDefault(), { once: true })
+        toSecond.click()
+
+        expect([first.open, second.open]).toEqual([true, false])
+      })
+
+      it('should clear the swap mark when the incoming dialog is disposed mid-swap', async () => {
+        const [open, first, second, toSecond, toFirst] = mount()
+        open.click()
+        await once(first, 'shown.coreui.dialog')
+        toSecond.click()
+        Dialog.getInstance(second).dispose()
+
+        expect(second.classList.contains('dialog-swap-in')).toBeFalse()
+
+        const secondShown = once(second, 'shown.coreui.dialog')
+        Dialog.getOrCreateInstance(second).show()
+        await secondShown
+        const firstShown = once(first, 'shown.coreui.dialog')
+        toFirst.click()
+
+        expect([first.open, second.open]).toEqual([true, false])
+        await firstShown
+      })
+    })
   })
 
   describe('getInstance', () => {

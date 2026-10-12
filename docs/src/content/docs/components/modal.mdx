@@ -331,7 +331,7 @@ Below is a live demo followed by example HTML and JavaScript. For more informati
 
 ### Toggle between modals
 
-Toggle between multiple modals with some clever placement of the `data-coreui-target` and `data-coreui-toggle` attributes. When a trigger sits inside an open modal, the component swaps to the target modal seamlessly — the backdrop stays up without flashing. For example, you could toggle a password reset modal from within an already open sign in modal.
+Toggle between multiple modals with some clever placement of the `data-coreui-target` and `data-coreui-toggle` attributes. When a trigger sits inside an open modal, the component swaps to the target modal seamlessly — the backdrop stays up without flashing. The swap fires `show.coreui.modal` on the target and `hide.coreui.modal` on the open modal before it changes either one; when a handler cancels either event, or one of the two modals is still opening or closing, the open modal stays as it is. For example, you could toggle a password reset modal from within an already open sign in modal.
 
 <Example code={`<dialog class="modal" id="exampleModalToggle" aria-labelledby="exampleModalToggleLabel">
     <div class="modal-header">

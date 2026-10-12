@@ -79,16 +79,34 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
   }
 
   async show(relatedTarget?: HTMLElement | null): Promise<void> {
-    if (this._element.open || this._isTransitioning) {
+    if (!this._canShow(relatedTarget)) {
       return
+    }
+
+    await this._show(relatedTarget)
+  }
+
+  async hide(): Promise<void> {
+    if (!this._canHide()) {
+      return
+    }
+
+    await this._hide()
+  }
+
+  // Protected — lifecycle stages
+
+  protected _canShow(relatedTarget?: HTMLElement | null): boolean {
+    if (this._element.open || this._isTransitioning) {
+      return false
     }
 
     const showEvent = EventHandler.trigger(this._element, this.constructor.eventName('show'), { relatedTarget })
 
-    if (showEvent.defaultPrevented) {
-      return
-    }
+    return !showEvent.defaultPrevented
+  }
 
+  protected async _show(relatedTarget?: HTMLElement | null): Promise<void> {
     this._isTransitioning = true
     this._onBeforeShow()
 
@@ -101,17 +119,17 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
     }, this._element, this._isAnimated())
   }
 
-  async hide(): Promise<void> {
+  protected _canHide(): boolean {
     if (!this._element.open || this._isTransitioning) {
-      return
+      return false
     }
 
     const hideEvent = EventHandler.trigger(this._element, this.constructor.eventName('hide'))
 
-    if (hideEvent.defaultPrevented) {
-      return
-    }
+    return !hideEvent.defaultPrevented
+  }
 
+  protected async _hide(): Promise<void> {
     this._isTransitioning = true
     this._hideElement()
 

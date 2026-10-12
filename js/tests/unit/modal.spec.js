@@ -1036,6 +1036,119 @@ describe('Modal', () => {
         firstTrigger.click()
       })
     })
+
+    describe('mid-swap and rejected swaps', () => {
+      const once = (element, type) => new Promise(resolve => {
+        element.addEventListener(type, resolve, { once: true })
+      })
+
+      const mount = (secondAttributes = '', firstAttributes = '') => {
+        fixtureEl.innerHTML = [
+          '<button id="open" data-coreui-toggle="modal" data-coreui-target="#first">Open first</button>',
+          `<dialog id="first" ${firstAttributes || 'class="modal"'}>`,
+          '  <button id="to-second" data-coreui-toggle="modal" data-coreui-target="#second">Go to second</button>',
+          '</dialog>',
+          `<dialog id="second" ${secondAttributes || 'class="modal"'}>`,
+          '  <button id="to-first" data-coreui-toggle="modal" data-coreui-target="#first">Back to first</button>',
+          '</dialog>'
+        ].join('')
+
+        return ['#open', '#first', '#second', '#to-second', '#to-first'].map(selector => fixtureEl.querySelector(selector))
+      }
+
+      it('should not open both modals when a swap trigger is clicked mid-swap, and swap back once the incoming one is shown', async () => {
+        const [open, first, second, toSecond, toFirst] = mount()
+        open.click()
+        await once(first, 'shown.coreui.modal')
+
+        const secondShown = once(second, 'shown.coreui.modal')
+        toSecond.click()
+        toFirst.click()
+
+        expect([first.open, second.open]).toEqual([false, true])
+
+        await secondShown
+        const firstShown = once(first, 'shown.coreui.modal')
+        toFirst.click()
+        await firstShown
+
+        expect([first.open, second.open]).toEqual([true, false])
+      })
+
+      it('should swap back from an instant modal', async () => {
+        const [open, first, second, toSecond, toFirst] = mount('class="modal modal-instant"')
+        open.click()
+        await once(first, 'shown.coreui.modal')
+
+        toSecond.click()
+
+        expect(second.classList.contains('modal-swap-in')).toBeFalse()
+
+        const firstShown = once(first, 'shown.coreui.modal')
+        toFirst.click()
+        await firstShown
+
+        expect([first.open, second.open]).toEqual([true, false])
+      })
+
+      it('should not swap out of a modal that is still opening', async () => {
+        const [open, first, second, toSecond] = mount()
+        const firstShown = once(first, 'shown.coreui.modal')
+        open.click()
+        toSecond.click()
+
+        expect([first.open, second.open]).toEqual([true, false])
+        await firstShown
+      })
+
+      it('should not swap into a modal that is already open', async () => {
+        const [, first, second, toSecond] = mount('class="modal" data-coreui-modal="false"', 'class="modal" data-coreui-modal="false"')
+        await Modal.getOrCreateInstance(first).show()
+        await Modal.getOrCreateInstance(second).show()
+        toSecond.click()
+
+        expect([first.open, second.open, second.classList.contains('modal-swap-in')]).toEqual([true, true, false])
+      })
+
+      it('should keep the current modal open when the incoming one cancels its show', async () => {
+        const [open, first, second, toSecond] = mount()
+        open.click()
+        await once(first, 'shown.coreui.modal')
+        second.addEventListener('show.coreui.modal', event => event.preventDefault(), { once: true })
+        toSecond.click()
+
+        expect([first.open, second.open]).toEqual([true, false])
+      })
+
+      it('should not open the incoming modal when the current one cancels its hide', async () => {
+        const [open, first, second, toSecond] = mount()
+        open.click()
+        await once(first, 'shown.coreui.modal')
+        first.addEventListener('hide.coreui.modal', event => event.preventDefault(), { once: true })
+        toSecond.click()
+
+        expect([first.open, second.open]).toEqual([true, false])
+      })
+
+      it('should clear the swap mark when the incoming modal is disposed mid-swap', async () => {
+        const [open, first, second, toSecond, toFirst] = mount()
+        open.click()
+        await once(first, 'shown.coreui.modal')
+        toSecond.click()
+        Modal.getInstance(second).dispose()
+
+        expect(second.classList.contains('modal-swap-in')).toBeFalse()
+
+        const secondShown = once(second, 'shown.coreui.modal')
+        Modal.getOrCreateInstance(second).show()
+        await secondShown
+        const firstShown = once(first, 'shown.coreui.modal')
+        toFirst.click()
+
+        expect([first.open, second.open]).toEqual([true, false])
+        await firstShown
+      })
+    })
   })
 
   describe('getInstance', () => {
