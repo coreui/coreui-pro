@@ -3544,6 +3544,157 @@ describe('Autocomplete', () => {
       })
     })
 
+    it('should clear a field that takes only defined options when the typed label names a disabled option', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        allowOnlyDefinedOptions: true,
+        options: [{ label: 'Apple', value: '1' }, { label: 'Cherry', value: '3', disabled: true }]
+      })
+      const changes = []
+
+      autocompleteEl.addEventListener('change.coreui.autocomplete', event => changes.push(event.value))
+      autocomplete._inputElement.value = 'Cherry'
+      autocomplete._inputElement.dispatchEvent(createEvent('blur'))
+
+      expect(autocomplete._inputElement.value).toBe('')
+      expect(changes.some(value => value?.value === '3')).toBeFalse()
+    })
+
+    it('should report a typed label that names a disabled option as free text', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        options: [{ label: 'Apple', value: '1' }, { label: 'Cherry', value: '3', disabled: true }]
+      })
+      const changes = []
+
+      autocompleteEl.addEventListener('change.coreui.autocomplete', event => changes.push(event.value))
+      autocomplete._inputElement.value = 'Cherry'
+      autocomplete._inputElement.dispatchEvent(createEvent('blur'))
+
+      expect(changes).toEqual(['Cherry'])
+    })
+
+    it('should pick the enabled option when a disabled one shares its label', () => {
+      const sharedLabel = [{ label: 'Cherry', value: '3', disabled: true }, { label: 'Cherry', value: '4' }]
+      const picked = []
+
+      for (const how of ['blur', 'enter']) {
+        fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+        const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+        const autocomplete = new Autocomplete(autocompleteEl, { options: sharedLabel })
+
+        autocompleteEl.addEventListener('change.coreui.autocomplete', event => picked.push(`${how}:${event.value?.value ?? event.value}`))
+        autocomplete._inputElement.value = 'Cherry'
+        autocomplete._inputElement.dispatchEvent(how === 'blur' ?
+          createEvent('blur') :
+          new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }))
+        autocomplete.dispose()
+      }
+
+      expect(picked).toEqual(['blur:4', 'enter:4'])
+    })
+
+    it.each([true, false])('should keep the selection when the field is left or confirmed with its label (allowOnlyDefinedOptions: %s)', allowOnlyDefinedOptions => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        allowOnlyDefinedOptions,
+        options: [{ label: 'Apple', value: '1' }, { label: 'Cherry', value: '3' }],
+        value: '3'
+      })
+      const changes = []
+
+      autocompleteEl.addEventListener('change.coreui.autocomplete', event => changes.push(event.value))
+      autocomplete._inputElement.dispatchEvent(createEvent('blur'))
+      autocomplete.setConfig({ options: [{ label: 'Apple', value: '1' }, { label: 'Cherry', value: '3', disabled: true }] })
+      autocomplete._inputElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }))
+      autocomplete._inputElement.dispatchEvent(createEvent('blur'))
+
+      expect(autocomplete._inputElement.value).toBe('Cherry')
+      expect(changes).toEqual([])
+    })
+
+    it('should keep a selection that shares its label with another option', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        options: [{ label: 'Cherry', value: '3' }, { label: 'Cherry', value: '4' }],
+        value: '4'
+      })
+      const changes = []
+
+      autocompleteEl.addEventListener('change.coreui.autocomplete', event => changes.push(event.value))
+      autocomplete._inputElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }))
+      autocomplete._inputElement.dispatchEvent(createEvent('blur'))
+
+      expect(changes).toEqual([])
+      expect(autocomplete._selected.map(option => option.value)).toEqual(['4'])
+    })
+
+    it('should put the label back when the field is left with the selection typed in another case', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        options: [{ label: 'Apple', value: '1' }, { label: 'Cherry', value: '3' }],
+        value: '3'
+      })
+      const changes = []
+
+      autocompleteEl.addEventListener('change.coreui.autocomplete', event => changes.push(event.value))
+      autocomplete._inputElement.value = 'cherry'
+      autocomplete._inputElement.dispatchEvent(new Event('input', { bubbles: true }))
+      autocomplete._inputElement.dispatchEvent(createEvent('blur'))
+
+      expect(autocomplete._inputElement.value).toBe('Cherry')
+      expect(changes.at(-1)?.value).toBe('3')
+    })
+
+    it('should pick the option a confirmed free text names once it arrives', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, { options: [], search: 'external' })
+      const changes = []
+
+      autocompleteEl.addEventListener('change.coreui.autocomplete', event => changes.push(event.value))
+      autocomplete._inputElement.value = 'Cherry'
+      autocomplete._inputElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }))
+      autocomplete.setConfig({ options: [{ label: 'Cherry', value: '3' }] })
+      autocomplete._inputElement.dispatchEvent(createEvent('blur'))
+
+      expect(changes.at(-1)?.value).toBe('3')
+    })
+
+    it('should close the panel when the field is left with the label of the selection', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        options: [{ label: 'Apple', value: '1' }, { label: 'Cherry', value: '3' }],
+        value: '3'
+      })
+
+      autocomplete.show()
+      autocomplete._inputElement.dispatchEvent(createEvent('blur'))
+
+      expect(autocomplete._isShown()).toBeFalse()
+    })
+
+    it('should not report a disabled option handed to the selection', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        options: [{ label: 'Apple', value: '1' }, { label: 'Cherry', value: '3', disabled: true }]
+      })
+      const changes = []
+
+      autocompleteEl.addEventListener('change.coreui.autocomplete', event => changes.push(event.value))
+      autocomplete._selectOption({ label: 'Cherry', value: '3', disabled: true })
+
+      expect(changes).toEqual([])
+      expect(autocomplete._selected).toEqual([])
+    })
+
     it('should clear on blur when allowOnlyDefinedOptions and no exact match', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
