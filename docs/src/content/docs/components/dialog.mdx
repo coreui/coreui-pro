@@ -165,7 +165,7 @@ Add `.dialog-scrollable` — the header and footer stay fixed while the dialog b
 
 ## Toggle between dialogs
 
-When a trigger sits inside an open dialog, the component swaps to the target dialog seamlessly — the backdrop stays up without flashing.
+When a trigger sits inside an open dialog, the component swaps to the target dialog seamlessly — the backdrop stays up without flashing. The swap fires `show.coreui.dialog` on the target and `hide.coreui.dialog` on the open dialog before it changes either one; when a handler cancels either event, or one of the two dialogs is still opening or closing, the open dialog stays as it is.
 
 <Example code={`<dialog class="dialog" id="exampleDialogToggle" aria-labelledby="exampleDialogToggleLabel">
     <div class="dialog-header">
