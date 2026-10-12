@@ -1,8 +1,9 @@
 import { vi } from 'vitest'
 import {
   alignValueField, clearValidationState, configureValueField, createValueField, dispatchValueChange, focusFirstInvalidControl, followUserValidity,
-  getFeedbackIds, getFeedbackText, getUserValidity, getValidationState, isFormValid, nextStateSerial, ownValidationState,
-  setStateValidity, updateValidationState, validateForm, writeValueField
+  getFeedbackIds, getFeedbackText, getServerState, getStateClasses, getUserValidity, getValidationState, isFormValid,
+  nextStateSerial, ownValidationState, setStateValidity, swapStateClass, updateValidationState, validateForm,
+  writeDescribedBy, writeValueField
 } from '../../../src/util/form-validation.js'
 import { clearFixture, getFixture } from '../../helpers/fixture.js'
 
@@ -582,6 +583,25 @@ describe('Form validation utilities', () => {
     })
   })
 
+  describe('getStateClasses', () => {
+    it('should read the state classes an element carries, invalid first', () => {
+      fixtureEl.innerHTML = '<div class="is-valid custom is-invalid"></div><div class="is-warning"></div>'
+      const [both, other] = fixtureEl.querySelectorAll('div')
+
+      expect(getStateClasses(both)).toEqual(['is-invalid', 'is-valid'])
+      expect(getStateClasses(other)).toEqual([])
+    })
+  })
+
+  describe('getServerState', () => {
+    it('should resolve the state classes to a state, invalid over valid', () => {
+      expect(getServerState(['is-valid', 'is-invalid'])).toBe('invalid')
+      expect(getServerState(['is-invalid'])).toBe('invalid')
+      expect(getServerState(['is-valid'])).toBe('valid')
+      expect(getServerState([])).toBeUndefined()
+    })
+  })
+
   describe('getUserValidity', () => {
     it('should read :user-invalid and :user-valid only in the forms that opt in', () => {
       fixtureEl.innerHTML = `<form id="invalid" data-coreui-validate novalidate><input id="empty" required></form>
@@ -880,6 +900,55 @@ describe('Form validation utilities', () => {
       setStateValidity(after, false)
 
       expect(after.validationMessage).toBe('Page rule.')
+    })
+  })
+
+  describe('swapStateClass', () => {
+    it('should move the state class and leave the element alone while the state stays', () => {
+      fixtureEl.innerHTML = '<div class="custom"></div>'
+      const div = fixtureEl.querySelector('div')
+
+      expect(swapStateClass(div, null, 'invalid')).toBe('is-invalid')
+      expect(div.className).toBe('custom is-invalid')
+
+      div.classList.add('is-warning')
+
+      expect(swapStateClass(div, 'is-invalid', 'invalid')).toBe('is-invalid')
+      expect(div.className).toBe('custom is-invalid is-warning')
+      expect(swapStateClass(div, 'is-invalid', 'valid')).toBe('is-valid')
+      expect(div.className).toBe('custom is-warning is-valid')
+      expect(swapStateClass(div, 'is-valid')).toBeNull()
+      expect(div.className).toBe('custom is-warning')
+    })
+  })
+
+  describe('writeDescribedBy', () => {
+    it('should follow the page description with the feedback ids, without duplicates', () => {
+      fixtureEl.innerHTML = '<input>'
+      const input = fixtureEl.querySelector('input')
+
+      writeDescribedBy(input, ' hint  feedback ', ['feedback', 'other'])
+
+      expect(describedBy(input)).toBe('hint feedback other')
+
+      const setAttribute = spyOn(input, 'setAttribute').and.callThrough()
+
+      writeDescribedBy(input, 'hint feedback', ['other'])
+
+      expect(setAttribute).not.toHaveBeenCalled()
+
+      writeDescribedBy(input, 'hint', [])
+
+      expect(describedBy(input)).toBe('hint')
+
+      writeDescribedBy(input, null, [])
+
+      expect(input.hasAttribute('aria-describedby')).toBeFalse()
+
+      input.setAttribute('aria-describedby', '')
+      writeDescribedBy(input, '', [])
+
+      expect(input.hasAttribute('aria-describedby')).toBeFalse()
     })
   })
 

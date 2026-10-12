@@ -41,11 +41,11 @@ import type {
 import { onLabelClick } from './util/field-label.js'
 import { captureHostClasses, type HostClasses, restoreHostClasses } from './util/form-control-group.js'
 import {
-  followUserValidity, getFeedbackIds, getValidationState, nextStateSerial, ownValidationState, setStateValidity,
-  type UserValidity, type ValidationState
+  followUserValidity, getFeedbackIds, getServerState, getStateClasses, getValidationState, nextStateSerial,
+  ownValidationState, setStateValidity, type UserValidity, type ValidationState, writeDescribedBy
 } from './util/form-validation.js'
 import {
-  defineJQueryPlugin, getNextActiveElement, isRTL, jQueryDispatch
+  defineJQueryPlugin, getNextActiveElement, isRTL, jQueryDispatch, writeAttribute
 } from './util/index.js'
 
 /**
@@ -77,8 +77,6 @@ const CLASS_NAME_ALL_SELECTED = 'form-date-time-all-selected'
 const CLASS_NAME_DISABLED = 'disabled'
 const CLASS_NAME_FORM_CONTROL = 'form-control'
 const CLASS_NAME_FILLED = 'form-date-time-filled'
-const CLASS_NAME_IS_INVALID = 'is-invalid'
-const CLASS_NAME_IS_VALID = 'is-valid'
 const CLASS_NAME_SECTION = 'form-date-time-section'
 const CLASS_NAME_SECTION_EMPTY = 'form-date-time-section-empty'
 const CLASS_NAME_SEPARATOR = 'form-date-time-separator'
@@ -287,7 +285,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
     this._hostClasses = captureHostClasses(this._element, HOST_CLASS_NAMES)
     this._hostNodes = [...this._element.childNodes]
     this._hostRole = this._element.getAttribute('role')
-    this._serverClasses = [CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID].filter(name => this._element.classList.contains(name))
+    this._serverClasses = getStateClasses(this._element)
     this._element.classList.remove(...this._serverClasses)
 
     this._createSectionInput()
@@ -398,10 +396,10 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
     restoreHostClasses(this._element, HOST_CLASS_NAMES, this._hostClasses)
 
     if (!this._hostAriaLabel) {
-      this._restoreAttribute('aria-label', this._hostAriaLabel)
+      writeAttribute(this._element, 'aria-label', this._hostAriaLabel)
     }
 
-    this._restoreAttribute('role', this._hostRole)
+    writeAttribute(this._element, 'role', this._hostRole)
     this._element.replaceChildren(...this._hostNodes)
     super.dispose()
   }
@@ -800,9 +798,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
   }
 
   _updateValidity(): void {
-    const givenState = getValidationState(this._config.validationState) ??
-      getValidationState(null, this._serverClasses.includes(CLASS_NAME_IS_VALID), this._serverClasses.includes(CLASS_NAME_IS_INVALID)) ??
-      this._ownerState
+    const givenState = getValidationState(this._config.validationState) ?? getServerState(this._serverClasses) ?? this._ownerState
 
     setStateValidity(this._inputElement!, givenState === 'invalid' && !this._config.disabled)
 
@@ -826,11 +822,7 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
     }
 
     for (const section of this._getSectionElements()) {
-      if (isInvalid) {
-        section.setAttribute('aria-invalid', 'true')
-      } else {
-        section.removeAttribute('aria-invalid')
-      }
+      writeAttribute(section, 'aria-invalid', isInvalid ? 'true' : null)
     }
 
     this._syncDescription()
@@ -847,17 +839,11 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
 
   _syncDescription(): void {
     const isAnnouncedInvalid = this._getSectionElements()[0]?.getAttribute('aria-invalid') === 'true'
-    const describedBy = [...new Set([
-      ...(this._element.getAttribute('aria-describedby') ?? '').split(/\s+/),
-      ...(isAnnouncedInvalid ? getFeedbackIds(this._inputElement!) : [])
-    ])].filter(Boolean).join(' ')
+    const describedBy = this._element.getAttribute('aria-describedby')
+    const feedbackIds = isAnnouncedInvalid ? getFeedbackIds(this._inputElement!) : []
 
     for (const [index, element] of this._getSectionElements().entries()) {
-      if (describedBy && (index === 0 || isAnnouncedInvalid)) {
-        element.setAttribute('aria-describedby', describedBy)
-      } else {
-        element.removeAttribute('aria-describedby')
-      }
+      writeDescribedBy(element, index === 0 || isAnnouncedInvalid ? describedBy : null, feedbackIds)
     }
   }
 
@@ -873,15 +859,6 @@ class DateInput<C extends Partial<DateInputConfig> = DateInputConfig> extends Ba
     }
 
     return getDateLimitError(this._sections, date, this._minDate, this._maxDate, this._config.disabledDates)
-  }
-
-  _restoreAttribute(name: string, value: string | null): void {
-    if (value === null) {
-      this._element.removeAttribute(name)
-      return
-    }
-
-    this._element.setAttribute(name, value)
   }
 
   _createSectionInput(): void {

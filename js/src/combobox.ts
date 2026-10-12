@@ -12,8 +12,8 @@ import SelectorEngine from './dom/selector-engine.js'
 import ListBox, { type ListBoxEntry } from './list-box.js'
 import {
   alignValueField, configureValueField, createValueField, dispatchValueChange, followUserValidity, getFeedbackIds,
-  getValidationState, nextStateSerial, ownValidationState, setStateValidity, type UserValidity, type ValidationState,
-  writeValueField
+  getServerState, getStateClasses, getValidationState, nextStateSerial, ownValidationState, setStateValidity,
+  swapStateClass, type UserValidity, type ValidationState, writeDescribedBy, writeValueField
 } from './util/form-validation.js'
 import { CARET_ICON } from './util/icons.js'
 import {
@@ -21,7 +21,7 @@ import {
 } from './util/sanitizer.js'
 import {
   captureHostClasses, type CountLabel, defineJQueryPlugin, getUID, type HostClasses, jQueryDispatch, resolveCountLabel,
-  restoreHostClasses
+  restoreHostClasses, writeAttribute
 } from './util/index.js'
 
 /**
@@ -53,8 +53,6 @@ const EVENT_LIST_BOX_SEARCH = `search${EVENT_LIST_BOX}`
 
 const CLASS_NAME_CARET = 'combobox-caret'
 const CLASS_NAME_DISABLED = 'disabled'
-const CLASS_NAME_IS_INVALID = 'is-invalid'
-const CLASS_NAME_IS_VALID = 'is-valid'
 const CLASS_NAME_LIST_BOX = 'list-box'
 const CLASS_NAME_OPTIONS = 'list-box-options'
 const CLASS_NAME_INPUT_GROUP_IGNORE = 'input-group-ignore'
@@ -199,7 +197,7 @@ class Combobox extends ComboboxBase {
     this._releaseValidationState = null
     this._resetValues = []
     this._searchElement = null
-    this._serverClasses = [CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID].filter(name => this._element.classList.contains(name))
+    this._serverClasses = getStateClasses(this._element)
     this._element.classList.remove(...this._serverClasses)
     this._stateClass = null
     this._stateSerial = nextStateSerial()
@@ -279,10 +277,7 @@ class Combobox extends ComboboxBase {
     this._releaseValidationState?.()
     this._valueField.remove()
 
-    if (this._stateClass) {
-      this._element.classList.remove(this._stateClass)
-    }
-
+    swapStateClass(this._element, this._stateClass)
     this._element.classList.add(...this._serverClasses)
 
     if (this._menu) {
@@ -324,7 +319,7 @@ class Combobox extends ComboboxBase {
     }
 
     for (const [name, value] of this._hostAttributes) {
-      this._restoreAttribute(name, value)
+      writeAttribute(this._element, name, value)
     }
 
     restoreHostClasses(this._element, HOST_CLASS_NAMES, this._hostClasses)
@@ -504,15 +499,6 @@ class Combobox extends ComboboxBase {
     this._searchElement = search
   }
 
-  _restoreAttribute(name: string, value: string | null): void {
-    if (value === null) {
-      this._element.removeAttribute(name)
-      return
-    }
-
-    this._element.setAttribute(name, value)
-  }
-
   override _getListBoxConfig(): any {
     return {
       activeDescendant: this._searchElement ?? this._element,
@@ -659,31 +645,15 @@ class Combobox extends ComboboxBase {
   }
 
   _updateValidity(): void {
-    const givenState = getValidationState(this._config.validationState) ??
-      getValidationState(null, this._serverClasses.includes(CLASS_NAME_IS_VALID), this._serverClasses.includes(CLASS_NAME_IS_INVALID))
+    const givenState = getValidationState(this._config.validationState) ?? getServerState(this._serverClasses)
 
     setStateValidity(this._valueField, givenState === 'invalid')
 
     const state = givenState ?? this._userValidity.read()
-    const stateClass = state ? `is-${state}` : null
-    const describedBy = [...new Set([
-      ...(this._describedBy ?? '').split(/\s+/),
-      ...(state === 'invalid' ? getFeedbackIds(this._valueField) : [])
-    ])].filter(Boolean).join(' ')
+    const feedbackIds = state === 'invalid' ? getFeedbackIds(this._valueField) : []
 
-    if (stateClass !== this._stateClass) {
-      if (this._stateClass) {
-        this._element.classList.remove(this._stateClass)
-      }
-
-      if (stateClass) {
-        this._element.classList.add(stateClass)
-      }
-
-      this._stateClass = stateClass
-    }
-
-    this._restoreAttribute('aria-describedby', describedBy || null)
+    this._stateClass = swapStateClass(this._element, this._stateClass, state)
+    writeDescribedBy(this._element, this._describedBy, feedbackIds)
   }
 
   _restoreValue(serial: number): void {

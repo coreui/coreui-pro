@@ -13,15 +13,16 @@ import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import FocusTrap from './util/focustrap.js'
 import {
-  followUserValidity, getFeedbackIds, getValidationState, nextStateSerial, ownValidationState, setStateValidity,
-  type UserValidity, type ValidationState
+  followUserValidity, getFeedbackIds, getServerState, getStateClasses, getValidationState, nextStateSerial,
+  ownValidationState, setStateValidity, swapStateClass, type UserValidity, type ValidationState, writeDescribedBy
 } from './util/form-validation.js'
 import { CLEANER_ICON, PICKER_ICON } from './util/icons.js'
 import {
   DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList, SVGAllowlist
 } from './util/sanitizer.js'
 import {
-  captureHostClasses, defineJQueryPlugin, getUID, type HostClasses, jQueryDispatch, resolveCountLabel, restoreHostClasses
+  captureHostClasses, defineJQueryPlugin, getUID, type HostClasses, jQueryDispatch, resolveCountLabel, restoreHostClasses,
+  writeAttribute
 } from './util/index.js'
 
 /**
@@ -271,7 +272,7 @@ class MultiSelect extends ComboboxBase {
 
     this._hostAttributes = new Map(HOST_ATTRIBUTES.map(name => [name, this._element.getAttribute(name)]))
     this._hostClasses = captureHostClasses(this._element, HOST_CLASS_NAMES)
-    this._serverClasses = [CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID].filter(name => this._element.classList.contains(name))
+    this._serverClasses = getStateClasses(this._element)
     this._element.classList.remove(...this._serverClasses)
     this._configureNativeSelect()
     this._indicatorElement = null
@@ -438,7 +439,7 @@ class MultiSelect extends ComboboxBase {
     setStateValidity(this._element as HTMLSelectElement, false)
 
     for (const [name, value] of this._hostAttributes) {
-      this._restoreAttribute(name, value)
+      writeAttribute(this._element, name, value)
     }
 
     this._element.classList.add(...this._serverClasses)
@@ -872,15 +873,6 @@ class MultiSelect extends ComboboxBase {
     }
   }
 
-  _restoreAttribute(name: string, value: string | null): void {
-    if (value === null) {
-      this._element.removeAttribute(name)
-      return
-    }
-
-    this._element.setAttribute(name, value)
-  }
-
   _hideNativeSelect(): void {
     // The custom control carries the semantics; hide the replaced select from
     // assistive tech (tabindex -1 keeps it out of the tab order, so the
@@ -922,40 +914,16 @@ class MultiSelect extends ComboboxBase {
 
     const select = this._element as HTMLSelectElement
     const givenState = getValidationState(this._config.validationState, this._config.valid, this._config.invalid) ??
-      getValidationState(null, this._serverClasses.includes(CLASS_NAME_IS_VALID), this._serverClasses.includes(CLASS_NAME_IS_INVALID))
+      getServerState(this._serverClasses)
 
     setStateValidity(select, givenState === 'invalid' && !this._config.disabled)
 
     const state = givenState ?? this._userValidity.read()
-    const stateClass = state ? `is-${state}` : null
-    const describedBy = [...new Set([
-      ...(this._describedBy ?? '').split(/\s+/),
-      ...(state === 'invalid' ? getFeedbackIds(select) : [])
-    ])].filter(Boolean).join(' ')
+    const feedbackIds = state === 'invalid' ? getFeedbackIds(select) : []
 
-    if (stateClass !== this._stateClass) {
-      if (this._stateClass) {
-        this._wrapperElement.classList.remove(this._stateClass)
-      }
-
-      if (stateClass) {
-        this._wrapperElement.classList.add(stateClass)
-      }
-
-      this._stateClass = stateClass
-    }
-
-    if (state === 'invalid') {
-      target.setAttribute('aria-invalid', 'true')
-    } else {
-      target.removeAttribute('aria-invalid')
-    }
-
-    if (describedBy) {
-      target.setAttribute('aria-describedby', describedBy)
-    } else {
-      target.removeAttribute('aria-describedby')
-    }
+    this._stateClass = swapStateClass(this._wrapperElement, this._stateClass, state)
+    writeAttribute(target, 'aria-invalid', state === 'invalid' ? 'true' : null)
+    writeDescribedBy(target, this._describedBy, feedbackIds)
   }
 
   _dismissValidationState(serial: number = Number.POSITIVE_INFINITY): void {

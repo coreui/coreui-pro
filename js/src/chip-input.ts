@@ -12,11 +12,12 @@ import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { applyControlGroupClasses } from './util/form-control-group.js'
 import {
-  configureValueField, createValueField, dispatchValueChange, followUserValidity, getFeedbackIds, getValidationState,
-  nextStateSerial, ownValidationState, setStateValidity, type UserValidity, type ValidationState, writeValueField
+  configureValueField, createValueField, dispatchValueChange, followUserValidity, getFeedbackIds, getServerState,
+  getStateClasses, getValidationState, nextStateSerial, ownValidationState, setStateValidity, swapStateClass,
+  type UserValidity, type ValidationState, writeDescribedBy, writeValueField
 } from './util/form-validation.js'
 import {
-  captureHostClasses, getUID, type HostClasses, isRTL, restoreHostClasses
+  captureHostClasses, getUID, type HostClasses, isRTL, restoreHostClasses, writeAttribute
 } from './util/index.js'
 
 /**
@@ -43,8 +44,6 @@ const SELECTOR_CHIP_REMOVE = '.chip-remove'
 const CLASS_NAME_DISABLED = 'disabled'
 const CLASS_NAME_CHIP_INPUT_FIELD = 'chip-input-field'
 const CLASS_NAME_GROUP = 'form-control-group'
-const CLASS_NAME_IS_INVALID = 'is-invalid'
-const CLASS_NAME_IS_VALID = 'is-valid'
 
 const HOST_CLASS_NAMES = [CLASS_NAME_DISABLED, CLASS_NAME_GROUP]
 
@@ -125,7 +124,7 @@ class ChipInput extends ChipSet {
     this._valueField = null
     this._releaseValidationState = null
     this._removingByCode = false
-    this._serverClasses = [CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID].filter(name => this._element.classList.contains(name))
+    this._serverClasses = getStateClasses(this._element)
     this._element.classList.remove(...this._serverClasses)
     this._stateClass = null
     this._stateSerial = nextStateSerial()
@@ -206,10 +205,7 @@ class ChipInput extends ChipSet {
     this._userValidity?.stop()
     this._releaseValidationState?.()
 
-    if (this._stateClass) {
-      this._element.classList.remove(this._stateClass)
-    }
-
+    swapStateClass(this._element, this._stateClass)
     this._element.classList.add(...this._serverClasses)
     restoreHostClasses(this._element, HOST_CLASS_NAMES, this._hostClasses)
 
@@ -221,9 +217,9 @@ class ChipInput extends ChipSet {
       this._labelledFor?.removeAttribute('for')
     } else {
       this._input.removeAttribute('aria-invalid')
-      this._restoreAttribute('aria-describedby', this._describedBy)
-      this._restoreAttribute('disabled', this._inputDisabled)
-      this._restoreAttribute('readonly', this._inputReadonly)
+      writeAttribute(this._input, 'aria-describedby', this._describedBy)
+      writeAttribute(this._input, 'disabled', this._inputDisabled)
+      writeAttribute(this._input, 'readonly', this._inputReadonly)
 
       if (this._addedAriaRequired) {
         this._input.removeAttribute('aria-required')
@@ -327,39 +323,18 @@ class ChipInput extends ChipSet {
 
   _updateValidity(): void {
     const field = this._valueField
-    const givenState = getValidationState(this._config.validationState) ??
-      getValidationState(null, this._serverClasses.includes(CLASS_NAME_IS_VALID), this._serverClasses.includes(CLASS_NAME_IS_INVALID))
+    const givenState = getValidationState(this._config.validationState) ?? getServerState(this._serverClasses)
 
     if (field) {
       setStateValidity(field, givenState === 'invalid')
     }
 
     const state = givenState ?? this._userValidity?.read()
-    const stateClass = state ? `is-${state}` : null
-    const describedBy = [...new Set([
-      ...(this._describedBy ?? '').split(/\s+/),
-      ...(state === 'invalid' ? getFeedbackIds(field ?? this._input) : [])
-    ])].filter(Boolean).join(' ')
+    const feedbackIds = state === 'invalid' ? getFeedbackIds(field ?? this._input) : []
 
-    if (stateClass !== this._stateClass) {
-      if (this._stateClass) {
-        this._element.classList.remove(this._stateClass)
-      }
-
-      if (stateClass) {
-        this._element.classList.add(stateClass)
-      }
-
-      this._stateClass = stateClass
-    }
-
-    if (state === 'invalid') {
-      this._input.setAttribute('aria-invalid', 'true')
-    } else {
-      this._input.removeAttribute('aria-invalid')
-    }
-
-    this._restoreAttribute('aria-describedby', describedBy || null)
+    this._stateClass = swapStateClass(this._element, this._stateClass, state)
+    writeAttribute(this._input, 'aria-invalid', state === 'invalid' ? 'true' : null)
+    writeDescribedBy(this._input, this._describedBy, feedbackIds)
   }
 
   _restoreChips(serial: number): void {
@@ -401,15 +376,6 @@ class ChipInput extends ChipSet {
     }
 
     this._updateValidity()
-  }
-
-  _restoreAttribute(name: string, value: string | null): void {
-    if (value === null) {
-      this._input.removeAttribute(name)
-      return
-    }
-
-    this._input.setAttribute(name, value)
   }
 
   _addInputEventListeners(): void {

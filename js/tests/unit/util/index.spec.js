@@ -1049,4 +1049,25 @@ describe('Util', () => {
       expect(div.getAttribute('class')).toEqual('')
     })
   })
+
+  describe('writeAttribute', () => {
+    it('should set the value, remove the attribute for null and leave an equal value untouched', () => {
+      fixtureEl.innerHTML = '<div aria-describedby="hint"></div>'
+      const div = fixtureEl.querySelector('div')
+      const setAttribute = spyOn(div, 'setAttribute').and.callThrough()
+      const removeAttribute = spyOn(div, 'removeAttribute').and.callThrough()
+
+      Util.writeAttribute(div, 'aria-describedby', 'hint')
+      Util.writeAttribute(div, 'aria-invalid', null)
+
+      expect(setAttribute).not.toHaveBeenCalled()
+      expect(removeAttribute).not.toHaveBeenCalled()
+
+      Util.writeAttribute(div, 'aria-invalid', 'true')
+      Util.writeAttribute(div, 'aria-describedby', null)
+
+      expect(div.getAttribute('aria-invalid')).toEqual('true')
+      expect(div.hasAttribute('aria-describedby')).toBeFalse()
+    })
+  })
 })

@@ -11,15 +11,15 @@ import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { applyControlGroupClasses } from './util/form-control-group.js'
 import {
-  followUserValidity, getFeedbackIds, getValidationState, nextStateSerial, ownValidationState, setStateValidity,
-  type UserValidity, type ValidationState
+  followUserValidity, getFeedbackIds, getServerState, getStateClasses, getValidationState, nextStateSerial,
+  ownValidationState, setStateValidity, swapStateClass, type UserValidity, type ValidationState
 } from './util/form-validation.js'
 import {
   DefaultAllowlist, escapeHtml, sanitizeByConfig, type SanitizerAllowList, SVGAllowlist
 } from './util/sanitizer.js'
 import { CLEANER_ICON, PICKER_ICON } from './util/icons.js'
 import {
-  captureHostClasses, defineJQueryPlugin, getUID, type HostClasses, jQueryDispatch, restoreHostClasses
+  captureHostClasses, defineJQueryPlugin, getUID, type HostClasses, jQueryDispatch, restoreHostClasses, writeAttribute
 } from './util/index.js'
 
 /**
@@ -59,8 +59,6 @@ const CLASS_NAME_INDICATOR = 'form-control-action'
 const CLASS_NAME_INPUT = 'form-control'
 const CLASS_NAME_INPUT_HINT = 'autocomplete-input-hint'
 const CLASS_NAME_INPUT_GROUP = 'form-control-group'
-const CLASS_NAME_IS_INVALID = 'is-invalid'
-const CLASS_NAME_IS_VALID = 'is-valid'
 const CLASS_NAME_SHOW = 'show'
 
 const HOST_CLASS_NAMES = [CLASS_NAME_AUTOCOMPLETE, CLASS_NAME_DISABLED, CLASS_NAME_INPUT_GROUP, CLASS_NAME_SHOW]
@@ -197,7 +195,7 @@ class Autocomplete extends ComboboxBase {
     this._hostClasses = captureHostClasses(this._element, HOST_CLASS_NAMES)
     this._feedbackIds = []
     this._keySerial = null
-    this._serverClasses = [CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID].filter(className => this._element.classList.contains(className))
+    this._serverClasses = getStateClasses(this._element)
     this._element.classList.remove(...this._serverClasses)
     this._shownText = ''
     this._stateClass = null
@@ -283,10 +281,7 @@ class Autocomplete extends ComboboxBase {
       }
     }
 
-    if (this._stateClass) {
-      this._element.classList.remove(this._stateClass)
-    }
-
+    swapStateClass(this._element, this._stateClass)
     this._element.classList.add(...this._serverClasses)
     restoreHostClasses(this._element, HOST_CLASS_NAMES, this._hostClasses)
 
@@ -873,45 +868,22 @@ class Autocomplete extends ComboboxBase {
   _updateValidationState(): void {
     const input = this._inputElement
     const givenState = getValidationState(this._config.validationState, this._config.valid, this._config.invalid) ??
-      getValidationState(null, this._serverClasses.includes(CLASS_NAME_IS_VALID), this._serverClasses.includes(CLASS_NAME_IS_INVALID))
+      getServerState(this._serverClasses)
 
     setStateValidity(input, givenState === 'invalid')
 
     const state = givenState ?? this._userValidity?.read()
-    const stateClass = state ? `is-${state}` : null
     const feedbackIds = state === 'invalid' ? getFeedbackIds(input) : []
 
-    if (stateClass !== this._stateClass) {
-      if (this._stateClass) {
-        this._element.classList.remove(this._stateClass)
-      }
-
-      if (stateClass) {
-        this._element.classList.add(stateClass)
-      }
-
-      this._stateClass = stateClass
-    }
+    this._stateClass = swapStateClass(this._element, this._stateClass, state)
 
     const current: string = input.getAttribute('aria-describedby') ?? ''
     const pageIds = current.split(/\s+/).filter(id => id && !this._feedbackIds.includes(id))
     const describedBy = [...new Set([...pageIds, ...feedbackIds])].join(' ')
 
     this._feedbackIds = feedbackIds.filter(id => !pageIds.includes(id))
-    this._writeInputAttribute('aria-invalid', state === 'invalid' ? 'true' : null)
-    this._writeInputAttribute('aria-describedby', describedBy || null)
-  }
-
-  _writeInputAttribute(name: string, value: string | null): void {
-    if (this._inputElement.getAttribute(name) === value) {
-      return
-    }
-
-    if (value === null) {
-      this._inputElement.removeAttribute(name)
-    } else {
-      this._inputElement.setAttribute(name, value)
-    }
+    writeAttribute(input, 'aria-invalid', state === 'invalid' ? 'true' : null)
+    writeAttribute(input, 'aria-describedby', describedBy || null)
   }
 
   _updateCleaner(): void {
