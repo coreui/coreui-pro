@@ -213,7 +213,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
 | `ariaAddedAnnouncement` | string | `'added'` | Wording appended to a chip's value when its addition is announced. |
-| `ariaRemoveLabel` | string | `'Remove'` | Accessible label applied to each chip's remove button. |
+| `ariaRemoveLabel` | string | `'Remove'` | Word that names each chip's remove button. The chip's value follows it, as in `Remove JavaScript`. |
 | `ariaRemovedAnnouncement` | string | `'removed'` | Wording appended to a chip's value when its removal is announced. |
 | `chipClassName` | string \| function \| null | `null` | Adds classes to chips. Use a string for all chips or a function `(value) => className` for per-chip styling. |
 | `create` | boolean | `true` | Turns typed text into chips. Set to `false` for the controlled mode: chips come only from `add()` — a host component's selection, say — typing never creates one, and no hidden field is rendered (the host owns the value). |
@@ -325,7 +325,7 @@ The Bootstrap Chip Input component follows WAI-ARIA patterns to ensure the chip 
 
 - Associate a `<label>` with the ghost input for screen readers.
 - Chips are focusable and keyboard navigable when initialized by the plugin.
-- Remove buttons include `aria-label="Remove"` by default.
+- Each remove button the component creates is named with `ariaRemoveLabel` followed by the chip's value, `Remove <value>` by default.
 - Adding and removing chips is announced through [`announce()`](/getting-started/accessibility/#announcing-messages) in the live region of the page, or of the modal dialog around the set, one message per update: the first chip added, or else the first one removed, and nothing while the set is hidden.
 - Use a descriptive `aria-label` or `<label>` on the chip input container to communicate its purpose (e.g., "Add skills" or "Recipients").
 
