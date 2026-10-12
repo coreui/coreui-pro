@@ -11,7 +11,6 @@ import type { DateInputConfig } from './date-input.js'
 import DateRangeInput, { type DateRangeInputConfig } from './date-range-input.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
-import type { SectionInputConfig } from './section-input.js'
 import { captureHostClasses } from './util/form-control-group.js'
 import type { ValidationState } from './util/form-validation.js'
 import {
@@ -66,7 +65,7 @@ type DateRangePickerConfig = {
   endDate: Date | string | null,
   endFloatingLabel: string | null,
   endName: string | null,
-  format: SectionInputConfig['format'],
+  format: DateInputConfig['format'],
   inputOptions: Partial<DateInputConfig>,
   invalid: boolean,
   locale: string,

@@ -144,6 +144,26 @@ describe('TimeInput', () => {
       expect(getSections(timeInput._element)).toHaveSize(3)
     })
 
+    it('should keep a date name the page gives it', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const timeInput = new TimeInput(fixtureEl.querySelector('div'), { ariaLabel: 'Date input' })
+
+      expect(timeInput._element.getAttribute('aria-label')).toEqual('Date input')
+    })
+
+    it('should keep the time sections when the type option asks for a date', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const timeInput = new TimeInput(fixtureEl.querySelector('div'), { locale: 'pl-PL', type: 'date' })
+      const getSectionTypes = () => [...getSections(timeInput._element)].map(section => section.dataset.coreuiSection)
+
+      expect(getSectionTypes()).toEqual(['hour', 'minute'])
+
+      timeInput.setConfig({ type: 'datetime' })
+
+      expect(getSectionTypes()).toEqual(['hour', 'minute'])
+      expect(timeInput._element.getAttribute('aria-label')).toEqual('Time input')
+    })
+
     it('should fill sections from the initial date', () => {
       const timeInput = createTimeInput({ date: new Date(2026, 6, 14, 14, 30) })
       const [hour, minute] = getSections(timeInput._element)

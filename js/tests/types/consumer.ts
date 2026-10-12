@@ -102,8 +102,8 @@ const calendarConfig: Partial<CalendarConfig> = {
 const pickerConfig: Partial<DatePickerConfig> = { format: 'dd.MM.yyyy', selectionType: 'month' }
 const rangePickerConfig: Partial<DateRangePickerConfig> = { calendars: 2, selectionType: 'week' }
 const timePickerConfig: Partial<TimePickerConfig> = { locale: 'en-US', seconds: false }
-const inputConfigs: [Partial<DateInputConfig>, Partial<TimeInputConfig>, Partial<DateRangeInputConfig>] = [
-  { type: 'datetime' }, { seconds: true }, { type: 'date' }
+const inputConfigs: [Partial<DateInputConfig>, Partial<DateInputConfig>, Partial<TimeInputConfig>, Partial<DateRangeInputConfig>] = [
+  { type: 'datetime' }, { type: 'time' }, { seconds: true }, { type: 'date' }
 ]
 
 // @ts-expect-error — 'weeks' is not a selection type
@@ -120,10 +120,10 @@ const monthFormatTypo: Partial<CalendarConfig> = { monthFormat: 'longg' }
 const weekdayFormatTypo: Partial<CalendarConfig> = { weekdayFormat: 'wide' }
 // @ts-expect-error — disabled dates are dates, date lists or a predicate
 const disabledDatesString: Partial<CalendarConfig> = { disabledDates: '2026-01-01' }
-// @ts-expect-error — a date field is a date or a date and time
-const inputTypeTypo: Partial<DateInputConfig> = { type: 'time' }
-// @ts-expect-error — the range field takes the same types
-const rangeInputTypeTypo: Partial<DateRangeInputConfig> = { type: 'dattime' }
+// @ts-expect-error — a date field is a date, a date and time, or a time
+const inputTypeTypo: Partial<DateInputConfig> = { type: 'times' }
+// @ts-expect-error — the range field is a date or a date and time
+const rangeInputTypeTypo: Partial<DateRangeInputConfig> = { type: 'time' }
 // @ts-expect-error — the picker's calendar options are the calendar's
 const nestedTypo: Partial<DatePickerConfig> = { calendarOptions: { selectionType: 'weeks' } }
 
@@ -176,6 +176,8 @@ const unknownOptions = [
   new RangeSlider(element, { steps: 5 }),
   // @ts-expect-error — not a time input option
   new TimeInput(element, { second: true }),
+  // @ts-expect-error — a time field fixes its type
+  new TimeInput(element, { type: 'date' }),
   // @ts-expect-error — not a toast option
   new Toast(element, { autoHide: false }),
   // @ts-expect-error — not a toaster option

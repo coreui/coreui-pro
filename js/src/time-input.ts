@@ -5,10 +5,9 @@
  * --------------------------------------------------------------------------
  */
 
+import DateInput, { type DateInputConfig } from './date-input.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
-import SectionInput, { type SectionInputConfig } from './section-input.js'
-import { convertValue, type DateSection, getTimeSectionsFromLocale } from './util/date-sections.js'
 import { defineJQueryPlugin, jQueryDispatch } from './util/index.js'
 
 /**
@@ -24,54 +23,43 @@ const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
 const SELECTOR_DATA_TIME_INPUT = '[data-coreui-time-input]'
 
-type TimeInputConfig = SectionInputConfig & {
-  seconds: boolean
-}
+type TimeInputConfig = Omit<DateInputConfig, 'type'>
 
-const Default: TimeInputConfig = {
-  ...SectionInput.Default,
+const Default: DateInputConfig = {
+  ...DateInput.Default,
   ariaLabel: 'Time input',
-  seconds: false
-}
-
-const DefaultType: Record<string, string> = {
-  ...SectionInput.DefaultType,
-  seconds: 'boolean'
+  type: 'time'
 }
 
 /**
  * Class definition
  */
 
-class TimeInput extends SectionInput<TimeInputConfig> {
+class TimeInput extends DateInput<TimeInputConfig> {
   // Getters
   static override get Default(): typeof Default {
     return Default
-  }
-
-  static override get DefaultType(): typeof DefaultType {
-    return DefaultType
   }
 
   static override get NAME(): string {
     return NAME
   }
 
-  static get CHANGE_EVENT_NAME() {
+  static override get CHANGE_EVENT_NAME(): string {
     return 'timeChange'
   }
 
   // Private
-  override _convertDate(value: any): Date | null {
-    return convertValue(value, 'time', this._config.locale)
+  override _configAfterMerge(config: DateInputConfig): DateInputConfig {
+    return { ...config, type: 'time' }
   }
 
-  override _getDefaultSections(locale: string): DateSection[] {
-    return getTimeSectionsFromLocale(locale, this._config.seconds)
+  override _getAriaLabel(): string {
+    return this._config.ariaLabel || this.constructor.Default.ariaLabel
   }
 
   // Static
-  static jQueryInterface(this: any, config: any, ...args: any[]): any {
+  static override jQueryInterface(this: any, config: any, ...args: any[]): any {
     return jQueryDispatch(this, TimeInput, config, args)
   }
 }

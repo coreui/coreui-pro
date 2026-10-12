@@ -31,8 +31,8 @@ const inherited = {
     reason: 'inherited from Menu; the dropdown markup has no `.submenu > .menu-item` for them to act on'
   },
   'time-input': {
-    keys: ['ariaDayLabel', 'ariaMonthLabel', 'ariaQuarterLabel', 'ariaWeekLabel', 'ariaYearLabel', 'dayPlaceholder', 'monthNames', 'monthPlaceholder', 'quarterPlaceholder', 'weekPlaceholder', 'yearPlaceholder'],
-    reason: 'inherited from SectionInput for the date sections a time field does not render'
+    keys: ['ariaDayLabel', 'ariaMonthLabel', 'ariaQuarterLabel', 'ariaWeekLabel', 'ariaYearLabel', 'dayPlaceholder', 'monthNames', 'monthPlaceholder', 'quarterPlaceholder', 'type', 'weekPlaceholder', 'yearPlaceholder'],
+    reason: 'inherited from DateInput for the date sections a time field does not render, and its type, which a time field fixes to time'
   }
 }
 

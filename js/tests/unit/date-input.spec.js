@@ -3177,4 +3177,50 @@ describe('DateInput', () => {
       expect(dateInput._element.getAttribute("aria-label")).toEqual("Appointment")
     })
   })
+
+  describe('time type', () => {
+    it('should derive the time sections from the locale', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const dateInput = new DateInput(fixtureEl.querySelector('div'), { locale: 'pl-PL', type: 'time' })
+
+      expect([...getSections(dateInput._element)].map(section => section.dataset.coreuiSection))
+        .toEqual(['hour', 'minute'])
+    })
+
+    it('should name itself a time input', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const dateInput = new DateInput(fixtureEl.querySelector('div'), { type: 'time' })
+
+      expect(dateInput._element.getAttribute('aria-label')).toEqual('Time input')
+    })
+
+    it('should keep the date name for a type it does not know', () => {
+      fixtureEl.innerHTML = '<div></div><div></div><div></div>'
+
+      for (const [index, type] of ['Time', 'constructor', 'toString'].entries()) {
+        const element = fixtureEl.querySelectorAll('div')[index]
+        // eslint-disable-next-line no-new
+        new DateInput(element, { type })
+
+        expect(element.getAttribute('aria-label')).toEqual('Date input')
+      }
+    })
+
+    it('should read a time string and report the time', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const element = fixtureEl.querySelector('div')
+      const dateInput = new DateInput(element, { date: '09:30', locale: 'pl-PL', type: 'time' })
+      const spy = vi.fn()
+      element.addEventListener('dateChange.coreui.date-input', spy)
+
+      expect(dateInput.getDate()).toEqual(new Date(1970, 0, 1, 9, 30))
+
+      const [hour] = getSections(element)
+      hour.focus()
+      pressKey(hour, 'ArrowUp')
+
+      expect(spy).toHaveBeenCalledOnce()
+      expect(spy.mock.calls[0][0].date).toEqual(new Date(1970, 0, 1, 10, 30))
+    })
+  })
 })
