@@ -3713,8 +3713,8 @@ map — several things below are breaking and are called out as such.
   callouts, combobox options and the range slider's tooltip sit on
   `--cui-radius-5` (`.5rem`), alerts, badges, popovers, dialogs, drawers, menus,
   accordions, toasts, dropdowns and popups on `--cui-radius-7` (`.75rem`),
-  cards on `--cui-radius-9` (`1rem`), and pills on `calc(var(--cui-radius) * 3)` (`1.5rem`),
-  computed from the base because no stop carries that value.
+  cards on `--cui-radius-9` (`1rem`), and nav pills on a fixed `3rem`, which
+  keeps a pill up to 96px tall fully round and does not follow `--cui-radius`.
   Everything that used the `.375rem` default is visibly rounder. To keep a
   component on its old radius, set its own token
   (`--cui-card-border-radius: .375rem`); to retune the whole page, set
