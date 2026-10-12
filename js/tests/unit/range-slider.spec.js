@@ -882,6 +882,17 @@ describe('RangeSlider', () => {
       expect(inputsOf(element)[0].validationMessage).toEqual('Invalid value.')
     })
 
+    it('should write aria-invalid="true" over another value on a handle once the state is invalid', () => {
+      const { element, rangeSlider } = mountInForm({ value: 40 })
+      const [input] = inputsOf(element)
+
+      input.setAttribute('aria-invalid', 'false')
+      rangeSlider.setConfig({ validationState: 'invalid' })
+
+      expect(inputsOf(element)[0]).toBe(input)
+      expect(input.getAttribute('aria-invalid')).toEqual('true')
+    })
+
     it('should not block for a valid or a custom state', () => {
       const { element, form, rangeSlider } = mountInForm({ validationState: 'valid', value: 40 })
 

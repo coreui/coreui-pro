@@ -1881,6 +1881,15 @@ describe('Rating', () => {
       expect(radiosOf(element)[0].validationMessage).toEqual('Invalid value.')
     })
 
+    it('should write aria-invalid="true" over a value set after build once the state is invalid', () => {
+      const { element, rating } = mountInForm()
+
+      element.setAttribute('aria-invalid', 'false')
+      rating.setConfig({ validationState: 'invalid' })
+
+      expect(element.getAttribute('aria-invalid')).toEqual('true')
+    })
+
     it('should not block for a valid or a custom state', () => {
       const { element, form, rating } = mountInForm({ validationState: 'valid' })
 

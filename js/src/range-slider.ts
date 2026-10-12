@@ -9,11 +9,12 @@ import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import {
-  followUserValidity, getFeedbackIds, getValidationState, nextStateSerial, ownValidationState, setStateValidity,
-  type UserValidity, type ValidationState
+  followUserValidity, getFeedbackIds, getServerState, getStateClasses, getValidationState, nextStateSerial,
+  ownValidationState, setStateValidity, swapStateClass, type UserValidity, type ValidationState, writeDescribedBy
 } from './util/form-validation.js'
 import {
-  captureHostClasses, defineJQueryPlugin, getUID, type HostClasses, isRTL, jQueryDispatch, restoreHostClasses
+  captureHostClasses, defineJQueryPlugin, getUID, type HostClasses, isRTL, jQueryDispatch, restoreHostClasses,
+  writeAttribute
 } from './util/index.js'
 import {
   constrainInput,
@@ -59,14 +60,10 @@ const HOST_ATTRIBUTES = ['aria-describedby', 'aria-label', 'aria-labelledby']
 const CLASS_NAME_FORM_RANGE = 'form-range'
 const CLASS_NAME_FORM_RANGE_INPUT = 'form-range-input'
 const CLASS_NAME_FORM_RANGE_VERTICAL = 'form-range-vertical'
-const CLASS_NAME_IS_INVALID = 'is-invalid'
-const CLASS_NAME_IS_VALID = 'is-valid'
 const CLASS_NAME_TICKS_CLICKABLE = 'form-range-ticks-clickable'
 const CLASS_NAME_TOOLTIP_END = 'bs-tooltip-end'
 const CLASS_NAME_TOOLTIP_START = 'bs-tooltip-start'
 const CLASS_NAME_TOOLTIP_TOP = 'bs-tooltip-top'
-
-const STATE_CLASSES = [CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID]
 
 const PROPERTY_FILL = '--cui-range-fill'
 const PROPERTY_FILL_START = '--cui-range-fill-start'
@@ -198,7 +195,7 @@ class RangeSlider extends BaseComponent {
     this._releaseValidationState = null
     this._resetRoot = this._element.getRootNode() instanceof ShadowRoot ? this._element.getRootNode() as ShadowRoot : this._element.ownerDocument
     this._resetTimeout = null
-    this._serverMarks = STATE_CLASSES.filter(name => this._element.classList.contains(name))
+    this._serverMarks = getStateClasses(this._element)
     this._shownValues = []
     this._stateClass = null
     this._stateSerial = nextStateSerial()
@@ -303,10 +300,7 @@ class RangeSlider extends BaseComponent {
     clearTimeout(this._resetTimeout!)
     EventHandler.off(this._resetRoot, EVENT_RESET, SELECTOR_FORM, this._onReset)
 
-    if (this._stateClass) {
-      this._element.classList.remove(this._stateClass)
-    }
-
+    swapStateClass(this._element, this._stateClass)
     this._element.classList.add(...this._serverMarks)
     restoreHostClasses(this._element, [], this._hostClasses)
 
@@ -533,8 +527,7 @@ class RangeSlider extends BaseComponent {
       return
     }
 
-    const givenState = getValidationState(this._config.validationState) ??
-      getValidationState(null, this._serverMarks.includes(CLASS_NAME_IS_VALID), this._serverMarks.includes(CLASS_NAME_IS_INVALID))
+    const givenState = getValidationState(this._config.validationState) ?? getServerState(this._serverMarks)
 
     if (givenState !== 'invalid') {
       setStateValidity(first, false)
@@ -542,25 +535,13 @@ class RangeSlider extends BaseComponent {
 
     const reported = this._userValidity.map(follower => follower.read())
     const state = givenState ?? (reported.includes('invalid') ? 'invalid' : reported.find(Boolean))
-    const stateClass = state ? `is-${state}` : null
     const previousClass = this._stateClass
+    const stateClass = swapStateClass(this._element, previousClass, state)
 
-    if (stateClass !== previousClass) {
-      if (previousClass) {
-        this._element.classList.remove(previousClass)
-      }
-
-      if (stateClass) {
-        this._element.classList.add(stateClass)
-      }
-
-      this._stateClass = stateClass
-    }
-
+    this._stateClass = stateClass
     setStateValidity(first, givenState === 'invalid')
 
     const feedbackIds = state === 'invalid' ? getFeedbackIds(first) : []
-    const describedBy = [...new Set([...(this._hostAttributes.get('aria-describedby') ?? '').split(/\s+/), ...feedbackIds])].filter(Boolean).join(' ')
 
     for (const input of this._inputs) {
       if (previousClass && previousClass !== stateClass) {
@@ -571,17 +552,8 @@ class RangeSlider extends BaseComponent {
         input.classList.add(stateClass)
       }
 
-      if (!describedBy) {
-        input.removeAttribute('aria-describedby')
-      } else if (input.getAttribute('aria-describedby') !== describedBy) {
-        input.setAttribute('aria-describedby', describedBy)
-      }
-
-      if (state !== 'invalid') {
-        input.removeAttribute('aria-invalid')
-      } else if (!input.hasAttribute('aria-invalid')) {
-        input.setAttribute('aria-invalid', 'true')
-      }
+      writeDescribedBy(input, this._hostAttributes.get('aria-describedby'), feedbackIds)
+      writeAttribute(input, 'aria-invalid', state === 'invalid' ? 'true' : null)
     }
   }
 

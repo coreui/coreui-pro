@@ -167,6 +167,26 @@ const setAriaAttribute = (element: Element, name: string, value: boolean): void 
   element.setAttribute(name, String(value))
 }
 
+/**
+ * Sets an attribute to a value, or removes it for `null`, leaving the element untouched when the
+ * attribute already holds that value.
+ *
+ * @param element - The element to write
+ * @param name - The attribute name
+ * @param value - The value, or `null` for no attribute
+ */
+const writeAttribute = (element: Element, name: string, value: string | null): void => {
+  if (element.getAttribute(name) === value) {
+    return
+  }
+
+  if (value === null) {
+    element.removeAttribute(name)
+  } else {
+    element.setAttribute(name, value)
+  }
+}
+
 const findShadowRoot = (element: Node): ShadowRoot | null => {
   if (!document.documentElement.attachShadow) {
     return null
@@ -477,5 +497,6 @@ export {
   restoreHostClasses,
   setAriaAttribute,
   triggerTransitionEnd,
-  toType
+  toType,
+  writeAttribute
 }

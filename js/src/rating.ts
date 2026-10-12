@@ -9,12 +9,12 @@ import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import {
-  followUserValidity, getFeedbackIds, getValidationState, nextStateSerial, ownValidationState, setStateValidity,
-  type UserValidity, type ValidationState
+  followUserValidity, getFeedbackIds, getServerState, getStateClasses, getValidationState, nextStateSerial,
+  ownValidationState, setStateValidity, swapStateClass, type UserValidity, type ValidationState
 } from './util/form-validation.js'
 import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 import {
-  captureHostClasses, defineJQueryPlugin, getUID, type HostClasses, jQueryDispatch, restoreHostClasses
+  captureHostClasses, defineJQueryPlugin, getUID, type HostClasses, jQueryDispatch, restoreHostClasses, writeAttribute
 } from './util/index.js'
 import Tooltip from './tooltip.js'
 
@@ -41,8 +41,6 @@ const EVENT_RESET = `reset${EVENT_KEY}`
 
 const CLASS_NAME_ACTIVE = 'active'
 const CLASS_NAME_DISABLED = 'disabled'
-const CLASS_NAME_IS_INVALID = 'is-invalid'
-const CLASS_NAME_IS_VALID = 'is-valid'
 const CLASS_NAME_RATING = 'rating'
 const CLASS_NAME_RATING_ITEM = 'rating-item'
 const CLASS_NAME_RATING_ITEM_ICON = 'rating-item-icon'
@@ -53,7 +51,6 @@ const CLASS_NAME_RATING_ITEM_LABEL = 'rating-item-label'
 const CLASS_NAME_READONLY = 'readonly'
 
 const SIZE_CLASS_NAMES = ['rating-lg', 'rating-sm']
-const STATE_CLASSES = [CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID]
 
 const SELECTOR_DATA_RATING = '[data-coreui-rating]'
 const SELECTOR_FORM = 'form'
@@ -170,7 +167,7 @@ class Rating extends BaseComponent {
     this._reported = false
     this._resetEvent = null
     this._resetRoot = this._element.getRootNode() instanceof ShadowRoot ? this._element.getRootNode() as ShadowRoot : this._element.ownerDocument
-    this._serverMarks = STATE_CLASSES.filter(name => this._element.classList.contains(name))
+    this._serverMarks = getStateClasses(this._element)
     this._stateClass = null
     this._stateSerial = nextStateSerial()
     this._userValidity = []
@@ -276,10 +273,7 @@ class Rating extends BaseComponent {
     this._form?.removeEventListener('reset', this._resetHandler, true)
     this._removeRating()
 
-    if (this._stateClass) {
-      this._element.classList.remove(this._stateClass)
-    }
-
+    swapStateClass(this._element, this._stateClass)
     restoreHostClasses(this._element, this._managedClassNames(), this._hostClasses)
 
     if (this._serverMarks.length > 0) {
@@ -626,8 +620,7 @@ class Rating extends BaseComponent {
     }
 
     const blocked = radios.find(radio => radio.checked) ?? radios[0]
-    const givenState = getValidationState(this._config.validationState) ??
-      getValidationState(null, this._serverMarks.includes(CLASS_NAME_IS_VALID), this._serverMarks.includes(CLASS_NAME_IS_INVALID))
+    const givenState = getValidationState(this._config.validationState) ?? getServerState(this._serverMarks)
 
     for (const radio of radios) {
       if (radio !== blocked || givenState !== 'invalid') {
@@ -637,20 +630,8 @@ class Rating extends BaseComponent {
 
     const reported = this._userValidity.map(follower => follower.read())
     const state = givenState ?? (reported.includes('invalid') ? 'invalid' : reported.find(Boolean))
-    const stateClass = state ? `is-${state}` : null
 
-    if (stateClass !== this._stateClass) {
-      if (this._stateClass) {
-        this._element.classList.remove(this._stateClass)
-      }
-
-      if (stateClass) {
-        this._element.classList.add(stateClass)
-      }
-
-      this._stateClass = stateClass
-    }
-
+    this._stateClass = swapStateClass(this._element, this._stateClass, state)
     setStateValidity(blocked, givenState === 'invalid' && !this._config.readonly)
     this._writeInvalid(state === 'invalid', radios, blocked)
   }
@@ -659,21 +640,11 @@ class Rating extends BaseComponent {
     const feedbackIds = invalid ? getFeedbackIds(blocked).join(' ') : ''
 
     for (const radio of radios) {
-      if (!feedbackIds) {
-        radio.removeAttribute('aria-describedby')
-      } else if (radio.getAttribute('aria-describedby') !== feedbackIds) {
-        radio.setAttribute('aria-describedby', feedbackIds)
-      }
+      writeAttribute(radio, 'aria-describedby', feedbackIds || null)
     }
 
-    if (this._hostAriaInvalid !== null) {
-      return
-    }
-
-    if (!invalid) {
-      this._element.removeAttribute('aria-invalid')
-    } else if (!this._element.hasAttribute('aria-invalid')) {
-      this._element.setAttribute('aria-invalid', 'true')
+    if (this._hostAriaInvalid === null) {
+      writeAttribute(this._element, 'aria-invalid', invalid ? 'true' : null)
     }
   }
 

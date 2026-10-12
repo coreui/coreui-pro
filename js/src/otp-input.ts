@@ -10,12 +10,13 @@ import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { onLabelClick } from './util/field-label.js'
 import {
-  configureValueField, createValueField, dispatchValueChange, followUserValidity, getFeedbackIds, getValidationState,
-  nextStateSerial, ownValidationState, setStateValidity, writeValueField, type UserValidity, type ValidationState
+  configureValueField, createValueField, dispatchValueChange, followUserValidity, getFeedbackIds, getServerState,
+  getStateClasses, getValidationState, nextStateSerial, ownValidationState, setStateValidity, swapStateClass,
+  writeDescribedBy, writeValueField, type UserValidity, type ValidationState
 } from './util/form-validation.js'
 import {
   captureHostClasses, defineJQueryPlugin, getNextActiveElement, type HostClasses, isRTL, jQueryDispatch,
-  restoreHostClasses
+  restoreHostClasses, writeAttribute
 } from './util/index.js'
 
 /**
@@ -39,10 +40,6 @@ const EVENT_INPUT = `input${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 const EVENT_PASTE = `paste${EVENT_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
-
-const CLASS_NAME_IS_INVALID = 'is-invalid'
-const CLASS_NAME_IS_VALID = 'is-valid'
-const STATE_CLASSES = [CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID]
 
 const SELECTOR_DATA_OTP = '[data-coreui-otp]'
 const SELECTOR_FORM_OTP_CONTROL = '.form-otp-control'
@@ -138,7 +135,7 @@ class OTPInput extends BaseComponent {
     this._userValidity = null
 
     for (const element of [this._element, ...this._getInputs()]) {
-      const names = STATE_CLASSES.filter(name => element.classList.contains(name))
+      const names = getStateClasses(element)
 
       if (names.length > 0) {
         element.classList.remove(...names)
@@ -191,9 +188,7 @@ class OTPInput extends BaseComponent {
     this._inputElement?.remove()
     this._inputElement = null
 
-    if (this._stateClass) {
-      this._element.classList.remove(this._stateClass)
-    }
+    swapStateClass(this._element, this._stateClass)
 
     for (const [element, names] of this._serverMarks) {
       element.classList.add(...names)
@@ -202,8 +197,8 @@ class OTPInput extends BaseComponent {
     restoreHostClasses(this._element, [], this._hostClasses)
 
     for (const [input, { describedBy, invalid }] of this._slotAria) {
-      this._writeSlotAttribute(input, 'aria-describedby', describedBy)
-      this._writeSlotAttribute(input, 'aria-invalid', invalid)
+      writeAttribute(input, 'aria-describedby', describedBy)
+      writeAttribute(input, 'aria-invalid', invalid)
     }
 
     for (const input of this._requiredSlots) {
@@ -560,37 +555,23 @@ class OTPInput extends BaseComponent {
       return
     }
 
-    const serverClasses = new Set([...this._serverMarks.values()].flat())
     const givenState = getValidationState(this._config.validationState) ??
-      getValidationState(null, serverClasses.has(CLASS_NAME_IS_VALID), serverClasses.has(CLASS_NAME_IS_INVALID))
+      getServerState([...this._serverMarks.values()].flat())
 
     setStateValidity(field, givenState === 'invalid')
 
     const state = givenState ?? this._userValidity?.read()
-    const stateClass = state ? `is-${state}` : null
     const feedbackIds = state === 'invalid' ? getFeedbackIds(field) : []
 
-    if (stateClass !== this._stateClass) {
-      if (this._stateClass) {
-        this._element.classList.remove(this._stateClass)
-      }
-
-      if (stateClass) {
-        this._element.classList.add(stateClass)
-      }
-
-      this._stateClass = stateClass
-    }
+    this._stateClass = swapStateClass(this._element, this._stateClass, state)
 
     for (const input of this._getInputs()) {
       if (!this._slotAria.has(input)) {
         this._slotAria.set(input, { describedBy: input.getAttribute('aria-describedby'), invalid: input.getAttribute('aria-invalid') })
       }
 
-      const ids = [...new Set([...(this._slotAria.get(input)!.describedBy ?? '').split(/\s+/), ...feedbackIds])].filter(Boolean)
-
-      this._writeSlotAttribute(input, 'aria-describedby', ids.length > 0 ? ids.join(' ') : null)
-      this._writeSlotAttribute(input, 'aria-invalid', state === 'invalid' ? 'true' : null)
+      writeDescribedBy(input, this._slotAria.get(input)!.describedBy, feedbackIds)
+      writeAttribute(input, 'aria-invalid', state === 'invalid' ? 'true' : null)
     }
   }
 
@@ -607,18 +588,6 @@ class OTPInput extends BaseComponent {
 
     this._syncFirstInputMaxLength()
     this._setInputsTabIndexes()
-  }
-
-  _writeSlotAttribute(input: HTMLInputElement, name: string, value: string | null): void {
-    if (input.getAttribute(name) === value) {
-      return
-    }
-
-    if (value === null) {
-      input.removeAttribute(name)
-    } else {
-      input.setAttribute(name, value)
-    }
   }
 
   _seedSlots({ clearWhenEmpty = false }: { clearWhenEmpty?: boolean } = {}): void {

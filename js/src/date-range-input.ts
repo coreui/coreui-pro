@@ -12,7 +12,9 @@ import SelectorEngine from './dom/selector-engine.js'
 import { type DisabledDate, isSameInstantAs } from './util/calendar.js'
 import { getForwardedOptions } from './util/composite.js'
 import { hasShortcutModifier, type SectionFormat } from './util/date-sections.js'
-import { getValidationState, nextStateSerial, type ValidationState } from './util/form-validation.js'
+import {
+  getServerState, getStateClasses, getValidationState, nextStateSerial, type ValidationState
+} from './util/form-validation.js'
 import {
   appendControlGroupField,
   applyControlGroupClasses,
@@ -45,8 +47,6 @@ const ARROW_RIGHT_KEY = 'ArrowRight'
 
 const CLASS_NAME_DATE_RANGE = 'form-date-range'
 const CLASS_NAME_INPUT_GROUP = 'form-control-group'
-const CLASS_NAME_IS_INVALID = 'is-invalid'
-const CLASS_NAME_IS_VALID = 'is-valid'
 const CLASS_NAME_SEPARATOR = 'form-control-icon'
 
 const ATTRIBUTE_ROLE_END = 'data-coreui-range-end'
@@ -251,7 +251,7 @@ class DateRangeInput extends BaseComponent {
     this._onDismissValidationState = null
     this._ownerState = undefined
     this._ownsStateClass = false
-    this._serverClasses = [CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID].filter(name => this._element.classList.contains(name))
+    this._serverClasses = getStateClasses(this._element)
     this._stateClass = null
     this._stateSerial = nextStateSerial()
     this._element.classList.remove(...this._serverClasses)
@@ -610,9 +610,7 @@ class DateRangeInput extends BaseComponent {
   }
 
   _updateValidity(): void {
-    const givenState = getValidationState(this._config.validationState) ??
-      getValidationState(null, this._serverClasses.includes(CLASS_NAME_IS_VALID), this._serverClasses.includes(CLASS_NAME_IS_INVALID)) ??
-      this._ownerState
+    const givenState = getValidationState(this._config.validationState) ?? getServerState(this._serverClasses) ?? this._ownerState
     const isOrderInvalid = !this.isRangeValid()
     const state = isOrderInvalid || this._startInput._rejected || this._endInput._rejected ? 'invalid' : givenState
     const stateClass = state ? `is-${state}` : null

@@ -11,7 +11,9 @@ import SelectorEngine from './dom/selector-engine.js'
 import { getForwardedOptions } from './util/composite.js'
 import type { ComponentConfig } from './util/config.js'
 import { createControlGroupAction, type HostClasses, restoreHostClasses } from './util/form-control-group.js'
-import { getValidationState, nextStateSerial, type ValidationState } from './util/form-validation.js'
+import {
+  getServerState, getStateClasses, getValidationState, nextStateSerial, type ValidationState
+} from './util/form-validation.js'
 import { getUID } from './util/index.js'
 import Popup from './util/popup.js'
 import { sanitizeByConfig } from './util/sanitizer.js'
@@ -20,8 +22,6 @@ import { sanitizeByConfig } from './util/sanitizer.js'
  * Constants
  */
 
-const CLASS_NAME_IS_INVALID = 'is-invalid'
-const CLASS_NAME_IS_VALID = 'is-valid'
 const CLASS_NAME_POPUP = 'popup'
 const CLASS_NAME_SHOW = 'show'
 
@@ -63,7 +63,7 @@ abstract class PickerBase extends BaseComponent {
     this._menu = null as any
     this._ownsStateClass = false
     this._popup = null as any
-    this._serverClasses = [CLASS_NAME_IS_INVALID, CLASS_NAME_IS_VALID].filter(name => this._element.classList.contains(name))
+    this._serverClasses = getStateClasses(this._element)
     this._stateClass = null
     this._stateSerial = nextStateSerial()
 
@@ -184,7 +184,7 @@ abstract class PickerBase extends BaseComponent {
 
   _updateValidity(): void {
     this._givenState = getValidationState(this._config.validationState, this._config.valid, this._config.invalid) ??
-      getValidationState(null, this._serverClasses.includes(CLASS_NAME_IS_VALID), this._serverClasses.includes(CLASS_NAME_IS_INVALID))
+      getServerState(this._serverClasses)
     this._syncStateClass()
     this._setFieldState(this._givenState)
   }
