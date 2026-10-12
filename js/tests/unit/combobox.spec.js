@@ -381,6 +381,15 @@ describe('Combobox', () => {
 
       expect(value(toggle)).toEqual('wybrano: 2')
     })
+
+    it('should fill {total} in the selected label with the number of options', () => {
+      const toggle = setMarkup()
+      const combobox = new Combobox(toggle, { multiple: true, selectedLabel: '{count} of {total} selected' })
+
+      combobox.setValue(['us', 'ca'])
+
+      expect(value(toggle)).toEqual('2 of 3 selected')
+    })
   })
 
   describe('selection', () => {
