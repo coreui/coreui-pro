@@ -56,7 +56,7 @@ Without a `.rounded-size-*` in scope the corner classes fall back to `--cui-radi
 
 ### CSS variables
 
-The radius scale is emitted on `:root` as `--cui-radius`, the base, and `--cui-radius-0` through `--cui-radius-9`, each a `calc()` multiple of the base, plus `--cui-radius-pill`. Components and the `.rounded-*` utilities read stops of the scale (`--cui-radius-5`, `--cui-radius-7`), so setting `--cui-radius` re-rounds the whole page and overriding one stop re-rounds everything that uses it, without recompiling.
+The radius scale is emitted on `:root` as `--cui-radius`, the base, and `--cui-radius-0` through `--cui-radius-9`, each a `calc()` multiple of the base, plus `--cui-radius-pill`. Components and the `.rounded-*` utilities read stops of the scale (`--cui-radius-5`, `--cui-radius-7`), so setting `--cui-radius` re-rounds every component that reads a stop and overriding one stop re-rounds everything that uses it, without recompiling. Shapes that are round by design keep their own value: `--cui-radius-pill` is a fixed `50rem` for chips, switches and `.rounded-pill`, and nav pills, avatars and the range track carry fixed radii of their own.
 
 <ScssDocs file="scss/_root.scss" capture="root-radius-loop" />
 

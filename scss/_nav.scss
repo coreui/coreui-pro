@@ -76,7 +76,7 @@ $nav-pills-tokens: () !default;
 // scss-docs-start nav-pills-tokens
 $nav-pills-tokens: defaults(
   (
-    --#{$prefix}nav-pills-border-radius: calc(var(--#{$prefix}radius) * 3),
+    --#{$prefix}nav-pills-border-radius: 3rem,
     --#{$prefix}nav-pills-link-active-color: var(--#{$prefix}primary-contrast),
     --#{$prefix}nav-pills-link-active-bg: var(--#{$prefix}primary-bg),
   ),
