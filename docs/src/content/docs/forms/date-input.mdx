@@ -40,6 +40,11 @@ Add `data-coreui-seconds="true"` for a seconds section:
 <Example pro code={`<label class="form-label" id="dateInputTimestampLabel">Timestamp</label>
   <div class="form-control form-date-time" data-coreui-date-input data-coreui-type="datetime" data-coreui-seconds="true" aria-labelledby="dateInputTimestampLabel"></div>`} />
 
+`data-coreui-type="time"` keeps only the time sections. That is the field [time input](/forms/time-input/) renders; it reports a change through `timeChange` instead of `dateChange`.
+
+<Example pro code={`<label class="form-label" id="dateInputTimeLabel">Opening hour</label>
+  <div class="form-control form-date-time" data-coreui-date-input data-coreui-type="time" data-coreui-name="opening-hour" aria-labelledby="dateInputTimeLabel"></div>`} />
+
 A `format` overrides the type, because it names the sections itself. [Date range input](/forms/date-range-input/) takes both options too, so a range with time is the same two attributes on the range container.
 
 ## With form field
@@ -326,7 +331,7 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | --- | --- | --- | --- |
 | `ariaDayLabel` | string | `'Day'` | The `aria-label` of the day section. |
 | `ariaHourLabel` | string | `'Hour'` | The `aria-label` of the hour section. |
-| `ariaLabel` | string | `'Date input'` | The `aria-label` of the `role="group"` container when the element carries no `aria-label` of its own. On `type="datetime"` the default becomes `'Date and time input'`. |
+| `ariaLabel` | string | `'Date input'` | The `aria-label` of the `role="group"` container when the element carries no `aria-label` of its own. On `type="datetime"` the default becomes `'Date and time input'`, on `type="time"` `'Time input'`. |
 | `ariaMeridiemLabel` | string | `'AM/PM'` | The `aria-label` of the meridiem section. |
 | `ariaMinuteLabel` | string | `'Minute'` | The `aria-label` of the minute section. |
 | `ariaMonthLabel` | string | `'Month'` | The `aria-label` of the month section. |
@@ -354,8 +359,8 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | `readonly` | boolean | `false` | Make the field focusable but non-editable |
 | `required` | boolean | `false` | Required attribute of the value input |
 | `secondPlaceholder` | string, null | `null` | Replaces the `ss` the second section shows while it is empty. |
-| `seconds` | boolean | `false` | Include a seconds section in the locale-derived layout of `type="datetime"` |
-| `type` | string | `'date'` | Which sections the locale-derived layout carries: `'date'` or `'datetime'`. A `format` names the sections itself and overrides this. |
+| `seconds` | boolean | `false` | Include a seconds section in the locale-derived layout of `type="datetime"` and `type="time"` |
+| `type` | string | `'date'` | Which sections the locale-derived layout carries: `'date'`, `'datetime'` or `'time'`. A `format` names the sections itself and overrides this. |
 | `validationState` | string, null | `null` | The validation state the field shows: `'valid'`, `'invalid'` or a state of `$form-validation-states`. `'invalid'` also blocks the submit. The next change of the date by the user clears it, see [Validation](#validation). |
 | `weekPlaceholder` | string, null | `null` | Replaces the `WW` the week section shows while it is empty. |
 | `yearPlaceholder` | string, null | `null` | Replaces the `YYYY` the year section shows while it is empty. |

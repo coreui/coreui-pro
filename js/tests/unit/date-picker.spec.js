@@ -2000,6 +2000,16 @@ describe('DatePicker', () => {
       expect(popup.querySelector('.time-picker-col')).toBeNull()
     })
 
+    it('should take the field type from timepicker, not from a type option', () => {
+      const getSectionTypes = () => [...fixtureEl.querySelectorAll('#picker .form-date-time-section')].map(section => section.dataset.coreuiSection)
+
+      buildPicker({ locale: 'pl-PL', type: 'time' })
+      expect(getSectionTypes()).toEqual(['day', 'month', 'year'])
+
+      buildPicker({ locale: 'pl-PL', timepicker: true, type: 'time' })
+      expect(getSectionTypes()).toEqual(['day', 'month', 'year', 'hour', 'minute', 'second'])
+    })
+
     it('should keep the time selects to a single tab stop and move between them with the arrows', () => {
       const picker = buildPicker({ timepicker: true })
       picker.show()

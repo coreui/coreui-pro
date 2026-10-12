@@ -10,7 +10,6 @@ import Calendar, { type CalendarConfig } from './calendar.js'
 import DateInput, { type DateInputConfig } from './date-input.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
-import type { SectionInputConfig } from './section-input.js'
 import type { TimeSelectionConfig } from './time-selection/base.js'
 import TimeSelects from './time-selection/selects.js'
 import {
@@ -76,13 +75,13 @@ type DatePickerConfig = {
   date: Date | string | null,
   disabled: boolean,
   floatingLabel: string | null,
-  format: SectionInputConfig['format'],
+  format: DateInputConfig['format'],
   inputOptions: Partial<DateInputConfig>,
   invalid: boolean,
   locale: string,
   maxDate: Date | string | null,
   minDate: Date | string | null,
-  monthNames: SectionInputConfig['monthNames'],
+  monthNames: DateInputConfig['monthNames'],
   name: string | null,
   pickerIcon: string | boolean,
   sanitize: boolean,
@@ -329,7 +328,7 @@ class DatePicker extends PickerBase {
       locale: this._config.locale,
       name: this._config.name,
       seconds: Boolean(this._config.seconds),
-      ...(this._config.timepicker ? { type: 'datetime' } : {}),
+      type: this._config.timepicker ? 'datetime' : 'date',
       ...(format ? { format } : {})
     }, {
       ...(this._config.floatingLabel ? { ariaLabel: this._config.floatingLabel } : {}),

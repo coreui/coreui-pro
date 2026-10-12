@@ -3,7 +3,7 @@ import Offcanvas from '../../src/offcanvas.js'
 const esm = await import('../../index.esm.js')
 const umd = await import('../../index.umd.js')
 
-const INTERNAL_MODULES = new Set(['base-component', 'combobox-base', 'dialog-base', 'picker-base', 'section-input'])
+const INTERNAL_MODULES = new Set(['base-component', 'combobox-base', 'dialog-base', 'picker-base'])
 
 describe('index', () => {
   it('should export every component module', () => {
