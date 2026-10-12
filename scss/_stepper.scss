@@ -31,7 +31,6 @@ $stepper-tokens: defaults(
     --#{$prefix}stepper-step-indicator-border-color: var(--#{$prefix}border-color),
     --#{$prefix}stepper-step-indicator-transition: #{color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out},
     --#{$prefix}stepper-step-indicator-active-color: var(--#{$prefix}primary-base),
-    --#{$prefix}stepper-step-indicator-active-bg: color-mix(in oklch, var(--#{$prefix}theme-bg, var(--#{$prefix}stepper-step-indicator-active-color)) 5%, transparent),
     --#{$prefix}stepper-step-indicator-active-border-color: var(--#{$prefix}primary-base),
     --#{$prefix}stepper-step-indicator-complete-color: var(--#{$prefix}primary-contrast),
     --#{$prefix}stepper-step-indicator-complete-bg: var(--#{$prefix}primary-base),
@@ -114,7 +113,7 @@ $stepper-tokens: defaults(
     &.active {
       --#{$prefix}stepper-step-button-color: var(--#{$prefix}stepper-step-button-active-color);
       --#{$prefix}stepper-step-indicator-color: var(--#{$prefix}theme-fg, var(--#{$prefix}stepper-step-indicator-active-color));
-      --#{$prefix}stepper-step-indicator-bg: var(--#{$prefix}stepper-step-indicator-active-bg);
+      --#{$prefix}stepper-step-indicator-bg: color-mix(in oklch, var(--#{$prefix}theme-bg, var(--#{$prefix}stepper-step-indicator-active-color)) 5%, transparent);
       --#{$prefix}stepper-step-indicator-border-color: var(--#{$prefix}theme-bg, var(--#{$prefix}stepper-step-indicator-active-border-color));
     }
 

@@ -249,8 +249,8 @@ $list-box-tokens: defaults(
   }
 
   .selected > .list-box-option-indicator {
-    background-color: var(--#{$prefix}check-checked-bg);
-    border-color: var(--#{$prefix}check-checked-border-color);
+    background-color: var(--#{$prefix}theme-bg, var(--#{$prefix}check-checked-bg));
+    border-color: var(--#{$prefix}theme-bg, var(--#{$prefix}check-checked-border-color));
 
     &::before {
       opacity: 1;

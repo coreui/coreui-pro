@@ -40,8 +40,8 @@ $switch-tokens: defaults(
     --#{$prefix}switch-thumb-bg: var(--#{$prefix}white),
     --#{$prefix}switch-thumb-size: calc(var(--#{$prefix}switch-height) - var(--#{$prefix}switch-padding) * 2 - var(--#{$prefix}switch-border-width) * 2),
     --#{$prefix}switch-thumb-shadow: 0 1px 2px color-mix(in oklch, var(--#{$prefix}black) 10%, transparent),
-    --#{$prefix}switch-checked-bg: var(--#{$prefix}theme-bg, var(--#{$prefix}control-checked-bg)),
-    --#{$prefix}switch-checked-border-color: var(--#{$prefix}theme-bg, var(--#{$prefix}control-checked-border-color)),
+    --#{$prefix}switch-checked-bg: var(--#{$prefix}control-checked-bg),
+    --#{$prefix}switch-checked-border-color: var(--#{$prefix}control-checked-border-color),
     --#{$prefix}switch-checked-thumb-bg: var(--#{$prefix}primary-contrast),
     --#{$prefix}switch-disabled-bg: var(--#{$prefix}control-disabled-bg),
     --#{$prefix}switch-disabled-thumb-bg: var(--#{$prefix}fg-3),
@@ -89,8 +89,8 @@ $switch-tokens: defaults(
   }
 
   &:checked {
-    background-color: var(--#{$prefix}switch-checked-bg);
-    border-color: var(--#{$prefix}switch-checked-border-color);
+    background-color: var(--#{$prefix}theme-bg, var(--#{$prefix}switch-checked-bg));
+    border-color: var(--#{$prefix}theme-bg, var(--#{$prefix}switch-checked-border-color));
 
     &::before {
       inset-inline-start: calc(100% - var(--#{$prefix}switch-thumb-size) - var(--#{$prefix}switch-padding));

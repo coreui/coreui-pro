@@ -46,12 +46,12 @@ To see how a component consumes these tokens, here's the badge in `scss/_badge.s
 
 ```scss
 // the token map carries only the badge's own default
---#{$prefix}badge-color: #{$badge-color},
---#{$prefix}badge-bg: #{$badge-bg},
+--#{$prefix}badge-color: inherit,
+--#{$prefix}badge-bg: var(--#{$prefix}bg-2),
 
 // the theme is read at the property, with the token as the fallback
 color: var(--#{$prefix}theme-contrast, var(--#{$prefix}badge-color));
-@include gradient-bg(var(--#{$prefix}theme-bg, var(--#{$prefix}badge-bg)));
+background-color: var(--#{$prefix}theme-bg, var(--#{$prefix}badge-bg));
 ```
 
 With no theme class the badge stays neutral; add `.theme-success` and the very same element resolves the success tokens — no `.badge-success` selector required. Structural variants compose with any theme:
@@ -74,7 +74,7 @@ Where a classic color class still exists — `.btn-primary`, `.alert-success` �
 Read the theme slot **at the property**, wrapping the component's own token. Slots inherit, so one form covers every case — the class works on the component, on an ancestor, or on any part of it:
 
 ```scss
---#{$prefix}badge-bg: #{$badge-bg},
+--#{$prefix}badge-bg: var(--#{$prefix}bg-2),
 // …
 background-color: var(--#{$prefix}theme-bg, var(--#{$prefix}badge-bg));
 ```
@@ -91,7 +91,15 @@ A structural variant maps the token to a slot of its own, and then **re-declares
 
 The second line is the part that is easy to miss. Set the token alone and the base rule still applies its own slot, so `.badge-subtle` and `.badge-outline` collapse into the solid theme color.
 
-While no theme class is present the token behaves as an override point; under one, the theme wins.
+A validation state works the same way: `.is-invalid` sets the checkbox's tokens and re-declares `background-color` and `border-color` on `:checked`, so a red invalid checkbox stays red inside a `.theme-success` form.
+
+While no theme class is present the token behaves as an override point; under one, the theme wins. That keeps a token set for the whole page (`.alert { --cui-alert-bg: … }` in your stylesheet, or `$alert-tokens` in Sass) from switching the themes off. To recolour a single element that carries a theme class, set the slot instead of the component token:
+
+```html
+<div class="alert theme-danger" style="--cui-theme-bg-subtle: #fde2e4">…</div>
+```
+
+On an element with a variant class it works the other way. `.btn-solid` and the other button variants, `.alert-solid`, `.badge-subtle`, `.badge-outline`, `.avatar-subtle` and `.chip-outline` map the component tokens to their own slots and paint from the tokens, so there a component token set on the element, or for the whole page in your stylesheet, wins over the theme.
 
 ## Backdrop
 

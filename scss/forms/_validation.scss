@@ -117,6 +117,11 @@
       --#{$prefix}check-checked-bg: var(--#{$prefix}#{$theme}-bg);
       --#{$prefix}check-checked-border-color: var(--#{$prefix}#{$theme}-bg);
 
+      &:checked:not(:indeterminate) {
+        background-color: var(--#{$prefix}check-checked-bg);
+        border-color: var(--#{$prefix}check-checked-border-color);
+      }
+
       &:focus-visible {
         @include focus-ring(true, $color: $focus-ring-color);
       }
@@ -154,6 +159,11 @@
       --#{$prefix}radio-checked-bg: var(--#{$prefix}#{$theme}-bg);
       --#{$prefix}radio-checked-border-color: var(--#{$prefix}#{$theme}-bg);
 
+      &:checked {
+        background-color: var(--#{$prefix}radio-checked-bg);
+        border-color: var(--#{$prefix}radio-checked-border-color);
+      }
+
       &:focus-visible {
         @include focus-ring(true, $color: $focus-ring-color);
       }
@@ -190,6 +200,11 @@
       --#{$prefix}switch-border-color: #{$border-color};
       --#{$prefix}switch-checked-bg: var(--#{$prefix}#{$theme}-bg);
       --#{$prefix}switch-checked-border-color: var(--#{$prefix}#{$theme}-bg);
+
+      &:checked {
+        background-color: var(--#{$prefix}switch-checked-bg);
+        border-color: var(--#{$prefix}switch-checked-border-color);
+      }
 
       &:focus-visible {
         @include focus-ring(true, $color: $focus-ring-color);

@@ -35,8 +35,8 @@ $check-tokens: defaults(
     --#{$prefix}check-mark-color: var(--#{$prefix}primary-contrast),
     --#{$prefix}check-mark-checked: #{escape-svg(url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path fill='none' stroke='black' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/></svg>"))},
     --#{$prefix}check-mark-indeterminate: #{escape-svg(url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path fill='none' stroke='black' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10h8'/></svg>"))},
-    --#{$prefix}check-checked-bg: var(--#{$prefix}theme-bg, var(--#{$prefix}control-checked-bg)),
-    --#{$prefix}check-checked-border-color: var(--#{$prefix}theme-bg, var(--#{$prefix}control-checked-border-color)),
+    --#{$prefix}check-checked-bg: var(--#{$prefix}control-checked-bg),
+    --#{$prefix}check-checked-border-color: var(--#{$prefix}control-checked-border-color),
     --#{$prefix}check-indeterminate-bg: var(--#{$prefix}control-indeterminate-bg),
     --#{$prefix}check-indeterminate-border-color: var(--#{$prefix}control-indeterminate-border-color),
     --#{$prefix}check-disabled-opacity: var(--#{$prefix}control-disabled-opacity),
@@ -79,8 +79,8 @@ $check-tokens: defaults(
   }
 
   &:checked {
-    background-color: var(--#{$prefix}check-checked-bg);
-    border-color: var(--#{$prefix}check-checked-border-color);
+    background-color: var(--#{$prefix}theme-bg, var(--#{$prefix}check-checked-bg));
+    border-color: var(--#{$prefix}theme-bg, var(--#{$prefix}check-checked-border-color));
 
     &::before {
       opacity: 1;
