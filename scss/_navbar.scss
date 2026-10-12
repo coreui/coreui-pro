@@ -9,7 +9,6 @@
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
 @use "mixins/translucent" as *;
-@use "colors" as *;
 @use "config" as *;
 @use "nav" as *;
 
@@ -94,7 +93,7 @@ $navbar-dark-tokens: () !default;
 // scss-docs-start navbar-dark-tokens
 $navbar-dark-tokens: defaults(
   (
-    --#{$prefix}navbar-color: #{rgba($white, .55)},
+    --#{$prefix}navbar-color: color-mix(in oklch, var(--#{$prefix}white) 55%, transparent),
     --#{$prefix}navbar-hover-color: color-mix(in oklch, var(--#{$prefix}white) 75%, transparent),
     --#{$prefix}navbar-disabled-color: color-mix(in oklch, var(--#{$prefix}white) 25%, transparent),
     --#{$prefix}navbar-active-color: var(--#{$prefix}white),
