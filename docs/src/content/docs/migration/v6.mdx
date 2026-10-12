@@ -3244,6 +3244,17 @@ Multi Select's option indicators moved with it — they render as a decorative
   `.w-100` where a block child has to stretch), and `text-align` no longer moves
   a button or a link, because they are flex items — use `.mx-auto` or `.ms-auto`
   instead.
+- **Stacked sections are divided by a single rule.** A body, a list group or a
+  bottom image cap that follows an image cap, a body or a list group draws a
+  divider above itself in the card's own border, so two bodies in a row, or an
+  image cap above a body, no longer sit with nothing between them, and a border
+  utility or a theme on the card carries over to every divider. A section hidden
+  with `hidden` or `.d-none` does not count. A header and a footer draw their
+  own divider, as before.
+- **`.card-group` squares the corners at each seam along the writing
+  direction.** The rules named the physical corners, so a right-to-left group
+  squared its outer corners and rounded the ones that meet. A list group at the
+  edge of a grouped card is squared like the other sections.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **`.card-link` is gone**, along with `--cui-card-title-spacer-y`. Both existed
   to space children the gap now handles; the class's inline margin only ever
