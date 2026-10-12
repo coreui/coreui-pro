@@ -30,7 +30,8 @@ const EVENT_HIDDEN = `hidden${EVENT_KEY}`
 const EVENT_RESIZE = `resize${EVENT_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
 
-const OPEN_SELECTOR = 'dialog[open][class*="drawer"]'
+const OPEN_SELECTOR = 'dialog[open]:is(.drawer, [class^="drawer-"], [class*=" drawer-"])'
+const SELECTOR_OPEN_RESPONSIVE = 'dialog[open]:not(.drawer):is([class^="drawer-"], [class*=" drawer-"])'
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="drawer"]'
 // Responsive variants replace the base class, so the dismiss fallback must
 // match them too
@@ -59,6 +60,11 @@ const DefaultType = {
  */
 
 class Drawer extends DialogBase<DrawerConfig> {
+  constructor(element?: string | Element | null, config?: Partial<DrawerConfig> | null) {
+    super(element, config)
+    this._initResizeObserver()
+  }
+
   // Getters
   static override get Default(): typeof Default {
     return Default
@@ -136,7 +142,7 @@ EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
 })
 
 EventHandler.on(window, EVENT_RESIZE, () => {
-  for (const element of SelectorEngine.find(OPEN_SELECTOR)) {
+  for (const element of SelectorEngine.find(SELECTOR_OPEN_RESPONSIVE)) {
     if (getComputedStyle(element).position !== 'fixed') {
       Drawer.getOrCreateInstance(element).hide()
     }

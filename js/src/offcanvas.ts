@@ -31,7 +31,8 @@ const EVENT_HIDDEN = `hidden${EVENT_KEY}`
 const EVENT_RESIZE = `resize${EVENT_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
 
-const OPEN_SELECTOR = 'dialog[open][class*="offcanvas"]'
+const OPEN_SELECTOR = 'dialog[open]:is(.offcanvas, [class^="offcanvas-"], [class*=" offcanvas-"])'
+const SELECTOR_OPEN_RESPONSIVE = 'dialog[open]:not(.offcanvas):is([class^="offcanvas-"], [class*=" offcanvas-"])'
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="offcanvas"]'
 // Responsive variants replace the base class, so the dismiss fallback must
 // match them too
@@ -62,6 +63,7 @@ const DefaultType = {
 class Offcanvas extends DialogBase<OffcanvasConfig> {
   constructor(element?: string | Element | null, config?: Partial<OffcanvasConfig> | null) {
     super(resolveDialogElement(element, NAME), config)
+    this._initResizeObserver()
   }
 
   // Getters
@@ -141,7 +143,7 @@ EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
 })
 
 EventHandler.on(window, EVENT_RESIZE, () => {
-  for (const element of SelectorEngine.find(OPEN_SELECTOR)) {
+  for (const element of SelectorEngine.find(SELECTOR_OPEN_RESPONSIVE)) {
     if (getComputedStyle(element).position !== 'fixed') {
       Offcanvas.getOrCreateInstance(element).hide()
     }
