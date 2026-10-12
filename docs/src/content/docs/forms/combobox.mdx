@@ -304,7 +304,7 @@ Group options in a `.list-box-section` and name it with a `.list-box-section-lab
 
 ## Multiple select
 
-`multiple` toggles options instead of replacing the selection, and the panel stays open so several picks cost one opening. The toggle shows the one label while a single option is selected and `selectedLabel` past that — a function of the count, or a string in which `{count}` is replaced. `selectionLimit` caps how many can be taken at once.
+`multiple` toggles options instead of replacing the selection, and the panel stays open so several picks cost one opening. The toggle shows the one label while a single option is selected and `selectedLabel` past that — a function of the count and the number of options, or a string in which `{count}` and `{total}` are replaced. `selectionLimit` caps how many can be taken at once.
 
 <Example code={`<button class="form-control combobox-toggle" type="button"
       data-coreui-toggle="combobox"
