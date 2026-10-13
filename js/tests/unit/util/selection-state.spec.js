@@ -1,4 +1,4 @@
-import { getAriaPressed, getSelectionState } from '../../../src/util/selection-state.js'
+import { fillSelection, getAriaPressed, getSelectionState } from '../../../src/util/selection-state.js'
 
 describe('Selection utilities', () => {
   describe('getSelectionState', () => {
@@ -31,6 +31,37 @@ describe('Selection utilities', () => {
       expect(getAriaPressed('all')).toBe('true')
       expect(getAriaPressed('some')).toBe('mixed')
       expect(getAriaPressed('none')).toBe('false')
+    })
+  })
+
+  describe('fillSelection', () => {
+    it('should add every new candidate in order when there is no limit', () => {
+      expect(fillSelection(['b'], ['a', 'b', 'c'])).toEqual({ added: ['a', 'c'], refused: null, values: ['b', 'a', 'c'] })
+      expect(fillSelection([], ['a', 'b'], null)).toEqual({ added: ['a', 'b'], refused: null, values: ['a', 'b'] })
+    })
+
+    it('should stop at the limit and report the first candidate it refused', () => {
+      expect(fillSelection(['a'], ['b', 'c', 'd'], 2)).toEqual({ added: ['b'], refused: 'c', values: ['a', 'b'] })
+      expect(fillSelection(['a', 'b'], ['c'], 2)).toEqual({ added: [], refused: 'c', values: ['a', 'b'] })
+      expect(fillSelection([], ['a'], 0)).toEqual({ added: [], refused: 'a', values: [] })
+      expect(fillSelection(['a', 'b', 'c'], ['d'], 2)).toEqual({ added: [], refused: 'd', values: ['a', 'b', 'c'] })
+    })
+
+    it('should spend no slot on a candidate already selected or listed twice', () => {
+      expect(fillSelection(['a'], ['a', 'b', 'b', 'c'], 3)).toEqual({ added: ['b', 'c'], refused: null, values: ['a', 'b', 'c'] })
+      expect(fillSelection(['a', 'b'], ['a', 'b'], 2)).toEqual({ added: [], refused: null, values: ['a', 'b'] })
+    })
+
+    it('should compare values strictly, so a number and its string are different values', () => {
+      expect(fillSelection([1], ['1', 1, 2], 3)).toEqual({ added: ['1', 2], refused: null, values: [1, '1', 2] })
+    })
+
+    it('should leave the selected list untouched', () => {
+      const selected = ['a']
+
+      fillSelection(selected, ['b'])
+
+      expect(selected).toEqual(['a'])
     })
   })
 })

@@ -18,7 +18,9 @@ import {
 } from './util/form-validation.js'
 import { CLEANER_ICON, PICKER_ICON } from './util/icons.js'
 import { flattenOptions, getSelectableOptions, isOptionGroup } from './util/option-tree.js'
-import { getAriaPressed, getSelectionState, type SelectionState } from './util/selection-state.js'
+import {
+  fillSelection, getAriaPressed, getSelectionState, type SelectionState
+} from './util/selection-state.js'
 import {
   DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList, SVGAllowlist
 } from './util/sanitizer.js'
@@ -485,12 +487,7 @@ class MultiSelect extends ComboboxBase {
   }
 
   selectAll(options: any[] = this._options): void {
-    const limitReached = this._selectAllOptions(options)
-    this._refreshAfterSelectionChange()
-
-    if (limitReached) {
-      this._triggerSelectionLimit()
-    }
+    this._selectUpToLimit(this._enabledOptions(options))
   }
 
   deselectAll(options: any[] = this._options): void {
@@ -499,27 +496,11 @@ class MultiSelect extends ComboboxBase {
   }
 
   selectFiltered(): void {
-    const items = this._getDisplayedItems()
+    const options = this._getDisplayedItems()
+      .map(item => this._findOptionByValue(String(item.dataset.coreuiValue)))
+      .filter(Boolean)
 
-    let limitReached = false
-    for (const item of items) {
-      if (this._isSelectionLimitReached()) {
-        limitReached = true
-        break
-      }
-
-      const value = String(item.dataset.coreuiValue)
-      const option = this._findOptionByValue(value)
-      if (option && !this._selected.some((selected: any) => selected.value === value)) {
-        this._selectOption(value, option.text, { refresh: false })
-      }
-    }
-
-    this._refreshAfterSelectionChange()
-
-    if (limitReached) {
-      this._triggerSelectionLimit()
-    }
+    this._selectUpToLimit(options)
   }
 
   deselectFiltered(): void {
@@ -1297,28 +1278,38 @@ class MultiSelect extends ComboboxBase {
     this._triggerSelectionLimit()
   }
 
-  _selectAllOptions(options: any[]): boolean {
+  _enabledOptions(options: any[]): any[] {
+    return options
+      .filter(option => !option.disabled)
+      .flatMap(option => (isOptionGroup(option) ? this._enabledOptions(option.options) : [option]))
+  }
+
+  _selectUpToLimit(options: any[]): void {
+    const texts = new Map<string, any>()
+
     for (const option of options) {
-      if (option.disabled) {
-        continue
+      const value = String(option.value)
+
+      if (!texts.has(value)) {
+        texts.set(value, option.text)
       }
-
-      if (isOptionGroup(option)) {
-        if (this._selectAllOptions(option.options)) {
-          return true
-        }
-
-        continue
-      }
-
-      if (this._isSelectionLimitReached()) {
-        return true
-      }
-
-      this._selectOption(option.value, option.text, { refresh: false })
     }
 
-    return false
+    const { added, refused } = fillSelection(
+      this._config.multiple ? this._selected.map((option: any) => option.value) : [],
+      [...texts.keys()],
+      this._hasSelectionLimit() ? this._config.selectionLimit : null
+    )
+
+    for (const value of added) {
+      this._selectOption(value, texts.get(value), { refresh: false })
+    }
+
+    this._refreshAfterSelectionChange()
+
+    if (refused !== null) {
+      this._triggerSelectionLimit()
+    }
   }
 
   _deselectAllOptions(options: any[]): void {

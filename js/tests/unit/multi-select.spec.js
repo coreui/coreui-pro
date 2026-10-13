@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 
 import Chip from '../../src/chip.js'
 import ChipSet from '../../src/chip-set.js'
@@ -2023,6 +2024,42 @@ describe('MultiSelect', () => {
       expect(multiSelect._selected.length).toBe(2)
     })
 
+    it('should report the selection limit once when selectAll stops at it', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const options = [
+        { value: '1', text: 'Option 1' },
+        { value: '2', text: 'Option 2' },
+        { value: '3', text: 'Option 3' },
+        { value: '4', text: 'Option 4' }
+      ]
+      const multiSelect = new MultiSelect(selectEl, { options, selectionLimit: 2 })
+      const onLimit = vi.fn()
+
+      selectEl.addEventListener('selectionLimit.coreui.multi-select', onLimit)
+      multiSelect.selectAll()
+
+      expect(multiSelect._selected.map(item => item.value)).toEqual(['1', '2'])
+      expect(onLimit).toHaveBeenCalledTimes(1)
+    })
+
+    it('should not report the selection limit when selectAll has nothing left to add', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const options = [
+        { value: '1', text: 'Option 1' },
+        { value: '2', text: 'Option 2' },
+        { value: '3', text: 'Option 3', disabled: true }
+      ]
+      const multiSelect = new MultiSelect(selectEl, { options, selectionLimit: 2, value: ['1', '2'] })
+      const onLimit = vi.fn()
+
+      selectEl.addEventListener('selectionLimit.coreui.multi-select', onLimit)
+      multiSelect.selectAll()
+
+      expect(onLimit).not.toHaveBeenCalled()
+    })
+
     it('should not select an option when selectionLimit is reached', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
@@ -2276,6 +2313,74 @@ describe('MultiSelect', () => {
       expect(changeCount).toBe(2)
     })
 
+    it('should trigger changed event only for the options it adds', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const options = [
+        { value: '1', text: 'Option 1' },
+        { value: '2', text: 'Option 2' },
+        { value: '3', text: 'Option 3' }
+      ]
+      const multiSelect = new MultiSelect(selectEl, { options, value: ['1'] })
+      let changeCount = 0
+
+      selectEl.addEventListener('change.coreui.multi-select', () => {
+        changeCount++
+      })
+
+      multiSelect.selectAll()
+      expect(changeCount).toBe(2)
+      expect(multiSelect._selected.map(item => item.value)).toEqual(['1', '2', '3'])
+    })
+
+    it('should skip a disabled group nested in another group', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const options = [
+        {
+          label: 'Outer',
+          options: [
+            { label: 'Inner', disabled: true, options: [{ value: '1', text: 'Option 1' }] },
+            { value: '2', text: 'Option 2' }
+          ]
+        }
+      ]
+      const multiSelect = new MultiSelect(selectEl, { options })
+
+      multiSelect.selectAll()
+      expect(multiSelect._selected.map(item => item.value)).toEqual(['2'])
+    })
+
+    it('should keep the text of the first option that carries a value', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const options = [
+        { label: 'A', options: [{ value: 'x', text: 'X in A' }] },
+        { label: 'B', options: [{ value: 'x', text: 'X in B' }] }
+      ]
+      const multiSelect = new MultiSelect(selectEl, { options })
+
+      multiSelect.selectAll()
+      expect(multiSelect._selected.map(item => item.text)).toEqual(['X in A'])
+    })
+
+    it('should end on the last enabled option in single mode, however often it runs', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const options = [
+        { value: '1', text: 'Option 1' },
+        { value: '2', text: 'Option 2' },
+        { value: '3', text: 'Option 3', selected: true }
+      ]
+      const multiSelect = new MultiSelect(selectEl, { multiple: false, options })
+
+      multiSelect.selectAll()
+      expect(multiSelect._selected.map(item => item.value)).toEqual(['3'])
+
+      multiSelect.selectAll()
+      expect(multiSelect._selected.map(item => item.value)).toEqual(['3'])
+    })
+
     it('should update native select options', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
@@ -2427,6 +2532,26 @@ describe('MultiSelect', () => {
 
       multiSelect.selectFiltered()
       expect(multiSelect._selected.length).toBe(2)
+    })
+
+    it('should not report the selection limit when the filtered options are already selected', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const options = [
+        { value: '1', text: 'Apple' },
+        { value: '2', text: 'Banana' },
+        { value: '3', text: 'Avocado' }
+      ]
+      const multiSelect = new MultiSelect(selectEl, {
+        options, search: true, selectionLimit: 2, value: ['1', '3']
+      })
+      const onLimit = vi.fn()
+
+      selectEl.addEventListener('selectionLimit.coreui.multi-select', onLimit)
+      multiSelect.search('av')
+      multiSelect.selectFiltered()
+
+      expect(onLimit).not.toHaveBeenCalled()
     })
   })
 

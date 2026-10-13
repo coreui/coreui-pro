@@ -1,3 +1,9 @@
+export type FilledSelection<T extends number | string> = {
+  added: T[]
+  refused: T | null
+  values: T[]
+}
+
 export type SelectionState = 'all' | 'none' | 'some'
 
 /**
@@ -33,4 +39,37 @@ export const getAriaPressed = (state: SelectionState): 'false' | 'mixed' | 'true
   }
 
   return state === 'some' ? 'mixed' : 'false'
+}
+
+/**
+ * Adds candidates to a selection in their order until it holds as many values as the limit
+ * allows. A candidate already in the selection, or listed twice, is skipped and takes no slot.
+ * Values are compared the way a `Set` compares them, so `1` and `'1'` are different values.
+ *
+ * @param selected - The values selected so far
+ * @param candidates - The values to add, in order
+ * @param limit - The selection limit, `null` or left out for none
+ * @returns The selection with the candidates that fit, the candidates it added, and the first
+ * candidate the limit refused, or `null` when none was refused
+ */
+export const fillSelection = <T extends number | string>(selected: readonly T[], candidates: readonly T[], limit?: number | null): FilledSelection<T> => {
+  const present = new Set(selected)
+  const values = [...selected]
+  const added: T[] = []
+
+  for (const value of candidates) {
+    if (present.has(value)) {
+      continue
+    }
+
+    if (limit !== null && limit !== undefined && values.length >= limit) {
+      return { added, refused: value, values }
+    }
+
+    present.add(value)
+    values.push(value)
+    added.push(value)
+  }
+
+  return { added, refused: null, values }
 }
