@@ -75,6 +75,17 @@ export const findOptionByLabel = <T extends OptionItem>(options: readonly T[], l
   flattenOptions(options).find(option => getOptionLabel(option).trim().toLowerCase() === label.trim().toLowerCase()) ?? null
 
 /**
+ * Finds the first option whose value, compared as text, equals a value, so `1` finds an option
+ * whose value is `'1'`. An option without a value is found by its label. Groups are not matched.
+ *
+ * @param options - The options list, groups included
+ * @param value - The value to match
+ * @returns The option, or `null` when none matches
+ */
+export const findOptionByValue = <T extends OptionItem>(options: readonly T[], value: number | string): T | null =>
+  flattenOptions(options).find(option => getOptionValue(option) === String(value)) ?? null
+
+/**
  * Prepares a text for search matching: trimmed, lowercased and, when asked, decomposed with the
  * combining diacritics removed, so `Café` and `cafe` compare equal. Only marks that are both
  * combining (category M) and diacritics go: vowel signs of scripts such as Devanagari stay, and so

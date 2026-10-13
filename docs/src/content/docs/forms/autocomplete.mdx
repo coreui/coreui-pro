@@ -350,7 +350,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `showHints` | boolean | `false` | Shows completion hints as users type. |
 | `valid` | boolean | `false` | Deprecated alias of `validationState: 'valid'`, ignored once `validationState` is set. |
 | `validationState` | string, null | `null` | The state the autocomplete shows: `'valid'`, `'invalid'` or a state of `$form-validation-states`. `'invalid'` blocks the submit. The user's next change of the value drops it. See [Validation](#validation). |
-| `value` | number, string, null | `null` | Sets the initial value of the component. It is applied once, as soon as the options contain it; pass it to `setConfig()` to select another option, or `null` to clear the field. |
+| `value` | number, string, null | `null` | Sets the initial value of the component: the option whose value, compared as text, equals it, so `1` and `'1'` select the same option. It is applied once, as soon as the options contain it; pass it to `setConfig()` to select another option, or `null` to clear the field. |
 
 ### Methods
 

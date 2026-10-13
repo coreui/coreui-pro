@@ -1,5 +1,5 @@
 import {
-  filterOptionTree, findOptionByLabel, flattenOptions, getOptionLabel, getOptionValue, getSelectableOptions, isOptionDisabled,
+  filterOptionTree, findOptionByLabel, findOptionByValue, flattenOptions, getOptionLabel, getOptionValue, getSelectableOptions, isOptionDisabled,
   isOptionGroup, normalizeSearchText
 } from '../../../src/util/option-tree.js'
 
@@ -65,6 +65,32 @@ describe('Option tree utilities', () => {
   describe('getSelectableOptions', () => {
     it('should list the enabled options with the groups flattened', () => {
       expect(getSelectableOptions(options).map(getOptionLabel)).toEqual(['Plain', 'Option 1', 'Option 2', 'Deep'])
+    })
+  })
+
+  describe('findOptionByValue', () => {
+    it('should find the first option with the value, compared as text', () => {
+      expect(findOptionByValue(options, '1')).toEqual({ label: 'Option 1', value: '1' })
+      expect(findOptionByValue(options, 1)).toEqual({ label: 'Option 1', value: '1' })
+      expect(findOptionByValue([{ label: 'One', value: 1 }], '1')).toEqual({ label: 'One', value: 1 })
+      expect(findOptionByValue([{ label: 'A', value: 'x' }, { label: 'B', value: 'x' }], 'x')).toEqual({ label: 'A', value: 'x' })
+    })
+
+    it('should find an option without a value by its label, and a plain string option by itself', () => {
+      expect(findOptionByValue(options, 'Deep')).toEqual({ label: 'Deep' })
+      expect(findOptionByValue(options, 'Plain')).toBe('Plain')
+    })
+
+    it('should not match a label that differs from the value, nor a group', () => {
+      expect(findOptionByValue(options, 'Option 1')).toBeNull()
+      expect(findOptionByValue(options, 'Group')).toBeNull()
+      expect(findOptionByValue(options, 'missing')).toBeNull()
+    })
+
+    it('should match the value exactly and find a disabled option', () => {
+      expect(findOptionByValue([{ label: 'A', value: 'x' }], 'X')).toBeNull()
+      expect(findOptionByValue([{ label: 'A', value: 'x' }], ' x ')).toBeNull()
+      expect(findOptionByValue(options, '3')).toBe(options[2].options[1])
     })
   })
 

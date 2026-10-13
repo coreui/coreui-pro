@@ -10,7 +10,7 @@ import ListBox from './list-box.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { createAnchoredPosition } from './util/floating-ui.js'
-import { isOptionGroup } from './util/option-tree.js'
+import { findOptionByValue, isOptionGroup } from './util/option-tree.js'
 import { resolvePopupContainer } from './util/popup.js'
 import { escapeHtml } from './util/sanitizer.js'
 import { executeAfterTransition, getElement } from './util/index.js'
@@ -458,20 +458,7 @@ class ComboboxBase extends BaseComponent {
   // Option model
 
   _findOptionByValue(value: any, options: any[] = this._options): any {
-    for (const option of options) {
-      if (String(option.value) === String(value)) {
-        return option
-      }
-
-      if (isOptionGroup(option)) {
-        const found = this._findOptionByValue(value, option.options)
-        if (found) {
-          return found
-        }
-      }
-    }
-
-    return null
+    return findOptionByValue(options, value)
   }
 
   // Anchored positioning (shared wiring around util/floating-ui)
