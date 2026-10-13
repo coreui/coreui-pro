@@ -89,9 +89,11 @@ description: "Track and review changes to the CoreUI for Bootstrap source files,
   `.btn-subtle-{color}`, `.btn-ghost-{color}`, `.callout-{color}`,
   `.chip-{color}`, `.list-group-item-{color}`), the form check markup
   (`.form-check`, `.form-check-input`, `.form-check-label`,
-  `.form-check-inline`, `.form-switch`, `.form-switch-lg` / `-xl`) and
-  `.btn-check` on the input — moved to `coreui-legacy.css`, 3.4&nbsp;kB gzip.
-  That takes 2.1&nbsp;kB gzip off `coreui.css` for markup that has already
+  `.form-check-inline`, `.form-switch`, `.form-switch-lg` / `-xl`),
+  `.btn-check` on the input and the opacity utilities (`.text-opacity-*`,
+  `.bg-opacity-*`, `.border-opacity-*`, `.link-opacity-*`,
+  `.underline-opacity-*`) — moved to `coreui-legacy.css`, 4.1&nbsp;kB gzip.
+  That takes 2.3&nbsp;kB gzip off `coreui.css` for markup that has already
   moved, and turns the compatibility layer into something you can see on a
   network tab and delete in one line.
 
@@ -3641,7 +3643,7 @@ Multi Select's option indicators moved with it — they render as a decorative
   <a href="#" class="link-primary underline-opacity-25">Primary link</a>
 
   <!-- v6 -->
-  <a href="#" class="theme-primary underline underline-opacity-25">Primary link</a>
+  <a href="#" class="theme-primary underline underline-30">Primary link</a>
   ```
 
   Two things change beyond the class name. The theme slot is a **tone picked for
@@ -4100,9 +4102,10 @@ background is too dark for any text to clear 75 against it.
   + background-color: color-mix(in srgb, var(--cui-primary) 50%, transparent);
   ```
 
-  Upstream v6 carries no rgb triplets either. The opacity utilities
-  (`.text-opacity-50`, `.bg-opacity-25`, `.link-opacity-75`) are unchanged —
-  they now scale the token through `calc(var(--cui-bg-opacity) * 100%)`.
+  Upstream v6 carries no rgb triplets either. The v6 opacity utilities
+  (`.fg-50`, `.bg-50`, `.link-50`, in steps of ten) mix the colour token with
+  `transparent`; the v5 spellings (`.text-opacity-50`, `.bg-opacity-25`,
+  `.link-opacity-75`) render the same way from `coreui-legacy.css`.
 - **The elevation system is gone**: `$elevations`, `$enable-elevations`,
   `$elevation-base-color`, the `elevation()` mixin and the `.elevation-*`
   utilities. It was disabled by default (`$enable-elevations: false`), so the
@@ -5172,7 +5175,7 @@ written as declared.
 ```
 
 The class API does not change — `.bg-primary` and `.bg-opacity-50` still exist
-and still compose. What changes is where the translucency expression lives:
+and still compose, the latter from `coreui-legacy.css`. What changes is where the translucency expression lives:
 
 - **`$utilities-text-colors`, `$utilities-bg-colors`, `$utilities-border-colors`
   and `$utilities-links-underline` now carry plain token references**
@@ -5913,10 +5916,11 @@ markup.
   `.text-{color}-emphasis`, `.text-body`, `.text-black`, `.text-white`,
   `.text-reset`, `.text-body-secondary`, `.text-body-tertiary`,
   `.bg-{color}-subtle`, `.bg-{color}-muted`,
-  `.border-{color}-subtle`, `.text-opacity-*`, `.bg-opacity-*`,
-  `.border-opacity-*`, `.link-opacity-*(-hover)`, `.underline-opacity-*(-hover)`,
-  `.lh-base`, `.shadow-opacity-25` and `-75`. The deprecated opacity steps keep
-  their old values (`25`, `75`); the new scale rounds them to `30` and `70`.
+  `.border-{color}-subtle`, `.lh-base`, `.shadow-opacity-25` and `-75`. The
+  opacity spellings `.text-opacity-*`, `.bg-opacity-*`, `.border-opacity-*`,
+  `.link-opacity-*(-hover)` and `.underline-opacity-*(-hover)` render the same
+  from `coreui-legacy.css`. The deprecated opacity steps keep their old values
+  (`25`, `75`); the new scale rounds them to `30` and `70`.
 
   What does change: the `--cui-text`, `--cui-text-opacity`, `--cui-bg-opacity`,
   `--cui-border-opacity`, `--cui-underline-opacity` and `--cui-link-opacity`

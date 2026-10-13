@@ -381,12 +381,6 @@ $utilities: map.merge(
       class: border,
       values: $utilities-border-subtle
     ),
-    // deprecated
-    "border-opacity-legacy": (
-      class: border-opacity,
-      property: border-color,
-      values: theme-opacity-values(--#{$prefix}border, null, (10: .1, 25: .25, 50: .5, 75: .75, 100: 1))
-    ),
     // scss-docs-end utils-border-color-subtle
     // scss-docs-end utils-borders
     // Sizing utilities
@@ -967,12 +961,6 @@ $utilities: map.merge(
         )
       )
     ),
-    // deprecated
-    "text-opacity": (
-      class: text-opacity,
-      property: color,
-      values: theme-opacity-values(--#{$prefix}fg, null, (25: .25, 50: .5, 75: .75, 100: 1))
-    ),
     // scss-docs-end utils-color
     // scss-docs-start utils-links
     "link": (
@@ -980,13 +968,6 @@ $utilities: map.merge(
       property: color,
       state: hover,
       values: theme-opacity-values(--#{$prefix}link-color)
-    ),
-    // deprecated
-    "link-opacity": (
-      class: link-opacity,
-      property: color,
-      state: hover,
-      values: theme-opacity-values(--#{$prefix}link-color, null, (10: .1, 25: .25, 50: .5, 75: .75, 100: 1))
     ),
     "underline-offset": (
       property: text-underline-offset,
@@ -1030,13 +1011,6 @@ $utilities: map.merge(
       property: text-decoration-color,
       state: hover,
       values: theme-opacity-values(--#{$prefix}underline, currentcolor)
-    ),
-    // deprecated
-    "underline-opacity-legacy": (
-      class: underline-opacity,
-      property: text-decoration-color,
-      state: hover,
-      values: theme-opacity-values(--#{$prefix}underline, currentcolor, (0: 0, 10: .1, 25: .25, 50: .5, 75: .75, 100: 1))
     ),
     // scss-docs-end utils-links
     // scss-docs-start utils-bg-color
@@ -1092,12 +1066,6 @@ $utilities: map.merge(
       ),
       class: bg,
       values: $utilities-bg-muted
-    ),
-    // deprecated
-    "bg-opacity-legacy": (
-      class: bg-opacity,
-      property: background-color,
-      values: theme-opacity-values(--#{$prefix}bg, null, (10: .1, 15: .15, 25: .25, 50: .5, 75: .75, 100: 1))
     ),
     // scss-docs-end utils-bg-color
     // scss-docs-start utils-theme

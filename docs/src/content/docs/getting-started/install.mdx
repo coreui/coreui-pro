@@ -327,7 +327,7 @@ ship in `coreui-legacy.css`, which you load after it:
 <link href="css/coreui-legacy.min.css" rel="stylesheet">
 ```
 
-It is 3.4&nbsp;kB gzip and covers:
+It is 4.1&nbsp;kB gzip and covers:
 
 - the responsive dropdown alignment classes `.dropdown-menu{-sm|-md|-lg|-xl|-2xl}{-start|-end}`, replaced by a responsive `data-coreui-placement`
 - the colour modifiers `.alert-{color}`, `.btn-{color}`, `.btn-outline-{color}`,
@@ -340,6 +340,9 @@ It is 3.4&nbsp;kB gzip and covers:
   [`.radio`](/forms/radio/) and [`.switch`](/forms/switch/);
 - `.btn-check` on the input, with a sibling `<label class="btn">`, which v6
   spells as `.btn-check` on the label.
+- the opacity utilities `.text-opacity-*`, `.bg-opacity-*`, `.border-opacity-*`,
+  `.link-opacity-*` and `.underline-opacity-*`, which v6 spells `.fg-*`,
+  `.bg-*`, `.border-*`, `.link-*` and `.underline-*` in steps of ten.
 
 Everything in it is removed in v7, so treat the sheet as a migration budget: drop
 it once your markup uses the v6 spellings. It also loads on its own alongside

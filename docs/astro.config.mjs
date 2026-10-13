@@ -81,5 +81,5 @@ export default defineConfig({
       }
     ]
   },
-  integrations: [...coreuiDocs({ libraryConfig: 'src/styles/_library-config.scss' }), mdx()],
+  integrations: [...coreuiDocs({ libraryConfig: 'src/styles/_library-config.scss', extraStyles: ['scss/legacy'] }), mdx()],
 })

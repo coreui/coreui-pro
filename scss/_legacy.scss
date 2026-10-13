@@ -12,6 +12,7 @@
 @use "mixins/radio" as *;
 @use "mixins/switch" as *;
 @use "mixins/tokens" as *;
+@use "mixins/utilities" as *;
 @use "config" as *;
 @use "layers";
 @use "theme" as *;
@@ -257,4 +258,43 @@ $switch-selector: ".form-switch .form-check-input" !default;
     }
   }
   // scss-docs-end list-group-modifiers
+}
+
+$utilities-legacy: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$utilities-legacy: map.merge(
+  (
+    "border-opacity-legacy": (
+      class: border-opacity,
+      property: border-color,
+      values: theme-opacity-values(--#{$prefix}border, null, (10: .1, 25: .25, 50: .5, 75: .75, 100: 1))
+    ),
+    "text-opacity": (
+      class: text-opacity,
+      property: color,
+      values: theme-opacity-values(--#{$prefix}fg, null, (25: .25, 50: .5, 75: .75, 100: 1))
+    ),
+    "link-opacity": (
+      class: link-opacity,
+      property: color,
+      state: hover,
+      values: theme-opacity-values(--#{$prefix}link-color, null, (10: .1, 25: .25, 50: .5, 75: .75, 100: 1))
+    ),
+    "underline-opacity-legacy": (
+      class: underline-opacity,
+      property: text-decoration-color,
+      state: hover,
+      values: theme-opacity-values(--#{$prefix}underline, currentcolor, (0: 0, 10: .1, 25: .25, 50: .5, 75: .75, 100: 1))
+    ),
+    "bg-opacity-legacy": (
+      class: bg-opacity,
+      property: background-color,
+      values: theme-opacity-values(--#{$prefix}bg, null, (10: .1, 15: .15, 25: .25, 50: .5, 75: .75, 100: 1))
+    ),
+  ),
+  $utilities-legacy
+);
+
+@layer utilities {
+  @include generate-utilities-loop($utilities-legacy, $breakpoints);
 }
