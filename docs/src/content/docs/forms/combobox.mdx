@@ -250,7 +250,7 @@ The panel is as tall as its content — cap it where you want a scroll container
 
 ### Matching past the accents
 
-`searchNormalize` compares both sides without their diacritics, so `zoe` finds `Zoë` and `oe` finds both. It normalizes to `NFD` and drops the combining marks, which leaves the labels themselves untouched — only the comparison changes.
+`searchNormalize` compares both sides without their diacritics, so `zoe` finds `Zoë` and `oe` finds both. It normalizes to `NFD` and drops the combining diacritics, which leaves the labels themselves untouched — only the comparison changes.
 
 <Example code={`<button class="form-control combobox-toggle" type="button"
       data-coreui-toggle="combobox"

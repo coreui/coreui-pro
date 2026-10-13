@@ -1,5 +1,6 @@
 import {
-  findOptionByLabel, flattenOptions, getOptionLabel, getOptionValue, getSelectableOptions, isOptionDisabled, isOptionGroup
+  filterOptionTree, findOptionByLabel, flattenOptions, getOptionLabel, getOptionValue, getSelectableOptions, isOptionDisabled,
+  isOptionGroup, normalizeSearchText
 } from '../../../src/util/option-tree.js'
 
 describe('Option tree utilities', () => {
@@ -74,6 +75,8 @@ describe('Option tree utilities', () => {
       expect(findOptionByLabel(options, 'deep')).toEqual({ label: 'Deep' })
       expect(findOptionByLabel(options, 'option 3')).toBe(options[2].options[1])
       expect(findOptionByLabel(options, 'option')).toBeNull()
+      expect(findOptionByLabel([' Apple '], 'apple')).toBe(' Apple ')
+      expect(findOptionByLabel(['Apple'], '  APPLE ')).toBe('Apple')
       expect(findOptionByLabel([{ label: 'A', value: 1 }, { label: 'a', value: 2 }], 'a')).toEqual({ label: 'A', value: 1 })
     })
 
@@ -84,6 +87,51 @@ describe('Option tree utilities', () => {
     it('should not match a group label', () => {
       expect(findOptionByLabel(options, 'Group')).toBeNull()
       expect(findOptionByLabel(options, 'Inner')).toBeNull()
+    })
+  })
+
+  describe('normalizeSearchText', () => {
+    it('should trim and lowercase, and remove combining accents only when asked', () => {
+      expect(normalizeSearchText('  Café ')).toBe('café')
+      expect(normalizeSearchText('  Café ', true)).toBe('cafe')
+      expect(normalizeSearchText('Ångström', true)).toBe('angstrom')
+      expect(normalizeSearchText('èç', true)).toBe('ec')
+      expect(normalizeSearchText('が', true)).toBe('か')
+      expect(normalizeSearchText('مُحَمَّد', true)).toBe('محمد')
+      expect(normalizeSearchText('が')).toBe('が')
+      expect(normalizeSearchText('c^2 ´x`', true)).toBe('c^2 ´x`')
+      expect(normalizeSearchText('מִ', true)).toBe('מ')
+      expect(normalizeSearchText('कि कु', true)).toBe('कि कु')
+    })
+  })
+
+  describe('filterOptionTree', () => {
+    it('should keep every option and drop only the empty groups for an empty or blank query', () => {
+      expect(filterOptionTree(options, '')).toEqual(options)
+      expect(filterOptionTree(options, '   ')).toEqual(options)
+      expect(filterOptionTree([{ label: 'Empty', options: [] }, 'A'], '')).toEqual(['A'])
+    })
+
+    it('should keep the options whose label contains the query, trimmed and in any case', () => {
+      expect(filterOptionTree(options, '  PLAIN ')).toEqual(['Plain'])
+      expect(filterOptionTree(options, 'option 1')).toEqual([options[1]])
+      expect(filterOptionTree(options, 'ption 2')).toEqual([{ label: 'Group', options: [options[2].options[0]] }])
+    })
+
+    it('should keep a group with the options of it that match, and drop it when none does', () => {
+      const filtered = filterOptionTree(options, 'option 3')
+
+      expect(filtered).toEqual([{ label: 'Group', options: [options[2].options[1]] }])
+      expect(filtered[0]).not.toBe(options[2])
+      expect(options[2].options).toHaveSize(3)
+      expect(filterOptionTree(options, 'deep')).toEqual([{ label: 'Group', options: [{ label: 'Inner', options: [{ label: 'Deep' }] }] }])
+      expect(filterOptionTree(options, 'group')).toEqual([])
+    })
+
+    it('should compare without accents only when asked', () => {
+      expect(filterOptionTree(['Café', 'Tea'], 'cafe')).toEqual([])
+      expect(filterOptionTree(['Café', 'Tea'], 'cafe', true)).toEqual(['Café'])
+      expect(filterOptionTree(['Cafe'], 'café', true)).toEqual(['Cafe'])
     })
   })
 })

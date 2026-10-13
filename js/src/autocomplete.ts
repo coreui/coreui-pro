@@ -18,7 +18,9 @@ import {
   DefaultAllowlist, escapeHtml, sanitizeByConfig, type SanitizerAllowList, SVGAllowlist
 } from './util/sanitizer.js'
 import { CLEANER_ICON, PICKER_ICON } from './util/icons.js'
-import { flattenOptions, getSelectableOptions, isOptionGroup } from './util/option-tree.js'
+import {
+  filterOptionTree, flattenOptions, getSelectableOptions, isOptionGroup
+} from './util/option-tree.js'
 import {
   captureHostClasses, defineJQueryPlugin, getUID, type HostClasses, jQueryDispatch, restoreHostClasses, writeAttribute
 } from './util/index.js'
@@ -242,7 +244,7 @@ class Autocomplete extends ComboboxBase {
 
   override _canShow(): boolean {
     return Boolean(this._config.searchNoResultsLabel) ||
-      flattenOptions(this._options).some(option => option.label.toLowerCase().includes(this._search.toLowerCase()))
+      filterOptionTree(this._options, this._search).length > 0
   }
 
   override _getAriaExpandedTarget(): HTMLElement {
@@ -378,11 +380,13 @@ class Autocomplete extends ComboboxBase {
   }
 
   _highlightOption(label: string): string {
-    if (!this._search) {
+    const search = this._search.trim()
+
+    if (!search) {
       return escapeHtml(label)
     }
 
-    const escapedSearch = this._search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    const escapedSearch = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
     const regex = new RegExp(`(${escapedSearch})`, 'gi')
     return String(label)
       .split(regex)
@@ -468,8 +472,8 @@ class Autocomplete extends ComboboxBase {
         return
       }
 
-      const inputValueLower = inputValue.toLowerCase()
-      const exactMatches = getSelectableOptions(this._options).filter(option => option.label.toLowerCase() === inputValueLower)
+      const inputValueLower = inputValue.trim().toLowerCase()
+      const exactMatches = getSelectableOptions(this._options).filter(option => option.label.trim().toLowerCase() === inputValueLower)
 
       if (exactMatches.length === 1) {
         this._selectOption(exactMatches[0])
@@ -530,8 +534,8 @@ class Autocomplete extends ComboboxBase {
 
       this.search(value)
       if (this._config.showHints) {
-        const option = value ? this._findHintOption(value) : undefined
-        this._inputHintElement.value = option ? `${value}${option.label.slice(value.length)}` : ''
+        const option = value.trim() ? this._findHintOption(value) : undefined
+        this._inputHintElement.value = option ? `${value}${option.label.slice(value.trimStart().length)}` : ''
       }
 
       if (value && !this._isShown()) {
@@ -581,7 +585,7 @@ class Autocomplete extends ComboboxBase {
       return
     }
 
-    const options = getSelectableOptions(this._options).filter(option => option.label.toLowerCase() === this._inputElement.value.toLowerCase())
+    const options = getSelectableOptions(this._options).filter(option => option.label.trim().toLowerCase() === this._inputElement.value.trim().toLowerCase())
 
     if (options.length > 0) {
       if (this._selected.some((option: any) => option.value === options[0].value)) {
@@ -821,11 +825,11 @@ class Autocomplete extends ComboboxBase {
   }
 
   _findHintOption(text: string): any {
-    return getSelectableOptions(this._options).find(option => option.label.toLowerCase().startsWith(text.toLowerCase()))
+    return getSelectableOptions(this._options).find(option => option.label.toLowerCase().startsWith(text.trimStart().toLowerCase()))
   }
 
   _namesSelection(text: string): boolean {
-    return this._selected.some((option: any) => option.label === text)
+    return this._selected.some((option: any) => option.label.trim() === text.trim())
   }
 
   _clearByUser(): void {
