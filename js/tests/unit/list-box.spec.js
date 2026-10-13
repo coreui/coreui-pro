@@ -465,6 +465,20 @@ describe('ListBox', () => {
       expect(reported).toEqual([[2, 'onion']])
     })
 
+    it('should report the selection limit after the selection it fills', () => {
+      const el = setMarkup()
+      const listBox = new ListBox(el, { selectionMode: 'multiple', selectionLimit: 2 })
+      const calls = []
+
+      el.addEventListener('change.coreui.list-box', event => calls.push(`change ${event.value.join(',')}`))
+      el.addEventListener('selectionLimit.coreui.list-box', event => calls.push(`limit ${event.value}`))
+
+      keydown(list(el), 'a', { ctrlKey: true })
+
+      expect(calls).toEqual(['change lettuce,tomato', 'limit onion'])
+      expect(listBox.getSelectedValues()).toEqual(['lettuce', 'tomato'])
+    })
+
     it('should stop a range at the limit and report it once', () => {
       const el = setMarkup()
       const listBox = new ListBox(el, { selectionMode: 'multiple', selectionLimit: 2 })
