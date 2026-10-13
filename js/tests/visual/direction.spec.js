@@ -109,6 +109,21 @@ describe('mirrored values follow the direction of the element they style', () =>
     expect(transform).toEqual(rtl ? 'matrix(-1, 0, 0, -1, 0, 0)' : 'none')
   })
 
+  it.each(shapes)('draws the group divider between the buttons in %s', (_name, shape) => {
+    const markup = '<div class="btn-group btn-group-divider" data-probe>' +
+      '<button type="button" class="btn btn-solid theme-primary">one</button>' +
+      '<button type="button" class="btn btn-solid theme-primary">two</button>' +
+      '</div>'
+    const [first, second] = mount(markup, shape).children
+    const a = first.getBoundingClientRect()
+    const b = second.getBoundingClientRect()
+    const divider = getComputedStyle(second, '::before')
+    const center = b.left + Number.parseFloat(divider.left) + (Number.parseFloat(divider.width) / 2)
+    const sharedEdge = a.left < b.left ? a.right : a.left
+
+    expect(Math.abs(center - sharedEdge)).toBeLessThanOrEqual(2)
+  })
+
   it.each(shapes)('straddles the corner an inset pins it to in %s', (_name, shape) => {
     const markup = '<div style="position: relative; width: 300px; height: 80px;">' +
       '<span class="badge badge-position-top-start" data-probe>9</span>' +
