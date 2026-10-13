@@ -55,6 +55,8 @@ const SELECTOR_INNER_ELEM = `${SELECTOR_INNER}, ${SELECTOR_DATA_TOGGLE}`
 
 const SELECTOR_DATA_TOGGLE_ACTIVE = `.${CLASS_NAME_ACTIVE}[data-coreui-toggle="tab"], .${CLASS_NAME_ACTIVE}[data-coreui-toggle="pill"], .${CLASS_NAME_ACTIVE}[data-coreui-toggle="list"]`
 
+const activationIds = new WeakMap<Element, number>()
+
 /**
  * Class definition
  */
@@ -102,12 +104,15 @@ class Tab extends BaseComponent {
       return
     }
 
+    const activationId = (activationIds.get(this._parent!) || 0) + 1
+    activationIds.set(this._parent!, activationId)
+
     this._deactivate(active, innerElem)
-    await this._activate(innerElem, active)
+    await this._activate(innerElem, active, activationId)
   }
 
   // Private
-  async _activate(element: HTMLElement | null, relatedElem?: HTMLElement | null): Promise<void> {
+  async _activate(element: HTMLElement | null, relatedElem?: HTMLElement | null, activationId?: number): Promise<void> {
     if (!element) {
       return
     }
@@ -125,7 +130,7 @@ class Tab extends BaseComponent {
     this._activate(pane) // Search and activate/show the proper section
 
     const complete = () => {
-      if (!element.classList.contains(CLASS_NAME_ACTIVE)) {
+      if ((activationId !== undefined && activationId !== activationIds.get(this._parent!)) || !element.classList.contains(CLASS_NAME_ACTIVE)) {
         return
       }
 
