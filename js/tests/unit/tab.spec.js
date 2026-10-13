@@ -475,6 +475,108 @@ describe('Tab', () => {
       expect(two.getAttribute('tabindex')).toEqual('-1')
       expect(one.getAttribute('aria-selected')).toEqual('true')
     })
+
+    it('should fire shown once for a tab selected again before its pane faded in', async () => {
+      fixtureEl.innerHTML = [
+        '<ul class="nav" role="tablist">',
+        '  <li><button type="button" id="one" class="active" data-coreui-target="#pane-one" role="tab" aria-selected="true">One</button></li>',
+        '  <li><button type="button" id="two" data-coreui-target="#pane-two" role="tab" aria-selected="false" tabindex="-1">Two</button></li>',
+        '</ul>',
+        '<div class="tab-content">',
+        '  <div class="tab-pane active" id="pane-one" role="tabpanel" style="transition: opacity .1s">One</div>',
+        '  <div class="tab-pane" id="pane-two" role="tabpanel" style="transition: opacity .1s">Two</div>',
+        '</div>'
+      ].join('')
+
+      const one = fixtureEl.querySelector('#one')
+      const two = fixtureEl.querySelector('#two')
+      let shown = 0
+      two.addEventListener('shown.coreui.tab', () => {
+        shown++
+      })
+
+      Tab.getOrCreateInstance(two).show()
+      Tab.getOrCreateInstance(one).show()
+      Tab.getOrCreateInstance(two).show()
+      await new Promise(resolve => {
+        setTimeout(resolve, 200)
+      })
+
+      expect(shown).toEqual(1)
+      expect(two.getAttribute('aria-selected')).toEqual('true')
+      expect(one.getAttribute('aria-selected')).toEqual('false')
+    })
+
+    const fadingTabs = (list, count) => [
+      `<ul class="nav" role="tablist" id="${list}">`,
+      ...Array.from({ length: count }, (_, index) => `<li><button type="button" id="${list}${index + 1}" ${index === 0 ? 'class="active" aria-selected="true"' : 'aria-selected="false" tabindex="-1"'} data-coreui-target="#${list}-pane${index + 1}" role="tab">${index + 1}</button></li>`),
+      '</ul>',
+      '<div class="tab-content">',
+      ...Array.from({ length: count }, (_, index) => `<div class="tab-pane${index === 0 ? ' active' : ''}" id="${list}-pane${index + 1}" role="tabpanel" style="transition: opacity .1s">${index + 1}</div>`),
+      '</div>'
+    ].join('')
+
+    const fadeOut = () => new Promise(resolve => {
+      setTimeout(resolve, 200)
+    })
+
+    it('should report the latest tab it replaced when a tab selected again fades in', async () => {
+      fixtureEl.innerHTML = fadingTabs('t', 3)
+      const [one, two, three] = ['#t1', '#t2', '#t3'].map(selector => fixtureEl.querySelector(selector))
+      const related = []
+      two.addEventListener('shown.coreui.tab', event => {
+        related.push(event.relatedTarget)
+      })
+
+      Tab.getOrCreateInstance(two).show()
+      Tab.getOrCreateInstance(three).show()
+      Tab.getOrCreateInstance(two).show()
+      await fadeOut()
+
+      expect(related).toEqual([three])
+      expect([one, two, three].map(tab => tab.getAttribute('aria-selected'))).toEqual(['false', 'true', 'false'])
+    })
+
+    it('should complete two tab lists switching at the same time', async () => {
+      fixtureEl.innerHTML = fadingTabs('a', 2) + fadingTabs('b', 2)
+      const a2 = fixtureEl.querySelector('#a2')
+      const b2 = fixtureEl.querySelector('#b2')
+      let shown = 0
+      for (const tab of [a2, b2]) {
+        tab.addEventListener('shown.coreui.tab', () => {
+          shown++
+        })
+      }
+
+      Tab.getOrCreateInstance(a2).show()
+      Tab.getOrCreateInstance(b2).show()
+      await fadeOut()
+
+      expect(shown).toEqual(2)
+      expect([a2, b2].map(tab => tab.getAttribute('aria-selected'))).toEqual(['true', 'true'])
+    })
+
+    it('should complete a fading tab when another tab is refused or the same tab is shown again', async () => {
+      fixtureEl.innerHTML = fadingTabs('t', 2)
+      const one = fixtureEl.querySelector('#t1')
+      const two = fixtureEl.querySelector('#t2')
+      let shown = 0
+      two.addEventListener('shown.coreui.tab', () => {
+        shown++
+      })
+      one.addEventListener('show.coreui.tab', event => {
+        event.preventDefault()
+      })
+
+      Tab.getOrCreateInstance(two).show()
+      Tab.getOrCreateInstance(one).show()
+      Tab.getOrCreateInstance(two).show()
+      await fadeOut()
+
+      expect(shown).toEqual(1)
+      expect(two.getAttribute('aria-selected')).toEqual('true')
+      expect(two.hasAttribute('tabindex')).toBeFalse()
+    })
   })
 
   describe('dispose', () => {
@@ -508,6 +610,31 @@ describe('Tab', () => {
       tab._activate(null, spy)
       expect(spyQueue).not.toHaveBeenCalled()
       expect(spy).not.toHaveBeenCalled()
+    })
+
+    it('should complete an activation that carries no id after a show in the same list', async () => {
+      fixtureEl.innerHTML = [
+        '<ul class="nav" role="tablist">',
+        '  <li><button type="button" id="one" class="active" data-coreui-target="#pane-one" role="tab" aria-selected="true">One</button></li>',
+        '  <li><button type="button" id="two" data-coreui-target="#pane-two" role="tab" aria-selected="false" tabindex="-1">Two</button></li>',
+        '  <li><button type="button" id="three" data-coreui-target="#pane-three" role="tab" aria-selected="false" tabindex="-1">Three</button></li>',
+        '</ul>',
+        '<div class="tab-content">',
+        '  <div class="tab-pane active" id="pane-one" role="tabpanel">One</div>',
+        '  <div class="tab-pane" id="pane-two" role="tabpanel">Two</div>',
+        '  <div class="tab-pane" id="pane-three" role="tabpanel">Three</div>',
+        '</div>'
+      ].join('')
+
+      const two = fixtureEl.querySelector('#two')
+      const three = fixtureEl.querySelector('#three')
+      await Tab.getOrCreateInstance(two).show()
+      const tab = Tab.getOrCreateInstance(three)
+      tab._deactivate(two, three)
+      await tab._activate(three, two)
+
+      expect(three.getAttribute('aria-selected')).toEqual('true')
+      expect(three.hasAttribute('tabindex')).toBeFalse()
     })
   })
 
