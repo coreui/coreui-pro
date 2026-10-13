@@ -19,7 +19,7 @@ import {
 } from './util/sanitizer.js'
 import { CLEANER_ICON, PICKER_ICON } from './util/icons.js'
 import {
-  filterOptionTree, flattenOptions, getSelectableOptions, isOptionGroup
+  filterOptionTree, findOptionByValue, flattenOptions, getSelectableOptions, isOptionGroup
 } from './util/option-tree.js'
 import {
   captureHostClasses, defineJQueryPlugin, getUID, type HostClasses, jQueryDispatch, restoreHostClasses, writeAttribute
@@ -943,7 +943,7 @@ class Autocomplete extends ComboboxBase {
 
     if (value !== null && value !== undefined && value !== '') {
       if (!this._valueApplied) {
-        seed = options.find(option => option.value === String(value))
+        seed = findOptionByValue(options, value)
         this._valueApplied = Boolean(seed)
       }
     } else {
