@@ -8,6 +8,9 @@
 import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
+import {
+  createTypeaheadBuffer, findTypeaheadMatch, rangeBetween, type TypeaheadBuffer
+} from './util/list-navigation.js'
 import { getOptionValue, normalizeSearchText } from './util/option-tree.js'
 import { DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList } from './util/sanitizer.js'
 import { getAriaPressed, getSelectionState, type SelectionState } from './util/selection-state.js'
@@ -31,8 +34,6 @@ const END_KEY = 'End'
 const ENTER_KEY = 'Enter'
 const SPACE_KEY = ' '
 const A_KEY = 'a'
-
-const TYPEAHEAD_TIMEOUT = 500
 
 const EVENT_ACTION = 'action'
 const EVENT_ACTIVATE = 'activate'
@@ -191,11 +192,10 @@ class ListBox extends BaseComponent {
   protected declare _limited: string | null
   protected declare _list: HTMLElement
   protected declare _query: string | null
-  protected declare _search: string
   protected declare _searchField: HTMLInputElement | null
-  protected declare _searchTimeout: ReturnType<typeof setTimeout> | null
   protected declare _selected: Set<string>
   protected declare _selectAll: HTMLButtonElement | null
+  protected declare _typeaheadBuffer: TypeaheadBuffer
 
   constructor(element?: string | Element | null, config?: Partial<ListBoxConfig> | null) {
     super(element, config)
@@ -209,11 +209,10 @@ class ListBox extends BaseComponent {
     this._list = this._resolveList()
     this._counter = this._resolveCounter()
     this._query = null
-    this._search = ''
     this._searchField = this._resolveSearch()
-    this._searchTimeout = null
     this._selectAll = SelectorEngine.findOne(SELECTOR_SELECT_ALL, this._element) as HTMLButtonElement | null
     this._selected = new Set()
+    this._typeaheadBuffer = createTypeaheadBuffer()
 
     this._render()
 
@@ -406,9 +405,7 @@ class ListBox extends BaseComponent {
   }
 
   override dispose(): void {
-    if (this._searchTimeout) {
-      clearTimeout(this._searchTimeout)
-    }
+    this._typeaheadBuffer.clear()
 
     this._element.removeAttribute(ATTRIBUTE_INDICATOR)
     this._element.classList.remove(CLASS_NAME_LOADING)
@@ -1008,20 +1005,21 @@ class ListBox extends BaseComponent {
 
   _selectRange(from: string | null, to: string): void {
     const options = this._navigableOptions()
-    const start = options.findIndex(option => this._optionValue(option) === from)
-    const end = options.findIndex(option => this._optionValue(option) === to)
+    const range = rangeBetween(
+      options,
+      options.findIndex(option => this._optionValue(option) === from),
+      options.findIndex(option => this._optionValue(option) === to)
+    )
 
-    if (end === -1) {
+    if (range.length === 0) {
       return
     }
 
-    const first = Math.min(start === -1 ? end : start, end)
-    const last = Math.max(start === -1 ? end : start, end)
     let changed = false
 
     this._limited = null
 
-    for (const option of options.slice(first, last + 1)) {
+    for (const option of range) {
       changed = this._selectValue(this._optionValue(option)) || changed
     }
 
@@ -1129,24 +1127,15 @@ class ListBox extends BaseComponent {
   }
 
   _typeahead(key: string): void {
-    if (!this._config.typeahead || key.length !== 1 || key === SPACE_KEY) {
+    const text = this._config.typeahead ? this._typeaheadBuffer.push(key) : null
+
+    if (!text) {
       return
     }
 
-    if (this._searchTimeout) {
-      clearTimeout(this._searchTimeout)
-    }
-
-    this._search += key.toLowerCase()
-    this._searchTimeout = setTimeout(() => {
-      this._search = ''
-    }, TYPEAHEAD_TIMEOUT)
-
     const options = this._navigableOptions()
-    const start = options.findIndex(option => this._optionValue(option) === this._active) + 1
-    const from = this._search.length > 1 ? start - 1 : start
-    const ordered = [...options.slice(from), ...options.slice(0, from)]
-    const match = ordered.find(option => this._optionText(option).startsWith(this._search))
+    const current = options.findIndex(option => this._optionValue(option) === this._active)
+    const match = findTypeaheadMatch(options, current, text, option => this._optionText(option))
 
     if (match) {
       this._setActive(this._optionValue(match), true)
