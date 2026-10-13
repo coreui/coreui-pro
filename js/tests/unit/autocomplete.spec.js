@@ -1630,45 +1630,6 @@ describe('Autocomplete', () => {
     })
   })
 
-  describe('_flattenOptions', () => {
-    it('should flatten nested options', () => {
-      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
-      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
-      const options = [
-        { label: 'Option 1', value: '1' },
-        {
-          label: 'Group 1',
-          options: [
-            { label: 'Option 2', value: '2' },
-            { label: 'Option 3', value: '3' }
-          ]
-        }
-      ]
-      const autocomplete = new Autocomplete(autocompleteEl, { options })
-
-      const flattened = autocomplete._flattenOptions()
-
-      expect(flattened).toEqual([
-        { label: 'Option 1', value: '1' },
-        { label: 'Option 2', value: '2' },
-        { label: 'Option 3', value: '3' }
-      ])
-    })
-
-    it('should return flat array for non-grouped options', () => {
-      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
-      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
-      const options = [
-        { label: 'Option 1', value: '1' },
-        { label: 'Option 2', value: '2' }
-      ]
-      const autocomplete = new Autocomplete(autocompleteEl, { options })
-
-      const flattened = autocomplete._flattenOptions()
-      expect(flattened.length).toBe(2)
-    })
-  })
-
   describe('_highlightOption', () => {
     it('should highlight matching text in options', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'

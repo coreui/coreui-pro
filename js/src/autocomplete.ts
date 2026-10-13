@@ -18,6 +18,7 @@ import {
   DefaultAllowlist, escapeHtml, sanitizeByConfig, type SanitizerAllowList, SVGAllowlist
 } from './util/sanitizer.js'
 import { CLEANER_ICON, PICKER_ICON } from './util/icons.js'
+import { flattenOptions, getSelectableOptions, isOptionGroup } from './util/option-tree.js'
 import {
   captureHostClasses, defineJQueryPlugin, getUID, type HostClasses, jQueryDispatch, restoreHostClasses, writeAttribute
 } from './util/index.js'
@@ -241,7 +242,7 @@ class Autocomplete extends ComboboxBase {
 
   override _canShow(): boolean {
     return Boolean(this._config.searchNoResultsLabel) ||
-      this._flattenOptions().some(option => option.label.toLowerCase().includes(this._search.toLowerCase()))
+      flattenOptions(this._options).some(option => option.label.toLowerCase().includes(this._search.toLowerCase()))
   }
 
   override _getAriaExpandedTarget(): HTMLElement {
@@ -358,7 +359,7 @@ class Autocomplete extends ComboboxBase {
         continue
       }
 
-      if (Array.isArray(option.options)) {
+      if (isOptionGroup(option)) {
         this.deselectAll(option.options)
         continue
       }
@@ -468,7 +469,7 @@ class Autocomplete extends ComboboxBase {
       }
 
       const inputValueLower = inputValue.toLowerCase()
-      const exactMatches = this._selectableOptions().filter(option => option.label.toLowerCase() === inputValueLower)
+      const exactMatches = getSelectableOptions(this._options).filter(option => option.label.toLowerCase() === inputValueLower)
 
       if (exactMatches.length === 1) {
         this._selectOption(exactMatches[0])
@@ -580,7 +581,7 @@ class Autocomplete extends ComboboxBase {
       return
     }
 
-    const options = this._selectableOptions().filter(option => option.label.toLowerCase() === this._inputElement.value.toLowerCase())
+    const options = getSelectableOptions(this._options).filter(option => option.label.toLowerCase() === this._inputElement.value.toLowerCase())
 
     if (options.length > 0) {
       if (this._selected.some((option: any) => option.value === options[0].value)) {
@@ -622,7 +623,7 @@ class Autocomplete extends ComboboxBase {
 
     const _options = []
     for (const option of options) {
-      if (option.options && Array.isArray(option.options)) {
+      if (isOptionGroup(option)) {
         const customGroupProperties = { ...option }
 
         delete customGroupProperties.label
@@ -820,15 +821,11 @@ class Autocomplete extends ComboboxBase {
   }
 
   _findHintOption(text: string): any {
-    return this._selectableOptions().find(option => option.label.toLowerCase().startsWith(text.toLowerCase()))
+    return getSelectableOptions(this._options).find(option => option.label.toLowerCase().startsWith(text.toLowerCase()))
   }
 
   _namesSelection(text: string): boolean {
     return this._selected.some((option: any) => option.label === text)
-  }
-
-  _selectableOptions(): any[] {
-    return this._flattenOptions().filter(option => !option.disabled)
   }
 
   _clearByUser(): void {
@@ -936,7 +933,7 @@ class Autocomplete extends ComboboxBase {
   }
 
   _seedSelection(): void {
-    const options = this._flattenOptions()
+    const options = flattenOptions(this._options)
     const { value } = this._config
     let seed
 
