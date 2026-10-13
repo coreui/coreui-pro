@@ -382,6 +382,486 @@ describe('Popover', () => {
     })
   })
 
+  describe('dismiss on next click', () => {
+    const settle = () => new Promise(resolve => {
+      setTimeout(resolve, 20)
+    })
+
+    const press = (element, type = 'pointerdown') => {
+      element.dispatchEvent(new PointerEvent(type, { bubbles: true, composed: true }))
+    }
+
+    const blur = (element, relatedTarget = null) => {
+      element.dispatchEvent(new FocusEvent('focusout', { bubbles: true, relatedTarget }))
+    }
+
+    const showPopover = async (popoverEl, options = {}) => {
+      const popover = new Popover(popoverEl, {
+        trigger: 'focus',
+        html: true,
+        content: 'Selectable text <a href="#inside" class="inside-link">Inside</a>',
+        ...options
+      })
+      const shown = new Promise(resolve => {
+        popoverEl.addEventListener('shown.coreui.popover', resolve, { once: true })
+      })
+
+      popoverEl.dispatchEvent(createEvent('focusin'))
+      await shown
+
+      return { popover, popoverEl, tip: document.querySelector('.popover') }
+    }
+
+    const showFocused = async (options = {}) => {
+      fixtureEl.innerHTML = '<a href="#" tabindex="0">Dismissible</a><button type="button" class="outside">Outside</button>'
+
+      return showPopover(fixtureEl.querySelector('a'), options)
+    }
+
+    it('should stay open when a press inside the popover takes focus from the trigger', async () => {
+      const { popover, popoverEl, tip } = await showFocused()
+
+      press(tip.querySelector('.popover-body'))
+      blur(popoverEl)
+      press(document, 'pointerup')
+      tip.querySelector('.popover-body').click()
+      await settle()
+
+      expect(popover._activeTrigger.focus).toBeTrue()
+      expect(tip).toHaveClass('show')
+    })
+
+    it('should stay open when a tap inside the popover takes focus after the release', async () => {
+      const { popoverEl, tip } = await showFocused()
+
+      press(tip.querySelector('.popover-body'))
+      press(document, 'pointerup')
+      blur(popoverEl)
+      tip.querySelector('.popover-body').click()
+      await settle()
+
+      expect(tip).toHaveClass('show')
+    })
+
+    it('should stay open when a press inside the popover takes focus from a link in it', async () => {
+      const { popover, tip } = await showFocused()
+
+      press(tip.querySelector('.popover-body'))
+      blur(tip.querySelector('.inside-link'))
+      await settle()
+
+      expect(popover._activeTrigger.focus).toBeTrue()
+      expect(tip).toHaveClass('show')
+    })
+
+    it('should stay open when focus moves from the trigger into the popover', async () => {
+      const { popover, popoverEl, tip } = await showFocused()
+
+      blur(popoverEl, tip.querySelector('.inside-link'))
+      await settle()
+
+      expect(popover._activeTrigger.focus).toBeTrue()
+      expect(tip).toHaveClass('show')
+    })
+
+    it('should hide when focus leaves the trigger for content outside the popover', async () => {
+      const { popoverEl } = await showFocused()
+      const hidden = new Promise(resolve => {
+        popoverEl.addEventListener('hidden.coreui.popover', resolve, { once: true })
+      })
+
+      blur(popoverEl, document.body)
+      await hidden
+
+      expect(document.querySelector('.popover')).toBeNull()
+    })
+
+    it('should hide when focus leaves a link inside the popover for content outside it', async () => {
+      const { popoverEl, tip } = await showFocused()
+      const hidden = new Promise(resolve => {
+        popoverEl.addEventListener('hidden.coreui.popover', resolve, { once: true })
+      })
+
+      blur(tip.querySelector('.inside-link'), document.body)
+      await hidden
+
+      expect(document.querySelector('.popover')).toBeNull()
+    })
+
+    it('should hide on the next click outside after a press inside the popover', async () => {
+      const { popoverEl, tip } = await showFocused()
+      const hidden = new Promise(resolve => {
+        popoverEl.addEventListener('hidden.coreui.popover', resolve, { once: true })
+      })
+
+      press(tip.querySelector('.popover-body'))
+      blur(popoverEl)
+      tip.querySelector('.popover-body').click()
+      await settle()
+
+      expect(tip).toHaveClass('show')
+
+      press(document.body)
+      document.body.click()
+      await hidden
+
+      expect(document.querySelector('.popover')).toBeNull()
+    })
+
+    it('should hide when focus moves outside after a press inside the popover', async () => {
+      const { popoverEl, tip } = await showFocused()
+      const hidden = new Promise(resolve => {
+        popoverEl.addEventListener('hidden.coreui.popover', resolve, { once: true })
+      })
+
+      press(tip.querySelector('.popover-body'))
+      blur(popoverEl)
+      tip.querySelector('.popover-body').click()
+      fixtureEl.querySelector('.outside').dispatchEvent(new FocusEvent('focusin', { bubbles: true }))
+      await hidden
+
+      expect(document.querySelector('.popover')).toBeNull()
+    })
+
+    it('should hide when focus leaves the trigger after a press that was cancelled', async () => {
+      const { popoverEl, tip } = await showFocused()
+      const hidden = new Promise(resolve => {
+        popoverEl.addEventListener('hidden.coreui.popover', resolve, { once: true })
+      })
+
+      press(tip.querySelector('.popover-body'))
+      press(document, 'pointercancel')
+      blur(popoverEl)
+      await hidden
+
+      expect(document.querySelector('.popover')).toBeNull()
+    })
+
+    it('should stay open when a press outside never becomes a click', async () => {
+      const { tip } = await showFocused()
+
+      press(document.body)
+      press(document, 'pointercancel')
+      await settle()
+
+      expect(tip).toHaveClass('show')
+    })
+
+    it('should stay open on a click outside while the trigger keeps focus', async () => {
+      fixtureEl.innerHTML = '<a href="#" tabindex="0">Dismissible</a>'
+
+      const popoverEl = fixtureEl.querySelector('a')
+      popoverEl.focus()
+
+      const { tip } = await showPopover(popoverEl)
+
+      press(document.body)
+      document.body.click()
+      await settle()
+
+      expect(document.activeElement).toBe(popoverEl)
+      expect(tip).toHaveClass('show')
+    })
+
+    it('should stay open on a click outside when it was shown from code', async () => {
+      fixtureEl.innerHTML = '<a href="#" tabindex="0">Dismissible</a>'
+
+      const popoverEl = fixtureEl.querySelector('a')
+      const popover = new Popover(popoverEl, { trigger: 'focus', content: 'Popover' })
+      const shown = new Promise(resolve => {
+        popoverEl.addEventListener('shown.coreui.popover', resolve, { once: true })
+      })
+
+      popover.show()
+      await shown
+      press(document.body)
+      document.body.click()
+      await settle()
+
+      expect(document.querySelector('.popover')).toHaveClass('show')
+    })
+
+    it('should hide a hover and focus popover when a press inside is dragged out of it', async () => {
+      fixtureEl.innerHTML = '<a href="#" tabindex="0">Dismissible</a>'
+
+      const popoverEl = fixtureEl.querySelector('a')
+      // eslint-disable-next-line no-new
+      new Popover(popoverEl, { trigger: 'hover focus', content: 'Selectable text' })
+      const shown = new Promise(resolve => {
+        popoverEl.addEventListener('shown.coreui.popover', resolve, { once: true })
+      })
+
+      popoverEl.dispatchEvent(createEvent('mouseover'))
+      await shown
+
+      const tip = document.querySelector('.popover')
+      const hidden = new Promise(resolve => {
+        popoverEl.addEventListener('hidden.coreui.popover', resolve, { once: true })
+      })
+
+      press(tip.querySelector('.popover-body'))
+      tip.dispatchEvent(new MouseEvent('mouseout', { bubbles: true, relatedTarget: document.body }))
+      await hidden
+
+      expect(document.querySelector('.popover')).toBeNull()
+    })
+
+    it('should stay open when the trigger inside a shadow root is pressed', async () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const shadowRoot = fixtureEl.querySelector('div').attachShadow({ mode: 'open' })
+      shadowRoot.innerHTML = '<a href="#" tabindex="0">Dismissible</a>'
+
+      const { tip } = await showPopover(shadowRoot.querySelector('a'))
+
+      press(shadowRoot.querySelector('a'))
+      shadowRoot.querySelector('a').click()
+      await settle()
+
+      expect(tip).toHaveClass('show')
+    })
+
+    it('should stay open when a trigger with its own shadow root is pressed', async () => {
+      fixtureEl.innerHTML = '<span tabindex="0"></span>'
+
+      const host = fixtureEl.querySelector('span')
+      host.attachShadow({ mode: 'open' }).innerHTML = '<b>Dismissible</b>'
+
+      const { tip } = await showPopover(host)
+
+      press(host.shadowRoot.querySelector('b'))
+      host.shadowRoot.querySelector('b').click()
+      await settle()
+
+      expect(tip).toHaveClass('show')
+    })
+
+    it('should stay open when the focused trigger inside a closed shadow root is pressed', async () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const shadowRoot = fixtureEl.querySelector('div').attachShadow({ mode: 'closed' })
+      shadowRoot.innerHTML = '<a href="#" tabindex="0">Dismissible</a>'
+
+      const popoverEl = shadowRoot.querySelector('a')
+      popoverEl.focus()
+
+      const { tip } = await showPopover(popoverEl)
+
+      press(popoverEl)
+      popoverEl.click()
+      await settle()
+
+      expect(tip).toHaveClass('show')
+    })
+
+    it('should stay open when a press inside a custom template without a tooltip role takes focus from the trigger', async () => {
+      const { popoverEl, tip } = await showFocused({
+        template: '<div class="popover"><div class="popover-arrow"></div><div class="popover-body"></div></div>'
+      })
+
+      expect(tip).not.toHaveAttribute('role')
+
+      press(tip.querySelector('.popover-body'))
+      blur(popoverEl)
+      tip.querySelector('.popover-body').click()
+      await settle()
+
+      expect(tip).toHaveClass('show')
+    })
+
+    it('should stay open when a label inside the popover toggles a control that takes no focus', async () => {
+      const { popoverEl, tip } = await showFocused({
+        sanitize: false,
+        content: '<input type="checkbox" id="toggle" hidden><label for="toggle">Toggle</label>'
+      })
+      const label = tip.querySelector('label')
+
+      press(label)
+      blur(popoverEl)
+      label.click()
+      await settle()
+
+      expect(tip.querySelector('input').checked).toBeTrue()
+      expect(tip).toHaveClass('show')
+    })
+
+    it('should stay open when focus moves to a link in the popover and the next click lands outside', async () => {
+      const { tip } = await showFocused()
+
+      tip.querySelector('.inside-link').focus()
+      press(document.body)
+      document.body.click()
+      await settle()
+
+      expect(document.activeElement).toBe(tip.querySelector('.inside-link'))
+      expect(tip).toHaveClass('show')
+    })
+
+    it('should hide a hover-opened popover on mouseleave after a press inside moved focus off a link in it', async () => {
+      fixtureEl.innerHTML = '<a href="#" tabindex="0">Dismissible</a>'
+
+      const popoverEl = fixtureEl.querySelector('a')
+      const popover = new Popover(popoverEl, {
+        trigger: 'hover focus',
+        html: true,
+        content: 'Selectable text <a href="#inside" class="inside-link">Inside</a>'
+      })
+      const shown = new Promise(resolve => {
+        popoverEl.addEventListener('shown.coreui.popover', resolve, { once: true })
+      })
+
+      popoverEl.dispatchEvent(createEvent('mouseover'))
+      await shown
+
+      const tip = document.querySelector('.popover')
+      const hidden = new Promise(resolve => {
+        popoverEl.addEventListener('hidden.coreui.popover', resolve, { once: true })
+      })
+
+      press(tip.querySelector('.popover-body'))
+      blur(tip.querySelector('.inside-link'))
+      tip.dispatchEvent(new MouseEvent('mouseout', { bubbles: true, relatedTarget: document.body }))
+      await hidden
+
+      expect(popover._activeTrigger.focus).toBeFalsy()
+      expect(document.querySelector('.popover')).toBeNull()
+    })
+
+    it('should hide a hover and focus popover when a press on the trigger is dragged off it', async () => {
+      fixtureEl.innerHTML = '<a href="#" tabindex="0">Dismissible</a>'
+
+      const popoverEl = fixtureEl.querySelector('a')
+      // eslint-disable-next-line no-new
+      new Popover(popoverEl, { trigger: 'hover focus', content: 'Popover' })
+      const shown = new Promise(resolve => {
+        popoverEl.addEventListener('shown.coreui.popover', resolve, { once: true })
+      })
+
+      popoverEl.dispatchEvent(createEvent('mouseover'))
+      await shown
+
+      const hidden = new Promise(resolve => {
+        popoverEl.addEventListener('hidden.coreui.popover', resolve, { once: true })
+      })
+
+      press(popoverEl)
+      popoverEl.dispatchEvent(new MouseEvent('mouseout', { bubbles: true, relatedTarget: document.body }))
+      await hidden
+
+      expect(document.querySelector('.popover')).toBeNull()
+    })
+
+    it('should keep both popovers open when a press inside a nested popover takes focus from its trigger', async () => {
+      fixtureEl.innerHTML = '<a href="#" tabindex="0">Outer</a>'
+
+      const nestedTrigger = document.createElement('button')
+      nestedTrigger.type = 'button'
+      nestedTrigger.textContent = 'Inner'
+
+      const outerEl = fixtureEl.querySelector('a')
+      const { tip: outerTip } = await showPopover(outerEl, { content: nestedTrigger })
+      const inner = new Popover(nestedTrigger, { trigger: 'focus', content: 'Selectable text' })
+      const innerShown = new Promise(resolve => {
+        nestedTrigger.addEventListener('shown.coreui.popover', resolve, { once: true })
+      })
+
+      blur(outerEl, nestedTrigger)
+      nestedTrigger.dispatchEvent(createEvent('focusin', { bubbles: true }))
+      await innerShown
+
+      const innerTip = inner._getTipElement()
+
+      press(innerTip.querySelector('.popover-body'))
+      blur(nestedTrigger)
+      innerTip.querySelector('.popover-body').click()
+      await settle()
+
+      expect(outerTip).toHaveClass('show')
+      expect(innerTip).toHaveClass('show')
+      expect(nestedTrigger.isConnected).toBeTrue()
+
+      inner.dispose()
+    })
+
+    it('should not watch the document for a popover without the focus trigger', async () => {
+      fixtureEl.innerHTML = '<a href="#">Click me</a>'
+
+      const popoverEl = fixtureEl.querySelector('a')
+      const popover = new Popover(popoverEl, { trigger: 'click', content: 'Popover' })
+      const addSpy = spyOn(document, 'addEventListener').and.callThrough()
+      const shown = new Promise(resolve => {
+        popoverEl.addEventListener('shown.coreui.popover', resolve, { once: true })
+      })
+
+      popover.show()
+      await shown
+
+      expect(addSpy).not.toHaveBeenCalledWith('focusin', jasmine.any(Function), true)
+    })
+
+    it('should watch the document once while shown and stop once hidden or disposed', async () => {
+      fixtureEl.innerHTML = '<a href="#" tabindex="0">Dismissible</a>'
+
+      const popoverEl = fixtureEl.querySelector('a')
+      const addSpy = spyOn(document, 'addEventListener').and.callThrough()
+      const { popover } = await showPopover(popoverEl)
+
+      await popover.show()
+
+      expect(addSpy.calls.allArgs().filter(([type]) => type === 'focusin')).toHaveSize(1)
+
+      const removeSpy = spyOn(document, 'removeEventListener').and.callThrough()
+      const hidden = new Promise(resolve => {
+        popoverEl.addEventListener('hidden.coreui.popover', resolve, { once: true })
+      })
+
+      popover.hide()
+      await hidden
+
+      for (const type of ['pointerdown', 'pointercancel', 'click', 'focusin']) {
+        expect(removeSpy).toHaveBeenCalledWith(type, jasmine.any(Function), true)
+      }
+
+      removeSpy.calls.reset()
+      await popover.show()
+
+      expect(addSpy.calls.allArgs().filter(([type]) => type === 'focusin')).toHaveSize(2)
+
+      popover.dispose()
+
+      for (const type of ['pointerdown', 'pointercancel', 'click', 'focusin']) {
+        expect(removeSpy).toHaveBeenCalledWith(type, jasmine.any(Function), true)
+      }
+    })
+
+    it('should forget a press inside once the popover hides', async () => {
+      const { popover, popoverEl, tip } = await showFocused()
+      const hidden = new Promise(resolve => {
+        popoverEl.addEventListener('hidden.coreui.popover', resolve, { once: true })
+      })
+
+      press(tip.querySelector('.popover-body'))
+      popover.hide()
+      await hidden
+
+      const shownAgain = new Promise(resolve => {
+        popoverEl.addEventListener('shown.coreui.popover', resolve, { once: true })
+      })
+
+      popoverEl.dispatchEvent(createEvent('focusin'))
+      await shownAgain
+
+      const hiddenAgain = new Promise(resolve => {
+        popoverEl.addEventListener('hidden.coreui.popover', resolve, { once: true })
+      })
+
+      blur(popoverEl)
+      await hiddenAgain
+
+      expect(document.querySelector('.popover')).toBeNull()
+    })
+  })
+
   describe('getInstance', () => {
     it('should return popover instance', () => {
       fixtureEl.innerHTML = '<a href="#" title="Popover" data-coreui-content="https://x.com/getbootstrap">BS X</a>'

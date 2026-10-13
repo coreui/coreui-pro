@@ -73,6 +73,8 @@ const EVENT_FOCUSOUT = 'focusout'
 const EVENT_MOUSEENTER = 'mouseenter'
 const EVENT_MOUSELEAVE = 'mouseleave'
 const EVENT_KEYDOWN = 'keydown'
+const EVENT_POINTERCANCEL = 'pointercancel'
+const EVENT_POINTERDOWN = 'pointerdown'
 
 const ATTACHMENTS: Record<string, [string, string]> = {
   AUTO: ['auto', 'auto'],
@@ -165,6 +167,8 @@ class Tooltip extends BaseComponent {
   protected declare _activeTrigger: Record<string, boolean>
   protected declare _floatingCleanup: (() => void) | null
   protected declare _keydownHandler: ((event: KeyboardEvent) => void) | null
+  protected declare _focusOutsideHandler: ((event: Event) => void) | null
+  protected declare _pressedInside: boolean
   protected declare _tipEventOut: ((event: CoreUIEvent) => void) | null
   protected declare _templateFactory: TemplateFactory | null
   protected declare _newContent: Record<string, TemplateContentEntry> | null
@@ -188,6 +192,8 @@ class Tooltip extends BaseComponent {
     this._activeTrigger = {}
     this._floatingCleanup = null
     this._keydownHandler = null
+    this._focusOutsideHandler = null
+    this._pressedInside = false
     this._tipEventOut = null
     this._templateFactory = null
     this._newContent = null
@@ -243,6 +249,7 @@ class Tooltip extends BaseComponent {
     this._clearTimeout()
 
     this._removeEscapeListener()
+    this._removeFocusOutsideListener()
 
     EventHandler.off(this._element.closest(SELECTOR_MODAL), EVENT_MODAL_HIDE, this._hideModalHandler)
 
@@ -308,6 +315,7 @@ class Tooltip extends BaseComponent {
 
     // Allow dismissing the tooltip with the Escape key (WCAG 1.4.13)
     this._setEscapeListener()
+    this._setFocusOutsideListener()
 
     // If this is a touch-enabled device we add extra
     // empty mouseover listeners to the body's immediate children;
@@ -343,6 +351,7 @@ class Tooltip extends BaseComponent {
     }
 
     this._removeEscapeListener()
+    this._removeFocusOutsideListener()
 
     const tip = this._getTipElement()
     tip.classList.remove(CLASS_NAME_SHOW)
@@ -689,6 +698,11 @@ class Tooltip extends BaseComponent {
         })
         EventHandler.on(this._element, eventOut, this._config.selector as string, event => {
           const context = this._initializeOnDelegatedTarget(event)
+
+          if (event.type === 'focusout' && context._pressedInside) {
+            return
+          }
+
           context._activeTrigger[event.type === 'focusout' ? TRIGGER_FOCUS : TRIGGER_HOVER] =
             context._isInside(event.relatedTarget)
 
@@ -717,6 +731,10 @@ class Tooltip extends BaseComponent {
     }
 
     this._tipEventOut = event => {
+      if (event.type === 'focusout' && this._pressedInside) {
+        return
+      }
+
       this._activeTrigger[event.type === 'focusout' ? TRIGGER_FOCUS : TRIGGER_HOVER] = this._isInside(event.relatedTarget as Node | null)
       this._leave()
     }
@@ -802,6 +820,56 @@ class Tooltip extends BaseComponent {
 
     this._element.ownerDocument.removeEventListener(EVENT_KEYDOWN, this._keydownHandler, true)
     this._keydownHandler = null
+  }
+
+  protected _setFocusOutsideListener(): void {
+    if (this._focusOutsideHandler || !this._getTrigger().split(' ').includes(TRIGGER_FOCUS)) {
+      return
+    }
+
+    this._focusOutsideHandler = event => {
+      const inside = event.composedPath().some(node =>
+        node === this._element || node === this.tip || (node as Element).getAttribute?.('role') === 'tooltip'
+      )
+
+      if (event.type === EVENT_POINTERDOWN) {
+        this._pressedInside = inside
+        return
+      }
+
+      const pressedInside = this._pressedInside
+      this._pressedInside = false
+
+      if (
+        inside ||
+        event.type === EVENT_POINTERCANCEL ||
+        (event.type === EVENT_CLICK && pressedInside) ||
+        !this._activeTrigger[TRIGGER_FOCUS] ||
+        [this._element, this.tip].some(element => element?.contains((element.getRootNode() as Document).activeElement))
+      ) {
+        return
+      }
+
+      this._activeTrigger[TRIGGER_FOCUS] = false
+      this._leave()
+    }
+
+    for (const type of [EVENT_POINTERDOWN, EVENT_POINTERCANCEL, EVENT_CLICK, EVENT_FOCUSIN]) {
+      this._element.ownerDocument.addEventListener(type, this._focusOutsideHandler, true)
+    }
+  }
+
+  protected _removeFocusOutsideListener(): void {
+    if (!this._focusOutsideHandler) {
+      return
+    }
+
+    for (const type of [EVENT_POINTERDOWN, EVENT_POINTERCANCEL, EVENT_CLICK, EVENT_FOCUSIN]) {
+      this._element.ownerDocument.removeEventListener(type, this._focusOutsideHandler, true)
+    }
+
+    this._focusOutsideHandler = null
+    this._pressedInside = false
   }
 
   protected _fixTitle(): void {
