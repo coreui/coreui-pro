@@ -13,6 +13,9 @@ import SelectorEngine from './dom/selector-engine.js'
 import { announce } from './util/announce.js'
 import { CHECK_ICON, REMOVE_ICON } from './util/icons.js'
 import {
+  createTypeaheadBuffer, findTypeaheadMatch, rangeBetween, type TypeaheadBuffer
+} from './util/list-navigation.js'
+import {
   defineJQueryPlugin, getNextActiveElement, isRTL, jQueryDispatch
 } from './util/index.js'
 
@@ -38,9 +41,6 @@ const ARROW_LEFT_KEY = 'ArrowLeft'
 const ARROW_RIGHT_KEY = 'ArrowRight'
 const END_KEY = 'End'
 const HOME_KEY = 'Home'
-const SPACE_KEY = ' '
-
-const TYPEAHEAD_TIMEOUT = 500
 
 const EVENT_CHIP_SELECTED = 'selected.coreui.chip'
 const EVENT_CHIP_DESELECTED = 'deselected.coreui.chip'
@@ -124,8 +124,7 @@ class ChipSet extends BaseComponent {
   protected declare _ownedChips: Map<HTMLElement, Chip>
   protected declare _input: HTMLElement | null
   protected declare _anchor: HTMLElement | null
-  protected declare _search: string
-  protected declare _searchTimeout: ReturnType<typeof setTimeout> | null
+  protected declare _typeaheadBuffer: TypeaheadBuffer
   protected declare _announcedFrom: string[] | null
   protected declare _settled: boolean
 
@@ -139,8 +138,7 @@ class ChipSet extends BaseComponent {
     this._optionChips = new Set()
     this._ownedChips = new Map()
     this._anchor = null
-    this._search = ''
-    this._searchTimeout = null
+    this._typeaheadBuffer = createTypeaheadBuffer()
     this._announcedFrom = null
     this._settled = false
 
@@ -320,9 +318,7 @@ class ChipSet extends BaseComponent {
       this._element.removeAttribute(name)
     }
 
-    if (this._searchTimeout) {
-      clearTimeout(this._searchTimeout)
-    }
+    this._typeaheadBuffer.clear()
 
     super.dispose()
   }
@@ -587,42 +583,23 @@ class ChipSet extends BaseComponent {
 
   _selectRange(from: HTMLElement, to: HTMLElement): void {
     const chips = this._getFocusableChips()
-    const start = chips.indexOf(from)
-    const end = chips.indexOf(to)
 
-    if (end === -1) {
-      return
-    }
-
-    const first = Math.min(start === -1 ? end : start, end)
-    const last = Math.max(start === -1 ? end : start, end)
-
-    for (const chip of chips.slice(first, last + 1)) {
+    for (const chip of rangeBetween(chips, chips.indexOf(from), chips.indexOf(to))) {
       Chip.getInstance(chip)?.select()
     }
   }
 
   _typeahead(key: string): void {
-    if (!this._config.typeahead || key.length !== 1 || key === SPACE_KEY) {
+    const text = this._config.typeahead ? this._typeaheadBuffer.push(key) : null
+
+    if (!text) {
       return
     }
 
-    if (this._searchTimeout) {
-      clearTimeout(this._searchTimeout)
-    }
-
-    this._search += key.toLowerCase()
-    this._searchTimeout = setTimeout(() => {
-      this._search = ''
-    }, TYPEAHEAD_TIMEOUT)
-
     const chips = this._getFocusableChips()
     const current = chips.indexOf(document.activeElement as HTMLElement)
-    const start = this._search.length > 1 ? Math.max(current, 0) : current + 1
-    const ordered = [...chips.slice(start), ...chips.slice(0, start)]
-    const match = ordered.find(chip => this._getChipValue(chip).toLowerCase().startsWith(this._search))
 
-    match?.focus()
+    findTypeaheadMatch(chips, current, text, chip => this._getChipValue(chip))?.focus()
   }
 
   _focusSibling(chip: HTMLElement, shouldGetNext: boolean): HTMLElement | null {

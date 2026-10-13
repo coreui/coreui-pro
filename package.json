@@ -186,6 +186,16 @@
         "default": "./js/dist/util/form-validation.js"
       }
     },
+    "./utils/list-navigation": {
+      "import": {
+        "types": "./js/dist/util/list-navigation.d.mts",
+        "default": "./js/dist/util/list-navigation.mjs"
+      },
+      "require": {
+        "types": "./js/dist/util/list-navigation.d.ts",
+        "default": "./js/dist/util/list-navigation.js"
+      }
+    },
     "./utils/option-tree": {
       "import": {
         "types": "./js/dist/util/option-tree.d.mts",

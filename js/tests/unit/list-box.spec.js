@@ -794,6 +794,21 @@ describe('ListBox', () => {
       expect(listBox.getActive()).toEqual('tomato')
     })
 
+    it('should search a typed prefix from the first option when none is active', () => {
+      const el = setMarkup('', [
+        '<div class="list-box-option" data-coreui-value="avocado">Avocado</div>',
+        '<div class="list-box-option" data-coreui-value="apple">Apple</div>',
+        '<div class="list-box-option" data-coreui-value="apricot">Apricot</div>'
+      ])
+      const listBox = new ListBox(el)
+
+      keydown(list(el), 'a')
+      listBox.setActive(null)
+      keydown(list(el), 'p')
+
+      expect(listBox.getActive()).toEqual('apple')
+    })
+
     it('should read the typeahead text from the option label', () => {
       const el = setMarkup('', [
         '<div class="list-box-option" data-coreui-value="lettuce"><span class="list-box-option-label">Lettuce</span><span class="list-box-option-description">Crisp</span></div>',
