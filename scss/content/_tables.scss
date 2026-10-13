@@ -1,6 +1,7 @@
 @use "sass:map";
 @use "../functions/defaults" as *;
 @use "../layout/breakpoints" as *;
+@use "../mixins/border-radius" as *;
 @use "../mixins/tokens" as *;
 @use "../mixins/visually-hidden" as *;
 @use "../config" as *;
@@ -208,6 +209,53 @@ $table-variants: map.keys($theme-colors) !default;
 
   @each $state in $table-variants {
     @include table-variant($state);
+  }
+
+  // Card-like tables
+  //
+  // Round and clip a table without nesting it in a `.card`. Apply to a wrapper
+  // around `.table`, or combine with `.table-responsive` on the same element.
+
+  .table-card {
+    margin-bottom: var(--#{$prefix}spacer);
+    overflow: clip;
+    border: var(--#{$prefix}border-width) solid var(--#{$prefix}theme-bg, var(--#{$prefix}border-color-translucent));
+    @include border-radius(var(--#{$prefix}radius-9));
+
+    > .table,
+    > [class*="table-responsive"] > .table {
+      margin-bottom: 0;
+    }
+
+    // Drop the last row border so it does not stack on the wrapper border.
+    // Same universal cell targeting as `.table`; wrapper + optional responsive
+    // nest pushes compound/combinator counts over the defaults.
+    // stylelint-disable selector-max-compound-selectors, selector-max-combinators
+    > .table:not(:has(> caption):not(.caption-top)),
+    > [class*="table-responsive"] > .table:not(:has(> caption):not(.caption-top)) {
+      > :not(caption):last-child > :last-child {
+        &,
+        > * {
+          border-block-end-width: 0;
+        }
+      }
+    }
+
+    > .table-bordered,
+    > [class*="table-responsive"] > .table-bordered {
+      > :nth-child(1 of :not(caption)) > :first-child {
+        border-block-start-width: 0;
+      }
+
+      > :not(caption) > * > :first-child {
+        border-inline-start-width: 0;
+      }
+
+      > :not(caption) > * > :last-child {
+        border-inline-end-width: 0;
+      }
+    }
+    // stylelint-enable selector-max-compound-selectors, selector-max-combinators
   }
 
   // Responsive tables

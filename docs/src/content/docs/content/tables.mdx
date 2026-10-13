@@ -227,6 +227,32 @@ Add `.table-borderless` for a table without borders.
 
 <Example html={demo('table table-inverse table-borderless')} code={snippet('table table-inverse table-borderless')} />
 
+## Card-like tables
+
+Need a bordered, rounded table without nesting it in a [card](/components/card/)? Wrap the table and clip the corners.
+
+### With utilities
+
+Compose [border](/utilities/border/), [border radius](/utilities/border-radius/), and [overflow](/utilities/overflow/) utilities. Drop the table's bottom margin with `.mb-0`.
+
+<Example html={`<div class="border rounded overflow-hidden">\n${demo('table table-striped mb-0')}\n</div>`} code={`<div class="border rounded overflow-hidden">\n  <table class="table table-striped mb-0">\n    ...\n  </table>\n</div>`} />
+
+### With `.table-card`
+
+Use `.table-card` for the card look in one class. It draws the border and corner radius of a [card](/components/card/), and a `.theme-*` class on it or on an ancestor colours the frame the way it colours a card. It clips the cells, drops the table's bottom margin, and removes the borders that would stack on the frame: the last row's bottom border and the outer borders of a `.table-bordered` table. A caption at the bottom keeps the line above it.
+
+<Example html={`<div class="table-card">\n${demo('table table-hover')}\n</div>`} code={`<div class="table-card">\n  <table class="table table-hover">\n    ...\n  </table>\n</div>`} />
+
+Put it on the [responsive wrapper](#responsive-tables) itself when the table can be wider than its container:
+
+<Example html={`<div class="table-responsive table-card">\n  <table class="table table-striped">\n    <thead>\n      <tr>\n        <th scope="col">#</th>\n        <th scope="col">Heading</th>\n        <th scope="col">Heading</th>\n        <th scope="col">Heading</th>\n        <th scope="col">Heading</th>\n        <th scope="col">Heading</th>\n        <th scope="col">Heading</th>\n        <th scope="col">Heading</th>\n        <th scope="col">Heading</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope="row">1</th>\n        <td>Cell</td>\n        <td>Cell</td>\n        <td>Cell</td>\n        <td>Cell</td>\n        <td>Cell</td>\n        <td>Cell</td>\n        <td>Cell</td>\n        <td>Cell</td>\n      </tr>\n      <tr>\n        <th scope="row">2</th>\n        <td>Cell</td>\n        <td>Cell</td>\n        <td>Cell</td>\n        <td>Cell</td>\n        <td>Cell</td>\n        <td>Cell</td>\n        <td>Cell</td>\n        <td>Cell</td>\n      </tr>\n      <tr>\n        <th scope="row">3</th>\n        <td>Cell</td>\n        <td>Cell</td>\n        <td>Cell</td>\n        <td>Cell</td>\n        <td>Cell</td>\n        <td>Cell</td>\n        <td>Cell</td>\n        <td>Cell</td>\n      </tr>\n    </tbody>\n  </table>\n</div>`} code={`<div class="table-responsive table-card">\n  <table class="table table-striped">\n    ...\n  </table>\n</div>`} />
+
+<Callout color="warning">
+##### Clipping
+
+`.table-card` clips everything at its rounded edge: a dropdown menu opened from a cell, the focus ring of a control in an edge cell, and columns wider than the frame. Append menus outside the table with the dropdown's [`container` option](/components/dropdowns/#options), and add `.table-responsive` to the wrapper when the table can be wider than it.
+</Callout>
+
 ## Small tables
 
 Add `.table-sm` to make any `.table` more compact by cutting all cell `padding` in half.
