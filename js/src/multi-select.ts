@@ -17,6 +17,7 @@ import {
   ownValidationState, setStateValidity, swapStateClass, type UserValidity, type ValidationState, writeDescribedBy
 } from './util/form-validation.js'
 import { CLEANER_ICON, PICKER_ICON } from './util/icons.js'
+import { flattenOptions, getSelectableOptions, isOptionGroup } from './util/option-tree.js'
 import { getAriaPressed, getSelectionState, type SelectionState } from './util/selection-state.js'
 import {
   DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList, SVGAllowlist
@@ -748,7 +749,7 @@ class MultiSelect extends ComboboxBase {
   _getOptionsFromConfig(options: any = this._config.options): any[] {
     const _options = []
     for (const option of options) {
-      if (this._isOptionGroup(option)) {
+      if (isOptionGroup(option)) {
         const customGroupProperties = { ...option }
 
         delete customGroupProperties.label
@@ -851,7 +852,7 @@ class MultiSelect extends ComboboxBase {
 
   _createNativeOptions(parentElement: HTMLElement, options: any[]): void {
     for (const option of options) {
-      if (this._isOptionGroup(option)) {
+      if (isOptionGroup(option)) {
         const optgroup = document.createElement('optgroup')
         optgroup.label = option.label
         this._createNativeOptions(optgroup, option.options)
@@ -1302,7 +1303,7 @@ class MultiSelect extends ComboboxBase {
         continue
       }
 
-      if (this._isOptionGroup(option)) {
+      if (isOptionGroup(option)) {
         if (this._selectAllOptions(option.options)) {
           return true
         }
@@ -1326,7 +1327,7 @@ class MultiSelect extends ComboboxBase {
         continue
       }
 
-      if (this._isOptionGroup(option)) {
+      if (isOptionGroup(option)) {
         this._deselectAllOptions(option.options)
         continue
       }
@@ -1347,12 +1348,8 @@ class MultiSelect extends ComboboxBase {
     return this._getDisplayedOptions().filter(element => !element.classList.contains(CLASS_NAME_DISABLED))
   }
 
-  _isOptionGroup(option: any): boolean {
-    return Array.isArray(option.options)
-  }
-
   _getSelectableOptionsCount(): number {
-    return this._flattenOptions().filter((option: any) => !option.disabled).length
+    return getSelectableOptions(this._options).length
   }
 
   _selectOption(value: any, text: string, { refresh = true }: { refresh?: boolean } = {}): void {
@@ -1468,7 +1465,7 @@ class MultiSelect extends ComboboxBase {
   }
 
   _restoreSelection(serial: number = Number.POSITIVE_INFINITY): void {
-    const options = this._flattenOptions()
+    const options = flattenOptions(this._options)
     const values = new Set(this._initialValues)
 
     this._selected = options

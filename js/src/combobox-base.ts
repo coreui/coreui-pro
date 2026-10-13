@@ -10,6 +10,7 @@ import ListBox from './list-box.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { createAnchoredPosition } from './util/floating-ui.js'
+import { isOptionGroup } from './util/option-tree.js'
 import { resolvePopupContainer } from './util/popup.js'
 import { escapeHtml } from './util/sanitizer.js'
 import { executeAfterTransition, getElement } from './util/index.js'
@@ -54,7 +55,7 @@ class ComboboxBase extends BaseComponent {
   protected declare _listBoxChangeHandler: (() => void) | null
   protected declare _menu: any
   protected declare _selected: any
-  protected declare _options: any
+  protected declare _options: any[]
   protected declare _search: any
   protected declare _syncing: boolean
   protected declare _floatingCleanup: (() => void) | null
@@ -341,7 +342,7 @@ class ComboboxBase extends BaseComponent {
 
   _getListBoxItems(options: any[] = this._options): any[] {
     return options.map((option: any) => {
-      if (Array.isArray(option.options)) {
+      if (isOptionGroup(option)) {
         return {
           label: this._renderGroupLabel(option),
           items: this._getListBoxItems(option.options)
@@ -456,26 +457,13 @@ class ComboboxBase extends BaseComponent {
 
   // Option model
 
-  _flattenOptions(options: any[] = this._options, flat: any[] = []): any[] {
-    for (const option of options) {
-      if (option && Array.isArray(option.options)) {
-        this._flattenOptions(option.options, flat)
-        continue
-      }
-
-      flat.push(option)
-    }
-
-    return flat
-  }
-
   _findOptionByValue(value: any, options: any[] = this._options): any {
     for (const option of options) {
       if (String(option.value) === String(value)) {
         return option
       }
 
-      if (option.options && Array.isArray(option.options)) {
+      if (isOptionGroup(option)) {
         const found = this._findOptionByValue(value, option.options)
         if (found) {
           return found

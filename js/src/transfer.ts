@@ -16,6 +16,7 @@ import {
 import {
   type CountLabel, defineJQueryPlugin, getUID, jQueryDispatch
 } from './util/index.js'
+import { getOptionValue } from './util/option-tree.js'
 import { sanitizeByConfig, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 
 /**
@@ -488,7 +489,7 @@ class Transfer extends BaseComponent {
   }
 
   _itemValue(item: ListBoxItem): string {
-    return String(item.value ?? item.label ?? '')
+    return getOptionValue(item)
   }
 
   _rankOptions(): void {

@@ -8,6 +8,7 @@
 import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
+import { getOptionValue } from './util/option-tree.js'
 import { DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList } from './util/sanitizer.js'
 import { getAriaPressed, getSelectionState, type SelectionState } from './util/selection-state.js'
 import {
@@ -626,7 +627,7 @@ class ListBox extends BaseComponent {
   }
 
   _normalizeItem(item: ListBoxItem): ListBoxItem {
-    const value = String(item.value ?? item.label ?? '')
+    const value = getOptionValue(item)
     const normalized: ListBoxItem = { value, label: String(item.label ?? value) }
 
     if (item.description !== undefined) {
