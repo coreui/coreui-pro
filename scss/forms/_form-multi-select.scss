@@ -112,23 +112,28 @@ $form-multi-select-tokens: defaults(
       }
     }
 
-    &:not(:focus-within, .form-multi-select-filled) {
-      .form-multi-select-placeholder {
-        color: transparent;
-      }
-
-      .form-multi-select-search::placeholder {
-        color: transparent;
-      }
-
-      ~ label {
-        transform: none;
-      }
-    }
-
     &:focus-within ~ label,
     &.form-multi-select-filled ~ label {
       transform: var(--#{$prefix}form-floating-label-transform);
+    }
+  }
+
+  .form-floating:is(.form-floating-always, .form-floating-always *) > .form-multi-select .form-multi-select-selection {
+    padding-top: var(--#{$prefix}form-floating-input-padding-t);
+    padding-bottom: var(--#{$prefix}form-floating-input-padding-b);
+  }
+
+  .form-floating:not(.form-floating-always, .form-floating-always *) > .form-multi-select:not(:focus-within, .form-multi-select-filled) {
+    .form-multi-select-placeholder {
+      color: transparent;
+    }
+
+    .form-multi-select-search::placeholder {
+      color: transparent;
+    }
+
+    ~ label {
+      transform: none;
     }
   }
 

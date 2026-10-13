@@ -8,7 +8,7 @@ otherFrameworks:
 
 ## Example
 
-Wrap a `<label>` and an `<input class="form-control" />` in `.form-floating` to enable floating labels with CoreUI for Bootstrap's textual form fields. A `placeholder` is required on each `<input />` as our method of CSS-only floating labels uses the `:placeholder-shown` pseudo-element.
+Wrap a `<label>` and an `<input class="form-control" />` in `.form-floating` to enable floating labels with CoreUI for Bootstrap's textual form fields. A `placeholder` is required on each `<input />` as our method of CSS-only floating labels uses the `:placeholder-shown` pseudo-element. The placeholder stays hidden while the label rests in the field, and shows under the floated label once the field has focus.
 
 Write the `<label>` first, so a screen reader announces it before the field's value. The v5 order — control first, label after — keeps working: every state is matched in both directions, forward with `:has()` and backward with the sibling combinator.
 
@@ -18,7 +18,7 @@ Write the `<label>` first, so a screen reader announces it before the field's va
   </div>
   <div class="form-floating">
     <label for="floatingPassword">Password</label>
-    <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
+    <input type="password" class="form-control" id="floatingPassword" placeholder="••••••••">
   </div>`} />
 
 When there's a `value` already defined, `<label>`s will automatically adjust to their floated position.
@@ -63,6 +63,19 @@ Other than `.form-control`, floating labels are only available on `.form-control
       <option value="2">Two</option>
       <option value="3">Three</option>
     </select>
+  </div>`} />
+
+## Date and time
+
+Date, time, datetime-local, month, and week inputs also always show the `<label>` in its floated state. These controls do not support placeholders the way textual inputs do, so a `placeholder` attribute is not required (and is ignored by most browsers on these types). For a field that formats its value by locale, use the [Date Picker](/forms/date-picker/#floating-labels) or the [Time Picker](/forms/time-picker/#floating-labels) with the `floatingLabel` option.
+
+<Example class="vstack gap-3" code={`<div class="form-floating">
+    <label for="floatingDate">Date</label>
+    <input type="date" class="form-control" id="floatingDate">
+  </div>
+  <div class="form-floating">
+    <label for="floatingTime">Time</label>
+    <input type="time" class="form-control" id="floatingTime">
   </div>`} />
 
 ## Disabled
@@ -112,7 +125,7 @@ Floating labels also support `.input-group` — put the `.form-floating` next to
     <span class="input-group-text">@</span>
     <div class="form-floating">
       <label for="floatingInputGroup1">Username</label>
-      <input type="text" class="form-control" id="floatingInputGroup1" placeholder="Username">
+      <input type="text" class="form-control" id="floatingInputGroup1" placeholder="mdo">
     </div>
   </div>`} />
 
@@ -123,13 +136,32 @@ When using `.input-group` and `.form-floating` along with form validation, wrap 
       <span class="input-group-text">@</span>
       <div class="form-floating is-invalid">
         <label for="floatingInputGroup2">Username</label>
-        <input type="text" class="form-control is-invalid" id="floatingInputGroup2" placeholder="Username" required>
+        <input type="text" class="form-control is-invalid" id="floatingInputGroup2" placeholder="mdo" required>
       </div>
     </div>
     <div class="invalid-feedback">
       Please choose a username.
     </div>
   </div>`} />
+
+## Always floating
+
+Add `.form-floating-always` to keep the label floated and show the placeholder. Use it on the `.form-floating` itself, or on any ancestor to cover every floating field inside.
+
+<Example class="vstack gap-3" code={`<div class="form-floating form-floating-always">
+    <label for="alwaysFloatingInput">Email address</label>
+    <input type="email" class="form-control" id="alwaysFloatingInput" placeholder="name@example.com">
+  </div>
+  <div class="form-floating form-floating-always">
+    <label for="alwaysFloatingPassword">Password</label>
+    <input type="password" class="form-control" id="alwaysFloatingPassword" placeholder="••••••••">
+  </div>`} />
+
+The date and time pickers build their `.form-floating` from the `floatingLabel` option, so put the class on the component element.
+
+<Example pro code={`<div class="form-floating-always" data-coreui-locale="en-US" data-coreui-floating-label="Delivery date" data-coreui-date-picker></div>`} />
+
+By default, placeholders stay transparent until the control is focused. With `.form-floating-always`, the placeholder stays visible in both states, so keep it short on a textarea, where the floated label covers its first line.
 
 ## Layout
 
