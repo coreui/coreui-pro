@@ -96,10 +96,6 @@ $form-floating-tokens: defaults(
     > .form-control-plaintext {
       padding: var(--#{$prefix}form-floating-padding-y) var(--#{$prefix}form-floating-padding-x);
 
-      &::placeholder {
-        color: transparent;
-      }
-
       &:focus,
       &:not(:placeholder-shown) {
         padding-top: var(--#{$prefix}form-floating-input-padding-t);
@@ -125,7 +121,8 @@ $form-floating-tokens: defaults(
     > .form-control:focus ~ label,
     > .form-control:not(.form-date-time, :placeholder-shown) ~ label,
     > .form-control-plaintext ~ label,
-    > .form-select ~ label {
+    > .form-select ~ label,
+    &:is(.form-floating-always, .form-floating-always *) > label {
       transform: var(--#{$prefix}form-floating-label-transform);
     }
     // Duplicated because `:-webkit-autofill` invalidates other selectors when grouped
@@ -155,12 +152,6 @@ $form-floating-tokens: defaults(
       > .form-control {
         padding-top: var(--#{$prefix}form-floating-padding-y);
         padding-bottom: var(--#{$prefix}form-floating-padding-y);
-
-        // Hidden until the label is out of the way, exactly as the direct-child
-        // rule above does it — otherwise the two overlap while the field is empty.
-        &::placeholder {
-          color: transparent;
-        }
       }
 
       &:focus-within > .form-control,
@@ -182,10 +173,34 @@ $form-floating-tokens: defaults(
       transform: var(--#{$prefix}form-floating-label-transform);
     }
 
+    &:is(.form-floating-always, .form-floating-always *) {
+      > :is(.form-control, .form-control-plaintext),
+      > .form-control-group > .form-control,
+      > .picker > .form-control-group > .form-control {
+        padding-top: var(--#{$prefix}form-floating-input-padding-t);
+        padding-bottom: var(--#{$prefix}form-floating-input-padding-b);
+      }
+    }
+
+    &:not(.form-floating-always, .form-floating-always *) {
+      > .form-control,
+      > .form-control-group > .form-control,
+      > .picker > .form-control-group > .form-control {
+        &:not(:focus)::placeholder {
+          color: transparent;
+        }
+      }
+    }
+
+    > .form-control-plaintext::placeholder {
+      color: transparent;
+    }
+
     > label:has(~ textarea:focus)::after,
     > label:has(~ textarea:not(:placeholder-shown))::after,
     > textarea:focus ~ label::after,
-    > textarea:not(:placeholder-shown) ~ label::after {
+    > textarea:not(:placeholder-shown) ~ label::after,
+    &:is(.form-floating-always, .form-floating-always *) > :is(label:has(~ textarea), textarea ~ label)::after {
       position: absolute;
       inset: var(--#{$prefix}form-floating-padding-y) calc(var(--#{$prefix}form-floating-padding-x) * .5);
       z-index: -1;

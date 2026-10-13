@@ -107,23 +107,23 @@ $form-date-time-tokens: defaults(
       padding-bottom: var(--#{$prefix}form-floating-input-padding-b);
     }
 
-    &:not(:focus-within, .form-date-time-filled) {
-      padding-top: var(--#{$prefix}form-floating-padding-y);
-      padding-bottom: var(--#{$prefix}form-floating-padding-y);
-
-      .form-date-time-section,
-      .form-date-time-separator {
-        color: transparent;
-      }
-
-      ~ label {
-        transform: none;
-      }
-    }
-
     &:focus-within ~ label,
     &.form-date-time-filled ~ label {
       transform: var(--#{$prefix}form-floating-label-transform);
+    }
+  }
+
+  .form-floating:not(.form-floating-always, .form-floating-always *) > .form-date-time:not(:focus-within, .form-date-time-filled) {
+    padding-top: var(--#{$prefix}form-floating-padding-y);
+    padding-bottom: var(--#{$prefix}form-floating-padding-y);
+
+    .form-date-time-section,
+    .form-date-time-separator {
+      color: transparent;
+    }
+
+    ~ label {
+      transform: none;
     }
   }
 
@@ -173,7 +173,9 @@ $form-date-time-tokens: defaults(
       padding-top: var(--#{$prefix}form-floating-input-padding-t);
       padding-bottom: var(--#{$prefix}form-floating-input-padding-b);
     }
+  }
 
+  .form-floating:not(.form-floating-always, .form-floating-always *) .form-control-group:has(> .form-date-time) {
     > .form-date-time:not(:focus-within, .form-date-time-filled) {
       .form-date-time-section,
       .form-date-time-separator {
@@ -188,12 +190,12 @@ $form-date-time-tokens: defaults(
 
   // The label is a sibling of whatever the wrapper holds — the frame itself,
   // or the picker around it.
+  .form-floating:not(.form-floating-always, .form-floating-always *) > :is(.form-control-group:has(> .form-date-time), .picker:has(> .form-control-group > .form-date-time)):not(:focus-within, :has(.form-date-time-filled)) ~ label {
+    transform: none;
+  }
+
   .form-floating > .form-control-group:has(> .form-date-time),
   .form-floating > .picker:has(> .form-control-group > .form-date-time) {
-    &:not(:focus-within, :has(.form-date-time-filled)) ~ label {
-      transform: none;
-    }
-
     &:focus-within ~ label,
     &:has(.form-date-time-filled) ~ label {
       transform: var(--#{$prefix}form-floating-label-transform);

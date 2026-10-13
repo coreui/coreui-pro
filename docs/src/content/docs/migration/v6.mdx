@@ -3131,6 +3131,15 @@ Multi Select's option indicators moved with it — they render as a decorative
 - **A textarea's label stays at the top.** The label is a flex box centred on the
   control, and `label:has(~ textarea)` anchors it to the start instead, so it
   floats correctly however tall the textarea is.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The placeholder shows once the field has focus.** It used to stay
+  transparent in every state; it now appears under the floated label while the
+  field, or the control inside a field component, has focus, and stays hidden
+  while the label rests in the field. A read-only `.form-control-plaintext`
+  keeps it hidden.
+- **New: `.form-floating-always`** keeps the label floated and the placeholder
+  showing while the field is empty. It works on `.form-floating` or on any
+  ancestor. See [Always floating](/forms/floating-labels/#always-floating).
 
 #### Lists
 
