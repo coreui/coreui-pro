@@ -278,6 +278,30 @@ describe('ChipSet', () => {
       expect(chipSet.getSelectedValues()).toEqual(['First', 'Second', 'Third'])
     })
 
+    it('should keep the anchor for the next Shift+click after a range', () => {
+      const el = setMarkup(['First', 'Second', 'Third', 'Fourth', 'Fifth'])
+      const chipSet = new ChipSet(el, { selectable: true })
+
+      const chips = el.querySelectorAll('.chip')
+      chips[0].click()
+      chips[2].dispatchEvent(new MouseEvent('click', { bubbles: true, shiftKey: true }))
+      chips[4].dispatchEvent(new MouseEvent('click', { bubbles: true, shiftKey: true }))
+
+      expect(chipSet.getSelectedValues()).toEqual(['First', 'Second', 'Third', 'Fourth', 'Fifth'])
+    })
+
+    it('should keep the anchor for a Shift+click after the selection is cleared', () => {
+      const el = setMarkup(['First', 'Second', 'Third'])
+      const chipSet = new ChipSet(el, { selectable: true })
+
+      const chips = el.querySelectorAll('.chip')
+      chips[0].click()
+      chipSet.clearSelection()
+      chips[2].dispatchEvent(new MouseEvent('click', { bubbles: true, shiftKey: true }))
+
+      expect(chipSet.getSelectedValues()).toEqual(['First', 'Second', 'Third'])
+    })
+
     it('should move focus to the chip matching the typed characters', () => {
       const el = setMarkup(['Alpha', 'Beta', 'Gamma'])
       // eslint-disable-next-line no-new
