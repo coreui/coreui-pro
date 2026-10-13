@@ -774,6 +774,46 @@ describe('Autocomplete', () => {
       }
     })
 
+    it.each([['leaving the field', 'blur'], ['Enter', 'enter']])('should take the option a label with spaces around it names on %s, and hint from the trimmed start', (_, how) => {
+      const { autocomplete, input } = mountInForm({ allowOnlyDefinedOptions: true, options: ['Apple', 'Banana'], showHints: true })
+
+      typeInto(input, '  app')
+
+      expect(autocomplete._inputHintElement.value).toBe('  apple')
+
+      typeInto(input, 'Apple ')
+
+      if (how === 'blur') {
+        input.dispatchEvent(new FocusEvent('blur'))
+      } else {
+        input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }))
+      }
+
+      expect(autocomplete._selected.map(option => option.label)).toEqual(['Apple'])
+    })
+
+    it.each([['leaving the field', 'blur'], ['Enter', 'enter']])('should open on a padded query, hint nothing for spaces alone and confirm a label padded on its own side on %s', (_, how) => {
+      const { autocomplete, input } = mountInForm({ allowOnlyDefinedOptions: true, options: [{ label: 'Apple ', value: 'apple' }, 'Banana'], showHints: true })
+
+      typeInto(input, '   ')
+
+      expect(autocomplete._inputHintElement.value).toBe('')
+
+      typeInto(input, '  app')
+
+      expect(autocomplete._isShown()).toBeTrue()
+
+      typeInto(input, 'apple')
+
+      if (how === 'blur') {
+        input.dispatchEvent(new FocusEvent('blur'))
+      } else {
+        input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }))
+      }
+
+      expect(autocomplete._selected.map(option => option.value)).toEqual(['apple'])
+    })
+
     it('should keep a given state when an input leaves the text as it was', () => {
       const { autocomplete, element, input } = mountInForm()
       typeInto(input, 'Germany')
@@ -1640,6 +1680,16 @@ describe('Autocomplete', () => {
       const highlighted = autocomplete._highlightOption('Option 1')
 
       expect(highlighted).toBe('<strong>Opt</strong>ion 1')
+    })
+
+    it('should read the search trimmed', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, { options: [] })
+
+      autocomplete._search = '  opt '
+
+      expect(autocomplete._highlightOption('Option 1')).toBe('<strong>Opt</strong>ion 1')
     })
 
     it('should highlight multiple matches', () => {

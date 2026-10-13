@@ -8,7 +8,7 @@
 import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
-import { getOptionValue } from './util/option-tree.js'
+import { getOptionValue, normalizeSearchText } from './util/option-tree.js'
 import { DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList } from './util/sanitizer.js'
 import { getAriaPressed, getSelectionState, type SelectionState } from './util/selection-state.js'
 import {
@@ -331,7 +331,7 @@ class ListBox extends BaseComponent {
   }
 
   filter(query: string | null): void {
-    this._query = query === null ? null : this._normalizeText(query.trim().toLowerCase())
+    this._query = query === null ? null : normalizeSearchText(query, this._config.searchNormalize)
 
     if (this._query === null) {
       for (const element of [...this._allOptions(), ...SelectorEngine.find(SELECTOR_SECTION, this._list)]) {
@@ -574,19 +574,15 @@ class ListBox extends BaseComponent {
       return
     }
 
-    const query = this._query ?? this._normalizeText(this._searchField!.value.trim().toLowerCase())
+    const query = this._query ?? normalizeSearchText(this._searchField!.value, this._config.searchNormalize)
 
     for (const option of this._allOptions()) {
-      option.toggleAttribute('hidden', query !== '' && !this._normalizeText(this._optionText(option)).includes(query))
+      option.toggleAttribute('hidden', query !== '' && !normalizeSearchText(this._optionText(option), this._config.searchNormalize).includes(query))
     }
 
     for (const section of SelectorEngine.find(SELECTOR_SECTION, this._list)) {
       section.toggleAttribute('hidden', SelectorEngine.find(SELECTOR_OPTION, section).every(option => option.hasAttribute('hidden')))
     }
-  }
-
-  _normalizeText(text: string): string {
-    return this._config.searchNormalize ? text.normalize('NFD').replaceAll(/[\u0300-\u036F]/g, '') : text
   }
 
   _initialSelection(): string[] {
