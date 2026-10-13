@@ -2423,6 +2423,41 @@ describe('OTPInput', () => {
       expect(inputs.map(input => input.value)).toEqual(['1', '2', '3', '4'])
     })
 
+    it('should spread a formatted code inserted at once before the slot length cuts it', async () => {
+      const otpContainer = markup()
+      new OTPInput(otpContainer, { type: 'number', name: 'code' }) // eslint-disable-line no-new
+
+      const inputs = [...otpContainer.querySelectorAll('.form-otp-control')]
+      await userEvent.fill(inputs[0], '123 456')
+
+      expect(inputs.map(input => input.value)).toEqual(['1', '2', '3', '4', '5', '6'])
+      expect(otpContainer.querySelector('.form-otp > input:not(.form-otp-control)').value).toEqual('123456')
+    })
+
+    it('should spread a partial code inserted at once from the slot that received it', async () => {
+      const otpContainer = markup()
+      new OTPInput(otpContainer, { type: 'number', name: 'code' }) // eslint-disable-line no-new
+
+      const inputs = [...otpContainer.querySelectorAll('.form-otp-control')]
+      await userEvent.fill(inputs[0], '9')
+      await userEvent.fill(inputs[1], '8')
+      await userEvent.fill(inputs[2], '4-5')
+
+      expect(inputs.map(input => input.value)).toEqual(['9', '8', '4', '5', '', ''])
+    })
+
+    it('should keep the slot value when text inserted at once has no valid character', async () => {
+      const otpContainer = markup(4)
+      new OTPInput(otpContainer, { type: 'number', name: 'code' }) // eslint-disable-line no-new
+
+      const inputs = [...otpContainer.querySelectorAll('.form-otp-control')]
+      inputs[0].value = '5'
+      inputs[0].dispatchEvent(new Event('input', { bubbles: true }))
+      await userEvent.fill(inputs[0], 'ab')
+
+      expect(inputs.map(input => input.value)).toEqual(['5', '', '', ''])
+    })
+
     it('should keep already filled slots when a partial code is pasted', () => {
       const otpContainer = markup(4)
       new OTPInput(otpContainer, { type: 'number', name: 'code' }) // eslint-disable-line no-new

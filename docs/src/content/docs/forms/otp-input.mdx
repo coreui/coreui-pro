@@ -365,6 +365,7 @@ The one-time password input component is designed with accessibility in mind and
 - **Screen Reader Support**: Clear announcements when values change; while the state is `'invalid'`, every slot carries `aria-invalid="true"` and the error message after the group
 - **Focus Management**: Automatic focus handling for seamless navigation
 - **Autofill**: only the first field advertises `autocomplete="one-time-code"`, so SMS autofill and password managers target a single field; a code delivered that way is spread across the slots automatically, exactly like a paste
+- **Text entered at once**: a code that dictation or an input method enters in one step, separators included, is cleaned and spread across the slots the same way, before the slot's length can cut it
 
 ### Customizing accessibility
 

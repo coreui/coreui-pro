@@ -262,9 +262,24 @@ class OTPInput extends BaseComponent {
   // Private
   _addEventListeners(): void {
     EventHandler.on(this._element, EVENT_BEFORE_INPUT, SELECTOR_FORM_OTP_CONTROL, event => {
-      const { data, inputType } = event as unknown as { data: string | null, inputType: string }
+      const { data, inputType, target } = event as unknown as { data: string | null, inputType: string, target: HTMLInputElement }
 
-      if (inputType === 'insertText' && data && data.length === 1 && !this._isValidInput(data)) {
+      if (!data || !['insertText', 'insertReplacementText'].includes(inputType)) {
+        return
+      }
+
+      if (data.length > 1) {
+        event.preventDefault()
+        const chars = this._extractValidChars(data)
+
+        if (chars) {
+          this._distributeChars(target, chars)
+        }
+
+        return
+      }
+
+      if (inputType === 'insertText' && !this._isValidInput(data)) {
         event.preventDefault()
       }
     })
