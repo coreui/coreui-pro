@@ -1410,6 +1410,88 @@ describe('Modal', () => {
         dialog.show()
       })
     })
+
+    it('should remove hiding class when disposed during the exit transition', async () => {
+      fixtureEl.innerHTML = '<dialog class="modal"></dialog>'
+
+      const modalEl = fixtureEl.querySelector('.modal')
+      const modal = new Modal(modalEl)
+      const shown = new Promise(resolve => {
+        modalEl.addEventListener('shown.coreui.modal', resolve, { once: true })
+      })
+
+      modal.show()
+      await shown
+      modal.hide()
+
+      expect(modalEl.classList.contains('hiding')).toBeTrue()
+
+      modal.dispose()
+
+      expect(modalEl.classList.contains('hiding')).toBeFalse()
+    })
+
+    it('should fire hidden once and release the scroll when closed during the exit transition', async () => {
+      fixtureEl.innerHTML = '<dialog class="modal"></dialog>'
+
+      const modalEl = fixtureEl.querySelector('.modal')
+      const modal = new Modal(modalEl)
+      const shown = new Promise(resolve => {
+        modalEl.addEventListener('shown.coreui.modal', resolve, { once: true })
+      })
+      let hiddenCount = 0
+
+      modalEl.addEventListener('hidden.coreui.modal', () => {
+        hiddenCount++
+      })
+
+      modal.show()
+      await shown
+      modal.hide()
+      modalEl.close()
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect(hiddenCount).toEqual(1)
+      expect(document.documentElement.classList.contains('dialog-open')).toBeFalse()
+    })
+
+    it('should release the scroll and still catch a later native close when the exit loses the open attribute', async () => {
+      fixtureEl.innerHTML = '<dialog class="modal"></dialog>'
+
+      const modalEl = fixtureEl.querySelector('.modal')
+      const modal = new Modal(modalEl)
+      const next = type => new Promise(resolve => {
+        modalEl.addEventListener(`${type}.coreui.modal`, resolve, { once: true })
+      })
+      let hiddenCount = 0
+
+      let shown = next('shown')
+      modal.show()
+      await shown
+
+      const hidden = next('hidden')
+      modal.hide()
+      modalEl.removeAttribute('open')
+      await hidden
+
+      expect(document.documentElement.classList.contains('dialog-open')).toBeFalse()
+
+      shown = next('shown')
+      modal.show()
+      await shown
+      modalEl.addEventListener('hidden.coreui.modal', () => {
+        hiddenCount++
+      })
+      modalEl.close()
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect(hiddenCount).toEqual(1)
+      expect(document.documentElement.classList.contains('dialog-open')).toBeFalse()
+    })
   })
 
   describe('hidePrevented', () => {

@@ -1091,6 +1091,88 @@ describe('Offcanvas', () => {
         drawer.show()
       })
     })
+
+    it('should remove hiding class when disposed during the exit transition', async () => {
+      fixtureEl.innerHTML = '<dialog class="offcanvas"></dialog>'
+
+      const offcanvasEl = fixtureEl.querySelector('.offcanvas')
+      const offcanvas = new Offcanvas(offcanvasEl)
+      const shown = new Promise(resolve => {
+        offcanvasEl.addEventListener('shown.coreui.offcanvas', resolve, { once: true })
+      })
+
+      offcanvas.show()
+      await shown
+      offcanvas.hide()
+
+      expect(offcanvasEl.classList.contains('hiding')).toBeTrue()
+
+      offcanvas.dispose()
+
+      expect(offcanvasEl.classList.contains('hiding')).toBeFalse()
+    })
+
+    it('should fire hidden once and release the scroll when closed during the exit transition', async () => {
+      fixtureEl.innerHTML = '<dialog class="offcanvas"></dialog>'
+
+      const offcanvasEl = fixtureEl.querySelector('.offcanvas')
+      const offcanvas = new Offcanvas(offcanvasEl)
+      const shown = new Promise(resolve => {
+        offcanvasEl.addEventListener('shown.coreui.offcanvas', resolve, { once: true })
+      })
+      let hiddenCount = 0
+
+      offcanvasEl.addEventListener('hidden.coreui.offcanvas', () => {
+        hiddenCount++
+      })
+
+      offcanvas.show()
+      await shown
+      offcanvas.hide()
+      offcanvasEl.close()
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect(hiddenCount).toEqual(1)
+      expect(document.documentElement.classList.contains('dialog-open')).toBeFalse()
+    })
+
+    it('should release the scroll and still catch a later native close when the exit loses the open attribute', async () => {
+      fixtureEl.innerHTML = '<dialog class="offcanvas"></dialog>'
+
+      const offcanvasEl = fixtureEl.querySelector('.offcanvas')
+      const offcanvas = new Offcanvas(offcanvasEl)
+      const next = type => new Promise(resolve => {
+        offcanvasEl.addEventListener(`${type}.coreui.offcanvas`, resolve, { once: true })
+      })
+      let hiddenCount = 0
+
+      let shown = next('shown')
+      offcanvas.show()
+      await shown
+
+      const hidden = next('hidden')
+      offcanvas.hide()
+      offcanvasEl.removeAttribute('open')
+      await hidden
+
+      expect(document.documentElement.classList.contains('dialog-open')).toBeFalse()
+
+      shown = next('shown')
+      offcanvas.show()
+      await shown
+      offcanvasEl.addEventListener('hidden.coreui.offcanvas', () => {
+        hiddenCount++
+      })
+      offcanvasEl.close()
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect(hiddenCount).toEqual(1)
+      expect(document.documentElement.classList.contains('dialog-open')).toBeFalse()
+    })
   })
 
   describe('offcanvas-static class', () => {

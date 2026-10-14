@@ -52,6 +52,7 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
   protected declare _isTransitioning: boolean
   protected declare _openedAsModal: boolean
   protected declare _closedByComponent: boolean
+  protected declare _hiddenByComponent: boolean
   protected declare _cancelHandler: (event: Event) => void
   protected declare _closeHandler: (event: Event) => void
   protected declare _resizeObserver: ResizeObserver | null
@@ -63,6 +64,7 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
     this._isTransitioning = false
     this._openedAsModal = false
     this._closedByComponent = false
+    this._hiddenByComponent = false
     this._resizeObserver = null
     this._resizeFrame = null
     this._addDialogListeners()
@@ -114,6 +116,7 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
 
   protected async _show(relatedTarget?: HTMLElement | null): Promise<void> {
     this._isTransitioning = true
+    this._hiddenByComponent = false
     this._onBeforeShow()
 
     const { modal, preventBodyScroll } = this._getShowOptions()
@@ -137,15 +140,18 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
 
   protected async _hide(): Promise<void> {
     this._isTransitioning = true
+    this._hiddenByComponent = true
     this._hideElement()
 
     await this._queueCallback(() => {
-      // Subclasses that defer close() until the exit transition ends (so the
-      // dialog stays in the top layer with its ::backdrop) close here instead
-      // of in _hideElement().
-      if (this._element.open) {
-        this._closeAndCleanup()
-      }
+      // For subclasses that defer close() until the exit transition ends
+      // (so the dialog stays in the top layer with its ::backdrop), close()
+      // happens here instead of in _hideElement(). It runs unconditionally:
+      // _closeAndCleanup() is a no-op on an already-closed dialog, and skipping
+      // it when something else closed the dialog during the exit (app code,
+      // a <form method="dialog"> submit) would leave scroll prevention
+      // (dialog-open) stuck on the root element.
+      this._closeAndCleanup()
 
       this._finishHide()
     }, this._element, this._isAnimated())
@@ -164,6 +170,12 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
     if (this._element.open) {
       this._closeAndCleanup()
     }
+
+    // `_queueCallback` skips its completion callback once the instance is
+    // disposed, so nothing else would clear the exit state. A stranded
+    // `.hiding` suppresses the `[open]:not(.hiding)` open state, which would
+    // leave a later instance on the same element showing an invisible dialog.
+    this._element.classList.remove(CLASS_NAME_HIDING)
 
     // The `cancel` and `close` listeners are unnamespaced, so super.dispose()'s
     // EVENT_KEY teardown misses them.
@@ -357,6 +369,10 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
     this._closeHandler = () => {
       if (this._closedByComponent) {
         this._closedByComponent = false
+        return
+      }
+
+      if (this._hiddenByComponent) {
         return
       }
 

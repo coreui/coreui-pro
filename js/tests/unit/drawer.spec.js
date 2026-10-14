@@ -1091,6 +1091,88 @@ describe('Drawer', () => {
         drawer.show()
       })
     })
+
+    it('should remove hiding class when disposed during the exit transition', async () => {
+      fixtureEl.innerHTML = '<dialog class="drawer"></dialog>'
+
+      const drawerEl = fixtureEl.querySelector('.drawer')
+      const drawer = new Drawer(drawerEl)
+      const shown = new Promise(resolve => {
+        drawerEl.addEventListener('shown.coreui.drawer', resolve, { once: true })
+      })
+
+      drawer.show()
+      await shown
+      drawer.hide()
+
+      expect(drawerEl.classList.contains('hiding')).toBeTrue()
+
+      drawer.dispose()
+
+      expect(drawerEl.classList.contains('hiding')).toBeFalse()
+    })
+
+    it('should fire hidden once and release the scroll when closed during the exit transition', async () => {
+      fixtureEl.innerHTML = '<dialog class="drawer"></dialog>'
+
+      const drawerEl = fixtureEl.querySelector('.drawer')
+      const drawer = new Drawer(drawerEl)
+      const shown = new Promise(resolve => {
+        drawerEl.addEventListener('shown.coreui.drawer', resolve, { once: true })
+      })
+      let hiddenCount = 0
+
+      drawerEl.addEventListener('hidden.coreui.drawer', () => {
+        hiddenCount++
+      })
+
+      drawer.show()
+      await shown
+      drawer.hide()
+      drawerEl.close()
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect(hiddenCount).toEqual(1)
+      expect(document.documentElement.classList.contains('dialog-open')).toBeFalse()
+    })
+
+    it('should release the scroll and still catch a later native close when the exit loses the open attribute', async () => {
+      fixtureEl.innerHTML = '<dialog class="drawer"></dialog>'
+
+      const drawerEl = fixtureEl.querySelector('.drawer')
+      const drawer = new Drawer(drawerEl)
+      const next = type => new Promise(resolve => {
+        drawerEl.addEventListener(`${type}.coreui.drawer`, resolve, { once: true })
+      })
+      let hiddenCount = 0
+
+      let shown = next('shown')
+      drawer.show()
+      await shown
+
+      const hidden = next('hidden')
+      drawer.hide()
+      drawerEl.removeAttribute('open')
+      await hidden
+
+      expect(document.documentElement.classList.contains('dialog-open')).toBeFalse()
+
+      shown = next('shown')
+      drawer.show()
+      await shown
+      drawerEl.addEventListener('hidden.coreui.drawer', () => {
+        hiddenCount++
+      })
+      drawerEl.close()
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect(hiddenCount).toEqual(1)
+      expect(document.documentElement.classList.contains('dialog-open')).toBeFalse()
+    })
   })
 
   describe('drawer-static class', () => {
