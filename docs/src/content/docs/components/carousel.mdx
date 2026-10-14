@@ -301,7 +301,7 @@ The `ends` option decides what happens past the last (or before the first) slide
 
 - `loop` (default) — continues seamlessly in the same direction where the layout allows it (single slide, no peek, no centering), and falls back to `wrap` elsewhere.
 - `wrap` — jumps back to the other end.
-- `stop` — hard stops: the matching control is disabled at each end, so there are no dead buttons.
+- `stop` — hard stops: the matching control is disabled at each end, so there are no dead buttons. When the control being disabled has focus, focus moves to the other control. Without one it moves to the viewport if that can take focus, and otherwise leaves the control.
 
 <Example code={`<div id="carouselExampleEnds" class="carousel" data-coreui-ends="stop">
     <div class="carousel-inner">

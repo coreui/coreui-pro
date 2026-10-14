@@ -710,8 +710,14 @@ class Carousel extends BaseComponent {
       atEnd = this._activeIndex >= last
     }
 
-    this._setControlsDisabled(this._prevControls, atStart)
-    this._setControlsDisabled(this._nextControls, atEnd)
+    // Enable before disabling, so a focused control can hand focus to the other one.
+    if (atStart) {
+      this._setControlsDisabled(this._nextControls, atEnd)
+      this._setControlsDisabled(this._prevControls, atStart)
+    } else {
+      this._setControlsDisabled(this._prevControls, atStart)
+      this._setControlsDisabled(this._nextControls, atEnd)
+    }
   }
 
   protected _setControlsDisabled(controls: HTMLButtonElement[], disabled: boolean): void {
@@ -724,6 +730,12 @@ class Carousel extends BaseComponent {
         // `preventScroll` so moving focus doesn't yank the page/viewport to the
         // newly-focused control mid-navigation.
         fallback.focus({ preventScroll: true })
+
+        // The viewport isn't focusable without a `tabindex`: don't leave focus
+        // on a control we're disabling, browsers differ on when they drop it.
+        if (document.activeElement === control) {
+          control.blur()
+        }
       }
 
       control.disabled = disabled
