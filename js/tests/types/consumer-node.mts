@@ -14,6 +14,7 @@ import Dropdown from '@coreui/coreui-pro/js/dist/dropdown.js'
 import Tooltip from '@coreui/coreui-pro/js/src/tooltip.js'
 import { announce } from '@coreui/coreui-pro/utils/announce'
 import { createDate } from '@coreui/coreui-pro/utils/calendar'
+import { appendChipValues } from '@coreui/coreui-pro/utils/chip-values'
 import { getSectionLayout } from '@coreui/coreui-pro/utils/date-sections'
 import { onLabelClick } from '@coreui/coreui-pro/utils/field-label'
 import { focusFirstInvalidControl } from '@coreui/coreui-pro/utils/form-validation'
@@ -31,6 +32,7 @@ rootAnnounce('Saved', { context: element, timeout: 1000 })()
 // @ts-expect-error — 'high' is not a priority
 announce('Saved', { priority: 'high' })
 createDate(2026, 0, 1).getFullYear()
+appendChipValues(['a'], ['b'], 2).at(-1)
 getSectionLayout('dd.MM.yyyy', 'en-US')
 onLabelClick(element, () => {})()
 focusFirstInvalidControl(document.createElement('form'))

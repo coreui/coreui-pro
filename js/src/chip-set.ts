@@ -11,6 +11,7 @@ import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { announce } from './util/announce.js'
+import { resolveChipClassName } from './util/chip-values.js'
 import { CHECK_ICON, REMOVE_ICON } from './util/icons.js'
 import {
   createTypeaheadBuffer, findTypeaheadMatch, rangeBetween, type TypeaheadBuffer
@@ -469,26 +470,12 @@ class ChipSet extends BaseComponent {
   }
 
   _applyChipClassName(chip: HTMLElement, value: string): void {
-    const className = this._resolveChipClassName(value)
+    const className = resolveChipClassName(this._config.chipClassName, value)
     if (!className) {
       return
     }
 
     chip.classList.add(...className.split(/\s+/).filter(Boolean))
-  }
-
-  _resolveChipClassName(value: string): string {
-    const { chipClassName } = this._config
-    if (!chipClassName) {
-      return ''
-    }
-
-    if (typeof chipClassName === 'function') {
-      const resolvedClassName = chipClassName(value)
-      return typeof resolvedClassName === 'string' ? resolvedClassName : ''
-    }
-
-    return typeof chipClassName === 'string' ? chipClassName : ''
   }
 
   _addEventListeners(): void {

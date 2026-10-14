@@ -1425,6 +1425,19 @@ describe('ChipInput', () => {
       expect(chipInput._input.value).toEqual('')
     })
 
+    it('should keep the text after the last separator in the field', () => {
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
+
+      const el = fixtureEl.querySelector('.chip-input')
+      const chipInput = new ChipInput(el)
+
+      chipInput._input.value = 'one, two,three'
+      chipInput._input.dispatchEvent(new InputEvent('input', { bubbles: true }))
+
+      expect(chipInput.getValues()).toEqual(['one', 'two'])
+      expect(chipInput._input.value).toEqual('three')
+    })
+
     it('should split pasted text by separator', () => {
       fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
@@ -1456,6 +1469,16 @@ describe('ChipInput', () => {
       pasteEvent.clipboardData.setData('text/plain', 'First,Second')
       chipInput._input.dispatchEvent(pasteEvent)
 
+      expect(chipInput.getValues()).toEqual([])
+    })
+
+    it('should ignore a paste without clipboard data when separator is null', () => {
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
+
+      const el = fixtureEl.querySelector('.chip-input')
+      const chipInput = new ChipInput(el, { separator: null })
+
+      expect(() => chipInput._input.dispatchEvent(new ClipboardEvent('paste', { bubbles: true }))).not.toThrow()
       expect(chipInput.getValues()).toEqual([])
     })
   })

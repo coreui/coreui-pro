@@ -10,6 +10,7 @@ import ChipSet, { type ChipSetConfig } from './chip-set.js'
 import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
+import { splitChipText } from './util/chip-values.js'
 import { applyControlGroupClasses } from './util/form-control-group.js'
 import {
   configureValueField, createValueField, dispatchValueChange, followUserValidity, getFeedbackIds, getServerState,
@@ -551,18 +552,18 @@ class ChipInput extends ChipSet {
       return
     }
 
-    const { value } = event.target
-    const { separator } = this._config
+    const parts = this._config.create ? splitChipText(event.target.value, this._config.separator) : null
 
-    if (this._config.create && separator && value.includes(separator)) {
-      const parts = value.split(separator)
+    if (parts) {
+      const rest = parts.pop() as string
+
       this._runAsUser(() => {
-        for (const part of parts.slice(0, -1)) {
-          this.add(part.trim())
+        for (const part of parts) {
+          this.add(part)
         }
       })
 
-      this._input.value = parts[parts.length - 1]
+      this._input.value = rest
     }
 
     this._setInputSize()
@@ -577,19 +578,18 @@ class ChipInput extends ChipSet {
       return
     }
 
-    const { separator } = this._config
-    if (!separator || !this._config.create) {
+    if (!this._config.create || !this._config.separator) {
       return
     }
 
-    const pastedData = (event.clipboardData || (window as any).clipboardData).getData('text')
-    if (pastedData.includes(separator)) {
+    const parts = splitChipText((event.clipboardData || (window as any).clipboardData).getData('text'), this._config.separator)
+
+    if (parts) {
       event.preventDefault()
 
-      const parts = pastedData.split(separator)
       this._runAsUser(() => {
         for (const part of parts) {
-          this.add(part.trim())
+          this.add(part)
         }
       })
     }
