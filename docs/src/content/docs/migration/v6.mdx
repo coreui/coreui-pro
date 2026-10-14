@@ -3252,12 +3252,15 @@ Multi Select's option indicators moved with it — they render as a decorative
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **A card is roomier and framed in the solid border colour.**
   `--cui-card-spacer-y` / `-x` go from `1rem` to `--cui-spacer-6` (`1.25rem`),
-  and the image-overlay padding follows them. The border reads
-  `--cui-border-color` instead of `--cui-border-color-translucent`, except on
-  `.card-translucent`, and the radius is `--cui-radius-7` (see the radius
-  scale below). The header and footer padding stays `.5rem` / `1rem`. To
-  keep the v5 spacing, set `--cui-card-spacer-y` and `-x` to
-  `var(--cui-spacer-5)` on `.card`.
+  and the image-overlay padding follows them. The header, the footer and a
+  list group placed directly in the card take `--cui-card-spacer-x` as their
+  inline padding, so their text lines up with the body; the header and footer
+  keep `.5rem` of block padding. The border reads `--cui-border-color` instead
+  of `--cui-border-color-translucent`, except on `.card-translucent`, and the
+  radius is `--cui-radius-7` (see the radius scale below). A card filled with
+  `.text-bg-*` keeps that neutral frame; add the matching `.border-{color}` to
+  frame it in the fill colour. To keep the v5 spacing, set
+  `--cui-card-spacer-y` and `-x` to `var(--cui-spacer-5)` on `.card`.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **`.card-header-pills` is gone.** It only pulled the pill row out to the
   header's padding edge, which is wrong for pills — they carry their own

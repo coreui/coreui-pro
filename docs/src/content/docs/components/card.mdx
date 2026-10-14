@@ -392,7 +392,7 @@ Add `.card-row` to lay a card out along the inline axis. The sections sit side b
 
 Cards include various options for customizing their backgrounds, borders, and color.
 
-These are general-purpose utilities applied to the card as a whole: `.text-bg-*` fills the card's own background and leaves the header and footer on their neutral caps. To color the caps instead — or to color one section on its own — reach for [theme variants](#theme-variants).
+These are general-purpose utilities applied to the card as a whole: `.text-bg-*` fills the card's own background and leaves the frame, the header and the footer neutral; add the matching `.border-{color}` to frame the card in the fill color. To color the caps instead — or to color one section on its own — reach for [theme variants](#theme-variants).
 
 ### Background and color
 
@@ -400,7 +400,7 @@ These are general-purpose utilities applied to the card as a whole: `.text-bg-*`
 
 Set a `background-color` with contrasting foreground `color` with [our `.text-bg-{color}` helpers](/helpers/color-background/). Previously it was required to manually pair your choice of [`.text-{color}`](/utilities/colors/) and [`.bg-{color}`](/utilities/background/) utilities for styling, which you still may use if you prefer.
 
-<Example code={getData('theme-colors').map((c) => `<div class="card text-bg-${c.name} mb-4" style="max-width: 18rem;">
+<Example code={getData('theme-colors').map((c) => `<div class="card text-bg-${c.name} border-${c.name} mb-4" style="max-width: 18rem;">
     <div class="card-header">Header</div>
     <div class="card-body">
       <h5 class="card-title">${c.title} card title</h5>

@@ -24,7 +24,7 @@ $card-tokens: defaults(
     --#{$prefix}card-box-shadow: none,
     --#{$prefix}card-inner-border-radius: calc(var(--#{$prefix}card-border-radius) - var(--#{$prefix}card-border-width)),
     --#{$prefix}card-cap-padding-y: var(--#{$prefix}spacer-3),
-    --#{$prefix}card-cap-padding-x: var(--#{$prefix}spacer-5),
+    --#{$prefix}card-cap-padding-x: var(--#{$prefix}card-spacer-x),
     --#{$prefix}card-cap-bg: var(--#{$prefix}bg-1),
     --#{$prefix}card-cap-color: inherit,
     --#{$prefix}card-height: auto,
@@ -61,6 +61,8 @@ $card-tokens: defaults(
     }
 
     > .list-group {
+      --#{$prefix}list-group-item-padding-x: var(--#{$prefix}card-spacer-x);
+
       &:first-child {
         @include border-top-radius(var(--#{$prefix}card-inner-border-radius));
       }
