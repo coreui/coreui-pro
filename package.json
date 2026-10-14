@@ -156,6 +156,16 @@
         "default": "./js/dist/util/calendar.js"
       }
     },
+    "./utils/chip-values": {
+      "import": {
+        "types": "./js/dist/util/chip-values.d.mts",
+        "default": "./js/dist/util/chip-values.mjs"
+      },
+      "require": {
+        "types": "./js/dist/util/chip-values.d.ts",
+        "default": "./js/dist/util/chip-values.js"
+      }
+    },
     "./utils/date-sections": {
       "import": {
         "types": "./js/dist/util/date-sections.d.mts",
