@@ -62,7 +62,7 @@ Each sets **one** custom property. The track's width follows its height through 
 Any other size is that one property:
 
 ```html
-<input class="switch" type="checkbox" role="switch" style="--cui-switch-height: 2rem">
+<input class="switch" type="checkbox" role="switch" style="--cui-switch-height: 2rem" aria-label="...">
 ```
 
 `--cui-switch-width` defaults to `calc(var(--cui-switch-height) * 1.75)`, so redefining it against the height changes the proportion of every size at once.
@@ -76,6 +76,12 @@ The switch reads its size from two tokens, so a wider switch with a larger thumb
     </div>
     <label for="switchCustomWidth">Custom width switch</label>
   </div>`} />
+
+## Without a label
+
+A switch with no label text is the input on its own. Give it an accessible name some other way — `aria-label`, for instance. The name says what the switch turns on or off, like `aria-label="Email notifications"`, and replaces the `...` placeholder in the example below. See the [forms overview](/forms/overview/#accessibility) for details.
+
+<Example code={`<input class="switch" type="checkbox" role="switch" id="switchNoLabel" aria-label="...">`} />
 
 ## With form field
 

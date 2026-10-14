@@ -98,12 +98,12 @@ There is no inline modifier: the control is an inline element, so a row is a fle
 Any other size is one custom property, and the alignment follows it:
 
 ```html
-<input class="radio" type="radio" style="--cui-radio-size: 2em">
+<input class="radio" type="radio" style="--cui-radio-size: 2em" aria-label="...">
 ```
 
 ## Without a label
 
-A radio with no label text is the input on its own. Give it an accessible name some other way — `aria-label`, for instance. See the [forms overview](/forms/overview/#accessibility) for details.
+A radio with no label text is the input on its own. Give it an accessible name some other way — `aria-label`, for instance. The name says what the option is, like `aria-label="Red"` in a color picker, and replaces the `...` placeholder in the example below. See the [forms overview](/forms/overview/#accessibility) for details.
 
 <Example code={`<input class="radio" type="radio" name="radioNoLabel" id="radioNoLabel1" value="" aria-label="...">`} />
 
