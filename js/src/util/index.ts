@@ -29,9 +29,11 @@ const MILLISECONDS_MULTIPLIER = 1000
 const TRANSITION_END = 'transitionend'
 
 /**
- * Properly escape IDs selectors to handle weird IDs
- * @param {string} selector
- * @returns {string}
+ * Properly escapes ID selectors to handle special characters in IDs
+ * (e.g. forward slashes, periods) so that they work with `document.querySelector`.
+ *
+ * @param selector - The selector to escape
+ * @returns The escaped selector
  */
 const parseSelector = (selector: string): string => {
   // The `window.CSS` checks guard against ancient browsers, so check them as
@@ -213,12 +215,11 @@ const findShadowRoot = (element: Node): ShadowRoot | null => {
 const noop = (): void => {}
 
 /**
- * Trick to restart an element's animation
+ * Trick to restart an element's animation by forcing a reflow.
  *
- * @param {HTMLElement} element
- * @return void
+ * @param element - The element whose animation should be restarted
  *
- * @see https://www.charistheo.io/blog/2021/02/restart-a-css-animation-with-javascript/#restarting-a-css-animation
+ * @see https://www.harrytheo.com/blog/2021/02/restart-a-css-animation-with-javascript/#restarting-a-css-animation
  */
 const reflow = (element: HTMLElement): void => {
   element.offsetHeight // eslint-disable-line @typescript-eslint/no-unused-expressions
@@ -404,11 +405,11 @@ const executeAfterTransition = (callback: () => void, transitionElement: Element
 /**
  * Return the previous/next element of a list.
  *
- * @param {array} list    The list of elements
- * @param activeElement   The active element
- * @param shouldGetNext   Choose to get next or previous element
- * @param isCycleAllowed
- * @return {Element|elem} The proper element
+ * @param list - The list of elements to traverse
+ * @param activeElement - The currently active element
+ * @param shouldGetNext - Whether to return the next element (`true`) or the previous one (`false`)
+ * @param isCycleAllowed - Whether to cycle back to the opposite end of the list when reaching the boundary
+ * @returns The appropriate previous/next element from the list
  */
 // `isCycleAllowed` is optional here where upstream requires it: our callers
 // omit it, and adding the argument to match would change the emitted code.
