@@ -40,9 +40,14 @@ describe('nav fill', () => {
     })
   }
 
-  it('should give every item the same width with .nav-justified', () => {
-    const [first, second] = mount('nav-enclosed nav-justified').children
+  it('should split an enclosed nav into equal halves of its container with .nav-justified', () => {
+    const nav = mount('nav-enclosed nav-justified')
+    const [first, second] = nav.children
+    const style = getComputedStyle(nav)
+    const content = container.clientWidth - Number.parseFloat(style.paddingInlineStart) - Number.parseFloat(style.paddingInlineEnd)
+    const half = (content - (Number.parseFloat(style.columnGap) || 0)) / 2
 
-    expect(width(first)).toBeCloseTo(width(second), 0)
+    expect(Math.abs(width(first) - half)).toBeLessThan(1)
+    expect(Math.abs(width(second) - half)).toBeLessThan(1)
   })
 })

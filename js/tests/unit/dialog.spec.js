@@ -1527,6 +1527,42 @@ describe('Dialog', () => {
       expect(hiddenCount).toEqual(1)
       expect(document.documentElement.classList.contains('dialog-open')).toBeFalse()
     })
+
+    it('should release the scroll and still catch a later native close when the exit loses the open attribute', async () => {
+      fixtureEl.innerHTML = '<dialog class="dialog"></dialog>'
+
+      const dialogEl = fixtureEl.querySelector('.dialog')
+      const dialog = new Dialog(dialogEl)
+      const next = type => new Promise(resolve => {
+        dialogEl.addEventListener(`${type}.coreui.dialog`, resolve, { once: true })
+      })
+      let hiddenCount = 0
+
+      let shown = next('shown')
+      dialog.show()
+      await shown
+
+      const hidden = next('hidden')
+      dialog.hide()
+      dialogEl.removeAttribute('open')
+      await hidden
+
+      expect(document.documentElement.classList.contains('dialog-open')).toBeFalse()
+
+      shown = next('shown')
+      dialog.show()
+      await shown
+      dialogEl.addEventListener('hidden.coreui.dialog', () => {
+        hiddenCount++
+      })
+      dialogEl.close()
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect(hiddenCount).toEqual(1)
+      expect(document.documentElement.classList.contains('dialog-open')).toBeFalse()
+    })
   })
 
   describe('hidePrevented', () => {

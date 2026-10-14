@@ -1137,6 +1137,42 @@ describe('Drawer', () => {
       expect(hiddenCount).toEqual(1)
       expect(document.documentElement.classList.contains('dialog-open')).toBeFalse()
     })
+
+    it('should release the scroll and still catch a later native close when the exit loses the open attribute', async () => {
+      fixtureEl.innerHTML = '<dialog class="drawer"></dialog>'
+
+      const drawerEl = fixtureEl.querySelector('.drawer')
+      const drawer = new Drawer(drawerEl)
+      const next = type => new Promise(resolve => {
+        drawerEl.addEventListener(`${type}.coreui.drawer`, resolve, { once: true })
+      })
+      let hiddenCount = 0
+
+      let shown = next('shown')
+      drawer.show()
+      await shown
+
+      const hidden = next('hidden')
+      drawer.hide()
+      drawerEl.removeAttribute('open')
+      await hidden
+
+      expect(document.documentElement.classList.contains('dialog-open')).toBeFalse()
+
+      shown = next('shown')
+      drawer.show()
+      await shown
+      drawerEl.addEventListener('hidden.coreui.drawer', () => {
+        hiddenCount++
+      })
+      drawerEl.close()
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect(hiddenCount).toEqual(1)
+      expect(document.documentElement.classList.contains('dialog-open')).toBeFalse()
+    })
   })
 
   describe('drawer-static class', () => {

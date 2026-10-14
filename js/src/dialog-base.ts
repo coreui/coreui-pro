@@ -137,7 +137,6 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
 
   protected async _hide(): Promise<void> {
     this._isTransitioning = true
-    this._closedByComponent = true
     this._hideElement()
 
     await this._queueCallback(() => {
@@ -358,14 +357,18 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
 
     EventHandler.on(this._element, 'cancel', this._cancelHandler)
 
-    // The native close event also follows the component's own close() or any
-    // close during its hide, a task later — `_closedByComponent` tells those
-    // apart from a form with method="dialog", a consumer's dialog.close() or
-    // any other native path, which skip hide() and would otherwise leave the
-    // scroll lock and the lifecycle state behind.
+    // The native close event also follows the component's own close(), a task
+    // later — `_closedByComponent` tells that one apart from a form with
+    // method="dialog", a consumer's dialog.close() or any other native path,
+    // which skip hide() and would otherwise leave the scroll lock and the
+    // lifecycle state behind.
     this._closeHandler = () => {
       if (this._closedByComponent) {
         this._closedByComponent = false
+        return
+      }
+
+      if (this._element.classList.contains(CLASS_NAME_HIDING)) {
         return
       }
 
