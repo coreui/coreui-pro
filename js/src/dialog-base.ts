@@ -52,6 +52,7 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
   protected declare _isTransitioning: boolean
   protected declare _openedAsModal: boolean
   protected declare _closedByComponent: boolean
+  protected declare _hiddenByComponent: boolean
   protected declare _cancelHandler: (event: Event) => void
   protected declare _closeHandler: (event: Event) => void
   protected declare _resizeObserver: ResizeObserver | null
@@ -63,6 +64,7 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
     this._isTransitioning = false
     this._openedAsModal = false
     this._closedByComponent = false
+    this._hiddenByComponent = false
     this._resizeObserver = null
     this._resizeFrame = null
     this._addDialogListeners()
@@ -114,6 +116,7 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
 
   protected async _show(relatedTarget?: HTMLElement | null): Promise<void> {
     this._isTransitioning = true
+    this._hiddenByComponent = false
     this._onBeforeShow()
 
     const { modal, preventBodyScroll } = this._getShowOptions()
@@ -137,6 +140,7 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
 
   protected async _hide(): Promise<void> {
     this._isTransitioning = true
+    this._hiddenByComponent = true
     this._hideElement()
 
     await this._queueCallback(() => {
@@ -368,7 +372,7 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
         return
       }
 
-      if (this._element.classList.contains(CLASS_NAME_HIDING)) {
+      if (this._hiddenByComponent) {
         return
       }
 
