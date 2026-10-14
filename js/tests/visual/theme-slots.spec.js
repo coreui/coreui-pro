@@ -31,6 +31,34 @@ const resolve = (className, value) => {
 }
 
 const slot = (theme, name) => resolve(theme, `var(--cui-theme-${name})`)
+const declared = (selector, property) => {
+  const walk = rules => {
+    for (const rule of rules) {
+      if (rule.selectorText?.split(',').some(part => part.trim() === selector) && rule.style.getPropertyValue(property)) {
+        return rule.style.getPropertyValue(property)
+      }
+
+      const found = rule.cssRules && walk(rule.cssRules)
+      if (found) {
+        return found
+      }
+    }
+  }
+
+  return [...document.styleSheets].map(sheet => walk(sheet.cssRules)).find(Boolean)
+}
+
+const firstColorMix = value => {
+  const start = value.indexOf('color-mix(')
+  let depth = 0
+  for (let index = start; index < value.length; index++) {
+    depth += { '(': 1, ')': -1 }[value[index]] ?? 0
+    if (depth === 0 && value[index] === ')') {
+      return value.slice(start, index + 1)
+    }
+  }
+}
+
 const paint = (selector, properties) => properties.map(property => style(selector)[property])
 
 afterEach(() => container?.remove())
@@ -58,6 +86,27 @@ describe('theme slots', () => {
 
     it(`should let the theme win over the ${name} token on the element`, () => {
       expect(render('', true)).not.toBe(render('', false))
+      expect(render('theme-danger', true)).toBe(render('theme-danger', false))
+    })
+  }
+
+  for (const [name, pseudo, property, token, color] of [
+    ['range thumb', '::-webkit-slider-thumb', 'background-color', 'range-thumb-bg', value => value],
+    ['range fill', '::-webkit-slider-runnable-track', 'background-image', 'range-track-fill-bg', firstColorMix]
+  ]) {
+    it(`should let the theme win over the ${name} token`, () => {
+      const value = color(declared(`.form-range-input${pseudo}`, property))
+      const render = (theme, withToken) => {
+        mount(`<div class="form-range ${theme}"${withToken ? ` style="--cui-${token}: ${PINK}"` : ''}><input type="range" class="form-range-input"><span data-probe></span></div>`)
+        const probe = container.querySelector('[data-probe]')
+        probe.style.color = value
+        const painted = getComputedStyle(probe).color
+        container.remove()
+        return painted
+      }
+
+      expect(render('', true)).not.toBe(render('', false))
+      expect(render('theme-danger', false)).not.toBe(render('', false))
       expect(render('theme-danger', true)).toBe(render('theme-danger', false))
     })
   }
