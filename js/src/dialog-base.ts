@@ -137,15 +137,18 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
 
   protected async _hide(): Promise<void> {
     this._isTransitioning = true
+    this._closedByComponent = true
     this._hideElement()
 
     await this._queueCallback(() => {
-      // Subclasses that defer close() until the exit transition ends (so the
-      // dialog stays in the top layer with its ::backdrop) close here instead
-      // of in _hideElement().
-      if (this._element.open) {
-        this._closeAndCleanup()
-      }
+      // For subclasses that defer close() until the exit transition ends
+      // (so the dialog stays in the top layer with its ::backdrop), close()
+      // happens here instead of in _hideElement(). It runs unconditionally:
+      // _closeAndCleanup() is a no-op on an already-closed dialog, and skipping
+      // it when something else closed the dialog during the exit (app code,
+      // a <form method="dialog"> submit) would leave scroll prevention
+      // (dialog-open) stuck on the root element.
+      this._closeAndCleanup()
 
       this._finishHide()
     }, this._element, this._isAnimated())
@@ -164,6 +167,12 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
     if (this._element.open) {
       this._closeAndCleanup()
     }
+
+    // `_queueCallback` skips its completion callback once the instance is
+    // disposed, so nothing else would clear the exit state. A stranded
+    // `.hiding` suppresses the `[open]:not(.hiding)` open state, which would
+    // leave a later instance on the same element showing an invisible dialog.
+    this._element.classList.remove(CLASS_NAME_HIDING)
 
     // The `cancel` and `close` listeners are unnamespaced, so super.dispose()'s
     // EVENT_KEY teardown misses them.
@@ -349,11 +358,11 @@ class DialogBase<C extends ComponentConfig = ComponentConfig> extends BaseCompon
 
     EventHandler.on(this._element, 'cancel', this._cancelHandler)
 
-    // The native close event also follows the component's own close(), a task
-    // later — `_closedByComponent` tells that one apart from a form with
-    // method="dialog", a consumer's dialog.close() or any other native path,
-    // which skip hide() and would otherwise leave the scroll lock and the
-    // lifecycle state behind.
+    // The native close event also follows the component's own close() or any
+    // close during its hide, a task later — `_closedByComponent` tells those
+    // apart from a form with method="dialog", a consumer's dialog.close() or
+    // any other native path, which skip hide() and would otherwise leave the
+    // scroll lock and the lifecycle state behind.
     this._closeHandler = () => {
       if (this._closedByComponent) {
         this._closedByComponent = false

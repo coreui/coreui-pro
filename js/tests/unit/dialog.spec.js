@@ -1481,6 +1481,52 @@ describe('Dialog', () => {
         dialog.show()
       })
     })
+
+    it('should remove hiding class when disposed during the exit transition', async () => {
+      fixtureEl.innerHTML = '<dialog class="dialog"></dialog>'
+
+      const dialogEl = fixtureEl.querySelector('.dialog')
+      const dialog = new Dialog(dialogEl)
+      const shown = new Promise(resolve => {
+        dialogEl.addEventListener('shown.coreui.dialog', resolve, { once: true })
+      })
+
+      dialog.show()
+      await shown
+      dialog.hide()
+
+      expect(dialogEl.classList.contains('hiding')).toBeTrue()
+
+      dialog.dispose()
+
+      expect(dialogEl.classList.contains('hiding')).toBeFalse()
+    })
+
+    it('should fire hidden once and release the scroll when closed during the exit transition', async () => {
+      fixtureEl.innerHTML = '<dialog class="dialog"></dialog>'
+
+      const dialogEl = fixtureEl.querySelector('.dialog')
+      const dialog = new Dialog(dialogEl)
+      const shown = new Promise(resolve => {
+        dialogEl.addEventListener('shown.coreui.dialog', resolve, { once: true })
+      })
+      let hiddenCount = 0
+
+      dialogEl.addEventListener('hidden.coreui.dialog', () => {
+        hiddenCount++
+      })
+
+      dialog.show()
+      await shown
+      dialog.hide()
+      dialogEl.close()
+      await new Promise(resolve => {
+        setTimeout(resolve, 50)
+      })
+
+      expect(hiddenCount).toEqual(1)
+      expect(document.documentElement.classList.contains('dialog-open')).toBeFalse()
+    })
   })
 
   describe('hidePrevented', () => {
