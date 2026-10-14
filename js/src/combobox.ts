@@ -19,6 +19,7 @@ import { CARET_ICON } from './util/icons.js'
 import {
   DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList, SVGAllowlist
 } from './util/sanitizer.js'
+import { toSelectionValues } from './util/selection-state.js'
 import {
   captureHostClasses, type CountLabel, defineJQueryPlugin, getUID, type HostClasses, jQueryDispatch, resolveCountLabel,
   restoreHostClasses, writeAttribute
@@ -237,7 +238,7 @@ class Combobox extends ComboboxBase {
   }
 
   setValue(value: string | string[] | null): void {
-    this._applySelection(value === null ? [] : (Array.isArray(value) ? value.map(String) : [String(value)]))
+    this._applySelection(toSelectionValues(value, 'multiple').map(String))
   }
 
   clear(): void {
@@ -522,7 +523,7 @@ class Combobox extends ComboboxBase {
 
   _initialValues(): string[] {
     const { value } = this._config
-    const configured = value === null ? [] : (Array.isArray(value) ? value : [value]).map(String)
+    const configured = toSelectionValues(value, 'multiple').map(String)
     const marked = SelectorEngine.find(`${SELECTOR_OPTION}.${CLASS_NAME_SELECTED}`, this._optionsElement)
       .map(option => this._valueOf(option as HTMLElement))
 
@@ -541,7 +542,7 @@ class Combobox extends ComboboxBase {
     this._syncing = true
     this._listBox.clear()
 
-    for (const value of (this._config.multiple ? values : values.slice(0, 1))) {
+    for (const value of toSelectionValues(values, this._config.multiple ? 'multiple' : 'single')) {
       this._listBox.select(value)
     }
 

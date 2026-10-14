@@ -2024,6 +2024,23 @@ describe('MultiSelect', () => {
       expect(multiSelect._selected.length).toBe(2)
     })
 
+    it('should ignore the selection limit when only one value can be selected', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const options = [
+        { value: '1', text: 'Option 1' },
+        { value: '2', text: 'Option 2' }
+      ]
+      const multiSelect = new MultiSelect(selectEl, { multiple: false, options, selectionLimit: 0 })
+      const onLimit = vi.fn()
+
+      selectEl.addEventListener('selectionLimit.coreui.multi-select', onLimit)
+      multiSelect._selectOption('1', 'Option 1')
+
+      expect(multiSelect._selected.map(item => item.value)).toEqual(['1'])
+      expect(onLimit).not.toHaveBeenCalled()
+    })
+
     it('should report the selection limit once when selectAll stops at it', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
