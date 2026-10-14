@@ -3252,12 +3252,12 @@ Multi Select's option indicators moved with it — they render as a decorative
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **A card is roomier and framed in the solid border colour.**
   `--cui-card-spacer-y` / `-x` go from `1rem` to `--cui-spacer-6` (`1.25rem`),
-  and the body gap and the image-overlay padding follow them. The border reads
-  `--cui-border-color` instead of `--cui-border-color-translucent`, and the
-  radius is `--cui-radius-7` (see the radius scale below). The header and
-  footer padding stays `.5rem` / `1rem`. `.table-card` takes the same radius
-  and border. To keep the v5 spacing, set `--cui-card-spacer-y` and `-x` back
-  to `1rem` on `.card`.
+  and the image-overlay padding follows them. The border reads
+  `--cui-border-color` instead of `--cui-border-color-translucent`, except on
+  `.card-translucent`, and the radius is `--cui-radius-7` (see the radius
+  scale below). The header and footer padding stays `.5rem` / `1rem`. To
+  keep the v5 spacing, set `--cui-card-spacer-y` and `-x` to
+  `var(--cui-spacer-5)` on `.card`.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **`.card-header-pills` is gone.** It only pulled the pill row out to the
   header's padding edge, which is wrong for pills — they carry their own
@@ -3958,8 +3958,9 @@ map — several things below are breaking and are called out as such.
   margin, padding, gap, space and gutter class and its responsive variants.
   The components
   are unchanged: their tokens read the stops that carry the v5 values, so
-  cards, alerts, modals, drawers, popovers, callouts, list groups, the
-  sidebar and the reboot margins keep their size.
+  alerts, modals, drawers, popovers, callouts, list groups, the sidebar and
+  the reboot margins keep their size. Cards are the exception, see
+  [Card](#card).
 
 #### Padding tokens carry both axes
 
@@ -3975,8 +3976,9 @@ map — several things below are breaking and are called out as such.
   `--cui-dialog-header-padding`, `--cui-dialog-footer-padding`,
   `--cui-form-field-card-padding`, `--cui-list-box-section-label-padding`,
   `--cui-mark-padding`, `--cui-thumbnail-padding`,
-  `--cui-date-picker-time-body-padding`). Defaults are unchanged, so set
-  both to the old value to keep the same box. A single-value token could not
+  `--cui-date-picker-time-body-padding`). Defaults are unchanged, except the
+  card overlay's (see [Card](#card)), so set both to the old value to keep
+  the same box. A single-value token could not
   be overridden per axis, and one of them was already a two-value shorthand
   (`--cui-list-box-section-label-padding: .5rem .625rem`), which made the
   horizontal padding unreachable without restating the vertical one.

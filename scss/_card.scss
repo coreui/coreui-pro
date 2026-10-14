@@ -8,7 +8,7 @@
 
 $card-tokens: () !default;
 
-// stylelint-disable scss/dollar-variable-default
+// stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
 // scss-docs-start card-tokens
 $card-tokens: defaults(
@@ -38,7 +38,7 @@ $card-tokens: defaults(
 );
 // scss-docs-end card-tokens
 
-// stylelint-enable scss/dollar-variable-default
+// stylelint-enable custom-property-no-missing-var-function, scss/dollar-variable-default
 @layer components {
   .card {
     @include tokens($card-tokens);
@@ -146,6 +146,7 @@ $card-tokens: defaults(
 
   .card-translucent {
     --#{$prefix}card-translucent-cap-bg-opacity: #{60%};
+    --#{$prefix}card-border-color: var(--#{$prefix}border-color-translucent);
     @include translucent(var(--#{$prefix}card-bg));
 
     .card-header,

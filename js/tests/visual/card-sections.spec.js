@@ -107,4 +107,33 @@ describe('card sections', () => {
       expect(getComputedStyle(last)[`borderTop${end}Radius`]).not.toBe('0px')
     })
   }
+
+  it('should pad the body with the sixth spacer stop and round the card with the seventh radius stop', () => {
+    const card = mount('<div class="card"><div class="card-body">a</div></div>')
+    const probe = document.createElement('span')
+    probe.style.cssText = 'padding-top: var(--cui-spacer-6); border-top-left-radius: var(--cui-radius-7); color: var(--cui-border-color)'
+    container.append(probe)
+
+    expect(getComputedStyle(card.firstElementChild).paddingTop).toBe(getComputedStyle(probe).paddingTop)
+    expect(getComputedStyle(card).borderTopLeftRadius).toBe(getComputedStyle(probe).borderTopLeftRadius)
+    expect(getComputedStyle(card).borderTopColor).toBe(getComputedStyle(probe).color)
+  })
+
+  it('should keep the translucent border on a translucent card', () => {
+    const card = mount('<div class="card card-translucent"><div class="card-body">a</div></div>')
+    const probe = document.createElement('span')
+    probe.style.color = 'var(--cui-border-color-translucent)'
+    container.append(probe)
+
+    expect(getComputedStyle(card).borderTopColor).toBe(getComputedStyle(probe).color)
+  })
+
+  it('should pad the image overlay with the card spacer', () => {
+    const card = mount(`<div class="card" style="--cui-card-spacer-y: 10px; --cui-card-spacer-x: 14px">
+        <div class="card-img-overlay">a</div>
+      </div>`)
+    const overlay = getComputedStyle(card.firstElementChild)
+
+    expect([overlay.paddingTop, overlay.paddingLeft]).toEqual(['10px', '14px'])
+  })
 })
