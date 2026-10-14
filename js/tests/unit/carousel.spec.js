@@ -857,7 +857,7 @@ describe('Carousel', () => {
       expect(document.activeElement).toEqual(prev)
     })
 
-    it('should fall back to the viewport when there is no opposite control to focus', () => {
+    it('should not leave focus on the disabled control when the viewport is not focusable', () => {
       fixtureEl.innerHTML = [
         '<div id="myCarousel" class="carousel slide">',
         '  <div class="carousel-inner">',
@@ -875,13 +875,66 @@ describe('Carousel', () => {
       carousel._refreshActiveState()
       prev.focus()
       expect(document.activeElement).toEqual(prev)
+      const blur = spyOn(prev, 'blur').and.callThrough()
 
       // Back to the first slide with no next control: focus leaves the now-disabled prev
       carousel._activeIndex = 0
       carousel._refreshActiveState()
 
       expect(prev.disabled).toBeTrue()
-      expect(document.activeElement).not.toEqual(prev)
+      expect(blur).toHaveBeenCalled()
+      expect(document.activeElement).toBe(document.body)
+    })
+
+    it('should move focus to the next control when the focused prev control becomes disabled in a two-slide carousel', () => {
+      fixtureEl.innerHTML = [
+        '<div id="myCarousel" class="carousel slide">',
+        '  <div class="carousel-inner">',
+        '    <div class="carousel-item active">item 1</div>',
+        '    <div class="carousel-item">item 2</div>',
+        '  </div>',
+        '  <button id="prev" class="btn-icon btn-sm" type="button" data-coreui-target="#myCarousel" data-coreui-slide="prev"></button>',
+        '  <button id="next" class="btn-icon btn-sm" type="button" data-coreui-target="#myCarousel" data-coreui-slide="next"></button>',
+        '</div>'
+      ].join('')
+
+      const carousel = new Carousel('#myCarousel', { ends: 'stop' })
+      const prev = fixtureEl.querySelector('#prev')
+      const next = fixtureEl.querySelector('#next')
+
+      carousel._activeIndex = 1
+      carousel._refreshActiveState()
+      prev.focus()
+
+      carousel._activeIndex = 0
+      carousel._refreshActiveState()
+
+      expect(prev.disabled).toBeTrue()
+      expect(document.activeElement).toEqual(next)
+    })
+
+    it('should fall back to a focusable viewport when there is no opposite control', () => {
+      fixtureEl.innerHTML = [
+        '<div id="myCarousel" class="carousel slide">',
+        '  <div class="carousel-inner" tabindex="-1">',
+        '    <div class="carousel-item active">item 1</div>',
+        '    <div class="carousel-item">item 2</div>',
+        '  </div>',
+        '  <button id="prev" class="btn-icon btn-sm" type="button" data-coreui-target="#myCarousel" data-coreui-slide="prev"></button>',
+        '</div>'
+      ].join('')
+
+      const carousel = new Carousel('#myCarousel', { ends: 'stop' })
+      const prev = fixtureEl.querySelector('#prev')
+
+      carousel._activeIndex = 1
+      carousel._refreshActiveState()
+      prev.focus()
+
+      carousel._activeIndex = 0
+      carousel._refreshActiveState()
+
+      expect(document.activeElement).toEqual(fixtureEl.querySelector('.carousel-inner'))
     })
 
     // Multi-item/peek/variable-width layouts can't bring the last slide to the
