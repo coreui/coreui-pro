@@ -236,6 +236,16 @@
         "default": "./js/dist/util/time.js"
       }
     },
+    "./utils/transfer": {
+      "import": {
+        "types": "./js/dist/util/transfer.d.mts",
+        "default": "./js/dist/util/transfer.mjs"
+      },
+      "require": {
+        "types": "./js/dist/util/transfer.d.ts",
+        "default": "./js/dist/util/transfer.js"
+      }
+    },
     "./package.json": "./package.json"
   },
   "sideEffects": [
