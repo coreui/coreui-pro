@@ -219,8 +219,8 @@ $table-variants: map.keys($theme-colors) !default;
   .table-card {
     margin-bottom: var(--#{$prefix}spacer);
     overflow: clip;
-    border: var(--#{$prefix}border-width) solid var(--#{$prefix}theme-bg, var(--#{$prefix}border-color-translucent));
-    @include border-radius(var(--#{$prefix}radius-9));
+    border: var(--#{$prefix}border-width) solid var(--#{$prefix}theme-bg, var(--#{$prefix}border-color));
+    @include border-radius(var(--#{$prefix}radius-7));
 
     > .table,
     > [class*="table-responsive"] > .table {

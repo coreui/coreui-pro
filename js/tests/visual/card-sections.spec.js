@@ -107,4 +107,48 @@ describe('card sections', () => {
       expect(getComputedStyle(last)[`borderTop${end}Radius`]).not.toBe('0px')
     })
   }
+
+  it('should pad the body with the sixth spacer stop and round the card with the seventh radius stop', () => {
+    const card = mount('<div class="card"><div class="card-body">a</div></div>')
+    const probe = document.createElement('span')
+    probe.style.cssText = 'padding-top: var(--cui-spacer-6); border-top-left-radius: var(--cui-radius-7); color: var(--cui-border-color)'
+    container.append(probe)
+
+    expect(getComputedStyle(card.firstElementChild).paddingTop).toBe(getComputedStyle(probe).paddingTop)
+    expect(getComputedStyle(card).borderTopLeftRadius).toBe(getComputedStyle(probe).borderTopLeftRadius)
+    expect(getComputedStyle(card).borderTopColor).toBe(getComputedStyle(probe).color)
+  })
+
+  it('should keep the translucent border on a translucent card', () => {
+    const card = mount('<div class="card card-translucent"><div class="card-body">a</div></div>')
+    const probe = document.createElement('span')
+    probe.style.color = 'var(--cui-border-color-translucent)'
+    container.append(probe)
+
+    expect(getComputedStyle(card).borderTopColor).toBe(getComputedStyle(probe).color)
+  })
+
+  it('should pad the image overlay with the card spacer', () => {
+    const card = mount(`<div class="card" style="--cui-card-spacer-y: 10px; --cui-card-spacer-x: 14px">
+        <div class="card-img-overlay">a</div>
+      </div>`)
+    const overlay = getComputedStyle(card.firstElementChild)
+
+    expect([overlay.paddingTop, overlay.paddingLeft]).toEqual(['10px', '14px'])
+  })
+
+  for (const [style, inset] of [['', '20px'], ['--cui-card-spacer-x: 14px', '14px']]) {
+    it(`should line up the caps, the body and a list group at ${inset} of card spacer`, () => {
+      const card = mount(`<div class="card" style="${style}">
+          <div class="card-header">a</div>
+          <div class="card-body">b</div>
+          <ul class="list-group list-group-flush"><li class="list-group-item">c</li></ul>
+          <div class="card-footer">d</div>
+        </div>`)
+      const [header, body, list, footer] = card.children
+      const start = element => getComputedStyle(element).paddingInlineStart
+
+      expect([start(header), start(body), start(list.firstElementChild), start(footer)]).toEqual([inset, inset, inset, inset])
+    })
+  }
 })

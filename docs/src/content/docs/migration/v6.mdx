@@ -3250,6 +3250,18 @@ Multi Select's option indicators moved with it — they render as a decorative
 #### Card
 
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **A card is roomier and framed in the solid border colour.**
+  `--cui-card-spacer-y` / `-x` go from `1rem` to `--cui-spacer-6` (`1.25rem`),
+  and the image-overlay padding follows them. The header, the footer and a
+  list group placed directly in the card take `--cui-card-spacer-x` as their
+  inline padding, so their text lines up with the body; the header and footer
+  keep `.5rem` of block padding. The border reads `--cui-border-color` instead
+  of `--cui-border-color-translucent`, except on `.card-translucent`, and the
+  radius is `--cui-radius-7` (see the radius scale below). A card filled with
+  `.text-bg-*` keeps that neutral frame; add the matching `.border-{color}` to
+  frame it in the fill colour. To keep the v5 spacing, set
+  `--cui-card-spacer-y` and `-x` to `var(--cui-spacer-5)` on `.card`.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **`.card-header-pills` is gone.** It only pulled the pill row out to the
   header's padding edge, which is wrong for pills — they carry their own
   background, so flush against the header's inner edge they touch the border.
@@ -3725,8 +3737,8 @@ map — several things below are breaking and are called out as such.
   list groups, tabs, nav links, progress, tooltips, thumbnails,
   callouts, combobox options and the range slider's tooltip sit on
   `--cui-radius-5` (`.5rem`), alerts, badges, popovers, dialogs, drawers, menus,
-  accordions, toasts, dropdowns and popups on `--cui-radius-7` (`.75rem`),
-  cards on `--cui-radius-9` (`1rem`), and nav pills on a fixed `3rem`, which
+  accordions, toasts, dropdowns, popups and cards on `--cui-radius-7` (`.75rem`),
+  and nav pills on a fixed `3rem`, which
   keeps a pill up to 96px tall fully round and does not follow `--cui-radius`.
   Everything that used the `.375rem` default is visibly rounder. To keep a
   component on its old radius, set its own token
@@ -3949,8 +3961,9 @@ map — several things below are breaking and are called out as such.
   margin, padding, gap, space and gutter class and its responsive variants.
   The components
   are unchanged: their tokens read the stops that carry the v5 values, so
-  cards, alerts, modals, drawers, popovers, callouts, list groups, the
-  sidebar and the reboot margins keep their size.
+  alerts, modals, drawers, popovers, callouts, list groups, the sidebar and
+  the reboot margins keep their size. Cards are the exception, see
+  [Card](#card).
 
 #### Padding tokens carry both axes
 
@@ -3966,8 +3979,9 @@ map — several things below are breaking and are called out as such.
   `--cui-dialog-header-padding`, `--cui-dialog-footer-padding`,
   `--cui-form-field-card-padding`, `--cui-list-box-section-label-padding`,
   `--cui-mark-padding`, `--cui-thumbnail-padding`,
-  `--cui-date-picker-time-body-padding`). Defaults are unchanged, so set
-  both to the old value to keep the same box. A single-value token could not
+  `--cui-date-picker-time-body-padding`). Defaults are unchanged, except the
+  card overlay's (see [Card](#card)), so set both to the old value to keep
+  the same box. A single-value token could not
   be overridden per axis, and one of them was already a two-value shorthand
   (`--cui-list-box-section-label-padding: .5rem .625rem`), which made the
   horizontal padding unreachable without restating the vertical one.

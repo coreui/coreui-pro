@@ -8,37 +8,37 @@
 
 $card-tokens: () !default;
 
-// stylelint-disable scss/dollar-variable-default
+// stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
 // scss-docs-start card-tokens
 $card-tokens: defaults(
   (
-    --#{$prefix}card-spacer-y: var(--#{$prefix}spacer),
-    --#{$prefix}card-spacer-x: var(--#{$prefix}spacer),
-    --#{$prefix}card-body-gap: calc(var(--#{$prefix}spacer) * .5),
+    --#{$prefix}card-spacer-y: var(--#{$prefix}spacer-6),
+    --#{$prefix}card-spacer-x: var(--#{$prefix}spacer-6),
+    --#{$prefix}card-body-gap: calc(var(--#{$prefix}card-spacer-y) * .5),
     --#{$prefix}card-title-color: inherit,
     --#{$prefix}card-subtitle-color: inherit,
     --#{$prefix}card-border-width: var(--#{$prefix}border-width),
-    --#{$prefix}card-border-color: var(--#{$prefix}border-color-translucent),
-    --#{$prefix}card-border-radius: var(--#{$prefix}radius-9),
+    --#{$prefix}card-border-color: var(--#{$prefix}border-color),
+    --#{$prefix}card-border-radius: var(--#{$prefix}radius-7),
     --#{$prefix}card-box-shadow: none,
     --#{$prefix}card-inner-border-radius: calc(var(--#{$prefix}card-border-radius) - var(--#{$prefix}card-border-width)),
-    --#{$prefix}card-cap-padding-y: calc(var(--#{$prefix}spacer) * .5),
-    --#{$prefix}card-cap-padding-x: var(--#{$prefix}spacer),
+    --#{$prefix}card-cap-padding-y: var(--#{$prefix}spacer-3),
+    --#{$prefix}card-cap-padding-x: var(--#{$prefix}card-spacer-x),
     --#{$prefix}card-cap-bg: var(--#{$prefix}bg-1),
     --#{$prefix}card-cap-color: inherit,
     --#{$prefix}card-height: auto,
     --#{$prefix}card-color: inherit,
     --#{$prefix}card-bg: var(--#{$prefix}bg-body),
-    --#{$prefix}card-img-overlay-padding-y: var(--#{$prefix}spacer),
-    --#{$prefix}card-img-overlay-padding-x: var(--#{$prefix}spacer),
+    --#{$prefix}card-img-overlay-padding-y: var(--#{$prefix}card-spacer-y),
+    --#{$prefix}card-img-overlay-padding-x: var(--#{$prefix}card-spacer-x),
     --#{$prefix}card-group-margin: #{$grid-gutter-x * .5},
   ),
   $card-tokens
 );
 // scss-docs-end card-tokens
 
-// stylelint-enable scss/dollar-variable-default
+// stylelint-enable custom-property-no-missing-var-function, scss/dollar-variable-default
 @layer components {
   .card {
     @include tokens($card-tokens);
@@ -61,6 +61,8 @@ $card-tokens: defaults(
     }
 
     > .list-group {
+      --#{$prefix}list-group-item-padding-x: var(--#{$prefix}card-spacer-x);
+
       &:first-child {
         @include border-top-radius(var(--#{$prefix}card-inner-border-radius));
       }
@@ -146,6 +148,7 @@ $card-tokens: defaults(
 
   .card-translucent {
     --#{$prefix}card-translucent-cap-bg-opacity: #{60%};
+    --#{$prefix}card-border-color: var(--#{$prefix}border-color-translucent);
     @include translucent(var(--#{$prefix}card-bg));
 
     .card-header,
