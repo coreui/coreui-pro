@@ -1,4 +1,6 @@
-import { fillSelection, getAriaPressed, getSelectionState } from '../../../src/util/selection-state.js'
+import {
+  fillSelection, getAriaPressed, getSelectionLimit, getSelectionState, isSelectionLimitReached, toSelectionValues
+} from '../../../src/util/selection-state.js'
 
 describe('Selection utilities', () => {
   describe('getSelectionState', () => {
@@ -62,6 +64,64 @@ describe('Selection utilities', () => {
       fillSelection(selected, ['b'])
 
       expect(selected).toEqual(['a'])
+    })
+  })
+
+  describe('toSelectionValues', () => {
+    it('should give no values for nothing or the none mode', () => {
+      expect(toSelectionValues(null, 'multiple')).toEqual([])
+      expect(toSelectionValues(undefined, 'multiple')).toEqual([])
+      expect(toSelectionValues(['a', 'b'], 'none')).toEqual([])
+      expect(toSelectionValues('a', 'none')).toEqual([])
+    })
+
+    it('should wrap a single value and keep a list in order', () => {
+      expect(toSelectionValues('a', 'multiple')).toEqual(['a'])
+      expect(toSelectionValues(1, 'multiple')).toEqual([1])
+      expect(toSelectionValues('', 'multiple')).toEqual([''])
+      expect(toSelectionValues(['b', 'a', 'b'], 'multiple')).toEqual(['b', 'a', 'b'])
+    })
+
+    it('should keep only the first value in the single mode', () => {
+      expect(toSelectionValues(['b', 'a'], 'single')).toEqual(['b'])
+      expect(toSelectionValues('a', 'single')).toEqual(['a'])
+      expect(toSelectionValues([], 'single')).toEqual([])
+    })
+
+    it('should return a new list rather than the one it was given', () => {
+      const values = ['a', 'b']
+
+      expect(toSelectionValues(values, 'multiple')).not.toBe(values)
+      expect(toSelectionValues(values, 'multiple')).toEqual(values)
+    })
+  })
+
+  describe('getSelectionLimit', () => {
+    it('should give the limit when several values can be selected', () => {
+      expect(getSelectionLimit(true, 3)).toBe(3)
+      expect(getSelectionLimit(true, 0)).toBe(0)
+    })
+
+    it('should give no limit for a single selection or a limit that is not a number', () => {
+      expect(getSelectionLimit(false, 3)).toBeNull()
+      expect(getSelectionLimit(true, null)).toBeNull()
+      expect(getSelectionLimit(true, undefined)).toBeNull()
+      expect(getSelectionLimit(true, '3')).toBeNull()
+    })
+  })
+
+  describe('isSelectionLimitReached', () => {
+    it('should be reached at and past the limit', () => {
+      expect(isSelectionLimitReached(1, 2)).toBeFalse()
+      expect(isSelectionLimitReached(2, 2)).toBeTrue()
+      expect(isSelectionLimitReached(3, 2)).toBeTrue()
+      expect(isSelectionLimitReached(0, 0)).toBeTrue()
+    })
+
+    it('should never be reached without a limit', () => {
+      expect(isSelectionLimitReached(5, null)).toBeFalse()
+      expect(isSelectionLimitReached(5)).toBeFalse()
+      expect(isSelectionLimitReached(5, Number.NaN)).toBeFalse()
     })
   })
 })

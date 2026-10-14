@@ -19,7 +19,7 @@ import {
 import { CLEANER_ICON, PICKER_ICON } from './util/icons.js'
 import { flattenOptions, getSelectableOptions, isOptionGroup } from './util/option-tree.js'
 import {
-  fillSelection, getAriaPressed, getSelectionState, type SelectionState
+  fillSelection, getAriaPressed, getSelectionLimit, getSelectionState, isSelectionLimitReached, type SelectionState
 } from './util/selection-state.js'
 import {
   DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList, SVGAllowlist
@@ -1298,7 +1298,7 @@ class MultiSelect extends ComboboxBase {
     const { added, refused } = fillSelection(
       this._config.multiple ? this._selected.map((option: any) => option.value) : [],
       [...texts.keys()],
-      this._hasSelectionLimit() ? this._config.selectionLimit : null
+      this._selectionLimit()
     )
 
     for (const value of added) {
@@ -1656,7 +1656,7 @@ class MultiSelect extends ComboboxBase {
 
   _getSelectAllState(): SelectionState {
     const { selected, total } = this._getSelectAllScope()
-    return getSelectionState(selected, total, this._hasSelectionLimit() ? this._config.selectionLimit : null)
+    return getSelectionState(selected, total, this._selectionLimit())
   }
 
   _getSelectAllScope(): any {
@@ -1751,12 +1751,12 @@ class MultiSelect extends ComboboxBase {
     }
   }
 
-  _hasSelectionLimit(): boolean {
-    return this._config.multiple && this._config.selectionLimit !== null
+  _selectionLimit(): number | null {
+    return getSelectionLimit(this._config.multiple, this._config.selectionLimit)
   }
 
   _isSelectionLimitReached(): boolean {
-    return this._hasSelectionLimit() && this._selected.length >= this._config.selectionLimit
+    return isSelectionLimitReached(this._selected.length, this._selectionLimit())
   }
 
   _triggerSelectionLimit(): void {

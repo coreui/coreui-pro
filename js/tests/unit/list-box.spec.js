@@ -1250,6 +1250,22 @@ describe('ListBox', () => {
       expect(item(el, 'tomato').classList.contains('selected')).toBeTrue()
     })
 
+    it('should keep the selection mode when setItems marks several items', () => {
+      const items = [
+        { value: 'lettuce', label: 'Lettuce', selected: true },
+        { value: 'tomato', label: 'Tomato', selected: true }
+      ]
+      const single = new ListBox(setEmptyMarkup(), { items: [] })
+
+      single.setItems(items)
+      expect(single.getSelectedValues()).toEqual(['lettuce'])
+
+      const none = new ListBox(setEmptyMarkup(' data-coreui-selection-mode="none"'), { items: [] })
+
+      none.setItems(items)
+      expect(none.getSelectedValues()).toEqual([])
+    })
+
     it('should not take a disabled item into the selection on setItems', () => {
       const el = setEmptyMarkup(' data-coreui-selection-mode="multiple"')
       const listBox = new ListBox(el, { items: [{ value: 'lettuce', label: 'Lettuce' }] })

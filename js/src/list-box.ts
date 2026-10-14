@@ -13,7 +13,15 @@ import {
 } from './util/list-navigation.js'
 import { getOptionValue, normalizeSearchText } from './util/option-tree.js'
 import { DefaultAllowlist, sanitizeByConfig, type SanitizerAllowList } from './util/sanitizer.js'
-import { getAriaPressed, getSelectionState, type SelectionState } from './util/selection-state.js'
+import {
+  getAriaPressed,
+  getSelectionLimit,
+  getSelectionState,
+  isSelectionLimitReached,
+  type SelectionMode,
+  type SelectionState,
+  toSelectionValues
+} from './util/selection-state.js'
 import {
   type CountLabel, defineJQueryPlugin, getElement, getNextActiveElement, getUID, jQueryDispatch, resolveCountLabel
 } from './util/index.js'
@@ -312,7 +320,7 @@ class ListBox extends BaseComponent {
     const next = [...new Set([...kept, ...marked])]
 
     this._anchor = null
-    this._selected = new Set(this._selectable(this._selectionFor(next)))
+    this._selected = new Set(this._selectable(toSelectionValues(next, this._config.selectionMode as SelectionMode)))
     this.update()
 
     if (previous.length !== this._selected.size || previous.some(value => !this._selected.has(value))) {
@@ -584,26 +592,16 @@ class ListBox extends BaseComponent {
 
   _initialSelection(): string[] {
     const { selected } = this._config
-    const configured = selected === null ? [] : (Array.isArray(selected) ? selected : [selected])
+    const configured = toSelectionValues(selected, SELECTION_MODE_MULTIPLE)
     const marked = this._flatItems().filter(item => item.selected).map(item => item.value)
 
-    return this._selectable(this._selectionFor([...new Set([...configured, ...marked])]))
+    return this._selectable(toSelectionValues([...new Set([...configured, ...marked])], this._config.selectionMode as SelectionMode))
   }
 
   _selectable(values: string[]): string[] {
     const disabled = new Set(this._allOptions().filter(option => this._isDisabled(option)).map(option => this._optionValue(option)))
 
     return values.filter(value => !disabled.has(value))
-  }
-
-  _selectionFor(values: string[]): string[] {
-    const { selectionMode } = this._config
-
-    if (selectionMode === SELECTION_MODE_NONE) {
-      return []
-    }
-
-    return selectionMode === SELECTION_MODE_SINGLE ? values.slice(0, 1) : values
   }
 
   _normalizeItems(items: ListBoxEntry[]): ListBoxEntry[] {
@@ -877,8 +875,7 @@ class ListBox extends BaseComponent {
   }
 
   _atLimit(): boolean {
-    const { selectionLimit, selectionMode } = this._config
-    return selectionMode === SELECTION_MODE_MULTIPLE && selectionLimit !== null && this._selected.size >= selectionLimit
+    return isSelectionLimitReached(this._selected.size, this._selectionLimit())
   }
 
   _reportLimit(): void {
@@ -895,12 +892,15 @@ class ListBox extends BaseComponent {
     })
   }
 
+  _selectionLimit(): number | null {
+    return getSelectionLimit(this._config.selectionMode === SELECTION_MODE_MULTIPLE, this._config.selectionLimit)
+  }
+
   _selectionState(): SelectionState {
-    const { selectionLimit, selectionMode } = this._config
     const options = this._navigableOptions()
     const selected = options.filter(option => this._selected.has(this._optionValue(option))).length
 
-    return getSelectionState(selected, options.length, selectionMode === SELECTION_MODE_MULTIPLE ? selectionLimit : null)
+    return getSelectionState(selected, options.length, this._selectionLimit())
   }
 
   _showSelectionState(element: HTMLElement, state: SelectionState): void {
