@@ -1811,7 +1811,7 @@ describe('MultiSelect', () => {
       // eslint-disable-next-line no-new
       new MultiSelect(selectEl, { multiple: false, required: true })
 
-      expect(selectEl.value).toBe('')
+      expect(selectEl.options[0].selected).toBeTrue()
       expect(selectEl.checkValidity()).toBeFalse()
     })
 
@@ -1820,6 +1820,13 @@ describe('MultiSelect', () => {
       const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { multiple: false })
 
       multiSelect.selectAll([])
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['b'])
+    })
+
+    it('should take the given value over the selected options of a multiple select', () => {
+      fixtureEl.innerHTML = '<select multiple><option value="a" selected>A</option><option value="b">B</option></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { value: ['b'] })
 
       expect(multiSelect.getValue().map(option => option.value)).toEqual(['b'])
     })
@@ -1857,7 +1864,7 @@ describe('MultiSelect', () => {
       multiSelect.selectAll([{ value: '2', text: 'Two' }])
       multiSelect.deselectAll()
 
-      expect(selectEl.value).toBe('')
+      expect(selectEl.options[0].selected).toBeTrue()
       expect(selectEl.checkValidity()).toBeFalse()
     })
 
@@ -2162,6 +2169,15 @@ describe('MultiSelect', () => {
   })
 
   describe('selectAll', () => {
+    it('should keep the first text of a value it is given twice', () => {
+      fixtureEl.innerHTML = '<select multiple></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'))
+
+      multiSelect.selectAll([{ value: 'x', text: 'First' }, { value: 'x', text: 'Second' }])
+
+      expect(multiSelect.getValue()).toEqual([{ value: 'x', text: 'First' }])
+    })
+
     it('should select all available options', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
@@ -2784,6 +2800,35 @@ describe('MultiSelect', () => {
       multiSelect._selectionCleanerElement.click()
 
       expect(multiSelect.getValue().map(option => option.value)).toEqual(['1'])
+    })
+
+    it('should leave the options of a disabled group out of the counter total', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), {
+        options: [
+          { label: 'G', disabled: true, options: [{ value: '1', text: 'One', selected: true }, { value: '3', text: 'Three' }] },
+          { value: '2', text: 'Two' }
+        ],
+        selectionType: 'counter',
+        selectedLabel: '{count}/{total}'
+      })
+
+      expect(multiSelect._selectionElement.textContent).toBe('1/2')
+    })
+
+    it('should send the selected option of a disabled group with the form no more than a disabled option', () => {
+      fixtureEl.innerHTML = '<form><select name="f"></select></form>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [
+          { label: 'G', disabled: true, options: [{ value: '1', text: 'One', selected: true }] },
+          { value: '2', text: 'Two', selected: true }
+        ]
+      })
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['1', '2'])
+      expect(selectEl.querySelector('option[value="1"]').disabled).toBeTrue()
+      expect(new FormData(fixtureEl.querySelector('form')).getAll('f')).toEqual(['2'])
     })
   })
 
@@ -5287,6 +5332,15 @@ describe('MultiSelect', () => {
   })
 
   describe('setConfig', () => {
+    it('should pick nothing when it turns an empty single select with a placeholder into a multiple one', () => {
+      fixtureEl.innerHTML = '<select><option value="" disabled selected>Choose</option><option value="a">A</option><option value="b">B</option></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { multiple: false })
+
+      multiSelect.setConfig({ multiple: true, value: null })
+
+      expect(multiSelect.getValue()).toEqual([])
+    })
+
     it('should update configuration and options', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
@@ -5629,6 +5683,32 @@ describe('MultiSelect', () => {
       })
     })
 
+    it('should mark the getValue() entry of a selected disabled option', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), {
+        options: [{
+          value: '1', text: 'One', selected: true, disabled: true
+        }]
+      })
+
+      expect(multiSelect.getValue()).toEqual([{ value: '1', text: 'One', disabled: true }])
+    })
+
+    it('should hold a value the markup lists twice once and report its removal', () => {
+      fixtureEl.innerHTML = '<select multiple><option value="a" selected>A</option><option value="b" selected>B</option><optgroup label="G"><option value="a" selected>A2</option></optgroup></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl)
+      const events = []
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['a', 'b'])
+
+      selectEl.addEventListener('change.coreui.multi-select', () => events.push('component'))
+      multiSelect._selectionElement.querySelector('[data-value="b"] .chip-remove').click()
+
+      expect(multiSelect.getValue().map(option => option.value)).toEqual(['a'])
+      expect(events).toEqual(['component'])
+    })
+
     it('should give getValue() objects with only a value and a text', () => {
       fixtureEl.innerHTML = '<select multiple><option value="a" selected>A</option></select>'
       const multiSelect = new MultiSelect(fixtureEl.querySelector('select'))
@@ -5698,6 +5778,7 @@ describe('MultiSelect', () => {
       multiSelect.setConfig({ value: [] })
 
       expect(multiSelect.getValue()).toEqual([])
+      expect(fixtureEl.querySelector('select').value).toBe('')
     })
   })
 

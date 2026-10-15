@@ -1057,11 +1057,13 @@ check, radio, carousel and toggler icons already work:
   `selectionLimit`; with options from the config it used to fall back to the
   options marked `selected`. A selected option that is disabled, also inside a
   disabled group, shows as a disabled chip and stays through the clear button,
-  `deselectAll()` and <kbd>Backspace</kbd>; the options of a disabled group are
-  disabled in the list as well. An empty single select selects its `value=""`
-  placeholder option, or none, instead of letting the browser fall back to the
-  first option, so the form never gets an option nobody picked, and a given
-  `value` wins over an option marked `selected` in the markup.
+  `deselectAll()` and <kbd>Backspace</kbd>; the options of a disabled group
+  are disabled in the list and in the native select as well, so, like any
+  disabled option, they are not sent with the form. An empty single select
+  selects its `value=""` placeholder option, or none, instead of letting the
+  browser fall back to the first option, so the form gets no option the
+  control does not show. A given `value` wins over options marked `selected`,
+  in the markup or in `options`; in a multiple select the two used to add up.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **Autocomplete's `search` takes only `'external'`, and global typing is
   `globalSearch`, on by default.** The array and the comma list are gone, so

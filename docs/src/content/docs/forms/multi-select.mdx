@@ -579,7 +579,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `invalid` | boolean | `false` | Deprecated alias of `validationState: 'invalid'`, ignored once `validationState` is set. |
 | `multiple` | boolean | `true` | It specifies that multiple options can be selected at once. |
 | `name` | string, null | `null` | Name of the native select the selection is submitted under. A `name` written on the `<select>` itself is honoured too, and this option wins over it. With neither the selection is not submitted with the form. |
-| `options` | boolean, array | `false` | List of option elements. |
+| `options` | boolean, array | `false` | List of option elements. A group with `disabled: true` disables every option in it. A selected disabled option stays selected and, like in a native select, is not sent with the form. |
 | `optionsGroupsSelectable` | boolean | `false` | When enabled (with `multiple`), each option group label becomes a tri-state button: clicking it toggles the group's visible options, and it reflects `none` / `all` / `indeterminate` based on the group's selected options. |
 | `optionsGroupsTemplate` | function, null | `null` | Custom template function for rendering option group labels. Receives the group object as parameter. |
 | `optionsMaxHeight` | number, string | `'auto'` | Sets `max-height` of options list.	 |
@@ -600,7 +600,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `selectionType` | string | `'tags'` | Sets the selection style: `'chips'`, `'counter'`, `'tags'` or `'text'`. Selections render as [Chip](/components/chip/) components — `'tags'` and `'chips'` are the same thing, kept as synonyms. |
 | `valid` | boolean | `false` | Deprecated alias of `validationState: 'valid'`, ignored once `validationState` is set. |
 | `validationState` | string, null | `null` | The validation state the control shows: `'valid'`, `'invalid'` or a state of `$form-validation-states`. `'invalid'` also blocks the submit. The next change of the selection by the user clears it, see [Validation](#validation). |
-| `value` | string, number, array, null | `null` | Sets the initially selected values for the multi-select component; a string may list several values separated by commas. |
+| `value` | string, number, array, null | `null` | Sets the initially selected values for the multi-select component; a string may list several values separated by commas. Given values win over options marked `selected`, in the markup or in `options`. An empty single select selects its `value=""` placeholder option, or no option, never the first one. |
 
 ### Methods
 
