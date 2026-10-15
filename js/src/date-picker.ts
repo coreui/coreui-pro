@@ -334,7 +334,7 @@ class DatePicker extends PickerBase {
       ...this._config.inputOptions,
       validationState: null
     }))
-    this._input._setOwnerDismiss((serial: number) => this._dismissValidationState(serial))
+    this._validation.adopt(this._input._validation)
 
     EventHandler.on(inputEl, DateInput.eventName(DateInput.CHANGE_EVENT_NAME), (event: any) => {
       this._onFieldChange(event.date)
@@ -365,10 +365,6 @@ class DatePicker extends PickerBase {
 
   override _isNowSelectable(): boolean {
     return this._input.isDateSelectable(new Date())
-  }
-
-  override _setFieldState(givenState: ValidationState | undefined): void {
-    this._input._setOwnerState(givenState)
   }
 
   override _popupLabel(): string {
@@ -455,7 +451,7 @@ class DatePicker extends PickerBase {
     this._source = source
 
     try {
-      this._withUser(this._input, () => this._input.setConfig({ date }))
+      this._input.setConfig({ date })
     } finally {
       this._source = previous
     }

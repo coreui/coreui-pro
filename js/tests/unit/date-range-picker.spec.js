@@ -879,6 +879,55 @@ describe('DateRangePicker', () => {
       expect(sectionStates()).toEqual(Array.from({ length: 6 }, () => ['true', feedback.id]))
     })
 
+    it('should show the order error on the picker element when only the start moves past the end', () => {
+      const picker = buildPicker({ endDate: new Date(2026, 6, 20), locale: 'en-US', startDate: new Date(2026, 6, 14) })
+      const element = fixtureEl.querySelector('#picker')
+
+      picker.setRange(new Date(2026, 6, 25), new Date(2026, 6, 20))
+
+      expect(element).toHaveClass('is-invalid')
+    })
+
+    it('should show the order error on the picker element when only the end moves before the start', () => {
+      const picker = buildPicker({ endDate: new Date(2026, 6, 20), locale: 'en-US', startDate: new Date(2026, 6, 14) })
+
+      picker.setRange(new Date(2026, 6, 14), new Date(2026, 6, 10))
+
+      expect(fixtureEl.querySelector('#picker')).toHaveClass('is-invalid')
+    })
+
+    it('should show the limit error of an end on the picker element and take it off once the user clears it', () => {
+      buildPicker({
+        endDate: new Date(2026, 6, 20), locale: 'en-US', maxDate: new Date(2026, 6, 25), startDate: new Date(2026, 6, 14)
+      })
+      const element = fixtureEl.querySelector('#picker')
+      const year = [...fixtureEl.querySelectorAll('[data-coreui-range-end] .form-date-time-section')].at(-1)
+      const press = key => year.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }))
+
+      year.focus()
+      press('ArrowUp')
+
+      expect(element).toHaveClass('is-invalid')
+
+      press('Backspace')
+
+      expect(element).not.toHaveClass('is-invalid')
+    })
+
+    it('should show the limit error of an end that keeps its date on the picker element, and take it off with the cleaner', () => {
+      const picker = buildPicker({ locale: 'en-US', maxDate: new Date(2026, 6, 25) })
+      const element = fixtureEl.querySelector('#picker')
+
+      picker.setRange(null, new Date(2026, 6, 30))
+
+      expect(picker.getEndDate()).toBeNull()
+      expect(element).toHaveClass('is-invalid')
+
+      fixtureEl.querySelector('.form-control-cleaner').click()
+
+      expect(element).not.toHaveClass('is-invalid')
+    })
+
     it('should show the order error on the picker element over a given valid state', () => {
       const picker = buildPicker({
         endDate: new Date(2026, 6, 20), locale: 'en-US', startDate: new Date(2026, 6, 14), validationState: 'valid'
@@ -990,6 +1039,61 @@ describe('DateRangePicker', () => {
         expect(fixtureEl.querySelector('.form-date-range')).not.toHaveClass('is-invalid')
         picker.dispose()
       }
+    })
+
+    it.each([
+      ['drop the given state through a native form reset', false],
+      ['keep the given state when a reset listener cancels the reset', true]
+    ])('should %s', async (_, cancel) => {
+      buildPicker({ endDate: new Date(2026, 6, 20), locale: 'en-US', startDate: new Date(2026, 6, 14) }, '<form><div id="picker" class="is-invalid"></div></form>')
+      const form = fixtureEl.querySelector('form')
+
+      form.addEventListener('reset', event => {
+        if (cancel) {
+          event.preventDefault()
+        }
+      })
+      form.reset()
+      await new Promise(resolve => {
+        setTimeout(resolve, 20)
+      })
+
+      expect(fixtureEl.querySelector('#picker').classList.contains('is-invalid')).toEqual(cancel)
+      expect(fixtureEl.querySelector('.form-date-range').classList.contains('is-invalid')).toEqual(cancel)
+      expect(form.checkValidity()).toEqual(!cancel)
+    })
+
+    it('should show the restored order to the date change listeners of a native reset', async () => {
+      const picker = buildPicker({ endDate: new Date(2026, 6, 20), locale: 'en-US', startDate: new Date(2026, 6, 14) }, '<form><div id="picker"></div></form>')
+      const element = fixtureEl.querySelector('#picker')
+      const seen = []
+
+      picker.setRange(new Date(2026, 6, 14), new Date(2026, 6, 10))
+
+      expect(element).toHaveClass('is-invalid')
+
+      element.addEventListener('endDateChange.coreui.date-range-picker', () => {
+        seen.push([element.classList.contains('is-invalid'), sectionStates().some(([ariaInvalid]) => ariaInvalid === 'true')])
+      })
+      fixtureEl.querySelector('form').reset()
+      await new Promise(resolve => {
+        setTimeout(resolve, 20)
+      })
+
+      expect(seen).toEqual([[false, false]])
+    })
+
+    it('should keep a state the page gives the picker after a native reset started', async () => {
+      const picker = buildPicker({ endDate: new Date(2026, 6, 20), locale: 'en-US', startDate: new Date(2026, 6, 14) }, '<form><div id="picker" class="is-valid"></div></form>')
+
+      fixtureEl.querySelector('form').reset()
+      picker.setConfig({ validationState: 'invalid' })
+      await new Promise(resolve => {
+        setTimeout(resolve, 20)
+      })
+
+      expect(fixtureEl.querySelector('#picker')).toHaveClass('is-invalid')
+      expect(fixtureEl.querySelector('form').checkValidity()).toBeFalse()
     })
 
     it('should change the state through setConfig and keep it through changes made by code', () => {

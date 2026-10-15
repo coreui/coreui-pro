@@ -214,18 +214,18 @@ class DateRangePicker extends PickerBase {
   }
 
   setRange(startDate: Date | null, endDate: Date | null): void {
-    this._withUser(this._rangeInput, () => this._rangeInput.setRange(startDate, endDate))
+    this._rangeInput.setRange(startDate, endDate)
     this._showRange()
     this._setSelectEndDate(false)
   }
 
   clear(): void {
-    this._withUser(this._rangeInput, () => this._rangeInput.clear())
+    this._rangeInput.clear()
     this._setSelectEndDate(false)
   }
 
   reset(): void {
-    this._withUser(this._rangeInput, () => this._rangeInput.reset())
+    this._rangeInput.reset()
     this._showRange()
     this._setSelectEndDate(false)
   }
@@ -324,10 +324,9 @@ class DateRangePicker extends PickerBase {
       validationState: null,
       ...(format ? { format } : {})
     }, { inputOptions: this._config.inputOptions }))
-    this._rangeInput._setOwnerDismiss((serial: number) => this._dismissValidationState(serial))
+    this._validation.adopt(this._rangeInput._validation)
 
     EventHandler.on(inputGroup, DateRangeInput.eventName('startDateChange'), (event: any) => {
-      this._syncRangeState()
       this._nameToggle()
       this._syncPickMessages()
 
@@ -339,7 +338,6 @@ class DateRangePicker extends PickerBase {
     })
 
     EventHandler.on(inputGroup, DateRangeInput.eventName('endDateChange'), (event: any) => {
-      this._syncRangeState()
       this._nameToggle()
 
       if (this._calendar && !isSameDateAs(this._calendar._endDate, event.date)) {
@@ -404,11 +402,11 @@ class DateRangePicker extends PickerBase {
     })
 
     EventHandler.on(this._calendar._element, 'startDateChange.coreui.calendar', event => {
-      this._rangeInput._runAsUser(() => this._rangeInput.setRange(event.dateObject, this.getEndDate()))
+      this._runAsUser(() => this._rangeInput.setRange(event.dateObject, this.getEndDate()))
     })
 
     EventHandler.on(this._calendar._element, 'endDateChange.coreui.calendar', event => {
-      this._rangeInput._runAsUser(() => this._rangeInput.setRange(this.getStartDate(), event.dateObject))
+      this._runAsUser(() => this._rangeInput.setRange(this.getStartDate(), event.dateObject))
 
       if (this.getEndDate() && this.getStartDate() && !this._footerTemplate) {
         this.hide()
@@ -458,21 +456,8 @@ class DateRangePicker extends PickerBase {
     return this._rangeInput.isDateSelectable(new Date())
   }
 
-  override _setFieldState(givenState: ValidationState | undefined): void {
-    this._rangeInput._setOwnerState(givenState)
-  }
-
-  override _shownStateClass(): string | null {
-    const { _endInput: end, _startInput: start } = this._rangeInput
-    const state = !this._rangeInput.isRangeValid() || start._rejected || end._rejected ? 'invalid' : this._givenState
-
-    return state ? `is-${state}` : null
-  }
-
-  _syncRangeState(): void {
-    if (this._syncStateClass()) {
-      this._rangeInput._updateValidity()
-    }
+  override _stateFrames(): Element[] {
+    return [this._element]
   }
 
   // Static
