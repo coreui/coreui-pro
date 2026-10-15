@@ -251,6 +251,7 @@ class MultiSelect extends ComboboxBase {
   protected declare _hostOptions: ChildNode[]
   protected declare _initialSelection: any[]
   protected declare _loading: boolean
+  protected declare _offListOptions: HTMLOptionElement[]
   protected declare _validation: FieldValidation
   protected declare _indicatorElement: any
   protected declare _selectAllElement: any
@@ -304,6 +305,7 @@ class MultiSelect extends ComboboxBase {
     this._anchoredPosition = null
     this._search = ''
     this._loading = false
+    this._offListOptions = []
 
     if (this._config.options.length > 0) {
       this._createNativeOptions(this._element, this._options)
@@ -438,7 +440,10 @@ class MultiSelect extends ComboboxBase {
   override dispose(): void {
     this._validation.dispose()
     this._destroySelect()
-    this._element.replaceChildren(...this._hostOptions)
+
+    if (this._element.firstChild !== this._hostOptions[0]) {
+      this._element.replaceChildren(...this._hostOptions)
+    }
 
     for (const [name, value] of this._hostAttributes) {
       writeAttribute(this._element, name, value)
@@ -465,12 +470,17 @@ class MultiSelect extends ComboboxBase {
   }
 
   setOptions(options: any[]): void {
+    if (!this._config) {
+      return
+    }
+
     const hadFocus = containsFocus(this._menu)
-    const active = this._listBox?.getActive() ?? null
+    const active = this._listBox?.getActive()
     const previous = new Set(flattenOptions(this._options).map((option: any) => String(option.value)))
     const selected = this._selected
 
     this._config.options = options
+    this._config.value = null
     this._selected = []
     this._options = this._getOptionsFromConfig(options)
 
@@ -485,21 +495,20 @@ class MultiSelect extends ComboboxBase {
     this._filterOptionsList()
     this._commit(next)
 
-    if (!hadFocus || (containsFocus(this._menu) && isVisible((this._menu.getRootNode() as Document | ShadowRoot).activeElement))) {
+    const focused = (this._menu.getRootNode() as Document | ShadowRoot).activeElement
+
+    if (!hadFocus || (focused !== this._menu && containsFocus(this._menu) && isVisible(focused))) {
       return
     }
 
-    if (active !== null && getSelectableOptions(this._options).some((option: any) => String(option.value) === active)) {
-      this._listBox!.setActive(active)
-      this._listBox!.focusActive()
-    } else if (this._searchElement) {
-      this._searchElement.focus()
-    } else {
-      this._listBox!.focusActive()
+    const items = this._getDisplayedItems()
+    const target = items.find(item => item.dataset.coreuiValue === active) ?? (this._config.search ? null : items[0])
 
-      if (!containsFocus(this._menu)) {
-        this._menu.focus()
-      }
+    if (target) {
+      this._listBox!.setActive(target.dataset.coreuiValue!)
+      this._listBox!.focusActive()
+    } else {
+      (this._config.search ? this._searchElement : this._menu).focus()
     }
   }
 
@@ -651,10 +660,7 @@ class MultiSelect extends ComboboxBase {
 
           if (stop?.dataset.coreuiValue) {
             event.preventDefault()
-
-            if (!this._loading) {
-              this._listBox?.toggle(stop.dataset.coreuiValue)
-            }
+            this._listBox?.toggle(stop.dataset.coreuiValue)
           }
 
           return
@@ -1173,6 +1179,7 @@ class MultiSelect extends ComboboxBase {
     }
 
     const chips = new Map<string, HTMLElement>()
+    let focused: string | undefined
 
     for (const chip of SelectorEngine.children(selection, SELECTOR_CHIP) as HTMLElement[]) {
       const option = this._selected.find((selected: any) => selected.value === chip.dataset.value)
@@ -1180,6 +1187,10 @@ class MultiSelect extends ComboboxBase {
       if (option && chip.firstChild?.textContent === option.text && Boolean(SelectorEngine.findOne(SELECTOR_CHIP_REMOVE, chip)) === (!this._config.disabled && option.disabled !== true)) {
         chips.set(option.value, chip)
         continue
+      }
+
+      if (containsFocus(chip)) {
+        focused = chip.dataset.value
       }
 
       Chip.getInstance(chip)?.dispose()
@@ -1199,11 +1210,20 @@ class MultiSelect extends ComboboxBase {
         }
       }
 
+      if (option.value === focused) {
+        chip.focus()
+      }
+
       next = chip
     }
   }
 
   override _onSelectionChange(): void {
+    if (this._loading) {
+      this._render()
+      return
+    }
+
     const proposed = this._listBox!.getSelectedValues()
     const listed = new Set(flattenOptions(this._options).map((option: any) => String(option.value)))
     const kept = this._config.multiple ?
@@ -1361,21 +1381,14 @@ class MultiSelect extends ComboboxBase {
   }
 
   _syncNativeSelection(options: Map<string, any>): void {
-    for (const option of SelectorEngine.find('option[hidden]', this._element) as HTMLOptionElement[]) {
-      if (!options.has(option.value)) {
-        option.remove()
-      }
+    for (const option of this._offListOptions) {
+      option.remove()
     }
 
-    for (const option of this._selected) {
-      if (!options.has(option.value)) {
-        const native = new Option(option.text, option.value)
-
-        native.hidden = true
-        native.disabled = option.disabled === true
-        this._element.append(native)
-      }
-    }
+    this._offListOptions = this._selected
+      .filter((option: any) => !options.has(option.value))
+      .map((option: any) => Object.assign(new Option(option.text, option.value), { disabled: option.disabled === true, hidden: true }))
+    this._element.append(...this._offListOptions)
 
     if (!this._config.multiple) {
       (this._element as HTMLSelectElement).value = this._selected[0]?.value ?? ''

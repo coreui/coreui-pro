@@ -5916,6 +5916,7 @@ describe('MultiSelect', () => {
       multiSelect.setLoading(true)
 
       expect(multiSelect._menu.querySelector('[role="listbox"]').getAttribute('aria-busy')).toBe('true')
+      expect(multiSelect._menu.querySelector('.list-box').classList.contains('loading')).toBeTrue()
 
       multiSelect.setLoading(false)
 
@@ -6245,6 +6246,134 @@ describe('MultiSelect', () => {
       multiSelect.setConfig({ placeholder: 'Search' })
 
       expect(multiSelect._menu.querySelector('[role="listbox"]').getAttribute('aria-busy')).toBe('true')
+    })
+
+    it('should give the focus to the panel when the select all button it held goes without a search field', () => {
+      fixtureEl.innerHTML = '<select multiple><option value="a">Angular</option></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'))
+
+      multiSelect.show()
+      multiSelect._selectAllElement.focus()
+      multiSelect.setOptions([])
+
+      expect(document.activeElement).toBe(multiSelect._menu)
+    })
+
+    it('should give the focus to the first option after setConfig takes the search field away', () => {
+      fixtureEl.innerHTML = '<select multiple><option value="a">Angular</option></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { search: true })
+
+      multiSelect.setConfig({ search: false })
+      multiSelect.show()
+      multiSelect._menu.querySelector('[data-coreui-value="a"]').focus()
+      multiSelect.setOptions([{ value: 'v', text: 'Vue.js' }])
+
+      expect(document.activeElement).toBe(multiSelect._menu.querySelector('[data-coreui-value="v"]'))
+    })
+
+    it('should give the focus to the first option once options reach a panel holding it', () => {
+      fixtureEl.innerHTML = '<select multiple></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { options: [] })
+
+      multiSelect.show()
+      multiSelect._menu.focus()
+      multiSelect.setOptions([{ value: 'v', text: 'Vue.js' }])
+
+      expect(document.activeElement).toBe(multiSelect._menu.querySelector('[data-coreui-value="v"]'))
+    })
+
+    it('should give the focus to the search field when the query hides the option that survives', async () => {
+      fixtureEl.innerHTML = '<select multiple><option value="a">Angular</option><option value="r">React</option></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { search: true })
+
+      multiSelect.show()
+      await userEvent.keyboard('ang')
+      multiSelect._menu.querySelector('[data-coreui-value="a"]').focus()
+      multiSelect.setOptions([{ value: 'a', text: 'NG' }, { value: 'r', text: 'React' }])
+
+      expect(document.activeElement).toBe(multiSelect._searchElement)
+    })
+
+    it('should keep the focus on a chip whose label changes', () => {
+      const multiSelect = mountExternal('<select multiple name="tech"><option value="a" selected>Angular</option></select>')
+
+      multiSelect._selectionElement.querySelector('.chip').focus()
+      multiSelect.setOptions([{ value: 'a', text: 'Angular (LTS)' }])
+
+      expect(document.activeElement).toBe(multiSelect._selectionElement.querySelector('.chip'))
+    })
+
+    it('should leave a hidden option of the page in the native select', () => {
+      fixtureEl.innerHTML = '<form><select name="s"><option value="" hidden>Pick</option><option value="a">A</option></select></form>'
+      const select = fixtureEl.querySelector('select')
+
+      // eslint-disable-next-line no-new
+      new MultiSelect(select, { multiple: false })
+
+      expect(select.querySelector('option[value=""]')).not.toBeNull()
+    })
+
+    it('should leave the native select of an instance it never rebuilt as it is on dispose', () => {
+      fixtureEl.innerHTML = '<select name="s"><option value="a">A</option><option value="b">B</option></select>'
+      const select = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(select, { multiple: false })
+
+      multiSelect.deselectAll()
+      multiSelect.dispose()
+
+      expect(select.value).toBe('')
+    })
+
+    it('should not bring back the initial value when resetSelectionOnOptionsChange takes new options', () => {
+      fixtureEl.innerHTML = '<select multiple></select>'
+      const poland = [{ value: 'waw', text: 'Warsaw' }, { value: 'krk', text: 'Krakow' }]
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { options: poland, resetSelectionOnOptionsChange: true, value: ['waw'] })
+
+      multiSelect.deselectAll()
+      multiSelect.setOptions([{ value: 'ber', text: 'Berlin' }])
+      multiSelect.setOptions(poland)
+
+      expect(multiSelect.getValue()).toEqual([])
+    })
+
+    it('should reset when the new options carry only some of the values', () => {
+      fixtureEl.innerHTML = '<select multiple><option value="waw" selected>Warsaw</option><option value="krk">Krakow</option></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), { resetSelectionOnOptionsChange: true })
+
+      multiSelect.setOptions([{ value: 'waw', text: 'Warsaw' }])
+
+      expect(multiSelect.getValue()).toEqual([])
+    })
+
+    it('should do nothing when options arrive after dispose', () => {
+      const multiSelect = mountExternal()
+
+      multiSelect.dispose()
+
+      expect(() => multiSelect.setOptions([])).not.toThrow()
+    })
+
+    it('should not pick an option from the keyboard while the list loads', async () => {
+      const multiSelect = mountExternal()
+
+      multiSelect.show()
+      multiSelect.setLoading(true)
+      multiSelect._menu.querySelector('[data-coreui-value="a"]').focus()
+      await userEvent.keyboard(' ')
+
+      expect(multiSelect.getValue()).toEqual([])
+      expect(multiSelect._menu.querySelector('[data-coreui-value="a"]').getAttribute('aria-selected')).toBe('false')
+    })
+
+    it('should report the search text as typed, once per change', () => {
+      const multiSelect = mountExternal()
+      const queries = []
+
+      fixtureEl.querySelector('select').addEventListener('search.coreui.multi-select', event => queries.push(event.query))
+      multiSelect.search('Vue')
+      multiSelect.search('Vue')
+
+      expect(queries).toEqual(['Vue'])
     })
 
     it('should deselect only the listed options when select all is pressed again', () => {
@@ -7435,7 +7564,7 @@ describe('MultiSelect', () => {
     })
   })
 
-  describe('search with keyup event handler', () => {
+  describe('search with input event handler', () => {
     it('should filter options on input in the search box', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')

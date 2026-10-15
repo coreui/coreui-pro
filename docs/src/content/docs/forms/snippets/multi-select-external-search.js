@@ -4,22 +4,33 @@ const multiSelect = new coreui.MultiSelect(element, {
   search: 'external'
 })
 
+let latest = 0
+
 const loadUsers = async (query = '') => {
+  latest += 1
+  const request = latest
   multiSelect.setLoading(true)
 
   try {
-    const response = await fetch(`https://apitest.coreui.io/demos/users?first_name=${query}&limit=10`)
+    const response = await fetch(`https://apitest.coreui.io/demos/users?first_name=${encodeURIComponent(query)}&limit=10`)
     const { records } = await response.json()
 
-    multiSelect.setOptions(records.map(user => ({
-      value: String(user.id),
-      text: `${user.first_name} ${user.last_name}`
-    })))
+    if (request === latest) {
+      multiSelect.setOptions(records.map(user => ({
+        value: String(user.id),
+        text: `${user.first_name} ${user.last_name}`
+      })))
+    }
   } catch (error) {
     console.error('Error fetching users:', error)
-    multiSelect.setOptions([])
+
+    if (request === latest) {
+      multiSelect.setOptions([])
+    }
   } finally {
-    multiSelect.setLoading(false)
+    if (request === latest) {
+      multiSelect.setLoading(false)
+    }
   }
 }
 

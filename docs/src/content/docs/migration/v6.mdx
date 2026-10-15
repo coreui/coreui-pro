@@ -1047,14 +1047,18 @@ check, radio, carousel and toggler icons already work:
   nothing, `search.coreui.multi-select` carries the `query`, and
   `setOptions()` replaces the options without rebuilding the control or
   touching the selection; a selected value the new options lack keeps its
-  chip and is still sent with the form. `setLoading()` dims the list
+  chip and is still sent with the form, unless it is disabled. `setLoading()` dims the list
   meanwhile. `resetSelectionOnOptionsChange` empties the selection when the new
   options carry different values, for options that depend on another field.
 - **Multi Select's `search.coreui.multi-select` follows the text, not the
   keys.** It fires when the text of the search box changes, a paste included,
   and no longer on a key that leaves the text alone, such as an arrow, or when
-  the panel opens or closes over an empty box. `dispose()` gives the native
-  select back the options it had before the component started.
+  the panel opens or closes over an empty box.
+- **Multi Select's `dispose()` gives the native select back the options it had
+  before the component started.** A select built from `options` in the config,
+  or one whose options `setConfig()` or `setOptions()` replaced, used to keep
+  the generated options; an empty `<select>` given `options` is empty again
+  after `dispose()`.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **Multi Select sends one `change.coreui.multi-select` per change of the
   selection.** The clear button, `deselectAll()`, `selectAll()` and a pick
